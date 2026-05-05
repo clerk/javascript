@@ -1,6 +1,7 @@
-## Running the Playground 
+## Running the Playground
 
 Standard:
+
 ```bash
 pnpm dev
 ```
@@ -17,31 +18,14 @@ Clerk is a developer-first authentication and user management solution. It provi
 
 After following the quickstart you'll have learned how to:
 
-- Scaffold a new application using the Plasmo framework
-- Install `@clerk/chrome-extension`
-- Set your environment variables
-- Add `<ClerkProvider>` to your application
-- Create a header with Clerk components for users to sign in and out
-- Configure a consistent CRX key
-- Load your Chrome Extension into your Chromium-based browser
-- Test your Chrome Extension
-
-
-## Connect with development package
-
-Run the development server:
-```bash
-> cd playground/browser-extension
-> n 18.17
-> npm i
-> npm run dev
-```
-
-In a separate terminal, build and publish the development package to your local registry:
-```bash
-> cd packages/chrome-extension
-> pnpm build && pnpm publish:local
-```
+* Scaffold a new application using the Plasmo framework
+* Install `@clerk/chrome-extension`
+* Set your environment variables
+* Add `<ClerkProvider>` to your application
+* Create a header with Clerk components for users to sign in and out
+* Configure a consistent CRX key
+* Load your Chrome Extension into your Chromium-based browser
+* Test your Chrome Extension
 
 ## Running the template
 
@@ -51,9 +35,9 @@ git clone https://github.com/clerkinc/clerk-chrome-extension-quickstart
 
 To run the example locally, you need to:
 
-1. Sign up for a Clerk account at [https://clerk.com](https://dashboard.clerk.com/sign-up?utm_source=readme&utm_medium=owned&utm_campaign=chrome-extension&utm_content=10-24-2023&utm_term=clerk-chrome-extension-quickstart).
+1. Sign up for a Clerk account at [https://clerk.com](https://dashboard.clerk.com/sign-up?utm_source=readme\&utm_medium=owned\&utm_campaign=chrome-extension\&utm_content=10-24-2023\&utm_term=clerk-chrome-extension-quickstart).
 
-2. Go to the [Clerk dashboard](https://dashboard.clerk.com?utm_source=readme&utm_medium=owned&utm_campaign=chrome-extension&utm_content=10-24-2023&utm_term=clerk-chrome-extension-quickstart) and create an application.
+2. Go to the [Clerk dashboard](https://dashboard.clerk.com?utm_source=readme\&utm_medium=owned\&utm_campaign=chrome-extension\&utm_content=10-24-2023\&utm_term=clerk-chrome-extension-quickstart) and create an application.
 
 3. Set the required Clerk environment variables as shown in [the example `.env.development` file](./.env.development.example).
 
@@ -61,18 +45,19 @@ To run the example locally, you need to:
 
 5. Set the public key are shown in [the example `.env.chrome` file](./.env.chrome.example).
 
-5. `pnpm install` the required dependencies.
+6. `pnpm install` the required dependencies.
 
-6. `pnpm dev` to launch the development server.
+7. `pnpm dev` to launch the development server.
 
 ## Learn more
 
 To learn more about Clerk and Chrome Extensions, check out the following resources:
 
-- [Quickstart: Get started with Chrome Extensions and Clerk](https://clerk.com/docs/quickstarts/chrome-extension?utm_source=readme&utm_medium=owned&utm_campaign=chrome-extension&utm_content=10-24-2023&utm_term=clerk-chrome-extension-quickstart)
+* [Quickstart: Get started with Chrome Extensions and Clerk](https://clerk.com/docs/quickstarts/chrome-extension?utm_source=readme\&utm_medium=owned\&utm_campaign=chrome-extension\&utm_content=10-24-2023\&utm_term=clerk-chrome-extension-quickstart)
 
-- [Clerk Documentation](https://clerk.com/docs?utm_source=readme&utm_medium=owned&utm_campaign=chrome-extension&utm_content=10-24-2023&utm_term=clerk-chrome-extension-quickstart)
-- [Chrome Extensions](https://developer.chrome.com/docs/extensions)
+* [Clerk Documentation](https://clerk.com/docs?utm_source=readme\&utm_medium=owned\&utm_campaign=chrome-extension\&utm_content=10-24-2023\&utm_term=clerk-chrome-extension-quickstart)
+
+* [Chrome Extensions](https://developer.chrome.com/docs/extensions)
 
 ## Found an issue or want to leave feedback
 

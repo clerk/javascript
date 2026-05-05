@@ -42,6 +42,9 @@ export default function Home() {
           <li>
             <Link href='/sign-in'>Sign In</Link>
           </li>
+          <li>
+            <Link href='/dynamic-route/test-123'>Dynamic Route</Link>
+          </li>
         </ul>
       </nav>
     </main>

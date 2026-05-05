@@ -49,7 +49,7 @@ export const OrganizationListPage = withCardStateProvider(() => {
 
   return (
     <Card.Root>
-      <Card.Content sx={t => ({ padding: `${t.space.$8} ${t.space.$none} ${t.space.$none}` })}>
+      <Card.Content sx={t => ({ padding: `${t.space.$4} ${t.space.$none} ${t.space.$none}` })}>
         {isLoading && (
           <Flex
             direction={'row'}
@@ -137,8 +137,9 @@ export const OrganizationListPageList = (props: { onCreateOrganizationClick: () 
     <>
       <Header.Root
         sx={t => ({
-          padding: `${t.space.$none} ${t.space.$8}`,
+          padding: `${t.space.$4} ${t.space.$4} ${t.space.$none}`,
         })}
+        showLogo
       >
         <Header.Title
           localizationKey={localizationKeys(

@@ -71,11 +71,15 @@ export default defineNuxtModule<ModuleOptions>({
           // prefetchUI config: can be false or undefined
           prefetchUI: options.prefetchUI,
           isSatellite: options.isSatellite,
+          // Listed explicitly so it can be overridden via NUXT_PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING.
+          unsafe_disableDevelopmentModeConsoleWarning: options.unsafe_disableDevelopmentModeConsoleWarning,
           // Backend specific variables that are safe to share.
           // We want them to be overridable like the other public keys (e.g NUXT_PUBLIC_CLERK_PROXY_URL)
           proxyUrl: options.proxyUrl,
-          apiUrl: 'https://api.clerk.com',
-          apiVersion: 'v1',
+          // Deprecated: use NUXT_CLERK_API_URL and NUXT_CLERK_API_VERSION instead.
+          // Kept for backwards compatibility with NUXT_PUBLIC_CLERK_API_URL / NUXT_PUBLIC_CLERK_API_VERSION.
+          apiUrl: undefined,
+          apiVersion: undefined,
         },
       },
       // Private keys available only on within server-side
@@ -84,6 +88,8 @@ export default defineNuxtModule<ModuleOptions>({
         machineSecretKey: undefined,
         jwtKey: undefined,
         webhookSigningSecret: undefined,
+        apiUrl: undefined,
+        apiVersion: undefined,
       },
     });
 
@@ -182,12 +188,31 @@ export default defineNuxtModule<ModuleOptions>({
       'RedirectToCreateOrganization',
       'Show',
       'Waitlist',
+      // API Keys
+      'APIKeys',
     ];
     otherComponents.forEach(component => {
       void addComponent({
         name: component,
         export: component,
         filePath: '@clerk/vue',
+      });
+    });
+
+    /**
+     * Experimental components from `@clerk/vue/experimental`.
+     * @experimental These components and their prop types are unstable and may change in future releases.
+     */
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+    const experimentalComponents: Array<keyof typeof import('@clerk/vue/experimental')> = [
+      // SSO
+      'ConfigureSSO',
+    ];
+    experimentalComponents.forEach(component => {
+      void addComponent({
+        name: component,
+        export: component,
+        filePath: '@clerk/vue/experimental',
       });
     });
   },

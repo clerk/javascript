@@ -1,8 +1,12 @@
 import { http, HttpResponse } from 'msw';
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { mockJwks, mockJwtPayload, mockM2MJwtPayload, signingJwks } from '../../fixtures';
+import { signJwt } from '../../jwt/signJwt';
 import { server, validateHeaders } from '../../mock-server';
+import { M2MTokenApi } from '../endpoints/M2MTokenApi';
 import { createBackendApiClient } from '../factory';
+import { buildRequest } from '../request';
 
 describe('M2MToken', () => {
   const m2mId = 'mt_1xxxxxxxxxxxxx';
@@ -109,6 +113,130 @@ describe('M2MToken', () => {
       expect(errResponse.errors[0].message).toBe(
         'The provided Machine Secret Key is invalid. Make sure that your Machine Secret Key is correct.',
       );
+    });
+
+    it('creates a jwt format m2m token', async () => {
+      const apiClient = createBackendApiClient({
+        apiUrl: 'https://api.clerk.test',
+        machineSecretKey: 'ak_xxxxx',
+      });
+
+      server.use(
+        http.post(
+          'https://api.clerk.test/m2m_tokens',
+          validateHeaders(async ({ request }) => {
+            expect(request.headers.get('Authorization')).toBe('Bearer ak_xxxxx');
+            const body = (await request.json()) as Record<string, unknown>;
+            expect(body.token_format).toBe('jwt');
+            return HttpResponse.json({
+              ...mockM2MToken,
+              token:
+                'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Imluc194eHh4eCJ9.eyJqdGkiOiJtdF94eHh4eCIsInN1YiI6Im1jaF94eHh4eCIsImF1ZCI6WyJtY2hfMXh4eHh4IiwibWNoXzJ4eHh4eCJdLCJzY29wZXMiOiJtY2hfMXh4eHh4IG1jaF8yeHh4eHgiLCJpYXQiOjE3NTM3NDMzMTYsImV4cCI6MTc1Mzc0NjkxNn0.signature',
+            });
+          }),
+        ),
+      );
+
+      const response = await apiClient.m2m.createToken({
+        tokenFormat: 'jwt',
+      });
+      expect(response.id).toBe(m2mId);
+      expect(response.token).toMatch(/^[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]+$/);
+      expect(response.scopes).toEqual(['mch_1xxxxxxxxxxxxx', 'mch_2xxxxxxxxxxxxx']);
+    });
+
+    it('creates a jwt m2m token with custom claims and scopes', async () => {
+      const apiClient = createBackendApiClient({
+        apiUrl: 'https://api.clerk.test',
+        machineSecretKey: 'ak_xxxxx',
+      });
+
+      const customClaims = {
+        role: 'service',
+        tier: 'gold',
+      };
+
+      server.use(
+        http.post(
+          'https://api.clerk.test/m2m_tokens',
+          validateHeaders(async ({ request }) => {
+            expect(request.headers.get('Authorization')).toBe('Bearer ak_xxxxx');
+            const body = (await request.json()) as Record<string, unknown>;
+            expect(body.token_format).toBe('jwt');
+            expect(body.claims).toEqual(customClaims);
+            return HttpResponse.json({
+              ...mockM2MToken,
+              claims: customClaims,
+              token:
+                'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Imluc194eHh4eCJ9.eyJqdGkiOiJtdF94eHh4eCIsInN1YiI6Im1jaF94eHh4eCIsImF1ZCI6WyJtY2hfMXh4eHh4IiwibWNoXzJ4eHh4eCJdLCJzY29wZXMiOiJtY2hfMXh4eHh4IG1jaF8yeHh4eHgiLCJyb2xlIjoic2VydmljZSIsInRpZXIiOiJnb2xkIiwiaWF0IjoxNzUzNzQzMzE2LCJleHAiOjE3NTM3NDY5MTZ9.signature',
+            });
+          }),
+        ),
+      );
+
+      const response = await apiClient.m2m.createToken({
+        tokenFormat: 'jwt',
+        claims: customClaims,
+      });
+
+      expect(response.id).toBe(m2mId);
+      expect(response.token).toMatch(/^[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]+$/);
+      expect(response.claims).toEqual(customClaims);
+      expect(response.scopes).toEqual(['mch_1xxxxxxxxxxxxx', 'mch_2xxxxxxxxxxxxx']);
+    });
+
+    it('creates an opaque format m2m token when explicitly specified', async () => {
+      const apiClient = createBackendApiClient({
+        apiUrl: 'https://api.clerk.test',
+        machineSecretKey: 'ak_xxxxx',
+      });
+
+      server.use(
+        http.post(
+          'https://api.clerk.test/m2m_tokens',
+          validateHeaders(async ({ request }) => {
+            expect(request.headers.get('Authorization')).toBe('Bearer ak_xxxxx');
+            const body = (await request.json()) as Record<string, unknown>;
+            expect(body.token_format).toBe('opaque');
+            return HttpResponse.json(mockM2MToken);
+          }),
+        ),
+      );
+
+      const response = await apiClient.m2m.createToken({
+        tokenFormat: 'opaque',
+      });
+
+      expect(response.id).toBe(m2mId);
+      expect(response.token).toBe(m2mSecret);
+      expect(response.token).toMatch(/^mt_.+$/);
+    });
+
+    it('creates an opaque m2m token by default when tokenFormat is omitted', async () => {
+      const apiClient = createBackendApiClient({
+        apiUrl: 'https://api.clerk.test',
+        machineSecretKey: 'ak_xxxxx',
+      });
+
+      server.use(
+        http.post(
+          'https://api.clerk.test/m2m_tokens',
+          validateHeaders(async ({ request }) => {
+            expect(request.headers.get('Authorization')).toBe('Bearer ak_xxxxx');
+            const body = (await request.json()) as Record<string, unknown>;
+            // tokenFormat defaults to 'opaque' when omitted
+            expect(body.token_format).toBe('opaque');
+            return HttpResponse.json(mockM2MToken);
+          }),
+        ),
+      );
+
+      const response = await apiClient.m2m.createToken({
+        secondsUntilExpiration: 3600,
+      });
+
+      expect(response.id).toBe(m2mId);
+      expect(response.token).toBe(m2mSecret);
     });
   });
 
@@ -283,6 +411,72 @@ describe('M2MToken', () => {
     });
   });
 
+  async function createSignedM2MJwt(payload = mockM2MJwtPayload) {
+    const { data } = await signJwt(payload, signingJwks, {
+      algorithm: 'RS256',
+      header: { typ: 'JWT', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD' },
+    });
+    return data!;
+  }
+
+  describe('verify — JWT format', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date(mockJwtPayload.iat * 1000));
+    });
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('verifies a JWT M2M token using secretKey (JWKS lookup)', async () => {
+      const m2mApi = new M2MTokenApi(
+        buildRequest({ apiUrl: 'https://api.clerk.test', skipApiVersionInUrl: true, requireSecretKey: false }),
+        { secretKey: 'sk_test_xxxxx', apiUrl: 'https://api.clerk.test', skipJwksCache: true },
+      );
+
+      server.use(
+        http.get(
+          'https://api.clerk.test/v1/jwks',
+          validateHeaders(() => HttpResponse.json(mockJwks)),
+        ),
+      );
+
+      const jwtToken = await createSignedM2MJwt();
+      const result = await m2mApi.verify({ token: jwtToken });
+
+      expect(result.id).toBe('mt_2xKa9Bgv7NxMRDFyQw8LpZ3cTmU1vHjE');
+      expect(result.subject).toBe('mch_2vYVtestTESTtestTESTtestTESTtest');
+      expect(result.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
+    });
+
+    it('throws when JWT signature cannot be verified', async () => {
+      const m2mApi = new M2MTokenApi(
+        buildRequest({ apiUrl: 'https://api.clerk.test', skipApiVersionInUrl: true, requireSecretKey: false }),
+        { secretKey: 'sk_test_xxxxx', apiUrl: 'https://api.clerk.test', skipJwksCache: true },
+      );
+
+      server.use(
+        http.get(
+          'https://api.clerk.test/v1/jwks',
+          validateHeaders(() => HttpResponse.json({ keys: [] })),
+        ),
+      );
+
+      const jwtToken = await createSignedM2MJwt();
+      await expect(m2mApi.verify({ token: jwtToken })).rejects.toThrow();
+    });
+
+    it('throws when no secretKey or jwtKey is provided', async () => {
+      const m2mApi = new M2MTokenApi(
+        buildRequest({ apiUrl: 'https://api.clerk.test', skipApiVersionInUrl: true, requireSecretKey: false }),
+        { apiUrl: 'https://api.clerk.test' },
+      );
+
+      const jwtToken = await createSignedM2MJwt();
+      await expect(m2mApi.verify({ token: jwtToken })).rejects.toThrow('Failed to resolve JWK during verification');
+    });
+  });
+
   describe('list', () => {
     const machineId = 'mch_1xxxxxxxxxxxxx';
     const mockM2MTokenList = {
@@ -429,6 +623,35 @@ describe('M2MToken', () => {
       });
 
       expect(response.data).toHaveLength(2);
+      expect(response.totalCount).toBe(2);
+    });
+
+    it('lists m2m tokens using machine secret key option', async () => {
+      const apiClient = createBackendApiClient({
+        apiUrl: 'https://api.clerk.test',
+      });
+
+      server.use(
+        http.get(
+          'https://api.clerk.test/m2m_tokens',
+          validateHeaders(({ request }) => {
+            expect(request.headers.get('Authorization')).toBe('Bearer ak_xxxxx');
+            const url = new URL(request.url);
+            expect(url.searchParams.get('subject')).toBe(machineId);
+            expect(url.searchParams.has('machineSecretKey')).toBe(false);
+            return HttpResponse.json(mockM2MTokenList);
+          }),
+        ),
+      );
+
+      const response = await apiClient.m2m.list({
+        machineSecretKey: 'ak_xxxxx',
+        subject: machineId,
+      });
+
+      expect(response.data).toHaveLength(2);
+      expect(response.data[0].id).toBe('mt_1xxxxxxxxxxxxx');
+      expect(response.data[1].id).toBe('mt_2xxxxxxxxxxxxx');
       expect(response.totalCount).toBe(2);
     });
 

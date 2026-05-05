@@ -11,5 +11,6 @@
     "sourceMap": false,
     "declarationDir": "./dist"
   },
-  "exclude": ["**/__tests__/**/*"]
+  "include": ["src"],
+  "exclude": ["**/__tests__/**/*", "app.plugin.js"]
 }

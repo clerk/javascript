@@ -38,7 +38,7 @@ export {
   getAuthObjectForAcceptedToken,
 } from './tokens/authObjects';
 
-export { AuthStatus } from './tokens/authStatus';
+export { AuthStatus, createBootstrapSignedOutState } from './tokens/authStatus';
 export type {
   RequestState,
   SignedInState,
@@ -56,10 +56,4 @@ export { reverificationError, reverificationErrorResponse } from '@clerk/shared/
 
 export { verifyMachineAuthToken } from './tokens/verify';
 
-export {
-  isMachineTokenByPrefix,
-  isMachineTokenType,
-  getMachineTokenType,
-  isTokenTypeAccepted,
-  isMachineToken,
-} from './tokens/machine';
+export { isMachineTokenByPrefix, isTokenTypeAccepted, isMachineToken } from './tokens/machine';

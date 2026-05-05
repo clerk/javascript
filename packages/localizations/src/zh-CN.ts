@@ -178,6 +178,11 @@ export const zhCN: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: '配置单点登录 (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: '创建组织',
     invitePage: {
@@ -1314,6 +1319,7 @@ export const zhCN: LocalizationResource = {
         title: '电子邮件地址',
       },
       enterpriseAccountsSection: {
+        primaryButton: '连接账户',
         title: '企业账户',
       },
       headerTitle__account: '账户',

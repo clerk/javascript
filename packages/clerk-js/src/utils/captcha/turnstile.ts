@@ -188,6 +188,10 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
              */
             if (retries < 2 && shouldRetryTurnstileErrorCode(errorCode.toString())) {
               setTimeout(() => {
+                if (widgetContainerQuerySelector && !document.querySelector(widgetContainerQuerySelector)) {
+                  reject([errorCodes.join(','), id]);
+                  return;
+                }
                 captcha.reset(id as string);
                 retries++;
               }, 250);

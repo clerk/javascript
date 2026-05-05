@@ -178,6 +178,11 @@ export const beBY: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'Налада адзінага ўваходу (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Стварыць арганізацыю',
     invitePage: {
@@ -1357,6 +1362,7 @@ export const beBY: LocalizationResource = {
         title: 'Адрасы электроннай пошты',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Падключыць уліковы запіс',
         title: 'Enterprise accounts',
       },
       headerTitle__account: 'Уліковы запіс',

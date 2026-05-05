@@ -7,6 +7,8 @@ export const usePathnameWithoutCatchAll = () => {
   const pathRef = React.useRef<string>();
 
   const { pagesRouter } = usePagesRouter();
+  const pathname = usePathname() ?? '';
+  const params = useParams();
 
   if (pagesRouter) {
     if (pathRef.current) {
@@ -24,14 +26,12 @@ export const usePathnameWithoutCatchAll = () => {
   // the filesystem route /user/[id]/profile/[[...rest]]/page.tsx
   // could give us the following pathname /user/123/profile/security
   // if the user navigates to the security section of the user profile
-  const pathname = usePathname() ?? '';
   const pathParts = pathname.split('/').filter(Boolean);
   // the useParams hook returns an object with all named and catch all params
   // for named params, the key in the returned object always contains a single value
   // for catch all params, the key in the returned object contains an array of values
   // we find the catch all params by checking if the value is an array
   // and then we remove one path part for each catch all param
-  const params = useParams();
   const catchAllParams = Object.values(params ?? {})
     .filter(v => Array.isArray(v))
     .flat(Infinity);

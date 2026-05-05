@@ -214,6 +214,115 @@ describe('AuthenticateContext', () => {
     });
   });
 
+  describe('relative proxyUrl resolution', () => {
+    it('resolves relative proxyUrl against forwarded origin', async () => {
+      const headers = new Headers({
+        'x-forwarded-proto': 'https',
+        'x-forwarded-host': 'myapp.example.com',
+      });
+      const clerkRequest = createClerkRequest(new Request('http://localhost:3000/path', { headers }));
+      const context = await createAuthenticateContext(clerkRequest, {
+        publishableKey: pkLive,
+        proxyUrl: '/__clerk',
+      });
+
+      // initPublishableKeyValues resolves it for parsePublishableKey (strips protocol)
+      expect(context.frontendApi).toBe('https://myapp.example.com/__clerk');
+      // post-Object.assign resolves this.proxyUrl
+      expect(context.proxyUrl).toBe('https://myapp.example.com/__clerk');
+    });
+
+    it('does not modify absolute proxyUrl', async () => {
+      const headers = new Headers({
+        'x-forwarded-proto': 'https',
+        'x-forwarded-host': 'myapp.example.com',
+      });
+      const clerkRequest = createClerkRequest(new Request('http://localhost:3000/path', { headers }));
+      const context = await createAuthenticateContext(clerkRequest, {
+        publishableKey: pkLive,
+        proxyUrl: 'https://custom.proxy.com/__clerk',
+      });
+
+      expect(context.frontendApi).toBe('https://custom.proxy.com/__clerk');
+      expect(context.proxyUrl).toBe('https://custom.proxy.com/__clerk');
+    });
+
+    it('resolves relative proxyUrl without forwarded headers using request origin', async () => {
+      const clerkRequest = createClerkRequest(new Request('http://localhost:3000/path'));
+      const context = await createAuthenticateContext(clerkRequest, {
+        publishableKey: pkLive,
+        proxyUrl: '/__clerk',
+      });
+
+      expect(context.proxyUrl).toBe('http://localhost:3000/__clerk');
+    });
+  });
+
+  describe('auto-proxy for eligible hosts', () => {
+    const originalEnv = process.env;
+
+    beforeEach(() => {
+      process.env = {
+        ...originalEnv,
+        VERCEL_TARGET_ENV: 'production',
+        VERCEL_PROJECT_PRODUCTION_URL: 'myapp-abc123.vercel.app',
+      };
+    });
+
+    afterEach(() => {
+      process.env = originalEnv;
+    });
+
+    it('auto-derives proxyUrl when Vercel env vars indicate production vercel.app', async () => {
+      const clerkRequest = createClerkRequest(new Request('https://myapp-abc123.vercel.app/dashboard'));
+      const context = await createAuthenticateContext(clerkRequest, {
+        publishableKey: pkLive,
+      });
+
+      expect(context.proxyUrl).toBe('https://myapp-abc123.vercel.app/__clerk');
+    });
+
+    it('does NOT auto-derive proxyUrl for development keys', async () => {
+      const clerkRequest = createClerkRequest(new Request('https://myapp-abc123.vercel.app/dashboard'));
+      const context = await createAuthenticateContext(clerkRequest, {
+        publishableKey: pkTest,
+      });
+
+      expect(context.proxyUrl).toBeUndefined();
+    });
+
+    it('does NOT auto-derive proxyUrl when Vercel env vars are absent', async () => {
+      delete process.env.VERCEL_TARGET_ENV;
+      delete process.env.VERCEL_PROJECT_PRODUCTION_URL;
+      const clerkRequest = createClerkRequest(new Request('https://myapp-abc123.vercel.app/dashboard'));
+      const context = await createAuthenticateContext(clerkRequest, {
+        publishableKey: pkLive,
+      });
+
+      expect(context.proxyUrl).toBeUndefined();
+    });
+
+    it('explicit proxyUrl takes precedence over auto-detection', async () => {
+      const clerkRequest = createClerkRequest(new Request('https://myapp-abc123.vercel.app/dashboard'));
+      const context = await createAuthenticateContext(clerkRequest, {
+        publishableKey: pkLive,
+        proxyUrl: 'https://custom-proxy.example.com/__clerk',
+      });
+
+      expect(context.proxyUrl).toBe('https://custom-proxy.example.com/__clerk');
+    });
+
+    it('explicit domain skips auto-detection', async () => {
+      const clerkRequest = createClerkRequest(new Request('https://myapp-abc123.vercel.app/dashboard'));
+      const context = await createAuthenticateContext(clerkRequest, {
+        publishableKey: pkLive,
+        domain: 'clerk.myapp.com',
+      });
+
+      expect(context.proxyUrl).toBeUndefined();
+    });
+  });
+
   // Added these tests to verify that the generated sha-1 is the same as the one used in cookie assignment
   // Tests copied from packages/shared/src/__tests__/keys.test.ts
   describe('getCookieSuffix(publishableKey, subtle)', () => {

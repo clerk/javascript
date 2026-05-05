@@ -178,6 +178,11 @@ export const teIN: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'సింగిల్ సైన్-ఆన్ (SSO) కాన్ఫిగర్ చేయండి',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'సంస్థను సృష్టించండి',
     invitePage: {
@@ -1361,6 +1366,7 @@ export const teIN: LocalizationResource = {
         title: 'ఇమెయిల్ చిరునామాలు',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'ఖాతాను కనెక్ట్ చేయండి',
         title: 'ఎంటర్‌ప్రైజ్ ఖాతాలు',
       },
       headerTitle__account: 'ప్రొఫైల్ వివరాలు',

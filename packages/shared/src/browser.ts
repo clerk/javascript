@@ -73,13 +73,18 @@ export function isBrowserOnline(): boolean {
     return false;
   }
 
-  const isNavigatorOnline = navigator?.onLine;
+  // Some environments (e.g. React Native) define a Navigator object but do not
+  // implement navigator.onLine as a boolean. Default to online in those cases.
+  if (typeof navigator.onLine !== 'boolean') {
+    return true;
+  }
 
-  // Being extra safe with the experimental `connection` property, as it is not defined in all browsers
-  // https://developer.mozilla.org/en-US/docs/Web/API/Navigator/connection#browser_compatibility
-  // @ts-ignore
-  const isExperimentalConnectionOnline = navigator?.connection?.rtt !== 0 && navigator?.connection?.downlink !== 0;
-  return isExperimentalConnectionOnline && isNavigatorOnline;
+  // navigator.onLine is the standard API and is reliable for detecting
+  // complete disconnection (airplane mode, WiFi off, etc.).
+  // The experimental navigator.connection API (rtt/downlink) was previously
+  // used as a secondary signal, but it reports zero values in headless browsers
+  // and CI environments even when connected, causing false offline detection.
+  return !!navigator.onLine;
 }
 
 /**

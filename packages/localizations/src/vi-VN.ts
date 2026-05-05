@@ -182,6 +182,11 @@ export const viVN: LocalizationResource = {
     viewPayment: undefined,
     year: 'Năm',
   },
+  configureSSO: {
+    navbar: {
+      title: 'Cấu hình đăng nhập một lần (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Tạo tổ chức',
     invitePage: {
@@ -1355,6 +1360,7 @@ export const viVN: LocalizationResource = {
         title: 'Địa chỉ email',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Kết nối tài khoản',
         title: 'Tài khoản doanh nghiệp',
       },
       headerTitle__account: 'Chi tiết hồ sơ',

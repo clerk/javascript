@@ -22,6 +22,6 @@ export default defineConfig({
     tailwind(),
   ],
   server: {
-    port: Number(process.env.PORT),
+    port: process.env.PORT ? Number(process.env.PORT) : undefined,
   },
 });

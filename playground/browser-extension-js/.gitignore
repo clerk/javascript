@@ -1,0 +1,7 @@
+node_modules/
+pnpm-lock.yaml
+build/*.js
+.env
+.yalc
+yalc.lock
+.npmrc

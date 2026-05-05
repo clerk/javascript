@@ -79,15 +79,13 @@ function useClerkSignal(
  * import { useSignIn } from "@clerk/react";
  *
  * function SignInForm() {
- *   const { signIn, errors, fetchStatus } = useSignInSignal();
+ *   const { signIn, errors, fetchStatus } = useSignIn();
  *   //
  * }
- *
- * @experimental This experimental API is subject to change.
  */
-export function useSignIn() {
+export const useSignIn = (): SignInSignalValue => {
   return useClerkSignal('signIn');
-}
+};
 
 /**
  * This hook allows you to access the Signal-based `SignUp` resource.
@@ -96,15 +94,13 @@ export function useSignIn() {
  * import { useSignUp } from "@clerk/react";
  *
  * function SignUpForm() {
- *   const { signUp, errors, fetchStatus } = useSignUpSignal();
+ *   const { signUp, errors, fetchStatus } = useSignUp();
  *   //
  * }
- *
- * @experimental This experimental API is subject to change.
  */
-export function useSignUp() {
+export const useSignUp = (): SignUpSignalValue => {
   return useClerkSignal('signUp');
-}
+};
 
 /**
  * This hook allows you to access the Signal-based `Waitlist` resource.
@@ -116,8 +112,6 @@ export function useSignUp() {
  *   const { waitlist, errors, fetchStatus } = useWaitlist();
  *   //
  * }
- *
- * @experimental This experimental API is subject to change.
  */
 export function useWaitlist() {
   return useClerkSignal('waitlist');

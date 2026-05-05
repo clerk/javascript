@@ -178,6 +178,11 @@ export const idID: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'Konfigurasi Single Sign-On (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Buat organisasi',
     invitePage: {
@@ -1348,6 +1353,7 @@ export const idID: LocalizationResource = {
         title: undefined,
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Hubungkan akun',
         title: undefined,
       },
       headerTitle__account: undefined,

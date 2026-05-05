@@ -184,6 +184,11 @@ export const itIT: LocalizationResource = {
     viewPayment: undefined,
     year: 'Anno',
   },
+  configureSSO: {
+    navbar: {
+      title: 'Configura Single Sign-On (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Crea organizzazione',
     invitePage: {
@@ -1359,6 +1364,7 @@ export const itIT: LocalizationResource = {
         title: 'Indirizzi email',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Collega account',
         title: 'Account aziendali',
       },
       headerTitle__account: 'Dettagli profilo',

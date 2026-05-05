@@ -178,6 +178,11 @@ export const srRS: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'Konfiguriši jedinstvenu prijavu (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Kreiraj organizaciju',
     invitePage: {
@@ -1345,6 +1350,7 @@ export const srRS: LocalizationResource = {
         title: 'E-mail adrese',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Poveži nalog',
         title: 'Korporativni nalozi',
       },
       headerTitle__account: 'Detalji profila',

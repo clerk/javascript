@@ -178,6 +178,11 @@ export const hiIN: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'सिंगल साइन-ऑन (SSO) कॉन्फ़िगर करें',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'संगठन बनाएँ',
     invitePage: {
@@ -1360,6 +1365,7 @@ export const hiIN: LocalizationResource = {
         title: 'ईमेल पते',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'खाता कनेक्ट करें',
         title: 'एंटरप्राइज खाते',
       },
       headerTitle__account: 'प्रोफ़ाइल विवरण',

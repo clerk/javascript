@@ -9,9 +9,10 @@ export const templates = {
   'next-app-router-quickstart': resolve(__dirname, './next-app-router-quickstart'),
   'next-app-router-bundled-ui': resolve(__dirname, './next-app-router-bundled-ui'),
   'next-app-router-quickstart-v6': resolve(__dirname, './next-app-router-quickstart-v6'),
-  'react-cra': resolve(__dirname, './react-cra'),
   'react-vite': resolve(__dirname, './react-vite'),
   'express-vite': resolve(__dirname, './express-vite'),
+  'fastify-vite': resolve(__dirname, './fastify-vite'),
+  'hono-vite': resolve(__dirname, './hono-vite'),
   'elements-next': resolve(__dirname, './elements-next'),
   'astro-node': resolve(__dirname, './astro-node'),
   'astro-hybrid': resolve(__dirname, './astro-hybrid'),
@@ -23,6 +24,7 @@ export const templates = {
   'react-router-library': resolve(__dirname, './react-router-library'),
   'custom-flows-react-vite': resolve(__dirname, './custom-flows-react-vite'),
   'vinext-app': resolve(__dirname, './vinext-app'),
+  'chrome-extension-vite': resolve(__dirname, './chrome-extension-vite'),
 } as const;
 
 if (new Set([...Object.values(templates)]).size !== Object.values(templates).length) {

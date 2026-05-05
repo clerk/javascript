@@ -18,8 +18,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
   });
 
   test.afterAll(async () => {
-    await fakeOrganization.delete();
-    await fakeUser.deleteIfExists();
+    await fakeOrganization?.delete();
+    await fakeUser?.deleteIfExists();
 
     await app.teardown();
   });
@@ -250,6 +250,21 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     // Click custom link and check navigation
     await dialog.getByRole('button', { name: /Homepage/i }).click();
     await u.page.waitForAppUrl('/');
+  });
+
+  test('<SignOutButton /> signs the user out when clicked', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.page.goToRelative('/sign-in');
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.expect.toBeSignedIn();
+    await u.page.waitForAppUrl('/');
+
+    await u.page.goToRelative('/sign-out');
+    await expect(u.page.locator('[data-signed-in]')).toBeVisible();
+
+    await u.page.getByRole('button', { name: /Sign out/i }).click();
+    await u.po.expect.toBeSignedOut();
   });
 
   test('redirects to sign-in when unauthenticated', async ({ page, context }) => {

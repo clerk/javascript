@@ -18,7 +18,7 @@ export const AccountPage = withCardStateProvider(() => {
   const { attributes, social, enterpriseSSO } = useEnvironment().userSettings;
   const card = useCardState();
   const { user } = useUser();
-  const { shouldAllowIdentificationCreation } = useUserProfileContext();
+  const { shouldAllowIdentificationCreation, immutableAttributes } = useUserProfileContext();
 
   const showUsername = attributes.username?.enabled;
   const showEmail = attributes.email_address?.enabled;
@@ -26,6 +26,10 @@ export const AccountPage = withCardStateProvider(() => {
   const showConnectedAccounts = social && Object.values(social).filter(p => p.enabled).length > 0;
   const showEnterpriseAccounts = user && enterpriseSSO.enabled;
   const showWeb3 = attributes.web3_wallet?.enabled;
+
+  const isEmailImmutable = immutableAttributes.has('email_address');
+  const isPhoneImmutable = immutableAttributes.has('phone_number');
+  const isUsernameImmutable = immutableAttributes.has('username');
 
   return (
     <Col
@@ -47,9 +51,19 @@ export const AccountPage = withCardStateProvider(() => {
         <Card.Alert>{card.error}</Card.Alert>
 
         <UserProfileSection />
-        {showUsername && <UsernameSection />}
-        {showEmail && <EmailsSection shouldAllowCreation={shouldAllowIdentificationCreation} />}
-        {showPhone && <PhoneSection shouldAllowCreation={shouldAllowIdentificationCreation} />}
+        {showUsername && <UsernameSection isImmutable={isUsernameImmutable} />}
+        {showEmail && (
+          <EmailsSection
+            shouldAllowCreation={shouldAllowIdentificationCreation && !isEmailImmutable}
+            shouldAllowDeletion={!isEmailImmutable}
+          />
+        )}
+        {showPhone && (
+          <PhoneSection
+            shouldAllowCreation={shouldAllowIdentificationCreation && !isPhoneImmutable}
+            shouldAllowDeletion={!isPhoneImmutable}
+          />
+        )}
         {showConnectedAccounts && <ConnectedAccountsSection shouldAllowCreation={shouldAllowIdentificationCreation} />}
 
         {/*TODO-STEP-UP: Verify that these work as expected*/}

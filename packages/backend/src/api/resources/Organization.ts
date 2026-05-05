@@ -1,7 +1,7 @@
 import type { OrganizationJSON } from './JSON';
 
 /**
- * The Backend `Organization` object is similar to the [`Organization`](https://clerk.com/docs/reference/javascript/organization) object as it holds information about an Organization, as well as methods for managing it. However, the Backend `Organization` object is different in that it is used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/Organizations#operation/ListOrganizations){{ target: '_blank' }} and is not directly accessible from the Frontend API.
+ * The Backend `Organization` object is similar to the [`Organization`](https://clerk.com/docs/reference/objects/organization) object as it holds information about an Organization, as well as methods for managing it. However, the Backend `Organization` object is different in that it is used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/Organizations#operation/ListOrganizations){{ target: '_blank' }} and is not directly accessible from the Frontend API.
  */
 export class Organization {
   private _raw: OrganizationJSON | null = null;

@@ -178,6 +178,11 @@ export const daDK: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'Konfigurer single sign-on (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Opret organisation',
     invitePage: {
@@ -1345,6 +1350,7 @@ export const daDK: LocalizationResource = {
         title: 'E-mailadresser',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Tilknyt konto',
         title: 'Virksomhedskonti',
       },
       headerTitle__account: 'Konto',

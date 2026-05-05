@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { afterEach, describe, expect, test, vi } from 'vitest';
 
 const clonedEnvVars = {
   CLERK_API_URL: process.env.CLERK_API_URL,

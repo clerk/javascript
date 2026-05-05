@@ -23,6 +23,7 @@ export type UserProfileContextType = UserProfileCtx & {
   pages: PagesType;
   shouldAllowIdentificationCreation: boolean;
   shouldShowBilling: boolean;
+  immutableAttributes: Set<string>;
 };
 
 export const UserProfileContext = createContext<UserProfileCtx | null>(null);
@@ -71,6 +72,16 @@ export const useUserProfileContext = (): UserProfileContextType => {
     );
   }, [user, environment.userSettings.enterpriseSSO]);
 
+  const immutableAttributes = useMemo(() => {
+    const result = new Set<string>();
+    for (const [name, data] of Object.entries(environment.userSettings.attributes)) {
+      if (data.immutable) {
+        result.add(name);
+      }
+    }
+    return result;
+  }, [environment.userSettings.attributes]);
+
   return {
     ...ctx,
     pages,
@@ -79,5 +90,6 @@ export const useUserProfileContext = (): UserProfileContextType => {
     authQueryString: '',
     shouldAllowIdentificationCreation,
     shouldShowBilling,
+    immutableAttributes,
   };
 };

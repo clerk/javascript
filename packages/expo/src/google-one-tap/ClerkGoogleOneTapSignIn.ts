@@ -1,5 +1,4 @@
-import { requireNativeModule } from 'expo-modules-core';
-
+import NativeClerkGoogleSignIn from '../specs/NativeClerkGoogleSignIn';
 import type {
   CancelledResponse,
   ConfigureParams,
@@ -11,23 +10,14 @@ import type {
   SignInParams,
 } from './types';
 
-// Type for the native module methods
-interface ClerkGoogleSignInNativeModule {
-  configure(params: ConfigureParams): void;
-  signIn(params: SignInParams): Promise<OneTapResponse>;
-  createAccount(params: CreateAccountParams): Promise<OneTapResponse>;
-  presentExplicitSignIn(params: ExplicitSignInParams): Promise<OneTapResponse>;
-  signOut(): Promise<void>;
-}
-
-// Lazy-load the native module to avoid crashes when not available
-let _nativeModule: ClerkGoogleSignInNativeModule | null = null;
-
-function getNativeModule(): ClerkGoogleSignInNativeModule {
-  if (!_nativeModule) {
-    _nativeModule = requireNativeModule<ClerkGoogleSignInNativeModule>('ClerkGoogleSignIn');
+function getNativeModule(): NonNullable<typeof NativeClerkGoogleSignIn> {
+  if (!NativeClerkGoogleSignIn) {
+    throw new Error(
+      'ClerkGoogleSignIn native module is not available. ' +
+        'Ensure the @clerk/expo plugin is added to your app.json and you have run a development build.',
+    );
   }
-  return _nativeModule;
+  return NativeClerkGoogleSignIn;
 }
 
 /**
@@ -84,7 +74,7 @@ export const ClerkGoogleOneTapSignIn = {
    * @param params.autoSelectEnabled - Auto-select for single credential (default: false)
    */
   configure(params: ConfigureParams): void {
-    getNativeModule().configure(params);
+    getNativeModule().configure(params as any);
   },
 
   /**
@@ -101,7 +91,7 @@ export const ClerkGoogleOneTapSignIn = {
    */
   async signIn(params?: SignInParams): Promise<OneTapResponse> {
     try {
-      return await getNativeModule().signIn(params ?? {});
+      return (await getNativeModule().signIn((params as any) ?? null)) as unknown as OneTapResponse;
     } catch (error) {
       if (isErrorWithCode(error)) {
         if (error.code === 'SIGN_IN_CANCELLED') {
@@ -128,7 +118,7 @@ export const ClerkGoogleOneTapSignIn = {
    */
   async createAccount(params?: CreateAccountParams): Promise<OneTapResponse> {
     try {
-      return await getNativeModule().createAccount(params ?? {});
+      return (await getNativeModule().createAccount((params as any) ?? null)) as unknown as OneTapResponse;
     } catch (error) {
       if (isErrorWithCode(error)) {
         if (error.code === 'SIGN_IN_CANCELLED') {
@@ -155,7 +145,7 @@ export const ClerkGoogleOneTapSignIn = {
    */
   async presentExplicitSignIn(params?: ExplicitSignInParams): Promise<OneTapResponse> {
     try {
-      return await getNativeModule().presentExplicitSignIn(params ?? {});
+      return (await getNativeModule().presentExplicitSignIn((params as any) ?? null)) as unknown as OneTapResponse;
     } catch (error) {
       if (isErrorWithCode(error)) {
         if (error.code === 'SIGN_IN_CANCELLED') {

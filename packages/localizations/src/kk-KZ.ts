@@ -178,6 +178,11 @@ export const kkKZ: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'Бірыңғай кіруді конфигурациялау (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Ұйым құру',
     invitePage: {
@@ -1327,6 +1332,7 @@ export const kkKZ: LocalizationResource = {
         title: 'Электрондық пошталар',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Есептік жазбаны қосу',
         title: 'Кәсіпорын есептік жазбалары',
       },
       headerTitle__account: 'Профиль мәліметтері',

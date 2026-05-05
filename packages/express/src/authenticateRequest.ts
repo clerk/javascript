@@ -24,7 +24,7 @@ import { incomingMessageToRequest, loadApiEnv, loadClientEnv, requestToProxyRequ
  */
 export const authenticateRequest = (opts: AuthenticateRequestParams) => {
   const { clerkClient, request, options } = opts;
-  const { jwtKey, authorizedParties, audience, acceptsToken } = options || {};
+  const { jwtKey, authorizedParties, audience, acceptsToken, clockSkewInMs } = options || {};
 
   const clerkRequest = createClerkRequest(incomingMessageToRequest(request));
   const env = { ...loadApiEnv(), ...loadClientEnv() };
@@ -55,6 +55,7 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
     machineSecretKey,
     publishableKey,
     jwtKey,
+    clockSkewInMs,
     authorizedParties,
     proxyUrl,
     isSatellite,
@@ -103,7 +104,7 @@ export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions =
 
   // Extract proxy configuration
   const frontendApiProxy = options.frontendApiProxy;
-  const proxyPath = stripTrailingSlashes(frontendApiProxy?.path ?? DEFAULT_PROXY_PATH);
+  const proxyPath = stripTrailingSlashes(frontendApiProxy?.path ?? DEFAULT_PROXY_PATH) || DEFAULT_PROXY_PATH;
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   const middleware: RequestHandler = async (request, response, next) => {
@@ -164,7 +165,8 @@ export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions =
       }
     }
 
-    // Auto-derive proxyUrl from frontendApiProxy config if not explicitly set
+    // Pass the proxy path to authenticateRequest - the backend resolves it
+    // against the request's public origin (from x-forwarded-* headers).
     let resolvedOptions = options;
     if (frontendApiProxy && !options.proxyUrl) {
       const requestUrl = new URL(request.originalUrl || request.url, `http://${request.headers.host}`);
@@ -173,17 +175,7 @@ export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions =
           ? frontendApiProxy.enabled(requestUrl)
           : frontendApiProxy.enabled;
       if (isProxyEnabled) {
-        const forwardedProto = request.headers['x-forwarded-proto'];
-        const protoHeader = Array.isArray(forwardedProto) ? forwardedProto[0] : forwardedProto;
-        const proto = (protoHeader || '').split(',')[0].trim();
-        const protocol = request.secure || proto === 'https' ? 'https' : 'http';
-
-        const forwardedHost = request.headers['x-forwarded-host'];
-        const hostHeader = Array.isArray(forwardedHost) ? forwardedHost[0] : forwardedHost;
-        const host = (hostHeader || '').split(',')[0].trim() || request.headers.host || 'localhost';
-
-        const derivedProxyUrl = `${protocol}://${host}${proxyPath}`;
-        resolvedOptions = { ...options, proxyUrl: derivedProxyUrl };
+        resolvedOptions = { ...options, proxyUrl: proxyPath };
       }
     }
 

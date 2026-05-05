@@ -2,6 +2,7 @@ import type { AttributeMappingJSON, SamlConnectionJSON } from './JSON';
 
 /**
  * The Backend `SamlConnection` object holds information about a SAML connection for an organization.
+ * @deprecated Use `EnterpriseConnection` instead.
  */
 export class SamlConnection {
   constructor(
@@ -86,7 +87,7 @@ export class SamlConnection {
      */
     readonly updatedAt: number,
     /**
-     * Defines the attribute name mapping between the Identity Provider (IdP) and Clerk's [`User`](https://clerk.com/docs/reference/javascript/user) properties.
+     * Defines the attribute name mapping between the Identity Provider (IdP) and Clerk's [`User`](https://clerk.com/docs/reference/objects/user) properties.
      */
     readonly attributeMapping: AttributeMapping,
   ) {}

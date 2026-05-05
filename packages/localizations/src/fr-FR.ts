@@ -186,6 +186,11 @@ export const frFR: LocalizationResource = {
     viewPayment: 'Voir le paiement',
     year: 'An',
   },
+  configureSSO: {
+    navbar: {
+      title: "Configurer l'authentification unique (SSO)",
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Créer l’organisation',
     invitePage: {
@@ -1372,6 +1377,7 @@ export const frFR: LocalizationResource = {
         title: 'Adresses e-mail',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Connecter un compte',
         title: 'Comptes entreprises',
       },
       headerTitle__account: 'Compte',

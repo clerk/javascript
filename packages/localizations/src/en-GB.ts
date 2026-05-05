@@ -178,6 +178,11 @@ export const enGB: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'Configure Single Sign-On (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Create organisation',
     invitePage: {
@@ -223,7 +228,7 @@ export const enGB: LocalizationResource = {
   formFieldInputPlaceholder__organizationSlug: 'my-org',
   formFieldInputPlaceholder__password: 'Enter your password',
   formFieldInputPlaceholder__phoneNumber: 'Enter your phone number',
-  formFieldInputPlaceholder__username: undefined,
+  formFieldInputPlaceholder__username: 'Enter your username',
   formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKey: 'API key',
   formFieldLabel__apiKeyDescription: 'Description',
@@ -1352,6 +1357,7 @@ export const enGB: LocalizationResource = {
         title: 'Email addresses',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Connect account',
         title: 'Enterprise accounts',
       },
       headerTitle__account: 'Profile details',

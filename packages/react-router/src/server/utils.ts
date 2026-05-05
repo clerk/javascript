@@ -1,5 +1,5 @@
 import { constants, debugRequestState } from '@clerk/backend/internal';
-import cookie from 'cookie';
+import { parse as parseCookie } from 'cookie';
 import type { AppLoadContext, UNSAFE_DataWithResponseInit } from 'react-router';
 
 import { getPublicEnvVariables } from '../utils/env';
@@ -32,7 +32,7 @@ export function isRedirect(res: Response): boolean {
 }
 
 export const parseCookies = (req: Request) => {
-  return cookie.parse(req.headers.get('cookie') || '');
+  return parseCookie(req.headers.get('cookie') || '');
 };
 
 export function assertValidHandlerResult(val: any, error?: string): asserts val is Record<string, unknown> | null {
@@ -102,6 +102,7 @@ export function getResponseClerkState(requestState: RequestStateWithRedirectUrls
     __prefetchUI: envVars.prefetchUI,
     __telemetryDisabled: envVars.telemetryDisabled,
     __telemetryDebug: envVars.telemetryDebug,
+    __unsafeDisableDevelopmentModeConsoleWarning: envVars.unsafeDisableDevelopmentModeConsoleWarning,
   };
 
   if (canUseKeyless && __keylessClaimUrl) {
@@ -135,12 +136,14 @@ export const wrapWithClerkState = (data: any) => {
  * @internal
  */
 export const patchRequest = (request: Request) => {
+  // Omit `signal` from the clone: Node 24's bundled undici tightened the
+  // instanceof AbortSignal check, which rejects cross-realm signals (e.g.
+  // those carried by framework Request subclasses).
   const clonedRequest = new Request(request.url, {
     headers: request.headers,
     method: request.method,
     redirect: request.redirect,
     cache: request.cache,
-    signal: request.signal,
   });
 
   // If duplex is not set, set it to 'half' to avoid duplex issues with unidici

@@ -1,6 +1,13 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
-import { isValidBrowserOnline } from '@clerk/shared/browser';
-import { ClerkOfflineError, ClerkWebAuthnError, is4xxError, MissingExpiredTokenError } from '@clerk/shared/error';
+import { isBrowserOnline, isValidBrowserOnline } from '@clerk/shared/browser';
+import {
+  ClerkOfflineError,
+  ClerkRuntimeError,
+  ClerkWebAuthnError,
+  is4xxError,
+  is429Error,
+  MissingExpiredTokenError,
+} from '@clerk/shared/error';
 import {
   convertJSONToPublicKeyRequestOptions,
   serializePublicKeyCredentialAssertion,
@@ -22,6 +29,7 @@ import type {
   SessionResource,
   SessionStatus,
   SessionTask,
+  SessionTouchParams,
   SessionVerificationJSON,
   SessionVerificationResource,
   SessionVerifyAttemptFirstFactorParams,
@@ -96,14 +104,16 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   private _touchPost = async (
-    { skipUpdateClient }: { skipUpdateClient: boolean } = { skipUpdateClient: false },
+    { intent, skipUpdateClient }: { intent?: SessionTouchParams['intent']; skipUpdateClient: boolean } = {
+      skipUpdateClient: false,
+    },
   ): Promise<FapiResponseJSON<SessionJSON> | null> => {
     const json = await BaseResource._fetch<SessionJSON>(
       {
         method: 'POST',
         path: this.path('touch'),
         // any is how we type the body in the BaseMutateParams as well
-        body: { active_organization_id: this.lastActiveOrganizationId } as any,
+        body: { active_organization_id: this.lastActiveOrganizationId, intent } as any,
       },
       { skipUpdateClient },
     );
@@ -114,8 +124,8 @@ export class Session extends BaseResource implements SessionResource {
     return json;
   };
 
-  touch = async (): Promise<SessionResource> => {
-    await this._touchPost();
+  touch = async ({ intent }: SessionTouchParams = {}): Promise<SessionResource> => {
+    await this._touchPost({ intent, skipUpdateClient: false });
 
     // _touchPost() will have updated `this` in-place
     // The post has potentially changed the session state, and so we need to ensure we emit the updated token that comes back in the response. This avoids potential issues where the session cookie is out of sync with the current session state.
@@ -136,8 +146,8 @@ export class Session extends BaseResource implements SessionResource {
    *
    * @internal
    */
-  __internal_touch = async (): Promise<ClientResource | undefined> => {
-    const json = await this._touchPost({ skipUpdateClient: true });
+  __internal_touch = async ({ intent }: SessionTouchParams = {}): Promise<ClientResource | undefined> => {
+    const json = await this._touchPost({ intent, skipUpdateClient: true });
     return getClientResourceFromPayload(json);
   };
 
@@ -146,9 +156,10 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   getToken: GetToken = async (options?: GetTokenOptions): Promise<string | null> => {
-    // This will retry the getToken call if it fails with a non-4xx error
-    // For offline state, we use shorter retries (~15s total) before throwing ClerkOfflineError
-    // For other errors, we retry up to 8 times over ~3 minutes
+    // Retry on transient failures (5xx, network errors, 429 rate limits).
+    // Do not retry on deterministic client errors (4xx) — they won't resolve on their own.
+    // For offline state, we use shorter retries (~15s total) before throwing ClerkOfflineError.
+    // For other errors, we retry up to 8 times over ~3 minutes.
     try {
       const result = await retry(() => this._getToken(options), {
         factor: 1.55,
@@ -156,7 +167,7 @@ export class Session extends BaseResource implements SessionResource {
         maxDelayBetweenRetries: 50 * 1_000,
         jitter: false,
         shouldRetry: (error, iterationsCount) => {
-          if (is4xxError(error)) {
+          if (is4xxError(error) && !is429Error(error)) {
             return false;
           }
 
@@ -190,7 +201,7 @@ export class Session extends BaseResource implements SessionResource {
     return createCheckAuthorization({
       userId: this.user?.id,
       factorVerificationAge: this.factorVerificationAge,
-      orgId: activeMembership?.id,
+      orgId: activeMembership?.organization?.id,
       orgRole: activeMembership?.role,
       orgPermissions: activeMembership?.permissions,
       features: (this.lastActiveToken?.jwt?.claims.fea as string) || '',
@@ -438,18 +449,31 @@ export class Session extends BaseResource implements SessionResource {
     // Dispatch tokenUpdate only for __session tokens with the session's active organization ID, and not JWT templates
     const shouldDispatchTokenUpdate = !template && organizationId === this.lastActiveOrganizationId;
 
+    let result: string | null;
+
     if (cacheResult) {
       // Proactive refresh is handled by timers scheduled in the cache
       // Prefer synchronous read to avoid microtask overhead when token is already resolved
       const cachedToken = cacheResult.entry.resolvedToken ?? (await cacheResult.entry.tokenResolver);
-      if (shouldDispatchTokenUpdate) {
+      // Only emit token updates when we have an actual token — emitting with an empty
+      // token causes AuthCookieService to remove the __session cookie (looks like sign-out).
+      if (shouldDispatchTokenUpdate && cachedToken.getRawString()) {
         eventBus.emit(events.TokenUpdate, { token: cachedToken });
       }
-      // Return null when raw string is empty to indicate signed-out state
-      return cachedToken.getRawString() || null;
+      result = cachedToken.getRawString() || null;
+    } else if (!isBrowserOnline()) {
+      throw new ClerkRuntimeError('Browser is offline, skipping token fetch', { code: 'network_error' });
+    } else {
+      result = await this.#fetchToken(template, organizationId, tokenId, shouldDispatchTokenUpdate, skipCache);
     }
 
-    return this.#fetchToken(template, organizationId, tokenId, shouldDispatchTokenUpdate, skipCache);
+    // Throw when offline and no token so retry() in getToken() can fire.
+    // Without this, _getToken returns null (success) and retry() never calls shouldRetry.
+    if (result === null && !isValidBrowserOnline()) {
+      throw new ClerkRuntimeError('Network request failed while offline', { code: 'network_error' });
+    }
+
+    return result;
   }
 
   #createTokenResolver(
@@ -459,21 +483,38 @@ export class Session extends BaseResource implements SessionResource {
   ): Promise<TokenResource> {
     const path = template ? `${this.path()}/tokens/${template}` : `${this.path()}/tokens`;
     // TODO: update template endpoint to accept organizationId
-    const params: Record<string, string | null> = template ? {} : { organizationId: organizationId ?? null };
-    const lastActiveToken = this.lastActiveToken?.getRawString();
+    const sessionMinterEnabled = Session.clerk?.__internal_environment?.authConfig?.sessionMinter;
+    const params: Record<string, string | null> = template
+      ? {}
+      : {
+          organizationId: organizationId ?? null,
+          ...(sessionMinterEnabled && this.lastActiveToken ? { token: this.lastActiveToken.getRawString() } : {}),
+          ...(sessionMinterEnabled && skipCache ? { forceOrigin: 'true' } : {}),
+        };
 
-    const tokenResolver = Token.create(path, params, skipCache ? { debug: 'skip_cache' } : undefined).catch(e => {
+    if (sessionMinterEnabled) {
+      // Session Minter sends the token in the body, no expired_token retry needed
+      return Token.create(path, params, skipCache ? { debug: 'skip_cache' } : undefined);
+    }
+
+    // TODO: Remove this expired_token retry flow when the sessionMinter flag is removed
+    const lastActiveToken = this.lastActiveToken?.getRawString();
+    return Token.create(path, params, skipCache ? { debug: 'skip_cache' } : undefined).catch(e => {
       if (MissingExpiredTokenError.is(e) && lastActiveToken) {
         return Token.create(path, { ...params }, { expired_token: lastActiveToken });
       }
       throw e;
     });
-
-    return tokenResolver;
   }
 
   #dispatchTokenEvents(token: TokenResource, shouldDispatch: boolean): void {
     if (!shouldDispatch) {
+      return;
+    }
+
+    // Never dispatch empty tokens — this would cause AuthCookieService to remove
+    // the __session cookie even though the user is still authenticated.
+    if (!token.getRawString()) {
       return;
     }
 
@@ -502,9 +543,14 @@ export class Session extends BaseResource implements SessionResource {
     });
 
     return tokenResolver.then(token => {
+      const rawString = token.getRawString();
+      if (!rawString) {
+        // Throw so retry logic in getToken() can handle it,
+        // rather than silently returning null (which callers interpret as "signed out").
+        throw new ClerkRuntimeError('Token fetch returned empty response', { code: 'network_error' });
+      }
       this.#dispatchTokenEvents(token, shouldDispatchTokenUpdate);
-      // Return null when raw string is empty to indicate signed-out state
-      return token.getRawString() || null;
+      return rawString;
     });
   }
 
@@ -528,12 +574,32 @@ export class Session extends BaseResource implements SessionResource {
 
     Session.#backgroundRefreshInProgress.add(tokenId);
 
+    // Mobile only: skip this refresh if the token is already expired.
+    // On iOS, the OS throttles background JS threads for hours (e.g. overnight audio apps).
+    // The refresh timer fires late — well past token expiry — with stale credentials.
+    // If we send that request, the 401 response triggers handleUnauthenticated(), which
+    // destroys the session even though it's still valid on the server (30-day lifetime).
+    // Instead, bail out here and let the next foreground getToken() call recover normally.
+    const experimental = Session.clerk?.__internal_getOption?.('experimental');
+    const isHeadless = experimental?.runtimeEnvironment === 'headless';
+    const lastTokenExp = this.lastActiveToken?.jwt?.claims?.exp;
+    if (isHeadless && lastTokenExp && Date.now() / 1000 > lastTokenExp) {
+      Session.#backgroundRefreshInProgress.delete(tokenId);
+      return;
+    }
+
     const tokenResolver = this.#createTokenResolver(template, organizationId, false);
 
     // Don't cache the promise immediately - only update cache on success
     // This allows concurrent calls to continue using the stale token
     tokenResolver
       .then(token => {
+        // Never cache or dispatch empty tokens — preserve the stale-but-valid
+        // token in cache instead of replacing it with an empty one.
+        if (!token.getRawString()) {
+          return;
+        }
+
         // Cache the resolved token for future calls
         // Re-register onRefresh to handle the next refresh cycle when this token approaches expiration
         SessionTokenCache.set({

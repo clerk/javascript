@@ -27,6 +27,7 @@ async function asyncSearchRHC(name, search, regex = false) {
 await Promise.allSettled([
   asyncSearchRHC('Turnstile', 'cloudflare.com/turnstile/v0/api.js'),
   asyncSearchRHC('clerk-js Hotloading', '/npm/@clerk/clerk-js'),
+  asyncSearchRHC('clerk-ui Hotloading', '/npm/@clerk/ui'),
   asyncSearchRHC('Google One Tap', 'accounts.google.com/gsi/client'),
   asyncSearchRHC('Coinbase', 'coinbase.com'),
   asyncSearchRHC('Coinbase Wallet import', 'import\s*"@coinbase/wallet-sdk', true), // eslint-disable-line no-useless-escape

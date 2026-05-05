@@ -178,6 +178,11 @@ export const nlBE: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'Single sign-on (SSO) configureren',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Creëer organisatie',
     invitePage: {
@@ -1348,6 +1353,7 @@ export const nlBE: LocalizationResource = {
         title: 'E-mailadressen',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Verbind een account',
         title: 'Bedrijfsaccounts',
       },
       headerTitle__account: 'Account',

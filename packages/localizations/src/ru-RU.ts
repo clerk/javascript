@@ -178,6 +178,11 @@ export const ruRU: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'Настроить единый вход (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Создать организацию',
     invitePage: {
@@ -1370,6 +1375,7 @@ export const ruRU: LocalizationResource = {
         title: 'Адреса электронной почты',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Подключить учетную запись',
         title: 'Корпоративные учетные записи',
       },
       headerTitle__account: 'Учетная запись',

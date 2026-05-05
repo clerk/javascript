@@ -46,10 +46,26 @@ vi.mock('react-native', () => {
   };
 });
 
-vi.mock('expo-modules-core', () => {
+vi.mock('../../specs/NativeClerkModule', () => {
   return {
-    EventEmitter: vi.fn(),
-    requireNativeModule: vi.fn(),
+    default: {
+      configure: vi.fn(),
+      getSession: vi.fn(),
+      getClientToken: vi.fn(),
+      signOut: vi.fn(),
+    },
+  };
+});
+
+vi.mock('../../specs/NativeClerkGoogleSignIn', () => {
+  return {
+    default: {
+      configure: vi.fn(),
+      signIn: vi.fn(),
+      createAccount: vi.fn(),
+      presentExplicitSignIn: vi.fn(),
+      signOut: vi.fn(),
+    },
   };
 });
 

@@ -178,6 +178,11 @@ export const trTR: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'Tek Oturum Açmayı (SSO) Yapılandır',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Oluştur',
     invitePage: {
@@ -1351,6 +1356,7 @@ export const trTR: LocalizationResource = {
         title: 'E-posta adresleri',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Hesap bağla',
         title: 'Kurumsal hesaplar',
       },
       headerTitle__account: 'Hesap',

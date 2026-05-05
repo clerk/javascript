@@ -184,6 +184,11 @@ export const esES: LocalizationResource = {
     viewPayment: 'Ver pago',
     year: 'Año',
   },
+  configureSSO: {
+    navbar: {
+      title: 'Configurar inicio de sesión único (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Crear organización',
     invitePage: {
@@ -1363,6 +1368,7 @@ export const esES: LocalizationResource = {
         title: 'Correos electrónicos',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Conectar cuenta',
         title: 'Cuentas empresariales',
       },
       headerTitle__account: 'Cuenta',

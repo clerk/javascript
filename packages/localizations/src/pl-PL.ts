@@ -178,6 +178,11 @@ export const plPL: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'Skonfiguruj logowanie jednokrotne (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Utwórz organizację',
     invitePage: {
@@ -1357,6 +1362,7 @@ export const plPL: LocalizationResource = {
         title: 'Adresy email',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Połącz konto',
         title: 'Konta firmowe',
       },
       headerTitle__account: 'Konto',

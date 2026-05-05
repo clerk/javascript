@@ -178,6 +178,11 @@ export const skSK: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'Nastaviť jednotné prihlasovanie (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Vytvoriť organizáciu',
     invitePage: {
@@ -1354,6 +1359,7 @@ export const skSK: LocalizationResource = {
         title: 'Emailové adresy',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Pripojiť účet',
         title: 'Firemné účty',
       },
       headerTitle__account: 'Účet',

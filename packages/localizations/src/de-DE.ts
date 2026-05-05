@@ -184,6 +184,11 @@ export const deDE: LocalizationResource = {
     viewPayment: 'Zahlung anzeigen',
     year: 'Jahr',
   },
+  configureSSO: {
+    navbar: {
+      title: 'Single Sign-On (SSO) konfigurieren',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Organisation erstellen',
     invitePage: {
@@ -745,7 +750,7 @@ export const deDE: LocalizationResource = {
       detailsLabel: 'Bevor wir Ihr Passwort zurücksetzen können, müssen wir Ihre Identität überprüfen.',
     },
     start: {
-      actionLink: 'Anmelden',
+      actionLink: 'Registrieren',
       actionLink__join_waitlist: 'Warteliste beitreten',
       actionLink__use_email: 'E-Mail nutzen',
       actionLink__use_email_username: 'E-Mail oder Benutzernamen nutzen',
@@ -1383,6 +1388,7 @@ export const deDE: LocalizationResource = {
         title: 'E-Mail-Adressen',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Konto verbinden',
         title: 'Unternehmens-Konten',
       },
       headerTitle__account: 'Konto',

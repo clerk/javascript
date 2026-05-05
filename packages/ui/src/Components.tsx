@@ -8,14 +8,18 @@ import type {
   __internal_UserVerificationProps,
   Clerk,
   ClerkOptions,
-  CreateOrganizationProps,
+  CreateOrganizationModalProps,
   EnvironmentResource,
   GoogleOneTapProps,
-  OrganizationProfileProps,
+  OrganizationProfileModalProps,
   SignInProps,
+  SignInModalProps,
   SignUpProps,
+  SignUpModalProps,
+  UserProfileModalProps,
   UserProfileProps,
   WaitlistProps,
+  WaitlistModalProps,
 } from '@clerk/shared/types';
 import { createDeferredPromise } from '@clerk/shared/utils';
 import React, { Suspense, useCallback, useRef, useSyncExternalStore } from 'react';
@@ -161,16 +165,16 @@ interface ComponentsState {
   appearance: Appearance | undefined;
   options: ClerkOptions | undefined;
   googleOneTapModal: null | GoogleOneTapProps;
-  signInModal: null | SignInProps;
-  signUpModal: null | SignUpProps;
-  userProfileModal: null | UserProfileProps;
+  signInModal: null | SignInModalProps;
+  signUpModal: null | SignUpModalProps;
+  userProfileModal: null | UserProfileModalProps;
   userVerificationModal: null | __internal_UserVerificationProps;
-  organizationProfileModal: null | OrganizationProfileProps;
-  createOrganizationModal: null | CreateOrganizationProps;
+  organizationProfileModal: null | OrganizationProfileModalProps;
+  createOrganizationModal: null | CreateOrganizationModalProps;
   enableOrganizationsPromptModal: null | __internal_EnableOrganizationsPromptProps;
   blankCaptchaModal: null;
   organizationSwitcherPrefetch: boolean;
-  waitlistModal: null | WaitlistProps;
+  waitlistModal: null | WaitlistModalProps;
   checkoutDrawer: {
     open: false;
     props: null | __internal_CheckoutProps;
@@ -232,29 +236,41 @@ export const mountComponentRenderer = (
       // .unmountComponent incorrectly called before the component is rendered
       if (!componentsControlsResolver) {
         const deferredPromise = createDeferredPromise();
-        componentsControlsResolver = import('./lazyModules/common').then(({ createRoot }) => {
-          createRoot(clerkRoot).render(
-            <Components
-              getClerk={getClerk}
-              getEnvironment={getEnvironment}
-              options={options}
-              onComponentsMounted={() => {
-                // Defer warning check to avoid blocking component mount
-                // Only check in development mode (based on publishable key, not NODE_ENV)
-                if (getClerk().instanceType === 'development') {
-                  const scheduleWarningCheck =
-                    typeof requestIdleCallback === 'function'
-                      ? requestIdleCallback
-                      : (cb: () => void) => setTimeout(cb, 0);
-                  scheduleWarningCheck(() => warnAboutCustomizationWithoutPinning(options));
-                }
-                deferredPromise.resolve();
-              }}
-              moduleManager={moduleManager}
-            />,
+        const mountTimeout = setTimeout(() => {
+          console.error(
+            '[Clerk UI] Component renderer did not mount within 10s. Common causes: a failed chunk load, a dev-server misconfiguration (e.g. unresolved lazy-compilation proxy), or a ClerkProvider/mountX call before the page is hydrated. Check the Network tab for stalled or empty requests.',
           );
-          return deferredPromise.promise.then(() => componentsControls);
-        });
+        }, 10_000);
+        componentsControlsResolver = import('./lazyModules/common')
+          .then(({ createRoot }) => {
+            createRoot(clerkRoot).render(
+              <Components
+                getClerk={getClerk}
+                getEnvironment={getEnvironment}
+                options={options}
+                onComponentsMounted={() => {
+                  clearTimeout(mountTimeout);
+                  // Defer warning check to avoid blocking component mount
+                  // Only check in development mode (based on publishable key, not NODE_ENV)
+                  if (getClerk().instanceType === 'development') {
+                    const scheduleWarningCheck =
+                      typeof requestIdleCallback === 'function'
+                        ? requestIdleCallback
+                        : (cb: () => void) => setTimeout(cb, 0);
+                    scheduleWarningCheck(() => warnAboutCustomizationWithoutPinning(options));
+                  }
+                  deferredPromise.resolve();
+                }}
+                moduleManager={moduleManager}
+              />,
+            );
+            return deferredPromise.promise.then(() => componentsControls);
+          })
+          .catch(err => {
+            clearTimeout(mountTimeout);
+            console.error('[Clerk UI] Failed to initialize component renderer:', err);
+            throw err;
+          });
       }
       return componentsControlsResolver.then(controls => controls);
     },
@@ -502,7 +518,7 @@ const Components = (props: ComponentsProps) => {
       onClose={() => componentsControls.closeModal('signIn')}
       onExternalNavigate={() => componentsControls.closeModal('signIn')}
       startPath={buildVirtualRouterUrl({ base: '/sign-in', path: urlStateParam?.path })}
-      getContainer={signInModal?.getContainer}
+      getContainer={signInModal?.getContainer ?? (() => null)}
       componentName={'SignInModal'}
     >
       <SignInModal {...signInModal} />
@@ -520,7 +536,7 @@ const Components = (props: ComponentsProps) => {
       onClose={() => componentsControls.closeModal('signUp')}
       onExternalNavigate={() => componentsControls.closeModal('signUp')}
       startPath={buildVirtualRouterUrl({ base: '/sign-up', path: urlStateParam?.path })}
-      getContainer={signUpModal?.getContainer}
+      getContainer={signUpModal?.getContainer ?? (() => null)}
       componentName={'SignUpModal'}
     >
       <SignInModal {...disambiguateRedirectOptions(signUpModal, 'signup')} />
@@ -541,7 +557,7 @@ const Components = (props: ComponentsProps) => {
         base: '/user',
         path: userProfileModal?.__experimental_startPath || urlStateParam?.path,
       })}
-      getContainer={userProfileModal?.getContainer}
+      getContainer={userProfileModal?.getContainer ?? (() => null)}
       componentName={'UserProfileModal'}
       modalContainerSx={{ alignItems: 'center' }}
       modalContentSx={t => ({ height: `min(${t.sizes.$176}, calc(100% - ${t.sizes.$12}))`, margin: 0 })}
@@ -559,7 +575,7 @@ const Components = (props: ComponentsProps) => {
       onClose={() => componentsControls.closeModal('userVerification')}
       onExternalNavigate={() => componentsControls.closeModal('userVerification')}
       startPath={buildVirtualRouterUrl({ base: '/user-verification', path: urlStateParam?.path })}
-      getContainer={userVerificationModal?.getContainer}
+      getContainer={userVerificationModal?.getContainer ?? (() => null)}
       componentName={'UserVerificationModal'}
       modalContainerSx={{ alignItems: 'center' }}
     >
@@ -579,7 +595,7 @@ const Components = (props: ComponentsProps) => {
         base: '/organizationProfile',
         path: organizationProfileModal?.__experimental_startPath || urlStateParam?.path,
       })}
-      getContainer={organizationProfileModal?.getContainer}
+      getContainer={organizationProfileModal?.getContainer ?? (() => null)}
       componentName={'OrganizationProfileModal'}
       modalContainerSx={{ alignItems: 'center' }}
       modalContentSx={t => ({ height: `min(${t.sizes.$176}, calc(100% - ${t.sizes.$12}))`, margin: 0 })}
@@ -597,7 +613,7 @@ const Components = (props: ComponentsProps) => {
       onClose={() => componentsControls.closeModal('createOrganization')}
       onExternalNavigate={() => componentsControls.closeModal('createOrganization')}
       startPath={buildVirtualRouterUrl({ base: '/createOrganization', path: urlStateParam?.path })}
-      getContainer={createOrganizationModal?.getContainer}
+      getContainer={createOrganizationModal?.getContainer ?? (() => null)}
       componentName={'CreateOrganizationModal'}
       modalContainerSx={{ alignItems: 'center' }}
       modalContentSx={t => ({ height: `min(${t.sizes.$120}, calc(100% - ${t.sizes.$12}))`, margin: 0 })}
@@ -615,7 +631,7 @@ const Components = (props: ComponentsProps) => {
       onClose={() => componentsControls.closeModal('waitlist')}
       onExternalNavigate={() => componentsControls.closeModal('waitlist')}
       startPath={buildVirtualRouterUrl({ base: '/waitlist', path: urlStateParam?.path })}
-      getContainer={waitlistModal?.getContainer}
+      getContainer={waitlistModal?.getContainer ?? (() => null)}
       componentName={'WaitlistModal'}
     >
       <WaitlistModal {...waitlistModal} />
@@ -638,6 +654,7 @@ const Components = (props: ComponentsProps) => {
       canCloseModal={false}
       modalId={'cl-modal-captcha-wrapper'}
       modalStyle={{ visibility: 'hidden', pointerEvents: 'none' }}
+      getContainer={() => null}
     >
       <BlankCaptchaModal />
     </LazyModalRenderer>

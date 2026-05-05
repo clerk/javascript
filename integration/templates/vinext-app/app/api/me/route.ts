@@ -1,6 +1,6 @@
 import { auth } from '@clerk/nextjs/server';
 
-export async function GET() {
+export async function GET(): Promise<Response> {
   const authObj = await auth();
   return new Response(
     JSON.stringify({

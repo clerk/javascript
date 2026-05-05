@@ -2,23 +2,41 @@ import { http, HttpResponse } from 'msw';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { APIKey, IdPOAuthAccessToken, M2MToken } from '../../api';
-import { createJwt, mockJwks, mockJwt, mockJwtPayload, mockOAuthAccessTokenJwtPayload } from '../../fixtures';
+import {
+  createJwt,
+  mockJwks,
+  mockJwt,
+  mockJwtPayload,
+  mockM2MJwtPayload,
+  mockOAuthAccessTokenJwtPayload,
+  signingJwks,
+} from '../../fixtures';
 import {
   mockSignedOAuthAccessTokenJwt,
   mockSignedOAuthAccessTokenJwtApplicationTyp,
   mockVerificationResults,
 } from '../../fixtures/machine';
+import { signJwt } from '../../jwt/signJwt';
 import { server, validateHeaders } from '../../mock-server';
 import { verifyMachineAuthToken, verifyToken } from '../verify';
 
-function createOAuthJwt(
+async function createSignedOAuthJwt(
   payload = mockOAuthAccessTokenJwtPayload,
   typ: 'at+jwt' | 'application/at+jwt' | 'JWT' = 'at+jwt',
 ) {
-  return createJwt({
+  const { data } = await signJwt(payload, signingJwks, {
+    algorithm: 'RS256',
     header: { typ, kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD' },
-    payload,
   });
+  return data!;
+}
+
+async function createSignedM2MJwt(payload = mockM2MJwtPayload) {
+  const { data } = await signJwt(payload, signingJwks, {
+    algorithm: 'RS256',
+    header: { typ: 'JWT', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD' },
+  });
+  return data!;
 }
 
 describe('tokens.verify(token, options)', () => {
@@ -67,6 +85,32 @@ describe('tokens.verify(token, options)', () => {
     });
 
     expect(data).toEqual(mockJwtPayload);
+  });
+
+  it('returns signature error before claims error when both are invalid', async () => {
+    server.use(
+      http.get(
+        'https://api.clerk.test/v1/jwks',
+        validateHeaders(() => {
+          return HttpResponse.json(mockJwks);
+        }),
+      ),
+    );
+
+    // Create a JWT with expired claims AND an invalid signature
+    const expiredJwt = createJwt({
+      payload: { ...mockJwtPayload, exp: mockJwtPayload.iat - 100 },
+    });
+
+    const { errors } = await verifyToken(expiredJwt, {
+      apiUrl: 'https://api.clerk.test',
+      secretKey: 'a-valid-key',
+      authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
+      skipJwksCache: true,
+    });
+
+    expect(errors).toBeDefined();
+    expect(errors?.[0].message).toContain('signature');
   });
 });
 
@@ -133,7 +177,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
     expect(result.errors).toBeUndefined();
 
     const data = result.data as M2MToken;
-    expect(data.id).toBe('m2m_ey966f1b1xf93586b2debdcadb0b3bd1');
+    expect(data.id).toBe('mt_ey966f1b1xf93586b2debdcadb0b3bd1');
     expect(data.subject).toBe('mch_2vYVtestTESTtestTESTtestTESTtest');
     expect(data.claims).toEqual({ foo: 'bar' });
     expect(data.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
@@ -163,7 +207,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
     expect(result.errors).toBeUndefined();
 
     const data = result.data as M2MToken;
-    expect(data.id).toBe('m2m_ey966f1b1xf93586b2debdcadb0b3bd1');
+    expect(data.id).toBe('mt_ey966f1b1xf93586b2debdcadb0b3bd1');
     expect(data.subject).toBe('mch_2vYVtestTESTtestTESTtestTESTtest');
     expect(data.claims).toEqual({ foo: 'bar' });
     expect(data.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
@@ -375,7 +419,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
         ),
       );
 
-      const oauthJwt = createOAuthJwt(mockOAuthAccessTokenJwtPayload, 'JWT');
+      const oauthJwt = await createSignedOAuthJwt(mockOAuthAccessTokenJwtPayload, 'JWT');
 
       const result = await verifyMachineAuthToken(oauthJwt, {
         apiUrl: 'https://api.clerk.test',
@@ -455,9 +499,97 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
         exp: mockOAuthAccessTokenJwtPayload.iat - 100,
       };
 
-      const oauthJwt = createOAuthJwt(expiredPayload, 'at+jwt');
+      const oauthJwt = await createSignedOAuthJwt(expiredPayload);
 
       const result = await verifyMachineAuthToken(oauthJwt, {
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+      });
+
+      expect(result.errors).toBeDefined();
+      expect(result.errors?.[0].message).toContain('expired');
+    });
+  });
+
+  describe('verifyM2MToken with JWT', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date(mockM2MJwtPayload.iat * 1000));
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('verifies a valid M2M JWT', async () => {
+      server.use(
+        http.get(
+          'https://api.clerk.test/v1/jwks',
+          validateHeaders(() => {
+            return HttpResponse.json(mockJwks);
+          }),
+        ),
+      );
+
+      const m2mJwt = await createSignedM2MJwt();
+
+      const result = await verifyMachineAuthToken(m2mJwt, {
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+      });
+
+      expect(result.tokenType).toBe('m2m_token');
+      expect(result.data).toBeDefined();
+      expect(result.errors).toBeUndefined();
+
+      const data = result.data as M2MToken;
+      expect(data.id).toBe('mt_2xKa9Bgv7NxMRDFyQw8LpZ3cTmU1vHjE');
+      expect(data.subject).toBe('mch_2vYVtestTESTtestTESTtestTESTtest');
+      expect(data.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
+    });
+
+    it('rejects M2M JWT with alg: none', async () => {
+      server.use(
+        http.get(
+          'https://api.clerk.test/v1/jwks',
+          validateHeaders(() => {
+            return HttpResponse.json(mockJwks);
+          }),
+        ),
+      );
+
+      const m2mJwt = createJwt({
+        header: { typ: 'JWT', alg: 'none', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD' },
+        payload: mockM2MJwtPayload,
+      });
+
+      const result = await verifyMachineAuthToken(m2mJwt, {
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+      });
+
+      expect(result.errors).toBeDefined();
+      expect(result.errors?.[0].message).toContain('Invalid JWT algorithm');
+    });
+
+    it('rejects expired M2M JWT', async () => {
+      server.use(
+        http.get(
+          'https://api.clerk.test/v1/jwks',
+          validateHeaders(() => {
+            return HttpResponse.json(mockJwks);
+          }),
+        ),
+      );
+
+      const expiredPayload = {
+        ...mockM2MJwtPayload,
+        exp: mockM2MJwtPayload.iat - 100,
+      };
+
+      const m2mJwt = await createSignedM2MJwt(expiredPayload);
+
+      const result = await verifyMachineAuthToken(m2mJwt, {
         apiUrl: 'https://api.clerk.test',
         secretKey: 'a-valid-key',
       });

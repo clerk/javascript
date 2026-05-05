@@ -1,3 +1,4 @@
+import { ClerkRuntimeError } from '@clerk/shared/error';
 import type { CaptchaWidgetType } from '@clerk/shared/types';
 
 import type { Clerk } from '../../core/resources/internal';
@@ -81,6 +82,11 @@ export class CaptchaChallenge {
    * managed by clerk-js itself.
    */
   public async managedInModal(opts?: Partial<CaptchaOptions>) {
+    if (typeof document === 'undefined') {
+      throw new ClerkRuntimeError('Captcha is not supported in non-browser environments', {
+        code: 'captcha_unavailable',
+      });
+    }
     return this.managedOrInvisible({
       modalWrapperQuerySelector: '#cl-modal-captcha-wrapper',
       modalContainerQuerySelector: '#cl-modal-captcha-container',

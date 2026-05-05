@@ -184,6 +184,11 @@ export const ptBR: LocalizationResource = {
     viewPayment: 'Ver pagamento',
     year: 'Ano',
   },
+  configureSSO: {
+    navbar: {
+      title: 'Configurar logon único (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Criar organização',
     invitePage: {
@@ -1368,6 +1373,7 @@ export const ptBR: LocalizationResource = {
         title: 'Endereços de e-mail',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Conectar conta',
         title: 'Contas corporativas',
       },
       headerTitle__account: 'Conta',

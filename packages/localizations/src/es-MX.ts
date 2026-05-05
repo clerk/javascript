@@ -179,6 +179,11 @@ export const esMX: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'Configurar inicio de sesión único (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Crear organización',
     invitePage: {
@@ -1363,6 +1368,7 @@ export const esMX: LocalizationResource = {
         title: 'Correos electrónicos',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Conectar cuenta',
         title: 'Cuentas de empresa',
       },
       headerTitle__account: 'Detalles de la cuenta',

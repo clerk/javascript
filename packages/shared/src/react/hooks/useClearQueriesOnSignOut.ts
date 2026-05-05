@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-import { useClerkQueryClient } from '../clerk-rq/use-clerk-query-client';
+import { useClerkQueryClient } from '../query/use-clerk-query-client';
 import { usePreviousValue } from './usePreviousValue';
 
 export const withInfiniteKey = <T extends string>(key: T) => [key, `${key}-inf`] as const;

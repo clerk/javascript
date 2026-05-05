@@ -52,6 +52,9 @@ export const koKR: LocalizationResource = {
       formHint: '이 시크릿 키를 삭제할까요?',
       formTitle: '"{{apiKeyName}}" 시크릿 키를 폐기할까요?',
     },
+    tableHeader__name: '이름',
+    tableHeader__lastUsed: '마지막 사용',
+    tableHeader__actions: '동작',
   },
   backButton: '돌아가기',
   badge__activePlan: '활성',
@@ -181,6 +184,11 @@ export const koKR: LocalizationResource = {
     viewFeatures: '기능 보기',
     viewPayment: '결제 보기',
     year: '년',
+  },
+  configureSSO: {
+    navbar: {
+      title: '싱글 사인온(SSO) 구성',
+    },
   },
   createOrganization: {
     formButtonSubmit: '조직 만들기',
@@ -1333,6 +1341,7 @@ export const koKR: LocalizationResource = {
         title: '이메일 주소',
       },
       enterpriseAccountsSection: {
+        primaryButton: '계정 연결하기',
         title: '기업 계정',
       },
       headerTitle__account: '프로필',

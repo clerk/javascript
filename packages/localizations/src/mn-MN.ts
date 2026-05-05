@@ -178,6 +178,11 @@ export const mnMN: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'Нэгдсэн нэвтрэлт (SSO) тохируулах',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Байгуулга үүсгэх',
     invitePage: {
@@ -1350,6 +1355,7 @@ export const mnMN: LocalizationResource = {
         title: 'Имэйл хаягууд',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Бүртгэлийг холбоно уу',
         title: 'Байгууллагын бүртгэлүүд',
       },
       headerTitle__account: 'Профайлын дэлгэрэнгүй',

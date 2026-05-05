@@ -178,6 +178,11 @@ export const bnIN: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'একক সাইন-অন (SSO) কনফিগার করুন',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'সংগঠন তৈরি করুন',
     invitePage: {
@@ -1359,6 +1364,7 @@ export const bnIN: LocalizationResource = {
         title: 'ইমেইল ঠিকানা',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'অ্যাকাউন্ট সংযুক্ত করুন',
         title: 'এন্টারপ্রাইজ অ্যাকাউন্ট',
       },
       headerTitle__account: 'প্রোফাইল বিবরণ',

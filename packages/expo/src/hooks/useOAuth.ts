@@ -1,7 +1,6 @@
 import { useSignIn, useSignUp } from '@clerk/react/legacy';
 import type { OAuthStrategy, SetActive, SignInResource, SignUpResource } from '@clerk/shared/types';
-import * as AuthSession from 'expo-auth-session';
-import * as WebBrowser from 'expo-web-browser';
+import type * as WebBrowser from 'expo-web-browser';
 
 import { errorThrower } from '../utils/errors';
 
@@ -46,6 +45,20 @@ export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
       };
     }
 
+    // Dynamically import expo-auth-session and expo-web-browser only when needed
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports -- dynamic import of optional dependency
+    let AuthSession: typeof import('expo-auth-session');
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports -- dynamic import of optional dependency
+    let WebBrowserModule: typeof import('expo-web-browser');
+    try {
+      [AuthSession, WebBrowserModule] = await Promise.all([import('expo-auth-session'), import('expo-web-browser')]);
+    } catch {
+      return errorThrower.throw(
+        'expo-auth-session and expo-web-browser are required for OAuth. ' +
+          'Install them: npx expo install expo-auth-session expo-web-browser',
+      );
+    }
+
     // Create a redirect url for the current platform and environment.
     //
     // This redirect URL needs to be whitelisted for your Clerk production instance via
@@ -64,7 +77,7 @@ export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
 
     const { externalVerificationRedirectURL } = signIn.firstFactorVerification;
 
-    const authSessionResult = await WebBrowser.openAuthSessionAsync(
+    const authSessionResult = await WebBrowserModule.openAuthSessionAsync(
       // @ts-ignore
       externalVerificationRedirectURL.toString(),
       oauthRedirectUrl,

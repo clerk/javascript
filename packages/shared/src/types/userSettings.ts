@@ -30,6 +30,7 @@ export type OAuthProviderSettings = {
 export type AttributeDataJSON = {
   enabled: boolean;
   required: boolean;
+  immutable?: boolean;
   verifications: VerificationStrategy[];
   used_for_first_factor: boolean;
   first_factors: VerificationStrategy[];
@@ -91,6 +92,7 @@ export type OAuthProviders = {
 };
 export type EnterpriseSSOSettings = {
   enabled: boolean;
+  self_serve_sso: boolean;
 };
 
 export type AttributesJSON = {

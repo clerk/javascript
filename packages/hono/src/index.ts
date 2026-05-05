@@ -1,5 +1,6 @@
 export { clerkMiddleware } from './clerkMiddleware';
 export type { ClerkMiddlewareOptions } from './clerkMiddleware';
+export type { FrontendApiProxyOptions } from './types';
 
 export { getAuth } from './getAuth';
 

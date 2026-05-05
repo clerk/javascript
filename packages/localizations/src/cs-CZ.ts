@@ -182,6 +182,11 @@ export const csCZ: LocalizationResource = {
     viewPayment: undefined,
     year: 'Rok',
   },
+  configureSSO: {
+    navbar: {
+      title: 'Nastavit jednotné přihlášení (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Vytvořit organizaci',
     invitePage: {
@@ -1361,6 +1366,7 @@ export const csCZ: LocalizationResource = {
         title: 'E-mailové adresy',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Připojit účet',
         title: 'Podnikové účty',
       },
       headerTitle__account: 'Podrobnosti profilu',

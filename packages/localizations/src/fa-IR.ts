@@ -183,6 +183,11 @@ export const faIR: LocalizationResource = {
     viewPayment: 'مشاهده پرداخت',
     year: 'سال',
   },
+  configureSSO: {
+    navbar: {
+      title: 'پیکربندی ورود یکپارچه (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'ایجاد سازمان',
     invitePage: {
@@ -1357,6 +1362,7 @@ export const faIR: LocalizationResource = {
         title: 'آدرس های ایمیل',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'اتصال حساب',
         title: 'حساب های سازمانی',
       },
       headerTitle__account: 'جزئیات نمایه',

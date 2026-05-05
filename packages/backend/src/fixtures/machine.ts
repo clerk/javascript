@@ -37,7 +37,7 @@ export const mockVerificationResults = {
     updatedAt: 1744928754551,
   },
   m2m_token: {
-    id: 'm2m_ey966f1b1xf93586b2debdcadb0b3bd1',
+    id: 'mt_ey966f1b1xf93586b2debdcadb0b3bd1',
     subject: 'mch_2vYVtestTESTtestTESTtestTESTtest',
     scopes: ['mch_1xxxxx', 'mch_2xxxxx'],
     claims: { foo: 'bar' },

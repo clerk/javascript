@@ -37,15 +37,22 @@ export function createDevBrowser({
 }: CreateDevBrowserOptions): DevBrowser {
   const devBrowserCookie = createDevBrowserCookie(cookieSuffix, cookieOptions);
 
+  // Hold the dev browser token in memory so it's always available to FAPI
+  // interceptors, even before Environment resolves and cookies can be written
+  // with the correct Partitioned attribute.
+  let devBrowserInMemory: string | undefined;
+
   function getDevBrowser() {
-    return devBrowserCookie.get();
+    return devBrowserInMemory || devBrowserCookie.get();
   }
 
   function setDevBrowser(devBrowser: string) {
+    devBrowserInMemory = devBrowser;
     devBrowserCookie.set(devBrowser);
   }
 
   function removeDevBrowser() {
+    devBrowserInMemory = undefined;
     devBrowserCookie.remove();
   }
 
@@ -81,7 +88,9 @@ export function createDevBrowser({
     }
 
     // 2. If no dev browser is found in the first step, check if one is already available in the __clerk_db_jwt JS cookie
-    if (devBrowserCookie.get()) {
+    const existingDevBrowser = devBrowserCookie.get();
+    if (existingDevBrowser) {
+      devBrowserInMemory = existingDevBrowser;
       return;
     }
 

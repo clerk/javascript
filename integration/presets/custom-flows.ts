@@ -1,6 +1,6 @@
 import { applicationConfig } from '../models/applicationConfig';
 import { templates } from '../templates';
-import { linkPackage } from './utils';
+import { PKGLAB } from './utils';
 
 const reactVite = applicationConfig()
   .setName('custom-flows-react-vite')
@@ -10,9 +10,9 @@ const reactVite = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm preview')
-  .addDependency('@clerk/react', linkPackage('react'))
-  .addDependency('@clerk/shared', linkPackage('shared'))
-  .addDependency('@clerk/ui', linkPackage('ui'));
+  .addDependency('@clerk/react', PKGLAB)
+  .addDependency('@clerk/shared', PKGLAB)
+  .addDependency('@clerk/ui', PKGLAB);
 
 export const customFlows = {
   reactVite,

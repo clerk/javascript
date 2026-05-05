@@ -190,6 +190,83 @@ describe('EmailSection', () => {
     });
   });
 
+  describe('Immutable email addresses', () => {
+    const withImmutableEmails = createFixtures.config(f => {
+      f.withEmailAddress({ immutable: true });
+      f.withUser({
+        email_addresses: ['test@clerk.com', 'test2@clerk.com'],
+      });
+    });
+
+    it('hides the "Add email address" button when email is immutable', async () => {
+      const { wrapper } = await createFixtures(withImmutableEmails);
+
+      const { queryByRole } = render(
+        <CardStateProvider>
+          <EmailsSection shouldAllowCreation={false} />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      expect(queryByRole('button', { name: /add email address/i })).not.toBeInTheDocument();
+    });
+
+    it('hides the "Remove" menu action when email is immutable', async () => {
+      const { wrapper } = await createFixtures(withImmutableEmails);
+
+      const { getByText, userEvent, queryByRole } = render(
+        <CardStateProvider>
+          <EmailsSection
+            shouldAllowCreation={false}
+            shouldAllowDeletion={false}
+          />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      const item = getByText('test@clerk.com');
+      const menuButton = getMenuItemFromText(item);
+      await act(async () => {
+        await userEvent.click(menuButton!);
+      });
+
+      expect(queryByRole('menuitem', { name: /remove email/i })).not.toBeInTheDocument();
+    });
+
+    it('still shows verify and set-as-primary actions when email is immutable', async () => {
+      const { wrapper } = await createFixtures(
+        createFixtures.config(f => {
+          f.withEmailAddress({ immutable: true });
+          f.withUser({
+            email_addresses: [
+              { email_address: 'primary@clerk.com', id: 'email_primary', verification: { status: 'verified' } },
+              { email_address: 'secondary@clerk.com', id: 'email_secondary', verification: { status: 'verified' } },
+            ],
+            primary_email_address_id: 'email_primary',
+          });
+        }),
+      );
+
+      const { getByText, userEvent, getByRole } = render(
+        <CardStateProvider>
+          <EmailsSection
+            shouldAllowCreation={false}
+            shouldAllowDeletion={false}
+          />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      const item = getByText('secondary@clerk.com');
+      const menuButton = getMenuItemFromText(item);
+      await act(async () => {
+        await userEvent.click(menuButton!);
+      });
+
+      getByRole('menuitem', { name: /set as primary/i });
+    });
+  });
+
   describe('Handles opening/closing actions', () => {
     it('closes add email form when remove an email address action is clicked', async () => {
       const { wrapper, fixtures } = await createFixtures(withEmails);

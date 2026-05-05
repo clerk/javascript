@@ -178,6 +178,11 @@ export const nlNL: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'Single sign-on (SSO) configureren',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Creëer organisatie',
     invitePage: {
@@ -459,7 +464,7 @@ export const nlNL: LocalizationResource = {
       headerTitle__general: 'Algemeen',
       headerTitle__members: 'Leden',
       profileSection: {
-        primaryButton: '',
+        primaryButton: 'Profiel bijwerken',
         title: 'Organisatieprofiel',
         uploadAction__title: 'Logo',
       },
@@ -1348,6 +1353,7 @@ export const nlNL: LocalizationResource = {
         title: 'E-mailadressen',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Verbind een account',
         title: 'Bedrijfsaccounts',
       },
       headerTitle__account: 'Account',
