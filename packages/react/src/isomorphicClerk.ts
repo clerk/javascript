@@ -344,11 +344,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return this.clerkjs?.isStandardBrowser || this.options.standardBrowser || false;
   }
 
-  get __internal_queryClient() {
-    // @ts-expect-error - __internal_queryClient is not typed
-    return this.clerkjs?.__internal_queryClient;
-  }
-
   get isSatellite() {
     // This getter can run in environments where window is not available.
     // In those cases we should expect and use domain as a string
@@ -654,13 +649,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     this.#eventBus.internal.retrieveListeners('status')?.forEach(listener => {
       // Since clerkjs exists it will call `this.clerkjs.on('status', listener)`
       this.on('status', listener, { notify: true });
-    });
-
-    // @ts-expect-error - queryClientStatus is not typed
-    this.#eventBus.internal.retrieveListeners('queryClientStatus')?.forEach(listener => {
-      // Since clerkjs exists it will call `this.clerkjs.on('queryClientStatus', listener)`
-      // @ts-expect-error - queryClientStatus is not typed
-      this.on('queryClientStatus', listener, { notify: true });
     });
 
     if (this.preopenSignIn !== null) {
