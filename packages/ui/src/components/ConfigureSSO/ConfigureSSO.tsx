@@ -11,8 +11,15 @@ import { ProfileCard } from '@/elements/ProfileCard';
 import { BoxIcon } from '@/icons';
 import { Route, Switch } from '@/router';
 
-import { ConfigureSSOFlowProvider } from './ConfigureSSOContext';
-import { CONFIGURE_SSO_STEPS } from './constants';
+import { ConfigureSSOFlowProvider, useConfigureSSOFlow } from './ConfigureSSOContext';
+import {
+  ConfigureCreateApp,
+  ConfigureMapAttributes,
+  ConfirmationStep,
+  ProvideEmail,
+  TestConfigurationStep,
+  VerifyDomain,
+} from './steps';
 import { ConfigureSSOWizard } from './wizard';
 
 const ConfigureSSOInternal = () => {
@@ -117,17 +124,87 @@ const AuthenticatedContent = withCoreUserGuard(() => {
             enterpriseConnection={enterpriseConnection}
             isLoading={isLoadingEnterpriseConnections}
           >
-            <ConfigureSSOWizard.Root steps={CONFIGURE_SSO_STEPS}>
-              <ConfigureSSOWizard.Header />
-              <ConfigureSSOWizard.Content />
-              <ConfigureSSOWizard.Footer />
-            </ConfigureSSOWizard.Root>
+            <ConfigureSSOSteps />
           </ConfigureSSOFlowProvider>
         </Col>
       </NavbarContextProvider>
     </ProfileCard.Root>
   );
 });
+
+/**
+ * The full ConfigureSSO step tree, declared inline. Each
+ * `<ConfigureSSOWizard.Step>` is one breadcrumb entry; nested
+ * `<ConfigureSSOWizard>` blocks declare inner sub-step routing.
+ *
+ * Conditional rendering on a step (`{cond && <Step ... />}`) skips
+ * it from the breadcrumb and from `goNext`/`goPrev` traversal — no
+ * `shouldSkip` predicate needed
+ */
+const ConfigureSSOSteps = () => {
+  const { domainAlreadyVerified } = useConfigureSSOFlow();
+
+  return (
+    <ConfigureSSOWizard>
+      {!domainAlreadyVerified && (
+        <ConfigureSSOWizard.Step
+          id='verify-email-domain'
+          path='verify-email-domain'
+          label='Verify domain'
+        >
+          <ConfigureSSOWizard>
+            <ConfigureSSOWizard.Step
+              id='provide-email'
+              path='provide-email'
+            >
+              <ProvideEmail />
+            </ConfigureSSOWizard.Step>
+            <ConfigureSSOWizard.Step
+              id='verify-domain'
+              path='verify-domain'
+            >
+              <VerifyDomain />
+            </ConfigureSSOWizard.Step>
+          </ConfigureSSOWizard>
+        </ConfigureSSOWizard.Step>
+      )}
+      <ConfigureSSOWizard.Step
+        id='configure'
+        path='configure'
+        label='Configure'
+      >
+        <ConfigureSSOWizard>
+          <ConfigureSSOWizard.Step
+            id='create-app'
+            path='create-app'
+          >
+            <ConfigureCreateApp />
+          </ConfigureSSOWizard.Step>
+          <ConfigureSSOWizard.Step
+            id='map-attributes'
+            path='map-attributes'
+          >
+            <ConfigureMapAttributes />
+          </ConfigureSSOWizard.Step>
+        </ConfigureSSOWizard>
+      </ConfigureSSOWizard.Step>
+      <ConfigureSSOWizard.Step
+        id='test'
+        path='test'
+        label='Test'
+      >
+        <TestConfigurationStep />
+      </ConfigureSSOWizard.Step>
+      <ConfigureSSOWizard.Step
+        id='confirmation'
+        path='confirmation'
+        label='Confirmation'
+      >
+        <ConfirmationStep />
+      </ConfigureSSOWizard.Step>
+    </ConfigureSSOWizard>
+  );
+};
 
 const OrganizationSidebarSubtitle = () => {
   const { organization } = useOrganization();

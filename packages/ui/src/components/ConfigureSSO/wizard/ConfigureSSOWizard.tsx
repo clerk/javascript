@@ -5,41 +5,109 @@ import { CaretLeft, CaretRight } from '@/icons';
 import { Route, Switch, useRouter } from '@/router';
 
 import { useConfigureSSOFlow } from '../ConfigureSSOContext';
-import { ConfigureSSOWizardProvider, useConfigureSSOWizard } from './ConfigureSSOWizardContext';
-import type { ConfigureSSOWizardInnerStep, ConfigureSSOWizardStep } from './types';
+import {
+  ConfigureSSOWizardContext,
+  useConfigureSSOWizard,
+  useRegisterWizard,
+  useWizardChromeRegistry,
+  WizardChromeProvider,
+} from './ConfigureSSOWizardContext';
+import type {
+  ConfigureSSOWizardActiveStep,
+  ConfigureSSOWizardContextValue,
+  ConfigureSSOWizardStepProps,
+} from './types';
 
-interface ConfigureSSOWizardRootProps {
-  steps: ReadonlyArray<ConfigureSSOWizardStep>;
+/**
+ * Marker component for a single step in `<ConfigureSSOWizard>`. The
+ * parent wizard reads its props directly off the JSX element; the
+ * component itself never renders independently
+ */
+const Step = (_: ConfigureSSOWizardStepProps): JSX.Element | null => null;
+Step.displayName = 'ConfigureSSOWizard.Step';
+
+interface RootProps {
   children: React.ReactNode;
 }
 
 /**
- * Top-level wizard scaffold for the ConfigureSSO flow. Sources its
- * `data` and `isLoading` from `useConfigureSSOFlow()` directly, so it
- * must be rendered inside `<ConfigureSSOFlowProvider>`
+ * Walks the wizard's children and returns the descriptors for every
+ * `<ConfigureSSOWizard.Step>` element. Anything else (`false` from
+ * `&&`, plain text, fragments, etc.) is silently ignored, so
+ * conditional rendering in JSX naturally drives "skipping"
  */
-const Root = (props: ConfigureSSOWizardRootProps): JSX.Element => {
-  const { steps, children } = props;
-  const router = useRouter();
-  const data = useConfigureSSOFlow();
-  const { isLoading } = data;
+function extractSteps(children: React.ReactNode): ConfigureSSOWizardActiveStep[] {
+  const steps: ConfigureSSOWizardActiveStep[] = [];
 
-  const activeSteps = React.useMemo(() => steps.filter(s => !s.shouldSkip?.(data)), [steps, data]);
-
-  const getActiveInnerSteps = React.useCallback(
-    (step: ConfigureSSOWizardStep | undefined): ConfigureSSOWizardInnerStep[] =>
-      step?.innerSteps?.filter(s => !s.shouldSkip?.(data)) ?? [],
-    [data],
-  );
-
-  const currentStep = React.useMemo<ConfigureSSOWizardStep | undefined>(() => {
-    if (activeSteps.length === 0) {
-      return undefined;
+  React.Children.forEach(children, child => {
+    if (!React.isValidElement(child)) return;
+    // Tolerate fragments at the top level (e.g. when users factor a
+    // group of steps into a helper component that returns one)
+    if (child.type === React.Fragment) {
+      const fragmentChildren = (child.props as { children?: React.ReactNode }).children;
+      steps.push(...extractSteps(fragmentChildren));
+      return;
     }
+    if (child.type !== Step) return;
+    const props = child.props as ConfigureSSOWizardStepProps;
+    steps.push({
+      id: props.id,
+      path: props.path,
+      label: props.label,
+      children: props.children,
+    });
+  });
 
-    // Match the URL against non-first main steps (most-specific first),
-    // the first main step is mounted as the wizard's catch-all and is
-    // always the fallback
+  return steps;
+}
+
+const Root = ({ children }: RootProps): JSX.Element => {
+  const parentWizard = React.useContext(ConfigureSSOWizardContext);
+  const isNested = parentWizard !== null;
+
+  // Outermost wizard owns the shared chrome registry. Nested wizards
+  // reuse whatever the outer one provided, so registrations bubble up
+  if (!isNested) {
+    return (
+      <WizardChromeProvider>
+        <RootInner
+          parentWizard={null}
+          isNested={false}
+        >
+          {children}
+        </RootInner>
+      </WizardChromeProvider>
+    );
+  }
+
+  return (
+    <RootInner
+      parentWizard={parentWizard}
+      isNested
+    >
+      {children}
+    </RootInner>
+  );
+};
+
+interface RootInnerProps {
+  parentWizard: ConfigureSSOWizardContextValue | null;
+  isNested: boolean;
+  children: React.ReactNode;
+}
+
+const RootInner = ({ parentWizard, isNested, children }: RootInnerProps): JSX.Element => {
+  const router = useRouter();
+  const flow = useConfigureSSOFlow();
+  const { isLoading } = flow;
+
+  const activeSteps = React.useMemo(() => extractSteps(children), [children]);
+
+  // Match the URL against non-first steps (most-specific first); the
+  // first step is mounted as the index route and is always the
+  // fallback when nothing else matches
+  const currentStep = React.useMemo<ConfigureSSOWizardActiveStep | undefined>(() => {
+    if (activeSteps.length === 0) return undefined;
     return (
       activeSteps
         .slice(1)
@@ -48,134 +116,97 @@ const Root = (props: ConfigureSSOWizardRootProps): JSX.Element => {
     );
   }, [activeSteps, router]);
 
-  const innerSteps = React.useMemo(() => getActiveInnerSteps(currentStep), [currentStep, getActiveInnerSteps]);
-
-  // Builds a path relative to the wizard base. The first main step
-  // is the catch-all, the first inner step of any main
-  // step is its parent's index route (no segment)
   const buildPath = React.useCallback(
-    (mainStep: ConfigureSSOWizardStep, innerStep?: ConfigureSSOWizardInnerStep): string => {
-      const inners = getActiveInnerSteps(mainStep);
-      const target = innerStep ?? inners[0];
-      const isFirstMain = activeSteps[0]?.id === mainStep.id;
-      const isFirstInner = !target || inners[0]?.id === target.id;
-      const segments = [isFirstMain ? '' : mainStep.path, isFirstInner ? '' : target.path].filter(Boolean);
-      return segments.join('/') || './';
+    (step: ConfigureSSOWizardActiveStep): string => {
+      const isFirst = activeSteps[0]?.id === step.id;
+      return isFirst ? './' : step.path;
     },
-    [activeSteps, getActiveInnerSteps],
+    [activeSteps],
   );
 
-  const currentInnerStep = React.useMemo<ConfigureSSOWizardInnerStep | undefined>(() => {
-    if (!currentStep || innerSteps.length === 0) {
-      return undefined;
-    }
-
-    return (
-      innerSteps
-        .slice(1)
-        .reverse()
-        .find(s => router.matches(buildPath(currentStep, s))) ?? innerSteps[0]
-    );
-  }, [currentStep, innerSteps, router, buildPath]);
-
   const navigateTo = React.useCallback(
-    (mainStep: ConfigureSSOWizardStep | undefined, innerStep?: ConfigureSSOWizardInnerStep) =>
-      mainStep ? router.navigate(buildPath(mainStep, innerStep)) : undefined,
+    (step: ConfigureSSOWizardActiveStep | undefined) => (step ? router.navigate(buildPath(step)) : undefined),
     [router, buildPath],
   );
 
   const goNext = React.useCallback(() => {
-    if (!currentStep) {
-      return;
-    }
-
-    const innerIndex = innerSteps.findIndex(s => s.id === currentInnerStep?.id);
-    if (innerIndex >= 0 && innerIndex < innerSteps.length - 1) {
-      return navigateTo(currentStep, innerSteps[innerIndex + 1]);
-    }
-
-    const mainIndex = activeSteps.findIndex(s => s.id === currentStep.id);
-    return navigateTo(activeSteps[mainIndex + 1]);
-  }, [activeSteps, currentStep, currentInnerStep, innerSteps, navigateTo]);
+    if (!currentStep) return;
+    const idx = activeSteps.findIndex(s => s.id === currentStep.id);
+    const next = activeSteps[idx + 1];
+    if (next) return navigateTo(next);
+    // End of *this* wizard's siblings → cascade to the parent so
+    // the outer wizard advances past us to the next outer step
+    return parentWizard?.goNext();
+  }, [activeSteps, currentStep, navigateTo, parentWizard]);
 
   const goPrev = React.useCallback(() => {
-    if (!currentStep) {
-      return;
-    }
-
-    const innerIndex = innerSteps.findIndex(s => s.id === currentInnerStep?.id);
-    if (innerIndex > 0) {
-      return navigateTo(currentStep, innerSteps[innerIndex - 1]);
-    }
-
-    const mainIndex = activeSteps.findIndex(s => s.id === currentStep.id);
-    const prevMain = activeSteps[mainIndex - 1];
-    if (!prevMain) {
-      return;
-    }
-
-    // Land on the previous main step's last inner step
-    const prevInners = getActiveInnerSteps(prevMain);
-    return navigateTo(prevMain, prevInners[prevInners.length - 1]);
-  }, [activeSteps, currentStep, currentInnerStep, innerSteps, navigateTo, getActiveInnerSteps]);
+    if (!currentStep) return;
+    const idx = activeSteps.findIndex(s => s.id === currentStep.id);
+    const prev = activeSteps[idx - 1];
+    if (prev) return navigateTo(prev);
+    // At the first sibling — defer to the parent so the user can
+    // step back into the previous outer step's last position
+    return parentWizard?.goPrev();
+  }, [activeSteps, currentStep, navigateTo, parentWizard]);
 
   const goToStep = React.useCallback(
     (id: string) => navigateTo(activeSteps.find(s => s.id === id)),
     [activeSteps, navigateTo],
   );
 
-  return (
-    <ConfigureSSOWizardProvider
-      activeSteps={activeSteps}
-      currentStep={currentStep}
-      innerSteps={innerSteps}
-      currentInnerStep={currentInnerStep}
-      isLoading={isLoading}
-      goNext={goNext}
-      goPrev={goPrev}
-      goToStep={goToStep}
-    >
-      {children}
-    </ConfigureSSOWizardProvider>
-  );
-};
+  const value = React.useMemo<ConfigureSSOWizardContextValue>(() => {
+    const idx = currentStep ? activeSteps.findIndex(s => s.id === currentStep.id) : -1;
+    return {
+      activeSteps,
+      currentStep,
+      currentIndex: idx,
+      totalSteps: activeSteps.length,
+      // First/last only count as edges when there's nothing past us
+      // to fall back on (otherwise the parent wizard absorbs the move)
+      isFirstStep: idx <= 0 && !parentWizard,
+      isLastStep: idx === activeSteps.length - 1 && !parentWizard,
+      isLoading,
+      goNext,
+      goPrev,
+      goToStep,
+      isNested,
+    };
+  }, [activeSteps, currentStep, isLoading, goNext, goPrev, goToStep, isNested, parentWizard]);
 
-/**
- * Renders a container step's inner sub-routes, or falls back to the
- * step's own `Component` for leaf steps
- */
-const StepRoutes = ({ step }: { step: ConfigureSSOWizardStep }): JSX.Element | null => {
-  const Component = step.Component;
-  if (!step.innerSteps?.length) {
-    return Component ? <Component /> : null;
+  // Push this wizard onto the chrome stack so the shared footer can
+  // dispatch Continue / Previous to the *deepest* mounted wizard,
+  // not just the outermost one
+  useRegisterWizard(value);
+
+  const body = <Body activeSteps={activeSteps} />;
+
+  if (isNested) {
+    // Nested wizards plug into the parent's chrome; they only own
+    // the inner routing for their step's body
+    return <ConfigureSSOWizardContext.Provider value={value}>{body}</ConfigureSSOWizardContext.Provider>;
   }
+
+  // Outermost wizard owns the full layout: breadcrumb on top, the
+  // step body in the middle, the shared footer at the bottom
   return (
-    <Switch>
-      {step.innerSteps.map((inner, i) => {
-        const InnerComponent = inner.Component;
-        return (
-          <Route
-            key={inner.id}
-            {...(i === 0 ? { index: true } : { path: inner.path })}
-          >
-            <InnerComponent />
-          </Route>
-        );
-      })}
-    </Switch>
+    <ConfigureSSOWizardContext.Provider value={value}>
+      <Header />
+      {body}
+      <Footer />
+    </ConfigureSSOWizardContext.Provider>
   );
 };
 
 /**
- * Renders the active step. Non-first main steps are routed by their
- * `path`, the first main step is mounted last as a path-less, index-
- * less catch-all so it owns the wizard's base URL *and* any URL that
- * doesn't match another main step (e.g. its own inner-step paths)
+ * Renders the active step's body (or a spinner while async deps are
+ * loading). Each step is mounted at its `path`; the first step is the
+ * index/catch-all so the wizard's base URL renders something
  */
-const Content = (): JSX.Element | null => {
-  const { activeSteps, isLoading } = useConfigureSSOWizard();
+const Body = ({ activeSteps }: { activeSteps: ConfigureSSOWizardActiveStep[] }): JSX.Element | null => {
+  const { isLoading, isNested } = useConfigureSSOWizard();
 
   if (isLoading) {
+    if (isNested) return null;
     return (
       <Flex
         align='center'
@@ -204,19 +235,18 @@ const Content = (): JSX.Element | null => {
           key={step.id}
           path={step.path}
         >
-          <StepRoutes step={step} />
+          {step.children}
         </Route>
       ))}
-      <Route key={firstStep.id}>
-        <StepRoutes step={firstStep} />
-      </Route>
+      <Route key={firstStep.id}>{firstStep.children}</Route>
     </Switch>
   );
 };
 
 /**
- * Numbered breadcrumb of all active steps. Completed and current steps
- * are clickable for backwards navigation, future steps are disabled
+ * Numbered breadcrumb of the outermost wizard's active steps.
+ * Completed and current steps are clickable for backwards navigation,
+ * future steps are disabled
  */
 const Header = (): JSX.Element => {
   const { activeSteps, currentIndex, isLoading, goToStep } = useConfigureSSOWizard();
@@ -238,7 +268,7 @@ const Header = (): JSX.Element => {
         const isCurrent = index === currentIndex;
         const isCompleted = index < currentIndex;
         const isReachable = index <= currentIndex;
-        const label = typeof step.label === 'string' ? step.label : t(step.label);
+        const labelText = step.label ? (typeof step.label === 'string' ? step.label : t(step.label)) : '';
 
         return (
           <React.Fragment key={step.id}>
@@ -283,7 +313,7 @@ const Header = (): JSX.Element => {
                   variant='body'
                   sx={{ fontWeight: 'inherit', color: 'inherit' }}
                 >
-                  {label}
+                  {labelText}
                 </Text>
               </Button>
             )}
@@ -326,15 +356,15 @@ const SkeletonBreadcrumbStep = (): JSX.Element => (
 );
 
 /**
- * Compact "Step X / Y" badge that tracks the current main step's
- * inner-step progress. Renders nothing when the current step has no
- * inner steps — that's the signal that the parent layout doesn't
- * need to reserve room for it
+ * Compact "Step X / Y" badge that mirrors the *nearest* wizard's
+ * progress. Renders nothing when the nearest wizard has only one
+ * step (i.e. there's nothing meaningful to count). Drop this inside
+ * an inner wizard's step layout to surface inner-step progress
  */
 const StepIndicator = (): JSX.Element | null => {
-  const { totalInnerSteps, currentInnerIndex } = useConfigureSSOWizard();
+  const { totalSteps, currentIndex } = useConfigureSSOWizard();
 
-  if (totalInnerSteps <= 0 || currentInnerIndex < 0) {
+  if (totalSteps <= 1 || currentIndex < 0) {
     return null;
   }
 
@@ -350,7 +380,7 @@ const StepIndicator = (): JSX.Element | null => {
           as='span'
           sx={t => ({ fontSize: t.fontSizes.$xs })}
         >
-          Step {currentInnerIndex + 1}/{totalInnerSteps}
+          Step {currentIndex + 1}/{totalSteps}
         </Text>
       </Badge>
     </Flex>
@@ -363,34 +393,40 @@ interface FooterProps {
    */
   previousLabel?: string;
   /**
-   * Override label for the Continue button (also overridable per step
-   * via `setContinueAction({ label })`)
+   * Override label for the Continue button (also overridable per
+   * step via `useRegisterContinueAction({ label })`)
    */
   continueLabel?: string;
   /**
-   * Hides the Previous button entirely (e.g. on the first step you may
-   * still want to keep it disabled rather than hidden — that is the
-   * default)
+   * Hides the Previous button entirely
    */
   hidePrevious?: boolean;
   /**
    * Force-disables both Previous and Continue regardless of the
-   * wizard's own state. Useful while async dependencies of the flow
-   * are still loading
+   * wizard's own state
    */
   isDisabled?: boolean;
 }
 
 /**
- * Shared Previous / Continue footer. Continue dispatches to the
- * currently registered step `ContinueAction` if any, otherwise it
- * simply advances to the next step
+ * Shared Previous / Continue footer. Owned by the outermost wizard.
+ * Continue dispatches to the currently registered step `ContinueAction`
+ * if any; otherwise it advances the outermost wizard
  */
 const Footer = (props: FooterProps): JSX.Element => {
   const { previousLabel = 'Previous', continueLabel = 'Continue', hidePrevious = false, isDisabled = false } = props;
-  const { isFirstStep, isLastStep, isLoading, goPrev, goNext, continueAction } = useConfigureSSOWizard();
+  const { isLoading } = useConfigureSSOWizard();
+  const { continueAction, deepestWizardRef } = useWizardChromeRegistry();
   const isForceDisabled = isDisabled || isLoading;
   const { t } = useLocalizations();
+
+  // Footer-level controls always dispatch to the deepest mounted
+  // wizard. That way Previous from the second inner sub-step lands
+  // on the first inner sub-step instead of jumping out to the
+  // previous outer step
+  const deepest = deepestWizardRef.current?.current;
+  const isFirstStep = deepest?.isFirstStep ?? true;
+  const isLastStep = deepest?.isLastStep ?? true;
 
   const continueLabelToShow =
     typeof continueAction?.label === 'string'
@@ -405,7 +441,11 @@ const Footer = (props: FooterProps): JSX.Element => {
       return;
     }
 
-    void goNext();
+    void deepestWizardRef.current?.current.goNext();
+  };
+
+  const handlePrevious = () => {
+    void deepestWizardRef.current?.current.goPrev();
   };
 
   return (
@@ -426,7 +466,7 @@ const Footer = (props: FooterProps): JSX.Element => {
           variant='outline'
           size='sm'
           isDisabled={isForceDisabled || isFirstStep}
-          onClick={() => void goPrev()}
+          onClick={handlePrevious}
         >
           <Icon
             icon={CaretLeft}
@@ -454,10 +494,17 @@ const Footer = (props: FooterProps): JSX.Element => {
   );
 };
 
-export const ConfigureSSOWizard = {
-  Root,
-  Header,
-  Content,
-  Footer,
+/**
+ * Declarative wizard for the ConfigureSSO flow.
+ *
+ * Steps are written as JSX children: render a `<ConfigureSSOWizard.Step>`
+ * for each step and toggle visibility with regular conditional
+ * expressions (`{cond && <Step>...</Step>}`). Inner sub-steps are
+ * declared by nesting another `<ConfigureSSOWizard>` inside a step's
+ * body — the inner wizard's `goNext` cascades to the outer one when
+ * it runs out of inner steps
+ */
+export const ConfigureSSOWizard = Object.assign(Root, {
+  Step,
   StepIndicator,
-};
+});
