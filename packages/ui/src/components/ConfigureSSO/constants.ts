@@ -20,16 +20,16 @@ export const CONFIGURE_SSO_STEPS: ReadonlyArray<WizardStep<ConfigureSSOData>> = 
         id: 'add-email-address',
         path: 'add-email-address',
         Component: AddEmailAddress,
+        shouldSkip: data => !!data.primaryEmailAddress,
       },
       {
         id: 'verify-domain',
         path: 'verify-domain',
         Component: VerifyDomain,
-        shouldSkip: data => data.domainAlreadyVerified,
+        shouldSkip: data => data.primaryEmailAddress?.verification.status === 'verified',
       },
     ],
-    // Skip this step when there's a primary email address domain already verified
-    shouldSkip: data => data.domainAlreadyVerified,
+    shouldSkip: data => data.primaryEmailAddress?.verification.status === 'verified',
   },
   {
     id: 'configure',

@@ -1,5 +1,5 @@
 import { useUser } from '@clerk/shared/react/index';
-import type { EnterpriseConnectionResource } from '@clerk/shared/types';
+import type { EmailAddressResource, EnterpriseConnectionResource } from '@clerk/shared/types';
 import React, { type PropsWithChildren } from 'react';
 
 /**
@@ -8,10 +8,8 @@ import React, { type PropsWithChildren } from 'react';
  * `data` prop
  */
 export interface ConfigureSSOData {
-  /**
-   * `true` if the user primary email address domain is already verified
-   */
-  domainAlreadyVerified: boolean;
+  /** The primary email address of the current user */
+  primaryEmailAddress?: EmailAddressResource | null;
   /**
    * The enterprise connection from the user's primary email address domain
    */
@@ -41,15 +39,13 @@ export const ConfigureSSOFlowProvider = ({
 }: PropsWithChildren<ConfigureSSOFlowProviderProps>): JSX.Element => {
   const { user } = useUser();
 
-  const domainAlreadyVerified = user?.primaryEmailAddress?.verification.status === 'verified';
-
   const value = React.useMemo<ConfigureSSOContextValue>(
     () => ({
+      primaryEmailAddress: user?.primaryEmailAddress,
       enterpriseConnection,
-      domainAlreadyVerified,
       isLoading,
     }),
-    [enterpriseConnection, domainAlreadyVerified, isLoading],
+    [user?.primaryEmailAddress, enterpriseConnection, isLoading],
   );
 
   return <ConfigureSSOFlowContext.Provider value={value}>{children}</ConfigureSSOFlowContext.Provider>;
