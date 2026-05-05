@@ -1356,4 +1356,238 @@ describe('SignUp', () => {
       });
     });
   });
+
+  describe('protectCheck', () => {
+    it('deserializes protect_check from JSON', () => {
+      const signUp = new SignUp({
+        id: 'signup_123',
+        object: 'sign_up',
+        status: 'missing_requirements',
+        required_fields: [],
+        optional_fields: [],
+        missing_fields: ['protect_check'],
+        unverified_fields: [],
+        username: null,
+        first_name: null,
+        last_name: null,
+        email_address: 'test@example.com',
+        phone_number: null,
+        web3_wallet: null,
+        external_account_strategy: null,
+        external_account: null,
+        has_password: false,
+        unsafe_metadata: {},
+        created_session_id: null,
+        created_user_id: null,
+        abandon_at: null,
+        legal_accepted_at: null,
+        locale: null,
+        verifications: null,
+        protect_check: {
+          status: 'pending',
+          token: 'challenge-token-abc',
+          sdk_url: 'https://sdk.example.com/challenge.js',
+          expires_at: 1741564800000,
+          ui_hints: { theme: 'dark' },
+        },
+      });
+
+      expect(signUp.protectCheck).not.toBeNull();
+      expect(signUp.protectCheck?.status).toBe('pending');
+      expect(signUp.protectCheck?.token).toBe('challenge-token-abc');
+      expect(signUp.protectCheck?.sdkUrl).toBe('https://sdk.example.com/challenge.js');
+      expect(signUp.protectCheck?.expiresAt).toBe(1741564800000);
+      expect(signUp.protectCheck?.uiHints).toEqual({ theme: 'dark' });
+      expect(signUp.missingFields).toContain('protect_check');
+    });
+
+    it('handles protect_check with optional expires_at and ui_hints omitted', () => {
+      const signUp = new SignUp({
+        id: 'signup_123',
+        object: 'sign_up',
+        status: 'missing_requirements',
+        required_fields: [],
+        optional_fields: [],
+        missing_fields: ['protect_check'],
+        unverified_fields: [],
+        username: null,
+        first_name: null,
+        last_name: null,
+        email_address: null,
+        phone_number: null,
+        web3_wallet: null,
+        external_account_strategy: null,
+        external_account: null,
+        has_password: false,
+        unsafe_metadata: {},
+        created_session_id: null,
+        created_user_id: null,
+        abandon_at: null,
+        legal_accepted_at: null,
+        locale: null,
+        verifications: null,
+        protect_check: {
+          status: 'pending',
+          token: 'minimal-token',
+          sdk_url: 'https://example.com/sdk.js',
+        },
+      });
+
+      expect(signUp.protectCheck?.status).toBe('pending');
+      expect(signUp.protectCheck?.token).toBe('minimal-token');
+      expect(signUp.protectCheck?.expiresAt).toBeUndefined();
+      expect(signUp.protectCheck?.uiHints).toBeUndefined();
+
+      // Snapshot omits the optional fields when absent
+      const snapshot = signUp.__internal_toSnapshot();
+      expect(snapshot.protect_check).toEqual({
+        status: 'pending',
+        token: 'minimal-token',
+        sdk_url: 'https://example.com/sdk.js',
+      });
+    });
+
+    it('sets protectCheck to null when not present in JSON', () => {
+      const signUp = new SignUp({
+        id: 'signup_123',
+        object: 'sign_up',
+        status: 'missing_requirements',
+        required_fields: [],
+        optional_fields: [],
+        missing_fields: [],
+        unverified_fields: [],
+        username: null,
+        first_name: null,
+        last_name: null,
+        email_address: null,
+        phone_number: null,
+        web3_wallet: null,
+        external_account_strategy: null,
+        external_account: null,
+        has_password: false,
+        unsafe_metadata: {},
+        created_session_id: null,
+        created_user_id: null,
+        abandon_at: null,
+        legal_accepted_at: null,
+        locale: null,
+        verifications: null,
+        protect_check: null,
+      });
+
+      expect(signUp.protectCheck).toBeNull();
+    });
+
+    it('round-trips protectCheck through snapshot', () => {
+      const signUp = new SignUp({
+        id: 'signup_123',
+        object: 'sign_up',
+        status: 'missing_requirements',
+        required_fields: [],
+        optional_fields: [],
+        missing_fields: ['protect_check'],
+        unverified_fields: [],
+        username: null,
+        first_name: null,
+        last_name: null,
+        email_address: null,
+        phone_number: null,
+        web3_wallet: null,
+        external_account_strategy: null,
+        external_account: null,
+        has_password: false,
+        unsafe_metadata: {},
+        created_session_id: null,
+        created_user_id: null,
+        abandon_at: null,
+        legal_accepted_at: null,
+        locale: null,
+        verifications: null,
+        protect_check: {
+          status: 'pending',
+          token: 'test-token',
+          sdk_url: 'https://example.com/sdk.js',
+          expires_at: 1700000000000,
+          ui_hints: {},
+        },
+      });
+
+      const snapshot = signUp.__internal_toSnapshot();
+      expect(snapshot.protect_check).toEqual({
+        status: 'pending',
+        token: 'test-token',
+        sdk_url: 'https://example.com/sdk.js',
+        expires_at: 1700000000000,
+        ui_hints: {},
+      });
+
+      // Re-create from snapshot
+      const signUp2 = new SignUp(snapshot);
+      expect(signUp2.protectCheck?.token).toBe('test-token');
+    });
+
+    it('calls _basePatch with correct params for submitProtectCheck', async () => {
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: {
+          id: 'signup_123',
+          object: 'sign_up',
+          status: 'complete',
+          required_fields: [],
+          optional_fields: [],
+          missing_fields: [],
+          unverified_fields: [],
+          verifications: null,
+          protect_check: null,
+          created_session_id: 'sess_123',
+          created_user_id: 'user_123',
+        },
+      });
+      BaseResource._fetch = mockFetch;
+
+      const signUp = new SignUp({
+        id: 'signup_123',
+        object: 'sign_up',
+        status: 'missing_requirements',
+        required_fields: [],
+        optional_fields: [],
+        missing_fields: ['protect_check'],
+        unverified_fields: [],
+        username: null,
+        first_name: null,
+        last_name: null,
+        email_address: null,
+        phone_number: null,
+        web3_wallet: null,
+        external_account_strategy: null,
+        external_account: null,
+        has_password: false,
+        unsafe_metadata: {},
+        created_session_id: null,
+        created_user_id: null,
+        abandon_at: null,
+        legal_accepted_at: null,
+        locale: null,
+        verifications: null,
+        protect_check: {
+          status: 'pending',
+          token: 'challenge-token',
+          sdk_url: 'https://example.com/sdk.js',
+          expires_at: 1700000000000,
+          ui_hints: {},
+        },
+      });
+
+      const result = await signUp.submitProtectCheck({ proofToken: 'proof-abc' });
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'PATCH',
+          body: { proof_token: 'proof-abc' },
+        }),
+      );
+      expect(result.status).toBe('complete');
+      expect(result.protectCheck).toBeNull();
+    });
+  });
 });

@@ -34,6 +34,7 @@ import { SignInAccountSwitcher } from './SignInAccountSwitcher';
 import { SignInClientTrust } from './SignInClientTrust';
 import { SignInFactorOne } from './SignInFactorOne';
 import { SignInFactorTwo } from './SignInFactorTwo';
+import { SignInProtectCheck } from './SignInProtectCheck';
 import { SignInSSOCallback } from './SignInSSOCallback';
 import { SignInStart } from './SignInStart';
 
@@ -52,6 +53,12 @@ function SignInRoutes(): JSX.Element {
   return (
     <Flow.Root flow='signIn'>
       <Switch>
+        <Route
+          path='protect-check'
+          canActivate={clerk => !!clerk.client.signIn.protectCheck}
+        >
+          <SignInProtectCheck />
+        </Route>
         <Route path='factor-one'>
           <SignInFactorOne />
         </Route>

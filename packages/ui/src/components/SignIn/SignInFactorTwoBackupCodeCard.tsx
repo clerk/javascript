@@ -15,6 +15,7 @@ import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
+import { isSignInProtectGated } from './handleProtectCheck';
 import { isResetPasswordStrategy } from './utils';
 
 type SignInFactorTwoBackupCodeCardProps = {
@@ -45,6 +46,9 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
     return signIn
       .attemptSecondFactor({ strategy: 'backup_code', code: codeControl.value })
       .then(res => {
+        if (isSignInProtectGated(res)) {
+          return navigate('../protect-check');
+        }
         switch (res.status) {
           case 'complete':
             if (isResettingPassword(res) && res.createdSessionId) {
@@ -58,6 +62,8 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
                 await navigateOnSetActive({ session, redirectUrl: afterSignInUrl, decorateUrl });
               },
             });
+          case 'needs_protect_check':
+            return navigate('../protect-check');
           default:
             return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
         }

@@ -14,6 +14,7 @@ import { useFetch } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { type LocalizationKey } from '../../localization';
 import { useRouter } from '../../router';
+import { isSignInProtectGated } from './handleProtectCheck';
 
 export type SignInFactorOneCodeCard = Pick<
   VerificationCodeCardProps,
@@ -94,6 +95,10 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
       .then(async res => {
         await resolve();
 
+        if (isSignInProtectGated(res)) {
+          return navigate('../protect-check');
+        }
+
         switch (res.status) {
           case 'complete':
             return setActive({
@@ -106,6 +111,8 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
             return navigate('../factor-two');
           case 'needs_new_password':
             return navigate('../reset-password');
+          case 'needs_protect_check':
+            return navigate('../protect-check');
           default:
             return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
         }

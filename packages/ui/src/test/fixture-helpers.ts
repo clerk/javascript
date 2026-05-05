@@ -223,7 +223,33 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
     } as SignInJSON;
   };
 
-  return { startSignInWithEmailAddress, startSignInWithPhoneNumber, startSignInFactorTwo };
+  const startSignInWithProtectCheck = (params?: {
+    expiresAt?: number;
+    uiHints?: Record<string, string>;
+    sdkUrl?: string;
+  }) => {
+    const { expiresAt, uiHints, sdkUrl = 'https://protect.example.com/sdk.js' } = params || {};
+    baseClient.sign_in = {
+      id: 'sia_2HseAXFGN12eqlwARPMxyyUa9o9',
+      status: 'needs_protect_check',
+      identifier: 'test@clerk.com',
+      supported_first_factors: [],
+      supported_second_factors: [],
+      first_factor_verification: null,
+      second_factor_verification: null,
+      created_session_id: null,
+      protect_check: {
+        status: 'pending',
+        token: 'challenge-token',
+        sdk_url: sdkUrl,
+        ...(expiresAt !== undefined && { expires_at: expiresAt }),
+        ...(uiHints !== undefined && { ui_hints: uiHints }),
+      },
+      user_data: { ...(createUserFixture() as any) },
+    } as SignInJSON;
+  };
+
+  return { startSignInWithEmailAddress, startSignInWithPhoneNumber, startSignInFactorTwo, startSignInWithProtectCheck };
 };
 
 const createSignUpFixtureHelpers = (baseClient: ClientJSON) => {
@@ -289,11 +315,32 @@ const createSignUpFixtureHelpers = (baseClient: ClientJSON) => {
     } as SignUpJSON;
   };
 
+  const startSignUpWithProtectCheck = (params?: {
+    expiresAt?: number;
+    uiHints?: Record<string, string>;
+    sdkUrl?: string;
+  }) => {
+    const { expiresAt, uiHints, sdkUrl = 'https://protect.example.com/sdk.js' } = params || {};
+    baseClient.sign_up = {
+      id: 'sua_2HseAXFGN12eqlwARPMxyyUa9o9',
+      status: 'missing_requirements',
+      missing_fields: ['protect_check'],
+      protect_check: {
+        status: 'pending',
+        token: 'challenge-token',
+        sdk_url: sdkUrl,
+        ...(expiresAt !== undefined && { expires_at: expiresAt }),
+        ...(uiHints !== undefined && { ui_hints: uiHints }),
+      },
+    } as SignUpJSON;
+  };
+
   return {
     startSignUpWithEmailAddress,
     startSignUpWithPhoneNumber,
     startSignUpWithMissingLegalAccepted,
     startSignUpWithMissingLegalAcceptedAndUnverifiedFields,
+    startSignUpWithProtectCheck,
   };
 };
 

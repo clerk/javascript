@@ -179,6 +179,7 @@ function SignUpContinueInternal() {
           signUp: res,
           verifyEmailPath: './verify-email-address',
           verifyPhonePath: './verify-phone-number',
+          protectCheckPath: '../protect-check',
           handleComplete: () =>
             clerk.setActive({
               session: res.createdSessionId,

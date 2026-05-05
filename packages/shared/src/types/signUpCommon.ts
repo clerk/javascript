@@ -24,7 +24,20 @@ import type { VerificationResource } from './verification';
 
 export type SignUpStatus = 'missing_requirements' | 'complete' | 'abandoned';
 
-export type SignUpField = SignUpAttributeField | SignUpIdentificationField;
+export type ProtectCheckField = 'protect_check';
+
+export type SignUpField = SignUpAttributeField | SignUpIdentificationField | ProtectCheckField;
+
+export interface ProtectCheckResource {
+  /**
+   * Always `'pending'` when surfaced to clients.
+   */
+  status: 'pending';
+  token: string;
+  sdkUrl: string;
+  expiresAt?: number;
+  uiHints?: Record<string, string>;
+}
 
 export type PrepareVerificationParams =
   | {

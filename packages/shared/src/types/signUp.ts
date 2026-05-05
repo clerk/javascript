@@ -6,6 +6,7 @@ import type { ClerkResource } from './resource';
 import type {
   AttemptVerificationParams,
   PrepareVerificationParams,
+  ProtectCheckResource,
   SignUpAuthenticateWithSolanaParams,
   SignUpAuthenticateWithWeb3Params,
   SignUpCreateParams,
@@ -48,6 +49,7 @@ export interface SignUpResource extends ClerkResource {
   missingFields: SignUpField[];
   unverifiedFields: SignUpIdentificationField[];
   verifications: SignUpVerificationsResource;
+  protectCheck: ProtectCheckResource | null;
 
   username: string | null;
   firstName: string | null;
@@ -103,6 +105,8 @@ export interface SignUpResource extends ClerkResource {
       legalAccepted?: boolean;
     },
   ) => Promise<SignUpResource>;
+
+  submitProtectCheck: (params: { proofToken: string }) => Promise<SignUpResource>;
 
   authenticateWithMetamask: (params?: SignUpAuthenticateWithWeb3Params) => Promise<SignUpResource>;
   authenticateWithCoinbaseWallet: (params?: SignUpAuthenticateWithWeb3Params) => Promise<SignUpResource>;

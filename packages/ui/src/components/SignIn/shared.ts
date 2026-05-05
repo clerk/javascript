@@ -10,6 +10,8 @@ import { handleError } from '@/ui/utils/errorHandler';
 
 import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
+import { useRouter } from '../../router';
+import { isSignInProtectGated } from './handleProtectCheck';
 
 function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>) {
   const card = useCardState();
@@ -18,6 +20,7 @@ function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>
   const supportEmail = useSupportEmail();
   const { afterSignInUrl, navigateOnSetActive } = useSignInContext();
   const { authenticateWithPasskey } = useCoreSignIn();
+  const { navigate } = useRouter();
 
   useEffect(() => {
     return () => {
@@ -28,6 +31,12 @@ function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>
   return useCallback(async (...args: Parameters<typeof authenticateWithPasskey>) => {
     try {
       const res = await authenticateWithPasskey(...args);
+      // Per spec §2.3 / §4: protect_check can fire on attempt_first_factor (which is what
+      // authenticateWithPasskey calls under the hood). Detect both the field and the
+      // SDK-version-gated status before dispatching on the underlying status.
+      if (isSignInProtectGated(res)) {
+        return navigate('../protect-check');
+      }
       switch (res.status) {
         case 'complete':
           return setActive({
@@ -38,6 +47,8 @@ function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>
           });
         case 'needs_second_factor':
           return onSecondFactor();
+        case 'needs_protect_check':
+          return navigate('../protect-check');
         default:
           return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
       }

@@ -14,6 +14,7 @@ import { Col, descriptors, localizationKeys, useLocalizations } from '../../cust
 import { useConfirmPassword } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
+import { isSignInProtectGated } from './handleProtectCheck';
 
 const ResetPasswordInternal = () => {
   const signIn = useCoreSignIn();
@@ -78,10 +79,15 @@ const ResetPasswordInternal = () => {
     passwordField.clearFeedback();
     confirmField.clearFeedback();
     try {
-      const { status, createdSessionId } = await signIn.resetPassword({
+      const res = await signIn.resetPassword({
         password: passwordField.value,
         signOutOfOtherSessions: sessionsField.checked,
       });
+      const { status, createdSessionId } = res;
+
+      if (isSignInProtectGated(res)) {
+        return navigate('../protect-check');
+      }
 
       switch (status) {
         case 'complete':
@@ -93,6 +99,8 @@ const ResetPasswordInternal = () => {
           return console.error(clerkInvalidFAPIResponse(status, supportEmail));
         case 'needs_second_factor':
           return navigate('../factor-two');
+        case 'needs_protect_check':
+          return navigate('../protect-check');
         default:
           return console.error(clerkInvalidFAPIResponse(status, supportEmail));
       }

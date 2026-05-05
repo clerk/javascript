@@ -164,6 +164,7 @@ function SignUpStartInternal(): JSX.Element {
           redirectUrlComplete,
           verifyEmailPath: 'verify-email-address',
           verifyPhonePath: 'verify-phone-number',
+          protectCheckPath: 'protect-check',
           continuePath: 'continue',
           handleComplete: () => {
             removeClerkQueryParam('__clerk_ticket');
@@ -345,6 +346,7 @@ function SignUpStartInternal(): JSX.Element {
           signUp: res,
           verifyEmailPath: 'verify-email-address',
           verifyPhonePath: 'verify-phone-number',
+          protectCheckPath: 'protect-check',
           handleComplete: () =>
             setActive({
               session: res.createdSessionId,

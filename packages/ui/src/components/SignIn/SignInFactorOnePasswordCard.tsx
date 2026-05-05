@@ -15,6 +15,7 @@ import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys } from '../../customizables';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router/RouteContext';
+import { isSignInProtectGated } from './handleProtectCheck';
 import { HavingTrouble } from './HavingTrouble';
 import { useResetPasswordFactor } from './useResetPasswordFactor';
 
@@ -74,6 +75,9 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
     void signIn
       .attemptFirstFactor({ strategy: 'password', password: passwordControl.value })
       .then(res => {
+        if (isSignInProtectGated(res)) {
+          return navigate('../protect-check');
+        }
         switch (res.status) {
           case 'complete':
             return setActive({
@@ -86,6 +90,8 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
             return navigate('../factor-two');
           case 'needs_client_trust':
             return navigate('../client-trust');
+          case 'needs_protect_check':
+            return navigate('../protect-check');
           default:
             return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
         }

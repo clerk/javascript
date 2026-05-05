@@ -45,6 +45,7 @@ export const ERROR_CODES = {
   CAPTCHA_INVALID: 'captcha_invalid',
   FRAUD_DEVICE_BLOCKED: 'device_blocked',
   FRAUD_ACTION_BLOCKED: 'action_blocked',
+  PROTECT_CHECK_ALREADY_RESOLVED: 'protect_check_already_resolved',
   SIGNUP_RATE_LIMIT_EXCEEDED: 'signup_rate_limit_exceeded',
   USER_BANNED: 'user_banned',
   USER_DEACTIVATED: 'user_deactivated',

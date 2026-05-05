@@ -46,6 +46,7 @@ export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) 
           signUp: res,
           verifyEmailPath: '../verify-email-address',
           verifyPhonePath: '../verify-phone-number',
+          protectCheckPath: '../protect-check',
           continuePath: '../continue',
           handleComplete: () =>
             setActive({
