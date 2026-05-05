@@ -129,6 +129,13 @@ export interface WizardContextValue<TData = unknown> {
    */
   innerSteps: WizardInnerStep<TData>[];
   /**
+   * Returns the active inner steps of an arbitrary main step (after
+   * `shouldSkip`). Used by the router to mount only the active inner
+   * routes — the first non-skipped inner step is mounted as the
+   * parent's index route
+   */
+  getActiveInnerSteps: (step: WizardStep<TData> | undefined) => WizardInnerStep<TData>[];
+  /**
    * The inner step matched by the current SDK route. `undefined` when
    * the current main step has no inner steps
    */

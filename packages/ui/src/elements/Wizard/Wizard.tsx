@@ -133,6 +133,7 @@ const Root = <TData,>(props: WizardRootProps<TData>): JSX.Element => {
       currentStep={currentStep}
       innerSteps={innerSteps}
       currentInnerStep={currentInnerStep}
+      getActiveInnerSteps={getActiveInnerSteps}
       isLoading={isLoading}
       goNext={goNext}
       goPrev={goPrev}
@@ -145,16 +146,23 @@ const Root = <TData,>(props: WizardRootProps<TData>): JSX.Element => {
 
 /**
  * Renders a container step's inner sub-routes, or falls back to the
- * step's own `Component` for leaf steps
+ * step's own `Component` for leaf steps. Inner steps with `shouldSkip`
+ * returning `true` are not mounted at all — the first non-skipped
+ * inner step always becomes the parent's index route, regardless of
+ * its position in the original `innerSteps` array
  */
 const StepRoutes = <TData,>({ step }: { step: WizardStep<TData> }): JSX.Element | null => {
+  const { getActiveInnerSteps } = useWizard<TData>();
   const Component = step.Component;
-  if (!step.innerSteps?.length) {
+  const activeInnerSteps = getActiveInnerSteps(step);
+
+  if (!activeInnerSteps.length) {
     return Component ? <Component /> : null;
   }
+
   return (
     <Switch>
-      {step.innerSteps.map((inner, i) => {
+      {activeInnerSteps.map((inner, i) => {
         const InnerComponent = inner.Component;
         return (
           <Route

@@ -20,6 +20,7 @@ interface WizardProviderProps<TData> {
   currentStep: WizardStep<TData> | undefined;
   innerSteps: WizardInnerStep<TData>[];
   currentInnerStep: WizardInnerStep<TData> | undefined;
+  getActiveInnerSteps: WizardContextValue<TData>['getActiveInnerSteps'];
   isLoading: boolean;
   goNext: WizardContextValue<TData>['goNext'];
   goPrev: WizardContextValue<TData>['goPrev'];
@@ -28,8 +29,18 @@ interface WizardProviderProps<TData> {
 }
 
 export function WizardProvider<TData>(props: WizardProviderProps<TData>): JSX.Element {
-  const { activeSteps, currentStep, innerSteps, currentInnerStep, isLoading, goNext, goPrev, goToStep, children } =
-    props;
+  const {
+    activeSteps,
+    currentStep,
+    innerSteps,
+    currentInnerStep,
+    getActiveInnerSteps,
+    isLoading,
+    goNext,
+    goPrev,
+    goToStep,
+    children,
+  } = props;
 
   const [continueAction, setContinueAction] = React.useState<ContinueAction | undefined>(undefined);
 
@@ -57,6 +68,7 @@ export function WizardProvider<TData>(props: WizardProviderProps<TData>): JSX.El
       currentInnerStep,
       currentInnerIndex,
       totalInnerSteps,
+      getActiveInnerSteps,
       isFirstStep,
       isLastStep,
       isLoading,
@@ -66,7 +78,18 @@ export function WizardProvider<TData>(props: WizardProviderProps<TData>): JSX.El
       continueAction,
       setContinueAction,
     };
-  }, [activeSteps, currentStep, innerSteps, currentInnerStep, isLoading, goNext, goPrev, goToStep, continueAction]);
+  }, [
+    activeSteps,
+    currentStep,
+    innerSteps,
+    currentInnerStep,
+    getActiveInnerSteps,
+    isLoading,
+    goNext,
+    goPrev,
+    goToStep,
+    continueAction,
+  ]);
 
   return <WizardContext.Provider value={value}>{children}</WizardContext.Provider>;
 }
