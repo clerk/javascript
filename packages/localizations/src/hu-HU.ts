@@ -207,6 +207,11 @@ export const huHU: LocalizationResource = {
     yearAbbreviation: 'év',
     yearPerUnit: 'Év / {{unitName}}',
   },
+  configureSSO: {
+    navbar: {
+      title: 'Egyszeri bejelentkezés (SSO) beállítása',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Szervezet létrehozása',
     invitePage: {

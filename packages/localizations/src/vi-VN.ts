@@ -182,6 +182,11 @@ export const viVN: LocalizationResource = {
     viewPayment: undefined,
     year: 'Năm',
   },
+  configureSSO: {
+    navbar: {
+      title: 'Cấu hình đăng nhập một lần (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Tạo tổ chức',
     invitePage: {

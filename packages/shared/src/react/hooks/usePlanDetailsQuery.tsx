@@ -1,6 +1,6 @@
-import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
-import { useClerkQuery } from '../clerk-rq/useQuery';
 import { useClerkInstanceContext } from '../contexts';
+import { defineKeepPreviousDataFn } from '../query/keep-previous-data';
+import { useClerkQuery } from '../query/useQuery';
 import { useBillingIsEnabled } from './useBillingIsEnabled';
 import { usePlanDetailsQueryCacheKeys } from './usePlanDetailsQuery.shared';
 import type { PlanDetailsQueryResult, UsePlanDetailsQueryParams } from './usePlanDetailsQuery.types';
