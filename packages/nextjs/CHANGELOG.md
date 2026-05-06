@@ -1,5 +1,109 @@
 # Change Log
 
+## 7.3.1
+
+### Patch Changes
+
+- Enforce middleware authorization during the keyless bootstrap window. `auth.protect()` and custom authorization checks now fail closed instead of being bypassed while the publishable key is being provisioned. ([#8369](https://github.com/clerk/javascript/pull/8369)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`9e9230c`](https://github.com/clerk/javascript/commit/9e9230c8c3cbdb1c253ca7cdd24cc8d681b5ee5a), [`68d32df`](https://github.com/clerk/javascript/commit/68d32dfcc453080ef93edf69be8de765a342d88c), [`1c27d4d`](https://github.com/clerk/javascript/commit/1c27d4dd41a27cf41c3823306fe88e026fed08fb), [`1001193`](https://github.com/clerk/javascript/commit/10011936981fc22bf7d3750f1591f0873ea78bcb)]:
+  - @clerk/shared@4.10.0
+  - @clerk/react@6.6.0
+  - @clerk/backend@3.4.5
+
+## 7.3.0
+
+### Minor Changes
+
+- Expose `OAuthConsent` as a public component export across React-based SDKs. ([#8381](https://github.com/clerk/javascript/pull/8381)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```tsx
+  import { OAuthConsent } from '@clerk/react';
+
+  export default function Page() {
+    return <OAuthConsent />;
+  }
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`785f057`](https://github.com/clerk/javascript/commit/785f057f5cda202c26a9f34bde7c1873a6cbd6ea), [`90beaeb`](https://github.com/clerk/javascript/commit/90beaeb8319d5bccb8fa52343f4b241c6d2d3ebe), [`244920d`](https://github.com/clerk/javascript/commit/244920d1ebb5d420a96bfc2a79d84cccafe9b61c)]:
+  - @clerk/shared@4.9.0
+  - @clerk/react@6.5.0
+  - @clerk/backend@3.4.4
+
+## 7.2.9
+
+### Patch Changes
+
+- Updated dependencies [[`1bfd8ab`](https://github.com/clerk/javascript/commit/1bfd8ab89c62e428038b8c565f118c582ed395ea)]:
+  - @clerk/shared@4.8.7
+  - @clerk/backend@3.4.3
+  - @clerk/react@6.4.7
+
+## 7.2.8
+
+### Patch Changes
+
+- Use a constant-time comparison when validating the integrity signature on the middleware-to-origin auth header handoff (`assertTokenSignature`). The previous `!==` compare was timing-variable; the new helper is synchronous and runtime-agnostic so it works in both Node and Edge Runtime. ([#8411](https://github.com/clerk/javascript/pull/8411)) by [@jacekradko](https://github.com/jacekradko)
+
+- Auto-proxy FAPI requests for `.vercel.app` subdomains. When deployed to a `.vercel.app` domain without explicit proxy or domain configuration, the SDK automatically routes Frontend API requests through `/__clerk` on the app's own origin. This enables Clerk production mode on Vercel deployments without manual proxy setup. ([#8035](https://github.com/clerk/javascript/pull/8035)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`9b57986`](https://github.com/clerk/javascript/commit/9b5798696eb0c6cc6ab548ade100b504f691895c), [`a9f9b29`](https://github.com/clerk/javascript/commit/a9f9b2971a026d04571ceb1865ec8dafedbbe863), [`e0a63f9`](https://github.com/clerk/javascript/commit/e0a63f9f976fd25f4ed68080c84b72149ef64646)]:
+  - @clerk/shared@4.8.6
+  - @clerk/backend@3.4.2
+  - @clerk/react@6.4.6
+
+## 7.2.7
+
+### Patch Changes
+
+- Updated dependencies [[`da76490`](https://github.com/clerk/javascript/commit/da7649075e24351737271318e81842b5c298dee1)]:
+  - @clerk/shared@4.8.5
+  - @clerk/backend@3.4.1
+  - @clerk/react@6.4.5
+
+## 7.2.6
+
+### Patch Changes
+
+- Updated dependencies [[`083c4c5`](https://github.com/clerk/javascript/commit/083c4c50a2d2e1cedc8ffb85d8ba749170ea4f90), [`dcaf694`](https://github.com/clerk/javascript/commit/dcaf694fbc7fd1b80fd10661225aa6d61eb3c2a9), [`d9011b4`](https://github.com/clerk/javascript/commit/d9011b45d622fecc727b3531fbedd805a4310abc)]:
+  - @clerk/shared@4.8.4
+  - @clerk/react@6.4.4
+  - @clerk/backend@3.4.0
+
+## 7.2.5
+
+### Patch Changes
+
+- Refactor `clerkMiddleware` internals to factor the post-authentication pipeline (handler invocation, CSP, redirects, response decoration) into a private `runHandlerWithRequestState` helper. Pure refactor — no behavioral change. ([#8368](https://github.com/clerk/javascript/pull/8368)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`93855c2`](https://github.com/clerk/javascript/commit/93855c26a624780a52ed12c25ea6605b6c009ec1)]:
+  - @clerk/backend@3.3.0
+
+## 7.2.4
+
+### Patch Changes
+
+- Add helpful TypeScript error for incorrect `auth` import path ([#8358](https://github.com/clerk/javascript/pull/8358)) by [@jacekradko](https://github.com/jacekradko)
+
+- Fix an authorization bypass in `has()`, `auth.protect()`, and related predicates when a single call combined conditions from more than one dimension (for example, `{ permission, reverification }` or `{ feature, permission }`). A dimension that should have denied the request was treated as indeterminate and ignored by the combining logic, allowing other passing dimensions to carry the result and authorize the call when it should have failed closed. ([#8372](https://github.com/clerk/javascript/pull/8372)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  Behavior is now:
+  - When a requested dimension cannot be satisfied because the underlying session data is missing, malformed, or invalid, the call denies. Previously these cases were treated as indeterminate and ignored, which could let another passing dimension carry the call.
+  - Fixed a minor bug where `session.checkAuthorization()` was building authorization options from the membership row id instead of the organization id.
+
+  Single-condition role, permission, feature, and plan checks (`has({ permission })`, etc.) are unchanged. Single-condition `reverification` checks are unchanged on well-formed session data; calls with a missing or malformed `factorVerificationAge` payload now deny where they previously returned indeterminate. Callback-form `auth.protect(has => ...)` is unaffected unless the callback itself invokes the affected shapes.
+
+  Separately, `auth.protect()` in `@clerk/nextjs` previously discarded authorization params (`role`, `permission`, `feature`, `plan`, `reverification`) whenever the same argument object also contained `unauthenticatedUrl`, `unauthorizedUrl`, or `token`. TypeScript's excess-property check caught this for inline object literals but did not apply once the argument was assigned to a variable, spread, or used from JavaScript. Mixed-shape calls like `auth.protect({ role: 'org:admin', unauthorizedUrl: '/denied' })` or `auth.protect({ permission: 'org:X', token: 'session_token' })` now correctly enforce the authorization check instead of silently letting every authenticated caller through.
+
+- Updated dependencies [[`d52b311`](https://github.com/clerk/javascript/commit/d52b311f16453e834df5c81594a1bfead30c935f), [`abaa339`](https://github.com/clerk/javascript/commit/abaa3390b076cf8b5ccfc0a22312d5bde0c60988)]:
+  - @clerk/shared@4.8.3
+  - @clerk/backend@3.2.14
+  - @clerk/react@6.4.3
+
 ## 7.2.3
 
 ### Patch Changes

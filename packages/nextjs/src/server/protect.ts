@@ -204,25 +204,32 @@ export function createProtect(opts: {
   }) as AuthProtect;
 }
 
+const AUTH_PARAM_KEYS = ['role', 'permission', 'feature', 'plan', 'reverification'] as const;
+
 const getAuthorizationParams = (arg: any) => {
   if (!arg) {
     return undefined;
   }
 
-  // Skip authorization check if the arg contains any of these options
-  if (arg.unauthenticatedUrl || arg.unauthorizedUrl || arg.token) {
+  // Predicate form: always return the function unchanged.
+  if (typeof arg === 'function') {
+    return arg as (has: CheckAuthorizationWithCustomPermissions) => boolean;
+  }
+
+  // Pick only the known authorization keys so option keys (unauthorizedUrl,
+  // token, etc.) and unknown extras do not leak into has().
+  const authParams: Record<string, unknown> = {};
+  for (const key of AUTH_PARAM_KEYS) {
+    if (arg[key] !== undefined) {
+      authParams[key] = arg[key];
+    }
+  }
+
+  if (Object.keys(authParams).length === 0) {
     return undefined;
   }
 
-  // Skip if it's just a token-only object
-  if (Object.keys(arg).length === 1 && 'token' in arg) {
-    return undefined;
-  }
-
-  // Return the authorization params/function
-  return arg as
-    | CheckAuthorizationParamsWithCustomPermissions
-    | ((has: CheckAuthorizationWithCustomPermissions) => boolean);
+  return authParams as CheckAuthorizationParamsWithCustomPermissions;
 };
 
 const isServerActionRequest = (req: Request) => {

@@ -182,6 +182,11 @@ export const thTH: LocalizationResource = {
     viewPayment: 'ดูการชำระเงิน',
     year: 'ปี',
   },
+  configureSSO: {
+    navbar: {
+      title: 'กำหนดค่าการลงชื่อเข้าใช้แบบครั้งเดียว (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'สร้างองค์กร',
     invitePage: {

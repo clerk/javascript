@@ -1,5 +1,66 @@
 # Change Log
 
+## 4.6.0
+
+### Minor Changes
+
+- Add experimental `<ConfigureSSO />` component. Not ready for usage yet. ([#8427](https://github.com/clerk/javascript/pull/8427)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Localize API keys table headers ([#8462](https://github.com/clerk/javascript/pull/8462)) by [@jebibot](https://github.com/jebibot)
+
+- Updated dependencies [[`9e9230c`](https://github.com/clerk/javascript/commit/9e9230c8c3cbdb1c253ca7cdd24cc8d681b5ee5a), [`68d32df`](https://github.com/clerk/javascript/commit/68d32dfcc453080ef93edf69be8de765a342d88c), [`1c27d4d`](https://github.com/clerk/javascript/commit/1c27d4dd41a27cf41c3823306fe88e026fed08fb), [`1001193`](https://github.com/clerk/javascript/commit/10011936981fc22bf7d3750f1591f0873ea78bcb)]:
+  - @clerk/shared@4.10.0
+
+## 4.5.8
+
+### Patch Changes
+
+- Updated dependencies [[`785f057`](https://github.com/clerk/javascript/commit/785f057f5cda202c26a9f34bde7c1873a6cbd6ea), [`90beaeb`](https://github.com/clerk/javascript/commit/90beaeb8319d5bccb8fa52343f4b241c6d2d3ebe), [`244920d`](https://github.com/clerk/javascript/commit/244920d1ebb5d420a96bfc2a79d84cccafe9b61c)]:
+  - @clerk/shared@4.9.0
+
+## 4.5.7
+
+### Patch Changes
+
+- Update multiple localizations with complete translations for previously missing sections including billing, reverification, API keys, MFA setup, task reset password, restricted access, enterprise connections, and legal consent. Languages updated: Icelandic (is-IS), Norwegian (nb-NO), Finnish (fi-FI), Croatian (hr-HR), Hungarian (hu-HU). ([#8224](https://github.com/clerk/javascript/pull/8224)) by [@bjaben](https://github.com/bjaben)
+
+- Updated dependencies [[`1bfd8ab`](https://github.com/clerk/javascript/commit/1bfd8ab89c62e428038b8c565f118c582ed395ea)]:
+  - @clerk/shared@4.8.7
+
+## 4.5.6
+
+### Patch Changes
+
+- Expand the Catalan (`ca-ES`) localization by filling in previously undefined translations across billing, checkout, subscription management, cancellation flows, and related UI strings. ([#8412](https://github.com/clerk/javascript/pull/8412)) by [@marcvive](https://github.com/marcvive)
+
+- Updated dependencies [[`9b57986`](https://github.com/clerk/javascript/commit/9b5798696eb0c6cc6ab548ade100b504f691895c), [`a9f9b29`](https://github.com/clerk/javascript/commit/a9f9b2971a026d04571ceb1865ec8dafedbbe863)]:
+  - @clerk/shared@4.8.6
+
+## 4.5.5
+
+### Patch Changes
+
+- Updated dependencies [[`da76490`](https://github.com/clerk/javascript/commit/da7649075e24351737271318e81842b5c298dee1)]:
+  - @clerk/shared@4.8.5
+
+## 4.5.4
+
+### Patch Changes
+
+- Complete the European Portuguese (`pt-PT`) localization by filling missing translations and replacing remaining English and Brazilian Portuguese strings with consistent formal PT-PT wording. ([#8394](https://github.com/clerk/javascript/pull/8394)) by [@mclima123](https://github.com/mclima123)
+
+- Updated dependencies [[`083c4c5`](https://github.com/clerk/javascript/commit/083c4c50a2d2e1cedc8ffb85d8ba749170ea4f90), [`dcaf694`](https://github.com/clerk/javascript/commit/dcaf694fbc7fd1b80fd10661225aa6d61eb3c2a9)]:
+  - @clerk/shared@4.8.4
+
+## 4.5.3
+
+### Patch Changes
+
+- Updated dependencies [[`d52b311`](https://github.com/clerk/javascript/commit/d52b311f16453e834df5c81594a1bfead30c935f)]:
+  - @clerk/shared@4.8.3
+
 ## 4.5.2
 
 ### Patch Changes

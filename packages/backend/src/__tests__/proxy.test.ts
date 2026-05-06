@@ -572,7 +572,11 @@ describe('proxy', () => {
       expect(response.status).toBe(200);
     });
 
-    it('propagates abort signal to upstream fetch', async () => {
+    it('omits signal from upstream fetch (Node 24 undici cross-realm AbortSignal)', async () => {
+      // Node 24's bundled undici tightened the instanceof AbortSignal check on
+      // RequestInit.signal, which throws on cross-realm signals carried by
+      // framework Request subclasses. Until we bridge abort propagation via an
+      // in-realm AbortController, the signal is intentionally omitted.
       const mockResponse = new Response(JSON.stringify({}), { status: 200 });
       mockFetch.mockResolvedValue(mockResponse);
 
@@ -587,7 +591,7 @@ describe('proxy', () => {
       });
 
       const [, options] = mockFetch.mock.calls[0];
-      expect(options.signal).toBe(request.signal);
+      expect(options.signal).toBeUndefined();
     });
 
     it('includes Cache-Control: no-store on error responses', async () => {
