@@ -10,9 +10,6 @@
 #
 # Test users are provisioned per-run via Clerk Backend API and deleted at
 # teardown — same pattern as /integration's createBapiUser.
-#
-# TODO(SDK team): confirm the instance-name slot to add inside
-# INTEGRATION_INSTANCE_KEYS for this workflow (placeholder: "expo-native").
 name: "Mobile e2e (@clerk/expo)"
 
 on:
@@ -28,8 +25,7 @@ on:
         default: "manual,skip"
 
 env:
-  # TODO(SDK team): replace with the canonical mobile-e2e instance name once confirmed.
-  EXPO_INSTANCE_NAME: expo-native
+  EXPO_INSTANCE_NAME: clerkstage-with-native-components
 
 concurrency:
   group: mobile-e2e-${{ github.ref }}
