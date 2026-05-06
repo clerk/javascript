@@ -56,27 +56,7 @@ describe('extractCssLayerNameFromAppearance', () => {
     expect(extractCssLayerNameFromAppearance(undefined)).toBeUndefined();
   });
 
-  describe('Components.updateProps state merge', () => {
-    // This replicates the state merge in Components.tsx updateProps handler:
-    //   setState(s => ({ ...s, ...restProps, options: { ...s.options, ...restProps.options } }))
-    //
-    // When ClerkProvider re-renders, it calls __internal_updateProps({ appearance: { theme: shadcn } }).
-    // This arrives in updateProps as restProps = { appearance: { theme: shadcn } }.
-    // The bug: cssLayerName buried in theme is not promoted to appearance level,
-    // so StyleCacheProvider never wraps Clerk CSS in @layer.
-
-    function updatePropsStateMerge(currentState: Record<string, any>, restProps: Record<string, any>) {
-      // This is the exact logic from Components.tsx line 400 (without fix)
-      return { ...currentState, ...restProps, options: { ...currentState.options, ...restProps.options } };
-    }
-
-    function updatePropsStateMergeFixed(currentState: Record<string, any>, restProps: Record<string, any>) {
-      if (restProps.appearance) {
-        restProps = { ...restProps, appearance: extractCssLayerNameFromAppearance(restProps.appearance) };
-      }
-      return { ...currentState, ...restProps, options: { ...currentState.options, ...restProps.options } };
-    }
-
+  it('persists cssLayerName when appearance is re-extracted after an updateProps-style state merge', () => {
     const theme = {
       name: 'shadcn',
       cssLayerName: 'components',
@@ -85,25 +65,32 @@ describe('extractCssLayerNameFromAppearance', () => {
       __type: 'prebuilt_appearance' as const,
     };
 
-    const initialState = {
-      appearance: { theme, cssLayerName: 'components' }, // after mountComponentRenderer extraction
-      options: {},
+    // Initial mount: cssLayerName is extracted to appearance level
+    const initialAppearance = extractCssLayerNameFromAppearance({ theme });
+    expect(initialAppearance?.cssLayerName).toBe('components');
+
+    // ClerkProvider re-renders and sends raw appearance (cssLayerName only inside theme)
+    const rawAppearance = { theme };
+
+    // updateProps must re-extract before merging into state
+    const reExtracted = extractCssLayerNameFromAppearance(rawAppearance);
+    expect(reExtracted?.cssLayerName).toBe('components');
+  });
+
+  it('respects a new cssLayerName passed via updateProps', () => {
+    const theme = {
+      name: 'shadcn',
+      cssLayerName: 'components',
+      variables: {},
+      elements: {},
+      __type: 'prebuilt_appearance' as const,
     };
 
-    it('BUG: updateProps overwrites extracted cssLayerName with raw appearance from ClerkProvider', () => {
-      // ClerkProvider sends raw appearance (cssLayerName only inside theme, not at top level)
-      const restProps = { appearance: { theme } };
-      const newState = updatePropsStateMerge(initialState, restProps);
+    // User changes cssLayerName at the appearance level
+    const updatedAppearance = { theme, cssLayerName: 'utilities' };
+    const result = extractCssLayerNameFromAppearance(updatedAppearance);
 
-      // cssLayerName is lost — it's only inside theme, not at the appearance level
-      expect(newState.appearance.cssLayerName).toBeUndefined();
-    });
-
-    it('FIX: updateProps extracts cssLayerName from theme before merging into state', () => {
-      const restProps = { appearance: { theme } };
-      const newState = updatePropsStateMergeFixed(initialState, restProps);
-
-      expect(newState.appearance.cssLayerName).toBe('components');
-    });
+    // Explicit appearance-level cssLayerName takes precedence over theme
+    expect(result?.cssLayerName).toBe('utilities');
   });
 });
