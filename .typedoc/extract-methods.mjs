@@ -491,7 +491,7 @@ function signatureWithInstantiation(sig, instantiationMap) {
 }
 
 /**
- * Must stay aligned with allowlisted `propertiesTable` filtering in `custom-theme.mjs` (callable members and callable-only namespaces are extracted here, not listed as properties).
+ * Must stay aligned with allowlisted `propertiesTable` filtering in `custom-theme.mjs` (`isCallableInterfaceProperty` / `isInlineNamespaceFullyExtractedToMethods`: extracted here, not listed as properties).
  *
  * @param {import('typedoc').DeclarationReflection} decl
  * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx

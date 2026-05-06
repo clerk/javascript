@@ -925,7 +925,7 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
           ? model.filter(
               prop =>
                 !isCallableInterfaceProperty(prop, this.helpers) &&
-                !isCallableOnlyNamespaceProperty(prop, this.helpers),
+                !isInlineNamespaceFullyExtractedToMethods(prop, this.helpers),
             )
           : model;
         return superPartials.propertiesTable(filtered, options);
@@ -1568,10 +1568,55 @@ function isCallableInterfaceProperty(prop, helpers) {
 }
 
 /**
- * Inline object type whose **direct** members are exclusively callables (e.g. `emailCode: { sendCode, verifyCode }` in `SignInFutureResource`).
- * Omitted from reference-object property tables; nested callables are documented via extract-methods.
+ * Inline object namespace whose **direct** members are each documented under `methods/` (either a callable → method MDX, or `@propertyTableDoc` → nested property table). Omits the parent row from reference-object property tables (e.g. `emailCode`, `emailLink` on `SignInFutureResource`).
  *
- * If any direct member is not callable, the parent stays in the property table. Use the @propertyTableDoc tag on non-callable members to avoid this behavior; it will create a page for that non-callable member in /methods that contains a heading and property table. (See `emailLink` in `SignInFutureResource` for an example; `emailLink.verification` is not callable and uses the @propertyTableDoc tag.)
+ * @param {import('typedoc').DeclarationReflection} prop
+ * @param {import('typedoc-plugin-markdown').MarkdownThemeContext['helpers']} helpers
+ */
+function isInlineNamespaceFullyExtractedToMethods(prop, helpers) {
+  const t =
+    (prop.kind === ReflectionKind.Property || prop.kind === ReflectionKind.Variable) && prop.type
+      ? prop.type
+      : helpers.getDeclarationType(prop);
+  let cur = /** @type {import('typedoc').Type | undefined} */ (t);
+  while (
+    cur &&
+    typeof cur === 'object' &&
+    /** @type {{ type?: string }} */ (cur).type === 'optional' &&
+    'elementType' in cur
+  ) {
+    cur = /** @type {import('typedoc').Type} */ (/** @type {import('typedoc').OptionalType} */ (cur).elementType);
+  }
+  if (!(cur instanceof ReflectionType)) {
+    return false;
+  }
+  const children = cur.declaration?.children ?? [];
+  if (children.length === 0) {
+    return false;
+  }
+  for (const c of children) {
+    if (
+      c.kind !== ReflectionKind.Property &&
+      c.kind !== ReflectionKind.Variable &&
+      c.kind !== ReflectionKind.Accessor
+    ) {
+      return false;
+    }
+    const documentedViaPropertyTable = Boolean(
+      /** @type {import('typedoc').DeclarationReflection} */ (c).comment?.getTag?.('@propertyTableDoc'),
+    );
+    if (!isCallableInterfaceProperty(c, helpers) && !documentedViaPropertyTable) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * Inline object type whose **direct** members are exclusively callables (e.g. `emailCode: { sendCode, verifyCode }` in `SignInFutureResource`).
+ * Used by extract-methods to decide which namespaces need the mixed-namespace nested callable path.
+ *
+ * For property-table omission, see {@link isInlineNamespaceFullyExtractedToMethods}.
  *
  * @param {import('typedoc').DeclarationReflection} prop
  * @param {import('typedoc-plugin-markdown').MarkdownThemeContext['helpers']} helpers
