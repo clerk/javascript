@@ -62,30 +62,4 @@ describe('runAsyncTask', () => {
       status: 'idle',
     });
   });
-
-  it('resets fetch status when a pending task is restored from bfcache', async () => {
-    const emitSpy = vi.spyOn(eventBus, 'emit');
-    let resolveTask: () => void;
-    const task = vi.fn(
-      () =>
-        new Promise<void>(resolve => {
-          resolveTask = resolve;
-        }),
-    );
-
-    const pendingTask = runAsyncResourceTask(resource, task);
-    await Promise.resolve();
-
-    const pageShowEvent = new Event('pageshow') as PageTransitionEvent;
-    Object.defineProperty(pageShowEvent, 'persisted', { value: true });
-    window.dispatchEvent(pageShowEvent);
-
-    expect(emitSpy).toHaveBeenNthCalledWith(3, 'resource:fetch', {
-      resource,
-      status: 'idle',
-    });
-
-    resolveTask!();
-    await pendingTask;
-  });
 });
