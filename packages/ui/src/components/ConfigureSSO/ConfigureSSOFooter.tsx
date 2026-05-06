@@ -26,13 +26,12 @@ export const ConfigureSSOFooter = ({
   hidePrevious = false,
   isDisabled = false,
 }: ConfigureSSOFooterProps): JSX.Element => {
-  const { continueAction, deepestWizardRef } = useFooterActions();
+  const { continueAction, deepestWizard } = useFooterActions();
   const { t } = useLocalizations();
 
   const isForceDisabled = isDisabled;
-  const deepest = deepestWizardRef.current?.current;
-  const isFirstStep = deepest?.isFirstStep ?? true;
-  const isLastStep = deepest?.isLastStep ?? true;
+  const isFirstStep = deepestWizard?.isFirstStep ?? true;
+  const isLastStep = deepestWizard?.isLastStep ?? true;
 
   const continueLabelToShow =
     typeof continueAction?.label === 'string'
@@ -46,11 +45,11 @@ export const ConfigureSSOFooter = ({
       void continueAction.handler();
       return;
     }
-    void deepestWizardRef.current?.current.goNext();
+    void deepestWizard?.goNext();
   };
 
   const handlePrevious = () => {
-    void deepestWizardRef.current?.current.goPrev();
+    void deepestWizard?.goPrev();
   };
 
   return (

@@ -10,15 +10,9 @@ import type { LocalizationKey } from '@/customizables';
 export interface WizardStepProps {
   /**
    * Stable identifier for the step. Used as a React key, for
-   * `goToStep(id)`, and as a fallback when two steps share a path
+   * `goToStep(id)`, and to register the step with the parent wizard
    */
   id: string;
-  /**
-   * Path fragment used by the SDK router. The first non-skipped
-   * sibling is mounted as the parent's index route, so its `path`
-   * is only used for `goToStep` / deep-linking purposes
-   */
-  path: string;
   /**
    * Label shown in the breadcrumb at the top of the wizard. Only
    * outermost steps need a label — inner steps reuse their parent's
@@ -65,26 +59,26 @@ export interface ContinueAction {
 }
 
 /**
- * Internal step descriptor extracted from a Step element's props.
- * Consumers shouldn't need to construct these directly
+ * Internal step descriptor mirrored from a Step's props once it has
+ * registered itself with the parent wizard. Consumers shouldn't need
+ * to construct these directly
  */
 export interface WizardActiveStep {
   id: string;
-  path: string;
   label?: LocalizationKey | string;
   isCompleted?: boolean;
-  children: React.ReactNode;
 }
 
 export interface WizardContextValue {
   /**
-   * The active siblings inside the *current* Wizard scope (only the
-   * steps that survived conditional rendering)
+   * The active siblings inside the *current* Wizard scope, in JSX
+   * declaration order. Steps register themselves on mount and
+   * unregister on unmount
    */
   activeSteps: WizardActiveStep[];
   /**
-   * The step matched by the current SDK route, or `undefined` while
-   * the router is settling
+   * The step currently rendered as the wizard's body, or `undefined`
+   * before the first step has registered
    */
   currentStep: WizardActiveStep | undefined;
   /**
@@ -106,6 +100,12 @@ export interface WizardContextValue {
    */
   isLastStep: boolean;
   /**
+   * `true` when this wizard is rendered inside another wizard. The
+   * outermost wizard owns the breadcrumb / footer chrome; nested
+   * wizards just contribute their own active step bodies
+   */
+  isNested: boolean;
+  /**
    * Navigate forward. Within this wizard, advances to the next active
    * sibling. On the last sibling, falls through to the parent
    * wizard's `goNext` (if any)
@@ -122,9 +122,13 @@ export interface WizardContextValue {
    */
   goToStep: (id: string) => Promise<unknown> | void;
   /**
-   * `true` when this wizard is rendered inside another wizard. The
-   * outermost wizard owns the breadcrumb / footer chrome; nested
-   * wizards render only the active step's body
+   * Internal — called by `<Wizard.Step>` on mount (and again whenever
+   * its descriptor props change) to register itself with the wizard
    */
-  isNested: boolean;
+  registerStep: (step: WizardActiveStep) => void;
+  /**
+   * Internal — called by `<Wizard.Step>` on unmount (or when its `id`
+   * changes) to remove itself from the wizard's active steps
+   */
+  unregisterStep: (id: string) => void;
 }

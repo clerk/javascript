@@ -14,7 +14,7 @@ import { BoxIcon } from '@/icons';
  * body Col with flex sizing so the wizard / pre-wizard gates can fill
  * the available space without needing their own sizing chrome
  */
-export const ConfigureSSOLayout = ({ children }: PropsWithChildren): JSX.Element => {
+export const ConfigureSSOCard = ({ children }: PropsWithChildren): JSX.Element => {
   const contentRef = React.useRef<HTMLDivElement>(null);
   const { applicationName, logoImageUrl } = useEnvironment().displayConfig;
   const { organizationSettings } = useEnvironment();
@@ -95,7 +95,7 @@ export const ConfigureSSOLayout = ({ children }: PropsWithChildren): JSX.Element
             flex: 1,
           })}
         >
-          <Col sx={{ flex: 1, minHeight: 0 }}>{children}</Col>
+          {children}
         </Col>
       </NavbarContextProvider>
     </ProfileCard.Root>
