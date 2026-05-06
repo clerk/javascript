@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { Col, descriptors } from '@/customizables';
 import { Route, Switch, useRouter } from '@/router';
 
 import { useConfigureSSOFlow } from '../../ConfigureSSOContext';
@@ -197,24 +196,10 @@ const RootInner = ({ parentWizard, isNested, children }: RootInnerProps): JSX.El
             key={step.id}
             path={step.path}
           >
-            <Col
-              elementDescriptor={descriptors.configureSSOWizardBody}
-              elementId={descriptors.configureSSOWizardBody.setId(step.id)}
-              sx={{ flex: 1, minHeight: 0 }}
-            >
-              {step.children}
-            </Col>
+            {step.children}
           </Route>
         ))}
-        <Route key={firstStep.id}>
-          <Col
-            elementDescriptor={descriptors.configureSSOWizardBody}
-            elementId={descriptors.configureSSOWizardBody.setId(firstStep.id)}
-            sx={{ flex: 1, minHeight: 0 }}
-          >
-            {firstStep.children}
-          </Col>
-        </Route>
+        <Route key={firstStep.id}>{firstStep.children}</Route>
       </Switch>
     </WizardContext.Provider>
   );
