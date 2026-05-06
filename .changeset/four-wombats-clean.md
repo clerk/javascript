@@ -1,6 +1,6 @@
 ---
-"@clerk/clerk-js": patch
-"@clerk/ui": patch
+"@clerk/clerk-js": minor
+"@clerk/ui": minor
 ---
 
 Removed unused internal OAuthConsent prop.
