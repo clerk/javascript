@@ -5,26 +5,29 @@ import { Col, Flow, Heading, Icon, Input, localizationKeys, Text, useLocalizatio
 import { useFieldOTP } from '@/elements/CodeControl';
 import { useCardState } from '@/elements/contexts';
 import { Form } from '@/elements/Form';
+import { DuotoneAtSymbol } from '@/icons';
 import { handleError } from '@/utils/errorHandler';
 
 import { useConfigureSSOWizard, useRegisterContinueAction } from '../wizard';
 import { StepLayout } from './StepLayout';
-import { DuotoneAtSymbol } from '@/icons';
 
-export const VerifyDomainStep = (): JSX.Element => {
-  const { goNext } = useConfigureSSOWizard();
+export const VerifyDomainStep = (): JSX.Element | null => {
+  const { goNext, goToStep } = useConfigureSSOWizard();
   const card = useCardState();
   const { t } = useLocalizations();
   const { user } = useUser();
 
-  const primaryEmailAddress = user?.primaryEmailAddress;
-  const isVerified = primaryEmailAddress?.verification.status === 'verified';
+  const emailToVerify =
+    user?.primaryEmailAddress ?? user?.emailAddresses?.find(e => e.verification.status !== 'verified');
+  const isVerified = emailToVerify?.verification.status === 'verified';
+  const isAlreadyPrimary = Boolean(emailToVerify && emailToVerify.id === user?.primaryEmailAddressId);
 
   const prepareEmailVerification = useReverification(() =>
-    primaryEmailAddress?.prepareVerification({ strategy: 'email_code' }),
+    emailToVerify?.prepareVerification({ strategy: 'email_code' }),
   );
-  const attemptEmailVerification = useReverification((code: string) =>
-    primaryEmailAddress?.attemptVerification({ code }),
+  const attemptEmailVerification = useReverification((code: string) => emailToVerify?.attemptVerification({ code }));
+  const setPrimaryEmailAddress = useReverification((emailAddressId: string) =>
+    user?.update({ primaryEmailAddressId: emailAddressId }),
   );
 
   const prepare = React.useCallback(
@@ -44,7 +47,15 @@ export const VerifyDomainStep = (): JSX.Element => {
     onResendCodeClicked: () => {
       void prepare();
     },
-    onResolve: () => {
+    onResolve: async () => {
+      if (emailToVerify && !isAlreadyPrimary) {
+        try {
+          await setPrimaryEmailAddress(emailToVerify.id);
+        } catch (err) {
+          handleError(err as Error, [], card.setError);
+          return;
+        }
+      }
       void goNext();
     },
   });
@@ -67,16 +78,26 @@ export const VerifyDomainStep = (): JSX.Element => {
         },
   );
 
+  React.useEffect(() => {
+    if (!emailToVerify) {
+      void goToStep('provide-email');
+    }
+  }, [emailToVerify, goToStep]);
+
   // Send the first code on mount (only when there's something to verify),
   // and clear any stale card error that could be lingering from a previous step
   React.useEffect(() => {
-    if (!isVerified) {
+    if (emailToVerify && !isVerified) {
       void prepare();
     }
     card.setError(undefined);
     return () => card.setError(undefined);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  if (!emailToVerify) {
+    return null;
+  }
 
   return (
     <Flow.Part part='verifyDomain'>
@@ -93,7 +114,7 @@ export const VerifyDomainStep = (): JSX.Element => {
             paddingBlock: t.space.$8,
           })}
         >
-          {showVerifiedView && primaryEmailAddress ? (
+          {showVerifiedView ? (
             <>
               <Icon
                 icon={DuotoneAtSymbol}
@@ -118,7 +139,7 @@ export const VerifyDomainStep = (): JSX.Element => {
               </Col>
               <Input
                 type='email'
-                value={primaryEmailAddress.emailAddress}
+                value={emailToVerify.emailAddress}
                 readOnly
                 aria-label={t(localizationKeys('configureSSO.verifyEmailDomainStep.emailCode.verified.inputLabel'))}
                 sx={t => ({ width: '100%', maxWidth: t.sizes.$66, backgroundColor: t.colors.$neutralAlpha50 })}
@@ -137,11 +158,10 @@ export const VerifyDomainStep = (): JSX.Element => {
                   variant='body'
                   sx={t => ({ color: t.colors.$colorMutedForeground })}
                   localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.emailCode.formSubtitle', {
-                    identifier: primaryEmailAddress?.emailAddress ?? '',
+                    identifier: emailToVerify.emailAddress,
                   })}
                 />
               </Col>
-
               <Form.OTPInput
                 {...otp}
                 resendButton={localizationKeys('configureSSO.verifyEmailDomainStep.emailCode.resendButton')}

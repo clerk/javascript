@@ -9,6 +9,8 @@ import { handleError } from '@/utils/errorHandler';
 import { useConfigureSSOWizard, useRegisterContinueAction } from '../wizard';
 import { StepLayout } from './StepLayout';
 
+const isEmail = (str: string) => /^\S+@\S+\.\S+$/.test(str);
+
 export const ProvideEmail = (): JSX.Element => {
   const { goNext } = useConfigureSSOWizard();
   const { user } = useUser();
@@ -18,7 +20,7 @@ export const ProvideEmail = (): JSX.Element => {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const createEmailAddress = useReverification((value: string) => user?.createEmailAddress({ email: value }));
 
-  const canSubmit = !isSubmitting;
+  const canSubmit = isEmail(email) && !isSubmitting;
 
   const submit = React.useCallback(async () => {
     if (!canSubmit) {

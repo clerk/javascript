@@ -128,7 +128,7 @@ const AuthenticatedContent = withCoreUserGuard(() => {
 const ConfigureSSOSteps = () => {
   const { user } = useUser();
 
-  const primaryEmailAddress = user?.primaryEmailAddress;
+  const hasEmailAddress = Boolean(user?.emailAddresses?.length);
 
   return (
     <ConfigureSSOWizard>
@@ -138,7 +138,7 @@ const ConfigureSSOSteps = () => {
         label='Verify domain'
       >
         <ConfigureSSOWizard>
-          {!primaryEmailAddress && (
+          {!hasEmailAddress && (
             <ConfigureSSOWizard.Step
               id='provide-email'
               path='provide-email'
