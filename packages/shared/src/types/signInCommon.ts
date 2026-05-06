@@ -57,6 +57,16 @@ import type {
 } from './strategies';
 import type { StartEmailLinkFlowParams } from './verification';
 
+/**
+ * @property {string} 'needs_identifier' - The user's identifier (e.g., email address, phone number, username) hasn't been provided.
+ * @property {string} 'needs_first_factor' - One of the following [first factor verification](!first-factor-verification) strategies is missing: `'email_link'`, `'email_code'`, `passkey`, `password`, `'phone_code'`, `'web3_base_signature'`, `'web3_metamask_signature'`, `'web3_coinbase_wallet_signature'`, `'web3_okx_wallet_signature'`, `'web3_solana_signature'`, [`OAuthStrategy`](https://clerk.com/docs/reference/types/sso#o-auth-strategy), or `'enterprise_sso'`.
+ * @property {string} 'needs_second_factor' - One of the following [second factor verification](!second-factor-verification) strategies is missing: `'phone_code'`, `'totp'`, `'backup_code'`, `'email_code'`, or `'email_link'`.
+ * @property {string} 'needs_client_trust' - The user is signing in from a new device and must complete a [second factor verification](!second-factor-verification) to establish [Client Trust](https://clerk.com/docs/guides/secure/client-trust). See the [Client Trust custom flow guide](https://clerk.com/docs/guides/development/custom-flows/authentication/client-trust) for more information.
+ * @property {string} 'needs_new_password' - The user needs to set a new password. See the [dedicated custom flow](https://clerk.com/docs/guides/development/custom-flows/account-updates/forgot-password) guide for more information.
+ *
+ * @interface
+ * @inline
+ */
 export type SignInStatus =
   | 'needs_identifier'
   | 'needs_first_factor'

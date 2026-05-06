@@ -8,18 +8,15 @@ import type { Web3Provider } from './web3';
 
 export interface SignInFutureCreateParams {
   /**
-   * The authentication identifier for the sign-in. This can be the value of the user's email address, phone number,
-   * username, or Web3 wallet address.
+   * The authentication identifier for the sign-in. This can be the value of the user's email address, phone number, username, or Web3 wallet address.
    */
   identifier?: string;
   /**
-   * The user's password. Only supported if
-   * [password](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#password) is enabled.
+   * The user's password. Only supported if [password](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#password) is enabled.
    */
   password?: string;
   /**
-   * The first factor verification strategy to use in the sign-in flow. Depends on the `identifier` value. Each
-   * authentication identifier supports different verification strategies.
+   * The first factor verification strategy to use in the sign-in flow. Depends on the `identifier` value. Each authentication identifier supports different verification strategies.
    */
   strategy?: OAuthStrategy | 'enterprise_sso' | PasskeyStrategy | TicketStrategy;
   /**
@@ -27,24 +24,19 @@ export interface SignInFutureCreateParams {
    */
   redirectUrl?: string;
   /**
-   * The URL that the user will be redirected to, after successful authorization from the OAuth provider and
-   * Clerk sign-in.
+   * The URL that the user will be redirected to, after successful authorization from the OAuth provider and Clerk sign-in.
    */
   actionCompleteRedirectUrl?: string;
   /**
-   * When set to `true`, the `SignIn` will attempt to retrieve information from the active `SignUp` instance and use it
-   * to complete the sign-in process. This is useful when you want to seamlessly transition a user from a sign-up
-   * attempt to a sign-in attempt.
+   * When set to `true`, the `SignIn` will attempt to retrieve information from the active `SignUp` instance and use it to complete the sign-in process. This is useful when you want to seamlessly transition a user from a sign-up attempt to a sign-in attempt.
    */
   transfer?: boolean;
   /**
-   * The [ticket _or token_](https://clerk.com/docs/guides/development/custom-flows/authentication/application-invitations)
-   * generated from the Backend API. **Required** if `strategy` is set to `'ticket'`.
+   * **Required** if `strategy` is set to `'ticket'`. The [ticket _or token_](https://clerk.com/docs/guides/development/custom-flows/authentication/application-invitations) generated from the Backend API.
    */
   ticket?: string;
   /**
-   * When set to `true`, if a user does not exist, the sign-up will prepare a transfer to sign up a new
-   * account. If bot sign-up protection is enabled, captcha will also be required on sign in.
+   * When set to `true`, if a user does not exist, the sign-up will prepare a transfer to sign up a new account. If bot sign-up protection is enabled, captcha will also be required on sign in.
    */
   signUpIfMissing?: boolean;
 }
@@ -90,6 +82,7 @@ export type SignInFuturePasswordParams = {
     }
 );
 
+/** Parameters for sending a sign-in email verification code. */
 export type SignInFutureEmailCodeSendParams =
   | {
       /**
@@ -107,6 +100,7 @@ export type SignInFutureEmailCodeSendParams =
       emailAddress?: never;
     };
 
+/** Parameters for sending a sign-in email link. */
 export type SignInFutureEmailLinkSendParams = {
   /**
    * The full URL that the user will be redirected to when they visit the email link.
@@ -115,15 +109,14 @@ export type SignInFutureEmailLinkSendParams = {
 } & (
   | {
       /**
-       * The user's email address. Only supported if [Email address](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#email)
-       * is enabled.
+       * The user's email address. Only supported if [Email address](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#email) is enabled. Provide either `emailAddress` or `emailAddressId`, not both. Omit both when a sign-in already exists and you are sending to the identified user.
        */
       emailAddress?: string;
       emailAddressId?: never;
     }
   | {
       /**
-       * The ID for the user's email address that will receive an email with the email link.
+       * The ID for the user's email address that will receive an email with the email link. Provide either `emailAddress` or `emailAddressId`, not both.
        */
       emailAddressId?: string;
       emailAddress?: never;
@@ -302,9 +295,7 @@ export interface SignInFutureFinalizeParams {
 }
 
 /**
- * The `SignInFuture` class holds the state of the current sign-in and provides helper methods to navigate and complete
- * the sign-in process. It is used to manage the sign-in lifecycle, including the first and second factor verification,
- * and the creation of a new session.
+ * The `SignInFuture` class holds the state of the current sign-in and provides helper methods to navigate and complete the sign-in process. It is used to manage the sign-in lifecycle, including the first and second factor verification, and the creation of a new session.
  */
 export interface SignInFutureResource {
   /**
@@ -313,14 +304,12 @@ export interface SignInFutureResource {
   readonly id?: string;
 
   /**
-   * Array of the first factors that are supported in the current sign-in. Each factor contains information about the
-   * verification strategy that can be used.
+   * Array of the first factors that are supported in the current sign-in. Each factor contains information about the verification strategy that can be used.
    */
   readonly supportedFirstFactors: SignInFirstFactor[];
 
   /**
-   * Array of the second factors that are supported in the current sign-in. Each factor contains information about the
-   * verification strategy that can be used. This property is populated only when the first factor is verified.
+   * Array of the second factors that are supported in the current sign-in. Each factor contains information about the verification strategy that can be used. This property is populated only when the first factor is verified.
    */
   readonly supportedSecondFactors: SignInSecondFactor[];
 
@@ -330,41 +319,38 @@ export interface SignInFutureResource {
   readonly status: SignInStatus;
 
   /**
-   * Indicates that there is not a matching user for the first-factor verification used, and that the sign-in can be
-   * transferred to a sign-up.
+   * Indicates that there is not a matching user for the first-factor verification used, and that the sign-in can be transferred to a sign-up.
    */
   readonly isTransferable: boolean;
 
+  /**
+   * Reflects that the sign-in was not able to create a new session because the identifier already exists in an existing session.
+   * @property {string} sessionId - The ID of the existing session.
+   */
   readonly existingSession?: { sessionId: string };
 
   /**
-   * The state of the verification process for the selected first factor. Initially, this property contains an empty
-   * verification object, since there is no first factor selected.
+   * The state of the verification process for the selected first factor. Initially, this property contains an empty verification object, since there is no first factor selected.
    */
   readonly firstFactorVerification: VerificationResource;
 
   /**
-   * The state of the verification process for the selected second factor. Initially, this property contains an empty
-   * verification object, since there is no second factor selected.
+   * The state of the verification process for the selected second factor. Initially, this property contains an empty verification object, since there is no second factor selected.
    */
   readonly secondFactorVerification: VerificationResource;
 
   /**
-   * The authentication identifier value for the current sign-in. `null` if the `strategy` is `'oauth_<provider>'`
-   * or `'enterprise_sso'`.
+   * The authentication identifier value for the current sign-in. `null` if the `strategy` is `'oauth_<provider>'` or `'enterprise_sso'`.
    */
   readonly identifier: string | null;
 
   /**
-   * The identifier of the session that was created upon completion of the current sign-in. The value of this property
-   * is `null` if the sign-in status is not `'complete'`.
+   * The ID of the session that was created upon completion of the current sign-in. The value of this property is `null` if the sign-in status is not `'complete'`.
    */
   readonly createdSessionId: string | null;
 
   /**
-   * An object containing information about the user of the current sign-in. This property is populated only once an
-   * identifier is given to the `SignIn` object through `signIn.create()` or another method that populates the
-   * `identifier` property.
+   * An object containing information about the user of the current sign-in. This property is populated only once an identifier is given to the `SignIn` object through `signIn.create()` or another method that populates the `identifier` property.
    */
   readonly userData: UserData;
 
@@ -376,18 +362,14 @@ export interface SignInFutureResource {
   readonly canBeDiscarded: boolean;
 
   /**
-   * Creates a new `SignIn` instance initialized with the provided parameters. The instance maintains the sign-in
-   * lifecycle state through its `status` property, which updates as the authentication flow progresses.
+   * Creates a new `SignIn` instance initialized with the provided parameters. The instance maintains the sign-in lifecycle state through its `status` property, which updates as the authentication flow progresses. Once the sign-in process is complete, call the `signIn.finalize()` method to set the newly created session as the active session.
    *
-   * What you must pass to `params` depends on which [sign-in options](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options)
-   * you have enabled in your app's settings in the Clerk Dashboard.
+   * What you must pass to `params` depends on which [sign-in options](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options) you have enabled in your app's settings in the Clerk Dashboard.
    *
-   * You can complete the sign-in process in one step if you supply the required fields to `create()`. Otherwise,
-   * Clerk's sign-in process provides great flexibility and allows users to easily create multi-step sign-in flows.
+   * You can complete the sign-in process in one step if you supply the required fields to `create()`. Otherwise, Clerk's sign-in process provides great flexibility and allows users to easily create multi-step sign-in flows.
    *
-   * > [!WARNING]
-   * > Once the sign-in process is complete, call the `signIn.finalize()` method to set the newly created session as
-   * > the active session.
+   * > [!IMPORTANT]
+   * > The `signIn.create()` method is intended for advanced use cases. For most use cases, prefer the use of the factor-specific methods such as `signIn.password()`, `signIn.emailCode.sendCode()`, etc.
    */
   create: (params: SignInFutureCreateParams) => Promise<{ error: ClerkError | null }>;
 
@@ -426,7 +408,9 @@ export interface SignInFutureResource {
     waitForVerification: () => Promise<{ error: ClerkError | null }>;
 
     /**
-     * The verification status
+     * The verification status of the email link. This property is populated by reading query parameters from the URL after the user visits the email link. Returns `null` if no verification status is available.
+     *
+     * @propertyTableDoc
      */
     verification: {
       /**
@@ -435,7 +419,7 @@ export interface SignInFutureResource {
       status: 'verified' | 'expired' | 'failed' | 'client_mismatch';
 
       /**
-       * The created session ID
+       * The ID of the session that was created upon completion of the current sign-in.
        */
       createdSessionId: string;
 

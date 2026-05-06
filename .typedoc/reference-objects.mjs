@@ -31,6 +31,10 @@ export const REFERENCE_OBJECT_CONFIG = {
     symbol: 'UserResource',
     declarationHint: 'types/user',
   },
+  'shared/sign-in-future-resource/sign-in-future-resource.mdx': {
+    symbol: 'SignInFutureResource',
+    declarationHint: 'types/signInFuture',
+  },
 };
 
 /** Stable iteration order matches key order in {@link REFERENCE_OBJECT_CONFIG}. */

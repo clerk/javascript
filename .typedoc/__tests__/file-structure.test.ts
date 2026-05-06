@@ -58,6 +58,10 @@ describe('Typedoc output', () => {
         "shared/client-resource/methods",
         "shared/session-resource",
         "shared/session-resource/methods",
+        "shared/user-resource",
+        "shared/user-resource/methods",
+        "shared/sign-in-future-resource",
+        "shared/sign-in-future-resource/methods",
       ]
     `);
   });
