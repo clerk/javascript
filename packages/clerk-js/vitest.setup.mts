@@ -78,11 +78,13 @@ if (typeof window !== 'undefined') {
   // Mock ResizeObserver
   window.ResizeObserver =
     window.ResizeObserver ||
-    vi.fn().mockImplementation(() => ({
-      disconnect: vi.fn(),
-      observe: vi.fn(),
-      unobserve: vi.fn(),
-    }));
+    (vi.fn().mockImplementation(function () {
+      return {
+        disconnect: vi.fn(),
+        observe: vi.fn(),
+        unobserve: vi.fn(),
+      };
+    }) as unknown as typeof ResizeObserver);
 
   // Mock matchMedia
   Object.defineProperty(window, 'matchMedia', {
@@ -278,10 +280,12 @@ vi.mock('@formkit/auto-animate', () => ({
 // Mock browser-tabs-lock to prevent window access errors in tests
 vi.mock('browser-tabs-lock', () => {
   return {
-    default: vi.fn().mockImplementation(() => ({
-      acquireLock: vi.fn().mockResolvedValue(true),
-      releaseLock: vi.fn().mockResolvedValue(true),
-    })),
+    default: vi.fn().mockImplementation(function () {
+      return {
+        acquireLock: vi.fn().mockResolvedValue(true),
+        releaseLock: vi.fn().mockResolvedValue(true),
+      };
+    }),
   };
 });
 

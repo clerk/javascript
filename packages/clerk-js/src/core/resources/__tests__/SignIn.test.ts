@@ -19,12 +19,14 @@ import { _futureAuthenticateWithPopup } from '../../../utils/authenticateWithPop
 
 // Mock the CaptchaChallenge module
 vi.mock('../../../utils/captcha/CaptchaChallenge', () => ({
-  CaptchaChallenge: vi.fn().mockImplementation(() => ({
-    managedOrInvisible: vi.fn().mockResolvedValue({
-      captchaToken: 'mock_captcha_token',
-      captchaWidgetType: 'invisible',
-    }),
-  })),
+  CaptchaChallenge: vi.fn().mockImplementation(function () {
+    return {
+      managedOrInvisible: vi.fn().mockResolvedValue({
+        captchaToken: 'mock_captcha_token',
+        captchaWidgetType: 'invisible',
+      }),
+    };
+  }),
 }));
 
 describe('SignIn', () => {
