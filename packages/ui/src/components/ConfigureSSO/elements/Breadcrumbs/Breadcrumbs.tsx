@@ -94,8 +94,8 @@ const Breadcrumbs_ = ({ currentId, onItemClick, children }: BreadcrumbsProps): J
                 align='center'
                 justify='center'
                 sx={theme => ({
-                  width: theme.sizes.$5,
-                  height: theme.sizes.$5,
+                  width: theme.sizes.$4,
+                  height: theme.sizes.$4,
                   borderRadius: theme.radii.$circle,
                   fontSize: theme.fontSizes.$xs,
                   fontWeight: theme.fontWeights.$semibold,
@@ -134,7 +134,7 @@ const Breadcrumbs_ = ({ currentId, onItemClick, children }: BreadcrumbsProps): J
               <Icon
                 elementDescriptor={descriptors.configureSSOWizardHeaderSeparator}
                 icon={CaretRight}
-                size='sm'
+                size='md'
                 sx={theme => ({ color: theme.colors.$colorMutedForeground })}
               />
             )}

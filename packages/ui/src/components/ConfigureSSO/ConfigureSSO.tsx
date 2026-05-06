@@ -3,13 +3,15 @@ import type { __experimental_ConfigureSSOProps } from '@clerk/shared/types';
 import React from 'react';
 
 import { withCoreUserGuard } from '@/contexts';
-import { descriptors, Flex, Flow, Spinner } from '@/customizables';
+import { Col, descriptors, Flow } from '@/customizables';
 import { withCardStateProvider } from '@/elements/contexts';
 import { ProfileCard } from '@/elements/ProfileCard';
 import { Route, Switch } from '@/router';
 
 import { ConfigureSSOFooter } from './ConfigureSSOFooter';
 import { ConfigureSSOHeader } from './ConfigureSSOHeader';
+import { ConfigureSSONavbar } from './ConfigureSSONavbar';
+import { ConfigureSSOSkeleton } from './ConfigureSSOSkeleton';
 import { Wizard } from './elements/Wizard';
 import { ConfigureCreateApp, ConfirmationStep, ProvideEmail, TestConfigurationStep, VerifyDomainStep } from './steps';
 
@@ -26,11 +28,33 @@ const ConfigureSSOInternal = () => {
 };
 
 const AuthenticatedContent = withCoreUserGuard(() => {
+  const contentRef = React.useRef<HTMLDivElement>(null);
+
   return (
     <ProfileCard.Root
       sx={t => ({ display: 'grid', gridTemplateColumns: '1fr 3fr', height: t.sizes.$176, overflow: 'hidden' })}
     >
-      <ConfigureSSOCardContent />
+      <ConfigureSSONavbar contentRef={contentRef}>
+        <Col
+          ref={contentRef}
+          elementDescriptor={descriptors.scrollBox}
+          sx={t => ({
+            backgroundColor: t.colors.$colorBackground,
+            position: 'relative',
+            borderRadius: t.radii.$lg,
+            width: '100%',
+            overflow: 'hidden',
+            borderWidth: t.borderWidths.$normal,
+            borderStyle: t.borderStyles.$solid,
+            borderColor: t.colors.$borderAlpha150,
+            marginBlock: '-1px',
+            marginInlineEnd: '-1px',
+            flex: 1,
+          })}
+        >
+          <ConfigureSSOCardContent />
+        </Col>
+      </ConfigureSSONavbar>
     </ProfileCard.Root>
   );
 });
@@ -42,19 +66,7 @@ const ConfigureSSOCardContent = () => {
 
   // Initial-load gate at root — wizard never sees isLoading
   if (isLoading && !enterpriseConnection) {
-    return (
-      <Flex
-        align='center'
-        justify='center'
-        sx={{ flex: 1 }}
-      >
-        <Spinner
-          size='xs'
-          colorScheme='neutral'
-          elementDescriptor={descriptors.spinner}
-        />
-      </Flex>
-    );
+    return <ConfigureSSOSkeleton />;
   }
 
   return (
