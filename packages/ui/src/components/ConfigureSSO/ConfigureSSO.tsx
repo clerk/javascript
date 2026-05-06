@@ -12,7 +12,14 @@ import { BoxIcon } from '@/icons';
 import { Route, Switch } from '@/router';
 
 import { ConfigureSSOFlowProvider } from './ConfigureSSOContext';
-import { ConfigureCreateApp, ConfirmationStep, ProvideEmail, TestConfigurationStep, VerifyDomainStep } from './steps';
+import {
+  ConfigureCreateApp,
+  ConfirmationStep,
+  ProvideEmail,
+  SelectProviderStep,
+  TestConfigurationStep,
+  VerifyDomainStep,
+} from './steps';
 import { ConfigureSSOWizard } from './wizard';
 
 const ConfigureSSOInternal = () => {
@@ -34,8 +41,14 @@ const AuthenticatedContent = withCoreUserGuard(() => {
   const { parsedOptions } = useAppearance();
   const hasLogo = Boolean(parsedOptions.logoImageUrl || logoImageUrl);
 
-  const { data: enterpriseConnections, isLoading: isLoadingEnterpriseConnections } =
-    __internal_useUserEnterpriseConnections({ enabled: true });
+  const {
+    data: enterpriseConnections,
+    isLoading: isLoadingEnterpriseConnections,
+    createEnterpriseConnection,
+    updateEnterpriseConnection,
+    deleteEnterpriseConnection,
+    revalidate: revalidateEnterpriseConnections,
+  } = __internal_useUserEnterpriseConnections({ enabled: true });
   // Currently FAPI only supports one enterprise connection per user
   const enterpriseConnection = enterpriseConnections?.[0];
 
@@ -116,6 +129,10 @@ const AuthenticatedContent = withCoreUserGuard(() => {
           <ConfigureSSOFlowProvider
             enterpriseConnection={enterpriseConnection}
             isLoading={isLoadingEnterpriseConnections}
+            createEnterpriseConnection={createEnterpriseConnection}
+            updateEnterpriseConnection={updateEnterpriseConnection}
+            deleteEnterpriseConnection={deleteEnterpriseConnection}
+            revalidate={revalidateEnterpriseConnections}
           >
             <ConfigureSSOSteps />
           </ConfigureSSOFlowProvider>
@@ -132,6 +149,13 @@ const ConfigureSSOSteps = () => {
 
   return (
     <ConfigureSSOWizard>
+      <ConfigureSSOWizard.Step
+        id='select-provider'
+        path='select-provider'
+        label='Select provider'
+      >
+        <SelectProviderStep />
+      </ConfigureSSOWizard.Step>
       <ConfigureSSOWizard.Step
         id='verify-email-domain'
         path='verify-email-domain'
@@ -159,15 +183,7 @@ const ConfigureSSOSteps = () => {
         path='configure'
         label='Configure'
       >
-        <ConfigureSSOWizard>
-          {/* TODO: Implement configure steps */}
-          <ConfigureSSOWizard.Step
-            id='create-app'
-            path='create-app'
-          >
-            <ConfigureCreateApp />
-          </ConfigureSSOWizard.Step>
-        </ConfigureSSOWizard>
+        <ConfigureCreateApp />
       </ConfigureSSOWizard.Step>
       <ConfigureSSOWizard.Step
         id='test'
