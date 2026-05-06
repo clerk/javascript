@@ -38,7 +38,7 @@ concurrency:
 jobs:
   android:
     name: Android
-    runs-on: ubuntu-latest
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     timeout-minutes: 45
     defaults:
       run:
