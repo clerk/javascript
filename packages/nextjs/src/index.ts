@@ -96,4 +96,4 @@ export const Show = ComponentsModule.Show as ServerComponentsServerModuleTypes['
  * The `auth` function is only available in server-side contexts:
  * API Routes, Server Components, Server Actions, and Middleware.
  */
-export declare const auth: never;
+export { auth } from './server-only-stubs';
