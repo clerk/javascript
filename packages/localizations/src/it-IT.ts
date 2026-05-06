@@ -184,6 +184,11 @@ export const itIT: LocalizationResource = {
     viewPayment: undefined,
     year: 'Anno',
   },
+  configureSSO: {
+    navbar: {
+      title: 'Configura Single Sign-On (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Crea organizzazione',
     invitePage: {

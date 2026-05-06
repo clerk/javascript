@@ -1,5 +1,21 @@
 # @clerk/ui
 
+## 1.8.0
+
+### Minor Changes
+
+- Add experimental `<ConfigureSSO />` component. Not ready for usage yet. ([#8427](https://github.com/clerk/javascript/pull/8427)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Localize API keys table headers ([#8462](https://github.com/clerk/javascript/pull/8462)) by [@jebibot](https://github.com/jebibot)
+
+- Surface initialization errors and stalled mounts in the component renderer. The internal `ensureMounted` pipeline now logs a `[Clerk UI]` error to the console when the lazy module import rejects, and emits a diagnostic warning if the renderer has not mounted within 10 seconds. Makes silent failures (e.g. failed dev-server chunk loads, unresolved lazy-compilation proxies) surface with an actionable message instead of hanging without feedback. ([#8379](https://github.com/clerk/javascript/pull/8379)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`9e9230c`](https://github.com/clerk/javascript/commit/9e9230c8c3cbdb1c253ca7cdd24cc8d681b5ee5a), [`68d32df`](https://github.com/clerk/javascript/commit/68d32dfcc453080ef93edf69be8de765a342d88c), [`1c27d4d`](https://github.com/clerk/javascript/commit/1c27d4dd41a27cf41c3823306fe88e026fed08fb), [`1001193`](https://github.com/clerk/javascript/commit/10011936981fc22bf7d3750f1591f0873ea78bcb)]:
+  - @clerk/localizations@4.6.0
+  - @clerk/shared@4.10.0
+
 ## 1.7.0
 
 ### Minor Changes

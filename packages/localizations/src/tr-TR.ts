@@ -178,6 +178,11 @@ export const trTR: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'Tek Oturum Açmayı (SSO) Yapılandır',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Oluştur',
     invitePage: {

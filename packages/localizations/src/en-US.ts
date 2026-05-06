@@ -41,6 +41,9 @@ export const enUS: LocalizationResource = {
       formHint: 'Are you sure you want to delete this Secret key?',
       formTitle: 'Revoke "{{apiKeyName}}" secret key?',
     },
+    tableHeader__name: 'Name',
+    tableHeader__lastUsed: 'Last used',
+    tableHeader__actions: 'Actions',
   },
   backButton: 'Back',
   badge__activePlan: 'Active',
@@ -196,6 +199,11 @@ export const enUS: LocalizationResource = {
     year: 'Year',
     yearAbbreviation: 'yr',
     yearPerUnit: 'Year per {{unitName}}',
+  },
+  configureSSO: {
+    navbar: {
+      title: 'Configure Single Sign-On (SSO)',
+    },
   },
   createOrganization: {
     formButtonSubmit: 'Create organization',
