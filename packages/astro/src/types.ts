@@ -120,4 +120,4 @@ export type InternalUIComponentId =
   | 'waitlist'
   | 'pricing-table'
   | 'api-keys'
-  | 'oauth-consent';
+  | 'configure-sso';

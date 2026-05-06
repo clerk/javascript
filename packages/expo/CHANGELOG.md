@@ -1,5 +1,18 @@
 # Change Log
 
+## 3.2.8
+
+### Patch Changes
+
+- Fix session loss on Expo JS reload (pressing R in dev) ([#8469](https://github.com/clerk/javascript/pull/8469)) by [@chriscanin](https://github.com/chriscanin)
+
+  `NativeSessionSync` was calling native `signOut()` during the loading phase when `isSignedIn` is `undefined`. On a JS reload, the native module persists from the previous session, so `signOut()` revokes the session server-side and clears all keychain items, forcing the user to log in again. This adds an `isLoaded` guard so native `signOut()` is only called when Clerk has confirmed the user is actually signed out.
+
+- Updated dependencies [[`9e9230c`](https://github.com/clerk/javascript/commit/9e9230c8c3cbdb1c253ca7cdd24cc8d681b5ee5a), [`68d32df`](https://github.com/clerk/javascript/commit/68d32dfcc453080ef93edf69be8de765a342d88c), [`1c27d4d`](https://github.com/clerk/javascript/commit/1c27d4dd41a27cf41c3823306fe88e026fed08fb), [`1001193`](https://github.com/clerk/javascript/commit/10011936981fc22bf7d3750f1591f0873ea78bcb)]:
+  - @clerk/shared@4.10.0
+  - @clerk/clerk-js@6.9.0
+  - @clerk/react@6.6.0
+
 ## 3.2.7
 
 ### Patch Changes

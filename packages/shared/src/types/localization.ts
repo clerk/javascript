@@ -1292,6 +1292,11 @@ export type __internal_LocalizationResource = {
       message: LocalizationValue;
     };
   };
+  configureSSO: {
+    navbar: {
+      title: LocalizationValue;
+    };
+  };
   apiKeys: {
     formTitle: LocalizationValue;
     formHint: LocalizationValue;
@@ -1299,6 +1304,9 @@ export type __internal_LocalizationResource = {
     menuAction__revoke: LocalizationValue;
     action__search: LocalizationValue;
     action__add: LocalizationValue;
+    tableHeader__name: LocalizationValue;
+    tableHeader__lastUsed: LocalizationValue;
+    tableHeader__actions: LocalizationValue;
     detailsTitle__emptyRow: LocalizationValue;
     revokeConfirmation: {
       formTitle: LocalizationValue<'apiKeyName'>;
