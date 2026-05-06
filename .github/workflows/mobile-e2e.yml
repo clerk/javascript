@@ -126,6 +126,7 @@ jobs:
         env:
           CLERK_TEST_EMAIL: ${{ steps.user.outputs.email }}
           CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
+          EXCLUDE_TAGS: ${{ inputs.exclude_tags }}
         with:
           api-level: 34
           target: google_apis
@@ -137,7 +138,7 @@ jobs:
             cd ../../integration-mobile
             # Maestro doesn't auto-recurse into subdirectories; pass each flow explicitly.
             find flows -type f -name "*.yaml" ! -path "*/common/*" -print0 | \
-              xargs -0 maestro test --exclude-tags "${{ inputs.exclude_tags }}"
+              xargs -0 maestro test --exclude-tags "$EXCLUDE_TAGS"
 
       - name: Upload Maestro artifacts on failure
         if: failure()
@@ -241,6 +242,7 @@ jobs:
         env:
           CLERK_TEST_EMAIL: ${{ steps.user.outputs.email }}
           CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
+          EXCLUDE_TAGS: ${{ inputs.exclude_tags }}
         run: |
           cd clerk-expo-quickstart/NativeComponentQuickstart
           npx expo prebuild --clean
@@ -248,7 +250,7 @@ jobs:
           cd ../../integration-mobile
           # Maestro doesn't auto-recurse into subdirectories; pass each flow explicitly.
           find flows -type f -name "*.yaml" ! -path "*/common/*" -print0 | \
-            xargs -0 maestro test --exclude-tags "${{ inputs.exclude_tags }},androidOnly"
+            xargs -0 maestro test --exclude-tags "$EXCLUDE_TAGS,androidOnly"
 
       - name: Upload Maestro artifacts on failure
         if: failure()
