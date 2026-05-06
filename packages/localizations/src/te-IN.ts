@@ -178,6 +178,11 @@ export const teIN: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'సింగిల్ సైన్-ఆన్ (SSO) కాన్ఫిగర్ చేయండి',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'సంస్థను సృష్టించండి',
     invitePage: {

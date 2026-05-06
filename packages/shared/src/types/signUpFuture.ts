@@ -98,9 +98,25 @@ export interface SignUpFutureCreateParams extends SignUpFutureAdditionalParams {
   web3Wallet?: string;
 }
 
-// This will likely get more properties
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface SignUpFutureUpdateParams extends SignUpFutureAdditionalParams {}
+export interface SignUpFutureUpdateParams extends SignUpFutureAdditionalParams {
+  /**
+   * The user's email address. Only supported if [Email address](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#email)
+   * is enabled. Keep in mind that the email address requires an extra verification process.
+   */
+  emailAddress?: string;
+  /**
+   * The user's phone number in [E.164 format](https://en.wikipedia.org/wiki/E.164). Only supported if
+   * [phone number](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#phone) is enabled.
+   * Keep in mind that the phone number requires an extra verification process.
+   */
+  phoneNumber?: string;
+  /**
+   * The user's username. Only supported if
+   * [username](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#username) is enabled in
+   * the instance settings.
+   */
+  username?: string;
+}
 
 export interface SignUpFutureEmailCodeVerifyParams {
   /**

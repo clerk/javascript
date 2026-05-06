@@ -11,6 +11,7 @@ export {
   useSession,
   useReverification,
   useAPIKeys,
+  useOAuthConsent,
   __experimental_useCheckout,
   __experimental_CheckoutProvider,
   __experimental_usePaymentElement,

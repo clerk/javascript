@@ -9,7 +9,6 @@ export const templates = {
   'next-app-router-quickstart': resolve(__dirname, './next-app-router-quickstart'),
   'next-app-router-bundled-ui': resolve(__dirname, './next-app-router-bundled-ui'),
   'next-app-router-quickstart-v6': resolve(__dirname, './next-app-router-quickstart-v6'),
-  'react-cra': resolve(__dirname, './react-cra'),
   'react-vite': resolve(__dirname, './react-vite'),
   'express-vite': resolve(__dirname, './express-vite'),
   'fastify-vite': resolve(__dirname, './fastify-vite'),

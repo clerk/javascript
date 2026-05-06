@@ -1,5 +1,90 @@
 # Change Log
 
+## 3.4.5
+
+### Patch Changes
+
+- Updated dependencies [[`9e9230c`](https://github.com/clerk/javascript/commit/9e9230c8c3cbdb1c253ca7cdd24cc8d681b5ee5a), [`68d32df`](https://github.com/clerk/javascript/commit/68d32dfcc453080ef93edf69be8de765a342d88c), [`1c27d4d`](https://github.com/clerk/javascript/commit/1c27d4dd41a27cf41c3823306fe88e026fed08fb), [`1001193`](https://github.com/clerk/javascript/commit/10011936981fc22bf7d3750f1591f0873ea78bcb)]:
+  - @clerk/shared@4.10.0
+
+## 3.4.4
+
+### Patch Changes
+
+- Updated dependencies [[`785f057`](https://github.com/clerk/javascript/commit/785f057f5cda202c26a9f34bde7c1873a6cbd6ea), [`90beaeb`](https://github.com/clerk/javascript/commit/90beaeb8319d5bccb8fa52343f4b241c6d2d3ebe), [`244920d`](https://github.com/clerk/javascript/commit/244920d1ebb5d420a96bfc2a79d84cccafe9b61c)]:
+  - @clerk/shared@4.9.0
+
+## 3.4.3
+
+### Patch Changes
+
+- Updated dependencies [[`1bfd8ab`](https://github.com/clerk/javascript/commit/1bfd8ab89c62e428038b8c565f118c582ed395ea)]:
+  - @clerk/shared@4.8.7
+
+## 3.4.2
+
+### Patch Changes
+
+- Auto-proxy FAPI requests for `.vercel.app` subdomains. When deployed to a `.vercel.app` domain without explicit proxy or domain configuration, the SDK automatically routes Frontend API requests through `/__clerk` on the app's own origin. This enables Clerk production mode on Vercel deployments without manual proxy setup. ([#8035](https://github.com/clerk/javascript/pull/8035)) by [@brkalow](https://github.com/brkalow)
+
+- Fix `Request` cloning and outbound `fetch` to omit cross-realm `AbortSignal`. Node 24's bundled undici tightened the `instanceof AbortSignal` check on `RequestInit.signal`, which broke: ([#8351](https://github.com/clerk/javascript/pull/8351)) by [@jacekradko](https://github.com/jacekradko)
+  - Cloning framework-specific requests such as `NextRequest` in `@clerk/backend`'s `ClerkRequest`.
+  - Subclassed `Request`s passed through `patchRequest` in `@clerk/react-router` and `@clerk/tanstack-react-start`.
+  - Frontend API proxying in `@clerk/backend`'s `clerkFrontendApiProxy`, which forwarded the inbound request's signal to the upstream `fetch`. Abort propagation will be restored in a follow-up via an in-realm `AbortController` bridge.
+
+- Updated dependencies [[`9b57986`](https://github.com/clerk/javascript/commit/9b5798696eb0c6cc6ab548ade100b504f691895c), [`a9f9b29`](https://github.com/clerk/javascript/commit/a9f9b2971a026d04571ceb1865ec8dafedbbe863)]:
+  - @clerk/shared@4.8.6
+
+## 3.4.1
+
+### Patch Changes
+
+- Updated dependencies [[`da76490`](https://github.com/clerk/javascript/commit/da7649075e24351737271318e81842b5c298dee1)]:
+  - @clerk/shared@4.8.5
+
+## 3.4.0
+
+### Minor Changes
+
+- Add backend query to GET organization settings for an instance. ([#8367](https://github.com/clerk/javascript/pull/8367)) by [@dmoerner](https://github.com/dmoerner)
+
+### Patch Changes
+
+- Updated dependencies [[`083c4c5`](https://github.com/clerk/javascript/commit/083c4c50a2d2e1cedc8ffb85d8ba749170ea4f90), [`dcaf694`](https://github.com/clerk/javascript/commit/dcaf694fbc7fd1b80fd10661225aa6d61eb3c2a9)]:
+  - @clerk/shared@4.8.4
+
+## 3.3.0
+
+### Minor Changes
+
+- Add `createBootstrapSignedOutState` helper to `@clerk/backend/internal`. Returns a synthetic `UnauthenticatedState<'session_token'>` without requiring a publishable key or an `AuthenticateContext`. Intended for framework integrations that need to run authorization logic before real Clerk keys are available (e.g. the Next.js keyless bootstrap window). Accepts optional `signInUrl`, `signUpUrl`, `isSatellite`, `domain`, and `proxyUrl` so that `createRedirect`-driven flows (including cross-origin satellite sign-in with the `__clerk_status=needs-sync` handshake marker) behave correctly during bootstrap. ([#8368](https://github.com/clerk/javascript/pull/8368)) by [@jacekradko](https://github.com/jacekradko)
+
+## 3.2.14
+
+### Patch Changes
+
+- A clock skew of 0 will not fall back to the default value anymore. ([#8359](https://github.com/clerk/javascript/pull/8359)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`d52b311`](https://github.com/clerk/javascript/commit/d52b311f16453e834df5c81594a1bfead30c935f)]:
+  - @clerk/shared@4.8.3
+
+## 3.2.13
+
+### Patch Changes
+
+- Add path traversal protections in `joinPaths` ([#8331](https://github.com/clerk/javascript/pull/8331)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+## 3.2.12
+
+### Patch Changes
+
+- Introduce `samlConnection` and `oauthConfig` into the `EnterpriseConnection` resource. ([#8326](https://github.com/clerk/javascript/pull/8326)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- The JWT claims are verified after the signature to avoid leaking information through error messages on forged tokens. ([#8332](https://github.com/clerk/javascript/pull/8332)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`c7b0f47`](https://github.com/clerk/javascript/commit/c7b0f4789c47d4d7eeed767a06d3b257a24a50dd), [`34762e8`](https://github.com/clerk/javascript/commit/34762e8f2772034e6abb5f4f4daec902f74b30b6)]:
+  - @clerk/shared@4.8.2
+
 ## 3.2.11
 
 ### Patch Changes

@@ -66,7 +66,64 @@ export function ListGroupContent({
     <Box
       {...props}
       as='ul'
-      sx={[t => ({ margin: t.sizes.$none, padding: t.sizes.$none }), sx]}
+      sx={[
+        t => ({
+          margin: t.sizes.$none,
+          padding: t.sizes.$none,
+          maxBlockSize: '10.9375rem',
+          backgroundColor: t.colors.$colorBackground,
+          overflowY: 'auto',
+          ...common.unstyledScrollbar(t),
+          '--fade-distance': '2.5rem',
+          '&::before, &::after': {
+            content: '""',
+            display: 'block',
+            position: 'sticky',
+            insetInline: 0,
+            blockSize: 'var(--fade-distance)',
+            pointerEvents: 'none',
+            zIndex: 1,
+            opacity: 0,
+          },
+          '&::before': {
+            insetBlockStart: 0,
+            marginBlockEnd: 'calc(var(--fade-distance) * -1)',
+            background: `linear-gradient(to bottom, ${t.colors.$colorBackground}, transparent)`,
+          },
+          '&::after': {
+            insetBlockEnd: 0,
+            marginBlockStart: 'calc(var(--fade-distance) * -1)',
+            background: `linear-gradient(to top, ${t.colors.$colorBackground}, transparent)`,
+          },
+          '@keyframes list-fade-top': {
+            from: { opacity: 0 },
+            to: { opacity: 1 },
+          },
+          '@keyframes list-fade-bottom': {
+            from: { opacity: 1 },
+            to: { opacity: 0 },
+          },
+          '@supports (animation-timeline: scroll())': {
+            '&::before': {
+              animationName: 'list-fade-top',
+              animationDuration: 'auto',
+              animationTimingFunction: 'linear',
+              animationFillMode: 'both',
+              animationTimeline: 'scroll(y)',
+              animationRange: '0 var(--fade-distance)',
+            },
+            '&::after': {
+              animationName: 'list-fade-bottom',
+              animationDuration: 'auto',
+              animationTimingFunction: 'linear',
+              animationFillMode: 'both',
+              animationTimeline: 'scroll(y)',
+              animationRange: 'calc(100% - var(--fade-distance)) 100%',
+            },
+          },
+        }),
+        sx,
+      ]}
       elementDescriptor={descriptors.listGroupContent}
     >
       {children}

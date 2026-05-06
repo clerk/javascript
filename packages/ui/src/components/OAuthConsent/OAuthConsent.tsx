@@ -1,4 +1,4 @@
-import { useClerk, useOAuthConsent, useOrganizationList, useUser } from '@clerk/shared/react';
+import { useClerk, useOAuthConsent, useUser } from '@clerk/shared/react';
 import { useState } from 'react';
 
 import { useEnvironment, useOAuthConsentContext, withCoreUserGuard } from '@/ui/contexts';
@@ -10,6 +10,7 @@ import { Header } from '@/ui/elements/Header';
 import { LoadingCardContainer } from '@/ui/elements/LoadingCard';
 import { Modal } from '@/ui/elements/Modal';
 import { Alert, Textarea } from '@/ui/primitives';
+import { Route, Switch } from '@/ui/router';
 
 import { InlineAction } from './InlineAction';
 import {
@@ -21,31 +22,23 @@ import {
   ListGroupItemLabel,
 } from './ListGroup';
 import { LogoGroup, LogoGroupIcon, LogoGroupItem, LogoGroupSeparator } from './LogoGroup';
-import type { OrgOption } from './OrgSelect';
 import { OrgSelect } from './OrgSelect';
-import { getForwardedParams, getOAuthConsentFromSearch, getRedirectUriFromSearch, getRootDomain } from './utils';
+import { getForwardedParams, getOAuthConsentFromSearch, getRedirectDisplay, getRedirectUriFromSearch } from './utils';
 
 const OFFLINE_ACCESS_SCOPE = 'offline_access';
+const USER_ORG_READ_SCOPE = 'user:org:read';
 
 function _OAuthConsent() {
   const ctx = useOAuthConsentContext();
   const clerk = useClerk();
   const { user } = useUser();
-  const { applicationName, logoImageUrl } = useEnvironment().displayConfig;
+  const {
+    displayConfig: { applicationName, logoImageUrl },
+    organizationSettings,
+  } = useEnvironment();
   const [isUriModalOpen, setIsUriModalOpen] = useState(false);
-  const { isLoaded: isMembershipsLoaded, userMemberships } = useOrganizationList({
-    // TODO(rob): Implement lazy loading in another PR
-    userMemberships: ctx.enableOrgSelection ? { infinite: true, pageSize: 50 } : undefined,
-  });
-
-  const orgOptions: OrgOption[] = (userMemberships.data ?? []).map(m => ({
-    value: m.organization.id,
-    label: m.organization.name,
-    logoUrl: m.organization.imageUrl,
-  }));
 
   const [selectedOrg, setSelectedOrg] = useState<string | null>(null);
-  const effectiveOrg = selectedOrg ?? orgOptions[0]?.value ?? null;
 
   // onAllow and onDeny are always provided as a pair by the accounts portal.
   const hasContextCallbacks = Boolean(ctx.onAllow || ctx.onDeny);
@@ -78,8 +71,21 @@ function _OAuthConsent() {
   const oauthApplicationUrl = ctx.oauthApplicationUrl ?? data?.oauthApplicationUrl;
   const redirectUrl = ctx.redirectUrl ?? getRedirectUriFromSearch();
 
+  const hasOrgReadScope = scopes.some(s => s.scope === USER_ORG_READ_SCOPE);
+  const orgSelectionEnabled = !!(hasOrgReadScope && organizationSettings.enabled);
+  const orgOptions = orgSelectionEnabled
+    ? (user?.organizationMemberships ?? []).map(m => ({
+        value: m.organization.id,
+        label: m.organization.name,
+        logoUrl: m.organization.imageUrl,
+      }))
+    : [];
+  const lastActiveOrgId = clerk.session?.lastActiveOrganizationId;
+  const defaultOrg = orgOptions.find(o => o.value === lastActiveOrgId)?.value ?? orgOptions[0]?.value ?? null;
+  const effectiveOrg = selectedOrg ?? defaultOrg;
+
   const { t } = useLocalizations();
-  const domainAction = getRootDomain(redirectUrl);
+  const domainAction = getRedirectDisplay(redirectUrl);
   const viewFullUrlText = t(localizationKeys('oauthConsent.viewFullUrl'));
 
   // Error states only apply to the public flow.
@@ -94,42 +100,25 @@ function _OAuthConsent() {
 
     if (errorMessage) {
       return (
-        <Flow.Root flow='oauthConsent'>
-          <Card.Root>
-            <Card.Content>
-              <Card.Alert>{errorMessage}</Card.Alert>
-            </Card.Content>
-            <Card.Footer />
-          </Card.Root>
-        </Flow.Root>
+        <Card.Root>
+          <Card.Content>
+            <Card.Alert>{errorMessage}</Card.Alert>
+          </Card.Content>
+          <Card.Footer />
+        </Card.Root>
       );
     }
 
     if (isLoading) {
       return (
-        <Flow.Root flow='oauthConsent'>
-          <Card.Root>
-            <Card.Content>
-              <LoadingCardContainer />
-            </Card.Content>
-            <Card.Footer />
-          </Card.Root>
-        </Flow.Root>
-      );
-    }
-  }
-
-  if (ctx.enableOrgSelection && (!isMembershipsLoaded || userMemberships.isLoading)) {
-    return (
-      <Flow.Root flow='oauthConsent'>
         <Card.Root>
           <Card.Content>
             <LoadingCardContainer />
           </Card.Content>
           <Card.Footer />
         </Card.Root>
-      </Flow.Root>
-    );
+      );
+    }
   }
 
   const actionUrl = clerk.oauthApplication.buildConsentActionUrl({ clientId: oauthClientId });
@@ -151,11 +140,11 @@ function _OAuthConsent() {
 
   const primaryIdentifier = user?.primaryEmailAddress?.emailAddress || user?.primaryPhoneNumber?.phoneNumber;
 
-  const displayedScopes = scopes.filter(item => item.scope !== OFFLINE_ACCESS_SCOPE);
+  const displayedScopes = scopes.filter(item => ![OFFLINE_ACCESS_SCOPE, USER_ORG_READ_SCOPE].includes(item.scope));
   const hasOfflineAccess = scopes.some(item => item.scope === OFFLINE_ACCESS_SCOPE);
 
   return (
-    <Flow.Root flow='oauthConsent'>
+    <>
       <form
         method='POST'
         action={actionUrl}
@@ -228,7 +217,7 @@ function _OAuthConsent() {
                 })}
               />
             </Header.Root>
-            {ctx.enableOrgSelection && orgOptions.length > 0 && effectiveOrg && (
+            {orgSelectionEnabled && orgOptions.length > 0 && effectiveOrg && (
               <OrgSelect
                 options={orgOptions}
                 value={effectiveOrg}
@@ -313,7 +302,7 @@ function _OAuthConsent() {
               value={value}
             />
           ))}
-        {!hasContextCallbacks && ctx.enableOrgSelection && effectiveOrg && (
+        {!hasContextCallbacks && orgSelectionEnabled && effectiveOrg && (
           <input
             type='hidden'
             name='organization_id'
@@ -328,7 +317,7 @@ function _OAuthConsent() {
         redirectUri={redirectUrl}
         oauthApplicationName={oauthApplicationName}
       />
-    </Flow.Root>
+    </>
   );
 }
 
@@ -373,4 +362,20 @@ function RedirectUriModal({ onOpen, onClose, isOpen, redirectUri, oauthApplicati
   );
 }
 
-export const OAuthConsent = withCoreUserGuard(withCardStateProvider(_OAuthConsent));
+const AuthenticatedRoutes = withCoreUserGuard(withCardStateProvider(_OAuthConsent));
+
+const OAuthConsentInternal = () => {
+  return (
+    <Flow.Root flow='oauthConsent'>
+      <Flow.Part>
+        <Switch>
+          <Route>
+            <AuthenticatedRoutes />
+          </Route>
+        </Switch>
+      </Flow.Part>
+    </Flow.Root>
+  );
+};
+
+export const OAuthConsent = OAuthConsentInternal;

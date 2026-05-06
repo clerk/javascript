@@ -71,7 +71,7 @@ export function NativeSessionSync({
   publishableKey: string;
   tokenCache: TokenCache | undefined;
 }) {
-  const { isSignedIn } = useAuth();
+  const { isSignedIn, isLoaded } = useAuth();
   const hasSyncedRef = useRef(false);
   // Use the provided tokenCache, falling back to the default SecureStore cache
   const effectiveTokenCache = tokenCache ?? defaultTokenCache;
@@ -80,15 +80,20 @@ export function NativeSessionSync({
     if (!isSignedIn) {
       hasSyncedRef.current = false;
 
-      // Clear the native session so native components (UserButton, etc.)
-      // don't continue showing a signed-in state after JS-side sign out.
-      const ClerkExpo = NativeClerkModule;
-      if (ClerkExpo?.signOut) {
-        void ClerkExpo.signOut().catch((error: unknown) => {
-          if (__DEV__) {
-            console.warn('[NativeSessionSync] Failed to clear native session:', error);
-          }
-        });
+      // Only call native signOut when Clerk has fully loaded and confirmed
+      // the user is actually signed out. Without this check, a JS reload
+      // (e.g. pressing R in Expo) triggers signOut during the loading phase
+      // (when isSignedIn is undefined), which revokes the session server-side
+      // and clears all keychain items, forcing the user to log in again.
+      if (isLoaded) {
+        const ClerkExpo = NativeClerkModule;
+        if (ClerkExpo?.signOut) {
+          void ClerkExpo.signOut().catch((error: unknown) => {
+            if (__DEV__) {
+              console.warn('[NativeSessionSync] Failed to clear native session:', error);
+            }
+          });
+        }
       }
 
       return;
@@ -131,7 +136,7 @@ export function NativeSessionSync({
     };
 
     void syncToNative();
-  }, [isSignedIn, publishableKey, effectiveTokenCache]);
+  }, [isSignedIn, isLoaded, publishableKey, effectiveTokenCache]);
 
   return null;
 }

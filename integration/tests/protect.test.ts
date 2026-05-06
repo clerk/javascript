@@ -63,6 +63,18 @@ testAgainstRunningApps({
     await u.page.goToRelative('/only-admin');
     await expect(u.page.getByText(/User is admin/i)).toBeVisible();
 
+    // Regression: SDK-68 - mixed auth param + option in a single arg still enforces the role.
+    await u.page.goToRelative('/settings/auth-protect-mixed-args');
+    await expect(u.page.getByText(/User has access/i)).toBeVisible();
+
+    // Regression: SDK-68 - { permission, token } still enforces the permission.
+    await u.page.goToRelative('/settings/auth-protect-mixed-token');
+    await expect(u.page.getByText(/User has access/i)).toBeVisible();
+
+    // Regression: SDK-67 - role + permission in the same call must AND.
+    await u.page.goToRelative('/settings/auth-protect-role-and-permission');
+    await expect(u.page.getByText(/User has access/i)).toBeVisible();
+
     // route handler
     await u.page.goToRelative('/api/settings/');
     await expect(u.page.getByText(/userId/i)).toBeVisible();
@@ -98,6 +110,12 @@ testAgainstRunningApps({
     await u.po.signIn.waitForMounted();
     await u.page.goToRelative('/only-admin');
     await u.po.signIn.waitForMounted();
+    await u.page.goToRelative('/settings/auth-protect-mixed-args');
+    await u.po.signIn.waitForMounted();
+    await u.page.goToRelative('/settings/auth-protect-mixed-token');
+    await u.po.signIn.waitForMounted();
+    await u.page.goToRelative('/settings/auth-protect-role-and-permission');
+    await u.po.signIn.waitForMounted();
   });
 
   test('Protect in RSCs and RCCs as `viewer`', async ({ page, context }) => {
@@ -124,6 +142,21 @@ testAgainstRunningApps({
     await expect(u.page.getByText(/this page could not be found/i)).toBeVisible();
 
     await u.page.goToRelative('/only-admin');
+    await expect(u.page.getByText(/this page could not be found/i)).toBeVisible();
+
+    // Regression: SDK-68 - mixed { role, unauthorizedUrl } used to authorize every
+    // authenticated user; viewer must now be redirected to the unauthorizedUrl.
+    await u.page.goToRelative('/settings/auth-protect-mixed-args');
+    await expect(u.page.getByText(/Denied/i)).toBeVisible();
+
+    // Regression: SDK-68 - { permission, token } used to discard the permission check
+    // entirely; viewer must now hit the not-found path.
+    await u.page.goToRelative('/settings/auth-protect-mixed-token');
+    await expect(u.page.getByText(/this page could not be found/i)).toBeVisible();
+
+    // Regression: SDK-67 - role + permission in the same call must AND. Viewer may have
+    // the permission but lacks the admin role, so the check must fail.
+    await u.page.goToRelative('/settings/auth-protect-role-and-permission');
     await expect(u.page.getByText(/this page could not be found/i)).toBeVisible();
 
     // Route Handler

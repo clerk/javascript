@@ -657,6 +657,107 @@ describe('clerkMiddleware(params)', () => {
       expect((await clerkClient()).authenticateRequest).toBeCalled();
     });
 
+    it('still authorizes when RBAC params are mixed with unauthorizedUrl in a single argument', async () => {
+      const req = mockRequest({
+        url: '/protected',
+        headers: new Headers({ [constants.Headers.SecFetchDest]: 'document' }),
+        appendDevBrowserCookie: true,
+      });
+      const hasSpy = vi.fn().mockReturnValue(false);
+
+      authenticateRequestMock.mockResolvedValueOnce({
+        publishableKey,
+        status: AuthStatus.SignedIn,
+        headers: new Headers(),
+        toAuth: () => ({ tokenType: TokenType.SessionToken, userId: 'user-id', has: hasSpy }),
+      });
+
+      const resp = await clerkMiddleware(async auth => {
+        const opts = { role: 'random-role', unauthorizedUrl: 'https://www.clerk.com/denied' } as const;
+        await auth.protect(opts);
+      })(req, {} as NextFetchEvent);
+
+      expect(hasSpy).toHaveBeenCalledWith({ role: 'random-role' });
+      expect(resp?.status).toEqual(307);
+      expect(resp?.headers.get('location')).toEqual('https://www.clerk.com/denied');
+      expect((await clerkClient()).authenticateRequest).toBeCalled();
+    });
+
+    it('still authorizes when permission is mixed with token in a single argument', async () => {
+      const req = mockRequest({
+        url: '/protected',
+        headers: new Headers({ [constants.Headers.SecFetchDest]: 'document' }),
+        appendDevBrowserCookie: true,
+      });
+      const hasSpy = vi.fn().mockReturnValue(false);
+
+      authenticateRequestMock.mockResolvedValueOnce({
+        publishableKey,
+        status: AuthStatus.SignedIn,
+        headers: new Headers(),
+        toAuth: () => ({ tokenType: TokenType.SessionToken, userId: 'user-id', has: hasSpy }),
+      });
+
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect({ permission: 'org:sys_memberships:read', token: TokenType.SessionToken } as any);
+      })(req, {} as NextFetchEvent);
+
+      expect(hasSpy).toHaveBeenCalledWith({ permission: 'org:sys_memberships:read' });
+      expect(resp?.status).toEqual(200);
+      expect(resp?.headers.get(constants.Headers.AuthReason)).toContain('protect-rewrite');
+      expect((await clerkClient()).authenticateRequest).toBeCalled();
+    });
+
+    it('passes through when mixed-shape authorization succeeds', async () => {
+      const req = mockRequest({
+        url: '/protected',
+        headers: new Headers({ [constants.Headers.SecFetchDest]: 'document' }),
+        appendDevBrowserCookie: true,
+      });
+      const hasSpy = vi.fn().mockReturnValue(true);
+
+      authenticateRequestMock.mockResolvedValueOnce({
+        publishableKey,
+        status: AuthStatus.SignedIn,
+        headers: new Headers(),
+        toAuth: () => ({ tokenType: TokenType.SessionToken, userId: 'user-id', has: hasSpy }),
+      });
+
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect({ role: 'org:admin', unauthorizedUrl: 'https://www.clerk.com/denied' } as any);
+      })(req, {} as NextFetchEvent);
+
+      expect(hasSpy).toHaveBeenCalledWith({ role: 'org:admin' });
+      expect(resp?.status).toEqual(200);
+      expect(resp?.headers.get('location')).toBeFalsy();
+      expect((await clerkClient()).authenticateRequest).toBeCalled();
+    });
+
+    it('takes the options-only fast path for options objects with unknown extra keys', async () => {
+      const req = mockRequest({
+        url: '/protected',
+        headers: new Headers({ [constants.Headers.SecFetchDest]: 'document' }),
+        appendDevBrowserCookie: true,
+      });
+      const hasSpy = vi.fn().mockReturnValue(false);
+
+      authenticateRequestMock.mockResolvedValueOnce({
+        publishableKey,
+        status: AuthStatus.SignedIn,
+        headers: new Headers(),
+        toAuth: () => ({ tokenType: TokenType.SessionToken, userId: 'user-id', has: hasSpy }),
+      });
+
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect({ unauthorizedUrl: 'https://www.clerk.com/denied', foo: 'bar' } as any);
+      })(req, {} as NextFetchEvent);
+
+      expect(hasSpy).not.toHaveBeenCalled();
+      expect(resp?.status).toEqual(200);
+      expect(resp?.headers.get('location')).toBeFalsy();
+      expect((await clerkClient()).authenticateRequest).toBeCalled();
+    });
+
     it('redirects to unauthenticatedUrl when protect is called with the redirectUrl param, the user is signed out, and is a page request', async () => {
       const req = mockRequest({
         url: '/protected',
@@ -1222,6 +1323,40 @@ describe('frontendApiProxy multi-domain support', () => {
         proxyUrl: 'https://custom-proxy.example.com/__clerk',
       }),
     );
+  });
+});
+
+describe('auto-proxy for eligible hosts', () => {
+  const productionPublishableKey = 'pk_live_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA';
+
+  it('auto-intercepts /__clerk/* requests on eligible hostnames', async () => {
+    const req = new NextRequest(new URL('/__clerk/v1/client', 'https://myapp-abc123.vercel.app').toString(), {
+      method: 'GET',
+      headers: new Headers(),
+    });
+
+    const resp = await clerkMiddleware({ publishableKey: productionPublishableKey })(req, {} as NextFetchEvent);
+
+    // Proxy should intercept the request — authenticateRequest should NOT be called
+    expect((await clerkClient()).authenticateRequest).not.toBeCalled();
+    expect(resp?.status).toBeDefined();
+  });
+
+  it('uses request.nextUrl for auto-detection', async () => {
+    const req = new NextRequest('http://127.0.0.1:3000/__clerk/v1/client', {
+      method: 'GET',
+      headers: new Headers(),
+    });
+
+    Object.defineProperty(req, 'nextUrl', {
+      value: new URL('https://myapp-abc123.vercel.app/__clerk/v1/client'),
+      configurable: true,
+    });
+
+    const resp = await clerkMiddleware({ publishableKey: productionPublishableKey })(req, {} as NextFetchEvent);
+
+    expect((await clerkClient()).authenticateRequest).not.toBeCalled();
+    expect(resp?.status).toBeDefined();
   });
 });
 
