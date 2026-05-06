@@ -1145,7 +1145,11 @@ class SignInFuture implements SignInFutureResource {
         routes.actionCompleteRedirectUrl = wrappedRoutes.redirectUrl;
       }
 
-      if (!this.#resource.id) {
+      if (
+        !this.#resource.id ||
+        strategy !== 'enterprise_sso' ||
+        this.#resource.firstFactorVerification.status === 'unverified'
+      ) {
         await this._create({
           strategy,
           ...routes,

@@ -11,6 +11,22 @@ export async function runAsyncResourceTask<T>(
   resource: BaseResource,
   task: () => Promise<T>,
 ): Promise<{ result?: T; error: ClerkError | null }> {
+  const resetFetchStatus = () => {
+    eventBus.emit('resource:fetch', {
+      resource,
+      status: 'idle',
+    });
+  };
+  const resetFetchStatusOnPageShow = (event: PageTransitionEvent) => {
+    if (event.persisted) {
+      resetFetchStatus();
+    }
+  };
+
+  if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+    window.addEventListener('pageshow', resetFetchStatusOnPageShow);
+  }
+
   eventBus.emit('resource:error', { resource, error: null });
   eventBus.emit('resource:fetch', {
     resource,
@@ -25,9 +41,9 @@ export async function runAsyncResourceTask<T>(
     // TODO @userland-errors:
     return { error: err };
   } finally {
-    eventBus.emit('resource:fetch', {
-      resource,
-      status: 'idle',
-    });
+    if (typeof window !== 'undefined' && typeof window.removeEventListener === 'function') {
+      window.removeEventListener('pageshow', resetFetchStatusOnPageShow);
+    }
+    resetFetchStatus();
   }
 }

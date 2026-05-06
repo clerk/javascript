@@ -2153,6 +2153,82 @@ describe('SignIn', () => {
         });
       });
 
+      it('creates a new OAuth sign-in when retrying after a previous provider redirect was abandoned', async () => {
+        vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
+
+        const mockPopup = { location: { href: '' } } as Window;
+        const mockBuildUrlWithAuth = vi.fn().mockImplementation(url => {
+          if (url.startsWith('/')) {
+            return 'https://example.com' + url;
+          }
+          return url;
+        });
+
+        SignIn.clerk = {
+          buildUrlWithAuth: mockBuildUrlWithAuth,
+          buildUrl: vi.fn().mockImplementation(path => 'https://example.com' + path),
+          frontendApi: 'clerk.example.com',
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
+
+        const mockFetch = vi.fn();
+        mockFetch.mockResolvedValueOnce({
+          client: null,
+          response: {
+            id: 'signin_github',
+            first_factor_verification: {
+              status: 'unverified',
+              external_verification_redirect_url: 'https://github.com/login/oauth/authorize',
+            },
+          },
+        });
+        mockFetch.mockResolvedValueOnce({
+          client: null,
+          response: {
+            id: 'signin_github',
+            status: 'complete',
+          },
+        });
+        BaseResource._fetch = mockFetch;
+
+        vi.mocked(_futureAuthenticateWithPopup).mockImplementation((_clerk, params) => {
+          params.popup.location.href = params.externalVerificationRedirectURL.toString();
+          return Promise.resolve();
+        });
+
+        const signIn = new SignIn({
+          id: 'signin_google',
+          object: 'sign_in',
+          status: 'needs_first_factor',
+          first_factor_verification: {
+            status: 'unverified',
+            strategy: 'oauth_google',
+            external_verification_redirect_url: 'https://accounts.google.com/o/oauth2/auth',
+          },
+        } as any);
+
+        const result = await signIn.__internal_future.sso({
+          strategy: 'oauth_github',
+          redirectUrl: 'https://complete.example.com',
+          redirectCallbackUrl: '/sso-callback',
+          popup: mockPopup,
+        });
+
+        expect(result.error).toBeNull();
+        expect(mockFetch).toHaveBeenNthCalledWith(1, {
+          method: 'POST',
+          path: '/client/sign_ins',
+          body: expect.objectContaining({
+            strategy: 'oauth_github',
+          }),
+        });
+        expect(mockPopup.location.href).toBe('https://github.com/login/oauth/authorize');
+      });
+
       it('uses popup when provided', async () => {
         vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
 
@@ -2198,9 +2274,10 @@ describe('SignIn', () => {
         });
         BaseResource._fetch = mockFetch;
 
-        vi.mocked(_futureAuthenticateWithPopup).mockImplementation(async (_clerk, params) => {
+        vi.mocked(_futureAuthenticateWithPopup).mockImplementation((_clerk, params) => {
           // Simulate the actual behavior of setting popup href
           params.popup.location.href = params.externalVerificationRedirectURL.toString();
+          return Promise.resolve();
         });
 
         const signIn = new SignIn();
