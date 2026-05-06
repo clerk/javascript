@@ -921,7 +921,13 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
 
         // On allowlisted output pages only, drop function-valued interface/class properties from property tables (property syntax with function types). Other pages unchanged.
         const allowlisted = pageMatchesAllowlist(this.page?.url, REFERENCE_OBJECTS_LIST);
-        const filtered = allowlisted ? model.filter(prop => !isCallableInterfaceProperty(prop, this.helpers)) : model;
+        const filtered = allowlisted
+          ? model.filter(
+              prop =>
+                !isCallableInterfaceProperty(prop, this.helpers) &&
+                !isCallableOnlyNamespaceProperty(prop, this.helpers),
+            )
+          : model;
         return superPartials.propertiesTable(filtered, options);
       },
       /**
@@ -1562,6 +1568,51 @@ function isCallableInterfaceProperty(prop, helpers) {
 }
 
 /**
+ * Inline object type whose **direct** members are exclusively callables (e.g. `emailCode: { sendCode, verifyCode }` in `SignInFutureResource`).
+ * Omitted from reference-object property tables; nested callables are documented via extract-methods.
+ *
+ * If any direct member is not callable, the parent stays in the property table. Use the @propertyTableDoc tag on non-callable members to avoid this behavior; it will create a page for that non-callable member in /methods that contains a heading and property table. (See `emailLink` in `SignInFutureResource` for an example; `emailLink.verification` is not callable and uses the @propertyTableDoc tag.)
+ *
+ * @param {import('typedoc').DeclarationReflection} prop
+ * @param {import('typedoc-plugin-markdown').MarkdownThemeContext['helpers']} helpers
+ */
+function isCallableOnlyNamespaceProperty(prop, helpers) {
+  const t =
+    (prop.kind === ReflectionKind.Property || prop.kind === ReflectionKind.Variable) && prop.type
+      ? prop.type
+      : helpers.getDeclarationType(prop);
+  let cur = /** @type {import('typedoc').SomeType | undefined} */ (t);
+  while (
+    cur &&
+    typeof cur === 'object' &&
+    /** @type {{ type?: string }} */ (cur).type === 'optional' &&
+    'elementType' in cur
+  ) {
+    cur = /** @type {import('typedoc').SomeType} */ (/** @type {import('typedoc').OptionalType} */ (cur).elementType);
+  }
+  if (!(cur instanceof ReflectionType)) {
+    return false;
+  }
+  const children = cur.declaration?.children ?? [];
+  if (children.length === 0) {
+    return false;
+  }
+  for (const c of children) {
+    if (
+      c.kind !== ReflectionKind.Property &&
+      c.kind !== ReflectionKind.Variable &&
+      c.kind !== ReflectionKind.Accessor
+    ) {
+      return false;
+    }
+    if (!isCallableInterfaceProperty(c, helpers)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
  * True when the property's value type is callable (function type, union/intersection of callables, or reference to a type alias of a function type). Object types with properties (e.g. namespaces) stay false.
  * E.g. `navigate: CustomNavigation` in clerk.ts
  *
@@ -1644,4 +1695,4 @@ function isCallablePropertyValueType(t, helpers, seenReflectionIds) {
   return false;
 }
 
-export { isCallableInterfaceProperty };
+export { isCallableInterfaceProperty, isCallableOnlyNamespaceProperty };

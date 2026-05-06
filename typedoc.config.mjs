@@ -6,6 +6,8 @@ const CUSTOM_BLOCK_TAGS = [
   '@paramExtension',
   '@experimental',
   '@hideReturns',
+  /** Nested property documented under `methods/` as heading + properties table (see extract-methods `buildPropertyTableDocMdx`). */
+  '@propertyTableDoc',
 ];
 
 /** @type {import("typedoc-plugin-markdown").PluginOptions} */

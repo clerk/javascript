@@ -4,10 +4,10 @@
  *
  * Run after `typedoc` (same cwd as repo root). Uses a second TypeDoc convert pass to read reflections.
  *
- * Like `extract-returns-and-params.mjs`, parameter tables are not hand-built: they use the same
- * `MarkdownThemeContext.partials` as TypeDoc markdown output (`parametersTable` / `propertiesTable`, which call
- * `someType` and therefore pick up `custom-theme.mjs` union/`&lt;code&gt;` behavior). Router + theme are prepared
- * via `prepare-markdown-renderer.mjs` (same idea as `typedoc-plugin-markdown` `render()`).
+ * Like `extract-returns-and-params.mjs`, parameter tables are not hand-built: they use the same `MarkdownThemeContext.partials` as TypeDoc markdown output (`parametersTable` / `propertiesTable`, which call `someType` and therefore pick up `custom-theme.mjs` union/`&lt;code&gt;` behavior). Router + theme are prepared via `prepare-markdown-renderer.mjs` (same idea as `typedoc-plugin-markdown` `render()`).
+ *
+ * Inline object properties whose members are **only** callables (e.g. `emailCode: { sendCode, verifyCode }`) are omitted from reference-object property tables and each nested callable is written under `methods/` (see `isCallableOnlyNamespaceProperty`).
+ * Mixed namespaces (e.g. `emailLink`) emit nested callables as methods and use the `@propertyTableDoc` tag to create a page in /methods that contains a heading and property table (see `buildPropertyTableDocMdx`).
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -27,7 +27,7 @@ import { MarkdownPageEvent, MarkdownTheme } from 'typedoc-plugin-markdown';
 import { removeLineBreaks } from '../node_modules/typedoc-plugin-markdown/dist/libs/utils/index.js';
 
 import typedocConfig from '../typedoc.config.mjs';
-import { isCallableInterfaceProperty } from './custom-theme.mjs';
+import { isCallableInterfaceProperty, isCallableOnlyNamespaceProperty } from './custom-theme.mjs';
 import {
   applyCatchAllMdReplacements,
   applyRelativeLinkReplacements,
@@ -491,7 +491,7 @@ function signatureWithInstantiation(sig, instantiationMap) {
 }
 
 /**
- * Must stay aligned with allowlisted `propertiesTable` filtering in `custom-theme.mjs` (callable members are extracted here, not listed as properties).
+ * Must stay aligned with allowlisted `propertiesTable` filtering in `custom-theme.mjs` (callable members and callable-only namespaces are extracted here, not listed as properties).
  *
  * @param {import('typedoc').DeclarationReflection} decl
  * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
@@ -508,6 +508,150 @@ function shouldExtractCallableMember(decl, ctx) {
     return isCallableInterfaceProperty(decl, ctx.helpers);
   }
   return false;
+}
+
+/**
+ * Nested callable properties from namespaces that are only callable properties (object of functions only). E.g. `emailCode: { sendCode, verifyCode }` in `SignInFutureResource`.
+ *
+ * @param {import('typedoc').DeclarationReflection} parentProp
+ * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
+ * @returns {import('typedoc').DeclarationReflection[]}
+ */
+function nestedCallablesFromCallableOnlyNamespace(parentProp, ctx) {
+  if (!isCallableOnlyNamespaceProperty(parentProp, ctx.helpers)) {
+    return [];
+  }
+  const cur = unwrapOptionalLayersSomeType(parentProp.type);
+  if (!(cur instanceof ReflectionType)) {
+    return [];
+  }
+  /** @type {import('typedoc').DeclarationReflection[]} */
+  const out = [];
+  for (const nested of cur.declaration.children ?? []) {
+    if (nested.name.startsWith('__')) {
+      continue;
+    }
+    out.push(/** @type {import('typedoc').DeclarationReflection} */ (nested));
+  }
+  return out;
+}
+
+/**
+ * @param {import('typedoc').SomeType | undefined} t
+ * @returns {import('typedoc').SomeType | undefined}
+ */
+function unwrapOptionalLayersSomeType(t) {
+  let cur = /** @type {import('typedoc').SomeType | undefined} */ (t);
+  while (
+    cur &&
+    typeof cur === 'object' &&
+    /** @type {{ type?: string }} */ (cur).type === 'optional' &&
+    'elementType' in cur
+  ) {
+    cur = /** @type {import('typedoc').SomeType} */ (/** @type {import('typedoc').OptionalType} */ (cur).elementType);
+  }
+  return cur;
+}
+
+/**
+ * Nested callables under inline object namespaces that also include non-callables (e.g. `emailLink.sendLink` in `SignInFutureResource`).
+ * Callable-only namespaces are handled by `nestedCallablesFromCallableOnlyNamespace` instead.
+ *
+ * @param {import('typedoc').DeclarationReflection} parentProp
+ * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
+ * @returns {import('typedoc').DeclarationReflection[]}
+ */
+function nestedCallablesFromMixedInlineNamespace(parentProp, ctx) {
+  if (isCallableOnlyNamespaceProperty(parentProp, ctx.helpers)) {
+    return [];
+  }
+  const cur = unwrapOptionalLayersSomeType(parentProp.type);
+  if (!(cur instanceof ReflectionType)) {
+    return [];
+  }
+  /** @type {import('typedoc').DeclarationReflection[]} */
+  const out = [];
+  for (const nested of cur.declaration.children ?? []) {
+    if (nested.name.startsWith('__')) {
+      continue;
+    }
+    const nd = /** @type {import('typedoc').DeclarationReflection} */ (nested);
+    if (isCallableInterfaceProperty(nd, ctx.helpers)) {
+      out.push(nd);
+    }
+  }
+  return out;
+}
+
+/**
+ * @param {import('typedoc').DeclarationReflection} parentProp
+ * @returns {import('typedoc').DeclarationReflection[]}
+ */
+function nestedPropertyTableDocMembers(parentProp) {
+  const cur = unwrapOptionalLayersSomeType(parentProp.type);
+  if (!(cur instanceof ReflectionType)) {
+    return [];
+  }
+  /** @type {import('typedoc').DeclarationReflection[]} */
+  const out = [];
+  for (const nested of cur.declaration.children ?? []) {
+    if (nested.name.startsWith('__')) {
+      continue;
+    }
+    const nd = /** @type {import('typedoc').DeclarationReflection} */ (nested);
+    if (nd.comment?.getTag('@propertyTableDoc')) {
+      out.push(nd);
+    }
+  }
+  return out;
+}
+
+/**
+ * Object-literal (or single object arm of `T | null`) property rows for a properties table.
+ *
+ * @param {import('typedoc').SomeType | undefined} valueType
+ * @returns {import('typedoc').DeclarationReflection[] | undefined}
+ */
+function resolveObjectShapeMembersForPropertyTable(valueType) {
+  let t = unwrapOptionalLayersSomeType(valueType);
+  if (t instanceof UnionType) {
+    const objectArms = t.types.filter(u => u instanceof ReflectionType && (u.declaration?.children?.length ?? 0) > 0);
+    if (objectArms.length !== 1) {
+      return undefined;
+    }
+    t = /** @type {import('typedoc').ReflectionType} */ (objectArms[0]);
+  }
+  if (!(t instanceof ReflectionType)) {
+    return undefined;
+  }
+  const kids = t.declaration?.children ?? [];
+  return kids.filter(
+    c => c.kind === ReflectionKind.Property || c.kind === ReflectionKind.Variable || c.kind === ReflectionKind.Accessor,
+  );
+}
+
+/**
+ * @param {string} parentName
+ * @param {import('typedoc').DeclarationReflection} nestedDecl
+ * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
+ */
+function buildPropertyTableDocMdx(parentName, nestedDecl, ctx) {
+  const qualifiedName = `${parentName}.${nestedDecl.name}`;
+  const title = `### \`${qualifiedName}\``;
+  const description = commentSummaryAndBody(nestedDecl.comment);
+  const props = resolveObjectShapeMembersForPropertyTable(nestedDecl.type);
+  if (!props?.length) {
+    return '';
+  }
+  const tableMd = renderMemberTableOmittingExampleBlocks(props, ctx, () =>
+    ctx.partials.propertiesTable(props, {
+      kind: ReflectionKind.Interface,
+      isEventProps: false,
+    }),
+  );
+  const chunks = [title, '', description, '', tableMd].filter(Boolean);
+  const raw = chunks.join('\n\n');
+  return `${applyCatchAllMdReplacements(applyRelativeLinkReplacements(raw)).trim()}\n`;
 }
 
 /**
@@ -686,7 +830,13 @@ function renderMemberTableOmittingExampleBlocks(roots, ctx, render) {
 }
 
 /** Block tags omitted from extracted method prose (see `custom-theme.mjs` `comment` partial for theme output). */
-const BLOCK_TAGS_OMITTED_FROM_EXTRACTED_METHOD_PROSE = new Set(['@param', '@typeParam', '@returns', '@experimental']);
+const BLOCK_TAGS_OMITTED_FROM_EXTRACTED_METHOD_PROSE = new Set([
+  '@param',
+  '@typeParam',
+  '@returns',
+  '@experimental',
+  '@propertyTableDoc',
+]);
 
 /**
  * @param {import('typedoc').Comment | undefined} comment
@@ -723,6 +873,37 @@ function appendSignatureOnlyReturns(declComment, sigComment) {
     return '';
   }
   return formatReturnsLineFromTag(tag);
+}
+
+/**
+ * @param {import('typedoc').DeclarationReflection} prop
+ */
+function propertyReflectionTypeIsNever(prop) {
+  let ty = prop.type;
+  while (ty?.type === 'optional') {
+    ty = /** @type {import('typedoc').OptionalType} */ (ty).elementType;
+  }
+  return ty?.type === 'intrinsic' && ty.name === 'never';
+}
+
+/**
+ * Union discriminators often use `otherProp?: never`. Prefer the branch with a documentable type.
+ *
+ * @param {import('typedoc').DeclarationReflection} existing
+ * @param {import('typedoc').DeclarationReflection} candidate
+ */
+function pickBetterUnionPropertyCandidate(existing, candidate) {
+  const existingNever = propertyReflectionTypeIsNever(existing);
+  const candidateNever = propertyReflectionTypeIsNever(candidate);
+  if (existingNever && !candidateNever) {
+    return candidate;
+  }
+  if (!existingNever && candidateNever) {
+    return existing;
+  }
+  const existingDoc = existing.comment?.summary?.length ?? 0;
+  const candidateDoc = candidate.comment?.summary?.length ?? 0;
+  return candidateDoc > existingDoc ? candidate : existing;
 }
 
 /**
@@ -825,6 +1006,41 @@ function resolveDeclarationWithObjectMembers(t) {
         children: [...byName.values()].sort((a, b) => a.name.localeCompare(b.name)),
         kind: ReflectionKind.TypeLiteral,
         name: '__intersectionMerged',
+      })
+    );
+  }
+  if (t.type === 'union') {
+    const u = /** @type {import('typedoc').UnionType} */ (t);
+    /** @type {Map<string, import('typedoc').DeclarationReflection>} */
+    const byName = new Map();
+    for (const inner of u.types) {
+      const res = resolveDeclarationWithObjectMembers(inner);
+      if (!res?.children?.length) {
+        continue;
+      }
+      for (const c of res.children) {
+        if (!c.kindOf(ReflectionKind.Property)) {
+          continue;
+        }
+        if (propertyReflectionTypeIsNever(c)) {
+          continue;
+        }
+        const existing = byName.get(c.name);
+        if (!existing) {
+          byName.set(c.name, c);
+        } else {
+          byName.set(c.name, pickBetterUnionPropertyCandidate(existing, c));
+        }
+      }
+    }
+    if (byName.size === 0) {
+      return undefined;
+    }
+    return /** @type {import('typedoc').DeclarationReflection} */ (
+      /** @type {unknown} */ ({
+        children: [...byName.values()].sort((a, b) => a.name.localeCompare(b.name)),
+        kind: ReflectionKind.TypeLiteral,
+        name: '__unionMerged',
       })
     );
   }
@@ -1079,9 +1295,10 @@ function parametersMarkdownTable(sig, ctx, instantiationMap) {
 /**
  * @param {import('typedoc').DeclarationReflection} decl
  * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
+ * @param {{ qualifiedName?: string }} [options] Nested namespace methods use `parent.child` for headings / signatures.
  */
-function buildMethodMdx(decl, ctx) {
-  const name = decl.name;
+function buildMethodMdx(decl, ctx, options = {}) {
+  const name = options.qualifiedName ?? decl.name;
   const sig = getPrimaryCallSignature(decl);
   if (!sig) {
     return '';
@@ -1145,18 +1362,55 @@ function extractMethodsForPage(pageUrl, project, app) {
     if (child.name.startsWith('__')) {
       continue;
     }
-    if (!shouldExtractCallableMember(/** @type {import('typedoc').DeclarationReflection} */ (child), ctx)) {
-      continue;
+    const childDecl = /** @type {import('typedoc').DeclarationReflection} */ (child);
+
+    if (shouldExtractCallableMember(childDecl, ctx)) {
+      const mdx = buildMethodMdx(childDecl, ctx);
+      if (mdx) {
+        const fileName = `${toKebabCase(child.name)}.mdx`;
+        const filePath = path.join(outDir, fileName);
+        fs.writeFileSync(filePath, mdx, 'utf-8');
+        console.log(`[extract-methods] Wrote ${path.relative(path.join(__dirname, '..'), filePath)}`);
+        count++;
+      }
     }
-    const mdx = buildMethodMdx(/** @type {import('typedoc').DeclarationReflection} */ (child), ctx);
-    if (!mdx) {
-      continue;
+
+    for (const nested of nestedCallablesFromCallableOnlyNamespace(childDecl, ctx)) {
+      const qualifiedName = `${child.name}.${nested.name}`;
+      const fileSlug = `${toKebabCase(child.name)}-${toKebabCase(nested.name)}`;
+      const mdx = buildMethodMdx(nested, ctx, { qualifiedName });
+      if (!mdx) {
+        continue;
+      }
+      const filePath = path.join(outDir, `${fileSlug}.mdx`);
+      fs.writeFileSync(filePath, mdx, 'utf-8');
+      console.log(`[extract-methods] Wrote ${path.relative(path.join(__dirname, '..'), filePath)}`);
+      count++;
     }
-    const fileName = `${toKebabCase(child.name)}.mdx`;
-    const filePath = path.join(outDir, fileName);
-    fs.writeFileSync(filePath, mdx, 'utf-8');
-    console.log(`[extract-methods] Wrote ${path.relative(path.join(__dirname, '..'), filePath)}`);
-    count++;
+
+    for (const nested of nestedCallablesFromMixedInlineNamespace(childDecl, ctx)) {
+      const fileSlug = `${toKebabCase(child.name)}-${toKebabCase(nested.name)}`;
+      const mdx = buildMethodMdx(nested, ctx, { qualifiedName: `${child.name}.${nested.name}` });
+      if (!mdx) {
+        continue;
+      }
+      const filePath = path.join(outDir, `${fileSlug}.mdx`);
+      fs.writeFileSync(filePath, mdx, 'utf-8');
+      console.log(`[extract-methods] Wrote ${path.relative(path.join(__dirname, '..'), filePath)}`);
+      count++;
+    }
+
+    for (const nested of nestedPropertyTableDocMembers(childDecl)) {
+      const fileSlug = `${toKebabCase(child.name)}-${toKebabCase(nested.name)}`;
+      const mdx = buildPropertyTableDocMdx(child.name, nested, ctx);
+      if (!mdx) {
+        continue;
+      }
+      const filePath = path.join(outDir, `${fileSlug}.mdx`);
+      fs.writeFileSync(filePath, mdx, 'utf-8');
+      console.log(`[extract-methods] Wrote ${path.relative(path.join(__dirname, '..'), filePath)}`);
+      count++;
+    }
   }
   return count;
 }
