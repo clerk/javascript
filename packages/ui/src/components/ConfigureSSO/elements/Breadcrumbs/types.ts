@@ -1,41 +1,35 @@
+import type React from 'react';
+
 import type { LocalizationKey } from '@/customizables';
 
 /**
- * A single breadcrumb item. Items are positional — their order in the
- * `items` array determines the displayed step number and which items
- * are reachable relative to the active one
+ * Props for `<Breadcrumbs.Item>`. Items are renderless descriptors —
+ * Breadcrumbs walks its children to collect them
  */
-export interface BreadcrumbsItem {
-  /**
-   * Stable identifier — used as a React key and as the argument to
-   * `onItemClick`
-   */
+export interface BreadcrumbsItemProps {
+  /** Stable identifier — used as React key, as the value compared against `Breadcrumbs.currentId`, and as the argument to `onItemClick` */
   id: string;
-  /**
-   * Display label. Optional — items without a label render the bullet
-   * only
-   */
+  /** Display label. Optional — items without a label render the bullet only */
   label?: LocalizationKey | string;
-  /**
-   * Marks this item as completed regardless of its position relative
-   * to `currentIndex`
-   */
+  /** Marks this item as completed regardless of its position relative to the current item */
+  isCompleted?: boolean;
+}
+
+/**
+ * Internal descriptor extracted from a `<Breadcrumbs.Item>` element's
+ * props. Consumers should not need to construct these directly
+ */
+export interface BreadcrumbsActiveItem {
+  id: string;
+  label?: LocalizationKey | string;
   isCompleted?: boolean;
 }
 
 export interface BreadcrumbsProps {
-  /**
-   * The items to render, in order
-   */
-  items: BreadcrumbsItem[];
-  /**
-   * Index of the currently active item. Items at indices `<= currentIndex`
-   * are clickable; later items are disabled. `-1` means none active
-   */
-  currentIndex: number;
-  /**
-   * Called with the item's `id` when an item is clicked. Only fired
-   * for reachable items (`isCompleted || index <= currentIndex`)
-   */
+  /** ID of the currently active item. Items at indices ≤ currentIndex are reachable; later items are disabled. `undefined` means none active */
+  currentId: string | undefined;
+  /** Called with the item's id when an item is clicked. Only fired for reachable items. */
   onItemClick: (id: string) => void;
+  /** `<Breadcrumbs.Item>` descriptors to render */
+  children: React.ReactNode;
 }

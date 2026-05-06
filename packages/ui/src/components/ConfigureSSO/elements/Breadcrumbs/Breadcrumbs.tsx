@@ -3,19 +3,51 @@ import React from 'react';
 import { Button, descriptors, Flex, Icon, Text, useLocalizations } from '@/customizables';
 import { CaretRight, Check } from '@/icons';
 
-import type { BreadcrumbsProps } from './types';
+import type { BreadcrumbsActiveItem, BreadcrumbsItemProps, BreadcrumbsProps } from './types';
+
+const Item = (_: BreadcrumbsItemProps): JSX.Element | null => null;
+Item.displayName = 'Breadcrumbs.Item';
 
 /**
- * Numbered breadcrumb of wizard steps.
- *
- * Presentational primitive — no awareness of the wizard or its
- * context. Items at indices `<= currentIndex` are clickable (calls
- * `onItemClick(id)`); later items are disabled. Items marked
- * `isCompleted` render the check icon and are reachable regardless of
- * position
+ * Walks the breadcrumbs' children and returns the descriptors for
+ * every `<Breadcrumbs.Item>` element
  */
-export const Breadcrumbs = ({ items, currentIndex, onItemClick }: BreadcrumbsProps): JSX.Element => {
+function extractItems(children: React.ReactNode): BreadcrumbsActiveItem[] {
+  const items: BreadcrumbsActiveItem[] = [];
+
+  React.Children.forEach(children, child => {
+    if (!React.isValidElement(child)) {
+      return;
+    }
+
+    // Tolerate fragments at the top level (e.g. when callers map over
+    // an array of steps and wrap items in a fragment)
+    if (child.type === React.Fragment) {
+      const fragmentChildren = (child.props as { children?: React.ReactNode }).children;
+      items.push(...extractItems(fragmentChildren));
+      return;
+    }
+
+    if (child.type !== Item) {
+      return;
+    }
+
+    const props = child.props as BreadcrumbsItemProps;
+    items.push({
+      id: props.id,
+      label: props.label,
+      isCompleted: props.isCompleted,
+    });
+  });
+
+  return items;
+}
+
+const Breadcrumbs_ = ({ currentId, onItemClick, children }: BreadcrumbsProps): JSX.Element => {
   const { t } = useLocalizations();
+
+  const items = React.useMemo(() => extractItems(children), [children]);
+  const currentIndex = React.useMemo(() => items.findIndex(i => i.id === currentId), [items, currentId]);
 
   return (
     <Flex
@@ -112,3 +144,20 @@ export const Breadcrumbs = ({ items, currentIndex, onItemClick }: BreadcrumbsPro
     </Flex>
   );
 };
+
+/**
+ * Numbered breadcrumb of wizard steps.
+ *
+ * Items are written as JSX children: render a `<Breadcrumbs.Item>`
+ * for each step. Reachability is computed internally from `currentId`
+ * + the items list — items at indices `<= currentIndex` are clickable
+ * (calls `onItemClick(id)`), later items are disabled. Items marked
+ * `isCompleted` render the check icon and are reachable regardless of
+ * position
+ *
+ * Presentational primitive — no awareness of the wizard or its
+ * context
+ */
+export const Breadcrumbs = Object.assign(Breadcrumbs_, {
+  Item,
+});
