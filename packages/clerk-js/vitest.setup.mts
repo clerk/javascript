@@ -78,11 +78,13 @@ if (typeof window !== 'undefined') {
   // Mock ResizeObserver
   window.ResizeObserver =
     window.ResizeObserver ||
-    vi.fn().mockImplementation(() => ({
-      disconnect: vi.fn(),
-      observe: vi.fn(),
-      unobserve: vi.fn(),
-    }));
+    (vi.fn().mockImplementation(function () {
+      return {
+        disconnect: vi.fn(),
+        observe: vi.fn(),
+        unobserve: vi.fn(),
+      };
+    }) as unknown as typeof ResizeObserver);
 
   // Mock matchMedia
   Object.defineProperty(window, 'matchMedia', {
