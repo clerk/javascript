@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "6.8.0",
+  "version": "6.9.0",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -103,16 +103,16 @@
   "devDependencies": {
     "@clerk/msw": "workspace:^",
     "@clerk/testing": "workspace:^",
-    "@emotion/react": "11.11.1",
+    "@emotion/react": "11.14.0",
     "@rsdoctor/rspack-plugin": "^0.4.13",
     "@rspack/cli": "catalog:rspack",
     "@rspack/core": "catalog:rspack",
     "@rspack/plugin-react-refresh": "catalog:rspack",
     "@types/cloudflare-turnstile": "^0.2.2",
     "@types/webpack-env": "^1.18.8",
-    "bundlewatch": "^0.4.1",
+    "bundlewatch": "^0.4.2",
     "jsdom": "26.1.0",
-    "minimatch": "^10.0.3",
+    "minimatch": "^10.2.5",
     "webpack-merge": "^5.10.0"
   },
   "engines": {
