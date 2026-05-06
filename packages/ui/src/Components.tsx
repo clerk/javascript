@@ -397,6 +397,11 @@ const Components = (props: ComponentsProps) => {
         }
       }
 
+      // Extract cssLayerName from theme if present and move it to appearance level
+      if (restProps.appearance) {
+        restProps = { ...restProps, appearance: extractCssLayerNameFromAppearance(restProps.appearance) };
+      }
+
       setState(s => ({ ...s, ...restProps, options: { ...s.options, ...restProps.options } }));
     };
 
