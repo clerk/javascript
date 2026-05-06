@@ -1,7 +1,6 @@
 import type { QueryClient } from '@tanstack/query-core';
-import { useEffect, useState } from 'react';
 
-import { useClerkInstanceContext } from '../contexts';
+import { getClerkQueryClient } from './clerk-query-client';
 
 export type RecursiveMock = {
   (...args: unknown[]): RecursiveMock;
@@ -57,28 +56,14 @@ function createRecursiveProxy(label: string): RecursiveMock {
 
 const mockQueryClient = createRecursiveProxy('ClerkMockQueryClient') as unknown as QueryClient;
 
+/**
+ * Returns `[client, isLoaded]`. The real client is owned by `@clerk/shared`
+ * and lazily instantiated on the browser only — SSR returns the proxy mock
+ * + `isLoaded: false` so per-request renders never share a query cache.
+ */
 const useClerkQueryClient = (): [QueryClient, boolean] => {
-  const clerk = useClerkInstanceContext();
-
-  // @ts-expect-error - __internal_queryClient is not typed
-  const queryClient = clerk.__internal_queryClient as { __tag: 'clerk-rq-client'; client: QueryClient } | undefined;
-  const [, setQueryClientLoaded] = useState(
-    typeof queryClient === 'object' && '__tag' in queryClient && queryClient.__tag === 'clerk-rq-client',
-  );
-
-  useEffect(() => {
-    const _setQueryClientLoaded = () => setQueryClientLoaded(true);
-    // @ts-expect-error - queryClientStatus is not typed
-    clerk.on('queryClientStatus', _setQueryClientLoaded);
-    return () => {
-      // @ts-expect-error - queryClientStatus is not typed
-      clerk.off('queryClientStatus', _setQueryClientLoaded);
-    };
-  }, [clerk, setQueryClientLoaded]);
-
-  const isLoaded = typeof queryClient === 'object' && '__tag' in queryClient && queryClient.__tag === 'clerk-rq-client';
-
-  return [queryClient?.client || mockQueryClient, isLoaded];
+  const client = getClerkQueryClient();
+  return [client ?? mockQueryClient, Boolean(client)];
 };
 
 export { useClerkQueryClient };

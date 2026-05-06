@@ -1,8 +1,8 @@
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import type { LoadedClerk } from '../../types/clerk';
-import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
-import { useClerkQuery } from '../clerk-rq/useQuery';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../contexts';
+import { defineKeepPreviousDataFn } from '../query/keep-previous-data';
+import { useClerkQuery } from '../query/useQuery';
 import { useUserBase } from './base/useUserBase';
 import { useOAuthConsentCacheKeys } from './useOAuthConsent.shared';
 import type { UseOAuthConsentParams, UseOAuthConsentReturn } from './useOAuthConsent.types';

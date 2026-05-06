@@ -178,6 +178,11 @@ export const taIN: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'ஒற்றை உள்நுழைவை (SSO) உள்ளமை',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'நிறுவனத்தை உருவாக்கு',
     invitePage: {

@@ -44,7 +44,14 @@ class ClerkAuthNativeView(context: Context) : FrameLayout(context) {
   var mode: String = "signInOrUp"
   var isDismissable: Boolean = true
 
-  private val activity: ComponentActivity? = findActivity(context)
+  private val activity: ComponentActivity? = findActivity(context).also {
+    // At cold start, ClerkExpoModule.configure() may run before React's
+    // host-resume sync — meaning getCurrentActivity() returns null there.
+    // This view's construction is a reliable second hook: we know the Activity
+    // is available (we just walked the context to find it) and we're about to
+    // render Google sign-in / passkey buttons that need it.
+    if (it != null) Clerk.attachActivity(it)
+  }
 
   // Per-view ViewModelStoreOwner so the AuthView's ViewModels (including its
   // navigation state) are scoped to THIS view instance, not the activity.
