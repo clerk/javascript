@@ -107,12 +107,6 @@ export interface ConfigureSSOWizardContextValue {
    */
   isLastStep: boolean;
   /**
-   * `true` while the parent flow is still loading async dependencies.
-   * The header renders a skeleton breadcrumb, the content renders a
-   * centered spinner, and the footer's buttons are disabled
-   */
-  isLoading: boolean;
-  /**
    * Navigate forward. Within this wizard, advances to the next active
    * sibling. On the last sibling, falls through to the parent
    * wizard's `goNext` (if any)

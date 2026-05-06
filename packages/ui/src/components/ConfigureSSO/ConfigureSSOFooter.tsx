@@ -1,7 +1,7 @@
 import { Button, descriptors, Flex, Icon, useLocalizations } from '@/customizables';
 import { CaretLeft, CaretRight } from '@/icons';
 
-import { useFooterActions, useWizard } from './elements/Wizard';
+import { useFooterActions } from './elements/Wizard';
 
 interface ConfigureSSOFooterProps {
   /** Override label for the Previous button */
@@ -26,11 +26,10 @@ export const ConfigureSSOFooter = ({
   hidePrevious = false,
   isDisabled = false,
 }: ConfigureSSOFooterProps): JSX.Element => {
-  const { isLoading } = useWizard();
   const { continueAction, deepestWizardRef } = useFooterActions();
   const { t } = useLocalizations();
 
-  const isForceDisabled = isDisabled || isLoading;
+  const isForceDisabled = isDisabled;
   const deepest = deepestWizardRef.current?.current;
   const isFirstStep = deepest?.isFirstStep ?? true;
   const isLastStep = deepest?.isLastStep ?? true;

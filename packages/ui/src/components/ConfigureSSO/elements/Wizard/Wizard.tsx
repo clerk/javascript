@@ -2,7 +2,6 @@ import React from 'react';
 
 import { Route, Switch, useRouter } from '@/router';
 
-import { useConfigureSSOFlow } from '../../ConfigureSSOContext';
 import { FooterActionsProvider, useRegisterWizard } from './FooterActionsContext';
 import type { WizardActiveStep, WizardContextValue, WizardStepProps } from './types';
 import { WizardContext } from './WizardContext';
@@ -89,8 +88,6 @@ interface RootInnerProps {
 
 const RootInner = ({ parentWizard, isNested, children }: RootInnerProps): JSX.Element => {
   const router = useRouter();
-  const flow = useConfigureSSOFlow();
-  const { isLoading } = flow;
 
   const activeSteps = React.useMemo(() => extractSteps(children), [children]);
 
@@ -163,7 +160,6 @@ const RootInner = ({ parentWizard, isNested, children }: RootInnerProps): JSX.El
       currentStep,
       currentIndex: index,
       totalSteps: activeSteps.length,
-      isLoading,
       goNext,
       goPrev,
       goToStep,
@@ -171,7 +167,7 @@ const RootInner = ({ parentWizard, isNested, children }: RootInnerProps): JSX.El
       isFirstStep: index <= 0 && (!parentWizard || parentWizard.isFirstStep),
       isLastStep: index === activeSteps.length - 1 && (!parentWizard || parentWizard.isLastStep),
     };
-  }, [activeSteps, currentStep, isLoading, goNext, goPrev, goToStep, isNested, parentWizard]);
+  }, [activeSteps, currentStep, goNext, goPrev, goToStep, isNested, parentWizard]);
 
   // Push this wizard onto the chrome stack so the shared footer can
   // dispatch Continue / Previous to the *deepest* mounted wizard,

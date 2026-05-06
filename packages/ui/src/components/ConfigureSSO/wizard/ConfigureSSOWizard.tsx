@@ -1,10 +1,9 @@
 import React from 'react';
 
-import { Badge, Box, Button, Col, descriptors, Flex, Icon, Spinner, Text, useLocalizations } from '@/customizables';
+import { Badge, Button, Col, descriptors, Flex, Icon, Text, useLocalizations } from '@/customizables';
 import { CaretLeft, CaretRight, Check } from '@/icons';
 import { Route, Switch, useRouter } from '@/router';
 
-import { useConfigureSSOFlow } from '../ConfigureSSOContext';
 import {
   ConfigureSSOWizardContext,
   useConfigureSSOWizard,
@@ -99,8 +98,6 @@ interface RootInnerProps {
 
 const RootInner = ({ parentWizard, isNested, children }: RootInnerProps): JSX.Element => {
   const router = useRouter();
-  const flow = useConfigureSSOFlow();
-  const { isLoading } = flow;
 
   const activeSteps = React.useMemo(() => extractSteps(children), [children]);
 
@@ -173,7 +170,6 @@ const RootInner = ({ parentWizard, isNested, children }: RootInnerProps): JSX.El
       currentStep,
       currentIndex: index,
       totalSteps: activeSteps.length,
-      isLoading,
       goNext,
       goPrev,
       goToStep,
@@ -181,7 +177,7 @@ const RootInner = ({ parentWizard, isNested, children }: RootInnerProps): JSX.El
       isFirstStep: index <= 0 && (!parentWizard || parentWizard.isFirstStep),
       isLastStep: index === activeSteps.length - 1 && (!parentWizard || parentWizard.isLastStep),
     };
-  }, [activeSteps, currentStep, isLoading, goNext, goPrev, goToStep, isNested, parentWizard]);
+  }, [activeSteps, currentStep, goNext, goPrev, goToStep, isNested, parentWizard]);
 
   // Push this wizard onto the chrome stack so the shared footer can
   // dispatch Continue / Previous to the *deepest* mounted wizard,
@@ -208,27 +204,6 @@ const RootInner = ({ parentWizard, isNested, children }: RootInnerProps): JSX.El
  * Renders the active step's body
  */
 const Body = ({ activeSteps }: { activeSteps: ConfigureSSOWizardActiveStep[] }): JSX.Element | null => {
-  const { isLoading, isNested } = useConfigureSSOWizard();
-
-  if (isLoading) {
-    if (isNested) {
-      return null;
-    }
-    return (
-      <Flex
-        align='center'
-        justify='center'
-        sx={{ flex: 1 }}
-      >
-        <Spinner
-          size='xs'
-          colorScheme='neutral'
-          elementDescriptor={descriptors.spinner}
-        />
-      </Flex>
-    );
-  }
-
   if (activeSteps.length === 0) {
     return null;
   }
@@ -268,7 +243,7 @@ const StepBody = ({ step }: { step: ConfigureSSOWizardActiveStep }): JSX.Element
  * future steps are disabled
  */
 const Header = (): JSX.Element => {
-  const { activeSteps, currentIndex, isLoading, goToStep } = useConfigureSSOWizard();
+  const { activeSteps, currentIndex, goToStep } = useConfigureSSOWizard();
   const { t } = useLocalizations();
 
   return (
@@ -292,70 +267,66 @@ const Header = (): JSX.Element => {
 
         return (
           <React.Fragment key={step.id}>
-            {isLoading ? (
-              <SkeletonBreadcrumbStep />
-            ) : (
-              <Button
-                elementDescriptor={descriptors.configureSSOWizardHeaderItem}
-                elementId={descriptors.configureSSOWizardHeaderItem.setId(step.id)}
+            <Button
+              elementDescriptor={descriptors.configureSSOWizardHeaderItem}
+              elementId={descriptors.configureSSOWizardHeaderItem.setId(step.id)}
+              isActive={isCurrent}
+              variant='unstyled'
+              isDisabled={!isReachable}
+              onClick={() => {
+                if (isReachable) {
+                  void goToStep(step.id);
+                }
+              }}
+              sx={theme => ({
+                gap: theme.space.$1x5,
+                padding: 0,
+                color: isCurrent ? theme.colors.$colorForeground : theme.colors.$colorMutedForeground,
+              })}
+            >
+              <Flex
+                elementDescriptor={descriptors.configureSSOWizardHeaderItemBullet}
+                elementId={descriptors.configureSSOWizardHeaderItemBullet.setId(step.id)}
                 isActive={isCurrent}
-                variant='unstyled'
-                isDisabled={!isReachable}
-                onClick={() => {
-                  if (isReachable) {
-                    void goToStep(step.id);
-                  }
-                }}
+                align='center'
+                justify='center'
                 sx={theme => ({
-                  gap: theme.space.$1x5,
-                  padding: 0,
-                  color: isCurrent ? theme.colors.$colorForeground : theme.colors.$colorMutedForeground,
+                  width: theme.sizes.$5,
+                  height: theme.sizes.$5,
+                  borderRadius: theme.radii.$circle,
+                  fontSize: theme.fontSizes.$xs,
+                  fontWeight: theme.fontWeights.$semibold,
+                  backgroundColor: isCurrent
+                    ? theme.colors.$colorForeground
+                    : isCompleted
+                      ? theme.colors.$success500
+                      : theme.colors.$neutralAlpha100,
+                  color: isCurrent
+                    ? theme.colors.$colorBackground
+                    : isCompleted
+                      ? theme.colors.$white
+                      : theme.colors.$colorMutedForeground,
                 })}
               >
-                <Flex
-                  elementDescriptor={descriptors.configureSSOWizardHeaderItemBullet}
-                  elementId={descriptors.configureSSOWizardHeaderItemBullet.setId(step.id)}
-                  isActive={isCurrent}
-                  align='center'
-                  justify='center'
-                  sx={theme => ({
-                    width: theme.sizes.$5,
-                    height: theme.sizes.$5,
-                    borderRadius: theme.radii.$circle,
-                    fontSize: theme.fontSizes.$xs,
-                    fontWeight: theme.fontWeights.$semibold,
-                    backgroundColor: isCurrent
-                      ? theme.colors.$colorForeground
-                      : isCompleted
-                        ? theme.colors.$success500
-                        : theme.colors.$neutralAlpha100,
-                    color: isCurrent
-                      ? theme.colors.$colorBackground
-                      : isCompleted
-                        ? theme.colors.$white
-                        : theme.colors.$colorMutedForeground,
-                  })}
-                >
-                  {isCompleted && !isCurrent ? (
-                    <Icon
-                      icon={Check}
-                      size='xs'
-                    />
-                  ) : (
-                    index + 1
-                  )}
-                </Flex>
-                <Text
-                  elementDescriptor={descriptors.configureSSOWizardHeaderItemLabel}
-                  elementId={descriptors.configureSSOWizardHeaderItemLabel.setId(step.id)}
-                  as='span'
-                  variant='body'
-                  sx={{ fontWeight: 'inherit', color: 'inherit' }}
-                >
-                  {labelText}
-                </Text>
-              </Button>
-            )}
+                {isCompleted && !isCurrent ? (
+                  <Icon
+                    icon={Check}
+                    size='xs'
+                  />
+                ) : (
+                  index + 1
+                )}
+              </Flex>
+              <Text
+                elementDescriptor={descriptors.configureSSOWizardHeaderItemLabel}
+                elementId={descriptors.configureSSOWizardHeaderItemLabel.setId(step.id)}
+                as='span'
+                variant='body'
+                sx={{ fontWeight: 'inherit', color: 'inherit' }}
+              >
+                {labelText}
+              </Text>
+            </Button>
             {index < activeSteps.length - 1 && (
               <Icon
                 elementDescriptor={descriptors.configureSSOWizardHeaderSeparator}
@@ -370,30 +341,6 @@ const Header = (): JSX.Element => {
     </Flex>
   );
 };
-
-const SkeletonBreadcrumbStep = (): JSX.Element => (
-  <Flex
-    align='center'
-    sx={t => ({ gap: t.space.$1x5 })}
-  >
-    <Box
-      sx={t => ({
-        width: t.sizes.$5,
-        height: t.sizes.$5,
-        borderRadius: t.radii.$circle,
-        backgroundColor: t.colors.$neutralAlpha100,
-      })}
-    />
-    <Box
-      sx={t => ({
-        width: t.sizes.$16,
-        height: t.space.$3,
-        borderRadius: t.radii.$md,
-        backgroundColor: t.colors.$neutralAlpha100,
-      })}
-    />
-  </Flex>
-);
 
 /**
  * Compact "Step X / Y" badge that mirrors the *nearest* wizard's
@@ -457,9 +404,8 @@ interface FooterProps {
  */
 const Footer = (props: FooterProps): JSX.Element => {
   const { previousLabel = 'Previous', continueLabel = 'Continue', hidePrevious = false, isDisabled = false } = props;
-  const { isLoading } = useConfigureSSOWizard();
   const { continueAction, deepestWizardRef } = useWizardChromeRegistry();
-  const isForceDisabled = isDisabled || isLoading;
+  const isForceDisabled = isDisabled;
   const { t } = useLocalizations();
 
   // Footer-level controls always dispatch to the deepest mounted
