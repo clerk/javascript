@@ -1,7 +1,7 @@
-import { Button, descriptors, Flex, Icon, Spinner } from '@/customizables';
-import { CaretLeft, CaretRight } from '@/icons';
+import { descriptors, Flex, Spinner } from '@/customizables';
 
-import { ProfileCardFooter, ProfileCardHeader } from './elements/ProfileCard';
+import { ProfileCardHeader } from './elements/ProfileCard';
+import { Step } from './elements/Step';
 import { Stepper } from './elements/Stepper';
 
 export const ConfigureSSOSkeleton = () => {
@@ -26,35 +26,10 @@ export const ConfigureSSOSkeleton = () => {
         />
       </Flex>
 
-      <ProfileCardFooter>
-        <Button
-          elementDescriptor={descriptors.configureSSOWizardFooterPreviousButton}
-          variant='outline'
-          size='sm'
-          isDisabled
-        >
-          <Icon
-            icon={CaretLeft}
-            size='sm'
-            sx={theme => ({ marginInlineEnd: theme.space.$1 })}
-          />
-          Previous
-        </Button>
-
-        <Button
-          elementDescriptor={descriptors.configureSSOWizardFooterContinueButton}
-          variant='solid'
-          size='sm'
-          isDisabled
-        >
-          Continue
-          <Icon
-            icon={CaretRight}
-            size='sm'
-            sx={theme => ({ marginInlineStart: theme.space.$1 })}
-          />
-        </Button>
-      </ProfileCardFooter>
+      <Step.Footer>
+        <Step.Footer.Previous isDisabled />
+        <Step.Footer.Continue isDisabled />
+      </Step.Footer>
     </>
   );
 };

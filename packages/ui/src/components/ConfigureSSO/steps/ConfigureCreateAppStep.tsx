@@ -1,8 +1,11 @@
 import { descriptors, Flow, Text } from '@/customizables';
 
 import { Step } from '../elements/Step';
+import { useWizard } from '../elements/Wizard';
 
 export const ConfigureCreateApp = (): JSX.Element => {
+  const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
+
   return (
     <Flow.Part part='configureCreateApp'>
       <Step
@@ -18,7 +21,16 @@ export const ConfigureCreateApp = (): JSX.Element => {
           <Text>UI goes here</Text>
         </Step.Body>
 
-        <Step.Footer />
+        <Step.Footer>
+          <Step.Footer.Previous
+            onClick={() => goPrev()}
+            isDisabled={isFirstStep}
+          />
+          <Step.Footer.Continue
+            onClick={() => goNext()}
+            isDisabled={isLastStep}
+          />
+        </Step.Footer>
       </Step>
     </Flow.Part>
   );

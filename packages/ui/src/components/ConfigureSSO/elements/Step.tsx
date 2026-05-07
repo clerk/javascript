@@ -5,7 +5,6 @@ import { CaretLeft, CaretRight } from '@/icons';
 import type { PropsOfComponent } from '@/styledSystem';
 
 import { ProfileCardFooter } from './ProfileCard';
-import { useWizard } from './Wizard';
 
 type StepLayoutProps = PropsOfComponent<typeof Col>;
 
@@ -77,95 +76,85 @@ const Body = ({ sx, ...props }: StepBodyProps): JSX.Element => (
   />
 );
 
-type StepFooterProps = {
-  /** Override label for Previous. Defaults to 'Previous'. */
-  previousLabel?: LocalizationKey | string;
-  /** Override label for Continue. Defaults to 'Continue'. */
-  continueLabel?: LocalizationKey | string;
-  /** Hide the Previous button entirely. */
-  hidePrevious?: boolean;
-  /** Hide the Continue button entirely. */
-  hideContinue?: boolean;
-  /** Force-disable Previous regardless of wizard state. Defaults to `useWizard().isFirstStep`. */
-  previousDisabled?: boolean;
-  /** Force-disable Continue. Defaults to `useWizard().isLastStep`. */
-  continueDisabled?: boolean;
-  /** Continue button loading state. */
-  continueLoading?: boolean;
-  /** Click handler for Previous. Defaults to `useWizard().goPrev`. */
-  onPrevious?: () => void | Promise<unknown>;
-  /** Click handler for Continue. Defaults to `useWizard().goNext`. */
-  onContinue?: () => void | Promise<unknown>;
+type FooterButtonProps = {
+  /** Click handler. Required — the buttons have no default behavior. */
+  onClick?: () => void | Promise<unknown>;
+  /** Disabled state. */
+  isDisabled?: boolean;
+  /** Loading state. */
+  isLoading?: boolean;
+  /** Override label. Defaults to 'Previous' / 'Continue'. */
+  label?: LocalizationKey | string;
 };
 
-const Footer = ({
-  previousLabel = 'Previous',
-  continueLabel = 'Continue',
-  hidePrevious = false,
-  hideContinue = false,
-  previousDisabled,
-  continueDisabled,
-  continueLoading,
-  onPrevious,
-  onContinue,
-}: StepFooterProps): JSX.Element => {
-  const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
+const FooterPrevious = ({ onClick, isDisabled, isLoading, label = 'Previous' }: FooterButtonProps): JSX.Element => {
   const { t } = useLocalizations();
-
-  const previousText = typeof previousLabel === 'string' ? previousLabel : t(previousLabel);
-  const continueText = typeof continueLabel === 'string' ? continueLabel : t(continueLabel);
-
-  const handlePrevious = (): void => {
-    void (onPrevious ? onPrevious() : goPrev());
-  };
-  const handleContinue = (): void => {
-    void (onContinue ? onContinue() : goNext());
-  };
-  const isPreviousDisabled = previousDisabled ?? isFirstStep;
-  const isContinueDisabled = continueDisabled ?? isLastStep;
+  const labelText = typeof label === 'string' ? label : t(label);
+  const handleClick = onClick
+    ? (): void => {
+        void onClick();
+      }
+    : undefined;
 
   return (
-    <ProfileCardFooter>
-      {!hidePrevious && (
-        <Button
-          elementDescriptor={descriptors.configureSSOWizardFooterPreviousButton}
-          variant='outline'
-          size='sm'
-          isDisabled={isPreviousDisabled}
-          onClick={handlePrevious}
-        >
-          <Icon
-            icon={CaretLeft}
-            size='sm'
-            sx={t => ({ marginInlineEnd: t.space.$1 })}
-          />
-          {previousText}
-        </Button>
-      )}
-      {!hideContinue && (
-        <Button
-          elementDescriptor={descriptors.configureSSOWizardFooterContinueButton}
-          variant='solid'
-          size='sm'
-          isDisabled={isContinueDisabled}
-          isLoading={continueLoading}
-          onClick={handleContinue}
-        >
-          {continueText}
-          <Icon
-            icon={CaretRight}
-            size='sm'
-            sx={t => ({ marginInlineStart: t.space.$1 })}
-          />
-        </Button>
-      )}
-    </ProfileCardFooter>
+    <Button
+      elementDescriptor={descriptors.configureSSOWizardFooterPreviousButton}
+      variant='outline'
+      size='sm'
+      isDisabled={isDisabled}
+      isLoading={isLoading}
+      onClick={handleClick}
+    >
+      <Icon
+        icon={CaretLeft}
+        size='sm'
+        sx={t => ({ marginInlineEnd: t.space.$1 })}
+      />
+      {labelText}
+    </Button>
   );
 };
+FooterPrevious.displayName = 'Step.Footer.Previous';
+
+const FooterContinue = ({ onClick, isDisabled, isLoading, label = 'Continue' }: FooterButtonProps): JSX.Element => {
+  const { t } = useLocalizations();
+  const labelText = typeof label === 'string' ? label : t(label);
+  const handleClick = onClick
+    ? (): void => {
+        void onClick();
+      }
+    : undefined;
+
+  return (
+    <Button
+      elementDescriptor={descriptors.configureSSOWizardFooterContinueButton}
+      variant='solid'
+      size='sm'
+      isDisabled={isDisabled}
+      isLoading={isLoading}
+      onClick={handleClick}
+    >
+      {labelText}
+      <Icon
+        icon={CaretRight}
+        size='sm'
+        sx={t => ({ marginInlineStart: t.space.$1 })}
+      />
+    </Button>
+  );
+};
+FooterContinue.displayName = 'Step.Footer.Continue';
+
+const Footer = ({ children }: PropsWithChildren): JSX.Element => <ProfileCardFooter>{children}</ProfileCardFooter>;
+
+const FooterCompound = Object.assign(Footer, {
+  Previous: FooterPrevious,
+  Continue: FooterContinue,
+});
 
 export const Step = Object.assign(Layout, {
   Section,
   Header,
   Body,
-  Footer,
+  Footer: FooterCompound,
 });
