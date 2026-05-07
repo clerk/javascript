@@ -79,7 +79,7 @@ beforeEach(() => {
   mocks.ClerkExpoModule.signOut = vi.fn().mockResolvedValue(undefined);
   mocks.defaultGetToken.mockResolvedValue(null);
   mocks.defaultSaveToken.mockResolvedValue(undefined);
-  mocks.useAuth.mockReturnValue({ isSignedIn: false });
+  mocks.useAuth.mockReturnValue({ isSignedIn: false, isLoaded: true });
 });
 
 afterEach(() => {
@@ -91,7 +91,7 @@ const PK = 'pk_test_x';
 
 describe('NativeSessionSync', () => {
   test('signed-out: clears the native session by calling ClerkExpo.signOut', async () => {
-    mocks.useAuth.mockReturnValue({ isSignedIn: false });
+    mocks.useAuth.mockReturnValue({ isSignedIn: false, isLoaded: true });
     render(React.createElement(NativeSessionSync, { publishableKey: PK, tokenCache: undefined }));
     await waitFor(() => {
       expect(mocks.ClerkExpoModule.signOut).toHaveBeenCalled();
@@ -99,7 +99,7 @@ describe('NativeSessionSync', () => {
   });
 
   test('signed-in + native already has a session: does NOT call configure', async () => {
-    mocks.useAuth.mockReturnValue({ isSignedIn: true });
+    mocks.useAuth.mockReturnValue({ isSignedIn: true, isLoaded: true });
     mocks.ClerkExpoModule.getSession.mockResolvedValue({ sessionId: 'sess_x' });
 
     render(React.createElement(NativeSessionSync, { publishableKey: PK, tokenCache: undefined }));
@@ -109,7 +109,7 @@ describe('NativeSessionSync', () => {
   });
 
   test('signed-in + native has no session + token cache has a token: calls configure', async () => {
-    mocks.useAuth.mockReturnValue({ isSignedIn: true });
+    mocks.useAuth.mockReturnValue({ isSignedIn: true, isLoaded: true });
     mocks.ClerkExpoModule.getSession.mockResolvedValue(null);
     mocks.defaultGetToken.mockResolvedValueOnce('the_token');
 
@@ -118,7 +118,7 @@ describe('NativeSessionSync', () => {
   });
 
   test('signed-in + token cache empty: does NOT call configure', async () => {
-    mocks.useAuth.mockReturnValue({ isSignedIn: true });
+    mocks.useAuth.mockReturnValue({ isSignedIn: true, isLoaded: true });
     mocks.ClerkExpoModule.getSession.mockResolvedValue(null);
     mocks.defaultGetToken.mockResolvedValue(null);
 
@@ -130,7 +130,7 @@ describe('NativeSessionSync', () => {
   test('user-provided tokenCache overrides the default', async () => {
     const customGet = vi.fn().mockResolvedValue('custom_token');
     const customSave = vi.fn();
-    mocks.useAuth.mockReturnValue({ isSignedIn: true });
+    mocks.useAuth.mockReturnValue({ isSignedIn: true, isLoaded: true });
     mocks.ClerkExpoModule.getSession.mockResolvedValue(null);
 
     render(
@@ -146,7 +146,7 @@ describe('NativeSessionSync', () => {
   });
 
   test('Android shape: { session: { id } } is treated as a session', async () => {
-    mocks.useAuth.mockReturnValue({ isSignedIn: true });
+    mocks.useAuth.mockReturnValue({ isSignedIn: true, isLoaded: true });
     mocks.ClerkExpoModule.getSession.mockResolvedValue({ session: { id: 'sess_y' } });
 
     render(React.createElement(NativeSessionSync, { publishableKey: PK, tokenCache: undefined }));
@@ -157,7 +157,7 @@ describe('NativeSessionSync', () => {
   });
 
   test('errors in the sync flow are caught and do not propagate', async () => {
-    mocks.useAuth.mockReturnValue({ isSignedIn: true });
+    mocks.useAuth.mockReturnValue({ isSignedIn: true, isLoaded: true });
     mocks.ClerkExpoModule.getSession.mockRejectedValueOnce(new Error('boom'));
 
     expect(() => {
@@ -171,14 +171,14 @@ describe('NativeSessionSync', () => {
 
   test('signed-in -> signed-out transition resets hasSyncedRef and triggers signOut', async () => {
     // First mount signed-in with a native session
-    mocks.useAuth.mockReturnValue({ isSignedIn: true });
+    mocks.useAuth.mockReturnValue({ isSignedIn: true, isLoaded: true });
     mocks.ClerkExpoModule.getSession.mockResolvedValue({ sessionId: 'sess_x' });
 
     const { rerender } = render(React.createElement(NativeSessionSync, { publishableKey: PK, tokenCache: undefined }));
     await waitFor(() => expect(mocks.ClerkExpoModule.getSession).toHaveBeenCalled());
 
     // Now flip to signed-out
-    mocks.useAuth.mockReturnValue({ isSignedIn: false });
+    mocks.useAuth.mockReturnValue({ isSignedIn: false, isLoaded: true });
     rerender(React.createElement(NativeSessionSync, { publishableKey: PK, tokenCache: undefined }));
 
     await waitFor(() => expect(mocks.ClerkExpoModule.signOut).toHaveBeenCalled());

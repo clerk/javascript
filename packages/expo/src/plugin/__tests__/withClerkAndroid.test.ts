@@ -9,6 +9,7 @@
  */
 import { describe, expect, test } from 'vitest';
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const plugin = require('../../../app.plugin.js') as {
   withClerkAndroid: (config: any) => any;
 };

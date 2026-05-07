@@ -14,6 +14,7 @@ const mocks = vi.hoisted(() => ({
 vi.mock('@clerk/react', () => ({ useClerk: mocks.useClerk }));
 
 vi.mock('react-native', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const React = require('react');
   return {
     Platform: { OS: 'ios' },

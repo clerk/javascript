@@ -8,6 +8,7 @@
  */
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const plugin = require('../../../app.plugin.js') as {
   withClerkExpo: (config: any, props?: any) => any;
   withClerkAppleSignIn: (config: any) => any;

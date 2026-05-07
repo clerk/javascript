@@ -17,6 +17,7 @@ const mocks = vi.hoisted(() => {
 
 // Render react-native primitives as plain HTML so jsdom can render them.
 vi.mock('react-native', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const React = require('react');
   return {
     Platform: { OS: 'ios' },
