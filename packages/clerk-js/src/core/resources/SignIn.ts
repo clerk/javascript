@@ -1145,11 +1145,25 @@ class SignInFuture implements SignInFutureResource {
         routes.actionCompleteRedirectUrl = wrappedRoutes.redirectUrl;
       }
 
-      if (
-        !this.#resource.id ||
-        strategy !== 'enterprise_sso' ||
-        this.#resource.firstFactorVerification.status === 'unverified'
-      ) {
+      const hasExistingSignIn = Boolean(this.#resource.id);
+      const isEnterpriseSSO = strategy === 'enterprise_sso';
+      const hasPendingFirstFactorVerification = this.#resource.firstFactorVerification.status === 'unverified';
+
+      const shouldStartNewSignIn = (() => {
+        if (!hasExistingSignIn) {
+          return true;
+        }
+
+        if (!isEnterpriseSSO) {
+          return true;
+        }
+
+        // Enterprise SSO can prepare a first factor on an existing sign-in,
+        // unless the current sign-in is still holding an abandoned redirect verification.
+        return hasPendingFirstFactorVerification;
+      })();
+
+      if (shouldStartNewSignIn) {
         await this._create({
           strategy,
           ...routes,
