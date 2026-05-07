@@ -2153,7 +2153,7 @@ describe('SignIn', () => {
         });
       });
 
-      it('creates a new OAuth sign-in when retrying after a previous provider redirect was abandoned', async () => {
+      it("creates a fresh sign-in on every sso() call, even when a prior provider's redirect is still pending", async () => {
         vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
 
         const mockPopup = { location: { href: '' } } as Window;
