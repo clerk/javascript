@@ -13,7 +13,7 @@ import { ConfigureSSOHeader } from './ConfigureSSOHeader';
 import { ConfigureSSONavbar } from './ConfigureSSONavbar';
 import { ConfigureSSOSkeleton } from './ConfigureSSOSkeleton';
 import { Wizard } from './elements/Wizard';
-import { ConfigureCreateApp, ConfirmationStep, TestConfigurationStep, VerifyEmailDomainStep } from './steps';
+import { ConfigureStep, ConfirmationStep, TestConfigurationStep, VerifyDomainStep } from './steps';
 
 const ConfigureSSOInternal = () => {
   return (
@@ -82,21 +82,17 @@ const ConfigureSSOSteps = () => {
   return (
     <>
       <Wizard.Step
-        id='verify-email-domain'
+        id='verify-domain'
         label='Verify domain'
       >
-        <VerifyEmailDomainStep />
+        <VerifyDomainStep />
       </Wizard.Step>
 
       <Wizard.Step
         id='configure'
         label='Configure'
       >
-        <Wizard>
-          <Wizard.Step id='create-app'>
-            <ConfigureCreateApp />
-          </Wizard.Step>
-        </Wizard>
+        <ConfigureStep />
       </Wizard.Step>
 
       <Wizard.Step

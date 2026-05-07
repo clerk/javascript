@@ -86,7 +86,7 @@ const Header = ({ title, description, children }: StepHeaderProps): JSX.Element 
 type StepBodyProps = PropsOfComponent<typeof Col>;
 
 const Body = ({ sx, ...props }: StepBodyProps): JSX.Element => (
-  <Section
+  <Col
     as='main'
     {...props}
     sx={[{ flex: 1, minHeight: 0, overflowY: 'auto' }, sx]}

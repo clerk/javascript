@@ -13,7 +13,9 @@ export const ConfirmationStep = (): JSX.Element => {
         elementId={descriptors.configureSSOWizardBody.setId('confirmation')}
       >
         <Step.Body>
-          <Text>UI goes here</Text>
+          <Step.Section>
+            <Text>UI goes here</Text>
+          </Step.Section>
         </Step.Body>
 
         <Step.Footer>
