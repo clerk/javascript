@@ -1,4 +1,5 @@
 import { descriptors, Flex } from '@/customizables';
+import { common } from '@/styledSystem';
 
 type ProfileCardHeaderProps = React.PropsWithChildren;
 
@@ -28,7 +29,7 @@ export const ProfileCardFooter = (props: ProfileCardFooterProps): JSX.Element =>
     sx={theme => ({
       gap: theme.space.$2,
       padding: `${theme.space.$4}`,
-      backgroundColor: theme.colors.$colorMutedForeground,
+      background: common.mutedBackground(theme),
       borderTopWidth: theme.borderWidths.$normal,
       borderTopStyle: theme.borderStyles.$solid,
       borderTopColor: theme.colors.$borderAlpha100,
