@@ -1,0 +1,108 @@
+import React from 'react';
+
+import { Button, Flex, Icon, Text, useLocalizations } from '@/customizables';
+import { CaretRight } from '@/icons';
+
+import type { StepperItemProps, StepperProps } from './types';
+
+const Item = ({
+  label,
+  bullet,
+  isCurrent,
+  isCompleted,
+  isReachable = true,
+  onClick,
+}: StepperItemProps): JSX.Element => {
+  const { t } = useLocalizations();
+  const labelText = label ? (typeof label === 'string' ? label : t(label)) : '';
+
+  return (
+    <Button
+      // TODO: add descriptor
+      isActive={isCurrent}
+      variant='unstyled'
+      isDisabled={!isReachable}
+      onClick={onClick}
+      sx={theme => ({
+        gap: theme.space.$1x5,
+        padding: 0,
+        color: isCurrent || isCompleted ? theme.colors.$colorForeground : theme.colors.$colorMutedForeground,
+      })}
+    >
+      <Flex
+        // TODO: add descriptor
+        isActive={isCurrent}
+        align='center'
+        justify='center'
+        sx={theme => ({
+          width: theme.sizes.$4,
+          height: theme.sizes.$4,
+          borderRadius: theme.radii.$circle,
+          backgroundColor: isCurrent
+            ? theme.colors.$colorForeground
+            : isCompleted
+              ? theme.colors.$success500
+              : theme.colors.$neutralAlpha400,
+        })}
+      >
+        {bullet}
+      </Flex>
+      <Text
+        // TODO: add descriptor
+        as='span'
+        variant='body'
+        sx={{ fontWeight: 'inherit', color: 'inherit' }}
+      >
+        {labelText}
+      </Text>
+    </Button>
+  );
+};
+Item.displayName = 'Stepper.Item';
+
+const Root = ({ children }: StepperProps): JSX.Element => {
+  const items = React.Children.toArray(children).filter(child => React.isValidElement(child));
+
+  return (
+    <Flex
+      // TODO: add descriptor
+      align='center'
+      sx={theme => ({
+        gap: theme.space.$2,
+        flexWrap: 'wrap',
+      })}
+    >
+      {items.map((child, index) => (
+        // eslint-disable-next-line react/no-array-index-key
+        <React.Fragment key={index}>
+          {child}
+          {index < items.length - 1 && (
+            <Icon
+              // TODO: add descriptor
+              icon={CaretRight}
+              size='md'
+              sx={theme => ({ color: theme.colors.$colorMutedForeground })}
+            />
+          )}
+        </React.Fragment>
+      ))}
+    </Flex>
+  );
+};
+
+/**
+ * Numbered step indicator — purely presentational.
+ *
+ * Each `<Stepper.Item>` is a self-rendering component that takes
+ * `label`, `bullet`, `isCurrent`, `isCompleted`, `isReachable`, and
+ * `onClick`. The Stepper container only handles layout (gap +
+ * inserts a chevron separator between items). It does NOT walk
+ * children to extract descriptors, NOT compute reachability, NOT
+ * track current state — all of that is the host's responsibility.
+ *
+ * For the wizard surface, see `ConfigureSSOHeader` which maps
+ * `useWizard()` state into Stepper.Item props.
+ */
+export const Stepper = Object.assign(Root, {
+  Item,
+});
