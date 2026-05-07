@@ -46,6 +46,12 @@ type SelectState<O extends Option> = Pick<
   select: (option: O) => void;
   focusedItemRef: React.RefObject<HTMLDivElement>;
   onTriggerClick: () => void;
+  generatedTriggerId: string;
+  triggerId: string;
+  setTriggerId: React.Dispatch<React.SetStateAction<string>>;
+  generatedListboxId: string;
+  listboxId: string;
+  setListboxId: React.Dispatch<React.SetStateAction<string>>;
   portal?: boolean;
 };
 
@@ -102,6 +108,10 @@ export const Select = withFloatingTree(<O extends Option>(props: PropsWithChildr
   });
   const togglePopover = popoverCtx.toggle;
   const focusedItemRef = React.useRef<HTMLDivElement>(null);
+  const generatedTriggerId = React.useId();
+  const generatedListboxId = React.useId();
+  const [triggerId, setTriggerId] = React.useState(generatedTriggerId);
+  const [listboxId, setListboxId] = React.useState(generatedListboxId);
   const searchInputCtx = useSearchInput({
     items: options,
     comparator: comparator || (() => true),
@@ -139,6 +149,12 @@ export const Select = withFloatingTree(<O extends Option>(props: PropsWithChildr
           comparator,
           select,
           onTriggerClick: togglePopover,
+          generatedTriggerId,
+          triggerId,
+          setTriggerId,
+          generatedListboxId,
+          listboxId,
+          setListboxId,
           elementId,
           portal,
         },
@@ -242,7 +258,16 @@ type SelectOptionListProps = PropsOfComponent<typeof Flex> & {
 };
 
 export const SelectOptionList = (props: SelectOptionListProps) => {
-  const { containerSx, sx, footer, onReachEnd, ...rest } = props;
+  const {
+    containerSx,
+    sx,
+    footer,
+    onReachEnd,
+    id,
+    'aria-label': ariaLabel,
+    'aria-labelledby': ariaLabelledBy,
+    ...rest
+  } = props;
   const {
     popoverCtx,
     searchInputCtx,
@@ -255,12 +280,21 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
     select,
     onTriggerClick,
     elementId,
+    triggerId,
+    generatedListboxId,
+    setListboxId,
     portal,
   } = useSelectState();
   const { filteredItems: options, searchInputProps } = searchInputCtx;
   const [focusedIndex, setFocusedIndex] = useState(0);
   const { isOpen, floating, styles, nodeId, context } = popoverCtx;
   const containerRef = React.useRef<HTMLDivElement>(null);
+  const effectiveListboxId = id ?? generatedListboxId;
+  const effectiveAriaLabelledBy = ariaLabelledBy ?? (ariaLabel ? undefined : triggerId);
+
+  React.useEffect(() => {
+    setListboxId(effectiveListboxId);
+  }, [effectiveListboxId, setListboxId]);
 
   const scrollToItemOnSelectedIndexChange = () => {
     if (!isOpen) {
@@ -350,8 +384,11 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
         )}
         <Flex
           ref={containerRef}
+          id={effectiveListboxId}
           direction='col'
           role='listbox'
+          aria-label={ariaLabel}
+          aria-labelledby={effectiveAriaLabelledBy}
           tabIndex={comparator ? undefined : 0}
           sx={[
             theme => ({
@@ -397,9 +434,24 @@ export const SelectButton = (
     iconSx?: ThemableCssProp;
   },
 ) => {
-  const { sx, children, icon, iconSx, ...rest } = props;
-  const { popoverCtx, onTriggerClick, buttonRenderOption, selectedOption, placeholder, elementId } = useSelectState();
+  const { sx, children, icon, iconSx, id, 'aria-controls': ariaControls, ...rest } = props;
+  const {
+    popoverCtx,
+    onTriggerClick,
+    buttonRenderOption,
+    selectedOption,
+    placeholder,
+    elementId,
+    generatedTriggerId,
+    listboxId,
+    setTriggerId,
+  } = useSelectState();
   const { reference, isOpen } = popoverCtx;
+  const effectiveTriggerId = id ?? generatedTriggerId;
+
+  React.useEffect(() => {
+    setTriggerId(effectiveTriggerId);
+  }, [effectiveTriggerId, setTriggerId]);
 
   let show: React.ReactNode = children;
   if (!children) {
@@ -411,11 +463,13 @@ export const SelectButton = (
       elementDescriptor={descriptors.selectButton}
       elementId={descriptors.selectButton.setId(elementId)}
       ref={reference}
+      id={effectiveTriggerId}
       variant='outline'
       textVariant='buttonLarge'
       onClick={onTriggerClick}
       aria-expanded={isOpen}
       aria-haspopup='listbox'
+      aria-controls={ariaControls ?? (isOpen ? listboxId : undefined)}
       sx={[
         theme => ({
           gap: theme.space.$2,
