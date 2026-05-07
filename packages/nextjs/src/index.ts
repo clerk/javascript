@@ -85,7 +85,7 @@ export const ClerkProvider = ComponentsModule.ClerkProvider as ServerComponentsS
 export const Show = ComponentsModule.Show as ServerComponentsServerModuleTypes['Show'];
 
 /**
- * `auth` is not available from this import path.
+ * @deprecated `auth()` must be imported from `@clerk/nextjs/server`, not `@clerk/nextjs`.
  *
  * **To fix this error:**
  * ```diff
@@ -96,4 +96,4 @@ export const Show = ComponentsModule.Show as ServerComponentsServerModuleTypes['
  * The `auth` function is only available in server-side contexts:
  * API Routes, Server Components, Server Actions, and Middleware.
  */
-export { auth } from './server-only-stubs';
+export declare const auth: never;
