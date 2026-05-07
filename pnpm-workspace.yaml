@@ -75,3 +75,17 @@ trustPolicyExclude:
   - 'chokidar@4.0.3'
 
 blockExoticSubdeps: true
+
+allowBuilds:
+  # allow esbuild for the binary linking optimization it makes
+  esbuild: true
+
+  '@parcel/watcher': false
+  browser-tabs-lock: false
+  bufferutil: false
+  core-js: false
+  cypress: false
+  msw: false
+  sharp: false
+  unrs-resolver: false
+  utf-8-validate: false
