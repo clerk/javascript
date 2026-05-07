@@ -26,6 +26,8 @@ export class ClerkAPIError<Meta extends ClerkAPIErrorMeta = any> implements Cler
         zxcvbn: json.meta?.zxcvbn,
         plan: json.meta?.plan,
         isPlanUpgradePossible: json.meta?.is_plan_upgrade_possible,
+        seatQuantityToAdd: json.meta?.seat_quantity_to_add,
+        seatQuantity: json.meta?.seat_quantity,
       } as unknown as Meta,
     };
     this.code = parsedError.code;

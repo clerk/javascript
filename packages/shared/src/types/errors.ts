@@ -21,6 +21,8 @@ export interface ClerkAPIErrorJSON {
       name: string;
     };
     is_plan_upgrade_possible?: boolean;
+    seat_quantity_to_add?: number;
+    seat_quantity?: number;
   };
 }
 
@@ -63,6 +65,8 @@ export interface ClerkAPIError {
       name: string;
     };
     isPlanUpgradePossible?: boolean;
+    seatQuantityToAdd?: number;
+    seatQuantity?: number;
   };
 }
 

@@ -2,8 +2,10 @@ import { useMemo, type ReactNode } from 'react';
 import { useOrganization } from '@clerk/shared/react';
 import { Animated } from '@/ui/elements/Animated';
 import { Tooltip } from '@/ui/elements/Tooltip';
+import { isPlanWithPerSeatCosts } from '@/utils/billingPlanSeats';
 
 import { useProtect } from '../../common';
+import { useSubscription } from '../../contexts';
 import { Button, descriptors, Flex, localizationKeys } from '../../customizables';
 import { Action } from '../../elements/Action';
 import { InviteMembersScreen } from './InviteMembersScreen';
@@ -15,10 +17,15 @@ type MembersActionsRowProps = {
 export const MembersActionsRow = ({ actionSlot }: MembersActionsRowProps) => {
   const canManageMemberships = useProtect({ permission: 'org:sys_memberships:manage' });
   const { organization } = useOrganization();
+  const { subscriptionItems } = useSubscription();
 
   const isBelowLimit = useMemo(() => {
     if (!organization) {
       return false;
+    }
+
+    if (subscriptionItems.length > 0 && isPlanWithPerSeatCosts(subscriptionItems[0].plan)) {
+      return true;
     }
 
     // A value of 0 means unlimited memberships, thus the organization is always below the limit
@@ -27,7 +34,7 @@ export const MembersActionsRow = ({ actionSlot }: MembersActionsRowProps) => {
     }
 
     return organization.membersCount + organization.pendingInvitationsCount < organization.maxAllowedMemberships;
-  }, [organization]);
+  }, [organization, subscriptionItems]);
 
   const inviteButton = (
     <Button

@@ -9,9 +9,15 @@ type CheckoutKey = string & { readonly __tag: 'CheckoutKey' };
 /**
  * Generate cache key for checkout instance
  */
-function cacheKey(options: { userId: string; orgId?: string; planId: string; planPeriod: string }): CheckoutKey {
-  const { userId, orgId, planId, planPeriod } = options;
-  return `${userId}-${orgId || 'user'}-${planId}-${planPeriod}` as CheckoutKey;
+function cacheKey(options: {
+  userId: string;
+  orgId?: string;
+  planId: string;
+  planPeriod: string;
+  seatsQuantity?: number;
+}): CheckoutKey {
+  const { userId, orgId, planId, planPeriod, seatsQuantity } = options;
+  return `${userId}-${orgId || 'user'}-${planId}-${planPeriod}-${seatsQuantity}` as CheckoutKey;
 }
 
 /**
@@ -26,7 +32,7 @@ const CheckoutSignalCache = new Map<
  * Create a checkout instance with the given options
  */
 function createCheckoutInstance(clerk: Clerk, options: __experimental_CheckoutOptions): CheckoutSignalValue {
-  const { for: forOrganization, planId, planPeriod } = options;
+  const { for: forOrganization, planId, planPeriod, seatsQuantity } = options;
 
   if (clerk.user === null) {
     throw new Error('Clerk: User is not authenticated');
@@ -43,6 +49,7 @@ function createCheckoutInstance(clerk: Clerk, options: __experimental_CheckoutOp
     orgId: forOrganization === 'organization' ? clerk.organization?.id : undefined,
     planId,
     planPeriod,
+    seatsQuantity,
   });
 
   const checkoutInstance = CheckoutSignalCache.get(checkoutKey);
@@ -56,6 +63,7 @@ function createCheckoutInstance(clerk: Clerk, options: __experimental_CheckoutOp
     ...(forOrganization === 'organization' ? { orgId: clerk.organization?.id } : {}),
     planId,
     planPeriod,
+    seatsQuantity,
   });
 
   CheckoutSignalCache.set(checkoutKey, { resource: checkout, signals });

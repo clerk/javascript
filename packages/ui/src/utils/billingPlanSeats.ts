@@ -45,3 +45,21 @@ export const organizationExceedsPlanSeatLimit = (
 
   return organization.membersCount + organization.pendingInvitationsCount > seatLimit;
 };
+
+export const isPlanWithPerSeatCosts = (plan: BillingPlanResource): boolean => {
+  const seatUnitPrice = getSeatUnitPrice(plan);
+
+  if (!seatUnitPrice) {
+    return false;
+  }
+
+  if (seatUnitPrice.tiers.length === 1 && seatUnitPrice.tiers[0].feePerBlock.amount > 0) {
+    return true;
+  }
+
+  if (seatUnitPrice.tiers.length === 2 && seatUnitPrice.tiers[1].feePerBlock.amount > 0) {
+    return true;
+  }
+
+  return false;
+};

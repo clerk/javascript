@@ -140,6 +140,8 @@ export type GetPlansParams = ClerkPaginationParams<{
    * The type of payer for the Plans.
    */
   for?: ForPayerType;
+  org_id?: string;
+  min_seats?: number;
 }>;
 
 /**
@@ -889,6 +891,7 @@ export type CreateCheckoutParams = WithOptionalOrgType<{
    * The billing period for the Plan.
    */
   planPeriod: BillingSubscriptionPlanPeriod;
+  seatsQuantity?: number;
 }>;
 
 /**
