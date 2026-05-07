@@ -10,6 +10,7 @@ import { USER_BUTTON_ITEM_ID } from '../../constants';
 import { useUserButtonContext } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { descriptors, Flex, localizationKeys } from '../../customizables';
+import { useAms } from '../../hooks/useAms';
 import { Add, CogFilled, SignOut, SwitchArrowRight } from '../../icons';
 import type { ThemableCssProp } from '../../styledSystem';
 import type { DefaultItemIds, MenuItem } from '../../utils/createCustomMenuItems';
@@ -138,6 +139,7 @@ export const MultiSessionActions = (props: MultiSessionActionsProps) => {
   } = props;
 
   const { menutItems } = useUserButtonContext();
+  const ams = useAms();
 
   const handleActionClick = async (route: MenuItem) => {
     if (route?.path) {
@@ -172,18 +174,20 @@ export const MultiSessionActions = (props: MultiSessionActionsProps) => {
             justify='between'
             sx={t => ({ marginInlineStart: t.space.$12, padding: `0 ${t.space.$5} ${t.space.$4}`, gap: t.space.$2 })}
           >
-            <SmallAction
-              elementDescriptor={descriptors.userButtonPopoverActionButton}
-              elementId={descriptors.userButtonPopoverActionButton.setId('manageAccount')}
-              iconBoxElementDescriptor={descriptors.userButtonPopoverActionButtonIconBox}
-              iconBoxElementId={descriptors.userButtonPopoverActionButtonIconBox.setId('manageAccount')}
-              iconElementDescriptor={descriptors.userButtonPopoverActionButtonIcon}
-              iconElementId={descriptors.userButtonPopoverActionButtonIcon.setId('manageAccount')}
-              icon={CogFilled}
-              label={localizationKeys('userButton.action__manageAccount')}
-              onClick={handleManageAccountClicked}
-              focusRing
-            />
+            {!ams.isActive && (
+              <SmallAction
+                elementDescriptor={descriptors.userButtonPopoverActionButton}
+                elementId={descriptors.userButtonPopoverActionButton.setId('manageAccount')}
+                iconBoxElementDescriptor={descriptors.userButtonPopoverActionButtonIconBox}
+                iconBoxElementId={descriptors.userButtonPopoverActionButtonIconBox.setId('manageAccount')}
+                iconElementDescriptor={descriptors.userButtonPopoverActionButtonIcon}
+                iconElementId={descriptors.userButtonPopoverActionButtonIcon.setId('manageAccount')}
+                icon={CogFilled}
+                label={localizationKeys('userButton.action__manageAccount')}
+                onClick={handleManageAccountClicked}
+                focusRing
+              />
+            )}
             <SmallAction
               elementDescriptor={descriptors.userButtonPopoverActionButton}
               elementId={descriptors.userButtonPopoverActionButton.setId('signOut')}

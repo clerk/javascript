@@ -1,7 +1,9 @@
 import { useClerk } from '@clerk/shared/react';
 import { createContext, useContext, useMemo } from 'react';
 
-import { createUserButtonCustomMenuItems } from '@/ui/utils/createCustomMenuItems';
+import { USER_BUTTON_ITEM_ID } from '@/ui/constants';
+import { useAms } from '@/ui/hooks/useAms';
+import { createUserButtonCustomMenuItems, type MenuItem } from '@/ui/utils/createCustomMenuItems';
 
 import { useEnvironment, useOptions } from '../../contexts';
 import { useRouter } from '../../router';
@@ -39,6 +41,15 @@ export const useUserButtonContext = () => {
     return createUserButtonCustomMenuItems(customMenuItems || [], clerk);
   }, []);
 
+  // When the active session carries the `ams` claim, the "Manage account"
+  // entry would launch a <UserProfile/> modal whose underlying writes are
+  // rejected by the issuer. Strip it from the menu while the claim is
+  // active so users aren't presented with actions that can never succeed.
+  const ams = useAms();
+  const visibleMenuItems = ams.isActive
+    ? menuItems.filter((item: MenuItem) => item.id !== USER_BUTTON_ITEM_ID.MANAGE_ACCOUNT)
+    : menuItems;
+
   return {
     ...ctx,
     componentName,
@@ -50,6 +61,6 @@ export const useUserButtonContext = () => {
     afterSignOutUrl,
     afterSwitchSessionUrl,
     userProfileMode: userProfileMode || 'modal',
-    menutItems: menuItems,
+    menutItems: visibleMenuItems,
   };
 };

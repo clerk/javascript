@@ -98,6 +98,13 @@ type JWTPayloadBase = {
   sts?: SessionStatusClaim;
 
   /**
+   * Reserved session claim. The claim shape is opaque and may change
+   * without notice. Do not depend on its presence or absence for
+   * authorization checks.
+   */
+  ams?: AmsClaim;
+
+  /**
    * Any other JWT Claim Set member.
    */
   [propName: string]: unknown;
@@ -213,3 +220,11 @@ export type AgentActClaim = ActClaim & { type: 'agent' };
  * The current state of the session which can only be `active` or `pending`.
  */
 export type SessionStatusClaim = Extract<SessionStatus, 'active' | 'pending'>;
+
+/**
+ * Opaque optional `ams` session claim. Consumers must not inspect its value
+ * or depend on its presence or absence for authorization checks.
+ *
+ * @inline
+ */
+export type AmsClaim = unknown;
