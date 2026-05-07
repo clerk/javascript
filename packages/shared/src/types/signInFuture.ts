@@ -223,8 +223,8 @@ export interface SignInFutureSSOParams {
    */
   oidcPrompt?: string;
   /**
-   * @experimental
    * The identifier of the enterprise connection to target when using the `enterprise_sso` strategy.
+   * @experimental
    */
   enterpriseConnectionId?: string;
   /**
@@ -331,6 +331,14 @@ export interface SignInFutureResource {
 
   /**
    * The current status of the sign-in.
+   * <ul>
+   * <li>`'complete'` - The sign-in process has been completed successfully.</li>
+   * <li>`'needs_client_trust'` - The user is signing in from a new device and must complete a [second factor verification](!second-factor-verification) to establish [Client Trust](https://clerk.com/docs/guides/secure/client-trust). See the [Client Trust custom flow guide](https://clerk.com/docs/guides/development/custom-flows/authentication/client-trust) for more information.</li>
+   * <li>`'needs_identifier'` - The user's identifier (e.g., email address, phone number, username) hasn't been provided.</li>
+   * <li>`'needs_first_factor'` - One of the following [first factor verification](!first-factor-verification) strategies is missing: `'email_link'`, `'email_code'`, `passkey`, `password`, `'phone_code'`, `'web3_base_signature'`, `'web3_metamask_signature'`, `'web3_coinbase_wallet_signature'`, `'web3_okx_wallet_signature'`, `'web3_solana_signature'`, [`OAuthStrategy`](https://clerk.com/docs/reference/types/sso#o-auth-strategy), or `'enterprise_sso'`.</li>
+   * <li>`'needs_second_factor'` - One of the following [second factor verification](!second-factor-verification) strategies is missing: `'phone_code'`, `'totp'`, `'backup_code'`, `'email_code'`, or `'email_link'`.</li>
+   * <li>`'needs_new_password'` - The user needs to set a new password. See the [dedicated custom flow](https://clerk.com/docs/guides/development/custom-flows/account-updates/forgot-password) guide for more information.</li>
+   * </ul>
    */
   readonly status: SignInStatus;
 
@@ -341,9 +349,13 @@ export interface SignInFutureResource {
 
   /**
    * Reflects that the sign-in was not able to create a new session because the identifier already exists in an existing session.
-   * @property {string} sessionId - The ID of the existing session.
    */
-  readonly existingSession?: { sessionId: string };
+  readonly existingSession?: {
+    /**
+     * The ID of the existing session.
+     */
+    sessionId: string;
+  };
 
   /**
    * The state of the verification process for the selected first factor. Initially, this property contains an empty verification object, since there is no first factor selected.
@@ -367,6 +379,12 @@ export interface SignInFutureResource {
 
   /**
    * An object containing information about the user of the current sign-in. This property is populated only once an identifier is given to the `SignIn` object through `signIn.create()` or another method that populates the `identifier` property.
+   * <ul>
+   *  <li>`'firstName'`: The user's first name.</li>
+   *  <li>`'lastName'`: The user's last name.</li>
+   *  <li>`'imageUrl'`: The user's profile image URL.</li>
+   *  <li>`'hasImage'`: Whether the user has a profile image.</li>
+   * </ul>
    */
   readonly userData: UserData;
 

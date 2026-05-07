@@ -223,8 +223,16 @@ function getCatchAllReplacements() {
         `[\`${type}\`](/docs/reference/types/errors)`,
     },
     {
+      pattern: /(?<![\[\w`#])`?SignInFirstFactor`?(?![\]\w`])/g,
+      replace: '[SignInFirstFactor](/docs/reference/types/sign-in-first-factor)',
+    },
+    {
       pattern: /(?<![\[\w`#])`?SignInFutureResource`?(?![\]\w`])/g,
       replace: '[SignInFutureResource](/docs/reference/objects/sign-in-future)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?SignInSecondFactor`?(?![\]\w`])/g,
+      replace: '[SignInSecondFactor](/docs/reference/types/sign-in-second-factor)',
     },
     {
       pattern: /(?<![\[\w`#])`?SignedInSessionResource`?(?![\]\w`])/g,
@@ -313,6 +321,10 @@ function getCatchAllReplacements() {
     {
       pattern: /(?<![\[\w`#])`?Web3WalletResource`?(?![\]\w`])/g,
       replace: '[Web3WalletResource](/docs/reference/types/web3-wallet)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?VerificationResource`?(?![\]\w`])/g,
+      replace: '[VerificationResource](/docs/reference/types/verification-resource)',
     },
     {
       /**

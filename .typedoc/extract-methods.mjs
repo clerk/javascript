@@ -33,7 +33,7 @@ import {
   stripReferenceObjectPropertiesSection,
 } from './custom-plugin.mjs';
 import { prepareMarkdownRenderer } from './prepare-markdown-renderer.mjs';
-import { commentContainsTodo } from './comment-utils.mjs';
+import { applyTodoStrippingToComment } from './comment-utils.mjs';
 import { REFERENCE_OBJECTS_LIST, REFERENCE_OBJECT_CONFIG } from './reference-objects.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -560,10 +560,12 @@ function buildPropertyTableDocMdx(parentName, nestedDecl, ctx) {
   const qualifiedName = `${parentName}.${nestedDecl.name}`;
   const title = `### \`${qualifiedName}\``;
   const description = commentSummaryAndBody(nestedDecl.comment);
-  const props = resolveObjectShapeMembersForPropertyTable(nestedDecl.type);
-  if (!props?.length) {
+  const propsUnsorted = resolveObjectShapeMembersForPropertyTable(nestedDecl.type);
+  if (!propsUnsorted?.length) {
     return '';
   }
+  /** Match nominal param tables and merged intersection holders: stable A–Z by property name (TypeDoc inline literal `children` order is declaration order). */
+  const props = [...propsUnsorted].sort((a, b) => a.name.localeCompare(b.name));
   const tableMd = renderMemberTableOmittingExampleBlocks(props, ctx, () =>
     ctx.partials.propertiesTable(
       props,
@@ -762,17 +764,18 @@ const BLOCK_TAGS_OMITTED_FROM_EXTRACTED_METHOD_PROSE = new Set(['@param', '@type
  * @param {import('typedoc').Comment | undefined} comment
  */
 function commentSummaryAndBody(comment) {
-  if (!comment || commentContainsTodo(comment)) {
+  if (!comment) {
     return '';
   }
-  const summary = displayPartsToString(comment.summary).trim();
-  const block = comment.blockTags
+  const c = applyTodoStrippingToComment(comment) ?? comment;
+  const summary = displayPartsToString(c.summary).trim();
+  const block = c.blockTags
     ?.filter(t => !BLOCK_TAGS_OMITTED_FROM_EXTRACTED_METHOD_PROSE.has(t.tag))
     .map(t => displayPartsToString(t.content).trim())
     .filter(Boolean)
     .join('\n\n');
   const returnsLines =
-    comment.blockTags
+    c.blockTags
       ?.filter(t => t.tag === '@returns')
       .map(t => formatReturnsLineFromTag(t))
       .filter(Boolean) ?? [];

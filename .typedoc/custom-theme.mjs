@@ -10,7 +10,7 @@ import {
 import { removeLineBreaks } from '../node_modules/typedoc-plugin-markdown/dist/libs/utils/index.js';
 import { TypeDeclarationVisibility } from '../node_modules/typedoc-plugin-markdown/dist/options/maps.js';
 
-import { commentContainsTodo } from './comment-utils.mjs';
+import { applyTodoStrippingToComment } from './comment-utils.mjs';
 import { REFERENCE_OBJECTS_LIST } from './reference-objects.mjs';
 
 export { REFERENCE_OBJECTS_LIST };
@@ -876,18 +876,19 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
        * @param {Parameters<typeof superPartials.comment>[1]} [options]
        */
       comment: (model, options) => {
-        if (commentContainsTodo(model)) {
-          return '';
+        if (!model) {
+          return superPartials.comment.call(this, model, options);
         }
+        const modelToRender = applyTodoStrippingToComment(model) ?? model;
         const hidden = new Set(['@inline', '@inlineType', '@experimental']);
-        const modTags = model?.modifierTags ? Array.from(model.modifierTags) : [];
+        const modTags = Array.from(modelToRender.modifierTags ?? []);
         if (modTags.some(/** @param {string} t */ t => hidden.has(t))) {
-          const clone = Object.assign(Object.create(Object.getPrototypeOf(model)), model, {
+          const clone = Object.assign(Object.create(Object.getPrototypeOf(modelToRender)), modelToRender, {
             modifierTags: new Set(modTags.filter(/** @param {string} t */ t => !hidden.has(t))),
           });
           return superPartials.comment.call(this, clone, options);
         }
-        return superPartials.comment.call(this, model, options);
+        return superPartials.comment.call(this, modelToRender, options);
       },
       /**
        * Remove the blockquote signature line.
