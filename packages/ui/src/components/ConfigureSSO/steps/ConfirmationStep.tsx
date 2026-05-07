@@ -13,7 +13,11 @@ export const ConfirmationStep = (): JSX.Element => {
         elementId={descriptors.configureSSOWizardBody.setId('confirmation')}
       >
         <Step.Body>
-          <Step.Section>
+          <Step.Section
+            sx={{ flex: 1 }}
+            align='center'
+            justify='center'
+          >
             <Text>UI goes here</Text>
           </Step.Section>
         </Step.Body>

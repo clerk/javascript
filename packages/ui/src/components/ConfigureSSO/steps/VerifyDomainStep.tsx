@@ -23,14 +23,16 @@ export const VerifyDomainStep = (): JSX.Element => {
             <InnerStepCounter />
           </Step.Header>
 
-          {!primaryEmailAddress && (
-            <Wizard.Step id='provide-email'>
-              <ProvideEmailStep />
+          <Step.Body>
+            {!primaryEmailAddress && (
+              <Wizard.Step id='provide-email'>
+                <ProvideEmailStep />
+              </Wizard.Step>
+            )}
+            <Wizard.Step id='verify-email-address'>
+              <EnterVerificationCodeStep />
             </Wizard.Step>
-          )}
-          <Wizard.Step id='verify-email-address'>
-            <EnterVerificationCodeStep />
-          </Wizard.Step>
+          </Step.Body>
         </Wizard>
       </Step>
     </Flow.Part>
@@ -52,11 +54,13 @@ export const ProvideEmailStep = (): JSX.Element => {
 
   return (
     <>
-      <Step.Body>
-        <Step.Section>
-          <Text>UI goes here</Text>
-        </Step.Section>
-      </Step.Body>
+      <Step.Section
+        sx={{ flex: 1 }}
+        align='center'
+        justify='center'
+      >
+        <Text>UI goes here</Text>
+      </Step.Section>
 
       <Step.Footer>
         <Step.Footer.Previous
@@ -77,11 +81,14 @@ export const EnterVerificationCodeStep = (): JSX.Element => {
 
   return (
     <>
-      <Step.Body>
-        <Step.Section>
-          <Text>UI goes here</Text>
-        </Step.Section>
-      </Step.Body>
+      <Step.Section
+        sx={{ flex: 1 }}
+        align='center'
+        justify='center'
+      >
+        <Text>UI goes here</Text>
+      </Step.Section>
+
       <Step.Footer>
         <Step.Footer.Previous
           onClick={() => goPrev()}
