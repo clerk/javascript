@@ -6,8 +6,7 @@
  *
  * Like `extract-returns-and-params.mjs`, parameter tables are not hand-built: they use the same `MarkdownThemeContext.partials` as TypeDoc markdown output (`parametersTable` / `propertiesTable`, which call `someType` and therefore pick up `custom-theme.mjs` union/`&lt;code&gt;` behavior). Router + theme are prepared via `prepare-markdown-renderer.mjs` (same idea as `typedoc-plugin-markdown` `render()`).
  *
- * Inline object properties whose members are **only** callables (e.g. `emailCode: { sendCode, verifyCode }`) are omitted from reference-object property tables and each nested callable is written under `methods/` (see `isCallableOnlyNamespaceProperty`).
- * Mixed namespaces (e.g. `emailLink`) emit nested callables as methods and use the `@propertyTableDoc` tag to create a page in /methods that contains a heading and property table (see `buildPropertyTableDocMdx`).
+ * Inline object namespaces tagged **`@extractMethods`** on the parent property are omitted from the main Properties table (see `custom-theme.mjs`). For each direct member: callables become `methods/<parent>-<child>.mdx` via `buildMethodMdx`; non-callables become a heading + property table via `buildPropertyTableDocMdx`.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -27,7 +26,7 @@ import { MarkdownPageEvent, MarkdownTheme } from 'typedoc-plugin-markdown';
 import { removeLineBreaks } from '../node_modules/typedoc-plugin-markdown/dist/libs/utils/index.js';
 
 import typedocConfig from '../typedoc.config.mjs';
-import { isCallableInterfaceProperty, isCallableOnlyNamespaceProperty } from './custom-theme.mjs';
+import { isCallableInterfaceProperty } from './custom-theme.mjs';
 import {
   applyCatchAllMdReplacements,
   applyRelativeLinkReplacements,
@@ -491,7 +490,7 @@ function signatureWithInstantiation(sig, instantiationMap) {
 }
 
 /**
- * Must stay aligned with allowlisted `propertiesTable` filtering in `custom-theme.mjs` (`isCallableInterfaceProperty` / `isInlineNamespaceFullyExtractedToMethods`: extracted here, not listed as properties).
+ * Must stay aligned with allowlisted `propertiesTable` filtering in `custom-theme.mjs` (`isCallableInterfaceProperty` and `@extractMethods`: extracted here, not listed as properties). Nested tables pass `applyAllowlistedPropertyTableRowFilters: false`.
  *
  * @param {import('typedoc').DeclarationReflection} decl
  * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
@@ -511,32 +510,6 @@ function shouldExtractCallableMember(decl, ctx) {
 }
 
 /**
- * Nested callable properties from namespaces that are only callable properties (object of functions only). E.g. `emailCode: { sendCode, verifyCode }` in `SignInFutureResource`.
- *
- * @param {import('typedoc').DeclarationReflection} parentProp
- * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
- * @returns {import('typedoc').DeclarationReflection[]}
- */
-function nestedCallablesFromCallableOnlyNamespace(parentProp, ctx) {
-  if (!isCallableOnlyNamespaceProperty(parentProp, ctx.helpers)) {
-    return [];
-  }
-  const cur = unwrapOptionalLayersSomeType(parentProp.type);
-  if (!(cur instanceof ReflectionType)) {
-    return [];
-  }
-  /** @type {import('typedoc').DeclarationReflection[]} */
-  const out = [];
-  for (const nested of cur.declaration.children ?? []) {
-    if (nested.name.startsWith('__')) {
-      continue;
-    }
-    out.push(/** @type {import('typedoc').DeclarationReflection} */ (nested));
-  }
-  return out;
-}
-
-/**
  * @param {import('typedoc').SomeType | undefined} t
  * @returns {import('typedoc').SomeType | undefined}
  */
@@ -551,59 +524,6 @@ function unwrapOptionalLayersSomeType(t) {
     cur = /** @type {import('typedoc').SomeType} */ (/** @type {import('typedoc').OptionalType} */ (cur).elementType);
   }
   return cur;
-}
-
-/**
- * Nested callables under inline object namespaces that also include non-callables (e.g. `emailLink.sendLink` in `SignInFutureResource`).
- * Callable-only namespaces are handled by `nestedCallablesFromCallableOnlyNamespace` instead.
- *
- * @param {import('typedoc').DeclarationReflection} parentProp
- * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
- * @returns {import('typedoc').DeclarationReflection[]}
- */
-function nestedCallablesFromMixedInlineNamespace(parentProp, ctx) {
-  if (isCallableOnlyNamespaceProperty(parentProp, ctx.helpers)) {
-    return [];
-  }
-  const cur = unwrapOptionalLayersSomeType(parentProp.type);
-  if (!(cur instanceof ReflectionType)) {
-    return [];
-  }
-  /** @type {import('typedoc').DeclarationReflection[]} */
-  const out = [];
-  for (const nested of cur.declaration.children ?? []) {
-    if (nested.name.startsWith('__')) {
-      continue;
-    }
-    const nd = /** @type {import('typedoc').DeclarationReflection} */ (nested);
-    if (isCallableInterfaceProperty(nd, ctx.helpers)) {
-      out.push(nd);
-    }
-  }
-  return out;
-}
-
-/**
- * @param {import('typedoc').DeclarationReflection} parentProp
- * @returns {import('typedoc').DeclarationReflection[]}
- */
-function nestedPropertyTableDocMembers(parentProp) {
-  const cur = unwrapOptionalLayersSomeType(parentProp.type);
-  if (!(cur instanceof ReflectionType)) {
-    return [];
-  }
-  /** @type {import('typedoc').DeclarationReflection[]} */
-  const out = [];
-  for (const nested of cur.declaration.children ?? []) {
-    if (nested.name.startsWith('__')) {
-      continue;
-    }
-    const nd = /** @type {import('typedoc').DeclarationReflection} */ (nested);
-    if (nd.comment?.getTag('@propertyTableDoc')) {
-      out.push(nd);
-    }
-  }
-  return out;
 }
 
 /**
@@ -644,10 +564,15 @@ function buildPropertyTableDocMdx(parentName, nestedDecl, ctx) {
     return '';
   }
   const tableMd = renderMemberTableOmittingExampleBlocks(props, ctx, () =>
-    ctx.partials.propertiesTable(props, {
-      kind: ReflectionKind.Interface,
-      isEventProps: false,
-    }),
+    ctx.partials.propertiesTable(
+      props,
+      /** @type {Parameters<import('typedoc-plugin-markdown').MarkdownThemeContext['partials']['propertiesTable']>[1]} */
+      ({
+        kind: ReflectionKind.Interface,
+        isEventProps: false,
+        applyAllowlistedPropertyTableRowFilters: false,
+      }),
+    ),
   );
   const chunks = [title, '', description, '', tableMd].filter(Boolean);
   const raw = chunks.join('\n\n');
@@ -830,13 +755,7 @@ function renderMemberTableOmittingExampleBlocks(roots, ctx, render) {
 }
 
 /** Block tags omitted from extracted method prose (see `custom-theme.mjs` `comment` partial for theme output). */
-const BLOCK_TAGS_OMITTED_FROM_EXTRACTED_METHOD_PROSE = new Set([
-  '@param',
-  '@typeParam',
-  '@returns',
-  '@experimental',
-  '@propertyTableDoc',
-]);
+const BLOCK_TAGS_OMITTED_FROM_EXTRACTED_METHOD_PROSE = new Set(['@param', '@typeParam', '@returns', '@experimental']);
 
 /**
  * @param {import('typedoc').Comment | undefined} comment
@@ -1249,10 +1168,15 @@ function trySingleNominalParameterTypeSection(sig, ctx) {
     return undefined;
   }
   const tableMd = renderMemberTableOmittingExampleBlocks(props, ctx, () =>
-    ctx.partials.propertiesTable(props, {
-      kind: nominal.typeDecl.kind,
-      isEventProps: false,
-    }),
+    ctx.partials.propertiesTable(
+      props,
+      /** @type {Parameters<import('typedoc-plugin-markdown').MarkdownThemeContext['partials']['propertiesTable']>[1]} */
+      ({
+        kind: nominal.typeDecl.kind,
+        isEventProps: false,
+        applyAllowlistedPropertyTableRowFilters: false,
+      }),
+    ),
   );
   if (!tableMd?.trim()) {
     return undefined;
@@ -1330,6 +1254,59 @@ function buildMethodMdx(decl, ctx, options = {}) {
 }
 
 /**
+ * @param {import('typedoc').DeclarationReflection} decl
+ */
+function hasExtractMethodsModifier(decl) {
+  return Boolean(decl.comment?.hasModifier('@extractMethods'));
+}
+
+/**
+ * Writes `methods/<parent>-<child>.mdx` for each direct member of an `@extractMethods` inline object: callables via {@link buildMethodMdx}, non-callables with a resolvable object shape via {@link buildPropertyTableDocMdx}.
+ *
+ * @param {import('typedoc').DeclarationReflection} parentDecl
+ * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
+ * @param {string} outDir
+ * @returns {number} Number of files written
+ */
+function processExtractMethodsNamespace(parentDecl, ctx, outDir) {
+  const cur = unwrapOptionalLayersSomeType(parentDecl.type);
+  if (!(cur instanceof ReflectionType)) {
+    console.warn(
+      `[extract-methods] @extractMethods on "${parentDecl.name}" requires an inline object (reflection) type; skipping nested extraction`,
+    );
+    return 0;
+  }
+  const parentName = parentDecl.name;
+  let count = 0;
+  for (const nested of cur.declaration?.children ?? []) {
+    if (nested.name.startsWith('__')) {
+      continue;
+    }
+    const nd = /** @type {import('typedoc').DeclarationReflection} */ (nested);
+    const fileSlug = `${toKebabCase(parentName)}-${toKebabCase(nd.name)}`;
+    const filePath = path.join(outDir, `${fileSlug}.mdx`);
+    if (shouldExtractCallableMember(nd, ctx)) {
+      const mdx = buildMethodMdx(nd, ctx, { qualifiedName: `${parentName}.${nd.name}` });
+      if (!mdx) {
+        continue;
+      }
+      fs.writeFileSync(filePath, mdx, 'utf-8');
+      console.log(`[extract-methods] Wrote ${path.relative(path.join(__dirname, '..'), filePath)}`);
+      count++;
+      continue;
+    }
+    const propTableMdx = buildPropertyTableDocMdx(parentName, nd, ctx);
+    if (!propTableMdx) {
+      continue;
+    }
+    fs.writeFileSync(filePath, propTableMdx, 'utf-8');
+    console.log(`[extract-methods] Wrote ${path.relative(path.join(__dirname, '..'), filePath)}`);
+    count++;
+  }
+  return count;
+}
+
+/**
  * @param {string} pageUrl
  * @param {import('typedoc').ProjectReflection} project
  * @param {import('typedoc').Application} app
@@ -1364,6 +1341,11 @@ function extractMethodsForPage(pageUrl, project, app) {
     }
     const childDecl = /** @type {import('typedoc').DeclarationReflection} */ (child);
 
+    if (hasExtractMethodsModifier(childDecl)) {
+      count += processExtractMethodsNamespace(childDecl, ctx, outDir);
+      continue;
+    }
+
     if (shouldExtractCallableMember(childDecl, ctx)) {
       const mdx = buildMethodMdx(childDecl, ctx);
       if (mdx) {
@@ -1373,43 +1355,6 @@ function extractMethodsForPage(pageUrl, project, app) {
         console.log(`[extract-methods] Wrote ${path.relative(path.join(__dirname, '..'), filePath)}`);
         count++;
       }
-    }
-
-    for (const nested of nestedCallablesFromCallableOnlyNamespace(childDecl, ctx)) {
-      const qualifiedName = `${child.name}.${nested.name}`;
-      const fileSlug = `${toKebabCase(child.name)}-${toKebabCase(nested.name)}`;
-      const mdx = buildMethodMdx(nested, ctx, { qualifiedName });
-      if (!mdx) {
-        continue;
-      }
-      const filePath = path.join(outDir, `${fileSlug}.mdx`);
-      fs.writeFileSync(filePath, mdx, 'utf-8');
-      console.log(`[extract-methods] Wrote ${path.relative(path.join(__dirname, '..'), filePath)}`);
-      count++;
-    }
-
-    for (const nested of nestedCallablesFromMixedInlineNamespace(childDecl, ctx)) {
-      const fileSlug = `${toKebabCase(child.name)}-${toKebabCase(nested.name)}`;
-      const mdx = buildMethodMdx(nested, ctx, { qualifiedName: `${child.name}.${nested.name}` });
-      if (!mdx) {
-        continue;
-      }
-      const filePath = path.join(outDir, `${fileSlug}.mdx`);
-      fs.writeFileSync(filePath, mdx, 'utf-8');
-      console.log(`[extract-methods] Wrote ${path.relative(path.join(__dirname, '..'), filePath)}`);
-      count++;
-    }
-
-    for (const nested of nestedPropertyTableDocMembers(childDecl)) {
-      const fileSlug = `${toKebabCase(child.name)}-${toKebabCase(nested.name)}`;
-      const mdx = buildPropertyTableDocMdx(child.name, nested, ctx);
-      if (!mdx) {
-        continue;
-      }
-      const filePath = path.join(outDir, `${fileSlug}.mdx`);
-      fs.writeFileSync(filePath, mdx, 'utf-8');
-      console.log(`[extract-methods] Wrote ${path.relative(path.join(__dirname, '..'), filePath)}`);
-      count++;
     }
   }
   return count;

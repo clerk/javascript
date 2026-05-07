@@ -6,8 +6,6 @@ const CUSTOM_BLOCK_TAGS = [
   '@paramExtension',
   '@experimental',
   '@hideReturns',
-  /** Nested property documented under `methods/` as heading + properties table (see extract-methods `buildPropertyTableDocMdx`). */
-  '@propertyTableDoc',
 ];
 
 /** @type {import("typedoc-plugin-markdown").PluginOptions} */
@@ -108,6 +106,11 @@ const config = {
       ...OptionDefaults.modifierTags.filter(tag => tag !== '@experimental'),
       /** Suppresses the Parameters table in `.typedoc/extract-methods.mjs` method MDX. */
       '@skipParametersSection',
+      /**
+       * On a reference-object property whose value is an inline object type: omit the parent from the main Properties table;
+       * extract each callable member as `methods/<parent>-<child>.mdx` and each non-callable object member as a nested heading + property table (see `.typedoc/extract-methods.mjs`).
+       */
+      '@extractMethods',
       /** Type-only / router hints; not user-facing prose (see `notRenderedTags`). */
       '@inline',
       '@inlineType',

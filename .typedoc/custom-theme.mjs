@@ -911,21 +911,22 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
         return superPartials.referenceType.call(this, model);
       },
       /**
+       * On allowlisted reference-object pages, drop function-valued members and `@extractMethods` namespace parents from property tables (they are documented under `methods/`).
+       * `extract-methods.mjs` reuses this partial for nominal param tables and nested `@extractMethods` docs on the same URL; pass `applyAllowlistedPropertyTableRowFilters: false` so rows are not stripped.
+       *
        * @param {import('typedoc').DeclarationReflection[]} model
-       * @param {Parameters<typeof superPartials.propertiesTable>[1]} [options]
+       * @param {Parameters<typeof superPartials.propertiesTable>[1] & { applyAllowlistedPropertyTableRowFilters?: boolean }} [options]
        */
       propertiesTable: (model, options) => {
         if (!Array.isArray(model)) {
           return superPartials.propertiesTable(/** @type {any} */ (model), options);
         }
 
-        // On allowlisted output pages only, drop function-valued interface/class properties from property tables (property syntax with function types). Other pages unchanged.
         const allowlisted = pageMatchesAllowlist(this.page?.url, REFERENCE_OBJECTS_LIST);
-        const filtered = allowlisted
+        const applyAllowlistFilters = allowlisted && options?.applyAllowlistedPropertyTableRowFilters !== false;
+        const filtered = applyAllowlistFilters
           ? model.filter(
-              prop =>
-                !isCallableInterfaceProperty(prop, this.helpers) &&
-                !isInlineNamespaceFullyExtractedToMethods(prop, this.helpers),
+              prop => !isCallableInterfaceProperty(prop, this.helpers) && !prop.comment?.hasModifier('@extractMethods'),
             )
           : model;
         return superPartials.propertiesTable(filtered, options);
@@ -1568,96 +1569,6 @@ function isCallableInterfaceProperty(prop, helpers) {
 }
 
 /**
- * Inline object namespace whose **direct** members are each documented under `methods/` (either a callable → method MDX, or `@propertyTableDoc` → nested property table). Omits the parent row from reference-object property tables (e.g. `emailCode`, `emailLink` on `SignInFutureResource`).
- *
- * @param {import('typedoc').DeclarationReflection} prop
- * @param {import('typedoc-plugin-markdown').MarkdownThemeContext['helpers']} helpers
- */
-function isInlineNamespaceFullyExtractedToMethods(prop, helpers) {
-  const t =
-    (prop.kind === ReflectionKind.Property || prop.kind === ReflectionKind.Variable) && prop.type
-      ? prop.type
-      : helpers.getDeclarationType(prop);
-  let cur = /** @type {import('typedoc').Type | undefined} */ (t);
-  while (
-    cur &&
-    typeof cur === 'object' &&
-    /** @type {{ type?: string }} */ (cur).type === 'optional' &&
-    'elementType' in cur
-  ) {
-    cur = /** @type {import('typedoc').Type} */ (/** @type {import('typedoc').OptionalType} */ (cur).elementType);
-  }
-  if (!(cur instanceof ReflectionType)) {
-    return false;
-  }
-  const children = cur.declaration?.children ?? [];
-  if (children.length === 0) {
-    return false;
-  }
-  for (const c of children) {
-    if (
-      c.kind !== ReflectionKind.Property &&
-      c.kind !== ReflectionKind.Variable &&
-      c.kind !== ReflectionKind.Accessor
-    ) {
-      return false;
-    }
-    const documentedViaPropertyTable = Boolean(
-      /** @type {import('typedoc').DeclarationReflection} */ (c).comment?.getTag?.('@propertyTableDoc'),
-    );
-    if (!isCallableInterfaceProperty(c, helpers) && !documentedViaPropertyTable) {
-      return false;
-    }
-  }
-  return true;
-}
-
-/**
- * Inline object type whose **direct** members are exclusively callables (e.g. `emailCode: { sendCode, verifyCode }` in `SignInFutureResource`).
- * Used by extract-methods to decide which namespaces need the mixed-namespace nested callable path.
- *
- * For property-table omission, see {@link isInlineNamespaceFullyExtractedToMethods}.
- *
- * @param {import('typedoc').DeclarationReflection} prop
- * @param {import('typedoc-plugin-markdown').MarkdownThemeContext['helpers']} helpers
- */
-function isCallableOnlyNamespaceProperty(prop, helpers) {
-  const t =
-    (prop.kind === ReflectionKind.Property || prop.kind === ReflectionKind.Variable) && prop.type
-      ? prop.type
-      : helpers.getDeclarationType(prop);
-  let cur = /** @type {import('typedoc').SomeType | undefined} */ (t);
-  while (
-    cur &&
-    typeof cur === 'object' &&
-    /** @type {{ type?: string }} */ (cur).type === 'optional' &&
-    'elementType' in cur
-  ) {
-    cur = /** @type {import('typedoc').SomeType} */ (/** @type {import('typedoc').OptionalType} */ (cur).elementType);
-  }
-  if (!(cur instanceof ReflectionType)) {
-    return false;
-  }
-  const children = cur.declaration?.children ?? [];
-  if (children.length === 0) {
-    return false;
-  }
-  for (const c of children) {
-    if (
-      c.kind !== ReflectionKind.Property &&
-      c.kind !== ReflectionKind.Variable &&
-      c.kind !== ReflectionKind.Accessor
-    ) {
-      return false;
-    }
-    if (!isCallableInterfaceProperty(c, helpers)) {
-      return false;
-    }
-  }
-  return true;
-}
-
-/**
  * True when the property's value type is callable (function type, union/intersection of callables, or reference to a type alias of a function type). Object types with properties (e.g. namespaces) stay false.
  * E.g. `navigate: CustomNavigation` in clerk.ts
  *
@@ -1740,4 +1651,4 @@ function isCallablePropertyValueType(t, helpers, seenReflectionIds) {
   return false;
 }
 
-export { isCallableInterfaceProperty, isCallableOnlyNamespaceProperty };
+export { isCallableInterfaceProperty };
