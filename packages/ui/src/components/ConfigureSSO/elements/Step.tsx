@@ -1,7 +1,11 @@
 import { type PropsWithChildren } from 'react';
 
-import { Col, Heading, type LocalizationKey, Text, useLocalizations } from '@/customizables';
+import { Button, Col, descriptors, Heading, Icon, type LocalizationKey, Text, useLocalizations } from '@/customizables';
+import { CaretLeft, CaretRight } from '@/icons';
 import type { PropsOfComponent } from '@/styledSystem';
+
+import { ProfileCardFooter } from './ProfileCard';
+import { useWizard } from './Wizard';
 
 type StepLayoutProps = PropsOfComponent<typeof Col>;
 
@@ -73,8 +77,95 @@ const Body = ({ sx, ...props }: StepBodyProps): JSX.Element => (
   />
 );
 
+type StepFooterProps = {
+  /** Override label for Previous. Defaults to 'Previous'. */
+  previousLabel?: LocalizationKey | string;
+  /** Override label for Continue. Defaults to 'Continue'. */
+  continueLabel?: LocalizationKey | string;
+  /** Hide the Previous button entirely. */
+  hidePrevious?: boolean;
+  /** Hide the Continue button entirely. */
+  hideContinue?: boolean;
+  /** Force-disable Previous regardless of wizard state. Defaults to `useWizard().isFirstStep`. */
+  previousDisabled?: boolean;
+  /** Force-disable Continue. Defaults to `useWizard().isLastStep`. */
+  continueDisabled?: boolean;
+  /** Continue button loading state. */
+  continueLoading?: boolean;
+  /** Click handler for Previous. Defaults to `useWizard().goPrev`. */
+  onPrevious?: () => void | Promise<unknown>;
+  /** Click handler for Continue. Defaults to `useWizard().goNext`. */
+  onContinue?: () => void | Promise<unknown>;
+};
+
+const Footer = ({
+  previousLabel = 'Previous',
+  continueLabel = 'Continue',
+  hidePrevious = false,
+  hideContinue = false,
+  previousDisabled,
+  continueDisabled,
+  continueLoading,
+  onPrevious,
+  onContinue,
+}: StepFooterProps): JSX.Element => {
+  const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
+  const { t } = useLocalizations();
+
+  const previousText = typeof previousLabel === 'string' ? previousLabel : t(previousLabel);
+  const continueText = typeof continueLabel === 'string' ? continueLabel : t(continueLabel);
+
+  const handlePrevious = (): void => {
+    void (onPrevious ? onPrevious() : goPrev());
+  };
+  const handleContinue = (): void => {
+    void (onContinue ? onContinue() : goNext());
+  };
+  const isPreviousDisabled = previousDisabled ?? isFirstStep;
+  const isContinueDisabled = continueDisabled ?? isLastStep;
+
+  return (
+    <ProfileCardFooter>
+      {!hidePrevious && (
+        <Button
+          elementDescriptor={descriptors.configureSSOWizardFooterPreviousButton}
+          variant='outline'
+          size='sm'
+          isDisabled={isPreviousDisabled}
+          onClick={handlePrevious}
+        >
+          <Icon
+            icon={CaretLeft}
+            size='sm'
+            sx={t => ({ marginInlineEnd: t.space.$1 })}
+          />
+          {previousText}
+        </Button>
+      )}
+      {!hideContinue && (
+        <Button
+          elementDescriptor={descriptors.configureSSOWizardFooterContinueButton}
+          variant='solid'
+          size='sm'
+          isDisabled={isContinueDisabled}
+          isLoading={continueLoading}
+          onClick={handleContinue}
+        >
+          {continueText}
+          <Icon
+            icon={CaretRight}
+            size='sm'
+            sx={t => ({ marginInlineStart: t.space.$1 })}
+          />
+        </Button>
+      )}
+    </ProfileCardFooter>
+  );
+};
+
 export const Step = Object.assign(Layout, {
   Section,
   Header,
   Body,
+  Footer,
 });

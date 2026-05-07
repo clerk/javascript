@@ -12,6 +12,8 @@ export const ConfirmationStep = (): JSX.Element => {
         <Step.Body>
           <Text>UI goes here</Text>
         </Step.Body>
+
+        <Step.Footer hideContinue />
       </Step>
     </Flow.Part>
   );

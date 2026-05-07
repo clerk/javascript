@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { FooterActionsProvider, useRegisterWizard } from './FooterActionsContext';
 import type { WizardActiveStep, WizardContextValue, WizardStepProps } from './types';
 import { useWizard, WizardContext } from './WizardContext';
 
@@ -12,26 +11,10 @@ const Root = ({ children }: RootProps): JSX.Element => {
   const parentWizard = React.useContext(WizardContext);
   const isNested = parentWizard !== null;
 
-  // Outermost wizard owns the shared footer-actions registry. Nested
-  // wizards reuse whatever the outer one provided, so registrations
-  // bubble up
-  if (!isNested) {
-    return (
-      <FooterActionsProvider>
-        <RootInner
-          parentWizard={null}
-          isNested={false}
-        >
-          {children}
-        </RootInner>
-      </FooterActionsProvider>
-    );
-  }
-
   return (
     <RootInner
       parentWizard={parentWizard}
-      isNested
+      isNested={isNested}
     >
       {children}
     </RootInner>
@@ -145,11 +128,6 @@ const RootInner = ({ parentWizard, isNested, children }: RootInnerProps): JSX.El
     ],
   );
 
-  // Push this wizard onto the chrome stack so the shared footer can
-  // dispatch Continue / Previous to the *deepest* mounted wizard,
-  // not just the outermost one
-  useRegisterWizard(value);
-
   return <WizardContext.Provider value={value}>{children}</WizardContext.Provider>;
 };
 
@@ -190,8 +168,9 @@ Step.displayName = 'Wizard.Step';
  *
  * The Wizard root renders `{children}` directly — no chrome, no
  * routing, no layout wrapper. Header, Footer, and any step indicator
- * are provided by the host layout via `useWizard()` and
- * `useFooterActions()`.
+ * are provided by the host layout via `useWizard()`. Each step owns
+ * its own footer via `<Step.Footer>`, which reads the nearest wizard
+ * via `useWizard()` so nested-wizard fall-through works automatically.
  */
 export const Wizard = Object.assign(Root, {
   Step,

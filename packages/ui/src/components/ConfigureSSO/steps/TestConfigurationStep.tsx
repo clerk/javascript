@@ -17,6 +17,8 @@ export const TestConfigurationStep = (): JSX.Element => {
         <Step.Body>
           <Text>UI goes here</Text>
         </Step.Body>
+
+        <Step.Footer />
       </Step>
     </Flow.Part>
   );

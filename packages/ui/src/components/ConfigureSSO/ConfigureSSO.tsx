@@ -9,7 +9,6 @@ import { ProfileCard } from '@/elements/ProfileCard';
 import { Route, Switch } from '@/router';
 
 import { ConfigureSSOFlowProvider } from './ConfigureSSOContext';
-import { ConfigureSSOFooter } from './ConfigureSSOFooter';
 import { ConfigureSSOHeader } from './ConfigureSSOHeader';
 import { ConfigureSSONavbar } from './ConfigureSSONavbar';
 import { ConfigureSSOSkeleton } from './ConfigureSSOSkeleton';
@@ -74,8 +73,6 @@ const ConfigureSSOCardContent = () => {
         <ConfigureSSOHeader />
 
         <ConfigureSSOSteps />
-
-        <ConfigureSSOFooter />
       </Wizard>
     </ConfigureSSOFlowProvider>
   );

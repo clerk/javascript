@@ -1,15 +1,8 @@
 import { descriptors, Flow, Text } from '@/customizables';
 
 import { Step } from '../elements/Step';
-import { useRegisterContinueAction, useWizard } from '../elements/Wizard';
 
 export const ProvideEmail = (): JSX.Element => {
-  const { goNext } = useWizard();
-
-  useRegisterContinueAction({
-    handler: () => goNext(),
-  });
-
   return (
     <Flow.Part part='provideEmail'>
       <Step
@@ -24,6 +17,8 @@ export const ProvideEmail = (): JSX.Element => {
         <Step.Body>
           <Text as='p'>UI goes here</Text>
         </Step.Body>
+
+        <Step.Footer />
       </Step>
     </Flow.Part>
   );

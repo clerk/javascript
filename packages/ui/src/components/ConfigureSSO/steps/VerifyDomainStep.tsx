@@ -1,17 +1,8 @@
 import { descriptors, Flow, Text } from '@/customizables';
 
 import { Step } from '../elements/Step';
-import { useRegisterContinueAction, useWizard } from '../elements/Wizard';
 
 export const VerifyDomainStep = (): JSX.Element => {
-  const { goNext } = useWizard();
-
-  useRegisterContinueAction({
-    handler: () => goNext(),
-    // TODO: Implement verification
-    // isDisabled: true,
-  });
-
   return (
     <Flow.Part part='verifyDomain'>
       <Step
@@ -26,6 +17,8 @@ export const VerifyDomainStep = (): JSX.Element => {
         <Step.Body>
           <Text>UI goes here</Text>
         </Step.Body>
+
+        <Step.Footer />
       </Step>
     </Flow.Part>
   );

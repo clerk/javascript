@@ -32,33 +32,6 @@ export interface WizardStepProps {
 }
 
 /**
- * Action registered by the currently active step to be invoked when
- * the "Continue" button in the Wizard footer is clicked
- *
- * If no step registers a `ContinueAction`, the footer falls back to
- * calling `goNext()` directly
- */
-export interface ContinueAction {
-  /**
-   * Called when the user clicks "Continue". Should typically validate /
-   * submit the step's form and then call `goNext()` on success
-   */
-  handler: () => void | Promise<unknown>;
-  /**
-   * Disables the Continue button (e.g. while a form is invalid)
-   */
-  isDisabled?: boolean;
-  /**
-   * Renders a loading state on the Continue button
-   */
-  isLoading?: boolean;
-  /**
-   * Optional override for the Continue button label
-   */
-  label?: LocalizationKey | string;
-}
-
-/**
  * Internal step descriptor mirrored from a Step's props once it has
  * registered itself with the parent wizard. Consumers shouldn't need
  * to construct these directly
