@@ -206,6 +206,11 @@ export const isIS: LocalizationResource = {
     yearAbbreviation: 'ár',
     yearPerUnit: 'Ár á {{unitName}}',
   },
+  configureSSO: {
+    navbar: {
+      title: 'Stilla einnar innskráningar (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Stofna samtök',
     invitePage: {

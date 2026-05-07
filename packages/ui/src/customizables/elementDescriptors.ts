@@ -536,6 +536,16 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'enterpriseConnectionButton',
   'enterpriseConnectionButtonText',
 
+  'configureSSOWizardHeader',
+  'configureSSOWizardHeaderItem',
+  'configureSSOWizardHeaderItemBullet',
+  'configureSSOWizardHeaderItemLabel',
+  'configureSSOWizardHeaderSeparator',
+  'configureSSOWizardBody',
+  'configureSSOWizardStepIndicator',
+  'configureSSOWizardFooterPreviousButton',
+  'configureSSOWizardFooterContinueButton',
+
   'web3SolanaWalletButtonsRoot',
   'web3SolanaWalletButtons',
   'web3SolanaWalletButtonsIconButton',

@@ -155,7 +155,8 @@ function SignInFactorOneInternal(): JSX.Element {
   }
 
   if (showAllStrategies || showForgotPasswordStrategies) {
-    const canGoBack = factorHasLocalStrategy(currentFactor);
+    // Password errors are not recoverable by re-entering the password, so we hide the back button
+    const canGoBack = factorHasLocalStrategy(currentFactor) && !passwordErrorCode;
 
     const toggle = showAllStrategies ? toggleAllStrategies : toggleForgotPasswordStrategies;
     const backHandler = () => {

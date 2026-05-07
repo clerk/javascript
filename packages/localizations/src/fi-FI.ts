@@ -206,6 +206,11 @@ export const fiFI: LocalizationResource = {
     yearAbbreviation: 'v',
     yearPerUnit: 'Vuosi per {{unitName}}',
   },
+  configureSSO: {
+    navbar: {
+      title: 'Määritä kertakirjautuminen (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Luo organisaatio',
     invitePage: {
