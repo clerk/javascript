@@ -259,6 +259,43 @@ describe('clerkMiddleware', () => {
 
       expect(mockCreateClerkClient).not.toHaveBeenCalled();
     });
+
+    it('routes outbound API traffic to the apiUrl override', async () => {
+      const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+        new Response('{"data":[],"total_count":0}', {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        }),
+      );
+
+      authenticateAndDecorateRequest({
+        apiUrl: 'https://api.example.test',
+        secretKey: 'sk_test_....',
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+      });
+
+      const client = mockCreateClerkClient.mock.results[0].value;
+      await client.users.getUserList().catch(() => undefined);
+
+      const calledUrls = fetchSpy.mock.calls.map(call => String(call[0]));
+      expect(calledUrls.some(url => url.startsWith('https://api.example.test'))).toBe(true);
+
+      fetchSpy.mockRestore();
+    });
+
+    it('callback form: builds a per-middleware ClerkClient when the callback returns apiUrl', async () => {
+      await runMiddleware(
+        clerkMiddleware(() => ({
+          apiUrl: 'https://api.example.test',
+          secretKey: 'sk_test_....',
+          publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        })),
+      ).expect(200);
+
+      expect(mockCreateClerkClient).toHaveBeenCalledWith(
+        expect.objectContaining({ apiUrl: 'https://api.example.test' }),
+      );
+    });
   });
 
   it('throws error if clerkMiddleware is not executed before getAuth', async () => {
