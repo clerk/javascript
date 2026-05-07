@@ -1,7 +1,7 @@
-import { Col, descriptors, Flow, Text } from '@/customizables';
+import { descriptors, Flow, Text } from '@/customizables';
 
-import { ProfileCardBody, ProfileCardSection } from '../elements/ProfileCard';
 import { useRegisterContinueAction, useWizard } from '../elements/Wizard';
+import { Step } from './Step';
 
 export const ConfigureCreateApp = (): JSX.Element => {
   const { goNext } = useWizard();
@@ -12,20 +12,19 @@ export const ConfigureCreateApp = (): JSX.Element => {
 
   return (
     <Flow.Part part='configureCreateApp'>
-      <Col
+      <Step
         elementDescriptor={descriptors.configureSSOWizardBody}
         elementId={descriptors.configureSSOWizardBody.setId('create-app')}
-        sx={{ flex: 1, minHeight: 0 }}
       >
-        <ProfileCardBody>
-          <ProfileCardSection
-            title='Configure Okta Workforce'
-            subtitle='Create a new enterprise application in your Okta Dashboard.'
-          >
-            <Text>UI goes here</Text>
-          </ProfileCardSection>
-        </ProfileCardBody>
-      </Col>
+        <Step.Header
+          title='Configure Okta Workforce'
+          description='Create a new enterprise application in your Okta Dashboard.'
+        />
+
+        <Step.Body>
+          <Text>UI goes here</Text>
+        </Step.Body>
+      </Step>
     </Flow.Part>
   );
 };

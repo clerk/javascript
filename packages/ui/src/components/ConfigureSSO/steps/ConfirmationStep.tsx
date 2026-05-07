@@ -1,21 +1,18 @@
-import { Col, descriptors, Flow, Text } from '@/customizables';
+import { descriptors, Flow, Text } from '@/customizables';
 
-import { ProfileCardBody, ProfileCardSection } from '../elements/ProfileCard';
+import { Step } from './Step';
 
 export const ConfirmationStep = (): JSX.Element => {
   return (
     <Flow.Part part='sso-confirmation'>
-      <Col
+      <Step
         elementDescriptor={descriptors.configureSSOWizardBody}
         elementId={descriptors.configureSSOWizardBody.setId('confirmation')}
-        sx={{ flex: 1, minHeight: 0 }}
       >
-        <ProfileCardBody>
-          <ProfileCardSection>
-            <Text>UI goes here</Text>
-          </ProfileCardSection>
-        </ProfileCardBody>
-      </Col>
+        <Step.Body>
+          <Text>UI goes here</Text>
+        </Step.Body>
+      </Step>
     </Flow.Part>
   );
 };

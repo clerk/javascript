@@ -1,7 +1,7 @@
-import { Col, descriptors, Flow, Text } from '@/customizables';
+import { descriptors, Flow, Text } from '@/customizables';
 
-import { ProfileCardBody, ProfileCardSection } from '../elements/ProfileCard';
 import { useRegisterContinueAction, useWizard } from '../elements/Wizard';
+import { Step } from './Step';
 
 export const VerifyDomainStep = (): JSX.Element => {
   const { goNext } = useWizard();
@@ -14,20 +14,19 @@ export const VerifyDomainStep = (): JSX.Element => {
 
   return (
     <Flow.Part part='verifyDomain'>
-      <Col
+      <Step
         elementDescriptor={descriptors.configureSSOWizardBody}
         elementId={descriptors.configureSSOWizardBody.setId('verify-domain')}
-        sx={{ flex: 1, minHeight: 0 }}
       >
-        <ProfileCardBody>
-          <ProfileCardSection
-            title='Verify your domain'
-            subtitle='Verify the domain you want to enable the enterprise connection on.'
-          >
-            <Text>UI goes here</Text>
-          </ProfileCardSection>
-        </ProfileCardBody>
-      </Col>
+        <Step.Header
+          title='Verify your domain'
+          description='Verify the domain you want to enable the enterprise connection on.'
+        />
+
+        <Step.Body>
+          <Text>UI goes here</Text>
+        </Step.Body>
+      </Step>
     </Flow.Part>
   );
 };
