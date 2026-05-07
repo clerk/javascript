@@ -50,6 +50,10 @@ minimumReleaseAgeExclude:
   # Renovate security update: astro@6.1.6
   - astro@6.1.6
 
+overrides:
+  # temporary override until we're able to merge our tsdown migration PR
+  rolldown: 1.0.0-beta.47
+
 trustPolicy: no-downgrade
 trustPolicyExclude:
   # Their 4.x package was published with provenance and this
