@@ -1,7 +1,7 @@
 import { useReverification } from '@clerk/shared/react';
 import React from 'react';
 
-import { Box, Button, Col, descriptors, Flex, Flow, Spinner, Text } from '@/customizables';
+import { Badge, Box, Button, Col, descriptors, Flex, Flow, Spinner, Text } from '@/customizables';
 import { useCardState } from '@/elements/contexts';
 import { handleError } from '@/utils/errorHandler';
 
@@ -32,7 +32,7 @@ export const ConfirmationStep = (): JSX.Element => {
   if (!enterpriseConnection) {
     return (
       <Flow.Part part='sso-confirmation'>
-        <StepLayout>
+        <StepLayout hideStepIndicator>
           <Flex
             align='center'
             justify='center'
@@ -81,12 +81,21 @@ export const ConfirmationStep = (): JSX.Element => {
 
   return (
     <Flow.Part part='sso-confirmation'>
-      <StepLayout>
-        <Col sx={t => ({ gap: t.space.$5, paddingBlockEnd: t.space.$4 })}>
-          <Heading
-            isActive={isActive}
-            domain={domain}
-          />
+      <StepLayout hideStepIndicator>
+        <Col sx={t => ({ gap: 0, paddingBlockEnd: t.space.$4 })}>
+          <Section>
+            <SectionRow
+              label='SSO Status'
+              value={
+                <Badge
+                  colorScheme={isActive ? 'success' : 'danger'}
+                  textVariant='caption'
+                >
+                  {isActive ? 'Active' : 'Inactive'}
+                </Badge>
+              }
+            />
+          </Section>
 
           <Section>
             <SectionRow
@@ -101,9 +110,31 @@ export const ConfirmationStep = (): JSX.Element => {
             />
           </Section>
 
+          {!isActive && domain ? (
+            <Section>
+              <SectionRow
+                label='Domain'
+                value={
+                  <Text
+                    as='span'
+                    sx={t => ({
+                      fontSize: t.fontSizes.$sm,
+                      color: t.colors.$primary500,
+                      textDecoration: 'underline',
+                      textUnderlineOffset: '2px',
+                    })}
+                  >
+                    {domain}
+                  </Text>
+                }
+              />
+            </Section>
+          ) : null}
+
           <Section>
             <SectionRow
               label='Configuration details'
+              align='start'
               value={
                 <Col sx={t => ({ gap: t.space.$2x5 })}>
                   <DetailRow
@@ -129,10 +160,7 @@ export const ConfirmationStep = (): JSX.Element => {
                       padding: 0,
                       color: t.colors.$colorMutedForeground,
                       fontSize: t.fontSizes.$sm,
-                      textDecoration: 'underline',
-                      textDecorationStyle: 'dotted',
-                      textUnderlineOffset: '2px',
-                      '&:hover': { color: t.colors.$colorForeground },
+                      '&:hover': { color: t.colors.$colorForeground, textDecoration: 'underline' },
                     })}
                   >
                     Configure again
@@ -172,7 +200,11 @@ export const ConfirmationStep = (): JSX.Element => {
             <Text
               as='p'
               variant='body'
-              sx={t => ({ color: t.colors.$danger500, fontSize: t.fontSizes.$sm })}
+              sx={t => ({
+                color: t.colors.$danger500,
+                fontSize: t.fontSizes.$sm,
+                paddingBlockStart: t.space.$3,
+              })}
             >
               {card.error}
             </Text>
@@ -182,55 +214,6 @@ export const ConfirmationStep = (): JSX.Element => {
     </Flow.Part>
   );
 };
-
-interface HeadingProps {
-  isActive: boolean;
-  domain: string;
-}
-
-const Heading = ({ isActive, domain }: HeadingProps): JSX.Element => (
-  <Col sx={t => ({ gap: t.space.$1 })}>
-    <Text
-      as='p'
-      sx={t => ({
-        color: t.colors.$colorForeground,
-        fontSize: t.fontSizes.$lg,
-        fontWeight: t.fontWeights.$semibold,
-      })}
-    >
-      Your SSO is{' '}
-      <Text
-        as='span'
-        sx={t => ({
-          color: isActive ? t.colors.$success500 : t.colors.$warning500,
-          fontWeight: t.fontWeights.$semibold,
-        })}
-      >
-        {isActive ? 'active' : 'inactive'}
-      </Text>{' '}
-      {domain ? (
-        <>
-          on{' '}
-          <Text
-            as='span'
-            sx={t => ({ color: t.colors.$colorForeground, fontWeight: t.fontWeights.$semibold })}
-          >
-            {domain}
-          </Text>
-        </>
-      ) : null}
-    </Text>
-    {!isActive ? (
-      <Text
-        as='p'
-        variant='body'
-        sx={t => ({ color: t.colors.$colorMutedForeground })}
-      >
-        Use the toggle below to enable SSO.
-      </Text>
-    ) : null}
-  </Col>
-);
 
 const Section = ({ children }: { children: React.ReactNode }): JSX.Element => (
   <Box
@@ -249,11 +232,17 @@ const Section = ({ children }: { children: React.ReactNode }): JSX.Element => (
 interface SectionRowProps {
   label: string;
   value: React.ReactNode;
+  /**
+   * Vertical alignment of the label against the value. Use `'start'`
+   * for rows whose value is multi-line (e.g. "Configuration details");
+   * single-line values look right with the default `'center'`
+   */
+  align?: 'start' | 'center';
 }
 
-const SectionRow = ({ label, value }: SectionRowProps): JSX.Element => (
+const SectionRow = ({ label, value, align = 'center' }: SectionRowProps): JSX.Element => (
   <Flex
-    align='start'
+    align={align}
     sx={t => ({
       gap: t.space.$4,
     })}
@@ -330,7 +319,10 @@ const Toggle = ({ isActive, isLoading, onClick }: ToggleProps): JSX.Element => (
     aria-pressed={isActive}
     sx={t => ({
       position: 'relative',
-      display: 'inline-flex',
+      // `flex` (not `inline-flex`) so the toggle is block-level and
+      // doesn't sit on the text-baseline of its parent — that was
+      // pushing the pill a couple of pixels below the row's center
+      display: 'flex',
       alignItems: 'center',
       width: t.sizes.$9,
       height: t.sizes.$5,

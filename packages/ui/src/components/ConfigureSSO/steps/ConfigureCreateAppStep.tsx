@@ -1,4 +1,4 @@
-import { useUser } from '@clerk/shared/react';
+import { useSession, useUser } from '@clerk/shared/react';
 import React from 'react';
 
 import { Box, Button, Col, descriptors, Flex, Flow, Icon, Input, Spinner, Text } from '@/customizables';
@@ -19,6 +19,10 @@ export const ConfigureCreateApp = (): JSX.Element => {
     useConfigureSSOFlow();
   const { user } = useUser();
   const card = useCardState();
+  // Active org id straight off the session — `useOrganization()` would
+  // subscribe to the organization resource and we only need the id
+  const { session } = useSession();
+  const activeOrganizationId = session?.lastActiveOrganizationId ?? undefined;
 
   const primaryEmail = user?.primaryEmailAddress?.emailAddress ?? '';
   const emailDomain = getEmailDomain(primaryEmail);
@@ -51,6 +55,7 @@ export const ConfigureCreateApp = (): JSX.Element => {
     createEnterpriseConnection({
       provider: selectedProvider,
       name: emailDomain,
+      organizationId: activeOrganizationId,
     })
       .catch(err => handleError(err as Error, [], card.setError))
       .finally(() => setIsCreating(false));

@@ -1,4 +1,4 @@
-import { __internal_useUserEnterpriseConnections, useOrganization, useUser } from '@clerk/shared/react';
+import { __internal_useUserEnterpriseConnections, useSession, useUser } from '@clerk/shared/react';
 import type { __experimental_ConfigureSSOProps } from '@clerk/shared/types';
 import React from 'react';
 
@@ -53,13 +53,16 @@ const AuthenticatedContent = withCoreUserGuard(() => {
   const { parsedOptions } = useAppearance();
   const hasLogo = Boolean(parsedOptions.logoImageUrl || logoImageUrl);
 
-  // Gate the entire wizard behind the org-level permission. When the
-  // user can't manage enterprise connections, we still render the
-  // outer sidebar/title chrome but replace the wizard with a
-  // permissions-error message so the layout stays consistent
-  const canManageEnterpriseConnections = useProtect({
+  const { session } = useSession();
+  const hasActiveOrganization = Boolean(session?.lastActiveOrganizationId);
+
+  // Gate the entire wizard behind the org-level permission. `useProtect`
+  // must be called unconditionally to satisfy the rules of hooks; we
+  // combine its result with `hasActiveOrganization` afterwards
+  const hasManagePermission = useProtect({
     permission: 'org:sys_enterprise_connections:manage',
   });
+  const canManageEnterpriseConnections = hasActiveOrganization && hasManagePermission;
 
   const {
     data: enterpriseConnections,
@@ -69,7 +72,7 @@ const AuthenticatedContent = withCoreUserGuard(() => {
     deleteEnterpriseConnection,
     revalidate: revalidateEnterpriseConnections,
   } = __internal_useUserEnterpriseConnections({
-    enabled: canManageEnterpriseConnections,
+    enabled: true,
   });
   // Currently FAPI only supports one enterprise connection per user
   const enterpriseConnection = enterpriseConnections?.[0];
@@ -148,7 +151,7 @@ const AuthenticatedContent = withCoreUserGuard(() => {
             flex: 1,
           })}
         >
-          {canManageEnterpriseConnections ? (
+          {canManageEnterpriseConnections || !hasActiveOrganization ? (
             <ConfigureSSOFlowProvider
               enterpriseConnection={enterpriseConnection}
               isLoading={isLoadingEnterpriseConnections}
@@ -185,6 +188,7 @@ const ConfigureSSOSteps = () => {
           id='select-provider'
           path='select-provider'
           label='Select provider'
+          hideFromBreadcrumb
         >
           <SelectProviderStep />
         </ConfigureSSOWizard.Step>
@@ -237,9 +241,18 @@ const ConfigureSSOSteps = () => {
 };
 
 const OrganizationSidebarSubtitle = () => {
-  const { organization } = useOrganization();
+  // Resolve the active org's name without `useOrganization()` (which
+  // would subscribe to the organization resource). The active id lives
+  // on the session, and the user already carries the matching
+  // membership eagerly, so we can join the two without an extra fetch
+  const { user } = useUser();
+  const { session } = useSession();
+  const activeOrganizationId = session?.lastActiveOrganizationId ?? null;
+  const activeOrganization = activeOrganizationId
+    ? user?.organizationMemberships.find(m => m.organization.id === activeOrganizationId)?.organization
+    : undefined;
 
-  if (!organization) {
+  if (!activeOrganization) {
     return null;
   }
 
@@ -249,7 +262,7 @@ const OrganizationSidebarSubtitle = () => {
       truncate
       sx={t => ({ color: t.colors.$colorMutedForeground })}
     >
-      {organization?.name}
+      {activeOrganization.name}
     </Text>
   );
 };

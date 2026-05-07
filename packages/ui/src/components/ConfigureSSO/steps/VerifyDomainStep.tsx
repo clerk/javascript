@@ -1,4 +1,4 @@
-import { useOrganization, useReverification, useUser } from '@clerk/shared/react';
+import { useReverification, useSession, useUser } from '@clerk/shared/react';
 import React from 'react';
 
 import { Col, Flow, Heading, Icon, Input, localizationKeys, Text, useLocalizations } from '@/customizables';
@@ -18,19 +18,23 @@ export const VerifyDomainStep = (): JSX.Element | null => {
   const card = useCardState();
   const { t } = useLocalizations();
   const { user } = useUser();
-  const { organization } = useOrganization();
+  const { session } = useSession();
+  const activeOrganizationId = session?.lastActiveOrganizationId ?? null;
 
   const emailToVerify =
     user?.primaryEmailAddress ?? user?.emailAddresses?.find(e => e.verification.status !== 'verified');
   const isVerified = emailToVerify?.verification.status === 'verified';
   const isAlreadyPrimary = Boolean(emailToVerify && emailToVerify.id === user?.primaryEmailAddressId);
 
+  // Domain that the existing connection is registered for.
+  const conflictingDomain = enterpriseConnection?.domains?.[0] ?? getEmailDomain(emailToVerify?.emailAddress ?? '');
+
   // The user's domain is already wired to an enterprise connection that
   // doesn't belong to the org they're currently configuring. They can't
   // take it over from here — they need the existing app's owner to
   // re-configure (or share) the connection
   const isDomainTakenByOtherOrg = Boolean(
-    isVerified && enterpriseConnection && enterpriseConnection.organizationId !== (organization?.id ?? null),
+    isVerified && enterpriseConnection && enterpriseConnection.organizationId !== activeOrganizationId,
   );
 
   const prepareEmailVerification = useReverification(() =>
@@ -147,14 +151,16 @@ export const VerifyDomainStep = (): JSX.Element | null => {
                   textVariant='h1'
                   sx={t => ({ color: t.colors.$colorForeground, fontSize: t.fontSizes.$md })}
                 >
-                  That domain already has an SSO connection
+                  {conflictingDomain
+                    ? `This domain (${conflictingDomain}) already has an SSO connection`
+                    : 'This domain already has an SSO connection'}
                 </Heading>
                 <Text
                   as='p'
                   variant='body'
                   sx={t => ({ color: t.colors.$colorMutedForeground })}
                 >
-                  Contact the application's administrator to get access through the existing connection.
+                  Contact the application&apos;s administrator to get access through the existing connection.
                 </Text>
               </Col>
             </>
@@ -217,3 +223,11 @@ export const VerifyDomainStep = (): JSX.Element | null => {
     </Flow.Part>
   );
 };
+
+function getEmailDomain(emailAddress: string): string {
+  const at = emailAddress.lastIndexOf('@');
+  if (at === -1) {
+    return '';
+  }
+  return emailAddress.slice(at + 1).toLowerCase();
+}

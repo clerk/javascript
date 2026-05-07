@@ -55,6 +55,7 @@ function extractSteps(children: React.ReactNode): ConfigureSSOWizardActiveStep[]
       path: props.path,
       label: props.label,
       isCompleted: props.isCompleted,
+      hideFromBreadcrumb: props.hideFromBreadcrumb,
       children: props.children,
     });
   });
@@ -265,11 +266,15 @@ const StepBody = ({ step }: { step: ConfigureSSOWizardActiveStep }): JSX.Element
 /**
  * Numbered breadcrumb of the outermost wizard's active steps.
  * Completed and current steps are clickable for backwards navigation,
- * future steps are disabled
+ * future steps are disabled. Steps marked with `hideFromBreadcrumb`
+ * are silently skipped over and the visible steps are renumbered, so
+ * dropping a hidden step from the wizard later doesn't shift numbers
  */
 const Header = (): JSX.Element => {
   const { activeSteps, currentIndex, isLoading, goToStep } = useConfigureSSOWizard();
   const { t } = useLocalizations();
+
+  const visibleSteps = React.useMemo(() => activeSteps.filter(s => !s.hideFromBreadcrumb), [activeSteps]);
 
   return (
     <Flex
@@ -284,10 +289,15 @@ const Header = (): JSX.Element => {
         flexWrap: 'wrap',
       })}
     >
-      {activeSteps.map((step, index) => {
-        const isCurrent = index === currentIndex;
-        const isCompleted = step.isCompleted ?? index < currentIndex;
-        const isReachable = isCompleted || index <= currentIndex;
+      {visibleSteps.map((step, visibleIndex) => {
+        // `currentIndex` is computed against the full `activeSteps`
+        // list, so look the visible step back up there to keep
+        // current/completed/reachable consistent with the wizard's
+        // own routing state
+        const actualIndex = activeSteps.findIndex(s => s.id === step.id);
+        const isCurrent = actualIndex === currentIndex;
+        const isCompleted = step.isCompleted ?? actualIndex < currentIndex;
+        const isReachable = isCompleted || actualIndex <= currentIndex;
         const labelText = step.label ? (typeof step.label === 'string' ? step.label : t(step.label)) : '';
 
         return (
@@ -342,7 +352,7 @@ const Header = (): JSX.Element => {
                       size='xs'
                     />
                   ) : (
-                    index + 1
+                    visibleIndex + 1
                   )}
                 </Flex>
                 <Text
@@ -356,7 +366,7 @@ const Header = (): JSX.Element => {
                 </Text>
               </Button>
             )}
-            {index < activeSteps.length - 1 && (
+            {visibleIndex < visibleSteps.length - 1 && (
               <Icon
                 elementDescriptor={descriptors.configureSSOWizardHeaderSeparator}
                 icon={CaretRight}

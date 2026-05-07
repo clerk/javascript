@@ -32,6 +32,14 @@ export interface ConfigureSSOWizardStepProps {
    */
   isCompleted?: boolean;
   /**
+   * Hides this step from the wizard breadcrumb/header while keeping
+   * it routable. Useful for "pre-flight" steps like provider
+   * selection that shouldn't be visible (or clickable) once the user
+   * has moved past them — and to avoid the visible step count
+   * shifting when the step is later dropped from the wizard
+   */
+  hideFromBreadcrumb?: boolean;
+  /**
    * The step body. Anything React, including a nested
    * `<ConfigureSSOWizard>` for inner sub-steps
    */
@@ -74,6 +82,7 @@ export interface ConfigureSSOWizardActiveStep {
   path: string;
   label?: LocalizationKey | string;
   isCompleted?: boolean;
+  hideFromBreadcrumb?: boolean;
   children: React.ReactNode;
 }
 
