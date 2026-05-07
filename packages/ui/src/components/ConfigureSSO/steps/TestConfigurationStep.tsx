@@ -18,8 +18,18 @@ export const TestConfigurationStep = (): JSX.Element => {
         />
 
         <Step.Body>
+          <Step.Section
+            sx={theme => ({
+              borderBottomWidth: theme.borderWidths.$normal,
+              borderBottomStyle: theme.borderStyles.$solid,
+              borderBottomColor: theme.colors.$borderAlpha100,
+            })}
+          >
+            <Text>Test your SSO URL</Text>
+          </Step.Section>
+
           <Step.Section>
-            <Text>UI goes here</Text>
+            <Text>Your test results</Text>
           </Step.Section>
         </Step.Body>
 
