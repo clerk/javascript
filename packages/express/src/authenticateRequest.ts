@@ -1,3 +1,4 @@
+import { createClerkClient } from '@clerk/backend';
 import type { RequestState } from '@clerk/backend/internal';
 import { AuthStatus, createClerkRequest } from '@clerk/backend/internal';
 import { clerkFrontendApiProxy, DEFAULT_PROXY_PATH, stripTrailingSlashes } from '@clerk/backend/proxy';
@@ -111,8 +112,27 @@ const absoluteProxyUrl = (relativeOrAbsoluteUrl: string, baseUrl: string): strin
   return new URL(relativeOrAbsoluteUrl, baseUrl).toString();
 };
 
+// `apiUrl` and `apiVersion` are pinned at client construction time inside
+// `@clerk/backend`'s `createAuthenticateRequest` factory (build-time values
+// override runtime ones). The default singleton in `./clerkClient` is built
+// from env only, so passing these via `clerkMiddleware()` would be silently
+// ignored. When the caller hasn't supplied their own `clerkClient` but did
+// pass `apiUrl`/`apiVersion`, build a per-middleware client with those values.
+const resolveDefaultClerkClient = (options: ClerkMiddlewareOptions) => {
+  if (!options.apiUrl && !options.apiVersion) {
+    return defaultClerkClient;
+  }
+  const env = { ...loadApiEnv(), ...loadClientEnv() };
+  return createClerkClient({
+    ...env,
+    ...(options.apiUrl ? { apiUrl: options.apiUrl } : {}),
+    ...(options.apiVersion ? { apiVersion: options.apiVersion } : {}),
+    userAgent: `${PACKAGE_NAME}@${PACKAGE_VERSION}`,
+  });
+};
+
 export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions = {}): RequestHandler => {
-  const clerkClient = options.clerkClient || defaultClerkClient;
+  const clerkClient = options.clerkClient || resolveDefaultClerkClient(options);
 
   // Extract proxy configuration
   const frontendApiProxy = options.frontendApiProxy;

@@ -12,7 +12,19 @@ vi.mock('@clerk/backend/proxy', async () => {
   };
 });
 
-import { authenticateRequest } from '../authenticateRequest';
+const { mockCreateClerkClient } = vi.hoisted(() => ({
+  mockCreateClerkClient: vi.fn(),
+}));
+vi.mock('@clerk/backend', async () => {
+  const actual = (await vi.importActual('@clerk/backend')) as typeof import('@clerk/backend');
+  mockCreateClerkClient.mockImplementation(actual.createClerkClient);
+  return {
+    ...actual,
+    createClerkClient: mockCreateClerkClient,
+  };
+});
+
+import { authenticateAndDecorateRequest, authenticateRequest } from '../authenticateRequest';
 import { clerkMiddleware } from '../clerkMiddleware';
 import { getAuth } from '../getAuth';
 import { assertNoDebugHeaders, assertSignedOutDebugHeaders, runMiddleware, runMiddlewareOnPath } from './helpers';
@@ -201,6 +213,52 @@ describe('clerkMiddleware', () => {
     expect(forwarded).not.toHaveProperty('clerkClient');
     expect(forwarded).not.toHaveProperty('debug');
     expect(forwarded).not.toHaveProperty('frontendApiProxy');
+  });
+
+  describe('apiUrl/apiVersion default-client construction', () => {
+    beforeEach(() => {
+      mockCreateClerkClient.mockClear();
+    });
+
+    it('builds a per-middleware ClerkClient with apiUrl when no custom clerkClient is supplied', () => {
+      authenticateAndDecorateRequest({
+        apiUrl: 'https://api.example.test',
+        secretKey: 'sk_test_....',
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+      });
+
+      expect(mockCreateClerkClient).toHaveBeenCalledWith(
+        expect.objectContaining({ apiUrl: 'https://api.example.test' }),
+      );
+    });
+
+    it('builds a per-middleware ClerkClient with apiVersion when no custom clerkClient is supplied', () => {
+      authenticateAndDecorateRequest({
+        apiVersion: 'v2',
+        secretKey: 'sk_test_....',
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+      });
+
+      expect(mockCreateClerkClient).toHaveBeenCalledWith(expect.objectContaining({ apiVersion: 'v2' }));
+    });
+
+    it('does not call createClerkClient at construction when apiUrl/apiVersion are not set', () => {
+      authenticateAndDecorateRequest({ secretKey: 'sk_test_....' });
+
+      expect(mockCreateClerkClient).not.toHaveBeenCalled();
+    });
+
+    it('does not build a per-middleware client when the caller supplies their own clerkClient', () => {
+      const customClient = { authenticateRequest: vi.fn() } as any;
+
+      authenticateAndDecorateRequest({
+        apiUrl: 'https://api.example.test',
+        apiVersion: 'v2',
+        clerkClient: customClient,
+      });
+
+      expect(mockCreateClerkClient).not.toHaveBeenCalled();
+    });
   });
 
   it('throws error if clerkMiddleware is not executed before getAuth', async () => {
