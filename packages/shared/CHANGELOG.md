@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.10.1
+
+### Patch Changes
+
+- Fix OAuth consent component and hook related types. ([#8483](https://github.com/clerk/javascript/pull/8483)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
 ## 4.10.0
 
 ### Minor Changes
