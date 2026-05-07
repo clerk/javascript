@@ -14,7 +14,7 @@ export const SelectProviderStep = (): JSX.Element => {
       >
         <Step.Header
           title='Select provider'
-          description='Select the provider you are going to setup SSO for.'
+          description='Select the provider you are going to setup SSO for'
         />
 
         <Step.Body>

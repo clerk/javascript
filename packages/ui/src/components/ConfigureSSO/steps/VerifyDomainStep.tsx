@@ -18,7 +18,7 @@ export const VerifyDomainStep = (): JSX.Element => {
         <Wizard>
           <Step.Header
             title='Verify your email address'
-            description='Verify the domain to configure your enterprise connection.'
+            description='Verify the domain to configure your enterprise connection'
           >
             <InnerStepCounter />
           </Step.Header>
