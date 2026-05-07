@@ -1,3 +1,4 @@
+import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import type { SignUpResource } from '@clerk/shared/types';
 import { describe, expect, it, vi } from 'vitest';
@@ -450,6 +451,45 @@ describe('SignUpStart', () => {
           unsafeMetadata: { foo: 'bar', nested: { value: 123 } },
         }),
       );
+    });
+
+    it('does not throw when unsafeMetadata is set and signUp.create rejects with an API error', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword();
+      });
+      fixtures.signUp.create.mockRejectedValueOnce(
+        new ClerkAPIResponseError('Error', {
+          data: [
+            {
+              code: 'form_password_pwned',
+              long_message: 'Password has been found in an online data breach.',
+              message: 'Password has been found in an online data breach.',
+              meta: { param_name: 'password' },
+            },
+          ],
+          status: 422,
+        }),
+      );
+      props.setProps({ unsafeMetadata: { foo: 'bar' } });
+
+      Object.defineProperty(window, 'location', {
+        writable: true,
+        value: { href: 'http://localhost/sign-up?__clerk_ticket=test_ticket' },
+      });
+      Object.defineProperty(window, 'history', {
+        writable: true,
+        value: { replaceState: vi.fn() },
+      });
+
+      render(
+        <CardStateProvider>
+          <SignUpStart />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      await waitFor(() => expect(fixtures.signUp.create).toHaveBeenCalled());
     });
 
     it('removes the ticket from the url when completing the sign up', async () => {
