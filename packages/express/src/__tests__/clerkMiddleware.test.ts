@@ -1,3 +1,4 @@
+import type * as ClerkBackend from '@clerk/backend';
 import type { Request, RequestHandler, Response } from 'express';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -16,7 +17,7 @@ const { mockCreateClerkClient } = vi.hoisted(() => ({
   mockCreateClerkClient: vi.fn(),
 }));
 vi.mock('@clerk/backend', async () => {
-  const actual = (await vi.importActual('@clerk/backend')) as typeof import('@clerk/backend');
+  const actual = await vi.importActual<typeof ClerkBackend>('@clerk/backend');
   mockCreateClerkClient.mockImplementation(actual.createClerkClient);
   return {
     ...actual,
@@ -277,8 +278,17 @@ describe('clerkMiddleware', () => {
       const client = mockCreateClerkClient.mock.results[0].value;
       await client.users.getUserList().catch(() => undefined);
 
-      const calledUrls = fetchSpy.mock.calls.map(call => String(call[0]));
-      expect(calledUrls.some(url => url.startsWith('https://api.example.test'))).toBe(true);
+      const calledUrls = fetchSpy.mock.calls.map(call => {
+        const input = call[0];
+        if (typeof input === 'string') {
+          return input;
+        }
+        if (input instanceof URL) {
+          return input.href;
+        }
+        return input.url;
+      });
+      expect(calledUrls.some(url => new URL(url).origin === 'https://api.example.test')).toBe(true);
 
       fetchSpy.mockRestore();
     });
