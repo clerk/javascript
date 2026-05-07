@@ -33,6 +33,7 @@ import {
   stripReferenceObjectPropertiesSection,
 } from './custom-plugin.mjs';
 import { prepareMarkdownRenderer } from './prepare-markdown-renderer.mjs';
+import { commentContainsTodo } from './comment-utils.mjs';
 import { REFERENCE_OBJECTS_LIST, REFERENCE_OBJECT_CONFIG } from './reference-objects.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -761,7 +762,7 @@ const BLOCK_TAGS_OMITTED_FROM_EXTRACTED_METHOD_PROSE = new Set(['@param', '@type
  * @param {import('typedoc').Comment | undefined} comment
  */
 function commentSummaryAndBody(comment) {
-  if (!comment) {
+  if (!comment || commentContainsTodo(comment)) {
     return '';
   }
   const summary = displayPartsToString(comment.summary).trim();

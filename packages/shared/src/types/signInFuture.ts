@@ -42,6 +42,7 @@ export interface SignInFutureCreateParams {
   signUpIfMissing?: boolean;
 }
 
+/** Parameters for submitting a password to sign-in. */
 export type SignInFuturePasswordParams = {
   /**
    * The user's password. Only supported if
@@ -51,8 +52,7 @@ export type SignInFuturePasswordParams = {
 } & (
   | {
       /**
-       * The authentication identifier for the sign-in. This can be the value of the user's email address, phone number,
-       * username, or Web3 wallet address.
+       * The authentication identifier for the sign-in (email address, phone number, username, or Web3 wallet address). Provide exactly one of `identifier`, `emailAddress`, or `phoneNumber`. Omit all when a sign-in already exists to use the current identifier.
        */
       identifier: string;
       emailAddress?: never;
@@ -60,8 +60,7 @@ export type SignInFuturePasswordParams = {
     }
   | {
       /**
-       * The user's email address. Only supported if [Email address](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#email)
-       * is enabled.
+       * The user's email address. Only supported if [Email address](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#email) is enabled. Provide exactly one of `identifier`, `emailAddress`, or `phoneNumber`.
        */
       emailAddress: string;
       identifier?: never;
@@ -69,8 +68,7 @@ export type SignInFuturePasswordParams = {
     }
   | {
       /**
-       * The user's phone number in [E.164 format](https://en.wikipedia.org/wiki/E.164). Only supported if
-       * [phone number](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#phone) is enabled.
+       * The user's phone number in [E.164 format](https://en.wikipedia.org/wiki/E.164). Only supported if [phone number](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#phone) is enabled. Provide exactly one of `identifier`, `emailAddress`, or `phoneNumber`.
        */
       phoneNumber: string;
       identifier?: never;
@@ -162,15 +160,14 @@ export type SignInFuturePhoneCodeSendParams = {
 } & (
   | {
       /**
-       * The user's phone number in [E.164 format](https://en.wikipedia.org/wiki/E.164). Only supported if
-       * [phone number](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#phone) is enabled.
+       * The user's phone number in [E.164 format](https://en.wikipedia.org/wiki/E.164). Only supported if [phone number](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#phone) is enabled. Provide either `phoneNumber` or `phoneNumberId`, not both. Omit both when a sign-in already exists.
        */
       phoneNumber?: string;
       phoneNumberId?: never;
     }
   | {
       /**
-       * The ID for the user's phone number that will receive a message with the one-time authentication code.
+       * The ID for the user's phone number that will receive a message with the one-time authentication code. Provide either `phoneNumber` or `phoneNumberId`, not both. Omit both when a sign-in already exists.
        */
       phoneNumberId: string;
       phoneNumber?: never;
@@ -204,12 +201,12 @@ export interface SignInFutureSSOParams {
    */
   redirectUrl: string;
   /**
+   * The URL to redirect to if a session was not created, and needs additional information.
    * TODO @revamp-hooks: This should be handled by FAPI instead.
    */
   redirectCallbackUrl: string;
   /**
-   * If provided, a `Window` to use for the OAuth flow. Useful in instances where you cannot navigate to an
-   * OAuth provider.
+   * If provided, a `Window` to use for the OAuth flow. Useful in instances where you cannot navigate to an OAuth provider.
    *
    * @example
    * ```ts
@@ -222,13 +219,12 @@ export interface SignInFutureSSOParams {
    */
   popup?: Window;
   /**
-   * Optional for `oauth_<provider>` or `enterprise_sso` strategies. The value to pass to the
-   * [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.)
-   * in the generated OAuth redirect URL.
+   * The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL.
    */
   oidcPrompt?: string;
   /**
    * @experimental
+   * The identifier of the enterprise connection to target when using the `enterprise_sso` strategy.
    */
   enterpriseConnectionId?: string;
   /**
@@ -240,7 +236,7 @@ export interface SignInFutureSSOParams {
 /** @document */
 export interface SignInFutureMFAPhoneCodeVerifyParams {
   /**
-   * The one-time code that was sent to the user as part of the `signIn.mfa.sendPhoneCode()` method.
+   * The one-time code that was sent to the user.
    */
   code: string;
 }
@@ -248,7 +244,7 @@ export interface SignInFutureMFAPhoneCodeVerifyParams {
 /** @document */
 export interface SignInFutureMFAEmailCodeVerifyParams {
   /**
-   * The one-time code that was sent to the user as part of the `signIn.mfa.sendEmailCode()` method.
+   * The one-time code that was sent to the user.
    */
   code: string;
 }
@@ -264,7 +260,7 @@ export interface SignInFutureTOTPVerifyParams {
 /** @document */
 export interface SignInFutureBackupCodeVerifyParams {
   /**
-   * The backup code that was provided to the user when they set up two-step authentication.
+   * The backup code that was provided to the user when they set up backup codes.
    */
   code: string;
 }
@@ -272,8 +268,7 @@ export interface SignInFutureBackupCodeVerifyParams {
 /** @document */
 export interface SignInFutureTicketParams {
   /**
-   * The [ticket _or token_](https://clerk.com/docs/guides/development/custom-flows/authentication/application-invitations)
-   * generated from the Backend API.
+   * The [ticket _or token_](https://clerk.com/docs/guides/development/custom-flows/authentication/application-invitations) generated from the Backend API.
    */
   ticket: string;
 }
@@ -289,7 +284,7 @@ export interface SignInFutureWeb3Params {
    */
   provider: Web3Provider;
   /**
-   * The name of the wallet to use for Solana sign-ins. Required when `provider` is set to `'solana'`.
+   * **Required** when `provider` is set to `'solana'`. The name of the wallet to use for Solana sign-ins.
    */
   walletName?: string;
 }
@@ -299,8 +294,10 @@ export interface SignInFuturePasskeyParams {
   /**
    * The flow to use for the passkey sign-in.
    *
-   * - `'autofill'`: The client prompts your users to select a passkey before they interact with your app.
-   * - `'discoverable'`: The client requires the user to interact with the client.
+   * <ul>
+   *  <li>`'autofill'`: The client prompts your users to select a passkey before they interact with your app.</li>
+   *  <li>`'discoverable'`: The client requires the user to interact with the client.</li>
+   * </ul>
    */
   flow?: 'autofill' | 'discoverable';
 }
@@ -427,7 +424,7 @@ export interface SignInFutureResource {
      */
     verification: {
       /**
-       * The verification status
+       * The verification status.
        */
       status: 'verified' | 'expired' | 'failed' | 'client_mismatch';
 
@@ -437,7 +434,7 @@ export interface SignInFutureResource {
       createdSessionId: string;
 
       /**
-       * Whether the verification was from the same client
+       * Whether the verification was from the same client.
        */
       verifiedFromTheSameClient: boolean;
     } | null;
@@ -446,12 +443,12 @@ export interface SignInFutureResource {
   /** @extractMethods */
   phoneCode: {
     /**
-     * Used to send a phone code to sign-in
+     * Sends a phone code to sign in with.
      */
     sendCode: (params?: SignInFuturePhoneCodeSendParams) => Promise<{ error: ClerkError | null }>;
 
     /**
-     * Used to verify a code sent via phone to sign-in
+     * Verifies a code sent with the [`sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#phone-code-send-code) method.
      */
     verifyCode: (params: SignInFuturePhoneCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
   };
@@ -459,17 +456,17 @@ export interface SignInFutureResource {
   /** @extractMethods */
   resetPasswordEmailCode: {
     /**
-     * Used to send a password reset code to the first email address on the account
+     * Sends a password reset code to the first email address on the account.
      */
     sendCode: () => Promise<{ error: ClerkError | null }>;
 
     /**
-     * Used to verify a password reset code sent via email. Will cause `signIn.status` to become `'needs_new_password'`.
+     * Verifies a password reset code sent with the [`sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#reset-password-email-code-send-code) method. Will cause `signIn.status` to become `'needs_new_password'`. This is when you will call the [`resetPasswordEmailCode.submitPassword()`](https://clerk.com/docs/reference/objects/sign-in-future#reset-password-email-code-submit-password) method to complete the password reset flow.
      */
     verifyCode: (params: SignInFutureEmailCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
 
     /**
-     * Used to submit a new password, and move the `signIn.status` to `'complete'`.
+     * Submits a new password and moves the sign-in status to `'complete'`.
      */
     submitPassword: (params: SignInFutureResetPasswordSubmitParams) => Promise<{ error: ClerkError | null }>;
   };
@@ -477,74 +474,71 @@ export interface SignInFutureResource {
   /** @extractMethods */
   resetPasswordPhoneCode: {
     /**
-     * Used to send a password reset code to the first phone number on the account
+     * Sends a password reset code to the first phone number on the account.
      */
     sendCode: (params?: SignInFutureResetPasswordPhoneCodeSendParams) => Promise<{ error: ClerkError | null }>;
 
     /**
-     * Used to verify a password reset code sent via phone. Will cause `signIn.status` to become `'needs_new_password'`.
+     * Verifies a password reset code sent with the [`sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#reset-password-phone-code-send-code) method. Will cause `signIn.status` to become `'needs_new_password'`. This is when you will call the [`resetPasswordPhoneCode.submitPassword()`](https://clerk.com/docs/reference/objects/sign-in-future#reset-password-phone-code-submit-password) method to complete the password reset flow.
      */
     verifyCode: (params: SignInFutureResetPasswordPhoneCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
 
     /**
-     * Used to submit a new password, and move the `signIn.status` to `'complete'`.
+     * Submits a new password and moves the sign-in status to `'complete'`.
      */
     submitPassword: (params: SignInFutureResetPasswordSubmitParams) => Promise<{ error: ClerkError | null }>;
   };
 
   /**
-   * Used to perform OAuth authentication.
+   * Performs an SSO-based sign-in (Social/OAuth or Enterprise).
    */
   sso: (params: SignInFutureSSOParams) => Promise<{ error: ClerkError | null }>;
 
   /** @extractMethods */
   mfa: {
     /**
-     * Used to send a phone code as a second factor to sign-in
+     * Sends a phone code to sign in with as a second factor.
      */
     sendPhoneCode: () => Promise<{ error: ClerkError | null }>;
 
     /**
-     * Used to verify a phone code sent as a second factor to sign-in
+     * Verifies a phone code sent with the [`sendPhoneCode()`](https://clerk.com/docs/reference/objects/sign-in-future#mfa-send-phone-code) method.
      */
     verifyPhoneCode: (params: SignInFutureMFAPhoneCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
 
     /**
-     * Used to send an email code as a second factor to sign-in
+     * Sends an email code to sign in with as a second factor.
      */
     sendEmailCode: () => Promise<{ error: ClerkError | null }>;
 
     /**
-     * Used to verify an email code sent as a second factor to sign-in
+     * Verifies an email code sent with the [`sendEmailCode()`](https://clerk.com/docs/reference/objects/sign-in-future#mfa-send-email-code) method.
      */
     verifyEmailCode: (params: SignInFutureMFAEmailCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
 
     /**
-     * Used to verify a TOTP code as a second factor to sign-in
+     * Verifies an authenticator app (TOTP) code to sign in with as a second factor.
      */
     verifyTOTP: (params: SignInFutureTOTPVerifyParams) => Promise<{ error: ClerkError | null }>;
 
     /**
-     * Used to verify a backup code as a second factor to sign-in
+     * Verifies a backup code to sign in with as a second factor.
      */
     verifyBackupCode: (params: SignInFutureBackupCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
   };
 
   /**
-   * Used to perform a ticket-based sign-in.
+   * Performs a ticket-based sign-in.
    */
   ticket: (params?: SignInFutureTicketParams) => Promise<{ error: ClerkError | null }>;
 
   /**
-   * Used to perform a Web3-based sign-in.
+   * Performs a Web3-based sign-in.
    */
   web3: (params: SignInFutureWeb3Params) => Promise<{ error: ClerkError | null }>;
 
   /**
-   * Initiates a passkey-based authentication flow, enabling users to authenticate using a previously
-   * registered passkey. When called without parameters, this method requires a prior call to
-   * `SignIn.create({ strategy: 'passkey' })` to initialize the sign-in context. This pattern is particularly useful in
-   * scenarios where the authentication strategy needs to be determined dynamically at runtime.
+   * Initiates a passkey-based authentication flow, enabling users to authenticate using a previously registered passkey. When called without parameters, this method requires a prior call to `SignIn.create({ strategy: 'passkey' })` to initialize the sign-in context. This pattern is particularly useful in scenarios where the authentication strategy needs to be determined dynamically at runtime.
    */
   passkey: (params?: SignInFuturePasskeyParams) => Promise<{ error: ClerkError | null }>;
 
@@ -554,12 +548,9 @@ export interface SignInFutureResource {
   finalize: (params?: SignInFutureFinalizeParams) => Promise<{ error: ClerkError | null }>;
 
   /**
-   * Resets the current sign-in attempt by clearing all local state back to null.
-   * This is useful when you want to allow users to go back to the beginning of
-   * the sign-in flow (e.g., to change their identifier during verification).
+   * Resets the current sign-in attempt by clearing all local state back to null. This is useful when you want to allow users to go back to the beginning of the sign-in flow (e.g., to change their identifier during verification).
    *
-   * Unlike other methods, `reset()` does not trigger the `fetchStatus` to change
-   * to `'fetching'` and does not make any API calls - it only clears local state.
+   * Unlike other methods, `reset()` does not trigger the `fetchStatus` to change to `'fetching'` and does not make any API calls - it only clears local state.
    */
   reset: () => Promise<{ error: ClerkError | null }>;
 }

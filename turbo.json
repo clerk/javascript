@@ -343,6 +343,7 @@
         "tsconfig.typedoc.json",
         "typedoc.config.mjs",
         ".typedoc/reference-objects.mjs",
+        ".typedoc/comment-utils.mjs",
         ".typedoc/extract-methods.mjs",
         ".typedoc/extract-returns-and-params.mjs"
       ],

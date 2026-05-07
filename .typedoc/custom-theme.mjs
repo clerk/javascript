@@ -10,6 +10,7 @@ import {
 import { removeLineBreaks } from '../node_modules/typedoc-plugin-markdown/dist/libs/utils/index.js';
 import { TypeDeclarationVisibility } from '../node_modules/typedoc-plugin-markdown/dist/options/maps.js';
 
+import { commentContainsTodo } from './comment-utils.mjs';
 import { REFERENCE_OBJECTS_LIST } from './reference-objects.mjs';
 
 export { REFERENCE_OBJECTS_LIST };
@@ -875,6 +876,9 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
        * @param {Parameters<typeof superPartials.comment>[1]} [options]
        */
       comment: (model, options) => {
+        if (commentContainsTodo(model)) {
+          return '';
+        }
         const hidden = new Set(['@inline', '@inlineType', '@experimental']);
         const modTags = model?.modifierTags ? Array.from(model.modifierTags) : [];
         if (modTags.some(/** @param {string} t */ t => hidden.has(t))) {
