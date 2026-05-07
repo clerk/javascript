@@ -58,7 +58,7 @@ const AuthenticatedContent = withCoreUserGuard(() => {
     >
       <NavbarContextProvider contentRef={contentRef}>
         <NavBar
-          header={
+          headerAboveTitle={
             <Flex
               align='center'
               sx={t => ({
