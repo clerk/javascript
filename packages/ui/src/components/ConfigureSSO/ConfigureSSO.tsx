@@ -2,13 +2,25 @@ import { __internal_useUserEnterpriseConnections, useOrganization, useUser } fro
 import type { __experimental_ConfigureSSOProps } from '@clerk/shared/types';
 import React from 'react';
 
+import { useProtect } from '@/common';
 import { useEnvironment, withCoreUserGuard } from '@/contexts';
-import { Box, Col, descriptors, Flex, Flow, Icon, localizationKeys, Text, useAppearance } from '@/customizables';
+import {
+  Box,
+  Col,
+  descriptors,
+  Flex,
+  Flow,
+  Heading,
+  Icon,
+  localizationKeys,
+  Text,
+  useAppearance,
+} from '@/customizables';
 import { ApplicationLogo } from '@/elements/ApplicationLogo';
 import { withCardStateProvider } from '@/elements/contexts';
 import { NavBar, NavbarContextProvider } from '@/elements/Navbar';
 import { ProfileCard } from '@/elements/ProfileCard';
-import { BoxIcon } from '@/icons';
+import { BoxIcon, ExclamationTriangle } from '@/icons';
 import { Route, Switch } from '@/router';
 
 import { ConfigureSSOFlowProvider, useConfigureSSOFlow } from './ConfigureSSOContext';
@@ -41,6 +53,14 @@ const AuthenticatedContent = withCoreUserGuard(() => {
   const { parsedOptions } = useAppearance();
   const hasLogo = Boolean(parsedOptions.logoImageUrl || logoImageUrl);
 
+  // Gate the entire wizard behind the org-level permission. When the
+  // user can't manage enterprise connections, we still render the
+  // outer sidebar/title chrome but replace the wizard with a
+  // permissions-error message so the layout stays consistent
+  const canManageEnterpriseConnections = useProtect({
+    permission: 'org:sys_enterprise_connections:manage',
+  });
+
   const {
     data: enterpriseConnections,
     isLoading: isLoadingEnterpriseConnections,
@@ -48,7 +68,9 @@ const AuthenticatedContent = withCoreUserGuard(() => {
     updateEnterpriseConnection,
     deleteEnterpriseConnection,
     revalidate: revalidateEnterpriseConnections,
-  } = __internal_useUserEnterpriseConnections({ enabled: true });
+  } = __internal_useUserEnterpriseConnections({
+    enabled: canManageEnterpriseConnections,
+  });
   // Currently FAPI only supports one enterprise connection per user
   const enterpriseConnection = enterpriseConnections?.[0];
 
@@ -126,16 +148,20 @@ const AuthenticatedContent = withCoreUserGuard(() => {
             flex: 1,
           })}
         >
-          <ConfigureSSOFlowProvider
-            enterpriseConnection={enterpriseConnection}
-            isLoading={isLoadingEnterpriseConnections}
-            createEnterpriseConnection={createEnterpriseConnection}
-            updateEnterpriseConnection={updateEnterpriseConnection}
-            deleteEnterpriseConnection={deleteEnterpriseConnection}
-            revalidate={revalidateEnterpriseConnections}
-          >
-            <ConfigureSSOSteps />
-          </ConfigureSSOFlowProvider>
+          {canManageEnterpriseConnections ? (
+            <ConfigureSSOFlowProvider
+              enterpriseConnection={enterpriseConnection}
+              isLoading={isLoadingEnterpriseConnections}
+              createEnterpriseConnection={createEnterpriseConnection}
+              updateEnterpriseConnection={updateEnterpriseConnection}
+              deleteEnterpriseConnection={deleteEnterpriseConnection}
+              revalidate={revalidateEnterpriseConnections}
+            >
+              <ConfigureSSOSteps />
+            </ConfigureSSOFlowProvider>
+          ) : (
+            <NoPermission />
+          )}
         </Col>
       </NavbarContextProvider>
     </ProfileCard.Root>
@@ -227,6 +253,42 @@ const OrganizationSidebarSubtitle = () => {
     </Text>
   );
 };
+
+/**
+ * Rendered in place of the wizard when the user lacks the
+ * `org:sys_enterprise_connections:manage` permission. The outer
+ * sidebar / title chrome stays the same; only the body changes
+ */
+const NoPermission = () => (
+  <Flex
+    align='center'
+    justify='center'
+    sx={t => ({ flex: 1, padding: t.space.$8 })}
+  >
+    <Col
+      align='center'
+      sx={t => ({ gap: t.space.$2, textAlign: 'center', maxWidth: t.sizes.$66 })}
+    >
+      <Icon
+        icon={ExclamationTriangle}
+        sx={t => ({ width: t.sizes.$8, height: t.sizes.$8, color: t.colors.$neutralAlpha600 })}
+      />
+      <Heading
+        textVariant='h1'
+        sx={t => ({ color: t.colors.$colorForeground, fontSize: t.fontSizes.$sm })}
+      >
+        You do not have permission to manage enterprise connections
+      </Heading>
+      <Text
+        as='p'
+        variant='body'
+        sx={t => ({ color: t.colors.$colorMutedForeground })}
+      >
+        Contact your organization administrator in order to have permissions to manage enterprise connections.
+      </Text>
+    </Col>
+  </Flex>
+);
 
 export const ConfigureSSO: React.ComponentType<__experimental_ConfigureSSOProps> =
   withCardStateProvider(ConfigureSSOInternal);

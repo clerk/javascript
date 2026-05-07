@@ -145,16 +145,16 @@ export const VerifyDomainStep = (): JSX.Element | null => {
               <Col sx={t => ({ gap: t.space.$1, textAlign: 'center', maxWidth: t.sizes.$66 })}>
                 <Heading
                   textVariant='h1'
-                  sx={t => ({ color: t.colors.$colorForeground, fontSize: t.fontSizes.$sm })}
+                  sx={t => ({ color: t.colors.$colorForeground, fontSize: t.fontSizes.$md })}
                 >
-                  That domain is already used for a different enterprise connection.
+                  That domain already has an SSO connection
                 </Heading>
                 <Text
                   as='p'
                   variant='body'
                   sx={t => ({ color: t.colors.$colorMutedForeground })}
                 >
-                  Contact the application owner to configure an SSO connection using the same domain.
+                  Contact the application's administrator to get access through the existing connection.
                 </Text>
               </Col>
             </>
