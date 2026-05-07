@@ -70,19 +70,7 @@ jobs:
         id: keys
         env:
           INTEGRATION_STAGING_INSTANCE_KEYS: ${{ secrets.INTEGRATION_STAGING_INSTANCE_KEYS }}
-        run: |
-          if [ -z "$INTEGRATION_STAGING_INSTANCE_KEYS" ]; then
-            echo "::error::INTEGRATION_STAGING_INSTANCE_KEYS secret is not set"
-            exit 1
-          fi
-          pk=$(echo "$INTEGRATION_STAGING_INSTANCE_KEYS" | jq -er ".[\"$EXPO_INSTANCE_NAME\"].pk") || {
-            echo "::error::No entry '$EXPO_INSTANCE_NAME' found in INTEGRATION_STAGING_INSTANCE_KEYS"
-            exit 1
-          }
-          sk=$(echo "$INTEGRATION_STAGING_INSTANCE_KEYS" | jq -er ".[\"$EXPO_INSTANCE_NAME\"].sk")
-          echo "::add-mask::$sk"
-          echo "pk=$pk" >> "$GITHUB_OUTPUT"
-          echo "sk=$sk" >> "$GITHUB_OUTPUT"
+        run: node scripts/resolve-instance-keys.mjs INTEGRATION_STAGING_INSTANCE_KEYS "$EXPO_INSTANCE_NAME"
 
       - name: Write quickstart .env
         working-directory: clerk-expo-quickstart/NativeComponentQuickstart
@@ -187,19 +175,7 @@ jobs:
         id: keys
         env:
           INTEGRATION_STAGING_INSTANCE_KEYS: ${{ secrets.INTEGRATION_STAGING_INSTANCE_KEYS }}
-        run: |
-          if [ -z "$INTEGRATION_STAGING_INSTANCE_KEYS" ]; then
-            echo "::error::INTEGRATION_STAGING_INSTANCE_KEYS secret is not set"
-            exit 1
-          fi
-          pk=$(echo "$INTEGRATION_STAGING_INSTANCE_KEYS" | jq -er ".[\"$EXPO_INSTANCE_NAME\"].pk") || {
-            echo "::error::No entry '$EXPO_INSTANCE_NAME' found in INTEGRATION_STAGING_INSTANCE_KEYS"
-            exit 1
-          }
-          sk=$(echo "$INTEGRATION_STAGING_INSTANCE_KEYS" | jq -er ".[\"$EXPO_INSTANCE_NAME\"].sk")
-          echo "::add-mask::$sk"
-          echo "pk=$pk" >> "$GITHUB_OUTPUT"
-          echo "sk=$sk" >> "$GITHUB_OUTPUT"
+        run: node scripts/resolve-instance-keys.mjs INTEGRATION_STAGING_INSTANCE_KEYS "$EXPO_INSTANCE_NAME"
 
       - name: Write quickstart .env
         working-directory: clerk-expo-quickstart/NativeComponentQuickstart
