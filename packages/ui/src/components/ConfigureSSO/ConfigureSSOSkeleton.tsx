@@ -8,7 +8,7 @@ export const ConfigureSSOSkeleton = () => {
   return (
     <>
       <ProfileCardHeader>
-        <Stepper.Skeleton totalSteps={4} />
+        <Stepper.Skeleton />
       </ProfileCardHeader>
 
       <Flex

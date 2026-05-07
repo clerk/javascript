@@ -90,7 +90,7 @@ const Item = ({
 };
 Item.displayName = 'Stepper.Item';
 
-const StepperItemSkeleton = (): JSX.Element => (
+const ItemSkeleton = (): JSX.Element => (
   <Flex
     align='center'
     sx={t => ({ gap: t.space.$1x5 })}
@@ -106,7 +106,7 @@ const StepperItemSkeleton = (): JSX.Element => (
     <Box
       sx={t => ({
         width: t.sizes.$17,
-        height: '5px',
+        height: t.sizes.$1x5,
         borderRadius: t.radii.$md,
         backgroundColor: t.colors.$neutralAlpha100,
       })}
@@ -130,7 +130,7 @@ const Skeleton = ({ totalSteps = 4 }: SkeletonProps): JSX.Element => (
     {Array.from({ length: totalSteps }).map((_, index) => (
       // eslint-disable-next-line react/no-array-index-key
       <React.Fragment key={index}>
-        <StepperItemSkeleton />
+        <ItemSkeleton />
         {index < totalSteps - 1 && (
           <Icon
             // TODO: add descriptor

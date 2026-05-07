@@ -39,7 +39,7 @@ const Header = ({ title, description, children }: StepHeaderProps): JSX.Element 
         borderBottomColor: theme.colors.$borderAlpha100,
       })}
     >
-      <Col sx={theme => ({ gap: theme.space.$1 })}>
+      <Col sx={theme => ({ gap: theme.space.$1x5 })}>
         <Heading
           textVariant='h3'
           sx={theme => ({ color: theme.colors.$colorForeground, fontSize: theme.fontSizes.$lg })}

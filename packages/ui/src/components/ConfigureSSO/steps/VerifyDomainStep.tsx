@@ -1,7 +1,7 @@
 import { descriptors, Flow, Text } from '@/customizables';
 
+import { Step } from '../elements/Step';
 import { useRegisterContinueAction, useWizard } from '../elements/Wizard';
-import { Step } from './Step';
 
 export const VerifyDomainStep = (): JSX.Element => {
   const { goNext } = useWizard();

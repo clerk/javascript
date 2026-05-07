@@ -1,6 +1,6 @@
 import { descriptors, Flow, Text } from '@/customizables';
 
-import { Step } from './Step';
+import { Step } from '../elements/Step';
 
 export const ConfirmationStep = (): JSX.Element => {
   return (
