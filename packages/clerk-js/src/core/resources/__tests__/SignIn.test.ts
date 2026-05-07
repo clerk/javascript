@@ -2110,6 +2110,59 @@ describe('SignIn', () => {
         });
       });
 
+      it('reuses an existing ticket sign-in when preparing enterprise SSO', async () => {
+        vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
+
+        SignIn.clerk = {
+          buildUrlWithAuth: vi.fn().mockReturnValue('https://example.com/sso-callback'),
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
+
+        const mockFetch = vi
+          .fn()
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signin_ticket',
+              status: 'needs_first_factor',
+              supported_first_factors: [{ strategy: 'enterprise_sso' }],
+            },
+          })
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signin_ticket',
+              first_factor_verification: {
+                status: 'unverified',
+                external_verification_redirect_url: 'https://sso.example.com/auth',
+              },
+            },
+          });
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn();
+        await signIn.__internal_future.ticket({ ticket: 'ticket_123' });
+        await signIn.__internal_future.sso({
+          strategy: 'enterprise_sso',
+          redirectUrl: 'https://complete.example.com',
+          redirectCallbackUrl: '/sso-callback',
+        });
+
+        expect(mockFetch).toHaveBeenNthCalledWith(2, {
+          method: 'POST',
+          path: '/client/sign_ins/signin_ticket/prepare_first_factor',
+          body: {
+            strategy: 'enterprise_sso',
+            redirectUrl: 'https://example.com/sso-callback',
+            actionCompleteRedirectUrl: 'https://complete.example.com',
+          },
+        });
+      });
+
       it('handles relative redirectUrl by converting to absolute', async () => {
         vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
 
@@ -2153,7 +2206,7 @@ describe('SignIn', () => {
         });
       });
 
-      it("creates a fresh sign-in on every sso() call, even when a prior provider's redirect is still pending", async () => {
+      it('creates a new OAuth sign-in when retrying after a previous provider redirect was abandoned', async () => {
         vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
 
         const mockPopup = { location: { href: '' } } as Window;
