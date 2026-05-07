@@ -28,7 +28,8 @@ export const ProfileCardFooter = (props: ProfileCardFooterProps): JSX.Element =>
     {...props}
     sx={theme => ({
       gap: theme.space.$2,
-      padding: `${theme.space.$4}`,
+      padding: theme.space.$4,
+      minHeight: theme.sizes.$16,
       background: common.mutedBackground(theme),
       borderTopWidth: theme.borderWidths.$normal,
       borderTopStyle: theme.borderStyles.$solid,
