@@ -3,10 +3,10 @@
 # and runs Maestro flows on iOS simulator and Android emulator.
 #
 # Secrets:
-#   INTEGRATION_INSTANCE_KEYS — JSON map of named test instances
+#   INTEGRATION_STAGING_INSTANCE_KEYS — JSON map of named staging test instances
 #     ({ "<name>": { "pk": "pk_test_...", "sk": "sk_test_..." } }).
-#     Same secret used by /integration (Playwright). We read the entry named
-#     EXPO_INSTANCE_NAME (set in env: below).
+#     Same secret used by /integration (Playwright) staging jobs. We read the
+#     entry named EXPO_INSTANCE_NAME (set in env: below).
 #
 # Test users are provisioned per-run via Clerk Backend API and deleted at
 # teardown — same pattern as /integration's createBapiUser.
@@ -69,17 +69,17 @@ jobs:
       - name: Resolve Clerk instance keys
         id: keys
         env:
-          INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
+          INTEGRATION_STAGING_INSTANCE_KEYS: ${{ secrets.INTEGRATION_STAGING_INSTANCE_KEYS }}
         run: |
-          if [ -z "$INTEGRATION_INSTANCE_KEYS" ]; then
-            echo "::error::INTEGRATION_INSTANCE_KEYS secret is not set"
+          if [ -z "$INTEGRATION_STAGING_INSTANCE_KEYS" ]; then
+            echo "::error::INTEGRATION_STAGING_INSTANCE_KEYS secret is not set"
             exit 1
           fi
-          pk=$(echo "$INTEGRATION_INSTANCE_KEYS" | jq -er ".[\"$EXPO_INSTANCE_NAME\"].pk") || {
-            echo "::error::No entry '$EXPO_INSTANCE_NAME' found in INTEGRATION_INSTANCE_KEYS"
+          pk=$(echo "$INTEGRATION_STAGING_INSTANCE_KEYS" | jq -er ".[\"$EXPO_INSTANCE_NAME\"].pk") || {
+            echo "::error::No entry '$EXPO_INSTANCE_NAME' found in INTEGRATION_STAGING_INSTANCE_KEYS"
             exit 1
           }
-          sk=$(echo "$INTEGRATION_INSTANCE_KEYS" | jq -er ".[\"$EXPO_INSTANCE_NAME\"].sk")
+          sk=$(echo "$INTEGRATION_STAGING_INSTANCE_KEYS" | jq -er ".[\"$EXPO_INSTANCE_NAME\"].sk")
           echo "::add-mask::$sk"
           echo "pk=$pk" >> "$GITHUB_OUTPUT"
           echo "sk=$sk" >> "$GITHUB_OUTPUT"
@@ -186,17 +186,17 @@ jobs:
       - name: Resolve Clerk instance keys
         id: keys
         env:
-          INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
+          INTEGRATION_STAGING_INSTANCE_KEYS: ${{ secrets.INTEGRATION_STAGING_INSTANCE_KEYS }}
         run: |
-          if [ -z "$INTEGRATION_INSTANCE_KEYS" ]; then
-            echo "::error::INTEGRATION_INSTANCE_KEYS secret is not set"
+          if [ -z "$INTEGRATION_STAGING_INSTANCE_KEYS" ]; then
+            echo "::error::INTEGRATION_STAGING_INSTANCE_KEYS secret is not set"
             exit 1
           fi
-          pk=$(echo "$INTEGRATION_INSTANCE_KEYS" | jq -er ".[\"$EXPO_INSTANCE_NAME\"].pk") || {
-            echo "::error::No entry '$EXPO_INSTANCE_NAME' found in INTEGRATION_INSTANCE_KEYS"
+          pk=$(echo "$INTEGRATION_STAGING_INSTANCE_KEYS" | jq -er ".[\"$EXPO_INSTANCE_NAME\"].pk") || {
+            echo "::error::No entry '$EXPO_INSTANCE_NAME' found in INTEGRATION_STAGING_INSTANCE_KEYS"
             exit 1
           }
-          sk=$(echo "$INTEGRATION_INSTANCE_KEYS" | jq -er ".[\"$EXPO_INSTANCE_NAME\"].sk")
+          sk=$(echo "$INTEGRATION_STAGING_INSTANCE_KEYS" | jq -er ".[\"$EXPO_INSTANCE_NAME\"].sk")
           echo "::add-mask::$sk"
           echo "pk=$pk" >> "$GITHUB_OUTPUT"
           echo "sk=$sk" >> "$GITHUB_OUTPUT"
