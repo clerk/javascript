@@ -1,9 +1,9 @@
-import { useOrganization } from '@clerk/shared/react/index';
+import { __internal_useUserEnterpriseConnections, useOrganization, useUser } from '@clerk/shared/react';
 import type { __experimental_ConfigureSSOProps } from '@clerk/shared/types';
 import React from 'react';
 
 import { useEnvironment, withCoreUserGuard } from '@/contexts';
-import { Box, Col, Flex, Flow, Icon, localizationKeys, Text, useAppearance } from '@/customizables';
+import { Box, Col, descriptors, Flex, Flow, Icon, localizationKeys, Text, useAppearance } from '@/customizables';
 import { ApplicationLogo } from '@/elements/ApplicationLogo';
 import { withCardStateProvider } from '@/elements/contexts';
 import { NavBar, NavbarContextProvider } from '@/elements/Navbar';
@@ -11,16 +11,18 @@ import { ProfileCard } from '@/elements/ProfileCard';
 import { BoxIcon } from '@/icons';
 import { Route, Switch } from '@/router';
 
+import { ConfigureSSOFlowProvider } from './ConfigureSSOContext';
+import { ConfigureCreateApp, ConfirmationStep, ProvideEmail, TestConfigurationStep, VerifyDomainStep } from './steps';
+import { ConfigureSSOWizard } from './wizard';
+
 const ConfigureSSOInternal = () => {
   return (
     <Flow.Root flow='configureSSO'>
-      <Flow.Part>
-        <Switch>
-          <Route>
-            <AuthenticatedContent />
-          </Route>
-        </Switch>
-      </Flow.Part>
+      <Switch>
+        <Route>
+          <AuthenticatedContent />
+        </Route>
+      </Switch>
     </Flow.Root>
   );
 };
@@ -31,6 +33,11 @@ const AuthenticatedContent = withCoreUserGuard(() => {
   const { organizationSettings } = useEnvironment();
   const { parsedOptions } = useAppearance();
   const hasLogo = Boolean(parsedOptions.logoImageUrl || logoImageUrl);
+
+  const { data: enterpriseConnections, isLoading: isLoadingEnterpriseConnections } =
+    __internal_useUserEnterpriseConnections({ enabled: true });
+  // Currently FAPI only supports one enterprise connection per user
+  const enterpriseConnection = enterpriseConnections?.[0];
 
   return (
     <ProfileCard.Root
@@ -89,11 +96,96 @@ const AuthenticatedContent = withCoreUserGuard(() => {
           routes={[]}
           contentRef={contentRef}
         />
-        <ProfileCard.Content contentRef={contentRef} />
+        <Col
+          ref={contentRef}
+          elementDescriptor={descriptors.scrollBox}
+          sx={t => ({
+            backgroundColor: t.colors.$colorBackground,
+            position: 'relative',
+            borderRadius: t.radii.$lg,
+            width: '100%',
+            overflow: 'hidden',
+            borderWidth: t.borderWidths.$normal,
+            borderStyle: t.borderStyles.$solid,
+            borderColor: t.colors.$borderAlpha150,
+            marginBlock: '-1px',
+            marginInlineEnd: '-1px',
+            flex: 1,
+          })}
+        >
+          <ConfigureSSOFlowProvider
+            enterpriseConnection={enterpriseConnection}
+            isLoading={isLoadingEnterpriseConnections}
+          >
+            <ConfigureSSOSteps />
+          </ConfigureSSOFlowProvider>
+        </Col>
       </NavbarContextProvider>
     </ProfileCard.Root>
   );
 });
+
+const ConfigureSSOSteps = () => {
+  const { user } = useUser();
+
+  const primaryEmailAddress = user?.primaryEmailAddress;
+
+  return (
+    <ConfigureSSOWizard>
+      <ConfigureSSOWizard.Step
+        id='verify-email-domain'
+        path='verify-email-domain'
+        label='Verify domain'
+      >
+        <ConfigureSSOWizard>
+          {!primaryEmailAddress && (
+            <ConfigureSSOWizard.Step
+              id='provide-email'
+              path='provide-email'
+            >
+              <ProvideEmail />
+            </ConfigureSSOWizard.Step>
+          )}
+          <ConfigureSSOWizard.Step
+            id='verify-domain'
+            path='verify-domain'
+          >
+            <VerifyDomainStep />
+          </ConfigureSSOWizard.Step>
+        </ConfigureSSOWizard>
+      </ConfigureSSOWizard.Step>
+      <ConfigureSSOWizard.Step
+        id='configure'
+        path='configure'
+        label='Configure'
+      >
+        <ConfigureSSOWizard>
+          {/* TODO: Implement configure steps */}
+          <ConfigureSSOWizard.Step
+            id='create-app'
+            path='create-app'
+          >
+            <ConfigureCreateApp />
+          </ConfigureSSOWizard.Step>
+        </ConfigureSSOWizard>
+      </ConfigureSSOWizard.Step>
+      <ConfigureSSOWizard.Step
+        id='test'
+        path='test'
+        label='Test'
+      >
+        <TestConfigurationStep />
+      </ConfigureSSOWizard.Step>
+      <ConfigureSSOWizard.Step
+        id='confirmation'
+        path='confirmation'
+        label='Confirmation'
+      >
+        <ConfirmationStep />
+      </ConfigureSSOWizard.Step>
+    </ConfigureSSOWizard>
+  );
+};
 
 const OrganizationSidebarSubtitle = () => {
   const { organization } = useOrganization();
