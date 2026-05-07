@@ -1,9 +1,39 @@
 import React from 'react';
 
-import { Button, Flex, Icon, Text, useLocalizations } from '@/customizables';
+import { Box, Button, Flex, Icon, Text, useLocalizations } from '@/customizables';
 import { CaretRight } from '@/icons';
 
 import type { StepperItemProps, StepperProps } from './types';
+
+const Root = ({ children }: StepperProps): JSX.Element => {
+  const items = React.Children.toArray(children).filter(child => React.isValidElement(child));
+
+  return (
+    <Flex
+      // TODO: add descriptor
+      align='center'
+      sx={theme => ({
+        gap: theme.space.$2,
+        flexWrap: 'wrap',
+      })}
+    >
+      {items.map((child, index) => (
+        // eslint-disable-next-line react/no-array-index-key
+        <React.Fragment key={index}>
+          {child}
+          {index < items.length - 1 && (
+            <Icon
+              // TODO: add descriptor
+              icon={CaretRight}
+              size='md'
+              sx={theme => ({ color: theme.colors.$colorMutedForeground })}
+            />
+          )}
+        </React.Fragment>
+      ))}
+    </Flex>
+  );
+};
 
 const Item = ({
   label,
@@ -60,35 +90,59 @@ const Item = ({
 };
 Item.displayName = 'Stepper.Item';
 
-const Root = ({ children }: StepperProps): JSX.Element => {
-  const items = React.Children.toArray(children).filter(child => React.isValidElement(child));
-
-  return (
-    <Flex
-      // TODO: add descriptor
-      align='center'
-      sx={theme => ({
-        gap: theme.space.$2,
-        flexWrap: 'wrap',
+const StepperItemSkeleton = (): JSX.Element => (
+  <Flex
+    align='center'
+    sx={t => ({ gap: t.space.$1x5 })}
+  >
+    <Box
+      sx={t => ({
+        width: t.sizes.$4,
+        height: t.sizes.$4,
+        borderRadius: t.radii.$circle,
+        backgroundColor: t.colors.$neutralAlpha100,
       })}
-    >
-      {items.map((child, index) => (
-        // eslint-disable-next-line react/no-array-index-key
-        <React.Fragment key={index}>
-          {child}
-          {index < items.length - 1 && (
-            <Icon
-              // TODO: add descriptor
-              icon={CaretRight}
-              size='md'
-              sx={theme => ({ color: theme.colors.$colorMutedForeground })}
-            />
-          )}
-        </React.Fragment>
-      ))}
-    </Flex>
-  );
+    />
+    <Box
+      sx={t => ({
+        width: t.sizes.$17,
+        height: '5px',
+        borderRadius: t.radii.$md,
+        backgroundColor: t.colors.$neutralAlpha100,
+      })}
+    />
+  </Flex>
+);
+
+type SkeletonProps = {
+  totalSteps?: number;
 };
+
+const Skeleton = ({ totalSteps = 4 }: SkeletonProps): JSX.Element => (
+  <Flex
+    // TODO: add descriptor
+    align='center'
+    sx={theme => ({
+      gap: theme.space.$2,
+      flexWrap: 'wrap',
+    })}
+  >
+    {Array.from({ length: totalSteps }).map((_, index) => (
+      // eslint-disable-next-line react/no-array-index-key
+      <React.Fragment key={index}>
+        <StepperItemSkeleton />
+        {index < totalSteps - 1 && (
+          <Icon
+            // TODO: add descriptor
+            icon={CaretRight}
+            size='md'
+            sx={theme => ({ color: theme.colors.$neutralAlpha100 })}
+          />
+        )}
+      </React.Fragment>
+    ))}
+  </Flex>
+);
 
 /**
  * Numbered step indicator — purely presentational.
@@ -105,4 +159,5 @@ const Root = ({ children }: StepperProps): JSX.Element => {
  */
 export const Stepper = Object.assign(Root, {
   Item,
+  Skeleton,
 });

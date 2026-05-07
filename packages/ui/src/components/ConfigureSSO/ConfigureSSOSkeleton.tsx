@@ -1,22 +1,14 @@
-import { Box, Button, descriptors, Flex, Icon, Spinner } from '@/customizables';
+import { Button, descriptors, Flex, Icon, Spinner } from '@/customizables';
 import { CaretLeft, CaretRight } from '@/icons';
 
 import { ProfileCardFooter, ProfileCardHeader } from './elements/ProfileCard';
+import { Stepper } from './elements/Stepper';
 
 export const ConfigureSSOSkeleton = () => {
   return (
     <>
       <ProfileCardHeader>
-        <BreadcrumbItemSkeleton />
-        <BreadcrumItemIconSkeleton />
-
-        <BreadcrumbItemSkeleton />
-        <BreadcrumItemIconSkeleton />
-
-        <BreadcrumbItemSkeleton />
-        <BreadcrumItemIconSkeleton />
-
-        <BreadcrumbItemSkeleton />
+        <Stepper.Skeleton totalSteps={4} />
       </ProfileCardHeader>
 
       <Flex
@@ -64,39 +56,5 @@ export const ConfigureSSOSkeleton = () => {
         </Button>
       </ProfileCardFooter>
     </>
-  );
-};
-
-const BreadcrumbItemSkeleton = (): JSX.Element => (
-  <Flex
-    align='center'
-    sx={t => ({ gap: t.space.$1x5 })}
-  >
-    <Box
-      sx={t => ({
-        width: t.sizes.$4,
-        height: t.sizes.$4,
-        borderRadius: t.radii.$circle,
-        backgroundColor: t.colors.$neutralAlpha100,
-      })}
-    />
-    <Box
-      sx={t => ({
-        width: t.sizes.$17,
-        height: '5px',
-        borderRadius: t.radii.$md,
-        backgroundColor: t.colors.$neutralAlpha100,
-      })}
-    />
-  </Flex>
-);
-
-const BreadcrumItemIconSkeleton = (): JSX.Element => {
-  return (
-    <Icon
-      icon={CaretRight}
-      size='md'
-      sx={theme => ({ color: theme.colors.$neutralAlpha100 })}
-    />
   );
 };
