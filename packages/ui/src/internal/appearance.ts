@@ -672,6 +672,16 @@ export type ElementsConfig = {
   enterpriseConnectionButton: WithOptions;
   enterpriseConnectionButtonText: WithOptions;
 
+  configureSSOWizardHeader: WithOptions;
+  configureSSOWizardHeaderItem: WithOptions<string, ActiveState>;
+  configureSSOWizardHeaderItemBullet: WithOptions<string, ActiveState>;
+  configureSSOWizardHeaderItemLabel: WithOptions<string>;
+  configureSSOWizardHeaderSeparator: WithOptions;
+  configureSSOWizardBody: WithOptions<string>;
+  configureSSOWizardStepIndicator: WithOptions;
+  configureSSOWizardFooterPreviousButton: WithOptions;
+  configureSSOWizardFooterContinueButton: WithOptions;
+
   web3SolanaWalletButtonsRoot: WithOptions;
   web3SolanaWalletButtons: WithOptions;
   web3SolanaWalletButtonsIconButton: WithOptions<string, LoadingState>;
