@@ -8,7 +8,7 @@ export const VerifyDomainStep = (): JSX.Element => {
   useRegisterContinueAction({
     handler: () => goNext(),
     // TODO: Implement verification
-    isDisabled: true,
+    // isDisabled: true,
   });
 
   return (
@@ -30,6 +30,7 @@ export const VerifyDomainStep = (): JSX.Element => {
             >
               Verify your domain
             </Heading>
+
             <Text
               as='p'
               variant='body'

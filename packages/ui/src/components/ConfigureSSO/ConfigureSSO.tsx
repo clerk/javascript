@@ -8,6 +8,7 @@ import { withCardStateProvider } from '@/elements/contexts';
 import { ProfileCard } from '@/elements/ProfileCard';
 import { Route, Switch } from '@/router';
 
+import { ConfigureSSOFlowProvider } from './ConfigureSSOContext';
 import { ConfigureSSOFooter } from './ConfigureSSOFooter';
 import { ConfigureSSOHeader } from './ConfigureSSOHeader';
 import { ConfigureSSONavbar } from './ConfigureSSONavbar';
@@ -47,8 +48,6 @@ const AuthenticatedContent = withCoreUserGuard(() => {
             borderWidth: t.borderWidths.$normal,
             borderStyle: t.borderStyles.$solid,
             borderColor: t.colors.$borderAlpha150,
-            marginBlock: '-1px',
-            marginInlineEnd: '-1px',
             flex: 1,
           })}
         >
@@ -70,13 +69,15 @@ const ConfigureSSOCardContent = () => {
   }
 
   return (
-    <Wizard>
-      <ConfigureSSOHeader />
+    <ConfigureSSOFlowProvider enterpriseConnection={enterpriseConnection}>
+      <Wizard>
+        <ConfigureSSOHeader />
 
-      <ConfigureSSOSteps />
+        <ConfigureSSOSteps />
 
-      <ConfigureSSOFooter />
-    </Wizard>
+        <ConfigureSSOFooter />
+      </Wizard>
+    </ConfigureSSOFlowProvider>
   );
 };
 

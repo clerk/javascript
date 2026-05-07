@@ -55,6 +55,7 @@ export const StepLayout = ({ title, subtitle, children }: StepLayoutProps): JSX.
         ) : null}
         <ConfigureSSOWizard.StepIndicator />
       </Flex>
+
       <Col
         sx={theme => ({
           flex: 1,

@@ -1,17 +1,12 @@
 import { Box, Button, descriptors, Flex, Icon, Spinner } from '@/customizables';
 import { CaretLeft, CaretRight } from '@/icons';
-import { common } from '@/styledSystem';
+
+import { ProfileCardFooter, ProfileCardHeader } from './elements/ProfileCard';
 
 export const ConfigureSSOSkeleton = () => {
   return (
     <>
-      <Flex
-        align='center'
-        sx={theme => ({
-          gap: theme.space.$2,
-          padding: `${theme.space.$4} ${theme.space.$6}`,
-        })}
-      >
+      <ProfileCardHeader>
         <BreadcrumbItemSkeleton />
         <BreadcrumItemIconSkeleton />
 
@@ -22,15 +17,14 @@ export const ConfigureSSOSkeleton = () => {
         <BreadcrumItemIconSkeleton />
 
         <BreadcrumbItemSkeleton />
-      </Flex>
+      </ProfileCardHeader>
 
       <Flex
         align='center'
         justify='center'
         sx={theme => ({
           flex: 1,
-          borderTopWidth: theme.borderWidths.$normal,
-          borderTopColor: theme.colors.$borderAlpha150,
+          padding: theme.space.$5,
         })}
       >
         <Spinner
@@ -40,19 +34,7 @@ export const ConfigureSSOSkeleton = () => {
         />
       </Flex>
 
-      <Flex
-        elementDescriptor={descriptors.footer}
-        align='center'
-        justify='end'
-        sx={theme => ({
-          gap: theme.space.$2,
-          padding: `${theme.space.$4}`,
-          background: common.mutedBackground(theme),
-          borderTopWidth: theme.borderWidths.$normal,
-          borderTopStyle: theme.borderStyles.$solid,
-          borderTopColor: theme.colors.$borderAlpha100,
-        })}
-      >
+      <ProfileCardFooter>
         <Button
           elementDescriptor={descriptors.configureSSOWizardFooterPreviousButton}
           variant='outline'
@@ -80,7 +62,7 @@ export const ConfigureSSOSkeleton = () => {
             sx={theme => ({ marginInlineStart: theme.space.$1 })}
           />
         </Button>
-      </Flex>
+      </ProfileCardFooter>
     </>
   );
 };

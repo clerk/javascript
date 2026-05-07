@@ -1,6 +1,7 @@
-import { Button, descriptors, Flex, Icon, useLocalizations } from '@/customizables';
+import { Button, descriptors, Icon, useLocalizations } from '@/customizables';
 import { CaretLeft, CaretRight } from '@/icons';
 
+import { ProfileCardFooter } from './elements/ProfileCard';
 import { useFooterActions } from './elements/Wizard';
 
 interface ConfigureSSOFooterProps {
@@ -53,18 +54,7 @@ export const ConfigureSSOFooter = ({
   };
 
   return (
-    <Flex
-      elementDescriptor={descriptors.footer}
-      align='center'
-      justify='end'
-      sx={theme => ({
-        gap: theme.space.$2,
-        padding: `${theme.space.$3} ${theme.space.$6}`,
-        borderTopWidth: theme.borderWidths.$normal,
-        borderTopStyle: theme.borderStyles.$solid,
-        borderTopColor: theme.colors.$borderAlpha100,
-      })}
-    >
+    <ProfileCardFooter>
       {!hidePrevious && (
         <Button
           elementDescriptor={descriptors.configureSSOWizardFooterPreviousButton}
@@ -96,6 +86,6 @@ export const ConfigureSSOFooter = ({
           sx={theme => ({ marginInlineStart: theme.space.$1 })}
         />
       </Button>
-    </Flex>
+    </ProfileCardFooter>
   );
 };

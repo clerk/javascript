@@ -43,7 +43,7 @@ function extractItems(children: React.ReactNode): BreadcrumbsActiveItem[] {
   return items;
 }
 
-const Breadcrumbs_ = ({ currentId, onItemClick, children }: BreadcrumbsProps): JSX.Element => {
+const Root = ({ currentId, onItemClick, children }: BreadcrumbsProps): JSX.Element => {
   const { t } = useLocalizations();
 
   const items = React.useMemo(() => extractItems(children), [children]);
@@ -51,14 +51,11 @@ const Breadcrumbs_ = ({ currentId, onItemClick, children }: BreadcrumbsProps): J
 
   return (
     <Flex
-      elementDescriptor={descriptors.configureSSOWizardHeader}
+      // TODO: add descriptor
+      // elementDescriptor={}
       align='center'
       sx={theme => ({
         gap: theme.space.$2,
-        padding: `${theme.space.$4} ${theme.space.$6}`,
-        borderBottomWidth: theme.borderWidths.$normal,
-        borderBottomStyle: theme.borderStyles.$solid,
-        borderBottomColor: theme.colors.$borderAlpha100,
         flexWrap: 'wrap',
       })}
     >
@@ -71,6 +68,7 @@ const Breadcrumbs_ = ({ currentId, onItemClick, children }: BreadcrumbsProps): J
         return (
           <React.Fragment key={item.id}>
             <Button
+              // TODO: add descriptor
               elementDescriptor={descriptors.configureSSOWizardHeaderItem}
               elementId={descriptors.configureSSOWizardHeaderItem.setId(item.id)}
               isActive={isCurrent}
@@ -84,7 +82,7 @@ const Breadcrumbs_ = ({ currentId, onItemClick, children }: BreadcrumbsProps): J
               sx={theme => ({
                 gap: theme.space.$1x5,
                 padding: 0,
-                color: isCurrent ? theme.colors.$colorForeground : theme.colors.$colorMutedForeground,
+                color: isCurrent || isCompleted ? theme.colors.$colorForeground : theme.colors.$colorMutedForeground,
               })}
             >
               <Flex
@@ -97,29 +95,32 @@ const Breadcrumbs_ = ({ currentId, onItemClick, children }: BreadcrumbsProps): J
                   width: theme.sizes.$4,
                   height: theme.sizes.$4,
                   borderRadius: theme.radii.$circle,
-                  fontSize: theme.fontSizes.$xs,
-                  fontWeight: theme.fontWeights.$semibold,
                   backgroundColor: isCurrent
                     ? theme.colors.$colorForeground
                     : isCompleted
                       ? theme.colors.$success500
-                      : theme.colors.$neutralAlpha100,
-                  color: isCurrent
-                    ? theme.colors.$colorBackground
-                    : isCompleted
-                      ? theme.colors.$white
-                      : theme.colors.$colorMutedForeground,
+                      : theme.colors.$neutralAlpha400,
                 })}
               >
                 {isCompleted && !isCurrent ? (
                   <Icon
                     icon={Check}
-                    size='xs'
+                    sx={theme => ({ width: theme.sizes.$2, height: theme.sizes.$2, color: theme.colors.$white })}
                   />
                 ) : (
-                  index + 1
+                  <Text
+                    as='span'
+                    sx={theme => ({
+                      fontSize: theme.fontSizes.$xs,
+                      fontWeight: theme.fontWeights.$semibold,
+                      color: theme.colors.$colorBackground,
+                    })}
+                  >
+                    {index + 1}
+                  </Text>
                 )}
               </Flex>
+
               <Text
                 elementDescriptor={descriptors.configureSSOWizardHeaderItemLabel}
                 elementId={descriptors.configureSSOWizardHeaderItemLabel.setId(item.id)}
@@ -158,6 +159,6 @@ const Breadcrumbs_ = ({ currentId, onItemClick, children }: BreadcrumbsProps): J
  * Presentational primitive — no awareness of the wizard or its
  * context
  */
-export const Breadcrumbs = Object.assign(Breadcrumbs_, {
+export const Breadcrumbs = Object.assign(Root, {
   Item,
 });
