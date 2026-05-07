@@ -3,13 +3,13 @@ import { Text } from '@/customizables';
 import { Step } from '../elements/Step';
 import { useWizard } from '../elements/Wizard';
 
-export const ProvideEmail = (): JSX.Element => {
+export const VerifyEmailAddressStep = (): JSX.Element => {
   const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
 
   return (
     <>
       <Step.Body>
-        <Text as='p'>UI goes here</Text>
+        <Text>UI goes here</Text>
       </Step.Body>
       <Step.Footer>
         <Step.Footer.Previous

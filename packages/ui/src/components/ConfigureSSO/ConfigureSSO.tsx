@@ -1,4 +1,4 @@
-import { __internal_useUserEnterpriseConnections, useUser } from '@clerk/shared/react';
+import { __internal_useUserEnterpriseConnections } from '@clerk/shared/react';
 import type { __experimental_ConfigureSSOProps } from '@clerk/shared/types';
 import React from 'react';
 
@@ -13,7 +13,7 @@ import { ConfigureSSOHeader } from './ConfigureSSOHeader';
 import { ConfigureSSONavbar } from './ConfigureSSONavbar';
 import { ConfigureSSOSkeleton } from './ConfigureSSOSkeleton';
 import { Wizard } from './elements/Wizard';
-import { ConfigureCreateApp, ConfirmationStep, ProvideEmail, TestConfigurationStep, VerifyDomainStep } from './steps';
+import { ConfigureCreateApp, ConfirmationStep, TestConfigurationStep, VerifyEmailDomainStep } from './steps';
 
 const ConfigureSSOInternal = () => {
   return (
@@ -79,26 +79,13 @@ const ConfigureSSOCardContent = () => {
 };
 
 const ConfigureSSOSteps = () => {
-  const { user } = useUser();
-
-  const primaryEmailAddress = user?.primaryEmailAddress;
-
   return (
     <>
       <Wizard.Step
         id='verify-email-domain'
         label='Verify domain'
       >
-        <Wizard>
-          {!primaryEmailAddress && (
-            <Wizard.Step id='provide-email'>
-              <ProvideEmail />
-            </Wizard.Step>
-          )}
-          <Wizard.Step id='verify-domain'>
-            <VerifyDomainStep />
-          </Wizard.Step>
-        </Wizard>
+        <VerifyEmailDomainStep />
       </Wizard.Step>
 
       <Wizard.Step

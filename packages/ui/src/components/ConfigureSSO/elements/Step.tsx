@@ -1,6 +1,17 @@
 import { type PropsWithChildren } from 'react';
 
-import { Button, Col, descriptors, Heading, Icon, type LocalizationKey, Text, useLocalizations } from '@/customizables';
+import {
+  Badge,
+  Button,
+  Col,
+  descriptors,
+  Flex,
+  Heading,
+  Icon,
+  type LocalizationKey,
+  Text,
+  useLocalizations,
+} from '@/customizables';
 import { CaretLeft, CaretRight } from '@/icons';
 import type { PropsOfComponent } from '@/styledSystem';
 
@@ -42,26 +53,32 @@ const Header = ({ title, description, children }: StepHeaderProps): JSX.Element 
         borderBottomColor: theme.colors.$borderAlpha100,
       })}
     >
-      <Col sx={theme => ({ gap: theme.space.$1x5 })}>
-        <Heading
-          textVariant='h3'
-          sx={theme => ({ color: theme.colors.$colorForeground, fontSize: theme.fontSizes.$lg })}
-        >
-          {titleText}
-        </Heading>
-
-        {descriptionText && (
-          <Text
-            as='p'
-            variant='body'
-            sx={theme => ({ color: theme.colors.$colorMutedForeground })}
+      <Flex
+        align='center'
+        justify='between'
+        sx={theme => ({ gap: theme.space.$4 })}
+      >
+        <Col sx={theme => ({ gap: theme.space.$1x5, minWidth: 0 })}>
+          <Heading
+            textVariant='h3'
+            sx={theme => ({ color: theme.colors.$colorForeground, fontSize: theme.fontSizes.$lg })}
           >
-            {descriptionText}
-          </Text>
-        )}
-      </Col>
+            {titleText}
+          </Heading>
 
-      {children}
+          {descriptionText && (
+            <Text
+              as='p'
+              variant='body'
+              sx={theme => ({ color: theme.colors.$colorMutedForeground })}
+            >
+              {descriptionText}
+            </Text>
+          )}
+        </Col>
+
+        {children}
+      </Flex>
     </Section>
   );
 };
@@ -152,9 +169,38 @@ const FooterCompound = Object.assign(Footer, {
   Continue: FooterContinue,
 });
 
+type StepCounterProps = {
+  total: number;
+  /** 1-indexed (i.e., first step = 1, not 0). */
+  current: number;
+};
+
+const Counter = ({ total, current }: StepCounterProps): JSX.Element | null => {
+  if (total <= 1) {
+    return null;
+  }
+
+  return (
+    <Badge
+      // TODO: add descriptor
+      colorScheme='primary'
+      sx={{ whiteSpace: 'nowrap' }}
+    >
+      <Text
+        as='span'
+        sx={t => ({ fontSize: t.fontSizes.$xs })}
+      >
+        Step {current}/{total}
+      </Text>
+    </Badge>
+  );
+};
+Counter.displayName = 'Step.Counter';
+
 export const Step = Object.assign(Layout, {
   Section,
   Header,
   Body,
   Footer: FooterCompound,
+  Counter,
 });
