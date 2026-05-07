@@ -69,50 +69,42 @@ const ConfigureSSOCardContent = () => {
 
   return (
     <ConfigureSSOFlowProvider enterpriseConnection={enterpriseConnection}>
-      <Wizard>
+      <Wizard initialStepId='configure'>
         <ConfigureSSOHeader />
 
-        <ConfigureSSOSteps />
+        <Wizard.Step id='select-provider'>
+          <SelectProviderStep />
+        </Wizard.Step>
+
+        <Wizard.Step
+          id='verify-domain'
+          label='Verify domain'
+        >
+          <VerifyDomainStep />
+        </Wizard.Step>
+
+        <Wizard.Step
+          id='configure'
+          label='Configure'
+        >
+          <ConfigureStep />
+        </Wizard.Step>
+
+        <Wizard.Step
+          id='test'
+          label='Test'
+        >
+          <TestConfigurationStep />
+        </Wizard.Step>
+
+        <Wizard.Step
+          id='confirmation'
+          label='Confirmation'
+        >
+          <ConfirmationStep />
+        </Wizard.Step>
       </Wizard>
     </ConfigureSSOFlowProvider>
-  );
-};
-
-const ConfigureSSOSteps = () => {
-  return (
-    <>
-      <Wizard.Step id='select-provider'>
-        <SelectProviderStep />
-      </Wizard.Step>
-
-      <Wizard.Step
-        id='verify-domain'
-        label='Verify domain'
-      >
-        <VerifyDomainStep />
-      </Wizard.Step>
-
-      <Wizard.Step
-        id='configure'
-        label='Configure'
-      >
-        <ConfigureStep />
-      </Wizard.Step>
-
-      <Wizard.Step
-        id='test'
-        label='Test'
-      >
-        <TestConfigurationStep />
-      </Wizard.Step>
-
-      <Wizard.Step
-        id='confirmation'
-        label='Confirmation'
-      >
-        <ConfirmationStep />
-      </Wizard.Step>
-    </>
   );
 };
 
