@@ -69,7 +69,7 @@ const ConfigureSSOCardContent = () => {
 
   return (
     <ConfigureSSOFlowProvider enterpriseConnection={enterpriseConnection}>
-      <Wizard initialStepId='configure'>
+      <Wizard>
         <ConfigureSSOHeader />
 
         <Wizard.Step id='select-provider'>
