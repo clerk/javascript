@@ -14,12 +14,6 @@ const HOOK_NAME = 'useOAuthConsent';
  * (`GET /me/oauth/consent/{oauthClientId}`). Ensure the user is authenticated before relying on this hook
  * (for example, redirect to sign-in on your custom consent route).
  *
- * The hook is a pure data fetcher: it takes an explicit `oauthClientId` and optional `scope` and
- * issues the fetch when both the user is signed in and `oauthClientId` is non-empty. The query is
- * disabled when `oauthClientId` is empty or omitted.
- *
- * @internal
- *
  * @example
  * ```tsx
  * import { useOAuthConsent } from '@clerk/react/internal'
@@ -30,7 +24,7 @@ const HOOK_NAME = 'useOAuthConsent';
  * })
  * ```
  */
-export function useOAuthConsent(params: UseOAuthConsentParams = {}): UseOAuthConsentReturn {
+export function useOAuthConsent(params: UseOAuthConsentParams): UseOAuthConsentReturn {
   useAssertWrappedByClerkProvider(HOOK_NAME);
 
   const { oauthClientId: oauthClientIdParam, scope, keepPreviousData = true, enabled = true } = params;

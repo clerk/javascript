@@ -259,7 +259,15 @@ function SignUpStartInternal(): JSX.Element {
     }, [] as Array<FormControlState>);
 
     if (unsafeMetadata) {
-      fieldsToSubmit.push({ id: 'unsafeMetadata', value: unsafeMetadata } as any);
+      const noop = () => {};
+      fieldsToSubmit.push({
+        id: 'unsafeMetadata',
+        value: unsafeMetadata,
+        clearFeedback: noop,
+        setValue: noop,
+        onChange: noop,
+        setError: noop,
+      } as any);
     }
 
     if (fields.ticket || hasExistingSignUpWithTicket) {

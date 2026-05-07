@@ -1,5 +1,16 @@
 # Change Log
 
+## 7.3.2
+
+### Patch Changes
+
+- Improved `auth()` error message when `clerkMiddleware()` is not detected to mention that infrastructure issues (e.g. edge runtime errors or platform outages) can also cause this error. ([#8007](https://github.com/clerk/javascript/pull/8007)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`7a5892f`](https://github.com/clerk/javascript/commit/7a5892f9bcaa1a6212e6e6d3741160929ffd027e)]:
+  - @clerk/backend@3.4.6
+  - @clerk/shared@4.10.1
+  - @clerk/react@6.6.1
+
 ## 7.3.1
 
 ### Patch Changes
