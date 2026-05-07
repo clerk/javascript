@@ -2163,6 +2163,78 @@ describe('SignIn', () => {
         });
       });
 
+      it('reuses an existing enterprise SSO sign-in and uses the fresh redirect URL when retrying after an abandoned attempt', async () => {
+        vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
+
+        const mockPopup = { location: { href: '' } } as Window;
+
+        SignIn.clerk = {
+          buildUrlWithAuth: vi.fn().mockReturnValue('https://example.com/sso-callback'),
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
+
+        const mockFetch = vi
+          .fn()
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signin_enterprise',
+              first_factor_verification: {
+                status: 'unverified',
+                external_verification_redirect_url: 'https://sso.example.com/auth/fresh',
+              },
+            },
+          })
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signin_enterprise',
+              status: 'complete',
+            },
+          });
+        BaseResource._fetch = mockFetch;
+
+        vi.mocked(_futureAuthenticateWithPopup).mockImplementation((_clerk, params) => {
+          params.popup.location.href = params.externalVerificationRedirectURL.toString();
+          return Promise.resolve();
+        });
+
+        const signIn = new SignIn({
+          id: 'signin_enterprise',
+          object: 'sign_in',
+          status: 'needs_first_factor',
+          first_factor_verification: {
+            status: 'unverified',
+            strategy: 'enterprise_sso',
+            external_verification_redirect_url: 'https://sso.example.com/auth/stale',
+          },
+        } as any);
+
+        const result = await signIn.__internal_future.sso({
+          strategy: 'enterprise_sso',
+          redirectUrl: 'https://complete.example.com',
+          redirectCallbackUrl: '/sso-callback',
+          popup: mockPopup,
+        });
+
+        expect(result.error).toBeNull();
+        expect(mockFetch).toHaveBeenNthCalledWith(1, {
+          method: 'POST',
+          path: '/client/sign_ins/signin_enterprise/prepare_first_factor',
+          body: expect.objectContaining({
+            strategy: 'enterprise_sso',
+          }),
+        });
+        expect(mockFetch).not.toHaveBeenCalledWith(
+          expect.objectContaining({ method: 'POST', path: '/client/sign_ins' }),
+        );
+        expect(mockPopup.location.href).toBe('https://sso.example.com/auth/fresh');
+      });
+
       it('handles relative redirectUrl by converting to absolute', async () => {
         vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
 

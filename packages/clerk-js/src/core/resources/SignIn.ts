@@ -1145,6 +1145,9 @@ class SignInFuture implements SignInFutureResource {
         routes.actionCompleteRedirectUrl = wrappedRoutes.redirectUrl;
       }
 
+      // Enterprise SSO can be entered with a pre-existing sign-in (e.g. from a ticket
+      // or identifier-based discovery), in which case `prepare_first_factor` must run
+      // against that resource. All other strategies always start fresh.
       const shouldCreateSignIn = !this.#resource.id || strategy !== 'enterprise_sso';
 
       if (shouldCreateSignIn) {
