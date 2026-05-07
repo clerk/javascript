@@ -7,12 +7,17 @@ import { useWizard } from './elements/Wizard';
 
 export const ConfigureSSOHeader = (): JSX.Element => {
   const { activeSteps, currentStep, goToStep } = useWizard();
-  const currentIndex = activeSteps.findIndex(s => s.id === currentStep?.id);
+  // Select Provider isn't part of the visual breadcrumb per the design —
+  // filter it out here. The wizard still tracks it as the first step
+  // for navigation (goNext from it advances to verify-domain, Previous
+  // is naturally disabled because isFirstStep is true).
+  const visibleSteps = activeSteps.filter(step => step.id !== 'select-provider');
+  const currentIndex = visibleSteps.findIndex(step => step.id === currentStep?.id);
 
   return (
     <ProfileCardHeader>
       <Stepper>
-        {activeSteps.map((step, index) => {
+        {visibleSteps.map((step, index) => {
           const isCurrent = index === currentIndex;
           const isCompleted = step.isCompleted ?? index < currentIndex;
           const isReachable = isCompleted || index <= currentIndex;

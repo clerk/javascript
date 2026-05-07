@@ -13,7 +13,7 @@ import { ConfigureSSOHeader } from './ConfigureSSOHeader';
 import { ConfigureSSONavbar } from './ConfigureSSONavbar';
 import { ConfigureSSOSkeleton } from './ConfigureSSOSkeleton';
 import { Wizard } from './elements/Wizard';
-import { ConfigureStep, ConfirmationStep, TestConfigurationStep, VerifyDomainStep } from './steps';
+import { ConfigureStep, ConfirmationStep, SelectProviderStep, TestConfigurationStep, VerifyDomainStep } from './steps';
 
 const ConfigureSSOInternal = () => {
   return (
@@ -81,6 +81,10 @@ const ConfigureSSOCardContent = () => {
 const ConfigureSSOSteps = () => {
   return (
     <>
+      <Wizard.Step id='select-provider'>
+        <SelectProviderStep />
+      </Wizard.Step>
+
       <Wizard.Step
         id='verify-domain'
         label='Verify domain'
