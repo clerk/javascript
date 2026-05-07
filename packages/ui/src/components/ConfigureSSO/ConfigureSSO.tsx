@@ -11,7 +11,7 @@ import { ProfileCard } from '@/elements/ProfileCard';
 import { BoxIcon } from '@/icons';
 import { Route, Switch } from '@/router';
 
-import { ConfigureSSOFlowProvider } from './ConfigureSSOContext';
+import { ConfigureSSOFlowProvider, useConfigureSSOFlow } from './ConfigureSSOContext';
 import {
   ConfigureCreateApp,
   ConfirmationStep,
@@ -144,18 +144,25 @@ const AuthenticatedContent = withCoreUserGuard(() => {
 
 const ConfigureSSOSteps = () => {
   const { user } = useUser();
+  const { enterpriseConnection } = useConfigureSSOFlow();
 
   const hasEmailAddress = Boolean(user?.emailAddresses?.length);
+  // The provider can only be picked once; if a connection already
+  // exists for this user we drop the step from the wizard entirely
+  // so it never shows in the breadcrumb and is not routable
+  const hasEnterpriseConnection = Boolean(enterpriseConnection);
 
   return (
     <ConfigureSSOWizard>
-      <ConfigureSSOWizard.Step
-        id='select-provider'
-        path='select-provider'
-        label='Select provider'
-      >
-        <SelectProviderStep />
-      </ConfigureSSOWizard.Step>
+      {!hasEnterpriseConnection && (
+        <ConfigureSSOWizard.Step
+          id='select-provider'
+          path='select-provider'
+          label='Select provider'
+        >
+          <SelectProviderStep />
+        </ConfigureSSOWizard.Step>
+      )}
       <ConfigureSSOWizard.Step
         id='verify-email-domain'
         path='verify-email-domain'

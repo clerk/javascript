@@ -1,26 +1,37 @@
-import { useReverification, useUser } from '@clerk/shared/react';
+import { useOrganization, useReverification, useUser } from '@clerk/shared/react';
 import React from 'react';
 
 import { Col, Flow, Heading, Icon, Input, localizationKeys, Text, useLocalizations } from '@/customizables';
 import { useFieldOTP } from '@/elements/CodeControl';
 import { useCardState } from '@/elements/contexts';
 import { Form } from '@/elements/Form';
-import { DuotoneAtSymbol } from '@/icons';
+import { DuotoneAtSymbol, ExclamationTriangle } from '@/icons';
 import { handleError } from '@/utils/errorHandler';
 
+import { useConfigureSSOFlow } from '../ConfigureSSOContext';
 import { useConfigureSSOWizard, useRegisterContinueAction } from '../wizard';
 import { StepLayout } from './StepLayout';
 
 export const VerifyDomainStep = (): JSX.Element | null => {
   const { goNext, goToStep } = useConfigureSSOWizard();
+  const { enterpriseConnection } = useConfigureSSOFlow();
   const card = useCardState();
   const { t } = useLocalizations();
   const { user } = useUser();
+  const { organization } = useOrganization();
 
   const emailToVerify =
     user?.primaryEmailAddress ?? user?.emailAddresses?.find(e => e.verification.status !== 'verified');
   const isVerified = emailToVerify?.verification.status === 'verified';
   const isAlreadyPrimary = Boolean(emailToVerify && emailToVerify.id === user?.primaryEmailAddressId);
+
+  // The user's domain is already wired to an enterprise connection that
+  // doesn't belong to the org they're currently configuring. They can't
+  // take it over from here — they need the existing app's owner to
+  // re-configure (or share) the connection
+  const isDomainTakenByOtherOrg = Boolean(
+    isVerified && enterpriseConnection && enterpriseConnection.organizationId !== (organization?.id ?? null),
+  );
 
   const prepareEmailVerification = useReverification(() =>
     emailToVerify?.prepareVerification({ strategy: 'email_code' }),
@@ -62,20 +73,27 @@ export const VerifyDomainStep = (): JSX.Element | null => {
 
   const { values, length } = otp.otpControl.otpInputProps;
   const isCodeComplete = values.filter(Boolean).length === length;
-  const showVerifiedView = isVerified && !codeSubmittedRef.current;
+  const showVerifiedView = isVerified && !codeSubmittedRef.current && !isDomainTakenByOtherOrg;
 
   useRegisterContinueAction(
-    showVerifiedView
+    isDomainTakenByOtherOrg
       ? {
           handler: () => {
-            void goNext();
+            // No-op: there's no path forward from this state
           },
+          isDisabled: true,
         }
-      : {
-          handler: otp.onFakeContinue,
-          isDisabled: !isCodeComplete,
-          isLoading: otp.isLoading,
-        },
+      : showVerifiedView
+        ? {
+            handler: () => {
+              void goNext();
+            },
+          }
+        : {
+            handler: otp.onFakeContinue,
+            isDisabled: !isCodeComplete,
+            isLoading: otp.isLoading,
+          },
   );
 
   React.useEffect(() => {
@@ -114,7 +132,33 @@ export const VerifyDomainStep = (): JSX.Element | null => {
             paddingBlock: t.space.$8,
           })}
         >
-          {showVerifiedView ? (
+          {isDomainTakenByOtherOrg ? (
+            <>
+              <Icon
+                icon={ExclamationTriangle}
+                sx={t => ({
+                  width: t.sizes.$8,
+                  height: t.sizes.$8,
+                  color: t.colors.$neutralAlpha600,
+                })}
+              />
+              <Col sx={t => ({ gap: t.space.$1, textAlign: 'center', maxWidth: t.sizes.$66 })}>
+                <Heading
+                  textVariant='h1'
+                  sx={t => ({ color: t.colors.$colorForeground, fontSize: t.fontSizes.$sm })}
+                >
+                  That domain is already used for a different enterprise connection.
+                </Heading>
+                <Text
+                  as='p'
+                  variant='body'
+                  sx={t => ({ color: t.colors.$colorMutedForeground })}
+                >
+                  Contact the application owner to configure an SSO connection using the same domain.
+                </Text>
+              </Col>
+            </>
+          ) : showVerifiedView ? (
             <>
               <Icon
                 icon={DuotoneAtSymbol}
