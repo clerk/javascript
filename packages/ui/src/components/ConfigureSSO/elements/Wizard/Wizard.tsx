@@ -5,9 +5,17 @@ import { useWizard, WizardContext } from './WizardContext';
 
 interface RootProps {
   children: React.ReactNode;
+  /**
+   * Initial active step id. When provided, the wizard mounts with this
+   * step active. When omitted, the first registered step becomes the
+   * default — useful when steps are statically known and order is the
+   * source of truth, or when the host derives the initial step from
+   * external state (e.g., a server-state hook) and passes it down.
+   */
+  initialStepId?: string;
 }
 
-const Root = ({ children }: RootProps): JSX.Element => {
+const Root = ({ children, initialStepId }: RootProps): JSX.Element => {
   const parentWizard = React.useContext(WizardContext);
   const isNested = parentWizard !== null;
 
@@ -15,6 +23,7 @@ const Root = ({ children }: RootProps): JSX.Element => {
     <RootInner
       parentWizard={parentWizard}
       isNested={isNested}
+      initialStepId={initialStepId}
     >
       {children}
     </RootInner>
@@ -24,15 +33,17 @@ const Root = ({ children }: RootProps): JSX.Element => {
 interface RootInnerProps {
   parentWizard: WizardContextValue | null;
   isNested: boolean;
+  initialStepId?: string;
   children: React.ReactNode;
 }
 
-const RootInner = ({ parentWizard, isNested, children }: RootInnerProps): JSX.Element => {
+const RootInner = ({ parentWizard, isNested, initialStepId, children }: RootInnerProps): JSX.Element => {
   // Stable registry of mounted Steps. Insertion order = JSX order =
   // display order
   const [activeSteps, setActiveSteps] = React.useState<WizardActiveStep[]>([]);
-  // Active step id. Defaults to the first registered step's id
-  const [currentStepId, setCurrentStepId] = React.useState<string | undefined>(undefined);
+  // Active step id. Defaults to the first registered step's id when
+  // `initialStepId` is omitted; otherwise mounts with the explicit id.
+  const [currentStepId, setCurrentStepId] = React.useState<string | undefined>(initialStepId);
 
   const registerStep = React.useCallback((step: WizardActiveStep) => {
     setActiveSteps(prev => {
@@ -171,6 +182,11 @@ Step.displayName = 'Wizard.Step';
  * are provided by the host layout via `useWizard()`. Each step owns
  * its own footer via `<Step.Footer>`, which reads the nearest wizard
  * via `useWizard()` so nested-wizard fall-through works automatically.
+ *
+ * When mounted without `initialStepId`, the wizard defaults to the
+ * first registered step. When `initialStepId` is provided, the wizard
+ * starts on that step instead — useful for resuming a flow from
+ * server-derived state.
  */
 export const Wizard = Object.assign(Root, {
   Step,
