@@ -198,8 +198,7 @@ function mergeIntersectionPropertyReflections(intersection, project) {
 }
 
 /**
- * For properties typed something like `false \| { a?: … }`, `getFlattenedDeclarations` does not walk the union, so nested keys
- * never become table rows. Collect object members from each union arm (primitives/literals yield nothing).
+ * For properties typed something like `false \| { a?: … }`, `getFlattenedDeclarations` does not walk the union, so nested keys never become table rows. Collect object members from each union arm (primitives/literals yield nothing).
  * E.g. `telemetry` prop in clerk.ts
  *
  * @param {import('typedoc').Type | undefined} t
@@ -224,10 +223,7 @@ function collectPropertyReflectionsFromUnionObjectArms(t, visitedReflectionIds, 
 }
 
 /**
- * Appends `parent.child` rows for union object arms (e.g. `false \| { disabled?: … }`). **Only** used when building
- * {@link clerkTypeDeclarationTable}; we intentionally do **not** hook `helpers.getFlattenedDeclarations` globally —
- * otherwise top-level `propertiesTable` output (e.g. `Clerk`) would gain synthetic rows like `client.*` for every
- * property whose type is a union such as `ClientResource \| undefined`.
+ * Appends `parent.child` rows for union object arms (e.g. `false \| { disabled?: … }`). **Only** used when building {@link clerkTypeDeclarationTable}; we intentionally do **not** hook `helpers.getFlattenedDeclarations` globally — otherwise top-level `propertiesTable` output (e.g. `Clerk`) would gain synthetic rows like `client.*` for every property whose type is a union such as `ClientResource \| undefined`.
  *
  * @template {import('typedoc').DeclarationReflection} T
  * @param {T[]} base
@@ -493,9 +489,7 @@ function renderPropertiesFormatTable(args) {
 }
 
 /**
- * Same logic as typedoc-plugin-markdown `member.typeDeclarationTable`, but **always** runs `getFlattenedDeclarations`
- * and then {@link appendUnionObjectChildPropertyRows} (union-object arm rows like `telemetry.*`). The default plugin
- * skips flattening in `compact` mode, which hides nested keys like `telemetry.disabled`.
+ * Same logic as typedoc-plugin-markdown `member.typeDeclarationTable`, but **always** runs `getFlattenedDeclarations` and then {@link appendUnionObjectChildPropertyRows} (union-object arm rows like `telemetry.*`). The default plugin skips flattening in `compact` mode, which hides nested keys like `telemetry.disabled`.
  *
  * @this {import('typedoc-plugin-markdown').MarkdownThemeContext}
  * @param {import('typedoc').DeclarationReflection[]} model

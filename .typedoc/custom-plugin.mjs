@@ -382,9 +382,7 @@ const ATX_HEADING_LINE = /^\s{0,3}#{1,6}(?:\s|$)/;
 const PIPE_CODE_PH = /\uE000(\d+)\uE001/g;
 
 /**
- * Inline code that contains a pipe (e.g. `` `a \\| b` `` or `` `a | b` ``) cannot receive per-token
- * link replacements without breaking MDX. Replace those whole spans with placeholders, run catch-alls,
- * then restore.
+ * Inline code that contains a pipe (e.g. `` `a \\| b` `` or `` `a | b` ``) cannot receive link replacements without breaking MDX. Replace those whole spans with placeholders, run catch-alls, then restore.
  *
  * @param {string} line
  * @returns {{ text: string, placeholders: string[] }}
@@ -412,8 +410,7 @@ function restoreProtectedInlineCodeSpans(text, placeholders) {
 }
 
 /**
- * Remove the Properties section (heading + table) from reference object pages (e.g. `shared/clerk/clerk.mdx`);
- * the table is copied into `shared/<object>/properties.mdx` by `extract-methods.mjs`.
+ * Remove the Properties section (heading + table) from reference object pages (e.g. `shared/clerk/clerk.mdx`); the table is copied into `shared/<object>/properties.mdx` by `extract-methods.mjs`.
  *
  * @param {string} contents
  */
