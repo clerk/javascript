@@ -36,6 +36,8 @@ const FILES_WITHOUT_HEADINGS = [
   'payment-element-props.mdx',
   'use-organization-creation-defaults-return.mdx',
   'use-organization-creation-defaults-params.mdx',
+  'use-o-auth-consent-params.mdx',
+  'use-o-auth-consent-return.mdx',
 ];
 
 /**
@@ -66,6 +68,8 @@ const LINK_REPLACEMENTS = [
   ['organization-domain-resource', '/docs/reference/types/organization-domain-resource'],
   ['organization-invitation-resource', '/docs/reference/types/organization-invitation'],
   ['organization-membership-request-resource', '/docs/reference/types/organization-membership-request'],
+  ['o-auth-consent-info', '/docs/reference/types/oauth-consent-info'],
+  ['o-auth-consent-scope', '/docs/reference/types/oauth-consent-scope'],
   ['session', '/docs/reference/backend/types/backend-session'],
   ['session-activity', '/docs/reference/backend/types/backend-session-activity'],
   ['organization', '/docs/reference/backend/types/backend-organization'],
@@ -76,6 +80,12 @@ const LINK_REPLACEMENTS = [
   ['email-address', '/docs/reference/backend/types/backend-email-address'],
   ['enterprise-account', '/docs/reference/backend/types/backend-enterprise-account'],
   ['enterprise-account-connection', '/docs/reference/backend/types/backend-enterprise-account-connection'],
+  ['enterprise-connection', '/docs/reference/backend/types/backend-enterprise-connection'],
+  ['enterprise-connection-oauth-config', '/docs/reference/backend/types/backend-enterprise-connection-oauth-config'],
+  [
+    'enterprise-connection-saml-connection',
+    '/docs/reference/backend/types/backend-enterprise-connection-saml-connection',
+  ],
   ['external-account', '/docs/reference/backend/types/backend-external-account'],
   ['phone-number', '/docs/reference/backend/types/backend-phone-number'],
   ['saml-account', '/docs/reference/backend/types/backend-saml-account'],
@@ -101,6 +111,7 @@ const LINK_REPLACEMENTS = [
   ['billing-statement-resource', '/docs/reference/types/billing-statement-resource'],
   ['billing-subscription-resource', '/docs/reference/types/billing-subscription-resource'],
   ['clerk-api-response-error', '/docs/reference/types/clerk-api-response-error'],
+  ['clerk-api-error', '/docs/reference/types/clerk-api-error'],
   ['billing-statement-totals', '/docs/reference/types/billing-statement-totals'],
   ['billing-payment-resource', '/docs/reference/types/billing-payment-resource'],
   ['deleted-object-resource', '/docs/reference/types/deleted-object-resource'],
@@ -159,6 +170,10 @@ export function applyRelativeLinkReplacements(contents) {
 
 function getCatchAllReplacements() {
   return [
+    {
+      pattern: /(?<![`[\]])\bClerkAPIResponseError\b(?![\]\(])/g,
+      replace: '[ClerkAPIResponseError](/docs/reference/types/clerk-api-response-error)',
+    },
     {
       pattern: /(?<![\[\w`#])`?APIKeysNamespace`?(?![\]\w`])/g,
       replace: '[APIKeys](/docs/reference/objects/api-keys)',

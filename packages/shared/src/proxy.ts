@@ -51,6 +51,10 @@ export function shouldAutoProxy(hostname: string): boolean {
   return AUTO_PROXY_HOST_SUFFIXES.some(hostSuffix => hostname?.endsWith(hostSuffix)) ?? false;
 }
 
+function getDefaultEnvironment(): NodeJS.ProcessEnv {
+  return typeof process !== 'undefined' && process.env ? process.env : {};
+}
+
 function normalizeHostname(hostnameOrUrl: string): string {
   if (hostnameOrUrl.startsWith('http://') || hostnameOrUrl.startsWith('https://')) {
     try {
@@ -80,7 +84,7 @@ export function getAutoProxyUrlFromEnvironment({
   publishableKey,
   hasDomain = false,
   hasProxyUrl = false,
-  environment = process.env,
+  environment = getDefaultEnvironment(),
 }: GetAutoProxyUrlFromEnvironmentOptions): string {
   if (hasProxyUrl || hasDomain || !isProductionFromPublishableKey(publishableKey)) {
     return '';

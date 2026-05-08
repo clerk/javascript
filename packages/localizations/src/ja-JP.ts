@@ -189,6 +189,11 @@ export const jaJP: LocalizationResource = {
     viewPayment: '支払いを表示',
     year: '年',
   },
+  configureSSO: {
+    navbar: {
+      title: 'シングルサインオン（SSO）を設定',
+    },
+  },
   createOrganization: {
     formButtonSubmit: '組織を作成する',
     invitePage: {

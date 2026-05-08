@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nuxt",
-  "version": "2.3.0",
+  "version": "2.4.1",
   "description": "Clerk SDK for Nuxt",
   "keywords": [
     "clerk",
@@ -78,7 +78,7 @@
   },
   "devDependencies": {
     "h3": "^1.15.4",
-    "nuxt": "^4.1.2",
+    "nuxt": "^4.4.4",
     "typescript": "catalog:repo",
     "vue": "catalog:repo"
   },

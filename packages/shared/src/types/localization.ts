@@ -62,8 +62,9 @@ type DeepLocalizationWithoutObjects<T> = {
  * as a starting point.
  */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- Needs to be an interface for typedoc to link correctly
-export interface LocalizationResource
-  extends DeepPartial<DeepLocalizationWithoutObjects<__internal_LocalizationResource>> {}
+export interface LocalizationResource extends DeepPartial<
+  DeepLocalizationWithoutObjects<__internal_LocalizationResource>
+> {}
 
 export type __internal_LocalizationResource = {
   locale: string;
@@ -1291,6 +1292,11 @@ export type __internal_LocalizationResource = {
       message: LocalizationValue;
     };
   };
+  configureSSO: {
+    navbar: {
+      title: LocalizationValue;
+    };
+  };
   apiKeys: {
     formTitle: LocalizationValue;
     formHint: LocalizationValue;
@@ -1298,6 +1304,9 @@ export type __internal_LocalizationResource = {
     menuAction__revoke: LocalizationValue;
     action__search: LocalizationValue;
     action__add: LocalizationValue;
+    tableHeader__name: LocalizationValue;
+    tableHeader__lastUsed: LocalizationValue;
+    tableHeader__actions: LocalizationValue;
     detailsTitle__emptyRow: LocalizationValue;
     revokeConfirmation: {
       formTitle: LocalizationValue<'apiKeyName'>;

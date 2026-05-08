@@ -3,6 +3,7 @@ name: CI
 on:
   merge_group:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     branches:
       - main
       - release/v4

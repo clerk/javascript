@@ -721,6 +721,26 @@ export interface Clerk {
   unmountAPIKeys: (targetNode: HTMLDivElement) => void;
 
   /**
+   * Mount a configure SSO component at the target element.
+   *
+   * @experimental This method is in early access and may change in future releases.
+   *
+   * @param targetNode - Target to mount the ConfigureSSO component.
+   * @param props - Configuration parameters.
+   */
+  __experimental_mountConfigureSSO: (targetNode: HTMLDivElement, props?: __experimental_ConfigureSSOProps) => void;
+
+  /**
+   * Unmount a configure SSO component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @experimental This method is in early access and may change in future releases.
+   *
+   * @param targetNode - Target node to unmount the ConfigureSSO component from.
+   */
+  __experimental_unmountConfigureSSO: (targetNode: HTMLDivElement) => void;
+
+  /**
    * Mounts a OAuth consent component at the target element.
    *
    * @param targetNode - Target node to mount the OAuth consent component.
@@ -1630,9 +1650,7 @@ export type SignInProps = RoutingOptions & {
    */
   signUpUrl?: string;
   /**
-   * Customization options to fully match the Clerk components to your own brand.
-   * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvider (if one is provided)
+   * Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided). See the [Appearance](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.
    */
   appearance?: ClerkAppearanceTheme;
   /**
@@ -1716,9 +1734,7 @@ export type __internal_UserVerificationProps = RoutingOptions & {
   level?: SessionVerificationLevel;
 
   /**
-   * Customization options to fully match the Clerk components to your own brand.
-   * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvider (if one is provided)
+   * Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided). See the [Appearance](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.
    */
   appearance?: ClerkAppearanceTheme;
 };
@@ -1779,6 +1795,9 @@ export type GoogleOneTapProps = GoogleOneTapRedirectUrlProps & {
    * @default true
    */
   fedCmSupport?: boolean;
+  /**
+   * Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided). See the [Appearance](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.
+   */
   appearance?: ClerkAppearanceTheme;
 };
 
@@ -1805,9 +1824,7 @@ export type SignUpProps = RoutingOptions & {
    */
   signInUrl?: string;
   /**
-   * Customization options to fully match the Clerk components to your own brand.
-   * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvider (if one is provided)
+   * Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided). See the [Appearance](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.
    */
   appearance?: ClerkAppearanceTheme;
 
@@ -1852,9 +1869,7 @@ export type SignUpModalProps = WithoutRouting<SignUpProps> & {
 /** @document */
 export type UserProfileProps = RoutingOptions & {
   /**
-   * Customization options to fully match the Clerk components to your own brand.
-   * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvider (if one is provided)
+   * Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided). See the [Appearance](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.
    */
   appearance?: ClerkAppearanceTheme;
   /*
@@ -1908,9 +1923,7 @@ export type OrganizationProfileProps = RoutingOptions & {
    */
   afterLeaveOrganizationUrl?: string;
   /**
-   * Customization options to fully match the Clerk components to your own brand.
-   * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvider (if one is provided)
+   * Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided). See the [Appearance](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.
    */
   appearance?: ClerkAppearanceTheme;
   /*
@@ -1968,9 +1981,7 @@ export type CreateOrganizationProps = RoutingOptions & {
    */
   skipInvitationScreen?: boolean;
   /**
-   * Customization options to fully match the Clerk components to your own brand.
-   * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvider (if one is provided)
+   * Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided). See the [Appearance](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.
    */
   appearance?: ClerkAppearanceTheme;
 };
@@ -2030,9 +2041,7 @@ export type UserButtonProps = UserButtonProfileMode & {
    */
   afterSwitchSessionUrl?: string;
   /**
-   * Customization options to fully match the Clerk components to your own brand.
-   * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvider (if one is provided)
+   * Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided). See the [Appearance](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.
    */
   appearance?: ClerkAppearanceTheme;
 
@@ -2049,6 +2058,9 @@ export type UserButtonProps = UserButtonProfileMode & {
 };
 
 export type UserAvatarProps = {
+  /**
+   * Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided). See the [Appearance](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.
+   */
   appearance?: ClerkAppearanceTheme;
   rounded?: boolean;
 };
@@ -2132,9 +2144,7 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      */
     skipInvitationScreen?: boolean;
     /**
-     * Customization options to fully match the Clerk components to your own brand.
-     * These options serve as overrides and will be merged with the global `appearance`
-     * prop of ClerkProvider(if one is provided)
+     * Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided). See the [Appearance](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.
      */
     appearance?: ClerkAppearanceTheme;
     /*
@@ -2164,9 +2174,7 @@ export type OrganizationListProps = {
     | ((organization: OrganizationResource) => string)
     | LooseExtractedParams<PrimitiveKeys<OrganizationResource>>;
   /**
-   * Customization options to fully match the Clerk components to your own brand.
-   * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvider (if one is provided)
+   * Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided). See the [Appearance](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.
    */
   appearance?: ClerkAppearanceTheme;
   /**
@@ -2201,9 +2209,7 @@ export type WaitlistProps = {
    */
   afterJoinWaitlistUrl?: string;
   /**
-   * Customization options to fully match the Clerk components to your own brand.
-   * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvided (if one is provided)
+   * Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided). See the [Appearance](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.
    */
   appearance?: ClerkAppearanceTheme;
   /**
@@ -2254,9 +2260,7 @@ type PricingTableBaseProps = {
    */
   for?: ForPayerType;
   /**
-   * Customization options to fully match the Clerk components to your own brand.
-   * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvider (if one is provided)
+   * Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided). See the [Appearance](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.
    */
   appearance?: ClerkAppearanceTheme;
   /*
@@ -2280,9 +2284,7 @@ export type APIKeysProps = {
    */
   perPage?: number;
   /**
-   * Customization options to fully match the Clerk components to your own brand.
-   * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvider (if one is provided)
+   * Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided). See the [Appearance](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.
    */
   appearance?: ClerkAppearanceTheme;
   /**
@@ -2291,6 +2293,16 @@ export type APIKeysProps = {
    * @default false
    */
   showDescription?: boolean;
+};
+
+/**
+ * @experimental This type is in early access and may change in future releases.
+ */
+export type __experimental_ConfigureSSOProps = {
+  /**
+   * Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided). See the [Appearance](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.
+   */
+  appearance?: ClerkAppearanceTheme;
 };
 
 /** @document */
@@ -2341,6 +2353,9 @@ export type RevokeAPIKeyParams = {
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type __internal_CheckoutProps = {
+  /**
+   * Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided). See the [Appearance](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.
+   */
   appearance?: ClerkAppearanceTheme;
   planId?: string;
   planPeriod?: BillingSubscriptionPlanPeriod;
@@ -2463,7 +2478,7 @@ export type __experimental_SubscriptionDetailsButtonProps = {
 
 export type OAuthConsentProps = {
   /**
-   * Customize the appearance of the component.
+   * Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided). See the [Appearance](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.
    */
   appearance?: ClerkAppearanceTheme;
   /**
@@ -2589,7 +2604,7 @@ export type TaskChooseOrganizationProps = {
    */
   redirectUrlComplete: string;
   /**
-   * Customization options to fully match the Clerk components to your own brand.
+   * Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided). See the [Appearance](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.
    */
   appearance?: ClerkAppearanceTheme;
 };
@@ -2601,7 +2616,7 @@ export type TaskResetPasswordProps = {
    */
   redirectUrlComplete: string;
   /**
-   * Customization options to fully match the Clerk components to your own brand.
+   * Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided). See the [Appearance](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.
    */
   appearance?: ClerkAppearanceTheme;
 };
@@ -2613,7 +2628,7 @@ export type TaskSetupMFAProps = {
    */
   redirectUrlComplete: string;
   /**
-   * Customization options to fully match the Clerk components to your own brand.
+   * Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided). See the [Appearance](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.
    */
   appearance?: ClerkAppearanceTheme;
 };
