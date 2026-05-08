@@ -83,11 +83,12 @@ jobs:
           CLERK_SECRET_KEY: ${{ steps.keys.outputs.sk }}
         run: |
           email="ci-${GITHUB_RUN_ID}-${RANDOM}+clerk_test@clerkcookie.com"
+          username="ci_${GITHUB_RUN_ID}_${RANDOM}"
           password="ClerkCI!$(openssl rand -hex 8)Aa1"
           http_code=$(curl -sS -o /tmp/bapi_response.json -w "%{http_code}" -X POST https://api.clerkstage.dev/v1/users \
             -H "Authorization: Bearer $CLERK_SECRET_KEY" \
             -H "Content-Type: application/json" \
-            -d "{\"email_address\":[\"$email\"],\"password\":\"$password\"}")
+            -d "{\"email_address\":[\"$email\"],\"username\":\"$username\",\"password\":\"$password\"}")
           if [ "$http_code" -lt 200 ] || [ "$http_code" -ge 300 ]; then
             echo "::error::BAPI user creation failed (HTTP $http_code)"
             jq . /tmp/bapi_response.json 2>/dev/null || cat /tmp/bapi_response.json
@@ -194,11 +195,12 @@ jobs:
           CLERK_SECRET_KEY: ${{ steps.keys.outputs.sk }}
         run: |
           email="ci-${GITHUB_RUN_ID}-${RANDOM}+clerk_test@clerkcookie.com"
+          username="ci_${GITHUB_RUN_ID}_${RANDOM}"
           password="ClerkCI!$(openssl rand -hex 8)Aa1"
           http_code=$(curl -sS -o /tmp/bapi_response.json -w "%{http_code}" -X POST https://api.clerkstage.dev/v1/users \
             -H "Authorization: Bearer $CLERK_SECRET_KEY" \
             -H "Content-Type: application/json" \
-            -d "{\"email_address\":[\"$email\"],\"password\":\"$password\"}")
+            -d "{\"email_address\":[\"$email\"],\"username\":\"$username\",\"password\":\"$password\"}")
           if [ "$http_code" -lt 200 ] || [ "$http_code" -ge 300 ]; then
             echo "::error::BAPI user creation failed (HTTP $http_code)"
             jq . /tmp/bapi_response.json 2>/dev/null || cat /tmp/bapi_response.json
