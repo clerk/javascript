@@ -879,9 +879,10 @@ function pickBetterUnionPropertyCandidate(existing, candidate) {
  * TypeDoc applies `@param parent.prop` descriptions onto property reflections under this declaration.
  *
  * @param {import('typedoc').SomeType | undefined} t
+ * @param {import('typedoc').ProjectReflection | undefined} [project] For resolving references when `ref.reflection` is missing (intersections like `Foo & WithOptionalOrgType<…>`).
  * @returns {import('typedoc').DeclarationReflection | undefined}
  */
-function resolveDeclarationWithObjectMembers(t) {
+function resolveDeclarationWithObjectMembers(t, project) {
   if (!t) {
     return undefined;
   }
@@ -893,11 +894,16 @@ function resolveDeclarationWithObjectMembers(t) {
   }
   if (t.type === 'reference') {
     const ref = /** @type {import('typedoc').ReferenceType} */ (t);
-    const r = ref.reflection;
-    if (r && 'type' in r) {
-      const decl = /** @type {import('typedoc').DeclarationReflection} */ (r);
-      const typeArgs = ref.typeArguments ?? [];
+    const typeArgs = ref.typeArguments ?? [];
 
+    let decl =
+      ref.reflection && 'kind' in ref.reflection
+        ? /** @type {import('typedoc').DeclarationReflection} */ (ref.reflection)
+        : undefined;
+    if (!decl && project && ref.name) {
+      decl = lookupInterfaceOrTypeAliasByName(project, ref.name);
+    }
+    if (decl) {
       /**
        * Generic aliases like `ClerkPaginationParams<{ status?: … }>` are a reference with `typeArguments`.
        * TypeDoc often puts pagination fields only on the target alias `children` and omits `decl.type`, so returning `decl` early drops the type argument object. Merge base + each type argument's properties.
@@ -906,7 +912,7 @@ function resolveDeclarationWithObjectMembers(t) {
         /** @type {Map<string, import('typedoc').DeclarationReflection>} */
         const byName = new Map();
         if (decl.type) {
-          const fromType = resolveDeclarationWithObjectMembers(decl.type);
+          const fromType = resolveDeclarationWithObjectMembers(decl.type, project);
           if (fromType?.children?.length) {
             for (const c of fromType.children) {
               if (c.kindOf(ReflectionKind.Property)) {
@@ -923,7 +929,7 @@ function resolveDeclarationWithObjectMembers(t) {
           }
         }
         for (const ta of typeArgs) {
-          const fromArg = resolveDeclarationWithObjectMembers(ta);
+          const fromArg = resolveDeclarationWithObjectMembers(ta, project);
           if (fromArg?.children?.length) {
             for (const c of fromArg.children) {
               if (c.kindOf(ReflectionKind.Property)) {
@@ -947,7 +953,7 @@ function resolveDeclarationWithObjectMembers(t) {
         return decl;
       }
       if (decl.type) {
-        return resolveDeclarationWithObjectMembers(decl.type);
+        return resolveDeclarationWithObjectMembers(decl.type, project);
       }
     }
   }
@@ -956,7 +962,7 @@ function resolveDeclarationWithObjectMembers(t) {
     /** @type {Map<string, import('typedoc').DeclarationReflection>} */
     const byName = new Map();
     for (const inner of inter.types) {
-      const res = resolveDeclarationWithObjectMembers(inner);
+      const res = resolveDeclarationWithObjectMembers(inner, project);
       if (res?.children?.length) {
         for (const c of res.children) {
           if (c.kindOf(ReflectionKind.Property)) {
@@ -982,7 +988,7 @@ function resolveDeclarationWithObjectMembers(t) {
     /** @type {Map<string, import('typedoc').DeclarationReflection>} */
     const byName = new Map();
     for (const inner of u.types) {
-      const res = resolveDeclarationWithObjectMembers(inner);
+      const res = resolveDeclarationWithObjectMembers(inner, project);
       if (!res?.children?.length) {
         continue;
       }
@@ -1013,7 +1019,7 @@ function resolveDeclarationWithObjectMembers(t) {
     );
   }
   if (t.type === 'optional') {
-    return resolveDeclarationWithObjectMembers(/** @type {import('typedoc').OptionalType} */ (t).elementType);
+    return resolveDeclarationWithObjectMembers(/** @type {import('typedoc').OptionalType} */ (t).elementType, project);
   }
   return undefined;
 }
@@ -1083,7 +1089,8 @@ function nestedParameterRowsFromDocumentedProperties(param, ctx) {
     return [];
   }
 
-  const holder = resolveDeclarationWithObjectMembers(param.type);
+  const project = /** @type {import('typedoc').ProjectReflection | undefined} */ (param.project ?? ctx.page?.project);
+  const holder = resolveDeclarationWithObjectMembers(param.type, project);
   if (!holder?.children?.length) {
     return [];
   }
@@ -1165,7 +1172,7 @@ function resolveNominalObjectTypeForSingleParam(t, project) {
     if (typeDecl.kindOf(ReflectionKind.TypeAlias)) {
       // Prefer resolving `typeAlias.type` so intersections and generic instantiations (e.g. `ClerkPaginationParams<{ status?: … }>`) merge every `&` arm into one property list.
       // Some aliases only attach members on `typeDecl.children` with no object shape on `.type`; keep that fallback (e.g. `SignOutOptions`, `JoinWaitlistParams`).
-      const fromResolvedType = typeDecl.type ? resolveDeclarationWithObjectMembers(typeDecl.type) : undefined;
+      const fromResolvedType = typeDecl.type ? resolveDeclarationWithObjectMembers(typeDecl.type, project) : undefined;
       const holder = fromResolvedType?.children?.length
         ? fromResolvedType
         : typeDecl.children?.length
@@ -1181,11 +1188,18 @@ function resolveNominalObjectTypeForSingleParam(t, project) {
 }
 
 /**
+ * Nominal param sections are skipped when there is no prose anywhere — avoids huge undocumented tables.
+ * Type-only aliases often use `@experimental` / `@deprecated` on the type with an empty summary; intersection params like `GetPaymentAttemptParams` still have documented arms (`id`, pagination) and must inline.
+ *
  * @param {import('typedoc').DeclarationReflection} typeDecl
  * @param {import('typedoc').DeclarationReflection[]} props
  */
 function isNominalParamTypeDocumented(typeDecl, props) {
   if (typeDecl.comment?.summary?.length) {
+    return true;
+  }
+  const blockTags = typeDecl.comment?.blockTags ?? [];
+  if (blockTags.some(t => t.tag !== '@inline')) {
     return true;
   }
   return props.some(p => p.comment?.summary?.length);
@@ -1323,7 +1337,8 @@ function hasExtractMethodsModifier(decl) {
  * @returns {number} Number of files written
  */
 function processExtractMethodsNamespace(parentDecl, ctx, outDir) {
-  const holder = resolveDeclarationWithObjectMembers(parentDecl.type);
+  const project = ctx.page?.project;
+  const holder = resolveDeclarationWithObjectMembers(parentDecl.type, project);
   const members = holder?.children ?? [];
   if (members.length === 0) {
     console.warn(

@@ -52,22 +52,24 @@ describe('Typedoc output', () => {
     expect(nestedFolders).toMatchInlineSnapshot(`
       [
         "react/legacy",
+        "shared/api-key-resource",
+        "shared/api-key-resource/methods",
+        "shared/billing-namespace",
+        "shared/billing-namespace/methods",
         "shared/clerk",
         "shared/clerk/methods",
         "shared/client-resource",
         "shared/client-resource/methods",
+        "shared/organization-resource",
+        "shared/organization-resource/methods",
         "shared/session-resource",
         "shared/session-resource/methods",
-        "shared/user-resource",
-        "shared/user-resource/methods",
         "shared/sign-in-future-resource",
         "shared/sign-in-future-resource/methods",
         "shared/sign-up-future-resource",
         "shared/sign-up-future-resource/methods",
-        "shared/organization-resource",
-        "shared/organization-resource/methods",
-        "shared/api-key-resource",
-        "shared/api-key-resource/methods",
+        "shared/user-resource",
+        "shared/user-resource/methods",
       ]
     `);
   });
