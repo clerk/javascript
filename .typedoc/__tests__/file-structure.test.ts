@@ -66,6 +66,8 @@ describe('Typedoc output', () => {
         "shared/sign-up-future-resource/methods",
         "shared/organization-resource",
         "shared/organization-resource/methods",
+        "shared/api-key-resource",
+        "shared/api-key-resource/methods",
       ]
     `);
   });

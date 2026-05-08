@@ -12,7 +12,9 @@
  *
  * `declarationHint` is a substring of `packages/shared/src/**` file paths (used by `findInterfaceOrClass()` in `extract-methods.mjs` when multiple reflections share the same interface/class name).
  *
- * `extract-methods.mjs` reads each file, writes `properties.mdx` with the same Properties table as TypeDoc, strips Properties from `<object>.mdx`, and writes methods under `methods/`.
+ * `extract-methods.mjs` reads each file, writes `properties.mdx` with the same Properties table as TypeDoc (no `## Properties` heading), strips Properties from `<object>.mdx`, and writes methods under `methods/`.
+ *
+ * Optional **`extraMethodInterfaces`**: extra `interface` / `class` declarations whose callable members (and `@extractMethods` namespaces) are emitted into the same `methods/` folder. Use when the documented resource type and the API surface live on different types (e.g. `APIKeyResource` vs `APIKeysNamespace` on `Clerk.apiKeys`).
  */
 export const REFERENCE_OBJECT_CONFIG = {
   'shared/clerk/clerk.mdx': {
@@ -42,6 +44,11 @@ export const REFERENCE_OBJECT_CONFIG = {
   'shared/organization-resource/organization-resource.mdx': {
     symbol: 'OrganizationResource',
     declarationHint: 'types/organization',
+  },
+  'shared/api-key-resource/api-key-resource.mdx': {
+    symbol: 'APIKeyResource',
+    declarationHint: 'types/apiKeys',
+    extraMethodInterfaces: [{ symbol: 'APIKeysNamespace', declarationHint: 'types/apiKeys' }],
   },
 };
 

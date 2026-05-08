@@ -2,6 +2,9 @@ import type { CreateAPIKeyParams, GetAPIKeysParams, RevokeAPIKeyParams } from '.
 import type { ClerkPaginatedResponse } from './pagination';
 import type { ClerkResource } from './resource';
 
+/**
+ * The `APIKeys` object provides methods for managing API keys that allow your application's users to grant third-party services programmatic access to your application's API endpoints on their behalf. API keys are long-lived, opaque tokens that can be instantly revoked.
+ */
 export interface APIKeyResource extends ClerkResource {
   /**
    * A unique identifier for the API key.
@@ -69,6 +72,7 @@ export interface APIKeyResource extends ClerkResource {
   updatedAt: Date;
 }
 
+/** @document */
 export interface APIKeysNamespace {
   /**
    * Retrieves a paginated list of API keys for the current user or organization.

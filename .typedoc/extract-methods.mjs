@@ -1374,34 +1374,15 @@ function processExtractMethodsNamespace(parentDecl, ctx, outDir) {
 }
 
 /**
- * @param {string} pageUrl
- * @param {import('typedoc').ProjectReflection} project
- * @param {import('typedoc').Application} app
+ * @param {import('typedoc').DeclarationReflection} decl
+ * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
+ * @param {string} outDir
  */
-function extractMethodsForPage(pageUrl, project, app) {
-  const entry = REFERENCE_OBJECT_CONFIG[/** @type {keyof typeof REFERENCE_OBJECT_CONFIG} */ (pageUrl)];
-  if (!entry) {
-    console.warn(`[extract-methods] No symbol mapping for ${pageUrl}, skipping`);
-    return 0;
-  }
-
-  const { symbol, declarationHint } = entry;
-  const decl = findInterfaceOrClass(project, symbol, declarationHint);
-  if (!decl?.children) {
-    console.warn(`[extract-methods] Could not find interface/class "${symbol}"`);
-    return 0;
-  }
-
-  extractPropertiesAndTrimSourcePage(pageUrl);
-
-  const ctx = createThemeContextForReferencePage(app, project, pageUrl, decl);
-
-  const pageDir = path.dirname(pageUrl);
-  const objectDir = path.join(__dirname, 'temp-docs', pageDir);
-  const outDir = path.join(objectDir, 'methods');
-  fs.mkdirSync(outDir, { recursive: true });
-
+function extractCallableMembersFromDeclaration(decl, ctx, outDir) {
   let count = 0;
+  if (!decl.children) {
+    return 0;
+  }
   for (const child of decl.children) {
     if (child.name.startsWith('__')) {
       continue;
@@ -1424,6 +1405,51 @@ function extractMethodsForPage(pageUrl, project, app) {
       }
     }
   }
+  return count;
+}
+
+/**
+ * @param {string} pageUrl
+ * @param {import('typedoc').ProjectReflection} project
+ * @param {import('typedoc').Application} app
+ */
+function extractMethodsForPage(pageUrl, project, app) {
+  const entry = REFERENCE_OBJECT_CONFIG[/** @type {keyof typeof REFERENCE_OBJECT_CONFIG} */ (pageUrl)];
+  if (!entry) {
+    console.warn(`[extract-methods] No symbol mapping for ${pageUrl}, skipping`);
+    return 0;
+  }
+
+  const { symbol, declarationHint } = entry;
+  const extraMethodInterfaces = 'extraMethodInterfaces' in entry ? entry.extraMethodInterfaces : undefined;
+  const decl = findInterfaceOrClass(project, symbol, declarationHint);
+  if (!decl?.children) {
+    console.warn(`[extract-methods] Could not find interface/class "${symbol}"`);
+    return 0;
+  }
+
+  extractPropertiesAndTrimSourcePage(pageUrl);
+
+  const ctx = createThemeContextForReferencePage(app, project, pageUrl, decl);
+
+  const pageDir = path.dirname(pageUrl);
+  const objectDir = path.join(__dirname, 'temp-docs', pageDir);
+  const outDir = path.join(objectDir, 'methods');
+  fs.mkdirSync(outDir, { recursive: true });
+
+  let count = extractCallableMembersFromDeclaration(decl, ctx, outDir);
+
+  if (Array.isArray(extraMethodInterfaces)) {
+    for (const extra of extraMethodInterfaces) {
+      const extraDecl = findInterfaceOrClass(project, extra.symbol, extra.declarationHint);
+      if (!extraDecl?.children) {
+        console.warn(`[extract-methods] extraMethodInterfaces: could not find "${extra.symbol}" for ${pageUrl}`);
+        continue;
+      }
+      count += extractCallableMembersFromDeclaration(extraDecl, ctx, outDir);
+    }
+  }
+
   return count;
 }
 
