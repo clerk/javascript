@@ -88,6 +88,172 @@ function findNamedTypeDeclaration(project, name) {
 }
 
 /**
+ * Prefer `packages/shared/src/types/strategies.ts` when multiple type aliases share the name `OAuthStrategy`.
+ *
+ * @param {import('typedoc').ProjectReflection | undefined} project
+ * @returns {import('typedoc').DeclarationReflection | undefined}
+ */
+function findOAuthStrategyDeclaration(project) {
+  if (!project) {
+    return undefined;
+  }
+  /** @param {import('typedoc').Reflection} r */
+  const sourcePath = r => {
+    const sources = /** @type {{ sources?: object[] }} */ (r).sources;
+    const s = sources?.[0];
+    if (!s) {
+      return '';
+    }
+    const raw = /** @type {{ file?: { fullFileName?: string }; fullFileName?: string }} */ (s);
+    const p = raw.file?.fullFileName ?? raw.fullFileName ?? '';
+    return String(p).replace(/\\/g, '/');
+  };
+
+  const byKind =
+    typeof project.getReflectionsByKind === 'function'
+      ? project.getReflectionsByKind(ReflectionKind.TypeAlias).filter(r => r.name === 'OAuthStrategy')
+      : Object.values(project.reflections ?? {}).filter(
+          r =>
+            r.name === 'OAuthStrategy' &&
+            /** @type {import('typedoc').Reflection} */ (r).kindOf?.(ReflectionKind.TypeAlias),
+        );
+  if (byKind.length === 0) {
+    return findNamedTypeDeclaration(project, 'OAuthStrategy');
+  }
+  if (byKind.length === 1) {
+    return /** @type {import('typedoc').DeclarationReflection} */ (byKind[0]);
+  }
+  const fromStrategies = byKind.find(r => sourcePath(r).includes('strategies'));
+  return /** @type {import('typedoc').DeclarationReflection | undefined} */ (fromStrategies ?? byKind[0]);
+}
+
+/**
+ * Stock `someType` uses `instanceof UnionType`; duplicate Typedoc copies in the tree break that check and unions
+ * fall through to `backTicks(model.toString())`, bypassing {@link unionType} entirely (including OAuth collapse).
+ *
+ * @param {import('typedoc').Type | undefined} model
+ * @returns {import('typedoc').UnionType | undefined}
+ */
+function coerceUnionTypeIfNeeded(model) {
+  if (!model || typeof model !== 'object') {
+    return undefined;
+  }
+  if (model instanceof UnionType) {
+    return model;
+  }
+  const o = /** @type {{ type?: string; types?: import('typedoc').SomeType[] }} */ (model);
+  if (o.type === 'union' && Array.isArray(o.types) && o.types.length) {
+    return new UnionType(o.types);
+  }
+  return undefined;
+}
+
+/**
+ * TypeScript normalizes `OAuthStrategy` to a large union of `oauth_*` string literals plus
+ * `` `oauth_custom_${string}` ``. That is not a {@link ReferenceType}, so the theme prints every literal.
+ * Collapse **only** when the union clearly matches that expanded Clerk shape, then render a link to `OAuthStrategy`.
+ *
+ * Guards (all must pass): many `oauth_` literals, fingerprint literals present, optional `oauth_custom_` template arm,
+ * `OAuthStrategy` exists and is not `@inline`. Skips ambiguous cases so other unions are unchanged.
+ *
+ * @param {import('typedoc').Type | undefined} t
+ * @returns {import('typedoc').Type[]}
+ */
+function flattenUnionTypeMembersForOAuthCollapse(t) {
+  if (!t || typeof t !== 'object') {
+    return [];
+  }
+  const o = /** @type {{ type?: string; types?: import('typedoc').Type[] }} */ (t);
+  if (o.type === 'union' && Array.isArray(o.types)) {
+    /** @type {import('typedoc').Type[]} */
+    const acc = [];
+    for (const inner of o.types) {
+      acc.push(...flattenUnionTypeMembersForOAuthCollapse(inner));
+    }
+    return acc;
+  }
+  return [t];
+}
+
+/**
+ * @param {import('typedoc').Type} t
+ */
+function isExpandedOAuthStrategyUnionArm(t) {
+  const o = /** @type {{ type?: string; value?: unknown; head?: string; tail?: unknown }} */ (t);
+  if (o.type === 'literal' && typeof o.value === 'string') {
+    return o.value.startsWith('oauth_');
+  }
+  if (o.type === 'templateLiteral' && typeof o.head === 'string') {
+    return o.head === 'oauth_custom_';
+  }
+  return false;
+}
+
+/** Minimum distinct `oauth_*` literal arms before we treat the union as “expanded OAuthStrategy”. */
+const OAUTH_STRATEGY_COLLAPSE_MIN_LITERAL_ARMS = 12;
+
+/**
+ * @param {import('typedoc').UnionType} model
+ * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
+ * @returns {import('typedoc').UnionType | undefined}
+ */
+function tryCollapseExpandedOAuthStrategyUnion(model, ctx) {
+  const project = ctx.page?.project;
+  if (!project) {
+    return undefined;
+  }
+  const oauthDecl = findOAuthStrategyDeclaration(project);
+  if (!oauthDecl?.kindOf(ReflectionKind.TypeAlias)) {
+    return undefined;
+  }
+  if (oauthDecl.comment?.hasModifier('@inline')) {
+    return undefined;
+  }
+
+  const members = flattenUnionTypeMembersForOAuthCollapse(model);
+  const oauthArms = members.filter(isExpandedOAuthStrategyUnionArm);
+  if (oauthArms.length < OAUTH_STRATEGY_COLLAPSE_MIN_LITERAL_ARMS) {
+    return undefined;
+  }
+
+  const literalVals = oauthArms
+    .filter(u => /** @type {{ type?: string }} */ (u).type === 'literal')
+    .map(u => /** @type {{ value?: unknown }} */ (/** @type {unknown} */ (u)).value)
+    .filter(/** @return {v is string} */ v => typeof v === 'string');
+  const literalSet = new Set(literalVals);
+  if (!literalSet.has('oauth_google') || (!literalSet.has('oauth_facebook') && !literalSet.has('oauth_github'))) {
+    return undefined;
+  }
+
+  const hasCustomTemplateArm = oauthArms.some(u => {
+    const o = /** @type {{ type?: string; head?: string }} */ (u);
+    return o.type === 'templateLiteral' && o.head === 'oauth_custom_';
+  });
+  /** Without the template arm, require an even larger literal set (avoids small hand-written unions). */
+  if (!hasCustomTemplateArm && literalVals.length < 20) {
+    return undefined;
+  }
+
+  const ref = ReferenceType.createResolvedReference('OAuthStrategy', oauthDecl, project);
+  /** @type {import('typedoc').Type[]} */
+  const out = [];
+  let i = 0;
+  while (i < members.length) {
+    if (isExpandedOAuthStrategyUnionArm(members[i])) {
+      out.push(ref);
+      i++;
+      while (i < members.length && isExpandedOAuthStrategyUnionArm(members[i])) {
+        i++;
+      }
+    } else {
+      out.push(members[i]);
+      i++;
+    }
+  }
+  return new UnionType(/** @type {import('typedoc').SomeType[]} */ (/** @type {unknown} */ (out)));
+}
+
+/**
  * Collect documented property reflections from one intersection arm (object literal, type alias, interface, nested `&`).
  * E.g. `{ a: string } & { b: number }` => `[{ name: 'a', type: 'string' }, { name: 'b', type: 'number' }]`
  *
@@ -862,6 +1028,25 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
     this.partials = {
       ...superPartials,
       /**
+       * Ensure unions always route through `unionType` (OAuth collapse) even when `instanceof UnionType` fails.
+       *
+       * @param {import('typedoc').Type | undefined} model
+       * @param {Parameters<typeof superPartials.someType>[1]} [options]
+       */
+      someType: (model, options) => {
+        const ut = coerceUnionTypeIfNeeded(model);
+        if (ut) {
+          const collapsed = tryCollapseExpandedOAuthStrategyUnion(ut, this);
+          const toRender = collapsed ?? ut;
+          return superPartials.someType.call(this, toRender, options);
+        }
+        return superPartials.someType.call(
+          this,
+          /** @type {import('typedoc').SomeType | undefined} */ (/** @type {unknown} */ (model)),
+          options,
+        );
+      },
+      /**
        * Stock `comments.comment` prints every {@link Comment.modifierTags} as **`TitleCase`** before the summary.
        * `@inline` / `@inlineType` are router/type hints only; `@experimental` is SDK-only guidance — none of these
        * must appear in property tables or prose.
@@ -1276,7 +1461,8 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
        * @param {import('typedoc').UnionType} model
        */
       unionType: model => {
-        const defaultOutput = superPartials.unionType(model);
+        const collapsed = tryCollapseExpandedOAuthStrategyUnion(model, this);
+        const defaultOutput = superPartials.unionType(collapsed ?? model);
 
         const output = defaultOutput
           // Escape stuff that would be turned into markdown

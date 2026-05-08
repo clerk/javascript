@@ -30,6 +30,7 @@ export type CustomOAuthStrategy = `oauth_custom_${string}`;
 /** @inline */
 export type EnterpriseSSOStrategy = 'enterprise_sso';
 
+/** OAuth-related authentication strategies (`oauth_<provider>` and custom OAuth). */
 export type OAuthStrategy = `oauth_${OAuthProvider}` | CustomOAuthStrategy;
 
 /** @inline */
