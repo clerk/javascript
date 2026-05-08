@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useSignIn, useUser } from '@clerk/react';
+import { useClerk, useSignIn, useUser } from '@clerk/react';
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router';
 
@@ -16,10 +16,16 @@ export function SignIn({ className, ...props }: React.ComponentProps<'div'>) {
   const [selectedStrategy, setSelectedStrategy] = useState<AvailableStrategy | null>(null);
   const { isSignedIn } = useUser();
   const navigate = useNavigate();
+  const clerk = useClerk();
 
-  const handleOauth = async (strategy: 'oauth_google') => {
+  const social = (clerk as any)?.__internal_environment?.userSettings?.social ?? {};
+  const oauthProviders = Object.entries(social as Record<string, { strategy: string; name: string; enabled: boolean }>)
+    .filter(([key, value]) => key.startsWith('oauth_') && value?.enabled)
+    .map(([, value]) => ({ strategy: value.strategy, name: value.name }));
+
+  const handleOauth = async (strategy: string) => {
     await signIn.sso({
-      strategy,
+      strategy: strategy as Parameters<typeof signIn.sso>[0]['strategy'],
       redirectUrl: '/sso-callback',
       redirectUrlComplete: '/protected',
     });
@@ -268,14 +274,17 @@ export function SignIn({ className, ...props }: React.ComponentProps<'div'>) {
         <CardContent>
           <form action={handleSubmit}>
             <div className='grid gap-6'>
-              <Button
-                type='button'
-                className='w-full'
-                disabled={fetchStatus === 'fetching'}
-                onClick={() => handleOauth('oauth_google')}
-              >
-                Sign in with Google
-              </Button>
+              {oauthProviders.map(provider => (
+                <Button
+                  key={provider.strategy}
+                  type='button'
+                  className='w-full'
+                  disabled={fetchStatus === 'fetching'}
+                  onClick={() => handleOauth(provider.strategy)}
+                >
+                  Sign in with {provider.name}
+                </Button>
+              ))}
               <div className='grid gap-6'>
                 <div className='grid gap-3'>
                   <Label htmlFor='identifier'>Username, email, or phone number</Label>
