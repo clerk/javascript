@@ -76,7 +76,10 @@ jobs:
 
       - name: Install quickstart deps
         working-directory: clerk-expo-quickstart/NativeComponentQuickstart
-        run: pnpm install --no-frozen-lockfile
+        # --ignore-workspace because the quickstart dir is nested inside the
+        # javascript checkout; without this, pnpm walks up and treats the
+        # outer monorepo as the workspace and skips the quickstart entirely.
+        run: pnpm install --ignore-workspace --no-frozen-lockfile
 
       - name: Resolve Clerk instance keys
         id: keys
@@ -197,7 +200,10 @@ jobs:
 
       - name: Install quickstart deps
         working-directory: clerk-expo-quickstart/NativeComponentQuickstart
-        run: pnpm install --no-frozen-lockfile
+        # --ignore-workspace because the quickstart dir is nested inside the
+        # javascript checkout; without this, pnpm walks up and treats the
+        # outer monorepo as the workspace and skips the quickstart entirely.
+        run: pnpm install --ignore-workspace --no-frozen-lockfile
 
       - name: Resolve Clerk instance keys
         id: keys
