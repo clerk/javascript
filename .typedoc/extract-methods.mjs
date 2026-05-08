@@ -1,6 +1,6 @@
 // @ts-check
 /**
- * For each entry in REFERENCE_OBJECTS_LIST, reads the TypeDoc output (e.g. `shared/clerk/clerk.mdx`), strips **Properties** from the main generated file and copies it into `properties.mdx`, and writes one .mdx per method under `methods/` (alongside the main page in that resource folder).
+ * For each entry in REFERENCE_OBJECTS_LIST, reads the TypeDoc output (e.g. `shared/clerk/clerk.mdx`), strips **Properties** from the main generated file and copies the section body (table only, no `## Properties` heading) into `properties.mdx`, and writes one .mdx per method under `methods/` (alongside the main page in that resource folder).
  *
  * Run after `typedoc` (same cwd as repo root). Uses a second TypeDoc convert pass to read reflections.
  *
@@ -661,7 +661,7 @@ function extractPropertiesAndTrimSourcePage(pageUrl) {
   fs.mkdirSync(objectDir, { recursive: true });
 
   if (body) {
-    const propertiesDoc = [`## Properties`, '', body.trimEnd(), ''].join('\n');
+    const propertiesDoc = `${body.trimEnd()}\n`;
     const propertiesPath = path.join(objectDir, 'properties.mdx');
     fs.writeFileSync(
       propertiesPath,
