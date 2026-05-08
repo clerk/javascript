@@ -49,6 +49,18 @@ function markdownHeading(level, text) {
 }
 
 /**
+ * Heading whose visible title is a type/identifier (nominal single-parameter object sections) needs to get wrapped in backticks.
+ *
+ * @param {number} level
+ * @param {string} text
+ */
+function markdownHeadingInlineCode(level, text) {
+  const l = Math.min(Math.max(level, 1), 6);
+  const t = text.trim();
+  return `${'#'.repeat(l)} \`${t}\``;
+}
+
+/**
  * Same as typedoc-plugin-markdown `removeLineBreaks` for table cells.
  *
  * @param {string | undefined} str
@@ -1218,7 +1230,7 @@ function trySingleNominalParameterTypeSection(sig, ctx) {
   if (!tableMd?.trim()) {
     return undefined;
   }
-  return [markdownHeading(4, nominal.sectionTitle), '', tableMd, ''].join('\n');
+  return [markdownHeadingInlineCode(4, nominal.sectionTitle), '', tableMd, ''].join('\n');
 }
 
 /**
