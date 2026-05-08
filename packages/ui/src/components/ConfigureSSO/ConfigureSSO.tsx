@@ -67,11 +67,11 @@ const ConfigureSSOCardContent = () => {
   const { session } = useSession();
 
   const isPersonalWorkspace = !session?.lastActiveOrganizationId;
-  const hasManageEnterpriseConnectionsPermission = useProtect(
+  const canManageEnterpriseConnections = useProtect(
     has => isPersonalWorkspace || has({ permission: 'org:sys_enterprise_connections:manage' }),
   );
 
-  if (!hasManageEnterpriseConnectionsPermission) {
+  if (!canManageEnterpriseConnections) {
     return <MissingManageEnterpriseConnectionsOrganizationPermission />;
   }
 
