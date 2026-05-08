@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.10.2
+
+### Patch Changes
+
+- Improved the `cannot_render_single_session_enabled` dev warning to use friendlier wording. The message now clearly states that the behavior is expected and points developers to the Clerk Dashboard to enable multi-session mode if needed. ([#8488](https://github.com/clerk/javascript/pull/8488)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 4.10.1
 
 ### Patch Changes
