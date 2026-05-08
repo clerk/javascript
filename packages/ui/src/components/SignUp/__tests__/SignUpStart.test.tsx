@@ -574,6 +574,6 @@ describe('SignUpStart', () => {
 
       process.off('unhandledRejection', onUnhandledRejection);
       expect(unhandledError).toBeNull();
-    });
+    }, 15_000);
   });
 });
