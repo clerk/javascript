@@ -46,7 +46,12 @@ createRoot(document.getElementById('root')!).render(
               />
               <Route
                 path='/sso-callback'
-                element={<AuthenticateWithRedirectCallback signInForceRedirectUrl='/protected' signUpForceRedirectUrl='/protected' />}
+                element={
+                  <AuthenticateWithRedirectCallback
+                    signInForceRedirectUrl='/protected'
+                    signUpForceRedirectUrl='/protected'
+                  />
+                }
               />
             </Routes>
           </BrowserRouter>

@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useClerk, useSignIn, useUser } from '@clerk/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router';
 
 type AvailableStrategy = 'email_code' | 'phone_code' | 'password' | 'reset_password_email_code';
@@ -18,10 +18,17 @@ export function SignIn({ className, ...props }: React.ComponentProps<'div'>) {
   const navigate = useNavigate();
   const clerk = useClerk();
 
-  const social = (clerk as any)?.__internal_environment?.userSettings?.social ?? {};
-  const oauthProviders = Object.entries(social as Record<string, { strategy: string; name: string; enabled: boolean }>)
-    .filter(([key, value]) => key.startsWith('oauth_') && value?.enabled)
-    .map(([, value]) => ({ strategy: value.strategy, name: value.name }));
+  const computeProviders = () => {
+    const social = (clerk as any)?.__internal_environment?.userSettings?.social ?? {};
+    return Object.entries(social as Record<string, { strategy: string; name: string; enabled: boolean }>)
+      .filter(([key, value]) => key.startsWith('oauth_') && value?.enabled)
+      .map(([, value]) => ({ strategy: value.strategy, name: value.name }));
+  };
+  const [oauthProviders, setOauthProviders] = useState<{ strategy: string; name: string }[]>(computeProviders);
+  useEffect(() => {
+    setOauthProviders(computeProviders());
+    return clerk.addListener?.(() => setOauthProviders(computeProviders()));
+  }, [clerk]);
 
   const handleOauth = async (strategy: string) => {
     await signIn.sso({
@@ -30,6 +37,22 @@ export function SignIn({ className, ...props }: React.ComponentProps<'div'>) {
       redirectUrlComplete: '/protected',
     });
   };
+
+  const oauthButtons = (
+    <>
+      {oauthProviders.map(provider => (
+        <Button
+          key={provider.strategy}
+          type='button'
+          className='w-full'
+          disabled={fetchStatus === 'fetching'}
+          onClick={() => handleOauth(provider.strategy)}
+        >
+          Sign in with {provider.name}
+        </Button>
+      ))}
+    </>
+  );
 
   const handleSubmit = async (formData: FormData) => {
     const identifier = formData.get('identifier');
@@ -109,6 +132,7 @@ export function SignIn({ className, ...props }: React.ComponentProps<'div'>) {
           </CardHeader>
           <CardContent>
             <div className='grid gap-6'>
+              {oauthButtons}
               {signIn.supportedFirstFactors
                 .filter(({ strategy }) => strategy !== 'reset_password_email_code')
                 .map(({ strategy }) => (
@@ -274,17 +298,7 @@ export function SignIn({ className, ...props }: React.ComponentProps<'div'>) {
         <CardContent>
           <form action={handleSubmit}>
             <div className='grid gap-6'>
-              {oauthProviders.map(provider => (
-                <Button
-                  key={provider.strategy}
-                  type='button'
-                  className='w-full'
-                  disabled={fetchStatus === 'fetching'}
-                  onClick={() => handleOauth(provider.strategy)}
-                >
-                  Sign in with {provider.name}
-                </Button>
-              ))}
+              {oauthButtons}
               <div className='grid gap-6'>
                 <div className='grid gap-3'>
                   <Label htmlFor='identifier'>Username, email, or phone number</Label>
