@@ -583,6 +583,39 @@ function buildPropertyTableDocMdx(parentName, nestedDecl, ctx) {
 }
 
 /**
+ * Parent-level property table for an `@extractMethods` namespace.
+ * Lists non-callable direct members on the namespace (e.g. `verifications.emailAddress`, `verifications.phoneNumber`).
+ *
+ * @param {import('typedoc').DeclarationReflection} parentDecl
+ * @param {import('typedoc').DeclarationReflection[]} nonCallableMembers
+ * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
+ */
+function buildExtractMethodsNamespacePropertyTableMdx(parentDecl, nonCallableMembers, ctx) {
+  if (!nonCallableMembers.length) {
+    return '';
+  }
+  const title = `### \`${parentDecl.name}\``;
+  const description = commentSummaryAndBody(parentDecl.comment);
+  const props = [...nonCallableMembers].sort((a, b) => a.name.localeCompare(b.name));
+  const tableMd = renderMemberTableOmittingExampleBlocks(props, ctx, () =>
+    ctx.partials.propertiesTable(
+      props,
+      /** @type {Parameters<import('typedoc-plugin-markdown').MarkdownThemeContext['partials']['propertiesTable']>[1]} */
+      ({
+        kind: ReflectionKind.Interface,
+        isEventProps: false,
+        applyAllowlistedPropertyTableRowFilters: false,
+      }),
+    ),
+  );
+  if (!tableMd?.trim()) {
+    return '';
+  }
+  const raw = [title, '', description, '', tableMd].filter(Boolean).join('\n\n');
+  return `${applyCatchAllMdReplacements(applyRelativeLinkReplacements(raw)).trim()}\n`;
+}
+
+/**
  * @param {string} markdown
  * @returns {string | undefined} Body under `## Properties` (no heading), or undefined
  */
@@ -1265,7 +1298,12 @@ function hasExtractMethodsModifier(decl) {
 }
 
 /**
- * Writes `methods/<parent>-<child>.mdx` for each direct member of an `@extractMethods` inline object: callables via {@link buildMethodMdx}, non-callables with a resolvable object shape via {@link buildPropertyTableDocMdx}.
+ * Writes `methods/<parent>-<child>.mdx` for each direct member of an `@extractMethods` object-like type:
+ * callables via {@link buildMethodMdx}, non-callables with a resolvable object shape via
+ * {@link buildPropertyTableDocMdx}.
+ *
+ * Supports inline object literals and named references (`interface` / object-like `type` aliases) by resolving
+ * the holder with {@link resolveDeclarationWithObjectMembers}.
  *
  * @param {import('typedoc').DeclarationReflection} parentDecl
  * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
@@ -1273,16 +1311,19 @@ function hasExtractMethodsModifier(decl) {
  * @returns {number} Number of files written
  */
 function processExtractMethodsNamespace(parentDecl, ctx, outDir) {
-  const cur = unwrapOptionalLayersSomeType(parentDecl.type);
-  if (!(cur instanceof ReflectionType)) {
+  const holder = resolveDeclarationWithObjectMembers(parentDecl.type);
+  const members = holder?.children ?? [];
+  if (members.length === 0) {
     console.warn(
-      `[extract-methods] @extractMethods on "${parentDecl.name}" requires an inline object (reflection) type; skipping nested extraction`,
+      `[extract-methods] @extractMethods on "${parentDecl.name}" requires an object-like type with members; skipping nested extraction`,
     );
     return 0;
   }
   const parentName = parentDecl.name;
   let count = 0;
-  for (const nested of cur.declaration?.children ?? []) {
+  /** @type {import('typedoc').DeclarationReflection[]} */
+  const nonCallableMembers = [];
+  for (const nested of members) {
     if (nested.name.startsWith('__')) {
       continue;
     }
@@ -1299,6 +1340,7 @@ function processExtractMethodsNamespace(parentDecl, ctx, outDir) {
       count++;
       continue;
     }
+    nonCallableMembers.push(nd);
     const propTableMdx = buildPropertyTableDocMdx(parentName, nd, ctx);
     if (!propTableMdx) {
       continue;
@@ -1306,6 +1348,15 @@ function processExtractMethodsNamespace(parentDecl, ctx, outDir) {
     fs.writeFileSync(filePath, propTableMdx, 'utf-8');
     console.log(`[extract-methods] Wrote ${path.relative(path.join(__dirname, '..'), filePath)}`);
     count++;
+  }
+  if (nonCallableMembers.length) {
+    const namespaceMdx = buildExtractMethodsNamespacePropertyTableMdx(parentDecl, nonCallableMembers, ctx);
+    if (namespaceMdx) {
+      const namespacePath = path.join(outDir, `${toKebabCase(parentName)}.mdx`);
+      fs.writeFileSync(namespacePath, namespaceMdx, 'utf-8');
+      console.log(`[extract-methods] Wrote ${path.relative(path.join(__dirname, '..'), namespacePath)}`);
+      count++;
+    }
   }
   return count;
 }

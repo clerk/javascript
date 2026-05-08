@@ -348,7 +348,7 @@ export interface SignInFutureResource {
   readonly isTransferable: boolean;
 
   /**
-   * Reflects that the sign-in was not able to create a new session because the identifier already exists in an existing session.
+   * Indicates that the sign-in was not able to create a new session because the identifier already exists in an existing session.
    */
   readonly existingSession?: {
     /**
