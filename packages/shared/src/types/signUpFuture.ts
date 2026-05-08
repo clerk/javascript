@@ -28,7 +28,7 @@ export interface SignUpFutureAdditionalParams {
    */
   unsafeMetadata?: SignUpUnsafeMetadata;
   /**
-   * A boolean indicating whether the user has agreed to the [legal compliance](https://clerk.com/docs/guides/secure/legal-compliance) documents.
+   * Indicates whether the user has agreed to the [legal compliance](https://clerk.com/docs/guides/secure/legal-compliance) documents.
    */
   legalAccepted?: boolean;
   /**
@@ -58,11 +58,11 @@ export interface SignUpFutureCreateParams extends SignUpFutureAdditionalParams {
     | AppleIdTokenStrategy
     | PhoneCodeStrategy;
   /**
-   * The user's email address. Only supported if [Email address](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#email) is enabled. Keep in mind that the email address requires an extra verification process.
+   * The user's email address. Only supported if [Email address](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#email) is enabled in the instance settings. Keep in mind that the email address requires an extra verification process.
    */
   emailAddress?: string;
   /**
-   * The user's phone number in [E.164 format](https://en.wikipedia.org/wiki/E.164). Only supported if [phone number](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#phone) is enabled. Keep in mind that the phone number requires an extra verification process.
+   * The user's phone number in [E.164 format](https://en.wikipedia.org/wiki/E.164). Only supported if [phone number](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#phone) is enabled in the instance settings. Keep in mind that the phone number requires an extra verification process.
    */
   phoneNumber?: string;
   /**
@@ -70,7 +70,7 @@ export interface SignUpFutureCreateParams extends SignUpFutureAdditionalParams {
    */
   username?: string;
   /**
-   * The user's password. Only supported if [password](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#password) is enabled.
+   * The user's password. [Password](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#password) must be enabled in the instance settings.
    */
   password?: string;
   /**
@@ -82,7 +82,7 @@ export interface SignUpFutureCreateParams extends SignUpFutureAdditionalParams {
    */
   ticket?: string;
   /**
-   * The Web3 wallet address, made up of 0x + 40 hexadecimal characters. Only supported if [Web3 authentication](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#web3-authentication) is enabled.
+   * The Web3 wallet address, made up of 0x + 40 hexadecimal characters. Only supported if [Web3 authentication](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#web3-authentication) is enabled in the instance settings.
    */
   web3Wallet?: string;
 }
@@ -90,11 +90,11 @@ export interface SignUpFutureCreateParams extends SignUpFutureAdditionalParams {
 /** @document */
 export interface SignUpFutureUpdateParams extends SignUpFutureAdditionalParams {
   /**
-   * The user's email address. Only supported if [Email address](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#email) is enabled. Keep in mind that the email address requires an extra verification process.
+   * The user's email address. Only supported if [Email address](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#email) is enabled in the instance settings. Keep in mind that the email address requires an extra verification process.
    */
   emailAddress?: string;
   /**
-   * The user's phone number in [E.164 format](https://en.wikipedia.org/wiki/E.164). Only supported if [phone number](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#phone) is enabled. Keep in mind that the phone number requires an extra verification process.
+   * The user's phone number in [E.164 format](https://en.wikipedia.org/wiki/E.164). Only supported if [phone number](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#phone) is enabled in the instance settings. Keep in mind that the phone number requires an extra verification process.
    */
   phoneNumber?: string;
   /**
@@ -122,17 +122,17 @@ export interface SignUpFutureEmailLinkSendParams {
 /** @document */
 export type SignUpFuturePasswordParams = SignUpFutureAdditionalParams & {
   /**
-   * The user's password. Only supported if [password](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#password) is enabled.
+   * The user's password. [Password](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#password) must be enabled in the instance settings.
    */
   password: string;
 } & (
     | {
         /**
-         * The user's email address. Only supported if [Email address](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#email) is enabled. Keep in mind that the email address requires an extra verification process.
+         * The user's email address. Only supported if [Email address](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#email) is enabled in the instance settings. Keep in mind that the email address requires an extra verification process.
          */
         emailAddress: string;
         /**
-         * The user's phone number in [E.164 format](https://en.wikipedia.org/wiki/E.164). Only supported if [phone number](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#phone) is enabled. Keep in mind that the phone number requires an extra verification process.
+         * The user's phone number in [E.164 format](https://en.wikipedia.org/wiki/E.164). Only supported if [phone number](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#phone) is enabled in the instance settings. Keep in mind that the phone number requires an extra verification process.
          */
         phoneNumber?: string;
         /**
@@ -142,11 +142,11 @@ export type SignUpFuturePasswordParams = SignUpFutureAdditionalParams & {
       }
     | {
         /**
-         * The user's email address. Only supported if [Email address](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#email) is enabled. Keep in mind that the email address requires an extra verification process.
+         * The user's email address. Only supported if [Email address](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#email) is enabled in the instance settings. Keep in mind that the email address requires an extra verification process.
          */
         emailAddress?: string;
         /**
-         * The user's phone number in [E.164 format](https://en.wikipedia.org/wiki/E.164). Only supported if [phone number](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#phone) is enabled. Keep in mind that the phone number requires an extra verification process.
+         * The user's phone number in [E.164 format](https://en.wikipedia.org/wiki/E.164). Only supported if [phone number](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#phone) is enabled in the instance settings. Keep in mind that the phone number requires an extra verification process.
          */
         phoneNumber: string;
         /**
@@ -156,11 +156,11 @@ export type SignUpFuturePasswordParams = SignUpFutureAdditionalParams & {
       }
     | {
         /**
-         * The user's email address. Only supported if [Email address](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#email) is enabled. Keep in mind that the email address requires an extra verification process.
+         * The user's email address. Only supported if [Email address](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#email) is enabled in the instance settings. Keep in mind that the email address requires an extra verification process.
          */
         emailAddress?: string;
         /**
-         * The user's phone number in [E.164 format](https://en.wikipedia.org/wiki/E.164). Only supported if [phone number](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#phone) is enabled. Keep in mind that the phone number requires an extra verification process.
+         * The user's phone number in [E.164 format](https://en.wikipedia.org/wiki/E.164). Only supported if [phone number](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#phone) is enabled in the instance settings. Keep in mind that the phone number requires an extra verification process.
          */
         phoneNumber?: string;
         /**
@@ -170,11 +170,11 @@ export type SignUpFuturePasswordParams = SignUpFutureAdditionalParams & {
       }
     | {
         /**
-         * The user's email address. Only supported if [Email address](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#email) is enabled. Keep in mind that the email address requires an extra verification process.
+         * The user's email address. Only supported if [Email address](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#email) is enabled in the instance settings. Keep in mind that the email address requires an extra verification process.
          */
         emailAddress?: string;
         /**
-         * The user's phone number in [E.164 format](https://en.wikipedia.org/wiki/E.164). Only supported if [phone number](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#phone) is enabled. Keep in mind that the phone number requires an extra verification process.
+         * The user's phone number in [E.164 format](https://en.wikipedia.org/wiki/E.164). Only supported if [phone number](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#phone) is enabled in the instance settings. Keep in mind that the phone number requires an extra verification process.
          */
         phoneNumber?: string;
         /**
@@ -205,7 +205,7 @@ export interface SignUpFutureSSOParams extends SignUpFutureAdditionalParams {
   /**
    * The strategy to use for authentication.
    */
-  strategy: string;
+  strategy: OAuthStrategy | EnterpriseSSOStrategy;
   /**
    * The URL or path to navigate to after the OAuth or SAML flow completes. Can be provided as a relative URL (such as `/dashboard`), in which case it will be prefixed with the base URL of the current page.
    */
@@ -452,7 +452,7 @@ export interface SignUpFutureResource {
   readonly legalAcceptedAt: number | null;
 
   /**
-   * The locale of the user in BCP 47 format.
+   * The locale of the user in [BCP 47](https://developer.mozilla.org/en-US/docs/Glossary/BCP_47_language_tag) format (e.g., "en-US", "fr-FR"), or `null` if not set.
    */
   readonly locale: string | null;
 
@@ -476,7 +476,7 @@ export interface SignUpFutureResource {
   create: (params: SignUpFutureCreateParams) => Promise<{ error: ClerkError | null }>;
 
   /**
-   * Updates the current `SignUp`.
+   * Updates the current `SignUpFutureResource` instance with the provided parameters.
    */
   update: (params: SignUpFutureUpdateParams) => Promise<{ error: ClerkError | null }>;
 
@@ -492,7 +492,7 @@ export interface SignUpFutureResource {
   password: (params: SignUpFuturePasswordParams) => Promise<{ error: ClerkError | null }>;
 
   /**
-   * Performs an OAuth-based sign-up.
+   * Performs an SSO-based sign-up ([Social/OAuth](https://clerk.com/docs/guides/configure/auth-strategies/social-connections/overview) or [Enterprise](https://clerk.com/docs/guides/configure/auth-strategies/enterprise-connections/overview)).
    */
   sso: (params: SignUpFutureSSOParams) => Promise<{ error: ClerkError | null }>;
 

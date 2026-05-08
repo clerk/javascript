@@ -268,6 +268,10 @@ function getCatchAllReplacements() {
       replace: '[SignUpResource](/docs/reference/objects/sign-up)',
     },
     {
+      pattern: /(?<![\[\w`#])`?SignUpVerificationResource`?(?![\]\w`])/g,
+      replace: '[SignUpVerificationResource](/docs/reference/types/sign-up-verification-resource)',
+    },
+    {
       pattern: /(?<![#])`SignUpUnsafeMetadata`/g,
       replace: '[SignUpUnsafeMetadata](/docs/reference/types/metadata#sign-up-unsafe-metadata)',
     },
