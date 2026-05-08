@@ -65,9 +65,18 @@ jobs:
       - name: Build @clerk/expo
         run: pnpm turbo build --filter=@clerk/expo...
 
+      - name: Point quickstart at locally-built @clerk/expo
+        working-directory: clerk-expo-quickstart/NativeComponentQuickstart
+        run: |
+          # The quickstart's main pins @clerk/expo to a local verdaccio
+          # snapshot version which doesn't exist on public npm. Swap it for
+          # the package we just built from this javascript checkout.
+          jq '.dependencies["@clerk/expo"] = "file:../../packages/expo"' package.json > package.json.tmp
+          mv package.json.tmp package.json
+
       - name: Install quickstart deps
         working-directory: clerk-expo-quickstart/NativeComponentQuickstart
-        run: pnpm install
+        run: pnpm install --no-frozen-lockfile
 
       - name: Resolve Clerk instance keys
         id: keys
@@ -177,9 +186,18 @@ jobs:
       - name: Build @clerk/expo
         run: pnpm turbo build --filter=@clerk/expo...
 
+      - name: Point quickstart at locally-built @clerk/expo
+        working-directory: clerk-expo-quickstart/NativeComponentQuickstart
+        run: |
+          # The quickstart's main pins @clerk/expo to a local verdaccio
+          # snapshot version which doesn't exist on public npm. Swap it for
+          # the package we just built from this javascript checkout.
+          jq '.dependencies["@clerk/expo"] = "file:../../packages/expo"' package.json > package.json.tmp
+          mv package.json.tmp package.json
+
       - name: Install quickstart deps
         working-directory: clerk-expo-quickstart/NativeComponentQuickstart
-        run: pnpm install
+        run: pnpm install --no-frozen-lockfile
 
       - name: Resolve Clerk instance keys
         id: keys
