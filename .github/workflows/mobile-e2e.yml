@@ -84,7 +84,7 @@ jobs:
         run: |
           email="ci-${GITHUB_RUN_ID}-${RANDOM}+clerk_test@clerkcookie.com"
           password="ClerkCI!$(openssl rand -hex 8)Aa1"
-          response=$(curl -fsS -X POST https://api.clerk.com/v1/users \
+          response=$(curl -fsS -X POST https://api.clerkstage.dev/v1/users \
             -H "Authorization: Bearer $CLERK_SECRET_KEY" \
             -H "Content-Type: application/json" \
             -d "{\"email_address\":[\"$email\"],\"password\":\"$password\"}")
@@ -137,7 +137,7 @@ jobs:
           CLERK_SECRET_KEY: ${{ steps.keys.outputs.sk }}
           USER_ID: ${{ steps.user.outputs.user_id }}
         run: |
-          curl -fsS -X DELETE "https://api.clerk.com/v1/users/$USER_ID" \
+          curl -fsS -X DELETE "https://api.clerkstage.dev/v1/users/$USER_ID" \
             -H "Authorization: Bearer $CLERK_SECRET_KEY" || true
 
   ios:
@@ -189,7 +189,7 @@ jobs:
         run: |
           email="ci-${GITHUB_RUN_ID}-${RANDOM}+clerk_test@clerkcookie.com"
           password="ClerkCI!$(openssl rand -hex 8)Aa1"
-          response=$(curl -fsS -X POST https://api.clerk.com/v1/users \
+          response=$(curl -fsS -X POST https://api.clerkstage.dev/v1/users \
             -H "Authorization: Bearer $CLERK_SECRET_KEY" \
             -H "Content-Type: application/json" \
             -d "{\"email_address\":[\"$email\"],\"password\":\"$password\"}")
@@ -237,5 +237,5 @@ jobs:
           CLERK_SECRET_KEY: ${{ steps.keys.outputs.sk }}
           USER_ID: ${{ steps.user.outputs.user_id }}
         run: |
-          curl -fsS -X DELETE "https://api.clerk.com/v1/users/$USER_ID" \
+          curl -fsS -X DELETE "https://api.clerkstage.dev/v1/users/$USER_ID" \
             -H "Authorization: Bearer $CLERK_SECRET_KEY" || true
