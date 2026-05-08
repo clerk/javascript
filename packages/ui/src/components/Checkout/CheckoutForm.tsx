@@ -9,7 +9,12 @@ import { LineItems } from '@/ui/elements/LineItems';
 import { SegmentedControl } from '@/ui/elements/SegmentedControl';
 import { Select, SelectButton, SelectOptionList } from '@/ui/elements/Select';
 import { Tooltip } from '@/ui/elements/Tooltip';
-import { getSeatUnitPrice } from '@/ui/utils/billingPlanSeats';
+import {
+  getCheckoutSeatUnitTotal,
+  getIncludedSeatsUnitTotalTier,
+  getPaidSeatsUnitTotalTier,
+  getSeatUnitPrice,
+} from '@/ui/utils/billingPlanSeats';
 import { handleError } from '@/ui/utils/errorHandler';
 
 import { DevOnly } from '../../common/DevOnly';
@@ -48,31 +53,18 @@ export const CheckoutForm = withCardStateProvider(() => {
       : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         plan.annualMonthlyFee!;
 
-  const seatPerUnitTotal = totals.perUnitTotals?.find(({ name }) => name === 'seats');
-  const seatPerUnitTotalTiers = seatPerUnitTotal?.tiers ?? [];
-  const firstSeatTotalTier = seatPerUnitTotalTiers[0];
-  const secondSeatTotalTier = seatPerUnitTotalTiers[1];
-  const paidSeatTotalTier =
-    firstSeatTotalTier?.feePerBlock.amount &&
-    firstSeatTotalTier.feePerBlock.amount > 0 &&
-    seatPerUnitTotalTiers.length === 1
-      ? firstSeatTotalTier
-      : secondSeatTotalTier?.feePerBlock.amount && secondSeatTotalTier.feePerBlock.amount > 0
-        ? secondSeatTotalTier
-        : undefined;
+  const seatPerUnitTotal = getCheckoutSeatUnitTotal(totals);
+  const includedSeatsTier = getIncludedSeatsUnitTotalTier(seatPerUnitTotal);
+  const paidSeatsTier = getPaidSeatsUnitTotalTier(seatPerUnitTotal);
 
   const descriptionElements: Array<ReturnType<typeof localizationKeys>> = [];
   if (planPeriod === 'annual') {
     descriptionElements.push(localizationKeys('billing.billedAnnually'));
   }
-  if (
-    seatPerUnitTotalTiers.length > 1 &&
-    firstSeatTotalTier?.feePerBlock.amount === 0 &&
-    firstSeatTotalTier.quantity !== null
-  ) {
+  if (includedSeatsTier && includedSeatsTier.quantity !== null) {
     descriptionElements.push(
       localizationKeys('billing.pricingTable.seatCost.includedSeats', {
-        includedSeats: firstSeatTotalTier.quantity,
+        includedSeats: includedSeatsTier.quantity,
       }),
     );
   }
@@ -115,12 +107,12 @@ export const CheckoutForm = withCardStateProvider(() => {
               suffix={localizationKeys('billing.checkout.perMonth')}
             />
           </LineItems.Group>
-          {paidSeatTotalTier && paidSeatTotalTier.quantity !== null && (
+          {paidSeatsTier && paidSeatsTier.quantity !== null && (
             <LineItems.Group borderTop>
               <LineItems.Title title={localizationKeys('billing.seats')} />
               <LineItems.Description
-                prefix={`${paidSeatTotalTier.quantity} x`}
-                text={`${paidSeatTotalTier.feePerBlock.currencySymbol}${paidSeatTotalTier.feePerBlock.amountFormatted}`}
+                prefix={`${paidSeatsTier.quantity} x`}
+                text={`${paidSeatsTier.feePerBlock.currencySymbol}${paidSeatsTier.feePerBlock.amountFormatted}`}
                 suffix={localizationKeys('billing.checkout.perMonth')}
               />
             </LineItems.Group>
