@@ -39,6 +39,10 @@ export const REFERENCE_OBJECT_CONFIG = {
     symbol: 'SignUpFutureResource',
     declarationHint: 'types/signUpFuture',
   },
+  'shared/organization-resource/organization-resource.mdx': {
+    symbol: 'OrganizationResource',
+    declarationHint: 'types/organization',
+  },
 };
 
 /** Stable iteration order matches key order in {@link REFERENCE_OBJECT_CONFIG}. */

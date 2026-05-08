@@ -62,6 +62,7 @@ const LINK_REPLACEMENTS = [
   ['user-resource', '/docs/reference/objects/user'],
   ['session-status-claim', '/docs/reference/types/session-status'],
   ['user-organization-invitation-resource', '/docs/reference/types/user-organization-invitation'],
+  ['organization-custom-role-key', '/docs/reference/types/organization-custom-role-key'],
   ['organization-membership-resource', '/docs/reference/types/organization-membership'],
   ['organization-suggestion-resource', '/docs/reference/types/organization-suggestion'],
   ['organization-resource', '/docs/reference/objects/organization'],
@@ -296,7 +297,7 @@ function getCatchAllReplacements() {
       replace: '[OrganizationPrivateMetadata](/docs/reference/types/metadata#organization-private-metadata)',
     },
     {
-      pattern: /(?<![#])\bOrganizationPublicMetadata\b/g,
+      pattern: /(?<![#])`OrganizationPublicMetadata`/g,
       replace: '[OrganizationPublicMetadata](/docs/reference/types/metadata#organization-public-metadata)',
     },
     {

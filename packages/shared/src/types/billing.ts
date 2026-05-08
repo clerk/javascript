@@ -107,17 +107,20 @@ export type BillingSubscriptionPlanPeriod = 'month' | 'annual';
  */
 export interface BillingPayerMethods {
   /**
-   * Initializes a payment method for the user.
+   * Initializes a payment method.
+   * @returns An [`BillingInitializedPaymentMethodResource`](https://clerk.com/docs/reference/types/billing-initialized-payment-method-resource) object.
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   initializePaymentMethod: (params: InitializePaymentMethodParams) => Promise<BillingInitializedPaymentMethodResource>;
   /**
-   * Adds a payment method for the user.
+   * Adds a payment method.
+   * @returns An [`BillingPaymentMethodResource`](https://clerk.com/docs/reference/types/billing-payment-method-resource) object.
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   addPaymentMethod: (params: AddPaymentMethodParams) => Promise<BillingPaymentMethodResource>;
   /**
-   * Retrieves a list of payment methods that have been stored for the user.
+   * Retrieves a list of payment methods that have been stored.
+   * @returns A [`ClerkPaginatedResponse`](https://clerk.com/docs/reference/types/clerk-paginated-response) of [`BillingPaymentMethodResource`](https://clerk.com/docs/reference/types/billing-payment-method-resource) objects.
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   getPaymentMethods: (
