@@ -9,8 +9,8 @@ export const SelectProviderStep = (): JSX.Element => {
   return (
     <Flow.Part part='selectProvider'>
       <Step
-        elementDescriptor={descriptors.configureSSOWizardBody}
-        elementId={descriptors.configureSSOWizardBody.setId('select-provider')}
+        elementDescriptor={descriptors.configureSSOStep}
+        elementId={descriptors.configureSSOStep.setId('select-provider')}
       >
         <Step.Header
           title='Select provider'

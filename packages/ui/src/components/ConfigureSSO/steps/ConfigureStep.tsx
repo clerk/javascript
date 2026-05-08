@@ -9,8 +9,8 @@ export const ConfigureStep = (): JSX.Element => {
   return (
     <Flow.Part part='configureCreateApp'>
       <Step
-        elementDescriptor={descriptors.configureSSOWizardBody}
-        elementId={descriptors.configureSSOWizardBody.setId('create-app')}
+        elementDescriptor={descriptors.configureSSOStep}
+        elementId={descriptors.configureSSOStep.setId('configure')}
       >
         <Step.Header
           title='Configure Okta Workforce'

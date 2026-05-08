@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Box, Button, Flex, Icon, Text, useLocalizations } from '@/customizables';
+import { Box, Button, descriptors, Flex, Icon, Text, useLocalizations } from '@/customizables';
 import { CaretRight } from '@/icons';
 
 import type { StepperItemProps, StepperProps } from './types';
@@ -10,7 +10,7 @@ const Root = ({ children }: StepperProps): JSX.Element => {
 
   return (
     <Flex
-      // TODO: add descriptor
+      elementDescriptor={descriptors.configureSSOStepper}
       align='center'
       sx={theme => ({
         gap: theme.space.$2,
@@ -23,7 +23,7 @@ const Root = ({ children }: StepperProps): JSX.Element => {
           {child}
           {index < items.length - 1 && (
             <Icon
-              // TODO: add descriptor
+              elementDescriptor={descriptors.configureSSOStepperSeparator}
               icon={CaretRight}
               size='md'
               sx={theme => ({ color: theme.colors.$colorMutedForeground })}
@@ -48,7 +48,7 @@ const Item = ({
 
   return (
     <Button
-      // TODO: add descriptor
+      elementDescriptor={descriptors.configureSSOStepperItem}
       isActive={isCurrent}
       variant='unstyled'
       isDisabled={!isReachable}
@@ -60,7 +60,7 @@ const Item = ({
       })}
     >
       <Flex
-        // TODO: add descriptor
+        elementDescriptor={descriptors.configureSSOStepperItemBullet}
         isActive={isCurrent}
         align='center'
         justify='center'
@@ -78,7 +78,7 @@ const Item = ({
         {bullet}
       </Flex>
       <Text
-        // TODO: add descriptor
+        elementDescriptor={descriptors.configureSSOStepperItemLabel}
         as='span'
         variant='body'
         sx={{ fontWeight: 'inherit', color: 'inherit' }}
@@ -120,7 +120,7 @@ type SkeletonProps = {
 
 const Skeleton = ({ totalSteps = 4 }: SkeletonProps): JSX.Element => (
   <Flex
-    // TODO: add descriptor
+    elementDescriptor={descriptors.configureSSOStepper}
     align='center'
     sx={theme => ({
       gap: theme.space.$2,
@@ -133,7 +133,7 @@ const Skeleton = ({ totalSteps = 4 }: SkeletonProps): JSX.Element => (
         <ItemSkeleton />
         {index < totalSteps - 1 && (
           <Icon
-            // TODO: add descriptor
+            elementDescriptor={descriptors.configureSSOStepperSeparator}
             icon={CaretRight}
             size='md'
             sx={theme => ({ color: theme.colors.$neutralAlpha100 })}

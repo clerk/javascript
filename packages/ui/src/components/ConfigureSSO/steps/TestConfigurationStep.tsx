@@ -9,8 +9,8 @@ export const TestConfigurationStep = (): JSX.Element => {
   return (
     <Flow.Part part='test-sso'>
       <Step
-        elementDescriptor={descriptors.configureSSOWizardBody}
-        elementId={descriptors.configureSSOWizardBody.setId('test')}
+        elementDescriptor={descriptors.configureSSOStep}
+        elementId={descriptors.configureSSOStep.setId('test')}
       >
         <Step.Header
           title='Test your SSO connection'

@@ -9,8 +9,8 @@ export const ConfirmationStep = (): JSX.Element => {
   return (
     <Flow.Part part='sso-confirmation'>
       <Step
-        elementDescriptor={descriptors.configureSSOWizardBody}
-        elementId={descriptors.configureSSOWizardBody.setId('confirmation')}
+        elementDescriptor={descriptors.configureSSOStep}
+        elementId={descriptors.configureSSOStep.setId('confirmation')}
       >
         <Step.Body>
           <Step.Section

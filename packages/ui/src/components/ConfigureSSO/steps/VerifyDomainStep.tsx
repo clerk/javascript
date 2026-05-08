@@ -12,8 +12,8 @@ export const VerifyDomainStep = (): JSX.Element => {
   return (
     <Flow.Part part='verifyDomain'>
       <Step
-        elementDescriptor={descriptors.configureSSOWizardBody}
-        elementId={descriptors.configureSSOWizardBody.setId('verify-domain')}
+        elementDescriptor={descriptors.configureSSOStep}
+        elementId={descriptors.configureSSOStep.setId('verify-domain')}
       >
         <Wizard>
           <Step.Header

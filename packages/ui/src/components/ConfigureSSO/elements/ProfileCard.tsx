@@ -6,6 +6,7 @@ type ProfileCardHeaderProps = React.PropsWithChildren;
 export const ProfileCardHeader = (props: ProfileCardHeaderProps): JSX.Element => (
   <Flex
     as='header'
+    elementDescriptor={descriptors.configureSSOHeader}
     {...props}
     sx={theme => ({
       gap: theme.space.$2,
@@ -22,7 +23,7 @@ type ProfileCardFooterProps = React.PropsWithChildren;
 export const ProfileCardFooter = (props: ProfileCardFooterProps): JSX.Element => (
   <Flex
     as='footer'
-    elementDescriptor={descriptors.footer}
+    elementDescriptor={descriptors.configureSSOFooter}
     align='center'
     justify='end'
     {...props}

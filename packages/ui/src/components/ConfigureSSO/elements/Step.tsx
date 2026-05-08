@@ -115,7 +115,7 @@ const FooterPrevious = ({ onClick, isDisabled, isLoading, label = 'Previous' }: 
 
   return (
     <Button
-      elementDescriptor={descriptors.configureSSOWizardFooterPreviousButton}
+      elementDescriptor={descriptors.configureSSOFooterPreviousButton}
       variant='outline'
       size='sm'
       isDisabled={isDisabled}
@@ -144,7 +144,7 @@ const FooterContinue = ({ onClick, isDisabled, isLoading, label = 'Continue' }: 
 
   return (
     <Button
-      elementDescriptor={descriptors.configureSSOWizardFooterContinueButton}
+      elementDescriptor={descriptors.configureSSOFooterContinueButton}
       variant='solid'
       size='sm'
       isDisabled={isDisabled}
@@ -182,7 +182,7 @@ const Counter = ({ total, current }: StepCounterProps): JSX.Element | null => {
 
   return (
     <Badge
-      // TODO: add descriptor
+      elementDescriptor={descriptors.configureSSOStepCounter}
       colorScheme='primary'
       sx={{ whiteSpace: 'nowrap' }}
     >
