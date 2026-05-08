@@ -26,6 +26,9 @@ on:
 
 env:
   EXPO_INSTANCE_NAME: clerkstage-with-native-components
+  # Override the quickstart's checked-in .npmrc, which points pnpm/npm/npx at a
+  # local verdaccio registry (http://localhost:4873) that doesn't exist on CI.
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
 
 concurrency:
   group: mobile-e2e-${{ github.ref }}
