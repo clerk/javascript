@@ -49,10 +49,15 @@ type NavBarProps = {
   contentRef: React.RefObject<HTMLDivElement>;
   routes: NavbarRoute[];
   header?: React.ReactNode;
+  /**
+   * Content rendered above the navbar title. Useful when the sidebar
+   * needs to show context (app + org) before the page title
+   */
+  headerAboveTitle?: React.ReactNode;
 };
 
 export const NavBar = (props: NavBarProps) => {
-  const { contentRef, title, titleSx, description, routes, header } = props;
+  const { contentRef, title, titleSx, description, routes, header, headerAboveTitle } = props;
   const { close } = useNavbarContext();
   const { navigate } = useRouter();
   const { navigateToFlowStart } = useNavigateToFlowStart();
@@ -129,11 +134,13 @@ export const NavBar = (props: NavBarProps) => {
         title={title}
         titleSx={titleSx}
         description={description}
+        headerAboveTitle={headerAboveTitle}
       >
         {header}
         {items}
       </NavbarContainer>
       <MobileNavbarContainer>
+        {headerAboveTitle}
         {header}
         {items}
       </MobileNavbarContainer>
@@ -146,9 +153,10 @@ const NavbarContainer = (
     title: LocalizationKey | string;
     titleSx?: ThemableCssProp;
     description?: LocalizationKey | string;
+    headerAboveTitle?: React.ReactNode;
   }>,
 ) => {
-  const { title, titleSx, description } = props;
+  const { title, titleSx, description, headerAboveTitle } = props;
   return (
     <Col
       elementDescriptor={descriptors.navbar}
@@ -170,6 +178,7 @@ const NavbarContainer = (
       <DevModeOverlay />
 
       <Col sx={t => ({ gap: t.space.$6, flex: `0 0 ${t.space.$60}` })}>
+        {headerAboveTitle}
         <Col
           sx={t => ({
             gap: t.space.$0x5,
