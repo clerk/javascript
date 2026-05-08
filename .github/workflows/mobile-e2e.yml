@@ -84,10 +84,16 @@ jobs:
         run: |
           email="ci-${GITHUB_RUN_ID}-${RANDOM}+clerk_test@clerkcookie.com"
           password="ClerkCI!$(openssl rand -hex 8)Aa1"
-          response=$(curl -fsS -X POST https://api.clerkstage.dev/v1/users \
+          http_code=$(curl -sS -o /tmp/bapi_response.json -w "%{http_code}" -X POST https://api.clerkstage.dev/v1/users \
             -H "Authorization: Bearer $CLERK_SECRET_KEY" \
             -H "Content-Type: application/json" \
             -d "{\"email_address\":[\"$email\"],\"password\":\"$password\"}")
+          if [ "$http_code" -lt 200 ] || [ "$http_code" -ge 300 ]; then
+            echo "::error::BAPI user creation failed (HTTP $http_code)"
+            jq . /tmp/bapi_response.json 2>/dev/null || cat /tmp/bapi_response.json
+            exit 1
+          fi
+          response=$(cat /tmp/bapi_response.json)
           user_id=$(echo "$response" | jq -er '.id')
           echo "::add-mask::$password"
           echo "email=$email" >> "$GITHUB_OUTPUT"
@@ -189,10 +195,16 @@ jobs:
         run: |
           email="ci-${GITHUB_RUN_ID}-${RANDOM}+clerk_test@clerkcookie.com"
           password="ClerkCI!$(openssl rand -hex 8)Aa1"
-          response=$(curl -fsS -X POST https://api.clerkstage.dev/v1/users \
+          http_code=$(curl -sS -o /tmp/bapi_response.json -w "%{http_code}" -X POST https://api.clerkstage.dev/v1/users \
             -H "Authorization: Bearer $CLERK_SECRET_KEY" \
             -H "Content-Type: application/json" \
             -d "{\"email_address\":[\"$email\"],\"password\":\"$password\"}")
+          if [ "$http_code" -lt 200 ] || [ "$http_code" -ge 300 ]; then
+            echo "::error::BAPI user creation failed (HTTP $http_code)"
+            jq . /tmp/bapi_response.json 2>/dev/null || cat /tmp/bapi_response.json
+            exit 1
+          fi
+          response=$(cat /tmp/bapi_response.json)
           user_id=$(echo "$response" | jq -er '.id')
           echo "::add-mask::$password"
           echo "email=$email" >> "$GITHUB_OUTPUT"
