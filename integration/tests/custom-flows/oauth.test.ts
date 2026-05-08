@@ -40,27 +40,43 @@ test.describe('Custom Flows OAuth @custom', () => {
   test('SDK-75: retrying OAuth after an abandoned redirect creates a fresh sign-in', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
 
+    // Block the OAuth provider redirect on the first attempt only. clerk-js sets
+    // `firstFactorVerification.status='unverified'` and `externalVerificationRedirectURL`
+    // the moment the POST resolves — before the navigation runs — so aborting the
+    // navigation deterministically reproduces the SDK-75 abandoned-redirect state
+    // without depending on browser back/BFCache semantics.
+    let blockOnce = true;
+    await page.route('**/oauth/authorize**', async route => {
+      if (blockOnce && route.request().isNavigationRequest()) {
+        blockOnce = false;
+        await route.abort('aborted');
+        return;
+      }
+      await route.continue();
+    });
+
     await u.page.goToRelative('/sign-in');
     await u.page.waitForClerkJsLoaded();
 
     const oauthButton = u.page.getByRole('button', { name: /^Sign in with / });
     await oauthButton.first().waitFor();
 
-    // First attempt: capture the POST that creates the sign-in.
+    // First attempt: capture the POST, then let the redirect get aborted.
     const firstPostPromise = page.waitForRequest(
       req => req.method() === 'POST' && /\/v1\/client\/sign_ins(\?|$)/.test(req.url()),
     );
     await oauthButton.first().click();
     await firstPostPromise;
 
-    // Wait until we're on the OAuth provider's consent screen, then abandon via back navigation.
-    await u.page.getByText('Sign in to oauth-provider').waitFor();
-    await u.page.goBack();
+    // The redirect was aborted, so we stay on the app's sign-in page with stale
+    // OAuth state lingering in the SignIn resource. Wait for the OAuth button to
+    // be re-enabled (fetchStatus settles back to 'idle' once the navigation aborts).
+    await u.page.waitForURL(url => url.toString().startsWith(app.serverUrl) && url.pathname.includes('/sign-in'));
     await oauthButton.first().waitFor();
 
-    // Second attempt: must POST to /client/sign_ins again. If reuse logic kicked in incorrectly,
-    // the SignInFuture would skip create and silently no-op (status null, no redirect URL),
-    // so the absence of a second POST is exactly the SDK-75 regression we're guarding against.
+    // Second attempt: must POST to /client/sign_ins again. If the previous reuse
+    // logic kicked in (pre-fix), SignInFuture.sso would skip create and silently
+    // no-op — so the second POST not happening is exactly the regression.
     const secondPostPromise = page.waitForRequest(
       req => req.method() === 'POST' && /\/v1\/client\/sign_ins(\?|$)/.test(req.url()),
     );
@@ -68,7 +84,7 @@ test.describe('Custom Flows OAuth @custom', () => {
     const secondPost = await secondPostPromise;
     expect(secondPost.method()).toBe('POST');
 
-    // Complete the OAuth flow and assert we're signed in on the app instance.
+    // Complete the OAuth flow end-to-end and assert we're signed in on the app instance.
     await u.page.getByText('Sign in to oauth-provider').waitFor();
     await u.po.signIn.setIdentifier(fakeUser.email);
     await u.po.signIn.continue();
