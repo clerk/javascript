@@ -89,25 +89,25 @@ export interface OrganizationResource extends ClerkResource, BillingPayerMethods
    */
   update: (params: UpdateOrganizationParams) => Promise<OrganizationResource>;
   /**
-   * Retrieves the list of Organization Memberships.
+   * Gets the list of Organization Memberships.
    * @returns A [`ClerkPaginatedResponse`](https://clerk.com/docs/reference/types/clerk-paginated-response) of [`OrganizationMembershipResource`](https://clerk.com/docs/reference/types/organization-membership) objects.
    */
   getMemberships: GetMemberships;
 
   /**
-   * Retrieves the list of invitations.
+   * Gets the list of invitations.
    * @returns A [`ClerkPaginatedResponse`](https://clerk.com/docs/reference/types/clerk-paginated-response) of [`OrganizationInvitationResource`](https://clerk.com/docs/reference/types/organization-invitation) objects.
    */
   getInvitations: (params?: GetInvitationsParams) => Promise<ClerkPaginatedResponse<OrganizationInvitationResource>>;
   /**
-   * Retrieves the list of [Roles](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) available.
+   * Gets the list of [Roles](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) available.
    * @returns A [`ClerkPaginatedResponse`](https://clerk.com/docs/reference/types/clerk-paginated-response) of [`RoleResource`](https://clerk.com/docs/reference/types/role) objects and a `has_role_set_migration` status.
    *
    * When `has_role_set_migration` is `true`, updating Organization membership Roles is not allowed. Learn how to [build a custom flow for managing member Roles in an Organization](/docs/guides/development/custom-flows/organizations/manage-roles).
    */
   getRoles: (params?: GetRolesParams) => Promise<GetRolesResponse>;
   /**
-   * Retrieves the list of domains.
+   * Gets the list of domains.
    * @returns A [`ClerkPaginatedResponse`](https://clerk.com/docs/reference/types/clerk-paginated-response) of [`OrganizationDomainResource`](https://clerk.com/docs/reference/types/organization-domain) objects.
    *
    * > [!WARNING]
@@ -115,7 +115,7 @@ export interface OrganizationResource extends ClerkResource, BillingPayerMethods
    */
   getDomains: (params?: GetDomainsParams) => Promise<ClerkPaginatedResponse<OrganizationDomainResource>>;
   /**
-   * Retrieves the list of membership requests.
+   * Gets the list of membership requests.
    * @returns A [`ClerkPaginatedResponse`](https://clerk.com/docs/reference/types/clerk-paginated-response) of [`OrganizationMembershipRequestResource`](https://clerk.com/docs/reference/types/organization-membership-request) objects.
    *
    * > [!WARNING]
@@ -160,12 +160,12 @@ export interface OrganizationResource extends ClerkResource, BillingPayerMethods
    */
   createDomain: (domainName: string) => Promise<OrganizationDomainResource>;
   /**
-   * Retrieves a domain for an Organization based on the given domain ID.
+   * Gets a domain for an Organization based on the given domain ID.
    * @returns An [`OrganizationDomainResource`](https://clerk.com/docs/reference/types/organization-domain) object.
    *
    * > [!WARNING]
    * > You must have [**Verified domains**](https://clerk.com/docs/guides/organizations/add-members/verified-domains) enabled in your app's settings in the Clerk Dashboard.
-   * @param domainId - The unique identifier of the domain to retrieve.
+   * @param domainId - The unique identifier of the domain to get.
    */
   getDomain: ({ domainId }: { domainId: string }) => Promise<OrganizationDomainResource>;
   /**
@@ -208,7 +208,7 @@ export type GetDomainsParams = ClerkPaginationParams<{
 /** @document */
 export type GetInvitationsParams = ClerkPaginationParams<{
   /**
-   * The status of the invitations to retrieve.
+   * The status of the invitations to get.
    */
   status?: OrganizationInvitationStatus[];
 }>;
@@ -216,7 +216,7 @@ export type GetInvitationsParams = ClerkPaginationParams<{
 /** @document */
 export type GetMembershipRequestParams = ClerkPaginationParams<{
   /**
-   * The status of the membership requests to retrieve.
+   * The status of the membership requests to get.
    */
   status?: OrganizationInvitationStatus;
 }>;

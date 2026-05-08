@@ -261,7 +261,7 @@ export interface UserResource extends ClerkResource, BillingPayerMethods {
    */
   isPrimaryIdentification: (ident: EmailAddressResource | PhoneNumberResource | Web3WalletResource) => boolean;
   /**
-   * Retrieves all **active** sessions for this user. This method uses a cache so a network request will only be triggered only once.
+   * Gets all **active** sessions for this user. This method uses a cache so a network request will only be triggered only once.
    * @returns An array of [`SessionWithActivities`](https://clerk.com/docs/reference/types/session-with-activities) objects.
    */
   getSessions: () => Promise<SessionWithActivitiesResource[]>;
@@ -278,21 +278,21 @@ export interface UserResource extends ClerkResource, BillingPayerMethods {
   createExternalAccount: (params: CreateExternalAccountParams) => Promise<ExternalAccountResource>;
   getOrganizationMemberships: GetOrganizationMemberships;
   /**
-   * Retrieves a list of Organization invitations for the user.
+   * Gets a list of Organization invitations for the user.
    * @returns A [`ClerkPaginatedResponse`](https://clerk.com/docs/reference/types/clerk-paginated-response) of [`UserOrganizationInvitation`](https://clerk.com/docs/reference/types/user-organization-invitation) objects.
    */
   getOrganizationInvitations: (
     params?: GetUserOrganizationInvitationsParams,
   ) => Promise<ClerkPaginatedResponse<UserOrganizationInvitationResource>>;
   /**
-   * Retrieves a list of Organization suggestions for the user.
+   * Gets a list of Organization suggestions for the user.
    * @returns A [`ClerkPaginatedResponse`](https://clerk.com/docs/reference/types/clerk-paginated-response) of [`OrganizationSuggestionResource`](https://clerk.com/docs/reference/types/organization-suggestion) objects.
    */
   getOrganizationSuggestions: (
     params?: GetUserOrganizationSuggestionsParams,
   ) => Promise<ClerkPaginatedResponse<OrganizationSuggestionResource>>;
   /**
-   * Retrieves organization creation defaults for the current user.
+   * Gets organization creation defaults for the current user.
    * @returns A [`OrganizationCreationDefaultsResource`](https://clerk.com/docs/reference/types/organization-creation-defaults) object.
    */
   getOrganizationCreationDefaults: () => Promise<OrganizationCreationDefaultsResource>;
@@ -479,7 +479,7 @@ export type GetUserOrganizationSuggestionsParams = ClerkPaginationParams<{
 export type GetUserOrganizationMembershipParams = ClerkPaginationParams;
 
 /**
- * Retrieves a list of Organization memberships for the user.
+ * Gets a list of Organization memberships for the user.
  * @returns A [`ClerkPaginatedResponse`](https://clerk.com/docs/reference/types/clerk-paginated-response) of [`OrganizationMembershipResource`](https://clerk.com/docs/reference/types/organization-membership) objects.
  */
 export type GetOrganizationMemberships = (

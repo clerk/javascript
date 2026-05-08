@@ -75,7 +75,7 @@ export interface APIKeyResource extends ClerkResource {
 /** @document */
 export interface APIKeysNamespace {
   /**
-   * Retrieves a paginated list of API keys for the current user or organization.
+   * Gets a paginated list of API keys for the current user or organization.
    */
   getAll(params?: GetAPIKeysParams): Promise<ClerkPaginatedResponse<APIKeyResource>>;
   /**

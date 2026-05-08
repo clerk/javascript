@@ -1117,9 +1117,9 @@ export interface Clerk {
   createOrganization: (params: CreateOrganizationParams) => Promise<OrganizationResource>;
 
   /**
-   * Retrieves a single [Organization](https://clerk.com/docs/reference/objects/organization) by ID.
+   * Gets a single [Organization](https://clerk.com/docs/reference/objects/organization) by ID.
    *
-   * @param organizationId - The ID of the Organization to retrieve.
+   * @param organizationId - The ID of the Organization to get.
    */
   getOrganization: (organizationId: string) => Promise<OrganizationResource>;
 
