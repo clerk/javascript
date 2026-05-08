@@ -843,6 +843,10 @@ export interface BillingCheckoutTotals {
    */
   totalDueNow: BillingMoneyAmount;
   /**
+   * The amount that will be charged per period for this subscription.
+   */
+  totalDuePerPeriod: BillingMoneyAmount;
+  /**
    * Any credits (like account balance or promo credits) that are being applied to the checkout.
    */
   credit: BillingMoneyAmount | null;

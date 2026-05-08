@@ -110,6 +110,7 @@ export const enUS: LocalizationResource = {
       title__subscriptionSuccessful: 'Success!',
       title__trialSuccess: 'Trial successfully started!',
       totalDueAfterTrial: 'Total Due after trial ends in {{days}} days',
+      totalDuePerPeriod: 'Total Due per period',
     },
     credit: 'Credit',
     prorationCredit: 'Prorated credit',
