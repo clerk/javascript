@@ -8,6 +8,9 @@ import { ApplicationLogo } from '../ApplicationLogo';
 import { useFlowMetadata } from '../contexts';
 import { ModalContext } from '../Modal';
 
+// Element style overrides for flush elevation. Injected into parsedElements at
+// index 1 (after baseTheme, before user overrides) via AppearanceContext so they
+// participate in the makeCustomizable cascade and can still be overridden by users.
 const FLUSH_ELEMENTS = {
   cardBox: {
     borderWidth: 0,
@@ -26,32 +29,37 @@ const FLUSH_ELEMENTS = {
   },
   footer: {
     background: 'transparent',
-  },
-  scrollBox: {
-    borderWidth: 0,
-    borderRadius: 0,
-    boxShadow: 'none',
-    backgroundColor: 'transparent',
-    marginBlock: 0,
-    marginInlineEnd: 0,
-  },
-  navbar: {
-    background: 'transparent',
-  },
-  navbarMobileMenuRow: {
-    background: 'transparent',
+    marginTop: 0,
+    paddingTop: 0,
+    '>:first-of-type': {
+      paddingInline: 0,
+    },
+    '>:not(:first-of-type)': {
+      borderTopWidth: 0,
+      paddingInline: 0,
+    },
   },
 };
 
-type CardRootProps = PropsOfComponent<typeof Col>;
+type CardRootProps = PropsOfComponent<typeof Col> & {
+  /**
+   * Override the visual elevation for this card instance.
+   * When omitted, falls back to `appearance.options.elevation` for page-mounted
+   * components, and `'raised'` for modals.
+   * Profile and popover card roots pass `'raised'` explicitly to opt out of flush.
+   */
+  elevation?: 'raised' | 'flush';
+};
 export const CardRoot = React.forwardRef<HTMLDivElement, CardRootProps>((props, ref) => {
-  const { sx, children, ...rest } = props;
+  const { sx, children, elevation: elevationProp, ...rest } = props;
   const appearance = useAppearance();
   const flowMetadata = useFlowMetadata();
 
   const rawModalCtx = React.useContext(ModalContext);
   const isModal = rawModalCtx !== undefined;
-  const isFlush = appearance.parsedOptions.elevation === 'flush' && !isModal;
+  // Explicit prop wins; modals always raised; otherwise use appearance option
+  const elevation = elevationProp ?? (isModal ? 'raised' : appearance.parsedOptions.elevation);
+  const isFlush = elevation === 'flush';
 
   const augmentedAppearance = React.useMemo(() => {
     if (!isFlush) {
