@@ -1002,6 +1002,17 @@ export type Options = {
    * @default true
    */
   autoFocus?: boolean;
+
+  /**
+   * Controls the visual elevation of card components.
+   * `raised` preserves the default appearance with border, shadow, and padding.
+   * `flush` removes the card border, box-shadow, border-radius, outer padding, and footer background,
+   * making the component sit flat against its container.
+   * Only applies to page-mounted components — modals always use `raised`.
+   *
+   * @default 'raised'
+   */
+  elevation?: 'raised' | 'flush';
 };
 
 export type CaptchaAppearanceOptions = {
