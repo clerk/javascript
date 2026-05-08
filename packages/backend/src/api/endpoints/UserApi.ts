@@ -16,6 +16,10 @@ import type { WithSign } from './util-types';
 
 const basePath = '/users';
 
+type ExternalAccountFilter =
+  | { provider: string; providerUserId: string[] }
+  | { provider?: undefined; providerUserId?: undefined };
+
 type UserCountParams = {
   emailAddress?: string[];
   phoneNumber?: string[];
@@ -24,7 +28,12 @@ type UserCountParams = {
   query?: string;
   userId?: string[];
   externalId?: string[];
-};
+  emailAddressQuery?: string;
+  phoneNumberQuery?: string;
+  usernameQuery?: string;
+  nameQuery?: string;
+  banned?: boolean;
+} & ExternalAccountFilter;
 
 type UserListParams = ClerkPaginationRequest<
   UserCountParams & {
