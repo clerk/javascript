@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { Box, Button, descriptors, Flex, Icon, Text, useLocalizations } from '@/customizables';
-import { CaretRight } from '@/icons';
+import { Box, Button, descriptors, Flex, Icon, Text } from '@/customizables';
+import { CaretRight, Check } from '@/icons';
 
 import type { StepperItemProps, StepperProps } from './types';
 
@@ -36,16 +36,13 @@ const Root = ({ children }: StepperProps): JSX.Element => {
 };
 
 const Item = ({
-  label,
   bullet,
   isCurrent,
   isCompleted,
   isReachable = true,
   onClick,
+  children,
 }: StepperItemProps): JSX.Element => {
-  const { t } = useLocalizations();
-  const labelText = label ? (typeof label === 'string' ? label : t(label)) : '';
-
   return (
     <Button
       elementDescriptor={descriptors.configureSSOStepperItem}
@@ -75,7 +72,23 @@ const Item = ({
               : theme.colors.$neutralAlpha400,
         })}
       >
-        {bullet}
+        {isCompleted && !isCurrent ? (
+          <Icon
+            icon={Check}
+            sx={theme => ({ width: theme.sizes.$2, height: theme.sizes.$2, color: theme.colors.$white })}
+          />
+        ) : (
+          <Text
+            as='span'
+            sx={theme => ({
+              fontSize: theme.fontSizes.$xs,
+              fontWeight: theme.fontWeights.$semibold,
+              color: theme.colors.$colorBackground,
+            })}
+          >
+            {bullet}
+          </Text>
+        )}
       </Flex>
       <Text
         elementDescriptor={descriptors.configureSSOStepperItemLabel}
@@ -83,7 +96,7 @@ const Item = ({
         variant='body'
         sx={{ fontWeight: 'inherit', color: 'inherit' }}
       >
-        {labelText}
+        {children}
       </Text>
     </Button>
   );
