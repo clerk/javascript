@@ -301,6 +301,7 @@ export type __internal_LocalizationResource = {
       downgradeNotice: LocalizationValue;
       pastDueNotice: LocalizationValue;
       totalDueAfterTrial: LocalizationValue<'days'>;
+      totalDuePerPeriod: LocalizationValue;
       perMonth: LocalizationValue;
     };
   };

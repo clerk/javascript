@@ -112,7 +112,6 @@ const Title = React.forwardRef<HTMLTableCellElement, TitleProps>(({ title, descr
         <Span
           sx={t => ({
             display: 'inline-flex',
-            alignItems: 'center',
             gap: t.space.$1,
           })}
         >
