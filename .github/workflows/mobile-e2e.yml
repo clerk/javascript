@@ -65,13 +65,20 @@ jobs:
       - name: Build @clerk/expo
         run: pnpm turbo build --filter=@clerk/expo...
 
-      - name: Point quickstart at locally-built @clerk/expo
+      - name: Pack @clerk/expo
+        # `pnpm pack` resolves workspace:^ deps to real versions in the
+        # packed tarball, which is what we need so the quickstart (outside
+        # the workspace) can install it.
+        run: pnpm --filter @clerk/expo pack --pack-destination /tmp/clerk-expo-pkg
+
+      - name: Point quickstart at packed @clerk/expo
         working-directory: clerk-expo-quickstart/NativeComponentQuickstart
         run: |
           # The quickstart's main pins @clerk/expo to a local verdaccio
           # snapshot version which doesn't exist on public npm. Swap it for
-          # the package we just built from this javascript checkout.
-          jq '.dependencies["@clerk/expo"] = "file:../../packages/expo"' package.json > package.json.tmp
+          # the tarball we just packed.
+          tarball=$(ls /tmp/clerk-expo-pkg/clerk-expo-*.tgz | head -1)
+          jq --arg t "file:$tarball" '.dependencies["@clerk/expo"] = $t' package.json > package.json.tmp
           mv package.json.tmp package.json
 
       - name: Install quickstart deps
@@ -189,13 +196,20 @@ jobs:
       - name: Build @clerk/expo
         run: pnpm turbo build --filter=@clerk/expo...
 
-      - name: Point quickstart at locally-built @clerk/expo
+      - name: Pack @clerk/expo
+        # `pnpm pack` resolves workspace:^ deps to real versions in the
+        # packed tarball, which is what we need so the quickstart (outside
+        # the workspace) can install it.
+        run: pnpm --filter @clerk/expo pack --pack-destination /tmp/clerk-expo-pkg
+
+      - name: Point quickstart at packed @clerk/expo
         working-directory: clerk-expo-quickstart/NativeComponentQuickstart
         run: |
           # The quickstart's main pins @clerk/expo to a local verdaccio
           # snapshot version which doesn't exist on public npm. Swap it for
-          # the package we just built from this javascript checkout.
-          jq '.dependencies["@clerk/expo"] = "file:../../packages/expo"' package.json > package.json.tmp
+          # the tarball we just packed.
+          tarball=$(ls /tmp/clerk-expo-pkg/clerk-expo-*.tgz | head -1)
+          jq --arg t "file:$tarball" '.dependencies["@clerk/expo"] = $t' package.json > package.json.tmp
           mv package.json.tmp package.json
 
       - name: Install quickstart deps
