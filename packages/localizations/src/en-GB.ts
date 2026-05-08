@@ -179,6 +179,11 @@ export const enGB: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        'Contact your organisation administrator in order to have permissions to manage enterprise connections.',
+      title: 'You do not have permission to manage enterprise connections',
+    },
     navbar: {
       title: 'Configure Single Sign-On (SSO)',
     },

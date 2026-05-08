@@ -179,6 +179,11 @@ export const daDK: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        'Kontakt din organisations administrator for at få tilladelse til at administrere virksomhedsforbindelser.',
+      title: 'Du har ikke tilladelse til at administrere virksomhedsforbindelser',
+    },
     navbar: {
       title: 'Konfigurer single sign-on (SSO)',
     },

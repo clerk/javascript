@@ -208,6 +208,11 @@ export const huHU: LocalizationResource = {
     yearPerUnit: 'Év / {{unitName}}',
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        'Vegye fel a kapcsolatot szervezete adminisztrátorával, hogy jogosultságot kapjon a vállalati kapcsolatok kezelésére.',
+      title: 'Nincs jogosultsága vállalati kapcsolatok kezelésére',
+    },
     navbar: {
       title: 'Egyszeri bejelentkezés (SSO) beállítása',
     },

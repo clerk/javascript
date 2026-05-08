@@ -183,6 +183,10 @@ export const csCZ: LocalizationResource = {
     year: 'Rok',
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'Kontaktujte správce vaší organizace, abyste získali oprávnění ke správě podnikových připojení.',
+      title: 'Nemáte oprávnění ke správě podnikových připojení',
+    },
     navbar: {
       title: 'Nastavit jednotné přihlášení (SSO)',
     },
