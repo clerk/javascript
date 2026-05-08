@@ -143,6 +143,7 @@ function getRelativeLinkReplacements() {
   return LINK_REPLACEMENTS.map(([fileName, newPath]) => {
     return {
       // Match both flat links and nested object-doc links
+      // Also matches optional anchors (#)
       pattern: new RegExp(`\\((?:(?:\\.{1,2}\\/)+[^()]*?|)(?:${fileName}\\/)?${fileName}\\.mdx(#[^)]+)?\\)`, 'g'),
       // Preserve the anchor in replacement if it exists
       replace: (/** @type {string} */ _match, anchor = '') => `(${newPath}${anchor})`,
