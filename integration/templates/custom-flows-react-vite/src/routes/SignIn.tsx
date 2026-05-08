@@ -33,8 +33,8 @@ export function SignIn({ className, ...props }: React.ComponentProps<'div'>) {
   const handleOauth = async (strategy: string) => {
     await signIn.sso({
       strategy: strategy as Parameters<typeof signIn.sso>[0]['strategy'],
-      redirectUrl: '/sso-callback',
-      redirectUrlComplete: '/protected',
+      redirectUrl: '/protected',
+      redirectCallbackUrl: '/sso-callback',
     });
   };
 
