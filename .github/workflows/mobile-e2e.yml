@@ -88,6 +88,17 @@ jobs:
         # outer monorepo as the workspace and skips the quickstart entirely.
         run: pnpm install --ignore-workspace --no-frozen-lockfile
 
+      - name: Stub missing image assets
+        working-directory: clerk-expo-quickstart/NativeComponentQuickstart
+        # The quickstart's app.json references splash-icon.png and android
+        # adaptive-icon variants that aren't actually committed. Fill them in
+        # from icon.png so prebuild's image-asset mods don't fail with ENOENT.
+        run: |
+          cd assets/images
+          for f in splash-icon.png android-icon-foreground.png android-icon-background.png android-icon-monochrome.png; do
+            [ -f "$f" ] || cp icon.png "$f"
+          done
+
       - name: Resolve Clerk instance keys
         id: keys
         env:
@@ -218,6 +229,17 @@ jobs:
         # javascript checkout; without this, pnpm walks up and treats the
         # outer monorepo as the workspace and skips the quickstart entirely.
         run: pnpm install --ignore-workspace --no-frozen-lockfile
+
+      - name: Stub missing image assets
+        working-directory: clerk-expo-quickstart/NativeComponentQuickstart
+        # The quickstart's app.json references splash-icon.png and android
+        # adaptive-icon variants that aren't actually committed. Fill them in
+        # from icon.png so prebuild's image-asset mods don't fail with ENOENT.
+        run: |
+          cd assets/images
+          for f in splash-icon.png android-icon-foreground.png android-icon-background.png android-icon-monochrome.png; do
+            [ -f "$f" ] || cp icon.png "$f"
+          done
 
       - name: Resolve Clerk instance keys
         id: keys
