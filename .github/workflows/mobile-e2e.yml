@@ -295,7 +295,19 @@ jobs:
         run: |
           cd clerk-expo-quickstart/NativeComponentQuickstart
           npx expo prebuild --clean
-          npx expo run:ios --configuration Release --no-bundler
+          # Pick the first available iOS simulator and boot it so expo
+          # run:ios builds for the simulator (no code-signing certs on CI)
+          # rather than defaulting to a physical device.
+          SIM_UDID=$(xcrun simctl list devices --json | jq -r '[.devices | to_entries[] | select(.key | startswith("com.apple.CoreSimulator.SimRuntime.iOS")) | .value[] | select(.isAvailable == true)] | first | .udid')
+          if [ -z "$SIM_UDID" ] || [ "$SIM_UDID" = "null" ]; then
+            echo "::error::No available iOS simulator found"
+            xcrun simctl list devices
+            exit 1
+          fi
+          echo "Using simulator $SIM_UDID"
+          xcrun simctl boot "$SIM_UDID" 2>/dev/null || true
+          xcrun simctl bootstatus "$SIM_UDID" -b
+          npx expo run:ios --device "$SIM_UDID" --configuration Release --no-bundler
           cd ../../integration-mobile
           # Maestro doesn't auto-recurse into subdirectories; pass each flow explicitly.
           find flows -type f -name "*.yaml" ! -path "*/common/*" -print0 | \
