@@ -1,5 +1,17 @@
 # Change Log
 
+## 2.1.15
+
+### Patch Changes
+
+- Forward all `AuthenticateRequestOptions` and `VerifyTokenOptions` passed to `clerkMiddleware()` through to the backend `authenticateRequest()` call. Previously only a hand-picked subset was forwarded, so options like `organizationSyncOptions`, `skipJwksCache`, and `headerType` were accepted by the TypeScript types but silently ignored at runtime — the same class of bug that caused `clockSkewInMs` to be dropped. ([#8370](https://github.com/clerk/javascript/pull/8370)) by [@jacekradko](https://github.com/jacekradko)
+
+  Additionally, when `apiUrl` or `apiVersion` are passed to `clerkMiddleware()` and no custom `clerkClient` is supplied, the middleware now builds a per-middleware `ClerkClient` configured with those values instead of using the env-only default singleton. This is required because `@clerk/backend` pins `apiUrl`/`apiVersion` at client construction time and ignores runtime overrides on `authenticateRequest()`. Passing your own `clerkClient` continues to take precedence.
+
+- Updated dependencies [[`0ab09a8`](https://github.com/clerk/javascript/commit/0ab09a89af1d7452df734278288e8218710f0e0e), [`6408ab6`](https://github.com/clerk/javascript/commit/6408ab6ec58d06af3f8334cb5a7d8d2647b8012e), [`5cda3ee`](https://github.com/clerk/javascript/commit/5cda3ee8451cc9af375895824d24a5c3ed7fbee6)]:
+  - @clerk/backend@3.4.7
+  - @clerk/shared@4.10.2
+
 ## 2.1.14
 
 ### Patch Changes
