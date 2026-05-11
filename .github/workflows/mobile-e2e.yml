@@ -71,7 +71,7 @@ jobs:
         # the workspace) can install it.
         run: pnpm --filter @clerk/expo pack --pack-destination /tmp/clerk-expo-pkg
 
-      - name: Point quickstart at packed @clerk/expo
+      - name: Point quickstart at packed @clerk/expo and configure for CI
         working-directory: clerk-expo-quickstart/NativeComponentQuickstart
         run: |
           # The quickstart's main pins @clerk/expo to a local verdaccio
@@ -80,6 +80,22 @@ jobs:
           tarball=$(ls /tmp/clerk-expo-pkg/clerk-expo-*.tgz | head -1)
           jq --arg t "file:$tarball" '.dependencies["@clerk/expo"] = $t' package.json > package.json.tmp
           mv package.json.tmp package.json
+          # Disable Apple Sign-In in the @clerk/expo plugin. Its default behavior
+          # injects the com.apple.developer.applesignin entitlement during prebuild,
+          # which makes Expo CLI's simulatorBuildRequiresCodeSigning() return true
+          # and demand a development signing identity even for simulator builds —
+          # CI doesn't have one. Maestro flows can't exercise Apple Sign-In without
+          # an Apple Developer team configured anyway.
+          # The plugin may be listed as a bare string "@clerk/expo" OR in array
+          # form ["@clerk/expo", { ...config }] (the quickstart uses the latter
+          # with a theme config). Handle both: rewrite the bare form, or merge
+          # appleSignIn: false into the existing config object.
+          jq '.expo.plugins |= map(
+            if . == "@clerk/expo" then ["@clerk/expo", {"appleSignIn": false}]
+            elif type == "array" and .[0] == "@clerk/expo" then [.[0], ((.[1] // {}) + {"appleSignIn": false})]
+            else . end
+          )' app.json > app.json.tmp
+          mv app.json.tmp app.json
 
       - name: Install quickstart deps
         working-directory: clerk-expo-quickstart/NativeComponentQuickstart
@@ -155,14 +171,18 @@ jobs:
           api-level: 34
           target: google_apis
           arch: x86_64
-          script: |
-            cd clerk-expo-quickstart/NativeComponentQuickstart
-            npx expo prebuild --clean
-            npx expo run:android --variant release --no-bundler
-            cd ../../integration-mobile
-            # Maestro doesn't auto-recurse into subdirectories; pass each flow explicitly.
-            find flows -type f -name "*.yaml" ! -path "*/common/*" -print0 | \
-              xargs -0 maestro test --exclude-tags "$EXCLUDE_TAGS"
+          # reactivecircus/android-emulator-runner runs each line of `script` in a
+          # separate `sh -c` invocation, so cwd doesn't persist between commands.
+          # Use a folded scalar (>-) plus `&&` chains so the entire pipeline runs
+          # in one shell invocation. Maestro doesn't auto-recurse into subdirs,
+          # so we pass each flow file explicitly via find.
+          script: >-
+            cd clerk-expo-quickstart/NativeComponentQuickstart &&
+            npx expo prebuild --clean &&
+            npx expo run:android --variant release --no-bundler &&
+            cd ../../integration-mobile &&
+            find flows -type f -name "*.yaml" ! -path "*/common/*" -print0
+            | xargs -0 maestro test --exclude-tags "$EXCLUDE_TAGS"
 
       - name: Upload Maestro artifacts on failure
         if: failure()
@@ -213,7 +233,7 @@ jobs:
         # the workspace) can install it.
         run: pnpm --filter @clerk/expo pack --pack-destination /tmp/clerk-expo-pkg
 
-      - name: Point quickstart at packed @clerk/expo
+      - name: Point quickstart at packed @clerk/expo and configure for CI
         working-directory: clerk-expo-quickstart/NativeComponentQuickstart
         run: |
           # The quickstart's main pins @clerk/expo to a local verdaccio
@@ -222,6 +242,22 @@ jobs:
           tarball=$(ls /tmp/clerk-expo-pkg/clerk-expo-*.tgz | head -1)
           jq --arg t "file:$tarball" '.dependencies["@clerk/expo"] = $t' package.json > package.json.tmp
           mv package.json.tmp package.json
+          # Disable Apple Sign-In in the @clerk/expo plugin. Its default behavior
+          # injects the com.apple.developer.applesignin entitlement during prebuild,
+          # which makes Expo CLI's simulatorBuildRequiresCodeSigning() return true
+          # and demand a development signing identity even for simulator builds —
+          # CI doesn't have one. Maestro flows can't exercise Apple Sign-In without
+          # an Apple Developer team configured anyway.
+          # The plugin may be listed as a bare string "@clerk/expo" OR in array
+          # form ["@clerk/expo", { ...config }] (the quickstart uses the latter
+          # with a theme config). Handle both: rewrite the bare form, or merge
+          # appleSignIn: false into the existing config object.
+          jq '.expo.plugins |= map(
+            if . == "@clerk/expo" then ["@clerk/expo", {"appleSignIn": false}]
+            elif type == "array" and .[0] == "@clerk/expo" then [.[0], ((.[1] // {}) + {"appleSignIn": false})]
+            else . end
+          )' app.json > app.json.tmp
+          mv app.json.tmp app.json
 
       - name: Install quickstart deps
         working-directory: clerk-expo-quickstart/NativeComponentQuickstart
