@@ -96,6 +96,12 @@ jobs:
             else . end
           )' app.json > app.json.tmp
           mv app.json.tmp app.json
+          # The quickstart's app.json ships with placeholder bundle ids
+          # ("com.yourcompany.yourapp") but the Maestro flows in
+          # integration-mobile/flows reference "com.clerk.clerkexpoquickstart".
+          # Align them so launchApp/clearAppState target the installed app.
+          jq '.expo.ios.bundleIdentifier = "com.clerk.clerkexpoquickstart" | .expo.android.package = "com.clerk.clerkexpoquickstart"' app.json > app.json.tmp
+          mv app.json.tmp app.json
 
       - name: Install quickstart deps
         working-directory: clerk-expo-quickstart/NativeComponentQuickstart
@@ -257,6 +263,12 @@ jobs:
             elif type == "array" and .[0] == "@clerk/expo" then [.[0], ((.[1] // {}) + {"appleSignIn": false})]
             else . end
           )' app.json > app.json.tmp
+          mv app.json.tmp app.json
+          # The quickstart's app.json ships with placeholder bundle ids
+          # ("com.yourcompany.yourapp") but the Maestro flows in
+          # integration-mobile/flows reference "com.clerk.clerkexpoquickstart".
+          # Align them so launchApp/clearAppState target the installed app.
+          jq '.expo.ios.bundleIdentifier = "com.clerk.clerkexpoquickstart" | .expo.android.package = "com.clerk.clerkexpoquickstart"' app.json > app.json.tmp
           mv app.json.tmp app.json
 
       - name: Install quickstart deps
