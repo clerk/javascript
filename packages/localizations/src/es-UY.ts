@@ -179,6 +179,11 @@ export const esUY: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        'Contactá al administrador de tu organización para obtener permisos para gestionar conexiones empresariales.',
+      title: 'No tenés permiso para gestionar conexiones empresariales',
+    },
     navbar: {
       title: 'Configurar inicio de sesión único (SSO)',
     },
