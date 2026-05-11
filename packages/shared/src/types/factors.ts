@@ -15,7 +15,9 @@ import type {
   Web3Strategy,
 } from './strategies';
 
-/** @document */
+/**
+ *
+ */
 export type EmailCodeFactor = {
   /**
    * The strategy type.
@@ -35,7 +37,9 @@ export type EmailCodeFactor = {
   primary?: boolean;
 };
 
-/** @document */
+/**
+ *
+ */
 export type EmailLinkFactor = {
   /**
    * The strategy type.
@@ -55,7 +59,9 @@ export type EmailLinkFactor = {
   primary?: boolean;
 };
 
-/** @document */
+/**
+ *
+ */
 export type PhoneCodeFactor = {
   /**
    * The strategy type.
@@ -83,7 +89,9 @@ export type PhoneCodeFactor = {
   channel?: PhoneCodeChannel;
 };
 
-/** @document */
+/**
+ *
+ */
 export type Web3SignatureFactor = {
   /**
    * The strategy type.
@@ -118,7 +126,9 @@ export type OauthFactor = {
   strategy: OAuthStrategy;
 };
 
-/** @document */
+/**
+ *
+ */
 export type EnterpriseSSOFactor = {
   /**
    * The strategy type.
@@ -146,7 +156,9 @@ export type BackupCodeFactor = {
   strategy: BackupCodeStrategy;
 };
 
-/** @document */
+/**
+ *
+ */
 export type ResetPasswordPhoneCodeFactor = {
   /**
    * The strategy type.
@@ -166,7 +178,9 @@ export type ResetPasswordPhoneCodeFactor = {
   primary?: boolean;
 };
 
-/** @document */
+/**
+ *
+ */
 export type ResetPasswordEmailCodeFactor = {
   /**
    * The strategy type.
@@ -186,32 +200,48 @@ export type ResetPasswordEmailCodeFactor = {
   primary?: boolean;
 };
 
-/** @document */
+/**
+ *
+ */
 export type ResetPasswordCodeFactor = ResetPasswordEmailCodeFactor | ResetPasswordPhoneCodeFactor;
 
-/** @document */
+/**
+ *
+ */
 export type ResetPasswordPhoneCodeFactorConfig = Omit<ResetPasswordPhoneCodeFactor, 'safeIdentifier'>;
-/** @document */
+/**
+ *
+ */
 export type ResetPasswordEmailCodeFactorConfig = Omit<ResetPasswordEmailCodeFactor, 'safeIdentifier'>;
 
-/** @document */
+/**
+ *
+ */
 export type EmailCodeConfig = Omit<EmailCodeFactor, 'safeIdentifier'>;
-/** @document */
+/**
+ *
+ */
 export type EmailLinkConfig = Omit<EmailLinkFactor, 'safeIdentifier'> & {
   /**
    * The URL to redirect to after the email link is clicked.
    */
   redirectUrl: string;
 };
-/** @document */
+/**
+ *
+ */
 export type PhoneCodeConfig = Omit<PhoneCodeFactor, 'safeIdentifier'>;
-/** @document */
+/**
+ *
+ */
 export type Web3SignatureConfig = Web3SignatureFactor;
 
 /** @inline */
 export type PassKeyConfig = PasskeyFactor;
 
-/** @document */
+/**
+ *
+ */
 export type OAuthConfig = OauthFactor & {
   /**
    * The URL to redirect to after the OAuth flow is completed.
@@ -231,7 +261,9 @@ export type OAuthConfig = OauthFactor & {
   oidcLoginHint?: string;
 };
 
-/** @document */
+/**
+ *
+ */
 export type EnterpriseSSOConfig = EnterpriseSSOFactor & {
   /**
    * The URL to redirect to after the OAuth flow is completed.
@@ -257,7 +289,9 @@ export type EnterpriseSSOConfig = EnterpriseSSOFactor & {
   enterpriseConnectionId?: string;
 };
 
-/** @document */
+/**
+ *
+ */
 export type PhoneCodeSecondFactorConfig = {
   /**
    * The strategy type.
@@ -269,7 +303,9 @@ export type PhoneCodeSecondFactorConfig = {
   phoneNumberId?: string;
 };
 
-/** @document */
+/**
+ *
+ */
 export type EmailCodeSecondFactorConfig = {
   /**
    * The strategy type.
@@ -282,7 +318,7 @@ export type EmailCodeSecondFactorConfig = {
 };
 
 /**
- * @document
+ *
  */
 export type EmailCodeAttempt = {
   /**
@@ -296,7 +332,7 @@ export type EmailCodeAttempt = {
 };
 
 /**
- * @document
+ *
  */
 export type PhoneCodeAttempt = {
   /**
@@ -310,7 +346,7 @@ export type PhoneCodeAttempt = {
 };
 
 /**
- * @document
+ *
  */
 export type PasswordAttempt = {
   /**
@@ -324,7 +360,7 @@ export type PasswordAttempt = {
 };
 
 /**
- * @document
+ *
  */
 export type PasskeyAttempt = {
   /**
@@ -337,7 +373,9 @@ export type PasskeyAttempt = {
   publicKeyCredential: PublicKeyCredentialWithAuthenticatorAssertionResponse;
 };
 
-/** @document */
+/**
+ *
+ */
 export type Web3Attempt = {
   /**
    * The strategy type.
@@ -349,7 +387,9 @@ export type Web3Attempt = {
   signature: string;
 };
 
-/** @document */
+/**
+ *
+ */
 export type TOTPAttempt = {
   /**
    * The strategy type.
@@ -361,7 +401,9 @@ export type TOTPAttempt = {
   code: string;
 };
 
-/** @document */
+/**
+ *
+ */
 export type BackupCodeAttempt = {
   /**
    * The strategy type.
@@ -373,7 +415,9 @@ export type BackupCodeAttempt = {
   code: string;
 };
 
-/** @document */
+/**
+ *
+ */
 export type ResetPasswordPhoneCodeAttempt = {
   /**
    * The strategy type.
@@ -389,7 +433,9 @@ export type ResetPasswordPhoneCodeAttempt = {
   password?: string;
 };
 
-/** @document */
+/**
+ *
+ */
 export type ResetPasswordEmailCodeAttempt = {
   /**
    * The strategy type.

@@ -174,18 +174,25 @@ export interface OrganizationResource extends ClerkResource, BillingPayerMethods
    * Deleting an Organization will also delete all memberships and invitations. **This is not reversible.**
    */
   destroy: () => Promise<void>;
+  /**
+   * Sets or replaces an Organization's logo.
+   */
   setLogo: (params: SetOrganizationLogoParams) => Promise<OrganizationResource>;
   __internal_toSnapshot: () => OrganizationJSONSnapshot;
 }
 
-/** @document */
+/**
+ *
+ */
 export type GetRolesParams = ClerkPaginationParams;
 
 export interface GetRolesResponse extends ClerkPaginatedResponse<RoleResource> {
   has_role_set_migration?: boolean;
 }
 
-/** @document */
+/**
+ *
+ */
 export type GetMembersParams = ClerkPaginationParams<{
   /**
    * The [Role](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) to filter the users by.
@@ -197,7 +204,9 @@ export type GetMembersParams = ClerkPaginationParams<{
   query?: string;
 }>;
 
-/** @document */
+/**
+ *
+ */
 export type GetDomainsParams = ClerkPaginationParams<{
   /**
    * The [enrollment mode](https://clerk.com/docs/guides/organizations/add-members/verified-domains#enable-verified-domains) will decide how new users join an organization.
@@ -205,7 +214,9 @@ export type GetDomainsParams = ClerkPaginationParams<{
   enrollmentMode?: OrganizationEnrollmentMode;
 }>;
 
-/** @document */
+/**
+ *
+ */
 export type GetInvitationsParams = ClerkPaginationParams<{
   /**
    * The status of the invitations to get.
@@ -213,7 +224,9 @@ export type GetInvitationsParams = ClerkPaginationParams<{
   status?: OrganizationInvitationStatus[];
 }>;
 
-/** @document */
+/**
+ *
+ */
 export type GetMembershipRequestParams = ClerkPaginationParams<{
   /**
    * The status of the membership requests to get.
@@ -221,7 +234,9 @@ export type GetMembershipRequestParams = ClerkPaginationParams<{
   status?: OrganizationInvitationStatus;
 }>;
 
-/** @document */
+/**
+ *
+ */
 export interface AddMemberParams {
   /**
    * The unique identifier of the user to add as a member.
@@ -233,7 +248,9 @@ export interface AddMemberParams {
   role: OrganizationCustomRoleKey;
 }
 
-/** @document */
+/**
+ *
+ */
 export interface InviteMemberParams {
   /**
    * The email address of the user to invite.
@@ -245,7 +262,9 @@ export interface InviteMemberParams {
   role: OrganizationCustomRoleKey;
 }
 
-/** @document */
+/**
+ *
+ */
 export interface InviteMembersParams {
   /**
    * The email addresses of the users to invite.
@@ -257,7 +276,9 @@ export interface InviteMembersParams {
   role: OrganizationCustomRoleKey;
 }
 
-/** @document */
+/**
+ *
+ */
 export interface UpdateMembershipParams {
   /**
    * The unique identifier of the user to update.
@@ -269,7 +290,9 @@ export interface UpdateMembershipParams {
   role: OrganizationCustomRoleKey;
 }
 
-/** @document */
+/**
+ *
+ */
 export interface UpdateOrganizationParams {
   /**
    * The name of the Organization.
@@ -281,15 +304,19 @@ export interface UpdateOrganizationParams {
   slug?: string;
 }
 
-/** @document */
+/**
+ *
+ */
 export interface SetOrganizationLogoParams {
   /**
-   * The file to set as the Organization's logo.
+   * The file to set as the Organization's logo. The file must be an image and its size cannot exceed 10MB.
    */
   file: Blob | File | string | null;
 }
 
-/** @document */
+/**
+ *
+ */
 export type GetMemberships = (
   params?: GetMembersParams,
 ) => Promise<ClerkPaginatedResponse<OrganizationMembershipResource>>;

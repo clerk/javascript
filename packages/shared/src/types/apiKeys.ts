@@ -72,7 +72,9 @@ export interface APIKeyResource extends ClerkResource {
   updatedAt: Date;
 }
 
-/** @document */
+/**
+ *
+ */
 export interface APIKeysNamespace {
   /**
    * Gets a paginated list of API keys for the current user or organization.

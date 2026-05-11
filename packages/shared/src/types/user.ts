@@ -359,35 +359,45 @@ export interface UserResource extends ClerkResource, BillingPayerMethods {
   __internal_toSnapshot: () => UserJSONSnapshot;
 }
 
-/** @document */
+/**
+ *
+ */
 export type CreateEmailAddressParams = {
   /**
    * The email address to add to the user.
    */
   email: string;
 };
-/** @document */
+/**
+ *
+ */
 export type CreatePhoneNumberParams = {
   /**
    * The phone number to add to the user.
    */
   phoneNumber: string;
 };
-/** @document */
+/**
+ *
+ */
 export type CreateWeb3WalletParams = {
   /**
    * The Web3 wallet address, made up of either 0x + 40 hexadecimal characters or a `base58` encoded `ed25519` public key (for Solana wallets).
    */
   web3Wallet: string;
 };
-/** @document */
+/**
+ *
+ */
 export type SetProfileImageParams = {
   /**
    * The file to set as the user's profile image, or `null` to remove the current image.
    */
   file: Blob | File | string | null;
 };
-/** @document */
+/**
+ *
+ */
 export type CreateExternalAccountParams = {
   /**
    * The strategy corresponding to the OAuth provider. For example: `'oauth_google'`.
@@ -415,7 +425,9 @@ export type CreateExternalAccountParams = {
    */
   oidcLoginHint?: string;
 };
-/** @document */
+/**
+ *
+ */
 export type VerifyTOTPParams = {
   /**
    * The code to verify.
@@ -436,7 +448,9 @@ type UpdateUserJSON = Pick<
 
 export type UpdateUserParams = Partial<SnakeToCamel<UpdateUserJSON>>;
 
-/** @document */
+/**
+ *
+ */
 export type UpdateUserPasswordParams = {
   /**
    * The user's new password.
@@ -452,7 +466,9 @@ export type UpdateUserPasswordParams = {
   signOutOfOtherSessions?: boolean;
 };
 
-/** @document */
+/**
+ *
+ */
 export type RemoveUserPasswordParams = {
   /**
    * The user's current password.
@@ -460,7 +476,9 @@ export type RemoveUserPasswordParams = {
   currentPassword?: string;
 };
 
-/** @document */
+/**
+ *
+ */
 export type GetUserOrganizationInvitationsParams = ClerkPaginationParams<{
   /**
    * The status an invitation can have.
@@ -468,7 +486,9 @@ export type GetUserOrganizationInvitationsParams = ClerkPaginationParams<{
   status?: OrganizationInvitationStatus;
 }>;
 
-/** @document */
+/**
+ *
+ */
 export type GetUserOrganizationSuggestionsParams = ClerkPaginationParams<{
   /**
    * The status a suggestion can have.

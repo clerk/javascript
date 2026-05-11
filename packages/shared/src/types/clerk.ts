@@ -1177,7 +1177,9 @@ export interface Clerk {
   __experimental_checkout: __experimental_CheckoutFunction;
 }
 
-/** @document */
+/**
+ *
+ */
 export type HandleOAuthCallbackParams = TransferableOption &
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
@@ -1261,7 +1263,9 @@ type ClerkOptionsNavigation =
       routerDebug?: boolean;
     };
 
-/** @document */
+/**
+ *
+ */
 type ClerkUnsafeOptions = {
   /**
    * Disables the `Clerk has been loaded with development keys` console warning that is logged when Clerk is
@@ -1284,7 +1288,9 @@ type ClerkUnsafeOptions = {
   unsafe_disableDevelopmentModeConsoleWarning?: boolean;
 };
 
-/** @document */
+/**
+ *
+ */
 export type ClerkOptions = ClerkOptionsNavigation &
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
@@ -1622,7 +1628,9 @@ export type RoutingOptions =
   | { path: string | undefined; routing?: Extract<RoutingStrategy, 'path'> }
   | { path?: never; routing?: Extract<RoutingStrategy, 'hash'> };
 
-/** @document */
+/**
+ *
+ */
 export type SignInProps = RoutingOptions & {
   /**
    * Full URL or path to navigate to after successful sign in.
@@ -1772,7 +1780,9 @@ export type __internal_AttemptToEnableEnvironmentSettingResult = {
 
 type GoogleOneTapRedirectUrlProps = SignInForceRedirectUrl & SignUpForceRedirectUrl;
 
-/** @document */
+/**
+ *
+ */
 export type GoogleOneTapProps = GoogleOneTapRedirectUrlProps & {
   /**
    * Whether to cancel the Google One Tap request if a user clicks outside the prompt.
@@ -1801,7 +1811,9 @@ export type GoogleOneTapProps = GoogleOneTapRedirectUrlProps & {
   appearance?: ClerkAppearanceTheme;
 };
 
-/** @document */
+/**
+ *
+ */
 export type SignUpProps = RoutingOptions & {
   /**
    * Full URL or path to navigate to after successful sign up.
@@ -1866,7 +1878,9 @@ export type SignUpModalProps = WithoutRouting<SignUpProps> & {
   getContainer?: () => HTMLElement | null;
 };
 
-/** @document */
+/**
+ *
+ */
 export type UserProfileProps = RoutingOptions & {
   /**
    * Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided). See the [Appearance](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.
@@ -1914,7 +1928,9 @@ export type UserProfileModalProps = WithoutRouting<UserProfileProps> & {
   getContainer?: () => HTMLElement | null;
 };
 
-/** @document */
+/**
+ *
+ */
 export type OrganizationProfileProps = RoutingOptions & {
   /**
    * Full URL or path to navigate to after the user leaves the currently Active Organization.
@@ -1963,7 +1979,9 @@ export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfilePr
   getContainer?: () => HTMLElement | null;
 };
 
-/** @document */
+/**
+ *
+ */
 export type CreateOrganizationProps = RoutingOptions & {
   /**
    * Full URL or path to navigate to after creating a new Organization.
@@ -1986,7 +2004,7 @@ export type CreateOrganizationProps = RoutingOptions & {
   appearance?: ClerkAppearanceTheme;
 };
 
-/** @document */
+/**  */
 export type CreateOrganizationModalProps = WithoutRouting<CreateOrganizationProps> & {
   /**
    * Function that returns the container element where portals should be rendered.
@@ -1999,7 +2017,7 @@ export type CreateOrganizationModalProps = WithoutRouting<CreateOrganizationProp
 /** @inline */
 type UserProfileMode = 'modal' | 'navigation';
 
-/** @document */
+/**  */
 type UserButtonProfileMode =
   | {
       userProfileUrl?: never;
@@ -2079,7 +2097,7 @@ type CreateOrganizationMode =
   | { createOrganizationUrl: string; createOrganizationMode?: 'navigation' }
   | { createOrganizationUrl?: never; createOrganizationMode?: 'modal' };
 
-/** @document */
+/**  */
 export type OrganizationSwitcherProps = CreateOrganizationMode &
   OrganizationProfileMode & {
     /**
@@ -2154,7 +2172,7 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
     organizationProfileProps?: Pick<OrganizationProfileProps, 'appearance' | 'customPages'>;
   };
 
-/** @document */
+/**  */
 export type OrganizationListProps = {
   /**
    * Full URL or path to navigate to after creating a new Organization.
@@ -2202,7 +2220,7 @@ export type OrganizationListProps = {
   afterSelectPersonalUrl?: ((user: UserResource) => string) | LooseExtractedParams<PrimitiveKeys<UserResource>>;
 };
 
-/** @document */
+/**  */
 export type WaitlistProps = {
   /**
    * Full URL or path to navigate to after join waitlist.
@@ -2218,7 +2236,7 @@ export type WaitlistProps = {
   signInUrl?: string;
 };
 
-/** @document */
+/**  */
 export type WaitlistModalProps = WaitlistProps & {
   /**
    * Function that returns the container element where portals should be rendered.
@@ -2228,7 +2246,7 @@ export type WaitlistModalProps = WaitlistProps & {
   getContainer?: () => HTMLElement | null;
 };
 
-/** @document */
+/**  */
 type PricingTableDefaultProps = {
   /**
    * The position of the CTA button.
@@ -2250,7 +2268,7 @@ type PricingTableDefaultProps = {
   newSubscriptionRedirectUrl?: string;
 };
 
-/** @document */
+/**  */
 type PricingTableBaseProps = {
   /**
    * The subscriber type to display plans for.
@@ -2272,10 +2290,10 @@ type PricingTableBaseProps = {
 
 type PortalRoot = HTMLElement | null | undefined;
 
-/** @document */
+/**  */
 export type PricingTableProps = PricingTableBaseProps & PricingTableDefaultProps;
 
-/** @document */
+/**  */
 export type APIKeysProps = {
   /**
    * The number of API keys to show per page.
@@ -2305,7 +2323,7 @@ export type __experimental_ConfigureSSOProps = {
   appearance?: ClerkAppearanceTheme;
 };
 
-/** @document */
+/**  */
 export type GetAPIKeysParams = ClerkPaginationParams<{
   /**
    * The user or organization ID to query API keys by. If not provided, defaults to the [Active Organization](!active-organization), then the current User.
@@ -2317,7 +2335,7 @@ export type GetAPIKeysParams = ClerkPaginationParams<{
   query?: string;
 }>;
 
-/** @document */
+/**  */
 export type CreateAPIKeyParams = {
   /**
    * The name of the API key.
@@ -2337,7 +2355,7 @@ export type CreateAPIKeyParams = {
   description?: string;
 };
 
-/** @document */
+/**  */
 export type RevokeAPIKeyParams = {
   /**
    * The ID of the API key to revoke.
@@ -2597,7 +2615,7 @@ export type SignUpButtonProps = (SignUpButtonPropsModal | ButtonPropsRedirect) &
     | 'oauthFlow'
   >;
 
-/** @document */
+/**  */
 export type TaskChooseOrganizationProps = {
   /**
    * Full URL or path to navigate to after successfully resolving all tasks
@@ -2609,7 +2627,7 @@ export type TaskChooseOrganizationProps = {
   appearance?: ClerkAppearanceTheme;
 };
 
-/** @document */
+/**  */
 export type TaskResetPasswordProps = {
   /**
    * Full URL or path to navigate to after successfully resolving all tasks
@@ -2621,7 +2639,7 @@ export type TaskResetPasswordProps = {
   appearance?: ClerkAppearanceTheme;
 };
 
-/** @document */
+/**  */
 export type TaskSetupMFAProps = {
   /**
    * Full URL or path to navigate to after successfully resolving all tasks
@@ -2633,7 +2651,7 @@ export type TaskSetupMFAProps = {
   appearance?: ClerkAppearanceTheme;
 };
 
-/** @document */
+/**  */
 export type CreateOrganizationInvitationParams = {
   /**
    * The email address of the user to invite.
@@ -2645,7 +2663,7 @@ export type CreateOrganizationInvitationParams = {
   role: OrganizationCustomRoleKey;
 };
 
-/** @document */
+/**  */
 export type CreateBulkOrganizationInvitationParams = {
   /**
    * The email addresses of the users to invite.
@@ -2671,7 +2689,7 @@ export interface CreateOrganizationParams {
   slug?: string;
 }
 
-/** @document */
+/**  */
 export interface ClerkAuthenticateWithWeb3Params {
   /**
    * A function that overrides Clerk's default navigation behavior, allowing custom handling of navigation during sign-up and sign-in flows.
@@ -2707,7 +2725,7 @@ export interface ClerkAuthenticateWithWeb3Params {
   walletName?: string;
 }
 
-/** @document */
+/**  */
 export interface AuthenticateWithMetamaskParams {
   /**
    * A function that overrides Clerk's default navigation behavior, allowing custom handling of navigation during sign-up and sign-in flows.
@@ -2731,7 +2749,7 @@ export interface AuthenticateWithMetamaskParams {
   legalAccepted?: boolean;
 }
 
-/** @document */
+/**  */
 export interface AuthenticateWithCoinbaseWalletParams {
   /**
    * A function that overrides Clerk's default navigation behavior, allowing custom handling of navigation during sign-up and sign-in flows.
@@ -2755,7 +2773,7 @@ export interface AuthenticateWithCoinbaseWalletParams {
   legalAccepted?: boolean;
 }
 
-/** @document */
+/**  */
 export interface AuthenticateWithOKXWalletParams {
   /**
    * A function that overrides Clerk's default navigation behavior, allowing custom handling of navigation during sign-up and sign-in flows.
@@ -2779,7 +2797,7 @@ export interface AuthenticateWithOKXWalletParams {
   legalAccepted?: boolean;
 }
 
-/** @document */
+/**  */
 export interface AuthenticateWithGoogleOneTapParams {
   /**
    * The Google credential token from the Google Identity Services response.
@@ -2791,7 +2809,7 @@ export interface AuthenticateWithGoogleOneTapParams {
   legalAccepted?: boolean;
 }
 
-/** @document */
+/**  */
 export interface AuthenticateWithBaseParams {
   /**
    * A function that overrides Clerk's default navigation behavior, allowing custom handling of navigation during sign-up and sign-in flows.
@@ -2815,7 +2833,9 @@ export interface AuthenticateWithBaseParams {
   legalAccepted?: boolean;
 }
 
-/** @document */
+/**
+ *
+ */
 export interface AuthenticateWithSolanaParams {
   /**
    * A function that overrides Clerk's default navigation behavior, allowing custom handling of navigation during sign-up and sign-in flows.
