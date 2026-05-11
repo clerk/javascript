@@ -3,33 +3,23 @@ import { descriptors, Flow, Text } from '@/customizables';
 import { Step } from '../elements/Step';
 import { useWizard } from '../elements/Wizard';
 
-export const TestConfigurationStep = (): JSX.Element => {
+export const SelectProviderStep = (): JSX.Element => {
   const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
 
   return (
-    <Flow.Part part='test-sso'>
+    <Flow.Part part='selectProvider'>
       <Step
         elementDescriptor={descriptors.configureSSOStep}
-        elementId={descriptors.configureSSOStep.setId('test')}
+        elementId={descriptors.configureSSOStep.setId('select-provider')}
       >
         <Step.Header
-          title='Test your SSO connection'
-          description='Test your SSO configuration to verify you can successfully authenticate via your identity provider'
+          title='Select provider'
+          description='Select the provider you are going to setup SSO for'
         />
 
         <Step.Body>
-          <Step.Section
-            sx={theme => ({
-              borderBottomWidth: theme.borderWidths.$normal,
-              borderBottomStyle: theme.borderStyles.$solid,
-              borderBottomColor: theme.colors.$borderAlpha100,
-            })}
-          >
-            <Text>Test your SSO URL</Text>
-          </Step.Section>
-
           <Step.Section>
-            <Text>Your test results</Text>
+            <Text>UI goes here</Text>
           </Step.Section>
         </Step.Body>
 
