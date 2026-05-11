@@ -9,6 +9,7 @@ import {
   mockJwks,
   mockJwt,
   mockJwtPayload,
+  mockM2MJwtPayload,
   signingJwks,
 } from '../../fixtures';
 import {
@@ -1873,6 +1874,51 @@ describe('tokens.authenticateRequest(options)', () => {
         exhaustBucket('unknown');
         const result = await authenticateRequest(mockRequestWithHeaderAuth(), mockOptions());
         expect(result).toBeSignedIn();
+      });
+
+      test('OAuth JWT tokens bypass the rate limiter', async () => {
+        vi.useFakeTimers();
+        vi.setSystemTime(new Date(mockJwtPayload.iat * 1000));
+        server.use(http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)));
+        const ip = '203.0.113.2';
+        exhaustBucket(ip);
+        const { data: oauthJwt } = await signJwt(
+          {
+            iss: 'https://clerk.oauth.example.test',
+            sub: 'user_2vYVtestTESTtestTESTtestTESTtest',
+            client_id: 'client_2VTWUzvGC5UhdJCNx6xG1D98edc',
+            scope: 'read:foo',
+            exp: mockJwtPayload.iat + 300,
+            iat: mockJwtPayload.iat,
+            nbf: mockJwtPayload.iat - 10,
+          },
+          signingJwks,
+          { algorithm: 'RS256', header: { typ: 'at+jwt', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD' } },
+        );
+        const result = await authenticateRequest(
+          mockRequest({ authorization: `Bearer ${oauthJwt}`, 'cf-connecting-ip': ip }),
+          mockOptions({ acceptsToken: 'oauth_token' }),
+        );
+        expect(result.reason).not.toBe(AuthErrorReason.MachineTokenRateLimit);
+        vi.useRealTimers();
+      });
+
+      test('M2M JWT tokens bypass the rate limiter', async () => {
+        vi.useFakeTimers();
+        vi.setSystemTime(new Date(mockJwtPayload.iat * 1000));
+        server.use(http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)));
+        const ip = '203.0.113.3';
+        exhaustBucket(ip);
+        const { data: m2mJwt } = await signJwt(mockM2MJwtPayload, signingJwks, {
+          algorithm: 'RS256',
+          header: { typ: 'JWT', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD' },
+        });
+        const result = await authenticateRequest(
+          mockRequest({ authorization: `Bearer ${m2mJwt}`, 'cf-connecting-ip': ip }),
+          mockOptions({ acceptsToken: 'm2m_token' }),
+        );
+        expect(result.reason).not.toBe(AuthErrorReason.MachineTokenRateLimit);
+        vi.useRealTimers();
       });
     });
 

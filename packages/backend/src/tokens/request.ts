@@ -14,7 +14,13 @@ import { AuthErrorReason, handshake, signedIn, signedOut, signedOutInvalidToken 
 import { createClerkRequest } from './clerkRequest';
 import { getCookieName, getCookieValue } from './cookie';
 import { HandshakeService } from './handshake';
-import { getMachineTokenType, isMachineJwt, isMachineToken, isTokenTypeAccepted } from './machine';
+import {
+  getMachineTokenType,
+  isMachineJwt,
+  isMachineToken,
+  isMachineTokenByPrefix,
+  isTokenTypeAccepted,
+} from './machine';
 import { checkMachineTokenRateLimit } from './machineTokenRateLimiter';
 import { OrganizationMatcher } from './organizationMatcher';
 import type { MachineTokenType, SessionTokenType } from './tokenTypes';
@@ -812,7 +818,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
       return mismatchState;
     }
 
-    if (!checkMachineTokenRateLimit(extractCallerIp(request))) {
+    if (isMachineTokenByPrefix(tokenInHeader) && !checkMachineTokenRateLimit(extractCallerIp(request))) {
       return signedOut({
         tokenType: parsedTokenType,
         authenticateContext,
@@ -848,7 +854,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
         return mismatchState;
       }
 
-      if (!checkMachineTokenRateLimit(extractCallerIp(request))) {
+      if (isMachineTokenByPrefix(tokenInHeader) && !checkMachineTokenRateLimit(extractCallerIp(request))) {
         return signedOut({
           tokenType: parsedTokenType,
           authenticateContext,
