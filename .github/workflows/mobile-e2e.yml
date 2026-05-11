@@ -102,6 +102,20 @@ jobs:
           # Align them so launchApp/clearAppState target the installed app.
           jq '.expo.ios.bundleIdentifier = "com.clerk.clerkexpoquickstart" | .expo.android.package = "com.clerk.clerkexpoquickstart"' app.json > app.json.tmp
           mv app.json.tmp app.json
+          # Strip expo-dev-client. With it installed, even release-variant
+          # builds boot into the dev launcher and try to reach Metro at a
+          # LAN IP unreachable from CI's emulator/simulator, leaving every
+          # Maestro flow stuck on a blank screen.
+          jq 'del(.dependencies["expo-dev-client"], .devDependencies["expo-dev-client"])' package.json > package.json.tmp
+          mv package.json.tmp package.json
+
+      - name: Cache quickstart node_modules
+        uses: actions/cache@v4
+        with:
+          path: clerk-expo-quickstart/NativeComponentQuickstart/node_modules
+          key: quickstart-nm-${{ runner.os }}-${{ hashFiles('clerk-expo-quickstart/NativeComponentQuickstart/package.json', 'packages/expo/package.json') }}
+          restore-keys: |
+            quickstart-nm-${{ runner.os }}-
 
       - name: Install quickstart deps
         working-directory: clerk-expo-quickstart/NativeComponentQuickstart
@@ -162,6 +176,49 @@ jobs:
           distribution: temurin
           java-version: 17
 
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('packages/expo/package.json', 'clerk-expo-quickstart/NativeComponentQuickstart/package.json') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
+
+      - name: Enable KVM
+        # Required so the x86_64 Android emulator can use hardware accel.
+        # Without it the emulator falls back to software rendering and is
+        # multiple times slower to boot and run.
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: AVD cache
+        uses: actions/cache@v4
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-34-google_apis-x86_64-v1
+
+      - name: Create AVD snapshot
+        # On cache miss, boot the emulator once with snapshot saving so a
+        # warm-boot snapshot ends up in ~/.android/avd/*. Subsequent runs
+        # hit the cache and skip this step.
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          disable-animations: false
+          script: echo "Generated AVD snapshot for caching."
+
       - name: Install Maestro
         run: |
           curl -Ls "https://get.maestro.mobile.dev" | bash
@@ -177,6 +234,9 @@ jobs:
           api-level: 34
           target: google_apis
           arch: x86_64
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          disable-animations: true
           # reactivecircus/android-emulator-runner runs each line of `script` in a
           # separate `sh -c` invocation, so cwd doesn't persist between commands.
           # Use a folded scalar (>-) plus `&&` chains so the entire pipeline runs
@@ -270,6 +330,20 @@ jobs:
           # Align them so launchApp/clearAppState target the installed app.
           jq '.expo.ios.bundleIdentifier = "com.clerk.clerkexpoquickstart" | .expo.android.package = "com.clerk.clerkexpoquickstart"' app.json > app.json.tmp
           mv app.json.tmp app.json
+          # Strip expo-dev-client. With it installed, even release-variant
+          # builds boot into the dev launcher and try to reach Metro at a
+          # LAN IP unreachable from CI's emulator/simulator, leaving every
+          # Maestro flow stuck on a blank screen.
+          jq 'del(.dependencies["expo-dev-client"], .devDependencies["expo-dev-client"])' package.json > package.json.tmp
+          mv package.json.tmp package.json
+
+      - name: Cache quickstart node_modules
+        uses: actions/cache@v4
+        with:
+          path: clerk-expo-quickstart/NativeComponentQuickstart/node_modules
+          key: quickstart-nm-${{ runner.os }}-${{ hashFiles('clerk-expo-quickstart/NativeComponentQuickstart/package.json', 'packages/expo/package.json') }}
+          restore-keys: |
+            quickstart-nm-${{ runner.os }}-
 
       - name: Install quickstart deps
         working-directory: clerk-expo-quickstart/NativeComponentQuickstart
@@ -324,11 +398,26 @@ jobs:
           echo "password=$password" >> "$GITHUB_OUTPUT"
           echo "user_id=$user_id" >> "$GITHUB_OUTPUT"
 
-      - name: Cache SPM
+      - name: Cache CocoaPods downloads
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/Library/Caches/CocoaPods
+            ~/.cocoapods/repos
+          key: cocoapods-${{ runner.os }}-${{ hashFiles('packages/expo/package.json', 'clerk-expo-quickstart/NativeComponentQuickstart/package.json') }}
+          restore-keys: |
+            cocoapods-${{ runner.os }}-
+
+      - name: Cache Xcode DerivedData
+        # Includes SPM checkouts and incremental build artifacts. Wider key
+        # than the old spm-only cache so it actually invalidates when the
+        # quickstart's deps change, not just when @clerk/expo's do.
         uses: actions/cache@v4
         with:
           path: ~/Library/Developer/Xcode/DerivedData
-          key: spm-${{ hashFiles('packages/expo/package.json') }}
+          key: deriveddata-${{ runner.os }}-${{ hashFiles('packages/expo/package.json', 'clerk-expo-quickstart/NativeComponentQuickstart/package.json') }}
+          restore-keys: |
+            deriveddata-${{ runner.os }}-
 
       - name: Install Maestro
         run: |
