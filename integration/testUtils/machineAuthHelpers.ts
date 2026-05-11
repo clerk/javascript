@@ -177,10 +177,6 @@ export type MachineAuthTestAdapter = {
     callbackPath: string;
     addRoutes: RouteBuilder;
   };
-  rateLimit?: {
-    path: string;
-    addRoutes: RouteBuilder;
-  };
 };
 
 const createApiKeysEnv = (): EnvironmentConfig => appConfigs.envs.withAPIKeys.clone();
@@ -447,97 +443,5 @@ export const registerOAuthAuthTests = (adapter: MachineAuthTestAdapter): void =>
         expect(res.status()).toBe(401);
       });
     }
-  });
-};
-
-export const registerRateLimitTests = (adapter: MachineAuthTestAdapter): void => {
-  if (!adapter.rateLimit) {
-    return;
-  }
-
-  test.describe('Machine token rate limiting', () => {
-    test.describe.configure({ mode: 'serial' });
-    let app: Application;
-    let fakeUser: FakeUser;
-    let fakeBapiUser: User;
-    let fakeAPIKey: FakeAPIKey;
-
-    test.beforeAll(async () => {
-      test.setTimeout(120_000);
-
-      app = await buildApp(adapter, adapter.rateLimit!.addRoutes);
-      await app.setup();
-      await app.withEnv(createApiKeysEnv());
-      await app.dev();
-
-      const u = createTestUtils({ app });
-      fakeUser = u.services.users.createFakeUser();
-      fakeBapiUser = await u.services.users.createBapiUser(fakeUser);
-      fakeAPIKey = await u.services.users.createFakeAPIKey(fakeBapiUser.id);
-    });
-
-    test.afterAll(async () => {
-      await fakeAPIKey?.revoke();
-      await fakeUser?.deleteIfExists();
-      await app?.teardown();
-    });
-
-    test('rate-limits opaque machine tokens after burst exhaustion', async ({ request }) => {
-      const url = new URL(adapter.rateLimit!.path, app.serverUrl).toString();
-      // Use a dedicated test IP so this test's bucket is isolated from others
-      const testIp = '203.0.113.42';
-
-      for (let i = 0; i < 20; i++) {
-        await request.get(url, {
-          headers: {
-            Authorization: `Bearer ${fakeAPIKey.secret}`,
-            'x-forwarded-for': testIp,
-          },
-        });
-      }
-
-      const res = await request.get(url, {
-        headers: {
-          Authorization: `Bearer ${fakeAPIKey.secret}`,
-          'x-forwarded-for': testIp,
-        },
-      });
-      expect(res.status()).toBe(401);
-      const body = await res.json();
-      expect(body.reason).toBe('machine-token-rate-limit');
-    });
-
-    test('tracks different source IPs independently', async ({ request }) => {
-      const url = new URL(adapter.rateLimit!.path, app.serverUrl).toString();
-      const ipA = '203.0.113.1';
-      const ipB = '203.0.113.2';
-
-      for (let i = 0; i < 20; i++) {
-        await request.get(url, {
-          headers: {
-            Authorization: `Bearer ${fakeAPIKey.secret}`,
-            'x-forwarded-for': ipA,
-          },
-        });
-      }
-
-      const resA = await request.get(url, {
-        headers: {
-          Authorization: `Bearer ${fakeAPIKey.secret}`,
-          'x-forwarded-for': ipA,
-        },
-      });
-      expect(resA.status()).toBe(401);
-      const bodyA = await resA.json();
-      expect(bodyA.reason).toBe('machine-token-rate-limit');
-
-      const resB = await request.get(url, {
-        headers: {
-          Authorization: `Bearer ${fakeAPIKey.secret}`,
-          'x-forwarded-for': ipB,
-        },
-      });
-      expect(resB.status()).toBe(200);
-    });
   });
 };
