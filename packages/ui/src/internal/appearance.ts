@@ -987,6 +987,13 @@ export type Options = {
    * @default false
    */
   unsafe_disableDevelopmentModeWarnings?: boolean;
+  /**
+   * Controls whether inputs will automatically receive focus when a component is mounted.
+   * Set to false to prevent the components from auto-focusing any input fields.
+   *
+   * @default true
+   */
+  autoFocus?: boolean;
 };
 
 export type CaptchaAppearanceOptions = {
