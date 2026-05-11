@@ -1,6 +1,6 @@
 import { useReverification, useSession, useUser } from '@clerk/shared/react';
 import type { EmailAddressResource } from '@clerk/shared/types';
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
   Col,
@@ -115,8 +115,34 @@ const InnerStepCounter = (): JSX.Element => {
   );
 };
 
+const isEmail = (str: string) => /^\S+@\S+\.\S+$/.test(str);
+
 export const ProvideEmailStep = (): JSX.Element => {
-  const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
+  const { goNext, goPrev, isFirstStep } = useWizard();
+  const { user } = useUser();
+  const card = useCardState();
+  const { t } = useLocalizations();
+  const [email, setEmail] = useState('');
+  const createEmailAddress = useReverification((value: string) => user?.createEmailAddress({ email: value }));
+
+  const canSubmit = isEmail(email) && !card.isLoading;
+  const handleSubmit = useCallback(async () => {
+    if (!canSubmit) {
+      return;
+    }
+
+    card.setError(undefined);
+    card.setLoading();
+
+    try {
+      await createEmailAddress(email);
+      await goNext();
+    } catch (err) {
+      handleError(err as Error, [], card.setError);
+    } finally {
+      card.setIdle();
+    }
+  }, [canSubmit, email, createEmailAddress, card, goNext]);
 
   return (
     <>
@@ -125,7 +151,62 @@ export const ProvideEmailStep = (): JSX.Element => {
         align='center'
         justify='center'
       >
-        <Text>UI goes here</Text>
+        <Form.Root
+          onSubmit={handleSubmit}
+          sx={t => ({
+            display: 'flex',
+            gap: t.space.$3,
+            maxWidth: t.sizes.$66,
+            textAlign: 'center',
+            flexDirection: 'column',
+            alignItems: 'center',
+          })}
+        >
+          <Icon
+            icon={DuotoneAtSymbol}
+            sx={t => ({
+              width: t.sizes.$8,
+              height: t.sizes.$8,
+              color: t.colors.$neutralAlpha600,
+            })}
+          />
+          <Col sx={t => ({ gap: t.space.$1 })}>
+            <Heading
+              textVariant='h1'
+              sx={t => ({ fontSize: t.fontSizes.$lg, fontWeight: t.fontWeights.$bold })}
+              localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.addEmailAddress.formTitle')}
+            />
+          </Col>
+
+          <Col sx={t => ({ gap: t.space.$1, width: '100%' })}>
+            <Text
+              as='p'
+              variant='body'
+              colorScheme='secondary'
+              localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.addEmailAddress.formSubtitle')}
+            />
+            <Input
+              type='email'
+              // eslint-disable-next-line jsx-a11y/no-autofocus
+              autoFocus
+              placeholder={t(localizationKeys('configureSSO.verifyEmailDomainStep.addEmailAddress.inputPlaceholder'))}
+              value={email}
+              onChange={e => setEmail(e.currentTarget.value)}
+              hasError={Boolean(card.error)}
+              isDisabled={card.isLoading}
+              aria-label={t(localizationKeys('configureSSO.verifyEmailDomainStep.addEmailAddress.inputLabel'))}
+            />
+            {card.error ? (
+              <Text
+                as='p'
+                variant='body'
+                sx={t => ({ color: t.colors.$danger500, fontSize: t.fontSizes.$sm, textAlign: 'start' })}
+              >
+                {card.error}
+              </Text>
+            ) : null}
+          </Col>
+        </Form.Root>
       </Step.Section>
 
       <Step.Footer>
@@ -135,7 +216,8 @@ export const ProvideEmailStep = (): JSX.Element => {
         />
         <Step.Footer.Continue
           onClick={() => goNext()}
-          isDisabled={isLastStep}
+          isLoading={card.isLoading}
+          isDisabled={!canSubmit || card.isLoading}
         />
       </Step.Footer>
     </>
@@ -150,7 +232,7 @@ export const EnterVerificationCodeStep = ({
   const { user } = useUser();
   const card = useCardState();
   const codeSubmittedRef = useRef(false);
-  const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
+  const { goNext, goPrev, isFirstStep } = useWizard();
 
   const isVerified = emailToVerify?.verification.status === 'verified';
   const isPrimary = emailToVerify?.id === user?.primaryEmailAddressId;
@@ -191,6 +273,12 @@ export const EnterVerificationCodeStep = ({
     },
   });
 
+  useEffect(() => {
+    if (emailToVerify && !isVerified) {
+      void prepare();
+    }
+  }, []);
+
   if (!emailToVerify) {
     return null;
   }
@@ -205,17 +293,17 @@ export const EnterVerificationCodeStep = ({
         {hasVerifiedEmail ? (
           <EmailAlreadyVerified emailAddress={emailToVerify.emailAddress} />
         ) : (
-          <>
-            <Col sx={t => ({ gap: t.space.$1, textAlign: 'center' })}>
+          <Col sx={t => ({ gap: t.space.$4, textAlign: 'center' })}>
+            <Col sx={t => ({ gap: t.space.$1 })}>
               <Heading
                 textVariant='h1'
-                sx={t => ({ color: t.colors.$colorForeground, fontSize: t.fontSizes.$sm })}
+                sx={t => ({ fontSize: t.fontSizes.$sm })}
                 localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.emailCode.formTitle')}
               />
               <Text
                 as='p'
                 variant='body'
-                sx={t => ({ color: t.colors.$colorMutedForeground })}
+                colorScheme='secondary'
                 localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.emailCode.formSubtitle', {
                   identifier: emailToVerify.emailAddress,
                 })}
@@ -225,18 +313,18 @@ export const EnterVerificationCodeStep = ({
               {...otp}
               resendButton={localizationKeys('configureSSO.verifyEmailDomainStep.emailCode.resendButton')}
             />
-          </>
+          </Col>
         )}
       </Step.Section>
 
       <Step.Footer>
         <Step.Footer.Previous
           onClick={() => goPrev()}
-          isDisabled={isFirstStep}
+          isDisabled
         />
         <Step.Footer.Continue
           onClick={() => goNext()}
-          isDisabled={isLastStep}
+          isDisabled={!isVerified}
         />
       </Step.Footer>
     </>
