@@ -46,28 +46,37 @@ export const VerifyDomainStep = (): JSX.Element => {
     return (
       <Flow.Part part='verifyDomain'>
         <Step>
-          <Icon
-            icon={ExclamationTriangle}
-            sx={t => ({
-              width: t.sizes.$8,
-              height: t.sizes.$8,
-              color: t.colors.$neutralAlpha600,
-            })}
-          />
-          <Col sx={t => ({ gap: t.space.$1, textAlign: 'center', maxWidth: t.sizes.$66 })}>
-            <Heading
-              textVariant='h1'
-              sx={t => ({ color: t.colors.$colorForeground, fontSize: t.fontSizes.$md })}
-              localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.domainTaken.title', {
-                domain: conflictingDomain,
+          <Col
+            justify='center'
+            align='center'
+            sx={t => ({ gap: t.space.$3, alignItems: 'center', flex: 1 })}
+          >
+            <Icon
+              icon={ExclamationTriangle}
+              sx={t => ({
+                width: t.sizes.$8,
+                height: t.sizes.$8,
+                color: t.colors.$neutralAlpha600,
               })}
             />
-            <Text
-              as='p'
-              variant='body'
-              sx={t => ({ color: t.colors.$colorMutedForeground })}
-              localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.domainTaken.subtitle')}
-            />
+            <Col
+              gap={1}
+              sx={t => ({ textAlign: 'center', maxWidth: t.sizes.$66 })}
+            >
+              <Heading
+                textVariant='h1'
+                sx={t => ({ fontSize: t.fontSizes.$lg })}
+                localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.domainTaken.title', {
+                  domain: conflictingDomain,
+                })}
+              />
+              <Text
+                as='p'
+                variant='body'
+                colorScheme='secondary'
+                localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.domainTaken.subtitle')}
+              />
+            </Col>
           </Col>
         </Step>
       </Flow.Part>
@@ -153,9 +162,9 @@ export const ProvideEmailStep = (): JSX.Element => {
       >
         <Form.Root
           onSubmit={handleSubmit}
+          gap={3}
           sx={t => ({
             display: 'flex',
-            gap: t.space.$3,
             maxWidth: t.sizes.$66,
             textAlign: 'center',
             flexDirection: 'column',
@@ -170,7 +179,7 @@ export const ProvideEmailStep = (): JSX.Element => {
               color: t.colors.$neutralAlpha600,
             })}
           />
-          <Col sx={t => ({ gap: t.space.$1 })}>
+          <Col gap={1}>
             <Heading
               textVariant='h1'
               sx={t => ({ fontSize: t.fontSizes.$lg, fontWeight: t.fontWeights.$bold })}
@@ -178,7 +187,10 @@ export const ProvideEmailStep = (): JSX.Element => {
             />
           </Col>
 
-          <Col sx={t => ({ gap: t.space.$1, width: '100%' })}>
+          <Col
+            gap={1}
+            sx={{ width: '100%' }}
+          >
             <Text
               as='p'
               variant='body'
@@ -187,14 +199,14 @@ export const ProvideEmailStep = (): JSX.Element => {
             />
             <Input
               type='email'
-              // eslint-disable-next-line jsx-a11y/no-autofocus
-              autoFocus
               placeholder={t(localizationKeys('configureSSO.verifyEmailDomainStep.addEmailAddress.inputPlaceholder'))}
+              aria-label={t(localizationKeys('configureSSO.verifyEmailDomainStep.addEmailAddress.inputLabel'))}
               value={email}
               onChange={e => setEmail(e.currentTarget.value)}
               hasError={Boolean(card.error)}
               isDisabled={card.isLoading}
-              aria-label={t(localizationKeys('configureSSO.verifyEmailDomainStep.addEmailAddress.inputLabel'))}
+              // eslint-disable-next-line jsx-a11y/no-autofocus
+              autoFocus
             />
             {card.error ? (
               <Text
@@ -232,7 +244,7 @@ export const EnterVerificationCodeStep = ({
   const { user } = useUser();
   const card = useCardState();
   const codeSubmittedRef = useRef(false);
-  const { goNext, goPrev, isFirstStep } = useWizard();
+  const { goNext, goPrev } = useWizard();
 
   const isVerified = emailToVerify?.verification.status === 'verified';
   const isPrimary = emailToVerify?.id === user?.primaryEmailAddressId;
@@ -293,8 +305,11 @@ export const EnterVerificationCodeStep = ({
         {hasVerifiedEmail ? (
           <EmailAlreadyVerified emailAddress={emailToVerify.emailAddress} />
         ) : (
-          <Col sx={t => ({ gap: t.space.$4, textAlign: 'center' })}>
-            <Col sx={t => ({ gap: t.space.$1 })}>
+          <Col
+            gap={4}
+            sx={{ textAlign: 'center' }}
+          >
+            <Col gap={1}>
               <Heading
                 textVariant='h1'
                 sx={t => ({ fontSize: t.fontSizes.$sm })}
@@ -324,6 +339,7 @@ export const EnterVerificationCodeStep = ({
         />
         <Step.Footer.Continue
           onClick={() => goNext()}
+          isLoading={otp.isLoading}
           isDisabled={!isVerified}
         />
       </Step.Footer>
@@ -335,7 +351,10 @@ const EmailAlreadyVerified = ({ emailAddress }: { emailAddress: string }): JSX.E
   const { t } = useLocalizations();
 
   return (
-    <Col sx={t => ({ gap: t.space.$3, alignItems: 'center' })}>
+    <Col
+      gap={3}
+      sx={{ alignItems: 'center' }}
+    >
       <Icon
         icon={DuotoneAtSymbol}
         sx={t => ({
@@ -344,13 +363,19 @@ const EmailAlreadyVerified = ({ emailAddress }: { emailAddress: string }): JSX.E
           color: t.colors.$neutralAlpha600,
         })}
       />
-      <Col sx={t => ({ gap: t.space.$1, textAlign: 'center', maxWidth: t.sizes.$66 })}>
+      <Col
+        gap={1}
+        sx={t => ({ textAlign: 'center', maxWidth: t.sizes.$66 })}
+      >
         <Heading
           textVariant='h1'
           sx={t => ({ fontSize: t.fontSizes.$lg, fontWeight: t.fontWeights.$bold })}
           localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.emailCode.verified.title')}
         />
-        <Col sx={t => ({ gap: t.space.$1, flex: 1 })}>
+        <Col
+          gap={1}
+          sx={{ flex: 1 }}
+        >
           <Text
             as='p'
             variant='body'
@@ -363,7 +388,7 @@ const EmailAlreadyVerified = ({ emailAddress }: { emailAddress: string }): JSX.E
           value={emailAddress}
           readOnly
           aria-label={t(localizationKeys('configureSSO.verifyEmailDomainStep.emailCode.verified.inputLabel'))}
-          sx={t => ({ width: '100%', maxWidth: t.sizes.$66, backgroundColor: t.colors.$neutralAlpha50 })}
+          sx={t => ({ backgroundColor: t.colors.$neutralAlpha50 })}
         />
       </Col>
     </Col>
