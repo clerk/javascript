@@ -2,7 +2,12 @@ import { test } from '@playwright/test';
 
 import { appConfigs } from '../presets';
 import type { MachineAuthTestAdapter } from '../testUtils/machineAuthHelpers';
-import { registerApiKeyAuthTests, registerM2MAuthTests, registerOAuthAuthTests } from '../testUtils/machineAuthHelpers';
+import {
+  registerApiKeyAuthTests,
+  registerM2MAuthTests,
+  registerOAuthAuthTests,
+  registerRateLimitTests,
+} from '../testUtils/machineAuthHelpers';
 
 const adapter: MachineAuthTestAdapter = {
   baseConfig: appConfigs.next.appRouter,
@@ -88,10 +93,32 @@ const adapter: MachineAuthTestAdapter = {
           `,
         ),
   },
+  rateLimit: {
+    path: '/api/rate-limit-test',
+    addRoutes: config =>
+      config.addFile(
+        'src/app/api/rate-limit-test/route.ts',
+        () => `
+        import { auth } from '@clerk/nextjs/server';
+
+        export async function GET(request: Request) {
+          const { userId, tokenType } = await auth({ acceptsToken: 'api_key' });
+
+          if (!userId) {
+            const reason = request.headers.get('x-clerk-auth-reason');
+            return Response.json({ error: 'Unauthorized', reason }, { status: 401 });
+          }
+
+          return Response.json({ userId, tokenType });
+        }
+        `,
+      ),
+  },
 };
 
 test.describe('Next.js machine authentication @machine', () => {
   registerApiKeyAuthTests(adapter);
   registerM2MAuthTests(adapter);
   registerOAuthAuthTests(adapter);
+  registerRateLimitTests(adapter);
 });
