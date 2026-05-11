@@ -13,17 +13,18 @@ import {
   Text,
   useLocalizations,
 } from '@/customizables';
+import { useCardState } from '@/elements/contexts';
 import { Alert } from '@/ui/elements/Alert';
+import { handleError } from '@/utils/errorHandler';
 
+import { type ProviderType, useConfigureSSOFlow } from '../ConfigureSSOContext';
 import { Step } from '../elements/Step';
 import { useWizard } from '../elements/Wizard';
 
-type ProviderType = 'okta' | 'custom_saml';
-
 const PROVIDER_OPTIONS: ReadonlyArray<{ id: ProviderType; label: LocalizationKey; iconId: string }> = [
-  { id: 'okta', label: localizationKeys('configureSSO.selectProviderStep.saml.okta'), iconId: 'okta' },
+  { id: 'saml_okta', label: localizationKeys('configureSSO.selectProviderStep.saml.okta'), iconId: 'okta' },
   {
-    id: 'custom_saml',
+    id: 'saml_custom',
     label: localizationKeys('configureSSO.selectProviderStep.saml.customSaml'),
     iconId: 'saml',
   },
@@ -31,7 +32,28 @@ const PROVIDER_OPTIONS: ReadonlyArray<{ id: ProviderType; label: LocalizationKey
 
 export const SelectProviderStep = (): JSX.Element => {
   const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
+  const { setProvider, createConnection } = useConfigureSSOFlow();
+  const card = useCardState();
   const [selected, setSelected] = React.useState<ProviderType | null>(null);
+
+  const handleContinue = async () => {
+    if (!selected) {
+      return;
+    }
+
+    setProvider(selected);
+    card.setError(undefined);
+    card.setLoading();
+
+    try {
+      await createConnection();
+      void goNext();
+    } catch (err) {
+      handleError(err as Error, [], card.setError);
+    } finally {
+      card.setIdle();
+    }
+  };
 
   return (
     <Flow.Part part='selectProvider'>
@@ -90,6 +112,16 @@ export const SelectProviderStep = (): JSX.Element => {
               variant='warning'
               title={localizationKeys('configureSSO.selectProviderStep.warning')}
             />
+
+            {card.error ? (
+              <Text
+                as='p'
+                variant='body'
+                sx={theme => ({ color: theme.colors.$danger500, fontSize: theme.fontSizes.$sm })}
+              >
+                {card.error}
+              </Text>
+            ) : null}
           </Step.Section>
         </Step.Body>
 
@@ -99,8 +131,9 @@ export const SelectProviderStep = (): JSX.Element => {
             isDisabled={isFirstStep}
           />
           <Step.Footer.Continue
-            onClick={() => goNext()}
-            isDisabled={isLastStep || !selected}
+            onClick={handleContinue}
+            isLoading={card.isLoading}
+            isDisabled={isLastStep || !selected || card.isLoading}
           />
         </Step.Footer>
       </Step>

@@ -10,10 +10,11 @@ import { ProfileCard } from '@/elements/ProfileCard';
 import { ExclamationTriangle } from '@/icons';
 import { Route, Switch } from '@/router';
 
-import { ConfigureSSOFlowProvider } from './ConfigureSSOContext';
+import { ConfigureSSOFlowProvider, useConfigureSSOFlow } from './ConfigureSSOContext';
 import { ConfigureSSOHeader } from './ConfigureSSOHeader';
 import { ConfigureSSONavbar } from './ConfigureSSONavbar';
 import { ConfigureSSOSkeleton } from './ConfigureSSOSkeleton';
+import { deriveInitialStep } from './deriveInitialStep';
 import { ProfileCardFooter, ProfileCardHeader } from './elements/ProfileCard';
 import { Step } from './elements/Step';
 import { Wizard } from './elements/Wizard';
@@ -74,43 +75,55 @@ const ConfigureSSOCardContent = () => {
   }
 
   return (
-    <ConfigureSSOFlowProvider enterpriseConnection={enterpriseConnection}>
-      <Wizard>
-        <ConfigureSSOHeader />
-
-        <Wizard.Step id='select-provider'>
-          <SelectProviderStep />
-        </Wizard.Step>
-
-        <Wizard.Step
-          id='verify-domain'
-          label='Verify domain'
-        >
-          <VerifyDomainStep />
-        </Wizard.Step>
-
-        <Wizard.Step
-          id='configure'
-          label='Configure'
-        >
-          <ConfigureStep />
-        </Wizard.Step>
-
-        <Wizard.Step
-          id='test'
-          label='Test'
-        >
-          <TestConfigurationStep />
-        </Wizard.Step>
-
-        <Wizard.Step
-          id='confirmation'
-          label='Confirmation'
-        >
-          <ConfirmationStep />
-        </Wizard.Step>
-      </Wizard>
+    <ConfigureSSOFlowProvider
+      enterpriseConnection={enterpriseConnection}
+      isLoading={isLoading}
+    >
+      <ConfigureSSOSteps />
     </ConfigureSSOFlowProvider>
+  );
+};
+
+const ConfigureSSOSteps = () => {
+  const { enterpriseConnection } = useConfigureSSOFlow();
+  const initialStepId = deriveInitialStep(enterpriseConnection);
+
+  return (
+    <Wizard initialStepId={initialStepId}>
+      <ConfigureSSOHeader />
+
+      <Wizard.Step id='select-provider'>
+        <SelectProviderStep />
+      </Wizard.Step>
+
+      <Wizard.Step
+        id='verify-domain'
+        label='Verify domain'
+      >
+        <VerifyDomainStep />
+      </Wizard.Step>
+
+      <Wizard.Step
+        id='configure'
+        label='Configure'
+      >
+        <ConfigureStep />
+      </Wizard.Step>
+
+      <Wizard.Step
+        id='test'
+        label='Test'
+      >
+        <TestConfigurationStep />
+      </Wizard.Step>
+
+      <Wizard.Step
+        id='confirmation'
+        label='Confirmation'
+      >
+        <ConfirmationStep />
+      </Wizard.Step>
+    </Wizard>
   );
 };
 
