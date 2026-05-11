@@ -18,10 +18,10 @@ import {
   getMachineTokenType,
   isMachineJwt,
   isMachineToken,
-  isMachineTokenByPrefix,
+  isOAuthTokenByPrefix,
   isTokenTypeAccepted,
 } from './machine';
-import { checkMachineTokenRateLimit } from './machineTokenRateLimiter';
+import { checkOAuthTokenRateLimit } from './oauthTokenRateLimiter';
 import { OrganizationMatcher } from './organizationMatcher';
 import type { MachineTokenType, SessionTokenType } from './tokenTypes';
 import { TokenType } from './tokenTypes';
@@ -821,11 +821,11 @@ export const authenticateRequest: AuthenticateRequest = (async (
       return mismatchState;
     }
 
-    if (isMachineTokenByPrefix(tokenInHeader) && !checkMachineTokenRateLimit(extractCallerIp(request))) {
+    if (isOAuthTokenByPrefix(tokenInHeader) && !checkOAuthTokenRateLimit(extractCallerIp(request))) {
       return signedOut({
         tokenType: parsedTokenType,
         authenticateContext,
-        reason: AuthErrorReason.MachineTokenRateLimit,
+        reason: AuthErrorReason.OAuthTokenRateLimit,
         message: '',
       });
     }
@@ -857,11 +857,11 @@ export const authenticateRequest: AuthenticateRequest = (async (
         return mismatchState;
       }
 
-      if (isMachineTokenByPrefix(tokenInHeader) && !checkMachineTokenRateLimit(extractCallerIp(request))) {
+      if (isOAuthTokenByPrefix(tokenInHeader) && !checkOAuthTokenRateLimit(extractCallerIp(request))) {
         return signedOut({
           tokenType: parsedTokenType,
           authenticateContext,
-          reason: AuthErrorReason.MachineTokenRateLimit,
+          reason: AuthErrorReason.OAuthTokenRateLimit,
           message: '',
         });
       }

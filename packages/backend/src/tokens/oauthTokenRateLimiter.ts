@@ -5,7 +5,7 @@ const MAX_BUCKETS = 10_000;
 type Bucket = { tokens: number; lastRefill: number };
 const buckets = new Map<string, Bucket>();
 
-export function checkMachineTokenRateLimit(ip: string): boolean {
+export function checkOAuthTokenRateLimit(ip: string): boolean {
   if (buckets.size >= MAX_BUCKETS) {
     // Evict the oldest entry rather than clearing all buckets to prevent an attacker
     // from neutralizing rate limits by forcing key churn across many distinct IPs.
@@ -27,6 +27,6 @@ export function checkMachineTokenRateLimit(ip: string): boolean {
   return true;
 }
 
-export function resetMachineTokenRateLimiter(): void {
+export function resetOAuthTokenRateLimiter(): void {
   buckets.clear();
 }

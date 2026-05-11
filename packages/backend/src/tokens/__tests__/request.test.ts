@@ -2,7 +2,7 @@ import { http, HttpResponse } from 'msw';
 import { afterEach, beforeEach, describe, expect, it, test, vi } from 'vitest';
 
 import { MachineTokenVerificationErrorCode, TokenVerificationErrorReason } from '../../errors';
-import { checkMachineTokenRateLimit, resetMachineTokenRateLimiter } from '../machineTokenRateLimiter';
+import { checkOAuthTokenRateLimit, resetOAuthTokenRateLimiter } from '../oauthTokenRateLimiter';
 import {
   mockExpiredJwt,
   mockInvalidSignatureJwt,
@@ -1766,12 +1766,12 @@ describe('tokens.authenticateRequest(options)', () => {
 
     describe('Rate limiting', () => {
       afterEach(() => {
-        resetMachineTokenRateLimiter();
+        resetOAuthTokenRateLimiter();
       });
 
       const exhaustBucket = (ip: string) => {
         for (let i = 0; i < 20; i++) {
-          checkMachineTokenRateLimit(ip);
+          checkOAuthTokenRateLimit(ip);
         }
       };
 
@@ -1789,7 +1789,7 @@ describe('tokens.authenticateRequest(options)', () => {
         );
         expect(rateLimited).toBeMachineUnauthenticated({
           tokenType: 'oauth_token',
-          reason: AuthErrorReason.MachineTokenRateLimit,
+          reason: AuthErrorReason.OAuthTokenRateLimit,
           message: '',
         });
       });
@@ -1813,7 +1813,7 @@ describe('tokens.authenticateRequest(options)', () => {
         );
         expect(rateLimited).toBeMachineUnauthenticated({
           tokenType: 'oauth_token',
-          reason: AuthErrorReason.MachineTokenRateLimit,
+          reason: AuthErrorReason.OAuthTokenRateLimit,
           message: '',
         });
         // x-forwarded-for IP is untouched: a request using only that header must be allowed
@@ -1841,7 +1841,7 @@ describe('tokens.authenticateRequest(options)', () => {
         );
         expect(rateLimited).toBeMachineUnauthenticated({
           tokenType: 'oauth_token',
-          reason: AuthErrorReason.MachineTokenRateLimit,
+          reason: AuthErrorReason.OAuthTokenRateLimit,
           message: '',
         });
       });
@@ -1863,7 +1863,7 @@ describe('tokens.authenticateRequest(options)', () => {
         );
         expect(rateLimited).toBeMachineUnauthenticated({
           tokenType: 'oauth_token',
-          reason: AuthErrorReason.MachineTokenRateLimit,
+          reason: AuthErrorReason.OAuthTokenRateLimit,
           message: '',
         });
       });
@@ -1899,7 +1899,7 @@ describe('tokens.authenticateRequest(options)', () => {
           mockRequest({ authorization: `Bearer ${oauthJwt}`, 'cf-connecting-ip': ip }),
           mockOptions({ acceptsToken: 'oauth_token' }),
         );
-        expect(result.reason).not.toBe(AuthErrorReason.MachineTokenRateLimit);
+        expect(result.reason).not.toBe(AuthErrorReason.OAuthTokenRateLimit);
         vi.useRealTimers();
       });
 
@@ -1917,8 +1917,38 @@ describe('tokens.authenticateRequest(options)', () => {
           mockRequest({ authorization: `Bearer ${m2mJwt}`, 'cf-connecting-ip': ip }),
           mockOptions({ acceptsToken: 'm2m_token' }),
         );
-        expect(result.reason).not.toBe(AuthErrorReason.MachineTokenRateLimit);
+        expect(result.reason).not.toBe(AuthErrorReason.OAuthTokenRateLimit);
         vi.useRealTimers();
+      });
+
+      test('opaque api_key tokens bypass the rate limiter', async () => {
+        server.use(
+          http.post(mockMachineAuthResponses.api_key.endpoint, () =>
+            HttpResponse.json(mockVerificationResults.api_key),
+          ),
+        );
+        const ip = '203.0.113.4';
+        exhaustBucket(ip);
+        const result = await authenticateRequest(
+          mockRequest({ authorization: `Bearer ${mockTokens.api_key}`, 'cf-connecting-ip': ip }),
+          mockOptions({ acceptsToken: 'api_key' }),
+        );
+        expect(result.reason).not.toBe(AuthErrorReason.OAuthTokenRateLimit);
+      });
+
+      test('opaque m2m tokens bypass the rate limiter', async () => {
+        server.use(
+          http.post(mockMachineAuthResponses.m2m_token.endpoint, () =>
+            HttpResponse.json(mockVerificationResults.m2m_token),
+          ),
+        );
+        const ip = '203.0.113.5';
+        exhaustBucket(ip);
+        const result = await authenticateRequest(
+          mockRequest({ authorization: `Bearer ${mockTokens.m2m_token}`, 'cf-connecting-ip': ip }),
+          mockOptions({ acceptsToken: 'm2m_token' }),
+        );
+        expect(result.reason).not.toBe(AuthErrorReason.OAuthTokenRateLimit);
       });
     });
 

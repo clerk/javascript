@@ -90,6 +90,10 @@ export function isMachineTokenByPrefix(token: string): boolean {
   return MACHINE_TOKEN_PREFIXES.some(prefix => token.startsWith(prefix));
 }
 
+export function isOAuthTokenByPrefix(token: string): boolean {
+  return token.startsWith(OAUTH_TOKEN_PREFIX);
+}
+
 /**
  * Checks if a token is a machine token by looking at its prefix or if it's an OAuth/M2M JWT.
  *
