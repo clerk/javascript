@@ -15,11 +15,28 @@ import { createClerkRequest } from './clerkRequest';
 import { getCookieName, getCookieValue } from './cookie';
 import { HandshakeService } from './handshake';
 import { getMachineTokenType, isMachineJwt, isMachineToken, isTokenTypeAccepted } from './machine';
+import { checkMachineTokenRateLimit } from './machineTokenRateLimiter';
 import { OrganizationMatcher } from './organizationMatcher';
 import type { MachineTokenType, SessionTokenType } from './tokenTypes';
 import { TokenType } from './tokenTypes';
 import type { AuthenticateRequestOptions } from './types';
 import { verifyMachineAuthToken, verifyToken } from './verify';
+
+function extractCallerIp(request: Request): string {
+  const cfConnectingIp = request.headers.get(constants.Headers.CfConnectingIp);
+  if (cfConnectingIp) {
+    return cfConnectingIp;
+  }
+  const xRealIp = request.headers.get(constants.Headers.RealIp);
+  if (xRealIp) {
+    return xRealIp;
+  }
+  const xForwardedFor = request.headers.get(constants.Headers.ForwardedFor);
+  if (xForwardedFor) {
+    return xForwardedFor.split(',')[0]?.trim() ?? 'unknown';
+  }
+  return 'unknown';
+}
 
 export const RefreshTokenErrorReason = {
   NonEligibleNoCookie: 'non-eligible-no-refresh-cookie',
@@ -795,6 +812,15 @@ export const authenticateRequest: AuthenticateRequest = (async (
       return mismatchState;
     }
 
+    if (!checkMachineTokenRateLimit(extractCallerIp(request))) {
+      return signedOut({
+        tokenType: parsedTokenType,
+        authenticateContext,
+        reason: AuthErrorReason.MachineTokenRateLimit,
+        message: '',
+      });
+    }
+
     const { data, tokenType, errors } = await verifyMachineAuthToken(tokenInHeader, authenticateContext);
     if (errors) {
       return handleMachineError(tokenType, errors[0]);
@@ -820,6 +846,15 @@ export const authenticateRequest: AuthenticateRequest = (async (
       const mismatchState = checkTokenTypeMismatch(parsedTokenType, acceptsToken, authenticateContext);
       if (mismatchState) {
         return mismatchState;
+      }
+
+      if (!checkMachineTokenRateLimit(extractCallerIp(request))) {
+        return signedOut({
+          tokenType: parsedTokenType,
+          authenticateContext,
+          reason: AuthErrorReason.MachineTokenRateLimit,
+          message: '',
+        });
       }
 
       const { data, tokenType, errors } = await verifyMachineAuthToken(tokenInHeader, authenticateContext);
