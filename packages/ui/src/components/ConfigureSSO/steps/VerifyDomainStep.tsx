@@ -1,6 +1,6 @@
-import { useSession, useUser } from '@clerk/shared/react';
+import { useReverification, useSession, useUser } from '@clerk/shared/react';
 import type { EmailAddressResource } from '@clerk/shared/types';
-import { useRef } from 'react';
+import { useCallback, useRef } from 'react';
 
 import {
   Col,
@@ -13,7 +13,11 @@ import {
   Text,
   useLocalizations,
 } from '@/customizables';
+import { useFieldOTP } from '@/elements/CodeControl';
+import { useCardState } from '@/elements/contexts';
+import { Form } from '@/elements/Form';
 import { DuotoneAtSymbol, ExclamationTriangle } from '@/icons';
+import { handleError } from '@/utils/errorHandler';
 
 import { useConfigureSSOFlow } from '../ConfigureSSOContext';
 import { Step } from '../elements/Step';
@@ -138,12 +142,58 @@ export const ProvideEmailStep = (): JSX.Element => {
   );
 };
 
-export const EnterVerificationCodeStep = ({ emailToVerify }: { emailToVerify?: EmailAddressResource }): JSX.Element => {
+export const EnterVerificationCodeStep = ({
+  emailToVerify,
+}: {
+  emailToVerify?: EmailAddressResource;
+}): JSX.Element | null => {
+  const { user } = useUser();
+  const card = useCardState();
+  const codeSubmittedRef = useRef(false);
   const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
 
-  const codeSubmittedRef = useRef(false);
   const isVerified = emailToVerify?.verification.status === 'verified';
+  const isPrimary = emailToVerify?.id === user?.primaryEmailAddressId;
   const hasVerifiedEmail = emailToVerify?.emailAddress && isVerified && !codeSubmittedRef.current;
+
+  const prepareEmailVerification = useReverification(() =>
+    emailToVerify?.prepareVerification({ strategy: 'email_code' }),
+  );
+  const attemptEmailVerification = useReverification((code: string) => emailToVerify?.attemptVerification({ code }));
+  const setPrimaryEmailAddress = useReverification((emailAddressId: string) =>
+    user?.update({ primaryEmailAddressId: emailAddressId }),
+  );
+  const prepare = useCallback(
+    () => prepareEmailVerification()?.catch(err => handleError(err, [], card.setError)),
+    [prepareEmailVerification, card],
+  );
+
+  const otp = useFieldOTP({
+    onCodeEntryFinished: (code, resolve, reject) => {
+      codeSubmittedRef.current = true;
+      attemptEmailVerification(code)
+        .then(() => resolve())
+        .catch(reject);
+    },
+    onResendCodeClicked: () => {
+      void prepare();
+    },
+    onResolve: async () => {
+      if (emailToVerify && !isPrimary) {
+        try {
+          await setPrimaryEmailAddress(emailToVerify.id);
+        } catch (err) {
+          handleError(err as Error, [], card.setError);
+          return;
+        }
+      }
+      void goNext();
+    },
+  });
+
+  if (!emailToVerify) {
+    return null;
+  }
 
   return (
     <>
@@ -155,7 +205,27 @@ export const EnterVerificationCodeStep = ({ emailToVerify }: { emailToVerify?: E
         {hasVerifiedEmail ? (
           <EmailAlreadyVerified emailAddress={emailToVerify.emailAddress} />
         ) : (
-          <Text>UI goes here</Text>
+          <>
+            <Col sx={t => ({ gap: t.space.$1, textAlign: 'center' })}>
+              <Heading
+                textVariant='h1'
+                sx={t => ({ color: t.colors.$colorForeground, fontSize: t.fontSizes.$sm })}
+                localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.emailCode.formTitle')}
+              />
+              <Text
+                as='p'
+                variant='body'
+                sx={t => ({ color: t.colors.$colorMutedForeground })}
+                localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.emailCode.formSubtitle', {
+                  identifier: emailToVerify.emailAddress,
+                })}
+              />
+            </Col>
+            <Form.OTPInput
+              {...otp}
+              resendButton={localizationKeys('configureSSO.verifyEmailDomainStep.emailCode.resendButton')}
+            />
+          </>
         )}
       </Step.Section>
 
