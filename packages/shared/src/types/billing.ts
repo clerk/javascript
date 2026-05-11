@@ -491,6 +491,8 @@ export interface BillingPaymentMethodResource extends ClerkResource {
 }
 
 /**
+ * The `BillingInitializedPaymentMethodResource` type represents a payment method that has been initialized for checkout session.
+ *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingInitializedPaymentMethodResource extends ClerkResource {
@@ -499,7 +501,7 @@ export interface BillingInitializedPaymentMethodResource extends ClerkResource {
    */
   externalClientSecret: string;
   /**
-   * The identifier for the external payment gateway used for this checkout session.
+   * The unique identifier for the external payment gateway used for this checkout session.
    */
   externalGatewayId: string;
   /**

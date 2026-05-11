@@ -101,14 +101,14 @@ export interface OrganizationResource extends ClerkResource, BillingPayerMethods
   getInvitations: (params?: GetInvitationsParams) => Promise<ClerkPaginatedResponse<OrganizationInvitationResource>>;
   /**
    * Gets the list of [Roles](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) available.
-   * @returns A [`ClerkPaginatedResponse`](https://clerk.com/docs/reference/types/clerk-paginated-response) of [`RoleResource`](https://clerk.com/docs/reference/types/role) objects and a `has_role_set_migration` status.
+   * @returns A [`ClerkPaginatedResponse`](https://clerk.com/docs/reference/types/clerk-paginated-response) of [`RoleResource`](https://clerk.com/docs/reference/types/role-resource) objects and a `has_role_set_migration` status.
    *
    * When `has_role_set_migration` is `true`, updating Organization membership Roles is not allowed. Learn how to [build a custom flow for managing member Roles in an Organization](/docs/guides/development/custom-flows/organizations/manage-roles).
    */
   getRoles: (params?: GetRolesParams) => Promise<GetRolesResponse>;
   /**
    * Gets the list of domains.
-   * @returns A [`ClerkPaginatedResponse`](https://clerk.com/docs/reference/types/clerk-paginated-response) of [`OrganizationDomainResource`](https://clerk.com/docs/reference/types/organization-domain) objects.
+   * @returns A [`ClerkPaginatedResponse`](https://clerk.com/docs/reference/types/clerk-paginated-response) of [`OrganizationDomainResource`](https://clerk.com/docs/reference/types/organization-domain-resource) objects.
    *
    * > [!WARNING]
    * > You must have [**Verified domains**](https://clerk.com/docs/guides/organizations/add-members/verified-domains) enabled in your app's settings in the Clerk Dashboard.
@@ -152,7 +152,7 @@ export interface OrganizationResource extends ClerkResource, BillingPayerMethods
   removeMember: (userId: string) => Promise<OrganizationMembershipResource>;
   /**
    * Creates a new domain.
-   * @returns An [`OrganizationDomainResource`](https://clerk.com/docs/reference/types/organization-domain) object.
+   * @returns An [`OrganizationDomainResource`](https://clerk.com/docs/reference/types/organization-domain-resource) object.
    *
    * > [!WARNING]
    * > You must have [**Verified domains**](https://clerk.com/docs/guides/organizations/add-members/verified-domains) enabled in your app's settings in the Clerk Dashboard.
@@ -161,7 +161,7 @@ export interface OrganizationResource extends ClerkResource, BillingPayerMethods
   createDomain: (domainName: string) => Promise<OrganizationDomainResource>;
   /**
    * Gets a domain for an Organization based on the given domain ID.
-   * @returns An [`OrganizationDomainResource`](https://clerk.com/docs/reference/types/organization-domain) object.
+   * @returns An [`OrganizationDomainResource`](https://clerk.com/docs/reference/types/organization-domain-resource) object.
    *
    * > [!WARNING]
    * > You must have [**Verified domains**](https://clerk.com/docs/guides/organizations/add-members/verified-domains) enabled in your app's settings in the Clerk Dashboard.
