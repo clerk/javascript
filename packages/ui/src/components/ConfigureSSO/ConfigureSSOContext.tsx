@@ -11,39 +11,28 @@ export interface ConfigureSSOData {
   enterpriseConnection: EnterpriseConnectionResource | undefined;
 }
 
-export interface ConfigureSSOContextValue extends ConfigureSSOData {
-  /**
-   * `true` while the parent is still fetching the user's enterprise
-   * connection
-   */
-  isLoading: boolean;
-}
-
 interface ConfigureSSOFlowProviderProps {
   enterpriseConnection: EnterpriseConnectionResource | undefined;
-  isLoading: boolean;
 }
 
-const ConfigureSSOFlowContext = React.createContext<ConfigureSSOContextValue | null>(null);
+const ConfigureSSOFlowContext = React.createContext<ConfigureSSOData | null>(null);
 ConfigureSSOFlowContext.displayName = 'ConfigureSSOFlowContext';
 
 export const ConfigureSSOFlowProvider = ({
   enterpriseConnection,
-  isLoading,
   children,
 }: PropsWithChildren<ConfigureSSOFlowProviderProps>): JSX.Element => {
-  const value = React.useMemo<ConfigureSSOContextValue>(
+  const value = React.useMemo<ConfigureSSOData>(
     () => ({
       enterpriseConnection,
-      isLoading,
     }),
-    [enterpriseConnection, isLoading],
+    [enterpriseConnection],
   );
 
   return <ConfigureSSOFlowContext.Provider value={value}>{children}</ConfigureSSOFlowContext.Provider>;
 };
 
-export const useConfigureSSOFlow = (): ConfigureSSOContextValue => {
+export const useConfigureSSOFlow = (): ConfigureSSOData => {
   const ctx = React.useContext(ConfigureSSOFlowContext);
   if (!ctx) {
     throw new Error('useConfigureSSOFlow called outside <ConfigureSSOFlowProvider>.');

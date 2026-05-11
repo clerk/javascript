@@ -3,33 +3,23 @@ import { descriptors, Flow, Text } from '@/customizables';
 import { Step } from '../elements/Step';
 import { useWizard } from '../elements/Wizard';
 
-export const TestConfigurationStep = (): JSX.Element => {
+export const ConfigureStep = (): JSX.Element => {
   const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
 
   return (
-    <Flow.Part part='test-sso'>
+    <Flow.Part part='configureCreateApp'>
       <Step
         elementDescriptor={descriptors.configureSSOStep}
-        elementId={descriptors.configureSSOStep.setId('test')}
+        elementId={descriptors.configureSSOStep.setId('configure')}
       >
         <Step.Header
-          title='Test your SSO connection'
-          description='Test your SSO configuration to verify you can successfully authenticate via your identity provider'
+          title='Configure Okta Workforce'
+          description='Create a new enterprise application in your Okta Dashboard'
         />
 
         <Step.Body>
-          <Step.Section
-            sx={theme => ({
-              borderBottomWidth: theme.borderWidths.$normal,
-              borderBottomStyle: theme.borderStyles.$solid,
-              borderBottomColor: theme.colors.$borderAlpha100,
-            })}
-          >
-            <Text>Test your SSO URL</Text>
-          </Step.Section>
-
           <Step.Section>
-            <Text>Your test results</Text>
+            <Text>UI goes here</Text>
           </Step.Section>
         </Step.Body>
 
