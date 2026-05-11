@@ -23,6 +23,10 @@ on:
         description: "Maestro tags to exclude (comma-separated)"
         required: false
         default: "manual,skip"
+      flows_filter:
+        description: "Optional: substring filter for flow paths (e.g. 'sign-in/email-password'). Empty = all flows."
+        required: false
+        default: ""
 
 env:
   EXPO_INSTANCE_NAME: clerkstage-with-native-components
@@ -170,6 +174,43 @@ jobs:
           echo "password=$password" >> "$GITHUB_OUTPUT"
           echo "user_id=$user_id" >> "$GITHUB_OUTPUT"
 
+      - name: Diagnose Clerk instance + user visibility
+        # When sign-in flows fail with "Element not found: Enter your password",
+        # the AuthView pivoted to sign-up because the frontend didn't recognize
+        # the BAPI-provisioned user. Most likely cause: the pk in
+        # INTEGRATION_STAGING_INSTANCE_KEYS[$EXPO_INSTANCE_NAME] points at a
+        # different Clerk instance than the sk does. This step logs both
+        # sides so we can confirm or rule that out from a single run.
+        env:
+          CLERK_SECRET_KEY: ${{ steps.keys.outputs.sk }}
+          PK: ${{ steps.keys.outputs.pk }}
+          USER_ID: ${{ steps.user.outputs.user_id }}
+          EMAIL: ${{ steps.user.outputs.email }}
+        run: |
+          set +e
+          echo "== publishable key frontend host =="
+          fapi_host=$(echo "$PK" | sed -E 's/^pk_(test|live)_//' | base64 -d 2>/dev/null | tr -d '$' || true)
+          echo "fapi_host=$fapi_host"
+          echo
+          echo "== sk -> /v1/users/USER_ID (does BAPI see the user just created?) =="
+          curl -sS -H "Authorization: Bearer $CLERK_SECRET_KEY" "https://api.clerkstage.dev/v1/users/$USER_ID" \
+            | jq '{id, email_addresses: [.email_addresses[].email_address], password_enabled, banned, locked, primary_email_address_id, object}'
+          echo
+          echo "== sk -> /v1/users?email_address=EMAIL (alternative lookup) =="
+          curl -sS -H "Authorization: Bearer $CLERK_SECRET_KEY" \
+            --data-urlencode "email_address[]=$EMAIL" -G \
+            "https://api.clerkstage.dev/v1/users" \
+            | jq '[.[] | {id, email_addresses: [.email_addresses[].email_address]}]'
+          echo
+          echo "== pk -> FAPI /v1/client/sign_ins (does the frontend recognize the user?) =="
+          curl -sS -X POST "https://$fapi_host/v1/client/sign_ins?__clerk_api_version=2025-04-10&_clerk_js_version=5" \
+            -H "Authorization: Bearer $PK" \
+            -H "Content-Type: application/x-www-form-urlencoded" \
+            --data-urlencode "identifier=$EMAIL" \
+            | jq '{status: (.response // .errors // .)}'
+          echo
+          echo "== If the user is visible to BAPI but the FAPI call returns 'not_found' or pivots to sign_up, pk and sk are for different instances. =="
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -230,6 +271,7 @@ jobs:
           CLERK_TEST_EMAIL: ${{ steps.user.outputs.email }}
           CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
           EXCLUDE_TAGS: ${{ inputs.exclude_tags }}
+          FLOWS_FILTER: ${{ inputs.flows_filter }}
         with:
           api-level: 34
           target: google_apis
@@ -247,7 +289,8 @@ jobs:
             npx expo prebuild --clean &&
             npx expo run:android --variant release --no-bundler &&
             cd ../../integration-mobile &&
-            find flows -type f -name "*.yaml" ! -path "*/common/*" -print0
+            find flows -type f -name "*.yaml" ! -path "*/common/*"
+            ${FLOWS_FILTER:+-path "*$FLOWS_FILTER*"} -print0
             | xargs -0 maestro test --exclude-tags "$EXCLUDE_TAGS"
 
       - name: Upload Maestro artifacts on failure
@@ -398,6 +441,43 @@ jobs:
           echo "password=$password" >> "$GITHUB_OUTPUT"
           echo "user_id=$user_id" >> "$GITHUB_OUTPUT"
 
+      - name: Diagnose Clerk instance + user visibility
+        # When sign-in flows fail with "Element not found: Enter your password",
+        # the AuthView pivoted to sign-up because the frontend didn't recognize
+        # the BAPI-provisioned user. Most likely cause: the pk in
+        # INTEGRATION_STAGING_INSTANCE_KEYS[$EXPO_INSTANCE_NAME] points at a
+        # different Clerk instance than the sk does. This step logs both
+        # sides so we can confirm or rule that out from a single run.
+        env:
+          CLERK_SECRET_KEY: ${{ steps.keys.outputs.sk }}
+          PK: ${{ steps.keys.outputs.pk }}
+          USER_ID: ${{ steps.user.outputs.user_id }}
+          EMAIL: ${{ steps.user.outputs.email }}
+        run: |
+          set +e
+          echo "== publishable key frontend host =="
+          fapi_host=$(echo "$PK" | sed -E 's/^pk_(test|live)_//' | base64 -d 2>/dev/null | tr -d '$' || true)
+          echo "fapi_host=$fapi_host"
+          echo
+          echo "== sk -> /v1/users/USER_ID (does BAPI see the user just created?) =="
+          curl -sS -H "Authorization: Bearer $CLERK_SECRET_KEY" "https://api.clerkstage.dev/v1/users/$USER_ID" \
+            | jq '{id, email_addresses: [.email_addresses[].email_address], password_enabled, banned, locked, primary_email_address_id, object}'
+          echo
+          echo "== sk -> /v1/users?email_address=EMAIL (alternative lookup) =="
+          curl -sS -H "Authorization: Bearer $CLERK_SECRET_KEY" \
+            --data-urlencode "email_address[]=$EMAIL" -G \
+            "https://api.clerkstage.dev/v1/users" \
+            | jq '[.[] | {id, email_addresses: [.email_addresses[].email_address]}]'
+          echo
+          echo "== pk -> FAPI /v1/client/sign_ins (does the frontend recognize the user?) =="
+          curl -sS -X POST "https://$fapi_host/v1/client/sign_ins?__clerk_api_version=2025-04-10&_clerk_js_version=5" \
+            -H "Authorization: Bearer $PK" \
+            -H "Content-Type: application/x-www-form-urlencoded" \
+            --data-urlencode "identifier=$EMAIL" \
+            | jq '{status: (.response // .errors // .)}'
+          echo
+          echo "== If the user is visible to BAPI but the FAPI call returns 'not_found' or pivots to sign_up, pk and sk are for different instances. =="
+
       - name: Cache CocoaPods downloads
         uses: actions/cache@v4
         with:
@@ -429,6 +509,7 @@ jobs:
           CLERK_TEST_EMAIL: ${{ steps.user.outputs.email }}
           CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
           EXCLUDE_TAGS: ${{ inputs.exclude_tags }}
+          FLOWS_FILTER: ${{ inputs.flows_filter }}
         run: |
           cd clerk-expo-quickstart/NativeComponentQuickstart
           npx expo prebuild --clean
@@ -447,7 +528,8 @@ jobs:
           npx expo run:ios --device "$SIM_UDID" --configuration Release --no-bundler
           cd ../../integration-mobile
           # Maestro doesn't auto-recurse into subdirectories; pass each flow explicitly.
-          find flows -type f -name "*.yaml" ! -path "*/common/*" -print0 | \
+          find flows -type f -name "*.yaml" ! -path "*/common/*" \
+            ${FLOWS_FILTER:+-path "*$FLOWS_FILTER*"} -print0 | \
             xargs -0 maestro test --exclude-tags "$EXCLUDE_TAGS,androidOnly"
 
       - name: Upload Maestro artifacts on failure
