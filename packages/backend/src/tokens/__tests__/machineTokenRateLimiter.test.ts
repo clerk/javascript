@@ -57,12 +57,12 @@ describe('checkMachineTokenRateLimit', () => {
     expect(checkMachineTokenRateLimit('unknown')).toBe(false);
   });
 
-  it('clears all buckets and allows requests again when MAX_BUCKETS is reached', () => {
+  it('evicts the oldest bucket and allows a new IP when MAX_BUCKETS is reached', () => {
     // Fill up to MAX_BUCKETS (10 000) unique IPs
     for (let i = 0; i < 10_000; i++) {
       checkMachineTokenRateLimit(`10.${Math.floor(i / 65536)}.${Math.floor((i % 65536) / 256)}.${i % 256}`);
     }
-    // The 10 001st IP triggers the clear; the new IP gets a fresh bucket
+    // The 10 001st IP triggers eviction of the oldest entry; the new IP gets a fresh bucket
     const freshIp = '172.16.0.1';
     expect(checkMachineTokenRateLimit(freshIp)).toBe(true);
   });

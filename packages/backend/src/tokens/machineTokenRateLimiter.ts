@@ -7,7 +7,12 @@ const buckets = new Map<string, Bucket>();
 
 export function checkMachineTokenRateLimit(ip: string): boolean {
   if (buckets.size >= MAX_BUCKETS) {
-    buckets.clear();
+    // Evict the oldest entry rather than clearing all buckets to prevent an attacker
+    // from neutralizing rate limits by forcing key churn across many distinct IPs.
+    const oldest = buckets.keys().next().value;
+    if (oldest !== undefined) {
+      buckets.delete(oldest);
+    }
   }
   const now = Date.now();
   const existing = buckets.get(ip);
