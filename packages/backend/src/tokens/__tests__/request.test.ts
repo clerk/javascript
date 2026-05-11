@@ -2,6 +2,7 @@ import { http, HttpResponse } from 'msw';
 import { afterEach, beforeEach, describe, expect, it, test, vi } from 'vitest';
 
 import { MachineTokenVerificationErrorCode, TokenVerificationErrorReason } from '../../errors';
+import { checkMachineTokenRateLimit, resetMachineTokenRateLimiter } from '../machineTokenRateLimiter';
 import {
   mockExpiredJwt,
   mockInvalidSignatureJwt,
@@ -1759,6 +1760,119 @@ describe('tokens.authenticateRequest(options)', () => {
           reason: AuthErrorReason.TokenTypeMismatch,
           message: '',
         });
+      });
+    });
+
+    describe('Rate limiting', () => {
+      afterEach(() => {
+        resetMachineTokenRateLimiter();
+      });
+
+      const exhaustBucket = (ip: string) => {
+        for (let i = 0; i < 20; i++) {
+          checkMachineTokenRateLimit(ip);
+        }
+      };
+
+      test('blocks machine token request when IP exceeds burst limit', async () => {
+        server.use(
+          http.post(mockMachineAuthResponses.oauth_token.endpoint, () =>
+            HttpResponse.json(mockVerificationResults.oauth_token),
+          ),
+        );
+        const ip = '203.0.113.1';
+        exhaustBucket(ip);
+        const rateLimited = await authenticateRequest(
+          mockRequest({ authorization: `Bearer ${mockTokens.oauth_token}`, 'cf-connecting-ip': ip }),
+          mockOptions({ acceptsToken: 'oauth_token' }),
+        );
+        expect(rateLimited).toBeMachineUnauthenticated({
+          tokenType: 'oauth_token',
+          reason: AuthErrorReason.MachineTokenRateLimit,
+          message: '',
+        });
+      });
+
+      test('prefers cf-connecting-ip over x-forwarded-for for rate limit key', async () => {
+        server.use(
+          http.post(mockMachineAuthResponses.oauth_token.endpoint, () =>
+            HttpResponse.json(mockVerificationResults.oauth_token),
+          ),
+        );
+        const cfIp = '10.0.0.1';
+        exhaustBucket(cfIp);
+        // cf-connecting-ip is exhausted; x-forwarded-for is a different IP and has full bucket
+        const rateLimited = await authenticateRequest(
+          mockRequest({
+            authorization: `Bearer ${mockTokens.oauth_token}`,
+            'cf-connecting-ip': cfIp,
+            'x-forwarded-for': '99.99.99.99',
+          }),
+          mockOptions({ acceptsToken: 'oauth_token' }),
+        );
+        expect(rateLimited).toBeMachineUnauthenticated({
+          tokenType: 'oauth_token',
+          reason: AuthErrorReason.MachineTokenRateLimit,
+          message: '',
+        });
+        // x-forwarded-for IP is untouched: a request using only that header must be allowed
+        const allowed = await authenticateRequest(
+          mockRequest({
+            authorization: `Bearer ${mockTokens.oauth_token}`,
+            'x-forwarded-for': '99.99.99.99',
+          }),
+          mockOptions({ acceptsToken: 'oauth_token' }),
+        );
+        expect(allowed).toBeMachineAuthenticated();
+      });
+
+      test('falls back to x-real-ip when cf-connecting-ip is absent', async () => {
+        server.use(
+          http.post(mockMachineAuthResponses.oauth_token.endpoint, () =>
+            HttpResponse.json(mockVerificationResults.oauth_token),
+          ),
+        );
+        const realIp = '192.168.10.20';
+        exhaustBucket(realIp);
+        const rateLimited = await authenticateRequest(
+          mockRequest({ authorization: `Bearer ${mockTokens.oauth_token}`, 'x-real-ip': realIp }),
+          mockOptions({ acceptsToken: 'oauth_token' }),
+        );
+        expect(rateLimited).toBeMachineUnauthenticated({
+          tokenType: 'oauth_token',
+          reason: AuthErrorReason.MachineTokenRateLimit,
+          message: '',
+        });
+      });
+
+      test('falls back to first value in x-forwarded-for when higher-priority headers are absent', async () => {
+        server.use(
+          http.post(mockMachineAuthResponses.oauth_token.endpoint, () =>
+            HttpResponse.json(mockVerificationResults.oauth_token),
+          ),
+        );
+        const ip = '172.16.5.5';
+        exhaustBucket(ip);
+        const rateLimited = await authenticateRequest(
+          mockRequest({
+            authorization: `Bearer ${mockTokens.oauth_token}`,
+            'x-forwarded-for': `${ip}, 10.0.0.2`,
+          }),
+          mockOptions({ acceptsToken: 'oauth_token' }),
+        );
+        expect(rateLimited).toBeMachineUnauthenticated({
+          tokenType: 'oauth_token',
+          reason: AuthErrorReason.MachineTokenRateLimit,
+          message: '',
+        });
+      });
+
+      test('session token path is not rate-limited', async () => {
+        server.use(http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)));
+        // Exhaust the 'unknown' sentinel bucket (no IP headers on mockRequestWithHeaderAuth)
+        exhaustBucket('unknown');
+        const result = await authenticateRequest(mockRequestWithHeaderAuth(), mockOptions());
+        expect(result).toBeSignedIn();
       });
     });
 
