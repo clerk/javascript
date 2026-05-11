@@ -1,12 +1,22 @@
-import type { PropsWithChildren } from 'react';
+import { iconImageUrl } from '@clerk/shared/constants';
+import React from 'react';
 
 import { Box, Col, descriptors, Flow, Grid, SimpleButton, Text } from '@/customizables';
+import { Alert } from '@/ui/elements/Alert';
 
 import { Step } from '../elements/Step';
 import { useWizard } from '../elements/Wizard';
 
+type ProviderType = 'okta' | 'custom_saml';
+
+const PROVIDER_OPTIONS: ReadonlyArray<{ id: ProviderType; label: string; iconId: string }> = [
+  { id: 'okta', label: 'Okta Workforce', iconId: 'okta' },
+  { id: 'custom_saml', label: 'Custom SAML Provider', iconId: 'saml' },
+];
+
 export const SelectProviderStep = (): JSX.Element => {
   const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
+  const [selected, setSelected] = React.useState<ProviderType | null>(null);
 
   return (
     <Flow.Part part='selectProvider'>
@@ -52,10 +62,21 @@ export const SelectProviderStep = (): JSX.Element => {
                 gap={3}
                 columns={2}
               >
-                <ProviderCard>Okta Workforce</ProviderCard>
-                <ProviderCard>Custom SAML Provider</ProviderCard>
+                {PROVIDER_OPTIONS.map(option => (
+                  <ProviderCard
+                    key={option.id}
+                    iconId={option.iconId}
+                    label={option.label}
+                    isSelected={selected === option.id}
+                    onClick={() => setSelected(option.id)}
+                  />
+                ))}
               </Grid>
             </Col>
+
+            <Alert variant='warning'>
+              Once a provider is selected you cannot change again until the configuration is over
+            </Alert>
           </Step.Section>
         </Step.Body>
 
@@ -66,7 +87,7 @@ export const SelectProviderStep = (): JSX.Element => {
           />
           <Step.Footer.Continue
             onClick={() => goNext()}
-            isDisabled={isLastStep}
+            isDisabled={isLastStep || !selected}
           />
         </Step.Footer>
       </Step>
@@ -74,12 +95,14 @@ export const SelectProviderStep = (): JSX.Element => {
   );
 };
 
-type ProviderCardProps = PropsWithChildren<{
+type ProviderCardProps = {
+  iconId: string;
+  label: string;
   isSelected?: boolean;
   onClick?: () => void;
-}>;
+};
 
-const ProviderCard = ({ isSelected, onClick, children }: ProviderCardProps): JSX.Element => {
+const ProviderCard = ({ iconId, label, isSelected, onClick }: ProviderCardProps): JSX.Element => {
   return (
     <SimpleButton
       variant='outline'
@@ -101,15 +124,16 @@ const ProviderCard = ({ isSelected, onClick, children }: ProviderCardProps): JSX
           : {}),
       })}
     >
-      {/* TODO: add provider icons */}
       <Box
         as='span'
         aria-hidden
         sx={theme => ({
           width: theme.sizes.$8,
           height: theme.sizes.$8,
-          borderRadius: theme.radii.$md,
-          backgroundColor: theme.colors.$primary500,
+          backgroundImage: `url(${iconImageUrl(iconId)})`,
+          backgroundSize: 'contain',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
         })}
       />
 
@@ -118,7 +142,7 @@ const ProviderCard = ({ isSelected, onClick, children }: ProviderCardProps): JSX
         variant='body'
         sx={theme => ({ color: theme.colors.$colorForeground })}
       >
-        {children}
+        {label}
       </Text>
     </SimpleButton>
   );
