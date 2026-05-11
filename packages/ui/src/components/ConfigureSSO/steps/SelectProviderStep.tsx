@@ -1,7 +1,7 @@
 import { iconImageUrl } from '@clerk/shared/constants';
 import React from 'react';
 
-import { Box, Col, descriptors, Flow, Grid, SimpleButton, Text } from '@/customizables';
+import { Col, descriptors, Flow, Grid, SimpleButton, Span, Text } from '@/customizables';
 import { Alert } from '@/ui/elements/Alert';
 
 import { Step } from '../elements/Step';
@@ -124,8 +124,7 @@ const ProviderCard = ({ iconId, label, isSelected, onClick }: ProviderCardProps)
           : {}),
       })}
     >
-      <Box
-        as='span'
+      <Span
         aria-hidden
         sx={theme => ({
           width: theme.sizes.$8,
