@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Box, Button, descriptors, Flex, Icon, Text } from '@/customizables';
+import { Box, descriptors, Flex, Icon, SimpleButton, Text } from '@/customizables';
 import { CaretRight, Check } from '@/icons';
 
 import type { StepperItemProps, StepperProps } from './types';
@@ -26,7 +26,7 @@ const Root = ({ children }: StepperProps): JSX.Element => {
               elementDescriptor={descriptors.configureSSOStepperSeparator}
               icon={CaretRight}
               size='md'
-              sx={theme => ({ color: theme.colors.$colorMutedForeground })}
+              colorScheme='neutral'
             />
           )}
         </React.Fragment>
@@ -44,7 +44,7 @@ const Item = ({
   children,
 }: StepperItemProps): JSX.Element => {
   return (
-    <Button
+    <SimpleButton
       elementDescriptor={descriptors.configureSSOStepperItem}
       isActive={isCurrent}
       variant='unstyled'
@@ -54,6 +54,9 @@ const Item = ({
         gap: theme.space.$1x5,
         padding: 0,
         color: isCurrent || isCompleted ? theme.colors.$colorForeground : theme.colors.$colorMutedForeground,
+        '&:disabled,&[data-disabled]': {
+          opacity: 1,
+        },
       })}
     >
       <Flex
@@ -69,7 +72,7 @@ const Item = ({
             ? theme.colors.$colorForeground
             : isCompleted
               ? theme.colors.$success500
-              : theme.colors.$neutralAlpha400,
+              : theme.colors.$colorMutedForeground,
         })}
       >
         {isCompleted && !isCurrent ? (
@@ -82,7 +85,7 @@ const Item = ({
             as='span'
             sx={theme => ({
               fontSize: theme.fontSizes.$xs,
-              fontWeight: theme.fontWeights.$semibold,
+              fontWeight: theme.fontWeights.$medium,
               color: theme.colors.$colorBackground,
             })}
           >
@@ -90,6 +93,7 @@ const Item = ({
           </Text>
         )}
       </Flex>
+
       <Text
         elementDescriptor={descriptors.configureSSOStepperItemLabel}
         as='span'
@@ -98,34 +102,10 @@ const Item = ({
       >
         {children}
       </Text>
-    </Button>
+    </SimpleButton>
   );
 };
 Item.displayName = 'Stepper.Item';
-
-const ItemSkeleton = (): JSX.Element => (
-  <Flex
-    align='center'
-    sx={t => ({ gap: t.space.$1x5 })}
-  >
-    <Box
-      sx={t => ({
-        width: t.sizes.$4,
-        height: t.sizes.$4,
-        borderRadius: t.radii.$circle,
-        backgroundColor: t.colors.$neutralAlpha100,
-      })}
-    />
-    <Box
-      sx={t => ({
-        width: t.sizes.$17,
-        height: t.sizes.$1x5,
-        borderRadius: t.radii.$md,
-        backgroundColor: t.colors.$neutralAlpha100,
-      })}
-    />
-  </Flex>
-);
 
 type SkeletonProps = {
   totalSteps?: number;
@@ -149,11 +129,36 @@ const Skeleton = ({ totalSteps = 4 }: SkeletonProps): JSX.Element => (
             elementDescriptor={descriptors.configureSSOStepperSeparator}
             icon={CaretRight}
             size='md'
-            sx={theme => ({ color: theme.colors.$neutralAlpha100 })}
+            colorScheme='neutral'
+            sx={{ opacity: 0.16 }}
           />
         )}
       </React.Fragment>
     ))}
+  </Flex>
+);
+
+const ItemSkeleton = (): JSX.Element => (
+  <Flex
+    align='center'
+    sx={t => ({ gap: t.space.$1x5, minHeight: t.sizes.$4x5, opacity: 0.16 })}
+  >
+    <Box
+      sx={t => ({
+        width: t.sizes.$4,
+        height: t.sizes.$4,
+        borderRadius: t.radii.$circle,
+        backgroundColor: t.colors.$colorMutedForeground,
+      })}
+    />
+    <Box
+      sx={t => ({
+        width: t.sizes.$17,
+        height: t.sizes.$1x5,
+        borderRadius: t.radii.$md,
+        backgroundColor: t.colors.$colorMutedForeground,
+      })}
+    />
   </Flex>
 );
 

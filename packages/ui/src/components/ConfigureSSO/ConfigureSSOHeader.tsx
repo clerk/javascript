@@ -30,11 +30,7 @@ export const ConfigureSSOHeader = (): JSX.Element => {
               isCurrent={isCurrent}
               isCompleted={isCompleted}
               isReachable={isReachable}
-              onClick={() => {
-                if (isReachable) {
-                  void goToStep(step.id);
-                }
-              }}
+              onClick={() => void goToStep(step.id)}
             >
               {labelText}
             </Stepper.Item>
