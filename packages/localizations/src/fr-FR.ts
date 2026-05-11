@@ -195,6 +195,21 @@ export const frFR: LocalizationResource = {
     navbar: {
       title: "Configurer l'authentification unique (SSO)",
     },
+    selectProviderStep: {
+      title: 'Sélectionner un fournisseur',
+      subtitle: 'Sélectionnez le fournisseur pour lequel vous allez configurer le SSO.',
+      body: {
+        title: "Sélectionnez votre fournisseur d'identité",
+        description: 'Nous vous guiderons ensuite à travers le processus de configuration détaillé.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Fournisseur SAML personnalisé',
+      },
+      warning:
+        "Une fois un fournisseur sélectionné, vous ne pourrez plus en changer jusqu'à la fin de la configuration",
+    },
     verifyEmailDomainStep: {
       title: "Vérifier l'adresse e-mail",
       subtitle: "Vérifiez l'adresse e-mail sur laquelle vous souhaitez activer la connexion entreprise.",

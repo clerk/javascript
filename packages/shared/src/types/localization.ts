@@ -1293,13 +1293,27 @@ export type __internal_LocalizationResource = {
     };
   };
   configureSSO: {
-    navbar: {
-      title: LocalizationValue;
-    };
     missingManageEnterpriseConnectionsPermission: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
     };
+    navbar: {
+      title: LocalizationValue;
+    };
+    selectProviderStep: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      body: {
+        title: LocalizationValue;
+        description: LocalizationValue;
+      };
+      saml: {
+        groupLabel: LocalizationValue;
+        okta: LocalizationValue;
+        customSaml: LocalizationValue;
+      };
+      warning: LocalizationValue;
+    },
     verifyEmailDomainStep: {
       title: LocalizationValue;
       subtitle: LocalizationValue;

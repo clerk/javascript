@@ -187,6 +187,20 @@ export const nlNL: LocalizationResource = {
     navbar: {
       title: 'Single sign-on (SSO) configureren',
     },
+    selectProviderStep: {
+      title: 'Provider selecteren',
+      subtitle: 'Selecteer de provider waarvoor je SSO gaat instellen.',
+      body: {
+        title: 'Selecteer je identiteitsprovider',
+        description: 'We begeleiden je hierna door het gedetailleerde installatieproces.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Aangepaste SAML-provider',
+      },
+      warning: 'Zodra een provider is geselecteerd, kun je deze niet meer wijzigen totdat de configuratie is voltooid',
+    },
     verifyEmailDomainStep: {
       title: 'E-mailadres verifiëren',
       subtitle: 'Verifieer het e-mailadres waarop je de enterprise-verbinding wilt inschakelen.',

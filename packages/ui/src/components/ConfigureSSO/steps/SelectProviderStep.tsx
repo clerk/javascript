@@ -1,7 +1,18 @@
 import { iconImageUrl } from '@clerk/shared/constants';
 import React from 'react';
 
-import { Col, descriptors, Flow, Grid, SimpleButton, Span, Text } from '@/customizables';
+import type { LocalizationKey } from '@/customizables';
+import {
+  Col,
+  descriptors,
+  Flow,
+  Grid,
+  localizationKeys,
+  SimpleButton,
+  Span,
+  Text,
+  useLocalizations,
+} from '@/customizables';
 import { Alert } from '@/ui/elements/Alert';
 
 import { Step } from '../elements/Step';
@@ -9,9 +20,13 @@ import { useWizard } from '../elements/Wizard';
 
 type ProviderType = 'okta' | 'custom_saml';
 
-const PROVIDER_OPTIONS: ReadonlyArray<{ id: ProviderType; label: string; iconId: string }> = [
-  { id: 'okta', label: 'Okta Workforce', iconId: 'okta' },
-  { id: 'custom_saml', label: 'Custom SAML Provider', iconId: 'saml' },
+const PROVIDER_OPTIONS: ReadonlyArray<{ id: ProviderType; label: LocalizationKey; iconId: string }> = [
+  { id: 'okta', label: localizationKeys('configureSSO.selectProviderStep.saml.okta'), iconId: 'okta' },
+  {
+    id: 'custom_saml',
+    label: localizationKeys('configureSSO.selectProviderStep.saml.customSaml'),
+    iconId: 'saml',
+  },
 ];
 
 export const SelectProviderStep = (): JSX.Element => {
@@ -25,8 +40,8 @@ export const SelectProviderStep = (): JSX.Element => {
         elementId={descriptors.configureSSOStep.setId('select-provider')}
       >
         <Step.Header
-          title='Select provider'
-          description='Select the provider you are going to setup SSO for'
+          title={localizationKeys('configureSSO.selectProviderStep.title')}
+          description={localizationKeys('configureSSO.selectProviderStep.subtitle')}
         />
 
         <Step.Body>
@@ -36,17 +51,15 @@ export const SelectProviderStep = (): JSX.Element => {
                 as='p'
                 variant='subtitle'
                 sx={theme => ({ color: theme.colors.$colorForeground })}
-              >
-                Select your identity provider
-              </Text>
+                localizationKey={localizationKeys('configureSSO.selectProviderStep.body.title')}
+              />
 
               <Text
                 as='p'
                 variant='body'
                 sx={theme => ({ color: theme.colors.$colorMutedForeground })}
-              >
-                We&apos;ll guide you through the detailed setup process next.
-              </Text>
+                localizationKey={localizationKeys('configureSSO.selectProviderStep.body.description')}
+              />
             </Col>
 
             <Col sx={theme => ({ gap: theme.space.$3 })}>
@@ -54,9 +67,8 @@ export const SelectProviderStep = (): JSX.Element => {
                 as='label'
                 variant='subtitle'
                 sx={theme => ({ color: theme.colors.$colorForeground })}
-              >
-                SAML
-              </Text>
+                localizationKey={localizationKeys('configureSSO.selectProviderStep.saml.groupLabel')}
+              />
 
               <Grid
                 gap={3}
@@ -74,9 +86,10 @@ export const SelectProviderStep = (): JSX.Element => {
               </Grid>
             </Col>
 
-            <Alert variant='warning'>
-              Once a provider is selected you cannot change again until the configuration is over
-            </Alert>
+            <Alert
+              variant='warning'
+              title={localizationKeys('configureSSO.selectProviderStep.warning')}
+            />
           </Step.Section>
         </Step.Body>
 
@@ -97,12 +110,15 @@ export const SelectProviderStep = (): JSX.Element => {
 
 type ProviderCardProps = {
   iconId: string;
-  label: string;
+  label: LocalizationKey;
   isSelected?: boolean;
   onClick?: () => void;
 };
 
 const ProviderCard = ({ iconId, label, isSelected, onClick }: ProviderCardProps): JSX.Element => {
+  const { t } = useLocalizations();
+  const labelText = t(label);
+
   return (
     <SimpleButton
       variant='outline'
@@ -141,7 +157,7 @@ const ProviderCard = ({ iconId, label, isSelected, onClick }: ProviderCardProps)
         variant='body'
         sx={theme => ({ color: theme.colors.$colorForeground })}
       >
-        {label}
+        {labelText}
       </Text>
     </SimpleButton>
   );

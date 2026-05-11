@@ -187,6 +187,20 @@ export const daDK: LocalizationResource = {
     navbar: {
       title: 'Konfigurer single sign-on (SSO)',
     },
+    selectProviderStep: {
+      title: 'Vælg udbyder',
+      subtitle: 'Vælg den udbyder, du vil opsætte SSO for.',
+      body: {
+        title: 'Vælg din identitetsudbyder',
+        description: 'Vi guider dig gennem den detaljerede opsætningsproces næste gang.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Brugerdefineret SAML-udbyder',
+      },
+      warning: 'Når en udbyder er valgt, kan du ikke ændre den, før konfigurationen er færdig',
+    },
     verifyEmailDomainStep: {
       title: 'Bekræft e-mailadresse',
       subtitle: 'Bekræft den e-mailadresse, du vil aktivere virksomhedsforbindelsen på.',
