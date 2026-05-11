@@ -14,6 +14,8 @@ import { ConfigureSSOFlowProvider } from './ConfigureSSOContext';
 import { ConfigureSSOHeader } from './ConfigureSSOHeader';
 import { ConfigureSSONavbar } from './ConfigureSSONavbar';
 import { ConfigureSSOSkeleton } from './ConfigureSSOSkeleton';
+import { ProfileCardFooter, ProfileCardHeader } from './elements/ProfileCard';
+import { Step } from './elements/Step';
 import { Wizard } from './elements/Wizard';
 import { ConfigureStep, ConfirmationStep, SelectProviderStep, TestConfigurationStep, VerifyDomainStep } from './steps';
 
@@ -113,32 +115,48 @@ const ConfigureSSOCardContent = () => {
 };
 
 const MissingManageEnterpriseConnectionsPermission = () => (
-  <Flex
-    align='center'
-    justify='center'
-    sx={t => ({ flex: 1, padding: t.space.$8 })}
-  >
-    <Col
-      align='center'
-      sx={t => ({ gap: t.space.$2, textAlign: 'center', maxWidth: t.sizes.$94 })}
-    >
-      <Icon
-        icon={ExclamationTriangle}
-        sx={t => ({ width: t.sizes.$8, height: t.sizes.$8, color: t.colors.$neutralAlpha600 })}
-      />
-      <Heading
-        localizationKey={localizationKeys('configureSSO.missingManageEnterpriseConnectionsPermission.title')}
-        textVariant='h1'
-        sx={t => ({ fontSize: t.fontSizes.$lg })}
-      />
-      <Text
-        as='p'
-        variant='body'
-        colorScheme='secondary'
-        localizationKey={localizationKeys('configureSSO.missingManageEnterpriseConnectionsPermission.subtitle')}
-      />
-    </Col>
-  </Flex>
+  <>
+    <Flex sx={t => ({ minHeight: t.sizes.$13, minWidth: '100%' })}>
+      <ProfileCardHeader />
+    </Flex>
+
+    <Step.Body>
+      <Step.Section
+        sx={{ flex: 1 }}
+        align='center'
+        justify='center'
+      >
+        <Flex
+          align='center'
+          justify='center'
+          sx={t => ({ flex: 1, padding: t.space.$8 })}
+        >
+          <Col
+            align='center'
+            sx={t => ({ gap: t.space.$2, textAlign: 'center', maxWidth: t.sizes.$94 })}
+          >
+            <Icon
+              icon={ExclamationTriangle}
+              sx={t => ({ width: t.sizes.$8, height: t.sizes.$8, color: t.colors.$neutralAlpha600 })}
+            />
+            <Heading
+              localizationKey={localizationKeys('configureSSO.missingManageEnterpriseConnectionsPermission.title')}
+              textVariant='h1'
+              sx={t => ({ fontSize: t.fontSizes.$lg, textWrap: 'balance' })}
+            />
+            <Text
+              as='p'
+              variant='body'
+              colorScheme='secondary'
+              localizationKey={localizationKeys('configureSSO.missingManageEnterpriseConnectionsPermission.subtitle')}
+              sx={{ textWrap: 'balance' }}
+            />
+          </Col>
+        </Flex>
+      </Step.Section>
+    </Step.Body>
+    <ProfileCardFooter />
+  </>
 );
 
 const ConfigureSSOCardProtect = ({ children }: { children: React.ReactNode }) => {
