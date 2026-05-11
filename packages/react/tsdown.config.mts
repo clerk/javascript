@@ -66,9 +66,7 @@ export default defineConfig((overrideOptions: Options) => {
       legacy: 'src/legacy.ts',
       types: 'src/types/index.ts',
     },
-    dts: {
-      cjsReexport: true,
-    },
+    dts: true,
     onSuccess: shouldPublish ? 'pkglab pub --ping' : undefined,
     format: ['cjs', 'esm'],
     clean: true,
