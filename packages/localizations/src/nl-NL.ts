@@ -179,6 +179,11 @@ export const nlNL: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        'Neem contact op met de beheerder van je organisatie om toestemming te krijgen voor het beheren van enterprise-verbindingen.',
+      title: 'Je hebt geen toestemming om enterprise-verbindingen te beheren',
+    },
     navbar: {
       title: 'Single sign-on (SSO) configureren',
     },

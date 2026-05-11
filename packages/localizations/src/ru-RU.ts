@@ -179,6 +179,11 @@ export const ruRU: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        'Обратитесь к администратору вашей организации, чтобы получить разрешения на управление корпоративными подключениями.',
+      title: 'У вас нет разрешения на управление корпоративными подключениями',
+    },
     navbar: {
       title: 'Настроить единый вход (SSO)',
     },

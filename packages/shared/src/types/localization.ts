@@ -1296,6 +1296,10 @@ export type __internal_LocalizationResource = {
     navbar: {
       title: LocalizationValue;
     };
+    missingManageEnterpriseConnectionsPermission: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+    };
   };
   apiKeys: {
     formTitle: LocalizationValue;

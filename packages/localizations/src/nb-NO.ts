@@ -208,6 +208,10 @@ export const nbNO: LocalizationResource = {
     yearPerUnit: 'År per {{unitName}}',
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'Kontakt organisasjonens administrator for å få tillatelser til å administrere bedriftstilkoblinger.',
+      title: 'Du har ikke tillatelse til å administrere bedriftstilkoblinger',
+    },
     navbar: {
       title: 'Konfigurer enkeltpålogging (SSO)',
     },
