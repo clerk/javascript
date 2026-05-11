@@ -187,6 +187,10 @@ export const ptPT: LocalizationResource = {
     year: 'Ano',
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'Contacte o administrador da sua organização para obter permissões para gerir ligações empresariais.',
+      title: 'Não tem permissão para gerir ligações empresariais',
+    },
     navbar: {
       title: 'Configurar autenticação única (SSO)',
     },

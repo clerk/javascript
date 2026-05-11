@@ -179,6 +179,11 @@ export const beBY: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        'Звярніцеся да адміністратара вашай арганізацыі, каб атрымаць дазволы на кіраванне карпаратыўнымі падключэннямі.',
+      title: 'У вас няма дазволу на кіраванне карпаратыўнымі падключэннямі',
+    },
     navbar: {
       title: 'Налада адзінага ўваходу (SSO)',
     },
