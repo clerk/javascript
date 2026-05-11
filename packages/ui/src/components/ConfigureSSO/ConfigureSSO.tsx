@@ -52,7 +52,9 @@ const AuthenticatedContent = withCoreUserGuard(() => {
             flex: 1,
           })}
         >
-          <ConfigureSSOCardContent />
+          <ConfigureSSOCardProtect>
+            <ConfigureSSOCardContent />
+          </ConfigureSSOCardProtect>
         </Col>
       </ConfigureSSONavbar>
     </ProfileCard.Root>
@@ -64,16 +66,6 @@ const ConfigureSSOCardContent = () => {
 
   // Currently FAPI only supports one enterprise connection per user
   const enterpriseConnection = enterpriseConnections?.[0];
-  const { session } = useSession();
-
-  const isPersonalWorkspace = !session?.lastActiveOrganizationId;
-  const canManageEnterpriseConnections = useProtect(
-    has => isPersonalWorkspace || has({ permission: 'org:sys_enterprise_connections:manage' }),
-  );
-
-  if (!canManageEnterpriseConnections) {
-    return <MissingManageEnterpriseConnectionsOrganizationPermission />;
-  }
 
   if (isLoading && !enterpriseConnection) {
     return <ConfigureSSOSkeleton />;
@@ -120,7 +112,7 @@ const ConfigureSSOCardContent = () => {
   );
 };
 
-const MissingManageEnterpriseConnectionsOrganizationPermission = () => (
+const MissingManageEnterpriseConnectionsPermission = () => (
   <Flex
     align='center'
     justify='center'
@@ -148,6 +140,20 @@ const MissingManageEnterpriseConnectionsOrganizationPermission = () => (
     </Col>
   </Flex>
 );
+
+const ConfigureSSOCardProtect = ({ children }: { children: React.ReactNode }) => {
+  const { session } = useSession();
+  const isPersonalWorkspace = !session?.lastActiveOrganizationId;
+  const canManageEnterpriseConnections = useProtect(
+    has => isPersonalWorkspace || has({ permission: 'org:sys_enterprise_connections:manage' }),
+  );
+
+  if (!canManageEnterpriseConnections) {
+    return <MissingManageEnterpriseConnectionsPermission />;
+  }
+
+  return children;
+};
 
 export const ConfigureSSO: React.ComponentType<__experimental_ConfigureSSOProps> =
   withCardStateProvider(ConfigureSSOInternal);
