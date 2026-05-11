@@ -183,6 +183,10 @@ export const viVN: LocalizationResource = {
     year: 'Năm',
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'Liên hệ với quản trị viên tổ chức của bạn để có quyền quản lý các kết nối doanh nghiệp.',
+      title: 'Bạn không có quyền quản lý các kết nối doanh nghiệp',
+    },
     navbar: {
       title: 'Cấu hình đăng nhập một lần (SSO)',
     },

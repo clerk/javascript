@@ -186,6 +186,11 @@ export const caES: LocalizationResource = {
     year: 'Any',
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        "Contacta amb l'administrador de la teva organització per obtenir permisos per gestionar connexions empresarials.",
+      title: 'No tens permís per gestionar connexions empresarials',
+    },
     navbar: {
       title: "Configura l'inici de sessió únic (SSO)",
     },

@@ -207,6 +207,11 @@ export const isIS: LocalizationResource = {
     yearPerUnit: 'Ár á {{unitName}}',
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        'Hafðu samband við stjórnanda fyrirtækisins þíns til að fá heimildir til að stjórna fyrirtækjatengingum.',
+      title: 'Þú hefur ekki heimild til að stjórna fyrirtækjatengingum',
+    },
     navbar: {
       title: 'Stilla einnar innskráningar (SSO)',
     },

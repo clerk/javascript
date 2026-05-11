@@ -1,5 +1,25 @@
 # Change Log
 
+## 3.4.7
+
+### Patch Changes
+
+- Support `min_remaining_ttl_seconds` for M2M token creation. ([#8513](https://github.com/clerk/javascript/pull/8513)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Usage:
+
+  ```ts
+  clerkClient.m2m.createToken({
+    machineSecretKey: 'ak_xxxxx',
+    minRemainingTtlSeconds: 240,
+  });
+  ```
+
+- Add `RoleSetJSON`, `RoleSetItemJSON`, and `RoleSetMigrationJSON` types matching the BAPI OpenAPI schema. Add `role_set_key`, `last_active_at`, and `missing_member_with_elevated_permissions` to `OrganizationJSON`. ([#8502](https://github.com/clerk/javascript/pull/8502)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`5cda3ee`](https://github.com/clerk/javascript/commit/5cda3ee8451cc9af375895824d24a5c3ed7fbee6)]:
+  - @clerk/shared@4.10.2
+
 ## 3.4.6
 
 ### Patch Changes

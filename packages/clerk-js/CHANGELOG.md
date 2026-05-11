@@ -1,5 +1,12 @@
 # Change Log
 
+## 6.10.1
+
+### Patch Changes
+
+- Updated dependencies [[`5cda3ee`](https://github.com/clerk/javascript/commit/5cda3ee8451cc9af375895824d24a5c3ed7fbee6)]:
+  - @clerk/shared@4.10.2
+
 ## 6.10.0
 
 ### Minor Changes

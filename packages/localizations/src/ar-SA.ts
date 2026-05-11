@@ -179,6 +179,10 @@ export const arSA: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'تواصل مع مسؤول مؤسستك للحصول على أذونات لإدارة الاتصالات المؤسسية.',
+      title: 'ليس لديك إذن لإدارة الاتصالات المؤسسية',
+    },
     navbar: {
       title: 'تكوين تسجيل الدخول الموحد (SSO)',
     },

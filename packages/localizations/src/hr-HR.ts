@@ -208,6 +208,11 @@ export const hrHR: LocalizationResource = {
     yearPerUnit: 'Godina po {{unitName}}',
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        'Obratite se administratoru vaše organizacije kako biste dobili dopuštenja za upravljanje poslovnim vezama.',
+      title: 'Nemate dopuštenje za upravljanje poslovnim vezama',
+    },
     navbar: {
       title: 'Konfiguriraj jedinstvenu prijavu (SSO)',
     },

@@ -180,6 +180,11 @@ export const bgBG: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        'Свържете се с администратора на вашата организация, за да получите разрешения за управление на корпоративни връзки.',
+      title: 'Нямате разрешение да управлявате корпоративни връзки',
+    },
     navbar: {
       title: 'Конфигуриране на единен вход (SSO)',
     },

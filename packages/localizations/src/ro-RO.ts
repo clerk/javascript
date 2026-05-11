@@ -185,6 +185,11 @@ export const roRO: LocalizationResource = {
     year: 'An',
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        'Contactați administratorul organizației dumneavoastră pentru a obține permisiuni de gestionare a conexiunilor de întreprindere.',
+      title: 'Nu aveți permisiunea să gestionați conexiunile de întreprindere',
+    },
     navbar: {
       title: 'Configurați autentificarea unică (SSO)',
     },
