@@ -1,118 +1,147 @@
-import { createCookieHandler } from '@clerk/shared/cookie';
-import { addYears } from '@clerk/shared/date';
-import { inCrossOriginIframe } from '@clerk/shared/internal/clerk-js/runtime';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { getSecureAttribute } from '../../getSecureAttribute';
 import { createDevBrowserCookie } from '../devBrowser';
-import { requiresSameSiteNone } from '../requireSameSiteNone';
 
-vi.mock('@clerk/shared/cookie');
-vi.mock('@clerk/shared/date');
-vi.mock('@clerk/shared/internal/clerk-js/runtime');
-vi.mock('../../getSecureAttribute');
-vi.mock('../requireSameSiteNone');
+const { cookieStore, removeCalls, setCalls } = vi.hoisted(() => ({
+  cookieStore: new Map<string, string>(),
+  removeCalls: [] as Array<{ name: string; attributes?: object }>,
+  setCalls: [] as Array<{ name: string; value: string; attributes?: object }>,
+}));
+
+vi.mock('@clerk/shared/cookie', () => ({
+  createCookieHandler: (name: string) => ({
+    get: () => cookieStore.get(name),
+    remove: (attributes?: object) => {
+      removeCalls.push({ name, attributes });
+      cookieStore.delete(name);
+    },
+    set: (value: string, attributes?: object) => {
+      setCalls.push({ name, value, attributes });
+      cookieStore.set(name, value);
+    },
+  }),
+}));
 
 describe('createDevBrowserCookie', () => {
-  const mockCookieSuffix = 'test-suffix';
-  const mockDevBrowser = 'test-dev-browser';
-  const mockExpires = new Date('2024-12-31');
+  const cookieSuffix = 'test-suffix';
+  const suffixedCookieName = '__clerk_db_jwt_test-suffix';
+  const unsuffixedCookieName = '__clerk_db_jwt';
+  const devBrowser = 'test-dev-browser';
+  const now = new Date('2024-01-01T00:00:00.000Z');
+  const expires = new Date('2025-01-01T00:00:00.000Z');
   const defaultOptions = { usePartitionedCookies: () => false };
-  const mockSet = vi.fn();
-  const mockRemove = vi.fn();
-  const mockGet = vi.fn();
 
   beforeEach(() => {
-    vi.clearAllMocks();
-    mockGet.mockReset();
-    (addYears as ReturnType<typeof vi.fn>).mockReturnValue(mockExpires);
-    (inCrossOriginIframe as ReturnType<typeof vi.fn>).mockReturnValue(false);
-    (requiresSameSiteNone as ReturnType<typeof vi.fn>).mockReturnValue(false);
-    (getSecureAttribute as ReturnType<typeof vi.fn>).mockReturnValue(true);
-    (createCookieHandler as ReturnType<typeof vi.fn>).mockImplementation(() => ({
-      set: mockSet,
-      remove: mockRemove,
-      get: mockGet,
-    }));
+    vi.useFakeTimers();
+    vi.setSystemTime(now);
+    cookieStore.clear();
+    removeCalls.length = 0;
+    setCalls.length = 0;
   });
 
-  it('should create both suffixed and non-suffixed cookie handlers', () => {
-    createDevBrowserCookie(mockCookieSuffix, defaultOptions);
-
-    expect(createCookieHandler).toHaveBeenCalledTimes(2);
-    expect(createCookieHandler).toHaveBeenCalledWith('__clerk_db_jwt');
-    expect(createCookieHandler).toHaveBeenCalledWith('__clerk_db_jwt_test-suffix');
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
   });
 
-  it('should remove non-partitioned and partitioned cookies even when partitioned cookies are disabled', () => {
-    const cookieHandler = createDevBrowserCookie(mockCookieSuffix, defaultOptions);
+  it('removes current, non-partitioned, and partitioned cookie variants for both dev browser cookie names', () => {
+    const cookieHandler = createDevBrowserCookie(cookieSuffix, defaultOptions);
+
     cookieHandler.remove();
 
-    const currentAttributes = {
-      sameSite: 'Lax',
-      secure: true,
-      partitioned: false,
-    };
-    const partitionedAttributes = {
-      sameSite: 'None',
-      secure: true,
-      partitioned: true,
-    };
-
-    expect(mockRemove).toHaveBeenCalledTimes(6);
-    expect(mockRemove).toHaveBeenNthCalledWith(1, currentAttributes);
-    expect(mockRemove).toHaveBeenNthCalledWith(2);
-    expect(mockRemove).toHaveBeenNthCalledWith(3, partitionedAttributes);
-    expect(mockRemove).toHaveBeenNthCalledWith(4, currentAttributes);
-    expect(mockRemove).toHaveBeenNthCalledWith(5);
-    expect(mockRemove).toHaveBeenNthCalledWith(6, partitionedAttributes);
+    expect(removeCalls).toEqual([
+      {
+        name: suffixedCookieName,
+        attributes: {
+          sameSite: 'Lax',
+          secure: false,
+          partitioned: false,
+        },
+      },
+      { name: suffixedCookieName, attributes: undefined },
+      {
+        name: suffixedCookieName,
+        attributes: {
+          sameSite: 'None',
+          secure: true,
+          partitioned: true,
+        },
+      },
+      {
+        name: unsuffixedCookieName,
+        attributes: {
+          sameSite: 'Lax',
+          secure: false,
+          partitioned: false,
+        },
+      },
+      { name: unsuffixedCookieName, attributes: undefined },
+      {
+        name: unsuffixedCookieName,
+        attributes: {
+          sameSite: 'None',
+          secure: true,
+          partitioned: true,
+        },
+      },
+    ]);
   });
 
-  it('should clear stale partitioned cookies before setting a new non-partitioned cookie', () => {
-    const cookieHandler = createDevBrowserCookie(mockCookieSuffix, defaultOptions);
-    cookieHandler.set(mockDevBrowser);
+  it('clears stale partitioned cookie variants before writing a new dev browser', () => {
+    const cookieHandler = createDevBrowserCookie(cookieSuffix, defaultOptions);
 
-    expect(mockRemove).toHaveBeenCalledWith({
-      sameSite: 'None',
-      secure: true,
-      partitioned: true,
+    cookieHandler.set(devBrowser);
+
+    expect(removeCalls).toContainEqual({
+      name: suffixedCookieName,
+      attributes: {
+        sameSite: 'None',
+        secure: true,
+        partitioned: true,
+      },
     });
-    expect(mockSet).toHaveBeenCalledTimes(2);
-    expect(mockSet).toHaveBeenCalledWith(mockDevBrowser, {
-      expires: mockExpires,
-      sameSite: 'Lax',
-      secure: true,
-      partitioned: false,
+    expect(removeCalls).toContainEqual({
+      name: unsuffixedCookieName,
+      attributes: {
+        sameSite: 'None',
+        secure: true,
+        partitioned: true,
+      },
     });
+    expect(setCalls).toEqual([
+      {
+        name: suffixedCookieName,
+        value: devBrowser,
+        attributes: {
+          expires,
+          sameSite: 'Lax',
+          secure: false,
+          partitioned: false,
+        },
+      },
+      {
+        name: unsuffixedCookieName,
+        value: devBrowser,
+        attributes: {
+          expires,
+          sameSite: 'Lax',
+          secure: false,
+          partitioned: false,
+        },
+      },
+    ]);
   });
 
-  it('should set partitioned cookies when usePartitionedCookies returns true', () => {
-    const cookieHandler = createDevBrowserCookie(mockCookieSuffix, { usePartitionedCookies: () => true });
-    cookieHandler.set(mockDevBrowser);
+  it('reads the suffixed cookie before falling back to the unsuffixed cookie', () => {
+    const cookieHandler = createDevBrowserCookie(cookieSuffix, defaultOptions);
 
-    expect(mockSet).toHaveBeenCalledWith(mockDevBrowser, {
-      expires: mockExpires,
-      sameSite: 'None',
-      secure: true,
-      partitioned: true,
-    });
-  });
+    cookieStore.set(unsuffixedCookieName, 'unsuffixed-value');
+    cookieStore.set(suffixedCookieName, 'suffixed-value');
 
-  it('should get cookie value from suffixed cookie first, then fallback to non-suffixed', () => {
-    mockGet.mockImplementationOnce(() => 'suffixed-value').mockImplementationOnce(() => 'non-suffixed-value');
+    expect(cookieHandler.get()).toBe('suffixed-value');
 
-    const cookieHandler = createDevBrowserCookie(mockCookieSuffix, defaultOptions);
-    const result = cookieHandler.get();
+    cookieStore.delete(suffixedCookieName);
 
-    expect(result).toBe('suffixed-value');
-  });
-
-  it('should fallback to non-suffixed cookie when suffixed cookie is not present', () => {
-    mockGet.mockImplementationOnce(() => undefined).mockImplementationOnce(() => 'non-suffixed-value');
-
-    const cookieHandler = createDevBrowserCookie(mockCookieSuffix, defaultOptions);
-    const result = cookieHandler.get();
-
-    expect(result).toBe('non-suffixed-value');
+    expect(cookieHandler.get()).toBe('unsuffixed-value');
   });
 });
