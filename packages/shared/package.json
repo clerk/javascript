@@ -12,7 +12,7 @@
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/index.d.ts",
+        "types": "./dist/index.d.mts",
         "default": "./dist/index.mjs"
       },
       "require": {
@@ -22,7 +22,7 @@
     },
     "./internal/clerk-js/*": {
       "import": {
-        "types": "./dist/internal/clerk-js/*.d.ts",
+        "types": "./dist/internal/clerk-js/*.d.mts",
         "default": "./dist/internal/clerk-js/*.mjs"
       },
       "require": {
@@ -32,7 +32,7 @@
     },
     "./*": {
       "import": {
-        "types": "./dist/*.d.ts",
+        "types": "./dist/*.d.mts",
         "default": "./dist/*.mjs"
       },
       "require": {
@@ -42,7 +42,7 @@
     },
     "./react": {
       "import": {
-        "types": "./dist/react/index.d.ts",
+        "types": "./dist/react/index.d.mts",
         "default": "./dist/react/index.mjs"
       },
       "require": {
@@ -52,7 +52,7 @@
     },
     "./keyless": {
       "import": {
-        "types": "./dist/keyless/index.d.ts",
+        "types": "./dist/keyless/index.d.mts",
         "default": "./dist/keyless/index.mjs"
       },
       "require": {
@@ -62,7 +62,7 @@
     },
     "./utils": {
       "import": {
-        "types": "./dist/utils/index.d.ts",
+        "types": "./dist/utils/index.d.mts",
         "default": "./dist/utils/index.mjs"
       },
       "require": {
@@ -72,7 +72,7 @@
     },
     "./workerTimers": {
       "import": {
-        "types": "./dist/workerTimers/index.d.ts",
+        "types": "./dist/workerTimers/index.d.mts",
         "default": "./dist/workerTimers/index.mjs"
       },
       "require": {
@@ -82,7 +82,7 @@
     },
     "./dom": {
       "import": {
-        "types": "./dist/dom/index.d.ts",
+        "types": "./dist/dom/index.d.mts",
         "default": "./dist/dom/index.mjs"
       },
       "require": {
@@ -92,7 +92,7 @@
     },
     "./ui": {
       "import": {
-        "types": "./dist/ui/index.d.ts",
+        "types": "./dist/ui/index.d.mts",
         "default": "./dist/ui/index.mjs"
       },
       "require": {
@@ -102,7 +102,7 @@
     },
     "./types": {
       "import": {
-        "types": "./dist/types/index.d.ts",
+        "types": "./dist/types/index.d.mts",
         "default": "./dist/types/index.mjs"
       },
       "require": {
@@ -117,8 +117,9 @@
     "scripts"
   ],
   "scripts": {
-    "build": "tsdown && pnpm build:declarations",
+    "build": "tsdown && pnpm build:declarations && pnpm build:declarations:esm",
     "build:declarations": "tsc -p tsconfig.declarations.json",
+    "build:declarations:esm": "node ./scripts/copy-dmts.mjs",
     "clean": "rimraf ./dist",
     "dev": "tsdown --watch src",
     "dev:pub": "pnpm dev -- --env.publish",
