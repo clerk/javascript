@@ -1,4 +1,4 @@
-import { descriptors, Flow, localizationKeys } from '@/customizables';
+import { descriptors, Flow, localizationKeys, Text } from '@/customizables';
 import { useCardState } from '@/elements/contexts';
 import { Form } from '@/elements/Form';
 import { handleError } from '@/utils/errorHandler';
@@ -17,7 +17,6 @@ export const ConfigureStep = (): JSX.Element => {
     type: 'text',
     label: localizationKeys('configureSSO.configureStep.metadataUrl.label'),
     placeholder: localizationKeys('configureSSO.configureStep.metadataUrl.placeholder'),
-    infoText: localizationKeys('configureSSO.configureStep.metadataUrl.description'),
     isRequired: true,
   });
 
@@ -55,6 +54,12 @@ export const ConfigureStep = (): JSX.Element => {
 
         <Step.Body>
           <Step.Section sx={theme => ({ gap: theme.space.$5 })}>
+            <Text
+              as='p'
+              variant='body'
+              sx={theme => ({ color: theme.colors.$colorMutedForeground })}
+              localizationKey={localizationKeys('configureSSO.configureStep.metadataUrl.description')}
+            />
             <Form.ControlRow elementId={metadataUrlField.id}>
               <Form.PlainInput {...metadataUrlField.props} />
             </Form.ControlRow>

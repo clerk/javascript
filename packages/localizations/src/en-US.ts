@@ -252,7 +252,11 @@ export const enUS: LocalizationResource = {
       subtitle: 'Create a new enterprise application in your Okta Dashboard',
       metadataUrl: {
         label: 'Metadata URL',
+<<<<<<< HEAD
         placeholder: 'https://app.okta.com/.../metadata',
+=======
+        placeholder: 'Paste URL here...',
+>>>>>>> 35011671b (fix(ui): render Configure step description above input)
         description: 'In your Okta SAML app, go to the Sign On tab and retrieve the metadata URL. Paste it below.',
       },
     },
