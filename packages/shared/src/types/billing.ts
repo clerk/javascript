@@ -21,7 +21,7 @@ export type WithOptionalOrgType<T> = T & {
  */
 export interface BillingNamespace {
   /**
-   * Gets a list of payment attempts for the current user or supplied organization.
+   * Gets a list of payment attempts for the current user or supplied Organization.
    * @returns A [`ClerkPaginatedResponse`](/docs/reference/types/clerk-paginated-response) of [`BillingPaymentResource`](/docs/reference/types/billing-payment-resource) objects.
    *
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
@@ -61,7 +61,7 @@ export interface BillingNamespace {
   getSubscription: (params: GetSubscriptionParams) => Promise<BillingSubscriptionResource>;
 
   /**
-   * Gets a list of billing statements for the current user or supplied Organization.
+   * Gets a list of Billing Statements for the current user or supplied Organization.
    * @returns A [`ClerkPaginatedResponse`](/docs/reference/types/clerk-paginated-response) of [`BillingStatementResource`](/docs/reference/types/billing-statement-resource) objects.
    *
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
