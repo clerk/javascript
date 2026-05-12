@@ -13,6 +13,7 @@ export default defineConfig(overrideOptions => {
       types: './src/types/index.ts',
     },
     format: ['cjs', 'esm'],
+    fixedExtension: false,
     clean: true,
     minify: false,
     sourcemap: true,
