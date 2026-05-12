@@ -4,6 +4,13 @@ appId: com.clerk.clerkexpoquickstart
 - tapOn:
     text: "Sign Out"
 - waitForAnimationToEnd:
-    timeout: 3000
+    timeout: 8000
 - assertVisible:
     text: 'Welcome! Sign in to continue\.?'
+# After sign-out the AuthView sometimes renders its welcome text a beat
+# before the email field. Don't return from this subflow until the
+# field is actually present, so cycle flows don't race a half-rendered
+# AuthView. If this assertion times out the test surfaces a real bug.
+- extendedWaitUntil:
+    visible: "Enter your email or username"
+    timeout: 10000
