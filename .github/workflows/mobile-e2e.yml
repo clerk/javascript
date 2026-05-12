@@ -312,7 +312,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: maestro-android
-          path: ~/.maestro/tests
+          # ~/.maestro/tests holds Maestro's auto-captured failure screenshots
+          # and commands JSON. integration-mobile/*.png holds the takeScreenshot
+          # debug captures that flows write, which Maestro saves relative to
+          # the cwd it was launched from (integration-mobile/).
+          path: |
+            ~/.maestro/tests
+            integration-mobile/*.png
 
       - name: Cleanup test user
         if: always() && steps.user.outputs.user_id != ''
@@ -565,7 +571,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: maestro-ios
-          path: ~/.maestro/tests
+          path: |
+            ~/.maestro/tests
+            integration-mobile/*.png
 
       - name: Cleanup test user
         if: always() && steps.user.outputs.user_id != ''
