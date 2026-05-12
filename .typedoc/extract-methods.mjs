@@ -1295,7 +1295,7 @@ function buildMethodMdx(decl, ctx, options = {}) {
   /** Prefer the declaration comment (property-style methods document `addListener` on the property, not the signature). */
   const comment = decl.comment ?? sig.comment;
   let description = commentSummaryAndBody(comment);
-  const sigReturns = appendSignatureOnlyReturns(decl.comment, sig.comment);
+  const sigReturns = comment === sig.comment ? '' : appendSignatureOnlyReturns(decl.comment, sig.comment);
   if (sigReturns) {
     description = [description, sigReturns].filter(Boolean).join('\n\n');
   }

@@ -83,13 +83,14 @@ export interface APIKeysNamespace {
   getAll(params?: GetAPIKeysParams): Promise<ClerkPaginatedResponse<APIKeyResource>>;
   /**
    * Creates a new API key. **The secret is only available in the response from `create()` and cannot be retrieved later.**
-   * @returns A [`APIKeyResource`](https://clerk.com/docs/reference/types/api-key-resource) object that includes the `secret` property.
+   * @returns An [`APIKeyResource`](https://clerk.com/docs/reference/types/api-key-resource) object that includes the `secret` property.
    * > [!WARNING]
    * > Make sure to store the API key secret immediately after creation, as it will not be available again.
    */
   create(params: CreateAPIKeyParams): Promise<APIKeyResource>;
   /**
    * Revokes a given API key by ID.
+   * @returns An [`APIKeyResource`](https://clerk.com/docs/reference/types/api-key-resource) object.
    */
   revoke(params: RevokeAPIKeyParams): Promise<APIKeyResource>;
 }
