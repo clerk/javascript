@@ -287,7 +287,11 @@ jobs:
           script: >-
             cd clerk-expo-quickstart/NativeComponentQuickstart &&
             npx expo prebuild --clean &&
-            npx expo run:android --variant release --no-bundler &&
+            ( ok=0; for i in 1 2 3; do
+                if npx expo run:android --variant release --no-bundler; then ok=1; break; fi;
+                echo "expo run:android attempt $i failed (likely gradle wrapper flake); retrying in 15s";
+                sleep 15;
+              done; [ "$ok" = 1 ] ) &&
             cd ../../integration-mobile &&
             find flows -type f -name "*.yaml" ! -path "*/common/*"
             ${FLOWS_FILTER:+-path "*$FLOWS_FILTER*"} -print0
