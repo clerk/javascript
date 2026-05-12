@@ -140,7 +140,7 @@ export type FlowMetadata = {
     | 'configureCreateApp'
     | 'configureMapAttributes'
     | 'test-sso'
-    | 'sso-confirmation';
+    | 'ssoConfirmation';
 };
 
 const [FlowMetadataCtx, useFlowMetadata] = createContextAndHook<FlowMetadata>('FlowMetadata');

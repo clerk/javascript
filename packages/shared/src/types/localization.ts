@@ -1429,6 +1429,29 @@ export type __internal_LocalizationResource = {
         };
       };
     };
+    confirmation: {
+      statusSection: {
+        title: LocalizationValue;
+        activeBadge: LocalizationValue;
+        inactiveBadge: LocalizationValue;
+      };
+      enableSection: {
+        title: LocalizationValue;
+      };
+      configurationSection: {
+        title: LocalizationValue;
+        ssoUrlLabel: LocalizationValue;
+        issuerLabel: LocalizationValue;
+        certificateLabel: LocalizationValue;
+        configureAgainLink: LocalizationValue;
+      };
+      resetSection: {
+        title: LocalizationValue;
+        warning: LocalizationValue;
+        confirmationFieldLabel: LocalizationValue<'name'>;
+        submitButton: LocalizationValue;
+      };
+    };
   };
   apiKeys: {
     formTitle: LocalizationValue;
