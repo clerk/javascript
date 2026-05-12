@@ -227,7 +227,7 @@ export const ProvideEmailStep = (): JSX.Element => {
           isDisabled={isFirstStep}
         />
         <Step.Footer.Continue
-          onClick={() => goNext()}
+          onClick={handleSubmit}
           isLoading={card.isLoading}
           isDisabled={!canSubmit || card.isLoading}
         />
@@ -244,7 +244,7 @@ export const EnterVerificationCodeStep = ({
   const { user } = useUser();
   const card = useCardState();
   const codeSubmittedRef = useRef(false);
-  const { goNext, goPrev } = useWizard();
+  const { goNext, goPrev, isFirstStep } = useWizard();
 
   const isVerified = emailToVerify?.verification.status === 'verified';
   const isPrimary = emailToVerify?.id === user?.primaryEmailAddressId;
@@ -335,7 +335,7 @@ export const EnterVerificationCodeStep = ({
       <Step.Footer>
         <Step.Footer.Previous
           onClick={() => goPrev()}
-          isDisabled
+          isDisabled={isFirstStep}
         />
         <Step.Footer.Continue
           onClick={() => goNext()}
