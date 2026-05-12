@@ -261,9 +261,23 @@ jobs:
           script: echo "Generated AVD snapshot for caching."
 
       - name: Install Maestro
+        # Use pipefail + verify the binary so a curl flake (e.g. TLS reset
+        # against github.com:443) doesn't leave us with an "installed" but
+        # missing maestro binary, which downstream xargs invocations only
+        # surface as a cryptic exit-code-127 after the build.
         run: |
-          curl -Ls "https://get.maestro.mobile.dev" | bash
+          set -o pipefail
+          installed=0
+          for i in 1 2 3; do
+            if curl -fLs --retry 3 --retry-delay 5 "https://get.maestro.mobile.dev" | bash; then
+              if [ -x "$HOME/.maestro/bin/maestro" ]; then installed=1; break; fi
+            fi
+            echo "Maestro install attempt $i failed (or binary missing); retrying"
+            sleep 5
+          done
+          [ "$installed" = 1 ] || { echo "::error::Maestro install failed after 3 attempts"; exit 1; }
           echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+          "$HOME/.maestro/bin/maestro" --version
 
       - name: Run Android e2e
         uses: reactivecircus/android-emulator-runner@v2
@@ -500,9 +514,23 @@ jobs:
             deriveddata-${{ runner.os }}-
 
       - name: Install Maestro
+        # Use pipefail + verify the binary so a curl flake (e.g. TLS reset
+        # against github.com:443) doesn't leave us with an "installed" but
+        # missing maestro binary, which downstream xargs invocations only
+        # surface as a cryptic exit-code-127 after the build.
         run: |
-          curl -Ls "https://get.maestro.mobile.dev" | bash
+          set -o pipefail
+          installed=0
+          for i in 1 2 3; do
+            if curl -fLs --retry 3 --retry-delay 5 "https://get.maestro.mobile.dev" | bash; then
+              if [ -x "$HOME/.maestro/bin/maestro" ]; then installed=1; break; fi
+            fi
+            echo "Maestro install attempt $i failed (or binary missing); retrying"
+            sleep 5
+          done
+          [ "$installed" = 1 ] || { echo "::error::Maestro install failed after 3 attempts"; exit 1; }
           echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+          "$HOME/.maestro/bin/maestro" --version
 
       - name: Build and run iOS e2e
         env:
