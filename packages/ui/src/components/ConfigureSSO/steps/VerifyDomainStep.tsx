@@ -98,11 +98,9 @@ export const VerifyDomainStep = (): JSX.Element => {
           </Step.Header>
 
           <Step.Body>
-            {!emailToVerify && (
-              <Wizard.Step id='provide-email'>
-                <ProvideEmailStep />
-              </Wizard.Step>
-            )}
+            <Wizard.Step id='provide-email'>
+              <ProvideEmailStep />
+            </Wizard.Step>
 
             <Wizard.Step id='verify-email-address'>
               <EnterVerificationCodeStep emailToVerify={emailToVerify} />
