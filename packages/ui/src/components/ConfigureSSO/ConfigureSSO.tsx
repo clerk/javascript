@@ -14,7 +14,6 @@ import { ConfigureSSOFlowProvider, useConfigureSSOFlow } from './ConfigureSSOCon
 import { ConfigureSSOHeader } from './ConfigureSSOHeader';
 import { ConfigureSSONavbar } from './ConfigureSSONavbar';
 import { ConfigureSSOSkeleton } from './ConfigureSSOSkeleton';
-import { deriveInitialStep } from './deriveInitialStep';
 import { ProfileCardFooter, ProfileCardHeader } from './elements/ProfileCard';
 import { Step } from './elements/Step';
 import { Wizard } from './elements/Wizard';
@@ -85,8 +84,7 @@ const ConfigureSSOCardContent = () => {
 };
 
 const ConfigureSSOSteps = () => {
-  const { enterpriseConnection } = useConfigureSSOFlow();
-  const initialStepId = deriveInitialStep(enterpriseConnection);
+  const { initialStepId } = useConfigureSSOFlow();
 
   return (
     <Wizard initialStepId={initialStepId}>

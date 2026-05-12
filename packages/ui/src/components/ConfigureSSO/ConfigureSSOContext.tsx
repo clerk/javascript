@@ -1,13 +1,15 @@
-import { useReverification, useSession, useUser } from '@clerk/shared/react';
+import { __internal_useUserEnterpriseConnections, useSession, useUser } from '@clerk/shared/react';
 import type { EnterpriseConnectionResource } from '@clerk/shared/types';
 import React, { type PropsWithChildren } from 'react';
 
-export type ProviderType = 'saml_okta' | 'saml_custom';
+import { deriveInitialStep } from './deriveInitialStep';
+import type { ProviderType, WizardStepId } from './types';
 
 /**
  * Shared form state for the ConfigureSSO wizard, persisted across steps
  */
 export interface ConfigureSSOData {
+  initialStepId: WizardStepId;
   /**
    * The enterprise connection from the user's primary email address domain
    */
@@ -27,11 +29,6 @@ export interface ConfigureSSOData {
    * connection has been created.
    */
   setProvider: (provider: ProviderType) => void;
-  /**
-   * Clears the local provider selection. Used by Reset on the Confirmation
-   * step (wired up by a follow-up PR).
-   */
-  clearProvider: () => void;
   /**
    * Creates the enterprise connection from the current provider selection,
    * the user's primary email domain, and the session's active organization.
@@ -56,11 +53,15 @@ export const ConfigureSSOFlowProvider = ({
 }: PropsWithChildren<ConfigureSSOFlowProviderProps>): JSX.Element => {
   const { user } = useUser();
   const { session } = useSession();
-  const [localProvider, setLocalProvider] = React.useState<ProviderType | undefined>(undefined);
+  const [provider, setProvider] = React.useState<ProviderType | undefined>(
+    enterpriseConnection?.provider as ProviderType,
+  );
 
-  const provider = (enterpriseConnection?.provider as ProviderType | undefined) ?? localProvider;
+  const { createEnterpriseConnection } = __internal_useUserEnterpriseConnections();
 
-  const createConnectionFetcher = React.useCallback(async () => {
+  const initialStepId = deriveInitialStep(enterpriseConnection);
+
+  const createConnection = React.useCallback(async () => {
     if (enterpriseConnection) {
       return;
     }
@@ -74,33 +75,23 @@ export const ConfigureSSOFlowProvider = ({
     const emailDomain = user.primaryEmailAddress.emailAddress.split('@')[1];
     const organizationId = session?.lastActiveOrganizationId ?? null;
 
-    await user.createEnterpriseConnection({
-      provider,
+    await createEnterpriseConnection({
+      provider: 'saml_okta',
       name: emailDomain,
       organizationId,
     });
-  }, [enterpriseConnection, provider, user, session]);
-
-  const createConnection = useReverification(createConnectionFetcher);
-
-  const setProvider = React.useCallback((next: ProviderType) => {
-    setLocalProvider(next);
-  }, []);
-
-  const clearProvider = React.useCallback(() => {
-    setLocalProvider(undefined);
-  }, []);
+  }, [enterpriseConnection, provider, user, session, createEnterpriseConnection]);
 
   const value = React.useMemo<ConfigureSSOData>(
     () => ({
+      initialStepId,
       enterpriseConnection,
       isLoading,
       provider,
       setProvider,
-      clearProvider,
       createConnection,
     }),
-    [enterpriseConnection, isLoading, provider, setProvider, clearProvider, createConnection],
+    [initialStepId, enterpriseConnection, isLoading, provider, setProvider, createConnection],
   );
 
   return <ConfigureSSOFlowContext.Provider value={value}>{children}</ConfigureSSOFlowContext.Provider>;

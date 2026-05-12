@@ -17,23 +17,34 @@ import { useCardState } from '@/elements/contexts';
 import { Alert } from '@/ui/elements/Alert';
 import { handleError } from '@/utils/errorHandler';
 
-import { type ProviderType, useConfigureSSOFlow } from '../ConfigureSSOContext';
+import { useConfigureSSOFlow } from '../ConfigureSSOContext';
 import { Step } from '../elements/Step';
 import { useWizard } from '../elements/Wizard';
+import type { ProviderType } from '../types';
 
-const PROVIDER_OPTIONS: ReadonlyArray<{ id: ProviderType; label: LocalizationKey; iconId: string }> = [
-  { id: 'saml_okta', label: localizationKeys('configureSSO.selectProviderStep.saml.okta'), iconId: 'okta' },
+const PROVIDER_GROUPS: ReadonlyArray<{
+  id: 'saml';
+  label: LocalizationKey;
+  options: ReadonlyArray<{ id: ProviderType; label: LocalizationKey; iconId: string }>;
+}> = [
   {
-    id: 'saml_custom',
-    label: localizationKeys('configureSSO.selectProviderStep.saml.customSaml'),
-    iconId: 'saml',
+    id: 'saml',
+    label: localizationKeys('configureSSO.selectProviderStep.saml.groupLabel'),
+    options: [
+      { id: 'saml_okta', label: localizationKeys('configureSSO.selectProviderStep.saml.okta'), iconId: 'okta' },
+      {
+        id: 'saml_custom',
+        label: localizationKeys('configureSSO.selectProviderStep.saml.customSaml'),
+        iconId: 'saml',
+      },
+    ],
   },
 ];
 
 export const SelectProviderStep = (): JSX.Element => {
-  const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
-  const { setProvider, createConnection } = useConfigureSSOFlow();
   const card = useCardState();
+  const { goNext, isLastStep } = useWizard();
+  const { setProvider, createConnection } = useConfigureSSOFlow();
   const [selected, setSelected] = React.useState<ProviderType | null>(null);
 
   const handleContinue = async () => {
@@ -84,29 +95,34 @@ export const SelectProviderStep = (): JSX.Element => {
               />
             </Col>
 
-            <Col sx={theme => ({ gap: theme.space.$3 })}>
-              <Text
-                as='label'
-                variant='subtitle'
-                sx={theme => ({ color: theme.colors.$colorForeground })}
-                localizationKey={localizationKeys('configureSSO.selectProviderStep.saml.groupLabel')}
-              />
-
-              <Grid
-                gap={3}
-                columns={2}
+            {PROVIDER_GROUPS.map(group => (
+              <Col
+                key={group.id}
+                sx={theme => ({ gap: theme.space.$3 })}
               >
-                {PROVIDER_OPTIONS.map(option => (
-                  <ProviderCard
-                    key={option.id}
-                    iconId={option.iconId}
-                    label={option.label}
-                    isSelected={selected === option.id}
-                    onClick={() => setSelected(option.id)}
-                  />
-                ))}
-              </Grid>
-            </Col>
+                <Text
+                  as='label'
+                  variant='subtitle'
+                  sx={theme => ({ color: theme.colors.$colorForeground })}
+                  localizationKey={group.label}
+                />
+
+                <Grid
+                  gap={3}
+                  columns={2}
+                >
+                  {group.options.map(option => (
+                    <ProviderCard
+                      key={option.id}
+                      iconId={option.iconId}
+                      label={option.label}
+                      isSelected={selected === option.id}
+                      onClick={() => setSelected(option.id)}
+                    />
+                  ))}
+                </Grid>
+              </Col>
+            ))}
 
             <Alert
               variant='warning'
@@ -126,10 +142,8 @@ export const SelectProviderStep = (): JSX.Element => {
         </Step.Body>
 
         <Step.Footer>
-          <Step.Footer.Previous
-            onClick={() => goPrev()}
-            isDisabled={isFirstStep}
-          />
+          <Step.Footer.Previous isDisabled />
+
           <Step.Footer.Continue
             onClick={handleContinue}
             isLoading={card.isLoading}

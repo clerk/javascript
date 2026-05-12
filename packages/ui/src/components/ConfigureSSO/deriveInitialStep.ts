@@ -1,6 +1,6 @@
 import type { EnterpriseConnectionResource } from '@clerk/shared/types';
 
-export type WizardStepId = 'select-provider' | 'verify-domain' | 'configure' | 'test' | 'confirmation';
+import type { WizardStepId } from './types';
 
 /**
  * Decides where the ConfigureSSO wizard should mount on (re)load based on
