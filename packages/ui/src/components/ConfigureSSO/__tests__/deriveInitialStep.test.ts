@@ -1,7 +1,8 @@
 import type { EnterpriseConnectionResource } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
-import { deriveInitialStep, type WizardStepId } from '../deriveInitialStep';
+import { deriveInitialStep } from '../deriveInitialStep';
+import type { WizardStepId } from '../types';
 
 const makeConnection = (overrides: Partial<EnterpriseConnectionResource> = {}): EnterpriseConnectionResource =>
   ({
