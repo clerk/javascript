@@ -305,7 +305,7 @@ jobs:
             cd ../../integration-mobile &&
             find flows -type f -name "*.yaml" ! -path "*/common/*"
             ${FLOWS_FILTER:+-path "*$FLOWS_FILTER*"} -print0
-            | xargs -0 maestro test --exclude-tags "$EXCLUDE_TAGS"
+            | xargs -0 maestro test --env CLERK_TEST_EMAIL="$CLERK_TEST_EMAIL" --env CLERK_TEST_PASSWORD="$CLERK_TEST_PASSWORD" --exclude-tags "$EXCLUDE_TAGS"
 
       - name: Upload Maestro artifacts on failure
         if: failure()
@@ -564,7 +564,10 @@ jobs:
           # Maestro doesn't auto-recurse into subdirectories; pass each flow explicitly.
           find flows -type f -name "*.yaml" ! -path "*/common/*" \
             ${FLOWS_FILTER:+-path "*$FLOWS_FILTER*"} -print0 | \
-            xargs -0 maestro test --exclude-tags "$EXCLUDE_TAGS,androidOnly"
+            xargs -0 maestro test \
+              --env CLERK_TEST_EMAIL="$CLERK_TEST_EMAIL" \
+              --env CLERK_TEST_PASSWORD="$CLERK_TEST_PASSWORD" \
+              --exclude-tags "$EXCLUDE_TAGS,androidOnly"
 
       - name: Upload Maestro artifacts on failure
         if: failure()
