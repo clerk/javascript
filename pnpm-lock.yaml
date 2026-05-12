@@ -297,7 +297,7 @@ importers:
         version: 1.2.2
       tsdown:
         specifier: catalog:repo
-        version: 0.22.0(@arethetypeswrong/core@0.18.2)(publint@0.3.20)(tsx@4.21.0)(typescript@6.0.2)(vue-tsc@3.2.8(typescript@6.0.2))
+        version: 0.22.0(@arethetypeswrong/core@0.18.2)(publint@0.3.20)(tsx@4.21.0)(typescript@6.0.2)(unrun@0.2.37)(vue-tsc@3.2.8(typescript@6.0.2))
       tsup:
         specifier: catalog:repo
         version: 8.5.1(jiti@2.7.0)(postcss@8.5.14)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.4)
@@ -319,6 +319,9 @@ importers:
       typescript-eslint:
         specifier: 8.58.0
         version: 8.58.0(eslint@9.31.0(jiti@2.7.0))(typescript@6.0.2)
+      unrun:
+        specifier: 0.2.37
+        version: 0.2.37
       uuid:
         specifier: 8.3.2
         version: 8.3.2
@@ -1022,7 +1025,7 @@ importers:
         version: 10.2.5
       tsdown:
         specifier: catalog:repo
-        version: 0.22.0(@arethetypeswrong/core@0.18.2)(publint@0.3.20)(tsx@4.21.0)(typescript@6.0.2)(vue-tsc@3.2.8(typescript@6.0.2))
+        version: 0.22.0(@arethetypeswrong/core@0.18.2)(publint@0.3.20)(tsx@4.21.0)(typescript@6.0.2)(unrun@0.2.37)(vue-tsc@3.2.8(typescript@6.0.2))
       webpack-merge:
         specifier: ^5.10.0
         version: 5.10.0
@@ -2552,7 +2555,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {node: '>=0.10.0'}
+    engines: {'0': node >=0.10.0}
 
   '@expo/cli@0.22.28':
     resolution: {integrity: sha512-lvt72KNitGuixYD2l3SZmRKVu2G4zJpmg5V7WfUBNpmUU5oODBw/6qmiJ6kSLAlfDozscUk+BBGknBBzxUrwrA==}
@@ -13720,6 +13723,16 @@ packages:
 
   unrs-resolver@1.11.1:
     resolution: {integrity: sha512-bSjt9pjaEBnNiGgc9rUiHGKv5l4/TGzDmYw3RhnkJGtLhbnnA/5qJj7x3dNDCRx/PJxu774LlH8lCOlB4hEfKg==}
+
+  unrun@0.2.37:
+    resolution: {integrity: sha512-AA7vDuYsgeSYVzJMm16UKA+aXFKhy7nFqW9z5l7q44K4ppFWZAMqYS58ePRZbugMLPH0fwwMzD5A8nP0avxwZQ==}
+    engines: {node: '>=20.19.0'}
+    hasBin: true
+    peerDependencies:
+      synckit: ^0.11.11
+    peerDependenciesMeta:
+      synckit:
+        optional: true
 
   unstorage@1.17.5:
     resolution: {integrity: sha512-0i3iqvRfx29hkNntHyQvJTpf5W9dQ9ZadSoRU8+xVlhVtT7jAX57fazYO9EHvcRCfBCyi5YRya7XCDOsbTgkPg==}
@@ -29451,7 +29464,7 @@ snapshots:
       minimist: 1.2.8
       strip-bom: 3.0.0
 
-  tsdown@0.22.0(@arethetypeswrong/core@0.18.2)(publint@0.3.20)(tsx@4.21.0)(typescript@6.0.2)(vue-tsc@3.2.8(typescript@6.0.2)):
+  tsdown@0.22.0(@arethetypeswrong/core@0.18.2)(publint@0.3.20)(tsx@4.21.0)(typescript@6.0.2)(unrun@0.2.37)(vue-tsc@3.2.8(typescript@6.0.2)):
     dependencies:
       ansis: 4.2.0
       cac: 7.0.0
@@ -29473,6 +29486,7 @@ snapshots:
       publint: 0.3.20
       tsx: 4.21.0
       typescript: 6.0.2
+      unrun: 0.2.37
     transitivePeerDependencies:
       - '@ts-macro/tsc'
       - '@typescript/native-preview'
@@ -29876,6 +29890,10 @@ snapshots:
       '@unrs/resolver-binding-win32-arm64-msvc': 1.11.1
       '@unrs/resolver-binding-win32-ia32-msvc': 1.11.1
       '@unrs/resolver-binding-win32-x64-msvc': 1.11.1
+
+  unrun@0.2.37:
+    dependencies:
+      rolldown: 1.0.0
 
   unstorage@1.17.5(db0@0.3.4)(idb-keyval@6.2.1)(ioredis@5.10.1):
     dependencies:
