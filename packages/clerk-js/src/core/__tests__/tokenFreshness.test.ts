@@ -118,13 +118,13 @@ describe('shouldRejectToken', () => {
     });
   });
 
-  describe('legacy oiat: 0', () => {
+  describe('legacy and edge cases', () => {
     // oiat is set by origin only; legacy tokens minted before the feature flag
     // landed will have no oiat field. A token with oiat literally === 0 is also
     // possible if a clock test mints during epoch (or if origin malfunctions).
-    it('treats oiat: 0 as missing oiat and falls back to iat', () => {
-      // 0 is falsy in JS; claimFreshness uses ?? so 0 IS a valid oiat.
-      // But tie-break logic checks `oiat != null`, so 0 counts as present.
+    it('treats oiat: 0 as PRESENT (numeric zero, not missing)', () => {
+      // claimFreshness uses ?? so 0 is a valid oiat. Tie-break logic checks
+      // `oiat != null`, which treats 0 as present.
       expect(claimFreshness(makeJwt({ oiat: 0, iat: 100 }))).toBe(0);
     });
 
