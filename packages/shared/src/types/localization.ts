@@ -1341,6 +1341,60 @@ export type __internal_LocalizationResource = {
     configureStep: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
+      createApp: {
+        createApp: {
+          title: LocalizationValue;
+          step1: {
+            prefix: LocalizationValue;
+            bold: LocalizationValue;
+            suffix: LocalizationValue;
+          };
+          step2: {
+            prefix: LocalizationValue;
+            bold: LocalizationValue;
+            suffix: LocalizationValue;
+          };
+          step3: {
+            prefix: LocalizationValue;
+            bold: LocalizationValue;
+            suffix: LocalizationValue;
+          };
+          step4: {
+            prefix: LocalizationValue;
+            bold: LocalizationValue;
+            suffix: LocalizationValue;
+          };
+          step5: {
+            prefix: LocalizationValue;
+            bold: LocalizationValue;
+            suffix: LocalizationValue;
+          };
+        };
+        serviceProvider: {
+          title: LocalizationValue;
+          paragraph1: LocalizationValue;
+          paragraph2: LocalizationValue;
+          acsUrl: {
+            label: LocalizationValue;
+          };
+          spEntityId: {
+            label: LocalizationValue;
+          };
+        };
+        completeSamlIntegration: {
+          title: LocalizationValue;
+          step1: {
+            prefix: LocalizationValue;
+            bold: LocalizationValue;
+            suffix: LocalizationValue;
+          };
+          step2: {
+            prefix: LocalizationValue;
+            bold: LocalizationValue;
+            suffix: LocalizationValue;
+          };
+        };
+      };
       metadataUrl: {
         label: LocalizationValue;
         placeholder: LocalizationValue;

@@ -250,6 +250,62 @@ export const enUS: LocalizationResource = {
     configureStep: {
       title: 'Configure Okta Workforce',
       subtitle: 'Create a new enterprise application in your Okta Dashboard',
+      createApp: {
+        createApp: {
+          title: 'Create a new enterprise application in Okta',
+          step1: {
+            prefix: 'Sign in to Okta and go to ',
+            bold: 'Admin → Applications',
+            suffix: '.',
+          },
+          step2: {
+            prefix: 'Click ',
+            bold: 'Create App Integration',
+            suffix: '.',
+          },
+          step3: {
+            prefix: 'Select ',
+            bold: 'SAML 2.0',
+            suffix: '.',
+          },
+          step4: {
+            prefix: 'Fill in the ',
+            bold: 'General Settings',
+            suffix: ' (App name is required).',
+          },
+          step5: {
+            prefix: 'Click ',
+            bold: 'Next',
+            suffix: ' to complete creating the application.',
+          },
+        },
+        serviceProvider: {
+          title: 'Configure service provider',
+          paragraph1:
+            'Once you have moved forward from the General Settings instructions, you will be presented with the Configure SAML page.',
+          paragraph2:
+            'To configure your service provider (Clerk), you must add these two fields to your Okta application:',
+          acsUrl: {
+            label: 'Single sign-on URL',
+          },
+          spEntityId: {
+            label: 'Audience URI',
+          },
+        },
+        completeSamlIntegration: {
+          title: 'Complete SAML integration',
+          step1: {
+            prefix: 'Select ',
+            bold: 'This is an internal app that we have created',
+            suffix: ' from the options menu.',
+          },
+          step2: {
+            prefix: 'Complete the form with any comments and select ',
+            bold: '"Finish"',
+            suffix: '.',
+          },
+        },
+      },
       metadataUrl: {
         label: 'Metadata URL',
 <<<<<<< HEAD

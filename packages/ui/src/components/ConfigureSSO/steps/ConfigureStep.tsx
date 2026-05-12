@@ -1,4 +1,5 @@
-import { descriptors, Flow, localizationKeys, Text } from '@/customizables';
+import { Col, descriptors, Flow, Heading, type LocalizationKey, localizationKeys, Text } from '@/customizables';
+import { ClipboardInput } from '@/elements/ClipboardInput';
 import { useCardState } from '@/elements/contexts';
 import { Form } from '@/elements/Form';
 import { handleError } from '@/utils/errorHandler';
@@ -56,13 +57,163 @@ const InnerStepCounter = (): JSX.Element => {
   );
 };
 
+type InstructionStepKeys = {
+  prefix: LocalizationKey;
+  bold: LocalizationKey;
+  suffix: LocalizationKey;
+};
+
+const InstructionStep = ({ prefix, bold, suffix }: InstructionStepKeys): JSX.Element => (
+  <Text
+    as='li'
+    variant='body'
+    sx={theme => ({ color: theme.colors.$colorMutedForeground })}
+  >
+    <Text
+      as='span'
+      variant='body'
+      colorScheme='inherit'
+      localizationKey={prefix}
+    />
+    <Text
+      as='span'
+      variant='body'
+      colorScheme='inherit'
+      sx={theme => ({ fontWeight: theme.fontWeights.$semibold, color: theme.colors.$colorForeground })}
+      localizationKey={bold}
+    />
+    <Text
+      as='span'
+      variant='body'
+      colorScheme='inherit'
+      localizationKey={suffix}
+    />
+  </Text>
+);
+
 export const CreateAppSubStep = (): JSX.Element => {
   const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
+  const { enterpriseConnection } = useConfigureSSO();
+
+  const acsUrl = enterpriseConnection?.samlConnection?.acsUrl ?? '';
+  const spEntityId = enterpriseConnection?.samlConnection?.spEntityId ?? '';
 
   return (
     <>
-      <Step.Section fill>
-        <Text>UI goes here</Text>
+      <Step.Section
+        fill
+        sx={theme => ({ gap: theme.space.$6 })}
+      >
+        <Col sx={theme => ({ gap: theme.space.$3 })}>
+          <Heading
+            as='h3'
+            textVariant='h3'
+            localizationKey={localizationKeys('configureSSO.configureStep.createApp.createApp.title')}
+          />
+          <Col
+            as='ul'
+            sx={theme => ({
+              gap: theme.space.$1,
+              margin: 0,
+              paddingInlineStart: theme.space.$4,
+              listStyleType: 'disc',
+            })}
+          >
+            <InstructionStep
+              prefix={localizationKeys('configureSSO.configureStep.createApp.createApp.step1.prefix')}
+              bold={localizationKeys('configureSSO.configureStep.createApp.createApp.step1.bold')}
+              suffix={localizationKeys('configureSSO.configureStep.createApp.createApp.step1.suffix')}
+            />
+            <InstructionStep
+              prefix={localizationKeys('configureSSO.configureStep.createApp.createApp.step2.prefix')}
+              bold={localizationKeys('configureSSO.configureStep.createApp.createApp.step2.bold')}
+              suffix={localizationKeys('configureSSO.configureStep.createApp.createApp.step2.suffix')}
+            />
+            <InstructionStep
+              prefix={localizationKeys('configureSSO.configureStep.createApp.createApp.step3.prefix')}
+              bold={localizationKeys('configureSSO.configureStep.createApp.createApp.step3.bold')}
+              suffix={localizationKeys('configureSSO.configureStep.createApp.createApp.step3.suffix')}
+            />
+            <InstructionStep
+              prefix={localizationKeys('configureSSO.configureStep.createApp.createApp.step4.prefix')}
+              bold={localizationKeys('configureSSO.configureStep.createApp.createApp.step4.bold')}
+              suffix={localizationKeys('configureSSO.configureStep.createApp.createApp.step4.suffix')}
+            />
+            <InstructionStep
+              prefix={localizationKeys('configureSSO.configureStep.createApp.createApp.step5.prefix')}
+              bold={localizationKeys('configureSSO.configureStep.createApp.createApp.step5.bold')}
+              suffix={localizationKeys('configureSSO.configureStep.createApp.createApp.step5.suffix')}
+            />
+          </Col>
+        </Col>
+
+        <Col sx={theme => ({ gap: theme.space.$3 })}>
+          <Heading
+            as='h3'
+            textVariant='h3'
+            localizationKey={localizationKeys('configureSSO.configureStep.createApp.serviceProvider.title')}
+          />
+          <Text
+            as='p'
+            variant='body'
+            sx={theme => ({ color: theme.colors.$colorMutedForeground })}
+            localizationKey={localizationKeys('configureSSO.configureStep.createApp.serviceProvider.paragraph1')}
+          />
+          <Text
+            as='p'
+            variant='body'
+            sx={theme => ({ color: theme.colors.$colorMutedForeground })}
+            localizationKey={localizationKeys('configureSSO.configureStep.createApp.serviceProvider.paragraph2')}
+          />
+          <Col sx={theme => ({ gap: theme.space.$2 })}>
+            <Text
+              as='label'
+              variant='body'
+              sx={theme => ({ fontWeight: theme.fontWeights.$medium, color: theme.colors.$colorForeground })}
+              localizationKey={localizationKeys('configureSSO.configureStep.createApp.serviceProvider.acsUrl.label')}
+            />
+            <ClipboardInput value={acsUrl} />
+          </Col>
+          <Col sx={theme => ({ gap: theme.space.$2 })}>
+            <Text
+              as='label'
+              variant='body'
+              sx={theme => ({ fontWeight: theme.fontWeights.$medium, color: theme.colors.$colorForeground })}
+              localizationKey={localizationKeys(
+                'configureSSO.configureStep.createApp.serviceProvider.spEntityId.label',
+              )}
+            />
+            <ClipboardInput value={spEntityId} />
+          </Col>
+        </Col>
+
+        <Col sx={theme => ({ gap: theme.space.$3 })}>
+          <Heading
+            as='h3'
+            textVariant='h3'
+            localizationKey={localizationKeys('configureSSO.configureStep.createApp.completeSamlIntegration.title')}
+          />
+          <Col
+            as='ul'
+            sx={theme => ({
+              gap: theme.space.$1,
+              margin: 0,
+              paddingInlineStart: theme.space.$4,
+              listStyleType: 'disc',
+            })}
+          >
+            <InstructionStep
+              prefix={localizationKeys('configureSSO.configureStep.createApp.completeSamlIntegration.step1.prefix')}
+              bold={localizationKeys('configureSSO.configureStep.createApp.completeSamlIntegration.step1.bold')}
+              suffix={localizationKeys('configureSSO.configureStep.createApp.completeSamlIntegration.step1.suffix')}
+            />
+            <InstructionStep
+              prefix={localizationKeys('configureSSO.configureStep.createApp.completeSamlIntegration.step2.prefix')}
+              bold={localizationKeys('configureSSO.configureStep.createApp.completeSamlIntegration.step2.bold')}
+              suffix={localizationKeys('configureSSO.configureStep.createApp.completeSamlIntegration.step2.suffix')}
+            />
+          </Col>
+        </Col>
       </Step.Section>
 
       <Step.Footer>
