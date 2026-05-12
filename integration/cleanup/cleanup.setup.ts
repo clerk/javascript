@@ -7,8 +7,8 @@ import { test as setup } from '@playwright/test';
 import { appConfigs } from '../presets/';
 
 setup('cleanup instances ', async () => {
-  const entries = Array.from(appConfigs.secrets.instanceKeys.values())
-    .map(({ pk, sk }) => {
+  const entries = Array.from(appConfigs.secrets.instanceKeys.entries())
+    .map(([keyName, { pk, sk }]) => {
       const secretKey = sk;
       if (!secretKey) {
         return null;
@@ -16,6 +16,7 @@ setup('cleanup instances ', async () => {
       const parsedPk = parsePublishableKey(pk);
       const apiUrl = isStaging(parsedPk.frontendApi) ? 'https://api.clerkstage.dev' : 'https://api.clerk.com';
       return {
+        keyName,
         secretKey,
         apiUrl,
         instanceName: parsedPk.instanceId || parsedPk.frontendApi.split('.')[0] || 'unknown',
@@ -24,6 +25,7 @@ setup('cleanup instances ', async () => {
     .filter(Boolean);
 
   const cleanupSummary: Array<{
+    keyName: string;
     instanceName: string;
     usersDeleted: number;
     orgsDeleted: number;
@@ -35,6 +37,7 @@ setup('cleanup instances ', async () => {
 
   for (const entry of entries) {
     const instanceSummary = {
+      keyName: entry.keyName,
       instanceName: entry.instanceName,
       usersDeleted: 0,
       orgsDeleted: 0,
@@ -45,27 +48,24 @@ setup('cleanup instances ', async () => {
     try {
       const clerkClient = createClerkClient({ secretKey: entry.secretKey, apiUrl: entry.apiUrl });
 
-      // Get users with error handling
+      // Fetch test users with broad queries, then filter strictly by test-domain
+      // email or test-phone marker. The previous `clerkcookie` query missed users
+      // from the older `test+clerk_test_<hash>@example.com` pattern, letting a
+      // backlog accumulate indefinitely. Broadening the fetch to `clerk_test`
+      // also matches some real team accounts (e.g. fredrik+debugging-clerk_test
+      // @clerk.dev), so deletion is gated by a strict domain/phone whitelist.
       let users: any[] = [];
       try {
-        const { data: usersWithEmail } = await clerkClient.users.getUserList({
-          orderBy: '-created_at',
-          query: 'clerkcookie',
-          limit: 150,
-        });
-
-        const { data: usersWithPhoneNumber } = await clerkClient.users.getUserList({
-          orderBy: '-created_at',
-          query: '55501',
-          limit: 150,
-        });
+        const usersWithClerkCookie = await fetchAllUsers(clerkClient, { query: 'clerkcookie' });
+        const usersWithClerkTest = await fetchAllUsers(clerkClient, { query: 'clerk_test' });
+        const usersWithPhoneNumber = await fetchAllUsers(clerkClient, { query: '55501' });
 
         // Deduplicate users by ID
         const allUsersMap = new Map();
-        [...usersWithEmail, ...usersWithPhoneNumber].forEach(user => {
+        [...usersWithClerkCookie, ...usersWithClerkTest, ...usersWithPhoneNumber].forEach(user => {
           allUsersMap.set(user.id, user);
         });
-        users = Array.from(allUsersMap.values());
+        users = Array.from(allUsersMap.values()).filter(isTestUser);
       } catch (error) {
         instanceSummary.errors.push(`Failed to get users: ${error.message}`);
         console.error(`Error getting users for ${entry.instanceName}:`, error);
@@ -146,10 +146,10 @@ setup('cleanup instances ', async () => {
       const maskedKey = entry.secretKey.replace(/(sk_(test|live)_)(.+)(...)/, '$1***$4');
       if (instanceSummary.usersDeleted > 0 || instanceSummary.orgsDeleted > 0) {
         console.log(
-          `✅ ${entry.instanceName} (${maskedKey}): ${instanceSummary.usersDeleted} users, ${instanceSummary.orgsDeleted} orgs deleted`,
+          `✅ ${entry.keyName} / ${entry.instanceName} (${maskedKey}): ${instanceSummary.usersDeleted} users, ${instanceSummary.orgsDeleted} orgs deleted`,
         );
       } else {
-        console.log(`✅ ${entry.instanceName} (${maskedKey}): clean`);
+        console.log(`✅ ${entry.keyName} / ${entry.instanceName} (${maskedKey}): clean`);
       }
 
       if (instanceSummary.errors.length > 0) {
@@ -158,10 +158,10 @@ setup('cleanup instances ', async () => {
     } catch (error) {
       const maskedKey = entry.secretKey.replace(/(sk_(test|live)_)(.+)(...)/, '$1***$4');
       if (isClerkAPIResponseError(error) && (error.status === 401 || error.status === 403)) {
-        console.log(`🔒 ${entry.instanceName} (${maskedKey}): Unauthorized access`);
+        console.log(`🔒 ${entry.keyName} / ${entry.instanceName} (${maskedKey}): Unauthorized access`);
         instanceSummary.status = 'unauthorized';
       } else {
-        console.log(`❌ ${entry.instanceName} (${maskedKey}): ${error.message}`);
+        console.log(`❌ ${entry.keyName} / ${entry.instanceName} (${maskedKey}): ${error.message}`);
         instanceSummary.errors.push(error.message);
         instanceSummary.status = 'error';
       }
@@ -186,7 +186,7 @@ setup('cleanup instances ', async () => {
   if (instancesWithErrors.length > 0) {
     console.log('\n=== DETAILED ERROR REPORT ===');
     instancesWithErrors.forEach(instance => {
-      console.log(`\n${instance.instanceName}:`);
+      console.log(`\n${instance.keyName} / ${instance.instanceName}:`);
       instance.errors.forEach(error => console.log(`  - ${error}`));
     });
   }
@@ -207,4 +207,39 @@ function batchElements<T>(objects: T[], batchSize = 5): T[][] {
     batches.push(objects.slice(i, i + batchSize));
   }
   return batches;
+}
+
+const PAGE_SIZE = 500;
+const MAX_PAGES = 50;
+
+const TEST_EMAIL_DOMAINS = new Set(['clerkcookie.com', 'example.com', 'mailsac.com']);
+const TEST_PHONE_PATTERN = /55501\d{2}$/;
+
+function isTestUser(user: any): boolean {
+  const emails: string[] = (user.emailAddresses ?? []).map((e: any) => e.emailAddress ?? '');
+  for (const email of emails) {
+    const domain = email.split('@')[1]?.toLowerCase();
+    if (domain && TEST_EMAIL_DOMAINS.has(domain)) return true;
+  }
+  const phones: string[] = (user.phoneNumbers ?? []).map((p: any) => p.phoneNumber ?? '');
+  if (phones.some(p => TEST_PHONE_PATTERN.test(p))) return true;
+  return false;
+}
+
+async function fetchAllUsers(
+  clerkClient: ReturnType<typeof createClerkClient>,
+  filter: { query: string },
+): Promise<any[]> {
+  const collected: any[] = [];
+  for (let page = 0; page < MAX_PAGES; page++) {
+    const { data } = await clerkClient.users.getUserList({
+      orderBy: '+created_at',
+      query: filter.query,
+      limit: PAGE_SIZE,
+      offset: page * PAGE_SIZE,
+    });
+    collected.push(...data);
+    if (data.length < PAGE_SIZE) break;
+  }
+  return collected;
 }
