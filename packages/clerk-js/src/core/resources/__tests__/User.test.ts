@@ -745,18 +745,20 @@ describe('User', () => {
     });
   });
 
-  it('.updateMetadata omits unsafe_metadata when not provided', async () => {
+  it('.updateMetadata sends an explicit null patch when a key is being removed', async () => {
     // @ts-ignore
     BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: {} }));
 
     const user = new User({} as unknown as UserJSON);
-    await user.updateMetadata({});
+    await user.updateMetadata({ unsafeMetadata: { theme: null as unknown as undefined } });
 
     // @ts-ignore
     expect(BaseResource._fetch).toHaveBeenCalledWith({
       method: 'PATCH',
       path: '/me/metadata',
-      body: {},
+      body: {
+        unsafeMetadata: JSON.stringify({ theme: null }),
+      },
     });
   });
 });

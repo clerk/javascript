@@ -190,12 +190,12 @@ export type UpdateUserParams = Partial<SnakeToCamel<UpdateUserJSON>>;
 
 /**
  * Parameters for {@link UserResource.updateMetadata}. Only `unsafeMetadata`
- * is end-user-writable on the Frontend API. The submitted value is deep-merged
- * with the existing `unsafeMetadata`; keys at any level whose value is `null`
- * are removed.
+ * is end-user-writable on the Frontend API and the field is required: the
+ * submitted value is deep-merged with the existing `unsafeMetadata`, and keys
+ * at any level whose value is `null` are removed.
  */
 export type UpdateUserMetadataParams = {
-  unsafeMetadata?: UserUnsafeMetadata;
+  unsafeMetadata: UserUnsafeMetadata;
 };
 
 export type UpdateUserPasswordParams = {
