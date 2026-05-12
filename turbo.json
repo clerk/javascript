@@ -40,12 +40,15 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": [
+        "package.json",
         "*.d.ts",
         "bundlewatch.config.json",
         "src/**",
         "tsconfig.json",
         "tsconfig.build.json",
         "tsconfig.declarations.json",
+        "tsdown.config.mts",
+        "tsdown.config.ts",
         "tsup.config.ts",
         "subpaths.mjs",
         "!**/*.test.*",
@@ -85,6 +88,7 @@
       "inputs": [
         "$TURBO_DEFAULT$",
         "$TURBO_ROOT$/jest.*.ts",
+        "package.json",
         "*.d.ts",
         "bundlewatch.config.json",
         "jest.*",
@@ -92,6 +96,8 @@
         "tests/**",
         "tsconfig.json",
         "tsconfig.*.json",
+        "tsdown.config.mts",
+        "tsdown.config.ts",
         "tsup.config.ts",
         "!**/__snapshots__/**",
         "!CHANGELOG.md",

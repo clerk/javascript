@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 import { parse as parseYaml } from 'yaml';
-import { defineConfig } from 'tsdown';
+import { defineConfig, type Options } from 'tsdown';
 
 import clerkJsPkgJson from '../clerk-js/package.json' with { type: 'json' };
 import pkgJson from './package.json' with { type: 'json' };
@@ -52,7 +52,7 @@ function getClerkUISupportedReactBounds(): VersionBounds[] {
   return bounds;
 }
 
-export default defineConfig(overrideOptions => {
+export default defineConfig((overrideOptions: Options) => {
   const isWatch = !!overrideOptions.watch;
   const shouldPublish = !!overrideOptions.env?.publish;
   const clerkUISupportedReactBounds = getClerkUISupportedReactBounds();

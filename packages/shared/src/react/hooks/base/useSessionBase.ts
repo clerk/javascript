@@ -1,7 +1,7 @@
 import { useCallback, useSyncExternalStore } from 'react';
 
-import { deriveFromSsrInitialState } from '@/deriveState';
-import type { SignedInSessionResource } from '@/types';
+import { deriveFromSsrInitialState } from '../../../deriveState';
+import type { SignedInSessionResource } from '../../../types';
 
 import { useClerkInstanceContext, useInitialStateContext } from '../../contexts';
 

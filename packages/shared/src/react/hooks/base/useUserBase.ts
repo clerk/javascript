@@ -1,6 +1,6 @@
 import { useCallback, useSyncExternalStore } from 'react';
 
-import type { UserResource } from '@/types';
+import type { UserResource } from '../../../types';
 
 import { useClerkInstanceContext, useInitialStateContext } from '../../contexts';
 

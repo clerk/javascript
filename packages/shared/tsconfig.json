@@ -21,10 +21,7 @@
     "emitDeclarationOnly": true,
     "declaration": true,
     "declarationMap": true,
-    "allowJs": true,
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+    "allowJs": true
   },
   "exclude": ["node_modules"],
   "include": ["src", "global.d.ts"]

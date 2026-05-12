@@ -29,8 +29,8 @@
         "default": "./dist/index.mjs"
       },
       "require": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
       }
     },
     "./internal": {
@@ -39,8 +39,8 @@
         "default": "./dist/internal.mjs"
       },
       "require": {
-        "types": "./dist/internal.d.ts",
-        "default": "./dist/internal.js"
+        "types": "./dist/internal.d.cts",
+        "default": "./dist/internal.cjs"
       }
     },
     "./errors": {
@@ -49,8 +49,8 @@
         "default": "./dist/errors.mjs"
       },
       "require": {
-        "types": "./dist/errors.d.ts",
-        "default": "./dist/errors.js"
+        "types": "./dist/errors.d.cts",
+        "default": "./dist/errors.cjs"
       }
     },
     "./experimental": {
@@ -59,8 +59,8 @@
         "default": "./dist/experimental.mjs"
       },
       "require": {
-        "types": "./dist/experimental.d.ts",
-        "default": "./dist/experimental.js"
+        "types": "./dist/experimental.d.cts",
+        "default": "./dist/experimental.cjs"
       }
     },
     "./legacy": {
@@ -69,8 +69,8 @@
         "default": "./dist/legacy.mjs"
       },
       "require": {
-        "types": "./dist/legacy.d.ts",
-        "default": "./dist/legacy.js"
+        "types": "./dist/legacy.d.cts",
+        "default": "./dist/legacy.cjs"
       }
     },
     "./types": {
@@ -78,12 +78,12 @@
         "types": "./dist/types.d.mts"
       },
       "require": {
-        "types": "./dist/types.d.ts"
+        "types": "./dist/types.d.cts"
       }
     },
     "./package.json": "./package.json"
   },
-  "main": "./dist/index.js",
+  "main": "./dist/index.cjs",
   "files": [
     "dist"
   ],

@@ -1,6 +1,6 @@
 import type { SolanaWalletAdapterWallet } from '@solana/wallet-standard';
 
-import { buildErrorThrower, ClerkRuntimeError } from '@/error';
+import { buildErrorThrower, ClerkRuntimeError } from '../../error';
 
 import type { ModuleManager } from '../../moduleManager';
 import type { GenerateSignature, Web3Provider } from '../../types';

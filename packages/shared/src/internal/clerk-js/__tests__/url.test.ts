@@ -1,7 +1,7 @@
 import { afterAll, beforeEach, describe, expect, it, test, vi } from 'vitest';
 
-import { logger } from '@/logger';
-import type { SignUpResource } from '@/types';
+import { logger } from '../../../logger';
+import type { SignUpResource } from '../../../types';
 
 import {
   buildURL,

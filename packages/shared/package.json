@@ -12,97 +12,97 @@
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/runtime/index.d.mts",
-        "default": "./dist/runtime/index.mjs"
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.mjs"
       },
       "require": {
-        "types": "./dist/runtime/index.d.ts",
-        "default": "./dist/runtime/index.js"
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
       }
     },
     "./internal/clerk-js/*": {
       "import": {
-        "types": "./dist/runtime/internal/clerk-js/*.d.mts",
-        "default": "./dist/runtime/internal/clerk-js/*.mjs"
+        "types": "./dist/internal/clerk-js/*.d.ts",
+        "default": "./dist/internal/clerk-js/*.mjs"
       },
       "require": {
-        "types": "./dist/runtime/internal/clerk-js/*.d.ts",
-        "default": "./dist/runtime/internal/clerk-js/*.js"
+        "types": "./dist/internal/clerk-js/*.d.ts",
+        "default": "./dist/internal/clerk-js/*.js"
       }
     },
     "./*": {
       "import": {
-        "types": "./dist/runtime/*.d.mts",
-        "default": "./dist/runtime/*.mjs"
+        "types": "./dist/*.d.ts",
+        "default": "./dist/*.mjs"
       },
       "require": {
-        "types": "./dist/runtime/*.d.ts",
-        "default": "./dist/runtime/*.js"
+        "types": "./dist/*.d.ts",
+        "default": "./dist/*.js"
       }
     },
     "./react": {
       "import": {
-        "types": "./dist/runtime/react/index.d.mts",
-        "default": "./dist/runtime/react/index.mjs"
+        "types": "./dist/react/index.d.ts",
+        "default": "./dist/react/index.mjs"
       },
       "require": {
-        "types": "./dist/runtime/react/index.d.ts",
-        "default": "./dist/runtime/react/index.js"
+        "types": "./dist/react/index.d.ts",
+        "default": "./dist/react/index.js"
       }
     },
     "./keyless": {
       "import": {
-        "types": "./dist/runtime/keyless/index.d.mts",
-        "default": "./dist/runtime/keyless/index.mjs"
+        "types": "./dist/keyless/index.d.ts",
+        "default": "./dist/keyless/index.mjs"
       },
       "require": {
-        "types": "./dist/runtime/keyless/index.d.ts",
-        "default": "./dist/runtime/keyless/index.js"
+        "types": "./dist/keyless/index.d.ts",
+        "default": "./dist/keyless/index.js"
       }
     },
     "./utils": {
       "import": {
-        "types": "./dist/runtime/utils/index.d.mts",
-        "default": "./dist/runtime/utils/index.mjs"
+        "types": "./dist/utils/index.d.ts",
+        "default": "./dist/utils/index.mjs"
       },
       "require": {
-        "types": "./dist/runtime/utils/index.d.ts",
-        "default": "./dist/runtime/utils/index.js"
+        "types": "./dist/utils/index.d.ts",
+        "default": "./dist/utils/index.js"
       }
     },
     "./workerTimers": {
       "import": {
-        "types": "./dist/runtime/workerTimers/index.d.mts",
-        "default": "./dist/runtime/workerTimers/index.mjs"
+        "types": "./dist/workerTimers/index.d.ts",
+        "default": "./dist/workerTimers/index.mjs"
       },
       "require": {
-        "types": "./dist/runtime/workerTimers/index.d.ts",
-        "default": "./dist/runtime/workerTimers/index.js"
+        "types": "./dist/workerTimers/index.d.ts",
+        "default": "./dist/workerTimers/index.js"
       }
     },
     "./dom": {
       "import": {
-        "types": "./dist/runtime/dom/index.d.mts",
-        "default": "./dist/runtime/dom/index.mjs"
+        "types": "./dist/dom/index.d.ts",
+        "default": "./dist/dom/index.mjs"
       },
       "require": {
-        "types": "./dist/runtime/dom/index.d.ts",
-        "default": "./dist/runtime/dom/index.js"
+        "types": "./dist/dom/index.d.ts",
+        "default": "./dist/dom/index.js"
       }
     },
     "./ui": {
       "import": {
-        "types": "./dist/runtime/ui/index.d.mts",
-        "default": "./dist/runtime/ui/index.mjs"
+        "types": "./dist/ui/index.d.ts",
+        "default": "./dist/ui/index.mjs"
       },
       "require": {
-        "types": "./dist/runtime/ui/index.d.ts",
-        "default": "./dist/runtime/ui/index.js"
+        "types": "./dist/ui/index.d.ts",
+        "default": "./dist/ui/index.js"
       }
     },
     "./types": {
       "import": {
-        "types": "./dist/types/index.d.mts",
+        "types": "./dist/types/index.d.ts",
         "default": "./dist/types/index.mjs"
       },
       "require": {
@@ -112,20 +112,13 @@
     },
     "./package.json": "./package.json"
   },
-  "typesVersions": {
-    "*": {
-      "types": [
-        "dist/types/index.d.ts"
-      ]
-    }
-  },
   "files": [
     "dist",
     "scripts"
   ],
   "scripts": {
-    "build": "tsdown",
-    "build:declarations": "tsc -p tsconfig.json",
+    "build": "tsdown && pnpm build:declarations",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
     "dev": "tsdown --watch src",
     "dev:pub": "pnpm dev -- --env.publish",
