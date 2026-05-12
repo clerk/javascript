@@ -61,11 +61,7 @@ export const CreateAppSubStep = (): JSX.Element => {
 
   return (
     <>
-      <Step.Section
-        sx={{ flex: 1 }}
-        align='center'
-        justify='center'
-      >
+      <Step.Section sx={{ flex: 1 }}>
         <Text>UI goes here</Text>
       </Step.Section>
 
@@ -88,11 +84,7 @@ export const ConfigureAttributesSubStep = (): JSX.Element => {
 
   return (
     <>
-      <Step.Section
-        sx={{ flex: 1 }}
-        align='center'
-        justify='center'
-      >
+      <Step.Section sx={{ flex: 1 }}>
         <Text>UI goes here</Text>
       </Step.Section>
 
@@ -115,11 +107,7 @@ export const AssignUsersSubStep = (): JSX.Element => {
 
   return (
     <>
-      <Step.Section
-        sx={{ flex: 1 }}
-        align='center'
-        justify='center'
-      >
+      <Step.Section sx={{ flex: 1 }}>
         <Text>UI goes here</Text>
       </Step.Section>
 
@@ -172,7 +160,7 @@ export const SubmitSamlConfigSubStep = (): JSX.Element => {
 
   return (
     <>
-      <Step.Section sx={theme => ({ gap: theme.space.$5 })}>
+      <Step.Section sx={theme => ({ flex: 1, gap: theme.space.$5 })}>
         <Text
           as='p'
           variant='body'
