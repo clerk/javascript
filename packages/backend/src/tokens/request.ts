@@ -21,31 +21,16 @@ import {
   isOAuthTokenByPrefix,
   isTokenTypeAccepted,
 } from './machine';
-import { checkOAuthTokenRateLimit } from './oauthTokenRateLimiter';
+import {
+  isOAuthTokenCachedAsInvalid,
+  maybeCacheOAuthTokenAsInvalid,
+  makeCachedInvalidOAuthTokenError,
+} from './oauthNegativeCache';
 import { OrganizationMatcher } from './organizationMatcher';
 import type { MachineTokenType, SessionTokenType } from './tokenTypes';
 import { TokenType } from './tokenTypes';
 import type { AuthenticateRequestOptions } from './types';
 import { verifyMachineAuthToken, verifyToken } from './verify';
-
-// NOTE: IP headers like x-forwarded-for can be spoofed by clients not behind a trusted proxy.
-// cf-connecting-ip (set by Cloudflare) and x-real-ip (set by Nginx) are more reliable when present.
-// The rate limiter is defense-in-depth against BAPI quota exhaustion, not a security boundary.
-function extractCallerIp(request: Request): string {
-  const cfConnectingIp = request.headers.get(constants.Headers.CfConnectingIp);
-  if (cfConnectingIp) {
-    return cfConnectingIp;
-  }
-  const xRealIp = request.headers.get(constants.Headers.RealIp);
-  if (xRealIp) {
-    return xRealIp;
-  }
-  const xForwardedFor = request.headers.get(constants.Headers.ForwardedFor);
-  if (xForwardedFor) {
-    return xForwardedFor.split(',')[0]?.trim() ?? 'unknown';
-  }
-  return 'unknown';
-}
 
 export const RefreshTokenErrorReason = {
   NonEligibleNoCookie: 'non-eligible-no-refresh-cookie',
@@ -821,17 +806,13 @@ export const authenticateRequest: AuthenticateRequest = (async (
       return mismatchState;
     }
 
-    if (isOAuthTokenByPrefix(tokenInHeader) && !checkOAuthTokenRateLimit(extractCallerIp(request))) {
-      return signedOut({
-        tokenType: parsedTokenType,
-        authenticateContext,
-        reason: AuthErrorReason.OAuthTokenRateLimit,
-        message: '',
-      });
+    if (isOAuthTokenByPrefix(tokenInHeader) && isOAuthTokenCachedAsInvalid(tokenInHeader)) {
+      return handleMachineError(parsedTokenType, makeCachedInvalidOAuthTokenError());
     }
 
     const { data, tokenType, errors } = await verifyMachineAuthToken(tokenInHeader, authenticateContext);
     if (errors) {
+      maybeCacheOAuthTokenAsInvalid(errors[0], tokenInHeader);
       return handleMachineError(tokenType, errors[0]);
     }
     return signedIn({
@@ -857,17 +838,13 @@ export const authenticateRequest: AuthenticateRequest = (async (
         return mismatchState;
       }
 
-      if (isOAuthTokenByPrefix(tokenInHeader) && !checkOAuthTokenRateLimit(extractCallerIp(request))) {
-        return signedOut({
-          tokenType: parsedTokenType,
-          authenticateContext,
-          reason: AuthErrorReason.OAuthTokenRateLimit,
-          message: '',
-        });
+      if (isOAuthTokenByPrefix(tokenInHeader) && isOAuthTokenCachedAsInvalid(tokenInHeader)) {
+        return handleMachineError(parsedTokenType, makeCachedInvalidOAuthTokenError());
       }
 
       const { data, tokenType, errors } = await verifyMachineAuthToken(tokenInHeader, authenticateContext);
       if (errors) {
+        maybeCacheOAuthTokenAsInvalid(errors[0], tokenInHeader);
         return handleMachineError(tokenType, errors[0]);
       }
 

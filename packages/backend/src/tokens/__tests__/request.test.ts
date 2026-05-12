@@ -2,14 +2,13 @@ import { http, HttpResponse } from 'msw';
 import { afterEach, beforeEach, describe, expect, it, test, vi } from 'vitest';
 
 import { MachineTokenVerificationErrorCode, TokenVerificationErrorReason } from '../../errors';
-import { checkOAuthTokenRateLimit, resetOAuthTokenRateLimiter } from '../oauthTokenRateLimiter';
+import { isOAuthTokenCachedAsInvalid, resetOAuthNegativeCache } from '../oauthNegativeCache';
 import {
   mockExpiredJwt,
   mockInvalidSignatureJwt,
   mockJwks,
   mockJwt,
   mockJwtPayload,
-  mockM2MJwtPayload,
   signingJwks,
 } from '../../fixtures';
 import {
@@ -1454,6 +1453,7 @@ describe('tokens.authenticateRequest(options)', () => {
   describe('Machine authentication', () => {
     afterEach(() => {
       vi.clearAllMocks();
+      resetOAuthNegativeCache();
     });
 
     // Test each token type with parameterized tests
@@ -1764,191 +1764,105 @@ describe('tokens.authenticateRequest(options)', () => {
       });
     });
 
-    describe('Rate limiting', () => {
+    describe('OAuth negative cache', () => {
       afterEach(() => {
-        resetOAuthTokenRateLimiter();
+        resetOAuthNegativeCache();
       });
 
-      const exhaustBucket = (ip: string) => {
-        for (let i = 0; i < 20; i++) {
-          checkOAuthTokenRateLimit(ip);
-        }
-      };
+      test('rejects a previously invalid oat_ token from cache without calling BAPI again', async () => {
+        server.use(
+          http.post(mockMachineAuthResponses.oauth_token.endpoint, () => HttpResponse.json({}, { status: 404 })),
+        );
+        const token = 'oat_invalid_garbage_token';
+        await authenticateRequest(
+          mockRequest({ authorization: `Bearer ${token}` }),
+          mockOptions({ acceptsToken: 'oauth_token' }),
+        );
 
-      test('blocks machine token request when IP exceeds burst limit', async () => {
+        // BAPI now returns 200, but the token should still be rejected from cache
         server.use(
           http.post(mockMachineAuthResponses.oauth_token.endpoint, () =>
             HttpResponse.json(mockVerificationResults.oauth_token),
           ),
         );
-        const ip = '203.0.113.1';
-        exhaustBucket(ip);
-        const rateLimited = await authenticateRequest(
-          mockRequest({ authorization: `Bearer ${mockTokens.oauth_token}`, 'cf-connecting-ip': ip }),
+        const second = await authenticateRequest(
+          mockRequest({ authorization: `Bearer ${token}` }),
           mockOptions({ acceptsToken: 'oauth_token' }),
         );
-        expect(rateLimited).toBeMachineUnauthenticated({
+        expect(second).toBeMachineUnauthenticated({
           tokenType: 'oauth_token',
-          reason: AuthErrorReason.OAuthTokenRateLimit,
-          message: '',
+          reason: MachineTokenVerificationErrorCode.TokenInvalid,
+          message: 'OAuth token not found (code=token-invalid, status=404)',
         });
       });
 
-      test('prefers cf-connecting-ip over x-forwarded-for for rate limit key', async () => {
+      test('does not cache valid oat_ tokens', async () => {
         server.use(
           http.post(mockMachineAuthResponses.oauth_token.endpoint, () =>
             HttpResponse.json(mockVerificationResults.oauth_token),
           ),
         );
-        const cfIp = '10.0.0.1';
-        exhaustBucket(cfIp);
-        // cf-connecting-ip is exhausted; x-forwarded-for is a different IP and has full bucket
-        const rateLimited = await authenticateRequest(
-          mockRequest({
-            authorization: `Bearer ${mockTokens.oauth_token}`,
-            'cf-connecting-ip': cfIp,
-            'x-forwarded-for': '99.99.99.99',
-          }),
+        await authenticateRequest(
+          mockRequest({ authorization: `Bearer ${mockTokens.oauth_token}` }),
           mockOptions({ acceptsToken: 'oauth_token' }),
         );
-        expect(rateLimited).toBeMachineUnauthenticated({
-          tokenType: 'oauth_token',
-          reason: AuthErrorReason.OAuthTokenRateLimit,
-          message: '',
-        });
-        // x-forwarded-for IP is untouched: a request using only that header must be allowed
-        const allowed = await authenticateRequest(
-          mockRequest({
-            authorization: `Bearer ${mockTokens.oauth_token}`,
-            'x-forwarded-for': '99.99.99.99',
-          }),
-          mockOptions({ acceptsToken: 'oauth_token' }),
-        );
-        expect(allowed).toBeMachineAuthenticated();
+        expect(isOAuthTokenCachedAsInvalid(mockTokens.oauth_token)).toBe(false);
       });
 
-      test('falls back to x-real-ip when cf-connecting-ip is absent', async () => {
+      test('does not cache oat_ tokens that fail with non-TokenInvalid errors', async () => {
+        // 401 maps to InvalidSecretKey, not TokenInvalid
         server.use(
-          http.post(mockMachineAuthResponses.oauth_token.endpoint, () =>
-            HttpResponse.json(mockVerificationResults.oauth_token),
-          ),
+          http.post(mockMachineAuthResponses.oauth_token.endpoint, () => HttpResponse.json({}, { status: 401 })),
         );
-        const realIp = '192.168.10.20';
-        exhaustBucket(realIp);
-        const rateLimited = await authenticateRequest(
-          mockRequest({ authorization: `Bearer ${mockTokens.oauth_token}`, 'x-real-ip': realIp }),
+        const token = 'oat_secret_key_error_token';
+        await authenticateRequest(
+          mockRequest({ authorization: `Bearer ${token}` }),
           mockOptions({ acceptsToken: 'oauth_token' }),
         );
-        expect(rateLimited).toBeMachineUnauthenticated({
-          tokenType: 'oauth_token',
-          reason: AuthErrorReason.OAuthTokenRateLimit,
-          message: '',
-        });
+        expect(isOAuthTokenCachedAsInvalid(token)).toBe(false);
       });
 
-      test('falls back to first value in x-forwarded-for when higher-priority headers are absent', async () => {
-        server.use(
-          http.post(mockMachineAuthResponses.oauth_token.endpoint, () =>
-            HttpResponse.json(mockVerificationResults.oauth_token),
-          ),
-        );
-        const ip = '172.16.5.5';
-        exhaustBucket(ip);
-        const rateLimited = await authenticateRequest(
-          mockRequest({
-            authorization: `Bearer ${mockTokens.oauth_token}`,
-            'x-forwarded-for': `${ip}, 10.0.0.2`,
-          }),
-          mockOptions({ acceptsToken: 'oauth_token' }),
-        );
-        expect(rateLimited).toBeMachineUnauthenticated({
-          tokenType: 'oauth_token',
-          reason: AuthErrorReason.OAuthTokenRateLimit,
-          message: '',
-        });
-      });
-
-      test('session token path is not rate-limited', async () => {
-        server.use(http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)));
-        // Exhaust the 'unknown' sentinel bucket (no IP headers on mockRequestWithHeaderAuth)
-        exhaustBucket('unknown');
-        const result = await authenticateRequest(mockRequestWithHeaderAuth(), mockOptions());
-        expect(result).toBeSignedIn();
-      });
-
-      test('OAuth JWT tokens bypass the rate limiter', async () => {
+      test('re-verifies token after cache TTL expires', async () => {
         vi.useFakeTimers();
-        vi.setSystemTime(new Date(mockJwtPayload.iat * 1000));
-        server.use(http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)));
-        const ip = '203.0.113.2';
-        exhaustBucket(ip);
-        const { data: oauthJwt } = await signJwt(
-          {
-            iss: 'https://clerk.oauth.example.test',
-            sub: 'user_2vYVtestTESTtestTESTtestTESTtest',
-            client_id: 'client_2VTWUzvGC5UhdJCNx6xG1D98edc',
-            scope: 'read:foo',
-            exp: mockJwtPayload.iat + 300,
-            iat: mockJwtPayload.iat,
-            nbf: mockJwtPayload.iat - 10,
-          },
-          signingJwks,
-          { algorithm: 'RS256', header: { typ: 'at+jwt', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD' } },
+        server.use(
+          http.post(mockMachineAuthResponses.oauth_token.endpoint, () => HttpResponse.json({}, { status: 404 })),
         );
-        const result = await authenticateRequest(
-          mockRequest({ authorization: `Bearer ${oauthJwt}`, 'cf-connecting-ip': ip }),
+        const token = 'oat_will_expire_from_cache';
+        await authenticateRequest(
+          mockRequest({ authorization: `Bearer ${token}` }),
           mockOptions({ acceptsToken: 'oauth_token' }),
         );
-        expect(result.reason).not.toBe(AuthErrorReason.OAuthTokenRateLimit);
+        expect(isOAuthTokenCachedAsInvalid(token)).toBe(true);
+
+        vi.advanceTimersByTime(30_001);
+        expect(isOAuthTokenCachedAsInvalid(token)).toBe(false);
         vi.useRealTimers();
       });
 
-      test('M2M JWT tokens bypass the rate limiter', async () => {
-        vi.useFakeTimers();
-        vi.setSystemTime(new Date(mockJwtPayload.iat * 1000));
-        server.use(http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)));
-        const ip = '203.0.113.3';
-        exhaustBucket(ip);
-        const { data: m2mJwt } = await signJwt(mockM2MJwtPayload, signingJwks, {
-          algorithm: 'RS256',
-          header: { typ: 'JWT', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD' },
-        });
-        const result = await authenticateRequest(
-          mockRequest({ authorization: `Bearer ${m2mJwt}`, 'cf-connecting-ip': ip }),
-          mockOptions({ acceptsToken: 'm2m_token' }),
-        );
-        expect(result.reason).not.toBe(AuthErrorReason.OAuthTokenRateLimit);
-        vi.useRealTimers();
-      });
-
-      test('opaque api_key tokens bypass the rate limiter', async () => {
+      test('ak_ tokens are not affected by the cache', async () => {
         server.use(
           http.post(mockMachineAuthResponses.api_key.endpoint, () =>
             HttpResponse.json(mockVerificationResults.api_key),
           ),
         );
-        const ip = '203.0.113.4';
-        exhaustBucket(ip);
         const result = await authenticateRequest(
-          mockRequest({ authorization: `Bearer ${mockTokens.api_key}`, 'cf-connecting-ip': ip }),
+          mockRequest({ authorization: `Bearer ${mockTokens.api_key}` }),
           mockOptions({ acceptsToken: 'api_key' }),
         );
-        expect(result.reason).not.toBe(AuthErrorReason.OAuthTokenRateLimit);
+        expect(result).toBeMachineAuthenticated();
       });
 
-      test('opaque m2m tokens bypass the rate limiter', async () => {
+      test('mt_ tokens are not affected by the cache', async () => {
         server.use(
           http.post(mockMachineAuthResponses.m2m_token.endpoint, () =>
             HttpResponse.json(mockVerificationResults.m2m_token),
           ),
         );
-        const ip = '203.0.113.5';
-        exhaustBucket(ip);
         const result = await authenticateRequest(
-          mockRequest({ authorization: `Bearer ${mockTokens.m2m_token}`, 'cf-connecting-ip': ip }),
+          mockRequest({ authorization: `Bearer ${mockTokens.m2m_token}` }),
           mockOptions({ acceptsToken: 'm2m_token' }),
         );
-        expect(result.reason).not.toBe(AuthErrorReason.OAuthTokenRateLimit);
+        expect(result).toBeMachineAuthenticated();
       });
     });
 

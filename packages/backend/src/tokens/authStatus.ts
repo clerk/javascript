@@ -118,7 +118,6 @@ export const AuthErrorReason = {
   SessionTokenWithoutClientUAT: 'session-token-but-no-client-uat',
   ActiveOrganizationMismatch: 'active-organization-mismatch',
   TokenTypeMismatch: 'token-type-mismatch',
-  OAuthTokenRateLimit: 'oauth-token-rate-limit',
   UnexpectedError: 'unexpected-error',
 } as const;
 
