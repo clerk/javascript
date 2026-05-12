@@ -336,7 +336,7 @@ jobs:
             cd integration/mobile &&
             find flows -type f -name "*.yaml" ! -path "*/common/*"
             ${FLOWS_FILTER:+-path "*$FLOWS_FILTER*"} -print0
-            | xargs -0 maestro test --env CLERK_TEST_EMAIL="$CLERK_TEST_EMAIL" --env CLERK_TEST_PASSWORD="$CLERK_TEST_PASSWORD" --exclude-tags "$EXCLUDE_TAGS"
+            | xargs -0 maestro test --env CLERK_TEST_EMAIL="$CLERK_TEST_EMAIL" --env CLERK_TEST_PASSWORD="$CLERK_TEST_PASSWORD" --exclude-tags "$EXCLUDE_TAGS,flakyAndroid"
 
       - name: Upload Maestro artifacts on failure
         if: failure()

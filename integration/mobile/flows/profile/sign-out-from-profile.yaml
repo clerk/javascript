@@ -1,8 +1,13 @@
 # Happy path: sign in, open profile, sign out from inside the profile modal,
 # assert AuthView is shown again.
+#
+# Flaky on Android CI: see TODO in cycles/sign-in-sign-out-sign-in.yaml. Same
+# clerk-android AuthStartView re-render race. Pass-rate is ~50% on CI. Keep
+# running on iOS where the underlying issue doesn't manifest.
 appId: com.clerk.clerkexpoquickstart
 tags:
   - happy-path
+  - flakyAndroid
 ---
 - runFlow: ../common/open-app.yaml
 - runFlow: ../common/sign-in-email-password.yaml
