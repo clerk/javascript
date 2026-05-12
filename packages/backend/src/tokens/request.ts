@@ -812,7 +812,9 @@ export const authenticateRequest: AuthenticateRequest = (async (
 
     const { data, tokenType, errors } = await verifyMachineAuthToken(tokenInHeader, authenticateContext);
     if (errors) {
-      maybeCacheOAuthTokenAsInvalid(errors[0], tokenInHeader);
+      if (isOAuthTokenByPrefix(tokenInHeader)) {
+        maybeCacheOAuthTokenAsInvalid(errors[0], tokenInHeader);
+      }
       return handleMachineError(tokenType, errors[0]);
     }
     return signedIn({
@@ -844,7 +846,9 @@ export const authenticateRequest: AuthenticateRequest = (async (
 
       const { data, tokenType, errors } = await verifyMachineAuthToken(tokenInHeader, authenticateContext);
       if (errors) {
-        maybeCacheOAuthTokenAsInvalid(errors[0], tokenInHeader);
+        if (isOAuthTokenByPrefix(tokenInHeader)) {
+          maybeCacheOAuthTokenAsInvalid(errors[0], tokenInHeader);
+        }
         return handleMachineError(tokenType, errors[0]);
       }
 
