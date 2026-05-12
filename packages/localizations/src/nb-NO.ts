@@ -208,6 +208,19 @@ export const nbNO: LocalizationResource = {
     yearPerUnit: 'År per {{unitName}}',
   },
   configureSSO: {
+    confirmation: {
+      domainSection: {
+        title: 'Domene',
+      },
+      enableSection: {
+        title: 'Aktiver SSO',
+      },
+      statusSection: {
+        activeBadge: 'Aktiv',
+        inactiveBadge: 'Inaktiv',
+        title: 'SSO-status',
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'Kontakt organisasjonens administrator for å få tillatelser til å administrere bedriftstilkoblinger.',
       title: 'Du har ikke tillatelse til å administrere bedriftstilkoblinger',

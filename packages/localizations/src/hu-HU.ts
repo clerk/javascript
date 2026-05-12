@@ -208,6 +208,19 @@ export const huHU: LocalizationResource = {
     yearPerUnit: 'Év / {{unitName}}',
   },
   configureSSO: {
+    confirmation: {
+      domainSection: {
+        title: 'Tartomány',
+      },
+      enableSection: {
+        title: 'SSO engedélyezése',
+      },
+      statusSection: {
+        activeBadge: 'Aktív',
+        inactiveBadge: 'Inaktív',
+        title: 'SSO állapot',
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle:
         'Vegye fel a kapcsolatot szervezete adminisztrátorával, hogy jogosultságot kapjon a vállalati kapcsolatok kezelésére.',

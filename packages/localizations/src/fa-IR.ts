@@ -184,6 +184,19 @@ export const faIR: LocalizationResource = {
     year: 'سال',
   },
   configureSSO: {
+    confirmation: {
+      domainSection: {
+        title: 'دامنه',
+      },
+      enableSection: {
+        title: 'فعال‌سازی SSO',
+      },
+      statusSection: {
+        activeBadge: 'فعال',
+        inactiveBadge: 'غیرفعال',
+        title: 'وضعیت SSO',
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'برای دریافت مجوز مدیریت اتصالات سازمانی با مدیر سازمان خود تماس بگیرید.',
       title: 'شما اجازه مدیریت اتصالات سازمانی را ندارید',

@@ -187,6 +187,19 @@ export const frFR: LocalizationResource = {
     year: 'An',
   },
   configureSSO: {
+    confirmation: {
+      domainSection: {
+        title: 'Domaine',
+      },
+      enableSection: {
+        title: 'Activer SSO',
+      },
+      statusSection: {
+        activeBadge: 'Actif',
+        inactiveBadge: 'Inactif',
+        title: 'Statut SSO',
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle:
         "Contactez l'administrateur de votre organisation afin d'obtenir les permissions pour gérer les connexions d'entreprise.",

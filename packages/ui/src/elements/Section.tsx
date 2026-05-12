@@ -1,5 +1,5 @@
 import type { ProfileSectionId } from '@clerk/shared/types';
-import { forwardRef, isValidElement, useLayoutEffect, useRef, useState } from 'react';
+import { forwardRef, isValidElement } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import { Button, Col, descriptors, Flex, Icon, Spinner, Text } from '../customizables';
@@ -13,21 +13,13 @@ import { Menu, MenuItem, MenuList, MenuTrigger } from './Menu';
 
 type ProfileSectionProps = Omit<PropsOfComponent<typeof Flex>, 'title'> & {
   title: LocalizationKey;
+  titleId?: string;
   centered?: boolean;
   id: ProfileSectionId;
 };
 
 const ProfileSectionRoot = (props: ProfileSectionProps) => {
-  const { title, centered = true, children, id, sx, ...rest } = props;
-  const ref = useRef<HTMLDivElement | null>(null);
-  const [height, setHeight] = useState(0);
-
-  useLayoutEffect(() => {
-    const element = ref.current;
-    if (element) {
-      setHeight(element.clientHeight + element.clientTop || 0);
-    }
-  }, []);
+  const { title, titleId, centered = true, children, id, sx, ...rest } = props;
 
   return (
     <Flex
@@ -55,13 +47,9 @@ const ProfileSectionRoot = (props: ProfileSectionProps) => {
         elementDescriptor={descriptors.profileSectionContent}
         elementId={descriptors.profileSectionContent.setId(id)}
         gap={2}
-        ref={ref}
         sx={{
           minWidth: 0,
           width: '100%',
-          '+ *': {
-            '--clerk-height': `${height}px`,
-          },
         }}
       >
         {children}
@@ -74,19 +62,16 @@ const ProfileSectionRoot = (props: ProfileSectionProps) => {
           padding: centered ? undefined : `${t.space.$1x5} 0`,
           gap: t.space.$1,
           width: t.space.$66,
-          alignSelf: height ? 'self-start' : centered ? 'center' : undefined,
-          marginTop: centered ? 'calc(var(--clerk-height)/2)' : undefined,
-          transform: height && centered ? 'translateY(-50%)' : undefined,
+          alignSelf: centered ? 'center' : 'self-start',
           [mqu.lg]: {
             alignSelf: 'self-start',
-            marginTop: 'unset',
-            transform: 'none',
             padding: 0,
           },
         })}
       >
         <SectionHeader
           localizationKey={title}
+          textId={titleId}
           elementDescriptor={descriptors.profileSectionTitle}
           elementId={descriptors.profileSectionTitle.setId(id)}
           textElementDescriptor={descriptors.profileSectionTitleText}
@@ -347,13 +332,15 @@ type SectionHeaderProps = PropsOfComponent<typeof Flex> & {
   localizationKey: LocalizationKey;
   textElementDescriptor?: ElementDescriptor;
   textElementId?: ElementId;
+  textId?: string;
 };
 
 export const SectionHeader = (props: SectionHeaderProps) => {
-  const { textElementDescriptor, textElementId, localizationKey, ...rest } = props;
+  const { textElementDescriptor, textElementId, textId, localizationKey, ...rest } = props;
   return (
     <Flex {...rest}>
       <Text
+        id={textId}
         localizationKey={localizationKey}
         variant='subtitle'
         elementDescriptor={textElementDescriptor}

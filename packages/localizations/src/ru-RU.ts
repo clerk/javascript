@@ -179,6 +179,19 @@ export const ruRU: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
+    confirmation: {
+      domainSection: {
+        title: 'Домен',
+      },
+      enableSection: {
+        title: 'Включить SSO',
+      },
+      statusSection: {
+        activeBadge: 'Активный',
+        inactiveBadge: 'Неактивный',
+        title: 'Статус SSO',
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle:
         'Обратитесь к администратору вашей организации, чтобы получить разрешения на управление корпоративными подключениями.',

@@ -179,6 +179,19 @@ export const srRS: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
+    confirmation: {
+      domainSection: {
+        title: 'Домен',
+      },
+      enableSection: {
+        title: 'Омогући SSO',
+      },
+      statusSection: {
+        activeBadge: 'Активан',
+        inactiveBadge: 'Неактиван',
+        title: 'SSO статус',
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle:
         'Kontaktirajte administratora vaše organizacije da biste dobili dozvole za upravljanje korporativnim vezama.',

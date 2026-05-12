@@ -179,6 +179,19 @@ export const beBY: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
+    confirmation: {
+      domainSection: {
+        title: 'Дамен',
+      },
+      enableSection: {
+        title: 'Уключыць SSO',
+      },
+      statusSection: {
+        activeBadge: 'Актыўны',
+        inactiveBadge: 'Неактыўны',
+        title: 'Статус SSO',
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle:
         'Звярніцеся да адміністратара вашай арганізацыі, каб атрымаць дазволы на кіраванне карпаратыўнымі падключэннямі.',

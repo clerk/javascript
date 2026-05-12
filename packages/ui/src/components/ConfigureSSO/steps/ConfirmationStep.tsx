@@ -2,24 +2,22 @@ import { useReverification, useUser } from '@clerk/shared/react';
 import { useState } from 'react';
 
 import { Badge, Col, descriptors, Flex, Flow, Grid, Link, localizationKeys, Text } from '@/customizables';
-import { useCardState } from '@/elements/contexts';
+import { Action } from '@/elements/Action';
+import { useActionContext } from '@/elements/Action/ActionRoot';
+import { useCardState, withCardStateProvider } from '@/elements/contexts';
 import { Form } from '@/elements/Form';
+import { FormButtons } from '@/elements/FormButtons';
+import type { FormProps } from '@/elements/FormContainer';
+import { FormContainer } from '@/elements/FormContainer';
 import { ProfileSection } from '@/elements/Section';
 import { Switch } from '@/elements/Switch';
+import { mqu } from '@/styledSystem';
 import { handleError } from '@/utils/errorHandler';
 import { useFormControl } from '@/utils/useFormControl';
 
 import { useConfigureSSOFlow } from '../ConfigureSSOContext';
 import { Step } from '../elements/Step';
 import { useWizard } from '../elements/Wizard';
-
-const truncateSx = {
-  minWidth: 0,
-  display: 'block',
-  overflow: 'hidden',
-  whiteSpace: 'nowrap',
-  textOverflow: 'ellipsis',
-} as const;
 
 export const ConfirmationStep = (): JSX.Element => {
   return (
@@ -31,6 +29,7 @@ export const ConfirmationStep = (): JSX.Element => {
         <Step.Body sx={t => ({ paddingInline: t.space.$8, paddingBlock: t.space.$4 })}>
           <SsoStatusSection />
           <EnableSsoSection />
+          <DomainSection />
           <ConfigurationDetailsSection />
           <ResetConnectionSection />
         </Step.Body>
@@ -102,16 +101,40 @@ const EnableSsoSection = (): JSX.Element => {
     <ProfileSection.Root
       title={localizationKeys('configureSSO.confirmation.enableSection.title')}
       id='enableSso'
-      centered
+      sx={{ border: 0 }}
     >
-      <Flex justify='start'>
-        <Switch
-          isChecked={isChecked}
-          isDisabled={card.isLoading || !enterpriseConnection}
-          onChange={active => void onChange(active)}
-          aria-label='Enable SSO'
-        />
-      </Flex>
+      <Switch
+        isChecked={isChecked}
+        isDisabled={card.isLoading}
+        onChange={active => void onChange(active)}
+        aria-label='Enable SSO'
+      />
+    </ProfileSection.Root>
+  );
+};
+
+const DomainSection = (): JSX.Element | null => {
+  const { enterpriseConnection } = useConfigureSSOFlow();
+  const domain = enterpriseConnection?.domains?.[0];
+
+  if (!domain) {
+    return null;
+  }
+
+  return (
+    <ProfileSection.Root
+      title={localizationKeys('configureSSO.confirmation.domainSection.title')}
+      id='ssoDomain'
+      sx={{ border: 0 }}
+    >
+      <Link
+        href={`https://${domain}`}
+        isExternal
+        title={domain}
+        sx={{ display: 'block', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}
+      >
+        {domain}
+      </Link>
     </ProfileSection.Root>
   );
 };
@@ -119,17 +142,18 @@ const EnableSsoSection = (): JSX.Element => {
 const ConfigurationDetailsSection = (): JSX.Element => {
   const { enterpriseConnection } = useConfigureSSOFlow();
   const samlConnection = enterpriseConnection?.samlConnection;
+  const { goToStep } = useWizard();
 
   return (
     <ProfileSection.Root
       title={localizationKeys('configureSSO.confirmation.configurationSection.title')}
       id='ssoConfiguration'
-      centered
+      centered={false}
     >
       <Col gap={3}>
         <Grid
           gap={3}
-          sx={{ width: '100%', alignItems: 'center', gridTemplateColumns: '150px 1fr' }}
+          sx={{ width: '100%', alignItems: 'center', gridTemplateColumns: '150px minmax(0, 1fr)' }}
         >
           <Text
             colorScheme='secondary'
@@ -139,9 +163,9 @@ const ConfigurationDetailsSection = (): JSX.Element => {
             href={samlConnection?.idpSsoUrl ?? ''}
             isExternal
             title={samlConnection?.idpSsoUrl}
-            sx={truncateSx}
+            sx={{ display: 'block', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}
           >
-            {samlConnection?.idpSsoUrl ?? '—'}
+            {samlConnection?.idpSsoUrl}
           </Link>
 
           <Text
@@ -149,10 +173,10 @@ const ConfigurationDetailsSection = (): JSX.Element => {
             localizationKey={localizationKeys('configureSSO.confirmation.configurationSection.issuerLabel')}
           />
           <Text
+            truncate
             title={samlConnection?.idpEntityId}
-            sx={truncateSx}
           >
-            {samlConnection?.idpEntityId ?? '—'}
+            {samlConnection?.idpEntityId}
           </Text>
 
           <Text
@@ -160,19 +184,22 @@ const ConfigurationDetailsSection = (): JSX.Element => {
             localizationKey={localizationKeys('configureSSO.confirmation.configurationSection.certificateLabel')}
           />
           <Text
+            truncate
             title={samlConnection?.idpCertificate}
-            sx={truncateSx}
           >
-            {samlConnection?.idpCertificate ?? '—'}
+            {samlConnection?.idpCertificate}
           </Text>
         </Grid>
 
         <Flex
           justify='start'
-          sx={t => ({ marginTop: t.space.$2 })}
+          sx={t => ({ marginTop: t.space.$2, paddingInlineStart: 0, marginInline: '-10px' })}
         >
-          <Link
-            href='#'
+          <ProfileSection.Button
+            id='configureAgain'
+            onClick={() => goToStep('select-provider')}
+            variant='ghost'
+            colorScheme='primary'
             localizationKey={localizationKeys('configureSSO.confirmation.configurationSection.configureAgainLink')}
           />
         </Flex>
@@ -181,10 +208,11 @@ const ConfigurationDetailsSection = (): JSX.Element => {
   );
 };
 
-const ResetConnectionSection = (): JSX.Element => {
+const ResetConnectionForm = withCardStateProvider((props: FormProps) => {
+  const { onReset, onSuccess } = props;
+  const card = useCardState();
   const { enterpriseConnection } = useConfigureSSOFlow();
   const { user } = useUser();
-  const card = useCardState();
   const { goToStep } = useWizard();
 
   const deleteEnterpriseConnection = useReverification((id: string) => user?.deleteEnterpriseConnection(id));
@@ -207,6 +235,7 @@ const ResetConnectionSection = (): JSX.Element => {
 
     try {
       await deleteEnterpriseConnection(enterpriseConnection.id);
+      onSuccess();
       await goToStep('select-provider');
     } catch (err) {
       handleError(err as Error, [confirmationField], card.setError);
@@ -214,33 +243,74 @@ const ResetConnectionSection = (): JSX.Element => {
   };
 
   return (
-    <ProfileSection.Root
-      title={localizationKeys('configureSSO.confirmation.resetSection.title')}
-      id='resetSso'
-      centered
+    <FormContainer
+      headerTitle={localizationKeys('configureSSO.confirmation.resetSection.title')}
+      sx={t => ({ gap: t.space.$0x5 })}
     >
       <Form.Root onSubmit={onSubmit}>
-        <Col gap={3}>
+        <Col gap={1}>
           <Text
             colorScheme='danger'
             localizationKey={localizationKeys('configureSSO.confirmation.resetSection.warning')}
           />
-          <Form.ControlRow elementId={confirmationField.id}>
-            <Form.PlainInput
-              {...confirmationField.props}
-              ignorePasswordManager
-            />
-          </Form.ControlRow>
-          <Flex justify='start'>
-            <Form.SubmitButton
-              block={false}
-              colorScheme='danger'
-              isDisabled={!canSubmit}
-              localizationKey={localizationKeys('configureSSO.confirmation.resetSection.submitButton')}
-            />
-          </Flex>
         </Col>
+        <Form.ControlRow elementId={confirmationField.id}>
+          <Form.PlainInput
+            {...confirmationField.props}
+            ignorePasswordManager
+          />
+        </Form.ControlRow>
+        <FormButtons
+          submitLabel={localizationKeys('configureSSO.confirmation.resetSection.submitButton')}
+          colorScheme='danger'
+          isDisabled={!canSubmit}
+          onReset={onReset}
+        />
       </Form.Root>
+    </FormContainer>
+  );
+});
+
+const ResetConnectionScreen = (): JSX.Element => {
+  const { close } = useActionContext();
+  return (
+    <ResetConnectionForm
+      onSuccess={close}
+      onReset={close}
+    />
+  );
+};
+
+const ResetConnectionSection = (): JSX.Element => {
+  return (
+    <ProfileSection.Root
+      title={localizationKeys('configureSSO.confirmation.resetSection.title')}
+      id='resetSso'
+      sx={{ alignItems: 'center', [mqu.md]: { alignItems: 'flex-start' } }}
+    >
+      <Action.Root>
+        <Action.Closed value='reset'>
+          <ProfileSection.Item
+            id='resetSso'
+            sx={{ paddingInlineStart: 0, marginInline: '-10px' }}
+          >
+            <Action.Trigger value='reset'>
+              <ProfileSection.Button
+                id='resetSso'
+                variant='ghost'
+                colorScheme='danger'
+                localizationKey={localizationKeys('configureSSO.confirmation.resetSection.title')}
+              />
+            </Action.Trigger>
+          </ProfileSection.Item>
+        </Action.Closed>
+
+        <Action.Open value='reset'>
+          <Action.Card variant='destructive'>
+            <ResetConnectionScreen />
+          </Action.Card>
+        </Action.Open>
+      </Action.Root>
     </ProfileSection.Root>
   );
 };

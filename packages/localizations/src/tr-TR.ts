@@ -179,6 +179,19 @@ export const trTR: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
+    confirmation: {
+      domainSection: {
+        title: 'Etki alanı',
+      },
+      enableSection: {
+        title: "SSO'yu Etkinleştir",
+      },
+      statusSection: {
+        activeBadge: 'Etkin',
+        inactiveBadge: 'Devre Dışı',
+        title: 'SSO Durumu',
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'Kurumsal bağlantıları yönetme izinleri almak için organizasyonunuzun yöneticisiyle iletişime geçin.',
       title: 'Kurumsal bağlantıları yönetme izniniz yok',

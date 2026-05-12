@@ -1438,6 +1438,9 @@ export type __internal_LocalizationResource = {
       enableSection: {
         title: LocalizationValue;
       };
+      domainSection: {
+        title: LocalizationValue;
+      };
       configurationSection: {
         title: LocalizationValue;
         ssoUrlLabel: LocalizationValue;

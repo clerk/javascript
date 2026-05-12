@@ -185,6 +185,19 @@ export const zhTW: LocalizationResource = {
     year: '年',
   },
   configureSSO: {
+    confirmation: {
+      domainSection: {
+        title: '網域',
+      },
+      enableSection: {
+        title: '啟用 SSO',
+      },
+      statusSection: {
+        activeBadge: '已啟用',
+        inactiveBadge: '未啟用',
+        title: 'SSO 狀態',
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: '請聯絡您的組織管理員以取得管理企業連線的權限。',
       title: '您沒有管理企業連線的權限',

@@ -179,6 +179,19 @@ export const taIN: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
+    confirmation: {
+      domainSection: {
+        title: 'டொமைன்',
+      },
+      enableSection: {
+        title: 'SSO ஐ இயக்கு',
+      },
+      statusSection: {
+        activeBadge: 'செயலில்',
+        inactiveBadge: 'செயலற்ற',
+        title: 'SSO நிலை',
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'நிறுவன இணைப்புகளை நிர்வகிக்க அனுமதிகளைப் பெற உங்கள் நிறுவனத்தின் நிர்வாகியைத் தொடர்பு கொள்ளவும்.',
       title: 'நிறுவன இணைப்புகளை நிர்வகிக்க உங்களுக்கு அனுமதி இல்லை',

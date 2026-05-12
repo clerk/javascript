@@ -179,6 +179,19 @@ export const arSA: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
+    confirmation: {
+      domainSection: {
+        title: 'النطاق',
+      },
+      enableSection: {
+        title: 'تمكين SSO',
+      },
+      statusSection: {
+        activeBadge: 'نشط',
+        inactiveBadge: 'غير نشط',
+        title: 'حالة SSO',
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'تواصل مع مسؤول مؤسستك للحصول على أذونات لإدارة الاتصالات المؤسسية.',
       title: 'ليس لديك إذن لإدارة الاتصالات المؤسسية',

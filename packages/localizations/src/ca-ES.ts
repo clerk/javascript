@@ -186,6 +186,19 @@ export const caES: LocalizationResource = {
     year: 'Any',
   },
   configureSSO: {
+    confirmation: {
+      domainSection: {
+        title: 'Domini',
+      },
+      enableSection: {
+        title: 'Activar SSO',
+      },
+      statusSection: {
+        activeBadge: 'Actiu',
+        inactiveBadge: 'Inactiu',
+        title: 'Estat SSO',
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle:
         "Contacta amb l'administrador de la teva organització per obtenir permisos per gestionar connexions empresarials.",

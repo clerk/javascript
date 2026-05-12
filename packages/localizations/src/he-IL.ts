@@ -179,6 +179,19 @@ export const heIL: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
+    confirmation: {
+      domainSection: {
+        title: 'דומיין',
+      },
+      enableSection: {
+        title: 'הפעל SSO',
+      },
+      statusSection: {
+        activeBadge: 'פעיל',
+        inactiveBadge: 'לא פעיל',
+        title: 'סטטוס SSO',
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'פנה למנהל הארגון שלך כדי לקבל הרשאות לניהול חיבורים ארגוניים.',
       title: 'אין לך הרשאה לנהל חיבורים ארגוניים',

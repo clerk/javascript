@@ -185,6 +185,19 @@ export const ptBR: LocalizationResource = {
     year: 'Ano',
   },
   configureSSO: {
+    confirmation: {
+      domainSection: {
+        title: 'Domínio',
+      },
+      enableSection: {
+        title: 'Ativar SSO',
+      },
+      statusSection: {
+        activeBadge: 'Ativo',
+        inactiveBadge: 'Inativo',
+        title: 'Status do SSO',
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle:
         'Entre em contato com o administrador da sua organização para obter permissões para gerenciar conexões empresariais.',

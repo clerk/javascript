@@ -180,6 +180,19 @@ export const bgBG: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
+    confirmation: {
+      domainSection: {
+        title: 'Домейн',
+      },
+      enableSection: {
+        title: 'Активиране на SSO',
+      },
+      statusSection: {
+        activeBadge: 'Активен',
+        inactiveBadge: 'Неактивен',
+        title: 'Статус на SSO',
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle:
         'Свържете се с администратора на вашата организация, за да получите разрешения за управление на корпоративни връзки.',

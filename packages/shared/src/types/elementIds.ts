@@ -51,7 +51,9 @@ export type ProfileSectionId =
   | 'paymentMethods'
   | 'ssoStatus'
   | 'enableSso'
+  | 'ssoDomain'
   | 'ssoConfiguration'
+  | 'configureAgain'
   | 'resetSso';
 export type ProfilePageId = 'account' | 'security' | 'organizationGeneral' | 'organizationMembers' | 'billing';
 

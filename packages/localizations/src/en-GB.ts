@@ -179,6 +179,19 @@ export const enGB: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
+    confirmation: {
+      domainSection: {
+        title: 'Domain',
+      },
+      enableSection: {
+        title: 'Enable SSO',
+      },
+      statusSection: {
+        activeBadge: 'Active',
+        inactiveBadge: 'Inactive',
+        title: 'SSO Status',
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle:
         'Contact your organisation administrator in order to have permissions to manage enterprise connections.',

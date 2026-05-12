@@ -209,6 +209,9 @@ export const enUS: LocalizationResource = {
         ssoUrlLabel: 'Sign on URL',
         title: 'Configuration details',
       },
+      domainSection: {
+        title: 'Domain',
+      },
       enableSection: {
         title: 'Enable SSO',
       },

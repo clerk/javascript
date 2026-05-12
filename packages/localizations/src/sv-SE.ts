@@ -179,6 +179,19 @@ export const svSE: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
+    confirmation: {
+      domainSection: {
+        title: 'Domän',
+      },
+      enableSection: {
+        title: 'Aktivera SSO',
+      },
+      statusSection: {
+        activeBadge: 'Aktiv',
+        inactiveBadge: 'Inaktiv',
+        title: 'SSO-status',
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'Kontakta administratören för din organisation för att få behörighet att hantera företagsanslutningar.',
       title: 'Du har inte behörighet att hantera företagsanslutningar',

@@ -185,6 +185,19 @@ export const roRO: LocalizationResource = {
     year: 'An',
   },
   configureSSO: {
+    confirmation: {
+      domainSection: {
+        title: 'Domeniu',
+      },
+      enableSection: {
+        title: 'Activează SSO',
+      },
+      statusSection: {
+        activeBadge: 'Activ',
+        inactiveBadge: 'Inactiv',
+        title: 'Stare SSO',
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle:
         'Contactați administratorul organizației dumneavoastră pentru a obține permisiuni de gestionare a conexiunilor de întreprindere.',

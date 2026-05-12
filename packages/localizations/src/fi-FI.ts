@@ -207,6 +207,19 @@ export const fiFI: LocalizationResource = {
     yearPerUnit: 'Vuosi per {{unitName}}',
   },
   configureSSO: {
+    confirmation: {
+      domainSection: {
+        title: 'Toimialue',
+      },
+      enableSection: {
+        title: 'Ota SSO käyttöön',
+      },
+      statusSection: {
+        activeBadge: 'Aktiivinen',
+        inactiveBadge: 'Ei aktiivinen',
+        title: 'SSO:n tila',
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'Ota yhteyttä organisaatiosi järjestelmänvalvojaan saadaksesi oikeudet hallita yritysyhteyksiä.',
       title: 'Sinulla ei ole oikeutta hallita yritysyhteyksiä',

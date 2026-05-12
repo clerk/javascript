@@ -179,6 +179,19 @@ export const daDK: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
+    confirmation: {
+      domainSection: {
+        title: 'Domæne',
+      },
+      enableSection: {
+        title: 'Aktivér SSO',
+      },
+      statusSection: {
+        activeBadge: 'Aktiv',
+        inactiveBadge: 'Inaktiv',
+        title: 'SSO-status',
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle:
         'Kontakt din organisations administrator for at få tilladelse til at administrere virksomhedsforbindelser.',

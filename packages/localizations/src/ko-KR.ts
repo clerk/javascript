@@ -186,6 +186,19 @@ export const koKR: LocalizationResource = {
     year: '년',
   },
   configureSSO: {
+    confirmation: {
+      domainSection: {
+        title: '도메인',
+      },
+      enableSection: {
+        title: 'SSO 활성화',
+      },
+      statusSection: {
+        activeBadge: '활성',
+        inactiveBadge: '비활성',
+        title: 'SSO 상태',
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: '엔터프라이즈 연결을 관리할 권한을 얻으려면 조직 관리자에게 문의하세요.',
       title: '엔터프라이즈 연결을 관리할 권한이 없습니다',

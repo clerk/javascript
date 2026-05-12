@@ -185,6 +185,19 @@ export const itIT: LocalizationResource = {
     year: 'Anno',
   },
   configureSSO: {
+    confirmation: {
+      domainSection: {
+        title: 'Dominio',
+      },
+      enableSection: {
+        title: 'Abilita SSO',
+      },
+      statusSection: {
+        activeBadge: 'Attivo',
+        inactiveBadge: 'Inattivo',
+        title: 'Stato SSO',
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle:
         "Contatta l'amministratore della tua organizzazione per ottenere i permessi per gestire le connessioni aziendali.",

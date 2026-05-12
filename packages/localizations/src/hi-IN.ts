@@ -179,6 +179,19 @@ export const hiIN: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
+    confirmation: {
+      domainSection: {
+        title: 'डोमेन',
+      },
+      enableSection: {
+        title: 'SSO सक्षम करें',
+      },
+      statusSection: {
+        activeBadge: 'सक्रिय',
+        inactiveBadge: 'निष्क्रिय',
+        title: 'SSO स्थिति',
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle:
         'एंटरप्राइज़ कनेक्शन प्रबंधित करने की अनुमति प्राप्त करने के लिए अपने संगठन के व्यवस्थापक से संपर्क करें।',

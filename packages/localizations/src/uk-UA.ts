@@ -179,6 +179,19 @@ export const ukUA: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
+    confirmation: {
+      domainSection: {
+        title: 'Домен',
+      },
+      enableSection: {
+        title: 'Увімкнути SSO',
+      },
+      statusSection: {
+        activeBadge: 'Активний',
+        inactiveBadge: 'Неактивний',
+        title: 'Статус SSO',
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle:
         'Зверніться до адміністратора вашої організації, щоб отримати дозвіл на керування корпоративними підключеннями.',

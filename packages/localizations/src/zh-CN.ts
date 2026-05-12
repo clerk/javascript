@@ -179,6 +179,19 @@ export const zhCN: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
+    confirmation: {
+      domainSection: {
+        title: '域名',
+      },
+      enableSection: {
+        title: '启用 SSO',
+      },
+      statusSection: {
+        activeBadge: '已启用',
+        inactiveBadge: '未启用',
+        title: 'SSO 状态',
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: '请联系您的组织管理员以获得管理企业连接的权限。',
       title: '您无权管理企业连接',

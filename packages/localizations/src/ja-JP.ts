@@ -190,6 +190,19 @@ export const jaJP: LocalizationResource = {
     year: '年',
   },
   configureSSO: {
+    confirmation: {
+      domainSection: {
+        title: 'ドメイン',
+      },
+      enableSection: {
+        title: 'SSOを有効にする',
+      },
+      statusSection: {
+        activeBadge: '有効',
+        inactiveBadge: '無効',
+        title: 'SSOステータス',
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'エンタープライズ接続を管理する権限を取得するには、組織の管理者にお問い合わせください。',
       title: 'エンタープライズ接続を管理する権限がありません',
