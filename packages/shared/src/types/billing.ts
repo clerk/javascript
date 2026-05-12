@@ -506,6 +506,35 @@ export type BillingPaymentChargeType = 'checkout' | 'recurring';
 export type BillingPaymentStatus = 'pending' | 'paid' | 'failed';
 
 /**
+ * The `BillingPaymentTotals` type represents the per-payment cost breakdown, including any base fee
+ * and per-unit (for example, seats) subtotals.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingPaymentTotals {
+  /**
+   * The price of the items before taxes, credits, or discounts are applied.
+   */
+  subtotal: BillingMoneyAmount;
+  /**
+   * The total amount for the payment, including taxes and after credits/discounts are applied.
+   */
+  grandTotal: BillingMoneyAmount;
+  /**
+   * The amount of tax included in the payment.
+   */
+  taxTotal: BillingMoneyAmount;
+  /**
+   * The flat base fee charged on top of any per-unit fees.
+   */
+  baseFee?: BillingMoneyAmount | null;
+  /**
+   * Per-unit cost breakdown for this payment (for example, seats).
+   */
+  perUnitTotals?: BillingPerUnitTotal[];
+}
+
+/**
  * The `BillingPaymentResource` type represents a payment attempt for a user or Organization.
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
@@ -547,6 +576,11 @@ export interface BillingPaymentResource extends ClerkResource {
    * The current status of the payment.
    */
   status: BillingPaymentStatus;
+  /**
+   * Per-payment breakdown with optional base fee and per-unit (for example, seats) subtotals.
+   * Absent on older responses.
+   */
+  totals?: BillingPaymentTotals | null;
 }
 
 /**
