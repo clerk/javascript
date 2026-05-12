@@ -51,6 +51,15 @@ function isReflectionTypeDoc(/** @type {import('typedoc').Type | undefined} */ t
 
 /**
  * @param {import('typedoc').Type | undefined} t
+ * @returns {boolean}
+ */
+function isUnionTypeDoc(/** @type {import('typedoc').Type | undefined} */ t) {
+  const o = /** @type {{ type?: string; types?: import('typedoc').Type[] } | null} */ (t);
+  return Boolean(o && typeof o === 'object' && o.type === 'union' && Array.isArray(o.types));
+}
+
+/**
+ * @param {import('typedoc').Type | undefined} t
  */
 function unwrapOptionalType(t) {
   if (
@@ -337,6 +346,10 @@ function collectPropertyReflectionsFromIntersectionArm(t, visitedReflectionIds, 
       out.push(...collectPropertyReflectionsFromIntersectionArm(arm, visitedReflectionIds, project));
     }
     return out;
+  }
+
+  if (isUnionTypeDoc(unwrapped)) {
+    return collectPropertyReflectionsFromUnionObjectArms(unwrapped, visitedReflectionIds, project);
   }
 
   return [];

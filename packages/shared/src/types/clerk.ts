@@ -1245,7 +1245,7 @@ export type ClerkThemeOptions = DeepSnakeToCamel<DeepPartial<DisplayThemeJSON>>;
  * Navigation options used to replace or push history changes.
  * Both `routerPush` & `routerReplace` OR none options should be passed.
  */
-type ClerkOptionsNavigation =
+export type ClerkOptionsNavigation =
   | {
       /**
        * A function which takes the destination path as an argument and performs a "push" navigation.
@@ -1255,11 +1255,23 @@ type ClerkOptionsNavigation =
        * A function which takes the destination path as an argument and performs a "replace" navigation.
        */
       routerReplace?: never;
+      /**
+       * If `true`, the router will log debug information to the console.
+       */
       routerDebug?: boolean;
     }
   | {
+      /**
+       * A function which takes the destination path as an argument and performs a "push" navigation.
+       */
       routerPush: RouterFn;
+      /**
+       * A function which takes the destination path as an argument and performs a "replace" navigation.
+       */
       routerReplace: RouterFn;
+      /**
+       * If `true`, the router will log debug information to the console.
+       */
       routerDebug?: boolean;
     };
 
