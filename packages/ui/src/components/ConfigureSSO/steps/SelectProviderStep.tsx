@@ -43,7 +43,7 @@ const PROVIDER_GROUPS: ReadonlyArray<{
 
 export const SelectProviderStep = (): JSX.Element => {
   const card = useCardState();
-  const { goNext, isLastStep } = useWizard();
+  const { goNext } = useWizard();
   const { setProvider, createConnection } = useConfigureSSO();
   const [selected, setSelected] = React.useState<ProviderType | null>(null);
 
@@ -147,7 +147,7 @@ export const SelectProviderStep = (): JSX.Element => {
           <Step.Footer.Continue
             onClick={handleContinue}
             isLoading={card.isLoading}
-            isDisabled={isLastStep || !selected || card.isLoading}
+            isDisabled={!selected || card.isLoading}
           />
         </Step.Footer>
       </Step>
