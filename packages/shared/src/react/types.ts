@@ -85,6 +85,7 @@ export type PaginatedResourcesWithDefault<T> = {
 
 /**
  * @inline
+ * @standalonePage
  */
 export type PaginatedHookConfig<T> = T & {
   /**

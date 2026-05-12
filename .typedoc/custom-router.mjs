@@ -2,6 +2,7 @@
 import { ReflectionKind } from 'typedoc';
 import { MemberRouter } from 'typedoc-plugin-markdown';
 
+import { isInlineModifierWithoutStandalonePage } from './standalone-page-tag.mjs';
 import { REFERENCE_OBJECT_PAGE_SYMBOLS } from './reference-objects.mjs';
 
 /** @type {Set<string>} */
@@ -58,15 +59,11 @@ class ClerkRouter extends MemberRouter {
         }
 
         /**
-         * `@inline` marks types that should be expanded at use sites, not documented as their own page.
+         * `@inline` marks types that should be expanded at use sites, not documented as their own page unless `@standalonePage` is also set (see `standalone-page-tag.mjs`).
          * TypeDoc still assigns `fullUrls` for exported aliases, so we also strip links in the theme's `referenceType` partial (`custom-theme.mjs`).
          */
         const model = page.model;
-        if (
-          model &&
-          'comment' in model &&
-          /** @type {{ comment?: import('typedoc').Comment | undefined }} */ (model).comment?.hasModifier('@inline')
-        ) {
+        if (model && isInlineModifierWithoutStandalonePage(/** @type {import('typedoc').Reflection} */ (model))) {
           return false;
         }
 

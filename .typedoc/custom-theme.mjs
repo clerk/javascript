@@ -11,6 +11,7 @@ import { removeLineBreaks } from '../node_modules/typedoc-plugin-markdown/dist/l
 import { TypeDeclarationVisibility } from '../node_modules/typedoc-plugin-markdown/dist/options/maps.js';
 
 import { applyTodoStrippingToComment } from './comment-utils.mjs';
+import { isInlineModifierWithoutStandalonePage } from './standalone-page-tag.mjs';
 import { REFERENCE_OBJECTS_LIST } from './reference-objects.mjs';
 
 export { REFERENCE_OBJECTS_LIST };
@@ -802,7 +803,7 @@ function renderMergedIntersectionDeclaration(ctx, model, opts, mergedChildren, s
   }
   if (model.comment) {
     md.push(
-      superPartials.comment(model.comment, {
+      ctx.partials.comment(model.comment, {
         headingLevel,
         showSummary: true,
         showTags: false,
@@ -821,7 +822,7 @@ function renderMergedIntersectionDeclaration(ctx, model, opts, mergedChildren, s
 
   if (model.comment) {
     md.push(
-      superPartials.comment(model.comment, {
+      ctx.partials.comment(model.comment, {
         headingLevel,
         showSummary: false,
         showTags: true,
@@ -1060,9 +1061,9 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
         );
       },
       /**
-       * Stock `comments.comment` prints every {@link Comment.modifierTags} as **`TitleCase`** before the summary.
-       * `@inline` / `@inlineType` are router/type hints only; `@experimental` is SDK-only guidance — none of these
-       * must appear in property tables or prose.
+       * Stock `comments.comment` prints every {@link Comment.modifierTags} as **`TitleCase`** before the summary
+       * (it does not consult `notRenderedTags`; that option only filters block tags). `@inline` / `@inlineType` are
+       * router/type hints; `@experimental` is SDK-only guidance — none of these must appear in property tables or prose.
        *
        * @param {import('typedoc').Comment} model
        * @param {Parameters<typeof superPartials.comment>[1]} [options]
@@ -1072,7 +1073,7 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
           return superPartials.comment.call(this, model, options);
         }
         const modelToRender = applyTodoStrippingToComment(model) ?? model;
-        const hidden = new Set(['@inline', '@inlineType', '@experimental']);
+        const hidden = new Set(['@inline', '@inlineType', '@experimental', '@standalonePage']);
         const modTags = Array.from(modelToRender.modifierTags ?? []);
         if (modTags.some(/** @param {string} t */ t => hidden.has(t))) {
           const clone = Object.assign(Object.create(Object.getPrototypeOf(modelToRender)), modelToRender, {
@@ -1089,12 +1090,12 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
        */
       declarationTitle: () => '',
       /**
-       * TypeDoc's default links every {@link ReferenceType} to a URL. Types marked `@inline` are expanded at use sites and (via the router) have no standalone page — linking produces broken relative `.mdx` paths in extracted method docs. Render the **aliased type** (RHS) so literals and unions show as `'phone_code'`, not `PhoneCodeStrategy`.
+       * TypeDoc's default links every {@link ReferenceType} to a URL. Types marked `@inline` are expanded at use sites and (via the router) have no standalone page — linking produces broken relative `.mdx` paths in extracted method docs. Render the **aliased type** (RHS) so literals and unions show as `'phone_code'`, not `PhoneCodeStrategy`, unless `@standalonePage` is set (`standalone-page-tag.mjs`).
        *
        * @param {import('typedoc').ReferenceType} model
        */
       referenceType: model => {
-        if (model.reflection?.comment?.hasModifier('@inline')) {
+        if (isInlineModifierWithoutStandalonePage(model.reflection)) {
           const decl = /** @type {import('typedoc').DeclarationReflection} */ (model.reflection);
           // Generic instantiation, e.g. `Fn<Args>` — let `someType` apply type arguments.
           if (model.typeArguments?.length) {

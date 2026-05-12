@@ -345,7 +345,8 @@
         ".typedoc/reference-objects.mjs",
         ".typedoc/comment-utils.mjs",
         ".typedoc/extract-methods.mjs",
-        ".typedoc/extract-returns-and-params.mjs"
+        ".typedoc/extract-returns-and-params.mjs",
+        ".typedoc/standalone-page-tag.mjs"
       ],
       "outputs": [".typedoc/**"],
       "outputLogs": "new-only"

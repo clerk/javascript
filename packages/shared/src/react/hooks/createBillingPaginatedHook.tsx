@@ -25,28 +25,28 @@ type BillingHookConfig<TResource extends ClerkResource, TParams extends PagesOrI
 
 /**
  * @interface
+ * @standalonePage
  */
-export interface HookParams
-  extends PaginatedHookConfig<
-    PagesOrInfiniteOptions & {
-      /**
-       * If `true`, a request will be triggered when the hook is mounted.
-       *
-       * @default true
-       */
-      enabled?: boolean;
-      /**
-       * On `cache` mode, no request will be triggered when the hook is mounted and the data will be fetched from the cache.
-       *
-       * @default undefined
-       *
-       * @hidden
-       *
-       * @experimental
-       */
-      __experimental_mode?: 'cache';
-    }
-  > {
+export interface HookParams extends PaginatedHookConfig<
+  PagesOrInfiniteOptions & {
+    /**
+     * If `true`, a request will be triggered when the hook is mounted.
+     *
+     * @default true
+     */
+    enabled?: boolean;
+    /**
+     * On `cache` mode, no request will be triggered when the hook is mounted and the data will be fetched from the cache.
+     *
+     * @default undefined
+     *
+     * @hidden
+     *
+     * @experimental
+     */
+    __experimental_mode?: 'cache';
+  }
+> {
   /**
    * Specifies whether to fetch for the current user or Organization.
    *

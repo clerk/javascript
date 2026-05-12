@@ -32,6 +32,7 @@ import {
   applyRelativeLinkReplacements,
   stripReferenceObjectPropertiesSection,
 } from './custom-plugin.mjs';
+import { isInlineModifierWithoutStandalonePage } from './standalone-page-tag.mjs';
 import { prepareMarkdownRenderer } from './prepare-markdown-renderer.mjs';
 import { applyTodoStrippingToComment } from './comment-utils.mjs';
 import { REFERENCE_OBJECTS_LIST, REFERENCE_OBJECT_CONFIG } from './reference-objects.mjs';
@@ -1048,7 +1049,7 @@ function unwrapOptionalParamType(t) {
 
 /**
  * When TypeDoc renders a parameter type as a markdown link to another generated `.mdx` file, that type has a dedicated page — omit nested `param?.prop` rows so readers follow the type link instead.
- * `@inline` aliases are expanded by the theme and do not link to a standalone page.
+ * `@inline` aliases are expanded by the theme and do not link to a standalone page unless `@standalonePage` is set (`standalone-page-tag.mjs`).
  *
  * @param {import('typedoc').SomeType | undefined} t
  * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
@@ -1060,7 +1061,7 @@ function parameterTypeLinksToStandaloneMdxPage(t, ctx) {
   }
   if (bare.type === 'reference') {
     const ref = /** @type {import('typedoc').ReferenceType} */ (bare);
-    if (ref.reflection?.comment?.hasModifier('@inline')) {
+    if (isInlineModifierWithoutStandalonePage(ref.reflection)) {
       return false;
     }
   }

@@ -91,6 +91,8 @@ const config = {
     /** Parsed for router/theme; must not appear as a doc section (otherwise renders as **Inline**). */
     '@inline',
     '@inlineType',
+    /** Opts into a dedicated reference page despite `@inline` (see `.typedoc/standalone-page-tag.mjs`). */
+    '@standalonePage',
   ],
   packageOptions: {
     includeVersion: false,
@@ -114,11 +116,15 @@ const config = {
       /** Type-only / router hints; not user-facing prose (see `notRenderedTags`). */
       '@inline',
       '@inlineType',
+      /** With `@inline`, still emit a standalone `.mdx` page (see `.typedoc/standalone-page-tag.mjs`). */
+      '@standalonePage',
     ],
     /**
-     * Stops TypeDoc from generating standalone pages for inline types.
+     * Keep `@inline` / `@inlineType` / `@standalonePage` in the model so the custom router and theme can read them.
      */
-    excludeTags: OptionDefaults.excludeTags.filter(tag => tag !== '@inline' && tag !== '@inlineType'),
+    excludeTags: OptionDefaults.excludeTags.filter(
+      tag => tag !== '@inline' && tag !== '@inlineType' && tag !== '@standalonePage',
+    ),
     exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
     readme: 'none',
     disableGit: true,
