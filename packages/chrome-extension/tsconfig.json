@@ -18,8 +18,7 @@
     "declarationDir": "dist/types",
     "declarationMap": true,
     "emitDeclarationOnly": true,
-    "rootDir": "./src",
-    "types": ["jest"]
+    "rootDir": "./src"
   },
   "include": ["src"]
 }
