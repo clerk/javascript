@@ -10,7 +10,7 @@ const hookName = `useSession`;
  * The `useSession()` hook provides access to the current user's [`Session`](https://clerk.com/docs/reference/objects/session) object, as well as helpers for setting the active session.
  *
  * @unionReturnHeadings
- * ["Initialization", "Signed out", "Signed in"]
+ * ["Loading", "Signed out", "Signed in"]
  *
  * @function
  *

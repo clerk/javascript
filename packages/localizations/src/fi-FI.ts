@@ -207,6 +207,10 @@ export const fiFI: LocalizationResource = {
     yearPerUnit: 'Vuosi per {{unitName}}',
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'Ota yhteyttä organisaatiosi järjestelmänvalvojaan saadaksesi oikeudet hallita yritysyhteyksiä.',
+      title: 'Sinulla ei ole oikeutta hallita yritysyhteyksiä',
+    },
     navbar: {
       title: 'Määritä kertakirjautuminen (SSO)',
     },

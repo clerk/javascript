@@ -179,6 +179,10 @@ export const teIN: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'ఎంటర్‌ప్రైజ్ కనెక్షన్‌లను నిర్వహించడానికి అనుమతులు పొందడానికి మీ సంస్థ నిర్వాహకుడిని సంప్రదించండి.',
+      title: 'ఎంటర్‌ప్రైజ్ కనెక్షన్‌లను నిర్వహించడానికి మీకు అనుమతి లేదు',
+    },
     navbar: {
       title: 'సింగిల్ సైన్-ఆన్ (SSO) కాన్ఫిగర్ చేయండి',
     },
