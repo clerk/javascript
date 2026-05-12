@@ -129,7 +129,7 @@ jobs:
           mv app.json.tmp app.json
           # The quickstart's app.json ships with placeholder bundle ids
           # ("com.yourcompany.yourapp") but the Maestro flows in
-          # integration-mobile/flows reference "com.clerk.clerkexpoquickstart".
+          # integration/mobile/flows reference "com.clerk.clerkexpoquickstart".
           # Align them so launchApp/clearAppState target the installed app.
           jq '.expo.ios.bundleIdentifier = "com.clerk.clerkexpoquickstart" | .expo.android.package = "com.clerk.clerkexpoquickstart"' app.json > app.json.tmp
           mv app.json.tmp app.json
@@ -333,7 +333,7 @@ jobs:
           # so we pass each flow file explicitly via find.
           script: >-
             adb install -r /tmp/cached-app-release.apk &&
-            cd integration-mobile &&
+            cd integration/mobile &&
             find flows -type f -name "*.yaml" ! -path "*/common/*"
             ${FLOWS_FILTER:+-path "*$FLOWS_FILTER*"} -print0
             | xargs -0 maestro test --env CLERK_TEST_EMAIL="$CLERK_TEST_EMAIL" --env CLERK_TEST_PASSWORD="$CLERK_TEST_PASSWORD" --exclude-tags "$EXCLUDE_TAGS"
@@ -344,12 +344,12 @@ jobs:
         with:
           name: maestro-android
           # ~/.maestro/tests holds Maestro's auto-captured failure screenshots
-          # and commands JSON. integration-mobile/*.png holds the takeScreenshot
+          # and commands JSON. integration/mobile/*.png holds the takeScreenshot
           # debug captures that flows write, which Maestro saves relative to
-          # the cwd it was launched from (integration-mobile/).
+          # the cwd it was launched from (integration/mobile/).
           path: |
             ~/.maestro/tests
-            integration-mobile/*.png
+            integration/mobile/*.png
 
       - name: Cleanup test user
         if: always() && steps.user.outputs.user_id != ''
@@ -440,7 +440,7 @@ jobs:
           mv app.json.tmp app.json
           # The quickstart's app.json ships with placeholder bundle ids
           # ("com.yourcompany.yourapp") but the Maestro flows in
-          # integration-mobile/flows reference "com.clerk.clerkexpoquickstart".
+          # integration/mobile/flows reference "com.clerk.clerkexpoquickstart".
           # Align them so launchApp/clearAppState target the installed app.
           jq '.expo.ios.bundleIdentifier = "com.clerk.clerkexpoquickstart" | .expo.android.package = "com.clerk.clerkexpoquickstart"' app.json > app.json.tmp
           mv app.json.tmp app.json
@@ -619,7 +619,7 @@ jobs:
           xcrun simctl boot "$SIM_UDID" 2>/dev/null || true
           xcrun simctl bootstatus "$SIM_UDID" -b
           xcrun simctl install "$SIM_UDID" /tmp/cached-clerknativequickstart.app
-          cd integration-mobile
+          cd integration/mobile
           # Maestro doesn't auto-recurse into subdirectories; pass each flow explicitly.
           find flows -type f -name "*.yaml" ! -path "*/common/*" \
             ${FLOWS_FILTER:+-path "*$FLOWS_FILTER*"} -print0 | \
@@ -635,7 +635,7 @@ jobs:
           name: maestro-ios
           path: |
             ~/.maestro/tests
-            integration-mobile/*.png
+            integration/mobile/*.png
 
       - name: Cleanup test user
         if: always() && steps.user.outputs.user_id != ''
