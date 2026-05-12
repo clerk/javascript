@@ -33,6 +33,6 @@ export default defineConfig(overrideOptions => {
       PACKAGE_NAME: `"${pkgJson.name}"`,
       PACKAGE_VERSION: `"${pkgJson.version}"`,
     },
-    external: ['#imports', 'nuxt/app'],
+    external: ['#imports', 'nuxt/app', 'vue'],
   };
 });
