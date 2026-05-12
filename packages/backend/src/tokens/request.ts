@@ -23,8 +23,8 @@ import {
 } from './machine';
 import {
   isOAuthTokenCachedAsInvalid,
-  maybeCacheOAuthTokenAsInvalid,
   makeCachedInvalidOAuthTokenError,
+  maybeCacheOAuthTokenAsInvalid,
 } from './oauthNegativeCache';
 import { OrganizationMatcher } from './organizationMatcher';
 import type { MachineTokenType, SessionTokenType } from './tokenTypes';

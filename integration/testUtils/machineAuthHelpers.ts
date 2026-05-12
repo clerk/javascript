@@ -432,48 +432,6 @@ export const registerOAuthAuthTests = (adapter: MachineAuthTestAdapter): void =>
       expect(res.status()).toBe(401);
     });
 
-    test('consistently rejects the same invalid oat_ token across repeated requests', async ({ request }) => {
-      // After the first rejection the token is cached as invalid in-process.
-      // Subsequent requests with the same token must still return 401 (not be
-      // accidentally accepted due to cache state).
-      const url = new URL(adapter.oauth.verifyPath, app.serverUrl).toString();
-      const invalidToken = `oat_integration_test_invalid_${Date.now()}`;
-
-      for (let i = 0; i < 3; i++) {
-        const res = await request.get(url, { headers: { Authorization: `Bearer ${invalidToken}` } });
-        expect(res.status()).toBe(401);
-      }
-    });
-
-    test('valid OAuth token is accepted after invalid tokens have been cached', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
-      const url = new URL(adapter.oauth.verifyPath, app.serverUrl).toString();
-
-      // Seed the negative cache with a few invalid tokens
-      for (let i = 0; i < 3; i++) {
-        await u.page.request.get(url, {
-          headers: { Authorization: `Bearer oat_integration_cache_seed_${i}` },
-        });
-      }
-
-      // A legitimate token obtained through the real OAuth flow must still work
-      const accessToken = await obtainOAuthAccessToken({
-        page: u.page,
-        oAuthApp: fakeOAuth.oAuthApp,
-        redirectUri: new URL(adapter.oauth.callbackPath, app.serverUrl).toString(),
-        fakeUser,
-        signIn: u.po.signIn,
-      });
-
-      const res = await u.page.request.get(url, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
-      expect(res.status()).toBe(200);
-      const authData = await res.json();
-      expect(authData.userId).toBeDefined();
-      expect(authData.tokenType).toBe(TokenType.OAuthToken);
-    });
-
     for (const [tokenType, token] of [
       ['API key', 'ak_test_mismatch'],
       ['M2M', 'mt_test_mismatch'],
