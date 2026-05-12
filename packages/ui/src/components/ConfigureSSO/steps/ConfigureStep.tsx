@@ -1,6 +1,3 @@
-import { useReverification, useUser } from '@clerk/shared/react';
-import type { UpdateMeEnterpriseConnectionParams } from '@clerk/shared/types';
-
 import { descriptors, Flow, localizationKeys } from '@/customizables';
 import { useCardState } from '@/elements/contexts';
 import { Form } from '@/elements/Form';
@@ -13,14 +10,8 @@ import { useWizard } from '../elements/Wizard';
 
 export const ConfigureStep = (): JSX.Element => {
   const card = useCardState();
-  const { user } = useUser();
   const { goNext, goPrev, isFirstStep } = useWizard();
-  const { enterpriseConnection } = useConfigureSSO();
-
-  const updateEnterpriseConnection = useReverification(
-    (enterpriseConnectionId: string, params: UpdateMeEnterpriseConnectionParams) =>
-      user?.updateEnterpriseConnection(enterpriseConnectionId, params),
-  );
+  const { enterpriseConnection, updateConnection } = useConfigureSSO();
 
   const metadataUrlField = useFormControl('idpMetadataUrl', '', {
     type: 'text',
@@ -42,9 +33,7 @@ export const ConfigureStep = (): JSX.Element => {
     card.setLoading();
 
     try {
-      await updateEnterpriseConnection(enterpriseConnection.id, {
-        saml: { idpMetadataUrl: trimmedMetadataUrl },
-      });
+      await updateConnection({ saml: { idpMetadataUrl: trimmedMetadataUrl } });
       void goNext();
     } catch (err) {
       handleError(err as Error, [metadataUrlField], card.setError);
