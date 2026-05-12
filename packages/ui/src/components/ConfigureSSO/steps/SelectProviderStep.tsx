@@ -57,7 +57,7 @@ export const SelectProviderStep = (): JSX.Element => {
     card.setLoading();
 
     try {
-      await createConnection();
+      await createConnection(selected);
       void goNext();
     } catch (err) {
       handleError(err as Error, [], card.setError);

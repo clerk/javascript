@@ -163,6 +163,7 @@ describe('SelectProviderStep', () => {
 
     expect(setProvider).toHaveBeenCalledWith('saml_okta');
     expect(createConnection).toHaveBeenCalledTimes(1);
+    expect(createConnection).toHaveBeenCalledWith('saml_okta');
     expect(callOrder).toEqual(['setProvider', 'createConnection', 'goNext']);
   });
 
@@ -180,6 +181,7 @@ describe('SelectProviderStep', () => {
 
     expect(setProvider).toHaveBeenCalledWith('saml_custom');
     expect(createConnection).toHaveBeenCalledTimes(1);
+    expect(createConnection).toHaveBeenCalledWith('saml_custom');
   });
 
   it('shows loading state while createConnection is pending', async () => {

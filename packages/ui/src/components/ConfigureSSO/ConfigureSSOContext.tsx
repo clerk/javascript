@@ -1,4 +1,4 @@
-import { __internal_useUserEnterpriseConnections, useSession, useUser } from '@clerk/shared/react';
+import { __internal_useUserEnterpriseConnections, useReverification, useSession, useUser } from '@clerk/shared/react';
 import type { EnterpriseConnectionResource } from '@clerk/shared/types';
 import React, { type PropsWithChildren } from 'react';
 
@@ -30,12 +30,11 @@ export interface ConfigureSSOData {
    */
   setProvider: (provider: ProviderType) => void;
   /**
-   * Creates the enterprise connection from the current provider selection,
-   * the user's primary email domain, and the session's active organization.
-   * No-ops when an enterprise connection already exists so callers can
-   * safely re-trigger.
+   * Creates the enterprise connection for the supplied provider, the user's
+   * primary email domain, and the session's active organization. No-ops when
+   * an enterprise connection already exists so callers can safely re-trigger.
    */
-  createConnection: () => Promise<void>;
+  createConnection: (provider: ProviderType) => Promise<void>;
 }
 
 interface ConfigureSSOFlowProviderProps {
@@ -61,26 +60,28 @@ export const ConfigureSSOFlowProvider = ({
 
   const initialStepId = deriveInitialStep(enterpriseConnection);
 
-  const createConnection = React.useCallback(async () => {
-    if (enterpriseConnection) {
-      return;
-    }
-    if (!provider) {
-      throw new Error('Provider not selected');
-    }
-    if (!user?.primaryEmailAddress) {
-      throw new Error('Primary email required');
-    }
+  const createConnectionFetcher = React.useCallback(
+    async (selectedProvider: ProviderType) => {
+      if (enterpriseConnection) {
+        return;
+      }
+      if (!user?.primaryEmailAddress) {
+        throw new Error('Primary email required');
+      }
 
-    const emailDomain = user.primaryEmailAddress.emailAddress.split('@')[1];
-    const organizationId = session?.lastActiveOrganizationId ?? null;
+      const emailDomain = user.primaryEmailAddress.emailAddress.split('@')[1];
+      const organizationId = session?.lastActiveOrganizationId ?? null;
 
-    await createEnterpriseConnection({
-      provider: 'saml_okta',
-      name: emailDomain,
-      organizationId,
-    });
-  }, [enterpriseConnection, provider, user, session, createEnterpriseConnection]);
+      await createEnterpriseConnection({
+        provider: selectedProvider,
+        name: emailDomain,
+        organizationId,
+      });
+    },
+    [enterpriseConnection, user, session, createEnterpriseConnection],
+  );
+
+  const createConnection = useReverification(createConnectionFetcher);
 
   const value = React.useMemo<ConfigureSSOData>(
     () => ({
@@ -91,7 +92,7 @@ export const ConfigureSSOFlowProvider = ({
       setProvider,
       createConnection,
     }),
-    [initialStepId, enterpriseConnection, isLoading, provider, setProvider, createConnection],
+    [initialStepId, enterpriseConnection, isLoading, provider, createConnection],
   );
 
   return <ConfigureSSOFlowContext.Provider value={value}>{children}</ConfigureSSOFlowContext.Provider>;
