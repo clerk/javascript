@@ -247,6 +247,15 @@ export const enUS: LocalizationResource = {
         subtitle: "Contact the application's administrator to get access through the existing connection.",
       },
     },
+    configureStep: {
+      title: 'Configure Okta Workforce',
+      subtitle: 'Create a new enterprise application in your Okta Dashboard',
+      metadataUrl: {
+        label: 'Metadata URL',
+        placeholder: 'https://app.okta.com/.../metadata',
+        description: 'In your Okta SAML app, go to the Sign On tab and retrieve the metadata URL. Paste it below.',
+      },
+    },
   },
   createOrganization: {
     formButtonSubmit: 'Create organization',

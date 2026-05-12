@@ -1338,6 +1338,15 @@ export type __internal_LocalizationResource = {
         subtitle: LocalizationValue;
       };
     };
+    configureStep: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      metadataUrl: {
+        label: LocalizationValue;
+        placeholder: LocalizationValue;
+        description: LocalizationValue;
+      };
+    };
   };
   apiKeys: {
     formTitle: LocalizationValue;
