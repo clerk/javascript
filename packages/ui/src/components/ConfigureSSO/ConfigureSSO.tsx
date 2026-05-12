@@ -10,7 +10,7 @@ import { ProfileCard } from '@/elements/ProfileCard';
 import { ExclamationTriangle } from '@/icons';
 import { Route, Switch } from '@/router';
 
-import { ConfigureSSOFlowProvider, useConfigureSSOFlow } from './ConfigureSSOContext';
+import { ConfigureSSOProvider, useConfigureSSO } from './ConfigureSSOContext';
 import { ConfigureSSOHeader } from './ConfigureSSOHeader';
 import { ConfigureSSONavbar } from './ConfigureSSONavbar';
 import { ConfigureSSOSkeleton } from './ConfigureSSOSkeleton';
@@ -64,8 +64,11 @@ const AuthenticatedContent = withCoreUserGuard(() => {
 });
 
 const ConfigureSSOCardContent = () => {
-  const { data: enterpriseConnections, isLoading } = __internal_useUserEnterpriseConnections({ enabled: true });
-
+  const {
+    data: enterpriseConnections,
+    isLoading,
+    createEnterpriseConnection,
+  } = __internal_useUserEnterpriseConnections({ enabled: true });
   // Currently FAPI only supports one enterprise connection per user
   const enterpriseConnection = enterpriseConnections?.[0];
 
@@ -74,17 +77,17 @@ const ConfigureSSOCardContent = () => {
   }
 
   return (
-    <ConfigureSSOFlowProvider
+    <ConfigureSSOProvider
       enterpriseConnection={enterpriseConnection}
-      isLoading={isLoading}
+      createEnterpriseConnection={createEnterpriseConnection}
     >
       <ConfigureSSOSteps />
-    </ConfigureSSOFlowProvider>
+    </ConfigureSSOProvider>
   );
 };
 
 const ConfigureSSOSteps = () => {
-  const { initialStepId } = useConfigureSSOFlow();
+  const { initialStepId } = useConfigureSSO();
 
   return (
     <Wizard initialStepId={initialStepId}>

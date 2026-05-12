@@ -17,7 +17,7 @@ import { useCardState } from '@/elements/contexts';
 import { Alert } from '@/ui/elements/Alert';
 import { handleError } from '@/utils/errorHandler';
 
-import { useConfigureSSOFlow } from '../ConfigureSSOContext';
+import { useConfigureSSO } from '../ConfigureSSOContext';
 import { Step } from '../elements/Step';
 import { useWizard } from '../elements/Wizard';
 import type { ProviderType } from '../types';
@@ -44,7 +44,7 @@ const PROVIDER_GROUPS: ReadonlyArray<{
 export const SelectProviderStep = (): JSX.Element => {
   const card = useCardState();
   const { goNext, isLastStep } = useWizard();
-  const { setProvider, createConnection } = useConfigureSSOFlow();
+  const { setProvider, createConnection } = useConfigureSSO();
   const [selected, setSelected] = React.useState<ProviderType | null>(null);
 
   const handleContinue = async () => {

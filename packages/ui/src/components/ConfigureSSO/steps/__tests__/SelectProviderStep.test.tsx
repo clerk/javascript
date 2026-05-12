@@ -31,9 +31,8 @@ const clearProvider = vi.fn();
 const createConnection = vi.fn();
 
 vi.mock('../../ConfigureSSOContext', () => ({
-  useConfigureSSOFlow: () => ({
+  useConfigureSSO: () => ({
     enterpriseConnection: undefined,
-    isLoading: false,
     provider: undefined,
     setProvider,
     clearProvider,

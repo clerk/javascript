@@ -1,5 +1,5 @@
-import { __internal_useUserEnterpriseConnections, useReverification, useSession, useUser } from '@clerk/shared/react';
-import type { EnterpriseConnectionResource } from '@clerk/shared/types';
+import { useReverification, useSession, useUser } from '@clerk/shared/react';
+import type { CreateMeEnterpriseConnectionParams, EnterpriseConnectionResource } from '@clerk/shared/types';
 import React, { type PropsWithChildren } from 'react';
 
 import { deriveInitialStep } from './deriveInitialStep';
@@ -14,10 +14,6 @@ export interface ConfigureSSOData {
    * The enterprise connection from the user's primary email address domain
    */
   enterpriseConnection: EnterpriseConnectionResource | undefined;
-  /**
-   * Whether the underlying enterprise connection data is still loading
-   */
-  isLoading: boolean;
   /**
    * The provider selected for this configuration. Reads from the existing
    * enterprise connection when present, falling back to the local selection
@@ -37,26 +33,26 @@ export interface ConfigureSSOData {
   createConnection: (provider: ProviderType) => Promise<void>;
 }
 
-interface ConfigureSSOFlowProviderProps {
+interface ConfigureSSOProviderProps {
   enterpriseConnection: EnterpriseConnectionResource | undefined;
-  isLoading?: boolean;
+  createEnterpriseConnection: (
+    params: CreateMeEnterpriseConnectionParams,
+  ) => Promise<EnterpriseConnectionResource | undefined>;
 }
 
-const ConfigureSSOFlowContext = React.createContext<ConfigureSSOData | null>(null);
-ConfigureSSOFlowContext.displayName = 'ConfigureSSOFlowContext';
+const ConfigureSSOContext = React.createContext<ConfigureSSOData | null>(null);
+ConfigureSSOContext.displayName = 'ConfigureSSOContext';
 
-export const ConfigureSSOFlowProvider = ({
+export const ConfigureSSOProvider = ({
   enterpriseConnection,
-  isLoading = false,
+  createEnterpriseConnection,
   children,
-}: PropsWithChildren<ConfigureSSOFlowProviderProps>): JSX.Element => {
+}: PropsWithChildren<ConfigureSSOProviderProps>): JSX.Element => {
   const { user } = useUser();
   const { session } = useSession();
   const [provider, setProvider] = React.useState<ProviderType | undefined>(
     enterpriseConnection?.provider as ProviderType,
   );
-
-  const { createEnterpriseConnection } = __internal_useUserEnterpriseConnections();
 
   const initialStepId = deriveInitialStep(enterpriseConnection);
 
@@ -87,21 +83,20 @@ export const ConfigureSSOFlowProvider = ({
     () => ({
       initialStepId,
       enterpriseConnection,
-      isLoading,
       provider,
       setProvider,
       createConnection,
     }),
-    [initialStepId, enterpriseConnection, isLoading, provider, createConnection],
+    [initialStepId, enterpriseConnection, provider, createConnection],
   );
 
-  return <ConfigureSSOFlowContext.Provider value={value}>{children}</ConfigureSSOFlowContext.Provider>;
+  return <ConfigureSSOContext.Provider value={value}>{children}</ConfigureSSOContext.Provider>;
 };
 
-export const useConfigureSSOFlow = (): ConfigureSSOData => {
-  const ctx = React.useContext(ConfigureSSOFlowContext);
+export const useConfigureSSO = (): ConfigureSSOData => {
+  const ctx = React.useContext(ConfigureSSOContext);
   if (!ctx) {
-    throw new Error('useConfigureSSOFlow called outside <ConfigureSSOFlowProvider>.');
+    throw new Error('useConfigureSSO called outside <ConfigureSSOProvider>.');
   }
   return ctx;
 };
