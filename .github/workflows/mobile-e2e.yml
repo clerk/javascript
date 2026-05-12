@@ -218,7 +218,9 @@ jobs:
             | jq '{id, email_addresses: [.email_addresses[].email_address], password_enabled, banned, locked}'
 
       - name: Set up JDK 17
-        if: steps.apk-cache.outputs.cache-hit != 'true'
+        # Always run, not just on cache miss: Maestro itself requires Java 17+
+        # to launch (the maestro CLI is a JVM app). When the APK cache hits
+        # and we skip gradle, we still need Java for the Maestro test step.
         uses: actions/setup-java@v4
         with:
           distribution: temurin
