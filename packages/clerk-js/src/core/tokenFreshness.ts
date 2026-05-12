@@ -20,12 +20,28 @@ export function claimFreshness(input: TokenResource | JWT | undefined | null): n
 }
 
 /**
+ * Extracts the underlying JWT from a TokenResource wrapper, or returns the JWT as-is.
+ */
+function asJwt(input: TokenResource | JWT): JWT | undefined {
+  return 'getRawString' in input ? input.jwt : input;
+}
+
+/**
  * Determines whether an incoming token should be rejected in favor of the existing one.
- * Returns true if the incoming token is staler than the existing one.
+ * Returns true if the incoming token is staler than the existing one. Accepts either
+ * TokenResource (cache layer) or a raw decoded JWT (cookie layer).
+ *
+ * Notes on coverage: enforced at /tokens responses, broadcast events, and cookie writes.
+ * Handshake-installed __session cookies are intentionally NOT gated here: handshake is
+ * a redirect-based full auth state resync, the browser commits the Set-Cookie before
+ * any SDK code runs, and there is no in-flight race window for the gate to protect.
  *
  * @internal
  */
-export function shouldRejectToken(existing: TokenResource, incoming: TokenResource): boolean {
+export function shouldRejectToken(
+  existing: TokenResource | JWT,
+  incoming: TokenResource | JWT,
+): boolean {
   const existingFreshness = claimFreshness(existing);
   const incomingFreshness = claimFreshness(incoming);
 
@@ -43,16 +59,18 @@ export function shouldRejectToken(existing: TokenResource, incoming: TokenResour
   }
 
   // Equal freshness: tie-break depends on regime
-  const existingHasOiat = existing.jwt?.header?.oiat != null;
-  const incomingHasOiat = incoming.jwt?.header?.oiat != null;
+  const existingJwt = asJwt(existing);
+  const incomingJwt = asJwt(incoming);
+  const existingHasOiat = existingJwt?.header?.oiat != null;
+  const incomingHasOiat = incomingJwt?.header?.oiat != null;
   const sameRegime = existingHasOiat === incomingHasOiat;
 
   if (sameRegime) {
     // Same regime, equal freshness.
     // Both have oiat: tie-break by iat (more recent mint wins). Equal iat: keep existing.
     // Neither has oiat: both origin, same DB snapshot. Keep existing (avoid churn).
-    const existingIat = existing.jwt?.claims?.iat ?? 0;
-    const incomingIat = incoming.jwt?.claims?.iat ?? 0;
+    const existingIat = existingJwt?.claims?.iat ?? 0;
+    const incomingIat = incomingJwt?.claims?.iat ?? 0;
     return existingIat >= incomingIat;
   }
 
