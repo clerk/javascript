@@ -190,6 +190,10 @@ export const jaJP: LocalizationResource = {
     year: '年',
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'エンタープライズ接続を管理する権限を取得するには、組織の管理者にお問い合わせください。',
+      title: 'エンタープライズ接続を管理する権限がありません',
+    },
     navbar: {
       title: 'シングルサインオン（SSO）を設定',
     },

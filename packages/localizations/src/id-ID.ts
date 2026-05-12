@@ -179,6 +179,10 @@ export const idID: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'Hubungi administrator organisasi Anda untuk mendapatkan izin mengelola koneksi enterprise.',
+      title: 'Anda tidak memiliki izin untuk mengelola koneksi enterprise',
+    },
     navbar: {
       title: 'Konfigurasi Single Sign-On (SSO)',
     },

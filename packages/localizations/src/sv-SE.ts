@@ -179,6 +179,10 @@ export const svSE: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'Kontakta administratören för din organisation för att få behörighet att hantera företagsanslutningar.',
+      title: 'Du har inte behörighet att hantera företagsanslutningar',
+    },
     navbar: {
       title: 'Konfigurera enkel inloggning (SSO)',
     },

@@ -183,6 +183,10 @@ export const thTH: LocalizationResource = {
     year: 'ปี',
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'ติดต่อผู้ดูแลระบบขององค์กรของคุณเพื่อขอสิทธิ์ในการจัดการการเชื่อมต่อระดับองค์กร',
+      title: 'คุณไม่มีสิทธิ์จัดการการเชื่อมต่อระดับองค์กร',
+    },
     navbar: {
       title: 'กำหนดค่าการลงชื่อเข้าใช้แบบครั้งเดียว (SSO)',
     },
