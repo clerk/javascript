@@ -505,7 +505,7 @@ export interface BillingInitializedPaymentMethodResource extends ClerkResource {
    */
   externalGatewayId: string;
   /**
-   * The order the payment methods will be displayed in when `<PaymentElement/>` renders.
+   * The order the payment methods will be displayed in when [`<PaymentElement/>`](/docs/nextjs/reference/hooks/use-payment-element#payment-element) renders.
    */
   paymentMethodOrder: string[];
 }
