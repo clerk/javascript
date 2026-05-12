@@ -26,12 +26,20 @@ const Layout = ({ sx, ...props }: StepLayoutProps): JSX.Element => (
   />
 );
 
-type StepSectionProps = PropsOfComponent<typeof Col>;
+type StepSectionProps = PropsOfComponent<typeof Col> & {
+  /**
+   * When true, the section grows to fill its parent's remaining vertical
+   * space (flex: 1). Defaults to false so the section sizes to its content
+   * — required for Step.Header, multi-section sub-steps, and other places
+   * where a section should stay natural-height.
+   */
+  fill?: boolean;
+};
 
-const Section = ({ sx, ...props }: StepSectionProps): JSX.Element => (
+const Section = ({ fill, sx, ...props }: StepSectionProps): JSX.Element => (
   <Col
     {...props}
-    sx={[theme => ({ padding: theme.space.$5 }), sx]}
+    sx={[theme => ({ padding: theme.space.$5 }), fill && { flex: 1 }, sx]}
   />
 );
 
