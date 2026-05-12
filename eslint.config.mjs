@@ -267,7 +267,6 @@ export default tseslint.config([
       'commitlint.config.ts',
       'packages/*/dist/**',
       'packages/*/examples',
-      'playground/*',
       'pnpm-lock.json',
       'eslint.config.mjs',
       'typedoc.config.mjs',
