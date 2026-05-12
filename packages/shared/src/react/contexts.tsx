@@ -74,6 +74,7 @@ export type UseCheckoutOptions = {
    */
   planId: string;
   seatsQuantity?: number;
+  priceId?: string;
 };
 
 const [CheckoutContext, useCheckoutContext] = createContextAndHook<UseCheckoutOptions>('CheckoutContext');

@@ -149,7 +149,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
           const { data: plans } = await clerk.billing.getPlans({
             for: 'organization',
             org_id: organization.id,
-            min_seats: err.errors[0].meta?.seatQuantity,
+            min_seats: err.errors[0].meta?.seatsQuantity,
           });
 
           if (plans.length === 0) {
@@ -159,20 +159,24 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
           const activeSubscriptionItem = subscriptionItems.find(si => si.status === 'active');
           if (activeSubscriptionItem) {
             const currentPlan = activeSubscriptionItem.plan;
-            const currentPlanSupportsDesiredSeatQuantity = plans.some(p => p.id === currentPlan.id);
-            if (currentPlanSupportsDesiredSeatQuantity) {
+            const currentPlanAndPriceSupportsDesiredSeatQuantity = plans.some(
+              p =>
+                p.id === currentPlan.id &&
+                p.availablePrices?.some(price => price.id === activeSubscriptionItem.priceId),
+            );
+            if (currentPlanAndPriceSupportsDesiredSeatQuantity) {
               console.log('params', {
                 mode: 'modal',
                 plan: currentPlan,
                 planPeriod: activeSubscriptionItem.planPeriod,
-                seatsQuantity: err.errors[0].meta?.seatQuantity,
+                seatsQuantity: err.errors[0].meta?.seatsQuantity,
                 portalRoot,
               });
               handleSelectPlan({
                 mode: 'modal',
                 plan: currentPlan,
                 planPeriod: activeSubscriptionItem.planPeriod,
-                seatsQuantity: err.errors[0].meta?.seatQuantity,
+                seatsQuantity: err.errors[0].meta?.seatsQuantity,
                 portalRoot,
               });
             }

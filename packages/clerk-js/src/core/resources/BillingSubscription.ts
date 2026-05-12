@@ -66,6 +66,7 @@ export class BillingSubscriptionItem extends BaseResource implements BillingSubs
   id!: string;
   plan!: BillingPlan;
   planPeriod!: BillingSubscriptionPlanPeriod;
+  priceId!: string;
   status!: BillingSubscriptionStatus;
   createdAt!: Date;
   periodStart!: Date;
@@ -94,6 +95,7 @@ export class BillingSubscriptionItem extends BaseResource implements BillingSubs
     this.id = data.id;
     this.plan = new BillingPlan(data.plan);
     this.planPeriod = data.plan_period;
+    this.priceId = data.price_id;
     this.status = data.status;
 
     this.createdAt = unixEpochToDate(data.created_at);

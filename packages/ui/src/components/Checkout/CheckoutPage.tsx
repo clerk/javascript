@@ -16,7 +16,7 @@ const Initiator = () => {
 };
 
 const Root = ({ children }: { children: React.ReactNode }) => {
-  const { planId, planPeriod, for: _for, seatsQuantity } = useCheckoutContext();
+  const { planId, planPeriod, for: _for, seatsQuantity, priceId } = useCheckoutContext();
 
   return (
     <CheckoutProvider
@@ -30,6 +30,7 @@ const Root = ({ children }: { children: React.ReactNode }) => {
         planPeriod!
       }
       seatsQuantity={seatsQuantity}
+      priceId={priceId}
     >
       <Initiator />
       {children}

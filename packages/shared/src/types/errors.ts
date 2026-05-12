@@ -65,8 +65,8 @@ export interface ClerkAPIError {
       name: string;
     };
     isPlanUpgradePossible?: boolean;
-    seatQuantityToAdd?: number;
-    seatQuantity?: number;
+    seatsQuantityToAdd?: number;
+    seatsQuantity?: number;
   };
 }
 

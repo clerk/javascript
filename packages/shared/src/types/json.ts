@@ -783,6 +783,7 @@ export interface BillingSubscriptionItemJSON extends ClerkResourceJSON {
   credits?: BillingCreditsJSON;
   plan: BillingPlanJSON;
   plan_period: BillingSubscriptionPlanPeriod;
+  price_id: string;
   status: BillingSubscriptionStatus;
   created_at: number;
   period_start: number;

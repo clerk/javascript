@@ -80,6 +80,7 @@ export type __experimental_CheckoutOptions = {
   planPeriod: BillingSubscriptionPlanPeriod;
   planId: string;
   seatsQuantity?: number;
+  priceId?: string;
 };
 
 export type CheckoutErrors = {
@@ -2150,6 +2151,7 @@ export type __internal_CheckoutProps = {
   planId?: string;
   planPeriod?: BillingSubscriptionPlanPeriod;
   seatsQuantity?: number;
+  priceId?: string;
   for?: ForPayerType;
   onSubscriptionComplete?: () => void;
   portalId?: string;
@@ -2171,6 +2173,7 @@ export type __experimental_CheckoutButtonProps = {
   planPeriod?: BillingSubscriptionPlanPeriod;
   for?: ForPayerType;
   seatsQuantity?: number;
+  priceId?: string;
   onSubscriptionComplete?: () => void;
   checkoutProps?: {
     appearance?: ClerkAppearanceTheme;

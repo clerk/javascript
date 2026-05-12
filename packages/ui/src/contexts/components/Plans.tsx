@@ -97,6 +97,7 @@ type HandleSelectPlanProps = {
   plan: BillingPlanResource;
   planPeriod: BillingSubscriptionPlanPeriod;
   seatsQuantity?: number;
+  priceId?: string;
   mode?: 'modal' | 'mounted';
   event?: React.MouseEvent<HTMLElement>;
   portalRoot?: HTMLElement | null;
@@ -340,6 +341,7 @@ export const usePlansContext = () => {
       plan,
       planPeriod,
       seatsQuantity,
+      priceId,
       mode = 'mounted',
       event,
       portalRoot: providedPortalRoot,
@@ -354,6 +356,7 @@ export const usePlansContext = () => {
         planPeriod: determinePlanPeriod(plan, planPeriod),
         for: subscriberType,
         seatsQuantity,
+        priceId,
         onSubscriptionComplete: () => {
           revalidateAll();
         },
