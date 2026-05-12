@@ -207,19 +207,6 @@ export const isIS: LocalizationResource = {
     yearPerUnit: 'Ár á {{unitName}}',
   },
   configureSSO: {
-    confirmation: {
-      domainSection: {
-        title: 'Lén',
-      },
-      enableSection: {
-        title: 'Virkja SSO',
-      },
-      statusSection: {
-        activeBadge: 'Virkur',
-        inactiveBadge: 'Óvirkur',
-        title: 'SSO staða',
-      },
-    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle:
         'Hafðu samband við stjórnanda fyrirtækisins þíns til að fá heimildir til að stjórna fyrirtækjatengingum.',

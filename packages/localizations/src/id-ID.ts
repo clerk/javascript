@@ -179,19 +179,6 @@ export const idID: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
-    confirmation: {
-      domainSection: {
-        title: 'Domain',
-      },
-      enableSection: {
-        title: 'Aktifkan SSO',
-      },
-      statusSection: {
-        activeBadge: 'Aktif',
-        inactiveBadge: 'Tidak aktif',
-        title: 'Status SSO',
-      },
-    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'Hubungi administrator organisasi Anda untuk mendapatkan izin mengelola koneksi enterprise.',
       title: 'Anda tidak memiliki izin untuk mengelola koneksi enterprise',

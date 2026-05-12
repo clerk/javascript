@@ -185,19 +185,6 @@ export const deDE: LocalizationResource = {
     year: 'Jahr',
   },
   configureSSO: {
-    confirmation: {
-      domainSection: {
-        title: 'Domain',
-      },
-      enableSection: {
-        title: 'SSO aktivieren',
-      },
-      statusSection: {
-        activeBadge: 'Aktiv',
-        inactiveBadge: 'Inaktiv',
-        title: 'SSO-Status',
-      },
-    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle:
         'Wenden Sie sich an Ihren Organisationsadministrator, um Berechtigungen zur Verwaltung von Enterprise-Verbindungen zu erhalten.',

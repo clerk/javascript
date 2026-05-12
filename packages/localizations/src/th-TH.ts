@@ -183,19 +183,6 @@ export const thTH: LocalizationResource = {
     year: 'ปี',
   },
   configureSSO: {
-    confirmation: {
-      domainSection: {
-        title: 'โดเมน',
-      },
-      enableSection: {
-        title: 'เปิดใช้งาน SSO',
-      },
-      statusSection: {
-        activeBadge: 'ใช้งาน',
-        inactiveBadge: 'ไม่ใช้งาน',
-        title: 'สถานะ SSO',
-      },
-    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'ติดต่อผู้ดูแลระบบขององค์กรของคุณเพื่อขอสิทธิ์ในการจัดการการเชื่อมต่อระดับองค์กร',
       title: 'คุณไม่มีสิทธิ์จัดการการเชื่อมต่อระดับองค์กร',

@@ -179,19 +179,6 @@ export const plPL: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
-    confirmation: {
-      domainSection: {
-        title: 'Domena',
-      },
-      enableSection: {
-        title: 'Włącz SSO',
-      },
-      statusSection: {
-        activeBadge: 'Aktywny',
-        inactiveBadge: 'Nieaktywny',
-        title: 'Status SSO',
-      },
-    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle:
         'Skontaktuj się z administratorem swojej organizacji, aby uzyskać uprawnienia do zarządzania połączeniami korporacyjnymi.',

@@ -1,4 +1,4 @@
-import { useReverification, useUser } from '@clerk/shared/react';
+import { __internal_useUserEnterpriseConnections, useReverification } from '@clerk/shared/react';
 import { useState } from 'react';
 
 import { Badge, Col, descriptors, Flex, Flow, Grid, Link, localizationKeys, Text } from '@/customizables';
@@ -12,10 +12,10 @@ import { FormContainer } from '@/elements/FormContainer';
 import { ProfileSection } from '@/elements/Section';
 import { Switch } from '@/elements/Switch';
 import { mqu } from '@/styledSystem';
+import { useFormControl } from '@/ui/utils/useFormControl';
 import { handleError } from '@/utils/errorHandler';
-import { useFormControl } from '@/utils/useFormControl';
 
-import { useConfigureSSOFlow } from '../ConfigureSSOContext';
+import { useConfigureSSO } from '../ConfigureSSOContext';
 import { Step } from '../elements/Step';
 import { useWizard } from '../elements/Wizard';
 
@@ -41,7 +41,7 @@ export const ConfirmationStep = (): JSX.Element => {
 };
 
 const SsoStatusSection = (): JSX.Element => {
-  const { enterpriseConnection } = useConfigureSSOFlow();
+  const { enterpriseConnection } = useConfigureSSO();
   const isActive = !!enterpriseConnection?.active;
 
   return (
@@ -65,18 +65,16 @@ const SsoStatusSection = (): JSX.Element => {
 };
 
 const EnableSsoSection = (): JSX.Element => {
-  const { enterpriseConnection } = useConfigureSSOFlow();
-  const { user } = useUser();
+  const { enterpriseConnection } = useConfigureSSO();
+  const { updateEnterpriseConnection } = __internal_useUserEnterpriseConnections({ enabled: false });
   const card = useCardState();
 
   const [isChecked, setIsChecked] = useState(!!enterpriseConnection?.active);
 
-  const updateEnterpriseConnection = useReverification((id: string, active: boolean) =>
-    user?.updateEnterpriseConnection(id, { active }),
-  );
+  const updateActive = useReverification((id: string, active: boolean) => updateEnterpriseConnection(id, { active }));
 
-  const onChange = async (active: boolean) => {
-    if (!enterpriseConnection || card.isLoading) {
+  const onActiveChange = async (active: boolean) => {
+    if (card.isLoading) {
       return;
     }
 
@@ -85,7 +83,9 @@ const EnableSsoSection = (): JSX.Element => {
     setIsChecked(active);
 
     try {
-      const updated = await updateEnterpriseConnection(enterpriseConnection.id, active);
+      // Enterprise connection is guaranteed to be set at this point
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const updated = await updateActive(enterpriseConnection!.id, active);
       if (updated) {
         setIsChecked(updated.active);
       }
@@ -101,12 +101,12 @@ const EnableSsoSection = (): JSX.Element => {
     <ProfileSection.Root
       title={localizationKeys('configureSSO.confirmation.enableSection.title')}
       id='enableSso'
-      sx={{ border: 0 }}
+      sx={t => ({ border: 0, paddingBlock: t.space.$2 })}
     >
       <Switch
         isChecked={isChecked}
         isDisabled={card.isLoading}
-        onChange={active => void onChange(active)}
+        onChange={active => void onActiveChange(active)}
         aria-label='Enable SSO'
       />
     </ProfileSection.Root>
@@ -114,9 +114,10 @@ const EnableSsoSection = (): JSX.Element => {
 };
 
 const DomainSection = (): JSX.Element | null => {
-  const { enterpriseConnection } = useConfigureSSOFlow();
+  const { enterpriseConnection } = useConfigureSSO();
   const domain = enterpriseConnection?.domains?.[0];
 
+  // A type guard only, domains are guaranteed to be set at this point
   if (!domain) {
     return null;
   }
@@ -131,7 +132,13 @@ const DomainSection = (): JSX.Element | null => {
         href={`https://${domain}`}
         isExternal
         title={domain}
-        sx={{ display: 'block', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}
+        sx={{
+          display: 'block',
+          overflow: 'hidden',
+          whiteSpace: 'nowrap',
+          textOverflow: 'ellipsis',
+          textDecoration: 'underline',
+        }}
       >
         {domain}
       </Link>
@@ -140,9 +147,11 @@ const DomainSection = (): JSX.Element | null => {
 };
 
 const ConfigurationDetailsSection = (): JSX.Element => {
-  const { enterpriseConnection } = useConfigureSSOFlow();
-  const samlConnection = enterpriseConnection?.samlConnection;
+  const { enterpriseConnection } = useConfigureSSO();
   const { goToStep } = useWizard();
+
+  // This will later be expanded to support OIDC connections as well
+  const samlConnection = enterpriseConnection?.samlConnection;
 
   return (
     <ProfileSection.Root
@@ -211,11 +220,11 @@ const ConfigurationDetailsSection = (): JSX.Element => {
 const ResetConnectionForm = withCardStateProvider((props: FormProps) => {
   const { onReset, onSuccess } = props;
   const card = useCardState();
-  const { enterpriseConnection } = useConfigureSSOFlow();
-  const { user } = useUser();
+  const { enterpriseConnection } = useConfigureSSO();
+  const { deleteEnterpriseConnection } = __internal_useUserEnterpriseConnections({ enabled: false });
   const { goToStep } = useWizard();
 
-  const deleteEnterpriseConnection = useReverification((id: string) => user?.deleteEnterpriseConnection(id));
+  const deleteConnection = useReverification((id: string) => deleteEnterpriseConnection(id));
 
   const confirmationField = useFormControl('deleteConfirmation', '', {
     type: 'text',
@@ -234,7 +243,7 @@ const ResetConnectionForm = withCardStateProvider((props: FormProps) => {
     }
 
     try {
-      await deleteEnterpriseConnection(enterpriseConnection.id);
+      await deleteConnection(enterpriseConnection.id);
       onSuccess();
       await goToStep('select-provider');
     } catch (err) {

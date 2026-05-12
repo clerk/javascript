@@ -179,19 +179,6 @@ export const nlBE: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
-    confirmation: {
-      domainSection: {
-        title: 'Domein',
-      },
-      enableSection: {
-        title: 'SSO inschakelen',
-      },
-      statusSection: {
-        activeBadge: 'Actief',
-        inactiveBadge: 'Inactief',
-        title: 'SSO-status',
-      },
-    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle:
         'Neem contact op met de beheerder van uw organisatie om toestemming te krijgen voor het beheren van enterprise-verbindingen.',

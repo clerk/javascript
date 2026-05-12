@@ -179,19 +179,6 @@ export const teIN: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
-    confirmation: {
-      domainSection: {
-        title: 'డొమైన్',
-      },
-      enableSection: {
-        title: 'SSO ని ప్రారంభించండి',
-      },
-      statusSection: {
-        activeBadge: 'సక్రియ',
-        inactiveBadge: 'నిష్క్రియ',
-        title: 'SSO స్థితి',
-      },
-    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'ఎంటర్‌ప్రైజ్ కనెక్షన్‌లను నిర్వహించడానికి అనుమతులు పొందడానికి మీ సంస్థ నిర్వాహకుడిని సంప్రదించండి.',
       title: 'ఎంటర్‌ప్రైజ్ కనెక్షన్‌లను నిర్వహించడానికి మీకు అనుమతి లేదు',

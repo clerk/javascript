@@ -179,19 +179,6 @@ export const skSK: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
-    confirmation: {
-      domainSection: {
-        title: 'Doména',
-      },
-      enableSection: {
-        title: 'Povoliť SSO',
-      },
-      statusSection: {
-        activeBadge: 'Aktívny',
-        inactiveBadge: 'Neaktívny',
-        title: 'Stav SSO',
-      },
-    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle:
         'Kontaktujte správcu vašej organizácie, aby ste získali oprávnenia na spravovanie podnikových pripojení.',

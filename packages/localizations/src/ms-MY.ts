@@ -179,19 +179,6 @@ export const msMY: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
-    confirmation: {
-      domainSection: {
-        title: 'Domain',
-      },
-      enableSection: {
-        title: 'Aktifkan SSO',
-      },
-      statusSection: {
-        activeBadge: 'Aktif',
-        inactiveBadge: 'Tidak aktif',
-        title: 'Status SSO',
-      },
-    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'Hubungi pentadbir organisasi anda untuk mendapatkan kebenaran mengurus sambungan perusahaan.',
       title: 'Anda tidak mempunyai kebenaran untuk mengurus sambungan perusahaan',

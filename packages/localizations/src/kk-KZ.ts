@@ -179,19 +179,6 @@ export const kkKZ: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
-    confirmation: {
-      domainSection: {
-        title: 'Домен',
-      },
-      enableSection: {
-        title: 'SSO қосу',
-      },
-      statusSection: {
-        activeBadge: 'Белсенді',
-        inactiveBadge: 'Белсенді емес',
-        title: 'SSO күйі',
-      },
-    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'Корпоративтік қосылыстарды басқару рұқсаттарын алу үшін ұйым әкімшісіне хабарласыңыз.',
       title: 'Сізде корпоративтік қосылыстарды басқаруға рұқсат жоқ',

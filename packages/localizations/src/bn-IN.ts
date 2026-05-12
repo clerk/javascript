@@ -179,19 +179,6 @@ export const bnIN: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
-    confirmation: {
-      domainSection: {
-        title: 'ডোমেইন',
-      },
-      enableSection: {
-        title: 'SSO সক্রিয় করুন',
-      },
-      statusSection: {
-        activeBadge: 'সক্রিয়',
-        inactiveBadge: 'নিষ্ক্রিয়',
-        title: 'SSO স্ট্যাটাস',
-      },
-    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'এন্টারপ্রাইজ সংযোগ পরিচালনার অনুমতি পেতে আপনার সংস্থার প্রশাসকের সাথে যোগাযোগ করুন।',
       title: 'এন্টারপ্রাইজ সংযোগ পরিচালনার অনুমতি আপনার নেই',

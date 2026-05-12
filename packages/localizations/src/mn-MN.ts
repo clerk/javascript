@@ -179,19 +179,6 @@ export const mnMN: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
-    confirmation: {
-      domainSection: {
-        title: 'Домейн',
-      },
-      enableSection: {
-        title: 'SSO идэвхжүүлэх',
-      },
-      statusSection: {
-        activeBadge: 'Идэвхтэй',
-        inactiveBadge: 'Идэвхгүй',
-        title: 'SSO төлөв',
-      },
-    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'Аж ахуйн нэгжийн холболтыг удирдах эрх авахын тулд байгууллагынхаа админтай холбогдоно уу.',
       title: 'Танд аж ахуйн нэгжийн холболтыг удирдах эрх байхгүй байна',

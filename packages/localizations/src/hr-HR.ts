@@ -208,19 +208,6 @@ export const hrHR: LocalizationResource = {
     yearPerUnit: 'Godina po {{unitName}}',
   },
   configureSSO: {
-    confirmation: {
-      domainSection: {
-        title: 'Domena',
-      },
-      enableSection: {
-        title: 'Omogući SSO',
-      },
-      statusSection: {
-        activeBadge: 'Aktivno',
-        inactiveBadge: 'Neaktivno',
-        title: 'SSO status',
-      },
-    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle:
         'Obratite se administratoru vaše organizacije kako biste dobili dopuštenja za upravljanje poslovnim vezama.',

@@ -185,19 +185,6 @@ export const esES: LocalizationResource = {
     year: 'Año',
   },
   configureSSO: {
-    confirmation: {
-      domainSection: {
-        title: 'Dominio',
-      },
-      enableSection: {
-        title: 'Activar SSO',
-      },
-      statusSection: {
-        activeBadge: 'Activo',
-        inactiveBadge: 'Inactivo',
-        title: 'Estado SSO',
-      },
-    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle:
         'Contacte al administrador de su organización para obtener permisos para gestionar conexiones empresariales.',

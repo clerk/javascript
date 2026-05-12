@@ -179,19 +179,6 @@ export const esUY: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
-    confirmation: {
-      domainSection: {
-        title: 'Dominio',
-      },
-      enableSection: {
-        title: 'Habilitar SSO',
-      },
-      statusSection: {
-        activeBadge: 'Activo',
-        inactiveBadge: 'Inactivo',
-        title: 'Estado SSO',
-      },
-    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle:
         'Contactá al administrador de tu organización para obtener permisos para gestionar conexiones empresariales.',

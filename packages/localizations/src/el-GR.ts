@@ -179,19 +179,6 @@ export const elGR: LocalizationResource = {
     year: 'έτος',
   },
   configureSSO: {
-    confirmation: {
-      domainSection: {
-        title: 'Τομέας',
-      },
-      enableSection: {
-        title: 'Ενεργοποίηση SSO',
-      },
-      statusSection: {
-        activeBadge: 'Ενεργό',
-        inactiveBadge: 'Ανενεργό',
-        title: 'Κατάσταση SSO',
-      },
-    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle:
         'Επικοινωνήστε με τον διαχειριστή του οργανισμού σας για να αποκτήσετε άδειες διαχείρισης εταιρικών συνδέσεων.',

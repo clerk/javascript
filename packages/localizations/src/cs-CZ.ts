@@ -183,19 +183,6 @@ export const csCZ: LocalizationResource = {
     year: 'Rok',
   },
   configureSSO: {
-    confirmation: {
-      domainSection: {
-        title: 'Doména',
-      },
-      enableSection: {
-        title: 'Povolit SSO',
-      },
-      statusSection: {
-        activeBadge: 'Aktivní',
-        inactiveBadge: 'Neaktivní',
-        title: 'Stav SSO',
-      },
-    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'Kontaktujte správce vaší organizace, abyste získali oprávnění ke správě podnikových připojení.',
       title: 'Nemáte oprávnění ke správě podnikových připojení',

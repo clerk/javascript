@@ -183,19 +183,6 @@ export const viVN: LocalizationResource = {
     year: 'Năm',
   },
   configureSSO: {
-    confirmation: {
-      domainSection: {
-        title: 'Tên miền',
-      },
-      enableSection: {
-        title: 'Bật SSO',
-      },
-      statusSection: {
-        activeBadge: 'Hoạt động',
-        inactiveBadge: 'Không hoạt động',
-        title: 'Trạng thái SSO',
-      },
-    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'Liên hệ với quản trị viên tổ chức của bạn để có quyền quản lý các kết nối doanh nghiệp.',
       title: 'Bạn không có quyền quản lý các kết nối doanh nghiệp',
