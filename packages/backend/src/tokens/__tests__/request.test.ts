@@ -1776,7 +1776,7 @@ describe('tokens.authenticateRequest(options)', () => {
         const token = 'oat_invalid_garbage_token';
         await authenticateRequest(
           mockRequest({ authorization: `Bearer ${token}` }),
-          mockOptions({ acceptsToken: 'oauth_token' }),
+          mockOptions({ acceptsToken: 'any' }),
         );
 
         // BAPI now returns 200, but the token should still be rejected from cache
@@ -1787,7 +1787,7 @@ describe('tokens.authenticateRequest(options)', () => {
         );
         const second = await authenticateRequest(
           mockRequest({ authorization: `Bearer ${token}` }),
-          mockOptions({ acceptsToken: 'oauth_token' }),
+          mockOptions({ acceptsToken: 'any' }),
         );
         expect(second).toBeMachineUnauthenticated({
           tokenType: 'oauth_token',
