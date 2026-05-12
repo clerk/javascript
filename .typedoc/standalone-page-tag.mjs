@@ -1,8 +1,7 @@
 // @ts-check
 
 /**
- * Modifier tag: keep a dedicated `.mdx` page even when `@inline` is present (TypeDoc + our router
- * otherwise drop inline-marked declarations; the theme also expands references instead of linking).
+ * Modifier tag: keep a dedicated `.mdx` page even when `@inline` is present (TypeDoc + our router otherwise drop inline-marked declarations; the theme also expands references instead of linking).
  */
 export const STANDALONE_PAGE_MODIFIER_TAG = '@standalonePage';
 
