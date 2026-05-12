@@ -14,6 +14,7 @@ export default defineConfig(overrideOptions => {
     sourcemap: true,
     treeshake: true,
     format: 'esm',
+    fixedExtension: false,
     outDir: './dist',
     dts: true,
     define: {

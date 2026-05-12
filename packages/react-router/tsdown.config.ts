@@ -9,6 +9,7 @@ export default defineConfig(overrideOptions => {
 
   return {
     format: 'esm',
+    fixedExtension: false,
     outDir: './dist',
     entry: ['./src/**/*.{ts,tsx,js,jsx}', '!./src/**/*.test.{ts,tsx}'],
     bundle: true,

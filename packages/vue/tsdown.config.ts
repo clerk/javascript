@@ -11,6 +11,7 @@ export default defineConfig(overrideOptions => {
     clean: true,
     entry: ['./src/index.ts', './src/experimental.ts', './src/internal.ts', './src/errors.ts', './src/types/index.ts'],
     format: ['esm'],
+    fixedExtension: false,
     sourcemap: true,
     minify: false,
     dts: false,

@@ -27,6 +27,7 @@ export default defineConfig(overrideOptions => {
     },
     sourcemap: true,
     format: ['esm'],
+    fixedExtension: false,
     external: ['astro', 'react', 'react-dom', 'node:async_hooks', '#async-local-storage', 'astro:transitions/client'],
   };
 });

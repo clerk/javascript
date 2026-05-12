@@ -21,6 +21,7 @@ export default defineConfig(overrideOptions => {
       './src/runtime/types/index.ts',
     ],
     format: ['esm'],
+    fixedExtension: false,
     // Make sure to not bundle the imports
     // or else the Nuxt module will not be able to resolve them
     unbundle: true,
