@@ -1,6 +1,6 @@
 {
   "name": "@clerk/backend",
-  "version": "3.2.3",
+  "version": "3.4.7",
   "description": "Clerk Backend SDK - REST Client for Backend API & JWT verification utilities",
   "homepage": "https://clerk.com/",
   "bugs": {
@@ -125,8 +125,8 @@
   },
   "devDependencies": {
     "@edge-runtime/vm": "5.0.0",
-    "cookie": "1.0.2",
-    "msw": "2.11.6",
+    "cookie": "1.1.1",
+    "msw": "2.14.2",
     "npm-run-all": "^4.1.5",
     "snakecase-keys": "9.0.2",
     "vitest-environment-miniflare": "2.14.4"

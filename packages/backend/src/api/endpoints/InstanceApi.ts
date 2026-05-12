@@ -91,6 +91,13 @@ export class InstanceAPI extends AbstractAPI {
     });
   }
 
+  public async getOrganizationSettings() {
+    return this.request<OrganizationSettings>({
+      method: 'GET',
+      path: joinPaths(basePath, 'organization_settings'),
+    });
+  }
+
   public async updateOrganizationSettings(params: UpdateOrganizationSettingsParams) {
     return this.request<OrganizationSettings>({
       method: 'PATCH',

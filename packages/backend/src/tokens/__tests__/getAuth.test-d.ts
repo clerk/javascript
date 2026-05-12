@@ -1,4 +1,4 @@
-import { expectTypeOf, test, describe } from 'vitest';
+import { describe, expectTypeOf, test } from 'vitest';
 
 import type { RedirectFun } from '../../createRedirect';
 import type { AuthObject, InvalidTokenAuthObject } from '../authObjects';

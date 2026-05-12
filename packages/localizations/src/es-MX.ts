@@ -179,6 +179,16 @@ export const esMX: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        'Contacta al administrador de tu organización para obtener permisos para administrar conexiones de empresa.',
+      title: 'No tienes permiso para administrar conexiones de empresa',
+    },
+    navbar: {
+      title: 'Configurar inicio de sesión único (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Crear organización',
     invitePage: {

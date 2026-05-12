@@ -178,6 +178,15 @@ export const heIL: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'פנה למנהל הארגון שלך כדי לקבל הרשאות לניהול חיבורים ארגוניים.',
+      title: 'אין לך הרשאה לנהל חיבורים ארגוניים',
+    },
+    navbar: {
+      title: 'הגדרת כניסה אחידה (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'צור ארגון',
     invitePage: {

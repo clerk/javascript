@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest';
+
 import * as errorsExports from '../errors';
 import * as publicExports from '../index';
 import * as legacyExports from '../legacy';

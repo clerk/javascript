@@ -13,8 +13,10 @@ import {
 import {
   disabledAllAPIKeysFeatures,
   disabledAllBillingFeatures,
+  disabledEmailAddressAttribute,
   disabledOrganizationAPIKeysFeature,
   disabledOrganizationsFeature,
+  disabledSelfServeSSOFeature,
   disabledUserAPIKeysFeature,
   isSignedInAndSingleSessionModeEnabled,
   noOrganizationExists,
@@ -38,7 +40,13 @@ import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import { logger } from '@clerk/shared/logger';
 import { CLERK_NETLIFY_CACHE_BUST_PARAM } from '@clerk/shared/netlifyCacheHandler';
-import { isHttpOrHttps, isValidProxyUrl, proxyUrlToAbsoluteURL } from '@clerk/shared/proxy';
+import {
+  AUTO_PROXY_PATH,
+  isHttpOrHttps,
+  isValidProxyUrl,
+  proxyUrlToAbsoluteURL,
+  shouldAutoProxy,
+} from '@clerk/shared/proxy';
 import {
   eventPrebuiltComponentMounted,
   eventPrebuiltComponentOpened,
@@ -47,6 +55,7 @@ import {
 } from '@clerk/shared/telemetry';
 import type {
   __experimental_CheckoutOptions,
+  __experimental_ConfigureSSOProps,
   __internal_AttemptToEnableEnvironmentSettingParams,
   __internal_AttemptToEnableEnvironmentSettingResult,
   __internal_CheckoutProps,
@@ -88,6 +97,7 @@ import type {
   ListenerOptions,
   LoadedClerk,
   NavigateOptions,
+  OAuthApplicationNamespace,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
@@ -130,7 +140,6 @@ import type {
 import type { ClerkUI } from '@clerk/shared/ui';
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
 import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
-import type { QueryClient } from '@tanstack/query-core';
 
 import { debugLogger, initDebugLogger } from '@/utils/debug';
 import { ModuleManager } from '@/utils/moduleManager';
@@ -177,6 +186,7 @@ import { createClientFromJwt } from './jwt-client';
 import { APIKeys } from './modules/apiKeys';
 import { Billing } from './modules/billing';
 import { createCheckoutInstance } from './modules/checkout/instance';
+import { OAuthApplication } from './modules/oauthApplication';
 import { Protect } from './protect';
 import { BaseResource, Client, Environment, Organization, Waitlist } from './resources/internal';
 import { State } from './state';
@@ -200,6 +210,9 @@ const CANNOT_RENDER_SINGLE_SESSION_ENABLED_ERROR_CODE = 'cannot_render_single_se
 const CANNOT_RENDER_API_KEYS_DISABLED_ERROR_CODE = 'cannot_render_api_keys_disabled';
 const CANNOT_RENDER_API_KEYS_USER_DISABLED_ERROR_CODE = 'cannot_render_api_keys_user_disabled';
 const CANNOT_RENDER_API_KEYS_ORG_DISABLED_ERROR_CODE = 'cannot_render_api_keys_org_disabled';
+const CANNOT_RENDER_SELF_SERVE_SSO_DISABLED_ERROR_CODE = 'cannot_render_self_serve_sso_disabled';
+const CANNOT_RENDER_CONFIGURE_SSO_EMAIL_ADDRESS_DISABLED_ERROR_CODE =
+  'cannot_render_configure_sso_email_address_disabled';
 const defaultOptions: ClerkOptions = {
   polling: true,
   standardBrowser: true,
@@ -224,6 +237,7 @@ export class Clerk implements ClerkInterface {
 
   private static _billing: BillingNamespace;
   private static _apiKeys: APIKeysNamespace;
+  private static _oauthApplication: OAuthApplicationNamespace;
   private _checkout: ClerkInterface['__experimental_checkout'] | undefined;
 
   public client: ClientResource | undefined;
@@ -238,7 +252,6 @@ export class Clerk implements ClerkInterface {
   // converted to protected environment to support `updateEnvironment` type assertion
   protected environment?: EnvironmentResource | null;
 
-  #queryClient: QueryClient | undefined;
   #publishableKey = '';
   #domain: DomainOrProxyUrl['domain'];
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
@@ -257,28 +270,6 @@ export class Clerk implements ClerkInterface {
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
   #publicEventBus = createClerkEventBus();
-
-  get __internal_queryClient(): { __tag: 'clerk-rq-client'; client: QueryClient } | undefined {
-    if (!this.#queryClient) {
-      void import('./query-core')
-        .then(module => module.QueryClient)
-        .then(QueryClient => {
-          if (this.#queryClient) {
-            return;
-          }
-          this.#queryClient = new QueryClient();
-          // @ts-expect-error - queryClientStatus is not typed
-          this.#publicEventBus.emit('queryClientStatus', 'ready');
-        });
-    }
-
-    return this.#queryClient
-      ? {
-          __tag: 'clerk-rq-client',
-          client: this.#queryClient,
-        }
-      : undefined;
-  }
 
   public __internal_getCachedResources:
     | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
@@ -358,7 +349,14 @@ export class Clerk implements ClerkInterface {
       if (!isValidProxyUrl(_unfilteredProxy)) {
         errorThrower.throwInvalidProxyUrl({ url: _unfilteredProxy });
       }
-      return proxyUrlToAbsoluteURL(_unfilteredProxy);
+      const resolved = proxyUrlToAbsoluteURL(_unfilteredProxy);
+      if (resolved) {
+        return resolved;
+      }
+      // Auto-detect when no explicit proxy or domain is configured (production only)
+      if (!this.#domain && this.#instanceType === 'production' && shouldAutoProxy(window.location.hostname)) {
+        return `${window.location.origin}${AUTO_PROXY_PATH}`;
+      }
     }
 
     if (typeof this.#proxyUrl === 'function') {
@@ -401,6 +399,13 @@ export class Clerk implements ClerkInterface {
       Clerk._apiKeys = new APIKeys();
     }
     return Clerk._apiKeys;
+  }
+
+  get oauthApplication(): OAuthApplicationNamespace {
+    if (!Clerk._oauthApplication) {
+      Clerk._oauthApplication = new OAuthApplication();
+    }
+    return Clerk._oauthApplication;
   }
 
   __experimental_checkout(options: __experimental_CheckoutOptions): CheckoutSignalValue {
@@ -1325,7 +1330,16 @@ export class Clerk implements ClerkInterface {
     void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
-  public __internal_mountOAuthConsent = (node: HTMLDivElement, props?: __internal_OAuthConsentProps) => {
+  public mountOAuthConsent = (node: HTMLDivElement, props?: __internal_OAuthConsentProps) => {
+    if (noUserExists(this)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderOAuthConsentComponentWhenUserDoesNotExist, {
+          code: CANNOT_RENDER_USER_MISSING_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
     this.assertComponentsReady(this.#clerkUI);
     const component = 'OAuthConsent';
     void this.#clerkUI
@@ -1340,20 +1354,30 @@ export class Clerk implements ClerkInterface {
       );
   };
 
-  public __internal_unmountOAuthConsent = (node: HTMLDivElement) => {
+  public unmountOAuthConsent = (node: HTMLDivElement) => {
     void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
   /**
-   * @experimental This API is in early access and may change in future releases.
-   *
-   * Mount a API keys component at the target element.
+   * @deprecated Use mountOAuthConsent instead.
+   */
+  public __internal_mountOAuthConsent = (node: HTMLDivElement, props?: __internal_OAuthConsentProps) => {
+    return this.mountOAuthConsent(node, props);
+  };
+
+  /**
+   * @deprecated Use unmountOAuthConsent instead.
+   */
+  public __internal_unmountOAuthConsent = (node: HTMLDivElement) => {
+    return this.unmountOAuthConsent(node);
+  };
+
+  /**
+   * Mount an API keys component at the target element.
    * @param targetNode Target to mount the APIKeys component.
    * @param props Configuration parameters.
    */
   public mountAPIKeys = (node: HTMLDivElement, props?: APIKeysProps) => {
-    logger.warnOnce('Clerk: <APIKeys /> component is in early access and not yet recommended for production use.');
-
     if (disabledAllAPIKeysFeatures(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponent, {
@@ -1398,14 +1422,74 @@ export class Clerk implements ClerkInterface {
   };
 
   /**
-   * @experimental This API is in early access and may change in future releases.
-   *
-   * Unmount a API keys component from the target element.
+   * Unmount an API keys component from the target element.
    * If there is no component mounted at the target node, results in a noop.
    *
    * @param targetNode Target node to unmount the APIKeys component from.
    */
   public unmountAPIKeys = (node: HTMLDivElement) => {
+    void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
+  };
+
+  /**
+   * Mount a configure SSO component at the target element.
+   *
+   * @experimental
+   * @param targetNode Target to mount the ConfigureSSO component.
+   * @param props Configuration parameters.
+   */
+  public __experimental_mountConfigureSSO = (node: HTMLDivElement, props?: __experimental_ConfigureSSOProps) => {
+    if (disabledSelfServeSSOFeature(this, this.environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderConfigureSSOComponentWhenDisabled, {
+          code: CANNOT_RENDER_SELF_SERVE_SSO_DISABLED_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
+    if (disabledEmailAddressAttribute(this, this.environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderConfigureSSOComponentWhenEmailAddressDisabled, {
+          code: CANNOT_RENDER_CONFIGURE_SSO_EMAIL_ADDRESS_DISABLED_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
+    if (noUserExists(this)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderConfigureSSOComponentWhenUserDoesNotExist, {
+          code: CANNOT_RENDER_USER_MISSING_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
+    this.assertComponentsReady(this.#clerkUI);
+    const component = 'ConfigureSSO';
+    void this.#clerkUI
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
+      .then(controls =>
+        controls.mountComponent({
+          name: component,
+          appearanceKey: '__experimental_configureSSO',
+          node,
+          props,
+        }),
+      );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted(component, props));
+  };
+
+  /**
+   * Unmount a configure SSO component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @experimental
+   * @param targetNode Target node to unmount the ConfigureSSO component from.
+   */
+  public __experimental_unmountConfigureSSO = (node: HTMLDivElement) => {
     void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 

@@ -56,6 +56,11 @@ type CreateM2MTokenParams = {
   secondsUntilExpiration?: number | null;
   claims?: Record<string, unknown> | null;
   /**
+   * Enables server-side token reuse for opaque tokens when an existing token
+   * with matching claims/scopes still has at least this many seconds remaining.
+   */
+  minRemainingTtlSeconds?: number;
+  /**
    * @default 'opaque'
    */
   tokenFormat?: M2MTokenFormat;
@@ -127,7 +132,13 @@ export class M2MTokenApi extends AbstractAPI {
   }
 
   async createToken(params?: CreateM2MTokenParams) {
-    const { claims = null, machineSecretKey, secondsUntilExpiration = null, tokenFormat = 'opaque' } = params || {};
+    const {
+      claims = null,
+      machineSecretKey,
+      minRemainingTtlSeconds,
+      secondsUntilExpiration = null,
+      tokenFormat = 'opaque',
+    } = params || {};
 
     const requestOptions = this.#createRequestOptions(
       {
@@ -136,6 +147,7 @@ export class M2MTokenApi extends AbstractAPI {
         bodyParams: {
           secondsUntilExpiration,
           claims,
+          minRemainingTtlSeconds,
           tokenFormat,
         },
       },

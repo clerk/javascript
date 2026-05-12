@@ -184,6 +184,16 @@ export const itIT: LocalizationResource = {
     viewPayment: undefined,
     year: 'Anno',
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        "Contatta l'amministratore della tua organizzazione per ottenere i permessi per gestire le connessioni aziendali.",
+      title: 'Non hai il permesso di gestire le connessioni aziendali',
+    },
+    navbar: {
+      title: 'Configura Single Sign-On (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Crea organizzazione',
     invitePage: {

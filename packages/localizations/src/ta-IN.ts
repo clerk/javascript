@@ -178,6 +178,15 @@ export const taIN: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'நிறுவன இணைப்புகளை நிர்வகிக்க அனுமதிகளைப் பெற உங்கள் நிறுவனத்தின் நிர்வாகியைத் தொடர்பு கொள்ளவும்.',
+      title: 'நிறுவன இணைப்புகளை நிர்வகிக்க உங்களுக்கு அனுமதி இல்லை',
+    },
+    navbar: {
+      title: 'ஒற்றை உள்நுழைவை (SSO) உள்ளமை',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'நிறுவனத்தை உருவாக்கு',
     invitePage: {

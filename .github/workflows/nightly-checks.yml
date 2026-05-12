@@ -4,6 +4,9 @@ on:
   schedule:
     - cron: "0 7 * * *"
 
+permissions:
+  contents: read
+
 jobs:
   integration-tests:
     name: Integration Tests

@@ -178,6 +178,15 @@ export const idID: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'Hubungi administrator organisasi Anda untuk mendapatkan izin mengelola koneksi enterprise.',
+      title: 'Anda tidak memiliki izin untuk mengelola koneksi enterprise',
+    },
+    navbar: {
+      title: 'Konfigurasi Single Sign-On (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Buat organisasi',
     invitePage: {

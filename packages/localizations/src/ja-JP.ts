@@ -189,6 +189,15 @@ export const jaJP: LocalizationResource = {
     viewPayment: '支払いを表示',
     year: '年',
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'エンタープライズ接続を管理する権限を取得するには、組織の管理者にお問い合わせください。',
+      title: 'エンタープライズ接続を管理する権限がありません',
+    },
+    navbar: {
+      title: 'シングルサインオン（SSO）を設定',
+    },
+  },
   createOrganization: {
     formButtonSubmit: '組織を作成する',
     invitePage: {

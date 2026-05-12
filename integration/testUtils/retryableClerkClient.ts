@@ -14,10 +14,11 @@ function sleep(ms: number): Promise<void> {
 }
 
 function getRetryDelay(error: unknown, attempt: number): number {
+  const exponentialDelay = BASE_DELAY_MS * Math.pow(2, attempt) + Math.random() * JITTER_MAX_MS;
   if (isClerkAPIResponseError(error) && typeof error.retryAfter === 'number') {
-    return Math.min(error.retryAfter * 1000, MAX_RETRY_DELAY_MS);
+    return Math.min(Math.max(error.retryAfter * 1000, exponentialDelay), MAX_RETRY_DELAY_MS);
   }
-  return BASE_DELAY_MS * Math.pow(2, attempt) + Math.random() * JITTER_MAX_MS;
+  return exponentialDelay;
 }
 
 function recordRetry(path: string): void {

@@ -183,6 +183,15 @@ export const faIR: LocalizationResource = {
     viewPayment: 'مشاهده پرداخت',
     year: 'سال',
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'برای دریافت مجوز مدیریت اتصالات سازمانی با مدیر سازمان خود تماس بگیرید.',
+      title: 'شما اجازه مدیریت اتصالات سازمانی را ندارید',
+    },
+    navbar: {
+      title: 'پیکربندی ورود یکپارچه (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'ایجاد سازمان',
     invitePage: {

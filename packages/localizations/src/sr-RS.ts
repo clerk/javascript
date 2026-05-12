@@ -178,6 +178,16 @@ export const srRS: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        'Kontaktirajte administratora vaše organizacije da biste dobili dozvole za upravljanje korporativnim vezama.',
+      title: 'Nemate dozvolu za upravljanje korporativnim vezama',
+    },
+    navbar: {
+      title: 'Konfiguriši jedinstvenu prijavu (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Kreiraj organizaciju',
     invitePage: {

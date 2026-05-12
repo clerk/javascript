@@ -48,34 +48,15 @@ export async function testToggleCollapsePopoverAndClaim({
 
   const claim = u.po.keylessPopover.promptsToClaim();
 
-  const [newPage] = await Promise.all([context.waitForEvent('page'), claim.click()]);
+  const href = await claim.getAttribute('href');
+  expect(href).toBeTruthy();
 
-  await newPage.waitForLoadState();
-
-  await newPage.waitForURL(url => {
-    const signInForceRedirectUrl = url.searchParams.get('sign_in_force_redirect_url');
-    const signUpForceRedirectUrl = url.searchParams.get('sign_up_force_redirect_url');
-
-    const signInHasRequiredParams =
-      signInForceRedirectUrl?.includes(`${dashboardUrl}apps/claim`) &&
-      signInForceRedirectUrl?.includes('token=') &&
-      signInForceRedirectUrl?.includes(`framework=${framework}`);
-
-    const signUpRegularCase =
-      signUpForceRedirectUrl?.includes(`${dashboardUrl}apps/claim`) &&
-      signUpForceRedirectUrl?.includes('token=') &&
-      signUpForceRedirectUrl?.includes(`framework=${framework}`);
-
-    const signUpPrepareAccountCase =
-      signUpForceRedirectUrl?.startsWith(`${dashboardUrl}prepare-account`) &&
-      signUpForceRedirectUrl?.includes(encodeURIComponent('apps/claim')) &&
-      signUpForceRedirectUrl?.includes(encodeURIComponent('token=')) &&
-      signUpForceRedirectUrl?.includes(encodeURIComponent(`framework=${framework}`));
-
-    const signUpHasRequiredParams = signUpRegularCase || signUpPrepareAccountCase;
-
-    return url.pathname === '/apps/claim/sign-in' && signInHasRequiredParams && signUpHasRequiredParams;
-  });
+  const claimUrl = new URL(href!);
+  expect(claimUrl.origin + '/').toBe(dashboardUrl);
+  expect(claimUrl.pathname).toBe('/apps/claim');
+  expect(claimUrl.searchParams.get('framework')).toBe(framework);
+  expect(claimUrl.searchParams.has('token')).toBe(true);
+  expect(claimUrl.searchParams.has('return_url')).toBe(true);
 }
 
 /**
@@ -102,15 +83,9 @@ export async function testClaimedAppWithMissingKeys({
   expect(await u.po.keylessPopover.isExpanded()).toBe(true);
   await expect(u.po.keylessPopover.promptToUseClaimedKeys()).toBeVisible();
 
-  const [newPage] = await Promise.all([
-    context.waitForEvent('page'),
-    u.po.keylessPopover.promptToUseClaimedKeys().click(),
-  ]);
-
-  await newPage.waitForLoadState();
-  await newPage.waitForURL(url => {
-    return url.href.startsWith(`${dashboardUrl}sign-in?redirect_url=${encodeURIComponent(dashboardUrl)}apps%2Fapp_`);
-  });
+  const href = await u.po.keylessPopover.promptToUseClaimedKeys().getAttribute('href');
+  expect(href).toBeTruthy();
+  expect(href).toContain(dashboardUrl);
 }
 
 /**

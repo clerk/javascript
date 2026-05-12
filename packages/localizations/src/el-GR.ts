@@ -178,6 +178,16 @@ export const elGR: LocalizationResource = {
     viewPayment: 'Προβολή πληρωμής',
     year: 'έτος',
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        'Επικοινωνήστε με τον διαχειριστή του οργανισμού σας για να αποκτήσετε άδειες διαχείρισης εταιρικών συνδέσεων.',
+      title: 'Δεν έχετε άδεια διαχείρισης εταιρικών συνδέσεων',
+    },
+    navbar: {
+      title: 'Διαμόρφωση Ενιαίας Σύνδεσης (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Δημιουργία οργανισμού',
     invitePage: {

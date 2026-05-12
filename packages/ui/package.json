@@ -1,6 +1,6 @@
 {
   "name": "@clerk/ui",
-  "version": "1.2.4",
+  "version": "1.9.1",
   "description": "Internal package that contains the UI components for the Clerk frontend SDKs",
   "repository": {
     "type": "git",
@@ -16,12 +16,12 @@
   "type": "module",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "react-server": {
         "types": "./dist/server.d.ts",
         "import": "./dist/server.js",
         "default": "./dist/server.js"
       },
-      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
@@ -80,7 +80,8 @@
     "clean": "rimraf ./dist",
     "dev": "rspack serve --config rspack.config.js",
     "dev:origin": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:${PORT:-4011}",
-    "dev:sandbox": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:4011",
+    "dev:sandbox": "pnpm -w dev:sandbox",
+    "dev:sandbox:serve": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:4011",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint:attw": "attw --pack . --exclude-entrypoints themes/shadcn.css --profile esm-only",
@@ -111,17 +112,17 @@
     "qrcode.react": "4.2.0"
   },
   "devDependencies": {
-    "@floating-ui/react-dom": "^2.1.6",
+    "@floating-ui/react-dom": "^2.1.8",
     "@rsdoctor/rspack-plugin": "^0.4.13",
-    "@rspack/cli": "^1.6.0",
-    "@rspack/core": "^1.6.0",
-    "@rspack/plugin-react-refresh": "^1.5.2",
+    "@rspack/cli": "catalog:rspack",
+    "@rspack/core": "catalog:rspack",
+    "@rspack/plugin-react-refresh": "catalog:rspack",
     "@svgr/rollup": "^8.1.0",
     "@svgr/webpack": "^6.5.1",
     "@types/webpack-env": "^1.18.8",
-    "bundlewatch": "^0.4.1",
+    "bundlewatch": "^0.4.2",
     "cross-fetch": "^4.1.0",
-    "minimatch": "^10.1.1",
+    "minimatch": "^10.2.5",
     "tsdown": "catalog:repo",
     "webpack-merge": "^5.10.0"
   },

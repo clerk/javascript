@@ -184,6 +184,16 @@ export const ptBR: LocalizationResource = {
     viewPayment: 'Ver pagamento',
     year: 'Ano',
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        'Entre em contato com o administrador da sua organização para obter permissões para gerenciar conexões empresariais.',
+      title: 'Você não tem permissão para gerenciar conexões empresariais',
+    },
+    navbar: {
+      title: 'Configurar logon único (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Criar organização',
     invitePage: {

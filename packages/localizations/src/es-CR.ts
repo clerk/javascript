@@ -178,6 +178,16 @@ export const esCR: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        'Contacta al administrador de tu organización para obtener permisos para gestionar conexiones de empresa.',
+      title: 'No tenés permiso para gestionar conexiones de empresa',
+    },
+    navbar: {
+      title: 'Configurar inicio de sesión único (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Crear organización',
     invitePage: {

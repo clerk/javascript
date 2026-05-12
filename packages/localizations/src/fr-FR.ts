@@ -186,6 +186,16 @@ export const frFR: LocalizationResource = {
     viewPayment: 'Voir le paiement',
     year: 'An',
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        "Contactez l'administrateur de votre organisation afin d'obtenir les permissions pour gérer les connexions d'entreprise.",
+      title: "Vous n'avez pas la permission de gérer les connexions d'entreprise",
+    },
+    navbar: {
+      title: "Configurer l'authentification unique (SSO)",
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Créer l’organisation',
     invitePage: {

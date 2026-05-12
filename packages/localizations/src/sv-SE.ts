@@ -178,6 +178,15 @@ export const svSE: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'Kontakta administratören för din organisation för att få behörighet att hantera företagsanslutningar.',
+      title: 'Du har inte behörighet att hantera företagsanslutningar',
+    },
+    navbar: {
+      title: 'Konfigurera enkel inloggning (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Skapa organisation',
     invitePage: {

@@ -1,5 +1,5 @@
 import { createClerkClient } from '@clerk/backend';
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import { appConfigs } from '../presets';
 import { instanceKeys } from '../presets/envs';
@@ -91,6 +91,42 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
     await u.po.expect.toBeSignedIn();
   });
 
+  test('openSignIn OAuth uses ClerkProvider.signInUrl for sso-callback', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+
+    await u.page.goToRelative('/buttons');
+    await u.page.waitForClerkJsLoaded();
+    await u.po.expect.toBeSignedOut();
+
+    await u.page.evaluate(() => {
+      (window as any).Clerk.openSignIn({ forceRedirectUrl: '/protected' });
+    });
+    await u.po.signIn.waitForModal();
+
+    const signInPostPromise = page.waitForRequest(
+      req => req.method() === 'POST' && /\/v1\/client\/sign_ins(\?|$)/.test(req.url()),
+    );
+
+    await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
+
+    const signInPost = await signInPostPromise;
+    const body = new URLSearchParams(signInPost.postData() || '');
+    const redirectUrl = body.get('redirect_url');
+    expect(redirectUrl).toBeTruthy();
+
+    // The sso-callback base must come from ClerkProvider.signInUrl (CLERK_SIGN_IN_URL=/sign-in in this fixture).
+    // Asserting origin alone would also pass for a blanket window.location.href style fix; asserting the
+    // pathname is /sign-in pins the redirect to ClerkProvider.signInUrl rather than displayConfig.signInUrl
+    // (accounts portal) or the current page URL. The hash assertion guarantees the callback actually targets
+    // the sso-callback route — without it, a regression that drops the #/sso-callback fragment would still
+    // satisfy origin/pathname while breaking the OAuth return path at runtime.
+    const parsed = new URL(redirectUrl!);
+    const appOrigin = new URL(app.serverUrl).origin;
+    expect(parsed.origin).toBe(appOrigin);
+    expect(parsed.pathname).toBe('/sign-in');
+    expect(parsed.hash).toMatch(/^#\/sso-callback/);
+  });
+
   test('sign up modal', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     // The SignUpModal will only redirect to its provided forceRedirectUrl if the user is signing up; it will not
@@ -178,6 +214,47 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
 
       await u.po.expect.toBeSignedIn();
     });
+  });
+});
+
+testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('oauth flows combined @nextjs', ({ app }) => {
+  test.describe.configure({ mode: 'serial' });
+
+  test.afterAll(async () => {
+    await app.teardown();
+  });
+
+  test('openSignIn OAuth in combined flow targets /sign-in#/create/sso-callback', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+
+    await u.page.goToRelative('/buttons');
+    await u.page.waitForClerkJsLoaded();
+    await u.po.expect.toBeSignedOut();
+
+    await u.page.evaluate(() => {
+      (window as any).Clerk.openSignIn({ forceRedirectUrl: '/protected' });
+    });
+    await u.po.signIn.waitForModal();
+
+    const signInPostPromise = page.waitForRequest(
+      req => req.method() === 'POST' && /\/v1\/client\/sign_ins(\?|$)/.test(req.url()),
+    );
+
+    await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
+
+    const signInPost = await signInPostPromise;
+    const body = new URLSearchParams(signInPost.postData() || '');
+    const redirectUrl = body.get('redirect_url');
+    expect(redirectUrl).toBeTruthy();
+
+    // Combined flow (CLERK_SIGN_UP_URL is unset in this env): the sso-callback must anchor to
+    // ClerkProvider.signInUrl and carry the combined-flow /create segment, since the
+    // create/sso-callback route is mounted under the SignIn tree — not SignUp.
+    const parsed = new URL(redirectUrl!);
+    const appOrigin = new URL(app.serverUrl).origin;
+    expect(parsed.origin).toBe(appOrigin);
+    expect(parsed.pathname).toBe('/sign-in');
+    expect(parsed.hash).toMatch(/^#\/create\/sso-callback/);
   });
 });
 

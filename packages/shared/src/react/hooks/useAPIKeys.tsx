@@ -7,7 +7,7 @@ import { createCacheKeys } from './createCacheKeys';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
 /**
- * @internal
+ * @interface
  */
 export type UseAPIKeysParams = PaginatedHookConfig<
   GetAPIKeysParams & {
@@ -21,7 +21,7 @@ export type UseAPIKeysParams = PaginatedHookConfig<
 >;
 
 /**
- * @internal
+ * @interface
  */
 export type UseAPIKeysReturn<T extends UseAPIKeysParams> = PaginatedResources<
   APIKeyResource,
@@ -29,8 +29,6 @@ export type UseAPIKeysReturn<T extends UseAPIKeysParams> = PaginatedResources<
 >;
 
 /**
- * @internal
- *
  * The `useAPIKeys()` hook provides access to paginated API keys for the current user or organization.
  *
  * @example

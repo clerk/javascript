@@ -1,3 +1,4 @@
+import type { ClerkErrorParams } from './clerkError';
 import { ClerkRuntimeError } from './clerkRuntimeError';
 
 type ClerkWebAuthnErrorCode =
@@ -14,14 +15,16 @@ type ClerkWebAuthnErrorCode =
   | 'passkey_registration_cancelled'
   | 'passkey_registration_failed';
 
+type ClerkWebAuthnErrorOptions = Omit<ClerkErrorParams, 'message' | 'code'> & { code: ClerkWebAuthnErrorCode };
+
 export class ClerkWebAuthnError extends ClerkRuntimeError {
   /**
    * A unique code identifying the error, can be used for localization.
    */
   code: ClerkWebAuthnErrorCode;
 
-  constructor(message: string, { code }: { code: ClerkWebAuthnErrorCode }) {
-    super(message, { code });
-    this.code = code;
+  constructor(message: string, options: ClerkWebAuthnErrorOptions) {
+    super(message, options);
+    this.code = options.code;
   }
 }

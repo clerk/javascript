@@ -178,6 +178,15 @@ export const zhCN: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: '请联系您的组织管理员以获得管理企业连接的权限。',
+      title: '您无权管理企业连接',
+    },
+    navbar: {
+      title: '配置单点登录 (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: '创建组织',
     invitePage: {

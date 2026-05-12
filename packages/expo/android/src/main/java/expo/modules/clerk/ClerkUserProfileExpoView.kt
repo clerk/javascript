@@ -24,6 +24,7 @@ import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.savedstate.compose.LocalSavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.clerk.api.Clerk
+import com.clerk.api.network.model.client.Client
 import com.clerk.ui.userprofile.UserProfileView
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.ReactContext
@@ -77,6 +78,17 @@ class ClerkUserProfileNativeView(context: Context) : FrameLayout(context) {
       LaunchedEffect(session) {
         if (hadSession && session == null) {
           Log.d(TAG, "Sign-out detected")
+          // Refresh the client from the server to clear any stale in-progress
+          // signIn/signUp state. Without this, when the AuthView re-mounts after
+          // sign-out it routes to the "Get help" fallback because the previous
+          // user's signIn is still in Clerk.client. Clerk.auth.signOut() (called
+          // internally by UserProfileView) only clears session/user state, not
+          // the in-progress signIn.
+          try {
+            Client.getSkippingClientId()
+          } catch (e: Exception) {
+            Log.w(TAG, "Client.getSkippingClientId() after UserProfile sign-out failed: ${e.message}")
+          }
           sendEvent("signedOut", emptyMap())
         }
         if (session != null) {

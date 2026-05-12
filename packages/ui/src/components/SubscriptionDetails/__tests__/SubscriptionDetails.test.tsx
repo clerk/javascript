@@ -51,7 +51,7 @@ describe('SubscriptionDetails', () => {
       nextPayment: {
         amount: {
           amount: 1000,
-          amountFormatted: '10.00',
+          amountFormatted: '15.00',
           currency: 'USD',
           currencySymbol: '$',
         },
@@ -108,32 +108,30 @@ describe('SubscriptionDetails', () => {
     );
     await waitFor(() => {
       expect(getByRole('heading', { name: /Subscription/i })).toBeVisible();
-
-      expect(getByText('Test Plan')).toBeVisible();
-      expect(getByText('Active')).toBeVisible();
-
-      expect(getByText('$10.00 / Month')).toBeVisible();
-
-      expect(getByText('Subscribed on')).toBeVisible();
-      expect(getByText('January 1, 2021')).toBeVisible();
-      expect(getByText('Renews at')).toBeVisible();
-
-      expect(getByText('Current billing cycle')).toBeVisible();
-      expect(getByText('Monthly')).toBeVisible();
-
-      expect(getByText('Next payment on')).toBeVisible();
-      const nextPaymentElements = getAllByText('February 1, 2021');
-      expect(nextPaymentElements.length).toBe(2);
-
-      expect(getByText('Next payment amount')).toBeVisible();
-      expect(getByText('$10.00')).toBeVisible();
-      expect(queryByText('Ends on')).toBeNull();
     });
 
-    await waitFor(() => {
-      expect(getByText('Switch to annual $100 / year')).toBeVisible();
-      expect(getByText('Cancel subscription')).toBeVisible();
-    });
+    expect(getByText('Test Plan')).toBeVisible();
+    expect(getByText('Active')).toBeVisible();
+
+    expect(getByText((_, node) => node.textContent?.replace(/\s+/g, ' ').trim() === '$10.00 / Month')).toBeVisible();
+
+    expect(getByText('Subscribed on')).toBeVisible();
+    expect(getByText('January 1, 2021')).toBeVisible();
+    expect(getByText('Renews at')).toBeVisible();
+
+    expect(getByText('Current billing cycle')).toBeVisible();
+    expect(getByText('Monthly')).toBeVisible();
+
+    expect(getByText('Next payment on')).toBeVisible();
+    const nextPaymentElements = getAllByText('February 1, 2021');
+    expect(nextPaymentElements.length).toBe(2);
+
+    expect(getByText('Next payment amount')).toBeVisible();
+    expect(getByText('$15.00')).toBeVisible();
+    expect(queryByText('Ends on')).toBeNull();
+
+    expect(getByText('Switch to annual $100 / year')).toBeVisible();
+    expect(getByText('Cancel subscription')).toBeVisible();
   });
 
   it('single active annual subscription', async () => {
@@ -154,7 +152,7 @@ describe('SubscriptionDetails', () => {
       nextPayment: {
         amount: {
           amount: 10000,
-          amountFormatted: '100.00',
+          amountFormatted: '101.00',
           currency: 'USD',
           currencySymbol: '$',
         },
@@ -211,32 +209,30 @@ describe('SubscriptionDetails', () => {
     );
     await waitFor(() => {
       expect(getByRole('heading', { name: /Subscription/i })).toBeVisible();
-
-      expect(getByText('Test Plan')).toBeVisible();
-      expect(getByText('Active')).toBeVisible();
-
-      expect(getByText('$100.00 / Year')).toBeVisible();
-
-      expect(getByText('Subscribed on')).toBeVisible();
-      expect(getByText('January 1, 2021')).toBeVisible();
-      expect(getByText('Renews at')).toBeVisible();
-
-      expect(getByText('Current billing cycle')).toBeVisible();
-      expect(getByText('Annually')).toBeVisible();
-
-      expect(getByText('Next payment on')).toBeVisible();
-      const nextPaymentElements = getAllByText('January 1, 2022');
-      expect(nextPaymentElements.length).toBe(2);
-
-      expect(getByText('Next payment amount')).toBeVisible();
-      expect(getByText('$100.00')).toBeVisible();
-      expect(queryByText('Ends on')).toBeNull();
     });
 
-    await waitFor(() => {
-      expect(getByText('Switch to monthly $10 / month')).toBeVisible();
-      expect(getByText('Cancel subscription')).toBeVisible();
-    });
+    expect(getByText('Test Plan')).toBeVisible();
+    expect(getByText('Active')).toBeVisible();
+
+    expect(getByText((_, node) => node.textContent?.replace(/\s+/g, ' ').trim() === '$100.00 / Year')).toBeVisible();
+
+    expect(getByText('Subscribed on')).toBeVisible();
+    expect(getByText('January 1, 2021')).toBeVisible();
+    expect(getByText('Renews at')).toBeVisible();
+
+    expect(getByText('Current billing cycle')).toBeVisible();
+    expect(getByText('Annually')).toBeVisible();
+
+    expect(getByText('Next payment on')).toBeVisible();
+    const nextPaymentElements = getAllByText('January 1, 2022');
+    expect(nextPaymentElements.length).toBe(2);
+
+    expect(getByText('Next payment amount')).toBeVisible();
+    expect(getByText('$101.00')).toBeVisible();
+    expect(queryByText('Ends on')).toBeNull();
+
+    expect(getByText('Switch to monthly $10 / month')).toBeVisible();
+    expect(getByText('Cancel subscription')).toBeVisible();
   });
 
   it('active free subscription', async () => {
@@ -294,27 +290,28 @@ describe('SubscriptionDetails', () => {
       </Drawer.Root>,
       { wrapper },
     );
+
     await waitFor(() => {
       expect(getByRole('heading', { name: /Subscription/i })).toBeVisible();
-
-      expect(getByText('Free Plan')).toBeVisible();
-      expect(getByText('Active')).toBeVisible();
-
-      expect(getByText('$0.00 / Month')).toBeVisible();
-
-      expect(getByText('Subscribed on')).toBeVisible();
-      expect(getByText('January 1, 2021')).toBeVisible();
-
-      expect(getByText('Renews at')).toBeVisible();
-      expect(queryByText('Ends on')).toBeNull();
-      expect(queryByText('Current billing cycle')).toBeNull();
-      expect(queryByText('Monthly')).toBeNull();
-      expect(queryByText('Next payment on')).toBeNull();
-      expect(queryByText('Next payment amount')).toBeNull();
-
-      expect(queryByText('Cancel subscription')).toBeNull();
-      expect(queryByText(/Switch to/i)).toBeNull();
     });
+
+    expect(getByText('Free Plan')).toBeVisible();
+    expect(getByText('Active')).toBeVisible();
+
+    expect(getByText((_, node) => node.textContent?.replace(/\s+/g, ' ').trim() === '$0.00 / Month')).toBeVisible();
+
+    expect(getByText('Subscribed on')).toBeVisible();
+    expect(getByText('January 1, 2021')).toBeVisible();
+
+    expect(getByText('Renews at')).toBeVisible();
+    expect(queryByText('Ends on')).toBeNull();
+    expect(queryByText('Current billing cycle')).toBeNull();
+    expect(queryByText('Monthly')).toBeNull();
+    expect(queryByText('Next payment on')).toBeNull();
+    expect(queryByText('Next payment amount')).toBeNull();
+
+    expect(queryByText('Cancel subscription')).toBeNull();
+    expect(queryByText(/Switch to/i)).toBeNull();
   });
 
   it('one active annual and one upcoming monthly subscription', async () => {
@@ -364,7 +361,7 @@ describe('SubscriptionDetails', () => {
       name: 'Monthly Plan',
       fee: {
         amount: 1000,
-        amountFormatted: '10.00',
+        amountFormatted: '15.00',
         currencySymbol: '$',
         currency: 'USD',
       },
@@ -442,35 +439,34 @@ describe('SubscriptionDetails', () => {
 
     await waitFor(() => {
       expect(getByRole('heading', { name: /Subscription/i })).toBeVisible();
-      expect(getByText('Annual Plan')).toBeVisible();
-      expect(getByText('Active')).toBeVisible();
-      expect(getByText('$120.00 / Year')).toBeVisible();
-      expect(getByText('Subscribed on')).toBeVisible();
-      expect(getByText('January 1, 2021')).toBeVisible();
-      expect(getByText('Ends on')).toBeVisible();
-      expect(getByText('January 1, 2022')).toBeVisible();
-      expect(queryByText('Renews at')).toBeNull();
-      expect(getByText('Current billing cycle')).toBeVisible();
-      expect(getByText('Annually')).toBeVisible();
-      expect(getByText('Next payment on')).toBeVisible();
-      expect(getAllByText('January 1, 2022').length).toBeGreaterThan(0);
-      expect(getByText('Next payment amount')).toBeVisible();
-      expect(getByText('$10.00')).toBeVisible();
-      // Check for the upcoming subscription details
-      expect(getByText('Upcoming')).toBeVisible();
-      expect(getByText('Monthly Plan')).toBeVisible();
-      expect(getByText('$10.00 / Month')).toBeVisible();
-      expect(getByText('Begins on')).toBeVisible();
     });
 
-    await waitFor(() => {
-      // Active (canceled) annual subscription buttons
-      expect(getByText('Switch to monthly $13 / month')).toBeVisible();
-      expect(getByText('Resubscribe')).toBeVisible();
-      // Upcoming monthly subscription buttons
-      expect(getByText('Switch to annual $90.99 / year')).toBeVisible();
-      expect(getAllByText('Cancel subscription').length).toBe(1);
-    });
+    expect(getByText('Annual Plan')).toBeVisible();
+    expect(getByText('Active')).toBeVisible();
+    expect(getByText((_, node) => node.textContent?.replace(/\s+/g, ' ').trim() === '$120.00 / Year')).toBeVisible();
+    expect(getByText('Subscribed on')).toBeVisible();
+    expect(getByText('January 1, 2021')).toBeVisible();
+    expect(getByText('Ends on')).toBeVisible();
+    expect(getByText('January 1, 2022')).toBeVisible();
+    expect(queryByText('Renews at')).toBeNull();
+    expect(getByText('Current billing cycle')).toBeVisible();
+    expect(getByText('Annually')).toBeVisible();
+    expect(getByText('Next payment on')).toBeVisible();
+    expect(getAllByText('January 1, 2022').length).toBeGreaterThan(0);
+    expect(getByText('Next payment amount')).toBeVisible();
+    expect(getByText('$10.00')).toBeVisible();
+    // Check for the upcoming subscription details
+    expect(getByText('Upcoming')).toBeVisible();
+    expect(getByText('Monthly Plan')).toBeVisible();
+    expect(getByText((_, node) => node.textContent?.replace(/\s+/g, ' ').trim() === '$15.00 / Month')).toBeVisible();
+    expect(getByText('Begins on')).toBeVisible();
+
+    // Active (canceled) annual subscription buttons
+    expect(getByText('Switch to monthly $13 / month')).toBeVisible();
+    expect(getByText('Resubscribe')).toBeVisible();
+    // Upcoming monthly subscription buttons
+    expect(getByText('Switch to annual $90.99 / year')).toBeVisible();
+    expect(getAllByText('Cancel subscription').length).toBe(1);
   });
 
   it('one active and one upcoming FREE subscription', async () => {
@@ -591,26 +587,27 @@ describe('SubscriptionDetails', () => {
 
     await waitFor(() => {
       expect(getByRole('heading', { name: /Subscription/i })).toBeVisible();
-      expect(getByText('Monthly Plan')).toBeVisible();
-      expect(getByText('Active')).toBeVisible();
-      expect(getByText('$10.00 / Month')).toBeVisible();
-      expect(getByText('Subscribed on')).toBeVisible();
-      expect(getByText('January 1, 2021')).toBeVisible();
-      expect(getByText('Ends on')).toBeVisible();
-
-      expect(queryByText('Renews at')).toBeNull();
-      expect(queryByText('Current billing cycle')).toBeNull();
-      expect(queryByText('Next payment on')).toBeNull();
-      expect(queryByText('Next payment amount')).toBeNull();
-      // Check for the upcoming free subscription details
-      expect(getByText('Upcoming')).toBeVisible();
-      expect(getByText('Free Plan (Upcoming)')).toBeVisible();
-      expect(getByText('$0.00 / Month')).toBeVisible();
-      expect(getByText('Begins on')).toBeVisible();
-
-      const nextPaymentElements = getAllByText('February 1, 2021');
-      expect(nextPaymentElements.length).toBe(2);
     });
+
+    expect(getByText('Monthly Plan')).toBeVisible();
+    expect(getByText('Active')).toBeVisible();
+    expect(getByText((_, node) => node.textContent?.replace(/\s+/g, ' ').trim() === '$10.00 / Month')).toBeVisible();
+    expect(getByText('Subscribed on')).toBeVisible();
+    expect(getByText('January 1, 2021')).toBeVisible();
+    expect(getByText('Ends on')).toBeVisible();
+
+    expect(queryByText('Renews at')).toBeNull();
+    expect(queryByText('Current billing cycle')).toBeNull();
+    expect(queryByText('Next payment on')).toBeNull();
+    expect(queryByText('Next payment amount')).toBeNull();
+    // Check for the upcoming free subscription details
+    expect(getByText('Upcoming')).toBeVisible();
+    expect(getByText('Free Plan (Upcoming)')).toBeVisible();
+    expect(getByText((_, node) => node.textContent?.replace(/\s+/g, ' ').trim() === '$0.00 / Month')).toBeVisible();
+    expect(getByText('Begins on')).toBeVisible();
+
+    const nextPaymentElements = getAllByText('February 1, 2021');
+    expect(nextPaymentElements.length).toBe(2);
   });
 
   it('allows cancelling a subscription of a monthly plan', async () => {
@@ -1013,14 +1010,15 @@ describe('SubscriptionDetails', () => {
 
     await waitFor(() => {
       expect(getByRole('heading', { name: /Subscription/i })).toBeVisible();
-      expect(getByText('Monthly Plan')).toBeVisible();
-      expect(getByText('Past due')).toBeVisible();
-      expect(getByText('$10.00 / Month')).toBeVisible();
-
-      expect(queryByText('Subscribed on')).toBeNull();
-      expect(getByText('Past due on')).toBeVisible();
-      expect(getByText('January 15, 2021')).toBeVisible();
     });
+
+    expect(getByText('Monthly Plan')).toBeVisible();
+    expect(getByText('Past due')).toBeVisible();
+    expect(getByText((_, node) => node.textContent?.replace(/\s+/g, ' ').trim() === '$10.00 / Month')).toBeVisible();
+
+    expect(queryByText('Subscribed on')).toBeNull();
+    expect(getByText('Past due on')).toBeVisible();
+    expect(getByText('January 15, 2021')).toBeVisible();
   });
 
   it('active free trial subscription shows correct labels and behavior', async () => {
@@ -1042,7 +1040,7 @@ describe('SubscriptionDetails', () => {
       nextPayment: {
         amount: {
           amount: 1000,
-          amountFormatted: '10.00',
+          amountFormatted: '15.00',
           currency: 'USD',
           currencySymbol: '$',
         },
@@ -1101,35 +1099,34 @@ describe('SubscriptionDetails', () => {
 
     await waitFor(() => {
       expect(getByRole('heading', { name: /Subscription/i })).toBeVisible();
-      expect(getByText('Pro Plan')).toBeVisible();
-      expect(getByText('Free trial')).toBeVisible();
-      expect(getByText('$10.00 / Month')).toBeVisible();
-
-      // Free trial specific labels
-      expect(getByText('Trial started on')).toBeVisible();
-      expect(getByText('January 1, 2021')).toBeVisible();
-      expect(getByText('Trial ends on')).toBeVisible();
-
-      // Should have multiple instances of February 1, 2021 (trial end and first payment)
-      const februaryDates = getAllByText('February 1, 2021');
-      expect(februaryDates.length).toBeGreaterThan(1);
-
-      // Payment related labels should use "first payment" wording
-      expect(getByText('First payment on')).toBeVisible();
-      expect(getByText('First payment amount')).toBeVisible();
-      expect(getByText('$10.00')).toBeVisible();
-
-      // Should not show regular subscription labels
-      expect(queryByText('Subscribed on')).toBeNull();
-      expect(queryByText('Renews at')).toBeNull();
-      expect(queryByText('Next payment on')).toBeNull();
-      expect(queryByText('Next payment amount')).toBeNull();
     });
+
+    expect(getByText('Pro Plan')).toBeVisible();
+    expect(getByText('Free trial')).toBeVisible();
+    expect(getByText((_, node) => node.textContent?.replace(/\s+/g, ' ').trim() === '$10.00 / Month')).toBeVisible();
+
+    // Free trial specific labels
+    expect(getByText('Trial started on')).toBeVisible();
+    expect(getByText('January 1, 2021')).toBeVisible();
+    expect(getByText('Trial ends on')).toBeVisible();
+
+    // Should have multiple instances of February 1, 2021 (trial end and first payment)
+    const februaryDates = getAllByText('February 1, 2021');
+    expect(februaryDates.length).toBeGreaterThan(1);
+
+    // Payment related labels should use "first payment" wording
+    expect(getByText('First payment on')).toBeVisible();
+    expect(getByText('First payment amount')).toBeVisible();
+    expect(getByText('$15.00')).toBeVisible();
+
+    // Should not show regular subscription labels
+    expect(queryByText('Subscribed on')).toBeNull();
+    expect(queryByText('Renews at')).toBeNull();
+    expect(queryByText('Next payment on')).toBeNull();
+    expect(queryByText('Next payment amount')).toBeNull();
 
     // Test the inline button shows free trial specific option
-    await waitFor(() => {
-      expect(getByText('Cancel free trial')).toBeVisible();
-    });
+    expect(getByText('Cancel free trial')).toBeVisible();
   });
 
   it('allows cancelling a free trial with specific dialog text', async () => {
