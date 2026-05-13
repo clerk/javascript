@@ -274,6 +274,23 @@ export const enUS: LocalizationResource = {
         subtitle: "Contact the application's administrator to get access through the existing connection.",
       },
     },
+    testConfigurationStep: {
+      title: 'Test your SSO connection',
+      subtitle: 'Authenticate using the test SSO URL to verify you configured the connection correctly.',
+      testUrl: {
+        title: 'Test your SSO URL',
+        subtitle: 'Generate and copy a test SSO URL to authenticate with.',
+        actionLabel__copy: 'Copy test URL',
+      },
+      testResults: {
+        title: 'Test results',
+        actionLabel__refresh: 'Refresh',
+        polling: 'Waiting for the test run to complete…',
+        status__success: 'Success',
+        status__failed: 'Failed',
+        status__pending: 'Pending',
+      },
+    },
     configureStep: {
       spFields: {
         acsUrl: {

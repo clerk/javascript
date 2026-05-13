@@ -1338,6 +1338,23 @@ export type __internal_LocalizationResource = {
         subtitle: LocalizationValue;
       };
     };
+    testConfigurationStep: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      testUrl: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+        actionLabel__copy: LocalizationValue;
+      };
+      testResults: {
+        title: LocalizationValue;
+        actionLabel__refresh: LocalizationValue;
+        polling: LocalizationValue;
+        status__success: LocalizationValue;
+        status__failed: LocalizationValue;
+        status__pending: LocalizationValue;
+      };
+    };
     configureStep: {
       spFields: {
         acsUrl: {

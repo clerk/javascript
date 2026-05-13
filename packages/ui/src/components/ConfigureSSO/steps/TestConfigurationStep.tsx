@@ -1,4 +1,17 @@
-import { descriptors, Flex, Flow, Icon, Spinner, Table, Tbody, Td, Text, Tr } from '@/customizables';
+import {
+  descriptors,
+  Flex,
+  Flow,
+  Icon,
+  localizationKeys,
+  Spinner,
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Tr,
+  useLocalizations,
+} from '@/customizables';
 import { ProfileSection } from '@/elements/Section';
 import { useClipboard } from '@/hooks';
 import { Check, Copy } from '@/icons';
@@ -17,8 +30,8 @@ export const TestConfigurationStep = (): JSX.Element => {
         elementId={descriptors.configureSSOStep.setId('test')}
       >
         <Step.Header
-          title='Test your SSO connection'
-          description='Test your SSO configuration to verify you can successfully authenticate via your identity provider'
+          title={localizationKeys('configureSSO.testConfigurationStep.title')}
+          description={localizationKeys('configureSSO.testConfigurationStep.subtitle')}
         />
 
         <Step.Body>
@@ -30,7 +43,7 @@ export const TestConfigurationStep = (): JSX.Element => {
             })}
           >
             <ProfileSection.Root
-              title='Test your SSO URL'
+              title={localizationKeys('configureSSO.testConfigurationStep.testUrl.title')}
               id='testSsoUrl'
               centered={false}
               sx={t => ({
@@ -38,12 +51,13 @@ export const TestConfigurationStep = (): JSX.Element => {
                 paddingTop: 0,
                 paddingBottom: 0,
                 flexDirection: 'column-reverse',
-                gap: t.space.$2,
+                gap: t.space.$1,
               })}
             >
-              <Text colorScheme='secondary'>
-                Authenticate using the test SSO URL to verify you configured the connection correctly.
-              </Text>
+              <Text
+                colorScheme='secondary'
+                localizationKey={localizationKeys('configureSSO.testConfigurationStep.testUrl.subtitle')}
+              />
               <ProfileSection.Item
                 id='testSsoUrl'
                 sx={{ paddingInlineStart: 0 }}
@@ -58,7 +72,7 @@ export const TestConfigurationStep = (): JSX.Element => {
 
           <Step.Section>
             <ProfileSection.Root
-              title='Your test results'
+              title={localizationKeys('configureSSO.testConfigurationStep.testResults.title')}
               id='testResults'
               centered={false}
               sx={t => ({
@@ -114,7 +128,10 @@ const TestResultsTable = ({ rows, isLoading }: { rows: TestResultRow[]; isLoadin
                     colorScheme='primary'
                     elementDescriptor={descriptors.spinner}
                   />
-                  <Text colorScheme='secondary'>loading logs</Text>
+                  <Text
+                    colorScheme='secondary'
+                    localizationKey={localizationKeys('configureSSO.testConfigurationStep.testResults.loading')}
+                  />
                 </Flex>
               </Td>
             </Tr>
@@ -139,10 +156,9 @@ const EmptyTestResultsRow = (): JSX.Element => {
       <Td>
         <Text
           colorScheme='secondary'
+          localizationKey={localizationKeys('configureSSO.testConfigurationStep.testResults.empty')}
           sx={t => ({ display: 'block', textAlign: 'center', padding: `${t.space.$10} 0` })}
-        >
-          No test results yet
-        </Text>
+        />
       </Td>
     </Tr>
   );
@@ -150,6 +166,7 @@ const EmptyTestResultsRow = (): JSX.Element => {
 
 const CopyTestUrlButton = ({ url, isLoading }: { url: string; isLoading: boolean }): JSX.Element => {
   const { onCopy, hasCopied } = useClipboard(url);
+  const { t } = useLocalizations();
 
   return (
     <ProfileSection.Button
@@ -158,7 +175,7 @@ const CopyTestUrlButton = ({ url, isLoading }: { url: string; isLoading: boolean
       size='sm'
       isDisabled={!url}
       isLoading={isLoading}
-      loadingText='Generating test URL…'
+      loadingText={t(localizationKeys('configureSSO.testConfigurationStep.testUrl.actionLabel__loading'))}
       onClick={onCopy}
       sx={t => ({
         gap: t.space.$1x5,
@@ -169,7 +186,14 @@ const CopyTestUrlButton = ({ url, isLoading }: { url: string; isLoading: boolean
         icon={hasCopied ? Check : Copy}
         size='sm'
       />
-      {hasCopied ? 'Copied' : 'Copy test URL'}
+      <Text
+        as='span'
+        localizationKey={localizationKeys(
+          hasCopied
+            ? 'configureSSO.testConfigurationStep.testUrl.actionLabel__copied'
+            : 'configureSSO.testConfigurationStep.testUrl.actionLabel__copy',
+        )}
+      />
     </ProfileSection.Button>
   );
 };
