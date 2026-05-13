@@ -1,3 +1,7 @@
+import { __internal_useUserEnterpriseConnections, useReverification } from '@clerk/shared/react';
+import type { UpdateMeEnterpriseConnectionParams } from '@clerk/shared/types';
+import React from 'react';
+
 import {
   Badge,
   Col,
@@ -744,7 +748,21 @@ export const AssignUsersSubStep = (): JSX.Element => {
 export const SubmitSamlConfigSubStep = (): JSX.Element => {
   const card = useCardState();
   const { goNext, goPrev, isFirstStep } = useWizard();
-  const { enterpriseConnection, updateConnection } = useConfigureSSO();
+  const { enterpriseConnection } = useConfigureSSO();
+  const { updateEnterpriseConnection } = __internal_useUserEnterpriseConnections();
+
+  const updateConnection = useReverification(
+    React.useCallback(
+      async (params: UpdateMeEnterpriseConnectionParams) => {
+        if (!enterpriseConnection) {
+          throw new Error('Enterprise connection required');
+        }
+
+        return updateEnterpriseConnection(enterpriseConnection.id, params);
+      },
+      [enterpriseConnection, updateEnterpriseConnection],
+    ),
+  );
 
   const metadataUrlField = useFormControl('idpMetadataUrl', '', {
     type: 'text',

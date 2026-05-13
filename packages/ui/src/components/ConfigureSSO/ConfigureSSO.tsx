@@ -64,11 +64,7 @@ const AuthenticatedContent = withCoreUserGuard(() => {
 });
 
 const ConfigureSSOCardContent = () => {
-  const {
-    data: enterpriseConnections,
-    isLoading,
-    updateEnterpriseConnection,
-  } = __internal_useUserEnterpriseConnections({ enabled: true });
+  const { data: enterpriseConnections, isLoading } = __internal_useUserEnterpriseConnections({ enabled: true });
 
   // Currently FAPI only supports one enterprise connection per user
   const enterpriseConnection = enterpriseConnections?.[0];
@@ -78,11 +74,7 @@ const ConfigureSSOCardContent = () => {
   }
 
   return (
-    <ConfigureSSOProvider
-      enterpriseConnection={enterpriseConnection}
-      updateEnterpriseConnection={updateEnterpriseConnection}
-    >
-
+    <ConfigureSSOProvider enterpriseConnection={enterpriseConnection}>
       <ConfigureSSOSteps />
     </ConfigureSSOProvider>
   );
