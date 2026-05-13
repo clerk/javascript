@@ -42,7 +42,11 @@ export function pickFreshestJwt<T extends TokenResource | JWT>(existing: T, inco
     return incoming;
   }
 
+  // Equal oiat: tie-break by iat (more recent mint wins). On a full tie,
+  // return incoming: two tokens with identical oiat+iat may still differ
+  // in other claims (azp, org_id, etc.) added in a token-format rollout,
+  // so we only suppress when existing is strictly fresher.
   const existingIat = asJwt(existing)?.claims?.iat ?? 0;
   const incomingIat = asJwt(incoming)?.claims?.iat ?? 0;
-  return existingIat >= incomingIat ? existing : incoming;
+  return existingIat > incomingIat ? existing : incoming;
 }

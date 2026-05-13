@@ -46,10 +46,13 @@ describe('pickFreshestJwt', () => {
       expect(pickFreshestJwt(existing, incoming)).toBe(incoming);
     });
 
-    it('picks existing when oiat equal and iat equal (identical, no churn)', () => {
+    it('picks incoming when oiat equal and iat equal (other claims may differ)', () => {
+      // Two tokens with identical oiat+iat may still differ in other claims
+      // (azp, org_id, etc.) during a token-format rollout. Only suppress when
+      // existing is strictly fresher; on full ties, let incoming through.
       const existing = makeToken({ oiat: 100, iat: 150 });
       const incoming = makeToken({ oiat: 100, iat: 150 });
-      expect(pickFreshestJwt(existing, incoming)).toBe(existing);
+      expect(pickFreshestJwt(existing, incoming)).toBe(incoming);
     });
 
     it('picks existing when oiat equal and incoming iat missing (treated as 0)', () => {
