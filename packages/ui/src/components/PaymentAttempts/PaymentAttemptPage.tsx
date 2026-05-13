@@ -4,7 +4,7 @@ import type { BillingPaymentResource } from '@clerk/shared/types';
 import { Alert } from '@/ui/elements/Alert';
 import { Header } from '@/ui/elements/Header';
 import { LineItems } from '@/ui/elements/LineItems';
-import { getSeatsPerUnitTotal, summarizeSeatCharges } from '@/ui/utils/billingPlanSeats';
+import { getPlanSeatLimit, getSeatsPerUnitTotal, summarizeSeatCharges } from '@/ui/utils/billingPlanSeats';
 import { formatDate } from '@/ui/utils/formatDate';
 import { truncateWithEndVisible } from '@/ui/utils/truncateTextWithEndVisible';
 
@@ -213,6 +213,8 @@ function PaymentAttemptBody({ paymentAttempt }: { paymentAttempt: BillingPayment
 
   const seatsTotal = subscriptionItem.seats != null ? getSeatsPerUnitTotal(paymentAttempt.totals) : undefined;
   const seatSummary = summarizeSeatCharges(seatsTotal);
+  const seatsChargeable = seatSummary ? seatSummary.used - seatSummary.included : 0;
+  const planSeatLimit = getPlanSeatLimit(subscriptionItem.plan);
 
   return (
     <Box
@@ -230,14 +232,23 @@ function PaymentAttemptBody({ paymentAttempt }: { paymentAttempt: BillingPayment
           />
         </LineItems.Group>
         {seatSummary && (
-          <LineItems.Group variant='tertiary'>
+          <LineItems.Group>
             <LineItems.Title
-              title={localizationKeys('billing.seats')}
-              description={`${seatSummary.used} ${seatSummary.used === 1 ? 'seat' : 'seats'}${
-                seatSummary.included > 0 ? ` (${seatSummary.included} included)` : ''
-              } × ${seatSummary.paidTier.feePerBlock.currencySymbol}${seatSummary.paidTier.feePerBlock.amountFormatted}`}
+              title={
+                planSeatLimit != null
+                  ? localizationKeys('billing.seatsWithLimit', { limit: planSeatLimit })
+                  : localizationKeys('billing.seats')
+              }
+              description={(() => {
+                const seatLabel = `${seatsChargeable} ${seatsChargeable === 1 ? 'seat' : 'seats'}`;
+                const rate = `${seatSummary.paidTier.feePerBlock.currencySymbol}${seatSummary.paidTier.feePerBlock.amountFormatted}/mo`;
+                return seatSummary.included > 0
+                  ? `${seatSummary.used} used − ${seatSummary.included} included → ${seatLabel} at ${rate}`
+                  : `${seatLabel} at ${rate}`;
+              })()}
             />
             <LineItems.Description
+              prefix={subscriptionItem.planPeriod === 'annual' ? 'x12' : undefined}
               text={`${seatSummary.paidTier.total.currencySymbol}${seatSummary.paidTier.total.amountFormatted}`}
             />
           </LineItems.Group>

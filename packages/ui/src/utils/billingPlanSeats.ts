@@ -70,7 +70,8 @@ export const summarizeSeatCharges = (seatsTotal: BillingPerUnitTotal | null | un
 };
 
 /**
- * Given a plan, return the seat limit for the plan, or undefined if the plan does not have a seat limit.
+ * Given a plan, return the seat limit for the plan in seats (not blocks), or `null` if seats are
+ * unlimited, or `undefined` if the plan has no seat-based pricing.
  */
 export const getPlanSeatLimit = (plan: BillingPlanResource): number | null | undefined => {
   const seatUnitPrice = getSeatUnitPrice(plan);
@@ -79,7 +80,8 @@ export const getPlanSeatLimit = (plan: BillingPlanResource): number | null | und
     return undefined;
   }
 
-  return seatUnitPrice.tiers[seatUnitPrice.tiers.length - 1]?.endsAfterBlock;
+  const lastTier = seatUnitPrice.tiers[seatUnitPrice.tiers.length - 1];
+  return lastTier.endsAfterBlock != null ? lastTier.endsAfterBlock * seatUnitPrice.blockSize : null;
 };
 
 /**
