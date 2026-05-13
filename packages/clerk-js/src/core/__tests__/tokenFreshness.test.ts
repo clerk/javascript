@@ -79,6 +79,17 @@ describe('pickFreshestJwt', () => {
     });
   });
 
+  describe('same object reference', () => {
+    // When the cache hands back the same object that is already stored as
+    // lastActiveToken, callers use `pickFreshestJwt(a, b) === a` to detect
+    // "existing won, suppress redundant emit". This test documents that
+    // intentional behavior.
+    it('returns the same reference when both args are the same object', () => {
+      const token = makeToken({ oiat: 100, iat: 150 });
+      expect(pickFreshestJwt(token, token)).toBe(token);
+    });
+  });
+
   describe('JWT input (cookie path)', () => {
     it('accepts raw decoded JWT for both arguments', () => {
       const a = makeJwt({ oiat: 100 });
