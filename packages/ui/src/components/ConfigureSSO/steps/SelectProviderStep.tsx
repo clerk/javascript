@@ -66,6 +66,7 @@ export const SelectProviderStep = (): JSX.Element => {
             <Col sx={theme => ({ gap: theme.space.$1x5 })}>
               <Text
                 as='p'
+                variant='subtitle'
                 localizationKey={localizationKeys('configureSSO.selectProviderStep.body.title')}
               />
 
@@ -168,6 +169,7 @@ const ProviderCard = ({ name, value, iconId, label, checked, onChange }: Provide
         // Keyboard focus indication — fires when the inner input is focused.
         '&:has(input:focus-visible)': {
           ...common.focusRingStyles(theme),
+          borderColor: theme.colors.$borderAlpha300,
         },
         // Selected ring — CSS-driven via :checked so it survives focus changes.
         '&:has(input:checked)': {
