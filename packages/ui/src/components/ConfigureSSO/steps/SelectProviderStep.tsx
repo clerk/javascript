@@ -2,17 +2,7 @@ import { iconImageUrl } from '@clerk/shared/constants';
 import React from 'react';
 
 import type { LocalizationKey } from '@/customizables';
-import {
-  Col,
-  descriptors,
-  Flow,
-  Grid,
-  localizationKeys,
-  SimpleButton,
-  Span,
-  Text,
-  useLocalizations,
-} from '@/customizables';
+import { Box, Col, descriptors, Flow, Grid, localizationKeys, Span, Text, useLocalizations } from '@/customizables';
 import { mqu } from '@/styledSystem';
 import { Alert } from '@/ui/elements/Alert';
 
@@ -106,10 +96,12 @@ export const SelectProviderStep = (): JSX.Element => {
                   {group.options.map(option => (
                     <ProviderCard
                       key={option.id}
+                      name='configure-sso-provider'
+                      value={option.id}
                       iconId={option.iconId}
                       label={option.label}
-                      isSelected={selected === option.id}
-                      onClick={() => setSelected(option.id)}
+                      checked={selected === option.id}
+                      onChange={() => setSelected(option.id)}
                     />
                   ))}
                 </Grid>
@@ -137,23 +129,29 @@ export const SelectProviderStep = (): JSX.Element => {
 };
 
 type ProviderCardProps = {
+  name: string;
+  value: string;
   iconId: string;
   label: LocalizationKey;
-  isSelected?: boolean;
-  onClick?: () => void;
+  checked?: boolean;
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
-const ProviderCard = ({ iconId, label, isSelected, onClick }: ProviderCardProps): JSX.Element => {
+const ProviderCard = ({ name, value, iconId, label, checked, onChange }: ProviderCardProps): JSX.Element => {
   const { t } = useLocalizations();
   const labelText = t(label);
 
   return (
-    <SimpleButton
-      variant='outline'
-      block
-      onClick={onClick}
-      aria-pressed={isSelected}
+    <Box
+      as='label'
       sx={theme => ({
+        // Outline-button look (mirrors SimpleButton variant='outline' for visual continuity).
+        borderWidth: theme.borderWidths.$normal,
+        borderStyle: theme.borderStyles.$solid,
+        borderColor: theme.colors.$borderAlpha150,
+        borderRadius: theme.radii.$md,
+        color: theme.colors.$neutralAlpha600,
+        display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
@@ -161,13 +159,39 @@ const ProviderCard = ({ iconId, label, isSelected, onClick }: ProviderCardProps)
         height: theme.sizes.$32,
         padding: theme.space.$1x5,
         backgroundColor: theme.colors.$colorBackground,
-        ...(isSelected
-          ? {
-              boxShadow: `0 0 0 4px ${theme.colors.$colorRing}`,
-            }
-          : {}),
+        cursor: 'pointer',
+        position: 'relative',
+        '&:hover': { backgroundColor: theme.colors.$neutralAlpha50 },
+        // Keyboard focus indication — fires when the inner input is focused.
+        '&:has(input:focus-visible)': {
+          outline: `2px solid ${theme.colors.$colorRing}`,
+          outlineOffset: '2px',
+        },
+        // Selected ring — CSS-driven via :checked so it survives focus changes.
+        '&:has(input:checked)': {
+          boxShadow: `0 0 0 4px ${theme.colors.$colorRing}`,
+        },
       })}
     >
+      <input
+        type='radio'
+        name={name}
+        value={value}
+        checked={checked}
+        onChange={onChange}
+        css={{
+          position: 'absolute',
+          width: '1px',
+          height: '1px',
+          padding: 0,
+          margin: '-1px',
+          overflow: 'hidden',
+          clip: 'rect(0,0,0,0)',
+          whiteSpace: 'nowrap',
+          borderWidth: 0,
+        }}
+      />
+
       <Span
         aria-hidden
         sx={theme => ({
@@ -187,6 +211,6 @@ const ProviderCard = ({ iconId, label, isSelected, onClick }: ProviderCardProps)
       >
         {labelText}
       </Text>
-    </SimpleButton>
+    </Box>
   );
 };

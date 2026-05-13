@@ -63,13 +63,13 @@ describe('SelectProviderStep', () => {
     expect(screen.getByText('Select your identity provider')).toBeInTheDocument();
   });
 
-  it('renders both SAML provider tiles with their labels', async () => {
+  it('renders both SAML provider radios with their labels', async () => {
     resetMocks();
     const { wrapper } = await createFixtures();
     renderStep(wrapper);
 
-    expect(screen.getByRole('button', { name: 'Okta Workforce' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Custom SAML Provider' })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'Okta Workforce' })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'Custom SAML Provider' })).toBeInTheDocument();
   });
 
   it('loads each tile icon from img.clerk.com', async () => {
@@ -78,7 +78,7 @@ describe('SelectProviderStep', () => {
     const { container } = renderStep(wrapper);
 
     // Emotion serializes sx into stylesheets, so we check both inline + the document's collected styles
-    const iconSpans = Array.from(container.querySelectorAll('button span[aria-hidden]'));
+    const iconSpans = Array.from(container.querySelectorAll('label span[aria-hidden]'));
     expect(iconSpans).toHaveLength(2);
 
     const collectedStyles = [
@@ -95,38 +95,40 @@ describe('SelectProviderStep', () => {
     const { wrapper } = await createFixtures();
     renderStep(wrapper);
 
+    expect(screen.getByRole('radio', { name: 'Okta Workforce' })).not.toBeChecked();
+    expect(screen.getByRole('radio', { name: 'Custom SAML Provider' })).not.toBeChecked();
     expect(screen.getByRole('button', { name: /Continue/i })).toBeDisabled();
   });
 
-  it('marks the clicked tile as pressed and enables Continue', async () => {
+  it('marks the clicked radio as checked and enables Continue', async () => {
     resetMocks();
     const { wrapper } = await createFixtures();
     const { userEvent } = renderStep(wrapper);
 
-    const oktaTile = screen.getByRole('button', { name: 'Okta Workforce' });
-    expect(oktaTile).toHaveAttribute('aria-pressed', 'false');
+    const oktaRadio = screen.getByRole('radio', { name: 'Okta Workforce' });
+    expect(oktaRadio).not.toBeChecked();
 
-    await userEvent.click(oktaTile);
+    await userEvent.click(oktaRadio);
 
-    expect(oktaTile).toHaveAttribute('aria-pressed', 'true');
+    expect(oktaRadio).toBeChecked();
     expect(screen.getByRole('button', { name: /Continue/i })).toBeEnabled();
   });
 
-  it('flips selection when a different tile is clicked', async () => {
+  it('flips selection when a different radio is clicked', async () => {
     resetMocks();
     const { wrapper } = await createFixtures();
     const { userEvent } = renderStep(wrapper);
 
-    const oktaTile = screen.getByRole('button', { name: 'Okta Workforce' });
-    const customSamlTile = screen.getByRole('button', { name: 'Custom SAML Provider' });
+    const oktaRadio = screen.getByRole('radio', { name: 'Okta Workforce' });
+    const customSamlRadio = screen.getByRole('radio', { name: 'Custom SAML Provider' });
 
-    await userEvent.click(oktaTile);
-    expect(oktaTile).toHaveAttribute('aria-pressed', 'true');
-    expect(customSamlTile).toHaveAttribute('aria-pressed', 'false');
+    await userEvent.click(oktaRadio);
+    expect(oktaRadio).toBeChecked();
+    expect(customSamlRadio).not.toBeChecked();
 
-    await userEvent.click(customSamlTile);
-    expect(oktaTile).toHaveAttribute('aria-pressed', 'false');
-    expect(customSamlTile).toHaveAttribute('aria-pressed', 'true');
+    await userEvent.click(customSamlRadio);
+    expect(oktaRadio).not.toBeChecked();
+    expect(customSamlRadio).toBeChecked();
   });
 
   it('records the provider and advances when Continue is clicked', async () => {
@@ -142,7 +144,7 @@ describe('SelectProviderStep', () => {
     const { wrapper } = await createFixtures();
     const { userEvent } = renderStep(wrapper);
 
-    await userEvent.click(screen.getByRole('button', { name: 'Okta Workforce' }));
+    await userEvent.click(screen.getByRole('radio', { name: 'Okta Workforce' }));
     await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
 
     await waitFor(() => {
@@ -158,7 +160,7 @@ describe('SelectProviderStep', () => {
     const { wrapper } = await createFixtures();
     const { userEvent } = renderStep(wrapper);
 
-    await userEvent.click(screen.getByRole('button', { name: 'Custom SAML Provider' }));
+    await userEvent.click(screen.getByRole('radio', { name: 'Custom SAML Provider' }));
     await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
 
     await waitFor(() => {
