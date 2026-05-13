@@ -1300,6 +1300,30 @@ export type __internal_LocalizationResource = {
       title: LocalizationValue;
       subtitle: LocalizationValue;
     };
+    verifyEmailDomainStep: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      addEmailAddress: {
+        formTitle: LocalizationValue;
+        formSubtitle: LocalizationValue;
+        inputPlaceholder: LocalizationValue;
+        inputLabel: LocalizationValue;
+      };
+      emailCode: {
+        formTitle: LocalizationValue;
+        formSubtitle: LocalizationValue<'identifier'>;
+        resendButton: LocalizationValue;
+        verified: {
+          title: LocalizationValue;
+          subtitle: LocalizationValue;
+          inputLabel: LocalizationValue;
+        };
+      };
+      domainTaken: {
+        title: LocalizationValue<'domain'>;
+        subtitle: LocalizationValue;
+      };
+    };
   };
   apiKeys: {
     formTitle: LocalizationValue;
