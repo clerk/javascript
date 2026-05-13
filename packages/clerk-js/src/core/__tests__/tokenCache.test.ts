@@ -47,7 +47,7 @@ describe('SessionTokenCache', () => {
     close: ReturnType<typeof vi.fn>;
     postMessage: ReturnType<typeof vi.fn>;
   };
-  let broadcastListener: (e: MessageEvent<SessionTokenEvent>) => void;
+  let broadcastListener: (e: MessageEvent<SessionTokenEvent>) => void | Promise<void>;
   let originalBroadcastChannel: any;
 
   beforeEach(() => {
@@ -243,7 +243,7 @@ describe('SessionTokenCache', () => {
       expect(resultAfterOlder?.entry.createdAt).toBe(newerCreatedAt);
     });
 
-    it('enforces monotonicity: replaces older cached token when a fresher-oiat broadcast arrives', () => {
+    it('enforces monotonicity: replaces older cached token when a fresher-oiat broadcast arrives', async () => {
       // Inverse of the previous test: a fresher-oiat broadcast must overwrite
       // an older-oiat token already in cache.
       const olderJwt = createJwtWithOiat(1666648190, 1666648190);
@@ -260,10 +260,10 @@ describe('SessionTokenCache', () => {
         },
       } as MessageEvent<SessionTokenEvent>;
 
-      broadcastListener(olderEvent);
+      await broadcastListener(olderEvent);
       const resultAfterOlder = SessionTokenCache.get({ tokenId: 'session_123' });
       expect(resultAfterOlder).toBeDefined();
-      const olderCreatedAt = resultAfterOlder?.entry.createdAt;
+      expect(resultAfterOlder?.entry.createdAt).toBe(1666648190);
 
       const newerEvent: MessageEvent<SessionTokenEvent> = {
         data: {
@@ -276,11 +276,10 @@ describe('SessionTokenCache', () => {
         },
       } as MessageEvent<SessionTokenEvent>;
 
-      broadcastListener(newerEvent);
+      await broadcastListener(newerEvent);
 
       const resultAfterNewer = SessionTokenCache.get({ tokenId: 'session_123' });
       expect(resultAfterNewer).toBeDefined();
-      expect(resultAfterNewer?.entry.createdAt).not.toBe(olderCreatedAt);
       expect(resultAfterNewer?.entry.createdAt).toBe(1666648250);
     });
 
