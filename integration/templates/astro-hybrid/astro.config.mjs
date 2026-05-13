@@ -20,4 +20,11 @@ export default defineConfig({
   server: {
     port: process.env.PORT ? Number(process.env.PORT) : undefined,
   },
+  vite: {
+    build: {
+      rollupOptions: {
+        external: ['cloudflare:workers'],
+      },
+    },
+  },
 });

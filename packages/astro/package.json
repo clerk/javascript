@@ -77,10 +77,10 @@
     "types.ts"
   ],
   "scripts": {
-    "build": "tsup --onSuccess \"pnpm build:dts\" && pnpm copy:components",
+    "build": "tsdown --onSuccess \"pnpm build:dts\" && pnpm copy:components",
     "build:dts": "tsc --emitDeclarationOnly --declaration",
     "copy:components": "rm -rf ./components && mkdir -p ./components/ && cp  -r ./src/astro-components/* ./components/ && cp ./src/types.ts ./",
-    "dev": "tsup --watch",
+    "dev": "tsdown --watch",
     "dev:pub": "pnpm dev -- --env.publish",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",

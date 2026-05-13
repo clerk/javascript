@@ -1,4 +1,4 @@
-import { defineConfig } from 'tsup';
+import { defineConfig } from 'tsdown';
 
 export default defineConfig(overrideOptions => {
   const shouldPublish = !!overrideOptions.env?.publish;
@@ -6,7 +6,7 @@ export default defineConfig(overrideOptions => {
   return {
     entry: ['src/*.ts'],
     format: ['cjs', 'esm'],
-    bundle: true,
+    fixedExtension: false,
     clean: true,
     minify: false,
     sourcemap: true,

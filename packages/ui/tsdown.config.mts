@@ -13,6 +13,7 @@ export default defineConfig(({ watch }) => {
     platform: 'browser',
     external: ['react', 'react-dom', '@clerk/localizations', '@clerk/shared'],
     format: ['esm'], // ESM only
+    fixedExtension: false,
     minify: false,
     plugins: [
       svgr({

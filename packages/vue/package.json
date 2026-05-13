@@ -50,9 +50,9 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup --onSuccess \"pnpm build:dts\"",
+    "build": "tsdown --onSuccess \"pnpm build:dts\"",
     "build:dts": "vue-tsc --declaration --emitDeclarationOnly -p tsconfig.build.json",
-    "dev": "tsup --watch",
+    "dev": "tsdown --watch",
     "dev:pub": "pnpm dev -- --env.publish",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
@@ -69,8 +69,8 @@
   "devDependencies": {
     "@clerk/ui": "workspace:^",
     "@testing-library/vue": "^8.1.0",
-    "@vitejs/plugin-vue": "^5.2.4",
-    "@vue.ts/tsx-auto-props": "^0.6.0",
+    "@vitejs/plugin-vue": "^6.0.5",
+    "@vue.ts/tsx-auto-props": "^1.0.0-beta.13",
     "unplugin-vue": "7.0.8",
     "vue": "catalog:repo",
     "vue-tsc": "^3.2.4"

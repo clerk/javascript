@@ -58,7 +58,6 @@ export const MenuTrigger = (props: MenuTriggerProps) => {
   }
 
   return cloneElement(children, {
-    // @ts-expect-error
     ref: reference,
     elementDescriptor: children.props.elementDescriptor || descriptors.menuButton,
     elementId: children.props.elementId || descriptors.menuButton.setId(elementId),
