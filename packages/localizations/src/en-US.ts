@@ -264,11 +264,31 @@ export const enUS: LocalizationResource = {
         subtitle: 'Create a new enterprise application in your Okta Dashboard',
         createApp: {
           title: 'Create a new enterprise application in Okta',
-          step1: 'Sign in to Okta and go to <strong>Admin → Applications</strong>.',
-          step2: 'Click <strong>Create App Integration</strong>.',
-          step3: 'Select <strong>SAML 2.0</strong>.',
-          step4: 'Fill in the <strong>General Settings</strong> (App name is required).',
-          step5: 'Click <strong>Next</strong> to complete creating the application.',
+          step1: {
+            prefix: 'Sign in to Okta and go to ',
+            bold: 'Admin → Applications',
+            suffix: '.',
+          },
+          step2: {
+            prefix: 'Click ',
+            bold: 'Create App Integration',
+            suffix: '.',
+          },
+          step3: {
+            prefix: 'Select ',
+            bold: 'SAML 2.0',
+            suffix: '.',
+          },
+          step4: {
+            prefix: 'Fill in the ',
+            bold: 'General Settings',
+            suffix: ' (App name is required).',
+          },
+          step5: {
+            prefix: 'Click ',
+            bold: 'Next',
+            suffix: ' to complete creating the application.',
+          },
         },
         serviceProvider: {
           title: 'Configure service provider',
@@ -279,17 +299,71 @@ export const enUS: LocalizationResource = {
         },
         completeSamlIntegration: {
           title: 'Complete SAML integration',
-          step1: 'Select <strong>This is an internal app that we have created</strong> from the options menu.',
-          step2: 'Complete the form with any comments and select <strong>"Finish"</strong>.',
+          step1: {
+            prefix: 'Select ',
+            bold: 'This is an internal app that we have created',
+            suffix: ' from the options menu.',
+          },
+          step2: {
+            prefix: 'Complete the form with any comments and select ',
+            bold: '"Finish"',
+            suffix: '.',
+          },
         },
         configureAttributes: {
-          step1: 'In the Okta dashboard, find the <strong>Attribute Statements</strong> section.',
-          step2:
-            'Select <strong>Add Expression</strong> for each attribute, and enter the following name and expression pairs:',
+          step1: {
+            prefix: 'In the Okta dashboard, find the ',
+            bold: 'Attribute Statements',
+            suffix: ' section.',
+          },
+          step2: {
+            prefix: 'Select ',
+            bold: 'Add Expression',
+            suffix: ' for each attribute, and enter the following name and expression pairs:',
+          },
           pairs: {
-            email: '<code>mail</code> and <code>user.profile.mail</code>',
-            firstName: '<code>firstName</code> and <code>user.profile.firstName</code>',
-            lastName: '<code>lastName</code> and <code>user.profile.lastName</code>',
+            conjunction: ' and ',
+            email: {
+              name: 'mail',
+              expression: 'user.profile.mail',
+            },
+            firstName: {
+              name: 'firstName',
+              expression: 'user.profile.firstName',
+            },
+            lastName: {
+              name: 'lastName',
+              expression: 'user.profile.lastName',
+            },
+          },
+        },
+        assignUsers: {
+          title: 'Assign selected user or group in Okta',
+          paragraph: 'You need to assign users or groups to your enterprise app before they can use it to sign in.',
+          step1: {
+            prefix: 'In the Okta dashboard, select the ',
+            bold: 'Assignments',
+            suffix: ' tab.',
+          },
+          step2: {
+            prefix: 'Select the ',
+            bold1: 'Assign',
+            middle1: ' dropdown. You can either select ',
+            bold2: 'Assign to people',
+            middle2: ' or ',
+            bold3: 'Assign to groups',
+            suffix: '.',
+          },
+          step3: 'In the search field, enter the user or group of users that you want to assign to the application.',
+          step4: {
+            prefix: 'Select the ',
+            bold: 'Assign',
+            suffix: ' button next to the user or group that you want to assign.',
+          },
+          step5: {
+            prefix: 'Select the ',
+            bold: 'Done',
+            suffix: ' button to complete the assignment.',
           },
         },
         metadataUrl: {

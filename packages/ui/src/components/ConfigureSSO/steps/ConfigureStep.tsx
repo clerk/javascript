@@ -5,7 +5,6 @@ import {
   Flex,
   Flow,
   Heading,
-  type LocalizationKey,
   localizationKeys,
   Table,
   Tbody,
@@ -14,7 +13,6 @@ import {
   Th,
   Thead,
   Tr,
-  useLocalizations,
 } from '@/customizables';
 import { ClipboardInput } from '@/elements/ClipboardInput';
 import { useCardState } from '@/elements/contexts';
@@ -73,70 +71,6 @@ const InnerStepCounter = (): JSX.Element => {
   );
 };
 
-const RICH_TEXT_PATTERN = /<(strong|code)>(.*?)<\/\1>/g;
-
-type RichTextSegment =
-  | { type: 'text'; value: string }
-  | { type: 'strong'; value: string }
-  | { type: 'code'; value: string };
-
-const parseRichText = (input: string): RichTextSegment[] => {
-  const segments: RichTextSegment[] = [];
-  let lastIndex = 0;
-  RICH_TEXT_PATTERN.lastIndex = 0;
-  let match: RegExpExecArray | null;
-  while ((match = RICH_TEXT_PATTERN.exec(input)) !== null) {
-    if (match.index > lastIndex) {
-      segments.push({ type: 'text', value: input.slice(lastIndex, match.index) });
-    }
-    segments.push({ type: match[1] as 'strong' | 'code', value: match[2] });
-    lastIndex = RICH_TEXT_PATTERN.lastIndex;
-  }
-  if (lastIndex < input.length) {
-    segments.push({ type: 'text', value: input.slice(lastIndex) });
-  }
-  return segments;
-};
-
-const RichText = ({ localizationKey }: { localizationKey: LocalizationKey }): JSX.Element => {
-  const { t } = useLocalizations();
-  const text = t(localizationKey);
-  if (!text) {
-    return <></>;
-  }
-  return (
-    <>
-      {parseRichText(text).map((segment, index) => {
-        if (segment.type === 'strong') {
-          return (
-            <Text
-              key={index}
-              as='span'
-              colorScheme='inherit'
-              sx={theme => ({ fontWeight: theme.fontWeights.$medium })}
-            >
-              {segment.value}
-            </Text>
-          );
-        }
-        if (segment.type === 'code') {
-          return (
-            <Text
-              key={index}
-              as='span'
-              colorScheme='inherit'
-              sx={{ fontFamily: 'monospace' }}
-            >
-              {segment.value}
-            </Text>
-          );
-        }
-        return segment.value;
-      })}
-    </>
-  );
-};
-
 const ATTRIBUTE_ROWS = [
   {
     id: 'email',
@@ -161,15 +95,18 @@ const ATTRIBUTE_ROWS = [
 const ATTRIBUTE_PAIRS = [
   {
     id: 'email',
-    value: localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.pairs.email'),
+    name: localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.pairs.email.name'),
+    expression: localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.pairs.email.expression'),
   },
   {
     id: 'firstName',
-    value: localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.pairs.firstName'),
+    name: localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.pairs.firstName.name'),
+    expression: localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.pairs.firstName.expression'),
   },
   {
     id: 'lastName',
-    value: localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.pairs.lastName'),
+    name: localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.pairs.lastName.name'),
+    expression: localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.pairs.lastName.expression'),
   },
 ] as const;
 
@@ -214,31 +151,106 @@ export const CreateAppSubStep = (): JSX.Element => {
                 as='li'
                 colorScheme='secondary'
               >
-                <RichText localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.createApp.step1')} />
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.createApp.step1.prefix')}
+                />
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  sx={theme => ({ fontWeight: theme.fontWeights.$medium })}
+                  localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.createApp.step1.bold')}
+                />
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.createApp.step1.suffix')}
+                />
               </Text>
               <Text
                 as='li'
                 colorScheme='secondary'
               >
-                <RichText localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.createApp.step2')} />
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.createApp.step2.prefix')}
+                />
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  sx={theme => ({ fontWeight: theme.fontWeights.$medium })}
+                  localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.createApp.step2.bold')}
+                />
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.createApp.step2.suffix')}
+                />
               </Text>
               <Text
                 as='li'
                 colorScheme='secondary'
               >
-                <RichText localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.createApp.step3')} />
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.createApp.step3.prefix')}
+                />
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  sx={theme => ({ fontWeight: theme.fontWeights.$medium })}
+                  localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.createApp.step3.bold')}
+                />
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.createApp.step3.suffix')}
+                />
               </Text>
               <Text
                 as='li'
                 colorScheme='secondary'
               >
-                <RichText localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.createApp.step4')} />
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.createApp.step4.prefix')}
+                />
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  sx={theme => ({ fontWeight: theme.fontWeights.$medium })}
+                  localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.createApp.step4.bold')}
+                />
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.createApp.step4.suffix')}
+                />
               </Text>
               <Text
                 as='li'
                 colorScheme='secondary'
               >
-                <RichText localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.createApp.step5')} />
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.createApp.step5.prefix')}
+                />
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  sx={theme => ({ fontWeight: theme.fontWeights.$medium })}
+                  localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.createApp.step5.bold')}
+                />
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.createApp.step5.suffix')}
+                />
               </Text>
             </Col>
           </Col>
@@ -300,9 +312,26 @@ export const CreateAppSubStep = (): JSX.Element => {
                 as='li'
                 colorScheme='secondary'
               >
-                <RichText
+                <Text
+                  as='span'
+                  colorScheme='inherit'
                   localizationKey={localizationKeys(
-                    'configureSSO.configureStep.samlOkta.completeSamlIntegration.step1',
+                    'configureSSO.configureStep.samlOkta.completeSamlIntegration.step1.prefix',
+                  )}
+                />
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  sx={theme => ({ fontWeight: theme.fontWeights.$medium })}
+                  localizationKey={localizationKeys(
+                    'configureSSO.configureStep.samlOkta.completeSamlIntegration.step1.bold',
+                  )}
+                />
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  localizationKey={localizationKeys(
+                    'configureSSO.configureStep.samlOkta.completeSamlIntegration.step1.suffix',
                   )}
                 />
               </Text>
@@ -310,9 +339,26 @@ export const CreateAppSubStep = (): JSX.Element => {
                 as='li'
                 colorScheme='secondary'
               >
-                <RichText
+                <Text
+                  as='span'
+                  colorScheme='inherit'
                   localizationKey={localizationKeys(
-                    'configureSSO.configureStep.samlOkta.completeSamlIntegration.step2',
+                    'configureSSO.configureStep.samlOkta.completeSamlIntegration.step2.prefix',
+                  )}
+                />
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  sx={theme => ({ fontWeight: theme.fontWeights.$medium })}
+                  localizationKey={localizationKeys(
+                    'configureSSO.configureStep.samlOkta.completeSamlIntegration.step2.bold',
+                  )}
+                />
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  localizationKey={localizationKeys(
+                    'configureSSO.configureStep.samlOkta.completeSamlIntegration.step2.suffix',
                   )}
                 />
               </Text>
@@ -436,25 +482,63 @@ export const ConfigureAttributesSubStep = (): JSX.Element => {
                 as='li'
                 colorScheme='secondary'
               >
-                <RichText
-                  localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.step1')}
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  localizationKey={localizationKeys(
+                    'configureSSO.configureStep.samlOkta.configureAttributes.step1.prefix',
+                  )}
+                />
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  sx={theme => ({ fontWeight: theme.fontWeights.$medium })}
+                  localizationKey={localizationKeys(
+                    'configureSSO.configureStep.samlOkta.configureAttributes.step1.bold',
+                  )}
+                />
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  localizationKey={localizationKeys(
+                    'configureSSO.configureStep.samlOkta.configureAttributes.step1.suffix',
+                  )}
                 />
               </Text>
               <Text
                 as='li'
                 colorScheme='secondary'
               >
-                <RichText
-                  localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.step2')}
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  localizationKey={localizationKeys(
+                    'configureSSO.configureStep.samlOkta.configureAttributes.step2.prefix',
+                  )}
+                />
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  sx={theme => ({ fontWeight: theme.fontWeights.$medium })}
+                  localizationKey={localizationKeys(
+                    'configureSSO.configureStep.samlOkta.configureAttributes.step2.bold',
+                  )}
+                />
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  localizationKey={localizationKeys(
+                    'configureSSO.configureStep.samlOkta.configureAttributes.step2.suffix',
+                  )}
                 />
                 <Col
                   as='ul'
                   sx={theme => ({
-                    gap: theme.space.$1x5,
+                    gap: theme.space.$1,
                     margin: 0,
-                    marginTop: theme.space.$1x5,
+                    marginTop: theme.space.$1,
                     paddingInlineStart: theme.space.$5,
-                    listStyleType: '"- "',
+                    listStyleType: 'disc',
                   })}
                 >
                   {ATTRIBUTE_PAIRS.map(pair => (
@@ -463,7 +547,15 @@ export const ConfigureAttributesSubStep = (): JSX.Element => {
                       as='li'
                       colorScheme='secondary'
                     >
-                      <RichText localizationKey={pair.value} />
+                      <Badge localizationKey={pair.name} />
+                      <Text
+                        as='span'
+                        colorScheme='inherit'
+                        localizationKey={localizationKeys(
+                          'configureSSO.configureStep.samlOkta.configureAttributes.pairs.conjunction',
+                        )}
+                      />
+                      <Badge localizationKey={pair.expression} />
                     </Text>
                   ))}
                 </Col>
@@ -493,8 +585,145 @@ export const AssignUsersSubStep = (): JSX.Element => {
   return (
     <>
       <Step.Body>
-        <Step.Section fill>
-          <Text>UI goes here</Text>
+        <Step.Section sx={theme => ({ gap: theme.space.$5 })}>
+          <Col sx={theme => ({ gap: theme.space.$3 })}>
+            <Heading
+              as='h3'
+              textVariant='subtitle'
+              localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.title')}
+            />
+            <Text
+              as='p'
+              colorScheme='secondary'
+              localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.paragraph')}
+            />
+
+            <Col
+              as='ol'
+              sx={theme => ({
+                gap: theme.space.$1x5,
+                margin: 0,
+                paddingInlineStart: theme.space.$5,
+                listStyleType: 'decimal',
+              })}
+            >
+              <Text
+                as='li'
+                colorScheme='secondary'
+              >
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step1.prefix')}
+                />
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  sx={theme => ({ fontWeight: theme.fontWeights.$medium })}
+                  localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step1.bold')}
+                />
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step1.suffix')}
+                />
+              </Text>
+
+              <Text
+                as='li'
+                colorScheme='secondary'
+              >
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step2.prefix')}
+                />
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  sx={theme => ({ fontWeight: theme.fontWeights.$medium })}
+                  localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step2.bold1')}
+                />
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step2.middle1')}
+                />
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  sx={theme => ({ fontWeight: theme.fontWeights.$medium })}
+                  localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step2.bold2')}
+                />
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step2.middle2')}
+                />
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  sx={theme => ({ fontWeight: theme.fontWeights.$medium })}
+                  localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step2.bold3')}
+                />
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step2.suffix')}
+                />
+              </Text>
+
+              <Text
+                as='li'
+                colorScheme='secondary'
+                localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step3')}
+              />
+
+              <Text
+                as='li'
+                colorScheme='secondary'
+              >
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step4.prefix')}
+                />
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  sx={theme => ({ fontWeight: theme.fontWeights.$medium })}
+                  localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step4.bold')}
+                />
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step4.suffix')}
+                />
+              </Text>
+
+              <Text
+                as='li'
+                colorScheme='secondary'
+              >
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step5.prefix')}
+                />
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  sx={theme => ({ fontWeight: theme.fontWeights.$medium })}
+                  localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step5.bold')}
+                />
+                <Text
+                  as='span'
+                  colorScheme='inherit'
+                  localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step5.suffix')}
+                />
+              </Text>
+            </Col>
+          </Col>
         </Step.Section>
       </Step.Body>
 
