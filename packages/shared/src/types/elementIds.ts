@@ -57,7 +57,9 @@ export type ProfileSectionId =
   | 'ssoDomain'
   | 'ssoConfiguration'
   | 'configureAgain'
-  | 'resetSso';
+  | 'resetSso'
+  | 'testSsoUrl'
+  | 'testResults';
 export type ProfilePageId = 'account' | 'security' | 'organizationGeneral' | 'organizationMembers' | 'billing';
 
 export type UserPreviewId = 'userButton' | 'personalWorkspace';
