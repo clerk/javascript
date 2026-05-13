@@ -37,8 +37,7 @@ function createJwtWithTtl(iatSeconds: number, ttlSeconds: number): string {
 function createJwtWithOiat(iatSeconds: number, oiatSeconds: number, ttlSeconds = 60): string {
   const header = { alg: 'HS256', typ: 'JWT', oiat: oiatSeconds };
   const payload = { sid: 'session_123', exp: iatSeconds + ttlSeconds, iat: iatSeconds };
-  const b64 = (o: object) =>
-    btoa(JSON.stringify(o)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+  const b64 = (o: object) => btoa(JSON.stringify(o)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
   return `${b64(header)}.${b64(payload)}.test-signature`;
 }
 
