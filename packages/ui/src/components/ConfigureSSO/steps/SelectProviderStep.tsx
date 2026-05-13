@@ -3,7 +3,7 @@ import React from 'react';
 
 import type { LocalizationKey } from '@/customizables';
 import { Box, Col, descriptors, Flow, Grid, localizationKeys, Span, Text, useLocalizations } from '@/customizables';
-import { mqu } from '@/styledSystem';
+import { common, mqu } from '@/styledSystem';
 import { Alert } from '@/ui/elements/Alert';
 
 import { useConfigureSSO } from '../ConfigureSSOContext';
@@ -66,15 +66,12 @@ export const SelectProviderStep = (): JSX.Element => {
             <Col sx={theme => ({ gap: theme.space.$1x5 })}>
               <Text
                 as='p'
-                variant='subtitle'
-                sx={theme => ({ color: theme.colors.$colorForeground })}
                 localizationKey={localizationKeys('configureSSO.selectProviderStep.body.title')}
               />
 
               <Text
                 as='p'
-                variant='body'
-                sx={theme => ({ color: theme.colors.$colorMutedForeground })}
+                colorScheme='secondary'
                 localizationKey={localizationKeys('configureSSO.selectProviderStep.body.description')}
               />
             </Col>
@@ -87,7 +84,6 @@ export const SelectProviderStep = (): JSX.Element => {
                 <Text
                   as='label'
                   variant='subtitle'
-                  sx={theme => ({ color: theme.colors.$colorForeground })}
                   localizationKey={group.label}
                 />
 
@@ -171,12 +167,11 @@ const ProviderCard = ({ name, value, iconId, label, checked, onChange }: Provide
         '&:hover': { backgroundColor: theme.colors.$neutralAlpha50 },
         // Keyboard focus indication — fires when the inner input is focused.
         '&:has(input:focus-visible)': {
-          outline: `2px solid ${theme.colors.$colorRing}`,
-          outlineOffset: '2px',
+          ...common.focusRingStyles(theme),
         },
         // Selected ring — CSS-driven via :checked so it survives focus changes.
         '&:has(input:checked)': {
-          boxShadow: `0 0 0 2px ${theme.colors.$primary500}`,
+          ...common.focusRingStyles(theme),
         },
       })}
     >
