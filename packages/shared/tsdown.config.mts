@@ -9,7 +9,7 @@ export default defineConfig(({ watch, env }) => {
   const shouldPublish = !!env?.publish;
 
   return {
-    dts: false,
+    dts: true,
     sourcemap: true,
     clean: true,
     target: 'es2022',
