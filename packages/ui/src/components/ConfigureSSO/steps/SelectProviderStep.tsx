@@ -1,4 +1,5 @@
 import { iconImageUrl } from '@clerk/shared/constants';
+import { __internal_useUserEnterpriseConnections, useReverification, useSession, useUser } from '@clerk/shared/react';
 import React from 'react';
 
 import type { LocalizationKey } from '@/customizables';
@@ -45,8 +46,34 @@ const PROVIDER_GROUPS: ReadonlyArray<{
 export const SelectProviderStep = (): JSX.Element => {
   const card = useCardState();
   const { goNext } = useWizard();
-  const { setProvider, createConnection } = useConfigureSSO();
+  const { setProvider, enterpriseConnection } = useConfigureSSO();
+  const { user } = useUser();
+  const { session } = useSession();
+  const { createEnterpriseConnection } = __internal_useUserEnterpriseConnections();
   const [selected, setSelected] = React.useState<ProviderType | null>(null);
+
+  const createConnection = useReverification(
+    React.useCallback(
+      async (selectedProvider: ProviderType) => {
+        if (enterpriseConnection) {
+          return;
+        }
+        if (!user?.primaryEmailAddress) {
+          throw new Error('Primary email required');
+        }
+
+        const emailDomain = user.primaryEmailAddress.emailAddress.split('@')[1];
+        const organizationId = session?.lastActiveOrganizationId ?? null;
+
+        await createEnterpriseConnection({
+          provider: selectedProvider,
+          name: emailDomain,
+          organizationId,
+        });
+      },
+      [enterpriseConnection, user, session, createEnterpriseConnection],
+    ),
+  );
 
   const handleContinue = async () => {
     if (!selected) {

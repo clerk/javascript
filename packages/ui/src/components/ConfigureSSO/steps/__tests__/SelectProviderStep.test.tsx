@@ -1,4 +1,5 @@
 import { ClerkRuntimeError } from '@clerk/shared/error';
+import type * as ClerkSharedReact from '@clerk/shared/react';
 import type { ReactElement } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -27,18 +28,41 @@ vi.mock('../../elements/Wizard', () => ({
 }));
 
 const setProvider = vi.fn();
-const clearProvider = vi.fn();
-const createConnection = vi.fn();
 
 vi.mock('../../ConfigureSSOContext', () => ({
   useConfigureSSO: () => ({
     enterpriseConnection: undefined,
     provider: undefined,
     setProvider,
-    clearProvider,
-    createConnection,
+    initialStepId: 'select-provider',
   }),
 }));
+
+const createEnterpriseConnection = vi.fn();
+
+vi.mock('@clerk/shared/react', async importOriginal => {
+  const actual = await importOriginal<typeof ClerkSharedReact>();
+  return {
+    ...actual,
+    __internal_useUserEnterpriseConnections: () => ({
+      data: undefined,
+      error: null,
+      isLoading: false,
+      isFetching: false,
+      createEnterpriseConnection,
+      updateEnterpriseConnection: vi.fn(),
+      deleteEnterpriseConnection: vi.fn(),
+      revalidate: vi.fn(),
+    }),
+    useReverification: <T,>(fn: T): T => fn,
+    useUser: () => ({
+      user: { primaryEmailAddress: { emailAddress: 'iago@acme.com' } },
+    }),
+    useSession: () => ({
+      session: { lastActiveOrganizationId: 'org_test' },
+    }),
+  };
+});
 
 import { SelectProviderStep } from '../SelectProviderStep';
 
@@ -55,9 +79,8 @@ const resetMocks = () => {
   goNext.mockReset();
   goPrev.mockReset();
   setProvider.mockReset();
-  clearProvider.mockReset();
-  createConnection.mockReset();
-  createConnection.mockResolvedValue(undefined);
+  createEnterpriseConnection.mockReset();
+  createEnterpriseConnection.mockResolvedValue({});
 };
 
 describe('SelectProviderStep', () => {
@@ -136,15 +159,15 @@ describe('SelectProviderStep', () => {
     expect(customSamlTile).toHaveAttribute('aria-pressed', 'true');
   });
 
-  it('calls setProvider, createConnection, then goNext when Continue is clicked', async () => {
+  it('calls setProvider, createEnterpriseConnection, then goNext when Continue is clicked', async () => {
     resetMocks();
     const callOrder: string[] = [];
     setProvider.mockImplementation(() => {
       callOrder.push('setProvider');
     });
-    createConnection.mockImplementation(() => {
-      callOrder.push('createConnection');
-      return Promise.resolve();
+    createEnterpriseConnection.mockImplementation(() => {
+      callOrder.push('createEnterpriseConnection');
+      return Promise.resolve({});
     });
     goNext.mockImplementation(() => {
       callOrder.push('goNext');
@@ -161,9 +184,13 @@ describe('SelectProviderStep', () => {
     });
 
     expect(setProvider).toHaveBeenCalledWith('saml_okta');
-    expect(createConnection).toHaveBeenCalledTimes(1);
-    expect(createConnection).toHaveBeenCalledWith('saml_okta');
-    expect(callOrder).toEqual(['setProvider', 'createConnection', 'goNext']);
+    expect(createEnterpriseConnection).toHaveBeenCalledTimes(1);
+    expect(createEnterpriseConnection).toHaveBeenCalledWith({
+      provider: 'saml_okta',
+      name: 'acme.com',
+      organizationId: 'org_test',
+    });
+    expect(callOrder).toEqual(['setProvider', 'createEnterpriseConnection', 'goNext']);
   });
 
   it('forwards the Custom SAML backend provider id when selected', async () => {
@@ -179,14 +206,18 @@ describe('SelectProviderStep', () => {
     });
 
     expect(setProvider).toHaveBeenCalledWith('saml_custom');
-    expect(createConnection).toHaveBeenCalledTimes(1);
-    expect(createConnection).toHaveBeenCalledWith('saml_custom');
+    expect(createEnterpriseConnection).toHaveBeenCalledTimes(1);
+    expect(createEnterpriseConnection).toHaveBeenCalledWith({
+      provider: 'saml_custom',
+      name: 'acme.com',
+      organizationId: 'org_test',
+    });
   });
 
-  it('shows loading state while createConnection is pending', async () => {
+  it('shows loading state while createEnterpriseConnection is pending', async () => {
     resetMocks();
     let resolveCreate: () => void = () => undefined;
-    createConnection.mockImplementation(
+    createEnterpriseConnection.mockImplementation(
       () =>
         new Promise<void>(resolve => {
           resolveCreate = resolve;
@@ -203,7 +234,7 @@ describe('SelectProviderStep', () => {
     // While create is pending, Continue stays disabled and goNext hasn't fired.
     // The button's accessible name flips to the spinner's "Loading" label while pending.
     await waitFor(() => {
-      expect(createConnection).toHaveBeenCalledTimes(1);
+      expect(createEnterpriseConnection).toHaveBeenCalledTimes(1);
     });
     expect(continueButton).toBeDisabled();
     expect(goNext).not.toHaveBeenCalled();
@@ -215,9 +246,11 @@ describe('SelectProviderStep', () => {
     });
   });
 
-  it('does not advance and surfaces the error when createConnection rejects', async () => {
+  it('does not advance and surfaces the error when createEnterpriseConnection rejects', async () => {
     resetMocks();
-    createConnection.mockRejectedValue(new ClerkRuntimeError('Backend unavailable', { code: 'create_failed' }));
+    createEnterpriseConnection.mockRejectedValue(
+      new ClerkRuntimeError('Backend unavailable', { code: 'create_failed' }),
+    );
 
     const { wrapper } = await createFixtures();
     const { userEvent, container } = renderStep(wrapper);
@@ -226,7 +259,7 @@ describe('SelectProviderStep', () => {
     await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
 
     await waitFor(() => {
-      expect(createConnection).toHaveBeenCalledTimes(1);
+      expect(createEnterpriseConnection).toHaveBeenCalledTimes(1);
     });
 
     expect(goNext).not.toHaveBeenCalled();
