@@ -7,7 +7,7 @@ export const TestConfigurationStep = (): JSX.Element => {
   const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
 
   return (
-    <Flow.Part part='test-sso'>
+    <Flow.Part part='testSso'>
       <Step
         elementDescriptor={descriptors.configureSSOStep}
         elementId={descriptors.configureSSOStep.setId('test')}
