@@ -1378,31 +1378,11 @@ export type __internal_LocalizationResource = {
         subtitle: LocalizationValue;
         createApp: {
           title: LocalizationValue;
-          step1: {
-            prefix: LocalizationValue;
-            bold: LocalizationValue;
-            suffix: LocalizationValue;
-          };
-          step2: {
-            prefix: LocalizationValue;
-            bold: LocalizationValue;
-            suffix: LocalizationValue;
-          };
-          step3: {
-            prefix: LocalizationValue;
-            bold: LocalizationValue;
-            suffix: LocalizationValue;
-          };
-          step4: {
-            prefix: LocalizationValue;
-            bold: LocalizationValue;
-            suffix: LocalizationValue;
-          };
-          step5: {
-            prefix: LocalizationValue;
-            bold: LocalizationValue;
-            suffix: LocalizationValue;
-          };
+          step1: LocalizationValue;
+          step2: LocalizationValue;
+          step3: LocalizationValue;
+          step4: LocalizationValue;
+          step5: LocalizationValue;
         };
         serviceProvider: {
           title: LocalizationValue;
@@ -1411,28 +1391,12 @@ export type __internal_LocalizationResource = {
         };
         completeSamlIntegration: {
           title: LocalizationValue;
-          step1: {
-            prefix: LocalizationValue;
-            bold: LocalizationValue;
-            suffix: LocalizationValue;
-          };
-          step2: {
-            prefix: LocalizationValue;
-            bold: LocalizationValue;
-            suffix: LocalizationValue;
-          };
+          step1: LocalizationValue;
+          step2: LocalizationValue;
         };
         configureAttributes: {
-          step1: {
-            prefix: LocalizationValue;
-            bold: LocalizationValue;
-            suffix: LocalizationValue;
-          };
-          step2: {
-            prefix: LocalizationValue;
-            bold: LocalizationValue;
-            suffix: LocalizationValue;
-          };
+          step1: LocalizationValue;
+          step2: LocalizationValue;
           pairs: {
             conjunction: LocalizationValue;
             email: {
@@ -1452,31 +1416,11 @@ export type __internal_LocalizationResource = {
         assignUsers: {
           title: LocalizationValue;
           paragraph: LocalizationValue;
-          step1: {
-            prefix: LocalizationValue;
-            bold: LocalizationValue;
-            suffix: LocalizationValue;
-          };
-          step2: {
-            prefix: LocalizationValue;
-            bold1: LocalizationValue;
-            middle1: LocalizationValue;
-            bold2: LocalizationValue;
-            middle2: LocalizationValue;
-            bold3: LocalizationValue;
-            suffix: LocalizationValue;
-          };
+          step1: LocalizationValue;
+          step2: LocalizationValue;
           step3: LocalizationValue;
-          step4: {
-            prefix: LocalizationValue;
-            bold: LocalizationValue;
-            suffix: LocalizationValue;
-          };
-          step5: {
-            prefix: LocalizationValue;
-            bold: LocalizationValue;
-            suffix: LocalizationValue;
-          };
+          step4: LocalizationValue;
+          step5: LocalizationValue;
         };
         metadataUrl: {
           label: LocalizationValue;
