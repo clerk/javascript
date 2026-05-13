@@ -14,7 +14,6 @@ Development Environment Setup
 Monorepo Development Workflow
 - Make changes in the relevant package under `/packages/`
 - Use `pnpm dev` to watch for changes and rebuild automatically
-- Test changes using playground applications in `/playground/`
 - Run specific package commands using pnpm workspace syntax: `pnpm --filter @clerk/nextjs build`
 - Use Turbo for efficient builds: `turbo build --filter=@clerk/nextjs`
 
@@ -111,7 +110,6 @@ Release Process
 - Maintain detailed changelogs
 
 Local Development Tips
-- Use playground applications to test changes quickly
 - Set up multiple test environments for different scenarios
 - Use pkglab for local npm registry testing (`pkglab pub` to publish, `pkglab add` to install)
 - Leverage hot reloading for faster development cycles
