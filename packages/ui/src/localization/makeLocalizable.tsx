@@ -4,6 +4,7 @@ import React from 'react';
 
 import { useOptions } from '../contexts';
 import { readObjectPath } from '../utils/readObjectPath';
+import { applyMarkupAndTokens, stripMarkup } from './applyMarkupToNodes';
 import type { GlobalTokens } from './applyTokensToString';
 import { applyTokensToString, useGlobalTokens } from './applyTokensToString';
 import { defaultResource } from './defaultEnglishResource';
@@ -49,7 +50,7 @@ export const makeLocalizable = <P,>(Component: React.FunctionComponent<P>): Loca
         ref={ref}
         data-localization-key={localizationKeyAttribute(localizationKey)}
       >
-        {localizedStringFromKey(localizationKey, parsedResource, globalTokens) || restProps.children}
+        {localizedNodeFromKey(localizationKey, parsedResource, globalTokens) || restProps.children}
       </Component>
     );
   });
@@ -68,7 +69,7 @@ export const useLocalizations = () => {
     if (!localizationKey || typeof localizationKey === 'string') {
       return localizationKey || '';
     }
-    return localizedStringFromKey(localizationKey, parsedResource, globalTokens);
+    return stripMarkup(localizedStringFromKey(localizationKey, parsedResource, globalTokens));
   };
 
   /**
@@ -120,4 +121,16 @@ const localizedStringFromKey = (
   const params = localizationKey.params;
   const tokens = { ...globalTokens, ...params };
   return applyTokensToString(base || '', tokens);
+};
+
+const localizedNodeFromKey = (
+  localizationKey: LocalizationKey,
+  resource: LocalizationResource,
+  globalTokens: GlobalTokens,
+) => {
+  const key = localizationKey.key;
+  const base = readObjectPath(resource, key) as string;
+  const params = localizationKey.params;
+  const tokens = { ...globalTokens, ...params };
+  return applyMarkupAndTokens(base, tokens);
 };
