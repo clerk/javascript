@@ -194,7 +194,7 @@ export const CreateAppSubStep = (): JSX.Element => {
               sx={theme => ({
                 gap: theme.space.$1x5,
                 margin: 0,
-                paddingInlineStart: theme.space.$4,
+                paddingInlineStart: theme.space.$5,
                 listStyleType: 'disc',
               })}
             >
@@ -317,7 +317,7 @@ export const ConfigureAttributesSubStep = (): JSX.Element => {
     <>
       <Step.Body>
         <Step.Section sx={theme => ({ gap: theme.space.$5 })}>
-          <Col sx={theme => ({ gap: theme.space.$1x5 })}>
+          <Col sx={theme => ({ gap: theme.space.$3 })}>
             <Heading
               as='h3'
               textVariant='subtitle'
@@ -325,18 +325,28 @@ export const ConfigureAttributesSubStep = (): JSX.Element => {
                 'configureSSO.configureStep.configureAttributes.attributeMapping.title',
               )}
             />
-            <Table>
+
+            <Table
+              sx={theme => ({
+                'tr > th:first-of-type': {
+                  paddingInlineStart: theme.space.$4,
+                },
+              })}
+            >
               <Thead>
                 <Tr>
                   <Th>
                     <Text
+                      sx={theme => ({ fontSize: theme.fontSizes.$xs })}
                       localizationKey={localizationKeys(
                         'configureSSO.configureStep.configureAttributes.attributeMapping.columns.attribute',
                       )}
                     />
                   </Th>
+
                   <Th>
                     <Text
+                      sx={theme => ({ fontSize: theme.fontSizes.$xs })}
                       localizationKey={localizationKeys(
                         'configureSSO.configureStep.configureAttributes.attributeMapping.columns.claimName',
                       )}
@@ -344,19 +354,22 @@ export const ConfigureAttributesSubStep = (): JSX.Element => {
                   </Th>
                 </Tr>
               </Thead>
+
               <Tbody>
                 <Tr>
                   <Td>
                     <Flex
+                      as='span'
                       align='center'
                       sx={theme => ({ gap: theme.space.$2 })}
                     >
                       <Text
-                        as='span'
+                        colorScheme='secondary'
                         localizationKey={localizationKeys(
                           'configureSSO.configureStep.configureAttributes.attributeMapping.rows.email.attribute',
                         )}
                       />
+
                       <Badge
                         colorScheme='warning'
                         localizationKey={localizationKeys(
@@ -365,88 +378,77 @@ export const ConfigureAttributesSubStep = (): JSX.Element => {
                       />
                     </Flex>
                   </Td>
+
                   <Td>
                     <Text
                       as='span'
-                      sx={theme => ({
-                        fontFamily: 'monospace',
-                        fontSize: theme.fontSizes.$sm,
-                        backgroundColor: theme.colors.$neutralAlpha100,
-                        borderRadius: theme.radii.$sm,
-                        padding: `${theme.space.$0x25} ${theme.space.$1}`,
-                      })}
+                      sx={{ fontFamily: 'monospace' }}
                       localizationKey={localizationKeys(
                         'configureSSO.configureStep.configureAttributes.attributeMapping.rows.email.claim',
                       )}
                     />
                   </Td>
                 </Tr>
+
                 <Tr>
                   <Td>
                     <Flex
+                      as='span'
                       align='center'
                       sx={theme => ({ gap: theme.space.$2 })}
                     >
                       <Text
-                        as='span'
+                        colorScheme='secondary'
                         localizationKey={localizationKeys(
                           'configureSSO.configureStep.configureAttributes.attributeMapping.rows.firstName.attribute',
                         )}
                       />
+
                       <Badge
-                        colorScheme='secondary'
                         localizationKey={localizationKeys(
                           'configureSSO.configureStep.configureAttributes.attributeMapping.badges.optional',
                         )}
                       />
                     </Flex>
                   </Td>
+
                   <Td>
                     <Text
                       as='span'
-                      sx={theme => ({
-                        fontFamily: 'monospace',
-                        fontSize: theme.fontSizes.$sm,
-                        backgroundColor: theme.colors.$neutralAlpha100,
-                        borderRadius: theme.radii.$sm,
-                        padding: `${theme.space.$0x25} ${theme.space.$1}`,
-                      })}
+                      sx={{ fontFamily: 'monospace' }}
                       localizationKey={localizationKeys(
                         'configureSSO.configureStep.configureAttributes.attributeMapping.rows.firstName.claim',
                       )}
                     />
                   </Td>
                 </Tr>
+
                 <Tr>
                   <Td>
                     <Flex
+                      as='span'
                       align='center'
                       sx={theme => ({ gap: theme.space.$2 })}
                     >
                       <Text
-                        as='span'
+                        colorScheme='secondary'
                         localizationKey={localizationKeys(
                           'configureSSO.configureStep.configureAttributes.attributeMapping.rows.lastName.attribute',
                         )}
                       />
+
                       <Badge
-                        colorScheme='secondary'
                         localizationKey={localizationKeys(
                           'configureSSO.configureStep.configureAttributes.attributeMapping.badges.optional',
                         )}
                       />
                     </Flex>
                   </Td>
+
                   <Td>
                     <Text
                       as='span'
-                      sx={theme => ({
-                        fontFamily: 'monospace',
-                        fontSize: theme.fontSizes.$sm,
-                        backgroundColor: theme.colors.$neutralAlpha100,
-                        borderRadius: theme.radii.$sm,
-                        padding: `${theme.space.$0x25} ${theme.space.$1}`,
-                      })}
+                      sx={{ fontFamily: 'monospace' }}
                       localizationKey={localizationKeys(
                         'configureSSO.configureStep.configureAttributes.attributeMapping.rows.lastName.claim',
                       )}
@@ -457,21 +459,21 @@ export const ConfigureAttributesSubStep = (): JSX.Element => {
             </Table>
           </Col>
 
-          <Col sx={theme => ({ gap: theme.space.$1x5 })}>
+          <Col sx={theme => ({ gap: theme.space.$3 })}>
             <Text
               as='p'
-              variant='body'
-              sx={theme => ({ color: theme.colors.$colorMutedForeground })}
+              colorScheme='secondary'
               localizationKey={localizationKeys(
                 'configureSSO.configureStep.configureAttributes.verifyMappings.paragraph',
               )}
             />
+
             <Col
               as='ol'
               sx={theme => ({
                 gap: theme.space.$1x5,
                 margin: 0,
-                paddingInlineStart: theme.space.$4,
+                paddingInlineStart: theme.space.$5,
                 listStyleType: 'decimal',
               })}
             >
