@@ -15,11 +15,11 @@ import { noop } from '@clerk/shared/utils';
 import { debugLogger } from '@/utils/debug';
 import { decode } from '@/utils/jwt';
 
-import { pickFreshestJwt } from '../tokenFreshness';
 import { clerkMissingDevBrowser } from '../errors';
 import { eventBus, events } from '../events';
 import type { FapiClient } from '../fapiClient';
 import { Environment } from '../resources/Environment';
+import { pickFreshestJwt } from '../tokenFreshness';
 import { createActiveContextCookie } from './cookies/activeContext';
 import type { ClientUatCookieHandler } from './cookies/clientUat';
 import { createClientUatCookie } from './cookies/clientUat';
