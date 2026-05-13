@@ -187,6 +187,31 @@ export const skSK: LocalizationResource = {
     navbar: {
       title: 'Nastaviť jednotné prihlasovanie (SSO)',
     },
+    verifyEmailDomainStep: {
+      title: 'Overiť e-mailovú adresu',
+      subtitle: 'Overte e-mailovú adresu, na ktorej chcete povoliť podnikové pripojenie.',
+      addEmailAddress: {
+        formTitle: 'Potrebujeme váš e-mail',
+        formSubtitle: 'Na začiatok budeme potrebovať vašu e-mailovú adresu',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'E-mailová adresa',
+      },
+      emailCode: {
+        formTitle: 'Overte svoju e-mailovú adresu',
+        formSubtitle: 'Zadajte overovací kód odoslaný na {{identifier}}',
+        resendButton: 'Nedostali ste kód? Odoslať znova',
+        verified: {
+          title: 'Máme váš e-mail',
+          subtitle: 'Overili ste svoju e-mailovú adresu nasledujúcim e-mailom',
+          inputLabel: 'Overená e-mailová adresa',
+        },
+      },
+      domainTaken: {
+        title: 'Táto doména ({{domain}}) už má SSO pripojenie',
+        subtitle:
+          'Kontaktujte administrátora aplikácie, aby ste získali prístup prostredníctvom existujúceho pripojenia.',
+      },
+    },
   },
   createOrganization: {
     formButtonSubmit: 'Vytvoriť organizáciu',
