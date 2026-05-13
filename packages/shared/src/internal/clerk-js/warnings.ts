@@ -53,7 +53,7 @@ const warnings = {
   cannotOpenCheckout:
     'The Checkout drawer cannot render unless a user is signed in. Since no user is signed in, this is no-op.',
   cannotOpenSignInOrSignUp:
-    'The SignIn or SignUp modals do not render when a user is already signed in, unless the application allows multiple sessions. Since a user is signed in and this application only allows a single session, this is no-op.',
+    'The <SignIn/> and <SignUp/> modals are hidden because a user is already signed in and this application is configured for single-session mode. This is expected behavior — no action is needed. To allow rendering while signed in, enable multi-session mode in your Clerk Dashboard.',
   cannotRenderAPIKeysComponent:
     'The <APIKeys/> component cannot be rendered when API keys is disabled. Since API keys is disabled, this is no-op.',
   cannotRenderAPIKeysComponentForOrgWhenUnauthorized:
@@ -64,6 +64,8 @@ const warnings = {
     'The <APIKeys/> component cannot be rendered when organization API keys are disabled. Since organization API keys are disabled, this is no-op.',
   cannotRenderOAuthConsentComponentWhenUserDoesNotExist:
     '<OAuthConsent/> cannot render unless a user is signed in. Since no user is signed in, this is no-op.',
+  cannotRenderConfigureSSOComponentWhenUserDoesNotExist:
+    '<ConfigureSSO/> cannot render unless a user is signed in. Since no user is signed in, this is no-op.',
   cannotRenderConfigureSSOComponentWhenDisabled:
     'The <ConfigureSSO/> component cannot be rendered when self-serve SSO is disabled. Visit `https://dashboard.clerk.com` to enable the feature. Since self-serve SSO is disabled, this is no-op.',
   cannotRenderConfigureSSOComponentWhenEmailAddressDisabled:

@@ -108,6 +108,7 @@ export interface UserResource extends ClerkResource, BillingPayerMethods {
   createdAt: Date | null;
 
   update: (params: UpdateUserParams) => Promise<UserResource>;
+  updateMetadata: (params: UpdateUserMetadataParams) => Promise<UserResource>;
   delete: () => Promise<void>;
   updatePassword: (params: UpdateUserPasswordParams) => Promise<UserResource>;
   removePassword: (params: RemoveUserPasswordParams) => Promise<UserResource>;
@@ -186,6 +187,16 @@ type UpdateUserJSON = Pick<
 >;
 
 export type UpdateUserParams = Partial<SnakeToCamel<UpdateUserJSON>>;
+
+/**
+ * Parameters for {@link UserResource.updateMetadata}. Only `unsafeMetadata`
+ * is end-user-writable on the Frontend API and the field is required: the
+ * submitted value is deep-merged with the existing `unsafeMetadata`, and keys
+ * at any level whose value is `null` are removed.
+ */
+export type UpdateUserMetadataParams = {
+  unsafeMetadata: UserUnsafeMetadata;
+};
 
 export type UpdateUserPasswordParams = {
   newPassword: string;

@@ -1,5 +1,33 @@
 # @clerk/ui
 
+## 1.9.1
+
+### Patch Changes
+
+- Fixed unhandled TypeError when `unsafeMetadata` is passed to `<SignUp />` ([#8500](https://github.com/clerk/javascript/pull/8500)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`5cda3ee`](https://github.com/clerk/javascript/commit/5cda3ee8451cc9af375895824d24a5c3ed7fbee6)]:
+  - @clerk/shared@4.10.2
+  - @clerk/localizations@4.6.2
+
+## 1.9.0
+
+### Minor Changes
+
+- Removed unused internal OAuthConsent prop. ([#8492](https://github.com/clerk/javascript/pull/8492)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Add wizard steps for the `<__experimental_ConfigureSSO />` component ([#8468](https://github.com/clerk/javascript/pull/8468)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Remove back button on the sign-in password compromised/pwned error screen. ([#8280](https://github.com/clerk/javascript/pull/8280)) by [@Ephem](https://github.com/Ephem)
+
+  These errors are not recoverable by re-entering the password, so the back button led to a confusing dead end that would always take you back to the same error.
+
+- Updated dependencies [[`7a5892f`](https://github.com/clerk/javascript/commit/7a5892f9bcaa1a6212e6e6d3741160929ffd027e)]:
+  - @clerk/shared@4.10.1
+  - @clerk/localizations@4.6.1
+
 ## 1.8.0
 
 ### Minor Changes

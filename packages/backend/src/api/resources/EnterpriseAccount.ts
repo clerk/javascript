@@ -2,7 +2,7 @@ import type { EnterpriseAccountConnectionJSON, EnterpriseAccountJSON } from './J
 import { Verification } from './Verification';
 
 /**
- * Represents an enterprise SSO connection associated with an enterprise account.
+ * The Backend `EnterpriseAccountConnection` object represents an enterprise SSO connection associated with an enterprise account.
  */
 export class EnterpriseAccountConnection {
   constructor(

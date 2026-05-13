@@ -46,6 +46,11 @@ jobs:
         with:
           fetch-depth: 0
           show-progress: false
+          # Use the PAT so pushes from `changesets/action` are authored by
+          # clerk-cookie. With the default GITHUB_TOKEN, GitHub suppresses
+          # the resulting `synchronize` events and CI never runs on Release
+          # PR updates — forcing a manual close/reopen to re-trigger.
+          token: ${{ secrets.CLERK_COOKIE_PAT }}
 
       - name: Setup
         id: config

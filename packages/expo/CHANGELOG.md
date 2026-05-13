@@ -1,5 +1,27 @@
 # Change Log
 
+## 3.2.10
+
+### Patch Changes
+
+- Updated dependencies [[`5cda3ee`](https://github.com/clerk/javascript/commit/5cda3ee8451cc9af375895824d24a5c3ed7fbee6)]:
+  - @clerk/shared@4.10.2
+  - @clerk/clerk-js@6.10.1
+  - @clerk/react@6.6.2
+
+## 3.2.9
+
+### Patch Changes
+
+- Fix `MissingActivity` error on cold-start Google sign-in / passkey flows. Previously, the first tap on "Sign in with Google" in `<AuthView />` failed with `Clerk error: Google sign-in cannot start: Credential Manager requires an active Activity context.` — the workaround was to background and foreground the app once before signing in. ([#8485](https://github.com/clerk/javascript/pull/8485)) by [@chriscanin](https://github.com/chriscanin)
+
+  The Android bridge now calls `Clerk.attachActivity()` (added in clerk-android 1.0.16) at SDK initialization and on AuthView/UserProfile mount, so the current Activity is registered with the underlying SDK before any Credential Manager call. No app-side changes required; the fix is transparent on rebuild.
+
+- Updated dependencies [[`7a5892f`](https://github.com/clerk/javascript/commit/7a5892f9bcaa1a6212e6e6d3741160929ffd027e), [`a1635f0`](https://github.com/clerk/javascript/commit/a1635f01b7f9ee52ad28f33440b527f29e65cbb5)]:
+  - @clerk/shared@4.10.1
+  - @clerk/clerk-js@6.10.0
+  - @clerk/react@6.6.1
+
 ## 3.2.8
 
 ### Patch Changes

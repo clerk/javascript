@@ -133,7 +133,14 @@ export type FlowMetadata = {
     | 'chooseWallet'
     | 'enterpriseConnections'
     | 'organizationCreationDisabled'
-    | 'methodSelectionMFA';
+    | 'methodSelectionMFA'
+    | 'provideEmail'
+    | 'selectProvider'
+    | 'verifyDomain'
+    | 'configureCreateApp'
+    | 'configureMapAttributes'
+    | 'test-sso'
+    | 'sso-confirmation';
 };
 
 const [FlowMetadataCtx, useFlowMetadata] = createContextAndHook<FlowMetadata>('FlowMetadata');

@@ -80,10 +80,6 @@ vue:
   - changed-files:
       - any-glob-to-any-file: packages/vue/**
 
-playground:
-  - changed-files:
-      - any-glob-to-any-file: playground/**
-
 actions:
   - changed-files:
       - any-glob-to-any-file: .github/workflows/**
