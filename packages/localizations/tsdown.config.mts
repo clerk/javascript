@@ -6,6 +6,7 @@ export default defineConfig(overrideOptions => {
   return {
     entry: ['src/*.ts'],
     format: ['cjs', 'esm'],
+    fixedExtension: false,
     clean: true,
     minify: false,
     sourcemap: true,
