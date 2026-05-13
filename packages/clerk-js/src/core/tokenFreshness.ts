@@ -29,7 +29,6 @@ export function shouldRejectToken(
   const existingOiat = asJwt(existing)?.header?.oiat;
   const incomingOiat = asJwt(incoming)?.header?.oiat;
 
-  // Missing oiat = pre-feature stale token. The oiat-bearing side always wins.
   if (incomingOiat == null && existingOiat == null) {
     return false;
   }
