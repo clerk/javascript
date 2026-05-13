@@ -88,14 +88,14 @@ export type SignInFutureEmailCodeSendParams =
   | {
       /**
        * The user's email address. Only supported if [Email address](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#email)
-       * is enabled.
+       * is enabled. Provide either `emailAddress` or `emailAddressId`, not both. Omit both when a sign-in already exists.
        */
       emailAddress?: string;
       emailAddressId?: never;
     }
   | {
       /**
-       * The ID for the user's email address that will receive an email with the one-time authentication code.
+       * The ID for the user's email address that will receive an email with the one-time authentication code. Provide either `emailAddress` or `emailAddressId`, not both. Omit both when a sign-in already exists.
        */
       emailAddressId?: string;
       emailAddress?: never;

@@ -531,7 +531,7 @@ export interface SignUpFutureResource {
   web3: (params: SignUpFutureWeb3Params) => Promise<{ error: ClerkError | null }>;
 
   /**
-   * Converts a sign-up with `status === 'complete'` into an active session. Will cause anything observing the session state (such as the `useUser()` hook) to update automatically.
+   * Converts a sign-up with `status === 'complete'` into an active session. Will cause anything observing the session state (such as the [`useUser()`](https://clerk.com/docs/reference/hooks/use-user) hook) to update automatically.
    */
   finalize: (params?: SignUpFutureFinalizeParams) => Promise<{ error: ClerkError | null }>;
 
