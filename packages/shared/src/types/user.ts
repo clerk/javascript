@@ -186,7 +186,7 @@ export interface UserResource extends ClerkResource, BillingPayerMethods {
    */
   lastSignInAt: Date | null;
   /**
-   * The date and time when the user accepted the legal compliance documents.
+   * The date and time when the user accepted the legal compliance documents. `null` if [**Require express consent to legal documents**](https://clerk.com/docs/guides/secure/legal-compliance) is not enabled.
    */
   legalAcceptedAt: Date | null;
   /**
