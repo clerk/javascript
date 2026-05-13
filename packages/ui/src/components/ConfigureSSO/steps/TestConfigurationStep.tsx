@@ -1,4 +1,8 @@
+import { useUser } from '@clerk/shared/react/index';
+import { useState } from 'react';
+
 import {
+  Button,
   descriptors,
   Flex,
   Flow,
@@ -12,11 +16,14 @@ import {
   Tr,
   useLocalizations,
 } from '@/customizables';
+import { useCardState } from '@/elements/contexts';
 import { ProfileSection } from '@/elements/Section';
 import { useClipboard } from '@/hooks';
 import { Check, Copy } from '@/icons';
 import { mqu } from '@/styledSystem';
+import { handleError } from '@/utils/errorHandler';
 
+import { useConfigureSSOFlow } from '../ConfigureSSOContext';
 import { Step } from '../elements/Step';
 import { useWizard } from '../elements/Wizard';
 
@@ -62,15 +69,12 @@ export const TestConfigurationStep = (): JSX.Element => {
                 id='testSsoUrl'
                 sx={{ paddingInlineStart: 0 }}
               >
-                <CopyTestUrlButton
-                  url=''
-                  isLoading={false}
-                />
+                <CopyTestUrlButton />
               </ProfileSection.Item>
             </ProfileSection.Root>
           </Step.Section>
 
-          <Step.Section>
+          <Step.Section sx={{ flex: 1, minHeight: 0 }}>
             <ProfileSection.Root
               title={localizationKeys('configureSSO.testConfigurationStep.testResults.title')}
               id='testResults'
@@ -81,21 +85,26 @@ export const TestConfigurationStep = (): JSX.Element => {
                 paddingBottom: 0,
                 flexDirection: 'column-reverse',
                 gap: t.space.$2,
+                flex: 1,
+                minHeight: 0,
+                '& > *:first-of-type': {
+                  flex: 1,
+                  minHeight: 0,
+                },
               })}
             >
               <TestResultsTable
                 rows={[]}
-                isLoading
+                // When test run has been created and we're waiting for the results, we show a loading state
+                isLoading={false}
               />
             </ProfileSection.Root>
           </Step.Section>
         </Step.Body>
 
         <Step.Footer>
-          <Step.Footer.Previous
-            onClick={() => goPrev()}
-            isDisabled={isFirstStep}
-          />
+          <Step.Footer.Previous onClick={() => goPrev()} />
+          {/* TODO - Only allow to continue if the test run has been created and there's at least one successful result */}
           <Step.Footer.Continue
             onClick={() => goNext()}
             isDisabled={isLastStep}
@@ -112,8 +121,18 @@ type TestResultRow = {
 
 const TestResultsTable = ({ rows, isLoading }: { rows: TestResultRow[]; isLoading: boolean }): JSX.Element => {
   return (
-    <Flex sx={t => ({ width: '100%', [mqu.sm]: { overflowX: 'auto', padding: t.space.$0x25 } })}>
-      <Table sx={t => ({ background: t.colors.$colorBackground })}>
+    <Flex
+      sx={t => ({
+        width: '100%',
+        flex: 1,
+        minHeight: 0,
+        [mqu.sm]: { overflowX: 'auto', padding: t.space.$0x25 },
+      })}
+    >
+      <Table
+        tableHeadVisuallyHidden
+        sx={t => ({ background: t.colors.$colorBackground, height: '100%' })}
+      >
         <Tbody>
           {isLoading ? (
             <Tr>
@@ -136,7 +155,17 @@ const TestResultsTable = ({ rows, isLoading }: { rows: TestResultRow[]; isLoadin
               </Td>
             </Tr>
           ) : !rows.length ? (
-            <EmptyTestResultsRow />
+            <Tr>
+              <Td>
+                <Flex
+                  align='center'
+                  justify='center'
+                  sx={t => ({ padding: `${t.space.$10} 0`, flex: 1 })}
+                >
+                  <CopyTestUrlButton />
+                </Flex>
+              </Td>
+            </Tr>
           ) : (
             rows.map(row => (
               <Tr key={row.id}>
@@ -150,36 +179,45 @@ const TestResultsTable = ({ rows, isLoading }: { rows: TestResultRow[]; isLoadin
   );
 };
 
-const EmptyTestResultsRow = (): JSX.Element => {
-  return (
-    <Tr>
-      <Td>
-        <Text
-          colorScheme='secondary'
-          localizationKey={localizationKeys('configureSSO.testConfigurationStep.testResults.empty')}
-          sx={t => ({ display: 'block', textAlign: 'center', padding: `${t.space.$10} 0` })}
-        />
-      </Td>
-    </Tr>
-  );
-};
-
-const CopyTestUrlButton = ({ url, isLoading }: { url: string; isLoading: boolean }): JSX.Element => {
-  const { onCopy, hasCopied } = useClipboard(url);
+const CopyTestUrlButton = (): JSX.Element => {
   const { t } = useLocalizations();
+  const { user } = useUser();
+  const card = useCardState();
+  const { enterpriseConnection } = useConfigureSSOFlow();
+
+  const [testUrl, setTestUrl] = useState('');
+  const [isCreatingTestRun, setIsCreatingTestRun] = useState(false);
+  const { onCopy, hasCopied } = useClipboard(testUrl);
+
+  const createTestRun = () => {
+    if (!user || !enterpriseConnection) {
+      return;
+    }
+
+    setIsCreatingTestRun(true);
+
+    user
+      .createEnterpriseConnectionTestRun(enterpriseConnection.id)
+      .then(({ url }) => {
+        setTestUrl(url);
+        onCopy();
+      })
+      .catch(err => handleError(err as Error, [], card.setError))
+      .finally(() => setIsCreatingTestRun(false));
+  };
 
   return (
-    <ProfileSection.Button
+    <Button
       id='testSsoUrl'
-      variant='outline'
-      size='sm'
-      isDisabled={!url}
-      isLoading={isLoading}
-      loadingText={t(localizationKeys('configureSSO.testConfigurationStep.testUrl.actionLabel__loading'))}
-      onClick={onCopy}
+      variant='bordered'
+      colorScheme='secondary'
+      size='xs'
+      onClick={createTestRun}
+      isDisabled={isCreatingTestRun}
+      isLoading={isCreatingTestRun}
+      loadingText={t(localizationKeys('configureSSO.testConfigurationStep.testUrl.actionLabel__copy'))}
       sx={t => ({
         gap: t.space.$1x5,
-        alignSelf: 'flex-start',
       })}
     >
       <Icon
@@ -188,12 +226,8 @@ const CopyTestUrlButton = ({ url, isLoading }: { url: string; isLoading: boolean
       />
       <Text
         as='span'
-        localizationKey={localizationKeys(
-          hasCopied
-            ? 'configureSSO.testConfigurationStep.testUrl.actionLabel__copied'
-            : 'configureSSO.testConfigurationStep.testUrl.actionLabel__copy',
-        )}
+        localizationKey={localizationKeys('configureSSO.testConfigurationStep.testUrl.actionLabel__copy')}
       />
-    </ProfileSection.Button>
+    </Button>
   );
 };
