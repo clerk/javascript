@@ -18,8 +18,8 @@ import {
 import { dark } from '@clerk/ui/themes';
 import { describe, expectTypeOf, it } from 'vitest';
 
-import type { ClerkProvider } from '../ClerkProvider';
 import type { ClerkProviderProps as GenericClerkProviderProps, Ui } from '../../types';
+import type { ClerkProvider } from '../ClerkProvider';
 
 type ClerkProviderProps = Parameters<typeof ClerkProvider>[0];
 type CustomAppearance = {
