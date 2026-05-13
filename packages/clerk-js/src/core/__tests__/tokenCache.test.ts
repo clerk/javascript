@@ -243,6 +243,47 @@ describe('SessionTokenCache', () => {
       expect(resultAfterOlder?.entry.createdAt).toBe(newerCreatedAt);
     });
 
+    it('enforces monotonicity: replaces older cached token when a fresher-oiat broadcast arrives', () => {
+      // Inverse of the previous test: a fresher-oiat broadcast must overwrite
+      // an older-oiat token already in cache.
+      const olderJwt = createJwtWithOiat(1666648190, 1666648190);
+      const newerJwt = createJwtWithOiat(1666648250, 1666648250);
+
+      const olderEvent: MessageEvent<SessionTokenEvent> = {
+        data: {
+          organizationId: null,
+          sessionId: 'session_123',
+          template: undefined,
+          tokenId: 'session_123',
+          tokenRaw: olderJwt,
+          traceId: 'test_trace_older_first',
+        },
+      } as MessageEvent<SessionTokenEvent>;
+
+      broadcastListener(olderEvent);
+      const resultAfterOlder = SessionTokenCache.get({ tokenId: 'session_123' });
+      expect(resultAfterOlder).toBeDefined();
+      const olderCreatedAt = resultAfterOlder?.entry.createdAt;
+
+      const newerEvent: MessageEvent<SessionTokenEvent> = {
+        data: {
+          organizationId: null,
+          sessionId: 'session_123',
+          template: undefined,
+          tokenId: 'session_123',
+          tokenRaw: newerJwt,
+          traceId: 'test_trace_newer_second',
+        },
+      } as MessageEvent<SessionTokenEvent>;
+
+      broadcastListener(newerEvent);
+
+      const resultAfterNewer = SessionTokenCache.get({ tokenId: 'session_123' });
+      expect(resultAfterNewer).toBeDefined();
+      expect(resultAfterNewer?.entry.createdAt).not.toBe(olderCreatedAt);
+      expect(resultAfterNewer?.entry.createdAt).toBe(1666648250);
+    });
+
     it('successfully updates cache with valid token', () => {
       const event: MessageEvent<SessionTokenEvent> = {
         data: {
