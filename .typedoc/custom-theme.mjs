@@ -76,6 +76,32 @@ function unwrapOptionalType(t) {
 }
 
 /**
+ * Stock `typedoc-plugin-markdown` `arrayType` only wraps `elementType.type === 'union'`.
+ * For `T | T[]` where `T` is an `@inline` alias to a union, the element is still a `reference` in the model but renders as `"a" \| "b"`, producing `"a" \| "b"[]` (wrong binding). Instead, parens the array type whenever the reference inlines to a union RHS so it produces `("a" \| "b")[]`.
+ * E.g. `status` in `GetUserOrganizationSuggestionsParams`.
+ *
+ * @param {import('typedoc').Type | undefined} elementType
+ * @returns {boolean}
+ */
+function isArrayElementReferenceInliningToUnion(elementType) {
+  if (!isReferenceTypeDoc(elementType)) {
+    return false;
+  }
+  const ref = /** @type {import('typedoc').ReferenceType} */ (elementType);
+  if (!ref.reflection) {
+    return false;
+  }
+  if (!isInlineModifierWithoutStandalonePage(ref.reflection)) {
+    return false;
+  }
+  const decl = /** @type {import('typedoc').DeclarationReflection} */ (ref.reflection);
+  if (!decl.kindOf?.(ReflectionKind.TypeAlias) || !decl.type) {
+    return false;
+  }
+  return isUnionTypeDoc(decl.type);
+}
+
+/**
  * When `ReferenceType.reflection` is unset (common for imported aliases), resolve by name in the converted project.
  *
  * @param {import('typedoc').ProjectReflection | undefined} project
@@ -1623,7 +1649,10 @@ ${tabs}
        * @param {import('typedoc').ArrayType} model
        */
       arrayType: model => {
-        const defaultOutput = superPartials.arrayType(model);
+        const el = model.elementType;
+        const theType = this.partials.someType(el);
+        const needsParens = el.type === 'union' || isArrayElementReferenceInliningToUnion(el);
+        const defaultOutput = needsParens ? `(${theType})[]` : `${theType}[]`;
 
         const output = defaultOutput
           // Remove any backticks
