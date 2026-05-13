@@ -186,7 +186,6 @@ const renovateConfig = {
     '.nvmrc',
     'integration/templates/**',
     'packages/upgrade/src/__tests__/fixtures/**',
-    'playground/**',
   ],
   includePaths: ['package.json', 'packages/**', 'pnpm-workspace.yaml'],
   major: { dependencyDashboardApproval: true },

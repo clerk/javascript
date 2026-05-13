@@ -179,8 +179,37 @@ export const daDK: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        'Kontakt din organisations administrator for at få tilladelse til at administrere virksomhedsforbindelser.',
+      title: 'Du har ikke tilladelse til at administrere virksomhedsforbindelser',
+    },
     navbar: {
       title: 'Konfigurer single sign-on (SSO)',
+    },
+    verifyEmailDomainStep: {
+      title: 'Bekræft e-mailadresse',
+      subtitle: 'Bekræft den e-mailadresse, du vil aktivere virksomhedsforbindelsen på.',
+      addEmailAddress: {
+        formTitle: 'Vi har brug for din e-mail',
+        formSubtitle: 'For at starte har vi brug for din e-mailadresse',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'E-mailadresse',
+      },
+      emailCode: {
+        formTitle: 'Bekræft din e-mailadresse',
+        formSubtitle: 'Indtast bekræftelseskoden sendt til {{identifier}}',
+        resendButton: 'Modtog du ingen kode? Send igen',
+        verified: {
+          title: 'Vi har modtaget din e-mail',
+          subtitle: 'Du har bekræftet din e-mailadresse med følgende e-mail',
+          inputLabel: 'Bekræftet e-mailadresse',
+        },
+      },
+      domainTaken: {
+        title: 'Dette domæne ({{domain}}) har allerede en SSO-forbindelse',
+        subtitle: 'Kontakt applikationens administrator for at få adgang via den eksisterende forbindelse.',
+      },
     },
   },
   createOrganization: {
