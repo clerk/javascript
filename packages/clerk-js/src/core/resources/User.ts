@@ -2,16 +2,27 @@ import { getFullName } from '@clerk/shared/internal/clerk-js/user';
 import type {
   BackupCodeJSON,
   BackupCodeResource,
+  ClerkPaginatedResponse,
   CreateEmailAddressParams,
   CreateExternalAccountParams,
+  CreateMeEnterpriseConnectionParams,
   CreatePhoneNumberParams,
   CreateWeb3WalletParams,
   DeletedObjectJSON,
   DeletedObjectResource,
   EmailAddressResource,
   EnterpriseAccountResource,
+  EnterpriseConnectionJSON,
+  EnterpriseConnectionResource,
+  EnterpriseConnectionTestRunInitJSON,
+  EnterpriseConnectionTestRunInitResource,
+  EnterpriseConnectionTestRunJSON,
+  EnterpriseConnectionTestRunResource,
+  EnterpriseConnectionTestRunsPaginatedJSON,
   ExternalAccountJSON,
   ExternalAccountResource,
+  GetEnterpriseConnectionsParams,
+  GetEnterpriseConnectionTestRunsParams,
   GetOrganizationMemberships,
   GetUserOrganizationInvitationsParams,
   GetUserOrganizationSuggestionsParams,
@@ -23,6 +34,7 @@ import type {
   SetProfileImageParams,
   TOTPJSON,
   TOTPResource,
+  UpdateMeEnterpriseConnectionParams,
   UpdateUserParams,
   UpdateUserPasswordParams,
   UserJSON,
@@ -31,7 +43,9 @@ import type {
   VerifyTOTPParams,
   Web3WalletResource,
 } from '@clerk/shared/types';
+import { deepCamelToSnake } from '@clerk/shared/underscore';
 
+import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
 import { unixEpochToDate } from '../../utils/date';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { eventBus, events } from '../events';
@@ -42,6 +56,8 @@ import {
   DeletedObject,
   EmailAddress,
   EnterpriseAccount,
+  EnterpriseConnection,
+  EnterpriseConnectionTestRun,
   ExternalAccount,
   Image,
   OrganizationMembership,
@@ -156,7 +172,7 @@ export class User extends BaseResource implements UserResource {
   };
 
   createExternalAccount = async (params: CreateExternalAccountParams): Promise<ExternalAccountResource> => {
-    const { strategy, redirectUrl, additionalScopes } = params || {};
+    const { strategy, redirectUrl, additionalScopes, enterpriseConnectionId } = params || {};
 
     const json = (
       await BaseResource._fetch<ExternalAccountJSON>({
@@ -166,6 +182,7 @@ export class User extends BaseResource implements UserResource {
           strategy,
           redirect_url: redirectUrl,
           additional_scope: additionalScopes,
+          enterprise_connection_id: enterpriseConnectionId,
         } as any,
       })
     )?.response as unknown as ExternalAccountJSON;
@@ -287,6 +304,107 @@ export class User extends BaseResource implements UserResource {
     )?.response as unknown as DeletedObjectJSON;
 
     return new DeletedObject(json);
+  };
+
+  getEnterpriseConnections = async (
+    params?: GetEnterpriseConnectionsParams,
+  ): Promise<EnterpriseConnectionResource[]> => {
+    const { withOrganizationAccountLinking } = params || {};
+
+    const json = (
+      await BaseResource._fetch({
+        path: '/me/enterprise_connections',
+        method: 'GET',
+        ...(withOrganizationAccountLinking !== undefined
+          ? {
+              search: {
+                with_organization_account_linking: String(withOrganizationAccountLinking),
+              },
+            }
+          : {}),
+      })
+    )?.response as unknown as EnterpriseConnectionJSON[];
+
+    return (json || []).map(connection => new EnterpriseConnection(connection));
+  };
+
+  createEnterpriseConnection = async (
+    params: CreateMeEnterpriseConnectionParams,
+  ): Promise<EnterpriseConnectionResource> => {
+    const json = (
+      await BaseResource._fetch<EnterpriseConnectionJSON>({
+        path: `${this.path()}/enterprise_connections`,
+        method: 'POST',
+        body: toMeEnterpriseConnectionBody(params) as any,
+      })
+    )?.response as unknown as EnterpriseConnectionJSON;
+
+    return new EnterpriseConnection(json);
+  };
+
+  updateEnterpriseConnection = async (
+    enterpriseConnectionId: string,
+    params: UpdateMeEnterpriseConnectionParams,
+  ): Promise<EnterpriseConnectionResource> => {
+    const json = (
+      await BaseResource._fetch<EnterpriseConnectionJSON>({
+        path: `${this.path()}/enterprise_connections/${enterpriseConnectionId}`,
+        method: 'PATCH',
+        body: toMeEnterpriseConnectionBody(params) as any,
+      })
+    )?.response as unknown as EnterpriseConnectionJSON;
+
+    return new EnterpriseConnection(json);
+  };
+
+  deleteEnterpriseConnection = async (enterpriseConnectionId: string): Promise<DeletedObjectResource> => {
+    const json = (
+      await BaseResource._fetch<DeletedObjectJSON>({
+        path: `${this.path()}/enterprise_connections/${enterpriseConnectionId}`,
+        method: 'DELETE',
+      })
+    )?.response as unknown as DeletedObjectJSON;
+
+    return new DeletedObject(json);
+  };
+
+  createEnterpriseConnectionTestRun = async (
+    enterpriseConnectionId: string,
+  ): Promise<EnterpriseConnectionTestRunInitResource> => {
+    const json = (
+      await BaseResource._fetch({
+        path: `${this.path()}/enterprise_connections/${enterpriseConnectionId}/test_runs`,
+        method: 'POST',
+      })
+    )?.response as unknown as EnterpriseConnectionTestRunInitJSON;
+
+    return { url: json.url };
+  };
+
+  getEnterpriseConnectionTestRuns = async (
+    enterpriseConnectionId: string,
+    params?: GetEnterpriseConnectionTestRunsParams,
+  ): Promise<ClerkPaginatedResponse<EnterpriseConnectionTestRunResource>> => {
+    const { status, ...rest } = params || {};
+    const search = convertPageToOffsetSearchParams(rest);
+    if (status?.length) {
+      for (const s of status) {
+        search.append('status', s);
+      }
+    }
+
+    const res = await BaseResource._fetch({
+      path: `${this.path()}/enterprise_connections/${enterpriseConnectionId}/test_runs`,
+      method: 'GET',
+      search,
+    });
+
+    const payload = res?.response as unknown as EnterpriseConnectionTestRunsPaginatedJSON | undefined;
+
+    return {
+      total_count: payload?.total_count ?? 0,
+      data: (payload?.data ?? []).map((row: EnterpriseConnectionTestRunJSON) => new EnterpriseConnectionTestRun(row)),
+    };
   };
 
   initializePaymentMethod: typeof initializePaymentMethod = params => {
@@ -427,4 +545,31 @@ export class User extends BaseResource implements UserResource {
       created_at: this.createdAt?.getTime() || null,
     };
   }
+}
+
+/**
+ * Serializes `CreateMeEnterpriseConnectionParams` / `UpdateMeEnterpriseConnectionParams`
+ * for the `/me/enterprise_connections` FAPI endpoints.
+ *
+ * Uses `deepCamelToSnake` but preserves `saml.attributeMapping` and `customAttributes` as-is. Their keys are
+ * user-supplied data and must not be camel→snake transformed.
+ */
+function toMeEnterpriseConnectionBody(
+  params: CreateMeEnterpriseConnectionParams | UpdateMeEnterpriseConnectionParams,
+): Record<string, unknown> {
+  const originalAttributeMapping =
+    params.saml && typeof params.saml === 'object' ? params.saml.attributeMapping : undefined;
+  const originalCustomAttributes = 'customAttributes' in params ? params.customAttributes : undefined;
+
+  const body = deepCamelToSnake(params) as Record<string, any>;
+
+  if (originalAttributeMapping !== undefined && body.saml && typeof body.saml === 'object') {
+    body.saml.attribute_mapping = originalAttributeMapping;
+  }
+
+  if (originalCustomAttributes !== undefined) {
+    body.custom_attributes = originalCustomAttributes;
+  }
+
+  return body;
 }

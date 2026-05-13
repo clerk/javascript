@@ -11,6 +11,7 @@ import type { FrontendApiProxyOptions } from './types';
 type ClerkEnv = {
   CLERK_SECRET_KEY: string;
   CLERK_PUBLISHABLE_KEY: string;
+  CLERK_MACHINE_SECRET_KEY?: string;
   CLERK_API_URL?: string;
   CLERK_API_VERSION?: string;
 };
@@ -43,6 +44,7 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareHan
     const {
       secretKey = clerkEnv.CLERK_SECRET_KEY || '',
       publishableKey = clerkEnv.CLERK_PUBLISHABLE_KEY || '',
+      machineSecretKey = clerkEnv.CLERK_MACHINE_SECRET_KEY || '',
       apiUrl = clerkEnv.CLERK_API_URL,
       apiVersion = clerkEnv.CLERK_API_VERSION,
       frontendApiProxy,
@@ -92,6 +94,7 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareHan
       apiVersion,
       secretKey,
       publishableKey,
+      machineSecretKey,
       userAgent: `${PACKAGE_NAME}@${PACKAGE_VERSION}`,
     });
 
@@ -99,6 +102,7 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareHan
       ...rest,
       secretKey,
       publishableKey,
+      machineSecretKey,
       proxyUrl: derivedProxyUrl,
       acceptsToken: 'any',
     });
@@ -120,7 +124,7 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareHan
     const authObjectFn = ((authOptions?: AuthOptions) =>
       getAuthObjectForAcceptedToken({
         authObject: requestState.toAuth(authOptions) as AuthObject,
-        acceptsToken: 'any',
+        acceptsToken: authOptions?.acceptsToken,
       })) as GetAuthFnNoRequest;
 
     c.set('clerkAuth', authObjectFn);

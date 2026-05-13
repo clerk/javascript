@@ -178,6 +178,15 @@ export const mnMN: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'Аж ахуйн нэгжийн холболтыг удирдах эрх авахын тулд байгууллагынхаа админтай холбогдоно уу.',
+      title: 'Танд аж ахуйн нэгжийн холболтыг удирдах эрх байхгүй байна',
+    },
+    navbar: {
+      title: 'Нэгдсэн нэвтрэлт (SSO) тохируулах',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Байгуулга үүсгэх',
     invitePage: {
@@ -1350,6 +1359,7 @@ export const mnMN: LocalizationResource = {
         title: 'Имэйл хаягууд',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Бүртгэлийг холбоно уу',
         title: 'Байгууллагын бүртгэлүүд',
       },
       headerTitle__account: 'Профайлын дэлгэрэнгүй',

@@ -182,6 +182,15 @@ export const csCZ: LocalizationResource = {
     viewPayment: undefined,
     year: 'Rok',
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'Kontaktujte správce vaší organizace, abyste získali oprávnění ke správě podnikových připojení.',
+      title: 'Nemáte oprávnění ke správě podnikových připojení',
+    },
+    navbar: {
+      title: 'Nastavit jednotné přihlášení (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Vytvořit organizaci',
     invitePage: {
@@ -1361,6 +1370,7 @@ export const csCZ: LocalizationResource = {
         title: 'E-mailové adresy',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Připojit účet',
         title: 'Podnikové účty',
       },
       headerTitle__account: 'Podrobnosti profilu',

@@ -1,4 +1,5 @@
 import { buildAccountsBaseUrl } from '@clerk/shared/buildAccountsBaseUrl';
+import { getAutoProxyUrlFromEnvironment } from '@clerk/shared/proxy';
 import type { Jwt } from '@clerk/shared/types';
 import { isCurrentDevAccountPortalOrigin, isLegacyDevAccountPortalOrigin } from '@clerk/shared/url';
 
@@ -17,6 +18,7 @@ interface AuthenticateContext extends AuthenticateRequestOptions {
   forwardedHost: string | undefined;
   forwardedProto: string | undefined;
   host: string | undefined;
+  method: string;
   origin: string | undefined;
   referrer: string | undefined;
   secFetchDest: string | undefined;
@@ -69,6 +71,18 @@ class AuthenticateContext implements AuthenticateContext {
     private clerkRequest: ClerkRequest,
     options: AuthenticateRequestOptions,
   ) {
+    // Auto-detect proxy for supported platform deployments using environment
+    // variables (e.g. VERCEL_TARGET_ENV, VERCEL_PROJECT_PRODUCTION_URL) instead
+    // of request headers, which avoids X-Forwarded-Host spoofing concerns.
+    const autoProxyPath = getAutoProxyUrlFromEnvironment({
+      publishableKey: options.publishableKey ?? '',
+      hasProxyUrl: !!options.proxyUrl,
+      hasDomain: !!options.domain,
+    });
+    if (autoProxyPath) {
+      options = { ...options, proxyUrl: `${clerkRequest.clerkUrl.origin}${autoProxyPath}` };
+    }
+
     if (options.acceptsToken === TokenType.M2MToken || options.acceptsToken === TokenType.ApiKey) {
       // For non-session tokens, we only want to set the header values.
       this.initHeaderValues();
@@ -281,6 +295,7 @@ class AuthenticateContext implements AuthenticateContext {
   }
 
   private initHeaderValues() {
+    this.method = this.clerkRequest.method;
     this.tokenInHeader = this.parseAuthorizationHeader(this.getHeader(constants.Headers.Authorization));
     this.origin = this.getHeader(constants.Headers.Origin);
     this.host = this.getHeader(constants.Headers.Host);

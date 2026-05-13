@@ -157,10 +157,12 @@ export function PricingTableMatrix({
               {plans.map(plan => {
                 const highlight = plan.slug === highlightedPlan;
                 const planFee = !plan.annualMonthlyFee
-                  ? plan.fee
+                  ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    plan.fee!
                   : planPeriod === 'annual'
                     ? plan.annualMonthlyFee
-                    : plan.fee;
+                    : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                      plan.fee!;
 
                 return (
                   <Box

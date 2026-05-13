@@ -139,6 +139,22 @@ describe('warnAboutCustomizationWithoutPinning', () => {
   });
 
   describe('appearance.elements - should warn', () => {
+    test('for nested selector referencing .cl-internal- class', () => {
+      warnAboutCustomizationWithoutPinning({
+        appearance: {
+          elements: {
+            card: {
+              '& .cl-internal-abc123': { padding: '20px' },
+            },
+          },
+        },
+      });
+
+      expect(logger.warnOnce).toHaveBeenCalledTimes(1);
+      const message = getWarningMessage();
+      expect(message).toContain('elements.card "& .cl-internal-abc123"');
+    });
+
     test('for nested selector with .cl- class reference', () => {
       warnAboutCustomizationWithoutPinning({
         appearance: {

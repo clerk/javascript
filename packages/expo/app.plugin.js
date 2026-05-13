@@ -258,41 +258,14 @@ const withClerkIOS = config => {
       const projectName = config.modRequest.projectName;
       const iosProjectPath = path.join(platformProjectRoot, projectName);
 
-      // Find the ClerkViewFactory.swift source file
-      // Check multiple possible locations in order of preference
+      // Find the ClerkViewFactory.swift source file using Node's module resolution,
+      // which handles arbitrary nesting depths in pnpm/yarn/npm workspaces.
       let sourceFile;
-      const possiblePaths = [
-        // Standard node_modules (npm, yarn)
-        path.join(config.modRequest.projectRoot, 'node_modules', '@clerk', 'expo', 'ios', 'ClerkViewFactory.swift'),
-        // pnpm hoisted node_modules
-        path.join(
-          config.modRequest.projectRoot,
-          '..',
-          'node_modules',
-          '@clerk',
-          'expo',
-          'ios',
-          'ClerkViewFactory.swift',
-        ),
-        // Monorepo workspace (pnpm workspace)
-        path.join(
-          config.modRequest.projectRoot,
-          '..',
-          'javascript',
-          'packages',
-          'expo',
-          'ios',
-          'ClerkViewFactory.swift',
-        ),
-        // Alternative monorepo structure
-        path.join(config.modRequest.projectRoot, '..', 'packages', 'expo', 'ios', 'ClerkViewFactory.swift'),
-      ];
-
-      for (const possiblePath of possiblePaths) {
-        if (fs.existsSync(possiblePath)) {
-          sourceFile = possiblePath;
-          break;
-        }
+      try {
+        const packageRoot = path.dirname(require.resolve('@clerk/expo/package.json'));
+        sourceFile = path.join(packageRoot, 'ios', 'ClerkViewFactory.swift');
+      } catch {
+        sourceFile = null;
       }
 
       if (sourceFile && fs.existsSync(sourceFile)) {
@@ -612,13 +585,135 @@ const withClerkAppleSignIn = config => {
   });
 };
 
+/**
+ * Apply a custom theme to Clerk native components (iOS + Android).
+ *
+ * Accepts a `theme` prop pointing to a JSON file with optional keys:
+ *   - colors: { primary, background, input, danger, success, warning,
+ *               foreground, mutedForeground, primaryForeground, inputForeground,
+ *               neutral, border, ring, muted, shadow }  (hex color strings)
+ *   - darkColors: same keys as colors (for dark mode)
+ *   - design: { fontFamily: string, borderRadius: number }
+ *
+ * iOS: Embeds the parsed JSON into Info.plist under key "ClerkTheme".
+ * Android: Copies the JSON file to android/app/src/main/assets/clerk_theme.json.
+ */
+const VALID_COLOR_KEYS = [
+  'primary',
+  'background',
+  'input',
+  'danger',
+  'success',
+  'warning',
+  'foreground',
+  'mutedForeground',
+  'primaryForeground',
+  'inputForeground',
+  'neutral',
+  'border',
+  'ring',
+  'muted',
+  'shadow',
+];
+
+const HEX_COLOR_REGEX = /^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/;
+
+function isPlainObject(value) {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function validateThemeJson(theme) {
+  if (!isPlainObject(theme)) {
+    throw new Error('Clerk theme: theme JSON must be a plain object');
+  }
+
+  const validateColors = (colors, label) => {
+    if (!isPlainObject(colors)) {
+      throw new Error(`Clerk theme: ${label} must be an object`);
+    }
+    for (const [key, value] of Object.entries(colors)) {
+      if (!VALID_COLOR_KEYS.includes(key)) {
+        console.warn(`⚠️  Clerk theme: unknown color key "${key}" in ${label}, ignoring`);
+        continue;
+      }
+      if (typeof value !== 'string' || !HEX_COLOR_REGEX.test(value)) {
+        throw new Error(`Clerk theme: invalid hex color for ${label}.${key}: "${value}"`);
+      }
+    }
+  };
+
+  if (theme.colors != null) validateColors(theme.colors, 'colors');
+  if (theme.darkColors != null) validateColors(theme.darkColors, 'darkColors');
+
+  if (theme.design != null) {
+    if (!isPlainObject(theme.design)) {
+      throw new Error(`Clerk theme: design must be an object`);
+    }
+    if (theme.design.fontFamily != null && typeof theme.design.fontFamily !== 'string') {
+      throw new Error(`Clerk theme: design.fontFamily must be a string`);
+    }
+    if (theme.design.borderRadius != null && typeof theme.design.borderRadius !== 'number') {
+      throw new Error(`Clerk theme: design.borderRadius must be a number`);
+    }
+  }
+}
+
+const withClerkTheme = (config, props = {}) => {
+  const { theme } = props;
+  if (!theme) return config;
+
+  // Resolve the theme file path relative to the project root
+  const themePath = path.resolve(theme);
+  if (!fs.existsSync(themePath)) {
+    console.warn(`⚠️  Clerk theme file not found: ${themePath}, skipping theme`);
+    return config;
+  }
+
+  let themeJson;
+  try {
+    themeJson = JSON.parse(fs.readFileSync(themePath, 'utf8'));
+    validateThemeJson(themeJson);
+  } catch (e) {
+    throw new Error(`Clerk theme: failed to parse ${themePath}: ${e.message}`);
+  }
+
+  // iOS: Embed theme in Info.plist under "ClerkTheme"
+  config = withInfoPlist(config, modConfig => {
+    modConfig.modResults.ClerkTheme = themeJson;
+    console.log('✅ Embedded Clerk theme in Info.plist');
+    return modConfig;
+  });
+
+  // Android: Copy theme JSON to assets
+  config = withDangerousMod(config, [
+    'android',
+    async config => {
+      const assetsDir = path.join(config.modRequest.platformProjectRoot, 'app', 'src', 'main', 'assets');
+      if (!fs.existsSync(assetsDir)) {
+        fs.mkdirSync(assetsDir, { recursive: true });
+      }
+      const destPath = path.join(assetsDir, 'clerk_theme.json');
+      fs.writeFileSync(destPath, JSON.stringify(themeJson, null, 2) + '\n');
+      console.log('✅ Copied Clerk theme to Android assets');
+      return config;
+    },
+  ]);
+
+  return config;
+};
+
 const withClerkExpo = (config, props = {}) => {
+  const { appleSignIn = true } = props;
   config = withClerkIOS(config);
-  config = withClerkAppleSignIn(config);
+  if (appleSignIn !== false) {
+    config = withClerkAppleSignIn(config);
+  }
   config = withClerkGoogleSignIn(config);
   config = withClerkAndroid(config);
   config = withClerkKeychainService(config, props);
+  config = withClerkTheme(config, props);
   return config;
 };
 
 module.exports = withClerkExpo;
+module.exports._testing = { validateThemeJson, isPlainObject, VALID_COLOR_KEYS, HEX_COLOR_REGEX };

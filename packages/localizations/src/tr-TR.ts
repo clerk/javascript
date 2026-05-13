@@ -178,6 +178,15 @@ export const trTR: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'Kurumsal bağlantıları yönetme izinleri almak için organizasyonunuzun yöneticisiyle iletişime geçin.',
+      title: 'Kurumsal bağlantıları yönetme izniniz yok',
+    },
+    navbar: {
+      title: 'Tek Oturum Açmayı (SSO) Yapılandır',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Oluştur',
     invitePage: {
@@ -1351,6 +1360,7 @@ export const trTR: LocalizationResource = {
         title: 'E-posta adresleri',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Hesap bağla',
         title: 'Kurumsal hesaplar',
       },
       headerTitle__account: 'Hesap',

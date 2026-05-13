@@ -178,6 +178,15 @@ export const svSE: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'Kontakta administratören för din organisation för att få behörighet att hantera företagsanslutningar.',
+      title: 'Du har inte behörighet att hantera företagsanslutningar',
+    },
+    navbar: {
+      title: 'Konfigurera enkel inloggning (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Skapa organisation',
     invitePage: {
@@ -1023,8 +1032,8 @@ export const svSE: LocalizationResource = {
     passkey_registration_cancelled: 'Registrering av passnyckel avbruten.',
     passkey_retrieval_cancelled: 'Hämtning av passnyckel avbruten.',
     passwordComplexity: {
-      maximumLength: 'Maximal längd',
-      minimumLength: 'Minimal längd',
+      maximumLength: 'mindre än {{length}} tecken',
+      minimumLength: '{{length}} eller fler tecken',
       requireLowercase: 'Kräver små bokstäver',
       requireNumbers: 'Kräver siffror',
       requireSpecialCharacter: 'Kräver specialtecken',
@@ -1349,6 +1358,7 @@ export const svSE: LocalizationResource = {
         title: 'E-postadresser',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Anslut konto',
         title: 'Enterprise accounts',
       },
       headerTitle__account: 'Konto',

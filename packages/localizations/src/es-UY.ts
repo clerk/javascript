@@ -178,6 +178,16 @@ export const esUY: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        'Contactá al administrador de tu organización para obtener permisos para gestionar conexiones empresariales.',
+      title: 'No tenés permiso para gestionar conexiones empresariales',
+    },
+    navbar: {
+      title: 'Configurar inicio de sesión único (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Crear organización',
     invitePage: {
@@ -1362,6 +1372,7 @@ export const esUY: LocalizationResource = {
         title: 'Correos electrónicos',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Conectar cuenta',
         title: 'Cuentas empresariales',
       },
       headerTitle__account: 'Detalles del perfil',

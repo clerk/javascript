@@ -178,6 +178,16 @@ export const hiIN: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        'एंटरप्राइज़ कनेक्शन प्रबंधित करने की अनुमति प्राप्त करने के लिए अपने संगठन के व्यवस्थापक से संपर्क करें।',
+      title: 'आपके पास एंटरप्राइज़ कनेक्शन प्रबंधित करने की अनुमति नहीं है',
+    },
+    navbar: {
+      title: 'सिंगल साइन-ऑन (SSO) कॉन्फ़िगर करें',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'संगठन बनाएँ',
     invitePage: {
@@ -1360,6 +1370,7 @@ export const hiIN: LocalizationResource = {
         title: 'ईमेल पते',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'खाता कनेक्ट करें',
         title: 'एंटरप्राइज खाते',
       },
       headerTitle__account: 'प्रोफ़ाइल विवरण',

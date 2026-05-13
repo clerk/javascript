@@ -32,6 +32,7 @@ const AVAILABLE_COMPONENTS = [
   'waitlist',
   'pricingTable',
   'apiKeys',
+  'configureSSO',
   'oauthConsent',
   'taskChooseOrganization',
   'taskResetPassword',
@@ -136,6 +137,7 @@ const componentControls: Record<AvailableComponent, ComponentPropsControl> = {
   waitlist: buildComponentControls('waitlist'),
   pricingTable: buildComponentControls('pricingTable'),
   apiKeys: buildComponentControls('apiKeys'),
+  configureSSO: buildComponentControls('configureSSO'),
   oauthConsent: buildComponentControls('oauthConsent'),
   taskChooseOrganization: buildComponentControls('taskChooseOrganization'),
   taskResetPassword: buildComponentControls('taskResetPassword'),
@@ -468,21 +470,22 @@ void (async () => {
     '/api-keys': () => {
       Clerk.mountAPIKeys(app, componentControls.apiKeys.getProps() ?? {});
     },
+    '/configure-sso': () => {
+      Clerk.__experimental_mountConfigureSSO(app, componentControls.configureSSO.getProps() ?? {});
+    },
     '/oauth-consent': () => {
       const searchParams = new URLSearchParams(window.location.search);
-      const scopes = (searchParams.get('scopes')?.split(',') ?? []).map(scope => ({
+      const scopes = (searchParams.get('scope')?.split(',') ?? []).map(scope => ({
         scope,
         description: scope === 'offline_access' ? null : `Grants access to your ${scope}`,
         requires_consent: true,
       }));
-      Clerk.__internal_mountOAuthConsent(
+      Clerk.mountOAuthConsent(
         app,
         componentControls.oauthConsent.getProps() ?? {
           scopes,
-          oAuthApplicationName: searchParams.get('oauth-application-name'),
-          redirectUrl: searchParams.get('redirect_uri'),
-          oAuthApplicationLogoUrl: searchParams.get('logo-url'),
-          oAuthApplicationUrl: searchParams.get('app-url'),
+          oauthClientId: 'Wg9fP2d0pSFXCZ1u',
+          redirectUrl: searchParams.get('redirect_uri') ?? 'http://localhost:4000/oauth/callback',
         },
       );
     },

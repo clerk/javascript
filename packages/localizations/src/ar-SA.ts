@@ -178,6 +178,15 @@ export const arSA: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'تواصل مع مسؤول مؤسستك للحصول على أذونات لإدارة الاتصالات المؤسسية.',
+      title: 'ليس لديك إذن لإدارة الاتصالات المؤسسية',
+    },
+    navbar: {
+      title: 'تكوين تسجيل الدخول الموحد (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'أنشاء منظمة',
     invitePage: {
@@ -1338,6 +1347,7 @@ export const arSA: LocalizationResource = {
         title: 'العنوان الإلكتروني',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'ربط حساب',
         title: 'حساب المؤسسات',
       },
       headerTitle__account: 'الحساب',

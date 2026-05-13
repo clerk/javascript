@@ -15,10 +15,12 @@ import { convertPageToOffsetSearchParams } from '@/utils/convertPageToOffsetSear
 import { APIKey, BaseResource } from '../../resources/internal';
 
 export class APIKeys implements APIKeysNamespace {
+  static readonly #pathRoot = '/api_keys';
+
   /**
    * Returns the base options for the FAPI proxy requests.
    */
-  private async getBaseFapiProxyOptions(): Promise<FapiRequestInit> {
+  async #getBaseFapiProxyOptions(): Promise<FapiRequestInit> {
     const token = await BaseResource.clerk.session?.getToken();
     if (!token) {
       throw new ClerkRuntimeError('No valid session token available', { code: 'no_session_token' });
@@ -27,7 +29,7 @@ export class APIKeys implements APIKeysNamespace {
     return {
       // Set to an empty string because FAPI Proxy does not include the version in the path.
       pathPrefix: '',
-      // Set the session token as a Bearer token in the Authorization header for authentication.
+      // FAPI Proxy looks for the session token in the Authorization header.
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -37,11 +39,19 @@ export class APIKeys implements APIKeysNamespace {
     };
   }
 
+  /**
+   * Retrieves a paginated list of API keys.
+   *
+   * The subject (owner) is resolved in the following order:
+   * 1. Explicit `subject` param (user or organization ID)
+   * 2. Active organization ID
+   * 3. Current user ID
+   */
   async getAll(params?: GetAPIKeysParams): Promise<ClerkPaginatedResponse<APIKeyResource>> {
     return BaseResource._fetch({
-      ...(await this.getBaseFapiProxyOptions()),
+      ...(await this.#getBaseFapiProxyOptions()),
       method: 'GET',
-      path: '/api_keys',
+      path: APIKeys.#pathRoot,
       search: convertPageToOffsetSearchParams({
         ...params,
         subject: params?.subject ?? BaseResource.clerk.organization?.id ?? BaseResource.clerk.user?.id ?? '',
@@ -59,8 +69,8 @@ export class APIKeys implements APIKeysNamespace {
 
   async create(params: CreateAPIKeyParams): Promise<APIKeyResource> {
     const json = (await BaseResource._fetch<ApiKeyJSON>({
-      ...(await this.getBaseFapiProxyOptions()),
-      path: '/api_keys',
+      ...(await this.#getBaseFapiProxyOptions()),
+      path: APIKeys.#pathRoot,
       method: 'POST',
       body: JSON.stringify({
         type: 'api_key',
@@ -76,9 +86,9 @@ export class APIKeys implements APIKeysNamespace {
 
   async revoke(params: RevokeAPIKeyParams): Promise<APIKeyResource> {
     const json = (await BaseResource._fetch<ApiKeyJSON>({
-      ...(await this.getBaseFapiProxyOptions()),
+      ...(await this.#getBaseFapiProxyOptions()),
       method: 'POST',
-      path: `/api_keys/${params.apiKeyID}/revoke`,
+      path: `${APIKeys.#pathRoot}/${params.apiKeyID}/revoke`,
       body: JSON.stringify({
         revocation_reason: params.revocationReason,
       }),

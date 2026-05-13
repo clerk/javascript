@@ -27,6 +27,8 @@
     "RSDOCTOR",
     "TZ",
     "VERCEL",
+    "VERCEL_PROJECT_PRODUCTION_URL",
+    "VERCEL_TARGET_ENV",
     "VITE_CLERK_*"
   ],
   "globalPassThroughEnv": [
@@ -84,10 +86,8 @@
       "dependsOn": ["build"],
       "inputs": [
         "$TURBO_DEFAULT$",
-        "$TURBO_ROOT$/jest.*.ts",
         "*.d.ts",
         "bundlewatch.config.json",
-        "jest.*",
         "src/**",
         "tests/**",
         "tsconfig.json",
@@ -218,11 +218,6 @@
     },
     "//#test:integration:fastify": {
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
-      "inputs": ["integration/**"],
-      "outputLogs": "new-only"
-    },
-    "//#test:integration:fastify": {
-      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
       "outputLogs": "new-only"
     },

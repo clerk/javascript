@@ -184,6 +184,16 @@ export const roRO: LocalizationResource = {
     viewPayment: 'Vezi plata',
     year: 'An',
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        'Contactați administratorul organizației dumneavoastră pentru a obține permisiuni de gestionare a conexiunilor de întreprindere.',
+      title: 'Nu aveți permisiunea să gestionați conexiunile de întreprindere',
+    },
+    navbar: {
+      title: 'Configurați autentificarea unică (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Creează organizație',
     invitePage: {
@@ -1365,6 +1375,7 @@ export const roRO: LocalizationResource = {
         title: 'Adrese de email',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Conectează cont',
         title: 'Conturi enterprise',
       },
       headerTitle__account: 'Detalii profil',
