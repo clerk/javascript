@@ -354,4 +354,55 @@ describe('security — adversarial inputs', () => {
       expectSafeHtml(html(applyMarkupAndTokens(input, tokens)));
     });
   });
+
+  describe('defense in depth — invariant pinning', () => {
+    it('deeply nested bolds produce only <strong> elements', () => {
+      const out = html(applyMarkupAndTokens('<bold><bold><bold>x</bold></bold></bold>', tokens));
+      expectSafeHtml(out);
+      expect(out).toBe('<strong><strong><strong>x</strong></strong></strong>');
+    });
+
+    it('HTML-entity-encoded tags do not become elements', () => {
+      const out = html(applyMarkupAndTokens('&lt;bold&gt;OK&lt;/bold&gt;', tokens));
+      expectSafeHtml(out);
+      expect(out).not.toContain('<strong');
+    });
+
+    it('token name resolving to a tag-shaped string renders as text only', () => {
+      const evil = withToken('tagName', 'script');
+      const out = html(applyMarkupAndTokens('<{{tagName}}>x</{{tagName}}>', evil));
+      expectSafeHtml(out);
+      expect(out).not.toContain('<strong');
+    });
+
+    it.each(['__proto__', 'toString', 'constructor', 'hasOwnProperty'])(
+      'prototype-chain token name %s does not produce dangerous output',
+      name => {
+        const out = html(applyMarkupAndTokens(`Hi {{${name}}}`, tokens));
+        expectSafeHtml(out);
+      },
+    );
+
+    it.each(['<boldx>OK</boldx>', '<bolder>OK</bolder>', '<bold123>OK</bold123>'])(
+      'tag-name prefix %s does not match the bold allowlist',
+      input => {
+        const out = html(applyMarkupAndTokens(input, tokens));
+        expectSafeHtml(out);
+        expect(out).not.toContain('<strong');
+      },
+    );
+
+    it('empty bold produces an empty <strong>', () => {
+      const out = html(applyMarkupAndTokens('<bold></bold>', tokens));
+      expectSafeHtml(out);
+      expect(out).toBe('<strong></strong>');
+    });
+
+    it('bold wrapping a token that resolves to empty still renders safely', () => {
+      const evil = withToken('user.firstName', '');
+      const out = html(applyMarkupAndTokens('<bold>{{user.firstName}}</bold>', evil));
+      expectSafeHtml(out);
+      expect(out).toBe('<strong></strong>');
+    });
+  });
 });
