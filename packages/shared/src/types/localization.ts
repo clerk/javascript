@@ -1292,6 +1292,39 @@ export type __internal_LocalizationResource = {
       message: LocalizationValue;
     };
   };
+  configureSSO: {
+    navbar: {
+      title: LocalizationValue;
+    };
+    missingManageEnterpriseConnectionsPermission: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+    };
+    verifyEmailDomainStep: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      addEmailAddress: {
+        formTitle: LocalizationValue;
+        formSubtitle: LocalizationValue;
+        inputPlaceholder: LocalizationValue;
+        inputLabel: LocalizationValue;
+      };
+      emailCode: {
+        formTitle: LocalizationValue;
+        formSubtitle: LocalizationValue<'identifier'>;
+        resendButton: LocalizationValue;
+        verified: {
+          title: LocalizationValue;
+          subtitle: LocalizationValue;
+          inputLabel: LocalizationValue;
+        };
+      };
+      domainTaken: {
+        title: LocalizationValue<'domain'>;
+        subtitle: LocalizationValue;
+      };
+    };
+  };
   apiKeys: {
     formTitle: LocalizationValue;
     formHint: LocalizationValue;
@@ -1299,6 +1332,9 @@ export type __internal_LocalizationResource = {
     menuAction__revoke: LocalizationValue;
     action__search: LocalizationValue;
     action__add: LocalizationValue;
+    tableHeader__name: LocalizationValue;
+    tableHeader__lastUsed: LocalizationValue;
+    tableHeader__actions: LocalizationValue;
     detailsTitle__emptyRow: LocalizationValue;
     revokeConfirmation: {
       formTitle: LocalizationValue<'apiKeyName'>;

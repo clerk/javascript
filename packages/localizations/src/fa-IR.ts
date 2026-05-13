@@ -183,6 +183,39 @@ export const faIR: LocalizationResource = {
     viewPayment: 'مشاهده پرداخت',
     year: 'سال',
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'برای دریافت مجوز مدیریت اتصالات سازمانی با مدیر سازمان خود تماس بگیرید.',
+      title: 'شما اجازه مدیریت اتصالات سازمانی را ندارید',
+    },
+    navbar: {
+      title: 'پیکربندی ورود یکپارچه (SSO)',
+    },
+    verifyEmailDomainStep: {
+      title: 'تأیید آدرس ایمیل',
+      subtitle: 'آدرس ایمیلی را که می‌خواهید اتصال سازمانی روی آن فعال شود، تأیید کنید.',
+      addEmailAddress: {
+        formTitle: 'به ایمیل شما نیاز داریم',
+        formSubtitle: 'برای شروع به آدرس ایمیل شما نیاز داریم',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'آدرس ایمیل',
+      },
+      emailCode: {
+        formTitle: 'آدرس ایمیل خود را تأیید کنید',
+        formSubtitle: 'کد تأیید ارسال شده به {{identifier}} را وارد کنید',
+        resendButton: 'کد را دریافت نکردید؟ ارسال مجدد',
+        verified: {
+          title: 'ایمیل شما را دریافت کردیم',
+          subtitle: 'شما آدرس ایمیل خود را با ایمیل زیر تأیید کرده‌اید',
+          inputLabel: 'آدرس ایمیل تأیید شده',
+        },
+      },
+      domainTaken: {
+        title: 'این دامنه ({{domain}}) قبلاً یک اتصال SSO دارد',
+        subtitle: 'برای دسترسی از طریق اتصال موجود، با مدیر برنامه تماس بگیرید.',
+      },
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'ایجاد سازمان',
     invitePage: {

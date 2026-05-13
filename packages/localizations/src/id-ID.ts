@@ -178,6 +178,39 @@ export const idID: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'Hubungi administrator organisasi Anda untuk mendapatkan izin mengelola koneksi enterprise.',
+      title: 'Anda tidak memiliki izin untuk mengelola koneksi enterprise',
+    },
+    navbar: {
+      title: 'Konfigurasi Single Sign-On (SSO)',
+    },
+    verifyEmailDomainStep: {
+      title: 'Verifikasi alamat email',
+      subtitle: 'Verifikasi alamat email yang ingin Anda aktifkan koneksi enterprise-nya.',
+      addEmailAddress: {
+        formTitle: 'Kami membutuhkan email Anda',
+        formSubtitle: 'Untuk memulai, kami membutuhkan alamat email Anda',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'Alamat email',
+      },
+      emailCode: {
+        formTitle: 'Verifikasi alamat email Anda',
+        formSubtitle: 'Masukkan kode verifikasi yang dikirim ke {{identifier}}',
+        resendButton: 'Tidak menerima kode? Kirim ulang',
+        verified: {
+          title: 'Kami mendapatkan email Anda',
+          subtitle: 'Anda telah memverifikasi alamat email Anda dengan email berikut',
+          inputLabel: 'Alamat email terverifikasi',
+        },
+      },
+      domainTaken: {
+        title: 'Domain ini ({{domain}}) sudah memiliki koneksi SSO',
+        subtitle: 'Hubungi administrator aplikasi untuk mendapatkan akses melalui koneksi yang ada.',
+      },
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Buat organisasi',
     invitePage: {

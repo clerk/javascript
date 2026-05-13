@@ -186,6 +186,39 @@ export const ptPT: LocalizationResource = {
     viewPayment: 'Ver pagamento',
     year: 'Ano',
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'Contacte o administrador da sua organização para obter permissões para gerir ligações empresariais.',
+      title: 'Não tem permissão para gerir ligações empresariais',
+    },
+    navbar: {
+      title: 'Configurar autenticação única (SSO)',
+    },
+    verifyEmailDomainStep: {
+      title: 'Verificar endereço de e-mail',
+      subtitle: 'Verifique o endereço de e-mail no qual pretende ativar a ligação empresarial.',
+      addEmailAddress: {
+        formTitle: 'Precisamos do seu e-mail',
+        formSubtitle: 'Para começar, precisaremos do seu endereço de e-mail',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'Endereço de e-mail',
+      },
+      emailCode: {
+        formTitle: 'Verifique o seu endereço de e-mail',
+        formSubtitle: 'Introduza o código de verificação enviado para {{identifier}}',
+        resendButton: 'Não recebeu um código? Reenviar',
+        verified: {
+          title: 'Recebemos o seu e-mail',
+          subtitle: 'Verificou o seu endereço de e-mail com o seguinte e-mail',
+          inputLabel: 'Endereço de e-mail verificado',
+        },
+      },
+      domainTaken: {
+        title: 'Este domínio ({{domain}}) já possui uma ligação SSO',
+        subtitle: 'Contacte o administrador da aplicação para obter acesso através da ligação existente.',
+      },
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Criar organização',
     invitePage: {

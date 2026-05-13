@@ -1,5 +1,35 @@
 # Change Log
 
+## 4.10.2
+
+### Patch Changes
+
+- Improved the `cannot_render_single_session_enabled` dev warning to use friendlier wording. The message now clearly states that the behavior is expected and points developers to the Clerk Dashboard to enable multi-session mode if needed. ([#8488](https://github.com/clerk/javascript/pull/8488)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.10.1
+
+### Patch Changes
+
+- Fix OAuth consent component and hook related types. ([#8483](https://github.com/clerk/javascript/pull/8483)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+## 4.10.0
+
+### Minor Changes
+
+- Add experimental `<ConfigureSSO />` component. Not ready for usage yet. ([#8427](https://github.com/clerk/javascript/pull/8427)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Localize API keys table headers ([#8462](https://github.com/clerk/javascript/pull/8462)) by [@jebibot](https://github.com/jebibot)
+
+- Avoid referencing `process.env` when auto-proxy detection runs in runtimes where `process` is unavailable. ([#8466](https://github.com/clerk/javascript/pull/8466)) by [@jacekradko](https://github.com/jacekradko)
+
+- Move ownership of the clerk-rq `QueryClient` from `@clerk/clerk-js` into `@clerk/shared`. The `QueryObserver` (constructed in `@clerk/shared`) and the `Query` objects it observes now always come from a single `@tanstack/query-core` resolution — the cross-bundle API contract that produced #8428 (`Query.isFetched is not a function`) no longer exists. ([#8434](https://github.com/clerk/javascript/pull/8434)) by [@jacekradko](https://github.com/jacekradko)
+
+  This removes the undocumented `clerk.__internal_queryClient` getter from both `@clerk/clerk-js` and `@clerk/react`'s `IsomorphicClerk`. The `QueryClient` is owned by an internal singleton in `@clerk/shared`, lazily instantiated on the browser only — server renders return `undefined`, preserving SSR safety and avoiding cross-request cache sharing.
+
+  `@tanstack/query-core` is no longer a direct dependency of `@clerk/clerk-js`; it remains a dep of `@clerk/shared` and resolves consumer-side as before.
+
 ## 4.9.0
 
 ### Minor Changes

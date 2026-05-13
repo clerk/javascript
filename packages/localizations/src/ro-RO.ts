@@ -184,6 +184,40 @@ export const roRO: LocalizationResource = {
     viewPayment: 'Vezi plata',
     year: 'An',
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        'Contactați administratorul organizației dumneavoastră pentru a obține permisiuni de gestionare a conexiunilor de întreprindere.',
+      title: 'Nu aveți permisiunea să gestionați conexiunile de întreprindere',
+    },
+    navbar: {
+      title: 'Configurați autentificarea unică (SSO)',
+    },
+    verifyEmailDomainStep: {
+      title: 'Verifică adresa de e-mail',
+      subtitle: 'Verifică adresa de e-mail pe care dorești să activezi conexiunea enterprise.',
+      addEmailAddress: {
+        formTitle: 'Avem nevoie de e-mailul tău',
+        formSubtitle: 'Pentru a începe, vom avea nevoie de adresa ta de e-mail',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'Adresă de e-mail',
+      },
+      emailCode: {
+        formTitle: 'Verifică adresa ta de e-mail',
+        formSubtitle: 'Introdu codul de verificare trimis la {{identifier}}',
+        resendButton: 'Nu ai primit un cod? Retrimite',
+        verified: {
+          title: 'Am primit e-mailul tău',
+          subtitle: 'Ai verificat adresa ta de e-mail cu următorul e-mail',
+          inputLabel: 'Adresă de e-mail verificată',
+        },
+      },
+      domainTaken: {
+        title: 'Acest domeniu ({{domain}}) are deja o conexiune SSO',
+        subtitle: 'Contactează administratorul aplicației pentru a obține acces prin conexiunea existentă.',
+      },
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Creează organizație',
     invitePage: {

@@ -189,6 +189,39 @@ export const jaJP: LocalizationResource = {
     viewPayment: '支払いを表示',
     year: '年',
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'エンタープライズ接続を管理する権限を取得するには、組織の管理者にお問い合わせください。',
+      title: 'エンタープライズ接続を管理する権限がありません',
+    },
+    navbar: {
+      title: 'シングルサインオン（SSO）を設定',
+    },
+    verifyEmailDomainStep: {
+      title: 'メールアドレスを確認',
+      subtitle: 'エンタープライズ接続を有効にしたいメールアドレスを確認します。',
+      addEmailAddress: {
+        formTitle: 'メールアドレスが必要です',
+        formSubtitle: '開始するにはメールアドレスが必要です',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'メールアドレス',
+      },
+      emailCode: {
+        formTitle: 'メールアドレスを確認',
+        formSubtitle: '{{identifier}} に送信された確認コードを入力してください',
+        resendButton: 'コードを受け取っていませんか？再送信',
+        verified: {
+          title: 'メールを受け取りました',
+          subtitle: '次のメールでメールアドレスを確認しました',
+          inputLabel: '確認済みメールアドレス',
+        },
+      },
+      domainTaken: {
+        title: 'このドメイン ({{domain}}) にはすでに SSO 接続が存在します',
+        subtitle: '既存の接続を通じてアクセスを取得するには、アプリケーションの管理者にお問い合わせください。',
+      },
+    },
+  },
   createOrganization: {
     formButtonSubmit: '組織を作成する',
     invitePage: {

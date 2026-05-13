@@ -11,11 +11,4 @@ jobs:
       pull-requests: write
     runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-          fetch-tags: false
-          filter: "blob:none"
-          show-progress: false
       - uses: actions/labeler@v6

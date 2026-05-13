@@ -178,6 +178,40 @@ export const esUY: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        'Contactá al administrador de tu organización para obtener permisos para gestionar conexiones empresariales.',
+      title: 'No tenés permiso para gestionar conexiones empresariales',
+    },
+    navbar: {
+      title: 'Configurar inicio de sesión único (SSO)',
+    },
+    verifyEmailDomainStep: {
+      title: 'Verificar correo electrónico',
+      subtitle: 'Verificá la dirección de correo electrónico en la que querés habilitar la conexión empresarial.',
+      addEmailAddress: {
+        formTitle: 'Necesitamos tu correo electrónico',
+        formSubtitle: 'Para empezar, necesitaremos tu dirección de correo electrónico',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'Dirección de correo electrónico',
+      },
+      emailCode: {
+        formTitle: 'Verificá tu dirección de correo electrónico',
+        formSubtitle: 'Ingresá el código de verificación enviado a {{identifier}}',
+        resendButton: '¿No recibiste un código? Reenviar',
+        verified: {
+          title: 'Recibimos tu correo electrónico',
+          subtitle: 'Verificaste tu dirección de correo electrónico con el siguiente correo',
+          inputLabel: 'Dirección de correo electrónico verificada',
+        },
+      },
+      domainTaken: {
+        title: 'Este dominio ({{domain}}) ya tiene una conexión SSO',
+        subtitle: 'Contactá al administrador de la aplicación para obtener acceso a través de la conexión existente.',
+      },
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Crear organización',
     invitePage: {

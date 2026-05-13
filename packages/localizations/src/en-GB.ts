@@ -178,6 +178,40 @@ export const enGB: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        'Contact your organisation administrator in order to have permissions to manage enterprise connections.',
+      title: 'You do not have permission to manage enterprise connections',
+    },
+    navbar: {
+      title: 'Configure Single Sign-On (SSO)',
+    },
+    verifyEmailDomainStep: {
+      title: 'Verify email address',
+      subtitle: 'Verify the email address you want to enable the enterprise connection on.',
+      addEmailAddress: {
+        formTitle: 'We need your email',
+        formSubtitle: 'In order to start we will need your email address',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'Email address',
+      },
+      emailCode: {
+        formTitle: 'Verify your email address',
+        formSubtitle: 'Enter the verification code sent to {{identifier}}',
+        resendButton: "Didn't receive a code? Resend",
+        verified: {
+          title: 'We got your email',
+          subtitle: "You've verified your email address with the following email",
+          inputLabel: 'Verified email address',
+        },
+      },
+      domainTaken: {
+        title: 'This domain ({{domain}}) already has an SSO connection',
+        subtitle: "Contact the application's administrator to get access through the existing connection.",
+      },
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Create organisation',
     invitePage: {
