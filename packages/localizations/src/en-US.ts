@@ -223,61 +223,52 @@ export const enUS: LocalizationResource = {
       },
       warning: 'Once a provider is selected you cannot change again until the configuration is over',
     },
-    verifyEmailDomainStep: {
-      title: 'Verify email address',
-      subtitle: 'Verify the email address you want to enable the enterprise connection on.',
-      addEmailAddress: {
-        formTitle: 'We need your email',
-        formSubtitle: 'In order to start we will need your email address',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'Email address',
-      },
-      emailCode: {
-        formTitle: 'Verify your email address',
-        formSubtitle: 'Enter the verification code sent to {{identifier}}',
-        resendButton: "Didn't receive a code? Resend",
-        verified: {
-          title: 'We got your email',
-          subtitle: "You've verified your email address with the following email",
-          inputLabel: 'Verified email address',
+    configureStep: {
+      spFields: {
+        acsUrl: {
+          label: 'Single sign-on URL',
+        },
+        spEntityId: {
+          label: 'Audience URI',
         },
       },
-      domainTaken: {
-        title: 'This domain ({{domain}}) already has an SSO connection',
-        subtitle: "Contact the application's administrator to get access through the existing connection.",
+      attributeMapping: {
+        title: 'We expect your SAML responses to have the following specific attributes:',
+        paragraph:
+          "These are the defaults and probably won't need you to change them. However, many SAML configuration errors are due to incorrect attribute mappings, so it's worth double-checking. Here's how:",
+        columns: {
+          attribute: 'Attribute',
+          claimName: 'Claim Name',
+        },
+        badges: {
+          required: 'Required',
+          optional: 'Optional',
+        },
+        rows: {
+          email: {
+            attribute: 'Email address',
+            claim: 'user.email',
+          },
+          firstName: {
+            attribute: 'First Name',
+            claim: 'user.firstName',
+          },
+          lastName: {
+            attribute: 'Last Name',
+            claim: 'user.lastName',
+          },
+        },
       },
-    },
-    configureStep: {
-      title: 'Configure Okta Workforce',
-      subtitle: 'Create a new enterprise application in your Okta Dashboard',
-      createApp: {
+      samlOkta: {
+        title: 'Configure Okta Workforce',
+        subtitle: 'Create a new enterprise application in your Okta Dashboard',
         createApp: {
           title: 'Create a new enterprise application in Okta',
-          step1: {
-            prefix: 'Sign in to Okta and go to ',
-            bold: 'Admin → Applications',
-            suffix: '.',
-          },
-          step2: {
-            prefix: 'Click ',
-            bold: 'Create App Integration',
-            suffix: '.',
-          },
-          step3: {
-            prefix: 'Select ',
-            bold: 'SAML 2.0',
-            suffix: '.',
-          },
-          step4: {
-            prefix: 'Fill in the ',
-            bold: 'General Settings',
-            suffix: ' (App name is required).',
-          },
-          step5: {
-            prefix: 'Click ',
-            bold: 'Next',
-            suffix: ' to complete creating the application.',
-          },
+          step1: 'Sign in to Okta and go to <strong>Admin → Applications</strong>.',
+          step2: 'Click <strong>Create App Integration</strong>.',
+          step3: 'Select <strong>SAML 2.0</strong>.',
+          step4: 'Fill in the <strong>General Settings</strong> (App name is required).',
+          step5: 'Click <strong>Next</strong> to complete creating the application.',
         },
         serviceProvider: {
           title: 'Configure service provider',
@@ -285,123 +276,27 @@ export const enUS: LocalizationResource = {
             'Once you have moved forward from the General Settings instructions, you will be presented with the Configure SAML page.',
           paragraph2:
             'To configure your service provider (Clerk), you must add these two fields to your Okta application:',
-          acsUrl: {
-            label: 'Single sign-on URL',
-          },
-          spEntityId: {
-            label: 'Audience URI',
-          },
         },
         completeSamlIntegration: {
           title: 'Complete SAML integration',
-          step1: {
-            prefix: 'Select ',
-            bold: 'This is an internal app that we have created',
-            suffix: ' from the options menu.',
-          },
-          step2: {
-            prefix: 'Complete the form with any comments and select ',
-            bold: '"Finish"',
-            suffix: '.',
+          step1: 'Select <strong>This is an internal app that we have created</strong> from the options menu.',
+          step2: 'Complete the form with any comments and select <strong>"Finish"</strong>.',
+        },
+        configureAttributes: {
+          step1: 'In the Okta dashboard, find the <strong>Attribute Statements</strong> section.',
+          step2:
+            'Select <strong>Add Expression</strong> for each attribute, and enter the following name and expression pairs:',
+          pairs: {
+            email: '<code>mail</code> and <code>user.profile.mail</code>',
+            firstName: '<code>firstName</code> and <code>user.profile.firstName</code>',
+            lastName: '<code>lastName</code> and <code>user.profile.lastName</code>',
           },
         },
-      },
-      configureAttributes: {
-        attributeMapping: {
-          title: 'We expect your SAML responses to have the following specific attributes:',
-          columns: {
-            attribute: 'Attribute',
-            claimName: 'Claim Name',
-          },
-          badges: {
-            required: 'Required',
-            optional: 'Optional',
-          },
-          rows: {
-            email: {
-              attribute: 'Email address',
-              claim: 'user.profile.email',
-            },
-            firstName: {
-              attribute: 'First Name',
-              claim: 'user.firstName',
-            },
-            lastName: {
-              attribute: 'Last Name',
-              claim: 'user.lastName',
-            },
-          },
+        metadataUrl: {
+          label: 'Metadata URL',
+          placeholder: 'Paste URL here...',
+          description: 'In your Okta SAML app, go to the Sign On tab and retrieve the metadata URL. Paste it below.',
         },
-        verifyMappings: {
-          paragraph:
-            "These are the defaults and probably won't need you to change them. However, many SAML configuration errors are due to incorrect attribute mappings, so it's worth double-checking. Here's how:",
-          step1: {
-            prefix: 'In the Okta dashboard, find the ',
-            bold: 'Attribute Statements',
-            suffix: ' section.',
-          },
-          step2: {
-            prefix: 'For the ',
-            bold: 'Name',
-            middle: ' field, enter ',
-            code: 'mail',
-            suffix: '',
-          },
-          step3: {
-            prefix: 'For the ',
-            bold: 'Value',
-            middle: ' field, choose ',
-            code: 'user.profile.mail',
-            suffix: ' from the dropdown.',
-          },
-          step4: {
-            prefix: 'Select the ',
-            bold: 'Add Another',
-            suffix: ' button to add another attribute.',
-          },
-          step5: {
-            prefix: 'For the ',
-            bold: 'Name',
-            middle: ' field, enter ',
-            code: 'firstName',
-            suffix: '',
-          },
-          step6: {
-            prefix: 'For the ',
-            bold: 'Value',
-            middle: ' field, choose ',
-            code: 'user.firstName',
-            suffix: ' from the dropdown.',
-          },
-          step7: {
-            prefix: 'Select the ',
-            bold: 'Add Another',
-            suffix: ' button to add another attribute.',
-          },
-          step8: {
-            prefix: 'For the ',
-            bold: 'Name',
-            middle: ' field, enter ',
-            code: 'lastName',
-            suffix: '',
-          },
-          step9: {
-            prefix: 'For the ',
-            bold: 'Value',
-            middle: ' field, choose ',
-            code: 'user.lastName',
-            suffix: ' from the dropdown.',
-          },
-        },
-      },
-      metadataUrl: {
-        label: 'Metadata URL',
-<<<<<<< HEAD
-        placeholder: 'https://app.okta.com/.../metadata',
-=======
-        placeholder: 'Paste URL here...',
->>>>>>> 35011671b (fix(ui): render Configure step description above input)
-        description: 'In your Okta SAML app, go to the Sign On tab and retrieve the metadata URL. Paste it below.',
       },
     },
   },

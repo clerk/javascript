@@ -1339,153 +1339,75 @@ export type __internal_LocalizationResource = {
       };
     };
     configureStep: {
-      title: LocalizationValue;
-      subtitle: LocalizationValue;
-      createApp: {
+      spFields: {
+        acsUrl: {
+          label: LocalizationValue;
+        };
+        spEntityId: {
+          label: LocalizationValue;
+        };
+      };
+      attributeMapping: {
+        title: LocalizationValue;
+        paragraph: LocalizationValue;
+        columns: {
+          attribute: LocalizationValue;
+          claimName: LocalizationValue;
+        };
+        badges: {
+          required: LocalizationValue;
+          optional: LocalizationValue;
+        };
+        rows: {
+          email: {
+            attribute: LocalizationValue;
+            claim: LocalizationValue;
+          };
+          firstName: {
+            attribute: LocalizationValue;
+            claim: LocalizationValue;
+          };
+          lastName: {
+            attribute: LocalizationValue;
+            claim: LocalizationValue;
+          };
+        };
+      };
+      samlOkta: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
         createApp: {
           title: LocalizationValue;
-          step1: {
-            prefix: LocalizationValue;
-            bold: LocalizationValue;
-            suffix: LocalizationValue;
-          };
-          step2: {
-            prefix: LocalizationValue;
-            bold: LocalizationValue;
-            suffix: LocalizationValue;
-          };
-          step3: {
-            prefix: LocalizationValue;
-            bold: LocalizationValue;
-            suffix: LocalizationValue;
-          };
-          step4: {
-            prefix: LocalizationValue;
-            bold: LocalizationValue;
-            suffix: LocalizationValue;
-          };
-          step5: {
-            prefix: LocalizationValue;
-            bold: LocalizationValue;
-            suffix: LocalizationValue;
-          };
+          step1: LocalizationValue;
+          step2: LocalizationValue;
+          step3: LocalizationValue;
+          step4: LocalizationValue;
+          step5: LocalizationValue;
         };
         serviceProvider: {
           title: LocalizationValue;
           paragraph1: LocalizationValue;
           paragraph2: LocalizationValue;
-          acsUrl: {
-            label: LocalizationValue;
-          };
-          spEntityId: {
-            label: LocalizationValue;
-          };
         };
         completeSamlIntegration: {
           title: LocalizationValue;
-          step1: {
-            prefix: LocalizationValue;
-            bold: LocalizationValue;
-            suffix: LocalizationValue;
-          };
-          step2: {
-            prefix: LocalizationValue;
-            bold: LocalizationValue;
-            suffix: LocalizationValue;
+          step1: LocalizationValue;
+          step2: LocalizationValue;
+        };
+        configureAttributes: {
+          step1: LocalizationValue;
+          step2: LocalizationValue;
+          pairs: {
+            email: LocalizationValue;
+            firstName: LocalizationValue;
+            lastName: LocalizationValue;
           };
         };
-      };
-      configureAttributes: {
-        attributeMapping: {
-          title: LocalizationValue;
-          columns: {
-            attribute: LocalizationValue;
-            claimName: LocalizationValue;
-          };
-          badges: {
-            required: LocalizationValue;
-            optional: LocalizationValue;
-          };
-          rows: {
-            email: {
-              attribute: LocalizationValue;
-              claim: LocalizationValue;
-            };
-            firstName: {
-              attribute: LocalizationValue;
-              claim: LocalizationValue;
-            };
-            lastName: {
-              attribute: LocalizationValue;
-              claim: LocalizationValue;
-            };
-          };
+        metadataUrl: {
+          label: LocalizationValue;
+          placeholder: LocalizationValue;
+          description: LocalizationValue;
         };
-        verifyMappings: {
-          paragraph: LocalizationValue;
-          step1: {
-            prefix: LocalizationValue;
-            bold: LocalizationValue;
-            suffix: LocalizationValue;
-          };
-          step2: {
-            prefix: LocalizationValue;
-            bold: LocalizationValue;
-            middle: LocalizationValue;
-            code: LocalizationValue;
-            suffix: LocalizationValue;
-          };
-          step3: {
-            prefix: LocalizationValue;
-            bold: LocalizationValue;
-            middle: LocalizationValue;
-            code: LocalizationValue;
-            suffix: LocalizationValue;
-          };
-          step4: {
-            prefix: LocalizationValue;
-            bold: LocalizationValue;
-            suffix: LocalizationValue;
-          };
-          step5: {
-            prefix: LocalizationValue;
-            bold: LocalizationValue;
-            middle: LocalizationValue;
-            code: LocalizationValue;
-            suffix: LocalizationValue;
-          };
-          step6: {
-            prefix: LocalizationValue;
-            bold: LocalizationValue;
-            middle: LocalizationValue;
-            code: LocalizationValue;
-            suffix: LocalizationValue;
-          };
-          step7: {
-            prefix: LocalizationValue;
-            bold: LocalizationValue;
-            suffix: LocalizationValue;
-          };
-          step8: {
-            prefix: LocalizationValue;
-            bold: LocalizationValue;
-            middle: LocalizationValue;
-            code: LocalizationValue;
-            suffix: LocalizationValue;
-          };
-          step9: {
-            prefix: LocalizationValue;
-            bold: LocalizationValue;
-            middle: LocalizationValue;
-            code: LocalizationValue;
-            suffix: LocalizationValue;
-          };
-        };
-      };
-      metadataUrl: {
-        label: LocalizationValue;
-        placeholder: LocalizationValue;
-        description: LocalizationValue;
       };
     };
   };
