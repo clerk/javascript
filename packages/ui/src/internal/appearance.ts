@@ -825,6 +825,13 @@ export type Variables = {
    */
   fontFamilyButtons?: FontFamily;
   /**
+   * The default monospace font that will be used for monospaced text (e.g. code, OTP inputs).
+   * See {@link Variables.fontFamily} for details on accepted values.
+   *
+   * @default 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
+   */
+  fontFamilyMono?: FontFamily;
+  /**
    * The value will be used as the base `md` to calculate all the other scale values (`xs`, `sm`, `lg` and `xl`).
    * By default, this value is relative to the root fontSize of the html element.
    *
