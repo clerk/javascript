@@ -13,13 +13,11 @@ import type { Clerk, InstanceType } from '@clerk/shared/types';
 import { noop } from '@clerk/shared/utils';
 
 import { debugLogger } from '@/utils/debug';
-import { decode } from '@/utils/jwt';
 
 import { clerkMissingDevBrowser } from '../errors';
 import { eventBus, events } from '../events';
 import type { FapiClient } from '../fapiClient';
 import { Environment } from '../resources/Environment';
-import { pickFreshestJwt } from '../tokenFreshness';
 import { createActiveContextCookie } from './cookies/activeContext';
 import type { ClientUatCookieHandler } from './cookies/clientUat';
 import { createClientUatCookie } from './cookies/clientUat';
@@ -194,27 +192,6 @@ export class AuthCookieService {
     // Only allow background tabs to update if both session and organization match
     if (!document.hasFocus() && !this.isCurrentContextActive()) {
       return;
-    }
-
-    // Monotonic freshness guard: don't regress the cookie within the same session.
-    if (token) {
-      const currentRaw = this.sessionCookie.get();
-      if (currentRaw) {
-        try {
-          const current = decode(currentRaw);
-          const incoming = decode(token);
-          const currentSid = current.claims.sid;
-          const incomingSid = incoming.claims.sid;
-          // Only apply within the same session. Different sessions always allowed.
-          if (currentSid && incomingSid && currentSid === incomingSid) {
-            if (pickFreshestJwt(current, incoming) === current) {
-              return;
-            }
-          }
-        } catch {
-          // If decode fails, allow the write (don't block on malformed tokens)
-        }
-      }
     }
 
     if (!token && !isValidBrowserOnline()) {
