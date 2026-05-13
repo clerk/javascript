@@ -1313,7 +1313,7 @@ export type __internal_LocalizationResource = {
         customSaml: LocalizationValue;
       };
       warning: LocalizationValue;
-    },
+    };
     verifyEmailDomainStep: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
