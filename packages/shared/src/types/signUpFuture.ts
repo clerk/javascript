@@ -317,6 +317,11 @@ export interface SignUpFutureVerifications {
 
   /**
    * The verification status for email link flows.
+   * <ul>
+   *  <li>`status`: The verification status.</li>
+   *  <li>`createdSessionId`: The ID of the session that was created upon successful verification.</li>
+   *  <li>`verifiedFromTheSameClient`: Whether the verification was from the same client (browser) that initiated the email link flow.</li>
+   * </ul>
    */
   readonly emailLinkVerification: {
     /**
@@ -341,7 +346,7 @@ export interface SignUpFutureVerifications {
   sendEmailCode: () => Promise<{ error: ClerkError | null }>;
 
   /**
-   * Verifies a code sent via [`verifications.sendEmailCode()`](https://clerk.com/docs/reference/objects/sign-up-future#verifications-send-email-code).
+   * Verifies a code sent with the [`verifications.sendEmailCode()`](https://clerk.com/docs/reference/objects/sign-up-future#verifications-send-email-code) method.
    */
   verifyEmailCode: (params: SignUpFutureEmailCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
 
@@ -361,7 +366,7 @@ export interface SignUpFutureVerifications {
   sendPhoneCode: (params?: SignUpFuturePhoneCodeSendParams) => Promise<{ error: ClerkError | null }>;
 
   /**
-   * Verifies a code sent via [`verifications.sendPhoneCode()`](https://clerk.com/docs/reference/objects/sign-up-future#verifications-send-phone-code).
+   * Verifies a code sent with the [`verifications.sendPhoneCode()`](https://clerk.com/docs/reference/objects/sign-up-future#verifications-send-phone-code) method.
    */
   verifyPhoneCode: (params: SignUpFuturePhoneCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
 }
@@ -500,7 +505,7 @@ export interface SignUpFutureResource {
   create: (params: SignUpFutureCreateParams) => Promise<{ error: ClerkError | null }>;
 
   /**
-   * Updates the current `SignUpFutureResource` instance with the provided parameters.
+   * Updates the current `SignUpFuture` instance with the provided parameters.
    */
   update: (params: SignUpFutureUpdateParams) => Promise<{ error: ClerkError | null }>;
 

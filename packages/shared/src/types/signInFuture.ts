@@ -452,7 +452,7 @@ export interface SignInFutureResource {
     sendCode: (params?: SignInFutureEmailCodeSendParams) => Promise<{ error: ClerkError | null }>;
 
     /**
-     * Verifies a code sent with the [`sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#email-code-send-code) method.
+     * Verifies a code sent with the [`emailCode.sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#email-code-send-code) method.
      */
     verifyCode: (params: SignInFutureEmailCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
   };
@@ -498,7 +498,7 @@ export interface SignInFutureResource {
     sendCode: (params?: SignInFuturePhoneCodeSendParams) => Promise<{ error: ClerkError | null }>;
 
     /**
-     * Verifies a code sent with the [`sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#phone-code-send-code) method.
+     * Verifies a code sent with the [`phoneCode.sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#phone-code-send-code) method.
      */
     verifyCode: (params: SignInFuturePhoneCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
   };
@@ -511,7 +511,7 @@ export interface SignInFutureResource {
     sendCode: () => Promise<{ error: ClerkError | null }>;
 
     /**
-     * Verifies a password reset code sent with the [`sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#reset-password-email-code-send-code) method. Will cause `signIn.status` to become `'needs_new_password'`. This is when you will call the [`resetPasswordEmailCode.submitPassword()`](https://clerk.com/docs/reference/objects/sign-in-future#reset-password-email-code-submit-password) method to complete the password reset flow.
+     * Verifies a password reset code sent with the [`resetPasswordEmailCode.sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#reset-password-email-code-send-code) method. Will cause `signIn.status` to become `'needs_new_password'`. This is when you will call the [`resetPasswordEmailCode.submitPassword()`](https://clerk.com/docs/reference/objects/sign-in-future#reset-password-email-code-submit-password) method to complete the password reset flow.
      */
     verifyCode: (params: SignInFutureEmailCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
 
@@ -529,7 +529,7 @@ export interface SignInFutureResource {
     sendCode: (params?: SignInFutureResetPasswordPhoneCodeSendParams) => Promise<{ error: ClerkError | null }>;
 
     /**
-     * Verifies a password reset code sent with the [`sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#reset-password-phone-code-send-code) method. Will cause `signIn.status` to become `'needs_new_password'`. This is when you will call the [`resetPasswordPhoneCode.submitPassword()`](https://clerk.com/docs/reference/objects/sign-in-future#reset-password-phone-code-submit-password) method to complete the password reset flow.
+     * Verifies a password reset code sent with the [`resetPasswordPhoneCode.sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#reset-password-phone-code-send-code) method. Will cause `signIn.status` to become `'needs_new_password'`. This is when you will call the [`resetPasswordPhoneCode.submitPassword()`](https://clerk.com/docs/reference/objects/sign-in-future#reset-password-phone-code-submit-password) method to complete the password reset flow.
      */
     verifyCode: (params: SignInFutureResetPasswordPhoneCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
 
@@ -552,7 +552,7 @@ export interface SignInFutureResource {
     sendPhoneCode: () => Promise<{ error: ClerkError | null }>;
 
     /**
-     * Verifies a phone code sent with the [`sendPhoneCode()`](https://clerk.com/docs/reference/objects/sign-in-future#mfa-send-phone-code) method.
+     * Verifies a phone code sent with the [`mfa.sendPhoneCode()`](https://clerk.com/docs/reference/objects/sign-in-future#mfa-send-phone-code) method.
      */
     verifyPhoneCode: (params: SignInFutureMFAPhoneCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
 
@@ -562,7 +562,7 @@ export interface SignInFutureResource {
     sendEmailCode: () => Promise<{ error: ClerkError | null }>;
 
     /**
-     * Verifies an email code sent with the [`sendEmailCode()`](https://clerk.com/docs/reference/objects/sign-in-future#mfa-send-email-code) method.
+     * Verifies an email code sent with the [`mfa.sendEmailCode()`](https://clerk.com/docs/reference/objects/sign-in-future#mfa-send-email-code) method.
      */
     verifyEmailCode: (params: SignInFutureMFAEmailCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
 
