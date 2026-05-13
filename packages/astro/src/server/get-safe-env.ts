@@ -41,8 +41,13 @@ function getContextEnvVar(envVarName: keyof InternalEnv, contextOrLocals: Contex
   // Astro v6+ Cloudflare adapter: env from cloudflare:workers
   // Checked first to avoid the expensive try/catch on locals.runtime.env,
   // which throws on every call in Astro v6 Cloudflare environments.
+  // Falls through when the key is missing — on CF Pages (Astro v5),
+  // cloudflare:workers env may not include dashboard secrets.
   if (cloudflareEnv) {
-    return cloudflareEnv[envVarName];
+    const value = cloudflareEnv[envVarName];
+    if (value !== undefined) {
+      return value;
+    }
   }
 
   // Astro v4/v5 Cloudflare adapter: env is on locals.runtime.env

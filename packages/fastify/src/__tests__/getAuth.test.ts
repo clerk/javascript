@@ -1,5 +1,6 @@
 import type { AuthenticatedMachineObject } from '@clerk/backend/internal';
 import type { FastifyRequest } from 'fastify';
+import { describe, expect, it, test } from 'vitest';
 
 import { getAuth } from '../getAuth';
 

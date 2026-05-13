@@ -275,7 +275,7 @@ class ClerkAuthActivity : ComponentActivity() {
                             // Client is ready, show AuthView
                             AuthView(
                                 modifier = Modifier.fillMaxSize(),
-                                clerkTheme = null // Use default theme, or pass custom
+                                clerkTheme = Clerk.customTheme
                             )
                         }
                         else -> {

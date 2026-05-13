@@ -350,6 +350,13 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
 
     const key = cacheKey.toKey();
 
+    // Clear timers from any existing entry for this key to prevent orphaned
+    // refresh timers from accumulating across set() calls (e.g., from
+    // #hydrateCache during _updateClient AND #refreshTokenInBackground).
+    const existing = cache.get(key);
+    clearTimeout(existing?.timeoutId);
+    clearTimeout(existing?.refreshTimeoutId);
+
     const nowSeconds = Math.floor(Date.now() / 1000);
     const createdAt = entry.createdAt ?? nowSeconds;
     const value: TokenCacheValue = { createdAt, entry, expiresIn: undefined };
@@ -367,15 +374,16 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
       }
     };
 
+    cache.set(key, value);
+
     entry.tokenResolver
       .then(newToken => {
-        // Compare-and-swap: if another concurrent resolve already committed
-        // a fresher token for this key, don't overwrite it.
-        const currentValue = cache.get(key);
-        if (currentValue?.entry?.resolvedToken && newToken) {
-          if (shouldRejectToken(currentValue.entry.resolvedToken, newToken)) {
-            return;
-          }
+        // If this entry was overwritten by a newer set() call while our promise
+        // was pending, bail out to avoid installing orphaned timers. Monotonic
+        // replacement is enforced at the read sites (cookie + broadcast + Session)
+        // where the user-visible state lives.
+        if (cache.get(key) !== value) {
+          return;
         }
 
         // Store resolved token for synchronous reads
@@ -465,8 +473,6 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
       .catch(() => {
         deleteKey();
       });
-
-    cache.set(key, value);
   };
 
   const close = () => {

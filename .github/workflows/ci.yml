@@ -3,6 +3,7 @@ name: CI
 on:
   merge_group:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     branches:
       - main
       - release/v4
@@ -218,7 +219,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - node-version: 22
+          - node-version: 24.15.0
+            test-filter: "**"
+            filter-label: "**"
+          - node-version: 20.19.0
             test-filter: "**"
             filter-label: "**"
 
@@ -257,7 +261,7 @@ jobs:
       - name: Run Typedoc tests
         run: |
           # Only run Typedoc tests for one matrix version and main test run
-          if [ "${{ matrix.node-version }}" == "22" ] && [ "${{ matrix.test-filter }}" = "**" ]; then
+          if [ "${{ matrix.node-version }}" == "24.15.0" ] && [ "${{ matrix.test-filter }}" = "**" ]; then
             pnpm turbo run //#test:typedoc
           fi
         env:
@@ -274,7 +278,9 @@ jobs:
 
   integration-tests:
     needs: [check-permissions, build-packages]
-    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
+    if: >-
+      ${{ (github.event_name != 'pull_request' || github.event.pull_request.draft == false)
+      && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
     name: Integration Tests (${{ matrix.test-name }}, ${{ matrix.test-project }}${{ matrix.next-version && format(', {0}', matrix.next-version) || '' }})
     permissions:
       contents: read
@@ -306,6 +312,7 @@ jobs:
             "react-router",
             "custom",
             "hono",
+            "chrome-extension",
           ]
         test-project: ["chrome"]
         include:
@@ -456,12 +463,21 @@ jobs:
           NODE_EXTRA_CA_CERTS: ${{ github.workspace }}/integration/certs/rootCA.pem
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
 
+      - name: Sanitize artifact name
+        if: ${{ cancelled() || failure() }}
+        id: sanitize
+        run: |
+          SANITIZED="${TEST_NAME//:/-}"
+          echo "artifact-suffix=${SANITIZED}" >> $GITHUB_OUTPUT
+        env:
+          TEST_NAME: ${{ matrix.test-name }}
+
       - name: Upload test-results
         if: ${{ cancelled() || failure() }}
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}${{ matrix.next-version && format('-next{0}', matrix.next-version) || '' }}
-          path: integration/test-results
+          name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ steps.sanitize.outputs.artifact-suffix }}${{ matrix.next-version && format('-next{0}', matrix.next-version) || '' }}
+          path: test-results
           retention-days: 1
 
   pkg-pr-new:
@@ -489,7 +505,7 @@ jobs:
         uses: ./.github/actions/init-blacksmith
         with:
           turbo-enabled: true
-          node-version: 22
+          node-version: 24.15.0
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
           turbo-team: ${{ vars.TURBO_TEAM }}

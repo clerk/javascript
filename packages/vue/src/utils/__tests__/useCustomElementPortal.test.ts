@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { h, Teleport } from 'vue';
 
 import { useCustomElementPortal } from '../useCustomElementPortal';

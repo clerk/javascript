@@ -152,6 +152,20 @@ describe('Token', () => {
       const [url] = (global.fetch as Mock).mock.calls[0];
       expect(url.toString()).not.toContain('debug=skip_cache');
     });
+
+    it('includes force_origin=true in POST body when provided', async () => {
+      mockFetch(true, 200, {
+        object: 'token',
+        jwt: mockJwt,
+      });
+      BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
+
+      await Token.create('/path/to/tokens', { forceOrigin: 'true' });
+
+      const [url, options] = (global.fetch as Mock).mock.calls[0];
+      expect(options.body).toContain('force_origin=true');
+      expect(url.toString()).not.toContain('force_origin');
+    });
   });
 
   describe('create with search parameters', () => {

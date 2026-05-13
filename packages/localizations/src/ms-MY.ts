@@ -178,6 +178,15 @@ export const msMY: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'Hubungi pentadbir organisasi anda untuk mendapatkan kebenaran mengurus sambungan perusahaan.',
+      title: 'Anda tidak mempunyai kebenaran untuk mengurus sambungan perusahaan',
+    },
+    navbar: {
+      title: 'Konfigurasi Log Masuk Tunggal (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Cipta organisasi',
     invitePage: {
@@ -1367,6 +1376,7 @@ export const msMY: LocalizationResource = {
         title: 'Alamat e-mel',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Sambung akaun',
         title: 'Akaun perusahaan',
       },
       headerTitle__account: 'Butiran profil',

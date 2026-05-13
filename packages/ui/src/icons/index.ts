@@ -13,6 +13,7 @@ export { default as ArrowsUpDown } from './arrows-up-down.svg';
 export { default as AuthApp } from './auth-app.svg';
 export { default as Billing } from './billing.svg';
 export { default as Block } from './block.svg';
+export { default as BoxIcon } from './box.svg';
 export { default as Caret } from './caret.svg';
 export { default as CaretLeft } from './caret-left.svg';
 export { default as CaretRight } from './caret-right.svg';

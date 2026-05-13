@@ -22,13 +22,11 @@ Core Package Categories
 - **Backend**: `@clerk/backend` - Server-side utilities and JWT verification
 - **Shared Utilities**: `@clerk/shared`, `@clerk/types` - Common utilities and TypeScript types
 - **Developer Tools**: `@clerk/testing`, `@clerk/dev-cli`, `@clerk/upgrade`
-- **Specialized**: `@clerk/agent-toolkit` - AI agent integration tools
 
 Directory Structure
 
 - `packages/` - All publishable packages
 - `integration/` - End-to-end tests and integration templates
-- `playground/` - Development and testing applications
 - `docs/` - Documentation and contribution guides
 - `scripts/` - Build and automation scripts
 - `tools/` - Internal development tools

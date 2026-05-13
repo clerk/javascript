@@ -1,4 +1,5 @@
 import { astro } from './astro';
+import { chromeExtension } from './chrome-extension';
 import { customFlows } from './custom-flows';
 import { envs, instanceKeys } from './envs';
 import { expo } from './expo';
@@ -14,6 +15,7 @@ import { tanstack } from './tanstack';
 import { vue } from './vue';
 
 export const appConfigs = {
+  chromeExtension,
   customFlows,
   envs,
   express,

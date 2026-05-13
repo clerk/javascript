@@ -178,6 +178,16 @@ export const daDK: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        'Kontakt din organisations administrator for at få tilladelse til at administrere virksomhedsforbindelser.',
+      title: 'Du har ikke tilladelse til at administrere virksomhedsforbindelser',
+    },
+    navbar: {
+      title: 'Konfigurer single sign-on (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Opret organisation',
     invitePage: {
@@ -1345,6 +1355,7 @@ export const daDK: LocalizationResource = {
         title: 'E-mailadresser',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Tilknyt konto',
         title: 'Virksomhedskonti',
       },
       headerTitle__account: 'Konto',

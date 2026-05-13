@@ -53,6 +53,18 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'logoBox',
   'logoImage',
 
+  'logoGroup',
+  'logoGroupItem',
+  'logoGroupIcon',
+  'logoGroupSeparator',
+
+  'listGroup',
+  'listGroupHeader',
+  'listGroupHeaderTitle',
+  'listGroupContent',
+  'listGroupItem',
+  'listGroupItemLabel',
+
   'header',
   'headerTitle',
   'headerSubtitle',
@@ -523,6 +535,18 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'enterpriseConnectionsRoot',
   'enterpriseConnectionButton',
   'enterpriseConnectionButtonText',
+
+  'configureSSOHeader',
+  'configureSSOStepper',
+  'configureSSOStepperItem',
+  'configureSSOStepperItemBullet',
+  'configureSSOStepperItemLabel',
+  'configureSSOStepperSeparator',
+  'configureSSOStep',
+  'configureSSOStepCounter',
+  'configureSSOFooter',
+  'configureSSOFooterPreviousButton',
+  'configureSSOFooterContinueButton',
 
   'web3SolanaWalletButtonsRoot',
   'web3SolanaWalletButtons',

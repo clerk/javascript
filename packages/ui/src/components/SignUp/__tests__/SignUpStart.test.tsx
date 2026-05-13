@@ -1,3 +1,4 @@
+import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import type { SignUpResource } from '@clerk/shared/types';
 import { describe, expect, it, vi } from 'vitest';
@@ -44,6 +45,7 @@ describe('SignUpStart', () => {
       render(<SignUpStart />, { wrapper });
       screen.getByText('Email address');
       screen.getByText('Password');
+      screen.getByPlaceholderText('Create a password');
     });
 
     it('enables sign up with phone number and password', async () => {

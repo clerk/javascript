@@ -178,6 +178,16 @@ export const plPL: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        'Skontaktuj się z administratorem swojej organizacji, aby uzyskać uprawnienia do zarządzania połączeniami korporacyjnymi.',
+      title: 'Nie masz uprawnień do zarządzania połączeniami korporacyjnymi',
+    },
+    navbar: {
+      title: 'Skonfiguruj logowanie jednokrotne (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Utwórz organizację',
     invitePage: {
@@ -1357,6 +1367,7 @@ export const plPL: LocalizationResource = {
         title: 'Adresy email',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Połącz konto',
         title: 'Konta firmowe',
       },
       headerTitle__account: 'Konto',

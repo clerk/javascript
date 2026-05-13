@@ -178,6 +178,16 @@ export const ukUA: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        'Зверніться до адміністратора вашої організації, щоб отримати дозвіл на керування корпоративними підключеннями.',
+      title: 'У вас немає дозволу на керування корпоративними підключеннями',
+    },
+    navbar: {
+      title: 'Налаштувати єдиний вхід (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Створити організацію',
     invitePage: {
@@ -1345,6 +1355,7 @@ export const ukUA: LocalizationResource = {
         title: 'Адреси електронної пошти',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Підключити акаунт',
         title: 'Enterprise accounts',
       },
       headerTitle__account: 'Обліковий запис',

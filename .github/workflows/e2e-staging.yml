@@ -37,14 +37,69 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  validate-instances:
-    name: Validate Staging Instances
+  permissions-check:
+    name: Check Permissions
+    if: ${{ github.event_name != 'repository_dispatch' }}
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     steps:
+      - name: Check org membership
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const org = context.repo.owner;
+            const username = process.env.GITHUB_TRIGGERING_ACTOR || context.actor;
+
+            try {
+              const { status } = await github.rest.orgs.checkMembershipForUser({
+                org,
+                username,
+              });
+
+              if (status !== 204) {
+                core.setFailed(`User '${username}' is not a member of the '${org}' organization.`);
+              }
+            } catch (error) {
+              if (error?.status === 404) {
+                core.setFailed(`User '${username}' is not a member of the '${org}' organization.`);
+              } else {
+                core.setFailed(
+                  `Org membership check failed for '${username}' in '${org}' (status: ${error?.status ?? 'unknown'}): ${error?.message ?? 'unknown error'}`
+                );
+              }
+            }
+
+  validate-instances:
+    name: Validate Staging Instances
+    needs: [permissions-check]
+    if: ${{ always() && (needs.permissions-check.result == 'success' || needs.permissions-check.result == 'skipped') }}
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    steps:
+      - name: Normalize inputs
+        id: inputs
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_REF: ${{ github.event.inputs.ref }}
+          PAYLOAD_REF: ${{ github.event.client_payload.ref }}
+        run: |
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "ref=${INPUT_REF:-main}" >> $GITHUB_OUTPUT
+          else
+            echo "ref=${PAYLOAD_REF:-main}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Validate ref
+        env:
+          REF: ${{ steps.inputs.outputs.ref }}
+        run: |
+          if [[ ! "$REF" =~ ^(main|release/.*)$ ]]; then
+            echo "::error::Ref '$REF' is not allowed. Only 'main' and 'release/*' branches are permitted."
+            exit 1
+          fi
+
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.ref || github.event.client_payload.ref || 'main' }}
+          ref: ${{ steps.inputs.outputs.ref }}
           sparse-checkout: scripts/validate-staging-instances.mjs
           fetch-depth: 1
 
@@ -56,6 +111,8 @@ jobs:
 
   integration-tests:
     name: Integration Tests (${{ matrix.test-name }}, ${{ matrix.test-project }})
+    needs: [permissions-check]
+    if: ${{ always() && (needs.permissions-check.result == 'success' || needs.permissions-check.result == 'skipped') }}
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     defaults:
       run:
@@ -64,6 +121,7 @@ jobs:
 
     strategy:
       fail-fast: false
+      max-parallel: 3
       matrix:
         test-name:
           - 'sessions:staging'
@@ -212,6 +270,7 @@ jobs:
         env:
           E2E_DEBUG: '1'
           E2E_STAGING: '1'
+          E2E_WORKERS: '2'
           E2E_SDK_SOURCE: ${{ steps.inputs.outputs.sdk-source }}
           E2E_APP_CLERK_JS_DIR: ${{ runner.temp }}
           E2E_APP_CLERK_UI_DIR: ${{ runner.temp }}
@@ -220,6 +279,7 @@ jobs:
           E2E_PROJECT: ${{ matrix.test-project }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           INTEGRATION_STAGING_INSTANCE_KEYS: ${{ secrets.INTEGRATION_STAGING_INSTANCE_KEYS }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
           NODE_EXTRA_CA_CERTS: ${{ github.workspace }}/integration/certs/rootCA.pem
 
       - name: Upload test-results
@@ -227,7 +287,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ steps.inputs.outputs.artifact-suffix }}
-          path: integration/test-results
+          path: test-results
           retention-days: 1
 
   report:
@@ -282,7 +342,7 @@ jobs:
               ]
             }
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SDK_SLACKER_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.STAGING_E2E_SLACK_WEBHOOK_URL }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
       # Uncomment when clerk_go side is ready

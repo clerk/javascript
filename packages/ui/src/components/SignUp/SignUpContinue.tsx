@@ -81,7 +81,7 @@ function SignUpContinueInternal() {
     password: useFormControl('password', '', {
       type: 'password',
       label: localizationKeys('formFieldLabel__password'),
-      placeholder: localizationKeys('formFieldInputPlaceholder__password'),
+      placeholder: localizationKeys('formFieldInputPlaceholder__signUpPassword'),
       validatePassword: true,
     }),
     legalAccepted: useFormControl('legalAccepted', '', {

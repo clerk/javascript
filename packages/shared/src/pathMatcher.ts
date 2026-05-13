@@ -5,8 +5,46 @@ export type WithPathPatternWildcard<T = string> = `${T & string}(.*)`;
 export type PathPattern = Autocomplete<WithPathPatternWildcard>;
 export type PathMatcherParam = Array<RegExp | PathPattern> | RegExp | PathPattern;
 
+export class MalformedURLError extends Error {
+  public readonly statusCode = 400;
+
+  constructor(pathname: string, cause?: unknown) {
+    super(`Malformed encoding in URL path: ${pathname}`);
+    this.name = 'MalformedURLError';
+    this.cause = cause;
+  }
+}
+
+/**
+ * String-based check for MalformedURLError that works across package bundles
+ * where `instanceof` would fail due to duplicate class identities.
+ */
+export function isMalformedURLError(e: unknown): e is MalformedURLError {
+  return e instanceof Error && e.name === 'MalformedURLError';
+}
+
 const precomputePathRegex = (patterns: Array<string | RegExp>) => {
   return patterns.map(pattern => (pattern instanceof RegExp ? pattern : pathToRegexp(pattern)));
+};
+
+/**
+ * Normalizes a URL path for safe route matching.
+ *
+ * 1. Decodes percent-encoded unreserved characters using decodeURI (not
+ *    decodeURIComponent) so path-reserved delimiters like %2F, %3F, %23
+ *    are preserved — matching how framework routers interpret paths.
+ * 2. Collapses consecutive slashes (e.g. //api/admin → /api/admin) to
+ *    prevent bypass via extra slashes.
+ *
+ * @throws {MalformedURLError} if the path contains invalid percent-encoding
+ */
+export const normalizePath = (pathname: string): string => {
+  try {
+    pathname = decodeURI(pathname);
+  } catch (e) {
+    throw new MalformedURLError(pathname, e);
+  }
+  return pathname.replace(/\/\/+/g, '/');
 };
 
 /**
@@ -18,5 +56,5 @@ const precomputePathRegex = (patterns: Array<string | RegExp>) => {
 export const createPathMatcher = (patterns: PathMatcherParam) => {
   const routePatterns = [patterns || ''].flat().filter(Boolean);
   const matchers = precomputePathRegex(routePatterns);
-  return (pathname: string) => matchers.some(matcher => matcher.test(pathname));
+  return (pathname: string) => matchers.some(matcher => matcher.test(normalizePath(pathname)));
 };

@@ -178,6 +178,15 @@ export const kkKZ: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'Корпоративтік қосылыстарды басқару рұқсаттарын алу үшін ұйым әкімшісіне хабарласыңыз.',
+      title: 'Сізде корпоративтік қосылыстарды басқаруға рұқсат жоқ',
+    },
+    navbar: {
+      title: 'Бірыңғай кіруді конфигурациялау (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Ұйым құру',
     invitePage: {
@@ -1327,6 +1336,7 @@ export const kkKZ: LocalizationResource = {
         title: 'Электрондық пошталар',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Есептік жазбаны қосу',
         title: 'Кәсіпорын есептік жазбалары',
       },
       headerTitle__account: 'Профиль мәліметтері',

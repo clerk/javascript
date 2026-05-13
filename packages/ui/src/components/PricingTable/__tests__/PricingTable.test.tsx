@@ -302,6 +302,47 @@ describe('PricingTable - plans visibility', () => {
     pathRoot: '',
     reload: vi.fn(),
   } as const;
+  const seatLimitedOrganizationPlan = {
+    ...testPlan,
+    id: 'plan_org_target',
+    name: 'Organization Plan',
+    slug: 'organization-plan',
+    forPayerType: 'org',
+    unitPrices: [
+      {
+        name: 'seats',
+        blockSize: 1,
+        tiers: [
+          {
+            id: 'tier_org_target_1',
+            startsAtBlock: 1,
+            endsAfterBlock: 20,
+            feePerBlock: testPlan.fee,
+          },
+        ],
+      },
+    ],
+  } as const;
+  const currentOrganizationPlan = {
+    ...seatLimitedOrganizationPlan,
+    id: 'plan_org_current',
+    name: 'Current Organization Plan',
+    slug: 'current-organization-plan',
+    unitPrices: [
+      {
+        name: 'seats',
+        blockSize: 1,
+        tiers: [
+          {
+            id: 'tier_org_current_1',
+            startsAtBlock: 1,
+            endsAfterBlock: 50,
+            feePerBlock: testPlan.fee,
+          },
+        ],
+      },
+    ],
+  } as const;
 
   it('shows no plans when user is signed in but has no subscription', async () => {
     const { wrapper, fixtures, props } = await createFixtures(f => {
@@ -579,6 +620,128 @@ describe('PricingTable - plans visibility', () => {
       // Ensure subscription called with active org
       expect(fixtures.clerk.billing.getSubscription).toHaveBeenCalledWith(expect.objectContaining({ orgId: 'Org1' }));
     });
+  });
+
+  it('disables switching to an organization plan when the active org exceeds its seat limit', async () => {
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withBilling();
+      f.withOrganizations();
+      f.withUser({
+        email_addresses: ['test@clerk.com'],
+        organization_memberships: [
+          {
+            name: 'Org1',
+            permissions: ['org:sys_billing:manage'],
+            members_count: 17,
+            pending_invitations_count: 4,
+          },
+        ],
+      });
+    });
+
+    props.setProps({ for: 'organization' } as any);
+
+    fixtures.clerk.billing.getStatements.mockRejectedValue();
+    fixtures.clerk.organization.getPaymentMethods.mockRejectedValue();
+    fixtures.clerk.billing.getPlans.mockResolvedValue({ data: [seatLimitedOrganizationPlan as any], total_count: 1 });
+    fixtures.clerk.billing.getSubscription.mockResolvedValue({
+      id: 'sub_org_active',
+      status: 'active',
+      activeAt: new Date('2021-01-01'),
+      createdAt: new Date('2021-01-01'),
+      nextPayment: null,
+      pastDueAt: null,
+      updatedAt: null,
+      subscriptionItems: [
+        {
+          id: 'si_org_active',
+          plan: currentOrganizationPlan,
+          createdAt: new Date('2021-01-01'),
+          paymentMethodId: 'src_1',
+          pastDueAt: null,
+          canceledAt: null,
+          periodStart: new Date('2021-01-01'),
+          periodEnd: new Date('2021-01-31'),
+          planPeriod: 'month' as const,
+          status: 'active' as const,
+          isFreeTrial: false,
+          cancel: vi.fn(),
+          pathRoot: '',
+          reload: vi.fn(),
+        },
+      ],
+      pathRoot: '',
+      reload: vi.fn(),
+    });
+
+    const { getByRole } = render(<PricingTable />, { wrapper });
+
+    await waitFor(() => {
+      expect(getByRole('heading', { name: 'Organization Plan' })).toBeVisible();
+    });
+
+    expect(getByRole('button', { name: 'Switch to this plan' })).toBeDisabled();
+  });
+
+  it('keeps switching enabled when the active org is exactly at the plan seat limit', async () => {
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withBilling();
+      f.withOrganizations();
+      f.withUser({
+        email_addresses: ['test@clerk.com'],
+        organization_memberships: [
+          {
+            name: 'Org1',
+            permissions: ['org:sys_billing:manage'],
+            members_count: 17,
+            pending_invitations_count: 3,
+          },
+        ],
+      });
+    });
+
+    props.setProps({ for: 'organization' } as any);
+
+    fixtures.clerk.billing.getStatements.mockRejectedValue();
+    fixtures.clerk.organization.getPaymentMethods.mockRejectedValue();
+    fixtures.clerk.billing.getPlans.mockResolvedValue({ data: [seatLimitedOrganizationPlan as any], total_count: 1 });
+    fixtures.clerk.billing.getSubscription.mockResolvedValue({
+      id: 'sub_org_active',
+      status: 'active',
+      activeAt: new Date('2021-01-01'),
+      createdAt: new Date('2021-01-01'),
+      nextPayment: null,
+      pastDueAt: null,
+      updatedAt: null,
+      subscriptionItems: [
+        {
+          id: 'si_org_active',
+          plan: currentOrganizationPlan,
+          createdAt: new Date('2021-01-01'),
+          paymentMethodId: 'src_1',
+          pastDueAt: null,
+          canceledAt: null,
+          periodStart: new Date('2021-01-01'),
+          periodEnd: new Date('2021-01-31'),
+          planPeriod: 'month' as const,
+          status: 'active' as const,
+          isFreeTrial: false,
+          cancel: vi.fn(),
+          pathRoot: '',
+          reload: vi.fn(),
+        },
+      ],
+      pathRoot: '',
+      reload: vi.fn(),
+    });
+
+    const { getByRole } = render(<PricingTable />, { wrapper });
+
+    await waitFor(() => {
+      expect(getByRole('heading', { name: 'Organization Plan' })).toBeVisible();
+    });
+
+    expect(getByRole('button', { name: 'Switch to this plan' })).toBeEnabled();
   });
 
   it('fetches user plans and renders when using for: user', async () => {

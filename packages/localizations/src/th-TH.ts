@@ -182,6 +182,15 @@ export const thTH: LocalizationResource = {
     viewPayment: 'ดูการชำระเงิน',
     year: 'ปี',
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'ติดต่อผู้ดูแลระบบขององค์กรของคุณเพื่อขอสิทธิ์ในการจัดการการเชื่อมต่อระดับองค์กร',
+      title: 'คุณไม่มีสิทธิ์จัดการการเชื่อมต่อระดับองค์กร',
+    },
+    navbar: {
+      title: 'กำหนดค่าการลงชื่อเข้าใช้แบบครั้งเดียว (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'สร้างองค์กร',
     invitePage: {
@@ -1340,6 +1349,7 @@ export const thTH: LocalizationResource = {
         title: 'ที่อยู่อีเมล',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'เชื่อมต่อบัญชี',
         title: 'บัญชีองค์กร',
       },
       headerTitle__account: 'รายละเอียดโปรไฟล์',

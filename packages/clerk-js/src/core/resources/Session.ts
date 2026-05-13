@@ -29,6 +29,7 @@ import type {
   SessionResource,
   SessionStatus,
   SessionTask,
+  SessionTouchParams,
   SessionVerificationJSON,
   SessionVerificationResource,
   SessionVerifyAttemptFirstFactorParams,
@@ -104,14 +105,16 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   private _touchPost = async (
-    { skipUpdateClient }: { skipUpdateClient: boolean } = { skipUpdateClient: false },
+    { intent, skipUpdateClient }: { intent?: SessionTouchParams['intent']; skipUpdateClient: boolean } = {
+      skipUpdateClient: false,
+    },
   ): Promise<FapiResponseJSON<SessionJSON> | null> => {
     const json = await BaseResource._fetch<SessionJSON>(
       {
         method: 'POST',
         path: this.path('touch'),
         // any is how we type the body in the BaseMutateParams as well
-        body: { active_organization_id: this.lastActiveOrganizationId } as any,
+        body: { active_organization_id: this.lastActiveOrganizationId, intent } as any,
       },
       { skipUpdateClient },
     );
@@ -122,8 +125,8 @@ export class Session extends BaseResource implements SessionResource {
     return json;
   };
 
-  touch = async (): Promise<SessionResource> => {
-    await this._touchPost();
+  touch = async ({ intent }: SessionTouchParams = {}): Promise<SessionResource> => {
+    await this._touchPost({ intent, skipUpdateClient: false });
 
     // _touchPost() will have updated `this` in-place
     // The post has potentially changed the session state, and so we need to ensure we emit the updated token that comes back in the response. This avoids potential issues where the session cookie is out of sync with the current session state.
@@ -144,8 +147,8 @@ export class Session extends BaseResource implements SessionResource {
    *
    * @internal
    */
-  __internal_touch = async (): Promise<ClientResource | undefined> => {
-    const json = await this._touchPost({ skipUpdateClient: true });
+  __internal_touch = async ({ intent }: SessionTouchParams = {}): Promise<ClientResource | undefined> => {
+    const json = await this._touchPost({ intent, skipUpdateClient: true });
     return getClientResourceFromPayload(json);
   };
 
@@ -199,7 +202,7 @@ export class Session extends BaseResource implements SessionResource {
     return createCheckAuthorization({
       userId: this.user?.id,
       factorVerificationAge: this.factorVerificationAge,
-      orgId: activeMembership?.id,
+      orgId: activeMembership?.organization?.id,
       orgRole: activeMembership?.role,
       orgPermissions: activeMembership?.permissions,
       features: (this.lastActiveToken?.jwt?.claims.fea as string) || '',
@@ -484,17 +487,28 @@ export class Session extends BaseResource implements SessionResource {
   ): Promise<TokenResource> {
     const path = template ? `${this.path()}/tokens/${template}` : `${this.path()}/tokens`;
     // TODO: update template endpoint to accept organizationId
-    const params: Record<string, string | null> = template ? {} : { organizationId: organizationId ?? null };
-    const lastActiveToken = this.lastActiveToken?.getRawString();
+    const sessionMinterEnabled = Session.clerk?.__internal_environment?.authConfig?.sessionMinter;
+    const params: Record<string, string | null> = template
+      ? {}
+      : {
+          organizationId: organizationId ?? null,
+          ...(sessionMinterEnabled && this.lastActiveToken ? { token: this.lastActiveToken.getRawString() } : {}),
+          ...(sessionMinterEnabled && skipCache ? { forceOrigin: 'true' } : {}),
+        };
 
-    const tokenResolver = Token.create(path, params, skipCache ? { debug: 'skip_cache' } : undefined).catch(e => {
+    if (sessionMinterEnabled) {
+      // Session Minter sends the token in the body, no expired_token retry needed
+      return Token.create(path, params, skipCache ? { debug: 'skip_cache' } : undefined);
+    }
+
+    // TODO: Remove this expired_token retry flow when the sessionMinter flag is removed
+    const lastActiveToken = this.lastActiveToken?.getRawString();
+    return Token.create(path, params, skipCache ? { debug: 'skip_cache' } : undefined).catch(e => {
       if (MissingExpiredTokenError.is(e) && lastActiveToken) {
         return Token.create(path, { ...params }, { expired_token: lastActiveToken });
       }
       throw e;
     });
-
-    return tokenResolver;
   }
 
   #dispatchTokenEvents(token: TokenResource, shouldDispatch: boolean): void {
@@ -569,6 +583,20 @@ export class Session extends BaseResource implements SessionResource {
     }
 
     Session.#backgroundRefreshInProgress.add(tokenId);
+
+    // Mobile only: skip this refresh if the token is already expired.
+    // On iOS, the OS throttles background JS threads for hours (e.g. overnight audio apps).
+    // The refresh timer fires late — well past token expiry — with stale credentials.
+    // If we send that request, the 401 response triggers handleUnauthenticated(), which
+    // destroys the session even though it's still valid on the server (30-day lifetime).
+    // Instead, bail out here and let the next foreground getToken() call recover normally.
+    const experimental = Session.clerk?.__internal_getOption?.('experimental');
+    const isHeadless = experimental?.runtimeEnvironment === 'headless';
+    const lastTokenExp = this.lastActiveToken?.jwt?.claims?.exp;
+    if (isHeadless && lastTokenExp && Date.now() / 1000 > lastTokenExp) {
+      Session.#backgroundRefreshInProgress.delete(tokenId);
+      return;
+    }
 
     const tokenResolver = this.#createTokenResolver(template, organizationId, false);
 

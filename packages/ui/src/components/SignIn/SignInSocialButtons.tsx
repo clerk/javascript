@@ -9,9 +9,7 @@ import { handleError as _handleError } from '@/ui/utils/errorHandler';
 import { originPrefersPopup } from '@/ui/utils/originPrefersPopup';
 import { web3CallbackErrorHandler } from '@/ui/utils/web3CallbackErrorHandler';
 
-import { buildSSOCallbackURL } from '../../common/redirects';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
-import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { useCardState } from '../../elements/contexts';
 import type { SocialButtonsProps } from '../../elements/SocialButtons';
 import { SocialButtons } from '../../elements/SocialButtons';
@@ -25,10 +23,9 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
   const clerk = useClerk();
   const { navigate } = useRouter();
   const card = useCardState();
-  const { displayConfig } = useEnvironment();
   const ctx = useSignInContext();
   const signIn = useCoreSignIn();
-  const redirectUrl = buildSSOCallbackURL(ctx, displayConfig.signInUrl);
+  const redirectUrl = ctx.ssoCallbackUrl;
   const redirectUrlComplete = ctx.afterSignInUrl || '/';
   const shouldUsePopup = ctx.oauthFlow === 'popup' || (ctx.oauthFlow === 'auto' && originPrefersPopup());
   const { onAlternativePhoneCodeProviderClick, ...rest } = props;

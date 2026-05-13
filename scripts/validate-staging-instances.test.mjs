@@ -158,6 +158,13 @@ describe('diffObjects', () => {
     expect(result).toEqual([{ path: 'a', prod: 1, staging: undefined }]);
   });
 
+  it('treats undefined and false as equivalent', () => {
+    expect(diffObjects({ a: undefined }, { a: false })).toEqual([]);
+    expect(diffObjects({ a: false }, { a: undefined })).toEqual([]);
+    expect(diffObjects({ a: null }, { a: false })).toEqual([]);
+    expect(diffObjects({ a: 0 }, { a: false })).toEqual([]);
+  });
+
   it('detects nested mismatches with correct paths', () => {
     const result = diffObjects({ a: { b: { c: 1 } } }, { a: { b: { c: 2 } } });
     expect(result).toEqual([{ path: 'a.b.c', prod: 1, staging: 2 }]);
@@ -222,9 +229,7 @@ describe('collapseAttributeMismatches', () => {
       { path: 'user_settings.attributes.phone_number.verifications', prod: ['phone_code'], staging: [] },
     ];
     const result = collapseAttributeMismatches(mismatches);
-    expect(result).toEqual([
-      { path: 'user_settings.attributes.phone_number.enabled', prod: true, staging: false },
-    ]);
+    expect(result).toEqual([{ path: 'user_settings.attributes.phone_number.enabled', prod: true, staging: false }]);
   });
 
   it('keeps child diffs when .enabled does NOT differ', () => {
@@ -279,9 +284,7 @@ describe('collapseSocialMismatches', () => {
       { path: 'user_settings.social.google.strategy', prod: 'oauth_google', staging: undefined },
     ];
     const result = collapseSocialMismatches(mismatches);
-    expect(result).toEqual([
-      { path: 'user_settings.social.google', prod: { enabled: true }, staging: undefined },
-    ]);
+    expect(result).toEqual([{ path: 'user_settings.social.google', prod: { enabled: true }, staging: undefined }]);
   });
 
   it('collapses child diffs for extra social provider on staging', () => {
@@ -290,9 +293,7 @@ describe('collapseSocialMismatches', () => {
       { path: 'user_settings.social.github.enabled', prod: undefined, staging: true },
     ];
     const result = collapseSocialMismatches(mismatches);
-    expect(result).toEqual([
-      { path: 'user_settings.social.github', prod: undefined, staging: { enabled: true } },
-    ]);
+    expect(result).toEqual([{ path: 'user_settings.social.github', prod: undefined, staging: { enabled: true } }]);
   });
 
   it('keeps child diffs when both prod and staging have the provider', () => {
@@ -306,9 +307,7 @@ describe('collapseSocialMismatches', () => {
   });
 
   it('does not affect non-social mismatches', () => {
-    const mismatches = [
-      { path: 'auth_config.session_token_ttl', prod: 3600, staging: 7200 },
-    ];
+    const mismatches = [{ path: 'auth_config.session_token_ttl', prod: 3600, staging: 7200 }];
     const result = collapseSocialMismatches(mismatches);
     expect(result).toEqual(mismatches);
   });
@@ -353,6 +352,18 @@ describe('fetchEnvironment', () => {
     await expect(fetchEnvironment('clerk.example.com')).rejects.toThrow('Network failure');
   });
 });
+
+// ── Helpers ─────────────────────────────────────────────────────────────────
+
+function makePk(domain) {
+  const encoded = Buffer.from(domain + '$').toString('base64');
+  return `pk_test_${encoded}`;
+}
+
+const PROD_DOMAIN = 'clerk.example.accounts.dev';
+const STAGING_DOMAIN = 'clerk.example.accountsstage.dev';
+const PROD_PK = makePk(PROD_DOMAIN);
+const STAGING_PK = makePk(STAGING_DOMAIN);
 
 // ── main orchestration ──────────────────────────────────────────────────────
 
@@ -420,15 +431,11 @@ describe('main', () => {
   });
 
   it('reports matched pairs when environments are identical', async () => {
-    const domain = 'clerk.example.com';
-    const encoded = Buffer.from(domain + '$').toString('base64');
-    const pk = `pk_test_${encoded}`;
-
     process.env.INTEGRATION_INSTANCE_KEYS = JSON.stringify({
-      myapp: { pk },
+      myapp: { pk: PROD_PK },
     });
     process.env.INTEGRATION_STAGING_INSTANCE_KEYS = JSON.stringify({
-      'clerkstage-myapp': { pk },
+      'clerkstage-myapp': { pk: STAGING_PK },
     });
 
     const envResponse = {
@@ -447,15 +454,11 @@ describe('main', () => {
   });
 
   it('reports mismatches when environments differ', async () => {
-    const domain = 'clerk.example.com';
-    const encoded = Buffer.from(domain + '$').toString('base64');
-    const pk = `pk_test_${encoded}`;
-
     process.env.INTEGRATION_INSTANCE_KEYS = JSON.stringify({
-      myapp: { pk },
+      myapp: { pk: PROD_PK },
     });
     process.env.INTEGRATION_STAGING_INSTANCE_KEYS = JSON.stringify({
-      'clerkstage-myapp': { pk },
+      'clerkstage-myapp': { pk: STAGING_PK },
     });
 
     const prodEnv = {
@@ -482,15 +485,11 @@ describe('main', () => {
   });
 
   it('reports fetch failures in summary', async () => {
-    const domain = 'clerk.example.com';
-    const encoded = Buffer.from(domain + '$').toString('base64');
-    const pk = `pk_test_${encoded}`;
-
     process.env.INTEGRATION_INSTANCE_KEYS = JSON.stringify({
-      myapp: { pk },
+      myapp: { pk: PROD_PK },
     });
     process.env.INTEGRATION_STAGING_INSTANCE_KEYS = JSON.stringify({
-      'clerkstage-myapp': { pk },
+      'clerkstage-myapp': { pk: STAGING_PK },
     });
 
     vi.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('timeout'));
@@ -500,17 +499,26 @@ describe('main', () => {
     expect(consoleLogs.some(m => m.includes('1 failed to fetch'))).toBe(true);
   });
 
-  it('reports key load errors in summary', async () => {
-    const domain = 'clerk.example.com';
-    const encoded = Buffer.from(domain + '$').toString('base64');
-    const pk = `pk_test_${encoded}`;
-
+  it('skips staging keys with non-staging domains', async () => {
     process.env.INTEGRATION_INSTANCE_KEYS = JSON.stringify({
-      myapp: { pk },
+      myapp: { pk: PROD_PK },
+    });
+    // Staging key points to a prod domain instead of accountsstage.dev
+    process.env.INTEGRATION_STAGING_INSTANCE_KEYS = JSON.stringify({
+      'clerkstage-myapp': { pk: PROD_PK },
+    });
+
+    await expect(main()).rejects.toThrow('process.exit(0)');
+    expect(consoleErrors.some(m => m.includes('not a staging domain'))).toBe(true);
+  });
+
+  it('reports key load errors in summary', async () => {
+    process.env.INTEGRATION_INSTANCE_KEYS = JSON.stringify({
+      myapp: { pk: PROD_PK },
       bad_entry: 'not_an_object',
     });
     process.env.INTEGRATION_STAGING_INSTANCE_KEYS = JSON.stringify({
-      'clerkstage-myapp': { pk },
+      'clerkstage-myapp': { pk: STAGING_PK },
     });
 
     const envResponse = {

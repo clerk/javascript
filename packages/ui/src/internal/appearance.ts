@@ -181,6 +181,18 @@ export type ElementsConfig = {
   logoBox: WithOptions;
   logoImage: WithOptions;
 
+  logoGroup: WithOptions;
+  logoGroupItem: WithOptions;
+  logoGroupIcon: WithOptions;
+  logoGroupSeparator: WithOptions;
+
+  listGroup: WithOptions;
+  listGroupHeader: WithOptions;
+  listGroupHeaderTitle: WithOptions;
+  listGroupContent: WithOptions;
+  listGroupItem: WithOptions;
+  listGroupItemLabel: WithOptions;
+
   header: WithOptions;
   headerTitle: WithOptions;
   headerSubtitle: WithOptions;
@@ -660,6 +672,18 @@ export type ElementsConfig = {
   enterpriseConnectionButton: WithOptions;
   enterpriseConnectionButtonText: WithOptions;
 
+  configureSSOHeader: WithOptions;
+  configureSSOStepper: WithOptions;
+  configureSSOStepperItem: WithOptions<string, ActiveState>;
+  configureSSOStepperItemBullet: WithOptions<string, ActiveState>;
+  configureSSOStepperItemLabel: WithOptions<string>;
+  configureSSOStepperSeparator: WithOptions;
+  configureSSOStep: WithOptions<string>;
+  configureSSOStepCounter: WithOptions;
+  configureSSOFooter: WithOptions;
+  configureSSOFooterPreviousButton: WithOptions;
+  configureSSOFooterContinueButton: WithOptions;
+
   web3SolanaWalletButtonsRoot: WithOptions;
   web3SolanaWalletButtons: WithOptions;
   web3SolanaWalletButtonsIconButton: WithOptions<string, LoadingState>;
@@ -1002,6 +1026,7 @@ export type CheckoutTheme = Theme;
 export type PlanDetailTheme = Theme;
 export type SubscriptionDetailsTheme = Theme;
 export type APIKeysTheme = Theme;
+export type __experimental_ConfigureSSOTheme = Theme;
 export type OAuthConsentTheme = Theme;
 export type TaskChooseOrganizationTheme = Theme;
 export type TaskResetPasswordTheme = Theme;
@@ -1078,6 +1103,10 @@ export type Appearance<T = Theme> = T &
      * Theme overrides that only apply to the `<APIKeys />` component
      */
     apiKeys?: T;
+    /**
+     * Theme overrides that only apply to the `<ConfigureSSO />` component
+     */
+    __experimental_configureSSO?: T;
     /**
      * Theme overrides that only apply to the `<OAuthConsent />` component
      */
