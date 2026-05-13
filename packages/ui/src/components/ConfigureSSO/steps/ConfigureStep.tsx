@@ -439,7 +439,7 @@ export const ConfigureAttributesSubStep = (): JSX.Element => {
                         />
 
                         <Badge
-                          colorScheme={row.isRequired ? 'warning' : undefined}
+                          colorScheme={row.isRequired ? 'warning' : 'primary'}
                           localizationKey={localizationKeys(
                             row.isRequired
                               ? 'configureSSO.configureStep.attributeMapping.badges.required'
@@ -538,7 +538,7 @@ export const ConfigureAttributesSubStep = (): JSX.Element => {
                     margin: 0,
                     marginTop: theme.space.$1,
                     paddingInlineStart: theme.space.$5,
-                    listStyleType: 'disc',
+                    listStyleType: '"- "',
                   })}
                 >
                   {ATTRIBUTE_PAIRS.map(pair => (
