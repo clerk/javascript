@@ -11,6 +11,13 @@ import { Step } from '../elements/Step';
 import { useWizard } from '../elements/Wizard';
 import type { ProviderType } from '../types';
 
+/**
+ * Provider icons whose SVGs are monochromatic and should flip with the
+ * theme. Mirrors the SUPPORTS_MASK_IMAGE list in `common/ProviderIcon.tsx`
+ * — keep in sync if either grows.
+ */
+const MONOCHROMATIC_PROVIDER_ICONS: ReadonlySet<string> = new Set(['okta']);
+
 const PROVIDER_GROUPS: ReadonlyArray<{
   id: 'saml';
   label: LocalizationKey;
@@ -194,14 +201,27 @@ const ProviderCard = ({ name, value, iconId, label, checked, onChange }: Provide
 
       <Span
         aria-hidden
-        sx={theme => ({
-          width: theme.sizes.$8,
-          height: theme.sizes.$8,
-          backgroundImage: `url(${iconImageUrl(iconId)})`,
-          backgroundSize: 'contain',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-        })}
+        sx={theme => {
+          const isMonochromatic = MONOCHROMATIC_PROVIDER_ICONS.has(iconId);
+          const baseSize = { width: theme.sizes.$8, height: theme.sizes.$8 };
+          if (isMonochromatic) {
+            return {
+              ...baseSize,
+              backgroundColor: theme.colors.$colorForeground,
+              maskImage: `url(${iconImageUrl(iconId)})`,
+              maskSize: 'contain',
+              maskPosition: 'center',
+              maskRepeat: 'no-repeat',
+            };
+          }
+          return {
+            ...baseSize,
+            backgroundImage: `url(${iconImageUrl(iconId)})`,
+            backgroundSize: 'contain',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+          };
+        }}
       />
 
       <Text
