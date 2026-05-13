@@ -1395,6 +1395,93 @@ export type __internal_LocalizationResource = {
           };
         };
       };
+      configureAttributes: {
+        attributeMapping: {
+          title: LocalizationValue;
+          columns: {
+            attribute: LocalizationValue;
+            claimName: LocalizationValue;
+          };
+          badges: {
+            required: LocalizationValue;
+            optional: LocalizationValue;
+          };
+          rows: {
+            email: {
+              attribute: LocalizationValue;
+              claim: LocalizationValue;
+            };
+            firstName: {
+              attribute: LocalizationValue;
+              claim: LocalizationValue;
+            };
+            lastName: {
+              attribute: LocalizationValue;
+              claim: LocalizationValue;
+            };
+          };
+        };
+        verifyMappings: {
+          paragraph: LocalizationValue;
+          step1: {
+            prefix: LocalizationValue;
+            bold: LocalizationValue;
+            suffix: LocalizationValue;
+          };
+          step2: {
+            prefix: LocalizationValue;
+            bold: LocalizationValue;
+            middle: LocalizationValue;
+            code: LocalizationValue;
+            suffix: LocalizationValue;
+          };
+          step3: {
+            prefix: LocalizationValue;
+            bold: LocalizationValue;
+            middle: LocalizationValue;
+            code: LocalizationValue;
+            suffix: LocalizationValue;
+          };
+          step4: {
+            prefix: LocalizationValue;
+            bold: LocalizationValue;
+            suffix: LocalizationValue;
+          };
+          step5: {
+            prefix: LocalizationValue;
+            bold: LocalizationValue;
+            middle: LocalizationValue;
+            code: LocalizationValue;
+            suffix: LocalizationValue;
+          };
+          step6: {
+            prefix: LocalizationValue;
+            bold: LocalizationValue;
+            middle: LocalizationValue;
+            code: LocalizationValue;
+            suffix: LocalizationValue;
+          };
+          step7: {
+            prefix: LocalizationValue;
+            bold: LocalizationValue;
+            suffix: LocalizationValue;
+          };
+          step8: {
+            prefix: LocalizationValue;
+            bold: LocalizationValue;
+            middle: LocalizationValue;
+            code: LocalizationValue;
+            suffix: LocalizationValue;
+          };
+          step9: {
+            prefix: LocalizationValue;
+            bold: LocalizationValue;
+            middle: LocalizationValue;
+            code: LocalizationValue;
+            suffix: LocalizationValue;
+          };
+        };
+      };
       metadataUrl: {
         label: LocalizationValue;
         placeholder: LocalizationValue;

@@ -1,4 +1,20 @@
-import { Col, descriptors, Flow, Heading, type LocalizationKey, localizationKeys, Text } from '@/customizables';
+import {
+  Badge,
+  Col,
+  descriptors,
+  Flex,
+  Flow,
+  Heading,
+  type LocalizationKey,
+  localizationKeys,
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
+} from '@/customizables';
 import { ClipboardInput } from '@/elements/ClipboardInput';
 import { useCardState } from '@/elements/contexts';
 import { Form } from '@/elements/Form';
@@ -80,6 +96,61 @@ const InstructionStep = ({ prefix, bold, suffix }: InstructionStepKeys): JSX.Ele
       colorScheme='inherit'
       sx={theme => ({ fontWeight: theme.fontWeights.$medium, color: theme.colors.$colorMutedForeground })}
       localizationKey={bold}
+    />
+    <Text
+      as='span'
+      variant='body'
+      colorScheme='inherit'
+      localizationKey={suffix}
+    />
+  </Text>
+);
+
+type InstructionStepWithCodeKeys = {
+  prefix: LocalizationKey;
+  bold: LocalizationKey;
+  middle: LocalizationKey;
+  code: LocalizationKey;
+  suffix: LocalizationKey;
+};
+
+const InstructionStepWithCode = ({ prefix, bold, middle, code, suffix }: InstructionStepWithCodeKeys): JSX.Element => (
+  <Text
+    as='li'
+    variant='body'
+    sx={theme => ({ color: theme.colors.$colorMutedForeground })}
+  >
+    <Text
+      as='span'
+      variant='body'
+      colorScheme='inherit'
+      localizationKey={prefix}
+    />
+    <Text
+      as='span'
+      variant='body'
+      colorScheme='inherit'
+      sx={theme => ({ fontWeight: theme.fontWeights.$medium, color: theme.colors.$colorMutedForeground })}
+      localizationKey={bold}
+    />
+    <Text
+      as='span'
+      variant='body'
+      colorScheme='inherit'
+      localizationKey={middle}
+    />
+    <Text
+      as='span'
+      variant='body'
+      colorScheme='inherit'
+      sx={theme => ({
+        fontFamily: 'monospace',
+        fontSize: theme.fontSizes.$sm,
+        backgroundColor: theme.colors.$neutralAlpha100,
+        borderRadius: theme.radii.$sm,
+        padding: `${theme.space.$0x25} ${theme.space.$1}`,
+      })}
+      localizationKey={code}
     />
     <Text
       as='span'
@@ -245,8 +316,224 @@ export const ConfigureAttributesSubStep = (): JSX.Element => {
   return (
     <>
       <Step.Body>
-        <Step.Section fill>
-          <Text>UI goes here</Text>
+        <Step.Section sx={theme => ({ gap: theme.space.$5 })}>
+          <Col sx={theme => ({ gap: theme.space.$1x5 })}>
+            <Heading
+              as='h3'
+              textVariant='subtitle'
+              localizationKey={localizationKeys(
+                'configureSSO.configureStep.configureAttributes.attributeMapping.title',
+              )}
+            />
+            <Table>
+              <Thead>
+                <Tr>
+                  <Th>
+                    <Text
+                      localizationKey={localizationKeys(
+                        'configureSSO.configureStep.configureAttributes.attributeMapping.columns.attribute',
+                      )}
+                    />
+                  </Th>
+                  <Th>
+                    <Text
+                      localizationKey={localizationKeys(
+                        'configureSSO.configureStep.configureAttributes.attributeMapping.columns.claimName',
+                      )}
+                    />
+                  </Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                <Tr>
+                  <Td>
+                    <Flex
+                      align='center'
+                      sx={theme => ({ gap: theme.space.$2 })}
+                    >
+                      <Text
+                        as='span'
+                        localizationKey={localizationKeys(
+                          'configureSSO.configureStep.configureAttributes.attributeMapping.rows.email.attribute',
+                        )}
+                      />
+                      <Badge
+                        colorScheme='warning'
+                        localizationKey={localizationKeys(
+                          'configureSSO.configureStep.configureAttributes.attributeMapping.badges.required',
+                        )}
+                      />
+                    </Flex>
+                  </Td>
+                  <Td>
+                    <Text
+                      as='span'
+                      sx={theme => ({
+                        fontFamily: 'monospace',
+                        fontSize: theme.fontSizes.$sm,
+                        backgroundColor: theme.colors.$neutralAlpha100,
+                        borderRadius: theme.radii.$sm,
+                        padding: `${theme.space.$0x25} ${theme.space.$1}`,
+                      })}
+                      localizationKey={localizationKeys(
+                        'configureSSO.configureStep.configureAttributes.attributeMapping.rows.email.claim',
+                      )}
+                    />
+                  </Td>
+                </Tr>
+                <Tr>
+                  <Td>
+                    <Flex
+                      align='center'
+                      sx={theme => ({ gap: theme.space.$2 })}
+                    >
+                      <Text
+                        as='span'
+                        localizationKey={localizationKeys(
+                          'configureSSO.configureStep.configureAttributes.attributeMapping.rows.firstName.attribute',
+                        )}
+                      />
+                      <Badge
+                        colorScheme='secondary'
+                        localizationKey={localizationKeys(
+                          'configureSSO.configureStep.configureAttributes.attributeMapping.badges.optional',
+                        )}
+                      />
+                    </Flex>
+                  </Td>
+                  <Td>
+                    <Text
+                      as='span'
+                      sx={theme => ({
+                        fontFamily: 'monospace',
+                        fontSize: theme.fontSizes.$sm,
+                        backgroundColor: theme.colors.$neutralAlpha100,
+                        borderRadius: theme.radii.$sm,
+                        padding: `${theme.space.$0x25} ${theme.space.$1}`,
+                      })}
+                      localizationKey={localizationKeys(
+                        'configureSSO.configureStep.configureAttributes.attributeMapping.rows.firstName.claim',
+                      )}
+                    />
+                  </Td>
+                </Tr>
+                <Tr>
+                  <Td>
+                    <Flex
+                      align='center'
+                      sx={theme => ({ gap: theme.space.$2 })}
+                    >
+                      <Text
+                        as='span'
+                        localizationKey={localizationKeys(
+                          'configureSSO.configureStep.configureAttributes.attributeMapping.rows.lastName.attribute',
+                        )}
+                      />
+                      <Badge
+                        colorScheme='secondary'
+                        localizationKey={localizationKeys(
+                          'configureSSO.configureStep.configureAttributes.attributeMapping.badges.optional',
+                        )}
+                      />
+                    </Flex>
+                  </Td>
+                  <Td>
+                    <Text
+                      as='span'
+                      sx={theme => ({
+                        fontFamily: 'monospace',
+                        fontSize: theme.fontSizes.$sm,
+                        backgroundColor: theme.colors.$neutralAlpha100,
+                        borderRadius: theme.radii.$sm,
+                        padding: `${theme.space.$0x25} ${theme.space.$1}`,
+                      })}
+                      localizationKey={localizationKeys(
+                        'configureSSO.configureStep.configureAttributes.attributeMapping.rows.lastName.claim',
+                      )}
+                    />
+                  </Td>
+                </Tr>
+              </Tbody>
+            </Table>
+          </Col>
+
+          <Col sx={theme => ({ gap: theme.space.$1x5 })}>
+            <Text
+              as='p'
+              variant='body'
+              sx={theme => ({ color: theme.colors.$colorMutedForeground })}
+              localizationKey={localizationKeys(
+                'configureSSO.configureStep.configureAttributes.verifyMappings.paragraph',
+              )}
+            />
+            <Col
+              as='ol'
+              sx={theme => ({
+                gap: theme.space.$1x5,
+                margin: 0,
+                paddingInlineStart: theme.space.$4,
+                listStyleType: 'decimal',
+              })}
+            >
+              <InstructionStep
+                prefix={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step1.prefix')}
+                bold={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step1.bold')}
+                suffix={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step1.suffix')}
+              />
+              <InstructionStepWithCode
+                prefix={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step2.prefix')}
+                bold={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step2.bold')}
+                middle={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step2.middle')}
+                code={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step2.code')}
+                suffix={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step2.suffix')}
+              />
+              <InstructionStepWithCode
+                prefix={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step3.prefix')}
+                bold={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step3.bold')}
+                middle={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step3.middle')}
+                code={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step3.code')}
+                suffix={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step3.suffix')}
+              />
+              <InstructionStep
+                prefix={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step4.prefix')}
+                bold={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step4.bold')}
+                suffix={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step4.suffix')}
+              />
+              <InstructionStepWithCode
+                prefix={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step5.prefix')}
+                bold={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step5.bold')}
+                middle={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step5.middle')}
+                code={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step5.code')}
+                suffix={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step5.suffix')}
+              />
+              <InstructionStepWithCode
+                prefix={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step6.prefix')}
+                bold={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step6.bold')}
+                middle={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step6.middle')}
+                code={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step6.code')}
+                suffix={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step6.suffix')}
+              />
+              <InstructionStep
+                prefix={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step7.prefix')}
+                bold={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step7.bold')}
+                suffix={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step7.suffix')}
+              />
+              <InstructionStepWithCode
+                prefix={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step8.prefix')}
+                bold={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step8.bold')}
+                middle={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step8.middle')}
+                code={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step8.code')}
+                suffix={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step8.suffix')}
+              />
+              <InstructionStepWithCode
+                prefix={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step9.prefix')}
+                bold={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step9.bold')}
+                middle={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step9.middle')}
+                code={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step9.code')}
+                suffix={localizationKeys('configureSSO.configureStep.configureAttributes.verifyMappings.step9.suffix')}
+              />
+            </Col>
+          </Col>
         </Step.Section>
       </Step.Body>
 

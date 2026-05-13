@@ -306,6 +306,94 @@ export const enUS: LocalizationResource = {
           },
         },
       },
+      configureAttributes: {
+        attributeMapping: {
+          title: 'We expect your SAML responses to have the following specific attributes:',
+          columns: {
+            attribute: 'Attribute',
+            claimName: 'Claim Name',
+          },
+          badges: {
+            required: 'Required',
+            optional: 'Optional',
+          },
+          rows: {
+            email: {
+              attribute: 'Email address',
+              claim: 'user.profile.email',
+            },
+            firstName: {
+              attribute: 'First Name',
+              claim: 'user.firstName',
+            },
+            lastName: {
+              attribute: 'Last Name',
+              claim: 'user.lastName',
+            },
+          },
+        },
+        verifyMappings: {
+          paragraph:
+            "These are the defaults and probably won't need you to change them. However, many SAML configuration errors are due to incorrect attribute mappings, so it's worth double-checking. Here's how:",
+          step1: {
+            prefix: 'In the Okta dashboard, find the ',
+            bold: 'Attribute Statements',
+            suffix: ' section.',
+          },
+          step2: {
+            prefix: 'For the ',
+            bold: 'Name',
+            middle: ' field, enter ',
+            code: 'mail',
+            suffix: '',
+          },
+          step3: {
+            prefix: 'For the ',
+            bold: 'Value',
+            middle: ' field, choose ',
+            code: 'user.profile.mail',
+            suffix: ' from the dropdown.',
+          },
+          step4: {
+            prefix: 'Select the ',
+            bold: 'Add Another',
+            suffix: ' button to add another attribute.',
+          },
+          step5: {
+            prefix: 'For the ',
+            bold: 'Name',
+            middle: ' field, enter ',
+            code: 'firstName',
+            suffix: '',
+          },
+          step6: {
+            prefix: 'For the ',
+            bold: 'Value',
+            middle: ' field, choose ',
+            code: 'user.firstName',
+            suffix: ' from the dropdown.',
+          },
+          step7: {
+            prefix: 'Select the ',
+            bold: 'Add Another',
+            suffix: ' button to add another attribute.',
+          },
+          step8: {
+            prefix: 'For the ',
+            bold: 'Name',
+            middle: ' field, enter ',
+            code: 'lastName',
+            suffix: '',
+          },
+          step9: {
+            prefix: 'For the ',
+            bold: 'Value',
+            middle: ' field, choose ',
+            code: 'user.lastName',
+            suffix: ' from the dropdown.',
+          },
+        },
+      },
       metadataUrl: {
         label: 'Metadata URL',
 <<<<<<< HEAD
