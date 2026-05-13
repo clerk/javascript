@@ -450,11 +450,11 @@ export const ConfigureAttributesSubStep = (): JSX.Element => {
                 <Col
                   as='ul'
                   sx={theme => ({
-                    gap: theme.space.$1,
+                    gap: theme.space.$1x5,
                     margin: 0,
-                    marginTop: theme.space.$1,
+                    marginTop: theme.space.$1x5,
                     paddingInlineStart: theme.space.$5,
-                    listStyleType: 'disc',
+                    listStyleType: '"- "',
                   })}
                 >
                   {ATTRIBUTE_PAIRS.map(pair => (
