@@ -1,5 +1,4 @@
 import type { ClerkGlobalHookError } from '../errors/globalHookError';
-
 import type { ClerkUIConstructor } from '../ui/types';
 import type { APIKeysNamespace } from './apiKeys';
 import type {

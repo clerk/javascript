@@ -1,5 +1,4 @@
 import type { ClerkError } from '../errors/clerkError';
-
 import type { SetActiveNavigate } from './clerk';
 import type { DeletedObjectResource } from './deletedObject';
 import type { ClerkPaginatedResponse, ClerkPaginationParams } from './pagination';
