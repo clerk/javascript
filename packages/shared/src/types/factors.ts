@@ -289,9 +289,6 @@ export type EnterpriseSSOConfig = EnterpriseSSOFactor & {
   enterpriseConnectionId?: string;
 };
 
-/**
- *
- */
 export type PhoneCodeSecondFactorConfig = {
   /**
    * The strategy type.
@@ -303,9 +300,6 @@ export type PhoneCodeSecondFactorConfig = {
   phoneNumberId?: string;
 };
 
-/**
- *
- */
 export type EmailCodeSecondFactorConfig = {
   /**
    * The strategy type.

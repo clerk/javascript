@@ -309,7 +309,6 @@ export interface SessionResource extends ClerkResource {
   /**
    * Initiates the reverification flow.
    * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
-   * @skipParametersSection
    */
   startVerification: (params: SessionVerifyCreateParams) => Promise<SessionVerificationResource>;
   /**
@@ -520,7 +519,13 @@ export type GetTokenOptions = {
  */
 export type GetToken = (options?: GetTokenOptions) => Promise<string | null>;
 
+/**
+ *
+ */
 export type SessionVerifyCreateParams = {
+  /**
+   * The level of the verification to create.
+   */
   level: SessionVerificationLevel;
 };
 
