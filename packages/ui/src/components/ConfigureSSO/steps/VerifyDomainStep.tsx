@@ -61,11 +61,11 @@ export const VerifyDomainStep = (): JSX.Element => {
             />
             <Col
               gap={1}
-              sx={t => ({ textAlign: 'center', maxWidth: t.sizes.$66 })}
+              sx={t => ({ textAlign: 'center', maxWidth: t.sizes.$94 })}
             >
               <Heading
                 textVariant='h1'
-                sx={t => ({ fontSize: t.fontSizes.$lg })}
+                sx={t => ({ fontSize: t.fontSizes.$lg, textWrap: 'balance' })}
                 localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.domainTaken.title', {
                   domain: conflictingDomain,
                 })}
@@ -363,7 +363,7 @@ const EmailAlreadyVerified = ({ emailAddress }: { emailAddress: string }): JSX.E
       />
       <Col
         gap={1}
-        sx={t => ({ textAlign: 'center', maxWidth: t.sizes.$66 })}
+        sx={t => ({ textAlign: 'center', maxWidth: t.sizes.$94 })}
       >
         <Heading
           textVariant='h1'
