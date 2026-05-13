@@ -136,7 +136,7 @@ export const CreateAppSubStep = (): JSX.Element => {
     <>
       <Step.Body>
         <Step.Section sx={theme => ({ gap: theme.space.$5 })}>
-          <Col sx={theme => ({ gap: theme.space.$3 })}>
+          <Col sx={theme => ({ gap: theme.space.$1x5 })}>
             <Heading
               as='h3'
               textVariant='subtitle'
@@ -179,7 +179,7 @@ export const CreateAppSubStep = (): JSX.Element => {
             </Col>
           </Col>
 
-          <Col sx={theme => ({ gap: theme.space.$3 })}>
+          <Col sx={theme => ({ gap: theme.space.$1x5 })}>
             <Heading
               as='h3'
               textVariant='subtitle'
@@ -217,7 +217,7 @@ export const CreateAppSubStep = (): JSX.Element => {
             />
           </Form.CommonInputWrapper>
 
-          <Col sx={theme => ({ gap: theme.space.$3 })}>
+          <Col sx={theme => ({ gap: theme.space.$1x5 })}>
             <Heading
               as='h3'
               textVariant='subtitle'
@@ -267,7 +267,7 @@ export const ConfigureAttributesSubStep = (): JSX.Element => {
   return (
     <>
       <Step.Body>
-        <Step.Section sx={theme => ({ gap: theme.space.$5 })}>
+        <Step.Section sx={theme => ({ gap: theme.space.$3 })}>
           <Col sx={theme => ({ gap: theme.space.$3 })}>
             <Heading
               as='h3'
@@ -369,15 +369,14 @@ export const ConfigureAttributesSubStep = (): JSX.Element => {
               >
                 <Text
                   as='span'
-                  colorScheme='inherit'
                   localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.step2')}
                 />
                 <Col
                   as='ul'
                   sx={theme => ({
-                    gap: theme.space.$1,
+                    gap: theme.space.$1x5,
                     margin: 0,
-                    marginTop: theme.space.$1,
+                    marginTop: theme.space.$1x5,
                     paddingInlineStart: theme.space.$5,
                     listStyleType: '"- "',
                   })}
@@ -386,16 +385,16 @@ export const ConfigureAttributesSubStep = (): JSX.Element => {
                     <Text
                       key={pair.id}
                       as='li'
-                      colorScheme='secondary'
                     >
                       <Badge localizationKey={pair.name} />
+
                       <Text
                         as='span'
-                        colorScheme='inherit'
                         localizationKey={localizationKeys(
                           'configureSSO.configureStep.samlOkta.configureAttributes.pairs.conjunction',
                         )}
                       />
+
                       <Badge localizationKey={pair.expression} />
                     </Text>
                   ))}
