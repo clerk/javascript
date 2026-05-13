@@ -1,8 +1,8 @@
 import { getEnvVariable } from '@clerk/shared/getEnvVariable';
 import { Webhook } from 'standardwebhooks';
-import { errorThrower } from './util/shared';
 
 import type { WebhookEvent } from './api/resources/Webhooks';
+import { errorThrower } from './util/shared';
 
 /**
  * @inline

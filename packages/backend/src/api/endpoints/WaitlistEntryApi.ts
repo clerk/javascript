@@ -1,6 +1,6 @@
 import type { ClerkPaginationRequest } from '@clerk/shared/types';
-import { joinPaths } from '../../util/path';
 
+import { joinPaths } from '../../util/path';
 import type { DeletedObject } from '../resources/DeletedObject';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import type { WaitlistEntryStatus } from '../resources/Enums';

@@ -1,6 +1,6 @@
 import type { ClerkPaginationRequest } from '@clerk/shared/types';
-import { joinPaths } from '../../util/path';
 
+import { joinPaths } from '../../util/path';
 import type { DeletedObject, JwtTemplate } from '../resources';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import { AbstractAPI } from './AbstractApi';
