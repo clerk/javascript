@@ -15,8 +15,9 @@ export const stripMarkup = (s: string): string => s.replace(/<\/?(bold)>/g, '');
 
 export const applyMarkupAndTokens = (template: string | undefined, tokens: Tokens): ReactNode => {
   if (!template) return '';
+  const substitute = (s: string) => (s.includes('{{') ? applyTokensToString(s, tokens) : s);
   if (!template.includes('<')) {
-    return applyTokensToString(template, tokens);
+    return substitute(template);
   }
 
   type Frame = { tag: TagName | 'root'; children: ReactNode[] };
@@ -28,7 +29,7 @@ export const applyMarkupAndTokens = (template: string | undefined, tokens: Token
   while ((match = TAG_RE.exec(template)) !== null) {
     const [full, slash, tag] = match;
     const text = template.slice(cursor, match.index);
-    if (text) stack[stack.length - 1].children.push(applyTokensToString(text, tokens));
+    if (text) stack[stack.length - 1].children.push(substitute(text));
     cursor = match.index + full.length;
 
     if (!slash) {
@@ -38,7 +39,7 @@ export const applyMarkupAndTokens = (template: string | undefined, tokens: Token
 
     const top = stack.pop();
     if (!top || top.tag !== tag) {
-      return applyTokensToString(template, tokens);
+      return substitute(template);
     }
     stack[stack.length - 1].children.push(
       createElement(TAGS[top.tag as TagName], { key: match.index }, ...top.children),
@@ -46,11 +47,11 @@ export const applyMarkupAndTokens = (template: string | undefined, tokens: Token
   }
 
   if (stack.length !== 1) {
-    return applyTokensToString(template, tokens);
+    return substitute(template);
   }
 
   const tail = template.slice(cursor);
-  if (tail) stack[0].children.push(applyTokensToString(tail, tokens));
+  if (tail) stack[0].children.push(substitute(tail));
 
   const out = stack[0].children;
   if (out.length === 0) return '';
