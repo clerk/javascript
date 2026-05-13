@@ -1,5 +1,4 @@
 import { iconImageUrl } from '@clerk/shared/constants';
-import { __internal_useUserEnterpriseConnections, useReverification, useSession, useUser } from '@clerk/shared/react';
 import React from 'react';
 
 import type { LocalizationKey } from '@/customizables';
@@ -14,10 +13,8 @@ import {
   Text,
   useLocalizations,
 } from '@/customizables';
-import { useCardState } from '@/elements/contexts';
 import { mqu } from '@/styledSystem';
 import { Alert } from '@/ui/elements/Alert';
-import { handleError } from '@/utils/errorHandler';
 
 import { useConfigureSSO } from '../ConfigureSSOContext';
 import { Step } from '../elements/Step';
@@ -44,54 +41,16 @@ const PROVIDER_GROUPS: ReadonlyArray<{
 ];
 
 export const SelectProviderStep = (): JSX.Element => {
-  const card = useCardState();
   const { goNext } = useWizard();
-  const { setProvider, enterpriseConnection } = useConfigureSSO();
-  const { user } = useUser();
-  const { session } = useSession();
-  const { createEnterpriseConnection } = __internal_useUserEnterpriseConnections();
+  const { setProvider } = useConfigureSSO();
   const [selected, setSelected] = React.useState<ProviderType | null>(null);
 
-  const createConnection = useReverification(
-    React.useCallback(
-      async (selectedProvider: ProviderType) => {
-        if (enterpriseConnection) {
-          return;
-        }
-        if (!user?.primaryEmailAddress) {
-          throw new Error('Primary email required');
-        }
-
-        const emailDomain = user.primaryEmailAddress.emailAddress.split('@')[1];
-        const organizationId = session?.lastActiveOrganizationId ?? null;
-
-        await createEnterpriseConnection({
-          provider: selectedProvider,
-          name: emailDomain,
-          organizationId,
-        });
-      },
-      [enterpriseConnection, user, session, createEnterpriseConnection],
-    ),
-  );
-
-  const handleContinue = async () => {
+  const handleContinue = () => {
     if (!selected) {
       return;
     }
-
     setProvider(selected);
-    card.setError(undefined);
-    card.setLoading();
-
-    try {
-      await createConnection(selected);
-      void goNext();
-    } catch (err) {
-      handleError(err as Error, [], card.setError);
-    } finally {
-      card.setIdle();
-    }
+    void goNext();
   };
 
   return (
@@ -161,16 +120,6 @@ export const SelectProviderStep = (): JSX.Element => {
               variant='warning'
               title={localizationKeys('configureSSO.selectProviderStep.warning')}
             />
-
-            {card.error ? (
-              <Text
-                as='p'
-                variant='body'
-                sx={theme => ({ color: theme.colors.$danger500, fontSize: theme.fontSizes.$sm })}
-              >
-                {card.error}
-              </Text>
-            ) : null}
           </Step.Section>
         </Step.Body>
 
@@ -179,8 +128,7 @@ export const SelectProviderStep = (): JSX.Element => {
 
           <Step.Footer.Continue
             onClick={handleContinue}
-            isLoading={card.isLoading}
-            isDisabled={!selected || card.isLoading}
+            isDisabled={!selected}
           />
         </Step.Footer>
       </Step>
