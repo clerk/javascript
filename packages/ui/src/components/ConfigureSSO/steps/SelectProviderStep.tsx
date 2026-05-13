@@ -14,6 +14,7 @@ import {
   useLocalizations,
 } from '@/customizables';
 import { useCardState } from '@/elements/contexts';
+import { mqu } from '@/styledSystem';
 import { Alert } from '@/ui/elements/Alert';
 import { handleError } from '@/utils/errorHandler';
 
@@ -109,7 +110,12 @@ export const SelectProviderStep = (): JSX.Element => {
 
                 <Grid
                   gap={3}
-                  columns={2}
+                  sx={{
+                    gridTemplateColumns: 'repeat(2, 1fr)',
+                    [mqu.sm]: {
+                      gridTemplateColumns: '1fr',
+                    },
+                  }}
                 >
                   {group.options.map(option => (
                     <ProviderCard
