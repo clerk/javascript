@@ -284,7 +284,7 @@ export const enUS: LocalizationResource = {
       },
       testResults: {
         title: 'Test results',
-        actionLabel__refresh: 'Refresh',
+        actionLabel__refresh: 'Refresh logs',
         polling: 'Waiting for the test run to complete…',
         status__success: 'Success',
         status__failed: 'Failed',
