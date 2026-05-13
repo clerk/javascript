@@ -309,6 +309,7 @@ export interface SessionResource extends ClerkResource {
   /**
    * Initiates the reverification flow.
    * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
+   * @skipParametersSection
    */
   startVerification: (params: SessionVerifyCreateParams) => Promise<SessionVerificationResource>;
   /**
@@ -328,7 +329,7 @@ export interface SessionResource extends ClerkResource {
     attemptFactor: SessionVerifyAttemptFirstFactorParams,
   ) => Promise<SessionVerificationResource>;
   /**
-   * Initiates the [second factor verification](!second-factor-verification) process.
+   * Initiates the [second factor verification](!second-factor-verification) process. This is a required step to complete a reverification flow when using a preparable factor.
    * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
    * @skipParametersSection
    */
@@ -519,9 +520,6 @@ export type GetTokenOptions = {
  */
 export type GetToken = (options?: GetTokenOptions) => Promise<string | null>;
 
-/**
- *
- */
 export type SessionVerifyCreateParams = {
   level: SessionVerificationLevel;
 };
