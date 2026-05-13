@@ -31,6 +31,17 @@ function createJwtWithTtl(iatSeconds: number, ttlSeconds: number): string {
   return `${headerB64}.${payloadB64}.${signature}`;
 }
 
+/**
+ * Helper to create a JWT with custom iat AND oiat header for monotonic-freshness tests
+ */
+function createJwtWithOiat(iatSeconds: number, oiatSeconds: number, ttlSeconds = 60): string {
+  const header = { alg: 'HS256', typ: 'JWT', oiat: oiatSeconds };
+  const payload = { sid: 'session_123', exp: iatSeconds + ttlSeconds, iat: iatSeconds };
+  const b64 = (o: object) =>
+    btoa(JSON.stringify(o)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+  return `${b64(header)}.${b64(payload)}.test-signature`;
+}
+
 describe('SessionTokenCache', () => {
   let mockBroadcastChannel: {
     addEventListener: ReturnType<typeof vi.fn>;
@@ -194,13 +205,18 @@ describe('SessionTokenCache', () => {
     });
 
     it('enforces monotonicity: does not overwrite newer token with older one', () => {
+      // Both tokens carry oiat (the production case post-rollout). Older oiat
+      // broadcast must not clobber the newer one already in cache.
+      const newerJwt = createJwtWithOiat(1666648250, 1666648250);
+      const olderJwt = createJwtWithOiat(1666648190, 1666648190);
+
       const newerEvent: MessageEvent<SessionTokenEvent> = {
         data: {
           organizationId: null,
           sessionId: 'session_123',
           template: undefined,
           tokenId: 'session_123',
-          tokenRaw: mockJwt,
+          tokenRaw: newerJwt,
           traceId: 'test_trace_7',
         },
       } as MessageEvent<SessionTokenEvent>;
@@ -210,9 +226,6 @@ describe('SessionTokenCache', () => {
       expect(resultAfterNewer).toBeDefined();
       const newerCreatedAt = resultAfterNewer?.entry.createdAt;
 
-      // mockJwt has iat: 1666648250, so create an older one with iat: 1666648190 (60 seconds earlier)
-      const olderJwt =
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjY2NDg4NTAsImlhdCI6MTY2NjY0ODE5MH0.Z1BC47lImYvaAtluJlY-kBo0qOoAk42Xb-gNrB2SxJg';
       const olderEvent: MessageEvent<SessionTokenEvent> = {
         data: {
           organizationId: null,
