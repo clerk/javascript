@@ -11,7 +11,7 @@ type TagName = keyof typeof TAGS;
 
 const TAG_RE = /<(\/?)(bold)>/g;
 
-export const stripMarkup = (s: string): string => s.replace(TAG_RE, '');
+export const stripMarkup = (s: string): string => s.replace(/<\/?(bold)>/g, '');
 
 export const applyMarkupAndTokens = (template: string | undefined, tokens: Tokens): ReactNode => {
   if (!template) return '';
@@ -22,7 +22,6 @@ export const applyMarkupAndTokens = (template: string | undefined, tokens: Token
   type Frame = { tag: TagName | 'root'; children: ReactNode[] };
   const stack: Frame[] = [{ tag: 'root', children: [] }];
   let cursor = 0;
-  let keyCounter = 0;
   let match: RegExpExecArray | null;
 
   TAG_RE.lastIndex = 0;
@@ -42,7 +41,7 @@ export const applyMarkupAndTokens = (template: string | undefined, tokens: Token
       return applyTokensToString(template, tokens);
     }
     stack[stack.length - 1].children.push(
-      createElement(TAGS[top.tag as TagName], { key: keyCounter++ }, ...top.children),
+      createElement(TAGS[top.tag as TagName], { key: match.index }, ...top.children),
     );
   }
 

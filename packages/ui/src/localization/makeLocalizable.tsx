@@ -111,15 +111,17 @@ const localizationKeyAttribute = (localizationKey: LocalizationKey) => {
   return localizationKey.key;
 };
 
+const resolveKey = (localizationKey: LocalizationKey, resource: LocalizationResource, globalTokens: GlobalTokens) => ({
+  base: readObjectPath(resource, localizationKey.key) as string,
+  tokens: { ...globalTokens, ...localizationKey.params },
+});
+
 const localizedStringFromKey = (
   localizationKey: LocalizationKey,
   resource: LocalizationResource,
   globalTokens: GlobalTokens,
 ): string => {
-  const key = localizationKey.key;
-  const base = readObjectPath(resource, key) as string;
-  const params = localizationKey.params;
-  const tokens = { ...globalTokens, ...params };
+  const { base, tokens } = resolveKey(localizationKey, resource, globalTokens);
   return applyTokensToString(base || '', tokens);
 };
 
@@ -128,9 +130,6 @@ const localizedNodeFromKey = (
   resource: LocalizationResource,
   globalTokens: GlobalTokens,
 ) => {
-  const key = localizationKey.key;
-  const base = readObjectPath(resource, key) as string;
-  const params = localizationKey.params;
-  const tokens = { ...globalTokens, ...params };
+  const { base, tokens } = resolveKey(localizationKey, resource, globalTokens);
   return applyMarkupAndTokens(base, tokens);
 };
