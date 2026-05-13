@@ -113,10 +113,15 @@ describe('assertAudienceClaim(audience?, aud?)', () => {
 });
 
 describe('assertHeaderType(typ?, allowedTypes?)', () => {
-  it('does not throw error if type is missing', () => {
+  it('does not throw error if type is missing and allowed types are not configured', () => {
     expect(() => assertHeaderType(undefined)).not.toThrow();
-    expect(() => assertHeaderType(undefined, 'JWT')).not.toThrow();
-    expect(() => assertHeaderType(undefined, ['JWT', 'at+jwt'])).not.toThrow();
+  });
+
+  it('throws error if type is missing and allowed types are configured', () => {
+    expect(() => assertHeaderType(undefined, 'JWT')).toThrow(`Invalid JWT type undefined. Expected "JWT".`);
+    expect(() => assertHeaderType(undefined, ['JWT', 'at+jwt'])).toThrow(
+      `Invalid JWT type undefined. Expected "JWT, at+jwt".`,
+    );
   });
 
   it('does not throw error if type matches default allowed type (JWT)', () => {

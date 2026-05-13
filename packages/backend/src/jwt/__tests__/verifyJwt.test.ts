@@ -192,6 +192,22 @@ describe('verifyJwt(jwt, options)', () => {
     expect(error?.message).toContain('Expected "at+jwt"');
   });
 
+  it('rejects JWT with missing type when headerType is configured', async () => {
+    const jwtWithoutTyp = createJwt({
+      header: { typ: undefined },
+    });
+    const inputVerifyJwtOptions = {
+      key: mockJwks.keys[0],
+      issuer: mockJwtPayload.iss,
+      authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
+      headerType: 'at+jwt',
+    };
+    const { errors: [error] = [] } = await verifyJwt(jwtWithoutTyp, inputVerifyJwtOptions);
+    expect(error).toBeDefined();
+    expect(error?.message).toContain('Invalid JWT type undefined');
+    expect(error?.message).toContain('Expected "at+jwt"');
+  });
+
   it('rejects OAuth JWT when headerType does not match', async () => {
     const inputVerifyJwtOptions = {
       key: mockJwks.keys[0],
