@@ -15,7 +15,7 @@ import { noop } from '@clerk/shared/utils';
 import { debugLogger } from '@/utils/debug';
 import { decode } from '@/utils/jwt';
 
-import { shouldRejectToken } from '../tokenFreshness';
+import { pickFreshestJwt } from '../tokenFreshness';
 import { clerkMissingDevBrowser } from '../errors';
 import { eventBus, events } from '../events';
 import type { FapiClient } from '../fapiClient';
@@ -197,8 +197,6 @@ export class AuthCookieService {
     }
 
     // Monotonic freshness guard: don't regress the cookie within the same session.
-    // Uses shouldRejectToken so equal-oiat tokens still tie-break by iat (newer wins),
-    // matching the comparator used at the broadcast handler and Session resource.
     if (token) {
       const currentRaw = this.sessionCookie.get();
       if (currentRaw) {
@@ -209,7 +207,7 @@ export class AuthCookieService {
           const incomingSid = incoming.claims.sid;
           // Only apply within the same session. Different sessions always allowed.
           if (currentSid && incomingSid && currentSid === incomingSid) {
-            if (shouldRejectToken(current, incoming)) {
+            if (pickFreshestJwt(current, incoming) === current) {
               return;
             }
           }

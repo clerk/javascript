@@ -42,7 +42,7 @@ import type {
 } from '@clerk/shared/types';
 import { isWebAuthnSupported as isWebAuthnSupportedOnWindow } from '@clerk/shared/webauthn';
 
-import { shouldRejectToken } from '@/core/tokenFreshness';
+import { pickFreshestJwt } from '@/core/tokenFreshness';
 import { unixEpochToDate } from '@/utils/date';
 import { debugLogger } from '@/utils/debug';
 import { TokenId } from '@/utils/tokenId';
@@ -459,8 +459,9 @@ export class Session extends BaseResource implements SessionResource {
       // Only emit token updates when we have an actual token — emitting with an empty
       // token causes AuthCookieService to remove the __session cookie (looks like sign-out).
       if (shouldDispatchTokenUpdate && cachedToken.getRawString()) {
-        const reject = this.lastActiveToken && shouldRejectToken(this.lastActiveToken, cachedToken);
-        if (!reject) {
+        const isStaler =
+          this.lastActiveToken && pickFreshestJwt(this.lastActiveToken, cachedToken) === this.lastActiveToken;
+        if (!isStaler) {
           eventBus.emit(events.TokenUpdate, { token: cachedToken });
         }
       }
@@ -522,10 +523,8 @@ export class Session extends BaseResource implements SessionResource {
       return;
     }
 
-    if (this.lastActiveToken) {
-      if (shouldRejectToken(this.lastActiveToken, token)) {
-        return;
-      }
+    if (this.lastActiveToken && pickFreshestJwt(this.lastActiveToken, token) === this.lastActiveToken) {
+      return;
     }
 
     eventBus.emit(events.TokenUpdate, { token });

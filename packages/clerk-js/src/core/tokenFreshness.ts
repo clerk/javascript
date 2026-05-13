@@ -5,50 +5,44 @@ function asJwt(input: TokenResource | JWT): JWT | undefined {
 }
 
 /**
- * Determines whether an incoming token should be rejected in favor of the existing one.
- * Returns true if the incoming token is staler than the existing one. Accepts either
- * TokenResource (cache layer) or a raw decoded JWT (cookie layer).
+ * Picks the freshest of two tokens. Returns whichever argument has the more
+ * recent claim freshness; on a tie, returns `existing` (no churn).
  *
- * All origin-minted tokens now carry the `oiat` JWT header (origin-issued-at; the
- * timestamp when token claims were last assembled from the DB). A token without
+ * All origin-minted tokens carry the `oiat` JWT header (origin-issued-at;
+ * timestamp when claims were last assembled from the DB). A token without
  * `oiat` is from a pre-feature codebase and is by definition staler than any
  * token that has one.
  *
- * Coverage: enforced at /tokens responses, broadcast events, and cookie writes.
- * Handshake-installed __session cookies are intentionally NOT gated here:
- * handshake is a redirect-based full auth state resync, the browser commits the
- * Set-Cookie before any SDK code runs, and there is no in-flight race window
- * for the gate to protect.
+ * Coverage: invoked at /tokens responses, broadcast events, and cookie writes.
+ * Handshake-installed __session cookies are intentionally NOT gated:
+ * handshake is a redirect-based full auth state resync, the browser commits
+ * the Set-Cookie before any SDK code runs, and there is no in-flight race
+ * window for the gate to protect.
  *
  * @internal
  */
-export function shouldRejectToken(
-  existing: TokenResource | JWT,
-  incoming: TokenResource | JWT,
-): boolean {
+export function pickFreshestJwt<T extends TokenResource | JWT>(existing: T, incoming: T): T {
   const existingOiat = asJwt(existing)?.header?.oiat;
   const incomingOiat = asJwt(incoming)?.header?.oiat;
 
-  if (incomingOiat == null && existingOiat == null) {
-    return false;
+  if (existingOiat == null && incomingOiat == null) {
+    return incoming;
   }
   if (incomingOiat == null) {
-    return true;
+    return existing;
   }
   if (existingOiat == null) {
-    return false;
+    return incoming;
   }
 
   if (existingOiat > incomingOiat) {
-    return true;
+    return existing;
   }
   if (existingOiat < incomingOiat) {
-    return false;
+    return incoming;
   }
 
-  // Equal oiat: tie-break by iat (more recent mint wins). Equal iat: keep
-  // existing (identical, no reason to replace).
   const existingIat = asJwt(existing)?.claims?.iat ?? 0;
   const incomingIat = asJwt(incoming)?.claims?.iat ?? 0;
-  return existingIat >= incomingIat;
+  return existingIat >= incomingIat ? existing : incoming;
 }

@@ -5,7 +5,7 @@ import { TokenId } from '@/utils/tokenId';
 
 import { POLLER_INTERVAL_IN_MS } from './auth/SessionCookiePoller';
 import { Token } from './resources/internal';
-import { shouldRejectToken } from './tokenFreshness';
+import { pickFreshestJwt } from './tokenFreshness';
 
 /**
  * Identifies a cached token entry by tokenId and optional audience.
@@ -289,7 +289,7 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
       const result = get({ tokenId: data.tokenId });
       if (result) {
         const existingToken = await result.entry.tokenResolver;
-        if (shouldRejectToken(existingToken, token)) {
+        if (pickFreshestJwt(existingToken, token) === existingToken) {
           debugLogger.debug(
             'Ignoring staler token broadcast',
             { tokenId: data.tokenId, traceId: data.traceId },
