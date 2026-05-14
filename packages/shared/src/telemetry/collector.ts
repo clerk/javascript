@@ -20,6 +20,7 @@ import type {
   TelemetryLogEntry,
 } from '../types';
 import { isTruthy } from '../underscore';
+import { maybeShowTelemetryNotice } from './notice';
 import { InMemoryThrottlerCache, LocalStorageThrottlerCache, TelemetryEventThrottler } from './throttler';
 import type { TelemetryCollectorOptions } from './types';
 
@@ -145,6 +146,11 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
       ? new LocalStorageThrottlerCache()
       : new InMemoryThrottlerCache();
     this.#eventThrottler = new TelemetryEventThrottler(cache);
+
+    // Surface the one-time telemetry disclosure at runtime instead of via a postinstall script.
+    // Gated on `isEnabled` so users who opted out (or are not on a development instance) are not
+    // shown a notice for collection that will never happen.
+    void maybeShowTelemetryNotice({ skip: !this.isEnabled });
   }
 
   get isEnabled(): boolean {
