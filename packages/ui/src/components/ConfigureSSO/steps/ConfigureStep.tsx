@@ -4,11 +4,14 @@ import React from 'react';
 
 import {
   Badge,
+  Button,
   Col,
   descriptors,
   Flex,
   Flow,
+  FormLabel,
   Heading,
+  Icon,
   localizationKeys,
   Table,
   Tbody,
@@ -23,7 +26,7 @@ import { ClipboardInput } from '@/elements/ClipboardInput';
 import { useCardState } from '@/elements/contexts';
 import { Form } from '@/elements/Form';
 import { SegmentedControl } from '@/elements/SegmentedControl';
-import { Check, ClipboardOutline } from '@/icons';
+import { Check, ClipboardOutline, Upload } from '@/icons';
 import { useFormControl } from '@/ui/utils/useFormControl';
 import { handleError } from '@/utils/errorHandler';
 
@@ -520,6 +523,20 @@ export const SubmitSamlConfigSubStep = (): JSX.Element => {
     isRequired: true,
   });
 
+  const signOnUrlField = useFormControl('idpSsoUrl', '', {
+    type: 'text',
+    label: localizationKeys('configureSSO.configureStep.samlOkta.manual.signOnUrl.label'),
+    placeholder: localizationKeys('configureSSO.configureStep.samlOkta.manual.signOnUrl.placeholder'),
+    isRequired: true,
+  });
+
+  const issuerField = useFormControl('idpEntityId', '', {
+    type: 'text',
+    label: localizationKeys('configureSSO.configureStep.samlOkta.manual.issuer.label'),
+    placeholder: localizationKeys('configureSSO.configureStep.samlOkta.manual.issuer.placeholder'),
+    isRequired: true,
+  });
+
   const trimmedMetadataUrl = metadataUrlField.value.trim();
   const canSubmit = mode === 'metadataUrl' && trimmedMetadataUrl.length > 0 && !card.isLoading;
 
@@ -579,6 +596,56 @@ export const SubmitSamlConfigSubStep = (): JSX.Element => {
               <Form.ControlRow elementId={metadataUrlField.id}>
                 <Form.PlainInput {...metadataUrlField.props} />
               </Form.ControlRow>
+            </>
+          )}
+
+          {mode === 'manual' && (
+            <>
+              <Text
+                as='p'
+                colorScheme='secondary'
+                localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.manual.description')}
+              />
+
+              <Form.ControlRow elementId={signOnUrlField.id}>
+                <Form.PlainInput {...signOnUrlField.props} />
+              </Form.ControlRow>
+
+              <Form.ControlRow elementId={issuerField.id}>
+                <Form.PlainInput {...issuerField.props} />
+              </Form.ControlRow>
+
+              <Col gap={2}>
+                <FormLabel>
+                  <Text
+                    as='span'
+                    variant='subtitle'
+                    localizationKey={localizationKeys(
+                      'configureSSO.configureStep.samlOkta.manual.signingCertificate.label',
+                    )}
+                  />
+                </FormLabel>
+
+                <Button
+                  size='sm'
+                  variant='outline'
+                  sx={{ alignSelf: 'flex-start' }}
+                >
+                  <Icon
+                    icon={Upload}
+                    size='sm'
+                    colorScheme='neutral'
+                    sx={t => ({ marginInlineEnd: t.space.$1 })}
+                  />
+
+                  <Text
+                    as='span'
+                    localizationKey={localizationKeys(
+                      'configureSSO.configureStep.samlOkta.manual.signingCertificate.uploadFile',
+                    )}
+                  />
+                </Button>
+              </Col>
             </>
           )}
         </Step.Section>

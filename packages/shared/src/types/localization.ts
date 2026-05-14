@@ -1435,6 +1435,21 @@ export type __internal_LocalizationResource = {
         submitSamlConfig: {
           title: LocalizationValue;
         };
+        manual: {
+          description: LocalizationValue;
+          signOnUrl: {
+            label: LocalizationValue;
+            placeholder: LocalizationValue;
+          };
+          issuer: {
+            label: LocalizationValue;
+            placeholder: LocalizationValue;
+          };
+          signingCertificate: {
+            label: LocalizationValue;
+            uploadFile: LocalizationValue;
+          };
+        };
       };
     };
   };

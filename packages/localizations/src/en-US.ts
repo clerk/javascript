@@ -347,6 +347,21 @@ export const enUS: LocalizationResource = {
         submitSamlConfig: {
           title: 'Fill in your Okta SAML application details',
         },
+        manual: {
+          description: 'In your Okta SAML app, go to the Sign On tab and retrieve these values.',
+          signOnUrl: {
+            label: 'Sign on URL',
+            placeholder: 'Paste URL here...',
+          },
+          issuer: {
+            label: 'Issuer',
+            placeholder: 'Paste URL here...',
+          },
+          signingCertificate: {
+            label: 'Signing certificate',
+            uploadFile: 'Upload file',
+          },
+        },
       },
     },
   },
