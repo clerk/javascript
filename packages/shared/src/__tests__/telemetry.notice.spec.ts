@@ -47,8 +47,8 @@ describe('maybeShowTelemetryNotice', () => {
     }
   });
 
-  test('prints the disclosure once and persists the marker', async () => {
-    await maybeShowTelemetryNotice();
+  test('prints the disclosure once and persists the marker', () => {
+    maybeShowTelemetryNotice();
 
     expect(logSpy).toHaveBeenCalled();
     const printed = logSpy.mock.calls.map(call => String(call[0])).join('\n');
@@ -57,45 +57,45 @@ describe('maybeShowTelemetryNotice', () => {
     expect(globalThis.localStorage.getItem(STORAGE_KEY)).toBe('1');
   });
 
-  test('does not print again when the marker is already set', async () => {
+  test('does not print again when the marker is already set', () => {
     globalThis.localStorage.setItem(STORAGE_KEY, '1');
 
-    await maybeShowTelemetryNotice();
+    maybeShowTelemetryNotice();
 
     expect(logSpy).not.toHaveBeenCalled();
   });
 
-  test('skips entirely when skip:true is passed', async () => {
-    await maybeShowTelemetryNotice({ skip: true });
+  test('skips entirely when skip:true is passed', () => {
+    maybeShowTelemetryNotice({ skip: true });
 
     expect(logSpy).not.toHaveBeenCalled();
     expect(globalThis.localStorage.getItem(STORAGE_KEY)).toBeNull();
   });
 
-  test('skips when a CI env var is set', async () => {
+  test('skips when a CI env var is set', () => {
     // eslint-disable-next-line turbo/no-undeclared-env-vars
     process.env.CI = 'true';
 
-    await maybeShowTelemetryNotice();
+    maybeShowTelemetryNotice();
 
     expect(logSpy).not.toHaveBeenCalled();
     expect(globalThis.localStorage.getItem(STORAGE_KEY)).toBeNull();
   });
 
-  test.each(CI_VARS)('skips when %s is set', async name => {
+  test.each(CI_VARS)('skips when %s is set', name => {
     process.env[name] = '1';
 
-    await maybeShowTelemetryNotice();
+    maybeShowTelemetryNotice();
 
     expect(logSpy).not.toHaveBeenCalled();
   });
 
-  test('skips when navigator.webdriver is true', async () => {
+  test('skips when navigator.webdriver is true', () => {
     const originalDescriptor = Object.getOwnPropertyDescriptor(window.navigator, 'webdriver');
     Object.defineProperty(window.navigator, 'webdriver', { configurable: true, value: true });
 
     try {
-      await maybeShowTelemetryNotice();
+      maybeShowTelemetryNotice();
       expect(logSpy).not.toHaveBeenCalled();
     } finally {
       if (originalDescriptor) {
@@ -106,20 +106,21 @@ describe('maybeShowTelemetryNotice', () => {
     }
   });
 
-  test('dedupes concurrent calls within a single process', async () => {
-    await Promise.all([maybeShowTelemetryNotice(), maybeShowTelemetryNotice(), maybeShowTelemetryNotice()]);
+  test('does not print again when called multiple times in the same process', () => {
+    maybeShowTelemetryNotice();
+    maybeShowTelemetryNotice();
+    maybeShowTelemetryNotice();
 
-    // Notice consists of three lines + an empty trailing newline; assert disclosure was printed exactly once.
     const disclosureCalls = logSpy.mock.calls.filter(call => /Clerk collects telemetry/.test(String(call[0])));
     expect(disclosureCalls).toHaveLength(1);
   });
 
-  test('does not throw if localStorage.setItem fails', async () => {
+  test('does not throw if localStorage.setItem fails', () => {
     const setItemSpy = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
       throw new Error('quota exceeded');
     });
 
-    await expect(maybeShowTelemetryNotice()).resolves.toBeUndefined();
+    expect(() => maybeShowTelemetryNotice()).not.toThrow();
     setItemSpy.mockRestore();
   });
 });

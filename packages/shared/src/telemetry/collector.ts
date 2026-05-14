@@ -150,7 +150,7 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
     // Surface the one-time telemetry disclosure at runtime instead of via a postinstall script.
     // Gated on `isEnabled` so users who opted out (or are not on a development instance) are not
     // shown a notice for collection that will never happen.
-    void maybeShowTelemetryNotice({ skip: !this.isEnabled });
+    maybeShowTelemetryNotice({ skip: !this.isEnabled });
   }
 
   get isEnabled(): boolean {
