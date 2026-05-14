@@ -1356,6 +1356,43 @@ export type __internal_LocalizationResource = {
       };
       testRunDetails: {
         title: LocalizationValue;
+        runDetails: {
+          sectionTitle: LocalizationValue;
+          timestamp: LocalizationValue;
+          status: LocalizationValue;
+          errorCode: LocalizationValue;
+          fullMessage: LocalizationValue;
+          actionLabel__copy: LocalizationValue;
+          actionLabel__copied: LocalizationValue;
+        };
+        howToFix: {
+          sectionTitle: LocalizationValue;
+          actionLabel__viewDocumentation: LocalizationValue;
+          generic: LocalizationValue;
+          saml_user_attribute_missing: {
+            intro: LocalizationValue;
+            step1: LocalizationValue;
+            step2: LocalizationValue;
+            step3: LocalizationValue;
+          };
+          saml_response_relaystate_missing: {
+            description: LocalizationValue;
+          };
+          saml_email_address_domain_mismatch: {
+            description: LocalizationValue;
+          };
+          oauth_access_denied: {
+            description: LocalizationValue;
+          };
+          oauth_token_exchange_error: {
+            description: LocalizationValue;
+          };
+          oauth_fetch_user_error: {
+            intro: LocalizationValue;
+            step1: LocalizationValue;
+            step2: LocalizationValue;
+          };
+        };
       };
     };
     configureStep: {

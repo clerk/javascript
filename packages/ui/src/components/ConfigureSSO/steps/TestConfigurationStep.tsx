@@ -4,10 +4,12 @@ import { useState } from 'react';
 
 import {
   Badge,
+  Box,
   Button,
   descriptors,
   Flex,
   Flow,
+  Heading,
   Icon,
   localizationKeys,
   Spinner,
@@ -22,6 +24,8 @@ import {
 } from '@/customizables';
 import { useCardState } from '@/elements/contexts';
 import { Drawer } from '@/elements/Drawer';
+import { IconButton } from '@/elements/IconButton';
+import { LineItems } from '@/elements/LineItems';
 import { ProfileSection } from '@/elements/Section';
 import { useClipboard } from '@/hooks';
 import { Check, Copy, RotateLeftRight } from '@/icons';
@@ -31,9 +35,10 @@ import { handleError } from '@/utils/errorHandler';
 import { useConfigureSSO } from '../ConfigureSSOContext';
 import { Step } from '../elements/Step';
 import { useWizard } from '../elements/Wizard';
+import { TestRunHowToFixSection } from './TestRunHowToFixSection';
 
 export const TestConfigurationStep = (): JSX.Element => {
-  const { goNext, goPrev, isLastStep } = useWizard();
+  const { goNext, goPrev } = useWizard();
   const { enterpriseConnection } = useConfigureSSO();
 
   const {
@@ -274,22 +279,29 @@ const TestResultsTable = ({ rows, isLoading, isPolling, onTestRunCreated }: Test
         <Drawer.Overlay />
         <Drawer.Content>
           <Drawer.Header title={drawerTitle} />
-          <Drawer.Body>{null}</Drawer.Body>
+          {selectedTestRun ? <TestRunDetailsBody testRun={selectedTestRun} /> : null}
         </Drawer.Content>
       </Drawer.Root>
     </>
   );
 };
 
-const TestRunTimestampCell = ({ testRun }: { testRun: EnterpriseConnectionTestRunResource }): JSX.Element | null => {
+const useTestRunFormattedTimestamp = (testRun: EnterpriseConnectionTestRunResource) => {
   const { locale } = useLocalizations();
-
   if (!testRun.createdAt) {
     return null;
   }
-
   const time = new Intl.DateTimeFormat(locale, { timeStyle: 'medium' }).format(testRun.createdAt);
   const day = new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric' }).format(testRun.createdAt);
+
+  return { time, day };
+};
+
+const TestRunTimestampCell = ({ testRun }: { testRun: EnterpriseConnectionTestRunResource }): JSX.Element | null => {
+  const formatted = useTestRunFormattedTimestamp(testRun);
+  if (!formatted) {
+    return null;
+  }
 
   return (
     <Flex
@@ -297,8 +309,136 @@ const TestRunTimestampCell = ({ testRun }: { testRun: EnterpriseConnectionTestRu
       align='baseline'
       sx={{ whiteSpace: 'nowrap' }}
     >
-      <Text>{time}</Text>
-      <Text colorScheme='secondary'>{day}</Text>
+      <Text>{formatted.time}</Text>
+      <Text colorScheme='secondary'>{formatted.day}</Text>
+    </Flex>
+  );
+};
+
+const TestRunDetailsBody = ({ testRun }: { testRun: EnterpriseConnectionTestRunResource }): JSX.Element => {
+  const formatted = useTestRunFormattedTimestamp(testRun);
+  const failedLog = testRun.status === 'failed' ? testRun.logs?.[0] : null;
+
+  return (
+    <Drawer.Body
+      sx={t => ({
+        display: 'flex',
+        flexDirection: 'column',
+        flex: 1,
+        overflowY: 'auto',
+        padding: t.space.$4,
+        gap: t.space.$4,
+      })}
+    >
+      <Heading
+        as='h3'
+        textVariant='h3'
+        localizationKey={localizationKeys('configureSSO.testConfigurationStep.testRunDetails.runDetails.sectionTitle')}
+      />
+
+      <LineItems.Root>
+        {formatted ? (
+          <LineItems.Group>
+            <LineItems.Title
+              title={localizationKeys('configureSSO.testConfigurationStep.testRunDetails.runDetails.timestamp')}
+            />
+            <LineItems.Description>
+              <Flex
+                gap={2}
+                align='baseline'
+                sx={{ whiteSpace: 'nowrap' }}
+              >
+                <Text>{formatted.time}</Text>
+                <Text colorScheme='secondary'>{formatted.day}</Text>
+              </Flex>
+            </LineItems.Description>
+          </LineItems.Group>
+        ) : null}
+
+        {testRun.status === 'failed' ? (
+          failedLog?.code ? (
+            <LineItems.Group>
+              <LineItems.Title
+                title={localizationKeys('configureSSO.testConfigurationStep.testRunDetails.runDetails.errorCode')}
+              />
+              <LineItems.Description>
+                <Text sx={t => ({ fontFamily: t.fonts.$mono })}>{failedLog.code}</Text>
+              </LineItems.Description>
+            </LineItems.Group>
+          ) : null
+        ) : (
+          <LineItems.Group>
+            <LineItems.Title
+              title={localizationKeys('configureSSO.testConfigurationStep.testRunDetails.runDetails.status')}
+            />
+            <LineItems.Description>
+              <TestRunStatusCell testRun={testRun} />
+            </LineItems.Description>
+          </LineItems.Group>
+        )}
+      </LineItems.Root>
+
+      {testRun.status === 'failed' && failedLog?.message ? <FullMessageBlock message={failedLog.message} /> : null}
+
+      {testRun.status === 'failed' ? <TestRunHowToFixSection errorCode={failedLog?.code} /> : null}
+    </Drawer.Body>
+  );
+};
+
+const FullMessageBlock = ({ message }: { message: string }): JSX.Element => {
+  const { t } = useLocalizations();
+  const { onCopy, hasCopied } = useClipboard(message);
+  const copyLabel = t(
+    localizationKeys(
+      hasCopied
+        ? 'configureSSO.testConfigurationStep.testRunDetails.runDetails.actionLabel__copied'
+        : 'configureSSO.testConfigurationStep.testRunDetails.runDetails.actionLabel__copy',
+    ),
+  );
+
+  return (
+    <Flex
+      direction='col'
+      gap={2}
+    >
+      <Flex
+        justify='between'
+        align='center'
+        gap={4}
+      >
+        <Text
+          colorScheme='secondary'
+          localizationKey={localizationKeys('configureSSO.testConfigurationStep.testRunDetails.runDetails.fullMessage')}
+        />
+        <IconButton
+          variant='ghost'
+          colorScheme='neutral'
+          size='xs'
+          icon={hasCopied ? Check : Copy}
+          aria-label={copyLabel}
+          onClick={() => onCopy()}
+        />
+      </Flex>
+      <Box
+        as='pre'
+        sx={t => ({
+          margin: 0,
+          padding: t.space.$3,
+          backgroundColor: t.colors.$colorBackground,
+          borderWidth: t.borderWidths.$normal,
+          borderStyle: t.borderStyles.$solid,
+          borderColor: t.colors.$borderAlpha150,
+          borderRadius: t.radii.$md,
+          boxShadow: t.shadows.$cardContentShadow,
+          fontFamily: t.fonts.$mono,
+          fontSize: t.fontSizes.$sm,
+          color: t.colors.$colorForeground,
+          whiteSpace: 'pre-wrap',
+          wordBreak: 'break-word',
+        })}
+      >
+        {message}
+      </Box>
     </Flex>
   );
 };

@@ -150,33 +150,49 @@ const Title = React.forwardRef<HTMLTableCellElement, TitleProps>(({ title, descr
  * LineItems.Description
  * -----------------------------------------------------------------------------------------------*/
 
-interface DescriptionProps {
-  text: string | LocalizationKey;
-  /**
-   * When true, the text will be truncated with an ellipsis in the middle and the last 5 characters will be visible.
-   * @default `false`
-   */
-  truncateText?: boolean;
-  /**
-   * When true, there will be a button to copy the providedtext.
-   * @default `false`
-   */
-  copyText?: boolean;
-  /**
-   * The visually hidden label for the copy button.
-   * @default `Copy`
-   */
-  copyLabel?: string;
-  prefix?: string | LocalizationKey;
-  suffix?: string | LocalizationKey;
-}
+type DescriptionProps =
+  | {
+      /**
+       * Custom value content. When provided, `text`, `prefix`, `suffix`, `truncateText`,
+       * `copyText`, and `copyLabel` are ignored.
+       */
+      children: React.ReactNode;
+      text?: never;
+      truncateText?: never;
+      copyText?: never;
+      copyLabel?: never;
+      prefix?: never;
+      suffix?: never;
+    }
+  | {
+      children?: never;
+      text: string | LocalizationKey;
+      /**
+       * When true, the text will be truncated with an ellipsis in the middle and the last 5 characters will be visible.
+       * @default `false`
+       */
+      truncateText?: boolean;
+      /**
+       * When true, there will be a button to copy the providedtext.
+       * @default `false`
+       */
+      copyText?: boolean;
+      /**
+       * The visually hidden label for the copy button.
+       * @default `Copy`
+       */
+      copyLabel?: string;
+      prefix?: string | LocalizationKey;
+      suffix?: string | LocalizationKey;
+    };
 
-function Description({ text, prefix, suffix, truncateText = false, copyText = false, copyLabel }: DescriptionProps) {
+function Description(props: DescriptionProps) {
   const context = React.useContext(GroupContext);
   if (!context) {
     throw new Error('LineItems.Description must be used within LineItems.Group');
   }
   const { variant } = context;
+
   return (
     <Dd
       elementDescriptor={descriptors.lineItemsDescription}
@@ -187,6 +203,25 @@ function Description({ text, prefix, suffix, truncateText = false, copyText = fa
         color: variant === 'tertiary' ? t.colors.$colorMutedForeground : t.colors.$colorForeground,
       })}
     >
+      {'children' in props && props.children !== undefined ? (
+        props.children
+      ) : (
+        <DescriptionContent {...(props as Exclude<DescriptionProps, { children: React.ReactNode }>)} />
+      )}
+    </Dd>
+  );
+}
+
+function DescriptionContent({
+  text,
+  prefix,
+  suffix,
+  truncateText = false,
+  copyText = false,
+  copyLabel,
+}: Exclude<DescriptionProps, { children: React.ReactNode }>) {
+  return (
+    <>
       <Span
         elementDescriptor={descriptors.lineItemsDescriptionInner}
         sx={t => ({
@@ -240,7 +275,7 @@ function Description({ text, prefix, suffix, truncateText = false, copyText = fa
           })}
         />
       ) : null}
-    </Dd>
+    </>
   );
 }
 

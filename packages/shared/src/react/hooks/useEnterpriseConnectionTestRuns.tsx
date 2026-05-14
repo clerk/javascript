@@ -103,6 +103,7 @@ function useEnterpriseConnectionTestRuns(
       return user?.getEnterpriseConnectionTestRuns(enterpriseConnectionId, fetchParams);
     },
     enabled: queryEnabled,
+    refetchIntervalInBackground: false,
     refetchInterval: q => {
       if (!shouldPoll) {
         return false;
