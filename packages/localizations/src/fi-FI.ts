@@ -207,8 +207,37 @@ export const fiFI: LocalizationResource = {
     yearPerUnit: 'Vuosi per {{unitName}}',
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'Ota yhteyttä organisaatiosi järjestelmänvalvojaan saadaksesi oikeudet hallita yritysyhteyksiä.',
+      title: 'Sinulla ei ole oikeutta hallita yritysyhteyksiä',
+    },
     navbar: {
       title: 'Määritä kertakirjautuminen (SSO)',
+    },
+    verifyEmailDomainStep: {
+      title: 'Vahvista sähköpostiosoite',
+      subtitle: 'Vahvista sähköpostiosoite, jolle haluat ottaa yritysyhteyden käyttöön.',
+      addEmailAddress: {
+        formTitle: 'Tarvitsemme sähköpostiosi',
+        formSubtitle: 'Aloittaaksemme tarvitsemme sähköpostiosoitteesi',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'Sähköpostiosoite',
+      },
+      emailCode: {
+        formTitle: 'Vahvista sähköpostiosoitteesi',
+        formSubtitle: 'Anna vahvistuskoodi, joka lähetettiin osoitteeseen {{identifier}}',
+        resendButton: 'Etkö saanut koodia? Lähetä uudelleen',
+        verified: {
+          title: 'Saimme sähköpostisi',
+          subtitle: 'Olet vahvistanut sähköpostiosoitteesi seuraavalla sähköpostilla',
+          inputLabel: 'Vahvistettu sähköpostiosoite',
+        },
+      },
+      domainTaken: {
+        title: 'Tällä verkkotunnuksella ({{domain}}) on jo SSO-yhteys',
+        subtitle:
+          'Ota yhteyttä sovelluksen järjestelmänvalvojaan saadaksesi käyttöoikeudet olemassa olevan yhteyden kautta.',
+      },
     },
   },
   createOrganization: {

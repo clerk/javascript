@@ -179,8 +179,38 @@ export const nlBE: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        'Neem contact op met de beheerder van uw organisatie om toestemming te krijgen voor het beheren van enterprise-verbindingen.',
+      title: 'U hebt geen toestemming om enterprise-verbindingen te beheren',
+    },
     navbar: {
       title: 'Single sign-on (SSO) configureren',
+    },
+    verifyEmailDomainStep: {
+      title: 'E-mailadres verifiëren',
+      subtitle: 'Verifieer het e-mailadres waarop u de enterprise-verbinding wilt inschakelen.',
+      addEmailAddress: {
+        formTitle: 'We hebben uw e-mail nodig',
+        formSubtitle: 'Om te beginnen hebben we uw e-mailadres nodig',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'E-mailadres',
+      },
+      emailCode: {
+        formTitle: 'Verifieer uw e-mailadres',
+        formSubtitle: 'Voer de verificatiecode in die is verzonden naar {{identifier}}',
+        resendButton: 'Geen code ontvangen? Opnieuw verzenden',
+        verified: {
+          title: 'We hebben uw e-mail ontvangen',
+          subtitle: 'U heeft uw e-mailadres geverifieerd met de volgende e-mail',
+          inputLabel: 'Geverifieerd e-mailadres',
+        },
+      },
+      domainTaken: {
+        title: 'Dit domein ({{domain}}) heeft al een SSO-verbinding',
+        subtitle:
+          'Neem contact op met de beheerder van de applicatie om toegang te krijgen via de bestaande verbinding.',
+      },
     },
   },
   createOrganization: {

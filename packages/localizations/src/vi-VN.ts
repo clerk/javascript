@@ -183,8 +183,36 @@ export const viVN: LocalizationResource = {
     year: 'Năm',
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'Liên hệ với quản trị viên tổ chức của bạn để có quyền quản lý các kết nối doanh nghiệp.',
+      title: 'Bạn không có quyền quản lý các kết nối doanh nghiệp',
+    },
     navbar: {
       title: 'Cấu hình đăng nhập một lần (SSO)',
+    },
+    verifyEmailDomainStep: {
+      title: 'Xác minh địa chỉ email',
+      subtitle: 'Xác minh địa chỉ email mà bạn muốn kích hoạt kết nối doanh nghiệp.',
+      addEmailAddress: {
+        formTitle: 'Chúng tôi cần email của bạn',
+        formSubtitle: 'Để bắt đầu, chúng tôi sẽ cần địa chỉ email của bạn',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'Địa chỉ email',
+      },
+      emailCode: {
+        formTitle: 'Xác minh địa chỉ email của bạn',
+        formSubtitle: 'Nhập mã xác minh đã được gửi tới {{identifier}}',
+        resendButton: 'Không nhận được mã? Gửi lại',
+        verified: {
+          title: 'Chúng tôi đã nhận được email của bạn',
+          subtitle: 'Bạn đã xác minh địa chỉ email của mình với email sau',
+          inputLabel: 'Địa chỉ email đã xác minh',
+        },
+      },
+      domainTaken: {
+        title: 'Tên miền này ({{domain}}) đã có kết nối SSO',
+        subtitle: 'Liên hệ với quản trị viên của ứng dụng để có quyền truy cập thông qua kết nối hiện có.',
+      },
     },
   },
   createOrganization: {

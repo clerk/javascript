@@ -13,6 +13,7 @@ permissions:
 
 jobs:
   check-major-bump:
+    if: ${{ github.event_name == 'pull_request' || github.event.issue.pull_request }}
     runs-on: ubuntu-latest
     steps:
       - name: Check for major changesets

@@ -179,8 +179,37 @@ export const srRS: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        'Kontaktirajte administratora vaše organizacije da biste dobili dozvole za upravljanje korporativnim vezama.',
+      title: 'Nemate dozvolu za upravljanje korporativnim vezama',
+    },
     navbar: {
       title: 'Konfiguriši jedinstvenu prijavu (SSO)',
+    },
+    verifyEmailDomainStep: {
+      title: 'Potvrdi adresu e-pošte',
+      subtitle: 'Potvrdite adresu e-pošte na kojoj želite da omogućite enterprise konekciju.',
+      addEmailAddress: {
+        formTitle: 'Potrebna nam je vaša e-pošta',
+        formSubtitle: 'Da bismo započeli, biće nam potrebna vaša adresa e-pošte',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'Adresa e-pošte',
+      },
+      emailCode: {
+        formTitle: 'Potvrdite svoju adresu e-pošte',
+        formSubtitle: 'Unesite verifikacioni kod poslat na {{identifier}}',
+        resendButton: 'Niste primili kod? Pošalji ponovo',
+        verified: {
+          title: 'Primili smo vašu e-poštu',
+          subtitle: 'Potvrdili ste svoju adresu e-pošte sledećom e-poštom',
+          inputLabel: 'Potvrđena adresa e-pošte',
+        },
+      },
+      domainTaken: {
+        title: 'Ovaj domen ({{domain}}) već ima SSO konekciju',
+        subtitle: 'Kontaktirajte administratora aplikacije da biste dobili pristup putem postojeće konekcije.',
+      },
     },
   },
   createOrganization: {
