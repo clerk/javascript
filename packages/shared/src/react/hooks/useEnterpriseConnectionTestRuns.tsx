@@ -37,24 +37,16 @@ export type UseEnterpriseConnectionTestRunsParams = {
 
 export type UseEnterpriseConnectionTestRunsReturn = {
   data: EnterpriseConnectionTestRunResource[] | undefined;
-  /** Convenience accessor for the most recent run (i.e. `data[0]`). */
-  latest: EnterpriseConnectionTestRunResource | undefined;
   totalCount: number | undefined;
   error: Error | null;
   isLoading: boolean;
   isFetching: boolean;
   /**
-   * `true` while the hook is actively polling for the first record to appear.
-   * Becomes `true` once `revalidate()` is called against an empty list and
-   * flips back to `false` permanently as soon as the response contains at
-   * least one record.
+   * `true` while the hook is actively polling for the first record to appear
    */
   isPolling: boolean;
   /**
-   * Force a refetch and (if the list is currently empty) arm polling. Once any
-   * record has been observed in the response, polling is disabled for the rest
-   * of this hook instance's lifetime — subsequent `revalidate()` calls just
-   * trigger a single refetch.
+   * Force a refetch and (if the list is currently empty) arm polling
    */
   revalidate: () => Promise<void>;
 };
@@ -102,8 +94,6 @@ function useEnterpriseConnectionTestRuns(
       }
       return user?.getEnterpriseConnectionTestRuns(enterpriseConnectionId, fetchParams);
     },
-    enabled: queryEnabled,
-    refetchIntervalInBackground: false,
     refetchInterval: q => {
       if (!shouldPoll) {
         return false;
@@ -112,6 +102,8 @@ function useEnterpriseConnectionTestRuns(
       const hasRows = (q.state.data?.data?.length ?? 0) > 0;
       return hasRows ? false : pollIntervalMs;
     },
+    enabled: queryEnabled,
+    refetchIntervalInBackground: false,
   });
 
   const hasRows = (query.data?.data?.length ?? 0) > 0;
@@ -135,7 +127,6 @@ function useEnterpriseConnectionTestRuns(
 
   return {
     data: query.data?.data,
-    latest: query.data?.data?.[0],
     totalCount: query.data?.total_count,
     error: query.error ?? null,
     isLoading: query.isLoading,

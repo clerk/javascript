@@ -122,8 +122,8 @@ export const TestRunHowToFixSection = ({ errorCode }: TestRunHowToFixSectionProp
             fontSize: t.fontSizes.$sm,
             fontWeight: t.fontWeights.$medium,
             textDecoration: 'none',
-            '&:hover': { backgroundColor: t.colors.$neutralAlpha50, textDecoration: 'none' },
             marginTop: t.space.$2,
+            '&:hover': { backgroundColor: t.colors.$neutralAlpha50, textDecoration: 'none' },
           })}
         >
           <Span

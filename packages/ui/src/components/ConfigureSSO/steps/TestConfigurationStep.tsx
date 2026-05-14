@@ -1,12 +1,17 @@
 import { __internal_useEnterpriseConnectionTestRuns, useUser } from '@clerk/shared/react/index';
 import type { EnterpriseConnectionTestRunResource } from '@clerk/shared/types';
+import type { ReactNode } from 'react';
 import { useState } from 'react';
 
+import type { LocalizationKey } from '@/customizables';
 import {
   Badge,
   Box,
   Button,
+  Dd,
   descriptors,
+  Dl,
+  Dt,
   Flex,
   Flow,
   Heading,
@@ -25,7 +30,6 @@ import {
 import { useCardState } from '@/elements/contexts';
 import { Drawer } from '@/elements/Drawer';
 import { IconButton } from '@/elements/IconButton';
-import { LineItems } from '@/elements/LineItems';
 import { Pagination } from '@/elements/Pagination';
 import { ProfileSection } from '@/elements/Section';
 import { useClipboard } from '@/hooks';
@@ -154,14 +158,14 @@ export const TestConfigurationStep = (): JSX.Element => {
             >
               <TestResultsTable
                 rows={testRuns ?? []}
-                isLoading={areTestRunsLoading}
-                onTestRunCreated={handleTestRunCreated}
                 isPolling={isPolling}
+                isLoading={areTestRunsLoading}
                 page={currentPage}
                 pageCount={pageCount}
                 pageSize={TEST_RUNS_PAGE_SIZE}
                 totalCount={totalCount ?? 0}
                 onPageChange={setCurrentPage}
+                onTestRunCreated={handleTestRunCreated}
               />
             </ProfileSection.Root>
           </Step.Section>
@@ -459,6 +463,34 @@ const TestRunTimestampCell = ({ testRun }: { testRun: EnterpriseConnectionTestRu
   );
 };
 
+const DetailRow = ({ title, children }: { title: LocalizationKey; children: ReactNode }): JSX.Element => (
+  <Box
+    as='div'
+    sx={t => ({
+      display: 'grid',
+      gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+      gap: t.space.$2,
+    })}
+  >
+    <Dt
+      localizationKey={title}
+      sx={t => ({
+        color: t.colors.$colorForeground,
+        ...common.textVariants(t).subtitle,
+      })}
+    />
+    <Dd
+      sx={t => ({
+        display: 'grid',
+        justifyContent: 'end',
+        color: t.colors.$colorForeground,
+      })}
+    >
+      {children}
+    </Dd>
+  </Box>
+);
+
 const TestRunDetailsBody = ({ testRun }: { testRun: EnterpriseConnectionTestRunResource }): JSX.Element => {
   const formatted = useTestRunFormattedTimestamp(testRun);
   const failedLog = testRun.status === 'failed' ? testRun.logs?.[0] : null;
@@ -480,47 +512,34 @@ const TestRunDetailsBody = ({ testRun }: { testRun: EnterpriseConnectionTestRunR
         localizationKey={localizationKeys('configureSSO.testConfigurationStep.testRunDetails.runDetails.sectionTitle')}
       />
 
-      <LineItems.Root>
+      <Dl sx={t => ({ display: 'grid', gridRowGap: t.space.$2 })}>
         {formatted ? (
-          <LineItems.Group>
-            <LineItems.Title
-              title={localizationKeys('configureSSO.testConfigurationStep.testRunDetails.runDetails.timestamp')}
-            />
-            <LineItems.Description>
-              <Flex
-                gap={2}
-                align='baseline'
-                sx={{ whiteSpace: 'nowrap' }}
-              >
-                <Text>{formatted.time}</Text>
-                <Text colorScheme='secondary'>{formatted.day}</Text>
-              </Flex>
-            </LineItems.Description>
-          </LineItems.Group>
+          <DetailRow title={localizationKeys('configureSSO.testConfigurationStep.testRunDetails.runDetails.timestamp')}>
+            <Flex
+              gap={2}
+              align='baseline'
+              sx={{ whiteSpace: 'nowrap' }}
+            >
+              <Text>{formatted.time}</Text>
+              <Text colorScheme='secondary'>{formatted.day}</Text>
+            </Flex>
+          </DetailRow>
         ) : null}
 
         {testRun.status === 'failed' ? (
           failedLog?.code ? (
-            <LineItems.Group>
-              <LineItems.Title
-                title={localizationKeys('configureSSO.testConfigurationStep.testRunDetails.runDetails.errorCode')}
-              />
-              <LineItems.Description>
-                <Text sx={t => ({ fontFamily: t.fonts.$mono })}>{failedLog.code}</Text>
-              </LineItems.Description>
-            </LineItems.Group>
+            <DetailRow
+              title={localizationKeys('configureSSO.testConfigurationStep.testRunDetails.runDetails.errorCode')}
+            >
+              <Text sx={t => ({ fontFamily: t.fonts.$mono })}>{failedLog.code}</Text>
+            </DetailRow>
           ) : null
         ) : (
-          <LineItems.Group>
-            <LineItems.Title
-              title={localizationKeys('configureSSO.testConfigurationStep.testRunDetails.runDetails.status')}
-            />
-            <LineItems.Description>
-              <TestRunStatusCell testRun={testRun} />
-            </LineItems.Description>
-          </LineItems.Group>
+          <DetailRow title={localizationKeys('configureSSO.testConfigurationStep.testRunDetails.runDetails.status')}>
+            <TestRunStatusCell testRun={testRun} />
+          </DetailRow>
         )}
-      </LineItems.Root>
+      </Dl>
 
       {testRun.status === 'failed' && failedLog?.message ? <FullMessageBlock message={failedLog.message} /> : null}
 
@@ -559,29 +578,21 @@ const ParsedUserInfoSection = ({
         )}
       />
 
-      <LineItems.Root>
+      <Dl sx={t => ({ display: 'grid', gridRowGap: t.space.$2 })}>
         {parsedUserInfo.emailAddress ? (
-          <LineItems.Group>
-            <LineItems.Title
-              title={localizationKeys('configureSSO.testConfigurationStep.testRunDetails.parsedUserInfo.email')}
-            />
-            <LineItems.Description>
-              <Text sx={t => ({ fontFamily: t.fonts.$mono })}>{parsedUserInfo.emailAddress}</Text>
-            </LineItems.Description>
-          </LineItems.Group>
+          <DetailRow title={localizationKeys('configureSSO.testConfigurationStep.testRunDetails.parsedUserInfo.email')}>
+            <Text sx={t => ({ fontFamily: t.fonts.$mono })}>{parsedUserInfo.emailAddress}</Text>
+          </DetailRow>
         ) : null}
 
         {parsedUserInfo.firstName ? (
-          <LineItems.Group>
-            <LineItems.Title
-              title={localizationKeys('configureSSO.testConfigurationStep.testRunDetails.parsedUserInfo.firstName')}
-            />
-            <LineItems.Description>
-              <Text sx={t => ({ fontFamily: t.fonts.$mono })}>{parsedUserInfo.firstName}</Text>
-            </LineItems.Description>
-          </LineItems.Group>
+          <DetailRow
+            title={localizationKeys('configureSSO.testConfigurationStep.testRunDetails.parsedUserInfo.firstName')}
+          >
+            <Text sx={t => ({ fontFamily: t.fonts.$mono })}>{parsedUserInfo.firstName}</Text>
+          </DetailRow>
         ) : null}
-      </LineItems.Root>
+      </Dl>
     </Flex>
   );
 };
@@ -694,7 +705,6 @@ const TestRunStatusCell = ({ testRun }: { testRun: EnterpriseConnectionTestRunRe
 };
 
 type CopyTestUrlButtonProps = {
-  /** Called once a new test run has been created and copied to the clipboard, with the generated test URL. */
   onTestRunCreated?: (testUrl: string) => void;
 };
 
@@ -719,7 +729,7 @@ const CopyTestUrlButton = ({ onTestRunCreated }: CopyTestUrlButtonProps): JSX.El
       .createEnterpriseConnectionTestRun(enterpriseConnection.id)
       .then(({ url }) => {
         setTestUrl(url);
-        onCopy(url);
+        onCopy();
         onTestRunCreated?.(url);
       })
       .catch(err => handleError(err as Error, [], card.setError))

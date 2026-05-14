@@ -1,6 +1,6 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { isOrganizationId } from '@clerk/shared/internal/clerk-js/organization';
-import { __internal_useOrganizationBase, useAPIKeys, useClerk, useUser } from '@clerk/shared/react';
+import { useAPIKeys, __internal_useOrganizationBase, useClerk, useUser } from '@clerk/shared/react';
 import type { APIKeyResource } from '@clerk/shared/types';
 import { lazy, useState } from 'react';
 
@@ -22,9 +22,9 @@ import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { InputWithIcon } from '@/ui/elements/InputWithIcon';
 import { Pagination } from '@/ui/elements/Pagination';
 import { useDebounce } from '@/ui/hooks';
+import { handleError } from '@/ui/utils/errorHandler';
 import { MagnifyingGlass } from '@/ui/icons';
 import { mqu } from '@/ui/styledSystem';
-import { handleError } from '@/ui/utils/errorHandler';
 
 import { APIKeysTable } from './ApiKeysTable';
 import type { OnCreateParams } from './CreateAPIKeyForm';
