@@ -66,6 +66,8 @@ export const TestRunHowToFixSection = ({ errorCode }: TestRunHowToFixSectionProp
     return null;
   }
 
+  errorCode = 'saml_user_attribute_missing';
+
   const content = HOW_TO_FIX_BY_ERROR_CODE[errorCode];
   if (!content) {
     return null;
@@ -102,40 +104,41 @@ export const TestRunHowToFixSection = ({ errorCode }: TestRunHowToFixSectionProp
         })}
       >
         <HowToFixContent content={content} />
-      </Box>
 
-      <Link
-        href={docsHref}
-        target='_blank'
-        rel='noopener noreferrer'
-        sx={t => ({
-          alignSelf: 'flex-start',
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: t.space.$1x5,
-          paddingBlock: t.space.$1,
-          paddingInline: t.space.$3,
-          borderRadius: t.radii.$md,
-          borderWidth: t.borderWidths.$normal,
-          borderStyle: t.borderStyles.$solid,
-          borderColor: t.colors.$borderAlpha150,
-          color: t.colors.$colorForeground,
-          fontSize: t.fontSizes.$sm,
-          fontWeight: t.fontWeights.$medium,
-          textDecoration: 'none',
-          '&:hover': { backgroundColor: t.colors.$neutralAlpha50, textDecoration: 'none' },
-        })}
-      >
-        <Span
-          localizationKey={localizationKeys(
-            'configureSSO.testConfigurationStep.testRunDetails.howToFix.actionLabel__viewDocumentation',
-          )}
-        />
-        <Icon
-          icon={ArrowRightIcon}
-          size='sm'
-        />
-      </Link>
+        <Link
+          href={docsHref}
+          target='_blank'
+          rel='noopener noreferrer'
+          sx={t => ({
+            alignSelf: 'flex-start',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: t.space.$1x5,
+            paddingBlock: t.space.$1,
+            paddingInline: t.space.$3,
+            borderRadius: t.radii.$md,
+            borderWidth: t.borderWidths.$normal,
+            borderStyle: t.borderStyles.$solid,
+            borderColor: t.colors.$borderAlpha150,
+            color: t.colors.$colorForeground,
+            fontSize: t.fontSizes.$sm,
+            fontWeight: t.fontWeights.$medium,
+            textDecoration: 'none',
+            '&:hover': { backgroundColor: t.colors.$neutralAlpha50, textDecoration: 'none' },
+            marginTop: t.space.$2,
+          })}
+        >
+          <Span
+            localizationKey={localizationKeys(
+              'configureSSO.testConfigurationStep.testRunDetails.howToFix.actionLabel__viewDocumentation',
+            )}
+          />
+          <Icon
+            icon={ArrowRightIcon}
+            size='sm'
+          />
+        </Link>
+      </Box>
     </Flex>
   );
 };
@@ -166,6 +169,7 @@ const HowToFixContent = ({ content }: { content: HowToFixContent }): JSX.Element
         sx={t => ({
           margin: 0,
           paddingInlineStart: t.space.$5,
+          listStyleType: 'decimal',
           display: 'flex',
           flexDirection: 'column',
           gap: t.space.$1,
@@ -175,7 +179,14 @@ const HowToFixContent = ({ content }: { content: HowToFixContent }): JSX.Element
           <Box
             key={stepKey.key}
             as='li'
-            sx={t => ({ color: t.colors.$colorMutedForeground })}
+            sx={t => ({
+              color: t.colors.$colorMutedForeground,
+              fontSize: t.fontSizes.$sm,
+              '&::marker': {
+                color: t.colors.$colorMutedForeground,
+                fontSize: t.fontSizes.$sm,
+              },
+            })}
           >
             <Text
               as='span'

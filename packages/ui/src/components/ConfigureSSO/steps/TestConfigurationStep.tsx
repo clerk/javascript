@@ -26,6 +26,7 @@ import { useCardState } from '@/elements/contexts';
 import { Drawer } from '@/elements/Drawer';
 import { IconButton } from '@/elements/IconButton';
 import { LineItems } from '@/elements/LineItems';
+import { Pagination } from '@/elements/Pagination';
 import { ProfileSection } from '@/elements/Section';
 import { useClipboard } from '@/hooks';
 import { Check, Copy, RotateLeftRight } from '@/icons';
@@ -37,24 +38,31 @@ import { Step } from '../elements/Step';
 import { useWizard } from '../elements/Wizard';
 import { TestRunHowToFixSection } from './TestRunHowToFixSection';
 
+const TEST_RUNS_PAGE_SIZE = 5;
+
 export const TestConfigurationStep = (): JSX.Element => {
   const { goNext, goPrev } = useWizard();
   const { enterpriseConnection } = useConfigureSSO();
 
+  const [currentPage, setCurrentPage] = useState(1);
+
   const {
     data: testRuns,
     latest,
+    totalCount,
     isLoading: areTestRunsLoading,
     isPolling,
     revalidate: revalidateTestRuns,
   } = __internal_useEnterpriseConnectionTestRuns({
     enterpriseConnectionId: enterpriseConnection?.id ?? null,
-    params: { initialPage: 1, pageSize: 10 },
+    params: { initialPage: currentPage, pageSize: TEST_RUNS_PAGE_SIZE },
   });
 
   const hasSuccessfulTestRun = latest?.status === 'success';
+  const pageCount = totalCount ? Math.ceil(totalCount / TEST_RUNS_PAGE_SIZE) : 0;
 
   const handleTestRunCreated = () => {
+    setCurrentPage(1);
     void revalidateTestRuns();
   };
 
@@ -149,6 +157,11 @@ export const TestConfigurationStep = (): JSX.Element => {
                 isLoading={areTestRunsLoading}
                 onTestRunCreated={handleTestRunCreated}
                 isPolling={isPolling}
+                page={currentPage}
+                pageCount={pageCount}
+                pageSize={TEST_RUNS_PAGE_SIZE}
+                totalCount={totalCount ?? 0}
+                onPageChange={setCurrentPage}
               />
             </ProfileSection.Root>
           </Step.Section>
@@ -171,9 +184,24 @@ type TestResultsTableProps = {
   isLoading: boolean;
   isPolling: boolean;
   onTestRunCreated?: (testUrl: string) => void;
+  page: number;
+  pageCount: number;
+  pageSize: number;
+  totalCount: number;
+  onPageChange: (page: number) => void;
 };
 
-const TestResultsTable = ({ rows, isLoading, isPolling, onTestRunCreated }: TestResultsTableProps): JSX.Element => {
+const TestResultsTable = ({
+  rows,
+  isLoading,
+  isPolling,
+  onTestRunCreated,
+  page,
+  pageCount,
+  pageSize,
+  totalCount,
+  onPageChange,
+}: TestResultsTableProps): JSX.Element => {
   const { t } = useLocalizations();
   const [selectedTestRun, setSelectedTestRun] = useState<EnterpriseConnectionTestRunResource | null>(null);
 
@@ -267,6 +295,20 @@ const TestResultsTable = ({ rows, isLoading, isPolling, onTestRunCreated }: Test
           </Tbody>
         </Table>
       </Flex>
+
+      {pageCount > 1 ? (
+        <Pagination
+          page={Math.min(page, pageCount)}
+          count={pageCount}
+          onChange={onPageChange}
+          siblingCount={1}
+          rowInfo={{
+            allRowsCount: totalCount,
+            startingRow: totalCount > 0 ? Math.max(0, (page - 1) * pageSize) + 1 : 0,
+            endingRow: Math.min(page * pageSize, totalCount),
+          }}
+        />
+      ) : null}
 
       <Drawer.Root
         open={selectedTestRun !== null}
