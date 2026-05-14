@@ -4,6 +4,7 @@ import React from 'react';
 
 import {
   Badge,
+  Box,
   Button,
   Col,
   descriptors,
@@ -714,85 +715,88 @@ const ManualEntryPanel = ({
         <Form.PlainInput {...issuerField.props} />
       </Form.ControlRow>
 
-      <Field.Root {...certFileField.props}>
-        <Field.LabelRow>
-          <Field.Label />
-        </Field.LabelRow>
+      <Box>
+        <Field.Root {...certFileField.props}>
+          <Col gap={2}>
+            <Field.LabelRow>
+              <Field.Label />
+            </Field.LabelRow>
 
-        <input
-          ref={certInputRef}
-          type='file'
-          accept='.pem,.key,.crt,.cer,.cert'
-          multiple={false}
-          style={{ display: 'none' }}
-          onChange={e => {
-            setCertFile(e.target.files?.[0] ?? null);
-            certFileField.clearFeedback();
-          }}
-        />
-
-        {certFile === null ? (
-          <Button
-            size='sm'
-            variant='outline'
-            sx={{ alignSelf: 'flex-start' }}
-            onClick={() => certInputRef.current?.click()}
-          >
-            <Icon
-              icon={Upload}
-              size='sm'
-              colorScheme='neutral'
-              sx={t => ({ marginInlineEnd: t.space.$1 })}
-            />
-
-            <Text
-              as='span'
-              localizationKey={localizationKeys(
-                existingCertPresent
-                  ? 'configureSSO.configureStep.samlOkta.manual.signingCertificate.replaceFile'
-                  : 'configureSSO.configureStep.samlOkta.manual.signingCertificate.uploadFile',
-              )}
-            />
-          </Button>
-        ) : (
-          <Flex
-            align='center'
-            gap={2}
-            sx={theme => ({ paddingTop: theme.space.$1, paddingBottom: theme.space.$1 })}
-          >
-            <Text
-              as='span'
-              colorScheme='secondary'
-              variant='buttonSmall'
-            >
-              {certFile.name}
-            </Text>
-
-            <Button
-              variant='ghost'
-              colorScheme='neutral'
-              aria-label={t(
-                localizationKeys('configureSSO.configureStep.samlOkta.manual.signingCertificate.removeFile'),
-              )}
-              onClick={() => {
-                setCertFile(null);
+            <input
+              ref={certInputRef}
+              type='file'
+              accept='.pem,.key,.crt,.cer,.cert'
+              multiple={false}
+              style={{ display: 'none' }}
+              onChange={e => {
+                setCertFile(e.target.files?.[0] ?? null);
                 certFileField.clearFeedback();
-                if (certInputRef.current) {
-                  certInputRef.current.value = '';
-                }
               }}
-              sx={t => ({ padding: t.space.$1 })}
-            >
-              <Icon
-                icon={Close}
-                size='xs'
-              />
-            </Button>
-          </Flex>
-        )}
+            />
 
-        <Field.Feedback />
-      </Field.Root>
+            {certFile === null ? (
+              <Button
+                size='sm'
+                variant='outline'
+                sx={{ alignSelf: 'flex-start' }}
+                onClick={() => certInputRef.current?.click()}
+              >
+                <Icon
+                  icon={Upload}
+                  size='sm'
+                  colorScheme='neutral'
+                  sx={t => ({ marginInlineEnd: t.space.$1 })}
+                />
+
+                <Text
+                  as='span'
+                  localizationKey={localizationKeys(
+                    existingCertPresent
+                      ? 'configureSSO.configureStep.samlOkta.manual.signingCertificate.replaceFile'
+                      : 'configureSSO.configureStep.samlOkta.manual.signingCertificate.uploadFile',
+                  )}
+                />
+              </Button>
+            ) : (
+              <Flex
+                align='center'
+                gap={2}
+                sx={theme => ({ paddingTop: theme.space.$1, paddingBottom: theme.space.$1 })}
+              >
+                <Text
+                  as='span'
+                  colorScheme='secondary'
+                  variant='buttonSmall'
+                >
+                  {certFile.name}
+                </Text>
+
+                <Button
+                  variant='ghost'
+                  colorScheme='neutral'
+                  aria-label={t(
+                    localizationKeys('configureSSO.configureStep.samlOkta.manual.signingCertificate.removeFile'),
+                  )}
+                  onClick={() => {
+                    setCertFile(null);
+                    certFileField.clearFeedback();
+                    if (certInputRef.current) {
+                      certInputRef.current.value = '';
+                    }
+                  }}
+                  sx={t => ({ padding: t.space.$1 })}
+                >
+                  <Icon
+                    icon={Close}
+                    size='xs'
+                  />
+                </Button>
+              </Flex>
+            )}
+          </Col>
+          <Field.Feedback />
+        </Field.Root>
+      </Box>
     </>
   );
 };
