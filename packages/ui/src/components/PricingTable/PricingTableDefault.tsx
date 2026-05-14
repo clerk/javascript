@@ -15,6 +15,7 @@ import { getClosestProfileScrollBox } from '@/ui/utils/getClosestProfileScrollBo
 import { useProtect } from '../../common';
 import { normalizeFormatted, usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
 import {
+  Badge,
   Box,
   Button,
   Col,
@@ -45,6 +46,7 @@ interface PricingTableDefaultProps {
 
 export function PricingTableDefault({
   plans,
+  highlightedPlan,
   planPeriod,
   setPlanPeriod,
   onSelect,
@@ -80,6 +82,7 @@ export function PricingTableDefault({
           <Card
             key={plan.id}
             plan={plan}
+            highlighted={plan.slug === highlightedPlan}
             planPeriod={planPeriod}
             setPlanPeriod={setPlanPeriod}
             onSelect={onSelect}
@@ -98,6 +101,7 @@ export function PricingTableDefault({
 
 interface CardProps {
   plan: BillingPlanResource;
+  highlighted?: boolean;
   planPeriod: BillingSubscriptionPlanPeriod;
   setPlanPeriod: (p: BillingSubscriptionPlanPeriod) => void;
   onSelect: (plan: BillingPlanResource, event?: React.MouseEvent<HTMLElement>) => void;
@@ -106,7 +110,7 @@ interface CardProps {
 }
 
 function Card(props: CardProps) {
-  const { plan, planPeriod, setPlanPeriod, onSelect, props: pricingTableProps, isCompact = false } = props;
+  const { plan, highlighted, planPeriod, setPlanPeriod, onSelect, props: pricingTableProps, isCompact = false } = props;
   const clerk = useClerk();
   const { isSignedIn } = useSession();
   const { mode = 'mounted', ctaPosition: ctxCtaPosition } = usePricingTableContext();
@@ -193,6 +197,13 @@ function Card(props: CardProps) {
         badge={
           subscription ? (
             <SubscriptionBadge subscription={subscription.isFreeTrial ? { status: 'free_trial' } : subscription} />
+          ) : highlighted ? (
+            <Badge
+              elementDescriptor={descriptors.pricingTableCardBadge}
+              colorScheme='secondary'
+              localizationKey={localizationKeys('billing.popular')}
+              data-highlighted-plan
+            />
           ) : undefined
         }
       />

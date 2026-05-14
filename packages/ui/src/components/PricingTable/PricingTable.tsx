@@ -86,11 +86,12 @@ const PricingTableRoot = (props: PricingTableProps) => {
           planPeriod={planPeriod}
           setPlanPeriod={setPlanPeriod}
           onSelect={selectPlan}
-          highlightedPlan={(props as any).highlightPlan}
+          highlightedPlan={props.highlightedPlan}
         />
       ) : (
         <PricingTableDefault
           plans={plansToRender}
+          highlightedPlan={props.highlightedPlan}
           planPeriod={planPeriod}
           setPlanPeriod={setPlanPeriod}
           onSelect={selectPlan}
