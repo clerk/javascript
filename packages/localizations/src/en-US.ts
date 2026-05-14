@@ -277,6 +277,8 @@ export const enUS: LocalizationResource = {
     testConfigurationStep: {
       title: 'Test your SSO connection',
       subtitle: 'Authenticate using the test SSO URL to verify you configured the connection correctly.',
+      error__noSuccessfulTestRun:
+        'You need at least one successful test run before you can continue. Generate a test SSO URL and complete the sign-in flow.',
       testUrl: {
         title: 'Test your SSO URL',
         subtitle: 'Generate and copy a test SSO URL to authenticate with.',

@@ -66,8 +66,6 @@ export const TestRunHowToFixSection = ({ errorCode }: TestRunHowToFixSectionProp
     return null;
   }
 
-  errorCode = 'saml_user_attribute_missing';
-
   const content = HOW_TO_FIX_BY_ERROR_CODE[errorCode];
   if (!content) {
     return null;

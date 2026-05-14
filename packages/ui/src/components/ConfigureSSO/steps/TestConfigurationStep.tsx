@@ -30,7 +30,7 @@ import { Pagination } from '@/elements/Pagination';
 import { ProfileSection } from '@/elements/Section';
 import { useClipboard } from '@/hooks';
 import { Check, Copy, RotateLeftRight } from '@/icons';
-import { mqu } from '@/styledSystem';
+import { common, mqu } from '@/styledSystem';
 import { handleError } from '@/utils/errorHandler';
 
 import { useConfigureSSO } from '../ConfigureSSOContext';
@@ -39,16 +39,17 @@ import { useWizard } from '../elements/Wizard';
 import { TestRunHowToFixSection } from './TestRunHowToFixSection';
 
 const TEST_RUNS_PAGE_SIZE = 5;
+const TEST_RESULTS_TABLE_COLUMN_COUNT = 3;
 
 export const TestConfigurationStep = (): JSX.Element => {
   const { goNext, goPrev } = useWizard();
   const { enterpriseConnection } = useConfigureSSO();
+  const card = useCardState();
 
   const [currentPage, setCurrentPage] = useState(1);
 
   const {
     data: testRuns,
-    latest,
     totalCount,
     isLoading: areTestRunsLoading,
     isPolling,
@@ -58,7 +59,6 @@ export const TestConfigurationStep = (): JSX.Element => {
     params: { initialPage: currentPage, pageSize: TEST_RUNS_PAGE_SIZE },
   });
 
-  const hasSuccessfulTestRun = latest?.status === 'success';
   const pageCount = totalCount ? Math.ceil(totalCount / TEST_RUNS_PAGE_SIZE) : 0;
 
   const handleTestRunCreated = () => {
@@ -167,15 +167,89 @@ export const TestConfigurationStep = (): JSX.Element => {
           </Step.Section>
         </Step.Body>
 
+        {card.error ? (
+          <Box
+            sx={t => ({
+              flexShrink: 0,
+              paddingInline: t.space.$5,
+              paddingBlock: t.space.$3,
+              borderTopWidth: t.borderWidths.$normal,
+              borderTopStyle: t.borderStyles.$solid,
+              borderTopColor: t.colors.$borderAlpha100,
+            })}
+          >
+            <Text
+              as='p'
+              variant='body'
+              sx={t => ({ color: t.colors.$danger500, fontSize: t.fontSizes.$sm })}
+            >
+              {card.error}
+            </Text>
+          </Box>
+        ) : null}
+
         <Step.Footer>
           <Step.Footer.Previous onClick={() => goPrev()} />
-          <Step.Footer.Continue
-            onClick={() => goNext()}
-            isDisabled={!hasSuccessfulTestRun || enterpriseConnection?.active}
+          <ContinueTestSsoStepButton
+            enterpriseConnectionId={enterpriseConnection?.id}
+            isConnectionActive={enterpriseConnection?.active}
+            onContinue={() => void goNext()}
           />
         </Step.Footer>
       </Step>
     </Flow.Part>
+  );
+};
+
+type ContinueTestSsoStepButtonProps = {
+  enterpriseConnectionId: string | undefined;
+  isConnectionActive: boolean | undefined;
+  onContinue: () => void;
+};
+
+const ContinueTestSsoStepButton = ({
+  enterpriseConnectionId,
+  isConnectionActive,
+  onContinue,
+}: ContinueTestSsoStepButtonProps): JSX.Element => {
+  const { user } = useUser();
+  const { t } = useLocalizations();
+  const card = useCardState();
+  const [isValidating, setIsValidating] = useState(false);
+
+  const handleContinue = async () => {
+    if (!user || !enterpriseConnectionId) {
+      return;
+    }
+
+    setIsValidating(true);
+    card.setError(undefined);
+
+    try {
+      const result = await user.getEnterpriseConnectionTestRuns(enterpriseConnectionId, {
+        initialPage: 1,
+        pageSize: 1,
+        status: ['success'],
+      });
+
+      if (result.data.length > 0) {
+        onContinue();
+      } else {
+        card.setError(t(localizationKeys('configureSSO.testConfigurationStep.error__noSuccessfulTestRun')));
+      }
+    } catch (err) {
+      handleError(err as Error, [], card.setError);
+    } finally {
+      setIsValidating(false);
+    }
+  };
+
+  return (
+    <Step.Footer.Continue
+      onClick={() => void handleContinue()}
+      isLoading={isValidating}
+      isDisabled={!enterpriseConnectionId || isConnectionActive}
+    />
   );
 };
 
@@ -214,27 +288,53 @@ const TestResultsTable = ({
   return (
     <>
       <Flex
+        direction='col'
         sx={t => ({
           width: '100%',
+          flex: '0 1 auto',
           minHeight: 0,
+          overflowY: 'auto',
+          borderWidth: t.borderWidths.$normal,
+          borderStyle: t.borderStyles.$solid,
+          borderColor: t.colors.$borderAlpha150,
+          borderRadius: t.radii.$lg,
+          ...common.unstyledScrollbar(t),
           [mqu.sm]: { overflowX: 'auto', padding: t.space.$0x25 },
         })}
       >
         <Table
           tableHeadVisuallyHidden={!rows.length}
-          sx={t => ({ background: t.colors.$colorBackground, height: '100%' })}
+          sx={t => ({
+            background: t.colors.$colorBackground,
+            '&&': {
+              border: 'none',
+              borderRadius: 0,
+            },
+          })}
         >
           <Thead>
             <Tr>
-              <Th>Timestamp</Th>
-              <Th>Details</Th>
-              <Th>Status</Th>
+              <Th
+                localizationKey={localizationKeys(
+                  'configureSSO.testConfigurationStep.testRunDetails.runDetails.timestamp',
+                )}
+              />
+              <Th
+                localizationKey={localizationKeys(
+                  'configureSSO.testConfigurationStep.testRunDetails.runDetails.sectionTitle',
+                )}
+              />
+              <Th
+                localizationKey={localizationKeys(
+                  'configureSSO.testConfigurationStep.testRunDetails.runDetails.status',
+                )}
+              />
             </Tr>
           </Thead>
           <Tbody>
             {isLoading || isPolling ? (
               <Tr>
-                <Td>
+                <Td colSpan={TEST_RESULTS_TABLE_COLUMN_COUNT}>
                   <Flex
                     direction='col'
                     align='center'
@@ -258,7 +358,7 @@ const TestResultsTable = ({
               </Tr>
             ) : !rows.length ? (
               <Tr>
-                <Td>
+                <Td colSpan={TEST_RESULTS_TABLE_COLUMN_COUNT}>
                   <Flex
                     align='center'
                     justify='center'
@@ -297,17 +397,19 @@ const TestResultsTable = ({
       </Flex>
 
       {pageCount > 1 ? (
-        <Pagination
-          page={Math.min(page, pageCount)}
-          count={pageCount}
-          onChange={onPageChange}
-          siblingCount={1}
-          rowInfo={{
-            allRowsCount: totalCount,
-            startingRow: totalCount > 0 ? Math.max(0, (page - 1) * pageSize) + 1 : 0,
-            endingRow: Math.min(page * pageSize, totalCount),
-          }}
-        />
+        <Box sx={{ flexShrink: 0 }}>
+          <Pagination
+            page={Math.min(page, pageCount)}
+            count={pageCount}
+            onChange={onPageChange}
+            siblingCount={1}
+            rowInfo={{
+              allRowsCount: totalCount,
+              startingRow: totalCount > 0 ? Math.max(0, (page - 1) * pageSize) + 1 : 0,
+              endingRow: Math.min(page * pageSize, totalCount),
+            }}
+          />
+        </Box>
       ) : null}
 
       <Drawer.Root
@@ -617,7 +719,7 @@ const CopyTestUrlButton = ({ onTestRunCreated }: CopyTestUrlButtonProps): JSX.El
       .createEnterpriseConnectionTestRun(enterpriseConnection.id)
       .then(({ url }) => {
         setTestUrl(url);
-        onCopy();
+        onCopy(url);
         onTestRunCreated?.(url);
       })
       .catch(err => handleError(err as Error, [], card.setError))

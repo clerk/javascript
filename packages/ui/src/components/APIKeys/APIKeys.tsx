@@ -208,7 +208,6 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
         />
       </Action.Root>
 
-      {/* here reference to paginated table for test runs */}
       <APIKeysTable
         rows={apiKeys}
         isLoading={isLoading}

@@ -1341,6 +1341,7 @@ export type __internal_LocalizationResource = {
     testConfigurationStep: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
+      error__noSuccessfulTestRun: LocalizationValue;
       testUrl: {
         title: LocalizationValue;
         subtitle: LocalizationValue;
