@@ -27,6 +27,36 @@ on:
         description: "Optional: substring filter for flow paths (e.g. 'sign-in/email-password'). Empty = all flows."
         required: false
         default: ""
+      clerk_ios_ref:
+        description: "Optional: pin SPM clerk-ios to this ref (SHA or branch). Empty = use the version pinned in app.plugin.js."
+        required: false
+        default: ""
+      clerk_android_ref:
+        description: "Optional: pin clerk-android Maven coordinates to this version (e.g. '1.0.17-SNAPSHOT'). Empty = use the version pinned in android/build.gradle."
+        required: false
+        default: ""
+  workflow_call:
+    inputs:
+      quickstart_ref:
+        type: string
+        required: false
+        default: "main"
+      exclude_tags:
+        type: string
+        required: false
+        default: "manual,skip"
+      flows_filter:
+        type: string
+        required: false
+        default: ""
+      clerk_ios_ref:
+        type: string
+        required: false
+        default: ""
+      clerk_android_ref:
+        type: string
+        required: false
+        default: ""
 
 env:
   EXPO_INSTANCE_NAME: clerkstage-with-native-components
@@ -56,6 +86,44 @@ jobs:
           repository: clerk/clerk-expo-quickstart
           ref: ${{ inputs.quickstart_ref }}
           path: clerk-expo-quickstart
+
+      - name: Pin clerk-ios SPM ref (compat-gate mode)
+        # When the caller (typically clerk-ios release-sdk.yml's expo-compat job)
+        # passes a specific clerk-ios ref, patch packages/expo/app.plugin.js to
+        # SHA-pin SPM (`kind: revision`) instead of using the default exact-version
+        # pin. The binary cache hash recomputes below, so the cache key naturally
+        # varies by ref and doesn't collide with normal PR / dispatch runs.
+        if: inputs.clerk_ios_ref != ''
+        env:
+          IOS_REF: ${{ inputs.clerk_ios_ref }}
+        run: |
+          set -euo pipefail
+          file="packages/expo/app.plugin.js"
+          tmp="$(mktemp)"
+          sed -e "s|const CLERK_IOS_VERSION = '[^']*'|const CLERK_IOS_VERSION = '${IOS_REF}'|" \
+              -e "s|kind: 'exactVersion'|kind: 'revision'|g" \
+              -e "s|version: CLERK_IOS_VERSION|revision: CLERK_IOS_VERSION|g" \
+              "$file" > "$tmp" && mv "$tmp" "$file"
+          echo "Pinned clerk-ios to ${IOS_REF}:"
+          grep -nE "CLERK_IOS_VERSION|kind:|revision:" "$file" | head
+
+      - name: Pin clerk-android Maven version (compat-gate mode)
+        # When the caller passes a specific clerk-android version (e.g. a
+        # SNAPSHOT or pre-release coordinate already published to Maven Central /
+        # Sonatype staging), rewrite the version constants in
+        # packages/expo/android/build.gradle.
+        if: inputs.clerk_android_ref != ''
+        env:
+          ANDROID_REF: ${{ inputs.clerk_android_ref }}
+        run: |
+          set -euo pipefail
+          file="packages/expo/android/build.gradle"
+          tmp="$(mktemp)"
+          sed -e "s|clerkAndroidApiVersion = \"[^\"]*\"|clerkAndroidApiVersion = \"${ANDROID_REF}\"|" \
+              -e "s|clerkAndroidUiVersion = \"[^\"]*\"|clerkAndroidUiVersion = \"${ANDROID_REF}\"|" \
+              "$file" > "$tmp" && mv "$tmp" "$file"
+          echo "Pinned clerk-android to ${ANDROID_REF}:"
+          grep -nE "clerkAndroid(Api|Ui)Version" "$file" | head
 
       - name: Compute binary source hash
         # Hash everything that affects the produced APK: @clerk/expo source,
@@ -374,6 +442,44 @@ jobs:
           repository: clerk/clerk-expo-quickstart
           ref: ${{ inputs.quickstart_ref }}
           path: clerk-expo-quickstart
+
+      - name: Pin clerk-ios SPM ref (compat-gate mode)
+        # When the caller (typically clerk-ios release-sdk.yml's expo-compat job)
+        # passes a specific clerk-ios ref, patch packages/expo/app.plugin.js to
+        # SHA-pin SPM (`kind: revision`) instead of using the default exact-version
+        # pin. The binary cache hash recomputes below, so the cache key naturally
+        # varies by ref and doesn't collide with normal PR / dispatch runs.
+        if: inputs.clerk_ios_ref != ''
+        env:
+          IOS_REF: ${{ inputs.clerk_ios_ref }}
+        run: |
+          set -euo pipefail
+          file="packages/expo/app.plugin.js"
+          tmp="$(mktemp)"
+          sed -e "s|const CLERK_IOS_VERSION = '[^']*'|const CLERK_IOS_VERSION = '${IOS_REF}'|" \
+              -e "s|kind: 'exactVersion'|kind: 'revision'|g" \
+              -e "s|version: CLERK_IOS_VERSION|revision: CLERK_IOS_VERSION|g" \
+              "$file" > "$tmp" && mv "$tmp" "$file"
+          echo "Pinned clerk-ios to ${IOS_REF}:"
+          grep -nE "CLERK_IOS_VERSION|kind:|revision:" "$file" | head
+
+      - name: Pin clerk-android Maven version (compat-gate mode)
+        # When the caller passes a specific clerk-android version (e.g. a
+        # SNAPSHOT or pre-release coordinate already published to Maven Central /
+        # Sonatype staging), rewrite the version constants in
+        # packages/expo/android/build.gradle.
+        if: inputs.clerk_android_ref != ''
+        env:
+          ANDROID_REF: ${{ inputs.clerk_android_ref }}
+        run: |
+          set -euo pipefail
+          file="packages/expo/android/build.gradle"
+          tmp="$(mktemp)"
+          sed -e "s|clerkAndroidApiVersion = \"[^\"]*\"|clerkAndroidApiVersion = \"${ANDROID_REF}\"|" \
+              -e "s|clerkAndroidUiVersion = \"[^\"]*\"|clerkAndroidUiVersion = \"${ANDROID_REF}\"|" \
+              "$file" > "$tmp" && mv "$tmp" "$file"
+          echo "Pinned clerk-android to ${ANDROID_REF}:"
+          grep -nE "clerkAndroid(Api|Ui)Version" "$file" | head
 
       - name: Compute binary source hash
         id: bin-hash
