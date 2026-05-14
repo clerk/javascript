@@ -1432,6 +1432,9 @@ export type __internal_LocalizationResource = {
           metadataUrl: LocalizationValue;
           manual: LocalizationValue;
         };
+        submitSamlConfig: {
+          title: LocalizationValue;
+        };
       };
     };
   };

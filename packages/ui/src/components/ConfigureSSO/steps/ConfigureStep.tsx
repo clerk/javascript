@@ -548,6 +548,11 @@ export const SubmitSamlConfigSubStep = (): JSX.Element => {
           fill
           sx={theme => ({ gap: theme.space.$5 })}
         >
+          <Heading
+            as='h3'
+            textVariant='subtitle'
+            localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.submitSamlConfig.title')}
+          />
           <SegmentedControl.Root
             aria-label={t(localizationKeys('configureSSO.configureStep.samlOkta.modes.ariaLabel'))}
             value={mode}

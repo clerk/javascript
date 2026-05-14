@@ -341,8 +341,11 @@ export const enUS: LocalizationResource = {
         },
         modes: {
           ariaLabel: 'Configuration mode',
-          metadataUrl: 'Add via metadata URL',
+          metadataUrl: 'Add via metadata',
           manual: 'Configure manually',
+        },
+        submitSamlConfig: {
+          title: 'Fill in your Okta SAML application details',
         },
       },
     },
