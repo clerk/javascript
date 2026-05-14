@@ -183,8 +183,36 @@ export const csCZ: LocalizationResource = {
     year: 'Rok',
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'Kontaktujte správce vaší organizace, abyste získali oprávnění ke správě podnikových připojení.',
+      title: 'Nemáte oprávnění ke správě podnikových připojení',
+    },
     navbar: {
       title: 'Nastavit jednotné přihlášení (SSO)',
+    },
+    verifyEmailDomainStep: {
+      title: 'Ověřit e-mailovou adresu',
+      subtitle: 'Ověřte e-mailovou adresu, na které chcete povolit podnikové připojení.',
+      addEmailAddress: {
+        formTitle: 'Potřebujeme váš e-mail',
+        formSubtitle: 'K zahájení budeme potřebovat vaši e-mailovou adresu',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'E-mailová adresa',
+      },
+      emailCode: {
+        formTitle: 'Ověřte svou e-mailovou adresu',
+        formSubtitle: 'Zadejte ověřovací kód odeslaný na {{identifier}}',
+        resendButton: 'Neobdrželi jste kód? Odeslat znovu',
+        verified: {
+          title: 'Máme váš e-mail',
+          subtitle: 'Ověřili jste svou e-mailovou adresu pomocí následujícího e-mailu',
+          inputLabel: 'Ověřená e-mailová adresa',
+        },
+      },
+      domainTaken: {
+        title: 'Tato doména ({{domain}}) již má SSO připojení',
+        subtitle: 'Kontaktujte administrátora aplikace, abyste získali přístup prostřednictvím stávajícího připojení.',
+      },
     },
   },
   createOrganization: {

@@ -179,8 +179,36 @@ export const bnIN: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'এন্টারপ্রাইজ সংযোগ পরিচালনার অনুমতি পেতে আপনার সংস্থার প্রশাসকের সাথে যোগাযোগ করুন।',
+      title: 'এন্টারপ্রাইজ সংযোগ পরিচালনার অনুমতি আপনার নেই',
+    },
     navbar: {
       title: 'একক সাইন-অন (SSO) কনফিগার করুন',
+    },
+    verifyEmailDomainStep: {
+      title: 'ইমেইল ঠিকানা যাচাই করুন',
+      subtitle: 'যে ইমেইল ঠিকানায় আপনি এন্টারপ্রাইজ সংযোগ সক্রিয় করতে চান তা যাচাই করুন।',
+      addEmailAddress: {
+        formTitle: 'আমাদের আপনার ইমেইল প্রয়োজন',
+        formSubtitle: 'শুরু করতে আমাদের আপনার ইমেইল ঠিকানা প্রয়োজন হবে',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'ইমেইল ঠিকানা',
+      },
+      emailCode: {
+        formTitle: 'আপনার ইমেইল ঠিকানা যাচাই করুন',
+        formSubtitle: '{{identifier}} এ পাঠানো যাচাইকরণ কোড লিখুন',
+        resendButton: 'কোড পাননি? পুনরায় পাঠান',
+        verified: {
+          title: 'আমরা আপনার ইমেইল পেয়েছি',
+          subtitle: 'আপনি নিম্নলিখিত ইমেইল দিয়ে আপনার ইমেইল ঠিকানা যাচাই করেছেন',
+          inputLabel: 'যাচাইকৃত ইমেইল ঠিকানা',
+        },
+      },
+      domainTaken: {
+        title: 'এই ডোমেইনে ({{domain}}) ইতিমধ্যে একটি SSO সংযোগ রয়েছে',
+        subtitle: 'বিদ্যমান সংযোগের মাধ্যমে অ্যাক্সেস পেতে অ্যাপ্লিকেশন প্রশাসকের সাথে যোগাযোগ করুন।',
+      },
     },
   },
   createOrganization: {

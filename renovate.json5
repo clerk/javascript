@@ -21,7 +21,6 @@
     ".nvmrc",
     "integration/templates/**",
     "packages/upgrade/src/__tests__/fixtures/**",
-    "playground/**",
   ],
   includePaths: [
     "package.json",
