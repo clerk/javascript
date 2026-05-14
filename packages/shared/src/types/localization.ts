@@ -1427,6 +1427,11 @@ export type __internal_LocalizationResource = {
           placeholder: LocalizationValue;
           description: LocalizationValue;
         };
+        modes: {
+          ariaLabel: LocalizationValue;
+          metadataUrl: LocalizationValue;
+          manual: LocalizationValue;
+        };
       };
     };
   };

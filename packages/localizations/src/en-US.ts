@@ -339,6 +339,11 @@ export const enUS: LocalizationResource = {
           placeholder: 'Paste URL here...',
           description: 'In your Okta SAML app, go to the Sign On tab and retrieve the metadata URL. Paste it below.',
         },
+        modes: {
+          ariaLabel: 'Configuration mode',
+          metadataUrl: 'Add via metadata URL',
+          manual: 'Configure manually',
+        },
       },
     },
   },
