@@ -1,10 +1,12 @@
-import { descriptors, Flow, Text } from '@/customizables';
+import { descriptors, Flow } from '@/customizables';
 
+import { useConfigureSSO } from '../ConfigureSSOContext';
 import { Step } from '../elements/Step';
 import { useWizard } from '../elements/Wizard';
 
 export const ConfigureStep = (): JSX.Element => {
   const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
+  const { enterpriseConnection } = useConfigureSSO();
 
   return (
     <Flow.Part part='configureCreateApp'>
@@ -18,9 +20,7 @@ export const ConfigureStep = (): JSX.Element => {
         />
 
         <Step.Body>
-          <Step.Section>
-            <Text>UI goes here</Text>
-          </Step.Section>
+          <Step.Section>Single sign-on URL: {enterpriseConnection?.samlConnection?.acsUrl}</Step.Section>
         </Step.Body>
 
         <Step.Footer>

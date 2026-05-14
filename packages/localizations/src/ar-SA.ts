@@ -186,6 +186,20 @@ export const arSA: LocalizationResource = {
     navbar: {
       title: 'تكوين تسجيل الدخول الموحد (SSO)',
     },
+    selectProviderStep: {
+      title: 'اختر المزود',
+      subtitle: 'اختر المزود الذي ستقوم بإعداد تسجيل الدخول الموحد (SSO) له.',
+      body: {
+        title: 'اختر مزود الهوية الخاص بك',
+        description: 'سنرشدك خلال عملية الإعداد التفصيلية بعد ذلك.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'مزود SAML مخصص',
+      },
+      warning: 'بمجرد اختيار المزود لا يمكنك التغيير مرة أخرى حتى انتهاء التكوين',
+    },
     verifyEmailDomainStep: {
       title: 'التحقق من البريد الإلكتروني',
       subtitle: 'تحقق من عنوان البريد الإلكتروني الذي تريد تفعيل اتصال المؤسسة عليه.',

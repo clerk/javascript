@@ -186,6 +186,20 @@ export const svSE: LocalizationResource = {
     navbar: {
       title: 'Konfigurera enkel inloggning (SSO)',
     },
+    selectProviderStep: {
+      title: 'Välj leverantör',
+      subtitle: 'Välj den leverantör du ska konfigurera SSO för.',
+      body: {
+        title: 'Välj din identitetsleverantör',
+        description: 'Vi guidar dig sedan genom den detaljerade konfigurationsprocessen.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Anpassad SAML-leverantör',
+      },
+      warning: 'När en leverantör har valts kan du inte ändra igen förrän konfigurationen är klar',
+    },
     verifyEmailDomainStep: {
       title: 'Verifiera e-postadress',
       subtitle: 'Verifiera e-postadressen som du vill aktivera företagsanslutningen för.',

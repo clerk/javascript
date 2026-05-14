@@ -193,6 +193,20 @@ export const koKR: LocalizationResource = {
     navbar: {
       title: '싱글 사인온(SSO) 구성',
     },
+    selectProviderStep: {
+      title: '공급자 선택',
+      subtitle: 'SSO를 설정할 공급자를 선택하세요.',
+      body: {
+        title: 'ID 공급자를 선택하세요',
+        description: '다음 단계에서 자세한 설정 프로세스를 안내해 드립니다.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: '사용자 지정 SAML 공급자',
+      },
+      warning: '공급자를 선택하면 구성이 완료될 때까지 다시 변경할 수 없습니다',
+    },
     verifyEmailDomainStep: {
       title: '이메일 주소 확인',
       subtitle: '엔터프라이즈 연결을 활성화하려는 이메일 주소를 확인하세요.',

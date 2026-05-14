@@ -209,6 +209,20 @@ export const enUS: LocalizationResource = {
     navbar: {
       title: 'Configure Single Sign-On (SSO)',
     },
+    selectProviderStep: {
+      title: 'Select provider',
+      subtitle: 'Select the provider you are going to setup SSO for.',
+      body: {
+        title: 'Select your identity provider',
+        description: "We'll guide you through the detailed setup process next.",
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Custom SAML Provider',
+      },
+      warning: 'Once a provider is selected you cannot change again until the configuration is over',
+    },
     verifyEmailDomainStep: {
       title: 'Verify email address',
       subtitle: 'Verify the email address you want to enable the enterprise connection on.',

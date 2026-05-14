@@ -54,11 +54,11 @@ const Header = ({ title, description, children }: StepHeaderProps): JSX.Element 
       })}
     >
       <Flex
-        align='center'
+        align='start'
         justify='between'
         sx={theme => ({ gap: theme.space.$4 })}
       >
-        <Col sx={theme => ({ gap: theme.space.$1x5, minWidth: 0 })}>
+        <Col sx={theme => ({ gap: theme.space.$2, minWidth: 0 })}>
           <Heading
             textVariant='h3'
             sx={theme => ({ color: theme.colors.$colorForeground, fontSize: theme.fontSizes.$lg })}

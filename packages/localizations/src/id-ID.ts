@@ -186,6 +186,20 @@ export const idID: LocalizationResource = {
     navbar: {
       title: 'Konfigurasi Single Sign-On (SSO)',
     },
+    selectProviderStep: {
+      title: 'Pilih penyedia',
+      subtitle: 'Pilih penyedia yang akan Anda atur untuk SSO.',
+      body: {
+        title: 'Pilih penyedia identitas Anda',
+        description: 'Kami akan memandu Anda melalui proses penyiapan terperinci berikutnya.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Penyedia SAML Khusus',
+      },
+      warning: 'Setelah penyedia dipilih, Anda tidak dapat mengubahnya lagi sampai konfigurasi selesai',
+    },
     verifyEmailDomainStep: {
       title: 'Verifikasi alamat email',
       subtitle: 'Verifikasi alamat email yang ingin Anda aktifkan koneksi enterprise-nya.',
