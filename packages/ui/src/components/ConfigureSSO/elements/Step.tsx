@@ -13,7 +13,7 @@ import {
   useLocalizations,
 } from '@/customizables';
 import { CaretLeft, CaretRight } from '@/icons';
-import type { PropsOfComponent } from '@/styledSystem';
+import { common, type PropsOfComponent } from '@/styledSystem';
 
 import { ProfileCardFooter } from './ProfileCard';
 
@@ -26,12 +26,20 @@ const Layout = ({ sx, ...props }: StepLayoutProps): JSX.Element => (
   />
 );
 
-type StepSectionProps = PropsOfComponent<typeof Col>;
+type StepSectionProps = PropsOfComponent<typeof Col> & {
+  /**
+   * When true, the section grows to fill its parent's remaining vertical
+   * space (flex: 1). Defaults to false so the section sizes to its content
+   * — required for Step.Header, multi-section sub-steps, and other places
+   * where a section should stay natural-height.
+   */
+  fill?: boolean;
+};
 
-const Section = ({ sx, ...props }: StepSectionProps): JSX.Element => (
+const Section = ({ fill, sx, ...props }: StepSectionProps): JSX.Element => (
   <Col
     {...props}
-    sx={[theme => ({ padding: theme.space.$5 }), sx]}
+    sx={[theme => ({ padding: theme.space.$5 }), fill && { flex: 1 }, sx]}
   />
 );
 
@@ -59,18 +67,12 @@ const Header = ({ title, description, children }: StepHeaderProps): JSX.Element 
         sx={theme => ({ gap: theme.space.$4 })}
       >
         <Col sx={theme => ({ gap: theme.space.$2, minWidth: 0 })}>
-          <Heading
-            textVariant='h3'
-            sx={theme => ({ color: theme.colors.$colorForeground, fontSize: theme.fontSizes.$lg })}
-          >
-            {titleText}
-          </Heading>
+          <Heading textVariant='h2'>{titleText}</Heading>
 
           {descriptionText && (
             <Text
               as='p'
-              variant='body'
-              sx={theme => ({ color: theme.colors.$colorMutedForeground })}
+              colorScheme='secondary'
             >
               {descriptionText}
             </Text>
@@ -89,7 +91,15 @@ const Body = ({ sx, ...props }: StepBodyProps): JSX.Element => (
   <Col
     as='main'
     {...props}
-    sx={[{ flex: 1, minHeight: 0, overflowY: 'auto' }, sx]}
+    sx={[
+      t => ({
+        flex: 1,
+        minHeight: 0,
+        overflowY: 'auto',
+        ...common.unstyledScrollbar(t),
+      }),
+      sx,
+    ]}
   />
 );
 
