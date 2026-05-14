@@ -245,9 +245,11 @@ describe('SessionTokenCache', () => {
 
     it('enforces monotonicity: replaces older cached token when a fresher-oiat broadcast arrives', async () => {
       // Inverse of the previous test: a fresher-oiat broadcast must overwrite
-      // an older-oiat token already in cache.
-      const olderJwt = createJwtWithOiat(1666648190, 1666648190);
-      const newerJwt = createJwtWithOiat(1666648250, 1666648250);
+      // an older-oiat token already in cache. Use ttl=120 so both tokens stay
+      // valid against the test clock (nowSec=1666648260) — cache.get drops
+      // entries past their expiry.
+      const olderJwt = createJwtWithOiat(1666648190, 1666648190, 120);
+      const newerJwt = createJwtWithOiat(1666648250, 1666648250, 120);
 
       const olderEvent: MessageEvent<SessionTokenEvent> = {
         data: {
