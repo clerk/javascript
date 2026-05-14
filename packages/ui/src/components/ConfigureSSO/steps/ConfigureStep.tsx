@@ -495,6 +495,148 @@ export const AssignUsersSubStep = (): JSX.Element => {
   );
 };
 
+export const SubmitSamlConfigSubStep = (): JSX.Element => {
+  const card = useCardState();
+  const { t } = useLocalizations();
+  const { goNext, goPrev, isFirstStep } = useWizard();
+  const { enterpriseConnection } = useConfigureSSO();
+  const { updateEnterpriseConnection } = __internal_useUserEnterpriseConnections();
+
+  const [mode, setMode] = React.useState<'metadataUrl' | 'manual'>('metadataUrl');
+  const [certFile, setCertFile] = React.useState<File | null>(null);
+
+  const updateConnection = useReverification(
+    React.useCallback(
+      async (params: UpdateMeEnterpriseConnectionParams) => {
+        if (!enterpriseConnection) {
+          throw new Error('Enterprise connection required');
+        }
+
+        return updateEnterpriseConnection(enterpriseConnection.id, params);
+      },
+      [enterpriseConnection, updateEnterpriseConnection],
+    ),
+  );
+
+  const metadataUrlField = useFormControl('idpMetadataUrl', '', {
+    type: 'text',
+    label: localizationKeys('configureSSO.configureStep.samlOkta.metadataUrl.label'),
+    placeholder: localizationKeys('configureSSO.configureStep.samlOkta.metadataUrl.placeholder'),
+    isRequired: true,
+  });
+
+  const signOnUrlField = useFormControl('idpSsoUrl', '', {
+    type: 'text',
+    label: localizationKeys('configureSSO.configureStep.samlOkta.manual.signOnUrl.label'),
+    placeholder: localizationKeys('configureSSO.configureStep.samlOkta.manual.signOnUrl.placeholder'),
+    isRequired: true,
+  });
+
+  const issuerField = useFormControl('idpEntityId', '', {
+    type: 'text',
+    label: localizationKeys('configureSSO.configureStep.samlOkta.manual.issuer.label'),
+    placeholder: localizationKeys('configureSSO.configureStep.samlOkta.manual.issuer.placeholder'),
+    isRequired: true,
+  });
+
+  const trimmedMetadataUrl = metadataUrlField.value.trim();
+  const trimmedSignOnUrl = signOnUrlField.value.trim();
+  const trimmedIssuer = issuerField.value.trim();
+
+  const canSubmit =
+    !card.isLoading &&
+    ((mode === 'metadataUrl' && trimmedMetadataUrl.length > 0) ||
+      (mode === 'manual' && trimmedSignOnUrl.length > 0 && trimmedIssuer.length > 0 && certFile !== null));
+
+  const handleContinue = async () => {
+    if (!certFile || !enterpriseConnection || !canSubmit) {
+      return;
+    }
+
+    card.setError(undefined);
+    card.setLoading();
+
+    try {
+      if (mode === 'metadataUrl') {
+        await updateConnection({ saml: { idpMetadataUrl: trimmedMetadataUrl } });
+      } else {
+        const idpCertificate = await certFile.text();
+        await updateConnection({
+          saml: {
+            idpSsoUrl: trimmedSignOnUrl,
+            idpEntityId: trimmedIssuer,
+            idpCertificate,
+          },
+        });
+      }
+      void goNext();
+    } catch (err) {
+      if (mode === 'metadataUrl') {
+        handleError(err as Error, [metadataUrlField], card.setError);
+      } else {
+        handleError(err as Error, [signOnUrlField, issuerField], card.setError);
+      }
+    } finally {
+      card.setIdle();
+    }
+  };
+
+  return (
+    <>
+      <Step.Body>
+        <Step.Section
+          fill
+          gap={5}
+        >
+          <Heading
+            as='h3'
+            textVariant='subtitle'
+            localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.submitSamlConfig.title')}
+          />
+          <SegmentedControl.Root
+            aria-label={t(localizationKeys('configureSSO.configureStep.samlOkta.modes.ariaLabel'))}
+            value={mode}
+            onChange={value => setMode(value as 'metadataUrl' | 'manual')}
+            fullWidth
+          >
+            <SegmentedControl.Button
+              value='metadataUrl'
+              text={localizationKeys('configureSSO.configureStep.samlOkta.modes.metadataUrl')}
+            />
+            <SegmentedControl.Button
+              value='manual'
+              text={localizationKeys('configureSSO.configureStep.samlOkta.modes.manual')}
+            />
+          </SegmentedControl.Root>
+
+          {mode === 'metadataUrl' ? (
+            <MetadataUrlPanel field={metadataUrlField} />
+          ) : (
+            <ManualEntryPanel
+              signOnUrlField={signOnUrlField}
+              issuerField={issuerField}
+              certFile={certFile}
+              setCertFile={setCertFile}
+            />
+          )}
+        </Step.Section>
+      </Step.Body>
+
+      <Step.Footer>
+        <Step.Footer.Previous
+          onClick={() => goPrev()}
+          isDisabled={isFirstStep || card.isLoading}
+        />
+        <Step.Footer.Continue
+          onClick={handleContinue}
+          isLoading={card.isLoading}
+          isDisabled={!canSubmit}
+        />
+      </Step.Footer>
+    </>
+  );
+};
+
 type FormControl = FormControlState<FieldId>;
 
 type MetadataUrlPanelProps = {
@@ -591,11 +733,12 @@ const ManualEntryPanel = ({
           <Flex
             align='center'
             gap={2}
+            sx={theme => ({ paddingTop: theme.space.$1, paddingBottom: theme.space.$1 })}
           >
             <Text
               as='span'
               colorScheme='secondary'
-              sx={t => ({ fontSize: t.fontSizes.$sm })}
+              variant='buttonSmall'
             >
               {certFile.name}
             </Text>
@@ -622,148 +765,6 @@ const ManualEntryPanel = ({
           </Flex>
         )}
       </Col>
-    </>
-  );
-};
-
-export const SubmitSamlConfigSubStep = (): JSX.Element => {
-  const card = useCardState();
-  const { t } = useLocalizations();
-  const { goNext, goPrev, isFirstStep } = useWizard();
-  const { enterpriseConnection } = useConfigureSSO();
-  const { updateEnterpriseConnection } = __internal_useUserEnterpriseConnections();
-
-  const [mode, setMode] = React.useState<'metadataUrl' | 'manual'>('metadataUrl');
-  const [certFile, setCertFile] = React.useState<File | null>(null);
-
-  const updateConnection = useReverification(
-    React.useCallback(
-      async (params: UpdateMeEnterpriseConnectionParams) => {
-        if (!enterpriseConnection) {
-          throw new Error('Enterprise connection required');
-        }
-
-        return updateEnterpriseConnection(enterpriseConnection.id, params);
-      },
-      [enterpriseConnection, updateEnterpriseConnection],
-    ),
-  );
-
-  const metadataUrlField = useFormControl('idpMetadataUrl', '', {
-    type: 'text',
-    label: localizationKeys('configureSSO.configureStep.samlOkta.metadataUrl.label'),
-    placeholder: localizationKeys('configureSSO.configureStep.samlOkta.metadataUrl.placeholder'),
-    isRequired: true,
-  });
-
-  const signOnUrlField = useFormControl('idpSsoUrl', '', {
-    type: 'text',
-    label: localizationKeys('configureSSO.configureStep.samlOkta.manual.signOnUrl.label'),
-    placeholder: localizationKeys('configureSSO.configureStep.samlOkta.manual.signOnUrl.placeholder'),
-    isRequired: true,
-  });
-
-  const issuerField = useFormControl('idpEntityId', '', {
-    type: 'text',
-    label: localizationKeys('configureSSO.configureStep.samlOkta.manual.issuer.label'),
-    placeholder: localizationKeys('configureSSO.configureStep.samlOkta.manual.issuer.placeholder'),
-    isRequired: true,
-  });
-
-  const trimmedMetadataUrl = metadataUrlField.value.trim();
-  const trimmedSignOnUrl = signOnUrlField.value.trim();
-  const trimmedIssuer = issuerField.value.trim();
-
-  const canSubmit =
-    !card.isLoading &&
-    ((mode === 'metadataUrl' && trimmedMetadataUrl.length > 0) ||
-      (mode === 'manual' && trimmedSignOnUrl.length > 0 && trimmedIssuer.length > 0 && certFile !== null));
-
-  const handleContinue = async () => {
-    if (!enterpriseConnection || !canSubmit) {
-      return;
-    }
-
-    card.setError(undefined);
-    card.setLoading();
-
-    try {
-      if (mode === 'metadataUrl') {
-        await updateConnection({ saml: { idpMetadataUrl: trimmedMetadataUrl } });
-      } else {
-        const idpCertificate = await certFile!.text();
-        await updateConnection({
-          saml: {
-            idpSsoUrl: trimmedSignOnUrl,
-            idpEntityId: trimmedIssuer,
-            idpCertificate,
-          },
-        });
-      }
-      void goNext();
-    } catch (err) {
-      if (mode === 'metadataUrl') {
-        handleError(err as Error, [metadataUrlField], card.setError);
-      } else {
-        handleError(err as Error, [signOnUrlField, issuerField], card.setError);
-      }
-    } finally {
-      card.setIdle();
-    }
-  };
-
-  return (
-    <>
-      <Step.Body>
-        <Step.Section
-          fill
-          sx={theme => ({ gap: theme.space.$5 })}
-        >
-          <Heading
-            as='h3'
-            textVariant='subtitle'
-            localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.submitSamlConfig.title')}
-          />
-          <SegmentedControl.Root
-            aria-label={t(localizationKeys('configureSSO.configureStep.samlOkta.modes.ariaLabel'))}
-            value={mode}
-            onChange={value => setMode(value as 'metadataUrl' | 'manual')}
-            fullWidth
-          >
-            <SegmentedControl.Button
-              value='metadataUrl'
-              text={localizationKeys('configureSSO.configureStep.samlOkta.modes.metadataUrl')}
-            />
-            <SegmentedControl.Button
-              value='manual'
-              text={localizationKeys('configureSSO.configureStep.samlOkta.modes.manual')}
-            />
-          </SegmentedControl.Root>
-
-          {mode === 'metadataUrl' ? (
-            <MetadataUrlPanel field={metadataUrlField} />
-          ) : (
-            <ManualEntryPanel
-              signOnUrlField={signOnUrlField}
-              issuerField={issuerField}
-              certFile={certFile}
-              setCertFile={setCertFile}
-            />
-          )}
-        </Step.Section>
-      </Step.Body>
-
-      <Step.Footer>
-        <Step.Footer.Previous
-          onClick={() => goPrev()}
-          isDisabled={isFirstStep || card.isLoading}
-        />
-        <Step.Footer.Continue
-          onClick={handleContinue}
-          isLoading={card.isLoading}
-          isDisabled={!canSubmit}
-        />
-      </Step.Footer>
     </>
   );
 };
