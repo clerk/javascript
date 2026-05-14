@@ -1354,6 +1354,9 @@ export type __internal_LocalizationResource = {
         status__failed: LocalizationValue;
         status__pending: LocalizationValue;
       };
+      testRunDetails: {
+        title: LocalizationValue;
+      };
     };
     configureStep: {
       spFields: {

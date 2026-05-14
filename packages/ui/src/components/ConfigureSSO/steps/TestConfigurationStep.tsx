@@ -21,6 +21,7 @@ import {
   useLocalizations,
 } from '@/customizables';
 import { useCardState } from '@/elements/contexts';
+import { Drawer } from '@/elements/Drawer';
 import { ProfileSection } from '@/elements/Section';
 import { useClipboard } from '@/hooks';
 import { Check, Copy, RotateLeftRight } from '@/icons';
@@ -49,7 +50,7 @@ export const TestConfigurationStep = (): JSX.Element => {
   const hasSuccessfulTestRun = latest?.status === 'success';
 
   const handleTestRunCreated = () => {
-    revalidateTestRuns();
+    void revalidateTestRuns();
   };
 
   return (
@@ -152,7 +153,7 @@ export const TestConfigurationStep = (): JSX.Element => {
           <Step.Footer.Previous onClick={() => goPrev()} />
           <Step.Footer.Continue
             onClick={() => goNext()}
-            isDisabled={isLastStep || !hasSuccessfulTestRun}
+            isDisabled={!hasSuccessfulTestRun || enterpriseConnection?.active}
           />
         </Step.Footer>
       </Step>
@@ -168,78 +169,115 @@ type TestResultsTableProps = {
 };
 
 const TestResultsTable = ({ rows, isLoading, isPolling, onTestRunCreated }: TestResultsTableProps): JSX.Element => {
+  const { t } = useLocalizations();
+  const [selectedTestRun, setSelectedTestRun] = useState<EnterpriseConnectionTestRunResource | null>(null);
+
+  const drawerTitle =
+    selectedTestRun?.status === 'failed'
+      ? selectedTestRun.logs?.[0]?.shortMessage ||
+        t(localizationKeys('configureSSO.testConfigurationStep.testRunDetails.title'))
+      : t(localizationKeys('configureSSO.testConfigurationStep.testRunDetails.title'));
+
   return (
-    <Flex
-      sx={t => ({
-        width: '100%',
-        minHeight: 0,
-        [mqu.sm]: { overflowX: 'auto', padding: t.space.$0x25 },
-      })}
-    >
-      <Table
-        tableHeadVisuallyHidden={!rows.length}
-        sx={t => ({ background: t.colors.$colorBackground, height: '100%' })}
+    <>
+      <Flex
+        sx={t => ({
+          width: '100%',
+          minHeight: 0,
+          [mqu.sm]: { overflowX: 'auto', padding: t.space.$0x25 },
+        })}
       >
-        <Thead>
-          <Tr>
-            <Th>Timestamp</Th>
-            <Th>Details</Th>
-            <Th>Status</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {isLoading || isPolling ? (
+        <Table
+          tableHeadVisuallyHidden={!rows.length}
+          sx={t => ({ background: t.colors.$colorBackground, height: '100%' })}
+        >
+          <Thead>
             <Tr>
-              <Td>
-                <Flex
-                  direction='col'
-                  align='center'
-                  gap={2}
-                  sx={t => ({ padding: `${t.space.$10} 0` })}
-                >
-                  <Spinner
-                    colorScheme='primary'
-                    elementDescriptor={descriptors.spinner}
-                  />
-                  <Text
-                    colorScheme='secondary'
-                    localizationKey={
-                      isPolling ? localizationKeys('configureSSO.testConfigurationStep.testResults.polling') : undefined
-                    }
-                  />
-                </Flex>
-              </Td>
+              <Th>Timestamp</Th>
+              <Th>Details</Th>
+              <Th>Status</Th>
             </Tr>
-          ) : !rows.length ? (
-            <Tr>
-              <Td>
-                <Flex
-                  align='center'
-                  justify='center'
-                  sx={t => ({ padding: `${t.space.$10} 0`, flex: 1 })}
-                >
-                  <CopyTestUrlButton onTestRunCreated={onTestRunCreated} />
-                </Flex>
-              </Td>
-            </Tr>
-          ) : (
-            rows.map(row => (
-              <Tr key={row.id}>
+          </Thead>
+          <Tbody>
+            {isLoading || isPolling ? (
+              <Tr>
                 <Td>
-                  <TestRunTimestampCell testRun={row} />
-                </Td>
-                <Td>
-                  <TestRunDetailsCell testRun={row} />
-                </Td>
-                <Td>
-                  <TestRunStatusCell testRun={row} />
+                  <Flex
+                    direction='col'
+                    align='center'
+                    gap={2}
+                    sx={t => ({ padding: `${t.space.$10} 0` })}
+                  >
+                    <Spinner
+                      colorScheme='primary'
+                      elementDescriptor={descriptors.spinner}
+                    />
+                    <Text
+                      colorScheme='secondary'
+                      localizationKey={
+                        isPolling
+                          ? localizationKeys('configureSSO.testConfigurationStep.testResults.polling')
+                          : undefined
+                      }
+                    />
+                  </Flex>
                 </Td>
               </Tr>
-            ))
-          )}
-        </Tbody>
-      </Table>
-    </Flex>
+            ) : !rows.length ? (
+              <Tr>
+                <Td>
+                  <Flex
+                    align='center'
+                    justify='center'
+                    sx={t => ({ padding: `${t.space.$10} 0`, flex: 1 })}
+                  >
+                    <CopyTestUrlButton onTestRunCreated={onTestRunCreated} />
+                  </Flex>
+                </Td>
+              </Tr>
+            ) : (
+              rows.map(row => (
+                <Tr
+                  key={row.id}
+                  onClick={() => setSelectedTestRun(row)}
+                  sx={t => ({
+                    cursor: 'pointer',
+                    '&:hover > td': {
+                      backgroundColor: t.colors.$neutralAlpha50,
+                    },
+                  })}
+                >
+                  <Td>
+                    <TestRunTimestampCell testRun={row} />
+                  </Td>
+                  <Td>
+                    <TestRunDetailsCell testRun={row} />
+                  </Td>
+                  <Td>
+                    <TestRunStatusCell testRun={row} />
+                  </Td>
+                </Tr>
+              ))
+            )}
+          </Tbody>
+        </Table>
+      </Flex>
+
+      <Drawer.Root
+        open={selectedTestRun !== null}
+        onOpenChange={open => {
+          if (!open) {
+            setSelectedTestRun(null);
+          }
+        }}
+      >
+        <Drawer.Overlay />
+        <Drawer.Content>
+          <Drawer.Header title={drawerTitle} />
+          <Drawer.Body>{null}</Drawer.Body>
+        </Drawer.Content>
+      </Drawer.Root>
+    </>
   );
 };
 
@@ -257,7 +295,7 @@ const TestRunTimestampCell = ({ testRun }: { testRun: EnterpriseConnectionTestRu
     <Flex
       gap={2}
       align='baseline'
-      sx={t => ({ whiteSpace: 'nowrap' })}
+      sx={{ whiteSpace: 'nowrap' }}
     >
       <Text>{time}</Text>
       <Text colorScheme='secondary'>{day}</Text>

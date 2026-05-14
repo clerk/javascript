@@ -290,6 +290,9 @@ export const enUS: LocalizationResource = {
         status__failed: 'Failed',
         status__pending: 'Pending',
       },
+      testRunDetails: {
+        title: 'Test run',
+      },
     },
     configureStep: {
       spFields: {
