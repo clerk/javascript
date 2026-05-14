@@ -201,7 +201,7 @@ function Card(props: CardProps) {
             <Badge
               elementDescriptor={descriptors.pricingTableCardBadge}
               colorScheme='secondary'
-              localizationKey={localizationKeys('billing.popular')}
+              localizationKey={localizationKeys('billing.highlightedPlanBadge')}
               data-highlighted-plan
             />
           ) : undefined

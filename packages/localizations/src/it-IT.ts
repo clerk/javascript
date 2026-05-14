@@ -147,7 +147,7 @@ export const itIT: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Metodi di pagamento',
-    popular: 'Popolare',
+    highlightedPlanBadge: 'Popolare',
     pricingTable: {
       billingCycle: 'Ciclo di fatturazione',
       included: 'Incluso',

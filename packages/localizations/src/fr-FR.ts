@@ -149,7 +149,7 @@ export const frFR: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Méthodes de paiement',
-    popular: 'Populaire',
+    highlightedPlanBadge: 'Populaire',
     pricingTable: {
       billingCycle: 'Cycle de facturation',
       included: 'Inclus',

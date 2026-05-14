@@ -153,7 +153,7 @@ export const fiFI: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Maksutavat',
-    popular: 'Suosittu',
+    highlightedPlanBadge: 'Suosittu',
     pricingTable: {
       billingCycle: 'Laskutusjakso',
       included: 'Sisältyy',
