@@ -360,6 +360,7 @@ export const enUS: LocalizationResource = {
           signingCertificate: {
             label: 'Signing certificate',
             uploadFile: 'Upload file',
+            replaceFile: 'Replace file',
             removeFile: 'Remove file',
           },
         },

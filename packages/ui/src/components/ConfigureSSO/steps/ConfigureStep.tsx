@@ -9,7 +9,6 @@ import {
   descriptors,
   Flex,
   Flow,
-  FormLabel,
   Heading,
   Icon,
   localizationKeys,
@@ -24,6 +23,7 @@ import {
 } from '@/customizables';
 import { ClipboardInput } from '@/elements/ClipboardInput';
 import { useCardState } from '@/elements/contexts';
+import { Field } from '@/elements/FieldControl';
 import { Form } from '@/elements/Form';
 import { SegmentedControl } from '@/elements/SegmentedControl';
 import { Check, ClipboardOutline, Close, Upload } from '@/icons';
@@ -502,7 +502,16 @@ export const SubmitSamlConfigSubStep = (): JSX.Element => {
   const { enterpriseConnection } = useConfigureSSO();
   const { updateEnterpriseConnection } = __internal_useUserEnterpriseConnections();
 
-  const [mode, setMode] = React.useState<'metadataUrl' | 'manual'>('metadataUrl');
+  const samlConnection = enterpriseConnection?.samlConnection;
+  const hasExistingConfig = Boolean(
+    samlConnection?.idpSsoUrl ||
+    samlConnection?.idpEntityId ||
+    samlConnection?.idpCertificate ||
+    samlConnection?.idpMetadataUrl,
+  );
+  const existingCertPresent = Boolean(samlConnection?.idpCertificate);
+
+  const [mode, setMode] = React.useState<'metadataUrl' | 'manual'>(hasExistingConfig ? 'manual' : 'metadataUrl');
   const [certFile, setCertFile] = React.useState<File | null>(null);
 
   const updateConnection = useReverification(
@@ -518,24 +527,30 @@ export const SubmitSamlConfigSubStep = (): JSX.Element => {
     ),
   );
 
-  const metadataUrlField = useFormControl('idpMetadataUrl', '', {
+  const metadataUrlField = useFormControl('idpMetadataUrl', samlConnection?.idpMetadataUrl ?? '', {
     type: 'text',
     label: localizationKeys('configureSSO.configureStep.samlOkta.metadataUrl.label'),
     placeholder: localizationKeys('configureSSO.configureStep.samlOkta.metadataUrl.placeholder'),
     isRequired: true,
   });
 
-  const signOnUrlField = useFormControl('idpSsoUrl', '', {
+  const signOnUrlField = useFormControl('idpSsoUrl', samlConnection?.idpSsoUrl ?? '', {
     type: 'text',
     label: localizationKeys('configureSSO.configureStep.samlOkta.manual.signOnUrl.label'),
     placeholder: localizationKeys('configureSSO.configureStep.samlOkta.manual.signOnUrl.placeholder'),
     isRequired: true,
   });
 
-  const issuerField = useFormControl('idpEntityId', '', {
+  const issuerField = useFormControl('idpEntityId', samlConnection?.idpEntityId ?? '', {
     type: 'text',
     label: localizationKeys('configureSSO.configureStep.samlOkta.manual.issuer.label'),
     placeholder: localizationKeys('configureSSO.configureStep.samlOkta.manual.issuer.placeholder'),
+    isRequired: true,
+  });
+
+  const certFileField = useFormControl('idpCertificate', '', {
+    type: 'text',
+    label: localizationKeys('configureSSO.configureStep.samlOkta.manual.signingCertificate.label'),
     isRequired: true,
   });
 
@@ -543,13 +558,14 @@ export const SubmitSamlConfigSubStep = (): JSX.Element => {
   const trimmedSignOnUrl = signOnUrlField.value.trim();
   const trimmedIssuer = issuerField.value.trim();
 
+  const hasCert = certFile !== null || existingCertPresent;
   const canSubmit =
     !card.isLoading &&
     ((mode === 'metadataUrl' && trimmedMetadataUrl.length > 0) ||
-      (mode === 'manual' && trimmedSignOnUrl.length > 0 && trimmedIssuer.length > 0 && certFile !== null));
+      (mode === 'manual' && trimmedSignOnUrl.length > 0 && trimmedIssuer.length > 0 && hasCert));
 
   const handleContinue = async () => {
-    if (!certFile || !enterpriseConnection || !canSubmit) {
+    if (!enterpriseConnection || !canSubmit) {
       return;
     }
 
@@ -560,21 +576,23 @@ export const SubmitSamlConfigSubStep = (): JSX.Element => {
       if (mode === 'metadataUrl') {
         await updateConnection({ saml: { idpMetadataUrl: trimmedMetadataUrl } });
       } else {
-        const idpCertificate = await certFile.text();
-        await updateConnection({
-          saml: {
-            idpSsoUrl: trimmedSignOnUrl,
-            idpEntityId: trimmedIssuer,
-            idpCertificate,
-          },
-        });
+        const samlPayload: NonNullable<UpdateMeEnterpriseConnectionParams['saml']> = {
+          idpSsoUrl: trimmedSignOnUrl,
+          idpEntityId: trimmedIssuer,
+        };
+
+        if (certFile !== null) {
+          samlPayload.idpCertificate = await certFile.text();
+        }
+
+        await updateConnection({ saml: samlPayload });
       }
       void goNext();
     } catch (err) {
       if (mode === 'metadataUrl') {
         handleError(err as Error, [metadataUrlField], card.setError);
       } else {
-        handleError(err as Error, [signOnUrlField, issuerField], card.setError);
+        handleError(err as Error, [signOnUrlField, issuerField, certFileField], card.setError);
       }
     } finally {
       card.setIdle();
@@ -615,8 +633,10 @@ export const SubmitSamlConfigSubStep = (): JSX.Element => {
             <ManualEntryPanel
               signOnUrlField={signOnUrlField}
               issuerField={issuerField}
+              certFileField={certFileField}
               certFile={certFile}
               setCertFile={setCertFile}
+              existingCertPresent={existingCertPresent}
             />
           )}
         </Step.Section>
@@ -646,8 +666,10 @@ type MetadataUrlPanelProps = {
 type ManualEntryPanelProps = {
   signOnUrlField: FormControl;
   issuerField: FormControl;
+  certFileField: FormControl;
   certFile: File | null;
   setCertFile: React.Dispatch<React.SetStateAction<File | null>>;
+  existingCertPresent: boolean;
 };
 
 const MetadataUrlPanel = ({ field }: MetadataUrlPanelProps): JSX.Element => {
@@ -668,8 +690,10 @@ const MetadataUrlPanel = ({ field }: MetadataUrlPanelProps): JSX.Element => {
 const ManualEntryPanel = ({
   signOnUrlField,
   issuerField,
+  certFileField,
   certFile,
   setCertFile,
+  existingCertPresent,
 }: ManualEntryPanelProps): JSX.Element => {
   const { t } = useLocalizations();
   const certInputRef = React.useRef<HTMLInputElement>(null);
@@ -690,14 +714,10 @@ const ManualEntryPanel = ({
         <Form.PlainInput {...issuerField.props} />
       </Form.ControlRow>
 
-      <Col gap={2}>
-        <FormLabel>
-          <Text
-            as='span'
-            variant='subtitle'
-            localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.manual.signingCertificate.label')}
-          />
-        </FormLabel>
+      <Field.Root {...certFileField.props}>
+        <Field.LabelRow>
+          <Field.Label />
+        </Field.LabelRow>
 
         <input
           ref={certInputRef}
@@ -705,7 +725,10 @@ const ManualEntryPanel = ({
           accept='.pem,.key,.crt,.cer,.cert'
           multiple={false}
           style={{ display: 'none' }}
-          onChange={e => setCertFile(e.target.files?.[0] ?? null)}
+          onChange={e => {
+            setCertFile(e.target.files?.[0] ?? null);
+            certFileField.clearFeedback();
+          }}
         />
 
         {certFile === null ? (
@@ -725,7 +748,9 @@ const ManualEntryPanel = ({
             <Text
               as='span'
               localizationKey={localizationKeys(
-                'configureSSO.configureStep.samlOkta.manual.signingCertificate.uploadFile',
+                existingCertPresent
+                  ? 'configureSSO.configureStep.samlOkta.manual.signingCertificate.replaceFile'
+                  : 'configureSSO.configureStep.samlOkta.manual.signingCertificate.uploadFile',
               )}
             />
           </Button>
@@ -751,6 +776,7 @@ const ManualEntryPanel = ({
               )}
               onClick={() => {
                 setCertFile(null);
+                certFileField.clearFeedback();
                 if (certInputRef.current) {
                   certInputRef.current.value = '';
                 }
@@ -764,7 +790,9 @@ const ManualEntryPanel = ({
             </Button>
           </Flex>
         )}
-      </Col>
+
+        <Field.Feedback />
+      </Field.Root>
     </>
   );
 };

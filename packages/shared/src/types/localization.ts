@@ -1448,6 +1448,7 @@ export type __internal_LocalizationResource = {
           signingCertificate: {
             label: LocalizationValue;
             uploadFile: LocalizationValue;
+            replaceFile: LocalizationValue;
             removeFile: LocalizationValue;
           };
         };
