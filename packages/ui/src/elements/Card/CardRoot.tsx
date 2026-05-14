@@ -74,6 +74,7 @@ export const CardRoot = React.forwardRef<HTMLDivElement, CardRootProps>((props, 
       elementDescriptor={[descriptors.cardBox, props.elementDescriptor as ElementDescriptor]}
       className={generateFlowPartClassname(flowMetadata)}
       ref={ref}
+      data-elevation={isFlush ? 'flush' : undefined}
       sx={[
         t => ({
           isolation: 'isolate',
