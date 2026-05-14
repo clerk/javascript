@@ -528,7 +528,7 @@ export const SubmitSamlConfigSubStep = (): JSX.Element => {
     ),
   );
 
-  const metadataUrlField = useFormControl('idpMetadataUrl', samlConnection?.idpMetadataUrl ?? '', {
+  const metadataUrlField = useFormControl('idpMetadataUrl', '', {
     type: 'text',
     label: localizationKeys('configureSSO.configureStep.samlOkta.metadataUrl.label'),
     placeholder: localizationKeys('configureSSO.configureStep.samlOkta.metadataUrl.placeholder'),
