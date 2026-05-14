@@ -6,18 +6,18 @@ function asJwt(input: TokenResource | JWT): JWT | undefined {
 
 /**
  * Picks the freshest of two tokens. Returns whichever argument has the more
- * recent claim freshness; on a tie, returns `existing` (no churn).
+ * recent claim freshness. On a full tie (same oiat AND same iat) it returns
+ * `incoming`, since two tokens with identical timestamps can still differ in
+ * other claims (azp, org_id, etc.) during a token-format rollout, so the
+ * guard should only suppress when existing is strictly fresher.
  *
  * All origin-minted tokens carry the `oiat` JWT header (origin-issued-at;
  * timestamp when claims were last assembled from the DB). A token without
  * `oiat` is from a pre-feature codebase and is by definition staler than any
  * token that has one.
  *
- * Coverage: invoked at /tokens responses, broadcast events, and cookie writes.
- * Handshake-installed __session cookies are intentionally NOT gated:
- * handshake is a redirect-based full auth state resync, the browser commits
- * the Set-Cookie before any SDK code runs, and there is no in-flight race
- * window for the gate to protect.
+ * Used by the cross-tab broadcast handler in tokenCache to drop stale
+ * edge-minted tokens that would otherwise clobber a fresher cached entry.
  *
  * @internal
  */

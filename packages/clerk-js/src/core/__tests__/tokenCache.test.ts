@@ -203,7 +203,7 @@ describe('SessionTokenCache', () => {
       expect(SessionTokenCache.size()).toBe(0);
     });
 
-    it('enforces monotonicity: does not overwrite newer token with older one', () => {
+    it('enforces monotonicity: does not overwrite newer token with older one', async () => {
       // Both tokens carry oiat (the production case post-rollout). Older oiat
       // broadcast must not clobber the newer one already in cache.
       const newerJwt = createJwtWithOiat(1666648250, 1666648250);
@@ -220,7 +220,7 @@ describe('SessionTokenCache', () => {
         },
       } as MessageEvent<SessionTokenEvent>;
 
-      broadcastListener(newerEvent);
+      await broadcastListener(newerEvent);
       const resultAfterNewer = SessionTokenCache.get({ tokenId: 'session_123' });
       expect(resultAfterNewer).toBeDefined();
       const newerCreatedAt = resultAfterNewer?.entry.createdAt;
@@ -236,7 +236,7 @@ describe('SessionTokenCache', () => {
         },
       } as MessageEvent<SessionTokenEvent>;
 
-      broadcastListener(olderEvent);
+      await broadcastListener(olderEvent);
 
       const resultAfterOlder = SessionTokenCache.get({ tokenId: 'session_123' });
       expect(resultAfterOlder).toBeDefined();
