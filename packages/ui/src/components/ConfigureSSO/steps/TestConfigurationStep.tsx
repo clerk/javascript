@@ -381,7 +381,64 @@ const TestRunDetailsBody = ({ testRun }: { testRun: EnterpriseConnectionTestRunR
       {testRun.status === 'failed' && failedLog?.message ? <FullMessageBlock message={failedLog.message} /> : null}
 
       {testRun.status === 'failed' ? <TestRunHowToFixSection errorCode={failedLog?.code} /> : null}
+
+      {testRun.status === 'success' ? <ParsedUserInfoSection parsedUserInfo={testRun.parsedUserInfo} /> : null}
     </Drawer.Body>
+  );
+};
+
+const ParsedUserInfoSection = ({
+  parsedUserInfo,
+}: {
+  parsedUserInfo: EnterpriseConnectionTestRunResource['parsedUserInfo'];
+}): JSX.Element | null => {
+  if (!parsedUserInfo?.emailAddress && !parsedUserInfo?.firstName) {
+    return null;
+  }
+
+  return (
+    <Flex
+      direction='col'
+      gap={3}
+      sx={t => ({
+        borderTopWidth: t.borderWidths.$normal,
+        borderTopStyle: t.borderStyles.$solid,
+        borderTopColor: t.colors.$borderAlpha100,
+        paddingTop: t.space.$4,
+      })}
+    >
+      <Heading
+        as='h3'
+        textVariant='h3'
+        localizationKey={localizationKeys(
+          'configureSSO.testConfigurationStep.testRunDetails.parsedUserInfo.sectionTitle',
+        )}
+      />
+
+      <LineItems.Root>
+        {parsedUserInfo.emailAddress ? (
+          <LineItems.Group>
+            <LineItems.Title
+              title={localizationKeys('configureSSO.testConfigurationStep.testRunDetails.parsedUserInfo.email')}
+            />
+            <LineItems.Description>
+              <Text sx={t => ({ fontFamily: t.fonts.$mono })}>{parsedUserInfo.emailAddress}</Text>
+            </LineItems.Description>
+          </LineItems.Group>
+        ) : null}
+
+        {parsedUserInfo.firstName ? (
+          <LineItems.Group>
+            <LineItems.Title
+              title={localizationKeys('configureSSO.testConfigurationStep.testRunDetails.parsedUserInfo.firstName')}
+            />
+            <LineItems.Description>
+              <Text sx={t => ({ fontFamily: t.fonts.$mono })}>{parsedUserInfo.firstName}</Text>
+            </LineItems.Description>
+          </LineItems.Group>
+        ) : null}
+      </LineItems.Root>
+    </Flex>
   );
 };
 

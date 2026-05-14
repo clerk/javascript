@@ -1365,10 +1365,14 @@ export type __internal_LocalizationResource = {
           actionLabel__copy: LocalizationValue;
           actionLabel__copied: LocalizationValue;
         };
+        parsedUserInfo: {
+          sectionTitle: LocalizationValue;
+          email: LocalizationValue;
+          firstName: LocalizationValue;
+        };
         howToFix: {
           sectionTitle: LocalizationValue;
           actionLabel__viewDocumentation: LocalizationValue;
-          generic: LocalizationValue;
           saml_user_attribute_missing: {
             intro: LocalizationValue;
             step1: LocalizationValue;

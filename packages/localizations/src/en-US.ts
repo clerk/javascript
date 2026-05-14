@@ -301,11 +301,14 @@ export const enUS: LocalizationResource = {
           actionLabel__copy: 'Copy message',
           actionLabel__copied: 'Copied',
         },
+        parsedUserInfo: {
+          sectionTitle: 'Parsed user info',
+          email: 'Email',
+          firstName: 'First name',
+        },
         howToFix: {
           sectionTitle: 'How to fix',
           actionLabel__viewDocumentation: 'View documentation',
-          generic:
-            'There is no specific guidance for this error. Refer to the documentation for general troubleshooting tips.',
           saml_user_attribute_missing: {
             intro: 'To fix this error, follow these steps:',
             step1: "Access your identity provider's configuration dashboard.",

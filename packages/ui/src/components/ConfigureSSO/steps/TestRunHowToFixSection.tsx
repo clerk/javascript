@@ -67,6 +67,10 @@ export const TestRunHowToFixSection = ({ errorCode }: TestRunHowToFixSectionProp
   }
 
   const content = HOW_TO_FIX_BY_ERROR_CODE[errorCode];
+  if (!content) {
+    return null;
+  }
+
   const docsHref = `${DOCS_BASE_URL}#${errorCode.replaceAll('_', '-')}`;
 
   return (
@@ -97,14 +101,7 @@ export const TestRunHowToFixSection = ({ errorCode }: TestRunHowToFixSectionProp
           boxShadow: t.shadows.$cardContentShadow,
         })}
       >
-        {content ? (
-          <HowToFixContent content={content} />
-        ) : (
-          <Text
-            colorScheme='secondary'
-            localizationKey={localizationKeys('configureSSO.testConfigurationStep.testRunDetails.howToFix.generic')}
-          />
-        )}
+        <HowToFixContent content={content} />
       </Box>
 
       <Link
@@ -174,9 +171,9 @@ const HowToFixContent = ({ content }: { content: HowToFixContent }): JSX.Element
           gap: t.space.$1,
         })}
       >
-        {content.stepKeys.map((stepKey, idx) => (
+        {content.stepKeys.map(stepKey => (
           <Box
-            key={idx}
+            key={stepKey.key}
             as='li'
             sx={t => ({ color: t.colors.$colorMutedForeground })}
           >
