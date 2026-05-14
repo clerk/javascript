@@ -173,6 +173,7 @@ const ProviderCard = ({ name, value, iconId, label, checked, onChange }: Provide
         },
         // Selected ring — CSS-driven via :checked so it survives focus changes.
         '&:has(input:checked)': {
+          borderColor: theme.colors.$borderAlpha300,
           ...common.focusRingStyles(theme),
         },
       })}
