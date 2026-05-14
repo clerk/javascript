@@ -186,6 +186,30 @@ export const mnMN: LocalizationResource = {
     navbar: {
       title: 'Нэгдсэн нэвтрэлт (SSO) тохируулах',
     },
+    verifyEmailDomainStep: {
+      title: 'И-мэйл хаягийг баталгаажуулах',
+      subtitle: 'Та байгууллагын холболтыг идэвхжүүлэхийг хүсэж буй и-мэйл хаягийг баталгаажуулна уу.',
+      addEmailAddress: {
+        formTitle: 'Бид таны и-мэйл хэрэгтэй',
+        formSubtitle: 'Эхлэхийн тулд бид таны и-мэйл хаягийг авах шаардлагатай',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'И-мэйл хаяг',
+      },
+      emailCode: {
+        formTitle: 'И-мэйл хаягаа баталгаажуулна уу',
+        formSubtitle: '{{identifier}} рүү илгээсэн баталгаажуулах кодыг оруулна уу',
+        resendButton: 'Код хүлээж аваагүй юу? Дахин илгээх',
+        verified: {
+          title: 'Бид таны и-мэйлийг хүлээн авлаа',
+          subtitle: 'Та доорх и-мэйлээр и-мэйл хаягаа баталгаажуулсан',
+          inputLabel: 'Баталгаажсан и-мэйл хаяг',
+        },
+      },
+      domainTaken: {
+        title: 'Энэ домейн ({{domain}}) аль хэдийн SSO холболттой байна',
+        subtitle: 'Одоо байгаа холболтоор дамжуулан хандах эрх авахын тулд програмын администратортой холбогдоно уу.',
+      },
+    },
   },
   createOrganization: {
     formButtonSubmit: 'Байгуулга үүсгэх',

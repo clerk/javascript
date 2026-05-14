@@ -187,6 +187,30 @@ export const plPL: LocalizationResource = {
     navbar: {
       title: 'Skonfiguruj logowanie jednokrotne (SSO)',
     },
+    verifyEmailDomainStep: {
+      title: 'Zweryfikuj adres e-mail',
+      subtitle: 'Zweryfikuj adres e-mail, na którym chcesz włączyć połączenie firmowe.',
+      addEmailAddress: {
+        formTitle: 'Potrzebujemy Twojego e-maila',
+        formSubtitle: 'Aby rozpocząć, potrzebujemy Twojego adresu e-mail',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'Adres e-mail',
+      },
+      emailCode: {
+        formTitle: 'Zweryfikuj swój adres e-mail',
+        formSubtitle: 'Wprowadź kod weryfikacyjny wysłany na adres {{identifier}}',
+        resendButton: 'Nie otrzymałeś kodu? Wyślij ponownie',
+        verified: {
+          title: 'Otrzymaliśmy Twój e-mail',
+          subtitle: 'Zweryfikowałeś swój adres e-mail za pomocą następującego e-maila',
+          inputLabel: 'Zweryfikowany adres e-mail',
+        },
+      },
+      domainTaken: {
+        title: 'Ta domena ({{domain}}) ma już połączenie SSO',
+        subtitle: 'Skontaktuj się z administratorem aplikacji, aby uzyskać dostęp przez istniejące połączenie.',
+      },
+    },
   },
   createOrganization: {
     formButtonSubmit: 'Utwórz organizację',

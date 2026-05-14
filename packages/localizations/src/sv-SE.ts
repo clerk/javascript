@@ -186,6 +186,30 @@ export const svSE: LocalizationResource = {
     navbar: {
       title: 'Konfigurera enkel inloggning (SSO)',
     },
+    verifyEmailDomainStep: {
+      title: 'Verifiera e-postadress',
+      subtitle: 'Verifiera e-postadressen som du vill aktivera företagsanslutningen för.',
+      addEmailAddress: {
+        formTitle: 'Vi behöver din e-post',
+        formSubtitle: 'För att börja behöver vi din e-postadress',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'E-postadress',
+      },
+      emailCode: {
+        formTitle: 'Verifiera din e-postadress',
+        formSubtitle: 'Ange verifieringskoden som skickats till {{identifier}}',
+        resendButton: 'Fick du ingen kod? Skicka igen',
+        verified: {
+          title: 'Vi har fått din e-post',
+          subtitle: 'Du har verifierat din e-postadress med följande e-post',
+          inputLabel: 'Verifierad e-postadress',
+        },
+      },
+      domainTaken: {
+        title: 'Denna domän ({{domain}}) har redan en SSO-anslutning',
+        subtitle: 'Kontakta applikationens administratör för att få åtkomst via den befintliga anslutningen.',
+      },
+    },
   },
   createOrganization: {
     formButtonSubmit: 'Skapa organisation',

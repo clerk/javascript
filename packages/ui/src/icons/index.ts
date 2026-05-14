@@ -34,6 +34,7 @@ export { default as DeviceLaptop } from './device-laptop.svg';
 export { default as DeviceMobile } from './device-mobile.svg';
 export { default as DotCircle } from './dot-circle-horizontal.svg';
 export { default as Download } from './download.svg';
+export { default as DuotoneAtSymbol } from './duotone-at-symbol.svg';
 export { default as Email } from './email.svg';
 export { default as ExclamationCircle } from './exclamation-circle.svg';
 export { default as ExclamationTriangle } from './exclamation-triangle.svg';

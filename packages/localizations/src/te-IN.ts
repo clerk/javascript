@@ -186,6 +186,30 @@ export const teIN: LocalizationResource = {
     navbar: {
       title: 'సింగిల్ సైన్-ఆన్ (SSO) కాన్ఫిగర్ చేయండి',
     },
+    verifyEmailDomainStep: {
+      title: 'ఇమెయిల్ చిరునామా ధృవీకరించండి',
+      subtitle: 'మీరు ఎంటర్‌ప్రైజ్ కనెక్షన్‌ను ప్రారంభించాలనుకుంటున్న ఇమెయిల్ చిరునామాను ధృవీకరించండి.',
+      addEmailAddress: {
+        formTitle: 'మాకు మీ ఇమెయిల్ అవసరం',
+        formSubtitle: 'ప్రారంభించడానికి మాకు మీ ఇమెయిల్ చిరునామా అవసరం',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'ఇమెయిల్ చిరునామా',
+      },
+      emailCode: {
+        formTitle: 'మీ ఇమెయిల్ చిరునామాను ధృవీకరించండి',
+        formSubtitle: '{{identifier}} కు పంపిన ధృవీకరణ కోడ్‌ను నమోదు చేయండి',
+        resendButton: 'కోడ్ అందలేదా? మళ్లీ పంపండి',
+        verified: {
+          title: 'మాకు మీ ఇమెయిల్ వచ్చింది',
+          subtitle: 'మీరు కింది ఇమెయిల్‌తో మీ ఇమెయిల్ చిరునామాను ధృవీకరించారు',
+          inputLabel: 'ధృవీకరించబడిన ఇమెయిల్ చిరునామా',
+        },
+      },
+      domainTaken: {
+        title: 'ఈ డొమైన్‌కి ({{domain}}) ఇప్పటికే SSO కనెక్షన్ ఉంది',
+        subtitle: 'ఇప్పటికే ఉన్న కనెక్షన్ ద్వారా యాక్సెస్ పొందడానికి అప్లికేషన్ నిర్వాహకుడిని సంప్రదించండి.',
+      },
+    },
   },
   createOrganization: {
     formButtonSubmit: 'సంస్థను సృష్టించండి',

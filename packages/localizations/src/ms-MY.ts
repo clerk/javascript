@@ -186,6 +186,30 @@ export const msMY: LocalizationResource = {
     navbar: {
       title: 'Konfigurasi Log Masuk Tunggal (SSO)',
     },
+    verifyEmailDomainStep: {
+      title: 'Sahkan alamat e-mel',
+      subtitle: 'Sahkan alamat e-mel yang anda ingin dayakan sambungan enterprise.',
+      addEmailAddress: {
+        formTitle: 'Kami memerlukan e-mel anda',
+        formSubtitle: 'Untuk memulakan kami memerlukan alamat e-mel anda',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'Alamat e-mel',
+      },
+      emailCode: {
+        formTitle: 'Sahkan alamat e-mel anda',
+        formSubtitle: 'Masukkan kod pengesahan yang dihantar ke {{identifier}}',
+        resendButton: 'Tidak menerima kod? Hantar semula',
+        verified: {
+          title: 'Kami menerima e-mel anda',
+          subtitle: 'Anda telah mengesahkan alamat e-mel anda dengan e-mel berikut',
+          inputLabel: 'Alamat e-mel disahkan',
+        },
+      },
+      domainTaken: {
+        title: 'Domain ini ({{domain}}) sudah mempunyai sambungan SSO',
+        subtitle: 'Hubungi pentadbir aplikasi untuk mendapatkan akses melalui sambungan sedia ada.',
+      },
+    },
   },
   createOrganization: {
     formButtonSubmit: 'Cipta organisasi',

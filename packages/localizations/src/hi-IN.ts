@@ -187,6 +187,30 @@ export const hiIN: LocalizationResource = {
     navbar: {
       title: 'सिंगल साइन-ऑन (SSO) कॉन्फ़िगर करें',
     },
+    verifyEmailDomainStep: {
+      title: 'ईमेल पता सत्यापित करें',
+      subtitle: 'उस ईमेल पते को सत्यापित करें जिस पर आप एंटरप्राइज़ कनेक्शन सक्षम करना चाहते हैं।',
+      addEmailAddress: {
+        formTitle: 'हमें आपके ईमेल की आवश्यकता है',
+        formSubtitle: 'शुरू करने के लिए हमें आपके ईमेल पते की आवश्यकता होगी',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'ईमेल पता',
+      },
+      emailCode: {
+        formTitle: 'अपना ईमेल पता सत्यापित करें',
+        formSubtitle: '{{identifier}} पर भेजा गया सत्यापन कोड दर्ज करें',
+        resendButton: 'कोड नहीं मिला? पुनः भेजें',
+        verified: {
+          title: 'हमें आपका ईमेल मिल गया',
+          subtitle: 'आपने निम्नलिखित ईमेल के साथ अपना ईमेल पता सत्यापित किया है',
+          inputLabel: 'सत्यापित ईमेल पता',
+        },
+      },
+      domainTaken: {
+        title: 'इस डोमेन ({{domain}}) में पहले से ही एक SSO कनेक्शन है',
+        subtitle: 'मौजूदा कनेक्शन के माध्यम से एक्सेस प्राप्त करने के लिए एप्लिकेशन के व्यवस्थापक से संपर्क करें।',
+      },
+    },
   },
   createOrganization: {
     formButtonSubmit: 'संगठन बनाएँ',
