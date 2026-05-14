@@ -122,11 +122,23 @@ const ConfigureSSOSteps = () => {
   );
 };
 
+const ConfigureSSOCardProtect = ({ children }: { children: React.ReactNode }) => {
+  const { session } = useSession();
+  const isPersonalWorkspace = !session?.lastActiveOrganizationId;
+  const canManageEnterpriseConnections = useProtect(
+    has => isPersonalWorkspace || has({ permission: 'org:sys_enterprise_connections:manage' }),
+  );
+
+  if (!canManageEnterpriseConnections) {
+    return <MissingManageEnterpriseConnectionsPermission />;
+  }
+
+  return children;
+};
+
 const MissingManageEnterpriseConnectionsPermission = () => (
   <>
-    <Flex sx={t => ({ minHeight: t.sizes.$13, minWidth: '100%' })}>
-      <ProfileCardHeader />
-    </Flex>
+    <ProfileCardHeader />
 
     <Step.Body>
       <Step.Section
@@ -163,23 +175,10 @@ const MissingManageEnterpriseConnectionsPermission = () => (
         </Flex>
       </Step.Section>
     </Step.Body>
+
     <ProfileCardFooter />
   </>
 );
-
-const ConfigureSSOCardProtect = ({ children }: { children: React.ReactNode }) => {
-  const { session } = useSession();
-  const isPersonalWorkspace = !session?.lastActiveOrganizationId;
-  const canManageEnterpriseConnections = useProtect(
-    has => isPersonalWorkspace || has({ permission: 'org:sys_enterprise_connections:manage' }),
-  );
-
-  if (!canManageEnterpriseConnections) {
-    return <MissingManageEnterpriseConnectionsPermission />;
-  }
-
-  return children;
-};
 
 export const ConfigureSSO: React.ComponentType<__experimental_ConfigureSSOProps> =
   withCardStateProvider(ConfigureSSOInternal);
