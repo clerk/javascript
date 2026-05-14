@@ -540,7 +540,13 @@ export const SubmitSamlConfigSubStep = (): JSX.Element => {
   });
 
   const trimmedMetadataUrl = metadataUrlField.value.trim();
-  const canSubmit = mode === 'metadataUrl' && trimmedMetadataUrl.length > 0 && !card.isLoading;
+  const trimmedSignOnUrl = signOnUrlField.value.trim();
+  const trimmedIssuer = issuerField.value.trim();
+
+  const canSubmit =
+    !card.isLoading &&
+    ((mode === 'metadataUrl' && trimmedMetadataUrl.length > 0) ||
+      (mode === 'manual' && trimmedSignOnUrl.length > 0 && trimmedIssuer.length > 0 && certFile !== null));
 
   const handleContinue = async () => {
     if (!enterpriseConnection || !canSubmit) {
@@ -551,10 +557,25 @@ export const SubmitSamlConfigSubStep = (): JSX.Element => {
     card.setLoading();
 
     try {
-      await updateConnection({ saml: { idpMetadataUrl: trimmedMetadataUrl } });
+      if (mode === 'metadataUrl') {
+        await updateConnection({ saml: { idpMetadataUrl: trimmedMetadataUrl } });
+      } else {
+        const idpCertificate = await certFile!.text();
+        await updateConnection({
+          saml: {
+            idpSsoUrl: trimmedSignOnUrl,
+            idpEntityId: trimmedIssuer,
+            idpCertificate,
+          },
+        });
+      }
       void goNext();
     } catch (err) {
-      handleError(err as Error, [metadataUrlField], card.setError);
+      if (mode === 'metadataUrl') {
+        handleError(err as Error, [metadataUrlField], card.setError);
+      } else {
+        handleError(err as Error, [signOnUrlField, issuerField], card.setError);
+      }
     } finally {
       card.setIdle();
     }
