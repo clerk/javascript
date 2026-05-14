@@ -193,6 +193,20 @@ export const roRO: LocalizationResource = {
     navbar: {
       title: 'Configurați autentificarea unică (SSO)',
     },
+    selectProviderStep: {
+      title: 'Selectați furnizorul',
+      subtitle: 'Selectați furnizorul pentru care veți configura SSO.',
+      body: {
+        title: 'Selectați furnizorul de identitate',
+        description: 'Vă vom ghida în continuare prin procesul de configurare detaliat.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Furnizor SAML personalizat',
+      },
+      warning: 'Odată ce un furnizor este selectat, nu îl puteți schimba până când configurația nu este finalizată',
+    },
     verifyEmailDomainStep: {
       title: 'Verifică adresa de e-mail',
       subtitle: 'Verifică adresa de e-mail pe care dorești să activezi conexiunea enterprise.',

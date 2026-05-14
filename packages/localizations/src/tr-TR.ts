@@ -186,6 +186,20 @@ export const trTR: LocalizationResource = {
     navbar: {
       title: 'Tek Oturum Açmayı (SSO) Yapılandır',
     },
+    selectProviderStep: {
+      title: 'Sağlayıcıyı seçin',
+      subtitle: "SSO'yu ayarlayacağınız sağlayıcıyı seçin.",
+      body: {
+        title: 'Kimlik sağlayıcınızı seçin',
+        description: 'Bir sonraki adımda sizi ayrıntılı kurulum sürecinde yönlendireceğiz.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Özel SAML Sağlayıcısı',
+      },
+      warning: 'Bir sağlayıcı seçildikten sonra yapılandırma bitene kadar tekrar değiştiremezsiniz',
+    },
     verifyEmailDomainStep: {
       title: 'E-posta adresini doğrula',
       subtitle: 'Kurumsal bağlantıyı etkinleştirmek istediğiniz e-posta adresini doğrulayın.',

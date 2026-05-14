@@ -186,6 +186,20 @@ export const zhCN: LocalizationResource = {
     navbar: {
       title: '配置单点登录 (SSO)',
     },
+    selectProviderStep: {
+      title: '选择提供商',
+      subtitle: '选择您要为其设置 SSO 的提供商。',
+      body: {
+        title: '选择您的身份提供商',
+        description: '接下来我们将引导您完成详细的设置过程。',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: '自定义 SAML 提供商',
+      },
+      warning: '选择提供商后,在配置完成之前无法再次更改',
+    },
     verifyEmailDomainStep: {
       title: '验证电子邮件地址',
       subtitle: '验证您想要启用企业连接的电子邮件地址。',

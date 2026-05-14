@@ -186,6 +186,20 @@ export const mnMN: LocalizationResource = {
     navbar: {
       title: 'Нэгдсэн нэвтрэлт (SSO) тохируулах',
     },
+    selectProviderStep: {
+      title: 'Select provider',
+      subtitle: 'Select the provider you are going to setup SSO for.',
+      body: {
+        title: 'Select your identity provider',
+        description: "We'll guide you through the detailed setup process next.",
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Custom SAML Provider',
+      },
+      warning: 'Once a provider is selected you cannot change again until the configuration is over',
+    },
     verifyEmailDomainStep: {
       title: 'И-мэйл хаягийг баталгаажуулах',
       subtitle: 'Та байгууллагын холболтыг идэвхжүүлэхийг хүсэж буй и-мэйл хаягийг баталгаажуулна уу.',
