@@ -1,5 +1,5 @@
 import { __internal_useUserEnterpriseConnections, useReverification } from '@clerk/shared/react';
-import type { UpdateMeEnterpriseConnectionParams } from '@clerk/shared/types';
+import type { FieldId, UpdateMeEnterpriseConnectionParams } from '@clerk/shared/types';
 import React from 'react';
 
 import {
@@ -27,6 +27,7 @@ import { useCardState } from '@/elements/contexts';
 import { Form } from '@/elements/Form';
 import { SegmentedControl } from '@/elements/SegmentedControl';
 import { Check, ClipboardOutline, Close, Upload } from '@/icons';
+import type { FormControlState } from '@/ui/utils/useFormControl';
 import { useFormControl } from '@/ui/utils/useFormControl';
 import { handleError } from '@/utils/errorHandler';
 
@@ -494,6 +495,137 @@ export const AssignUsersSubStep = (): JSX.Element => {
   );
 };
 
+type FormControl = FormControlState<FieldId>;
+
+type MetadataUrlPanelProps = {
+  field: FormControl;
+};
+
+type ManualEntryPanelProps = {
+  signOnUrlField: FormControl;
+  issuerField: FormControl;
+  certFile: File | null;
+  setCertFile: React.Dispatch<React.SetStateAction<File | null>>;
+};
+
+const MetadataUrlPanel = ({ field }: MetadataUrlPanelProps): JSX.Element => {
+  return (
+    <>
+      <Text
+        as='p'
+        colorScheme='secondary'
+        localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.metadataUrl.description')}
+      />
+      <Form.ControlRow elementId={field.id}>
+        <Form.PlainInput {...field.props} />
+      </Form.ControlRow>
+    </>
+  );
+};
+
+const ManualEntryPanel = ({
+  signOnUrlField,
+  issuerField,
+  certFile,
+  setCertFile,
+}: ManualEntryPanelProps): JSX.Element => {
+  const { t } = useLocalizations();
+  const certInputRef = React.useRef<HTMLInputElement>(null);
+
+  return (
+    <>
+      <Text
+        as='p'
+        colorScheme='secondary'
+        localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.manual.description')}
+      />
+
+      <Form.ControlRow elementId={signOnUrlField.id}>
+        <Form.PlainInput {...signOnUrlField.props} />
+      </Form.ControlRow>
+
+      <Form.ControlRow elementId={issuerField.id}>
+        <Form.PlainInput {...issuerField.props} />
+      </Form.ControlRow>
+
+      <Col gap={2}>
+        <FormLabel>
+          <Text
+            as='span'
+            variant='subtitle'
+            localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.manual.signingCertificate.label')}
+          />
+        </FormLabel>
+
+        <input
+          ref={certInputRef}
+          type='file'
+          accept='.pem,.key,.crt,.cer,.cert'
+          multiple={false}
+          style={{ display: 'none' }}
+          onChange={e => setCertFile(e.target.files?.[0] ?? null)}
+        />
+
+        {certFile === null ? (
+          <Button
+            size='sm'
+            variant='outline'
+            sx={{ alignSelf: 'flex-start' }}
+            onClick={() => certInputRef.current?.click()}
+          >
+            <Icon
+              icon={Upload}
+              size='sm'
+              colorScheme='neutral'
+              sx={t => ({ marginInlineEnd: t.space.$1 })}
+            />
+
+            <Text
+              as='span'
+              localizationKey={localizationKeys(
+                'configureSSO.configureStep.samlOkta.manual.signingCertificate.uploadFile',
+              )}
+            />
+          </Button>
+        ) : (
+          <Flex
+            align='center'
+            gap={2}
+          >
+            <Text
+              as='span'
+              colorScheme='secondary'
+              sx={t => ({ fontSize: t.fontSizes.$sm })}
+            >
+              {certFile.name}
+            </Text>
+
+            <Button
+              variant='ghost'
+              colorScheme='neutral'
+              aria-label={t(
+                localizationKeys('configureSSO.configureStep.samlOkta.manual.signingCertificate.removeFile'),
+              )}
+              onClick={() => {
+                setCertFile(null);
+                if (certInputRef.current) {
+                  certInputRef.current.value = '';
+                }
+              }}
+              sx={t => ({ padding: t.space.$1 })}
+            >
+              <Icon
+                icon={Close}
+                size='xs'
+              />
+            </Button>
+          </Flex>
+        )}
+      </Col>
+    </>
+  );
+};
+
 export const SubmitSamlConfigSubStep = (): JSX.Element => {
   const card = useCardState();
   const { t } = useLocalizations();
@@ -503,7 +635,6 @@ export const SubmitSamlConfigSubStep = (): JSX.Element => {
 
   const [mode, setMode] = React.useState<'metadataUrl' | 'manual'>('metadataUrl');
   const [certFile, setCertFile] = React.useState<File | null>(null);
-  const certInputRef = React.useRef<HTMLInputElement>(null);
 
   const updateConnection = useReverification(
     React.useCallback(
@@ -609,112 +740,15 @@ export const SubmitSamlConfigSubStep = (): JSX.Element => {
             />
           </SegmentedControl.Root>
 
-          {mode === 'metadataUrl' && (
-            <>
-              <Text
-                as='p'
-                colorScheme='secondary'
-                localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.metadataUrl.description')}
-              />
-              <Form.ControlRow elementId={metadataUrlField.id}>
-                <Form.PlainInput {...metadataUrlField.props} />
-              </Form.ControlRow>
-            </>
-          )}
-
-          {mode === 'manual' && (
-            <>
-              <Text
-                as='p'
-                colorScheme='secondary'
-                localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.manual.description')}
-              />
-
-              <Form.ControlRow elementId={signOnUrlField.id}>
-                <Form.PlainInput {...signOnUrlField.props} />
-              </Form.ControlRow>
-
-              <Form.ControlRow elementId={issuerField.id}>
-                <Form.PlainInput {...issuerField.props} />
-              </Form.ControlRow>
-
-              <Col gap={2}>
-                <FormLabel>
-                  <Text
-                    as='span'
-                    variant='subtitle'
-                    localizationKey={localizationKeys(
-                      'configureSSO.configureStep.samlOkta.manual.signingCertificate.label',
-                    )}
-                  />
-                </FormLabel>
-
-                <input
-                  ref={certInputRef}
-                  type='file'
-                  accept='.pem,.crt,.cer,.txt'
-                  multiple={false}
-                  style={{ display: 'none' }}
-                  onChange={e => setCertFile(e.target.files?.[0] ?? null)}
-                />
-
-                {certFile === null ? (
-                  <Button
-                    size='sm'
-                    variant='outline'
-                    sx={{ alignSelf: 'flex-start' }}
-                    onClick={() => certInputRef.current?.click()}
-                  >
-                    <Icon
-                      icon={Upload}
-                      size='sm'
-                      colorScheme='neutral'
-                      sx={t => ({ marginInlineEnd: t.space.$1 })}
-                    />
-
-                    <Text
-                      as='span'
-                      localizationKey={localizationKeys(
-                        'configureSSO.configureStep.samlOkta.manual.signingCertificate.uploadFile',
-                      )}
-                    />
-                  </Button>
-                ) : (
-                  <Flex
-                    align='center'
-                    gap={2}
-                  >
-                    <Text
-                      as='span'
-                      colorScheme='secondary'
-                      sx={t => ({ fontSize: t.fontSizes.$sm })}
-                    >
-                      {certFile.name}
-                    </Text>
-
-                    <Button
-                      variant='ghost'
-                      colorScheme='neutral'
-                      aria-label={t(
-                        localizationKeys('configureSSO.configureStep.samlOkta.manual.signingCertificate.removeFile'),
-                      )}
-                      onClick={() => {
-                        setCertFile(null);
-                        if (certInputRef.current) {
-                          certInputRef.current.value = '';
-                        }
-                      }}
-                      sx={t => ({ padding: t.space.$1 })}
-                    >
-                      <Icon
-                        icon={Close}
-                        size='xs'
-                      />
-                    </Button>
-                  </Flex>
-                )}
-              </Col>
-            </>
+          {mode === 'metadataUrl' ? (
+            <MetadataUrlPanel field={metadataUrlField} />
+          ) : (
+            <ManualEntryPanel
+              signOnUrlField={signOnUrlField}
+              issuerField={issuerField}
+              certFile={certFile}
+              setCertFile={setCertFile}
+            />
           )}
         </Step.Section>
       </Step.Body>
