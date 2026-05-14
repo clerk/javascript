@@ -147,11 +147,7 @@ describe('SignInFactorOneCodeForm', () => {
 
       renderWithProviders(<SignInFactorOneCodeForm {...propsWithFactorPrepared} />, { wrapper });
 
-      expect(vi.mocked(useFetch)).toHaveBeenCalledWith(
-        expect.any(Function),
-        expect.any(Object),
-        expect.any(Object),
-      );
+      expect(vi.mocked(useFetch)).toHaveBeenCalledWith(expect.any(Function), expect.any(Object), expect.any(Object));
     });
 
     it('allows prepare when factor is not already prepared', async () => {
