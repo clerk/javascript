@@ -145,7 +145,6 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
           break;
         }
         case 'insufficient_seats': {
-          console.log({ err });
           const { data: plans } = await clerk.billing.getPlans({
             for: 'organization',
             org_id: organization.id,
@@ -153,7 +152,10 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
           });
 
           if (plans.length === 0) {
-            console.error('No plans support the desired number of seats.');
+            handleError(err, [], () =>
+              card.setError(t(localizationKeys('unstable__errors.insufficient_seats_contact_support'))),
+            );
+            break;
           }
 
           const activeSubscriptionItem = subscriptionItems.find(si => si.status === 'active');
@@ -165,13 +167,6 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
                 p.availablePrices?.some(price => price.id === activeSubscriptionItem.priceId),
             );
             if (currentPlanAndPriceSupportsDesiredSeatQuantity) {
-              console.log('params', {
-                mode: 'modal',
-                plan: currentPlan,
-                planPeriod: activeSubscriptionItem.planPeriod,
-                seatsQuantity: err.errors[0].meta?.seatsQuantity,
-                portalRoot,
-              });
               handleSelectPlan({
                 mode: 'modal',
                 plan: currentPlan,
@@ -179,9 +174,13 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
                 seatsQuantity: err.errors[0].meta?.seatsQuantity,
                 portalRoot,
               });
+              break;
             }
           }
 
+          handleError(err, [], () =>
+            card.setError(t(localizationKeys('unstable__errors.insufficient_seats_change_plan'))),
+          );
           break;
         }
         default: {
