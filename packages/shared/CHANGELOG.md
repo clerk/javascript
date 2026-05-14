@@ -1,5 +1,79 @@
 # Change Log
 
+## 4.10.2
+
+### Patch Changes
+
+- Improved the `cannot_render_single_session_enabled` dev warning to use friendlier wording. The message now clearly states that the behavior is expected and points developers to the Clerk Dashboard to enable multi-session mode if needed. ([#8488](https://github.com/clerk/javascript/pull/8488)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.10.1
+
+### Patch Changes
+
+- Fix OAuth consent component and hook related types. ([#8483](https://github.com/clerk/javascript/pull/8483)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+## 4.10.0
+
+### Minor Changes
+
+- Add experimental `<ConfigureSSO />` component. Not ready for usage yet. ([#8427](https://github.com/clerk/javascript/pull/8427)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Localize API keys table headers ([#8462](https://github.com/clerk/javascript/pull/8462)) by [@jebibot](https://github.com/jebibot)
+
+- Avoid referencing `process.env` when auto-proxy detection runs in runtimes where `process` is unavailable. ([#8466](https://github.com/clerk/javascript/pull/8466)) by [@jacekradko](https://github.com/jacekradko)
+
+- Move ownership of the clerk-rq `QueryClient` from `@clerk/clerk-js` into `@clerk/shared`. The `QueryObserver` (constructed in `@clerk/shared`) and the `Query` objects it observes now always come from a single `@tanstack/query-core` resolution — the cross-bundle API contract that produced #8428 (`Query.isFetched is not a function`) no longer exists. ([#8434](https://github.com/clerk/javascript/pull/8434)) by [@jacekradko](https://github.com/jacekradko)
+
+  This removes the undocumented `clerk.__internal_queryClient` getter from both `@clerk/clerk-js` and `@clerk/react`'s `IsomorphicClerk`. The `QueryClient` is owned by an internal singleton in `@clerk/shared`, lazily instantiated on the browser only — server renders return `undefined`, preserving SSR safety and avoiding cross-request cache sharing.
+
+  `@tanstack/query-core` is no longer a direct dependency of `@clerk/clerk-js`; it remains a dep of `@clerk/shared` and resolves consumer-side as before.
+
+## 4.9.0
+
+### Minor Changes
+
+- Add internal API methods to manage enterprise connections ([#8421](https://github.com/clerk/javascript/pull/8421)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Expose `OAuthConsent` as a public component export across React-based SDKs. ([#8381](https://github.com/clerk/javascript/pull/8381)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```tsx
+  import { OAuthConsent } from '@clerk/react';
+
+  export default function Page() {
+    return <OAuthConsent />;
+  }
+  ```
+
+### Patch Changes
+
+- Add an env-var shortcut for `unsafe_disableDevelopmentModeConsoleWarning` across the Astro, Nuxt, React Router, and TanStack Start integrations so the development-keys console warning can be suppressed without threading the option through `<ClerkProvider>` manually: ([#8402](https://github.com/clerk/javascript/pull/8402)) by [@jacekradko](https://github.com/jacekradko)
+  - Astro: `PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`
+  - Nuxt: `NUXT_PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`
+  - React Router: `VITE_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING` (or `CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`)
+  - TanStack Start: `VITE_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING` (or `CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`)
+
+  The Next.js equivalent (`NEXT_PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`) already existed; the JSDoc on `unsafe_disableDevelopmentModeConsoleWarning` now lists every framework's env-var shortcut and clarifies that suppressing the warning at source also keeps it from being mirrored to the dev-server terminal (e.g. Next.js with `experimental.browserDebugInfoInTerminal`).
+
+## 4.8.7
+
+### Patch Changes
+
+- Raise the `@tanstack/query-core` floor to `^5.100.6` in the repo catalog and consume it from `@clerk/shared` and `@clerk/clerk-js` so the version baked into the production `clerk-js` CDN bundle stays in lockstep with what consumer-side `@clerk/shared` resolves to. ([#8432](https://github.com/clerk/javascript/pull/8432)) by [@jacekradko](https://github.com/jacekradko)
+
+  Fixes a runtime crash (`TypeError: e.isFetched is not a function`) introduced when consumer dedupe resolved `query-core` to `5.100.x` (which adds `Query.isFetched()`) while the published CDN bundle still embedded `5.90.16`. The new `QueryObserver` then called `isFetched()` on `Query` objects from the older bundled version.
+
+## 4.8.6
+
+### Patch Changes
+
+- Auto-proxy FAPI requests for `.vercel.app` subdomains. When deployed to a `.vercel.app` domain without explicit proxy or domain configuration, the SDK automatically routes Frontend API requests through `/__clerk` on the app's own origin. This enables Clerk production mode on Vercel deployments without manual proxy setup. ([#8035](https://github.com/clerk/javascript/pull/8035)) by [@brkalow](https://github.com/brkalow)
+
+- Loosen `@tanstack/query-core` dependency from an exact pin to a caret range (`^5.90.16`) so it can dedupe with consumer-installed `@tanstack/react-query` versions. This avoids Vite `resolve.dedupe` resolution failures under Bun when two divergent copies of `query-core` end up nested instead of hoisted. ([#8417](https://github.com/clerk/javascript/pull/8417)) by [@jacekradko](https://github.com/jacekradko)
+
 ## 4.8.5
 
 ### Patch Changes

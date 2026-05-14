@@ -1,5 +1,86 @@
 # @clerk/tanstack-react-start
 
+## 1.2.3
+
+### Patch Changes
+
+- Updated dependencies [[`0ab09a8`](https://github.com/clerk/javascript/commit/0ab09a89af1d7452df734278288e8218710f0e0e), [`6408ab6`](https://github.com/clerk/javascript/commit/6408ab6ec58d06af3f8334cb5a7d8d2647b8012e), [`5cda3ee`](https://github.com/clerk/javascript/commit/5cda3ee8451cc9af375895824d24a5c3ed7fbee6)]:
+  - @clerk/backend@3.4.7
+  - @clerk/shared@4.10.2
+  - @clerk/react@6.6.2
+
+## 1.2.2
+
+### Patch Changes
+
+- Updated dependencies [[`7a5892f`](https://github.com/clerk/javascript/commit/7a5892f9bcaa1a6212e6e6d3741160929ffd027e)]:
+  - @clerk/backend@3.4.6
+  - @clerk/shared@4.10.1
+  - @clerk/react@6.6.1
+
+## 1.2.1
+
+### Patch Changes
+
+- Updated dependencies [[`9e9230c`](https://github.com/clerk/javascript/commit/9e9230c8c3cbdb1c253ca7cdd24cc8d681b5ee5a), [`68d32df`](https://github.com/clerk/javascript/commit/68d32dfcc453080ef93edf69be8de765a342d88c), [`1c27d4d`](https://github.com/clerk/javascript/commit/1c27d4dd41a27cf41c3823306fe88e026fed08fb), [`1001193`](https://github.com/clerk/javascript/commit/10011936981fc22bf7d3750f1591f0873ea78bcb)]:
+  - @clerk/shared@4.10.0
+  - @clerk/react@6.6.0
+  - @clerk/backend@3.4.5
+
+## 1.2.0
+
+### Minor Changes
+
+- Add an env-var shortcut for `unsafe_disableDevelopmentModeConsoleWarning` across the Astro, Nuxt, React Router, and TanStack Start integrations so the development-keys console warning can be suppressed without threading the option through `<ClerkProvider>` manually: ([#8402](https://github.com/clerk/javascript/pull/8402)) by [@jacekradko](https://github.com/jacekradko)
+  - Astro: `PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`
+  - Nuxt: `NUXT_PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`
+  - React Router: `VITE_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING` (or `CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`)
+  - TanStack Start: `VITE_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING` (or `CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`)
+
+  The Next.js equivalent (`NEXT_PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`) already existed; the JSDoc on `unsafe_disableDevelopmentModeConsoleWarning` now lists every framework's env-var shortcut and clarifies that suppressing the warning at source also keeps it from being mirrored to the dev-server terminal (e.g. Next.js with `experimental.browserDebugInfoInTerminal`).
+
+- Expose `OAuthConsent` as a public component export across React-based SDKs. ([#8381](https://github.com/clerk/javascript/pull/8381)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```tsx
+  import { OAuthConsent } from '@clerk/react';
+
+  export default function Page() {
+    return <OAuthConsent />;
+  }
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`785f057`](https://github.com/clerk/javascript/commit/785f057f5cda202c26a9f34bde7c1873a6cbd6ea), [`90beaeb`](https://github.com/clerk/javascript/commit/90beaeb8319d5bccb8fa52343f4b241c6d2d3ebe), [`244920d`](https://github.com/clerk/javascript/commit/244920d1ebb5d420a96bfc2a79d84cccafe9b61c)]:
+  - @clerk/shared@4.9.0
+  - @clerk/react@6.5.0
+  - @clerk/backend@3.4.4
+
+## 1.1.9
+
+### Patch Changes
+
+- Updated dependencies [[`1bfd8ab`](https://github.com/clerk/javascript/commit/1bfd8ab89c62e428038b8c565f118c582ed395ea)]:
+  - @clerk/shared@4.8.7
+  - @clerk/backend@3.4.3
+  - @clerk/react@6.4.7
+
+## 1.1.8
+
+### Patch Changes
+
+- Fix `Request` cloning and outbound `fetch` to omit cross-realm `AbortSignal`. Node 24's bundled undici tightened the `instanceof AbortSignal` check on `RequestInit.signal`, which broke: ([#8351](https://github.com/clerk/javascript/pull/8351)) by [@jacekradko](https://github.com/jacekradko)
+  - Cloning framework-specific requests such as `NextRequest` in `@clerk/backend`'s `ClerkRequest`.
+  - Subclassed `Request`s passed through `patchRequest` in `@clerk/react-router` and `@clerk/tanstack-react-start`.
+  - Frontend API proxying in `@clerk/backend`'s `clerkFrontendApiProxy`, which forwarded the inbound request's signal to the upstream `fetch`. Abort propagation will be restored in a follow-up via an in-realm `AbortController` bridge.
+
+- Updated dependencies [[`9b57986`](https://github.com/clerk/javascript/commit/9b5798696eb0c6cc6ab548ade100b504f691895c), [`a9f9b29`](https://github.com/clerk/javascript/commit/a9f9b2971a026d04571ceb1865ec8dafedbbe863), [`e0a63f9`](https://github.com/clerk/javascript/commit/e0a63f9f976fd25f4ed68080c84b72149ef64646)]:
+  - @clerk/shared@4.8.6
+  - @clerk/backend@3.4.2
+  - @clerk/react@6.4.6
+
 ## 1.1.7
 
 ### Patch Changes

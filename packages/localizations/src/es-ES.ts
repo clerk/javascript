@@ -184,6 +184,55 @@ export const esES: LocalizationResource = {
     viewPayment: 'Ver pago',
     year: 'Año',
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        'Contacte al administrador de su organización para obtener permisos para gestionar conexiones empresariales.',
+      title: 'No tiene permiso para gestionar conexiones empresariales',
+    },
+    navbar: {
+      title: 'Configurar inicio de sesión único (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Seleccionar proveedor',
+      subtitle: 'Selecciona el proveedor para el que vas a configurar SSO.',
+      body: {
+        title: 'Selecciona tu proveedor de identidad',
+        description: 'Te guiaremos a través del proceso de configuración detallado a continuación.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Proveedor SAML personalizado',
+      },
+      warning: 'Una vez seleccionado un proveedor no podrás cambiarlo hasta que finalice la configuración',
+    },
+    verifyEmailDomainStep: {
+      title: 'Verificar correo electrónico',
+      subtitle: 'Verifica la dirección de correo electrónico en la que deseas habilitar la conexión empresarial.',
+      addEmailAddress: {
+        formTitle: 'Necesitamos tu correo electrónico',
+        formSubtitle: 'Para empezar, necesitaremos tu dirección de correo electrónico',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'Dirección de correo electrónico',
+      },
+      emailCode: {
+        formTitle: 'Verifica tu dirección de correo electrónico',
+        formSubtitle: 'Introduce el código de verificación enviado a {{identifier}}',
+        resendButton: '¿No has recibido un código? Reenviar',
+        verified: {
+          title: 'Hemos recibido tu correo electrónico',
+          subtitle: 'Has verificado tu dirección de correo electrónico con el siguiente correo',
+          inputLabel: 'Dirección de correo electrónico verificada',
+        },
+      },
+      domainTaken: {
+        title: 'Este dominio ({{domain}}) ya tiene una conexión SSO',
+        subtitle:
+          'Contacta con el administrador de la aplicación para obtener acceso a través de la conexión existente.',
+      },
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Crear organización',
     invitePage: {

@@ -1,5 +1,85 @@
 # Change Log
 
+## 6.10.1
+
+### Patch Changes
+
+- Updated dependencies [[`5cda3ee`](https://github.com/clerk/javascript/commit/5cda3ee8451cc9af375895824d24a5c3ed7fbee6)]:
+  - @clerk/shared@4.10.2
+
+## 6.10.0
+
+### Minor Changes
+
+- Removed unused internal OAuthConsent prop. ([#8492](https://github.com/clerk/javascript/pull/8492)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`7a5892f`](https://github.com/clerk/javascript/commit/7a5892f9bcaa1a6212e6e6d3741160929ffd027e)]:
+  - @clerk/shared@4.10.1
+
+## 6.9.0
+
+### Minor Changes
+
+- Add experimental `<ConfigureSSO />` component. Not ready for usage yet. ([#8427](https://github.com/clerk/javascript/pull/8427)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Move ownership of the clerk-rq `QueryClient` from `@clerk/clerk-js` into `@clerk/shared`. The `QueryObserver` (constructed in `@clerk/shared`) and the `Query` objects it observes now always come from a single `@tanstack/query-core` resolution — the cross-bundle API contract that produced #8428 (`Query.isFetched is not a function`) no longer exists. ([#8434](https://github.com/clerk/javascript/pull/8434)) by [@jacekradko](https://github.com/jacekradko)
+
+  This removes the undocumented `clerk.__internal_queryClient` getter from both `@clerk/clerk-js` and `@clerk/react`'s `IsomorphicClerk`. The `QueryClient` is owned by an internal singleton in `@clerk/shared`, lazily instantiated on the browser only — server renders return `undefined`, preserving SSR safety and avoiding cross-request cache sharing.
+
+  `@tanstack/query-core` is no longer a direct dependency of `@clerk/clerk-js`; it remains a dep of `@clerk/shared` and resolves consumer-side as before.
+
+- Updated dependencies [[`9e9230c`](https://github.com/clerk/javascript/commit/9e9230c8c3cbdb1c253ca7cdd24cc8d681b5ee5a), [`68d32df`](https://github.com/clerk/javascript/commit/68d32dfcc453080ef93edf69be8de765a342d88c), [`1c27d4d`](https://github.com/clerk/javascript/commit/1c27d4dd41a27cf41c3823306fe88e026fed08fb), [`1001193`](https://github.com/clerk/javascript/commit/10011936981fc22bf7d3750f1591f0873ea78bcb)]:
+  - @clerk/shared@4.10.0
+
+## 6.8.0
+
+### Minor Changes
+
+- Add internal API methods to manage enterprise connections ([#8421](https://github.com/clerk/javascript/pull/8421)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Expose `OAuthConsent` as a public component export across React-based SDKs. ([#8381](https://github.com/clerk/javascript/pull/8381)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```tsx
+  import { OAuthConsent } from '@clerk/react';
+
+  export default function Page() {
+    return <OAuthConsent />;
+  }
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`785f057`](https://github.com/clerk/javascript/commit/785f057f5cda202c26a9f34bde7c1873a6cbd6ea), [`90beaeb`](https://github.com/clerk/javascript/commit/90beaeb8319d5bccb8fa52343f4b241c6d2d3ebe), [`244920d`](https://github.com/clerk/javascript/commit/244920d1ebb5d420a96bfc2a79d84cccafe9b61c)]:
+  - @clerk/shared@4.9.0
+
+## 6.7.9
+
+### Patch Changes
+
+- Raise the `@tanstack/query-core` floor to `^5.100.6` in the repo catalog and consume it from `@clerk/shared` and `@clerk/clerk-js` so the version baked into the production `clerk-js` CDN bundle stays in lockstep with what consumer-side `@clerk/shared` resolves to. ([#8432](https://github.com/clerk/javascript/pull/8432)) by [@jacekradko](https://github.com/jacekradko)
+
+  Fixes a runtime crash (`TypeError: e.isFetched is not a function`) introduced when consumer dedupe resolved `query-core` to `5.100.x` (which adds `Query.isFetched()`) while the published CDN bundle still embedded `5.90.16`. The new `QueryObserver` then called `isFetched()` on `Query` objects from the older bundled version.
+
+- Updated dependencies [[`1bfd8ab`](https://github.com/clerk/javascript/commit/1bfd8ab89c62e428038b8c565f118c582ed395ea)]:
+  - @clerk/shared@4.8.7
+
+## 6.7.8
+
+### Patch Changes
+
+- Auto-proxy FAPI requests for `.vercel.app` subdomains. When deployed to a `.vercel.app` domain without explicit proxy or domain configuration, the SDK automatically routes Frontend API requests through `/__clerk` on the app's own origin. This enables Clerk production mode on Vercel deployments without manual proxy setup. ([#8035](https://github.com/clerk/javascript/pull/8035)) by [@brkalow](https://github.com/brkalow)
+
+- Loosen `@tanstack/query-core` dependency from an exact pin to a caret range (`^5.90.16`) so it can dedupe with consumer-installed `@tanstack/react-query` versions. This avoids Vite `resolve.dedupe` resolution failures under Bun when two divergent copies of `query-core` end up nested instead of hoisted. ([#8417](https://github.com/clerk/javascript/pull/8417)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`9b57986`](https://github.com/clerk/javascript/commit/9b5798696eb0c6cc6ab548ade100b504f691895c), [`a9f9b29`](https://github.com/clerk/javascript/commit/a9f9b2971a026d04571ceb1865ec8dafedbbe863)]:
+  - @clerk/shared@4.8.6
+
 ## 6.7.7
 
 ### Patch Changes

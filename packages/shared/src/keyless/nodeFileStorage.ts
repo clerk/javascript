@@ -15,6 +15,7 @@ export interface NodeFileStorageOptions {
 
   /**
    * The framework name for the README message.
+   *
    * @example '@clerk/nextjs'
    */
   frameworkPackageName?: string;

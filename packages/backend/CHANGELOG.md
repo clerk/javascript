@@ -1,5 +1,69 @@
 # Change Log
 
+## 3.4.7
+
+### Patch Changes
+
+- Support `min_remaining_ttl_seconds` for M2M token creation. ([#8513](https://github.com/clerk/javascript/pull/8513)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Usage:
+
+  ```ts
+  clerkClient.m2m.createToken({
+    machineSecretKey: 'ak_xxxxx',
+    minRemainingTtlSeconds: 240,
+  });
+  ```
+
+- Add `RoleSetJSON`, `RoleSetItemJSON`, and `RoleSetMigrationJSON` types matching the BAPI OpenAPI schema. Add `role_set_key`, `last_active_at`, and `missing_member_with_elevated_permissions` to `OrganizationJSON`. ([#8502](https://github.com/clerk/javascript/pull/8502)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`5cda3ee`](https://github.com/clerk/javascript/commit/5cda3ee8451cc9af375895824d24a5c3ed7fbee6)]:
+  - @clerk/shared@4.10.2
+
+## 3.4.6
+
+### Patch Changes
+
+- Fix OAuth consent component and hook related types. ([#8483](https://github.com/clerk/javascript/pull/8483)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Updated dependencies [[`7a5892f`](https://github.com/clerk/javascript/commit/7a5892f9bcaa1a6212e6e6d3741160929ffd027e)]:
+  - @clerk/shared@4.10.1
+
+## 3.4.5
+
+### Patch Changes
+
+- Updated dependencies [[`9e9230c`](https://github.com/clerk/javascript/commit/9e9230c8c3cbdb1c253ca7cdd24cc8d681b5ee5a), [`68d32df`](https://github.com/clerk/javascript/commit/68d32dfcc453080ef93edf69be8de765a342d88c), [`1c27d4d`](https://github.com/clerk/javascript/commit/1c27d4dd41a27cf41c3823306fe88e026fed08fb), [`1001193`](https://github.com/clerk/javascript/commit/10011936981fc22bf7d3750f1591f0873ea78bcb)]:
+  - @clerk/shared@4.10.0
+
+## 3.4.4
+
+### Patch Changes
+
+- Updated dependencies [[`785f057`](https://github.com/clerk/javascript/commit/785f057f5cda202c26a9f34bde7c1873a6cbd6ea), [`90beaeb`](https://github.com/clerk/javascript/commit/90beaeb8319d5bccb8fa52343f4b241c6d2d3ebe), [`244920d`](https://github.com/clerk/javascript/commit/244920d1ebb5d420a96bfc2a79d84cccafe9b61c)]:
+  - @clerk/shared@4.9.0
+
+## 3.4.3
+
+### Patch Changes
+
+- Updated dependencies [[`1bfd8ab`](https://github.com/clerk/javascript/commit/1bfd8ab89c62e428038b8c565f118c582ed395ea)]:
+  - @clerk/shared@4.8.7
+
+## 3.4.2
+
+### Patch Changes
+
+- Auto-proxy FAPI requests for `.vercel.app` subdomains. When deployed to a `.vercel.app` domain without explicit proxy or domain configuration, the SDK automatically routes Frontend API requests through `/__clerk` on the app's own origin. This enables Clerk production mode on Vercel deployments without manual proxy setup. ([#8035](https://github.com/clerk/javascript/pull/8035)) by [@brkalow](https://github.com/brkalow)
+
+- Fix `Request` cloning and outbound `fetch` to omit cross-realm `AbortSignal`. Node 24's bundled undici tightened the `instanceof AbortSignal` check on `RequestInit.signal`, which broke: ([#8351](https://github.com/clerk/javascript/pull/8351)) by [@jacekradko](https://github.com/jacekradko)
+  - Cloning framework-specific requests such as `NextRequest` in `@clerk/backend`'s `ClerkRequest`.
+  - Subclassed `Request`s passed through `patchRequest` in `@clerk/react-router` and `@clerk/tanstack-react-start`.
+  - Frontend API proxying in `@clerk/backend`'s `clerkFrontendApiProxy`, which forwarded the inbound request's signal to the upstream `fetch`. Abort propagation will be restored in a follow-up via an in-realm `AbortController` bridge.
+
+- Updated dependencies [[`9b57986`](https://github.com/clerk/javascript/commit/9b5798696eb0c6cc6ab548ade100b504f691895c), [`a9f9b29`](https://github.com/clerk/javascript/commit/a9f9b2971a026d04571ceb1865ec8dafedbbe863)]:
+  - @clerk/shared@4.8.6
+
 ## 3.4.1
 
 ### Patch Changes

@@ -27,7 +27,6 @@ Directory Structure
 
 - `packages/` - All publishable packages
 - `integration/` - End-to-end tests and integration templates
-- `playground/` - Development and testing applications
 - `docs/` - Documentation and contribution guides
 - `scripts/` - Build and automation scripts
 - `tools/` - Internal development tools

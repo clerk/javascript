@@ -178,6 +178,53 @@ export const taIN: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'நிறுவன இணைப்புகளை நிர்வகிக்க அனுமதிகளைப் பெற உங்கள் நிறுவனத்தின் நிர்வாகியைத் தொடர்பு கொள்ளவும்.',
+      title: 'நிறுவன இணைப்புகளை நிர்வகிக்க உங்களுக்கு அனுமதி இல்லை',
+    },
+    navbar: {
+      title: 'ஒற்றை உள்நுழைவை (SSO) உள்ளமை',
+    },
+    selectProviderStep: {
+      title: 'Select provider',
+      subtitle: 'Select the provider you are going to setup SSO for.',
+      body: {
+        title: 'Select your identity provider',
+        description: "We'll guide you through the detailed setup process next.",
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Custom SAML Provider',
+      },
+      warning: 'Once a provider is selected you cannot change again until the configuration is over',
+    },
+    verifyEmailDomainStep: {
+      title: 'மின்னஞ்சல் முகவரியை சரிபார்க்கவும்',
+      subtitle: 'நீங்கள் நிறுவன இணைப்பை இயக்க விரும்பும் மின்னஞ்சல் முகவரியை சரிபார்க்கவும்.',
+      addEmailAddress: {
+        formTitle: 'எங்களுக்கு உங்கள் மின்னஞ்சல் தேவை',
+        formSubtitle: 'தொடங்க உங்கள் மின்னஞ்சல் முகவரி தேவைப்படும்',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'மின்னஞ்சல் முகவரி',
+      },
+      emailCode: {
+        formTitle: 'உங்கள் மின்னஞ்சல் முகவரியை சரிபார்க்கவும்',
+        formSubtitle: '{{identifier}} க்கு அனுப்பப்பட்ட சரிபார்ப்பு குறியீட்டை உள்ளிடவும்',
+        resendButton: 'குறியீடு கிடைக்கவில்லையா? மீண்டும் அனுப்பு',
+        verified: {
+          title: 'உங்கள் மின்னஞ்சல் கிடைத்தது',
+          subtitle: 'பின்வரும் மின்னஞ்சலுடன் உங்கள் மின்னஞ்சல் முகவரியை சரிபார்த்துள்ளீர்கள்',
+          inputLabel: 'சரிபார்க்கப்பட்ட மின்னஞ்சல் முகவரி',
+        },
+      },
+      domainTaken: {
+        title: 'இந்த டொமைனுக்கு ({{domain}}) ஏற்கனவே SSO இணைப்பு உள்ளது',
+        subtitle: 'ஏற்கனவே உள்ள இணைப்பின் வழியாக அணுகலைப் பெற, பயன்பாட்டின் நிர்வாகியைத் தொடர்பு கொள்ளவும்.',
+      },
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'நிறுவனத்தை உருவாக்கு',
     invitePage: {
