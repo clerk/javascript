@@ -40,8 +40,8 @@ minimumReleaseAgeExclude:
   - '@clerk/*'
   - 'pkglab'
   - 'pkglab-*'
-  # CVE-2026-23869: React Server Components DoS
-  - 'next@15.5.15'
+  # GHSA-26hh-7cqf-hhc6: Middleware/Proxy bypass via segment-prefetch routes (incomplete fix follow-up)
+  - 'next@15.5.18'
   - '@next/*'
   # Renovate security update: @modelcontextprotocol/sdk@1.26.0
   - '@modelcontextprotocol/sdk@1.26.0'
