@@ -6,12 +6,13 @@
  * keeps published packages free of install-time code, which is a common supply-chain
  * concern, and only surfaces the notice in environments where telemetry actually fires.
  *
- * The notice is shown at most once per machine. The marker is persisted to:
- *   - `localStorage` in browsers
- *   - the same env-paths style config file the previous postinstall wrote to on Node,
- *     so users who already saw the notice via postinstall do not see it again
- *   - nowhere in environments without either (Workers, edge runtimes); the notice is
- *     simply skipped there
+ * Persistence:
+ *   - In browsers, `localStorage` keeps the notice from re-displaying across reloads.
+ *   - In Node and other JS runtimes, a `globalThis` Symbol flag keeps it from
+ *     re-displaying within the same process (this also survives Next.js HMR module
+ *     reloads, since `globalThis` is shared). No filesystem access is performed so the
+ *     module remains safe to bundle for Edge Runtime, Workers, and other restricted
+ *     environments.
  *
  * All work is wrapped in try/catch. Failure to display or persist the notice must never
  * affect the SDK.
@@ -19,21 +20,14 @@
 
 import { isTruthy } from '../underscore';
 
-const TELEMETRY_NOTICE_VERSION = 1;
 const STORAGE_KEY = 'clerk_telemetry_notice_v1';
-const CONFIG_DIR_NAME = 'clerk';
-const CONFIG_FILE_NAME = 'config.json';
+const PROCESS_FLAG = Symbol.for('@clerk/shared.telemetryNoticeShown');
 
 const NOTICE_LINES = [
   'Attention: Clerk collects telemetry data from its SDKs when connected to development instances.',
   "The data collected is used to inform Clerk's product roadmap.",
   'To learn more, including how to opt-out from the telemetry program, visit: https://clerk.com/docs/telemetry.',
 ];
-
-interface NoticeStore {
-  hasSeen(): Promise<boolean>;
-  markSeen(): Promise<void>;
-}
 
 const CI_ENV_VARS = [
   'CI',
@@ -69,102 +63,27 @@ function hasUsableLocalStorage(): boolean {
   }
 }
 
-class BrowserNoticeStore implements NoticeStore {
-  async hasSeen(): Promise<boolean> {
-    const value = globalThis.localStorage.getItem(STORAGE_KEY);
-    return parseInt(value ?? '0', 10) >= TELEMETRY_NOTICE_VERSION;
-  }
-
-  async markSeen(): Promise<void> {
-    globalThis.localStorage.setItem(STORAGE_KEY, String(TELEMETRY_NOTICE_VERSION));
-  }
-}
-
-class NodeNoticeStore implements NoticeStore {
-  #pathPromise: Promise<{ dir: string; file: string } | null> | null = null;
-
-  async #getPaths(): Promise<{ dir: string; file: string } | null> {
-    if (!this.#pathPromise) {
-      this.#pathPromise = (async () => {
-        try {
-          const os = await importNodeModule<typeof import('node:os')>('node:os');
-          const path = await importNodeModule<typeof import('node:path')>('node:path');
-          const homedir = os.homedir();
-          let dir: string;
-          switch (process.platform) {
-            case 'darwin':
-              dir = path.join(homedir, 'Library', 'Preferences', CONFIG_DIR_NAME);
-              break;
-            case 'win32': {
-              // eslint-disable-next-line turbo/no-undeclared-env-vars
-              const appData = process.env.APPDATA ?? path.join(homedir, 'AppData', 'Roaming');
-              dir = path.join(appData, CONFIG_DIR_NAME, 'Config');
-              break;
-            }
-            default: {
-              // eslint-disable-next-line turbo/no-undeclared-env-vars
-              const xdg = process.env.XDG_CONFIG_HOME ?? path.join(homedir, '.config');
-              dir = path.join(xdg, CONFIG_DIR_NAME);
-            }
-          }
-          return { dir, file: path.join(dir, CONFIG_FILE_NAME) };
-        } catch {
-          return null;
-        }
-      })();
-    }
-    return this.#pathPromise;
-  }
-
-  async hasSeen(): Promise<boolean> {
-    const paths = await this.#getPaths();
-    if (!paths) {
-      return false;
-    }
-    try {
-      const fs = await importNodeModule<typeof import('node:fs/promises')>('node:fs/promises');
-      const raw = await fs.readFile(paths.file, 'utf8');
-      const parsed = JSON.parse(raw) as { telemetryNoticeVersion?: string | number };
-      return parseInt(String(parsed.telemetryNoticeVersion ?? '0'), 10) >= TELEMETRY_NOTICE_VERSION;
-    } catch {
-      return false;
-    }
-  }
-
-  async markSeen(): Promise<void> {
-    const paths = await this.#getPaths();
-    if (!paths) {
-      return;
-    }
-    const fs = await importNodeModule<typeof import('node:fs/promises')>('node:fs/promises');
-    await fs.mkdir(paths.dir, { recursive: true });
-    let existing: Record<string, unknown> = {};
-    try {
-      existing = JSON.parse(await fs.readFile(paths.file, 'utf8')) as Record<string, unknown>;
-    } catch {
-      // file missing or unreadable
-    }
-    existing.telemetryNoticeVersion = TELEMETRY_NOTICE_VERSION;
-    await fs.writeFile(paths.file, JSON.stringify(existing, null, '\t'));
-  }
-}
-
-/**
- * Loads a Node built-in module without exposing the import to static bundler analysis.
- * Bundlers that target the browser (webpack, Rspack) would otherwise fail to compile the
- * `node:fs/promises` / `node:os` / `node:path` literals even though the import is only
- * reachable in a Node runtime.
- */
-const importNodeModule = new Function('id', 'return import(id)') as <T = unknown>(id: string) => Promise<T>;
-
-function pickStore(): NoticeStore | null {
+function hasSeen(): boolean {
   if (hasUsableLocalStorage()) {
-    return new BrowserNoticeStore();
+    try {
+      return globalThis.localStorage.getItem(STORAGE_KEY) === '1';
+    } catch {
+      return false;
+    }
   }
-  if (typeof process !== 'undefined' && process.versions?.node) {
-    return new NodeNoticeStore();
+  return Boolean((globalThis as Record<symbol, unknown>)[PROCESS_FLAG]);
+}
+
+function markSeen(): void {
+  if (hasUsableLocalStorage()) {
+    try {
+      globalThis.localStorage.setItem(STORAGE_KEY, '1');
+      return;
+    } catch {
+      // fall through to the in-process flag
+    }
   }
-  return null;
+  (globalThis as Record<symbol, unknown>)[PROCESS_FLAG] = true;
 }
 
 function printNotice(): void {
@@ -186,47 +105,34 @@ export type MaybeShowTelemetryNoticeOptions = {
   skip?: boolean;
 };
 
-let inFlight: Promise<void> | null = null;
-
 /**
- * Display the one-time telemetry disclosure if it has not been shown on this machine.
- *
- * Safe to call multiple times: subsequent calls within the same process are deduped,
- * and the persistence marker prevents re-display across processes. Never throws.
+ * Display the one-time telemetry disclosure if it has not already been shown. Safe to
+ * call repeatedly: the browser-side marker prevents re-display across reloads, and the
+ * `globalThis` flag prevents re-display within the same Node process. Never throws.
  */
-export function maybeShowTelemetryNotice(options: MaybeShowTelemetryNoticeOptions = {}): Promise<void> {
+export function maybeShowTelemetryNotice(options: MaybeShowTelemetryNoticeOptions = {}): void {
   if (options.skip) {
-    return Promise.resolve();
+    return;
   }
-  if (inFlight) {
-    return inFlight;
-  }
-  inFlight = (async () => {
-    try {
-      if (isCI() || isHeadlessBrowser()) {
-        return;
-      }
-      const store = pickStore();
-      if (!store) {
-        return;
-      }
-      if (await store.hasSeen()) {
-        return;
-      }
-      printNotice();
-      await store.markSeen();
-    } catch {
-      // never let disclosure break the SDK
+  try {
+    if (isCI() || isHeadlessBrowser()) {
+      return;
     }
-  })();
-  return inFlight;
+    if (hasSeen()) {
+      return;
+    }
+    printNotice();
+    markSeen();
+  } catch {
+    // never let disclosure break the SDK
+  }
 }
 
 /**
- * Test-only: reset the in-process dedupe so the next call re-runs the gating logic.
+ * Test-only: clear the in-process flag so the next call re-runs the gating logic.
  *
  * @internal
  */
 export function __resetTelemetryNoticeForTests(): void {
-  inFlight = null;
+  delete (globalThis as Record<symbol, unknown>)[PROCESS_FLAG];
 }
