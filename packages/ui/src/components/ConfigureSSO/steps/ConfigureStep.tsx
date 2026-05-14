@@ -23,7 +23,7 @@ import { useCardState } from '@/elements/contexts';
 import { Form } from '@/elements/Form';
 import { Check, ClipboardOutline } from '@/icons';
 import { handleError } from '@/utils/errorHandler';
-import { useFormControl } from '@/utils/useFormControl';
+import { useFormControl } from '@/ui/utils/useFormControl';
 
 import { useConfigureSSO } from '../ConfigureSSOContext';
 import { Step } from '../elements/Step';
@@ -126,7 +126,7 @@ export const CreateAppSubStep = (): JSX.Element => {
     label: localizationKeys('configureSSO.configureStep.spFields.acsUrl.label'),
     isRequired: false,
   });
-  const spEntityIdField = useFormControl('acsUrl', spEntityId, {
+  const spEntityIdField = useFormControl('spEntityId', spEntityId, {
     type: 'text',
     label: localizationKeys('configureSSO.configureStep.spFields.spEntityId.label'),
     isRequired: false,
@@ -208,14 +208,16 @@ export const CreateAppSubStep = (): JSX.Element => {
             </Form.CommonInputWrapper>
           </Form.ControlRow>
 
-          <Form.CommonInputWrapper {...spEntityIdField.props}>
-            <ClipboardInput
-              value={spEntityId}
-              readOnly
-              copyIcon={ClipboardOutline}
-              copiedIcon={Check}
-            />
-          </Form.CommonInputWrapper>
+          <Form.ControlRow elementId={spEntityIdField.id}>
+            <Form.CommonInputWrapper {...spEntityIdField.props}>
+              <ClipboardInput
+                value={spEntityId}
+                readOnly
+                copyIcon={ClipboardOutline}
+                copiedIcon={Check}
+              />
+            </Form.CommonInputWrapper>
+          </Form.ControlRow>
 
           <Col sx={theme => ({ gap: theme.space.$1x5 })}>
             <Heading

@@ -28,6 +28,7 @@ export type FieldId =
   | 'apiKeySecret'
   | 'idpMetadataUrl'
   | 'acsUrl'
+  | 'spEntityId'
   | 'web3WalletName';
 export type ProfileSectionId =
   | 'profile'
