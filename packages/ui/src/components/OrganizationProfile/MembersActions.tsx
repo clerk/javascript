@@ -2,7 +2,7 @@ import { useMemo, type ReactNode } from 'react';
 import { useOrganization } from '@clerk/shared/react';
 import { Animated } from '@/ui/elements/Animated';
 import { Tooltip } from '@/ui/elements/Tooltip';
-import { isPlanWithPerSeatCosts } from '@/utils/billingPlanSeats';
+import { isPlanWithPerSeatCosts } from '@/ui/utils/billingPlanSeats';
 
 import { useProtect } from '../../common';
 import { useSubscription } from '../../contexts';
