@@ -87,8 +87,8 @@ class NodeNoticeStore implements NoticeStore {
     if (!this.#pathPromise) {
       this.#pathPromise = (async () => {
         try {
-          const os = await import('node:os');
-          const path = await import('node:path');
+          const os = await importNodeModule<typeof import('node:os')>('node:os');
+          const path = await importNodeModule<typeof import('node:path')>('node:path');
           const homedir = os.homedir();
           let dir: string;
           switch (process.platform) {
@@ -122,7 +122,7 @@ class NodeNoticeStore implements NoticeStore {
       return false;
     }
     try {
-      const fs = await import('node:fs/promises');
+      const fs = await importNodeModule<typeof import('node:fs/promises')>('node:fs/promises');
       const raw = await fs.readFile(paths.file, 'utf8');
       const parsed = JSON.parse(raw) as { telemetryNoticeVersion?: string | number };
       return parseInt(String(parsed.telemetryNoticeVersion ?? '0'), 10) >= TELEMETRY_NOTICE_VERSION;
@@ -136,7 +136,7 @@ class NodeNoticeStore implements NoticeStore {
     if (!paths) {
       return;
     }
-    const fs = await import('node:fs/promises');
+    const fs = await importNodeModule<typeof import('node:fs/promises')>('node:fs/promises');
     await fs.mkdir(paths.dir, { recursive: true });
     let existing: Record<string, unknown> = {};
     try {
@@ -148,6 +148,14 @@ class NodeNoticeStore implements NoticeStore {
     await fs.writeFile(paths.file, JSON.stringify(existing, null, '\t'));
   }
 }
+
+/**
+ * Loads a Node built-in module without exposing the import to static bundler analysis.
+ * Bundlers that target the browser (webpack, Rspack) would otherwise fail to compile the
+ * `node:fs/promises` / `node:os` / `node:path` literals even though the import is only
+ * reachable in a Node runtime.
+ */
+const importNodeModule = new Function('id', 'return import(id)') as <T = unknown>(id: string) => Promise<T>;
 
 function pickStore(): NoticeStore | null {
   if (hasUsableLocalStorage()) {

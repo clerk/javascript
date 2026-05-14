@@ -107,11 +107,7 @@ describe('maybeShowTelemetryNotice', () => {
   });
 
   test('dedupes concurrent calls within a single process', async () => {
-    await Promise.all([
-      maybeShowTelemetryNotice(),
-      maybeShowTelemetryNotice(),
-      maybeShowTelemetryNotice(),
-    ]);
+    await Promise.all([maybeShowTelemetryNotice(), maybeShowTelemetryNotice(), maybeShowTelemetryNotice()]);
 
     // Notice consists of three lines + an empty trailing newline; assert disclosure was printed exactly once.
     const disclosureCalls = logSpy.mock.calls.filter(call => /Clerk collects telemetry/.test(String(call[0])));
