@@ -26,7 +26,7 @@ import { ClipboardInput } from '@/elements/ClipboardInput';
 import { useCardState } from '@/elements/contexts';
 import { Form } from '@/elements/Form';
 import { SegmentedControl } from '@/elements/SegmentedControl';
-import { Check, ClipboardOutline, Upload } from '@/icons';
+import { Check, ClipboardOutline, Close, Upload } from '@/icons';
 import { useFormControl } from '@/ui/utils/useFormControl';
 import { handleError } from '@/utils/errorHandler';
 
@@ -502,6 +502,8 @@ export const SubmitSamlConfigSubStep = (): JSX.Element => {
   const { updateEnterpriseConnection } = __internal_useUserEnterpriseConnections();
 
   const [mode, setMode] = React.useState<'metadataUrl' | 'manual'>('metadataUrl');
+  const [certFile, setCertFile] = React.useState<File | null>(null);
+  const certInputRef = React.useRef<HTMLInputElement>(null);
 
   const updateConnection = useReverification(
     React.useCallback(
@@ -626,25 +628,70 @@ export const SubmitSamlConfigSubStep = (): JSX.Element => {
                   />
                 </FormLabel>
 
-                <Button
-                  size='sm'
-                  variant='outline'
-                  sx={{ alignSelf: 'flex-start' }}
-                >
-                  <Icon
-                    icon={Upload}
-                    size='sm'
-                    colorScheme='neutral'
-                    sx={t => ({ marginInlineEnd: t.space.$1 })}
-                  />
+                <input
+                  ref={certInputRef}
+                  type='file'
+                  accept='.pem,.crt,.cer,.txt'
+                  multiple={false}
+                  style={{ display: 'none' }}
+                  onChange={e => setCertFile(e.target.files?.[0] ?? null)}
+                />
 
-                  <Text
-                    as='span'
-                    localizationKey={localizationKeys(
-                      'configureSSO.configureStep.samlOkta.manual.signingCertificate.uploadFile',
-                    )}
-                  />
-                </Button>
+                {certFile === null ? (
+                  <Button
+                    size='sm'
+                    variant='outline'
+                    sx={{ alignSelf: 'flex-start' }}
+                    onClick={() => certInputRef.current?.click()}
+                  >
+                    <Icon
+                      icon={Upload}
+                      size='sm'
+                      colorScheme='neutral'
+                      sx={t => ({ marginInlineEnd: t.space.$1 })}
+                    />
+
+                    <Text
+                      as='span'
+                      localizationKey={localizationKeys(
+                        'configureSSO.configureStep.samlOkta.manual.signingCertificate.uploadFile',
+                      )}
+                    />
+                  </Button>
+                ) : (
+                  <Flex
+                    align='center'
+                    gap={2}
+                  >
+                    <Text
+                      as='span'
+                      colorScheme='secondary'
+                      sx={t => ({ fontSize: t.fontSizes.$sm })}
+                    >
+                      {certFile.name}
+                    </Text>
+
+                    <Button
+                      variant='ghost'
+                      colorScheme='neutral'
+                      aria-label={t(
+                        localizationKeys('configureSSO.configureStep.samlOkta.manual.signingCertificate.removeFile'),
+                      )}
+                      onClick={() => {
+                        setCertFile(null);
+                        if (certInputRef.current) {
+                          certInputRef.current.value = '';
+                        }
+                      }}
+                      sx={t => ({ padding: t.space.$1 })}
+                    >
+                      <Icon
+                        icon={Close}
+                        size='xs'
+                      />
+                    </Button>
+                  </Flex>
+                )}
               </Col>
             </>
           )}
