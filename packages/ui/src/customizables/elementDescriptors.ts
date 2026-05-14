@@ -536,6 +536,18 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'enterpriseConnectionButton',
   'enterpriseConnectionButtonText',
 
+  'configureSSOHeader',
+  'configureSSOStepper',
+  'configureSSOStepperItem',
+  'configureSSOStepperItemBullet',
+  'configureSSOStepperItemLabel',
+  'configureSSOStepperSeparator',
+  'configureSSOStep',
+  'configureSSOStepCounter',
+  'configureSSOFooter',
+  'configureSSOFooterPreviousButton',
+  'configureSSOFooterContinueButton',
+
   'web3SolanaWalletButtonsRoot',
   'web3SolanaWalletButtons',
   'web3SolanaWalletButtonsIconButton',

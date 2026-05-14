@@ -179,6 +179,54 @@ export const bgBG: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        'Свържете се с администратора на вашата организация, за да получите разрешения за управление на корпоративни връзки.',
+      title: 'Нямате разрешение да управлявате корпоративни връзки',
+    },
+    navbar: {
+      title: 'Конфигуриране на единен вход (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Изберете доставчик',
+      subtitle: 'Изберете доставчика, за който ще конфигурирате SSO.',
+      body: {
+        title: 'Изберете вашия доставчик на идентичност',
+        description: 'Ще ви преведем през подробния процес на настройка след това.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Персонализиран SAML доставчик',
+      },
+      warning: 'След като изберете доставчик, не можете да го промените, докато конфигурацията не приключи',
+    },
+    verifyEmailDomainStep: {
+      title: 'Потвърди имейл адреса',
+      subtitle: 'Потвърдете имейл адреса, на който искате да активирате корпоративната връзка.',
+      addEmailAddress: {
+        formTitle: 'Нуждаем се от вашия имейл',
+        formSubtitle: 'За да започнем, ще ни е необходим вашият имейл адрес',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'Имейл адрес',
+      },
+      emailCode: {
+        formTitle: 'Потвърдете имейл адреса си',
+        formSubtitle: 'Въведете кода за потвърждение, изпратен на {{identifier}}',
+        resendButton: 'Не получихте код? Изпрати отново',
+        verified: {
+          title: 'Получихме имейла ви',
+          subtitle: 'Потвърдихте имейл адреса си със следния имейл',
+          inputLabel: 'Потвърден имейл адрес',
+        },
+      },
+      domainTaken: {
+        title: 'Този домейн ({{domain}}) вече има SSO връзка',
+        subtitle: 'Свържете се с администратора на приложението, за да получите достъп чрез съществуващата връзка.',
+      },
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Създаване на организация',
     invitePage: {

@@ -41,6 +41,9 @@ export const enUS: LocalizationResource = {
       formHint: 'Are you sure you want to delete this Secret key?',
       formTitle: 'Revoke "{{apiKeyName}}" secret key?',
     },
+    tableHeader__name: 'Name',
+    tableHeader__lastUsed: 'Last used',
+    tableHeader__actions: 'Actions',
   },
   backButton: 'Back',
   badge__activePlan: 'Active',
@@ -197,6 +200,148 @@ export const enUS: LocalizationResource = {
     year: 'Year',
     yearAbbreviation: 'yr',
     yearPerUnit: 'Year per {{unitName}}',
+  },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        'Contact your organization administrator in order to have permissions to manage enterprise connections.',
+      title: 'You do not have permission to manage enterprise connections',
+    },
+    navbar: {
+      title: 'Configure Single Sign-On (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Select provider',
+      subtitle: 'Select the provider you are going to setup SSO for.',
+      body: {
+        title: 'Select your identity provider',
+        description: "We'll guide you through the detailed setup process next.",
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Custom SAML Provider',
+      },
+      warning: 'Once a provider is selected you cannot change again until the configuration is over',
+    },
+    verifyEmailDomainStep: {
+      title: 'Verify email address',
+      subtitle: 'Verify the email address you want to enable the enterprise connection on.',
+      addEmailAddress: {
+        formTitle: 'We need your email',
+        formSubtitle: 'In order to start we will need your email address',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'Email address',
+      },
+      emailCode: {
+        formTitle: 'Verify your email address',
+        formSubtitle: 'Enter the verification code sent to {{identifier}}',
+        resendButton: "Didn't receive a code? Resend",
+        verified: {
+          title: 'We got your email',
+          subtitle: "You've verified your email address with the following email",
+          inputLabel: 'Verified email address',
+        },
+      },
+      domainTaken: {
+        title: 'This domain ({{domain}}) already has an SSO connection',
+        subtitle: "Contact the application's administrator to get access through the existing connection.",
+      },
+    },
+    configureStep: {
+      spFields: {
+        acsUrl: {
+          label: 'Single sign-on URL',
+        },
+        spEntityId: {
+          label: 'Audience URI',
+        },
+      },
+      attributeMapping: {
+        title: 'We expect your SAML responses to have the following specific attributes:',
+        paragraph:
+          "These are the defaults and probably won't need you to change them. However, many SAML configuration errors are due to incorrect attribute mappings, so it's worth double-checking. Here's how:",
+        columns: {
+          attribute: 'Attribute',
+          claimName: 'Claim Name',
+        },
+        badges: {
+          required: 'Required',
+          optional: 'Optional',
+        },
+        rows: {
+          email: {
+            attribute: 'Email address',
+            claim: 'user.email',
+          },
+          firstName: {
+            attribute: 'First Name',
+            claim: 'user.firstName',
+          },
+          lastName: {
+            attribute: 'Last Name',
+            claim: 'user.lastName',
+          },
+        },
+      },
+      samlOkta: {
+        title: 'Configure Okta Workforce',
+        subtitle: 'Create a new enterprise application in your Okta Dashboard',
+        createApp: {
+          title: 'Create a new enterprise application in Okta',
+          step1: 'Sign in to Okta and go to Admin → Applications.',
+          step2: 'Click Create App Integration.',
+          step3: 'Select SAML 2.0.',
+          step4: 'Fill in the General Settings (App name is required).',
+          step5: 'Click Next to complete creating the application.',
+        },
+        serviceProvider: {
+          title: 'Configure service provider',
+          paragraph1:
+            'Once you have moved forward from the General Settings instructions, you will be presented with the Configure SAML page.',
+          paragraph2:
+            'To configure your service provider (Clerk), you must add these two fields to your Okta application:',
+        },
+        completeSamlIntegration: {
+          title: 'Complete SAML integration',
+          step1: 'Select This is an internal app that we have created from the options menu.',
+          step2: 'Complete the form with any comments and select "Finish".',
+        },
+        configureAttributes: {
+          step1: 'In the Okta dashboard, find the Attribute Statements section.',
+          step2: 'Select Add Expression for each attribute, and enter the following name and expression pairs:',
+          pairs: {
+            conjunction: ' and ',
+            email: {
+              name: 'mail',
+              expression: 'user.profile.mail',
+            },
+            firstName: {
+              name: 'firstName',
+              expression: 'user.profile.firstName',
+            },
+            lastName: {
+              name: 'lastName',
+              expression: 'user.profile.lastName',
+            },
+          },
+        },
+        assignUsers: {
+          title: 'Assign selected user or group in Okta',
+          paragraph: 'You need to assign users or groups to your enterprise app before they can use it to sign in.',
+          step1: 'In the Okta dashboard, select the Assignments tab.',
+          step2: 'Select the Assign dropdown. You can either select Assign to people or Assign to groups.',
+          step3: 'In the search field, enter the user or group of users that you want to assign to the application.',
+          step4: 'Select the Assign button next to the user or group that you want to assign.',
+          step5: 'Select the Done button to complete the assignment.',
+        },
+        metadataUrl: {
+          label: 'Metadata URL',
+          placeholder: 'Paste URL here...',
+          description: 'In your Okta SAML app, go to the Sign On tab and retrieve the metadata URL. Paste it below.',
+        },
+      },
+    },
   },
   createOrganization: {
     formButtonSubmit: 'Create organization',

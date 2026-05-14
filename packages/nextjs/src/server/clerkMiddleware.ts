@@ -12,6 +12,7 @@ import type {
 import {
   AuthStatus,
   constants,
+  createBootstrapSignedOutState,
   createClerkRequest,
   createRedirect,
   getAuthObjectForAcceptedToken,
@@ -21,9 +22,10 @@ import {
   TokenType,
 } from '@clerk/backend/internal';
 import { clerkFrontendApiProxy, DEFAULT_PROXY_PATH, matchProxyPath } from '@clerk/backend/proxy';
-import { parsePublishableKey } from '@clerk/shared/keys';
+import { isProductionFromPublishableKey, parsePublishableKey } from '@clerk/shared/keys';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
 import { isMalformedURLError } from '@clerk/shared/pathMatcher';
+import { shouldAutoProxy } from '@clerk/shared/proxy';
 import { notFound as nextjsNotFound } from 'next/navigation';
 import type { NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -35,7 +37,7 @@ import type { Logger, LoggerNoCommit } from '../utils/debugLogger';
 import { withLogger } from '../utils/debugLogger';
 import { canUseKeyless } from '../utils/feature-flags';
 import { clerkClient } from './clerkClient';
-import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
+import { DOMAIN, PROXY_URL, PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
 import { type ContentSecurityPolicyOptions, createContentSecurityPolicyHeaders } from './content-security-policy';
 import { errorThrower } from './errorThrower';
 import { getHeader } from './headers-utils';
@@ -161,12 +163,20 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       );
 
       // Handle Frontend API proxy requests early, before authentication
-      const frontendApiProxyConfig = resolvedParams.frontendApiProxy;
+      const requestUrl = new URL(request.nextUrl.href);
+      let frontendApiProxyConfig = resolvedParams.frontendApiProxy;
+
+      // Auto-detect when no explicit proxy or domain is configured
+      const hasExplicitProxyOrDomain = resolvedParams.proxyUrl || PROXY_URL || resolvedParams.domain || DOMAIN;
+      if (!frontendApiProxyConfig && !hasExplicitProxyOrDomain && isProductionFromPublishableKey(publishableKey)) {
+        if (shouldAutoProxy(requestUrl.hostname)) {
+          frontendApiProxyConfig = { enabled: true };
+        }
+      }
       if (frontendApiProxyConfig) {
         const { enabled, path: proxyPath = DEFAULT_PROXY_PATH } = frontendApiProxyConfig;
 
         // Resolve enabled - either boolean or function
-        const requestUrl = new URL(request.url);
         const isEnabled = typeof enabled === 'function' ? enabled(requestUrl) : enabled;
 
         if (isEnabled && matchProxyPath(request, { proxyPath })) {
@@ -230,6 +240,50 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       });
     });
 
+    /**
+     * Runs the user's handler against a synthetic signed-out `RequestState` during the keyless
+     * bootstrap window, so authorization fails closed until a publishable key is provisioned.
+     */
+    const bootstrapNextMiddleware: NextMiddleware = withLogger('clerkMiddleware', logger => async (request, event) => {
+      const resolvedParams = typeof params === 'function' ? await params(request) : params;
+      const keyless = await getKeylessCookieValue(name => request.cookies.get(name)?.value);
+
+      const signInUrl = resolvedParams.signInUrl || SIGN_IN_URL || '';
+      const signUpUrl = resolvedParams.signUpUrl || SIGN_UP_URL || '';
+
+      const options = {
+        publishableKey: '',
+        secretKey: '',
+        signInUrl,
+        signUpUrl,
+        ...resolvedParams,
+      };
+
+      clerkMiddlewareRequestDataStore.set('requestData', options);
+
+      if (options.debug) {
+        logger.enable();
+      }
+
+      const clerkRequest = createClerkRequest(request);
+      logger.debug('keyless bootstrap (no publishable key)', () => ({ signInUrl, signUpUrl }));
+      logger.debug('url', () => clerkRequest.toJSON());
+
+      const requestState = createBootstrapSignedOutState({ signInUrl, signUpUrl });
+
+      return runHandlerWithRequestState({
+        clerkRequest,
+        request,
+        event,
+        requestState,
+        handler,
+        options,
+        resolvedParams,
+        keyless,
+        logger,
+      });
+    });
+
     const keylessMiddleware: NextMiddleware = async (request, event) => {
       /**
        * This mechanism replaces a full-page reload. Ensures that middleware will re-run and authenticate the request properly without the secret key or publishable key to be missing.
@@ -244,15 +298,8 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       const isMissingPublishableKey = !(resolvedParams.publishableKey || PUBLISHABLE_KEY || keyless?.publishableKey);
       const authHeader = getHeader(request, constants.Headers.Authorization)?.replace('Bearer ', '') ?? '';
 
-      /**
-       * In keyless mode, if the publishable key is missing, let the request through, to render `<ClerkProvider/>` that will resume the flow gracefully.
-       */
       if (isMissingPublishableKey && !isMachineTokenByPrefix(authHeader)) {
-        const res = NextResponse.next();
-        setRequestHeadersOnNextResponse(res, request, {
-          [constants.Headers.AuthStatus]: 'signed-out',
-        });
-        return res;
+        return bootstrapNextMiddleware(request, event);
       }
 
       return baseNextMiddleware(request, event);

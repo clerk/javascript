@@ -1,5 +1,89 @@
 # @clerk/ui
 
+## 1.9.1
+
+### Patch Changes
+
+- Fixed unhandled TypeError when `unsafeMetadata` is passed to `<SignUp />` ([#8500](https://github.com/clerk/javascript/pull/8500)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`5cda3ee`](https://github.com/clerk/javascript/commit/5cda3ee8451cc9af375895824d24a5c3ed7fbee6)]:
+  - @clerk/shared@4.10.2
+  - @clerk/localizations@4.6.2
+
+## 1.9.0
+
+### Minor Changes
+
+- Removed unused internal OAuthConsent prop. ([#8492](https://github.com/clerk/javascript/pull/8492)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Add wizard steps for the `<__experimental_ConfigureSSO />` component ([#8468](https://github.com/clerk/javascript/pull/8468)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Remove back button on the sign-in password compromised/pwned error screen. ([#8280](https://github.com/clerk/javascript/pull/8280)) by [@Ephem](https://github.com/Ephem)
+
+  These errors are not recoverable by re-entering the password, so the back button led to a confusing dead end that would always take you back to the same error.
+
+- Updated dependencies [[`7a5892f`](https://github.com/clerk/javascript/commit/7a5892f9bcaa1a6212e6e6d3741160929ffd027e)]:
+  - @clerk/shared@4.10.1
+  - @clerk/localizations@4.6.1
+
+## 1.8.0
+
+### Minor Changes
+
+- Add experimental `<ConfigureSSO />` component. Not ready for usage yet. ([#8427](https://github.com/clerk/javascript/pull/8427)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Localize API keys table headers ([#8462](https://github.com/clerk/javascript/pull/8462)) by [@jebibot](https://github.com/jebibot)
+
+- Surface initialization errors and stalled mounts in the component renderer. The internal `ensureMounted` pipeline now logs a `[Clerk UI]` error to the console when the lazy module import rejects, and emits a diagnostic warning if the renderer has not mounted within 10 seconds. Makes silent failures (e.g. failed dev-server chunk loads, unresolved lazy-compilation proxies) surface with an actionable message instead of hanging without feedback. ([#8379](https://github.com/clerk/javascript/pull/8379)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`9e9230c`](https://github.com/clerk/javascript/commit/9e9230c8c3cbdb1c253ca7cdd24cc8d681b5ee5a), [`68d32df`](https://github.com/clerk/javascript/commit/68d32dfcc453080ef93edf69be8de765a342d88c), [`1c27d4d`](https://github.com/clerk/javascript/commit/1c27d4dd41a27cf41c3823306fe88e026fed08fb), [`1001193`](https://github.com/clerk/javascript/commit/10011936981fc22bf7d3750f1591f0873ea78bcb)]:
+  - @clerk/localizations@4.6.0
+  - @clerk/shared@4.10.0
+
+## 1.7.0
+
+### Minor Changes
+
+- Render OAuthConsent organization selector from `user:org:read` scope. ([#8415](https://github.com/clerk/javascript/pull/8415)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Expose `OAuthConsent` as a public component export across React-based SDKs. ([#8381](https://github.com/clerk/javascript/pull/8381)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```tsx
+  import { OAuthConsent } from '@clerk/react';
+
+  export default function Page() {
+    return <OAuthConsent />;
+  }
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`785f057`](https://github.com/clerk/javascript/commit/785f057f5cda202c26a9f34bde7c1873a6cbd6ea), [`90beaeb`](https://github.com/clerk/javascript/commit/90beaeb8319d5bccb8fa52343f4b241c6d2d3ebe), [`244920d`](https://github.com/clerk/javascript/commit/244920d1ebb5d420a96bfc2a79d84cccafe9b61c)]:
+  - @clerk/shared@4.9.0
+  - @clerk/localizations@4.5.8
+
+## 1.6.9
+
+### Patch Changes
+
+- Updated dependencies [[`1bfd8ab`](https://github.com/clerk/javascript/commit/1bfd8ab89c62e428038b8c565f118c582ed395ea), [`5eec2fe`](https://github.com/clerk/javascript/commit/5eec2fee4e5b36d0b7dafedc704760e245d3a0e9)]:
+  - @clerk/shared@4.8.7
+  - @clerk/localizations@4.5.7
+
+## 1.6.8
+
+### Patch Changes
+
+- Updated dependencies [[`9b57986`](https://github.com/clerk/javascript/commit/9b5798696eb0c6cc6ab548ade100b504f691895c), [`00f9ff9`](https://github.com/clerk/javascript/commit/00f9ff942f0568f3839a04ff2527339d8fbf3a5d), [`a9f9b29`](https://github.com/clerk/javascript/commit/a9f9b2971a026d04571ceb1865ec8dafedbbe863)]:
+  - @clerk/shared@4.8.6
+  - @clerk/localizations@4.5.6
+
 ## 1.6.7
 
 ### Patch Changes

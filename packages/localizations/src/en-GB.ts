@@ -178,6 +178,54 @@ export const enGB: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        'Contact your organisation administrator in order to have permissions to manage enterprise connections.',
+      title: 'You do not have permission to manage enterprise connections',
+    },
+    navbar: {
+      title: 'Configure Single Sign-On (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Select provider',
+      subtitle: 'Select the provider you are going to set up SSO for.',
+      body: {
+        title: 'Select your identity provider',
+        description: "We'll guide you through the detailed setup process next.",
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Custom SAML Provider',
+      },
+      warning: 'Once a provider is selected you cannot change again until the configuration is over',
+    },
+    verifyEmailDomainStep: {
+      title: 'Verify email address',
+      subtitle: 'Verify the email address you want to enable the enterprise connection on.',
+      addEmailAddress: {
+        formTitle: 'We need your email',
+        formSubtitle: 'In order to start we will need your email address',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'Email address',
+      },
+      emailCode: {
+        formTitle: 'Verify your email address',
+        formSubtitle: 'Enter the verification code sent to {{identifier}}',
+        resendButton: "Didn't receive a code? Resend",
+        verified: {
+          title: 'We got your email',
+          subtitle: "You've verified your email address with the following email",
+          inputLabel: 'Verified email address',
+        },
+      },
+      domainTaken: {
+        title: 'This domain ({{domain}}) already has an SSO connection',
+        subtitle: "Contact the application's administrator to get access through the existing connection.",
+      },
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Create organisation',
     invitePage: {

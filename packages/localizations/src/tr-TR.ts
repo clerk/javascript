@@ -178,6 +178,53 @@ export const trTR: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'Kurumsal bağlantıları yönetme izinleri almak için organizasyonunuzun yöneticisiyle iletişime geçin.',
+      title: 'Kurumsal bağlantıları yönetme izniniz yok',
+    },
+    navbar: {
+      title: 'Tek Oturum Açmayı (SSO) Yapılandır',
+    },
+    selectProviderStep: {
+      title: 'Sağlayıcıyı seçin',
+      subtitle: "SSO'yu ayarlayacağınız sağlayıcıyı seçin.",
+      body: {
+        title: 'Kimlik sağlayıcınızı seçin',
+        description: 'Bir sonraki adımda sizi ayrıntılı kurulum sürecinde yönlendireceğiz.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Özel SAML Sağlayıcısı',
+      },
+      warning: 'Bir sağlayıcı seçildikten sonra yapılandırma bitene kadar tekrar değiştiremezsiniz',
+    },
+    verifyEmailDomainStep: {
+      title: 'E-posta adresini doğrula',
+      subtitle: 'Kurumsal bağlantıyı etkinleştirmek istediğiniz e-posta adresini doğrulayın.',
+      addEmailAddress: {
+        formTitle: 'E-postanıza ihtiyacımız var',
+        formSubtitle: 'Başlamak için e-posta adresinize ihtiyacımız olacak',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'E-posta adresi',
+      },
+      emailCode: {
+        formTitle: 'E-posta adresinizi doğrulayın',
+        formSubtitle: '{{identifier}} adresine gönderilen doğrulama kodunu girin',
+        resendButton: 'Kod almadınız mı? Tekrar gönder',
+        verified: {
+          title: 'E-postanızı aldık',
+          subtitle: 'E-posta adresinizi aşağıdaki e-posta ile doğruladınız',
+          inputLabel: 'Doğrulanmış e-posta adresi',
+        },
+      },
+      domainTaken: {
+        title: 'Bu alan adı ({{domain}}) zaten bir SSO bağlantısına sahip',
+        subtitle: 'Mevcut bağlantı üzerinden erişim sağlamak için uygulamanın yöneticisiyle iletişime geçin.',
+      },
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Oluştur',
     invitePage: {
