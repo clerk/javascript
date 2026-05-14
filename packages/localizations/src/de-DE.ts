@@ -193,6 +193,21 @@ export const deDE: LocalizationResource = {
     navbar: {
       title: 'Single Sign-On (SSO) konfigurieren',
     },
+    selectProviderStep: {
+      title: 'Anbieter auswählen',
+      subtitle: 'Wählen Sie den Anbieter, für den Sie SSO einrichten möchten.',
+      body: {
+        title: 'Wählen Sie Ihren Identitätsanbieter',
+        description: 'Wir führen Sie als nächstes durch den detaillierten Einrichtungsprozess.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Benutzerdefinierter SAML-Anbieter',
+      },
+      warning:
+        'Sobald ein Anbieter ausgewählt ist, können Sie ihn nicht mehr ändern, bis die Konfiguration abgeschlossen ist',
+    },
     verifyEmailDomainStep: {
       title: 'E-Mail-Adresse verifizieren',
       subtitle: 'Verifizieren Sie die E-Mail-Adresse, für die Sie die Unternehmensverbindung aktivieren möchten.',

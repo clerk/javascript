@@ -190,6 +190,20 @@ export const csCZ: LocalizationResource = {
     navbar: {
       title: 'Nastavit jednotné přihlášení (SSO)',
     },
+    selectProviderStep: {
+      title: 'Vyberte poskytovatele',
+      subtitle: 'Vyberte poskytovatele, pro kterého budete nastavovat SSO.',
+      body: {
+        title: 'Vyberte svého poskytovatele identity',
+        description: 'Provedeme vás dále podrobným procesem nastavení.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Vlastní poskytovatel SAML',
+      },
+      warning: 'Jakmile vyberete poskytovatele, nelze ho změnit, dokud nebude konfigurace dokončena',
+    },
     verifyEmailDomainStep: {
       title: 'Ověřit e-mailovou adresu',
       subtitle: 'Ověřte e-mailovou adresu, na které chcete povolit podnikové připojení.',

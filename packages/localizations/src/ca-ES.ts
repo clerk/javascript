@@ -194,6 +194,20 @@ export const caES: LocalizationResource = {
     navbar: {
       title: "Configura l'inici de sessió únic (SSO)",
     },
+    selectProviderStep: {
+      title: 'Seleccioneu un proveïdor',
+      subtitle: 'Seleccioneu el proveïdor per al qual configurareu SSO.',
+      body: {
+        title: "Seleccioneu el vostre proveïdor d'identitat",
+        description: 'Us guiarem pel procés de configuració detallat a continuació.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Proveïdor SAML personalitzat',
+      },
+      warning: 'Un cop seleccionat un proveïdor no podreu canviar-lo fins que la configuració hagi finalitzat',
+    },
     verifyEmailDomainStep: {
       title: 'Verifica el correu electrònic',
       subtitle: "Verifica l'adreça de correu electrònic on vols habilitar la connexió empresarial.",
