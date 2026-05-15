@@ -65,14 +65,13 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFun
       signUpUrl,
       organizationSyncOptions,
     } = loadedOptions;
+    const multiDomainOrProxyOptions = proxyUrl ? { proxyUrl, isSatellite } : { domain, isSatellite };
 
     const requestState = await clerkClient(args, loadedOptions).authenticateRequest(clerkRequest, {
       apiUrl,
       secretKey: loadedOptions.secretKey,
       jwtKey,
-      proxyUrl,
-      isSatellite,
-      domain,
+      ...multiDomainOrProxyOptions,
       publishableKey: loadedOptions.publishableKey,
       machineSecretKey,
       audience,
