@@ -89,6 +89,9 @@ export const billingTotalsFromJSON = <T extends BillingStatementTotalsJSON | Bil
   if ('total_due_now' in data) {
     totals.totalDueNow = billingMoneyAmountFromJSON(data.total_due_now);
   }
+  if ('total_due_per_period' in data) {
+    totals.totalDuePerPeriod = billingMoneyAmountFromJSON(data.total_due_per_period);
+  }
 
   if ('total_due_after_free_trial' in data) {
     totals.totalDueAfterFreeTrial = data.total_due_after_free_trial

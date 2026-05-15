@@ -187,6 +187,20 @@ export const srRS: LocalizationResource = {
     navbar: {
       title: 'Konfiguriši jedinstvenu prijavu (SSO)',
     },
+    selectProviderStep: {
+      title: 'Izaberite provajdera',
+      subtitle: 'Izaberite provajdera za koga ćete podesiti SSO.',
+      body: {
+        title: 'Izaberite svog provajdera identiteta',
+        description: 'Vodićemo vas kroz detaljan proces podešavanja u nastavku.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Prilagođeni SAML provajder',
+      },
+      warning: 'Kada se provajder izabere, ne možete ga ponovo menjati dok se konfiguracija ne završi',
+    },
     verifyEmailDomainStep: {
       title: 'Potvrdi adresu e-pošte',
       subtitle: 'Potvrdite adresu e-pošte na kojoj želite da omogućite enterprise konekciju.',

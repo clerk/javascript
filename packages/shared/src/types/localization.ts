@@ -306,6 +306,7 @@ export type __internal_LocalizationResource = {
       downgradeNotice: LocalizationValue;
       pastDueNotice: LocalizationValue;
       totalDueAfterTrial: LocalizationValue<'days'>;
+      totalDuePerPeriod: LocalizationValue;
       perMonth: LocalizationValue;
     };
   };
@@ -1298,12 +1299,26 @@ export type __internal_LocalizationResource = {
     };
   };
   configureSSO: {
-    navbar: {
-      title: LocalizationValue;
-    };
     missingManageEnterpriseConnectionsPermission: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
+    };
+    navbar: {
+      title: LocalizationValue;
+    };
+    selectProviderStep: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      body: {
+        title: LocalizationValue;
+        description: LocalizationValue;
+      };
+      saml: {
+        groupLabel: LocalizationValue;
+        okta: LocalizationValue;
+        customSaml: LocalizationValue;
+      };
+      warning: LocalizationValue;
     };
     verifyEmailDomainStep: {
       title: LocalizationValue;
@@ -1327,6 +1342,97 @@ export type __internal_LocalizationResource = {
       domainTaken: {
         title: LocalizationValue<'domain'>;
         subtitle: LocalizationValue;
+      };
+    };
+    configureStep: {
+      spFields: {
+        acsUrl: {
+          label: LocalizationValue;
+        };
+        spEntityId: {
+          label: LocalizationValue;
+        };
+      };
+      attributeMapping: {
+        title: LocalizationValue;
+        paragraph: LocalizationValue;
+        columns: {
+          attribute: LocalizationValue;
+          claimName: LocalizationValue;
+        };
+        badges: {
+          required: LocalizationValue;
+          optional: LocalizationValue;
+        };
+        rows: {
+          email: {
+            attribute: LocalizationValue;
+            claim: LocalizationValue;
+          };
+          firstName: {
+            attribute: LocalizationValue;
+            claim: LocalizationValue;
+          };
+          lastName: {
+            attribute: LocalizationValue;
+            claim: LocalizationValue;
+          };
+        };
+      };
+      samlOkta: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+        createApp: {
+          title: LocalizationValue;
+          step1: LocalizationValue;
+          step2: LocalizationValue;
+          step3: LocalizationValue;
+          step4: LocalizationValue;
+          step5: LocalizationValue;
+        };
+        serviceProvider: {
+          title: LocalizationValue;
+          paragraph1: LocalizationValue;
+          paragraph2: LocalizationValue;
+        };
+        completeSamlIntegration: {
+          title: LocalizationValue;
+          step1: LocalizationValue;
+          step2: LocalizationValue;
+        };
+        configureAttributes: {
+          step1: LocalizationValue;
+          step2: LocalizationValue;
+          pairs: {
+            conjunction: LocalizationValue;
+            email: {
+              name: LocalizationValue;
+              expression: LocalizationValue;
+            };
+            firstName: {
+              name: LocalizationValue;
+              expression: LocalizationValue;
+            };
+            lastName: {
+              name: LocalizationValue;
+              expression: LocalizationValue;
+            };
+          };
+        };
+        assignUsers: {
+          title: LocalizationValue;
+          paragraph: LocalizationValue;
+          step1: LocalizationValue;
+          step2: LocalizationValue;
+          step3: LocalizationValue;
+          step4: LocalizationValue;
+          step5: LocalizationValue;
+        };
+        metadataUrl: {
+          label: LocalizationValue;
+          placeholder: LocalizationValue;
+          description: LocalizationValue;
+        };
       };
     };
   };

@@ -878,6 +878,7 @@ export interface BillingCheckoutTotalsJSON {
    */
   per_unit_totals?: BillingPerUnitTotalJSON[];
   total_due_now: BillingMoneyAmountJSON;
+  total_due_per_period: BillingMoneyAmountJSON;
   credit: BillingMoneyAmountJSON | null;
   credits: BillingCreditsJSON | null;
   account_credit: BillingMoneyAmountJSON | null;

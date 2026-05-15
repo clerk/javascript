@@ -192,6 +192,20 @@ export const zhTW: LocalizationResource = {
     navbar: {
       title: '設定單一登入 (SSO)',
     },
+    selectProviderStep: {
+      title: '選擇提供者',
+      subtitle: '選擇您要為其設定 SSO 的提供者。',
+      body: {
+        title: '選擇您的身分提供者',
+        description: '接下來我們將引導您完成詳細的設定流程。',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: '自訂 SAML 提供者',
+      },
+      warning: '選擇提供者後,在設定完成之前無法再次變更',
+    },
     verifyEmailDomainStep: {
       title: '驗證電子郵件地址',
       subtitle: '驗證您想要啟用企業連線的電子郵件地址。',

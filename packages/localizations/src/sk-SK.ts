@@ -187,6 +187,20 @@ export const skSK: LocalizationResource = {
     navbar: {
       title: 'Nastaviť jednotné prihlasovanie (SSO)',
     },
+    selectProviderStep: {
+      title: 'Vyberte poskytovateľa',
+      subtitle: 'Vyberte poskytovateľa, pre ktorého budete nastavovať SSO.',
+      body: {
+        title: 'Vyberte si svojho poskytovateľa identity',
+        description: 'Následne vás prevedieme podrobným procesom nastavenia.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Vlastný poskytovateľ SAML',
+      },
+      warning: 'Po výbere poskytovateľa ho nemôžete zmeniť, kým sa konfigurácia neukončí',
+    },
     verifyEmailDomainStep: {
       title: 'Overiť e-mailovú adresu',
       subtitle: 'Overte e-mailovú adresu, na ktorej chcete povoliť podnikové pripojenie.',

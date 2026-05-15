@@ -10,7 +10,7 @@ import { ProfileCard } from '@/elements/ProfileCard';
 import { ExclamationTriangle } from '@/icons';
 import { Route, Switch } from '@/router';
 
-import { ConfigureSSOFlowProvider } from './ConfigureSSOContext';
+import { ConfigureSSOProvider, useConfigureSSO } from './ConfigureSSOContext';
 import { ConfigureSSOHeader } from './ConfigureSSOHeader';
 import { ConfigureSSONavbar } from './ConfigureSSONavbar';
 import { ConfigureSSOSkeleton } from './ConfigureSSOSkeleton';
@@ -74,51 +74,71 @@ const ConfigureSSOCardContent = () => {
   }
 
   return (
-    <ConfigureSSOFlowProvider enterpriseConnection={enterpriseConnection}>
-      <Wizard>
-        <ConfigureSSOHeader />
-
-        <Wizard.Step id='select-provider'>
-          <SelectProviderStep />
-        </Wizard.Step>
-
-        <Wizard.Step
-          id='verify-domain'
-          label='Verify domain'
-        >
-          <VerifyDomainStep />
-        </Wizard.Step>
-
-        <Wizard.Step
-          id='configure'
-          label='Configure'
-        >
-          <ConfigureStep />
-        </Wizard.Step>
-
-        <Wizard.Step
-          id='test'
-          label='Test'
-        >
-          <TestConfigurationStep />
-        </Wizard.Step>
-
-        <Wizard.Step
-          id='confirmation'
-          label='Confirmation'
-        >
-          <ConfirmationStep />
-        </Wizard.Step>
-      </Wizard>
-    </ConfigureSSOFlowProvider>
+    <ConfigureSSOProvider enterpriseConnection={enterpriseConnection}>
+      <ConfigureSSOSteps />
+    </ConfigureSSOProvider>
   );
+};
+
+const ConfigureSSOSteps = () => {
+  const { initialStepId } = useConfigureSSO();
+
+  return (
+    <Wizard initialStepId={initialStepId}>
+      <ConfigureSSOHeader />
+
+      <Wizard.Step id='select-provider'>
+        <SelectProviderStep />
+      </Wizard.Step>
+
+      <Wizard.Step
+        id='verify-domain'
+        label='Verify domain'
+      >
+        <VerifyDomainStep />
+      </Wizard.Step>
+
+      <Wizard.Step
+        id='configure'
+        label='Configure'
+      >
+        <ConfigureStep />
+      </Wizard.Step>
+
+      <Wizard.Step
+        id='test'
+        label='Test'
+      >
+        <TestConfigurationStep />
+      </Wizard.Step>
+
+      <Wizard.Step
+        id='confirmation'
+        label='Confirmation'
+      >
+        <ConfirmationStep />
+      </Wizard.Step>
+    </Wizard>
+  );
+};
+
+const ConfigureSSOCardProtect = ({ children }: { children: React.ReactNode }) => {
+  const { session } = useSession();
+  const isPersonalWorkspace = !session?.lastActiveOrganizationId;
+  const canManageEnterpriseConnections = useProtect(
+    has => isPersonalWorkspace || has({ permission: 'org:sys_enterprise_connections:manage' }),
+  );
+
+  if (!canManageEnterpriseConnections) {
+    return <MissingManageEnterpriseConnectionsPermission />;
+  }
+
+  return children;
 };
 
 const MissingManageEnterpriseConnectionsPermission = () => (
   <>
-    <Flex sx={t => ({ minHeight: t.sizes.$13, minWidth: '100%' })}>
-      <ProfileCardHeader />
-    </Flex>
+    <ProfileCardHeader />
 
     <Step.Body>
       <Step.Section
@@ -155,23 +175,10 @@ const MissingManageEnterpriseConnectionsPermission = () => (
         </Flex>
       </Step.Section>
     </Step.Body>
+
     <ProfileCardFooter />
   </>
 );
-
-const ConfigureSSOCardProtect = ({ children }: { children: React.ReactNode }) => {
-  const { session } = useSession();
-  const isPersonalWorkspace = !session?.lastActiveOrganizationId;
-  const canManageEnterpriseConnections = useProtect(
-    has => isPersonalWorkspace || has({ permission: 'org:sys_enterprise_connections:manage' }),
-  );
-
-  if (!canManageEnterpriseConnections) {
-    return <MissingManageEnterpriseConnectionsPermission />;
-  }
-
-  return children;
-};
 
 export const ConfigureSSO: React.ComponentType<__experimental_ConfigureSSOProps> =
   withCardStateProvider(ConfigureSSOInternal);
