@@ -1,26 +1,22 @@
 /**
  * One-time runtime disclosure that Clerk collects telemetry from development instances.
  *
- * This module replaces the previous `postinstall` script that ran on every install of
- * `@clerk/shared`. Running disclosure at runtime (rather than via npm lifecycle scripts)
- * keeps published packages free of install-time code, which is a common supply-chain
- * concern, and only surfaces the notice in environments where telemetry actually fires.
+ * Replaces the previous `postinstall` script. Disclosure is intentionally surfaced
+ * only on Node (server-side) so the noise profile matches the original postinstall
+ * (terminal-only, dev-eyes-only). Browser consoles are not used because they are
+ * frequently observed by non-developers (QA, screenshots, demos), and adding another
+ * console warning is a common source of customer complaints.
  *
- * Persistence:
- *   - In browsers, `localStorage` keeps the notice from re-displaying across reloads.
- *   - In Node and other JS runtimes, a `globalThis` Symbol flag keeps it from
- *     re-displaying within the same process (this also survives Next.js HMR module
- *     reloads, since `globalThis` is shared). No filesystem access is performed so the
- *     module remains safe to bundle for Edge Runtime, Workers, and other restricted
- *     environments.
+ * Persistence is in-process via a `globalThis` Symbol, which survives Next.js HMR
+ * module reloads. No filesystem access, no `node:` imports, no dynamic-code APIs, so
+ * the module remains safe to bundle for Edge Runtime, Workers, and any browser path.
  *
- * All work is wrapped in try/catch. Failure to display or persist the notice must never
- * affect the SDK.
+ * All work is wrapped in try/catch. Failure to display the notice must never affect
+ * the SDK.
  */
 
 import { isTruthy } from '../underscore';
 
-const STORAGE_KEY = 'clerk_telemetry_notice_v1';
 const PROCESS_FLAG = Symbol.for('@clerk/shared.telemetryNoticeShown');
 
 const NOTICE_LINES = [
@@ -44,6 +40,10 @@ const CI_ENV_VARS = [
   'CODEBUILD_BUILD_ID',
 ];
 
+function isNodeRuntime(): boolean {
+  return typeof window === 'undefined' && typeof process !== 'undefined' && Boolean(process.versions?.node);
+}
+
 function isCI(): boolean {
   if (typeof process === 'undefined' || !process.env) {
     return false;
@@ -51,38 +51,11 @@ function isCI(): boolean {
   return CI_ENV_VARS.some(name => isTruthy(process.env[name]));
 }
 
-function isHeadlessBrowser(): boolean {
-  return typeof window !== 'undefined' && Boolean(window?.navigator?.webdriver);
-}
-
-function hasUsableLocalStorage(): boolean {
-  try {
-    return typeof globalThis !== 'undefined' && typeof globalThis.localStorage !== 'undefined';
-  } catch {
-    return false;
-  }
-}
-
 function hasSeen(): boolean {
-  if (hasUsableLocalStorage()) {
-    try {
-      return globalThis.localStorage.getItem(STORAGE_KEY) === '1';
-    } catch {
-      return false;
-    }
-  }
   return Boolean((globalThis as Record<symbol, unknown>)[PROCESS_FLAG]);
 }
 
 function markSeen(): void {
-  if (hasUsableLocalStorage()) {
-    try {
-      globalThis.localStorage.setItem(STORAGE_KEY, '1');
-      return;
-    } catch {
-      // fall through to the in-process flag
-    }
-  }
   (globalThis as Record<symbol, unknown>)[PROCESS_FLAG] = true;
 }
 
@@ -106,16 +79,18 @@ export type MaybeShowTelemetryNoticeOptions = {
 };
 
 /**
- * Display the one-time telemetry disclosure if it has not already been shown. Safe to
- * call repeatedly: the browser-side marker prevents re-display across reloads, and the
- * `globalThis` flag prevents re-display within the same Node process. Never throws.
+ * Display the one-time telemetry disclosure on Node if it has not already been shown
+ * in this process. Browser callers are silently skipped. Never throws.
  */
 export function maybeShowTelemetryNotice(options: MaybeShowTelemetryNoticeOptions = {}): void {
   if (options.skip) {
     return;
   }
   try {
-    if (isCI() || isHeadlessBrowser()) {
+    if (!isNodeRuntime()) {
+      return;
+    }
+    if (isCI()) {
       return;
     }
     if (hasSeen()) {
