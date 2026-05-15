@@ -216,6 +216,20 @@ export const hrHR: LocalizationResource = {
     navbar: {
       title: 'Konfiguriraj jedinstvenu prijavu (SSO)',
     },
+    selectProviderStep: {
+      title: 'Odaberite pružatelja',
+      subtitle: 'Odaberite pružatelja za kojeg ćete postaviti SSO.',
+      body: {
+        title: 'Odaberite svog pružatelja identiteta',
+        description: 'Vodit ćemo vas kroz detaljan proces postavljanja u nastavku.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Prilagođeni SAML pružatelj',
+      },
+      warning: 'Nakon odabira pružatelja ne možete ga ponovno mijenjati dok konfiguracija ne završi',
+    },
     verifyEmailDomainStep: {
       title: 'Potvrdi e-mail adresu',
       subtitle: 'Potvrdite e-mail adresu na kojoj želite omogućiti poslovnu vezu.',

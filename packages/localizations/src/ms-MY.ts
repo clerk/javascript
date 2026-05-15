@@ -186,6 +186,20 @@ export const msMY: LocalizationResource = {
     navbar: {
       title: 'Konfigurasi Log Masuk Tunggal (SSO)',
     },
+    selectProviderStep: {
+      title: 'Pilih pembekal',
+      subtitle: 'Pilih pembekal yang anda akan sediakan SSO untuknya.',
+      body: {
+        title: 'Pilih pembekal identiti anda',
+        description: 'Kami akan membimbing anda melalui proses persediaan terperinci seterusnya.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Pembekal SAML Tersuai',
+      },
+      warning: 'Setelah pembekal dipilih anda tidak boleh menukar lagi sehingga konfigurasi selesai',
+    },
     verifyEmailDomainStep: {
       title: 'Sahkan alamat e-mel',
       subtitle: 'Sahkan alamat e-mel yang anda ingin dayakan sambungan enterprise.',

@@ -1,5 +1,30 @@
 # Change Log
 
+## 6.11.0
+
+### Minor Changes
+
+- Add `user.updateMetadata()` for updating current user's metadata attributes by merging existing values with the provided parameters. ([#8537](https://github.com/clerk/javascript/pull/8537)) by [@brunol95](https://github.com/brunol95)
+
+### Patch Changes
+
+- Fix dev browser recovery by clearing stale partitioned and non-partitioned dev browser cookie variants before minting a new dev browser. ([#8538](https://github.com/clerk/javascript/pull/8538)) by [@brkalow](https://github.com/brkalow)
+
+- Implement the provider selection step of `<__experimental_ConfigureSSO />`. Renders the two SAML provider tiles (Okta Workforce and Custom SAML Provider) with real icons sourced from `img.clerk.com`, tracks the picked provider in local state, and gates `Step.Footer.Continue` on a selection. Includes a warning callout about provider lock-in and a minor `Step.Header` alignment tweak. All user-visible strings are wired through `@clerk/localizations`, with translations for every supported locale. ([#8503](https://github.com/clerk/javascript/pull/8503)) by [@iagodahlem](https://github.com/iagodahlem)
+
+  Also extends the flow context with `provider` and `setProvider`, adds the `deriveInitialStep` helper, and wires the wizard's `initialStepId` so the configure flow remounts on the right step after a reload. Continue on Select Provider stages the chosen provider and advances to the next step; the enterprise connection is created on Verify Domain once the user's email is verified and primary.
+
+- Fix `toMeEnterpriseConnectionBody` to produce the flat snake_case body shape the backend expects for `user.createEnterpriseConnection` and `user.updateEnterpriseConnection`. SAML and OIDC fields are now top-level prefixed (e.g., `saml_idp_metadata_url`) rather than nested under `saml` / `oidc` objects. Without this fix, IdP metadata submission in `<__experimental_ConfigureSSO />` silently fails on the backend. ([#8535](https://github.com/clerk/javascript/pull/8535)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Update `<ConfigureSSO />` in the context of organizations to only allow managing enterprise connections based on system permission ([#8515](https://github.com/clerk/javascript/pull/8515)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Add monotonic token replacement based on `oiat` to prevent edge-minted tokens with stale claims from overwriting fresher DB-minted tokens in multi-tab scenarios. ([#8097](https://github.com/clerk/javascript/pull/8097)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Add verify/add email address step to `<__experimental_ConfigureSSO />` ([#8520](https://github.com/clerk/javascript/pull/8520)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`1a4d7d1`](https://github.com/clerk/javascript/commit/1a4d7d1c711c25f4f83c0773616b799df2feb010), [`a6916b1`](https://github.com/clerk/javascript/commit/a6916b15658625a0e627c474a62212a65868bfb6), [`1084180`](https://github.com/clerk/javascript/commit/1084180797722ff113df8404a3c967bc6abeb12d), [`39099b6`](https://github.com/clerk/javascript/commit/39099b62308fc9b0ebbb25988c0ae4b655efe744), [`18e0a1a`](https://github.com/clerk/javascript/commit/18e0a1aa48e7f65a6610ec3c6ffe105deb3474b2)]:
+  - @clerk/shared@4.11.0
+
 ## 6.10.1
 
 ### Patch Changes

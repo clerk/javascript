@@ -56,11 +56,8 @@ jobs:
         id: config
         uses: ./.github/actions/init
         with:
-          playwright-enabled: true # Must be present to enable caching on branched workflows
+          cache-enabled: false # OIDC publish job; do not restore poisonable cache state.
           turbo-enabled: false # Release uses --force, so turbo cache is not needed
-          # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          # turbo-team: ${{ vars.TURBO_TEAM }}
-          # turbo-token: ${{ secrets.TURBO_TOKEN }}
           turbo-team: ""
           turbo-token: ""
 
@@ -241,10 +238,6 @@ jobs:
     if: ${{ github.event_name == 'push' && github.repository == 'clerk/javascript' }}
     runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
-    env:
-      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
-      TURBO_CACHE: remote:rw
     permissions:
       contents: read
       id-token: write
@@ -260,10 +253,10 @@ jobs:
         id: config
         uses: ./.github/actions/init
         with:
-          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          turbo-team: ${{ vars.TURBO_TEAM }}
-          turbo-token: ${{ secrets.TURBO_TOKEN }}
-          playwright-enabled: true # Must be present to enable caching on branched workflows
+          cache-enabled: false # OIDC publish job; do not restore poisonable cache state.
+          turbo-enabled: false # Remote cache disabled in OIDC publish path.
+          turbo-team: ""
+          turbo-token: ""
 
       - name: Upgrade npm for trusted publishing
         run: npx npm@11 install -g npm@11
@@ -404,9 +397,10 @@ jobs:
         id: config
         uses: ./.github/actions/init
         with:
-          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          turbo-team: ${{ vars.TURBO_TEAM }}
-          turbo-token: ${{ secrets.TURBO_TOKEN }}
+          cache-enabled: false # OIDC publish job; do not restore poisonable cache state.
+          turbo-enabled: false # Remote cache disabled in OIDC publish path.
+          turbo-team: ""
+          turbo-token: ""
 
       - name: Upgrade npm for trusted publishing
         run: npx npm@11 install -g npm@11
@@ -543,6 +537,7 @@ jobs:
       - name: Cache node_modules (Node v${{ matrix.version }})
         uses: ./.github/actions/init
         with:
+          cache-enabled: true
           node-version: ${{ matrix.version }}
           turbo-enabled: false
           turbo-team: ""

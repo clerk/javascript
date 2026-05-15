@@ -93,6 +93,12 @@ describe('assertAudienceClaim(audience?, aud?)', () => {
     );
   });
 
+  it('throws error when audience string[] has no intersection with aud string[]', () => {
+    expect(() => assertAudienceClaim([audience], [invalidAudience])).toThrow(
+      `Invalid JWT audience claim array (aud) ${JSON.stringify([audience])}. Is not included in "${JSON.stringify([invalidAudience])}".`,
+    );
+  });
+
   it('throws error when aud is a substring of audience', () => {
     expect(() => assertAudienceClaim(audience.slice(0, -2), audience)).toThrow(
       `Invalid JWT audience claim (aud) "${audience.slice(0, -2)}". Is not included in "${JSON.stringify([audience])}".`,

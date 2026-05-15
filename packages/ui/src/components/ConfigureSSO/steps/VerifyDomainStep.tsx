@@ -1,4 +1,4 @@
-import { useReverification, useSession, useUser } from '@clerk/shared/react';
+import { __internal_useUserEnterpriseConnections, useReverification, useSession, useUser } from '@clerk/shared/react';
 import type { EmailAddressResource } from '@clerk/shared/types';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -19,14 +19,15 @@ import { Form } from '@/elements/Form';
 import { DuotoneAtSymbol, ExclamationTriangle } from '@/icons';
 import { handleError } from '@/utils/errorHandler';
 
-import { useConfigureSSOFlow } from '../ConfigureSSOContext';
+import { useConfigureSSO } from '../ConfigureSSOContext';
 import { Step } from '../elements/Step';
 import { useWizard, Wizard } from '../elements/Wizard';
+import type { ProviderType } from '../types';
 
 export const VerifyDomainStep = (): JSX.Element => {
   const { user } = useUser();
   const { session } = useSession();
-  const { enterpriseConnection } = useConfigureSSOFlow();
+  const { enterpriseConnection } = useConfigureSSO();
   const { t } = useLocalizations();
 
   const emailToVerify =
@@ -240,6 +241,9 @@ export const EnterVerificationCodeStep = ({
   emailToVerify?: EmailAddressResource;
 }): JSX.Element | null => {
   const { user } = useUser();
+  const { session } = useSession();
+  const { provider, enterpriseConnection } = useConfigureSSO();
+  const { createEnterpriseConnection } = __internal_useUserEnterpriseConnections();
   const card = useCardState();
   const codeSubmittedRef = useRef(false);
   const { goNext, goPrev, isFirstStep } = useWizard();
@@ -254,6 +258,28 @@ export const EnterVerificationCodeStep = ({
   const attemptEmailVerification = useReverification((code: string) => emailToVerify?.attemptVerification({ code }));
   const setPrimaryEmailAddress = useReverification((emailAddressId: string) =>
     user?.update({ primaryEmailAddressId: emailAddressId }),
+  );
+  const createConnection = useReverification(
+    useCallback(
+      async (selectedProvider: ProviderType) => {
+        if (enterpriseConnection) {
+          return;
+        }
+        if (!user?.primaryEmailAddress) {
+          throw new Error('Primary email required');
+        }
+
+        const emailDomain = user.primaryEmailAddress.emailAddress.split('@')[1];
+        const organizationId = session?.lastActiveOrganizationId ?? null;
+
+        await createEnterpriseConnection({
+          provider: selectedProvider,
+          name: emailDomain,
+          organizationId,
+        });
+      },
+      [enterpriseConnection, user, session, createEnterpriseConnection],
+    ),
   );
   const prepare = useCallback(
     () => prepareEmailVerification()?.catch(err => handleError(err, [], card.setError)),
@@ -279,6 +305,19 @@ export const EnterVerificationCodeStep = ({
           return;
         }
       }
+
+      if (!provider) {
+        void goNext();
+        return;
+      }
+
+      try {
+        await createConnection(provider);
+      } catch (err) {
+        handleError(err as Error, [], card.setError);
+        return;
+      }
+
       void goNext();
     },
   });
