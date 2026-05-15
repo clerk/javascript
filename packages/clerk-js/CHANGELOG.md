@@ -1,5 +1,18 @@
 # Change Log
 
+## 6.11.1
+
+### Patch Changes
+
+- Add confirmation step for `<__experimental_ConfigureSSO />` ([#8531](https://github.com/clerk/javascript/pull/8531)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Restore the `clerk.__internal_queryClient` getter as a backward-compatibility shim so apps still on `@clerk/shared < 4.10.0` can hydrate their query client and continue to render paginated hooks (e.g. `useOrganizationList`, `useOrganization`). The getter lazily imports `@tanstack/query-core` only when accessed, so apps on `@clerk/shared >= 4.10.0` (which use the singleton in `@clerk/shared`) pay zero runtime cost. ([#8562](https://github.com/clerk/javascript/pull/8562)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix Future `signUp.update()` and `signUp.sso()` to patch the active sign-up resource URL when continuing an existing sign-up. ([#8558](https://github.com/clerk/javascript/pull/8558)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`9fa6642`](https://github.com/clerk/javascript/commit/9fa6642de6a734faf532ca70c411431c5d0d2bbb), [`930047f`](https://github.com/clerk/javascript/commit/930047f3ea9b603a7f254f7764c3dc5e0fa7c769), [`b45777c`](https://github.com/clerk/javascript/commit/b45777c5723b01b8c7ee3d37b712c639067b36ab), [`5a7225e`](https://github.com/clerk/javascript/commit/5a7225ef119edf551e20bdce8af465b42981c8f2)]:
+  - @clerk/shared@4.12.0
+
 ## 6.11.0
 
 ### Minor Changes
