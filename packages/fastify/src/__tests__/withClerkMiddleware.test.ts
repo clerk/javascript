@@ -179,6 +179,37 @@ describe('withClerkMiddleware(options)', () => {
     });
   });
 
+  test('skips handshake redirect when enableHandshake is false', async () => {
+    authenticateRequestMock.mockResolvedValueOnce({
+      status: 'handshake',
+      headers: new Headers({
+        location: 'https://fapi.example.com/v1/clients/handshake',
+        'x-clerk-auth-status': 'handshake',
+      }),
+      toAuth: () => ({
+        tokenType: 'session_token',
+      }),
+    });
+    const fastify = Fastify();
+    await fastify.register(clerkPlugin, { enableHandshake: false });
+
+    fastify.get('/', (request: FastifyRequest, reply: FastifyReply) => {
+      const auth = getAuth(request);
+      reply.send({ auth });
+    });
+
+    const response = await fastify.inject({
+      method: 'GET',
+      path: '/',
+      headers: {
+        cookie: '__clerk_handshake_nonce=deadbeef; __client_uat=1675692233',
+      },
+    });
+
+    expect(response.statusCode).toEqual(200);
+    expect(response.body).toEqual(JSON.stringify({ auth: { tokenType: 'session_token' } }));
+  });
+
   test('handles signout case by populating the req.auth', async () => {
     authenticateRequestMock.mockResolvedValueOnce({
       headers: new Headers(),
