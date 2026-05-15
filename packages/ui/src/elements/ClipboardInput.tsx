@@ -30,7 +30,7 @@ export const ClipboardInput = (props: ClipboardInputProps) => {
       <Button
         elementDescriptor={descriptors.formFieldInputCopyToClipboardButton}
         variant='ghost'
-        onClick={onCopy}
+        onClick={() => onCopy()}
         sx={{
           position: 'absolute',
           insetInlineEnd: 0,

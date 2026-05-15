@@ -139,7 +139,7 @@ export type FlowMetadata = {
     | 'verifyDomain'
     | 'configureCreateApp'
     | 'configureMapAttributes'
-    | 'test-sso'
+    | 'testSso'
     | 'ssoConfirmation';
 };
 

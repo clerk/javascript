@@ -274,6 +274,74 @@ export const enUS: LocalizationResource = {
         subtitle: "Contact the application's administrator to get access through the existing connection.",
       },
     },
+    testConfigurationStep: {
+      title: 'Test your SSO connection',
+      subtitle: 'Authenticate using the test SSO URL to verify you configured the connection correctly.',
+      error__noSuccessfulTestRun:
+        'You need at least one successful test run before you can continue. Generate a test SSO URL and complete the sign-in flow.',
+      testUrl: {
+        title: 'Test your SSO URL',
+        subtitle: 'Generate and copy a test SSO URL to authenticate with.',
+        actionLabel__copy: 'Copy test URL',
+      },
+      testResults: {
+        title: 'Test results',
+        actionLabel__refresh: 'Refresh logs',
+        polling: 'Waiting for the test run to complete…',
+        status__success: 'Success',
+        status__failed: 'Failed',
+        status__pending: 'Pending',
+      },
+      testRunDetails: {
+        title: 'Test run',
+        runDetails: {
+          sectionTitle: 'Run details',
+          timestamp: 'Timestamp',
+          status: 'Status',
+          errorCode: 'Error code',
+          fullMessage: 'Full message',
+          actionLabel__copy: 'Copy message',
+          actionLabel__copied: 'Copied',
+        },
+        parsedUserInfo: {
+          sectionTitle: 'Parsed user info',
+          email: 'Email',
+          firstName: 'First name',
+        },
+        howToFix: {
+          sectionTitle: 'How to fix',
+          actionLabel__viewDocumentation: 'View documentation',
+          saml_user_attribute_missing: {
+            intro: 'To fix this error, follow these steps:',
+            step1: "Access your identity provider's configuration dashboard.",
+            step2: "Navigate to your application's SAML settings or attribute mapping configuration.",
+            step3: "Ensure that the 'mail' attribute is properly mapped to the user's email address field.",
+          },
+          saml_response_relaystate_missing: {
+            description:
+              'Check that your identity provider is correctly returning the RelayState parameter that was sent in the original request.',
+          },
+          saml_email_address_domain_mismatch: {
+            description:
+              'Verify that the user is signing in with an email address that matches one of the allowed domains for this connection. If you need to add additional domains, update the allowed domains in your connection settings.',
+          },
+          oauth_access_denied: {
+            description:
+              "This error occurs when the user clicked Cancel or Deny on the OAuth provider's authorization screen, or the provider rejected the authorization request. Verify that the OAuth application credentials (Client ID and Client Secret) are correctly configured.",
+          },
+          oauth_token_exchange_error: {
+            description:
+              "Verify that your OAuth application's Client ID and Client Secret are correctly configured and match the credentials from your OAuth provider's dashboard.",
+          },
+          oauth_fetch_user_error: {
+            intro: 'To fix this error, follow these steps:',
+            step1:
+              'Verify that the OAuth scopes configured in your connection settings include the necessary permissions to read user profile information.',
+            step2: 'Ensure that the user info endpoint URL is correctly configured.',
+          },
+        },
+      },
+    },
     configureStep: {
       spFields: {
         acsUrl: {

@@ -24,10 +24,15 @@ export interface ConfigureSSOData {
    * connection has been created.
    */
   setProvider: (provider: ProviderType) => void;
+  /**
+   * Ref to the scrollable content container of the wizard.
+   */
+  contentRef: React.RefObject<HTMLDivElement>;
 }
 
 interface ConfigureSSOProviderProps {
   enterpriseConnection: EnterpriseConnectionResource | undefined;
+  contentRef: React.RefObject<HTMLDivElement>;
 }
 
 const ConfigureSSOContext = React.createContext<ConfigureSSOData | null>(null);
@@ -35,6 +40,7 @@ ConfigureSSOContext.displayName = 'ConfigureSSOContext';
 
 export const ConfigureSSOProvider = ({
   enterpriseConnection,
+  contentRef,
   children,
 }: PropsWithChildren<ConfigureSSOProviderProps>): JSX.Element => {
   const [provider, setProvider] = React.useState<ProviderType | undefined>(
@@ -49,8 +55,9 @@ export const ConfigureSSOProvider = ({
       enterpriseConnection,
       provider,
       setProvider,
+      contentRef,
     }),
-    [initialStepId, enterpriseConnection, provider],
+    [initialStepId, enterpriseConnection, provider, contentRef],
   );
 
   return <ConfigureSSOContext.Provider value={value}>{children}</ConfigureSSOContext.Provider>;
