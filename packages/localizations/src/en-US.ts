@@ -147,7 +147,7 @@ export const enUS: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Payment Methods',
-    popular: 'Popular',
+    highlightedPlanBadge: 'Popular',
     pricingTable: {
       billingCycle: 'Billing cycle',
       included: 'Included',
@@ -201,6 +201,33 @@ export const enUS: LocalizationResource = {
     yearPerUnit: 'Year per {{unitName}}',
   },
   configureSSO: {
+    confirmation: {
+      configurationSection: {
+        certificateLabel: 'Certificate',
+        configureAgainLink: 'Configure again',
+        issuerLabel: 'Issuer',
+        ssoUrlLabel: 'Sign on URL',
+        title: 'Configuration details',
+      },
+      domainSection: {
+        title: 'Domain',
+      },
+      enableSection: {
+        title: 'Enable SSO',
+      },
+      resetSection: {
+        confirmationFieldLabel: 'Type "{{name}}" to confirm',
+        submitButton: 'Reset connection',
+        title: 'Reset connection',
+        warning:
+          'This will permanently remove the SSO configuration. Members will no longer be able to sign in with SSO.',
+      },
+      statusSection: {
+        activeBadge: 'Active',
+        inactiveBadge: 'Inactive',
+        title: 'SSO Status',
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle:
         'Contact your organization administrator in order to have permissions to manage enterprise connections.',
@@ -247,6 +274,74 @@ export const enUS: LocalizationResource = {
         subtitle: "Contact the application's administrator to get access through the existing connection.",
       },
     },
+    testConfigurationStep: {
+      title: 'Test your SSO connection',
+      subtitle: 'Authenticate using the test SSO URL to verify you configured the connection correctly.',
+      error__noSuccessfulTestRun:
+        'You need at least one successful test run before you can continue. Generate a test SSO URL and complete the sign-in flow.',
+      testUrl: {
+        title: 'Test your SSO URL',
+        subtitle: 'Generate and copy a test SSO URL to authenticate with.',
+        actionLabel__copy: 'Copy test URL',
+      },
+      testResults: {
+        title: 'Test results',
+        actionLabel__refresh: 'Refresh logs',
+        polling: 'Waiting for the test run to complete…',
+        status__success: 'Success',
+        status__failed: 'Failed',
+        status__pending: 'Pending',
+      },
+      testRunDetails: {
+        title: 'Test run',
+        runDetails: {
+          sectionTitle: 'Run details',
+          timestamp: 'Timestamp',
+          status: 'Status',
+          errorCode: 'Error code',
+          fullMessage: 'Full message',
+          actionLabel__copy: 'Copy message',
+          actionLabel__copied: 'Copied',
+        },
+        parsedUserInfo: {
+          sectionTitle: 'Parsed user info',
+          email: 'Email',
+          firstName: 'First name',
+        },
+        howToFix: {
+          sectionTitle: 'How to fix',
+          actionLabel__viewDocumentation: 'View documentation',
+          saml_user_attribute_missing: {
+            intro: 'To fix this error, follow these steps:',
+            step1: "Access your identity provider's configuration dashboard.",
+            step2: "Navigate to your application's SAML settings or attribute mapping configuration.",
+            step3: "Ensure that the 'mail' attribute is properly mapped to the user's email address field.",
+          },
+          saml_response_relaystate_missing: {
+            description:
+              'Check that your identity provider is correctly returning the RelayState parameter that was sent in the original request.',
+          },
+          saml_email_address_domain_mismatch: {
+            description:
+              'Verify that the user is signing in with an email address that matches one of the allowed domains for this connection. If you need to add additional domains, update the allowed domains in your connection settings.',
+          },
+          oauth_access_denied: {
+            description:
+              "This error occurs when the user clicked Cancel or Deny on the OAuth provider's authorization screen, or the provider rejected the authorization request. Verify that the OAuth application credentials (Client ID and Client Secret) are correctly configured.",
+          },
+          oauth_token_exchange_error: {
+            description:
+              "Verify that your OAuth application's Client ID and Client Secret are correctly configured and match the credentials from your OAuth provider's dashboard.",
+          },
+          oauth_fetch_user_error: {
+            intro: 'To fix this error, follow these steps:',
+            step1:
+              'Verify that the OAuth scopes configured in your connection settings include the necessary permissions to read user profile information.',
+            step2: 'Ensure that the user info endpoint URL is correctly configured.',
+          },
+        },
+      },
+    },
     configureStep: {
       spFields: {
         acsUrl: {
@@ -288,11 +383,11 @@ export const enUS: LocalizationResource = {
         subtitle: 'Create a new enterprise application in your Okta Dashboard',
         createApp: {
           title: 'Create a new enterprise application in Okta',
-          step1: 'Sign in to Okta and go to Admin → Applications.',
-          step2: 'Click Create App Integration.',
-          step3: 'Select SAML 2.0.',
+          step1: 'Sign in to Okta and go to <bold>Admin → Applications.</bold>',
+          step2: 'Click <bold>Create App Integration.</bold>',
+          step3: 'Select <bold>SAML 2.0.</bold>',
           step4: 'Fill in the General Settings (App name is required).',
-          step5: 'Click Next to complete creating the application.',
+          step5: 'Click <bold>Next</bold> to complete creating the application.',
         },
         serviceProvider: {
           title: 'Configure service provider',
@@ -303,12 +398,13 @@ export const enUS: LocalizationResource = {
         },
         completeSamlIntegration: {
           title: 'Complete SAML integration',
-          step1: 'Select This is an internal app that we have created from the options menu.',
-          step2: 'Complete the form with any comments and select "Finish".',
+          step1: 'Select <bold>This is an internal app</bold> that we have created from the options menu.',
+          step2: 'Complete the form with any comments and select <bold>Finish</bold>.',
         },
         configureAttributes: {
-          step1: 'In the Okta dashboard, find the Attribute Statements section.',
-          step2: 'Select Add Expression for each attribute, and enter the following name and expression pairs:',
+          step1: 'In the Okta dashboard, find the <bold>Attribute Statements</bold> section.',
+          step2:
+            'Select <bold>Add Expression</bold> for each attribute, and enter the following name and expression pairs:',
           pairs: {
             conjunction: ' and ',
             email: {
@@ -328,16 +424,43 @@ export const enUS: LocalizationResource = {
         assignUsers: {
           title: 'Assign selected user or group in Okta',
           paragraph: 'You need to assign users or groups to your enterprise app before they can use it to sign in.',
-          step1: 'In the Okta dashboard, select the Assignments tab.',
-          step2: 'Select the Assign dropdown. You can either select Assign to people or Assign to groups.',
+          step1: 'In the Okta dashboard, select the <bold>Assignments</bold> tab.',
+          step2:
+            'Select the <bold>Assign</bold> dropdown. You can either select <bold>Assign to people</bold> or <bold>Assign to groups</bold>.',
           step3: 'In the search field, enter the user or group of users that you want to assign to the application.',
-          step4: 'Select the Assign button next to the user or group that you want to assign.',
-          step5: 'Select the Done button to complete the assignment.',
+          step4: 'Select the <bold>Assign</bold> button next to the user or group that you want to assign.',
+          step5: 'Select the <bold>Done</bold> button to complete the assignment.',
         },
         metadataUrl: {
           label: 'Metadata URL',
           placeholder: 'Paste URL here...',
           description: 'In your Okta SAML app, go to the Sign On tab and retrieve the metadata URL. Paste it below.',
+        },
+        modes: {
+          ariaLabel: 'Configuration mode',
+          metadataUrl: 'Add via metadata',
+          manual: 'Configure manually',
+        },
+        submitSamlConfig: {
+          title: 'Fill in your Okta SAML application details',
+        },
+        manual: {
+          description: 'In your Okta SAML app, go to the Sign On tab and retrieve these values.',
+          signOnUrl: {
+            label: 'Sign on URL',
+            placeholder: 'Paste URL here...',
+          },
+          issuer: {
+            label: 'Issuer',
+            placeholder: 'Paste URL here...',
+          },
+          signingCertificate: {
+            label: 'Signing certificate',
+            uploadFile: 'Upload file',
+            replaceFile: 'Replace file',
+            removeFile: 'Remove file',
+            fileUploaded: 'File uploaded',
+          },
         },
       },
     },

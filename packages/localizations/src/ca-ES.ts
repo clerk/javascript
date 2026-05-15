@@ -148,7 +148,7 @@ export const caES: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Mètodes de pagament',
-    popular: 'Popular',
+    highlightedPlanBadge: 'Popular',
     pricingTable: {
       billingCycle: 'Cicle de facturació',
       included: 'Inclòs',

@@ -145,7 +145,7 @@ export const thTH: LocalizationResource = {
       },
     },
     paymentMethods__label: 'วิธีการชำระเงิน',
-    popular: 'ยอดนิยม',
+    highlightedPlanBadge: 'ยอดนิยม',
     pricingTable: {
       billingCycle: 'รอบการเรียกเก็บเงิน',
       included: 'รวมอยู่',

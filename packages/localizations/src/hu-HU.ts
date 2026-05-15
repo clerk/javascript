@@ -154,7 +154,7 @@ export const huHU: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Fizetési módok',
-    popular: 'Népszerű',
+    highlightedPlanBadge: 'Népszerű',
     pricingTable: {
       billingCycle: 'Számlázási ciklus',
       included: 'Tartalmazza',

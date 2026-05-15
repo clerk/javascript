@@ -154,7 +154,7 @@ export const nbNO: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Betalingsmetoder',
-    popular: 'Populær',
+    highlightedPlanBadge: 'Populær',
     pricingTable: {
       billingCycle: 'Faktureringsperiode',
       included: 'Inkludert',

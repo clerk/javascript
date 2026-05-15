@@ -1,14 +1,17 @@
 import { __internal_useUserEnterpriseConnections, useReverification } from '@clerk/shared/react';
-import type { UpdateMeEnterpriseConnectionParams } from '@clerk/shared/types';
+import type { FieldId, UpdateMeEnterpriseConnectionParams } from '@clerk/shared/types';
 import React from 'react';
 
 import {
   Badge,
+  Box,
+  Button,
   Col,
   descriptors,
   Flex,
   Flow,
   Heading,
+  Icon,
   localizationKeys,
   Table,
   Tbody,
@@ -17,13 +20,17 @@ import {
   Th,
   Thead,
   Tr,
+  useLocalizations,
 } from '@/customizables';
 import { ClipboardInput } from '@/elements/ClipboardInput';
 import { useCardState } from '@/elements/contexts';
+import { Field } from '@/elements/FieldControl';
 import { Form } from '@/elements/Form';
-import { Check, ClipboardOutline } from '@/icons';
-import { handleError } from '@/utils/errorHandler';
+import { SegmentedControl } from '@/elements/SegmentedControl';
+import { Check, ClipboardOutline, Close, Upload } from '@/icons';
+import type { FormControlState } from '@/ui/utils/useFormControl';
 import { useFormControl } from '@/ui/utils/useFormControl';
+import { handleError } from '@/utils/errorHandler';
 
 import { useConfigureSSO } from '../ConfigureSSOContext';
 import { Step } from '../elements/Step';
@@ -270,139 +277,137 @@ export const ConfigureAttributesSubStep = (): JSX.Element => {
     <>
       <Step.Body>
         <Step.Section sx={theme => ({ gap: theme.space.$3 })}>
-          <Col sx={theme => ({ gap: theme.space.$3 })}>
-            <Heading
-              as='h3'
-              textVariant='subtitle'
-              localizationKey={localizationKeys('configureSSO.configureStep.attributeMapping.title')}
-            />
+          <Heading
+            as='h3'
+            textVariant='subtitle'
+            localizationKey={localizationKeys('configureSSO.configureStep.attributeMapping.title')}
+          />
 
-            <Table
-              sx={theme => ({
-                'tr > th:first-of-type': {
-                  paddingInlineStart: theme.space.$4,
-                },
-              })}
-            >
-              <Thead>
-                <Tr>
-                  <Th>
-                    <Text
-                      sx={theme => ({ fontSize: theme.fontSizes.$xs })}
-                      localizationKey={localizationKeys(
-                        'configureSSO.configureStep.attributeMapping.columns.attribute',
-                      )}
-                    />
-                  </Th>
+          <Table
+            sx={theme => ({
+              'tr > th:first-of-type': {
+                paddingInlineStart: theme.space.$4,
+              },
+            })}
+          >
+            <Thead>
+              <Tr>
+                <Th>
+                  <Text
+                    sx={theme => ({ fontSize: theme.fontSizes.$xs })}
+                    localizationKey={localizationKeys('configureSSO.configureStep.attributeMapping.columns.attribute')}
+                  />
+                </Th>
 
-                  <Th>
-                    <Text
-                      sx={theme => ({ fontSize: theme.fontSizes.$xs })}
-                      localizationKey={localizationKeys(
-                        'configureSSO.configureStep.attributeMapping.columns.claimName',
-                      )}
-                    />
-                  </Th>
-                </Tr>
-              </Thead>
+                <Th>
+                  <Text
+                    sx={theme => ({ fontSize: theme.fontSizes.$xs })}
+                    localizationKey={localizationKeys('configureSSO.configureStep.attributeMapping.columns.claimName')}
+                  />
+                </Th>
+              </Tr>
+            </Thead>
 
-              <Tbody>
-                {ATTRIBUTE_ROWS.map(row => (
-                  <Tr key={row.id}>
-                    <Td>
-                      <Flex
-                        as='span'
-                        align='center'
-                        sx={theme => ({ gap: theme.space.$2 })}
-                      >
-                        <Text
-                          colorScheme='secondary'
-                          localizationKey={row.attribute}
-                        />
-
-                        <Badge
-                          colorScheme={row.isRequired ? 'warning' : 'primary'}
-                          localizationKey={localizationKeys(
-                            row.isRequired
-                              ? 'configureSSO.configureStep.attributeMapping.badges.required'
-                              : 'configureSSO.configureStep.attributeMapping.badges.optional',
-                          )}
-                        />
-                      </Flex>
-                    </Td>
-
-                    <Td>
-                      <Text
-                        as='span'
-                        sx={{ fontFamily: 'monospace' }}
-                        localizationKey={row.claim}
-                      />
-                    </Td>
-                  </Tr>
-                ))}
-              </Tbody>
-            </Table>
-          </Col>
-
-          <Col sx={theme => ({ gap: theme.space.$3 })}>
-            <Text
-              as='p'
-              colorScheme='secondary'
-              localizationKey={localizationKeys('configureSSO.configureStep.attributeMapping.paragraph')}
-            />
-
-            <Col
-              as='ol'
-              sx={theme => ({
-                gap: theme.space.$1x5,
-                margin: 0,
-                paddingInlineStart: theme.space.$5,
-                listStyleType: 'decimal',
-              })}
-            >
-              <Text
-                as='li'
-                colorScheme='secondary'
-                localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.step1')}
-              />
-              <Text
-                as='li'
-                colorScheme='secondary'
-              >
-                <Text
-                  as='span'
-                  localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.step2')}
-                />
-                <Col
-                  as='ul'
-                  sx={theme => ({
-                    gap: theme.space.$1x5,
-                    margin: 0,
-                    marginTop: theme.space.$1x5,
-                    paddingInlineStart: theme.space.$5,
-                    listStyleType: '"- "',
-                  })}
-                >
-                  {ATTRIBUTE_PAIRS.map(pair => (
-                    <Text
-                      key={pair.id}
-                      as='li'
+            <Tbody>
+              {ATTRIBUTE_ROWS.map(row => (
+                <Tr key={row.id}>
+                  <Td>
+                    <Flex
+                      as='span'
+                      align='center'
+                      sx={theme => ({ gap: theme.space.$2 })}
                     >
-                      <Badge localizationKey={pair.name} />
-
                       <Text
-                        as='span'
+                        colorScheme='secondary'
+                        localizationKey={row.attribute}
+                      />
+
+                      <Badge
+                        colorScheme={row.isRequired ? 'warning' : 'primary'}
                         localizationKey={localizationKeys(
-                          'configureSSO.configureStep.samlOkta.configureAttributes.pairs.conjunction',
+                          row.isRequired
+                            ? 'configureSSO.configureStep.attributeMapping.badges.required'
+                            : 'configureSSO.configureStep.attributeMapping.badges.optional',
                         )}
                       />
+                    </Flex>
+                  </Td>
 
-                      <Badge localizationKey={pair.expression} />
-                    </Text>
-                  ))}
-                </Col>
-              </Text>
-            </Col>
+                  <Td>
+                    <Text
+                      as='span'
+                      sx={{ fontFamily: 'monospace' }}
+                      localizationKey={row.claim}
+                    />
+                  </Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+
+          <Text
+            as='p'
+            colorScheme='secondary'
+            localizationKey={localizationKeys('configureSSO.configureStep.attributeMapping.paragraph')}
+          />
+
+          <Col
+            as='ol'
+            sx={theme => ({
+              gap: theme.space.$1x5,
+              margin: 0,
+              paddingInlineStart: theme.space.$5,
+              listStyleType: 'decimal',
+            })}
+          >
+            <Text
+              as='li'
+              colorScheme='secondary'
+              localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.step1')}
+            />
+            <Text
+              as='li'
+              colorScheme='secondary'
+            >
+              <Text
+                as='span'
+                localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.step2')}
+              />
+              <Col
+                as='ul'
+                sx={theme => ({
+                  gap: theme.space.$1x5,
+                  margin: 0,
+                  marginTop: theme.space.$1x5,
+                  paddingInlineStart: theme.space.$5,
+                  listStyleType: '"- "',
+                })}
+              >
+                {ATTRIBUTE_PAIRS.map(pair => (
+                  <Text
+                    key={pair.id}
+                    as='li'
+                  >
+                    <Badge
+                      localizationKey={pair.name}
+                      sx={{ fontFamily: 'monospace' }}
+                    />
+
+                    <Text
+                      as='span'
+                      localizationKey={localizationKeys(
+                        'configureSSO.configureStep.samlOkta.configureAttributes.pairs.conjunction',
+                      )}
+                    />
+
+                    <Badge
+                      localizationKey={pair.expression}
+                      sx={{ fontFamily: 'monospace' }}
+                    />
+                  </Text>
+                ))}
+              </Col>
+            </Text>
           </Col>
         </Step.Section>
       </Step.Body>
@@ -427,54 +432,52 @@ export const AssignUsersSubStep = (): JSX.Element => {
   return (
     <>
       <Step.Body>
-        <Step.Section sx={theme => ({ gap: theme.space.$5 })}>
-          <Col sx={theme => ({ gap: theme.space.$3 })}>
-            <Heading
-              as='h3'
-              textVariant='subtitle'
-              localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.title')}
+        <Step.Section sx={theme => ({ gap: theme.space.$3 })}>
+          <Heading
+            as='h3'
+            textVariant='subtitle'
+            localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.title')}
+          />
+          <Text
+            as='p'
+            colorScheme='secondary'
+            localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.paragraph')}
+          />
+
+          <Col
+            as='ol'
+            sx={theme => ({
+              gap: theme.space.$1x5,
+              margin: 0,
+              paddingInlineStart: theme.space.$5,
+              listStyleType: 'decimal',
+            })}
+          >
+            <Text
+              as='li'
+              colorScheme='secondary'
+              localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step1')}
             />
             <Text
-              as='p'
+              as='li'
               colorScheme='secondary'
-              localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.paragraph')}
+              localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step2')}
             />
-
-            <Col
-              as='ol'
-              sx={theme => ({
-                gap: theme.space.$1x5,
-                margin: 0,
-                paddingInlineStart: theme.space.$5,
-                listStyleType: 'decimal',
-              })}
-            >
-              <Text
-                as='li'
-                colorScheme='secondary'
-                localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step1')}
-              />
-              <Text
-                as='li'
-                colorScheme='secondary'
-                localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step2')}
-              />
-              <Text
-                as='li'
-                colorScheme='secondary'
-                localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step3')}
-              />
-              <Text
-                as='li'
-                colorScheme='secondary'
-                localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step4')}
-              />
-              <Text
-                as='li'
-                colorScheme='secondary'
-                localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step5')}
-              />
-            </Col>
+            <Text
+              as='li'
+              colorScheme='secondary'
+              localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step3')}
+            />
+            <Text
+              as='li'
+              colorScheme='secondary'
+              localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step4')}
+            />
+            <Text
+              as='li'
+              colorScheme='secondary'
+              localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step5')}
+            />
           </Col>
         </Step.Section>
       </Step.Body>
@@ -495,9 +498,22 @@ export const AssignUsersSubStep = (): JSX.Element => {
 
 export const SubmitSamlConfigSubStep = (): JSX.Element => {
   const card = useCardState();
+  const { t } = useLocalizations();
   const { goNext, goPrev, isFirstStep } = useWizard();
   const { enterpriseConnection } = useConfigureSSO();
   const { updateEnterpriseConnection } = __internal_useUserEnterpriseConnections();
+
+  const samlConnection = enterpriseConnection?.samlConnection;
+  const hasExistingConfig = Boolean(
+    samlConnection?.idpSsoUrl ||
+    samlConnection?.idpEntityId ||
+    samlConnection?.idpCertificate ||
+    samlConnection?.idpMetadataUrl,
+  );
+  const existingCertPresent = Boolean(samlConnection?.idpCertificate);
+
+  const [mode, setMode] = React.useState<'metadataUrl' | 'manual'>(hasExistingConfig ? 'manual' : 'metadataUrl');
+  const [certFile, setCertFile] = React.useState<File | null>(null);
 
   const updateConnection = useReverification(
     React.useCallback(
@@ -512,15 +528,42 @@ export const SubmitSamlConfigSubStep = (): JSX.Element => {
     ),
   );
 
-  const metadataUrlField = useFormControl('idpMetadataUrl', '', {
+  const metadataUrlField = useFormControl('idpMetadataUrl', samlConnection?.idpMetadataUrl ?? '', {
     type: 'text',
     label: localizationKeys('configureSSO.configureStep.samlOkta.metadataUrl.label'),
     placeholder: localizationKeys('configureSSO.configureStep.samlOkta.metadataUrl.placeholder'),
     isRequired: true,
   });
 
+  const signOnUrlField = useFormControl('idpSsoUrl', samlConnection?.idpSsoUrl ?? '', {
+    type: 'text',
+    label: localizationKeys('configureSSO.configureStep.samlOkta.manual.signOnUrl.label'),
+    placeholder: localizationKeys('configureSSO.configureStep.samlOkta.manual.signOnUrl.placeholder'),
+    isRequired: true,
+  });
+
+  const issuerField = useFormControl('idpEntityId', samlConnection?.idpEntityId ?? '', {
+    type: 'text',
+    label: localizationKeys('configureSSO.configureStep.samlOkta.manual.issuer.label'),
+    placeholder: localizationKeys('configureSSO.configureStep.samlOkta.manual.issuer.placeholder'),
+    isRequired: true,
+  });
+
+  const certFileField = useFormControl('idpCertificate', '', {
+    type: 'text',
+    label: localizationKeys('configureSSO.configureStep.samlOkta.manual.signingCertificate.label'),
+    isRequired: true,
+  });
+
   const trimmedMetadataUrl = metadataUrlField.value.trim();
-  const canSubmit = trimmedMetadataUrl.length > 0 && !card.isLoading;
+  const trimmedSignOnUrl = signOnUrlField.value.trim();
+  const trimmedIssuer = issuerField.value.trim();
+
+  const hasCert = certFile !== null || existingCertPresent;
+  const canSubmit =
+    !card.isLoading &&
+    ((mode === 'metadataUrl' && trimmedMetadataUrl.length > 0) ||
+      (mode === 'manual' && trimmedSignOnUrl.length > 0 && trimmedIssuer.length > 0 && hasCert));
 
   const handleContinue = async () => {
     if (!enterpriseConnection || !canSubmit) {
@@ -531,10 +574,27 @@ export const SubmitSamlConfigSubStep = (): JSX.Element => {
     card.setLoading();
 
     try {
-      await updateConnection({ saml: { idpMetadataUrl: trimmedMetadataUrl } });
+      if (mode === 'metadataUrl') {
+        await updateConnection({ saml: { idpMetadataUrl: trimmedMetadataUrl } });
+      } else {
+        const samlPayload: NonNullable<UpdateMeEnterpriseConnectionParams['saml']> = {
+          idpSsoUrl: trimmedSignOnUrl,
+          idpEntityId: trimmedIssuer,
+        };
+
+        if (certFile !== null) {
+          samlPayload.idpCertificate = await certFile.text();
+        }
+
+        await updateConnection({ saml: samlPayload });
+      }
       void goNext();
     } catch (err) {
-      handleError(err as Error, [metadataUrlField], card.setError);
+      if (mode === 'metadataUrl') {
+        handleError(err as Error, [metadataUrlField], card.setError);
+      } else {
+        handleError(err as Error, [signOnUrlField, issuerField, certFileField], card.setError);
+      }
     } finally {
       card.setIdle();
     }
@@ -545,16 +605,41 @@ export const SubmitSamlConfigSubStep = (): JSX.Element => {
       <Step.Body>
         <Step.Section
           fill
-          sx={theme => ({ gap: theme.space.$5 })}
+          gap={5}
         >
-          <Text
-            as='p'
-            colorScheme='secondary'
-            localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.metadataUrl.description')}
+          <Heading
+            as='h3'
+            textVariant='subtitle'
+            localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.submitSamlConfig.title')}
           />
-          <Form.ControlRow elementId={metadataUrlField.id}>
-            <Form.PlainInput {...metadataUrlField.props} />
-          </Form.ControlRow>
+          <SegmentedControl.Root
+            aria-label={t(localizationKeys('configureSSO.configureStep.samlOkta.modes.ariaLabel'))}
+            value={mode}
+            onChange={value => setMode(value as 'metadataUrl' | 'manual')}
+            fullWidth
+          >
+            <SegmentedControl.Button
+              value='metadataUrl'
+              text={localizationKeys('configureSSO.configureStep.samlOkta.modes.metadataUrl')}
+            />
+            <SegmentedControl.Button
+              value='manual'
+              text={localizationKeys('configureSSO.configureStep.samlOkta.modes.manual')}
+            />
+          </SegmentedControl.Root>
+
+          {mode === 'metadataUrl' ? (
+            <MetadataUrlPanel field={metadataUrlField} />
+          ) : (
+            <ManualEntryPanel
+              signOnUrlField={signOnUrlField}
+              issuerField={issuerField}
+              certFileField={certFileField}
+              certFile={certFile}
+              setCertFile={setCertFile}
+              existingCertPresent={existingCertPresent}
+            />
+          )}
         </Step.Section>
       </Step.Body>
 
@@ -569,6 +654,161 @@ export const SubmitSamlConfigSubStep = (): JSX.Element => {
           isDisabled={!canSubmit}
         />
       </Step.Footer>
+    </>
+  );
+};
+
+type FormControl = FormControlState<FieldId>;
+
+type MetadataUrlPanelProps = {
+  field: FormControl;
+};
+
+type ManualEntryPanelProps = {
+  signOnUrlField: FormControl;
+  issuerField: FormControl;
+  certFileField: FormControl;
+  certFile: File | null;
+  setCertFile: React.Dispatch<React.SetStateAction<File | null>>;
+  existingCertPresent: boolean;
+};
+
+const MetadataUrlPanel = ({ field }: MetadataUrlPanelProps): JSX.Element => {
+  return (
+    <>
+      <Text
+        as='p'
+        colorScheme='secondary'
+        localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.metadataUrl.description')}
+      />
+      <Form.ControlRow elementId={field.id}>
+        <Form.PlainInput {...field.props} />
+      </Form.ControlRow>
+    </>
+  );
+};
+
+const ManualEntryPanel = ({
+  signOnUrlField,
+  issuerField,
+  certFileField,
+  certFile,
+  setCertFile,
+  existingCertPresent,
+}: ManualEntryPanelProps): JSX.Element => {
+  const { t } = useLocalizations();
+  const certInputRef = React.useRef<HTMLInputElement>(null);
+
+  return (
+    <>
+      <Text
+        as='p'
+        colorScheme='secondary'
+        localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.manual.description')}
+      />
+
+      <Form.ControlRow elementId={signOnUrlField.id}>
+        <Form.PlainInput {...signOnUrlField.props} />
+      </Form.ControlRow>
+
+      <Form.ControlRow elementId={issuerField.id}>
+        <Form.PlainInput {...issuerField.props} />
+      </Form.ControlRow>
+
+      <Box>
+        <Field.Root {...certFileField.props}>
+          <Col gap={2}>
+            <Field.LabelRow>
+              <Field.Label />
+            </Field.LabelRow>
+
+            <input
+              ref={certInputRef}
+              type='file'
+              accept='.pem,.key,.crt,.cer,.cert'
+              multiple={false}
+              style={{ display: 'none' }}
+              onChange={e => {
+                setCertFile(e.target.files?.[0] ?? null);
+                certFileField.clearFeedback();
+              }}
+            />
+
+            {certFile === null ? (
+              <Flex
+                align='center'
+                gap={2}
+                sx={{ alignSelf: 'flex-start', flexWrap: 'wrap' }}
+              >
+                {existingCertPresent && (
+                  <Badge
+                    localizationKey={localizationKeys(
+                      'configureSSO.configureStep.samlOkta.manual.signingCertificate.fileUploaded',
+                    )}
+                  />
+                )}
+                <Button
+                  size='sm'
+                  variant='outline'
+                  onClick={() => certInputRef.current?.click()}
+                >
+                  <Icon
+                    icon={Upload}
+                    size='sm'
+                    colorScheme='neutral'
+                    sx={t => ({ marginInlineEnd: t.space.$1 })}
+                  />
+
+                  <Text
+                    as='span'
+                    localizationKey={localizationKeys(
+                      existingCertPresent
+                        ? 'configureSSO.configureStep.samlOkta.manual.signingCertificate.replaceFile'
+                        : 'configureSSO.configureStep.samlOkta.manual.signingCertificate.uploadFile',
+                    )}
+                  />
+                </Button>
+              </Flex>
+            ) : (
+              <Flex
+                align='center'
+                gap={2}
+                sx={theme => ({ paddingTop: theme.space.$1, paddingBottom: theme.space.$1 })}
+              >
+                <Text
+                  as='span'
+                  colorScheme='secondary'
+                  variant='buttonSmall'
+                >
+                  {certFile.name}
+                </Text>
+
+                <Button
+                  variant='ghost'
+                  colorScheme='neutral'
+                  aria-label={t(
+                    localizationKeys('configureSSO.configureStep.samlOkta.manual.signingCertificate.removeFile'),
+                  )}
+                  onClick={() => {
+                    setCertFile(null);
+                    certFileField.clearFeedback();
+                    if (certInputRef.current) {
+                      certInputRef.current.value = '';
+                    }
+                  }}
+                  sx={t => ({ padding: t.space.$1 })}
+                >
+                  <Icon
+                    icon={Close}
+                    size='xs'
+                  />
+                </Button>
+              </Flex>
+            )}
+          </Col>
+          <Field.Feedback />
+        </Field.Root>
+      </Box>
     </>
   );
 };

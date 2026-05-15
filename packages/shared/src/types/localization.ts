@@ -227,7 +227,7 @@ export type __internal_LocalizationResource = {
     cancelSubscriptionNoCharge: LocalizationValue;
     cancelSubscriptionAccessUntil: LocalizationValue<'plan' | 'date'>;
     cancelSubscriptionPastDue: LocalizationValue;
-    popular: LocalizationValue;
+    highlightedPlanBadge: LocalizationValue;
     paymentMethods__label: LocalizationValue;
     addPaymentMethod__label: LocalizationValue;
     paymentMethod: {
@@ -1338,6 +1338,68 @@ export type __internal_LocalizationResource = {
         subtitle: LocalizationValue;
       };
     };
+    testConfigurationStep: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      error__noSuccessfulTestRun: LocalizationValue;
+      testUrl: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+        actionLabel__copy: LocalizationValue;
+      };
+      testResults: {
+        title: LocalizationValue;
+        actionLabel__refresh: LocalizationValue;
+        polling: LocalizationValue;
+        status__success: LocalizationValue;
+        status__failed: LocalizationValue;
+        status__pending: LocalizationValue;
+      };
+      testRunDetails: {
+        title: LocalizationValue;
+        runDetails: {
+          sectionTitle: LocalizationValue;
+          timestamp: LocalizationValue;
+          status: LocalizationValue;
+          errorCode: LocalizationValue;
+          fullMessage: LocalizationValue;
+          actionLabel__copy: LocalizationValue;
+          actionLabel__copied: LocalizationValue;
+        };
+        parsedUserInfo: {
+          sectionTitle: LocalizationValue;
+          email: LocalizationValue;
+          firstName: LocalizationValue;
+        };
+        howToFix: {
+          sectionTitle: LocalizationValue;
+          actionLabel__viewDocumentation: LocalizationValue;
+          saml_user_attribute_missing: {
+            intro: LocalizationValue;
+            step1: LocalizationValue;
+            step2: LocalizationValue;
+            step3: LocalizationValue;
+          };
+          saml_response_relaystate_missing: {
+            description: LocalizationValue;
+          };
+          saml_email_address_domain_mismatch: {
+            description: LocalizationValue;
+          };
+          oauth_access_denied: {
+            description: LocalizationValue;
+          };
+          oauth_token_exchange_error: {
+            description: LocalizationValue;
+          };
+          oauth_fetch_user_error: {
+            intro: LocalizationValue;
+            step1: LocalizationValue;
+            step2: LocalizationValue;
+          };
+        };
+      };
+    };
     configureStep: {
       spFields: {
         acsUrl: {
@@ -1427,6 +1489,58 @@ export type __internal_LocalizationResource = {
           placeholder: LocalizationValue;
           description: LocalizationValue;
         };
+        modes: {
+          ariaLabel: LocalizationValue;
+          metadataUrl: LocalizationValue;
+          manual: LocalizationValue;
+        };
+        submitSamlConfig: {
+          title: LocalizationValue;
+        };
+        manual: {
+          description: LocalizationValue;
+          signOnUrl: {
+            label: LocalizationValue;
+            placeholder: LocalizationValue;
+          };
+          issuer: {
+            label: LocalizationValue;
+            placeholder: LocalizationValue;
+          };
+          signingCertificate: {
+            label: LocalizationValue;
+            uploadFile: LocalizationValue;
+            replaceFile: LocalizationValue;
+            removeFile: LocalizationValue;
+            fileUploaded: LocalizationValue;
+          };
+        };
+      };
+    };
+    confirmation: {
+      statusSection: {
+        title: LocalizationValue;
+        activeBadge: LocalizationValue;
+        inactiveBadge: LocalizationValue;
+      };
+      enableSection: {
+        title: LocalizationValue;
+      };
+      domainSection: {
+        title: LocalizationValue;
+      };
+      configurationSection: {
+        title: LocalizationValue;
+        ssoUrlLabel: LocalizationValue;
+        issuerLabel: LocalizationValue;
+        certificateLabel: LocalizationValue;
+        configureAgainLink: LocalizationValue;
+      };
+      resetSection: {
+        title: LocalizationValue;
+        warning: LocalizationValue;
+        confirmationFieldLabel: LocalizationValue<'name'>;
+        submitButton: LocalizationValue;
       };
     };
   };

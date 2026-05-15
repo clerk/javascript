@@ -154,7 +154,7 @@ export const hrHR: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Načini plaćanja',
-    popular: 'Popularno',
+    highlightedPlanBadge: 'Popularno',
     pricingTable: {
       billingCycle: 'Obračunsko razdoblje',
       included: 'Uključeno',

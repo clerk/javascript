@@ -423,6 +423,7 @@ export type ElementsConfig = {
   pricingTableCardHeader: WithOptions;
   pricingTableCardTitleContainer: WithOptions;
   pricingTableCardTitle: WithOptions;
+  pricingTableCardBadge: WithOptions;
   pricingTableCardDescription: WithOptions;
   pricingTableCardFeeContainer: WithOptions;
   pricingTableCardFee: WithOptions;

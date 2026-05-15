@@ -152,7 +152,7 @@ export const jaJP: LocalizationResource = {
       },
     },
     paymentMethods__label: '支払い方法',
-    popular: '人気',
+    highlightedPlanBadge: '人気',
     pricingTable: {
       billingCycle: '請求サイクル',
       included: '含まれる内容',

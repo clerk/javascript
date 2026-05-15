@@ -147,7 +147,7 @@ export const roRO: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Metode de plată',
-    popular: 'Popular',
+    highlightedPlanBadge: 'Popular',
     pricingTable: {
       billingCycle: 'Ciclu de facturare',
       included: 'Inclus',

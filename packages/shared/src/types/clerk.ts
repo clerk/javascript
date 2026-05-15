@@ -2125,6 +2125,10 @@ type PricingTableDefaultProps = {
 
 type PricingTableBaseProps = {
   /**
+   * The plan slug to highlight with a "Popular" badge.
+   */
+  highlightedPlan?: string;
+  /**
    * The subscriber type to display plans for.
    * If `organization`, show Plans for the Active Organization; otherwise for the user.
    *

@@ -886,7 +886,7 @@ class SignUpFuture implements SignUpFutureResource {
         unsafeMetadata: params.unsafeMetadata ? normalizeUnsafeMetadata(params.unsafeMetadata) : undefined,
       };
 
-      await this.#resource.__internal_basePatch({ path: this.#resource.pathRoot, body });
+      await this.#resource.__internal_basePatch({ body });
     });
   }
 
@@ -1039,7 +1039,7 @@ class SignUpFuture implements SignUpFutureResource {
           captchaError,
         };
         if (this.#resource.id) {
-          return this.#resource.__internal_basePatch({ path: this.#resource.pathRoot, body });
+          return this.#resource.__internal_basePatch({ body });
         }
         return this.#resource.__internal_basePost({ path: this.#resource.pathRoot, body });
       };

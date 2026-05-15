@@ -147,7 +147,7 @@ export const deDE: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Zahlungsmethoden',
-    popular: 'Beliebt',
+    highlightedPlanBadge: 'Beliebt',
     pricingTable: {
       billingCycle: 'Abrechnungszyklus',
       included: 'Enthalten',
