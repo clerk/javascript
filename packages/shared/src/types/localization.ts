@@ -1450,6 +1450,7 @@ export type __internal_LocalizationResource = {
             uploadFile: LocalizationValue;
             replaceFile: LocalizationValue;
             removeFile: LocalizationValue;
+            fileUploaded: LocalizationValue;
           };
         };
       };

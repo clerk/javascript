@@ -364,6 +364,7 @@ export const enUS: LocalizationResource = {
             uploadFile: 'Upload file',
             replaceFile: 'Replace file',
             removeFile: 'Remove file',
+            fileUploaded: 'File uploaded',
           },
         },
       },

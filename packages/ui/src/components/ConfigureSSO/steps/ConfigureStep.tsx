@@ -735,28 +735,40 @@ const ManualEntryPanel = ({
             />
 
             {certFile === null ? (
-              <Button
-                size='sm'
-                variant='outline'
-                sx={{ alignSelf: 'flex-start' }}
-                onClick={() => certInputRef.current?.click()}
+              <Flex
+                align='center'
+                gap={2}
+                sx={{ alignSelf: 'flex-start', flexWrap: 'wrap' }}
               >
-                <Icon
-                  icon={Upload}
+                {existingCertPresent && (
+                  <Badge
+                    localizationKey={localizationKeys(
+                      'configureSSO.configureStep.samlOkta.manual.signingCertificate.fileUploaded',
+                    )}
+                  />
+                )}
+                <Button
                   size='sm'
-                  colorScheme='neutral'
-                  sx={t => ({ marginInlineEnd: t.space.$1 })}
-                />
+                  variant='outline'
+                  onClick={() => certInputRef.current?.click()}
+                >
+                  <Icon
+                    icon={Upload}
+                    size='sm'
+                    colorScheme='neutral'
+                    sx={t => ({ marginInlineEnd: t.space.$1 })}
+                  />
 
-                <Text
-                  as='span'
-                  localizationKey={localizationKeys(
-                    existingCertPresent
-                      ? 'configureSSO.configureStep.samlOkta.manual.signingCertificate.replaceFile'
-                      : 'configureSSO.configureStep.samlOkta.manual.signingCertificate.uploadFile',
-                  )}
-                />
-              </Button>
+                  <Text
+                    as='span'
+                    localizationKey={localizationKeys(
+                      existingCertPresent
+                        ? 'configureSSO.configureStep.samlOkta.manual.signingCertificate.replaceFile'
+                        : 'configureSSO.configureStep.samlOkta.manual.signingCertificate.uploadFile',
+                    )}
+                  />
+                </Button>
+              </Flex>
             ) : (
               <Flex
                 align='center'
