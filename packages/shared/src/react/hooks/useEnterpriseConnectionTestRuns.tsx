@@ -70,7 +70,7 @@ function useEnterpriseConnectionTestRuns(
   const user = useUserBase();
   const [queryClient] = useClerkQueryClient();
 
-  const { queryKey, stableKey, authenticated } = useEnterpriseConnectionTestRunsCacheKeys({
+  const { queryKey, invalidationKey, stableKey, authenticated } = useEnterpriseConnectionTestRunsCacheKeys({
     userId: user?.id ?? null,
     enterpriseConnectionId,
     args: fetchParams,
@@ -120,8 +120,8 @@ function useEnterpriseConnectionTestRuns(
     if (!hasRows) {
       setShouldPoll(true);
     }
-    await queryClient.invalidateQueries({ queryKey: [stableKey] });
-  }, [queryClient, stableKey, hasRows]);
+    await queryClient.invalidateQueries({ queryKey: invalidationKey });
+  }, [queryClient, invalidationKey, hasRows]);
 
   const isPolling = queryEnabled && shouldPoll && !hasRows;
 
