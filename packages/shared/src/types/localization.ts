@@ -1524,6 +1524,7 @@ export type __internal_LocalizationResource = {
         createApp: {
           headerSubtitle: LocalizationValue;
           title: LocalizationValue;
+          subtitle: LocalizationValue;
         };
         configureAttributes: {
           headerSubtitle: LocalizationValue;

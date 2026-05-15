@@ -472,6 +472,8 @@ export const enUS: LocalizationResource = {
           headerSubtitle:
             'Register Clerk as a service provider in your IdP, then add your identity provider configuration.',
           title: 'Create a SAML application on your identity provider',
+          subtitle:
+            'In your identity provider’s admin dashboard, create a new SAML 2.0 application and use the following service provider details:',
         },
         configureAttributes: {
           headerSubtitle: 'Map user attributes from your identity provider to Clerk.',

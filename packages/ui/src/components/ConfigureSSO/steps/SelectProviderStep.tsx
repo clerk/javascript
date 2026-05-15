@@ -143,6 +143,7 @@ export const SelectProviderStep = (): JSX.Element => {
               <Alert
                 variant='danger'
                 title={card.error}
+                sx={t => ({ margin: t.space.$3 })}
               />
             )}
           </Step.Section>
