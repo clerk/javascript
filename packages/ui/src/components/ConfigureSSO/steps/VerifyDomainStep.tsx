@@ -1,4 +1,4 @@
-import { __internal_useUserEnterpriseConnections, useReverification, useSession, useUser } from '@clerk/shared/react';
+import { useReverification, useSession, useUser } from '@clerk/shared/react';
 import type { EmailAddressResource } from '@clerk/shared/types';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -22,7 +22,6 @@ import { handleError } from '@/utils/errorHandler';
 import { useConfigureSSO } from '../ConfigureSSOContext';
 import { Step } from '../elements/Step';
 import { useWizard, Wizard } from '../elements/Wizard';
-import type { ProviderType } from '../types';
 
 export const VerifyDomainStep = (): JSX.Element => {
   const { user } = useUser();
@@ -241,9 +240,7 @@ export const EnterVerificationCodeStep = ({
   emailToVerify?: EmailAddressResource;
 }): JSX.Element | null => {
   const { user } = useUser();
-  const { session } = useSession();
-  const { provider, enterpriseConnection } = useConfigureSSO();
-  const { createEnterpriseConnection } = __internal_useUserEnterpriseConnections();
+  const { provider, createEnterpriseConnection } = useConfigureSSO();
   const card = useCardState();
   const codeSubmittedRef = useRef(false);
   const { goNext, goPrev, isFirstStep } = useWizard();
@@ -259,28 +256,7 @@ export const EnterVerificationCodeStep = ({
   const setPrimaryEmailAddress = useReverification((emailAddressId: string) =>
     user?.update({ primaryEmailAddressId: emailAddressId }),
   );
-  const createConnection = useReverification(
-    useCallback(
-      async (selectedProvider: ProviderType) => {
-        if (enterpriseConnection) {
-          return;
-        }
-        if (!user?.primaryEmailAddress) {
-          throw new Error('Primary email required');
-        }
 
-        const emailDomain = user.primaryEmailAddress.emailAddress.split('@')[1];
-        const organizationId = session?.lastActiveOrganizationId ?? null;
-
-        await createEnterpriseConnection({
-          provider: selectedProvider,
-          name: emailDomain,
-          organizationId,
-        });
-      },
-      [enterpriseConnection, user, session, createEnterpriseConnection],
-    ),
-  );
   const prepare = useCallback(
     () => prepareEmailVerification()?.catch(err => handleError(err, [], card.setError)),
     [prepareEmailVerification, card],
@@ -312,7 +288,7 @@ export const EnterVerificationCodeStep = ({
       }
 
       try {
-        await createConnection(provider);
+        await createEnterpriseConnection(provider);
       } catch (err) {
         handleError(err as Error, [], card.setError);
         return;
@@ -376,8 +352,8 @@ export const EnterVerificationCodeStep = ({
         />
         <Step.Footer.Continue
           onClick={() => goNext()}
-          isLoading={otp.isLoading}
-          isDisabled={!isVerified}
+          isLoading={otp.isLoading || card.isLoading}
+          isDisabled={!isVerified || !!card.error}
         />
       </Step.Footer>
     </>

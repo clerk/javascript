@@ -466,6 +466,55 @@ export const enUS: LocalizationResource = {
           },
         },
       },
+      samlCustom: {
+        headerTitle: 'Configure your identity provider (IdP)',
+        createApp: {
+          headerSubtitle:
+            'Register Clerk as a service provider in your IdP, then add your identity provider configuration.',
+          title: 'Create a SAML application on your identity provider',
+        },
+        configureAttributes: {
+          headerSubtitle: 'Map user attributes from your identity provider to Clerk.',
+          title: 'We expect your SAML responses to have the following specific attributes:',
+        },
+        assignUsers: {
+          headerSubtitle: 'Assign users to the enterprise app',
+          title: 'Assign selected user or group',
+          paragraph: 'You need to assign users or groups to your enterprise app before they can use it to sign in.',
+        },
+        metadataUrl: {
+          headerSubtitle: 'Configure identity provider metadata',
+          label: 'Metadata URL',
+          placeholder: 'Paste URL here...',
+          description: 'In your enterprise app, retrieve the metadata URL. Paste it below.',
+        },
+        modes: {
+          ariaLabel: 'Configuration mode',
+          metadataUrl: 'Add via metadata',
+          manual: 'Configure manually',
+        },
+        submitSamlConfig: {
+          title: 'Fill in your SAML application details',
+        },
+        manual: {
+          description: 'In your SAML app, retrieve these values.',
+          signOnUrl: {
+            label: 'Sign on URL',
+            placeholder: 'Paste URL here...',
+          },
+          issuer: {
+            label: 'Issuer',
+            placeholder: 'Paste URL here...',
+          },
+          signingCertificate: {
+            label: 'Signing certificate',
+            uploadFile: 'Upload file',
+            replaceFile: 'Replace file',
+            removeFile: 'Remove file',
+            fileUploaded: 'File uploaded',
+          },
+        },
+      },
     },
   },
   createOrganization: {

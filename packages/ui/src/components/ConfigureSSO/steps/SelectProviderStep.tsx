@@ -1,8 +1,10 @@
 import { iconImageUrl } from '@clerk/shared/constants';
+import { useUser } from '@clerk/shared/react/index';
 import React from 'react';
 
 import type { LocalizationKey } from '@/customizables';
 import { Box, Col, descriptors, Flow, Grid, localizationKeys, Span, Text, useLocalizations } from '@/customizables';
+import { useCardState } from '@/elements/contexts';
 import { common, mqu } from '@/styledSystem';
 import { Alert } from '@/ui/elements/Alert';
 
@@ -38,16 +40,36 @@ const PROVIDER_GROUPS: ReadonlyArray<{
 ];
 
 export const SelectProviderStep = (): JSX.Element => {
-  const { goNext } = useWizard();
-  const { setProvider } = useConfigureSSO();
+  const { goToStep } = useWizard();
+  const { setProvider, createEnterpriseConnection } = useConfigureSSO();
   const [selected, setSelected] = React.useState<ProviderType | null>(null);
+  const { user } = useUser();
+  const card = useCardState();
 
-  const handleContinue = () => {
-    if (!selected) {
+  const handleContinue = async () => {
+    if (!selected || !user) {
       return;
     }
+
+    const primaryEmailAddress = user?.primaryEmailAddress;
+    const hasVerifiedPrimaryEmailAddress = primaryEmailAddress?.verification.status === 'verified';
+
+    // If the user doesn't have a primary email address, go direct to the provide email step
+    if (!primaryEmailAddress) {
+      void goToStep('provide-email');
+      return;
+    }
+
+    // If the user's primary email address is not verified, go to the verify email address step
+    if (!hasVerifiedPrimaryEmailAddress) {
+      void goToStep('verify-email-address');
+      return;
+    }
+
+    // Otherwise, set the provider and create the enterprise connection
     setProvider(selected);
-    void goNext();
+    await createEnterpriseConnection(selected);
+    void goToStep('configure');
   };
 
   return (
@@ -116,6 +138,13 @@ export const SelectProviderStep = (): JSX.Element => {
               variant='warning'
               title={localizationKeys('configureSSO.selectProviderStep.warning')}
             />
+
+            {card.error && (
+              <Alert
+                variant='danger'
+                title={card.error}
+              />
+            )}
           </Step.Section>
         </Step.Body>
 
@@ -124,7 +153,8 @@ export const SelectProviderStep = (): JSX.Element => {
 
           <Step.Footer.Continue
             onClick={handleContinue}
-            isDisabled={!selected}
+            isLoading={card.isLoading}
+            isDisabled={!selected || !!card.error}
           />
         </Step.Footer>
       </Step>

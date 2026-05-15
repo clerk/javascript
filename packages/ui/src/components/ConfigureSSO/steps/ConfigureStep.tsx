@@ -35,8 +35,11 @@ import { handleError } from '@/utils/errorHandler';
 import { useConfigureSSO } from '../ConfigureSSOContext';
 import { Step } from '../elements/Step';
 import { useWizard, Wizard } from '../elements/Wizard';
+import { useConfigureStepTranslations } from './configureStepTranslations';
 
 export const ConfigureStep = (): JSX.Element => {
+  const { key } = useConfigureStepTranslations();
+
   return (
     <Flow.Part part='configureCreateApp'>
       <Step
@@ -46,8 +49,8 @@ export const ConfigureStep = (): JSX.Element => {
         <Wizard>
           <Wizard.Step id='create-app'>
             <Step.Header
-              title={localizationKeys('configureSSO.configureStep.samlOkta.headerTitle')}
-              description={localizationKeys('configureSSO.configureStep.samlOkta.createApp.headerSubtitle')}
+              title={localizationKeys(key('headerTitle'))}
+              description={localizationKeys(key('createApp.headerSubtitle'))}
             >
               <InnerStepCounter />
             </Step.Header>
@@ -57,8 +60,8 @@ export const ConfigureStep = (): JSX.Element => {
 
           <Wizard.Step id='configure-attributes'>
             <Step.Header
-              title={localizationKeys('configureSSO.configureStep.samlOkta.headerTitle')}
-              description={localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.headerSubtitle')}
+              title={localizationKeys(key('headerTitle'))}
+              description={localizationKeys(key('configureAttributes.headerSubtitle'))}
             >
               <InnerStepCounter />
             </Step.Header>
@@ -68,8 +71,8 @@ export const ConfigureStep = (): JSX.Element => {
 
           <Wizard.Step id='assign-users'>
             <Step.Header
-              title={localizationKeys('configureSSO.configureStep.samlOkta.headerTitle')}
-              description={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.headerSubtitle')}
+              title={localizationKeys(key('headerTitle'))}
+              description={localizationKeys(key('assignUsers.headerSubtitle'))}
             >
               <InnerStepCounter />
             </Step.Header>
@@ -79,8 +82,8 @@ export const ConfigureStep = (): JSX.Element => {
 
           <Wizard.Step id='submit-saml-config'>
             <Step.Header
-              title={localizationKeys('configureSSO.configureStep.samlOkta.headerTitle')}
-              description={localizationKeys('configureSSO.configureStep.samlOkta.metadataUrl.headerSubtitle')}
+              title={localizationKeys(key('headerTitle'))}
+              description={localizationKeys(key('metadataUrl.headerSubtitle'))}
             >
               <InnerStepCounter />
             </Step.Header>
@@ -145,6 +148,7 @@ const ATTRIBUTE_PAIRS = [
 export const CreateAppSubStep = (): JSX.Element => {
   const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
   const { enterpriseConnection } = useConfigureSSO();
+  const { key } = useConfigureStepTranslations();
 
   const acsUrl = enterpriseConnection?.samlConnection?.acsUrl ?? '';
   const spEntityId = enterpriseConnection?.samlConnection?.spEntityId ?? '';
@@ -168,7 +172,7 @@ export const CreateAppSubStep = (): JSX.Element => {
             <Heading
               as='h3'
               textVariant='subtitle'
-              localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.createApp.title')}
+              localizationKey={localizationKeys(key('createApp.title'))}
             />
             <Col
               as='ul'

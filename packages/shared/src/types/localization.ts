@@ -1519,6 +1519,54 @@ export type __internal_LocalizationResource = {
           };
         };
       };
+      samlCustom: {
+        headerTitle: LocalizationValue;
+        createApp: {
+          headerSubtitle: LocalizationValue;
+          title: LocalizationValue;
+        };
+        configureAttributes: {
+          headerSubtitle: LocalizationValue;
+          title: LocalizationValue;
+        };
+        assignUsers: {
+          headerSubtitle: LocalizationValue;
+          title: LocalizationValue;
+          paragraph: LocalizationValue;
+        };
+        metadataUrl: {
+          headerSubtitle: LocalizationValue;
+          label: LocalizationValue;
+          placeholder: LocalizationValue;
+          description: LocalizationValue;
+        };
+        modes: {
+          ariaLabel: LocalizationValue;
+          metadataUrl: LocalizationValue;
+          manual: LocalizationValue;
+        };
+        submitSamlConfig: {
+          title: LocalizationValue;
+        };
+        manual: {
+          description: LocalizationValue;
+          signOnUrl: {
+            label: LocalizationValue;
+            placeholder: LocalizationValue;
+          };
+          issuer: {
+            label: LocalizationValue;
+            placeholder: LocalizationValue;
+          };
+          signingCertificate: {
+            label: LocalizationValue;
+            uploadFile: LocalizationValue;
+            replaceFile: LocalizationValue;
+            removeFile: LocalizationValue;
+            fileUploaded: LocalizationValue;
+          };
+        };
+      };
     };
     confirmation: {
       statusSection: {

@@ -1,5 +1,9 @@
+import { __internal_useUserEnterpriseConnections, useSession, useUser } from '@clerk/shared/react/index';
 import type { EnterpriseConnectionResource } from '@clerk/shared/types';
-import React, { type PropsWithChildren } from 'react';
+import React, { type PropsWithChildren, useCallback } from 'react';
+
+import { useCardState } from '@/elements/contexts';
+import { handleError } from '@/utils/errorHandler';
 
 import { deriveInitialStep } from './deriveInitialStep';
 import type { ProviderType, WizardStepId } from './types';
@@ -28,6 +32,10 @@ export interface ConfigureSSOData {
    * Ref to the scrollable content container of the wizard.
    */
   contentRef: React.RefObject<HTMLDivElement>;
+  /**
+   * Creates a new enterprise connection.
+   */
+  createEnterpriseConnection: (provider: ProviderType) => Promise<void>;
 }
 
 interface ConfigureSSOProviderProps {
@@ -46,18 +54,49 @@ export const ConfigureSSOProvider = ({
   const [provider, setProvider] = React.useState<ProviderType | undefined>(
     enterpriseConnection?.provider as ProviderType,
   );
-
+  const enterpriseConnectionApi = __internal_useUserEnterpriseConnections();
+  const { user } = useUser();
+  const { session } = useSession();
+  const card = useCardState();
   const initialStepId = deriveInitialStep(enterpriseConnection);
+
+  const createEnterpriseConnection = useCallback(
+    async (provider: ProviderType): Promise<void> => {
+      const emailDomain = user?.primaryEmailAddress?.emailAddress.split('@')[1];
+      const organizationId = session?.lastActiveOrganizationId ?? null;
+
+      if (!emailDomain) {
+        return;
+      }
+
+      card.setLoading();
+
+      await enterpriseConnectionApi
+        .createEnterpriseConnection({
+          provider,
+          name: emailDomain,
+          organizationId,
+        })
+        .catch(err => {
+          handleError(err, [], card.setError);
+        })
+        .finally(() => {
+          card.setIdle();
+        });
+    },
+    [user, card, session, enterpriseConnectionApi],
+  );
 
   const value = React.useMemo<ConfigureSSOData>(
     () => ({
       initialStepId,
       enterpriseConnection,
       provider,
+      createEnterpriseConnection,
       setProvider,
       contentRef,
     }),
-    [initialStepId, enterpriseConnection, provider, contentRef],
+    [initialStepId, enterpriseConnection, createEnterpriseConnection, provider, contentRef],
   );
 
   return <ConfigureSSOContext.Provider value={value}>{children}</ConfigureSSOContext.Provider>;
