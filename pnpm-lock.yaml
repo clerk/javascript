@@ -444,6 +444,9 @@ importers:
       '@swc/helpers':
         specifier: catalog:repo
         version: 0.5.21
+      '@tanstack/query-core':
+        specifier: catalog:repo
+        version: 5.100.6
       '@wallet-standard/core':
         specifier: catalog:module-manager
         version: 1.1.1
