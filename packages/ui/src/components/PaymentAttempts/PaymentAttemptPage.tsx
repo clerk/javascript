@@ -245,12 +245,12 @@ function PaymentAttemptBody({ paymentAttempt }: { paymentAttempt: BillingPayment
                 if (seatSummary.included > 0) {
                   return isSingular
                     ? localizationKeys('billing.seatBreakdownIncludedSingular', {
-                        used: seatSummary.totalSeats,
+                        totalSeats: seatSummary.totalSeats,
                         included: seatSummary.included,
                         rate,
                       })
                     : localizationKeys('billing.seatBreakdownIncludedPlural', {
-                        used: seatSummary.totalSeats,
+                        totalSeats: seatSummary.totalSeats,
                         included: seatSummary.included,
                         chargeable: seatsChargeable,
                         rate,

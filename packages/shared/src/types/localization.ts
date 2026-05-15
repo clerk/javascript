@@ -194,8 +194,8 @@ export type __internal_LocalizationResource = {
     seatsWithLimit: LocalizationValue<'limit'>;
     seatBreakdownSingular: LocalizationValue<'rate'>;
     seatBreakdownPlural: LocalizationValue<'chargeable' | 'rate'>;
-    seatBreakdownIncludedSingular: LocalizationValue<'used' | 'included' | 'rate'>;
-    seatBreakdownIncludedPlural: LocalizationValue<'used' | 'included' | 'chargeable' | 'rate'>;
+    seatBreakdownIncludedSingular: LocalizationValue<'totalSeats' | 'included' | 'rate'>;
+    seatBreakdownIncludedPlural: LocalizationValue<'totalSeats' | 'included' | 'chargeable' | 'rate'>;
     subscribe: LocalizationValue;
     startFreeTrial: LocalizationValue;
     startFreeTrial__days: LocalizationValue<'days'>;
