@@ -40,7 +40,7 @@ describe('Clerk __internal_queryClient (backward compat shim)', () => {
 
   it('returns a tagged QueryClient after the lazy import resolves', async () => {
     // Trigger the getter (fires the lazy import)
-    clerk.__internal_queryClient;
+    void clerk.__internal_queryClient;
 
     // Wait for the dynamic import and QueryClient construction to settle
     await vi.dynamicImportSettled();
@@ -52,7 +52,7 @@ describe('Clerk __internal_queryClient (backward compat shim)', () => {
   });
 
   it('returns the same QueryClient instance on repeated access', async () => {
-    clerk.__internal_queryClient;
+    void clerk.__internal_queryClient;
     await vi.dynamicImportSettled();
 
     const first = clerk.__internal_queryClient;
@@ -65,7 +65,7 @@ describe('Clerk __internal_queryClient (backward compat shim)', () => {
     // @ts-expect-error - queryClientStatus is not typed on clerk.on
     clerk.on('queryClientStatus', listener);
 
-    clerk.__internal_queryClient;
+    void clerk.__internal_queryClient;
     await vi.dynamicImportSettled();
 
     expect(listener).toHaveBeenCalledWith('ready');
