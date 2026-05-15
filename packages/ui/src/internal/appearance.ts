@@ -928,6 +928,14 @@ export type Options = {
    */
   logoImageUrl?: string;
   /**
+   * The URL of your custom logo for dark mode. When provided, this logo is
+   * automatically displayed when Clerk components render in a dark color scheme.
+   * By default, the components will use the dark logo you've set in the Clerk Dashboard.
+   *
+   * @default undefined
+   */
+  darkLogoImageUrl?: string;
+  /**
    * Controls where the browser will redirect to after the user clicks the application logo,
    * usually found in the SignIn and SignUp components.
    * If a URL is provided, it will be used as the `href` of the link.

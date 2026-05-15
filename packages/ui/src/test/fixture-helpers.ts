@@ -331,7 +331,16 @@ const createDisplayConfigFixtureHelpers = (environment: EnvironmentJSON) => {
     dc.terms_url = opts.termsOfService || '';
     dc.privacy_policy_url = opts.privacyPolicy || '';
   };
-  return { withSupportEmail, withoutClerkBranding, withPreferredSignInStrategy, withTermsPrivacyPolicyUrls };
+  const withDisplayConfig = (overrides: Partial<DisplayConfigJSON>) => {
+    Object.assign(dc, overrides);
+  };
+  return {
+    withSupportEmail,
+    withoutClerkBranding,
+    withPreferredSignInStrategy,
+    withTermsPrivacyPolicyUrls,
+    withDisplayConfig,
+  };
 };
 
 const createOrganizationSettingsFixtureHelpers = (environment: EnvironmentJSON) => {

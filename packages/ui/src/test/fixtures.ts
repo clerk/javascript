@@ -69,6 +69,7 @@ const createBaseDisplayConfig = (): DisplayConfigJSON => {
     },
     preferred_sign_in_strategy: 'password',
     logo_image_url: 'https://images.clerk.com/uploaded/img_logo.png',
+    dark_logo_image_url: '',
     favicon_image_url: 'https://images.clerk.com/uploaded/img_favicon.png',
     home_url: 'https://dashboard.clerk.com',
     sign_in_url: 'https://dashboard.clerk.com/sign-in',

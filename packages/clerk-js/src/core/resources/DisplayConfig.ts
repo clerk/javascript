@@ -33,6 +33,7 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
   captchaWidgetType: CaptchaWidgetType = null;
   clerkJSVersion?: string;
   createOrganizationUrl: string = '';
+  darkLogoImageUrl: string = '';
   faviconImageUrl: string = '';
   googleOneTapClientId?: string;
   homeUrl: string = '';
@@ -93,6 +94,7 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
     this.captchaWidgetType = this.withDefault(data.captcha_widget_type, this.captchaWidgetType);
     this.clerkJSVersion = this.withDefault(data.clerk_js_version, this.clerkJSVersion);
     this.createOrganizationUrl = this.withDefault(data.create_organization_url, this.createOrganizationUrl);
+    this.darkLogoImageUrl = this.withDefault(data.dark_logo_image_url, this.darkLogoImageUrl);
     this.faviconImageUrl = this.withDefault(data.favicon_image_url, this.faviconImageUrl);
     this.googleOneTapClientId = this.withDefault(data.google_one_tap_client_id, this.googleOneTapClientId);
     this.homeUrl = this.withDefault(data.home_url, this.homeUrl);
@@ -136,6 +138,7 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
       captcha_widget_type: this.captchaWidgetType,
       clerk_js_version: this.clerkJSVersion,
       create_organization_url: this.createOrganizationUrl,
+      dark_logo_image_url: this.darkLogoImageUrl,
       favicon_image_url: this.faviconImageUrl,
       google_one_tap_client_id: this.googleOneTapClientId,
       home_url: this.homeUrl,

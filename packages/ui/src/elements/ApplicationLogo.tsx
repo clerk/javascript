@@ -13,14 +13,56 @@ const getContainerHeightForImageRatio = (imageRef: React.RefObject<HTMLImageElem
   const ratio = imageRef.current.naturalWidth / imageRef.current.naturalHeight;
 
   if (ratio <= 1) {
-    // logo is taller than it is wide
     return `calc(${width} * 2)`;
   } else if (ratio > 1 && ratio <= 2) {
-    // logo is up to 2x wider than it is tall
     return `calc((${width} * 2) / ${ratio})`;
   }
   return width;
 };
+
+function resolveColorScheme(el: Element): 'light' | 'dark' {
+  const computed = getComputedStyle(el).colorScheme;
+  if (computed === 'dark') {
+    return 'dark';
+  }
+  if (computed === 'light dark' || computed === 'dark light') {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  return 'light';
+}
+
+function useResolvedColorScheme(ref: React.RefObject<Element>): 'light' | 'dark' {
+  const [scheme, setScheme] = React.useState<'light' | 'dark'>('light');
+
+  React.useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) {
+      return;
+    }
+
+    const update = () => setScheme(resolveColorScheme(el));
+    update();
+
+    // Watch system preference changes (for color-scheme: normal / light dark)
+    const mql = window.matchMedia('(prefers-color-scheme: dark)');
+    mql.addEventListener('change', update);
+
+    // Watch ancestors for style/class changes that might affect inherited color-scheme
+    const observer = new MutationObserver(update);
+    let ancestor: Element | null = el;
+    while (ancestor) {
+      observer.observe(ancestor, { attributes: true, attributeFilter: ['style', 'class', 'data-theme'] });
+      ancestor = ancestor.parentElement;
+    }
+
+    return () => {
+      mql.removeEventListener('change', update);
+      observer.disconnect();
+    };
+  }, [ref]);
+
+  return scheme;
+}
 
 export type ApplicationLogoProps = PropsOfComponent<typeof Flex> & {
   /**
@@ -45,37 +87,47 @@ export type ApplicationLogoProps = PropsOfComponent<typeof Flex> & {
 
 export const ApplicationLogo: React.FC<ApplicationLogoProps> = (props: ApplicationLogoProps): JSX.Element | null => {
   const { src, alt, href, isExternal, sx, ...rest } = props;
+  const containerRef = React.useRef<HTMLDivElement>(null);
   const imageRef = React.useRef<HTMLImageElement>(null);
   const [loaded, setLoaded] = React.useState(false);
-  const { logoImageUrl, applicationName, homeUrl } = useEnvironment().displayConfig;
+  const { logoImageUrl, darkLogoImageUrl, applicationName, homeUrl } = useEnvironment().displayConfig;
   const { parsedOptions } = useAppearance();
   const imageSrc = src || parsedOptions.logoImageUrl || logoImageUrl;
+  const darkImageSrc =
+    src || parsedOptions.logoImageUrl ? undefined : parsedOptions.darkLogoImageUrl || darkLogoImageUrl;
   const imageAlt = alt || applicationName;
   const logoUrl = href || parsedOptions.logoLinkUrl || homeUrl;
+  const colorScheme = useResolvedColorScheme(containerRef);
+  const showDark = darkImageSrc && colorScheme === 'dark';
 
   if (!imageSrc) {
     return null;
   }
+
+  const sharedImageStyles = {
+    height: '100%',
+    width: '100%',
+    objectFit: 'contain' as const,
+  };
 
   const image = (
     <Image
       ref={imageRef}
       elementDescriptor={descriptors.logoImage}
       alt={imageAlt}
-      src={imageSrc}
+      src={showDark ? darkImageSrc : imageSrc}
       size={200}
       onLoad={() => setLoaded(true)}
       sx={{
         display: loaded ? 'inline-block' : 'none',
-        height: '100%',
-        width: '100%',
-        objectFit: 'contain',
+        ...sharedImageStyles,
       }}
     />
   );
 
   return (
     <Flex
+      ref={containerRef}
       elementDescriptor={descriptors.logoBox}
       {...rest}
       sx={[
