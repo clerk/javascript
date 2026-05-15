@@ -24,6 +24,7 @@ export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
     userAgent: options.userAgent || `${constants.SDK_METADATA.name}@${constants.SDK_METADATA.version}`,
     sdkMetadata: options.sdkMetadata || constants.SDK_METADATA,
   });
+  const enableHandshake = options.enableHandshake ?? true;
 
   return async (fastifyRequest: FastifyRequest, reply: FastifyReply) => {
     // Handle Frontend API proxy requests and auto-derive proxyUrl
@@ -94,11 +95,13 @@ export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
 
     requestState.headers.forEach((value, key) => reply.header(key, value));
 
-    const locationHeader = requestState.headers.get(constants.Headers.Location);
-    if (locationHeader) {
-      return reply.code(307).send();
-    } else if (requestState.status === AuthStatus.Handshake) {
-      throw new Error('Clerk: handshake status without redirect');
+    if (enableHandshake) {
+      const locationHeader = requestState.headers.get(constants.Headers.Location);
+      if (locationHeader) {
+        return reply.code(307).send();
+      } else if (requestState.status === AuthStatus.Handshake) {
+        throw new Error('Clerk: handshake status without redirect');
+      }
     }
 
     // @ts-expect-error Inject auth so getAuth can read it
