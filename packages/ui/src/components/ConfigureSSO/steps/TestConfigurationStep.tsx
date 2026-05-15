@@ -281,6 +281,7 @@ const TestResultsTable = ({
   onPageChange,
 }: TestResultsTableProps): JSX.Element => {
   const { t } = useLocalizations();
+  const { contentRef } = useConfigureSSO();
   const [selectedTestRun, setSelectedTestRun] = useState<EnterpriseConnectionTestRunResource | null>(null);
 
   const drawerTitle =
@@ -423,6 +424,8 @@ const TestResultsTable = ({
             setSelectedTestRun(null);
           }
         }}
+        strategy='absolute'
+        portalProps={{ root: contentRef }}
       >
         <Drawer.Overlay />
         <Drawer.Content>
