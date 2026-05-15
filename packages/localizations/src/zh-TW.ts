@@ -147,7 +147,7 @@ export const zhTW: LocalizationResource = {
       },
     },
     paymentMethods__label: '付款方式',
-    popular: '熱門',
+    highlightedPlanBadge: '熱門',
     pricingTable: {
       billingCycle: '計費週期',
       included: '包含',

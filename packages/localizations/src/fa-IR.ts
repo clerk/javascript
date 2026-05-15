@@ -146,7 +146,7 @@ export const faIR: LocalizationResource = {
       },
     },
     paymentMethods__label: 'روش های پرداخت',
-    popular: 'محبوب',
+    highlightedPlanBadge: 'محبوب',
     pricingTable: {
       billingCycle: 'چرخه صورتحساب',
       included: 'شامل',

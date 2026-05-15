@@ -145,7 +145,7 @@ export const csCZ: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Platební metody',
-    popular: 'Populární',
+    highlightedPlanBadge: 'Populární',
     pricingTable: {
       billingCycle: 'Fakturační cyklus',
       included: 'Zahrnuto',

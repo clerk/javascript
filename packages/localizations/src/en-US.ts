@@ -147,7 +147,7 @@ export const enUS: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Payment Methods',
-    popular: 'Popular',
+    highlightedPlanBadge: 'Popular',
     pricingTable: {
       billingCycle: 'Billing cycle',
       included: 'Included',

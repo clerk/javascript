@@ -148,7 +148,7 @@ export const koKR: LocalizationResource = {
       },
     },
     paymentMethods__label: '결제 수단',
-    popular: '인기',
+    highlightedPlanBadge: '인기',
     pricingTable: {
       billingCycle: '결제 주기',
       included: '포함',

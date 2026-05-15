@@ -147,7 +147,7 @@ export const esES: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Métodos de pago',
-    popular: 'Popular',
+    highlightedPlanBadge: 'Popular',
     pricingTable: {
       billingCycle: 'Ciclo de facturación',
       included: 'Incluido',

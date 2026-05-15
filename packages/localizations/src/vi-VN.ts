@@ -145,7 +145,7 @@ export const viVN: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Phương thức thanh toán',
-    popular: 'Phổ biến',
+    highlightedPlanBadge: 'Phổ biến',
     pricingTable: {
       billingCycle: 'Chu kỳ thanh toán',
       included: 'Bao gồm',

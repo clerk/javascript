@@ -227,7 +227,7 @@ export type __internal_LocalizationResource = {
     cancelSubscriptionNoCharge: LocalizationValue;
     cancelSubscriptionAccessUntil: LocalizationValue<'plan' | 'date'>;
     cancelSubscriptionPastDue: LocalizationValue;
-    popular: LocalizationValue;
+    highlightedPlanBadge: LocalizationValue;
     paymentMethods__label: LocalizationValue;
     addPaymentMethod__label: LocalizationValue;
     paymentMethod: {
