@@ -105,6 +105,17 @@ describe('maybeShowTelemetryNotice', () => {
     }
   });
 
+  test('skips in Next.js Edge Runtime', () => {
+    (globalThis as { EdgeRuntime?: string }).EdgeRuntime = 'edge-runtime';
+
+    try {
+      maybeShowTelemetryNotice();
+      expect(logSpy).not.toHaveBeenCalled();
+    } finally {
+      delete (globalThis as { EdgeRuntime?: string }).EdgeRuntime;
+    }
+  });
+
   test('does not throw if console.log fails', () => {
     logSpy.mockImplementation(() => {
       throw new Error('console broken');
