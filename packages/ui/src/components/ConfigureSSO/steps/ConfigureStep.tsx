@@ -328,17 +328,18 @@ export const ConfigureAttributesSubStep = (): JSX.Element => {
   const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
 
   const { provider } = useConfigureSSO();
-  const { key } = useConfigureStepTranslations();
 
   return (
     <>
       <Step.Body>
         <Step.Section sx={theme => ({ gap: theme.space.$3 })}>
-          <Heading
-            as='h3'
-            textVariant='subtitle'
-            localizationKey={localizationKeys(key('configureAttributes.title'))}
-          />
+          {provider === 'saml_custom' && (
+            <Heading
+              as='h3'
+              textVariant='subtitle'
+              localizationKey={localizationKeys('configureSSO.configureStep.samlCustom.configureAttributes.title')}
+            />
+          )}
 
           <Table
             sx={theme => ({
@@ -758,7 +759,7 @@ export const SubmitSamlConfigSubStep = (): JSX.Element => {
         <Step.Footer.Continue
           onClick={handleContinue}
           isLoading={card.isLoading}
-          isDisabled={!canSubmit || !!card.error}
+          isDisabled={!canSubmit}
         />
       </Step.Footer>
     </>

@@ -3,7 +3,6 @@ import type { EnterpriseConnectionResource } from '@clerk/shared/types';
 import React, { type PropsWithChildren, useCallback } from 'react';
 
 import { useCardState } from '@/elements/contexts';
-import { handleError } from '@/utils/errorHandler';
 
 import { deriveInitialStep } from './deriveInitialStep';
 import type { ProviderType, WizardStepId } from './types';
@@ -71,18 +70,15 @@ export const ConfigureSSOProvider = ({
 
       card.setLoading();
 
-      await enterpriseConnectionApi
-        .createEnterpriseConnection({
+      try {
+        await enterpriseConnectionApi.createEnterpriseConnection({
           provider,
           name: emailDomain,
           organizationId,
-        })
-        .catch(err => {
-          handleError(err, [], card.setError);
-        })
-        .finally(() => {
-          card.setIdle();
         });
+      } finally {
+        card.setIdle();
+      }
     },
     [user, card, session, enterpriseConnectionApi],
   );

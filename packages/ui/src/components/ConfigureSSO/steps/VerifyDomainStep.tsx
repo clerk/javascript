@@ -353,7 +353,7 @@ export const EnterVerificationCodeStep = ({
         <Step.Footer.Continue
           onClick={() => goNext()}
           isLoading={otp.isLoading || card.isLoading}
-          isDisabled={!isVerified || !!card.error}
+          isDisabled={!isVerified}
         />
       </Step.Footer>
     </>

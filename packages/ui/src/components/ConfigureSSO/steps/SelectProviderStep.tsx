@@ -7,6 +7,7 @@ import { Box, Col, descriptors, Flow, Grid, localizationKeys, Span, Text, useLoc
 import { useCardState } from '@/elements/contexts';
 import { common, mqu } from '@/styledSystem';
 import { Alert } from '@/ui/elements/Alert';
+import { handleError } from '@/utils/errorHandler';
 
 import { useConfigureSSO } from '../ConfigureSSOContext';
 import { Step } from '../elements/Step';
@@ -51,6 +52,8 @@ export const SelectProviderStep = (): JSX.Element => {
       return;
     }
 
+    setProvider(selected);
+
     const primaryEmailAddress = user?.primaryEmailAddress;
     const hasVerifiedPrimaryEmailAddress = primaryEmailAddress?.verification.status === 'verified';
 
@@ -67,8 +70,13 @@ export const SelectProviderStep = (): JSX.Element => {
     }
 
     // Otherwise, set the provider and create the enterprise connection
-    setProvider(selected);
-    await createEnterpriseConnection(selected);
+    try {
+      await createEnterpriseConnection(selected);
+    } catch (err) {
+      handleError(err as Error, [], card.setError);
+      return;
+    }
+
     void goToStep('configure');
   };
 
@@ -155,7 +163,7 @@ export const SelectProviderStep = (): JSX.Element => {
           <Step.Footer.Continue
             onClick={handleContinue}
             isLoading={card.isLoading}
-            isDisabled={!selected || !!card.error}
+            isDisabled={!selected}
           />
         </Step.Footer>
       </Step>
