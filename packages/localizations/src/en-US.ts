@@ -201,6 +201,33 @@ export const enUS: LocalizationResource = {
     yearPerUnit: 'Year per {{unitName}}',
   },
   configureSSO: {
+    confirmation: {
+      configurationSection: {
+        certificateLabel: 'Certificate',
+        configureAgainLink: 'Configure again',
+        issuerLabel: 'Issuer',
+        ssoUrlLabel: 'Sign on URL',
+        title: 'Configuration details',
+      },
+      domainSection: {
+        title: 'Domain',
+      },
+      enableSection: {
+        title: 'Enable SSO',
+      },
+      resetSection: {
+        confirmationFieldLabel: 'Type "{{name}}" to confirm',
+        submitButton: 'Reset connection',
+        title: 'Reset connection',
+        warning:
+          'This will permanently remove the SSO configuration. Members will no longer be able to sign in with SSO.',
+      },
+      statusSection: {
+        activeBadge: 'Active',
+        inactiveBadge: 'Inactive',
+        title: 'SSO Status',
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle:
         'Contact your organization administrator in order to have permissions to manage enterprise connections.',
