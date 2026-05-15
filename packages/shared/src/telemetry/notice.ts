@@ -40,8 +40,14 @@ const CI_ENV_VARS = [
   'CODEBUILD_BUILD_ID',
 ];
 
-function isNodeRuntime(): boolean {
-  return typeof window === 'undefined' && typeof process !== 'undefined' && Boolean(process.versions?.node);
+function isServerRuntime(): boolean {
+  // Skip in browsers.
+  if (typeof window !== 'undefined') return false;
+  // Skip in Next.js Edge Runtime, which exposes a global `EdgeRuntime` marker. We detect via
+  // this marker (rather than checking `process.versions`) because the Edge Runtime build-time
+  // analyzer flags any reachable read of `process.versions` even when it sits behind a guard.
+  if (typeof (globalThis as { EdgeRuntime?: string }).EdgeRuntime !== 'undefined') return false;
+  return true;
 }
 
 function isCI(): boolean {
@@ -79,15 +85,15 @@ export type MaybeShowTelemetryNoticeOptions = {
 };
 
 /**
- * Display the one-time telemetry disclosure on Node if it has not already been shown
- * in this process. Browser callers are silently skipped. Never throws.
+ * Display the one-time telemetry disclosure on server runtimes if it has not already been
+ * shown in this process. Browser and Edge Runtime callers are silently skipped. Never throws.
  */
 export function maybeShowTelemetryNotice(options: MaybeShowTelemetryNoticeOptions = {}): void {
   if (options.skip) {
     return;
   }
   try {
-    if (!isNodeRuntime()) {
+    if (!isServerRuntime()) {
       return;
     }
     if (isCI()) {
