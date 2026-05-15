@@ -115,7 +115,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       }
     }
 
-    const requestState = await clerkClient(event, options).authenticateRequest(clerkRequest, {
+    const requestState = await clerkClient(event).authenticateRequest(clerkRequest, {
       ...options,
       acceptsToken: 'any',
     });

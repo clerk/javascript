@@ -106,5 +106,6 @@ export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
 
     // @ts-expect-error Inject auth so getAuth can read it
     fastifyRequest.auth = requestState.toAuth();
+    fastifyRequest.clerk = clerkClient;
   };
 };

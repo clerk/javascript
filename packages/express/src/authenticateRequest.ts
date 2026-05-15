@@ -112,26 +112,21 @@ const absoluteProxyUrl = (relativeOrAbsoluteUrl: string, baseUrl: string): strin
   return new URL(relativeOrAbsoluteUrl, baseUrl).toString();
 };
 
-// Some options are pinned at client construction time inside `@clerk/backend`'s
-// `createAuthenticateRequest` factory, including the API client used for nonce
-// handshake payload exchange. The default singleton in `./clerkClient` is built
+// `apiUrl` and `apiVersion` are pinned at client construction time inside
+// `@clerk/backend`'s `createAuthenticateRequest` factory (build-time values
+// override runtime ones). The default singleton in `./clerkClient` is built
 // from env only, so passing these via `clerkMiddleware()` would be silently
-// ignored. When the caller hasn't supplied their own `clerkClient` but did pass
-// client construction options, build a per-middleware client with those values.
+// ignored. When the caller hasn't supplied their own `clerkClient` but did
+// pass `apiUrl`/`apiVersion`, build a per-middleware client with those values.
 const resolveDefaultClerkClient = (options: ClerkMiddlewareOptions) => {
-  const { apiUrl, apiVersion, secretKey, machineSecretKey, publishableKey, jwtKey } = options;
-  if (!apiUrl && !apiVersion && !secretKey && !machineSecretKey && !publishableKey && !jwtKey) {
+  if (!options.apiUrl && !options.apiVersion) {
     return defaultClerkClient;
   }
   const env = { ...loadApiEnv(), ...loadClientEnv() };
   return createClerkClient({
     ...env,
-    ...(apiUrl ? { apiUrl } : {}),
-    ...(apiVersion ? { apiVersion } : {}),
-    ...(secretKey ? { secretKey } : {}),
-    ...(machineSecretKey ? { machineSecretKey } : {}),
-    ...(publishableKey ? { publishableKey } : {}),
-    ...(jwtKey ? { jwtKey } : {}),
+    ...(options.apiUrl ? { apiUrl: options.apiUrl } : {}),
+    ...(options.apiVersion ? { apiVersion: options.apiVersion } : {}),
     userAgent: `${PACKAGE_NAME}@${PACKAGE_VERSION}`,
   });
 };

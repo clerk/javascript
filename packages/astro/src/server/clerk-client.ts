@@ -29,6 +29,6 @@ const createClerkClientWithOptions: CreateClerkClientWithOptions = (context, opt
     ...options,
   });
 
-const clerkClient = (context: APIContext, options?: ClerkOptions) => createClerkClientWithOptions(context, options);
+const clerkClient = (context: APIContext) => createClerkClientWithOptions(context);
 
 export { clerkClient };

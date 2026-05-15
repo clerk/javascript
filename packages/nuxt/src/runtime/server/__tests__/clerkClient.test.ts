@@ -90,20 +90,4 @@ describe('clerkClient', () => {
       }),
     );
   });
-
-  it('passes runtime options to createClerkClient', () => {
-    mockRuntimeConfig();
-
-    clerkClient({} as any, {
-      secretKey: 'sk_test_runtime',
-      publishableKey: 'pk_test_runtime',
-    });
-
-    expect(createClerkClientMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        secretKey: 'sk_test_runtime',
-        publishableKey: 'pk_test_runtime',
-      }),
-    );
-  });
 });

@@ -4,22 +4,19 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { clerkPlugin, getAuth } from '../index';
 
-const { authenticateRequestMock, createClerkClientMock } = vi.hoisted(() => {
+const { authenticateRequestMock, createClerkClientMock, mockClerkClient } = vi.hoisted(() => {
   const authenticateRequestMock = vi.fn();
-  const createClerkClientMock = vi.fn(() => {
-    return {
-      authenticateRequest: (...args: any) => authenticateRequestMock(...args),
-    };
-  });
+  const mockClerkClient = { authenticateRequest: (...args: any) => authenticateRequestMock(...args) };
+  const createClerkClientMock = vi.fn(() => mockClerkClient);
 
-  return { authenticateRequestMock, createClerkClientMock };
+  return { authenticateRequestMock, createClerkClientMock, mockClerkClient };
 });
 
 vi.mock('@clerk/backend', async () => {
   const actual = await vi.importActual('@clerk/backend');
   return {
     ...actual,
-    createClerkClient: (...args: any[]) => createClerkClientMock(...args),
+    createClerkClient: createClerkClientMock,
   };
 });
 
@@ -208,6 +205,25 @@ describe('withClerkMiddleware(options)', () => {
 
     expect(response.statusCode).toEqual(200);
     expect(response.body).toEqual(JSON.stringify({ auth: { tokenType: 'session_token' } }));
+  });
+
+  test('exposes the clerk client instance on request.clerk', async () => {
+    authenticateRequestMock.mockResolvedValueOnce({
+      headers: new Headers(),
+      toAuth: () => ({ tokenType: 'session_token' }),
+    });
+    const fastify = Fastify();
+    await fastify.register(clerkPlugin);
+
+    let clerkOnRequest: unknown;
+    fastify.get('/', (request: FastifyRequest, reply: FastifyReply) => {
+      clerkOnRequest = request.clerk;
+      reply.send({});
+    });
+
+    await fastify.inject({ method: 'GET', path: '/' });
+
+    expect(clerkOnRequest).toBe(mockClerkClient);
   });
 
   test('handles signout case by populating the req.auth', async () => {
