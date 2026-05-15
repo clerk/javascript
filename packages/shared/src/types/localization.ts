@@ -192,6 +192,10 @@ export type __internal_LocalizationResource = {
     reSubscribe: LocalizationValue;
     seats: LocalizationValue;
     seatsWithLimit: LocalizationValue<'limit'>;
+    seatBreakdownSingular: LocalizationValue<'rate'>;
+    seatBreakdownPlural: LocalizationValue<'chargeable' | 'rate'>;
+    seatBreakdownIncludedSingular: LocalizationValue<'used' | 'included' | 'rate'>;
+    seatBreakdownIncludedPlural: LocalizationValue<'used' | 'included' | 'chargeable' | 'rate'>;
     subscribe: LocalizationValue;
     startFreeTrial: LocalizationValue;
     startFreeTrial__days: LocalizationValue<'days'>;

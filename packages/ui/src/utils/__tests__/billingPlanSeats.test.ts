@@ -86,7 +86,7 @@ describe('summarizeSeatCharges', () => {
     };
     const summary = summarizeSeatCharges(seats);
     expect(summary).not.toBeNull();
-    expect(summary!.used).toBe(5);
+    expect(summary!.totalSeats).toBe(5);
     expect(summary!.included).toBe(0);
     expect(summary!.paidTier.feePerBlock.amount).toBe(500);
     expect(summary!.paidTier.total.amount).toBe(2500);
@@ -103,7 +103,7 @@ describe('summarizeSeatCharges', () => {
     };
     const summary = summarizeSeatCharges(seats);
     expect(summary).not.toBeNull();
-    expect(summary!.used).toBe(5);
+    expect(summary!.totalSeats).toBe(5);
     expect(summary!.included).toBe(3);
     expect(summary!.paidTier.feePerBlock.amount).toBe(500);
     expect(summary!.paidTier.total.amount).toBe(1000);
@@ -117,7 +117,7 @@ describe('summarizeSeatCharges', () => {
     };
     const summary = summarizeSeatCharges(seats);
     expect(summary).not.toBeNull();
-    expect(summary!.used).toBe(0);
+    expect(summary!.totalSeats).toBe(0);
     expect(summary!.included).toBe(0);
   });
 });

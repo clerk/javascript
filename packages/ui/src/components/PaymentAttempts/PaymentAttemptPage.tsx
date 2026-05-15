@@ -213,7 +213,7 @@ function PaymentAttemptBody({ paymentAttempt }: { paymentAttempt: BillingPayment
 
   const seatsTotal = subscriptionItem.seats != null ? getSeatsPerUnitTotal(paymentAttempt.totals) : undefined;
   const seatSummary = summarizeSeatCharges(seatsTotal);
-  const seatsChargeable = seatSummary ? seatSummary.used - seatSummary.included : 0;
+  const seatsChargeable = seatSummary ? seatSummary.totalSeats - seatSummary.included : 0;
   const planSeatLimit = getPlanSeatLimit(subscriptionItem.plan);
 
   return (
@@ -240,11 +240,25 @@ function PaymentAttemptBody({ paymentAttempt }: { paymentAttempt: BillingPayment
                   : localizationKeys('billing.seats')
               }
               description={(() => {
-                const seatLabel = `${seatsChargeable} ${seatsChargeable === 1 ? 'seat' : 'seats'}`;
-                const rate = `${seatSummary.paidTier.feePerBlock.currencySymbol}${seatSummary.paidTier.feePerBlock.amountFormatted}/mo`;
-                return seatSummary.included > 0
-                  ? `${seatSummary.used} used − ${seatSummary.included} included → ${seatLabel} at ${rate}`
-                  : `${seatLabel} at ${rate}`;
+                const rate = `${seatSummary.paidTier.feePerBlock.currencySymbol}${seatSummary.paidTier.feePerBlock.amountFormatted}`;
+                const isSingular = seatsChargeable === 1;
+                if (seatSummary.included > 0) {
+                  return isSingular
+                    ? localizationKeys('billing.seatBreakdownIncludedSingular', {
+                        used: seatSummary.totalSeats,
+                        included: seatSummary.included,
+                        rate,
+                      })
+                    : localizationKeys('billing.seatBreakdownIncludedPlural', {
+                        used: seatSummary.totalSeats,
+                        included: seatSummary.included,
+                        chargeable: seatsChargeable,
+                        rate,
+                      });
+                }
+                return isSingular
+                  ? localizationKeys('billing.seatBreakdownSingular', { rate })
+                  : localizationKeys('billing.seatBreakdownPlural', { chargeable: seatsChargeable, rate });
               })()}
             />
             <LineItems.Description

@@ -34,8 +34,13 @@ export const getSeatsPerUnitTotal = (
 };
 
 export type SeatChargeSummary = {
-  /** Sum of `quantity` across all tiers (paid + included). */
-  used: number;
+  /**
+   * Sum of `quantity` across all tiers (paid + included) — the seats accounted for in this
+   * breakdown. In every case where this helper returns a non-null summary, the backend guarantees
+   * `totalSeats` equals the org's occupied seat count (right-sizing only inflates counts when
+   * occupancy is entirely within a free tier, which is a case this helper short-circuits on).
+   */
+  totalSeats: number;
   /** Sum of `quantity` across $0 (included) tiers. `0` when the plan has no included seats. */
   included: number;
   /** The first tier with `feePerBlock > 0`. Used for the rate and total. */
@@ -49,24 +54,22 @@ export type SeatChargeSummary = {
  * per-seat pricing at all (only a seat limit), or because the org's occupied seats fall entirely
  * within the included tier (right-sized by the backend so the only tier carries `feePerBlock = $0`).
  *
- * Returns `{ used, included, paidTier }` otherwise. `used` is the actual occupied seat count when a
- * paid tier is present, because the backend right-sizes only when occupancy is entirely in the free
- * tier; once a paid tier is crossed, tier quantities reflect real occupancy.
+ * Returns `{ totalSeats, included, paidTier }` otherwise.
  */
 export const summarizeSeatCharges = (seatsTotal: BillingPerUnitTotal | null | undefined): SeatChargeSummary | null => {
   if (!seatsTotal) return null;
   const paidTier = seatsTotal.tiers.find(tier => tier.feePerBlock.amount > 0);
   if (!paidTier) return null;
-  let used = 0;
+  let totalSeats = 0;
   let included = 0;
   for (const tier of seatsTotal.tiers) {
     if (tier.quantity === null) continue;
-    used += tier.quantity;
+    totalSeats += tier.quantity;
     if (tier.feePerBlock.amount === 0) {
       included += tier.quantity;
     }
   }
-  return { used, included, paidTier };
+  return { totalSeats, included, paidTier };
 };
 
 /**
