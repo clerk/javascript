@@ -117,7 +117,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
       }
     }
 
-    const requestState = await clerkClient(context).authenticateRequest(
+    const requestState = await clerkClient(context, keylessOptions).authenticateRequest(
       clerkRequest,
       createAuthenticateRequestOptions(clerkRequest, keylessOptions, context),
     );

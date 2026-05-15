@@ -43,7 +43,7 @@ export const clerkMiddleware = (
       loadedOptions.secretKey = secretKey;
     }
 
-    const requestState = await clerkClient().authenticateRequest(clerkRequest, {
+    const requestState = await clerkClient(loadedOptions).authenticateRequest(clerkRequest, {
       ...loadedOptions,
       acceptsToken: 'any',
     });

@@ -62,6 +62,13 @@ describe('clerkMiddleware', () => {
 
     const result = await middleware(args, mockNext);
 
+    expect(mockClerkClient).toHaveBeenCalledWith(
+      args,
+      expect.objectContaining({
+        secretKey: 'sk_test_...',
+        publishableKey: 'pk_test_...',
+      }),
+    );
     expect(mockAuthenticateRequest).toHaveBeenCalledWith(expect.any(Object), {
       apiUrl: undefined,
       secretKey: 'sk_test_...',

@@ -4,17 +4,22 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { clerkPlugin, getAuth } from '../index';
 
-const authenticateRequestMock = vi.fn();
+const { authenticateRequestMock, createClerkClientMock } = vi.hoisted(() => {
+  const authenticateRequestMock = vi.fn();
+  const createClerkClientMock = vi.fn(() => {
+    return {
+      authenticateRequest: (...args: any) => authenticateRequestMock(...args),
+    };
+  });
+
+  return { authenticateRequestMock, createClerkClientMock };
+});
 
 vi.mock('@clerk/backend', async () => {
   const actual = await vi.importActual('@clerk/backend');
   return {
     ...actual,
-    createClerkClient: () => {
-      return {
-        authenticateRequest: (...args: any) => authenticateRequestMock(...args),
-      };
-    },
+    createClerkClient: (...args: any[]) => createClerkClientMock(...args),
   };
 });
 
@@ -22,6 +27,38 @@ describe('withClerkMiddleware(options)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.restoreAllMocks();
+  });
+
+  test('creates the request client with plugin runtime keys', async () => {
+    authenticateRequestMock.mockResolvedValueOnce({
+      headers: new Headers(),
+      toAuth: () => ({
+        tokenType: 'session_token',
+      }),
+    });
+    const fastify = Fastify();
+    await fastify.register(clerkPlugin, {
+      secretKey: 'runtime_secret_key',
+      publishableKey: 'runtime_publishable_key',
+    });
+
+    fastify.get('/', (request: FastifyRequest, reply: FastifyReply) => {
+      const auth = getAuth(request);
+      reply.send({ auth });
+    });
+
+    const response = await fastify.inject({
+      method: 'GET',
+      path: '/',
+    });
+
+    expect(response.statusCode).toEqual(200);
+    expect(createClerkClientMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        secretKey: 'runtime_secret_key',
+        publishableKey: 'runtime_publishable_key',
+      }),
+    );
   });
 
   test('handles signin with Authorization Bearer', async () => {

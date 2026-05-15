@@ -1,3 +1,4 @@
+import type { ClerkOptions } from '@clerk/backend';
 import { createClerkClient } from '@clerk/backend';
 import { apiUrlFromPublishableKey } from '@clerk/shared/apiUrlFromPublishableKey';
 import { deprecated } from '@clerk/shared/deprecated';
@@ -28,7 +29,7 @@ function resolveApiVersion(runtimeConfig: ReturnType<typeof useRuntimeConfig>): 
   return 'v1';
 }
 
-export function clerkClient(event: H3Event) {
+export function clerkClient(event: H3Event, options?: ClerkOptions) {
   const runtimeConfig = useRuntimeConfig(event);
 
   return createClerkClient({
@@ -51,5 +52,6 @@ export function clerkClient(event: H3Event) {
       version: PACKAGE_VERSION,
       environment: process.env.NODE_ENV,
     },
+    ...options,
   });
 }

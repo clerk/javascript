@@ -216,7 +216,7 @@ describe('clerkMiddleware', () => {
     expect(forwarded).not.toHaveProperty('frontendApiProxy');
   });
 
-  describe('apiUrl/apiVersion default-client construction', () => {
+  describe('default-client construction overrides', () => {
     beforeEach(() => {
       mockCreateClerkClient.mockClear();
     });
@@ -243,8 +243,22 @@ describe('clerkMiddleware', () => {
       expect(mockCreateClerkClient).toHaveBeenCalledWith(expect.objectContaining({ apiVersion: 'v2' }));
     });
 
-    it('does not call createClerkClient at construction when apiUrl/apiVersion are not set', () => {
-      authenticateAndDecorateRequest({ secretKey: 'sk_test_....' });
+    it('builds a per-middleware ClerkClient with runtime keys when no custom clerkClient is supplied', () => {
+      authenticateAndDecorateRequest({
+        secretKey: 'sk_test_runtime',
+        publishableKey: 'pk_test_runtime',
+      });
+
+      expect(mockCreateClerkClient).toHaveBeenCalledWith(
+        expect.objectContaining({
+          secretKey: 'sk_test_runtime',
+          publishableKey: 'pk_test_runtime',
+        }),
+      );
+    });
+
+    it('does not call createClerkClient at construction when client construction overrides are not set', () => {
+      authenticateAndDecorateRequest({});
 
       expect(mockCreateClerkClient).not.toHaveBeenCalled();
     });
