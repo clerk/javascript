@@ -379,9 +379,9 @@ export const enUS: LocalizationResource = {
         },
       },
       samlOkta: {
-        title: 'Configure Okta Workforce',
-        subtitle: 'Create a new enterprise application in your Okta Dashboard',
+        headerTitle: 'Configure Okta Workforce',
         createApp: {
+          headerSubtitle: 'Create a new enterprise application in your Okta Dashboard',
           title: 'Create a new enterprise application in Okta',
           step1: 'Sign in to Okta and go to <bold>Admin → Applications.</bold>',
           step2: 'Click <bold>Create App Integration.</bold>',
@@ -402,6 +402,7 @@ export const enUS: LocalizationResource = {
           step2: 'Complete the form with any comments and select <bold>Finish</bold>.',
         },
         configureAttributes: {
+          headerSubtitle: 'Map users attributes from Okta to Clerk',
           step1: 'In the Okta dashboard, find the <bold>Attribute Statements</bold> section.',
           step2:
             'Select <bold>Add Expression</bold> for each attribute, and enter the following name and expression pairs:',
@@ -422,6 +423,7 @@ export const enUS: LocalizationResource = {
           },
         },
         assignUsers: {
+          headerSubtitle: 'Assign users to the enterprise app',
           title: 'Assign selected user or group in Okta',
           paragraph: 'You need to assign users or groups to your enterprise app before they can use it to sign in.',
           step1: 'In the Okta dashboard, select the <bold>Assignments</bold> tab.',
@@ -432,6 +434,7 @@ export const enUS: LocalizationResource = {
           step5: 'Select the <bold>Done</bold> button to complete the assignment.',
         },
         metadataUrl: {
+          headerSubtitle: 'Configure identity provider metadata',
           label: 'Metadata URL',
           placeholder: 'Paste URL here...',
           description: 'In your Okta SAML app, go to the Sign On tab and retrieve the metadata URL. Paste it below.',

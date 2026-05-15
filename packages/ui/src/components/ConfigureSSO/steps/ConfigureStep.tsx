@@ -44,26 +44,47 @@ export const ConfigureStep = (): JSX.Element => {
         elementId={descriptors.configureSSOStep.setId('configure')}
       >
         <Wizard>
-          <Step.Header
-            title={localizationKeys('configureSSO.configureStep.samlOkta.title')}
-            description={localizationKeys('configureSSO.configureStep.samlOkta.subtitle')}
-          >
-            <InnerStepCounter />
-          </Step.Header>
-
           <Wizard.Step id='create-app'>
+            <Step.Header
+              title={localizationKeys('configureSSO.configureStep.samlOkta.headerTitle')}
+              description={localizationKeys('configureSSO.configureStep.samlOkta.createApp.headerSubtitle')}
+            >
+              <InnerStepCounter />
+            </Step.Header>
+
             <CreateAppSubStep />
           </Wizard.Step>
 
           <Wizard.Step id='configure-attributes'>
+            <Step.Header
+              title={localizationKeys('configureSSO.configureStep.samlOkta.headerTitle')}
+              description={localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.headerSubtitle')}
+            >
+              <InnerStepCounter />
+            </Step.Header>
+
             <ConfigureAttributesSubStep />
           </Wizard.Step>
 
           <Wizard.Step id='assign-users'>
+            <Step.Header
+              title={localizationKeys('configureSSO.configureStep.samlOkta.headerTitle')}
+              description={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.headerSubtitle')}
+            >
+              <InnerStepCounter />
+            </Step.Header>
+
             <AssignUsersSubStep />
           </Wizard.Step>
 
           <Wizard.Step id='submit-saml-config'>
+            <Step.Header
+              title={localizationKeys('configureSSO.configureStep.samlOkta.headerTitle')}
+              description={localizationKeys('configureSSO.configureStep.samlOkta.metadataUrl.headerSubtitle')}
+            >
+              <InnerStepCounter />
+            </Step.Header>
+
             <SubmitSamlConfigSubStep />
           </Wizard.Step>
         </Wizard>
