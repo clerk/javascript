@@ -288,11 +288,11 @@ export const enUS: LocalizationResource = {
         subtitle: 'Create a new enterprise application in your Okta Dashboard',
         createApp: {
           title: 'Create a new enterprise application in Okta',
-          step1: 'Sign in to Okta and go to Admin → Applications.',
-          step2: 'Click Create App Integration.',
-          step3: 'Select SAML 2.0.',
+          step1: 'Sign in to Okta and go to <bold>Admin → Applications.</bold>',
+          step2: 'Click <bold>Create App Integration.</bold>',
+          step3: 'Select <bold>SAML 2.0.</bold>',
           step4: 'Fill in the General Settings (App name is required).',
-          step5: 'Click Next to complete creating the application.',
+          step5: 'Click <bold>Next</bold> to complete creating the application.',
         },
         serviceProvider: {
           title: 'Configure service provider',
@@ -303,12 +303,13 @@ export const enUS: LocalizationResource = {
         },
         completeSamlIntegration: {
           title: 'Complete SAML integration',
-          step1: 'Select This is an internal app that we have created from the options menu.',
-          step2: 'Complete the form with any comments and select "Finish".',
+          step1: 'Select <bold>This is an internal app</bold> that we have created from the options menu.',
+          step2: 'Complete the form with any comments and select <bold>Finish</bold>.',
         },
         configureAttributes: {
-          step1: 'In the Okta dashboard, find the Attribute Statements section.',
-          step2: 'Select Add Expression for each attribute, and enter the following name and expression pairs:',
+          step1: 'In the Okta dashboard, find the <bold>Attribute Statements</bold> section.',
+          step2:
+            'Select <bold>Add Expression</bold> for each attribute, and enter the following name and expression pairs:',
           pairs: {
             conjunction: ' and ',
             email: {
@@ -328,16 +329,43 @@ export const enUS: LocalizationResource = {
         assignUsers: {
           title: 'Assign selected user or group in Okta',
           paragraph: 'You need to assign users or groups to your enterprise app before they can use it to sign in.',
-          step1: 'In the Okta dashboard, select the Assignments tab.',
-          step2: 'Select the Assign dropdown. You can either select Assign to people or Assign to groups.',
+          step1: 'In the Okta dashboard, select the <bold>Assignments</bold> tab.',
+          step2:
+            'Select the <bold>Assign</bold> dropdown. You can either select <bold>Assign to people</bold> or <bold>Assign to groups</bold>.',
           step3: 'In the search field, enter the user or group of users that you want to assign to the application.',
-          step4: 'Select the Assign button next to the user or group that you want to assign.',
-          step5: 'Select the Done button to complete the assignment.',
+          step4: 'Select the <bold>Assign</bold> button next to the user or group that you want to assign.',
+          step5: 'Select the <bold>Done</bold> button to complete the assignment.',
         },
         metadataUrl: {
           label: 'Metadata URL',
           placeholder: 'Paste URL here...',
           description: 'In your Okta SAML app, go to the Sign On tab and retrieve the metadata URL. Paste it below.',
+        },
+        modes: {
+          ariaLabel: 'Configuration mode',
+          metadataUrl: 'Add via metadata',
+          manual: 'Configure manually',
+        },
+        submitSamlConfig: {
+          title: 'Fill in your Okta SAML application details',
+        },
+        manual: {
+          description: 'In your Okta SAML app, go to the Sign On tab and retrieve these values.',
+          signOnUrl: {
+            label: 'Sign on URL',
+            placeholder: 'Paste URL here...',
+          },
+          issuer: {
+            label: 'Issuer',
+            placeholder: 'Paste URL here...',
+          },
+          signingCertificate: {
+            label: 'Signing certificate',
+            uploadFile: 'Upload file',
+            replaceFile: 'Replace file',
+            removeFile: 'Remove file',
+            fileUploaded: 'File uploaded',
+          },
         },
       },
     },

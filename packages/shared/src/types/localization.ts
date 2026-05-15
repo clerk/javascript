@@ -1427,6 +1427,32 @@ export type __internal_LocalizationResource = {
           placeholder: LocalizationValue;
           description: LocalizationValue;
         };
+        modes: {
+          ariaLabel: LocalizationValue;
+          metadataUrl: LocalizationValue;
+          manual: LocalizationValue;
+        };
+        submitSamlConfig: {
+          title: LocalizationValue;
+        };
+        manual: {
+          description: LocalizationValue;
+          signOnUrl: {
+            label: LocalizationValue;
+            placeholder: LocalizationValue;
+          };
+          issuer: {
+            label: LocalizationValue;
+            placeholder: LocalizationValue;
+          };
+          signingCertificate: {
+            label: LocalizationValue;
+            uploadFile: LocalizationValue;
+            replaceFile: LocalizationValue;
+            removeFile: LocalizationValue;
+            fileUploaded: LocalizationValue;
+          };
+        };
       };
     };
   };

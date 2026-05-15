@@ -26,7 +26,10 @@ export type FieldId =
   | 'apiKeyExpirationDate'
   | 'apiKeyRevokeConfirmation'
   | 'apiKeySecret'
+  | 'idpCertificate'
+  | 'idpEntityId'
   | 'idpMetadataUrl'
+  | 'idpSsoUrl'
   | 'acsUrl'
   | 'spEntityId'
   | 'web3WalletName';
