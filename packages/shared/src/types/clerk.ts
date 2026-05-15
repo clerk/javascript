@@ -933,7 +933,7 @@ export interface Clerk {
   buildAfterSignInUrl({ params }?: { params?: URLSearchParams }): string;
 
   /**
-   * Returns the configured `afterSignInUrl` of the instance.
+   * Returns the configured `afterSignUpUrl` of the instance.
    * @param params - Optional query parameters to append to the URL.
    */
   buildAfterSignUpUrl({ params }?: { params?: URLSearchParams }): string;

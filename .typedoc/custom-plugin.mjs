@@ -120,6 +120,7 @@ const LINK_REPLACEMENTS = [
   ['checkout-flow-resource', '/docs/reference/hooks/use-checkout#checkout-flow-resource'],
   ['organization-creation-defaults-resource', '#organization-creation-defaults-resource'],
   ['billing-namespace', '/docs/reference/objects/billing'],
+  ['api-keys-namespace', '/docs/reference/objects/api-keys'],
   ['client-resource', '/docs/reference/objects/client'],
   ['redirect-options', '/docs/reference/types/redirect-options'],
   ['handle-o-auth-callback-params', '/docs/reference/types/handle-o-auth-callback-params'],
