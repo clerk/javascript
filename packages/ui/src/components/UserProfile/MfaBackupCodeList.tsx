@@ -131,7 +131,7 @@ export const MfaBackupCodeList = (props: MfaBackupCodeListProps) => {
           </Button>
           <Button
             variant='ghost'
-            onClick={onCopy}
+            onClick={() => onCopy()}
             sx={t => ({ width: '100%', padding: `${t.space.$2} 0`, borderRadius: 0 })}
           >
             <Icon icon={hasCopied ? Check : Copy} />

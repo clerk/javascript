@@ -732,7 +732,7 @@ const CopyTestUrlButton = ({ onTestRunCreated }: CopyTestUrlButtonProps): JSX.El
       .createEnterpriseConnectionTestRun(enterpriseConnection.id)
       .then(({ url }) => {
         setTestUrl(url);
-        onCopy();
+        onCopy(url);
         onTestRunCreated?.(url);
       })
       .catch(err => handleError(err as Error, [], card.setError))
