@@ -42,11 +42,15 @@ const CI_ENV_VARS = [
 
 function isServerRuntime(): boolean {
   // Skip in browsers.
-  if (typeof window !== 'undefined') return false;
+  if (typeof window !== 'undefined') {
+    return false;
+  }
   // Skip in Next.js Edge Runtime, which exposes a global `EdgeRuntime` marker. We detect via
   // this marker (rather than checking `process.versions`) because the Edge Runtime build-time
   // analyzer flags any reachable read of `process.versions` even when it sits behind a guard.
-  if (typeof (globalThis as { EdgeRuntime?: string }).EdgeRuntime !== 'undefined') return false;
+  if (typeof (globalThis as { EdgeRuntime?: string }).EdgeRuntime !== 'undefined') {
+    return false;
+  }
   return true;
 }
 
