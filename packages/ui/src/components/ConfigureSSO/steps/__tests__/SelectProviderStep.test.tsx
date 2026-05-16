@@ -1,3 +1,4 @@
+import { ClerkRuntimeError } from '@clerk/shared/error';
 import type { ReactElement } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -7,6 +8,7 @@ import { CardStateProvider } from '@/ui/elements/contexts';
 
 const goNext = vi.fn();
 const goPrev = vi.fn();
+const goToStep = vi.fn();
 
 vi.mock('../../elements/Wizard', () => ({
   useWizard: () => ({
@@ -19,22 +21,41 @@ vi.mock('../../elements/Wizard', () => ({
     isNested: false,
     goNext,
     goPrev,
-    goToStep: vi.fn(),
+    goToStep,
     registerStep: vi.fn(),
     unregisterStep: vi.fn(),
   }),
 }));
 
 const setProvider = vi.fn();
+const createEnterpriseConnection = vi.fn();
 
 vi.mock('../../ConfigureSSOContext', () => ({
   useConfigureSSO: () => ({
     enterpriseConnection: undefined,
     provider: undefined,
     setProvider,
+    createEnterpriseConnection,
     initialStepId: 'select-provider',
   }),
 }));
+
+vi.mock('@clerk/shared/react/index', async importOriginal => {
+  const actual = await importOriginal<typeof import('@clerk/shared/react/index')>();
+  return {
+    ...actual,
+    useUser: () => ({
+      user: {
+        primaryEmailAddress: {
+          emailAddress: 'test@clerk.com',
+          verification: { status: 'verified' },
+        },
+      },
+      isLoaded: true,
+      isSignedIn: true,
+    }),
+  };
+});
 
 import { SelectProviderStep } from '../SelectProviderStep';
 
@@ -50,7 +71,10 @@ const renderStep = (
 const resetMocks = () => {
   goNext.mockReset();
   goPrev.mockReset();
+  goToStep.mockReset();
   setProvider.mockReset();
+  createEnterpriseConnection.mockReset();
+  createEnterpriseConnection.mockResolvedValue(undefined);
 };
 
 describe('SelectProviderStep', () => {
@@ -137,8 +161,11 @@ describe('SelectProviderStep', () => {
     setProvider.mockImplementation(() => {
       callOrder.push('setProvider');
     });
-    goNext.mockImplementation(() => {
-      callOrder.push('goNext');
+    createEnterpriseConnection.mockImplementation(async () => {
+      callOrder.push('createEnterpriseConnection');
+    });
+    goToStep.mockImplementation(() => {
+      callOrder.push('goToStep');
     });
 
     const { wrapper } = await createFixtures();
@@ -148,11 +175,12 @@ describe('SelectProviderStep', () => {
     await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
 
     await waitFor(() => {
-      expect(goNext).toHaveBeenCalledTimes(1);
+      expect(goToStep).toHaveBeenCalledWith('configure');
     });
 
     expect(setProvider).toHaveBeenCalledWith('saml_okta');
-    expect(callOrder).toEqual(['setProvider', 'goNext']);
+    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta');
+    expect(callOrder).toEqual(['setProvider', 'createEnterpriseConnection', 'goToStep']);
   });
 
   it('forwards the Custom SAML backend provider id when selected', async () => {
@@ -164,10 +192,32 @@ describe('SelectProviderStep', () => {
     await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
 
     await waitFor(() => {
-      expect(goNext).toHaveBeenCalledTimes(1);
+      expect(goToStep).toHaveBeenCalledWith('configure');
     });
 
     expect(setProvider).toHaveBeenCalledWith('saml_custom');
+    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_custom');
+  });
+
+  it('does not advance when failing to create enterprise connection', async () => {
+    resetMocks();
+    createEnterpriseConnection.mockRejectedValue(
+      new ClerkRuntimeError('failed to create enterprise connection', {
+        code: 'enterprise_connection_creation_failed',
+      }),
+    );
+
+    const { wrapper } = await createFixtures();
+    const { userEvent } = renderStep(wrapper);
+
+    await userEvent.click(screen.getByRole('radio', { name: 'Okta Workforce' }));
+    await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
+
+    await waitFor(() => {
+      expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta');
+    });
+
+    expect(goToStep).not.toHaveBeenCalled();
   });
 
   it('disables Previous on the first step', async () => {
