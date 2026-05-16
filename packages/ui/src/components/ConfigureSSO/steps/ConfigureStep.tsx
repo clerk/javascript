@@ -1,4 +1,4 @@
-import { __internal_useUserEnterpriseConnections, useReverification } from '@clerk/shared/react';
+import { useReverification } from '@clerk/shared/react';
 import type { FieldId, UpdateMeEnterpriseConnectionParams } from '@clerk/shared/types';
 import React, { type JSX } from 'react';
 
@@ -599,8 +599,7 @@ export const SubmitSamlConfigSubStep = (): JSX.Element => {
   const card = useCardState();
   const { t } = useLocalizations();
   const { goNext, goPrev, isFirstStep } = useWizard();
-  const { enterpriseConnection } = useConfigureSSO();
-  const { updateEnterpriseConnection } = __internal_useUserEnterpriseConnections();
+  const { enterpriseConnection, updateEnterpriseConnection } = useConfigureSSO();
   const { key } = useConfigureStepTranslations();
 
   const samlConnection = enterpriseConnection?.samlConnection;

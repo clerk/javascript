@@ -1,5 +1,9 @@
-import { __internal_useUserEnterpriseConnections, useSession } from '@clerk/shared/react';
-import type { __experimental_ConfigureSSOProps } from '@clerk/shared/types';
+import {
+  __internal_useEnterpriseConnectionTestRuns,
+  __internal_useUserEnterpriseConnections,
+  useSession,
+} from '@clerk/shared/react';
+import type { __experimental_ConfigureSSOProps, EnterpriseConnectionResource } from '@clerk/shared/types';
 import React from 'react';
 
 import { useProtect } from '@/common';
@@ -64,19 +68,31 @@ const AuthenticatedContent = withCoreUserGuard(() => {
 });
 
 const ConfigureSSOCardContent = ({ contentRef }: { contentRef: React.RefObject<HTMLDivElement> }) => {
-  const { data: enterpriseConnections, isLoading } = __internal_useUserEnterpriseConnections({ enabled: true });
-
+  const {
+    data: enterpriseConnections,
+    isLoading: isLoadingEnterpriseConnections,
+    createEnterpriseConnection,
+    updateEnterpriseConnection,
+    deleteEnterpriseConnection,
+  } = __internal_useUserEnterpriseConnections({ enabled: true });
   // Currently FAPI only supports one enterprise connection per user
   const enterpriseConnection = enterpriseConnections?.[0];
 
+  const { hasSuccessfulTestRun, isLoading: isLoadingTestRuns } = useHasSuccessfulTestRun(enterpriseConnection);
+
+  const isLoading = isLoadingEnterpriseConnections || isLoadingTestRuns;
   if (isLoading && !enterpriseConnection) {
     return <ConfigureSSOSkeleton />;
   }
 
   return (
     <ConfigureSSOProvider
+      hasSuccessfulTestRun={hasSuccessfulTestRun}
       enterpriseConnection={enterpriseConnection}
       contentRef={contentRef}
+      createEnterpriseConnection={createEnterpriseConnection}
+      updateEnterpriseConnection={updateEnterpriseConnection}
+      deleteEnterpriseConnection={deleteEnterpriseConnection}
     >
       <ConfigureSSOSteps />
     </ConfigureSSOProvider>
@@ -182,6 +198,23 @@ const MissingManageEnterpriseConnectionsPermission = () => (
     <ProfileCardFooter />
   </>
 );
+
+/**
+ * Fetches a single successful test run for the given connection on mount
+ */
+const useHasSuccessfulTestRun = (
+  enterpriseConnection: EnterpriseConnectionResource | undefined,
+): { hasSuccessfulTestRun: boolean; isLoading: boolean } => {
+  const { data: successfulTestRuns, isLoading } = __internal_useEnterpriseConnectionTestRuns({
+    enterpriseConnectionId: enterpriseConnection?.id ?? null,
+    params: { initialPage: 1, pageSize: 1, status: ['success'] },
+  });
+
+  return {
+    hasSuccessfulTestRun: (successfulTestRuns?.length ?? 0) > 0,
+    isLoading,
+  };
+};
 
 export const ConfigureSSO: React.ComponentType<__experimental_ConfigureSSOProps> =
   withCardStateProvider(ConfigureSSOInternal);
