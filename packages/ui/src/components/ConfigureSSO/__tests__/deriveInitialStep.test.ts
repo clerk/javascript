@@ -1,4 +1,4 @@
-import type { EnterpriseConnectionResource } from '@clerk/shared/types';
+import type { EnterpriseConnectionResource, SamlAccountConnectionResource } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
 import { deriveInitialStep } from '../deriveInitialStep';
@@ -25,65 +25,83 @@ const makeConnection = (overrides: Partial<EnterpriseConnectionResource> = {}): 
     ...overrides,
   }) as EnterpriseConnectionResource;
 
+const makeSamlConnection = (overrides: Partial<SamlAccountConnectionResource> = {}): SamlAccountConnectionResource =>
+  ({
+    id: 'saml_1',
+    name: 'acme.com',
+    active: false,
+    idpEntityId: '',
+    idpSsoUrl: '',
+    idpCertificate: '',
+    idpMetadataUrl: '',
+    idpMetadata: '',
+    acsUrl: 'https://clerk.example.com/acs',
+    spEntityId: 'https://clerk.example.com',
+    spMetadataUrl: 'https://clerk.example.com/sp-metadata',
+    allowSubdomains: false,
+    allowIdpInitiated: false,
+    forceAuthn: false,
+    ...overrides,
+  }) as SamlAccountConnectionResource;
+
+const defaultOptions = { isDomainTakenByOtherOrg: false, hasSuccessfulTestRun: false };
+
 describe('deriveInitialStep', () => {
-  const cases: Array<{ name: string; input: EnterpriseConnectionResource | undefined; expected: WizardStepId }> = [
+  const cases: Array<{
+    name: string;
+    input: EnterpriseConnectionResource | undefined;
+    options?: Partial<typeof defaultOptions>;
+    expected: WizardStepId;
+  }> = [
+    {
+      name: 'domain taken by other org → verify-domain',
+      input: makeConnection(),
+      options: { isDomainTakenByOtherOrg: true },
+      expected: 'verify-domain',
+    },
     {
       name: 'no connection → select-provider',
       input: undefined,
       expected: 'select-provider',
     },
     {
-      name: 'connection without samlConnection → configure',
-      input: makeConnection({ samlConnection: null }),
+      name: 'active connection → confirmation',
+      input: makeConnection({ active: true, samlConnection: makeSamlConnection() }),
+      expected: 'confirmation',
+    },
+    {
+      name: 'connection with empty SAML IdP config → configure',
+      input: makeConnection({ samlConnection: makeSamlConnection() }),
       expected: 'configure',
     },
     {
-      name: 'connection with empty samlConnection.idpSsoUrl → configure',
+      name: 'configured connection without successful test run → test',
       input: makeConnection({
-        samlConnection: {
-          id: 'saml_1',
-          name: 'acme.com',
-          active: false,
-          idpEntityId: '',
-          idpSsoUrl: '',
-          idpCertificate: '',
-          idpMetadataUrl: '',
-          idpMetadata: '',
-          acsUrl: 'https://clerk.example.com/acs',
-          spEntityId: 'https://clerk.example.com',
-          spMetadataUrl: 'https://clerk.example.com/sp-metadata',
-          allowSubdomains: false,
-          allowIdpInitiated: false,
-          forceAuthn: false,
-        },
-      }),
-      expected: 'configure',
-    },
-    {
-      name: 'connection with samlConnection.idpSsoUrl populated → confirmation',
-      input: makeConnection({
-        samlConnection: {
-          id: 'saml_1',
-          name: 'acme.com',
-          active: true,
+        samlConnection: makeSamlConnection({
           idpEntityId: 'https://idp.example.com/entity',
           idpSsoUrl: 'https://idp.example.com/sso',
           idpCertificate: 'CERT',
           idpMetadataUrl: 'https://idp.example.com/metadata',
-          idpMetadata: '',
-          acsUrl: 'https://clerk.example.com/acs',
-          spEntityId: 'https://clerk.example.com',
-          spMetadataUrl: 'https://clerk.example.com/sp-metadata',
-          allowSubdomains: false,
-          allowIdpInitiated: false,
-          forceAuthn: false,
-        },
+        }),
       }),
+      expected: 'test',
+    },
+    {
+      name: 'configured connection with successful test run → confirmation',
+      input: makeConnection({
+        samlConnection: makeSamlConnection({
+          idpEntityId: 'https://idp.example.com/entity',
+          idpSsoUrl: 'https://idp.example.com/sso',
+          idpCertificate: 'CERT',
+          idpMetadataUrl: 'https://idp.example.com/metadata',
+        }),
+      }),
+      options: { hasSuccessfulTestRun: true },
       expected: 'confirmation',
     },
   ];
 
-  it.each(cases)('$name', ({ input, expected }) => {
-    expect(deriveInitialStep(input)).toBe(expected);
+  it.each(cases)('$name', ({ input, options, expected }) => {
+    expect(deriveInitialStep(input, { ...defaultOptions, ...options })).toBe(expected);
   });
 });
