@@ -28,6 +28,7 @@ export const VerifyDomainStep = (): JSX.Element => {
   const { session } = useSession();
   const { enterpriseConnection } = useConfigureSSO();
   const { t } = useLocalizations();
+  const { goNext: outerGoNext } = useWizard();
 
   const emailToVerify =
     user?.primaryEmailAddress ?? user?.emailAddresses?.find(e => e.verification.status !== 'verified');
@@ -39,6 +40,8 @@ export const VerifyDomainStep = (): JSX.Element => {
   const isDomainTakenByOtherOrg = Boolean(
     isVerified && enterpriseConnection && enterpriseConnection.organizationId !== activeOrganizationId,
   );
+
+  const wasVerifiedOnMountRef = useRef(isVerified);
 
   if (isDomainTakenByOtherOrg) {
     const conflictingDomain = enterpriseConnection?.domains[0] as string;
@@ -78,6 +81,36 @@ export const VerifyDomainStep = (): JSX.Element => {
               />
             </Col>
           </Col>
+        </Step>
+      </Flow.Part>
+    );
+  }
+
+  if (wasVerifiedOnMountRef.current && emailToVerify?.emailAddress) {
+    return (
+      <Flow.Part part='verifyDomain'>
+        <Step
+          elementDescriptor={descriptors.configureSSOStep}
+          elementId={descriptors.configureSSOStep.setId('verify-domain')}
+        >
+          <Step.Header
+            title={t(localizationKeys('configureSSO.verifyEmailDomainStep.title'))}
+            description={t(localizationKeys('configureSSO.verifyEmailDomainStep.subtitle'))}
+          />
+
+          <Step.Body>
+            <Step.Section
+              sx={{ flex: 1 }}
+              align='center'
+              justify='center'
+            >
+              <EmailAlreadyVerified emailAddress={emailToVerify.emailAddress} />
+            </Step.Section>
+          </Step.Body>
+
+          <Step.Footer>
+            <Step.Footer.Continue onClick={() => outerGoNext()} />
+          </Step.Footer>
         </Step>
       </Flow.Part>
     );
@@ -242,12 +275,10 @@ export const EnterVerificationCodeStep = ({
   const { user } = useUser();
   const { provider, createEnterpriseConnection } = useConfigureSSO();
   const card = useCardState();
-  const codeSubmittedRef = useRef(false);
   const { goNext, goPrev, isFirstStep } = useWizard();
 
   const isVerified = emailToVerify?.verification.status === 'verified';
   const isPrimary = emailToVerify?.id === user?.primaryEmailAddressId;
-  const hasVerifiedEmail = emailToVerify?.emailAddress && isVerified && !codeSubmittedRef.current;
 
   const prepareEmailVerification = useReverification(() =>
     emailToVerify?.prepareVerification({ strategy: 'email_code' }),
@@ -264,7 +295,6 @@ export const EnterVerificationCodeStep = ({
 
   const otp = useFieldOTP({
     onCodeEntryFinished: (code, resolve, reject) => {
-      codeSubmittedRef.current = true;
       attemptEmailVerification(code)
         .then(() => resolve())
         .catch(reject);
@@ -315,34 +345,30 @@ export const EnterVerificationCodeStep = ({
         align='center'
         justify='center'
       >
-        {hasVerifiedEmail ? (
-          <EmailAlreadyVerified emailAddress={emailToVerify.emailAddress} />
-        ) : (
-          <Col
-            gap={4}
-            sx={{ textAlign: 'center' }}
-          >
-            <Col gap={1}>
-              <Heading
-                textVariant='h1'
-                sx={t => ({ fontSize: t.fontSizes.$sm })}
-                localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.emailCode.formTitle')}
-              />
-              <Text
-                as='p'
-                variant='body'
-                colorScheme='secondary'
-                localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.emailCode.formSubtitle', {
-                  identifier: emailToVerify.emailAddress,
-                })}
-              />
-            </Col>
-            <Form.OTPInput
-              {...otp}
-              resendButton={localizationKeys('configureSSO.verifyEmailDomainStep.emailCode.resendButton')}
+        <Col
+          gap={4}
+          sx={{ textAlign: 'center' }}
+        >
+          <Col gap={1}>
+            <Heading
+              textVariant='h1'
+              sx={t => ({ fontSize: t.fontSizes.$sm })}
+              localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.emailCode.formTitle')}
+            />
+            <Text
+              as='p'
+              variant='body'
+              colorScheme='secondary'
+              localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.emailCode.formSubtitle', {
+                identifier: emailToVerify.emailAddress,
+              })}
             />
           </Col>
-        )}
+          <Form.OTPInput
+            {...otp}
+            resendButton={localizationKeys('configureSSO.verifyEmailDomainStep.emailCode.resendButton')}
+          />
+        </Col>
       </Step.Section>
 
       <Step.Footer>
@@ -377,8 +403,8 @@ const EmailAlreadyVerified = ({ emailAddress }: { emailAddress: string }): JSX.E
         })}
       />
       <Col
-        gap={1}
-        sx={t => ({ textAlign: 'center', maxWidth: t.sizes.$94 })}
+        gap={2}
+        sx={t => ({ textAlign: 'center', maxWidth: t.sizes.$66 })}
       >
         <Heading
           textVariant='h1'
@@ -386,7 +412,7 @@ const EmailAlreadyVerified = ({ emailAddress }: { emailAddress: string }): JSX.E
           localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.emailCode.verified.title')}
         />
         <Col
-          gap={1}
+          gap={3}
           sx={{ flex: 1 }}
         >
           <Text
