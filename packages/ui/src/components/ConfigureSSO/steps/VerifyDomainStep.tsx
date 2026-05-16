@@ -1,6 +1,6 @@
 import { useReverification, useSession, useUser } from '@clerk/shared/react';
 import type { EmailAddressResource } from '@clerk/shared/types';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
   Col,
@@ -42,6 +42,11 @@ export const VerifyDomainStep = (): JSX.Element => {
   );
 
   const wasVerifiedOnMountRef = useRef(isVerified);
+  const emailAddressRef = useRef<EmailAddressResource | undefined>(emailToVerify);
+  const preExistingEmailIdRef = useRef<string | undefined>(emailToVerify?.id);
+  const initialInnerStepIdRef = useRef<'provide-email' | 'verify-email-address'>(
+    emailToVerify ? 'verify-email-address' : 'provide-email',
+  );
 
   if (isDomainTakenByOtherOrg) {
     const conflictingDomain = enterpriseConnection?.domains[0] as string;
@@ -122,7 +127,7 @@ export const VerifyDomainStep = (): JSX.Element => {
         elementDescriptor={descriptors.configureSSOStep}
         elementId={descriptors.configureSSOStep.setId('verify-domain')}
       >
-        <Wizard>
+        <Wizard initialStepId={initialInnerStepIdRef.current}>
           <Step.Header
             title={t(localizationKeys('configureSSO.verifyEmailDomainStep.title'))}
             description={t(localizationKeys('configureSSO.verifyEmailDomainStep.subtitle'))}
@@ -132,11 +137,14 @@ export const VerifyDomainStep = (): JSX.Element => {
 
           <Step.Body>
             <Wizard.Step id='provide-email'>
-              <ProvideEmailStep />
+              <ProvideEmailStep
+                emailAddressRef={emailAddressRef}
+                preExistingEmailIdRef={preExistingEmailIdRef}
+              />
             </Wizard.Step>
 
             <Wizard.Step id='verify-email-address'>
-              <EnterVerificationCodeStep emailToVerify={emailToVerify} />
+              <EnterVerificationCodeStep emailAddressRef={emailAddressRef} />
             </Wizard.Step>
           </Step.Body>
         </Wizard>
@@ -157,12 +165,21 @@ const InnerStepCounter = (): JSX.Element => {
 
 const isEmail = (str: string) => /^\S+@\S+\.\S+$/.test(str);
 
-export const ProvideEmailStep = (): JSX.Element => {
-  const { goNext, goPrev, isFirstStep } = useWizard();
+type ProvideEmailStepProps = {
+  emailAddressRef: React.MutableRefObject<EmailAddressResource | undefined>;
+  preExistingEmailIdRef: React.MutableRefObject<string | undefined>;
+};
+
+const normalizeEmail = (value: string): string => value.trim().toLowerCase();
+
+export const ProvideEmailStep = ({ emailAddressRef, preExistingEmailIdRef }: ProvideEmailStepProps): JSX.Element => {
+  const { goNext, goPrev } = useWizard();
   const { user } = useUser();
   const card = useCardState();
   const { t } = useLocalizations();
-  const [email, setEmail] = useState('');
+  // Pre-fill with whatever email the parent is currently tracking so navigating back from the
+  // verify step shows the user what they previously submitted instead of an empty field.
+  const [email, setEmail] = useState(() => emailAddressRef.current?.emailAddress ?? '');
   const createEmailAddress = useReverification((value: string) => user?.createEmailAddress({ email: value }));
 
   const canSubmit = isEmail(email) && !card.isLoading;
@@ -171,18 +188,41 @@ export const ProvideEmailStep = (): JSX.Element => {
       return;
     }
 
+    const current = emailAddressRef.current;
+    const submittedEmail = email.trim();
+
+    // Same email address as previously submitted, skip the flow
+    if (current && normalizeEmail(current.emailAddress) === normalizeEmail(submittedEmail)) {
+      await goNext();
+      return;
+    }
+
     card.setError(undefined);
     card.setLoading();
 
     try {
-      await createEmailAddress(email);
+      const created = await createEmailAddress(submittedEmail);
+      const previous = current;
+      emailAddressRef.current = created ?? undefined;
+
+      // Clean up the previous in-flight address so the user doesn't accumulate orphans on
+      // their account
+      if (previous && previous.id !== preExistingEmailIdRef.current && previous.id !== created?.id) {
+        try {
+          await previous.destroy();
+        } catch {
+          // A leftover unverified address is preferable to surfacing a cleanup
+          // error after a successful create.
+        }
+      }
+
       await goNext();
     } catch (err) {
       handleError(err as Error, [], card.setError);
     } finally {
       card.setIdle();
     }
-  }, [canSubmit, email, createEmailAddress, card, goNext]);
+  }, [canSubmit, email, createEmailAddress, card, goNext, emailAddressRef, preExistingEmailIdRef]);
 
   return (
     <>
@@ -255,7 +295,7 @@ export const ProvideEmailStep = (): JSX.Element => {
       <Step.Footer>
         <Step.Footer.Previous
           onClick={() => goPrev()}
-          isDisabled={isFirstStep}
+          isDisabled
         />
         <Step.Footer.Continue
           onClick={handleSubmit}
@@ -268,22 +308,26 @@ export const ProvideEmailStep = (): JSX.Element => {
 };
 
 export const EnterVerificationCodeStep = ({
-  emailToVerify,
+  emailAddressRef,
 }: {
-  emailToVerify?: EmailAddressResource;
+  emailAddressRef: React.MutableRefObject<EmailAddressResource | undefined>;
 }): JSX.Element | null => {
   const { user } = useUser();
   const { provider, createEnterpriseConnection } = useConfigureSSO();
   const card = useCardState();
-  const { goNext, goPrev, isFirstStep } = useWizard();
+  const { goNext, goPrev } = useWizard();
+  const primaryEmailAddress = user?.primaryEmailAddress;
 
+  const emailToVerify = emailAddressRef.current;
   const isVerified = emailToVerify?.verification.status === 'verified';
   const isPrimary = emailToVerify?.id === user?.primaryEmailAddressId;
 
   const prepareEmailVerification = useReverification(() =>
-    emailToVerify?.prepareVerification({ strategy: 'email_code' }),
+    emailAddressRef.current?.prepareVerification({ strategy: 'email_code' }),
   );
-  const attemptEmailVerification = useReverification((code: string) => emailToVerify?.attemptVerification({ code }));
+  const attemptEmailVerification = useReverification((code: string) =>
+    emailAddressRef.current?.attemptVerification({ code }),
+  );
   const setPrimaryEmailAddress = useReverification((emailAddressId: string) =>
     user?.update({ primaryEmailAddressId: emailAddressId }),
   );
@@ -303,9 +347,10 @@ export const EnterVerificationCodeStep = ({
       void prepare();
     },
     onResolve: async () => {
-      if (emailToVerify && !isPrimary) {
+      const target = emailAddressRef.current;
+      if (target && !isPrimary) {
         try {
-          await setPrimaryEmailAddress(emailToVerify.id);
+          await setPrimaryEmailAddress(target.id);
         } catch (err) {
           handleError(err as Error, [], card.setError);
           return;
@@ -318,7 +363,7 @@ export const EnterVerificationCodeStep = ({
       }
 
       try {
-        await createEnterpriseConnection(provider);
+        await createEnterpriseConnection(provider, emailToVerify);
       } catch (err) {
         handleError(err as Error, [], card.setError);
         return;
@@ -328,10 +373,12 @@ export const EnterVerificationCodeStep = ({
     },
   });
 
+  // Send a code on mount, but only when the target address is not already verified
   useEffect(() => {
     if (emailToVerify && !isVerified) {
       void prepare();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (!emailToVerify) {
@@ -374,7 +421,7 @@ export const EnterVerificationCodeStep = ({
       <Step.Footer>
         <Step.Footer.Previous
           onClick={() => goPrev()}
-          isDisabled={isFirstStep}
+          isDisabled={!!primaryEmailAddress}
         />
         <Step.Footer.Continue
           onClick={() => goNext()}

@@ -57,21 +57,14 @@ export const SelectProviderStep = (): JSX.Element => {
     const primaryEmailAddress = user?.primaryEmailAddress;
     const hasVerifiedPrimaryEmailAddress = primaryEmailAddress?.verification.status === 'verified';
 
-    // If the user doesn't have a primary email address, go direct to the provide email step
-    if (!primaryEmailAddress) {
-      void goToStep('provide-email');
-      return;
-    }
-
-    // If the user's primary email address is not verified, go to the verify email address step
-    if (!hasVerifiedPrimaryEmailAddress) {
-      void goToStep('verify-email-address');
+    if (!primaryEmailAddress || !hasVerifiedPrimaryEmailAddress) {
+      void goToStep('verify-domain');
       return;
     }
 
     // Otherwise, set the provider and create the enterprise connection
     try {
-      await createEnterpriseConnection(selected);
+      await createEnterpriseConnection(selected, primaryEmailAddress);
     } catch (err) {
       handleError(err as Error, [], card.setError);
       return;

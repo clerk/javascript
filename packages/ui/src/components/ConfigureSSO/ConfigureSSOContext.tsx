@@ -1,6 +1,11 @@
 import type { UseUserEnterpriseConnectionsReturn } from '@clerk/shared/react/index';
 import { useSession, useUser } from '@clerk/shared/react/index';
-import type { EnterpriseConnectionResource, SignedInSessionResource, UserResource } from '@clerk/shared/types';
+import type {
+  EmailAddressResource,
+  EnterpriseConnectionResource,
+  SignedInSessionResource,
+  UserResource,
+} from '@clerk/shared/types';
 import React, { type PropsWithChildren, useCallback } from 'react';
 
 import { useCardState } from '@/elements/contexts';
@@ -35,7 +40,7 @@ export interface ConfigureSSOData {
   /**
    * Creates a new enterprise connection
    */
-  createEnterpriseConnection: (provider: ProviderType) => Promise<void>;
+  createEnterpriseConnection: (provider: ProviderType, primaryEmailAddress?: EmailAddressResource) => Promise<void>;
   /**
    * Updates an existing enterprise connection
    */
@@ -75,16 +80,16 @@ export const ConfigureSSOProvider = ({
   const [provider, setProvider] = React.useState<ProviderType | undefined>(
     enterpriseConnection?.provider as ProviderType,
   );
-  const { user } = useUser();
   const { session } = useSession();
+  const { user } = useUser();
   const card = useCardState();
 
   const isDomainTakenByOtherOrg = checkDomainTakenByOtherOrg(user, session, enterpriseConnection);
   const initialStepId = deriveInitialStep(enterpriseConnection, { isDomainTakenByOtherOrg, hasSuccessfulTestRun });
 
   const createEnterpriseConnection = useCallback(
-    async (provider: ProviderType): Promise<void> => {
-      const emailDomain = user?.primaryEmailAddress?.emailAddress.split('@')[1];
+    async (provider: ProviderType, primaryEmailAddress?: EmailAddressResource): Promise<void> => {
+      const emailDomain = primaryEmailAddress?.emailAddress.split('@')[1];
       const organizationId = session?.lastActiveOrganizationId ?? null;
 
       if (!emailDomain) {
@@ -103,7 +108,7 @@ export const ConfigureSSOProvider = ({
         card.setIdle();
       }
     },
-    [user, card, session, createEnterpriseConnectionApi],
+    [card, session, createEnterpriseConnectionApi],
   );
 
   const value = React.useMemo<ConfigureSSOData>(

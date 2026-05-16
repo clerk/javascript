@@ -40,17 +40,26 @@ vi.mock('../../ConfigureSSOContext', () => ({
   }),
 }));
 
+const userMockState = vi.hoisted(() => ({
+  current: {
+    primaryEmailAddress: {
+      emailAddress: 'test@clerk.com',
+      verification: { status: 'verified' as 'verified' | 'unverified' },
+    },
+  } as {
+    primaryEmailAddress?: {
+      emailAddress: string;
+      verification: { status: 'verified' | 'unverified' };
+    };
+  } | null,
+}));
+
 vi.mock('@clerk/shared/react/index', async importOriginal => {
   const actual = await importOriginal<typeof import('@clerk/shared/react/index')>();
   return {
     ...actual,
     useUser: () => ({
-      user: {
-        primaryEmailAddress: {
-          emailAddress: 'test@clerk.com',
-          verification: { status: 'verified' },
-        },
-      },
+      user: userMockState.current,
       isLoaded: true,
       isSignedIn: true,
     }),
@@ -75,6 +84,12 @@ const resetMocks = () => {
   setProvider.mockReset();
   createEnterpriseConnection.mockReset();
   createEnterpriseConnection.mockResolvedValue(undefined);
+  userMockState.current = {
+    primaryEmailAddress: {
+      emailAddress: 'test@clerk.com',
+      verification: { status: 'verified' },
+    },
+  };
 };
 
 describe('SelectProviderStep', () => {
@@ -179,7 +194,7 @@ describe('SelectProviderStep', () => {
     });
 
     expect(setProvider).toHaveBeenCalledWith('saml_okta');
-    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta');
+    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta', userMockState.current?.primaryEmailAddress);
     expect(callOrder).toEqual(['setProvider', 'createEnterpriseConnection', 'goToStep']);
   });
 
@@ -196,7 +211,7 @@ describe('SelectProviderStep', () => {
     });
 
     expect(setProvider).toHaveBeenCalledWith('saml_custom');
-    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_custom');
+    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_custom', userMockState.current?.primaryEmailAddress);
   });
 
   it('does not advance when failing to create enterprise connection', async () => {
@@ -214,7 +229,7 @@ describe('SelectProviderStep', () => {
     await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
 
     await waitFor(() => {
-      expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta');
+      expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta', userMockState.current?.primaryEmailAddress);
     });
 
     expect(goToStep).not.toHaveBeenCalled();
@@ -226,5 +241,46 @@ describe('SelectProviderStep', () => {
     renderStep(wrapper);
 
     expect(screen.getByRole('button', { name: /Previous/i })).toBeDisabled();
+  });
+
+  it('routes to verify-domain when the user has no primary email address', async () => {
+    resetMocks();
+    userMockState.current = {};
+
+    const { wrapper } = await createFixtures();
+    const { userEvent } = renderStep(wrapper);
+
+    await userEvent.click(screen.getByRole('radio', { name: 'Okta Workforce' }));
+    await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
+
+    await waitFor(() => {
+      expect(goToStep).toHaveBeenCalledWith('verify-domain');
+    });
+
+    expect(setProvider).toHaveBeenCalledWith('saml_okta');
+    expect(createEnterpriseConnection).not.toHaveBeenCalled();
+  });
+
+  it('routes to verify-domain when the user has an unverified primary email address', async () => {
+    resetMocks();
+    userMockState.current = {
+      primaryEmailAddress: {
+        emailAddress: 'test@clerk.com',
+        verification: { status: 'unverified' },
+      },
+    };
+
+    const { wrapper } = await createFixtures();
+    const { userEvent } = renderStep(wrapper);
+
+    await userEvent.click(screen.getByRole('radio', { name: 'Okta Workforce' }));
+    await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
+
+    await waitFor(() => {
+      expect(goToStep).toHaveBeenCalledWith('verify-domain');
+    });
+
+    expect(setProvider).toHaveBeenCalledWith('saml_okta');
+    expect(createEnterpriseConnection).not.toHaveBeenCalled();
   });
 });
