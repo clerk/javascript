@@ -1,5 +1,16 @@
 # Change Log
 
+## 7.3.5
+
+### Patch Changes
+
+- Bump `next` devDependency to `15.5.18` to pick up the fix for GHSA-26hh-7cqf-hhc6, a high-severity (CVSS 7.5) Middleware/Proxy bypass in App Router applications via segment-prefetch routes (incomplete-fix follow-up). If you use the Next.js App Router, we recommend upgrading to Next.js `15.5.18`, `16.2.6`, or a later patched release. The `16.0.0` through `16.2.5` versions are still affected. ([#8547](https://github.com/clerk/javascript/pull/8547)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`9fa6642`](https://github.com/clerk/javascript/commit/9fa6642de6a734faf532ca70c411431c5d0d2bbb), [`930047f`](https://github.com/clerk/javascript/commit/930047f3ea9b603a7f254f7764c3dc5e0fa7c769), [`b45777c`](https://github.com/clerk/javascript/commit/b45777c5723b01b8c7ee3d37b712c639067b36ab), [`5441d86`](https://github.com/clerk/javascript/commit/5441d863146cacb5bc8446825c820fac51e4312b), [`5a7225e`](https://github.com/clerk/javascript/commit/5a7225ef119edf551e20bdce8af465b42981c8f2)]:
+  - @clerk/shared@4.12.0
+  - @clerk/react@6.6.4
+  - @clerk/backend@3.4.9
+
 ## 7.3.4
 
 ### Patch Changes
