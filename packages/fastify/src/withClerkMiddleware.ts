@@ -8,6 +8,30 @@ import * as constants from './constants';
 import type { ClerkFastifyOptions } from './types';
 import { fastifyRequestToRequest, requestToProxyRequest } from './utils';
 
+function stripHandshakeCookiesAndParams(req: Request, cookieNames: string[]): Request {
+  const url = new URL(req.url);
+  for (const name of cookieNames) {
+    url.searchParams.delete(name);
+  }
+
+  const headers = new Headers(req.headers);
+  const cookieHeader = headers.get('cookie');
+  if (cookieHeader) {
+    const filtered = cookieHeader
+      .split(';')
+      .map(c => c.trim())
+      .filter(c => !cookieNames.some(name => c === name || c.startsWith(`${name}=`)))
+      .join('; ');
+    if (filtered) {
+      headers.set('cookie', filtered);
+    } else {
+      headers.delete('cookie');
+    }
+  }
+
+  return new Request(url.toString(), { method: req.method, headers });
+}
+
 export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
   const frontendApiProxy = options.frontendApiProxy;
   const proxyPath = stripTrailingSlashes(frontendApiProxy?.path ?? DEFAULT_PROXY_PATH) || DEFAULT_PROXY_PATH;
@@ -83,7 +107,11 @@ export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
       }
     }
 
-    const req = fastifyRequestToRequest(fastifyRequest);
+    let req = fastifyRequestToRequest(fastifyRequest);
+
+    if (!enableHandshake) {
+      req = stripHandshakeCookiesAndParams(req, [constants.Cookies.Handshake, constants.Cookies.HandshakeNonce]);
+    }
 
     const requestState = await clerkClient.authenticateRequest(req, {
       ...options,
