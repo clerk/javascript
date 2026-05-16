@@ -11,8 +11,8 @@ const plugin: FastifyPluginCallback<ClerkFastifyOptions> = (
   done,
 ) => {
   instance.decorateRequest('auth', null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  instance.decorateRequest('clerk', null as any);
+  instance.decorateRequest('clerk', null);
+
   // run clerk as a middleware to all scoped routes
   const hookName = opts.hookName || 'preHandler';
   if (!ALLOWED_HOOKS.includes(hookName)) {
