@@ -81,7 +81,7 @@ const ConfigureSSOCardContent = ({ contentRef }: { contentRef: React.RefObject<H
   const { hasSuccessfulTestRun, isLoading: isLoadingTestRuns } = useHasSuccessfulTestRun(enterpriseConnection);
 
   const isLoading = isLoadingEnterpriseConnections || isLoadingTestRuns;
-  if (isLoading && !enterpriseConnection) {
+  if (isLoading) {
     return <ConfigureSSOSkeleton />;
   }
 

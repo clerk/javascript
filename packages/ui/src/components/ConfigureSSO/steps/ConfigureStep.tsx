@@ -1,9 +1,9 @@
+import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { useReverification } from '@clerk/shared/react';
 import type { FieldId, UpdateMeEnterpriseConnectionParams } from '@clerk/shared/types';
 import React, { type JSX } from 'react';
 
 import {
-  Alert,
   Badge,
   Box,
   Button,
@@ -687,12 +687,21 @@ export const SubmitSamlConfigSubStep = (): JSX.Element => {
 
         await updateConnection({ saml: samlPayload });
       }
+
       void goNext();
     } catch (err) {
-      if (mode === 'metadataUrl') {
-        handleError(err as Error, [metadataUrlField], card.setError);
-      } else {
-        handleError(err as Error, [signOnUrlField, issuerField, certFileField], card.setError);
+      const fields = mode === 'metadataUrl' ? [metadataUrlField] : [signOnUrlField, issuerField, certFileField];
+
+      handleError(err as Error, fields, card.setError);
+
+      if (isClerkAPIResponseError(err)) {
+        const unscopedSamlError = err.errors.find(e => e.code?.startsWith('saml_') && !e.meta?.paramName);
+
+        if (unscopedSamlError) {
+          const primaryField = mode === 'metadataUrl' ? metadataUrlField : signOnUrlField;
+          primaryField.setError(unscopedSamlError);
+          card.setError(undefined);
+        }
       }
     } finally {
       card.setIdle();
@@ -714,7 +723,10 @@ export const SubmitSamlConfigSubStep = (): JSX.Element => {
           <SegmentedControl.Root
             aria-label={t(localizationKeys(key('modes.ariaLabel')))}
             value={mode}
-            onChange={value => setMode(value as 'metadataUrl' | 'manual')}
+            onChange={value => {
+              card.setError(undefined);
+              setMode(value as 'metadataUrl' | 'manual');
+            }}
             fullWidth
           >
             <SegmentedControl.Button
@@ -740,14 +752,6 @@ export const SubmitSamlConfigSubStep = (): JSX.Element => {
             />
           )}
         </Step.Section>
-
-        {card.error && (
-          <Alert
-            colorScheme='danger'
-            title={card.error}
-            sx={t => ({ margin: t.space.$3 })}
-          />
-        )}
       </Step.Body>
 
       <Step.Footer>
@@ -858,7 +862,7 @@ const ManualEntryPanel = ({
                   />
                 )}
                 <Button
-                  size='sm'
+                  size='xs'
                   variant='outline'
                   onClick={() => certInputRef.current?.click()}
                 >

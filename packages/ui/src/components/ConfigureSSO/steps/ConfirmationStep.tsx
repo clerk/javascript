@@ -205,7 +205,7 @@ const ConfigurationDetailsSection = (): JSX.Element => {
         >
           <ProfileSection.Button
             id='configureAgain'
-            onClick={() => goToStep('select-provider')}
+            onClick={() => goToStep('configure')}
             variant='ghost'
             colorScheme='primary'
             localizationKey={localizationKeys('configureSSO.confirmation.configurationSection.configureAgainLink')}
