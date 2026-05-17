@@ -351,6 +351,11 @@ export default tseslint.config([
               message: "Please always import from '@clerk/shared/<module>' instead of '@clerk/shared'.",
               name: '@clerk/shared',
             },
+            {
+              name: 'base-64',
+              message:
+                "base-64 is vendored at packages/expo/src/vendor/base-64. Import { encode, decode } from '../vendor/base-64' instead. See packages/expo/src/vendor/base-64/README.md.",
+            },
           ],
           patterns: [
             {
