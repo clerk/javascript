@@ -196,7 +196,6 @@ export const TestConfigurationStep = (): JSX.Element => {
           <Step.Footer.Previous onClick={() => goPrev()} />
           <ContinueTestSsoStepButton
             enterpriseConnectionId={enterpriseConnection?.id}
-            isConnectionActive={enterpriseConnection?.active}
             onContinue={() => void goNext()}
           />
         </Step.Footer>
@@ -207,13 +206,11 @@ export const TestConfigurationStep = (): JSX.Element => {
 
 type ContinueTestSsoStepButtonProps = {
   enterpriseConnectionId: string | undefined;
-  isConnectionActive: boolean | undefined;
   onContinue: () => void;
 };
 
 const ContinueTestSsoStepButton = ({
   enterpriseConnectionId,
-  isConnectionActive,
   onContinue,
 }: ContinueTestSsoStepButtonProps): JSX.Element => {
   const { user } = useUser();
@@ -252,7 +249,6 @@ const ContinueTestSsoStepButton = ({
     <Step.Footer.Continue
       onClick={() => void handleContinue()}
       isLoading={isValidating}
-      isDisabled={!enterpriseConnectionId || isConnectionActive}
     />
   );
 };
