@@ -1,4 +1,4 @@
-import { __internal_useUserEnterpriseConnections, useReverification } from '@clerk/shared/react';
+import { useReverification } from '@clerk/shared/react';
 import { useState } from 'react';
 
 import { Badge, Col, descriptors, Flex, Flow, Grid, Link, localizationKeys, Text } from '@/customizables';
@@ -65,8 +65,7 @@ const SsoStatusSection = (): JSX.Element => {
 };
 
 const EnableSsoSection = (): JSX.Element => {
-  const { enterpriseConnection } = useConfigureSSO();
-  const { updateEnterpriseConnection } = __internal_useUserEnterpriseConnections({ enabled: false });
+  const { enterpriseConnection, updateEnterpriseConnection } = useConfigureSSO();
   const card = useCardState();
 
   const [isChecked, setIsChecked] = useState(!!enterpriseConnection?.active);
@@ -206,7 +205,7 @@ const ConfigurationDetailsSection = (): JSX.Element => {
         >
           <ProfileSection.Button
             id='configureAgain'
-            onClick={() => goToStep('select-provider')}
+            onClick={() => goToStep('configure')}
             variant='ghost'
             colorScheme='primary'
             localizationKey={localizationKeys('configureSSO.confirmation.configurationSection.configureAgainLink')}
@@ -220,8 +219,7 @@ const ConfigurationDetailsSection = (): JSX.Element => {
 const ResetConnectionForm = withCardStateProvider((props: FormProps) => {
   const { onReset, onSuccess } = props;
   const card = useCardState();
-  const { enterpriseConnection } = useConfigureSSO();
-  const { deleteEnterpriseConnection } = __internal_useUserEnterpriseConnections({ enabled: false });
+  const { enterpriseConnection, deleteEnterpriseConnection } = useConfigureSSO();
   const { goToStep } = useWizard();
 
   const deleteConnection = useReverification((id: string) => deleteEnterpriseConnection(id));

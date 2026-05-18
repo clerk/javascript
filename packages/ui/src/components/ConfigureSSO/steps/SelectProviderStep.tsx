@@ -1,10 +1,13 @@
 import { iconImageUrl } from '@clerk/shared/constants';
+import { useUser } from '@clerk/shared/react/index';
 import React from 'react';
 
 import type { LocalizationKey } from '@/customizables';
 import { Box, Col, descriptors, Flow, Grid, localizationKeys, Span, Text, useLocalizations } from '@/customizables';
+import { useCardState } from '@/elements/contexts';
 import { common, mqu } from '@/styledSystem';
 import { Alert } from '@/ui/elements/Alert';
+import { handleError } from '@/utils/errorHandler';
 
 import { useConfigureSSO } from '../ConfigureSSOContext';
 import { Step } from '../elements/Step';
@@ -38,16 +41,36 @@ const PROVIDER_GROUPS: ReadonlyArray<{
 ];
 
 export const SelectProviderStep = (): JSX.Element => {
-  const { goNext } = useWizard();
-  const { setProvider } = useConfigureSSO();
+  const { goToStep } = useWizard();
+  const { setProvider, createEnterpriseConnection } = useConfigureSSO();
   const [selected, setSelected] = React.useState<ProviderType | null>(null);
+  const { user } = useUser();
+  const card = useCardState();
 
-  const handleContinue = () => {
-    if (!selected) {
+  const handleContinue = async () => {
+    if (!selected || !user) {
       return;
     }
+
     setProvider(selected);
-    void goNext();
+
+    const primaryEmailAddress = user?.primaryEmailAddress;
+    const hasVerifiedPrimaryEmailAddress = primaryEmailAddress?.verification.status === 'verified';
+
+    if (!primaryEmailAddress || !hasVerifiedPrimaryEmailAddress) {
+      void goToStep('verify-domain');
+      return;
+    }
+
+    // Otherwise, set the provider and create the enterprise connection
+    try {
+      await createEnterpriseConnection(selected, primaryEmailAddress);
+    } catch (err) {
+      handleError(err as Error, [], card.setError);
+      return;
+    }
+
+    void goToStep('configure');
   };
 
   return (
@@ -116,6 +139,14 @@ export const SelectProviderStep = (): JSX.Element => {
               variant='warning'
               title={localizationKeys('configureSSO.selectProviderStep.warning')}
             />
+
+            {card.error && (
+              <Alert
+                variant='danger'
+                title={card.error}
+                sx={t => ({ margin: t.space.$3 })}
+              />
+            )}
           </Step.Section>
         </Step.Body>
 
@@ -124,6 +155,7 @@ export const SelectProviderStep = (): JSX.Element => {
 
           <Step.Footer.Continue
             onClick={handleContinue}
+            isLoading={card.isLoading}
             isDisabled={!selected}
           />
         </Step.Footer>

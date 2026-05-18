@@ -1436,9 +1436,9 @@ export type __internal_LocalizationResource = {
         };
       };
       samlOkta: {
-        title: LocalizationValue;
-        subtitle: LocalizationValue;
+        headerTitle: LocalizationValue;
         createApp: {
+          headerSubtitle: LocalizationValue;
           title: LocalizationValue;
           step1: LocalizationValue;
           step2: LocalizationValue;
@@ -1457,6 +1457,7 @@ export type __internal_LocalizationResource = {
           step2: LocalizationValue;
         };
         configureAttributes: {
+          headerSubtitle: LocalizationValue;
           step1: LocalizationValue;
           step2: LocalizationValue;
           pairs: {
@@ -1476,6 +1477,7 @@ export type __internal_LocalizationResource = {
           };
         };
         assignUsers: {
+          headerSubtitle: LocalizationValue;
           title: LocalizationValue;
           paragraph: LocalizationValue;
           step1: LocalizationValue;
@@ -1485,6 +1487,56 @@ export type __internal_LocalizationResource = {
           step5: LocalizationValue;
         };
         metadataUrl: {
+          headerSubtitle: LocalizationValue;
+          label: LocalizationValue;
+          placeholder: LocalizationValue;
+          description: LocalizationValue;
+        };
+        modes: {
+          ariaLabel: LocalizationValue;
+          metadataUrl: LocalizationValue;
+          manual: LocalizationValue;
+        };
+        submitSamlConfig: {
+          title: LocalizationValue;
+        };
+        manual: {
+          description: LocalizationValue;
+          signOnUrl: {
+            label: LocalizationValue;
+            placeholder: LocalizationValue;
+          };
+          issuer: {
+            label: LocalizationValue;
+            placeholder: LocalizationValue;
+          };
+          signingCertificate: {
+            label: LocalizationValue;
+            uploadFile: LocalizationValue;
+            replaceFile: LocalizationValue;
+            removeFile: LocalizationValue;
+            fileUploaded: LocalizationValue;
+          };
+        };
+      };
+      samlCustom: {
+        headerTitle: LocalizationValue;
+        createApp: {
+          headerSubtitle: LocalizationValue;
+          title: LocalizationValue;
+          subtitle: LocalizationValue;
+        };
+        configureAttributes: {
+          headerSubtitle: LocalizationValue;
+          title: LocalizationValue;
+        };
+        assignUsers: {
+          headerSubtitle: LocalizationValue;
+          title: LocalizationValue;
+          paragraph: LocalizationValue;
+        };
+        metadataUrl: {
+          headerSubtitle: LocalizationValue;
           label: LocalizationValue;
           placeholder: LocalizationValue;
           description: LocalizationValue;
