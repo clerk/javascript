@@ -2,16 +2,17 @@ import React from 'react';
 
 import { AppearanceContext, Col, descriptors, generateFlowPartClassname, useAppearance } from '../../customizables';
 import type { ElementDescriptor } from '../../customizables/elementDescriptors';
-import type { PropsOfComponent } from '../../styledSystem';
+import type { InternalTheme, PropsOfComponent } from '../../styledSystem';
 import { mqu } from '../../styledSystem';
 import { ApplicationLogo } from '../ApplicationLogo';
 import { useFlowMetadata } from '../contexts';
 import { ModalContext } from '../Modal';
 
-// Element style overrides for flush elevation. Injected into parsedElements at
+// Element style overrides for flush elevation. Resolved with the current theme
+// so values like `t.space.$4` are available, then injected into parsedElements at
 // index 1 (after baseTheme, before user overrides) via AppearanceContext so they
 // participate in the makeCustomizable cascade and can still be overridden by users.
-const FLUSH_ELEMENTS = {
+const getFlushElements = (t: InternalTheme) => ({
   cardBox: {
     borderWidth: 0,
     borderRadius: 0,
@@ -23,23 +24,25 @@ const FLUSH_ELEMENTS = {
     borderRadius: 0,
     boxShadow: 'none',
     backgroundColor: 'transparent',
-    padding: 0,
+    paddingInline: 0,
+    paddingBlock: 0,
     marginBlockStart: 0,
     marginInline: 0,
   },
   footer: {
     background: 'transparent',
-    marginTop: 0,
+    marginTop: t.space.$8,
     paddingTop: 0,
+    rowGap: t.space.$8,
     '>:first-of-type': {
-      paddingInline: 0,
+      padding: 0,
     },
     '>:not(:first-of-type)': {
       borderTopWidth: 0,
-      paddingInline: 0,
+      padding: 0,
     },
   },
-};
+});
 
 type CardRootProps = PropsOfComponent<typeof Col> & {
   /**
@@ -65,7 +68,8 @@ export const CardRoot = React.forwardRef<HTMLDivElement, CardRootProps>((props, 
     if (!isFlush) {
       return appearance;
     }
-    const newParsedElements = [appearance.parsedElements[0], FLUSH_ELEMENTS, ...appearance.parsedElements.slice(1)];
+    const flushElements = getFlushElements(appearance.parsedInternalTheme);
+    const newParsedElements = [appearance.parsedElements[0], flushElements, ...appearance.parsedElements.slice(1)];
     return { ...appearance, parsedElements: newParsedElements };
   }, [appearance, isFlush]);
 
