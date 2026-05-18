@@ -1,11 +1,15 @@
-import { __internal_useUserEnterpriseConnections, useSession } from '@clerk/shared/react';
-import type { __experimental_ConfigureSSOProps } from '@clerk/shared/types';
+import {
+  __internal_useEnterpriseConnectionTestRuns,
+  __internal_useUserEnterpriseConnections,
+  useSession,
+} from '@clerk/shared/react';
+import type { __experimental_ConfigureSSOProps, EnterpriseConnectionResource } from '@clerk/shared/types';
 import React from 'react';
 
 import { useProtect } from '@/common';
 import { withCoreUserGuard } from '@/contexts';
 import { Col, descriptors, Flex, Flow, Heading, Icon, localizationKeys, Text } from '@/customizables';
-import { withCardStateProvider } from '@/elements/contexts';
+import { useCardState, withCardStateProvider } from '@/elements/contexts';
 import { ProfileCard } from '@/elements/ProfileCard';
 import { ExclamationTriangle } from '@/icons';
 import { Route, Switch } from '@/router';
@@ -16,7 +20,7 @@ import { ConfigureSSONavbar } from './ConfigureSSONavbar';
 import { ConfigureSSOSkeleton } from './ConfigureSSOSkeleton';
 import { ProfileCardFooter, ProfileCardHeader } from './elements/ProfileCard';
 import { Step } from './elements/Step';
-import { Wizard } from './elements/Wizard';
+import { useWizard, Wizard } from './elements/Wizard';
 import { ConfigureStep, ConfirmationStep, SelectProviderStep, TestConfigurationStep, VerifyDomainStep } from './steps';
 
 const ConfigureSSOInternal = () => {
@@ -64,19 +68,31 @@ const AuthenticatedContent = withCoreUserGuard(() => {
 });
 
 const ConfigureSSOCardContent = ({ contentRef }: { contentRef: React.RefObject<HTMLDivElement> }) => {
-  const { data: enterpriseConnections, isLoading } = __internal_useUserEnterpriseConnections({ enabled: true });
-
+  const {
+    data: enterpriseConnections,
+    isLoading: isLoadingEnterpriseConnections,
+    createEnterpriseConnection,
+    updateEnterpriseConnection,
+    deleteEnterpriseConnection,
+  } = __internal_useUserEnterpriseConnections({ enabled: true });
   // Currently FAPI only supports one enterprise connection per user
   const enterpriseConnection = enterpriseConnections?.[0];
 
-  if (isLoading && !enterpriseConnection) {
+  const { hasSuccessfulTestRun, isLoading: isLoadingTestRuns } = useHasSuccessfulTestRun(enterpriseConnection);
+
+  const isLoading = isLoadingEnterpriseConnections || isLoadingTestRuns;
+  if (isLoading) {
     return <ConfigureSSOSkeleton />;
   }
 
   return (
     <ConfigureSSOProvider
+      hasSuccessfulTestRun={hasSuccessfulTestRun}
       enterpriseConnection={enterpriseConnection}
       contentRef={contentRef}
+      createEnterpriseConnection={createEnterpriseConnection}
+      updateEnterpriseConnection={updateEnterpriseConnection}
+      deleteEnterpriseConnection={deleteEnterpriseConnection}
     >
       <ConfigureSSOSteps />
     </ConfigureSSOProvider>
@@ -88,6 +104,7 @@ const ConfigureSSOSteps = () => {
 
   return (
     <Wizard initialStepId={initialStepId}>
+      <ResetCardErrorOnStepChange />
       <ConfigureSSOHeader />
 
       <Wizard.Step id='select-provider'>
@@ -182,6 +199,46 @@ const MissingManageEnterpriseConnectionsPermission = () => (
     <ProfileCardFooter />
   </>
 );
+
+/**
+ * Sentinel component rendered inside `<Wizard>`
+ *
+ * Clears any card-level error whenever the active step transitions, so a stale failure from one step
+ * doesn't leak into the next
+ */
+const ResetCardErrorOnStepChange = (): null => {
+  const { currentStep } = useWizard();
+  const card = useCardState();
+  const previousStepIdRef = React.useRef(currentStep?.id);
+
+  React.useEffect(() => {
+    if (previousStepIdRef.current === currentStep?.id) {
+      return;
+    }
+
+    previousStepIdRef.current = currentStep?.id;
+    card.setError(undefined);
+  }, [currentStep?.id, card]);
+
+  return null;
+};
+
+/**
+ * Fetches a single successful test run for the given connection on mount
+ */
+const useHasSuccessfulTestRun = (
+  enterpriseConnection: EnterpriseConnectionResource | undefined,
+): { hasSuccessfulTestRun: boolean; isLoading: boolean } => {
+  const { data: successfulTestRuns, isLoading } = __internal_useEnterpriseConnectionTestRuns({
+    enterpriseConnectionId: enterpriseConnection?.id ?? null,
+    params: { initialPage: 1, pageSize: 1, status: ['success'] },
+  });
+
+  return {
+    hasSuccessfulTestRun: (successfulTestRuns?.length ?? 0) > 0,
+    isLoading,
+  };
+};
 
 export const ConfigureSSO: React.ComponentType<__experimental_ConfigureSSOProps> =
   withCardStateProvider(ConfigureSSOInternal);

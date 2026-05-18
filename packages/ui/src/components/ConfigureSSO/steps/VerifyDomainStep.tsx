@@ -1,6 +1,6 @@
-import { __internal_useUserEnterpriseConnections, useReverification, useSession, useUser } from '@clerk/shared/react';
+import { useReverification, useSession, useUser } from '@clerk/shared/react';
 import type { EmailAddressResource } from '@clerk/shared/types';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
   Col,
@@ -22,13 +22,13 @@ import { handleError } from '@/utils/errorHandler';
 import { useConfigureSSO } from '../ConfigureSSOContext';
 import { Step } from '../elements/Step';
 import { useWizard, Wizard } from '../elements/Wizard';
-import type { ProviderType } from '../types';
 
 export const VerifyDomainStep = (): JSX.Element => {
   const { user } = useUser();
   const { session } = useSession();
   const { enterpriseConnection } = useConfigureSSO();
   const { t } = useLocalizations();
+  const { goNext: outerGoNext } = useWizard();
 
   const emailToVerify =
     user?.primaryEmailAddress ?? user?.emailAddresses?.find(e => e.verification.status !== 'verified');
@@ -39,6 +39,13 @@ export const VerifyDomainStep = (): JSX.Element => {
   const activeOrganizationId = session?.lastActiveOrganizationId ?? null;
   const isDomainTakenByOtherOrg = Boolean(
     isVerified && enterpriseConnection && enterpriseConnection.organizationId !== activeOrganizationId,
+  );
+
+  const wasVerifiedOnMountRef = useRef(isVerified);
+  const emailAddressRef = useRef<EmailAddressResource | undefined>(emailToVerify);
+  const preExistingEmailIdRef = useRef<string | undefined>(emailToVerify?.id);
+  const initialInnerStepIdRef = useRef<'provide-email' | 'verify-email-address'>(
+    emailToVerify ? 'verify-email-address' : 'provide-email',
   );
 
   if (isDomainTakenByOtherOrg) {
@@ -84,13 +91,43 @@ export const VerifyDomainStep = (): JSX.Element => {
     );
   }
 
+  if (wasVerifiedOnMountRef.current && emailToVerify?.emailAddress) {
+    return (
+      <Flow.Part part='verifyDomain'>
+        <Step
+          elementDescriptor={descriptors.configureSSOStep}
+          elementId={descriptors.configureSSOStep.setId('verify-domain')}
+        >
+          <Step.Header
+            title={t(localizationKeys('configureSSO.verifyEmailDomainStep.title'))}
+            description={t(localizationKeys('configureSSO.verifyEmailDomainStep.subtitle'))}
+          />
+
+          <Step.Body>
+            <Step.Section
+              sx={{ flex: 1 }}
+              align='center'
+              justify='center'
+            >
+              <EmailAlreadyVerified emailAddress={emailToVerify.emailAddress} />
+            </Step.Section>
+          </Step.Body>
+
+          <Step.Footer>
+            <Step.Footer.Continue onClick={() => outerGoNext()} />
+          </Step.Footer>
+        </Step>
+      </Flow.Part>
+    );
+  }
+
   return (
     <Flow.Part part='verifyDomain'>
       <Step
         elementDescriptor={descriptors.configureSSOStep}
         elementId={descriptors.configureSSOStep.setId('verify-domain')}
       >
-        <Wizard>
+        <Wizard initialStepId={initialInnerStepIdRef.current}>
           <Step.Header
             title={t(localizationKeys('configureSSO.verifyEmailDomainStep.title'))}
             description={t(localizationKeys('configureSSO.verifyEmailDomainStep.subtitle'))}
@@ -100,11 +137,14 @@ export const VerifyDomainStep = (): JSX.Element => {
 
           <Step.Body>
             <Wizard.Step id='provide-email'>
-              <ProvideEmailStep />
+              <ProvideEmailStep
+                emailAddressRef={emailAddressRef}
+                preExistingEmailIdRef={preExistingEmailIdRef}
+              />
             </Wizard.Step>
 
             <Wizard.Step id='verify-email-address'>
-              <EnterVerificationCodeStep emailToVerify={emailToVerify} />
+              <EnterVerificationCodeStep emailAddressRef={emailAddressRef} />
             </Wizard.Step>
           </Step.Body>
         </Wizard>
@@ -125,12 +165,21 @@ const InnerStepCounter = (): JSX.Element => {
 
 const isEmail = (str: string) => /^\S+@\S+\.\S+$/.test(str);
 
-export const ProvideEmailStep = (): JSX.Element => {
-  const { goNext, goPrev, isFirstStep } = useWizard();
+type ProvideEmailStepProps = {
+  emailAddressRef: React.MutableRefObject<EmailAddressResource | undefined>;
+  preExistingEmailIdRef: React.MutableRefObject<string | undefined>;
+};
+
+const normalizeEmail = (value: string): string => value.trim().toLowerCase();
+
+export const ProvideEmailStep = ({ emailAddressRef, preExistingEmailIdRef }: ProvideEmailStepProps): JSX.Element => {
+  const { goNext, goPrev } = useWizard();
   const { user } = useUser();
   const card = useCardState();
   const { t } = useLocalizations();
-  const [email, setEmail] = useState('');
+  // Pre-fill with whatever email the parent is currently tracking so navigating back from the
+  // verify step shows the user what they previously submitted instead of an empty field.
+  const [email, setEmail] = useState(() => emailAddressRef.current?.emailAddress ?? '');
   const createEmailAddress = useReverification((value: string) => user?.createEmailAddress({ email: value }));
 
   const canSubmit = isEmail(email) && !card.isLoading;
@@ -139,18 +188,41 @@ export const ProvideEmailStep = (): JSX.Element => {
       return;
     }
 
+    const current = emailAddressRef.current;
+    const submittedEmail = email.trim();
+
+    // Same email address as previously submitted, skip the flow
+    if (current && normalizeEmail(current.emailAddress) === normalizeEmail(submittedEmail)) {
+      await goNext();
+      return;
+    }
+
     card.setError(undefined);
     card.setLoading();
 
     try {
-      await createEmailAddress(email);
+      const created = await createEmailAddress(submittedEmail);
+      const previous = current;
+      emailAddressRef.current = created ?? undefined;
+
+      // Clean up the previous in-flight address so the user doesn't accumulate orphans on
+      // their account
+      if (previous && previous.id !== preExistingEmailIdRef.current && previous.id !== created?.id) {
+        try {
+          await previous.destroy();
+        } catch {
+          // A leftover unverified address is preferable to surfacing a cleanup
+          // error after a successful create.
+        }
+      }
+
       await goNext();
     } catch (err) {
       handleError(err as Error, [], card.setError);
     } finally {
       card.setIdle();
     }
-  }, [canSubmit, email, createEmailAddress, card, goNext]);
+  }, [canSubmit, email, createEmailAddress, card, goNext, emailAddressRef, preExistingEmailIdRef]);
 
   return (
     <>
@@ -223,7 +295,7 @@ export const ProvideEmailStep = (): JSX.Element => {
       <Step.Footer>
         <Step.Footer.Previous
           onClick={() => goPrev()}
-          isDisabled={isFirstStep}
+          isDisabled
         />
         <Step.Footer.Continue
           onClick={handleSubmit}
@@ -236,51 +308,30 @@ export const ProvideEmailStep = (): JSX.Element => {
 };
 
 export const EnterVerificationCodeStep = ({
-  emailToVerify,
+  emailAddressRef,
 }: {
-  emailToVerify?: EmailAddressResource;
+  emailAddressRef: React.MutableRefObject<EmailAddressResource | undefined>;
 }): JSX.Element | null => {
   const { user } = useUser();
-  const { session } = useSession();
-  const { provider, enterpriseConnection } = useConfigureSSO();
-  const { createEnterpriseConnection } = __internal_useUserEnterpriseConnections();
+  const { provider, createEnterpriseConnection } = useConfigureSSO();
   const card = useCardState();
-  const codeSubmittedRef = useRef(false);
-  const { goNext, goPrev, isFirstStep } = useWizard();
+  const { goNext, goPrev } = useWizard();
+  const primaryEmailAddress = user?.primaryEmailAddress;
 
+  const emailToVerify = emailAddressRef.current;
   const isVerified = emailToVerify?.verification.status === 'verified';
   const isPrimary = emailToVerify?.id === user?.primaryEmailAddressId;
-  const hasVerifiedEmail = emailToVerify?.emailAddress && isVerified && !codeSubmittedRef.current;
 
   const prepareEmailVerification = useReverification(() =>
-    emailToVerify?.prepareVerification({ strategy: 'email_code' }),
+    emailAddressRef.current?.prepareVerification({ strategy: 'email_code' }),
   );
-  const attemptEmailVerification = useReverification((code: string) => emailToVerify?.attemptVerification({ code }));
+  const attemptEmailVerification = useReverification((code: string) =>
+    emailAddressRef.current?.attemptVerification({ code }),
+  );
   const setPrimaryEmailAddress = useReverification((emailAddressId: string) =>
     user?.update({ primaryEmailAddressId: emailAddressId }),
   );
-  const createConnection = useReverification(
-    useCallback(
-      async (selectedProvider: ProviderType) => {
-        if (enterpriseConnection) {
-          return;
-        }
-        if (!user?.primaryEmailAddress) {
-          throw new Error('Primary email required');
-        }
 
-        const emailDomain = user.primaryEmailAddress.emailAddress.split('@')[1];
-        const organizationId = session?.lastActiveOrganizationId ?? null;
-
-        await createEnterpriseConnection({
-          provider: selectedProvider,
-          name: emailDomain,
-          organizationId,
-        });
-      },
-      [enterpriseConnection, user, session, createEnterpriseConnection],
-    ),
-  );
   const prepare = useCallback(
     () => prepareEmailVerification()?.catch(err => handleError(err, [], card.setError)),
     [prepareEmailVerification, card],
@@ -288,7 +339,6 @@ export const EnterVerificationCodeStep = ({
 
   const otp = useFieldOTP({
     onCodeEntryFinished: (code, resolve, reject) => {
-      codeSubmittedRef.current = true;
       attemptEmailVerification(code)
         .then(() => resolve())
         .catch(reject);
@@ -297,9 +347,10 @@ export const EnterVerificationCodeStep = ({
       void prepare();
     },
     onResolve: async () => {
-      if (emailToVerify && !isPrimary) {
+      const target = emailAddressRef.current;
+      if (target && !isPrimary) {
         try {
-          await setPrimaryEmailAddress(emailToVerify.id);
+          await setPrimaryEmailAddress(target.id);
         } catch (err) {
           handleError(err as Error, [], card.setError);
           return;
@@ -312,7 +363,7 @@ export const EnterVerificationCodeStep = ({
       }
 
       try {
-        await createConnection(provider);
+        await createEnterpriseConnection(provider, emailToVerify);
       } catch (err) {
         handleError(err as Error, [], card.setError);
         return;
@@ -322,10 +373,12 @@ export const EnterVerificationCodeStep = ({
     },
   });
 
+  // Send a code on mount, but only when the target address is not already verified
   useEffect(() => {
     if (emailToVerify && !isVerified) {
       void prepare();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (!emailToVerify) {
@@ -339,44 +392,40 @@ export const EnterVerificationCodeStep = ({
         align='center'
         justify='center'
       >
-        {hasVerifiedEmail ? (
-          <EmailAlreadyVerified emailAddress={emailToVerify.emailAddress} />
-        ) : (
-          <Col
-            gap={4}
-            sx={{ textAlign: 'center' }}
-          >
-            <Col gap={1}>
-              <Heading
-                textVariant='h1'
-                sx={t => ({ fontSize: t.fontSizes.$sm })}
-                localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.emailCode.formTitle')}
-              />
-              <Text
-                as='p'
-                variant='body'
-                colorScheme='secondary'
-                localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.emailCode.formSubtitle', {
-                  identifier: emailToVerify.emailAddress,
-                })}
-              />
-            </Col>
-            <Form.OTPInput
-              {...otp}
-              resendButton={localizationKeys('configureSSO.verifyEmailDomainStep.emailCode.resendButton')}
+        <Col
+          gap={4}
+          sx={{ textAlign: 'center' }}
+        >
+          <Col gap={1}>
+            <Heading
+              textVariant='h1'
+              sx={t => ({ fontSize: t.fontSizes.$sm })}
+              localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.emailCode.formTitle')}
+            />
+            <Text
+              as='p'
+              variant='body'
+              colorScheme='secondary'
+              localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.emailCode.formSubtitle', {
+                identifier: emailToVerify.emailAddress,
+              })}
             />
           </Col>
-        )}
+          <Form.OTPInput
+            {...otp}
+            resendButton={localizationKeys('configureSSO.verifyEmailDomainStep.emailCode.resendButton')}
+          />
+        </Col>
       </Step.Section>
 
       <Step.Footer>
         <Step.Footer.Previous
           onClick={() => goPrev()}
-          isDisabled={isFirstStep}
+          isDisabled={!!primaryEmailAddress}
         />
         <Step.Footer.Continue
           onClick={() => goNext()}
-          isLoading={otp.isLoading}
+          isLoading={otp.isLoading || card.isLoading}
           isDisabled={!isVerified}
         />
       </Step.Footer>
@@ -401,8 +450,8 @@ const EmailAlreadyVerified = ({ emailAddress }: { emailAddress: string }): JSX.E
         })}
       />
       <Col
-        gap={1}
-        sx={t => ({ textAlign: 'center', maxWidth: t.sizes.$94 })}
+        gap={2}
+        sx={t => ({ textAlign: 'center', maxWidth: t.sizes.$66 })}
       >
         <Heading
           textVariant='h1'
@@ -410,7 +459,7 @@ const EmailAlreadyVerified = ({ emailAddress }: { emailAddress: string }): JSX.E
           localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.emailCode.verified.title')}
         />
         <Col
-          gap={1}
+          gap={3}
           sx={{ flex: 1 }}
         >
           <Text
