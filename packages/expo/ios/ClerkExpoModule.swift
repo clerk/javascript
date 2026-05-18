@@ -18,6 +18,7 @@ public protocol ClerkViewFactoryProtocol {
   // Inline rendering — returns UIViewController to preserve SwiftUI lifecycle
   func createAuthView(mode: String, dismissable: Bool, onEvent: @escaping (String, [String: Any]) -> Void) -> UIViewController?
   func createUserProfileView(dismissable: Bool, onEvent: @escaping (String, [String: Any]) -> Void) -> UIViewController?
+  func createOrganizationSwitcherView(hidePersonal: Bool, onEvent: @escaping (String, [String: Any]) -> Void) -> UIViewController?
 
   // SDK operations
   func configure(publishableKey: String, bearerToken: String?) async throws
@@ -440,6 +441,88 @@ public class ClerkUserProfileNativeView: UIView {
     } else {
       returnedController.view.frame = bounds
       returnedController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+      addSubview(returnedController.view)
+      hostingController = returnedController
+    }
+  }
+
+  private func findViewController() -> UIViewController? {
+    var responder: UIResponder? = self
+    while let nextResponder = responder?.next {
+      if let vc = nextResponder as? UIViewController {
+        return vc
+      }
+      responder = nextResponder
+    }
+    return nil
+  }
+
+  override public func layoutSubviews() {
+    super.layoutSubviews()
+    hostingController?.view.frame = bounds
+  }
+}
+
+// MARK: - Inline View: ClerkOrganizationSwitcherNativeView
+
+public class ClerkOrganizationSwitcherNativeView: UIView {
+  private var hostingController: UIViewController?
+  private var currentHidePersonal: Bool = false
+  private var hasInitialized: Bool = false
+
+  @objc var onOrganizationEvent: RCTBubblingEventBlock?
+
+  @objc var hidePersonal: NSNumber? {
+    didSet {
+      currentHidePersonal = hidePersonal?.boolValue ?? false
+      if hasInitialized { updateView() }
+    }
+  }
+
+  override init(frame: CGRect) {
+    super.init(frame: frame)
+  }
+
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
+  override public func didMoveToWindow() {
+    super.didMoveToWindow()
+    if window != nil && !hasInitialized {
+      hasInitialized = true
+      updateView()
+    }
+  }
+
+  private func updateView() {
+    hostingController?.view.removeFromSuperview()
+    hostingController?.removeFromParent()
+    hostingController = nil
+
+    guard let factory = clerkViewFactory else { return }
+
+    guard let returnedController = factory.createOrganizationSwitcherView(
+      hidePersonal: currentHidePersonal,
+      onEvent: { [weak self] eventName, data in
+        let jsonData = (try? JSONSerialization.data(withJSONObject: data)) ?? Data()
+        let jsonString = String(data: jsonData, encoding: .utf8) ?? "{}"
+        self?.onOrganizationEvent?(["type": eventName, "data": jsonString])
+      }
+    ) else { return }
+
+    if let parentVC = findViewController() {
+      parentVC.addChild(returnedController)
+      returnedController.view.frame = bounds
+      returnedController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+      returnedController.view.backgroundColor = .clear
+      addSubview(returnedController.view)
+      returnedController.didMove(toParent: parentVC)
+      hostingController = returnedController
+    } else {
+      returnedController.view.frame = bounds
+      returnedController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+      returnedController.view.backgroundColor = .clear
       addSubview(returnedController.view)
       hostingController = returnedController
     }

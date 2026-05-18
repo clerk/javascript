@@ -209,6 +209,20 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
     )
   }
 
+  public func createOrganizationSwitcherView(
+    hidePersonal: Bool,
+    onEvent: @escaping (String, [String: Any]) -> Void
+  ) -> UIViewController? {
+    makeHostingController(
+      rootView: ClerkInlineOrganizationSwitcherWrapperView(
+        hidePersonal: hidePersonal,
+        lightTheme: lightTheme,
+        darkTheme: darkTheme,
+        onEvent: onEvent
+      )
+    )
+  }
+
   @MainActor
   public func getSession() async -> [String: Any]? {
     guard Self.clerkConfigured, let session = Clerk.shared.session else {
@@ -643,6 +657,41 @@ struct ClerkInlineAuthWrapperView: View {
             break
           }
         }
+      }
+  }
+}
+
+// MARK: - Inline Organization Switcher Wrapper (for embedded rendering)
+
+struct ClerkInlineOrganizationSwitcherWrapperView: View {
+  let hidePersonal: Bool
+  let lightTheme: ClerkTheme?
+  let darkTheme: ClerkTheme?
+  let onEvent: (String, [String: Any]) -> Void
+
+  @Environment(\.colorScheme) private var colorScheme
+
+  // Observe the active organization id to emit `organizationChanged` events.
+  // The native OrganizationSwitcher view itself does not expose a callback;
+  // it mutates Clerk.shared.organization via setActive internally.
+  @State private var lastOrganizationId: String? = Clerk.shared.organization?.id
+
+  var body: some View {
+    let view = OrganizationSwitcher(hidePersonal: hidePersonal)
+      .environment(Clerk.shared)
+    let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
+    let themedView = Group {
+      if let theme {
+        view.environment(\.clerkTheme, theme)
+      } else {
+        view
+      }
+    }
+    themedView
+      .onChange(of: Clerk.shared.organization?.id) { _, newId in
+        guard newId != lastOrganizationId else { return }
+        lastOrganizationId = newId
+        onEvent("organizationChanged", ["organizationId": newId as Any])
       }
   }
 }
