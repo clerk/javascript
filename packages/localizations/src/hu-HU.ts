@@ -154,7 +154,7 @@ export const huHU: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Fizetési módok',
-    popular: 'Népszerű',
+    highlightedPlanBadge: 'Népszerű',
     pricingTable: {
       billingCycle: 'Számlázási ciklus',
       included: 'Tartalmazza',
@@ -215,6 +215,20 @@ export const huHU: LocalizationResource = {
     },
     navbar: {
       title: 'Egyszeri bejelentkezés (SSO) beállítása',
+    },
+    selectProviderStep: {
+      title: 'Szolgáltató kiválasztása',
+      subtitle: 'Válassza ki azt a szolgáltatót, amelyhez beállítja az SSO-t.',
+      body: {
+        title: 'Válassza ki az identitásszolgáltatóját',
+        description: 'Ezután végigvezetjük a részletes beállítási folyamaton.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Egyéni SAML szolgáltató',
+      },
+      warning: 'Miután kiválasztotta a szolgáltatót, nem módosíthatja, amíg a konfiguráció be nem fejeződik',
     },
     verifyEmailDomainStep: {
       title: 'E-mail-cím megerősítése',

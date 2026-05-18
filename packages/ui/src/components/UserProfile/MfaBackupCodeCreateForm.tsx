@@ -10,7 +10,7 @@ import { FormContainer } from '@/ui/elements/FormContainer';
 import { FullHeightLoader } from '@/ui/elements/FullHeightLoader';
 import { handleError } from '@/ui/utils/errorHandler';
 
-import { Button, descriptors, localizationKeys, Text } from '../../customizables';
+import { Button, descriptors, localizationKeys, Text, useAppearance } from '../../customizables';
 import { MfaBackupCodeList } from './MfaBackupCodeList';
 
 type MfaBackupCodeCreateFormProps = FormProps;
@@ -18,6 +18,7 @@ export const MfaBackupCodeCreateForm = withCardStateProvider((props: MfaBackupCo
   const { onSuccess, onReset } = props;
   const { user } = useUser();
   const card = useCardState();
+  const { autoFocus: optionAutoFocus } = useAppearance().parsedOptions;
   const createBackupCode = useReverification(() => user?.createBackupCode());
   const [backupCode, setBackupCode] = React.useState<BackupCodeResource | undefined>(undefined);
 
@@ -56,7 +57,7 @@ export const MfaBackupCodeCreateForm = withCardStateProvider((props: MfaBackupCo
 
           <FormButtonContainer>
             <Button
-              autoFocus
+              autoFocus={optionAutoFocus}
               onClick={onSuccess}
               localizationKey={localizationKeys('userProfile.formButtonPrimary__finish')}
               elementDescriptor={descriptors.formButtonPrimary}

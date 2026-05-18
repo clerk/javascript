@@ -38,6 +38,11 @@ export type {
   UseUserEnterpriseConnectionsParams,
   UseUserEnterpriseConnectionsReturn,
 } from './useUserEnterpriseConnections';
+export { __internal_useEnterpriseConnectionTestRuns } from './useEnterpriseConnectionTestRuns';
+export type {
+  UseEnterpriseConnectionTestRunsParams,
+  UseEnterpriseConnectionTestRunsReturn,
+} from './useEnterpriseConnectionTestRuns';
 
 export { useUserBase as __internal_useUserBase } from './base/useUserBase';
 export { useClientBase as __internal_useClientBase } from './base/useClientBase';

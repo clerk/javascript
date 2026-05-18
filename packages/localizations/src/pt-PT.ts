@@ -149,7 +149,7 @@ export const ptPT: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Métodos de pagamento',
-    popular: 'Popular',
+    highlightedPlanBadge: 'Popular',
     pricingTable: {
       billingCycle: 'Ciclo de faturação',
       included: 'Incluído',
@@ -193,6 +193,20 @@ export const ptPT: LocalizationResource = {
     },
     navbar: {
       title: 'Configurar autenticação única (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Selecionar fornecedor',
+      subtitle: 'Selecione o fornecedor para o qual vai configurar o SSO.',
+      body: {
+        title: 'Selecione o seu fornecedor de identidade',
+        description: 'Iremos guiá-lo pelo processo de configuração detalhado a seguir.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Fornecedor SAML personalizado',
+      },
+      warning: 'Depois de um fornecedor ser selecionado não pode ser alterado até que a configuração esteja terminada',
     },
     verifyEmailDomainStep: {
       title: 'Verificar endereço de e-mail',

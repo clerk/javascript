@@ -141,7 +141,7 @@ export const ukUA: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -186,6 +186,20 @@ export const ukUA: LocalizationResource = {
     },
     navbar: {
       title: 'Налаштувати єдиний вхід (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Виберіть постачальника',
+      subtitle: 'Виберіть постачальника, для якого ви налаштовуватимете SSO.',
+      body: {
+        title: 'Виберіть вашого постачальника ідентифікації',
+        description: 'Далі ми проведемо вас через детальний процес налаштування.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Користувацький постачальник SAML',
+      },
+      warning: 'Після вибору постачальника ви не зможете змінити його, доки не буде завершено налаштування',
     },
     verifyEmailDomainStep: {
       title: 'Підтвердити адресу електронної пошти',

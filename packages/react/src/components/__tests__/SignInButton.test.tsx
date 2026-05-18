@@ -89,6 +89,30 @@ describe('<SignInButton/>', () => {
     expect(mockRedirectToSignIn).toHaveBeenCalled();
   });
 
+  it('accepts a single child passed as an array', async () => {
+    const handler = vi.fn();
+
+    render(
+      <SignInButton>
+        {[
+          <button
+            key='custom'
+            onClick={handler}
+            type='button'
+          >
+            custom button
+          </button>,
+        ]}
+      </SignInButton>,
+    );
+
+    const btn = screen.getByText('custom button');
+    await userEvent.click(btn);
+
+    expect(handler).toHaveBeenCalled();
+    expect(mockRedirectToSignIn).toHaveBeenCalled();
+  });
+
   it('uses text passed as children', async () => {
     render(<SignInButton>text</SignInButton>);
 

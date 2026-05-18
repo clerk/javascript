@@ -147,7 +147,7 @@ export const roRO: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Metode de plată',
-    popular: 'Popular',
+    highlightedPlanBadge: 'Popular',
     pricingTable: {
       billingCycle: 'Ciclu de facturare',
       included: 'Inclus',
@@ -192,6 +192,20 @@ export const roRO: LocalizationResource = {
     },
     navbar: {
       title: 'Configurați autentificarea unică (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Selectați furnizorul',
+      subtitle: 'Selectați furnizorul pentru care veți configura SSO.',
+      body: {
+        title: 'Selectați furnizorul de identitate',
+        description: 'Vă vom ghida în continuare prin procesul de configurare detaliat.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Furnizor SAML personalizat',
+      },
+      warning: 'Odată ce un furnizor este selectat, nu îl puteți schimba până când configurația nu este finalizată',
     },
     verifyEmailDomainStep: {
       title: 'Verifică adresa de e-mail',

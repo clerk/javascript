@@ -153,7 +153,7 @@ export const fiFI: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Maksutavat',
-    popular: 'Suosittu',
+    highlightedPlanBadge: 'Suosittu',
     pricingTable: {
       billingCycle: 'Laskutusjakso',
       included: 'Sisältyy',
@@ -213,6 +213,20 @@ export const fiFI: LocalizationResource = {
     },
     navbar: {
       title: 'Määritä kertakirjautuminen (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Valitse palveluntarjoaja',
+      subtitle: 'Valitse palveluntarjoaja, jolle määrität SSO:n.',
+      body: {
+        title: 'Valitse henkilöllisyyden tarjoaja',
+        description: 'Opastamme sinut yksityiskohtaisen määritysprosessin läpi seuraavaksi.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Mukautettu SAML-palveluntarjoaja',
+      },
+      warning: 'Kun palveluntarjoaja on valittu, et voi vaihtaa sitä ennen kuin määritys on valmis',
     },
     verifyEmailDomainStep: {
       title: 'Vahvista sähköpostiosoite',

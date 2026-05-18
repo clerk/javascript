@@ -70,6 +70,10 @@ export const ConfigureSSONavbar = ({ children, contentRef }: ConfigureSSONavbarP
           </Flex>
         }
         titleSx={t => ({ fontSize: t.fontSizes.$lg })}
+        containerSx={{
+          flexDirection: 'column-reverse',
+          flex: 0,
+        }}
         title={localizationKeys('configureSSO.navbar.title')}
         routes={[]}
         contentRef={contentRef}

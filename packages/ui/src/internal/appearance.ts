@@ -423,6 +423,7 @@ export type ElementsConfig = {
   pricingTableCardHeader: WithOptions;
   pricingTableCardTitleContainer: WithOptions;
   pricingTableCardTitle: WithOptions;
+  pricingTableCardBadge: WithOptions;
   pricingTableCardDescription: WithOptions;
   pricingTableCardFeeContainer: WithOptions;
   pricingTableCardFee: WithOptions;
@@ -825,6 +826,13 @@ export type Variables = {
    */
   fontFamilyButtons?: FontFamily;
   /**
+   * The default monospace font that will be used for monospaced text (e.g. code, OTP inputs).
+   * See {@link Variables.fontFamily} for details on accepted values.
+   *
+   * @default 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
+   */
+  fontFamilyMono?: FontFamily;
+  /**
    * The value will be used as the base `md` to calculate all the other scale values (`xs`, `sm`, `lg` and `xl`).
    * By default, this value is relative to the root fontSize of the html element.
    *
@@ -987,6 +995,13 @@ export type Options = {
    * @default false
    */
   unsafe_disableDevelopmentModeWarnings?: boolean;
+  /**
+   * Controls whether inputs will automatically receive focus when a component is mounted.
+   * Set to false to prevent the components from auto-focusing any input fields.
+   *
+   * @default true
+   */
+  autoFocus?: boolean;
 };
 
 export type CaptchaAppearanceOptions = {

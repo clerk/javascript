@@ -38,6 +38,10 @@ inputs:
     description: 'Enable verbose output'
     required: false
     default: 'false'
+  cache-enabled:
+    description: 'Enable setup-node pnpm cache and Playwright cache restore. Defaults to false so privileged jobs that hold id-token: write cannot accidentally restore poisonable cache state. Callers that want cache (ordinary CI) must opt in with cache-enabled: true.'
+    required: false
+    default: 'false'
 
 runs:
   using: 'composite'
@@ -111,14 +115,14 @@ runs:
     - name: Setup NodeJS ${{ inputs.node-version }}
       uses: useblacksmith/setup-node@v5
       with:
-        cache: pnpm
+        cache: ${{ inputs.cache-enabled == 'true' && 'pnpm' || '' }}
         node-version: ${{ inputs.node-version }}
         registry-url: ${{ inputs.registry-url }}
 
     - name: Install PNPM Dependencies
       env:
         CYPRESS_INSTALL_BINARY: 0
-      run: pnpm install
+      run: pnpm install --frozen-lockfile
       shell: bash
 
     - name: Add node_modules/.bin to PATH
@@ -134,7 +138,7 @@ runs:
         echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
 
     - name: Cache Playwright Binaries
-      if: inputs.playwright-enabled == 'true'
+      if: inputs.playwright-enabled == 'true' && inputs.cache-enabled == 'true'
       uses: useblacksmith/cache@v5
       id: playwright-cache
       with:

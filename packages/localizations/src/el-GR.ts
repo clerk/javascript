@@ -141,7 +141,7 @@ export const elGR: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Μέθοδοι πληρωμής',
-    popular: 'Δημοφιλές',
+    highlightedPlanBadge: 'Δημοφιλές',
     pricingTable: {
       billingCycle: 'Κύκλος χρέωσης',
       included: 'Περιλαμβάνεται',
@@ -186,6 +186,20 @@ export const elGR: LocalizationResource = {
     },
     navbar: {
       title: 'Διαμόρφωση Ενιαίας Σύνδεσης (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Επιλέξτε πάροχο',
+      subtitle: 'Επιλέξτε τον πάροχο για τον οποίο θα ρυθμίσετε SSO.',
+      body: {
+        title: 'Επιλέξτε τον πάροχο ταυτότητάς σας',
+        description: 'Θα σας καθοδηγήσουμε στη λεπτομερή διαδικασία ρύθμισης στη συνέχεια.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Προσαρμοσμένος πάροχος SAML',
+      },
+      warning: 'Μόλις επιλεγεί ένας πάροχος δεν μπορείτε να τον αλλάξετε μέχρι να ολοκληρωθεί η ρύθμιση',
     },
     verifyEmailDomainStep: {
       title: 'Επαλήθευση διεύθυνσης email',

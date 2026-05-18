@@ -141,7 +141,7 @@ export const esCR: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -186,6 +186,20 @@ export const esCR: LocalizationResource = {
     },
     navbar: {
       title: 'Configurar inicio de sesión único (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Seleccionar proveedor',
+      subtitle: 'Selecciona el proveedor para el que vas a configurar SSO.',
+      body: {
+        title: 'Selecciona tu proveedor de identidad',
+        description: 'Te guiaremos a través del proceso de configuración detallado a continuación.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Proveedor SAML personalizado',
+      },
+      warning: 'Una vez que se selecciona un proveedor no puedes cambiarlo hasta que termine la configuración',
     },
     verifyEmailDomainStep: {
       title: 'Verificar correo electrónico',

@@ -364,6 +364,35 @@ describe('SignUp', () => {
       });
     });
 
+    describe('update', () => {
+      afterEach(() => {
+        vi.clearAllMocks();
+        vi.unstubAllGlobals();
+        SignUp.clerk = {} as any;
+      });
+
+      it('patches the active sign up resource', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_123', first_name: 'Ada' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp({ id: 'signup_123' } as any);
+        await signUp.__internal_future.update({ firstName: 'Ada' });
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'PATCH',
+            path: '/client/sign_ups/signup_123',
+            body: expect.objectContaining({
+              firstName: 'Ada',
+            }),
+          }),
+        );
+      });
+    });
+
     describe('sendPhoneCode', () => {
       afterEach(() => {
         vi.clearAllMocks();
@@ -664,6 +693,114 @@ describe('SignUp', () => {
               strategy: 'oauth_google',
               redirectUrl: 'https://example.com/sso-callback',
               actionCompleteRedirectUrl: 'https://other.com/complete',
+            }),
+          }),
+        );
+      });
+
+      it('continues an existing sign up via the resource URL', async () => {
+        vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
+
+        const mockBuildUrlWithAuth = vi.fn().mockReturnValue('https://example.com/sso-callback');
+        SignUp.clerk = {
+          buildUrlWithAuth: mockBuildUrlWithAuth,
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
+
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: {
+            id: 'signup_123',
+            verifications: {
+              external_account: {
+                status: 'complete',
+              },
+            },
+          },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp({ id: 'signup_123' } as any);
+        await signUp.__internal_future.sso({
+          strategy: 'oauth_google',
+          redirectUrl: '/complete',
+          redirectCallbackUrl: '/sso-callback',
+        });
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'PATCH',
+            path: '/client/sign_ups/signup_123',
+            body: expect.objectContaining({
+              strategy: 'oauth_google',
+              redirectUrl: 'https://example.com/sso-callback',
+              actionCompleteRedirectUrl: 'https://example.com/complete',
+            }),
+          }),
+        );
+      });
+
+      it('continues a ticket sign up with sso via the resource URL', async () => {
+        vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
+
+        const mockBuildUrlWithAuth = vi.fn().mockReturnValue('https://example.com/sso-callback');
+        SignUp.clerk = {
+          buildUrlWithAuth: mockBuildUrlWithAuth,
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
+
+        const mockFetch = vi
+          .fn()
+          .mockResolvedValueOnce({
+            client: null,
+            response: { id: 'signup_123' },
+          })
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signup_123',
+              verifications: {
+                external_account: {
+                  status: 'complete',
+                },
+              },
+            },
+          });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp();
+        await signUp.__internal_future.ticket({ ticket: 'provided_ticket' });
+        await signUp.__internal_future.sso({
+          strategy: 'oauth_google',
+          redirectUrl: '/complete',
+          redirectCallbackUrl: '/sso-callback',
+        });
+
+        expect(mockFetch).toHaveBeenNthCalledWith(
+          1,
+          expect.objectContaining({
+            method: 'POST',
+            path: '/client/sign_ups',
+            body: expect.objectContaining({
+              ticket: 'provided_ticket',
+            }),
+          }),
+        );
+        expect(mockFetch).toHaveBeenNthCalledWith(
+          2,
+          expect.objectContaining({
+            method: 'PATCH',
+            path: '/client/sign_ups/signup_123',
+            body: expect.objectContaining({
+              strategy: 'oauth_google',
             }),
           }),
         );

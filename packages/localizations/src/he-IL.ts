@@ -141,7 +141,7 @@ export const heIL: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -185,6 +185,20 @@ export const heIL: LocalizationResource = {
     },
     navbar: {
       title: 'הגדרת כניסה אחידה (SSO)',
+    },
+    selectProviderStep: {
+      title: 'בחר ספק',
+      subtitle: 'בחר את הספק שעבורו תגדיר SSO.',
+      body: {
+        title: 'בחר את ספק הזהות שלך',
+        description: 'נדריך אותך בתהליך ההגדרה המפורט בהמשך.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'ספק SAML מותאם אישית',
+      },
+      warning: 'לאחר בחירת ספק לא ניתן לשנות אותו עד לסיום ההגדרה',
     },
     verifyEmailDomainStep: {
       title: 'אימות כתובת אימייל',
