@@ -252,7 +252,6 @@ const ContinueTestSsoStepButton = ({
     <Step.Footer.Continue
       onClick={() => void handleContinue()}
       isLoading={isValidating}
-      isDisabled={!enterpriseConnectionId || isConnectionActive}
     />
   );
 };
