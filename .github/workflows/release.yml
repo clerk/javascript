@@ -49,8 +49,23 @@ jobs:
           # Use the PAT so pushes from `changesets/action` are authored by
           # clerk-cookie. With the default GITHUB_TOKEN, GitHub suppresses
           # the resulting `synchronize` events and CI never runs on Release
-          # PR updates — forcing a manual close/reopen to re-trigger.
+          # PR updates, forcing a manual close/reopen to re-trigger.
           token: ${{ secrets.CLERK_COOKIE_PAT }}
+
+      # Guard against races where this run is on a SHA that has been
+      # superseded by a newer commit on main (e.g. two Version-packages
+      # PRs merging back-to-back, or a manual re-run of an older release
+      # after main has moved). Bail before build/publish so we don't
+      # waste CI or trigger spurious failure alerts.
+      - name: Ensure HEAD is origin/main
+        run: |
+          git fetch origin main --quiet
+          local_sha=$(git rev-parse HEAD)
+          remote_sha=$(git rev-parse origin/main)
+          if [ "$local_sha" != "$remote_sha" ]; then
+            echo "::notice::Skipping release: HEAD ($local_sha) has been superseded by origin/main ($remote_sha). The newer push will handle this release."
+            exit 1
+          fi
 
       - name: Setup
         id: config
