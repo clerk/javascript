@@ -34,6 +34,9 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
+          # Always read versions from main, regardless of which ref a
+          # manual workflow_dispatch was triggered on.
+          ref: main
           fetch-depth: 1
           show-progress: false
 

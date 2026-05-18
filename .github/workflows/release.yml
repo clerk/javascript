@@ -117,7 +117,7 @@ jobs:
               const clerkUiVersion = require('./packages/ui/package.json').version;
               const nextjsVersion = require('./packages/nextjs/package.json').version;
 
-              // NOTE: Keep in sync with the `targets` array in the "Recover downstream notifications" step below.
+              // NOTE: Keep in sync with the `targets` array in `release-recovery.yml`.
               const targets = [
                 { repo: 'sdk-infra-workers', workflow_id: 'update-pkg-versions.yml', inputs: { clerkjsVersion, clerkUiVersion } },
                 { repo: 'dashboard', workflow_id: 'prepare-nextjs-sdk-update.yml', inputs: { version: nextjsVersion } },
