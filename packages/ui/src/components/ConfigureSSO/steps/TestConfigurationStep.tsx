@@ -708,7 +708,6 @@ type CopyTestUrlButtonProps = {
 };
 
 const CopyTestUrlButton = ({ onTestRunCreated }: CopyTestUrlButtonProps): JSX.Element => {
-  const { t } = useLocalizations();
   const { user } = useUser();
   const card = useCardState();
   const { enterpriseConnection } = useConfigureSSO();
