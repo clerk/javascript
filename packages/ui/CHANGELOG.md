@@ -1,5 +1,15 @@
 # @clerk/ui
 
+## 1.12.1
+
+### Patch Changes
+
+- Fix attribute statement section in `<ConfigureSSO />` with claim name for Custom SAML provider ([#8586](https://github.com/clerk/javascript/pull/8586)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`95f6c2f`](https://github.com/clerk/javascript/commit/95f6c2f8b7154b11dc64c864dcd994baab637c70)]:
+  - @clerk/localizations@4.6.6
+  - @clerk/shared@4.12.2
+
 ## 1.12.0
 
 ### Minor Changes

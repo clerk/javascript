@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.4.11
+
+### Patch Changes
+
+- Adds `agentTaskId` and deprecates `taskId` to Agent Tasks Create response. ([#8013](https://github.com/clerk/javascript/pull/8013)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`95f6c2f`](https://github.com/clerk/javascript/commit/95f6c2f8b7154b11dc64c864dcd994baab637c70)]:
+  - @clerk/shared@4.12.2
+
 ## 3.4.10
 
 ### Patch Changes

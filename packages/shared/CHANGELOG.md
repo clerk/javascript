@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.12.2
+
+### Patch Changes
+
+- Fix attribute statement section in `<ConfigureSSO />` with claim name for Custom SAML provider ([#8586](https://github.com/clerk/javascript/pull/8586)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
 ## 4.12.1
 
 ### Patch Changes
