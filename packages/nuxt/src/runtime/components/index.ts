@@ -4,6 +4,7 @@ export {
   UserAvatar,
   UserButton,
   OrganizationSwitcher,
+  ConfigureSSO,
   GoogleOneTap,
   OAuthConsent,
   Waitlist,
