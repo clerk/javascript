@@ -757,4 +757,100 @@ describe('User', () => {
       },
     });
   });
+
+  describe('.update with metadata routing', () => {
+    it('calls PATCH /me only when no unsafeMetadata is provided', async () => {
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: {} }));
+
+      const user = new User({} as unknown as UserJSON);
+      await user.update({ firstName: 'Jane' });
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledTimes(1);
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith({
+        method: 'PATCH',
+        path: '/me',
+        body: { firstName: 'Jane' },
+      });
+    });
+
+    it('routes only-metadata updates to /me/metadata as an RFC 7396 merge patch', async () => {
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: {} }));
+
+      // Seed current state: { theme: 'dark', layout: 'compact' }. Desired
+      // state drops `layout` and changes `theme` — the merge patch must
+      // null-delete `layout` to preserve replace semantics.
+      const user = new User({
+        unsafe_metadata: { theme: 'dark', layout: 'compact' },
+      } as unknown as UserJSON);
+
+      await user.update({ unsafeMetadata: { theme: 'light' } });
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledTimes(1);
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith({
+        method: 'PATCH',
+        path: '/me/metadata',
+        body: {
+          unsafeMetadata: JSON.stringify({ theme: 'light', layout: null }),
+        },
+      });
+    });
+
+    it('splits mixed calls: PATCH /me for non-metadata, then PATCH /me/metadata for metadata', async () => {
+      const calls: Array<{ method: string; path: string | undefined }> = [];
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockImplementation((opts: any) => {
+        calls.push({ method: opts.method, path: opts.path });
+        return Promise.resolve({ response: {} });
+      });
+
+      const user = new User({
+        unsafe_metadata: { foo: 'old' },
+      } as unknown as UserJSON);
+
+      await user.update({
+        firstName: 'Jane',
+        unsafeMetadata: { foo: 'new', bar: 'added' },
+      });
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledTimes(2);
+      expect(calls[0]).toEqual({ method: 'PATCH', path: '/me' });
+      expect(calls[1]).toEqual({ method: 'PATCH', path: '/me/metadata' });
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenNthCalledWith(1, {
+        method: 'PATCH',
+        path: '/me',
+        body: { firstName: 'Jane' },
+      });
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenNthCalledWith(2, {
+        method: 'PATCH',
+        path: '/me/metadata',
+        body: {
+          unsafeMetadata: JSON.stringify({ foo: 'new', bar: 'added' }),
+        },
+      });
+    });
+
+    it('makes no API calls when desired metadata equals current (no-op)', async () => {
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: {} }));
+
+      const user = new User({
+        unsafe_metadata: { theme: 'dark' },
+      } as unknown as UserJSON);
+
+      await user.update({ unsafeMetadata: { theme: 'dark' } });
+
+      // @ts-ignore
+      expect(BaseResource._fetch).not.toHaveBeenCalled();
+    });
+  });
 });

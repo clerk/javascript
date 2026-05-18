@@ -1,3 +1,4 @@
+import { deprecated } from '@clerk/shared/deprecated';
 import { getFullName } from '@clerk/shared/internal/clerk-js/user';
 import type {
   BackupCodeJSON,
@@ -47,6 +48,7 @@ import type {
 
 import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
 import { unixEpochToDate } from '../../utils/date';
+import { computeMergePatch } from '../../utils/mergePatch';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { eventBus, events } from '../events';
 import { addPaymentMethod, getPaymentMethods, initializePaymentMethod } from '../modules/billing';
@@ -235,9 +237,42 @@ export class User extends BaseResource implements UserResource {
     return new BackupCode(json);
   };
 
-  update = (params: UpdateUserParams): Promise<UserResource> => {
-    return this._basePatch({
-      body: normalizeUnsafeMetadata(params),
+  update = async (params: UpdateUserParams): Promise<UserResource> => {
+    const { unsafeMetadata, ...rest } = params;
+    const hasMetadata = unsafeMetadata !== undefined;
+    const hasRest = Object.keys(rest).length > 0;
+
+    if (!hasMetadata) {
+      return this._basePatch({
+        body: normalizeUnsafeMetadata(params),
+      });
+    }
+
+    deprecated(
+      'user.update({ unsafeMetadata })',
+      'Use user.updateMetadata({ unsafeMetadata }) for partial updates (deep merge) instead.',
+    );
+
+    // The FAPI endpoint deprecates `unsafe_metadata` on PATCH /me. Route
+    // metadata through PATCH /me/metadata (deep-merge) while preserving the
+    // *replace* semantics of `user.update({ unsafeMetadata })` by
+    // diffing the locally-cached value against the desired one and sending
+    // an RFC 7396 merge patch (null-deletes for removed keys).
+    if (hasRest) {
+      await this._basePatch({
+        body: normalizeUnsafeMetadata(rest as UpdateUserParams),
+      });
+    }
+
+    const patch = computeMergePatch(this.unsafeMetadata, unsafeMetadata);
+
+    // An empty patch means current already equals desired — short-circuit.
+    if (patch !== null && typeof patch === 'object' && Object.keys(patch).length === 0) {
+      return this;
+    }
+
+    return this.updateMetadata({
+      unsafeMetadata: patch as UserUnsafeMetadata,
     });
   };
 

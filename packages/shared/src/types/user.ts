@@ -186,7 +186,14 @@ type UpdateUserJSON = Pick<
   | 'unsafe_metadata'
 >;
 
-export type UpdateUserParams = Partial<SnakeToCamel<UpdateUserJSON>>;
+export type UpdateUserParams = Omit<Partial<SnakeToCamel<UpdateUserJSON>>, 'unsafeMetadata'> & {
+  /**
+   * @deprecated Updating `unsafeMetadata` via `user.update()` is deprecated.
+   * Use `user.updateMetadata({ unsafeMetadata })` for partial updates (deep
+   * merge). The parameter will be removed in a future major version.
+   */
+  unsafeMetadata?: UserUnsafeMetadata;
+};
 
 /**
  * Parameters for {@link UserResource.updateMetadata}. Only `unsafeMetadata`

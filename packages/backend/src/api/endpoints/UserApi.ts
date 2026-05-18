@@ -171,8 +171,34 @@ type UpdateUserParams = {
 
   /** The maximum number of Organizations the user can create. 0 means unlimited. */
   createOrganizationsLimit?: number;
-} & UserMetadataParams &
-  (UserPasswordHashingParams | object);
+
+  /**
+   * Metadata visible to your Frontend and Backend APIs.
+   *
+   * @deprecated Updating metadata via `updateUser` is deprecated. Use
+   * `updateUserMetadata` for partial updates (deep merge) or
+   * `replaceUserMetadata` for full replacement.
+   */
+  publicMetadata?: UserPublicMetadata;
+
+  /**
+   * Metadata visible only to your Backend API.
+   *
+   * @deprecated Updating metadata via `updateUser` is deprecated. Use
+   * `updateUserMetadata` for partial updates (deep merge) or
+   * `replaceUserMetadata` for full replacement.
+   */
+  privateMetadata?: UserPrivateMetadata;
+
+  /**
+   * Metadata writeable from both the Frontend and Backend APIs.
+   *
+   * @deprecated Updating metadata via `updateUser` is deprecated. Use
+   * `updateUserMetadata` for partial updates (deep merge) or
+   * `replaceUserMetadata` for full replacement.
+   */
+  unsafeMetadata?: UserUnsafeMetadata;
+} & (UserPasswordHashingParams | object);
 
 type GetOrganizationMembershipListParams = ClerkPaginationRequest<{
   userId: string;
@@ -252,10 +278,38 @@ export class UserAPI extends AbstractAPI {
   public async updateUser(userId: string, params: UpdateUserParams = {}) {
     this.requireId(userId);
 
+    const { publicMetadata, privateMetadata, unsafeMetadata, ...rest } = params as UpdateUserParams &
+      UserMetadataParams;
+    const hasMetadata = publicMetadata !== undefined || privateMetadata !== undefined || unsafeMetadata !== undefined;
+    const hasRest = Object.keys(rest).length > 0;
+
+    if (hasMetadata) {
+      deprecated(
+        'updateUser(userId, { publicMetadata | privateMetadata | unsafeMetadata })',
+        'Use updateUserMetadata for partial updates (merge) or replaceUserMetadata for full replacement.',
+      );
+    }
+
+    if (!hasMetadata) {
+      return this.request<User>({
+        method: 'PATCH',
+        path: joinPaths(basePath, userId),
+        bodyParams: rest,
+      });
+    }
+
+    if (hasRest) {
+      await this.request<User>({
+        method: 'PATCH',
+        path: joinPaths(basePath, userId),
+        bodyParams: rest,
+      });
+    }
+
     return this.request<User>({
-      method: 'PATCH',
-      path: joinPaths(basePath, userId),
-      bodyParams: params,
+      method: 'PUT',
+      path: joinPaths(basePath, userId, 'metadata'),
+      bodyParams: { publicMetadata, privateMetadata, unsafeMetadata },
     });
   }
 
@@ -277,6 +331,21 @@ export class UserAPI extends AbstractAPI {
 
     return this.request<User>({
       method: 'PATCH',
+      path: joinPaths(basePath, userId, 'metadata'),
+      bodyParams: params,
+    });
+  }
+
+  /**
+   * Replace a user's metadata. Supplied fields are overwritten in full; fields
+   * omitted from `params` are left unchanged. Prefer `updateUserMetadata` for
+   * partial updates with deep-merge semantics.
+   */
+  public async replaceUserMetadata(userId: string, params: UserMetadataParams) {
+    this.requireId(userId);
+
+    return this.request<User>({
+      method: 'PUT',
       path: joinPaths(basePath, userId, 'metadata'),
       bodyParams: params,
     });
