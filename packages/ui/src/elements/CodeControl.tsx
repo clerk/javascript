@@ -5,7 +5,7 @@ import type { PropsWithChildren } from 'react';
 import React, { useCallback } from 'react';
 
 import type { LocalizationKey } from '../customizables';
-import { Box, descriptors, Flex, OTPInputSegment } from '../customizables';
+import { Box, descriptors, Flex, OTPInputSegment, useAppearance } from '../customizables';
 import { useCardState } from '../elements/contexts';
 import { useLoadingStatus } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
@@ -166,6 +166,7 @@ export const OTPResendButton = () => {
 export const OTPCodeControl = () => {
   const [disabled, setDisabled] = React.useState(false);
   const { otpControl, isLoading, isDisabled } = useOTPInputContext();
+  const { autoFocus: optionAutoFocus } = useAppearance().parsedOptions;
   const { feedback, values, setValues, feedbackType, length } = otpControl.otpInputProps;
 
   React.useEffect(() => {
@@ -180,7 +181,7 @@ export const OTPCodeControl = () => {
       sx={{ position: 'relative' }}
     >
       <OTPInput
-        autoFocus // eslint-disable-line jsx-a11y/no-autofocus
+        autoFocus={optionAutoFocus} // eslint-disable-line jsx-a11y/no-autofocus
         aria-label='Enter verification code'
         aria-required
         maxLength={length}
