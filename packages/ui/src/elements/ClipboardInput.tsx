@@ -23,17 +23,19 @@ export const ClipboardInput = (props: ClipboardInputProps) => {
       <Input
         {...rest}
         value={value}
-        isDisabled
-        sx={theme => ({ paddingInlineEnd: theme.space.$8 })}
+        readOnly
+        sx={theme => ({ paddingInlineEnd: theme.space.$10, textOverflow: 'ellipsis' })}
       />
 
       <Button
         elementDescriptor={descriptors.formFieldInputCopyToClipboardButton}
         variant='ghost'
         onClick={() => onCopy()}
-        sx={{
-          position: 'absolute',
-          insetInlineEnd: 0,
+        sx={t => {
+          return {
+            position: 'absolute',
+            insetInlineEnd: t.space.$0x5,
+          };
         }}
       >
         <Icon
