@@ -60,7 +60,7 @@ export const usePopover = (props: UsePopoverProps = {}): UsePopoverReturn => {
       shift(),
       size({
         apply({ elements }) {
-          if (adjustToReferenceWidth) {
+          if (typeof adjustToReferenceWidth === 'number' || adjustToReferenceWidth === true) {
             const reference = elements.reference as any as HTMLElement;
             const extra = typeof adjustToReferenceWidth === 'number' ? adjustToReferenceWidth : 0;
             elements.floating.style.width = reference ? `${reference.offsetWidth + extra}px` : '';
