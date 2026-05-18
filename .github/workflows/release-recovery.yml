@@ -1,17 +1,21 @@
 name: Release Recovery (manual)
 
-# Manual recovery handle for downstream notifications. Use when a release
+# Recovery handle for downstream notifications. Use when a release
 # run published to npm but failed to dispatch one or more downstream
 # workflows (sdk-infra-workers, dashboard, clerk-docs). Reads versions
 # from main's package.json, verifies what is actually on npm, then
 # re-dispatches the same workflows that the production release job
 # would have dispatched.
 #
-# Trigger via: gh workflow run release-recovery.yml -R clerk/javascript
-# Or from the Actions UI ("Run workflow").
+# Invoked two ways:
+#  - Automatically as a dependent job from release.yml when the
+#    changesets step fails (workflow_call).
+#  - Manually via `gh workflow run release-recovery.yml -R clerk/javascript`
+#    or the Actions UI (workflow_dispatch).
 
 on:
   workflow_dispatch:
+  workflow_call:
 
 concurrency:
   group: ${{ github.workflow }}
