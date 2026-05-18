@@ -8,10 +8,7 @@ import { ApplicationLogo } from '../ApplicationLogo';
 import { useFlowMetadata } from '../contexts';
 import { ModalContext } from '../Modal';
 
-// Element style overrides for flush elevation. Resolved with the current theme
-// so values like `t.space.$4` are available, then injected into parsedElements at
-// index 1 (after baseTheme, before user overrides) via AppearanceContext so they
-// participate in the makeCustomizable cascade and can still be overridden by users.
+// Flush overrides injected into parsedElements after baseTheme but before user overrides.
 const getFlushElements = (t: InternalTheme) => ({
   cardBox: {
     borderWidth: 0,
