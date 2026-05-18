@@ -1,5 +1,15 @@
 # @clerk/astro
 
+## 3.2.5
+
+### Patch Changes
+
+- Allow unstyled button components to accept a single React element passed as an array. Fixes a misleading "multiple children" error that could appear when a custom button child crossed a server/client boundary and arrived as a one-item array. ([#8561](https://github.com/clerk/javascript/pull/8561)) by [@manovotny](https://github.com/manovotny)
+
+- Updated dependencies [[`4fc38a0`](https://github.com/clerk/javascript/commit/4fc38a097cb9ed1d37c9c3faa274e5c44e405c68)]:
+  - @clerk/shared@4.12.1
+  - @clerk/backend@3.4.10
+
 ## 3.2.4
 
 ### Patch Changes

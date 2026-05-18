@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.12.1
+
+### Patch Changes
+
+- Add support for custom SAML provider in `<ConfigureSSO />` ([#8564](https://github.com/clerk/javascript/pull/8564)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
 ## 4.12.0
 
 ### Minor Changes
