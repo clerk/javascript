@@ -103,6 +103,7 @@ export const Select = withFloatingTree(<O extends Option>(props: PropsWithChildr
   } = props;
   const popoverCtx = usePopover({
     autoUpdate: true,
+    // +2px compensates for the 1px border on each side of the trigger
     adjustToReferenceWidth: 2,
     referenceElement: referenceElement,
     offset: { mainAxis: 6, crossAxis: -1 },
