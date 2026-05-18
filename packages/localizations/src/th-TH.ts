@@ -145,7 +145,7 @@ export const thTH: LocalizationResource = {
       },
     },
     paymentMethods__label: 'วิธีการชำระเงิน',
-    popular: 'ยอดนิยม',
+    highlightedPlanBadge: 'ยอดนิยม',
     pricingTable: {
       billingCycle: 'รอบการเรียกเก็บเงิน',
       included: 'รวมอยู่',
@@ -189,6 +189,20 @@ export const thTH: LocalizationResource = {
     },
     navbar: {
       title: 'กำหนดค่าการลงชื่อเข้าใช้แบบครั้งเดียว (SSO)',
+    },
+    selectProviderStep: {
+      title: 'เลือกผู้ให้บริการ',
+      subtitle: 'เลือกผู้ให้บริการที่คุณจะตั้งค่า SSO ให้',
+      body: {
+        title: 'เลือกผู้ให้บริการข้อมูลประจำตัวของคุณ',
+        description: 'เราจะแนะนำคุณตลอดกระบวนการตั้งค่าโดยละเอียดในขั้นตอนถัดไป',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'ผู้ให้บริการ SAML แบบกำหนดเอง',
+      },
+      warning: 'เมื่อเลือกผู้ให้บริการแล้วคุณไม่สามารถเปลี่ยนได้อีกจนกว่าการกำหนดค่าจะเสร็จสิ้น',
     },
     verifyEmailDomainStep: {
       title: 'ยืนยันที่อยู่อีเมล',

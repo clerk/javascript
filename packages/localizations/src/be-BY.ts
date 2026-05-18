@@ -141,7 +141,7 @@ export const beBY: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -186,6 +186,20 @@ export const beBY: LocalizationResource = {
     },
     navbar: {
       title: 'Налада адзінага ўваходу (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Выберыце правайдэра',
+      subtitle: 'Выберыце правайдэра, для якога вы будзеце наладжваць SSO.',
+      body: {
+        title: 'Выберыце вашага правайдэра ідэнтыфікацыі',
+        description: 'Мы правядзём вас праз падрабязны працэс налады далей.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Карыстальніцкі правайдэр SAML',
+      },
+      warning: 'Пасля выбару правайдэра вы не зможаце змяніць яго, пакуль не скончыце канфігурацыю',
     },
     verifyEmailDomainStep: {
       title: 'Пацвердзіць адрас электроннай пошты',

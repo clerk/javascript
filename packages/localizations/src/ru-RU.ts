@@ -141,7 +141,7 @@ export const ruRU: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -186,6 +186,20 @@ export const ruRU: LocalizationResource = {
     },
     navbar: {
       title: 'Настроить единый вход (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Выберите поставщика',
+      subtitle: 'Выберите поставщика, для которого вы будете настраивать SSO.',
+      body: {
+        title: 'Выберите вашего поставщика идентификации',
+        description: 'Далее мы проведём вас через подробный процесс настройки.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Пользовательский поставщик SAML',
+      },
+      warning: 'После выбора поставщика вы не сможете изменить его до завершения настройки',
     },
     verifyEmailDomainStep: {
       title: 'Подтвердить адрес электронной почты',

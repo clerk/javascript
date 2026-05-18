@@ -141,7 +141,7 @@ export const hiIN: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -186,6 +186,20 @@ export const hiIN: LocalizationResource = {
     },
     navbar: {
       title: 'सिंगल साइन-ऑन (SSO) कॉन्फ़िगर करें',
+    },
+    selectProviderStep: {
+      title: 'प्रदाता चुनें',
+      subtitle: 'उस प्रदाता का चयन करें जिसके लिए आप SSO सेट अप कर रहे हैं।',
+      body: {
+        title: 'अपना पहचान प्रदाता चुनें',
+        description: 'हम आपको आगे विस्तृत सेटअप प्रक्रिया के माध्यम से मार्गदर्शन करेंगे।',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'कस्टम SAML प्रदाता',
+      },
+      warning: 'एक बार प्रदाता का चयन करने के बाद आप कॉन्फ़िगरेशन समाप्त होने तक इसे बदल नहीं सकते',
     },
     verifyEmailDomainStep: {
       title: 'ईमेल पता सत्यापित करें',

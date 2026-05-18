@@ -147,7 +147,7 @@ export const itIT: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Metodi di pagamento',
-    popular: 'Popolare',
+    highlightedPlanBadge: 'Popolare',
     pricingTable: {
       billingCycle: 'Ciclo di fatturazione',
       included: 'Incluso',
@@ -192,6 +192,20 @@ export const itIT: LocalizationResource = {
     },
     navbar: {
       title: 'Configura Single Sign-On (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Seleziona provider',
+      subtitle: "Seleziona il provider per cui configurerai l'SSO.",
+      body: {
+        title: 'Seleziona il tuo provider di identità',
+        description: 'Ti guideremo nel processo di configurazione dettagliato successivamente.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Provider SAML personalizzato',
+      },
+      warning: 'Una volta selezionato un provider non potrai cambiarlo fino al termine della configurazione',
     },
     verifyEmailDomainStep: {
       title: 'Verifica indirizzo email',

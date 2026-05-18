@@ -150,7 +150,7 @@ export const isIS: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Greiðslumátar',
-    popular: 'Vinsælt',
+    highlightedPlanBadge: 'Vinsælt',
     pricingTable: {
       billingCycle: 'Greiðslutímabil',
       included: 'Innifalið',
@@ -214,6 +214,20 @@ export const isIS: LocalizationResource = {
     },
     navbar: {
       title: 'Stilla einnar innskráningar (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Veldu þjónustuaðila',
+      subtitle: 'Veldu þjónustuaðilann sem þú ætlar að setja upp SSO fyrir.',
+      body: {
+        title: 'Veldu auðkennisþjónustuaðila þinn',
+        description: 'Við munum leiðbeina þér í gegnum ítarlegt uppsetningarferli næst.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Sérsniðinn SAML þjónustuaðili',
+      },
+      warning: 'Þegar þjónustuaðili hefur verið valinn er ekki hægt að breyta aftur fyrr en stillingu er lokið',
     },
     verifyEmailDomainStep: {
       title: 'Staðfesta tölvupóstfang',

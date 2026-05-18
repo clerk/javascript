@@ -266,7 +266,7 @@ function CopyButton({ text, copyLabel = 'Copy' }: { text: string; copyLabel?: st
     <Button
       elementDescriptor={descriptors.paymentAttemptCopyButton}
       variant='unstyled'
-      onClick={onCopy}
+      onClick={() => onCopy()}
       sx={t => ({
         color: 'inherit',
         width: t.sizes.$4,

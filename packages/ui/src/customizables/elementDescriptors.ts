@@ -281,6 +281,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'pricingTableCardHeader',
   'pricingTableCardTitleContainer',
   'pricingTableCardTitle',
+  'pricingTableCardBadge',
   'pricingTableCardDescription',
   'pricingTableCardBody',
   'pricingTableCardStatusRow',
