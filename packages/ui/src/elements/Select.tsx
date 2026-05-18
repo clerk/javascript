@@ -103,8 +103,9 @@ export const Select = withFloatingTree(<O extends Option>(props: PropsWithChildr
   } = props;
   const popoverCtx = usePopover({
     autoUpdate: true,
-    adjustToReferenceWidth: !!referenceElement,
+    adjustToReferenceWidth: 2,
     referenceElement: referenceElement,
+    offset: { mainAxis: 6, crossAxis: -1 },
   });
   const togglePopover = popoverCtx.toggle;
   const focusedItemRef = React.useRef<HTMLDivElement>(null);
