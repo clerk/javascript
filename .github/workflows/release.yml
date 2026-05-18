@@ -60,15 +60,24 @@ jobs:
       # Guard against races where this run is on a SHA that has been
       # superseded by a newer commit on main (e.g. two Version-packages
       # PRs merging back-to-back, or a manual re-run of an older release
-      # after main has moved). Bail before build/publish so we don't
-      # waste CI or trigger spurious failure alerts.
+      # after main has moved). Cancel the run before build/publish so we
+      # don't waste CI or trigger spurious failure alerts. Cancelling
+      # (rather than failing) matches the status that
+      # `concurrency: cancel-in-progress` would produce.
       - name: Ensure HEAD is origin/main
+        env:
+          GH_TOKEN: ${{ secrets.CLERK_COOKIE_PAT }}
         run: |
           git fetch origin main --quiet
           local_sha=$(git rev-parse HEAD)
           remote_sha=$(git rev-parse origin/main)
           if [ "$local_sha" != "$remote_sha" ]; then
-            echo "::notice::Skipping release: HEAD ($local_sha) has been superseded by origin/main ($remote_sha). The newer push will handle this release."
+            echo "::notice::Cancelling release: HEAD ($local_sha) has been superseded by origin/main ($remote_sha). The newer push will handle this release."
+            gh run cancel ${{ github.run_id }} --repo ${{ github.repository }}
+            # Cancellation is async; sleep so the runner is interrupted
+            # before subsequent steps execute. exit 1 as fallback if
+            # cancellation does not take effect within the window.
+            sleep 30
             exit 1
           fi
 
