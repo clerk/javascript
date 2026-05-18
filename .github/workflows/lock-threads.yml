@@ -8,7 +8,6 @@ on:
     - cron: '0 0 * * *'
 
 permissions:
-  contents: write # only for delete-branch option
   issues: write
   pull-requests: write
 
