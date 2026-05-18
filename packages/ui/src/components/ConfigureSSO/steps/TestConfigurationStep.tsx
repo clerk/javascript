@@ -743,17 +743,22 @@ const CopyTestUrlButton = ({ onTestRunCreated }: CopyTestUrlButtonProps): JSX.El
       size='xs'
       onClick={createTestRun}
       isDisabled={isCreatingTestRun}
-      isLoading={isCreatingTestRun}
-      loadingText={t(localizationKeys('configureSSO.testConfigurationStep.testUrl.actionLabel__copy'))}
       sx={t => ({
         gap: t.space.$1x5,
       })}
     >
-      <Icon
-        icon={hasCopied ? Check : Copy}
-        size='sm'
-        colorScheme='neutral'
-      />
+      {isCreatingTestRun ? (
+        <Spinner
+          elementDescriptor={descriptors.spinner}
+          size='xs'
+        />
+      ) : (
+        <Icon
+          icon={hasCopied ? Check : Copy}
+          size='sm'
+          colorScheme='neutral'
+        />
+      )}
       <Text
         as='span'
         localizationKey={localizationKeys('configureSSO.testConfigurationStep.testUrl.actionLabel__copy')}
