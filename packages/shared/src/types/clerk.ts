@@ -662,6 +662,26 @@ export interface Clerk {
   unmountAPIKeys: (targetNode: HTMLDivElement) => void;
 
   /**
+   * Mount a configure SSO component at the target element.
+   *
+   * @experimental This method is in early access and may change in future releases.
+   *
+   * @param targetNode - Target to mount the ConfigureSSO component.
+   * @param props - Configuration parameters.
+   */
+  __experimental_mountConfigureSSO: (targetNode: HTMLDivElement, props?: __experimental_ConfigureSSOProps) => void;
+
+  /**
+   * Unmount a configure SSO component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @experimental This method is in early access and may change in future releases.
+   *
+   * @param targetNode - Target node to unmount the ConfigureSSO component from.
+   */
+  __experimental_unmountConfigureSSO: (targetNode: HTMLDivElement) => void;
+
+  /**
    * Mounts a OAuth consent component at the target element.
    *
    * @param targetNode - Target node to mount the OAuth consent component.
@@ -675,6 +695,21 @@ export interface Clerk {
    * @param targetNode - Target node to unmount the OAuth consent component from.
    */
   __internal_unmountOAuthConsent: (targetNode: HTMLDivElement) => void;
+
+  /**
+   * Mounts a OAuth consent component at the target element.
+   *
+   * @param targetNode - Target node to mount the OAuth consent component.
+   * @param oauthConsentProps - OAuth consent configuration parameters.
+   */
+  mountOAuthConsent: (targetNode: HTMLDivElement, oauthConsentProps?: OAuthConsentProps) => void;
+
+  /**
+   * Unmounts a OAuth consent component from the target element.
+   *
+   * @param targetNode - Target node to unmount the OAuth consent component from.
+   */
+  unmountOAuthConsent: (targetNode: HTMLDivElement) => void;
 
   /**
    * Mounts a TaskChooseOrganization component at the target element.
@@ -1123,7 +1158,17 @@ type ClerkOptionsNavigation =
 
 type ClerkUnsafeOptions = {
   /**
-   * Disables the console warning that is logged when Clerk is initialized with development keys.
+   * Disables the `Clerk has been loaded with development keys` console warning that is logged when Clerk is
+   * initialized with development keys. The warning is emitted by `clerk-js` to the browser console; in dev servers
+   * that mirror browser logs to the terminal (e.g. Next.js with `experimental.browserDebugInfoInTerminal`), setting
+   * this option also stops it from showing up there.
+   *
+   * Each framework integration also exposes an env-var shortcut so you don't need to thread the option through
+   * `<ClerkProvider>` manually:
+   * - Next.js: `NEXT_PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`
+   * - Astro: `PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`
+   * - TanStack Start / React Router: `VITE_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`
+   * - Nuxt: `NUXT_PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`
    *
    * [WARNING] The development mode warning is intended to ensure that you don't go to production with a non-production
    * Clerk instance. If you're disabling it, please make sure you don't ship with a non-production Clerk instance!
@@ -2080,6 +2125,10 @@ type PricingTableDefaultProps = {
 
 type PricingTableBaseProps = {
   /**
+   * The plan slug to highlight with a "Popular" badge.
+   */
+  highlightedPlan?: string;
+  /**
    * The subscriber type to display plans for.
    * If `organization`, show Plans for the Active Organization; otherwise for the user.
    *
@@ -2122,6 +2171,18 @@ export type APIKeysProps = {
    * @default false
    */
   showDescription?: boolean;
+};
+
+/**
+ * @experimental This type is in early access and may change in future releases.
+ */
+export type __experimental_ConfigureSSOProps = {
+  /**
+   * Customisation options to fully match the Clerk components to your own brand.
+   * These options serve as overrides and will be merged with the global `appearance`
+   * prop of ClerkProvider (if one is provided)
+   */
+  appearance?: ClerkAppearanceTheme;
 };
 
 export type GetAPIKeysParams = ClerkPaginationParams<{
@@ -2265,7 +2326,7 @@ export type __experimental_SubscriptionDetailsButtonProps = {
   };
 };
 
-export type __internal_OAuthConsentProps = {
+export type OAuthConsentProps = {
   /**
    * Customize the appearance of the component.
    */
@@ -2327,6 +2388,9 @@ export type __internal_OAuthConsentProps = {
    */
   onDeny?: () => void;
 };
+
+/** @deprecated Use OAuthConsentProps instead. */
+export type __internal_OAuthConsentProps = OAuthConsentProps;
 
 export interface HandleEmailLinkVerificationParams {
   /**

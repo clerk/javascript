@@ -1,5 +1,119 @@
 # Change Log
 
+## 7.3.5
+
+### Patch Changes
+
+- Bump `next` devDependency to `15.5.18` to pick up the fix for GHSA-26hh-7cqf-hhc6, a high-severity (CVSS 7.5) Middleware/Proxy bypass in App Router applications via segment-prefetch routes (incomplete-fix follow-up). If you use the Next.js App Router, we recommend upgrading to Next.js `15.5.18`, `16.2.6`, or a later patched release. The `16.0.0` through `16.2.5` versions are still affected. ([#8547](https://github.com/clerk/javascript/pull/8547)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`9fa6642`](https://github.com/clerk/javascript/commit/9fa6642de6a734faf532ca70c411431c5d0d2bbb), [`930047f`](https://github.com/clerk/javascript/commit/930047f3ea9b603a7f254f7764c3dc5e0fa7c769), [`b45777c`](https://github.com/clerk/javascript/commit/b45777c5723b01b8c7ee3d37b712c639067b36ab), [`5441d86`](https://github.com/clerk/javascript/commit/5441d863146cacb5bc8446825c820fac51e4312b), [`5a7225e`](https://github.com/clerk/javascript/commit/5a7225ef119edf551e20bdce8af465b42981c8f2)]:
+  - @clerk/shared@4.12.0
+  - @clerk/react@6.6.4
+  - @clerk/backend@3.4.9
+
+## 7.3.4
+
+### Patch Changes
+
+- Updated dependencies [[`1a4d7d1`](https://github.com/clerk/javascript/commit/1a4d7d1c711c25f4f83c0773616b799df2feb010), [`a6916b1`](https://github.com/clerk/javascript/commit/a6916b15658625a0e627c474a62212a65868bfb6), [`1084180`](https://github.com/clerk/javascript/commit/1084180797722ff113df8404a3c967bc6abeb12d), [`ee25cf2`](https://github.com/clerk/javascript/commit/ee25cf258f4b46d2303e318f9be2367307953d70), [`39099b6`](https://github.com/clerk/javascript/commit/39099b62308fc9b0ebbb25988c0ae4b655efe744), [`2377305`](https://github.com/clerk/javascript/commit/2377305aa9e9c5e63dbd6fe7c9ee3b3bc474d8b7), [`18e0a1a`](https://github.com/clerk/javascript/commit/18e0a1aa48e7f65a6610ec3c6ffe105deb3474b2)]:
+  - @clerk/shared@4.11.0
+  - @clerk/backend@3.4.8
+  - @clerk/react@6.6.3
+
+## 7.3.3
+
+### Patch Changes
+
+- Updated dependencies [[`0ab09a8`](https://github.com/clerk/javascript/commit/0ab09a89af1d7452df734278288e8218710f0e0e), [`6408ab6`](https://github.com/clerk/javascript/commit/6408ab6ec58d06af3f8334cb5a7d8d2647b8012e), [`5cda3ee`](https://github.com/clerk/javascript/commit/5cda3ee8451cc9af375895824d24a5c3ed7fbee6)]:
+  - @clerk/backend@3.4.7
+  - @clerk/shared@4.10.2
+  - @clerk/react@6.6.2
+
+## 7.3.2
+
+### Patch Changes
+
+- Improved `auth()` error message when `clerkMiddleware()` is not detected to mention that infrastructure issues (e.g. edge runtime errors or platform outages) can also cause this error. ([#8007](https://github.com/clerk/javascript/pull/8007)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`7a5892f`](https://github.com/clerk/javascript/commit/7a5892f9bcaa1a6212e6e6d3741160929ffd027e)]:
+  - @clerk/backend@3.4.6
+  - @clerk/shared@4.10.1
+  - @clerk/react@6.6.1
+
+## 7.3.1
+
+### Patch Changes
+
+- Enforce middleware authorization during the keyless bootstrap window. `auth.protect()` and custom authorization checks now fail closed instead of being bypassed while the publishable key is being provisioned. ([#8369](https://github.com/clerk/javascript/pull/8369)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`9e9230c`](https://github.com/clerk/javascript/commit/9e9230c8c3cbdb1c253ca7cdd24cc8d681b5ee5a), [`68d32df`](https://github.com/clerk/javascript/commit/68d32dfcc453080ef93edf69be8de765a342d88c), [`1c27d4d`](https://github.com/clerk/javascript/commit/1c27d4dd41a27cf41c3823306fe88e026fed08fb), [`1001193`](https://github.com/clerk/javascript/commit/10011936981fc22bf7d3750f1591f0873ea78bcb)]:
+  - @clerk/shared@4.10.0
+  - @clerk/react@6.6.0
+  - @clerk/backend@3.4.5
+
+## 7.3.0
+
+### Minor Changes
+
+- Expose `OAuthConsent` as a public component export across React-based SDKs. ([#8381](https://github.com/clerk/javascript/pull/8381)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```tsx
+  import { OAuthConsent } from '@clerk/react';
+
+  export default function Page() {
+    return <OAuthConsent />;
+  }
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`785f057`](https://github.com/clerk/javascript/commit/785f057f5cda202c26a9f34bde7c1873a6cbd6ea), [`90beaeb`](https://github.com/clerk/javascript/commit/90beaeb8319d5bccb8fa52343f4b241c6d2d3ebe), [`244920d`](https://github.com/clerk/javascript/commit/244920d1ebb5d420a96bfc2a79d84cccafe9b61c)]:
+  - @clerk/shared@4.9.0
+  - @clerk/react@6.5.0
+  - @clerk/backend@3.4.4
+
+## 7.2.9
+
+### Patch Changes
+
+- Updated dependencies [[`1bfd8ab`](https://github.com/clerk/javascript/commit/1bfd8ab89c62e428038b8c565f118c582ed395ea)]:
+  - @clerk/shared@4.8.7
+  - @clerk/backend@3.4.3
+  - @clerk/react@6.4.7
+
+## 7.2.8
+
+### Patch Changes
+
+- Use a constant-time comparison when validating the integrity signature on the middleware-to-origin auth header handoff (`assertTokenSignature`). The previous `!==` compare was timing-variable; the new helper is synchronous and runtime-agnostic so it works in both Node and Edge Runtime. ([#8411](https://github.com/clerk/javascript/pull/8411)) by [@jacekradko](https://github.com/jacekradko)
+
+- Auto-proxy FAPI requests for `.vercel.app` subdomains. When deployed to a `.vercel.app` domain without explicit proxy or domain configuration, the SDK automatically routes Frontend API requests through `/__clerk` on the app's own origin. This enables Clerk production mode on Vercel deployments without manual proxy setup. ([#8035](https://github.com/clerk/javascript/pull/8035)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`9b57986`](https://github.com/clerk/javascript/commit/9b5798696eb0c6cc6ab548ade100b504f691895c), [`a9f9b29`](https://github.com/clerk/javascript/commit/a9f9b2971a026d04571ceb1865ec8dafedbbe863), [`e0a63f9`](https://github.com/clerk/javascript/commit/e0a63f9f976fd25f4ed68080c84b72149ef64646)]:
+  - @clerk/shared@4.8.6
+  - @clerk/backend@3.4.2
+  - @clerk/react@6.4.6
+
+## 7.2.7
+
+### Patch Changes
+
+- Updated dependencies [[`da76490`](https://github.com/clerk/javascript/commit/da7649075e24351737271318e81842b5c298dee1)]:
+  - @clerk/shared@4.8.5
+  - @clerk/backend@3.4.1
+  - @clerk/react@6.4.5
+
+## 7.2.6
+
+### Patch Changes
+
+- Updated dependencies [[`083c4c5`](https://github.com/clerk/javascript/commit/083c4c50a2d2e1cedc8ffb85d8ba749170ea4f90), [`dcaf694`](https://github.com/clerk/javascript/commit/dcaf694fbc7fd1b80fd10661225aa6d61eb3c2a9), [`d9011b4`](https://github.com/clerk/javascript/commit/d9011b45d622fecc727b3531fbedd805a4310abc)]:
+  - @clerk/shared@4.8.4
+  - @clerk/react@6.4.4
+  - @clerk/backend@3.4.0
+
 ## 7.2.5
 
 ### Patch Changes

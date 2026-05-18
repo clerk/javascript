@@ -141,7 +141,7 @@ export const heIL: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -177,6 +177,53 @@ export const heIL: LocalizationResource = {
     viewFeatures: undefined,
     viewPayment: undefined,
     year: undefined,
+  },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'פנה למנהל הארגון שלך כדי לקבל הרשאות לניהול חיבורים ארגוניים.',
+      title: 'אין לך הרשאה לנהל חיבורים ארגוניים',
+    },
+    navbar: {
+      title: 'הגדרת כניסה אחידה (SSO)',
+    },
+    selectProviderStep: {
+      title: 'בחר ספק',
+      subtitle: 'בחר את הספק שעבורו תגדיר SSO.',
+      body: {
+        title: 'בחר את ספק הזהות שלך',
+        description: 'נדריך אותך בתהליך ההגדרה המפורט בהמשך.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'ספק SAML מותאם אישית',
+      },
+      warning: 'לאחר בחירת ספק לא ניתן לשנות אותו עד לסיום ההגדרה',
+    },
+    verifyEmailDomainStep: {
+      title: 'אימות כתובת אימייל',
+      subtitle: 'אמת את כתובת האימייל שעליה ברצונך להפעיל את חיבור הארגון.',
+      addEmailAddress: {
+        formTitle: 'אנחנו צריכים את האימייל שלך',
+        formSubtitle: 'כדי להתחיל, נצטרך את כתובת האימייל שלך',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'כתובת אימייל',
+      },
+      emailCode: {
+        formTitle: 'אמת את כתובת האימייל שלך',
+        formSubtitle: 'הזן את קוד האימות שנשלח אל {{identifier}}',
+        resendButton: 'לא קיבלת קוד? שלח שוב',
+        verified: {
+          title: 'קיבלנו את האימייל שלך',
+          subtitle: 'אימתת את כתובת האימייל שלך עם האימייל הבא',
+          inputLabel: 'כתובת אימייל מאומתת',
+        },
+      },
+      domainTaken: {
+        title: 'לדומיין הזה ({{domain}}) כבר יש חיבור SSO',
+        subtitle: 'צור קשר עם מנהל היישום כדי לקבל גישה דרך החיבור הקיים.',
+      },
+    },
   },
   createOrganization: {
     formButtonSubmit: 'צור ארגון',

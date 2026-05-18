@@ -147,7 +147,7 @@ export const itIT: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Metodi di pagamento',
-    popular: 'Popolare',
+    highlightedPlanBadge: 'Popolare',
     pricingTable: {
       billingCycle: 'Ciclo di fatturazione',
       included: 'Incluso',
@@ -183,6 +183,55 @@ export const itIT: LocalizationResource = {
     viewFeatures: 'Visualizza funzionalità',
     viewPayment: undefined,
     year: 'Anno',
+  },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        "Contatta l'amministratore della tua organizzazione per ottenere i permessi per gestire le connessioni aziendali.",
+      title: 'Non hai il permesso di gestire le connessioni aziendali',
+    },
+    navbar: {
+      title: 'Configura Single Sign-On (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Seleziona provider',
+      subtitle: "Seleziona il provider per cui configurerai l'SSO.",
+      body: {
+        title: 'Seleziona il tuo provider di identità',
+        description: 'Ti guideremo nel processo di configurazione dettagliato successivamente.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Provider SAML personalizzato',
+      },
+      warning: 'Una volta selezionato un provider non potrai cambiarlo fino al termine della configurazione',
+    },
+    verifyEmailDomainStep: {
+      title: 'Verifica indirizzo email',
+      subtitle: "Verifica l'indirizzo email su cui vuoi abilitare la connessione aziendale.",
+      addEmailAddress: {
+        formTitle: 'Abbiamo bisogno della tua email',
+        formSubtitle: 'Per iniziare avremo bisogno del tuo indirizzo email',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'Indirizzo email',
+      },
+      emailCode: {
+        formTitle: 'Verifica il tuo indirizzo email',
+        formSubtitle: 'Inserisci il codice di verifica inviato a {{identifier}}',
+        resendButton: 'Non hai ricevuto il codice? Invia di nuovo',
+        verified: {
+          title: 'Abbiamo ricevuto la tua email',
+          subtitle: 'Hai verificato il tuo indirizzo email con la seguente email',
+          inputLabel: 'Indirizzo email verificato',
+        },
+      },
+      domainTaken: {
+        title: 'Questo dominio ({{domain}}) ha già una connessione SSO',
+        subtitle:
+          "Contatta l'amministratore dell'applicazione per ottenere l'accesso tramite la connessione esistente.",
+      },
+    },
   },
   createOrganization: {
     formButtonSubmit: 'Crea organizzazione',

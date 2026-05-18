@@ -24,11 +24,11 @@
     "lint": "eslint src"
   },
   "dependencies": {
-    "commander": "^14.0.1",
+    "commander": "^14.0.3",
     "concurrently": "^9.2.1",
-    "dotenv": "^17.2.3",
+    "dotenv": "^17.4.2",
     "jscodeshift": "^17.3.0",
-    "tinyglobby": "^0.2.15"
+    "tinyglobby": "^0.2.16"
   },
   "devDependencies": {},
   "engines": {

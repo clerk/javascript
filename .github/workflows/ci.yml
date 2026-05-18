@@ -3,6 +3,7 @@ name: CI
 on:
   merge_group:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     branches:
       - main
       - release/v4
@@ -70,6 +71,7 @@ jobs:
         id: config
         uses: ./.github/actions/init-blacksmith
         with:
+          cache-enabled: true
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
@@ -118,6 +120,7 @@ jobs:
         id: config
         uses: ./.github/actions/init-blacksmith
         with:
+          cache-enabled: true
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
           turbo-team: ${{ vars.TURBO_TEAM }}
@@ -164,6 +167,7 @@ jobs:
         id: config
         uses: ./.github/actions/init-blacksmith
         with:
+          cache-enabled: true
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
           turbo-team: ${{ vars.TURBO_TEAM }}
@@ -218,7 +222,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - node-version: 22
+          - node-version: 24.15.0
+            test-filter: "**"
+            filter-label: "**"
+          - node-version: 20.19.0
             test-filter: "**"
             filter-label: "**"
 
@@ -235,6 +242,7 @@ jobs:
         id: config
         uses: ./.github/actions/init-blacksmith
         with:
+          cache-enabled: true
           # Ensures that all builds are cached appropriately with a consistent run name `Unit Tests (20)`.
           node-version: ${{ matrix.node-version }}
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
@@ -257,7 +265,7 @@ jobs:
       - name: Run Typedoc tests
         run: |
           # Only run Typedoc tests for one matrix version and main test run
-          if [ "${{ matrix.node-version }}" == "22" ] && [ "${{ matrix.test-filter }}" = "**" ]; then
+          if [ "${{ matrix.node-version }}" == "24.15.0" ] && [ "${{ matrix.test-filter }}" = "**" ]; then
             pnpm turbo run //#test:typedoc
           fi
         env:
@@ -345,6 +353,7 @@ jobs:
         id: config
         uses: ./.github/actions/init-blacksmith
         with:
+          cache-enabled: true
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
@@ -500,8 +509,9 @@ jobs:
       - name: Setup Node
         uses: ./.github/actions/init-blacksmith
         with:
+          cache-enabled: true
           turbo-enabled: true
-          node-version: 22
+          node-version: 24.15.0
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
           turbo-team: ${{ vars.TURBO_TEAM }}

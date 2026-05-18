@@ -212,7 +212,7 @@ export function PricingTableMatrix({
                             <Badge
                               elementDescriptor={descriptors.pricingTableMatrixBadge}
                               colorScheme='secondary'
-                              localizationKey={localizationKeys('billing.popular')}
+                              localizationKey={localizationKeys('billing.highlightedPlanBadge')}
                             />
                           ) : null}
                         </Span>
