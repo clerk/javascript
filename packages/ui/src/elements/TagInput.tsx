@@ -1,7 +1,7 @@
 import React from 'react';
 
 import type { LocalizationKey } from '../customizables';
-import { descriptors, Flex, Icon, Input, Text, useLocalizations } from '../customizables';
+import { descriptors, Flex, Icon, Input, Text, useAppearance, useLocalizations } from '../customizables';
 import { Plus } from '../icons';
 import type { PropsOfComponent } from '../styledSystem';
 import { common } from '../styledSystem';
@@ -21,16 +21,18 @@ type TagInputProps = Pick<PropsOfComponent<typeof Flex>, 'sx'> & {
 
 export const TagInput = (props: TagInputProps) => {
   const { t } = useLocalizations();
+  const { autoFocus: optionAutoFocus } = useAppearance().parsedOptions;
   const {
     sx,
     placeholder,
     validate = () => true,
     value: valueProp,
     onChange: onChangeProp,
-    autoFocus,
+    autoFocus: autoFocusProp,
     validateUnsubmittedEmail = () => null,
     ...rest
   } = props;
+  const autoFocus = optionAutoFocus && autoFocusProp;
   const tags = valueProp.split(',').map(sanitize).filter(Boolean);
   const tagsSet = new Set(tags);
   const keyReleasedRef = React.useRef(true);

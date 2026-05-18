@@ -1,5 +1,23 @@
 # @clerk/ui
 
+## 1.12.0
+
+### Minor Changes
+
+- Add `autoFocus` appearance option to disable automatic input focusing ([#8521](https://github.com/clerk/javascript/pull/8521)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Improve Floating UI usage: fix `arialLabel` typo in `MenuTrigger`, replace imperative floating ref in `MenuList` with `useMergeRefs`, remove manual position offset in `SelectOptionList`, add `aria-haspopup` to `MenuTrigger`, and add missing ARIA attributes (`aria-expanded`, `aria-haspopup`, `role`, `aria-selected`) to `Select` components. ([#8328](https://github.com/clerk/javascript/pull/8328)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add support for custom SAML provider in `<ConfigureSSO />` ([#8564](https://github.com/clerk/javascript/pull/8564)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Update `NavBar` to receive `containerSx` prop ([#8568](https://github.com/clerk/javascript/pull/8568)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`4fc38a0`](https://github.com/clerk/javascript/commit/4fc38a097cb9ed1d37c9c3faa274e5c44e405c68)]:
+  - @clerk/localizations@4.6.5
+  - @clerk/shared@4.12.1
+
 ## 1.11.0
 
 ### Minor Changes
