@@ -141,7 +141,7 @@ export const msMY: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -177,6 +177,53 @@ export const msMY: LocalizationResource = {
     viewFeatures: undefined,
     viewPayment: undefined,
     year: undefined,
+  },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'Hubungi pentadbir organisasi anda untuk mendapatkan kebenaran mengurus sambungan perusahaan.',
+      title: 'Anda tidak mempunyai kebenaran untuk mengurus sambungan perusahaan',
+    },
+    navbar: {
+      title: 'Konfigurasi Log Masuk Tunggal (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Pilih pembekal',
+      subtitle: 'Pilih pembekal yang anda akan sediakan SSO untuknya.',
+      body: {
+        title: 'Pilih pembekal identiti anda',
+        description: 'Kami akan membimbing anda melalui proses persediaan terperinci seterusnya.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Pembekal SAML Tersuai',
+      },
+      warning: 'Setelah pembekal dipilih anda tidak boleh menukar lagi sehingga konfigurasi selesai',
+    },
+    verifyEmailDomainStep: {
+      title: 'Sahkan alamat e-mel',
+      subtitle: 'Sahkan alamat e-mel yang anda ingin dayakan sambungan enterprise.',
+      addEmailAddress: {
+        formTitle: 'Kami memerlukan e-mel anda',
+        formSubtitle: 'Untuk memulakan kami memerlukan alamat e-mel anda',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'Alamat e-mel',
+      },
+      emailCode: {
+        formTitle: 'Sahkan alamat e-mel anda',
+        formSubtitle: 'Masukkan kod pengesahan yang dihantar ke {{identifier}}',
+        resendButton: 'Tidak menerima kod? Hantar semula',
+        verified: {
+          title: 'Kami menerima e-mel anda',
+          subtitle: 'Anda telah mengesahkan alamat e-mel anda dengan e-mel berikut',
+          inputLabel: 'Alamat e-mel disahkan',
+        },
+      },
+      domainTaken: {
+        title: 'Domain ini ({{domain}}) sudah mempunyai sambungan SSO',
+        subtitle: 'Hubungi pentadbir aplikasi untuk mendapatkan akses melalui sambungan sedia ada.',
+      },
+    },
   },
   createOrganization: {
     formButtonSubmit: 'Cipta organisasi',

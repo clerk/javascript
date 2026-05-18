@@ -1,5 +1,137 @@
 # Change Log
 
+## 6.11.1
+
+### Patch Changes
+
+- Add confirmation step for `<__experimental_ConfigureSSO />` ([#8531](https://github.com/clerk/javascript/pull/8531)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Restore the `clerk.__internal_queryClient` getter as a backward-compatibility shim so apps still on `@clerk/shared < 4.10.0` can hydrate their query client and continue to render paginated hooks (e.g. `useOrganizationList`, `useOrganization`). The getter lazily imports `@tanstack/query-core` only when accessed, so apps on `@clerk/shared >= 4.10.0` (which use the singleton in `@clerk/shared`) pay zero runtime cost. ([#8562](https://github.com/clerk/javascript/pull/8562)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix Future `signUp.update()` and `signUp.sso()` to patch the active sign-up resource URL when continuing an existing sign-up. ([#8558](https://github.com/clerk/javascript/pull/8558)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`9fa6642`](https://github.com/clerk/javascript/commit/9fa6642de6a734faf532ca70c411431c5d0d2bbb), [`930047f`](https://github.com/clerk/javascript/commit/930047f3ea9b603a7f254f7764c3dc5e0fa7c769), [`b45777c`](https://github.com/clerk/javascript/commit/b45777c5723b01b8c7ee3d37b712c639067b36ab), [`5a7225e`](https://github.com/clerk/javascript/commit/5a7225ef119edf551e20bdce8af465b42981c8f2)]:
+  - @clerk/shared@4.12.0
+
+## 6.11.0
+
+### Minor Changes
+
+- Add `user.updateMetadata()` for updating current user's metadata attributes by merging existing values with the provided parameters. ([#8537](https://github.com/clerk/javascript/pull/8537)) by [@brunol95](https://github.com/brunol95)
+
+### Patch Changes
+
+- Fix dev browser recovery by clearing stale partitioned and non-partitioned dev browser cookie variants before minting a new dev browser. ([#8538](https://github.com/clerk/javascript/pull/8538)) by [@brkalow](https://github.com/brkalow)
+
+- Implement the provider selection step of `<__experimental_ConfigureSSO />`. Renders the two SAML provider tiles (Okta Workforce and Custom SAML Provider) with real icons sourced from `img.clerk.com`, tracks the picked provider in local state, and gates `Step.Footer.Continue` on a selection. Includes a warning callout about provider lock-in and a minor `Step.Header` alignment tweak. All user-visible strings are wired through `@clerk/localizations`, with translations for every supported locale. ([#8503](https://github.com/clerk/javascript/pull/8503)) by [@iagodahlem](https://github.com/iagodahlem)
+
+  Also extends the flow context with `provider` and `setProvider`, adds the `deriveInitialStep` helper, and wires the wizard's `initialStepId` so the configure flow remounts on the right step after a reload. Continue on Select Provider stages the chosen provider and advances to the next step; the enterprise connection is created on Verify Domain once the user's email is verified and primary.
+
+- Fix `toMeEnterpriseConnectionBody` to produce the flat snake_case body shape the backend expects for `user.createEnterpriseConnection` and `user.updateEnterpriseConnection`. SAML and OIDC fields are now top-level prefixed (e.g., `saml_idp_metadata_url`) rather than nested under `saml` / `oidc` objects. Without this fix, IdP metadata submission in `<__experimental_ConfigureSSO />` silently fails on the backend. ([#8535](https://github.com/clerk/javascript/pull/8535)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Update `<ConfigureSSO />` in the context of organizations to only allow managing enterprise connections based on system permission ([#8515](https://github.com/clerk/javascript/pull/8515)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Add monotonic token replacement based on `oiat` to prevent edge-minted tokens with stale claims from overwriting fresher DB-minted tokens in multi-tab scenarios. ([#8097](https://github.com/clerk/javascript/pull/8097)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Add verify/add email address step to `<__experimental_ConfigureSSO />` ([#8520](https://github.com/clerk/javascript/pull/8520)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`1a4d7d1`](https://github.com/clerk/javascript/commit/1a4d7d1c711c25f4f83c0773616b799df2feb010), [`a6916b1`](https://github.com/clerk/javascript/commit/a6916b15658625a0e627c474a62212a65868bfb6), [`1084180`](https://github.com/clerk/javascript/commit/1084180797722ff113df8404a3c967bc6abeb12d), [`39099b6`](https://github.com/clerk/javascript/commit/39099b62308fc9b0ebbb25988c0ae4b655efe744), [`18e0a1a`](https://github.com/clerk/javascript/commit/18e0a1aa48e7f65a6610ec3c6ffe105deb3474b2)]:
+  - @clerk/shared@4.11.0
+
+## 6.10.1
+
+### Patch Changes
+
+- Updated dependencies [[`5cda3ee`](https://github.com/clerk/javascript/commit/5cda3ee8451cc9af375895824d24a5c3ed7fbee6)]:
+  - @clerk/shared@4.10.2
+
+## 6.10.0
+
+### Minor Changes
+
+- Removed unused internal OAuthConsent prop. ([#8492](https://github.com/clerk/javascript/pull/8492)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`7a5892f`](https://github.com/clerk/javascript/commit/7a5892f9bcaa1a6212e6e6d3741160929ffd027e)]:
+  - @clerk/shared@4.10.1
+
+## 6.9.0
+
+### Minor Changes
+
+- Add experimental `<ConfigureSSO />` component. Not ready for usage yet. ([#8427](https://github.com/clerk/javascript/pull/8427)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Move ownership of the clerk-rq `QueryClient` from `@clerk/clerk-js` into `@clerk/shared`. The `QueryObserver` (constructed in `@clerk/shared`) and the `Query` objects it observes now always come from a single `@tanstack/query-core` resolution — the cross-bundle API contract that produced #8428 (`Query.isFetched is not a function`) no longer exists. ([#8434](https://github.com/clerk/javascript/pull/8434)) by [@jacekradko](https://github.com/jacekradko)
+
+  This removes the undocumented `clerk.__internal_queryClient` getter from both `@clerk/clerk-js` and `@clerk/react`'s `IsomorphicClerk`. The `QueryClient` is owned by an internal singleton in `@clerk/shared`, lazily instantiated on the browser only — server renders return `undefined`, preserving SSR safety and avoiding cross-request cache sharing.
+
+  `@tanstack/query-core` is no longer a direct dependency of `@clerk/clerk-js`; it remains a dep of `@clerk/shared` and resolves consumer-side as before.
+
+- Updated dependencies [[`9e9230c`](https://github.com/clerk/javascript/commit/9e9230c8c3cbdb1c253ca7cdd24cc8d681b5ee5a), [`68d32df`](https://github.com/clerk/javascript/commit/68d32dfcc453080ef93edf69be8de765a342d88c), [`1c27d4d`](https://github.com/clerk/javascript/commit/1c27d4dd41a27cf41c3823306fe88e026fed08fb), [`1001193`](https://github.com/clerk/javascript/commit/10011936981fc22bf7d3750f1591f0873ea78bcb)]:
+  - @clerk/shared@4.10.0
+
+## 6.8.0
+
+### Minor Changes
+
+- Add internal API methods to manage enterprise connections ([#8421](https://github.com/clerk/javascript/pull/8421)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Expose `OAuthConsent` as a public component export across React-based SDKs. ([#8381](https://github.com/clerk/javascript/pull/8381)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```tsx
+  import { OAuthConsent } from '@clerk/react';
+
+  export default function Page() {
+    return <OAuthConsent />;
+  }
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`785f057`](https://github.com/clerk/javascript/commit/785f057f5cda202c26a9f34bde7c1873a6cbd6ea), [`90beaeb`](https://github.com/clerk/javascript/commit/90beaeb8319d5bccb8fa52343f4b241c6d2d3ebe), [`244920d`](https://github.com/clerk/javascript/commit/244920d1ebb5d420a96bfc2a79d84cccafe9b61c)]:
+  - @clerk/shared@4.9.0
+
+## 6.7.9
+
+### Patch Changes
+
+- Raise the `@tanstack/query-core` floor to `^5.100.6` in the repo catalog and consume it from `@clerk/shared` and `@clerk/clerk-js` so the version baked into the production `clerk-js` CDN bundle stays in lockstep with what consumer-side `@clerk/shared` resolves to. ([#8432](https://github.com/clerk/javascript/pull/8432)) by [@jacekradko](https://github.com/jacekradko)
+
+  Fixes a runtime crash (`TypeError: e.isFetched is not a function`) introduced when consumer dedupe resolved `query-core` to `5.100.x` (which adds `Query.isFetched()`) while the published CDN bundle still embedded `5.90.16`. The new `QueryObserver` then called `isFetched()` on `Query` objects from the older bundled version.
+
+- Updated dependencies [[`1bfd8ab`](https://github.com/clerk/javascript/commit/1bfd8ab89c62e428038b8c565f118c582ed395ea)]:
+  - @clerk/shared@4.8.7
+
+## 6.7.8
+
+### Patch Changes
+
+- Auto-proxy FAPI requests for `.vercel.app` subdomains. When deployed to a `.vercel.app` domain without explicit proxy or domain configuration, the SDK automatically routes Frontend API requests through `/__clerk` on the app's own origin. This enables Clerk production mode on Vercel deployments without manual proxy setup. ([#8035](https://github.com/clerk/javascript/pull/8035)) by [@brkalow](https://github.com/brkalow)
+
+- Loosen `@tanstack/query-core` dependency from an exact pin to a caret range (`^5.90.16`) so it can dedupe with consumer-installed `@tanstack/react-query` versions. This avoids Vite `resolve.dedupe` resolution failures under Bun when two divergent copies of `query-core` end up nested instead of hoisted. ([#8417](https://github.com/clerk/javascript/pull/8417)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`9b57986`](https://github.com/clerk/javascript/commit/9b5798696eb0c6cc6ab548ade100b504f691895c), [`a9f9b29`](https://github.com/clerk/javascript/commit/a9f9b2971a026d04571ceb1865ec8dafedbbe863)]:
+  - @clerk/shared@4.8.6
+
+## 6.7.7
+
+### Patch Changes
+
+- Updated dependencies [[`da76490`](https://github.com/clerk/javascript/commit/da7649075e24351737271318e81842b5c298dee1)]:
+  - @clerk/shared@4.8.5
+
+## 6.7.6
+
+### Patch Changes
+
+- Updated dependencies [[`083c4c5`](https://github.com/clerk/javascript/commit/083c4c50a2d2e1cedc8ffb85d8ba749170ea4f90), [`dcaf694`](https://github.com/clerk/javascript/commit/dcaf694fbc7fd1b80fd10661225aa6d61eb3c2a9)]:
+  - @clerk/shared@4.8.4
+
 ## 6.7.5
 
 ### Patch Changes

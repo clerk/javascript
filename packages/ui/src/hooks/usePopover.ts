@@ -21,7 +21,7 @@ type UsePopoverProps = {
   shoudFlip?: boolean;
   autoUpdate?: boolean;
   outsidePress?: boolean | ((event: MouseEvent) => boolean);
-  adjustToReferenceWidth?: boolean;
+  adjustToReferenceWidth?: boolean | number;
   referenceElement?: React.RefObject<HTMLElement> | null;
   canCloseModal?: boolean;
   bubbles?:
@@ -76,9 +76,10 @@ export const usePopover = (props: UsePopoverProps = {}): UsePopoverReturn => {
       shift(),
       size({
         apply({ elements }) {
-          if (adjustToReferenceWidth) {
+          if (typeof adjustToReferenceWidth === 'number' || adjustToReferenceWidth === true) {
             const reference = elements.reference as any as HTMLElement;
-            elements.floating.style.width = reference ? `${reference?.offsetWidth}px` : '';
+            const extra = typeof adjustToReferenceWidth === 'number' ? adjustToReferenceWidth : 0;
+            elements.floating.style.width = reference ? `${reference.offsetWidth + extra}px` : '';
           }
         },
       }),

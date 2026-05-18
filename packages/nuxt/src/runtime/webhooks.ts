@@ -2,10 +2,8 @@
 import type { VerifyWebhookOptions } from '@clerk/backend/webhooks';
 import { verifyWebhook as verifyWebhookBase } from '@clerk/backend/webhooks';
 import type { H3Event } from 'h3';
-import { toWebRequest } from 'h3';
 
-// @ts-expect-error: Nitro import. Handled by Nuxt.
-import { useRuntimeConfig } from '#imports';
+import { toWebRequest, useRuntimeConfig } from '#imports';
 
 // Ordering of exports matter here since
 // we're overriding the base verifyWebhook

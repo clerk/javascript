@@ -1,7 +1,8 @@
 import type { PathMatcherParam } from '@clerk/shared/pathMatcher';
 import { createPathMatcher } from '@clerk/shared/pathMatcher';
 import type { H3Event } from 'h3';
-import { getRequestURL } from 'h3';
+
+import { getRequestURL } from '#imports';
 
 export type RouteMatcherParam = PathMatcherParam;
 
