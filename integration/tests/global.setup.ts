@@ -1,8 +1,7 @@
 import { test as setup } from '@playwright/test';
 
 import { constants } from '../constants';
-import { appConfigs } from '../presets';
-import { fs, parseEnvOptions, startClerkJsHttpServer, startClerkUiHttpServer } from '../scripts';
+import { fs, startClerkJsHttpServer, startClerkUiHttpServer } from '../scripts';
 
 setup('start long running apps', async () => {
   setup.setTimeout(300_000);
@@ -12,14 +11,8 @@ setup('start long running apps', async () => {
   await startClerkJsHttpServer();
   await startClerkUiHttpServer();
 
-  const { appIds } = parseEnvOptions();
-  if (appIds.length) {
-    const apps = appConfigs.longRunningApps.getByPattern(appIds);
-    // state cannot be shared using playwright,
-    // so we save the state in a file using a strategy similar to `storageState`
-    await Promise.all(apps.map(app => app.init()));
-  } else {
-    // start a single app using the available env variables
-  }
-  console.log('Apps started');
+  // Apps are now initialized lazily by testAgainstRunningApps via test.beforeAll.
+  // Each app is started on-demand when a test first needs it, using file-based
+  // locking to prevent duplicate initialization across Playwright workers.
+  console.log('HTTP servers started. Apps will initialize lazily.');
 });
