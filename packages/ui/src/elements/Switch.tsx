@@ -5,15 +5,30 @@ import { descriptors, Flex, Text } from '../customizables';
 import { common } from '../styledSystem';
 
 interface SwitchProps {
+  id?: string;
   isChecked?: boolean;
   defaultChecked?: boolean;
   onChange?: (checked: boolean) => void;
   isDisabled?: boolean;
-  label: string | LocalizationKey;
+  label?: string | LocalizationKey;
+  'aria-label'?: string;
+  'aria-labelledby'?: string;
 }
 
 export const Switch = forwardRef<HTMLDivElement, SwitchProps>(
-  ({ isChecked: controlledChecked, defaultChecked, onChange, isDisabled = false, label }, ref) => {
+  (
+    {
+      id,
+      isChecked: controlledChecked,
+      defaultChecked,
+      onChange,
+      isDisabled = false,
+      label,
+      'aria-label': ariaLabel,
+      'aria-labelledby': ariaLabelledBy,
+    },
+    ref,
+  ) => {
     const [internalChecked, setInternalChecked] = useState(!!defaultChecked);
     const isControlled = controlledChecked !== undefined;
     const checked = isControlled ? controlledChecked : internalChecked;
@@ -27,6 +42,8 @@ export const Switch = forwardRef<HTMLDivElement, SwitchProps>(
       }
       onChange?.(e.target.checked);
     };
+
+    const hasInternalLabel = label !== undefined;
 
     return (
       <Flex
@@ -45,12 +62,15 @@ export const Switch = forwardRef<HTMLDivElement, SwitchProps>(
       >
         {/* The order of the elements is important here for the focus ring to work. The input is visually hidden, so the focus ring is applied to the span. */}
         <input
+          id={id}
           type='checkbox'
           role='switch'
           disabled={isDisabled}
           defaultChecked={defaultChecked}
           checked={checked}
           onChange={handleChange}
+          aria-label={ariaLabel}
+          aria-labelledby={ariaLabelledBy}
           style={{
             ...common.visuallyHidden(),
           }}
@@ -92,17 +112,19 @@ export const Switch = forwardRef<HTMLDivElement, SwitchProps>(
             })}
           />
         </Flex>
-        <Text
-          as='span'
-          variant='caption'
-          colorScheme='secondary'
-          localizationKey={label}
-          sx={t => ({
-            paddingInlineStart: t.sizes.$2,
-            cursor: isDisabled ? 'not-allowed' : 'pointer',
-            userSelect: 'none',
-          })}
-        />
+        {hasInternalLabel ? (
+          <Text
+            as='span'
+            variant='caption'
+            colorScheme='secondary'
+            localizationKey={label}
+            sx={t => ({
+              paddingInlineStart: t.sizes.$2,
+              cursor: isDisabled ? 'not-allowed' : 'pointer',
+              userSelect: 'none',
+            })}
+          />
+        ) : null}
       </Flex>
     );
   },

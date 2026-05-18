@@ -1,22 +1,26 @@
-import { __internal_useUserEnterpriseConnections, useSession } from '@clerk/shared/react';
-import type { __experimental_ConfigureSSOProps } from '@clerk/shared/types';
+import {
+  __internal_useEnterpriseConnectionTestRuns,
+  __internal_useUserEnterpriseConnections,
+  useSession,
+} from '@clerk/shared/react';
+import type { __experimental_ConfigureSSOProps, EnterpriseConnectionResource } from '@clerk/shared/types';
 import React from 'react';
 
 import { useProtect } from '@/common';
 import { withCoreUserGuard } from '@/contexts';
 import { Col, descriptors, Flex, Flow, Heading, Icon, localizationKeys, Text } from '@/customizables';
-import { withCardStateProvider } from '@/elements/contexts';
+import { useCardState, withCardStateProvider } from '@/elements/contexts';
 import { ProfileCard } from '@/elements/ProfileCard';
 import { ExclamationTriangle } from '@/icons';
 import { Route, Switch } from '@/router';
 
-import { ConfigureSSOFlowProvider } from './ConfigureSSOContext';
+import { ConfigureSSOProvider, useConfigureSSO } from './ConfigureSSOContext';
 import { ConfigureSSOHeader } from './ConfigureSSOHeader';
 import { ConfigureSSONavbar } from './ConfigureSSONavbar';
 import { ConfigureSSOSkeleton } from './ConfigureSSOSkeleton';
 import { ProfileCardFooter, ProfileCardHeader } from './elements/ProfileCard';
 import { Step } from './elements/Step';
-import { Wizard } from './elements/Wizard';
+import { useWizard, Wizard } from './elements/Wizard';
 import { ConfigureStep, ConfirmationStep, SelectProviderStep, TestConfigurationStep, VerifyDomainStep } from './steps';
 
 const ConfigureSSOInternal = () => {
@@ -55,7 +59,7 @@ const AuthenticatedContent = withCoreUserGuard(() => {
           })}
         >
           <ConfigureSSOCardProtect>
-            <ConfigureSSOCardContent />
+            <ConfigureSSOCardContent contentRef={contentRef} />
           </ConfigureSSOCardProtect>
         </Col>
       </ConfigureSSONavbar>
@@ -63,62 +67,98 @@ const AuthenticatedContent = withCoreUserGuard(() => {
   );
 });
 
-const ConfigureSSOCardContent = () => {
-  const { data: enterpriseConnections, isLoading } = __internal_useUserEnterpriseConnections({ enabled: true });
-
+const ConfigureSSOCardContent = ({ contentRef }: { contentRef: React.RefObject<HTMLDivElement> }) => {
+  const {
+    data: enterpriseConnections,
+    isLoading: isLoadingEnterpriseConnections,
+    createEnterpriseConnection,
+    updateEnterpriseConnection,
+    deleteEnterpriseConnection,
+  } = __internal_useUserEnterpriseConnections({ enabled: true });
   // Currently FAPI only supports one enterprise connection per user
   const enterpriseConnection = enterpriseConnections?.[0];
 
-  if (isLoading && !enterpriseConnection) {
+  const { hasSuccessfulTestRun, isLoading: isLoadingTestRuns } = useHasSuccessfulTestRun(enterpriseConnection);
+
+  const isLoading = isLoadingEnterpriseConnections || isLoadingTestRuns;
+  if (isLoading) {
     return <ConfigureSSOSkeleton />;
   }
 
   return (
-    <ConfigureSSOFlowProvider enterpriseConnection={enterpriseConnection}>
-      <Wizard>
-        <ConfigureSSOHeader />
-
-        <Wizard.Step id='select-provider'>
-          <SelectProviderStep />
-        </Wizard.Step>
-
-        <Wizard.Step
-          id='verify-domain'
-          label='Verify domain'
-        >
-          <VerifyDomainStep />
-        </Wizard.Step>
-
-        <Wizard.Step
-          id='configure'
-          label='Configure'
-        >
-          <ConfigureStep />
-        </Wizard.Step>
-
-        <Wizard.Step
-          id='test'
-          label='Test'
-        >
-          <TestConfigurationStep />
-        </Wizard.Step>
-
-        <Wizard.Step
-          id='confirmation'
-          label='Confirmation'
-        >
-          <ConfirmationStep />
-        </Wizard.Step>
-      </Wizard>
-    </ConfigureSSOFlowProvider>
+    <ConfigureSSOProvider
+      hasSuccessfulTestRun={hasSuccessfulTestRun}
+      enterpriseConnection={enterpriseConnection}
+      contentRef={contentRef}
+      createEnterpriseConnection={createEnterpriseConnection}
+      updateEnterpriseConnection={updateEnterpriseConnection}
+      deleteEnterpriseConnection={deleteEnterpriseConnection}
+    >
+      <ConfigureSSOSteps />
+    </ConfigureSSOProvider>
   );
+};
+
+const ConfigureSSOSteps = () => {
+  const { initialStepId } = useConfigureSSO();
+
+  return (
+    <Wizard initialStepId={initialStepId}>
+      <ResetCardErrorOnStepChange />
+      <ConfigureSSOHeader />
+
+      <Wizard.Step id='select-provider'>
+        <SelectProviderStep />
+      </Wizard.Step>
+
+      <Wizard.Step
+        id='verify-domain'
+        label='Verify domain'
+      >
+        <VerifyDomainStep />
+      </Wizard.Step>
+
+      <Wizard.Step
+        id='configure'
+        label='Configure'
+      >
+        <ConfigureStep />
+      </Wizard.Step>
+
+      <Wizard.Step
+        id='test'
+        label='Test'
+      >
+        <TestConfigurationStep />
+      </Wizard.Step>
+
+      <Wizard.Step
+        id='confirmation'
+        label='Confirmation'
+      >
+        <ConfirmationStep />
+      </Wizard.Step>
+    </Wizard>
+  );
+};
+
+const ConfigureSSOCardProtect = ({ children }: { children: React.ReactNode }) => {
+  const { session } = useSession();
+  const isPersonalWorkspace = !session?.lastActiveOrganizationId;
+  const canManageEnterpriseConnections = useProtect(
+    has => isPersonalWorkspace || has({ permission: 'org:sys_enterprise_connections:manage' }),
+  );
+
+  if (!canManageEnterpriseConnections) {
+    return <MissingManageEnterpriseConnectionsPermission />;
+  }
+
+  return children;
 };
 
 const MissingManageEnterpriseConnectionsPermission = () => (
   <>
-    <Flex sx={t => ({ minHeight: t.sizes.$13, minWidth: '100%' })}>
-      <ProfileCardHeader />
-    </Flex>
+    <ProfileCardHeader />
 
     <Step.Body>
       <Step.Section
@@ -155,22 +195,49 @@ const MissingManageEnterpriseConnectionsPermission = () => (
         </Flex>
       </Step.Section>
     </Step.Body>
+
     <ProfileCardFooter />
   </>
 );
 
-const ConfigureSSOCardProtect = ({ children }: { children: React.ReactNode }) => {
-  const { session } = useSession();
-  const isPersonalWorkspace = !session?.lastActiveOrganizationId;
-  const canManageEnterpriseConnections = useProtect(
-    has => isPersonalWorkspace || has({ permission: 'org:sys_enterprise_connections:manage' }),
-  );
+/**
+ * Sentinel component rendered inside `<Wizard>`
+ *
+ * Clears any card-level error whenever the active step transitions, so a stale failure from one step
+ * doesn't leak into the next
+ */
+const ResetCardErrorOnStepChange = (): null => {
+  const { currentStep } = useWizard();
+  const card = useCardState();
+  const previousStepIdRef = React.useRef(currentStep?.id);
 
-  if (!canManageEnterpriseConnections) {
-    return <MissingManageEnterpriseConnectionsPermission />;
-  }
+  React.useEffect(() => {
+    if (previousStepIdRef.current === currentStep?.id) {
+      return;
+    }
 
-  return children;
+    previousStepIdRef.current = currentStep?.id;
+    card.setError(undefined);
+  }, [currentStep?.id, card]);
+
+  return null;
+};
+
+/**
+ * Fetches a single successful test run for the given connection on mount
+ */
+const useHasSuccessfulTestRun = (
+  enterpriseConnection: EnterpriseConnectionResource | undefined,
+): { hasSuccessfulTestRun: boolean; isLoading: boolean } => {
+  const { data: successfulTestRuns, isLoading } = __internal_useEnterpriseConnectionTestRuns({
+    enterpriseConnectionId: enterpriseConnection?.id ?? null,
+    params: { initialPage: 1, pageSize: 1, status: ['success'] },
+  });
+
+  return {
+    hasSuccessfulTestRun: (successfulTestRuns?.length ?? 0) > 0,
+    isLoading,
+  };
 };
 
 export const ConfigureSSO: React.ComponentType<__experimental_ConfigureSSOProps> =

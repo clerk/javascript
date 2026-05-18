@@ -147,7 +147,7 @@ export const deDE: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Zahlungsmethoden',
-    popular: 'Beliebt',
+    highlightedPlanBadge: 'Beliebt',
     pricingTable: {
       billingCycle: 'Abrechnungszyklus',
       included: 'Enthalten',
@@ -192,6 +192,46 @@ export const deDE: LocalizationResource = {
     },
     navbar: {
       title: 'Single Sign-On (SSO) konfigurieren',
+    },
+    selectProviderStep: {
+      title: 'Anbieter auswählen',
+      subtitle: 'Wählen Sie den Anbieter, für den Sie SSO einrichten möchten.',
+      body: {
+        title: 'Wählen Sie Ihren Identitätsanbieter',
+        description: 'Wir führen Sie als nächstes durch den detaillierten Einrichtungsprozess.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Benutzerdefinierter SAML-Anbieter',
+      },
+      warning:
+        'Sobald ein Anbieter ausgewählt ist, können Sie ihn nicht mehr ändern, bis die Konfiguration abgeschlossen ist',
+    },
+    verifyEmailDomainStep: {
+      title: 'E-Mail-Adresse verifizieren',
+      subtitle: 'Verifizieren Sie die E-Mail-Adresse, für die Sie die Unternehmensverbindung aktivieren möchten.',
+      addEmailAddress: {
+        formTitle: 'Wir benötigen Ihre E-Mail',
+        formSubtitle: 'Um zu beginnen, benötigen wir Ihre E-Mail-Adresse',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'E-Mail-Adresse',
+      },
+      emailCode: {
+        formTitle: 'Verifizieren Sie Ihre E-Mail-Adresse',
+        formSubtitle: 'Geben Sie den an {{identifier}} gesendeten Verifizierungscode ein',
+        resendButton: 'Keinen Code erhalten? Erneut senden',
+        verified: {
+          title: 'Wir haben Ihre E-Mail erhalten',
+          subtitle: 'Sie haben Ihre E-Mail-Adresse mit der folgenden E-Mail verifiziert',
+          inputLabel: 'Verifizierte E-Mail-Adresse',
+        },
+      },
+      domainTaken: {
+        title: 'Diese Domain ({{domain}}) hat bereits eine SSO-Verbindung',
+        subtitle:
+          'Wenden Sie sich an den Administrator der Anwendung, um über die bestehende Verbindung Zugriff zu erhalten.',
+      },
     },
   },
   createOrganization: {

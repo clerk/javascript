@@ -9,9 +9,10 @@ export const ProfileCardHeader = (props: ProfileCardHeaderProps): JSX.Element =>
     elementDescriptor={descriptors.configureSSOHeader}
     {...props}
     sx={theme => ({
-      width: '100%',
       gap: theme.space.$2,
-      padding: `${theme.space.$5}`,
+      width: '100%',
+      minHeight: theme.sizes.$13,
+      padding: theme.space.$5,
       borderBottomWidth: theme.borderWidths.$normal,
       borderBottomStyle: theme.borderStyles.$solid,
       borderBottomColor: theme.colors.$borderAlpha100,
@@ -30,8 +31,8 @@ export const ProfileCardFooter = (props: ProfileCardFooterProps): JSX.Element =>
     {...props}
     sx={theme => ({
       gap: theme.space.$2,
-      padding: theme.space.$4,
       minHeight: theme.sizes.$16,
+      padding: theme.space.$4,
       background: common.mutedBackground(theme),
       borderTopWidth: theme.borderWidths.$normal,
       borderTopStyle: theme.borderStyles.$solid,

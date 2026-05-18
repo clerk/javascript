@@ -139,8 +139,8 @@ export type FlowMetadata = {
     | 'verifyDomain'
     | 'configureCreateApp'
     | 'configureMapAttributes'
-    | 'test-sso'
-    | 'sso-confirmation';
+    | 'testSso'
+    | 'ssoConfirmation';
 };
 
 const [FlowMetadataCtx, useFlowMetadata] = createContextAndHook<FlowMetadata>('FlowMetadata');

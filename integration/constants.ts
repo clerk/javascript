@@ -100,5 +100,4 @@ export const TRUSTED_OVERRIDES: Record<string, string> = {
   'semver@<7.7.3': '7.7.4',
   'chokidar@<5.0.0': '5.0.0',
   'undici-types@<7.16.0': '7.24.8',
-  'tailwind-merge@<3.4.0': '3.4.0',
 };

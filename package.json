@@ -11,7 +11,7 @@
     "changeset:empty": "pnpm changeset --empty",
     "clean": "turbo run clean",
     "dev": "TURBO_UI=0 FORCE_COLOR=1 turbo dev --filter=@clerk/* --filter=!@clerk/expo --filter=!@clerk/tanstack-react-start --filter=!@clerk/chrome-extension",
-    "dev:fe-libs": "TURBO_UI=0 FORCE_COLOR=1 turbo dev --filter=@clerk/clerk-js --filter=@clerk/ui",
+    "dev:fe-libs": "TURBO_UI=0 FORCE_COLOR=1 turbo dev --filter=@clerk/clerk-js --filter=@clerk/ui --filter=@clerk/shared",
     "dev:js": "TURBO_UI=0 FORCE_COLOR=1 turbo dev:current --filter=@clerk/clerk-js",
     "dev:sandbox": "TURBO_UI=0 FORCE_COLOR=1 turbo dev:sandbox:serve",
     "format": "turbo format && node scripts/format-non-workspace.mjs",
@@ -166,7 +166,6 @@
       "react-dom": "catalog:react",
       "rolldown": "catalog:repo",
       "semver@<7.7.3": "7.7.4",
-      "tailwind-merge@<3.4.0": "3.4.0",
       "undici-types@<7.16.0": "7.24.8",
       "utf-8-validate": "5.0.10"
     }

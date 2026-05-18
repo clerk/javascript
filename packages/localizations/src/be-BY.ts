@@ -141,7 +141,7 @@ export const beBY: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -186,6 +186,44 @@ export const beBY: LocalizationResource = {
     },
     navbar: {
       title: 'Налада адзінага ўваходу (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Выберыце правайдэра',
+      subtitle: 'Выберыце правайдэра, для якога вы будзеце наладжваць SSO.',
+      body: {
+        title: 'Выберыце вашага правайдэра ідэнтыфікацыі',
+        description: 'Мы правядзём вас праз падрабязны працэс налады далей.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Карыстальніцкі правайдэр SAML',
+      },
+      warning: 'Пасля выбару правайдэра вы не зможаце змяніць яго, пакуль не скончыце канфігурацыю',
+    },
+    verifyEmailDomainStep: {
+      title: 'Пацвердзіць адрас электроннай пошты',
+      subtitle: 'Пацвердзіце адрас электроннай пошты, на якім вы хочаце ўключыць карпаратыўнае падключэнне.',
+      addEmailAddress: {
+        formTitle: 'Нам патрэбна ваша пошта',
+        formSubtitle: 'Каб пачаць, нам спатрэбіцца ваш адрас электроннай пошты',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'Адрас электроннай пошты',
+      },
+      emailCode: {
+        formTitle: 'Пацвердзіце ваш адрас электроннай пошты',
+        formSubtitle: 'Увядзіце код пацверджання, дасланы на {{identifier}}',
+        resendButton: 'Не атрымалі код? Адправіць паўторна',
+        verified: {
+          title: 'Мы атрымалі вашу пошту',
+          subtitle: 'Вы пацвердзілі свой адрас электроннай пошты з наступнай поштай',
+          inputLabel: 'Пацверджаны адрас электроннай пошты',
+        },
+      },
+      domainTaken: {
+        title: 'Гэты дамен ({{domain}}) ужо мае SSO-падключэнне',
+        subtitle: 'Звяжыцеся з адміністратарам прыкладання, каб атрымаць доступ праз існуючае падключэнне.',
+      },
     },
   },
   createOrganization: {
