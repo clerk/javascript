@@ -133,6 +133,33 @@ describe('CardRoot augmentedAppearance — flush', () => {
     expect(captured.parsedElements[1].cardBox?.boxShadow).toBe('none');
     expect(captured.parsedElements[1].card?.backgroundColor).toBe('transparent');
   });
+
+  it('user string classname elements are preserved after flush overrides', () => {
+    renderCard({
+      elevation: 'flush',
+      appearance: { elements: { card: 'my-custom-class' } },
+    });
+    expect(captured.parsedElements[1].card?.backgroundColor).toBe('transparent');
+    expect(captured.parsedElements[2].card).toBe('my-custom-class');
+  });
+
+  it('user footer overrides with nested selectors appear after flush footer', () => {
+    renderCard({
+      elevation: 'flush',
+      appearance: {
+        elements: {
+          footer: {
+            background: 'blue',
+            '>:first-of-type': { padding: '16px' },
+          },
+        },
+      },
+    });
+    expect(captured.parsedElements[1].footer?.background).toBe('transparent');
+    expect(captured.parsedElements[1].footer?.['>:first-of-type']?.padding).toBe(0);
+    expect(captured.parsedElements[2].footer?.background).toBe('blue');
+    expect(captured.parsedElements[2].footer?.['>:first-of-type']?.padding).toBe('16px');
+  });
 });
 
 describe('CardRoot elevation resolution priority', () => {
