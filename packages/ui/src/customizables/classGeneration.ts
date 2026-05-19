@@ -126,28 +126,14 @@ const getElementState = (props: PropsWithState | undefined): ElementState | unde
 
 const addStringClassname = (cn: string, val?: unknown) => (typeof val === 'string' ? cn + ' ' + val : cn);
 
-const normalizeFocusSelectors = (val: Record<string, unknown>): Record<string, unknown> => {
-  let result = val;
-  for (const key of Object.keys(val)) {
-    if (key.includes(':focus') && !key.includes(':focus-visible') && !key.includes(':focus-within')) {
-      const newKey = key.replace(/:focus/g, ':focus-visible');
-      if (!(newKey in val)) {
-        result = result === val ? { ...val } : result;
-        result[newKey] = val[key];
-      }
-    }
-  }
-  return result;
-};
-
 const addStyleRuleObject = (css: unknown[], val: unknown, specificity = 0) => {
   if (specificity) {
     if (val && typeof val === 'object') {
-      css.push({ ['&'.repeat(specificity)]: normalizeFocusSelectors(val as Record<string, unknown>) });
+      css.push({ ['&'.repeat(specificity)]: val });
     }
   } else {
     if (val && typeof val === 'object') {
-      css.push(normalizeFocusSelectors(val as Record<string, unknown>));
+      css.push(val);
     }
   }
 };

@@ -123,6 +123,11 @@ const borderVariants = (t: InternalTheme, props?: any) => {
     props?.focusRing === false
       ? {}
       : {
+          '&:focus': focusStyleValues,
+          '&:focus:not(:focus-visible)': {
+            borderColor,
+            boxShadow: defaultBoxShadow,
+          },
           '&:focus-visible': focusStyleValues,
         };
 
@@ -161,6 +166,12 @@ const focusRingStyles = (t: InternalTheme) => {
 
 const focusRing = (t: InternalTheme) => {
   return {
+    '&:focus': {
+      ...focusRingStyles(t),
+    },
+    '&:focus:not(:focus-visible)': {
+      boxShadow: 'none',
+    },
     '&:focus-visible': {
       ...focusRingStyles(t),
     },
