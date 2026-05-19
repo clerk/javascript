@@ -1,4 +1,4 @@
-import type { UseFloatingOptions, UseFloatingReturn, UseRoleProps } from '@floating-ui/react';
+import type { UseFloatingOptions, UseFloatingReturn, UseInteractionsReturn, UseRoleProps } from '@floating-ui/react';
 import {
   autoUpdate,
   flip,
@@ -45,8 +45,8 @@ export type UsePopoverReturn = {
   isOpen: boolean;
   styles: { position: React.CSSProperties['position']; top: number; left: number };
   context: UseFloatingReturn['context'];
-  getReferenceProps: (userProps?: React.HTMLProps<Element>) => Record<string, unknown>;
-  getFloatingProps: (userProps?: React.HTMLProps<HTMLElement>) => Record<string, unknown>;
+  getReferenceProps: UseInteractionsReturn['getReferenceProps'];
+  getFloatingProps: UseInteractionsReturn['getFloatingProps'];
 };
 
 export const usePopover = (props: UsePopoverProps = {}): UsePopoverReturn => {
