@@ -1,5 +1,5 @@
 import { Box, descriptors, Flex, Heading, Icon, Link, localizationKeys, Span, Text } from '@/customizables';
-import { ArrowRightIcon } from '@/icons';
+import { ArrowRight } from '@/icons';
 
 import type { LocalizationKey } from '../../../localization';
 
@@ -134,7 +134,7 @@ export const TestRunHowToFixSection = ({ errorCode }: TestRunHowToFixSectionProp
             )}
           />
           <Icon
-            icon={ArrowRightIcon}
+            icon={ArrowRight}
             size='sm'
           />
         </Link>

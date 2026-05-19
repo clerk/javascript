@@ -33,7 +33,7 @@ import { Drawer } from '@/elements/Drawer';
 import { IconButton } from '@/elements/IconButton';
 import { Pagination } from '@/elements/Pagination';
 import { useClipboard, useSpinDelay } from '@/hooks';
-import { Check, Copy, LinkIcon, RotateLeftRight } from '@/icons';
+import { Checkmark, Copy, Link as LinkIcon, RotateLeftRight } from '@/icons';
 import { common, mqu } from '@/styledSystem';
 import { handleError } from '@/utils/errorHandler';
 
@@ -627,7 +627,7 @@ const FullMessageBlock = ({ message }: { message: string }): JSX.Element => {
           variant='ghost'
           colorScheme='neutral'
           size='xs'
-          icon={hasCopied ? Check : Copy}
+          icon={hasCopied ? Checkmark : Copy}
           aria-label={copyLabel}
           onClick={() => onCopy()}
         />

@@ -12,7 +12,7 @@ import {
   Text,
   useLocalizations,
 } from '@/customizables';
-import { CaretLeft, CaretRight } from '@/icons';
+import { ChevronLeft, ChevronRight } from '@/icons';
 import { common, type PropsOfComponent } from '@/styledSystem';
 
 import { ProfileCardFooter } from './ProfileCard';
@@ -142,7 +142,7 @@ const FooterPrevious = ({ onClick, isDisabled, isLoading, label = 'Previous' }: 
       onClick={handleClick}
     >
       <Icon
-        icon={CaretLeft}
+        icon={ChevronLeft}
         size='sm'
         sx={t => ({ marginInlineEnd: t.space.$1 })}
       />
@@ -172,7 +172,7 @@ const FooterContinue = ({ onClick, isDisabled, isLoading, label = 'Continue' }: 
     >
       {labelText}
       <Icon
-        icon={CaretRight}
+        icon={ChevronRight}
         size='sm'
         sx={t => ({ marginInlineStart: t.space.$1 })}
       />
