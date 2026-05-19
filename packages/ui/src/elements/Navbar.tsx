@@ -296,7 +296,7 @@ const NavButton = (props: NavButtonProps) => {
           '&:hover': {
             backgroundColor: isActive ? undefined : t.colors.$neutralAlpha25,
           },
-          '&:focus': {
+          '&:focus-visible': {
             backgroundColor: isActive ? undefined : t.colors.$neutralAlpha50,
           },
         }),
