@@ -259,7 +259,7 @@ describe('UserButton', () => {
 
       for (let i = 0; i < 10; i++) {
         await userEvent.tab();
-        expect(trigger).not.toHaveFocus();
+        expect(dialog.contains(document.activeElement)).toBe(true);
       }
 
       expect(screen.getByRole('dialog', { name: 'Account panel' })).toBeInTheDocument();
