@@ -24,7 +24,7 @@ export const ClipboardInput = (props: ClipboardInputProps) => {
         {...rest}
         value={value}
         readOnly
-        sx={theme => ({ paddingInlineEnd: theme.space.$10, textOverflow: 'ellipsis' })}
+        sx={theme => ({ paddingInlineEnd: theme.space.$7x5, textOverflow: 'ellipsis' })}
       />
 
       <Button
@@ -34,7 +34,10 @@ export const ClipboardInput = (props: ClipboardInputProps) => {
         sx={t => {
           return {
             position: 'absolute',
+            padding: 0,
             insetInlineEnd: t.space.$0x5,
+            insetBlock: t.space.$0x5,
+            aspectRatio: 1,
           };
         }}
       >
