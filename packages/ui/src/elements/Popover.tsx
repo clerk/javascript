@@ -15,6 +15,12 @@ type PopoverProps = PropsWithChildren<{
    */
   outsideElementsInert?: boolean;
   order?: Array<'reference' | 'floating' | 'content'>;
+  /**
+   * Whether the floating element is modal. When `true`, focus is trapped inside and outside elements are inerted.
+   * When `false`, focus can leave the floating element and it closes on focus out.
+   * @default true (FloatingFocusManager default)
+   */
+  modal?: boolean;
   portal?: boolean;
   /**
    * The root element to render the portal into.
@@ -29,6 +35,7 @@ export const Popover = (props: PopoverProps) => {
     initialFocus,
     outsideElementsInert = false,
     order = ['reference', 'content'],
+    modal,
     nodeId,
     isOpen,
     portal = true,
@@ -49,6 +56,7 @@ export const Popover = (props: PopoverProps) => {
               initialFocus={initialFocus}
               outsideElementsInert={outsideElementsInert}
               order={order}
+              modal={modal}
             >
               <>{children}</>
             </FloatingFocusManager>
@@ -65,6 +73,7 @@ export const Popover = (props: PopoverProps) => {
           context={context}
           initialFocus={initialFocus}
           order={order}
+          modal={modal}
         >
           <>{children}</>
         </FloatingFocusManager>

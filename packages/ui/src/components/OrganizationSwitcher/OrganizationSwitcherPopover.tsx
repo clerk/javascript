@@ -127,7 +127,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
             padding: `${t.space.$4} ${t.space.$5}`,
           })}
         />
-        <Actions role='menu'>{manageOrganizationButton}</Actions>
+        <Actions>{manageOrganizationButton}</Actions>
       </Flex>
     );
 
@@ -142,10 +142,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
           {...rest}
         >
           <PopoverCard.Content elementDescriptor={descriptors.organizationSwitcherPopoverMain}>
-            <Actions
-              elementDescriptor={descriptors.organizationSwitcherPopoverActions}
-              role='menu'
-            >
+            <Actions elementDescriptor={descriptors.organizationSwitcherPopoverActions}>
               {currentOrg
                 ? selectedOrganizationPreview(currentOrg)
                 : !hidePersonal && (

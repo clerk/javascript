@@ -299,7 +299,6 @@ const SmsCodeScreen = withCardStateProvider((props: SmsCodeScreenProps) => {
         )}
         <Col>
           <Actions
-            role='menu'
             elementDescriptor={descriptors.taskSetupMfaPhoneSelectionItems}
             sx={t => ({
               borderTopWidth: t.borderWidths.$normal,
