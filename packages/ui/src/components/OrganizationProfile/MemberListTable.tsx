@@ -1,7 +1,7 @@
-import React, { memo, useMemo } from 'react';
+import React, { useMemo } from 'react';
 
 import { Pagination } from '@/ui/elements/Pagination';
-import { Select, SelectButton, SelectOptionList } from '@/ui/elements/Select';
+import { Select, SelectButton, SelectOption, SelectOptionList } from '@/ui/elements/Select';
 
 import type { LocalizationKey } from '../../customizables';
 import {
@@ -175,10 +175,9 @@ export const RoleSelect = (props: {
       placeholder={t(localizationKeys('organizationProfile.invitePage.selectDropdown__role'))}
       onChange={role => onChange(role.value)}
       renderOption={(option, _index, isSelected) => (
-        <RolesListItem
-          isSelected={isSelected}
-          option={option}
-        />
+        <SelectOption isSelected={isSelected}>
+          <SelectOption.Label>{option.label}</SelectOption.Label>
+        </SelectOption>
       )}
     >
       {/*Store value inside an input in order to be accessible as form data*/}
@@ -230,36 +229,3 @@ export const RoleSelect = (props: {
     </Select>
   );
 };
-
-type RolesListItemProps = PropsOfComponent<typeof Flex> & {
-  isSelected?: boolean;
-  option?: {
-    label: string;
-    value: string;
-  };
-};
-
-const RolesListItem = memo((props: RolesListItemProps) => {
-  const { option, isSelected, sx, ...rest } = props;
-  return (
-    <Flex
-      sx={[
-        theme => ({
-          width: '100%',
-          padding: `${theme.space.$2} ${theme.space.$4}`,
-          borderRadius: theme.radii.$md,
-          '&:hover': {
-            backgroundColor: theme.colors.$neutralAlpha100,
-          },
-          '&[data-focused="true"]': {
-            backgroundColor: theme.colors.$neutralAlpha150,
-          },
-        }),
-        sx,
-      ]}
-      {...rest}
-    >
-      <Text variant='subtitle'>{option?.label}</Text>
-    </Flex>
-  );
-});
