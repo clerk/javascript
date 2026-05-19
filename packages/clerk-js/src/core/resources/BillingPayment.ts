@@ -5,10 +5,11 @@ import type {
   BillingPaymentMethodResource,
   BillingPaymentResource,
   BillingPaymentStatus,
+  BillingPaymentTotals,
   BillingSubscriptionItemResource,
 } from '@clerk/shared/types';
 
-import { billingMoneyAmountFromJSON } from '../../utils';
+import { billingMoneyAmountFromJSON, billingPaymentTotalsFromJSON } from '../../utils';
 import { unixEpochToDate } from '../../utils/date';
 import { BaseResource, BillingPaymentMethod, BillingSubscriptionItem } from './internal';
 
@@ -22,6 +23,7 @@ export class BillingPayment extends BaseResource implements BillingPaymentResour
   subscriptionItem!: BillingSubscriptionItemResource;
   chargeType!: BillingPaymentChargeType;
   status!: BillingPaymentStatus;
+  totals: BillingPaymentTotals | null = null;
 
   constructor(data: BillingPaymentJSON) {
     super();
@@ -42,6 +44,7 @@ export class BillingPayment extends BaseResource implements BillingPaymentResour
     this.subscriptionItem = new BillingSubscriptionItem(data.subscription_item);
     this.chargeType = data.charge_type;
     this.status = data.status;
+    this.totals = data.totals ? billingPaymentTotalsFromJSON(data.totals) : null;
     return this;
   }
 }
