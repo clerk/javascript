@@ -20,7 +20,7 @@ const UserButtonWithFloatingTree = withFloatingTree<{ children: ReactElement }>(
     });
 
   const userButtonMenuId = useId();
-  const popoverRef = useRef<HTMLElement>(null);
+  const popoverRef = useRef<HTMLElement | null>(null);
   const floatingRef = useCallback(
     (node: HTMLElement | null) => {
       floating(node);
@@ -45,16 +45,15 @@ const UserButtonWithFloatingTree = withFloatingTree<{ children: ReactElement }>(
         order={['content']}
         initialFocus={popoverRef}
       >
-        {cloneElement(
-          children,
-          getFloatingProps({
+        {cloneElement(children, {
+          ...getFloatingProps({
             id: userButtonMenuId,
-            close: toggle,
             tabIndex: -1,
             ref: floatingRef,
             style: styles,
           }),
-        )}
+          close: toggle,
+        })}
       </Popover>
     </>
   );
