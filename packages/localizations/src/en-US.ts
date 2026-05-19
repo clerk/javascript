@@ -358,6 +358,7 @@ export const enUS: LocalizationResource = {
         columns: {
           attribute: 'Attribute',
           claimName: 'Claim Name',
+          claimValue: 'Claim Value',
         },
         badges: {
           required: 'Required',
@@ -366,15 +367,15 @@ export const enUS: LocalizationResource = {
         rows: {
           email: {
             attribute: 'Email address',
-            claim: 'user.email',
+            claim: 'mail',
           },
           firstName: {
             attribute: 'First Name',
-            claim: 'user.firstName',
+            claim: 'firstName',
           },
           lastName: {
             attribute: 'Last Name',
-            claim: 'user.lastName',
+            claim: 'lastName',
           },
         },
       },

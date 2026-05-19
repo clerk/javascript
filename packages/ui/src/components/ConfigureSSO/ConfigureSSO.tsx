@@ -3,7 +3,7 @@ import {
   __internal_useUserEnterpriseConnections,
   useSession,
 } from '@clerk/shared/react';
-import type { __experimental_ConfigureSSOProps, EnterpriseConnectionResource } from '@clerk/shared/types';
+import type { ConfigureSSOProps, EnterpriseConnectionResource } from '@clerk/shared/types';
 import React from 'react';
 
 import { useProtect } from '@/common';
@@ -240,5 +240,4 @@ const useHasSuccessfulTestRun = (
   };
 };
 
-export const ConfigureSSO: React.ComponentType<__experimental_ConfigureSSOProps> =
-  withCardStateProvider(ConfigureSSOInternal);
+export const ConfigureSSO: React.ComponentType<ConfigureSSOProps> = withCardStateProvider(ConfigureSSOInternal);
