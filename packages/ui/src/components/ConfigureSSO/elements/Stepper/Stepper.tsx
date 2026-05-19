@@ -78,7 +78,8 @@ const Item = ({
         {isCompleted && !isCurrent ? (
           <Icon
             icon={Checkmark}
-            sx={theme => ({ width: theme.sizes.$2, height: theme.sizes.$2, color: theme.colors.$white })}
+            size='sm'
+            sx={theme => ({ color: theme.colors.$white })}
           />
         ) : (
           <Text

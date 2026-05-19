@@ -760,8 +760,13 @@ const OpenTestUrlButton = ({ onTestRunCreated }: OpenTestUrlButtonProps): JSX.El
         />
       ) : (
         <Icon
+<<<<<<< HEAD
           icon={LinkIcon}
           size='sm'
+=======
+          icon={hasCopied ? Checkmark : Copy}
+          size='md'
+>>>>>>> 8669a68a0 (fixing icons)
           colorScheme='neutral'
         />
       )}
