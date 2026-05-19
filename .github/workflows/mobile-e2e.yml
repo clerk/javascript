@@ -202,37 +202,6 @@ jobs:
           echo "Pinned @clerk/expo (snapshot mode):"
           grep -nE "clerkAndroid(Api|Ui)Version|mavenLocal" "$file" | head
 
-      - name: Expose mavenLocal to every Gradle build on the runner
-        # `expo prebuild --clean` regenerates the quickstart's android/build.gradle
-        # from template without mavenLocal(), so the consumer-side Gradle build
-        # can't resolve the snapshot we just publishToMavenLocal'd. A global
-        # init script injects mavenLocal() into every Gradle invocation on
-        # this runner (both the prebuild's gradle-plugin resolution and the
-        # final :app:assembleRelease).
-        if: inputs.clerk_android_ref != '' && inputs.clerk_android_snapshot_suffix != ''
-        run: |
-          mkdir -p ~/.gradle/init.d
-          cat > ~/.gradle/init.d/mavenLocal.gradle <<'EOG'
-          allprojects {
-            repositories {
-              mavenLocal()
-            }
-          }
-          settingsEvaluated { settings ->
-            settings.pluginManagement {
-              repositories {
-                mavenLocal()
-              }
-            }
-            settings.dependencyResolutionManagement {
-              repositories {
-                mavenLocal()
-              }
-            }
-          }
-          EOG
-          echo "Wrote ~/.gradle/init.d/mavenLocal.gradle"
-
       - name: Pin clerk-android Maven version (version-string mode)
         # When the caller passes a pre-published clerk-android version
         # (e.g. "1.0.17-SNAPSHOT" already on Maven Central / Sonatype staging),
@@ -437,8 +406,31 @@ jobs:
         # `expo run:android`). Output is copied to a stable cache path.
         if: steps.apk-cache.outputs.cache-hit != 'true'
         working-directory: clerk-expo-quickstart/NativeComponentQuickstart
+        env:
+          SNAPSHOT_MODE: ${{ inputs.clerk_android_ref != '' && inputs.clerk_android_snapshot_suffix != '' && 'true' || 'false' }}
         run: |
           npx expo prebuild --clean --platform android
+          # In snapshot mode (compat-gate), inject mavenLocal() into the
+          # regenerated android/build.gradle so the consumer build can resolve
+          # the clerk-android snapshot we just publishToMavenLocal'd. Only
+          # touches project repositories — leaves pluginManagement alone so
+          # the Gradle Plugin Portal stays the default for resolving the
+          # kotlin/android plugins.
+          if [ "$SNAPSHOT_MODE" = "true" ]; then
+            file="android/build.gradle"
+            if ! grep -q "mavenLocal()" "$file"; then
+              awk '
+                /^allprojects\s*\{/ { in_all = 1 }
+                in_all && /repositories\s*\{/ && !done {
+                  print; print "    mavenLocal()"; done = 1; next
+                }
+                in_all && /^\}/ { in_all = 0 }
+                { print }
+              ' "$file" > "$file.tmp" && mv "$file.tmp" "$file"
+              echo "Injected mavenLocal() into $file:"
+              grep -nE "mavenLocal|allprojects|repositories" "$file" | head -20
+            fi
+          fi
           cd android
           ( ok=0; for i in 1 2 3; do if ./gradlew :app:assembleRelease; then ok=1; break; fi; echo "gradle attempt $i failed; retrying in 15s"; sleep 15; done; [ "$ok" = 1 ] )
           cp app/build/outputs/apk/release/app-release.apk /tmp/cached-app-release.apk
