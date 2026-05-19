@@ -202,6 +202,37 @@ jobs:
           echo "Pinned @clerk/expo (snapshot mode):"
           grep -nE "clerkAndroid(Api|Ui)Version|mavenLocal" "$file" | head
 
+      - name: Expose mavenLocal to every Gradle build on the runner
+        # `expo prebuild --clean` regenerates the quickstart's android/build.gradle
+        # from template without mavenLocal(), so the consumer-side Gradle build
+        # can't resolve the snapshot we just publishToMavenLocal'd. A global
+        # init script injects mavenLocal() into every Gradle invocation on
+        # this runner (both the prebuild's gradle-plugin resolution and the
+        # final :app:assembleRelease).
+        if: inputs.clerk_android_ref != '' && inputs.clerk_android_snapshot_suffix != ''
+        run: |
+          mkdir -p ~/.gradle/init.d
+          cat > ~/.gradle/init.d/mavenLocal.gradle <<'EOG'
+          allprojects {
+            repositories {
+              mavenLocal()
+            }
+          }
+          settingsEvaluated { settings ->
+            settings.pluginManagement {
+              repositories {
+                mavenLocal()
+              }
+            }
+            settings.dependencyResolutionManagement {
+              repositories {
+                mavenLocal()
+              }
+            }
+          }
+          EOG
+          echo "Wrote ~/.gradle/init.d/mavenLocal.gradle"
+
       - name: Pin clerk-android Maven version (version-string mode)
         # When the caller passes a pre-published clerk-android version
         # (e.g. "1.0.17-SNAPSHOT" already on Maven Central / Sonatype staging),
