@@ -756,7 +756,7 @@ const OpenTestUrlButton = ({ onTestRunCreated }: OpenTestUrlButtonProps): JSX.El
       {isCreatingTestRun ? (
         <Spinner
           elementDescriptor={descriptors.spinner}
-          size='xs'
+          size='sm'
         />
       ) : (
         <Icon
