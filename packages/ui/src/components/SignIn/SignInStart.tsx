@@ -432,6 +432,7 @@ function SignInStartInternal(): JSX.Element {
       (e: ClerkAPIError) =>
         e.code === ERROR_CODES.INVALID_STRATEGY_FOR_USER ||
         e.code === ERROR_CODES.FORM_PASSWORD_INCORRECT ||
+        e.code === ERROR_CODES.FORM_PASSWORD_OR_IDENTIFIER_INCORRECT ||
         e.code === ERROR_CODES.FORM_PASSWORD_PWNED,
     );
 
