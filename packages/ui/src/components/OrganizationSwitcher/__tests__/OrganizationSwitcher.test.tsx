@@ -358,7 +358,7 @@ describe('OrganizationSwitcher', () => {
       props.setProps({ hidePersonal: true });
       const { getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
       await userEvent.click(getByRole('button'));
-      await userEvent.click(getByRole('menuitem'));
+      await userEvent.click(getByRole('button', { name: /manage/i }));
       expect(fixtures.clerk.openOrganizationProfile).toHaveBeenCalled();
     });
 
@@ -375,7 +375,7 @@ describe('OrganizationSwitcher', () => {
       props.setProps({ hidePersonal: true });
       const { getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
       await userEvent.click(getByRole('button', { name: 'Open organization switcher' }));
-      await userEvent.click(getByRole('menuitem', { name: 'Create organization' }));
+      await userEvent.click(getByRole('button', { name: 'Create organization' }));
       expect(fixtures.clerk.openCreateOrganization).toHaveBeenCalled();
     });
 
@@ -391,7 +391,7 @@ describe('OrganizationSwitcher', () => {
 
       const { getByRole, queryByLabelText, userEvent } = render(<OrganizationSwitcher />, { wrapper });
       await userEvent.click(getByRole('button', { name: 'Open organization switcher' }));
-      await userEvent.click(getByRole('menuitem', { name: 'Create organization' }));
+      await userEvent.click(getByRole('button', { name: 'Create organization' }));
       expect(fixtures.clerk.openCreateOrganization).toHaveBeenCalled();
       expect(queryByLabelText(/Slug/i)).not.toBeInTheDocument();
     });
@@ -619,7 +619,7 @@ describe('OrganizationSwitcher', () => {
       );
 
       await userEvent.click(getByRole('button'));
-      const manageButton = await waitFor(() => screen.getByRole('menuitem', { name: /manage/i }));
+      const manageButton = await waitFor(() => screen.getByRole('button', { name: /manage/i }));
       await userEvent.click(manageButton);
 
       expect(fixtures.clerk.openOrganizationProfile).toHaveBeenCalledWith(expect.objectContaining({ getContainer }));
@@ -649,7 +649,7 @@ describe('OrganizationSwitcher', () => {
       );
 
       await userEvent.click(getByRole('button', { name: 'Open organization switcher' }));
-      const createButton = await waitFor(() => screen.getByRole('menuitem', { name: 'Create organization' }));
+      const createButton = await waitFor(() => screen.getByRole('button', { name: 'Create organization' }));
       await userEvent.click(createButton);
 
       expect(fixtures.clerk.openCreateOrganization).toHaveBeenCalledWith(expect.objectContaining({ getContainer }));
