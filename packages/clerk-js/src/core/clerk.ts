@@ -518,6 +518,13 @@ export class Clerk implements ClerkInterface {
   public load = async (options?: ClerkOptions): Promise<void> => {
     debugLogger.info('load() start', {}, 'clerk');
     if (this.loaded) {
+      const legacy = options as Record<string, unknown> | undefined;
+      const hasClerkUI = Boolean(options?.ui?.ClerkUI || legacy?.clerkUICtor || legacy?.clerkUiCtor);
+      if (!this.#clerkUI && hasClerkUI) {
+        const nextOptions = this.#initOptions({ ...this.#options, ...options });
+        this.#options = nextOptions;
+        this.#initClerkUI();
+      }
       return;
     }
 
@@ -530,18 +537,7 @@ export class Clerk implements ClerkInterface {
 
     this.#options = this.#initOptions(options);
 
-    // Initialize ClerkUI if it was provided
-    if (this.#options.ui?.ClerkUI) {
-      this.#clerkUI = Promise.resolve(this.#options.ui.ClerkUI).then(
-        ClerkUI =>
-          new ClerkUI(
-            () => this,
-            () => this.environment,
-            this.#options,
-            new ModuleManager(),
-          ),
-      );
-    }
+    this.#initClerkUI();
 
     // In development mode, if custom router options are provided, warn if both routerPush and routerReplace are not provided
     if (
@@ -616,6 +612,22 @@ export class Clerk implements ClerkInterface {
       // bubble up the error
       throw error;
     }
+  };
+
+  #initClerkUI = (): void => {
+    if (this.#clerkUI || !this.#options.ui?.ClerkUI) {
+      return;
+    }
+
+    this.#clerkUI = Promise.resolve(this.#options.ui.ClerkUI).then(
+      ClerkUI =>
+        new ClerkUI(
+          () => this,
+          () => this.environment,
+          this.#options,
+          new ModuleManager(),
+        ),
+    );
   };
 
   #isCombinedSignInOrUpFlow(): boolean {

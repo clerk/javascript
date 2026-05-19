@@ -243,6 +243,35 @@ describe('isomorphicClerk', () => {
       );
     });
 
+    it('attaches UI before replaying premounts when global Clerk is already loaded', async () => {
+      const mockLoad = vi.fn().mockResolvedValue(undefined);
+      const mockMountUserButton = vi.fn();
+      const mockClerkInstance = {
+        load: mockLoad,
+        loaded: true,
+        status: 'ready',
+        mountUserButton: mockMountUserButton,
+      };
+      (global as any).Clerk = mockClerkInstance;
+
+      const clerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+      const node = document.createElement('div');
+      clerk.mountUserButton(node);
+
+      await (clerk as any).getEntryChunks();
+
+      expect(loadClerkUIScript).toHaveBeenCalled();
+      expect(mockLoad).toHaveBeenCalledWith(
+        expect.objectContaining({
+          ui: expect.objectContaining({
+            ClerkUI: (global as any).__internal_ClerkUICtor,
+          }),
+        }),
+      );
+      expect(mockMountUserButton).toHaveBeenCalledWith(node, undefined);
+      expect(mockLoad.mock.invocationCallOrder[0]).toBeLessThan(mockMountUserButton.mock.invocationCallOrder[0]);
+    });
+
     // ─── @clerk/react with bundled ui prop (e.g. user passes ui={ui} from @clerk/ui) ───
     // These SDKs: no Clerk prop, ui with ClerkUI, standardBrowser omitted
     // shouldLoadUi = (true && true) || true = true
