@@ -1002,6 +1002,26 @@ export type Options = {
    * @default true
    */
   autoFocus?: boolean;
+
+  /**
+   * Controls the visual elevation of card-based components.
+   *
+   * - `'raised'` (default) — the card renders with its border, box-shadow, border-radius, and padding.
+   * - `'flush'` — removes the card border, box-shadow, border-radius, outer padding, and footer
+   *   background so the component sits flat against its container.
+   *
+   * Applies to all card-based components including `<SignIn />`, `<SignUp />`,
+   * `<Waitlist />`, `<CreateOrganization />`, `<OrganizationList />`,
+   * `<OAuthConsent />`, `<UserVerification />`, and session task components.
+   *
+   * Does **not** affect profile components (`<UserProfile />`, `<OrganizationProfile />`)
+   * or popover components (`<UserButton />`, `<OrganizationSwitcher />`), which always render as raised.
+   *
+   * When a component is opened as a modal, it always renders as raised regardless of this setting.
+   *
+   * @default 'raised'
+   */
+  elevation?: 'raised' | 'flush';
 };
 
 export type CaptchaAppearanceOptions = {

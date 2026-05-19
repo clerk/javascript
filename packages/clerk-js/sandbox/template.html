@@ -33,7 +33,7 @@
       }
     </script>
   </head>
-  <body class="flex min-h-full flex-col overflow-x-hidden bg-gray-50 lg:has-[*[data-sidebar]:not(.hidden)]:px-72">
+  <body class="flex min-h-full flex-col overflow-x-hidden bg-white lg:has-[*[data-sidebar]:not(.hidden)]:px-72">
     <div
       data-sidebar
       class="fixed inset-y-0 left-0 w-72 overflow-y-auto border-r border-gray-100 bg-white px-2 py-4 max-lg:hidden"
@@ -435,6 +435,24 @@
         <label class="flex items-center justify-between border-t border-gray-100 py-2">
           <span class="font-mono text-xs">localization</span>
           <select id="localizationSelect"></select>
+        </label>
+        <label class="flex items-center justify-between border-t border-gray-100 py-2">
+          <span class="font-mono text-xs">elevation</span>
+          <select
+            id="elevationSelect"
+            class="text-sm"
+          >
+            <option value="raised">raised</option>
+            <option value="flush">flush</option>
+          </select>
+        </label>
+        <label class="flex items-center justify-between border-t border-gray-100 py-2">
+          <span class="font-mono text-xs">devWarnings</span>
+          <input
+            type="checkbox"
+            id="devWarningsToggle"
+            checked
+          />
         </label>
       </fieldset>
     </div>
