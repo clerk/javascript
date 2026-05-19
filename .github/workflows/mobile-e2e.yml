@@ -168,8 +168,24 @@ jobs:
           sed -i "s/^CLERK_API_VERSION=.*/CLERK_API_VERSION=${API_VERSION}/" gradle.properties
           sed -i "s/^CLERK_UI_VERSION=.*/CLERK_UI_VERSION=${UI_VERSION}/" gradle.properties
           sed -i "s/^CLERK_TELEMETRY_VERSION=.*/CLERK_TELEMETRY_VERSION=${TELEMETRY_VERSION}/" gradle.properties
+          # clerk-android's build calls signAllPublications() unconditionally
+          # on api/ui/telemetry. For snapshot tests we don't have signing keys
+          # configured and we don't need signed artifacts in mavenLocal, so
+          # disable every sign* task via an init script (more reliable than
+          # enumerating -x flags for each module + publication variant).
+          cat > /tmp/disable-signing.gradle <<'EOG'
+          allprojects {
+            tasks.matching { it.name.startsWith("sign") }.configureEach {
+              enabled = false
+            }
+          }
+          EOG
           chmod +x gradlew
-          ./gradlew :source:api:publishToMavenLocal :source:ui:publishToMavenLocal :source:telemetry:publishToMavenLocal -x signMavenPublication
+          ./gradlew \
+            -I /tmp/disable-signing.gradle \
+            :source:api:publishToMavenLocal \
+            :source:ui:publishToMavenLocal \
+            :source:telemetry:publishToMavenLocal
 
       - name: Pin @clerk/expo to mavenLocal snapshot
         if: inputs.clerk_android_ref != '' && inputs.clerk_android_snapshot_suffix != ''
