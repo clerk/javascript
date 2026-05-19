@@ -54,12 +54,15 @@ appId: com.clerk.clerkexpoquickstart
 # installed, and the JS bundle hasn't been parsed yet — the trailing
 # assertVisible races bundle load and fails against a blank
 # loading-spinner screen, even though the bundle would have loaded in
-# another ~5s. Wait up to 30s for either the AuthView's "Welcome!" text
-# (signed-out) or the landing screen's "Sign Out" button (signed-in,
-# handled below). Returns immediately once either is seen, so warm-bundle
-# flows don't pay the cost.
+# another ~5s. Wait up to 30s for any Clerk-rendered UI to appear before
+# the sign-out detection / final assertion below.
+#
+# "Welcome" matches both the AuthView ("Welcome! Sign in to continue.")
+# and the signed-in landing screen ("Welcome" header). Plain substring,
+# no regex special-char issues. Returns immediately once either is seen,
+# so warm-bundle flows don't pay the cost.
 - extendedWaitUntil:
-    visible: "Welcome! Sign in to continue|Sign Out"
+    visible: "Welcome"
     timeout: 30000
 # If a previous flow left the user signed in (session persists in
 # Keychain/SecureStore across clearState), sign out so subsequent flows
