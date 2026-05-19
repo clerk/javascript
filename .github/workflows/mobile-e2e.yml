@@ -32,7 +32,11 @@ on:
         required: false
         default: ""
       clerk_android_ref:
-        description: "Optional: pin clerk-android Maven coordinates to this version (e.g. '1.0.17-SNAPSHOT'). Empty = use the version pinned in android/build.gradle."
+        description: "Optional: pin clerk-android Maven coordinates to this version (e.g. '1.0.17-SNAPSHOT'). When clerk_android_snapshot_suffix is set, this is treated as a git ref (SHA/branch/tag) of clerk-android instead, and the snapshot is published to mavenLocal at runtime. Empty = use the version pinned in android/build.gradle."
+        required: false
+        default: ""
+      clerk_android_snapshot_suffix:
+        description: "Optional: when set together with clerk_android_ref, the workflow checks out clerk-android at that ref, bumps CLERK_*_VERSION by appending this suffix (e.g. '-expo-compat-123'), publishes to mavenLocal, and pins @clerk/expo to the resulting version. Used by clerk-android's expo-compat release gate."
         required: false
         default: ""
   workflow_call:
@@ -54,6 +58,10 @@ on:
         required: false
         default: ""
       clerk_android_ref:
+        type: string
+        required: false
+        default: ""
+      clerk_android_snapshot_suffix:
         type: string
         required: false
         default: ""
@@ -107,12 +115,83 @@ jobs:
           echo "Pinned clerk-ios to ${IOS_REF}:"
           grep -nE "CLERK_IOS_VERSION|kind:|revision:" "$file" | head
 
-      - name: Pin clerk-android Maven version (compat-gate mode)
-        # When the caller passes a specific clerk-android version (e.g. a
-        # SNAPSHOT or pre-release coordinate already published to Maven Central /
-        # Sonatype staging), rewrite the version constants in
-        # packages/expo/android/build.gradle.
-        if: inputs.clerk_android_ref != ''
+      # ---------------------------------------------------------------------
+      # clerk-android snapshot mode (compat-gate from clerk-android's release).
+      # When clerk_android_snapshot_suffix is set, clerk_android_ref is a git
+      # ref of clerk-android. We check it out, bump CLERK_*_VERSION in its
+      # gradle.properties by appending the suffix, publish to mavenLocal,
+      # then pin @clerk/expo to the resulting version + ensure mavenLocal()
+      # is in the resolution chain. When the suffix is empty,
+      # clerk_android_ref is a pre-published version string and the
+      # "version-string mode" step below handles it.
+      # ---------------------------------------------------------------------
+      - name: Checkout clerk-android (snapshot mode)
+        if: inputs.clerk_android_ref != '' && inputs.clerk_android_snapshot_suffix != ''
+        uses: actions/checkout@v4
+        with:
+          repository: clerk/clerk-android
+          ref: ${{ inputs.clerk_android_ref }}
+          path: clerk-android
+
+      - name: Set up JDK 21 for clerk-android publish (snapshot mode)
+        # clerk-android requires JDK 21 to build. The quickstart build below
+        # uses JDK 17 — re-run setup-java to switch back after publish.
+        if: inputs.clerk_android_ref != '' && inputs.clerk_android_snapshot_suffix != ''
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Compute clerk-android snapshot versions
+        id: android_versions
+        if: inputs.clerk_android_ref != '' && inputs.clerk_android_snapshot_suffix != ''
+        working-directory: clerk-android
+        env:
+          SUFFIX: ${{ inputs.clerk_android_snapshot_suffix }}
+        run: |
+          api="$(awk -F= '/^CLERK_API_VERSION=/{print $2}' gradle.properties | tr -d '[:space:]')${SUFFIX}"
+          ui="$(awk -F= '/^CLERK_UI_VERSION=/{print $2}' gradle.properties | tr -d '[:space:]')${SUFFIX}"
+          telemetry="$(awk -F= '/^CLERK_TELEMETRY_VERSION=/{print $2}' gradle.properties | tr -d '[:space:]')${SUFFIX}"
+          echo "api=$api" >> "$GITHUB_OUTPUT"
+          echo "ui=$ui" >> "$GITHUB_OUTPUT"
+          echo "telemetry=$telemetry" >> "$GITHUB_OUTPUT"
+          echo "Computed snapshot versions: api=$api ui=$ui telemetry=$telemetry"
+
+      - name: Publish clerk-android snapshot to mavenLocal
+        if: inputs.clerk_android_ref != '' && inputs.clerk_android_snapshot_suffix != ''
+        working-directory: clerk-android
+        env:
+          API_VERSION: ${{ steps.android_versions.outputs.api }}
+          UI_VERSION: ${{ steps.android_versions.outputs.ui }}
+          TELEMETRY_VERSION: ${{ steps.android_versions.outputs.telemetry }}
+        run: |
+          sed -i "s/^CLERK_API_VERSION=.*/CLERK_API_VERSION=${API_VERSION}/" gradle.properties
+          sed -i "s/^CLERK_UI_VERSION=.*/CLERK_UI_VERSION=${UI_VERSION}/" gradle.properties
+          sed -i "s/^CLERK_TELEMETRY_VERSION=.*/CLERK_TELEMETRY_VERSION=${TELEMETRY_VERSION}/" gradle.properties
+          chmod +x gradlew
+          ./gradlew :source:api:publishToMavenLocal :source:ui:publishToMavenLocal :source:telemetry:publishToMavenLocal -x signMavenPublication
+
+      - name: Pin @clerk/expo to mavenLocal snapshot
+        if: inputs.clerk_android_ref != '' && inputs.clerk_android_snapshot_suffix != ''
+        env:
+          API_VERSION: ${{ steps.android_versions.outputs.api }}
+          UI_VERSION: ${{ steps.android_versions.outputs.ui }}
+        run: |
+          file="packages/expo/android/build.gradle"
+          sed -i "s|clerkAndroidApiVersion = \"[^\"]*\"|clerkAndroidApiVersion = \"${API_VERSION}\"|" "$file"
+          sed -i "s|clerkAndroidUiVersion = \"[^\"]*\"|clerkAndroidUiVersion = \"${UI_VERSION}\"|" "$file"
+          if ! grep -q "mavenLocal()" "$file"; then
+            sed -i '/^repositories\s*{/a \  mavenLocal()' "$file" || true
+          fi
+          echo "Pinned @clerk/expo (snapshot mode):"
+          grep -nE "clerkAndroid(Api|Ui)Version|mavenLocal" "$file" | head
+
+      - name: Pin clerk-android Maven version (version-string mode)
+        # When the caller passes a pre-published clerk-android version
+        # (e.g. "1.0.17-SNAPSHOT" already on Maven Central / Sonatype staging),
+        # rewrite the version constants in packages/expo/android/build.gradle.
+        # The snapshot-from-SHA path is handled separately above (Android job).
+        if: inputs.clerk_android_ref != '' && inputs.clerk_android_snapshot_suffix == ''
         env:
           ANDROID_REF: ${{ inputs.clerk_android_ref }}
         run: |
@@ -430,6 +509,11 @@ jobs:
 
   ios:
     name: iOS
+    # Skip iOS when the dispatch is scoped to Android only — used by
+    # clerk-android's expo-compat release gate, which passes clerk_android_ref
+    # (and clerk_android_snapshot_suffix) but not clerk_ios_ref. Manual
+    # dispatches without ref inputs still run both jobs.
+    if: inputs.clerk_android_ref == '' || inputs.clerk_ios_ref != ''
     runs-on: macos-15
     timeout-minutes: 60
     steps:
@@ -463,12 +547,12 @@ jobs:
           echo "Pinned clerk-ios to ${IOS_REF}:"
           grep -nE "CLERK_IOS_VERSION|kind:|revision:" "$file" | head
 
-      - name: Pin clerk-android Maven version (compat-gate mode)
-        # When the caller passes a specific clerk-android version (e.g. a
-        # SNAPSHOT or pre-release coordinate already published to Maven Central /
-        # Sonatype staging), rewrite the version constants in
-        # packages/expo/android/build.gradle.
-        if: inputs.clerk_android_ref != ''
+      - name: Pin clerk-android Maven version (version-string mode)
+        # When the caller passes a pre-published clerk-android version
+        # (e.g. "1.0.17-SNAPSHOT" already on Maven Central / Sonatype staging),
+        # rewrite the version constants in packages/expo/android/build.gradle.
+        # The snapshot-from-SHA path is handled separately above (Android job).
+        if: inputs.clerk_android_ref != '' && inputs.clerk_android_snapshot_suffix == ''
         env:
           ANDROID_REF: ${{ inputs.clerk_android_ref }}
         run: |
