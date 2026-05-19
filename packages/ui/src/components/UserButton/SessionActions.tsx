@@ -104,7 +104,6 @@ export const SingleSessionActions = (props: SingleSessionActionsProps) => {
                 ? handleSignOutSessionClicked(session)
                 : () => handleActionClick(item)
             }
-            role={undefined}
             sx={commonActionSx}
             iconSx={t => ({
               width: t.sizes.$4,
@@ -188,7 +187,6 @@ export const MultiSessionActions = (props: MultiSessionActionsProps) => {
               label={localizationKeys('userButton.action__manageAccount')}
               onClick={handleManageAccountClicked}
               focusRing
-              role={undefined}
             />
             <SmallAction
               elementDescriptor={descriptors.userButtonPopoverActionButton}
@@ -201,7 +199,6 @@ export const MultiSessionActions = (props: MultiSessionActionsProps) => {
               label={localizationKeys('userButton.action__signOut')}
               onClick={handleSignOutSessionClicked(session)}
               focusRing
-              role={undefined}
             />
           </Flex>
         </SmallActions>
@@ -254,7 +251,6 @@ export const MultiSessionActions = (props: MultiSessionActionsProps) => {
                     ? handleSignOutSessionClicked(session)
                     : () => handleActionClick(item)
                 }
-                role={undefined}
                 sx={t => ({
                   border: 0,
                   padding: `${t.space.$2} ${t.space.$5}`,
