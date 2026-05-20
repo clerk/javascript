@@ -526,12 +526,23 @@ jobs:
           # Use a folded scalar (>-) plus `&&` chains so the entire pipeline runs
           # in one shell invocation. Maestro doesn't auto-recurse into subdirs,
           # so we pass each flow file explicitly via find.
+          # Maestro's `--exclude-tags` only filters when given a directory;
+          # with explicit file paths it runs every file regardless of tag.
+          # We want per-flow invocation (one crash/hang can't poison the
+          # rest) AND tag filtering, so pre-filter the file list in shell:
+          # for each candidate flow, grep its YAML for a top-level
+          # `- <excluded-tag>` line and drop it from the list.
           script: >-
             adb install -r /tmp/cached-app-release.apk &&
             cd integration/mobile &&
-            find flows -type f -name "*.yaml" ! -path "*/common/*"
-            ${FLOWS_FILTER:+-path "*$FLOWS_FILTER*"} -print0
-            | xargs -0 -n 1 maestro test --env CLERK_TEST_EMAIL="$CLERK_TEST_EMAIL" --env CLERK_TEST_PASSWORD="$CLERK_TEST_PASSWORD" --exclude-tags "$EXCLUDE_TAGS,flakyAndroid" --flatten-debug-output
+            excluded="$EXCLUDE_TAGS,flakyAndroid" &&
+            pattern="$(echo "$excluded" | sed 's/,/|/g')" &&
+            find flows -type f -name '*.yaml' ! -path '*/common/*'
+            ${FLOWS_FILTER:+-path "*$FLOWS_FILTER*"}
+            | while read f; do
+              grep -qE "^[[:space:]]*-[[:space:]]*(${pattern})[[:space:]]*$" "$f" || printf '%s\n' "$f";
+              done
+            | xargs -n 1 maestro test --env CLERK_TEST_EMAIL="$CLERK_TEST_EMAIL" --env CLERK_TEST_PASSWORD="$CLERK_TEST_PASSWORD" --flatten-debug-output
 
       - name: Upload Maestro artifacts on failure or cancel
         if: failure() || cancelled()
@@ -877,17 +888,38 @@ jobs:
           xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.Prediction -bool NO || true
           xcrun simctl install "$SIM_UDID" /tmp/cached-clerknativequickstart.app
           cd integration/mobile
-          # Maestro doesn't auto-recurse into subdirectories; pass each flow
-          # explicitly. `xargs -n 1` runs maestro test once per flow so a
-          # hanging flow can't poison the rest; combined with
-          # `--timeout 300` it bounds any single flow to 5 minutes.
-          find flows -type f -name "*.yaml" ! -path "*/common/*" \
-            ${FLOWS_FILTER:+-path "*$FLOWS_FILTER*"} -print0 | \
-            xargs -0 -n 1 maestro test \
-              --env CLERK_TEST_EMAIL="$CLERK_TEST_EMAIL" \
-              --env CLERK_TEST_PASSWORD="$CLERK_TEST_PASSWORD" \
-              --exclude-tags "$EXCLUDE_TAGS,androidOnly" \
-              --flatten-debug-output
+          # Maestro's `--exclude-tags` only filters when running a
+          # DIRECTORY; with explicit file paths Maestro runs every file
+          # regardless of tag. We want per-flow invocation (so one
+          # crash/hang can't poison the rest) AND tag filtering, so
+          # pre-filter the file list here in shell.
+          excluded="$EXCLUDE_TAGS,androidOnly"
+          # Build a grep -E alternation: '^\s*-\s*(tag1|tag2|...)\s*$'
+          pattern="^[[:space:]]*-[[:space:]]*($(echo "$excluded" | sed 's/,/|/g'))[[:space:]]*$"
+          mapfile -d '' files < <(
+            find flows -type f -name "*.yaml" ! -path "*/common/*" \
+              ${FLOWS_FILTER:+-path "*$FLOWS_FILTER*"} -print0
+          )
+          kept=()
+          for f in "${files[@]}"; do
+            if grep -qE "$pattern" "$f"; then
+              echo "::group::Skip $f (matches excluded tag in $excluded)"
+              grep -E "$pattern" "$f"
+              echo "::endgroup::"
+            else
+              kept+=("$f")
+            fi
+          done
+          if [ "${#kept[@]}" -eq 0 ]; then
+            echo "::warning::No flows left to run after tag filter"
+            exit 0
+          fi
+          # `xargs -n 1` runs maestro test once per flow so a hanging
+          # flow can't poison the rest.
+          printf '%s\0' "${kept[@]}" | xargs -0 -n 1 maestro test \
+            --env CLERK_TEST_EMAIL="$CLERK_TEST_EMAIL" \
+            --env CLERK_TEST_PASSWORD="$CLERK_TEST_PASSWORD" \
+            --flatten-debug-output
 
       - name: Upload Maestro artifacts on failure or cancel
         if: failure() || cancelled()
