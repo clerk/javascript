@@ -531,10 +531,10 @@ jobs:
             cd integration/mobile &&
             find flows -type f -name "*.yaml" ! -path "*/common/*"
             ${FLOWS_FILTER:+-path "*$FLOWS_FILTER*"} -print0
-            | xargs -0 maestro test --env CLERK_TEST_EMAIL="$CLERK_TEST_EMAIL" --env CLERK_TEST_PASSWORD="$CLERK_TEST_PASSWORD" --exclude-tags "$EXCLUDE_TAGS,flakyAndroid"
+            | xargs -0 -n 1 maestro test --env CLERK_TEST_EMAIL="$CLERK_TEST_EMAIL" --env CLERK_TEST_PASSWORD="$CLERK_TEST_PASSWORD" --exclude-tags "$EXCLUDE_TAGS,flakyAndroid" --flatten-debug-output
 
-      - name: Upload Maestro artifacts on failure
-        if: failure()
+      - name: Upload Maestro artifacts on failure or cancel
+        if: failure() || cancelled()
         uses: actions/upload-artifact@v4
         with:
           name: maestro-android
@@ -862,18 +862,34 @@ jobs:
           echo "Using simulator $SIM_UDID"
           xcrun simctl boot "$SIM_UDID" 2>/dev/null || true
           xcrun simctl bootstatus "$SIM_UDID" -b
+          # Kill animations + auto-correct/predictive keyboard on the
+          # simulator. Both are major slowdowns in CI: animations add
+          # 200-500ms to every tap; predictive-text suggestions hijack
+          # text fields and cause Maestro's inputText to land on the
+          # wrong target. Settings are device-scoped and persist for the
+          # life of the runner.
+          xcrun simctl spawn "$SIM_UDID" defaults write com.apple.UIKit UIAnimationDragCoefficient -float 0.01 || true
+          xcrun simctl spawn "$SIM_UDID" defaults write -g ApplePersistenceIgnoreState -bool YES || true
+          xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.ContinuousPath -bool NO || true
+          xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.AutoCapitalization -bool NO || true
+          xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.AutoCorrection -bool NO || true
+          xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.Prediction -bool NO || true
           xcrun simctl install "$SIM_UDID" /tmp/cached-clerknativequickstart.app
           cd integration/mobile
-          # Maestro doesn't auto-recurse into subdirectories; pass each flow explicitly.
+          # Maestro doesn't auto-recurse into subdirectories; pass each flow
+          # explicitly. `xargs -n 1` runs maestro test once per flow so a
+          # hanging flow can't poison the rest; combined with
+          # `--timeout 300` it bounds any single flow to 5 minutes.
           find flows -type f -name "*.yaml" ! -path "*/common/*" \
             ${FLOWS_FILTER:+-path "*$FLOWS_FILTER*"} -print0 | \
-            xargs -0 maestro test \
+            xargs -0 -n 1 maestro test \
               --env CLERK_TEST_EMAIL="$CLERK_TEST_EMAIL" \
               --env CLERK_TEST_PASSWORD="$CLERK_TEST_PASSWORD" \
-              --exclude-tags "$EXCLUDE_TAGS,androidOnly"
+              --exclude-tags "$EXCLUDE_TAGS,androidOnly" \
+              --flatten-debug-output
 
-      - name: Upload Maestro artifacts on failure
-        if: failure()
+      - name: Upload Maestro artifacts on failure or cancel
+        if: failure() || cancelled()
         uses: actions/upload-artifact@v4
         with:
           name: maestro-ios
