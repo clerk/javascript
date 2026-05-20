@@ -566,7 +566,6 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
             <Icon
               icon={Checkmark}
               colorScheme='neutral'
-              size='sm'
               aria-hidden
               sx={t => ({
                 transform: `translateY(${t.space.$0x25})`,
@@ -593,13 +592,12 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
           sx={t => ({
             marginBlockStart: 'auto',
             paddingBlock: t.space.$1,
-            gap: t.space.$1,
+            gap: t.space.$2,
           })}
         >
           <Icon
             icon={Plus}
             colorScheme='neutral'
-            size='md'
             aria-hidden
           />
           <Span localizationKey={localizationKeys('billing.seeAllFeatures')} />
@@ -739,7 +737,6 @@ const CardFeaturesListSeatCost = ({ plan }: { plan: BillingPlanResource }) => {
           <Icon
             icon={row.icon}
             colorScheme='neutral'
-            size='sm'
             aria-hidden
             sx={t => ({
               transform: `translateY(${t.space.$0x25})`,
