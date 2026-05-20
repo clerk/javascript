@@ -418,48 +418,38 @@ export const ConfigureAttributesSubStep = (): JSX.Element => {
   );
 };
 
-const OktaConfigureAttributesStepContent = (): JSX.Element => {
-  return (
-    <>
-      <Text
-        as='p'
-        colorScheme='secondary'
-        localizationKey={localizationKeys('configureSSO.configureStep.attributeMapping.paragraph')}
-      />
-
-      <Col
-        elementDescriptor={descriptors.configureSSOInstructionsList}
-        as='ol'
-        sx={theme => ({
-          gap: theme.space.$1x5,
-          margin: 0,
-          paddingInlineStart: theme.space.$5,
-          listStyleType: 'decimal',
-        })}
-      >
-        <Text
-          elementDescriptor={descriptors.configureSSOInstructionsListItem}
-          as='li'
-          colorScheme='secondary'
-          localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.step1')}
-        />
-        {/*
-         * The actual name/expression pairs that step 2 refers to are
-         * rendered by the `AttributeMappingTable` immediately below this
-         * component — keeping them in a single tabular surface instead of
-         * an inline badge list matches the design (see Okta screenshot:
-         * "Create the following attribute mapping statements:" + table).
-         */}
-        <Text
-          elementDescriptor={descriptors.configureSSOInstructionsListItem}
-          as='li'
-          colorScheme='secondary'
-          localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.step2')}
-        />
-      </Col>
-    </>
-  );
-};
+const OktaConfigureAttributesStepContent = (): JSX.Element => (
+  <Col
+    elementDescriptor={descriptors.configureSSOInstructionsList}
+    as='ol'
+    sx={theme => ({
+      gap: theme.space.$1x5,
+      margin: 0,
+      paddingInlineStart: theme.space.$5,
+      listStyleType: 'decimal',
+    })}
+  >
+    <Text
+      elementDescriptor={descriptors.configureSSOInstructionsListItem}
+      as='li'
+      colorScheme='secondary'
+      localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.step1')}
+    />
+    {/*
+     * The actual name/expression pairs that step 2 refers to are rendered
+     * by the `AttributeMappingTable` immediately below this component —
+     * keeping them in a single tabular surface instead of an inline badge
+     * list matches the design (see Okta screenshot: "Create the following
+     * attribute mapping statements:" + table).
+     */}
+    <Text
+      elementDescriptor={descriptors.configureSSOInstructionsListItem}
+      as='li'
+      colorScheme='secondary'
+      localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.step2')}
+    />
+  </Col>
+);
 
 const AttributeMappingTable = ({ config }: { config: AttributeMappingTableConfig }): JSX.Element => (
   <Table

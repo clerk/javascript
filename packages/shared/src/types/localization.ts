@@ -1339,9 +1339,7 @@ export type __internal_LocalizationResource = {
       subtitle: LocalizationValue;
       error__noSuccessfulTestRun: LocalizationValue;
       testUrl: {
-        title: LocalizationValue;
-        subtitle: LocalizationValue;
-        actionLabel__copy: LocalizationValue;
+        actionLabel__open: LocalizationValue;
       };
       testResults: {
         title: LocalizationValue;

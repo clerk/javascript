@@ -718,7 +718,7 @@ export type ElementsConfig = {
   configureSSOCertificateFileName: WithOptions;
   configureSSOCertificateRemoveButton: WithOptions;
 
-  configureSSOTestUrlCopyButton: WithOptions;
+  configureSSOTestUrlOpenButton: WithOptions;
   configureSSOTestRefreshButton: WithOptions;
   configureSSOTestResultsTable: WithOptions;
   configureSSOTestResultsRow: WithOptions;

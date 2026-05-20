@@ -8,6 +8,7 @@ import {
   Badge,
   Box,
   Button,
+  Col,
   Dd,
   descriptors,
   Dl,
@@ -31,9 +32,8 @@ import { useCardState } from '@/elements/contexts';
 import { Drawer } from '@/elements/Drawer';
 import { IconButton } from '@/elements/IconButton';
 import { Pagination } from '@/elements/Pagination';
-import { ProfileSection } from '@/elements/Section';
 import { useClipboard } from '@/hooks';
-import { Check, Copy, RotateLeftRight } from '@/icons';
+import { Check, Copy, LinkIcon, RotateLeftRight } from '@/icons';
 import { common, mqu } from '@/styledSystem';
 import { handleError } from '@/utils/errorHandler';
 
@@ -76,10 +76,7 @@ export const TestConfigurationStep = (): JSX.Element => {
         elementDescriptor={descriptors.configureSSOStep}
         elementId={descriptors.configureSSOStep.setId('test')}
       >
-        <Step.Header
-          title={localizationKeys('configureSSO.testConfigurationStep.title')}
-          description={localizationKeys('configureSSO.testConfigurationStep.subtitle')}
-        />
+        <Step.Header title={localizationKeys('configureSSO.testConfigurationStep.title')} />
 
         <Step.Body>
           <Step.Section
@@ -89,74 +86,50 @@ export const TestConfigurationStep = (): JSX.Element => {
               borderBottomColor: theme.colors.$borderAlpha100,
             })}
           >
-            <ProfileSection.Root
-              title={localizationKeys('configureSSO.testConfigurationStep.testUrl.title')}
-              id='testSsoUrl'
-              centered={false}
-              sx={t => ({
-                borderTopWidth: 0,
-                paddingTop: 0,
-                paddingBottom: 0,
-                flexDirection: 'column-reverse',
-                gap: t.space.$1,
-              })}
-            >
+            <Col gap={3}>
               <Text
-                colorScheme='secondary'
-                localizationKey={localizationKeys('configureSSO.testConfigurationStep.testUrl.subtitle')}
+                as='p'
+                localizationKey={localizationKeys('configureSSO.testConfigurationStep.subtitle')}
               />
-              <ProfileSection.Item
-                id='testSsoUrl'
-                sx={{ paddingInlineStart: 0 }}
-              >
-                <Flex gap={2}>
-                  <CopyTestUrlButton onTestRunCreated={handleTestRunCreated} />
 
-                  <Button
-                    elementDescriptor={descriptors.configureSSOTestRefreshButton}
-                    variant='bordered'
-                    colorScheme='secondary'
-                    size='xs'
-                    onClick={() => void revalidateTestRuns()}
-                    isDisabled={areTestRunsLoading}
-                    sx={t => ({ gap: t.space.$1x5 })}
-                  >
-                    <Icon
-                      icon={RotateLeftRight}
-                      size='sm'
-                      colorScheme='neutral'
-                    />
-                    <Text
-                      as='span'
-                      localizationKey={localizationKeys(
-                        'configureSSO.testConfigurationStep.testResults.actionLabel__refresh',
-                      )}
-                    />
-                  </Button>
-                </Flex>
-              </ProfileSection.Item>
-            </ProfileSection.Root>
+              <OpenTestUrlButton onTestRunCreated={handleTestRunCreated} />
+            </Col>
           </Step.Section>
 
-          <Step.Section sx={{ flex: 1, minHeight: 0 }}>
-            <ProfileSection.Root
-              title={localizationKeys('configureSSO.testConfigurationStep.testResults.title')}
-              id='testResults'
-              centered={false}
-              sx={t => ({
-                borderTopWidth: 0,
-                paddingTop: 0,
-                paddingBottom: 0,
-                flexDirection: 'column-reverse',
-                gap: t.space.$2,
-                flex: 1,
-                minHeight: 0,
-                '& > *:first-of-type': {
-                  flex: 1,
-                  minHeight: 0,
-                },
-              })}
+          <Step.Section sx={t => ({ flex: 1, minHeight: 0, gap: t.space.$3 })}>
+            <Flex
+              align='center'
+              justify='between'
+              sx={t => ({ gap: t.space.$2, flexShrink: 0 })}
             >
+              <Text
+                variant='subtitle'
+                localizationKey={localizationKeys('configureSSO.testConfigurationStep.testResults.title')}
+              />
+              <Button
+                elementDescriptor={descriptors.configureSSOTestRefreshButton}
+                variant='bordered'
+                colorScheme='secondary'
+                size='xs'
+                onClick={() => void revalidateTestRuns()}
+                isDisabled={areTestRunsLoading}
+                sx={t => ({ gap: t.space.$1x5 })}
+              >
+                <Icon
+                  icon={RotateLeftRight}
+                  size='sm'
+                  colorScheme='neutral'
+                />
+                <Text
+                  as='span'
+                  localizationKey={localizationKeys(
+                    'configureSSO.testConfigurationStep.testResults.actionLabel__refresh',
+                  )}
+                />
+              </Button>
+            </Flex>
+
+            <Col sx={{ flex: 1, minHeight: 0 }}>
               <TestResultsTable
                 rows={testRuns ?? []}
                 isPolling={isPolling}
@@ -168,7 +141,7 @@ export const TestConfigurationStep = (): JSX.Element => {
                 onPageChange={setCurrentPage}
                 onTestRunCreated={handleTestRunCreated}
               />
-            </ProfileSection.Root>
+            </Col>
           </Step.Section>
         </Step.Body>
 
@@ -369,7 +342,7 @@ const TestResultsTable = ({
                     justify='center'
                     sx={t => ({ padding: `${t.space.$10} 0`, flex: 1 })}
                   >
-                    <CopyTestUrlButton onTestRunCreated={onTestRunCreated} />
+                    <OpenTestUrlButton onTestRunCreated={onTestRunCreated} />
                   </Flex>
                 </Td>
               </Tr>
@@ -717,20 +690,18 @@ const TestRunStatusCell = ({ testRun }: { testRun: EnterpriseConnectionTestRunRe
   );
 };
 
-type CopyTestUrlButtonProps = {
+type OpenTestUrlButtonProps = {
   onTestRunCreated?: (testUrl: string) => void;
 };
 
-const CopyTestUrlButton = ({ onTestRunCreated }: CopyTestUrlButtonProps): JSX.Element => {
+const OpenTestUrlButton = ({ onTestRunCreated }: OpenTestUrlButtonProps): JSX.Element => {
   const { user } = useUser();
   const card = useCardState();
   const { enterpriseConnection } = useConfigureSSO();
 
-  const [testUrl, setTestUrl] = useState('');
   const [isCreatingTestRun, setIsCreatingTestRun] = useState(false);
-  const { onCopy, hasCopied } = useClipboard(testUrl);
 
-  const createTestRun = () => {
+  const openTestRun = () => {
     if (!user || !enterpriseConnection) {
       return;
     }
@@ -740,9 +711,10 @@ const CopyTestUrlButton = ({ onTestRunCreated }: CopyTestUrlButtonProps): JSX.El
     user
       .createEnterpriseConnectionTestRun(enterpriseConnection.id)
       .then(({ url }) => {
-        setTestUrl(url);
-        onCopy(url);
         onTestRunCreated?.(url);
+        // `noopener,noreferrer` so the IdP can't reach back into the dashboard
+        // via `window.opener` once it lands the SAML response.
+        window.open(url, '_blank', 'noopener,noreferrer');
       })
       .catch(err => handleError(err as Error, [], card.setError))
       .finally(() => setIsCreatingTestRun(false));
@@ -750,16 +722,14 @@ const CopyTestUrlButton = ({ onTestRunCreated }: CopyTestUrlButtonProps): JSX.El
 
   return (
     <Button
-      elementDescriptor={descriptors.configureSSOTestUrlCopyButton}
+      elementDescriptor={descriptors.configureSSOTestUrlOpenButton}
       id='testSsoUrl'
       variant='bordered'
       colorScheme='secondary'
       size='xs'
-      onClick={createTestRun}
+      onClick={openTestRun}
       isDisabled={isCreatingTestRun}
-      sx={t => ({
-        gap: t.space.$1x5,
-      })}
+      sx={t => ({ gap: t.space.$1x5, width: 'fit-content' })}
     >
       {isCreatingTestRun ? (
         <Spinner
@@ -768,14 +738,14 @@ const CopyTestUrlButton = ({ onTestRunCreated }: CopyTestUrlButtonProps): JSX.El
         />
       ) : (
         <Icon
-          icon={hasCopied ? Check : Copy}
+          icon={LinkIcon}
           size='sm'
           colorScheme='neutral'
         />
       )}
       <Text
         as='span'
-        localizationKey={localizationKeys('configureSSO.testConfigurationStep.testUrl.actionLabel__copy')}
+        localizationKey={localizationKeys('configureSSO.testConfigurationStep.testUrl.actionLabel__open')}
       />
     </Button>
   );

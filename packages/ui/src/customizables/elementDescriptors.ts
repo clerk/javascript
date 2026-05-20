@@ -582,7 +582,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'configureSSOCertificateFileName',
   'configureSSOCertificateRemoveButton',
 
-  'configureSSOTestUrlCopyButton',
+  'configureSSOTestUrlOpenButton',
   'configureSSOTestRefreshButton',
   'configureSSOTestResultsTable',
   'configureSSOTestResultsRow',
