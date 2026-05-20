@@ -86,20 +86,6 @@ export const SelectProviderStep = (): JSX.Element => {
 
         <Step.Body>
           <Step.Section sx={theme => ({ gap: theme.space.$5 })}>
-            <Col sx={theme => ({ gap: theme.space.$1x5 })}>
-              <Text
-                as='p'
-                variant='subtitle'
-                localizationKey={localizationKeys('configureSSO.selectProviderStep.body.title')}
-              />
-
-              <Text
-                as='p'
-                colorScheme='secondary'
-                localizationKey={localizationKeys('configureSSO.selectProviderStep.body.description')}
-              />
-            </Col>
-
             {PROVIDER_GROUPS.map(group => (
               <Col
                 key={group.id}

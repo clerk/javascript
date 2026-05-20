@@ -193,10 +193,6 @@ export const viVN: LocalizationResource = {
     selectProviderStep: {
       title: 'Chọn nhà cung cấp',
       subtitle: 'Chọn nhà cung cấp mà bạn sẽ thiết lập SSO cho.',
-      body: {
-        title: 'Chọn nhà cung cấp danh tính của bạn',
-        description: 'Chúng tôi sẽ hướng dẫn bạn qua quy trình thiết lập chi tiết tiếp theo.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

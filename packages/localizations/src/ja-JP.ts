@@ -200,10 +200,6 @@ export const jaJP: LocalizationResource = {
     selectProviderStep: {
       title: 'プロバイダーを選択',
       subtitle: 'SSOを設定するプロバイダーを選択してください。',
-      body: {
-        title: 'IDプロバイダーを選択してください',
-        description: '次に、詳細な設定プロセスをご案内します。',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

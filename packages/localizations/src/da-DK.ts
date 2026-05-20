@@ -190,10 +190,6 @@ export const daDK: LocalizationResource = {
     selectProviderStep: {
       title: 'Vælg udbyder',
       subtitle: 'Vælg den udbyder, du vil opsætte SSO for.',
-      body: {
-        title: 'Vælg din identitetsudbyder',
-        description: 'Vi guider dig gennem den detaljerede opsætningsproces næste gang.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

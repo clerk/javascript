@@ -190,10 +190,6 @@ export const esUY: LocalizationResource = {
     selectProviderStep: {
       title: 'Seleccionar proveedor',
       subtitle: 'Seleccioná el proveedor para el que vas a configurar SSO.',
-      body: {
-        title: 'Seleccioná tu proveedor de identidad',
-        description: 'Te guiaremos a través del proceso de configuración detallado a continuación.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

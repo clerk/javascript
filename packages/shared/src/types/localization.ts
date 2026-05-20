@@ -1303,10 +1303,6 @@ export type __internal_LocalizationResource = {
     selectProviderStep: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
-      body: {
-        title: LocalizationValue;
-        description: LocalizationValue;
-      };
       saml: {
         groupLabel: LocalizationValue;
         okta: LocalizationValue;

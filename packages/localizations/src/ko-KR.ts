@@ -196,10 +196,6 @@ export const koKR: LocalizationResource = {
     selectProviderStep: {
       title: '공급자 선택',
       subtitle: 'SSO를 설정할 공급자를 선택하세요.',
-      body: {
-        title: 'ID 공급자를 선택하세요',
-        description: '다음 단계에서 자세한 설정 프로세스를 안내해 드립니다.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

@@ -187,18 +187,14 @@ export const kkKZ: LocalizationResource = {
       title: 'Бірыңғай кіруді конфигурациялау (SSO)',
     },
     selectProviderStep: {
-      title: 'Select provider',
-      subtitle: 'Select the provider you are going to setup SSO for.',
-      body: {
-        title: 'Select your identity provider',
-        description: "We'll guide you through the detailed setup process next.",
-      },
+      title: 'Провайдерді таңдау',
+      subtitle: 'SSO-ны баптамақшы провайдерді таңдаңыз.',
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',
-        customSaml: 'Custom SAML Provider',
+        customSaml: 'Реттелетін SAML провайдері',
       },
-      warning: 'Once a provider is selected you cannot change again until the configuration is over',
+      warning: 'Провайдер таңдалғаннан кейін, конфигурация аяқталғанша өзгерте алмайсыз',
     },
     verifyEmailDomainStep: {
       title: 'Электрондық пошта мекенжайын растау',

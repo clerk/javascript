@@ -189,10 +189,6 @@ export const heIL: LocalizationResource = {
     selectProviderStep: {
       title: 'בחר ספק',
       subtitle: 'בחר את הספק שעבורו תגדיר SSO.',
-      body: {
-        title: 'בחר את ספק הזהות שלך',
-        description: 'נדריך אותך בתהליך ההגדרה המפורט בהמשך.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

@@ -187,18 +187,14 @@ export const teIN: LocalizationResource = {
       title: 'సింగిల్ సైన్-ఆన్ (SSO) కాన్ఫిగర్ చేయండి',
     },
     selectProviderStep: {
-      title: 'Select provider',
-      subtitle: 'Select the provider you are going to setup SSO for.',
-      body: {
-        title: 'Select your identity provider',
-        description: "We'll guide you through the detailed setup process next.",
-      },
+      title: 'ప్రొవైడర్‌ను ఎంచుకోండి',
+      subtitle: 'మీరు SSO సెటప్ చేయబోతున్న ప్రొవైడర్‌ను ఎంచుకోండి.',
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',
-        customSaml: 'Custom SAML Provider',
+        customSaml: 'కస్టమ్ SAML ప్రొవైడర్',
       },
-      warning: 'Once a provider is selected you cannot change again until the configuration is over',
+      warning: 'ఒకసారి ప్రొవైడర్ ఎంచుకున్న తర్వాత, కాన్ఫిగరేషన్ ముగిసే వరకు మీరు మళ్లీ మార్చలేరు',
     },
     verifyEmailDomainStep: {
       title: 'ఇమెయిల్ చిరునామా ధృవీకరించండి',

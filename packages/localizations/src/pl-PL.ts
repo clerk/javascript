@@ -190,10 +190,6 @@ export const plPL: LocalizationResource = {
     selectProviderStep: {
       title: 'Wybierz dostawcę',
       subtitle: 'Wybierz dostawcę, dla którego skonfigurujesz SSO.',
-      body: {
-        title: 'Wybierz swojego dostawcę tożsamości',
-        description: 'Następnie przeprowadzimy Cię przez szczegółowy proces konfiguracji.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

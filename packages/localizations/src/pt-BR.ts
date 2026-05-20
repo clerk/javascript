@@ -196,10 +196,6 @@ export const ptBR: LocalizationResource = {
     selectProviderStep: {
       title: 'Selecionar provedor',
       subtitle: 'Selecione o provedor para o qual você vai configurar o SSO.',
-      body: {
-        title: 'Selecione seu provedor de identidade',
-        description: 'Iremos guiá-lo pelo processo de configuração detalhado em seguida.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

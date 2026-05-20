@@ -190,10 +190,6 @@ export const ukUA: LocalizationResource = {
     selectProviderStep: {
       title: 'Виберіть постачальника',
       subtitle: 'Виберіть постачальника, для якого ви налаштовуватимете SSO.',
-      body: {
-        title: 'Виберіть вашого постачальника ідентифікації',
-        description: 'Далі ми проведемо вас через детальний процес налаштування.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

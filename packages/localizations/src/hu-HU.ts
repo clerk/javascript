@@ -219,10 +219,6 @@ export const huHU: LocalizationResource = {
     selectProviderStep: {
       title: 'Szolgáltató kiválasztása',
       subtitle: 'Válassza ki azt a szolgáltatót, amelyhez beállítja az SSO-t.',
-      body: {
-        title: 'Válassza ki az identitásszolgáltatóját',
-        description: 'Ezután végigvezetjük a részletes beállítási folyamaton.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

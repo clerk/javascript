@@ -190,10 +190,6 @@ export const nlNL: LocalizationResource = {
     selectProviderStep: {
       title: 'Provider selecteren',
       subtitle: 'Selecteer de provider waarvoor je SSO gaat instellen.',
-      body: {
-        title: 'Selecteer je identiteitsprovider',
-        description: 'We begeleiden je hierna door het gedetailleerde installatieproces.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

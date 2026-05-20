@@ -190,10 +190,6 @@ export const hiIN: LocalizationResource = {
     selectProviderStep: {
       title: 'प्रदाता चुनें',
       subtitle: 'उस प्रदाता का चयन करें जिसके लिए आप SSO सेट अप कर रहे हैं।',
-      body: {
-        title: 'अपना पहचान प्रदाता चुनें',
-        description: 'हम आपको आगे विस्तृत सेटअप प्रक्रिया के माध्यम से मार्गदर्शन करेंगे।',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

@@ -187,18 +187,14 @@ export const bnIN: LocalizationResource = {
       title: 'একক সাইন-অন (SSO) কনফিগার করুন',
     },
     selectProviderStep: {
-      title: 'Select provider',
-      subtitle: 'Select the provider you are going to setup SSO for.',
-      body: {
-        title: 'Select your identity provider',
-        description: "We'll guide you through the detailed setup process next.",
-      },
+      title: 'প্রদানকারী নির্বাচন করুন',
+      subtitle: 'আপনি যে প্রদানকারীর জন্য SSO সেটআপ করতে যাচ্ছেন তা নির্বাচন করুন।',
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',
-        customSaml: 'Custom SAML Provider',
+        customSaml: 'কাস্টম SAML প্রদানকারী',
       },
-      warning: 'Once a provider is selected you cannot change again until the configuration is over',
+      warning: 'একবার প্রদানকারী নির্বাচন করার পরে, কনফিগারেশন শেষ না হওয়া পর্যন্ত আপনি আবার পরিবর্তন করতে পারবেন না',
     },
     verifyEmailDomainStep: {
       title: 'ইমেইল ঠিকানা যাচাই করুন',

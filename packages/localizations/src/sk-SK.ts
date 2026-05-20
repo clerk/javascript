@@ -190,10 +190,6 @@ export const skSK: LocalizationResource = {
     selectProviderStep: {
       title: 'Vyberte poskytovateľa',
       subtitle: 'Vyberte poskytovateľa, pre ktorého budete nastavovať SSO.',
-      body: {
-        title: 'Vyberte si svojho poskytovateľa identity',
-        description: 'Následne vás prevedieme podrobným procesom nastavenia.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

@@ -190,10 +190,6 @@ export const beBY: LocalizationResource = {
     selectProviderStep: {
       title: 'Выберыце правайдэра',
       subtitle: 'Выберыце правайдэра, для якога вы будзеце наладжваць SSO.',
-      body: {
-        title: 'Выберыце вашага правайдэра ідэнтыфікацыі',
-        description: 'Мы правядзём вас праз падрабязны працэс налады далей.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

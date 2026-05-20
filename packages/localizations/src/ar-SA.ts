@@ -189,10 +189,6 @@ export const arSA: LocalizationResource = {
     selectProviderStep: {
       title: 'اختر المزود',
       subtitle: 'اختر المزود الذي ستقوم بإعداد تسجيل الدخول الموحد (SSO) له.',
-      body: {
-        title: 'اختر مزود الهوية الخاص بك',
-        description: 'سنرشدك خلال عملية الإعداد التفصيلية بعد ذلك.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

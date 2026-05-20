@@ -196,10 +196,6 @@ export const itIT: LocalizationResource = {
     selectProviderStep: {
       title: 'Seleziona provider',
       subtitle: "Seleziona il provider per cui configurerai l'SSO.",
-      body: {
-        title: 'Seleziona il tuo provider di identità',
-        description: 'Ti guideremo nel processo di configurazione dettagliato successivamente.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

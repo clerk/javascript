@@ -187,18 +187,14 @@ export const taIN: LocalizationResource = {
       title: 'ஒற்றை உள்நுழைவை (SSO) உள்ளமை',
     },
     selectProviderStep: {
-      title: 'Select provider',
-      subtitle: 'Select the provider you are going to setup SSO for.',
-      body: {
-        title: 'Select your identity provider',
-        description: "We'll guide you through the detailed setup process next.",
-      },
+      title: 'வழங்குநரைத் தேர்ந்தெடுக்கவும்',
+      subtitle: 'நீங்கள் SSO அமைக்கப் போகும் வழங்குநரைத் தேர்ந்தெடுக்கவும்.',
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',
-        customSaml: 'Custom SAML Provider',
+        customSaml: 'தனிப்பயன் SAML வழங்குநர்',
       },
-      warning: 'Once a provider is selected you cannot change again until the configuration is over',
+      warning: 'வழங்குநரைத் தேர்ந்தெடுத்த பிறகு, கட்டமைப்பு முடியும் வரை மீண்டும் மாற்ற முடியாது',
     },
     verifyEmailDomainStep: {
       title: 'மின்னஞ்சல் முகவரியை சரிபார்க்கவும்',

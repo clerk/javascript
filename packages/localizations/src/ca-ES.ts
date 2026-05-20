@@ -197,10 +197,6 @@ export const caES: LocalizationResource = {
     selectProviderStep: {
       title: 'Seleccioneu un proveïdor',
       subtitle: 'Seleccioneu el proveïdor per al qual configurareu SSO.',
-      body: {
-        title: "Seleccioneu el vostre proveïdor d'identitat",
-        description: 'Us guiarem pel procés de configuració detallat a continuació.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

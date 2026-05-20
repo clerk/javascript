@@ -190,10 +190,6 @@ export const elGR: LocalizationResource = {
     selectProviderStep: {
       title: 'Επιλέξτε πάροχο',
       subtitle: 'Επιλέξτε τον πάροχο για τον οποίο θα ρυθμίσετε SSO.',
-      body: {
-        title: 'Επιλέξτε τον πάροχο ταυτότητάς σας',
-        description: 'Θα σας καθοδηγήσουμε στη λεπτομερή διαδικασία ρύθμισης στη συνέχεια.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

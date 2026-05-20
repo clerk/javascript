@@ -189,10 +189,6 @@ export const idID: LocalizationResource = {
     selectProviderStep: {
       title: 'Pilih penyedia',
       subtitle: 'Pilih penyedia yang akan Anda atur untuk SSO.',
-      body: {
-        title: 'Pilih penyedia identitas Anda',
-        description: 'Kami akan memandu Anda melalui proses penyiapan terperinci berikutnya.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

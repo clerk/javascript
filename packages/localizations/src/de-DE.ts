@@ -196,10 +196,6 @@ export const deDE: LocalizationResource = {
     selectProviderStep: {
       title: 'Anbieter auswählen',
       subtitle: 'Wählen Sie den Anbieter, für den Sie SSO einrichten möchten.',
-      body: {
-        title: 'Wählen Sie Ihren Identitätsanbieter',
-        description: 'Wir führen Sie als nächstes durch den detaillierten Einrichtungsprozess.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

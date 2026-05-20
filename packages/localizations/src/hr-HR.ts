@@ -219,10 +219,6 @@ export const hrHR: LocalizationResource = {
     selectProviderStep: {
       title: 'Odaberite pružatelja',
       subtitle: 'Odaberite pružatelja za kojeg ćete postaviti SSO.',
-      body: {
-        title: 'Odaberite svog pružatelja identiteta',
-        description: 'Vodit ćemo vas kroz detaljan proces postavljanja u nastavku.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

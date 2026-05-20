@@ -194,10 +194,6 @@ export const faIR: LocalizationResource = {
     selectProviderStep: {
       title: 'ارائه‌دهنده را انتخاب کنید',
       subtitle: 'ارائه‌دهنده‌ای را که می‌خواهید SSO را برای آن راه‌اندازی کنید، انتخاب کنید.',
-      body: {
-        title: 'ارائه‌دهنده هویت خود را انتخاب کنید',
-        description: 'در ادامه شما را در فرآیند راه‌اندازی دقیق راهنمایی خواهیم کرد.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

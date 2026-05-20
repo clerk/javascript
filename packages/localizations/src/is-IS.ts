@@ -218,10 +218,6 @@ export const isIS: LocalizationResource = {
     selectProviderStep: {
       title: 'Veldu þjónustuaðila',
       subtitle: 'Veldu þjónustuaðilann sem þú ætlar að setja upp SSO fyrir.',
-      body: {
-        title: 'Veldu auðkennisþjónustuaðila þinn',
-        description: 'Við munum leiðbeina þér í gegnum ítarlegt uppsetningarferli næst.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

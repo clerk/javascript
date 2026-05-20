@@ -237,12 +237,8 @@ export const enUS: LocalizationResource = {
       title: 'Configure Single Sign-On (SSO)',
     },
     selectProviderStep: {
-      title: 'Select provider',
-      subtitle: 'Select the provider you are going to setup SSO for.',
-      body: {
-        title: 'Select your identity provider',
-        description: "We'll guide you through the detailed setup process next.",
-      },
+      title: 'Select your identity provider',
+      subtitle: 'We’ll guide you through the detailed setup process next.',
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

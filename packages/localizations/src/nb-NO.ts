@@ -218,10 +218,6 @@ export const nbNO: LocalizationResource = {
     selectProviderStep: {
       title: 'Velg leverandør',
       subtitle: 'Velg leverandøren du skal konfigurere SSO for.',
-      body: {
-        title: 'Velg din identitetsleverandør',
-        description: 'Vi veileder deg gjennom den detaljerte konfigurasjonsprosessen neste gang.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

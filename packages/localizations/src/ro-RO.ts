@@ -196,10 +196,6 @@ export const roRO: LocalizationResource = {
     selectProviderStep: {
       title: 'Selectați furnizorul',
       subtitle: 'Selectați furnizorul pentru care veți configura SSO.',
-      body: {
-        title: 'Selectați furnizorul de identitate',
-        description: 'Vă vom ghida în continuare prin procesul de configurare detaliat.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

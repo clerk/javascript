@@ -190,10 +190,6 @@ export const srRS: LocalizationResource = {
     selectProviderStep: {
       title: 'Izaberite provajdera',
       subtitle: 'Izaberite provajdera za koga ćete podesiti SSO.',
-      body: {
-        title: 'Izaberite svog provajdera identiteta',
-        description: 'Vodićemo vas kroz detaljan proces podešavanja u nastavku.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

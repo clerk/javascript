@@ -191,10 +191,6 @@ export const bgBG: LocalizationResource = {
     selectProviderStep: {
       title: 'Изберете доставчик',
       subtitle: 'Изберете доставчика, за който ще конфигурирате SSO.',
-      body: {
-        title: 'Изберете вашия доставчик на идентичност',
-        description: 'Ще ви преведем през подробния процес на настройка след това.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

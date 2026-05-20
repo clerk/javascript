@@ -190,10 +190,6 @@ export const ruRU: LocalizationResource = {
     selectProviderStep: {
       title: 'Выберите поставщика',
       subtitle: 'Выберите поставщика, для которого вы будете настраивать SSO.',
-      body: {
-        title: 'Выберите вашего поставщика идентификации',
-        description: 'Далее мы проведём вас через подробный процесс настройки.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

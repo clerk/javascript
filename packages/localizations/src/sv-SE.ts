@@ -189,10 +189,6 @@ export const svSE: LocalizationResource = {
     selectProviderStep: {
       title: 'Välj leverantör',
       subtitle: 'Välj den leverantör du ska konfigurera SSO för.',
-      body: {
-        title: 'Välj din identitetsleverantör',
-        description: 'Vi guidar dig sedan genom den detaljerade konfigurationsprocessen.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

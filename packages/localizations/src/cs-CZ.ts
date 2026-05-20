@@ -193,10 +193,6 @@ export const csCZ: LocalizationResource = {
     selectProviderStep: {
       title: 'Vyberte poskytovatele',
       subtitle: 'Vyberte poskytovatele, pro kterého budete nastavovat SSO.',
-      body: {
-        title: 'Vyberte svého poskytovatele identity',
-        description: 'Provedeme vás dále podrobným procesem nastavení.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

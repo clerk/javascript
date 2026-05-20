@@ -193,10 +193,6 @@ export const thTH: LocalizationResource = {
     selectProviderStep: {
       title: 'เลือกผู้ให้บริการ',
       subtitle: 'เลือกผู้ให้บริการที่คุณจะตั้งค่า SSO ให้',
-      body: {
-        title: 'เลือกผู้ให้บริการข้อมูลประจำตัวของคุณ',
-        description: 'เราจะแนะนำคุณตลอดกระบวนการตั้งค่าโดยละเอียดในขั้นตอนถัดไป',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

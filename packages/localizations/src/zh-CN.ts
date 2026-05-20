@@ -189,10 +189,6 @@ export const zhCN: LocalizationResource = {
     selectProviderStep: {
       title: '选择提供商',
       subtitle: '选择您要为其设置 SSO 的提供商。',
-      body: {
-        title: '选择您的身份提供商',
-        description: '接下来我们将引导您完成详细的设置过程。',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

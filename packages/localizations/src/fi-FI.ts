@@ -217,10 +217,6 @@ export const fiFI: LocalizationResource = {
     selectProviderStep: {
       title: 'Valitse palveluntarjoaja',
       subtitle: 'Valitse palveluntarjoaja, jolle määrität SSO:n.',
-      body: {
-        title: 'Valitse henkilöllisyyden tarjoaja',
-        description: 'Opastamme sinut yksityiskohtaisen määritysprosessin läpi seuraavaksi.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

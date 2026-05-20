@@ -189,10 +189,6 @@ export const msMY: LocalizationResource = {
     selectProviderStep: {
       title: 'Pilih pembekal',
       subtitle: 'Pilih pembekal yang anda akan sediakan SSO untuknya.',
-      body: {
-        title: 'Pilih pembekal identiti anda',
-        description: 'Kami akan membimbing anda melalui proses persediaan terperinci seterusnya.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',
