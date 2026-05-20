@@ -32,7 +32,7 @@ export { default as Copy } from './copy.svg';
 export { default as CreditCard } from './credit-card.svg';
 export { default as DeviceLaptop } from './device-laptop.svg';
 export { default as DeviceMobile } from './device-mobile.svg';
-export { default as DotCircleHorizontal } from './dot-circle-horizontal.svg';
+export { default as ThreeDotsCircle } from './three-dots-circle.svg';
 export { default as DuotoneAtSymbol } from './duotone-at-symbol.svg';
 export { default as Envelope } from './envelope.svg';
 export { default as ExclamationCircle } from './exclamation-circle.svg';
