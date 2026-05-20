@@ -10,3 +10,7 @@ Clerk's JavaScript SDK and library monorepo.
 ## References
 
 - For questions about theming, appearance customization, or the styled system, see `references/theming-architecture.md`.
+- For the monorepo package inventory and dependency graph, see `references/repo-structure.md`.
+- For build tools, turborepo pipelines, linting, CI/CD, and release flows, see `references/build-and-tooling.md`.
+- For test frameworks, fixtures, patterns, and how to run tests, see `references/testing.md`.
+- For local dev setup, sandbox usage, env vars, and PR workflow, see `references/development-workflow.md`.
