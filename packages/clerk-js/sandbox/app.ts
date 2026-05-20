@@ -272,21 +272,8 @@ async function initControls() {
     });
   };
 
-  // Variables folder
-  const varFolder = pane.addFolder({ title: 'Variables' });
-  for (const key of Object.keys(COLOR_DEFAULTS)) {
-    varFolder.addBinding(PARAMS, key).on('change', applyVariables);
-  }
-  varFolder.addBinding(PARAMS, 'spacing').on('change', applyVariables);
-  varFolder.addBinding(PARAMS, 'borderRadius').on('change', applyVariables);
-  varFolder.addButton({ title: 'Reset' }).on('click', () => {
-    Object.assign(PARAMS, VARIABLE_DEFAULTS);
-    pane.refresh();
-    applyVariables();
-  });
-
   // Theme folder
-  const themeFolder = pane.addFolder({ title: 'Theme' });
+  const themeFolder = pane.addFolder({ title: 'Theme', expanded: false });
   themeFolder
     .addBinding(PARAMS, 'baseTheme', {
       options: {
@@ -305,21 +292,21 @@ async function initControls() {
     applyTheme();
   });
 
-  // Page folder
-  const pageFolder = pane.addFolder({ title: 'Page' });
-  pageFolder.addBinding(PARAMS, 'darkMode', { label: 'Dark mode' }).on('change', (ev: any) => {
-    document.documentElement.classList.toggle('dark', ev.value);
-    localStorage.setItem('clerk-js-sandbox-dark-mode', ev.value ? 'on' : 'off');
-  });
-  pageFolder.addButton({ title: 'Reset' }).on('click', () => {
-    PARAMS.darkMode = false;
-    document.documentElement.classList.remove('dark');
-    localStorage.removeItem('clerk-js-sandbox-dark-mode');
+  // Variables folder
+  const varFolder = pane.addFolder({ title: 'Variables' });
+  for (const key of Object.keys(COLOR_DEFAULTS)) {
+    varFolder.addBinding(PARAMS, key).on('change', applyVariables);
+  }
+  varFolder.addBinding(PARAMS, 'spacing').on('change', applyVariables);
+  varFolder.addBinding(PARAMS, 'borderRadius').on('change', applyVariables);
+  varFolder.addButton({ title: 'Reset' }).on('click', () => {
+    Object.assign(PARAMS, VARIABLE_DEFAULTS);
     pane.refresh();
+    applyVariables();
   });
 
   // Options folder
-  const otherFolder = pane.addFolder({ title: 'Options' });
+  const otherFolder = pane.addFolder({ title: 'Options', expanded: false });
   const localeOptions: Record<string, string> = {};
   for (const locale of AVAILABLE_LOCALES) {
     localeOptions[locale] = locale;
@@ -339,6 +326,19 @@ async function initControls() {
     pane.refresh();
     applyLocalization();
     applyAppearanceOptions();
+  });
+
+  // Page folder
+  const pageFolder = pane.addFolder({ title: 'Page', expanded: false });
+  pageFolder.addBinding(PARAMS, 'darkMode', { label: 'Dark mode' }).on('change', (ev: any) => {
+    document.documentElement.classList.toggle('dark', ev.value);
+    localStorage.setItem('clerk-js-sandbox-dark-mode', ev.value ? 'on' : 'off');
+  });
+  pageFolder.addButton({ title: 'Reset' }).on('click', () => {
+    PARAMS.darkMode = false;
+    document.documentElement.classList.remove('dark');
+    localStorage.removeItem('clerk-js-sandbox-dark-mode');
+    pane.refresh();
   });
 
   return { pane, applyVariables, applyTheme, applyLocalization, applyAppearanceOptions };
