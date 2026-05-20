@@ -247,7 +247,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: pnpm
+          # Intentionally no `cache: pnpm` — pnpm/action-setup@v4 already
+          # caches the pnpm store. setup-node's post-job cache save races
+          # with the snapshot-mode working-directory changes and fails with
+          # "Path Validation Error", which bubbles up as a job failure
+          # even when every test step succeeded.
 
       - name: Install monorepo deps
         if: steps.apk-cache.outputs.cache-hit != 'true'
@@ -624,7 +628,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: pnpm
+          # Intentionally no `cache: pnpm` — pnpm/action-setup@v4 already
+          # caches the pnpm store. setup-node's post-job cache save races
+          # with the snapshot-mode working-directory changes and fails with
+          # "Path Validation Error", which bubbles up as a job failure
+          # even when every test step succeeded.
 
       - name: Install monorepo deps
         if: steps.app-cache.outputs.cache-hit != 'true'
