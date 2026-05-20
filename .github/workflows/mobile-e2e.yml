@@ -73,7 +73,15 @@ env:
   NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
 
 concurrency:
-  group: mobile-e2e-${{ github.ref }}
+  # Scope by platform so iOS and Android compat-gate dispatches can run in
+  # parallel without cancelling each other. A rapid re-dispatch with the
+  # same platform scope still cancels the in-flight one (intended).
+  group: >-
+    mobile-e2e-${{ github.ref }}-${{
+      (inputs.clerk_ios_ref != '' && inputs.clerk_android_ref == '' && 'ios') ||
+      (inputs.clerk_android_ref != '' && inputs.clerk_ios_ref == '' && 'android') ||
+      'full'
+    }}
   cancel-in-progress: true
 
 jobs:
