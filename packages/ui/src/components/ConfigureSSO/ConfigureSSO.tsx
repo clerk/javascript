@@ -107,15 +107,15 @@ const ConfigureSSOSteps = () => {
       <ResetCardErrorOnStepChange />
       <ConfigureSSOHeader />
 
-      <Wizard.Step id='select-provider'>
-        <SelectProviderStep />
-      </Wizard.Step>
-
       <Wizard.Step
         id='verify-domain'
         label='Verify domain'
       >
         <VerifyDomainStep />
+      </Wizard.Step>
+
+      <Wizard.Step id='select-provider'>
+        <SelectProviderStep />
       </Wizard.Step>
 
       <Wizard.Step

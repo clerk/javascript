@@ -313,7 +313,6 @@ export const EnterVerificationCodeStep = ({
   emailAddressRef: React.MutableRefObject<EmailAddressResource | undefined>;
 }): JSX.Element | null => {
   const { user } = useUser();
-  const { provider, createEnterpriseConnection } = useConfigureSSO();
   const card = useCardState();
   const { goNext, goPrev } = useWizard();
   const primaryEmailAddress = user?.primaryEmailAddress;
@@ -355,18 +354,6 @@ export const EnterVerificationCodeStep = ({
           handleError(err as Error, [], card.setError);
           return;
         }
-      }
-
-      if (!provider) {
-        void goNext();
-        return;
-      }
-
-      try {
-        await createEnterpriseConnection(provider, emailToVerify);
-      } catch (err) {
-        handleError(err as Error, [], card.setError);
-        return;
       }
 
       void goNext();
