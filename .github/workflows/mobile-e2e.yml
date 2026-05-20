@@ -562,7 +562,9 @@ jobs:
     # (and clerk_android_snapshot_suffix) but not clerk_ios_ref. Manual
     # dispatches without ref inputs still run both jobs.
     if: inputs.clerk_android_ref == '' || inputs.clerk_ios_ref != ''
-    runs-on: macos-15
+    # Blacksmith macOS drop-in for GitHub-hosted macos-15; matches the
+    # vcpu sizing of the Android job above.
+    runs-on: blacksmith-8vcpu-macos-15
     timeout-minutes: 60
     steps:
       - name: Checkout @clerk/javascript
