@@ -777,8 +777,17 @@ describe('User', () => {
     });
 
     it('routes only-metadata updates to /me/metadata as an RFC 7396 merge patch', async () => {
+      // Server still reflects the locally-cached state; the reload returns
+      // the same metadata, so the diff is computed identically.
       // @ts-ignore
-      BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: {} }));
+      BaseResource._fetch = vi.fn().mockImplementation((opts: any) => {
+        if (opts.method === 'GET') {
+          return Promise.resolve({
+            response: { unsafe_metadata: { theme: 'dark', layout: 'compact' } },
+          });
+        }
+        return Promise.resolve({ response: {} });
+      });
 
       // Seed current state: { theme: 'dark', layout: 'compact' }. Desired
       // state drops `layout` and changes `theme` — the merge patch must
@@ -789,14 +798,58 @@ describe('User', () => {
 
       await user.update({ unsafeMetadata: { theme: 'light' } });
 
+      // Two calls now: a GET /me reload to refresh the diff baseline, then
+      // PATCH /me/metadata with the computed patch.
       // @ts-ignore
-      expect(BaseResource._fetch).toHaveBeenCalledTimes(1);
+      expect(BaseResource._fetch).toHaveBeenCalledTimes(2);
       // @ts-ignore
-      expect(BaseResource._fetch).toHaveBeenCalledWith({
+      expect(BaseResource._fetch).toHaveBeenNthCalledWith(
+        1,
+        expect.objectContaining({ method: 'GET', path: '/me' }),
+        expect.anything(),
+      );
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenNthCalledWith(2, {
         method: 'PATCH',
         path: '/me/metadata',
         body: {
           unsafeMetadata: JSON.stringify({ theme: 'light', layout: null }),
+        },
+      });
+    });
+
+    it('reloads before diffing so server-side mutations are not lost', async () => {
+      // The local cache thinks unsafeMetadata is { a: 1 }, but the server
+      // has actually drifted to { a: 1, b: 2 }. Without the pre-diff reload
+      // the SDK would compute mergePatch({ a: 1 }, { a: 99 }) = { a: 99 }
+      // and `b` would survive on the server, silently violating the
+      // caller's intended replace semantics.
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockImplementation((opts: any) => {
+        if (opts.method === 'GET') {
+          return Promise.resolve({
+            response: { unsafe_metadata: { a: 1, b: 2 } },
+          });
+        }
+        return Promise.resolve({ response: {} });
+      });
+
+      const user = new User({
+        unsafe_metadata: { a: 1 },
+      } as unknown as UserJSON);
+
+      await user.update({ unsafeMetadata: { a: 99 } });
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledTimes(2);
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenNthCalledWith(2, {
+        method: 'PATCH',
+        path: '/me/metadata',
+        body: {
+          // The patch null-deletes `b` because the reload surfaced it as a
+          // key the server has and the desired state does not.
+          unsafeMetadata: JSON.stringify({ a: 99, b: null }),
         },
       });
     });
@@ -839,9 +892,18 @@ describe('User', () => {
       });
     });
 
-    it('makes no API calls when desired metadata equals current (no-op)', async () => {
+    it('makes only a reload call when desired metadata equals current (no PUT)', async () => {
+      // The pre-diff reload always runs, but if the fresh server state
+      // matches `desired` the computed patch is empty and we skip the PUT.
       // @ts-ignore
-      BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: {} }));
+      BaseResource._fetch = vi.fn().mockImplementation((opts: any) => {
+        if (opts.method === 'GET') {
+          return Promise.resolve({
+            response: { unsafe_metadata: { theme: 'dark' } },
+          });
+        }
+        return Promise.resolve({ response: {} });
+      });
 
       const user = new User({
         unsafe_metadata: { theme: 'dark' },
@@ -849,8 +911,14 @@ describe('User', () => {
 
       await user.update({ unsafeMetadata: { theme: 'dark' } });
 
+      // Exactly one call: the reload. No PATCH /me/metadata.
       // @ts-ignore
-      expect(BaseResource._fetch).not.toHaveBeenCalled();
+      expect(BaseResource._fetch).toHaveBeenCalledTimes(1);
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith(
+        expect.objectContaining({ method: 'GET', path: '/me' }),
+        expect.anything(),
+      );
     });
   });
 });

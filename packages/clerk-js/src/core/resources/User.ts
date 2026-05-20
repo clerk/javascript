@@ -258,10 +258,18 @@ export class User extends BaseResource implements UserResource {
     // *replace* semantics of `user.update({ unsafeMetadata })` by
     // diffing the locally-cached value against the desired one and sending
     // an RFC 7396 merge patch (null-deletes for removed keys).
+    //
+    //
+    // When `hasRest` is true the PATCH /me below refreshes `this` in place
+    // via `fromJSON` before we read `this.unsafeMetadata` for the diff.
+    // When it's false (only-metadata update), no upstream call refreshes the cache,
+    // so we `reload()` explicitly.
     if (hasRest) {
       await this._basePatch({
         body: normalizeUnsafeMetadata(rest as UpdateUserParams),
       });
+    } else {
+      await this.reload();
     }
 
     const patch = computeMergePatch(this.unsafeMetadata, unsafeMetadata);
