@@ -58,16 +58,16 @@ const AuthenticatedContent = withCoreUserGuard(() => {
             flex: 1,
           })}
         >
-          <ConfigureSSOCardProtect>
-            <ConfigureSSOCardContent contentRef={contentRef} />
-          </ConfigureSSOCardProtect>
+          <ConfigureSSOProtect>
+            <ConfigureSSOContent contentRef={contentRef} />
+          </ConfigureSSOProtect>
         </Col>
       </ConfigureSSONavbar>
     </ProfileCard.Root>
   );
 });
 
-const ConfigureSSOCardContent = ({ contentRef }: { contentRef: React.RefObject<HTMLDivElement> }) => {
+export const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObject<HTMLDivElement> }) => {
   const {
     data: enterpriseConnections,
     isLoading: isLoadingEnterpriseConnections,
@@ -151,7 +151,7 @@ const ConfigureSSOSteps = () => {
   );
 };
 
-const ConfigureSSOCardProtect = ({ children }: { children: React.ReactNode }) => {
+export const ConfigureSSOProtect = ({ children }: { children: React.ReactNode }) => {
   const { session } = useSession();
   const isPersonalWorkspace = !session?.lastActiveOrganizationId;
   const canManageEnterpriseConnections = useProtect(

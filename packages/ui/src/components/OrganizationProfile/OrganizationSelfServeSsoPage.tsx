@@ -1,10 +1,11 @@
 import { useOrganization } from '@clerk/shared/react';
+import { useRef } from 'react';
 
-import { Col } from '@/ui/customizables';
-import { Header } from '@/ui/elements/Header';
+import { ConfigureSSOContent, ConfigureSSOProtect } from '../ConfigureSSO/ConfigureSSO';
 
 export const OrganizationSelfServeSsoPage = () => {
   const { organization } = useOrganization();
+  const contentRef = useRef<HTMLDivElement>(null);
 
   if (!organization) {
     // We should never reach this point, but we'll return null to make TS happy
@@ -12,13 +13,8 @@ export const OrganizationSelfServeSsoPage = () => {
   }
 
   return (
-    <Col gap={4}>
-      <Header.Root>
-        <Header.Title
-          title='Self-Serve SSO'
-          textVariant='h2'
-        />
-      </Header.Root>
-    </Col>
+    <ConfigureSSOProtect>
+      <ConfigureSSOContent contentRef={contentRef} />
+    </ConfigureSSOProtect>
   );
 };
