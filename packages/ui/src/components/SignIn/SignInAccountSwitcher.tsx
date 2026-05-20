@@ -8,7 +8,7 @@ import { UserPreview } from '@/ui/elements/UserPreview';
 import { withRedirectToAfterSignIn } from '../../common';
 import { useEnvironment, useSignInContext, useSignOutContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
-import { ArrowRight, Plus } from '../../icons';
+import { Add, ArrowRight } from '../../icons';
 import { SignOutAllActions } from '../UserButton/SessionActions';
 import { useMultisessionActions } from '../UserButton/useMultisessionActions';
 
@@ -73,7 +73,7 @@ const SignInAccountSwitcherInternal = () => {
                 iconBoxElementId={descriptors.accountSwitcherActionButtonIconBox.setId('addAccount')}
                 iconElementDescriptor={descriptors.accountSwitcherActionButtonIcon}
                 iconElementId={descriptors.accountSwitcherActionButtonIcon.setId('addAccount')}
-                icon={Plus}
+                icon={Add}
                 label={localizationKeys('signIn.accountSwitcher.action__addAccount')}
                 onClick={handleAddAccountClicked}
                 iconSx={t => ({
