@@ -24,9 +24,9 @@ describe('ConfigureSSO', () => {
 
       const { findByText, queryByText } = render(<ConfigureSSO />, { wrapper });
 
-      await findByText(/you do not have permission to manage enterprise connections/i);
-      expect(queryByText(/contact your organization administrator in order to have permissions/i)).toBeInTheDocument();
-      expect(queryByText(/select provider/i)).not.toBeInTheDocument();
+      await findByText(/you do not have permission to manage single sign-on/i);
+      expect(queryByText(/contact your organization.*administrator to upgrade your permissions/i)).toBeInTheDocument();
+      expect(queryByText(/select your identity provider/i)).not.toBeInTheDocument();
     });
 
     it('renders the wizard when the active organization membership has the manage enterprise connections permission', async () => {
@@ -45,9 +45,9 @@ describe('ConfigureSSO', () => {
       const { findByText, queryByText } = render(<ConfigureSSO />, { wrapper });
 
       await waitFor(() => {
-        expect(queryByText(/you do not have permission to manage enterprise connections/i)).not.toBeInTheDocument();
+        expect(queryByText(/you do not have permission to manage single sign-on/i)).not.toBeInTheDocument();
       });
-      await findByText(/select provider/i);
+      await findByText(/select your identity provider/i);
     });
   });
 
@@ -63,8 +63,8 @@ describe('ConfigureSSO', () => {
 
       const { findByText, queryByText } = render(<ConfigureSSO />, { wrapper });
 
-      await findByText(/select provider/i);
-      expect(queryByText(/you do not have permission to manage enterprise connections/i)).not.toBeInTheDocument();
+      await findByText(/select your identity provider/i);
+      expect(queryByText(/you do not have permission to manage single sign-on/i)).not.toBeInTheDocument();
     });
   });
 });

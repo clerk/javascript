@@ -56,6 +56,7 @@ export const TestConfigurationStep = (): JSX.Element => {
     data: testRuns,
     totalCount,
     isLoading: areTestRunsLoading,
+    isFetching: areTestRunsFetching,
     isPolling,
     revalidate: revalidateTestRuns,
   } = __internal_useEnterpriseConnectionTestRuns({
@@ -63,6 +64,7 @@ export const TestConfigurationStep = (): JSX.Element => {
     params: { initialPage: currentPage, pageSize: TEST_RUNS_PAGE_SIZE },
   });
 
+  const isRefreshingTestRuns = areTestRunsFetching && !areTestRunsLoading;
   const pageCount = totalCount ? Math.ceil(totalCount / TEST_RUNS_PAGE_SIZE) : 0;
 
   const handleTestRunCreated = () => {
@@ -112,14 +114,21 @@ export const TestConfigurationStep = (): JSX.Element => {
                 colorScheme='secondary'
                 size='xs'
                 onClick={() => void revalidateTestRuns()}
-                isDisabled={areTestRunsLoading}
+                isDisabled={isRefreshingTestRuns}
                 sx={t => ({ gap: t.space.$1x5 })}
               >
-                <Icon
-                  icon={RotateLeftRight}
-                  size='sm'
-                  colorScheme='neutral'
-                />
+                {isRefreshingTestRuns ? (
+                  <Spinner
+                    elementDescriptor={descriptors.spinner}
+                    size='xs'
+                  />
+                ) : (
+                  <Icon
+                    icon={RotateLeftRight}
+                    size='sm'
+                    colorScheme='neutral'
+                  />
+                )}
                 <Text
                   as='span'
                   localizationKey={localizationKeys(
