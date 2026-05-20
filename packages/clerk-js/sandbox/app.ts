@@ -217,7 +217,6 @@ async function initControls() {
     PARAMS[key] = sessionStorage.getItem(key) ?? def;
   }
   PARAMS.baseTheme = sessionStorage.getItem('baseTheme') ?? '';
-  PARAMS.tailwindEnabled = localStorage.getItem('clerk-js-sandbox-tailwind') !== 'off';
   PARAMS.darkMode = document.documentElement.classList.contains('dark');
   PARAMS.localization = sessionStorage.getItem('localization') ?? OTHER_DEFAULTS.localization;
   PARAMS.elevation = sessionStorage.getItem('elevation') ?? OTHER_DEFAULTS.elevation;
@@ -312,16 +311,10 @@ async function initControls() {
     document.documentElement.classList.toggle('dark', ev.value);
     localStorage.setItem('clerk-js-sandbox-dark-mode', ev.value ? 'on' : 'off');
   });
-  pageFolder.addBinding(PARAMS, 'tailwindEnabled', { label: 'Tailwind CSS' }).on('change', (ev: any) => {
-    localStorage.setItem('clerk-js-sandbox-tailwind', ev.value ? 'on' : 'off');
-    location.reload();
-  });
   pageFolder.addButton({ title: 'Reset' }).on('click', () => {
     PARAMS.darkMode = false;
-    PARAMS.tailwindEnabled = true;
     document.documentElement.classList.remove('dark');
     localStorage.removeItem('clerk-js-sandbox-dark-mode');
-    localStorage.removeItem('clerk-js-sandbox-tailwind');
     pane.refresh();
   });
 
