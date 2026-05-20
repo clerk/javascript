@@ -12,7 +12,11 @@ export const deriveInitialStep = (
 ): WizardStepId => {
   const { isDomainTakenByOtherOrg, hasSuccessfulTestRun } = options;
 
-  if (isDomainTakenByOtherOrg || !enterpriseConnection) {
+  if (!enterpriseConnection) {
+    return 'select-provider';
+  }
+
+  if (isDomainTakenByOtherOrg) {
     return 'verify-domain';
   }
 

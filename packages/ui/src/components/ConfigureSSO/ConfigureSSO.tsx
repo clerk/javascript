@@ -100,22 +100,31 @@ const ConfigureSSOCardContent = ({ contentRef }: { contentRef: React.RefObject<H
 };
 
 const ConfigureSSOSteps = () => {
-  const { initialStepId } = useConfigureSSO();
+  const { initialStepId, enterpriseConnection } = useConfigureSSO();
 
   return (
     <Wizard initialStepId={initialStepId}>
       <ResetCardErrorOnStepChange />
       <ConfigureSSOHeader />
 
+      {/*
+       * `select-provider` is only a wizard step while there's no enterprise
+       * connection yet — creating one unregisters this step, which:
+       *   1. Hides it from the breadcrumb (no need for a manual filter), and
+       *   2. Prevents `goPrev` from any later step (e.g. configure's first
+       *      substep) from ever bubbling back into provider selection.
+       */}
+      {!enterpriseConnection && (
+        <Wizard.Step id='select-provider'>
+          <SelectProviderStep />
+        </Wizard.Step>
+      )}
+
       <Wizard.Step
         id='verify-domain'
         label='Verify domain'
       >
         <VerifyDomainStep />
-      </Wizard.Step>
-
-      <Wizard.Step id='select-provider'>
-        <SelectProviderStep />
       </Wizard.Step>
 
       <Wizard.Step

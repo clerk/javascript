@@ -42,8 +42,12 @@ const PROVIDER_GROUPS: ReadonlyArray<{
 
 export const SelectProviderStep = (): JSX.Element => {
   const { goToStep } = useWizard();
-  const { setProvider, createEnterpriseConnection } = useConfigureSSO();
-  const [selected, setSelected] = React.useState<ProviderType | null>(null);
+  const { provider, setProvider, createEnterpriseConnection } = useConfigureSSO();
+
+  // Re-hydrate from context so users returning from `verify-domain`
+  // (after picking a provider but needing to verify their email first)
+  // don't have to re-click their provider.
+  const [selected, setSelected] = React.useState<ProviderType | null>(provider ?? null);
   const { user } = useUser();
   const card = useCardState();
 
