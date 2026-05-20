@@ -36,7 +36,7 @@ describe('ConfigureSSO', () => {
         f.withOrganizations();
         f.withUser({
           email_addresses: ['test@clerk.com'],
-          organization_memberships: [{ name: 'Org1', permissions: ['org:sys_enterprise_connections:manage'] }],
+          organization_memberships: [{ name: 'Org1', permissions: ['org:sys_entconns:manage'] }],
         });
       });
 

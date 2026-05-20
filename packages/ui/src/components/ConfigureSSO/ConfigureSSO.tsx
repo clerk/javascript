@@ -146,7 +146,7 @@ const ConfigureSSOCardProtect = ({ children }: { children: React.ReactNode }) =>
   const { session } = useSession();
   const isPersonalWorkspace = !session?.lastActiveOrganizationId;
   const canManageEnterpriseConnections = useProtect(
-    has => isPersonalWorkspace || has({ permission: 'org:sys_enterprise_connections:manage' }),
+    has => isPersonalWorkspace || has({ permission: 'org:sys_entconns:manage' }),
   );
 
   if (!canManageEnterpriseConnections) {
