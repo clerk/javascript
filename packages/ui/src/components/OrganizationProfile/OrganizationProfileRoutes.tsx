@@ -37,6 +37,12 @@ const OrganizationPaymentAttemptPage = lazy(() =>
   })),
 );
 
+const OrganizationSelfServeSsoPage = lazy(() =>
+  import(/* webpackChunkName: "op-self-serve-sso-page"*/ './OrganizationSelfServeSsoPage').then(module => ({
+    default: module.OrganizationSelfServeSsoPage,
+  })),
+);
+
 export const OrganizationProfileRoutes = () => {
   const {
     pages,
@@ -44,7 +50,9 @@ export const OrganizationProfileRoutes = () => {
     isGeneralPageRoot,
     isBillingPageRoot,
     isAPIKeysPageRoot,
+    isSelfServeSsoPageRoot,
     shouldShowBilling,
+    shouldShowSelfServeSso,
     apiKeysProps,
   } = useOrganizationProfileContext();
 
@@ -142,6 +150,15 @@ export const OrganizationProfileRoutes = () => {
             </Route>
           </Protect>
         )}
+        {shouldShowSelfServeSso ? (
+          <Route path={isSelfServeSsoPageRoot ? undefined : 'organization-self-serve-sso'}>
+            <Switch>
+              <Route index>
+                <OrganizationSelfServeSsoPage />
+              </Route>
+            </Switch>
+          </Route>
+        ) : null}
       </Route>
     </Switch>
   );

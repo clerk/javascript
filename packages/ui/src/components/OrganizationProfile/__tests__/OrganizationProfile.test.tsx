@@ -476,6 +476,68 @@ describe('OrganizationProfile', () => {
     });
   });
 
+  describe('Self-Serve SSO visibility', () => {
+    it('includes Self-Serve SSO when self-serve SSO is enabled in environment settings', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEnterpriseSso({ selfServeSso: true });
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [
+            {
+              name: 'Org1',
+              permissions: ['org:sys_entconns:manage'],
+            },
+          ],
+        });
+      });
+
+      render(<OrganizationProfile />, { wrapper });
+      expect(await screen.findByText('Self-Serve SSO')).toBeDefined();
+    });
+
+    it('does not include Self-Serve SSO when self-serve SSO is disabled in environment settings', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEnterpriseSso({ selfServeSso: false });
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [
+            {
+              name: 'Org1',
+              permissions: ['org:sys_entconns:manage'],
+            },
+          ],
+        });
+      });
+
+      const { queryByText } = render(<OrganizationProfile />, { wrapper });
+      await waitFor(() => expect(queryByText('Self-Serve SSO')).toBeNull());
+    });
+
+    // We keep showing the section but the internal page displays a warning for missing permission
+
+    it('includes Self-Serve SSO even when the user does not have the manage enterprise connections permission', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEnterpriseSso({ selfServeSso: true });
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [
+            {
+              name: 'Org1',
+              permissions: [],
+            },
+          ],
+        });
+      });
+
+      // TODO -> Add assertions for page content warning
+      render(<OrganizationProfile />, { wrapper });
+      expect(await screen.findByText('Self-Serve SSO')).toBeDefined();
+    });
+  });
+
   it('removes member nav item if user is lacking permissions', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
