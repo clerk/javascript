@@ -1,3 +1,4 @@
+import { isDevelopmentFromPublishableKey } from '@clerk/shared/keys';
 import { getFullName } from '@clerk/shared/internal/clerk-js/user';
 import type {
   BackupCodeJSON,
@@ -247,7 +248,7 @@ export class User extends BaseResource implements UserResource {
       });
     }
 
-    if (__DEV__) {
+    if (isDevelopmentFromPublishableKey(BaseResource.clerk.publishableKey)) {
       console.warn(
         'Clerk - DEPRECATION WARNING: "user.update({ unsafeMetadata })" is deprecated and will be removed in the next major release.\nUse user.updateMetadata({ unsafeMetadata }) for partial updates (deep merge) instead.',
       );
