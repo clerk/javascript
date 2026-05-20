@@ -1,4 +1,3 @@
-import { deprecated } from '@clerk/shared/deprecated';
 import { getFullName } from '@clerk/shared/internal/clerk-js/user';
 import type {
   BackupCodeJSON,
@@ -248,10 +247,11 @@ export class User extends BaseResource implements UserResource {
       });
     }
 
-    deprecated(
-      'user.update({ unsafeMetadata })',
-      'Use user.updateMetadata({ unsafeMetadata }) for partial updates (deep merge) instead.',
-    );
+    if (__DEV__) {
+      console.warn(
+        'Clerk - DEPRECATION WARNING: "user.update({ unsafeMetadata })" is deprecated and will be removed in the next major release.\nUse user.updateMetadata({ unsafeMetadata }) for partial updates (deep merge) instead.',
+      );
+    }
 
     // The FAPI endpoint deprecates `unsafe_metadata` on PATCH /me. Route
     // metadata through PATCH /me/metadata (deep-merge) while preserving the
