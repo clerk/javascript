@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 export type UseCustomElementPortalParams = {
@@ -8,7 +8,7 @@ export type UseCustomElementPortalParams = {
 };
 
 export type UseCustomElementPortalReturn = {
-  portal: () => React.JSX.Element;
+  portal: React.ComponentType;
   mount: (node: Element) => void;
   unmount: () => void;
   id: number;
@@ -18,19 +18,47 @@ export type UseCustomElementPortalReturn = {
 // the given component into a given node
 export const useCustomElementPortal = (elements: UseCustomElementPortalParams[]) => {
   const [nodeMap, setNodeMap] = useState<Map<string, Element | null>>(new Map());
+  const nodeMapRef = useRef(nodeMap);
+  const elementsRef = useRef<Map<string, React.ReactNode>>(new Map());
+  const portalsRef = useRef<Map<string, UseCustomElementPortalReturn>>(new Map());
 
-  return elements.map(el => ({
-    id: el.id,
-    mount: (node: Element) => setNodeMap(prev => new Map(prev).set(String(el.id), node)),
-    unmount: () =>
-      setNodeMap(prev => {
-        const newMap = new Map(prev);
-        newMap.set(String(el.id), null);
-        return newMap;
-      }),
-    portal: () => {
-      const node = nodeMap.get(String(el.id));
-      return node ? createPortal(el.component, node) : null;
-    },
-  }));
+  nodeMapRef.current = nodeMap;
+  elementsRef.current = new Map(elements.map(el => [String(el.id), el.component]));
+
+  const elementIds = new Set(elements.map(el => String(el.id)));
+  portalsRef.current.forEach((_, id) => {
+    if (!elementIds.has(id)) {
+      portalsRef.current.delete(id);
+    }
+  });
+
+  return elements.map(el => {
+    const id = String(el.id);
+    const existingPortal = portalsRef.current.get(id);
+
+    if (existingPortal) {
+      return existingPortal;
+    }
+
+    const portal: React.ComponentType = () => {
+      const node = nodeMapRef.current.get(id);
+      const component = elementsRef.current.get(id);
+      return node ? createPortal(component, node) : null;
+    };
+
+    const customElementPortal = {
+      id: el.id,
+      mount: (node: Element) => setNodeMap(prev => new Map(prev).set(id, node)),
+      unmount: () =>
+        setNodeMap(prev => {
+          const newMap = new Map(prev);
+          newMap.set(id, null);
+          return newMap;
+        }),
+      portal,
+    };
+
+    portalsRef.current.set(id, customElementPortal);
+    return customElementPortal;
+  });
 };
