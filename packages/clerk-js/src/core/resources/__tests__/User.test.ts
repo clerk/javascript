@@ -925,5 +925,56 @@ describe('User', () => {
         expect.anything(),
       );
     });
+
+    it('logs a deprecation warning when unsafeMetadata is passed to update()', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockImplementation((opts: any) => {
+        if (opts.method === 'GET') {
+          return Promise.resolve({ response: { unsafe_metadata: {} } });
+        }
+        return Promise.resolve({ response: {} });
+      });
+
+      const user = new User({} as unknown as UserJSON);
+      await user.update({ unsafeMetadata: { theme: 'dark' } });
+
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('user.update({ unsafeMetadata })'));
+
+      warnSpy.mockRestore();
+    });
+
+    it('does not log a deprecation warning when unsafeMetadata is not passed to update()', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: {} }));
+
+      const user = new User({} as unknown as UserJSON);
+      await user.update({ firstName: 'Jane' });
+
+      expect(warnSpy).not.toHaveBeenCalled();
+
+      warnSpy.mockRestore();
+    });
+
+    it('does not log a deprecation warning for production publishable keys', async () => {
+      // @ts-ignore
+      BaseResource.clerk = { publishableKey: 'pk_live_foo' };
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockImplementation((opts: any) => {
+        if (opts.method === 'GET') {
+          return Promise.resolve({ response: { unsafe_metadata: {} } });
+        }
+        return Promise.resolve({ response: {} });
+      });
+
+      const user = new User({} as unknown as UserJSON);
+      await user.update({ unsafeMetadata: { theme: 'dark' } });
+
+      expect(warnSpy).not.toHaveBeenCalled();
+
+      warnSpy.mockRestore();
+    });
   });
 });
