@@ -540,16 +540,17 @@ jobs:
           # rest) AND tag filtering, so pre-filter the file list in shell:
           # for each candidate flow, grep its YAML for a top-level
           # `- <excluded-tag>` line and drop it from the list.
+          # All lines at the same indent so YAML's folded scalar (>-) joins
+          # them with single spaces. Any extra indentation would preserve
+          # newlines and break the shell pipe. The while-do-done stays on
+          # one logical line for the same reason.
           script: >-
             adb install -r /tmp/cached-app-release.apk &&
             cd integration/mobile &&
             excluded="$EXCLUDE_TAGS,flakyAndroid" &&
             pattern="$(echo "$excluded" | sed 's/,/|/g')" &&
-            find flows -type f -name '*.yaml' ! -path '*/common/*'
-            ${FLOWS_FILTER:+-path "*$FLOWS_FILTER*"}
-            | while read f; do
-              grep -qE "^[[:space:]]*-[[:space:]]*(${pattern})[[:space:]]*$" "$f" || printf '%s\n' "$f";
-              done
+            find flows -type f -name '*.yaml' ! -path '*/common/*' ${FLOWS_FILTER:+-path "*$FLOWS_FILTER*"}
+            | while read f; do grep -qE "^[[:space:]]*-[[:space:]]*(${pattern})[[:space:]]*$" "$f" || printf '%s\n' "$f"; done
             | xargs -n 1 maestro test --env CLERK_TEST_EMAIL="$CLERK_TEST_EMAIL" --env CLERK_TEST_PASSWORD="$CLERK_TEST_PASSWORD" --flatten-debug-output
 
       - name: Upload Maestro artifacts on failure or cancel
