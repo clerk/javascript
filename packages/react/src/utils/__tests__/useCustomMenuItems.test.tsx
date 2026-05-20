@@ -135,4 +135,41 @@ describe('useUserButtonCustomMenuItems', () => {
       expect(mockOnClick).toHaveBeenCalledTimes(1);
     }
   });
+
+  it('keeps portal identity with the logical menu item when inserting before it', () => {
+    const firstItem = (
+      <MenuAction
+        key='first'
+        label='First action'
+        labelIcon={<div>First icon</div>}
+        onClick={() => {}}
+      />
+    );
+    const secondItem = (
+      <MenuAction
+        key='second'
+        label='Second action'
+        labelIcon={<div>Second icon</div>}
+        onClick={() => {}}
+      />
+    );
+    const makeChildren = (includeFirstItem: boolean) => (
+      <MenuItems>{includeFirstItem ? [firstItem, secondItem] : [secondItem]}</MenuItems>
+    );
+
+    const { result, rerender } = renderHook(
+      ({ includeFirstItem }) => useUserButtonCustomMenuItems(makeChildren(includeFirstItem)),
+      {
+        initialProps: { includeFirstItem: false },
+      },
+    );
+
+    const secondItemIconPortal = result.current.customMenuItemsPortals[0];
+
+    rerender({ includeFirstItem: true });
+
+    expect(result.current.customMenuItems).toHaveLength(2);
+    expect(result.current.customMenuItemsPortals[0]).not.toBe(secondItemIconPortal);
+    expect(result.current.customMenuItemsPortals[1]).toBe(secondItemIconPortal);
+  });
 });

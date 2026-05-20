@@ -64,7 +64,7 @@ type UseCustomPagesOptions = {
   allowForAnyChildren: boolean;
 };
 
-type CustomPageWithIdType = UserProfilePageProps & { children?: React.ReactNode };
+type CustomPageWithIdType = UserProfilePageProps & { children?: React.ReactNode; portalId?: string };
 
 /**
  * Exclude any children that is used for identifying Custom Pages or Custom Items.
@@ -121,13 +121,21 @@ const useCustomPages = (params: UseCustomPagesParams, options?: UseCustomPagesOp
 
     const { children, label, url, labelIcon } = props;
 
+    const childKey = (child as ReactElement).key;
+
     if (isThatComponent(child, PageComponent)) {
       if (isReorderItem(props, reorderItemsLabels)) {
         // This is a reordering item
         validChildren.push({ label });
       } else if (isCustomPage(props)) {
         // this is a custom page
-        validChildren.push({ label, labelIcon, children, url });
+        validChildren.push({
+          label,
+          labelIcon,
+          children,
+          url,
+          portalId: getCustomPagePortalId('page', props, childKey),
+        });
       } else {
         logErrorInDevMode(customPageWrongProps(componentName));
         return;
@@ -137,7 +145,7 @@ const useCustomPages = (params: UseCustomPagesParams, options?: UseCustomPagesOp
     if (isThatComponent(child, LinkComponent)) {
       if (isExternalLink(props)) {
         // This is an external link
-        validChildren.push({ label, labelIcon, url });
+        validChildren.push({ label, labelIcon, url, portalId: getCustomPagePortalId('link', props, childKey) });
       } else {
         logErrorInDevMode(customLinkWrongProps(componentName));
         return;
@@ -151,12 +159,12 @@ const useCustomPages = (params: UseCustomPagesParams, options?: UseCustomPagesOp
 
   validChildren.forEach((cp, index) => {
     if (isCustomPage(cp)) {
-      customPageContents.push({ component: cp.children, id: index });
-      customPageLabelIcons.push({ component: cp.labelIcon, id: index });
+      customPageContents.push({ component: cp.children, id: cp.portalId || index });
+      customPageLabelIcons.push({ component: cp.labelIcon, id: cp.portalId || index });
       return;
     }
     if (isExternalLink(cp)) {
-      customLinkLabelIcons.push({ component: cp.labelIcon, id: index });
+      customLinkLabelIcons.push({ component: cp.labelIcon, id: cp.portalId || index });
     }
   });
 
@@ -177,12 +185,12 @@ const useCustomPages = (params: UseCustomPagesParams, options?: UseCustomPagesOp
         portal: contentPortal,
         mount,
         unmount,
-      } = customPageContentsPortals.find(p => p.id === index) as UseCustomElementPortalReturn;
+      } = customPageContentsPortals.find(p => p.id === (cp.portalId || index)) as UseCustomElementPortalReturn;
       const {
         portal: labelPortal,
         mount: mountIcon,
         unmount: unmountIcon,
-      } = customPageLabelIconsPortals.find(p => p.id === index) as UseCustomElementPortalReturn;
+      } = customPageLabelIconsPortals.find(p => p.id === (cp.portalId || index)) as UseCustomElementPortalReturn;
       customPages.push({ label: cp.label, url: cp.url, mount, unmount, mountIcon, unmountIcon });
       customPagesPortals.push(contentPortal);
       customPagesPortals.push(labelPortal);
@@ -193,7 +201,7 @@ const useCustomPages = (params: UseCustomPagesParams, options?: UseCustomPagesOp
         portal: labelPortal,
         mount: mountIcon,
         unmount: unmountIcon,
-      } = customLinkLabelIconsPortals.find(p => p.id === index) as UseCustomElementPortalReturn;
+      } = customLinkLabelIconsPortals.find(p => p.id === (cp.portalId || index)) as UseCustomElementPortalReturn;
       customPages.push({ label: cp.label, url: cp.url, mountIcon, unmountIcon });
       customPagesPortals.push(labelPortal);
       return;
@@ -201,6 +209,14 @@ const useCustomPages = (params: UseCustomPagesParams, options?: UseCustomPagesOp
   });
 
   return { customPages, customPagesPortals };
+};
+
+const getCustomPagePortalId = (
+  type: 'page' | 'link',
+  props: Pick<CustomPageWithIdType, 'label' | 'url'>,
+  key: React.Key | null,
+) => {
+  return key == null ? `${type}:${props.label}:${props.url}` : `${type}:key:${key}`;
 };
 
 const isReorderItem = (childProps: any, validItems: string[]): boolean => {

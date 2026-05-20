@@ -4,14 +4,14 @@ import { createPortal } from 'react-dom';
 
 export type UseCustomElementPortalParams = {
   component: React.ReactNode;
-  id: number;
+  id: string | number;
 };
 
 export type UseCustomElementPortalReturn = {
   portal: React.ComponentType;
   mount: (node: Element) => void;
   unmount: () => void;
-  id: number;
+  id: string | number;
 };
 
 // This function takes a component as prop, and returns functions that mount and unmount
