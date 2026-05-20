@@ -196,7 +196,6 @@ export const TestConfigurationStep = (): JSX.Element => {
           <Step.Footer.Previous onClick={() => goPrev()} />
           <ContinueTestSsoStepButton
             enterpriseConnectionId={enterpriseConnection?.id}
-            isConnectionActive={enterpriseConnection?.active}
             onContinue={() => void goNext()}
           />
         </Step.Footer>
@@ -207,13 +206,11 @@ export const TestConfigurationStep = (): JSX.Element => {
 
 type ContinueTestSsoStepButtonProps = {
   enterpriseConnectionId: string | undefined;
-  isConnectionActive: boolean | undefined;
   onContinue: () => void;
 };
 
 const ContinueTestSsoStepButton = ({
   enterpriseConnectionId,
-  isConnectionActive,
   onContinue,
 }: ContinueTestSsoStepButtonProps): JSX.Element => {
   const { user } = useUser();
@@ -252,7 +249,6 @@ const ContinueTestSsoStepButton = ({
     <Step.Footer.Continue
       onClick={() => void handleContinue()}
       isLoading={isValidating}
-      isDisabled={!enterpriseConnectionId || isConnectionActive}
     />
   );
 };
@@ -712,7 +708,6 @@ type CopyTestUrlButtonProps = {
 };
 
 const CopyTestUrlButton = ({ onTestRunCreated }: CopyTestUrlButtonProps): JSX.Element => {
-  const { t } = useLocalizations();
   const { user } = useUser();
   const card = useCardState();
   const { enterpriseConnection } = useConfigureSSO();
@@ -747,17 +742,22 @@ const CopyTestUrlButton = ({ onTestRunCreated }: CopyTestUrlButtonProps): JSX.El
       size='xs'
       onClick={createTestRun}
       isDisabled={isCreatingTestRun}
-      isLoading={isCreatingTestRun}
-      loadingText={t(localizationKeys('configureSSO.testConfigurationStep.testUrl.actionLabel__copy'))}
       sx={t => ({
         gap: t.space.$1x5,
       })}
     >
-      <Icon
-        icon={hasCopied ? Check : Copy}
-        size='sm'
-        colorScheme='neutral'
-      />
+      {isCreatingTestRun ? (
+        <Spinner
+          elementDescriptor={descriptors.spinner}
+          size='xs'
+        />
+      ) : (
+        <Icon
+          icon={hasCopied ? Check : Copy}
+          size='sm'
+          colorScheme='neutral'
+        />
+      )}
       <Text
         as='span'
         localizationKey={localizationKeys('configureSSO.testConfigurationStep.testUrl.actionLabel__copy')}

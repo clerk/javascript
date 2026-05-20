@@ -80,8 +80,6 @@ export function isNetworkError(e: any): boolean {
 
 /**
  * Checks if the provided error is either a ClerkAPIResponseError, a ClerkRuntimeError, or a MetamaskError.
- *
- * @internal
  */
 export function isKnownError(error: any): error is ClerkAPIResponseError | ClerkRuntimeError | MetamaskError {
   return isClerkAPIResponseError(error) || isMetamaskError(error) || isClerkRuntimeError(error);
@@ -89,8 +87,6 @@ export function isKnownError(error: any): error is ClerkAPIResponseError | Clerk
 
 /**
  * Checks if the provided error is a Clerk runtime error indicating a reverification was cancelled.
- *
- * @internal
  */
 export function isReverificationCancelledError(err: any) {
   return isClerkRuntimeError(err) && err.code === 'reverification_cancelled';
@@ -98,8 +94,6 @@ export function isReverificationCancelledError(err: any) {
 
 /**
  * Checks if the provided error is a Metamask error.
- *
- * @internal
  */
 export function isMetamaskError(err: any): err is MetamaskError {
   return 'code' in err && [4001, 32602, 32603].includes(err.code) && 'message' in err;
@@ -107,8 +101,6 @@ export function isMetamaskError(err: any): err is MetamaskError {
 
 /**
  * Checks if the provided error is clerk api response error indicating a user is locked.
- *
- * @internal
  */
 export function isUserLockedError(err: any) {
   return isClerkAPIResponseError(err) && err.errors?.[0]?.code === 'user_locked';
@@ -134,8 +126,6 @@ export function isPasswordCompromisedError(err: any) {
 
 /**
  * Checks if the provided error is an EmailLinkError.
- *
- * @internal
  */
 export function isEmailLinkError(err: Error): err is EmailLinkError {
   return err.name === 'EmailLinkError';
