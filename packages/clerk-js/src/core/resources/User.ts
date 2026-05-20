@@ -1,5 +1,5 @@
-import { isDevelopmentFromPublishableKey } from '@clerk/shared/keys';
 import { getFullName } from '@clerk/shared/internal/clerk-js/user';
+import { isDevelopmentFromPublishableKey } from '@clerk/shared/keys';
 import type {
   BackupCodeJSON,
   BackupCodeResource,
