@@ -1,157 +1,81 @@
-# Testing Infrastructure
+# Testing
+
+## How to Run Tests
+
+**Always run from the monorepo root** (`/path/to/javascript/`). Never `cd` into a package directory to run tests.
+
+### Run all tests for a package
+
+```sh
+turbo test --filter @clerk/nextjs
+```
+
+Do NOT run `vitest` or `pnpm test` directly inside a package directory. Use `turbo test --filter` from the root — it ensures dependencies are built first.
+
+### Run a single test file
+
+```sh
+turbo test --filter @clerk/react -- --testPathPattern=useAuth
+turbo test --filter @clerk/clerk-js -- --testPathPattern=SignInForm
+```
+
+The argument after `--` is a regex matched against the file path. A substring of the filename is usually enough.
+
+### Run a single test by name
+
+```sh
+turbo test --filter @clerk/backend -- --testNamePattern="should verify"
+```
+
+### Run tests in watch mode
+
+```sh
+turbo test --filter @clerk/react -- --watch
+```
+
+### Common mistakes to avoid
+
+| Wrong                            | Right                              | Why                                    |
+| -------------------------------- | ---------------------------------- | -------------------------------------- |
+| `cd packages/react && pnpm test` | `turbo test --filter @clerk/react` | Turbo ensures deps are built first     |
+| `vitest run packages/react`      | `turbo test --filter @clerk/react` | Direct vitest skips build dependencies |
+| `pnpm test` (from root)          | `turbo test --filter @clerk/react` | Unfiltered runs the entire monorepo    |
+| `turbo test --filter react`      | `turbo test --filter @clerk/react` | Filter needs the full package name     |
 
 ## Frameworks
 
-- **Unit/component tests**: Vitest (v3.2.4) exclusively. No Jest.
-- **Integration/E2E tests**: Playwright.
-- **Cypress**: Supported in `@clerk/testing` as a public SDK for end-users, but not used within this repo.
+- **Unit/component**: Vitest only (no Jest)
+- **E2E**: Playwright
 
-Vitest workspace config at root (`vitest.workspace.mjs`) aggregates all per-package configs:
+## Backend Multi-Runtime Tests
 
-```
-packages/*/vitest.config.{mts,mjs,js,ts}
-scripts/vitest.config.mjs
-```
-
-## Running Tests
-
-### Unit Tests
+`@clerk/backend` tests against three runtimes. These are separate scripts, not vitest environments you pass as flags:
 
 ```sh
-pnpm test                        # All packages via turbo (depends on build)
-pnpm test:cache:clear            # Clear turbo test cache first
-turbo test --filter @clerk/nextjs  # Single package
+turbo test --filter @clerk/backend               # runs all three
 ```
 
-Most packages expose a watch mode:
+## Component Test Fixtures
+
+`clerk-js` and `ui` share a fixture system in `packages/clerk-js/src/test/`:
+
+- `bindCreateFixtures(componentName)` — builds a full React provider tree for component-level tests
+- `fixtures.ts` — JSON stubs for all Clerk API shapes (environment, client, user)
+- `mockClerkMethods` — deep-mocks the entire Clerk singleton
+- `ui` reuses these fixtures via a path alias in its vitest config
+
+## Integration Tests
+
+`integration/` is a standalone Playwright project. These require 1Password secrets (`pnpm integration:secrets`) and `pkglab` for a local package registry — they're not part of the normal dev loop.
 
 ```sh
-cd packages/react && pnpm test:watch   # vitest watch
+pnpm test:integration:base          # full suite
+pnpm test:integration:nextjs        # framework-specific
 ```
-
-### Backend Multi-Runtime Tests
-
-`@clerk/backend` tests against three runtimes:
-
-```sh
-pnpm test:node                   # vitest --environment node
-pnpm test:edge-runtime           # vitest --environment edge-runtime
-pnpm test:cloudflare-miniflare   # vitest --environment miniflare
-```
-
-### Integration Tests
-
-```sh
-pnpm test:integration:base       # Full Playwright suite
-pnpm test:integration:nextjs     # Next.js-specific tests
-pnpm test:integration:generic    # React + Next.js generic tests
-pnpm test:integration:sessions   # Cross-origin session tests
-pnpm test:integration:handshake  # Handshake flow tests
-pnpm test:integration:billing    # Billing + JWT v2 tests
-pnpm test:integration:astro      # Astro tests
-pnpm test:integration:vue        # Vue tests
-pnpm test:integration:nuxt       # Nuxt tests
-# ...and one for every framework
-```
-
-Integration tests require secrets from 1Password:
-
-```sh
-pnpm integration:secrets         # Pulls .env.local + .keys.json
-pnpm playwright install chromium webkit
-npm install -g pkglab
-pnpm build && pkglab pub
-pnpm test:integration:base
-```
-
-## Test Patterns
-
-### Unit Test Structure
-
-All tests use explicit Vitest imports (`import { describe, it, expect, vi } from 'vitest'`). No globals mode.
-
-### Component Tests (clerk-js, ui)
-
-Use `bindCreateFixtures` to build a fully rendered React provider tree:
-
-```ts
-const { createFixtures } = bindCreateFixtures('OrganizationProfile');
-const { wrapper, fixtures } = await createFixtures(f => {
-  f.withOrganizations();
-});
-const { result } = renderHook(() => useOrganization(...), { wrapper });
-```
-
-### Mocking
-
-- `vi.mock()` with `vi.hoisted()` for module-level mocks
-- `vi.fn()`, `vi.spyOn()`, `vi.stubEnv()` for per-test stubs
-- `vi.importActual()` for partial module mocks
-
-### Type Tests
-
-Several packages use `expectTypeOf` from Vitest with `typecheck.enabled: true` for compile-time type assertions.
-
-### Integration Tests (Playwright)
-
-Use page object model via `createTestUtils`:
-
-```ts
-const u = createTestUtils({ app, page, context });
-await u.po.signIn.goto();
-await u.po.signIn.setIdentifier('user@example.com');
-```
-
-Tests tagged with `@grep` labels (`@nextjs`, `@generic`, etc.) for targeted runs.
-
-## Shared Test Utilities
-
-### `@clerk/testing` (published package)
-
-Public testing utilities for end-users:
-
-- `@clerk/testing/playwright` — `clerkSetup`, `setupClerkTestingToken`, `clerk` helpers
-- `@clerk/testing/playwright/unstable` — POM factory `createPageObjects`, `createAppPageObject`
-- `@clerk/testing/cypress` — `clerkSetup`, `addClerkCommands`, `setupClerkTestingToken`
-
-`setupClerkTestingToken` intercepts FAPI requests to inject testing tokens and bypass bot protection.
-
-### Internal Fixtures (`packages/clerk-js/src/test/`)
-
-Rich fixture system shared between `clerk-js` and `ui`:
-
-- `create-fixtures.tsx` — `bindCreateFixtures` / `unboundCreateFixtures` — builds full React provider tree
-- `fixtures.ts` — `createBaseEnvironmentJSON`, `createBaseClientJSON`, `createUserFixture` — complete JSON stubs
-- `mock-helpers.ts` — `mockClerkMethods` (deep-mocks all Clerk singleton methods), `mockRouteContextValue`
-- `utils.ts` — custom `render` wrapper adding `userEvent` to RTL's render
-
-The `@clerk/ui` package reuses clerk-js fixtures via a path alias in its vitest config.
-
-### MSW (`@clerk/backend`)
-
-`packages/backend/src/mock-server.ts` sets up an MSW node server for backend tests. Validates Authorization, Clerk-API-Version, and User-Agent headers.
-
-### Internal Integration Utils (`integration/testUtils/`)
-
-- `createTestUtils` — factory wiring services, page objects, and browser helpers
-- `testAgainstRunningApps` — wraps `test.describe` to iterate over running app configurations
-- Service helpers: `usersService`, `organizationsService`, `emailService`
-
-## Coverage
-
-Coverage uses `@vitest/coverage-v8`. Configured per-package, no monorepo-wide thresholds.
-
-Packages with coverage enabled by default: `backend`, `express`, `fastify`, `hono`, `testing`.
-Packages with opt-in coverage scripts: `shared`, `ui` (via `pnpm test:coverage`).
-`clerk-js` has coverage configured but disabled by default.
 
 ## Integration Test Architecture
 
-The `integration/` directory is a standalone Playwright project:
-
-- `templates/` — 19 app templates (next-app-router, react-vite, astro, express, nuxt, vue, etc.)
-- `presets/` — typed app config builders per framework, plus `envs.ts` loading Clerk keys
-- `models/` — `Application`, `ApplicationConfig`, `LongRunningApplication` — orchestrates app servers
-- `global.setup.ts` / `global.teardown.ts` — lifecycle management
-
-Playwright config: `fullyParallel: true`, 5 retries on CI, Desktop Chrome, `bypassCSP: true`, `actionTimeout: 10s`, `navigationTimeout: 30s`.
+- `integration/templates/` — 19 app templates (one per framework)
+- `integration/presets/` — typed config builders per framework
+- `integration/testUtils/` — `createTestUtils` factory providing page objects (`u.po.signIn`) and service helpers (`u.services.users`)
+- Tests tagged with `@grep` labels (`@nextjs`, `@generic`) for targeted CI runs
