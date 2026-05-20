@@ -55,11 +55,13 @@ export const VerifyDomainStep = (): JSX.Element => {
       <Flow.Part part='verifyDomain'>
         <Step>
           <Col
+            elementDescriptor={descriptors.configureSSOVerifyDomainErrorRoot}
             justify='center'
             align='center'
             sx={t => ({ gap: t.space.$3, alignItems: 'center', flex: 1 })}
           >
             <Icon
+              elementDescriptor={descriptors.configureSSOVerifyDomainErrorIcon}
               icon={ExclamationTriangle}
               sx={t => ({
                 width: t.sizes.$8,
@@ -72,6 +74,7 @@ export const VerifyDomainStep = (): JSX.Element => {
               sx={t => ({ textAlign: 'center', maxWidth: t.sizes.$94 })}
             >
               <Heading
+                elementDescriptor={descriptors.configureSSOVerifyDomainErrorTitle}
                 textVariant='h1'
                 sx={t => ({ fontSize: t.fontSizes.$lg, textWrap: 'balance' })}
                 localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.domainTaken.title', {
@@ -79,6 +82,7 @@ export const VerifyDomainStep = (): JSX.Element => {
                 })}
               />
               <Text
+                elementDescriptor={descriptors.configureSSOVerifyDomainErrorSubtitle}
                 as='p'
                 variant='body'
                 colorScheme='secondary'
@@ -232,6 +236,8 @@ export const ProvideEmailStep = ({ emailAddressRef, preExistingEmailIdRef }: Pro
         justify='center'
       >
         <Form.Root
+          elementDescriptor={descriptors.configureSSOEmailVerificationForm}
+          elementId={descriptors.configureSSOEmailVerificationForm.setId('provide')}
           onSubmit={handleSubmit}
           gap={3}
           sx={t => ({
@@ -243,6 +249,8 @@ export const ProvideEmailStep = ({ emailAddressRef, preExistingEmailIdRef }: Pro
           })}
         >
           <Icon
+            elementDescriptor={descriptors.configureSSOEmailVerificationIcon}
+            elementId={descriptors.configureSSOEmailVerificationIcon.setId('provide')}
             icon={DuotoneAtSymbol}
             sx={t => ({
               width: t.sizes.$8,
@@ -252,6 +260,8 @@ export const ProvideEmailStep = ({ emailAddressRef, preExistingEmailIdRef }: Pro
           />
           <Col gap={1}>
             <Heading
+              elementDescriptor={descriptors.configureSSOEmailVerificationTitle}
+              elementId={descriptors.configureSSOEmailVerificationTitle.setId('provide')}
               textVariant='h1'
               sx={t => ({ fontSize: t.fontSizes.$lg, fontWeight: t.fontWeights.$bold })}
               localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.addEmailAddress.formTitle')}
@@ -263,12 +273,16 @@ export const ProvideEmailStep = ({ emailAddressRef, preExistingEmailIdRef }: Pro
             sx={{ width: '100%' }}
           >
             <Text
+              elementDescriptor={descriptors.configureSSOEmailVerificationSubtitle}
+              elementId={descriptors.configureSSOEmailVerificationSubtitle.setId('provide')}
               as='p'
               variant='body'
               colorScheme='secondary'
               localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.addEmailAddress.formSubtitle')}
             />
             <Input
+              elementDescriptor={descriptors.configureSSOEmailVerificationInput}
+              elementId={descriptors.configureSSOEmailVerificationInput.setId('provide')}
               type='email'
               placeholder={t(localizationKeys('configureSSO.verifyEmailDomainStep.addEmailAddress.inputPlaceholder'))}
               aria-label={t(localizationKeys('configureSSO.verifyEmailDomainStep.addEmailAddress.inputLabel'))}
@@ -281,6 +295,7 @@ export const ProvideEmailStep = ({ emailAddressRef, preExistingEmailIdRef }: Pro
             />
             {card.error ? (
               <Text
+                elementDescriptor={descriptors.configureSSOEmailVerificationError}
                 as='p'
                 variant='body'
                 sx={t => ({ color: t.colors.$danger500, fontSize: t.fontSizes.$sm, textAlign: 'start' })}
@@ -385,11 +400,15 @@ export const EnterVerificationCodeStep = ({
         >
           <Col gap={1}>
             <Heading
+              elementDescriptor={descriptors.configureSSOEmailVerificationTitle}
+              elementId={descriptors.configureSSOEmailVerificationTitle.setId('enter-code')}
               textVariant='h1'
               sx={t => ({ fontSize: t.fontSizes.$sm })}
               localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.emailCode.formTitle')}
             />
             <Text
+              elementDescriptor={descriptors.configureSSOEmailVerificationSubtitle}
+              elementId={descriptors.configureSSOEmailVerificationSubtitle.setId('enter-code')}
               as='p'
               variant='body'
               colorScheme='secondary'
@@ -425,10 +444,14 @@ const EmailAlreadyVerified = ({ emailAddress }: { emailAddress: string }): JSX.E
 
   return (
     <Col
+      elementDescriptor={descriptors.configureSSOEmailVerificationForm}
+      elementId={descriptors.configureSSOEmailVerificationForm.setId('verified')}
       gap={3}
       sx={{ alignItems: 'center' }}
     >
       <Icon
+        elementDescriptor={descriptors.configureSSOEmailVerificationIcon}
+        elementId={descriptors.configureSSOEmailVerificationIcon.setId('verified')}
         icon={DuotoneAtSymbol}
         sx={t => ({
           width: t.sizes.$8,
@@ -441,6 +464,8 @@ const EmailAlreadyVerified = ({ emailAddress }: { emailAddress: string }): JSX.E
         sx={t => ({ textAlign: 'center', maxWidth: t.sizes.$66 })}
       >
         <Heading
+          elementDescriptor={descriptors.configureSSOEmailVerificationTitle}
+          elementId={descriptors.configureSSOEmailVerificationTitle.setId('verified')}
           textVariant='h1'
           sx={t => ({ fontSize: t.fontSizes.$lg, fontWeight: t.fontWeights.$bold })}
           localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.emailCode.verified.title')}
@@ -450,6 +475,8 @@ const EmailAlreadyVerified = ({ emailAddress }: { emailAddress: string }): JSX.E
           sx={{ flex: 1 }}
         >
           <Text
+            elementDescriptor={descriptors.configureSSOEmailVerificationSubtitle}
+            elementId={descriptors.configureSSOEmailVerificationSubtitle.setId('verified')}
             as='p'
             variant='body'
             colorScheme='secondary'
@@ -457,6 +484,8 @@ const EmailAlreadyVerified = ({ emailAddress }: { emailAddress: string }): JSX.E
           />
         </Col>
         <Input
+          elementDescriptor={descriptors.configureSSOEmailVerificationInput}
+          elementId={descriptors.configureSSOEmailVerificationInput.setId('verified')}
           type='email'
           value={emailAddress}
           readOnly

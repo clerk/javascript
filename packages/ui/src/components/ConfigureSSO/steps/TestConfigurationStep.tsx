@@ -113,6 +113,7 @@ export const TestConfigurationStep = (): JSX.Element => {
                   <CopyTestUrlButton onTestRunCreated={handleTestRunCreated} />
 
                   <Button
+                    elementDescriptor={descriptors.configureSSOTestRefreshButton}
                     variant='bordered'
                     colorScheme='secondary'
                     size='xs'
@@ -173,6 +174,7 @@ export const TestConfigurationStep = (): JSX.Element => {
 
         {card.error ? (
           <Box
+            elementDescriptor={descriptors.configureSSOTestError}
             sx={t => ({
               flexShrink: 0,
               paddingInline: t.space.$5,
@@ -304,6 +306,7 @@ const TestResultsTable = ({
         })}
       >
         <Table
+          elementDescriptor={descriptors.configureSSOTestResultsTable}
           tableHeadVisuallyHidden={!rows.length}
           sx={t => ({
             background: t.colors.$colorBackground,
@@ -344,7 +347,7 @@ const TestResultsTable = ({
                   >
                     <Spinner
                       colorScheme='primary'
-                      elementDescriptor={descriptors.spinner}
+                      elementDescriptor={descriptors.configureSSOTestResultsLoadingSpinner}
                     />
                     <Text
                       colorScheme='secondary'
@@ -361,6 +364,7 @@ const TestResultsTable = ({
               <Tr>
                 <Td colSpan={TEST_RESULTS_TABLE_COLUMN_COUNT}>
                   <Flex
+                    elementDescriptor={descriptors.configureSSOTestResultsEmpty}
                     align='center'
                     justify='center'
                     sx={t => ({ padding: `${t.space.$10} 0`, flex: 1 })}
@@ -373,6 +377,7 @@ const TestResultsTable = ({
               rows.map(row => (
                 <Tr
                   key={row.id}
+                  elementDescriptor={descriptors.configureSSOTestResultsRow}
                   onClick={() => setSelectedTestRun(row)}
                   sx={t => ({
                     cursor: 'pointer',
@@ -560,6 +565,7 @@ const ParsedUserInfoSection = ({
 
   return (
     <Flex
+      elementDescriptor={descriptors.configureSSOTestRunParsedUserInfo}
       direction='col'
       gap={3}
       sx={t => ({
@@ -622,6 +628,7 @@ const FullMessageBlock = ({ message }: { message: string }): JSX.Element => {
           localizationKey={localizationKeys('configureSSO.testConfigurationStep.testRunDetails.runDetails.fullMessage')}
         />
         <IconButton
+          elementDescriptor={descriptors.configureSSOTestRunFullMessageCopyButton}
           variant='ghost'
           colorScheme='neutral'
           size='xs'
@@ -631,6 +638,7 @@ const FullMessageBlock = ({ message }: { message: string }): JSX.Element => {
         />
       </Flex>
       <Box
+        elementDescriptor={descriptors.configureSSOTestRunFullMessage}
         as='pre'
         sx={t => ({
           margin: 0,
@@ -682,6 +690,8 @@ const TestRunStatusCell = ({ testRun }: { testRun: EnterpriseConnectionTestRunRe
   if (testRun.status === 'success') {
     return (
       <Badge
+        elementDescriptor={descriptors.configureSSOTestRunStatusBadge}
+        elementId={descriptors.configureSSOTestRunStatusBadge.setId('success')}
         colorScheme='success'
         localizationKey={localizationKeys('configureSSO.testConfigurationStep.testResults.status__success')}
       />
@@ -690,6 +700,8 @@ const TestRunStatusCell = ({ testRun }: { testRun: EnterpriseConnectionTestRunRe
   if (testRun.status === 'failed') {
     return (
       <Badge
+        elementDescriptor={descriptors.configureSSOTestRunStatusBadge}
+        elementId={descriptors.configureSSOTestRunStatusBadge.setId('failed')}
         colorScheme='danger'
         localizationKey={localizationKeys('configureSSO.testConfigurationStep.testResults.status__failed')}
       />
@@ -697,6 +709,8 @@ const TestRunStatusCell = ({ testRun }: { testRun: EnterpriseConnectionTestRunRe
   }
   return (
     <Badge
+      elementDescriptor={descriptors.configureSSOTestRunStatusBadge}
+      elementId={descriptors.configureSSOTestRunStatusBadge.setId('pending')}
       colorScheme='warning'
       localizationKey={localizationKeys('configureSSO.testConfigurationStep.testResults.status__pending')}
     />
@@ -736,6 +750,7 @@ const CopyTestUrlButton = ({ onTestRunCreated }: CopyTestUrlButtonProps): JSX.El
 
   return (
     <Button
+      elementDescriptor={descriptors.configureSSOTestUrlCopyButton}
       id='testSsoUrl'
       variant='bordered'
       colorScheme='secondary'

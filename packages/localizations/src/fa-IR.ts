@@ -185,8 +185,8 @@ export const faIR: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: 'برای دریافت مجوز مدیریت اتصالات سازمانی با مدیر سازمان خود تماس بگیرید.',
-      title: 'شما اجازه مدیریت اتصالات سازمانی را ندارید',
+      subtitle: 'برای ارتقای مجوزهای خود با مدیر سازمان تماس بگیرید.',
+      title: 'شما اجازه مدیریت ورود یکپارچه (SSO) را ندارید',
     },
     navbar: {
       title: 'پیکربندی ورود یکپارچه (SSO)',

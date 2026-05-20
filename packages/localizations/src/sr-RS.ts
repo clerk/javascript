@@ -180,9 +180,8 @@ export const srRS: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'Kontaktirajte administratora vaše organizacije da biste dobili dozvole za upravljanje korporativnim vezama.',
-      title: 'Nemate dozvolu za upravljanje korporativnim vezama',
+      subtitle: 'Kontaktirajte administratora vaše organizacije da biste proširili svoje dozvole.',
+      title: 'Nemate dozvolu za upravljanje jedinstvenom prijavom (SSO)',
     },
     navbar: {
       title: 'Konfiguriši jedinstvenu prijavu (SSO)',

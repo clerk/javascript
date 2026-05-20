@@ -209,8 +209,8 @@ export const nbNO: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: 'Kontakt organisasjonens administrator for å få tillatelser til å administrere bedriftstilkoblinger.',
-      title: 'Du har ikke tillatelse til å administrere bedriftstilkoblinger',
+      subtitle: 'Kontakt organisasjonens administrator for å oppgradere tillatelsene dine.',
+      title: 'Du har ikke tillatelse til å administrere enkeltpålogging (SSO)',
     },
     navbar: {
       title: 'Konfigurer enkeltpålogging (SSO)',

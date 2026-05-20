@@ -184,8 +184,8 @@ export const viVN: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: 'Liên hệ với quản trị viên tổ chức của bạn để có quyền quản lý các kết nối doanh nghiệp.',
-      title: 'Bạn không có quyền quản lý các kết nối doanh nghiệp',
+      subtitle: 'Liên hệ với quản trị viên tổ chức của bạn để nâng cấp quyền của bạn.',
+      title: 'Bạn không có quyền quản lý đăng nhập một lần (SSO)',
     },
     navbar: {
       title: 'Cấu hình đăng nhập một lần (SSO)',

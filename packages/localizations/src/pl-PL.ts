@@ -180,9 +180,8 @@ export const plPL: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'Skontaktuj się z administratorem swojej organizacji, aby uzyskać uprawnienia do zarządzania połączeniami korporacyjnymi.',
-      title: 'Nie masz uprawnień do zarządzania połączeniami korporacyjnymi',
+      subtitle: 'Skontaktuj się z administratorem swojej organizacji, aby rozszerzyć swoje uprawnienia.',
+      title: 'Nie masz uprawnień do zarządzania logowaniem jednokrotnym (SSO)',
     },
     navbar: {
       title: 'Skonfiguruj logowanie jednokrotne (SSO)',

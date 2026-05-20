@@ -178,6 +178,7 @@ export const CreateAppSubStep = (): JSX.Element => {
         <Step.Section sx={theme => ({ gap: theme.space.$5 })}>
           <Col sx={theme => ({ gap: theme.space.$1x5 })}>
             <Heading
+              elementDescriptor={descriptors.configureSSOInstructionsHeading}
               as='h3'
               textVariant='subtitle'
               localizationKey={localizationKeys(key('createApp.title'))}
@@ -241,6 +242,7 @@ const OktaServiceProviderStepContent = (): JSX.Element => {
   return (
     <Col sx={theme => ({ gap: theme.space.$1x5 })}>
       <Heading
+        elementDescriptor={descriptors.configureSSOInstructionsHeading}
         as='h3'
         textVariant='subtitle'
         localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.serviceProvider.title')}
@@ -262,6 +264,7 @@ const OktaServiceProviderStepContent = (): JSX.Element => {
 const OktaCreateAppStepContent = (): JSX.Element => {
   return (
     <Col
+      elementDescriptor={descriptors.configureSSOInstructionsList}
       as='ul'
       sx={theme => ({
         gap: theme.space.$1x5,
@@ -271,26 +274,31 @@ const OktaCreateAppStepContent = (): JSX.Element => {
       })}
     >
       <Text
+        elementDescriptor={descriptors.configureSSOInstructionsListItem}
         as='li'
         colorScheme='secondary'
         localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.createApp.step1')}
       />
       <Text
+        elementDescriptor={descriptors.configureSSOInstructionsListItem}
         as='li'
         colorScheme='secondary'
         localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.createApp.step2')}
       />
       <Text
+        elementDescriptor={descriptors.configureSSOInstructionsListItem}
         as='li'
         colorScheme='secondary'
         localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.createApp.step3')}
       />
       <Text
+        elementDescriptor={descriptors.configureSSOInstructionsListItem}
         as='li'
         colorScheme='secondary'
         localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.createApp.step4')}
       />
       <Text
+        elementDescriptor={descriptors.configureSSOInstructionsListItem}
         as='li'
         colorScheme='secondary'
         localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.createApp.step5')}
@@ -303,11 +311,13 @@ const OktaCompleteSamlIntegrationStepContent = (): JSX.Element => {
   return (
     <Col sx={theme => ({ gap: theme.space.$1x5 })}>
       <Heading
+        elementDescriptor={descriptors.configureSSOInstructionsHeading}
         as='h3'
         textVariant='subtitle'
         localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.completeSamlIntegration.title')}
       />
       <Col
+        elementDescriptor={descriptors.configureSSOInstructionsList}
         as='ul'
         sx={theme => ({
           gap: theme.space.$1x5,
@@ -317,11 +327,13 @@ const OktaCompleteSamlIntegrationStepContent = (): JSX.Element => {
         })}
       >
         <Text
+          elementDescriptor={descriptors.configureSSOInstructionsListItem}
           as='li'
           colorScheme='secondary'
           localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.completeSamlIntegration.step1')}
         />
         <Text
+          elementDescriptor={descriptors.configureSSOInstructionsListItem}
           as='li'
           colorScheme='secondary'
           localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.completeSamlIntegration.step2')}
@@ -343,6 +355,7 @@ export const ConfigureAttributesSubStep = (): JSX.Element => {
         <Step.Section sx={theme => ({ gap: theme.space.$3 })}>
           {provider === 'saml_custom' && (
             <Heading
+              elementDescriptor={descriptors.configureSSOInstructionsHeading}
               as='h3'
               textVariant='subtitle'
               localizationKey={localizationKeys('configureSSO.configureStep.samlCustom.configureAttributes.title')}
@@ -350,6 +363,7 @@ export const ConfigureAttributesSubStep = (): JSX.Element => {
           )}
 
           <Table
+            elementDescriptor={descriptors.configureSSOAttributeMappingTable}
             sx={theme => ({
               'tr > th:first-of-type': {
                 paddingInlineStart: theme.space.$4,
@@ -400,6 +414,10 @@ export const ConfigureAttributesSubStep = (): JSX.Element => {
                       />
 
                       <Badge
+                        elementDescriptor={descriptors.configureSSOAttributeMappingBadge}
+                        elementId={descriptors.configureSSOAttributeMappingBadge.setId(
+                          row.isRequired ? 'required' : 'optional',
+                        )}
                         colorScheme={row.isRequired ? 'warning' : 'primary'}
                         localizationKey={localizationKeys(
                           row.isRequired
@@ -460,6 +478,7 @@ const OktaConfigureAttributesStepContent = (): JSX.Element => {
       />
 
       <Col
+        elementDescriptor={descriptors.configureSSOInstructionsList}
         as='ol'
         sx={theme => ({
           gap: theme.space.$1x5,
@@ -469,11 +488,13 @@ const OktaConfigureAttributesStepContent = (): JSX.Element => {
         })}
       >
         <Text
+          elementDescriptor={descriptors.configureSSOInstructionsListItem}
           as='li'
           colorScheme='secondary'
           localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.step1')}
         />
         <Text
+          elementDescriptor={descriptors.configureSSOInstructionsListItem}
           as='li'
           colorScheme='secondary'
         >
@@ -482,6 +503,7 @@ const OktaConfigureAttributesStepContent = (): JSX.Element => {
             localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.step2')}
           />
           <Col
+            elementDescriptor={descriptors.configureSSOInstructionsList}
             as='ul'
             sx={theme => ({
               gap: theme.space.$1x5,
@@ -494,6 +516,7 @@ const OktaConfigureAttributesStepContent = (): JSX.Element => {
             {ATTRIBUTE_PAIRS.map(pair => (
               <Text
                 key={pair.id}
+                elementDescriptor={descriptors.configureSSOInstructionsListItem}
                 as='li'
               >
                 <Badge
@@ -531,6 +554,7 @@ export const AssignUsersSubStep = (): JSX.Element => {
         <Step.Body>
           <Step.Section sx={theme => ({ gap: theme.space.$3 })}>
             <Heading
+              elementDescriptor={descriptors.configureSSOInstructionsHeading}
               as='h3'
               textVariant='subtitle'
               localizationKey={localizationKeys('configureSSO.configureStep.samlCustom.assignUsers.title')}
@@ -562,6 +586,7 @@ export const AssignUsersSubStep = (): JSX.Element => {
       <Step.Body>
         <Step.Section sx={theme => ({ gap: theme.space.$3 })}>
           <Heading
+            elementDescriptor={descriptors.configureSSOInstructionsHeading}
             as='h3'
             textVariant='subtitle'
             localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.title')}
@@ -573,6 +598,7 @@ export const AssignUsersSubStep = (): JSX.Element => {
           />
 
           <Col
+            elementDescriptor={descriptors.configureSSOInstructionsList}
             as='ol'
             sx={theme => ({
               gap: theme.space.$1x5,
@@ -582,26 +608,31 @@ export const AssignUsersSubStep = (): JSX.Element => {
             })}
           >
             <Text
+              elementDescriptor={descriptors.configureSSOInstructionsListItem}
               as='li'
               colorScheme='secondary'
               localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step1')}
             />
             <Text
+              elementDescriptor={descriptors.configureSSOInstructionsListItem}
               as='li'
               colorScheme='secondary'
               localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step2')}
             />
             <Text
+              elementDescriptor={descriptors.configureSSOInstructionsListItem}
               as='li'
               colorScheme='secondary'
               localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step3')}
             />
             <Text
+              elementDescriptor={descriptors.configureSSOInstructionsListItem}
               as='li'
               colorScheme='secondary'
               localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step4')}
             />
             <Text
+              elementDescriptor={descriptors.configureSSOInstructionsListItem}
               as='li'
               colorScheme='secondary'
               localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step5')}
@@ -745,6 +776,7 @@ export const SubmitSamlConfigSubStep = (): JSX.Element => {
           gap={5}
         >
           <Heading
+            elementDescriptor={descriptors.configureSSOInstructionsHeading}
             as='h3'
             textVariant='subtitle'
             localizationKey={localizationKeys(key('submitSamlConfig.title'))}
@@ -885,12 +917,14 @@ const ManualEntryPanel = ({
               >
                 {existingCertPresent && (
                   <Badge
+                    elementDescriptor={descriptors.configureSSOCertificateFileBadge}
                     localizationKey={localizationKeys(
                       'configureSSO.configureStep.samlOkta.manual.signingCertificate.fileUploaded',
                     )}
                   />
                 )}
                 <Button
+                  elementDescriptor={descriptors.configureSSOCertificateUploadButton}
                   size='xs'
                   variant='outline'
                   onClick={() => certInputRef.current?.click()}
@@ -919,6 +953,7 @@ const ManualEntryPanel = ({
                 sx={theme => ({ paddingTop: theme.space.$1, paddingBottom: theme.space.$1 })}
               >
                 <Text
+                  elementDescriptor={descriptors.configureSSOCertificateFileName}
                   as='span'
                   colorScheme='secondary'
                   variant='buttonSmall'
@@ -927,6 +962,7 @@ const ManualEntryPanel = ({
                 </Text>
 
                 <Button
+                  elementDescriptor={descriptors.configureSSOCertificateRemoveButton}
                   variant='ghost'
                   colorScheme='neutral'
                   aria-label={t(

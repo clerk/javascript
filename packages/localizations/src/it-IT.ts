@@ -186,9 +186,8 @@ export const itIT: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        "Contatta l'amministratore della tua organizzazione per ottenere i permessi per gestire le connessioni aziendali.",
-      title: 'Non hai il permesso di gestire le connessioni aziendali',
+      subtitle: "Contatta l'amministratore della tua organizzazione per ampliare i tuoi permessi.",
+      title: 'Non hai il permesso di gestire il Single Sign-On (SSO)',
     },
     navbar: {
       title: 'Configura Single Sign-On (SSO)',

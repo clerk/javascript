@@ -180,9 +180,8 @@ export const enGB: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'Contact your organisation administrator in order to have permissions to manage enterprise connections.',
-      title: 'You do not have permission to manage enterprise connections',
+      subtitle: "Contact your organisation's administrator to upgrade your permissions.",
+      title: 'You do not have permission to manage Single Sign-On (SSO)',
     },
     navbar: {
       title: 'Configure Single Sign-On (SSO)',

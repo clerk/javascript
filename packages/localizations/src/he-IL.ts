@@ -180,8 +180,8 @@ export const heIL: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: 'פנה למנהל הארגון שלך כדי לקבל הרשאות לניהול חיבורים ארגוניים.',
-      title: 'אין לך הרשאה לנהל חיבורים ארגוניים',
+      subtitle: 'פנה למנהל הארגון שלך כדי לשדרג את ההרשאות שלך.',
+      title: 'אין לך הרשאה לנהל כניסה אחידה (SSO)',
     },
     navbar: {
       title: 'הגדרת כניסה אחידה (SSO)',

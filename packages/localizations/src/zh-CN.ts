@@ -180,8 +180,8 @@ export const zhCN: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: '请联系您的组织管理员以获得管理企业连接的权限。',
-      title: '您无权管理企业连接',
+      subtitle: '请联系您的组织管理员以升级您的权限。',
+      title: '您无权管理单点登录 (SSO)',
     },
     navbar: {
       title: '配置单点登录 (SSO)',

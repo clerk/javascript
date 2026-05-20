@@ -180,8 +180,8 @@ export const bnIN: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: 'এন্টারপ্রাইজ সংযোগ পরিচালনার অনুমতি পেতে আপনার সংস্থার প্রশাসকের সাথে যোগাযোগ করুন।',
-      title: 'এন্টারপ্রাইজ সংযোগ পরিচালনার অনুমতি আপনার নেই',
+      subtitle: 'আপনার অনুমতি আপগ্রেড করতে আপনার সংস্থার প্রশাসকের সাথে যোগাযোগ করুন।',
+      title: 'একক সাইন-অন (SSO) পরিচালনার অনুমতি আপনার নেই',
     },
     navbar: {
       title: 'একক সাইন-অন (SSO) কনফিগার করুন',

@@ -188,8 +188,8 @@ export const ptPT: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: 'Contacte o administrador da sua organização para obter permissões para gerir ligações empresariais.',
-      title: 'Não tem permissão para gerir ligações empresariais',
+      subtitle: 'Contacte o administrador da sua organização para ampliar as suas permissões.',
+      title: 'Não tem permissão para gerir a autenticação única (SSO)',
     },
     navbar: {
       title: 'Configurar autenticação única (SSO)',

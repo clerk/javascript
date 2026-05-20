@@ -208,8 +208,8 @@ export const fiFI: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: 'Ota yhteyttä organisaatiosi järjestelmänvalvojaan saadaksesi oikeudet hallita yritysyhteyksiä.',
-      title: 'Sinulla ei ole oikeutta hallita yritysyhteyksiä',
+      subtitle: 'Ota yhteyttä organisaatiosi järjestelmänvalvojaan päivittääksesi oikeuksiasi.',
+      title: 'Sinulla ei ole oikeutta hallita kertakirjautumista (SSO)',
     },
     navbar: {
       title: 'Määritä kertakirjautuminen (SSO)',

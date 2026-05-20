@@ -229,9 +229,8 @@ export const enUS: LocalizationResource = {
       },
     },
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'Contact your organization administrator in order to have permissions to manage enterprise connections.',
-      title: 'You do not have permission to manage enterprise connections',
+      subtitle: "Contact your organization's administrator to upgrade your permissions.",
+      title: 'You do not have permission to manage Single Sign-on (SSO)',
     },
     navbar: {
       title: 'Configure Single Sign-On (SSO)',

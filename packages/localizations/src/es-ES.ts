@@ -186,9 +186,8 @@ export const esES: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'Contacte al administrador de su organización para obtener permisos para gestionar conexiones empresariales.',
-      title: 'No tiene permiso para gestionar conexiones empresariales',
+      subtitle: 'Contacte al administrador de su organización para ampliar sus permisos.',
+      title: 'No tiene permiso para gestionar el inicio de sesión único (SSO)',
     },
     navbar: {
       title: 'Configurar inicio de sesión único (SSO)',

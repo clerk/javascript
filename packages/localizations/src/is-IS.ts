@@ -208,9 +208,8 @@ export const isIS: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'Hafðu samband við stjórnanda fyrirtækisins þíns til að fá heimildir til að stjórna fyrirtækjatengingum.',
-      title: 'Þú hefur ekki heimild til að stjórna fyrirtækjatengingum',
+      subtitle: 'Hafðu samband við stjórnanda fyrirtækisins þíns til að uppfæra heimildir þínar.',
+      title: 'Þú hefur ekki heimild til að stjórna einnar innskráningar (SSO)',
     },
     navbar: {
       title: 'Stilla einnar innskráningar (SSO)',

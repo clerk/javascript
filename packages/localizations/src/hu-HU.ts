@@ -209,9 +209,8 @@ export const huHU: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'Vegye fel a kapcsolatot szervezete adminisztrátorával, hogy jogosultságot kapjon a vállalati kapcsolatok kezelésére.',
-      title: 'Nincs jogosultsága vállalati kapcsolatok kezelésére',
+      subtitle: 'Vegye fel a kapcsolatot szervezete adminisztrátorával a jogosultságai bővítéséhez.',
+      title: 'Nincs jogosultsága az egyszeri bejelentkezés (SSO) kezelésére',
     },
     navbar: {
       title: 'Egyszeri bejelentkezés (SSO) beállítása',

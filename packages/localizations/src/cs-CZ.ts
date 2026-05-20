@@ -184,8 +184,8 @@ export const csCZ: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: 'Kontaktujte správce vaší organizace, abyste získali oprávnění ke správě podnikových připojení.',
-      title: 'Nemáte oprávnění ke správě podnikových připojení',
+      subtitle: 'Kontaktujte správce vaší organizace pro rozšíření vašich oprávnění.',
+      title: 'Nemáte oprávnění ke správě jednotného přihlášení (SSO)',
     },
     navbar: {
       title: 'Nastavit jednotné přihlášení (SSO)',

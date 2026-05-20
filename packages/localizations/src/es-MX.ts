@@ -181,9 +181,8 @@ export const esMX: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'Contacta al administrador de tu organización para obtener permisos para administrar conexiones de empresa.',
-      title: 'No tienes permiso para administrar conexiones de empresa',
+      subtitle: 'Contacta al administrador de tu organización para ampliar tus permisos.',
+      title: 'No tienes permiso para administrar el inicio de sesión único (SSO)',
     },
     navbar: {
       title: 'Configurar inicio de sesión único (SSO)',

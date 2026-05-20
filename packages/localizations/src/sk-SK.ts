@@ -180,9 +180,8 @@ export const skSK: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'Kontaktujte správcu vašej organizácie, aby ste získali oprávnenia na spravovanie podnikových pripojení.',
-      title: 'Nemáte oprávnenie spravovať podnikové pripojenia',
+      subtitle: 'Kontaktujte správcu vašej organizácie pre rozšírenie vašich oprávnení.',
+      title: 'Nemáte oprávnenie spravovať jednotné prihlasovanie (SSO)',
     },
     navbar: {
       title: 'Nastaviť jednotné prihlasovanie (SSO)',

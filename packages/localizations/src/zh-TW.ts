@@ -186,8 +186,8 @@ export const zhTW: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: '請聯絡您的組織管理員以取得管理企業連線的權限。',
-      title: '您沒有管理企業連線的權限',
+      subtitle: '請聯絡您的組織管理員以升級您的權限。',
+      title: '您沒有管理單一登入 (SSO) 的權限',
     },
     navbar: {
       title: '設定單一登入 (SSO)',

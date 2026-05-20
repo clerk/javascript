@@ -180,8 +180,8 @@ export const kkKZ: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: 'Корпоративтік қосылыстарды басқару рұқсаттарын алу үшін ұйым әкімшісіне хабарласыңыз.',
-      title: 'Сізде корпоративтік қосылыстарды басқаруға рұқсат жоқ',
+      subtitle: 'Рұқсаттарыңызды жаңарту үшін ұйым әкімшісіне хабарласыңыз.',
+      title: 'Сізде бірыңғай кіруді (SSO) басқаруға рұқсат жоқ',
     },
     navbar: {
       title: 'Бірыңғай кіруді конфигурациялау (SSO)',

@@ -180,8 +180,8 @@ export const arSA: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: 'تواصل مع مسؤول مؤسستك للحصول على أذونات لإدارة الاتصالات المؤسسية.',
-      title: 'ليس لديك إذن لإدارة الاتصالات المؤسسية',
+      subtitle: 'تواصل مع مسؤول مؤسستك لترقية أذوناتك.',
+      title: 'ليس لديك إذن لإدارة تسجيل الدخول الموحد (SSO)',
     },
     navbar: {
       title: 'تكوين تسجيل الدخول الموحد (SSO)',

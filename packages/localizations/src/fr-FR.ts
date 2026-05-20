@@ -188,9 +188,8 @@ export const frFR: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        "Contactez l'administrateur de votre organisation afin d'obtenir les permissions pour gérer les connexions d'entreprise.",
-      title: "Vous n'avez pas la permission de gérer les connexions d'entreprise",
+      subtitle: "Contactez l'administrateur de votre organisation pour étendre vos permissions.",
+      title: "Vous n'avez pas la permission de gérer l'authentification unique (SSO)",
     },
     navbar: {
       title: "Configurer l'authentification unique (SSO)",

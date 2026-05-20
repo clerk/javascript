@@ -180,9 +180,8 @@ export const nlBE: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'Neem contact op met de beheerder van uw organisatie om toestemming te krijgen voor het beheren van enterprise-verbindingen.',
-      title: 'U hebt geen toestemming om enterprise-verbindingen te beheren',
+      subtitle: 'Neem contact op met de beheerder van uw organisatie om uw rechten uit te breiden.',
+      title: 'U hebt geen toestemming om single sign-on (SSO) te beheren',
     },
     navbar: {
       title: 'Single sign-on (SSO) configureren',

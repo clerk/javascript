@@ -187,8 +187,8 @@ export const koKR: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: '엔터프라이즈 연결을 관리할 권한을 얻으려면 조직 관리자에게 문의하세요.',
-      title: '엔터프라이즈 연결을 관리할 권한이 없습니다',
+      subtitle: '권한을 업그레이드하려면 조직 관리자에게 문의하세요.',
+      title: '싱글 사인온(SSO)을 관리할 권한이 없습니다',
     },
     navbar: {
       title: '싱글 사인온(SSO) 구성',
