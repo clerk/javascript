@@ -1,5 +1,5 @@
 import type { EnterpriseConnectionJSON, UserJSON } from '@clerk/shared/types';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { BaseResource } from '../internal';
 import { User } from '../User';
@@ -759,6 +759,11 @@ describe('User', () => {
   });
 
   describe('.update with metadata routing', () => {
+    beforeEach(() => {
+      // @ts-ignore
+      BaseResource.clerk = { publishableKey: 'pk_test_foo' };
+    });
+
     it('calls PATCH /me only when no unsafeMetadata is provided', async () => {
       // @ts-ignore
       BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: {} }));
