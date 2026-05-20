@@ -338,14 +338,6 @@ export const enUS: LocalizationResource = {
       },
     },
     configureStep: {
-      spFields: {
-        acsUrl: {
-          label: 'Single sign-on URL',
-        },
-        spEntityId: {
-          label: 'Audience URI',
-        },
-      },
       attributeMapping: {
         title: 'We expect your SAML responses to have the following specific attributes:',
         paragraph:
@@ -376,6 +368,14 @@ export const enUS: LocalizationResource = {
       },
       samlOkta: {
         headerTitle: 'Configure Okta Workforce',
+        spFields: {
+          acsUrl: {
+            label: 'Single sign-on URL',
+          },
+          spEntityId: {
+            label: 'Audience URI (SP Entity ID)',
+          },
+        },
         createApp: {
           headerSubtitle: 'Create a new enterprise application in your Okta Dashboard',
           title: 'Create a new enterprise application in Okta',
@@ -464,6 +464,14 @@ export const enUS: LocalizationResource = {
       },
       samlCustom: {
         headerTitle: 'Configure your identity provider (IdP)',
+        spFields: {
+          acsUrl: {
+            label: 'Assertion consumer service (ACS) URL',
+          },
+          spEntityId: {
+            label: 'Service provider entity ID',
+          },
+        },
         createApp: {
           headerSubtitle:
             'Register Clerk as a service provider in your IdP, then add your identity provider configuration.',

@@ -1397,14 +1397,6 @@ export type __internal_LocalizationResource = {
       };
     };
     configureStep: {
-      spFields: {
-        acsUrl: {
-          label: LocalizationValue;
-        };
-        spEntityId: {
-          label: LocalizationValue;
-        };
-      };
       attributeMapping: {
         title: LocalizationValue;
         paragraph: LocalizationValue;
@@ -1434,6 +1426,14 @@ export type __internal_LocalizationResource = {
       };
       samlOkta: {
         headerTitle: LocalizationValue;
+        spFields: {
+          acsUrl: {
+            label: LocalizationValue;
+          };
+          spEntityId: {
+            label: LocalizationValue;
+          };
+        };
         createApp: {
           headerSubtitle: LocalizationValue;
           title: LocalizationValue;
@@ -1518,6 +1518,14 @@ export type __internal_LocalizationResource = {
       };
       samlCustom: {
         headerTitle: LocalizationValue;
+        spFields: {
+          acsUrl: {
+            label: LocalizationValue;
+          };
+          spEntityId: {
+            label: LocalizationValue;
+          };
+        };
         createApp: {
           headerSubtitle: LocalizationValue;
           title: LocalizationValue;

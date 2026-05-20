@@ -163,12 +163,12 @@ export const CreateAppSubStep = (): JSX.Element => {
 
   const acsUrlField = useFormControl('acsUrl', acsUrl, {
     type: 'text',
-    label: localizationKeys('configureSSO.configureStep.spFields.acsUrl.label'),
+    label: localizationKeys(key('spFields.acsUrl.label')),
     isRequired: false,
   });
   const spEntityIdField = useFormControl('spEntityId', spEntityId, {
     type: 'text',
-    label: localizationKeys('configureSSO.configureStep.spFields.spEntityId.label'),
+    label: localizationKeys(key('spFields.spEntityId.label')),
     isRequired: false,
   });
 
