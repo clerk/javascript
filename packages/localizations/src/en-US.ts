@@ -368,6 +368,17 @@ export const enUS: LocalizationResource = {
       },
       samlOkta: {
         headerTitle: 'Configure Okta Workforce',
+        attributeMapping: {
+          columns: {
+            name: 'Name',
+            value: 'Value',
+          },
+          rows: {
+            email: { name: 'mail', value: 'user.profile.mail' },
+            firstName: { name: 'firstName', value: 'user.profile.firstName' },
+            lastName: { name: 'lastName', value: 'user.profile.lastName' },
+          },
+        },
         spFields: {
           acsUrl: {
             label: 'Single sign-on URL',
@@ -464,6 +475,18 @@ export const enUS: LocalizationResource = {
       },
       samlCustom: {
         headerTitle: 'Configure your identity provider (IdP)',
+        attributeMapping: {
+          columns: {
+            userProfile: 'Identity Provider User Profile',
+            attributeName: 'Attribute Name',
+          },
+          rows: {
+            id: { userProfile: 'Unique identifier representing a user', attributeName: 'id' },
+            email: { userProfile: 'User’s email address', attributeName: 'email' },
+            firstName: { userProfile: 'User’s first name', attributeName: 'firstName' },
+            lastName: { userProfile: 'User’s last name', attributeName: 'lastName' },
+          },
+        },
         spFields: {
           acsUrl: {
             label: 'Assertion consumer service (ACS) URL',

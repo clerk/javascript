@@ -12,12 +12,14 @@ export const deriveInitialStep = (
 ): WizardStepId => {
   const { isDomainTakenByOtherOrg, hasSuccessfulTestRun } = options;
 
-  if (!enterpriseConnection) {
-    return 'select-provider';
-  }
-
+  // Go to the verify domain step in order to display warning
   if (isDomainTakenByOtherOrg) {
     return 'verify-domain';
+  }
+
+  // If no initial connection, go to the select provider step
+  if (!enterpriseConnection) {
+    return 'select-provider';
   }
 
   // Connection is enabled, go to the confirmation step
