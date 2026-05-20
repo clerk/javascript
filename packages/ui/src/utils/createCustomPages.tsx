@@ -1,6 +1,7 @@
 import {
   disabledOrganizationAPIKeysFeature,
   disabledOrganizationBillingFeature,
+  disabledSelfServeSSOFeature,
   disabledUserAPIKeysFeature,
   disabledUserBillingFeature,
 } from '@clerk/shared/internal/clerk-js/componentGuards';
@@ -9,7 +10,7 @@ import type { CustomPage, EnvironmentResource, LoadedClerk } from '@clerk/shared
 
 import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID, USER_PROFILE_NAVBAR_ROUTE_ID } from '../constants';
 import type { NavbarRoute } from '../elements/Navbar';
-import { Code, CreditCard, Organization, TickShield, User, Users } from '../icons';
+import { Code, Connections, CreditCard, Organization, TickShield, User, Users } from '../icons';
 import { localizationKeys } from '../localization';
 import { ExternalElementMounter } from './ExternalElementMounter';
 import { isDevelopmentSDK } from './runtimeEnvironment';
@@ -48,7 +49,15 @@ type GetDefaultRoutesReturnType = {
 
 type CreateCustomPagesParams = {
   customPages: CustomPage[];
-  getDefaultRoutes: ({ commerce, apiKeys }: { commerce: boolean; apiKeys: boolean }) => GetDefaultRoutesReturnType;
+  getDefaultRoutes: ({
+    commerce,
+    apiKeys,
+    selfServeSso,
+  }: {
+    commerce: boolean;
+    apiKeys: boolean;
+    selfServeSso: boolean;
+  }) => GetDefaultRoutesReturnType;
   setFirstPathToRoot: (routes: NavbarRoute[]) => NavbarRoute[];
   excludedPathsFromDuplicateWarning: string[];
 };
@@ -106,6 +115,7 @@ const createCustomPages = (
     apiKeys: organization
       ? !disabledOrganizationAPIKeysFeature(clerk, environment)
       : !disabledUserAPIKeysFeature(clerk, environment),
+    selfServeSso: organization ? !disabledSelfServeSSOFeature(clerk, environment) : false,
   });
 
   if (isDevelopmentSDK(clerk)) {
@@ -315,9 +325,11 @@ const getUserProfileDefaultRoutes = ({
 const getOrganizationProfileDefaultRoutes = ({
   commerce,
   apiKeys,
+  selfServeSso,
 }: {
   commerce: boolean;
   apiKeys: boolean;
+  selfServeSso: boolean;
 }): GetDefaultRoutesReturnType => {
   const INITIAL_ROUTES: NavbarRoute[] = [
     {
@@ -347,6 +359,14 @@ const getOrganizationProfileDefaultRoutes = ({
       id: ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.API_KEYS,
       icon: Code,
       path: 'organization-api-keys',
+    });
+  }
+  if (selfServeSso) {
+    INITIAL_ROUTES.push({
+      name: localizationKeys('organizationProfile.navbar.selfServeSso'),
+      id: ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.SELF_SERVE_SSO,
+      icon: Connections,
+      path: 'organization-self-serve-sso',
     });
   }
 

@@ -794,6 +794,7 @@ export const enUS: LocalizationResource = {
     navbar: {
       apiKeys: 'API keys',
       billing: 'Billing',
+      selfServeSso: 'Self-Serve SSO',
       description: 'Manage your organization.',
       general: 'General',
       members: 'Members',
