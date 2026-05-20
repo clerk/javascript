@@ -141,7 +141,7 @@ export const elGR: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Μέθοδοι πληρωμής',
-    popular: 'Δημοφιλές',
+    highlightedPlanBadge: 'Δημοφιλές',
     pricingTable: {
       billingCycle: 'Κύκλος χρέωσης',
       included: 'Περιλαμβάνεται',
@@ -179,8 +179,52 @@ export const elGR: LocalizationResource = {
     year: 'έτος',
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        'Επικοινωνήστε με τον διαχειριστή του οργανισμού σας για να αποκτήσετε άδειες διαχείρισης εταιρικών συνδέσεων.',
+      title: 'Δεν έχετε άδεια διαχείρισης εταιρικών συνδέσεων',
+    },
     navbar: {
       title: 'Διαμόρφωση Ενιαίας Σύνδεσης (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Επιλέξτε πάροχο',
+      subtitle: 'Επιλέξτε τον πάροχο για τον οποίο θα ρυθμίσετε SSO.',
+      body: {
+        title: 'Επιλέξτε τον πάροχο ταυτότητάς σας',
+        description: 'Θα σας καθοδηγήσουμε στη λεπτομερή διαδικασία ρύθμισης στη συνέχεια.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Προσαρμοσμένος πάροχος SAML',
+      },
+      warning: 'Μόλις επιλεγεί ένας πάροχος δεν μπορείτε να τον αλλάξετε μέχρι να ολοκληρωθεί η ρύθμιση',
+    },
+    verifyEmailDomainStep: {
+      title: 'Επαλήθευση διεύθυνσης email',
+      subtitle: 'Επαληθεύστε τη διεύθυνση email στην οποία θέλετε να ενεργοποιήσετε τη σύνδεση επιχείρησης.',
+      addEmailAddress: {
+        formTitle: 'Χρειαζόμαστε το email σας',
+        formSubtitle: 'Για να ξεκινήσουμε, θα χρειαστούμε τη διεύθυνση email σας',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'Διεύθυνση email',
+      },
+      emailCode: {
+        formTitle: 'Επαληθεύστε τη διεύθυνση email σας',
+        formSubtitle: 'Εισαγάγετε τον κωδικό επαλήθευσης που στάλθηκε στο {{identifier}}',
+        resendButton: 'Δεν λάβατε κωδικό; Επαναποστολή',
+        verified: {
+          title: 'Λάβαμε το email σας',
+          subtitle: 'Έχετε επαληθεύσει τη διεύθυνση email σας με το ακόλουθο email',
+          inputLabel: 'Επαληθευμένη διεύθυνση email',
+        },
+      },
+      domainTaken: {
+        title: 'Αυτός ο τομέας ({{domain}}) διαθέτει ήδη σύνδεση SSO',
+        subtitle:
+          'Επικοινωνήστε με τον διαχειριστή της εφαρμογής για να αποκτήσετε πρόσβαση μέσω της υπάρχουσας σύνδεσης.',
+      },
     },
   },
   createOrganization: {

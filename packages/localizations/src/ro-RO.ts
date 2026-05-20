@@ -147,7 +147,7 @@ export const roRO: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Metode de plată',
-    popular: 'Popular',
+    highlightedPlanBadge: 'Popular',
     pricingTable: {
       billingCycle: 'Ciclu de facturare',
       included: 'Inclus',
@@ -185,8 +185,51 @@ export const roRO: LocalizationResource = {
     year: 'An',
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        'Contactați administratorul organizației dumneavoastră pentru a obține permisiuni de gestionare a conexiunilor de întreprindere.',
+      title: 'Nu aveți permisiunea să gestionați conexiunile de întreprindere',
+    },
     navbar: {
       title: 'Configurați autentificarea unică (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Selectați furnizorul',
+      subtitle: 'Selectați furnizorul pentru care veți configura SSO.',
+      body: {
+        title: 'Selectați furnizorul de identitate',
+        description: 'Vă vom ghida în continuare prin procesul de configurare detaliat.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Furnizor SAML personalizat',
+      },
+      warning: 'Odată ce un furnizor este selectat, nu îl puteți schimba până când configurația nu este finalizată',
+    },
+    verifyEmailDomainStep: {
+      title: 'Verifică adresa de e-mail',
+      subtitle: 'Verifică adresa de e-mail pe care dorești să activezi conexiunea enterprise.',
+      addEmailAddress: {
+        formTitle: 'Avem nevoie de e-mailul tău',
+        formSubtitle: 'Pentru a începe, vom avea nevoie de adresa ta de e-mail',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'Adresă de e-mail',
+      },
+      emailCode: {
+        formTitle: 'Verifică adresa ta de e-mail',
+        formSubtitle: 'Introdu codul de verificare trimis la {{identifier}}',
+        resendButton: 'Nu ai primit un cod? Retrimite',
+        verified: {
+          title: 'Am primit e-mailul tău',
+          subtitle: 'Ai verificat adresa ta de e-mail cu următorul e-mail',
+          inputLabel: 'Adresă de e-mail verificată',
+        },
+      },
+      domainTaken: {
+        title: 'Acest domeniu ({{domain}}) are deja o conexiune SSO',
+        subtitle: 'Contactează administratorul aplicației pentru a obține acces prin conexiunea existentă.',
+      },
     },
   },
   createOrganization: {

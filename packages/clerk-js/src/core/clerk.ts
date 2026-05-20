@@ -55,7 +55,6 @@ import {
 } from '@clerk/shared/telemetry';
 import type {
   __experimental_CheckoutOptions,
-  __experimental_ConfigureSSOProps,
   __internal_AttemptToEnableEnvironmentSettingParams,
   __internal_AttemptToEnableEnvironmentSettingResult,
   __internal_CheckoutProps,
@@ -80,6 +79,7 @@ import type {
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
+  ConfigureSSOProps,
   CreateOrganizationParams,
   CreateOrganizationProps,
   CredentialReturn,
@@ -140,6 +140,7 @@ import type {
 import type { ClerkUI } from '@clerk/shared/ui';
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
 import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
+import type { QueryClient } from '@tanstack/query-core';
 
 import { debugLogger, initDebugLogger } from '@/utils/debug';
 import { ModuleManager } from '@/utils/moduleManager';
@@ -252,6 +253,7 @@ export class Clerk implements ClerkInterface {
   // converted to protected environment to support `updateEnvironment` type assertion
   protected environment?: EnvironmentResource | null;
 
+  #queryClient: QueryClient | undefined;
   #publishableKey = '';
   #domain: DomainOrProxyUrl['domain'];
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
@@ -270,6 +272,28 @@ export class Clerk implements ClerkInterface {
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
   #publicEventBus = createClerkEventBus();
+
+  get __internal_queryClient(): { __tag: 'clerk-rq-client'; client: QueryClient } | undefined {
+    if (!this.#queryClient) {
+      void import('./query-core')
+        .then(module => module.QueryClient)
+        .then(QueryClient => {
+          if (this.#queryClient) {
+            return;
+          }
+          this.#queryClient = new QueryClient();
+          // @ts-expect-error - queryClientStatus is not typed
+          this.#publicEventBus.emit('queryClientStatus', 'ready');
+        });
+    }
+
+    return this.#queryClient
+      ? {
+          __tag: 'clerk-rq-client',
+          client: this.#queryClient,
+        }
+      : undefined;
+  }
 
   public __internal_getCachedResources:
     | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
@@ -1434,11 +1458,10 @@ export class Clerk implements ClerkInterface {
   /**
    * Mount a configure SSO component at the target element.
    *
-   * @experimental
    * @param targetNode Target to mount the ConfigureSSO component.
    * @param props Configuration parameters.
    */
-  public __experimental_mountConfigureSSO = (node: HTMLDivElement, props?: __experimental_ConfigureSSOProps) => {
+  public mountConfigureSSO = (node: HTMLDivElement, props?: ConfigureSSOProps) => {
     if (disabledSelfServeSSOFeature(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderConfigureSSOComponentWhenDisabled, {
@@ -1473,7 +1496,7 @@ export class Clerk implements ClerkInterface {
       .then(controls =>
         controls.mountComponent({
           name: component,
-          appearanceKey: '__experimental_configureSSO',
+          appearanceKey: 'configureSSO',
           node,
           props,
         }),
@@ -1486,11 +1509,24 @@ export class Clerk implements ClerkInterface {
    * Unmount a configure SSO component from the target element.
    * If there is no component mounted at the target node, results in a noop.
    *
-   * @experimental
    * @param targetNode Target node to unmount the ConfigureSSO component from.
    */
-  public __experimental_unmountConfigureSSO = (node: HTMLDivElement) => {
+  public unmountConfigureSSO = (node: HTMLDivElement) => {
     void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
+  };
+
+  /**
+   * @deprecated Use `mountConfigureSSO` instead.
+   */
+  public __experimental_mountConfigureSSO = (node: HTMLDivElement, props?: ConfigureSSOProps) => {
+    return this.mountConfigureSSO(node, props);
+  };
+
+  /**
+   * @deprecated Use `unmountConfigureSSO` instead.
+   */
+  public __experimental_unmountConfigureSSO = (node: HTMLDivElement) => {
+    return this.unmountConfigureSSO(node);
   };
 
   public mountTaskChooseOrganization = (node: HTMLDivElement, props?: TaskChooseOrganizationProps) => {

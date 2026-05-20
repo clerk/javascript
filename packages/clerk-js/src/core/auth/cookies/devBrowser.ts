@@ -25,6 +25,12 @@ const getCookieAttributes = (options: DevBrowserCookieOptions) => {
   return { sameSite, secure, partitioned } as const;
 };
 
+const partitionedCookieAttributes = {
+  sameSite: 'None',
+  secure: true,
+  partitioned: true,
+} as const;
+
 /**
  * Create a long-lived JS cookie to store the dev browser token
  * ONLY for development instances.
@@ -40,33 +46,29 @@ export const createDevBrowserCookie = (
 
   const get = () => suffixedDevBrowserCookie.get() || devBrowserCookie.get();
 
+  const removeAll = () => {
+    const attributes = getCookieAttributes(options);
+
+    for (const cookie of [suffixedDevBrowserCookie, devBrowserCookie]) {
+      cookie.remove(attributes);
+      cookie.remove();
+      cookie.remove(partitionedCookieAttributes);
+    }
+  };
+
   const set = (devBrowser: string) => {
     const expires = addYears(Date.now(), 1);
     const { sameSite, secure, partitioned } = getCookieAttributes(options);
 
-    // Remove old non-partitioned cookies — the browser treats partitioned and
-    // non-partitioned cookies with the same name as distinct cookies.
-    if (partitioned) {
-      suffixedDevBrowserCookie.remove();
-      devBrowserCookie.remove();
-    }
+    // Remove stale variants before writing. The environment may not be loaded
+    // yet, so the current partitioned-cookies setting cannot be trusted.
+    removeAll();
 
     suffixedDevBrowserCookie.set(devBrowser, { expires, sameSite, secure, partitioned });
     devBrowserCookie.set(devBrowser, { expires, sameSite, secure, partitioned });
   };
 
-  const remove = () => {
-    const attributes = getCookieAttributes(options);
-    suffixedDevBrowserCookie.remove(attributes);
-    devBrowserCookie.remove(attributes);
-
-    // Also remove non-partitioned variants — the browser treats partitioned and
-    // non-partitioned cookies with the same name as distinct cookies.
-    if (attributes.partitioned) {
-      suffixedDevBrowserCookie.remove();
-      devBrowserCookie.remove();
-    }
-  };
+  const remove = () => removeAll();
 
   return {
     get,

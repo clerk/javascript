@@ -141,7 +141,7 @@ export const ruRU: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -179,8 +179,51 @@ export const ruRU: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle:
+        'Обратитесь к администратору вашей организации, чтобы получить разрешения на управление корпоративными подключениями.',
+      title: 'У вас нет разрешения на управление корпоративными подключениями',
+    },
     navbar: {
       title: 'Настроить единый вход (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Выберите поставщика',
+      subtitle: 'Выберите поставщика, для которого вы будете настраивать SSO.',
+      body: {
+        title: 'Выберите вашего поставщика идентификации',
+        description: 'Далее мы проведём вас через подробный процесс настройки.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Пользовательский поставщик SAML',
+      },
+      warning: 'После выбора поставщика вы не сможете изменить его до завершения настройки',
+    },
+    verifyEmailDomainStep: {
+      title: 'Подтвердить адрес электронной почты',
+      subtitle: 'Подтвердите адрес электронной почты, для которого вы хотите включить корпоративное подключение.',
+      addEmailAddress: {
+        formTitle: 'Нам нужна ваша электронная почта',
+        formSubtitle: 'Чтобы начать, нам потребуется ваш адрес электронной почты',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'Адрес электронной почты',
+      },
+      emailCode: {
+        formTitle: 'Подтвердите ваш адрес электронной почты',
+        formSubtitle: 'Введите код подтверждения, отправленный на {{identifier}}',
+        resendButton: 'Не получили код? Отправить повторно',
+        verified: {
+          title: 'Мы получили вашу электронную почту',
+          subtitle: 'Вы подтвердили свой адрес электронной почты с помощью следующего письма',
+          inputLabel: 'Подтверждённый адрес электронной почты',
+        },
+      },
+      domainTaken: {
+        title: 'Этот домен ({{domain}}) уже имеет SSO-подключение',
+        subtitle: 'Свяжитесь с администратором приложения, чтобы получить доступ через существующее подключение.',
+      },
     },
   },
   createOrganization: {

@@ -423,6 +423,7 @@ export type ElementsConfig = {
   pricingTableCardHeader: WithOptions;
   pricingTableCardTitleContainer: WithOptions;
   pricingTableCardTitle: WithOptions;
+  pricingTableCardBadge: WithOptions;
   pricingTableCardDescription: WithOptions;
   pricingTableCardFeeContainer: WithOptions;
   pricingTableCardFee: WithOptions;
@@ -672,15 +673,17 @@ export type ElementsConfig = {
   enterpriseConnectionButton: WithOptions;
   enterpriseConnectionButtonText: WithOptions;
 
-  configureSSOWizardHeader: WithOptions;
-  configureSSOWizardHeaderItem: WithOptions<string, ActiveState>;
-  configureSSOWizardHeaderItemBullet: WithOptions<string, ActiveState>;
-  configureSSOWizardHeaderItemLabel: WithOptions<string>;
-  configureSSOWizardHeaderSeparator: WithOptions;
-  configureSSOWizardBody: WithOptions<string>;
-  configureSSOWizardStepIndicator: WithOptions;
-  configureSSOWizardFooterPreviousButton: WithOptions;
-  configureSSOWizardFooterContinueButton: WithOptions;
+  configureSSOHeader: WithOptions;
+  configureSSOStepper: WithOptions;
+  configureSSOStepperItem: WithOptions<string, ActiveState>;
+  configureSSOStepperItemBullet: WithOptions<string, ActiveState>;
+  configureSSOStepperItemLabel: WithOptions<string>;
+  configureSSOStepperSeparator: WithOptions;
+  configureSSOStep: WithOptions<string>;
+  configureSSOStepCounter: WithOptions;
+  configureSSOFooter: WithOptions;
+  configureSSOFooterPreviousButton: WithOptions;
+  configureSSOFooterContinueButton: WithOptions;
 
   web3SolanaWalletButtonsRoot: WithOptions;
   web3SolanaWalletButtons: WithOptions;
@@ -822,6 +825,13 @@ export type Variables = {
    * @default 'inherit'
    */
   fontFamilyButtons?: FontFamily;
+  /**
+   * The default monospace font that will be used for monospaced text (e.g. code, OTP inputs).
+   * See {@link Variables.fontFamily} for details on accepted values.
+   *
+   * @default 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
+   */
+  fontFamilyMono?: FontFamily;
   /**
    * The value will be used as the base `md` to calculate all the other scale values (`xs`, `sm`, `lg` and `xl`).
    * By default, this value is relative to the root fontSize of the html element.
@@ -985,6 +995,33 @@ export type Options = {
    * @default false
    */
   unsafe_disableDevelopmentModeWarnings?: boolean;
+  /**
+   * Controls whether inputs will automatically receive focus when a component is mounted.
+   * Set to false to prevent the components from auto-focusing any input fields.
+   *
+   * @default true
+   */
+  autoFocus?: boolean;
+
+  /**
+   * Controls the visual elevation of card-based components.
+   *
+   * - `'raised'` (default) — the card renders with its border, box-shadow, border-radius, and padding.
+   * - `'flush'` — removes the card border, box-shadow, border-radius, outer padding, and footer
+   *   background so the component sits flat against its container.
+   *
+   * Applies to all card-based components including `<SignIn />`, `<SignUp />`,
+   * `<Waitlist />`, `<CreateOrganization />`, `<OrganizationList />`,
+   * `<OAuthConsent />`, `<UserVerification />`, and session task components.
+   *
+   * Does **not** affect profile components (`<UserProfile />`, `<OrganizationProfile />`)
+   * or popover components (`<UserButton />`, `<OrganizationSwitcher />`), which always render as raised.
+   *
+   * When a component is opened as a modal, it always renders as raised regardless of this setting.
+   *
+   * @default 'raised'
+   */
+  elevation?: 'raised' | 'flush';
 };
 
 export type CaptchaAppearanceOptions = {
@@ -1024,7 +1061,7 @@ export type CheckoutTheme = Theme;
 export type PlanDetailTheme = Theme;
 export type SubscriptionDetailsTheme = Theme;
 export type APIKeysTheme = Theme;
-export type __experimental_ConfigureSSOTheme = Theme;
+export type ConfigureSSOTheme = Theme;
 export type OAuthConsentTheme = Theme;
 export type TaskChooseOrganizationTheme = Theme;
 export type TaskResetPasswordTheme = Theme;
@@ -1104,7 +1141,7 @@ export type Appearance<T = Theme> = T &
     /**
      * Theme overrides that only apply to the `<ConfigureSSO />` component
      */
-    __experimental_configureSSO?: T;
+    configureSSO?: T;
     /**
      * Theme overrides that only apply to the `<OAuthConsent />` component
      */

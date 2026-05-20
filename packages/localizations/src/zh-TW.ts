@@ -147,7 +147,7 @@ export const zhTW: LocalizationResource = {
       },
     },
     paymentMethods__label: '付款方式',
-    popular: '熱門',
+    highlightedPlanBadge: '熱門',
     pricingTable: {
       billingCycle: '計費週期',
       included: '包含',
@@ -185,8 +185,50 @@ export const zhTW: LocalizationResource = {
     year: '年',
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: '請聯絡您的組織管理員以取得管理企業連線的權限。',
+      title: '您沒有管理企業連線的權限',
+    },
     navbar: {
       title: '設定單一登入 (SSO)',
+    },
+    selectProviderStep: {
+      title: '選擇提供者',
+      subtitle: '選擇您要為其設定 SSO 的提供者。',
+      body: {
+        title: '選擇您的身分提供者',
+        description: '接下來我們將引導您完成詳細的設定流程。',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: '自訂 SAML 提供者',
+      },
+      warning: '選擇提供者後,在設定完成之前無法再次變更',
+    },
+    verifyEmailDomainStep: {
+      title: '驗證電子郵件地址',
+      subtitle: '驗證您想要啟用企業連線的電子郵件地址。',
+      addEmailAddress: {
+        formTitle: '我們需要您的電子郵件',
+        formSubtitle: '為了開始，我們需要您的電子郵件地址',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: '電子郵件地址',
+      },
+      emailCode: {
+        formTitle: '驗證您的電子郵件地址',
+        formSubtitle: '輸入發送到 {{identifier}} 的驗證碼',
+        resendButton: '沒有收到驗證碼？重新發送',
+        verified: {
+          title: '我們已收到您的電子郵件',
+          subtitle: '您已使用以下電子郵件驗證了您的電子郵件地址',
+          inputLabel: '已驗證的電子郵件地址',
+        },
+      },
+      domainTaken: {
+        title: '此網域 ({{domain}}) 已存在 SSO 連線',
+        subtitle: '請聯絡應用程式管理員，透過現有連線取得存取權限。',
+      },
     },
   },
   createOrganization: {

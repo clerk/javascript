@@ -37,8 +37,10 @@ describe('M2MToken', () => {
       server.use(
         http.post(
           'https://api.clerk.test/m2m_tokens',
-          validateHeaders(({ request }) => {
+          validateHeaders(async ({ request }) => {
             expect(request.headers.get('Authorization')).toBe('Bearer ak_xxxxx');
+            const body = (await request.json()) as Record<string, unknown>;
+            expect(body.min_remaining_ttl_seconds).toBe(240);
             return HttpResponse.json(mockM2MToken);
           }),
         ),
@@ -46,6 +48,7 @@ describe('M2MToken', () => {
 
       const response = await apiClient.m2m.createToken({
         secondsUntilExpiration: 3600,
+        minRemainingTtlSeconds: 240,
       });
 
       expect(response.id).toBe(m2mId);
@@ -62,8 +65,10 @@ describe('M2MToken', () => {
       server.use(
         http.post(
           'https://api.clerk.test/m2m_tokens',
-          validateHeaders(({ request }) => {
+          validateHeaders(async ({ request }) => {
             expect(request.headers.get('Authorization')).toBe('Bearer ak_xxxxx');
+            const body = (await request.json()) as Record<string, unknown>;
+            expect(body.min_remaining_ttl_seconds).toBe(240);
             return HttpResponse.json(mockM2MToken);
           }),
         ),
@@ -72,6 +77,7 @@ describe('M2MToken', () => {
       const response = await apiClient.m2m.createToken({
         machineSecretKey: 'ak_xxxxx',
         secondsUntilExpiration: 3600,
+        minRemainingTtlSeconds: 240,
       });
 
       expect(response.id).toBe(m2mId);
