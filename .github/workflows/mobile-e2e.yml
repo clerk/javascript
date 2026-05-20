@@ -892,34 +892,26 @@ jobs:
           # DIRECTORY; with explicit file paths Maestro runs every file
           # regardless of tag. We want per-flow invocation (so one
           # crash/hang can't poison the rest) AND tag filtering, so
-          # pre-filter the file list here in shell.
+          # pre-filter the file list. macOS ships bash 3.2 (no mapfile),
+          # so this uses a portable pipe: skip-messages go to stderr so
+          # only kept paths flow into xargs.
           excluded="$EXCLUDE_TAGS,androidOnly"
-          # Build a grep -E alternation: '^\s*-\s*(tag1|tag2|...)\s*$'
-          pattern="^[[:space:]]*-[[:space:]]*($(echo "$excluded" | sed 's/,/|/g'))[[:space:]]*$"
-          mapfile -d '' files < <(
-            find flows -type f -name "*.yaml" ! -path "*/common/*" \
-              ${FLOWS_FILTER:+-path "*$FLOWS_FILTER*"} -print0
-          )
-          kept=()
-          for f in "${files[@]}"; do
-            if grep -qE "$pattern" "$f"; then
-              echo "::group::Skip $f (matches excluded tag in $excluded)"
-              grep -E "$pattern" "$f"
-              echo "::endgroup::"
-            else
-              kept+=("$f")
-            fi
-          done
-          if [ "${#kept[@]}" -eq 0 ]; then
-            echo "::warning::No flows left to run after tag filter"
-            exit 0
-          fi
-          # `xargs -n 1` runs maestro test once per flow so a hanging
-          # flow can't poison the rest.
-          printf '%s\0' "${kept[@]}" | xargs -0 -n 1 maestro test \
-            --env CLERK_TEST_EMAIL="$CLERK_TEST_EMAIL" \
-            --env CLERK_TEST_PASSWORD="$CLERK_TEST_PASSWORD" \
-            --flatten-debug-output
+          pattern="$(echo "$excluded" | sed 's/,/|/g')"
+          find flows -type f -name '*.yaml' ! -path '*/common/*' \
+            ${FLOWS_FILTER:+-path "*$FLOWS_FILTER*"} | \
+            while IFS= read -r f; do
+              if grep -qE "^[[:space:]]*-[[:space:]]*(${pattern})[[:space:]]*\$" "$f"; then
+                echo "::group::Skip $f (matches excluded tag in ${excluded})" >&2
+                grep -E "^[[:space:]]*-[[:space:]]*(${pattern})[[:space:]]*\$" "$f" >&2
+                echo "::endgroup::" >&2
+              else
+                printf '%s\n' "$f"
+              fi
+            done | \
+            xargs -n 1 maestro test \
+              --env CLERK_TEST_EMAIL="$CLERK_TEST_EMAIL" \
+              --env CLERK_TEST_PASSWORD="$CLERK_TEST_PASSWORD" \
+              --flatten-debug-output
 
       - name: Upload Maestro artifacts on failure or cancel
         if: failure() || cancelled()
