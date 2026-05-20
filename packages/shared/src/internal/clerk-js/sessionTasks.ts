@@ -69,3 +69,27 @@ export function warnMissingPendingTaskHandlers(options: Record<string, unknown>)
     `Clerk: Session has pending tasks but no handling is configured. To handle pending tasks, provide either "taskUrls" for navigation to custom URLs or "navigate" for programmatic navigation. Without these options, users may get stuck on incomplete flows.`,
   );
 }
+
+/**
+ * Warns when a session is in the `pending` state. Mirrors the behavior of
+ * `SessionStatusLogger` on iOS / Android so developers across platforms get the
+ * same heads-up that the SDK is treating their signed-in user as signed out
+ * until the remaining session task is resolved.
+ *
+ * Dedupe is per-session/per-task: a new pending session or a task transition
+ * within the same session both surface a fresh log line.
+ */
+export function warnPendingSessionStatus(session: Pick<SessionResource, 'id' | 'status' | 'currentTask'>) {
+  if (session.status !== 'pending') {
+    return;
+  }
+
+  const taskKey = session.currentTask?.key;
+  const tasksDescription = taskKey ? ` Remaining session tasks: [${taskKey}].` : '';
+
+  logger.warnOnce(
+    `Clerk: Session ${session.id} is currently pending. ` +
+      `\`isSignedIn\` will return false and \`useAuth\` will report the user as signed out ` +
+      `until the remaining session tasks are completed.${tasksDescription}`,
+  );
+}
