@@ -141,7 +141,7 @@ export const plPL: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -186,6 +186,20 @@ export const plPL: LocalizationResource = {
     },
     navbar: {
       title: 'Skonfiguruj logowanie jednokrotne (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Wybierz dostawcę',
+      subtitle: 'Wybierz dostawcę, dla którego skonfigurujesz SSO.',
+      body: {
+        title: 'Wybierz swojego dostawcę tożsamości',
+        description: 'Następnie przeprowadzimy Cię przez szczegółowy proces konfiguracji.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Niestandardowy dostawca SAML',
+      },
+      warning: 'Po wybraniu dostawcy nie można go ponownie zmienić aż do zakończenia konfiguracji',
     },
     verifyEmailDomainStep: {
       title: 'Zweryfikuj adres e-mail',

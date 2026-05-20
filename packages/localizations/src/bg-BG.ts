@@ -142,7 +142,7 @@ export const bgBG: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -187,6 +187,20 @@ export const bgBG: LocalizationResource = {
     },
     navbar: {
       title: 'Конфигуриране на единен вход (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Изберете доставчик',
+      subtitle: 'Изберете доставчика, за който ще конфигурирате SSO.',
+      body: {
+        title: 'Изберете вашия доставчик на идентичност',
+        description: 'Ще ви преведем през подробния процес на настройка след това.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Персонализиран SAML доставчик',
+      },
+      warning: 'След като изберете доставчик, не можете да го промените, докато конфигурацията не приключи',
     },
     verifyEmailDomainStep: {
       title: 'Потвърди имейл адреса',

@@ -146,7 +146,7 @@ export const faIR: LocalizationResource = {
       },
     },
     paymentMethods__label: 'روش های پرداخت',
-    popular: 'محبوب',
+    highlightedPlanBadge: 'محبوب',
     pricingTable: {
       billingCycle: 'چرخه صورتحساب',
       included: 'شامل',
@@ -190,6 +190,20 @@ export const faIR: LocalizationResource = {
     },
     navbar: {
       title: 'پیکربندی ورود یکپارچه (SSO)',
+    },
+    selectProviderStep: {
+      title: 'ارائه‌دهنده را انتخاب کنید',
+      subtitle: 'ارائه‌دهنده‌ای را که می‌خواهید SSO را برای آن راه‌اندازی کنید، انتخاب کنید.',
+      body: {
+        title: 'ارائه‌دهنده هویت خود را انتخاب کنید',
+        description: 'در ادامه شما را در فرآیند راه‌اندازی دقیق راهنمایی خواهیم کرد.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'ارائه‌دهنده SAML سفارشی',
+      },
+      warning: 'پس از انتخاب یک ارائه‌دهنده، نمی‌توانید آن را تا پایان پیکربندی تغییر دهید',
     },
     verifyEmailDomainStep: {
       title: 'تأیید آدرس ایمیل',

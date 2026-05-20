@@ -154,7 +154,7 @@ export const nbNO: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Betalingsmetoder',
-    popular: 'Populær',
+    highlightedPlanBadge: 'Populær',
     pricingTable: {
       billingCycle: 'Faktureringsperiode',
       included: 'Inkludert',
@@ -214,6 +214,20 @@ export const nbNO: LocalizationResource = {
     },
     navbar: {
       title: 'Konfigurer enkeltpålogging (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Velg leverandør',
+      subtitle: 'Velg leverandøren du skal konfigurere SSO for.',
+      body: {
+        title: 'Velg din identitetsleverandør',
+        description: 'Vi veileder deg gjennom den detaljerte konfigurasjonsprosessen neste gang.',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Egendefinert SAML-leverandør',
+      },
+      warning: 'Når en leverandør er valgt, kan du ikke endre igjen før konfigurasjonen er ferdig',
     },
     verifyEmailDomainStep: {
       title: 'Verifiser e-postadresse',

@@ -152,7 +152,7 @@ export const jaJP: LocalizationResource = {
       },
     },
     paymentMethods__label: '支払い方法',
-    popular: '人気',
+    highlightedPlanBadge: '人気',
     pricingTable: {
       billingCycle: '請求サイクル',
       included: '含まれる内容',
@@ -196,6 +196,20 @@ export const jaJP: LocalizationResource = {
     },
     navbar: {
       title: 'シングルサインオン（SSO）を設定',
+    },
+    selectProviderStep: {
+      title: 'プロバイダーを選択',
+      subtitle: 'SSOを設定するプロバイダーを選択してください。',
+      body: {
+        title: 'IDプロバイダーを選択してください',
+        description: '次に、詳細な設定プロセスをご案内します。',
+      },
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'カスタムSAMLプロバイダー',
+      },
+      warning: 'プロバイダーを選択すると、設定が完了するまで変更できません',
     },
     verifyEmailDomainStep: {
       title: 'メールアドレスを確認',

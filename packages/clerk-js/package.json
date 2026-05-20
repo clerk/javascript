@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "6.10.1",
+  "version": "6.11.3",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -91,6 +91,7 @@
     "@solana/wallet-standard": "catalog:module-manager",
     "@stripe/stripe-js": "5.6.0",
     "@swc/helpers": "catalog:repo",
+    "@tanstack/query-core": "catalog:repo",
     "@wallet-standard/core": "catalog:module-manager",
     "@zxcvbn-ts/core": "catalog:module-manager",
     "@zxcvbn-ts/language-common": "catalog:module-manager",

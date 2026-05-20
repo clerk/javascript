@@ -1,6 +1,6 @@
 {
   "name": "@clerk/msw",
-  "version": "0.0.23",
+  "version": "0.0.27",
   "private": true,
   "sideEffects": false,
   "type": "module",
@@ -18,7 +18,7 @@
     "msw": "2.13.6"
   },
   "peerDependencies": {
-    "next": ">=15.0.0",
+    "next": ">=15.5.18",
     "react": "catalog:peer-react"
   }
 }

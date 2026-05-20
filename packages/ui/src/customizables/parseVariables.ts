@@ -177,8 +177,8 @@ export const createFontWeightScale = (theme: Theme): Partial<Record<keyof typeof
 };
 
 export const createFonts = (theme: Theme) => {
-  const { fontFamily, fontFamilyButtons } = theme.variables || {};
-  return removeUndefinedProps({ main: fontFamily, buttons: fontFamilyButtons });
+  const { fontFamily, fontFamilyButtons, fontFamilyMono } = theme.variables || {};
+  return removeUndefinedProps({ main: fontFamily, buttons: fontFamilyButtons, mono: fontFamilyMono });
 };
 
 export const createShadowsUnits = (theme: Theme) => {

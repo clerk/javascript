@@ -281,12 +281,25 @@ function otherOptions() {
     localization: document.getElementById('localizationSelect') as HTMLSelectElement,
   };
 
+  const elevationSelect = document.getElementById('elevationSelect') as HTMLSelectElement;
+  const devWarningsToggle = document.getElementById('devWarningsToggle') as HTMLInputElement;
+
   Object.entries(otherOptionsInputs).forEach(([key, input]) => {
     const savedValue = sessionStorage.getItem(key);
     if (savedValue) {
       input.value = savedValue;
     }
   });
+
+  const savedElevation = sessionStorage.getItem('elevation');
+  if (savedElevation) {
+    elevationSelect.value = savedElevation;
+  }
+
+  const savedDevWarnings = sessionStorage.getItem('devWarnings');
+  if (savedDevWarnings !== null) {
+    devWarningsToggle.checked = savedDevWarnings === 'on';
+  }
 
   const updateOtherOptions = () => {
     void Clerk.__internal_updateProps({
@@ -304,16 +317,40 @@ function otherOptions() {
     });
   };
 
+  const updateAppearanceOptions = () => {
+    sessionStorage.setItem('elevation', elevationSelect.value);
+    sessionStorage.setItem('devWarnings', devWarningsToggle.checked ? 'on' : 'off');
+    const currentAppearance = Clerk.__internal_getOption('appearance') ?? {};
+    void Clerk.__internal_updateProps({
+      appearance: {
+        ...currentAppearance,
+        options: {
+          ...(currentAppearance as any).options,
+          elevation: elevationSelect.value as 'raised' | 'flush',
+          unsafe_disableDevelopmentModeWarnings: !devWarningsToggle.checked,
+        },
+      },
+    });
+  };
+
   Object.values(otherOptionsInputs).forEach(input => {
     input.addEventListener('change', updateOtherOptions);
   });
 
+  elevationSelect.addEventListener('change', updateAppearanceOptions);
+  devWarningsToggle.addEventListener('change', updateAppearanceOptions);
+
   resetOtherOptionsBtn?.addEventListener('click', () => {
     otherOptionsInputs.localization.value = 'enUS';
+    elevationSelect.value = 'raised';
+    devWarningsToggle.checked = true;
+    sessionStorage.removeItem('elevation');
+    sessionStorage.removeItem('devWarnings');
     updateOtherOptions();
+    updateAppearanceOptions();
   });
 
-  return { updateOtherOptions };
+  return { updateOtherOptions, updateAppearanceOptions };
 }
 
 const themes: Record<string, unknown> = {
@@ -411,7 +448,7 @@ void (async () => {
   const { updateVariables } = appearanceVariableOptions();
   const { updateTheme } = themeSelector();
   const { updatePreset } = presetSelector();
-  const { updateOtherOptions } = otherOptions();
+  const { updateOtherOptions, updateAppearanceOptions } = otherOptions();
 
   const sidebars = document.querySelectorAll('[data-sidebar]');
   document.addEventListener('keydown', e => {
@@ -471,7 +508,7 @@ void (async () => {
       Clerk.mountAPIKeys(app, componentControls.apiKeys.getProps() ?? {});
     },
     '/configure-sso': () => {
-      Clerk.__experimental_mountConfigureSSO(app, componentControls.configureSSO.getProps() ?? {});
+      Clerk.mountConfigureSSO(app, componentControls.configureSSO.getProps() ?? {});
     },
     '/oauth-consent': () => {
       const searchParams = new URLSearchParams(window.location.search);
@@ -540,6 +577,15 @@ void (async () => {
     const initialTheme = initialThemeName ? themes[initialThemeName] : undefined;
     const initialPresetName = sessionStorage.getItem('preset') ?? '';
     const initialPreset = initialPresetName ? presets[initialPresetName] : undefined;
+    const initialElevation = sessionStorage.getItem('elevation') as 'raised' | 'flush' | null;
+    const initialDevWarnings = sessionStorage.getItem('devWarnings');
+    const initialAppearanceOptions: Record<string, unknown> = {};
+    if (initialElevation) {
+      initialAppearanceOptions.elevation = initialElevation;
+    }
+    if (initialDevWarnings === 'off') {
+      initialAppearanceOptions.unsafe_disableDevelopmentModeWarnings = true;
+    }
 
     await Clerk.load({
       ...(componentControls.clerk.getProps() ?? {}),
@@ -549,6 +595,7 @@ void (async () => {
       appearance: {
         ...(initialTheme ? { theme: initialTheme } : {}),
         ...presetToAppearance(initialPreset),
+        ...(Object.keys(initialAppearanceOptions).length ? { options: initialAppearanceOptions } : {}),
       },
     });
     renderCurrentRoute();
@@ -560,6 +607,7 @@ void (async () => {
       updateVariables();
     }
     updateOtherOptions();
+    updateAppearanceOptions();
   } else {
     console.error(`Unknown route: "${route}".`);
   }
