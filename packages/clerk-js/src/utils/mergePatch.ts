@@ -1,3 +1,5 @@
+import { dequal } from 'dequal';
+
 /**
  * Computes a JSON Merge Patch (RFC 7396) that, when deep-merged into `current`,
  * produces `desired`. Keys present in `current` but absent from `desired`
@@ -38,7 +40,7 @@ export function computeMergePatch(current: unknown, desired: unknown): unknown {
         continue;
       }
       patch[key] = sub;
-    } else if (!deepEqual(cur, des)) {
+    } else if (!dequal(cur, des)) {
       patch[key] = des;
     }
   }
@@ -53,32 +55,7 @@ export function computeMergePatch(current: unknown, desired: unknown): unknown {
 }
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-function deepEqual(a: unknown, b: unknown): boolean {
-  if (a === b) {
-    return true;
-  }
-  if (typeof a !== typeof b || a === null || b === null) {
-    return false;
-  }
-  if (Array.isArray(a)) {
-    if (!Array.isArray(b) || a.length !== b.length) {
-      return false;
-    }
-    return a.every((v, i) => deepEqual(v, b[i]));
-  }
-  if (typeof a === 'object') {
-    if (typeof b !== 'object' || Array.isArray(b)) {
-      return false;
-    }
-    const aKeys = Object.keys(a as Record<string, unknown>);
-    const bKeys = Object.keys(b as Record<string, unknown>);
-    if (aKeys.length !== bKeys.length) {
-      return false;
-    }
-    return aKeys.every(k => deepEqual((a as Record<string, unknown>)[k], (b as Record<string, unknown>)[k]));
-  }
-  return false;
+  if (typeof value !== 'object' || value === null) return false;
+  const proto = Object.getPrototypeOf(value);
+  return proto === null || proto === Object.prototype;
 }

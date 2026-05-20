@@ -102,7 +102,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('unsafeMet
     // against the locally-cached value; the server-side outcome must match
     // a true replace (the original `position` key is gone).
     await page.evaluate(async () => {
-      await (window as any).Clerk.user.update({ unsafeMetadata: { city: 'Toronto' } });
+      await window.Clerk.user.update({ unsafeMetadata: { city: 'Toronto' } });
     });
 
     const refreshed = await u.services.users.getUser({ id: bapiUser.id });
@@ -117,7 +117,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('unsafeMet
     // The recommended migration target. Unlike `update(...)`, this is a
     // partial update — the original `position` key must survive.
     await page.evaluate(async () => {
-      await (window as any).Clerk.user.updateMetadata({ unsafeMetadata: { city: 'Toronto' } });
+      await window.Clerk.user.updateMetadata({ unsafeMetadata: { city: 'Toronto' } });
     });
 
     const refreshed = await u.services.users.getUser({ id: bapiUser.id });
@@ -132,7 +132,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('unsafeMet
     // Mixed call: PATCH /v1/me for the non-metadata field, then
     // PATCH /v1/me/metadata for the computed patch. Both must land.
     await page.evaluate(async () => {
-      await (window as any).Clerk.user.update({
+      await window.Clerk.user.update({
         firstName: 'Updated',
         unsafeMetadata: { city: 'Toronto' },
       });
@@ -161,7 +161,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('unsafeMet
     // send `{ position: null, city: 'Toronto' }`, and the server-side `adminAdded` would silently survive violating replace semantics.
     // The reload makes the SDK observe the fresh state and null-delete the server-added key too.
     await page.evaluate(async () => {
-      await (window as any).Clerk.user.update({ unsafeMetadata: { city: 'Toronto' } });
+      await window.Clerk.user.update({ unsafeMetadata: { city: 'Toronto' } });
     });
 
     const refreshed = await u.services.users.getUser({ id: bapiUser.id });

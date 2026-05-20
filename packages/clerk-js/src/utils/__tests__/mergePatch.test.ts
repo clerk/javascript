@@ -80,4 +80,57 @@ describe('computeMergePatch', () => {
 
     expect(applyMergePatch(current, patch)).toEqual(desired);
   });
+
+  describe('non-POJO values are treated as atomic', () => {
+    it('emits a Date when the value changed', () => {
+      const current = { lastSeen: new Date('2024-01-01T00:00:00Z') };
+      const desired = { lastSeen: new Date('2024-01-02T00:00:00Z') };
+      expect(computeMergePatch(current, desired)).toEqual({
+        lastSeen: new Date('2024-01-02T00:00:00Z'),
+      });
+    });
+
+    it('skips a Date whose value is unchanged', () => {
+      const ts = '2024-01-01T00:00:00.000Z';
+      expect(computeMergePatch({ lastSeen: new Date(ts) }, { lastSeen: new Date(ts) })).toEqual({});
+    });
+
+    it('emits a Map when the value changed', () => {
+      const current = { tags: new Map([['a', 1]]) };
+      const desired = { tags: new Map([['b', 2]]) };
+      expect(computeMergePatch(current, desired)).toEqual({ tags: new Map([['b', 2]]) });
+    });
+
+    it('omits a Map when the value is unchanged', () => {
+      const map = new Map([['a', 1]]);
+      expect(computeMergePatch({ tags: map }, { tags: map })).toEqual({});
+    });
+
+    it('emits a class instance when the value changed', () => {
+      class Tag {
+        constructor(public name: string) {}
+      }
+      const current = { tag: new Tag('one') };
+      const desired = { tag: new Tag('two') };
+      expect(computeMergePatch(current, desired)).toEqual({ tag: new Tag('two') });
+    });
+
+    it('omits a class instance when the value is unchanged', () => {
+      class Tag {
+        constructor(public name: string) {}
+      }
+      const tag = new Tag('one');
+      expect(computeMergePatch({ tag }, { tag })).toEqual({});
+    });
+
+    it('does not match Object.create(null) hash maps as opaque values', () => {
+      // Prototype-less objects with no class identity SHOULD still recurse as POJOs.
+      const current: Record<string, unknown> = Object.create(null);
+      current.a = 1;
+      current.b = 2;
+      const desired: Record<string, unknown> = Object.create(null);
+      desired.a = 1;
+      expect(computeMergePatch(current, desired)).toEqual({ b: null });
+    });
+  });
 });
