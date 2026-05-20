@@ -79,6 +79,11 @@ concurrency:
 jobs:
   android:
     name: Android
+    # Skip Android when the dispatch is scoped to iOS only — used by
+    # clerk-ios's expo-compat release gate (passes clerk_ios_ref without
+    # clerk_android_ref). Manual dispatches without ref inputs still run
+    # both jobs.
+    if: inputs.clerk_ios_ref == '' || inputs.clerk_android_ref != ''
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     timeout-minutes: 45
     defaults:
