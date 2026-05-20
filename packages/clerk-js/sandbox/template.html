@@ -29,7 +29,7 @@
       }
     </style>
     <script>
-      (function() {
+      (function () {
         var saved = localStorage.getItem('clerk-js-sandbox-dark-mode');
         if (saved === 'on' || (saved === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
           document.documentElement.classList.add('dark');
@@ -41,23 +41,30 @@
         connectedCallback() {
           var href = this.getAttribute('href');
           var label = this.getAttribute('label');
-          this.innerHTML = '<li class="relative"><a class="relative isolate flex w-full rounded-md border border-transparent px-2 py-[0.4375rem] text-sm text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground aria-[current]:bg-sidebar-accent aria-[current]:text-sidebar-accent-foreground" href="' + href + '">' + label + '</a></li>';
+          this.innerHTML =
+            '<li class="relative"><a class="relative isolate flex w-full rounded-md border border-transparent px-2 py-[0.4375rem] text-sm text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground aria-[current]:bg-sidebar-accent aria-[current]:text-sidebar-accent-foreground" href="' +
+            href +
+            '">' +
+            label +
+            '</a></li>';
         }
       }
       customElements.define('nav-link', NavLink);
     </script>
   </head>
-  <body class="flex min-h-full flex-col overflow-x-hidden bg-white lg:has-[*[data-sidebar]:not(.hidden)]:pl-72 dark:bg-neutral-950">
+  <body
+    class="flex min-h-full flex-col overflow-x-hidden bg-white lg:has-[*[data-sidebar]:not(.hidden)]:pl-72 dark:bg-neutral-950"
+  >
     <div
       data-sidebar
-      class="fixed inset-y-0 left-0 z-40 w-72 overflow-y-auto border-r border-sidebar-border bg-sidebar text-sidebar-foreground px-2 py-4 max-lg:hidden"
+      class="border-sidebar-border bg-sidebar text-sidebar-foreground fixed inset-y-0 left-0 z-40 w-72 overflow-y-auto border-r px-2 py-4 max-lg:hidden"
     >
-      <header class="mb-2 flex items-center justify-center gap-x-2 border-b border-sidebar-border pb-4">
+      <header class="border-sidebar-border mb-2 flex items-center justify-center gap-x-2 border-b pb-4">
         <svg
           viewBox="0 0 62 18"
           fill="none"
           aria-hidden="true"
-          class="h-[1.125rem] text-sidebar-foreground"
+          class="text-sidebar-foreground h-[1.125rem]"
         >
           <ellipse
             cx="8.99999"
@@ -83,44 +90,114 @@
           ></path>
         </svg>
         <div
-          class="mt-0.5 rounded-full bg-sidebar-accent px-2 py-1 text-[0.625rem]/3 font-medium text-sidebar-muted-foreground ring-1 ring-inset ring-sidebar-border"
+          class="bg-sidebar-accent text-sidebar-muted-foreground ring-sidebar-border mt-0.5 rounded-full px-2 py-1 text-[0.625rem]/3 font-medium ring-1 ring-inset"
         >
           Sandbox
         </div>
       </header>
       <nav>
         <ul role="list">
-          <nav-link href="/" label="Home"></nav-link>
-          <nav-link href="/sign-in" label="Sign In"></nav-link>
-          <nav-link href="/sign-up" label="Sign Up"></nav-link>
-          <nav-link href="/user-avatar" label="User Avatar"></nav-link>
-          <nav-link href="/user-button" label="User Button"></nav-link>
-          <nav-link href="/user-profile" label="User Profile"></nav-link>
-          <nav-link href="/create-organization" label="Create Organization"></nav-link>
-          <nav-link href="/organization-list" label="Organization List"></nav-link>
-          <nav-link href="/organization-profile" label="Organization Profile"></nav-link>
-          <nav-link href="/organization-switcher" label="Organization Switcher"></nav-link>
-          <nav-link href="/waitlist" label="Waitlist"></nav-link>
-          <nav-link href="/keyless" label="Keyless"></nav-link>
-          <nav-link href="/pricing-table" label="PricingTable"></nav-link>
-          <nav-link href="/api-keys" label="API Keys"></nav-link>
-          <nav-link href="/configure-sso" label="ConfigureSSO"></nav-link>
-          <nav-link href="/oauth-consent" label="OAuthConsent"></nav-link>
-          <nav-link href="/task-choose-organization" label="TaskChooseOrganization"></nav-link>
-          <nav-link href="/task-setup-mfa" label="TaskSetupMFA"></nav-link>
-          <nav-link href="/open-sign-in" label="Open sign in"></nav-link>
-          <nav-link href="/open-sign-up" label="Open sign up"></nav-link>
+          <nav-link
+            href="/"
+            label="Home"
+          ></nav-link>
+          <nav-link
+            href="/sign-in"
+            label="Sign In"
+          ></nav-link>
+          <nav-link
+            href="/sign-up"
+            label="Sign Up"
+          ></nav-link>
+          <nav-link
+            href="/user-avatar"
+            label="User Avatar"
+          ></nav-link>
+          <nav-link
+            href="/user-button"
+            label="User Button"
+          ></nav-link>
+          <nav-link
+            href="/user-profile"
+            label="User Profile"
+          ></nav-link>
+          <nav-link
+            href="/create-organization"
+            label="Create Organization"
+          ></nav-link>
+          <nav-link
+            href="/organization-list"
+            label="Organization List"
+          ></nav-link>
+          <nav-link
+            href="/organization-profile"
+            label="Organization Profile"
+          ></nav-link>
+          <nav-link
+            href="/organization-switcher"
+            label="Organization Switcher"
+          ></nav-link>
+          <nav-link
+            href="/waitlist"
+            label="Waitlist"
+          ></nav-link>
+          <nav-link
+            href="/keyless"
+            label="Keyless"
+          ></nav-link>
+          <nav-link
+            href="/pricing-table"
+            label="PricingTable"
+          ></nav-link>
+          <nav-link
+            href="/api-keys"
+            label="API Keys"
+          ></nav-link>
+          <nav-link
+            href="/configure-sso"
+            label="ConfigureSSO"
+          ></nav-link>
+          <nav-link
+            href="/oauth-consent"
+            label="OAuthConsent"
+          ></nav-link>
+          <nav-link
+            href="/task-choose-organization"
+            label="TaskChooseOrganization"
+          ></nav-link>
+          <nav-link
+            href="/task-setup-mfa"
+            label="TaskSetupMFA"
+          ></nav-link>
+          <nav-link
+            href="/open-sign-in"
+            label="Open sign in"
+          ></nav-link>
+          <nav-link
+            href="/open-sign-up"
+            label="Open sign up"
+          ></nav-link>
         </ul>
       </nav>
     </div>
 
     <button
       id="sidebarToggle"
-      class="fixed top-3 left-3 z-50 rounded-md border border-sidebar-border bg-sidebar p-1.5 text-sidebar-foreground lg:hidden"
+      class="border-sidebar-border bg-sidebar text-sidebar-foreground fixed left-3 top-3 z-50 rounded-md border p-1.5 lg:hidden"
       aria-label="Toggle sidebar"
     >
-      <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+      <svg
+        class="size-5"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+        />
       </svg>
     </button>
 
