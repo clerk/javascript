@@ -138,13 +138,13 @@ const SAML_OKTA_ATTRIBUTE_MAPPING: AttributeMappingTableConfig = {
     },
     {
       id: 'firstName',
-      isRequired: true,
+      isRequired: false,
       first: localizationKeys('configureSSO.configureStep.samlOkta.attributeMapping.rows.firstName.name'),
       second: localizationKeys('configureSSO.configureStep.samlOkta.attributeMapping.rows.firstName.value'),
     },
     {
       id: 'lastName',
-      isRequired: true,
+      isRequired: false,
       first: localizationKeys('configureSSO.configureStep.samlOkta.attributeMapping.rows.lastName.name'),
       second: localizationKeys('configureSSO.configureStep.samlOkta.attributeMapping.rows.lastName.value'),
     },
@@ -171,13 +171,13 @@ const SAML_CUSTOM_ATTRIBUTE_MAPPING: AttributeMappingTableConfig = {
     },
     {
       id: 'firstName',
-      isRequired: true,
+      isRequired: false,
       first: localizationKeys('configureSSO.configureStep.samlCustom.attributeMapping.rows.firstName.userProfile'),
       second: localizationKeys('configureSSO.configureStep.samlCustom.attributeMapping.rows.firstName.attributeName'),
     },
     {
       id: 'lastName',
-      isRequired: true,
+      isRequired: false,
       first: localizationKeys('configureSSO.configureStep.samlCustom.attributeMapping.rows.lastName.userProfile'),
       second: localizationKeys('configureSSO.configureStep.samlCustom.attributeMapping.rows.lastName.attributeName'),
     },
@@ -492,14 +492,18 @@ const AttributeMappingTable = ({ config }: { config: AttributeMappingTableConfig
                 sx={config.monoFirst ? { fontFamily: 'monospace' } : undefined}
                 localizationKey={row.first}
               />
-              {row.isRequired && (
-                <Badge
-                  elementDescriptor={descriptors.configureSSOAttributeMappingBadge}
-                  elementId={descriptors.configureSSOAttributeMappingBadge.setId('required')}
-                  colorScheme='warning'
-                  localizationKey={localizationKeys('configureSSO.configureStep.attributeMapping.badges.required')}
-                />
-              )}
+              <Badge
+                elementDescriptor={descriptors.configureSSOAttributeMappingBadge}
+                elementId={descriptors.configureSSOAttributeMappingBadge.setId(
+                  row.isRequired ? 'required' : 'optional',
+                )}
+                colorScheme={row.isRequired ? 'warning' : 'primary'}
+                localizationKey={localizationKeys(
+                  row.isRequired
+                    ? 'configureSSO.configureStep.attributeMapping.badges.required'
+                    : 'configureSSO.configureStep.attributeMapping.badges.optional',
+                )}
+              />
             </Flex>
           </Td>
           <Td>
