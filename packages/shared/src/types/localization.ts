@@ -1415,6 +1415,7 @@ export type __internal_LocalizationResource = {
         columns: {
           attribute: LocalizationValue;
           claimName: LocalizationValue;
+          claimValue: LocalizationValue;
         };
         badges: {
           required: LocalizationValue;

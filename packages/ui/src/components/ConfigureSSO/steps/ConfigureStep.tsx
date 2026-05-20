@@ -113,18 +113,25 @@ const ATTRIBUTE_ROWS = [
     isRequired: true,
     attribute: localizationKeys('configureSSO.configureStep.attributeMapping.rows.email.attribute'),
     claim: localizationKeys('configureSSO.configureStep.attributeMapping.rows.email.claim'),
+    oktaClaimValue: localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.pairs.email.expression'),
   },
   {
     id: 'firstName',
     isRequired: false,
     attribute: localizationKeys('configureSSO.configureStep.attributeMapping.rows.firstName.attribute'),
     claim: localizationKeys('configureSSO.configureStep.attributeMapping.rows.firstName.claim'),
+    oktaClaimValue: localizationKeys(
+      'configureSSO.configureStep.samlOkta.configureAttributes.pairs.firstName.expression',
+    ),
   },
   {
     id: 'lastName',
     isRequired: false,
     attribute: localizationKeys('configureSSO.configureStep.attributeMapping.rows.lastName.attribute'),
     claim: localizationKeys('configureSSO.configureStep.attributeMapping.rows.lastName.claim'),
+    oktaClaimValue: localizationKeys(
+      'configureSSO.configureStep.samlOkta.configureAttributes.pairs.lastName.expression',
+    ),
   },
 ] as const;
 
@@ -328,6 +335,7 @@ export const ConfigureAttributesSubStep = (): JSX.Element => {
   const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
 
   const { provider } = useConfigureSSO();
+  const isOkta = provider === 'saml_okta';
 
   return (
     <>
@@ -363,6 +371,17 @@ export const ConfigureAttributesSubStep = (): JSX.Element => {
                     localizationKey={localizationKeys('configureSSO.configureStep.attributeMapping.columns.claimName')}
                   />
                 </Th>
+
+                {isOkta && (
+                  <Th>
+                    <Text
+                      sx={theme => ({ fontSize: theme.fontSizes.$xs })}
+                      localizationKey={localizationKeys(
+                        'configureSSO.configureStep.attributeMapping.columns.claimValue',
+                      )}
+                    />
+                  </Th>
+                )}
               </Tr>
             </Thead>
 
@@ -398,12 +417,22 @@ export const ConfigureAttributesSubStep = (): JSX.Element => {
                       localizationKey={row.claim}
                     />
                   </Td>
+
+                  {isOkta && (
+                    <Td>
+                      <Text
+                        as='span'
+                        sx={{ fontFamily: 'monospace' }}
+                        localizationKey={row.oktaClaimValue}
+                      />
+                    </Td>
+                  )}
                 </Tr>
               ))}
             </Tbody>
           </Table>
 
-          {provider === 'saml_okta' && <OktaConfigureAttributesStepContent />}
+          {isOkta && <OktaConfigureAttributesStepContent />}
         </Step.Section>
       </Step.Body>
 
