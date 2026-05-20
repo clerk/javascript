@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { constants, SUPPORTED_BAPI_VERSION } from '../../constants';
+import { constants } from '../../constants';
 import { TokenVerificationError, TokenVerificationErrorReason } from '../../errors';
 import type { AuthenticateContext } from '../authenticateContext';
 import { HandshakeService } from '../handshake';
