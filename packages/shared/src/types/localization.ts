@@ -1348,6 +1348,10 @@ export type __internal_LocalizationResource = {
         status__success: LocalizationValue;
         status__failed: LocalizationValue;
         status__pending: LocalizationValue;
+        empty: {
+          title: LocalizationValue;
+          subtitle: LocalizationValue;
+        };
       };
       testRunDetails: {
         title: LocalizationValue;

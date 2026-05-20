@@ -278,12 +278,16 @@ export const enUS: LocalizationResource = {
         actionLabel__open: 'Open test URL',
       },
       testResults: {
-        title: 'Test results',
+        title: 'Your test results',
         actionLabel__refresh: 'Refresh logs',
         polling: 'Waiting for the test run to complete…',
         status__success: 'Success',
         status__failed: 'Failed',
         status__pending: 'Pending',
+        empty: {
+          title: 'No test results',
+          subtitle: 'Use the button above to start running tests',
+        },
       },
       testRunDetails: {
         title: 'Test run',

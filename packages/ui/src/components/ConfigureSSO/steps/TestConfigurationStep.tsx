@@ -139,7 +139,6 @@ export const TestConfigurationStep = (): JSX.Element => {
                 pageSize={TEST_RUNS_PAGE_SIZE}
                 totalCount={totalCount ?? 0}
                 onPageChange={setCurrentPage}
-                onTestRunCreated={handleTestRunCreated}
               />
             </Col>
           </Step.Section>
@@ -232,7 +231,6 @@ type TestResultsTableProps = {
   rows: EnterpriseConnectionTestRunResource[];
   isLoading: boolean;
   isPolling: boolean;
-  onTestRunCreated?: (testUrl: string) => void;
   page: number;
   pageCount: number;
   pageSize: number;
@@ -244,7 +242,6 @@ const TestResultsTable = ({
   rows,
   isLoading,
   isPolling,
-  onTestRunCreated,
   page,
   pageCount,
   pageSize,
@@ -338,11 +335,26 @@ const TestResultsTable = ({
                 <Td colSpan={TEST_RESULTS_TABLE_COLUMN_COUNT}>
                   <Flex
                     elementDescriptor={descriptors.configureSSOTestResultsEmpty}
+                    direction='col'
                     align='center'
                     justify='center'
-                    sx={t => ({ padding: `${t.space.$10} 0`, flex: 1 })}
+                    sx={t => ({
+                      padding: `${t.space.$10} 0`,
+                      flex: 1,
+                      gap: t.space.$1,
+                      textAlign: 'center',
+                    })}
                   >
-                    <OpenTestUrlButton onTestRunCreated={onTestRunCreated} />
+                    <Text
+                      variant='subtitle'
+                      localizationKey={localizationKeys('configureSSO.testConfigurationStep.testResults.empty.title')}
+                    />
+                    <Text
+                      colorScheme='secondary'
+                      localizationKey={localizationKeys(
+                        'configureSSO.testConfigurationStep.testResults.empty.subtitle',
+                      )}
+                    />
                   </Flex>
                 </Td>
               </Tr>
