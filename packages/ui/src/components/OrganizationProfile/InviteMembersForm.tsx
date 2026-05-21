@@ -12,13 +12,18 @@ import { handleError } from '@/ui/utils/errorHandler';
 import { createListFormat } from '@/ui/utils/passwordUtils';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
-import { useEnvironment } from '../../contexts';
+import { useEnvironment, useSubscription } from '../../contexts';
 import { Flex } from '../../customizables';
 import { useFetchRoles } from '../../hooks/useFetchRoles';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys, useLocalizations } from '../../localization';
 import { mqu } from '../../styledSystem';
 import { RoleSelect } from './MemberListTable';
+import {
+  getPaidSeatsUnitTier,
+  getSeatUnitPrice,
+  organizationAndInvitationsExceedsPurchasedSeats,
+} from '@/utils/billingPlanSeats';
 
 const isEmail = (str: string) => /^\S+@\S+\.\S+$/.test(str);
 
@@ -37,6 +42,8 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
       keepPreviousData: true,
     },
   });
+  const { data: subscription } = useSubscription();
+  const activeSubscriptionItem = subscription?.subscriptionItems.find(si => si.status === 'active');
   const card = useCardState();
   const { t, locale } = useLocalizations();
   const [isValidUnsubmittedEmail, setIsValidUnsubmittedEmail] = useState(false);
@@ -74,6 +81,14 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
   } = emailAddressField;
 
   const canSubmit = (!!emailAddressField.value.length || isValidUnsubmittedEmail) && !!roleField.value;
+  const emailAddresses = emailAddressField.value.split(',');
+
+  const seatUnitPrice = activeSubscriptionItem ? getSeatUnitPrice(activeSubscriptionItem.plan) : null;
+  const paidSeatsTier = seatUnitPrice ? getPaidSeatsUnitTier(seatUnitPrice) : null;
+  const isPerSeatCostPlan = !!paidSeatsTier;
+  const mustPurchaseSeats =
+    isPerSeatCostPlan &&
+    organizationAndInvitationsExceedsPurchasedSeats(activeSubscriptionItem, organization, emailAddresses.length);
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -84,7 +99,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
     const submittedData = new FormData(e.currentTarget);
     return organization
       .inviteMembers({
-        emailAddresses: emailAddressField.value.split(','),
+        emailAddresses,
         role: submittedData.get('role') as string,
       })
       .then(async () => {
@@ -176,7 +191,11 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
           <Form.SubmitButton
             block={false}
             isDisabled={!canSubmit}
-            localizationKey={localizationKeys('organizationProfile.invitePage.formButtonPrimary__continue')}
+            localizationKey={
+              isPerSeatCostPlan && mustPurchaseSeats
+                ? localizationKeys('organizationProfile.invitePage.formButtonPrimary__purchaseSeats')
+                : localizationKeys('organizationProfile.invitePage.formButtonPrimary__continue')
+            }
           />
           <Form.ResetButton
             localizationKey={resetButtonLabel || localizationKeys('userProfile.formButtonReset')}

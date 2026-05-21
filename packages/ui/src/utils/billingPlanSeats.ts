@@ -3,6 +3,8 @@ import type {
   BillingPerUnitTotalTier,
   BillingPlanResource,
   BillingPlanUnitPrice,
+  BillingPlanUnitPriceTier,
+  BillingSubscriptionItemResource,
   OrganizationResource,
 } from '@clerk/shared/types';
 
@@ -86,6 +88,26 @@ export const getIncludedSeatsUnitTotalTier = (
   return null;
 };
 
+export const getPaidSeatsUnitTier = (unitPrice: BillingPlanUnitPrice | null): BillingPlanUnitPriceTier | null => {
+  if (!unitPrice) {
+    return null;
+  }
+
+  if (unitPrice.tiers.length === 1 && unitPrice.tiers[0].feePerBlock.amount > 0) {
+    return unitPrice.tiers[0];
+  }
+
+  if (
+    unitPrice.tiers.length === 2 &&
+    unitPrice.tiers[0].feePerBlock.amount === 0 &&
+    unitPrice.tiers[1].feePerBlock.amount > 0
+  ) {
+    return unitPrice.tiers[1];
+  }
+
+  return null;
+};
+
 /**
  * Given a plan, return the seat limit for the plan, or undefined if the plan does not have a seat limit.
  */
@@ -113,4 +135,19 @@ export const organizationExceedsPlanSeatLimit = (
   }
 
   return organization.membersCount + organization.pendingInvitationsCount > seatLimit;
+};
+
+export const organizationAndInvitationsExceedsPurchasedSeats = (
+  subscriptionItem: BillingSubscriptionItemResource | undefined,
+  organization: OrganizationResource,
+  invitationsCount: number,
+): boolean => {
+  if (!subscriptionItem || !subscriptionItem.seats || !subscriptionItem.seats.quantity) {
+    return false;
+  }
+
+  return (
+    organization.membersCount + organization.pendingInvitationsCount + invitationsCount >
+    subscriptionItem.seats.quantity
+  );
 };
