@@ -38,9 +38,13 @@ Pod::Spec.new do |s|
   # Only include the module files in the pod (both Swift and ObjC bridges).
   # ClerkViewFactory.swift (with views) is injected into the app target by the config plugin
   # because it uses `import ClerkKit` which is only available via SPM in the app target.
+  # ClerkAuthLogic.swift holds pure-logic predicates (no ClerkKit / UIKit imports)
+  # that both the pod-included code AND the in-app ClerkViewFactory.swift call,
+  # so the XCTest target exercises the same code production runs against.
   s.source_files = "ClerkExpoModule.swift", "ClerkExpoModule.m",
                    "ClerkAuthViewManager.swift", "ClerkAuthViewManager.m",
-                   "ClerkUserProfileViewManager.swift", "ClerkUserProfileViewManager.m"
+                   "ClerkUserProfileViewManager.swift", "ClerkUserProfileViewManager.m",
+                   "ClerkAuthLogic.swift"
 
   # XCTest unit tests. Cocoapods generates an "ClerkExpo-Unit-Tests" scheme when
   # the pod is installed with `pod install`, which can be run via:

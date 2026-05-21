@@ -319,7 +319,13 @@ public class ClerkAuthNativeView: UIView {
   /// If a previous modal is still dismissing, waits for its transition coordinator
   /// to finish — no fixed delays.
   private func presentWhenReady(_ authVC: UIViewController, attempts: Int) {
-    guard !isInvalidated, presentedAuthVC == nil, attempts < 30 else { return }
+    // Bail-out predicate is in ClerkPresentationLogic so XCTest exercises
+    // the same code production runs against.
+    guard ClerkPresentationLogic.shouldProceedWithPresentation(
+      isInvalidated: isInvalidated,
+      hasPresentedAuthVC: presentedAuthVC != nil,
+      attempts: attempts
+    ) else { return }
     guard let rootVC = Self.topViewController() else {
       DispatchQueue.main.async { [weak self] in
         self?.presentWhenReady(authVC, attempts: attempts + 1)

@@ -1,48 +1,16 @@
 // ClerkViewFactoryTests
 //
-// Tests for the session-id comparison logic used by
-// ClerkAuthWrapperViewController.viewDidDisappear in ClerkViewFactory.swift.
+// Exercises the session-id comparison used by
+// `ClerkAuthWrapperViewController.viewDidDisappear` in ClerkViewFactory.swift.
 //
-// The core of the fix is deciding — when the auth modal disappears — whether
-// the disappearance is a *successful sign-in* (a new session exists) or a
-// *user cancel* (no session, or the same session as before).
-//
-// The original code in ClerkViewFactory.swift reads:
-//
-//   override func viewDidDisappear(_ animated: Bool) {
-//     super.viewDidDisappear(animated)
-//     if isBeingDismissed {
-//       if let session = Clerk.shared.session, session.id != initialSessionId {
-//         completeOnce(.success(["sessionId": session.id, "type": "signIn"]))
-//       } else {
-//         completeOnce(.success(["cancelled": true]))
-//       }
-//     }
-//   }
-//
-// The UIKit / ClerkKit side of that method is not unit-testable without a
-// running app (that part is covered by Maestro flows). What IS testable is
-// the comparison that decides success-vs-cancel. We extract that comparison
-// into a small pure helper and exercise the four meaningful transitions.
+// The UIKit / ClerkKit side of viewDidDisappear is not unit-testable without
+// a host app (Maestro covers it). The success-vs-cancel decision IS testable
+// — it's a pure comparison that lives in `ClerkAuthSessionLogic` in the pod
+// source files, so both the production call site (ClerkViewFactory.swift)
+// and this test target call the same function.
 
 import XCTest
-
-/// Pure-logic mirror of the comparison used in
-/// `ClerkAuthWrapperViewController.viewDidDisappear`.
-///
-/// Returns `true` when the disappearance should be treated as a successful
-/// auth (a new, different session is present). Returns `false` when it
-/// should be treated as a cancellation.
-///
-/// The real code is:
-///   `if let session = Clerk.shared.session, session.id != initialSessionId { success } else { cancel }`
-///
-/// This helper encodes the same rule so we can test the four cases below
-/// without needing the Clerk SDK or UIKit.
-fileprivate func isSuccessfulAuth(initialSessionId: String?, currentSessionId: String?) -> Bool {
-    guard let current = currentSessionId else { return false }
-    return current != initialSessionId
-}
+@testable import ClerkExpo
 
 final class ClerkViewFactoryTests: XCTestCase {
 
@@ -53,7 +21,7 @@ final class ClerkViewFactoryTests: XCTestCase {
     /// treated as a success, not a cancel.
     func testSessionIdNilToNonNilIsSuccess() {
         XCTAssertTrue(
-            isSuccessfulAuth(initialSessionId: nil, currentSessionId: "sess_new"),
+            ClerkAuthSessionLogic.isSuccessfulAuth(initialSessionId: nil, currentSessionId: "sess_new"),
             "nil -> non-nil must be treated as successful auth"
         )
     }
@@ -62,7 +30,7 @@ final class ClerkViewFactoryTests: XCTestCase {
     /// never signed in. This must be treated as a cancel.
     func testSessionIdNilToNilIsCancel() {
         XCTAssertFalse(
-            isSuccessfulAuth(initialSessionId: nil, currentSessionId: nil),
+            ClerkAuthSessionLogic.isSuccessfulAuth(initialSessionId: nil, currentSessionId: nil),
             "nil -> nil must be treated as cancellation"
         )
     }
@@ -73,7 +41,7 @@ final class ClerkViewFactoryTests: XCTestCase {
     /// "signInCompleted" event here would double-fire for no real state change.
     func testSessionIdUnchangedIsCancel() {
         XCTAssertFalse(
-            isSuccessfulAuth(initialSessionId: "sess_same", currentSessionId: "sess_same"),
+            ClerkAuthSessionLogic.isSuccessfulAuth(initialSessionId: "sess_same", currentSessionId: "sess_same"),
             "same session id on both sides must be treated as cancellation"
         )
     }
@@ -85,7 +53,7 @@ final class ClerkViewFactoryTests: XCTestCase {
     /// nil-vs-non-nil) is what catches this.
     func testSessionIdChangedBetweenTwoNonNilValuesIsSuccess() {
         XCTAssertTrue(
-            isSuccessfulAuth(initialSessionId: "sess_stale", currentSessionId: "sess_new"),
+            ClerkAuthSessionLogic.isSuccessfulAuth(initialSessionId: "sess_stale", currentSessionId: "sess_new"),
             "stale -> new must be treated as successful auth"
         )
     }
@@ -105,7 +73,7 @@ final class ClerkViewFactoryTests: XCTestCase {
 
         // New (correct) logic: treat as success whenever the id changed to a
         // non-nil value.
-        let newLogicDetects = isSuccessfulAuth(initialSessionId: initial, currentSessionId: current)
+        let newLogicDetects = ClerkAuthSessionLogic.isSuccessfulAuth(initialSessionId: initial, currentSessionId: current)
         XCTAssertTrue(newLogicDetects, "New inequality logic catches stale -> new")
     }
 }

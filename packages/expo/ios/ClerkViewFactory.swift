@@ -446,9 +446,13 @@ class ClerkAuthWrapperViewController: UIHostingController<ClerkAuthWrapperView> 
   override func viewDidDisappear(_ animated: Bool) {
     super.viewDidDisappear(animated)
     if isBeingDismissed {
-      // Check if auth completed (session exists) vs user cancelled
-      if let session = Clerk.shared.session, session.id != initialSessionId {
-        completeOnce(.success(["sessionId": session.id, "type": "signIn"]))
+      // Check if auth completed (session exists and differs from the one
+      // captured at present-time) vs user cancelled. The pure comparison
+      // lives in ClerkAuthSessionLogic so XCTest can hit the same code.
+      let currentSessionId = Clerk.shared.session?.id
+      if let currentSessionId,
+         ClerkAuthSessionLogic.isSuccessfulAuth(initialSessionId: initialSessionId, currentSessionId: currentSessionId) {
+        completeOnce(.success(["sessionId": currentSessionId, "type": "signIn"]))
       } else {
         completeOnce(.success(["cancelled": true]))
       }

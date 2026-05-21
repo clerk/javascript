@@ -4,6 +4,8 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 FLOWS_DIR="$SCRIPT_DIR/../flows"
+# shellcheck disable=SC1091
+source "$SCRIPT_DIR/lib/filter-flows.sh"
 
 if [[ -f "$SCRIPT_DIR/../config/.env" ]]; then
   set -a
@@ -18,20 +20,28 @@ if ! command -v maestro >/dev/null 2>&1; then
 fi
 
 echo "==> Running all non-manual flows on Android..."
-# Maestro does not auto-recurse into subdirectories. Pass each flow file
-# explicitly to pick up flows/sign-in/, flows/profile/, etc. Skip the
-# flows/common/ directory — those are subflows invoked via runFlow.
-# Use while-read to stay compatible with macOS bash 3.2 (no mapfile).
-FLOW_FILES=()
+ALL_FLOWS=()
 while IFS= read -r f; do
-  FLOW_FILES+=("$f")
+  ALL_FLOWS+=("$f")
 done < <(find "$FLOWS_DIR" -type f -name "*.yaml" ! -path "*/common/*")
 
+# Maestro's --exclude-tags is a no-op when explicit file paths are passed,
+# so pre-filter the list ourselves before handing it off.
+KEEP=()
+while IFS= read -r f; do
+  [[ -z "$f" ]] && continue
+  KEEP+=("$f")
+done < <(filter_flows "iosOnly,manual,skip" "${ALL_FLOWS[@]}")
+
+if [[ ${#KEEP[@]} -eq 0 ]]; then
+  echo "No flows to run after tag filtering." >&2
+  exit 0
+fi
+
 maestro --platform android test \
-  --exclude-tags iosOnly,manual,skip \
   -e CLERK_TEST_EMAIL="${CLERK_TEST_EMAIL}" \
   -e CLERK_TEST_PASSWORD="${CLERK_TEST_PASSWORD}" \
   -e CLERK_TEST_EMAIL_SECONDARY="${CLERK_TEST_EMAIL_SECONDARY:-}" \
   -e CLERK_TEST_PASSWORD_SECONDARY="${CLERK_TEST_PASSWORD_SECONDARY:-}" \
   "$@" \
-  "${FLOW_FILES[@]}"
+  "${KEEP[@]}"
