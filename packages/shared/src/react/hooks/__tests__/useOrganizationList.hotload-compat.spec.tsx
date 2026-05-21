@@ -98,6 +98,7 @@ function createHotloadedClerkQueryClientShim() {
     telemetry: { record: vi.fn() },
     setActive: vi.fn(),
     createOrganization: vi.fn(),
+    // Reached transitively via useAttemptToEnableOrganizations.
     __internal_attemptToEnableEnvironmentSetting: vi.fn(),
     get __internal_queryClient() {
       if (!queryClient && !isResolving) {
