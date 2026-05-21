@@ -602,7 +602,15 @@ jobs:
     # our trial (capacity / label availability) — revisit when Blacksmith
     # exposes a label we know is provisioned on this account.
     runs-on: macos-15
-    timeout-minutes: 60
+    # 90 minutes accounts for: ~10 min monorepo install, ~12 min iOS build +
+    # SPM checkout on a cold derived-data cache, ~3 min cold-sim warmup,
+    # then ~5-8 min per top-level flow on iOS sim (vs ~45s on Android — iOS
+    # ASWebAuthenticationSession + simctl install are inherently heavier).
+    # The previous 60 was tight enough that the suite was killed mid-run on
+    # cache-miss days even with every flow passing. Tighten this back down
+    # once we either (a) parallelize flows across shards or (b) move iOS to
+    # a runner with persistent DerivedData caching.
+    timeout-minutes: 90
     steps:
       - name: Checkout @clerk/javascript
         uses: actions/checkout@v4
