@@ -1462,6 +1462,30 @@ export class Clerk implements ClerkInterface {
    * @param props Configuration parameters.
    */
   public mountConfigureSSO = (node: HTMLDivElement, props?: ConfigureSSOProps) => {
+    const { isEnabled: isOrganizationsEnabled } = this.__internal_attemptToEnableEnvironmentSetting({
+      for: 'organizations',
+      caller: 'ConfigureSSO',
+      onClose: () => {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('ConfigureSSO'), {
+          code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
+        });
+      },
+    });
+
+    if (!isOrganizationsEnabled) {
+      return;
+    }
+
+    const userExists = !noUserExists(this);
+    if (noOrganizationExists(this) && userExists) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderComponentWhenOrgDoesNotExist, {
+          code: CANNOT_RENDER_ORGANIZATION_MISSING_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
     if (disabledSelfServeSSOFeature(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderConfigureSSOComponentWhenDisabled, {
@@ -1475,16 +1499,6 @@ export class Clerk implements ClerkInterface {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderConfigureSSOComponentWhenEmailAddressDisabled, {
           code: CANNOT_RENDER_CONFIGURE_SSO_EMAIL_ADDRESS_DISABLED_ERROR_CODE,
-        });
-      }
-      return;
-    }
-
-    const userExists = !noUserExists(this);
-    if (noOrganizationExists(this) && userExists) {
-      if (this.#instanceType === 'development') {
-        throw new ClerkRuntimeError(warnings.cannotRenderComponentWhenOrgDoesNotExist, {
-          code: CANNOT_RENDER_ORGANIZATION_MISSING_ERROR_CODE,
         });
       }
       return;

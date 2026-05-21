@@ -10,7 +10,8 @@ const createMessageForDisabledOrganizations = (
     | 'OrganizationSwitcher'
     | 'OrganizationList'
     | 'CreateOrganization'
-    | 'TaskChooseOrganization',
+    | 'TaskChooseOrganization'
+    | 'ConfigureSSO',
 ) => {
   return formatWarning(
     `The <${componentName}/> cannot be rendered when the feature is turned off. Visit 'dashboard.clerk.com' to enable the feature. Since the feature is turned off, this is no-op.`,
