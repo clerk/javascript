@@ -9,6 +9,7 @@
     "bundlewatch": "turbo run bundlewatch",
     "changeset": "changeset",
     "changeset:empty": "pnpm changeset --empty",
+    "check:hotload-boundary": "node ./scripts/hotload-boundary/check-hotload-boundary.mjs",
     "clean": "turbo run clean",
     "dev": "TURBO_UI=0 FORCE_COLOR=1 turbo dev --filter=@clerk/* --filter=!@clerk/expo --filter=!@clerk/tanstack-react-start --filter=!@clerk/chrome-extension",
     "dev:fe-libs": "TURBO_UI=0 FORCE_COLOR=1 turbo dev --filter=@clerk/clerk-js --filter=@clerk/ui --filter=@clerk/shared",

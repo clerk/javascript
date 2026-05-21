@@ -1,0 +1,427 @@
+{
+  "version": 1,
+  "description": "Runtime contract manifest for Clerk / IsomorphicClerk __internal_* members that can cross the Clerk.js hotload boundary.",
+  "surfaces": {
+    "Clerk": {
+      "package": "@clerk/clerk-js",
+      "file": "packages/clerk-js/src/core/clerk.ts",
+      "className": "Clerk"
+    },
+    "IsomorphicClerk": {
+      "package": "@clerk/react",
+      "file": "packages/react/src/isomorphicClerk.ts",
+      "className": "IsomorphicClerk"
+    }
+  },
+  "entries": [
+    {
+      "member": "__internal_addNavigationListener",
+      "surfaces": ["Clerk"],
+      "boundary": "hotload-boundary",
+      "compatibility": "keep",
+      "risk": "medium",
+      "consumerFiles": ["packages/ui/src/router/VirtualRouter.tsx"],
+      "notes": "Consumed by UI routing code to observe external navigation; removal would break UI packages paired with hotloaded Clerk.js."
+    },
+    {
+      "member": "__internal_attemptToEnableEnvironmentSetting",
+      "surfaces": ["Clerk", "IsomorphicClerk"],
+      "boundary": "hotload-boundary",
+      "compatibility": "keep",
+      "risk": "medium",
+      "consumerFiles": [
+        "packages/shared/src/react/hooks/useAttemptToEnableOrganizations.ts",
+        "packages/vue/src/composables/useOrganization.ts"
+      ],
+      "notes": "Consumed by shared and framework hooks to enable environment-backed features on demand."
+    },
+    {
+      "member": "__internal_closeBlankCaptchaModal",
+      "surfaces": ["Clerk"],
+      "boundary": "local-only",
+      "compatibility": "keep",
+      "risk": "low",
+      "consumerFiles": ["packages/clerk-js/src/utils/captcha/CaptchaChallenge.ts"],
+      "notes": "Used inside clerk-js captcha handling; no current cross-package consumer."
+    },
+    {
+      "member": "__internal_closeCheckout",
+      "surfaces": ["Clerk", "IsomorphicClerk"],
+      "boundary": "hotload-boundary",
+      "compatibility": "keep",
+      "risk": "medium",
+      "consumerFiles": ["packages/react/src/isomorphicClerk.ts", "packages/shared/src/types/clerk.ts"],
+      "notes": "Part of the checkout UI control surface mirrored through IsomorphicClerk."
+    },
+    {
+      "member": "__internal_closeEnableOrganizationsPrompt",
+      "surfaces": ["Clerk", "IsomorphicClerk"],
+      "boundary": "hotload-boundary",
+      "compatibility": "keep",
+      "risk": "medium",
+      "consumerFiles": ["packages/ui/src/components/devPrompts/EnableOrganizationsPrompt/index.tsx"],
+      "notes": "Consumed by UI prompts that can be bundled separately from the hotloaded Clerk runtime."
+    },
+    {
+      "member": "__internal_closePlanDetails",
+      "surfaces": ["Clerk", "IsomorphicClerk"],
+      "boundary": "hotload-boundary",
+      "compatibility": "keep",
+      "risk": "medium",
+      "consumerFiles": ["packages/react/src/isomorphicClerk.ts", "packages/shared/src/types/clerk.ts"],
+      "notes": "Part of the plan details UI control surface mirrored through IsomorphicClerk."
+    },
+    {
+      "member": "__internal_closeReverification",
+      "surfaces": ["Clerk", "IsomorphicClerk"],
+      "boundary": "hotload-boundary",
+      "compatibility": "keep",
+      "risk": "medium",
+      "consumerFiles": ["packages/shared/src/types/clerk.ts"],
+      "notes": "Part of the reverification UI control surface exposed through shared Clerk types."
+    },
+    {
+      "member": "__internal_closeSubscriptionDetails",
+      "surfaces": ["Clerk", "IsomorphicClerk"],
+      "boundary": "hotload-boundary",
+      "compatibility": "keep",
+      "risk": "medium",
+      "consumerFiles": ["packages/react/src/isomorphicClerk.ts", "packages/shared/src/types/clerk.ts"],
+      "notes": "Part of the subscription details UI control surface mirrored through IsomorphicClerk."
+    },
+    {
+      "member": "__internal_country",
+      "surfaces": ["Clerk"],
+      "boundary": "local-only",
+      "compatibility": "keep",
+      "risk": "low",
+      "consumerFiles": ["packages/clerk-js/src/core/clerk.ts"],
+      "notes": "Set and read by clerk-js resources for country-specific behavior."
+    },
+    {
+      "member": "__internal_createPublicCredentials",
+      "surfaces": ["Clerk"],
+      "boundary": "hotload-boundary",
+      "compatibility": "keep",
+      "risk": "medium",
+      "consumerFiles": ["packages/expo/src/provider/singleton/createClerkInstance.ts"],
+      "notes": "Assigned by Expo to provide native passkey credential creation to Clerk resources."
+    },
+    {
+      "member": "__internal_environment",
+      "surfaces": ["Clerk", "IsomorphicClerk"],
+      "boundary": "hotload-boundary",
+      "compatibility": "keep",
+      "risk": "high",
+      "consumerFiles": [
+        "packages/shared/src/react/hooks/useBillingIsEnabled.ts",
+        "packages/shared/src/react/billing/payment-element.tsx",
+        "packages/expo/src/provider/singleton/createClerkInstance.ts"
+      ],
+      "notes": "Broadly consumed for environment settings and feature flags; shape changes can silently alter feature availability."
+    },
+    {
+      "member": "__internal_getCachedResources",
+      "surfaces": ["Clerk"],
+      "boundary": "hotload-boundary",
+      "compatibility": "keep",
+      "risk": "medium",
+      "consumerFiles": [
+        "packages/expo/src/provider/singleton/createClerkInstance.ts",
+        "packages/shared/src/types/clerk.ts"
+      ],
+      "notes": "Installed SDKs can provide cached resources that the hotloaded runtime consumes during bootstrap."
+    },
+    {
+      "member": "__internal_getOption",
+      "surfaces": ["Clerk", "IsomorphicClerk"],
+      "boundary": "hotload-boundary",
+      "compatibility": "keep",
+      "risk": "high",
+      "consumerFiles": [
+        "packages/ui/src/contexts/components/SessionTasks.ts",
+        "packages/shared/src/react/billing/payment-element.tsx",
+        "packages/clerk-js/src/utils/captcha/retrieveCaptchaInfo.ts"
+      ],
+      "notes": "Shared, UI, and runtime code read Clerk options through this method; signature changes affect multiple package generations."
+    },
+    {
+      "member": "__internal_getPublicCredentials",
+      "surfaces": ["Clerk"],
+      "boundary": "hotload-boundary",
+      "compatibility": "keep",
+      "risk": "medium",
+      "consumerFiles": [
+        "packages/expo/src/provider/singleton/createClerkInstance.ts",
+        "packages/clerk-js/src/core/resources/SignIn.ts"
+      ],
+      "notes": "Assigned by Expo and consumed by Clerk resources for native passkey credential retrieval."
+    },
+    {
+      "member": "__internal_handleUnauthenticatedDevBrowser",
+      "surfaces": ["Clerk"],
+      "boundary": "local-only",
+      "compatibility": "keep",
+      "risk": "low",
+      "consumerFiles": ["packages/clerk-js/src/core/resources/Base.ts"],
+      "notes": "Used by clerk-js resources for development browser handling."
+    },
+    {
+      "member": "__internal_isWebAuthnAutofillSupported",
+      "surfaces": ["Clerk"],
+      "boundary": "hotload-boundary",
+      "compatibility": "keep",
+      "risk": "medium",
+      "consumerFiles": [
+        "packages/expo/src/provider/singleton/createClerkInstance.ts",
+        "packages/clerk-js/src/core/resources/SignIn.ts"
+      ],
+      "notes": "Assigned by Expo and consumed by Clerk resources for native WebAuthn autofill support."
+    },
+    {
+      "member": "__internal_isWebAuthnPlatformAuthenticatorSupported",
+      "surfaces": ["Clerk"],
+      "boundary": "hotload-boundary",
+      "compatibility": "keep",
+      "risk": "medium",
+      "consumerFiles": [
+        "packages/expo/src/provider/singleton/createClerkInstance.ts",
+        "packages/clerk-js/src/core/resources/Passkey.ts"
+      ],
+      "notes": "Assigned by Expo and consumed by Clerk resources for native platform authenticator support."
+    },
+    {
+      "member": "__internal_isWebAuthnSupported",
+      "surfaces": ["Clerk"],
+      "boundary": "hotload-boundary",
+      "compatibility": "keep",
+      "risk": "medium",
+      "consumerFiles": [
+        "packages/expo/src/provider/singleton/createClerkInstance.ts",
+        "packages/clerk-js/src/core/resources/SignIn.ts"
+      ],
+      "notes": "Assigned by Expo and consumed by Clerk resources for native WebAuthn support."
+    },
+    {
+      "member": "__internal_lastEmittedResources",
+      "surfaces": ["Clerk", "IsomorphicClerk"],
+      "boundary": "hotload-boundary",
+      "compatibility": "keep",
+      "risk": "high",
+      "consumerFiles": [
+        "packages/react/src/hooks/useAuthBase.tsx",
+        "packages/shared/src/react/hooks/base/useClientBase.ts",
+        "packages/ui/src/Components.tsx"
+      ],
+      "notes": "Used by hooks to read the latest emitted resource snapshot; stale or missing values can produce silent empty state."
+    },
+    {
+      "member": "__internal_last_error",
+      "surfaces": ["Clerk"],
+      "boundary": "local-only",
+      "compatibility": "keep",
+      "risk": "low",
+      "consumerFiles": ["packages/clerk-js/src/core/clerk.ts"],
+      "notes": "Internal backing storage for navigation-with-error handling."
+    },
+    {
+      "member": "__internal_loadStripeJs",
+      "surfaces": ["Clerk", "IsomorphicClerk"],
+      "boundary": "hotload-boundary",
+      "compatibility": "keep",
+      "risk": "medium",
+      "consumerFiles": ["packages/shared/src/react/billing/useStripeClerkLibs.tsx"],
+      "notes": "Shared billing code loads Stripe through Clerk; keep the function shape coordinated with billing packages."
+    },
+    {
+      "member": "__internal_mountOAuthConsent",
+      "surfaces": ["Clerk", "IsomorphicClerk"],
+      "boundary": "hotload-boundary",
+      "compatibility": "keep",
+      "risk": "medium",
+      "consumerFiles": ["packages/react/src/components/uiComponents.tsx"],
+      "notes": "React UI components mount OAuth consent through this bridge."
+    },
+    {
+      "member": "__internal_navigateWithError",
+      "surfaces": ["Clerk"],
+      "boundary": "hotload-boundary",
+      "compatibility": "keep",
+      "risk": "medium",
+      "consumerFiles": ["packages/ui/src/components/SignIn/shared.ts"],
+      "notes": "UI sign-in flows use this method to route while preserving Clerk API errors."
+    },
+    {
+      "member": "__internal_onAfterResponse",
+      "surfaces": ["Clerk"],
+      "boundary": "hotload-boundary",
+      "compatibility": "keep",
+      "risk": "medium",
+      "consumerFiles": [
+        "packages/expo/src/provider/singleton/createClerkInstance.ts",
+        "packages/chrome-extension/src/internal/clerk.ts"
+      ],
+      "notes": "Installed SDKs attach response interceptors to the Clerk runtime."
+    },
+    {
+      "member": "__internal_onBeforeRequest",
+      "surfaces": ["Clerk"],
+      "boundary": "hotload-boundary",
+      "compatibility": "keep",
+      "risk": "medium",
+      "consumerFiles": [
+        "packages/expo/src/provider/singleton/createClerkInstance.ts",
+        "packages/chrome-extension/src/internal/clerk.ts"
+      ],
+      "notes": "Installed SDKs attach request interceptors to the Clerk runtime."
+    },
+    {
+      "member": "__internal_openBlankCaptchaModal",
+      "surfaces": ["Clerk"],
+      "boundary": "local-only",
+      "compatibility": "keep",
+      "risk": "low",
+      "consumerFiles": ["packages/clerk-js/src/utils/captcha/CaptchaChallenge.ts"],
+      "notes": "Used inside clerk-js captcha handling; no current cross-package consumer."
+    },
+    {
+      "member": "__internal_openCheckout",
+      "surfaces": ["Clerk", "IsomorphicClerk"],
+      "boundary": "hotload-boundary",
+      "compatibility": "keep",
+      "risk": "medium",
+      "consumerFiles": [
+        "packages/react/src/components/CheckoutButton.tsx",
+        "packages/ui/src/contexts/components/Plans.tsx",
+        "packages/vue/src/components/CheckoutButton.vue"
+      ],
+      "notes": "Framework and UI packages open checkout through this runtime method."
+    },
+    {
+      "member": "__internal_openEnableOrganizationsPrompt",
+      "surfaces": ["Clerk", "IsomorphicClerk"],
+      "boundary": "hotload-boundary",
+      "compatibility": "keep",
+      "risk": "medium",
+      "consumerFiles": ["packages/react/src/isomorphicClerk.ts", "packages/shared/src/types/clerk.ts"],
+      "notes": "Prompt control surface used when installed packages request organization enablement."
+    },
+    {
+      "member": "__internal_openPlanDetails",
+      "surfaces": ["Clerk", "IsomorphicClerk"],
+      "boundary": "hotload-boundary",
+      "compatibility": "keep",
+      "risk": "medium",
+      "consumerFiles": [
+        "packages/react/src/components/PlanDetailsButton.tsx",
+        "packages/ui/src/components/PricingTable/PricingTableDefault.tsx",
+        "packages/vue/src/components/PlanDetailsButton.vue"
+      ],
+      "notes": "Framework and UI packages open plan details through this runtime method."
+    },
+    {
+      "member": "__internal_openReverification",
+      "surfaces": ["Clerk", "IsomorphicClerk"],
+      "boundary": "hotload-boundary",
+      "compatibility": "keep",
+      "risk": "medium",
+      "consumerFiles": ["packages/shared/src/react/hooks/useReverification.ts"],
+      "notes": "Shared reverification hooks open the runtime reverification UI through this method."
+    },
+    {
+      "member": "__internal_openSubscriptionDetails",
+      "surfaces": ["Clerk", "IsomorphicClerk"],
+      "boundary": "hotload-boundary",
+      "compatibility": "keep",
+      "risk": "medium",
+      "consumerFiles": [
+        "packages/react/src/components/SubscriptionDetailsButton.tsx",
+        "packages/ui/src/contexts/components/Plans.tsx",
+        "packages/vue/src/components/SubscriptionDetailsButton.vue"
+      ],
+      "notes": "Framework and UI packages open subscription details through this runtime method."
+    },
+    {
+      "member": "__internal_queryClient",
+      "surfaces": ["Clerk"],
+      "boundary": "hotload-boundary",
+      "compatibility": "shim",
+      "risk": "high",
+      "notes": "Backward-compatibility shim for older installed @clerk/shared versions that read this getter and wait for queryClientStatus."
+    },
+    {
+      "member": "__internal_reloadInitialResources",
+      "surfaces": ["Clerk"],
+      "boundary": "hotload-boundary",
+      "compatibility": "keep",
+      "risk": "medium",
+      "consumerFiles": ["packages/expo/src/provider/ClerkProvider.tsx", "packages/expo/src/native/AuthView.tsx"],
+      "notes": "Expo uses this method to recover initial resources after native auth flows."
+    },
+    {
+      "member": "__internal_setActiveInProgress",
+      "surfaces": ["Clerk"],
+      "boundary": "hotload-boundary",
+      "compatibility": "keep",
+      "risk": "medium",
+      "consumerFiles": [
+        "packages/ui/src/common/SSOCallback.tsx",
+        "packages/ui/src/components/SignIn/SignInFactorOne.tsx"
+      ],
+      "notes": "UI flows use this flag to avoid racing active-session transitions."
+    },
+    {
+      "member": "__internal_setCountry",
+      "surfaces": ["Clerk"],
+      "boundary": "local-only",
+      "compatibility": "keep",
+      "risk": "low",
+      "consumerFiles": ["packages/clerk-js/src/core/resources/Base.ts"],
+      "notes": "Used by clerk-js resources to persist response-derived country state."
+    },
+    {
+      "member": "__internal_setEnvironment",
+      "surfaces": ["Clerk", "IsomorphicClerk"],
+      "boundary": "released-together",
+      "compatibility": "keep",
+      "risk": "low",
+      "consumerFiles": ["packages/react/src/isomorphicClerk.ts"],
+      "notes": "Compatibility bridge for older Clerk implementations; currently used by IsomorphicClerk when available."
+    },
+    {
+      "member": "__internal_state",
+      "surfaces": ["Clerk", "IsomorphicClerk"],
+      "boundary": "hotload-boundary",
+      "compatibility": "keep",
+      "risk": "high",
+      "consumerFiles": [
+        "packages/react/src/hooks/useClerkSignal.ts",
+        "packages/shared/src/react/hooks/useCheckout.ts",
+        "packages/react/src/stateProxy.ts"
+      ],
+      "notes": "State signal object consumed by installed React/shared code; shape and signal semantics are runtime contract."
+    },
+    {
+      "member": "__internal_unmountOAuthConsent",
+      "surfaces": ["Clerk", "IsomorphicClerk"],
+      "boundary": "hotload-boundary",
+      "compatibility": "keep",
+      "risk": "medium",
+      "consumerFiles": ["packages/react/src/components/uiComponents.tsx"],
+      "notes": "React UI components unmount OAuth consent through this bridge."
+    },
+    {
+      "member": "__internal_updateProps",
+      "surfaces": ["Clerk", "IsomorphicClerk"],
+      "boundary": "hotload-boundary",
+      "compatibility": "keep",
+      "risk": "high",
+      "consumerFiles": [
+        "packages/react/src/components/uiComponents.tsx",
+        "packages/vue/src/utils/updateClerkOptions.ts",
+        "packages/astro/src/internal/create-clerk-instance.ts"
+      ],
+      "notes": "Framework adapters and component wrappers update runtime props through this method."
+    }
+  ]
+}
