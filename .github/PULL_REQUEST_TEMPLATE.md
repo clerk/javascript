@@ -17,6 +17,7 @@
 
 - [ ] `pnpm test` runs as expected.
 - [ ] `pnpm build` runs as expected.
+- [ ] (If applicable) Changes to `packages/clerk-js/src/core/clerk.ts`, `packages/react/src/isomorphicClerk.ts`, or `@clerk/ui` runtime calls have been checked against `docs/hotload-boundary-abi-inventory.md`.
 - [ ] (If applicable) [JSDoc comments](https://jsdoc.app/about-getting-started.html) have been added or updated for any package exports
 - [ ] (If applicable) [Documentation](https://github.com/clerk/clerk-docs) has been updated
 
