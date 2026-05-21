@@ -117,7 +117,7 @@ const PrimaryEmailDomainFooter = (): JSX.Element | null => {
         padding: `${t.space.$none} ${t.space.$3}`,
       })}
     >
-      <Hr sx={{ backgroundColor: 'borderAlpha100' }} />
+      <Hr sx={t => ({ backgroundColor: t.colors.$borderAlpha100 })} />
 
       <Text
         as='span'
