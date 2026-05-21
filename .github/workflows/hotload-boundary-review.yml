@@ -1,0 +1,72 @@
+name: Hotload Boundary Review
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+    branches:
+      - main
+      - release/v4
+      - release/core-2
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  clerk-core-review:
+    name: Clerk Core Review Gate
+    if: ${{ github.event.pull_request.draft == false }}
+    runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_SHORT && fromJSON(vars.TIMEOUT_MINUTES_SHORT) || 3 }}
+    steps:
+      - name: Verify hotload-boundary review
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const guardedPaths = new Set([
+              'packages/clerk-js/src/core/clerk.ts',
+              'packages/react/src/isomorphicClerk.ts',
+            ]);
+            const markerPattern =
+              /- \[[xX]\] \(If applicable\) Hotload-boundary review completed for Clerk core \/ IsomorphicClerk changes\./;
+
+            const { owner, repo } = context.repo;
+            const pull_number = context.payload.pull_request.number;
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner,
+              repo,
+              pull_number,
+              per_page: 100,
+            });
+            const touchedGuardedPaths = files
+              .map(file => file.filename)
+              .filter(filename => guardedPaths.has(filename));
+
+            if (touchedGuardedPaths.length === 0) {
+              core.info('No Clerk core hotload-boundary files changed.');
+              return;
+            }
+
+            await core.summary
+              .addHeading('Hotload Boundary Review')
+              .addRaw(
+                'This PR changes files that define Clerk runtime members consumed across hotloaded package boundaries.\n\n',
+              )
+              .addList(touchedGuardedPaths)
+              .addRaw(
+                '\nConfirm the PR template checklist item after reviewing whether changed `Clerk` / `IsomorphicClerk` members are consumed by older installed SDK packages.\n',
+              )
+              .write();
+
+            const body = context.payload.pull_request.body ?? '';
+            if (!markerPattern.test(body)) {
+              core.setFailed(
+                [
+                  'This PR changes Clerk core hotload-boundary files:',
+                  ...touchedGuardedPaths.map(path => `- ${path}`),
+                  '',
+                  'Check the PR template item "Hotload-boundary review completed for Clerk core / IsomorphicClerk changes." after documenting the compatibility decision.',
+                  'Non-major Clerk.js and UI releases can hotload into apps with older installed SDK packages, so removals or renames need a compatibility shim, deprecation plan, or major-version removal plan.',
+                ].join('\n'),
+              );
+            }
