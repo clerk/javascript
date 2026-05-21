@@ -63,7 +63,7 @@ export class BillingPlan extends BaseResource implements BillingPlanResource {
       fee: price.fee ? billingMoneyAmountFromJSON(price.fee) : null,
       annualMonthlyFee: price.annual_monthly_fee ? billingMoneyAmountFromJSON(price.annual_monthly_fee) : null,
       isDefault: price.is_default,
-      unitPrices: data.unit_prices?.map(billingUnitPriceFromJSON),
+      unitPrices: price.unit_prices?.map(billingUnitPriceFromJSON),
     }));
 
     return this;
