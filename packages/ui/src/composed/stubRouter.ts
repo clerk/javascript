@@ -1,7 +1,14 @@
 import type { RouteContextValue } from '../router/RouteContext';
 
 const noop = () => {};
-const noopAsync = () => Promise.resolve();
+
+function isExternalUrl(to: string): boolean {
+  try {
+    return new URL(to).origin !== window.location.origin;
+  } catch {
+    return false;
+  }
+}
 
 export const stubRouter: RouteContextValue = {
   basePath: '',
@@ -11,8 +18,16 @@ export const stubRouter: RouteContextValue = {
   indexPath: '',
   currentPath: '',
   matches: () => false,
-  baseNavigate: noopAsync,
-  navigate: noopAsync,
+  baseNavigate: async (toURL: URL) => {
+    if (toURL.origin !== window.location.origin) {
+      window.location.href = toURL.href;
+    }
+  },
+  navigate: async (to: string) => {
+    if (isExternalUrl(to)) {
+      window.location.href = to;
+    }
+  },
   resolve: (to: string) => new URL(to, window.location.origin),
   refresh: noop,
   params: {},
