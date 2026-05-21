@@ -194,11 +194,29 @@ jobs:
           }
           EOG
           chmod +x gradlew
-          ./gradlew \
-            -I /tmp/disable-signing.gradle \
-            :source:api:publishToMavenLocal \
-            :source:ui:publishToMavenLocal \
-            :source:telemetry:publishToMavenLocal
+          # Bump the Gradle wrapper download + dependency HTTP timeouts.
+          # The default socketTimeout is 10s and services.gradle.org has
+          # transient slow-responses (saw a 10s-timeout failure that aborted
+          # the entire compat-gate at the wrapper-fetch step before a single
+          # publish task ran). 60s is comfortably long without making real
+          # network outages look like hangs. Also retry the gradlew invocation
+          # twice to absorb single-shot blips.
+          export GRADLE_OPTS="${GRADLE_OPTS:-} -Dorg.gradle.internal.http.connectionTimeout=60000 -Dorg.gradle.internal.http.socketTimeout=60000"
+          for attempt in 1 2 3; do
+            if ./gradlew \
+              -I /tmp/disable-signing.gradle \
+              :source:api:publishToMavenLocal \
+              :source:ui:publishToMavenLocal \
+              :source:telemetry:publishToMavenLocal; then
+              break
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              echo "::error::Gradle publish failed after 3 attempts"
+              exit 1
+            fi
+            echo "Gradle publish attempt $attempt failed; retrying in 10s..."
+            sleep 10
+          done
 
       - name: Pin @clerk/expo to mavenLocal snapshot
         if: inputs.clerk_android_ref != '' && inputs.clerk_android_snapshot_suffix != ''
