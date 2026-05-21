@@ -561,7 +561,7 @@ jobs:
           script: >-
             adb install -r /tmp/cached-app-release.apk &&
             cd integration/mobile &&
-            excluded="$EXCLUDE_TAGS,flakyAndroid" &&
+            excluded="$EXCLUDE_TAGS,iosOnly,flakyAndroid" &&
             pattern="$(echo "$excluded" | sed 's/,/|/g')" &&
             find flows -type f -name '*.yaml' ! -path '*/common/*' ${FLOWS_FILTER:+-path "*$FLOWS_FILTER*"}
             | while read f; do grep -qE "^[[:space:]]*-[[:space:]]*(${pattern})[[:space:]]*$" "$f" || printf '%s\n' "$f"; done
