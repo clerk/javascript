@@ -154,7 +154,9 @@ export const OrganizationProfileRoutes = () => {
           <Route path={isSelfServeSsoPageRoot ? undefined : 'organization-self-serve-sso'}>
             <Switch>
               <Route index>
-                <OrganizationSelfServeSSOPage />
+                <Suspense fallback={''}>
+                  <OrganizationSelfServeSSOPage />
+                </Suspense>
               </Route>
             </Switch>
           </Route>

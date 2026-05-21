@@ -2,9 +2,10 @@ import type { CustomPage } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { render, screen, waitFor } from '@/test/utils';
+import { cleanup, render, screen, waitFor } from '@/test/utils';
 
 import { OrganizationProfile } from '../';
+import { OrganizationSelfServeSSOPage } from '../OrganizationSelfServeSSOPage';
 
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 
@@ -494,7 +495,7 @@ describe('OrganizationProfile', () => {
       });
 
       render(<OrganizationProfile />, { wrapper });
-      expect(await screen.findByText('Self-Serve SSO')).toBeDefined();
+      expect(await screen.findByText('Single Sign-On (SSO)')).toBeDefined();
     });
 
     it('does not include SSO when disabled at the instance level', async () => {
@@ -514,7 +515,7 @@ describe('OrganizationProfile', () => {
       });
 
       const { queryByText } = render(<OrganizationProfile />, { wrapper });
-      await waitFor(() => expect(queryByText('Self-Serve SSO')).toBeNull());
+      await waitFor(() => expect(queryByText('Single Sign-On (SSO)')).toBeNull());
     });
 
     it('does not include SSO when the org has not opted in, even if the instance has it enabled', async () => {
@@ -534,10 +535,10 @@ describe('OrganizationProfile', () => {
       });
 
       const { queryByText } = render(<OrganizationProfile />, { wrapper });
-      await waitFor(() => expect(queryByText('Self-Serve SSO')).toBeNull());
+      await waitFor(() => expect(queryByText('Single Sign-On (SSO)')).toBeNull());
     });
 
-    it('includes SSO even when the user does not have the manage enterprise connections permission', async () => {
+    it('includes SSO even when the user does not have the manage enterprise connections permission, but the page surfaces a warning', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withEnterpriseSso({ selfServeSSO: true });
         f.withOrganizations();
@@ -553,9 +554,15 @@ describe('OrganizationProfile', () => {
         });
       });
 
-      // TODO -> Add assertions for page content warning
       render(<OrganizationProfile />, { wrapper });
-      expect(await screen.findByText('Self-Serve SSO')).toBeDefined();
+      expect(await screen.findByText('Single Sign-On (SSO)')).toBeDefined();
+
+      cleanup();
+      render(<OrganizationSelfServeSSOPage />, { wrapper });
+      expect(await screen.findByText(/you do not have permission to manage enterprise connections/i)).toBeDefined();
+      expect(
+        screen.queryByText(/contact your organization administrator in order to have permissions/i),
+      ).toBeInTheDocument();
     });
   });
 
