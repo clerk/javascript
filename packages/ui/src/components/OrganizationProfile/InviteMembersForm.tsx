@@ -145,43 +145,52 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
           break;
         }
         case 'insufficient_seats': {
-          const { data: plans } = await clerk.billing.getPlans({
-            for: 'organization',
-            org_id: organization.id,
-            min_seats: err.errors[0].meta?.seatsQuantity,
-          });
+          try {
+            const { data: plans } = await clerk.billing.getPlans({
+              for: 'organization',
+              org_id: organization.id,
+              min_seats: err.errors[0].meta?.seatsQuantity,
+            });
 
-          if (plans.length === 0) {
-            handleError(err, [], () =>
-              card.setError(t(localizationKeys('unstable__errors.insufficient_seats_contact_support'))),
-            );
-            break;
-          }
-
-          const activeSubscriptionItem = subscriptionItems.find(si => si.status === 'active');
-          if (activeSubscriptionItem) {
-            const currentPlan = activeSubscriptionItem.plan;
-            const currentPlanAndPriceSupportsDesiredSeatQuantity = plans.some(
-              p =>
-                p.id === currentPlan.id &&
-                p.availablePrices?.some(price => price.id === activeSubscriptionItem.priceId),
-            );
-            if (currentPlanAndPriceSupportsDesiredSeatQuantity) {
-              handleSelectPlan({
-                mode: 'modal',
-                plan: currentPlan,
-                planPeriod: activeSubscriptionItem.planPeriod,
-                seatsQuantity: err.errors[0].meta?.seatsQuantity,
-                portalRoot,
-              });
+            if (plans.length === 0) {
+              handleError(err, [], () =>
+                card.setError(t(localizationKeys('unstable__errors.insufficient_seats_contact_support'))),
+              );
               break;
             }
-          }
 
-          handleError(err, [], () =>
-            card.setError(t(localizationKeys('unstable__errors.insufficient_seats_change_plan'))),
-          );
-          break;
+            const activeSubscriptionItem = subscriptionItems.find(si => si.status === 'active');
+            if (activeSubscriptionItem) {
+              const currentPlan = activeSubscriptionItem.plan;
+              const currentPlanAndPriceSupportsDesiredSeatQuantity = plans.some(
+                p =>
+                  p.id === currentPlan.id &&
+                  p.availablePrices?.some(price => price.id === activeSubscriptionItem.priceId),
+              );
+              if (currentPlanAndPriceSupportsDesiredSeatQuantity) {
+                handleSelectPlan({
+                  mode: 'modal',
+                  plan: currentPlan,
+                  planPeriod: activeSubscriptionItem.planPeriod,
+                  seatsQuantity: err.errors[0].meta?.seatsQuantity,
+                  portalRoot,
+                });
+                break;
+              }
+            }
+
+            handleError(err, [], () =>
+              card.setError(t(localizationKeys('unstable__errors.insufficient_seats_change_plan'))),
+            );
+            break;
+          } catch (err: unknown) {
+            if (err instanceof Error) {
+              handleError(err, [], () =>
+                card.setError(t(localizationKeys('unstable__errors.insufficient_seats_contact_support'))),
+              );
+            }
+            break;
+          }
         }
         default: {
           handleError(err, [], card.setError);
