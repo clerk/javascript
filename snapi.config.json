@@ -1,0 +1,7 @@
+{
+  "packages": ["packages/clerk-js", "packages/react", "packages/shared"],
+  "snapshotDir": ".api-snapshots",
+  "mainBranch": "main",
+  "checkVersionBump": true,
+  "outputFormat": "markdown"
+}

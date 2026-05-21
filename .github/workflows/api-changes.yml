@@ -1,0 +1,100 @@
+name: API Changes
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - main
+      - release/v4
+      - release/core-2
+    paths:
+      - 'packages/clerk-js/**'
+      - 'packages/react/**'
+      - 'packages/shared/**'
+      - 'snapi.config.json'
+      - '.github/workflows/api-changes.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-api:
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
+    name: API Changes
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    continue-on-error: true
+    defaults:
+      run:
+        shell: bash
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
+
+    env:
+      SNAPI_PACKAGE: github:clerk/snapi#8c021a2796b313cdefa945a715df8f02e4f99867
+      SNAPI_FILTERS: >-
+        --filter=@clerk/clerk-js
+        --filter=@clerk/react
+        --filter=@clerk/shared
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+          fetch-tags: false
+          filter: 'blob:none'
+          show-progress: false
+
+      - name: Fetch base branch
+        run: git fetch origin "${GITHUB_BASE_REF}:refs/remotes/origin/${GITHUB_BASE_REF}" --depth=100
+
+      - name: Setup
+        id: config
+        uses: ./.github/actions/init-blacksmith
+        with:
+          cache-enabled: true
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+
+      - name: Build current declarations
+        run: pnpm turbo build:declarations $TURBO_ARGS $SNAPI_FILTERS
+
+      - name: Generate current API snapshots
+        run: pnpm dlx --package "$SNAPI_PACKAGE" snapi snapshot --output .api-snapshots-current
+
+      - name: Create baseline worktree
+        run: |
+          mkdir -p .worktrees
+          git worktree add .worktrees/snapi-baseline "origin/${GITHUB_BASE_REF}"
+          cp snapi.config.json .worktrees/snapi-baseline/snapi.config.json
+
+      - name: Install baseline dependencies
+        run: pnpm --dir .worktrees/snapi-baseline install --frozen-lockfile
+
+      - name: Build baseline declarations
+        run: pnpm --dir .worktrees/snapi-baseline turbo build:declarations $TURBO_ARGS $SNAPI_FILTERS
+
+      - name: Generate baseline API snapshots
+        run: |
+          pnpm --dir .worktrees/snapi-baseline dlx --package "$SNAPI_PACKAGE" snapi snapshot \
+            --output "$GITHUB_WORKSPACE/.api-snapshots-baseline"
+
+      - name: Detect API changes
+        run: |
+          pnpm dlx --package "$SNAPI_PACKAGE" snapi detect \
+            --baseline .api-snapshots-baseline \
+            --output api-changes-report.md \
+            --fail-on-breaking
+
+      - name: Upload API changes report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: api-changes-report
+          path: api-changes-report.md
+          if-no-files-found: ignore
+          retention-days: 5
