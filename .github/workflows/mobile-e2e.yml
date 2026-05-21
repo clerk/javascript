@@ -563,7 +563,9 @@ jobs:
             cd integration/mobile &&
             excluded="$EXCLUDE_TAGS,iosOnly,flakyAndroid" &&
             pattern="$(echo "$excluded" | sed 's/,/|/g')" &&
+            ( maestro test --flatten-debug-output flows/common/_warmup.yaml || true ) &&
             find flows -type f -name '*.yaml' ! -path '*/common/*' ${FLOWS_FILTER:+-path "*$FLOWS_FILTER*"}
+            | sort
             | while read f; do grep -qE "^[[:space:]]*-[[:space:]]*(${pattern})[[:space:]]*$" "$f" || printf '%s\n' "$f"; done
             | xargs -n 1 maestro test --env CLERK_TEST_EMAIL="$CLERK_TEST_EMAIL" --env CLERK_TEST_PASSWORD="$CLERK_TEST_PASSWORD" --flatten-debug-output
 
@@ -854,9 +856,26 @@ jobs:
           fi
           xcrun simctl boot "$SIM_UDID" 2>/dev/null || true
           xcrun simctl bootstatus "$SIM_UDID" -b
+          # expo run:ios builds + installs + then tries to deep-link the app
+          # via the dev-launcher URL (com.<bundle>://expo-development-client/
+          # ?url=http://<LAN-IP>:8081). On GitHub-hosted macos-15 runners the
+          # LAN IP is unreachable from the simulator and `xcrun simctl openurl`
+          # times out at 60s, exiting expo run:ios with code 1 — even though
+          # the build itself succeeded and the .app is sitting in DerivedData.
+          # We don't need the post-install launch (Maestro re-installs and
+          # opens the app cleanly later), so swallow the openurl failure and
+          # let the .app-exists check below decide whether to proceed.
+          set +e
           npx expo run:ios --device "$SIM_UDID" --configuration Release --no-bundler
+          run_ios_rc=$?
+          set -e
           app=$(find ~/Library/Developer/Xcode/DerivedData -name "clerknativequickstart.app" -path "*/Release-iphonesimulator/*" | head -1)
-          if [ -z "$app" ]; then echo "::error::No .app found in DerivedData"; exit 1; fi
+          if [ -z "$app" ]; then
+            echo "::error::No .app found in DerivedData (expo run:ios exit=$run_ios_rc)"; exit 1
+          fi
+          if [ "$run_ios_rc" -ne 0 ]; then
+            echo "expo run:ios exited with $run_ios_rc but the .app was built ($app); continuing with the cached copy."
+          fi
           rm -rf /tmp/cached-clerknativequickstart.app
           cp -R "$app" /tmp/cached-clerknativequickstart.app
           ls -la /tmp/cached-clerknativequickstart.app | head
@@ -920,17 +939,26 @@ jobs:
           xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.Prediction -bool NO || true
           xcrun simctl install "$SIM_UDID" /tmp/cached-clerknativequickstart.app
           cd integration/mobile
+          # Cold-sim warmup: launch the app once and let the JS bundle parse
+          # and the accessibility tree populate before the per-flow loop
+          # runs. Without this, whichever flow happens to run first eats the
+          # cold-start cost and consistently flakes its in-flow wait — even
+          # though the screen is visually rendered, Maestro's text matcher
+          # races the a11y tree on freshly-booted runners.
+          maestro test --flatten-debug-output flows/common/_warmup.yaml || true
           # Maestro's `--exclude-tags` only filters when running a
           # DIRECTORY; with explicit file paths Maestro runs every file
           # regardless of tag. We want per-flow invocation (so one
           # crash/hang can't poison the rest) AND tag filtering, so
           # pre-filter the file list. macOS ships bash 3.2 (no mapfile),
           # so this uses a portable pipe: skip-messages go to stderr so
-          # only kept paths flow into xargs.
+          # only kept paths flow into xargs. The `sort` step keeps the
+          # alphabetic order stable across runs so any future first-flow
+          # quirk is easy to reproduce.
           excluded="$EXCLUDE_TAGS,androidOnly"
           pattern="$(echo "$excluded" | sed 's/,/|/g')"
           find flows -type f -name '*.yaml' ! -path '*/common/*' \
-            ${FLOWS_FILTER:+-path "*$FLOWS_FILTER*"} | \
+            ${FLOWS_FILTER:+-path "*$FLOWS_FILTER*"} | sort | \
             while IFS= read -r f; do
               if grep -qE "^[[:space:]]*-[[:space:]]*(${pattern})[[:space:]]*\$" "$f"; then
                 echo "::group::Skip $f (matches excluded tag in ${excluded})" >&2
