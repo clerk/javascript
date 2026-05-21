@@ -10,6 +10,36 @@ vi.mock('@clerk/shared', () => ({
 }));
 
 describe('useOrganizationProfileCustomPages', () => {
+  it('uses separate portals for duplicate non-keyed custom pages', () => {
+    const children = [
+      React.createElement(
+        OrganizationProfilePage,
+        {
+          label: 'Duplicate',
+          labelIcon: <div>First icon</div>,
+          url: 'duplicate',
+        },
+        <div>First content</div>,
+      ),
+      React.createElement(
+        OrganizationProfilePage,
+        {
+          label: 'Duplicate',
+          labelIcon: <div>Second icon</div>,
+          url: 'duplicate',
+        },
+        <div>Second content</div>,
+      ),
+    ];
+
+    const { result } = renderHook(() => useOrganizationProfileCustomPages(children));
+
+    expect(result.current.customPages).toHaveLength(2);
+    expect(result.current.customPagesPortals).toHaveLength(4);
+    expect(result.current.customPagesPortals[0]).not.toBe(result.current.customPagesPortals[2]);
+    expect(result.current.customPagesPortals[1]).not.toBe(result.current.customPagesPortals[3]);
+  });
+
   it('keeps portal identity with the logical custom page when inserting before it', () => {
     const firstPage = (
       <OrganizationProfilePage

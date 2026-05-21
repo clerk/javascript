@@ -104,6 +104,7 @@ const useCustomPages = (params: UseCustomPagesParams, options?: UseCustomPagesOp
   const { children, LinkComponent, PageComponent, MenuItemsComponent, reorderItemsLabels, componentName } = params;
   const { allowForAnyChildren = false } = options || {};
   const validChildren: CustomPageWithIdType[] = [];
+  const portalIdCounts = new Map<string, number>();
 
   React.Children.forEach(children, child => {
     if (
@@ -134,7 +135,7 @@ const useCustomPages = (params: UseCustomPagesParams, options?: UseCustomPagesOp
           labelIcon,
           children,
           url,
-          portalId: getCustomPagePortalId('page', props, childKey),
+          portalId: getCustomPagePortalId('page', props, childKey, portalIdCounts),
         });
       } else {
         logErrorInDevMode(customPageWrongProps(componentName));
@@ -145,7 +146,12 @@ const useCustomPages = (params: UseCustomPagesParams, options?: UseCustomPagesOp
     if (isThatComponent(child, LinkComponent)) {
       if (isExternalLink(props)) {
         // This is an external link
-        validChildren.push({ label, labelIcon, url, portalId: getCustomPagePortalId('link', props, childKey) });
+        validChildren.push({
+          label,
+          labelIcon,
+          url,
+          portalId: getCustomPagePortalId('link', props, childKey, portalIdCounts),
+        });
       } else {
         logErrorInDevMode(customLinkWrongProps(componentName));
         return;
@@ -215,8 +221,16 @@ const getCustomPagePortalId = (
   type: 'page' | 'link',
   props: Pick<CustomPageWithIdType, 'label' | 'url'>,
   key: React.Key | null,
+  portalIdCounts: Map<string, number>,
 ) => {
-  return key == null ? `${type}:${props.label}:${props.url}` : `${type}:key:${key}`;
+  if (key != null) {
+    return `${type}:key:${key}`;
+  }
+
+  const baseId = `${type}:${props.label}:${props.url}`;
+  const occurrence = portalIdCounts.get(baseId) ?? 0;
+  portalIdCounts.set(baseId, occurrence + 1);
+  return `${baseId}:${occurrence}`;
 };
 
 const isReorderItem = (childProps: any, validItems: string[]): boolean => {

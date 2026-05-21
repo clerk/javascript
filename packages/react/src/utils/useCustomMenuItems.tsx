@@ -58,6 +58,7 @@ const useCustomMenuItems = ({
   const validChildren: CustomMenuItemType[] = [];
   const customMenuItems: CustomMenuItem[] = [];
   const customMenuItemsPortals: React.ComponentType[] = [];
+  const portalIdCounts = new Map<string, number>();
 
   React.Children.forEach(children, child => {
     if (
@@ -107,13 +108,13 @@ const useCustomMenuItems = ({
             validChildren.push({
               ...baseItem,
               onClick,
-              portalId: getCustomMenuItemPortalId('action', props, childKey),
+              portalId: getCustomMenuItemPortalId('action', props, childKey, portalIdCounts),
             });
           } else if (open !== undefined) {
             validChildren.push({
               ...baseItem,
               open: open.startsWith('/') ? open : `/${open}`,
-              portalId: getCustomMenuItemPortalId('action', props, childKey),
+              portalId: getCustomMenuItemPortalId('action', props, childKey, portalIdCounts),
             });
           } else {
             // Handle the case where neither onClick nor open is defined
@@ -128,7 +129,12 @@ const useCustomMenuItems = ({
 
       if (isThatComponent(child, MenuLinkComponent)) {
         if (isExternalLink(props)) {
-          validChildren.push({ label, labelIcon, href, portalId: getCustomMenuItemPortalId('link', props, childKey) });
+          validChildren.push({
+            label,
+            labelIcon,
+            href,
+            portalId: getCustomMenuItemPortalId('link', props, childKey, portalIdCounts),
+          });
         } else {
           logErrorInDevMode(userButtonMenuItemLinkWrongProps);
           return;
@@ -200,13 +206,17 @@ const getCustomMenuItemPortalId = (
   type: 'action' | 'link',
   props: Pick<CustomMenuItemType, 'label'> & { href?: string; open?: string },
   key: React.Key | null,
+  portalIdCounts: Map<string, number>,
 ) => {
   if (key != null) {
     return `${type}:key:${key}`;
   }
 
   const target = props.href || props.open || '';
-  return `${type}:${props.label}:${target}`;
+  const baseId = `${type}:${props.label}:${target}`;
+  const occurrence = portalIdCounts.get(baseId) ?? 0;
+  portalIdCounts.set(baseId, occurrence + 1);
+  return `${baseId}:${occurrence}`;
 };
 
 const isReorderItem = (childProps: any, validItems: string[]): boolean => {

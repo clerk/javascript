@@ -136,6 +136,29 @@ describe('useUserButtonCustomMenuItems', () => {
     }
   });
 
+  it('uses separate portals for duplicate non-keyed menu items', () => {
+    const children = (
+      <MenuItems>
+        <MenuAction
+          label='Duplicate'
+          labelIcon={<div>First icon</div>}
+          open='/duplicate'
+        />
+        <MenuAction
+          label='Duplicate'
+          labelIcon={<div>Second icon</div>}
+          open='/duplicate'
+        />
+      </MenuItems>
+    );
+
+    const { result } = renderHook(() => useUserButtonCustomMenuItems(children));
+
+    expect(result.current.customMenuItems).toHaveLength(2);
+    expect(result.current.customMenuItemsPortals).toHaveLength(2);
+    expect(result.current.customMenuItemsPortals[0]).not.toBe(result.current.customMenuItemsPortals[1]);
+  });
+
   it('keeps portal identity with the logical menu item when inserting before it', () => {
     const firstItem = (
       <MenuAction
