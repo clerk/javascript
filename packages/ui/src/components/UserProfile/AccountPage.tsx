@@ -36,7 +36,7 @@ export const AccountPage = withCardStateProvider(() => {
     <ProfileCard.Page>
       <Col
         elementDescriptor={descriptors.page}
-        sx={t => ({ gap: t.space.$8, color: t.colors.$colorForeground })}
+        sx={t => ({ gap: t.space.$8, color: t.colors.$colorForeground, isolation: 'isolate' })}
       >
         <Col
           elementDescriptor={descriptors.profilePage}
