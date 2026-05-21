@@ -1,8 +1,12 @@
-import type { PropsWithChildren } from 'react';
+import { createContext, type PropsWithChildren, useContext } from 'react';
 
 import { Col } from '../../customizables';
 import type { ThemableCssProp } from '../../styledSystem';
 import { mqu } from '../../styledSystem';
+
+const ProfileCardPagePaddingContext = createContext(true);
+
+export const ProfileCardPagePaddingProvider = ProfileCardPagePaddingContext.Provider;
 
 type ProfileCardPageProps = PropsWithChildren<{
   /**
@@ -29,8 +33,10 @@ type ProfileCardPageProps = PropsWithChildren<{
  * Each routed page inside `UserProfile` / `OrganizationProfile` should wrap its content
  * in this component
  */
-export const ProfileCardPage = ({ children, padding = true, bleeding = false, sx }: ProfileCardPageProps) => {
-  if (!padding && !bleeding) {
+export const ProfileCardPage = ({ children, padding, bleeding = false, sx }: ProfileCardPageProps) => {
+  const defaultPadding = useContext(ProfileCardPagePaddingContext);
+  const shouldPad = padding ?? defaultPadding;
+  if (!shouldPad && !bleeding) {
     return <>{children}</>;
   }
 
@@ -38,7 +44,7 @@ export const ProfileCardPage = ({ children, padding = true, bleeding = false, sx
     <Col
       sx={[
         theme => ({
-          ...(padding && {
+          ...(shouldPad && {
             paddingTop: theme.space.$7,
             paddingBottom: theme.space.$7,
             paddingInlineStart: theme.space.$8,
