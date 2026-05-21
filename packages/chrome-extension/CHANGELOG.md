@@ -1,5 +1,15 @@
 # Change Log
 
+## 3.1.29
+
+### Patch Changes
+
+- Updated dependencies [[`6eaf4d6`](https://github.com/clerk/javascript/commit/6eaf4d66fe0b21fb96a5cd19d61e6c3b2302ff97), [`75e5d25`](https://github.com/clerk/javascript/commit/75e5d25a960ffbbd6f19eadda05623df63a30f92), [`4696c51`](https://github.com/clerk/javascript/commit/4696c5113eef50b1ffec34b0d0c24154d5045e82), [`761ebdd`](https://github.com/clerk/javascript/commit/761ebdde5a26c44a5489b377ed4954aab5c3f9cc), [`1aab31e`](https://github.com/clerk/javascript/commit/1aab31e5070b7223402ff71f65a0d829bbc29cfd), [`c2fff36`](https://github.com/clerk/javascript/commit/c2fff3675e05c3a7e1c3718c013d33f824663a89)]:
+  - @clerk/clerk-js@6.12.0
+  - @clerk/shared@4.13.0
+  - @clerk/react@6.7.0
+  - @clerk/ui@1.13.0
+
 ## 3.1.28
 
 ### Patch Changes

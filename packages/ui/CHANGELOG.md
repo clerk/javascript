@@ -1,5 +1,27 @@
 # @clerk/ui
 
+## 1.13.0
+
+### Minor Changes
+
+- Remove `<ConfigureSSO />` from experimental path ([#8588](https://github.com/clerk/javascript/pull/8588)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Add `elevation` appearance option with `'raised'` (default) and `'flush'` values. When set to `flush`, card-based components render without border, box-shadow, border-radius, outer padding, and footer background, allowing them to sit flat against their container. Applies to `<SignIn />`, `<SignUp />`, `<Waitlist />`, `<CreateOrganization />`, `<OrganizationList />`, `<OAuthConsent />`, `<UserVerification />`, and session task components. Profile and popover components always render as raised. Modal components always render as raised regardless of this setting. ([#8510](https://github.com/clerk/javascript/pull/8510)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  The `cardBox` element exposes a `data-elevation="flush"` attribute when flush is active, giving className-based themes a hook to neutralize their card chrome via attribute selectors. The `shadcn` theme uses this hook to drop its `shadow-sm border` utilities under flush.
+
+### Patch Changes
+
+- Add `ProfileCard.Page` for `UserProfile` and `OrganizationProfile` pages ([#8602](https://github.com/clerk/javascript/pull/8602)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Fix layout shift when Copy test URL button enters loading state in `<ConfigureSSO />` ([#8592](https://github.com/clerk/javascript/pull/8592)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Improve ClipboardInput positioning and accessibility by using `readOnly` instead of `isDisabled` ([#8593](https://github.com/clerk/javascript/pull/8593)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`6eaf4d6`](https://github.com/clerk/javascript/commit/6eaf4d66fe0b21fb96a5cd19d61e6c3b2302ff97), [`1aab31e`](https://github.com/clerk/javascript/commit/1aab31e5070b7223402ff71f65a0d829bbc29cfd)]:
+  - @clerk/shared@4.13.0
+  - @clerk/localizations@4.6.7
+
 ## 1.12.1
 
 ### Patch Changes

@@ -1,5 +1,18 @@
 # @clerk/tanstack-react-start
 
+## 1.3.0
+
+### Minor Changes
+
+- Remove `<ConfigureSSO />` from experimental path ([#8588](https://github.com/clerk/javascript/pull/8588)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Updated dependencies [[`6eaf4d6`](https://github.com/clerk/javascript/commit/6eaf4d66fe0b21fb96a5cd19d61e6c3b2302ff97), [`1aab31e`](https://github.com/clerk/javascript/commit/1aab31e5070b7223402ff71f65a0d829bbc29cfd)]:
+  - @clerk/shared@4.13.0
+  - @clerk/react@6.7.0
+  - @clerk/backend@3.4.12
+
 ## 1.2.7
 
 ### Patch Changes
