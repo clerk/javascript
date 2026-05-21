@@ -751,6 +751,19 @@ export interface BillingStatementGroupJSON extends ClerkResourceJSON {
 
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ *
+ * Per-payment cost breakdown including optional base fee and per-unit (for example, seats) subtotals.
+ */
+export interface BillingPaymentTotalsJSON {
+  subtotal: BillingMoneyAmountJSON;
+  grand_total: BillingMoneyAmountJSON;
+  tax_total: BillingMoneyAmountJSON;
+  base_fee?: BillingMoneyAmountJSON | null;
+  per_unit_totals?: BillingPerUnitTotalJSON[];
+}
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingPaymentJSON extends ClerkResourceJSON {
   object: 'commerce_payment';
@@ -763,6 +776,11 @@ export interface BillingPaymentJSON extends ClerkResourceJSON {
   subscription_item: BillingSubscriptionItemJSON;
   charge_type: BillingPaymentChargeType;
   status: BillingPaymentStatus;
+  /**
+   * Per-payment breakdown with optional base fee and per-unit (for example, seats)
+   * subtotals. Absent on older responses.
+   */
+  totals?: BillingPaymentTotalsJSON | null;
 }
 
 /**

@@ -1,9 +1,10 @@
 import { __internal_usePaymentAttemptQuery } from '@clerk/shared/react/index';
-import type { BillingSubscriptionItemResource } from '@clerk/shared/types';
+import type { BillingPaymentResource } from '@clerk/shared/types';
 
 import { Alert } from '@/ui/elements/Alert';
 import { Header } from '@/ui/elements/Header';
 import { LineItems } from '@/ui/elements/LineItems';
+import { getPlanSeatLimit, getSeatsPerUnitTotal, summarizeSeatCharges } from '@/ui/utils/billingPlanSeats';
 import { formatDate } from '@/ui/utils/formatDate';
 import { truncateWithEndVisible } from '@/ui/utils/truncateTextWithEndVisible';
 
@@ -41,8 +42,6 @@ export const PaymentAttemptPage = () => {
     for: requesterType,
     enabled: Boolean(params.paymentAttemptId),
   });
-
-  const subscriptionItem = paymentAttempt?.subscriptionItem;
 
   if (isLoading) {
     return (
@@ -147,7 +146,7 @@ export const PaymentAttemptPage = () => {
               {paymentAttempt.status}
             </Badge>
           </Box>
-          <PaymentAttemptBody subscriptionItem={subscriptionItem} />
+          <PaymentAttemptBody paymentAttempt={paymentAttempt} />
           <Box
             elementDescriptor={descriptors.paymentAttemptFooter}
             as='footer'
@@ -198,10 +197,12 @@ export const PaymentAttemptPage = () => {
   );
 };
 
-function PaymentAttemptBody({ subscriptionItem }: { subscriptionItem: BillingSubscriptionItemResource | undefined }) {
-  if (!subscriptionItem) {
+function PaymentAttemptBody({ paymentAttempt }: { paymentAttempt: BillingPaymentResource | undefined }) {
+  if (!paymentAttempt) {
     return null;
   }
+
+  const { subscriptionItem } = paymentAttempt;
 
   const fee =
     subscriptionItem.planPeriod === 'month'
@@ -209,6 +210,11 @@ function PaymentAttemptBody({ subscriptionItem }: { subscriptionItem: BillingSub
         subscriptionItem.plan.fee!
       : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         subscriptionItem.plan.annualMonthlyFee!;
+
+  const seatsTotal = subscriptionItem.seats != null ? getSeatsPerUnitTotal(paymentAttempt.totals) : undefined;
+  const seatSummary = summarizeSeatCharges(seatsTotal);
+  const seatsChargeable = seatSummary ? seatSummary.totalSeats - seatSummary.included : 0;
+  const planSeatLimit = getPlanSeatLimit(subscriptionItem.plan);
 
   return (
     <Box
@@ -225,6 +231,42 @@ function PaymentAttemptBody({ subscriptionItem }: { subscriptionItem: BillingSub
             text={`${fee.currencySymbol}${fee.amountFormatted}`}
           />
         </LineItems.Group>
+        {seatSummary && (
+          <LineItems.Group>
+            <LineItems.Title
+              title={
+                planSeatLimit != null
+                  ? localizationKeys('billing.seatsWithLimit', { limit: planSeatLimit })
+                  : localizationKeys('billing.seats')
+              }
+              description={(() => {
+                const rate = `${seatSummary.paidTier.feePerBlock.currencySymbol}${seatSummary.paidTier.feePerBlock.amountFormatted}`;
+                const isSingular = seatsChargeable === 1;
+                if (seatSummary.included > 0) {
+                  return isSingular
+                    ? localizationKeys('billing.seatBreakdownIncludedSingular', {
+                        totalSeats: seatSummary.totalSeats,
+                        included: seatSummary.included,
+                        rate,
+                      })
+                    : localizationKeys('billing.seatBreakdownIncludedPlural', {
+                        totalSeats: seatSummary.totalSeats,
+                        included: seatSummary.included,
+                        chargeable: seatsChargeable,
+                        rate,
+                      });
+                }
+                return isSingular
+                  ? localizationKeys('billing.seatBreakdownSingular', { rate })
+                  : localizationKeys('billing.seatBreakdownPlural', { chargeable: seatsChargeable, rate });
+              })()}
+            />
+            <LineItems.Description
+              prefix={subscriptionItem.planPeriod === 'annual' ? 'x12' : undefined}
+              text={`${seatSummary.paidTier.total.currencySymbol}${seatSummary.paidTier.total.amountFormatted}`}
+            />
+          </LineItems.Group>
+        )}
         <LineItems.Group
           borderTop
           variant='tertiary'

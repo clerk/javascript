@@ -5,6 +5,8 @@ import type {
   BillingCreditsJSON,
   BillingMoneyAmount,
   BillingMoneyAmountJSON,
+  BillingPaymentTotals,
+  BillingPaymentTotalsJSON,
   BillingPerUnitTotal,
   BillingPerUnitTotalJSON,
   BillingPlanUnitPriceJSON,
@@ -43,6 +45,16 @@ export const billingUnitPriceFromJSON = (unitPrice: BillingPlanUnitPriceJSON) =>
     feePerBlock: billingMoneyAmountFromJSON(tier.fee_per_block),
   })),
 });
+
+export const billingPaymentTotalsFromJSON = (data: BillingPaymentTotalsJSON): BillingPaymentTotals => {
+  return {
+    subtotal: billingMoneyAmountFromJSON(data.subtotal),
+    grandTotal: billingMoneyAmountFromJSON(data.grand_total),
+    taxTotal: billingMoneyAmountFromJSON(data.tax_total),
+    baseFee: data.base_fee ? billingMoneyAmountFromJSON(data.base_fee) : null,
+    perUnitTotals: data.per_unit_totals ? billingPerUnitTotalsFromJSON(data.per_unit_totals) : undefined,
+  };
+};
 
 export const billingCreditsFromJSON = (data: BillingCreditsJSON): BillingCredits => {
   return {
