@@ -1,0 +1,25 @@
+# Hotload boundary
+#
+# These files are part of the runtime surface that ships to consumer
+# apps without explicit version bumps. See AGENTS.md for context.
+
+/packages/clerk-js/src/core/clerk.ts          @clerk/team-sdk
+/packages/react/src/isomorphicClerk.ts        @clerk/team-sdk
+/packages/ui/src/contexts/                    @clerk/team-sdk
+
+# CI workflows and repo automation
+#
+# Changes here affect how every PR is built, gated, and merged, and the
+# CODEOWNERS policy itself.
+
+/.github/workflows/                           @clerk/team-sdk
+/.github/CODEOWNERS                            @clerk/team-sdk
+
+# Release tooling
+#
+# Changeset config and changelog generation drive what gets published and
+# how versions are computed. The per-PR changeset entries (.changeset/*.md)
+# are intentionally left unowned so they don't gate every PR.
+
+/.changeset/config.json                       @clerk/team-sdk
+/.changeset/changelog.js                      @clerk/team-sdk
