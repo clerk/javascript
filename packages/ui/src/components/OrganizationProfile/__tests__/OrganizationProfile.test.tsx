@@ -476,16 +476,17 @@ describe('OrganizationProfile', () => {
     });
   });
 
-  describe('Self-Serve SSO visibility', () => {
-    it('includes Self-Serve SSO when self-serve SSO is enabled in environment settings', async () => {
+  describe('SSO visibility', () => {
+    it('includes SSO when enabled at the instance and the org has opted in', async () => {
       const { wrapper } = await createFixtures(f => {
-        f.withEnterpriseSso({ selfServeSso: true });
+        f.withEnterpriseSso({ selfServeSSO: true });
         f.withOrganizations();
         f.withUser({
           email_addresses: ['test@clerk.com'],
           organization_memberships: [
             {
               name: 'Org1',
+              self_serve_sso_enabled: true,
               permissions: ['org:sys_entconns:manage'],
             },
           ],
@@ -496,15 +497,16 @@ describe('OrganizationProfile', () => {
       expect(await screen.findByText('Self-Serve SSO')).toBeDefined();
     });
 
-    it('does not include Self-Serve SSO when self-serve SSO is disabled in environment settings', async () => {
+    it('does not include SSO when disabled at the instance level', async () => {
       const { wrapper } = await createFixtures(f => {
-        f.withEnterpriseSso({ selfServeSso: false });
+        f.withEnterpriseSso({ selfServeSSO: false });
         f.withOrganizations();
         f.withUser({
           email_addresses: ['test@clerk.com'],
           organization_memberships: [
             {
               name: 'Org1',
+              self_serve_sso_enabled: true,
               permissions: ['org:sys_entconns:manage'],
             },
           ],
@@ -515,16 +517,36 @@ describe('OrganizationProfile', () => {
       await waitFor(() => expect(queryByText('Self-Serve SSO')).toBeNull());
     });
 
-    // We keep showing the section but the internal page displays a warning for missing permission
-    it('includes Self-Serve SSO even when the user does not have the manage enterprise connections permission', async () => {
+    it('does not include SSO when the org has not opted in, even if the instance has it enabled', async () => {
       const { wrapper } = await createFixtures(f => {
-        f.withEnterpriseSso({ selfServeSso: true });
+        f.withEnterpriseSso({ selfServeSSO: true });
         f.withOrganizations();
         f.withUser({
           email_addresses: ['test@clerk.com'],
           organization_memberships: [
             {
               name: 'Org1',
+              self_serve_sso_enabled: false,
+              permissions: ['org:sys_entconns:manage'],
+            },
+          ],
+        });
+      });
+
+      const { queryByText } = render(<OrganizationProfile />, { wrapper });
+      await waitFor(() => expect(queryByText('Self-Serve SSO')).toBeNull());
+    });
+
+    it('includes SSO even when the user does not have the manage enterprise connections permission', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEnterpriseSso({ selfServeSSO: true });
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [
+            {
+              name: 'Org1',
+              self_serve_sso_enabled: true,
               permissions: [],
             },
           ],

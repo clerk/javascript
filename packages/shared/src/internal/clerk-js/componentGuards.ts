@@ -18,7 +18,6 @@ export const noOrganizationExists: ComponentGuard = clerk => {
   return !clerk.organization;
 };
 
-// TODO -> Update with per org check
 export const disabledOrganizationsFeature: ComponentGuard = (_, environment) => {
   return !environment?.organizationSettings.enabled;
 };

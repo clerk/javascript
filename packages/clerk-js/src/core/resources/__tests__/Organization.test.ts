@@ -19,6 +19,7 @@ describe('Organization', () => {
       admin_delete_enabled: true,
       max_allowed_memberships: 3,
       has_image: true,
+      self_serve_sso_enabled: true,
     });
 
     expect(organization).toMatchObject({
@@ -32,11 +33,32 @@ describe('Organization', () => {
       pendingInvitationsCount: 10,
       maxAllowedMemberships: 3,
       adminDeleteEnabled: true,
+      selfServeSSOEnabled: true,
       createdAt: expect.any(Date),
       updatedAt: expect.any(Date),
       publicMetadata: {
         public: 'metadata',
       },
     });
+  });
+
+  it('defaults selfServeSSOEnabled to false when the field is omitted from FAPI', () => {
+    const organization = new Organization({
+      object: 'organization',
+      id: 'test_id',
+      name: 'test_name',
+      public_metadata: {},
+      slug: 'test_slug',
+      image_url: '',
+      created_at: 12345,
+      updated_at: 5678,
+      members_count: 1,
+      pending_invitations_count: 0,
+      admin_delete_enabled: true,
+      max_allowed_memberships: 3,
+      has_image: false,
+    });
+
+    expect(organization.selfServeSSOEnabled).toBe(false);
   });
 });

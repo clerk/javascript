@@ -3,7 +3,7 @@ import { useRef } from 'react';
 
 import { ConfigureSSOContent, ConfigureSSOProtect } from '../ConfigureSSO/ConfigureSSO';
 
-export const OrganizationSelfServeSsoPage = () => {
+export const OrganizationSelfServeSSOPage = () => {
   const { organization } = useOrganization();
   const contentRef = useRef<HTMLDivElement>(null);
 

@@ -46,6 +46,11 @@ export interface OrganizationResource extends ClerkResource, BillingPayerMethods
   publicMetadata: OrganizationPublicMetadata;
   adminDeleteEnabled: boolean;
   maxAllowedMemberships: number;
+  /**
+   * Whether the organization opted-in to self-serve SSO. Defaults to `false`
+   * when the instance does not have self-serve SSO enabled.
+   */
+  selfServeSSOEnabled: boolean;
   createdAt: Date;
   updatedAt: Date;
   update: (params: UpdateOrganizationParams) => Promise<OrganizationResource>;

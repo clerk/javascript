@@ -1,4 +1,4 @@
-import { useClerk } from '@clerk/shared/react';
+import { __internal_useOrganizationBase, useClerk } from '@clerk/shared/react';
 import { createContext, useContext, useMemo } from 'react';
 
 import type { NavbarRoute } from '@/ui/elements/Navbar';
@@ -27,7 +27,7 @@ export type OrganizationProfileContextType = OrganizationProfileCtx & {
   isAPIKeysPageRoot: boolean;
   isSelfServeSsoPageRoot: boolean;
   shouldShowBilling: boolean;
-  shouldShowSelfServeSso: boolean;
+  shouldShowSelfServeSSO: boolean;
 };
 
 export const OrganizationProfileContext = createContext<OrganizationProfileCtx | null>(null);
@@ -37,6 +37,7 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
   const { navigate } = useRouter();
   const environment = useEnvironment();
   const clerk = useClerk();
+  const organization = __internal_useOrganizationBase();
 
   if (!context || context.componentName !== 'OrganizationProfile') {
     throw new Error('Clerk: useOrganizationProfileContext called outside OrganizationProfile.');
@@ -58,12 +59,19 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
     // The C2 had a subscription in the past
     Boolean(statements.data.length > 0);
 
-  // TODO -> Check for org level as well
-  const shouldShowSelfServeSso = environment.userSettings.enterpriseSSO.self_serve_sso;
+  const shouldShowSelfServeSSO =
+    environment.userSettings.enterpriseSSO.self_serve_sso && !!organization?.selfServeSSOEnabled;
 
   const pages = useMemo(
-    () => createOrganizationProfileCustomPages(customPages || [], clerk, shouldShowBilling, environment),
-    [customPages, shouldShowBilling],
+    () =>
+      createOrganizationProfileCustomPages(
+        customPages || [],
+        clerk,
+        shouldShowBilling,
+        environment,
+        shouldShowSelfServeSSO,
+      ),
+    [customPages, shouldShowBilling, shouldShowSelfServeSSO],
   );
 
   const navigateAfterLeaveOrganization = () =>
@@ -89,6 +97,6 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
     isAPIKeysPageRoot,
     isSelfServeSsoPageRoot,
     shouldShowBilling,
-    shouldShowSelfServeSso,
+    shouldShowSelfServeSSO,
   };
 };
