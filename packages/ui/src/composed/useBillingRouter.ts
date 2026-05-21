@@ -71,6 +71,13 @@ export function useBillingRouter(): { router: RouteContextValue; route: BillingR
     queryParams,
     queryString: new URLSearchParams(queryParams).toString(),
     navigate: async (to: string, options?: { searchParams?: URLSearchParams }) => {
+      try {
+        const url = new URL(to);
+        if (url.origin !== window.location.origin) {
+          window.location.href = to;
+          return;
+        }
+      } catch {}
       const newRoute = resolveNavigation(route, to);
       setRoute(newRoute);
       if (options?.searchParams) {
