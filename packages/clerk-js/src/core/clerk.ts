@@ -1480,10 +1480,11 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
-    if (noUserExists(this)) {
+    const userExists = !noUserExists(this);
+    if (noOrganizationExists(this) && userExists) {
       if (this.#instanceType === 'development') {
-        throw new ClerkRuntimeError(warnings.cannotRenderConfigureSSOComponentWhenUserDoesNotExist, {
-          code: CANNOT_RENDER_USER_MISSING_ERROR_CODE,
+        throw new ClerkRuntimeError(warnings.cannotRenderComponentWhenOrgDoesNotExist, {
+          code: CANNOT_RENDER_ORGANIZATION_MISSING_ERROR_CODE,
         });
       }
       return;
