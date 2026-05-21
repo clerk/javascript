@@ -8,6 +8,11 @@ import { useCardState } from '@/ui/elements/contexts';
 import { Form } from '@/ui/elements/Form';
 import { FormButtonContainer } from '@/ui/elements/FormButtons';
 import { TagInput } from '@/ui/elements/TagInput';
+import {
+  getPaidSeatsUnitTier,
+  getSeatUnitPrice,
+  organizationAndInvitationsExceedsPurchasedSeats,
+} from '@/ui/utils/billingPlanSeats';
 import { handleError } from '@/ui/utils/errorHandler';
 import { createListFormat } from '@/ui/utils/passwordUtils';
 import { useFormControl } from '@/ui/utils/useFormControl';
@@ -19,11 +24,6 @@ import type { LocalizationKey } from '../../localization';
 import { localizationKeys, useLocalizations } from '../../localization';
 import { mqu } from '../../styledSystem';
 import { RoleSelect } from './MemberListTable';
-import {
-  getPaidSeatsUnitTier,
-  getSeatUnitPrice,
-  organizationAndInvitationsExceedsPurchasedSeats,
-} from '@/utils/billingPlanSeats';
 
 const isEmail = (str: string) => /^\S+@\S+\.\S+$/.test(str);
 
