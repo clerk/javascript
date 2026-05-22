@@ -68,19 +68,6 @@ describe('renderElement', () => {
     expect(el).toHaveTextContent('hello');
   });
 
-  it('renders custom element via render prop (element)', () => {
-    const element = renderElement({
-      defaultTagName: 'div',
-      render: <section />,
-      props: { 'data-testid': 'test', children: 'content' },
-    });
-
-    render(element!);
-
-    const el = screen.getByTestId('test');
-    expect(el.tagName).toBe('SECTION');
-  });
-
   it('renders via render function', () => {
     const element = renderElement({
       defaultTagName: 'div',

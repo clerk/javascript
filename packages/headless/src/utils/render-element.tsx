@@ -5,12 +5,9 @@ import * as React from 'react';
 // ---------------------------------------------------------------------------
 
 /**
- * A render prop: either a JSX element to clone, or a function that receives
- * computed HTML props and returns a JSX element.
+ * A render prop: a function that receives computed HTML props and returns a JSX element.
  */
-export type RenderProp<Props = React.HTMLAttributes<HTMLElement>> =
-  | React.ReactElement
-  | ((props: Props) => React.ReactElement);
+export type RenderProp<Props = React.HTMLAttributes<HTMLElement>> = (props: Props) => React.ReactElement;
 
 /**
  * Props accepted by any primitive part. Extends the native props for `Tag`
@@ -151,12 +148,8 @@ export function renderElement<
 
   const computedProps = { ...props, ...dataAttrs };
 
-  if (typeof render === 'function') {
-    return render(computedProps as React.HTMLAttributes<HTMLElement>);
-  }
-
   if (render) {
-    return React.cloneElement(render, computedProps);
+    return render(computedProps as React.HTMLAttributes<HTMLElement>);
   }
 
   return React.createElement(defaultTagName, computedProps);
