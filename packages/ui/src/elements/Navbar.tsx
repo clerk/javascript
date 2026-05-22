@@ -50,11 +50,10 @@ type NavBarProps = {
   contentRef: React.RefObject<HTMLDivElement>;
   routes: NavbarRoute[];
   header?: React.ReactNode;
-  footer?: React.ReactNode;
 };
 
 export const NavBar = (props: NavBarProps) => {
-  const { contentRef, title, titleSx, containerSx, description, routes, header, footer } = props;
+  const { contentRef, title, titleSx, containerSx, description, routes, header } = props;
   const { close } = useNavbarContext();
   const { navigate } = useRouter();
   const { navigateToFlowStart } = useNavigateToFlowStart();
@@ -133,7 +132,6 @@ export const NavBar = (props: NavBarProps) => {
         titleSx={titleSx}
         containerSx={containerSx}
         description={description}
-        footer={footer}
       >
         {header}
         {items}
@@ -141,7 +139,6 @@ export const NavBar = (props: NavBarProps) => {
       <MobileNavbarContainer>
         {header}
         {items}
-        {footer}
       </MobileNavbarContainer>
     </>
   );
@@ -153,10 +150,9 @@ const NavbarContainer = (
     titleSx?: ThemableCssProp;
     containerSx?: ThemableCssProp;
     description?: LocalizationKey | string;
-    footer?: React.ReactNode;
   }>,
 ) => {
-  const { title, titleSx, containerSx, description, footer } = props;
+  const { title, titleSx, containerSx, description } = props;
   return (
     <Col
       elementDescriptor={descriptors.navbar}
@@ -178,7 +174,6 @@ const NavbarContainer = (
       <DevModeOverlay />
 
       <Col sx={[t => ({ gap: t.space.$6, flex: `0 0 ${t.space.$60}` }), containerSx]}>
-        {footer}
         <Col
           sx={t => ({
             gap: t.space.$0x5,

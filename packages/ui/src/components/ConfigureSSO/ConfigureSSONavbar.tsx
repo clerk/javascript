@@ -1,8 +1,8 @@
-import { useOrganization, useUser } from '@clerk/shared/react/index';
+import { useOrganization } from '@clerk/shared/react/index';
 import React from 'react';
 
 import { useEnvironment } from '@/contexts';
-import { Box, Col, Flex, Hr, Icon, localizationKeys, Text, useAppearance } from '@/customizables';
+import { Box, Col, Flex, Icon, localizationKeys, Text, useAppearance } from '@/customizables';
 import { ApplicationLogo } from '@/elements/ApplicationLogo';
 import { NavBar, NavbarContextProvider } from '@/elements/Navbar';
 import { BoxIcon } from '@/icons';
@@ -23,6 +23,14 @@ export const ConfigureSSONavbar = ({ children, contentRef }: ConfigureSSONavbarP
   return (
     <NavbarContextProvider contentRef={contentRef}>
       <NavBar
+        contentRef={contentRef}
+        title={localizationKeys('configureSSO.navbar.title')}
+        titleSx={t => ({ fontSize: t.fontSizes.$lg })}
+        containerSx={{
+          flexDirection: 'column-reverse',
+          flex: 0,
+        }}
+        routes={[]}
         header={
           <Flex
             align='center'
@@ -69,15 +77,6 @@ export const ConfigureSSONavbar = ({ children, contentRef }: ConfigureSSONavbarP
             </Col>
           </Flex>
         }
-        titleSx={t => ({ fontSize: t.fontSizes.$lg })}
-        containerSx={{
-          flexDirection: 'column-reverse',
-          flex: 0,
-        }}
-        title={localizationKeys('configureSSO.navbar.title')}
-        routes={[]}
-        contentRef={contentRef}
-        footer={<PrimaryEmailDomainFooter />}
       />
       {children}
     </NavbarContextProvider>
@@ -99,33 +98,5 @@ const OrganizationSidebarSubtitle = (): JSX.Element | null => {
     >
       {organization?.name}
     </Text>
-  );
-};
-
-const PrimaryEmailDomainFooter = (): JSX.Element | null => {
-  const { user } = useUser();
-  const emailDomain = user?.primaryEmailAddress?.emailAddress.split('@')[1];
-
-  if (!emailDomain) {
-    return null;
-  }
-
-  return (
-    <Col
-      sx={t => ({
-        gap: t.space.$6,
-        padding: `${t.space.$none} ${t.space.$3}`,
-      })}
-    >
-      <Hr sx={t => ({ backgroundColor: t.colors.$borderAlpha100 })} />
-
-      <Text
-        as='span'
-        truncate
-        sx={{ textDecoration: 'underline' }}
-      >
-        {emailDomain}
-      </Text>
-    </Col>
   );
 };
