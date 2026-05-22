@@ -81,6 +81,8 @@ const config = {
     './.typedoc/custom-router.mjs',
     './.typedoc/custom-theme.mjs',
     './.typedoc/custom-plugin.mjs',
+    /** Must load after custom-plugin.mjs so its END listener (link replacements) fires first. */
+    './.typedoc/extract-methods.mjs',
   ],
   theme: 'clerkTheme',
   router: 'clerk-router',

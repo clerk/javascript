@@ -1,0 +1,5 @@
+### `emailLink`
+
+| Property       | Type                                                                                                                                                       | Description                                                                                                                                                                                                 |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `verification` | <code>null \| \{ createdSessionId: string; status: "expired" \| "failed" \| "verified" \| "client_mismatch"; verifiedFromTheSameClient: boolean; \}</code> | The verification status of the email link. This property is populated by reading query parameters from the URL after the user visits the email link. Returns `null` if no verification status is available. |

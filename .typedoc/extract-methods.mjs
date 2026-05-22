@@ -1,22 +1,36 @@
 // @ts-check
 /**
- * For each entry in REFERENCE_OBJECTS_LIST, reads the TypeDoc output (e.g. `shared/clerk/clerk.mdx`), strips **Properties** from the main generated file and copies the section body (table only, no `## Properties` heading) into `properties.mdx`, and writes one .mdx per method under `methods/` (alongside the main page in that resource folder).
+ * TypeDoc plugin that runs during the markdown render pass. For each reference-object page
+ * listed in {@link REFERENCE_OBJECT_CONFIG} (e.g. `shared/clerk/clerk.mdx`), this listener:
  *
- * Run after `typedoc` (same cwd as repo root). Uses a second TypeDoc convert pass to read reflections.
+ * - copies the body of the page's `## Properties` section (table only, no heading) into a
+ *   sibling `properties.mdx`,
+ * - mutates `output.contents` to drop the `## Properties` section from the main page,
+ * - writes one `methods/<name>.mdx` per callable child on the reflection (and on any
+ *   `extraMethodInterfaces`), alongside the main page in that resource folder.
  *
- * Like `extract-returns-and-params.mjs`, parameter tables are not hand-built: they use the same `MarkdownThemeContext.partials` as TypeDoc markdown output (`parametersTable` / `propertiesTable`, which call `someType` and therefore pick up `custom-theme.mjs` union/`&lt;code&gt;` behavior). Router + theme are prepared via `prepare-markdown-renderer.mjs` (same idea as `typedoc-plugin-markdown` `render()`).
+ * Must load **after** `custom-plugin.mjs` so its `MarkdownPageEvent.END` listener — which
+ * applies link replacements to `output.contents` — runs first. The Properties body we copy
+ * out is then already in its final, replaced form.
  *
- * Inline object namespaces tagged **`@extractMethods`** on the parent property are omitted from the main Properties table (see `custom-theme.mjs`). For each direct member: callables become `methods/<parent>-<child>.mdx` via `buildMethodMdx`; non-callables become a heading + property table via `buildPropertyTableDocMdx`.
+ * Like `extract-returns-and-params.mjs`, parameter tables are not hand-built: they use the
+ * same `MarkdownThemeContext.partials` as TypeDoc markdown output (`parametersTable` /
+ * `propertiesTable`, which call `someType` and therefore pick up `custom-theme.mjs` union /
+ * `&lt;code&gt;` behavior). The theme context comes from `theme.getRenderContext(output)`
+ * on the live page event — no second TypeDoc convert pass.
+ *
+ * Inline object namespaces tagged **`@extractMethods`** on the parent property are omitted
+ * from the main Properties table (see `custom-theme.mjs`). For each direct member: callables
+ * become `methods/<parent>-<child>.mdx` via `buildMethodMdx`; non-callables become a heading
+ * + property table via `buildPropertyTableDocMdx`.
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  Application,
   Comment,
   IntersectionType,
   OptionalType,
-  PageKind,
   ReferenceType,
   ReflectionKind,
   ReflectionType,
@@ -25,7 +39,6 @@ import {
 import { MarkdownPageEvent, MarkdownTheme } from 'typedoc-plugin-markdown';
 import { removeLineBreaks } from '../node_modules/typedoc-plugin-markdown/dist/libs/utils/index.js';
 
-import typedocConfig from '../typedoc.config.mjs';
 import { isCallableInterfaceProperty } from './custom-theme.mjs';
 import {
   applyCatchAllMdReplacements,
@@ -33,9 +46,8 @@ import {
   stripReferenceObjectPropertiesSection,
 } from './custom-plugin.mjs';
 import { isInlineModifierWithoutStandalonePage } from './standalone-page-tag.mjs';
-import { prepareMarkdownRenderer } from './prepare-markdown-renderer.mjs';
 import { applyTodoStrippingToComment } from './comment-utils.mjs';
-import { REFERENCE_OBJECTS_LIST, REFERENCE_OBJECT_CONFIG } from './reference-objects.mjs';
+import { REFERENCE_OBJECT_CONFIG } from './reference-objects.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -187,25 +199,6 @@ function formatMethodParametersTable(tableMd) {
   }
 
   return `${leadingNewlines}${[header, sep, ...body].join('\n')}\n`;
-}
-
-/**
- * @param {import('typedoc').Application} app
- * @param {import('typedoc').ProjectReflection} project
- * @param {string} pageUrl e.g. `shared/clerk/index.mdx`
- * @param {import('typedoc').DeclarationReflection} interfaceDecl
- */
-function createThemeContextForReferencePage(app, project, pageUrl, interfaceDecl) {
-  const page = new MarkdownPageEvent(interfaceDecl);
-  page.url = pageUrl;
-  page.filename = path.join(app.options.getValue('out') ?? '', pageUrl);
-  page.pageKind = PageKind.Reflection;
-  page.project = project;
-  const theme = /** @type {InstanceType<typeof MarkdownTheme> | undefined} */ (app.renderer.theme);
-  if (!theme || typeof theme.getRenderContext !== 'function') {
-    throw new Error('[extract-methods] Renderer theme is not ready; call prepareMarkdownRenderer(app) after convert');
-  }
-  return /** @type {import('typedoc-plugin-markdown').MarkdownThemeContext} */ (theme.getRenderContext(page));
 }
 
 /**
@@ -647,36 +640,24 @@ function extractPropertiesSectionBody(markdown) {
 }
 
 /**
- * @param {string} pageUrl e.g. `shared/clerk/clerk.mdx`
+ * Split the `## Properties` section out of page contents, returning the body (no heading)
+ * and the page contents with the Properties section removed.
+ *
+ * Operates on the in-memory `output.contents` of a `MarkdownPageEvent`; the caller writes
+ * `properties.mdx` and assigns the stripped string back to `output.contents`. The page's
+ * own END pipeline (link replacements) has already run by the time we get called, so the
+ * Properties body is in its final, replaced form — no re-application needed.
+ *
+ * @param {string} contents
+ * @returns {{ propertiesBody: string | undefined, stripped: string }}
  */
-function extractPropertiesAndTrimSourcePage(pageUrl) {
-  const sourcePath = path.join(__dirname, 'temp-docs', pageUrl);
-  if (!fs.existsSync(sourcePath)) {
-    console.warn(`[extract-methods] Expected TypeDoc output missing: ${sourcePath}`);
-    return;
+function splitPropertiesFromContents(contents) {
+  if (!contents) {
+    return { propertiesBody: undefined, stripped: contents };
   }
-  const raw = fs.readFileSync(sourcePath, 'utf-8');
-  const body = extractPropertiesSectionBody(raw);
-  const pageDir = path.dirname(pageUrl);
-  const objectDir = path.join(__dirname, 'temp-docs', pageDir);
-  fs.mkdirSync(objectDir, { recursive: true });
-
-  if (body) {
-    const propertiesDoc = `${body.trimEnd()}\n`;
-    const propertiesPath = path.join(objectDir, 'properties.mdx');
-    fs.writeFileSync(
-      propertiesPath,
-      applyCatchAllMdReplacements(applyRelativeLinkReplacements(propertiesDoc)),
-      'utf-8',
-    );
-    console.log(`[extract-methods] Wrote ${path.relative(path.join(__dirname, '..'), propertiesPath)}`);
-  }
-
-  const stripped = stripReferenceObjectPropertiesSection(raw);
-  if (stripped !== raw) {
-    fs.writeFileSync(sourcePath, stripped, 'utf-8');
-    console.log(`[extract-methods] Stripped Properties from ${path.relative(path.join(__dirname, '..'), sourcePath)}`);
-  }
+  const propertiesBody = extractPropertiesSectionBody(contents);
+  const stripped = stripReferenceObjectPropertiesSection(contents);
+  return { propertiesBody, stripped };
 }
 
 /**
@@ -1325,17 +1306,21 @@ function hasExtractMethodsModifier(decl) {
 }
 
 /**
- * Writes `methods/<parent>-<child>.mdx` for each direct member of an `@extractMethods` object-like type:
- * callables via {@link buildMethodMdx}, non-callables with a resolvable object shape via
- * {@link buildPropertyTableDocMdx}.
+ * @typedef {{ filePath: string, content: string }} ExtractedFile
+ */
+
+/**
+ * Collect `methods/<parent>-<child>.mdx` content for each direct member of an `@extractMethods`
+ * object-like type: callables via {@link buildMethodMdx}, non-callables with a resolvable object
+ * shape via {@link buildPropertyTableDocMdx}. Plus a `<parent>.mdx` index for non-callable members.
  *
- * Supports inline object literals and named references (`interface` / object-like `type` aliases) by resolving
- * the holder with {@link resolveDeclarationWithObjectMembers}.
+ * Supports inline object literals and named references (`interface` / object-like `type` aliases)
+ * via {@link resolveDeclarationWithObjectMembers}.
  *
  * @param {import('typedoc').DeclarationReflection} parentDecl
  * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
  * @param {string} outDir
- * @returns {number} Number of files written
+ * @returns {ExtractedFile[]}
  */
 function processExtractMethodsNamespace(parentDecl, ctx, outDir) {
   const project = ctx.page?.project;
@@ -1345,10 +1330,11 @@ function processExtractMethodsNamespace(parentDecl, ctx, outDir) {
     console.warn(
       `[extract-methods] @extractMethods on "${parentDecl.name}" requires an object-like type with members; skipping nested extraction`,
     );
-    return 0;
+    return [];
   }
   const parentName = parentDecl.name;
-  let count = 0;
+  /** @type {ExtractedFile[]} */
+  const collected = [];
   /** @type {import('typedoc').DeclarationReflection[]} */
   const nonCallableMembers = [];
   for (const nested of members) {
@@ -1363,9 +1349,7 @@ function processExtractMethodsNamespace(parentDecl, ctx, outDir) {
       if (!mdx) {
         continue;
       }
-      fs.writeFileSync(filePath, mdx, 'utf-8');
-      console.log(`[extract-methods] Wrote ${path.relative(path.join(__dirname, '..'), filePath)}`);
-      count++;
+      collected.push({ filePath, content: mdx });
       continue;
     }
     nonCallableMembers.push(nd);
@@ -1373,32 +1357,33 @@ function processExtractMethodsNamespace(parentDecl, ctx, outDir) {
     if (!propTableMdx) {
       continue;
     }
-    fs.writeFileSync(filePath, propTableMdx, 'utf-8');
-    console.log(`[extract-methods] Wrote ${path.relative(path.join(__dirname, '..'), filePath)}`);
-    count++;
+    collected.push({ filePath, content: propTableMdx });
   }
   if (nonCallableMembers.length) {
     const namespaceMdx = buildExtractMethodsNamespacePropertyTableMdx(parentDecl, nonCallableMembers, ctx);
     if (namespaceMdx) {
       const namespacePath = path.join(outDir, `${toKebabCase(parentName)}.mdx`);
-      fs.writeFileSync(namespacePath, namespaceMdx, 'utf-8');
-      console.log(`[extract-methods] Wrote ${path.relative(path.join(__dirname, '..'), namespacePath)}`);
-      count++;
+      collected.push({ filePath: namespacePath, content: namespaceMdx });
     }
   }
-  return count;
+  return collected;
 }
 
 /**
+ * Collect (path, content) pairs for each callable/`@extractMethods` child on `decl`. Callers
+ * are responsible for writing — see {@link load} which prettifies then writes.
+ *
  * @param {import('typedoc').DeclarationReflection} decl
  * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
  * @param {string} outDir
+ * @returns {ExtractedFile[]}
  */
 function extractCallableMembersFromDeclaration(decl, ctx, outDir) {
-  let count = 0;
   if (!decl.children) {
-    return 0;
+    return [];
   }
+  /** @type {ExtractedFile[]} */
+  const collected = [];
   for (const child of decl.children) {
     if (child.name.startsWith('__')) {
       continue;
@@ -1406,7 +1391,7 @@ function extractCallableMembersFromDeclaration(decl, ctx, outDir) {
     const childDecl = /** @type {import('typedoc').DeclarationReflection} */ (child);
 
     if (hasExtractMethodsModifier(childDecl)) {
-      count += processExtractMethodsNamespace(childDecl, ctx, outDir);
+      collected.push(...processExtractMethodsNamespace(childDecl, ctx, outDir));
       continue;
     }
 
@@ -1415,83 +1400,108 @@ function extractCallableMembersFromDeclaration(decl, ctx, outDir) {
       if (mdx) {
         const fileName = `${toKebabCase(child.name)}.mdx`;
         const filePath = path.join(outDir, fileName);
-        fs.writeFileSync(filePath, mdx, 'utf-8');
-        console.log(`[extract-methods] Wrote ${path.relative(path.join(__dirname, '..'), filePath)}`);
-        count++;
+        collected.push({ filePath, content: mdx });
       }
     }
   }
-  return count;
+  return collected;
 }
 
 /**
- * @param {string} pageUrl
- * @param {import('typedoc').ProjectReflection} project
- * @param {import('typedoc').Application} app
+ * @param {import('typedoc-plugin-markdown').MarkdownPageEvent<import('typedoc').Reflection>} output
+ * @returns {keyof typeof REFERENCE_OBJECT_CONFIG | undefined}
  */
-function extractMethodsForPage(pageUrl, project, app) {
-  const entry = REFERENCE_OBJECT_CONFIG[/** @type {keyof typeof REFERENCE_OBJECT_CONFIG} */ (pageUrl)];
-  if (!entry) {
-    console.warn(`[extract-methods] No symbol mapping for ${pageUrl}, skipping`);
-    return 0;
+function matchReferenceObjectPageUrl(output) {
+  if (!output.url) {
+    return undefined;
   }
+  const normalized = output.url.replace(/\\/g, '/');
+  return normalized in REFERENCE_OBJECT_CONFIG
+    ? /** @type {keyof typeof REFERENCE_OBJECT_CONFIG} */ (normalized)
+    : undefined;
+}
 
-  const { symbol, declarationHint } = entry;
-  const extraMethodInterfaces = 'extraMethodInterfaces' in entry ? entry.extraMethodInterfaces : undefined;
-  const decl = findInterfaceOrClass(project, symbol, declarationHint);
-  if (!decl?.children) {
-    console.warn(`[extract-methods] Could not find interface/class "${symbol}"`);
-    return 0;
-  }
-
-  extractPropertiesAndTrimSourcePage(pageUrl);
-
-  const ctx = createThemeContextForReferencePage(app, project, pageUrl, decl);
-
-  const pageDir = path.dirname(pageUrl);
-  const objectDir = path.join(__dirname, 'temp-docs', pageDir);
-  const outDir = path.join(objectDir, 'methods');
-  fs.mkdirSync(outDir, { recursive: true });
-
-  let count = extractCallableMembersFromDeclaration(decl, ctx, outDir);
-
-  if (Array.isArray(extraMethodInterfaces)) {
-    for (const extra of extraMethodInterfaces) {
-      const extraDecl = findInterfaceOrClass(project, extra.symbol, extra.declarationHint);
-      if (!extraDecl?.children) {
-        console.warn(`[extract-methods] extraMethodInterfaces: could not find "${extra.symbol}" for ${pageUrl}`);
-        continue;
-      }
-      count += extractCallableMembersFromDeclaration(extraDecl, ctx, outDir);
+/**
+ * Plugin entry: registers a `MarkdownPageEvent.END` listener that, for each page in
+ * {@link REFERENCE_OBJECT_CONFIG}, queues a `preWriteAsyncJob` to extract Properties + methods.
+ *
+ * The job runs **after** typedoc-plugin-markdown's own prettier job (also a `preWriteAsyncJob`,
+ * queued during `renderDocument`) — so by the time we read `output.contents`, the Properties
+ * table is already prettier-formatted, and our `properties.mdx` inherits that formatting.
+ * Method files are written raw (matching the pre-refactor behavior, where extract-methods.mjs
+ * also bypassed prettier for `methods/*.mdx`).
+ *
+ * Must be loaded **after** `custom-plugin.mjs` so its END listener (link replacements +
+ * heading filtering) runs first.
+ *
+ * @param {import('typedoc-plugin-markdown').MarkdownApplication} app
+ */
+export function load(app) {
+  app.renderer.on(MarkdownPageEvent.END, output => {
+    const pageUrl = matchReferenceObjectPageUrl(output);
+    if (!pageUrl) {
+      return;
     }
-  }
+    const entry = REFERENCE_OBJECT_CONFIG[pageUrl];
+    const decl = /** @type {import('typedoc').DeclarationReflection | undefined} */ (output.model);
+    if (!decl?.children) {
+      console.warn(`[extract-methods] No children on reflection for ${pageUrl}, skipping`);
+      return;
+    }
+    const project = output.project;
+    if (!project) {
+      console.warn(`[extract-methods] No project on page event for ${pageUrl}, skipping`);
+      return;
+    }
+    const theme = /** @type {InstanceType<typeof MarkdownTheme> | undefined} */ (app.renderer.theme);
+    if (!theme || typeof theme.getRenderContext !== 'function') {
+      console.warn(`[extract-methods] Renderer theme not ready for ${pageUrl}, skipping`);
+      return;
+    }
+    const ctx = /** @type {import('typedoc-plugin-markdown').MarkdownThemeContext} */ (theme.getRenderContext(output));
 
-  return count;
-}
+    const objectDir = path.dirname(output.filename);
+    const outDir = path.join(objectDir, 'methods');
 
-async function main() {
-  const app = await Application.bootstrapWithPlugins({
-    ...typedocConfig,
-    // Avoid writing markdown twice; we only need reflections.
-    out: path.join(__dirname, 'temp-docs-unused'),
+    /** @type {ExtractedFile[]} */
+    const methodFiles = extractCallableMembersFromDeclaration(decl, ctx, outDir);
+    const extraMethodInterfaces = 'extraMethodInterfaces' in entry ? entry.extraMethodInterfaces : undefined;
+    if (Array.isArray(extraMethodInterfaces)) {
+      for (const extra of extraMethodInterfaces) {
+        const extraDecl = findInterfaceOrClass(project, extra.symbol, extra.declarationHint);
+        if (!extraDecl?.children) {
+          console.warn(`[extract-methods] extraMethodInterfaces: could not find "${extra.symbol}" for ${pageUrl}`);
+          continue;
+        }
+        methodFiles.push(...extractCallableMembersFromDeclaration(extraDecl, ctx, outDir));
+      }
+    }
+
+    output.preWriteAsyncJobs.push(async () => {
+      fs.mkdirSync(objectDir, { recursive: true });
+
+      // `output.contents` is already prettier-formatted by typedoc-plugin-markdown's earlier
+      // pre-write job. Extract the Properties body from it (also formatted), write it out,
+      // then strip the section so the main page no longer ships it.
+      const { propertiesBody, stripped } = splitPropertiesFromContents(output.contents ?? '');
+      if (propertiesBody) {
+        const propertiesPath = path.join(objectDir, 'properties.mdx');
+        fs.writeFileSync(propertiesPath, `${propertiesBody.trimEnd()}\n`, 'utf-8');
+        console.log(`[extract-methods] Wrote ${path.relative(path.join(__dirname, '..'), propertiesPath)}`);
+      }
+      if (stripped && stripped !== output.contents) {
+        output.contents = stripped;
+      }
+
+      if (methodFiles.length === 0) {
+        return;
+      }
+      fs.mkdirSync(outDir, { recursive: true });
+      for (const { filePath, content } of methodFiles) {
+        fs.writeFileSync(filePath, content, 'utf-8');
+        console.log(`[extract-methods] Wrote ${path.relative(path.join(__dirname, '..'), filePath)}`);
+      }
+      console.log(`[extract-methods] ${pageUrl}: wrote ${methodFiles.length} method file(s)`);
+    });
   });
-
-  const project = await app.convert();
-  if (!project) {
-    console.error('[extract-methods] TypeDoc conversion failed');
-    process.exit(1);
-  }
-
-  prepareMarkdownRenderer(app, project);
-
-  let total = 0;
-  for (const pageUrl of REFERENCE_OBJECTS_LIST) {
-    total += extractMethodsForPage(pageUrl, project, app);
-  }
-  console.log(`[extract-methods] Wrote ${total} method files total`);
 }
-
-main().catch(err => {
-  console.error(err);
-  process.exit(1);
-});

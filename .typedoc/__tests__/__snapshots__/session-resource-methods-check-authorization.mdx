@@ -1,0 +1,7 @@
+### `checkAuthorization()`
+
+Checks if the user is [authorized for the specified Role, Permission, Feature, or Plan](/docs/guides/secure/authorization-checks) or requires the user to [reverify their credentials](/docs/guides/secure/reverification) if their last verification is older than allowed.
+
+```typescript
+function checkAuthorization(isAuthorizedParams: CheckAuthorizationParams): boolean;
+```
