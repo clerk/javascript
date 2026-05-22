@@ -1,5 +1,15 @@
 # @clerk/ui
 
+## 1.13.1
+
+### Patch Changes
+
+- Fix the Manage Subscription button in `<UserProfile />` / `<OrganizationProfile />` and the Cancel / Re-subscribe actions in `<SubscriptionDetails />` so they are shown for paid seat-based plans that have no base fee. A shared `isManageableSubscriptionItem` helper now drives both places, treating "free / unmanageable" as "the instance's default plan" instead of "the plan has no base fee". ([#8375](https://github.com/clerk/javascript/pull/8375)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+- Updated dependencies [[`a036ce8`](https://github.com/clerk/javascript/commit/a036ce8fef3b3ee2b49fd05d592b083ffc37f463)]:
+  - @clerk/shared@4.13.1
+  - @clerk/localizations@4.6.8
+
 ## 1.13.0
 
 ### Minor Changes
