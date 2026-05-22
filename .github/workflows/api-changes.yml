@@ -134,16 +134,19 @@ jobs:
 
       - name: Install baseline dependencies
         if: steps.baseline-cache.outputs.cache-matched-key == ''
-        run: pnpm --dir .worktrees/snapi-baseline install --frozen-lockfile
+        working-directory: .worktrees/snapi-baseline
+        run: pnpm install --frozen-lockfile
 
       - name: Build baseline declarations
         if: steps.baseline-cache.outputs.cache-matched-key == ''
-        run: pnpm --dir .worktrees/snapi-baseline turbo build:declarations $TURBO_ARGS $SNAPI_FILTERS
+        working-directory: .worktrees/snapi-baseline
+        run: pnpm turbo build:declarations $TURBO_ARGS $SNAPI_FILTERS
 
       - name: Generate baseline API snapshots
         if: steps.baseline-cache.outputs.cache-matched-key == ''
+        working-directory: .worktrees/snapi-baseline
         run: |
-          pnpm --dir .worktrees/snapi-baseline dlx --package "$SNAPI_PACKAGE" snapi snapshot \
+          pnpm dlx --package "$SNAPI_PACKAGE" snapi snapshot \
             --output "$GITHUB_WORKSPACE/.api-snapshots-baseline"
 
       - name: Detect API changes
