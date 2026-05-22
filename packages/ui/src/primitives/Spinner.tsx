@@ -6,6 +6,7 @@ const { size, thickness, speed } = createCssVariables('speed', 'size', 'thicknes
 const { applyVariants, filterProps } = createVariants(theme => {
   return {
     base: {
+      boxSizing: 'border-box',
       display: 'inline-block',
       borderRadius: '99999px',
       borderTop: `${thickness} solid currentColor`,

@@ -1,4 +1,5 @@
 import { ClerkProvider } from '@clerk/react';
+import { ui } from '@clerk/ui';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
@@ -12,7 +13,10 @@ if (!publishableKey) {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ClerkProvider publishableKey={publishableKey}>
+    <ClerkProvider
+      publishableKey={publishableKey}
+      ui={ui}
+    >
       <App />
     </ClerkProvider>
   </StrictMode>,
