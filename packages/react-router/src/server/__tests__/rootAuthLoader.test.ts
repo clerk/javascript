@@ -12,16 +12,21 @@ describe('rootAuthLoader', () => {
   });
 
   describe('with middleware context', () => {
+    const mockRequestState = {
+      toAuth: vi.fn().mockImplementation(() => ({
+        userId: 'user_xxx',
+        tokenType: TokenType.SessionToken,
+      })),
+      headers: new Headers(),
+      status: 'signed-in',
+    };
+
     const mockContext = {
       get: vi.fn().mockImplementation(contextKey => {
         if (contextKey === requestStateContext) {
           return {
-            toAuth: vi.fn().mockImplementation(() => ({
-              userId: 'user_xxx',
-              tokenType: TokenType.SessionToken,
-            })),
-            headers: new Headers(),
-            status: 'signed-in',
+            requestState: mockRequestState,
+            additionalState: {},
           };
         }
         if (contextKey === authFnContext) {
@@ -100,6 +105,40 @@ describe('rootAuthLoader', () => {
       const result = await rootAuthLoader(args, () => null);
 
       expect(result).toHaveProperty('clerkState');
+    });
+
+    it('should forward redirect URL options from additionalState into clerkState', async () => {
+      const mockContext2 = {
+        get: vi.fn().mockImplementation(contextKey => {
+          if (contextKey === requestStateContext) {
+            return {
+              requestState: mockRequestState,
+              additionalState: {
+                signInForceRedirectUrl: '/dashboard',
+                signUpForceRedirectUrl: '/welcome',
+                signInFallbackRedirectUrl: '/home',
+                signUpFallbackRedirectUrl: '/home',
+              },
+            };
+          }
+          if (contextKey === authFnContext) {
+            return vi.fn().mockReturnValue({ userId: 'user_xxx', tokenType: TokenType.SessionToken });
+          }
+          return null;
+        }),
+        set: vi.fn(),
+      };
+
+      const result = (await rootAuthLoader({
+        context: mockContext2,
+        request: new Request('http://clerk.com'),
+      } as LoaderFunctionArgs)) as any;
+
+      const internalState = result.clerkState.__internal_clerk_state;
+      expect(internalState.__signInForceRedirectUrl).toBe('/dashboard');
+      expect(internalState.__signUpForceRedirectUrl).toBe('/welcome');
+      expect(internalState.__signInFallbackRedirectUrl).toBe('/home');
+      expect(internalState.__signUpFallbackRedirectUrl).toBe('/home');
     });
   });
 });
