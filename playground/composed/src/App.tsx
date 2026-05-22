@@ -5,11 +5,13 @@ import { useState } from 'react';
 type ProfileType = 'user' | 'organization';
 type UserTab = 'account' | 'security' | 'billing' | 'api-keys';
 type OrgTab = 'general' | 'members' | 'billing' | 'api-keys';
+type ComposedMode = 'passthrough' | 'composed';
 
 export function App() {
   const [profileType, setProfileType] = useState<ProfileType>('user');
   const [userTab, setUserTab] = useState<UserTab>('account');
   const [orgTab, setOrgTab] = useState<OrgTab>('general');
+  const [composedMode, setComposedMode] = useState<ComposedMode>('passthrough');
 
   return (
     <div style={{ fontFamily: 'system-ui, sans-serif', maxWidth: 800, margin: '0 auto', padding: 24 }}>
@@ -53,6 +55,37 @@ export function App() {
               </button>
             </div>
 
+            <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+              <button
+                onClick={() => setComposedMode('passthrough')}
+                style={{
+                  padding: '6px 12px',
+                  border: '1px solid #ccc',
+                  borderRadius: 6,
+                  background: composedMode === 'passthrough' ? '#555' : '#fff',
+                  color: composedMode === 'passthrough' ? '#fff' : '#000',
+                  cursor: 'pointer',
+                  fontSize: 12,
+                }}
+              >
+                Page
+              </button>
+              <button
+                onClick={() => setComposedMode('composed')}
+                style={{
+                  padding: '6px 12px',
+                  border: '1px solid #ccc',
+                  borderRadius: 6,
+                  background: composedMode === 'composed' ? '#555' : '#fff',
+                  color: composedMode === 'composed' ? '#fff' : '#000',
+                  cursor: 'pointer',
+                  fontSize: 12,
+                }}
+              >
+                Sections
+              </button>
+            </div>
+
             {profileType === 'user' && (
               <UserProfile.Provider>
                 <TabBar
@@ -60,10 +93,38 @@ export function App() {
                   active={userTab}
                   onChange={setUserTab}
                 />
-                {userTab === 'account' && <UserProfile.Account />}
-                {userTab === 'security' && <UserProfile.Security />}
-                {userTab === 'billing' && <UserProfile.Billing />}
-                {userTab === 'api-keys' && <UserProfile.APIKeys />}
+                {composedMode === 'passthrough' ? (
+                  <>
+                    {userTab === 'account' && <UserProfile.Account />}
+                    {userTab === 'security' && <UserProfile.Security />}
+                    {userTab === 'billing' && <UserProfile.Billing />}
+                    {userTab === 'api-keys' && <UserProfile.APIKeys />}
+                  </>
+                ) : (
+                  <>
+                    {userTab === 'account' && (
+                      <UserProfile.Account>
+                        <UserProfile.AccountProfile />
+                        <div style={{ padding: '1rem', textAlign: 'center', background: 'lime' }}>hello world</div>
+                        <UserProfile.AccountEmails />
+                        <UserProfile.AccountPhone />
+                        <UserProfile.AccountConnectedAccounts />
+                        <UserProfile.AccountWeb3 />
+                      </UserProfile.Account>
+                    )}
+                    {userTab === 'security' && (
+                      <UserProfile.Security>
+                        <UserProfile.SecurityPassword />
+                        <UserProfile.SecurityPasskeys />
+                        <UserProfile.SecurityMfa />
+                        <UserProfile.SecurityActiveDevices />
+                        <UserProfile.SecurityDelete />
+                      </UserProfile.Security>
+                    )}
+                    {userTab === 'billing' && <UserProfile.Billing />}
+                    {userTab === 'api-keys' && <UserProfile.APIKeys />}
+                  </>
+                )}
               </UserProfile.Provider>
             )}
 
@@ -74,10 +135,28 @@ export function App() {
                   active={orgTab}
                   onChange={setOrgTab}
                 />
-                {orgTab === 'general' && <OrganizationProfile.General />}
-                {orgTab === 'members' && <OrganizationProfile.Members />}
-                {orgTab === 'billing' && <OrganizationProfile.Billing />}
-                {orgTab === 'api-keys' && <OrganizationProfile.APIKeys />}
+                {composedMode === 'passthrough' ? (
+                  <>
+                    {orgTab === 'general' && <OrganizationProfile.General />}
+                    {orgTab === 'members' && <OrganizationProfile.Members />}
+                    {orgTab === 'billing' && <OrganizationProfile.Billing />}
+                    {orgTab === 'api-keys' && <OrganizationProfile.APIKeys />}
+                  </>
+                ) : (
+                  <>
+                    {orgTab === 'general' && (
+                      <OrganizationProfile.General>
+                        <OrganizationProfile.GeneralOrganizationProfile />
+                        <OrganizationProfile.GeneralVerifiedDomains />
+                        <OrganizationProfile.GeneralLeaveOrganization />
+                        <OrganizationProfile.GeneralDeleteOrganization />
+                      </OrganizationProfile.General>
+                    )}
+                    {orgTab === 'members' && <OrganizationProfile.Members />}
+                    {orgTab === 'billing' && <OrganizationProfile.Billing />}
+                    {orgTab === 'api-keys' && <OrganizationProfile.APIKeys />}
+                  </>
+                )}
               </OrganizationProfile.Provider>
             )}
           </>
