@@ -1,5 +1,21 @@
 import type { ClerkOptions } from '@clerk/shared/types';
 
+function buildInternalParamsExpression(internalParams: ClerkOptions) {
+  const serializedParams = JSON.stringify(internalParams);
+
+  if (!internalParams.ui) {
+    return {
+      imports: '',
+      params: serializedParams,
+    };
+  }
+
+  return {
+    imports: 'import { ui as __internal_clerkAstroUi } from "@clerk/ui";',
+    params: `{ ...${serializedParams}, ui: __internal_clerkAstroUi }`,
+  };
+}
+
 /**
  * Creates a snippet that initializes Clerk before client-side framework hydration occurs.
  *
@@ -24,10 +40,13 @@ export function buildBeforeHydrationSnippet({
   buildImportPath: string;
   internalParams: ClerkOptions;
 }) {
+  const { imports, params } = buildInternalParamsExpression(internalParams);
+
   return `
   ${command === 'dev' ? `console.log("${packageName}","Initialize Clerk: before-hydration")` : ''}
+  ${imports}
   import { runInjectionScript } from "${buildImportPath}";
-  await runInjectionScript(${JSON.stringify(internalParams)});`;
+  await runInjectionScript(${params});`;
 }
 
 /**
@@ -59,8 +78,11 @@ export function buildPageLoadSnippet({
   buildImportPath: string;
   internalParams: ClerkOptions;
 }) {
+  const { imports, params } = buildInternalParamsExpression(internalParams);
+
   return `
   ${command === 'dev' ? `console.log("${packageName}","Initialize Clerk: page")` : ''}
+  ${imports}
   import { runInjectionScript, swapDocument } from "${buildImportPath}";
 
   // Taken from https://github.com/withastro/astro/blob/e10b03e88c22592fbb42d7245b65c4f486ab736d/packages/astro/src/transitions/router.ts#L39.
@@ -89,12 +111,12 @@ export function buildPageLoadSnippet({
       const { navigate } = await import('astro:transitions/client');
 
       await runInjectionScript({
-        ...${JSON.stringify(internalParams)},
+        ...${params},
         routerPush: navigate,
         routerReplace: (url) => navigate(url, { history: 'replace' }),
       });
     })
   } else {
-    await runInjectionScript(${JSON.stringify(internalParams)});
+    await runInjectionScript(${params});
   }`;
 }
