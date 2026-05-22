@@ -14,18 +14,20 @@ export type UseCustomElementPortalReturn = {
   id: string | number;
 };
 
+type PortalKey = string | number;
+
 // This function takes a component as prop, and returns functions that mount and unmount
 // the given component into a given node
 export const useCustomElementPortal = (elements: UseCustomElementPortalParams[]) => {
-  const [nodeMap, setNodeMap] = useState<Map<string, Element | null>>(new Map());
+  const [nodeMap, setNodeMap] = useState<Map<PortalKey, Element | null>>(new Map());
   const nodeMapRef = useRef(nodeMap);
-  const elementsRef = useRef<Map<string, React.ReactNode>>(new Map());
-  const portalsRef = useRef<Map<string, UseCustomElementPortalReturn>>(new Map());
+  const elementsRef = useRef<Map<PortalKey, React.ReactNode>>(new Map());
+  const portalsRef = useRef<Map<PortalKey, UseCustomElementPortalReturn>>(new Map());
 
   nodeMapRef.current = nodeMap;
-  elementsRef.current = new Map(elements.map(el => [String(el.id), el.component]));
+  elementsRef.current = new Map(elements.map(el => [el.id, el.component]));
 
-  const elementIds = new Set(elements.map(el => String(el.id)));
+  const elementIds = new Set(elements.map(el => el.id));
   portalsRef.current.forEach((_, id) => {
     if (!elementIds.has(id)) {
       portalsRef.current.delete(id);
@@ -33,7 +35,7 @@ export const useCustomElementPortal = (elements: UseCustomElementPortalParams[])
   });
 
   return elements.map(el => {
-    const id = String(el.id);
+    const id = el.id;
     const existingPortal = portalsRef.current.get(id);
 
     if (existingPortal) {

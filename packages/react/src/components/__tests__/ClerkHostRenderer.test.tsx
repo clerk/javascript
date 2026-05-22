@@ -14,6 +14,34 @@ vi.mock('@clerk/shared/react', () => ({
 }));
 
 describe('<ClerkHostRenderer />', () => {
+  it('does not throw when mounted component props are omitted during updates', () => {
+    const mount = vi.fn();
+    const unmount = vi.fn();
+    const updateProps = vi.fn();
+
+    const { rerender } = render(
+      <ClerkHostRenderer
+        component='UserProfile'
+        mount={mount}
+        unmount={unmount}
+        updateProps={updateProps}
+      />,
+    );
+
+    expect(() =>
+      rerender(
+        <ClerkHostRenderer
+          component='OrganizationProfile'
+          mount={mount}
+          unmount={unmount}
+          updateProps={updateProps}
+        />,
+      ),
+    ).not.toThrow();
+
+    expect(updateProps).not.toHaveBeenCalled();
+  });
+
   it('updates mounted component props when custom pages are added or removed', () => {
     const mount = vi.fn();
     const unmount = vi.fn();

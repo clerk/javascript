@@ -74,4 +74,42 @@ describe('useCustomElementPortal', () => {
     await screen.findByText('0');
     expect(portalRoot.textContent).toBe('0');
   });
+
+  it('keeps string and number ids in separate portal caches', async () => {
+    const TestComponent = () => {
+      const [
+        { mount: mountNumber, portal: NumberPortal, unmount: unmountNumber },
+        { mount: mountString, portal: StringPortal, unmount: unmountString },
+      ] = useCustomElementPortal([
+        { component: <div>number id</div>, id: 1 },
+        { component: <div>string id</div>, id: '1' },
+      ]);
+
+      useEffect(() => {
+        mountNumber(portalRoot);
+        mountString(portalRoot);
+
+        return () => {
+          unmountNumber();
+          unmountString();
+        };
+      }, [mountNumber, mountString, unmountNumber, unmountString]);
+
+      return (
+        <>
+          <NumberPortal />
+          <StringPortal />
+        </>
+      );
+    };
+
+    portalRoot = document.createElement('div');
+    document.body.appendChild(portalRoot);
+
+    render(<TestComponent />);
+
+    await screen.findByText('number id');
+    await screen.findByText('string id');
+    expect(portalRoot.textContent).toBe('number idstring id');
+  });
 });
