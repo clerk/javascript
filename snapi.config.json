@@ -1,5 +1,5 @@
 {
-  "packages": ["packages/clerk-js", "packages/react", "packages/shared"],
+  "packages": ["packages/clerk-js", "packages/react", "packages/shared", "packages/ui"],
   "snapshotDir": ".api-snapshots",
   "mainBranch": "main",
   "checkVersionBump": true,
