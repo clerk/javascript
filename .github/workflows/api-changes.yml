@@ -131,6 +131,12 @@ jobs:
           mkdir -p .worktrees
           git worktree add .worktrees/snapi-baseline "origin/${GITHUB_BASE_REF}"
           cp snapi.config.json .worktrees/snapi-baseline/snapi.config.json
+          # Overlay HEAD's build:declarations wiring for watched packages onto
+          # the baseline. snapi watches a package set defined by HEAD, so the
+          # baseline must produce declarations the same way, even if a watched
+          # package only acquired its build:declarations task in this PR.
+          cp packages/ui/package.json .worktrees/snapi-baseline/packages/ui/package.json
+          cp packages/ui/tsconfig.declarations.json .worktrees/snapi-baseline/packages/ui/tsconfig.declarations.json
 
       - name: Install baseline dependencies
         if: steps.baseline-cache.outputs.cache-matched-key == ''
