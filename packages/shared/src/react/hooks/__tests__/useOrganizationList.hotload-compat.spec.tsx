@@ -144,7 +144,7 @@ afterEach(() => {
 
 describe('useOrganizationList hotload compatibility', () => {
   it('leaves the legacy mock query-client state and requests organization memberships', async () => {
-    const fapiRequest = vi.fn(() =>
+    const fapiRequest = vi.fn((_request: unknown) =>
       Promise.resolve({
         data: [],
         total_count: 0,
