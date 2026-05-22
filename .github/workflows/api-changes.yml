@@ -63,9 +63,6 @@ jobs:
       - name: Build current declarations
         run: pnpm turbo build:declarations $TURBO_ARGS $SNAPI_FILTERS
 
-      - name: Generate current API snapshots
-        run: pnpm dlx --package "$SNAPI_PACKAGE" snapi snapshot --output .api-snapshots-current
-
       - name: Create baseline worktree
         run: |
           mkdir -p .worktrees
