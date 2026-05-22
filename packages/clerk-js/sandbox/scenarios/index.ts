@@ -4,3 +4,8 @@ export { CheckoutSeats } from './checkout-seats';
 export { OrgProfileSeatLimit } from './org-profile-seat-limit';
 export { PricingTableSBB } from './pricing-table-sbb';
 export { AnnualOnlyPlans } from './annual-only-plans';
+export { SignInFactorOnePassword, SignInFactorOneEmailCode, SignInFactorOnePhoneCode } from './sign-in-factor-one';
+export { SignInFactorTwoTOTP, SignInFactorTwoBackupCode } from './sign-in-factor-two';
+export { SignInResetPassword } from './sign-in-reset-password';
+export { SignUpVerifyEmail } from './sign-up-verify-email';
+export { SignUpVerifyPhone } from './sign-up-verify-phone';

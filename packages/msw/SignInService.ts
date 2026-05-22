@@ -31,19 +31,38 @@ export class SignInService {
   static createSignInResponse(
     options: {
       createdSessionId?: string | null;
+      firstFactorStrategy?: 'password' | 'email_code' | 'phone_code';
       identifier?: string;
-      status?: 'needs_first_factor' | 'complete';
+      status?: 'needs_first_factor' | 'needs_second_factor' | 'complete';
+      supportedSecondFactors?: Array<{ strategy: string }>;
       verificationAttempts?: number;
       verificationStatus?: 'unverified' | 'verified';
     } = {},
   ) {
     const {
       createdSessionId = null,
+      firstFactorStrategy = 'password',
       identifier = this.currentIdentifier,
       status = 'needs_first_factor',
+      supportedSecondFactors = [],
       verificationAttempts = 0,
       verificationStatus = 'unverified',
     } = options;
+
+    const isSecondFactor = status === 'needs_second_factor';
+
+    const supportedFirstFactors = this.buildSupportedFirstFactors(firstFactorStrategy, identifier);
+
+    const secondFactorVerification = isSecondFactor
+      ? {
+          attempts: 0,
+          error: null,
+          expire_at: Date.now() + 600000,
+          status: 'unverified',
+          strategy: supportedSecondFactors[0]?.strategy ?? 'totp',
+          supported_strategies: supportedSecondFactors.map(f => f.strategy),
+        }
+      : null;
 
     const signInResponse = {
       abandon_at: null,
@@ -52,25 +71,21 @@ export class SignInService {
         attempts: verificationAttempts,
         error: null,
         expire_at: Date.now() + 600000,
-        status: verificationStatus,
-        strategy: 'password',
-        supported_strategies: ['password'],
+        status: isSecondFactor ? 'verified' : verificationStatus,
+        strategy: firstFactorStrategy,
+        supported_strategies: [firstFactorStrategy],
       },
       id: 'si_mock_signin_id',
       identifier,
       object: 'sign_in',
-      second_factor_verification: null,
+      second_factor_verification: secondFactorVerification,
       status,
-      supported_first_factors: [
-        {
-          email_address_id: 'idn_mock_email',
-          primary: true,
-          safe_identifier: identifier,
-          strategy: 'password',
-        },
-      ],
+      supported_first_factors: supportedFirstFactors,
       supported_identifiers: ['email_address'],
-      supported_second_factors: [],
+      supported_second_factors: supportedSecondFactors.map(f => ({
+        ...f,
+        phone_number_id: f.strategy === 'phone_code' ? 'idn_mock_phone' : undefined,
+      })),
       user_data: null,
     };
 
@@ -119,5 +134,38 @@ export class SignInService {
       newUser,
       signInResponse,
     };
+  }
+
+  private static buildSupportedFirstFactors(strategy: string, identifier: string) {
+    switch (strategy) {
+      case 'email_code':
+        return [
+          {
+            email_address_id: 'idn_mock_email',
+            primary: true,
+            safe_identifier: identifier,
+            strategy: 'email_code',
+          },
+        ];
+      case 'phone_code':
+        return [
+          {
+            phone_number_id: 'idn_mock_phone',
+            primary: true,
+            safe_identifier: '+1********00',
+            strategy: 'phone_code',
+          },
+        ];
+      case 'password':
+      default:
+        return [
+          {
+            email_address_id: 'idn_mock_email',
+            primary: true,
+            safe_identifier: identifier,
+            strategy: 'password',
+          },
+        ];
+    }
   }
 }
