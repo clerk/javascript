@@ -1,7 +1,7 @@
 import type { ModuleManager } from '@clerk/shared/moduleManager';
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type { EnvironmentResource, OAuthProvider, OAuthScope } from '@clerk/shared/types';
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import { AppearanceProvider } from '@/ui/customizables/AppearanceContext';
 import { FlowMetadataProvider } from '@/ui/elements/contexts';
@@ -16,10 +16,11 @@ import { OptionsProvider } from '../../contexts/OptionsContext';
 import { SubscriberTypeContext } from '../../contexts/components/SubscriberType';
 import { OrganizationProfileContext } from '../../contexts/components/OrganizationProfile';
 import { ProfileCardPagePaddingProvider } from '../../elements/ProfileCard';
-import { stubRouter } from '../stubRouter';
+import { getModuleManager } from '../moduleManagerStore';
+import { createComposedRouter } from '../stubRouter';
 
-const stubModuleManager: ModuleManager = {
-  import: () => Promise.resolve(undefined),
+const fallbackModuleManager: ModuleManager = {
+  import: () => Promise.resolve(undefined) as any,
 };
 
 type OrganizationProfileProviderProps = React.PropsWithChildren<{
@@ -34,6 +35,8 @@ export const OrganizationProfileProvider = (props: OrganizationProfileProviderPr
   const { organization } = useOrganization();
 
   const environment = (clerk as any).__internal_environment as EnvironmentResource | null | undefined;
+  const moduleManager: ModuleManager = getModuleManager() ?? fallbackModuleManager;
+  const router = useMemo(() => createComposedRouter(clerk.navigate), [clerk]);
 
   if (!isLoaded || !user || !organization || !environment) {
     return null;
@@ -55,10 +58,10 @@ export const OrganizationProfileProvider = (props: OrganizationProfileProviderPr
       >
         <FlowMetadataProvider flow='organizationProfile'>
           <InternalThemeProvider>
-            <ModuleManagerProvider moduleManager={stubModuleManager}>
+            <ModuleManagerProvider moduleManager={moduleManager}>
               <OptionsProvider value={{}}>
                 <EnvironmentProvider value={environment}>
-                  <RouteContext.Provider value={stubRouter}>
+                  <RouteContext.Provider value={router}>
                     <SubscriberTypeContext.Provider value='organization'>
                       <OrganizationProfileContext.Provider value={orgProfileCtxValue}>
                         <ProfileCardPagePaddingProvider value={false}>{children}</ProfileCardPagePaddingProvider>
