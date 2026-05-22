@@ -207,6 +207,62 @@ describe('withClerkMiddleware(options)', () => {
     expect(response.body).toEqual(JSON.stringify({ auth: { tokenType: 'session_token' } }));
   });
 
+  test('still redirects for dev-browser-missing handshake even when enableHandshake is false', async () => {
+    authenticateRequestMock.mockResolvedValueOnce({
+      status: 'handshake',
+      reason: 'dev-browser-missing',
+      headers: new Headers({
+        location: 'https://fapi.example.com/v1/clients/handshake',
+        'x-clerk-auth-status': 'handshake',
+        'x-clerk-auth-reason': 'dev-browser-missing',
+      }),
+      toAuth: () => ({ tokenType: 'session_token' }),
+    });
+    const fastify = Fastify();
+    await fastify.register(clerkPlugin, { enableHandshake: false });
+
+    fastify.get('/', (_request: FastifyRequest, reply: FastifyReply) => {
+      reply.send({});
+    });
+
+    const response = await fastify.inject({
+      method: 'GET',
+      path: '/',
+      headers: { cookie: '__client_uat=1675692233' },
+    });
+
+    expect(response.statusCode).toEqual(307);
+    expect(response.headers.location).toEqual('https://fapi.example.com/v1/clients/handshake');
+  });
+
+  test('still redirects for dev-browser-sync handshake even when enableHandshake is false', async () => {
+    authenticateRequestMock.mockResolvedValueOnce({
+      status: 'handshake',
+      reason: 'dev-browser-sync',
+      headers: new Headers({
+        location: 'https://fapi.example.com/v1/clients/handshake',
+        'x-clerk-auth-status': 'handshake',
+        'x-clerk-auth-reason': 'dev-browser-sync',
+      }),
+      toAuth: () => ({ tokenType: 'session_token' }),
+    });
+    const fastify = Fastify();
+    await fastify.register(clerkPlugin, { enableHandshake: false });
+
+    fastify.get('/', (_request: FastifyRequest, reply: FastifyReply) => {
+      reply.send({});
+    });
+
+    const response = await fastify.inject({
+      method: 'GET',
+      path: '/',
+      headers: { cookie: '__client_uat=1675692233' },
+    });
+
+    expect(response.statusCode).toEqual(307);
+    expect(response.headers.location).toEqual('https://fapi.example.com/v1/clients/handshake');
+  });
+
   test('strips handshake cookies and query params before authenticating when enableHandshake is false', async () => {
     authenticateRequestMock.mockResolvedValueOnce({
       headers: new Headers(),

@@ -123,13 +123,15 @@ export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
 
     requestState.headers.forEach((value, key) => reply.header(key, value));
 
-    if (enableHandshake) {
-      const locationHeader = requestState.headers.get(constants.Headers.Location);
-      if (locationHeader) {
+    const locationHeader = requestState.headers.get(constants.Headers.Location);
+    if (locationHeader) {
+      const isDevBrowserHandshake =
+        requestState.reason === 'dev-browser-missing' || requestState.reason === 'dev-browser-sync';
+      if (enableHandshake || isDevBrowserHandshake) {
         return reply.code(307).send();
-      } else if (requestState.status === AuthStatus.Handshake) {
-        throw new Error('Clerk: handshake status without redirect');
       }
+    } else if (enableHandshake && requestState.status === AuthStatus.Handshake) {
+      throw new Error('Clerk: handshake status without redirect');
     }
 
     // @ts-expect-error Inject auth so getAuth can read it
