@@ -50,6 +50,15 @@ tags:
           text: "Sign Out"
       - waitForAnimationToEnd:
           timeout: 3000
-- assertVisible:
-    text: 'Welcome! Sign in to continue\.?'
+# The no-flash regression check is the `cold-launch-immediate` screenshot
+# captured above, BEFORE this assertion. This final check only confirms
+# we landed on the AuthView at all. Use extendedWaitUntil instead of a
+# bare assertVisible because on cold Android emulators (and slow iOS sims
+# with cache misses) the AuthView's JS bundle can still be parsing at
+# t=10s post-launch — assertVisible races bundle-load and flakes, even
+# though the AuthView shows up a few seconds later. 30s mirrors the
+# matching wait in flows/common/open-app.yaml.
+- extendedWaitUntil:
+    visible: 'Welcome! Sign in to continue\.?'
+    timeout: 30000
 - takeScreenshot: cold-launch-settled
