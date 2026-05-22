@@ -663,6 +663,14 @@ export interface BillingPerUnitTotalJSON {
   tiers: BillingPerUnitTotalTierJSON[];
 }
 
+export interface BillingPriceJSON extends ClerkResourceJSON {
+  object: 'commerce_price';
+  fee: BillingMoneyAmountJSON | null;
+  annual_monthly_fee: BillingMoneyAmountJSON | null;
+  is_default: boolean;
+  unit_prices?: BillingPlanUnitPriceJSON[];
+}
+
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
@@ -688,6 +696,7 @@ export interface BillingPlanJSON extends ClerkResourceJSON {
    * Per-unit pricing tiers for this plan (for example, seats).
    */
   unit_prices?: BillingPlanUnitPriceJSON[];
+  available_prices?: BillingPriceJSON[];
 }
 
 /**
@@ -792,6 +801,7 @@ export interface BillingSubscriptionItemJSON extends ClerkResourceJSON {
   credits?: BillingCreditsJSON;
   plan: BillingPlanJSON;
   plan_period: BillingSubscriptionPlanPeriod;
+  price_id: string;
   status: BillingSubscriptionStatus;
   created_at: number;
   period_start: number;

@@ -1,5 +1,5 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
-import { useOrganization } from '@clerk/shared/react';
+import { useClerk, useOrganization } from '@clerk/shared/react';
 import type { ClerkAPIError } from '@clerk/shared/types';
 import type { FormEvent } from 'react';
 import { useEffect, useState } from 'react';
@@ -9,10 +9,11 @@ import { Form } from '@/ui/elements/Form';
 import { FormButtonContainer } from '@/ui/elements/FormButtons';
 import { TagInput } from '@/ui/elements/TagInput';
 import { handleError } from '@/ui/utils/errorHandler';
+import { getClosestProfileScrollBoxFromElement } from '@/ui/utils/getClosestProfileScrollBox';
 import { createListFormat } from '@/ui/utils/passwordUtils';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
-import { useEnvironment } from '../../contexts';
+import { useEnvironment, usePlansContext, useSubscription } from '../../contexts';
 import { Flex } from '../../customizables';
 import { useFetchRoles } from '../../hooks/useFetchRoles';
 import type { LocalizationKey } from '../../localization';
@@ -31,12 +32,15 @@ type InviteMembersFormProps = {
 
 export const InviteMembersForm = (props: InviteMembersFormProps) => {
   const { onSuccess, onReset, resetButtonLabel } = props;
+  const clerk = useClerk();
   const { organization, invitations } = useOrganization({
     invitations: {
       pageSize: 10,
       keepPreviousData: true,
     },
   });
+  const { subscriptionItems } = useSubscription();
+  const { handleSelectPlan } = usePlansContext();
   const card = useCardState();
   const { t, locale } = useLocalizations();
   const [isValidUnsubmittedEmail, setIsValidUnsubmittedEmail] = useState(false);
@@ -75,72 +79,124 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
 
   const canSubmit = (!!emailAddressField.value.length || isValidUnsubmittedEmail) && !!roleField.value;
 
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!canSubmit) {
       return;
     }
 
     const submittedData = new FormData(e.currentTarget);
-    return organization
-      .inviteMembers({
+    const portalRoot = getClosestProfileScrollBoxFromElement(e.currentTarget);
+    try {
+      await organization.inviteMembers({
         emailAddresses: emailAddressField.value.split(','),
         role: submittedData.get('role') as string,
-      })
-      .then(async () => {
-        await invitations?.revalidate?.();
-        return onSuccess?.();
-      })
-      .catch(err => {
-        if (!isClerkAPIResponseError(err)) {
+      });
+
+      await invitations?.revalidate?.();
+      onSuccess?.();
+    } catch (err) {
+      if (!isClerkAPIResponseError(err)) {
+        if (err instanceof Error) {
           handleError(err, [], card.setError);
           return;
         }
 
-        removeInvalidEmails(err.errors[0]);
+        throw err;
+      }
 
-        switch (err.errors?.[0]?.code) {
-          case 'duplicate_record': {
-            const unlocalizedEmailsList = err.errors[0].meta?.emailAddresses || [];
-            card.setError(
-              t(
-                localizationKeys('organizationProfile.invitePage.detailsTitle__inviteFailed', {
-                  // Create a localized list of email addresses
-                  email_addresses: createListFormat(unlocalizedEmailsList, locale),
-                }),
-              ),
+      removeInvalidEmails(err.errors[0]);
+
+      switch (err.errors?.[0]?.code) {
+        case 'duplicate_record': {
+          const unlocalizedEmailsList = err.errors[0].meta?.emailAddresses || [];
+          card.setError(
+            t(
+              localizationKeys('organizationProfile.invitePage.detailsTitle__inviteFailed', {
+                // Create a localized list of email addresses
+                email_addresses: createListFormat(unlocalizedEmailsList, locale),
+              }),
+            ),
+          );
+          break;
+        }
+        case 'already_a_member_in_organization': {
+          /**
+           * Extracts email from the error message since it's not provided in the error response
+           */
+          const longMessage = err.errors[0].longMessage ?? '';
+          const email = longMessage.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/)?.[0];
+
+          handleError(err, [], err =>
+            email
+              ? /**
+                 * Fallbacks to original error message in case the email cannot be extracted
+                 */
+                card.setError(
+                  t(
+                    localizationKeys('unstable__errors.already_a_member_in_organization', {
+                      email,
+                    }),
+                  ),
+                )
+              : card.setError(err),
+          );
+
+          break;
+        }
+        case 'insufficient_seats': {
+          try {
+            const { data: plans } = await clerk.billing.getPlans({
+              for: 'organization',
+              org_id: organization.id,
+              min_seats: err.errors[0].meta?.seatsQuantity,
+            });
+
+            if (plans.length === 0) {
+              handleError(err, [], () =>
+                card.setError(t(localizationKeys('unstable__errors.insufficient_seats_contact_support'))),
+              );
+              break;
+            }
+
+            const activeSubscriptionItem = subscriptionItems.find(si => si.status === 'active');
+            if (activeSubscriptionItem) {
+              const currentPlan = activeSubscriptionItem.plan;
+              const currentPlanAndPriceSupportsDesiredSeatQuantity = plans.some(
+                p =>
+                  p.id === currentPlan.id &&
+                  p.availablePrices?.some(price => price.id === activeSubscriptionItem.priceId),
+              );
+              if (currentPlanAndPriceSupportsDesiredSeatQuantity) {
+                handleSelectPlan({
+                  mode: 'modal',
+                  plan: currentPlan,
+                  planPeriod: activeSubscriptionItem.planPeriod,
+                  seatsQuantity: err.errors[0].meta?.seatsQuantity,
+                  portalRoot,
+                });
+                break;
+              }
+            }
+
+            handleError(err, [], () =>
+              card.setError(t(localizationKeys('unstable__errors.insufficient_seats_change_plan'))),
             );
             break;
-          }
-          case 'already_a_member_in_organization': {
-            /**
-             * Extracts email from the error message since it's not provided in the error response
-             */
-            const longMessage = err.errors[0].longMessage ?? '';
-            const email = longMessage.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/)?.[0];
-
-            handleError(err, [], err =>
-              email
-                ? /**
-                   * Fallbacks to original error message in case the email cannot be extracted
-                   */
-                  card.setError(
-                    t(
-                      localizationKeys('unstable__errors.already_a_member_in_organization', {
-                        email,
-                      }),
-                    ),
-                  )
-                : card.setError(err),
-            );
-
+          } catch (err: unknown) {
+            if (err instanceof Error) {
+              handleError(err, [], () =>
+                card.setError(t(localizationKeys('unstable__errors.insufficient_seats_contact_support'))),
+              );
+            }
             break;
-          }
-          default: {
-            handleError(err, [], card.setError);
           }
         }
-      });
+        default: {
+          handleError(err, [], card.setError);
+        }
+      }
+    }
   };
 
   const removeInvalidEmails = (err: ClerkAPIError) => {

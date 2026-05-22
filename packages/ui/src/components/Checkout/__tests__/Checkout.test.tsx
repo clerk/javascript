@@ -61,6 +61,39 @@ describe('Checkout', () => {
     });
   });
 
+  it('passes seatsQuantity to checkout initialization', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
+    });
+
+    fixtures.clerk.billing.startCheckout.mockResolvedValue({} as any);
+
+    render(
+      <Drawer.Root
+        open
+        onOpenChange={() => {}}
+      >
+        <Checkout
+          planId='plan_with_seats'
+          planPeriod='month'
+          seatsQuantity={7}
+        />
+      </Drawer.Root>,
+      { wrapper },
+    );
+
+    await waitFor(() => {
+      expect(fixtures.clerk.billing.startCheckout).toHaveBeenCalledWith(
+        expect.objectContaining({
+          planId: 'plan_with_seats',
+          planPeriod: 'month',
+          seatsQuantity: 7,
+        }),
+      );
+    });
+  });
+
   it('renders drawer structure and localization correctly', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
@@ -345,6 +378,7 @@ describe('Checkout', () => {
         },
         pastDue: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
         totalDueNow: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
+        totalDuePerPeriod: { amount: 2500, amountFormatted: '25.00', currency: 'USD', currencySymbol: '$' },
       },
       isImmediatePlanChange: true,
       planPeriod: 'month',
@@ -442,6 +476,7 @@ describe('Checkout', () => {
         pastDue: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
         totalDueAfterFreeTrial: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
         totalDueNow: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+        totalDuePerPeriod: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
       },
       isImmediatePlanChange: true,
       planPeriod: 'month',
@@ -526,6 +561,7 @@ describe('Checkout', () => {
         credit: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
         pastDue: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
         totalDueNow: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+        totalDuePerPeriod: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
       },
       isImmediatePlanChange: true,
       planPeriod: 'month',
@@ -606,6 +642,7 @@ describe('Checkout', () => {
         credit: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
         pastDue: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
         totalDueNow: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+        totalDuePerPeriod: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
       },
       isImmediatePlanChange: true,
       planPeriod: 'month',
@@ -699,6 +736,7 @@ describe('Checkout', () => {
         credit: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
         pastDue: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
         totalDueNow: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
+        totalDuePerPeriod: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
       },
       isImmediatePlanChange: true,
       planPeriod: 'month',
@@ -825,6 +863,7 @@ describe('Checkout', () => {
           credit: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
           pastDue: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
           totalDueNow: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+          totalDuePerPeriod: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
         },
         isImmediatePlanChange: true,
         planPeriod: 'month',
@@ -965,6 +1004,7 @@ describe('Checkout', () => {
           credit: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
           pastDue: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
           totalDueNow: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
+          totalDuePerPeriod: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
         },
         isImmediatePlanChange: true,
         planPeriod: 'month',
@@ -1092,6 +1132,7 @@ describe('Checkout', () => {
           credit: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
           pastDue: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
           totalDueNow: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+          totalDuePerPeriod: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
         },
         isImmediatePlanChange: true,
         planPeriod: 'month',
@@ -1187,6 +1228,7 @@ describe('Checkout', () => {
           credit: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
           pastDue: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
           totalDueNow: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+          totalDuePerPeriod: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
         },
         isImmediatePlanChange: true,
         planPeriod: 'month',
@@ -1278,6 +1320,7 @@ describe('Checkout', () => {
           credit: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
           pastDue: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
           totalDueNow: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+          totalDuePerPeriod: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
         },
         isImmediatePlanChange: true,
         planPeriod: 'month',
@@ -1383,6 +1426,7 @@ describe('Checkout', () => {
           credit: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
           pastDue: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
           totalDueNow: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+          totalDuePerPeriod: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
         },
         isImmediatePlanChange: true,
         planPeriod: 'month',
@@ -1515,6 +1559,7 @@ describe('Checkout', () => {
           credit: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
           pastDue: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
           totalDueNow: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+          totalDuePerPeriod: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
         },
         isImmediatePlanChange: false,
         planPeriod: 'month',

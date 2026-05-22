@@ -1209,6 +1209,10 @@ export const enUS: LocalizationResource = {
     form_username_invalid_length: 'Your username must be between {{min_length}} and {{max_length}} characters long.',
     form_username_needs_non_number_char: 'Your username must contain at least one non-numeric character.',
     identification_deletion_failed: undefined,
+    insufficient_seats_change_plan:
+      'Your organization does not have enough seats to invite the desired number of members. Please change to a plan that supports the number of members you are attempting to invite.',
+    insufficient_seats_contact_support:
+      'Your organization does not have enough seats to invite the desired number of members. Please contact support.',
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,

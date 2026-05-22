@@ -140,6 +140,8 @@ export type GetPlansParams = ClerkPaginationParams<{
    * The type of payer for the Plans.
    */
   for?: ForPayerType;
+  org_id?: string;
+  min_seats?: number;
 }>;
 
 /**
@@ -210,6 +212,7 @@ export interface BillingPlanResource extends ClerkResource {
    * Per-unit pricing tiers for this Plan (for example, seats).
    */
   unitPrices?: BillingPlanUnitPrice[];
+  availablePrices?: BillingPlanPrice[];
   /**
    * The number of days of the free trial for the Plan. `null` if the Plan does not have a free trial.
    */
@@ -274,6 +277,14 @@ export interface BillingPlanUnitPrice {
    * Tiers that define how each block range is priced.
    */
   tiers: BillingPlanUnitPriceTier[];
+}
+
+export interface BillingPlanPrice {
+  id: string;
+  fee: BillingMoneyAmount | null;
+  annualMonthlyFee: BillingMoneyAmount | null;
+  isDefault: boolean;
+  unitPrices?: BillingPlanUnitPrice[];
 }
 
 /**
@@ -690,6 +701,7 @@ export interface BillingSubscriptionItemResource extends ClerkResource {
    * The billing period for the subscription item.
    */
   planPeriod: BillingSubscriptionPlanPeriod;
+  priceId: string;
   /**
    * The status of the subscription item.
    */
@@ -927,6 +939,8 @@ export type CreateCheckoutParams = WithOptionalOrgType<{
    * The billing period for the Plan.
    */
   planPeriod: BillingSubscriptionPlanPeriod;
+  seatsQuantity?: number;
+  priceId?: string;
 }>;
 
 /**
