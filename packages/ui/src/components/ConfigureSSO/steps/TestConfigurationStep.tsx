@@ -32,7 +32,7 @@ import { useCardState } from '@/elements/contexts';
 import { Drawer } from '@/elements/Drawer';
 import { IconButton } from '@/elements/IconButton';
 import { Pagination } from '@/elements/Pagination';
-import { useClipboard } from '@/hooks';
+import { useClipboard, useSpinDelay } from '@/hooks';
 import { Check, Copy, LinkIcon, RotateLeftRight } from '@/icons';
 import { common, mqu } from '@/styledSystem';
 import { handleError } from '@/utils/errorHandler';
@@ -65,6 +65,7 @@ export const TestConfigurationStep = (): JSX.Element => {
   });
 
   const isRefreshingTestRuns = areTestRunsFetching && !areTestRunsLoading;
+  const showRefreshLogsSpinner = useSpinDelay(isRefreshingTestRuns);
   const pageCount = totalCount ? Math.ceil(totalCount / TEST_RUNS_PAGE_SIZE) : 0;
 
   const handleTestRunCreated = () => {
@@ -114,10 +115,10 @@ export const TestConfigurationStep = (): JSX.Element => {
                 colorScheme='secondary'
                 size='xs'
                 onClick={() => void revalidateTestRuns()}
-                isDisabled={isRefreshingTestRuns}
+                isDisabled={showRefreshLogsSpinner}
                 sx={t => ({ gap: t.space.$1x5 })}
               >
-                {isRefreshingTestRuns ? (
+                {showRefreshLogsSpinner ? (
                   <Spinner
                     elementDescriptor={descriptors.spinner}
                     size='xs'
