@@ -3,6 +3,12 @@ import { Billing } from './Billing';
 import { General } from './General';
 import { Members } from './Members';
 import { OrganizationProfileProvider } from './OrganizationProfileProvider';
+import {
+  GeneralDeleteOrganization,
+  GeneralLeaveOrganization,
+  GeneralOrganizationProfile,
+  GeneralVerifiedDomains,
+} from './sectionWrappers';
 
 export const OrganizationProfile = {
   Provider: OrganizationProfileProvider,
@@ -10,4 +16,8 @@ export const OrganizationProfile = {
   Members,
   Billing,
   APIKeys,
+  GeneralOrganizationProfile,
+  GeneralVerifiedDomains,
+  GeneralLeaveOrganization,
+  GeneralDeleteOrganization,
 };

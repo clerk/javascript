@@ -85,7 +85,7 @@ export const OrganizationGeneralPage = () => {
   );
 };
 
-const OrganizationProfileSection = () => {
+export const OrganizationProfileSection = () => {
   const { organization } = useOrganization();
 
   if (!organization) {
@@ -134,7 +134,7 @@ const OrganizationProfileSection = () => {
   );
 };
 
-const OrganizationDomainsSection = () => {
+export const OrganizationDomainsSection = () => {
   const { organizationSettings } = useEnvironment();
   const { organization } = useOrganization();
 
@@ -183,7 +183,7 @@ const OrganizationDomainsSection = () => {
   );
 };
 
-const OrganizationLeaveSection = () => {
+export const OrganizationLeaveSection = () => {
   const { organization } = useOrganization();
 
   if (!organization) {
@@ -229,7 +229,7 @@ const OrganizationLeaveSection = () => {
   );
 };
 
-const OrganizationDeleteSection = () => {
+export const OrganizationDeleteSection = () => {
   const { organization } = useOrganization();
   const canDeleteOrganization = useProtect({ permission: 'org:sys_profile:delete' });
 
