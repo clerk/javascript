@@ -48,6 +48,7 @@ import {
 import { isInlineModifierWithoutStandalonePage } from './standalone-page-tag.mjs';
 import { applyTodoStrippingToComment } from './comment-utils.mjs';
 import { REFERENCE_OBJECT_CONFIG } from './reference-objects.mjs';
+import { toFileSlug } from './slug.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -396,16 +397,31 @@ function getPrimaryCallSignature(decl) {
 }
 
 /**
- * @param {import('typedoc').Type | undefined} t
+ * Strip one (or, with `{ deep: true }`, all) `OptionalType` layers and return the inner
+ * type. Returns `t` unchanged when it isn't an `OptionalType`, or when `t` is nullish.
+ *
+ * Typed loosely (`Type` ⊕ `SomeType`) so callers in either type domain can use the same
+ * helper; the runtime check is structural (`type === 'optional' && 'elementType' in t`).
+ *
+ * @template {import('typedoc').Type | import('typedoc').SomeType | undefined} T
+ * @param {T} t
+ * @param {{ deep?: boolean }} [options]
+ * @returns {T}
  */
-function unwrapOptionalType(t) {
-  if (!t || typeof t !== 'object') {
-    return t;
+function unwrapOptional(t, options) {
+  let cur = t;
+  while (
+    cur &&
+    typeof cur === 'object' &&
+    /** @type {{ type?: string }} */ (cur).type === 'optional' &&
+    'elementType' in cur
+  ) {
+    cur = /** @type {T} */ (/** @type {{ elementType: import('typedoc').Type }} */ (cur).elementType);
+    if (!options?.deep) {
+      break;
+    }
   }
-  if (/** @type {{ type?: string }} */ (t).type === 'optional' && 'elementType' in t) {
-    return /** @type {{ elementType: import('typedoc').Type }} */ (t).elementType;
-  }
-  return t;
+  return cur;
 }
 
 /**
@@ -415,7 +431,7 @@ function unwrapOptionalType(t) {
  * @returns {Map<string, import('typedoc').Type> | undefined}
  */
 function getGenericInstantiationMapFromCallableProperty(propertyDecl) {
-  const t = unwrapOptionalType(propertyDecl.type);
+  const t = unwrapOptional(propertyDecl.type);
   if (!(t instanceof ReferenceType) || !t.reflection) {
     return undefined;
   }
@@ -423,7 +439,7 @@ function getGenericInstantiationMapFromCallableProperty(propertyDecl) {
   if (!alias.kindOf(ReflectionKind.TypeAlias) || !alias.type) {
     return undefined;
   }
-  const inner = unwrapOptionalType(alias.type);
+  const inner = unwrapOptional(alias.type);
   if (!(inner instanceof ReferenceType) || !inner.typeArguments?.length || !inner.reflection) {
     return undefined;
   }
@@ -517,30 +533,13 @@ function shouldExtractCallableMember(decl, ctx) {
 }
 
 /**
- * @param {import('typedoc').SomeType | undefined} t
- * @returns {import('typedoc').SomeType | undefined}
- */
-function unwrapOptionalLayersSomeType(t) {
-  let cur = /** @type {import('typedoc').SomeType | undefined} */ (t);
-  while (
-    cur &&
-    typeof cur === 'object' &&
-    /** @type {{ type?: string }} */ (cur).type === 'optional' &&
-    'elementType' in cur
-  ) {
-    cur = /** @type {import('typedoc').SomeType} */ (/** @type {import('typedoc').OptionalType} */ (cur).elementType);
-  }
-  return cur;
-}
-
-/**
  * Object-literal (or single object arm of `T | null`) property rows for a properties table.
  *
  * @param {import('typedoc').SomeType | undefined} valueType
  * @returns {import('typedoc').DeclarationReflection[] | undefined}
  */
 function resolveObjectShapeMembersForPropertyTable(valueType) {
-  let t = unwrapOptionalLayersSomeType(valueType);
+  let t = unwrapOptional(valueType, { deep: true });
   if (t instanceof UnionType) {
     const objectArms = t.types.filter(u => u instanceof ReflectionType && (u.declaration?.children?.length ?? 0) > 0);
     if (objectArms.length !== 1) {
@@ -658,16 +657,6 @@ function splitPropertiesFromContents(contents) {
   const propertiesBody = extractPropertiesSectionBody(contents);
   const stripped = stripReferenceObjectPropertiesSection(contents);
   return { propertiesBody, stripped };
-}
-
-/**
- * @param {string} name
- */
-function toKebabCase(name) {
-  return name
-    .replace(/([a-z\d])([A-Z])/g, '$1-$2')
-    .replace(/[\s_]+/g, '-')
-    .toLowerCase();
 }
 
 /**
@@ -829,10 +818,7 @@ function appendSignatureOnlyReturns(declComment, sigComment) {
  * @param {import('typedoc').DeclarationReflection} prop
  */
 function propertyReflectionTypeIsNever(prop) {
-  let ty = prop.type;
-  while (ty?.type === 'optional') {
-    ty = /** @type {import('typedoc').OptionalType} */ (ty).elementType;
-  }
+  const ty = unwrapOptional(prop.type, { deep: true });
   return ty?.type === 'intrinsic' && ty.name === 'never';
 }
 
@@ -1016,19 +1002,6 @@ function formatNestedParamNameColumn(baseName, pathSegments) {
 }
 
 /**
- * This function unwraps a TypeDoc parameter type if it is an optional type. If the provided type is of type "optional", it returns the underlying element type (the real type being wrapped). If it is not optional or is undefined, it returns the type as-is.
- *
- * @param {import('typedoc').SomeType | undefined} t
- * @returns {import('typedoc').SomeType | undefined}
- */
-function unwrapOptionalParamType(t) {
-  if (t?.type === 'optional') {
-    return /** @type {import('typedoc').OptionalType} */ (t).elementType;
-  }
-  return t;
-}
-
-/**
  * When TypeDoc renders a parameter type as a markdown link to another generated `.mdx` file, that type has a dedicated page — omit nested `param?.prop` rows so readers follow the type link instead.
  * `@inline` aliases are expanded by the theme and do not link to a standalone page unless `@standalonePage` is set (`standalone-page-tag.mjs`).
  *
@@ -1036,7 +1009,7 @@ function unwrapOptionalParamType(t) {
  * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
  */
 function parameterTypeLinksToStandaloneMdxPage(t, ctx) {
-  const bare = unwrapOptionalParamType(t);
+  const bare = unwrapOptional(t);
   if (!bare) {
     return false;
   }
@@ -1342,7 +1315,7 @@ function processExtractMethodsNamespace(parentDecl, ctx, outDir) {
       continue;
     }
     const nd = /** @type {import('typedoc').DeclarationReflection} */ (nested);
-    const fileSlug = `${toKebabCase(parentName)}-${toKebabCase(nd.name)}`;
+    const fileSlug = `${toFileSlug(parentName)}-${toFileSlug(nd.name)}`;
     const filePath = path.join(outDir, `${fileSlug}.mdx`);
     if (shouldExtractCallableMember(nd, ctx)) {
       const mdx = buildMethodMdx(nd, ctx, { qualifiedName: `${parentName}.${nd.name}` });
@@ -1362,7 +1335,7 @@ function processExtractMethodsNamespace(parentDecl, ctx, outDir) {
   if (nonCallableMembers.length) {
     const namespaceMdx = buildExtractMethodsNamespacePropertyTableMdx(parentDecl, nonCallableMembers, ctx);
     if (namespaceMdx) {
-      const namespacePath = path.join(outDir, `${toKebabCase(parentName)}.mdx`);
+      const namespacePath = path.join(outDir, `${toFileSlug(parentName)}.mdx`);
       collected.push({ filePath: namespacePath, content: namespaceMdx });
     }
   }
@@ -1398,7 +1371,7 @@ function extractCallableMembersFromDeclaration(decl, ctx, outDir) {
     if (shouldExtractCallableMember(childDecl, ctx)) {
       const mdx = buildMethodMdx(childDecl, ctx);
       if (mdx) {
-        const fileName = `${toKebabCase(child.name)}.mdx`;
+        const fileName = `${toFileSlug(child.name)}.mdx`;
         const filePath = path.join(outDir, fileName);
         collected.push({ filePath, content: mdx });
       }
