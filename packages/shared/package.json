@@ -143,7 +143,7 @@
     "@tanstack/query-core": "catalog:repo",
     "dequal": "2.0.3",
     "glob-to-regexp": "0.4.1",
-    "js-cookie": "3.0.5",
+    "js-cookie": "3.0.7",
     "std-env": "^3.9.0"
   },
   "devDependencies": {
