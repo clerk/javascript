@@ -582,6 +582,7 @@ jobs:
             excluded="$EXCLUDE_TAGS,iosOnly,flakyAndroid" &&
             pattern="$(echo "$excluded" | sed 's/,/|/g')" &&
             ( maestro test --flatten-debug-output flows/common/_warmup.yaml || true ) &&
+            ( adb shell am force-stop com.clerk.clerkexpoquickstart 2>/dev/null || true ) &&
             find flows -type f -name '*.yaml' ! -path '*/common/*' ${FLOWS_FILTER:+-path "*$FLOWS_FILTER*"}
             | sort
             | while read f; do grep -qE "^[[:space:]]*-[[:space:]]*(${pattern})[[:space:]]*$" "$f" || printf '%s\n' "$f"; done
@@ -972,6 +973,12 @@ jobs:
           # though the screen is visually rendered, Maestro's text matcher
           # races the a11y tree on freshly-booted runners.
           maestro test --flatten-debug-output flows/common/_warmup.yaml || true
+          # Force-stop the app after warmup. Without this, the first per-flow
+          # iteration's `launchApp clearState: true` races a still-running app
+          # process (simctl/adb's clear can't wipe data while the app is
+          # foregrounded), which intermittently shows up as
+          # "Launch app ... FAILED" on the very first flow only.
+          xcrun simctl terminate "$SIM_UDID" com.clerk.clerkexpoquickstart || true
           # Maestro's `--exclude-tags` only filters when running a
           # DIRECTORY; with explicit file paths Maestro runs every file
           # regardless of tag. We want per-flow invocation (so one
