@@ -586,7 +586,7 @@ jobs:
             find flows -type f -name '*.yaml' ! -path '*/common/*' ${FLOWS_FILTER:+-path "*$FLOWS_FILTER*"}
             | sort
             | while read f; do grep -qE "^[[:space:]]*-[[:space:]]*(${pattern})[[:space:]]*$" "$f" || printf '%s\n' "$f"; done
-            | xargs -n 1 maestro test --env CLERK_TEST_EMAIL="$CLERK_TEST_EMAIL" --env CLERK_TEST_PASSWORD="$CLERK_TEST_PASSWORD" --flatten-debug-output
+            | xargs -n 1 -I FLOW bash -c 'flow="$1"; for a in 1 2; do if maestro test --env CLERK_TEST_EMAIL="$CLERK_TEST_EMAIL" --env CLERK_TEST_PASSWORD="$CLERK_TEST_PASSWORD" --flatten-debug-output "$flow"; then exit 0; fi; if [ "$a" -eq 2 ]; then echo "::error::Flow $flow failed after 2 attempts"; exit 1; fi; echo "::warning::Flow $flow failed attempt $a, retrying after 10s..."; adb shell am force-stop com.clerk.clerkexpoquickstart >/dev/null 2>&1 || true; sleep 10; done' _ FLOW
 
       - name: Upload Maestro artifacts on failure or cancel
         if: failure() || cancelled()
@@ -1001,10 +1001,25 @@ jobs:
                 printf '%s\n' "$f"
               fi
             done | \
-            xargs -n 1 maestro test \
-              --env CLERK_TEST_EMAIL="$CLERK_TEST_EMAIL" \
-              --env CLERK_TEST_PASSWORD="$CLERK_TEST_PASSWORD" \
-              --flatten-debug-output
+            xargs -n 1 -I FLOW bash -c '
+              flow="$1"
+              for a in 1 2; do
+                if maestro test \
+                    --env CLERK_TEST_EMAIL="$CLERK_TEST_EMAIL" \
+                    --env CLERK_TEST_PASSWORD="$CLERK_TEST_PASSWORD" \
+                    --flatten-debug-output \
+                    "$flow"; then
+                  exit 0
+                fi
+                if [ "$a" -eq 2 ]; then
+                  echo "::error::Flow $flow failed after 2 attempts"
+                  exit 1
+                fi
+                echo "::warning::Flow $flow failed attempt $a, retrying after 10s..."
+                xcrun simctl terminate "'"$SIM_UDID"'" com.clerk.clerkexpoquickstart >/dev/null 2>&1 || true
+                sleep 10
+              done
+            ' _ FLOW
 
       - name: Upload Maestro artifacts on failure or cancel
         if: failure() || cancelled()
