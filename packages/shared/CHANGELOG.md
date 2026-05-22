@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.47.6
+
+### Patch Changes
+
+- Bump `js-cookie` to `3.0.7` to address GHSA-qjx8-664m-686j. ([#8631](https://github.com/clerk/javascript/pull/8631)) by [@jacekradko](https://github.com/jacekradko)
+
 ## 3.47.5
 
 ### Patch Changes

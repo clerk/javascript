@@ -1,5 +1,14 @@
 # Change Log
 
+## 2.9.16
+
+### Patch Changes
+
+- Updated dependencies [[`fbba78c`](https://github.com/clerk/javascript/commit/fbba78cb22423333bd41efbd2b0f29372e8f0873)]:
+  - @clerk/shared@3.47.6
+  - @clerk/clerk-js@5.125.11
+  - @clerk/clerk-react@5.61.7
+
 ## 2.9.15
 
 ### Patch Changes
