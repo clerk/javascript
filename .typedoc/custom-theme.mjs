@@ -553,11 +553,16 @@ function clerkParametersTable(model) {
     return shouldFlatten ? [...acc, current, ...flattenParams(current)] : [...acc, current];
   };
   /**
+   * Joins flattened names with `?.` when the parent is optional (so `options?.foo` reflects
+   * the type at runtime) and `.` when required (`options.foo`). Same logic recurses for
+   * deeper inline shapes: separator between each level depends on **that** level's optionality.
+   *
    * @param {import('typedoc').ParameterReflection} current
    * @returns {import('typedoc').ParameterReflection[]}
    */
   const flattenParams = current => {
     const decl = getParameterObjectShapeDeclaration(current.type);
+    const separator = current.flags?.isOptional ? '?.' : '.';
     return (
       decl?.children?.reduce(
         /**
@@ -568,7 +573,7 @@ function clerkParametersTable(model) {
         (acc, child) => {
           const childObj = {
             ...child,
-            name: `${current.name}.${child.name}`,
+            name: `${current.name}${separator}${child.name}`,
           };
           return parseParams(
             /** @type {import('typedoc').ParameterReflection} */ (/** @type {unknown} */ (childObj)),

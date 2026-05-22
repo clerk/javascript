@@ -15,6 +15,7 @@ import { describe, expect, it } from 'vitest';
  *
  * - `methods/sign-out.mdx`           – simple zero-arg callable
  * - `methods/handle-redirect-callback.mdx` – multi-param `parametersTable` with nested rows
+ * - `methods/handle-email-link-verification.mdx` – required parent (`params`) flattened to `.`
  * - `methods/join-waitlist.mdx`      – single nominal-param section (`JoinWaitlistParams`)
  * - `methods/create.mdx` (api-key)   – another single-nominal-param case + warning callout
  * - `methods/check-authorization.mdx` – generic instantiation (`CheckAuthorization`)
@@ -39,6 +40,11 @@ describe('extract-methods snapshots', () => {
   it('multi-param method with nested rows: clerk.handleRedirectCallback()', async () => {
     const content = await readGenerated('shared/clerk/methods/handle-redirect-callback.mdx');
     await expect(content).toMatchFileSnapshot('./__snapshots__/clerk-methods-handle-redirect-callback.mdx');
+  });
+
+  it('required-parent flatten uses `.` not `?.`: clerk.handleEmailLinkVerification()', async () => {
+    const content = await readGenerated('shared/clerk/methods/handle-email-link-verification.mdx');
+    await expect(content).toMatchFileSnapshot('./__snapshots__/clerk-methods-handle-email-link-verification.mdx');
   });
 
   it('single nominal-param section: clerk.joinWaitlist()', async () => {

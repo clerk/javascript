@@ -84,125 +84,6 @@ function removeLineBreaksForTableCell(str) {
 }
 
 /**
- * Append data rows to a markdown table string (header + separator + rows).
- *
- * @param {string} tableMd
- * @param {string[]} rowLines Lines like `| a | b | c |`
- */
-function appendMarkdownTableRows(tableMd, rowLines) {
-  if (!rowLines.length) {
-    return tableMd;
-  }
-  return `${tableMd.trimEnd()}\n${rowLines.join('\n')}\n`;
-}
-
-/**
- * Post-process the theme’s parameters markdown table. TypeDoc flattens object params as `parent.child` and may interleave those rows with other parameters. Here we (1) move each `parent.*` block directly under `parent`, and (2) rewrite dotted paths in the name column to optional-chaining (`parent?.child`, `a?.b?.c`). Top-level names are unchanged (`foo?`, `exa`).
- *
- * @param {string} tableMd
- */
-function formatMethodParametersTable(tableMd) {
-  const leadingNewlines = (tableMd.match(/^\n+/) ?? [''])[0];
-  const nonEmpty = tableMd.split('\n').filter(l => l.trim().length);
-  if (nonEmpty.length < 3) {
-    return tableMd;
-  }
-  const header = nonEmpty[0];
-  const sep = nonEmpty[1];
-  const dataLines = nonEmpty.slice(2).filter(l => l.trim().startsWith('|'));
-  if (dataLines.length <= 1) {
-    return tableMd;
-  }
-
-  /** @param {string} line */
-  const firstName = line => {
-    const m = line.match(/^\|\s*(?:<a\s+id="[^"]*"\s*><\/a>\s*)?`([^`]+)`/);
-    return m ? m[1] : '';
-  };
-  /** `parent.child` / `parent?.child` → grouping key `parent` (matches top-level `parent` or `parent?` via fallback below). */
-  /** @param {string} raw */
-  const parentOfNested = raw => {
-    const j = raw.indexOf('?.');
-    if (j !== -1) {
-      return raw.slice(0, j);
-    }
-    const i = raw.indexOf('.');
-    return i === -1 ? '' : raw.slice(0, i);
-  };
-  /** `a.b.c` → `a?.b?.c`; leave `foo?` and names without `.` alone. */
-  /** @param {string} raw */
-  const nameForDisplay = raw => (!raw.includes('.') || raw.includes('?.') ? raw : raw.split('.').join('?.'));
-  /** @param {string} line @param {string} name */
-  const replaceFirstName = (line, name) =>
-    line.replace(/^(\|\s*(?:<a\s+id="[^"]*"\s*><\/a>\s*)?)`[^`]+`/, `$1\`${name}\``);
-
-  const topLevelOrder = [];
-  const seenTop = new Set();
-  /** @type {Map<string, string[]>} */
-  const childrenOf = new Map();
-
-  for (const line of dataLines) {
-    const raw = firstName(line);
-    if (!raw) {
-      continue;
-    }
-    if (!raw.includes('.')) {
-      if (!seenTop.has(raw)) {
-        seenTop.add(raw);
-        topLevelOrder.push(raw);
-      }
-      continue;
-    }
-    const p = parentOfNested(raw);
-    if (!p) {
-      continue;
-    }
-    let bucket = childrenOf.get(p);
-    if (!bucket) {
-      bucket = [];
-      childrenOf.set(p, bucket);
-    }
-    bucket.push(line);
-  }
-
-  for (const lines of childrenOf.values()) {
-    lines.sort((a, b) => firstName(a).localeCompare(firstName(b)));
-  }
-
-  /** @param {string} top */
-  const rowsForParent = top =>
-    childrenOf.get(top) ?? (top.endsWith('?') ? childrenOf.get(top.slice(0, -1)) : undefined);
-
-  const body = [];
-  const emitted = new Set();
-
-  for (const top of topLevelOrder) {
-    const topLine = dataLines.find(l => firstName(l) === top);
-    if (topLine) {
-      const r = firstName(topLine);
-      body.push(replaceFirstName(topLine, nameForDisplay(r)));
-      emitted.add(topLine);
-    }
-    const kids = rowsForParent(top);
-    if (kids) {
-      for (const line of kids) {
-        body.push(replaceFirstName(line, nameForDisplay(firstName(line))));
-        emitted.add(line);
-      }
-    }
-  }
-
-  for (const line of dataLines) {
-    if (!emitted.has(line)) {
-      const r = firstName(line);
-      body.push(r ? replaceFirstName(line, nameForDisplay(r)) : line);
-    }
-  }
-
-  return `${leadingNewlines}${[header, sep, ...body].join('\n')}\n`;
-}
-
-/**
  * TypeDoc `code` display parts often already include backticks (same as {@link Comment.combineDisplayParts}).
  * Wrapping again would produce `` `Client` `` in MDX.
  *
@@ -993,12 +874,16 @@ function resolveDeclarationWithObjectMembers(t, project) {
 }
 
 /**
- * @param {string} baseName
- * @param {string[]} pathSegments
+ * Build the name cell for a nominal-nested row. Uses `?.` when the parent param is optional
+ * (so `options?.foo` mirrors how it would be accessed at runtime) and `.` when required —
+ * same rule as `clerkParametersTable.flattenParams` in `custom-theme.mjs`.
+ *
+ * @param {import('typedoc').ParameterReflection} parentParam
+ * @param {string} childName
  */
-function formatNestedParamNameColumn(baseName, pathSegments) {
-  const pathChain = pathSegments.join('?.');
-  return `\`${baseName}?.${pathChain}\``;
+function formatNestedParamNameColumn(parentParam, childName) {
+  const sep = parentParam.flags?.isOptional ? '?.' : '.';
+  return `\`${parentParam.name}${sep}${childName}\``;
 }
 
 /**
@@ -1056,7 +941,7 @@ function nestedParameterRowsFromDocumentedProperties(param, ctx) {
   for (const child of props) {
     const summary = child.comment?.summary;
     const typeCell = child.type ? removeLineBreaksForTableCell(ctx.partials.someType(child.type)) : '`unknown`';
-    const nestedNameCol = formatNestedParamNameColumn(param.name, [child.name]);
+    const nestedNameCol = formatNestedParamNameColumn(param, child.name);
     const nestedDesc = summary?.length ? displayPartsToString(summary).trim() || '—' : '—';
     rows.push(`| ${nestedNameCol} | ${typeCell} | ${nestedDesc} |`);
   }
@@ -1226,10 +1111,8 @@ function parametersMarkdownTable(sig, ctx, instantiationMap) {
     nested.push(...nestedParameterRowsFromDocumentedProperties(p, ctx));
   }
   if (nested.length) {
-    tableMd = appendMarkdownTableRows(tableMd, nested);
+    tableMd = `${tableMd.trimEnd()}\n${nested.join('\n')}\n`;
   }
-
-  tableMd = formatMethodParametersTable(tableMd);
 
   return [markdownHeading(4, ReflectionKind.pluralString(ReflectionKind.Parameter)), '', tableMd, ''].join('\n');
 }
