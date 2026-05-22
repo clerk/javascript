@@ -35,7 +35,7 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
-  SNAPI_PACKAGE: github:clerk/snapi#8c021a2796b313cdefa945a715df8f02e4f99867
+  SNAPI_PACKAGE: https://pkg.pr.new/clerk/snapi/@clerk/snapi@5b897f1c8be7692b3914e7f11d2720e91e216b34
   SNAPI_FILTERS: >-
     --filter=@clerk/clerk-js
     --filter=@clerk/react
@@ -121,15 +121,15 @@ jobs:
       - name: Build current declarations
         run: pnpm turbo build:declarations $TURBO_ARGS $SNAPI_FILTERS
 
-      - name: Fetch base branch
+      - name: Fetch base commit
         if: steps.baseline-cache.outputs.cache-matched-key == ''
-        run: git fetch origin "${GITHUB_BASE_REF}:refs/remotes/origin/${GITHUB_BASE_REF}" --depth=100
+        run: git fetch origin "${{ github.event.pull_request.base.sha }}" --depth=1
 
       - name: Create baseline worktree
         if: steps.baseline-cache.outputs.cache-matched-key == ''
         run: |
           mkdir -p .worktrees
-          git worktree add .worktrees/snapi-baseline "origin/${GITHUB_BASE_REF}"
+          git worktree add --detach .worktrees/snapi-baseline "${{ github.event.pull_request.base.sha }}"
           cp snapi.config.json .worktrees/snapi-baseline/snapi.config.json
 
       - name: Install baseline dependencies
