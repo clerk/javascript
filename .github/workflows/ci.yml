@@ -384,11 +384,15 @@ jobs:
           # from turbo.json, hiding real configuration errors.
           TASK_NAME="test:integration:${{ matrix.test-name }}"
           TURBO_STDERR=$(mktemp)
-          if ! TURBO_JSON=$(pnpm turbo run "$TASK_NAME" --dry=json 2>"$TURBO_STDERR"); then
+          if ! TURBO_RAW=$(pnpm turbo run "$TASK_NAME" --dry=json 2>"$TURBO_STDERR"); then
             echo "::error::Turbo task '$TASK_NAME' failed validation"
             cat "$TURBO_STDERR"
             exit 1
           fi
+
+          # pnpm can prepend non-JSON lines (e.g. `WARN  Unsupported engine: ...`)
+          # to stdout, which would break jq. Drop everything before the first `{`.
+          TURBO_JSON=$(printf '%s\n' "$TURBO_RAW" | awk '/^\{/{found=1} found')
 
           if ! TASK_COUNT=$(jq -er '.tasks | length' <<< "$TURBO_JSON"); then
             echo "::error::Turbo task '$TASK_NAME' returned invalid JSON or missing .tasks"
