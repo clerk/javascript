@@ -87,6 +87,9 @@ jobs:
     name: API Changes
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     continue-on-error: true
+    permissions:
+      contents: read
+      pull-requests: write
     defaults:
       run:
         shell: bash
@@ -164,3 +167,39 @@ jobs:
           path: api-changes-report.md
           if-no-files-found: ignore
           retention-days: 5
+
+      - name: Build snapi comment body
+        if: always()
+        id: report
+        run: |
+          if [ ! -f api-changes-report.md ]; then
+            exit 0
+          fi
+          {
+            echo 'body<<SNAPI_REPORT_EOF'
+            echo '<!-- snapi-report -->'
+            if grep -q '## No API Changes Detected' api-changes-report.md; then
+              echo '**Snapi**: no API changes detected in `@clerk/clerk-js`, `@clerk/react`, `@clerk/shared`, `@clerk/ui`.'
+            else
+              cat api-changes-report.md
+            fi
+            echo 'SNAPI_REPORT_EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Find existing snapi comment
+        if: always() && steps.report.outputs.body != ''
+        id: find-comment
+        uses: peter-evans/find-comment@3eae4d37986fb5a8592848f6a574fdf654e61f9e # v3.1.0
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: '<!-- snapi-report -->'
+
+      - name: Post snapi report
+        if: always() && steps.report.outputs.body != ''
+        uses: peter-evans/create-or-update-comment@23ff15729ef2fc348714a3bb66d2f655ca9066f2 # v3.1.0
+        with:
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: ${{ steps.report.outputs.body }}
+          edit-mode: replace
