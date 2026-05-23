@@ -242,10 +242,6 @@ export type OffEventListener = <E extends ClerkEvent>(event: E, handler: EventHa
 
 /**
  * @inline
- * @property {ClerkStatus} degraded - Set when Clerk is partially operational.
- * @property {ClerkStatus} error - Set when hotloading `clerk-js` or `Clerk.load()` failed.
- * @property {ClerkStatus} loading - Set during initialization.
- * @property {ClerkStatus} ready - Set when Clerk is fully operational.
  */
 export type ClerkStatus = 'degraded' | 'error' | 'loading' | 'ready';
 
