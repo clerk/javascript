@@ -25,7 +25,7 @@ import {
   UnionType,
 } from 'typedoc';
 import { MarkdownPageEvent, MarkdownTheme } from 'typedoc-plugin-markdown';
-import { removeLineBreaks } from '../node_modules/typedoc-plugin-markdown/dist/libs/utils/index.js';
+import { removeLineBreaks } from './markdown-helpers.mjs';
 
 import { isCallableInterfaceProperty } from './custom-theme.mjs';
 import {

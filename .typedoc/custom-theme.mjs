@@ -1,14 +1,7 @@
 // @ts-check
 import { ArrayType, i18n, IntersectionType, ReferenceType, ReflectionKind, ReflectionType, UnionType } from 'typedoc';
 import { MarkdownTheme, MarkdownThemeContext } from 'typedoc-plugin-markdown';
-import {
-  backTicks,
-  heading,
-  htmlTable,
-  table,
-} from '../node_modules/typedoc-plugin-markdown/dist/libs/markdown/index.js';
-import { removeLineBreaks } from '../node_modules/typedoc-plugin-markdown/dist/libs/utils/index.js';
-import { TypeDeclarationVisibility } from '../node_modules/typedoc-plugin-markdown/dist/options/maps.js';
+import { backTicks, heading, htmlTable, removeLineBreaks, table } from './markdown-helpers.mjs';
 
 import { applyTodoStrippingToComment } from './comment-utils.mjs';
 import { isInlineModifierWithoutStandalonePage } from './standalone-page-tag.mjs';
@@ -704,7 +697,8 @@ function clerkTypeDeclarationTable(model, options) {
     this.options.getValue('tableColumnSettings') ?? {}
   );
   const leftAlignHeadings = tableColumnsOptions.leftAlignHeaders;
-  const isCompact = this.options.getValue('typeDeclarationVisibility') === TypeDeclarationVisibility.Compact;
+  // typedoc-plugin-markdown's `TypeDeclarationVisibility.Compact` is just the string `'compact'`.
+  const isCompact = this.options.getValue('typeDeclarationVisibility') === 'compact';
   const hasSources = !tableColumnsOptions.hideSources && !this.options.getValue('disableSources');
   const headers = [];
   const baseDeclarations = this.helpers.getFlattenedDeclarations(model, {
