@@ -1,28 +1,16 @@
 // @ts-check
 /**
- * TypeDoc plugin that runs during the markdown render pass. For each reference-object page
- * listed in {@link REFERENCE_OBJECT_CONFIG} (e.g. `shared/clerk/clerk.mdx`), this listener:
+ * TypeDoc plugin that runs during the markdown render pass. For each reference-object page listed in {@link REFERENCE_OBJECT_CONFIG} (e.g. `shared/clerk/clerk.mdx`), this listener:
  *
- * - copies the body of the page's `## Properties` section (table only, no heading) into a
- *   sibling `properties.mdx`,
+ * - copies the body of the page's `## Properties` section (table only, no heading) into a sibling `properties.mdx`,
  * - mutates `output.contents` to drop the `## Properties` section from the main page,
- * - writes one `methods/<name>.mdx` per callable child on the reflection (and on any
- *   `extraMethodInterfaces`), alongside the main page in that resource folder.
+ * - writes one `methods/<name>.mdx` per callable child on the reflection (and on any `extraMethodInterfaces`), alongside the main page in that resource folder.
  *
- * Must load **after** `custom-plugin.mjs` so its `MarkdownPageEvent.END` listener — which
- * applies link replacements to `output.contents` — runs first. The Properties body we copy
- * out is then already in its final, replaced form.
+ * Must load **after** `custom-plugin.mjs` so its `MarkdownPageEvent.END` listener — which applies link replacements to `output.contents` — runs first. The Properties body we copy out is then already in its final, replaced form.
  *
- * Like `extract-returns-and-params.mjs`, parameter tables are not hand-built: they use the
- * same `MarkdownThemeContext.partials` as TypeDoc markdown output (`parametersTable` /
- * `propertiesTable`, which call `someType` and therefore pick up `custom-theme.mjs` union /
- * `&lt;code&gt;` behavior). The theme context comes from `theme.getRenderContext(output)`
- * on the live page event — no second TypeDoc convert pass.
+ * Like `extract-returns-and-params.mjs`, parameter tables are not hand-built: they use the same `MarkdownThemeContext.partials` as TypeDoc markdown output (`parametersTable`/`propertiesTable`, which call `someType` and therefore pick up `custom-theme.mjs` union `&lt;code&gt;` behavior). The theme context comes from `theme.getRenderContext(output)` on the live page event — no second TypeDoc convert pass.
  *
- * Inline object namespaces tagged **`@extractMethods`** on the parent property are omitted
- * from the main Properties table (see `custom-theme.mjs`). For each direct member: callables
- * become `methods/<parent>-<child>.mdx` via `buildMethodMdx`; non-callables become a heading
- * + property table via `buildPropertyTableDocMdx`.
+ * Inline object namespaces tagged **`@extractMethods`** on the parent property are omitted from the main Properties table (see `custom-theme.mjs`). For each direct member: callables become `methods/<parent>-<child>.mdx` via `buildMethodMdx`; non-callables become a heading + property table via `buildPropertyTableDocMdx`.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -278,11 +266,9 @@ function getPrimaryCallSignature(decl) {
 }
 
 /**
- * Strip one (or, with `{ deep: true }`, all) `OptionalType` layers and return the inner
- * type. Returns `t` unchanged when it isn't an `OptionalType`, or when `t` is nullish.
+ * Strip one (or, with `{ deep: true }`, all) `OptionalType` layers and return the inner type. Returns `t` unchanged when it isn't an `OptionalType`, or when `t` is nullish.
  *
- * Typed loosely (`Type` ⊕ `SomeType`) so callers in either type domain can use the same
- * helper; the runtime check is structural (`type === 'optional' && 'elementType' in t`).
+ * Typed loosely (`Type` ⊕ `SomeType`) so callers in either type domain can use the same helper; the runtime check is structural (`type === 'optional' && 'elementType' in t`).
  *
  * @template {import('typedoc').Type | import('typedoc').SomeType | undefined} T
  * @param {T} t
@@ -520,13 +506,9 @@ function extractPropertiesSectionBody(markdown) {
 }
 
 /**
- * Split the `## Properties` section out of page contents, returning the body (no heading)
- * and the page contents with the Properties section removed.
+ * Split the `## Properties` section out of page contents, returning the body (no heading) and the page contents with the Properties section removed.
  *
- * Operates on the in-memory `output.contents` of a `MarkdownPageEvent`; the caller writes
- * `properties.mdx` and assigns the stripped string back to `output.contents`. The page's
- * own END pipeline (link replacements) has already run by the time we get called, so the
- * Properties body is in its final, replaced form — no re-application needed.
+ * Operates on the in-memory `output.contents` of a `MarkdownPageEvent`; the caller writes `properties.mdx` and assigns the stripped string back to `output.contents`. The page's own END pipeline (link replacements) has already run by the time we get called, so the Properties body is in its final, replaced form — no re-application needed.
  *
  * @param {string} contents
  * @returns {{ propertiesBody: string | undefined, stripped: string }}
@@ -874,9 +856,7 @@ function resolveDeclarationWithObjectMembers(t, project) {
 }
 
 /**
- * Build the name cell for a nominal-nested row. Uses `?.` when the parent param is optional
- * (so `options?.foo` mirrors how it would be accessed at runtime) and `.` when required —
- * same rule as `clerkParametersTable.flattenParams` in `custom-theme.mjs`.
+ * Build the name cell for a nominal-nested row. Uses `?.` when the parent param is optional (so `options?.foo` mirrors how it would be accessed at runtime) and `.` when required — same rule as `clerkParametersTable.flattenParams` in `custom-theme.mjs`.
  *
  * @param {import('typedoc').ParameterReflection} parentParam
  * @param {string} childName
@@ -1166,12 +1146,9 @@ function hasExtractMethodsModifier(decl) {
  */
 
 /**
- * Collect `methods/<parent>-<child>.mdx` content for each direct member of an `@extractMethods`
- * object-like type: callables via {@link buildMethodMdx}, non-callables with a resolvable object
- * shape via {@link buildPropertyTableDocMdx}. Plus a `<parent>.mdx` index for non-callable members.
+ * Collect `methods/<parent>-<child>.mdx` content for each direct member of an `@extractMethods` object-like type: callables via {@link buildMethodMdx}, non-callables with a resolvable object shape via {@link buildPropertyTableDocMdx}. Plus a `<parent>.mdx` index for non-callable members.
  *
- * Supports inline object literals and named references (`interface` / object-like `type` aliases)
- * via {@link resolveDeclarationWithObjectMembers}.
+ * Supports inline object literals and named references (`interface` / object-like `type` aliases) via {@link resolveDeclarationWithObjectMembers}.
  *
  * @param {import('typedoc').DeclarationReflection} parentDecl
  * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
@@ -1226,8 +1203,7 @@ function processExtractMethodsNamespace(parentDecl, ctx, outDir) {
 }
 
 /**
- * Collect (path, content) pairs for each callable/`@extractMethods` child on `decl`. Callers
- * are responsible for writing — see {@link load} which prettifies then writes.
+ * Collect (path, content) pairs for each callable/`@extractMethods` child on `decl`. Callers are responsible for writing — see {@link load} which prettifies then writes.
  *
  * @param {import('typedoc').DeclarationReflection} decl
  * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
@@ -1278,17 +1254,11 @@ function matchReferenceObjectPageUrl(output) {
 }
 
 /**
- * Plugin entry: registers a `MarkdownPageEvent.END` listener that, for each page in
- * {@link REFERENCE_OBJECT_CONFIG}, queues a `preWriteAsyncJob` to extract Properties + methods.
+ * Plugin entry: registers a `MarkdownPageEvent.END` listener that, for each page in {@link REFERENCE_OBJECT_CONFIG}, queues a `preWriteAsyncJob` to extract Properties + methods.
  *
- * The job runs **after** typedoc-plugin-markdown's own prettier job (also a `preWriteAsyncJob`,
- * queued during `renderDocument`) — so by the time we read `output.contents`, the Properties
- * table is already prettier-formatted, and our `properties.mdx` inherits that formatting.
- * Method files are written raw (matching the pre-refactor behavior, where extract-methods.mjs
- * also bypassed prettier for `methods/*.mdx`).
+ * The job runs **after** typedoc-plugin-markdown's own prettier job (also a `preWriteAsyncJob`, queued during `renderDocument`) — so by the time we read `output.contents`, the Properties table is already prettier-formatted, and our `properties.mdx` inherits that formatting. Method files are written raw (matching the pre-refactor behavior, where extract-methods.mjs also bypassed prettier for `methods/*.mdx`).
  *
- * Must be loaded **after** `custom-plugin.mjs` so its END listener (link replacements +
- * heading filtering) runs first.
+ * Must be loaded **after** `custom-plugin.mjs` so its END listener (link replacements + heading filtering) runs first.
  *
  * @param {import('typedoc-plugin-markdown').MarkdownApplication} app
  */

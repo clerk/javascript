@@ -23,8 +23,7 @@ export { REFERENCE_OBJECTS_LIST };
  * @returns {import('typedoc').Type}
  */
 /**
- * Prefer structural checks over `instanceof` so we still match when multiple TypeDoc copies are loaded
- * (otherwise `instanceof IntersectionType` is false at render time).
+ * Prefer structural checks over `instanceof` so we still match when multiple TypeDoc copies are loaded (otherwise `instanceof IntersectionType` is false at render time).
  *
  * @param {import('typedoc').Type | undefined} t
  * @returns {t is import('typedoc').IntersectionType}
@@ -164,8 +163,7 @@ function findOAuthStrategyDeclaration(project) {
 }
 
 /**
- * Stock `someType` uses `instanceof UnionType`; duplicate Typedoc copies in the tree break that check and unions
- * fall through to `backTicks(model.toString())`, bypassing {@link unionType} entirely (including OAuth collapse).
+ * Stock `someType` uses `instanceof UnionType`; duplicate Typedoc copies in the tree break that check and unions fall through to `backTicks(model.toString())`, bypassing {@link unionType} entirely (including OAuth collapse).
  *
  * @param {import('typedoc').Type | undefined} model
  * @returns {import('typedoc').UnionType | undefined}
@@ -185,12 +183,9 @@ function coerceUnionTypeIfNeeded(model) {
 }
 
 /**
- * TypeScript normalizes `OAuthStrategy` to a large union of `oauth_*` string literals plus
- * `` `oauth_custom_${string}` ``. That is not a {@link ReferenceType}, so the theme prints every literal.
- * Collapse **only** when the union clearly matches that expanded Clerk shape, then render a link to `OAuthStrategy`.
+ * TypeScript normalizes `OAuthStrategy` to a large union of `oauth_*` string literals plus `` `oauth_custom_${string}` ``. That is not a {@link ReferenceType}, so the theme prints every literal. Collapse **only** when the union clearly matches that expanded Clerk shape, then render a link to `OAuthStrategy`.
  *
- * Guards (all must pass): many `oauth_` literals, fingerprint literals present, optional `oauth_custom_` template arm,
- * `OAuthStrategy` exists and is not `@inline`. Skips ambiguous cases so other unions are unchanged.
+ * Guards (all must pass): many `oauth_` literals, fingerprint literals present, optional `oauth_custom_` template arm, `OAuthStrategy` exists and is not `@inline`. Skips ambiguous cases so other unions are unchanged.
  *
  * @param {import('typedoc').Type | undefined} t
  * @returns {import('typedoc').Type[]}
@@ -553,9 +548,7 @@ function clerkParametersTable(model) {
     return shouldFlatten ? [...acc, current, ...flattenParams(current)] : [...acc, current];
   };
   /**
-   * Joins flattened names with `?.` when the parent is optional (so `options?.foo` reflects
-   * the type at runtime) and `.` when required (`options.foo`). Same logic recurses for
-   * deeper inline shapes: separator between each level depends on **that** level's optionality.
+   * Joins flattened names with `?.` when the parent is optional (so `options?.foo` reflects the type at runtime) and `.` when required (`options.foo`). Same logic recurses for deeper inline shapes: separator between each level depends on **that** level's optionality.
    *
    * @param {import('typedoc').ParameterReflection} current
    * @returns {import('typedoc').ParameterReflection[]}
@@ -1092,9 +1085,7 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
         );
       },
       /**
-       * Stock `comments.comment` prints every {@link Comment.modifierTags} as **`TitleCase`** before the summary
-       * (it does not consult `notRenderedTags`; that option only filters block tags). `@inline` / `@inlineType` are
-       * router/type hints; `@experimental` is SDK-only guidance — none of these must appear in property tables or prose.
+       * Stock `comments.comment` prints every {@link Comment.modifierTags} as **`TitleCase`** before the summary (it does not consult `notRenderedTags`; that option only filters block tags). `@inline` / `@inlineType` are router/type hints; `@experimental` is SDK-only guidance — none of these must appear in property tables or prose.
        *
        * @param {import('typedoc').Comment} model
        * @param {Parameters<typeof superPartials.comment>[1]} [options]
@@ -1862,9 +1853,7 @@ function isCallablePropertyValueType(t, helpers, seenReflectionIds) {
     try {
       const decl = /** @type {import('typedoc').DeclarationReflection} */ (ref);
       /**
-       * For `type Fn = (a: T) => U`, TypeDoc may attach call signatures to the TypeAlias reflection.
-       * `getDeclarationType` then returns `signatures[0].type` (here `U`), not the full function type, so we
-       * mis-classify properties typed as that alias (e.g. `navigate: CustomNavigation`) as non-callable.
+       * For `type Fn = (a: T) => U`, TypeDoc may attach call signatures to the TypeAlias reflection. `getDeclarationType` then returns `signatures[0].type` (here `U`), not the full function type, so we mis-classify properties typed as that alias (e.g. `navigate: CustomNavigation`) as non-callable.
        * Prefer `decl.type` (the full RHS) for type aliases.
        */
       const typeToCheck =

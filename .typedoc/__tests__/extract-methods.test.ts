@@ -3,10 +3,7 @@ import { join } from 'path';
 import { describe, expect, it } from 'vitest';
 
 /**
- * Snapshots for `extract-methods.mjs` output. Each `.mdx` under `__snapshots__/` is a frozen
- * copy of a representative file produced by `typedoc:generate`. Refactors to the plugin or
- * its helpers should leave these files byte-identical; a diff means the change is observable
- * in the published docs and needs a human decision.
+ * Snapshots for `extract-methods.mjs` output. Each `.mdx` under `__snapshots__/` is a frozen copy of a representative file produced by `typedoc:generate`. Refactors to the plugin or its helpers should leave these files byte-identical; a diff means the change is observable in the published docs and needs a human decision.
  *
  * Run `pnpm typedoc:generate` first to populate `.typedoc/docs/`, then `vitest run` here.
  * To intentionally update a snapshot after reviewing the diff: `vitest run -u`.
