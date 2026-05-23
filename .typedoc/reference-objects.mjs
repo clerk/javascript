@@ -53,7 +53,6 @@ export const REFERENCE_OBJECT_CONFIG = {
   'shared/billing-namespace/billing-namespace.mdx': {
     symbol: 'BillingNamespace',
     declarationHint: 'types/billing',
-    extraMethodInterfaces: [{ symbol: 'BillingNamespace', declarationHint: 'types/billing' }],
   },
 };
 
