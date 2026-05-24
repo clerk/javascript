@@ -1,0 +1,18 @@
+# Subflow: tap the Sign Out button on the home screen and wait for AuthView.
+appId: com.clerk.clerkexpoquickstart
+---
+- tapOn:
+    text: "Sign Out"
+- waitForAnimationToEnd:
+    timeout: 8000
+- extendedWaitUntil:
+    visible: 'Welcome! Sign in to continue\.?'
+    timeout: 20000
+# After sign-out the AuthView sometimes renders its welcome text a beat
+# before the email field. Don't return from this subflow until the
+# field is actually present, so cycle flows don't race a half-rendered
+# AuthView. Bumped to 25s because the AuthView mount-after-signOut path
+# is consistently the slowest in this suite on CI.
+- extendedWaitUntil:
+    visible: "Enter your email or username"
+    timeout: 25000

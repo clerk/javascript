@@ -1,0 +1,23 @@
+# Subflow: assert the user is on the signed-in home screen.
+# Use extendedWaitUntil throughout so we tolerate slow CI renders after
+# sign-in. assertVisible has no retry; extendedWaitUntil retries until
+# the timeout elapses.
+appId: com.clerk.clerkexpoquickstart
+---
+# Screenshot the state we landed in BEFORE the assertion so a future
+# failure here has something to look at instead of just "timed out".
+- takeScreenshot: debug-assert-signed-in-state
+# Check "Sign Out" first — it's the most reliable signal that we're on
+# the signed-in landing screen, and the same assertion shape that Android
+# already passes against. If this fails we genuinely aren't signed in;
+# if THIS passes but "Manage Profile" below fails, we have an iOS-specific
+# accessibility issue with the TouchableOpacity wrapping the text.
+- extendedWaitUntil:
+    visible: "Sign Out"
+    timeout: 20000
+- extendedWaitUntil:
+    visible: "Welcome"
+    timeout: 5000
+- extendedWaitUntil:
+    visible: "Manage Profile"
+    timeout: 10000

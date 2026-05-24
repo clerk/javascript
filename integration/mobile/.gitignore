@@ -1,0 +1,7 @@
+# Local env file — never commit. Use config/.env.example as the template.
+config/.env
+
+# Maestro artifacts
+*.png
+*.mp4
+maestro-output/

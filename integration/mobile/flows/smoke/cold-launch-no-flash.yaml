@@ -1,0 +1,64 @@
+# REGRESSION: A brief white flash was visible when the native AuthView first
+# mounted. This flow approximates the check by:
+#   1. Cold-launching with clearState
+#   2. Handling the dev build launcher
+#   3. Taking a screenshot at the earliest possible moment
+#   4. Asserting the AuthView is visible (not a blank/white screen)
+appId: com.clerk.clerkexpoquickstart
+tags:
+  - regression
+  - smoke
+---
+- launchApp:
+    clearState: true
+- waitForAnimationToEnd:
+    timeout: 5000
+# Dev build: tap the dev server URL to connect (iOS: localhost, Android: 10.0.2.2).
+- runFlow:
+    when:
+      visible: "Development Build"
+    commands:
+      - tapOn:
+          text: ".*:8081"
+      - waitForAnimationToEnd:
+          timeout: 8000
+# Dismiss the Expo developer menu if it pops up (Close X with backdrop fallback)
+- runFlow:
+    when:
+      visible: ".*developer menu.*"
+    commands:
+      - tapOn:
+          text: "Close"
+          optional: true
+      - runFlow:
+          when:
+            visible: ".*developer menu.*"
+          commands:
+            - tapOn:
+                point: "50%,20%"
+# Capture immediately after dev menu dismissal -- catch any white-flash window
+- takeScreenshot: cold-launch-immediate
+- waitForAnimationToEnd:
+    timeout: 5000
+# If a previous flow left the user signed in, sign out first so the
+# cold-launch check can assert on the signed-out AuthView.
+- runFlow:
+    when:
+      visible: "Sign Out"
+    commands:
+      - tapOn:
+          text: "Sign Out"
+      - waitForAnimationToEnd:
+          timeout: 3000
+# The no-flash regression check is the `cold-launch-immediate` screenshot
+# captured above, BEFORE this assertion. This final check only confirms
+# we landed on the AuthView at all. Use extendedWaitUntil instead of a
+# bare assertVisible because on cold Android emulators (and slow iOS sims
+# with cache misses) the AuthView's JS bundle can still be parsing at
+# t=10s post-launch — assertVisible races bundle-load and flakes, even
+# though the AuthView shows up a few seconds later. 30s mirrors the
+# matching wait in flows/common/open-app.yaml.
+- extendedWaitUntil:
+    visible: 'Welcome! Sign in to continue\.?'
+    timeout: 30000
+- takeScreenshot: cold-launch-settled

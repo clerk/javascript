@@ -1,0 +1,16 @@
+# Happy path: Sign in with Apple. iOS-only via tag filter.
+# Manual-only until we have an Apple OAuth stub.
+appId: com.clerk.clerkexpoquickstart
+tags:
+  - happy-path
+  - manual
+  - iosOnly
+---
+- runFlow: ../common/open-app.yaml
+- runFlow: ../common/assert-signed-out.yaml
+- tapOn:
+    text: "Sign in with Apple"
+- waitForAnimationToEnd:
+    timeout: 8000
+# Manual step: complete Apple sign-in.
+- runFlow: ../common/assert-signed-in.yaml

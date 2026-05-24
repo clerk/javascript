@@ -39,7 +39,10 @@ if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
 }
 
 const entry = parsed[instanceName];
-if (!entry) fail(`No entry '${instanceName}' found in ${secretVar}`);
+if (!entry) {
+  const available = Object.keys(parsed).sort().join(', ') || '(none)';
+  fail(`No entry '${instanceName}' found in ${secretVar}. Available keys: ${available}`);
+}
 
 const { pk, sk } = entry;
 if (!pk) fail(`Entry '${instanceName}' in ${secretVar} is missing 'pk'`);

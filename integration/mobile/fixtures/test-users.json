@@ -1,0 +1,27 @@
+{
+  "$schema": "Test user metadata for the Maestro flows. Real credentials live in config/.env, never in this file.",
+  "users": [
+    {
+      "id": "primary",
+      "description": "Primary test user. Pre-existing in the Clerk dev instance.",
+      "emailEnv": "CLERK_TEST_EMAIL",
+      "passwordEnv": "CLERK_TEST_PASSWORD"
+    },
+    {
+      "id": "secondary",
+      "description": "Used by sign-out-then-sign-in-different-user flow. Provision separately.",
+      "emailEnv": "CLERK_TEST_EMAIL_SECONDARY",
+      "passwordEnv": "CLERK_TEST_PASSWORD_SECONDARY"
+    },
+    {
+      "id": "signup",
+      "description": "Generated per run with the +clerk_test pattern so verification codes auto-resolve.",
+      "emailTemplate": "tester+clerk_test_{timestamp}@example.com",
+      "passwordEnv": "CLERK_TEST_PASSWORD"
+    }
+  ],
+  "notes": [
+    "Use +clerk_test addresses to bypass captcha and get higher rate limits.",
+    "Document any new test users you add here so future devs know what they're for."
+  ]
+}

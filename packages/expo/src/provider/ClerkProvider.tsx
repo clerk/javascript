@@ -63,7 +63,8 @@ const SDK_METADATA = {
  *
  * Must be rendered inside `ClerkReactProvider` so `useAuth()` has access to context.
  */
-function NativeSessionSync({
+// Exported for unit tests. Not part of the public API — do not import outside `__tests__`.
+export function NativeSessionSync({
   publishableKey,
   tokenCache,
 }: {

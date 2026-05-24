@@ -1,0 +1,29 @@
+# REGRESSION: After sign-in -> sign-out -> sign-in, the second sign-in
+# completed natively but the JS SDK never picked it up. This flow signs in
+# twice in a row to verify the cycle works correctly.
+#
+# TODO: re-enable once two underlying issues are fixed:
+#   - Android: clerk-android AuthStartView reads Clerk.enabledFirstFactorAttributes
+#     and Clerk.socialProviders via non-observable getters; the body of a re-mounted
+#     AuthView can be left empty when its first composition wins the race against
+#     environment population. A MutableStateFlow + observe in AuthStartView fixes
+#     it (see drafted patch in clerk-android workspace).
+#   - iOS: Maestro's field-clearing on the second sign-in leaves a leading
+#     character (saw ".ci-..." in failing screenshots), which Clerk rejects as
+#     "Identifier is invalid".
+# Both bugs are real; both manifest only on slower hardware (CI) and both pass
+# reliably on local Pixel 9 Pro / iPhone 17 Pro simulators.
+appId: com.clerk.clerkexpoquickstart
+tags:
+  - regression
+  - skip
+---
+- runFlow: ../common/open-app.yaml
+# First sign-in
+- runFlow: ../common/sign-in-email-password.yaml
+- runFlow: ../common/assert-signed-in.yaml
+# Sign out via the Sign Out button
+- runFlow: ../common/sign-out-via-button.yaml
+# Second sign-in -- must work without the bug
+- runFlow: ../common/sign-in-email-password.yaml
+- runFlow: ../common/assert-signed-in.yaml

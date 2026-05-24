@@ -1,0 +1,43 @@
+# REGRESSION: Android <AuthView> got stuck in a navigation loop after
+# interacting with profile sections. This flow signs in, opens the profile
+# via Manage Profile, looks for any navigation targets (e.g. Security,
+# Manage account), navigates in and out, and verifies the user is still
+# signed in afterwards.
+appId: com.clerk.clerkexpoquickstart
+tags:
+  - regression
+  - androidOnly
+---
+- runFlow: ../common/open-app.yaml
+- runFlow: ../common/sign-in-email-password.yaml
+- runFlow: ../common/assert-signed-in.yaml
+# Open the profile modal via Manage Profile
+- tapOn:
+    text: "Manage Profile"
+- waitForAnimationToEnd:
+    timeout: 3000
+- assertVisible:
+    text: "Account"
+# Navigate into Security and back
+- tapOn:
+    text: "Security"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 2000
+- back
+- waitForAnimationToEnd:
+    timeout: 2000
+# Navigate into Security again and back (the regression pattern)
+- tapOn:
+    text: "Security"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 2000
+- back
+- waitForAnimationToEnd:
+    timeout: 2000
+# Dismiss profile and assert we are still signed in (the bug signed us out)
+- back
+- waitForAnimationToEnd:
+    timeout: 2000
+- runFlow: ../common/assert-signed-in.yaml

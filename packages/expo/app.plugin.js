@@ -716,4 +716,11 @@ const withClerkExpo = (config, props = {}) => {
 };
 
 module.exports = withClerkExpo;
+// Named exports for unit tests. The default export remains the combined plugin.
+module.exports.withClerkExpo = withClerkExpo;
+module.exports.withClerkIOS = withClerkIOS;
+module.exports.withClerkAndroid = withClerkAndroid;
+module.exports.withClerkAppleSignIn = withClerkAppleSignIn;
+module.exports.withClerkGoogleSignIn = withClerkGoogleSignIn;
+module.exports.withClerkKeychainService = withClerkKeychainService;
 module.exports._testing = { validateThemeJson, isPlainObject, VALID_COLOR_KEYS, HEX_COLOR_REGEX };

@@ -1,0 +1,20 @@
+# Cold-emulator warmup. Not a test — just launches the app once and lets the
+# JS bundle parse and the accessibility tree populate before the real per-flow
+# loop runs. Fresh Android emulators (and to a lesser extent fresh iOS sims)
+# can take 40+ seconds on the first cold launch for the Clerk AuthView's text
+# fields to become matchable via Maestro. Without a warmup, whichever flow
+# happens to be alphabetically first pays that cost and consistently flakes
+# its in-flow wait.
+#
+# Invoked from .github/workflows/mobile-e2e.yml's "Run iOS e2e" / "Run Android
+# e2e" steps before the xargs loop. The leading underscore is intentional —
+# the workflow's per-flow find excludes flows/common/ anyway, but the prefix
+# makes it obvious this isn't a real test if anyone runs maestro test on the
+# directory by hand.
+appId: com.clerk.clerkexpoquickstart
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible: '(Welcome! Sign in to continue\.?|Sign Out)'
+    timeout: 90000

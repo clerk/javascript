@@ -23,17 +23,75 @@ on:
         description: "Maestro tags to exclude (comma-separated)"
         required: false
         default: "manual,skip"
+      flows_filter:
+        description: "Optional: substring filter for flow paths (e.g. 'sign-in/email-password'). Empty = all flows."
+        required: false
+        default: ""
+      clerk_ios_ref:
+        description: "Optional: pin SPM clerk-ios to this ref (SHA or branch). Empty = use the version pinned in app.plugin.js."
+        required: false
+        default: ""
+      clerk_android_ref:
+        description: "Optional: pin clerk-android Maven coordinates to this version (e.g. '1.0.17-SNAPSHOT'). When clerk_android_snapshot_suffix is set, this is treated as a git ref (SHA/branch/tag) of clerk-android instead, and the snapshot is published to mavenLocal at runtime. Empty = use the version pinned in android/build.gradle."
+        required: false
+        default: ""
+      clerk_android_snapshot_suffix:
+        description: "Optional: when set together with clerk_android_ref, the workflow checks out clerk-android at that ref, bumps CLERK_*_VERSION by appending this suffix (e.g. '-expo-compat-123'), publishes to mavenLocal, and pins @clerk/expo to the resulting version. Used by clerk-android's expo-compat release gate."
+        required: false
+        default: ""
+  workflow_call:
+    inputs:
+      quickstart_ref:
+        type: string
+        required: false
+        default: "main"
+      exclude_tags:
+        type: string
+        required: false
+        default: "manual,skip"
+      flows_filter:
+        type: string
+        required: false
+        default: ""
+      clerk_ios_ref:
+        type: string
+        required: false
+        default: ""
+      clerk_android_ref:
+        type: string
+        required: false
+        default: ""
+      clerk_android_snapshot_suffix:
+        type: string
+        required: false
+        default: ""
 
 env:
   EXPO_INSTANCE_NAME: clerkstage-with-native-components
+  # Override the quickstart's checked-in .npmrc, which points pnpm/npm/npx at a
+  # local verdaccio registry (http://localhost:4873) that doesn't exist on CI.
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
 
 concurrency:
-  group: mobile-e2e-${{ github.ref }}
+  # Scope by platform so iOS and Android compat-gate dispatches can run in
+  # parallel without cancelling each other. A rapid re-dispatch with the
+  # same platform scope still cancels the in-flight one (intended).
+  group: >-
+    mobile-e2e-${{ github.ref }}-${{
+      (inputs.clerk_ios_ref != '' && inputs.clerk_android_ref == '' && 'ios') ||
+      (inputs.clerk_android_ref != '' && inputs.clerk_ios_ref == '' && 'android') ||
+      'full'
+    }}
   cancel-in-progress: true
 
 jobs:
   android:
     name: Android
+    # Skip Android when the dispatch is scoped to iOS only — used by
+    # clerk-ios's expo-compat release gate (passes clerk_ios_ref without
+    # clerk_android_ref). Manual dispatches without ref inputs still run
+    # both jobs.
+    if: inputs.clerk_ios_ref == '' || inputs.clerk_android_ref != ''
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     timeout-minutes: 45
     defaults:
@@ -50,21 +108,278 @@ jobs:
           ref: ${{ inputs.quickstart_ref }}
           path: clerk-expo-quickstart
 
+      - name: Pin clerk-ios SPM ref (compat-gate mode)
+        # When the caller (typically clerk-ios release-sdk.yml's expo-compat job)
+        # passes a specific clerk-ios ref, patch packages/expo/app.plugin.js to
+        # SHA-pin SPM (`kind: revision`) instead of using the default exact-version
+        # pin. The binary cache hash recomputes below, so the cache key naturally
+        # varies by ref and doesn't collide with normal PR / dispatch runs.
+        if: inputs.clerk_ios_ref != ''
+        env:
+          IOS_REF: ${{ inputs.clerk_ios_ref }}
+        run: |
+          set -euo pipefail
+          file="packages/expo/app.plugin.js"
+          tmp="$(mktemp)"
+          sed -e "s|const CLERK_IOS_VERSION = '[^']*'|const CLERK_IOS_VERSION = '${IOS_REF}'|" \
+              -e "s|kind: 'exactVersion'|kind: 'revision'|g" \
+              -e "s|version: CLERK_IOS_VERSION|revision: CLERK_IOS_VERSION|g" \
+              "$file" > "$tmp" && mv "$tmp" "$file"
+          echo "Pinned clerk-ios to ${IOS_REF}:"
+          grep -nE "CLERK_IOS_VERSION|kind:|revision:" "$file" | head
+
+      # ---------------------------------------------------------------------
+      # clerk-android snapshot mode (compat-gate from clerk-android's release).
+      # When clerk_android_snapshot_suffix is set, clerk_android_ref is a git
+      # ref of clerk-android. We check it out, bump CLERK_*_VERSION in its
+      # gradle.properties by appending the suffix, publish to mavenLocal,
+      # then pin @clerk/expo to the resulting version + ensure mavenLocal()
+      # is in the resolution chain. When the suffix is empty,
+      # clerk_android_ref is a pre-published version string and the
+      # "version-string mode" step below handles it.
+      # ---------------------------------------------------------------------
+      - name: Checkout clerk-android (snapshot mode)
+        if: inputs.clerk_android_ref != '' && inputs.clerk_android_snapshot_suffix != ''
+        uses: actions/checkout@v4
+        with:
+          repository: clerk/clerk-android
+          ref: ${{ inputs.clerk_android_ref }}
+          path: clerk-android
+
+      - name: Set up JDK 21 for clerk-android publish (snapshot mode)
+        # clerk-android requires JDK 21 to build. The quickstart build below
+        # uses JDK 17 — re-run setup-java to switch back after publish.
+        if: inputs.clerk_android_ref != '' && inputs.clerk_android_snapshot_suffix != ''
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Compute clerk-android snapshot versions
+        id: android_versions
+        if: inputs.clerk_android_ref != '' && inputs.clerk_android_snapshot_suffix != ''
+        working-directory: clerk-android
+        env:
+          SUFFIX: ${{ inputs.clerk_android_snapshot_suffix }}
+        run: |
+          api="$(awk -F= '/^CLERK_API_VERSION=/{print $2}' gradle.properties | tr -d '[:space:]')${SUFFIX}"
+          ui="$(awk -F= '/^CLERK_UI_VERSION=/{print $2}' gradle.properties | tr -d '[:space:]')${SUFFIX}"
+          telemetry="$(awk -F= '/^CLERK_TELEMETRY_VERSION=/{print $2}' gradle.properties | tr -d '[:space:]')${SUFFIX}"
+          echo "api=$api" >> "$GITHUB_OUTPUT"
+          echo "ui=$ui" >> "$GITHUB_OUTPUT"
+          echo "telemetry=$telemetry" >> "$GITHUB_OUTPUT"
+          echo "Computed snapshot versions: api=$api ui=$ui telemetry=$telemetry"
+
+      - name: Publish clerk-android snapshot to mavenLocal
+        if: inputs.clerk_android_ref != '' && inputs.clerk_android_snapshot_suffix != ''
+        working-directory: clerk-android
+        env:
+          API_VERSION: ${{ steps.android_versions.outputs.api }}
+          UI_VERSION: ${{ steps.android_versions.outputs.ui }}
+          TELEMETRY_VERSION: ${{ steps.android_versions.outputs.telemetry }}
+        run: |
+          sed -i "s/^CLERK_API_VERSION=.*/CLERK_API_VERSION=${API_VERSION}/" gradle.properties
+          sed -i "s/^CLERK_UI_VERSION=.*/CLERK_UI_VERSION=${UI_VERSION}/" gradle.properties
+          sed -i "s/^CLERK_TELEMETRY_VERSION=.*/CLERK_TELEMETRY_VERSION=${TELEMETRY_VERSION}/" gradle.properties
+          # clerk-android's build calls signAllPublications() unconditionally
+          # on api/ui/telemetry. For snapshot tests we don't have signing keys
+          # configured and we don't need signed artifacts in mavenLocal, so
+          # disable every sign* task via an init script (more reliable than
+          # enumerating -x flags for each module + publication variant).
+          cat > /tmp/disable-signing.gradle <<'EOG'
+          allprojects {
+            tasks.matching { it.name.startsWith("sign") }.configureEach {
+              enabled = false
+            }
+          }
+          EOG
+          chmod +x gradlew
+          # Bump the Gradle wrapper download + dependency HTTP timeouts.
+          # The default socketTimeout is 10s and services.gradle.org has
+          # transient slow-responses (saw a 10s-timeout failure that aborted
+          # the entire compat-gate at the wrapper-fetch step before a single
+          # publish task ran). 60s is comfortably long without making real
+          # network outages look like hangs. Also retry the gradlew invocation
+          # twice to absorb single-shot blips.
+          export GRADLE_OPTS="${GRADLE_OPTS:-} -Dorg.gradle.internal.http.connectionTimeout=60000 -Dorg.gradle.internal.http.socketTimeout=60000"
+          for attempt in 1 2 3; do
+            if ./gradlew \
+              -I /tmp/disable-signing.gradle \
+              :source:api:publishToMavenLocal \
+              :source:ui:publishToMavenLocal \
+              :source:telemetry:publishToMavenLocal; then
+              break
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              echo "::error::Gradle publish failed after 3 attempts"
+              exit 1
+            fi
+            echo "Gradle publish attempt $attempt failed; retrying in 10s..."
+            sleep 10
+          done
+
+      - name: Pin @clerk/expo to mavenLocal snapshot
+        if: inputs.clerk_android_ref != '' && inputs.clerk_android_snapshot_suffix != ''
+        env:
+          API_VERSION: ${{ steps.android_versions.outputs.api }}
+          UI_VERSION: ${{ steps.android_versions.outputs.ui }}
+        run: |
+          file="packages/expo/android/build.gradle"
+          sed -i "s|clerkAndroidApiVersion = \"[^\"]*\"|clerkAndroidApiVersion = \"${API_VERSION}\"|" "$file"
+          sed -i "s|clerkAndroidUiVersion = \"[^\"]*\"|clerkAndroidUiVersion = \"${UI_VERSION}\"|" "$file"
+          if ! grep -q "mavenLocal()" "$file"; then
+            sed -i '/^repositories\s*{/a \  mavenLocal()' "$file" || true
+          fi
+          echo "Pinned @clerk/expo (snapshot mode):"
+          grep -nE "clerkAndroid(Api|Ui)Version|mavenLocal" "$file" | head
+
+      - name: Pin clerk-android Maven version (version-string mode)
+        # When the caller passes a pre-published clerk-android version
+        # (e.g. "1.0.17-SNAPSHOT" already on Maven Central / Sonatype staging),
+        # rewrite the version constants in packages/expo/android/build.gradle.
+        # The snapshot-from-SHA path is handled separately above (Android job).
+        if: inputs.clerk_android_ref != '' && inputs.clerk_android_snapshot_suffix == ''
+        env:
+          ANDROID_REF: ${{ inputs.clerk_android_ref }}
+        run: |
+          set -euo pipefail
+          file="packages/expo/android/build.gradle"
+          tmp="$(mktemp)"
+          sed -e "s|clerkAndroidApiVersion = \"[^\"]*\"|clerkAndroidApiVersion = \"${ANDROID_REF}\"|" \
+              -e "s|clerkAndroidUiVersion = \"[^\"]*\"|clerkAndroidUiVersion = \"${ANDROID_REF}\"|" \
+              "$file" > "$tmp" && mv "$tmp" "$file"
+          echo "Pinned clerk-android to ${ANDROID_REF}:"
+          grep -nE "clerkAndroid(Api|Ui)Version" "$file" | head
+
+      - name: Compute binary source hash
+        # Hash everything that affects the produced APK: @clerk/expo source,
+        # the workflow file (which encodes the quickstart-modification rules),
+        # and the quickstart source itself. node_modules, android/, and ios/
+        # are excluded (they're build outputs / regenerated by prebuild).
+        #
+        # Also fold the compat-gate ref inputs into the hash. The "Pin clerk-*"
+        # steps above mutate the working tree (app.plugin.js, build.gradle),
+        # but `git ls-tree -r HEAD` reads committed blobs and would miss those
+        # patches — a stale cache hit could then install the OLD SDK refs while
+        # claiming to test the new ones. Including the input strings here makes
+        # the cache key honest about what's actually being built.
+        id: bin-hash
+        env:
+          CLERK_IOS_REF: ${{ inputs.clerk_ios_ref }}
+          CLERK_ANDROID_REF: ${{ inputs.clerk_android_ref }}
+          CLERK_ANDROID_SNAPSHOT_SUFFIX: ${{ inputs.clerk_android_snapshot_suffix }}
+        run: |
+          expo_tree=$(git ls-tree -r HEAD packages/expo .github/workflows/mobile-e2e.yml | grep -v "/dist/")
+          qs_tree=$(git -C clerk-expo-quickstart ls-tree -r HEAD NativeComponentQuickstart | grep -vE "node_modules|/android/|/ios/")
+          hash=$(printf '%s\n%s\nios=%s\nandroid=%s\nsnapshot=%s\n' \
+            "$expo_tree" "$qs_tree" \
+            "$CLERK_IOS_REF" "$CLERK_ANDROID_REF" "$CLERK_ANDROID_SNAPSHOT_SUFFIX" \
+            | sha256sum | cut -c1-16)
+          echo "hash=$hash" >> "$GITHUB_OUTPUT"
+          echo "Binary source hash: $hash (ios=$CLERK_IOS_REF android=$CLERK_ANDROID_REF snapshot=$CLERK_ANDROID_SNAPSHOT_SUFFIX)"
+
+      - name: Restore Android APK cache
+        # On hit, the entire build path below is skipped. Cache key includes
+        # EXPO_INSTANCE_NAME because the publishable key is baked into the JS
+        # bundle at build time.
+        id: apk-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: /tmp/cached-app-release.apk
+          key: android-apk-${{ steps.bin-hash.outputs.hash }}-${{ env.EXPO_INSTANCE_NAME }}-v1
+
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: pnpm
+          # Intentionally no `cache: pnpm` — pnpm/action-setup@v4 already
+          # caches the pnpm store. setup-node's post-job cache save races
+          # with the snapshot-mode working-directory changes and fails with
+          # "Path Validation Error", which bubbles up as a job failure
+          # even when every test step succeeded.
 
       - name: Install monorepo deps
+        if: steps.apk-cache.outputs.cache-hit != 'true'
         run: pnpm install --frozen-lockfile
 
       - name: Build @clerk/expo
+        if: steps.apk-cache.outputs.cache-hit != 'true'
         run: pnpm turbo build --filter=@clerk/expo...
 
-      - name: Install quickstart deps
+      - name: Pack @clerk/expo
+        if: steps.apk-cache.outputs.cache-hit != 'true'
+        # `pnpm pack` resolves workspace:^ deps to real versions in the
+        # packed tarball, which is what we need so the quickstart (outside
+        # the workspace) can install it.
+        run: pnpm --filter @clerk/expo pack --pack-destination /tmp/clerk-expo-pkg
+
+      - name: Point quickstart at packed @clerk/expo and configure for CI
+        if: steps.apk-cache.outputs.cache-hit != 'true'
         working-directory: clerk-expo-quickstart/NativeComponentQuickstart
-        run: pnpm install
+        run: |
+          # The quickstart's main pins @clerk/expo to a local verdaccio
+          # snapshot version which doesn't exist on public npm. Swap it for
+          # the tarball we just packed.
+          tarball=$(ls /tmp/clerk-expo-pkg/clerk-expo-*.tgz | head -1)
+          jq --arg t "file:$tarball" '.dependencies["@clerk/expo"] = $t' package.json > package.json.tmp
+          mv package.json.tmp package.json
+          # Disable Apple Sign-In in the @clerk/expo plugin. Its default behavior
+          # injects the com.apple.developer.applesignin entitlement during prebuild,
+          # which makes Expo CLI's simulatorBuildRequiresCodeSigning() return true
+          # and demand a development signing identity even for simulator builds —
+          # CI doesn't have one. Maestro flows can't exercise Apple Sign-In without
+          # an Apple Developer team configured anyway.
+          # The plugin may be listed as a bare string "@clerk/expo" OR in array
+          # form ["@clerk/expo", { ...config }] (the quickstart uses the latter
+          # with a theme config). Handle both: rewrite the bare form, or merge
+          # appleSignIn: false into the existing config object.
+          jq '.expo.plugins |= map(
+            if . == "@clerk/expo" then ["@clerk/expo", {"appleSignIn": false}]
+            elif type == "array" and .[0] == "@clerk/expo" then [.[0], ((.[1] // {}) + {"appleSignIn": false})]
+            else . end
+          )' app.json > app.json.tmp
+          mv app.json.tmp app.json
+          # The quickstart's app.json ships with placeholder bundle ids
+          # ("com.yourcompany.yourapp") but the Maestro flows in
+          # integration/mobile/flows reference "com.clerk.clerkexpoquickstart".
+          # Align them so launchApp/clearAppState target the installed app.
+          jq '.expo.ios.bundleIdentifier = "com.clerk.clerkexpoquickstart" | .expo.android.package = "com.clerk.clerkexpoquickstart"' app.json > app.json.tmp
+          mv app.json.tmp app.json
+          # Strip expo-dev-client. With it installed, even release-variant
+          # builds boot into the dev launcher and try to reach Metro at a
+          # LAN IP unreachable from CI's emulator/simulator, leaving every
+          # Maestro flow stuck on a blank screen.
+          jq 'del(.dependencies["expo-dev-client"], .devDependencies["expo-dev-client"])' package.json > package.json.tmp
+          mv package.json.tmp package.json
+
+      - name: Cache quickstart node_modules
+        if: steps.apk-cache.outputs.cache-hit != 'true'
+        uses: actions/cache@v4
+        with:
+          path: clerk-expo-quickstart/NativeComponentQuickstart/node_modules
+          key: quickstart-nm-${{ runner.os }}-${{ hashFiles('clerk-expo-quickstart/NativeComponentQuickstart/package.json', 'packages/expo/package.json') }}
+          restore-keys: |
+            quickstart-nm-${{ runner.os }}-
+
+      - name: Install quickstart deps
+        if: steps.apk-cache.outputs.cache-hit != 'true'
+        working-directory: clerk-expo-quickstart/NativeComponentQuickstart
+        # --ignore-workspace because the quickstart dir is nested inside the
+        # javascript checkout; without this, pnpm walks up and treats the
+        # outer monorepo as the workspace and skips the quickstart entirely.
+        run: pnpm install --ignore-workspace --no-frozen-lockfile
+
+      - name: Stub missing image assets
+        if: steps.apk-cache.outputs.cache-hit != 'true'
+        working-directory: clerk-expo-quickstart/NativeComponentQuickstart
+        # The quickstart's app.json references splash-icon.png and android
+        # adaptive-icon variants that aren't actually committed. Fill them in
+        # from icon.png so prebuild's image-asset mods don't fail with ENOENT.
+        run: |
+          cd assets/images
+          for f in splash-icon.png android-icon-foreground.png android-icon-background.png android-icon-monochrome.png; do
+            [ -f "$f" ] || cp icon.png "$f"
+          done
 
       - name: Resolve Clerk instance keys
         id: keys
@@ -73,6 +388,7 @@ jobs:
         run: node scripts/resolve-instance-keys.mjs INTEGRATION_STAGING_INSTANCE_KEYS "$EXPO_INSTANCE_NAME"
 
       - name: Write quickstart .env
+        if: steps.apk-cache.outputs.cache-hit != 'true'
         working-directory: clerk-expo-quickstart/NativeComponentQuickstart
         run: |
           echo "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=${{ steps.keys.outputs.pk }}" > .env
@@ -83,27 +399,153 @@ jobs:
           CLERK_SECRET_KEY: ${{ steps.keys.outputs.sk }}
         run: |
           email="ci-${GITHUB_RUN_ID}-${RANDOM}+clerk_test@clerkcookie.com"
+          username="ci_${GITHUB_RUN_ID}_${RANDOM}"
           password="ClerkCI!$(openssl rand -hex 8)Aa1"
-          response=$(curl -fsS -X POST https://api.clerk.com/v1/users \
+          http_code=$(curl -sS -o /tmp/bapi_response.json -w "%{http_code}" -X POST https://api.clerkstage.dev/v1/users \
             -H "Authorization: Bearer $CLERK_SECRET_KEY" \
             -H "Content-Type: application/json" \
-            -d "{\"email_address\":[\"$email\"],\"password\":\"$password\"}")
+            -d "{\"email_address\":[\"$email\"],\"username\":\"$username\",\"password\":\"$password\"}")
+          if [ "$http_code" -lt 200 ] || [ "$http_code" -ge 300 ]; then
+            echo "::error::BAPI user creation failed (HTTP $http_code)"
+            jq . /tmp/bapi_response.json 2>/dev/null || cat /tmp/bapi_response.json
+            exit 1
+          fi
+          response=$(cat /tmp/bapi_response.json)
           user_id=$(echo "$response" | jq -er '.id')
           echo "::add-mask::$password"
           echo "email=$email" >> "$GITHUB_OUTPUT"
           echo "password=$password" >> "$GITHUB_OUTPUT"
           echo "user_id=$user_id" >> "$GITHUB_OUTPUT"
 
+      - name: Verify BAPI user
+        # Sanity check: confirm the just-created user is visible to BAPI with
+        # the expected properties before we hand off to Maestro. If sign-in
+        # flows start failing again, this step's output is the first place
+        # to look (and pre-dates the maestro driver coming up).
+        env:
+          CLERK_SECRET_KEY: ${{ steps.keys.outputs.sk }}
+          USER_ID: ${{ steps.user.outputs.user_id }}
+        run: |
+          curl -fsS -H "Authorization: Bearer $CLERK_SECRET_KEY" "https://api.clerkstage.dev/v1/users/$USER_ID" \
+            | jq '{id, email_addresses: [.email_addresses[].email_address], password_enabled, banned, locked}'
+
       - name: Set up JDK 17
+        # Always run, not just on cache miss: Maestro itself requires Java 17+
+        # to launch (the maestro CLI is a JVM app). When the APK cache hits
+        # and we skip gradle, we still need Java for the Maestro test step.
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
-      - name: Install Maestro
+      - name: Cache Gradle
+        if: steps.apk-cache.outputs.cache-hit != 'true'
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('packages/expo/package.json', 'clerk-expo-quickstart/NativeComponentQuickstart/package.json') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
+
+      - name: Build Android APK
+        # Build with prebuild + gradle directly so we can do it before booting
+        # the emulator (gradle assembleRelease doesn't need a device, unlike
+        # `expo run:android`). Output is copied to a stable cache path.
+        if: steps.apk-cache.outputs.cache-hit != 'true'
+        working-directory: clerk-expo-quickstart/NativeComponentQuickstart
+        env:
+          SNAPSHOT_MODE: ${{ inputs.clerk_android_ref != '' && inputs.clerk_android_snapshot_suffix != '' && 'true' || 'false' }}
         run: |
-          curl -Ls "https://get.maestro.mobile.dev" | bash
+          npx expo prebuild --clean --platform android
+          # In snapshot mode (compat-gate), inject mavenLocal() into the
+          # regenerated android/build.gradle so the consumer build can resolve
+          # the clerk-android snapshot we just publishToMavenLocal'd. Only
+          # touches project repositories — leaves pluginManagement alone so
+          # the Gradle Plugin Portal stays the default for resolving the
+          # kotlin/android plugins.
+          if [ "$SNAPSHOT_MODE" = "true" ]; then
+            file="android/build.gradle"
+            if ! grep -q "mavenLocal()" "$file"; then
+              awk '
+                /^allprojects\s*\{/ { in_all = 1 }
+                in_all && /repositories\s*\{/ && !done {
+                  print; print "    mavenLocal()"; done = 1; next
+                }
+                in_all && /^\}/ { in_all = 0 }
+                { print }
+              ' "$file" > "$file.tmp" && mv "$file.tmp" "$file"
+              echo "Injected mavenLocal() into $file:"
+              grep -nE "mavenLocal|allprojects|repositories" "$file" | head -20
+            fi
+          fi
+          cd android
+          ( ok=0; for i in 1 2 3; do if ./gradlew :app:assembleRelease; then ok=1; break; fi; echo "gradle attempt $i failed; retrying in 15s"; sleep 15; done; [ "$ok" = 1 ] )
+          cp app/build/outputs/apk/release/app-release.apk /tmp/cached-app-release.apk
+          ls -lh /tmp/cached-app-release.apk
+
+      - name: Save Android APK cache
+        # Save runs on success (no `always()` - if build failed, don't cache a
+        # missing or partial APK). Skipped on cache hit since the binary is
+        # already there.
+        if: steps.apk-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /tmp/cached-app-release.apk
+          key: android-apk-${{ steps.bin-hash.outputs.hash }}-${{ env.EXPO_INSTANCE_NAME }}-v1
+
+      - name: Enable KVM
+        # Required so the x86_64 Android emulator can use hardware accel.
+        # Without it the emulator falls back to software rendering and is
+        # multiple times slower to boot and run.
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: AVD cache
+        uses: actions/cache@v4
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-34-google_apis-x86_64-v1
+
+      - name: Create AVD snapshot
+        # On cache miss, boot the emulator once with snapshot saving so a
+        # warm-boot snapshot ends up in ~/.android/avd/*. Subsequent runs
+        # hit the cache and skip this step.
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          disable-animations: false
+          script: echo "Generated AVD snapshot for caching."
+
+      - name: Install Maestro
+        # Use pipefail + verify the binary so a curl flake (e.g. TLS reset
+        # against github.com:443) doesn't leave us with an "installed" but
+        # missing maestro binary, which downstream xargs invocations only
+        # surface as a cryptic exit-code-127 after the build.
+        run: |
+          set -o pipefail
+          installed=0
+          for i in 1 2 3; do
+            if curl -fLs --retry 3 --retry-delay 5 "https://get.maestro.mobile.dev" | bash; then
+              if [ -x "$HOME/.maestro/bin/maestro" ]; then installed=1; break; fi
+            fi
+            echo "Maestro install attempt $i failed (or binary missing); retrying"
+            sleep 5
+          done
+          [ "$installed" = 1 ] || { echo "::error::Maestro install failed after 3 attempts"; exit 1; }
           echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+          "$HOME/.maestro/bin/maestro" --version
 
       - name: Run Android e2e
         uses: reactivecircus/android-emulator-runner@v2
@@ -111,25 +553,53 @@ jobs:
           CLERK_TEST_EMAIL: ${{ steps.user.outputs.email }}
           CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
           EXCLUDE_TAGS: ${{ inputs.exclude_tags }}
+          FLOWS_FILTER: ${{ inputs.flows_filter }}
         with:
           api-level: 34
           target: google_apis
           arch: x86_64
-          script: |
-            cd clerk-expo-quickstart/NativeComponentQuickstart
-            npx expo prebuild --clean
-            npx expo run:android --variant release --no-bundler
-            cd ../../integration-mobile
-            # Maestro doesn't auto-recurse into subdirectories; pass each flow explicitly.
-            find flows -type f -name "*.yaml" ! -path "*/common/*" -print0 | \
-              xargs -0 maestro test --exclude-tags "$EXCLUDE_TAGS"
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          disable-animations: true
+          # reactivecircus/android-emulator-runner runs each line of `script` in a
+          # separate `sh -c` invocation, so cwd doesn't persist between commands.
+          # Use a folded scalar (>-) plus `&&` chains so the entire pipeline runs
+          # in one shell invocation. Maestro doesn't auto-recurse into subdirs,
+          # so we pass each flow file explicitly via find.
+          # Maestro's `--exclude-tags` only filters when given a directory;
+          # with explicit file paths it runs every file regardless of tag.
+          # We want per-flow invocation (one crash/hang can't poison the
+          # rest) AND tag filtering, so pre-filter the file list in shell:
+          # for each candidate flow, grep its YAML for a top-level
+          # `- <excluded-tag>` line and drop it from the list.
+          # All lines at the same indent so YAML's folded scalar (>-) joins
+          # them with single spaces. Any extra indentation would preserve
+          # newlines and break the shell pipe. The while-do-done stays on
+          # one logical line for the same reason.
+          script: >-
+            adb install -r /tmp/cached-app-release.apk &&
+            cd integration/mobile &&
+            excluded="$EXCLUDE_TAGS,iosOnly,flakyAndroid" &&
+            pattern="$(echo "$excluded" | sed 's/,/|/g')" &&
+            ( maestro test --flatten-debug-output flows/common/_warmup.yaml || true ) &&
+            ( adb shell am force-stop com.clerk.clerkexpoquickstart 2>/dev/null || true ) &&
+            find flows -type f -name '*.yaml' ! -path '*/common/*' ${FLOWS_FILTER:+-path "*$FLOWS_FILTER*"}
+            | sort
+            | while read f; do grep -qE "^[[:space:]]*-[[:space:]]*(${pattern})[[:space:]]*$" "$f" || printf '%s\n' "$f"; done
+            | xargs -n 1 -I FLOW bash -c 'flow="$1"; for a in 1 2; do if maestro test --env CLERK_TEST_EMAIL="$CLERK_TEST_EMAIL" --env CLERK_TEST_PASSWORD="$CLERK_TEST_PASSWORD" --flatten-debug-output "$flow"; then exit 0; fi; if [ "$a" -eq 2 ]; then echo "::error::Flow $flow failed after 2 attempts"; exit 1; fi; echo "::warning::Flow $flow failed attempt $a, retrying after 10s..."; adb shell am force-stop com.clerk.clerkexpoquickstart >/dev/null 2>&1 || true; sleep 10; done' _ FLOW
 
-      - name: Upload Maestro artifacts on failure
-        if: failure()
+      - name: Upload Maestro artifacts on failure or cancel
+        if: failure() || cancelled()
         uses: actions/upload-artifact@v4
         with:
           name: maestro-android
-          path: ~/.maestro/tests
+          # ~/.maestro/tests holds Maestro's auto-captured failure screenshots
+          # and commands JSON. integration/mobile/*.png holds the takeScreenshot
+          # debug captures that flows write, which Maestro saves relative to
+          # the cwd it was launched from (integration/mobile/).
+          path: |
+            ~/.maestro/tests
+            integration/mobile/*.png
 
       - name: Cleanup test user
         if: always() && steps.user.outputs.user_id != ''
@@ -137,13 +607,29 @@ jobs:
           CLERK_SECRET_KEY: ${{ steps.keys.outputs.sk }}
           USER_ID: ${{ steps.user.outputs.user_id }}
         run: |
-          curl -fsS -X DELETE "https://api.clerk.com/v1/users/$USER_ID" \
+          curl -fsS -X DELETE "https://api.clerkstage.dev/v1/users/$USER_ID" \
             -H "Authorization: Bearer $CLERK_SECRET_KEY" || true
 
   ios:
     name: iOS
+    # Skip iOS when the dispatch is scoped to Android only — used by
+    # clerk-android's expo-compat release gate, which passes clerk_android_ref
+    # (and clerk_android_snapshot_suffix) but not clerk_ios_ref. Manual
+    # dispatches without ref inputs still run both jobs.
+    if: inputs.clerk_android_ref == '' || inputs.clerk_ios_ref != ''
+    # GitHub-hosted runner. Blacksmith macOS-15 didn't pick up the job in
+    # our trial (capacity / label availability) — revisit when Blacksmith
+    # exposes a label we know is provisioned on this account.
     runs-on: macos-15
-    timeout-minutes: 60
+    # 90 minutes accounts for: ~10 min monorepo install, ~12 min iOS build +
+    # SPM checkout on a cold derived-data cache, ~3 min cold-sim warmup,
+    # then ~5-8 min per top-level flow on iOS sim (vs ~45s on Android — iOS
+    # ASWebAuthenticationSession + simctl install are inherently heavier).
+    # The previous 60 was tight enough that the suite was killed mid-run on
+    # cache-miss days even with every flow passing. Tighten this back down
+    # once we either (a) parallelize flows across shards or (b) move iOS to
+    # a runner with persistent DerivedData caching.
+    timeout-minutes: 90
     steps:
       - name: Checkout @clerk/javascript
         uses: actions/checkout@v4
@@ -155,21 +641,161 @@ jobs:
           ref: ${{ inputs.quickstart_ref }}
           path: clerk-expo-quickstart
 
+      - name: Pin clerk-ios SPM ref (compat-gate mode)
+        # When the caller (typically clerk-ios release-sdk.yml's expo-compat job)
+        # passes a specific clerk-ios ref, patch packages/expo/app.plugin.js to
+        # SHA-pin SPM (`kind: revision`) instead of using the default exact-version
+        # pin. The binary cache hash recomputes below, so the cache key naturally
+        # varies by ref and doesn't collide with normal PR / dispatch runs.
+        if: inputs.clerk_ios_ref != ''
+        env:
+          IOS_REF: ${{ inputs.clerk_ios_ref }}
+        run: |
+          set -euo pipefail
+          file="packages/expo/app.plugin.js"
+          tmp="$(mktemp)"
+          sed -e "s|const CLERK_IOS_VERSION = '[^']*'|const CLERK_IOS_VERSION = '${IOS_REF}'|" \
+              -e "s|kind: 'exactVersion'|kind: 'revision'|g" \
+              -e "s|version: CLERK_IOS_VERSION|revision: CLERK_IOS_VERSION|g" \
+              "$file" > "$tmp" && mv "$tmp" "$file"
+          echo "Pinned clerk-ios to ${IOS_REF}:"
+          grep -nE "CLERK_IOS_VERSION|kind:|revision:" "$file" | head
+
+      - name: Pin clerk-android Maven version (version-string mode)
+        # When the caller passes a pre-published clerk-android version
+        # (e.g. "1.0.17-SNAPSHOT" already on Maven Central / Sonatype staging),
+        # rewrite the version constants in packages/expo/android/build.gradle.
+        # The snapshot-from-SHA path is handled separately above (Android job).
+        if: inputs.clerk_android_ref != '' && inputs.clerk_android_snapshot_suffix == ''
+        env:
+          ANDROID_REF: ${{ inputs.clerk_android_ref }}
+        run: |
+          set -euo pipefail
+          file="packages/expo/android/build.gradle"
+          tmp="$(mktemp)"
+          sed -e "s|clerkAndroidApiVersion = \"[^\"]*\"|clerkAndroidApiVersion = \"${ANDROID_REF}\"|" \
+              -e "s|clerkAndroidUiVersion = \"[^\"]*\"|clerkAndroidUiVersion = \"${ANDROID_REF}\"|" \
+              "$file" > "$tmp" && mv "$tmp" "$file"
+          echo "Pinned clerk-android to ${ANDROID_REF}:"
+          grep -nE "clerkAndroid(Api|Ui)Version" "$file" | head
+
+      - name: Compute binary source hash
+        # See the matching step in the Android job for the rationale on folding
+        # the compat-gate ref inputs into the hash — same logic applies here.
+        id: bin-hash
+        env:
+          CLERK_IOS_REF: ${{ inputs.clerk_ios_ref }}
+          CLERK_ANDROID_REF: ${{ inputs.clerk_android_ref }}
+          CLERK_ANDROID_SNAPSHOT_SUFFIX: ${{ inputs.clerk_android_snapshot_suffix }}
+        run: |
+          expo_tree=$(git ls-tree -r HEAD packages/expo .github/workflows/mobile-e2e.yml | grep -v "/dist/")
+          qs_tree=$(git -C clerk-expo-quickstart ls-tree -r HEAD NativeComponentQuickstart | grep -vE "node_modules|/android/|/ios/")
+          hash=$(printf '%s\n%s\nios=%s\nandroid=%s\nsnapshot=%s\n' \
+            "$expo_tree" "$qs_tree" \
+            "$CLERK_IOS_REF" "$CLERK_ANDROID_REF" "$CLERK_ANDROID_SNAPSHOT_SUFFIX" \
+            | sha256sum | cut -c1-16)
+          echo "hash=$hash" >> "$GITHUB_OUTPUT"
+          echo "Binary source hash: $hash (ios=$CLERK_IOS_REF android=$CLERK_ANDROID_REF snapshot=$CLERK_ANDROID_SNAPSHOT_SUFFIX)"
+
+      - name: Restore iOS .app cache
+        id: app-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: /tmp/cached-clerknativequickstart.app
+          key: ios-app-${{ steps.bin-hash.outputs.hash }}-${{ env.EXPO_INSTANCE_NAME }}-v1
+
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: pnpm
+          # Intentionally no `cache: pnpm` — pnpm/action-setup@v4 already
+          # caches the pnpm store. setup-node's post-job cache save races
+          # with the snapshot-mode working-directory changes and fails with
+          # "Path Validation Error", which bubbles up as a job failure
+          # even when every test step succeeded.
 
       - name: Install monorepo deps
+        if: steps.app-cache.outputs.cache-hit != 'true'
         run: pnpm install --frozen-lockfile
 
       - name: Build @clerk/expo
+        if: steps.app-cache.outputs.cache-hit != 'true'
         run: pnpm turbo build --filter=@clerk/expo...
 
-      - name: Install quickstart deps
+      - name: Pack @clerk/expo
+        if: steps.app-cache.outputs.cache-hit != 'true'
+        # `pnpm pack` resolves workspace:^ deps to real versions in the
+        # packed tarball, which is what we need so the quickstart (outside
+        # the workspace) can install it.
+        run: pnpm --filter @clerk/expo pack --pack-destination /tmp/clerk-expo-pkg
+
+      - name: Point quickstart at packed @clerk/expo and configure for CI
+        if: steps.app-cache.outputs.cache-hit != 'true'
         working-directory: clerk-expo-quickstart/NativeComponentQuickstart
-        run: pnpm install
+        run: |
+          # The quickstart's main pins @clerk/expo to a local verdaccio
+          # snapshot version which doesn't exist on public npm. Swap it for
+          # the tarball we just packed.
+          tarball=$(ls /tmp/clerk-expo-pkg/clerk-expo-*.tgz | head -1)
+          jq --arg t "file:$tarball" '.dependencies["@clerk/expo"] = $t' package.json > package.json.tmp
+          mv package.json.tmp package.json
+          # Disable Apple Sign-In in the @clerk/expo plugin. Its default behavior
+          # injects the com.apple.developer.applesignin entitlement during prebuild,
+          # which makes Expo CLI's simulatorBuildRequiresCodeSigning() return true
+          # and demand a development signing identity even for simulator builds —
+          # CI doesn't have one. Maestro flows can't exercise Apple Sign-In without
+          # an Apple Developer team configured anyway.
+          # The plugin may be listed as a bare string "@clerk/expo" OR in array
+          # form ["@clerk/expo", { ...config }] (the quickstart uses the latter
+          # with a theme config). Handle both: rewrite the bare form, or merge
+          # appleSignIn: false into the existing config object.
+          jq '.expo.plugins |= map(
+            if . == "@clerk/expo" then ["@clerk/expo", {"appleSignIn": false}]
+            elif type == "array" and .[0] == "@clerk/expo" then [.[0], ((.[1] // {}) + {"appleSignIn": false})]
+            else . end
+          )' app.json > app.json.tmp
+          mv app.json.tmp app.json
+          # The quickstart's app.json ships with placeholder bundle ids
+          # ("com.yourcompany.yourapp") but the Maestro flows in
+          # integration/mobile/flows reference "com.clerk.clerkexpoquickstart".
+          # Align them so launchApp/clearAppState target the installed app.
+          jq '.expo.ios.bundleIdentifier = "com.clerk.clerkexpoquickstart" | .expo.android.package = "com.clerk.clerkexpoquickstart"' app.json > app.json.tmp
+          mv app.json.tmp app.json
+          # Strip expo-dev-client. With it installed, even release-variant
+          # builds boot into the dev launcher and try to reach Metro at a
+          # LAN IP unreachable from CI's emulator/simulator, leaving every
+          # Maestro flow stuck on a blank screen.
+          jq 'del(.dependencies["expo-dev-client"], .devDependencies["expo-dev-client"])' package.json > package.json.tmp
+          mv package.json.tmp package.json
+
+      - name: Cache quickstart node_modules
+        if: steps.app-cache.outputs.cache-hit != 'true'
+        uses: actions/cache@v4
+        with:
+          path: clerk-expo-quickstart/NativeComponentQuickstart/node_modules
+          key: quickstart-nm-${{ runner.os }}-${{ hashFiles('clerk-expo-quickstart/NativeComponentQuickstart/package.json', 'packages/expo/package.json') }}
+          restore-keys: |
+            quickstart-nm-${{ runner.os }}-
+
+      - name: Install quickstart deps
+        if: steps.app-cache.outputs.cache-hit != 'true'
+        working-directory: clerk-expo-quickstart/NativeComponentQuickstart
+        # --ignore-workspace because the quickstart dir is nested inside the
+        # javascript checkout; without this, pnpm walks up and treats the
+        # outer monorepo as the workspace and skips the quickstart entirely.
+        run: pnpm install --ignore-workspace --no-frozen-lockfile
+
+      - name: Stub missing image assets
+        if: steps.app-cache.outputs.cache-hit != 'true'
+        working-directory: clerk-expo-quickstart/NativeComponentQuickstart
+        # The quickstart's app.json references splash-icon.png and android
+        # adaptive-icon variants that aren't actually committed. Fill them in
+        # from icon.png so prebuild's image-asset mods don't fail with ENOENT.
+        run: |
+          cd assets/images
+          for f in splash-icon.png android-icon-foreground.png android-icon-background.png android-icon-monochrome.png; do
+            [ -f "$f" ] || cp icon.png "$f"
+          done
 
       - name: Resolve Clerk instance keys
         id: keys
@@ -178,6 +804,7 @@ jobs:
         run: node scripts/resolve-instance-keys.mjs INTEGRATION_STAGING_INSTANCE_KEYS "$EXPO_INSTANCE_NAME"
 
       - name: Write quickstart .env
+        if: steps.app-cache.outputs.cache-hit != 'true'
         working-directory: clerk-expo-quickstart/NativeComponentQuickstart
         run: |
           echo "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=${{ steps.keys.outputs.pk }}" > .env
@@ -188,48 +815,220 @@ jobs:
           CLERK_SECRET_KEY: ${{ steps.keys.outputs.sk }}
         run: |
           email="ci-${GITHUB_RUN_ID}-${RANDOM}+clerk_test@clerkcookie.com"
+          username="ci_${GITHUB_RUN_ID}_${RANDOM}"
           password="ClerkCI!$(openssl rand -hex 8)Aa1"
-          response=$(curl -fsS -X POST https://api.clerk.com/v1/users \
+          http_code=$(curl -sS -o /tmp/bapi_response.json -w "%{http_code}" -X POST https://api.clerkstage.dev/v1/users \
             -H "Authorization: Bearer $CLERK_SECRET_KEY" \
             -H "Content-Type: application/json" \
-            -d "{\"email_address\":[\"$email\"],\"password\":\"$password\"}")
+            -d "{\"email_address\":[\"$email\"],\"username\":\"$username\",\"password\":\"$password\"}")
+          if [ "$http_code" -lt 200 ] || [ "$http_code" -ge 300 ]; then
+            echo "::error::BAPI user creation failed (HTTP $http_code)"
+            jq . /tmp/bapi_response.json 2>/dev/null || cat /tmp/bapi_response.json
+            exit 1
+          fi
+          response=$(cat /tmp/bapi_response.json)
           user_id=$(echo "$response" | jq -er '.id')
           echo "::add-mask::$password"
           echo "email=$email" >> "$GITHUB_OUTPUT"
           echo "password=$password" >> "$GITHUB_OUTPUT"
           echo "user_id=$user_id" >> "$GITHUB_OUTPUT"
 
-      - name: Cache SPM
+      - name: Verify BAPI user
+        # Sanity check: confirm the just-created user is visible to BAPI with
+        # the expected properties before we hand off to Maestro. If sign-in
+        # flows start failing again, this step's output is the first place
+        # to look (and pre-dates the maestro driver coming up).
+        env:
+          CLERK_SECRET_KEY: ${{ steps.keys.outputs.sk }}
+          USER_ID: ${{ steps.user.outputs.user_id }}
+        run: |
+          curl -fsS -H "Authorization: Bearer $CLERK_SECRET_KEY" "https://api.clerkstage.dev/v1/users/$USER_ID" \
+            | jq '{id, email_addresses: [.email_addresses[].email_address], password_enabled, banned, locked}'
+
+      - name: Cache CocoaPods downloads
+        if: steps.app-cache.outputs.cache-hit != 'true'
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/Library/Caches/CocoaPods
+            ~/.cocoapods/repos
+          key: cocoapods-${{ runner.os }}-${{ hashFiles('packages/expo/package.json', 'clerk-expo-quickstart/NativeComponentQuickstart/package.json') }}
+          restore-keys: |
+            cocoapods-${{ runner.os }}-
+
+      - name: Cache Xcode DerivedData
+        # Includes SPM checkouts and incremental build artifacts. Wider key
+        # than the old spm-only cache so it actually invalidates when the
+        # quickstart's deps change, not just when @clerk/expo's do.
+        if: steps.app-cache.outputs.cache-hit != 'true'
         uses: actions/cache@v4
         with:
           path: ~/Library/Developer/Xcode/DerivedData
-          key: spm-${{ hashFiles('packages/expo/package.json') }}
+          key: deriveddata-${{ runner.os }}-${{ hashFiles('packages/expo/package.json', 'clerk-expo-quickstart/NativeComponentQuickstart/package.json') }}
+          restore-keys: |
+            deriveddata-${{ runner.os }}-
+
+      - name: Build iOS .app
+        # Build with expo run:ios (which builds + installs to the booted sim).
+        # We then extract the .app bundle from DerivedData to a stable cache
+        # path. The Maestro step below installs from that path regardless of
+        # whether the build ran or the cache restored.
+        if: steps.app-cache.outputs.cache-hit != 'true'
+        working-directory: clerk-expo-quickstart/NativeComponentQuickstart
+        run: |
+          npx expo prebuild --clean --platform ios
+          SIM_UDID=$(xcrun simctl list devices --json | jq -r '[.devices | to_entries[] | select(.key | startswith("com.apple.CoreSimulator.SimRuntime.iOS")) | .value[] | select(.isAvailable == true)] | first | .udid')
+          if [ -z "$SIM_UDID" ] || [ "$SIM_UDID" = "null" ]; then
+            echo "::error::No available iOS simulator found"; xcrun simctl list devices; exit 1
+          fi
+          xcrun simctl boot "$SIM_UDID" 2>/dev/null || true
+          xcrun simctl bootstatus "$SIM_UDID" -b
+          # expo run:ios builds + installs + then tries to deep-link the app
+          # via the dev-launcher URL (com.<bundle>://expo-development-client/
+          # ?url=http://<LAN-IP>:8081). On GitHub-hosted macos-15 runners the
+          # LAN IP is unreachable from the simulator and `xcrun simctl openurl`
+          # times out at 60s, exiting expo run:ios with code 1 — even though
+          # the build itself succeeded and the .app is sitting in DerivedData.
+          # We don't need the post-install launch (Maestro re-installs and
+          # opens the app cleanly later), so swallow the openurl failure and
+          # let the .app-exists check below decide whether to proceed.
+          set +e
+          npx expo run:ios --device "$SIM_UDID" --configuration Release --no-bundler
+          run_ios_rc=$?
+          set -e
+          app=$(find ~/Library/Developer/Xcode/DerivedData -name "clerknativequickstart.app" -path "*/Release-iphonesimulator/*" | head -1)
+          if [ -z "$app" ]; then
+            echo "::error::No .app found in DerivedData (expo run:ios exit=$run_ios_rc)"; exit 1
+          fi
+          if [ "$run_ios_rc" -ne 0 ]; then
+            echo "expo run:ios exited with $run_ios_rc but the .app was built ($app); continuing with the cached copy."
+          fi
+          rm -rf /tmp/cached-clerknativequickstart.app
+          cp -R "$app" /tmp/cached-clerknativequickstart.app
+          ls -la /tmp/cached-clerknativequickstart.app | head
+
+      - name: Save iOS .app cache
+        if: steps.app-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /tmp/cached-clerknativequickstart.app
+          key: ios-app-${{ steps.bin-hash.outputs.hash }}-${{ env.EXPO_INSTANCE_NAME }}-v1
 
       - name: Install Maestro
+        # Use pipefail + verify the binary so a curl flake (e.g. TLS reset
+        # against github.com:443) doesn't leave us with an "installed" but
+        # missing maestro binary, which downstream xargs invocations only
+        # surface as a cryptic exit-code-127 after the build.
         run: |
-          curl -Ls "https://get.maestro.mobile.dev" | bash
+          set -o pipefail
+          installed=0
+          for i in 1 2 3; do
+            if curl -fLs --retry 3 --retry-delay 5 "https://get.maestro.mobile.dev" | bash; then
+              if [ -x "$HOME/.maestro/bin/maestro" ]; then installed=1; break; fi
+            fi
+            echo "Maestro install attempt $i failed (or binary missing); retrying"
+            sleep 5
+          done
+          [ "$installed" = 1 ] || { echo "::error::Maestro install failed after 3 attempts"; exit 1; }
           echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+          "$HOME/.maestro/bin/maestro" --version
 
-      - name: Build and run iOS e2e
+      - name: Run iOS e2e
+        # Boot a simulator, install the cached (or freshly-built) .app, and
+        # run the Maestro sweep. No xcodebuild here — that all happened in
+        # "Build iOS .app" or was restored from the actions/cache step.
         env:
           CLERK_TEST_EMAIL: ${{ steps.user.outputs.email }}
           CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
           EXCLUDE_TAGS: ${{ inputs.exclude_tags }}
+          FLOWS_FILTER: ${{ inputs.flows_filter }}
         run: |
-          cd clerk-expo-quickstart/NativeComponentQuickstart
-          npx expo prebuild --clean
-          npx expo run:ios --configuration Release --no-bundler
-          cd ../../integration-mobile
-          # Maestro doesn't auto-recurse into subdirectories; pass each flow explicitly.
-          find flows -type f -name "*.yaml" ! -path "*/common/*" -print0 | \
-            xargs -0 maestro test --exclude-tags "$EXCLUDE_TAGS,androidOnly"
+          SIM_UDID=$(xcrun simctl list devices --json | jq -r '[.devices | to_entries[] | select(.key | startswith("com.apple.CoreSimulator.SimRuntime.iOS")) | .value[] | select(.isAvailable == true)] | first | .udid')
+          if [ -z "$SIM_UDID" ] || [ "$SIM_UDID" = "null" ]; then
+            echo "::error::No available iOS simulator found"
+            xcrun simctl list devices
+            exit 1
+          fi
+          echo "Using simulator $SIM_UDID"
+          xcrun simctl boot "$SIM_UDID" 2>/dev/null || true
+          xcrun simctl bootstatus "$SIM_UDID" -b
+          # Kill animations + auto-correct/predictive keyboard on the
+          # simulator. Both are major slowdowns in CI: animations add
+          # 200-500ms to every tap; predictive-text suggestions hijack
+          # text fields and cause Maestro's inputText to land on the
+          # wrong target. Settings are device-scoped and persist for the
+          # life of the runner.
+          xcrun simctl spawn "$SIM_UDID" defaults write com.apple.UIKit UIAnimationDragCoefficient -float 0.01 || true
+          xcrun simctl spawn "$SIM_UDID" defaults write -g ApplePersistenceIgnoreState -bool YES || true
+          xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.ContinuousPath -bool NO || true
+          xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.AutoCapitalization -bool NO || true
+          xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.AutoCorrection -bool NO || true
+          xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.Prediction -bool NO || true
+          xcrun simctl install "$SIM_UDID" /tmp/cached-clerknativequickstart.app
+          cd integration/mobile
+          # Cold-sim warmup: launch the app once and let the JS bundle parse
+          # and the accessibility tree populate before the per-flow loop
+          # runs. Without this, whichever flow happens to run first eats the
+          # cold-start cost and consistently flakes its in-flow wait — even
+          # though the screen is visually rendered, Maestro's text matcher
+          # races the a11y tree on freshly-booted runners.
+          maestro test --flatten-debug-output flows/common/_warmup.yaml || true
+          # Force-stop the app after warmup. Without this, the first per-flow
+          # iteration's `launchApp clearState: true` races a still-running app
+          # process (simctl/adb's clear can't wipe data while the app is
+          # foregrounded), which intermittently shows up as
+          # "Launch app ... FAILED" on the very first flow only.
+          xcrun simctl terminate "$SIM_UDID" com.clerk.clerkexpoquickstart || true
+          # Maestro's `--exclude-tags` only filters when running a
+          # DIRECTORY; with explicit file paths Maestro runs every file
+          # regardless of tag. We want per-flow invocation (so one
+          # crash/hang can't poison the rest) AND tag filtering, so
+          # pre-filter the file list. macOS ships bash 3.2 (no mapfile),
+          # so this uses a portable pipe: skip-messages go to stderr so
+          # only kept paths flow into xargs. The `sort` step keeps the
+          # alphabetic order stable across runs so any future first-flow
+          # quirk is easy to reproduce.
+          excluded="$EXCLUDE_TAGS,androidOnly"
+          pattern="$(echo "$excluded" | sed 's/,/|/g')"
+          find flows -type f -name '*.yaml' ! -path '*/common/*' \
+            ${FLOWS_FILTER:+-path "*$FLOWS_FILTER*"} | sort | \
+            while IFS= read -r f; do
+              if grep -qE "^[[:space:]]*-[[:space:]]*(${pattern})[[:space:]]*\$" "$f"; then
+                echo "::group::Skip $f (matches excluded tag in ${excluded})" >&2
+                grep -E "^[[:space:]]*-[[:space:]]*(${pattern})[[:space:]]*\$" "$f" >&2
+                echo "::endgroup::" >&2
+              else
+                printf '%s\n' "$f"
+              fi
+            done | \
+            xargs -n 1 -I FLOW bash -c '
+              flow="$1"
+              for a in 1 2; do
+                if maestro test \
+                    --env CLERK_TEST_EMAIL="$CLERK_TEST_EMAIL" \
+                    --env CLERK_TEST_PASSWORD="$CLERK_TEST_PASSWORD" \
+                    --flatten-debug-output \
+                    "$flow"; then
+                  exit 0
+                fi
+                if [ "$a" -eq 2 ]; then
+                  echo "::error::Flow $flow failed after 2 attempts"
+                  exit 1
+                fi
+                echo "::warning::Flow $flow failed attempt $a, retrying after 10s..."
+                xcrun simctl terminate "'"$SIM_UDID"'" com.clerk.clerkexpoquickstart >/dev/null 2>&1 || true
+                sleep 10
+              done
+            ' _ FLOW
 
-      - name: Upload Maestro artifacts on failure
-        if: failure()
+      - name: Upload Maestro artifacts on failure or cancel
+        if: failure() || cancelled()
         uses: actions/upload-artifact@v4
         with:
           name: maestro-ios
-          path: ~/.maestro/tests
+          path: |
+            ~/.maestro/tests
+            integration/mobile/*.png
 
       - name: Cleanup test user
         if: always() && steps.user.outputs.user_id != ''
@@ -237,5 +1036,5 @@ jobs:
           CLERK_SECRET_KEY: ${{ steps.keys.outputs.sk }}
           USER_ID: ${{ steps.user.outputs.user_id }}
         run: |
-          curl -fsS -X DELETE "https://api.clerk.com/v1/users/$USER_ID" \
+          curl -fsS -X DELETE "https://api.clerkstage.dev/v1/users/$USER_ID" \
             -H "Authorization: Bearer $CLERK_SECRET_KEY" || true

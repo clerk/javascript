@@ -1,0 +1,16 @@
+# Subflow: open the UserProfile via Manage Profile, tap Log out, assert signed out.
+appId: com.clerk.clerkexpoquickstart
+---
+- tapOn:
+    text: "Manage Profile"
+- waitForAnimationToEnd:
+    timeout: 3000
+- assertVisible:
+    text: "Account"
+# iOS renders "Sign out", Android renders "Log out"
+- tapOn:
+    text: "Log out|Sign out"
+- waitForAnimationToEnd:
+    timeout: 3000
+- assertVisible:
+    text: 'Welcome! Sign in to continue\.?'
