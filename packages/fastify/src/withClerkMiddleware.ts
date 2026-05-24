@@ -1,9 +1,9 @@
+import { createClerkClient } from '@clerk/backend';
 import { AuthStatus } from '@clerk/backend/internal';
 import { clerkFrontendApiProxy, DEFAULT_PROXY_PATH, stripTrailingSlashes } from '@clerk/backend/proxy';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { Readable } from 'stream';
 
-import { clerkClient } from './clerkClient';
 import * as constants from './constants';
 import type { ClerkFastifyOptions } from './types';
 import { fastifyRequestToRequest, requestToProxyRequest } from './utils';
@@ -11,11 +11,21 @@ import { fastifyRequestToRequest, requestToProxyRequest } from './utils';
 export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
   const frontendApiProxy = options.frontendApiProxy;
   const proxyPath = stripTrailingSlashes(frontendApiProxy?.path ?? DEFAULT_PROXY_PATH) || DEFAULT_PROXY_PATH;
+  const publishableKey = options.publishableKey || constants.PUBLISHABLE_KEY;
+  const secretKey = options.secretKey || constants.SECRET_KEY;
+  const clerkClient = createClerkClient({
+    ...options,
+    publishableKey,
+    secretKey,
+    machineSecretKey: options.machineSecretKey || constants.MACHINE_SECRET_KEY,
+    apiUrl: options.apiUrl || constants.API_URL,
+    apiVersion: options.apiVersion || constants.API_VERSION,
+    jwtKey: options.jwtKey || constants.JWT_KEY,
+    userAgent: options.userAgent || `${constants.SDK_METADATA.name}@${constants.SDK_METADATA.version}`,
+    sdkMetadata: options.sdkMetadata || constants.SDK_METADATA,
+  });
 
   return async (fastifyRequest: FastifyRequest, reply: FastifyReply) => {
-    const publishableKey = options.publishableKey || constants.PUBLISHABLE_KEY;
-    const secretKey = options.secretKey || constants.SECRET_KEY;
-
     // Handle Frontend API proxy requests and auto-derive proxyUrl
     let resolvedProxyUrl = options.proxyUrl;
     if (frontendApiProxy) {
@@ -93,5 +103,6 @@ export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
 
     // @ts-expect-error Inject auth so getAuth can read it
     fastifyRequest.auth = requestState.toAuth();
+    fastifyRequest.clerk = clerkClient;
   };
 };
