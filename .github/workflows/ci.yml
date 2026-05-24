@@ -47,7 +47,6 @@ jobs:
 
   pre-checks:
     needs: [check-permissions]
-    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     name: Formatting | Dedupe | Changeset
     runs-on: "blacksmith-8vcpu-ubuntu-2204"
     defaults:
@@ -83,7 +82,7 @@ jobs:
         run: pnpm format:check
 
       - name: Require Changeset
-        if: ${{ !(github.event_name == 'merge_group') }}
+        if: ${{ github.event_name != 'merge_group' && github.event.pull_request.draft == false }}
         run: |
           if [[ "${{ github.event.pull_request.user.login }}" = "clerk-cookie" || "${{ github.event.pull_request.user.login }}" = "renovate[bot]" ]]; then
             echo 'Skipping';
@@ -94,7 +93,6 @@ jobs:
 
   build-packages:
     needs: [check-permissions]
-    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     name: Build Packages
     runs-on: "blacksmith-8vcpu-ubuntu-2204"
     permissions:
@@ -140,7 +138,6 @@ jobs:
 
   static-analysis:
     needs: [check-permissions, build-packages]
-    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     name: Static analysis
     permissions:
       contents: read
@@ -204,7 +201,6 @@ jobs:
 
   unit-tests:
     needs: [check-permissions, build-packages]
-    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     name: Unit Tests (${{ matrix.filter-label }})
     permissions:
       contents: read
@@ -282,9 +278,7 @@ jobs:
 
   integration-tests:
     needs: [check-permissions, build-packages]
-    if: >-
-      ${{ (github.event_name != 'pull_request' || github.event.pull_request.draft == false)
-      && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
     name: Integration Tests (${{ matrix.test-name }}, ${{ matrix.test-project }}${{ matrix.next-version && format(', {0}', matrix.next-version) || '' }})
     permissions:
       contents: read
@@ -491,7 +485,6 @@ jobs:
 
   pkg-pr-new:
     name: Publish with pkg-pr-new
-    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     needs: [check-permissions, build-packages]
     runs-on: "blacksmith-8vcpu-ubuntu-2204"
     defaults:
