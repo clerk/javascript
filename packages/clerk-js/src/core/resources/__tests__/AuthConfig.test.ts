@@ -46,7 +46,6 @@ describe('AuthConfig', () => {
       id: '',
       reverification: true,
       single_session_mode: true,
-      session_minter: false,
     });
   });
 });
