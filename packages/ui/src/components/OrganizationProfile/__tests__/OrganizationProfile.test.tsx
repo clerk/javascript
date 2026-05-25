@@ -539,7 +539,7 @@ describe('OrganizationProfile', () => {
     });
 
     it('includes SSO even when the user does not have the manage enterprise connections permission, but the page surfaces a warning', async () => {
-      const { wrapper } = await createFixtures(f => {
+      const { wrapper, fixtures } = await createFixtures(f => {
         f.withEnterpriseSso({ selfServeSSO: true });
         f.withOrganizations();
         f.withUser({
@@ -554,14 +554,16 @@ describe('OrganizationProfile', () => {
         });
       });
 
+      fixtures.clerk.user?.getEnterpriseConnections.mockResolvedValue([]);
+
       render(<OrganizationProfile />, { wrapper });
       expect(await screen.findByText('Single Sign-On (SSO)')).toBeDefined();
 
       cleanup();
       render(<OrganizationSelfServeSSOPage />, { wrapper });
-      expect(await screen.findByText(/you do not have permission to manage enterprise connections/i)).toBeDefined();
+      expect(await screen.findByText(/you do not have permission to manage single sign-on/i)).toBeDefined();
       expect(
-        screen.queryByText(/contact your organization administrator in order to have permissions/i),
+        screen.queryByText(/contact your organization.*administrator to upgrade your permissions/i),
       ).toBeInTheDocument();
     });
   });

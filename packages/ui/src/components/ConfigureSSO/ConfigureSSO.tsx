@@ -58,9 +58,7 @@ const AuthenticatedContent = withCoreUserGuard(() => {
             flex: 1,
           })}
         >
-          <ConfigureSSOProtect>
-            <ConfigureSSOContent contentRef={contentRef} />
-          </ConfigureSSOProtect>
+          <ConfigureSSOContent contentRef={contentRef} />
         </Col>
       </ConfigureSSONavbar>
     </ProfileCard.Root>
@@ -86,16 +84,18 @@ export const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObjec
   }
 
   return (
-    <ConfigureSSOProvider
-      hasSuccessfulTestRun={hasSuccessfulTestRun}
-      enterpriseConnection={enterpriseConnection}
-      contentRef={contentRef}
-      createEnterpriseConnection={createEnterpriseConnection}
-      updateEnterpriseConnection={updateEnterpriseConnection}
-      deleteEnterpriseConnection={deleteEnterpriseConnection}
-    >
-      <ConfigureSSOSteps />
-    </ConfigureSSOProvider>
+    <ConfigureSSOProtect>
+      <ConfigureSSOProvider
+        hasSuccessfulTestRun={hasSuccessfulTestRun}
+        enterpriseConnection={enterpriseConnection}
+        contentRef={contentRef}
+        createEnterpriseConnection={createEnterpriseConnection}
+        updateEnterpriseConnection={updateEnterpriseConnection}
+        deleteEnterpriseConnection={deleteEnterpriseConnection}
+      >
+        <ConfigureSSOSteps />
+      </ConfigureSSOProvider>
+    </ConfigureSSOProtect>
   );
 };
 
@@ -151,7 +151,7 @@ const ConfigureSSOSteps = () => {
   );
 };
 
-export const ConfigureSSOProtect = ({ children }: { children: React.ReactNode }) => {
+const ConfigureSSOProtect = ({ children }: { children: React.ReactNode }) => {
   const { session } = useSession();
   const isPersonalWorkspace = !session?.lastActiveOrganizationId;
   const canManageEnterpriseConnections = useProtect(

@@ -1,7 +1,7 @@
 import { useOrganization } from '@clerk/shared/react';
 import { useRef } from 'react';
 
-import { ConfigureSSOContent, ConfigureSSOProtect } from '../ConfigureSSO/ConfigureSSO';
+import { ConfigureSSOContent } from '../ConfigureSSO/ConfigureSSO';
 
 export const OrganizationSelfServeSSOPage = () => {
   const { organization } = useOrganization();
@@ -12,9 +12,5 @@ export const OrganizationSelfServeSSOPage = () => {
     return null;
   }
 
-  return (
-    <ConfigureSSOProtect>
-      <ConfigureSSOContent contentRef={contentRef} />
-    </ConfigureSSOProtect>
-  );
+  return <ConfigureSSOContent contentRef={contentRef} />;
 };
