@@ -100,16 +100,25 @@ const ConfigureSSOCardContent = ({ contentRef }: { contentRef: React.RefObject<H
 };
 
 const ConfigureSSOSteps = () => {
-  const { initialStepId } = useConfigureSSO();
+  const { initialStepId, enterpriseConnection } = useConfigureSSO();
 
   return (
     <Wizard initialStepId={initialStepId}>
       <ResetCardErrorOnStepChange />
       <ConfigureSSOHeader />
 
-      <Wizard.Step id='select-provider'>
-        <SelectProviderStep />
-      </Wizard.Step>
+      {/*
+       * `select-provider` is only a wizard step while there's no enterprise
+       * connection yet — creating one unregisters this step, which:
+       *   1. Hides it from the breadcrumb (no need for a manual filter), and
+       *   2. Prevents `goPrev` from any later step (e.g. configure's first
+       *      substep) from ever bubbling back into provider selection.
+       */}
+      {!enterpriseConnection && (
+        <Wizard.Step id='select-provider'>
+          <SelectProviderStep />
+        </Wizard.Step>
+      )}
 
       <Wizard.Step
         id='verify-domain'
@@ -146,7 +155,7 @@ const ConfigureSSOCardProtect = ({ children }: { children: React.ReactNode }) =>
   const { session } = useSession();
   const isPersonalWorkspace = !session?.lastActiveOrganizationId;
   const canManageEnterpriseConnections = useProtect(
-    has => isPersonalWorkspace || has({ permission: 'org:sys_enterprise_connections:manage' }),
+    has => isPersonalWorkspace || has({ permission: 'org:sys_entconns:manage' }),
   );
 
   if (!canManageEnterpriseConnections) {
