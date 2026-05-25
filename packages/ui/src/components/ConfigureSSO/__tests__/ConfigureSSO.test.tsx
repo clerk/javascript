@@ -11,7 +11,7 @@ describe('ConfigureSSO', () => {
   describe('within an organization', () => {
     it('shows a warning if the active organization membership lacks the manage enterprise connections permission', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
-        f.withEnterpriseSso({ selfServeSso: true });
+        f.withEnterpriseSso({ selfServeSSO: true });
         f.withEmailAddress();
         f.withOrganizations();
         f.withUser({
@@ -31,7 +31,7 @@ describe('ConfigureSSO', () => {
 
     it('renders the wizard when the active organization membership has the manage enterprise connections permission', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
-        f.withEnterpriseSso({ selfServeSso: true });
+        f.withEnterpriseSso({ selfServeSSO: true });
         f.withEmailAddress();
         f.withOrganizations();
         f.withUser({
@@ -54,7 +54,7 @@ describe('ConfigureSSO', () => {
   describe('in a personal workspace', () => {
     it('renders the wizard without checking the manage enterprise connections permission', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
-        f.withEnterpriseSso({ selfServeSso: true });
+        f.withEnterpriseSso({ selfServeSSO: true });
         f.withEmailAddress();
         f.withUser({ email_addresses: ['test@clerk.com'] });
       });

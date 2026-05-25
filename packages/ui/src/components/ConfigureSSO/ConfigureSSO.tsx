@@ -58,16 +58,14 @@ const AuthenticatedContent = withCoreUserGuard(() => {
             flex: 1,
           })}
         >
-          <ConfigureSSOCardProtect>
-            <ConfigureSSOCardContent contentRef={contentRef} />
-          </ConfigureSSOCardProtect>
+          <ConfigureSSOContent contentRef={contentRef} />
         </Col>
       </ConfigureSSONavbar>
     </ProfileCard.Root>
   );
 });
 
-const ConfigureSSOCardContent = ({ contentRef }: { contentRef: React.RefObject<HTMLDivElement> }) => {
+export const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObject<HTMLDivElement> }) => {
   const {
     data: enterpriseConnections,
     isLoading: isLoadingEnterpriseConnections,
@@ -86,16 +84,18 @@ const ConfigureSSOCardContent = ({ contentRef }: { contentRef: React.RefObject<H
   }
 
   return (
-    <ConfigureSSOProvider
-      hasSuccessfulTestRun={hasSuccessfulTestRun}
-      enterpriseConnection={enterpriseConnection}
-      contentRef={contentRef}
-      createEnterpriseConnection={createEnterpriseConnection}
-      updateEnterpriseConnection={updateEnterpriseConnection}
-      deleteEnterpriseConnection={deleteEnterpriseConnection}
-    >
-      <ConfigureSSOSteps />
-    </ConfigureSSOProvider>
+    <ConfigureSSOProtect>
+      <ConfigureSSOProvider
+        hasSuccessfulTestRun={hasSuccessfulTestRun}
+        enterpriseConnection={enterpriseConnection}
+        contentRef={contentRef}
+        createEnterpriseConnection={createEnterpriseConnection}
+        updateEnterpriseConnection={updateEnterpriseConnection}
+        deleteEnterpriseConnection={deleteEnterpriseConnection}
+      >
+        <ConfigureSSOSteps />
+      </ConfigureSSOProvider>
+    </ConfigureSSOProtect>
   );
 };
 
@@ -151,7 +151,7 @@ const ConfigureSSOSteps = () => {
   );
 };
 
-const ConfigureSSOCardProtect = ({ children }: { children: React.ReactNode }) => {
+const ConfigureSSOProtect = ({ children }: { children: React.ReactNode }) => {
   const { session } = useSession();
   const isPersonalWorkspace = !session?.lastActiveOrganizationId;
   const canManageEnterpriseConnections = useProtect(
