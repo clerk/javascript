@@ -1,0 +1,117 @@
+name: Release Recovery (manual)
+
+# Recovery handle for downstream notifications. Use when a release
+# run published to npm but failed to dispatch one or more downstream
+# workflows (sdk-infra-workers, dashboard, clerk-docs). Reads versions
+# from main's package.json, verifies what is actually on npm, then
+# re-dispatches the same workflows that the production release job
+# would have dispatched.
+#
+# Invoked two ways:
+#  - Automatically as a dependent job from release.yml when the
+#    changesets step fails (workflow_call).
+#  - Manually via `gh workflow run release-recovery.yml -R clerk/javascript`
+#    or the Actions UI (workflow_dispatch).
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  recover:
+    name: Recover downstream notifications
+    if: ${{ github.repository == 'clerk/javascript' }}
+    runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
+    timeout-minutes: 5
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          # Always read versions from main, regardless of which ref a
+          # manual workflow_dispatch was triggered on.
+          ref: main
+          fetch-depth: 1
+          show-progress: false
+
+      - name: Dispatch downstream workflows
+        uses: actions/github-script@v7
+        with:
+          result-encoding: string
+          retries: 3
+          retry-exempt-status-codes: 400,401
+          github-token: ${{ secrets.CLERK_COOKIE_PAT }}
+          script: |
+            const { execSync } = require('child_process');
+
+            const clerkjsVersion = require('./packages/clerk-js/package.json').version;
+            const clerkUiVersion = require('./packages/ui/package.json').version;
+
+            // Only recover stable releases
+            const preReleases = [
+              clerkjsVersion.includes('-') && `@clerk/clerk-js@${clerkjsVersion}`,
+              clerkUiVersion.includes('-') && `@clerk/ui@${clerkUiVersion}`,
+            ].filter(Boolean);
+            if (preReleases.length > 0) {
+              console.log(`Skipping recovery: ${preReleases.join(', ')} is a pre-release`);
+              return;
+            }
+
+            const preMode = require("fs").existsSync("./.changeset/pre.json");
+            if (preMode) {
+              core.warning("Changeset in pre-mode, skipping recovery dispatch");
+              return;
+            }
+
+            // Check if either version was actually published to npm
+            function isPublished(name, version) {
+              try {
+                return execSync(`npm view ${name}@${version} version`, { encoding: 'utf8' }).trim() === version;
+              } catch (e) {
+                console.log(`npm view ${name}@${version} failed: ${e.message}`);
+                return false;
+              }
+            }
+
+            const clerkjsPublished = isPublished('@clerk/clerk-js', clerkjsVersion);
+            const clerkUiPublished = isPublished('@clerk/ui', clerkUiVersion);
+
+            if (!clerkjsPublished && !clerkUiPublished) {
+              console.log('Neither @clerk/clerk-js nor @clerk/ui were published to npm, no recovery needed');
+              return;
+            }
+
+            const published = [
+              clerkjsPublished && `@clerk/clerk-js@${clerkjsVersion}`,
+              clerkUiPublished && `@clerk/ui@${clerkUiVersion}`,
+            ].filter(Boolean).join(', ');
+            core.warning(`Recovery: ${published} published to npm but downstream repos were not notified. Dispatching now.`);
+
+            const nextjsVersion = require('./packages/nextjs/package.json').version;
+
+            // NOTE: Keep in sync with the `targets` array in release.yml's
+            // "Trigger workflows on related repos" and "Recover downstream
+            // notifications" steps.
+            const targets = [
+              { repo: 'sdk-infra-workers', workflow_id: 'update-pkg-versions.yml', inputs: { clerkjsVersion, clerkUiVersion } },
+              { repo: 'dashboard', workflow_id: 'prepare-nextjs-sdk-update.yml', inputs: { version: nextjsVersion } },
+              { repo: 'clerk-docs', workflow_id: 'typedoc.yml' },
+            ];
+            const results = await Promise.allSettled(
+              targets.map(t => github.rest.actions.createWorkflowDispatch({ owner: 'clerk', ref: 'main', ...t }))
+            );
+            const failures = results
+              .map((r, i) => r.status === 'rejected' ? { target: targets[i], reason: r.reason } : null)
+              .filter(Boolean);
+            if (failures.length) {
+              failures.forEach(f => core.error(`Recovery dispatch to ${f.target.repo}/${f.target.workflow_id} failed: ${f.reason?.message ?? f.reason}`));
+              core.setFailed(`${failures.length} recovery dispatch(es) failed`);
+            } else {
+              core.notice('Recovery dispatch completed successfully');
+            }
