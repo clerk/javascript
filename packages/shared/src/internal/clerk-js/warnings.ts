@@ -17,6 +17,13 @@ const createMessageForDisabledOrganizations = (
     `The <${componentName}/> cannot be rendered when the feature is turned off. Visit 'dashboard.clerk.com' to enable the feature. Since the feature is turned off, this is no-op.`,
   );
 };
+
+const createCannotRenderComponentWhenOrgDoesNotExist = (componentName: 'OrganizationProfile' | 'ConfigureSSO') => {
+  return formatWarning(
+    `<${componentName}/> cannot render unless an organization is active. Since no organization is currently active, this is no-op.`,
+  );
+};
+
 const createMessageForDisabledBilling = (componentName: 'PricingTable' | 'Checkout' | 'PlanDetails') => {
   return formatWarning(
     `The <${componentName}/> component cannot be rendered when billing is disabled. Visit 'https://dashboard.clerk.com/last-active?path=billing/settings' to follow the necessary steps to enable billing. Since billing is disabled, this is no-op.`,
@@ -46,7 +53,7 @@ const warnings = {
     'The <SignIn/> component cannot render when a user has a pending task, unless the application allows multiple sessions. Since a user is signed in and this application only allows a single session, Clerk is redirecting to the task instead.',
   cannotRenderComponentWhenUserDoesNotExist:
     '<UserProfile/> cannot render unless a user is signed in. Since no user is signed in, this is no-op.',
-  cannotRenderComponentWhenOrgDoesNotExist: `<OrganizationProfile/> cannot render unless an organization is active. Since no organization is currently active, this is no-op.`,
+  createCannotRenderComponentWhenOrgDoesNotExist,
   cannotRenderAnyOrganizationComponent: createMessageForDisabledOrganizations,
   cannotRenderAnyBillingComponent: createMessageForDisabledBilling,
   cannotOpenUserProfile:

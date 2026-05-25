@@ -960,7 +960,7 @@ export class Clerk implements ClerkInterface {
 
     if (noOrganizationExists(this)) {
       if (this.#instanceType === 'development') {
-        throw new ClerkRuntimeError(warnings.cannotRenderComponentWhenOrgDoesNotExist, {
+        throw new ClerkRuntimeError(warnings.createCannotRenderComponentWhenOrgDoesNotExist('OrganizationProfile'), {
           code: CANNOT_RENDER_ORGANIZATION_MISSING_ERROR_CODE,
         });
       }
@@ -1131,7 +1131,7 @@ export class Clerk implements ClerkInterface {
     const userExists = !noUserExists(this);
     if (noOrganizationExists(this) && userExists) {
       if (this.#instanceType === 'development') {
-        throw new ClerkRuntimeError(warnings.cannotRenderComponentWhenOrgDoesNotExist, {
+        throw new ClerkRuntimeError(warnings.createCannotRenderComponentWhenOrgDoesNotExist('OrganizationProfile'), {
           code: CANNOT_RENDER_ORGANIZATION_MISSING_ERROR_CODE,
         });
       }
@@ -1479,7 +1479,7 @@ export class Clerk implements ClerkInterface {
     const userExists = !noUserExists(this);
     if (noOrganizationExists(this) && userExists) {
       if (this.#instanceType === 'development') {
-        throw new ClerkRuntimeError(warnings.cannotRenderComponentWhenOrgDoesNotExist, {
+        throw new ClerkRuntimeError(warnings.createCannotRenderComponentWhenOrgDoesNotExist('ConfigureSSO'), {
           code: CANNOT_RENDER_ORGANIZATION_MISSING_ERROR_CODE,
         });
       }
