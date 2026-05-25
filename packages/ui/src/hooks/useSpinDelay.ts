@@ -14,17 +14,12 @@ type UseSpinDelayOptions = {
    * Once the flag becomes `true`, it stays `true` for at least this long (in ms) even if the
    * underlying `value` returns to `false` earlier. Prevents the spinner from flickering on fast
    * operations.
-   *
-   * @default 425
    */
   minDuration?: number;
 };
 
 const DEFAULT_DELAY = 0;
-// 425ms is the default used by the dashboard (`apps/dashboard/app/hooks/use-pending-hooks.ts`),
-// chosen by trial-and-error as the threshold above which a spinner feels intentional rather
-// than a flicker.
-const DEFAULT_MIN_DURATION = 425;
+const DEFAULT_MIN_DURATION_MS = 425;
 
 /**
  * Smooths a transient boolean flag (typically a loading/fetching state) so the consumer never
@@ -37,7 +32,7 @@ const DEFAULT_MIN_DURATION = 425;
  */
 export function useSpinDelay(
   value: boolean,
-  { delay = DEFAULT_DELAY, minDuration = DEFAULT_MIN_DURATION }: UseSpinDelayOptions = {},
+  { delay = DEFAULT_DELAY, minDuration = DEFAULT_MIN_DURATION_MS }: UseSpinDelayOptions = {},
 ): boolean {
   const [displayed, setDisplayed] = useSafeState(false);
   const shownAtRef = useRef<number | null>(null);
