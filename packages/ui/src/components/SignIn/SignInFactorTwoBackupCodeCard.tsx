@@ -1,4 +1,3 @@
-import type { SignInResource } from '@clerk/shared/types';
 import React from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -8,42 +7,28 @@ import { Header } from '@/ui/elements/Header';
 import { handleError } from '@/ui/utils/errorHandler';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
-import { useCoreSignIn } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
-import { useHandleSecondFactorResult, useHandleUserLockedError } from './useHandleAttemptResult';
-import { isResetPasswordStrategy } from './utils';
 
 type SignInFactorTwoBackupCodeCardProps = {
   onShowAlternativeMethodsClicked: React.MouseEventHandler;
+  onAttemptBackupCode: (code: string) => Promise<void>;
+  isResettingPassword: boolean;
 };
 
 export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCardProps) => {
-  const { onShowAlternativeMethodsClicked } = props;
-  const signIn = useCoreSignIn();
+  const { onShowAlternativeMethodsClicked, onAttemptBackupCode, isResettingPassword } = props;
   const card = useCardState();
   const codeControl = useFormControl('code', '', {
     type: 'text',
     label: localizationKeys('formFieldLabel__backupCode'),
     isRequired: true,
   });
-  const handleSecondFactorResult = useHandleSecondFactorResult();
-  const handleUserLockedError = useHandleUserLockedError();
-
-  const isResettingPassword = (resource: SignInResource) =>
-    isResetPasswordStrategy(resource.firstFactorVerification?.strategy) &&
-    resource.firstFactorVerification?.status === 'verified';
 
   const handleBackupCodeSubmit: React.FormEventHandler = e => {
     e.preventDefault();
-    return signIn
-      .attemptSecondFactor({ strategy: 'backup_code', code: codeControl.value })
-      .then(handleSecondFactorResult)
-      .catch(err => {
-        if (handleUserLockedError(err)) {
-          return;
-        }
-        handleError(err, [codeControl], card.setError);
-      });
+    return onAttemptBackupCode(codeControl.value).catch(err => {
+      handleError(err, [codeControl], card.setError);
+    });
   };
 
   return (
@@ -53,7 +38,7 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
           <Header.Title localizationKey={localizationKeys('signIn.backupCodeMfa.title')} />
           <Header.Subtitle
             localizationKey={
-              isResettingPassword(signIn)
+              isResettingPassword
                 ? localizationKeys('signIn.forgotPassword.subtitle')
                 : localizationKeys('signIn.backupCodeMfa.subtitle')
             }

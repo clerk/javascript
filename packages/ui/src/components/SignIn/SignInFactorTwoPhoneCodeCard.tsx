@@ -1,26 +1,26 @@
-import type { PhoneCodeFactor } from '@clerk/shared/types';
+import type { PhoneCodeFactor, SignInResource } from '@clerk/shared/types';
 
-import { useCoreSignIn } from '../../contexts';
 import { Flow, localizationKeys } from '../../customizables';
 import type { SignInFactorTwoCodeCard } from './SignInFactorTwoCodeForm';
 import { SignInFactorTwoCodeForm } from './SignInFactorTwoCodeForm';
 
-type SignInFactorTwoPhoneCodeCardProps = SignInFactorTwoCodeCard & { factor: PhoneCodeFactor };
+type SignInFactorTwoPhoneCodeCardProps = SignInFactorTwoCodeCard & {
+  factor: PhoneCodeFactor;
+  onPrepareSecondFactor: (factor: PhoneCodeFactor) => Promise<SignInResource>;
+};
 
 export const SignInFactorTwoPhoneCodeCard = (props: SignInFactorTwoPhoneCodeCardProps) => {
-  const signIn = useCoreSignIn();
+  const { onPrepareSecondFactor, ...rest } = props;
 
   const prepare = () => {
-    // TODO: Why does the BE throw an error if I simply pass
-    // the whole factor?
     const { phoneNumberId, strategy } = props.factor;
-    return signIn.prepareSecondFactor({ phoneNumberId, strategy });
+    return onPrepareSecondFactor({ phoneNumberId, strategy } as PhoneCodeFactor);
   };
 
   return (
     <Flow.Part part='phoneCode2Fa'>
       <SignInFactorTwoCodeForm
-        {...props}
+        {...rest}
         cardTitle={localizationKeys('signIn.phoneCodeMfa.title')}
         cardSubtitle={localizationKeys('signIn.phoneCodeMfa.subtitle')}
         inputLabel={localizationKeys('signIn.phoneCodeMfa.formTitle')}
