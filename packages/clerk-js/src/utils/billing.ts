@@ -5,8 +5,11 @@ import type {
   BillingCreditsJSON,
   BillingMoneyAmount,
   BillingMoneyAmountJSON,
+  BillingPaymentTotals,
+  BillingPaymentTotalsJSON,
   BillingPerUnitTotal,
   BillingPerUnitTotalJSON,
+  BillingPlanUnitPriceJSON,
   BillingStatementTotals,
   BillingStatementTotalsJSON,
 } from '@clerk/shared/types';
@@ -30,6 +33,27 @@ const billingPerUnitTotalsFromJSON = (data: BillingPerUnitTotalJSON[]): BillingP
       total: billingMoneyAmountFromJSON(tier.total),
     })),
   }));
+};
+
+export const billingUnitPriceFromJSON = (unitPrice: BillingPlanUnitPriceJSON) => ({
+  name: unitPrice.name,
+  blockSize: unitPrice.block_size,
+  tiers: unitPrice.tiers.map(tier => ({
+    id: tier.id,
+    startsAtBlock: tier.starts_at_block,
+    endsAfterBlock: tier.ends_after_block,
+    feePerBlock: billingMoneyAmountFromJSON(tier.fee_per_block),
+  })),
+});
+
+export const billingPaymentTotalsFromJSON = (data: BillingPaymentTotalsJSON): BillingPaymentTotals => {
+  return {
+    subtotal: billingMoneyAmountFromJSON(data.subtotal),
+    grandTotal: billingMoneyAmountFromJSON(data.grand_total),
+    taxTotal: billingMoneyAmountFromJSON(data.tax_total),
+    baseFee: data.base_fee ? billingMoneyAmountFromJSON(data.base_fee) : null,
+    perUnitTotals: data.per_unit_totals ? billingPerUnitTotalsFromJSON(data.per_unit_totals) : undefined,
+  };
 };
 
 export const billingCreditsFromJSON = (data: BillingCreditsJSON): BillingCredits => {

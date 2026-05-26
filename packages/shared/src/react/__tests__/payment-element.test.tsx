@@ -127,6 +127,7 @@ describe('PaymentElement Localization', () => {
       grandTotal: { amount: 1000, amountFormatted: '$10.00', currency: 'usd', currencySymbol: '$' },
       taxTotal: { amount: 0, amountFormatted: '$0.00', currency: 'usd', currencySymbol: '$' },
       totalDueNow: { amount: 1000, amountFormatted: '$10.00', currency: 'usd', currencySymbol: '$' },
+      totalDuePerPeriod: { amount: 1000, amountFormatted: '$10.00', currency: 'usd', currencySymbol: '$' },
       totalDueAfterFreeTrial: null,
       credit: { amount: 0, amountFormatted: '$0.00', currency: 'usd', currencySymbol: '$' },
       credits: {

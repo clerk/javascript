@@ -140,6 +140,8 @@ export type GetPlansParams = ClerkPaginationParams<{
    * The type of payer for the Plans.
    */
   for?: ForPayerType;
+  org_id?: string;
+  min_seats?: number;
 }>;
 
 /**
@@ -210,6 +212,7 @@ export interface BillingPlanResource extends ClerkResource {
    * Per-unit pricing tiers for this Plan (for example, seats).
    */
   unitPrices?: BillingPlanUnitPrice[];
+  availablePrices?: BillingPlanPrice[];
   /**
    * The number of days of the free trial for the Plan. `null` if the Plan does not have a free trial.
    */
@@ -274,6 +277,14 @@ export interface BillingPlanUnitPrice {
    * Tiers that define how each block range is priced.
    */
   tiers: BillingPlanUnitPriceTier[];
+}
+
+export interface BillingPlanPrice {
+  id: string;
+  fee: BillingMoneyAmount | null;
+  annualMonthlyFee: BillingMoneyAmount | null;
+  isDefault: boolean;
+  unitPrices?: BillingPlanUnitPrice[];
 }
 
 /**
@@ -506,6 +517,35 @@ export type BillingPaymentChargeType = 'checkout' | 'recurring';
 export type BillingPaymentStatus = 'pending' | 'paid' | 'failed';
 
 /**
+ * The `BillingPaymentTotals` type represents the per-payment cost breakdown, including any base fee
+ * and per-unit (for example, seats) subtotals.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingPaymentTotals {
+  /**
+   * The price of the items before taxes, credits, or discounts are applied.
+   */
+  subtotal: BillingMoneyAmount;
+  /**
+   * The total amount for the payment, including taxes and after credits/discounts are applied.
+   */
+  grandTotal: BillingMoneyAmount;
+  /**
+   * The amount of tax included in the payment.
+   */
+  taxTotal: BillingMoneyAmount;
+  /**
+   * The flat base fee charged on top of any per-unit fees.
+   */
+  baseFee?: BillingMoneyAmount | null;
+  /**
+   * Per-unit cost breakdown for this payment (for example, seats).
+   */
+  perUnitTotals?: BillingPerUnitTotal[];
+}
+
+/**
  * The `BillingPaymentResource` type represents a payment attempt for a user or Organization.
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
@@ -547,6 +587,11 @@ export interface BillingPaymentResource extends ClerkResource {
    * The current status of the payment.
    */
   status: BillingPaymentStatus;
+  /**
+   * Per-payment breakdown with optional base fee and per-unit (for example, seats) subtotals.
+   * Absent on older responses.
+   */
+  totals?: BillingPaymentTotals | null;
 }
 
 /**
@@ -656,6 +701,7 @@ export interface BillingSubscriptionItemResource extends ClerkResource {
    * The billing period for the subscription item.
    */
   planPeriod: BillingSubscriptionPlanPeriod;
+  priceId: string;
   /**
    * The status of the subscription item.
    */
@@ -893,6 +939,8 @@ export type CreateCheckoutParams = WithOptionalOrgType<{
    * The billing period for the Plan.
    */
   planPeriod: BillingSubscriptionPlanPeriod;
+  seatsQuantity?: number;
+  priceId?: string;
 }>;
 
 /**
