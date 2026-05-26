@@ -2270,7 +2270,43 @@ describe('SignIn', () => {
           expect.objectContaining({
             method: 'POST',
             path: '/client/sign_ins',
-            body: { ticket: 'ticket_from_query' },
+            body: { strategy: 'ticket', ticket: 'ticket_from_query' },
+          }),
+        );
+      });
+
+      it('uses provided ticket parameter', async () => {
+        const mockSearchParams = new URLSearchParams('?__clerk_ticket=ticket_from_query');
+        vi.stubGlobal('window', {
+          location: {
+            search: '?__clerk_ticket=ticket_from_query',
+            href: 'https://example.com?__clerk_ticket=ticket_from_query',
+          },
+        });
+        vi.stubGlobal('URLSearchParams', vi.fn().mockReturnValue(mockSearchParams));
+
+        SignIn.clerk = {
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
+
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signin_123' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn();
+        await signIn.__internal_future.ticket({ ticket: 'provided_ticket' });
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'POST',
+            path: '/client/sign_ins',
+            body: { strategy: 'ticket', ticket: 'provided_ticket' },
           }),
         );
       });

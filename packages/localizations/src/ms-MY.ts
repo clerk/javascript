@@ -180,8 +180,8 @@ export const msMY: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: 'Hubungi pentadbir organisasi anda untuk mendapatkan kebenaran mengurus sambungan perusahaan.',
-      title: 'Anda tidak mempunyai kebenaran untuk mengurus sambungan perusahaan',
+      subtitle: 'Hubungi pentadbir organisasi anda untuk menaik taraf kebenaran anda.',
+      title: 'Anda tidak mempunyai kebenaran untuk mengurus Log Masuk Tunggal (SSO)',
     },
     navbar: {
       title: 'Konfigurasi Log Masuk Tunggal (SSO)',
@@ -189,10 +189,6 @@ export const msMY: LocalizationResource = {
     selectProviderStep: {
       title: 'Pilih pembekal',
       subtitle: 'Pilih pembekal yang anda akan sediakan SSO untuknya.',
-      body: {
-        title: 'Pilih pembekal identiti anda',
-        description: 'Kami akan membimbing anda melalui proses persediaan terperinci seterusnya.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

@@ -68,6 +68,15 @@ export interface KeylessUrls {
   __keylessApiKeysUrl?: string;
 }
 
+export type AdditionalStateOptions = SignInFallbackRedirectUrl &
+  SignUpFallbackRedirectUrl &
+  SignInForceRedirectUrl &
+  SignUpForceRedirectUrl &
+  KeylessUrls;
+
+/**
+ * @deprecated This type is no longer used internally. Use `AdditionalStateOptions` instead.
+ */
 export type RequestStateWithRedirectUrls = RequestState &
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &

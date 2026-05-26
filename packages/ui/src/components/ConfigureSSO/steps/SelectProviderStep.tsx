@@ -42,8 +42,12 @@ const PROVIDER_GROUPS: ReadonlyArray<{
 
 export const SelectProviderStep = (): JSX.Element => {
   const { goToStep } = useWizard();
-  const { setProvider, createEnterpriseConnection } = useConfigureSSO();
-  const [selected, setSelected] = React.useState<ProviderType | null>(null);
+  const { provider, setProvider, createEnterpriseConnection } = useConfigureSSO();
+
+  // Re-hydrate from context so users returning from `verify-domain`
+  // (after picking a provider but needing to verify their email first)
+  // don't have to re-click their provider.
+  const [selected, setSelected] = React.useState<ProviderType | null>(provider ?? null);
   const { user } = useUser();
   const card = useCardState();
 
@@ -86,32 +90,23 @@ export const SelectProviderStep = (): JSX.Element => {
 
         <Step.Body>
           <Step.Section sx={theme => ({ gap: theme.space.$5 })}>
-            <Col sx={theme => ({ gap: theme.space.$1x5 })}>
-              <Text
-                as='p'
-                variant='subtitle'
-                localizationKey={localizationKeys('configureSSO.selectProviderStep.body.title')}
-              />
-
-              <Text
-                as='p'
-                colorScheme='secondary'
-                localizationKey={localizationKeys('configureSSO.selectProviderStep.body.description')}
-              />
-            </Col>
-
             {PROVIDER_GROUPS.map(group => (
               <Col
                 key={group.id}
+                elementDescriptor={descriptors.configureSSOProviderGroup}
+                elementId={descriptors.configureSSOProviderGroup.setId(group.id)}
                 sx={theme => ({ gap: theme.space.$3 })}
               >
                 <Text
+                  elementDescriptor={descriptors.configureSSOProviderGroupLabel}
+                  elementId={descriptors.configureSSOProviderGroupLabel.setId(group.id)}
                   as='label'
                   variant='subtitle'
                   localizationKey={group.label}
                 />
 
                 <Grid
+                  elementDescriptor={descriptors.configureSSOProviderGrid}
                   gap={3}
                   sx={{
                     gridTemplateColumns: 'repeat(2, 1fr)',
@@ -180,6 +175,9 @@ const ProviderCard = ({ name, value, iconId, label, checked, onChange }: Provide
   return (
     <Box
       as='label'
+      elementDescriptor={descriptors.configureSSOProviderCard}
+      elementId={descriptors.configureSSOProviderCard.setId(value)}
+      isActive={checked}
       sx={theme => ({
         // Outline-button look (mirrors SimpleButton variant='outline' for visual continuity).
         borderWidth: theme.borderWidths.$normal,
@@ -230,6 +228,8 @@ const ProviderCard = ({ name, value, iconId, label, checked, onChange }: Provide
       />
 
       <Span
+        elementDescriptor={descriptors.configureSSOProviderCardIcon}
+        elementId={descriptors.configureSSOProviderCardIcon.setId(value)}
         aria-hidden
         sx={theme => {
           const isMonochromatic = MONOCHROMATIC_PROVIDER_ICONS.has(iconId);
@@ -255,6 +255,8 @@ const ProviderCard = ({ name, value, iconId, label, checked, onChange }: Provide
       />
 
       <Text
+        elementDescriptor={descriptors.configureSSOProviderCardLabel}
+        elementId={descriptors.configureSSOProviderCardLabel.setId(value)}
         as='span'
         variant='body'
         sx={theme => ({ color: theme.colors.$colorForeground })}

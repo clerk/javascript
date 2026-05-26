@@ -16,7 +16,7 @@ import { InfiniteListSpinner } from '../../common';
 import { useAcceptedInvitations } from '../../contexts';
 import { Box, Button, descriptors, Flex, localizationKeys, Text } from '../../customizables';
 import { useInView } from '../../hooks';
-import { SwitchArrowRight } from '../../icons';
+import { ArrowRight } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
 import { common } from '../../styledSystem';
 import { organizationListParams, populateCacheUpdateItem } from './utils';
@@ -178,7 +178,7 @@ const InvitationPreview = withCardStateProvider(
       return (
         <PreviewButton
           elementDescriptor={descriptors.organizationSwitcherPreviewButton}
-          icon={SwitchArrowRight}
+          icon={ArrowRight}
           onClick={acceptedOrganization ? () => onOrganizationClick(acceptedOrganization) : undefined}
           role='menuitem'
         >

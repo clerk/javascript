@@ -229,20 +229,15 @@ export const enUS: LocalizationResource = {
       },
     },
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'Contact your organization administrator in order to have permissions to manage enterprise connections.',
-      title: 'You do not have permission to manage enterprise connections',
+      subtitle: "Contact your organization's administrator to upgrade your permissions.",
+      title: 'You do not have permission to manage Single Sign-on (SSO)',
     },
     navbar: {
       title: 'Configure Single Sign-On (SSO)',
     },
     selectProviderStep: {
-      title: 'Select provider',
-      subtitle: 'Select the provider you are going to setup SSO for.',
-      body: {
-        title: 'Select your identity provider',
-        description: "We'll guide you through the detailed setup process next.",
-      },
+      title: 'Select your identity provider',
+      subtitle: 'We’ll guide you through the detailed setup process next.',
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',
@@ -252,7 +247,7 @@ export const enUS: LocalizationResource = {
     },
     verifyEmailDomainStep: {
       title: 'Verify email address',
-      subtitle: 'Verify the email address you want to enable the enterprise connection on.',
+      subtitle: 'Verify the domain you want to enable the enterprise connection on.',
       addEmailAddress: {
         formTitle: 'We need your email',
         formSubtitle: 'In order to start we will need your email address',
@@ -280,17 +275,19 @@ export const enUS: LocalizationResource = {
       error__noSuccessfulTestRun:
         'You need at least one successful test run before you can continue. Generate a test SSO URL and complete the sign-in flow.',
       testUrl: {
-        title: 'Test your SSO URL',
-        subtitle: 'Generate and copy a test SSO URL to authenticate with.',
-        actionLabel__copy: 'Copy test URL',
+        actionLabel__open: 'Open test URL',
       },
       testResults: {
-        title: 'Test results',
+        title: 'Your test results',
         actionLabel__refresh: 'Refresh logs',
         polling: 'Waiting for the test run to complete…',
         status__success: 'Success',
         status__failed: 'Failed',
         status__pending: 'Pending',
+        empty: {
+          title: 'No test results',
+          subtitle: 'Use the button above to start running tests',
+        },
       },
       testRunDetails: {
         title: 'Test run',
@@ -343,18 +340,8 @@ export const enUS: LocalizationResource = {
       },
     },
     configureStep: {
-      spFields: {
-        acsUrl: {
-          label: 'Single sign-on URL',
-        },
-        spEntityId: {
-          label: 'Audience URI',
-        },
-      },
       attributeMapping: {
         title: 'We expect your SAML responses to have the following specific attributes:',
-        paragraph:
-          "These are the defaults and probably won't need you to change them. However, many SAML configuration errors are due to incorrect attribute mappings, so it's worth double-checking. Here's how:",
         columns: {
           attribute: 'Attribute',
           claimName: 'Claim Name',
@@ -381,6 +368,25 @@ export const enUS: LocalizationResource = {
       },
       samlOkta: {
         headerTitle: 'Configure Okta Workforce',
+        attributeMapping: {
+          columns: {
+            name: 'Name',
+            value: 'Value',
+          },
+          rows: {
+            email: { name: 'mail', value: 'user.profile.mail' },
+            firstName: { name: 'firstName', value: 'user.profile.firstName' },
+            lastName: { name: 'lastName', value: 'user.profile.lastName' },
+          },
+        },
+        spFields: {
+          acsUrl: {
+            label: 'Single sign-on URL',
+          },
+          spEntityId: {
+            label: 'Audience URI (SP Entity ID)',
+          },
+        },
         createApp: {
           headerSubtitle: 'Create a new enterprise application in your Okta Dashboard',
           title: 'Create a new enterprise application in Okta',
@@ -403,10 +409,10 @@ export const enUS: LocalizationResource = {
           step2: 'Complete the form with any comments and select <bold>Finish</bold>.',
         },
         configureAttributes: {
-          headerSubtitle: 'Map users attributes from Okta to Clerk',
-          step1: 'In the Okta dashboard, find the <bold>Attribute Statements</bold> section.',
-          step2:
-            'Select <bold>Add Expression</bold> for each attribute, and enter the following name and expression pairs:',
+          headerSubtitle: 'Map user attributes from Okta to Clerk',
+          step1:
+            'Open the <bold>Sign On</bold> tab of your Okta application and locate the <bold>Attribute Statements</bold> section. If you don’t see it, click <bold>Show legacy configuration</bold>, then <bold>Edit</bold>.',
+          step2: 'Select <bold>Add Expression</bold> for each row below, then enter the matching name and value:',
           pairs: {
             conjunction: ' and ',
             email: {
@@ -469,6 +475,26 @@ export const enUS: LocalizationResource = {
       },
       samlCustom: {
         headerTitle: 'Configure your identity provider (IdP)',
+        attributeMapping: {
+          columns: {
+            userProfile: 'Identity Provider User Profile',
+            attributeName: 'Attribute Name',
+          },
+          rows: {
+            id: { userProfile: 'Unique identifier representing a user', attributeName: 'id' },
+            email: { userProfile: 'User’s email address', attributeName: 'email' },
+            firstName: { userProfile: 'User’s first name', attributeName: 'firstName' },
+            lastName: { userProfile: 'User’s last name', attributeName: 'lastName' },
+          },
+        },
+        spFields: {
+          acsUrl: {
+            label: 'Assertion consumer service (ACS) URL',
+          },
+          spEntityId: {
+            label: 'Service provider entity ID',
+          },
+        },
         createApp: {
           headerSubtitle:
             'Register Clerk as a service provider in your IdP, then add your identity provider configuration.',
@@ -768,6 +794,7 @@ export const enUS: LocalizationResource = {
     navbar: {
       apiKeys: 'API keys',
       billing: 'Billing',
+      selfServeSSO: 'Single Sign-On (SSO)',
       description: 'Manage your organization.',
       general: 'General',
       members: 'Members',

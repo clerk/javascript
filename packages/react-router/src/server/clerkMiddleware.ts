@@ -9,11 +9,16 @@ import { createContext } from 'react-router';
 import { clerkClient } from './clerkClient';
 import { resolveKeysWithKeylessFallback } from './keyless/utils';
 import { loadOptions } from './loadOptions';
-import type { ClerkMiddlewareOptions } from './types';
+import type { AdditionalStateOptions, ClerkMiddlewareOptions } from './types';
 import { patchRequest } from './utils';
 
+type RequestStateContextValue = {
+  requestState: RequestState<any>;
+  additionalState: AdditionalStateOptions;
+};
+
 export const authFnContext = createContext<((options?: PendingSessionOptions) => AuthObject) | null>(null);
-export const requestStateContext = createContext<RequestState<any> | null>(null);
+export const requestStateContext = createContext<RequestStateContextValue | null>(null);
 
 /**
  * Middleware that integrates Clerk authentication into your React Router application.
@@ -83,11 +88,6 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFun
       acceptsToken: 'any',
     });
 
-    Object.assign(requestState, {
-      __keylessClaimUrl,
-      __keylessApiKeysUrl,
-    });
-
     const locationHeader = requestState.headers.get(constants.Headers.Location);
     if (locationHeader) {
       handleNetlifyCacheInDevInstance({
@@ -104,7 +104,17 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFun
     }
 
     args.context.set(authFnContext, (opts?: PendingSessionOptions) => requestState.toAuth(opts));
-    args.context.set(requestStateContext, requestState);
+    args.context.set(requestStateContext, {
+      requestState,
+      additionalState: {
+        __keylessClaimUrl,
+        __keylessApiKeysUrl,
+        signInForceRedirectUrl: loadedOptions.signInForceRedirectUrl,
+        signUpForceRedirectUrl: loadedOptions.signUpForceRedirectUrl,
+        signInFallbackRedirectUrl: loadedOptions.signInFallbackRedirectUrl,
+        signUpFallbackRedirectUrl: loadedOptions.signUpFallbackRedirectUrl,
+      },
+    });
 
     const response = await next();
 

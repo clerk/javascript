@@ -180,9 +180,8 @@ export const hiIN: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'एंटरप्राइज़ कनेक्शन प्रबंधित करने की अनुमति प्राप्त करने के लिए अपने संगठन के व्यवस्थापक से संपर्क करें।',
-      title: 'आपके पास एंटरप्राइज़ कनेक्शन प्रबंधित करने की अनुमति नहीं है',
+      subtitle: 'अपनी अनुमतियाँ अपग्रेड करने के लिए अपने संगठन के व्यवस्थापक से संपर्क करें।',
+      title: 'आपके पास सिंगल साइन-ऑन (SSO) प्रबंधित करने की अनुमति नहीं है',
     },
     navbar: {
       title: 'सिंगल साइन-ऑन (SSO) कॉन्फ़िगर करें',
@@ -190,10 +189,6 @@ export const hiIN: LocalizationResource = {
     selectProviderStep: {
       title: 'प्रदाता चुनें',
       subtitle: 'उस प्रदाता का चयन करें जिसके लिए आप SSO सेट अप कर रहे हैं।',
-      body: {
-        title: 'अपना पहचान प्रदाता चुनें',
-        description: 'हम आपको आगे विस्तृत सेटअप प्रक्रिया के माध्यम से मार्गदर्शन करेंगे।',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

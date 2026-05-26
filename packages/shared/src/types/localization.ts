@@ -1021,6 +1021,7 @@ export type __internal_LocalizationResource = {
       members: LocalizationValue;
       billing: LocalizationValue;
       apiKeys: LocalizationValue;
+      selfServeSSO: LocalizationValue;
     };
     badge__unverified: LocalizationValue;
     badge__automaticInvitation: LocalizationValue;
@@ -1303,10 +1304,6 @@ export type __internal_LocalizationResource = {
     selectProviderStep: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
-      body: {
-        title: LocalizationValue;
-        description: LocalizationValue;
-      };
       saml: {
         groupLabel: LocalizationValue;
         okta: LocalizationValue;
@@ -1343,9 +1340,7 @@ export type __internal_LocalizationResource = {
       subtitle: LocalizationValue;
       error__noSuccessfulTestRun: LocalizationValue;
       testUrl: {
-        title: LocalizationValue;
-        subtitle: LocalizationValue;
-        actionLabel__copy: LocalizationValue;
+        actionLabel__open: LocalizationValue;
       };
       testResults: {
         title: LocalizationValue;
@@ -1354,6 +1349,10 @@ export type __internal_LocalizationResource = {
         status__success: LocalizationValue;
         status__failed: LocalizationValue;
         status__pending: LocalizationValue;
+        empty: {
+          title: LocalizationValue;
+          subtitle: LocalizationValue;
+        };
       };
       testRunDetails: {
         title: LocalizationValue;
@@ -1401,14 +1400,6 @@ export type __internal_LocalizationResource = {
       };
     };
     configureStep: {
-      spFields: {
-        acsUrl: {
-          label: LocalizationValue;
-        };
-        spEntityId: {
-          label: LocalizationValue;
-        };
-      };
       attributeMapping: {
         title: LocalizationValue;
         paragraph: LocalizationValue;
@@ -1438,6 +1429,25 @@ export type __internal_LocalizationResource = {
       };
       samlOkta: {
         headerTitle: LocalizationValue;
+        attributeMapping: {
+          columns: {
+            name: LocalizationValue;
+            value: LocalizationValue;
+          };
+          rows: {
+            email: { name: LocalizationValue; value: LocalizationValue };
+            firstName: { name: LocalizationValue; value: LocalizationValue };
+            lastName: { name: LocalizationValue; value: LocalizationValue };
+          };
+        };
+        spFields: {
+          acsUrl: {
+            label: LocalizationValue;
+          };
+          spEntityId: {
+            label: LocalizationValue;
+          };
+        };
         createApp: {
           headerSubtitle: LocalizationValue;
           title: LocalizationValue;
@@ -1522,6 +1532,26 @@ export type __internal_LocalizationResource = {
       };
       samlCustom: {
         headerTitle: LocalizationValue;
+        attributeMapping: {
+          columns: {
+            userProfile: LocalizationValue;
+            attributeName: LocalizationValue;
+          };
+          rows: {
+            id: { userProfile: LocalizationValue; attributeName: LocalizationValue };
+            email: { userProfile: LocalizationValue; attributeName: LocalizationValue };
+            firstName: { userProfile: LocalizationValue; attributeName: LocalizationValue };
+            lastName: { userProfile: LocalizationValue; attributeName: LocalizationValue };
+          };
+        };
+        spFields: {
+          acsUrl: {
+            label: LocalizationValue;
+          };
+          spEntityId: {
+            label: LocalizationValue;
+          };
+        };
         createApp: {
           headerSubtitle: LocalizationValue;
           title: LocalizationValue;
