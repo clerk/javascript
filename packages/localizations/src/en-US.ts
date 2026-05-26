@@ -433,9 +433,6 @@ export const enUS: LocalizationResource = {
         },
         identityProviderMetadataStep: {
           headerSubtitle: 'Configure identity provider metadata',
-          label: '',
-          placeholder: '',
-          description: '',
           modes: {
             title: 'Fill in your Okta SAML application details',
             ariaLabel: 'Configuration ',
