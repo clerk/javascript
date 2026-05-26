@@ -367,180 +367,174 @@ export const enUS: LocalizationResource = {
         },
       },
       samlOkta: {
-        headerTitle: 'Configure Okta Workforce',
-        attributeMapping: {
-          columns: {
-            name: 'Name',
-            value: 'Value',
-          },
-          rows: {
-            email: { name: 'mail', value: 'user.profile.mail' },
-            firstName: { name: 'firstName', value: 'user.profile.firstName' },
-            lastName: { name: 'lastName', value: 'user.profile.lastName' },
-          },
-        },
-        spFields: {
-          acsUrl: {
-            label: 'Single sign-on URL',
-          },
-          spEntityId: {
-            label: 'Audience URI (SP Entity ID)',
-          },
-        },
-        createApp: {
+        mainHeaderTitle: 'Configure Okta Workforce',
+        createAppStep: {
           headerSubtitle: 'Create a new enterprise application in your Okta Dashboard',
-          title: 'Create a new enterprise application in Okta',
-          step1: 'Sign in to Okta and go to <bold>Admin → Applications.</bold>',
-          step2: 'Click <bold>Create App Integration.</bold>',
-          step3: 'Select <bold>SAML 2.0.</bold>',
-          step4: 'Fill in the General Settings (App name is required).',
-          step5: 'Click <bold>Next</bold> to complete creating the application.',
+          createAppInstructions: {
+            title: 'Create a new enterprise application in Okta',
+            step1: 'Sign in to Okta and go to <bold>Admin → Applications.</bold>',
+            step2: 'Click <bold>Create App Integration.</bold>',
+            step3: 'Select <bold>SAML 2.0.</bold>',
+            step4: 'Fill in the General Settings (App name is required).',
+            step5: 'Click <bold>Next</bold> to complete creating the application.',
+          },
+          serviceProviderInstructions: {
+            title: 'Configure service provider',
+            paragraph1:
+              'Once you have moved forward from the General Settings instructions, you will be presented with the Configure SAML page.',
+            paragraph2:
+              'To configure your service provider (Clerk), you must add these two fields to your Okta application:',
+            serviceProviderFields: {
+              acsUrl: {
+                label: 'Single sign-on URL',
+              },
+              spEntityId: {
+                label: 'Audience URI (SP Entity ID)',
+              },
+            },
+          },
+          completeSamlIntegrationInstructions: {
+            title: 'Complete SAML integration',
+            step1: 'Select <bold>This is an internal app that we have created</bold> from the options menu.',
+            step2: 'Complete the form with any comments and select <bold>"Finish"</bold>.',
+          },
         },
-        serviceProvider: {
-          title: 'Configure service provider',
-          paragraph1:
-            'Once you have moved forward from the General Settings instructions, you will be presented with the Configure SAML page.',
-          paragraph2:
-            'To configure your service provider (Clerk), you must add these two fields to your Okta application:',
-        },
-        completeSamlIntegration: {
-          title: 'Complete SAML integration',
-          step1: 'Select <bold>This is an internal app</bold> that we have created from the options menu.',
-          step2: 'Complete the form with any comments and select <bold>Finish</bold>.',
-        },
-        configureAttributes: {
+        attributeMappingStep: {
+          // TODO - Not mention Clerk
           headerSubtitle: 'Map user attributes from Okta to Clerk',
+          paragraph: 'We expect your SAML responses to have the following specific attributes:',
           step1:
             'Open the <bold>Sign On</bold> tab of your Okta application and locate the <bold>Attribute Statements</bold> section. If you don’t see it, click <bold>Show legacy configuration</bold>, then <bold>Edit</bold>.',
           step2: 'Select <bold>Add Expression</bold> for each row below, then enter the matching name and value:',
-          pairs: {
-            conjunction: ' and ',
-            email: {
-              name: 'mail',
-              expression: 'user.profile.mail',
+          attributeMappingTable: {
+            columns: {
+              name: 'Name',
+              expression: 'Expression',
             },
-            firstName: {
-              name: 'firstName',
-              expression: 'user.profile.firstName',
-            },
-            lastName: {
-              name: 'lastName',
-              expression: 'user.profile.lastName',
+            rows: {
+              email: { name: 'mail', expression: 'user.mail' },
+              firstName: { name: 'firstName', expression: 'user.firstName' },
+              lastName: { name: 'lastName', expression: 'user.lastName' },
             },
           },
         },
-        assignUsers: {
+        assignUsersStep: {
           headerSubtitle: 'Assign users to the enterprise app',
-          title: 'Assign selected user or group in Okta',
-          paragraph: 'You need to assign users or groups to your enterprise app before they can use it to sign in.',
-          step1: 'In the Okta dashboard, select the <bold>Assignments</bold> tab.',
-          step2:
-            'Select the <bold>Assign</bold> dropdown. You can either select <bold>Assign to people</bold> or <bold>Assign to groups</bold>.',
-          step3: 'In the search field, enter the user or group of users that you want to assign to the application.',
-          step4: 'Select the <bold>Assign</bold> button next to the user or group that you want to assign.',
-          step5: 'Select the <bold>Done</bold> button to complete the assignment.',
+          assignUsersInstructions: {
+            title: 'Assign selected user or group in Okta',
+            paragraph: 'You need to assign users or groups to your enterprise app before they can use it to sign in.',
+            step1: 'In the Okta dashboard, select the <bold>Assignments</bold> tab.',
+            step2:
+              'Select the <bold>Assign</bold> dropdown. You can either select <bold>Assign to people</bold> or <bold>Assign to groups</bold>.',
+            step3: 'In the search field, enter the user or group of users that you want to assign to the application.',
+            step4: 'Select the <bold>Assign</bold> button next to the user or group that you want to assign.',
+            step5: 'Select the <bold>Done</bold> button to complete the assignment.',
+          },
         },
-        metadataUrl: {
+        identityProviderMetadataStep: {
           headerSubtitle: 'Configure identity provider metadata',
-          label: 'Metadata URL',
-          placeholder: 'Paste URL here...',
-          description: 'In your Okta SAML app, go to the Sign On tab and retrieve the metadata URL. Paste it below.',
-        },
-        modes: {
-          ariaLabel: 'Configuration mode',
-          metadataUrl: 'Add via metadata',
-          manual: 'Configure manually',
-        },
-        submitSamlConfig: {
-          title: 'Fill in your Okta SAML application details',
-        },
-        manual: {
-          description: 'In your Okta SAML app, go to the Sign On tab and retrieve these values.',
-          signOnUrl: {
-            label: 'Sign on URL',
-            placeholder: 'Paste URL here...',
+          label: '',
+          placeholder: '',
+          description: '',
+          modes: {
+            title: 'Fill in your Okta SAML application details',
+            ariaLabel: 'Configuration ',
+            metadataUrl: 'Add via metadata',
+            manual: 'Configure manually',
           },
-          issuer: {
-            label: 'Issuer',
+          metadataUrl: {
+            label: 'Metadata URL',
             placeholder: 'Paste URL here...',
+            description: 'In your Okta SAML app, go to the Sign On tab and retrieve the metadata URL. Paste it below.',
           },
-          signingCertificate: {
-            label: 'Signing certificate',
-            uploadFile: 'Upload file',
-            replaceFile: 'Replace file',
-            removeFile: 'Remove file',
-            fileUploaded: 'File uploaded',
+          manual: {
+            description: 'In your Okta SAML app, go to the Sign On tab and retrieve these values.',
+            signOnUrl: {
+              label: 'Single Sign-On URL',
+              placeholder: 'Paste URL here...',
+            },
+            issuer: {
+              label: 'Issuer',
+              placeholder: 'Paste URL here...',
+            },
+            signingCertificate: {
+              label: 'X.509 certificate',
+              uploadFile: 'Upload file',
+              replaceFile: 'Replace file',
+              removeFile: 'Remove file',
+              fileUploaded: 'File uploaded',
+            },
           },
         },
       },
       samlCustom: {
-        headerTitle: 'Configure your identity provider (IdP)',
-        attributeMapping: {
-          columns: {
-            userProfile: 'Identity Provider User Profile',
-            attributeName: 'Attribute Name',
+        mainHeaderTitle: 'Configure your identity provider (IdP)',
+        createAppStep: {
+          headerSubtitle: 'Create a new enterprise application in your identity provider’s admin dashboard',
+          createAppInstructions: {
+            title: 'Create a SAML application on your identity provider',
+            paragraph:
+              'In your identity provider’s admin dashboard, create a new SAML 2.0 application and use the following service provider details:',
           },
-          rows: {
-            id: { userProfile: 'Unique identifier representing a user', attributeName: 'id' },
-            email: { userProfile: 'User’s email address', attributeName: 'email' },
-            firstName: { userProfile: 'User’s first name', attributeName: 'firstName' },
-            lastName: { userProfile: 'User’s last name', attributeName: 'lastName' },
-          },
-        },
-        spFields: {
-          acsUrl: {
-            label: 'Assertion consumer service (ACS) URL',
-          },
-          spEntityId: {
-            label: 'Service provider entity ID',
+          serviceProviderFields: {
+            acsUrl: {
+              label: 'Assertion consumer service (ACS) URL',
+            },
+            spEntityId: {
+              label: 'Service provider entity ID',
+            },
           },
         },
-        createApp: {
-          headerSubtitle:
-            'Register Clerk as a service provider in your IdP, then add your identity provider configuration.',
-          title: 'Create a SAML application on your identity provider',
-          subtitle:
-            'In your identity provider’s admin dashboard, create a new SAML 2.0 application and use the following service provider details:',
+        attributeMappingStep: {
+          // TODO - Implement header subtitle copy
+          headerSubtitle: 'Map user attributes from your identity provider.',
+          attributeMappingTable: {
+            columns: {
+              userProfile: 'Identity Provider User Profile',
+              attributeName: 'Attribute Name',
+            },
+            rows: {
+              email: { userProfile: 'User’s email address', attributeName: 'email' },
+              firstName: { userProfile: 'User’s first name', attributeName: 'firstName' },
+              lastName: { userProfile: 'User’s last name', attributeName: 'lastName' },
+            },
+          },
         },
-        configureAttributes: {
-          headerSubtitle: 'Map user attributes from your identity provider to Clerk.',
-          title: 'We expect your SAML responses to have the following specific attributes:',
-        },
-        assignUsers: {
+        assignUsersStep: {
           headerSubtitle: 'Assign users to the enterprise app',
           title: 'Assign selected user or group',
           paragraph: 'You need to assign users or groups to your enterprise app before they can use it to sign in.',
         },
-        metadataUrl: {
+        identityProviderMetadataStep: {
           headerSubtitle: 'Configure identity provider metadata',
-          label: 'Metadata URL',
-          placeholder: 'Paste URL here...',
-          description: 'In your enterprise app, retrieve the metadata URL. Paste it below.',
-        },
-        modes: {
-          ariaLabel: 'Configuration mode',
-          metadataUrl: 'Add via metadata',
-          manual: 'Configure manually',
-        },
-        submitSamlConfig: {
-          title: 'Fill in your SAML application details',
-        },
-        manual: {
-          description: 'In your SAML app, retrieve these values.',
-          signOnUrl: {
-            label: 'Sign on URL',
-            placeholder: 'Paste URL here...',
+          modes: {
+            title: 'Fill in your SAML application details',
+            ariaLabel: 'Configuration ',
+            metadataUrl: 'Add via metadata',
+            manual: 'Configure manually',
           },
-          issuer: {
-            label: 'Issuer',
+          metadataUrl: {
+            label: 'Metadata URL',
             placeholder: 'Paste URL here...',
+            description: 'In your enterprise app, retrieve the metadata URL. Paste it below.',
           },
-          signingCertificate: {
-            label: 'Signing certificate',
-            uploadFile: 'Upload file',
-            replaceFile: 'Replace file',
-            removeFile: 'Remove file',
-            fileUploaded: 'File uploaded',
+          manual: {
+            description: 'In your SAML app, retrieve these values.',
+            signOnUrl: {
+              label: 'Single Sign-On URL',
+              placeholder: 'Paste URL here...',
+            },
+            issuer: {
+              label: 'Issuer',
+              placeholder: 'Paste URL here...',
+            },
+            signingCertificate: {
+              label: 'X.509 certificate',
+              uploadFile: 'Upload file',
+              replaceFile: 'Replace file',
+              removeFile: 'Remove file',
+              fileUploaded: 'File uploaded',
+            },
           },
         },
       },
