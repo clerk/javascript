@@ -20,5 +20,10 @@ export interface AuthConfigResource extends ClerkResource {
    * Preferred channels for phone code providers.
    */
   preferredChannels: Record<string, PhoneCodeChannel> | null;
+  /**
+   * Whether the Session Minter (edge token minting) is enabled at the instance level.
+   * @internal
+   */
+  sessionMinter: boolean;
   __internal_toSnapshot: () => AuthConfigJSONSnapshot;
 }

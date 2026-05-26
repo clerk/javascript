@@ -231,6 +231,11 @@ export class Clerk implements ClerkInterface {
   // converted to protected environment to support `updateEnvironment` type assertion
   protected environment?: EnvironmentResource | null;
 
+  /** @internal Expose protected environment to internal Resource callers (e.g. Session token requests). */
+  get __internal_environment(): EnvironmentResource | null | undefined {
+    return this.environment;
+  }
+
   #queryClient: QueryClient | undefined;
   #publishableKey = '';
   #domain: DomainOrProxyUrl['domain'];
