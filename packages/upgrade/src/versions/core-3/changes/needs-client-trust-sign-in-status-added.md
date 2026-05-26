@@ -14,7 +14,7 @@ Prerequisites:
 - Sign-in with [Email](https://dashboard.clerk.com/~/user-authentication/user-and-authentication) and/or [Phone](https://dashboard.clerk.com/~/user-authentication/user-and-authentication?user_auth_tab=phone) identifiers are enabled.
 - If [Email](https://dashboard.clerk.com/~/user-authentication/user-and-authentication) or [SMS](https://dashboard.clerk.com/~/user-authentication/user-and-authentication?user_auth_tab=phone) sign-in verification aren't enabled.
 
-While your application may differ, we've provided an example change below. Please reach out to [Support](mailto:support@clerk.dev) if you have any questions.
+While your application may differ, we've provided an example change below. Please reach out to [Support](mailto:support@clerk.com) if you have any questions.
 
 ```diff
 const { signIn } = useSignIn()
