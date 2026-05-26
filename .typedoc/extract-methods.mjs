@@ -706,27 +706,82 @@ function pickBetterUnionPropertyCandidate(existing, candidate) {
 }
 
 /**
- * Object / type-literal declaration for a parameter type (reference, inlined reflection, intersection).
- * TypeDoc applies `@param parent.prop` descriptions onto property reflections under this declaration.
+ * Filter each arm to `Property` reflections and dedupe by name, returning a single sorted list
+ * (or `undefined` if every arm was empty). Used for intersection / union / generic-instantiation
+ * arm merges in {@link resolveDeclarationWithObjectMembers}.
+ *
+ * Default behavior is "later arm wins" overwrite (right for intersections + generic instantiations
+ * where every arm's properties are part of the final shape). For unions, set
+ * `{ skipNever: true, pickBetter: true }`: union arms often use `prop?: never` as a discriminator,
+ * so we drop those and keep the documentable branch when names collide.
+ *
+ * @param {Array<import('typedoc').DeclarationReflection[] | undefined>} arms
+ * @param {{ skipNever?: boolean, pickBetter?: boolean }} [options]
+ * @returns {import('typedoc').DeclarationReflection[] | undefined}
+ */
+function mergePropertyArms(arms, options) {
+  /** @type {Map<string, import('typedoc').DeclarationReflection>} */
+  const byName = new Map();
+  for (const arm of arms) {
+    if (!arm?.length) {
+      continue;
+    }
+    for (const c of arm) {
+      if (!c.kindOf(ReflectionKind.Property)) {
+        continue;
+      }
+      if (options?.skipNever && propertyReflectionTypeIsNever(c)) {
+        continue;
+      }
+      const existing = byName.get(c.name);
+      if (!existing) {
+        byName.set(c.name, c);
+        continue;
+      }
+      byName.set(c.name, options?.pickBetter ? pickBetterUnionPropertyCandidate(existing, c) : c);
+    }
+  }
+  if (byName.size === 0) {
+    return undefined;
+  }
+  return [...byName.values()].sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/**
+ * Resolve a parameter / property type to the list of `Property` reflections that should populate
+ * a nested rows table. TypeDoc applies `@param parent.prop` descriptions onto these reflections.
+ *
+ * Cases:
+ * - `reflection` (inline `{...}`): the declaration's own children.
+ * - `reference` to a named interface/alias: the target's children, or — for generic instantiations
+ *   like `ClerkPaginationParams<{ status?: … }>` — the base properties merged with each typeArg's.
+ * - `intersection`: every `&` arm's properties combined (later arm wins on name collision).
+ * - `union`: every `|` arm's properties combined, dropping `prop?: never` discriminators and
+ *   preferring the branch with more documentation on collisions.
+ * - `optional`: unwrap and recurse.
+ *
+ * Returns `undefined` when nothing resolves (so callers can `if (!children?.length)` cheaply).
+ * The children list may include non-`Property` kinds for direct `reflection` / `reference` cases —
+ * callers that need only `Property` should filter; merge cases (typeArgs / intersection / union)
+ * pre-filter via {@link mergePropertyArms}.
  *
  * @param {import('typedoc').SomeType | undefined} t
  * @param {import('typedoc').ProjectReflection | undefined} [project] For resolving references when `ref.reflection` is missing (intersections like `Foo & WithOptionalOrgType<…>`).
- * @returns {import('typedoc').DeclarationReflection | undefined}
+ * @returns {import('typedoc').DeclarationReflection[] | undefined}
  */
 function resolveDeclarationWithObjectMembers(t, project) {
   if (!t) {
     return undefined;
   }
+  if (t.type === 'optional') {
+    return resolveDeclarationWithObjectMembers(/** @type {import('typedoc').OptionalType} */ (t).elementType, project);
+  }
   if (t.type === 'reflection') {
-    const d = t.declaration;
-    if (d.children?.length) {
-      return d;
-    }
+    const children = t.declaration?.children;
+    return children?.length ? children : undefined;
   }
   if (t.type === 'reference') {
     const ref = /** @type {import('typedoc').ReferenceType} */ (t);
-    const typeArgs = ref.typeArguments ?? [];
-
     let decl =
       ref.reflection && 'kind' in ref.reflection
         ? /** @type {import('typedoc').DeclarationReflection} */ (ref.reflection)
@@ -734,123 +789,40 @@ function resolveDeclarationWithObjectMembers(t, project) {
     if (!decl && project && ref.name) {
       decl = lookupInterfaceOrTypeAliasByName(project, ref.name);
     }
-    if (decl) {
-      /**
-       * Generic aliases like `ClerkPaginationParams<{ status?: … }>` are a reference with `typeArguments`.
-       * TypeDoc often puts pagination fields only on the target alias `children` and omits `decl.type`, so returning `decl` early drops the type argument object. Merge base + each type argument's properties.
-       */
-      if (typeArgs.length > 0) {
-        /** @type {Map<string, import('typedoc').DeclarationReflection>} */
-        const byName = new Map();
-        if (decl.type) {
-          const fromType = resolveDeclarationWithObjectMembers(decl.type, project);
-          if (fromType?.children?.length) {
-            for (const c of fromType.children) {
-              if (c.kindOf(ReflectionKind.Property)) {
-                byName.set(c.name, c);
-              }
-            }
-          }
-        }
-        if (byName.size === 0 && decl.children?.length) {
-          for (const c of decl.children) {
-            if (c.kindOf(ReflectionKind.Property)) {
-              byName.set(c.name, c);
-            }
-          }
-        }
-        for (const ta of typeArgs) {
-          const fromArg = resolveDeclarationWithObjectMembers(ta, project);
-          if (fromArg?.children?.length) {
-            for (const c of fromArg.children) {
-              if (c.kindOf(ReflectionKind.Property)) {
-                byName.set(c.name, c);
-              }
-            }
-          }
-        }
-        if (byName.size > 0) {
-          return /** @type {import('typedoc').DeclarationReflection} */ (
-            /** @type {unknown} */ ({
-              children: [...byName.values()].sort((a, b) => a.name.localeCompare(b.name)),
-              kind: ReflectionKind.TypeLiteral,
-              name: '__referenceMerged',
-            })
-          );
-        }
-      }
-
-      if (decl.children?.length) {
-        return decl;
-      }
-      if (decl.type) {
-        return resolveDeclarationWithObjectMembers(decl.type, project);
-      }
+    if (!decl) {
+      return undefined;
     }
+    /**
+     * Generic instantiation: TypeDoc often attaches pagination fields only to the target alias's
+     * own `children` and omits `decl.type`, so returning the base early drops the type argument
+     * object. Merge the base (`decl.type` if present, else `decl.children` as a fallback) with
+     * each type argument's properties.
+     */
+    const typeArgs = ref.typeArguments ?? [];
+    if (typeArgs.length > 0) {
+      const baseFromType = decl.type ? resolveDeclarationWithObjectMembers(decl.type, project) : undefined;
+      const base = baseFromType ?? (decl.children?.length ? decl.children : undefined);
+      const argArms = typeArgs.map(ta => resolveDeclarationWithObjectMembers(ta, project));
+      return mergePropertyArms([base, ...argArms]);
+    }
+    if (decl.children?.length) {
+      return decl.children;
+    }
+    if (decl.type) {
+      return resolveDeclarationWithObjectMembers(decl.type, project);
+    }
+    return undefined;
   }
   if (t.type === 'intersection') {
     const inter = /** @type {import('typedoc').IntersectionType} */ (t);
-    /** @type {Map<string, import('typedoc').DeclarationReflection>} */
-    const byName = new Map();
-    for (const inner of inter.types) {
-      const res = resolveDeclarationWithObjectMembers(inner, project);
-      if (res?.children?.length) {
-        for (const c of res.children) {
-          if (c.kindOf(ReflectionKind.Property)) {
-            byName.set(c.name, c);
-          }
-        }
-      }
-    }
-    if (byName.size === 0) {
-      return undefined;
-    }
-    // Synthetic holder so nominal param sections list every `&` arm (e.g. `RedirectOptions`).
-    return /** @type {import('typedoc').DeclarationReflection} */ (
-      /** @type {unknown} */ ({
-        children: [...byName.values()].sort((a, b) => a.name.localeCompare(b.name)),
-        kind: ReflectionKind.TypeLiteral,
-        name: '__intersectionMerged',
-      })
-    );
+    return mergePropertyArms(inter.types.map(inner => resolveDeclarationWithObjectMembers(inner, project)));
   }
   if (t.type === 'union') {
     const u = /** @type {import('typedoc').UnionType} */ (t);
-    /** @type {Map<string, import('typedoc').DeclarationReflection>} */
-    const byName = new Map();
-    for (const inner of u.types) {
-      const res = resolveDeclarationWithObjectMembers(inner, project);
-      if (!res?.children?.length) {
-        continue;
-      }
-      for (const c of res.children) {
-        if (!c.kindOf(ReflectionKind.Property)) {
-          continue;
-        }
-        if (propertyReflectionTypeIsNever(c)) {
-          continue;
-        }
-        const existing = byName.get(c.name);
-        if (!existing) {
-          byName.set(c.name, c);
-        } else {
-          byName.set(c.name, pickBetterUnionPropertyCandidate(existing, c));
-        }
-      }
-    }
-    if (byName.size === 0) {
-      return undefined;
-    }
-    return /** @type {import('typedoc').DeclarationReflection} */ (
-      /** @type {unknown} */ ({
-        children: [...byName.values()].sort((a, b) => a.name.localeCompare(b.name)),
-        kind: ReflectionKind.TypeLiteral,
-        name: '__unionMerged',
-      })
+    return mergePropertyArms(
+      u.types.map(inner => resolveDeclarationWithObjectMembers(inner, project)),
+      { skipNever: true, pickBetter: true },
     );
-  }
-  if (t.type === 'optional') {
-    return resolveDeclarationWithObjectMembers(/** @type {import('typedoc').OptionalType} */ (t).elementType, project);
   }
   return undefined;
 }
@@ -910,11 +882,11 @@ function nestedParameterRowsFromDocumentedProperties(param, ctx) {
   }
 
   const project = /** @type {import('typedoc').ProjectReflection | undefined} */ (param.project ?? ctx.page?.project);
-  const holder = resolveDeclarationWithObjectMembers(param.type, project);
-  if (!holder?.children?.length) {
+  const children = resolveDeclarationWithObjectMembers(param.type, project);
+  if (!children?.length) {
     return [];
   }
-  const props = holder.children.filter(c => c.kindOf(ReflectionKind.Property));
+  const props = children.filter(c => c.kindOf(ReflectionKind.Property));
   props.sort((a, b) => a.name.localeCompare(b.name));
   /** @type {string[]} */
   const rows = [];
@@ -958,11 +930,13 @@ function lookupInterfaceOrTypeAliasByName(project, name) {
 }
 
 /**
- * Unwrap optional wrappers. When the parameter is a single named interface or type alias for an object shape, returns that name and the declaration holding object properties.
+ * Unwrap optional wrappers. When the parameter is a single named interface or type alias for an
+ * object shape, returns the section title (the type's name), the resolved property list, and the
+ * source `typeDecl` for `@experimental` / `@deprecated` checks.
  *
  * @param {import('typedoc').SomeType | undefined} t
  * @param {import('typedoc').ProjectReflection} project
- * @returns {{ sectionTitle: string, holder: import('typedoc').DeclarationReflection, typeDecl: import('typedoc').DeclarationReflection } | undefined}
+ * @returns {{ sectionTitle: string, children: import('typedoc').DeclarationReflection[], typeDecl: import('typedoc').DeclarationReflection } | undefined}
  */
 function resolveNominalObjectTypeForSingleParam(t, project) {
   if (!t) {
@@ -974,35 +948,32 @@ function resolveNominalObjectTypeForSingleParam(t, project) {
       project,
     );
   }
-  if (t.type === 'reference') {
-    const ref = /** @type {import('typedoc').ReferenceType} */ (t);
-    let typeDecl =
-      ref.reflection && 'kind' in ref.reflection
-        ? /** @type {import('typedoc').DeclarationReflection} */ (ref.reflection)
-        : lookupInterfaceOrTypeAliasByName(project, ref.name);
-    if (!typeDecl) {
+  if (t.type !== 'reference') {
+    return undefined;
+  }
+  const ref = /** @type {import('typedoc').ReferenceType} */ (t);
+  const typeDecl =
+    ref.reflection && 'kind' in ref.reflection
+      ? /** @type {import('typedoc').DeclarationReflection} */ (ref.reflection)
+      : lookupInterfaceOrTypeAliasByName(project, ref.name);
+  if (!typeDecl) {
+    return undefined;
+  }
+  if (typeDecl.kindOf(ReflectionKind.Interface)) {
+    if (!typeDecl.children?.length) {
       return undefined;
     }
-    if (typeDecl.kindOf(ReflectionKind.Interface)) {
-      if (!typeDecl.children?.length) {
-        return undefined;
-      }
-      return { sectionTitle: typeDecl.name, holder: typeDecl, typeDecl };
+    return { sectionTitle: typeDecl.name, children: typeDecl.children, typeDecl };
+  }
+  if (typeDecl.kindOf(ReflectionKind.TypeAlias)) {
+    // Prefer resolving `typeAlias.type` so intersections and generic instantiations (e.g. `ClerkPaginationParams<{ status?: … }>`) merge every `&` arm into one property list.
+    // Some aliases only attach members on `typeDecl.children` with no object shape on `.type`; keep that fallback (e.g. `SignOutOptions`, `JoinWaitlistParams`).
+    const fromResolvedType = typeDecl.type ? resolveDeclarationWithObjectMembers(typeDecl.type, project) : undefined;
+    const children = fromResolvedType?.length ? fromResolvedType : typeDecl.children;
+    if (!children?.length) {
+      return undefined;
     }
-    if (typeDecl.kindOf(ReflectionKind.TypeAlias)) {
-      // Prefer resolving `typeAlias.type` so intersections and generic instantiations (e.g. `ClerkPaginationParams<{ status?: … }>`) merge every `&` arm into one property list.
-      // Some aliases only attach members on `typeDecl.children` with no object shape on `.type`; keep that fallback (e.g. `SignOutOptions`, `JoinWaitlistParams`).
-      const fromResolvedType = typeDecl.type ? resolveDeclarationWithObjectMembers(typeDecl.type, project) : undefined;
-      const holder = fromResolvedType?.children?.length
-        ? fromResolvedType
-        : typeDecl.children?.length
-          ? typeDecl
-          : undefined;
-      if (!holder?.children?.length) {
-        return undefined;
-      }
-      return { sectionTitle: typeDecl.name, holder, typeDecl };
-    }
+    return { sectionTitle: typeDecl.name, children, typeDecl };
   }
   return undefined;
 }
@@ -1043,7 +1014,7 @@ function trySingleNominalParameterTypeSection(sig, ctx) {
   if (!nominal) {
     return undefined;
   }
-  const props = (nominal.holder.children ?? []).filter(c => c.kindOf(ReflectionKind.Property));
+  const props = nominal.children.filter(c => c.kindOf(ReflectionKind.Property));
   if (props.length === 0) {
     return undefined;
   }
@@ -1157,8 +1128,7 @@ function hasExtractMethodsModifier(decl) {
  */
 function processExtractMethodsNamespace(parentDecl, ctx, outDir) {
   const project = ctx.page?.project;
-  const holder = resolveDeclarationWithObjectMembers(parentDecl.type, project);
-  const members = holder?.children ?? [];
+  const members = resolveDeclarationWithObjectMembers(parentDecl.type, project) ?? [];
   if (members.length === 0) {
     console.warn(
       `[extract-methods] @extractMethods on "${parentDecl.name}" requires an object-like type with members; skipping nested extraction`,
