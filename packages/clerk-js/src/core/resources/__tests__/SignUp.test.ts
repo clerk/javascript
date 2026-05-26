@@ -790,6 +790,7 @@ describe('SignUp', () => {
             method: 'POST',
             path: '/client/sign_ups',
             body: expect.objectContaining({
+              strategy: 'ticket',
               ticket: 'provided_ticket',
             }),
           }),
@@ -1296,6 +1297,7 @@ describe('SignUp', () => {
             method: 'POST',
             path: '/client/sign_ups',
             body: expect.objectContaining({
+              strategy: 'ticket',
               ticket: 'ticket_from_query',
             }),
           }),
@@ -1319,13 +1321,37 @@ describe('SignUp', () => {
         BaseResource._fetch = mockFetch;
 
         const signUp = new SignUp();
-        await signUp.__internal_future.ticket({ ticket: 'provided_ticket' });
+        await signUp.__internal_future.ticket({ ticket: 'provided_ticket', firstName: 'Test' });
 
         expect(mockFetch).toHaveBeenCalledWith(
           expect.objectContaining({
             method: 'POST',
             path: '/client/sign_ups',
             body: expect.objectContaining({
+              strategy: 'ticket',
+              ticket: 'provided_ticket',
+              firstName: 'Test',
+            }),
+          }),
+        );
+      });
+
+      it('forces the ticket strategy', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_123' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp();
+        await signUp.__internal_future.ticket({ strategy: 'oauth_google', ticket: 'provided_ticket' } as any);
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'POST',
+            path: '/client/sign_ups',
+            body: expect.objectContaining({
+              strategy: 'ticket',
               ticket: 'provided_ticket',
             }),
           }),
