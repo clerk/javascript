@@ -12,6 +12,10 @@ chrome-extension:
   - changed-files:
       - any-glob-to-any-file: packages/chrome-extension/**
 
+cli-auth:
+  - changed-files:
+      - any-glob-to-any-file: packages/cli-auth/**
+
 clerk-js:
   - changed-files:
       - any-glob-to-any-file: packages/clerk-js/**
