@@ -540,6 +540,7 @@ export const enUS: LocalizationResource = {
       detailsTitle__inviteFailed:
         'The invitations could not be sent. There are already pending invitations for the following email addresses: {{email_addresses}}.',
       formButtonPrimary__continue: 'Send invitations',
+      formButtonPrimary__purchaseSeats: 'Purchase additional seats',
       selectDropdown__role: 'Select role',
       subtitle: 'Enter or paste one or more email addresses, separated by spaces or commas.',
       successMessage: 'Invitations successfully sent',

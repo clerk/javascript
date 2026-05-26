@@ -8,6 +8,11 @@ import { useCardState } from '@/ui/elements/contexts';
 import { Form } from '@/ui/elements/Form';
 import { FormButtonContainer } from '@/ui/elements/FormButtons';
 import { TagInput } from '@/ui/elements/TagInput';
+import {
+  getPaidSeatsUnitTier,
+  getSeatUnitPrice,
+  organizationAndInvitationsExceedsPurchasedSeats,
+} from '@/ui/utils/billingPlanSeats';
 import { handleError } from '@/ui/utils/errorHandler';
 import { getClosestProfileScrollBoxFromElement } from '@/ui/utils/getClosestProfileScrollBox';
 import { createListFormat } from '@/ui/utils/passwordUtils';
@@ -39,7 +44,8 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
       keepPreviousData: true,
     },
   });
-  const { subscriptionItems } = useSubscription();
+  const { data: subscription, subscriptionItems } = useSubscription();
+  const activeSubscriptionItem = subscription?.subscriptionItems.find(si => si.status === 'active');
   const { handleSelectPlan } = usePlansContext();
   const card = useCardState();
   const { t, locale } = useLocalizations();
@@ -78,6 +84,14 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
   } = emailAddressField;
 
   const canSubmit = (!!emailAddressField.value.length || isValidUnsubmittedEmail) && !!roleField.value;
+  const emailAddresses = emailAddressField.value.split(',');
+
+  const seatUnitPrice = activeSubscriptionItem ? getSeatUnitPrice(activeSubscriptionItem.plan) : null;
+  const paidSeatsTier = seatUnitPrice ? getPaidSeatsUnitTier(seatUnitPrice) : null;
+  const isPerSeatCostPlan = !!paidSeatsTier;
+  const mustPurchaseSeats =
+    isPerSeatCostPlan &&
+    organizationAndInvitationsExceedsPurchasedSeats(activeSubscriptionItem, organization, emailAddresses.length);
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -232,7 +246,11 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
           <Form.SubmitButton
             block={false}
             isDisabled={!canSubmit}
-            localizationKey={localizationKeys('organizationProfile.invitePage.formButtonPrimary__continue')}
+            localizationKey={
+              isPerSeatCostPlan && mustPurchaseSeats
+                ? localizationKeys('organizationProfile.invitePage.formButtonPrimary__purchaseSeats')
+                : localizationKeys('organizationProfile.invitePage.formButtonPrimary__continue')
+            }
           />
           <Form.ResetButton
             localizationKey={resetButtonLabel || localizationKeys('userProfile.formButtonReset')}
