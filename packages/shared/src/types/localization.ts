@@ -1400,32 +1400,10 @@ export type __internal_LocalizationResource = {
       };
     };
     configureStep: {
-      // TODO -> Is it worth to maintain a separate generic list of attribute mapping
-      attributeMapping: {
-        title: LocalizationValue;
-        paragraph: LocalizationValue;
-        columns: {
-          attribute: LocalizationValue;
-          claimName: LocalizationValue;
-          claimValue: LocalizationValue;
-        };
+      attributeMappingTable: {
         badges: {
           required: LocalizationValue;
           optional: LocalizationValue;
-        };
-        rows: {
-          email: {
-            attribute: LocalizationValue;
-            claim: LocalizationValue;
-          };
-          firstName: {
-            attribute: LocalizationValue;
-            claim: LocalizationValue;
-          };
-          lastName: {
-            attribute: LocalizationValue;
-            claim: LocalizationValue;
-          };
         };
       };
       samlOkta: {
@@ -1540,6 +1518,7 @@ export type __internal_LocalizationResource = {
         };
         attributeMappingStep: {
           headerSubtitle: LocalizationValue;
+          paragraph: LocalizationValue;
           attributeMappingTable: {
             title: LocalizationValue;
             columns: {

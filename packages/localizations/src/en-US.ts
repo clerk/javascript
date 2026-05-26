@@ -340,30 +340,10 @@ export const enUS: LocalizationResource = {
       },
     },
     configureStep: {
-      attributeMapping: {
-        title: 'We expect your SAML responses to have the following specific attributes:',
-        columns: {
-          attribute: 'Attribute',
-          claimName: 'Claim Name',
-          claimValue: 'Claim Value',
-        },
+      attributeMappingTable: {
         badges: {
           required: 'Required',
           optional: 'Optional',
-        },
-        rows: {
-          email: {
-            attribute: 'Email address',
-            claim: 'mail',
-          },
-          firstName: {
-            attribute: 'First Name',
-            claim: 'firstName',
-          },
-          lastName: {
-            attribute: 'Last Name',
-            claim: 'lastName',
-          },
         },
       },
       samlOkta: {
@@ -483,15 +463,16 @@ export const enUS: LocalizationResource = {
         },
         attributeMappingStep: {
           headerSubtitle: 'Map user attributes from your identity provider to your application.',
+          paragraph: 'We expect your SAML response to return the user’s email, first name and last name.',
           attributeMappingTable: {
             columns: {
               userProfile: 'Identity Provider User Profile',
               attributeName: 'Attribute Name',
             },
             rows: {
-              email: { userProfile: 'User’s email address', attributeName: 'email' },
-              firstName: { userProfile: 'User’s first name', attributeName: 'firstName' },
-              lastName: { userProfile: 'User’s last name', attributeName: 'lastName' },
+              email: { userProfile: 'Email address', attributeName: 'email' },
+              firstName: { userProfile: 'First name', attributeName: 'firstName' },
+              lastName: { userProfile: 'Last name', attributeName: 'lastName' },
             },
           },
         },
