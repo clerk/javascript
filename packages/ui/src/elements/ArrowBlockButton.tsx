@@ -3,7 +3,7 @@ import React, { isValidElement } from 'react';
 import type { Button, LocalizationKey } from '../customizables';
 import { Flex, Icon, SimpleButton, Spinner, Text } from '../customizables';
 import type { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
-import { ArrowRightIcon } from '../icons';
+import { ArrowRight } from '../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 
 type ArrowBlockButtonProps = PropsOfComponent<typeof Button> & {
@@ -27,7 +27,7 @@ type ArrowBlockButtonProps = PropsOfComponent<typeof Button> & {
 
 export const ArrowBlockButton = React.forwardRef<HTMLButtonElement, ArrowBlockButtonProps>((props, ref) => {
   const {
-    rightIcon = ArrowRightIcon,
+    rightIcon = ArrowRight,
     rightIconSx,
     leftIcon,
     leftIconSx,

@@ -6,7 +6,7 @@ import { Col, descriptors, Flex, Flow, Icon, localizationKeys, Spinner, Text } f
 import { Card } from '../elements/Card';
 import { useCardState } from '../elements/contexts';
 import { Header } from '../elements/Header';
-import { ExclamationTriangle, SwitchArrows, TickShield } from '../icons';
+import { ArrowLeftRight, ExclamationTriangle, ShieldCheck } from '../icons';
 import type { InternalTheme } from '../styledSystem';
 import { animations } from '../styledSystem';
 
@@ -19,8 +19,8 @@ type EmailLinkStatusCardProps = React.PropsWithChildren<{
 }>;
 
 const StatusToIcon: Record<Exclude<EmailLinkUIStatus, 'loading'>, React.ComponentType> = {
-  verified: TickShield,
-  verified_switch_tab: SwitchArrows,
+  verified: ShieldCheck,
+  verified_switch_tab: ArrowLeftRight,
   expired: ExclamationTriangle,
   failed: ExclamationTriangle,
   client_mismatch: ExclamationTriangle,
