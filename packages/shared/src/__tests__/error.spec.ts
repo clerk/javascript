@@ -108,9 +108,15 @@ describe('isUnauthenticatedError', () => {
     expect(isUnauthenticatedError({ status: 422 })).toBe(true);
   });
 
+  it('returns true for terminal user state 403 errors', () => {
+    expect(isUnauthenticatedError({ status: 403, errors: [{ code: 'user_banned' }] })).toBe(true);
+    expect(isUnauthenticatedError({ status: 403, errors: [{ code: 'user_deactivated' }] })).toBe(true);
+  });
+
   it('returns false for other 4xx status codes', () => {
     expect(isUnauthenticatedError({ status: 400 })).toBe(false);
     expect(isUnauthenticatedError({ status: 403 })).toBe(false);
+    expect(isUnauthenticatedError({ status: 403, errors: [{ code: 'not_allowed_access' }] })).toBe(false);
     expect(isUnauthenticatedError({ status: 404 })).toBe(false);
     expect(isUnauthenticatedError({ status: 429 })).toBe(false);
   });
