@@ -1,6 +1,3 @@
-import { isUserLockedError } from '@clerk/shared/error';
-import { clerkInvalidFAPIResponse } from '@clerk/shared/internal/clerk-js/errors';
-import { useClerk } from '@clerk/shared/react';
 import type { EmailCodeFactor, PhoneCodeFactor, SignInResource, TOTPFactor } from '@clerk/shared/types';
 import React, { useMemo } from 'react';
 
@@ -9,11 +6,10 @@ import type { VerificationCodeCardProps } from '@/ui/elements/VerificationCodeCa
 import { VerificationCodeCard } from '@/ui/elements/VerificationCodeCard';
 import { handleError } from '@/ui/utils/errorHandler';
 
-import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
+import { useCoreSignIn, useEnvironment } from '../../contexts';
 import { localizationKeys, Text } from '../../customizables';
-import { useSupportEmail } from '../../hooks/useSupportEmail';
 import type { LocalizationKey } from '../../localization';
-import { useRouter } from '../../router';
+import { useHandleSecondFactorResult, useHandleUserLockedError } from './useHandleAttemptResult';
 import { isResetPasswordStrategy } from './utils';
 
 export type SignInFactorTwoCodeCard = Pick<VerificationCodeCardProps, 'onShowAlternativeMethodsClicked'> & {
@@ -39,11 +35,8 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
   const env = useEnvironment();
   const signIn = useCoreSignIn();
   const card = useCardState();
-  const { afterSignInUrl, navigateOnSetActive } = useSignInContext();
-  const { setActive } = useClerk();
-  const { navigate } = useRouter();
-  const supportEmail = useSupportEmail();
-  const clerk = useClerk();
+  const handleSecondFactorResult = useHandleSecondFactorResult();
+  const handleUserLockedError = useHandleUserLockedError();
 
   // Only show the new device verification notice if the user is new
   // and no attributes are explicitly used for second factor.
@@ -69,11 +62,9 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
           .prepare?.()
           .then(() => props.onFactorPrepare())
           .catch(err => {
-            if (isUserLockedError(err)) {
-              // @ts-expect-error -- private method for the time being
-              return clerk.__internal_navigateWithError('..', err.errors[0]);
+            if (handleUserLockedError(err)) {
+              return;
             }
-
             handleError(err, [], card.setError);
           });
       }
@@ -84,29 +75,12 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
       .attemptSecondFactor({ strategy: props.factor.strategy, code })
       .then(async res => {
         await resolve();
-        switch (res.status) {
-          case 'complete':
-            if (isResettingPassword(res) && res.createdSessionId) {
-              const queryParams = new URLSearchParams();
-              queryParams.set('createdSessionId', res.createdSessionId);
-              return navigate(`../reset-password-success?${queryParams.toString()}`);
-            }
-            return setActive({
-              session: res.createdSessionId,
-              navigate: async ({ session, decorateUrl }) => {
-                await navigateOnSetActive({ session, redirectUrl: afterSignInUrl, decorateUrl });
-              },
-            });
-          default:
-            return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
-        }
+        return handleSecondFactorResult(res);
       })
       .catch(err => {
-        if (isUserLockedError(err)) {
-          // @ts-expect-error -- private method for the time being
-          return clerk.__internal_navigateWithError('..', err.errors[0]);
+        if (handleUserLockedError(err)) {
+          return;
         }
-
         return reject(err);
       });
   };

@@ -1,4 +1,3 @@
-import { isUserLockedError } from '@clerk/shared/error';
 import { useClerk } from '@clerk/shared/react';
 import type { EmailLinkFactor, SignInResource } from '@clerk/shared/types';
 import React from 'react';
@@ -13,6 +12,7 @@ import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { Flow, localizationKeys, useLocalizations } from '../../customizables';
 import { useCardState } from '../../elements/contexts';
 import { useEmailLink } from '../../hooks/useEmailLink';
+import { useHandleUserLockedError } from './useHandleAttemptResult';
 
 type SignInFactorTwoEmailLinkCardProps = Pick<VerificationCodeCardProps, 'onShowAlternativeMethodsClicked'> & {
   showClientTrustNotice?: boolean;
@@ -34,7 +34,7 @@ export const SignInFactorTwoEmailLinkCard = (props: SignInFactorTwoEmailLinkCard
   const { setActive } = useClerk();
   const { startEmailLinkFlow, cancelEmailLinkFlow } = useEmailLink(signIn);
   const [showVerifyModal, setShowVerifyModal] = React.useState(false);
-  const clerk = useClerk();
+  const handleUserLockedError = useHandleUserLockedError();
 
   React.useEffect(() => {
     void startEmailLinkVerification();
@@ -52,11 +52,9 @@ export const SignInFactorTwoEmailLinkCard = (props: SignInFactorTwoEmailLinkCard
     })
       .then(res => handleVerificationResult(res))
       .catch(err => {
-        if (isUserLockedError(err)) {
-          // @ts-expect-error -- private method for the time being
-          return clerk.__internal_navigateWithError('..', err.errors[0]);
+        if (handleUserLockedError(err)) {
+          return;
         }
-
         handleError(err, [], card.setError);
       });
   };

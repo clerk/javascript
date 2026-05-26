@@ -1,6 +1,3 @@
-import { isUserLockedError } from '@clerk/shared/error';
-import { clerkInvalidFAPIResponse } from '@clerk/shared/internal/clerk-js/errors';
-import { useClerk } from '@clerk/shared/react';
 import type { PhoneCodeFactor, SignInFactor } from '@clerk/shared/types';
 
 import { useCardState } from '@/ui/elements/contexts';
@@ -8,10 +5,10 @@ import type { VerificationCodeCardProps } from '@/ui/elements/VerificationCodeCa
 import { VerificationCodeCard } from '@/ui/elements/VerificationCodeCard';
 import { handleError } from '@/ui/utils/errorHandler';
 
-import { useCoreSignIn, useSignInContext } from '../../contexts';
-import { useSupportEmail } from '../../hooks/useSupportEmail';
+import { useCoreSignIn } from '../../contexts';
 import { type LocalizationKey, localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
+import { useHandleFirstFactorResult, useHandleUserLockedError } from './useHandleAttemptResult';
 
 export type SignInFactorOneAlternativeChannelCodeCard = Pick<
   VerificationCodeCardProps,
@@ -34,10 +31,8 @@ export const SignInFactorOneAlternativeChannelCodeForm = (props: SignInFactorOne
   const signIn = useCoreSignIn();
   const card = useCardState();
   const { navigate } = useRouter();
-  const { afterSignInUrl, navigateOnSetActive } = useSignInContext();
-  const { setActive } = useClerk();
-  const supportEmail = useSupportEmail();
-  const clerk = useClerk();
+  const handleFirstFactorResult = useHandleFirstFactorResult();
+  const handleUserLockedError = useHandleUserLockedError();
   const channel = props.factor.channel;
 
   const shouldAvoidPrepare = signIn.firstFactorVerification.status === 'verified' && props.factorAlreadyPrepared;
@@ -62,29 +57,12 @@ export const SignInFactorOneAlternativeChannelCodeForm = (props: SignInFactorOne
       .attemptFirstFactor({ strategy: props.factor.strategy, code })
       .then(async res => {
         await resolve();
-
-        switch (res.status) {
-          case 'complete':
-            return setActive({
-              session: res.createdSessionId,
-              navigate: async ({ session, decorateUrl }) => {
-                await navigateOnSetActive({ session, redirectUrl: afterSignInUrl, decorateUrl });
-              },
-            });
-          case 'needs_second_factor':
-            return navigate('../factor-two');
-          case 'needs_new_password':
-            return navigate('../reset-password');
-          default:
-            return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
-        }
+        return handleFirstFactorResult(res);
       })
       .catch(err => {
-        if (isUserLockedError(err)) {
-          // @ts-expect-error -- private method for the time being
-          return clerk.__internal_navigateWithError('..', err.errors[0]);
+        if (handleUserLockedError(err)) {
+          return;
         }
-
         return reject(err);
       });
   };

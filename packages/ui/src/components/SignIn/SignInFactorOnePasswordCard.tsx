@@ -1,6 +1,4 @@
-import { isPasswordCompromisedError, isPasswordPwnedError, isUserLockedError } from '@clerk/shared/error';
-import { clerkInvalidFAPIResponse } from '@clerk/shared/internal/clerk-js/errors';
-import { useClerk } from '@clerk/shared/react';
+import { isPasswordCompromisedError, isPasswordPwnedError } from '@clerk/shared/error';
 import React from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -11,11 +9,11 @@ import { IdentityPreview } from '@/ui/elements/IdentityPreview';
 import { handleError } from '@/ui/utils/errorHandler';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
-import { useCoreSignIn, useSignInContext } from '../../contexts';
+import { useCoreSignIn } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys } from '../../customizables';
-import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router/RouteContext';
 import { HavingTrouble } from './HavingTrouble';
+import { useHandleFirstFactorResult, useHandleUserLockedError } from './useHandleAttemptResult';
 import { useResetPasswordFactor } from './useResetPasswordFactor';
 
 export type PasswordErrorCode = 'compromised' | 'pwned';
@@ -55,15 +53,13 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
   const { onShowAlternativeMethodsClick, onPasswordError } = props;
   const passwordInputRef = React.useRef<HTMLInputElement>(null);
   const card = useCardState();
-  const { setActive } = useClerk();
   const signIn = useCoreSignIn();
-  const { afterSignInUrl, navigateOnSetActive } = useSignInContext();
-  const supportEmail = useSupportEmail();
   const passwordControl = usePasswordControl(props);
   const { navigate } = useRouter();
   const [showHavingTrouble, setShowHavingTrouble] = React.useState(false);
   const toggleHavingTrouble = React.useCallback(() => setShowHavingTrouble(s => !s), [setShowHavingTrouble]);
-  const clerk = useClerk();
+  const handleFirstFactorResult = useHandleFirstFactorResult();
+  const handleUserLockedError = useHandleUserLockedError();
 
   const goBack = () => {
     void navigate('../');
@@ -73,27 +69,10 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
     e.preventDefault();
     void signIn
       .attemptFirstFactor({ strategy: 'password', password: passwordControl.value })
-      .then(res => {
-        switch (res.status) {
-          case 'complete':
-            return setActive({
-              session: res.createdSessionId,
-              navigate: ({ session, decorateUrl }) => {
-                return navigateOnSetActive({ session, redirectUrl: afterSignInUrl, decorateUrl });
-              },
-            });
-          case 'needs_second_factor':
-            return navigate('../factor-two');
-          case 'needs_client_trust':
-            return navigate('../client-trust');
-          default:
-            return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
-        }
-      })
+      .then(handleFirstFactorResult)
       .catch(err => {
-        if (isUserLockedError(err)) {
-          // @ts-expect-error -- private method for the time being
-          return clerk.__internal_navigateWithError('..', err.errors[0]);
+        if (handleUserLockedError(err)) {
+          return;
         }
 
         if (onPasswordError) {

@@ -1,6 +1,3 @@
-import { isUserLockedError } from '@clerk/shared/error';
-import { clerkInvalidFAPIResponse } from '@clerk/shared/internal/clerk-js/errors';
-import { useClerk } from '@clerk/shared/react';
 import type { SignInResource } from '@clerk/shared/types';
 import React from 'react';
 
@@ -11,10 +8,9 @@ import { Header } from '@/ui/elements/Header';
 import { handleError } from '@/ui/utils/errorHandler';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
-import { useCoreSignIn, useSignInContext } from '../../contexts';
+import { useCoreSignIn } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
-import { useSupportEmail } from '../../hooks/useSupportEmail';
-import { useRouter } from '../../router';
+import { useHandleSecondFactorResult, useHandleUserLockedError } from './useHandleAttemptResult';
 import { isResetPasswordStrategy } from './utils';
 
 type SignInFactorTwoBackupCodeCardProps = {
@@ -24,17 +20,14 @@ type SignInFactorTwoBackupCodeCardProps = {
 export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCardProps) => {
   const { onShowAlternativeMethodsClicked } = props;
   const signIn = useCoreSignIn();
-  const { afterSignInUrl, navigateOnSetActive } = useSignInContext();
-  const { setActive } = useClerk();
-  const { navigate } = useRouter();
-  const supportEmail = useSupportEmail();
   const card = useCardState();
   const codeControl = useFormControl('code', '', {
     type: 'text',
     label: localizationKeys('formFieldLabel__backupCode'),
     isRequired: true,
   });
-  const clerk = useClerk();
+  const handleSecondFactorResult = useHandleSecondFactorResult();
+  const handleUserLockedError = useHandleUserLockedError();
 
   const isResettingPassword = (resource: SignInResource) =>
     isResetPasswordStrategy(resource.firstFactorVerification?.strategy) &&
@@ -44,30 +37,11 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
     e.preventDefault();
     return signIn
       .attemptSecondFactor({ strategy: 'backup_code', code: codeControl.value })
-      .then(res => {
-        switch (res.status) {
-          case 'complete':
-            if (isResettingPassword(res) && res.createdSessionId) {
-              const queryParams = new URLSearchParams();
-              queryParams.set('createdSessionId', res.createdSessionId);
-              return navigate(`../reset-password-success?${queryParams.toString()}`);
-            }
-            return setActive({
-              session: res.createdSessionId,
-              navigate: async ({ session, decorateUrl }) => {
-                await navigateOnSetActive({ session, redirectUrl: afterSignInUrl, decorateUrl });
-              },
-            });
-          default:
-            return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
-        }
-      })
+      .then(handleSecondFactorResult)
       .catch(err => {
-        if (isUserLockedError(err)) {
-          // @ts-expect-error -- private method for the time being
-          return clerk.__internal_navigateWithError('..', err.errors[0]);
+        if (handleUserLockedError(err)) {
+          return;
         }
-
         handleError(err, [codeControl], card.setError);
       });
   };

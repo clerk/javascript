@@ -1,4 +1,3 @@
-import { isUserLockedError } from '@clerk/shared/error';
 import { useClerk } from '@clerk/shared/react';
 import type { EmailLinkFactor, SignInResource } from '@clerk/shared/types';
 import React from 'react';
@@ -14,6 +13,7 @@ import { Flow, localizationKeys, useLocalizations } from '../../customizables';
 import { useCardState } from '../../elements/contexts';
 import { useEmailLink } from '../../hooks/useEmailLink';
 import { useRouter } from '../../router/RouteContext';
+import { useHandleUserLockedError } from './useHandleAttemptResult';
 
 type SignInFactorOneEmailLinkCardProps = Pick<VerificationCodeCardProps, 'onShowAlternativeMethodsClicked'> & {
   factor: EmailLinkFactor;
@@ -32,7 +32,7 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
   const { setActive } = useClerk();
   const { startEmailLinkFlow, cancelEmailLinkFlow } = useEmailLink(signIn);
   const [showVerifyModal, setShowVerifyModal] = React.useState(false);
-  const clerk = useClerk();
+  const handleUserLockedError = useHandleUserLockedError();
 
   React.useEffect(() => {
     void startEmailLinkVerification();
@@ -50,11 +50,9 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
     })
       .then(res => handleVerificationResult(res))
       .catch(err => {
-        if (isUserLockedError(err)) {
-          // @ts-expect-error -- private method for the time being
-          return clerk.__internal_navigateWithError('..', err.errors[0]);
+        if (handleUserLockedError(err)) {
+          return;
         }
-
         handleError(err, [], card.setError);
       });
   };
