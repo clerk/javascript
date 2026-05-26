@@ -9,6 +9,7 @@ on:
     paths:
       - 'packages/backend/**'
       - 'packages/clerk-js/**'
+      - 'packages/nextjs/**'
       - 'packages/react/**'
       - 'packages/shared/**'
       - 'packages/ui/**'
@@ -23,6 +24,7 @@ on:
     paths:
       - 'packages/backend/**'
       - 'packages/clerk-js/**'
+      - 'packages/nextjs/**'
       - 'packages/react/**'
       - 'packages/shared/**'
       - 'packages/ui/**'
@@ -41,6 +43,7 @@ env:
   SNAPI_FILTERS: >-
     --filter=@clerk/backend
     --filter=@clerk/clerk-js
+    --filter=@clerk/nextjs
     --filter=@clerk/react
     --filter=@clerk/shared
     --filter=@clerk/ui
@@ -121,8 +124,6 @@ jobs:
         with:
           path: .api-snapshots-baseline
           key: snapi-baseline-${{ github.event.pull_request.base.sha }}
-          restore-keys: |
-            snapi-baseline-
 
       - name: Build current declarations
         run: pnpm turbo build:declarations $TURBO_ARGS $SNAPI_FILTERS
@@ -182,7 +183,7 @@ jobs:
             echo 'body<<SNAPI_REPORT_EOF'
             echo '<!-- snapi-report -->'
             if grep -q '## No API Changes Detected' api-changes-report.md; then
-              echo '**Snapi**: no API changes detected in `@clerk/backend`, `@clerk/clerk-js`, `@clerk/react`, `@clerk/shared`, `@clerk/ui`.'
+              echo '**Snapi**: no API changes detected in `@clerk/backend`, `@clerk/clerk-js`, `@clerk/nextjs`, `@clerk/react`, `@clerk/shared`, `@clerk/ui`.'
             else
               cat api-changes-report.md
             fi

@@ -1,5 +1,5 @@
 {
-  "packages": ["packages/backend", "packages/clerk-js", "packages/react", "packages/shared", "packages/ui"],
+  "packages": ["packages/backend", "packages/clerk-js", "packages/nextjs", "packages/react", "packages/shared", "packages/ui"],
   "snapshotDir": ".api-snapshots",
   "mainBranch": "main",
   "checkVersionBump": true,
