@@ -13,6 +13,7 @@ import {
   Flow,
   Heading,
   Icon,
+  type LocalizationKey,
   localizationKeys,
   Table,
   Tbody,
@@ -36,6 +37,7 @@ import { handleError } from '@/utils/errorHandler';
 import { useConfigureSSO } from '../ConfigureSSOContext';
 import { Step } from '../elements/Step';
 import { useWizard, Wizard } from '../elements/Wizard';
+import type { ProviderType } from '../types';
 import { useConfigureStepTranslations } from './configureStepTranslations';
 
 export const ConfigureStep = (): JSX.Element => {
@@ -107,51 +109,85 @@ const InnerStepCounter = (): JSX.Element => {
   );
 };
 
-const ATTRIBUTE_ROWS = [
-  {
-    id: 'email',
-    isRequired: true,
-    attribute: localizationKeys('configureSSO.configureStep.attributeMapping.rows.email.attribute'),
-    claim: localizationKeys('configureSSO.configureStep.attributeMapping.rows.email.claim'),
-    oktaClaimValue: localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.pairs.email.expression'),
-  },
-  {
-    id: 'firstName',
-    isRequired: false,
-    attribute: localizationKeys('configureSSO.configureStep.attributeMapping.rows.firstName.attribute'),
-    claim: localizationKeys('configureSSO.configureStep.attributeMapping.rows.firstName.claim'),
-    oktaClaimValue: localizationKeys(
-      'configureSSO.configureStep.samlOkta.configureAttributes.pairs.firstName.expression',
-    ),
-  },
-  {
-    id: 'lastName',
-    isRequired: false,
-    attribute: localizationKeys('configureSSO.configureStep.attributeMapping.rows.lastName.attribute'),
-    claim: localizationKeys('configureSSO.configureStep.attributeMapping.rows.lastName.claim'),
-    oktaClaimValue: localizationKeys(
-      'configureSSO.configureStep.samlOkta.configureAttributes.pairs.lastName.expression',
-    ),
-  },
-] as const;
+/**
+ * Per-provider attribute mapping table descriptor
+ */
+type AttributeMappingTableConfig = {
+  columns: { first: LocalizationKey; second: LocalizationKey };
+  monoFirst?: boolean;
+  rows: ReadonlyArray<{
+    id: string;
+    isRequired: boolean;
+    first: LocalizationKey;
+    second: LocalizationKey;
+  }>;
+};
 
-const ATTRIBUTE_PAIRS = [
-  {
-    id: 'email',
-    name: localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.pairs.email.name'),
-    expression: localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.pairs.email.expression'),
+const SAML_OKTA_ATTRIBUTE_MAPPING: AttributeMappingTableConfig = {
+  columns: {
+    first: localizationKeys('configureSSO.configureStep.samlOkta.attributeMapping.columns.name'),
+    second: localizationKeys('configureSSO.configureStep.samlOkta.attributeMapping.columns.value'),
   },
-  {
-    id: 'firstName',
-    name: localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.pairs.firstName.name'),
-    expression: localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.pairs.firstName.expression'),
+  monoFirst: true,
+  rows: [
+    {
+      id: 'email',
+      isRequired: true,
+      first: localizationKeys('configureSSO.configureStep.samlOkta.attributeMapping.rows.email.name'),
+      second: localizationKeys('configureSSO.configureStep.samlOkta.attributeMapping.rows.email.value'),
+    },
+    {
+      id: 'firstName',
+      isRequired: false,
+      first: localizationKeys('configureSSO.configureStep.samlOkta.attributeMapping.rows.firstName.name'),
+      second: localizationKeys('configureSSO.configureStep.samlOkta.attributeMapping.rows.firstName.value'),
+    },
+    {
+      id: 'lastName',
+      isRequired: false,
+      first: localizationKeys('configureSSO.configureStep.samlOkta.attributeMapping.rows.lastName.name'),
+      second: localizationKeys('configureSSO.configureStep.samlOkta.attributeMapping.rows.lastName.value'),
+    },
+  ],
+};
+
+const SAML_CUSTOM_ATTRIBUTE_MAPPING: AttributeMappingTableConfig = {
+  columns: {
+    first: localizationKeys('configureSSO.configureStep.samlCustom.attributeMapping.columns.userProfile'),
+    second: localizationKeys('configureSSO.configureStep.samlCustom.attributeMapping.columns.attributeName'),
   },
-  {
-    id: 'lastName',
-    name: localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.pairs.lastName.name'),
-    expression: localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.pairs.lastName.expression'),
-  },
-] as const;
+  rows: [
+    {
+      id: 'id',
+      isRequired: true,
+      first: localizationKeys('configureSSO.configureStep.samlCustom.attributeMapping.rows.id.userProfile'),
+      second: localizationKeys('configureSSO.configureStep.samlCustom.attributeMapping.rows.id.attributeName'),
+    },
+    {
+      id: 'email',
+      isRequired: true,
+      first: localizationKeys('configureSSO.configureStep.samlCustom.attributeMapping.rows.email.userProfile'),
+      second: localizationKeys('configureSSO.configureStep.samlCustom.attributeMapping.rows.email.attributeName'),
+    },
+    {
+      id: 'firstName',
+      isRequired: false,
+      first: localizationKeys('configureSSO.configureStep.samlCustom.attributeMapping.rows.firstName.userProfile'),
+      second: localizationKeys('configureSSO.configureStep.samlCustom.attributeMapping.rows.firstName.attributeName'),
+    },
+    {
+      id: 'lastName',
+      isRequired: false,
+      first: localizationKeys('configureSSO.configureStep.samlCustom.attributeMapping.rows.lastName.userProfile'),
+      second: localizationKeys('configureSSO.configureStep.samlCustom.attributeMapping.rows.lastName.attributeName'),
+    },
+  ],
+};
+
+const ATTRIBUTE_MAPPING_BY_PROVIDER: Partial<Record<ProviderType, AttributeMappingTableConfig>> = {
+  saml_okta: SAML_OKTA_ATTRIBUTE_MAPPING,
+  saml_custom: SAML_CUSTOM_ATTRIBUTE_MAPPING,
+};
 
 export const CreateAppSubStep = (): JSX.Element => {
   const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
@@ -163,12 +199,12 @@ export const CreateAppSubStep = (): JSX.Element => {
 
   const acsUrlField = useFormControl('acsUrl', acsUrl, {
     type: 'text',
-    label: localizationKeys('configureSSO.configureStep.spFields.acsUrl.label'),
+    label: localizationKeys(key('spFields.acsUrl.label')),
     isRequired: false,
   });
   const spEntityIdField = useFormControl('spEntityId', spEntityId, {
     type: 'text',
-    label: localizationKeys('configureSSO.configureStep.spFields.spEntityId.label'),
+    label: localizationKeys(key('spFields.spEntityId.label')),
     isRequired: false,
   });
 
@@ -178,6 +214,7 @@ export const CreateAppSubStep = (): JSX.Element => {
         <Step.Section sx={theme => ({ gap: theme.space.$5 })}>
           <Col sx={theme => ({ gap: theme.space.$1x5 })}>
             <Heading
+              elementDescriptor={descriptors.configureSSOInstructionsHeading}
               as='h3'
               textVariant='subtitle'
               localizationKey={localizationKeys(key('createApp.title'))}
@@ -241,6 +278,7 @@ const OktaServiceProviderStepContent = (): JSX.Element => {
   return (
     <Col sx={theme => ({ gap: theme.space.$1x5 })}>
       <Heading
+        elementDescriptor={descriptors.configureSSOInstructionsHeading}
         as='h3'
         textVariant='subtitle'
         localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.serviceProvider.title')}
@@ -262,6 +300,7 @@ const OktaServiceProviderStepContent = (): JSX.Element => {
 const OktaCreateAppStepContent = (): JSX.Element => {
   return (
     <Col
+      elementDescriptor={descriptors.configureSSOInstructionsList}
       as='ul'
       sx={theme => ({
         gap: theme.space.$1x5,
@@ -271,26 +310,31 @@ const OktaCreateAppStepContent = (): JSX.Element => {
       })}
     >
       <Text
+        elementDescriptor={descriptors.configureSSOInstructionsListItem}
         as='li'
         colorScheme='secondary'
         localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.createApp.step1')}
       />
       <Text
+        elementDescriptor={descriptors.configureSSOInstructionsListItem}
         as='li'
         colorScheme='secondary'
         localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.createApp.step2')}
       />
       <Text
+        elementDescriptor={descriptors.configureSSOInstructionsListItem}
         as='li'
         colorScheme='secondary'
         localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.createApp.step3')}
       />
       <Text
+        elementDescriptor={descriptors.configureSSOInstructionsListItem}
         as='li'
         colorScheme='secondary'
         localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.createApp.step4')}
       />
       <Text
+        elementDescriptor={descriptors.configureSSOInstructionsListItem}
         as='li'
         colorScheme='secondary'
         localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.createApp.step5')}
@@ -303,11 +347,13 @@ const OktaCompleteSamlIntegrationStepContent = (): JSX.Element => {
   return (
     <Col sx={theme => ({ gap: theme.space.$1x5 })}>
       <Heading
+        elementDescriptor={descriptors.configureSSOInstructionsHeading}
         as='h3'
         textVariant='subtitle'
         localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.completeSamlIntegration.title')}
       />
       <Col
+        elementDescriptor={descriptors.configureSSOInstructionsList}
         as='ul'
         sx={theme => ({
           gap: theme.space.$1x5,
@@ -317,11 +363,13 @@ const OktaCompleteSamlIntegrationStepContent = (): JSX.Element => {
         })}
       >
         <Text
+          elementDescriptor={descriptors.configureSSOInstructionsListItem}
           as='li'
           colorScheme='secondary'
           localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.completeSamlIntegration.step1')}
         />
         <Text
+          elementDescriptor={descriptors.configureSSOInstructionsListItem}
           as='li'
           colorScheme='secondary'
           localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.completeSamlIntegration.step2')}
@@ -335,7 +383,7 @@ export const ConfigureAttributesSubStep = (): JSX.Element => {
   const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
 
   const { provider } = useConfigureSSO();
-  const isOkta = provider === 'saml_okta';
+  const mappingConfig = provider ? ATTRIBUTE_MAPPING_BY_PROVIDER[provider] : undefined;
 
   return (
     <>
@@ -343,96 +391,16 @@ export const ConfigureAttributesSubStep = (): JSX.Element => {
         <Step.Section sx={theme => ({ gap: theme.space.$3 })}>
           {provider === 'saml_custom' && (
             <Heading
+              elementDescriptor={descriptors.configureSSOInstructionsHeading}
               as='h3'
               textVariant='subtitle'
               localizationKey={localizationKeys('configureSSO.configureStep.samlCustom.configureAttributes.title')}
             />
           )}
 
-          <Table
-            sx={theme => ({
-              'tr > th:first-of-type': {
-                paddingInlineStart: theme.space.$4,
-              },
-            })}
-          >
-            <Thead>
-              <Tr>
-                <Th>
-                  <Text
-                    sx={theme => ({ fontSize: theme.fontSizes.$xs })}
-                    localizationKey={localizationKeys('configureSSO.configureStep.attributeMapping.columns.attribute')}
-                  />
-                </Th>
+          {provider === 'saml_okta' && <OktaConfigureAttributesStepContent />}
 
-                <Th>
-                  <Text
-                    sx={theme => ({ fontSize: theme.fontSizes.$xs })}
-                    localizationKey={localizationKeys('configureSSO.configureStep.attributeMapping.columns.claimName')}
-                  />
-                </Th>
-
-                {isOkta && (
-                  <Th>
-                    <Text
-                      sx={theme => ({ fontSize: theme.fontSizes.$xs })}
-                      localizationKey={localizationKeys(
-                        'configureSSO.configureStep.attributeMapping.columns.claimValue',
-                      )}
-                    />
-                  </Th>
-                )}
-              </Tr>
-            </Thead>
-
-            <Tbody>
-              {ATTRIBUTE_ROWS.map(row => (
-                <Tr key={row.id}>
-                  <Td>
-                    <Flex
-                      as='span'
-                      align='center'
-                      sx={theme => ({ gap: theme.space.$2 })}
-                    >
-                      <Text
-                        colorScheme='secondary'
-                        localizationKey={row.attribute}
-                      />
-
-                      <Badge
-                        colorScheme={row.isRequired ? 'warning' : 'primary'}
-                        localizationKey={localizationKeys(
-                          row.isRequired
-                            ? 'configureSSO.configureStep.attributeMapping.badges.required'
-                            : 'configureSSO.configureStep.attributeMapping.badges.optional',
-                        )}
-                      />
-                    </Flex>
-                  </Td>
-
-                  <Td>
-                    <Text
-                      as='span'
-                      sx={{ fontFamily: 'monospace' }}
-                      localizationKey={row.claim}
-                    />
-                  </Td>
-
-                  {isOkta && (
-                    <Td>
-                      <Text
-                        as='span'
-                        sx={{ fontFamily: 'monospace' }}
-                        localizationKey={row.oktaClaimValue}
-                      />
-                    </Td>
-                  )}
-                </Tr>
-              ))}
-            </Tbody>
-          </Table>
-
-          {isOkta && <OktaConfigureAttributesStepContent />}
+          {mappingConfig && <AttributeMappingTable config={mappingConfig} />}
         </Step.Section>
       </Step.Body>
 
@@ -450,76 +418,106 @@ export const ConfigureAttributesSubStep = (): JSX.Element => {
   );
 };
 
-const OktaConfigureAttributesStepContent = (): JSX.Element => {
-  return (
-    <>
-      <Text
-        as='p'
-        colorScheme='secondary'
-        localizationKey={localizationKeys('configureSSO.configureStep.attributeMapping.paragraph')}
-      />
+const OktaConfigureAttributesStepContent = (): JSX.Element => (
+  <Col
+    elementDescriptor={descriptors.configureSSOInstructionsList}
+    as='ol'
+    sx={theme => ({
+      gap: theme.space.$1x5,
+      margin: 0,
+      paddingInlineStart: theme.space.$5,
+      listStyleType: 'decimal',
+    })}
+  >
+    <Text
+      elementDescriptor={descriptors.configureSSOInstructionsListItem}
+      as='li'
+      colorScheme='secondary'
+      localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.step1')}
+    />
+    {/*
+     * The actual name/expression pairs that step 2 refers to are rendered
+     * by the `AttributeMappingTable` immediately below this component —
+     * keeping them in a single tabular surface instead of an inline badge
+     * list matches the design (see Okta screenshot: "Create the following
+     * attribute mapping statements:" + table).
+     */}
+    <Text
+      elementDescriptor={descriptors.configureSSOInstructionsListItem}
+      as='li'
+      colorScheme='secondary'
+      localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.step2')}
+    />
+  </Col>
+);
 
-      <Col
-        as='ol'
-        sx={theme => ({
-          gap: theme.space.$1x5,
-          margin: 0,
-          paddingInlineStart: theme.space.$5,
-          listStyleType: 'decimal',
-        })}
-      >
-        <Text
-          as='li'
-          colorScheme='secondary'
-          localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.step1')}
-        />
-        <Text
-          as='li'
-          colorScheme='secondary'
-        >
+const AttributeMappingTable = ({ config }: { config: AttributeMappingTableConfig }): JSX.Element => (
+  <Table
+    elementDescriptor={descriptors.configureSSOAttributeMappingTable}
+    sx={theme => ({
+      'tr > th:first-of-type': {
+        paddingInlineStart: theme.space.$4,
+      },
+    })}
+  >
+    <Thead>
+      <Tr>
+        <Th>
           <Text
-            as='span'
-            localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.configureAttributes.step2')}
+            sx={theme => ({ fontSize: theme.fontSizes.$xs })}
+            localizationKey={config.columns.first}
           />
-          <Col
-            as='ul'
-            sx={theme => ({
-              gap: theme.space.$1x5,
-              margin: 0,
-              marginTop: theme.space.$1x5,
-              paddingInlineStart: theme.space.$5,
-              listStyleType: '"- "',
-            })}
-          >
-            {ATTRIBUTE_PAIRS.map(pair => (
+        </Th>
+        <Th>
+          <Text
+            sx={theme => ({ fontSize: theme.fontSizes.$xs })}
+            localizationKey={config.columns.second}
+          />
+        </Th>
+      </Tr>
+    </Thead>
+
+    <Tbody>
+      {config.rows.map(row => (
+        <Tr key={row.id}>
+          <Td>
+            <Flex
+              as='span'
+              align='center'
+              sx={theme => ({ gap: theme.space.$2 })}
+            >
               <Text
-                key={pair.id}
-                as='li'
-              >
-                <Badge
-                  localizationKey={pair.name}
-                  sx={{ fontFamily: 'monospace' }}
-                />
-
-                <Text
-                  as='span'
-                  localizationKey={localizationKeys(
-                    'configureSSO.configureStep.samlOkta.configureAttributes.pairs.conjunction',
-                  )}
-                />
-
-                <Badge
-                  localizationKey={pair.expression}
-                  sx={{ fontFamily: 'monospace' }}
-                />
-              </Text>
-            ))}
-          </Col>
-        </Text>
-      </Col>
-    </>
-  );
-};
+                as='span'
+                colorScheme={config.monoFirst ? undefined : 'secondary'}
+                sx={config.monoFirst ? { fontFamily: 'monospace' } : undefined}
+                localizationKey={row.first}
+              />
+              <Badge
+                elementDescriptor={descriptors.configureSSOAttributeMappingBadge}
+                elementId={descriptors.configureSSOAttributeMappingBadge.setId(
+                  row.isRequired ? 'required' : 'optional',
+                )}
+                colorScheme={row.isRequired ? 'warning' : 'primary'}
+                localizationKey={localizationKeys(
+                  row.isRequired
+                    ? 'configureSSO.configureStep.attributeMapping.badges.required'
+                    : 'configureSSO.configureStep.attributeMapping.badges.optional',
+                )}
+              />
+            </Flex>
+          </Td>
+          <Td>
+            <Text
+              as='span'
+              sx={{ fontFamily: 'monospace' }}
+              localizationKey={row.second}
+            />
+          </Td>
+        </Tr>
+      ))}
+    </Tbody>
+  </Table>
+);
 
 export const AssignUsersSubStep = (): JSX.Element => {
   const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
@@ -531,6 +529,7 @@ export const AssignUsersSubStep = (): JSX.Element => {
         <Step.Body>
           <Step.Section sx={theme => ({ gap: theme.space.$3 })}>
             <Heading
+              elementDescriptor={descriptors.configureSSOInstructionsHeading}
               as='h3'
               textVariant='subtitle'
               localizationKey={localizationKeys('configureSSO.configureStep.samlCustom.assignUsers.title')}
@@ -562,6 +561,7 @@ export const AssignUsersSubStep = (): JSX.Element => {
       <Step.Body>
         <Step.Section sx={theme => ({ gap: theme.space.$3 })}>
           <Heading
+            elementDescriptor={descriptors.configureSSOInstructionsHeading}
             as='h3'
             textVariant='subtitle'
             localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.title')}
@@ -573,6 +573,7 @@ export const AssignUsersSubStep = (): JSX.Element => {
           />
 
           <Col
+            elementDescriptor={descriptors.configureSSOInstructionsList}
             as='ol'
             sx={theme => ({
               gap: theme.space.$1x5,
@@ -582,26 +583,31 @@ export const AssignUsersSubStep = (): JSX.Element => {
             })}
           >
             <Text
+              elementDescriptor={descriptors.configureSSOInstructionsListItem}
               as='li'
               colorScheme='secondary'
               localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step1')}
             />
             <Text
+              elementDescriptor={descriptors.configureSSOInstructionsListItem}
               as='li'
               colorScheme='secondary'
               localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step2')}
             />
             <Text
+              elementDescriptor={descriptors.configureSSOInstructionsListItem}
               as='li'
               colorScheme='secondary'
               localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step3')}
             />
             <Text
+              elementDescriptor={descriptors.configureSSOInstructionsListItem}
               as='li'
               colorScheme='secondary'
               localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step4')}
             />
             <Text
+              elementDescriptor={descriptors.configureSSOInstructionsListItem}
               as='li'
               colorScheme='secondary'
               localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.assignUsers.step5')}
@@ -745,6 +751,7 @@ export const SubmitSamlConfigSubStep = (): JSX.Element => {
           gap={5}
         >
           <Heading
+            elementDescriptor={descriptors.configureSSOInstructionsHeading}
             as='h3'
             textVariant='subtitle'
             localizationKey={localizationKeys(key('submitSamlConfig.title'))}
@@ -885,12 +892,14 @@ const ManualEntryPanel = ({
               >
                 {existingCertPresent && (
                   <Badge
+                    elementDescriptor={descriptors.configureSSOCertificateFileBadge}
                     localizationKey={localizationKeys(
                       'configureSSO.configureStep.samlOkta.manual.signingCertificate.fileUploaded',
                     )}
                   />
                 )}
                 <Button
+                  elementDescriptor={descriptors.configureSSOCertificateUploadButton}
                   size='xs'
                   variant='outline'
                   onClick={() => certInputRef.current?.click()}
@@ -919,6 +928,7 @@ const ManualEntryPanel = ({
                 sx={theme => ({ paddingTop: theme.space.$1, paddingBottom: theme.space.$1 })}
               >
                 <Text
+                  elementDescriptor={descriptors.configureSSOCertificateFileName}
                   as='span'
                   colorScheme='secondary'
                   variant='buttonSmall'
@@ -927,6 +937,7 @@ const ManualEntryPanel = ({
                 </Text>
 
                 <Button
+                  elementDescriptor={descriptors.configureSSOCertificateRemoveButton}
                   variant='ghost'
                   colorScheme='neutral'
                   aria-label={t(
