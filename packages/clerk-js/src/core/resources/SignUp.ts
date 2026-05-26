@@ -1135,7 +1135,7 @@ class SignUpFuture implements SignUpFutureResource {
 
   async ticket(params?: SignUpFutureTicketParams): Promise<{ error: ClerkError | null }> {
     const ticket = params?.ticket ?? getClerkQueryParam('__clerk_ticket');
-    return this.create({ ...params, ticket: ticket ?? undefined });
+    return this.create({ ...params, strategy: 'ticket', ticket: ticket ?? undefined });
   }
 
   async finalize(params?: SignUpFutureFinalizeParams): Promise<{ error: ClerkError | null }> {
