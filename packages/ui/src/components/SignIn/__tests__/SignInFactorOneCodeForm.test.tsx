@@ -36,6 +36,12 @@ describe('SignInFactorOneCodeForm', () => {
     },
     factorAlreadyPrepared: false,
     onFactorPrepare: vi.fn(),
+    onAttemptCode: vi.fn(),
+    onPrepare: vi.fn().mockResolvedValue({}),
+    onGoBack: vi.fn(),
+    identifier: '+1234567890',
+    avatarUrl: undefined,
+    shouldAvoidPrepare: false,
     cardTitle: localizationKeys('signIn.phoneCode.title'),
     cardSubtitle: localizationKeys('signIn.phoneCode.subtitle'),
     inputLabel: localizationKeys('signIn.phoneCode.formTitle'),
@@ -72,18 +78,13 @@ describe('SignInFactorOneCodeForm', () => {
       });
 
       const phonePropsWithChannel = {
+        ...defaultProps,
         factor: {
           strategy: 'phone_code' as const,
           phoneNumberId: 'idn_123',
           safeIdentifier: '+1234567890',
           channel: 'whatsapp' as const,
         },
-        factorAlreadyPrepared: false,
-        onFactorPrepare: vi.fn(),
-        cardTitle: localizationKeys('signIn.phoneCode.title'),
-        cardSubtitle: localizationKeys('signIn.phoneCode.subtitle'),
-        inputLabel: localizationKeys('signIn.phoneCode.formTitle'),
-        resendButton: localizationKeys('signIn.phoneCode.resendButton'),
       };
 
       renderWithProviders(<SignInFactorOneCodeForm {...phonePropsWithChannel} />, { wrapper });
@@ -109,17 +110,8 @@ describe('SignInFactorOneCodeForm', () => {
       });
 
       const props = {
-        factor: {
-          strategy: 'phone_code' as const,
-          phoneNumberId: 'idn_123',
-          safeIdentifier: '+1234567890',
-        },
+        ...defaultProps,
         factorAlreadyPrepared: true,
-        onFactorPrepare: vi.fn(),
-        cardTitle: localizationKeys('signIn.phoneCode.title'),
-        cardSubtitle: localizationKeys('signIn.phoneCode.subtitle'),
-        inputLabel: localizationKeys('signIn.phoneCode.formTitle'),
-        resendButton: localizationKeys('signIn.phoneCode.resendButton'),
       };
 
       renderWithProviders(<SignInFactorOneCodeForm {...props} />, { wrapper });
@@ -189,13 +181,13 @@ describe('SignInFactorOneCodeForm', () => {
       });
 
       const emailProps = {
+        ...defaultProps,
         factor: {
           strategy: 'email_code' as const,
           emailAddressId: 'idn_456',
           safeIdentifier: 'test@example.com',
         },
-        factorAlreadyPrepared: false,
-        onFactorPrepare: vi.fn(),
+        identifier: 'test@example.com',
         cardTitle: localizationKeys('signIn.emailCode.title'),
         cardSubtitle: localizationKeys('signIn.emailCode.subtitle'),
         inputLabel: localizationKeys('signIn.emailCode.formTitle'),

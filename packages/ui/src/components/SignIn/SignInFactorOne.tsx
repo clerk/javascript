@@ -1,3 +1,4 @@
+import { isPasswordCompromisedError, isPasswordPwnedError } from '@clerk/shared/error';
 import { useClerk } from '@clerk/shared/react';
 import type { SignInFactor } from '@clerk/shared/types';
 import React from 'react';
@@ -23,25 +24,9 @@ import { SignInFactorOnePasskey } from './SignInFactorOnePasskey';
 import type { PasswordErrorCode } from './SignInFactorOnePasswordCard';
 import { SignInFactorOnePasswordCard } from './SignInFactorOnePasswordCard';
 import { SignInFactorOnePhoneCodeCard } from './SignInFactorOnePhoneCodeCard';
+import { useHandleFirstFactorResult, useHandleUserLockedError } from './useHandleAttemptResult';
 import { useResetPasswordFactor } from './useResetPasswordFactor';
-import { determineStartingSignInFactor, factorHasLocalStrategy } from './utils';
-
-const factorKey = (factor: SignInFactor | null | undefined) => {
-  if (!factor) {
-    return '';
-  }
-  let key = factor.strategy;
-  if ('emailAddressId' in factor) {
-    key += factor.emailAddressId;
-  }
-  if ('phoneNumberId' in factor) {
-    key += factor.phoneNumberId;
-  }
-  if ('channel' in factor) {
-    key += factor.channel;
-  }
-  return key;
-};
+import { determineStartingSignInFactor, factorHasLocalStrategy, factorKey } from './utils';
 
 function determineAlternativeMethodsMode(
   showForgotPasswordStrategies: boolean,
@@ -106,6 +91,66 @@ function SignInFactorOneInternal(): JSX.Element {
   const [showForgotPasswordStrategies, setShowForgotPasswordStrategies] = React.useState(false);
 
   const [passwordErrorCode, setPasswordErrorCode] = React.useState<PasswordErrorCode | null>(null);
+
+  const handleFirstFactorResult = useHandleFirstFactorResult();
+  const handleUserLockedError = useHandleUserLockedError();
+
+  const goBack = React.useCallback(() => {
+    void router.navigate('../');
+  }, [router]);
+
+  const handleAttemptPassword = React.useCallback(
+    async (password: string) => {
+      try {
+        const res = await signIn.attemptFirstFactor({ strategy: 'password', password });
+        await handleFirstFactorResult(res);
+      } catch (err: any) {
+        if (handleUserLockedError(err)) {
+          return;
+        }
+        if (isPasswordPwnedError(err)) {
+          card.setError({ ...err.errors[0], code: 'form_password_pwned__sign_in' });
+          setPasswordErrorCode('pwned');
+          setShowForgotPasswordStrategies(s => !s);
+          return;
+        }
+        if (isPasswordCompromisedError(err)) {
+          card.setError({ ...err.errors[0], code: 'form_password_compromised__sign_in' });
+          setPasswordErrorCode('compromised');
+          setShowForgotPasswordStrategies(s => !s);
+          return;
+        }
+        throw err;
+      }
+    },
+    [signIn, handleFirstFactorResult, handleUserLockedError, card],
+  );
+
+  const handleAttemptCode = React.useCallback(
+    (code: string, resolve: () => Promise<void>, reject: (err: unknown) => void) => {
+      if (!currentFactor) {
+        return;
+      }
+      signIn
+        .attemptFirstFactor({ strategy: currentFactor.strategy as any, code })
+        .then(async res => {
+          await resolve();
+          return handleFirstFactorResult(res);
+        })
+        .catch(err => {
+          if (handleUserLockedError(err)) {
+            return;
+          }
+          return reject(err);
+        });
+    },
+    [signIn, currentFactor, handleFirstFactorResult, handleUserLockedError],
+  );
+
+  const handlePrepareFirstFactor = React.useCallback(
+    (factor: SignInFactor) => signIn.prepareFirstFactor(factor as any),
+    [signIn],
+  );
 
   React.useEffect(() => {
     if (__internal_setActiveInProgress) {
@@ -184,6 +229,17 @@ function SignInFactorOneInternal(): JSX.Element {
     return <LoadingCard />;
   }
 
+  const factorAlreadyPrepared = lastPreparedFactorKeyRef.current === factorKey(currentFactor);
+  const shouldAvoidPrepare = signIn.firstFactorVerification.status === 'verified' && factorAlreadyPrepared;
+  const codeCardProps = {
+    onAttemptCode: handleAttemptCode,
+    onPrepare: handlePrepareFirstFactor,
+    onGoBack: goBack,
+    identifier: signIn.identifier,
+    avatarUrl: signIn.userData.imageUrl,
+    shouldAvoidPrepare,
+  } as const;
+
   switch (currentFactor?.strategy) {
     case 'passkey':
       return (
@@ -197,40 +253,42 @@ function SignInFactorOneInternal(): JSX.Element {
         <SignInFactorOnePasswordCard
           onForgotPasswordMethodClick={resetPasswordFactor ? toggleForgotPasswordStrategies : toggleAllStrategies}
           onShowAlternativeMethodsClick={toggleAllStrategies}
-          onPasswordError={errorCode => {
-            setPasswordErrorCode(errorCode);
-            toggleForgotPasswordStrategies();
-          }}
+          onAttemptPassword={handleAttemptPassword}
+          onGoBack={goBack}
+          identifier={signIn.identifier}
+          avatarUrl={signIn.userData.imageUrl}
+          hasResetPasswordFactor={!!resetPasswordFactor}
         />
       );
     case 'email_code':
       return (
         <SignInFactorOneEmailCodeCard
-          factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
+          factorAlreadyPrepared={factorAlreadyPrepared}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
+          {...codeCardProps}
         />
       );
     case 'phone_code':
       if (currentFactor.channel && currentFactor.channel !== 'sms') {
-        // Alternative phone code provider (e.g. WhatsApp)
         return (
           <SignInFactorOneAlternativePhoneCodeCard
-            factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
+            factorAlreadyPrepared={factorAlreadyPrepared}
             onFactorPrepare={handleFactorPrepare}
             factor={currentFactor}
             onChangePhoneCodeChannel={selectFactor}
+            {...codeCardProps}
           />
         );
       } else {
-        // SMS
         return (
           <SignInFactorOnePhoneCodeCard
-            factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
+            factorAlreadyPrepared={factorAlreadyPrepared}
             onFactorPrepare={handleFactorPrepare}
             factor={currentFactor}
             onShowAlternativeMethodsClicked={toggleAllStrategies}
+            {...codeCardProps}
           />
         );
       }
@@ -238,7 +296,7 @@ function SignInFactorOneInternal(): JSX.Element {
     case 'email_link':
       return (
         <SignInFactorOneEmailLinkCard
-          factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
+          factorAlreadyPrepared={factorAlreadyPrepared}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
@@ -247,7 +305,7 @@ function SignInFactorOneInternal(): JSX.Element {
     case 'reset_password_phone_code':
       return (
         <SignInFactorOneForgotPasswordCard
-          factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
+          factorAlreadyPrepared={factorAlreadyPrepared}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
@@ -259,13 +317,14 @@ function SignInFactorOneInternal(): JSX.Element {
             toggleForgotPasswordStrategies();
           }}
           cardSubtitle={localizationKeys('signIn.forgotPassword.subtitle_phone')}
+          {...codeCardProps}
         />
       );
 
     case 'reset_password_email_code':
       return (
         <SignInFactorOneForgotPasswordCard
-          factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
+          factorAlreadyPrepared={factorAlreadyPrepared}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
@@ -277,6 +336,7 @@ function SignInFactorOneInternal(): JSX.Element {
             toggleForgotPasswordStrategies();
           }}
           cardSubtitle={localizationKeys('signIn.forgotPassword.subtitle_email')}
+          {...codeCardProps}
         />
       );
     default:

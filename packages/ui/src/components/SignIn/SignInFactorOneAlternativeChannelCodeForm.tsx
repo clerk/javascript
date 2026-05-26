@@ -1,14 +1,11 @@
-import type { PhoneCodeFactor, SignInFactor } from '@clerk/shared/types';
+import type { PhoneCodeFactor, SignInFactor, SignInResource } from '@clerk/shared/types';
 
 import { useCardState } from '@/ui/elements/contexts';
 import type { VerificationCodeCardProps } from '@/ui/elements/VerificationCodeCard';
 import { VerificationCodeCard } from '@/ui/elements/VerificationCodeCard';
 import { handleError } from '@/ui/utils/errorHandler';
 
-import { useCoreSignIn } from '../../contexts';
 import { type LocalizationKey, localizationKeys } from '../../localization';
-import { useRouter } from '../../router';
-import { useHandleFirstFactorResult, useHandleUserLockedError } from './useHandleAttemptResult';
 
 export type SignInFactorOneAlternativeChannelCodeCard = Pick<
   VerificationCodeCardProps,
@@ -18,6 +15,11 @@ export type SignInFactorOneAlternativeChannelCodeCard = Pick<
   factorAlreadyPrepared: boolean;
   onFactorPrepare: () => void;
   onChangePhoneCodeChannel: (factor: SignInFactor) => void;
+  onAttemptCode: VerificationCodeCardProps['onCodeEntryFinishedAction'];
+  onPrepare: (factor: PhoneCodeFactor) => Promise<SignInResource>;
+  onGoBack: () => void;
+  avatarUrl: string | undefined;
+  shouldAvoidPrepare: boolean;
 };
 
 export type SignInFactorOneAlternativeChannelCodeFormProps = SignInFactorOneAlternativeChannelCodeCard & {
@@ -28,46 +30,20 @@ export type SignInFactorOneAlternativeChannelCodeFormProps = SignInFactorOneAlte
 };
 
 export const SignInFactorOneAlternativeChannelCodeForm = (props: SignInFactorOneAlternativeChannelCodeFormProps) => {
-  const signIn = useCoreSignIn();
   const card = useCardState();
-  const { navigate } = useRouter();
-  const handleFirstFactorResult = useHandleFirstFactorResult();
-  const handleUserLockedError = useHandleUserLockedError();
   const channel = props.factor.channel;
 
-  const shouldAvoidPrepare = signIn.firstFactorVerification.status === 'verified' && props.factorAlreadyPrepared;
-
-  const goBack = () => {
-    return navigate('../');
-  };
-
   const prepare = () => {
-    if (shouldAvoidPrepare) {
+    if (props.shouldAvoidPrepare) {
       return;
     }
 
-    void signIn
-      .prepareFirstFactor({ ...props.factor, channel } as PhoneCodeFactor)
+    void props
+      .onPrepare({ ...props.factor, channel } as PhoneCodeFactor)
       .then(() => props.onFactorPrepare())
       .catch(err => handleError(err, [], card.setError));
   };
 
-  const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
-    signIn
-      .attemptFirstFactor({ strategy: props.factor.strategy, code })
-      .then(async res => {
-        await resolve();
-        return handleFirstFactorResult(res);
-      })
-      .catch(err => {
-        if (handleUserLockedError(err)) {
-          return;
-        }
-        return reject(err);
-      });
-  };
-
-  // This is used on clicking "Send code via SMS instead"
   const prepareWithSMS = () => {
     card.setError(undefined);
     props.onChangePhoneCodeChannel({ ...props.factor, channel: undefined } as SignInFactor);
@@ -79,14 +55,14 @@ export const SignInFactorOneAlternativeChannelCodeForm = (props: SignInFactorOne
       cardSubtitle={props.cardSubtitle}
       inputLabel={props.inputLabel}
       resendButton={props.resendButton}
-      onCodeEntryFinishedAction={action}
+      onCodeEntryFinishedAction={props.onAttemptCode}
       onResendCodeClicked={prepare}
       safeIdentifier={props.factor.safeIdentifier}
-      profileImageUrl={signIn.userData.imageUrl}
+      profileImageUrl={props.avatarUrl}
       alternativeMethodsLabel={localizationKeys('footerActionLink__alternativePhoneCodeProvider')}
       onShowAlternativeMethodsClicked={prepareWithSMS}
       showAlternativeMethods
-      onIdentityPreviewEditClicked={goBack}
+      onIdentityPreviewEditClicked={props.onGoBack}
       onBackLinkClicked={props.onBackLinkClicked}
     />
   );

@@ -1,4 +1,3 @@
-import { isPasswordCompromisedError, isPasswordPwnedError } from '@clerk/shared/error';
 import React from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -9,24 +8,33 @@ import { IdentityPreview } from '@/ui/elements/IdentityPreview';
 import { handleError } from '@/ui/utils/errorHandler';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
-import { useCoreSignIn } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys } from '../../customizables';
-import { useRouter } from '../../router/RouteContext';
 import { HavingTrouble } from './HavingTrouble';
-import { useHandleFirstFactorResult, useHandleUserLockedError } from './useHandleAttemptResult';
-import { useResetPasswordFactor } from './useResetPasswordFactor';
 
 export type PasswordErrorCode = 'compromised' | 'pwned';
 
 type SignInFactorOnePasswordProps = {
   onForgotPasswordMethodClick: React.MouseEventHandler | undefined;
   onShowAlternativeMethodsClick: React.MouseEventHandler | undefined;
-  onPasswordError?: (errorCode: PasswordErrorCode) => void;
+  onAttemptPassword: (password: string) => Promise<void>;
+  onGoBack: () => void;
+  identifier: string | null;
+  avatarUrl: string | undefined;
+  hasResetPasswordFactor: boolean;
 };
 
-const usePasswordControl = (props: SignInFactorOnePasswordProps) => {
-  const { onForgotPasswordMethodClick, onShowAlternativeMethodsClick } = props;
-  const resetPasswordFactor = useResetPasswordFactor();
+export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps) => {
+  const {
+    onShowAlternativeMethodsClick,
+    onAttemptPassword,
+    onGoBack,
+    identifier,
+    avatarUrl,
+    hasResetPasswordFactor,
+    onForgotPasswordMethodClick,
+  } = props;
+  const passwordInputRef = React.useRef<HTMLInputElement>(null);
+  const card = useCardState();
 
   const passwordControl = useFormControl('password', '', {
     type: 'password',
@@ -34,12 +42,14 @@ const usePasswordControl = (props: SignInFactorOnePasswordProps) => {
     placeholder: localizationKeys('formFieldInputPlaceholder__password'),
   });
 
-  return {
+  const passwordControlWithAction = {
     ...passwordControl,
     props: {
       ...passwordControl.props,
       actionLabel:
-        resetPasswordFactor || onShowAlternativeMethodsClick ? localizationKeys('formFieldAction__forgotPassword') : '',
+        hasResetPasswordFactor || onShowAlternativeMethodsClick
+          ? localizationKeys('formFieldAction__forgotPassword')
+          : '',
       onActionClicked: onForgotPasswordMethodClick
         ? onForgotPasswordMethodClick
         : onShowAlternativeMethodsClick
@@ -47,52 +57,16 @@ const usePasswordControl = (props: SignInFactorOnePasswordProps) => {
           : () => null,
     },
   };
-};
 
-export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps) => {
-  const { onShowAlternativeMethodsClick, onPasswordError } = props;
-  const passwordInputRef = React.useRef<HTMLInputElement>(null);
-  const card = useCardState();
-  const signIn = useCoreSignIn();
-  const passwordControl = usePasswordControl(props);
-  const { navigate } = useRouter();
   const [showHavingTrouble, setShowHavingTrouble] = React.useState(false);
   const toggleHavingTrouble = React.useCallback(() => setShowHavingTrouble(s => !s), [setShowHavingTrouble]);
-  const handleFirstFactorResult = useHandleFirstFactorResult();
-  const handleUserLockedError = useHandleUserLockedError();
-
-  const goBack = () => {
-    void navigate('../');
-  };
 
   const handlePasswordSubmit: React.FormEventHandler<HTMLFormElement> = e => {
     e.preventDefault();
-    void signIn
-      .attemptFirstFactor({ strategy: 'password', password: passwordControl.value })
-      .then(handleFirstFactorResult)
-      .catch(err => {
-        if (handleUserLockedError(err)) {
-          return;
-        }
-
-        if (onPasswordError) {
-          if (isPasswordPwnedError(err)) {
-            card.setError({ ...err.errors[0], code: 'form_password_pwned__sign_in' });
-            onPasswordError('pwned');
-            return;
-          }
-
-          if (isPasswordCompromisedError(err)) {
-            card.setError({ ...err.errors[0], code: 'form_password_compromised__sign_in' });
-            onPasswordError('compromised');
-            return;
-          }
-        }
-
-        handleError(err, [passwordControl], card.setError);
-
-        setTimeout(() => passwordInputRef.current?.focus(), 0);
-      });
+    void onAttemptPassword(passwordControlWithAction.value).catch(err => {
+      handleError(err, [passwordControlWithAction], card.setError);
+      setTimeout(() => passwordInputRef.current?.focus(), 0);
+    });
   };
 
   if (showHavingTrouble) {
@@ -107,9 +81,9 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
             <Header.Title localizationKey={localizationKeys('signIn.password.title')} />
             <Header.Subtitle localizationKey={localizationKeys('signIn.password.subtitle')} />
             <IdentityPreview
-              identifier={signIn.identifier}
-              avatarUrl={signIn.userData.imageUrl}
-              onClick={goBack}
+              identifier={identifier}
+              avatarUrl={avatarUrl}
+              onClick={onGoBack}
             />
           </Header.Root>
           <Card.Alert>{card.error}</Card.Alert>
@@ -128,12 +102,12 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
                 readOnly
                 id='identifier-field'
                 name='identifier'
-                value={signIn.identifier || ''}
+                value={identifier || ''}
                 style={{ display: 'none' }}
               />
-              <Form.ControlRow elementId={passwordControl.id}>
+              <Form.ControlRow elementId={passwordControlWithAction.id}>
                 <Form.PasswordInput
-                  {...passwordControl.props}
+                  {...passwordControlWithAction.props}
                   ref={passwordInputRef}
                   autoFocus
                 />

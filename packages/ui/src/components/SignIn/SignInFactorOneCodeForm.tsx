@@ -1,4 +1,4 @@
-import type { EmailCodeFactor, PhoneCodeFactor, ResetPasswordCodeFactor } from '@clerk/shared/types';
+import type { EmailCodeFactor, PhoneCodeFactor, ResetPasswordCodeFactor, SignInResource } from '@clerk/shared/types';
 import { useMemo } from 'react';
 
 import { useCardState } from '@/ui/elements/contexts';
@@ -6,11 +6,8 @@ import type { VerificationCodeCardProps } from '@/ui/elements/VerificationCodeCa
 import { VerificationCodeCard } from '@/ui/elements/VerificationCodeCard';
 import { handleError } from '@/ui/utils/errorHandler';
 
-import { useCoreSignIn } from '../../contexts';
 import { useFetch } from '../../hooks';
 import { type LocalizationKey } from '../../localization';
-import { useRouter } from '../../router';
-import { useHandleFirstFactorResult, useHandleUserLockedError } from './useHandleAttemptResult';
 
 export type SignInFactorOneCodeCard = Pick<
   VerificationCodeCardProps,
@@ -19,6 +16,12 @@ export type SignInFactorOneCodeCard = Pick<
   factor: EmailCodeFactor | PhoneCodeFactor | ResetPasswordCodeFactor;
   factorAlreadyPrepared: boolean;
   onFactorPrepare: () => void;
+  onAttemptCode: VerificationCodeCardProps['onCodeEntryFinishedAction'];
+  onPrepare: (factor: EmailCodeFactor | PhoneCodeFactor | ResetPasswordCodeFactor) => Promise<SignInResource>;
+  onGoBack: () => void;
+  identifier: string | null;
+  avatarUrl: string | undefined;
+  shouldAvoidPrepare: boolean;
 };
 
 export type SignInFactorOneCodeFormProps = SignInFactorOneCodeCard & {
@@ -29,31 +32,25 @@ export type SignInFactorOneCodeFormProps = SignInFactorOneCodeCard & {
 };
 
 export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => {
-  const signIn = useCoreSignIn();
   const card = useCardState();
-  const { navigate } = useRouter();
-  const handleFirstFactorResult = useHandleFirstFactorResult();
-  const handleUserLockedError = useHandleUserLockedError();
-
-  const shouldAvoidPrepare = signIn.firstFactorVerification.status === 'verified' && props.factorAlreadyPrepared;
 
   const cacheKey = useMemo(() => {
     const factor = props.factor;
-    let factorKey = factor.strategy;
+    let key = factor.strategy as string;
 
     if ('emailAddressId' in factor) {
-      factorKey += `_${factor.emailAddressId}`;
+      key += `_${factor.emailAddressId}`;
     }
     if ('phoneNumberId' in factor) {
-      factorKey += `_${factor.phoneNumberId}`;
+      key += `_${factor.phoneNumberId}`;
     }
     if ('channel' in factor && factor.channel) {
-      factorKey += `_${factor.channel}`;
+      key += `_${factor.channel}`;
     }
 
     return {
       name: 'signIn.prepareFirstFactor',
-      factorKey,
+      factorKey: key,
     };
   }, [
     props.factor.strategy,
@@ -62,41 +59,22 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
     'channel' in props.factor ? props.factor.channel : undefined,
   ]);
 
-  const goBack = () => {
-    return navigate('../');
-  };
-
   const prepare = () => {
-    if (shouldAvoidPrepare) {
+    if (props.shouldAvoidPrepare) {
       return;
     }
 
-    void signIn
-      .prepareFirstFactor(props.factor)
+    void props
+      .onPrepare(props.factor)
       .then(() => props.onFactorPrepare())
       .catch(err => handleError(err, [], card.setError));
   };
 
-  useFetch(shouldAvoidPrepare ? undefined : () => signIn?.prepareFirstFactor(props.factor), cacheKey, {
+  useFetch(props.shouldAvoidPrepare ? undefined : () => props.onPrepare(props.factor), cacheKey, {
     staleTime: 100,
     onSuccess: () => props.onFactorPrepare(),
     onError: err => handleError(err, [], card.setError),
   });
-
-  const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
-    signIn
-      .attemptFirstFactor({ strategy: props.factor.strategy, code })
-      .then(async res => {
-        await resolve();
-        return handleFirstFactorResult(res);
-      })
-      .catch(err => {
-        if (handleUserLockedError(err)) {
-          return;
-        }
-        return reject(err);
-      });
-  };
 
   return (
     <VerificationCodeCard
@@ -104,13 +82,13 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
       cardSubtitle={props.cardSubtitle}
       inputLabel={props.inputLabel}
       resendButton={props.resendButton}
-      onCodeEntryFinishedAction={action}
+      onCodeEntryFinishedAction={props.onAttemptCode}
       onResendCodeClicked={prepare}
       safeIdentifier={props.factor.safeIdentifier}
-      profileImageUrl={signIn.userData.imageUrl}
+      profileImageUrl={props.avatarUrl}
       onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
       showAlternativeMethods={props.showAlternativeMethods}
-      onIdentityPreviewEditClicked={goBack}
+      onIdentityPreviewEditClicked={props.onGoBack}
       onBackLinkClicked={props.onBackLinkClicked}
     />
   );

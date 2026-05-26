@@ -118,6 +118,23 @@ const resetPasswordStrategies: SignInStrategy[] = ['reset_password_phone_code', 
 export const isResetPasswordStrategy = (strategy: SignInStrategy | string | null | undefined) =>
   !!strategy && resetPasswordStrategies.includes(strategy as SignInStrategy);
 
+export const factorKey = (factor: SignInFactor | null | undefined): string => {
+  if (!factor) {
+    return '';
+  }
+  let key = factor.strategy as string;
+  if ('emailAddressId' in factor) {
+    key += factor.emailAddressId;
+  }
+  if ('phoneNumberId' in factor) {
+    key += factor.phoneNumberId;
+  }
+  if ('channel' in factor) {
+    key += factor.channel;
+  }
+  return key;
+};
+
 const isEmail = (str: string) => /^\S+@\S+\.\S+$/.test(str);
 export function getSignUpAttributeFromIdentifier(identifier: FormControlState<'identifier'>) {
   if (identifier.type === 'tel') {
