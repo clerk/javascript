@@ -28,6 +28,7 @@ export { default as Clipboard } from './clipboard.svg';
 export { default as Close } from './close.svg';
 export { default as Code } from './code.svg';
 export { default as Cog } from './cog.svg';
+export { default as Connections } from './connections.svg';
 export { default as Copy } from './copy.svg';
 export { default as CreditCard } from './credit-card.svg';
 export { default as DeviceLaptop } from './device-laptop.svg';
