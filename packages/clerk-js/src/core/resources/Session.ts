@@ -407,6 +407,7 @@ export class Session extends BaseResource implements SessionResource {
       : {
           organizationId,
           ...(sessionMinterEnabled && this.lastActiveToken ? { token: this.lastActiveToken.getRawString() } : {}),
+          ...(sessionMinterEnabled && skipCache ? { forceOrigin: 'true' } : {}),
         };
 
     const lastActiveToken = this.lastActiveToken?.getRawString();
