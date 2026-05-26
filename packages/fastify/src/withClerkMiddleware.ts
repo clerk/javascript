@@ -1,6 +1,7 @@
 import { createClerkClient } from '@clerk/backend';
 import { AuthStatus } from '@clerk/backend/internal';
 import { clerkFrontendApiProxy, DEFAULT_PROXY_PATH, stripTrailingSlashes } from '@clerk/backend/proxy';
+import { apiUrlFromPublishableKey } from '@clerk/shared/apiUrlFromPublishableKey';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { Readable } from 'stream';
 
@@ -13,12 +14,13 @@ export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
   const proxyPath = stripTrailingSlashes(frontendApiProxy?.path ?? DEFAULT_PROXY_PATH) || DEFAULT_PROXY_PATH;
   const publishableKey = options.publishableKey || constants.PUBLISHABLE_KEY;
   const secretKey = options.secretKey || constants.SECRET_KEY;
+  const apiUrl = options.apiUrl || apiUrlFromPublishableKey(publishableKey);
   const clerkClient = createClerkClient({
     ...options,
     publishableKey,
     secretKey,
     machineSecretKey: options.machineSecretKey || constants.MACHINE_SECRET_KEY,
-    apiUrl: options.apiUrl || constants.API_URL,
+    apiUrl,
     apiVersion: options.apiVersion || constants.API_VERSION,
     jwtKey: options.jwtKey || constants.JWT_KEY,
     userAgent: options.userAgent || `${constants.SDK_METADATA.name}@${constants.SDK_METADATA.version}`,

@@ -60,6 +60,37 @@ describe('withClerkMiddleware(options)', () => {
     );
   });
 
+  test('creates the request client with an apiUrl derived from the runtime publishable key', async () => {
+    authenticateRequestMock.mockResolvedValueOnce({
+      headers: new Headers(),
+      toAuth: () => ({
+        tokenType: 'session_token',
+      }),
+    });
+    const fastify = Fastify();
+    await fastify.register(clerkPlugin, {
+      secretKey: 'runtime_secret_key',
+      publishableKey: 'pk_test_aW1tdW5lLWhhd2stNjUuY2xlcmsuYWNjb3VudHNzdGFnZS5kZXYk',
+    });
+
+    fastify.get('/', (_request: FastifyRequest, reply: FastifyReply) => {
+      reply.send({});
+    });
+
+    const response = await fastify.inject({
+      method: 'GET',
+      path: '/',
+    });
+
+    expect(response.statusCode).toEqual(200);
+    expect(createClerkClientMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        apiUrl: 'https://api.clerkstage.dev',
+        publishableKey: 'pk_test_aW1tdW5lLWhhd2stNjUuY2xlcmsuYWNjb3VudHNzdGFnZS5kZXYk',
+      }),
+    );
+  });
+
   test('handles signin with Authorization Bearer', async () => {
     authenticateRequestMock.mockResolvedValueOnce({
       headers: new Headers(),
