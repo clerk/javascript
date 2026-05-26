@@ -4,6 +4,7 @@ import { debugLogger } from '@/utils/debug';
 import { TokenId } from '@/utils/tokenId';
 
 import { Token } from './resources/internal';
+import { pickFreshestJwt } from './tokenFreshness';
 
 /**
  * Identifies a cached token entry by tokenId and optional audience.
@@ -252,11 +253,10 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
       const existingEntry = get({ tokenId: data.tokenId });
       if (existingEntry) {
         const existingToken = await existingEntry.tokenResolver;
-        const existingIat = existingToken.jwt?.claims?.iat;
-        if (existingIat && existingIat >= iat) {
+        if (pickFreshestJwt(existingToken, token) === existingToken) {
           debugLogger.debug(
-            'Ignoring older token broadcast',
-            { existingIat, incomingIat: iat, tabId, tokenId: data.tokenId, traceId: data.traceId },
+            'Ignoring staler token broadcast',
+            { tokenId: data.tokenId, traceId: data.traceId },
             'tokenCache',
           );
           return;
