@@ -1,4 +1,4 @@
-import { useClerk } from '@clerk/shared/react';
+import { __internal_useOrganizationBase, useClerk } from '@clerk/shared/react';
 import { createContext, useContext, useMemo } from 'react';
 
 import type { NavbarRoute } from '@/ui/elements/Navbar';
@@ -25,7 +25,9 @@ export type OrganizationProfileContextType = OrganizationProfileCtx & {
   isGeneralPageRoot: boolean;
   isBillingPageRoot: boolean;
   isAPIKeysPageRoot: boolean;
+  isSelfServeSsoPageRoot: boolean;
   shouldShowBilling: boolean;
+  shouldShowSelfServeSSO: boolean;
 };
 
 export const OrganizationProfileContext = createContext<OrganizationProfileCtx | null>(null);
@@ -35,6 +37,7 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
   const { navigate } = useRouter();
   const environment = useEnvironment();
   const clerk = useClerk();
+  const organization = __internal_useOrganizationBase();
 
   if (!context || context.componentName !== 'OrganizationProfile') {
     throw new Error('Clerk: useOrganizationProfileContext called outside OrganizationProfile.');
@@ -56,9 +59,19 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
     // The C2 had a subscription in the past
     Boolean(statements.data.length > 0);
 
+  const shouldShowSelfServeSSO =
+    environment.userSettings.enterpriseSSO.self_serve_sso && !!organization?.selfServeSSOEnabled;
+
   const pages = useMemo(
-    () => createOrganizationProfileCustomPages(customPages || [], clerk, shouldShowBilling, environment),
-    [customPages, shouldShowBilling],
+    () =>
+      createOrganizationProfileCustomPages(
+        customPages || [],
+        clerk,
+        shouldShowBilling,
+        environment,
+        shouldShowSelfServeSSO,
+      ),
+    [customPages, shouldShowBilling, shouldShowSelfServeSSO],
   );
 
   const navigateAfterLeaveOrganization = () =>
@@ -68,6 +81,7 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
   const isGeneralPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.GENERAL;
   const isBillingPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.BILLING;
   const isAPIKeysPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.API_KEYS;
+  const isSelfServeSsoPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.SELF_SERVE_SSO;
   const navigateToGeneralPageRoot = () =>
     navigate(isGeneralPageRoot ? '../' : isMembersPageRoot ? './organization-general' : '../organization-general');
 
@@ -81,6 +95,8 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
     isGeneralPageRoot,
     isBillingPageRoot,
     isAPIKeysPageRoot,
+    isSelfServeSsoPageRoot,
     shouldShowBilling,
+    shouldShowSelfServeSSO,
   };
 };

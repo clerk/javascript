@@ -1,4 +1,4 @@
-import { Box, Flex, Heading, Icon, Link, localizationKeys, Span, Text } from '@/customizables';
+import { Box, descriptors, Flex, Heading, Icon, Link, localizationKeys, Span, Text } from '@/customizables';
 import { ArrowRightIcon } from '@/icons';
 
 import type { LocalizationKey } from '../../../localization';
@@ -75,6 +75,7 @@ export const TestRunHowToFixSection = ({ errorCode }: TestRunHowToFixSectionProp
 
   return (
     <Flex
+      elementDescriptor={descriptors.configureSSOTestRunHowToFixSection}
       direction='col'
       gap={3}
       sx={t => ({
@@ -104,6 +105,7 @@ export const TestRunHowToFixSection = ({ errorCode }: TestRunHowToFixSectionProp
         <HowToFixContent content={content} />
 
         <Link
+          elementDescriptor={descriptors.configureSSOTestRunHowToFixDocsLink}
           href={docsHref}
           target='_blank'
           rel='noopener noreferrer'
