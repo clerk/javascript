@@ -1,7 +1,19 @@
-import type { BillingMoneyAmount, BillingPaymentTotals, BillingPerUnitTotal } from '@clerk/shared/types';
+import type {
+  BillingMoneyAmount,
+  BillingPaymentTotals,
+  BillingPerUnitTotal,
+  BillingPlanUnitPrice,
+  BillingSubscriptionItemResource,
+  OrganizationResource,
+} from '@clerk/shared/types';
 import { describe, expect, test } from 'vitest';
 
-import { getSeatsPerUnitTotal, summarizeSeatCharges } from '../billingPlanSeats';
+import {
+  getPaidSeatsUnitTier,
+  getSeatsPerUnitTotal,
+  organizationAndInvitationsExceedsPurchasedSeats,
+  summarizeSeatCharges,
+} from '../billingPlanSeats';
 
 const money = (amount: number): BillingMoneyAmount => ({
   amount,
@@ -119,5 +131,69 @@ describe('summarizeSeatCharges', () => {
     expect(summary).not.toBeNull();
     expect(summary!.totalSeats).toBe(0);
     expect(summary!.included).toBe(0);
+  });
+});
+
+describe('getPaidSeatsUnitTier', () => {
+  test('returns the paid tier from a seats unit price with included seats', () => {
+    const paidTier = {
+      id: 'tier_paid',
+      startsAtBlock: 4,
+      endsAfterBlock: null,
+      feePerBlock: money(500),
+    };
+    const unitPrice: BillingPlanUnitPrice = {
+      name: 'seats',
+      blockSize: 1,
+      tiers: [
+        {
+          id: 'tier_included',
+          startsAtBlock: 1,
+          endsAfterBlock: 3,
+          feePerBlock: money(0),
+        },
+        paidTier,
+      ],
+    };
+
+    expect(getPaidSeatsUnitTier(unitPrice)).toBe(paidTier);
+  });
+});
+
+describe('organizationAndInvitationsExceedsPurchasedSeats', () => {
+  test('returns true when members, pending invitations, and invitations exceed seats entitlements', () => {
+    const subscriptionItem = {
+      seats: { quantity: 4 },
+    } as BillingSubscriptionItemResource;
+    const organization = {
+      membersCount: 2,
+      pendingInvitationsCount: 1,
+    } as OrganizationResource;
+
+    expect(organizationAndInvitationsExceedsPurchasedSeats(subscriptionItem, organization, 2)).toBe(true);
+  });
+
+  test('returns false when members, pending invitations, and invitations equal seats entitlements', () => {
+    const subscriptionItem = {
+      seats: { quantity: 5 },
+    } as BillingSubscriptionItemResource;
+    const organization = {
+      membersCount: 2,
+      pendingInvitationsCount: 1,
+    } as OrganizationResource;
+
+    expect(organizationAndInvitationsExceedsPurchasedSeats(subscriptionItem, organization, 2)).toBe(false);
+  });
+
+  test('returns false when members, pending invitations, and invitations are below seats entitlements', () => {
+    const subscriptionItem = {
+      seats: { quantity: 10 },
+    } as BillingSubscriptionItemResource;
+    const organization = {
+      membersCount: 2,
+      pendingInvitationsCount: 1,
+    } as OrganizationResource;
+
+    expect(organizationAndInvitationsExceedsPurchasedSeats(subscriptionItem, organization, 2)).toBe(false);
   });
 });
