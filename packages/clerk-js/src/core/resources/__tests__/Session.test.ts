@@ -1385,7 +1385,7 @@ describe('Session', () => {
         __unstable__environment: {
           authConfig: { sessionMinter: true },
         },
-      }) as any;
+      } as any) as any;
     });
 
     afterEach(() => {
@@ -1445,7 +1445,7 @@ describe('Session', () => {
         method: 'POST',
         body: { organizationId: null },
       });
-      expect(fetchSpy.mock.calls[0][0].body).not.toHaveProperty('token');
+      expect((fetchSpy.mock.calls[0][0] as any).body).not.toHaveProperty('token');
     });
 
     it('does not include token in request body for template token requests', async () => {
@@ -1472,7 +1472,7 @@ describe('Session', () => {
         path: '/client/sessions/session_1/tokens/my-template',
         method: 'POST',
       });
-      expect(fetchSpy.mock.calls[0][0].body).toEqual({});
+      expect((fetchSpy.mock.calls[0][0] as any).body).toEqual({});
     });
 
     it('token value matches lastActiveToken.getRawString() exactly', async () => {
@@ -1494,7 +1494,7 @@ describe('Session', () => {
 
       await session.getToken();
 
-      expect(fetchSpy.mock.calls[0][0].body.token).toBe(mockJwt);
+      expect((fetchSpy.mock.calls[0][0] as any).body.token).toBe(mockJwt);
     });
   });
 
@@ -1509,7 +1509,7 @@ describe('Session', () => {
         __unstable__environment: {
           authConfig: { sessionMinter: true },
         },
-      }) as any;
+      } as any) as any;
     });
 
     afterEach(() => {
@@ -1544,7 +1544,7 @@ describe('Session', () => {
         body: expect.objectContaining({ forceOrigin: 'true' }),
         search: { debug: 'skip_cache' },
       });
-      expect(fetchSpy.mock.calls[0][0].body).not.toHaveProperty('debug');
+      expect((fetchSpy.mock.calls[0][0] as any).body).not.toHaveProperty('debug');
     });
 
     it('does not include forceOrigin in body when skipCache is false or undefined', async () => {
@@ -1567,7 +1567,7 @@ describe('Session', () => {
       await session.getToken();
 
       expect(fetchSpy).toHaveBeenCalledTimes(1);
-      expect(fetchSpy.mock.calls[0][0].body).not.toHaveProperty('forceOrigin');
+      expect((fetchSpy.mock.calls[0][0] as any).body).not.toHaveProperty('forceOrigin');
     });
 
     it('does not include forceOrigin when sessionMinter is false even with skipCache true', async () => {
@@ -1575,7 +1575,7 @@ describe('Session', () => {
         __unstable__environment: {
           authConfig: { sessionMinter: false },
         },
-      }) as any;
+      } as any) as any;
 
       const session = new Session({
         status: 'active',
@@ -1596,7 +1596,7 @@ describe('Session', () => {
       await session.getToken({ skipCache: true });
 
       expect(fetchSpy).toHaveBeenCalledTimes(1);
-      expect(fetchSpy.mock.calls[0][0].body).not.toHaveProperty('forceOrigin');
+      expect((fetchSpy.mock.calls[0][0] as any).body).not.toHaveProperty('forceOrigin');
     });
   });
 });

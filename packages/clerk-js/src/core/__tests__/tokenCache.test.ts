@@ -106,7 +106,7 @@ describe('SessionTokenCache', () => {
         },
       } as MessageEvent<SessionTokenEvent>;
 
-      broadcastListener(event);
+      void broadcastListener(event);
 
       expect(SessionTokenCache.size()).toBe(0);
     });
@@ -123,7 +123,7 @@ describe('SessionTokenCache', () => {
         },
       } as MessageEvent<SessionTokenEvent>;
 
-      broadcastListener(event);
+      void broadcastListener(event);
 
       expect(SessionTokenCache.size()).toBe(1);
     });
@@ -140,7 +140,7 @@ describe('SessionTokenCache', () => {
         },
       } as MessageEvent<SessionTokenEvent>;
 
-      broadcastListener(event);
+      void broadcastListener(event);
 
       expect(SessionTokenCache.size()).toBe(1);
     });
@@ -158,7 +158,7 @@ describe('SessionTokenCache', () => {
       } as MessageEvent<SessionTokenEvent>;
 
       expect(() => {
-        broadcastListener(event);
+        void broadcastListener(event);
       }).not.toThrow();
 
       expect(SessionTokenCache.size()).toBe(0);
@@ -178,7 +178,7 @@ describe('SessionTokenCache', () => {
         },
       } as MessageEvent<SessionTokenEvent>;
 
-      broadcastListener(event);
+      void broadcastListener(event);
 
       expect(SessionTokenCache.size()).toBe(0);
     });
@@ -198,7 +198,7 @@ describe('SessionTokenCache', () => {
         },
       } as MessageEvent<SessionTokenEvent>;
 
-      broadcastListener(event);
+      void broadcastListener(event);
 
       expect(SessionTokenCache.size()).toBe(0);
     });
@@ -296,7 +296,7 @@ describe('SessionTokenCache', () => {
         },
       } as MessageEvent<SessionTokenEvent>;
 
-      broadcastListener(event);
+      void broadcastListener(event);
 
       const cachedEntry = SessionTokenCache.get({ tokenId: 'session_123' });
       expect(cachedEntry).toBeDefined();
@@ -318,7 +318,7 @@ describe('SessionTokenCache', () => {
         },
       } as MessageEvent<SessionTokenEvent>;
 
-      broadcastListener(event);
+      void broadcastListener(event);
 
       // Flush microtasks to let the tokenResolver promise settle without advancing timers
       await Promise.resolve();
@@ -810,7 +810,7 @@ describe('SessionTokenCache', () => {
       } as MessageEvent<SessionTokenEvent>;
 
       expect(() => {
-        broadcastListener(event);
+        void broadcastListener(event);
       }).not.toThrow();
     });
   });
@@ -854,7 +854,7 @@ describe('SessionTokenCache', () => {
         },
       } as MessageEvent<SessionTokenEvent>;
 
-      broadcastListener(broadcastEvent);
+      void broadcastListener(broadcastEvent);
 
       await vi.waitFor(() => {
         expect(SessionTokenCache.get({ tokenId: session2Id })).toBeDefined();
@@ -915,7 +915,7 @@ describe('SessionTokenCache', () => {
         },
       } as MessageEvent<SessionTokenEvent>;
 
-      broadcastListener(broadcastEvent);
+      void broadcastListener(broadcastEvent);
 
       await vi.waitFor(async () => {
         const updatedCached = SessionTokenCache.get({ tokenId: sessionId });
