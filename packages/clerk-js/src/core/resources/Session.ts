@@ -411,12 +411,16 @@ export class Session extends BaseResource implements SessionResource {
 
     const lastActiveToken = this.lastActiveToken?.getRawString();
 
-    const tokenResolver = Token.create(path, params, skipCache ? { debug: 'skip_cache' } : undefined).catch(e => {
-      if (MissingExpiredTokenError.is(e) && lastActiveToken) {
-        return Token.create(path, { ...params }, { expired_token: lastActiveToken });
-      }
-      throw e;
-    });
+    const tokenResolver = sessionMinterEnabled
+      ? // Session Minter sends the token in the body, no expired_token retry needed
+        Token.create(path, params, skipCache ? { debug: 'skip_cache' } : undefined)
+      : // TODO: Remove this expired_token retry flow when the sessionMinter flag is removed
+        Token.create(path, params, skipCache ? { debug: 'skip_cache' } : undefined).catch(e => {
+          if (MissingExpiredTokenError.is(e) && lastActiveToken) {
+            return Token.create(path, { ...params }, { expired_token: lastActiveToken });
+          }
+          throw e;
+        });
     SessionTokenCache.set({ tokenId, tokenResolver });
 
     return tokenResolver.then(token => {
