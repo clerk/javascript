@@ -2,4 +2,4 @@
 '@clerk/fastify': patch
 ---
 
-Fixed an issue where secrets passed directly to clerkPlugin() were not used when verifying sessions, causing authentication failures when keys are loaded at runtime. The runtime-key Clerk client is also now available on `request.clerk` and derives its API URL from runtime publishable keys unless an explicit `apiUrl` is provided.
+Fixed `clerkPlugin()` to honor `publishableKey` and `secretKey` passed in plugin options when authenticating Fastify requests. The plugin now also exposes `request.clerk`, which uses the same plugin keys and resolves the correct Clerk API host for non-production publishable keys.
