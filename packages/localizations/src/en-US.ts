@@ -400,8 +400,7 @@ export const enUS: LocalizationResource = {
           },
         },
         attributeMappingStep: {
-          // TODO - Not mention Clerk
-          headerSubtitle: 'Map user attributes from Okta to Clerk',
+          headerSubtitle: 'Map user attributes from Okta to your application',
           paragraph: 'We expect your SAML responses to have the following specific attributes:',
           step1:
             'Open the <bold>Sign On</bold> tab of your Okta application and locate the <bold>Attribute Statements</bold> section. If you don’t see it, click <bold>Show legacy configuration</bold>, then <bold>Edit</bold>.',
@@ -483,8 +482,7 @@ export const enUS: LocalizationResource = {
           },
         },
         attributeMappingStep: {
-          // TODO - Implement header subtitle copy
-          headerSubtitle: 'Map user attributes from your identity provider.',
+          headerSubtitle: 'Map user attributes from your identity provider to your application.',
           attributeMappingTable: {
             columns: {
               userProfile: 'Identity Provider User Profile',
