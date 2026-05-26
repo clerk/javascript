@@ -7,6 +7,7 @@ on:
       - release/v4
       - release/core-2
     paths:
+      - 'packages/backend/**'
       - 'packages/clerk-js/**'
       - 'packages/react/**'
       - 'packages/shared/**'
@@ -20,6 +21,7 @@ on:
       - release/v4
       - release/core-2
     paths:
+      - 'packages/backend/**'
       - 'packages/clerk-js/**'
       - 'packages/react/**'
       - 'packages/shared/**'
@@ -37,6 +39,7 @@ concurrency:
 env:
   SNAPI_PACKAGE: https://pkg.pr.new/clerk/snapi/@clerk/snapi@d3ee0217f35a3b1ebb3ce73d252d12761b01f374
   SNAPI_FILTERS: >-
+    --filter=@clerk/backend
     --filter=@clerk/clerk-js
     --filter=@clerk/react
     --filter=@clerk/shared
@@ -179,7 +182,7 @@ jobs:
             echo 'body<<SNAPI_REPORT_EOF'
             echo '<!-- snapi-report -->'
             if grep -q '## No API Changes Detected' api-changes-report.md; then
-              echo '**Snapi**: no API changes detected in `@clerk/clerk-js`, `@clerk/react`, `@clerk/shared`, `@clerk/ui`.'
+              echo '**Snapi**: no API changes detected in `@clerk/backend`, `@clerk/clerk-js`, `@clerk/react`, `@clerk/shared`, `@clerk/ui`.'
             else
               cat api-changes-report.md
             fi
