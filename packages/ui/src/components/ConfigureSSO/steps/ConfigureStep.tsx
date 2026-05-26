@@ -29,7 +29,7 @@ import { useCardState } from '@/elements/contexts';
 import { Field } from '@/elements/FieldControl';
 import { Form } from '@/elements/Form';
 import { SegmentedControl } from '@/elements/SegmentedControl';
-import { Check, ClipboardOutline, Close, Upload } from '@/icons';
+import { Checkmark, Clipboard, Close, ArrowUpTray } from '@/icons';
 import type { FormControlState } from '@/ui/utils/useFormControl';
 import { useFormControl } from '@/ui/utils/useFormControl';
 import { handleError } from '@/utils/errorHandler';
@@ -238,8 +238,8 @@ export const CreateAppSubStep = (): JSX.Element => {
               <ClipboardInput
                 value={acsUrl}
                 readOnly
-                copyIcon={ClipboardOutline}
-                copiedIcon={Check}
+                copyIcon={Clipboard}
+                copiedIcon={Checkmark}
               />
             </Form.CommonInputWrapper>
           </Form.ControlRow>
@@ -249,8 +249,8 @@ export const CreateAppSubStep = (): JSX.Element => {
               <ClipboardInput
                 value={spEntityId}
                 readOnly
-                copyIcon={ClipboardOutline}
-                copiedIcon={Check}
+                copyIcon={Clipboard}
+                copiedIcon={Checkmark}
               />
             </Form.CommonInputWrapper>
           </Form.ControlRow>
@@ -905,7 +905,7 @@ const ManualEntryPanel = ({
                   onClick={() => certInputRef.current?.click()}
                 >
                   <Icon
-                    icon={Upload}
+                    icon={ArrowUpTray}
                     size='sm'
                     colorScheme='neutral'
                     sx={t => ({ marginInlineEnd: t.space.$1 })}
