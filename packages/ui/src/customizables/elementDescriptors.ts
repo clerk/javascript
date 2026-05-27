@@ -558,6 +558,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'configureSSOProviderGroupLabel',
   'configureSSOProviderGrid',
   'configureSSOProviderCard',
+  'configureSSOProviderCardRadio',
   'configureSSOProviderCardIcon',
   'configureSSOProviderCardLabel',
 
