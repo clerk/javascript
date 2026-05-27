@@ -190,12 +190,7 @@ const ProviderCard = ({ name, value, iconId, label, checked, onChange }: Provide
       elementId={descriptors.configureSSOProviderCard.setId(value)}
       isActive={checked}
       sx={theme => ({
-        // Outline-button look (mirrors SimpleButton variant='outline' for visual continuity).
-        borderWidth: theme.borderWidths.$normal,
-        borderStyle: theme.borderStyles.$solid,
-        borderColor: theme.colors.$borderAlpha150,
-        borderRadius: theme.radii.$md,
-        color: theme.colors.$neutralAlpha600,
+        ...common.outlineButtonStyles(theme),
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -203,10 +198,8 @@ const ProviderCard = ({ name, value, iconId, label, checked, onChange }: Provide
         gap: theme.space.$2,
         height: theme.sizes.$32,
         padding: theme.space.$1x5,
-        backgroundColor: theme.colors.$colorBackground,
         cursor: 'pointer',
         position: 'relative',
-        '&:hover': { backgroundColor: theme.colors.$neutralAlpha50 },
         '&:has(input:focus-visible)': {
           ...common.focusRingStyles(theme),
           borderColor: theme.colors.$borderAlpha300,
@@ -228,6 +221,7 @@ const ProviderCard = ({ name, value, iconId, label, checked, onChange }: Provide
           insetInlineStart: theme.space.$1x5,
           margin: 0,
           width: 'fit-content',
+          boxShadow: 'none',
         })}
       />
 

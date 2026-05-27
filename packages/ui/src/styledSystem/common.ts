@@ -156,6 +156,18 @@ const focusRingStyles = (t: InternalTheme) => {
   } as const;
 };
 
+const outlineButtonStyles = (t: InternalTheme) => {
+  return {
+    borderWidth: t.borderWidths.$normal,
+    borderStyle: t.borderStyles.$solid,
+    borderColor: t.colors.$borderAlpha150,
+    borderRadius: t.radii.$md,
+    color: t.colors.$neutralAlpha600,
+    backgroundColor: t.colors.$colorBackground,
+    '&:hover': { backgroundColor: t.colors.$neutralAlpha50 },
+  } as const;
+};
+
 const focusRing = (t: InternalTheme) => {
   return {
     '&:focus': {
@@ -248,6 +260,7 @@ export const common = {
   borderVariants,
   focusRingStyles,
   focusRing,
+  outlineButtonStyles,
   disabled,
   borderColor,
   centeredFlex,
