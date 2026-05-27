@@ -74,7 +74,6 @@ describe('subpath /jwt exports', () => {
     expect(Object.keys(jwtExports).sort()).toMatchInlineSnapshot(`
       [
         "decodeJwt",
-        "hasValidSignature",
         "signJwt",
         "verifyJwt",
       ]
