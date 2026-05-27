@@ -8,6 +8,7 @@ import {
   Badge,
   Box,
   Button,
+  Col,
   Dd,
   descriptors,
   Dl,
@@ -31,9 +32,8 @@ import { useCardState } from '@/elements/contexts';
 import { Drawer } from '@/elements/Drawer';
 import { IconButton } from '@/elements/IconButton';
 import { Pagination } from '@/elements/Pagination';
-import { ProfileSection } from '@/elements/Section';
-import { useClipboard } from '@/hooks';
-import { Check, Copy, RotateLeftRight } from '@/icons';
+import { useClipboard, useSpinDelay } from '@/hooks';
+import { Checkmark, Copy, Link as LinkIcon, RotateLeftRight } from '@/icons';
 import { common, mqu } from '@/styledSystem';
 import { handleError } from '@/utils/errorHandler';
 
@@ -56,6 +56,7 @@ export const TestConfigurationStep = (): JSX.Element => {
     data: testRuns,
     totalCount,
     isLoading: areTestRunsLoading,
+    isFetching: areTestRunsFetching,
     isPolling,
     revalidate: revalidateTestRuns,
   } = __internal_useEnterpriseConnectionTestRuns({
@@ -63,6 +64,8 @@ export const TestConfigurationStep = (): JSX.Element => {
     params: { initialPage: currentPage, pageSize: TEST_RUNS_PAGE_SIZE },
   });
 
+  const isRefreshingTestRuns = areTestRunsFetching && !areTestRunsLoading;
+  const showRefreshLogsSpinner = useSpinDelay(isRefreshingTestRuns);
   const pageCount = totalCount ? Math.ceil(totalCount / TEST_RUNS_PAGE_SIZE) : 0;
 
   const handleTestRunCreated = () => {
@@ -76,10 +79,7 @@ export const TestConfigurationStep = (): JSX.Element => {
         elementDescriptor={descriptors.configureSSOStep}
         elementId={descriptors.configureSSOStep.setId('test')}
       >
-        <Step.Header
-          title={localizationKeys('configureSSO.testConfigurationStep.title')}
-          description={localizationKeys('configureSSO.testConfigurationStep.subtitle')}
-        />
+        <Step.Header title={localizationKeys('configureSSO.testConfigurationStep.title')} />
 
         <Step.Body>
           <Step.Section
@@ -89,73 +89,57 @@ export const TestConfigurationStep = (): JSX.Element => {
               borderBottomColor: theme.colors.$borderAlpha100,
             })}
           >
-            <ProfileSection.Root
-              title={localizationKeys('configureSSO.testConfigurationStep.testUrl.title')}
-              id='testSsoUrl'
-              centered={false}
-              sx={t => ({
-                borderTopWidth: 0,
-                paddingTop: 0,
-                paddingBottom: 0,
-                flexDirection: 'column-reverse',
-                gap: t.space.$1,
-              })}
-            >
+            <Col gap={3}>
               <Text
-                colorScheme='secondary'
-                localizationKey={localizationKeys('configureSSO.testConfigurationStep.testUrl.subtitle')}
+                as='p'
+                localizationKey={localizationKeys('configureSSO.testConfigurationStep.subtitle')}
               />
-              <ProfileSection.Item
-                id='testSsoUrl'
-                sx={{ paddingInlineStart: 0 }}
-              >
-                <Flex gap={2}>
-                  <CopyTestUrlButton onTestRunCreated={handleTestRunCreated} />
 
-                  <Button
-                    variant='bordered'
-                    colorScheme='secondary'
-                    size='xs'
-                    onClick={() => void revalidateTestRuns()}
-                    isDisabled={areTestRunsLoading}
-                    sx={t => ({ gap: t.space.$1x5 })}
-                  >
-                    <Icon
-                      icon={RotateLeftRight}
-                      size='sm'
-                      colorScheme='neutral'
-                    />
-                    <Text
-                      as='span'
-                      localizationKey={localizationKeys(
-                        'configureSSO.testConfigurationStep.testResults.actionLabel__refresh',
-                      )}
-                    />
-                  </Button>
-                </Flex>
-              </ProfileSection.Item>
-            </ProfileSection.Root>
+              <OpenTestUrlButton onTestRunCreated={handleTestRunCreated} />
+            </Col>
           </Step.Section>
 
-          <Step.Section sx={{ flex: 1, minHeight: 0 }}>
-            <ProfileSection.Root
-              title={localizationKeys('configureSSO.testConfigurationStep.testResults.title')}
-              id='testResults'
-              centered={false}
-              sx={t => ({
-                borderTopWidth: 0,
-                paddingTop: 0,
-                paddingBottom: 0,
-                flexDirection: 'column-reverse',
-                gap: t.space.$2,
-                flex: 1,
-                minHeight: 0,
-                '& > *:first-of-type': {
-                  flex: 1,
-                  minHeight: 0,
-                },
-              })}
+          <Step.Section sx={t => ({ flex: 1, minHeight: 0, gap: t.space.$3 })}>
+            <Flex
+              align='center'
+              justify='between'
+              sx={t => ({ gap: t.space.$2, flexShrink: 0 })}
             >
+              <Text
+                variant='subtitle'
+                localizationKey={localizationKeys('configureSSO.testConfigurationStep.testResults.title')}
+              />
+              <Button
+                elementDescriptor={descriptors.configureSSOTestRefreshButton}
+                variant='bordered'
+                colorScheme='secondary'
+                size='xs'
+                onClick={() => void revalidateTestRuns()}
+                isDisabled={showRefreshLogsSpinner}
+                sx={t => ({ gap: t.space.$1x5 })}
+              >
+                {showRefreshLogsSpinner ? (
+                  <Spinner
+                    elementDescriptor={descriptors.spinner}
+                    size='xs'
+                  />
+                ) : (
+                  <Icon
+                    icon={RotateLeftRight}
+                    size='sm'
+                    colorScheme='neutral'
+                  />
+                )}
+                <Text
+                  as='span'
+                  localizationKey={localizationKeys(
+                    'configureSSO.testConfigurationStep.testResults.actionLabel__refresh',
+                  )}
+                />
+              </Button>
+            </Flex>
+
+            <Col sx={{ flex: 1, minHeight: 0 }}>
               <TestResultsTable
                 rows={testRuns ?? []}
                 isPolling={isPolling}
@@ -165,14 +149,14 @@ export const TestConfigurationStep = (): JSX.Element => {
                 pageSize={TEST_RUNS_PAGE_SIZE}
                 totalCount={totalCount ?? 0}
                 onPageChange={setCurrentPage}
-                onTestRunCreated={handleTestRunCreated}
               />
-            </ProfileSection.Root>
+            </Col>
           </Step.Section>
         </Step.Body>
 
         {card.error ? (
           <Box
+            elementDescriptor={descriptors.configureSSOTestError}
             sx={t => ({
               flexShrink: 0,
               paddingInline: t.space.$5,
@@ -257,7 +241,6 @@ type TestResultsTableProps = {
   rows: EnterpriseConnectionTestRunResource[];
   isLoading: boolean;
   isPolling: boolean;
-  onTestRunCreated?: (testUrl: string) => void;
   page: number;
   pageCount: number;
   pageSize: number;
@@ -269,7 +252,6 @@ const TestResultsTable = ({
   rows,
   isLoading,
   isPolling,
-  onTestRunCreated,
   page,
   pageCount,
   pageSize,
@@ -304,6 +286,7 @@ const TestResultsTable = ({
         })}
       >
         <Table
+          elementDescriptor={descriptors.configureSSOTestResultsTable}
           tableHeadVisuallyHidden={!rows.length}
           sx={t => ({
             background: t.colors.$colorBackground,
@@ -344,7 +327,7 @@ const TestResultsTable = ({
                   >
                     <Spinner
                       colorScheme='primary'
-                      elementDescriptor={descriptors.spinner}
+                      elementDescriptor={descriptors.configureSSOTestResultsLoadingSpinner}
                     />
                     <Text
                       colorScheme='secondary'
@@ -361,11 +344,27 @@ const TestResultsTable = ({
               <Tr>
                 <Td colSpan={TEST_RESULTS_TABLE_COLUMN_COUNT}>
                   <Flex
+                    elementDescriptor={descriptors.configureSSOTestResultsEmpty}
+                    direction='col'
                     align='center'
                     justify='center'
-                    sx={t => ({ padding: `${t.space.$10} 0`, flex: 1 })}
+                    sx={t => ({
+                      padding: `${t.space.$10} 0`,
+                      flex: 1,
+                      gap: t.space.$1,
+                      textAlign: 'center',
+                    })}
                   >
-                    <CopyTestUrlButton onTestRunCreated={onTestRunCreated} />
+                    <Text
+                      variant='subtitle'
+                      localizationKey={localizationKeys('configureSSO.testConfigurationStep.testResults.empty.title')}
+                    />
+                    <Text
+                      colorScheme='secondary'
+                      localizationKey={localizationKeys(
+                        'configureSSO.testConfigurationStep.testResults.empty.subtitle',
+                      )}
+                    />
                   </Flex>
                 </Td>
               </Tr>
@@ -373,6 +372,7 @@ const TestResultsTable = ({
               rows.map(row => (
                 <Tr
                   key={row.id}
+                  elementDescriptor={descriptors.configureSSOTestResultsRow}
                   onClick={() => setSelectedTestRun(row)}
                   sx={t => ({
                     cursor: 'pointer',
@@ -560,6 +560,7 @@ const ParsedUserInfoSection = ({
 
   return (
     <Flex
+      elementDescriptor={descriptors.configureSSOTestRunParsedUserInfo}
       direction='col'
       gap={3}
       sx={t => ({
@@ -622,15 +623,17 @@ const FullMessageBlock = ({ message }: { message: string }): JSX.Element => {
           localizationKey={localizationKeys('configureSSO.testConfigurationStep.testRunDetails.runDetails.fullMessage')}
         />
         <IconButton
+          elementDescriptor={descriptors.configureSSOTestRunFullMessageCopyButton}
           variant='ghost'
           colorScheme='neutral'
           size='xs'
-          icon={hasCopied ? Check : Copy}
+          icon={hasCopied ? Checkmark : Copy}
           aria-label={copyLabel}
           onClick={() => onCopy()}
         />
       </Flex>
       <Box
+        elementDescriptor={descriptors.configureSSOTestRunFullMessage}
         as='pre'
         sx={t => ({
           margin: 0,
@@ -682,6 +685,8 @@ const TestRunStatusCell = ({ testRun }: { testRun: EnterpriseConnectionTestRunRe
   if (testRun.status === 'success') {
     return (
       <Badge
+        elementDescriptor={descriptors.configureSSOTestRunStatusBadge}
+        elementId={descriptors.configureSSOTestRunStatusBadge.setId('success')}
         colorScheme='success'
         localizationKey={localizationKeys('configureSSO.testConfigurationStep.testResults.status__success')}
       />
@@ -690,6 +695,8 @@ const TestRunStatusCell = ({ testRun }: { testRun: EnterpriseConnectionTestRunRe
   if (testRun.status === 'failed') {
     return (
       <Badge
+        elementDescriptor={descriptors.configureSSOTestRunStatusBadge}
+        elementId={descriptors.configureSSOTestRunStatusBadge.setId('failed')}
         colorScheme='danger'
         localizationKey={localizationKeys('configureSSO.testConfigurationStep.testResults.status__failed')}
       />
@@ -697,26 +704,26 @@ const TestRunStatusCell = ({ testRun }: { testRun: EnterpriseConnectionTestRunRe
   }
   return (
     <Badge
+      elementDescriptor={descriptors.configureSSOTestRunStatusBadge}
+      elementId={descriptors.configureSSOTestRunStatusBadge.setId('pending')}
       colorScheme='warning'
       localizationKey={localizationKeys('configureSSO.testConfigurationStep.testResults.status__pending')}
     />
   );
 };
 
-type CopyTestUrlButtonProps = {
+type OpenTestUrlButtonProps = {
   onTestRunCreated?: (testUrl: string) => void;
 };
 
-const CopyTestUrlButton = ({ onTestRunCreated }: CopyTestUrlButtonProps): JSX.Element => {
+const OpenTestUrlButton = ({ onTestRunCreated }: OpenTestUrlButtonProps): JSX.Element => {
   const { user } = useUser();
   const card = useCardState();
   const { enterpriseConnection } = useConfigureSSO();
 
-  const [testUrl, setTestUrl] = useState('');
   const [isCreatingTestRun, setIsCreatingTestRun] = useState(false);
-  const { onCopy, hasCopied } = useClipboard(testUrl);
 
-  const createTestRun = () => {
+  const openTestRun = () => {
     if (!user || !enterpriseConnection) {
       return;
     }
@@ -726,9 +733,10 @@ const CopyTestUrlButton = ({ onTestRunCreated }: CopyTestUrlButtonProps): JSX.El
     user
       .createEnterpriseConnectionTestRun(enterpriseConnection.id)
       .then(({ url }) => {
-        setTestUrl(url);
-        onCopy(url);
         onTestRunCreated?.(url);
+        // `noopener,noreferrer` so the IdP can't reach back into the dashboard
+        // via `window.opener` once it lands the SAML response.
+        window.open(url, '_blank', 'noopener,noreferrer');
       })
       .catch(err => handleError(err as Error, [], card.setError))
       .finally(() => setIsCreatingTestRun(false));
@@ -736,31 +744,30 @@ const CopyTestUrlButton = ({ onTestRunCreated }: CopyTestUrlButtonProps): JSX.El
 
   return (
     <Button
+      elementDescriptor={descriptors.configureSSOTestUrlOpenButton}
       id='testSsoUrl'
       variant='bordered'
       colorScheme='secondary'
       size='xs'
-      onClick={createTestRun}
+      onClick={openTestRun}
       isDisabled={isCreatingTestRun}
-      sx={t => ({
-        gap: t.space.$1x5,
-      })}
+      sx={t => ({ gap: t.space.$1x5, width: 'fit-content' })}
     >
       {isCreatingTestRun ? (
         <Spinner
           elementDescriptor={descriptors.spinner}
-          size='xs'
+          size='sm'
         />
       ) : (
         <Icon
-          icon={hasCopied ? Check : Copy}
+          icon={LinkIcon}
           size='sm'
           colorScheme='neutral'
         />
       )}
       <Text
         as='span'
-        localizationKey={localizationKeys('configureSSO.testConfigurationStep.testUrl.actionLabel__copy')}
+        localizationKey={localizationKeys('configureSSO.testConfigurationStep.testUrl.actionLabel__open')}
       />
     </Button>
   );

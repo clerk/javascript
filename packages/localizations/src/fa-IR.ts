@@ -185,8 +185,8 @@ export const faIR: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: 'برای دریافت مجوز مدیریت اتصالات سازمانی با مدیر سازمان خود تماس بگیرید.',
-      title: 'شما اجازه مدیریت اتصالات سازمانی را ندارید',
+      subtitle: 'برای ارتقای مجوزهای خود با مدیر سازمان تماس بگیرید.',
+      title: 'شما اجازه مدیریت ورود یکپارچه (SSO) را ندارید',
     },
     navbar: {
       title: 'پیکربندی ورود یکپارچه (SSO)',
@@ -194,10 +194,6 @@ export const faIR: LocalizationResource = {
     selectProviderStep: {
       title: 'ارائه‌دهنده را انتخاب کنید',
       subtitle: 'ارائه‌دهنده‌ای را که می‌خواهید SSO را برای آن راه‌اندازی کنید، انتخاب کنید.',
-      body: {
-        title: 'ارائه‌دهنده هویت خود را انتخاب کنید',
-        description: 'در ادامه شما را در فرآیند راه‌اندازی دقیق راهنمایی خواهیم کرد.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',
