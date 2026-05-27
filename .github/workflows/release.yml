@@ -42,7 +42,7 @@ jobs:
           GITHUB_CONTEXT: ${{ toJson(github) }}
 
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0
           show-progress: false
@@ -69,7 +69,7 @@ jobs:
 
       - name: Create Release PR
         id: changesets
-        uses: changesets/action@v1
+        uses: changesets/action@63a615b9cd06ba9a3e6d13796c7fbcb080a60a0b # v1
         with:
           commit: "ci(repo): Version packages"
           title: "ci(repo): Version packages"
@@ -84,7 +84,7 @@ jobs:
       - name: Trigger workflows on related repos
         if: steps.changesets.outputs.published == 'true'
         continue-on-error: true
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           result-encoding: string
           retries: 3
@@ -125,7 +125,7 @@ jobs:
       - name: Recover downstream notifications
         if: always() && steps.changesets.conclusion == 'failure'
         continue-on-error: true
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           result-encoding: string
           retries: 3
@@ -206,7 +206,7 @@ jobs:
       - name: Send commit log to Slack
         id: slack
         if: steps.changesets.outputs.published == 'true'
-        uses: slackapi/slack-github-action@v1.24.0
+        uses: slackapi/slack-github-action@e28cf165c92ffef168d23c5c9000cffc8a25e117 # v1.24.0
         with:
           payload: ${{ steps.notification.outputs.payload }}
         env:
@@ -215,7 +215,7 @@ jobs:
 
       - name: Notify Slack on failure
         if: ${{ always() && steps.changesets.outcome == 'failure' }}
-        uses: slackapi/slack-github-action@v1.24.0
+        uses: slackapi/slack-github-action@e28cf165c92ffef168d23c5c9000cffc8a25e117 # v1.24.0
         with:
           payload: |
             {
@@ -243,8 +243,9 @@ jobs:
       id-token: write
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
+          persist-credentials: false
           fetch-depth: 1
           fetch-tags: false
           filter: 'blob:none'
@@ -279,7 +280,7 @@ jobs:
       - name: Trigger workflows on related repos
         if: steps.publish.outcome == 'success'
         continue-on-error: true
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           result-encoding: string
           retries: 3
@@ -314,7 +315,7 @@ jobs:
 
       - name: Notify Slack on failure
         if: ${{ always() && steps.publish.outcome == 'failure' }}
-        uses: slackapi/slack-github-action@v1.24.0
+        uses: slackapi/slack-github-action@e28cf165c92ffef168d23c5c9000cffc8a25e117 # v1.24.0
         with:
           payload: |
             {
@@ -345,7 +346,7 @@ jobs:
 
     steps:
       - name: Limit action to Clerk members
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           result-encoding: string
           retries: 3
@@ -365,7 +366,7 @@ jobs:
             }
 
       - name: Validate PR source and freshness
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           result-encoding: string
           retries: 3
@@ -390,7 +391,7 @@ jobs:
             }
 
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           ref: refs/pull/${{ github.event.issue.number }}/head
           persist-credentials: false
@@ -412,7 +413,7 @@ jobs:
 
       - name: Extract snapshot name
         id: extract-snapshot-name
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           script: |
             const match = context.payload.comment.body.match(/!snapshot (.*)/)
@@ -440,7 +441,7 @@ jobs:
       - name: Package info
         if: steps.version-packages.outputs.success == '1'
         id: package-info
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           script: |
             const fs = require("fs");
@@ -467,14 +468,14 @@ jobs:
 
       - name: Update Comment
         if: steps.version-packages.outputs.success == '1'
-        uses: peter-evans/create-or-update-comment@v3.0.0
+        uses: peter-evans/create-or-update-comment@3383acd359705b10cb1eeef05c0e88c056ea4666 # v3.0.0
         with:
           comment-id: ${{ github.event.comment.id }}
           reactions: heart
 
       - name: Minimize previous snapshot comments
         if: steps.version-packages.outputs.success == '1'
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           script: |
             const { data: comments } = await github.rest.issues.listComments({
@@ -503,7 +504,7 @@ jobs:
 
       - name: Create snapshot release comment
         if: steps.version-packages.outputs.success == '1'
-        uses: peter-evans/create-or-update-comment@v3.0.0
+        uses: peter-evans/create-or-update-comment@3383acd359705b10cb1eeef05c0e88c056ea4666 # v3.0.0
         with:
           issue-number: ${{ github.event.issue.number }}
           body: |
@@ -532,8 +533,9 @@ jobs:
 
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
+          persist-credentials: false
           fetch-depth: 1
           fetch-tags: false
           filter: "blob:none"

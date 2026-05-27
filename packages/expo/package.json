@@ -1,6 +1,6 @@
 {
   "name": "@clerk/expo",
-  "version": "3.2.14",
+  "version": "3.2.16",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -136,7 +136,7 @@
   },
   "peerDependencies": {
     "@clerk/expo-passkeys": ">=0.0.6",
-    "expo": ">=53 <56",
+    "expo": ">=53 <57",
     "expo-apple-authentication": ">=7.0.0",
     "expo-auth-session": ">=5",
     "expo-constants": ">=12",
