@@ -63,7 +63,8 @@ export async function syncNativeSession(sessionId: string): Promise<void> {
  * - **Android**: clerk-android (Jetpack Compose) - https://github.com/clerk/clerk-android
  *
  * After authentication completes, the session is automatically synced with the JS SDK.
- * Use `useAuth()`, `useUser()`, or `useSession()` in a `useEffect` to react to state changes.
+ * Use `useAuth()`, `useUser()`, or `useSession()` to react to authentication
+ * state changes.
  *
  * @example
  * ```tsx
@@ -83,7 +84,7 @@ export async function syncNativeSession(sessionId: string): Promise<void> {
  *
  * @see {@link https://clerk.com/docs/components/authentication/sign-in} Clerk Sign-In Documentation
  */
-export function AuthView({ mode = 'signInOrUp', isDismissable = false }: AuthViewProps) {
+export function AuthView({ mode = 'signInOrUp', isDismissable = false, onDismiss }: AuthViewProps) {
   const authCompletedRef = useRef(false);
 
   const syncSession = useCallback(async (sessionId: string) => {
@@ -116,6 +117,11 @@ export function AuthView({ mode = 'signInOrUp', isDismissable = false }: AuthVie
       }
       const data: Record<string, any> = typeof rawData === 'string' ? JSON.parse(rawData) : rawData;
 
+      if (type === 'dismissed') {
+        onDismiss?.();
+        return;
+      }
+
       if (type === 'signInCompleted' || type === 'signUpCompleted') {
         const sessionId = data?.sessionId;
         if (sessionId) {
@@ -125,7 +131,7 @@ export function AuthView({ mode = 'signInOrUp', isDismissable = false }: AuthVie
         }
       }
     },
-    [syncSession],
+    [onDismiss, syncSession],
   );
 
   if (!isNativeSupported || !NativeClerkAuthView) {
