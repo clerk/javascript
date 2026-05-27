@@ -67,7 +67,7 @@ export function useSSO() {
      * Creates a redirect URL based on the application platform
      * It must be whitelisted, either via Clerk Dashboard, or BAPI, in order
      * to include the `rotating_token_nonce` on SSO callback
-     * @ref https://clerk.com/docs/reference/backend-api/tag/Redirect-URLs#operation/CreateRedirectURL
+     * @ref https://clerk.com/docs/reference/backend-api/tag/redirect-urls/POST/redirect_urls
      */
     const redirectUrl =
       startSSOFlowParams.redirectUrl ??
