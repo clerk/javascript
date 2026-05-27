@@ -251,16 +251,54 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
   );
 });
 
-const SimpleButton = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
-  const parsedProps: ButtonProps = { ...props, isDisabled: props.isDisabled || props.isLoading };
+// @ts-ignore — `as` widens the element. Existing callers without `as` keep
+// the `<button>` typing; passing `as='label'` switches to label semantics
+// (no `type`/`disabled`/preventDefault) so the wrapped input drives state.
+type SimpleButtonProps = ButtonProps & { as?: 'button' | 'label' };
 
-  const { loadingText, isDisabled, hoverAsFocus, children, onClick: onClickProp, ...rest } = filterProps(parsedProps);
+const SimpleButton = React.forwardRef<HTMLButtonElement | HTMLLabelElement, SimpleButtonProps>((props, ref) => {
+  const parsedProps: SimpleButtonProps = { ...props, isDisabled: props.isDisabled || props.isLoading };
+
+  const {
+    as: As = 'button',
+    loadingText,
+    isDisabled,
+    hoverAsFocus,
+    children,
+    onClick: onClickProp,
+    ...rest
+  } = filterProps(parsedProps) as SimpleButtonProps;
+
+  if (As === 'label') {
+    // Strip button-only props so the label doesn't receive `type`/`disabled`
+    // and clicks propagate naturally to the wrapped input.
+    const {
+      type: _type,
+      disabled: _disabled,
+      ...labelRest
+    } = rest as React.LabelHTMLAttributes<HTMLLabelElement> & {
+      type?: unknown;
+      disabled?: unknown;
+    };
+    return (
+      <label
+        {...applyDataStateProps(labelRest)}
+        onClick={onClickProp as unknown as React.MouseEventHandler<HTMLLabelElement>}
+        css={applyVariants(parsedProps)}
+        data-variant={props.variant || 'solid'}
+        data-color={props.colorScheme || 'primary'}
+        ref={ref as React.Ref<HTMLLabelElement>}
+      >
+        {children}
+      </label>
+    );
+  }
 
   const onClick: React.MouseEventHandler<HTMLButtonElement> = e => {
-    if (rest.type !== 'submit') {
+    if ((rest as React.ButtonHTMLAttributes<HTMLButtonElement>).type !== 'submit') {
       e.preventDefault();
     }
-    return onClickProp?.(e);
+    return (onClickProp as React.MouseEventHandler<HTMLButtonElement> | undefined)?.(e);
   };
 
   return (
@@ -275,7 +313,7 @@ const SimpleButton = React.forwardRef<HTMLButtonElement, ButtonProps>((props, re
       disabled={isDisabled}
       data-variant={props.variant || 'solid'}
       data-color={props.colorScheme || 'primary'}
-      ref={ref}
+      ref={ref as React.Ref<HTMLButtonElement>}
     >
       {children}
     </button>

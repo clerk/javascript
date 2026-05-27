@@ -4,13 +4,13 @@ import React from 'react';
 
 import type { LocalizationKey } from '@/customizables';
 import {
-  Box,
   Col,
   descriptors,
   Flow,
   Grid,
   localizationKeys,
   RadioInput,
+  SimpleButton,
   Span,
   Text,
   useLocalizations,
@@ -184,18 +184,13 @@ const ProviderCard = ({ name, value, iconId, label, checked, onChange }: Provide
   const labelText = t(label);
 
   return (
-    <Box
+    <SimpleButton
       as='label'
+      variant='outline'
       elementDescriptor={descriptors.configureSSOProviderCard}
       elementId={descriptors.configureSSOProviderCard.setId(value)}
       isActive={checked}
       sx={theme => ({
-        // Outline-button look (mirrors SimpleButton variant='outline' for visual continuity).
-        borderWidth: theme.borderWidths.$normal,
-        borderStyle: theme.borderStyles.$solid,
-        borderColor: theme.colors.$borderAlpha150,
-        borderRadius: theme.radii.$md,
-        color: theme.colors.$neutralAlpha600,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -203,10 +198,8 @@ const ProviderCard = ({ name, value, iconId, label, checked, onChange }: Provide
         gap: theme.space.$2,
         height: theme.sizes.$32,
         padding: theme.space.$1x5,
-        backgroundColor: theme.colors.$colorBackground,
-        cursor: 'pointer',
         position: 'relative',
-        '&:hover': { backgroundColor: theme.colors.$neutralAlpha50 },
+        cursor: 'pointer',
         '&:has(input:focus-visible)': {
           ...common.focusRingStyles(theme),
           borderColor: theme.colors.$borderAlpha300,
@@ -267,6 +260,6 @@ const ProviderCard = ({ name, value, iconId, label, checked, onChange }: Provide
       >
         {labelText}
       </Text>
-    </Box>
+    </SimpleButton>
   );
 };
