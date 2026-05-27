@@ -213,6 +213,8 @@ const ProviderCard = ({ name, value, iconId, label, checked, onChange }: Provide
       })}
     >
       <RadioInput
+        elementDescriptor={descriptors.configureSSOProviderCardRadio}
+        elementId={descriptors.configureSSOProviderCardRadio.setId(value)}
         name={name}
         value={value}
         checked={checked}
