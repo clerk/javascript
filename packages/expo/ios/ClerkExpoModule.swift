@@ -1,7 +1,7 @@
 // ClerkExpoModule - Native module for Clerk integration
-// This module provides the configure function and view presentation methods.
-// Views are presented as modal view controllers (not embedded views)
-// because the Clerk SDK (SPM) isn't accessible from CocoaPods.
+// This module provides the configure function, session sync, and native view bridges.
+// SwiftUI Clerk views are created by the app target through ClerkViewFactory because
+// the Clerk SDK (SPM) isn't accessible from the CocoaPods-backed React Native pod.
 
 import UIKit
 import React
@@ -11,7 +11,7 @@ public var clerkViewFactory: ClerkViewFactoryProtocol?
 
 // Protocol that the app target implements to provide Clerk views
 public protocol ClerkViewFactoryProtocol {
-  // Modal presentation (existing)
+  // Modal presentation helpers.
   func createAuthViewController(mode: String, dismissable: Bool, completion: @escaping (Result<[String: Any], Error>) -> Void) -> UIViewController?
   func createUserProfileViewController(dismissable: Bool, completion: @escaping (Result<[String: Any], Error>) -> Void) -> UIViewController?
 
@@ -219,12 +219,12 @@ class ClerkExpoModule: RCTEventEmitter {
 // MARK: - Inline View: ClerkAuthNativeView
 
 public class ClerkAuthNativeView: UIView {
+  private var hostingController: UIViewController?
   private var currentMode: String = "signInOrUp"
-  private var currentDismissable: Bool = true
+  private var currentDismissable: Bool = false
   private var hasInitialized: Bool = false
-  private var authEventSent: Bool = false
-  private var presentedAuthVC: UIViewController?
-  private var isInvalidated: Bool = false
+  private var didCompleteAuthentication: Bool = false
+  private var dismissalEventSent: Bool = false
 
   @objc var onAuthEvent: RCTBubblingEventBlock?
 
@@ -233,22 +233,16 @@ public class ClerkAuthNativeView: UIView {
       let newMode = (mode as String?) ?? "signInOrUp"
       guard newMode != currentMode else { return }
       currentMode = newMode
-      if hasInitialized {
-        dismissAuthModal()
-        presentAuthModal()
-      }
+      if hasInitialized { updateView() }
     }
   }
 
   @objc var isDismissable: NSNumber? {
     didSet {
-      let newDismissable = isDismissable?.boolValue ?? true
+      let newDismissable = isDismissable?.boolValue ?? false
       guard newDismissable != currentDismissable else { return }
       currentDismissable = newDismissable
-      if hasInitialized {
-        dismissAuthModal()
-        presentAuthModal()
-      }
+      if hasInitialized { updateView() }
     }
   }
 
@@ -264,114 +258,83 @@ public class ClerkAuthNativeView: UIView {
     super.didMoveToWindow()
     if window != nil && !hasInitialized {
       hasInitialized = true
-      presentAuthModal()
+      updateView()
+    } else if window == nil && hasInitialized && currentDismissable && !didCompleteAuthentication && !dismissalEventSent {
+      dismissalEventSent = true
+      sendAuthEvent(type: "dismissed", data: [:])
     }
-  }
-
-  override public func removeFromSuperview() {
-    isInvalidated = true
-    dismissAuthModal()
-    super.removeFromSuperview()
-  }
-
-  // MARK: - Modal Presentation
-  //
-  // The AuthView is presented as a real modal rather than embedded inline.
-  // Embedding a UIHostingController as a child of a React Native view disrupts
-  // ASWebAuthenticationSession callbacks during OAuth flows (e.g., SSO from the
-  // forgot-password screen). Modal presentation provides an isolated SwiftUI
-  // lifecycle that handles all OAuth flows correctly.
-
-  private func presentAuthModal() {
-    guard let factory = clerkViewFactory else { return }
-
-    guard let authVC = factory.createAuthViewController(
-      mode: currentMode,
-      dismissable: currentDismissable,
-      completion: { [weak self] result in
-        guard let self = self, !self.authEventSent else { return }
-        switch result {
-        case .success(let data):
-          if let _ = data["cancelled"] {
-            // User dismissed — don't send auth event
-            return
-          }
-          self.authEventSent = true
-          self.sendAuthEvent(type: "signInCompleted", data: data)
-        case .failure:
-          break
-        }
-      }
-    ) else { return }
-
-    authVC.modalPresentationStyle = .fullScreen
-    // Try to present immediately. Only wait if a previous modal is dismissing.
-    presentWhenReady(authVC, attempts: 0)
-  }
-
-  private func dismissAuthModal() {
-    presentedAuthVC?.dismiss(animated: false)
-    presentedAuthVC = nil
-  }
-
-  /// Presents the auth view controller as soon as it's safe to do so.
-  /// On initial mount this presents synchronously (no delay, no white flash).
-  /// If a previous modal is still dismissing, waits for its transition coordinator
-  /// to finish — no fixed delays.
-  private func presentWhenReady(_ authVC: UIViewController, attempts: Int) {
-    guard !isInvalidated, presentedAuthVC == nil, attempts < 30 else { return }
-    guard let rootVC = Self.topViewController() else {
-      DispatchQueue.main.async { [weak self] in
-        self?.presentWhenReady(authVC, attempts: attempts + 1)
-      }
-      return
-    }
-
-    // If a previous modal is animating dismissal, wait for it via the
-    // transition coordinator instead of a fixed delay.
-    if let coordinator = rootVC.transitionCoordinator {
-      coordinator.animate(alongsideTransition: nil) { [weak self] _ in
-        self?.presentWhenReady(authVC, attempts: attempts + 1)
-      }
-      return
-    }
-
-    // If there's still a presented VC (no coordinator yet), wait one frame.
-    if rootVC.presentedViewController != nil {
-      DispatchQueue.main.async { [weak self] in
-        self?.presentWhenReady(authVC, attempts: attempts + 1)
-      }
-      return
-    }
-
-    rootVC.present(authVC, animated: false)
-    presentedAuthVC = authVC
-  }
-
-  private static func topViewController() -> UIViewController? {
-    guard let scene = UIApplication.shared.connectedScenes
-      .compactMap({ $0 as? UIWindowScene })
-      .first(where: { $0.activationState == .foregroundActive }),
-      let rootVC = scene.windows.first(where: { $0.isKeyWindow })?.rootViewController
-    else { return nil }
-
-    var top = rootVC
-    while let presented = top.presentedViewController {
-      top = presented
-    }
-    return top
   }
 
   private func sendAuthEvent(type: String, data: [String: Any]) {
     let jsonData = (try? JSONSerialization.data(withJSONObject: data)) ?? Data()
     let jsonString = String(data: jsonData, encoding: .utf8) ?? "{}"
     onAuthEvent?(["type": type, "data": jsonString])
+  }
 
-    // Also emit module-level event so ClerkProvider's useNativeAuthEvents picks it up
-    if type == "signInCompleted" || type == "signUpCompleted" {
-      let sessionId = data["sessionId"] as? String
-      ClerkExpoModule.emitAuthStateChange(type: "signedIn", sessionId: sessionId)
+  private func updateView() {
+    detachHostingController()
+
+    guard let factory = clerkViewFactory else { return }
+
+    guard let returnedController = factory.createAuthView(
+      mode: currentMode,
+      dismissable: currentDismissable,
+      onEvent: { [weak self] eventName, data in
+        let didCompleteAuthentication = eventName == "signInCompleted" || eventName == "signUpCompleted"
+
+        if didCompleteAuthentication {
+          self?.didCompleteAuthentication = true
+        }
+
+        self?.sendAuthEvent(type: eventName, data: data)
+
+        if didCompleteAuthentication {
+          let sessionId = data["sessionId"] as? String
+          ClerkExpoModule.emitAuthStateChange(type: "signedIn", sessionId: sessionId)
+        }
+      }
+    ) else { return }
+
+    attachHostingController(returnedController)
+  }
+
+  private func attachHostingController(_ controller: UIViewController) {
+    controller.view.frame = bounds
+    controller.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+
+    if let parentVC = findViewController() {
+      parentVC.addChild(controller)
+      addSubview(controller.view)
+      controller.didMove(toParent: parentVC)
+    } else {
+      addSubview(controller.view)
     }
+
+    hostingController = controller
+  }
+
+  private func detachHostingController() {
+    guard let controller = hostingController else { return }
+    controller.willMove(toParent: nil)
+    controller.view.removeFromSuperview()
+    controller.removeFromParent()
+    hostingController = nil
+  }
+
+  private func findViewController() -> UIViewController? {
+    var responder: UIResponder? = self
+    while let nextResponder = responder?.next {
+      if let vc = nextResponder as? UIViewController {
+        return vc
+      }
+      responder = nextResponder
+    }
+    return nil
+  }
+
+  override public func layoutSubviews() {
+    super.layoutSubviews()
+    hostingController?.view.frame = bounds
   }
 }
 
