@@ -458,7 +458,7 @@ export class Session extends BaseResource implements SessionResource {
       // Only emit token updates when we have an actual token — emitting with an empty
       // token causes AuthCookieService to remove the __session cookie (looks like sign-out).
       if (shouldDispatchTokenUpdate && cachedToken.getRawString()) {
-        eventBus.emit(events.TokenUpdate, { token: cachedToken });
+        this.#dispatchTokenUpdate(cachedToken, shouldDispatchTokenUpdate);
       }
       result = cachedToken.getRawString() || null;
     } else if (!isBrowserOnline()) {
@@ -507,18 +507,27 @@ export class Session extends BaseResource implements SessionResource {
     });
   }
 
-  #dispatchTokenEvents(token: TokenResource, shouldDispatch: boolean): void {
+  #dispatchTokenUpdate(token: TokenResource, shouldDispatch: boolean): boolean {
     if (!shouldDispatch) {
-      return;
+      return false;
     }
 
     // Never dispatch empty tokens — this would cause AuthCookieService to remove
     // the __session cookie even though the user is still authenticated.
     if (!token.getRawString()) {
-      return;
+      return false;
     }
 
+    Session.clerk?.__internal_state?.__internal_setSessionToken(token);
     eventBus.emit(events.TokenUpdate, { token });
+    return true;
+  }
+
+  #dispatchTokenEvents(token: TokenResource, shouldDispatch: boolean): void {
+    const didDispatchTokenUpdate = this.#dispatchTokenUpdate(token, shouldDispatch);
+    if (!didDispatchTokenUpdate) {
+      return;
+    }
 
     if (token.jwt) {
       this.lastActiveToken = token;

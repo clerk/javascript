@@ -3393,6 +3393,7 @@ export class Clerk implements ClerkInterface {
     this.session = newSession;
     this.organization = organization;
     this.user = user;
+    this.__internal_state.__internal_setSessionToken(this.session?.lastActiveToken ?? null);
 
     if (!options?.dangerouslySkipEmit) {
       this.#emit();

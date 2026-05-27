@@ -197,6 +197,7 @@ describe('Clerk singleton', () => {
         await waitFor(() => {
           expect(mockSession.touch).not.toHaveBeenCalled();
           expect(eventBusSpy).toHaveBeenCalledWith('token:update', { token: null });
+          expect(sut.__internal_state.sessionTokenSignal()).toEqual({ isLoaded: true, token: null });
         });
       });
 
@@ -2719,6 +2720,39 @@ describe('Clerk singleton', () => {
       await waitFor(() => {
         expect(mockOnAfterSetActive).toHaveBeenCalledTimes(1);
       });
+    });
+
+    it('updates the active session token signal from the active session token', () => {
+      const mockSession = {
+        id: 'session_1',
+        status: 'active',
+        user: { id: 'user_1', organizationMemberships: [] },
+        lastActiveToken: { getRawString: () => 'token_1' },
+      };
+
+      const mockClient = {
+        sessions: [mockSession],
+        signedInSessions: [mockSession],
+        lastActiveSessionId: 'session_1',
+      };
+
+      const sut = new Clerk(productionPublishableKey);
+      sut.updateClient(mockClient as any);
+
+      expect(sut.__internal_state.sessionTokenSignal()).toEqual({ isLoaded: true, token: 'token_1' });
+    });
+
+    it('sets the active session token signal to null when there is no active session', () => {
+      const mockClient = {
+        sessions: [],
+        signedInSessions: [],
+        lastActiveSessionId: null,
+      };
+
+      const sut = new Clerk(productionPublishableKey);
+      sut.updateClient(mockClient as any);
+
+      expect(sut.__internal_state.sessionTokenSignal()).toEqual({ isLoaded: true, token: null });
     });
 
     it('does not emit to listeners when __internal_dangerouslySkipEmit is true', () => {
