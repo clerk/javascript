@@ -222,6 +222,7 @@ const ProviderCard = ({ name, value, iconId, label, checked, onChange }: Provide
           margin: 0,
           width: 'fit-content',
           boxShadow: 'none',
+          '&:hover': { boxShadow: 'none' },
         })}
       />
 
