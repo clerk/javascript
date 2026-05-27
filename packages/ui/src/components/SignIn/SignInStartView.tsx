@@ -20,6 +20,7 @@ import type { SignInStartViewConfig } from './useSignInStartFlow';
 export type SignInStartViewProps = {
   state: SignInStartState;
   dispatch: (event: SignInStartEvent) => void;
+  onSubmit: () => Promise<void>;
   config: SignInStartViewConfig;
   identifierField: FormControlState<'identifier'>;
   phoneIdentifierField: FormControlState<'identifier'>;
@@ -32,6 +33,7 @@ export type SignInStartViewProps = {
 export function SignInStartView({
   state,
   dispatch,
+  onSubmit,
   config,
   identifierField,
   phoneIdentifierField,
@@ -46,7 +48,7 @@ export function SignInStartView({
 
   const handleFirstPartySubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    dispatch({ type: 'SUBMIT' });
+    void onSubmit();
   };
 
   const onAlternativePhoneCodeProviderClick = (phoneCodeChannel: PhoneCodeChannel) => {

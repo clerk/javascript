@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
 import type { SignInStartConfig, SignInStartState, SubmitErrorResult } from '../signInStartMachine';
-import { initSignInStartState, signInStartReducer } from '../signInStartMachine';
+import {
+  classifySubmitError,
+  initSignInStartState,
+  routeSignInStatus,
+  signInStartReducer,
+} from '../signInStartMachine';
 
 const baseConfig: SignInStartConfig = {
   identifierAttributes: ['email_address'],
@@ -63,30 +68,6 @@ describe('signInStartMachine', () => {
     });
   });
 
-  describe('SET_IDENTIFIER', () => {
-    it('updates identifier value', () => {
-      const state = createState();
-      const { state: next, effects } = signInStartReducer(state, {
-        type: 'SET_IDENTIFIER',
-        value: 'user@example.com',
-      });
-      expect(next.identifierValue).toBe('user@example.com');
-      expect(effects).toEqual([]);
-    });
-  });
-
-  describe('SET_PASSWORD', () => {
-    it('updates password value', () => {
-      const state = createState();
-      const { state: next, effects } = signInStartReducer(state, {
-        type: 'SET_PASSWORD',
-        value: 'secret123',
-      });
-      expect(next.passwordValue).toBe('secret123');
-      expect(effects).toEqual([]);
-    });
-  });
-
   describe('SWITCH_IDENTIFIER', () => {
     it('cycles to next identifier attribute', () => {
       const state = createState({
@@ -96,7 +77,7 @@ describe('signInStartMachine', () => {
         },
         identifierAttribute: 'email_address',
       });
-      const { state: next } = signInStartReducer(state, { type: 'SWITCH_IDENTIFIER' });
+      const next = signInStartReducer(state, { type: 'SWITCH_IDENTIFIER' });
       expect(next.identifierAttribute).toBe('phone_number');
       expect(next.shouldAutofocus).toBe(true);
       expect(next.hasSwitchedByAutofill).toBe(false);
@@ -110,7 +91,7 @@ describe('signInStartMachine', () => {
         },
         identifierAttribute: 'phone_number',
       });
-      const { state: next } = signInStartReducer(state, { type: 'SWITCH_IDENTIFIER' });
+      const next = signInStartReducer(state, { type: 'SWITCH_IDENTIFIER' });
       expect(next.identifierAttribute).toBe('email_address');
     });
   });
@@ -124,20 +105,19 @@ describe('signInStartMachine', () => {
         },
         identifierAttribute: 'email_address',
       });
-      const { state: next } = signInStartReducer(state, {
+      const next = signInStartReducer(state, {
         type: 'AUTOFILL_PHONE_SWITCH',
-        value: '+1234567890',
+        identifierAttribute: 'phone_number',
       });
       expect(next.identifierAttribute).toBe('phone_number');
-      expect(next.identifierValue).toBe('+1234567890');
       expect(next.hasSwitchedByAutofill).toBe(true);
     });
 
     it('does not switch if phone_number is not in identifier attributes', () => {
       const state = createState({ identifierAttribute: 'email_address' });
-      const { state: next } = signInStartReducer(state, {
+      const next = signInStartReducer(state, {
         type: 'AUTOFILL_PHONE_SWITCH',
-        value: '+1234567890',
+        identifierAttribute: 'phone_number',
       });
       expect(next.identifierAttribute).toBe('email_address');
     });
@@ -151,9 +131,9 @@ describe('signInStartMachine', () => {
         identifierAttribute: 'email_address',
         hasSwitchedByAutofill: true,
       });
-      const { state: next } = signInStartReducer(state, {
+      const next = signInStartReducer(state, {
         type: 'AUTOFILL_PHONE_SWITCH',
-        value: '+1234567890',
+        identifierAttribute: 'phone_number',
       });
       expect(next.identifierAttribute).toBe('email_address');
     });
@@ -163,7 +143,7 @@ describe('signInStartMachine', () => {
     it('switches to alternative phone code screen', () => {
       const state = createState();
       const provider = { channel: 'whatsapp' as const, name: 'WhatsApp', iconUrl: '' };
-      const { state: next } = signInStartReducer(state, {
+      const next = signInStartReducer(state, {
         type: 'SELECT_ALT_PHONE_PROVIDER',
         provider: provider as any,
       });
@@ -176,7 +156,7 @@ describe('signInStartMachine', () => {
         screen: 'alternativePhoneCode',
         alternativePhoneCodeProvider: { channel: 'whatsapp' } as any,
       });
-      const { state: next } = signInStartReducer(state, { type: 'CLEAR_ALT_PHONE_PROVIDER' });
+      const next = signInStartReducer(state, { type: 'CLEAR_ALT_PHONE_PROVIDER' });
       expect(next.screen).toBe('form');
       expect(next.alternativePhoneCodeProvider).toBeNull();
     });
@@ -184,36 +164,17 @@ describe('signInStartMachine', () => {
 
   describe('SUBMIT', () => {
     it('sets isSubmitting and clears error', () => {
-      const state = createState({
-        identifierValue: 'user@example.com',
-        cardError: 'previous error',
-      });
-      const { state: next, effects } = signInStartReducer(state, { type: 'SUBMIT' });
+      const state = createState({ cardError: 'previous error' });
+      const next = signInStartReducer(state, { type: 'SUBMIT' });
       expect(next.isSubmitting).toBe(true);
       expect(next.cardError).toBeUndefined();
-      expect(effects).toHaveLength(1);
-      expect(effects[0].type).toBe('SIGN_IN_CREATE');
-    });
-
-    it('emits SIGN_IN_CREATE effect with identifier and password', () => {
-      const state = createState({
-        identifierValue: 'user@example.com',
-        passwordValue: 'secret123',
-      });
-      const { effects } = signInStartReducer(state, { type: 'SUBMIT' });
-      expect(effects[0]).toEqual({
-        type: 'SIGN_IN_CREATE',
-        identifier: 'user@example.com',
-        password: 'secret123',
-        alternativePhoneChannel: null,
-      });
     });
   });
 
   describe('SUBMIT_SUCCESS', () => {
-    it('navigates to factor-one when status is needs_first_factor', () => {
+    it('clears isSubmitting', () => {
       const state = createState({ isSubmitting: true });
-      const { state: next, effects } = signInStartReducer(state, {
+      const next = signInStartReducer(state, {
         type: 'SUBMIT_SUCCESS',
         result: {
           status: 'needs_first_factor',
@@ -224,223 +185,22 @@ describe('signInStartMachine', () => {
         },
       });
       expect(next.isSubmitting).toBe(false);
-      expect(effects).toEqual([{ type: 'NAVIGATE', to: 'factor-one' }]);
-    });
-
-    it('navigates to factor-two when status is needs_second_factor', () => {
-      const state = createState({ isSubmitting: true });
-      const { effects } = signInStartReducer(state, {
-        type: 'SUBMIT_SUCCESS',
-        result: {
-          status: 'needs_second_factor',
-          createdSessionId: null,
-          supportedFirstFactors: [],
-          hasOnlyEnterpriseSSO: false,
-          hasMultipleEnterpriseConnections: false,
-        },
-      });
-      expect(effects).toEqual([{ type: 'NAVIGATE', to: 'factor-two' }]);
-    });
-
-    it('navigates to client-trust when status is needs_client_trust', () => {
-      const state = createState({ isSubmitting: true });
-      const { effects } = signInStartReducer(state, {
-        type: 'SUBMIT_SUCCESS',
-        result: {
-          status: 'needs_client_trust',
-          createdSessionId: null,
-          supportedFirstFactors: [],
-          hasOnlyEnterpriseSSO: false,
-          hasMultipleEnterpriseConnections: false,
-        },
-      });
-      expect(effects).toEqual([{ type: 'NAVIGATE', to: 'client-trust' }]);
-    });
-
-    it('emits SET_ACTIVE when status is complete', () => {
-      const state = createState({ isSubmitting: true });
-      const { effects } = signInStartReducer(state, {
-        type: 'SUBMIT_SUCCESS',
-        result: {
-          status: 'complete',
-          createdSessionId: 'sess_123',
-          supportedFirstFactors: [],
-          hasOnlyEnterpriseSSO: false,
-          hasMultipleEnterpriseConnections: false,
-        },
-      });
-      expect(effects).toEqual([{ type: 'SET_ACTIVE', sessionId: 'sess_123' }]);
-    });
-
-    it('redirects to enterprise SSO when only enterprise SSO factors and single connection', () => {
-      const state = createState({ isSubmitting: true });
-      const { effects } = signInStartReducer(state, {
-        type: 'SUBMIT_SUCCESS',
-        result: {
-          status: 'needs_first_factor',
-          createdSessionId: null,
-          supportedFirstFactors: [],
-          hasOnlyEnterpriseSSO: true,
-          hasMultipleEnterpriseConnections: false,
-        },
-      });
-      expect(effects).toEqual([{ type: 'ENTERPRISE_SSO_REDIRECT' }]);
-    });
-
-    it('navigates to factor-one when multiple enterprise connections', () => {
-      const state = createState({ isSubmitting: true });
-      const { effects } = signInStartReducer(state, {
-        type: 'SUBMIT_SUCCESS',
-        result: {
-          status: 'needs_first_factor',
-          createdSessionId: null,
-          supportedFirstFactors: [],
-          hasOnlyEnterpriseSSO: true,
-          hasMultipleEnterpriseConnections: true,
-        },
-      });
-      expect(effects).toEqual([{ type: 'NAVIGATE', to: 'factor-one' }]);
-    });
-
-    it('emits ENTERPRISE_SSO_REDIRECT when status is needs_identifier with enterprise SSO factors', () => {
-      const state = createState({ isSubmitting: true });
-      const { effects } = signInStartReducer(state, {
-        type: 'SUBMIT_SUCCESS',
-        result: {
-          status: 'needs_identifier',
-          createdSessionId: null,
-          supportedFirstFactors: [{ strategy: 'enterprise_sso' }] as any,
-          hasOnlyEnterpriseSSO: false,
-          hasMultipleEnterpriseConnections: false,
-        },
-      });
-      expect(effects).toEqual([{ type: 'ENTERPRISE_SSO_REDIRECT' }]);
-    });
-  });
-
-  describe('SUBMIT_ERROR', () => {
-    it('retries without password on invalid strategy error', () => {
-      const state = createState({ identifierValue: 'user@example.com' });
-      const result: SubmitErrorResult = {
-        errors: [{ code: 'strategy_for_user_invalid', message: '', longMessage: '' }],
-        identifierType: 'email',
-        identifierValue: 'user@example.com',
-      };
-      const { effects } = signInStartReducer(state, { type: 'SUBMIT_ERROR', result });
-      expect(effects).toHaveLength(1);
-      expect(effects[0].type).toBe('SIGN_IN_CREATE_WITHOUT_PASSWORD');
-    });
-
-    it('sets active last session on session_exists error', () => {
-      const state = createState();
-      const result: SubmitErrorResult = {
-        errors: [{ code: 'session_exists', message: '', longMessage: '' }],
-        identifierType: 'email',
-        identifierValue: 'user@example.com',
-      };
-      const { effects } = signInStartReducer(state, { type: 'SUBMIT_ERROR', result });
-      expect(effects).toEqual([{ type: 'SET_ACTIVE_LAST_SESSION' }]);
-    });
-
-    it('sets active specific session on already_signed_in error', () => {
-      const state = createState();
-      const result: SubmitErrorResult = {
-        errors: [
-          {
-            code: 'identifier_already_signed_in',
-            message: '',
-            longMessage: '',
-            meta: { sessionId: 'sess_456' },
-          },
-        ],
-        identifierType: 'email',
-        identifierValue: 'user@example.com',
-      };
-      const { effects } = signInStartReducer(state, { type: 'SUBMIT_ERROR', result });
-      expect(effects).toEqual([{ type: 'SET_ACTIVE_SESSION', sessionId: 'sess_456' }]);
-    });
-
-    it('emits combined flow transfer when account does not exist in combined flow', () => {
-      const state = createState({
-        config: { ...baseConfig, isCombinedFlow: true },
-      });
-      const result: SubmitErrorResult = {
-        errors: [{ code: 'form_identifier_not_found', message: '', longMessage: '' }],
-        identifierType: 'email',
-        identifierValue: 'user@example.com',
-      };
-      const { effects } = signInStartReducer(state, { type: 'SUBMIT_ERROR', result });
-      expect(effects).toEqual([
-        { type: 'COMBINED_FLOW_TRANSFER', identifierType: 'email', identifierValue: 'user@example.com' },
-      ]);
-    });
-
-    it('does not emit combined flow transfer when not in combined flow', () => {
-      const state = createState();
-      const result: SubmitErrorResult = {
-        errors: [{ code: 'form_identifier_not_found', message: '', longMessage: '' }],
-        identifierType: 'email',
-        identifierValue: 'user@example.com',
-      };
-      const { effects } = signInStartReducer(state, { type: 'SUBMIT_ERROR', result });
-      expect(effects[0].type).toBe('HANDLE_FIELD_ERRORS');
-    });
-
-    it('falls through to HANDLE_FIELD_ERRORS for unknown errors', () => {
-      const state = createState();
-      const errors = [{ code: 'some_unknown_error', message: 'Oops', longMessage: '' }];
-      const result: SubmitErrorResult = {
-        errors: errors as any,
-        identifierType: 'email',
-        identifierValue: 'user@example.com',
-      };
-      const { effects } = signInStartReducer(state, { type: 'SUBMIT_ERROR', result });
-      expect(effects).toEqual([{ type: 'HANDLE_FIELD_ERRORS', errors }]);
-    });
-  });
-
-  describe('OAUTH_ERROR', () => {
-    it('sets known error on card', () => {
-      const error = { code: 'oauth_access_denied', message: 'Denied', longMessage: '' };
-      const state = createState();
-      const { state: next, effects } = signInStartReducer(state, {
-        type: 'OAUTH_ERROR',
-        error: error as any,
-      });
-      expect(next.cardError).toBe(error);
-      expect(effects).toEqual([{ type: 'RESET_SIGN_IN' }]);
-    });
-
-    it('sets generic error for unknown error codes', () => {
-      const error = { code: 'some_weird_error', message: 'Details', longMessage: '' };
-      const state = createState();
-      const { state: next, effects } = signInStartReducer(state, {
-        type: 'OAUTH_ERROR',
-        error: error as any,
-      });
-      expect(next.cardError).toBe(
-        'Unable to complete action at this time. If the problem persists please contact support.',
-      );
-      expect(effects).toEqual([{ type: 'RESET_SIGN_IN' }]);
     });
   });
 
   describe('TICKET_PROCESSING', () => {
-    it('sets loading state and emits ticket create effect', () => {
-      const state = createState({
-        config: { ...baseConfig, organizationTicket: 'test_ticket' },
-      });
-      const { state: next, effects } = signInStartReducer(state, { type: 'TICKET_PROCESSING' });
+    it('sets loading state', () => {
+      const state = createState();
+      const next = signInStartReducer(state, { type: 'TICKET_PROCESSING' });
       expect(next.screen).toBe('loading');
       expect(next.isSubmitting).toBe(true);
-      expect(effects).toEqual([{ type: 'SIGN_IN_CREATE_TICKET', ticket: 'test_ticket' }]);
     });
   });
 
   describe('TICKET_DONE', () => {
-    it('stays in loading state when redirecting to SSO', () => {
+    it('stays in current state when redirecting to SSO', () => {
       const state = createState({ screen: 'loading', isSubmitting: true });
-      const { state: next } = signInStartReducer(state, {
+      const next = signInStartReducer(state, {
         type: 'TICKET_DONE',
         isRedirectingToSSO: true,
       });
@@ -450,12 +210,188 @@ describe('signInStartMachine', () => {
 
     it('returns to form state when not redirecting', () => {
       const state = createState({ screen: 'loading', isSubmitting: true });
-      const { state: next } = signInStartReducer(state, {
+      const next = signInStartReducer(state, {
         type: 'TICKET_DONE',
         isRedirectingToSSO: false,
       });
       expect(next.screen).toBe('form');
       expect(next.isSubmitting).toBe(false);
     });
+  });
+
+  describe('OAUTH_ERROR', () => {
+    it('sets known error on card', () => {
+      const error = { code: 'oauth_access_denied', message: 'Denied', longMessage: '' };
+      const state = createState();
+      const next = signInStartReducer(state, {
+        type: 'OAUTH_ERROR',
+        error: error as any,
+      });
+      expect(next.cardError).toBe(error);
+    });
+
+    it('sets generic error for unknown error codes', () => {
+      const error = { code: 'some_weird_error', message: 'Details', longMessage: '' };
+      const state = createState();
+      const next = signInStartReducer(state, {
+        type: 'OAUTH_ERROR',
+        error: error as any,
+      });
+      expect(next.cardError).toBe(
+        'Unable to complete action at this time. If the problem persists please contact support.',
+      );
+    });
+  });
+});
+
+describe('routeSignInStatus', () => {
+  it('navigates to factor-one when status is needs_first_factor', () => {
+    const decision = routeSignInStatus({
+      status: 'needs_first_factor',
+      createdSessionId: null,
+      supportedFirstFactors: [],
+      hasOnlyEnterpriseSSO: false,
+      hasMultipleEnterpriseConnections: false,
+    });
+    expect(decision).toEqual({ action: 'navigate', to: 'factor-one' });
+  });
+
+  it('navigates to factor-two when status is needs_second_factor', () => {
+    const decision = routeSignInStatus({
+      status: 'needs_second_factor',
+      createdSessionId: null,
+      supportedFirstFactors: [],
+      hasOnlyEnterpriseSSO: false,
+      hasMultipleEnterpriseConnections: false,
+    });
+    expect(decision).toEqual({ action: 'navigate', to: 'factor-two' });
+  });
+
+  it('navigates to client-trust when status is needs_client_trust', () => {
+    const decision = routeSignInStatus({
+      status: 'needs_client_trust',
+      createdSessionId: null,
+      supportedFirstFactors: [],
+      hasOnlyEnterpriseSSO: false,
+      hasMultipleEnterpriseConnections: false,
+    });
+    expect(decision).toEqual({ action: 'navigate', to: 'client-trust' });
+  });
+
+  it('returns set_active when status is complete', () => {
+    const decision = routeSignInStatus({
+      status: 'complete',
+      createdSessionId: 'sess_123',
+      supportedFirstFactors: [],
+      hasOnlyEnterpriseSSO: false,
+      hasMultipleEnterpriseConnections: false,
+    });
+    expect(decision).toEqual({ action: 'set_active', sessionId: 'sess_123' });
+  });
+
+  it('redirects to enterprise SSO when only enterprise SSO factors and single connection', () => {
+    const decision = routeSignInStatus({
+      status: 'needs_first_factor',
+      createdSessionId: null,
+      supportedFirstFactors: [],
+      hasOnlyEnterpriseSSO: true,
+      hasMultipleEnterpriseConnections: false,
+    });
+    expect(decision).toEqual({ action: 'enterprise_sso_redirect' });
+  });
+
+  it('navigates to factor-one when multiple enterprise connections', () => {
+    const decision = routeSignInStatus({
+      status: 'needs_first_factor',
+      createdSessionId: null,
+      supportedFirstFactors: [],
+      hasOnlyEnterpriseSSO: true,
+      hasMultipleEnterpriseConnections: true,
+    });
+    expect(decision).toEqual({ action: 'navigate', to: 'factor-one' });
+  });
+
+  it('returns enterprise_sso_redirect when status is needs_identifier with enterprise SSO factors', () => {
+    const decision = routeSignInStatus({
+      status: 'needs_identifier',
+      createdSessionId: null,
+      supportedFirstFactors: [{ strategy: 'enterprise_sso' }] as any,
+      hasOnlyEnterpriseSSO: false,
+      hasMultipleEnterpriseConnections: false,
+    });
+    expect(decision).toEqual({ action: 'enterprise_sso_redirect' });
+  });
+
+  it('returns none for unknown status', () => {
+    const decision = routeSignInStatus({
+      status: 'unknown',
+      createdSessionId: null,
+      supportedFirstFactors: [],
+      hasOnlyEnterpriseSSO: false,
+      hasMultipleEnterpriseConnections: false,
+    });
+    expect(decision).toEqual({ action: 'none' });
+  });
+});
+
+describe('classifySubmitError', () => {
+  it('retries without password on invalid strategy error', () => {
+    const decision = classifySubmitError(
+      [{ code: 'strategy_for_user_invalid', message: '', longMessage: '' }],
+      false,
+      'email',
+      'user@example.com',
+    );
+    expect(decision).toEqual({ action: 'retry_without_password' });
+  });
+
+  it('sets active last session on session_exists error', () => {
+    const decision = classifySubmitError(
+      [{ code: 'session_exists', message: '', longMessage: '' }],
+      false,
+      'email',
+      'user@example.com',
+    );
+    expect(decision).toEqual({ action: 'set_active_last_session' });
+  });
+
+  it('sets active specific session on already_signed_in error', () => {
+    const decision = classifySubmitError(
+      [{ code: 'identifier_already_signed_in', message: '', longMessage: '', meta: { sessionId: 'sess_456' } }],
+      false,
+      'email',
+      'user@example.com',
+    );
+    expect(decision).toEqual({ action: 'set_active_session', sessionId: 'sess_456' });
+  });
+
+  it('emits combined flow transfer when account does not exist in combined flow', () => {
+    const decision = classifySubmitError(
+      [{ code: 'form_identifier_not_found', message: '', longMessage: '' }],
+      true,
+      'email',
+      'user@example.com',
+    );
+    expect(decision).toEqual({
+      action: 'combined_flow_transfer',
+      identifierType: 'email',
+      identifierValue: 'user@example.com',
+    });
+  });
+
+  it('does not emit combined flow transfer when not in combined flow', () => {
+    const decision = classifySubmitError(
+      [{ code: 'form_identifier_not_found', message: '', longMessage: '' }],
+      false,
+      'email',
+      'user@example.com',
+    );
+    expect(decision.action).toBe('handle_field_errors');
+  });
+
+  it('falls through to handle_field_errors for unknown errors', () => {
+    const errors = [{ code: 'some_unknown_error', message: 'Oops', longMessage: '' }];
+    const decision = classifySubmitError(errors as any, false, 'email', 'user@example.com');
+    expect(decision).toEqual({ action: 'handle_field_errors', errors });
   });
 });

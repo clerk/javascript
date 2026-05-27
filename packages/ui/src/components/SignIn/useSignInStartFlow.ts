@@ -20,8 +20,7 @@ import { useTotalEnabledAuthMethods } from '../../hooks/useTotalEnabledAuthMetho
 import { useRouter } from '../../router';
 import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
 import { hasMultipleEnterpriseConnections, useHandleAuthenticateWithPasskey } from './shared';
-import type { SignInStartEffect, SignInStartEvent, SignInStartState } from './signInStartMachine';
-import { initSignInStartState, signInStartReducer } from './signInStartMachine';
+import { classifySubmitError, initSignInStartState, routeSignInStatus, signInStartReducer } from './signInStartMachine';
 import {
   getPreferredAlternativePhoneChannel,
   getPreferredAlternativePhoneChannelForCombinedFlow,
@@ -121,11 +120,7 @@ export function useSignInStartFlow() {
     [],
   );
 
-  const [state, rawDispatch] = useReducer(
-    (s: SignInStartState, e: SignInStartEvent) => signInStartReducer(s, e).state,
-    config,
-    initSignInStartState,
-  );
+  const [state, dispatch] = useReducer(signInStartReducer, config, initSignInStartState);
 
   const stateRef = useRef(state);
   stateRef.current = state;
@@ -163,174 +158,25 @@ export function useSignInStartFlow() {
   const [webAuthnAutofillSupported, setWebAuthnAutofillSupported] = useState(false);
   const isWebSupported = isWebAuthnSupported();
 
-  // --- Effect executor ---
+  // --- Side-effect execution helpers ---
 
-  const executeEffect = useCallback(
-    async (effect: SignInStartEffect) => {
-      switch (effect.type) {
-        case 'SIGN_IN_CREATE': {
-          const fields: Array<FormControlState<string>> = [identifierField, instantPasswordField];
-          const preferredChannel =
-            stateRef.current.alternativePhoneCodeProvider?.channel ||
-            getPreferredAlternativePhoneChannel(fields, authConfig.preferredChannels, 'identifier');
-
-          if (preferredChannel) {
-            const noop = () => {};
-            fields.push({
-              id: 'strategy',
-              value: 'phone_code',
-              clearFeedback: noop,
-              setValue: noop,
-              onChange: noop,
-              setError: noop,
-            } as any);
-            fields.push({
-              id: 'channel',
-              value: preferredChannel,
-              clearFeedback: noop,
-              setValue: noop,
-              onChange: noop,
-              setError: noop,
-            } as any);
-          }
-
-          const hasPassword = fields.some(f => f.name === 'password' && !!f.value);
-          let filteredFields = [...fields];
-          if (!hasPassword || userSettings.enterpriseSSO.enabled) {
-            filteredFields = filteredFields.filter(f => f.name !== 'password');
-          }
-          const params = {
-            ...buildRequest(filteredFields),
-            ...(hasPassword && !userSettings.enterpriseSSO.enabled && { strategy: 'password' as const }),
-          };
-
-          try {
-            let res = await signIn.create(params as any);
-
-            if (userSettings.enterpriseSSO.enabled) {
-              const passwordField = fields.find(f => f.name === 'password')?.value;
-              if (passwordField && !res.supportedFirstFactors?.some(ff => ff.strategy === 'enterprise_sso')) {
-                res = await res.attemptFirstFactor({ strategy: 'password', password: passwordField });
-              }
-            }
-
-            dispatch({ type: 'SUBMIT_SUCCESS', result: extractResult(res) });
-          } catch (e: any) {
-            lastCaughtErrorRef.current = e;
-            dispatch({
-              type: 'SUBMIT_ERROR',
-              result: {
-                errors: e.errors || [],
-                identifierType: identifierField.type as 'tel' | 'text' | 'email',
-                identifierValue: identifierField.value,
-              },
-            });
-          }
+  const executeStatusRoute = useCallback(
+    (result: ReturnType<typeof extractResult>) => {
+      const decision = routeSignInStatus(result);
+      switch (decision.action) {
+        case 'navigate':
+          void navigate(decision.to);
           break;
-        }
-
-        case 'SIGN_IN_CREATE_WITHOUT_PASSWORD': {
-          const fields: Array<FormControlState<string>> = [identifierField];
-          const preferredChannel =
-            stateRef.current.alternativePhoneCodeProvider?.channel ||
-            getPreferredAlternativePhoneChannel(fields, authConfig.preferredChannels, 'identifier');
-
-          if (preferredChannel) {
-            const noop = () => {};
-            fields.push({
-              id: 'strategy',
-              value: 'phone_code',
-              clearFeedback: noop,
-              setValue: noop,
-              onChange: noop,
-              setError: noop,
-            } as any);
-            fields.push({
-              id: 'channel',
-              value: preferredChannel,
-              clearFeedback: noop,
-              setValue: noop,
-              onChange: noop,
-              setError: noop,
-            } as any);
-          }
-
-          try {
-            const res = await signIn.create(buildRequest(fields) as any);
-            dispatch({ type: 'SUBMIT_SUCCESS', result: extractResult(res) });
-          } catch (e: any) {
-            lastCaughtErrorRef.current = e;
-            dispatch({
-              type: 'SUBMIT_ERROR',
-              result: {
-                errors: e.errors || [],
-                identifierType: identifierField.type as 'tel' | 'text' | 'email',
-                identifierValue: identifierField.value,
-              },
-            });
-          }
-          break;
-        }
-
-        case 'SIGN_IN_CREATE_TICKET': {
-          try {
-            const res = await signIn.create({ strategy: 'ticket', ticket: effect.ticket });
-            dispatch({ type: 'TICKET_SUCCESS', result: extractResult(res) });
-          } catch (e: any) {
-            lastCaughtErrorRef.current = e;
-            dispatch({
-              type: 'TICKET_ERROR',
-              result: {
-                errors: e.errors || [],
-                identifierType: identifierField.type as 'tel' | 'text' | 'email',
-                identifierValue: identifierField.value,
-              },
-            });
-          } finally {
-            const isRedirectingToSSO = hasOnlyEnterpriseSSOFirstFactors(signIn);
-            dispatch({ type: 'TICKET_DONE', isRedirectingToSSO: !!isRedirectingToSSO });
-          }
-          break;
-        }
-
-        case 'NAVIGATE':
-          if (effect.searchParams) {
-            const params = new URLSearchParams(effect.searchParams);
-            void navigate(effect.to, { searchParams: params });
-          } else {
-            void navigate(effect.to);
-          }
-          break;
-
-        case 'SET_ACTIVE':
+        case 'set_active':
           removeClerkQueryParam('__clerk_ticket');
           void clerk.setActive({
-            session: effect.sessionId,
+            session: decision.sessionId,
             navigate: async ({ session, decorateUrl }) => {
               await ctx.navigateOnSetActive({ session, redirectUrl: ctx.afterSignInUrl, decorateUrl });
             },
           });
           break;
-
-        case 'SET_ACTIVE_LAST_SESSION':
-          void clerk.setActive({
-            session: clerk.client.lastActiveSessionId,
-            navigate: async ({ session, decorateUrl }) => {
-              await ctx.navigateOnSetActive({ session, redirectUrl: ctx.afterSignInUrl, decorateUrl });
-            },
-          });
-          break;
-
-        case 'SET_ACTIVE_SESSION':
-          void clerk.setActive({
-            session: effect.sessionId,
-            navigate: async ({ session, decorateUrl }) => {
-              await ctx.navigateOnSetActive({ session, redirectUrl: ctx.afterSignInUrl, decorateUrl });
-            },
-          });
-          break;
-
-        case 'ENTERPRISE_SSO_REDIRECT':
+        case 'enterprise_sso_redirect':
           void signIn.authenticateWithRedirect({
             strategy: 'enterprise_sso',
             redirectUrl: ctx.ssoCallbackUrl,
@@ -339,8 +185,42 @@ export function useSignInStartFlow() {
             continueSignIn: true,
           });
           break;
+        case 'none':
+          break;
+      }
+    },
+    [navigate, clerk, ctx, signIn],
+  );
 
-        case 'COMBINED_FLOW_TRANSFER': {
+  const executeSubmitErrorDecision = useCallback(
+    async (
+      errors: import('@clerk/shared/types').ClerkAPIError[],
+      identType: 'tel' | 'text' | 'email',
+      identValue: string,
+    ) => {
+      const decision = classifySubmitError(errors, stateRef.current.config.isCombinedFlow, identType, identValue);
+
+      switch (decision.action) {
+        case 'retry_without_password':
+          await handleSignInCreateWithoutPassword();
+          break;
+        case 'set_active_last_session':
+          void clerk.setActive({
+            session: clerk.client.lastActiveSessionId,
+            navigate: async ({ session, decorateUrl }) => {
+              await ctx.navigateOnSetActive({ session, redirectUrl: ctx.afterSignInUrl, decorateUrl });
+            },
+          });
+          break;
+        case 'set_active_session':
+          void clerk.setActive({
+            session: decision.sessionId,
+            navigate: async ({ session, decorateUrl }) => {
+              await ctx.navigateOnSetActive({ session, redirectUrl: ctx.afterSignInUrl, decorateUrl });
+            },
+          });
+          break;
+        case 'combined_flow_transfer': {
           const attribute = getSignUpAttributeFromIdentifier(identifierField);
           const identifierValue = identifierField.value;
 
@@ -378,41 +258,139 @@ export function useSignInStartFlow() {
           });
           break;
         }
-
-        case 'RESET_SIGN_IN':
-          void signIn.create({});
-          break;
-
-        case 'NAVIGATE_SIGN_UP': {
-          const params = effect.searchParams ? new URLSearchParams(effect.searchParams) : undefined;
-          void navigate(ctx.isCombinedFlow ? 'create' : ctx.signUpUrl, { searchParams: params });
-          break;
-        }
-
-        case 'HANDLE_FIELD_ERRORS':
+        case 'handle_field_errors':
           if (lastCaughtErrorRef.current) {
             handleError(lastCaughtErrorRef.current, [identifierField, instantPasswordField], card.setError);
             lastCaughtErrorRef.current = null;
           }
           break;
-
-        case 'PASSKEY_AUTOFILL':
-          break;
       }
     },
-    [signIn, clerk, navigate, ctx, userSettings, authConfig, identifierField, instantPasswordField, card],
+    [clerk, ctx, navigate, identifierField, instantPasswordField, card, userSettings, authConfig, organizationTicket],
   );
 
-  const dispatch = useCallback(
-    (event: SignInStartEvent) => {
-      const { effects } = signInStartReducer(stateRef.current, event);
-      rawDispatch(event);
+  // --- Async action handlers ---
 
-      for (const effect of effects) {
-        void executeEffect(effect);
+  const buildSignInCreateFields = useCallback(
+    (includePassword: boolean) => {
+      const fields: Array<FormControlState<string>> = includePassword
+        ? [identifierField, instantPasswordField]
+        : [identifierField];
+
+      const preferredChannel =
+        stateRef.current.alternativePhoneCodeProvider?.channel ||
+        getPreferredAlternativePhoneChannel(fields, authConfig.preferredChannels, 'identifier');
+
+      if (preferredChannel) {
+        const noop = () => {};
+        fields.push({
+          id: 'strategy',
+          value: 'phone_code',
+          clearFeedback: noop,
+          setValue: noop,
+          onChange: noop,
+          setError: noop,
+        } as any);
+        fields.push({
+          id: 'channel',
+          value: preferredChannel,
+          clearFeedback: noop,
+          setValue: noop,
+          onChange: noop,
+          setError: noop,
+        } as any);
       }
+
+      return fields;
     },
-    [executeEffect],
+    [identifierField, instantPasswordField, authConfig],
+  );
+
+  const handleSignInCreate = useCallback(async () => {
+    dispatch({ type: 'SUBMIT' });
+
+    const fields = buildSignInCreateFields(true);
+    const hasPassword = fields.some(f => f.name === 'password' && !!f.value);
+    let filteredFields = [...fields];
+    if (!hasPassword || userSettings.enterpriseSSO.enabled) {
+      filteredFields = filteredFields.filter(f => f.name !== 'password');
+    }
+    const params = {
+      ...buildRequest(filteredFields),
+      ...(hasPassword && !userSettings.enterpriseSSO.enabled && { strategy: 'password' as const }),
+    };
+
+    try {
+      let res = await signIn.create(params as any);
+
+      if (userSettings.enterpriseSSO.enabled) {
+        const passwordField = fields.find(f => f.name === 'password')?.value;
+        if (passwordField && !res.supportedFirstFactors?.some(ff => ff.strategy === 'enterprise_sso')) {
+          res = await res.attemptFirstFactor({ strategy: 'password', password: passwordField });
+        }
+      }
+
+      const result = extractResult(res);
+      dispatch({ type: 'SUBMIT_SUCCESS', result });
+      executeStatusRoute(result);
+    } catch (e: any) {
+      lastCaughtErrorRef.current = e;
+      dispatch({ type: 'SUBMIT_ERROR' });
+      await executeSubmitErrorDecision(
+        e.errors || [],
+        identifierField.type as 'tel' | 'text' | 'email',
+        identifierField.value,
+      );
+    }
+  }, [signIn, identifierField, buildSignInCreateFields, userSettings, executeStatusRoute, executeSubmitErrorDecision]);
+
+  const handleSignInCreateWithoutPassword = useCallback(async () => {
+    const fields = buildSignInCreateFields(false);
+
+    try {
+      const res = await signIn.create(buildRequest(fields) as any);
+      const result = extractResult(res);
+      dispatch({ type: 'SUBMIT_SUCCESS', result });
+      executeStatusRoute(result);
+    } catch (e: any) {
+      lastCaughtErrorRef.current = e;
+      dispatch({ type: 'SUBMIT_ERROR' });
+      await executeSubmitErrorDecision(
+        e.errors || [],
+        identifierField.type as 'tel' | 'text' | 'email',
+        identifierField.value,
+      );
+    }
+  }, [signIn, identifierField, buildSignInCreateFields, executeStatusRoute, executeSubmitErrorDecision]);
+
+  const handleTicketFlow = useCallback(async () => {
+    dispatch({ type: 'TICKET_PROCESSING' });
+
+    try {
+      const res = await signIn.create({ strategy: 'ticket', ticket: organizationTicket });
+      const result = extractResult(res);
+      dispatch({ type: 'TICKET_SUCCESS', result });
+      executeStatusRoute(result);
+    } catch (e: any) {
+      lastCaughtErrorRef.current = e;
+      dispatch({ type: 'TICKET_ERROR' });
+      await executeSubmitErrorDecision(
+        e.errors || [],
+        identifierField.type as 'tel' | 'text' | 'email',
+        identifierField.value,
+      );
+    } finally {
+      const isRedirectingToSSO = hasOnlyEnterpriseSSOFirstFactors(signIn);
+      dispatch({ type: 'TICKET_DONE', isRedirectingToSSO: !!isRedirectingToSSO });
+    }
+  }, [signIn, organizationTicket, identifierField, executeStatusRoute, executeSubmitErrorDecision]);
+
+  const handleOAuthError = useCallback(
+    (error: import('@clerk/shared/types').ClerkAPIError) => {
+      dispatch({ type: 'OAUTH_ERROR', error });
+      void signIn.create({});
+    },
+    [signIn],
   );
 
   // --- On mount: ticket flow ---
@@ -435,7 +413,7 @@ export function useSignInStartFlow() {
 
     loadingStatus.setLoading();
     card.setLoading();
-    dispatch({ type: 'TICKET_PROCESSING' });
+    void handleTicketFlow();
   }, []);
 
   // --- On mount: OAuth error recovery ---
@@ -443,7 +421,7 @@ export function useSignInStartFlow() {
   useEffect(() => {
     const error = signIn?.firstFactorVerification?.error;
     if (error) {
-      dispatch({ type: 'OAUTH_ERROR', error });
+      handleOAuthError(error);
     }
   }, []);
 
@@ -466,7 +444,7 @@ export function useSignInStartFlow() {
 
   useLayoutEffect(() => {
     if (identifierField.value.startsWith('+')) {
-      dispatch({ type: 'AUTOFILL_PHONE_SWITCH', value: identifierField.value });
+      dispatch({ type: 'AUTOFILL_PHONE_SWITCH', identifierAttribute: 'phone_number' });
     }
   }, [identifierField.value]);
 
@@ -535,6 +513,7 @@ export function useSignInStartFlow() {
   return {
     state,
     dispatch,
+    handleSignInCreate,
     viewConfig,
     identifierField,
     phoneIdentifierField,

@@ -81,6 +81,7 @@ function createProps(overrides?: Partial<SignInStartViewProps>): SignInStartView
   return {
     state: initSignInStartState(machineConfig),
     dispatch: vi.fn(),
+    onSubmit: vi.fn().mockResolvedValue(undefined),
     config: baseConfig,
     identifierField: stubFormControl('identifier'),
     phoneIdentifierField: stubFormControl('identifier'),

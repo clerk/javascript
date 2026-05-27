@@ -13,6 +13,7 @@ function SignInStartInternal(): JSX.Element {
   const {
     state,
     dispatch,
+    handleSignInCreate,
     viewConfig,
     identifierField,
     phoneIdentifierField,
@@ -24,6 +25,7 @@ function SignInStartInternal(): JSX.Element {
     <SignInStartView
       state={state}
       dispatch={dispatch}
+      onSubmit={handleSignInCreate}
       config={viewConfig}
       identifierField={identifierField}
       phoneIdentifierField={phoneIdentifierField}
