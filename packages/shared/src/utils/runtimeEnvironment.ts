@@ -16,7 +16,6 @@ export const automatedEnvironmentVariables = [
   'JENKINS_URL',
   'HUDSON_URL',
   'BAMBOO_BUILDKEY',
-  'NOW_BUILDER',
   'CF_PAGES',
 ] as const;
 

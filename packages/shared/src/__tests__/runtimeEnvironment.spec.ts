@@ -38,10 +38,10 @@ describe('isAutomatedEnvironment', () => {
     expect(isAutomatedEnvironment()).toBe(true);
   });
 
-  it('detects build-only hosted provider variables', () => {
+  it('does not treat presence-sensitive build tool variables as automation signals', () => {
     vi.stubEnv('NOW_BUILDER', '1');
 
-    expect(isAutomatedEnvironment()).toBe(true);
+    expect(isAutomatedEnvironment()).toBe(false);
   });
 
   it('does not treat interactive development host variables as automation signals', () => {
