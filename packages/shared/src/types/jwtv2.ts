@@ -25,6 +25,8 @@ export interface JwtHeader {
   'x5t#S256'?: string;
   x5t?: string;
   x5c?: string | string[];
+  /** @internal - used by Session Minter for monotonic token freshness checks. Do not depend on this field. */
+  oiat?: number;
 }
 
 declare global {
