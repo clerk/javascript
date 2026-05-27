@@ -1,6 +1,6 @@
 import {
-  __internal_useEnterpriseConnectionTestRuns,
-  __internal_useUserEnterpriseConnections,
+  __internal_useOrganizationEnterpriseConnections,
+  __internal_useOrganizationEnterpriseConnectionTestRuns,
   useSession,
 } from '@clerk/shared/react';
 import type { ConfigureSSOProps, EnterpriseConnectionResource } from '@clerk/shared/types';
@@ -56,7 +56,7 @@ export const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObjec
     createEnterpriseConnection,
     updateEnterpriseConnection,
     deleteEnterpriseConnection,
-  } = __internal_useUserEnterpriseConnections({ enabled: true });
+  } = __internal_useOrganizationEnterpriseConnections({ enabled: true });
   // Currently FAPI only supports one enterprise connection per user
   const enterpriseConnection = enterpriseConnections?.[0];
 
@@ -222,7 +222,7 @@ const ResetCardErrorOnStepChange = (): null => {
 const useHasSuccessfulTestRun = (
   enterpriseConnection: EnterpriseConnectionResource | undefined,
 ): { hasSuccessfulTestRun: boolean; isLoading: boolean } => {
-  const { data: successfulTestRuns, isLoading } = __internal_useEnterpriseConnectionTestRuns({
+  const { data: successfulTestRuns, isLoading } = __internal_useOrganizationEnterpriseConnectionTestRuns({
     enterpriseConnectionId: enterpriseConnection?.id ?? null,
     params: { initialPage: 1, pageSize: 1, status: ['success'] },
   });
