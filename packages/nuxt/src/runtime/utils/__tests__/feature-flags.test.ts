@@ -32,7 +32,8 @@ async function loadCanUseKeyless() {
 describe('canUseKeyless', () => {
   beforeEach(() => {
     vi.stubEnv('NODE_ENV', 'development');
-    vi.stubEnv('NEXT_PUBLIC_CLERK_KEYLESS_DISABLED', undefined);
+    vi.stubEnv('NUXT_PUBLIC_CLERK_KEYLESS_DISABLED', undefined);
+    vi.stubEnv('CLERK_KEYLESS_DISABLED', undefined);
     automatedEnvironmentVariables.forEach(name => {
       vi.stubEnv(name, undefined);
       vi.stubGlobal(name, undefined);

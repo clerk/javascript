@@ -10,7 +10,8 @@ const KEYLESS_DISABLED =
 
 /**
  * Whether keyless mode can be used in the current environment.
- * Keyless mode is only available in development and when not explicitly disabled.
+ * Keyless mode is only available in development, when not explicitly disabled,
+ * and when not running in an automated/CI environment.
  *
  * To disable keyless mode, set either:
  * - `VITE_CLERK_KEYLESS_DISABLED=1` (for Vite-based projects)
