@@ -189,23 +189,26 @@ const ProviderCard = ({ name, value, iconId, label, checked, onChange }: Provide
       elementDescriptor={descriptors.configureSSOProviderCard}
       elementId={descriptors.configureSSOProviderCard.setId(value)}
       isActive={checked}
-      sx={theme => ({
-        ...common.outlineButtonStyles(theme),
+      sx={t => ({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: theme.space.$2,
-        height: theme.sizes.$32,
-        padding: theme.space.$1x5,
+        gap: t.space.$2,
+        height: t.sizes.$32,
+        padding: t.space.$1x5,
         cursor: 'pointer',
         position: 'relative',
+        ...common.borderVariants(t).normal,
         '&:has(input:focus-visible)': {
-          ...common.focusRingStyles(theme),
-          borderColor: theme.colors.$borderAlpha300,
+          ...common.focusRingStyles(t),
+          borderColor: t.colors.$borderAlpha300,
+        },
+        '&:hover': {
+          backgroundColor: t.colors.$neutralAlpha50,
         },
         '&:has(input:checked)': {
-          backgroundColor: theme.colors.$neutralAlpha50,
+          backgroundColor: t.colors.$neutralAlpha50,
         },
       })}
     >
