@@ -1,5 +1,21 @@
 # Change Log
 
+## 5.125.12
+
+### Patch Changes
+
+- Skip `expired_token` retry flow when Session Minter is enabled. When `sessionMinter` is on, the token is sent in the POST body, so the retry-with-expired-token fallback is unnecessary. The retry flow is preserved for non-Session Minter mode. ([#8643](https://github.com/clerk/javascript/pull/8643)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Send `force_origin=true` body param on `/tokens` requests when `skipCache` is true, so FAPI Proxy routes to origin instead of Session Minter. ([#8643](https://github.com/clerk/javascript/pull/8643)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Add monotonic token replacement based on `oiat` to prevent edge-minted tokens with stale claims from overwriting fresher DB-minted tokens in multi-tab scenarios. ([#8643](https://github.com/clerk/javascript/pull/8643)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Send previous session token on `/tokens` requests to support Session Minter edge token minting. ([#8643](https://github.com/clerk/javascript/pull/8643)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`9d421ef`](https://github.com/clerk/javascript/commit/9d421efdd30df629daa8a61ad2ac9dd04e16242c), [`9d421ef`](https://github.com/clerk/javascript/commit/9d421efdd30df629daa8a61ad2ac9dd04e16242c)]:
+  - @clerk/shared@3.47.7
+  - @clerk/localizations@3.37.7
+
 ## 5.125.11
 
 ### Patch Changes
