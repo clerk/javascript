@@ -23,7 +23,7 @@ echo "==> Running all non-manual flows on Android..."
 ALL_FLOWS=()
 while IFS= read -r f; do
   ALL_FLOWS+=("$f")
-done < <(find "$FLOWS_DIR" -type f -name "*.yaml" ! -path "*/common/*")
+done < <(find "$FLOWS_DIR" -type f -name "*.yaml" ! -path "*/common/*" ! -path "*/native-side/*")
 
 # Maestro's --exclude-tags is a no-op when explicit file paths are passed,
 # so pre-filter the list ourselves before handing it off.

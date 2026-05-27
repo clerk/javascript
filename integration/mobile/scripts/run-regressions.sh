@@ -9,10 +9,12 @@ PLATFORM="${1:-both}"
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/lib/filter-flows.sh"
 
+# Note: google-sso-from-forgot-password and sign-in-sign-out-sign-in were moved
+# to flows/native-side/ (they primarily exercise native auth UI, which the
+# clerk-ios/clerk-android suites own). They no longer run as part of the Expo
+# regression set. See flows/native-side/README.md.
 REGRESSION_FLOWS=(
-  "$FLOWS_DIR/sign-in/google-sso-from-forgot-password.yaml"
   "$FLOWS_DIR/sign-in/get-help-loop-regression.yaml"
-  "$FLOWS_DIR/cycles/sign-in-sign-out-sign-in.yaml"
   "$FLOWS_DIR/theming/custom-theme-applied.yaml"
   "$FLOWS_DIR/smoke/cold-launch-no-flash.yaml"
 )
