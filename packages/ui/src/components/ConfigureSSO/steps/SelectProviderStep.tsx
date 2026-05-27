@@ -106,7 +106,7 @@ export const SelectProviderStep = (): JSX.Element => {
                 key={group.id}
                 elementDescriptor={descriptors.configureSSOProviderGroup}
                 elementId={descriptors.configureSSOProviderGroup.setId(group.id)}
-                sx={theme => ({ gap: theme.space.$3 })}
+                gap={3}
               >
                 <Text
                   elementDescriptor={descriptors.configureSSOProviderGroupLabel}
@@ -207,15 +207,12 @@ const ProviderCard = ({ name, value, iconId, label, checked, onChange }: Provide
         cursor: 'pointer',
         position: 'relative',
         '&:hover': { backgroundColor: theme.colors.$neutralAlpha50 },
-        // Keyboard focus indication — fires when the inner input is focused.
         '&:has(input:focus-visible)': {
           ...common.focusRingStyles(theme),
           borderColor: theme.colors.$borderAlpha300,
         },
-        // Selected ring — CSS-driven via :checked so it survives focus changes.
         '&:has(input:checked)': {
-          borderColor: theme.colors.$borderAlpha300,
-          ...common.focusRingStyles(theme),
+          backgroundColor: theme.colors.$neutralAlpha50,
         },
       })}
     >
