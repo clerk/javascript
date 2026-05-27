@@ -1,5 +1,13 @@
 # Change Log
 
+## 3.47.7
+
+### Patch Changes
+
+- Add `oiat` (original_issued_at) field to `JwtHeader` type for Session Minter monotonic token freshness checks. ([#8643](https://github.com/clerk/javascript/pull/8643)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Send previous session token on `/tokens` requests to support Session Minter edge token minting. ([#8643](https://github.com/clerk/javascript/pull/8643)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 3.47.6
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # @clerk/testing
 
+## 1.14.8
+
+### Patch Changes
+
+- Updated dependencies [[`9d421ef`](https://github.com/clerk/javascript/commit/9d421efdd30df629daa8a61ad2ac9dd04e16242c), [`9d421ef`](https://github.com/clerk/javascript/commit/9d421efdd30df629daa8a61ad2ac9dd04e16242c)]:
+  - @clerk/shared@3.47.7
+  - @clerk/backend@2.33.5
+  - @clerk/types@4.101.25
+
 ## 1.14.7
 
 ### Patch Changes
