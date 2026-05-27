@@ -141,7 +141,7 @@ export const plPL: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -179,8 +179,46 @@ export const plPL: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'Skontaktuj się z administratorem swojej organizacji, aby rozszerzyć swoje uprawnienia.',
+      title: 'Nie masz uprawnień do zarządzania logowaniem jednokrotnym (SSO)',
+    },
     navbar: {
       title: 'Skonfiguruj logowanie jednokrotne (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Wybierz dostawcę',
+      subtitle: 'Wybierz dostawcę, dla którego skonfigurujesz SSO.',
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Niestandardowy dostawca SAML',
+      },
+      warning: 'Po wybraniu dostawcy nie można go ponownie zmienić aż do zakończenia konfiguracji',
+    },
+    verifyEmailDomainStep: {
+      title: 'Zweryfikuj adres e-mail',
+      subtitle: 'Zweryfikuj adres e-mail, na którym chcesz włączyć połączenie firmowe.',
+      addEmailAddress: {
+        formTitle: 'Potrzebujemy Twojego e-maila',
+        formSubtitle: 'Aby rozpocząć, potrzebujemy Twojego adresu e-mail',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'Adres e-mail',
+      },
+      emailCode: {
+        formTitle: 'Zweryfikuj swój adres e-mail',
+        formSubtitle: 'Wprowadź kod weryfikacyjny wysłany na adres {{identifier}}',
+        resendButton: 'Nie otrzymałeś kodu? Wyślij ponownie',
+        verified: {
+          title: 'Otrzymaliśmy Twój e-mail',
+          subtitle: 'Zweryfikowałeś swój adres e-mail za pomocą następującego e-maila',
+          inputLabel: 'Zweryfikowany adres e-mail',
+        },
+      },
+      domainTaken: {
+        title: 'Ta domena ({{domain}}) ma już połączenie SSO',
+        subtitle: 'Skontaktuj się z administratorem aplikacji, aby uzyskać dostęp przez istniejące połączenie.',
+      },
     },
   },
   createOrganization: {

@@ -1,5 +1,84 @@
 # Change Log
 
+## 6.7.1
+
+### Patch Changes
+
+- Updated dependencies [[`a036ce8`](https://github.com/clerk/javascript/commit/a036ce8fef3b3ee2b49fd05d592b083ffc37f463)]:
+  - @clerk/shared@4.13.1
+
+## 6.7.0
+
+### Minor Changes
+
+- Remove `<ConfigureSSO />` from experimental path ([#8588](https://github.com/clerk/javascript/pull/8588)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Updated dependencies [[`6eaf4d6`](https://github.com/clerk/javascript/commit/6eaf4d66fe0b21fb96a5cd19d61e6c3b2302ff97), [`1aab31e`](https://github.com/clerk/javascript/commit/1aab31e5070b7223402ff71f65a0d829bbc29cfd)]:
+  - @clerk/shared@4.13.0
+
+## 6.6.6
+
+### Patch Changes
+
+- Updated dependencies [[`95f6c2f`](https://github.com/clerk/javascript/commit/95f6c2f8b7154b11dc64c864dcd994baab637c70)]:
+  - @clerk/shared@4.12.2
+
+## 6.6.5
+
+### Patch Changes
+
+- Updated dependencies [[`4fc38a0`](https://github.com/clerk/javascript/commit/4fc38a097cb9ed1d37c9c3faa274e5c44e405c68)]:
+  - @clerk/shared@4.12.1
+
+## 6.6.4
+
+### Patch Changes
+
+- Allow unstyled button components to accept a single React element passed as an array. ([#8556](https://github.com/clerk/javascript/pull/8556)) by [@jescalan](https://github.com/jescalan)
+
+- Updated dependencies [[`9fa6642`](https://github.com/clerk/javascript/commit/9fa6642de6a734faf532ca70c411431c5d0d2bbb), [`930047f`](https://github.com/clerk/javascript/commit/930047f3ea9b603a7f254f7764c3dc5e0fa7c769), [`b45777c`](https://github.com/clerk/javascript/commit/b45777c5723b01b8c7ee3d37b712c639067b36ab), [`5a7225e`](https://github.com/clerk/javascript/commit/5a7225ef119edf551e20bdce8af465b42981c8f2)]:
+  - @clerk/shared@4.12.0
+
+## 6.6.3
+
+### Patch Changes
+
+- Updated dependencies [[`1a4d7d1`](https://github.com/clerk/javascript/commit/1a4d7d1c711c25f4f83c0773616b799df2feb010), [`a6916b1`](https://github.com/clerk/javascript/commit/a6916b15658625a0e627c474a62212a65868bfb6), [`1084180`](https://github.com/clerk/javascript/commit/1084180797722ff113df8404a3c967bc6abeb12d), [`39099b6`](https://github.com/clerk/javascript/commit/39099b62308fc9b0ebbb25988c0ae4b655efe744), [`18e0a1a`](https://github.com/clerk/javascript/commit/18e0a1aa48e7f65a6610ec3c6ffe105deb3474b2)]:
+  - @clerk/shared@4.11.0
+
+## 6.6.2
+
+### Patch Changes
+
+- Updated dependencies [[`5cda3ee`](https://github.com/clerk/javascript/commit/5cda3ee8451cc9af375895824d24a5c3ed7fbee6)]:
+  - @clerk/shared@4.10.2
+
+## 6.6.1
+
+### Patch Changes
+
+- Updated dependencies [[`7a5892f`](https://github.com/clerk/javascript/commit/7a5892f9bcaa1a6212e6e6d3741160929ffd027e)]:
+  - @clerk/shared@4.10.1
+
+## 6.6.0
+
+### Minor Changes
+
+- Add experimental `<ConfigureSSO />` component. Not ready for usage yet. ([#8427](https://github.com/clerk/javascript/pull/8427)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Move ownership of the clerk-rq `QueryClient` from `@clerk/clerk-js` into `@clerk/shared`. The `QueryObserver` (constructed in `@clerk/shared`) and the `Query` objects it observes now always come from a single `@tanstack/query-core` resolution — the cross-bundle API contract that produced #8428 (`Query.isFetched is not a function`) no longer exists. ([#8434](https://github.com/clerk/javascript/pull/8434)) by [@jacekradko](https://github.com/jacekradko)
+
+  This removes the undocumented `clerk.__internal_queryClient` getter from both `@clerk/clerk-js` and `@clerk/react`'s `IsomorphicClerk`. The `QueryClient` is owned by an internal singleton in `@clerk/shared`, lazily instantiated on the browser only — server renders return `undefined`, preserving SSR safety and avoiding cross-request cache sharing.
+
+  `@tanstack/query-core` is no longer a direct dependency of `@clerk/clerk-js`; it remains a dep of `@clerk/shared` and resolves consumer-side as before.
+
+- Updated dependencies [[`9e9230c`](https://github.com/clerk/javascript/commit/9e9230c8c3cbdb1c253ca7cdd24cc8d681b5ee5a), [`68d32df`](https://github.com/clerk/javascript/commit/68d32dfcc453080ef93edf69be8de765a342d88c), [`1c27d4d`](https://github.com/clerk/javascript/commit/1c27d4dd41a27cf41c3823306fe88e026fed08fb), [`1001193`](https://github.com/clerk/javascript/commit/10011936981fc22bf7d3750f1591f0873ea78bcb)]:
+  - @clerk/shared@4.10.0
+
 ## 6.5.0
 
 ### Minor Changes

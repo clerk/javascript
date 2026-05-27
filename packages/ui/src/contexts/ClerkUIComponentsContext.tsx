@@ -1,7 +1,7 @@
 import type {
-  OAuthConsentProps,
-  __experimental_ConfigureSSOProps,
   APIKeysProps,
+  ConfigureSSOProps,
+  OAuthConsentProps,
   PricingTableProps,
   TaskChooseOrganizationProps,
   TaskResetPasswordProps,
@@ -118,7 +118,7 @@ export function ComponentContextProvider({
       );
     case 'ConfigureSSO':
       return (
-        <ConfigureSSOContext.Provider value={{ componentName, ...(props as __experimental_ConfigureSSOProps) }}>
+        <ConfigureSSOContext.Provider value={{ componentName, ...(props as ConfigureSSOProps) }}>
           {children}
         </ConfigureSSOContext.Provider>
       );
@@ -142,7 +142,6 @@ export function ComponentContextProvider({
             onAllow: p.onAllow,
             onDeny: p.onDeny,
             appearance: p.appearance,
-            enableOrgSelection: (p as any).__internal_enableOrgSelection === true,
           }}
         >
           {children}

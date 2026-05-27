@@ -154,7 +154,7 @@ export const hrHR: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Načini plaćanja',
-    popular: 'Popularno',
+    highlightedPlanBadge: 'Popularno',
     pricingTable: {
       billingCycle: 'Obračunsko razdoblje',
       included: 'Uključeno',
@@ -208,8 +208,46 @@ export const hrHR: LocalizationResource = {
     yearPerUnit: 'Godina po {{unitName}}',
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'Obratite se administratoru vaše organizacije kako biste nadogradili svoja dopuštenja.',
+      title: 'Nemate dopuštenje za upravljanje jedinstvenom prijavom (SSO)',
+    },
     navbar: {
       title: 'Konfiguriraj jedinstvenu prijavu (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Odaberite pružatelja',
+      subtitle: 'Odaberite pružatelja za kojeg ćete postaviti SSO.',
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Prilagođeni SAML pružatelj',
+      },
+      warning: 'Nakon odabira pružatelja ne možete ga ponovno mijenjati dok konfiguracija ne završi',
+    },
+    verifyEmailDomainStep: {
+      title: 'Potvrdi e-mail adresu',
+      subtitle: 'Potvrdite e-mail adresu na kojoj želite omogućiti poslovnu vezu.',
+      addEmailAddress: {
+        formTitle: 'Treba nam vaš e-mail',
+        formSubtitle: 'Za početak ćemo trebati vašu e-mail adresu',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'E-mail adresa',
+      },
+      emailCode: {
+        formTitle: 'Potvrdite svoju e-mail adresu',
+        formSubtitle: 'Unesite verifikacijski kod poslan na {{identifier}}',
+        resendButton: 'Niste primili kod? Pošalji ponovno',
+        verified: {
+          title: 'Primili smo vaš e-mail',
+          subtitle: 'Potvrdili ste svoju e-mail adresu sljedećim e-mailom',
+          inputLabel: 'Potvrđena e-mail adresa',
+        },
+      },
+      domainTaken: {
+        title: 'Ova domena ({{domain}}) već ima SSO vezu',
+        subtitle: 'Kontaktirajte administratora aplikacije kako biste dobili pristup putem postojeće veze.',
+      },
     },
   },
   createOrganization: {

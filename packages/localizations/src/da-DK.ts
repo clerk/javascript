@@ -141,7 +141,7 @@ export const daDK: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -179,8 +179,46 @@ export const daDK: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'Kontakt din organisations administrator for at opgradere dine tilladelser.',
+      title: 'Du har ikke tilladelse til at administrere single sign-on (SSO)',
+    },
     navbar: {
       title: 'Konfigurer single sign-on (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Vælg udbyder',
+      subtitle: 'Vælg den udbyder, du vil opsætte SSO for.',
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Brugerdefineret SAML-udbyder',
+      },
+      warning: 'Når en udbyder er valgt, kan du ikke ændre den, før konfigurationen er færdig',
+    },
+    verifyEmailDomainStep: {
+      title: 'Bekræft e-mailadresse',
+      subtitle: 'Bekræft den e-mailadresse, du vil aktivere virksomhedsforbindelsen på.',
+      addEmailAddress: {
+        formTitle: 'Vi har brug for din e-mail',
+        formSubtitle: 'For at starte har vi brug for din e-mailadresse',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'E-mailadresse',
+      },
+      emailCode: {
+        formTitle: 'Bekræft din e-mailadresse',
+        formSubtitle: 'Indtast bekræftelseskoden sendt til {{identifier}}',
+        resendButton: 'Modtog du ingen kode? Send igen',
+        verified: {
+          title: 'Vi har modtaget din e-mail',
+          subtitle: 'Du har bekræftet din e-mailadresse med følgende e-mail',
+          inputLabel: 'Bekræftet e-mailadresse',
+        },
+      },
+      domainTaken: {
+        title: 'Dette domæne ({{domain}}) har allerede en SSO-forbindelse',
+        subtitle: 'Kontakt applikationens administrator for at få adgang via den eksisterende forbindelse.',
+      },
     },
   },
   createOrganization: {

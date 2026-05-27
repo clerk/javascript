@@ -141,7 +141,7 @@ export const zhCN: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -179,8 +179,46 @@ export const zhCN: LocalizationResource = {
     year: undefined,
   },
   configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: '请联系您的组织管理员以升级您的权限。',
+      title: '您无权管理单点登录 (SSO)',
+    },
     navbar: {
       title: '配置单点登录 (SSO)',
+    },
+    selectProviderStep: {
+      title: '选择提供商',
+      subtitle: '选择您要为其设置 SSO 的提供商。',
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: '自定义 SAML 提供商',
+      },
+      warning: '选择提供商后,在配置完成之前无法再次更改',
+    },
+    verifyEmailDomainStep: {
+      title: '验证电子邮件地址',
+      subtitle: '验证您想要启用企业连接的电子邮件地址。',
+      addEmailAddress: {
+        formTitle: '我们需要您的电子邮件',
+        formSubtitle: '为了开始，我们需要您的电子邮件地址',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: '电子邮件地址',
+      },
+      emailCode: {
+        formTitle: '验证您的电子邮件地址',
+        formSubtitle: '输入发送到 {{identifier}} 的验证码',
+        resendButton: '没有收到验证码？重新发送',
+        verified: {
+          title: '我们已收到您的电子邮件',
+          subtitle: '您已使用以下电子邮件验证了您的电子邮件地址',
+          inputLabel: '已验证的电子邮件地址',
+        },
+      },
+      domainTaken: {
+        title: '此域名 ({{domain}}) 已存在 SSO 连接',
+        subtitle: '请联系应用程序管理员，通过现有连接获取访问权限。',
+      },
     },
   },
   createOrganization: {

@@ -1,5 +1,94 @@
 # Change Log
 
+## 3.2.16
+
+### Patch Changes
+
+- Updated dependencies [[`a036ce8`](https://github.com/clerk/javascript/commit/a036ce8fef3b3ee2b49fd05d592b083ffc37f463)]:
+  - @clerk/shared@4.13.1
+  - @clerk/react@6.7.1
+  - @clerk/clerk-js@6.12.1
+
+## 3.2.15
+
+### Patch Changes
+
+- Updated dependencies [[`6eaf4d6`](https://github.com/clerk/javascript/commit/6eaf4d66fe0b21fb96a5cd19d61e6c3b2302ff97), [`1aab31e`](https://github.com/clerk/javascript/commit/1aab31e5070b7223402ff71f65a0d829bbc29cfd)]:
+  - @clerk/clerk-js@6.12.0
+  - @clerk/shared@4.13.0
+  - @clerk/react@6.7.0
+
+## 3.2.14
+
+### Patch Changes
+
+- Updated dependencies [[`95f6c2f`](https://github.com/clerk/javascript/commit/95f6c2f8b7154b11dc64c864dcd994baab637c70)]:
+  - @clerk/clerk-js@6.11.3
+  - @clerk/shared@4.12.2
+  - @clerk/react@6.6.6
+
+## 3.2.13
+
+### Patch Changes
+
+- Updated dependencies [[`4fc38a0`](https://github.com/clerk/javascript/commit/4fc38a097cb9ed1d37c9c3faa274e5c44e405c68)]:
+  - @clerk/clerk-js@6.11.2
+  - @clerk/shared@4.12.1
+  - @clerk/react@6.6.5
+
+## 3.2.12
+
+### Patch Changes
+
+- Updated dependencies [[`9fa6642`](https://github.com/clerk/javascript/commit/9fa6642de6a734faf532ca70c411431c5d0d2bbb), [`930047f`](https://github.com/clerk/javascript/commit/930047f3ea9b603a7f254f7764c3dc5e0fa7c769), [`b45777c`](https://github.com/clerk/javascript/commit/b45777c5723b01b8c7ee3d37b712c639067b36ab), [`692b68d`](https://github.com/clerk/javascript/commit/692b68d1807b09459c15f5fd6570ca78cd7ec636), [`6b27d54`](https://github.com/clerk/javascript/commit/6b27d54edae6f8e5ad4b78df5c50bbceaafd0c10), [`5441d86`](https://github.com/clerk/javascript/commit/5441d863146cacb5bc8446825c820fac51e4312b), [`5a7225e`](https://github.com/clerk/javascript/commit/5a7225ef119edf551e20bdce8af465b42981c8f2)]:
+  - @clerk/shared@4.12.0
+  - @clerk/clerk-js@6.11.1
+  - @clerk/react@6.6.4
+
+## 3.2.11
+
+### Patch Changes
+
+- Updated dependencies [[`a492b1b`](https://github.com/clerk/javascript/commit/a492b1babe77819ed5e4aca151c866aa712a915e), [`1a4d7d1`](https://github.com/clerk/javascript/commit/1a4d7d1c711c25f4f83c0773616b799df2feb010), [`a6916b1`](https://github.com/clerk/javascript/commit/a6916b15658625a0e627c474a62212a65868bfb6), [`1a4d7d1`](https://github.com/clerk/javascript/commit/1a4d7d1c711c25f4f83c0773616b799df2feb010), [`1084180`](https://github.com/clerk/javascript/commit/1084180797722ff113df8404a3c967bc6abeb12d), [`1e2e237`](https://github.com/clerk/javascript/commit/1e2e23775f02a41e34bf504534b803e9b39a75c6), [`39099b6`](https://github.com/clerk/javascript/commit/39099b62308fc9b0ebbb25988c0ae4b655efe744), [`18e0a1a`](https://github.com/clerk/javascript/commit/18e0a1aa48e7f65a6610ec3c6ffe105deb3474b2)]:
+  - @clerk/clerk-js@6.11.0
+  - @clerk/shared@4.11.0
+  - @clerk/react@6.6.3
+
+## 3.2.10
+
+### Patch Changes
+
+- Updated dependencies [[`5cda3ee`](https://github.com/clerk/javascript/commit/5cda3ee8451cc9af375895824d24a5c3ed7fbee6)]:
+  - @clerk/shared@4.10.2
+  - @clerk/clerk-js@6.10.1
+  - @clerk/react@6.6.2
+
+## 3.2.9
+
+### Patch Changes
+
+- Fix `MissingActivity` error on cold-start Google sign-in / passkey flows. Previously, the first tap on "Sign in with Google" in `<AuthView />` failed with `Clerk error: Google sign-in cannot start: Credential Manager requires an active Activity context.` — the workaround was to background and foreground the app once before signing in. ([#8485](https://github.com/clerk/javascript/pull/8485)) by [@chriscanin](https://github.com/chriscanin)
+
+  The Android bridge now calls `Clerk.attachActivity()` (added in clerk-android 1.0.16) at SDK initialization and on AuthView/UserProfile mount, so the current Activity is registered with the underlying SDK before any Credential Manager call. No app-side changes required; the fix is transparent on rebuild.
+
+- Updated dependencies [[`7a5892f`](https://github.com/clerk/javascript/commit/7a5892f9bcaa1a6212e6e6d3741160929ffd027e), [`a1635f0`](https://github.com/clerk/javascript/commit/a1635f01b7f9ee52ad28f33440b527f29e65cbb5)]:
+  - @clerk/shared@4.10.1
+  - @clerk/clerk-js@6.10.0
+  - @clerk/react@6.6.1
+
+## 3.2.8
+
+### Patch Changes
+
+- Fix session loss on Expo JS reload (pressing R in dev) ([#8469](https://github.com/clerk/javascript/pull/8469)) by [@chriscanin](https://github.com/chriscanin)
+
+  `NativeSessionSync` was calling native `signOut()` during the loading phase when `isSignedIn` is `undefined`. On a JS reload, the native module persists from the previous session, so `signOut()` revokes the session server-side and clears all keychain items, forcing the user to log in again. This adds an `isLoaded` guard so native `signOut()` is only called when Clerk has confirmed the user is actually signed out.
+
+- Updated dependencies [[`9e9230c`](https://github.com/clerk/javascript/commit/9e9230c8c3cbdb1c253ca7cdd24cc8d681b5ee5a), [`68d32df`](https://github.com/clerk/javascript/commit/68d32dfcc453080ef93edf69be8de765a342d88c), [`1c27d4d`](https://github.com/clerk/javascript/commit/1c27d4dd41a27cf41c3823306fe88e026fed08fb), [`1001193`](https://github.com/clerk/javascript/commit/10011936981fc22bf7d3750f1591f0873ea78bcb)]:
+  - @clerk/shared@4.10.0
+  - @clerk/clerk-js@6.9.0
+  - @clerk/react@6.6.0
+
 ## 3.2.7
 
 ### Patch Changes

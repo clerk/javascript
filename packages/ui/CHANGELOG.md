@@ -1,5 +1,157 @@
 # @clerk/ui
 
+## 1.13.1
+
+### Patch Changes
+
+- Fix the Manage Subscription button in `<UserProfile />` / `<OrganizationProfile />` and the Cancel / Re-subscribe actions in `<SubscriptionDetails />` so they are shown for paid seat-based plans that have no base fee. A shared `isManageableSubscriptionItem` helper now drives both places, treating "free / unmanageable" as "the instance's default plan" instead of "the plan has no base fee". ([#8375](https://github.com/clerk/javascript/pull/8375)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+- Updated dependencies [[`a036ce8`](https://github.com/clerk/javascript/commit/a036ce8fef3b3ee2b49fd05d592b083ffc37f463)]:
+  - @clerk/shared@4.13.1
+  - @clerk/localizations@4.6.8
+
+## 1.13.0
+
+### Minor Changes
+
+- Remove `<ConfigureSSO />` from experimental path ([#8588](https://github.com/clerk/javascript/pull/8588)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Add `elevation` appearance option with `'raised'` (default) and `'flush'` values. When set to `flush`, card-based components render without border, box-shadow, border-radius, outer padding, and footer background, allowing them to sit flat against their container. Applies to `<SignIn />`, `<SignUp />`, `<Waitlist />`, `<CreateOrganization />`, `<OrganizationList />`, `<OAuthConsent />`, `<UserVerification />`, and session task components. Profile and popover components always render as raised. Modal components always render as raised regardless of this setting. ([#8510](https://github.com/clerk/javascript/pull/8510)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  The `cardBox` element exposes a `data-elevation="flush"` attribute when flush is active, giving className-based themes a hook to neutralize their card chrome via attribute selectors. The `shadcn` theme uses this hook to drop its `shadow-sm border` utilities under flush.
+
+### Patch Changes
+
+- Add `ProfileCard.Page` for `UserProfile` and `OrganizationProfile` pages ([#8602](https://github.com/clerk/javascript/pull/8602)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Fix layout shift when Copy test URL button enters loading state in `<ConfigureSSO />` ([#8592](https://github.com/clerk/javascript/pull/8592)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Improve ClipboardInput positioning and accessibility by using `readOnly` instead of `isDisabled` ([#8593](https://github.com/clerk/javascript/pull/8593)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`6eaf4d6`](https://github.com/clerk/javascript/commit/6eaf4d66fe0b21fb96a5cd19d61e6c3b2302ff97), [`1aab31e`](https://github.com/clerk/javascript/commit/1aab31e5070b7223402ff71f65a0d829bbc29cfd)]:
+  - @clerk/shared@4.13.0
+  - @clerk/localizations@4.6.7
+
+## 1.12.1
+
+### Patch Changes
+
+- Fix attribute statement section in `<ConfigureSSO />` with claim name for Custom SAML provider ([#8586](https://github.com/clerk/javascript/pull/8586)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`95f6c2f`](https://github.com/clerk/javascript/commit/95f6c2f8b7154b11dc64c864dcd994baab637c70)]:
+  - @clerk/localizations@4.6.6
+  - @clerk/shared@4.12.2
+
+## 1.12.0
+
+### Minor Changes
+
+- Add `autoFocus` appearance option to disable automatic input focusing ([#8521](https://github.com/clerk/javascript/pull/8521)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Improve Floating UI usage: fix `arialLabel` typo in `MenuTrigger`, replace imperative floating ref in `MenuList` with `useMergeRefs`, remove manual position offset in `SelectOptionList`, add `aria-haspopup` to `MenuTrigger`, and add missing ARIA attributes (`aria-expanded`, `aria-haspopup`, `role`, `aria-selected`) to `Select` components. ([#8328](https://github.com/clerk/javascript/pull/8328)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add support for custom SAML provider in `<ConfigureSSO />` ([#8564](https://github.com/clerk/javascript/pull/8564)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Update `NavBar` to receive `containerSx` prop ([#8568](https://github.com/clerk/javascript/pull/8568)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`4fc38a0`](https://github.com/clerk/javascript/commit/4fc38a097cb9ed1d37c9c3faa274e5c44e405c68)]:
+  - @clerk/localizations@4.6.5
+  - @clerk/shared@4.12.1
+
+## 1.11.0
+
+### Minor Changes
+
+- Add `highlightedPlan` prop to PricingTable default layout to render a "Popular" badge on the matching plan ([#8554](https://github.com/clerk/javascript/pull/8554)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add support for inline `<bold>` markup in localization values, rendered as `<strong>` elements. Translators can now write `'Agree to <bold>Terms</bold>'` in a single key instead of splitting into prefix/bold/suffix fragments. Token values are substituted only into parsed text leaves, so user-controlled data can never become markup. Also hardens `applyTokensToString` to use `Object.prototype.hasOwnProperty.call` when filtering token names, preventing prototype-chain names like `{{hasOwnProperty}}` from crashing rendering. ([#8539](https://github.com/clerk/javascript/pull/8539)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Add a two-mode segmented control to the SAML config submission sub-step in `<__experimental_ConfigureSSO />`. Users pick between **Add via metadata URL** (default) and **Configure manually**. The metadata URL form is unchanged; the manual entry form ships in a follow-up commit. Locale keys added under `configureSSO.configureStep.samlOkta.modes` in `en-US`. ([#8553](https://github.com/clerk/javascript/pull/8553)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Add confirmation step for `<__experimental_ConfigureSSO />` ([#8531](https://github.com/clerk/javascript/pull/8531)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Add test step for `<__experimental_ConfigureSSO />` ([#8544](https://github.com/clerk/javascript/pull/8544)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`9fa6642`](https://github.com/clerk/javascript/commit/9fa6642de6a734faf532ca70c411431c5d0d2bbb), [`930047f`](https://github.com/clerk/javascript/commit/930047f3ea9b603a7f254f7764c3dc5e0fa7c769), [`b45777c`](https://github.com/clerk/javascript/commit/b45777c5723b01b8c7ee3d37b712c639067b36ab), [`5a7225e`](https://github.com/clerk/javascript/commit/5a7225ef119edf551e20bdce8af465b42981c8f2)]:
+  - @clerk/shared@4.12.0
+  - @clerk/localizations@4.6.4
+
+## 1.10.0
+
+### Minor Changes
+
+- Add `fontFamilyMono` appearance variable for customizing the monospace font used in Clerk components. Defaults to `ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace` and is exposed as the `--clerk-font-family-mono` CSS variable. ([#8546](https://github.com/clerk/javascript/pull/8546)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Implement the Okta SAML metadata URL submission path in the Configure step of `<__experimental_ConfigureSSO />`. Adds a single text input for the IdP metadata URL; Continue posts `{ saml: { idpMetadataUrl } }` via `user.updateEnterpriseConnection` wrapped in `useReverification`, with `useCardState` driving the loading state and `handleError` routing backend errors inline to the field or to the card-level error surface. Locale keys added under `configureSSO.configureStep` in `en-US`. Manual entry, file upload, SP-side copy rows, and the Okta admin-console walkthrough ship in follow-up PRs. ([#8535](https://github.com/clerk/javascript/pull/8535)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Implement the provider selection step of `<__experimental_ConfigureSSO />`. Renders the two SAML provider tiles (Okta Workforce and Custom SAML Provider) with real icons sourced from `img.clerk.com`, tracks the picked provider in local state, and gates `Step.Footer.Continue` on a selection. Includes a warning callout about provider lock-in and a minor `Step.Header` alignment tweak. All user-visible strings are wired through `@clerk/localizations`, with translations for every supported locale. ([#8503](https://github.com/clerk/javascript/pull/8503)) by [@iagodahlem](https://github.com/iagodahlem)
+
+  Also extends the flow context with `provider` and `setProvider`, adds the `deriveInitialStep` helper, and wires the wizard's `initialStepId` so the configure flow remounts on the right step after a reload. Continue on Select Provider stages the chosen provider and advances to the next step; the enterprise connection is created on Verify Domain once the user's email is verified and primary.
+
+- Update `<ConfigureSSO />` in the context of organizations to only allow managing enterprise connections based on system permission ([#8515](https://github.com/clerk/javascript/pull/8515)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- fix(ui): don't treat numeric usernames as phone numbers ([#8532](https://github.com/clerk/javascript/pull/8532)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+- Fixed custom page icons not rendering in React 19 due to a forwarded ref overwriting the internal node reference. ([#8534](https://github.com/clerk/javascript/pull/8534)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Add verify/add email address step to `<__experimental_ConfigureSSO />` ([#8520](https://github.com/clerk/javascript/pull/8520)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Refactor `<__experimental_ConfigureSSO />` into a layered primitive set: a state-driven Wizard, a UI-only Stepper, a `Step` compound, and ProfileCard chrome. No public component API change. Drops the central FooterActionsContext registry — each step now renders its own footer via `Step.Footer.Previous` / `Step.Footer.Continue` purely-presentational compounds. Adds a SelectProviderStep boilerplate filtered out of the breadcrumb. ([#8493](https://github.com/clerk/javascript/pull/8493)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Updated dependencies [[`1a4d7d1`](https://github.com/clerk/javascript/commit/1a4d7d1c711c25f4f83c0773616b799df2feb010), [`a6916b1`](https://github.com/clerk/javascript/commit/a6916b15658625a0e627c474a62212a65868bfb6), [`1084180`](https://github.com/clerk/javascript/commit/1084180797722ff113df8404a3c967bc6abeb12d), [`39099b6`](https://github.com/clerk/javascript/commit/39099b62308fc9b0ebbb25988c0ae4b655efe744), [`18e0a1a`](https://github.com/clerk/javascript/commit/18e0a1aa48e7f65a6610ec3c6ffe105deb3474b2)]:
+  - @clerk/localizations@4.6.3
+  - @clerk/shared@4.11.0
+
+## 1.9.1
+
+### Patch Changes
+
+- Fixed unhandled TypeError when `unsafeMetadata` is passed to `<SignUp />` ([#8500](https://github.com/clerk/javascript/pull/8500)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`5cda3ee`](https://github.com/clerk/javascript/commit/5cda3ee8451cc9af375895824d24a5c3ed7fbee6)]:
+  - @clerk/shared@4.10.2
+  - @clerk/localizations@4.6.2
+
+## 1.9.0
+
+### Minor Changes
+
+- Removed unused internal OAuthConsent prop. ([#8492](https://github.com/clerk/javascript/pull/8492)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Add wizard steps for the `<__experimental_ConfigureSSO />` component ([#8468](https://github.com/clerk/javascript/pull/8468)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Remove back button on the sign-in password compromised/pwned error screen. ([#8280](https://github.com/clerk/javascript/pull/8280)) by [@Ephem](https://github.com/Ephem)
+
+  These errors are not recoverable by re-entering the password, so the back button led to a confusing dead end that would always take you back to the same error.
+
+- Updated dependencies [[`7a5892f`](https://github.com/clerk/javascript/commit/7a5892f9bcaa1a6212e6e6d3741160929ffd027e)]:
+  - @clerk/shared@4.10.1
+  - @clerk/localizations@4.6.1
+
+## 1.8.0
+
+### Minor Changes
+
+- Add experimental `<ConfigureSSO />` component. Not ready for usage yet. ([#8427](https://github.com/clerk/javascript/pull/8427)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Localize API keys table headers ([#8462](https://github.com/clerk/javascript/pull/8462)) by [@jebibot](https://github.com/jebibot)
+
+- Surface initialization errors and stalled mounts in the component renderer. The internal `ensureMounted` pipeline now logs a `[Clerk UI]` error to the console when the lazy module import rejects, and emits a diagnostic warning if the renderer has not mounted within 10 seconds. Makes silent failures (e.g. failed dev-server chunk loads, unresolved lazy-compilation proxies) surface with an actionable message instead of hanging without feedback. ([#8379](https://github.com/clerk/javascript/pull/8379)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`9e9230c`](https://github.com/clerk/javascript/commit/9e9230c8c3cbdb1c253ca7cdd24cc8d681b5ee5a), [`68d32df`](https://github.com/clerk/javascript/commit/68d32dfcc453080ef93edf69be8de765a342d88c), [`1c27d4d`](https://github.com/clerk/javascript/commit/1c27d4dd41a27cf41c3823306fe88e026fed08fb), [`1001193`](https://github.com/clerk/javascript/commit/10011936981fc22bf7d3750f1591f0873ea78bcb)]:
+  - @clerk/localizations@4.6.0
+  - @clerk/shared@4.10.0
+
 ## 1.7.0
 
 ### Minor Changes

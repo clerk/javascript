@@ -43,7 +43,7 @@ jobs:
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     steps:
       - name: Check org membership
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           script: |
             const org = context.repo.owner;
@@ -97,8 +97,9 @@ jobs:
           fi
 
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
+          persist-credentials: false
           ref: ${{ steps.inputs.outputs.ref }}
           sparse-checkout: scripts/validate-staging-instances.mjs
           fetch-depth: 1
@@ -173,8 +174,9 @@ jobs:
           fi
 
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
+          persist-credentials: false
           ref: ${{ steps.inputs.outputs.ref }}
           fetch-depth: 1
           fetch-tags: false
@@ -185,6 +187,7 @@ jobs:
         id: config
         uses: ./.github/actions/init-blacksmith
         with:
+          cache-enabled: true
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
@@ -244,7 +247,7 @@ jobs:
           pnpm add @clerk/ui@latest
 
       - name: Write all ENV certificates to files in integration/certs
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         env:
           INTEGRATION_CERTS: '${{ secrets.INTEGRATION_CERTS }}'
           INTEGRATION_ROOT_CA: '${{ secrets.INTEGRATION_ROOT_CA }}'
@@ -284,7 +287,7 @@ jobs:
 
       - name: Upload test-results
         if: ${{ cancelled() || failure() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ steps.inputs.outputs.artifact-suffix }}
           path: test-results
@@ -327,7 +330,7 @@ jobs:
 
       - name: Notify Slack on failure
         if: ${{ needs.integration-tests.result == 'failure' && steps.inputs.outputs.notify-slack == 'true' }}
-        uses: slackapi/slack-github-action@v1.24.0
+        uses: slackapi/slack-github-action@e28cf165c92ffef168d23c5c9000cffc8a25e117 # v1.24.0
         with:
           payload: |
             {
@@ -348,7 +351,7 @@ jobs:
       # Uncomment when clerk_go side is ready
       # - name: Post commit status to clerk_go
       #   if: ${{ steps.inputs.outputs.clerk-go-commit-sha != '' }}
-      #   uses: actions/github-script@v7
+      #   uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
       #   with:
       #     github-token: ${{ secrets.CLERK_COOKIE_PAT }}
       #     script: |

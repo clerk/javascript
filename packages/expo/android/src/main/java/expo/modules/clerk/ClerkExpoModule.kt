@@ -85,6 +85,16 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
                     }
 
                     Clerk.initialize(reactApplicationContext, pubKey)
+                    // clerk-android registers ActivityLifecycleCallbacks during
+                    // initialize(), but in React Native MainActivity has already passed
+                    // onResume() by the time <ClerkProvider> mounts and we reach this
+                    // line, so the callbacks miss the initial activity. Without seeding,
+                    // the first Credential Manager call (Google sign-in / passkeys)
+                    // fails with MissingActivity until the user backgrounds and
+                    // foregrounds the app. getCurrentActivity() can be null here on
+                    // cold start before React's host-resume sync — AuthView and
+                    // UserProfile also call attachActivity() on mount as a backstop.
+                    getCurrentActivity()?.let { Clerk.attachActivity(it) }
                     // Theme loading is centralized here. ClerkViewFactory.configure()
                     // and ClerkUserProfileActivity.onCreate() only call Clerk.initialize()
                     // when Clerk is not yet initialized, so by the time they run

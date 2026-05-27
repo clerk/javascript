@@ -1,5 +1,96 @@
 # Change Log
 
+## 7.4.1
+
+### Patch Changes
+
+- Updated dependencies [[`a036ce8`](https://github.com/clerk/javascript/commit/a036ce8fef3b3ee2b49fd05d592b083ffc37f463)]:
+  - @clerk/shared@4.13.1
+  - @clerk/react@6.7.1
+  - @clerk/backend@3.4.13
+
+## 7.4.0
+
+### Minor Changes
+
+- Remove `<ConfigureSSO />` from experimental path ([#8588](https://github.com/clerk/javascript/pull/8588)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Updated dependencies [[`6eaf4d6`](https://github.com/clerk/javascript/commit/6eaf4d66fe0b21fb96a5cd19d61e6c3b2302ff97), [`1aab31e`](https://github.com/clerk/javascript/commit/1aab31e5070b7223402ff71f65a0d829bbc29cfd)]:
+  - @clerk/shared@4.13.0
+  - @clerk/react@6.7.0
+  - @clerk/backend@3.4.12
+
+## 7.3.7
+
+### Patch Changes
+
+- Updated dependencies [[`3599747`](https://github.com/clerk/javascript/commit/3599747fc7bb3273ac07043faa409d9a40dd93a9), [`95f6c2f`](https://github.com/clerk/javascript/commit/95f6c2f8b7154b11dc64c864dcd994baab637c70)]:
+  - @clerk/backend@3.4.11
+  - @clerk/shared@4.12.2
+  - @clerk/react@6.6.6
+
+## 7.3.6
+
+### Patch Changes
+
+- Updated dependencies [[`4fc38a0`](https://github.com/clerk/javascript/commit/4fc38a097cb9ed1d37c9c3faa274e5c44e405c68)]:
+  - @clerk/shared@4.12.1
+  - @clerk/react@6.6.5
+  - @clerk/backend@3.4.10
+
+## 7.3.5
+
+### Patch Changes
+
+- Bump `next` devDependency to `15.5.18` to pick up the fix for GHSA-26hh-7cqf-hhc6, a high-severity (CVSS 7.5) Middleware/Proxy bypass in App Router applications via segment-prefetch routes (incomplete-fix follow-up). If you use the Next.js App Router, we recommend upgrading to Next.js `15.5.18`, `16.2.6`, or a later patched release. The `16.0.0` through `16.2.5` versions are still affected. ([#8547](https://github.com/clerk/javascript/pull/8547)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`9fa6642`](https://github.com/clerk/javascript/commit/9fa6642de6a734faf532ca70c411431c5d0d2bbb), [`930047f`](https://github.com/clerk/javascript/commit/930047f3ea9b603a7f254f7764c3dc5e0fa7c769), [`b45777c`](https://github.com/clerk/javascript/commit/b45777c5723b01b8c7ee3d37b712c639067b36ab), [`5441d86`](https://github.com/clerk/javascript/commit/5441d863146cacb5bc8446825c820fac51e4312b), [`5a7225e`](https://github.com/clerk/javascript/commit/5a7225ef119edf551e20bdce8af465b42981c8f2)]:
+  - @clerk/shared@4.12.0
+  - @clerk/react@6.6.4
+  - @clerk/backend@3.4.9
+
+## 7.3.4
+
+### Patch Changes
+
+- Updated dependencies [[`1a4d7d1`](https://github.com/clerk/javascript/commit/1a4d7d1c711c25f4f83c0773616b799df2feb010), [`a6916b1`](https://github.com/clerk/javascript/commit/a6916b15658625a0e627c474a62212a65868bfb6), [`1084180`](https://github.com/clerk/javascript/commit/1084180797722ff113df8404a3c967bc6abeb12d), [`ee25cf2`](https://github.com/clerk/javascript/commit/ee25cf258f4b46d2303e318f9be2367307953d70), [`39099b6`](https://github.com/clerk/javascript/commit/39099b62308fc9b0ebbb25988c0ae4b655efe744), [`2377305`](https://github.com/clerk/javascript/commit/2377305aa9e9c5e63dbd6fe7c9ee3b3bc474d8b7), [`18e0a1a`](https://github.com/clerk/javascript/commit/18e0a1aa48e7f65a6610ec3c6ffe105deb3474b2)]:
+  - @clerk/shared@4.11.0
+  - @clerk/backend@3.4.8
+  - @clerk/react@6.6.3
+
+## 7.3.3
+
+### Patch Changes
+
+- Updated dependencies [[`0ab09a8`](https://github.com/clerk/javascript/commit/0ab09a89af1d7452df734278288e8218710f0e0e), [`6408ab6`](https://github.com/clerk/javascript/commit/6408ab6ec58d06af3f8334cb5a7d8d2647b8012e), [`5cda3ee`](https://github.com/clerk/javascript/commit/5cda3ee8451cc9af375895824d24a5c3ed7fbee6)]:
+  - @clerk/backend@3.4.7
+  - @clerk/shared@4.10.2
+  - @clerk/react@6.6.2
+
+## 7.3.2
+
+### Patch Changes
+
+- Improved `auth()` error message when `clerkMiddleware()` is not detected to mention that infrastructure issues (e.g. edge runtime errors or platform outages) can also cause this error. ([#8007](https://github.com/clerk/javascript/pull/8007)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`7a5892f`](https://github.com/clerk/javascript/commit/7a5892f9bcaa1a6212e6e6d3741160929ffd027e)]:
+  - @clerk/backend@3.4.6
+  - @clerk/shared@4.10.1
+  - @clerk/react@6.6.1
+
+## 7.3.1
+
+### Patch Changes
+
+- Enforce middleware authorization during the keyless bootstrap window. `auth.protect()` and custom authorization checks now fail closed instead of being bypassed while the publishable key is being provisioned. ([#8369](https://github.com/clerk/javascript/pull/8369)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`9e9230c`](https://github.com/clerk/javascript/commit/9e9230c8c3cbdb1c253ca7cdd24cc8d681b5ee5a), [`68d32df`](https://github.com/clerk/javascript/commit/68d32dfcc453080ef93edf69be8de765a342d88c), [`1c27d4d`](https://github.com/clerk/javascript/commit/1c27d4dd41a27cf41c3823306fe88e026fed08fb), [`1001193`](https://github.com/clerk/javascript/commit/10011936981fc22bf7d3750f1591f0873ea78bcb)]:
+  - @clerk/shared@4.10.0
+  - @clerk/react@6.6.0
+  - @clerk/backend@3.4.5
+
 ## 7.3.0
 
 ### Minor Changes

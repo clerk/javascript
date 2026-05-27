@@ -46,6 +46,7 @@ export interface OrganizationResource extends ClerkResource, BillingPayerMethods
   publicMetadata: OrganizationPublicMetadata;
   adminDeleteEnabled: boolean;
   maxAllowedMemberships: number;
+  selfServeSSOEnabled: boolean;
   createdAt: Date;
   updatedAt: Date;
   update: (params: UpdateOrganizationParams) => Promise<OrganizationResource>;

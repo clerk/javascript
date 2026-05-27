@@ -24,30 +24,60 @@ export interface OAuthConsentInfoJSON extends ClerkResourceJSON {
 
 /**
  * A single OAuth scope with its description and whether it requires consent.
+ *
+ * @interface
  */
 export type OAuthConsentScope = {
+  /**
+   * The name of the scope, as defined by the OAuth application.
+   */
   scope: string;
+  /**
+   * The description of the scope, which can be shown to users on the consent screen. This may be `null` if no description is available.
+   */
   description: string | null;
+  /**
+   * Whether or not this scope requires explicit user consent. If `false`, the scope is considered "safe" and can be granted without showing the consent screen to the user.
+   */
   requiresConsent: boolean;
 };
 
 /**
- * OAuth consent screen metadata from `GET /v1/me/oauth/consent/{oauthClientId}`.
- * Includes information needed to populate the consent dialog.
+ * An interface representing OAuth consent information, including application details and requested scopes.
+ *
+ * @interface
  */
 export type OAuthConsentInfo = {
+  /**
+   * The display name of the OAuth application requesting access.
+   */
   oauthApplicationName: string;
+  /**
+   * The URL of the OAuth application's logo image.
+   */
   oauthApplicationLogoUrl: string;
+  /**
+   * The homepage URL of the OAuth application.
+   */
   oauthApplicationUrl: string;
+  /**
+   * The OAuth `client_id` identifying the application.
+   */
   clientId: string;
+  /**
+   * The `state` parameter from the original authorize request.
+   */
   state: string;
+  /**
+   * A list of scopes the application is requesting, with descriptions and consent requirements.
+   */
   scopes: OAuthConsentScope[];
 };
 
 export type GetOAuthConsentInfoParams = {
-  /** OAuth `client_id` from the authorize request. */
+  /** The OAuth `client_id` from the authorize request. The hook is disabled when this value is empty or omitted. */
   oauthClientId: string;
-  /** Optional space-delimited scope string from the authorize request. */
+  /** A space-delimited scope string from the authorize request. */
   scope?: string;
 };
 
