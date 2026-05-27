@@ -12,6 +12,10 @@ export type VerifyWebhookOptions = {
    * The signing secret for the webhook. It's recommended to use the [`CLERK_WEBHOOK_SIGNING_SECRET` environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables#webhooks) instead.
    */
   signingSecret?: string;
+  /**
+   * Optional tolerance, in seconds, for accepting webhooks whose timestamp falls outside the default replay window.
+   */
+  timestampToleranceSeconds?: number;
 };
 
 // Standard Webhooks header names

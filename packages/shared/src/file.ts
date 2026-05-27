@@ -3,8 +3,10 @@
  *
  * Probably paired with:
  *  <input type='file' accept='application/JSON' ... />
+ *
+ * Renamed from `readJSONFile` to align naming with the rest of the parse-* helpers.
  */
-export function readJSONFile(file: File): Promise<unknown> {
+export function parseJSONFile(file: File): Promise<unknown> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.addEventListener('load', function () {
@@ -28,6 +30,8 @@ const MimeTypeToExtensionMap = Object.freeze({
 
 export type SupportedMimeType = keyof typeof MimeTypeToExtensionMap;
 
-export const extension = (mimeType: SupportedMimeType): string => {
-  return MimeTypeToExtensionMap[mimeType];
+export type MimeTypeExtension = (typeof MimeTypeToExtensionMap)[SupportedMimeType];
+
+export const extension = (mimeType: SupportedMimeType, fallback?: string): string => {
+  return MimeTypeToExtensionMap[mimeType] ?? fallback ?? '';
 };
