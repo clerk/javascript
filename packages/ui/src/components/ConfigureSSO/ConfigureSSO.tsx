@@ -8,7 +8,7 @@ import React from 'react';
 
 import { useProtect } from '@/common';
 import { withCoreUserGuard } from '@/contexts';
-import { Col, descriptors, Flex, Flow, Heading, Icon, localizationKeys, Text } from '@/customizables';
+import { Col, Flex, Flow, Heading, Icon, localizationKeys, Text } from '@/customizables';
 import { useCardState, withCardStateProvider } from '@/elements/contexts';
 import { ProfileCard } from '@/elements/ProfileCard';
 import { ExclamationTriangle } from '@/icons';
@@ -43,23 +43,7 @@ const AuthenticatedContent = withCoreUserGuard(() => {
       sx={t => ({ display: 'grid', gridTemplateColumns: '1fr 3fr', height: t.sizes.$176, overflow: 'hidden' })}
     >
       <ConfigureSSONavbar contentRef={contentRef}>
-        <Col
-          ref={contentRef}
-          elementDescriptor={descriptors.scrollBox}
-          sx={t => ({
-            backgroundColor: t.colors.$colorBackground,
-            position: 'relative',
-            borderRadius: t.radii.$lg,
-            width: '100%',
-            overflow: 'hidden',
-            borderWidth: t.borderWidths.$normal,
-            borderStyle: t.borderStyles.$solid,
-            borderColor: t.colors.$borderAlpha150,
-            flex: 1,
-          })}
-        >
-          <ConfigureSSOContent contentRef={contentRef} />
-        </Col>
+        <ConfigureSSOContent contentRef={contentRef} />
       </ConfigureSSONavbar>
     </ProfileCard.Root>
   );
