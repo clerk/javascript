@@ -114,7 +114,6 @@
     "bundlewatch": "^0.4.2",
     "jsdom": "26.1.0",
     "minimatch": "^10.2.5",
-    "react-grab": "^0.1.37",
     "webpack-merge": "^5.10.0"
   },
   "engines": {
