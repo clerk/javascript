@@ -1,4 +1,3 @@
-import { useClerk } from '@clerk/shared/react';
 import type { EmailLinkFactor, SignInResource } from '@clerk/shared/types';
 import React from 'react';
 
@@ -7,32 +6,26 @@ import { VerificationLinkCard } from '@/ui/elements/VerificationLinkCard';
 import { handleError } from '@/ui/utils/errorHandler';
 
 import { EmailLinkStatusCard } from '../../common';
-import { buildVerificationRedirectUrl } from '../../common/redirects';
-import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { Flow, localizationKeys, useLocalizations } from '../../customizables';
 import { useCardState } from '../../elements/contexts';
 import { useEmailLink } from '../../hooks/useEmailLink';
-import { useRouter } from '../../router/RouteContext';
-import { useHandleUserLockedError } from './useHandleAttemptResult';
 
 type SignInFactorOneEmailLinkCardProps = Pick<VerificationCodeCardProps, 'onShowAlternativeMethodsClicked'> & {
   factor: EmailLinkFactor;
   factorAlreadyPrepared: boolean;
   onFactorPrepare: () => void;
+  signIn: SignInResource;
+  onVerificationComplete: (si: SignInResource) => Promise<void>;
+  onUserLockedError: (err: unknown) => boolean;
+  avatarUrl: string | undefined;
+  redirectUrl: string;
 };
 
 export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCardProps) => {
   const { t } = useLocalizations();
   const card = useCardState();
-  const signIn = useCoreSignIn();
-  const signInContext = useSignInContext();
-  const { signInUrl } = signInContext;
-  const { navigate } = useRouter();
-  const { afterSignInUrl } = useSignInContext();
-  const { setActive } = useClerk();
-  const { startEmailLinkFlow, cancelEmailLinkFlow } = useEmailLink(signIn);
+  const { startEmailLinkFlow, cancelEmailLinkFlow } = useEmailLink(props.signIn);
   const [showVerifyModal, setShowVerifyModal] = React.useState(false);
-  const handleUserLockedError = useHandleUserLockedError();
 
   React.useEffect(() => {
     void startEmailLinkVerification();
@@ -46,11 +39,11 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
   const startEmailLinkVerification = () => {
     startEmailLinkFlow({
       emailAddressId: props.factor.emailAddressId,
-      redirectUrl: buildVerificationRedirectUrl({ ctx: signInContext, baseUrl: signInUrl, intent: 'sign-in' }),
+      redirectUrl: props.redirectUrl,
     })
       .then(res => handleVerificationResult(res))
       .catch(err => {
-        if (handleUserLockedError(err)) {
+        if (props.onUserLockedError(err)) {
           return;
         }
         handleError(err, [], card.setError);
@@ -64,18 +57,7 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
     } else if (ver.verifiedFromTheSameClient()) {
       setShowVerifyModal(true);
     } else {
-      await completeSignInFlow(si);
-    }
-  };
-
-  const completeSignInFlow = async (si: SignInResource) => {
-    if (si.status === 'complete') {
-      return setActive({
-        session: si.createdSessionId,
-        redirectUrl: afterSignInUrl,
-      });
-    } else if (si.status === 'needs_second_factor') {
-      return navigate('../factor-two');
+      await props.onVerificationComplete(si);
     }
   };
 
@@ -99,7 +81,7 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
         resendButton={localizationKeys('signIn.emailLink.resendButton')}
         onResendCodeClicked={restartVerification}
         safeIdentifier={props.factor.safeIdentifier}
-        profileImageUrl={signIn.userData.imageUrl}
+        profileImageUrl={props.avatarUrl}
         onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
       />
     </Flow.Part>

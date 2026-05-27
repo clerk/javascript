@@ -1,4 +1,3 @@
-import { useClerk } from '@clerk/shared/react/index';
 import type { ComponentType } from 'react';
 
 import { withRedirect } from '@/ui/common';
@@ -10,45 +9,21 @@ import type { AvailableComponentProps } from '@/ui/types';
 
 import { hasMultipleEnterpriseConnections } from './shared';
 
-/**
- * @experimental
- */
-const SignInFactorOneEnterpriseConnectionsInternal = () => {
-  const ctx = useSignInContext();
-  const clerk = useClerk();
-  const signIn = clerk.client.signIn;
+type EnterpriseConnection = { id: string; name: string };
 
-  if (!hasMultipleEnterpriseConnections(signIn.supportedFirstFactors)) {
-    // This should not happen due to the HOC guard, but provides type safety
-    return null;
-  }
+type SignInFactorOneEnterpriseConnectionsInternalProps = {
+  enterpriseConnections: EnterpriseConnection[];
+  onEnterpriseSSO: (enterpriseConnectionId: string) => Promise<void> | void;
+};
 
-  const enterpriseConnections = signIn.supportedFirstFactors.map(ff => ({
-    id: ff.enterpriseConnectionId,
-    name: ff.enterpriseConnectionName,
-  }));
-
-  const handleEnterpriseSSO = (enterpriseConnectionId: string) => {
-    const redirectUrl = ctx.ssoCallbackUrl;
-    const redirectUrlComplete = ctx.afterSignInUrl || '/';
-
-    return signIn.authenticateWithRedirect({
-      strategy: 'enterprise_sso',
-      redirectUrl,
-      redirectUrlComplete,
-      oidcPrompt: ctx.oidcPrompt,
-      continueSignIn: true,
-      enterpriseConnectionId,
-    });
-  };
-
+export const SignInFactorOneEnterpriseConnectionsCard = (props: SignInFactorOneEnterpriseConnectionsInternalProps) => {
   return (
     <Flow.Part part='enterpriseConnections'>
       <ChooseEnterpriseConnectionCard
         title={localizationKeys('signIn.enterpriseConnections.title')}
         subtitle={localizationKeys('signIn.enterpriseConnections.subtitle')}
-        onClick={handleEnterpriseSSO}
-        enterpriseConnections={enterpriseConnections}
+        onClick={props.onEnterpriseSSO as (id: string) => Promise<void>}
+        enterpriseConnections={props.enterpriseConnections}
       />
     </Flow.Part>
   );
@@ -75,6 +50,8 @@ const withEnterpriseConnectionsGuard = <P extends AvailableComponentProps>(Compo
   return HOC;
 };
 
+export { type EnterpriseConnection };
+
 export const SignInFactorOneEnterpriseConnections = withCardStateProvider(
-  withEnterpriseConnectionsGuard(SignInFactorOneEnterpriseConnectionsInternal),
+  withEnterpriseConnectionsGuard(SignInFactorOneEnterpriseConnectionsCard as any),
 );

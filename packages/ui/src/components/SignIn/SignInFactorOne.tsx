@@ -4,26 +4,16 @@ import type { SignInFactor } from '@clerk/shared/types';
 import React from 'react';
 
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
-import { ErrorCard } from '@/ui/elements/ErrorCard';
-import { LoadingCard } from '@/ui/elements/LoadingCard';
 
 import { withRedirectToAfterSignIn, withRedirectToSignInTask } from '../../common';
-import { useCoreSignIn, useEnvironment } from '../../contexts';
+import { buildVerificationRedirectUrl } from '../../common/redirects';
+import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
 import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
-import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
 import type { AlternativeMethodsMode } from './AlternativeMethods';
-import { AlternativeMethods } from './AlternativeMethods';
-import { hasMultipleEnterpriseConnections } from './shared';
-import { SignInFactorOneAlternativePhoneCodeCard } from './SignInFactorOneAlternativePhoneCodeCard';
-import { SignInFactorOneEmailCodeCard } from './SignInFactorOneEmailCodeCard';
-import { SignInFactorOneEmailLinkCard } from './SignInFactorOneEmailLinkCard';
-import { SignInFactorOneEnterpriseConnections } from './SignInFactorOneEnterpriseConnections';
-import { SignInFactorOneForgotPasswordCard } from './SignInFactorOneForgotPasswordCard';
-import { SignInFactorOnePasskey } from './SignInFactorOnePasskey';
+import { hasMultipleEnterpriseConnections, useHandleAuthenticateWithPasskey } from './shared';
 import type { PasswordErrorCode } from './SignInFactorOnePasswordCard';
-import { SignInFactorOnePasswordCard } from './SignInFactorOnePasswordCard';
-import { SignInFactorOnePhoneCodeCard } from './SignInFactorOnePhoneCodeCard';
+import { SignInFactorOneView } from './SignInFactorOneView';
 import { useHandleFirstFactorResult, useHandleUserLockedError } from './useHandleAttemptResult';
 import { useResetPasswordFactor } from './useResetPasswordFactor';
 import { determineStartingSignInFactor, factorHasLocalStrategy, factorKey } from './utils';
@@ -48,12 +38,15 @@ function determineAlternativeMethodsMode(
 }
 
 function SignInFactorOneInternal(): JSX.Element {
-  const { __internal_setActiveInProgress } = useClerk();
+  const clerk = useClerk();
+  const { __internal_setActiveInProgress } = clerk;
   const signIn = useCoreSignIn();
-  const { preferredSignInStrategy } = useEnvironment().displayConfig;
+  const env = useEnvironment();
+  const { preferredSignInStrategy } = env.displayConfig;
   const availableFactors = signIn.supportedFirstFactors;
   const router = useRouter();
   const card = useCardState();
+  const signInContext = useSignInContext();
   const { supportedFirstFactors, firstFactorVerification } = useCoreSignIn();
 
   const lastPreparedFactorKeyRef = React.useRef('');
@@ -67,8 +60,6 @@ function SignInFactorOneInternal(): JSX.Element {
       !!firstFactorVerification.channel &&
       firstFactorVerification.channel !== 'sms'
     ) {
-      // This is only applied to phone_code with channel that is not 'sms'
-      // because we don't want to send the channel parameter when its value is 'sms'
       factor.channel = firstFactorVerification.channel;
     }
     return {
@@ -152,38 +143,64 @@ function SignInFactorOneInternal(): JSX.Element {
     [signIn],
   );
 
+  const onSecondFactor = React.useCallback(() => router.navigate('../factor-two'), [router]);
+  const authenticateWithPasskey = useHandleAuthenticateWithPasskey(onSecondFactor);
+
+  const handleEmailLinkVerificationComplete = React.useCallback(
+    async (si: import('@clerk/shared/types').SignInResource) => {
+      if (si.status === 'complete') {
+        await clerk.setActive({
+          session: si.createdSessionId,
+          redirectUrl: signInContext.afterSignInUrl,
+        });
+      } else if (si.status === 'needs_second_factor') {
+        await router.navigate('../factor-two');
+      }
+    },
+    [clerk, signInContext.afterSignInUrl, router],
+  );
+
+  const emailLinkRedirectUrl = React.useMemo(
+    () =>
+      buildVerificationRedirectUrl({
+        ctx: signInContext,
+        baseUrl: signInContext.signInUrl,
+        intent: 'sign-in',
+      }),
+    [signInContext],
+  );
+
+  const handleEnterpriseSSO = React.useCallback(
+    (enterpriseConnectionId: string) => {
+      void signIn.authenticateWithRedirect({
+        strategy: 'enterprise_sso',
+        redirectUrl: signInContext.ssoCallbackUrl,
+        redirectUrlComplete: signInContext.afterSignInUrl || '/',
+        oidcPrompt: signInContext.oidcPrompt,
+        continueSignIn: true,
+        enterpriseConnectionId,
+      });
+    },
+    [signIn, signInContext],
+  );
+
   React.useEffect(() => {
     if (__internal_setActiveInProgress) {
       return;
     }
 
-    // Handle the case where a user lands on alternative methods screen,
-    // clicks a social button but then navigates back to sign in.
-    // SignIn status resets to 'needs_identifier'
     if (signIn.status === 'needs_identifier' || signIn.status === null) {
       void router.navigate('../');
     }
   }, [__internal_setActiveInProgress]);
 
-  if (!currentFactor) {
-    return signIn.status ? (
-      <ErrorCard
-        cardTitle={localizationKeys('signIn.noAvailableMethods.title')}
-        cardSubtitle={localizationKeys('signIn.noAvailableMethods.subtitle')}
-        message={localizationKeys('signIn.noAvailableMethods.message')}
-      />
-    ) : (
-      <LoadingCard />
-    );
-  }
-
   const toggleAllStrategies = hasAnyStrategy ? () => setShowAllStrategies(s => !s) : undefined;
-
   const toggleForgotPasswordStrategies = () => setShowForgotPasswordStrategies(s => !s);
 
   const handleFactorPrepare = () => {
-    lastPreparedFactorKeyRef.current = factorKey(currentFactor);
+    lastPreparedFactorKeyRef.current = factorKey(currentFactor!);
   };
+
   const selectFactor = (factor: SignInFactor) => {
     setFactor(prev => ({
       currentFactor: factor,
@@ -191,157 +208,66 @@ function SignInFactorOneInternal(): JSX.Element {
     }));
   };
 
-  /**
-   * Prompt to choose between a list of enterprise connections as supported first factors
-   * @experimental
-   */
-  if (hasMultipleEnterpriseConnections(signIn.supportedFirstFactors)) {
-    return <SignInFactorOneEnterpriseConnections />;
-  }
+  const handleClearPasswordError = () => {
+    card.setError(undefined);
+    setPasswordErrorCode(null);
+  };
 
-  if (showAllStrategies || showForgotPasswordStrategies) {
-    // Password errors are not recoverable by re-entering the password, so we hide the back button
-    const canGoBack = factorHasLocalStrategy(currentFactor) && !passwordErrorCode;
+  const handleResetPasswordBackLink = () => {
+    setFactor(prev => ({
+      currentFactor: prev.prevCurrentFactor,
+      prevCurrentFactor: prev.currentFactor,
+    }));
+    toggleForgotPasswordStrategies();
+  };
 
-    const toggle = showAllStrategies ? toggleAllStrategies : toggleForgotPasswordStrategies;
-    const backHandler = () => {
-      card.setError(undefined);
-      setPasswordErrorCode(null);
-      toggle?.();
-    };
+  const factorAlreadyPrepared = currentFactor ? lastPreparedFactorKeyRef.current === factorKey(currentFactor) : false;
 
-    const mode = determineAlternativeMethodsMode(showForgotPasswordStrategies, passwordErrorCode);
-
-    return (
-      <AlternativeMethods
-        mode={mode}
-        onBackLinkClick={canGoBack ? backHandler : undefined}
-        onFactorSelected={f => {
-          selectFactor(f);
-          toggle?.();
-        }}
-        currentFactor={currentFactor}
-      />
-    );
-  }
-
-  if (!currentFactor) {
-    return <LoadingCard />;
-  }
-
-  const factorAlreadyPrepared = lastPreparedFactorKeyRef.current === factorKey(currentFactor);
   const shouldAvoidPrepare = signIn.firstFactorVerification.status === 'verified' && factorAlreadyPrepared;
-  const codeCardProps = {
-    onAttemptCode: handleAttemptCode,
-    onPrepare: handlePrepareFirstFactor,
-    onGoBack: goBack,
-    identifier: signIn.identifier,
-    avatarUrl: signIn.userData.imageUrl,
-    shouldAvoidPrepare,
-  } as const;
 
-  switch (currentFactor?.strategy) {
-    case 'passkey':
-      return (
-        <SignInFactorOnePasskey
-          onFactorPrepare={handleFactorPrepare}
-          onShowAlternativeMethodsClick={toggleAllStrategies}
-        />
-      );
-    case 'password':
-      return (
-        <SignInFactorOnePasswordCard
-          onForgotPasswordMethodClick={resetPasswordFactor ? toggleForgotPasswordStrategies : toggleAllStrategies}
-          onShowAlternativeMethodsClick={toggleAllStrategies}
-          onAttemptPassword={handleAttemptPassword}
-          onGoBack={goBack}
-          identifier={signIn.identifier}
-          avatarUrl={signIn.userData.imageUrl}
-          hasResetPasswordFactor={!!resetPasswordFactor}
-        />
-      );
-    case 'email_code':
-      return (
-        <SignInFactorOneEmailCodeCard
-          factorAlreadyPrepared={factorAlreadyPrepared}
-          onFactorPrepare={handleFactorPrepare}
-          factor={currentFactor}
-          onShowAlternativeMethodsClicked={toggleAllStrategies}
-          {...codeCardProps}
-        />
-      );
-    case 'phone_code':
-      if (currentFactor.channel && currentFactor.channel !== 'sms') {
-        return (
-          <SignInFactorOneAlternativePhoneCodeCard
-            factorAlreadyPrepared={factorAlreadyPrepared}
-            onFactorPrepare={handleFactorPrepare}
-            factor={currentFactor}
-            onChangePhoneCodeChannel={selectFactor}
-            {...codeCardProps}
-          />
-        );
-      } else {
-        return (
-          <SignInFactorOnePhoneCodeCard
-            factorAlreadyPrepared={factorAlreadyPrepared}
-            onFactorPrepare={handleFactorPrepare}
-            factor={currentFactor}
-            onShowAlternativeMethodsClicked={toggleAllStrategies}
-            {...codeCardProps}
-          />
-        );
-      }
+  const enterpriseConnections = hasMultipleEnterpriseConnections(signIn.supportedFirstFactors)
+    ? signIn.supportedFirstFactors.map(ff => ({
+        id: ff.enterpriseConnectionId,
+        name: ff.enterpriseConnectionName,
+      }))
+    : [];
 
-    case 'email_link':
-      return (
-        <SignInFactorOneEmailLinkCard
-          factorAlreadyPrepared={factorAlreadyPrepared}
-          onFactorPrepare={handleFactorPrepare}
-          factor={currentFactor}
-          onShowAlternativeMethodsClicked={toggleAllStrategies}
-        />
-      );
-    case 'reset_password_phone_code':
-      return (
-        <SignInFactorOneForgotPasswordCard
-          factorAlreadyPrepared={factorAlreadyPrepared}
-          onFactorPrepare={handleFactorPrepare}
-          factor={currentFactor}
-          onShowAlternativeMethodsClicked={toggleAllStrategies}
-          onBackLinkClicked={() => {
-            setFactor(prev => ({
-              currentFactor: prev.prevCurrentFactor,
-              prevCurrentFactor: prev.currentFactor,
-            }));
-            toggleForgotPasswordStrategies();
-          }}
-          cardSubtitle={localizationKeys('signIn.forgotPassword.subtitle_phone')}
-          {...codeCardProps}
-        />
-      );
-
-    case 'reset_password_email_code':
-      return (
-        <SignInFactorOneForgotPasswordCard
-          factorAlreadyPrepared={factorAlreadyPrepared}
-          onFactorPrepare={handleFactorPrepare}
-          factor={currentFactor}
-          onShowAlternativeMethodsClicked={toggleAllStrategies}
-          onBackLinkClicked={() => {
-            setFactor(prev => ({
-              currentFactor: prev.prevCurrentFactor,
-              prevCurrentFactor: prev.currentFactor,
-            }));
-            toggleForgotPasswordStrategies();
-          }}
-          cardSubtitle={localizationKeys('signIn.forgotPassword.subtitle_email')}
-          {...codeCardProps}
-        />
-      );
-    default:
-      return <LoadingCard />;
-  }
+  return (
+    <SignInFactorOneView
+      currentFactor={currentFactor}
+      signInStatus={signIn.status}
+      showAllStrategies={showAllStrategies}
+      showForgotPasswordStrategies={showForgotPasswordStrategies}
+      passwordErrorCode={passwordErrorCode}
+      hasAnyAlternativeStrategy={hasAnyStrategy}
+      hasResetPasswordFactor={!!resetPasswordFactor}
+      hasMultipleEnterpriseConnections={hasMultipleEnterpriseConnections(signIn.supportedFirstFactors)}
+      factorAlreadyPrepared={factorAlreadyPrepared}
+      shouldAvoidPrepare={shouldAvoidPrepare}
+      identifier={signIn.identifier}
+      avatarUrl={signIn.userData.imageUrl}
+      enterpriseConnections={enterpriseConnections}
+      onGoBack={goBack}
+      onToggleAllStrategies={toggleAllStrategies}
+      onToggleForgotPasswordStrategies={toggleForgotPasswordStrategies}
+      onSelectFactor={selectFactor}
+      onFactorPrepare={handleFactorPrepare}
+      onClearPasswordError={handleClearPasswordError}
+      onAttemptPassword={handleAttemptPassword}
+      onAttemptCode={handleAttemptCode}
+      onPrepareFirstFactor={handlePrepareFirstFactor}
+      authenticateWithPasskey={async () => {
+        await authenticateWithPasskey();
+      }}
+      onEnterpriseSSO={handleEnterpriseSSO}
+      signIn={signIn}
+      onEmailLinkVerificationComplete={handleEmailLinkVerificationComplete}
+      onUserLockedError={handleUserLockedError}
+      emailLinkRedirectUrl={emailLinkRedirectUrl}
+      alternativeMethodsMode={determineAlternativeMethodsMode(showForgotPasswordStrategies, passwordErrorCode)}
+      onResetPasswordBackLink={handleResetPasswordBackLink}
+    />
+  );
 }
 
 export const SignInFactorOne = withRedirectToSignInTask(

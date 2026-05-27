@@ -1,0 +1,1626 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`SignInFactorOneView snapshots > renders default/loading for unknown strategy 1`] = `
+<div>
+  <div
+    class="cl-cardBox 🔒️ css-lesbzj"
+  >
+    <div
+      class="cl-card 🔒️ css-umn37z"
+    >
+      <div
+        class="cl-main 🔒️ css-1m9gx1x"
+      >
+        <span
+          aria-busy="true"
+          aria-live="polite"
+          class="cl-spinner 🔒️ css-1h6s71a-Spinner"
+        />
+      </div>
+      <div
+        class="css-aurft1"
+        data-cl-language="en-us"
+        data-cl-size="normal"
+        data-cl-theme="auto"
+        id="clerk-captcha"
+        style="display: block; align-self: center; max-height: 0; min-height: unset; margin-bottom: unset;"
+      />
+    </div>
+    <div
+      class="cl-footer 🔒️ css-12ewqpd"
+    >
+      <div
+        class="cl-footerItem 🔒️ css-1ww4jbf"
+      >
+        <div
+          class="css-dt53uo"
+        >
+          <div
+            class="css-y44tp9"
+          >
+            <div
+              class="css-ssjl5l"
+            >
+              <p
+                class="css-1scq7x4"
+                data-color="inherit"
+                data-variant="buttonSmall"
+              >
+                Secured by
+              </p>
+              <a
+                aria-label="Clerk logo"
+                class="css-1bdbjec-Link"
+                href="https://go.clerk.com/components"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <span
+                  class="css-yjy4qv-Icon"
+                />
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`SignInFactorOneView snapshots > renders email code card 1`] = `
+<div>
+  <div
+    class="cl-cardBox cl-signIn-emailCode 🔒️ css-lesbzj"
+  >
+    <div
+      class="cl-card cl-signIn-emailCode 🔒️ css-umn37z"
+    >
+      <div
+        class="cl-header 🔒️ css-1f4p2mz"
+      >
+        <div
+          class="css-x0fvpz"
+        >
+          <h1
+            class="cl-headerTitle 🔒️ css-x8j9i5-Heading"
+            data-localization-key="signIn.emailCode.title"
+          >
+            Check your email
+          </h1>
+          <p
+            class="cl-headerSubtitle 🔒️ css-qqe4hk"
+            data-color="secondary"
+            data-localization-key="signIn.emailCode.subtitle"
+            data-variant="body"
+          >
+            to continue to TestApp
+          </p>
+          <div
+            class="cl-identityPreview 🔒️ css-1389xgv"
+          >
+            <p
+              class="cl-identityPreviewText 🔒️ css-j1oc9"
+              data-color="secondary"
+              data-variant="body"
+            >
+              u***@example.com
+            </p>
+            <button
+              aria-label="Edit"
+              class="cl-identityPreviewEditButton cl-button 🔒️ css-xn52nr"
+              data-color="primary"
+              data-variant="link"
+            >
+              <span
+                class="cl-identityPreviewEditButtonIcon 🔒️ css-1ctxcx1-Icon"
+              />
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        class="cl-main 🔒️ css-ji79b9"
+      >
+        <div
+          class="cl-form 🔒️ css-2l8bgd"
+        >
+          <div
+            class="cl-otpCodeField 🔒️ css-1ugvctd"
+          >
+            <div
+              class="cl-otpCodeFieldInputContainer 🔒️ css-1quu1j7"
+            >
+              <noscript />
+              <div
+                data-input-otp-container="true"
+                style="position: relative; cursor: text; user-select: none; pointer-events: none; --root-height: 0px;"
+              >
+                <div
+                  class="cl-otpCodeFieldInputs 🔒️ css-1erfakr"
+                  role="group"
+                >
+                  <div
+                    aria-invalid="false"
+                    class="cl-otpCodeFieldInput cl-input 🔒️ css-oo2m5"
+                    data-feedback="info"
+                    data-focus-within="true"
+                    data-testid="otp-input-segment"
+                    data-variant="default"
+                  >
+                    <style>
+                      
+        @keyframes caret-blink-animation {
+          0%, 50% {
+            opacity: 1;
+          }
+          51%, 100% {
+            opacity: 0;
+          }
+        }
+      
+                    </style>
+                    <div
+                      class="css-1qlrn70"
+                    >
+                      <div
+                        class="css-31k80"
+                      />
+                    </div>
+                  </div>
+                  <div
+                    aria-invalid="false"
+                    class="cl-otpCodeFieldInput cl-input 🔒️ css-1sh4xr3"
+                    data-feedback="info"
+                    data-focus-within="false"
+                    data-testid="otp-input-segment"
+                    data-variant="default"
+                  />
+                  <div
+                    aria-invalid="false"
+                    class="cl-otpCodeFieldInput cl-input 🔒️ css-1sh4xr3"
+                    data-feedback="info"
+                    data-focus-within="false"
+                    data-testid="otp-input-segment"
+                    data-variant="default"
+                  />
+                  <div
+                    aria-invalid="false"
+                    class="cl-otpCodeFieldInput cl-input 🔒️ css-1sh4xr3"
+                    data-feedback="info"
+                    data-focus-within="false"
+                    data-testid="otp-input-segment"
+                    data-variant="default"
+                  />
+                  <div
+                    aria-invalid="false"
+                    class="cl-otpCodeFieldInput cl-input 🔒️ css-1sh4xr3"
+                    data-feedback="info"
+                    data-focus-within="false"
+                    data-testid="otp-input-segment"
+                    data-variant="default"
+                  />
+                  <div
+                    aria-invalid="false"
+                    class="cl-otpCodeFieldInput cl-input 🔒️ css-1sh4xr3"
+                    data-feedback="info"
+                    data-focus-within="false"
+                    data-testid="otp-input-segment"
+                    data-variant="default"
+                  />
+                </div>
+                <div
+                  style="position: absolute; inset: 0; pointer-events: none;"
+                >
+                  <input
+                    aria-label="Enter verification code"
+                    aria-required="true"
+                    autocomplete="one-time-code"
+                    data-input-otp="true"
+                    data-input-otp-mse="0"
+                    data-input-otp-mss="0"
+                    data-input-otp-placeholder-shown="true"
+                    inputmode="numeric"
+                    maxlength="6"
+                    pattern="^\\d+$"
+                    style="position: absolute; inset: 0; width: 100%; height: 100%; display: flex; text-align: center; opacity: 1; color: transparent; pointer-events: all; background: transparent; caret-color: transparent; border: 0px solid transparent; outline: 0 solid transparent; box-shadow: none; line-height: 1; letter-spacing: -.5em; font-size: var(--root-height); font-family: monospace; font-variant-numeric: tabular-nums;"
+                    value=""
+                  />
+                </div>
+              </div>
+            </div>
+            <span
+              aria-atomic="true"
+              aria-live="polite"
+              class="css-5ur8x"
+            />
+            <div
+              class="css-1vrundg"
+              style="height: 0px; position: relative;"
+            />
+          </div>
+          <button
+            class="cl-formResendCodeLink cl-button 🔒️ css-xn52nr"
+            data-color="primary"
+            data-variant="link"
+            disabled=""
+          >
+            Didn't receive a code? Resend
+             (30)
+          </button>
+        </div>
+        <div
+          class="css-bails5"
+        >
+          <button
+            class="cl-formButtonPrimary cl-button 🔒️ css-6yxkbg"
+            data-color="primary"
+            data-localization-key="formButtonPrimary"
+            data-variant="solid"
+          >
+            <span
+              class="css-2iusy0"
+            >
+              Continue
+              <span
+                class="cl-buttonArrowIcon 🔒️ css-ra3p3j-Icon"
+              />
+            </span>
+          </button>
+          <div
+            class="cl-footerAction cl-footerAction__alternativeMethods 🔒️ css-h2zfvr"
+          >
+            <a
+              class="cl-footerActionLink 🔒️ css-12ndoxu-Link"
+              data-localization-key="footerActionLink__useAnotherMethod"
+              href="https://clerk.com/"
+            >
+              Use another method
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="cl-footer 🔒️ css-12ewqpd"
+    >
+      <div
+        class="cl-footerItem 🔒️ css-1ww4jbf"
+      >
+        <div
+          class="css-dt53uo"
+        >
+          <div
+            class="css-y44tp9"
+          >
+            <div
+              class="css-ssjl5l"
+            >
+              <p
+                class="css-1scq7x4"
+                data-color="inherit"
+                data-variant="buttonSmall"
+              >
+                Secured by
+              </p>
+              <a
+                aria-label="Clerk logo"
+                class="css-1bdbjec-Link"
+                href="https://go.clerk.com/components"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <span
+                  class="css-yjy4qv-Icon"
+                />
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`SignInFactorOneView snapshots > renders error state when no available methods 1`] = `
+<div>
+  <div
+    class="cl-cardBox cl-signIn-havingTrouble 🔒️ css-lesbzj"
+  >
+    <div
+      class="cl-card cl-signIn-havingTrouble 🔒️ css-umn37z"
+    >
+      <div
+        class="cl-header 🔒️ css-1f4p2mz"
+      >
+        <div
+          class="cl-logoBox 🔒️ css-18b18uy"
+        >
+          <a
+            class="css-1xlmx23-Link"
+            href="https://dashboard.clerk.com/"
+          >
+            <img
+              alt="TestApp"
+              class="cl-logoImage 🔒️ css-oc7xeg"
+              crossorigin="anonymous"
+              src="https://images.clerk.com/uploaded/img_logo.png"
+            />
+          </a>
+        </div>
+        <div
+          class="css-x0fvpz"
+        >
+          <h1
+            class="cl-headerTitle 🔒️ css-x8j9i5-Heading"
+            data-localization-key="signIn.noAvailableMethods.title"
+          >
+            Cannot sign in
+          </h1>
+          <p
+            class="cl-headerSubtitle 🔒️ css-qqe4hk"
+            data-color="secondary"
+            data-localization-key="signIn.noAvailableMethods.subtitle"
+            data-variant="body"
+          >
+            An error occurred
+          </p>
+        </div>
+      </div>
+      <div
+        class="cl-main 🔒️ css-1f4p2mz"
+      >
+        <p
+          class="css-skdmtm"
+          data-color="secondary"
+          data-localization-key="signIn.noAvailableMethods.message"
+          data-variant="body"
+        >
+          Cannot proceed with sign in. There's no available authentication factor.
+        </p>
+        <button
+          class="cl-button 🔒️ css-j5eood"
+          data-color="primary"
+          data-localization-key="signIn.alternativeMethods.getHelp.blockButton__emailSupport"
+          data-variant="solid"
+        >
+          <span
+            class="css-2iusy0"
+          >
+            Email support
+            <span
+              class="cl-buttonArrowIcon 🔒️ css-ra3p3j-Icon"
+            />
+          </span>
+        </button>
+        <div
+          class="cl-footerAction cl-footerAction__alternativeMethods 🔒️ css-h2zfvr"
+        >
+          <a
+            class="cl-footerActionLink 🔒️ css-12ndoxu-Link"
+            data-localization-key="backButton"
+            href="https://clerk.com/"
+          >
+            Back
+          </a>
+        </div>
+      </div>
+    </div>
+    <div
+      class="cl-footer 🔒️ css-12ewqpd"
+    >
+      <div
+        class="cl-footerItem 🔒️ css-1ww4jbf"
+      >
+        <div
+          class="css-dt53uo"
+        >
+          <div
+            class="css-y44tp9"
+          >
+            <div
+              class="css-ssjl5l"
+            >
+              <p
+                class="css-1scq7x4"
+                data-color="inherit"
+                data-variant="buttonSmall"
+              >
+                Secured by
+              </p>
+              <a
+                aria-label="Clerk logo"
+                class="css-1bdbjec-Link"
+                href="https://go.clerk.com/components"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <span
+                  class="css-yjy4qv-Icon"
+                />
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`SignInFactorOneView snapshots > renders loading state when signIn status is null 1`] = `
+<div>
+  <div
+    class="cl-cardBox 🔒️ css-lesbzj"
+  >
+    <div
+      class="cl-card 🔒️ css-umn37z"
+    >
+      <div
+        class="cl-main 🔒️ css-1m9gx1x"
+      >
+        <span
+          aria-busy="true"
+          aria-live="polite"
+          class="cl-spinner 🔒️ css-1h6s71a-Spinner"
+        />
+      </div>
+      <div
+        class="css-aurft1"
+        data-cl-language="en-us"
+        data-cl-size="normal"
+        data-cl-theme="auto"
+        id="clerk-captcha"
+        style="display: block; align-self: center; max-height: 0; min-height: unset; margin-bottom: unset;"
+      />
+    </div>
+    <div
+      class="cl-footer 🔒️ css-12ewqpd"
+    >
+      <div
+        class="cl-footerItem 🔒️ css-1ww4jbf"
+      >
+        <div
+          class="css-dt53uo"
+        >
+          <div
+            class="css-y44tp9"
+          >
+            <div
+              class="css-ssjl5l"
+            >
+              <p
+                class="css-1scq7x4"
+                data-color="inherit"
+                data-variant="buttonSmall"
+              >
+                Secured by
+              </p>
+              <a
+                aria-label="Clerk logo"
+                class="css-1bdbjec-Link"
+                href="https://go.clerk.com/components"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <span
+                  class="css-yjy4qv-Icon"
+                />
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`SignInFactorOneView snapshots > renders passkey card 1`] = `
+<div>
+  <div
+    class="cl-cardBox cl-signIn-password 🔒️ css-lesbzj"
+  >
+    <div
+      class="cl-card cl-signIn-password 🔒️ css-umn37z"
+    >
+      <div
+        class="cl-header 🔒️ css-1f4p2mz"
+      >
+        <div
+          class="cl-logoBox 🔒️ css-18b18uy"
+        >
+          <a
+            class="css-1xlmx23-Link"
+            href="https://dashboard.clerk.com/"
+          >
+            <img
+              alt="TestApp"
+              class="cl-logoImage 🔒️ css-oc7xeg"
+              crossorigin="anonymous"
+              src="https://images.clerk.com/uploaded/img_logo.png"
+            />
+          </a>
+        </div>
+        <div
+          class="css-x0fvpz"
+        >
+          <h1
+            class="cl-headerTitle 🔒️ css-x8j9i5-Heading"
+            data-localization-key="signIn.passkey.title"
+          >
+            Use your passkey
+          </h1>
+          <p
+            class="cl-headerSubtitle 🔒️ css-qqe4hk"
+            data-color="secondary"
+            data-localization-key="signIn.passkey.subtitle"
+            data-variant="body"
+          >
+            Using your passkey confirms it's you. Your device may ask for your fingerprint, face or screen lock.
+          </p>
+          <div
+            class="cl-identityPreview 🔒️ css-1389xgv"
+          >
+            <p
+              class="cl-identityPreviewText 🔒️ css-j1oc9"
+              data-color="secondary"
+              data-variant="body"
+            >
+              user@example.com
+            </p>
+            <button
+              aria-label="Edit"
+              class="cl-identityPreviewEditButton cl-button 🔒️ css-xn52nr"
+              data-color="primary"
+              data-variant="link"
+            >
+              <span
+                class="cl-identityPreviewEditButtonIcon 🔒️ css-1ctxcx1-Icon"
+              />
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        class="cl-main 🔒️ css-1f4p2mz"
+      >
+        <form
+          class="cl-form 🔒️ css-ji79b9"
+        >
+          <button
+            aria-hidden="true"
+            style="visibility: hidden; position: absolute;"
+            type="submit"
+          />
+          <button
+            class="cl-formButtonPrimary cl-button 🔒️ css-6yxkbg"
+            data-color="primary"
+            data-localization-key="formButtonPrimary"
+            data-variant="solid"
+          >
+            <span
+              class="css-2iusy0"
+            >
+              Continue
+              <span
+                class="cl-buttonArrowIcon 🔒️ css-ra3p3j-Icon"
+              />
+            </span>
+          </button>
+        </form>
+        <div
+          class="cl-footerAction cl-footerAction__alternativeMethods 🔒️ css-h2zfvr"
+        >
+          <a
+            class="cl-footerActionLink 🔒️ css-12ndoxu-Link"
+            data-localization-key="footerActionLink__useAnotherMethod"
+            href="https://clerk.com/"
+          >
+            Use another method
+          </a>
+        </div>
+      </div>
+    </div>
+    <div
+      class="cl-footer 🔒️ css-12ewqpd"
+    >
+      <div
+        class="cl-footerItem 🔒️ css-1ww4jbf"
+      >
+        <div
+          class="css-dt53uo"
+        >
+          <div
+            class="css-y44tp9"
+          >
+            <div
+              class="css-ssjl5l"
+            >
+              <p
+                class="css-1scq7x4"
+                data-color="inherit"
+                data-variant="buttonSmall"
+              >
+                Secured by
+              </p>
+              <a
+                aria-label="Clerk logo"
+                class="css-1bdbjec-Link"
+                href="https://go.clerk.com/components"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <span
+                  class="css-yjy4qv-Icon"
+                />
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`SignInFactorOneView snapshots > renders password card 1`] = `
+<div>
+  <div
+    class="cl-cardBox cl-signIn-password 🔒️ css-lesbzj"
+  >
+    <div
+      class="cl-card cl-signIn-password 🔒️ css-umn37z"
+    >
+      <div
+        class="cl-header 🔒️ css-1f4p2mz"
+      >
+        <div
+          class="cl-logoBox 🔒️ css-nu1iui"
+        >
+          <a
+            class="css-1xlmx23-Link"
+            href="https://dashboard.clerk.com/"
+          >
+            <img
+              alt="TestApp"
+              class="cl-logoImage 🔒️ css-oc7xeg"
+              crossorigin="anonymous"
+              src="https://images.clerk.com/uploaded/img_logo.png"
+            />
+          </a>
+        </div>
+        <div
+          class="css-x0fvpz"
+        >
+          <h1
+            class="cl-headerTitle 🔒️ css-x8j9i5-Heading"
+            data-localization-key="signIn.password.title"
+          >
+            Enter your password
+          </h1>
+          <p
+            class="cl-headerSubtitle 🔒️ css-qqe4hk"
+            data-color="secondary"
+            data-localization-key="signIn.password.subtitle"
+            data-variant="body"
+          >
+            Enter the password associated with your account
+          </p>
+          <div
+            class="cl-identityPreview 🔒️ css-1389xgv"
+          >
+            <p
+              class="cl-identityPreviewText 🔒️ css-j1oc9"
+              data-color="secondary"
+              data-variant="body"
+            >
+              user@example.com
+            </p>
+            <button
+              aria-label="Edit"
+              class="cl-identityPreviewEditButton cl-button 🔒️ css-xn52nr"
+              data-color="primary"
+              data-variant="link"
+            >
+              <span
+                class="cl-identityPreviewEditButtonIcon 🔒️ css-1ctxcx1-Icon"
+              />
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        class="cl-main 🔒️ css-1f4p2mz"
+      >
+        <form
+          class="cl-form 🔒️ css-ji79b9"
+        >
+          <button
+            aria-hidden="true"
+            style="visibility: hidden; position: absolute;"
+            type="submit"
+          />
+          <input
+            id="identifier-field"
+            name="identifier"
+            readonly=""
+            style="display: none;"
+            value="user@example.com"
+          />
+          <div
+            class="cl-formFieldRow cl-formFieldRow__password 🔒️ css-k7wlaf"
+          >
+            <div
+              class="cl-formField cl-formField__password 🔒️ css-10rdw13"
+            >
+              <div
+                class="css-17uj465"
+              >
+                <div
+                  class="cl-formFieldLabelRow cl-formFieldLabelRow__password 🔒️ css-66mzqw"
+                >
+                  <label
+                    class="cl-formFieldLabel cl-formFieldLabel__password-field 🔒️ css-h16r45-FormLabel"
+                    data-localization-key="formFieldLabel__password"
+                    for="password-field"
+                  >
+                    Password
+                  </label>
+                  <a
+                    class="cl-formFieldAction cl-formFieldAction__password 🔒️ css-1vj5m21-Link"
+                    data-localization-key="formFieldAction__forgotPassword"
+                    href=""
+                  >
+                    Forgot password?
+                  </a>
+                </div>
+                <div
+                  class="cl-formFieldInputGroup 🔒️ css-i1u4p8"
+                >
+                  <input
+                    aria-disabled="false"
+                    aria-invalid="false"
+                    aria-required="false"
+                    class="cl-formFieldInput cl-input cl-formFieldInput__password cl-input__password 🔒️ css-nvk3g"
+                    data-feedback="info"
+                    data-variant="default"
+                    id="password-field"
+                    name="password"
+                    placeholder="Enter your password"
+                    type="password"
+                    value=""
+                  />
+                  <button
+                    aria-label="Show password"
+                    class="cl-formFieldInputShowPasswordButton cl-button 🔒️ css-poejws"
+                    data-color="primary"
+                    data-variant="ghost"
+                  >
+                    <span
+                      class="cl-formFieldInputShowPasswordIcon 🔒️ css-1ctxcx1-Icon"
+                    />
+                  </button>
+                </div>
+              </div>
+              <span
+                aria-atomic="true"
+                aria-live="polite"
+                class="css-5ur8x"
+              />
+              <div
+                class="css-z8mie1"
+                style="height: 0px; position: relative;"
+              />
+            </div>
+          </div>
+          <button
+            class="cl-formButtonPrimary cl-button 🔒️ css-6yxkbg"
+            data-color="primary"
+            data-localization-key="formButtonPrimary"
+            data-variant="solid"
+          >
+            <span
+              class="css-2iusy0"
+            >
+              Continue
+              <span
+                class="cl-buttonArrowIcon 🔒️ css-ra3p3j-Icon"
+              />
+            </span>
+          </button>
+        </form>
+        <div
+          class="cl-footerAction cl-footerAction__alternativeMethods 🔒️ css-h2zfvr"
+        >
+          <a
+            class="cl-footerActionLink 🔒️ css-12ndoxu-Link"
+            data-localization-key="signIn.password.actionLink"
+            href="https://clerk.com/"
+          >
+            Use another method
+          </a>
+        </div>
+      </div>
+    </div>
+    <div
+      class="cl-footer 🔒️ css-12ewqpd"
+    >
+      <div
+        class="cl-footerItem 🔒️ css-1ww4jbf"
+      >
+        <div
+          class="css-dt53uo"
+        >
+          <div
+            class="css-y44tp9"
+          >
+            <div
+              class="css-ssjl5l"
+            >
+              <p
+                class="css-1scq7x4"
+                data-color="inherit"
+                data-variant="buttonSmall"
+              >
+                Secured by
+              </p>
+              <a
+                aria-label="Clerk logo"
+                class="css-1bdbjec-Link"
+                href="https://go.clerk.com/components"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <span
+                  class="css-yjy4qv-Icon"
+                />
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`SignInFactorOneView snapshots > renders phone code card 1`] = `
+<div>
+  <div
+    class="cl-cardBox cl-signIn-phoneCode 🔒️ css-lesbzj"
+  >
+    <div
+      class="cl-card cl-signIn-phoneCode 🔒️ css-umn37z"
+    >
+      <div
+        class="cl-header 🔒️ css-1f4p2mz"
+      >
+        <div
+          class="css-x0fvpz"
+        >
+          <h1
+            class="cl-headerTitle 🔒️ css-x8j9i5-Heading"
+            data-localization-key="signIn.phoneCode.title"
+          >
+            Check your phone
+          </h1>
+          <p
+            class="cl-headerSubtitle 🔒️ css-qqe4hk"
+            data-color="secondary"
+            data-localization-key="signIn.phoneCode.subtitle"
+            data-variant="body"
+          >
+            to continue to TestApp
+          </p>
+          <div
+            class="cl-identityPreview 🔒️ css-1389xgv"
+          >
+            <p
+              class="cl-identityPreviewText 🔒️ css-j1oc9"
+              data-color="secondary"
+              data-variant="body"
+            >
+              +1***1234
+            </p>
+            <button
+              aria-label="Edit"
+              class="cl-identityPreviewEditButton cl-button 🔒️ css-xn52nr"
+              data-color="primary"
+              data-variant="link"
+            >
+              <span
+                class="cl-identityPreviewEditButtonIcon 🔒️ css-1ctxcx1-Icon"
+              />
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        class="cl-main 🔒️ css-ji79b9"
+      >
+        <div
+          class="cl-form 🔒️ css-2l8bgd"
+        >
+          <div
+            class="cl-otpCodeField 🔒️ css-1ugvctd"
+          >
+            <div
+              class="cl-otpCodeFieldInputContainer 🔒️ css-1quu1j7"
+            >
+              <noscript />
+              <div
+                data-input-otp-container="true"
+                style="position: relative; cursor: text; user-select: none; pointer-events: none; --root-height: 0px;"
+              >
+                <div
+                  class="cl-otpCodeFieldInputs 🔒️ css-1erfakr"
+                  role="group"
+                >
+                  <div
+                    aria-invalid="false"
+                    class="cl-otpCodeFieldInput cl-input 🔒️ css-oo2m5"
+                    data-feedback="info"
+                    data-focus-within="true"
+                    data-testid="otp-input-segment"
+                    data-variant="default"
+                  >
+                    <style>
+                      
+        @keyframes caret-blink-animation {
+          0%, 50% {
+            opacity: 1;
+          }
+          51%, 100% {
+            opacity: 0;
+          }
+        }
+      
+                    </style>
+                    <div
+                      class="css-1qlrn70"
+                    >
+                      <div
+                        class="css-31k80"
+                      />
+                    </div>
+                  </div>
+                  <div
+                    aria-invalid="false"
+                    class="cl-otpCodeFieldInput cl-input 🔒️ css-1sh4xr3"
+                    data-feedback="info"
+                    data-focus-within="false"
+                    data-testid="otp-input-segment"
+                    data-variant="default"
+                  />
+                  <div
+                    aria-invalid="false"
+                    class="cl-otpCodeFieldInput cl-input 🔒️ css-1sh4xr3"
+                    data-feedback="info"
+                    data-focus-within="false"
+                    data-testid="otp-input-segment"
+                    data-variant="default"
+                  />
+                  <div
+                    aria-invalid="false"
+                    class="cl-otpCodeFieldInput cl-input 🔒️ css-1sh4xr3"
+                    data-feedback="info"
+                    data-focus-within="false"
+                    data-testid="otp-input-segment"
+                    data-variant="default"
+                  />
+                  <div
+                    aria-invalid="false"
+                    class="cl-otpCodeFieldInput cl-input 🔒️ css-1sh4xr3"
+                    data-feedback="info"
+                    data-focus-within="false"
+                    data-testid="otp-input-segment"
+                    data-variant="default"
+                  />
+                  <div
+                    aria-invalid="false"
+                    class="cl-otpCodeFieldInput cl-input 🔒️ css-1sh4xr3"
+                    data-feedback="info"
+                    data-focus-within="false"
+                    data-testid="otp-input-segment"
+                    data-variant="default"
+                  />
+                </div>
+                <div
+                  style="position: absolute; inset: 0; pointer-events: none;"
+                >
+                  <input
+                    aria-label="Enter verification code"
+                    aria-required="true"
+                    autocomplete="one-time-code"
+                    data-input-otp="true"
+                    data-input-otp-mse="0"
+                    data-input-otp-mss="0"
+                    data-input-otp-placeholder-shown="true"
+                    inputmode="numeric"
+                    maxlength="6"
+                    pattern="^\\d+$"
+                    style="position: absolute; inset: 0; width: 100%; height: 100%; display: flex; text-align: center; opacity: 1; color: transparent; pointer-events: all; background: transparent; caret-color: transparent; border: 0px solid transparent; outline: 0 solid transparent; box-shadow: none; line-height: 1; letter-spacing: -.5em; font-size: var(--root-height); font-family: monospace; font-variant-numeric: tabular-nums;"
+                    value=""
+                  />
+                </div>
+              </div>
+            </div>
+            <span
+              aria-atomic="true"
+              aria-live="polite"
+              class="css-5ur8x"
+            />
+            <div
+              class="css-1vrundg"
+              style="height: 0px; position: relative;"
+            />
+          </div>
+          <button
+            class="cl-formResendCodeLink cl-button 🔒️ css-xn52nr"
+            data-color="primary"
+            data-variant="link"
+            disabled=""
+          >
+            Didn't receive a code? Resend
+             (30)
+          </button>
+        </div>
+        <div
+          class="css-bails5"
+        >
+          <button
+            class="cl-formButtonPrimary cl-button 🔒️ css-6yxkbg"
+            data-color="primary"
+            data-localization-key="formButtonPrimary"
+            data-variant="solid"
+          >
+            <span
+              class="css-2iusy0"
+            >
+              Continue
+              <span
+                class="cl-buttonArrowIcon 🔒️ css-ra3p3j-Icon"
+              />
+            </span>
+          </button>
+          <div
+            class="cl-footerAction cl-footerAction__alternativeMethods 🔒️ css-h2zfvr"
+          >
+            <a
+              class="cl-footerActionLink 🔒️ css-12ndoxu-Link"
+              data-localization-key="footerActionLink__useAnotherMethod"
+              href="https://clerk.com/"
+            >
+              Use another method
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="cl-footer 🔒️ css-12ewqpd"
+    >
+      <div
+        class="cl-footerItem 🔒️ css-1ww4jbf"
+      >
+        <div
+          class="css-dt53uo"
+        >
+          <div
+            class="css-y44tp9"
+          >
+            <div
+              class="css-ssjl5l"
+            >
+              <p
+                class="css-1scq7x4"
+                data-color="inherit"
+                data-variant="buttonSmall"
+              >
+                Secured by
+              </p>
+              <a
+                aria-label="Clerk logo"
+                class="css-1bdbjec-Link"
+                href="https://go.clerk.com/components"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <span
+                  class="css-yjy4qv-Icon"
+                />
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`SignInFactorOneView snapshots > renders reset password email code card 1`] = `
+<div>
+  <div
+    class="cl-cardBox cl-signIn-resetPassword 🔒️ css-lesbzj"
+  >
+    <div
+      class="cl-card cl-signIn-resetPassword 🔒️ css-umn37z"
+    >
+      <div
+        class="cl-header 🔒️ css-1f4p2mz"
+      >
+        <div
+          class="css-x0fvpz"
+        >
+          <h1
+            class="cl-headerTitle 🔒️ css-x8j9i5-Heading"
+            data-localization-key="signIn.forgotPassword.title"
+          >
+            Reset password
+          </h1>
+          <p
+            class="cl-headerSubtitle 🔒️ css-qqe4hk"
+            data-color="secondary"
+            data-localization-key="signIn.forgotPassword.subtitle_email"
+            data-variant="body"
+          >
+            First, enter the code sent to your email address
+          </p>
+          <div
+            class="cl-identityPreview 🔒️ css-1389xgv"
+          >
+            <button
+              aria-label="Edit"
+              class="cl-identityPreviewEditButton cl-button 🔒️ css-xn52nr"
+              data-color="primary"
+              data-variant="link"
+            >
+              <span
+                class="cl-identityPreviewEditButtonIcon 🔒️ css-1ctxcx1-Icon"
+              />
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        class="cl-main 🔒️ css-ji79b9"
+      >
+        <div
+          class="cl-form 🔒️ css-2l8bgd"
+        >
+          <div
+            class="cl-otpCodeField 🔒️ css-1ugvctd"
+          >
+            <div
+              class="cl-otpCodeFieldInputContainer 🔒️ css-1quu1j7"
+            >
+              <noscript />
+              <div
+                data-input-otp-container="true"
+                style="position: relative; cursor: text; user-select: none; pointer-events: none; --root-height: 0px;"
+              >
+                <div
+                  class="cl-otpCodeFieldInputs 🔒️ css-1erfakr"
+                  role="group"
+                >
+                  <div
+                    aria-invalid="false"
+                    class="cl-otpCodeFieldInput cl-input 🔒️ css-oo2m5"
+                    data-feedback="info"
+                    data-focus-within="true"
+                    data-testid="otp-input-segment"
+                    data-variant="default"
+                  >
+                    <style>
+                      
+        @keyframes caret-blink-animation {
+          0%, 50% {
+            opacity: 1;
+          }
+          51%, 100% {
+            opacity: 0;
+          }
+        }
+      
+                    </style>
+                    <div
+                      class="css-1qlrn70"
+                    >
+                      <div
+                        class="css-31k80"
+                      />
+                    </div>
+                  </div>
+                  <div
+                    aria-invalid="false"
+                    class="cl-otpCodeFieldInput cl-input 🔒️ css-1sh4xr3"
+                    data-feedback="info"
+                    data-focus-within="false"
+                    data-testid="otp-input-segment"
+                    data-variant="default"
+                  />
+                  <div
+                    aria-invalid="false"
+                    class="cl-otpCodeFieldInput cl-input 🔒️ css-1sh4xr3"
+                    data-feedback="info"
+                    data-focus-within="false"
+                    data-testid="otp-input-segment"
+                    data-variant="default"
+                  />
+                  <div
+                    aria-invalid="false"
+                    class="cl-otpCodeFieldInput cl-input 🔒️ css-1sh4xr3"
+                    data-feedback="info"
+                    data-focus-within="false"
+                    data-testid="otp-input-segment"
+                    data-variant="default"
+                  />
+                  <div
+                    aria-invalid="false"
+                    class="cl-otpCodeFieldInput cl-input 🔒️ css-1sh4xr3"
+                    data-feedback="info"
+                    data-focus-within="false"
+                    data-testid="otp-input-segment"
+                    data-variant="default"
+                  />
+                  <div
+                    aria-invalid="false"
+                    class="cl-otpCodeFieldInput cl-input 🔒️ css-1sh4xr3"
+                    data-feedback="info"
+                    data-focus-within="false"
+                    data-testid="otp-input-segment"
+                    data-variant="default"
+                  />
+                </div>
+                <div
+                  style="position: absolute; inset: 0; pointer-events: none;"
+                >
+                  <input
+                    aria-label="Enter verification code"
+                    aria-required="true"
+                    autocomplete="one-time-code"
+                    data-input-otp="true"
+                    data-input-otp-mse="0"
+                    data-input-otp-mss="0"
+                    data-input-otp-placeholder-shown="true"
+                    inputmode="numeric"
+                    maxlength="6"
+                    pattern="^\\d+$"
+                    style="position: absolute; inset: 0; width: 100%; height: 100%; display: flex; text-align: center; opacity: 1; color: transparent; pointer-events: all; background: transparent; caret-color: transparent; border: 0px solid transparent; outline: 0 solid transparent; box-shadow: none; line-height: 1; letter-spacing: -.5em; font-size: var(--root-height); font-family: monospace; font-variant-numeric: tabular-nums;"
+                    value=""
+                  />
+                </div>
+              </div>
+            </div>
+            <span
+              aria-atomic="true"
+              aria-live="polite"
+              class="css-5ur8x"
+            />
+            <div
+              class="css-1vrundg"
+              style="height: 0px; position: relative;"
+            />
+          </div>
+          <button
+            class="cl-formResendCodeLink cl-button 🔒️ css-xn52nr"
+            data-color="primary"
+            data-variant="link"
+            disabled=""
+          >
+            Didn't receive a code? Resend
+             (30)
+          </button>
+        </div>
+        <div
+          class="css-bails5"
+        >
+          <button
+            class="cl-formButtonPrimary cl-button 🔒️ css-6yxkbg"
+            data-color="primary"
+            data-localization-key="formButtonPrimary"
+            data-variant="solid"
+          >
+            <span
+              class="css-2iusy0"
+            >
+              Continue
+              <span
+                class="cl-buttonArrowIcon 🔒️ css-ra3p3j-Icon"
+              />
+            </span>
+          </button>
+          <button
+            class="cl-formButtonReset cl-button 🔒️ css-1qfxkx"
+            data-color="primary"
+            data-variant="ghost"
+          />
+        </div>
+      </div>
+    </div>
+    <div
+      class="cl-footer 🔒️ css-12ewqpd"
+    >
+      <div
+        class="cl-footerItem 🔒️ css-1ww4jbf"
+      >
+        <div
+          class="css-dt53uo"
+        >
+          <div
+            class="css-y44tp9"
+          >
+            <div
+              class="css-ssjl5l"
+            >
+              <p
+                class="css-1scq7x4"
+                data-color="inherit"
+                data-variant="buttonSmall"
+              >
+                Secured by
+              </p>
+              <a
+                aria-label="Clerk logo"
+                class="css-1bdbjec-Link"
+                href="https://go.clerk.com/components"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <span
+                  class="css-yjy4qv-Icon"
+                />
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`SignInFactorOneView snapshots > renders reset password phone code card 1`] = `
+<div>
+  <div
+    class="cl-cardBox cl-signIn-resetPassword 🔒️ css-lesbzj"
+  >
+    <div
+      class="cl-card cl-signIn-resetPassword 🔒️ css-umn37z"
+    >
+      <div
+        class="cl-header 🔒️ css-1f4p2mz"
+      >
+        <div
+          class="css-x0fvpz"
+        >
+          <h1
+            class="cl-headerTitle 🔒️ css-x8j9i5-Heading"
+            data-localization-key="signIn.forgotPassword.title"
+          >
+            Reset password
+          </h1>
+          <p
+            class="cl-headerSubtitle 🔒️ css-qqe4hk"
+            data-color="secondary"
+            data-localization-key="signIn.forgotPassword.subtitle_phone"
+            data-variant="body"
+          >
+            First, enter the code sent to your phone
+          </p>
+          <div
+            class="cl-identityPreview 🔒️ css-1389xgv"
+          >
+            <button
+              aria-label="Edit"
+              class="cl-identityPreviewEditButton cl-button 🔒️ css-xn52nr"
+              data-color="primary"
+              data-variant="link"
+            >
+              <span
+                class="cl-identityPreviewEditButtonIcon 🔒️ css-1ctxcx1-Icon"
+              />
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        class="cl-main 🔒️ css-ji79b9"
+      >
+        <div
+          class="cl-form 🔒️ css-2l8bgd"
+        >
+          <div
+            class="cl-otpCodeField 🔒️ css-1ugvctd"
+          >
+            <div
+              class="cl-otpCodeFieldInputContainer 🔒️ css-1quu1j7"
+            >
+              <noscript />
+              <div
+                data-input-otp-container="true"
+                style="position: relative; cursor: text; user-select: none; pointer-events: none; --root-height: 0px;"
+              >
+                <div
+                  class="cl-otpCodeFieldInputs 🔒️ css-1erfakr"
+                  role="group"
+                >
+                  <div
+                    aria-invalid="false"
+                    class="cl-otpCodeFieldInput cl-input 🔒️ css-oo2m5"
+                    data-feedback="info"
+                    data-focus-within="true"
+                    data-testid="otp-input-segment"
+                    data-variant="default"
+                  >
+                    <style>
+                      
+        @keyframes caret-blink-animation {
+          0%, 50% {
+            opacity: 1;
+          }
+          51%, 100% {
+            opacity: 0;
+          }
+        }
+      
+                    </style>
+                    <div
+                      class="css-1qlrn70"
+                    >
+                      <div
+                        class="css-31k80"
+                      />
+                    </div>
+                  </div>
+                  <div
+                    aria-invalid="false"
+                    class="cl-otpCodeFieldInput cl-input 🔒️ css-1sh4xr3"
+                    data-feedback="info"
+                    data-focus-within="false"
+                    data-testid="otp-input-segment"
+                    data-variant="default"
+                  />
+                  <div
+                    aria-invalid="false"
+                    class="cl-otpCodeFieldInput cl-input 🔒️ css-1sh4xr3"
+                    data-feedback="info"
+                    data-focus-within="false"
+                    data-testid="otp-input-segment"
+                    data-variant="default"
+                  />
+                  <div
+                    aria-invalid="false"
+                    class="cl-otpCodeFieldInput cl-input 🔒️ css-1sh4xr3"
+                    data-feedback="info"
+                    data-focus-within="false"
+                    data-testid="otp-input-segment"
+                    data-variant="default"
+                  />
+                  <div
+                    aria-invalid="false"
+                    class="cl-otpCodeFieldInput cl-input 🔒️ css-1sh4xr3"
+                    data-feedback="info"
+                    data-focus-within="false"
+                    data-testid="otp-input-segment"
+                    data-variant="default"
+                  />
+                  <div
+                    aria-invalid="false"
+                    class="cl-otpCodeFieldInput cl-input 🔒️ css-1sh4xr3"
+                    data-feedback="info"
+                    data-focus-within="false"
+                    data-testid="otp-input-segment"
+                    data-variant="default"
+                  />
+                </div>
+                <div
+                  style="position: absolute; inset: 0; pointer-events: none;"
+                >
+                  <input
+                    aria-label="Enter verification code"
+                    aria-required="true"
+                    autocomplete="one-time-code"
+                    data-input-otp="true"
+                    data-input-otp-mse="0"
+                    data-input-otp-mss="0"
+                    data-input-otp-placeholder-shown="true"
+                    inputmode="numeric"
+                    maxlength="6"
+                    pattern="^\\d+$"
+                    style="position: absolute; inset: 0; width: 100%; height: 100%; display: flex; text-align: center; opacity: 1; color: transparent; pointer-events: all; background: transparent; caret-color: transparent; border: 0px solid transparent; outline: 0 solid transparent; box-shadow: none; line-height: 1; letter-spacing: -.5em; font-size: var(--root-height); font-family: monospace; font-variant-numeric: tabular-nums;"
+                    value=""
+                  />
+                </div>
+              </div>
+            </div>
+            <span
+              aria-atomic="true"
+              aria-live="polite"
+              class="css-5ur8x"
+            />
+            <div
+              class="css-1vrundg"
+              style="height: 0px; position: relative;"
+            />
+          </div>
+          <button
+            class="cl-formResendCodeLink cl-button 🔒️ css-xn52nr"
+            data-color="primary"
+            data-variant="link"
+            disabled=""
+          >
+            Didn't receive a code? Resend
+             (30)
+          </button>
+        </div>
+        <div
+          class="css-bails5"
+        >
+          <button
+            class="cl-formButtonPrimary cl-button 🔒️ css-6yxkbg"
+            data-color="primary"
+            data-localization-key="formButtonPrimary"
+            data-variant="solid"
+          >
+            <span
+              class="css-2iusy0"
+            >
+              Continue
+              <span
+                class="cl-buttonArrowIcon 🔒️ css-ra3p3j-Icon"
+              />
+            </span>
+          </button>
+          <button
+            class="cl-formButtonReset cl-button 🔒️ css-1qfxkx"
+            data-color="primary"
+            data-variant="ghost"
+          />
+        </div>
+      </div>
+    </div>
+    <div
+      class="cl-footer 🔒️ css-12ewqpd"
+    >
+      <div
+        class="cl-footerItem 🔒️ css-1ww4jbf"
+      >
+        <div
+          class="css-dt53uo"
+        >
+          <div
+            class="css-y44tp9"
+          >
+            <div
+              class="css-ssjl5l"
+            >
+              <p
+                class="css-1scq7x4"
+                data-color="inherit"
+                data-variant="buttonSmall"
+              >
+                Secured by
+              </p>
+              <a
+                aria-label="Clerk logo"
+                class="css-1bdbjec-Link"
+                href="https://go.clerk.com/components"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <span
+                  class="css-yjy4qv-Icon"
+                />
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

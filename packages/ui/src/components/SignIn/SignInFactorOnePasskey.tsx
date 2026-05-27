@@ -1,4 +1,3 @@
-import type { ResetPasswordCodeFactor } from '@clerk/shared/types';
 import React from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -7,30 +6,23 @@ import { Form } from '@/ui/elements/Form';
 import { Header } from '@/ui/elements/Header';
 import { IdentityPreview } from '@/ui/elements/IdentityPreview';
 
-import { useCoreSignIn } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys } from '../../customizables';
-import { useRouter } from '../../router/RouteContext';
 import { HavingTrouble } from './HavingTrouble';
-import { useHandleAuthenticateWithPasskey } from './shared';
 
-type SignInFactorOnePasswordProps = {
+type SignInFactorOnePasskeyProps = {
   onShowAlternativeMethodsClick: React.MouseEventHandler | undefined;
-  onFactorPrepare: (f: ResetPasswordCodeFactor) => void;
+  onFactorPrepare: () => void;
+  authenticateWithPasskey: () => Promise<void>;
+  onGoBack: () => void;
+  identifier: string | null;
+  avatarUrl: string | undefined;
 };
 
-export const SignInFactorOnePasskey = (props: SignInFactorOnePasswordProps) => {
-  const { onShowAlternativeMethodsClick } = props;
+export const SignInFactorOnePasskey = (props: SignInFactorOnePasskeyProps) => {
+  const { onShowAlternativeMethodsClick, authenticateWithPasskey, onGoBack, identifier, avatarUrl } = props;
   const card = useCardState();
-  const signIn = useCoreSignIn();
-  const { navigate } = useRouter();
   const [showHavingTrouble, setShowHavingTrouble] = React.useState(false);
   const toggleHavingTrouble = React.useCallback(() => setShowHavingTrouble(s => !s), [setShowHavingTrouble]);
-  const onSecondFactor = () => navigate('../factor-two');
-  const authenticateWithPasskey = useHandleAuthenticateWithPasskey(onSecondFactor);
-
-  const goBack = () => {
-    return navigate('../');
-  };
 
   const handleSubmit: React.FormEventHandler = e => {
     e.preventDefault();
@@ -49,9 +41,9 @@ export const SignInFactorOnePasskey = (props: SignInFactorOnePasswordProps) => {
             <Header.Title localizationKey={localizationKeys('signIn.passkey.title')} />
             <Header.Subtitle localizationKey={localizationKeys('signIn.passkey.subtitle')} />
             <IdentityPreview
-              identifier={signIn.identifier}
-              avatarUrl={signIn.userData.imageUrl}
-              onClick={goBack}
+              identifier={identifier}
+              avatarUrl={avatarUrl}
+              onClick={onGoBack}
             />
           </Header.Root>
           <Card.Alert>{card.error}</Card.Alert>
