@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, type ReactNode } from 'react';
 
 import { RouteContext } from '../../router/RouteContext';
 import { useBillingRouter } from '../useBillingRouter';
@@ -27,10 +27,10 @@ const PaymentAttemptPage = lazy(() =>
   })),
 );
 
-export const Billing = () => {
+export const Billing = (): ReactNode => {
   const { router, route } = useBillingRouter();
 
-  let content: React.ReactNode;
+  let content: ReactNode;
   switch (route.page) {
     case 'plans':
       content = <PlansPage />;

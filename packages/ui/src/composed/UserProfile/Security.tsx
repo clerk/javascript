@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from 'react';
+import type { PropsWithChildren, ReactNode } from 'react';
 
 import { Card } from '@/ui/elements/Card';
 import { CardStateProvider, useCardState } from '@/ui/elements/contexts';
@@ -9,7 +9,7 @@ import { Col, descriptors, localizationKeys } from '../../customizables';
 import { SecurityPage } from '../../components/UserProfile/SecurityPage';
 import { PageContext } from '../PageContext';
 
-function SecurityChrome({ children }: PropsWithChildren) {
+function SecurityChrome({ children }: PropsWithChildren): ReactNode {
   const card = useCardState();
   return (
     <ProfileCard.Page>
@@ -36,7 +36,7 @@ function SecurityChrome({ children }: PropsWithChildren) {
   );
 }
 
-export function Security({ children }: PropsWithChildren) {
+export function Security({ children }: PropsWithChildren): ReactNode {
   if (!children) {
     return <SecurityPage />;
   }

@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, type ReactNode } from 'react';
 
 import { Protect } from '../../common';
 import {
@@ -20,12 +20,12 @@ function useRequirePage(componentName: string): boolean {
   return true;
 }
 
-export function GeneralOrganizationProfile() {
+export function GeneralOrganizationProfile(): ReactNode {
   if (!useRequirePage('GeneralOrganizationProfile')) return null;
   return <OrganizationProfileSection />;
 }
 
-export function GeneralVerifiedDomains() {
+export function GeneralVerifiedDomains(): ReactNode {
   if (!useRequirePage('GeneralVerifiedDomains')) return null;
   return (
     <Protect permission='org:sys_domains:read'>
@@ -34,12 +34,12 @@ export function GeneralVerifiedDomains() {
   );
 }
 
-export function GeneralLeaveOrganization() {
+export function GeneralLeaveOrganization(): ReactNode {
   if (!useRequirePage('GeneralLeaveOrganization')) return null;
   return <OrganizationLeaveSection />;
 }
 
-export function GeneralDeleteOrganization() {
+export function GeneralDeleteOrganization(): ReactNode {
   if (!useRequirePage('GeneralDeleteOrganization')) return null;
   return <OrganizationDeleteSection />;
 }
