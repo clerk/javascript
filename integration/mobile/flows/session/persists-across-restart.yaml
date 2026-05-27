@@ -1,0 +1,54 @@
+# PERSISTENCE: the Expo token cache (expo-secure-store) must rehydrate the
+# Clerk session across a full app restart. This is a pure-Expo concern — the
+# native SDKs don't own JS-side session persistence — so it's exactly the
+# bridge/integration coverage the native UI suites (Sam/Sean) can't provide.
+#
+# Sign in, FULLY kill the app (cold start, not background), relaunch WITHOUT
+# clearing state, and assert we land on the signed-in home screen without
+# re-entering credentials. If the token cache regresses, this lands on the
+# signed-out AuthView instead.
+appId: com.clerk.clerkexpoquickstart
+tags:
+  - regression
+  - persistence
+---
+# Clean start → sign in.
+- runFlow: ../common/open-app.yaml
+- runFlow: ../common/assert-signed-out.yaml
+- runFlow: ../common/sign-in-email-password.yaml
+- runFlow: ../common/assert-signed-in.yaml
+# Fully terminate the app to force a cold start that must rehydrate the
+# session from secure-store rather than from in-memory state.
+- stopApp
+- waitForAnimationToEnd:
+    timeout: 2000
+# Relaunch WITHOUT clearState — the persisted session must survive.
+- launchApp
+- waitForAnimationToEnd:
+    timeout: 5000
+# Dev build: reconnect to the dev server if the launcher reappears after a
+# cold start (iOS: localhost, Android: 10.0.2.2 — both end in :8081).
+- runFlow:
+    when:
+      visible: "Development Build"
+    commands:
+      - tapOn:
+          text: ".*:8081"
+      - waitForAnimationToEnd:
+          timeout: 10000
+- runFlow:
+    when:
+      visible: ".*developer menu.*"
+    commands:
+      - tapOn:
+          text: "Close"
+          optional: true
+- waitForAnimationToEnd:
+    timeout: 3000
+# The whole point: signed in WITHOUT re-entering credentials. extendedWaitUntil
+# tolerates cold-start rehydration time; if the cache regressed we'd instead
+# see the AuthView's "Welcome! Sign in to continue".
+- extendedWaitUntil:
+    visible: "Sign Out"
+    timeout: 30000
+- takeScreenshot: session-persisted

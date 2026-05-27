@@ -1,0 +1,8 @@
+{
+  "name": "clerk-mobile-e2e-scripts",
+  "private": true,
+  "description": "Node helpers for the @clerk/expo Maestro e2e suite (post-flow image checks). Not a pnpm workspace package — verify-themes.sh runs `npm install` here on demand.",
+  "dependencies": {
+    "pngjs": "7.0.0"
+  }
+}

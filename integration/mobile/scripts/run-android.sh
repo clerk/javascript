@@ -38,6 +38,12 @@ if [[ ${#KEEP[@]} -eq 0 ]]; then
   exit 0
 fi
 
+# Run maestro from integration/mobile so `takeScreenshot` files (theme-*.png)
+# land in a known place for the theme post-step below. KEEP[] are absolute
+# paths and subflows resolve relative to their flow file, so the cd is safe.
+cd "$FLOWS_DIR/.."
+
+set +e
 maestro --platform android test \
   -e CLERK_TEST_EMAIL="${CLERK_TEST_EMAIL}" \
   -e CLERK_TEST_PASSWORD="${CLERK_TEST_PASSWORD}" \
@@ -45,3 +51,11 @@ maestro --platform android test \
   -e CLERK_TEST_PASSWORD_SECONDARY="${CLERK_TEST_PASSWORD_SECONDARY:-}" \
   "$@" \
   "${KEEP[@]}"
+maestro_rc=$?
+set -e
+
+# Verify theming on whatever screenshots the theming flows captured (Node
+# post-step; Maestro can't decode PNGs). A theme regression fails the run.
+"$SCRIPT_DIR/verify-themes.sh" || maestro_rc=1
+
+exit "$maestro_rc"

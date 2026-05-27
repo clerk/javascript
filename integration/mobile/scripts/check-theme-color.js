@@ -1,19 +1,28 @@
 #!/usr/bin/env node
 /**
- * Reads a Maestro screenshot file and asserts that a sampled pixel color
- * is within tolerance of an expected hex color.
+ * Asserts that a Maestro screenshot contains a meaningful REGION of the
+ * expected theme color — proving the Expo config plugin actually delivered
+ * clerk-theme.json through to the rendered native component.
  *
- * Used by `flows/theming/custom-theme-applied.yaml` to verify that the
- * Clerk native components actually render with the user-provided theme
- * (regression for the bug where `Clerk.initialize()` was resetting the
- * customTheme on Android).
+ * Why region-count instead of sampling a single (x,y) pixel:
+ *   - Pixel coordinates are device/resolution-specific; the CI sim and a local
+ *     sim render at different sizes, so a hardcoded (x,y) is inherently flaky.
+ *   - The themed primary button is a large, solid block of the theme color.
+ *     A themed screenshot has tens of thousands of matching pixels; an
+ *     UN-themed one (default neutral button) has ~none. Counting matching
+ *     pixels is robust to layout shifts and resolution and catches the exact
+ *     regression we care about: "the theme never reached the native layer".
+ *
+ * This runs as a Node POST-STEP in the runner (run-ios.sh / run-android.sh)
+ * AFTER Maestro captures the screenshot — NOT as a Maestro `runScript`, whose
+ * GraalJS sandbox has no `fs`/`require` and cannot decode a PNG.
  *
  * Usage:
  *   node check-theme-color.js \
  *     --image=/path/to/screenshot.png \
- *     --x=200 --y=400 \
  *     --expected=#FF4444 \
- *     --tolerance=15
+ *     --tolerance=24 \
+ *     --min-pixels=8000
  */
 
 const fs = require('fs');
@@ -40,66 +49,63 @@ function hexToRgb(hex) {
   };
 }
 
-function colorDistance(a, b) {
-  const dr = a.r - b.r;
-  const dg = a.g - b.g;
-  const db = a.b - b.b;
-  return Math.sqrt(dr * dr + dg * dg + db * db);
-}
-
-async function main() {
+function main() {
   const args = parseArgs(process.argv);
-  const required = ['image', 'x', 'y', 'expected'];
-  for (const key of required) {
+  for (const key of ['image', 'expected']) {
     if (args[key] == null) {
       console.error(`Missing required arg: --${key}`);
       process.exit(2);
     }
   }
 
-  const tolerance = Number(args.tolerance ?? 15);
   const expected = hexToRgb(args.expected);
-  const x = Number(args.x);
-  const y = Number(args.y);
+  // Per-channel max delta. The themed button is a flat fill, so a tight-ish
+  // tolerance still leaves a huge matching region while excluding unrelated UI.
+  const tolerance = Number(args.tolerance ?? 24);
+  // Minimum number of matching pixels for the assertion to pass. The themed
+  // primary button is a large block; an un-themed screenshot has effectively
+  // none. 8000 is comfortably above noise and below the button's true area.
+  const minPixels = Number(args['min-pixels'] ?? 8000);
 
   if (!fs.existsSync(args.image)) {
     console.error(`Image not found: ${args.image}`);
     process.exit(2);
   }
 
-  // pngjs is a small zero-dep PNG decoder; install with the test app's deps.
-  // We require it lazily so the script fails with a clear message if missing.
   let PNG;
   try {
     ({ PNG } = require('pngjs'));
   } catch (err) {
-    console.error('pngjs not found. Install it in the test app: pnpm add -D pngjs');
+    console.error('pngjs not found. Run `npm install` in integration/mobile/scripts.');
     process.exit(2);
   }
 
-  const buf = fs.readFileSync(args.image);
-  const png = PNG.sync.read(buf);
-  const idx = (png.width * y + x) << 2;
-  const actual = {
-    r: png.data[idx],
-    g: png.data[idx + 1],
-    b: png.data[idx + 2],
-  };
+  const png = PNG.sync.read(fs.readFileSync(args.image));
+  let matched = 0;
+  for (let i = 0; i < png.data.length; i += 4) {
+    if (
+      Math.abs(png.data[i] - expected.r) <= tolerance &&
+      Math.abs(png.data[i + 1] - expected.g) <= tolerance &&
+      Math.abs(png.data[i + 2] - expected.b) <= tolerance
+    ) {
+      matched++;
+    }
+  }
 
-  const distance = colorDistance(expected, actual);
-  const relativeImage = path.relative(process.cwd(), args.image);
+  const total = png.width * png.height || 1;
+  const ratio = ((matched / total) * 100).toFixed(2);
+  const rel = path.relative(process.cwd(), args.image);
   console.log(
-    `[${relativeImage}] sampled (${x},${y}) = rgb(${actual.r},${actual.g},${actual.b}); ` +
-      `expected ${args.expected}; distance=${distance.toFixed(1)}; tolerance=${tolerance}`,
+    `[${rel}] ${png.width}x${png.height}; matched ${matched}px (${ratio}%) within +/-${tolerance} of ${args.expected}; need >=${minPixels}`,
   );
 
-  if (distance > tolerance) {
-    console.error(`THEME ASSERTION FAILED: pixel at (${x},${y}) is more than ${tolerance} away from ${args.expected}`);
+  if (matched < minPixels) {
+    console.error(
+      `THEME ASSERTION FAILED: only ${matched}px match ${args.expected} (need >=${minPixels}). ` +
+        `The theme likely never reached the native layer.`,
+    );
     process.exit(1);
   }
 }
 
-main().catch(err => {
-  console.error(err);
-  process.exit(2);
-});
+main();

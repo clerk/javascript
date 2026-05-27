@@ -39,6 +39,11 @@ on:
         description: "Optional: when set together with clerk_android_ref, the workflow checks out clerk-android at that ref, bumps CLERK_*_VERSION by appending this suffix (e.g. '-expo-compat-123'), publishes to mavenLocal, and pins @clerk/expo to the resulting version. Used by clerk-android's expo-compat release gate."
         required: false
         default: ""
+      run_e2e:
+        description: "Run the e2e build + Maestro jobs. Set false to skip e2e entirely (the fast JS unit tests still run separately in ci.yml). Default true while we validate the suite; flip to false for unit-only once the suite is trusted."
+        required: false
+        type: boolean
+        default: true
   workflow_call:
     inputs:
       quickstart_ref:
@@ -65,6 +70,10 @@ on:
         type: string
         required: false
         default: ""
+      run_e2e:
+        type: boolean
+        required: false
+        default: true
 
 env:
   EXPO_INSTANCE_NAME: clerkstage-with-native-components
@@ -91,7 +100,7 @@ jobs:
     # clerk-ios's expo-compat release gate (passes clerk_ios_ref without
     # clerk_android_ref). Manual dispatches without ref inputs still run
     # both jobs.
-    if: inputs.clerk_ios_ref == '' || inputs.clerk_android_ref != ''
+    if: inputs.run_e2e && (inputs.clerk_ios_ref == '' || inputs.clerk_android_ref != '')
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     timeout-minutes: 45
     defaults:
@@ -588,6 +597,15 @@ jobs:
             | while read f; do grep -qE "^[[:space:]]*-[[:space:]]*(${pattern})[[:space:]]*$" "$f" || printf '%s\n' "$f"; done
             | xargs -n 1 -I FLOW bash -c 'flow="$1"; for a in 1 2; do if maestro test --env CLERK_TEST_EMAIL="$CLERK_TEST_EMAIL" --env CLERK_TEST_PASSWORD="$CLERK_TEST_PASSWORD" --flatten-debug-output "$flow"; then exit 0; fi; if [ "$a" -eq 2 ]; then echo "::error::Flow $flow failed after 2 attempts"; exit 1; fi; echo "::warning::Flow $flow failed attempt $a, retrying after 10s..."; adb shell am force-stop com.clerk.clerkexpoquickstart >/dev/null 2>&1 || true; sleep 10; done' _ FLOW
 
+      # Theme verification is a Node post-step (Maestro can't decode PNGs in its
+      # JS sandbox). The theming flows wrote theme-light.png / theme-dark.png to
+      # integration/mobile; this asserts each contains a large region of the
+      # expected themed color. Runs on success OR failure so a flaked flow
+      # doesn't hide a theming regression; skips cleanly if no theme shots exist.
+      - name: Verify Android theming
+        if: success() || failure()
+        run: bash integration/mobile/scripts/verify-themes.sh
+
       - name: Upload Maestro artifacts on failure or cancel
         if: failure() || cancelled()
         uses: actions/upload-artifact@v4
@@ -616,7 +634,7 @@ jobs:
     # clerk-android's expo-compat release gate, which passes clerk_android_ref
     # (and clerk_android_snapshot_suffix) but not clerk_ios_ref. Manual
     # dispatches without ref inputs still run both jobs.
-    if: inputs.clerk_android_ref == '' || inputs.clerk_ios_ref != ''
+    if: inputs.run_e2e && (inputs.clerk_android_ref == '' || inputs.clerk_ios_ref != '')
     # GitHub-hosted runner. Blacksmith macOS-15 didn't pick up the job in
     # our trial (capacity / label availability) — revisit when Blacksmith
     # exposes a label we know is provisioned on this account.
@@ -1020,6 +1038,13 @@ jobs:
                 sleep 10
               done
             ' _ FLOW
+
+      # Theme verification is a Node post-step (Maestro can't decode PNGs in its
+      # JS sandbox). iOS runs the light theme only (dark-mode is androidOnly);
+      # verify-themes.sh skips any theme shot that wasn't produced.
+      - name: Verify iOS theming
+        if: success() || failure()
+        run: bash integration/mobile/scripts/verify-themes.sh
 
       - name: Upload Maestro artifacts on failure or cancel
         if: failure() || cancelled()

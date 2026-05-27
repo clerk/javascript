@@ -16,7 +16,6 @@
 appId: com.clerk.clerkexpoquickstart
 tags:
   - regression
-  - skip
 ---
 - runFlow: ../common/open-app.yaml
 # First sign-in

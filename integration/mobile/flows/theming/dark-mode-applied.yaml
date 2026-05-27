@@ -1,12 +1,13 @@
-# Theming: verify dark mode applies the darkColors from clerk-theme.json.
-# Android only: iOS hex colors are static for v1 of the theming plugin.
+# Theming: dark mode applies the darkColors from clerk-theme.json (primary
+# #FF6666). Android only — iOS theme colors are static in v1 of the plugin.
+#
+# Captures the signed-out AuthView screenshot under dark mode. The color
+# assertion is a Node post-step in the runner (scripts/check-theme-color.js),
+# which asserts a large region of the dark-mode primary (#FF6666) is present.
 appId: com.clerk.clerkexpoquickstart
-# TODO: check-theme-color.js requires pngjs (install in the quickstart app).
-# Skip until theming tooling is wired up alongside custom-theme-applied.
 tags:
   - theming
   - androidOnly
-  - skip
 ---
 # Force the device to dark mode before launching the app.
 - launchApp:
@@ -15,7 +16,7 @@ tags:
       darkMode: true
 - waitForAnimationToEnd:
     timeout: 5000
-# Dev build: tap the dev server URL to connect (iOS: localhost, Android: 10.0.2.2).
+# Dev build: tap the dev server URL to connect (Android: 10.0.2.2:8081).
 - runFlow:
     when:
       visible: "Development Build"
@@ -34,13 +35,6 @@ tags:
 - waitForAnimationToEnd:
     timeout: 3000
 - runFlow: ../common/assert-signed-out.yaml
-- takeScreenshot: dark-theme-screenshot
-# Sample a pixel from the primary button. The dark theme primary is #FF6666.
-- runScript:
-    file: ../../scripts/check-theme-color.js
-    env:
-      THEME_IMAGE: dark-theme-screenshot.png
-      THEME_X: "200"
-      THEME_Y: "560"
-      THEME_EXPECTED: "#FF6666"
-      THEME_TOLERANCE: "20"
+# Written to integration/mobile/theme-dark.png (maestro's CWD). The runner's
+# theme-check post-step reads this file.
+- takeScreenshot: theme-dark
