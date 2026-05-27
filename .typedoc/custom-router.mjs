@@ -2,9 +2,9 @@
 import { ReflectionKind } from 'typedoc';
 import { MemberRouter } from 'typedoc-plugin-markdown';
 
-import { isInlineModifierWithoutStandalonePage } from './standalone-page-tag.mjs';
 import { REFERENCE_OBJECT_PAGE_SYMBOLS } from './reference-objects.mjs';
 import { toUrlSlug } from './slug.mjs';
+import { isInlineModifierWithoutStandalonePage } from './standalone-page-tag.mjs';
 
 /** @type {Set<string>} */
 const REFERENCE_OBJECT_SYMBOL_NAMES = new Set(Object.values(REFERENCE_OBJECT_PAGE_SYMBOLS));

@@ -1,11 +1,11 @@
 // @ts-check
 import { ArrayType, i18n, IntersectionType, ReferenceType, ReflectionKind, ReflectionType, UnionType } from 'typedoc';
 import { MarkdownTheme, MarkdownThemeContext } from 'typedoc-plugin-markdown';
-import { backTicks, heading, htmlTable, removeLineBreaks, table } from './markdown-helpers.mjs';
 
 import { applyTodoStrippingToComment } from './comment-utils.mjs';
-import { isInlineModifierWithoutStandalonePage } from './standalone-page-tag.mjs';
+import { backTicks, heading, htmlTable, removeLineBreaks, table } from './markdown-helpers.mjs';
 import { REFERENCE_OBJECTS_LIST } from './reference-objects.mjs';
+import { isInlineModifierWithoutStandalonePage } from './standalone-page-tag.mjs';
 
 export { REFERENCE_OBJECTS_LIST };
 
@@ -1203,7 +1203,9 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
               // Find the immediate next heading after '## Parameters'
               const nextHeadingIndex = splitOutput.findIndex((item, index) => {
                 // Skip the items before the parameters
-                if (index <= parametersIndex) return false;
+                if (index <= parametersIndex) {
+                  return false;
+                }
                 // Find the next heading
                 return item.startsWith('##') || item.startsWith('\n##');
               });

@@ -15,6 +15,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+
 import {
   Comment,
   IntersectionType,
@@ -24,19 +25,19 @@ import {
   ReflectionType,
   UnionType,
 } from 'typedoc';
-import { MarkdownPageEvent, MarkdownTheme } from 'typedoc-plugin-markdown';
-import { removeLineBreaks } from './markdown-helpers.mjs';
+import { MarkdownPageEvent } from 'typedoc-plugin-markdown';
 
-import { isCallableInterfaceProperty } from './custom-theme.mjs';
+import { applyTodoStrippingToComment } from './comment-utils.mjs';
 import {
   applyCatchAllMdReplacements,
   applyRelativeLinkReplacements,
   stripReferenceObjectPropertiesSection,
 } from './custom-plugin.mjs';
-import { isInlineModifierWithoutStandalonePage } from './standalone-page-tag.mjs';
-import { applyTodoStrippingToComment } from './comment-utils.mjs';
+import { isCallableInterfaceProperty } from './custom-theme.mjs';
+import { removeLineBreaks } from './markdown-helpers.mjs';
 import { REFERENCE_OBJECT_CONFIG } from './reference-objects.mjs';
 import { toFileSlug } from './slug.mjs';
+import { isInlineModifierWithoutStandalonePage } from './standalone-page-tag.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -1249,7 +1250,9 @@ export function load(app) {
       console.warn(`[extract-methods] No project on page event for ${pageUrl}, skipping`);
       return;
     }
-    const theme = /** @type {InstanceType<typeof MarkdownTheme> | undefined} */ (app.renderer.theme);
+    const theme = /** @type {InstanceType<typeof import('typedoc-plugin-markdown').MarkdownTheme> | undefined} */ (
+      app.renderer.theme
+    );
     if (!theme || typeof theme.getRenderContext !== 'function') {
       console.warn(`[extract-methods] Renderer theme not ready for ${pageUrl}, skipping`);
       return;
@@ -1273,7 +1276,7 @@ export function load(app) {
       }
     }
 
-    output.preWriteAsyncJobs.push(async () => {
+    output.preWriteAsyncJobs.push(() => {
       fs.mkdirSync(objectDir, { recursive: true });
 
       // `output.contents` is already prettier-formatted by typedoc-plugin-markdown's earlier
