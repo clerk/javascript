@@ -7,6 +7,16 @@
  * frequently observed by non-developers (QA, screenshots, demos), and adding another
  * console warning is a common source of customer complaints.
  *
+ * Known gap: pure browser-only setups with no server-side Clerk runtime (e.g. a Vite
+ * SPA using `@clerk/clerk-react` or `@clerk/clerk-js` directly, without any Node/Edge
+ * backend that imports `@clerk/shared`) will never hit this code path and therefore
+ * see no in-band disclosure. This is an accepted trade-off: the original postinstall
+ * already fired only once at install time and was easily missed, so the practical
+ * delta is small. Authoritative disclosure for those setups lives in the Clerk
+ * telemetry docs (https://clerk.com/docs/telemetry). Opt-out continues to work the
+ * same way (`telemetry={false}` on `<ClerkProvider>` or the framework-specific
+ * `*_CLERK_TELEMETRY_DISABLED` env var).
+ *
  * Persistence is in-process via a `globalThis` Symbol, which survives Next.js HMR
  * module reloads. No filesystem access, no `node:` imports, no dynamic-code APIs, so
  * the module remains safe to bundle for Edge Runtime, Workers, and any browser path.
