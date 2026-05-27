@@ -40,6 +40,7 @@ export const createAppRuntimeEnv = (env?: EnvironmentConfig): Record<string, str
   }
 
   const runtimeEnv: Record<string, string> = {};
+  // Private variables intentionally win when the same runtime key exists in both maps.
   for (const [key, value] of [...env.publicVariables, ...env.privateVariables]) {
     if (value === undefined || value === null) {
       continue;

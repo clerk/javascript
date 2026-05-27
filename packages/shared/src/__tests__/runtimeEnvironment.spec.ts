@@ -38,6 +38,21 @@ describe('isAutomatedEnvironment', () => {
     expect(isAutomatedEnvironment()).toBe(true);
   });
 
+  it('detects build-only hosted provider variables', () => {
+    vi.stubEnv('NOW_BUILDER', '1');
+
+    expect(isAutomatedEnvironment()).toBe(true);
+  });
+
+  it('does not treat interactive development host variables as automation signals', () => {
+    vi.stubEnv('CODESPACES', 'true');
+    vi.stubEnv('GITPOD_WORKSPACE_ID', 'workspace-id');
+    vi.stubEnv('VERCEL', '1');
+    vi.stubEnv('NETLIFY', 'true');
+
+    expect(isAutomatedEnvironment()).toBe(false);
+  });
+
   it('ignores non-string automation environment variables from shared runtime fallbacks', () => {
     vi.stubEnv('CI', undefined);
     vi.stubGlobal('CI', true);

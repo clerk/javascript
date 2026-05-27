@@ -36,6 +36,25 @@ describe('AccountlessApplications', () => {
     expect(response.publishableKey).toBe('pk_test_keyless');
   });
 
+  it('creates an accountless application without a source query parameter when source is omitted', async () => {
+    const apiClient = createBackendApiClient({
+      apiUrl: 'https://api.clerk.test',
+    });
+
+    server.use(
+      http.post('https://api.clerk.test/v1/accountless_applications', ({ request }) => {
+        const url = new URL(request.url);
+        expect(url.searchParams.has('source')).toBe(false);
+
+        return HttpResponse.json(mockAccountlessApplication);
+      }),
+    );
+
+    const response = await apiClient.__experimental_accountlessApplications.createAccountlessApplication();
+
+    expect(response.publishableKey).toBe('pk_test_keyless');
+  });
+
   it('completes accountless application onboarding with a source query parameter', async () => {
     const apiClient = createBackendApiClient({
       apiUrl: 'https://api.clerk.test',
@@ -55,6 +74,25 @@ describe('AccountlessApplications', () => {
     const response = await apiClient.__experimental_accountlessApplications.completeAccountlessApplicationOnboarding({
       source: 'nextjs',
     });
+
+    expect(response.publishableKey).toBe('pk_test_keyless');
+  });
+
+  it('completes accountless application onboarding without a source query parameter when source is omitted', async () => {
+    const apiClient = createBackendApiClient({
+      apiUrl: 'https://api.clerk.test',
+    });
+
+    server.use(
+      http.post('https://api.clerk.test/v1/accountless_applications/complete', ({ request }) => {
+        const url = new URL(request.url);
+        expect(url.searchParams.has('source')).toBe(false);
+
+        return HttpResponse.json(mockAccountlessApplication);
+      }),
+    );
+
+    const response = await apiClient.__experimental_accountlessApplications.completeAccountlessApplicationOnboarding();
 
     expect(response.publishableKey).toBe('pk_test_keyless');
   });

@@ -16,15 +16,12 @@ export const automatedEnvironmentVariables = [
   'JENKINS_URL',
   'HUDSON_URL',
   'BAMBOO_BUILDKEY',
-  'VERCEL',
-  'NETLIFY',
+  'NOW_BUILDER',
   'CF_PAGES',
-  'CODESPACES',
-  'GITPOD_WORKSPACE_ID',
 ] as const;
 
-const isTruthyEnvValue = (value: string | undefined): boolean => {
-  if (!value) {
+const isTruthyEnvValue = (value: unknown): boolean => {
+  if (typeof value !== 'string' || !value) {
     return false;
   }
 

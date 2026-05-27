@@ -33,4 +33,16 @@ describe('canUseKeyless', () => {
 
     await expect(loadCanUseKeyless()).resolves.toBe(false);
   });
+
+  it('disables keyless outside development mode', async () => {
+    vi.stubEnv('NODE_ENV', 'production');
+
+    await expect(loadCanUseKeyless()).resolves.toBe(false);
+  });
+
+  it('disables keyless when explicitly disabled', async () => {
+    vi.stubEnv('VITE_CLERK_KEYLESS_DISABLED', 'true');
+
+    await expect(loadCanUseKeyless()).resolves.toBe(false);
+  });
 });

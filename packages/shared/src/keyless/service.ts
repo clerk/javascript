@@ -2,6 +2,7 @@ import { clerkDevelopmentCache, createConfirmationMessage, createKeylessModeMess
 import type { AccountlessApplication } from './types';
 
 const KEYLESS_SOURCE_FALLBACK = 'javascript';
+// Keep the source compact for BAPI metadata dimensions while covering common framework identifiers.
 const KEYLESS_SOURCE_MAX_LENGTH = 36;
 
 /**
