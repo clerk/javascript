@@ -6,15 +6,6 @@ on:
       - main
       - release/v4
       - release/core-2
-    paths:
-      - 'packages/backend/**'
-      - 'packages/clerk-js/**'
-      - 'packages/nextjs/**'
-      - 'packages/react/**'
-      - 'packages/shared/**'
-      - 'packages/ui/**'
-      - 'snapi.config.json'
-      - '.github/workflows/api-changes.yml'
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     branches:
@@ -39,7 +30,7 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
-  SNAPI_PACKAGE: https://pkg.pr.new/clerk/snapi/@clerk/snapi@d3ee0217f35a3b1ebb3ce73d252d12761b01f374
+  SNAPI_PACKAGE: https://pkg.pr.new/clerk/snapi/@clerk/snapi@d42ed8b7857f9254bbb2a6e9ead44d5e7b1aa60c
   SNAPI_FILTERS: >-
     --filter=@clerk/backend
     --filter=@clerk/clerk-js
