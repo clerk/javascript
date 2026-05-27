@@ -5,6 +5,7 @@ import { UserInvitationSuggestionList } from './UserInvitationSuggestionList';
 import type { UserMembershipListProps } from './UserMembershipList';
 import { UserMembershipList } from './UserMembershipList';
 import { CreateOrganizationAction } from '@/common/CreateOrganizationAction';
+import { Add } from '@/icons';
 
 export interface OrganizationActionListProps extends UserMembershipListProps {
   onCreateOrganizationClick: React.MouseEventHandler;
@@ -21,6 +22,7 @@ const CreateOrganizationButton = ({
       iconBoxElementId={descriptors.organizationSwitcherPopoverActionButtonIconBox.setId('createOrganization')}
       iconElementDescriptor={descriptors.organizationSwitcherPopoverActionButtonIcon}
       iconElementId={descriptors.organizationSwitcherPopoverActionButtonIcon.setId('createOrganization')}
+      icon={Add}
       label={localizationKeys('organizationSwitcher.action__createOrganization')}
       onClick={onCreateOrganizationClick}
       sx={t => ({

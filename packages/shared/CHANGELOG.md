@@ -1,5 +1,21 @@
 # Change Log
 
+## 4.13.1
+
+### Patch Changes
+
+- Bump `js-cookie` to `3.0.7` to address GHSA-qjx8-664m-686j. ([#8630](https://github.com/clerk/javascript/pull/8630)) by [@jacekradko](https://github.com/jacekradko)
+
+## 4.13.0
+
+### Minor Changes
+
+- Remove `<ConfigureSSO />` from experimental path ([#8588](https://github.com/clerk/javascript/pull/8588)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Remove internal tag from publicly re-exported error helpers ([#8598](https://github.com/clerk/javascript/pull/8598)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 4.12.2
 
 ### Patch Changes

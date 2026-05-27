@@ -1,5 +1,19 @@
 # Change Log
 
+## 3.4.13
+
+### Patch Changes
+
+- Updated dependencies [[`a036ce8`](https://github.com/clerk/javascript/commit/a036ce8fef3b3ee2b49fd05d592b083ffc37f463)]:
+  - @clerk/shared@4.13.1
+
+## 3.4.12
+
+### Patch Changes
+
+- Updated dependencies [[`6eaf4d6`](https://github.com/clerk/javascript/commit/6eaf4d66fe0b21fb96a5cd19d61e6c3b2302ff97), [`1aab31e`](https://github.com/clerk/javascript/commit/1aab31e5070b7223402ff71f65a0d829bbc29cfd)]:
+  - @clerk/shared@4.13.0
+
 ## 3.4.11
 
 ### Patch Changes
@@ -3919,7 +3933,7 @@
 - b3a3dcdf4: Add OrganizationRoleAPI for CRUD operations regarding instance level organization roles.
 - 935b0886e: The `emails` endpoint helper and the corresponding `createEmail` method have been removed from the `@clerk/backend` SDK and `apiClint.emails.createEmail` will no longer be available.
 
-  We will not be providing an alternative method for creating and sending emails directly from our JavaScript SDKs with this release. If you are currently using `createEmail` and you wish to update to the latest SDK version, please reach out to our support team (https://clerk.com/support) so we can assist you.
+  We will not be providing an alternative method for creating and sending emails directly from our JavaScript SDKs with this release. If you are currently using `createEmail` and you wish to update to the latest SDK version, please reach out to our support team (https://clerk.com/contact/support) so we can assist you.
 
 - 93d05c868: Drop the introduction of `OrganizationRole` and `OrganizationPermission` resources fro BAPI.
 - 4aaf5103d: Remove createSms functions from @clerk/backend and @clerk/sdk-node.
@@ -4348,7 +4362,7 @@
 
 - The `emails` endpoint helper and the corresponding `createEmail` method have been removed from the `@clerk/backend` SDK and `apiClint.emails.createEmail` will no longer be available. ([#2548](https://github.com/clerk/javascript/pull/2548)) by [@Nikpolik](https://github.com/Nikpolik)
 
-  We will not be providing an alternative method for creating and sending emails directly from our JavaScript SDKs with this release. If you are currently using `createEmail` and you wish to update to the latest SDK version, please reach out to our support team (https://clerk.com/support) so we can assist you.
+  We will not be providing an alternative method for creating and sending emails directly from our JavaScript SDKs with this release. If you are currently using `createEmail` and you wish to update to the latest SDK version, please reach out to our support team (https://clerk.com/contact/support) so we can assist you.
 
 - Update README for v5 ([#2577](https://github.com/clerk/javascript/pull/2577)) by [@LekoArts](https://github.com/LekoArts)
 
