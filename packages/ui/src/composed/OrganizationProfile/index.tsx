@@ -10,8 +10,7 @@ import {
   GeneralVerifiedDomains,
 } from './sectionWrappers';
 
-export const OrganizationProfile = {
-  Provider: OrganizationProfileProvider,
+export const OrganizationProfile = Object.assign(OrganizationProfileProvider, {
   General,
   Members,
   Billing,
@@ -20,4 +19,4 @@ export const OrganizationProfile = {
   GeneralVerifiedDomains,
   GeneralLeaveOrganization,
   GeneralDeleteOrganization,
-};
+});

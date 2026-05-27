@@ -18,8 +18,7 @@ import {
 } from './sectionWrappers';
 import { UserProfileProvider } from './UserProfileProvider';
 
-export const UserProfile = {
-  Provider: UserProfileProvider,
+export const UserProfile = Object.assign(UserProfileProvider, {
   Account,
   Security,
   Billing,
@@ -36,4 +35,4 @@ export const UserProfile = {
   SecurityMfa,
   SecurityActiveDevices,
   SecurityDelete,
-};
+});

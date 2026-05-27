@@ -87,7 +87,7 @@ export function App() {
             </div>
 
             {profileType === 'user' && (
-              <UserProfile.Provider>
+              <UserProfile>
                 <TabBar
                   tabs={['account', 'security', 'billing', 'api-keys']}
                   active={userTab}
@@ -125,11 +125,11 @@ export function App() {
                     {userTab === 'api-keys' && <UserProfile.APIKeys />}
                   </>
                 )}
-              </UserProfile.Provider>
+              </UserProfile>
             )}
 
             {profileType === 'organization' && (
-              <OrganizationProfile.Provider>
+              <OrganizationProfile>
                 <TabBar
                   tabs={['general', 'members', 'billing', 'api-keys']}
                   active={orgTab}
@@ -157,7 +157,7 @@ export function App() {
                     {orgTab === 'api-keys' && <OrganizationProfile.APIKeys />}
                   </>
                 )}
-              </OrganizationProfile.Provider>
+              </OrganizationProfile>
             )}
           </>
         }
