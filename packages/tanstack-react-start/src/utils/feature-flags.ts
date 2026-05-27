@@ -1,6 +1,6 @@
 import { getEnvVariable } from '@clerk/shared/getEnvVariable';
 import { isTruthy } from '@clerk/shared/underscore';
-import { isDevelopmentEnvironment } from '@clerk/shared/utils';
+import { isAutomatedEnvironment, isDevelopmentEnvironment } from '@clerk/shared/utils';
 
 // Support both Vite-style and generic env var names for disabling keyless mode
 const KEYLESS_DISABLED =
@@ -16,4 +16,4 @@ const KEYLESS_DISABLED =
  * - `VITE_CLERK_KEYLESS_DISABLED=1` (for Vite-based projects)
  * - `CLERK_KEYLESS_DISABLED=1` (generic)
  */
-export const canUseKeyless = isDevelopmentEnvironment() && !KEYLESS_DISABLED;
+export const canUseKeyless = isDevelopmentEnvironment() && !isAutomatedEnvironment() && !KEYLESS_DISABLED;
