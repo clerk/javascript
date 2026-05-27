@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="h-full antialiased font-sans">
+<html class="h-full font-sans antialiased">
   <head>
     <title>clerk-js Sandbox</title>
     <meta charset="utf-8" />
@@ -7,8 +7,15 @@
       name="viewport"
       content="width=device-width,initial-scale=1"
     />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="preconnect"
+      href="https://fonts.googleapis.com"
+    />
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin
+    />
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap"
@@ -18,14 +25,12 @@
       @custom-variant dark (&:where(.dark, .dark *));
       @theme {
         --font-sans:
-          'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
-          'Helvetica Neue', Arial, sans-serif;
+          'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
         --font-heading:
-          'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
-          'Helvetica Neue', Arial, sans-serif;
+          'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
         --font-mono:
-          'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-          'Liberation Mono', 'Courier New', monospace;
+          'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+          monospace;
         --color-sidebar: oklch(0.985 0 0);
         --color-sidebar-foreground: oklch(0.145 0 0);
         --color-sidebar-border: oklch(0.922 0 0);
@@ -141,8 +146,7 @@
           wrapper.className = 'flex flex-col gap-1';
 
           var heading = document.createElement('div');
-          heading.className =
-            'px-1 text-[10px] font-medium uppercase tracking-wide text-sidebar-muted-foreground';
+          heading.className = 'px-1 text-[10px] font-medium uppercase tracking-wide text-sidebar-muted-foreground';
           heading.textContent = label;
 
           var inner = document.createElement('div');
@@ -179,7 +183,12 @@
           aria-hidden="true"
           class="ml-2 size-5"
         >
-          <rect width="160" height="160" rx="80" fill="#6C47FF" />
+          <rect
+            width="160"
+            height="160"
+            rx="80"
+            fill="#6C47FF"
+          />
           <path
             d="M111.125 33.4395C112.875 34.6113 113.024 37.0763 111.535 38.5652L98.7464 51.3541C97.5905 52.5099 95.7974 52.6925 94.3426 51.9472C90.0408 49.7434 85.1656 48.5 80 48.5C62.603 48.5 48.5 62.603 48.5 80C48.5 85.1656 49.7434 90.0408 51.9472 94.3426C52.6925 95.7974 52.5099 97.5905 51.3541 98.7464L38.5652 111.535C37.0763 113.024 34.6113 112.875 33.4395 111.125C27.4773 102.224 24 91.5181 24 80C24 49.0721 49.0721 24 80 24C91.5181 24 102.224 27.4773 111.125 33.4395Z"
             fill="white"
@@ -224,38 +233,115 @@
       </header>
       <nav class="flex flex-col gap-4">
         <nav-group label="Get Started">
-          <nav-link href="/" label="Home"></nav-link>
+          <nav-link
+            href="/"
+            label="Home"
+          ></nav-link>
         </nav-group>
         <nav-group label="Auth">
-          <nav-link href="/sign-in" label="Sign In" component="<SignIn />"></nav-link>
-          <nav-link href="/sign-up" label="Sign Up" component="<SignUp />"></nav-link>
-          <nav-link href="/waitlist" label="Waitlist" component="<Waitlist />"></nav-link>
-          <nav-link href="/oauth-consent" label="OAuth Consent" component="<OAuthConsent />"></nav-link>
-          <nav-link href="/api-keys" label="API Keys" component="<APIKeys />"></nav-link>
+          <nav-link
+            href="/sign-in"
+            label="Sign In"
+            component="<SignIn />"
+          ></nav-link>
+          <nav-link
+            href="/sign-up"
+            label="Sign Up"
+            component="<SignUp />"
+          ></nav-link>
+          <nav-link
+            href="/waitlist"
+            label="Waitlist"
+            component="<Waitlist />"
+          ></nav-link>
+          <nav-link
+            href="/oauth-consent"
+            label="OAuth Consent"
+            component="<OAuthConsent />"
+          ></nav-link>
+          <nav-link
+            href="/api-keys"
+            label="API Keys"
+            component="<APIKeys />"
+          ></nav-link>
         </nav-group>
         <nav-group label="User">
-          <nav-link href="/user-avatar" label="User Avatar" component="<UserAvatar />"></nav-link>
-          <nav-link href="/user-button" label="User Button" component="<UserButton />"></nav-link>
-          <nav-link href="/user-profile" label="User Profile" component="<UserProfile />"></nav-link>
+          <nav-link
+            href="/user-avatar"
+            label="User Avatar"
+            component="<UserAvatar />"
+          ></nav-link>
+          <nav-link
+            href="/user-button"
+            label="User Button"
+            component="<UserButton />"
+          ></nav-link>
+          <nav-link
+            href="/user-profile"
+            label="User Profile"
+            component="<UserProfile />"
+          ></nav-link>
         </nav-group>
         <nav-group label="Orgs">
-          <nav-link href="/create-organization" label="Create Org" component="<CreateOrganization />"></nav-link>
-          <nav-link href="/organization-list" label="Org List" component="<OrganizationList />"></nav-link>
-          <nav-link href="/organization-profile" label="Org Profile" component="<OrganizationProfile />"></nav-link>
-          <nav-link href="/organization-switcher" label="Org Switcher" component="<OrganizationSwitcher />"></nav-link>
-          <nav-link href="/configure-sso" label="Configure SSO" component="<ConfigureSSO />"></nav-link>
+          <nav-link
+            href="/create-organization"
+            label="Create Org"
+            component="<CreateOrganization />"
+          ></nav-link>
+          <nav-link
+            href="/organization-list"
+            label="Org List"
+            component="<OrganizationList />"
+          ></nav-link>
+          <nav-link
+            href="/organization-profile"
+            label="Org Profile"
+            component="<OrganizationProfile />"
+          ></nav-link>
+          <nav-link
+            href="/organization-switcher"
+            label="Org Switcher"
+            component="<OrganizationSwitcher />"
+          ></nav-link>
+          <nav-link
+            href="/configure-sso"
+            label="Configure SSO"
+            component="<ConfigureSSO />"
+          ></nav-link>
         </nav-group>
         <nav-group label="Tasks">
-          <nav-link href="/task-choose-organization" label="Choose Org" component="<TaskChooseOrganization />"></nav-link>
-          <nav-link href="/task-setup-mfa" label="Setup MFA" component="<TaskSetupMFA />"></nav-link>
+          <nav-link
+            href="/task-choose-organization"
+            label="Choose Org"
+            component="<TaskChooseOrganization />"
+          ></nav-link>
+          <nav-link
+            href="/task-setup-mfa"
+            label="Setup MFA"
+            component="<TaskSetupMFA />"
+          ></nav-link>
         </nav-group>
         <nav-group label="Billing">
-          <nav-link href="/pricing-table" label="Pricing Table" component="<PricingTable />"></nav-link>
+          <nav-link
+            href="/pricing-table"
+            label="Pricing Table"
+            component="<PricingTable />"
+          ></nav-link>
         </nav-group>
         <nav-group label="Other">
-          <nav-link href="/keyless" label="Keyless" component="<Keyless />"></nav-link>
-          <nav-link href="/open-sign-in" label="Open sign in"></nav-link>
-          <nav-link href="/open-sign-up" label="Open sign up"></nav-link>
+          <nav-link
+            href="/keyless"
+            label="Keyless"
+            component="<Keyless />"
+          ></nav-link>
+          <nav-link
+            href="/open-sign-in"
+            label="Open sign in"
+          ></nav-link>
+          <nav-link
+            href="/open-sign-up"
+            label="Open sign up"
+          ></nav-link>
         </nav-group>
       </nav>
     </div>
