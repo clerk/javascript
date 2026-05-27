@@ -1,6 +1,6 @@
 import { getEnvVariable } from '../getEnvVariable';
 
-const automatedEnvironmentVariables = [
+export const automatedEnvironmentVariables = [
   'CI',
   'CONTINUOUS_INTEGRATION',
   'GITHUB_ACTIONS',

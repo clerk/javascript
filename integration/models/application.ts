@@ -34,6 +34,23 @@ export const resolveServerUrl = (
   return fallbackServerUrl || `http://localhost:${port}`;
 };
 
+export const createAppRuntimeEnv = (env?: EnvironmentConfig): Record<string, string> => {
+  if (!env?.publicVariables || !env?.privateVariables) {
+    return {};
+  }
+
+  const runtimeEnv: Record<string, string> = {};
+  for (const [key, value] of [...env.publicVariables, ...env.privateVariables]) {
+    if (value === undefined || value === null) {
+      continue;
+    }
+
+    runtimeEnv[key] = String(value);
+  }
+
+  return runtimeEnv;
+};
+
 export const application = (
   config: ApplicationConfig,
   appDirPath: string,
@@ -103,7 +120,7 @@ export const application = (
 
       const proc = run(scripts.dev, {
         cwd: appDirPath,
-        env: { PORT: port.toString() },
+        env: { ...createAppRuntimeEnv(state.env), PORT: port.toString() },
         detached: opts.detached,
         stdout: opts.detached ? fs.openSync(stdoutFilePath, 'a') : undefined,
         stderr: opts.detached ? fs.openSync(stderrFilePath, 'a') : undefined,
@@ -158,6 +175,7 @@ export const application = (
       const log = logger.child({ prefix: 'build' }).info;
       await run(scripts.build, {
         cwd: appDirPath,
+        env: createAppRuntimeEnv(state.env),
         log: (msg: string) => {
           buildOutput += `\n${msg}`;
           log(msg);
@@ -200,7 +218,7 @@ export const application = (
 
       const proc = run(scripts.serve, {
         cwd: appDirPath,
-        env: { ...envFromFile, PORT: port.toString() },
+        env: { ...envFromFile, ...createAppRuntimeEnv(state.env), PORT: port.toString() },
         detached: opts.detached,
         stdout: opts.detached ? fs.openSync(stdoutFilePath, 'a') : undefined,
         stderr: opts.detached ? fs.openSync(stderrFilePath, 'a') : undefined,

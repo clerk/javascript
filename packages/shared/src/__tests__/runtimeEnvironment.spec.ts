@@ -1,29 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { isAutomatedEnvironment } from '../utils/runtimeEnvironment';
-
-const automatedEnvironmentVariables = [
-  'CI',
-  'CONTINUOUS_INTEGRATION',
-  'GITHUB_ACTIONS',
-  'GITLAB_CI',
-  'CIRCLECI',
-  'TRAVIS',
-  'BUILDKITE',
-  'BITBUCKET_BUILD_NUMBER',
-  'APPVEYOR',
-  'CODEBUILD_BUILD_ID',
-  'TF_BUILD',
-  'TEAMCITY_VERSION',
-  'JENKINS_URL',
-  'HUDSON_URL',
-  'BAMBOO_BUILDKEY',
-  'VERCEL',
-  'NETLIFY',
-  'CF_PAGES',
-  'CODESPACES',
-  'GITPOD_WORKSPACE_ID',
-] as const;
+import { automatedEnvironmentVariables, isAutomatedEnvironment } from '../utils/runtimeEnvironment';
 
 describe('isAutomatedEnvironment', () => {
   beforeEach(() => {

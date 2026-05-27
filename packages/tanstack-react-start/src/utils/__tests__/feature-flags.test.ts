@@ -1,27 +1,5 @@
+import { automatedEnvironmentVariables } from '@clerk/shared/utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-
-const automatedEnvironmentVariables = [
-  'CI',
-  'CONTINUOUS_INTEGRATION',
-  'GITHUB_ACTIONS',
-  'GITLAB_CI',
-  'CIRCLECI',
-  'TRAVIS',
-  'BUILDKITE',
-  'BITBUCKET_BUILD_NUMBER',
-  'APPVEYOR',
-  'CODEBUILD_BUILD_ID',
-  'TF_BUILD',
-  'TEAMCITY_VERSION',
-  'JENKINS_URL',
-  'HUDSON_URL',
-  'BAMBOO_BUILDKEY',
-  'VERCEL',
-  'NETLIFY',
-  'CF_PAGES',
-  'CODESPACES',
-  'GITPOD_WORKSPACE_ID',
-] as const;
 
 async function loadCanUseKeyless() {
   vi.resetModules();
