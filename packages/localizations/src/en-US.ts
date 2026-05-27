@@ -398,10 +398,11 @@ export const enUS: LocalizationResource = {
           },
         },
         assignUsersStep: {
-          headerSubtitle: 'Assign users to the enterprise app',
+          headerSubtitle: 'Assign users to the enterprise application',
           assignUsersInstructions: {
             title: 'Assign selected user or group in Okta',
-            paragraph: 'You need to assign users or groups to your enterprise app before they can use it to sign in.',
+            paragraph:
+              'You need to assign users or groups to your enterprise application before they can use it to sign in.',
             step1: 'In the Okta dashboard, select the <bold>Assignments</bold> tab.',
             step2:
               'Select the <bold>Assign</bold> dropdown. You can either select <bold>Assign to people</bold> or <bold>Assign to groups</bold>.',
@@ -470,16 +471,17 @@ export const enUS: LocalizationResource = {
               attributeName: 'Attribute Name',
             },
             rows: {
-              email: { userProfile: 'Email address', attributeName: 'email' },
+              email: { userProfile: 'Primary email', attributeName: 'email' },
               firstName: { userProfile: 'First name', attributeName: 'firstName' },
               lastName: { userProfile: 'Last name', attributeName: 'lastName' },
             },
           },
         },
         assignUsersStep: {
-          headerSubtitle: 'Assign users to the enterprise app',
+          headerSubtitle: 'Assign users to the enterprise application',
           title: 'Assign selected user or group',
-          paragraph: 'You need to assign users or groups to your enterprise app before they can use it to sign in.',
+          paragraph:
+            'You need to assign users or groups to your enterprise application before they can use it to sign in.',
         },
         identityProviderMetadataStep: {
           headerSubtitle: 'Configure identity provider metadata',
@@ -492,10 +494,10 @@ export const enUS: LocalizationResource = {
           metadataUrl: {
             label: 'Metadata URL',
             placeholder: 'Paste URL here...',
-            description: 'In your enterprise app, retrieve the metadata URL. Paste it below.',
+            description: 'In your enterprise application, retrieve the metadata URL. Paste it below.',
           },
           manual: {
-            description: 'In your SAML app, retrieve these values.',
+            description: 'In your SAML application, retrieve these values.',
             signOnUrl: {
               label: 'Single Sign-On URL',
               placeholder: 'Paste URL here...',
