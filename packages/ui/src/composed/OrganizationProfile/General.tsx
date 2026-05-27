@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from 'react';
+import type { PropsWithChildren, ReactNode } from 'react';
 
 import { Header } from '@/ui/elements/Header';
 import { ProfileCard } from '@/ui/elements/ProfileCard';
@@ -7,7 +7,7 @@ import { Col, descriptors, localizationKeys } from '../../customizables';
 import { OrganizationGeneralPage } from '../../components/OrganizationProfile/OrganizationGeneralPage';
 import { PageContext } from '../PageContext';
 
-export function General({ children }: PropsWithChildren) {
+export function General({ children }: PropsWithChildren): ReactNode {
   if (!children) {
     return <OrganizationGeneralPage />;
   }

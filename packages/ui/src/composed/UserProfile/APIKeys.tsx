@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, type ReactNode } from 'react';
 
 import { CardStateProvider } from '../../elements/contexts';
 
@@ -8,7 +8,7 @@ const APIKeysPage = lazy(() =>
   })),
 );
 
-export const APIKeys = () => (
+export const APIKeys = (): ReactNode => (
   <CardStateProvider>
     <Suspense fallback={''}>
       <APIKeysPage />

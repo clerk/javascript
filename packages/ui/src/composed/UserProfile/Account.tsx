@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from 'react';
+import type { PropsWithChildren, ReactNode } from 'react';
 
 import { Card } from '@/ui/elements/Card';
 import { CardStateProvider, useCardState } from '@/ui/elements/contexts';
@@ -9,7 +9,7 @@ import { Col, descriptors, localizationKeys } from '../../customizables';
 import { AccountPage } from '../../components/UserProfile/AccountPage';
 import { PageContext } from '../PageContext';
 
-function AccountChrome({ children }: PropsWithChildren) {
+function AccountChrome({ children }: PropsWithChildren): ReactNode {
   const card = useCardState();
   return (
     <ProfileCard.Page>
@@ -36,7 +36,7 @@ function AccountChrome({ children }: PropsWithChildren) {
   );
 }
 
-export function Account({ children }: PropsWithChildren) {
+export function Account({ children }: PropsWithChildren): ReactNode {
   if (!children) {
     return <AccountPage />;
   }

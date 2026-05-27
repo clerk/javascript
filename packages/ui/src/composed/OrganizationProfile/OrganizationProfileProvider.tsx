@@ -1,7 +1,7 @@
 import type { ModuleManager } from '@clerk/shared/moduleManager';
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type { EnvironmentResource, OAuthProvider, OAuthScope } from '@clerk/shared/types';
-import React, { useMemo } from 'react';
+import React, { useMemo, type ReactNode } from 'react';
 
 import { AppearanceProvider } from '@/ui/customizables/AppearanceContext';
 import { FlowMetadataProvider } from '@/ui/elements/contexts';
@@ -28,7 +28,7 @@ type OrganizationProfileProviderProps = React.PropsWithChildren<{
   additionalOAuthScopes?: Partial<Record<OAuthProvider, OAuthScope[]>>;
 }>;
 
-export const OrganizationProfileProvider = (props: OrganizationProfileProviderProps) => {
+export const OrganizationProfileProvider = (props: OrganizationProfileProviderProps): ReactNode => {
   const { children, appearance } = props;
   const clerk = useClerk();
   const { isLoaded, user } = useUser();
