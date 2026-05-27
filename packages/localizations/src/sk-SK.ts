@@ -141,7 +141,7 @@ export const skSK: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -180,12 +180,46 @@ export const skSK: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'Kontaktujte správcu vašej organizácie, aby ste získali oprávnenia na spravovanie podnikových pripojení.',
-      title: 'Nemáte oprávnenie spravovať podnikové pripojenia',
+      subtitle: 'Kontaktujte správcu vašej organizácie pre rozšírenie vašich oprávnení.',
+      title: 'Nemáte oprávnenie spravovať jednotné prihlasovanie (SSO)',
     },
     navbar: {
       title: 'Nastaviť jednotné prihlasovanie (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Vyberte poskytovateľa',
+      subtitle: 'Vyberte poskytovateľa, pre ktorého budete nastavovať SSO.',
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Vlastný poskytovateľ SAML',
+      },
+      warning: 'Po výbere poskytovateľa ho nemôžete zmeniť, kým sa konfigurácia neukončí',
+    },
+    verifyEmailDomainStep: {
+      title: 'Overiť e-mailovú adresu',
+      subtitle: 'Overte e-mailovú adresu, na ktorej chcete povoliť podnikové pripojenie.',
+      addEmailAddress: {
+        formTitle: 'Potrebujeme váš e-mail',
+        formSubtitle: 'Na začiatok budeme potrebovať vašu e-mailovú adresu',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'E-mailová adresa',
+      },
+      emailCode: {
+        formTitle: 'Overte svoju e-mailovú adresu',
+        formSubtitle: 'Zadajte overovací kód odoslaný na {{identifier}}',
+        resendButton: 'Nedostali ste kód? Odoslať znova',
+        verified: {
+          title: 'Máme váš e-mail',
+          subtitle: 'Overili ste svoju e-mailovú adresu nasledujúcim e-mailom',
+          inputLabel: 'Overená e-mailová adresa',
+        },
+      },
+      domainTaken: {
+        title: 'Táto doména ({{domain}}) už má SSO pripojenie',
+        subtitle:
+          'Kontaktujte administrátora aplikácie, aby ste získali prístup prostredníctvom existujúceho pripojenia.',
+      },
     },
   },
   createOrganization: {

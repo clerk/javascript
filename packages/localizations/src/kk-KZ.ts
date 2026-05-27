@@ -141,7 +141,7 @@ export const kkKZ: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -180,11 +180,45 @@ export const kkKZ: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: 'Корпоративтік қосылыстарды басқару рұқсаттарын алу үшін ұйым әкімшісіне хабарласыңыз.',
-      title: 'Сізде корпоративтік қосылыстарды басқаруға рұқсат жоқ',
+      subtitle: 'Рұқсаттарыңызды жаңарту үшін ұйым әкімшісіне хабарласыңыз.',
+      title: 'Сізде бірыңғай кіруді (SSO) басқаруға рұқсат жоқ',
     },
     navbar: {
       title: 'Бірыңғай кіруді конфигурациялау (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Провайдерді таңдау',
+      subtitle: 'SSO-ны баптамақшы провайдерді таңдаңыз.',
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Реттелетін SAML провайдері',
+      },
+      warning: 'Провайдер таңдалғаннан кейін, конфигурация аяқталғанша өзгерте алмайсыз',
+    },
+    verifyEmailDomainStep: {
+      title: 'Электрондық пошта мекенжайын растау',
+      subtitle: 'Кәсіпорын байланысын іске қосқыңыз келетін электрондық пошта мекенжайын растаңыз.',
+      addEmailAddress: {
+        formTitle: 'Бізге электрондық поштаңыз қажет',
+        formSubtitle: 'Бастау үшін электрондық пошта мекенжайыңыз қажет болады',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'Электрондық пошта мекенжайы',
+      },
+      emailCode: {
+        formTitle: 'Электрондық пошта мекенжайыңызды растаңыз',
+        formSubtitle: '{{identifier}} мекенжайына жіберілген растау кодын енгізіңіз',
+        resendButton: 'Код алмадыңыз ба? Қайта жіберу',
+        verified: {
+          title: 'Электрондық поштаңызды алдық',
+          subtitle: 'Электрондық пошта мекенжайыңызды келесі поштамен растадыңыз',
+          inputLabel: 'Расталған электрондық пошта мекенжайы',
+        },
+      },
+      domainTaken: {
+        title: 'Бұл доменде ({{domain}}) бұрыннан SSO байланысы бар',
+        subtitle: 'Қолданыстағы байланыс арқылы кіруге қол жеткізу үшін қолданба әкімшісіне хабарласыңыз.',
+      },
     },
   },
   createOrganization: {

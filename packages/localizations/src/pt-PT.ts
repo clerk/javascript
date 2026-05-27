@@ -149,7 +149,7 @@ export const ptPT: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Métodos de pagamento',
-    popular: 'Popular',
+    highlightedPlanBadge: 'Popular',
     pricingTable: {
       billingCycle: 'Ciclo de faturação',
       included: 'Incluído',
@@ -188,11 +188,45 @@ export const ptPT: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: 'Contacte o administrador da sua organização para obter permissões para gerir ligações empresariais.',
-      title: 'Não tem permissão para gerir ligações empresariais',
+      subtitle: 'Contacte o administrador da sua organização para ampliar as suas permissões.',
+      title: 'Não tem permissão para gerir a autenticação única (SSO)',
     },
     navbar: {
       title: 'Configurar autenticação única (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Selecionar fornecedor',
+      subtitle: 'Selecione o fornecedor para o qual vai configurar o SSO.',
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Fornecedor SAML personalizado',
+      },
+      warning: 'Depois de um fornecedor ser selecionado não pode ser alterado até que a configuração esteja terminada',
+    },
+    verifyEmailDomainStep: {
+      title: 'Verificar endereço de e-mail',
+      subtitle: 'Verifique o endereço de e-mail no qual pretende ativar a ligação empresarial.',
+      addEmailAddress: {
+        formTitle: 'Precisamos do seu e-mail',
+        formSubtitle: 'Para começar, precisaremos do seu endereço de e-mail',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'Endereço de e-mail',
+      },
+      emailCode: {
+        formTitle: 'Verifique o seu endereço de e-mail',
+        formSubtitle: 'Introduza o código de verificação enviado para {{identifier}}',
+        resendButton: 'Não recebeu um código? Reenviar',
+        verified: {
+          title: 'Recebemos o seu e-mail',
+          subtitle: 'Verificou o seu endereço de e-mail com o seguinte e-mail',
+          inputLabel: 'Endereço de e-mail verificado',
+        },
+      },
+      domainTaken: {
+        title: 'Este domínio ({{domain}}) já possui uma ligação SSO',
+        subtitle: 'Contacte o administrador da aplicação para obter acesso através da ligação existente.',
+      },
     },
   },
   createOrganization: {

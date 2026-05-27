@@ -77,6 +77,10 @@ export interface OrganizationResource extends ClerkResource, BillingPayerMethods
    */
   maxAllowedMemberships: number;
   /**
+   * Whether the Organization allows self-serve SSO.
+   */
+  selfServeSSOEnabled: boolean;
+  /**
    * The date when the Organization was first created.
    */
   createdAt: Date;

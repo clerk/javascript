@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Box, descriptors, Flex, Icon, SimpleButton, Text } from '@/customizables';
-import { CaretRight, Check } from '@/icons';
+import { ChevronRight, Checkmark } from '@/icons';
 
 import type { StepperItemProps, StepperProps } from './types';
 
@@ -24,7 +24,7 @@ const Root = ({ children }: StepperProps): JSX.Element => {
           {index < items.length - 1 && (
             <Icon
               elementDescriptor={descriptors.configureSSOStepperSeparator}
-              icon={CaretRight}
+              icon={ChevronRight}
               size='md'
               colorScheme='neutral'
             />
@@ -77,8 +77,9 @@ const Item = ({
       >
         {isCompleted && !isCurrent ? (
           <Icon
-            icon={Check}
-            sx={theme => ({ width: theme.sizes.$2, height: theme.sizes.$2, color: theme.colors.$white })}
+            icon={Checkmark}
+            size='sm'
+            sx={theme => ({ color: theme.colors.$white })}
           />
         ) : (
           <Text
@@ -127,7 +128,7 @@ const Skeleton = ({ totalSteps = 4 }: SkeletonProps): JSX.Element => (
         {index < totalSteps - 1 && (
           <Icon
             elementDescriptor={descriptors.configureSSOStepperSeparator}
-            icon={CaretRight}
+            icon={ChevronRight}
             size='md'
             colorScheme='neutral'
             sx={{ opacity: 0.16 }}

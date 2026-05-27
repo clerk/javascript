@@ -2,7 +2,6 @@ import { inBrowser } from '@clerk/shared/browser';
 import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
 import { loadClerkJSScript, loadClerkUIScript } from '@clerk/shared/loadClerkJsScript';
 import type {
-  __experimental_ConfigureSSOProps,
   __internal_AttemptToEnableEnvironmentSettingParams,
   __internal_AttemptToEnableEnvironmentSettingResult,
   __internal_CheckoutProps,
@@ -26,6 +25,7 @@ import type {
   ClerkOptions,
   ClerkStatus,
   ClientResource,
+  ConfigureSSOProps,
   CreateOrganizationParams,
   CreateOrganizationProps,
   DomainOrProxyUrl,
@@ -160,7 +160,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountWaitlistNodes = new Map<HTMLDivElement, WaitlistProps | undefined>();
   private premountPricingTableNodes = new Map<HTMLDivElement, PricingTableProps | undefined>();
   private premountAPIKeysNodes = new Map<HTMLDivElement, APIKeysProps | undefined>();
-  private premountConfigureSSONodes = new Map<HTMLDivElement, __experimental_ConfigureSSOProps | undefined>();
+  private premountConfigureSSONodes = new Map<HTMLDivElement, ConfigureSSOProps | undefined>();
   private premountOAuthConsentNodes = new Map<HTMLDivElement, __internal_OAuthConsentProps | undefined>();
   private premountTaskChooseOrganizationNodes = new Map<HTMLDivElement, TaskChooseOrganizationProps | undefined>();
   private premountTaskResetPasswordNodes = new Map<HTMLDivElement, TaskResetPasswordProps | undefined>();
@@ -738,7 +738,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     });
 
     this.premountConfigureSSONodes.forEach((props, node) => {
-      clerkjs.__experimental_mountConfigureSSO(node, props);
+      clerkjs.mountConfigureSSO(node, props);
     });
 
     this.premountOAuthConsentNodes.forEach((props, node) => {
@@ -1277,20 +1277,34 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __experimental_mountConfigureSSO = (node: HTMLDivElement, props?: __experimental_ConfigureSSOProps): void => {
+  mountConfigureSSO = (node: HTMLDivElement, props?: ConfigureSSOProps): void => {
     if (this.clerkjs && this.loaded) {
-      this.clerkjs.__experimental_mountConfigureSSO(node, props);
+      this.clerkjs.mountConfigureSSO(node, props);
     } else {
       this.premountConfigureSSONodes.set(node, props);
     }
   };
 
-  __experimental_unmountConfigureSSO = (node: HTMLDivElement): void => {
+  unmountConfigureSSO = (node: HTMLDivElement): void => {
     if (this.clerkjs && this.loaded) {
-      this.clerkjs.__experimental_unmountConfigureSSO(node);
+      this.clerkjs.unmountConfigureSSO(node);
     } else {
       this.premountConfigureSSONodes.delete(node);
     }
+  };
+
+  /**
+   * @deprecated Use `mountConfigureSSO` instead.
+   */
+  __experimental_mountConfigureSSO = (node: HTMLDivElement, props?: ConfigureSSOProps): void => {
+    this.mountConfigureSSO(node, props);
+  };
+
+  /**
+   * @deprecated Use `unmountConfigureSSO` instead.
+   */
+  __experimental_unmountConfigureSSO = (node: HTMLDivElement): void => {
+    this.unmountConfigureSSO(node);
   };
 
   __internal_mountOAuthConsent = (node: HTMLDivElement, props?: OAuthConsentProps) => {

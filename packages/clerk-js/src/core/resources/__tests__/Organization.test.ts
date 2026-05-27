@@ -19,6 +19,7 @@ describe('Organization', () => {
       admin_delete_enabled: true,
       max_allowed_memberships: 3,
       has_image: true,
+      self_serve_sso_enabled: true,
     });
 
     expect(organization).toMatchObject({
@@ -32,6 +33,7 @@ describe('Organization', () => {
       pendingInvitationsCount: 10,
       maxAllowedMemberships: 3,
       adminDeleteEnabled: true,
+      selfServeSSOEnabled: true,
       createdAt: expect.any(Date),
       updatedAt: expect.any(Date),
       publicMetadata: {

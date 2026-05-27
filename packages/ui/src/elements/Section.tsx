@@ -13,12 +13,13 @@ import { Menu, MenuItem, MenuList, MenuTrigger } from './Menu';
 
 type ProfileSectionProps = Omit<PropsOfComponent<typeof Flex>, 'title'> & {
   title: LocalizationKey;
+  titleId?: string;
   centered?: boolean;
   id: ProfileSectionId;
 };
 
 const ProfileSectionRoot = (props: ProfileSectionProps) => {
-  const { title, centered = true, children, id, sx, ...rest } = props;
+  const { title, titleId, centered = true, children, id, sx, ...rest } = props;
   const ref = useRef<HTMLDivElement | null>(null);
   const [height, setHeight] = useState(0);
 
@@ -87,6 +88,7 @@ const ProfileSectionRoot = (props: ProfileSectionProps) => {
       >
         <SectionHeader
           localizationKey={title}
+          textId={titleId}
           elementDescriptor={descriptors.profileSectionTitle}
           elementId={descriptors.profileSectionTitle.setId(id)}
           textElementDescriptor={descriptors.profileSectionTitleText}
@@ -347,13 +349,15 @@ type SectionHeaderProps = PropsOfComponent<typeof Flex> & {
   localizationKey: LocalizationKey;
   textElementDescriptor?: ElementDescriptor;
   textElementId?: ElementId;
+  textId?: string;
 };
 
 export const SectionHeader = (props: SectionHeaderProps) => {
-  const { textElementDescriptor, textElementId, localizationKey, ...rest } = props;
+  const { textElementDescriptor, textElementId, textId, localizationKey, ...rest } = props;
   return (
     <Flex {...rest}>
       <Text
+        id={textId}
         localizationKey={localizationKey}
         variant='subtitle'
         elementDescriptor={textElementDescriptor}
