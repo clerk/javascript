@@ -113,6 +113,7 @@ const ConfigureSSOMobileNavbar = () => {
   return (
     <Col
       as='header'
+      elementDescriptor={descriptors.configureSSOMobileNavbar}
       sx={t => ({
         display: 'none',
         [mqu.md]: {
