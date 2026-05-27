@@ -50,10 +50,13 @@ export const OrganizationProfileProvider = (props: OrganizationProfileProviderPr
     customPages: [],
   };
 
+  const globalAppearance = clerk.__internal_getOption('appearance');
+
   return (
     <StyleCacheProvider>
       <AppearanceProvider
         appearanceKey='organizationProfile'
+        globalAppearance={globalAppearance}
         appearance={appearance}
       >
         <FlowMetadataProvider flow='organizationProfile'>
