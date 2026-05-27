@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import type { SignInStartConfig, SignInStartState, SubmitErrorResult } from '../signInStartMachine';
-import { initSignInStartState, signInStartReducer } from '../signInStartMachine';
+import type { FormViewStatus, SignInStartConfig, SignInStartState, SubmitErrorResult } from '../signInStartMachine';
+import { getAltPhoneChannel, getViewModel, initSignInStartState, signInStartReducer } from '../signInStartMachine';
 
 const baseConfig: SignInStartConfig = {
   identifierAttributes: ['email_address'],
@@ -24,27 +24,26 @@ function createState(overrides?: Partial<SignInStartState>): SignInStartState {
 
 describe('signInStartMachine', () => {
   describe('initSignInStartState', () => {
-    it('initializes with form screen by default', () => {
+    it('initializes with idle status by default', () => {
       const state = initSignInStartState(baseConfig);
-      expect(state.screen).toBe('form');
-      expect(state.isSubmitting).toBe(false);
+      expect(state.status).toEqual({ tag: 'idle' });
       expect(state.cardError).toBeUndefined();
     });
 
-    it('initializes with loading screen when organization ticket is present', () => {
+    it('initializes with ticketProcessing status when organization ticket is present', () => {
       const state = initSignInStartState({
         ...baseConfig,
         organizationTicket: 'test_ticket',
       });
-      expect(state.screen).toBe('loading');
+      expect(state.status).toEqual({ tag: 'ticketProcessing' });
     });
 
-    it('initializes with loading screen when clerk status is sign_up', () => {
+    it('initializes with ticketProcessing status when clerk status is sign_up', () => {
       const state = initSignInStartState({
         ...baseConfig,
         clerkStatus: 'sign_up',
       });
-      expect(state.screen).toBe('loading');
+      expect(state.status).toEqual({ tag: 'ticketProcessing' });
     });
 
     it('sets shouldAutofocus to false on mobile', () => {
@@ -72,6 +71,18 @@ describe('signInStartMachine', () => {
       });
       expect(next.identifierValue).toBe('user@example.com');
       expect(effects).toEqual([]);
+    });
+
+    it('works in submitting state', () => {
+      const state = createState({
+        status: { tag: 'submitting', resumeTo: { tag: 'idle' } },
+      });
+      const { state: next } = signInStartReducer(state, {
+        type: 'SET_IDENTIFIER',
+        value: 'new@example.com',
+      });
+      expect(next.identifierValue).toBe('new@example.com');
+      expect(next.status.tag).toBe('submitting');
     });
   });
 
@@ -160,36 +171,34 @@ describe('signInStartMachine', () => {
   });
 
   describe('SELECT_ALT_PHONE_PROVIDER / CLEAR_ALT_PHONE_PROVIDER', () => {
-    it('switches to alternative phone code screen', () => {
+    it('switches to alternative phone code status', () => {
       const state = createState();
       const provider = { channel: 'whatsapp' as const, name: 'WhatsApp', iconUrl: '' };
       const { state: next } = signInStartReducer(state, {
         type: 'SELECT_ALT_PHONE_PROVIDER',
         provider: provider as any,
       });
-      expect(next.screen).toBe('alternativePhoneCode');
-      expect(next.alternativePhoneCodeProvider).toBe(provider);
+      expect(next.status).toEqual({ tag: 'altPhoneCode', provider });
     });
 
     it('clears alternative phone code provider', () => {
+      const provider = { channel: 'whatsapp' as const, name: 'WhatsApp', iconUrl: '' };
       const state = createState({
-        screen: 'alternativePhoneCode',
-        alternativePhoneCodeProvider: { channel: 'whatsapp' } as any,
+        status: { tag: 'altPhoneCode', provider: provider as any },
       });
       const { state: next } = signInStartReducer(state, { type: 'CLEAR_ALT_PHONE_PROVIDER' });
-      expect(next.screen).toBe('form');
-      expect(next.alternativePhoneCodeProvider).toBeNull();
+      expect(next.status).toEqual({ tag: 'idle' });
     });
   });
 
   describe('SUBMIT', () => {
-    it('sets isSubmitting and clears error', () => {
+    it('transitions to submitting and clears error', () => {
       const state = createState({
         identifierValue: 'user@example.com',
         cardError: 'previous error',
       });
       const { state: next, effects } = signInStartReducer(state, { type: 'SUBMIT' });
-      expect(next.isSubmitting).toBe(true);
+      expect(next.status).toEqual({ tag: 'submitting', resumeTo: { tag: 'idle' } });
       expect(next.cardError).toBeUndefined();
       expect(effects).toHaveLength(1);
       expect(effects[0].type).toBe('SIGN_IN_CREATE');
@@ -208,11 +217,43 @@ describe('signInStartMachine', () => {
         alternativePhoneChannel: null,
       });
     });
+
+    it('preserves altPhoneCode in resumeTo when submitting from altPhoneCode', () => {
+      const provider = { channel: 'whatsapp' as const, name: 'WhatsApp', iconUrl: '' };
+      const state = createState({
+        status: { tag: 'altPhoneCode', provider: provider as any },
+        identifierValue: '+1234567890',
+      });
+      const { state: next, effects } = signInStartReducer(state, { type: 'SUBMIT' });
+      expect(next.status).toEqual({
+        tag: 'submitting',
+        resumeTo: { tag: 'altPhoneCode', provider },
+      });
+      expect(effects[0]).toEqual({
+        type: 'SIGN_IN_CREATE',
+        identifier: '+1234567890',
+        password: '',
+        alternativePhoneChannel: 'whatsapp',
+      });
+    });
+
+    it('allows re-submit while already submitting (preserves current behavior)', () => {
+      const state = createState({
+        status: { tag: 'submitting', resumeTo: { tag: 'idle' } },
+        identifierValue: 'user@example.com',
+      });
+      const { state: next, effects } = signInStartReducer(state, { type: 'SUBMIT' });
+      expect(next.status.tag).toBe('submitting');
+      expect(effects).toHaveLength(1);
+      expect(effects[0].type).toBe('SIGN_IN_CREATE');
+    });
   });
 
   describe('SUBMIT_SUCCESS', () => {
     it('navigates to factor-one when status is needs_first_factor', () => {
-      const state = createState({ isSubmitting: true });
+      const state = createState({
+        status: { tag: 'submitting', resumeTo: { tag: 'idle' } },
+      });
       const { state: next, effects } = signInStartReducer(state, {
         type: 'SUBMIT_SUCCESS',
         result: {
@@ -223,12 +264,14 @@ describe('signInStartMachine', () => {
           hasMultipleEnterpriseConnections: false,
         },
       });
-      expect(next.isSubmitting).toBe(false);
+      expect(next.status).toEqual({ tag: 'idle' });
       expect(effects).toEqual([{ type: 'NAVIGATE', to: 'factor-one' }]);
     });
 
     it('navigates to factor-two when status is needs_second_factor', () => {
-      const state = createState({ isSubmitting: true });
+      const state = createState({
+        status: { tag: 'submitting', resumeTo: { tag: 'idle' } },
+      });
       const { effects } = signInStartReducer(state, {
         type: 'SUBMIT_SUCCESS',
         result: {
@@ -243,7 +286,9 @@ describe('signInStartMachine', () => {
     });
 
     it('navigates to client-trust when status is needs_client_trust', () => {
-      const state = createState({ isSubmitting: true });
+      const state = createState({
+        status: { tag: 'submitting', resumeTo: { tag: 'idle' } },
+      });
       const { effects } = signInStartReducer(state, {
         type: 'SUBMIT_SUCCESS',
         result: {
@@ -258,7 +303,9 @@ describe('signInStartMachine', () => {
     });
 
     it('emits SET_ACTIVE when status is complete', () => {
-      const state = createState({ isSubmitting: true });
+      const state = createState({
+        status: { tag: 'submitting', resumeTo: { tag: 'idle' } },
+      });
       const { effects } = signInStartReducer(state, {
         type: 'SUBMIT_SUCCESS',
         result: {
@@ -273,7 +320,9 @@ describe('signInStartMachine', () => {
     });
 
     it('redirects to enterprise SSO when only enterprise SSO factors and single connection', () => {
-      const state = createState({ isSubmitting: true });
+      const state = createState({
+        status: { tag: 'submitting', resumeTo: { tag: 'idle' } },
+      });
       const { effects } = signInStartReducer(state, {
         type: 'SUBMIT_SUCCESS',
         result: {
@@ -288,7 +337,9 @@ describe('signInStartMachine', () => {
     });
 
     it('navigates to factor-one when multiple enterprise connections', () => {
-      const state = createState({ isSubmitting: true });
+      const state = createState({
+        status: { tag: 'submitting', resumeTo: { tag: 'idle' } },
+      });
       const { effects } = signInStartReducer(state, {
         type: 'SUBMIT_SUCCESS',
         result: {
@@ -303,7 +354,9 @@ describe('signInStartMachine', () => {
     });
 
     it('emits ENTERPRISE_SSO_REDIRECT when status is needs_identifier with enterprise SSO factors', () => {
-      const state = createState({ isSubmitting: true });
+      const state = createState({
+        status: { tag: 'submitting', resumeTo: { tag: 'idle' } },
+      });
       const { effects } = signInStartReducer(state, {
         type: 'SUBMIT_SUCCESS',
         result: {
@@ -316,11 +369,33 @@ describe('signInStartMachine', () => {
       });
       expect(effects).toEqual([{ type: 'ENTERPRISE_SSO_REDIRECT' }]);
     });
+
+    it('restores resumeTo status after success', () => {
+      const provider = { channel: 'whatsapp' as const, name: 'WhatsApp', iconUrl: '' };
+      const resumeTo: FormViewStatus = { tag: 'altPhoneCode', provider: provider as any };
+      const state = createState({
+        status: { tag: 'submitting', resumeTo },
+      });
+      const { state: next } = signInStartReducer(state, {
+        type: 'SUBMIT_SUCCESS',
+        result: {
+          status: 'needs_first_factor',
+          createdSessionId: null,
+          supportedFirstFactors: [],
+          hasOnlyEnterpriseSSO: false,
+          hasMultipleEnterpriseConnections: false,
+        },
+      });
+      expect(next.status).toEqual(resumeTo);
+    });
   });
 
   describe('SUBMIT_ERROR', () => {
     it('retries without password on invalid strategy error', () => {
-      const state = createState({ identifierValue: 'user@example.com' });
+      const state = createState({
+        identifierValue: 'user@example.com',
+        status: { tag: 'submitting', resumeTo: { tag: 'idle' } },
+      });
       const result: SubmitErrorResult = {
         errors: [{ code: 'strategy_for_user_invalid', message: '', longMessage: '' }],
         identifierType: 'email',
@@ -332,7 +407,9 @@ describe('signInStartMachine', () => {
     });
 
     it('sets active last session on session_exists error', () => {
-      const state = createState();
+      const state = createState({
+        status: { tag: 'submitting', resumeTo: { tag: 'idle' } },
+      });
       const result: SubmitErrorResult = {
         errors: [{ code: 'session_exists', message: '', longMessage: '' }],
         identifierType: 'email',
@@ -343,7 +420,9 @@ describe('signInStartMachine', () => {
     });
 
     it('sets active specific session on already_signed_in error', () => {
-      const state = createState();
+      const state = createState({
+        status: { tag: 'submitting', resumeTo: { tag: 'idle' } },
+      });
       const result: SubmitErrorResult = {
         errors: [
           {
@@ -363,6 +442,7 @@ describe('signInStartMachine', () => {
     it('emits combined flow transfer when account does not exist in combined flow', () => {
       const state = createState({
         config: { ...baseConfig, isCombinedFlow: true },
+        status: { tag: 'submitting', resumeTo: { tag: 'idle' } },
       });
       const result: SubmitErrorResult = {
         errors: [{ code: 'form_identifier_not_found', message: '', longMessage: '' }],
@@ -376,7 +456,9 @@ describe('signInStartMachine', () => {
     });
 
     it('does not emit combined flow transfer when not in combined flow', () => {
-      const state = createState();
+      const state = createState({
+        status: { tag: 'submitting', resumeTo: { tag: 'idle' } },
+      });
       const result: SubmitErrorResult = {
         errors: [{ code: 'form_identifier_not_found', message: '', longMessage: '' }],
         identifierType: 'email',
@@ -387,7 +469,9 @@ describe('signInStartMachine', () => {
     });
 
     it('falls through to HANDLE_FIELD_ERRORS for unknown errors', () => {
-      const state = createState();
+      const state = createState({
+        status: { tag: 'submitting', resumeTo: { tag: 'idle' } },
+      });
       const errors = [{ code: 'some_unknown_error', message: 'Oops', longMessage: '' }];
       const result: SubmitErrorResult = {
         errors: errors as any,
@@ -396,6 +480,21 @@ describe('signInStartMachine', () => {
       };
       const { effects } = signInStartReducer(state, { type: 'SUBMIT_ERROR', result });
       expect(effects).toEqual([{ type: 'HANDLE_FIELD_ERRORS', errors }]);
+    });
+
+    it('restores altPhoneCode status after error when submitted from altPhoneCode', () => {
+      const provider = { channel: 'whatsapp' as const, name: 'WhatsApp', iconUrl: '' };
+      const resumeTo: FormViewStatus = { tag: 'altPhoneCode', provider: provider as any };
+      const state = createState({
+        status: { tag: 'submitting', resumeTo },
+      });
+      const result: SubmitErrorResult = {
+        errors: [{ code: 'some_unknown_error', message: 'Oops', longMessage: '' }],
+        identifierType: 'email',
+        identifierValue: 'user@example.com',
+      };
+      const { state: next } = signInStartReducer(state, { type: 'SUBMIT_ERROR', result });
+      expect(next.status).toEqual(resumeTo);
     });
   });
 
@@ -426,36 +525,92 @@ describe('signInStartMachine', () => {
   });
 
   describe('TICKET_PROCESSING', () => {
-    it('sets loading state and emits ticket create effect', () => {
+    it('sets ticketProcessing status and emits ticket create effect', () => {
       const state = createState({
         config: { ...baseConfig, organizationTicket: 'test_ticket' },
       });
       const { state: next, effects } = signInStartReducer(state, { type: 'TICKET_PROCESSING' });
-      expect(next.screen).toBe('loading');
-      expect(next.isSubmitting).toBe(true);
+      expect(next.status).toEqual({ tag: 'ticketProcessing' });
       expect(effects).toEqual([{ type: 'SIGN_IN_CREATE_TICKET', ticket: 'test_ticket' }]);
     });
   });
 
   describe('TICKET_DONE', () => {
-    it('stays in loading state when redirecting to SSO', () => {
-      const state = createState({ screen: 'loading', isSubmitting: true });
+    it('stays in ticketProcessing when redirecting to SSO', () => {
+      const state = createState({ status: { tag: 'ticketProcessing' } });
       const { state: next } = signInStartReducer(state, {
         type: 'TICKET_DONE',
         isRedirectingToSSO: true,
       });
-      expect(next.screen).toBe('loading');
-      expect(next.isSubmitting).toBe(true);
+      expect(next.status).toEqual({ tag: 'ticketProcessing' });
     });
 
-    it('returns to form state when not redirecting', () => {
-      const state = createState({ screen: 'loading', isSubmitting: true });
+    it('returns to idle when not redirecting', () => {
+      const state = createState({ status: { tag: 'ticketProcessing' } });
       const { state: next } = signInStartReducer(state, {
         type: 'TICKET_DONE',
         isRedirectingToSSO: false,
       });
-      expect(next.screen).toBe('form');
-      expect(next.isSubmitting).toBe(false);
+      expect(next.status).toEqual({ tag: 'idle' });
+    });
+  });
+
+  describe('getViewModel', () => {
+    it('returns loading for ticketProcessing', () => {
+      const state = createState({ status: { tag: 'ticketProcessing' } });
+      expect(getViewModel(state)).toEqual({ kind: 'loading' });
+    });
+
+    it('returns form for idle', () => {
+      const state = createState({ status: { tag: 'idle' } });
+      expect(getViewModel(state)).toEqual({ kind: 'form' });
+    });
+
+    it('returns altPhoneCode with provider for altPhoneCode status', () => {
+      const provider = { channel: 'whatsapp' as const, name: 'WhatsApp', iconUrl: '' };
+      const state = createState({ status: { tag: 'altPhoneCode', provider: provider as any } });
+      expect(getViewModel(state)).toEqual({ kind: 'altPhoneCode', provider });
+    });
+
+    it('returns form for submitting with idle resumeTo', () => {
+      const state = createState({
+        status: { tag: 'submitting', resumeTo: { tag: 'idle' } },
+      });
+      expect(getViewModel(state)).toEqual({ kind: 'form' });
+    });
+
+    it('returns altPhoneCode for submitting with altPhoneCode resumeTo', () => {
+      const provider = { channel: 'whatsapp' as const, name: 'WhatsApp', iconUrl: '' };
+      const state = createState({
+        status: { tag: 'submitting', resumeTo: { tag: 'altPhoneCode', provider: provider as any } },
+      });
+      expect(getViewModel(state)).toEqual({ kind: 'altPhoneCode', provider });
+    });
+  });
+
+  describe('getAltPhoneChannel', () => {
+    it('returns channel from altPhoneCode status', () => {
+      const provider = { channel: 'whatsapp' as const, name: 'WhatsApp', iconUrl: '' };
+      expect(getAltPhoneChannel({ tag: 'altPhoneCode', provider: provider as any })).toBe('whatsapp');
+    });
+
+    it('returns channel from submitting with altPhoneCode resumeTo', () => {
+      const provider = { channel: 'whatsapp' as const, name: 'WhatsApp', iconUrl: '' };
+      expect(
+        getAltPhoneChannel({ tag: 'submitting', resumeTo: { tag: 'altPhoneCode', provider: provider as any } }),
+      ).toBe('whatsapp');
+    });
+
+    it('returns null for idle status', () => {
+      expect(getAltPhoneChannel({ tag: 'idle' })).toBeNull();
+    });
+
+    it('returns null for submitting with idle resumeTo', () => {
+      expect(getAltPhoneChannel({ tag: 'submitting', resumeTo: { tag: 'idle' } })).toBeNull();
+    });
+
+    it('returns null for ticketProcessing', () => {
+      expect(getAltPhoneChannel({ tag: 'ticketProcessing' })).toBeNull();
     });
   });
 });

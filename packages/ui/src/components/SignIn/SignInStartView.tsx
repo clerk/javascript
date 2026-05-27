@@ -1,6 +1,6 @@
 import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
 import { SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
-import type { PhoneCodeChannel } from '@clerk/shared/types';
+import type { PhoneCodeChannel, PhoneCodeChannelData } from '@clerk/shared/types';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -13,6 +13,7 @@ import type { FormControlState } from '@/ui/utils/useFormControl';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import { CaptchaElement } from '../../elements/CaptchaElement';
 import type { SignInStartEvent, SignInStartState } from './signInStartMachine';
+import { getViewModel } from './signInStartMachine';
 import { SignInAlternativePhoneCodePhoneNumberCard } from './SignInAlternativePhoneCodePhoneNumberCard';
 import { SignInSocialButtons } from './SignInSocialButtons';
 import type { SignInStartViewConfig } from './useSignInStartFlow';
@@ -40,7 +41,9 @@ export function SignInStartView({
   signUpUrlWithAuth,
   waitlistUrlWithAuth,
 }: SignInStartViewProps) {
-  if (state.screen === 'loading') {
+  const viewModel = getViewModel(state);
+
+  if (viewModel.kind === 'loading') {
     return <LoadingCard />;
   }
 
@@ -69,14 +72,14 @@ export function SignInStartView({
   // @ts-expect-error `action` is not typed
   const { action, validLastAuthenticationStrategies, ...identifierFieldProps } = identifierField.props;
 
-  if (state.screen === 'alternativePhoneCode' && state.alternativePhoneCodeProvider) {
+  if (viewModel.kind === 'altPhoneCode') {
     return (
       <Flow.Part part='start'>
         <SignInAlternativePhoneCodePhoneNumberCard
           handleSubmit={handleFirstPartySubmit}
           phoneNumberFormState={phoneIdentifierField}
           onUseAnotherMethod={() => dispatch({ type: 'CLEAR_ALT_PHONE_PROVIDER' })}
-          phoneCodeProvider={state.alternativePhoneCodeProvider}
+          phoneCodeProvider={viewModel.provider}
         />
       </Flow.Part>
     );

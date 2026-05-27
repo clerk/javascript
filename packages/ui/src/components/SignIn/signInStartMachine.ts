@@ -17,20 +17,54 @@ export type SignInStartConfig = {
   enterpriseSSOEnabled: boolean;
 };
 
+// --- Status (discriminated union replacing screen + isSubmitting + alternativePhoneCodeProvider) ---
+
+type IdleStatus = { tag: 'idle' };
+type AltPhoneCodeStatus = { tag: 'altPhoneCode'; provider: PhoneCodeChannelData };
+export type FormViewStatus = IdleStatus | AltPhoneCodeStatus;
+type SubmittingStatus = { tag: 'submitting'; resumeTo: FormViewStatus };
+type TicketProcessingStatus = { tag: 'ticketProcessing' };
+
+export type SignInStartStatus = FormViewStatus | SubmittingStatus | TicketProcessingStatus;
+
 // --- State ---
 
 export type SignInStartState = {
-  screen: 'form' | 'loading' | 'alternativePhoneCode';
+  status: SignInStartStatus;
   identifierAttribute: SignInStartIdentifier;
   identifierValue: string;
   passwordValue: string;
   shouldAutofocus: boolean;
   hasSwitchedByAutofill: boolean;
-  alternativePhoneCodeProvider: PhoneCodeChannelData | null;
   cardError: ClerkAPIError | string | undefined;
-  isSubmitting: boolean;
   config: SignInStartConfig;
 };
+
+// --- View model (pure projection of status for the view layer) ---
+
+export type SignInStartViewModel =
+  | { kind: 'loading' }
+  | { kind: 'form' }
+  | { kind: 'altPhoneCode'; provider: PhoneCodeChannelData };
+
+export function getViewModel(state: SignInStartState): SignInStartViewModel {
+  switch (state.status.tag) {
+    case 'ticketProcessing':
+      return { kind: 'loading' };
+    case 'altPhoneCode':
+      return { kind: 'altPhoneCode', provider: state.status.provider };
+    case 'submitting': {
+      const { resumeTo } = state.status;
+      if (resumeTo.tag === 'altPhoneCode') {
+        return { kind: 'altPhoneCode', provider: resumeTo.provider };
+      }
+      return { kind: 'form' };
+    }
+    case 'idle':
+    default:
+      return { kind: 'form' };
+  }
+}
 
 // --- Result from API calls (serializable subset the reducer needs) ---
 
@@ -126,27 +160,54 @@ const ACCOUNT_NOT_EXIST_CODES = new Set([
   ERROR_CODES.FORM_IDENTIFIER_NOT_FOUND,
 ]);
 
-// --- Reducer ---
+// --- Helpers ---
+
+export function getAltPhoneChannel(status: SignInStartStatus): PhoneCodeChannel | null {
+  if (status.tag === 'altPhoneCode') return status.provider.channel;
+  if (status.tag === 'submitting' && status.resumeTo.tag === 'altPhoneCode') {
+    return status.resumeTo.provider.channel;
+  }
+  return null;
+}
+
+// --- Init ---
 
 export function initSignInStartState(config: SignInStartConfig): SignInStartState {
   const isTicketFlow = !!config.organizationTicket;
   const isSignUpRedirect = config.clerkStatus === 'sign_up';
 
   return {
-    screen: isTicketFlow || isSignUpRedirect ? 'loading' : 'form',
+    status: isTicketFlow || isSignUpRedirect ? { tag: 'ticketProcessing' } : { tag: 'idle' },
     identifierAttribute: config.initialIdentifier,
     identifierValue: config.initialIdentifierValue,
     passwordValue: '',
     shouldAutofocus: !config.isMobile && !config.hasSocialOrWeb3Buttons,
     hasSwitchedByAutofill: false,
-    alternativePhoneCodeProvider: null,
     cardError: undefined,
-    isSubmitting: false,
     config,
   };
 }
 
-function handleSignInStatus(state: SignInStartState, result: SignInCreateResult): ReducerResult {
+// --- Shared handlers ---
+
+function handleCommonEvent(state: SignInStartState, event: SignInStartEvent): ReducerResult | null {
+  switch (event.type) {
+    case 'SET_IDENTIFIER':
+      return { state: { ...state, identifierValue: event.value }, effects: [] };
+    case 'SET_PASSWORD':
+      return { state: { ...state, passwordValue: event.value }, effects: [] };
+    case 'SET_CARD_ERROR':
+      return { state: { ...state, cardError: event.error }, effects: [] };
+    default:
+      return null;
+  }
+}
+
+function handleSignInStatus(
+  state: SignInStartState,
+  result: SignInCreateResult,
+  resumeTo: FormViewStatus,
+): ReducerResult {
   const effects: SignInStartEffect[] = [];
 
   switch (result.status) {
@@ -154,7 +215,7 @@ function handleSignInStatus(state: SignInStartState, result: SignInCreateResult)
       if (result.supportedFirstFactors?.some(ff => ff.strategy === 'enterprise_sso')) {
         effects.push({ type: 'ENTERPRISE_SSO_REDIRECT' });
       }
-      return { state: { ...state, isSubmitting: false }, effects };
+      return { state: { ...state, status: resumeTo }, effects };
 
     case 'needs_first_factor':
       if (!result.hasOnlyEnterpriseSSO || result.hasMultipleEnterpriseConnections) {
@@ -162,26 +223,30 @@ function handleSignInStatus(state: SignInStartState, result: SignInCreateResult)
       } else {
         effects.push({ type: 'ENTERPRISE_SSO_REDIRECT' });
       }
-      return { state: { ...state, isSubmitting: false }, effects };
+      return { state: { ...state, status: resumeTo }, effects };
 
     case 'needs_second_factor':
       effects.push({ type: 'NAVIGATE', to: 'factor-two' });
-      return { state: { ...state, isSubmitting: false }, effects };
+      return { state: { ...state, status: resumeTo }, effects };
 
     case 'needs_client_trust':
       effects.push({ type: 'NAVIGATE', to: 'client-trust' });
-      return { state: { ...state, isSubmitting: false }, effects };
+      return { state: { ...state, status: resumeTo }, effects };
 
     case 'complete':
       effects.push({ type: 'SET_ACTIVE', sessionId: result.createdSessionId ?? '' });
-      return { state: { ...state, isSubmitting: false }, effects };
+      return { state: { ...state, status: resumeTo }, effects };
 
     default:
-      return { state: { ...state, isSubmitting: false }, effects };
+      return { state: { ...state, status: resumeTo }, effects };
   }
 }
 
-function handleSubmitError(state: SignInStartState, result: SubmitErrorResult): ReducerResult {
+function handleSubmitError(
+  state: SignInStartState,
+  result: SubmitErrorResult,
+  resumeTo: FormViewStatus,
+): ReducerResult {
   const { errors } = result;
   const effects: SignInStartEffect[] = [];
 
@@ -194,14 +259,14 @@ function handleSubmitError(state: SignInStartState, result: SubmitErrorResult): 
     effects.push({
       type: 'SIGN_IN_CREATE_WITHOUT_PASSWORD',
       identifier: state.identifierValue,
-      alternativePhoneChannel: state.alternativePhoneCodeProvider?.channel || null,
+      alternativePhoneChannel: getAltPhoneChannel(state.status),
     });
     return { state, effects };
   }
 
   if (sessionAlreadyExistsError) {
     effects.push({ type: 'SET_ACTIVE_LAST_SESSION' });
-    return { state: { ...state, isSubmitting: false }, effects };
+    return { state: { ...state, status: resumeTo }, effects };
   }
 
   if (alreadySignedInError) {
@@ -209,7 +274,7 @@ function handleSubmitError(state: SignInStartState, result: SubmitErrorResult): 
     if (sid) {
       effects.push({ type: 'SET_ACTIVE_SESSION', sessionId: sid });
     }
-    return { state: { ...state, isSubmitting: false }, effects };
+    return { state: { ...state, status: resumeTo }, effects };
   }
 
   if (state.config.isCombinedFlow && accountDoesNotExistError) {
@@ -218,27 +283,39 @@ function handleSubmitError(state: SignInStartState, result: SubmitErrorResult): 
       identifierType: result.identifierType,
       identifierValue: result.identifierValue,
     });
-    return { state: { ...state, isSubmitting: false }, effects };
+    return { state: { ...state, status: resumeTo }, effects };
   }
 
   effects.push({ type: 'HANDLE_FIELD_ERRORS', errors });
-  return { state: { ...state, isSubmitting: false }, effects };
+  return { state: { ...state, status: resumeTo }, effects };
 }
 
-export function signInStartReducer(state: SignInStartState, event: SignInStartEvent): ReducerResult {
+function handleOAuthError(
+  state: SignInStartState,
+  event: { type: 'OAUTH_ERROR'; error: ClerkAPIError } | { type: 'OAUTH_ERROR_GENERIC' },
+): ReducerResult {
+  if (event.type === 'OAUTH_ERROR' && KNOWN_OAUTH_ERROR_CODES.has(event.error.code)) {
+    return {
+      state: { ...state, cardError: event.error },
+      effects: [{ type: 'RESET_SIGN_IN' }],
+    };
+  }
+  return {
+    state: {
+      ...state,
+      cardError: 'Unable to complete action at this time. If the problem persists please contact support.',
+    },
+    effects: [{ type: 'RESET_SIGN_IN' }],
+  };
+}
+
+// --- Sub-reducers ---
+
+function reduceIdle(state: SignInStartState, event: SignInStartEvent): ReducerResult {
+  const common = handleCommonEvent(state, event);
+  if (common) return common;
+
   switch (event.type) {
-    case 'SET_IDENTIFIER':
-      return {
-        state: { ...state, identifierValue: event.value },
-        effects: [],
-      };
-
-    case 'SET_PASSWORD':
-      return {
-        state: { ...state, passwordValue: event.value },
-        effects: [],
-      };
-
     case 'SWITCH_IDENTIFIER': {
       const attrs = state.config.identifierAttributes;
       const currentIndex = attrs.indexOf(state.identifierAttribute);
@@ -278,95 +355,182 @@ export function signInStartReducer(state: SignInStartState, event: SignInStartEv
       return {
         state: {
           ...state,
-          screen: 'alternativePhoneCode',
-          alternativePhoneCodeProvider: event.provider,
+          status: { tag: 'altPhoneCode', provider: event.provider },
         },
         effects: [],
       };
 
-    case 'CLEAR_ALT_PHONE_PROVIDER':
+    case 'SUBMIT':
       return {
-        state: {
-          ...state,
-          screen: 'form',
-          alternativePhoneCodeProvider: null,
-        },
-        effects: [],
-      };
-
-    case 'SUBMIT': {
-      return {
-        state: { ...state, isSubmitting: true, cardError: undefined },
+        state: { ...state, status: { tag: 'submitting', resumeTo: { tag: 'idle' } }, cardError: undefined },
         effects: [
           {
             type: 'SIGN_IN_CREATE',
             identifier: state.identifierValue,
             password: state.passwordValue,
-            alternativePhoneChannel: state.alternativePhoneCodeProvider?.channel || null,
+            alternativePhoneChannel: null,
           },
         ],
       };
-    }
-
-    case 'SUBMIT_SUCCESS':
-      return handleSignInStatus(state, event.result);
-
-    case 'SUBMIT_ERROR':
-      return handleSubmitError(state, event.result);
 
     case 'TICKET_PROCESSING':
       return {
-        state: { ...state, screen: 'loading', isSubmitting: true },
+        state: { ...state, status: { tag: 'ticketProcessing' } },
         effects: [{ type: 'SIGN_IN_CREATE_TICKET', ticket: state.config.organizationTicket }],
       };
 
-    case 'TICKET_SUCCESS':
-      return handleSignInStatus(state, event.result);
+    case 'OAUTH_ERROR':
+    case 'OAUTH_ERROR_GENERIC':
+      return handleOAuthError(state, event);
 
-    case 'TICKET_ERROR':
-      return handleSubmitError(state, event.result);
+    default:
+      return { state, effects: [] };
+  }
+}
 
-    case 'TICKET_DONE': {
-      if (event.isRedirectingToSSO) {
-        return { state, effects: [] };
-      }
+function reduceAltPhoneCode(
+  state: SignInStartState,
+  status: AltPhoneCodeStatus,
+  event: SignInStartEvent,
+): ReducerResult {
+  const common = handleCommonEvent(state, event);
+  if (common) return common;
+
+  switch (event.type) {
+    case 'CLEAR_ALT_PHONE_PROVIDER':
       return {
-        state: { ...state, screen: 'form', isSubmitting: false },
+        state: { ...state, status: { tag: 'idle' } },
+        effects: [],
+      };
+
+    case 'SUBMIT':
+      return {
+        state: { ...state, status: { tag: 'submitting', resumeTo: status }, cardError: undefined },
+        effects: [
+          {
+            type: 'SIGN_IN_CREATE',
+            identifier: state.identifierValue,
+            password: state.passwordValue,
+            alternativePhoneChannel: status.provider.channel,
+          },
+        ],
+      };
+
+    case 'SWITCH_IDENTIFIER': {
+      const attrs = state.config.identifierAttributes;
+      const currentIndex = attrs.indexOf(state.identifierAttribute);
+      const nextAttribute = attrs[(currentIndex + 1) % attrs.length];
+      return {
+        state: {
+          ...state,
+          identifierAttribute: nextAttribute,
+          shouldAutofocus: true,
+          hasSwitchedByAutofill: false,
+        },
         effects: [],
       };
     }
 
-    case 'OAUTH_ERROR':
-      if (KNOWN_OAUTH_ERROR_CODES.has(event.error.code)) {
+    case 'AUTOFILL_PHONE_SWITCH': {
+      if (
+        state.config.identifierAttributes.includes('phone_number') &&
+        state.identifierAttribute !== 'phone_number' &&
+        !state.hasSwitchedByAutofill
+      ) {
         return {
-          state: { ...state, cardError: event.error },
-          effects: [{ type: 'RESET_SIGN_IN' }],
+          state: {
+            ...state,
+            identifierAttribute: 'phone_number',
+            identifierValue: event.value,
+            shouldAutofocus: true,
+            hasSwitchedByAutofill: true,
+          },
+          effects: [],
         };
       }
-      return {
-        state: {
-          ...state,
-          cardError: 'Unable to complete action at this time. If the problem persists please contact support.',
-        },
-        effects: [{ type: 'RESET_SIGN_IN' }],
-      };
+      return { state, effects: [] };
+    }
 
+    case 'OAUTH_ERROR':
     case 'OAUTH_ERROR_GENERIC':
+      return handleOAuthError(state, event);
+
+    default:
+      return { state, effects: [] };
+  }
+}
+
+function reduceSubmitting(state: SignInStartState, status: SubmittingStatus, event: SignInStartEvent): ReducerResult {
+  const common = handleCommonEvent(state, event);
+  if (common) return common;
+
+  switch (event.type) {
+    case 'SUBMIT':
       return {
-        state: {
-          ...state,
-          cardError: 'Unable to complete action at this time. If the problem persists please contact support.',
-        },
-        effects: [{ type: 'RESET_SIGN_IN' }],
+        state: { ...state, cardError: undefined },
+        effects: [
+          {
+            type: 'SIGN_IN_CREATE',
+            identifier: state.identifierValue,
+            password: state.passwordValue,
+            alternativePhoneChannel: getAltPhoneChannel(state.status),
+          },
+        ],
       };
 
-    case 'SET_CARD_ERROR':
+    case 'SUBMIT_SUCCESS':
+      return handleSignInStatus(state, event.result, status.resumeTo);
+
+    case 'SUBMIT_ERROR':
+      return handleSubmitError(state, event.result, status.resumeTo);
+
+    default:
+      return { state, effects: [] };
+  }
+}
+
+function reduceTicketProcessing(state: SignInStartState, event: SignInStartEvent): ReducerResult {
+  const common = handleCommonEvent(state, event);
+  if (common) return common;
+
+  switch (event.type) {
+    case 'TICKET_PROCESSING':
       return {
-        state: { ...state, cardError: event.error },
+        state,
+        effects: [{ type: 'SIGN_IN_CREATE_TICKET', ticket: state.config.organizationTicket }],
+      };
+
+    case 'TICKET_SUCCESS':
+      return handleSignInStatus(state, event.result, { tag: 'idle' });
+
+    case 'TICKET_ERROR':
+      return handleSubmitError(state, event.result, { tag: 'idle' });
+
+    case 'TICKET_DONE':
+      if (event.isRedirectingToSSO) {
+        return { state, effects: [] };
+      }
+      return {
+        state: { ...state, status: { tag: 'idle' } },
         effects: [],
       };
 
     default:
       return { state, effects: [] };
+  }
+}
+
+// --- Main reducer ---
+
+export function signInStartReducer(state: SignInStartState, event: SignInStartEvent): ReducerResult {
+  switch (state.status.tag) {
+    case 'idle':
+      return reduceIdle(state, event);
+    case 'altPhoneCode':
+      return reduceAltPhoneCode(state, state.status, event);
+    case 'submitting':
+      return reduceSubmitting(state, state.status, event);
+    case 'ticketProcessing':
+      return reduceTicketProcessing(state, event);
   }
 }

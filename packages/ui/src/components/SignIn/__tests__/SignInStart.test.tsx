@@ -606,6 +606,41 @@ describe('SignInStart', () => {
     });
   });
 
+  describe('loading state behavior', () => {
+    it('re-enables the form after a submission error', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+      });
+
+      const apiError = new ClerkAPIResponseError('Error', {
+        data: [
+          {
+            code: 'form_identifier_not_found',
+            long_message: 'Identifier not found',
+            message: 'Not found',
+            meta: { param_name: 'identifier' },
+          },
+        ],
+        status: 422,
+      });
+      fixtures.signIn.create.mockRejectedValueOnce(apiError);
+
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      const emailInput = screen.getByLabelText(/email address/i);
+      await userEvent.type(emailInput, 'hello@clerk.com');
+      await userEvent.click(screen.getByText('Continue'));
+
+      await waitFor(() => {
+        expect(fixtures.signIn.create).toHaveBeenCalled();
+      });
+
+      await waitFor(() => {
+        const button = screen.getByText('Continue').closest('button');
+        expect(button).not.toBeDisabled();
+      });
+    });
+  });
+
   describe('ticket flow', () => {
     it('calls the appropriate resource function upon detecting the ticket', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {

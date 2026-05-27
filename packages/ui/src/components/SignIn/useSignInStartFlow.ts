@@ -21,7 +21,7 @@ import { useRouter } from '../../router';
 import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
 import { hasMultipleEnterpriseConnections, useHandleAuthenticateWithPasskey } from './shared';
 import type { SignInStartEffect, SignInStartEvent, SignInStartState } from './signInStartMachine';
-import { initSignInStartState, signInStartReducer } from './signInStartMachine';
+import { getAltPhoneChannel, initSignInStartState, signInStartReducer } from './signInStartMachine';
 import {
   getPreferredAlternativePhoneChannel,
   getPreferredAlternativePhoneChannelForCombinedFlow,
@@ -171,7 +171,7 @@ export function useSignInStartFlow() {
         case 'SIGN_IN_CREATE': {
           const fields: Array<FormControlState<string>> = [identifierField, instantPasswordField];
           const preferredChannel =
-            stateRef.current.alternativePhoneCodeProvider?.channel ||
+            getAltPhoneChannel(stateRef.current.status) ||
             getPreferredAlternativePhoneChannel(fields, authConfig.preferredChannels, 'identifier');
 
           if (preferredChannel) {
@@ -232,7 +232,7 @@ export function useSignInStartFlow() {
         case 'SIGN_IN_CREATE_WITHOUT_PASSWORD': {
           const fields: Array<FormControlState<string>> = [identifierField];
           const preferredChannel =
-            stateRef.current.alternativePhoneCodeProvider?.channel ||
+            getAltPhoneChannel(stateRef.current.status) ||
             getPreferredAlternativePhoneChannel(fields, authConfig.preferredChannels, 'identifier');
 
           if (preferredChannel) {
@@ -368,7 +368,7 @@ export function useSignInStartFlow() {
             navigateOnSetActive: ctx.navigateOnSetActive,
             passwordEnabled: userSettings.attributes.password?.required ?? false,
             alternativePhoneCodeChannel:
-              stateRef.current.alternativePhoneCodeProvider?.channel ||
+              getAltPhoneChannel(stateRef.current.status) ||
               getPreferredAlternativePhoneChannelForCombinedFlow(
                 authConfig.preferredChannels,
                 attribute,
@@ -478,15 +478,17 @@ export function useSignInStartFlow() {
     }
   }, [state.cardError]);
 
+  const isLoadingState = state.status.tag === 'submitting' || state.status.tag === 'ticketProcessing';
+
   useEffect(() => {
-    if (state.isSubmitting) {
+    if (isLoadingState) {
       card.setLoading();
       loadingStatus.setLoading();
     } else {
       card.setIdle();
       loadingStatus.setIdle();
     }
-  }, [state.isSubmitting]);
+  }, [isLoadingState]);
 
   // --- View config (derived from environment, stable) ---
 
