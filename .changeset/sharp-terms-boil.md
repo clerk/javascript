@@ -2,4 +2,4 @@
 '@clerk/ui': patch
 ---
 
-Add mobile header for `<ConfigureSSO />` to display application name, logo and organization name
+Add mobile support for `<ConfigureSSO />` navbar to display application name, logo and organization name
