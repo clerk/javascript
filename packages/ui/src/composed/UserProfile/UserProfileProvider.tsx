@@ -49,10 +49,13 @@ export const UserProfileProvider = (props: UserProfileProviderProps): ReactNode 
     customPages: [],
   };
 
+  const globalAppearance = clerk.__internal_getOption('appearance');
+
   return (
     <StyleCacheProvider>
       <AppearanceProvider
         appearanceKey='userProfile'
+        globalAppearance={globalAppearance}
         appearance={appearance}
       >
         <FlowMetadataProvider flow='userProfile'>
