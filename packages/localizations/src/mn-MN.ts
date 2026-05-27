@@ -180,25 +180,21 @@ export const mnMN: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: 'Аж ахуйн нэгжийн холболтыг удирдах эрх авахын тулд байгууллагынхаа админтай холбогдоно уу.',
-      title: 'Танд аж ахуйн нэгжийн холболтыг удирдах эрх байхгүй байна',
+      subtitle: 'Эрхээ дээшлүүлэхийн тулд байгууллагынхаа админтай холбогдоно уу.',
+      title: 'Танд Нэгдсэн нэвтрэлт (SSO) удирдах эрх байхгүй байна',
     },
     navbar: {
       title: 'Нэгдсэн нэвтрэлт (SSO) тохируулах',
     },
     selectProviderStep: {
-      title: 'Select provider',
-      subtitle: 'Select the provider you are going to setup SSO for.',
-      body: {
-        title: 'Select your identity provider',
-        description: "We'll guide you through the detailed setup process next.",
-      },
+      title: 'Үйлчилгээ үзүүлэгчийг сонгох',
+      subtitle: 'SSO тохируулах гэж буй үйлчилгээ үзүүлэгчээ сонгоно уу.',
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',
-        customSaml: 'Custom SAML Provider',
+        customSaml: 'Хэрэглэгчийн тохируулсан SAML үйлчилгээ үзүүлэгч',
       },
-      warning: 'Once a provider is selected you cannot change again until the configuration is over',
+      warning: 'Үйлчилгээ үзүүлэгчийг сонгосны дараа тохиргоо дуустал өөрчлөх боломжгүй',
     },
     verifyEmailDomainStep: {
       title: 'И-мэйл хаягийг баталгаажуулах',

@@ -31,4 +31,4 @@ export { default as Waitlist } from './interactive/Waitlist.astro';
 export { default as OAuthConsent } from './interactive/OAuthConsent.astro';
 export { default as PricingTable } from './interactive/PricingTable.astro';
 export { default as APIKeys } from './interactive/APIKeys.astro';
-export { default as __experimental_ConfigureSSO } from './interactive/ConfigureSSO.astro';
+export { default as ConfigureSSO } from './interactive/ConfigureSSO.astro';

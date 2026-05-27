@@ -3,7 +3,7 @@ import {
   __internal_useUserEnterpriseConnections,
   useSession,
 } from '@clerk/shared/react';
-import type { __experimental_ConfigureSSOProps, EnterpriseConnectionResource } from '@clerk/shared/types';
+import type { ConfigureSSOProps, EnterpriseConnectionResource } from '@clerk/shared/types';
 import React from 'react';
 
 import { useProtect } from '@/common';
@@ -58,16 +58,14 @@ const AuthenticatedContent = withCoreUserGuard(() => {
             flex: 1,
           })}
         >
-          <ConfigureSSOCardProtect>
-            <ConfigureSSOCardContent contentRef={contentRef} />
-          </ConfigureSSOCardProtect>
+          <ConfigureSSOContent contentRef={contentRef} />
         </Col>
       </ConfigureSSONavbar>
     </ProfileCard.Root>
   );
 });
 
-const ConfigureSSOCardContent = ({ contentRef }: { contentRef: React.RefObject<HTMLDivElement> }) => {
+export const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObject<HTMLDivElement> }) => {
   const {
     data: enterpriseConnections,
     isLoading: isLoadingEnterpriseConnections,
@@ -86,30 +84,41 @@ const ConfigureSSOCardContent = ({ contentRef }: { contentRef: React.RefObject<H
   }
 
   return (
-    <ConfigureSSOProvider
-      hasSuccessfulTestRun={hasSuccessfulTestRun}
-      enterpriseConnection={enterpriseConnection}
-      contentRef={contentRef}
-      createEnterpriseConnection={createEnterpriseConnection}
-      updateEnterpriseConnection={updateEnterpriseConnection}
-      deleteEnterpriseConnection={deleteEnterpriseConnection}
-    >
-      <ConfigureSSOSteps />
-    </ConfigureSSOProvider>
+    <ConfigureSSOProtect>
+      <ConfigureSSOProvider
+        hasSuccessfulTestRun={hasSuccessfulTestRun}
+        enterpriseConnection={enterpriseConnection}
+        contentRef={contentRef}
+        createEnterpriseConnection={createEnterpriseConnection}
+        updateEnterpriseConnection={updateEnterpriseConnection}
+        deleteEnterpriseConnection={deleteEnterpriseConnection}
+      >
+        <ConfigureSSOSteps />
+      </ConfigureSSOProvider>
+    </ConfigureSSOProtect>
   );
 };
 
 const ConfigureSSOSteps = () => {
-  const { initialStepId } = useConfigureSSO();
+  const { initialStepId, enterpriseConnection } = useConfigureSSO();
 
   return (
     <Wizard initialStepId={initialStepId}>
       <ResetCardErrorOnStepChange />
       <ConfigureSSOHeader />
 
-      <Wizard.Step id='select-provider'>
-        <SelectProviderStep />
-      </Wizard.Step>
+      {/*
+       * `select-provider` is only a wizard step while there's no enterprise
+       * connection yet — creating one unregisters this step, which:
+       *   1. Hides it from the breadcrumb (no need for a manual filter), and
+       *   2. Prevents `goPrev` from any later step (e.g. configure's first
+       *      substep) from ever bubbling back into provider selection.
+       */}
+      {!enterpriseConnection && (
+        <Wizard.Step id='select-provider'>
+          <SelectProviderStep />
+        </Wizard.Step>
+      )}
 
       <Wizard.Step
         id='verify-domain'
@@ -142,11 +151,11 @@ const ConfigureSSOSteps = () => {
   );
 };
 
-const ConfigureSSOCardProtect = ({ children }: { children: React.ReactNode }) => {
+const ConfigureSSOProtect = ({ children }: { children: React.ReactNode }) => {
   const { session } = useSession();
   const isPersonalWorkspace = !session?.lastActiveOrganizationId;
   const canManageEnterpriseConnections = useProtect(
-    has => isPersonalWorkspace || has({ permission: 'org:sys_enterprise_connections:manage' }),
+    has => isPersonalWorkspace || has({ permission: 'org:sys_entconns:manage' }),
   );
 
   if (!canManageEnterpriseConnections) {
@@ -240,5 +249,4 @@ const useHasSuccessfulTestRun = (
   };
 };
 
-export const ConfigureSSO: React.ComponentType<__experimental_ConfigureSSOProps> =
-  withCardStateProvider(ConfigureSSOInternal);
+export const ConfigureSSO: React.ComponentType<ConfigureSSOProps> = withCardStateProvider(ConfigureSSOInternal);

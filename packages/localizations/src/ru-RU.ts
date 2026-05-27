@@ -180,9 +180,8 @@ export const ruRU: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'Обратитесь к администратору вашей организации, чтобы получить разрешения на управление корпоративными подключениями.',
-      title: 'У вас нет разрешения на управление корпоративными подключениями',
+      subtitle: 'Обратитесь к администратору вашей организации, чтобы расширить ваши разрешения.',
+      title: 'У вас нет разрешения на управление единым входом (SSO)',
     },
     navbar: {
       title: 'Настроить единый вход (SSO)',
@@ -190,10 +189,6 @@ export const ruRU: LocalizationResource = {
     selectProviderStep: {
       title: 'Выберите поставщика',
       subtitle: 'Выберите поставщика, для которого вы будете настраивать SSO.',
-      body: {
-        title: 'Выберите вашего поставщика идентификации',
-        description: 'Далее мы проведём вас через подробный процесс настройки.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

@@ -680,10 +680,65 @@ export type ElementsConfig = {
   configureSSOStepperItemLabel: WithOptions<string>;
   configureSSOStepperSeparator: WithOptions;
   configureSSOStep: WithOptions<string>;
+  configureSSOStepHeader: WithOptions;
+  configureSSOStepHeaderTitle: WithOptions;
+  configureSSOStepHeaderDescription: WithOptions;
+  configureSSOStepBody: WithOptions;
+  configureSSOStepSection: WithOptions;
   configureSSOStepCounter: WithOptions;
   configureSSOFooter: WithOptions;
   configureSSOFooterPreviousButton: WithOptions;
   configureSSOFooterContinueButton: WithOptions;
+
+  configureSSOProviderGroup: WithOptions<string>;
+  configureSSOProviderGroupLabel: WithOptions<string>;
+  configureSSOProviderGrid: WithOptions;
+  configureSSOProviderCard: WithOptions<string, ActiveState>;
+  configureSSOProviderCardIcon: WithOptions<string>;
+  configureSSOProviderCardLabel: WithOptions<string>;
+
+  configureSSOVerifyDomainErrorRoot: WithOptions;
+  configureSSOVerifyDomainErrorIcon: WithOptions;
+  configureSSOVerifyDomainErrorTitle: WithOptions;
+  configureSSOVerifyDomainErrorSubtitle: WithOptions;
+  configureSSOEmailVerificationForm: WithOptions<string>;
+  configureSSOEmailVerificationIcon: WithOptions<string>;
+  configureSSOEmailVerificationTitle: WithOptions<string>;
+  configureSSOEmailVerificationSubtitle: WithOptions<string>;
+  configureSSOEmailVerificationInput: WithOptions<string>;
+  configureSSOEmailVerificationError: WithOptions;
+
+  configureSSOInstructionsHeading: WithOptions;
+  configureSSOInstructionsList: WithOptions;
+  configureSSOInstructionsListItem: WithOptions;
+  configureSSOAttributeMappingTable: WithOptions;
+  configureSSOAttributeMappingBadge: WithOptions<string>;
+  configureSSOCertificateUploadButton: WithOptions;
+  configureSSOCertificateFileBadge: WithOptions;
+  configureSSOCertificateFileName: WithOptions;
+  configureSSOCertificateRemoveButton: WithOptions;
+
+  configureSSOTestUrlOpenButton: WithOptions;
+  configureSSOTestRefreshButton: WithOptions;
+  configureSSOTestResultsTable: WithOptions;
+  configureSSOTestResultsRow: WithOptions;
+  configureSSOTestResultsEmpty: WithOptions;
+  configureSSOTestResultsLoadingSpinner: WithOptions;
+  configureSSOTestRunStatusBadge: WithOptions<string>;
+  configureSSOTestRunFullMessage: WithOptions;
+  configureSSOTestRunFullMessageCopyButton: WithOptions;
+  configureSSOTestRunHowToFixSection: WithOptions;
+  configureSSOTestRunHowToFixDocsLink: WithOptions;
+  configureSSOTestRunParsedUserInfo: WithOptions;
+  configureSSOTestError: WithOptions;
+
+  configureSSOConfirmationStatusBadge: WithOptions<string>;
+  configureSSOConfirmationDomainLink: WithOptions;
+  configureSSOConfirmationConfigDetailsLabel: WithOptions;
+  configureSSOConfirmationConfigDetailsValue: WithOptions;
+  configureSSOConfirmationConfigDetailsLink: WithOptions;
+  configureSSOConfirmationReconfigureButton: WithOptions;
+  configureSSOConfirmationResetButton: WithOptions;
 
   web3SolanaWalletButtonsRoot: WithOptions;
   web3SolanaWalletButtons: WithOptions;
@@ -1002,6 +1057,26 @@ export type Options = {
    * @default true
    */
   autoFocus?: boolean;
+
+  /**
+   * Controls the visual elevation of card-based components.
+   *
+   * - `'raised'` (default) — the card renders with its border, box-shadow, border-radius, and padding.
+   * - `'flush'` — removes the card border, box-shadow, border-radius, outer padding, and footer
+   *   background so the component sits flat against its container.
+   *
+   * Applies to all card-based components including `<SignIn />`, `<SignUp />`,
+   * `<Waitlist />`, `<CreateOrganization />`, `<OrganizationList />`,
+   * `<OAuthConsent />`, `<UserVerification />`, and session task components.
+   *
+   * Does **not** affect profile components (`<UserProfile />`, `<OrganizationProfile />`)
+   * or popover components (`<UserButton />`, `<OrganizationSwitcher />`), which always render as raised.
+   *
+   * When a component is opened as a modal, it always renders as raised regardless of this setting.
+   *
+   * @default 'raised'
+   */
+  elevation?: 'raised' | 'flush';
 };
 
 export type CaptchaAppearanceOptions = {
@@ -1041,7 +1116,7 @@ export type CheckoutTheme = Theme;
 export type PlanDetailTheme = Theme;
 export type SubscriptionDetailsTheme = Theme;
 export type APIKeysTheme = Theme;
-export type __experimental_ConfigureSSOTheme = Theme;
+export type ConfigureSSOTheme = Theme;
 export type OAuthConsentTheme = Theme;
 export type TaskChooseOrganizationTheme = Theme;
 export type TaskResetPasswordTheme = Theme;
@@ -1121,7 +1196,7 @@ export type Appearance<T = Theme> = T &
     /**
      * Theme overrides that only apply to the `<ConfigureSSO />` component
      */
-    __experimental_configureSSO?: T;
+    configureSSO?: T;
     /**
      * Theme overrides that only apply to the `<OAuthConsent />` component
      */
