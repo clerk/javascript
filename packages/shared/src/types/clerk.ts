@@ -242,10 +242,6 @@ export type OffEventListener = <E extends ClerkEvent>(event: E, handler: EventHa
 
 /**
  * @inline
- * @property {ClerkStatus} degraded - Set when Clerk is partially operational.
- * @property {ClerkStatus} error - Set when hotloading `clerk-js` or `Clerk.load()` failed.
- * @property {ClerkStatus} loading - Set during initialization.
- * @property {ClerkStatus} ready - Set when Clerk is fully operational.
  */
 export type ClerkStatus = 'degraded' | 'error' | 'loading' | 'ready';
 
@@ -723,20 +719,26 @@ export interface Clerk {
   /**
    * Mount a configure SSO component at the target element.
    *
-   * @experimental This method is in early access and may change in future releases.
-   *
    * @param targetNode - Target to mount the ConfigureSSO component.
    * @param props - Configuration parameters.
    */
-  __experimental_mountConfigureSSO: (targetNode: HTMLDivElement, props?: __experimental_ConfigureSSOProps) => void;
+  mountConfigureSSO: (targetNode: HTMLDivElement, props?: ConfigureSSOProps) => void;
 
   /**
    * Unmount a configure SSO component from the target element.
    * If there is no component mounted at the target node, results in a noop.
    *
-   * @experimental This method is in early access and may change in future releases.
-   *
    * @param targetNode - Target node to unmount the ConfigureSSO component from.
+   */
+  unmountConfigureSSO: (targetNode: HTMLDivElement) => void;
+
+  /**
+   * @deprecated Use `mountConfigureSSO` instead.
+   */
+  __experimental_mountConfigureSSO: (targetNode: HTMLDivElement, props?: ConfigureSSOProps) => void;
+
+  /**
+   * @deprecated Use `unmountConfigureSSO` instead.
    */
   __experimental_unmountConfigureSSO: (targetNode: HTMLDivElement) => void;
 
@@ -1781,6 +1783,7 @@ export type __internal_AttemptToEnableEnvironmentSettingParams = {
     | 'OrganizationList'
     | 'CreateOrganization'
     | 'TaskChooseOrganization'
+    | 'ConfigureSSO'
     | 'useOrganizationList'
     | 'useOrganization';
   onClose?: () => void;
@@ -2283,6 +2286,10 @@ type PricingTableDefaultProps = {
 /**  */
 type PricingTableBaseProps = {
   /**
+   * The plan slug to highlight with a "Popular" badge.
+   */
+  highlightedPlan?: string;
+  /**
    * The subscriber type to display plans for.
    * If `organization`, show Plans for the Active Organization; otherwise for the user.
    *
@@ -2325,17 +2332,17 @@ export type APIKeysProps = {
   showDescription?: boolean;
 };
 
-/**
- * @experimental This type is in early access and may change in future releases.
- */
-export type __experimental_ConfigureSSOProps = {
+export type ConfigureSSOProps = {
   /**
    * Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided). See the [`Appearance`](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.
    */
   appearance?: ClerkAppearanceTheme;
 };
 
-/**  */
+/** @deprecated Use `ConfigureSSOProps` instead. */
+export type __experimental_ConfigureSSOProps = ConfigureSSOProps;
+
+/** */
 export type GetAPIKeysParams = ClerkPaginationParams<{
   /**
    * The user or organization ID to query API keys by. If not provided, defaults to the [Active Organization](!active-organization), then the current User.

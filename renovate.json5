@@ -21,9 +21,10 @@
     ".nvmrc",
     "integration/templates/**",
     "packages/upgrade/src/__tests__/fixtures/**",
-    "playground/**",
   ],
   includePaths: [
+    ".github/actions/**",
+    ".github/workflows/**",
     "package.json",
     "packages/**",
     "pnpm-workspace.yaml",
@@ -1433,6 +1434,32 @@
         "minor",
         "major",
       ],
+    },
+    {
+      matchManagers: [
+        "github-actions",
+      ],
+      pinDigests: true,
+      groupName: "GitHub Actions",
+      groupSlug: "github-actions",
+      matchUpdateTypes: [
+        "patch",
+        "minor",
+        "digest",
+      ],
+      semanticCommitScope: "repo",
+      automerge: false,
+    },
+    {
+      matchManagers: [
+        "github-actions",
+      ],
+      matchUpdateTypes: [
+        "major",
+      ],
+      groupName: "GitHub Actions (major)",
+      groupSlug: "github-actions-major",
+      semanticCommitScope: "repo",
     },
   ],
   postUpdateOptions: [

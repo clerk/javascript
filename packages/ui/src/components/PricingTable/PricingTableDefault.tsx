@@ -15,6 +15,7 @@ import { getClosestProfileScrollBox } from '@/ui/utils/getClosestProfileScrollBo
 import { useProtect } from '../../common';
 import { normalizeFormatted, usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
 import {
+  Badge,
   Box,
   Button,
   Col,
@@ -28,7 +29,7 @@ import {
   Text,
   useLocalizations,
 } from '../../customizables';
-import { Check, Plus, User, Users } from '../../icons';
+import { Checkmark, Plus, UserCircle, Users } from '../../icons';
 import { common, InternalThemeProvider } from '../../styledSystem';
 import { SubscriptionBadge } from '../Subscriptions/badge';
 import { getPricingFooterState } from './utils/pricing-footer-state';
@@ -45,6 +46,7 @@ interface PricingTableDefaultProps {
 
 export function PricingTableDefault({
   plans,
+  highlightedPlan,
   planPeriod,
   setPlanPeriod,
   onSelect,
@@ -80,6 +82,7 @@ export function PricingTableDefault({
           <Card
             key={plan.id}
             plan={plan}
+            highlighted={plan.slug === highlightedPlan}
             planPeriod={planPeriod}
             setPlanPeriod={setPlanPeriod}
             onSelect={onSelect}
@@ -98,6 +101,7 @@ export function PricingTableDefault({
 
 interface CardProps {
   plan: BillingPlanResource;
+  highlighted?: boolean;
   planPeriod: BillingSubscriptionPlanPeriod;
   setPlanPeriod: (p: BillingSubscriptionPlanPeriod) => void;
   onSelect: (plan: BillingPlanResource, event?: React.MouseEvent<HTMLElement>) => void;
@@ -106,7 +110,7 @@ interface CardProps {
 }
 
 function Card(props: CardProps) {
-  const { plan, planPeriod, setPlanPeriod, onSelect, props: pricingTableProps, isCompact = false } = props;
+  const { plan, highlighted, planPeriod, setPlanPeriod, onSelect, props: pricingTableProps, isCompact = false } = props;
   const clerk = useClerk();
   const { isSignedIn } = useSession();
   const { mode = 'mounted', ctaPosition: ctxCtaPosition } = usePricingTableContext();
@@ -193,6 +197,13 @@ function Card(props: CardProps) {
         badge={
           subscription ? (
             <SubscriptionBadge subscription={subscription.isFreeTrial ? { status: 'free_trial' } : subscription} />
+          ) : highlighted ? (
+            <Badge
+              elementDescriptor={descriptors.pricingTableCardBadge}
+              colorScheme='secondary'
+              localizationKey={localizationKeys('billing.highlightedPlanBadge')}
+              data-highlighted-plan
+            />
           ) : undefined
         }
       />
@@ -553,9 +564,8 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
             })}
           >
             <Icon
-              icon={Check}
+              icon={Checkmark}
               colorScheme='neutral'
-              size='sm'
               aria-hidden
               sx={t => ({
                 transform: `translateY(${t.space.$0x25})`,
@@ -582,13 +592,12 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
           sx={t => ({
             marginBlockStart: 'auto',
             paddingBlock: t.space.$1,
-            gap: t.space.$1,
+            gap: t.space.$2,
           })}
         >
           <Icon
             icon={Plus}
             colorScheme='neutral'
-            size='md'
             aria-hidden
           />
           <Span localizationKey={localizationKeys('billing.seeAllFeatures')} />
@@ -626,7 +635,7 @@ const CardFeaturesListSeatCost = ({ plan }: { plan: BillingPlanResource }) => {
       const tier = seatUnitPrice.tiers[0];
       const rows: Array<{
         elementId: string;
-        icon: typeof User | typeof Users;
+        icon: typeof UserCircle | typeof Users;
         text: ReturnType<typeof localizationKeys>;
         additionalText?: ReturnType<typeof localizationKeys>;
         additionalTooltipText?: string;
@@ -635,7 +644,7 @@ const CardFeaturesListSeatCost = ({ plan }: { plan: BillingPlanResource }) => {
       if (tier.feePerBlock.amount !== 0 && plan.hasBaseFee) {
         rows.push({
           elementId: 'seats',
-          icon: User,
+          icon: UserCircle,
           text: localizationKeys('billing.pricingTable.seatCost.perSeat', {
             feePerBlockAmount: formatTierFee(tier),
             periodAbbreviation,
@@ -683,7 +692,7 @@ const CardFeaturesListSeatCost = ({ plan }: { plan: BillingPlanResource }) => {
         return [
           {
             elementId: 'seats',
-            icon: User,
+            icon: UserCircle,
             text: localizationKeys('billing.pricingTable.seatCost.includedSeats', {
               includedSeats: includedTier.endsAfterBlock,
             }),
@@ -728,7 +737,6 @@ const CardFeaturesListSeatCost = ({ plan }: { plan: BillingPlanResource }) => {
           <Icon
             icon={row.icon}
             colorScheme='neutral'
-            size='sm'
             aria-hidden
             sx={t => ({
               transform: `translateY(${t.space.$0x25})`,

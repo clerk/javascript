@@ -218,6 +218,10 @@ export interface UserResource extends ClerkResource, BillingPayerMethods {
    */
   update: (params: UpdateUserParams) => Promise<UserResource>;
   /**
+   * Updates the user's `unsafeMetadata` using deep-merge semantics. Unlike [`update()`](https://clerk.com/docs/reference/objects/user#update), which fully replaces `unsafeMetadata`, this method merges the provided value with the existing `unsafeMetadata`. Top-level and nested keys are merged, and any key set to `null` is removed. Only `unsafeMetadata` is writable from the frontend; `publicMetadata` and `privateMetadata` can only be set from the [Backend API](https://clerk.com/docs/reference/backend-api){{ target: '_blank' }}.
+   */
+  updateMetadata: (params: UpdateUserMetadataParams) => Promise<UserResource>;
+  /**
    * Deletes the current user.
    */
   delete: () => Promise<void>;
@@ -448,9 +452,15 @@ type UpdateUserJSON = Pick<
 
 export type UpdateUserParams = Partial<SnakeToCamel<UpdateUserJSON>>;
 
-/**
- *
- */
+/** */
+export type UpdateUserMetadataParams = {
+  /**
+   * The metadata to deep-merge with the user's existing `unsafeMetadata`. Keys at any nesting level whose value is `null` are removed.
+   */
+  unsafeMetadata: UserUnsafeMetadata;
+};
+
+/**  */
 export type UpdateUserPasswordParams = {
   /**
    * The user's new password.

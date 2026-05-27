@@ -12,8 +12,8 @@ import {
   Text,
   useLocalizations,
 } from '@/customizables';
-import { CaretLeft, CaretRight } from '@/icons';
-import type { PropsOfComponent } from '@/styledSystem';
+import { ChevronLeft, ChevronRight } from '@/icons';
+import { common, type PropsOfComponent } from '@/styledSystem';
 
 import { ProfileCardFooter } from './ProfileCard';
 
@@ -26,12 +26,21 @@ const Layout = ({ sx, ...props }: StepLayoutProps): JSX.Element => (
   />
 );
 
-type StepSectionProps = PropsOfComponent<typeof Col>;
+type StepSectionProps = PropsOfComponent<typeof Col> & {
+  /**
+   * When true, the section grows to fill its parent's remaining vertical
+   * space (flex: 1). Defaults to false so the section sizes to its content
+   * — required for Step.Header, multi-section sub-steps, and other places
+   * where a section should stay natural-height.
+   */
+  fill?: boolean;
+};
 
-const Section = ({ sx, ...props }: StepSectionProps): JSX.Element => (
+const Section = ({ fill, sx, ...props }: StepSectionProps): JSX.Element => (
   <Col
+    elementDescriptor={descriptors.configureSSOStepSection}
     {...props}
-    sx={[theme => ({ padding: theme.space.$5 }), sx]}
+    sx={[theme => ({ padding: theme.space.$5 }), fill && { flex: 1 }, sx]}
   />
 );
 
@@ -47,6 +56,7 @@ const Header = ({ title, description, children }: StepHeaderProps): JSX.Element 
 
   return (
     <Section
+      elementDescriptor={descriptors.configureSSOStepHeader}
       sx={theme => ({
         borderBottomWidth: theme.borderWidths.$normal,
         borderBottomStyle: theme.borderStyles.$solid,
@@ -54,23 +64,23 @@ const Header = ({ title, description, children }: StepHeaderProps): JSX.Element 
       })}
     >
       <Flex
-        align='center'
+        align='start'
         justify='between'
         sx={theme => ({ gap: theme.space.$4 })}
       >
-        <Col sx={theme => ({ gap: theme.space.$1x5, minWidth: 0 })}>
+        <Col sx={theme => ({ gap: theme.space.$2, minWidth: 0 })}>
           <Heading
-            textVariant='h3'
-            sx={theme => ({ color: theme.colors.$colorForeground, fontSize: theme.fontSizes.$lg })}
+            elementDescriptor={descriptors.configureSSOStepHeaderTitle}
+            textVariant='h2'
           >
             {titleText}
           </Heading>
 
           {descriptionText && (
             <Text
+              elementDescriptor={descriptors.configureSSOStepHeaderDescription}
               as='p'
-              variant='body'
-              sx={theme => ({ color: theme.colors.$colorMutedForeground })}
+              colorScheme='secondary'
             >
               {descriptionText}
             </Text>
@@ -87,9 +97,18 @@ type StepBodyProps = PropsOfComponent<typeof Col>;
 
 const Body = ({ sx, ...props }: StepBodyProps): JSX.Element => (
   <Col
+    elementDescriptor={descriptors.configureSSOStepBody}
     as='main'
     {...props}
-    sx={[{ flex: 1, minHeight: 0, overflowY: 'auto' }, sx]}
+    sx={[
+      t => ({
+        flex: 1,
+        minHeight: 0,
+        overflowY: 'auto',
+        ...common.unstyledScrollbar(t),
+      }),
+      sx,
+    ]}
   />
 );
 
@@ -123,7 +142,7 @@ const FooterPrevious = ({ onClick, isDisabled, isLoading, label = 'Previous' }: 
       onClick={handleClick}
     >
       <Icon
-        icon={CaretLeft}
+        icon={ChevronLeft}
         size='sm'
         sx={t => ({ marginInlineEnd: t.space.$1 })}
       />
@@ -153,7 +172,7 @@ const FooterContinue = ({ onClick, isDisabled, isLoading, label = 'Continue' }: 
     >
       {labelText}
       <Icon
-        icon={CaretRight}
+        icon={ChevronRight}
         size='sm'
         sx={t => ({ marginInlineStart: t.space.$1 })}
       />

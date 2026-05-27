@@ -1,0 +1,202 @@
+name: API Changes
+
+on:
+  push:
+    branches:
+      - main
+      - release/v4
+      - release/core-2
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - main
+      - release/v4
+      - release/core-2
+    paths:
+      - 'packages/backend/**'
+      - 'packages/clerk-js/**'
+      - 'packages/nextjs/**'
+      - 'packages/react/**'
+      - 'packages/shared/**'
+      - 'packages/ui/**'
+      - 'snapi.config.json'
+      - '.github/workflows/api-changes.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  SNAPI_PACKAGE: https://pkg.pr.new/clerk/snapi/@clerk/snapi@d42ed8b7857f9254bbb2a6e9ead44d5e7b1aa60c
+  SNAPI_FILTERS: >-
+    --filter=@clerk/backend
+    --filter=@clerk/clerk-js
+    --filter=@clerk/nextjs
+    --filter=@clerk/react
+    --filter=@clerk/shared
+    --filter=@clerk/ui
+
+jobs:
+  publish-baseline:
+    if: github.event_name == 'push'
+    name: Publish API Baseline
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    continue-on-error: true
+    defaults:
+      run:
+        shell: bash
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          filter: 'blob:none'
+          show-progress: false
+
+      - name: Setup
+        uses: ./.github/actions/init-blacksmith
+        with:
+          cache-enabled: true
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+
+      - name: Build declarations
+        run: pnpm turbo build:declarations $TURBO_ARGS $SNAPI_FILTERS
+
+      - name: Generate API snapshot
+        run: |
+          pnpm dlx --package "$SNAPI_PACKAGE" snapi snapshot \
+            --output "$GITHUB_WORKSPACE/.api-snapshots-baseline"
+
+      - name: Save baseline to cache
+        uses: actions/cache/save@v4
+        with:
+          path: .api-snapshots-baseline
+          key: snapi-baseline-${{ github.sha }}
+
+  check-api:
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.draft == false }}
+    name: API Changes
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    continue-on-error: true
+    permissions:
+      contents: read
+      pull-requests: write
+    defaults:
+      run:
+        shell: bash
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+          fetch-tags: false
+          filter: 'blob:none'
+          show-progress: false
+
+      - name: Setup
+        uses: ./.github/actions/init-blacksmith
+        with:
+          cache-enabled: true
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+
+      - name: Restore baseline from cache
+        id: baseline-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: .api-snapshots-baseline
+          key: snapi-baseline-${{ github.event.pull_request.base.sha }}
+
+      - name: Build current declarations
+        run: pnpm turbo build:declarations $TURBO_ARGS $SNAPI_FILTERS
+
+      - name: Fetch base commit
+        if: steps.baseline-cache.outputs.cache-matched-key == ''
+        run: git fetch origin "${{ github.event.pull_request.base.sha }}" --depth=1
+
+      - name: Create baseline worktree
+        if: steps.baseline-cache.outputs.cache-matched-key == ''
+        run: |
+          mkdir -p .worktrees
+          git worktree add --detach .worktrees/snapi-baseline "${{ github.event.pull_request.base.sha }}"
+          cp snapi.config.json .worktrees/snapi-baseline/snapi.config.json
+
+      - name: Install baseline dependencies
+        if: steps.baseline-cache.outputs.cache-matched-key == ''
+        working-directory: .worktrees/snapi-baseline
+        run: pnpm install --frozen-lockfile
+
+      - name: Build baseline declarations
+        if: steps.baseline-cache.outputs.cache-matched-key == ''
+        working-directory: .worktrees/snapi-baseline
+        run: pnpm turbo build:declarations $TURBO_ARGS $SNAPI_FILTERS
+
+      - name: Generate baseline API snapshots
+        if: steps.baseline-cache.outputs.cache-matched-key == ''
+        working-directory: .worktrees/snapi-baseline
+        run: |
+          pnpm dlx --package "$SNAPI_PACKAGE" snapi snapshot \
+            --output "$GITHUB_WORKSPACE/.api-snapshots-baseline"
+
+      - name: Detect API changes
+        env:
+          SNAPI_ANTHROPIC_API_KEY: ${{ secrets.SNAPI_ANTHROPIC_API_KEY }}
+        run: |
+          pnpm dlx --package "$SNAPI_PACKAGE" snapi detect \
+            --baseline .api-snapshots-baseline \
+            --output api-changes-report.md \
+            --fail-on-breaking
+
+      - name: Upload API changes report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: api-changes-report
+          path: api-changes-report.md
+          if-no-files-found: ignore
+          retention-days: 5
+
+      - name: Build snapi comment body
+        if: always()
+        id: report
+        run: |
+          if [ ! -f api-changes-report.md ]; then
+            exit 0
+          fi
+          {
+            echo 'body<<SNAPI_REPORT_EOF'
+            echo '<!-- snapi-report -->'
+            if grep -q '## No API Changes Detected' api-changes-report.md; then
+              echo '**Snapi**: no API changes detected in `@clerk/backend`, `@clerk/clerk-js`, `@clerk/nextjs`, `@clerk/react`, `@clerk/shared`, `@clerk/ui`.'
+            else
+              cat api-changes-report.md
+            fi
+            echo 'SNAPI_REPORT_EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Find existing snapi comment
+        if: always() && steps.report.outputs.body != ''
+        id: find-comment
+        uses: peter-evans/find-comment@3eae4d37986fb5a8592848f6a574fdf654e61f9e # v3.1.0
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: '<!-- snapi-report -->'
+
+      - name: Post snapi report
+        if: always() && steps.report.outputs.body != ''
+        uses: peter-evans/create-or-update-comment@23ff15729ef2fc348714a3bb66d2f655ca9066f2 # v3.1.0
+        with:
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: ${{ steps.report.outputs.body }}
+          edit-mode: replace

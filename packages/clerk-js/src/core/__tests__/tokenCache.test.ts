@@ -31,13 +31,23 @@ function createJwtWithTtl(iatSeconds: number, ttlSeconds: number): string {
   return `${headerB64}.${payloadB64}.${signature}`;
 }
 
+/**
+ * Helper to create a JWT with custom iat AND oiat header for monotonic-freshness tests
+ */
+function createJwtWithOiat(iatSeconds: number, oiatSeconds: number, ttlSeconds = 60): string {
+  const header = { alg: 'HS256', typ: 'JWT', oiat: oiatSeconds };
+  const payload = { sid: 'session_123', exp: iatSeconds + ttlSeconds, iat: iatSeconds };
+  const b64 = (o: object) => btoa(JSON.stringify(o)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+  return `${b64(header)}.${b64(payload)}.test-signature`;
+}
+
 describe('SessionTokenCache', () => {
   let mockBroadcastChannel: {
     addEventListener: ReturnType<typeof vi.fn>;
     close: ReturnType<typeof vi.fn>;
     postMessage: ReturnType<typeof vi.fn>;
   };
-  let broadcastListener: (e: MessageEvent<SessionTokenEvent>) => void;
+  let broadcastListener: (e: MessageEvent<SessionTokenEvent>) => void | Promise<void>;
   let originalBroadcastChannel: any;
 
   beforeEach(() => {
@@ -193,26 +203,28 @@ describe('SessionTokenCache', () => {
       expect(SessionTokenCache.size()).toBe(0);
     });
 
-    it('enforces monotonicity: does not overwrite newer token with older one', () => {
+    it('enforces monotonicity: does not overwrite newer token with older one', async () => {
+      // Both tokens carry oiat (the production case post-rollout). Older oiat
+      // broadcast must not clobber the newer one already in cache.
+      const newerJwt = createJwtWithOiat(1666648250, 1666648250);
+      const olderJwt = createJwtWithOiat(1666648190, 1666648190);
+
       const newerEvent: MessageEvent<SessionTokenEvent> = {
         data: {
           organizationId: null,
           sessionId: 'session_123',
           template: undefined,
           tokenId: 'session_123',
-          tokenRaw: mockJwt,
+          tokenRaw: newerJwt,
           traceId: 'test_trace_7',
         },
       } as MessageEvent<SessionTokenEvent>;
 
-      broadcastListener(newerEvent);
+      await broadcastListener(newerEvent);
       const resultAfterNewer = SessionTokenCache.get({ tokenId: 'session_123' });
       expect(resultAfterNewer).toBeDefined();
       const newerCreatedAt = resultAfterNewer?.entry.createdAt;
 
-      // mockJwt has iat: 1666648250, so create an older one with iat: 1666648190 (60 seconds earlier)
-      const olderJwt =
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjY2NDg4NTAsImlhdCI6MTY2NjY0ODE5MH0.Z1BC47lImYvaAtluJlY-kBo0qOoAk42Xb-gNrB2SxJg';
       const olderEvent: MessageEvent<SessionTokenEvent> = {
         data: {
           organizationId: null,
@@ -224,11 +236,53 @@ describe('SessionTokenCache', () => {
         },
       } as MessageEvent<SessionTokenEvent>;
 
-      broadcastListener(olderEvent);
+      await broadcastListener(olderEvent);
 
       const resultAfterOlder = SessionTokenCache.get({ tokenId: 'session_123' });
       expect(resultAfterOlder).toBeDefined();
       expect(resultAfterOlder?.entry.createdAt).toBe(newerCreatedAt);
+    });
+
+    it('enforces monotonicity: replaces older cached token when a fresher-oiat broadcast arrives', async () => {
+      // Inverse of the previous test: a fresher-oiat broadcast must overwrite
+      // an older-oiat token already in cache. Use ttl=120 so both tokens stay
+      // valid against the test clock (nowSec=1666648260) — cache.get drops
+      // entries past their expiry.
+      const olderJwt = createJwtWithOiat(1666648190, 1666648190, 120);
+      const newerJwt = createJwtWithOiat(1666648250, 1666648250, 120);
+
+      const olderEvent: MessageEvent<SessionTokenEvent> = {
+        data: {
+          organizationId: null,
+          sessionId: 'session_123',
+          template: undefined,
+          tokenId: 'session_123',
+          tokenRaw: olderJwt,
+          traceId: 'test_trace_older_first',
+        },
+      } as MessageEvent<SessionTokenEvent>;
+
+      await broadcastListener(olderEvent);
+      const resultAfterOlder = SessionTokenCache.get({ tokenId: 'session_123' });
+      expect(resultAfterOlder).toBeDefined();
+      expect(resultAfterOlder?.entry.createdAt).toBe(1666648190);
+
+      const newerEvent: MessageEvent<SessionTokenEvent> = {
+        data: {
+          organizationId: null,
+          sessionId: 'session_123',
+          template: undefined,
+          tokenId: 'session_123',
+          tokenRaw: newerJwt,
+          traceId: 'test_trace_newer_second',
+        },
+      } as MessageEvent<SessionTokenEvent>;
+
+      await broadcastListener(newerEvent);
+
+      const resultAfterNewer = SessionTokenCache.get({ tokenId: 'session_123' });
+      expect(resultAfterNewer).toBeDefined();
+      expect(resultAfterNewer?.entry.createdAt).toBe(1666648250);
     });
 
     it('successfully updates cache with valid token', () => {

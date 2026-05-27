@@ -7,10 +7,10 @@ import { useWizard } from './elements/Wizard';
 export const ConfigureSSOHeader = (): JSX.Element => {
   const { activeSteps, currentStep, goToStep } = useWizard();
   const { t } = useLocalizations();
-  // Select Provider isn't part of the visual breadcrumb per the design —
-  // filter it out here. The wizard still tracks it as the first step
-  // for navigation (goNext from it advances to verify-domain, Previous
-  // is naturally disabled because isFirstStep is true).
+
+  // `select-provider` is only mounted while there's no enterprise connection,
+  // but per design it should never appear in the visual breadcrumb regardless,
+  // so we always filter it out here
   const visibleSteps = activeSteps.filter(step => step.id !== 'select-provider');
   const currentIndex = visibleSteps.findIndex(step => step.id === currentStep?.id);
 

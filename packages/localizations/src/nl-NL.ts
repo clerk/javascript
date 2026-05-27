@@ -141,7 +141,7 @@ export const nlNL: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -180,12 +180,46 @@ export const nlNL: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'Neem contact op met de beheerder van je organisatie om toestemming te krijgen voor het beheren van enterprise-verbindingen.',
-      title: 'Je hebt geen toestemming om enterprise-verbindingen te beheren',
+      subtitle: 'Neem contact op met de beheerder van je organisatie om je rechten uit te breiden.',
+      title: 'Je hebt geen toestemming om single sign-on (SSO) te beheren',
     },
     navbar: {
       title: 'Single sign-on (SSO) configureren',
+    },
+    selectProviderStep: {
+      title: 'Provider selecteren',
+      subtitle: 'Selecteer de provider waarvoor je SSO gaat instellen.',
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Aangepaste SAML-provider',
+      },
+      warning: 'Zodra een provider is geselecteerd, kun je deze niet meer wijzigen totdat de configuratie is voltooid',
+    },
+    verifyEmailDomainStep: {
+      title: 'E-mailadres verifiëren',
+      subtitle: 'Verifieer het e-mailadres waarop je de enterprise-verbinding wilt inschakelen.',
+      addEmailAddress: {
+        formTitle: 'We hebben je e-mail nodig',
+        formSubtitle: 'Om te beginnen hebben we je e-mailadres nodig',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'E-mailadres',
+      },
+      emailCode: {
+        formTitle: 'Verifieer je e-mailadres',
+        formSubtitle: 'Voer de verificatiecode in die is verzonden naar {{identifier}}',
+        resendButton: 'Geen code ontvangen? Opnieuw verzenden',
+        verified: {
+          title: 'We hebben je e-mail ontvangen',
+          subtitle: 'Je hebt je e-mailadres geverifieerd met de volgende e-mail',
+          inputLabel: 'Geverifieerd e-mailadres',
+        },
+      },
+      domainTaken: {
+        title: 'Dit domein ({{domain}}) heeft al een SSO-verbinding',
+        subtitle:
+          'Neem contact op met de beheerder van de applicatie om toegang te krijgen via de bestaande verbinding.',
+      },
     },
   },
   createOrganization: {
