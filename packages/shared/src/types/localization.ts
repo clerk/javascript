@@ -1308,6 +1308,7 @@ export type __internal_LocalizationResource = {
         groupLabel: LocalizationValue;
         okta: LocalizationValue;
         customSaml: LocalizationValue;
+        google: LocalizationValue;
       };
       warning: LocalizationValue;
     };

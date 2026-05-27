@@ -242,6 +242,7 @@ export const enUS: LocalizationResource = {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',
         customSaml: 'Custom SAML Provider',
+        google: 'Google Workspace',
       },
       warning: 'Once a provider is selected you cannot change again until the configuration is over',
     },
@@ -387,7 +388,7 @@ export const enUS: LocalizationResource = {
           step2: 'Select <bold>Add Expression</bold> for each row below, then enter the matching name and value:',
           attributeMappingTable: {
             columns: {
-              name: 'Name',
+              name: 'Attribute name',
               expression: 'Expression',
             },
             rows: {
