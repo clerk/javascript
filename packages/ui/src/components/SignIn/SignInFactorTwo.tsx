@@ -7,6 +7,7 @@ import type { VerificationCodeCardProps } from '@/ui/elements/VerificationCodeCa
 import { LoadingCard } from '@/ui/elements/LoadingCard';
 
 import { withRedirectToAfterSignIn, withRedirectToSignInTask } from '../../common';
+import { buildVerificationRedirectUrl } from '../../common/redirects';
 import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
 import { useRouter } from '../../router';
 import { SignInFactorTwoAlternativeMethods } from './SignInFactorTwoAlternativeMethods';
@@ -24,7 +25,8 @@ function SignInFactorTwoInternal(): JSX.Element {
   const signIn = useCoreSignIn();
   const env = useEnvironment();
   const router = useRouter();
-  const { afterSignInUrl } = useSignInContext();
+  const signInContext = useSignInContext();
+  const { afterSignInUrl } = signInContext;
   const handleSecondFactorResult = useHandleSecondFactorResult();
   const handleUserLockedError = useHandleUserLockedError();
   const {
@@ -86,6 +88,30 @@ function SignInFactorTwoInternal(): JSX.Element {
   const handlePrepareSecondFactor = React.useCallback(
     (factor: SignInFactor) => signIn.prepareSecondFactor(factor as any),
     [signIn],
+  );
+
+  const handleEmailLinkVerificationComplete = React.useCallback(
+    async (si: SignInResource) => {
+      if (si.status === 'complete') {
+        await clerk.setActive({
+          session: si.createdSessionId,
+          redirectUrl: afterSignInUrl,
+        });
+      } else if (si.status === 'needs_second_factor') {
+        await router.navigate('../factor-two');
+      }
+    },
+    [clerk, afterSignInUrl, router],
+  );
+
+  const emailLinkRedirectUrl = React.useMemo(
+    () =>
+      buildVerificationRedirectUrl({
+        ctx: signInContext,
+        baseUrl: signInContext.signInUrl,
+        intent: 'sign-in',
+      }),
+    [signInContext],
   );
 
   React.useEffect(() => {
@@ -171,6 +197,12 @@ function SignInFactorTwoInternal(): JSX.Element {
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
+          signIn={signIn}
+          onVerificationComplete={handleEmailLinkVerificationComplete}
+          onUserLockedError={handleUserLockedError}
+          avatarUrl={signIn.userData.imageUrl}
+          redirectUrl={emailLinkRedirectUrl}
+          isNewDevice={signIn.clientTrustState === 'new'}
         />
       );
     default:

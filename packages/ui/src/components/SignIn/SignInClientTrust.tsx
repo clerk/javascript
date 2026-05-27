@@ -1,3 +1,4 @@
+import { useClerk } from '@clerk/shared/react';
 import type { SignInFactor, SignInResource } from '@clerk/shared/types';
 import React from 'react';
 
@@ -6,7 +7,9 @@ import type { VerificationCodeCardProps } from '@/ui/elements/VerificationCodeCa
 import { LoadingCard } from '@/ui/elements/LoadingCard';
 
 import { withRedirectToAfterSignIn, withRedirectToSignInTask } from '../../common';
-import { useCoreSignIn } from '../../contexts';
+import { buildVerificationRedirectUrl } from '../../common/redirects';
+import { useCoreSignIn, useSignInContext } from '../../contexts';
+import { useRouter } from '../../router';
 import { SignInFactorTwoAlternativeMethods } from './SignInFactorTwoAlternativeMethods';
 import { SignInFactorTwoEmailCodeCard } from './SignInFactorTwoEmailCodeCard';
 import { SignInFactorTwoEmailLinkCard } from './SignInFactorTwoEmailLinkCard';
@@ -16,7 +19,11 @@ import { useSecondFactorSelection } from './useSecondFactorSelection';
 import { isResetPasswordStrategy } from './utils';
 
 function SignInClientTrustInternal(): JSX.Element {
+  const clerk = useClerk();
   const signIn = useCoreSignIn();
+  const router = useRouter();
+  const signInContext = useSignInContext();
+  const { afterSignInUrl } = signInContext;
   const handleSecondFactorResult = useHandleSecondFactorResult();
   const handleUserLockedError = useHandleUserLockedError();
   const {
@@ -56,6 +63,28 @@ function SignInClientTrustInternal(): JSX.Element {
   const handlePrepareSecondFactor = React.useCallback(
     (factor: SignInFactor) => signIn.prepareSecondFactor(factor as any),
     [signIn],
+  );
+
+  const handleEmailLinkVerificationComplete = React.useCallback(
+    async (si: SignInResource) => {
+      if (si.status === 'complete') {
+        await clerk.setActive({
+          session: si.createdSessionId,
+          redirectUrl: afterSignInUrl,
+        });
+      }
+    },
+    [clerk, afterSignInUrl],
+  );
+
+  const emailLinkRedirectUrl = React.useMemo(
+    () =>
+      buildVerificationRedirectUrl({
+        ctx: signInContext,
+        baseUrl: signInContext.signInUrl,
+        intent: 'sign-in',
+      }),
+    [signInContext],
   );
 
   if (!currentFactor) {
@@ -111,6 +140,12 @@ function SignInClientTrustInternal(): JSX.Element {
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
+          signIn={signIn}
+          onVerificationComplete={handleEmailLinkVerificationComplete}
+          onUserLockedError={handleUserLockedError}
+          avatarUrl={signIn.userData.imageUrl}
+          redirectUrl={emailLinkRedirectUrl}
+          isNewDevice={signIn.clientTrustState === 'new'}
         />
       );
     default:
