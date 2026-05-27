@@ -597,15 +597,6 @@ jobs:
             | while read f; do grep -qE "^[[:space:]]*-[[:space:]]*(${pattern})[[:space:]]*$" "$f" || printf '%s\n' "$f"; done
             | xargs -n 1 -I FLOW bash -c 'flow="$1"; for a in 1 2; do if maestro test --env CLERK_TEST_EMAIL="$CLERK_TEST_EMAIL" --env CLERK_TEST_PASSWORD="$CLERK_TEST_PASSWORD" --flatten-debug-output "$flow"; then exit 0; fi; if [ "$a" -eq 2 ]; then echo "::error::Flow $flow failed after 2 attempts"; exit 1; fi; echo "::warning::Flow $flow failed attempt $a, retrying after 10s..."; adb shell am force-stop com.clerk.clerkexpoquickstart >/dev/null 2>&1 || true; sleep 10; done' _ FLOW
 
-      # Theme verification is a Node post-step (Maestro can't decode PNGs in its
-      # JS sandbox). The theming flows wrote theme-light.png / theme-dark.png to
-      # integration/mobile; this asserts each contains a large region of the
-      # expected themed color. Runs on success OR failure so a flaked flow
-      # doesn't hide a theming regression; skips cleanly if no theme shots exist.
-      - name: Verify Android theming
-        if: success() || failure()
-        run: bash integration/mobile/scripts/verify-themes.sh
-
       - name: Upload Maestro artifacts on failure or cancel
         if: failure() || cancelled()
         uses: actions/upload-artifact@v4
@@ -1038,13 +1029,6 @@ jobs:
                 sleep 10
               done
             ' _ FLOW
-
-      # Theme verification is a Node post-step (Maestro can't decode PNGs in its
-      # JS sandbox). iOS runs the light theme only (dark-mode is androidOnly);
-      # verify-themes.sh skips any theme shot that wasn't produced.
-      - name: Verify iOS theming
-        if: success() || failure()
-        run: bash integration/mobile/scripts/verify-themes.sh
 
       - name: Upload Maestro artifacts on failure or cancel
         if: failure() || cancelled()

@@ -11,11 +11,12 @@ source "$SCRIPT_DIR/lib/filter-flows.sh"
 
 # Note: google-sso-from-forgot-password and sign-in-sign-out-sign-in were moved
 # to flows/native-side/ (they primarily exercise native auth UI, which the
-# clerk-ios/clerk-android suites own). They no longer run as part of the Expo
-# regression set. See flows/native-side/README.md.
+# clerk-ios/clerk-android suites own). The theming flows were removed entirely:
+# theme *delivery* is now verified deterministically by the config-plugin unit
+# test (src/__tests__/appPlugin.theme.test.js), and the color *render* is the
+# native SDKs' responsibility — no fragile screenshot pixel-check.
 REGRESSION_FLOWS=(
   "$FLOWS_DIR/sign-in/get-help-loop-regression.yaml"
-  "$FLOWS_DIR/theming/custom-theme-applied.yaml"
   "$FLOWS_DIR/smoke/cold-launch-no-flash.yaml"
 )
 

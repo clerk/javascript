@@ -1,5 +1,0 @@
-# npm regenerates these whenever verify-themes.sh runs `npm install`. This is a
-# standalone helper dir (not a pnpm workspace package), so its lockfile/modules
-# are runtime-only and intentionally not tracked.
-node_modules/
-package-lock.json

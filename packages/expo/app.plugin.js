@@ -723,4 +723,5 @@ module.exports.withClerkAndroid = withClerkAndroid;
 module.exports.withClerkAppleSignIn = withClerkAppleSignIn;
 module.exports.withClerkGoogleSignIn = withClerkGoogleSignIn;
 module.exports.withClerkKeychainService = withClerkKeychainService;
+module.exports.withClerkTheme = withClerkTheme;
 module.exports._testing = { validateThemeJson, isPlainObject, VALID_COLOR_KEYS, HEX_COLOR_REGEX };

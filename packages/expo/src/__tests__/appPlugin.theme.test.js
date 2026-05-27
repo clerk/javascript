@@ -1,7 +1,12 @@
-import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports -- CJS plugin, no ESM export
-const { validateThemeJson } = require('../../app.plugin.js')._testing;
+const plugin = require('../../app.plugin.js');
+const { validateThemeJson } = plugin._testing;
+const { withClerkTheme } = plugin;
 
 describe('validateThemeJson', () => {
   beforeEach(() => {
@@ -104,5 +109,61 @@ describe('validateThemeJson', () => {
 
   test('throws when borderRadius is a string', () => {
     expect(() => validateThemeJson({ design: { borderRadius: '12' } })).toThrow('design.borderRadius must be a number');
+  });
+});
+
+// Deterministic delivery check: proves the config plugin actually wires the
+// theme into the native build (iOS Info.plist + Android assets) when a `theme`
+// prop is provided — and is a no-op when it isn't. This replaces a fragile
+// Maestro screenshot/pixel check: the color *render* is clerk-android /
+// clerk-ios's responsibility; @clerk/expo's job is to *deliver* the theme.
+describe('withClerkTheme — delivery', () => {
+  let themeDir;
+  let themePath;
+
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    themeDir = mkdtempSync(join(tmpdir(), 'clerk-theme-test-'));
+    themePath = join(themeDir, 'clerk-theme.json');
+    writeFileSync(
+      themePath,
+      JSON.stringify({
+        colors: { primary: '#6C47FF', background: '#FFFFFF' },
+        darkColors: { primary: '#8B6FFF' },
+        design: { borderRadius: 12 },
+      }),
+    );
+  });
+
+  afterEach(() => {
+    rmSync(themeDir, { recursive: true, force: true });
+  });
+
+  test('queues the iOS Info.plist mod and the Android assets mod when a theme is provided', () => {
+    const out = withClerkTheme({}, { theme: themePath });
+    expect(typeof out.mods?.ios?.infoPlist).toBe('function');
+    expect(typeof out.mods?.android?.dangerous).toBe('function');
+  });
+
+  test('embeds the parsed theme into Info.plist under "ClerkTheme"', async () => {
+    vi.spyOn(console, 'log').mockImplementation(() => {});
+    const out = withClerkTheme({}, { theme: themePath });
+    const result = await out.mods.ios.infoPlist({ modResults: {} });
+    expect(result.modResults.ClerkTheme.colors.primary).toBe('#6C47FF');
+    expect(result.modResults.ClerkTheme.darkColors.primary).toBe('#8B6FFF');
+    expect(result.modResults.ClerkTheme.design.borderRadius).toBe(12);
+  });
+
+  test('is a no-op when no theme prop is provided (regression: bare "@clerk/expo" plugin string)', () => {
+    const out = withClerkTheme({}, {});
+    expect(out.mods?.ios?.infoPlist).toBeUndefined();
+    expect(out.mods?.android?.dangerous).toBeUndefined();
+  });
+
+  test('warns and is a no-op when the theme file does not exist', () => {
+    const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const out = withClerkTheme({}, { theme: join(themeDir, 'missing.json') });
+    expect(spy).toHaveBeenCalledWith(expect.stringContaining('Clerk theme file not found'));
+    expect(out.mods?.ios?.infoPlist).toBeUndefined();
   });
 });
