@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useModuleManager } from '@/ui/contexts';
+import { useAppearance } from '@/ui/customizables/AppearanceContext';
 import { useRouter } from '@/ui/router';
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen } from '@/test/utils';
@@ -117,6 +118,44 @@ describe('UserProfileProvider wiring', () => {
     );
 
     expect(screen.queryByTestId('should-not-render')).not.toBeInTheDocument();
+  });
+
+  it('cascades globalAppearance from ClerkProvider into composed theme', async () => {
+    setModuleManager({ import: vi.fn(() => Promise.resolve(undefined)) });
+
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'], first_name: 'Test', last_name: 'User' });
+    });
+    patchEnvironment(fixtures.clerk, fixtures.environment);
+
+    // Simulate ClerkProvider setting appearance with colorPrimary
+    fixtures.clerk.__internal_getOption = vi.fn((key: string) => {
+      if (key === 'appearance') {
+        return { variables: { colorPrimary: '#ff0000' } };
+      }
+      return undefined;
+    });
+
+    function AppearanceProbe() {
+      const { parsedInternalTheme } = useAppearance();
+      return (
+        <div
+          data-testid='appearance-probe'
+          data-color-primary={parsedInternalTheme.colors.$primary500}
+        />
+      );
+    }
+
+    render(
+      <UserProfileProvider>
+        <AppearanceProbe />
+      </UserProfileProvider>,
+      { wrapper },
+    );
+
+    const probe = screen.getByTestId('appearance-probe');
+    // #ff0000 = hsla(0, 100%, 50%, 1) — the global appearance should cascade
+    expect(probe.dataset.colorPrimary).toBe('hsla(0, 100%, 50%, 1)');
   });
 
   it('returns null when environment is missing', async () => {
