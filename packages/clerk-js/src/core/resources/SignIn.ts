@@ -1421,7 +1421,7 @@ class SignInFuture implements SignInFutureResource {
 
   async ticket(params?: SignInFutureTicketParams): Promise<{ error: ClerkError | null }> {
     const ticket = params?.ticket ?? getClerkQueryParam('__clerk_ticket');
-    return this.create({ ticket: ticket ?? undefined });
+    return this.create({ strategy: 'ticket', ticket: ticket ?? undefined });
   }
 
   async finalize(params?: SignInFutureFinalizeParams): Promise<{ error: ClerkError | null }> {

@@ -98,8 +98,8 @@ describe('SelectProviderStep', () => {
     const { wrapper } = await createFixtures();
     renderStep(wrapper);
 
-    expect(screen.getByRole('heading', { name: 'Select provider' })).toBeInTheDocument();
-    expect(screen.getByText('Select your identity provider')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Select your identity provider' })).toBeInTheDocument();
+    expect(screen.getByText(/We.*ll guide you through the detailed setup process next\./)).toBeInTheDocument();
   });
 
   it('renders both SAML provider radios with their labels', async () => {

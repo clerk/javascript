@@ -12,7 +12,7 @@ import {
   Text,
   useLocalizations,
 } from '@/customizables';
-import { CaretLeft, CaretRight } from '@/icons';
+import { ChevronLeft, ChevronRight } from '@/icons';
 import { common, type PropsOfComponent } from '@/styledSystem';
 
 import { ProfileCardFooter } from './ProfileCard';
@@ -38,6 +38,7 @@ type StepSectionProps = PropsOfComponent<typeof Col> & {
 
 const Section = ({ fill, sx, ...props }: StepSectionProps): JSX.Element => (
   <Col
+    elementDescriptor={descriptors.configureSSOStepSection}
     {...props}
     sx={[theme => ({ padding: theme.space.$5 }), fill && { flex: 1 }, sx]}
   />
@@ -55,6 +56,7 @@ const Header = ({ title, description, children }: StepHeaderProps): JSX.Element 
 
   return (
     <Section
+      elementDescriptor={descriptors.configureSSOStepHeader}
       sx={theme => ({
         borderBottomWidth: theme.borderWidths.$normal,
         borderBottomStyle: theme.borderStyles.$solid,
@@ -67,10 +69,16 @@ const Header = ({ title, description, children }: StepHeaderProps): JSX.Element 
         sx={theme => ({ gap: theme.space.$4 })}
       >
         <Col sx={theme => ({ gap: theme.space.$2, minWidth: 0 })}>
-          <Heading textVariant='h2'>{titleText}</Heading>
+          <Heading
+            elementDescriptor={descriptors.configureSSOStepHeaderTitle}
+            textVariant='h2'
+          >
+            {titleText}
+          </Heading>
 
           {descriptionText && (
             <Text
+              elementDescriptor={descriptors.configureSSOStepHeaderDescription}
               as='p'
               colorScheme='secondary'
             >
@@ -89,6 +97,7 @@ type StepBodyProps = PropsOfComponent<typeof Col>;
 
 const Body = ({ sx, ...props }: StepBodyProps): JSX.Element => (
   <Col
+    elementDescriptor={descriptors.configureSSOStepBody}
     as='main'
     {...props}
     sx={[
@@ -133,7 +142,7 @@ const FooterPrevious = ({ onClick, isDisabled, isLoading, label = 'Previous' }: 
       onClick={handleClick}
     >
       <Icon
-        icon={CaretLeft}
+        icon={ChevronLeft}
         size='sm'
         sx={t => ({ marginInlineEnd: t.space.$1 })}
       />
@@ -163,7 +172,7 @@ const FooterContinue = ({ onClick, isDisabled, isLoading, label = 'Continue' }: 
     >
       {labelText}
       <Icon
-        icon={CaretRight}
+        icon={ChevronRight}
         size='sm'
         sx={t => ({ marginInlineStart: t.space.$1 })}
       />
