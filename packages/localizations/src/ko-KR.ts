@@ -187,8 +187,8 @@ export const koKR: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: '엔터프라이즈 연결을 관리할 권한을 얻으려면 조직 관리자에게 문의하세요.',
-      title: '엔터프라이즈 연결을 관리할 권한이 없습니다',
+      subtitle: '권한을 업그레이드하려면 조직 관리자에게 문의하세요.',
+      title: '싱글 사인온(SSO)을 관리할 권한이 없습니다',
     },
     navbar: {
       title: '싱글 사인온(SSO) 구성',
@@ -196,10 +196,6 @@ export const koKR: LocalizationResource = {
     selectProviderStep: {
       title: '공급자 선택',
       subtitle: 'SSO를 설정할 공급자를 선택하세요.',
-      body: {
-        title: 'ID 공급자를 선택하세요',
-        description: '다음 단계에서 자세한 설정 프로세스를 안내해 드립니다.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',
