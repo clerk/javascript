@@ -16,6 +16,7 @@ import { Route, Switch } from '@/router';
 
 import { ConfigureSSOProvider, useConfigureSSO } from './ConfigureSSOContext';
 import { ConfigureSSOHeader } from './ConfigureSSOHeader';
+import { ConfigureSSOMobileHeader } from './ConfigureSSOMobileHeader';
 import { ConfigureSSONavbar } from './ConfigureSSONavbar';
 import { ConfigureSSOSkeleton } from './ConfigureSSOSkeleton';
 import { ProfileCardFooter, ProfileCardHeader } from './elements/ProfileCard';
@@ -58,6 +59,7 @@ const AuthenticatedContent = withCoreUserGuard(() => {
             flex: 1,
           })}
         >
+          <ConfigureSSOMobileHeader />
           <ConfigureSSOContent contentRef={contentRef} />
         </Col>
       </ConfigureSSONavbar>
