@@ -1,5 +1,5 @@
 import { useUser } from '@clerk/shared/react';
-import { useContext } from 'react';
+import { useContext, type ReactNode } from 'react';
 
 import { getSecondFactors } from '@/ui/utils/mfa';
 
@@ -31,12 +31,12 @@ function useRequirePage(componentName: string): boolean {
 
 // --- Account sections ---
 
-export function AccountProfile() {
+export function AccountProfile(): ReactNode {
   if (!useRequirePage('AccountProfile')) return null;
   return <UserProfileSection />;
 }
 
-export function AccountUsername() {
+export function AccountUsername(): ReactNode {
   if (!useRequirePage('AccountUsername')) return null;
 
   const { attributes } = useEnvironment().userSettings;
@@ -48,7 +48,7 @@ export function AccountUsername() {
   return <UsernameSection isImmutable={isImmutable} />;
 }
 
-export function AccountEmails() {
+export function AccountEmails(): ReactNode {
   if (!useRequirePage('AccountEmails')) return null;
 
   const { attributes } = useEnvironment().userSettings;
@@ -65,7 +65,7 @@ export function AccountEmails() {
   );
 }
 
-export function AccountPhone() {
+export function AccountPhone(): ReactNode {
   if (!useRequirePage('AccountPhone')) return null;
 
   const { attributes } = useEnvironment().userSettings;
@@ -82,7 +82,7 @@ export function AccountPhone() {
   );
 }
 
-export function AccountConnectedAccounts() {
+export function AccountConnectedAccounts(): ReactNode {
   if (!useRequirePage('AccountConnectedAccounts')) return null;
 
   const { social } = useEnvironment().userSettings;
@@ -93,7 +93,7 @@ export function AccountConnectedAccounts() {
   return <ConnectedAccountsSection shouldAllowCreation={shouldAllowIdentificationCreation} />;
 }
 
-export function AccountEnterpriseAccounts() {
+export function AccountEnterpriseAccounts(): ReactNode {
   if (!useRequirePage('AccountEnterpriseAccounts')) return null;
 
   const { enterpriseSSO } = useEnvironment().userSettings;
@@ -104,7 +104,7 @@ export function AccountEnterpriseAccounts() {
   return <EnterpriseAccountsSection />;
 }
 
-export function AccountWeb3() {
+export function AccountWeb3(): ReactNode {
   if (!useRequirePage('AccountWeb3')) return null;
 
   const { attributes } = useEnvironment().userSettings;
@@ -117,7 +117,7 @@ export function AccountWeb3() {
 
 // --- Security sections ---
 
-export function SecurityPassword() {
+export function SecurityPassword(): ReactNode {
   if (!useRequirePage('SecurityPassword')) return null;
 
   const { instanceIsPasswordBased } = useEnvironment().userSettings;
@@ -127,7 +127,7 @@ export function SecurityPassword() {
   return <PasswordSection />;
 }
 
-export function SecurityPasskeys() {
+export function SecurityPasskeys(): ReactNode {
   if (!useRequirePage('SecurityPasskeys')) return null;
 
   const { attributes } = useEnvironment().userSettings;
@@ -138,7 +138,7 @@ export function SecurityPasskeys() {
   return <PasskeySection />;
 }
 
-export function SecurityMfa() {
+export function SecurityMfa(): ReactNode {
   if (!useRequirePage('SecurityMfa')) return null;
 
   const { attributes } = useEnvironment().userSettings;
@@ -148,12 +148,12 @@ export function SecurityMfa() {
   return <MfaSection />;
 }
 
-export function SecurityActiveDevices() {
+export function SecurityActiveDevices(): ReactNode {
   if (!useRequirePage('SecurityActiveDevices')) return null;
   return <ActiveDevicesSection />;
 }
 
-export function SecurityDelete() {
+export function SecurityDelete(): ReactNode {
   if (!useRequirePage('SecurityDelete')) return null;
 
   const { user } = useUser();
