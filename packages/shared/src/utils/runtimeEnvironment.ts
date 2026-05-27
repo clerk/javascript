@@ -1,3 +1,5 @@
+import { getEnvVariable } from '../getEnvVariable';
+
 const automatedEnvironmentVariables = [
   'CI',
   'CONTINUOUS_INTEGRATION',
@@ -27,15 +29,6 @@ const isTruthyEnvValue = (value: string | undefined): boolean => {
   }
 
   return !['0', 'false', 'off', 'no'].includes(value.toLowerCase());
-};
-
-const getEnvVariable = (name: string): string | undefined => {
-  try {
-    return process.env[name];
-    // eslint-disable-next-line no-empty
-  } catch {}
-
-  return undefined;
 };
 
 export const isDevelopmentEnvironment = (): boolean => {
