@@ -46,6 +46,8 @@ export function is429Error(e: any): boolean {
   return e?.status === 429;
 }
 
+const unauthenticated403ErrorCodes = new Set(['user_banned', 'user_deactivated']);
+
 /**
  * Checks if the provided error indicates the user's session is no longer valid
  * and should trigger the unauthenticated flow (e.g. sign-out / redirect to sign-in).
@@ -53,6 +55,7 @@ export function is429Error(e: any): boolean {
  * Only matches explicit authentication failure status codes:
  * - 401: session is invalid or expired
  * - 422: invalid session state (e.g. missing_expired_token)
+ * - 403: terminal user state (e.g. user_banned, user_deactivated)
  *
  * 404 is intentionally excluded despite being returned for "session not found",
  * because it's also returned for unrelated resources (org not found, JWT template
@@ -64,7 +67,10 @@ export function is429Error(e: any): boolean {
  */
 export function isUnauthenticatedError(e: any): boolean {
   const status = e?.status;
-  return status === 401 || status === 422;
+  const hasTerminalUserErrorCode =
+    Array.isArray(e?.errors) && e.errors.some((error: any) => unauthenticated403ErrorCodes.has(error?.code));
+
+  return status === 401 || status === 422 || (status === 403 && hasTerminalUserErrorCode);
 }
 
 /**
