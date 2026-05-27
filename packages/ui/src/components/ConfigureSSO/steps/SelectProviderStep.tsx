@@ -3,7 +3,18 @@ import { useUser } from '@clerk/shared/react/index';
 import React from 'react';
 
 import type { LocalizationKey } from '@/customizables';
-import { Box, Col, descriptors, Flow, Grid, localizationKeys, Span, Text, useLocalizations } from '@/customizables';
+import {
+  Box,
+  Col,
+  descriptors,
+  Flow,
+  Grid,
+  localizationKeys,
+  RadioInput,
+  Span,
+  Text,
+  useLocalizations,
+} from '@/customizables';
 import { useCardState } from '@/elements/contexts';
 import { common, mqu } from '@/styledSystem';
 import { Alert } from '@/ui/elements/Alert';
@@ -208,23 +219,19 @@ const ProviderCard = ({ name, value, iconId, label, checked, onChange }: Provide
         },
       })}
     >
-      <input
-        type='radio'
+      <RadioInput
         name={name}
         value={value}
         checked={checked}
         onChange={onChange}
-        css={{
+        focusRing={false}
+        sx={theme => ({
           position: 'absolute',
-          width: '1px',
-          height: '1px',
-          padding: 0,
-          margin: '-1px',
-          overflow: 'hidden',
-          clip: 'rect(0,0,0,0)',
-          whiteSpace: 'nowrap',
-          borderWidth: 0,
-        }}
+          top: theme.space.$1x5,
+          insetInlineStart: theme.space.$1x5,
+          margin: 0,
+          width: 'fit-content',
+        })}
       />
 
       <Span
