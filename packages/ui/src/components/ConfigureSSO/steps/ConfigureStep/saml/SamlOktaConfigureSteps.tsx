@@ -3,7 +3,7 @@ import { type JSX } from 'react';
 import { Col, descriptors, Heading, localizationKeys, Text } from '@/customizables';
 import { ClipboardInput } from '@/elements/ClipboardInput';
 import { Form } from '@/elements/Form';
-import { Check, ClipboardOutline } from '@/icons';
+import { Checkmark, Clipboard } from '@/icons';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
 import { useConfigureSSO } from '../../../ConfigureSSOContext';
@@ -180,8 +180,8 @@ const SamlOktaCreateAppStep = (): JSX.Element => {
               <ClipboardInput
                 value={acsUrl}
                 readOnly
-                copyIcon={ClipboardOutline}
-                copiedIcon={Check}
+                copyIcon={Clipboard}
+                copiedIcon={Checkmark}
               />
             </Form.CommonInputWrapper>
           </Form.ControlRow>
@@ -191,8 +191,8 @@ const SamlOktaCreateAppStep = (): JSX.Element => {
               <ClipboardInput
                 value={spEntityId}
                 readOnly
-                copyIcon={ClipboardOutline}
-                copiedIcon={Check}
+                copyIcon={Clipboard}
+                copiedIcon={Checkmark}
               />
             </Form.CommonInputWrapper>
           </Form.ControlRow>

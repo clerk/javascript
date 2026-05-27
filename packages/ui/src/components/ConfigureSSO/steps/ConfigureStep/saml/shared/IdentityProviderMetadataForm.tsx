@@ -20,7 +20,7 @@ import { useCardState } from '@/elements/contexts';
 import { Field } from '@/elements/FieldControl';
 import { Form } from '@/elements/Form';
 import { SegmentedControl } from '@/elements/SegmentedControl';
-import { Close, Upload } from '@/icons';
+import { ArrowUpTray, Close } from '@/icons';
 import type { FormControlState } from '@/ui/utils/useFormControl';
 import { useFormControl } from '@/ui/utils/useFormControl';
 import { handleError } from '@/utils/errorHandler';
@@ -369,7 +369,7 @@ const ManualEntryPanel = ({
                   onClick={() => certInputRef.current?.click()}
                 >
                   <Icon
-                    icon={Upload}
+                    icon={ArrowUpTray}
                     size='sm'
                     colorScheme='neutral'
                     sx={theme => ({ marginInlineEnd: theme.space.$1 })}
