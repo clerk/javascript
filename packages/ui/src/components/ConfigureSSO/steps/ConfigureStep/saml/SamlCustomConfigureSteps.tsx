@@ -2,6 +2,7 @@ import { type JSX } from 'react';
 
 import { Col, descriptors, Heading, localizationKeys, Text } from '@/customizables';
 import { ClipboardInput } from '@/elements/ClipboardInput';
+import { useCardState } from '@/elements/contexts';
 import { Form } from '@/elements/Form';
 import { Checkmark, Clipboard } from '@/icons';
 import { useFormControl } from '@/ui/utils/useFormControl';
@@ -12,6 +13,7 @@ import { useWizard, Wizard } from '../../../elements/Wizard';
 import { InnerStepCounter } from '../../../elements/Wizard/InnerStepCounter';
 import { AttributeMappingTable, type AttributeMappingTableConfig } from './shared/AttributeMappingTable';
 import { IdentityProviderMetadataForm } from './shared/IdentityProviderMetadataForm';
+import { useIdentityProviderMetadataForm } from './shared/useIdentityProviderMetadataForm';
 
 export const SamlCustomConfigureSteps = (): JSX.Element => {
   return (
@@ -250,29 +252,19 @@ const SamlCustomAssignUsersStep = (): JSX.Element => {
   );
 };
 
-const SamlCustomIdentityProviderMetadataStep = (): JSX.Element => (
-  <IdentityProviderMetadataForm
-    modes={{
-      title: localizationKeys('configureSSO.configureStep.samlCustom.identityProviderMetadataStep.modes.title'),
-      ariaLabel: localizationKeys('configureSSO.configureStep.samlCustom.identityProviderMetadataStep.modes.ariaLabel'),
-      metadataUrlLabel: localizationKeys(
-        'configureSSO.configureStep.samlCustom.identityProviderMetadataStep.modes.metadataUrl',
-      ),
-      manualLabel: localizationKeys('configureSSO.configureStep.samlCustom.identityProviderMetadataStep.modes.manual'),
-    }}
-    metadataUrl={{
+const SamlCustomIdentityProviderMetadataStep = (): JSX.Element => {
+  const card = useCardState();
+  const { goNext, goPrev, isFirstStep } = useWizard();
+  const { enterpriseConnection, updateEnterpriseConnection } = useConfigureSSO();
+
+  const controller = useIdentityProviderMetadataForm({
+    metadataUrl: {
       label: localizationKeys('configureSSO.configureStep.samlCustom.identityProviderMetadataStep.metadataUrl.label'),
       placeholder: localizationKeys(
         'configureSSO.configureStep.samlCustom.identityProviderMetadataStep.metadataUrl.placeholder',
       ),
-      description: localizationKeys(
-        'configureSSO.configureStep.samlCustom.identityProviderMetadataStep.metadataUrl.description',
-      ),
-    }}
-    manual={{
-      description: localizationKeys(
-        'configureSSO.configureStep.samlCustom.identityProviderMetadataStep.manual.description',
-      ),
+    },
+    manual: {
       signOnUrl: {
         label: localizationKeys(
           'configureSSO.configureStep.samlCustom.identityProviderMetadataStep.manual.signOnUrl.label',
@@ -289,23 +281,103 @@ const SamlCustomIdentityProviderMetadataStep = (): JSX.Element => (
           'configureSSO.configureStep.samlCustom.identityProviderMetadataStep.manual.issuer.placeholder',
         ),
       },
-      signingCertificate: {
-        label: localizationKeys(
-          'configureSSO.configureStep.samlCustom.identityProviderMetadataStep.manual.signingCertificate.label',
-        ),
-        uploadFile: localizationKeys(
-          'configureSSO.configureStep.samlCustom.identityProviderMetadataStep.manual.signingCertificate.uploadFile',
-        ),
-        replaceFile: localizationKeys(
-          'configureSSO.configureStep.samlCustom.identityProviderMetadataStep.manual.signingCertificate.replaceFile',
-        ),
-        removeFile: localizationKeys(
-          'configureSSO.configureStep.samlCustom.identityProviderMetadataStep.manual.signingCertificate.removeFile',
-        ),
-        fileUploaded: localizationKeys(
-          'configureSSO.configureStep.samlCustom.identityProviderMetadataStep.manual.signingCertificate.fileUploaded',
-        ),
-      },
-    }}
-  />
-);
+      signingCertificateLabel: localizationKeys(
+        'configureSSO.configureStep.samlCustom.identityProviderMetadataStep.manual.signingCertificate.label',
+      ),
+    },
+  });
+
+  const canSubmit = !card.isLoading && controller.isValid;
+
+  const handleContinue = async (): Promise<void> => {
+    if (!enterpriseConnection || !canSubmit) {
+      return;
+    }
+
+    card.setError(undefined);
+    card.setLoading();
+
+    try {
+      const saml = await controller.buildSamlPayload();
+      await updateEnterpriseConnection(enterpriseConnection.id, { saml });
+      void goNext();
+    } catch (err) {
+      controller.applySubmitError(err, card);
+    } finally {
+      card.setIdle();
+    }
+  };
+
+  return (
+    <>
+      <Step.Body>
+        <Step.Section
+          fill
+          gap={5}
+        >
+          <Heading
+            elementDescriptor={descriptors.configureSSOInstructionsHeading}
+            as='h3'
+            textVariant='subtitle'
+            localizationKey={localizationKeys(
+              'configureSSO.configureStep.samlCustom.identityProviderMetadataStep.modes.title',
+            )}
+          />
+          <IdentityProviderMetadataForm
+            controller={controller}
+            modes={{
+              ariaLabel: localizationKeys(
+                'configureSSO.configureStep.samlCustom.identityProviderMetadataStep.modes.ariaLabel',
+              ),
+              metadataUrlLabel: localizationKeys(
+                'configureSSO.configureStep.samlCustom.identityProviderMetadataStep.modes.metadataUrl',
+              ),
+              manualLabel: localizationKeys(
+                'configureSSO.configureStep.samlCustom.identityProviderMetadataStep.modes.manual',
+              ),
+            }}
+            metadataUrl={{
+              description: localizationKeys(
+                'configureSSO.configureStep.samlCustom.identityProviderMetadataStep.metadataUrl.description',
+              ),
+            }}
+            manual={{
+              description: localizationKeys(
+                'configureSSO.configureStep.samlCustom.identityProviderMetadataStep.manual.description',
+              ),
+              signingCertificate: {
+                label: localizationKeys(
+                  'configureSSO.configureStep.samlCustom.identityProviderMetadataStep.manual.signingCertificate.label',
+                ),
+                uploadFile: localizationKeys(
+                  'configureSSO.configureStep.samlCustom.identityProviderMetadataStep.manual.signingCertificate.uploadFile',
+                ),
+                replaceFile: localizationKeys(
+                  'configureSSO.configureStep.samlCustom.identityProviderMetadataStep.manual.signingCertificate.replaceFile',
+                ),
+                removeFile: localizationKeys(
+                  'configureSSO.configureStep.samlCustom.identityProviderMetadataStep.manual.signingCertificate.removeFile',
+                ),
+                fileUploaded: localizationKeys(
+                  'configureSSO.configureStep.samlCustom.identityProviderMetadataStep.manual.signingCertificate.fileUploaded',
+                ),
+              },
+            }}
+          />
+        </Step.Section>
+      </Step.Body>
+
+      <Step.Footer>
+        <Step.Footer.Previous
+          onClick={() => goPrev()}
+          isDisabled={isFirstStep || card.isLoading}
+        />
+        <Step.Footer.Continue
+          onClick={handleContinue}
+          isLoading={card.isLoading}
+          isDisabled={!canSubmit}
+        />
+      </Step.Footer>
+    </>
+  );
+};
