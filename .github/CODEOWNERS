@@ -1,0 +1,8 @@
+# Hotload boundary
+#
+# These files are part of the runtime surface that ships to consumer
+# apps without explicit version bumps. See AGENTS.md for context.
+
+/packages/clerk-js/src/core/clerk.ts          @clerk/team-sdk
+/packages/react/src/isomorphicClerk.ts        @clerk/team-sdk
+/packages/ui/src/contexts/                    @clerk/team-sdk
