@@ -149,9 +149,9 @@ export function cliAuth(options: CliAuthFactoryOptions = {}): CliAuthInstance {
 
     return async function routeHandler(request: Request): Promise<Response> {
       try {
-        const verifier = (routeOptions.verifyToken ?? defaultVerifyToken) as unknown as VerifyTokenFn;
+        const verifier: VerifyTokenFn<T> = routeOptions.verifyToken ?? defaultVerifyToken;
 
-        const { tokenInfo } = await runHandlePipeline(request, {
+        const { tokenInfo } = await runHandlePipeline<T>(request, {
           accepts: routeOptions.accepts,
           verifyToken: verifier,
           getClerk: routeGetClerk,
@@ -159,7 +159,7 @@ export function cliAuth(options: CliAuthFactoryOptions = {}): CliAuthInstance {
 
         const clerk = await routeGetClerk();
         const resolver = routeOptions.resolveAuthInfo ?? defaultResolveAuthInfo;
-        const raw = await resolver({ tokenInfo: tokenInfo as TokenInfo<T>, request, clerk });
+        const raw = await resolver({ tokenInfo, request, clerk });
         const info = validateIdentity(raw);
 
         return Response.json(info, { status: 200 });

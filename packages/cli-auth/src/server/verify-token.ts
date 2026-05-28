@@ -92,14 +92,14 @@ export async function defaultVerifyToken<T extends TokenTypeT>(ctx: VerifyTokenC
  * Internal: end-to-end pipeline used by `handle()`. Read bearer, detect type, gate on
  * `accepts`, run the (default or overridden) verifier with the resolved `clerk` injected.
  */
-export async function runHandlePipeline(
+export async function runHandlePipeline<T extends TokenTypeT = TokenTypeT>(
   request: Request,
   options: {
     accepts: AcceptsToken;
-    verifyToken: VerifyTokenFn;
+    verifyToken: VerifyTokenFn<T>;
     getClerk: () => Promise<ClerkClient>;
   },
-): Promise<{ tokenInfo: TokenInfo; rawToken: string }> {
+): Promise<{ tokenInfo: TokenInfo<T>; rawToken: string }> {
   const token = readBearer(request);
   const type = detectTokenType(token);
 
@@ -108,6 +108,6 @@ export async function runHandlePipeline(
   }
 
   const clerk = await options.getClerk();
-  const tokenInfo = await options.verifyToken({ token, type, request, clerk });
+  const tokenInfo = await options.verifyToken({ token, type: type as T, request, clerk });
   return { tokenInfo, rawToken: token };
 }
