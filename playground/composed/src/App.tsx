@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 type ProfileType = 'user' | 'organization';
 type UserTab = 'account' | 'security' | 'billing' | 'api-keys';
-type OrgTab = 'general' | 'members' | 'billing' | 'api-keys';
+type OrgTab = 'general' | 'members' | 'billing' | 'api-keys' | 'configure-sso';
 type ComposedMode = 'passthrough' | 'composed';
 
 export function App() {
@@ -131,7 +131,7 @@ export function App() {
             {profileType === 'organization' && (
               <OrganizationProfile>
                 <TabBar
-                  tabs={['general', 'members', 'billing', 'api-keys']}
+                  tabs={['general', 'members', 'billing', 'api-keys', 'configure-sso']}
                   active={orgTab}
                   onChange={setOrgTab}
                 />
@@ -141,6 +141,7 @@ export function App() {
                     {orgTab === 'members' && <OrganizationProfile.Members />}
                     {orgTab === 'billing' && <OrganizationProfile.Billing />}
                     {orgTab === 'api-keys' && <OrganizationProfile.APIKeys />}
+                    {orgTab === 'configure-sso' && <OrganizationProfile.ConfigureSSO />}
                   </>
                 ) : (
                   <>
@@ -155,6 +156,7 @@ export function App() {
                     {orgTab === 'members' && <OrganizationProfile.Members />}
                     {orgTab === 'billing' && <OrganizationProfile.Billing />}
                     {orgTab === 'api-keys' && <OrganizationProfile.APIKeys />}
+                    {orgTab === 'configure-sso' && <OrganizationProfile.ConfigureSSO />}
                   </>
                 )}
               </OrganizationProfile>
