@@ -1,5 +1,22 @@
 # Change Log
 
+## 4.14.0
+
+### Minor Changes
+
+- Display "Single Sign-on (SSO)" section in `OrganizationProfile` if self-serve SSO is enabled on the current active organization ([#8600](https://github.com/clerk/javascript/pull/8600)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Guard `ConfigureSSO` based on active organization ([#8613](https://github.com/clerk/javascript/pull/8613)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Treat terminal user-state 403 responses as unauthenticated in ClerkJS. ([#8649](https://github.com/clerk/javascript/pull/8649)) by [@jacekradko](https://github.com/jacekradko)
+
+- Introduce UX improvements for `<ConfigureSSO />` such as: ([#8601](https://github.com/clerk/javascript/pull/8601)) by [@LauraBeatris](https://github.com/LauraBeatris)
+  - Render attribute-mapping and service-provider field labels per IdP nomenclature
+  - Add "Open test URL" button and surface a clear empty state
+  - Expand the appearance descriptor surface across step content so developers can override styling
+
 ## 4.13.1
 
 ### Patch Changes

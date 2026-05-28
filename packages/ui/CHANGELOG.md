@@ -1,5 +1,28 @@
 # @clerk/ui
 
+## 1.14.0
+
+### Minor Changes
+
+- Migrate to new icon set to create consistency across components. ([#8319](https://github.com/clerk/javascript/pull/8319)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Display "Single Sign-on (SSO)" section in `OrganizationProfile` if self-serve SSO is enabled on the current active organization ([#8600](https://github.com/clerk/javascript/pull/8600)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Simplify ActionCard shadow styling. ([#8625](https://github.com/clerk/javascript/pull/8625)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add a visible radio indicator to each provider card on the `<ConfigureSSO />` Select Provider step. ([#8664](https://github.com/clerk/javascript/pull/8664)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Introduce UX improvements for `<ConfigureSSO />` such as: ([#8601](https://github.com/clerk/javascript/pull/8601)) by [@LauraBeatris](https://github.com/LauraBeatris)
+  - Render attribute-mapping and service-provider field labels per IdP nomenclature
+  - Add "Open test URL" button and surface a clear empty state
+  - Expand the appearance descriptor surface across step content so developers can override styling
+
+- Updated dependencies [[`e538525`](https://github.com/clerk/javascript/commit/e538525f2399e94099f0f523169710e4c73d430e), [`79cdd1f`](https://github.com/clerk/javascript/commit/79cdd1f9c9d8aa5d9a98d8d245b5f7f98c0cabb4), [`0937b5d`](https://github.com/clerk/javascript/commit/0937b5dfd8e119a0517576b921d887c924f0b148), [`48e3f64`](https://github.com/clerk/javascript/commit/48e3f647d3c89d99f42763a5ee741b684a176e96), [`4af9389`](https://github.com/clerk/javascript/commit/4af93898e1c3c8d51a9ce4ed590d1d564737718c), [`4d5027b`](https://github.com/clerk/javascript/commit/4d5027b15873dc6637e49f51142be64ef5f8e9bf), [`10d36ab`](https://github.com/clerk/javascript/commit/10d36abfd7e4fe0eed421565093704941a8574b9), [`4e08924`](https://github.com/clerk/javascript/commit/4e089248a3dfdf99fc110c06b699a084d4e8a7ee), [`bcf0e77`](https://github.com/clerk/javascript/commit/bcf0e776231c6ec675d3a3a8bfd122513d3c57ef)]:
+  - @clerk/localizations@4.7.0
+  - @clerk/shared@4.14.0
+
 ## 1.13.1
 
 ### Patch Changes

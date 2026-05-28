@@ -2,6 +2,7 @@ import { PageMocking, type MockScenario } from '@clerk/msw';
 import * as l from '../../localizations';
 import { dark, neobrutalism, shadcn, shadesOfPurple } from '../../ui/src/themes';
 import type { Clerk as ClerkType } from '../';
+import { initCommandPalette } from './cmdk';
 import * as scenarios from './scenarios';
 
 interface ComponentPropsControl {
@@ -175,6 +176,8 @@ window.AVAILABLE_SCENARIOS = AVAILABLE_SCENARIOS.reduce(
   },
   {} as Record<AvailableScenario, AvailableScenario>,
 );
+
+initCommandPalette();
 
 const Clerk = window.Clerk;
 function assertClerkIsLoaded(c: ClerkType | undefined): asserts c is ClerkType {
@@ -514,6 +517,10 @@ void (async () => {
 
     document.addEventListener('keydown', e => {
       if (e.key === '/') {
+        const target = e.target as HTMLElement | null;
+        if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+          return;
+        }
         leftSidebar?.classList.toggle('hidden');
         pane.hidden = !pane.hidden;
       }
