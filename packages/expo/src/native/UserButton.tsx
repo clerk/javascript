@@ -164,8 +164,9 @@ export function UserButton({ onPress, style }: UserButtonProps) {
 
 const styles = StyleSheet.create({
   button: {
-    width: '100%',
-    height: '100%',
+    width: 40,
+    height: 40,
+    borderRadius: 9999,
     overflow: 'hidden',
   },
   avatar: {
