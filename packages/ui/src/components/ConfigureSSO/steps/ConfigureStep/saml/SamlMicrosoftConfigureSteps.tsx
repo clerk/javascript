@@ -11,6 +11,7 @@ import { useConfigureSSO } from '../../../ConfigureSSOContext';
 import { Step } from '../../../elements/Step';
 import { useWizard, Wizard } from '../../../elements/Wizard';
 import { InnerStepCounter } from '../../../elements/Wizard/InnerStepCounter';
+import { AttributeMappingTable, type AttributeMappingTableConfig } from './shared/AttributeMappingTable';
 import {
   applySamlSubmitError,
   buildSamlConfigurationPayload,
@@ -43,6 +44,16 @@ export const SamlMicrosoftConfigureSteps = (): JSX.Element => {
           <InnerStepCounter />
         </Step.Header>
         <SamlMicrosoftServiceProviderStep />
+      </Wizard.Step>
+
+      <Wizard.Step id='attribute-mapping'>
+        <Step.Header
+          title={localizationKeys('configureSSO.configureStep.samlMicrosoft.mainHeaderTitle')}
+          description={localizationKeys('configureSSO.configureStep.samlMicrosoft.attributeMappingStep.headerSubtitle')}
+        >
+          <InnerStepCounter />
+        </Step.Header>
+        <SamlMicrosoftAttributeMappingStep />
       </Wizard.Step>
 
       <Wizard.Step id='identity-provider-metadata'>
@@ -375,6 +386,134 @@ const SamlMicrosoftServiceProviderStep = (): JSX.Element => {
               as='li'
               colorScheme='secondary'
               localizationKey={localizationKeys('configureSSO.configureStep.samlMicrosoft.serviceProviderStep.step6')}
+            />
+          </Col>
+        </Step.Section>
+      </Step.Body>
+
+      <Step.Footer>
+        <Step.Footer.Previous
+          onClick={() => goPrev()}
+          isDisabled={isFirstStep}
+        />
+        <Step.Footer.Continue
+          onClick={() => goNext()}
+          isDisabled={isLastStep}
+        />
+      </Step.Footer>
+    </>
+  );
+};
+
+const MICROSOFT_ATTRIBUTE_MAPPING: AttributeMappingTableConfig = {
+  columns: {
+    first: localizationKeys(
+      'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.columns.attribute',
+    ),
+    second: localizationKeys(
+      'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.columns.claimName',
+    ),
+    third: localizationKeys(
+      'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.columns.value',
+    ),
+  },
+  // Microsoft's default claim names are long URLs that don't fit the column;
+  // truncate them with an ellipsis and surface the full value in a tooltip.
+  truncateSecond: true,
+  rows: [
+    {
+      id: 'email',
+      isRequired: true,
+      first: localizationKeys(
+        'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.rows.email.attribute',
+      ),
+      second: localizationKeys(
+        'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.rows.email.claimName',
+      ),
+      third: localizationKeys(
+        'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.rows.email.value',
+      ),
+    },
+    {
+      id: 'firstName',
+      isRequired: false,
+      first: localizationKeys(
+        'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.rows.firstName.attribute',
+      ),
+      second: localizationKeys(
+        'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.rows.firstName.claimName',
+      ),
+      third: localizationKeys(
+        'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.rows.firstName.value',
+      ),
+    },
+    {
+      id: 'lastName',
+      isRequired: false,
+      first: localizationKeys(
+        'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.rows.lastName.attribute',
+      ),
+      second: localizationKeys(
+        'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.rows.lastName.claimName',
+      ),
+      third: localizationKeys(
+        'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.rows.lastName.value',
+      ),
+    },
+  ],
+};
+
+const SamlMicrosoftAttributeMappingStep = (): JSX.Element => {
+  const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
+
+  return (
+    <>
+      <Step.Body>
+        <Step.Section sx={theme => ({ gap: theme.space.$3 })}>
+          <Heading
+            elementDescriptor={descriptors.configureSSOInstructionsHeading}
+            as='h3'
+            textVariant='subtitle'
+            localizationKey={localizationKeys('configureSSO.configureStep.samlMicrosoft.attributeMappingStep.title')}
+          />
+
+          <AttributeMappingTable config={MICROSOFT_ATTRIBUTE_MAPPING} />
+
+          <Text
+            as='p'
+            colorScheme='secondary'
+            localizationKey={localizationKeys(
+              'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.paragraph',
+            )}
+          />
+
+          <Col
+            elementDescriptor={descriptors.configureSSOInstructionsList}
+            as='ul'
+            sx={theme => ({
+              gap: theme.space.$1x5,
+              margin: 0,
+              paddingInlineStart: theme.space.$5,
+              listStyleType: 'disc',
+            })}
+          >
+            <Text
+              elementDescriptor={descriptors.configureSSOInstructionsListItem}
+              as='li'
+              colorScheme='secondary'
+              localizationKey={localizationKeys('configureSSO.configureStep.samlMicrosoft.attributeMappingStep.step1')}
+            />
+            <Text
+              elementDescriptor={descriptors.configureSSOInstructionsListItem}
+              as='li'
+              colorScheme='secondary'
+              localizationKey={localizationKeys('configureSSO.configureStep.samlMicrosoft.attributeMappingStep.step2')}
+            />
+            <Text
+              elementDescriptor={descriptors.configureSSOInstructionsListItem}
+              as='li'
+              colorScheme='secondary'
+              localizationKey={localizationKeys('configureSSO.configureStep.samlMicrosoft.attributeMappingStep.step3')}
             />
           </Col>
         </Step.Section>

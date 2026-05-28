@@ -703,6 +703,39 @@ export const enUS: LocalizationResource = {
             },
           },
         },
+        attributeMappingStep: {
+          headerSubtitle: 'Map user attributes from Microsoft Entra to your application',
+          title: 'We expect your SAML responses to have the following specific attributes:',
+          paragraph:
+            "These are the defaults and probably won't need you to change them. However, many SAML configuration errors are due to incorrect attribute mappings, so it's worth double-checking. Here's how:",
+          step1: 'On the <bold>SAML-based Sign-on</bold> page, find the <bold>Attributes & Claims</bold> section.',
+          step2: 'Select <bold>Edit</bold>',
+          step3: 'Verify that the above three attributes and values are present.',
+          attributeMappingTable: {
+            columns: {
+              attribute: 'Attribute',
+              claimName: 'Claim name',
+              value: 'Value',
+            },
+            rows: {
+              email: {
+                attribute: 'Email address',
+                claimName: 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress',
+                value: 'user.mail',
+              },
+              firstName: {
+                attribute: 'First name',
+                claimName: 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname',
+                value: 'user.givenname',
+              },
+              lastName: {
+                attribute: 'Last name',
+                claimName: 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname',
+                value: 'user.surname',
+              },
+            },
+          },
+        },
       },
     },
   },

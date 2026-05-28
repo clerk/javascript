@@ -1744,6 +1744,26 @@ export type __internal_LocalizationResource = {
             };
           };
         };
+        attributeMappingStep: {
+          headerSubtitle: LocalizationValue;
+          title: LocalizationValue;
+          paragraph: LocalizationValue;
+          step1: LocalizationValue;
+          step2: LocalizationValue;
+          step3: LocalizationValue;
+          attributeMappingTable: {
+            columns: {
+              attribute: LocalizationValue;
+              claimName: LocalizationValue;
+              value: LocalizationValue;
+            };
+            rows: {
+              email: { attribute: LocalizationValue; claimName: LocalizationValue; value: LocalizationValue };
+              firstName: { attribute: LocalizationValue; claimName: LocalizationValue; value: LocalizationValue };
+              lastName: { attribute: LocalizationValue; claimName: LocalizationValue; value: LocalizationValue };
+            };
+          };
+        };
       };
     };
     confirmation: {
