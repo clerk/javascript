@@ -440,7 +440,7 @@ type UpdateUserJSON = Pick<
 
 export type UpdateUserParams = Partial<SnakeToCamel<UpdateUserJSON>>;
 
-/** */
+/** @generateWithEmptyComment */
 export type UpdateUserMetadataParams = {
   /**
    * The metadata to deep-merge with the user's existing `unsafeMetadata`. Keys at any nesting level whose value is `null` are removed.
@@ -448,7 +448,7 @@ export type UpdateUserMetadataParams = {
   unsafeMetadata: UserUnsafeMetadata;
 };
 
-/**  */
+/** @generateWithEmptyComment */
 export type UpdateUserPasswordParams = {
   /**
    * The user's new password.
