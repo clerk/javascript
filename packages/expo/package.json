@@ -116,7 +116,6 @@
     "@clerk/clerk-js": "workspace:^",
     "@clerk/react": "workspace:^",
     "@clerk/shared": "workspace:^",
-    "base-64": "^1.0.0",
     "react-native-url-polyfill": "2.0.0",
     "tslib": "catalog:repo"
   },
@@ -124,6 +123,7 @@
     "@clerk/expo-passkeys": "workspace:*",
     "@expo/config-plugins": "^54.0.4",
     "@types/base-64": "^1.0.2",
+    "base-64": "^1.0.0",
     "esbuild": "^0.28.0",
     "expo-apple-authentication": "^7.2.4",
     "expo-auth-session": "^5.5.2",
