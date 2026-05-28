@@ -62,7 +62,7 @@ export interface TelemetryLogEntry {
  */
 export interface TelemetryCollector {
   /**
-   * If `true`, telemetry events are only logged to the console and not sent to Clerk.
+   * Indicates whether telemetry is enabled.
    */
   isEnabled: boolean;
   /**

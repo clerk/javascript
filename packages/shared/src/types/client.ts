@@ -24,15 +24,15 @@ export interface ClientResource extends ClerkResource {
    */
   signedInSessions: SignedInSessionResource[];
   /**
-   * The current sign up attempt, or `null` if there is none.
+   * The current sign-up attempt.
    */
   signUp: SignUpResource;
   /**
-   * The current sign in attempt, or `null` if there is none.
+   * The current sign-in attempt.
    */
   signIn: SignInResource;
   /**
-   * Returns `true` if this client hasn't been saved (created) yet in the Frontend API. Returns `false` otherwise.
+   * Indicates whether this client hasn't been saved (created) yet in the Frontend API.
    */
   isNew: () => boolean;
   /**
@@ -60,7 +60,7 @@ export interface ClientResource extends ClerkResource {
    */
   resetSignUp: () => void;
   /**
-   * Returns `true` if the client cookie is due to expire in 8 days or less. Returns `false` otherwise.
+   * Indicates whether the client cookie is due to expire in 8 days or less.
    */
   isEligibleForTouch: () => boolean;
   /**

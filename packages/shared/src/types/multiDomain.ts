@@ -61,7 +61,7 @@ export type MultiDomainAndOrProxyPrimitives =
     };
 
 /**
- * Only one of the two properties are allowed to be set at a time.
+ * If both `proxyUrl` and `domain` are set, the `proxyUrl` will be used.
  */
 export type DomainOrProxyUrl = {
   /**

@@ -178,7 +178,7 @@ export interface UserResource extends ClerkResource, BillingPayerMethods {
   /**
    * Metadata that can be read and set from the Frontend API. It's considered unsafe because it can be modified from the frontend.
    *
-   * There is also an `unsafeMetadata` attribute in the [`SignUp`](https://clerk.com/docs/reference/objects/sign-up-future) object. The value of that field will be automatically copied to the user's unsafe metadata once the sign up is complete.
+   * There is also an `unsafeMetadata` attribute in the [`SignUp`](https://clerk.com/docs/reference/objects/sign-up-future) object. The value of that field will be automatically copied to the user's unsafe metadata once the sign-up is complete.
    */
   unsafeMetadata: UserUnsafeMetadata;
   /**

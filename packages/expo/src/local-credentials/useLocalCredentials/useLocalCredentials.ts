@@ -195,7 +195,7 @@ export const useLocalCredentials = (): LocalCredentialsReturn => {
      */
     hasCredentials: hasLocalAuthCredentials,
     /**
-     * Indicates whether the stored credentials belong to the signed in uer. When there is no signed-in user the value will always be `false`.
+     * Indicates whether the stored credentials belong to the signed in user. When there is no signed-in user the value will always be `false`.
      */
     userOwnsCredentials,
     /**
