@@ -243,6 +243,7 @@ export const enUS: LocalizationResource = {
         okta: 'Okta Workforce',
         customSaml: 'Custom SAML Provider',
         google: 'Google Workspace',
+        microsoft: 'Microsoft Entra (formerly AD)',
       },
       warning: 'Once a provider is selected you cannot change again until the configuration is over',
     },
