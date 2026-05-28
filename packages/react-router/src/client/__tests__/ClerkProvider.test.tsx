@@ -73,6 +73,24 @@ describe('ClerkProvider __internal_clerkUIUrl via clerkState', () => {
     );
   });
 
+  it('reads VITE_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING in SPA mode where clerkState is absent', async () => {
+    vi.stubEnv('VITE_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING', 'true');
+    const { ClerkProvider } = await import('../ReactRouterClerkProvider');
+
+    render(
+      <ClerkProvider publishableKey='pk_test_xxx'>
+        <div>Test</div>
+      </ClerkProvider>,
+    );
+
+    expect(mockClerkProvider).toHaveBeenCalledWith(
+      expect.objectContaining({
+        unsafe_disableDevelopmentModeConsoleWarning: true,
+      }),
+    );
+    vi.unstubAllEnvs();
+  });
+
   it('passes __internal_clerkUIUrl alongside other props from clerkState', async () => {
     const { ClerkProvider } = await import('../ReactRouterClerkProvider');
 
