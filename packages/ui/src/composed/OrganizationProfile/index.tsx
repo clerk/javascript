@@ -9,12 +9,14 @@ import {
   GeneralOrganizationProfile,
   GeneralVerifiedDomains,
 } from './sectionWrappers';
+import { ConfigureSSO } from './ConfigureSSO';
 
 export const OrganizationProfile = Object.assign(OrganizationProfileProvider, {
   General,
   Members,
   Billing,
   APIKeys,
+  ConfigureSSO,
   GeneralOrganizationProfile,
   GeneralVerifiedDomains,
   GeneralLeaveOrganization,
