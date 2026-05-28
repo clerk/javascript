@@ -38,10 +38,10 @@ export default defineConfig({
       testMatch: /global\.teardown/,
     },
     {
-      name: 'chrome',
+      name: process.env.E2E_BROWSER || 'chrome',
       use: {
         ...devices['Desktop Chrome'],
-        channel: 'chrome',
+        ...((process.env.E2E_BROWSER || 'chrome') === 'chrome' ? { channel: 'chrome' as const } : {}),
         launchOptions: {
           args: [process.env.DISABLE_WEB_SECURITY ? '--disable-web-security' : ''],
         },
