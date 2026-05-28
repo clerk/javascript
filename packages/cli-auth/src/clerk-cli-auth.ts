@@ -201,12 +201,12 @@ export class ClerkCliAuth {
     if (this.config.apiKeys?.envVar) {
       const fromEnv = process.env[this.config.apiKeys.envVar];
       if (fromEnv) {
-        return { token: fromEnv, kind: 'api_key' };
+        return { token: fromEnv, kind: classifyToken(fromEnv) };
       }
     }
     const accessToken = await this.getAccessToken();
     if (accessToken) {
-      return { token: accessToken, kind: 'oauth' };
+      return { token: accessToken, kind: classifyToken(accessToken) };
     }
 
     const envHint = this.config.apiKeys?.envVar ? ` or set $${this.config.apiKeys.envVar}` : '';
