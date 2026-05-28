@@ -3,9 +3,9 @@ package expo.modules.clerk
 import android.content.Context
 import android.util.Log
 import android.widget.FrameLayout
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Recomposer
@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.AndroidUiDispatcher
 import androidx.compose.ui.platform.ComposeView
@@ -25,19 +26,16 @@ import androidx.savedstate.compose.LocalSavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.clerk.api.Clerk
 import com.clerk.api.network.model.client.Client
-import com.clerk.ui.userprofile.UserProfileView
-import com.facebook.react.bridge.Arguments
-import com.facebook.react.bridge.ReactContext
-import com.facebook.react.uimanager.events.RCTEventEmitter
+import com.clerk.ui.userbutton.UserButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-private const val TAG = "ClerkUserProfileExpoView"
+private const val USER_BUTTON_TAG = "ClerkUserButtonExpoView"
 
-class ClerkUserProfileNativeView(context: Context) : FrameLayout(context) {
-  var isDismissable: Boolean = true
-
-  private val activity = ClerkAuthNativeView.findActivity(context)
+class ClerkUserButtonNativeView(context: Context) : FrameLayout(context) {
+  private val activity = ClerkAuthNativeView.findActivity(context).also {
+    if (it != null) Clerk.attachActivity(it)
+  }
 
   private var recomposer: Recomposer? = null
   private var recomposerJob: kotlinx.coroutines.Job? = null
@@ -61,33 +59,28 @@ class ClerkUserProfileNativeView(context: Context) : FrameLayout(context) {
     addView(view, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
   }
 
+  override fun onAttachedToWindow() {
+    super.onAttachedToWindow()
+    setupView()
+  }
+
   override fun onDetachedFromWindow() {
     recomposer?.cancel()
     recomposerJob?.cancel()
     super.onDetachedFromWindow()
   }
 
-  fun setupView() {
-    Log.d(TAG, "setupView - isDismissable: $isDismissable")
-
+  private fun setupView() {
     composeView.setContent {
       val session by Clerk.sessionFlow.collectAsStateWithLifecycle()
-
       var hadSession by remember { mutableStateOf(Clerk.session != null) }
 
       LaunchedEffect(session) {
         if (hadSession && session == null) {
-          Log.d(TAG, "Sign-out detected")
-          // Refresh the client from the server to clear any stale in-progress
-          // signIn/signUp state. Without this, when the AuthView re-mounts after
-          // sign-out it routes to the "Get help" fallback because the previous
-          // user's signIn is still in Clerk.client. Clerk.auth.signOut() (called
-          // internally by UserProfileView) only clears session/user state, not
-          // the in-progress signIn.
           try {
             Client.getSkippingClientId()
           } catch (e: Exception) {
-            Log.w(TAG, "Client.getSkippingClientId() after UserProfile sign-out failed: ${e.message}")
+            Log.w(USER_BUTTON_TAG, "Client refresh after UserButton sign-out failed: ${e.message}")
           }
           ClerkExpoModule.emitAuthStateChange("signedOut", null)
         }
@@ -98,17 +91,11 @@ class ClerkUserProfileNativeView(context: Context) : FrameLayout(context) {
 
       val content = @androidx.compose.runtime.Composable {
         MaterialTheme {
-          Surface(
+          Box(
             modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
+            contentAlignment = Alignment.Center,
           ) {
-            UserProfileView(
-              clerkTheme = Clerk.customTheme,
-              onDismiss = {
-                Log.d(TAG, "Profile dismissed")
-                sendEvent("dismissed")
-              }
-            )
+            UserButton(clerkTheme = Clerk.customTheme)
           }
         }
       }
@@ -125,14 +112,5 @@ class ClerkUserProfileNativeView(context: Context) : FrameLayout(context) {
         content()
       }
     }
-  }
-
-  private fun sendEvent(type: String) {
-    val reactContext = context as? ReactContext ?: return
-    val eventData = Arguments.createMap().apply {
-      putString("type", type)
-    }
-    reactContext.getJSModule(RCTEventEmitter::class.java)
-      .receiveEvent(id, "onProfileEvent", eventData)
   }
 }
