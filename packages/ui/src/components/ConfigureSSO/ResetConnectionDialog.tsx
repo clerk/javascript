@@ -97,6 +97,8 @@ const ResetConnectionDialogContent = withCardStateProvider((props: ResetConnecti
 });
 
 export const ResetConnectionDialog = (props: ResetConnectionDialogProps): JSX.Element | null => {
+  const { contentRef } = useConfigureSSO();
+
   if (!props.isOpen) {
     return null;
   }
@@ -104,7 +106,15 @@ export const ResetConnectionDialog = (props: ResetConnectionDialogProps): JSX.El
   return (
     <Modal
       handleClose={props.onClose}
-      containerSx={{ alignItems: 'center' }}
+      canCloseModal={false}
+      portalRoot={contentRef}
+      containerSx={{
+        alignItems: 'center',
+        position: 'absolute',
+        inset: 0,
+        width: 'auto',
+        height: 'auto',
+      }}
     >
       <ResetConnectionDialogContent {...props} />
     </Modal>
