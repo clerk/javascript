@@ -42,18 +42,19 @@ export interface ClerkCliAuthConfig {
   requestTimeoutMs?: number;
   /** Injected opener for the browser step (for testing). Default: auto-detect. */
   openBrowser?: (url: string) => Promise<void>;
-  /** Enables non-OAuth credential auth (API keys, machine tokens) alongside OAuth. */
-  apiKeys?: {
-    /**
-     * Backend endpoint that returns the verified `Identity` for a credential. Called with
-     * `Authorization: Bearer <token>`. The server is responsible for verifying the credential
-     * (e.g. via `clerk.apiKeys.verify()` from `@clerk/nextjs/server`) and responding with an
-     * `Identity` payload — verification stays server-side, never in the CLI.
-     */
-    identityEndpoint: string;
-    /** Env var to read a credential from (e.g. 'MYAPP_API_KEY'). */
-    envVar: string;
-  };
+  /**
+   * Backend endpoint that returns the verified `Identity` for a credential (API key,
+   * machine token, or OAuth access token). Called with `Authorization: Bearer <token>`.
+   * The server is responsible for verifying the credential (e.g. via `clerk.apiKeys.verify()`
+   * from `@clerk/nextjs/server`) and responding with an `Identity` payload — verification
+   * stays server-side, never in the CLI. Setting this enables `verifyToken()`.
+   */
+  identityEndpoint?: string;
+  /**
+   * Env var to read a non-OAuth credential from (e.g. `'MYAPP_API_KEY'`). When set,
+   * `resolveToken()` falls back to this env var before the cached OAuth session.
+   */
+  tokenEnvVar?: string;
 }
 
 export interface TokenSet {

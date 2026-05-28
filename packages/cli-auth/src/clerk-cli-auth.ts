@@ -48,10 +48,13 @@ async function openBrowserFallback(url: string): Promise<void> {
 }
 
 export class ClerkCliAuth {
-  private readonly config: Required<Omit<ClerkCliAuthConfig, 'openBrowser' | 'storage' | 'apiKeys'>> & {
+  private readonly config: Required<
+    Omit<ClerkCliAuthConfig, 'openBrowser' | 'storage' | 'identityEndpoint' | 'tokenEnvVar'>
+  > & {
     storage: CredentialStore;
     openBrowser?: (url: string) => Promise<void>;
-    apiKeys?: ClerkCliAuthConfig['apiKeys'];
+    identityEndpoint?: string;
+    tokenEnvVar?: string;
   };
 
   constructor(config: ClerkCliAuthConfig) {
@@ -82,7 +85,8 @@ export class ClerkCliAuth {
       loginTimeoutMs: config.loginTimeoutMs ?? 120_000,
       requestTimeoutMs: config.requestTimeoutMs ?? 30_000,
       openBrowser: config.openBrowser,
-      apiKeys: config.apiKeys,
+      identityEndpoint: config.identityEndpoint,
+      tokenEnvVar: config.tokenEnvVar,
     };
   }
 
@@ -181,11 +185,11 @@ export class ClerkCliAuth {
   }
 
   async verifyToken(token: string): Promise<Identity> {
-    if (!this.config.apiKeys?.identityEndpoint) {
-      throw new ClerkCliAuthError('config', 'apiKeys.identityEndpoint is not configured.');
+    if (!this.config.identityEndpoint) {
+      throw new ClerkCliAuthError('config', 'identityEndpoint is not configured.');
     }
     return verifyTokenRequest({
-      endpoint: this.config.apiKeys.identityEndpoint,
+      endpoint: this.config.identityEndpoint,
       token,
       timeoutMs: this.config.requestTimeoutMs,
     });
@@ -198,8 +202,8 @@ export class ClerkCliAuth {
         kind: classifyToken(opts.tokenFromArg),
       };
     }
-    if (this.config.apiKeys?.envVar) {
-      const fromEnv = process.env[this.config.apiKeys.envVar];
+    if (this.config.tokenEnvVar) {
+      const fromEnv = process.env[this.config.tokenEnvVar];
       if (fromEnv) {
         return { token: fromEnv, kind: classifyToken(fromEnv) };
       }
@@ -209,7 +213,7 @@ export class ClerkCliAuth {
       return { token: accessToken, kind: classifyToken(accessToken) };
     }
 
-    const envHint = this.config.apiKeys?.envVar ? ` or set $${this.config.apiKeys.envVar}` : '';
+    const envHint = this.config.tokenEnvVar ? ` or set $${this.config.tokenEnvVar}` : '';
     throw new ClerkCliAuthError('not_authenticated', `Not logged in. Run \`auth login\`${envHint}.`);
   }
 

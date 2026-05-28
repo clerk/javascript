@@ -124,16 +124,14 @@ await auth.logout({ revoke: false });
 
 ### Accept API keys and machine tokens alongside OAuth
 
-CLIs that run in CI/CD, agents, or scripted environments often need to authenticate with a Clerk API key (`ak_*`) or machine-to-machine token (`mt_*`) instead of going through the browser. Configure the `apiKeys` block to enable this:
+CLIs that run in CI/CD, agents, or scripted environments often need to authenticate with a Clerk API key (`ak_*`) or machine-to-machine token (`mt_*`) instead of going through the browser. Configure `identityEndpoint` (and optionally `tokenEnvVar`) to enable this:
 
 ```ts
 const auth = new ClerkCliAuth({
   clientId: process.env.CLERK_OAUTH_CLIENT_ID!,
   issuer: process.env.CLERK_ISSUER!,
-  apiKeys: {
-    identityEndpoint: 'https://myapp.com/api/cli/identity',
-    envVar: 'MYAPP_API_KEY',
-  },
+  identityEndpoint: 'https://myapp.com/api/cli/identity',
+  tokenEnvVar: 'MYAPP_API_KEY',
 });
 
 // Look up the identity for a specific token (API key, machine token, or OAuth access token):
@@ -146,7 +144,7 @@ const { token, kind } = await auth.resolveToken({ tokenFromArg: argv.token });
 `resolveToken()` checks for a credential in this order:
 
 1. The `tokenFromArg` you pass in (typically from a `--token` CLI flag).
-2. The environment variable named in `apiKeys.envVar`.
+2. The environment variable named in `tokenEnvVar`.
 3. The cached OAuth access token from `login()`.
 
 It returns `{ token, kind }`, where `kind` is one of `'session_token'`, `'api_key'`, `'m2m_token'`, or `'oauth_token'` (matching the Clerk Backend SDK's `TokenType`). Use it to branch logic per credential type:
@@ -195,7 +193,7 @@ export const { handle, verifyToken, verifyTokenFromRequest } = cliAuth({
 
 ### Identity endpoint
 
-Set `apiKeys.identityEndpoint` in your `ClerkCliAuth` constructor config to a backend route that returns the verified `Identity` for a token:
+Set `identityEndpoint` in your `ClerkCliAuth` constructor config to a backend route that returns the verified `Identity` for a token:
 
 ```ts
 // app/api/cli/identity/route.ts
