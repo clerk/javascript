@@ -1,6 +1,4 @@
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type ClerkResourceReloadParams = {
   /**
    * A nonce to use for rotating the user's token. Used in native application OAuth flows to allow the native client to update its JWT once despite changes in its rotating token.

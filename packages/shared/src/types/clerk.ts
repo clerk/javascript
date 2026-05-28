@@ -1179,9 +1179,7 @@ export interface Clerk {
   __experimental_checkout: __experimental_CheckoutFunction;
 }
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type HandleOAuthCallbackParams = TransferableOption &
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
@@ -1277,9 +1275,7 @@ export type ClerkOptionsNavigation =
       routerDebug?: boolean;
     };
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 type ClerkUnsafeOptions = {
   /**
    * Disables the `Clerk has been loaded with development keys` console warning that is logged when Clerk is
@@ -1302,9 +1298,7 @@ type ClerkUnsafeOptions = {
   unsafe_disableDevelopmentModeConsoleWarning?: boolean;
 };
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type ClerkOptions = ClerkOptionsNavigation &
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
@@ -1642,9 +1636,7 @@ export type RoutingOptions =
   | { path: string | undefined; routing?: Extract<RoutingStrategy, 'path'> }
   | { path?: never; routing?: Extract<RoutingStrategy, 'hash'> };
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type SignInProps = RoutingOptions & {
   /**
    * Full URL or path to navigate to after successful sign in.
@@ -1795,9 +1787,7 @@ export type __internal_AttemptToEnableEnvironmentSettingResult = {
 
 type GoogleOneTapRedirectUrlProps = SignInForceRedirectUrl & SignUpForceRedirectUrl;
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type GoogleOneTapProps = GoogleOneTapRedirectUrlProps & {
   /**
    * Whether to cancel the Google One Tap request if a user clicks outside the prompt.
@@ -1826,9 +1816,7 @@ export type GoogleOneTapProps = GoogleOneTapRedirectUrlProps & {
   appearance?: ClerkAppearanceTheme;
 };
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type SignUpProps = RoutingOptions & {
   /**
    * Full URL or path to navigate to after successful sign up.
@@ -1893,9 +1881,7 @@ export type SignUpModalProps = WithoutRouting<SignUpProps> & {
   getContainer?: () => HTMLElement | null;
 };
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type UserProfileProps = RoutingOptions & {
   /**
    * Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided). See the [`Appearance`](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.
@@ -1943,9 +1929,7 @@ export type UserProfileModalProps = WithoutRouting<UserProfileProps> & {
   getContainer?: () => HTMLElement | null;
 };
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type OrganizationProfileProps = RoutingOptions & {
   /**
    * Full URL or path to navigate to after the user leaves the currently Active Organization.
@@ -1994,9 +1978,7 @@ export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfilePr
   getContainer?: () => HTMLElement | null;
 };
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type CreateOrganizationProps = RoutingOptions & {
   /**
    * Full URL or path to navigate to after creating a new Organization.
@@ -2852,9 +2834,7 @@ export interface AuthenticateWithBaseParams {
   legalAccepted?: boolean;
 }
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export interface AuthenticateWithSolanaParams {
   /**
    * A function that overrides Clerk's default navigation behavior, allowing custom handling of navigation during sign-up and sign-in flows.

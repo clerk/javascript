@@ -15,9 +15,7 @@ import type {
   Web3Strategy,
 } from './strategies';
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type EmailCodeFactor = {
   /**
    * The strategy type.
@@ -37,9 +35,7 @@ export type EmailCodeFactor = {
   primary?: boolean;
 };
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type EmailLinkFactor = {
   /**
    * The strategy type.
@@ -59,9 +55,7 @@ export type EmailLinkFactor = {
   primary?: boolean;
 };
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type PhoneCodeFactor = {
   /**
    * The strategy type.
@@ -89,9 +83,7 @@ export type PhoneCodeFactor = {
   channel?: PhoneCodeChannel;
 };
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type Web3SignatureFactor = {
   /**
    * The strategy type.
@@ -126,9 +118,7 @@ export type OauthFactor = {
   strategy: OAuthStrategy;
 };
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type EnterpriseSSOFactor = {
   /**
    * The strategy type.
@@ -156,9 +146,7 @@ export type BackupCodeFactor = {
   strategy: BackupCodeStrategy;
 };
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type ResetPasswordPhoneCodeFactor = {
   /**
    * The strategy type.
@@ -178,9 +166,7 @@ export type ResetPasswordPhoneCodeFactor = {
   primary?: boolean;
 };
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type ResetPasswordEmailCodeFactor = {
   /**
    * The strategy type.
@@ -200,56 +186,38 @@ export type ResetPasswordEmailCodeFactor = {
   primary?: boolean;
 };
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type ResetPasswordCodeFactor = ResetPasswordEmailCodeFactor | ResetPasswordPhoneCodeFactor;
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type ResetPasswordPhoneCodeFactorConfig = Omit<ResetPasswordPhoneCodeFactor, 'safeIdentifier'>;
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type ResetPasswordEmailCodeFactorConfig = Omit<ResetPasswordEmailCodeFactor, 'safeIdentifier'>;
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type EmailCodeConfig = Omit<EmailCodeFactor, 'safeIdentifier'>;
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type EmailLinkConfig = Omit<EmailLinkFactor, 'safeIdentifier'> & {
   /**
    * The URL to redirect to after the email link is clicked.
    */
   redirectUrl: string;
 };
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type PhoneCodeConfig = Omit<PhoneCodeFactor, 'safeIdentifier'>;
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type Web3SignatureConfig = Web3SignatureFactor;
 
 /** @inline */
 export type PassKeyConfig = PasskeyFactor;
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type OAuthConfig = OauthFactor & {
   /**
    * The URL to redirect to after the OAuth flow is completed.
    */
   redirectUrl: string;
-  /**
-   *
-   */
+  /** @generateWithEmptyComment */
   actionCompleteRedirectUrl: string;
   /**
    * The OIDC prompt parameter to use for the OAuth flow.
@@ -261,17 +229,13 @@ export type OAuthConfig = OauthFactor & {
   oidcLoginHint?: string;
 };
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type EnterpriseSSOConfig = EnterpriseSSOFactor & {
   /**
    * The URL to redirect to after the OAuth flow is completed.
    */
   redirectUrl: string;
-  /**
-   *
-   */
+  /** @generateWithEmptyComment */
   actionCompleteRedirectUrl: string;
   /**
    * The OIDC prompt parameter to use for the OAuth flow.
@@ -311,9 +275,7 @@ export type EmailCodeSecondFactorConfig = {
   emailAddressId?: string;
 };
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type EmailCodeAttempt = {
   /**
    * The strategy type.
@@ -325,9 +287,7 @@ export type EmailCodeAttempt = {
   code: string;
 };
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type PhoneCodeAttempt = {
   /**
    * The strategy type.
@@ -339,9 +299,7 @@ export type PhoneCodeAttempt = {
   code: string;
 };
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type PasswordAttempt = {
   /**
    * The strategy type.
@@ -353,9 +311,7 @@ export type PasswordAttempt = {
   password: string;
 };
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type PasskeyAttempt = {
   /**
    * The strategy type.
@@ -367,9 +323,7 @@ export type PasskeyAttempt = {
   publicKeyCredential: PublicKeyCredentialWithAuthenticatorAssertionResponse;
 };
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type Web3Attempt = {
   /**
    * The strategy type.
@@ -381,9 +335,7 @@ export type Web3Attempt = {
   signature: string;
 };
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type TOTPAttempt = {
   /**
    * The strategy type.
@@ -395,9 +347,7 @@ export type TOTPAttempt = {
   code: string;
 };
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type BackupCodeAttempt = {
   /**
    * The strategy type.
@@ -409,9 +359,7 @@ export type BackupCodeAttempt = {
   code: string;
 };
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type ResetPasswordPhoneCodeAttempt = {
   /**
    * The strategy type.
@@ -427,9 +375,7 @@ export type ResetPasswordPhoneCodeAttempt = {
   password?: string;
 };
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type ResetPasswordEmailCodeAttempt = {
   /**
    * The strategy type.

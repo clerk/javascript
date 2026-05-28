@@ -185,18 +185,14 @@ export interface OrganizationResource extends ClerkResource, BillingPayerMethods
   __internal_toSnapshot: () => OrganizationJSONSnapshot;
 }
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type GetRolesParams = ClerkPaginationParams;
 
 export interface GetRolesResponse extends ClerkPaginatedResponse<RoleResource> {
   has_role_set_migration?: boolean;
 }
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type GetMembersParams = ClerkPaginationParams<{
   /**
    * The [Role](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) to filter the users by.
@@ -208,9 +204,7 @@ export type GetMembersParams = ClerkPaginationParams<{
   query?: string;
 }>;
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type GetDomainsParams = ClerkPaginationParams<{
   /**
    * The [enrollment mode](https://clerk.com/docs/guides/organizations/add-members/verified-domains#enable-verified-domains) will decide how new users join an organization.
@@ -218,9 +212,7 @@ export type GetDomainsParams = ClerkPaginationParams<{
   enrollmentMode?: OrganizationEnrollmentMode;
 }>;
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type GetInvitationsParams = ClerkPaginationParams<{
   /**
    * The status of the invitations to get.
@@ -228,9 +220,7 @@ export type GetInvitationsParams = ClerkPaginationParams<{
   status?: OrganizationInvitationStatus[];
 }>;
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type GetMembershipRequestParams = ClerkPaginationParams<{
   /**
    * The status of the membership requests to get.
@@ -238,9 +228,7 @@ export type GetMembershipRequestParams = ClerkPaginationParams<{
   status?: OrganizationInvitationStatus;
 }>;
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export interface AddMemberParams {
   /**
    * The unique identifier of the user to add as a member.
@@ -252,9 +240,7 @@ export interface AddMemberParams {
   role: OrganizationCustomRoleKey;
 }
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export interface InviteMemberParams {
   /**
    * The email address of the user to invite.
@@ -266,9 +252,7 @@ export interface InviteMemberParams {
   role: OrganizationCustomRoleKey;
 }
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export interface InviteMembersParams {
   /**
    * The email addresses of the users to invite.
@@ -280,9 +264,7 @@ export interface InviteMembersParams {
   role: OrganizationCustomRoleKey;
 }
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export interface UpdateMembershipParams {
   /**
    * The unique identifier of the user to update.
@@ -294,9 +276,7 @@ export interface UpdateMembershipParams {
   role: OrganizationCustomRoleKey;
 }
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export interface UpdateOrganizationParams {
   /**
    * The name of the Organization.
@@ -308,9 +288,7 @@ export interface UpdateOrganizationParams {
   slug?: string;
 }
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export interface SetOrganizationLogoParams {
   /**
    * The file to set as the Organization's logo. The file must be an image and its size cannot exceed 10MB.
@@ -318,9 +296,7 @@ export interface SetOrganizationLogoParams {
   file: Blob | File | string | null;
 }
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type GetMemberships = (
   params?: GetMembersParams,
 ) => Promise<ClerkPaginatedResponse<OrganizationMembershipResource>>;

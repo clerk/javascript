@@ -100,9 +100,7 @@ export type CheckAuthorizationParamsWithCustomPermissions = WithReverification<
   | { role?: never; permission?: never; feature?: never; plan?: never }
 >;
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type CheckAuthorization = CheckAuthorizationFn<CheckAuthorizationParams>;
 
 type CheckAuthorizationParams = WithReverification<
@@ -439,9 +437,7 @@ export type SessionStatus =
 /** @inline */
 export type SessionTouchIntent = 'focus' | 'select_session' | 'select_org';
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type SessionTouchParams = {
   /**
    * The intent of the touch operation.
@@ -497,9 +493,7 @@ export interface SessionTask {
   key: 'choose-organization' | 'reset-password' | 'setup-mfa';
 }
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type GetTokenOptions = {
   /**
    * The Organization associated with the generated session token. _Does not modify the session's currently [Active Organization](!active-organization)._
@@ -519,9 +513,7 @@ export type GetTokenOptions = {
  */
 export type GetToken = (options?: GetTokenOptions) => Promise<string | null>;
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type SessionVerifyCreateParams = {
   /**
    * The level of the verification to create.

@@ -120,6 +120,8 @@ const config = {
       '@inlineType',
       /** With `@inline`, still emit a standalone `.mdx` page (see `.typedoc/standalone-page-tag.mjs`). */
       '@standalonePage',
+      /** Self-documenting placeholder for declarations intentionally left without a description. */
+      '@generateWithEmptyComment',
     ],
     /**
      * Keep `@inline` / `@inlineType` / `@standalonePage` in the model so the custom router and theme can read them.

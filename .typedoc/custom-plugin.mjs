@@ -1,4 +1,5 @@
 // @ts-check - Enable TypeScript checks for safer MDX post-processing and link rewriting
+import { Converter } from 'typedoc';
 import { MarkdownPageEvent } from 'typedoc-plugin-markdown';
 
 /**
@@ -467,6 +468,17 @@ export function applyCatchAllMdReplacements(contents) {
  * @param {import('typedoc-plugin-markdown').MarkdownApplication} app
  */
 export function load(app) {
+  /**
+   * `@generateWithEmptyComment` exists only to make "intentionally undocumented" explicit at the source.
+   * Strip it from the model post-resolve so the markdown plugin sees a comment indistinguishable from `/** *​/` —
+   * otherwise the table renderer treats the modifier as content and drops the `-` placeholder in the description column.
+   */
+  app.converter.on(Converter.EVENT_RESOLVE_END, context => {
+    for (const reflection of Object.values(context.project.reflections)) {
+      reflection.comment?.modifierTags?.delete('@generateWithEmptyComment');
+    }
+  });
+
   app.renderer.on(MarkdownPageEvent.END, output => {
     const fileName = output.url.split('/').pop();
 

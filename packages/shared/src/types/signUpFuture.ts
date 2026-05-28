@@ -13,9 +13,7 @@ import type {
 } from './strategies';
 import type { VerificationResource } from './verification';
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export interface SignUpFutureAdditionalParams {
   /**
    * The user's first name. Only supported if [First and last name](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#user-model) is enabled in the instance settings.
@@ -39,9 +37,7 @@ export interface SignUpFutureAdditionalParams {
   locale?: string;
 }
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export interface SignUpFutureCreateParams extends SignUpFutureAdditionalParams {
   /**
    * The strategy to use for the sign-up. The following strategies are supported:
@@ -91,9 +87,7 @@ export interface SignUpFutureCreateParams extends SignUpFutureAdditionalParams {
   web3Wallet?: string;
 }
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export interface SignUpFutureUpdateParams extends SignUpFutureAdditionalParams {
   /**
    * The user's email address. Only supported if [Email address](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#email) is enabled in the instance settings. Keep in mind that the email address requires an extra verification process.
@@ -109,9 +103,7 @@ export interface SignUpFutureUpdateParams extends SignUpFutureAdditionalParams {
   username?: string;
 }
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export interface SignUpFutureEmailCodeVerifyParams {
   /**
    * The code that was sent to the user.
@@ -119,9 +111,7 @@ export interface SignUpFutureEmailCodeVerifyParams {
   code: string;
 }
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export interface SignUpFutureEmailLinkSendParams {
   /**
    * The full URL that the user will be redirected to when they visit the email link.
@@ -129,9 +119,7 @@ export interface SignUpFutureEmailLinkSendParams {
   verificationUrl: string;
 }
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export type SignUpFuturePasswordParams = SignUpFutureAdditionalParams & {
   /**
    * The user's password. [Password](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#password) must be enabled in the instance settings.
@@ -196,9 +184,7 @@ export type SignUpFuturePasswordParams = SignUpFutureAdditionalParams & {
       }
   );
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export interface SignUpFuturePhoneCodeSendParams {
   /**
    * The mechanism to use to send the code to the provided phone number. Defaults to `'sms'`.
@@ -206,9 +192,7 @@ export interface SignUpFuturePhoneCodeSendParams {
   channel?: PhoneCodeChannel;
 }
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export interface SignUpFuturePhoneCodeVerifyParams {
   /**
    * The code that was sent to the user.
@@ -216,9 +200,7 @@ export interface SignUpFuturePhoneCodeVerifyParams {
   code: string;
 }
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export interface SignUpFutureSSOParams extends SignUpFutureAdditionalParams {
   /**
    * The strategy to use for authentication.
@@ -261,9 +243,7 @@ export interface SignUpFutureSSOParams extends SignUpFutureAdditionalParams {
   emailAddress?: string;
 }
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export interface SignUpFutureTicketParams extends SignUpFutureAdditionalParams {
   /**
    * **Required** if `strategy` is set to `'ticket'`. The [ticket _or token_](https://clerk.com/docs/guides/development/custom-flows/authentication/application-invitations) generated from the Backend API.
@@ -271,9 +251,7 @@ export interface SignUpFutureTicketParams extends SignUpFutureAdditionalParams {
   ticket: string;
 }
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export interface SignUpFutureWeb3Params extends SignUpFutureAdditionalParams {
   /**
    * The verification strategy to validate the user's sign-up request.
@@ -281,9 +259,7 @@ export interface SignUpFutureWeb3Params extends SignUpFutureAdditionalParams {
   strategy: Web3Strategy;
 }
 
-/**
- *
- */
+/** @generateWithEmptyComment */
 export interface SignUpFutureFinalizeParams {
   /**
    * A custom navigation function to be called just before the session and/or Organization is set. When provided, it takes precedence over the `redirectUrl` parameter for navigation. The callback receives a `decorateUrl` function that should be used to wrap destination URLs. This enables Safari ITP cookie refresh when needed. The decorated URL may be an external URL (starting with `https://`) that requires `window.location.href` instead of client-side navigation. See the [section on using the `navigate()` parameter](https://clerk.com/docs/reference/objects/clerk#using-the-navigate-parameter) for more details.
