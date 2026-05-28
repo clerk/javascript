@@ -63,6 +63,7 @@
     "lint:attw": "attw --pack . --profile node16",
     "lint:publint": "publint",
     "test": "vitest run",
+    "test:integration": "vitest run --config vitest.integration.config.mts",
     "test:watch": "vitest watch"
   },
   "dependencies": {
