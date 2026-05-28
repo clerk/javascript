@@ -12,6 +12,7 @@ import { useConfigureSSO } from '../../../ConfigureSSOContext';
 import { Step } from '../../../elements/Step';
 import { useWizard, Wizard } from '../../../elements/Wizard';
 import { InnerStepCounter } from '../../../elements/Wizard/InnerStepCounter';
+import { AttributeMappingTable, type AttributeMappingTableConfig } from './shared/AttributeMappingTable';
 import {
   applySamlSubmitError,
   buildSamlConfigurationPayload,
@@ -56,6 +57,16 @@ export const SamlGoogleConfigureSteps = (): JSX.Element => {
           <InnerStepCounter />
         </Step.Header>
         <SamlGoogleServiceProviderStep />
+      </Wizard.Step>
+
+      <Wizard.Step id='attribute-mapping'>
+        <Step.Header
+          title={localizationKeys('configureSSO.configureStep.samlGoogle.mainHeaderTitle')}
+          description={localizationKeys('configureSSO.configureStep.samlGoogle.attributeMappingStep.headerSubtitle')}
+        >
+          <InnerStepCounter />
+        </Step.Header>
+        <SamlGoogleAttributeMappingStep />
       </Wizard.Step>
     </>
   );
@@ -436,6 +447,104 @@ const SamlGoogleServiceProviderStep = (): JSX.Element => {
               )}
             />
           </Col>
+        </Step.Section>
+      </Step.Body>
+
+      <Step.Footer>
+        <Step.Footer.Previous
+          onClick={() => goPrev()}
+          isDisabled={isFirstStep}
+        />
+        <Step.Footer.Continue
+          onClick={() => goNext()}
+          isDisabled={isLastStep}
+        />
+      </Step.Footer>
+    </>
+  );
+};
+
+const GOOGLE_ATTRIBUTE_MAPPING: AttributeMappingTableConfig = {
+  columns: {
+    first: localizationKeys(
+      'configureSSO.configureStep.samlGoogle.attributeMappingStep.attributeMappingTable.columns.googleAttribute',
+    ),
+    second: localizationKeys(
+      'configureSSO.configureStep.samlGoogle.attributeMappingStep.attributeMappingTable.columns.appAttribute',
+    ),
+  },
+  rows: [
+    {
+      id: 'email',
+      isRequired: true,
+      first: localizationKeys(
+        'configureSSO.configureStep.samlGoogle.attributeMappingStep.attributeMappingTable.rows.email.googleAttribute',
+      ),
+      second: localizationKeys(
+        'configureSSO.configureStep.samlGoogle.attributeMappingStep.attributeMappingTable.rows.email.appAttribute',
+      ),
+    },
+    {
+      id: 'firstName',
+      isRequired: false,
+      first: localizationKeys(
+        'configureSSO.configureStep.samlGoogle.attributeMappingStep.attributeMappingTable.rows.firstName.googleAttribute',
+      ),
+      second: localizationKeys(
+        'configureSSO.configureStep.samlGoogle.attributeMappingStep.attributeMappingTable.rows.firstName.appAttribute',
+      ),
+    },
+    {
+      id: 'lastName',
+      isRequired: false,
+      first: localizationKeys(
+        'configureSSO.configureStep.samlGoogle.attributeMappingStep.attributeMappingTable.rows.lastName.googleAttribute',
+      ),
+      second: localizationKeys(
+        'configureSSO.configureStep.samlGoogle.attributeMappingStep.attributeMappingTable.rows.lastName.appAttribute',
+      ),
+    },
+  ],
+};
+
+const SamlGoogleAttributeMappingStep = (): JSX.Element => {
+  const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
+
+  return (
+    <>
+      <Step.Body>
+        <Step.Section sx={theme => ({ gap: theme.space.$3 })}>
+          <Text
+            as='p'
+            colorScheme='secondary'
+            localizationKey={localizationKeys('configureSSO.configureStep.samlGoogle.attributeMappingStep.paragraph')}
+          />
+
+          <Col
+            elementDescriptor={descriptors.configureSSOInstructionsList}
+            as='ol'
+            sx={theme => ({
+              gap: theme.space.$1x5,
+              margin: 0,
+              paddingInlineStart: theme.space.$5,
+              listStyleType: 'decimal',
+            })}
+          >
+            <Text
+              elementDescriptor={descriptors.configureSSOInstructionsListItem}
+              as='li'
+              colorScheme='secondary'
+              localizationKey={localizationKeys('configureSSO.configureStep.samlGoogle.attributeMappingStep.step1')}
+            />
+            <Text
+              elementDescriptor={descriptors.configureSSOInstructionsListItem}
+              as='li'
+              colorScheme='secondary'
+              localizationKey={localizationKeys('configureSSO.configureStep.samlGoogle.attributeMappingStep.step2')}
+            />
+          </Col>
+
+          <AttributeMappingTable config={GOOGLE_ATTRIBUTE_MAPPING} />
         </Step.Section>
       </Step.Body>
 

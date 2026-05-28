@@ -596,9 +596,9 @@ export const enUS: LocalizationResource = {
               appAttribute: 'App attribute',
             },
             rows: {
-              email: { name: 'mail' },
-              firstName: { name: 'firstName' },
-              lastName: { name: 'lastName' },
+              email: { googleAttribute: 'Primary email', appAttribute: 'email' },
+              firstName: { googleAttribute: 'First name', appAttribute: 'firstName' },
+              lastName: { googleAttribute: 'Last name', appAttribute: 'lastName' },
             },
           },
         },

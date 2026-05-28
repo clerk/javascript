@@ -1645,12 +1645,11 @@ export type __internal_LocalizationResource = {
             columns: {
               googleAttribute: LocalizationValue;
               appAttribute: LocalizationValue;
-              expression: LocalizationValue;
             };
             rows: {
-              email: { name: LocalizationValue };
-              firstName: { name: LocalizationValue };
-              lastName: { name: LocalizationValue };
+              email: { googleAttribute: LocalizationValue; appAttribute: LocalizationValue };
+              firstName: { googleAttribute: LocalizationValue; appAttribute: LocalizationValue };
+              lastName: { googleAttribute: LocalizationValue; appAttribute: LocalizationValue };
             };
           };
         };
