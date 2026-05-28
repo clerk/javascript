@@ -6,7 +6,7 @@ const TODO_WORD = /\bTODO\b/i;
 /**
  * @param {import('typedoc').Comment | undefined} comment
  */
-export function commentContainsTodo(comment) {
+function commentContainsTodo(comment) {
   if (!comment) {
     return false;
   }
@@ -20,22 +20,6 @@ export function commentContainsTodo(comment) {
     }
   }
   return chunks.some(text => TODO_WORD.test(text));
-}
-
-/**
- * Truncate at the first word "TODO" (case-insensitive). Used when flattening display parts to a string.
- *
- * @param {string} text
- */
-export function stripTextAfterTodo(text) {
-  if (!text) {
-    return '';
-  }
-  const m = TODO_WORD.exec(text);
-  if (!m) {
-    return text;
-  }
-  return text.slice(0, m.index).trimEnd();
 }
 
 /**
