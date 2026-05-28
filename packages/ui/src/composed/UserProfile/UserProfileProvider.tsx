@@ -14,12 +14,17 @@ import { EnvironmentProvider } from '../../contexts/EnvironmentContext';
 import { ModuleManagerProvider } from '../../contexts/ModuleManagerContext';
 import { OptionsProvider } from '../../contexts/OptionsContext';
 import { UserProfileContext } from '../../contexts/components/UserProfile';
-import { ProfileCardPagePaddingProvider } from '../../elements/ProfileCard';
+import { AppearanceOverrides } from '../../elements/AppearanceOverrides';
+import type { Elements } from '../../internal/appearance';
 import { getModuleManager } from '../moduleManagerStore';
 import { createComposedRouter } from '../stubRouter';
 
 const fallbackModuleManager: ModuleManager = {
   import: () => Promise.resolve(undefined) as any,
+};
+
+const composedOverrides: Elements = {
+  profilePageContent: { padding: 0 },
 };
 
 type UserProfileProviderProps = React.PropsWithChildren<{
@@ -65,7 +70,7 @@ export const UserProfileProvider = (props: UserProfileProviderProps): ReactNode 
                 <EnvironmentProvider value={environment}>
                   <RouteContext.Provider value={router}>
                     <UserProfileContext.Provider value={userProfileCtxValue}>
-                      <ProfileCardPagePaddingProvider value={false}>{children}</ProfileCardPagePaddingProvider>
+                      <AppearanceOverrides elements={composedOverrides}>{children}</AppearanceOverrides>
                     </UserProfileContext.Provider>
                   </RouteContext.Provider>
                 </EnvironmentProvider>
