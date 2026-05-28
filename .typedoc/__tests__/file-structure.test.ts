@@ -2,10 +2,7 @@ import { readdir } from 'fs/promises';
 import { join, relative } from 'path';
 import { describe, expect, it } from 'vitest';
 
-// Same function as in custom-router.mjs
-function toKebabCase(str: string) {
-  return str.replace(/((?<=[a-z\d])[A-Z]|(?<=[A-Z\d])[A-Z](?=[a-z]))/g, '-$1').toLowerCase();
-}
+import { toUrlSlug } from '../slug.mjs';
 
 const OUTPUT_LOCATION = `${process.cwd()}/docs`;
 
@@ -82,7 +79,7 @@ describe('Typedoc output', () => {
   });
   it('should only contain kebab-cased files', async () => {
     const files = await scanDirectory('file');
-    const incorrectFiles = files.filter(file => file !== toKebabCase(file));
+    const incorrectFiles = files.filter(file => file !== toUrlSlug(file));
 
     expect(incorrectFiles).toHaveLength(0);
   });

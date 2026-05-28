@@ -2,8 +2,9 @@
 import { ReflectionKind } from 'typedoc';
 import { MemberRouter } from 'typedoc-plugin-markdown';
 
-import { isInlineModifierWithoutStandalonePage } from './standalone-page-tag.mjs';
 import { REFERENCE_OBJECT_PAGE_SYMBOLS } from './reference-objects.mjs';
+import { toUrlSlug } from './slug.mjs';
+import { isInlineModifierWithoutStandalonePage } from './standalone-page-tag.mjs';
 
 /** @type {Set<string>} */
 const REFERENCE_OBJECT_SYMBOL_NAMES = new Set(Object.values(REFERENCE_OBJECT_PAGE_SYMBOLS));
@@ -18,13 +19,6 @@ function flattenDirName(filePath) {
     return `${parts[0]}/${parts[parts.length - 1]}`;
   }
   return filePath;
-}
-
-/**
- * @param {string} str
- */
-function toKebabCase(str) {
-  return str.replace(/((?<=[a-z\d])[A-Z]|(?<=[A-Z\d])[A-Z](?=[a-z]))/g, '-$1').toLowerCase();
 }
 
 /**
@@ -79,7 +73,7 @@ class ClerkRouter extends MemberRouter {
   getIdealBaseName(reflection) {
     const original = super.getIdealBaseName(reflection);
     // Convert URLs (by default camelCase) to kebab-case
-    let filePath = toKebabCase(original);
+    let filePath = toUrlSlug(original);
 
     /**
      * By default, the paths are deeply nested, e.g.:
@@ -100,7 +94,7 @@ class ClerkRouter extends MemberRouter {
       (reflection.kind === ReflectionKind.Interface || reflection.kind === ReflectionKind.Class) &&
       REFERENCE_OBJECT_SYMBOL_NAMES.has(reflection.name)
     ) {
-      const kebab = toKebabCase(reflection.name);
+      const kebab = toUrlSlug(reflection.name);
       const m = filePath.match(/^([^/]+)\/([^/]+)$/);
       if (m) {
         const [, pkg] = m;

@@ -1,18 +1,12 @@
 // @ts-check
 import { ArrayType, i18n, IntersectionType, ReferenceType, ReflectionKind, ReflectionType, UnionType } from 'typedoc';
 import { MarkdownTheme, MarkdownThemeContext } from 'typedoc-plugin-markdown';
-import {
-  backTicks,
-  heading,
-  htmlTable,
-  table,
-} from '../node_modules/typedoc-plugin-markdown/dist/libs/markdown/index.js';
-import { removeLineBreaks } from '../node_modules/typedoc-plugin-markdown/dist/libs/utils/index.js';
-import { TypeDeclarationVisibility } from '../node_modules/typedoc-plugin-markdown/dist/options/maps.js';
 
 import { applyTodoStrippingToComment } from './comment-utils.mjs';
-import { isInlineModifierWithoutStandalonePage } from './standalone-page-tag.mjs';
+import { backTicks, heading, htmlTable, removeLineBreaks, table } from './markdown-helpers.mjs';
 import { REFERENCE_OBJECTS_LIST } from './reference-objects.mjs';
+import { isInlineModifierWithoutStandalonePage } from './standalone-page-tag.mjs';
+import { unwrapOptional } from './type-utils.mjs';
 
 export { REFERENCE_OBJECTS_LIST };
 
@@ -23,8 +17,7 @@ export { REFERENCE_OBJECTS_LIST };
  * @returns {import('typedoc').Type}
  */
 /**
- * Prefer structural checks over `instanceof` so we still match when multiple TypeDoc copies are loaded
- * (otherwise `instanceof IntersectionType` is false at render time).
+ * Prefer structural checks over `instanceof` so we still match when multiple TypeDoc copies are loaded (otherwise `instanceof IntersectionType` is false at render time).
  *
  * @param {import('typedoc').Type | undefined} t
  * @returns {t is import('typedoc').IntersectionType}
@@ -57,22 +50,6 @@ function isReflectionTypeDoc(/** @type {import('typedoc').Type | undefined} */ t
 function isUnionTypeDoc(/** @type {import('typedoc').Type | undefined} */ t) {
   const o = /** @type {{ type?: string; types?: import('typedoc').Type[] } | null} */ (t);
   return Boolean(o && typeof o === 'object' && o.type === 'union' && Array.isArray(o.types));
-}
-
-/**
- * @param {import('typedoc').Type | undefined} t
- */
-function unwrapOptionalType(t) {
-  if (
-    t &&
-    typeof t === 'object' &&
-    'type' in t &&
-    /** @type {{ type: string }} */ (t).type === 'optional' &&
-    'elementType' in t
-  ) {
-    return /** @type {{ elementType: import('typedoc').Type }} */ (t).elementType;
-  }
-  return t;
 }
 
 /**
@@ -164,8 +141,7 @@ function findOAuthStrategyDeclaration(project) {
 }
 
 /**
- * Stock `someType` uses `instanceof UnionType`; duplicate Typedoc copies in the tree break that check and unions
- * fall through to `backTicks(model.toString())`, bypassing {@link unionType} entirely (including OAuth collapse).
+ * Stock `someType` uses `instanceof UnionType`; duplicate Typedoc copies in the tree break that check and unions fall through to `backTicks(model.toString())`, bypassing {@link unionType} entirely (including OAuth collapse).
  *
  * @param {import('typedoc').Type | undefined} model
  * @returns {import('typedoc').UnionType | undefined}
@@ -185,12 +161,9 @@ function coerceUnionTypeIfNeeded(model) {
 }
 
 /**
- * TypeScript normalizes `OAuthStrategy` to a large union of `oauth_*` string literals plus
- * `` `oauth_custom_${string}` ``. That is not a {@link ReferenceType}, so the theme prints every literal.
- * Collapse **only** when the union clearly matches that expanded Clerk shape, then render a link to `OAuthStrategy`.
+ * TypeScript normalizes `OAuthStrategy` to a large union of `oauth_*` string literals plus `` `oauth_custom_${string}` ``. That is not a {@link ReferenceType}, so the theme prints every literal. Collapse **only** when the union clearly matches that expanded Clerk shape, then render a link to `OAuthStrategy`.
  *
- * Guards (all must pass): many `oauth_` literals, fingerprint literals present, optional `oauth_custom_` template arm,
- * `OAuthStrategy` exists and is not `@inline`. Skips ambiguous cases so other unions are unchanged.
+ * Guards (all must pass): many `oauth_` literals, fingerprint literals present, optional `oauth_custom_` template arm, `OAuthStrategy` exists and is not `@inline`. Skips ambiguous cases so other unions are unchanged.
  *
  * @param {import('typedoc').Type | undefined} t
  * @returns {import('typedoc').Type[]}
@@ -299,7 +272,7 @@ function tryCollapseExpandedOAuthStrategyUnion(model, ctx) {
  * @returns {import('typedoc').DeclarationReflection[]}
  */
 function collectPropertyReflectionsFromIntersectionArm(t, visitedReflectionIds, project) {
-  const unwrapped = unwrapOptionalType(t);
+  const unwrapped = unwrapOptional(t);
   if (!unwrapped) {
     return [];
   }
@@ -413,7 +386,7 @@ function mergeIntersectionPropertyReflections(intersection, project) {
  * @returns {import('typedoc').DeclarationReflection[]}
  */
 function collectPropertyReflectionsFromUnionObjectArms(t, visitedReflectionIds, project) {
-  const unwrapped = unwrapOptionalType(t);
+  const unwrapped = unwrapOptional(t);
   if (!unwrapped || /** @type {{ type?: string }} */ (unwrapped).type !== 'union') {
     return [];
   }
@@ -553,11 +526,14 @@ function clerkParametersTable(model) {
     return shouldFlatten ? [...acc, current, ...flattenParams(current)] : [...acc, current];
   };
   /**
+   * Joins flattened names with `?.` when the parent is optional (so `options?.foo` reflects the type at runtime) and `.` when required (`options.foo`). Same logic recurses for deeper inline shapes: separator between each level depends on **that** level's optionality.
+   *
    * @param {import('typedoc').ParameterReflection} current
    * @returns {import('typedoc').ParameterReflection[]}
    */
   const flattenParams = current => {
     const decl = getParameterObjectShapeDeclaration(current.type);
+    const separator = current.flags?.isOptional ? '?.' : '.';
     return (
       decl?.children?.reduce(
         /**
@@ -568,7 +544,7 @@ function clerkParametersTable(model) {
         (acc, child) => {
           const childObj = {
             ...child,
-            name: `${current.name}.${child.name}`,
+            name: `${current.name}${separator}${child.name}`,
           };
           return parseParams(
             /** @type {import('typedoc').ParameterReflection} */ (/** @type {unknown} */ (childObj)),
@@ -706,7 +682,8 @@ function clerkTypeDeclarationTable(model, options) {
     this.options.getValue('tableColumnSettings') ?? {}
   );
   const leftAlignHeadings = tableColumnsOptions.leftAlignHeaders;
-  const isCompact = this.options.getValue('typeDeclarationVisibility') === TypeDeclarationVisibility.Compact;
+  // typedoc-plugin-markdown's `TypeDeclarationVisibility.Compact` is just the string `'compact'`.
+  const isCompact = this.options.getValue('typeDeclarationVisibility') === 'compact';
   const hasSources = !tableColumnsOptions.hideSources && !this.options.getValue('disableSources');
   const headers = [];
   const baseDeclarations = this.helpers.getFlattenedDeclarations(model, {
@@ -1087,9 +1064,7 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
         );
       },
       /**
-       * Stock `comments.comment` prints every {@link Comment.modifierTags} as **`TitleCase`** before the summary
-       * (it does not consult `notRenderedTags`; that option only filters block tags). `@inline` / `@inlineType` are
-       * router/type hints; `@experimental` is SDK-only guidance — none of these must appear in property tables or prose.
+       * Stock `comments.comment` prints every {@link Comment.modifierTags} as **`TitleCase`** before the summary (it does not consult `notRenderedTags`; that option only filters block tags). `@inline` / `@inlineType` are router/type hints; `@experimental` is SDK-only guidance — none of these must appear in property tables or prose.
        *
        * @param {import('typedoc').Comment} model
        * @param {Parameters<typeof superPartials.comment>[1]} [options]
@@ -1213,7 +1188,9 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
               // Find the immediate next heading after '## Parameters'
               const nextHeadingIndex = splitOutput.findIndex((item, index) => {
                 // Skip the items before the parameters
-                if (index <= parametersIndex) return false;
+                if (index <= parametersIndex) {
+                  return false;
+                }
                 // Find the next heading
                 return item.startsWith('##') || item.startsWith('\n##');
               });
@@ -1857,9 +1834,7 @@ function isCallablePropertyValueType(t, helpers, seenReflectionIds) {
     try {
       const decl = /** @type {import('typedoc').DeclarationReflection} */ (ref);
       /**
-       * For `type Fn = (a: T) => U`, TypeDoc may attach call signatures to the TypeAlias reflection.
-       * `getDeclarationType` then returns `signatures[0].type` (here `U`), not the full function type, so we
-       * mis-classify properties typed as that alias (e.g. `navigate: CustomNavigation`) as non-callable.
+       * For `type Fn = (a: T) => U`, TypeDoc may attach call signatures to the TypeAlias reflection. `getDeclarationType` then returns `signatures[0].type` (here `U`), not the full function type, so we mis-classify properties typed as that alias (e.g. `navigate: CustomNavigation`) as non-callable.
        * Prefer `decl.type` (the full RHS) for type aliases.
        */
       const typeToCheck =

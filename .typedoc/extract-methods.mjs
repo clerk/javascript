@@ -1,41 +1,44 @@
 // @ts-check
 /**
- * For each entry in REFERENCE_OBJECTS_LIST, reads the TypeDoc output (e.g. `shared/clerk/clerk.mdx`), strips **Properties** from the main generated file and copies the section body (table only, no `## Properties` heading) into `properties.mdx`, and writes one .mdx per method under `methods/` (alongside the main page in that resource folder).
+ * TypeDoc plugin that runs during the markdown render pass. For each reference-object page listed in {@link REFERENCE_OBJECT_CONFIG} (e.g. `shared/clerk/clerk.mdx`), this listener:
  *
- * Run after `typedoc` (same cwd as repo root). Uses a second TypeDoc convert pass to read reflections.
+ * - copies the body of the page's `## Properties` section (table only, no heading) into a sibling `properties.mdx`,
+ * - mutates `output.contents` to drop the `## Properties` section from the main page,
+ * - writes one `methods/<name>.mdx` per callable child on the reflection (and on any `extraMethodInterfaces`), alongside the main page in that resource folder.
  *
- * Like `extract-returns-and-params.mjs`, parameter tables are not hand-built: they use the same `MarkdownThemeContext.partials` as TypeDoc markdown output (`parametersTable` / `propertiesTable`, which call `someType` and therefore pick up `custom-theme.mjs` union/`&lt;code&gt;` behavior). Router + theme are prepared via `prepare-markdown-renderer.mjs` (same idea as `typedoc-plugin-markdown` `render()`).
+ * Must load **after** `custom-plugin.mjs` so its `MarkdownPageEvent.END` listener — which applies link replacements to `output.contents` — runs first. The Properties body we copy out is then already in its final, replaced form.
+ *
+ * Like `extract-returns-and-params.mjs`, parameter tables are not hand-built: they use the same `MarkdownThemeContext.partials` as TypeDoc markdown output (`parametersTable`/`propertiesTable`, which call `someType` and therefore pick up `custom-theme.mjs` union `&lt;code&gt;` behavior). The theme context comes from `theme.getRenderContext(output)` on the live page event — no second TypeDoc convert pass.
  *
  * Inline object namespaces tagged **`@extractMethods`** on the parent property are omitted from the main Properties table (see `custom-theme.mjs`). For each direct member: callables become `methods/<parent>-<child>.mdx` via `buildMethodMdx`; non-callables become a heading + property table via `buildPropertyTableDocMdx`.
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+
 import {
-  Application,
   Comment,
   IntersectionType,
   OptionalType,
-  PageKind,
   ReferenceType,
   ReflectionKind,
   ReflectionType,
   UnionType,
 } from 'typedoc';
-import { MarkdownPageEvent, MarkdownTheme } from 'typedoc-plugin-markdown';
-import { removeLineBreaks } from '../node_modules/typedoc-plugin-markdown/dist/libs/utils/index.js';
+import { MarkdownPageEvent } from 'typedoc-plugin-markdown';
 
-import typedocConfig from '../typedoc.config.mjs';
-import { isCallableInterfaceProperty } from './custom-theme.mjs';
+import { applyTodoStrippingToComment } from './comment-utils.mjs';
 import {
   applyCatchAllMdReplacements,
   applyRelativeLinkReplacements,
   stripReferenceObjectPropertiesSection,
 } from './custom-plugin.mjs';
+import { isCallableInterfaceProperty } from './custom-theme.mjs';
+import { removeLineBreaks } from './markdown-helpers.mjs';
+import { REFERENCE_OBJECT_CONFIG } from './reference-objects.mjs';
+import { toFileSlug } from './slug.mjs';
 import { isInlineModifierWithoutStandalonePage } from './standalone-page-tag.mjs';
-import { prepareMarkdownRenderer } from './prepare-markdown-renderer.mjs';
-import { applyTodoStrippingToComment } from './comment-utils.mjs';
-import { REFERENCE_OBJECTS_LIST, REFERENCE_OBJECT_CONFIG } from './reference-objects.mjs';
+import { unwrapOptional } from './type-utils.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -68,144 +71,6 @@ function markdownHeadingInlineCode(level, text) {
  */
 function removeLineBreaksForTableCell(str) {
   return str?.replace(/\r?\n/g, ' ').replace(/ {2,}/g, ' ');
-}
-
-/**
- * Append data rows to a markdown table string (header + separator + rows).
- *
- * @param {string} tableMd
- * @param {string[]} rowLines Lines like `| a | b | c |`
- */
-function appendMarkdownTableRows(tableMd, rowLines) {
-  if (!rowLines.length) {
-    return tableMd;
-  }
-  return `${tableMd.trimEnd()}\n${rowLines.join('\n')}\n`;
-}
-
-/**
- * Post-process the theme’s parameters markdown table. TypeDoc flattens object params as `parent.child` and may interleave those rows with other parameters. Here we (1) move each `parent.*` block directly under `parent`, and (2) rewrite dotted paths in the name column to optional-chaining (`parent?.child`, `a?.b?.c`). Top-level names are unchanged (`foo?`, `exa`).
- *
- * @param {string} tableMd
- */
-function formatMethodParametersTable(tableMd) {
-  const leadingNewlines = (tableMd.match(/^\n+/) ?? [''])[0];
-  const nonEmpty = tableMd.split('\n').filter(l => l.trim().length);
-  if (nonEmpty.length < 3) {
-    return tableMd;
-  }
-  const header = nonEmpty[0];
-  const sep = nonEmpty[1];
-  const dataLines = nonEmpty.slice(2).filter(l => l.trim().startsWith('|'));
-  if (dataLines.length <= 1) {
-    return tableMd;
-  }
-
-  /** @param {string} line */
-  const firstName = line => {
-    const m = line.match(/^\|\s*(?:<a\s+id="[^"]*"\s*><\/a>\s*)?`([^`]+)`/);
-    return m ? m[1] : '';
-  };
-  /** `parent.child` / `parent?.child` → grouping key `parent` (matches top-level `parent` or `parent?` via fallback below). */
-  /** @param {string} raw */
-  const parentOfNested = raw => {
-    const j = raw.indexOf('?.');
-    if (j !== -1) {
-      return raw.slice(0, j);
-    }
-    const i = raw.indexOf('.');
-    return i === -1 ? '' : raw.slice(0, i);
-  };
-  /** `a.b.c` → `a?.b?.c`; leave `foo?` and names without `.` alone. */
-  /** @param {string} raw */
-  const nameForDisplay = raw => (!raw.includes('.') || raw.includes('?.') ? raw : raw.split('.').join('?.'));
-  /** @param {string} line @param {string} name */
-  const replaceFirstName = (line, name) =>
-    line.replace(/^(\|\s*(?:<a\s+id="[^"]*"\s*><\/a>\s*)?)`[^`]+`/, `$1\`${name}\``);
-
-  const topLevelOrder = [];
-  const seenTop = new Set();
-  /** @type {Map<string, string[]>} */
-  const childrenOf = new Map();
-
-  for (const line of dataLines) {
-    const raw = firstName(line);
-    if (!raw) {
-      continue;
-    }
-    if (!raw.includes('.')) {
-      if (!seenTop.has(raw)) {
-        seenTop.add(raw);
-        topLevelOrder.push(raw);
-      }
-      continue;
-    }
-    const p = parentOfNested(raw);
-    if (!p) {
-      continue;
-    }
-    let bucket = childrenOf.get(p);
-    if (!bucket) {
-      bucket = [];
-      childrenOf.set(p, bucket);
-    }
-    bucket.push(line);
-  }
-
-  for (const lines of childrenOf.values()) {
-    lines.sort((a, b) => firstName(a).localeCompare(firstName(b)));
-  }
-
-  /** @param {string} top */
-  const rowsForParent = top =>
-    childrenOf.get(top) ?? (top.endsWith('?') ? childrenOf.get(top.slice(0, -1)) : undefined);
-
-  const body = [];
-  const emitted = new Set();
-
-  for (const top of topLevelOrder) {
-    const topLine = dataLines.find(l => firstName(l) === top);
-    if (topLine) {
-      const r = firstName(topLine);
-      body.push(replaceFirstName(topLine, nameForDisplay(r)));
-      emitted.add(topLine);
-    }
-    const kids = rowsForParent(top);
-    if (kids) {
-      for (const line of kids) {
-        body.push(replaceFirstName(line, nameForDisplay(firstName(line))));
-        emitted.add(line);
-      }
-    }
-  }
-
-  for (const line of dataLines) {
-    if (!emitted.has(line)) {
-      const r = firstName(line);
-      body.push(r ? replaceFirstName(line, nameForDisplay(r)) : line);
-    }
-  }
-
-  return `${leadingNewlines}${[header, sep, ...body].join('\n')}\n`;
-}
-
-/**
- * @param {import('typedoc').Application} app
- * @param {import('typedoc').ProjectReflection} project
- * @param {string} pageUrl e.g. `shared/clerk/index.mdx`
- * @param {import('typedoc').DeclarationReflection} interfaceDecl
- */
-function createThemeContextForReferencePage(app, project, pageUrl, interfaceDecl) {
-  const page = new MarkdownPageEvent(interfaceDecl);
-  page.url = pageUrl;
-  page.filename = path.join(app.options.getValue('out') ?? '', pageUrl);
-  page.pageKind = PageKind.Reflection;
-  page.project = project;
-  const theme = /** @type {InstanceType<typeof MarkdownTheme> | undefined} */ (app.renderer.theme);
-  if (!theme || typeof theme.getRenderContext !== 'function') {
-    throw new Error('[extract-methods] Renderer theme is not ready; call prepareMarkdownRenderer(app) after convert');
-  }
-  return /** @type {import('typedoc-plugin-markdown').MarkdownThemeContext} */ (theme.getRenderContext(page));
 }
 
 /**
@@ -403,26 +268,13 @@ function getPrimaryCallSignature(decl) {
 }
 
 /**
- * @param {import('typedoc').Type | undefined} t
- */
-function unwrapOptionalType(t) {
-  if (!t || typeof t !== 'object') {
-    return t;
-  }
-  if (/** @type {{ type?: string }} */ (t).type === 'optional' && 'elementType' in t) {
-    return /** @type {{ elementType: import('typedoc').Type }} */ (t).elementType;
-  }
-  return t;
-}
-
-/**
  * For `prop: OuterAlias` where `type OuterAlias = SomeFn<TArg>`, maps generic parameter names on `SomeFn` to the instantiated type arguments (e.g. `Params` → `CheckAuthorizationParams`).
  *
  * @param {import('typedoc').DeclarationReflection} propertyDecl
  * @returns {Map<string, import('typedoc').Type> | undefined}
  */
 function getGenericInstantiationMapFromCallableProperty(propertyDecl) {
-  const t = unwrapOptionalType(propertyDecl.type);
+  const t = unwrapOptional(propertyDecl.type);
   if (!(t instanceof ReferenceType) || !t.reflection) {
     return undefined;
   }
@@ -430,7 +282,7 @@ function getGenericInstantiationMapFromCallableProperty(propertyDecl) {
   if (!alias.kindOf(ReflectionKind.TypeAlias) || !alias.type) {
     return undefined;
   }
-  const inner = unwrapOptionalType(alias.type);
+  const inner = unwrapOptional(alias.type);
   if (!(inner instanceof ReferenceType) || !inner.typeArguments?.length || !inner.reflection) {
     return undefined;
   }
@@ -524,30 +376,13 @@ function shouldExtractCallableMember(decl, ctx) {
 }
 
 /**
- * @param {import('typedoc').SomeType | undefined} t
- * @returns {import('typedoc').SomeType | undefined}
- */
-function unwrapOptionalLayersSomeType(t) {
-  let cur = /** @type {import('typedoc').SomeType | undefined} */ (t);
-  while (
-    cur &&
-    typeof cur === 'object' &&
-    /** @type {{ type?: string }} */ (cur).type === 'optional' &&
-    'elementType' in cur
-  ) {
-    cur = /** @type {import('typedoc').SomeType} */ (/** @type {import('typedoc').OptionalType} */ (cur).elementType);
-  }
-  return cur;
-}
-
-/**
  * Object-literal (or single object arm of `T | null`) property rows for a properties table.
  *
  * @param {import('typedoc').SomeType | undefined} valueType
  * @returns {import('typedoc').DeclarationReflection[] | undefined}
  */
 function resolveObjectShapeMembersForPropertyTable(valueType) {
-  let t = unwrapOptionalLayersSomeType(valueType);
+  let t = unwrapOptional(valueType, { deep: true });
   if (t instanceof UnionType) {
     const objectArms = t.types.filter(u => u instanceof ReflectionType && (u.declaration?.children?.length ?? 0) > 0);
     if (objectArms.length !== 1) {
@@ -647,46 +482,20 @@ function extractPropertiesSectionBody(markdown) {
 }
 
 /**
- * @param {string} pageUrl e.g. `shared/clerk/clerk.mdx`
+ * Split the `## Properties` section out of page contents, returning the body (no heading) and the page contents with the Properties section removed.
+ *
+ * Operates on the in-memory `output.contents` of a `MarkdownPageEvent`; the caller writes `properties.mdx` and assigns the stripped string back to `output.contents`. The page's own END pipeline (link replacements) has already run by the time we get called, so the Properties body is in its final, replaced form — no re-application needed.
+ *
+ * @param {string} contents
+ * @returns {{ propertiesBody: string | undefined, stripped: string }}
  */
-function extractPropertiesAndTrimSourcePage(pageUrl) {
-  const sourcePath = path.join(__dirname, 'temp-docs', pageUrl);
-  if (!fs.existsSync(sourcePath)) {
-    console.warn(`[extract-methods] Expected TypeDoc output missing: ${sourcePath}`);
-    return;
+function splitPropertiesFromContents(contents) {
+  if (!contents) {
+    return { propertiesBody: undefined, stripped: contents };
   }
-  const raw = fs.readFileSync(sourcePath, 'utf-8');
-  const body = extractPropertiesSectionBody(raw);
-  const pageDir = path.dirname(pageUrl);
-  const objectDir = path.join(__dirname, 'temp-docs', pageDir);
-  fs.mkdirSync(objectDir, { recursive: true });
-
-  if (body) {
-    const propertiesDoc = `${body.trimEnd()}\n`;
-    const propertiesPath = path.join(objectDir, 'properties.mdx');
-    fs.writeFileSync(
-      propertiesPath,
-      applyCatchAllMdReplacements(applyRelativeLinkReplacements(propertiesDoc)),
-      'utf-8',
-    );
-    console.log(`[extract-methods] Wrote ${path.relative(path.join(__dirname, '..'), propertiesPath)}`);
-  }
-
-  const stripped = stripReferenceObjectPropertiesSection(raw);
-  if (stripped !== raw) {
-    fs.writeFileSync(sourcePath, stripped, 'utf-8');
-    console.log(`[extract-methods] Stripped Properties from ${path.relative(path.join(__dirname, '..'), sourcePath)}`);
-  }
-}
-
-/**
- * @param {string} name
- */
-function toKebabCase(name) {
-  return name
-    .replace(/([a-z\d])([A-Z])/g, '$1-$2')
-    .replace(/[\s_]+/g, '-')
-    .toLowerCase();
+  const propertiesBody = extractPropertiesSectionBody(contents);
+  const stripped = stripReferenceObjectPropertiesSection(contents);
+  return { propertiesBody, stripped };
 }
 
 /**
@@ -720,7 +529,9 @@ function formatTypeScriptSignature(sig, memberName, instantiationMap) {
     }) ?? [];
   const retT = substituteGenericParamRefsInType(sig.type, instantiationMap) ?? sig.type;
   const ret = retT ? typeStringForTypeScriptFence(retT) : 'void';
-  return `function ${memberName}${typeParamStr}(${params.join(', ')}): ${ret}`;
+  // Qualified names (`emailCode.sendCode`) aren't valid in `function foo.bar()` syntax; use the bare last segment — the parent is already in the heading above.
+  const displayName = memberName.includes('.') ? memberName.split('.').pop() : memberName;
+  return `function ${displayName}${typeParamStr}(${params.join(', ')}): ${ret}`;
 }
 
 /**
@@ -848,10 +659,7 @@ function appendSignatureOnlyReturns(declComment, sigComment) {
  * @param {import('typedoc').DeclarationReflection} prop
  */
 function propertyReflectionTypeIsNever(prop) {
-  let ty = prop.type;
-  while (ty?.type === 'optional') {
-    ty = /** @type {import('typedoc').OptionalType} */ (ty).elementType;
-  }
+  const ty = unwrapOptional(prop.type, { deep: true });
   return ty?.type === 'intrinsic' && ty.name === 'never';
 }
 
@@ -876,27 +684,82 @@ function pickBetterUnionPropertyCandidate(existing, candidate) {
 }
 
 /**
- * Object / type-literal declaration for a parameter type (reference, inlined reflection, intersection).
- * TypeDoc applies `@param parent.prop` descriptions onto property reflections under this declaration.
+ * Filter each arm to `Property` reflections and dedupe by name, returning a single sorted list
+ * (or `undefined` if every arm was empty). Used for intersection / union / generic-instantiation
+ * arm merges in {@link resolveDeclarationWithObjectMembers}.
+ *
+ * Default behavior is "later arm wins" overwrite (right for intersections + generic instantiations
+ * where every arm's properties are part of the final shape). For unions, set
+ * `{ skipNever: true, pickBetter: true }`: union arms often use `prop?: never` as a discriminator,
+ * so we drop those and keep the documentable branch when names collide.
+ *
+ * @param {Array<import('typedoc').DeclarationReflection[] | undefined>} arms
+ * @param {{ skipNever?: boolean, pickBetter?: boolean }} [options]
+ * @returns {import('typedoc').DeclarationReflection[] | undefined}
+ */
+function mergePropertyArms(arms, options) {
+  /** @type {Map<string, import('typedoc').DeclarationReflection>} */
+  const byName = new Map();
+  for (const arm of arms) {
+    if (!arm?.length) {
+      continue;
+    }
+    for (const c of arm) {
+      if (!c.kindOf(ReflectionKind.Property)) {
+        continue;
+      }
+      if (options?.skipNever && propertyReflectionTypeIsNever(c)) {
+        continue;
+      }
+      const existing = byName.get(c.name);
+      if (!existing) {
+        byName.set(c.name, c);
+        continue;
+      }
+      byName.set(c.name, options?.pickBetter ? pickBetterUnionPropertyCandidate(existing, c) : c);
+    }
+  }
+  if (byName.size === 0) {
+    return undefined;
+  }
+  return [...byName.values()].sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/**
+ * Resolve a parameter / property type to the list of `Property` reflections that should populate
+ * a nested rows table. TypeDoc applies `@param parent.prop` descriptions onto these reflections.
+ *
+ * Cases:
+ * - `reflection` (inline `{...}`): the declaration's own children.
+ * - `reference` to a named interface/alias: the target's children, or — for generic instantiations
+ *   like `ClerkPaginationParams<{ status?: … }>` — the base properties merged with each typeArg's.
+ * - `intersection`: every `&` arm's properties combined (later arm wins on name collision).
+ * - `union`: every `|` arm's properties combined, dropping `prop?: never` discriminators and
+ *   preferring the branch with more documentation on collisions.
+ * - `optional`: unwrap and recurse.
+ *
+ * Returns `undefined` when nothing resolves (so callers can `if (!children?.length)` cheaply).
+ * The children list may include non-`Property` kinds for direct `reflection` / `reference` cases —
+ * callers that need only `Property` should filter; merge cases (typeArgs / intersection / union)
+ * pre-filter via {@link mergePropertyArms}.
  *
  * @param {import('typedoc').SomeType | undefined} t
  * @param {import('typedoc').ProjectReflection | undefined} [project] For resolving references when `ref.reflection` is missing (intersections like `Foo & WithOptionalOrgType<…>`).
- * @returns {import('typedoc').DeclarationReflection | undefined}
+ * @returns {import('typedoc').DeclarationReflection[] | undefined}
  */
 function resolveDeclarationWithObjectMembers(t, project) {
   if (!t) {
     return undefined;
   }
+  if (t.type === 'optional') {
+    return resolveDeclarationWithObjectMembers(/** @type {import('typedoc').OptionalType} */ (t).elementType, project);
+  }
   if (t.type === 'reflection') {
-    const d = t.declaration;
-    if (d.children?.length) {
-      return d;
-    }
+    const children = t.declaration?.children;
+    return children?.length ? children : undefined;
   }
   if (t.type === 'reference') {
     const ref = /** @type {import('typedoc').ReferenceType} */ (t);
-    const typeArgs = ref.typeArguments ?? [];
-
     let decl =
       ref.reflection && 'kind' in ref.reflection
         ? /** @type {import('typedoc').DeclarationReflection} */ (ref.reflection)
@@ -904,147 +767,53 @@ function resolveDeclarationWithObjectMembers(t, project) {
     if (!decl && project && ref.name) {
       decl = lookupInterfaceOrTypeAliasByName(project, ref.name);
     }
-    if (decl) {
-      /**
-       * Generic aliases like `ClerkPaginationParams<{ status?: … }>` are a reference with `typeArguments`.
-       * TypeDoc often puts pagination fields only on the target alias `children` and omits `decl.type`, so returning `decl` early drops the type argument object. Merge base + each type argument's properties.
-       */
-      if (typeArgs.length > 0) {
-        /** @type {Map<string, import('typedoc').DeclarationReflection>} */
-        const byName = new Map();
-        if (decl.type) {
-          const fromType = resolveDeclarationWithObjectMembers(decl.type, project);
-          if (fromType?.children?.length) {
-            for (const c of fromType.children) {
-              if (c.kindOf(ReflectionKind.Property)) {
-                byName.set(c.name, c);
-              }
-            }
-          }
-        }
-        if (byName.size === 0 && decl.children?.length) {
-          for (const c of decl.children) {
-            if (c.kindOf(ReflectionKind.Property)) {
-              byName.set(c.name, c);
-            }
-          }
-        }
-        for (const ta of typeArgs) {
-          const fromArg = resolveDeclarationWithObjectMembers(ta, project);
-          if (fromArg?.children?.length) {
-            for (const c of fromArg.children) {
-              if (c.kindOf(ReflectionKind.Property)) {
-                byName.set(c.name, c);
-              }
-            }
-          }
-        }
-        if (byName.size > 0) {
-          return /** @type {import('typedoc').DeclarationReflection} */ (
-            /** @type {unknown} */ ({
-              children: [...byName.values()].sort((a, b) => a.name.localeCompare(b.name)),
-              kind: ReflectionKind.TypeLiteral,
-              name: '__referenceMerged',
-            })
-          );
-        }
-      }
-
-      if (decl.children?.length) {
-        return decl;
-      }
-      if (decl.type) {
-        return resolveDeclarationWithObjectMembers(decl.type, project);
-      }
+    if (!decl) {
+      return undefined;
     }
+    /**
+     * Generic instantiation: TypeDoc often attaches pagination fields only to the target alias's
+     * own `children` and omits `decl.type`, so returning the base early drops the type argument
+     * object. Merge the base (`decl.type` if present, else `decl.children` as a fallback) with
+     * each type argument's properties.
+     */
+    const typeArgs = ref.typeArguments ?? [];
+    if (typeArgs.length > 0) {
+      const baseFromType = decl.type ? resolveDeclarationWithObjectMembers(decl.type, project) : undefined;
+      const base = baseFromType ?? (decl.children?.length ? decl.children : undefined);
+      const argArms = typeArgs.map(ta => resolveDeclarationWithObjectMembers(ta, project));
+      return mergePropertyArms([base, ...argArms]);
+    }
+    if (decl.children?.length) {
+      return decl.children;
+    }
+    if (decl.type) {
+      return resolveDeclarationWithObjectMembers(decl.type, project);
+    }
+    return undefined;
   }
   if (t.type === 'intersection') {
     const inter = /** @type {import('typedoc').IntersectionType} */ (t);
-    /** @type {Map<string, import('typedoc').DeclarationReflection>} */
-    const byName = new Map();
-    for (const inner of inter.types) {
-      const res = resolveDeclarationWithObjectMembers(inner, project);
-      if (res?.children?.length) {
-        for (const c of res.children) {
-          if (c.kindOf(ReflectionKind.Property)) {
-            byName.set(c.name, c);
-          }
-        }
-      }
-    }
-    if (byName.size === 0) {
-      return undefined;
-    }
-    // Synthetic holder so nominal param sections list every `&` arm (e.g. `RedirectOptions`).
-    return /** @type {import('typedoc').DeclarationReflection} */ (
-      /** @type {unknown} */ ({
-        children: [...byName.values()].sort((a, b) => a.name.localeCompare(b.name)),
-        kind: ReflectionKind.TypeLiteral,
-        name: '__intersectionMerged',
-      })
-    );
+    return mergePropertyArms(inter.types.map(inner => resolveDeclarationWithObjectMembers(inner, project)));
   }
   if (t.type === 'union') {
     const u = /** @type {import('typedoc').UnionType} */ (t);
-    /** @type {Map<string, import('typedoc').DeclarationReflection>} */
-    const byName = new Map();
-    for (const inner of u.types) {
-      const res = resolveDeclarationWithObjectMembers(inner, project);
-      if (!res?.children?.length) {
-        continue;
-      }
-      for (const c of res.children) {
-        if (!c.kindOf(ReflectionKind.Property)) {
-          continue;
-        }
-        if (propertyReflectionTypeIsNever(c)) {
-          continue;
-        }
-        const existing = byName.get(c.name);
-        if (!existing) {
-          byName.set(c.name, c);
-        } else {
-          byName.set(c.name, pickBetterUnionPropertyCandidate(existing, c));
-        }
-      }
-    }
-    if (byName.size === 0) {
-      return undefined;
-    }
-    return /** @type {import('typedoc').DeclarationReflection} */ (
-      /** @type {unknown} */ ({
-        children: [...byName.values()].sort((a, b) => a.name.localeCompare(b.name)),
-        kind: ReflectionKind.TypeLiteral,
-        name: '__unionMerged',
-      })
+    return mergePropertyArms(
+      u.types.map(inner => resolveDeclarationWithObjectMembers(inner, project)),
+      { skipNever: true, pickBetter: true },
     );
-  }
-  if (t.type === 'optional') {
-    return resolveDeclarationWithObjectMembers(/** @type {import('typedoc').OptionalType} */ (t).elementType, project);
   }
   return undefined;
 }
 
 /**
- * @param {string} baseName
- * @param {string[]} pathSegments
- */
-function formatNestedParamNameColumn(baseName, pathSegments) {
-  const pathChain = pathSegments.join('?.');
-  return `\`${baseName}?.${pathChain}\``;
-}
-
-/**
- * This function unwraps a TypeDoc parameter type if it is an optional type. If the provided type is of type "optional", it returns the underlying element type (the real type being wrapped). If it is not optional or is undefined, it returns the type as-is.
+ * Build the name cell for a nominal-nested row. Uses `?.` when the parent param is optional (so `options?.foo` mirrors how it would be accessed at runtime) and `.` when required — same rule as `clerkParametersTable.flattenParams` in `custom-theme.mjs`.
  *
- * @param {import('typedoc').SomeType | undefined} t
- * @returns {import('typedoc').SomeType | undefined}
+ * @param {import('typedoc').ParameterReflection} parentParam
+ * @param {string} childName
  */
-function unwrapOptionalParamType(t) {
-  if (t?.type === 'optional') {
-    return /** @type {import('typedoc').OptionalType} */ (t).elementType;
-  }
-  return t;
+function formatNestedParamNameColumn(parentParam, childName) {
+  const sep = parentParam.flags?.isOptional ? '?.' : '.';
+  return `\`${parentParam.name}${sep}${childName}\``;
 }
 
 /**
@@ -1055,7 +824,7 @@ function unwrapOptionalParamType(t) {
  * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
  */
 function parameterTypeLinksToStandaloneMdxPage(t, ctx) {
-  const bare = unwrapOptionalParamType(t);
+  const bare = unwrapOptional(t);
   if (!bare) {
     return false;
   }
@@ -1091,18 +860,18 @@ function nestedParameterRowsFromDocumentedProperties(param, ctx) {
   }
 
   const project = /** @type {import('typedoc').ProjectReflection | undefined} */ (param.project ?? ctx.page?.project);
-  const holder = resolveDeclarationWithObjectMembers(param.type, project);
-  if (!holder?.children?.length) {
+  const children = resolveDeclarationWithObjectMembers(param.type, project);
+  if (!children?.length) {
     return [];
   }
-  const props = holder.children.filter(c => c.kindOf(ReflectionKind.Property));
+  const props = children.filter(c => c.kindOf(ReflectionKind.Property));
   props.sort((a, b) => a.name.localeCompare(b.name));
   /** @type {string[]} */
   const rows = [];
   for (const child of props) {
     const summary = child.comment?.summary;
     const typeCell = child.type ? removeLineBreaksForTableCell(ctx.partials.someType(child.type)) : '`unknown`';
-    const nestedNameCol = formatNestedParamNameColumn(param.name, [child.name]);
+    const nestedNameCol = formatNestedParamNameColumn(param, child.name);
     const nestedDesc = summary?.length ? displayPartsToString(summary).trim() || '—' : '—';
     rows.push(`| ${nestedNameCol} | ${typeCell} | ${nestedDesc} |`);
   }
@@ -1139,11 +908,13 @@ function lookupInterfaceOrTypeAliasByName(project, name) {
 }
 
 /**
- * Unwrap optional wrappers. When the parameter is a single named interface or type alias for an object shape, returns that name and the declaration holding object properties.
+ * Unwrap optional wrappers. When the parameter is a single named interface or type alias for an
+ * object shape, returns the section title (the type's name), the resolved property list, and the
+ * source `typeDecl` for `@experimental` / `@deprecated` checks.
  *
  * @param {import('typedoc').SomeType | undefined} t
  * @param {import('typedoc').ProjectReflection} project
- * @returns {{ sectionTitle: string, holder: import('typedoc').DeclarationReflection, typeDecl: import('typedoc').DeclarationReflection } | undefined}
+ * @returns {{ sectionTitle: string, children: import('typedoc').DeclarationReflection[], typeDecl: import('typedoc').DeclarationReflection } | undefined}
  */
 function resolveNominalObjectTypeForSingleParam(t, project) {
   if (!t) {
@@ -1155,35 +926,32 @@ function resolveNominalObjectTypeForSingleParam(t, project) {
       project,
     );
   }
-  if (t.type === 'reference') {
-    const ref = /** @type {import('typedoc').ReferenceType} */ (t);
-    let typeDecl =
-      ref.reflection && 'kind' in ref.reflection
-        ? /** @type {import('typedoc').DeclarationReflection} */ (ref.reflection)
-        : lookupInterfaceOrTypeAliasByName(project, ref.name);
-    if (!typeDecl) {
+  if (t.type !== 'reference') {
+    return undefined;
+  }
+  const ref = /** @type {import('typedoc').ReferenceType} */ (t);
+  const typeDecl =
+    ref.reflection && 'kind' in ref.reflection
+      ? /** @type {import('typedoc').DeclarationReflection} */ (ref.reflection)
+      : lookupInterfaceOrTypeAliasByName(project, ref.name);
+  if (!typeDecl) {
+    return undefined;
+  }
+  if (typeDecl.kindOf(ReflectionKind.Interface)) {
+    if (!typeDecl.children?.length) {
       return undefined;
     }
-    if (typeDecl.kindOf(ReflectionKind.Interface)) {
-      if (!typeDecl.children?.length) {
-        return undefined;
-      }
-      return { sectionTitle: typeDecl.name, holder: typeDecl, typeDecl };
+    return { sectionTitle: typeDecl.name, children: typeDecl.children, typeDecl };
+  }
+  if (typeDecl.kindOf(ReflectionKind.TypeAlias)) {
+    // Prefer resolving `typeAlias.type` so intersections and generic instantiations (e.g. `ClerkPaginationParams<{ status?: … }>`) merge every `&` arm into one property list.
+    // Some aliases only attach members on `typeDecl.children` with no object shape on `.type`; keep that fallback (e.g. `SignOutOptions`, `JoinWaitlistParams`).
+    const fromResolvedType = typeDecl.type ? resolveDeclarationWithObjectMembers(typeDecl.type, project) : undefined;
+    const children = fromResolvedType?.length ? fromResolvedType : typeDecl.children;
+    if (!children?.length) {
+      return undefined;
     }
-    if (typeDecl.kindOf(ReflectionKind.TypeAlias)) {
-      // Prefer resolving `typeAlias.type` so intersections and generic instantiations (e.g. `ClerkPaginationParams<{ status?: … }>`) merge every `&` arm into one property list.
-      // Some aliases only attach members on `typeDecl.children` with no object shape on `.type`; keep that fallback (e.g. `SignOutOptions`, `JoinWaitlistParams`).
-      const fromResolvedType = typeDecl.type ? resolveDeclarationWithObjectMembers(typeDecl.type, project) : undefined;
-      const holder = fromResolvedType?.children?.length
-        ? fromResolvedType
-        : typeDecl.children?.length
-          ? typeDecl
-          : undefined;
-      if (!holder?.children?.length) {
-        return undefined;
-      }
-      return { sectionTitle: typeDecl.name, holder, typeDecl };
-    }
+    return { sectionTitle: typeDecl.name, children, typeDecl };
   }
   return undefined;
 }
@@ -1224,7 +992,7 @@ function trySingleNominalParameterTypeSection(sig, ctx) {
   if (!nominal) {
     return undefined;
   }
-  const props = (nominal.holder.children ?? []).filter(c => c.kindOf(ReflectionKind.Property));
+  const props = nominal.children.filter(c => c.kindOf(ReflectionKind.Property));
   if (props.length === 0) {
     return undefined;
   }
@@ -1272,10 +1040,8 @@ function parametersMarkdownTable(sig, ctx, instantiationMap) {
     nested.push(...nestedParameterRowsFromDocumentedProperties(p, ctx));
   }
   if (nested.length) {
-    tableMd = appendMarkdownTableRows(tableMd, nested);
+    tableMd = `${tableMd.trimEnd()}\n${nested.join('\n')}\n`;
   }
-
-  tableMd = formatMethodParametersTable(tableMd);
 
   return [markdownHeading(4, ReflectionKind.pluralString(ReflectionKind.Parameter)), '', tableMd, ''].join('\n');
 }
@@ -1325,30 +1091,31 @@ function hasExtractMethodsModifier(decl) {
 }
 
 /**
- * Writes `methods/<parent>-<child>.mdx` for each direct member of an `@extractMethods` object-like type:
- * callables via {@link buildMethodMdx}, non-callables with a resolvable object shape via
- * {@link buildPropertyTableDocMdx}.
+ * @typedef {{ filePath: string, content: string }} ExtractedFile
+ */
+
+/**
+ * Collect `methods/<parent>-<child>.mdx` content for each direct member of an `@extractMethods` object-like type: callables via {@link buildMethodMdx}, non-callables with a resolvable object shape via {@link buildPropertyTableDocMdx}. Plus a `<parent>.mdx` index for non-callable members.
  *
- * Supports inline object literals and named references (`interface` / object-like `type` aliases) by resolving
- * the holder with {@link resolveDeclarationWithObjectMembers}.
+ * Supports inline object literals and named references (`interface` / object-like `type` aliases) via {@link resolveDeclarationWithObjectMembers}.
  *
  * @param {import('typedoc').DeclarationReflection} parentDecl
  * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
  * @param {string} outDir
- * @returns {number} Number of files written
+ * @returns {ExtractedFile[]}
  */
 function processExtractMethodsNamespace(parentDecl, ctx, outDir) {
   const project = ctx.page?.project;
-  const holder = resolveDeclarationWithObjectMembers(parentDecl.type, project);
-  const members = holder?.children ?? [];
+  const members = resolveDeclarationWithObjectMembers(parentDecl.type, project) ?? [];
   if (members.length === 0) {
     console.warn(
       `[extract-methods] @extractMethods on "${parentDecl.name}" requires an object-like type with members; skipping nested extraction`,
     );
-    return 0;
+    return [];
   }
   const parentName = parentDecl.name;
-  let count = 0;
+  /** @type {ExtractedFile[]} */
+  const collected = [];
   /** @type {import('typedoc').DeclarationReflection[]} */
   const nonCallableMembers = [];
   for (const nested of members) {
@@ -1356,16 +1123,14 @@ function processExtractMethodsNamespace(parentDecl, ctx, outDir) {
       continue;
     }
     const nd = /** @type {import('typedoc').DeclarationReflection} */ (nested);
-    const fileSlug = `${toKebabCase(parentName)}-${toKebabCase(nd.name)}`;
+    const fileSlug = `${toFileSlug(parentName)}-${toFileSlug(nd.name)}`;
     const filePath = path.join(outDir, `${fileSlug}.mdx`);
     if (shouldExtractCallableMember(nd, ctx)) {
       const mdx = buildMethodMdx(nd, ctx, { qualifiedName: `${parentName}.${nd.name}` });
       if (!mdx) {
         continue;
       }
-      fs.writeFileSync(filePath, mdx, 'utf-8');
-      console.log(`[extract-methods] Wrote ${path.relative(path.join(__dirname, '..'), filePath)}`);
-      count++;
+      collected.push({ filePath, content: mdx });
       continue;
     }
     nonCallableMembers.push(nd);
@@ -1373,32 +1138,32 @@ function processExtractMethodsNamespace(parentDecl, ctx, outDir) {
     if (!propTableMdx) {
       continue;
     }
-    fs.writeFileSync(filePath, propTableMdx, 'utf-8');
-    console.log(`[extract-methods] Wrote ${path.relative(path.join(__dirname, '..'), filePath)}`);
-    count++;
+    collected.push({ filePath, content: propTableMdx });
   }
   if (nonCallableMembers.length) {
     const namespaceMdx = buildExtractMethodsNamespacePropertyTableMdx(parentDecl, nonCallableMembers, ctx);
     if (namespaceMdx) {
-      const namespacePath = path.join(outDir, `${toKebabCase(parentName)}.mdx`);
-      fs.writeFileSync(namespacePath, namespaceMdx, 'utf-8');
-      console.log(`[extract-methods] Wrote ${path.relative(path.join(__dirname, '..'), namespacePath)}`);
-      count++;
+      const namespacePath = path.join(outDir, `${toFileSlug(parentName)}.mdx`);
+      collected.push({ filePath: namespacePath, content: namespaceMdx });
     }
   }
-  return count;
+  return collected;
 }
 
 /**
+ * Collect (path, content) pairs for each callable/`@extractMethods` child on `decl`. Callers are responsible for writing — see {@link load} which prettifies then writes.
+ *
  * @param {import('typedoc').DeclarationReflection} decl
  * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
  * @param {string} outDir
+ * @returns {ExtractedFile[]}
  */
 function extractCallableMembersFromDeclaration(decl, ctx, outDir) {
-  let count = 0;
   if (!decl.children) {
-    return 0;
+    return [];
   }
+  /** @type {ExtractedFile[]} */
+  const collected = [];
   for (const child of decl.children) {
     if (child.name.startsWith('__')) {
       continue;
@@ -1406,92 +1171,113 @@ function extractCallableMembersFromDeclaration(decl, ctx, outDir) {
     const childDecl = /** @type {import('typedoc').DeclarationReflection} */ (child);
 
     if (hasExtractMethodsModifier(childDecl)) {
-      count += processExtractMethodsNamespace(childDecl, ctx, outDir);
+      collected.push(...processExtractMethodsNamespace(childDecl, ctx, outDir));
       continue;
     }
 
     if (shouldExtractCallableMember(childDecl, ctx)) {
       const mdx = buildMethodMdx(childDecl, ctx);
       if (mdx) {
-        const fileName = `${toKebabCase(child.name)}.mdx`;
+        const fileName = `${toFileSlug(child.name)}.mdx`;
         const filePath = path.join(outDir, fileName);
-        fs.writeFileSync(filePath, mdx, 'utf-8');
-        console.log(`[extract-methods] Wrote ${path.relative(path.join(__dirname, '..'), filePath)}`);
-        count++;
+        collected.push({ filePath, content: mdx });
       }
     }
   }
-  return count;
+  return collected;
 }
 
 /**
- * @param {string} pageUrl
- * @param {import('typedoc').ProjectReflection} project
- * @param {import('typedoc').Application} app
+ * @param {import('typedoc-plugin-markdown').MarkdownPageEvent<import('typedoc').Reflection>} output
+ * @returns {keyof typeof REFERENCE_OBJECT_CONFIG | undefined}
  */
-function extractMethodsForPage(pageUrl, project, app) {
-  const entry = REFERENCE_OBJECT_CONFIG[/** @type {keyof typeof REFERENCE_OBJECT_CONFIG} */ (pageUrl)];
-  if (!entry) {
-    console.warn(`[extract-methods] No symbol mapping for ${pageUrl}, skipping`);
-    return 0;
+function matchReferenceObjectPageUrl(output) {
+  if (!output.url) {
+    return undefined;
   }
+  const normalized = output.url.replace(/\\/g, '/');
+  return normalized in REFERENCE_OBJECT_CONFIG
+    ? /** @type {keyof typeof REFERENCE_OBJECT_CONFIG} */ (normalized)
+    : undefined;
+}
 
-  const { symbol, declarationHint } = entry;
-  const extraMethodInterfaces = 'extraMethodInterfaces' in entry ? entry.extraMethodInterfaces : undefined;
-  const decl = findInterfaceOrClass(project, symbol, declarationHint);
-  if (!decl?.children) {
-    console.warn(`[extract-methods] Could not find interface/class "${symbol}"`);
-    return 0;
-  }
-
-  extractPropertiesAndTrimSourcePage(pageUrl);
-
-  const ctx = createThemeContextForReferencePage(app, project, pageUrl, decl);
-
-  const pageDir = path.dirname(pageUrl);
-  const objectDir = path.join(__dirname, 'temp-docs', pageDir);
-  const outDir = path.join(objectDir, 'methods');
-  fs.mkdirSync(outDir, { recursive: true });
-
-  let count = extractCallableMembersFromDeclaration(decl, ctx, outDir);
-
-  if (Array.isArray(extraMethodInterfaces)) {
-    for (const extra of extraMethodInterfaces) {
-      const extraDecl = findInterfaceOrClass(project, extra.symbol, extra.declarationHint);
-      if (!extraDecl?.children) {
-        console.warn(`[extract-methods] extraMethodInterfaces: could not find "${extra.symbol}" for ${pageUrl}`);
-        continue;
-      }
-      count += extractCallableMembersFromDeclaration(extraDecl, ctx, outDir);
+/**
+ * Plugin entry: registers a `MarkdownPageEvent.END` listener that, for each page in {@link REFERENCE_OBJECT_CONFIG}, queues a `preWriteAsyncJob` to extract Properties + methods.
+ *
+ * The job runs **after** typedoc-plugin-markdown's own prettier job (also a `preWriteAsyncJob`, queued during `renderDocument`) — so by the time we read `output.contents`, the Properties table is already prettier-formatted, and our `properties.mdx` inherits that formatting. Method files are written raw (matching the pre-refactor behavior, where extract-methods.mjs also bypassed prettier for `methods/*.mdx`).
+ *
+ * Must be loaded **after** `custom-plugin.mjs` so its END listener (link replacements + heading filtering) runs first.
+ *
+ * @param {import('typedoc-plugin-markdown').MarkdownApplication} app
+ */
+export function load(app) {
+  app.renderer.on(MarkdownPageEvent.END, output => {
+    const pageUrl = matchReferenceObjectPageUrl(output);
+    if (!pageUrl) {
+      return;
     }
-  }
+    const entry = REFERENCE_OBJECT_CONFIG[pageUrl];
+    const decl = /** @type {import('typedoc').DeclarationReflection | undefined} */ (output.model);
+    if (!decl?.children) {
+      console.warn(`[extract-methods] No children on reflection for ${pageUrl}, skipping`);
+      return;
+    }
+    const project = output.project;
+    if (!project) {
+      console.warn(`[extract-methods] No project on page event for ${pageUrl}, skipping`);
+      return;
+    }
+    const theme = /** @type {InstanceType<typeof import('typedoc-plugin-markdown').MarkdownTheme> | undefined} */ (
+      app.renderer.theme
+    );
+    if (!theme || typeof theme.getRenderContext !== 'function') {
+      console.warn(`[extract-methods] Renderer theme not ready for ${pageUrl}, skipping`);
+      return;
+    }
+    const ctx = /** @type {import('typedoc-plugin-markdown').MarkdownThemeContext} */ (theme.getRenderContext(output));
 
-  return count;
-}
+    const objectDir = path.dirname(output.filename);
+    const outDir = path.join(objectDir, 'methods');
 
-async function main() {
-  const app = await Application.bootstrapWithPlugins({
-    ...typedocConfig,
-    // Avoid writing markdown twice; we only need reflections.
-    out: path.join(__dirname, 'temp-docs-unused'),
+    /** @type {ExtractedFile[]} */
+    const methodFiles = extractCallableMembersFromDeclaration(decl, ctx, outDir);
+    const extraMethodInterfaces = 'extraMethodInterfaces' in entry ? entry.extraMethodInterfaces : undefined;
+    if (Array.isArray(extraMethodInterfaces)) {
+      for (const extra of extraMethodInterfaces) {
+        const extraDecl = findInterfaceOrClass(project, extra.symbol, extra.declarationHint);
+        if (!extraDecl?.children) {
+          console.warn(`[extract-methods] extraMethodInterfaces: could not find "${extra.symbol}" for ${pageUrl}`);
+          continue;
+        }
+        methodFiles.push(...extractCallableMembersFromDeclaration(extraDecl, ctx, outDir));
+      }
+    }
+
+    output.preWriteAsyncJobs.push(() => {
+      fs.mkdirSync(objectDir, { recursive: true });
+
+      // `output.contents` is already prettier-formatted by typedoc-plugin-markdown's earlier
+      // pre-write job. Extract the Properties body from it (also formatted), write it out,
+      // then strip the section so the main page no longer ships it.
+      const { propertiesBody, stripped } = splitPropertiesFromContents(output.contents ?? '');
+      if (propertiesBody) {
+        const propertiesPath = path.join(objectDir, 'properties.mdx');
+        fs.writeFileSync(propertiesPath, `${propertiesBody.trimEnd()}\n`, 'utf-8');
+        console.log(`[extract-methods] Wrote ${path.relative(path.join(__dirname, '..'), propertiesPath)}`);
+      }
+      if (stripped && stripped !== output.contents) {
+        output.contents = stripped;
+      }
+
+      if (methodFiles.length === 0) {
+        return;
+      }
+      fs.mkdirSync(outDir, { recursive: true });
+      for (const { filePath, content } of methodFiles) {
+        fs.writeFileSync(filePath, content, 'utf-8');
+        console.log(`[extract-methods] Wrote ${path.relative(path.join(__dirname, '..'), filePath)}`);
+      }
+      console.log(`[extract-methods] ${pageUrl}: wrote ${methodFiles.length} method file(s)`);
+    });
   });
-
-  const project = await app.convert();
-  if (!project) {
-    console.error('[extract-methods] TypeDoc conversion failed');
-    process.exit(1);
-  }
-
-  prepareMarkdownRenderer(app, project);
-
-  let total = 0;
-  for (const pageUrl of REFERENCE_OBJECTS_LIST) {
-    total += extractMethodsForPage(pageUrl, project, app);
-  }
-  console.log(`[extract-methods] Wrote ${total} method files total`);
 }
-
-main().catch(err => {
-  console.error(err);
-  process.exit(1);
-});
