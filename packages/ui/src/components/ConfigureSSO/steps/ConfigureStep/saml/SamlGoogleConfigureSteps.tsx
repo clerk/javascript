@@ -68,6 +68,16 @@ export const SamlGoogleConfigureSteps = (): JSX.Element => {
         </Step.Header>
         <SamlGoogleAttributeMappingStep />
       </Wizard.Step>
+
+      <Wizard.Step id='configure-user-access'>
+        <Step.Header
+          title={localizationKeys('configureSSO.configureStep.samlGoogle.mainHeaderTitle')}
+          description={localizationKeys('configureSSO.configureStep.samlGoogle.configureUserAccess.headerSubtitle')}
+        >
+          <InnerStepCounter />
+        </Step.Header>
+        <SamlGoogleConfigureUserAccessStep />
+      </Wizard.Step>
     </>
   );
 };
@@ -545,6 +555,81 @@ const SamlGoogleAttributeMappingStep = (): JSX.Element => {
           </Col>
 
           <AttributeMappingTable config={GOOGLE_ATTRIBUTE_MAPPING} />
+        </Step.Section>
+      </Step.Body>
+
+      <Step.Footer>
+        <Step.Footer.Previous
+          onClick={() => goPrev()}
+          isDisabled={isFirstStep}
+        />
+        <Step.Footer.Continue
+          onClick={() => goNext()}
+          isDisabled={isLastStep}
+        />
+      </Step.Footer>
+    </>
+  );
+};
+
+const SamlGoogleConfigureUserAccessStep = (): JSX.Element => {
+  const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
+
+  return (
+    <>
+      <Step.Body>
+        <Step.Section sx={theme => ({ gap: theme.space.$3 })}>
+          <Text
+            as='p'
+            colorScheme='secondary'
+            localizationKey={localizationKeys(
+              'configureSSO.configureStep.samlGoogle.configureUserAccess.assignUsersInstructions.paragraph1',
+            )}
+          />
+
+          <Col
+            elementDescriptor={descriptors.configureSSOInstructionsList}
+            as='ul'
+            sx={theme => ({
+              gap: theme.space.$1x5,
+              margin: 0,
+              paddingInlineStart: theme.space.$5,
+              listStyleType: 'disc',
+            })}
+          >
+            <Text
+              elementDescriptor={descriptors.configureSSOInstructionsListItem}
+              as='li'
+              colorScheme='secondary'
+              localizationKey={localizationKeys(
+                'configureSSO.configureStep.samlGoogle.configureUserAccess.assignUsersInstructions.step1',
+              )}
+            />
+            <Text
+              elementDescriptor={descriptors.configureSSOInstructionsListItem}
+              as='li'
+              colorScheme='secondary'
+              localizationKey={localizationKeys(
+                'configureSSO.configureStep.samlGoogle.configureUserAccess.assignUsersInstructions.step2',
+              )}
+            />
+            <Text
+              elementDescriptor={descriptors.configureSSOInstructionsListItem}
+              as='li'
+              colorScheme='secondary'
+              localizationKey={localizationKeys(
+                'configureSSO.configureStep.samlGoogle.configureUserAccess.assignUsersInstructions.step3',
+              )}
+            />
+          </Col>
+
+          <Text
+            as='p'
+            colorScheme='secondary'
+            localizationKey={localizationKeys(
+              'configureSSO.configureStep.samlGoogle.configureUserAccess.assignUsersInstructions.paragraph2',
+            )}
+          />
         </Step.Section>
       </Step.Body>
 

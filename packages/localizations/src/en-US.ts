@@ -603,13 +603,13 @@ export const enUS: LocalizationResource = {
           },
         },
         configureUserAccess: {
-          headerSubtitle: 'Configure users access to the enterprise application',
+          headerSubtitle: 'Enable your Google Workspace SAML workspace',
           assignUsersInstructions: {
             paragraph1:
               "Once the configuration is complete in Google, you'll be redirected to the app's overview page.",
-            step1: 'Open the <bold>User access</bold> section',
-            step2: 'Select <bold>ON</bold> for everyone',
-            step3: 'Select <bold>Save</bold>',
+            step1: 'Open the <bold>User access</bold> section.',
+            step2: 'Select <bold>ON</bold> for everyone.',
+            step3: 'Select <bold>Save</bold>.',
             paragraph2:
               'Google may take up to 24 hours to propagate these changes. The connection will remain inactive until they take effect.',
           },

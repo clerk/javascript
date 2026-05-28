@@ -1656,7 +1656,6 @@ export type __internal_LocalizationResource = {
         configureUserAccess: {
           headerSubtitle: LocalizationValue;
           assignUsersInstructions: {
-            title: LocalizationValue;
             paragraph1: LocalizationValue;
             step1: LocalizationValue;
             step2: LocalizationValue;
