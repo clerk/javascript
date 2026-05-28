@@ -9,6 +9,7 @@ export function generateCodeVerifier(): string {
 }
 
 export async function generateCodeChallenge(verifier: string): Promise<string> {
+  await Promise.resolve();
   return base64Url(createHash('sha256').update(verifier).digest());
 }
 

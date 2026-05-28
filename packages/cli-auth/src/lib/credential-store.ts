@@ -35,14 +35,17 @@ class MemoryCredentialStore implements CredentialStore {
   private readonly values = new Map<string, string>();
 
   async get(key: string): Promise<string | null> {
+    await Promise.resolve();
     return this.values.get(key) ?? null;
   }
 
   async set(key: string, value: string): Promise<void> {
+    await Promise.resolve();
     this.values.set(key, value);
   }
 
   async delete(key: string): Promise<void> {
+    await Promise.resolve();
     this.values.delete(key);
   }
 }

@@ -13,14 +13,26 @@ function seededStore(entries: Record<string, unknown>): CredentialStore {
   }
   return {
     async get(key) {
+      await Promise.resolve();
       return data.get(key) ?? null;
     },
     async set(key, value) {
+      await Promise.resolve();
       data.set(key, value);
     },
     async delete(key) {
+      await Promise.resolve();
       data.delete(key);
     },
+  };
+}
+
+/** Adapt an async `createServer` handler so it returns `void`, not a Promise. */
+function asyncServerHandler(
+  fn: (req: IncomingMessage, res: ServerResponse) => Promise<void>,
+): (req: IncomingMessage, res: ServerResponse) => void {
+  return (req, res) => {
+    void fn(req, res);
   };
 }
 
@@ -56,34 +68,36 @@ describe('ClerkCliAuth', () => {
     let userinfoAuthorization: string | undefined;
     let authorizeUrl: URL | undefined;
 
-    const issuerServer = createServer(async (req, res) => {
-      const url = new URL(req.url ?? '/', 'http://127.0.0.1');
+    const issuerServer = createServer(
+      asyncServerHandler(async (req, res) => {
+        const url = new URL(req.url ?? '/', 'http://127.0.0.1');
 
-      if (req.method === 'POST' && url.pathname === '/oauth/token') {
-        tokenRequest = new URLSearchParams(await readBody(req));
-        json(res, 200, {
-          access_token: 'access-token',
-          refresh_token: 'refresh-token',
-          id_token: 'id-token',
-          expires_in: 3600,
-          scope: 'profile email openid offline_access',
-          token_type: 'Bearer',
-        });
-        return;
-      }
+        if (req.method === 'POST' && url.pathname === '/oauth/token') {
+          tokenRequest = new URLSearchParams(await readBody(req));
+          json(res, 200, {
+            access_token: 'access-token',
+            refresh_token: 'refresh-token',
+            id_token: 'id-token',
+            expires_in: 3600,
+            scope: 'profile email openid offline_access',
+            token_type: 'Bearer',
+          });
+          return;
+        }
 
-      if (req.method === 'GET' && url.pathname === '/oauth/userinfo') {
-        userinfoAuthorization = req.headers.authorization;
-        json(res, 200, {
-          sub: 'user_123',
-          email: 'test@example.com',
-          name: 'Test User',
-        });
-        return;
-      }
+        if (req.method === 'GET' && url.pathname === '/oauth/userinfo') {
+          userinfoAuthorization = req.headers.authorization;
+          json(res, 200, {
+            sub: 'user_123',
+            email: 'test@example.com',
+            name: 'Test User',
+          });
+          return;
+        }
 
-      json(res, 404, { error: 'not_found' });
-    });
+        json(res, 404, { error: 'not_found' });
+      }),
+    );
     servers.push(issuerServer);
 
     await new Promise<void>(resolve => issuerServer.listen(0, '127.0.0.1', resolve));
@@ -140,35 +154,37 @@ describe('ClerkCliAuth', () => {
     const revoked = new Set<string>();
     const refreshToAccess = new Map([['refresh-token', 'access-token']]);
 
-    const issuerServer = createServer(async (req, res) => {
-      const url = new URL(req.url ?? '/', 'http://127.0.0.1');
-      const authHeader = req.headers.authorization ?? '';
-      const bearer = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
+    const issuerServer = createServer(
+      asyncServerHandler(async (req, res) => {
+        const url = new URL(req.url ?? '/', 'http://127.0.0.1');
+        const authHeader = req.headers.authorization ?? '';
+        const bearer = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
 
-      if (req.method === 'GET' && url.pathname === '/oauth/userinfo') {
-        if (revoked.has(bearer)) {
-          json(res, 401, { error: 'invalid_token' });
+        if (req.method === 'GET' && url.pathname === '/oauth/userinfo') {
+          if (revoked.has(bearer)) {
+            json(res, 401, { error: 'invalid_token' });
+            return;
+          }
+          json(res, 200, { sub: 'user_123' });
           return;
         }
-        json(res, 200, { sub: 'user_123' });
-        return;
-      }
 
-      if (req.method === 'POST' && url.pathname === '/oauth/token/revoke') {
-        const body = new URLSearchParams(await readBody(req));
-        const token = body.get('token') ?? '';
-        revoked.add(token);
-        const cascaded = refreshToAccess.get(token);
-        if (cascaded) {
-          revoked.add(cascaded);
+        if (req.method === 'POST' && url.pathname === '/oauth/token/revoke') {
+          const body = new URLSearchParams(await readBody(req));
+          const token = body.get('token') ?? '';
+          revoked.add(token);
+          const cascaded = refreshToAccess.get(token);
+          if (cascaded) {
+            revoked.add(cascaded);
+          }
+          res.writeHead(200);
+          res.end();
+          return;
         }
-        res.writeHead(200);
-        res.end();
-        return;
-      }
 
-      json(res, 404, { error: 'not_found' });
-    });
+        json(res, 404, { error: 'not_found' });
+      }),
+    );
     servers.push(issuerServer);
     await new Promise<void>(resolve => issuerServer.listen(0, '127.0.0.1', resolve));
     const issuer = `http://127.0.0.1:${(issuerServer.address() as AddressInfo).port}`;
@@ -201,35 +217,37 @@ describe('ClerkCliAuth', () => {
     const revoked = new Set<string>();
     const refreshToAccess = new Map([['refresh-token', 'access-token']]);
 
-    const issuerServer = createServer(async (req, res) => {
-      const url = new URL(req.url ?? '/', 'http://127.0.0.1');
-      const authHeader = req.headers.authorization ?? '';
-      const bearer = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
+    const issuerServer = createServer(
+      asyncServerHandler(async (req, res) => {
+        const url = new URL(req.url ?? '/', 'http://127.0.0.1');
+        const authHeader = req.headers.authorization ?? '';
+        const bearer = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
 
-      if (req.method === 'GET' && url.pathname === '/oauth/userinfo') {
-        if (revoked.has(bearer)) {
-          json(res, 401, { error: 'invalid_token' });
+        if (req.method === 'GET' && url.pathname === '/oauth/userinfo') {
+          if (revoked.has(bearer)) {
+            json(res, 401, { error: 'invalid_token' });
+            return;
+          }
+          json(res, 200, { sub: 'user_123' });
           return;
         }
-        json(res, 200, { sub: 'user_123' });
-        return;
-      }
 
-      if (req.method === 'POST' && url.pathname === '/oauth/token/revoke') {
-        const body = new URLSearchParams(await readBody(req));
-        const token = body.get('token') ?? '';
-        revoked.add(token);
-        const cascaded = refreshToAccess.get(token);
-        if (cascaded) {
-          revoked.add(cascaded);
+        if (req.method === 'POST' && url.pathname === '/oauth/token/revoke') {
+          const body = new URLSearchParams(await readBody(req));
+          const token = body.get('token') ?? '';
+          revoked.add(token);
+          const cascaded = refreshToAccess.get(token);
+          if (cascaded) {
+            revoked.add(cascaded);
+          }
+          res.writeHead(200);
+          res.end();
+          return;
         }
-        res.writeHead(200);
-        res.end();
-        return;
-      }
 
-      json(res, 404, { error: 'not_found' });
-    });
+        json(res, 404, { error: 'not_found' });
+      }),
+    );
     servers.push(issuerServer);
     await new Promise<void>(resolve => issuerServer.listen(0, '127.0.0.1', resolve));
     const issuer = `http://127.0.0.1:${(issuerServer.address() as AddressInfo).port}`;
@@ -256,16 +274,18 @@ describe('ClerkCliAuth', () => {
   it('revokes the refresh token on logout and clears local state', async () => {
     let revokeRequest: URLSearchParams | undefined;
 
-    const issuerServer = createServer(async (req, res) => {
-      const url = new URL(req.url ?? '/', 'http://127.0.0.1');
-      if (req.method === 'POST' && url.pathname === '/oauth/token/revoke') {
-        revokeRequest = new URLSearchParams(await readBody(req));
-        res.writeHead(200);
-        res.end();
-        return;
-      }
-      json(res, 404, { error: 'not_found' });
-    });
+    const issuerServer = createServer(
+      asyncServerHandler(async (req, res) => {
+        const url = new URL(req.url ?? '/', 'http://127.0.0.1');
+        if (req.method === 'POST' && url.pathname === '/oauth/token/revoke') {
+          revokeRequest = new URLSearchParams(await readBody(req));
+          res.writeHead(200);
+          res.end();
+          return;
+        }
+        json(res, 404, { error: 'not_found' });
+      }),
+    );
     servers.push(issuerServer);
     await new Promise<void>(resolve => issuerServer.listen(0, '127.0.0.1', resolve));
     const issuer = `http://127.0.0.1:${(issuerServer.address() as AddressInfo).port}`;

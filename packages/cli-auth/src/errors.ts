@@ -23,9 +23,9 @@ export interface ClerkCliAuthErrorOptions {
 }
 
 export class ClerkCliAuthError extends Error {
-  code: ErrorCode | string;
+  code: ErrorCode | (string & {});
   exitCode: ExitCode;
-  constructor(code: ErrorCode | string, message: string, options?: ClerkCliAuthErrorOptions) {
+  constructor(code: ErrorCode | (string & {}), message: string, options?: ClerkCliAuthErrorOptions) {
     super(message, options?.cause ? { cause: options.cause } : undefined);
     this.name = 'ClerkCliAuthError';
     this.code = code;
