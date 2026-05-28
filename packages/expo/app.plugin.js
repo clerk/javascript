@@ -591,7 +591,10 @@ const withClerkAppleSignIn = config => {
  * Accepts a `theme` prop pointing to a JSON file with optional keys:
  *   - colors: { primary, background, input, danger, success, warning,
  *               foreground, mutedForeground, primaryForeground, inputForeground,
- *               neutral, border, ring, muted, shadow }  (hex color strings)
+ *               neutral, border, ring, muted, secondaryButton, shadow }  (hex color strings)
+ *               `secondaryButton` is the fill for social/SSO (secondary) buttons;
+ *               it defaults to the standard adaptive surface so a custom
+ *               `background` does not bleed into the buttons.
  *   - darkColors: same keys as colors (for dark mode)
  *   - design: { fontFamily: string, borderRadius: number }
  *
@@ -613,6 +616,7 @@ const VALID_COLOR_KEYS = [
   'border',
   'ring',
   'muted',
+  'secondaryButton',
   'shadow',
 ];
 

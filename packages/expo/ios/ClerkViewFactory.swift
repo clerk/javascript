@@ -283,6 +283,7 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
       neutral: dict["neutral"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultNeutralColor,
       ring: dict["ring"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultRingColor,
       muted: dict["muted"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultMutedColor,
+      secondaryButton: dict["secondaryButton"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultSecondaryButtonColor,
       shadow: dict["shadow"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultShadowColor,
       border: dict["border"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultBorderColor
     )
