@@ -1,4 +1,4 @@
-// @ts-check
+// @ts-check — JSDoc-typed plugin helpers.
 /**
  * Small markdown utilities. These are inlined from `typedoc-plugin-markdown`'s
  * internal `dist/libs/markdown/` and `dist/libs/utils/` modules — the plugin's

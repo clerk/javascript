@@ -1,4 +1,4 @@
-// @ts-check
+// @ts-check — JSDoc-typed plugin helpers.
 /**
  * Two kebab-case flavors. They produce different output for acronym-heavy names (`mountOAuthConsent`, `authenticateWithOKXWallet`, …) and the published docs depend on both styles existing — do not consolidate them without changing the output.
  *

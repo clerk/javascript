@@ -6,6 +6,7 @@ import { applyTodoStrippingToComment } from './comment-utils.mjs';
 import { backTicks, heading, htmlTable, removeLineBreaks, table } from './markdown-helpers.mjs';
 import { REFERENCE_OBJECTS_LIST } from './reference-objects.mjs';
 import { isInlineModifierWithoutStandalonePage } from './standalone-page-tag.mjs';
+import { unwrapOptional } from './type-utils.mjs';
 
 export { REFERENCE_OBJECTS_LIST };
 
@@ -49,22 +50,6 @@ function isReflectionTypeDoc(/** @type {import('typedoc').Type | undefined} */ t
 function isUnionTypeDoc(/** @type {import('typedoc').Type | undefined} */ t) {
   const o = /** @type {{ type?: string; types?: import('typedoc').Type[] } | null} */ (t);
   return Boolean(o && typeof o === 'object' && o.type === 'union' && Array.isArray(o.types));
-}
-
-/**
- * @param {import('typedoc').Type | undefined} t
- */
-function unwrapOptionalType(t) {
-  if (
-    t &&
-    typeof t === 'object' &&
-    'type' in t &&
-    /** @type {{ type: string }} */ (t).type === 'optional' &&
-    'elementType' in t
-  ) {
-    return /** @type {{ elementType: import('typedoc').Type }} */ (t).elementType;
-  }
-  return t;
 }
 
 /**
@@ -287,7 +272,7 @@ function tryCollapseExpandedOAuthStrategyUnion(model, ctx) {
  * @returns {import('typedoc').DeclarationReflection[]}
  */
 function collectPropertyReflectionsFromIntersectionArm(t, visitedReflectionIds, project) {
-  const unwrapped = unwrapOptionalType(t);
+  const unwrapped = unwrapOptional(t);
   if (!unwrapped) {
     return [];
   }
@@ -401,7 +386,7 @@ function mergeIntersectionPropertyReflections(intersection, project) {
  * @returns {import('typedoc').DeclarationReflection[]}
  */
 function collectPropertyReflectionsFromUnionObjectArms(t, visitedReflectionIds, project) {
-  const unwrapped = unwrapOptionalType(t);
+  const unwrapped = unwrapOptional(t);
   if (!unwrapped || /** @type {{ type?: string }} */ (unwrapped).type !== 'union') {
     return [];
   }

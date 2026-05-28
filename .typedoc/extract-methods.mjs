@@ -38,6 +38,7 @@ import { removeLineBreaks } from './markdown-helpers.mjs';
 import { REFERENCE_OBJECT_CONFIG } from './reference-objects.mjs';
 import { toFileSlug } from './slug.mjs';
 import { isInlineModifierWithoutStandalonePage } from './standalone-page-tag.mjs';
+import { unwrapOptional } from './type-utils.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -264,32 +265,6 @@ function getPrimaryCallSignature(decl) {
     }
   }
   return undefined;
-}
-
-/**
- * Strip one (or, with `{ deep: true }`, all) `OptionalType` layers and return the inner type. Returns `t` unchanged when it isn't an `OptionalType`, or when `t` is nullish.
- *
- * Typed loosely (`Type` ⊕ `SomeType`) so callers in either type domain can use the same helper; the runtime check is structural (`type === 'optional' && 'elementType' in t`).
- *
- * @template {import('typedoc').Type | import('typedoc').SomeType | undefined} T
- * @param {T} t
- * @param {{ deep?: boolean }} [options]
- * @returns {T}
- */
-function unwrapOptional(t, options) {
-  let cur = t;
-  while (
-    cur &&
-    typeof cur === 'object' &&
-    /** @type {{ type?: string }} */ (cur).type === 'optional' &&
-    'elementType' in cur
-  ) {
-    cur = /** @type {T} */ (/** @type {{ elementType: import('typedoc').Type }} */ (cur).elementType);
-    if (!options?.deep) {
-      break;
-    }
-  }
-  return cur;
 }
 
 /**
@@ -554,7 +529,9 @@ function formatTypeScriptSignature(sig, memberName, instantiationMap) {
     }) ?? [];
   const retT = substituteGenericParamRefsInType(sig.type, instantiationMap) ?? sig.type;
   const ret = retT ? typeStringForTypeScriptFence(retT) : 'void';
-  return `function ${memberName}${typeParamStr}(${params.join(', ')}): ${ret}`;
+  // Qualified names (`emailCode.sendCode`) aren't valid in `function foo.bar()` syntax; use the bare last segment — the parent is already in the heading above.
+  const displayName = memberName.includes('.') ? memberName.split('.').pop() : memberName;
+  return `function ${displayName}${typeParamStr}(${params.join(', ')}): ${ret}`;
 }
 
 /**
