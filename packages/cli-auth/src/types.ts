@@ -36,6 +36,8 @@ export interface ClerkCliAuthConfig {
   environment?: string;
   /** Override the port the ephemeral callback server binds to. Default: 0 (random). */
   callbackPort?: number;
+  /** How long `login()` waits for the user to complete browser sign-in and redirect back to the localhost callback. Default: 120000 (2min). */
+  loginTimeoutMs?: number;
   /** Per-HTTP-request timeout in ms for token exchange, refresh, revoke, userinfo, and API key verification. Default: 30000 (30s). */
   requestTimeoutMs?: number;
   /** Injected opener for the browser step (for testing). Default: auto-detect. */

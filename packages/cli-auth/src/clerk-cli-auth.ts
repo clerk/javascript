@@ -79,6 +79,7 @@ export class ClerkCliAuth {
       keychainService: config.keychainService ?? 'clerk-cli-auth',
       environment,
       callbackPort: config.callbackPort ?? 0,
+      loginTimeoutMs: config.loginTimeoutMs ?? 120_000,
       requestTimeoutMs: config.requestTimeoutMs ?? 30_000,
       openBrowser: config.openBrowser,
       apiKeys: config.apiKeys,
@@ -93,6 +94,7 @@ export class ClerkCliAuth {
     const server = await startAuthServer({
       expectedState: state,
       port: this.config.callbackPort,
+      timeoutMs: this.config.loginTimeoutMs,
     });
 
     try {
