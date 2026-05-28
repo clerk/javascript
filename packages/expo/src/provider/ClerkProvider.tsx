@@ -367,7 +367,7 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
 
     const syncNativeAuthToJs = async () => {
       try {
-        if (nativeAuthState.type === 'signedIn' && nativeAuthState.sessionId && clerkInstance.setActive) {
+        if (nativeAuthState.type === 'signedIn' && nativeAuthState.sessionId) {
           if (!isMountedRef.current) {
             return;
           }
