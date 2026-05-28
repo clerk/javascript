@@ -15,12 +15,17 @@ import { ModuleManagerProvider } from '../../contexts/ModuleManagerContext';
 import { OptionsProvider } from '../../contexts/OptionsContext';
 import { SubscriberTypeContext } from '../../contexts/components/SubscriberType';
 import { OrganizationProfileContext } from '../../contexts/components/OrganizationProfile';
-import { ProfileCardPagePaddingProvider } from '../../elements/ProfileCard';
+import { AppearanceOverrides } from '../../elements/AppearanceOverrides';
+import type { Elements } from '../../internal/appearance';
 import { getModuleManager } from '../moduleManagerStore';
 import { createComposedRouter } from '../stubRouter';
 
 const fallbackModuleManager: ModuleManager = {
   import: () => Promise.resolve(undefined) as any,
+};
+
+const composedOverrides: Elements = {
+  profilePageContent: { padding: 0 },
 };
 
 type OrganizationProfileProviderProps = React.PropsWithChildren<{
@@ -67,7 +72,7 @@ export const OrganizationProfileProvider = (props: OrganizationProfileProviderPr
                   <RouteContext.Provider value={router}>
                     <SubscriberTypeContext.Provider value='organization'>
                       <OrganizationProfileContext.Provider value={orgProfileCtxValue}>
-                        <ProfileCardPagePaddingProvider value={false}>{children}</ProfileCardPagePaddingProvider>
+                        <AppearanceOverrides elements={composedOverrides}>{children}</AppearanceOverrides>
                       </OrganizationProfileContext.Provider>
                     </SubscriberTypeContext.Provider>
                   </RouteContext.Provider>
