@@ -1,11 +1,8 @@
 import { describe, expect, test, vi } from 'vitest';
 
 /* eslint-disable @typescript-eslint/no-require-imports -- CJS plugin, no ESM export */
-const {
-  CLERK_IOS_REQUIREMENT,
-  findOrCreateClerkIOSPackageReference,
-  findOrCreateSwiftPackageProductDependency,
-} = require('../../app.plugin.js')._testing;
+const { CLERK_IOS_REQUIREMENT, findOrCreateClerkIOSPackageReference, findOrCreateSwiftPackageProductDependency } =
+  require('../../app.plugin.js')._testing;
 /* eslint-enable @typescript-eslint/no-require-imports */
 
 const createXcodeProject = objects => ({
