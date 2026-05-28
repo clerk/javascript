@@ -38,6 +38,7 @@ class ClerkPackage : TurboReactPackage() {
     return listOf(
       ClerkAuthViewManager(),
       ClerkUserProfileViewManager(),
+      ClerkUserButtonViewManager(),
     )
   }
 }

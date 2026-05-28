@@ -14,6 +14,7 @@ public protocol ClerkViewFactoryProtocol {
   // Inline rendering — returns UIViewController to preserve SwiftUI lifecycle
   func createAuthView(mode: String, dismissable: Bool, onEvent: @escaping (String, [String: Any]) -> Void) -> UIViewController?
   func createUserProfileView(dismissable: Bool, onEvent: @escaping (String, [String: Any]) -> Void) -> UIViewController?
+  func createUserButton(onEvent: @escaping (String, [String: Any]) -> Void) -> UIViewController?
 
   // SDK operations
   func configure(publishableKey: String, bearerToken: String?) async throws
@@ -52,8 +53,7 @@ class ClerkExpoModule: RCTEventEmitter {
   }
 
   /// Emits an onAuthStateChange event to JS from anywhere in the native layer.
-  /// Used by inline views (AuthView, UserProfileView) to notify ClerkProvider
-  /// of auth state changes in addition to the view-level onAuthEvent callback.
+  /// Used by native views to notify ClerkProvider of auth state changes.
   static func emitAuthStateChange(type: String, sessionId: String?) {
     guard _hasListeners, let instance = sharedInstance else { return }
     instance.sendEvent(withName: "onAuthStateChange", body: [
@@ -130,6 +130,86 @@ class ClerkExpoModule: RCTEventEmitter {
   }
 }
 
+// MARK: - Inline View: ClerkUserButtonNativeView
+
+public class ClerkUserButtonNativeView: UIView {
+  private var hostingController: UIViewController?
+  private var hasInitialized: Bool = false
+
+  override init(frame: CGRect) {
+    super.init(frame: frame)
+  }
+
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
+  override public func didMoveToWindow() {
+    super.didMoveToWindow()
+    if window != nil && !hasInitialized {
+      hasInitialized = true
+      updateView()
+    }
+  }
+
+  private func updateView() {
+    detachHostingController()
+
+    guard let factory = clerkViewFactory else { return }
+
+    guard let returnedController = factory.createUserButton(
+      onEvent: { eventName, data in
+        if eventName == "signedOut" {
+          let sessionId = data["sessionId"] as? String
+          ClerkExpoModule.emitAuthStateChange(type: "signedOut", sessionId: sessionId)
+        }
+      }
+    ) else { return }
+
+    attachHostingController(returnedController)
+  }
+
+  private func attachHostingController(_ controller: UIViewController) {
+    controller.view.frame = bounds
+    controller.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    controller.view.backgroundColor = .clear
+
+    if let parentVC = findViewController() {
+      parentVC.addChild(controller)
+      addSubview(controller.view)
+      controller.didMove(toParent: parentVC)
+    } else {
+      addSubview(controller.view)
+    }
+
+    hostingController = controller
+  }
+
+  private func detachHostingController() {
+    guard let controller = hostingController else { return }
+    controller.willMove(toParent: nil)
+    controller.view.removeFromSuperview()
+    controller.removeFromParent()
+    hostingController = nil
+  }
+
+  private func findViewController() -> UIViewController? {
+    var responder: UIResponder? = self
+    while let nextResponder = responder?.next {
+      if let vc = nextResponder as? UIViewController {
+        return vc
+      }
+      responder = nextResponder
+    }
+    return nil
+  }
+
+  override public func layoutSubviews() {
+    super.layoutSubviews()
+    hostingController?.view.frame = bounds
+  }
+}
+
 // MARK: - Inline View: ClerkAuthNativeView
 
 public class ClerkAuthNativeView: UIView {
@@ -175,14 +255,12 @@ public class ClerkAuthNativeView: UIView {
       updateView()
     } else if window == nil && hasInitialized && currentDismissable && !didCompleteAuthentication && !dismissalEventSent {
       dismissalEventSent = true
-      sendAuthEvent(type: "dismissed", data: [:])
+      sendAuthEvent(type: "dismissed")
     }
   }
 
-  private func sendAuthEvent(type: String, data: [String: Any]) {
-    let jsonData = (try? JSONSerialization.data(withJSONObject: data)) ?? Data()
-    let jsonString = String(data: jsonData, encoding: .utf8) ?? "{}"
-    onAuthEvent?(["type": type, "data": jsonString])
+  private func sendAuthEvent(type: String) {
+    onAuthEvent?(["type": type])
   }
 
   private func updateView() {
@@ -198,11 +276,6 @@ public class ClerkAuthNativeView: UIView {
 
         if didCompleteAuthentication {
           self?.didCompleteAuthentication = true
-        }
-
-        self?.sendAuthEvent(type: eventName, data: data)
-
-        if didCompleteAuthentication {
           let sessionId = data["sessionId"] as? String
           ClerkExpoModule.emitAuthStateChange(type: "signedIn", sessionId: sessionId)
         }
@@ -285,14 +358,12 @@ public class ClerkUserProfileNativeView: UIView {
       updateView()
     } else if window == nil && hasInitialized && currentDismissable && !didSignOut && !dismissalEventSent {
       dismissalEventSent = true
-      sendProfileEvent(type: "dismissed", data: [:])
+      sendProfileEvent(type: "dismissed")
     }
   }
 
-  private func sendProfileEvent(type: String, data: [String: Any]) {
-    let jsonData = (try? JSONSerialization.data(withJSONObject: data)) ?? Data()
-    let jsonString = String(data: jsonData, encoding: .utf8) ?? "{}"
-    onProfileEvent?(["type": type, "data": jsonString])
+  private func sendProfileEvent(type: String) {
+    onProfileEvent?(["type": type])
   }
 
   private func updateView() {
@@ -305,11 +376,6 @@ public class ClerkUserProfileNativeView: UIView {
       onEvent: { [weak self] eventName, data in
         if eventName == "signedOut" {
           self?.didSignOut = true
-        }
-
-        self?.sendProfileEvent(type: eventName, data: data)
-
-        if eventName == "signedOut" {
           let sessionId = data["sessionId"] as? String
           ClerkExpoModule.emitAuthStateChange(type: "signedOut", sessionId: sessionId)
         }

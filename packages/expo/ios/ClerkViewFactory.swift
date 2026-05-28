@@ -60,6 +60,7 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
     // Clerk.configure() is a no-op on subsequent calls, so we use refreshClient().
     if Self.shouldRefreshConfiguredClient(for: bearerToken) {
       _ = try? await Clerk.shared.refreshClient()
+      await Self.waitForLoadedSession()
       return
     }
 
@@ -107,7 +108,7 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
     // Wait for Clerk to finish loading (cached data + API refresh).
     // The static configure() fires off async refreshes; poll until loaded.
     for _ in 0..<clerkLoadMaxAttempts {
-      if Clerk.shared.isLoaded && Clerk.shared.session != nil {
+      if Clerk.shared.isLoaded && Clerk.shared.session != nil && Clerk.shared.user != nil {
         return
       }
       try? await Task.sleep(nanoseconds: clerkLoadIntervalNs)
@@ -174,6 +175,18 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
     makeHostingController(
       rootView: ClerkInlineProfileWrapperView(
         dismissable: dismissable,
+        lightTheme: lightTheme,
+        darkTheme: darkTheme,
+        onEvent: onEvent
+      )
+    )
+  }
+
+  public func createUserButton(
+    onEvent: @escaping (String, [String: Any]) -> Void
+  ) -> UIViewController? {
+    makeHostingController(
+      rootView: ClerkInlineUserButtonWrapperView(
         lightTheme: lightTheme,
         darkTheme: darkTheme,
         onEvent: onEvent
@@ -389,6 +402,41 @@ private struct ExpoKeychain {
       kSecAttrService as String: service,
       kSecAttrAccount as String: key,
     ]
+  }
+}
+
+// MARK: - Inline User Button Wrapper (for embedded rendering)
+
+struct ClerkInlineUserButtonWrapperView: View {
+  let lightTheme: ClerkTheme?
+  let darkTheme: ClerkTheme?
+  let onEvent: (String, [String: Any]) -> Void
+
+  @Environment(\.colorScheme) private var colorScheme
+
+  var body: some View {
+    let view = UserButton()
+      .environment(Clerk.shared)
+    let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
+    let themedView = Group {
+      if let theme {
+        view.environment(\.clerkTheme, theme)
+      } else {
+        view
+      }
+    }
+    themedView
+      .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+      .task {
+        for await event in Clerk.shared.auth.events {
+          switch event {
+          case .signedOut(let session):
+            onEvent("signedOut", ["sessionId": session.id])
+          default:
+            break
+          }
+        }
+      }
   }
 }
 

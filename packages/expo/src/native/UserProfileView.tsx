@@ -1,10 +1,9 @@
-import { useClerk } from '@clerk/react';
-import { useCallback, useRef } from 'react';
+import { useCallback } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 import { StyleSheet, Text, View } from 'react-native';
 
 import NativeClerkUserProfileView from '../specs/NativeClerkUserProfileView';
-import { ClerkExpoModule as ClerkExpo, isNativeSupported } from '../utils/native-module';
+import { isNativeSupported } from '../utils/native-module';
 
 /**
  * Props for the UserProfileView component.
@@ -62,41 +61,13 @@ export interface UserProfileViewProps {
  * @see {@link https://clerk.com/docs/components/user/user-profile} Clerk UserProfile Documentation
  */
 export function UserProfileView({ isDismissable = false, style, onDismiss }: UserProfileViewProps) {
-  const clerk = useClerk();
-  const signOutTriggered = useRef(false);
-
   const handleProfileEvent = useCallback(
-    async (event: { nativeEvent: { type: string; data: string } }) => {
-      const { type } = event.nativeEvent;
-
-      if (type === 'dismissed') {
+    (event: { nativeEvent: { type: string } }) => {
+      if (event.nativeEvent.type === 'dismissed') {
         onDismiss?.();
-        return;
-      }
-
-      if (type === 'signedOut' && !signOutTriggered.current) {
-        signOutTriggered.current = true;
-
-        try {
-          await ClerkExpo?.signOut();
-        } catch (e) {
-          if (__DEV__) {
-            console.warn('[UserProfileView] Native signOut error (may already be signed out):', e);
-          }
-        }
-
-        if (clerk?.signOut) {
-          try {
-            await clerk.signOut();
-          } catch (err) {
-            if (__DEV__) {
-              console.warn('[UserProfileView] JS SDK sign out error:', err);
-            }
-          }
-        }
       }
     },
-    [clerk, onDismiss],
+    [onDismiss],
   );
 
   if (!isNativeSupported || !NativeClerkUserProfileView) {
