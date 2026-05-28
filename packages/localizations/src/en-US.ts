@@ -649,6 +649,26 @@ export const enUS: LocalizationResource = {
             step6: 'Select <bold>Assign</bold> at the bottom of the page.',
           },
         },
+        serviceProviderStep: {
+          headerSubtitle: 'Add service provider configuration to Microsoft Entra',
+          title: 'Configure service provider',
+          step1: 'In the side navigation, open the <bold>Manage</bold> dropdown and select Single sign-on.',
+          step2:
+            "In the <bold>Select a single sign-on</bold> method section, select <bold>SAML</bold>. You'll be redirected to the <bold>Set up Single Sign-On with SAML</bold> page.",
+          step3: 'Find the <bold>Basic SAML Configuration</bold> section.',
+          step4: 'Select <bold>Edit</bold>. The <bold>Basic SAML Configuration</bold> panel will open.',
+          step5:
+            'Add the following <bold>Identifier (Entity ID)</bold> and <bold>Reply URL (Assertion Consumer Service URL)</bold> values. These values will be saved automatically.',
+          step6: 'Select <bold>Save</bold> at the top of the panel. Close the panel.',
+          serviceProviderFields: {
+            acsUrl: {
+              label: 'Reply URL (Assertion Consumer Service URL)',
+            },
+            spEntityId: {
+              label: 'Identifier (Entity ID)',
+            },
+          },
+        },
       },
     },
   },

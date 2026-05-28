@@ -1694,6 +1694,24 @@ export type __internal_LocalizationResource = {
             step6: LocalizationValue;
           };
         };
+        serviceProviderStep: {
+          headerSubtitle: LocalizationValue;
+          title: LocalizationValue;
+          step1: LocalizationValue;
+          step2: LocalizationValue;
+          step3: LocalizationValue;
+          step4: LocalizationValue;
+          step5: LocalizationValue;
+          step6: LocalizationValue;
+          serviceProviderFields: {
+            spEntityId: {
+              label: LocalizationValue;
+            };
+            acsUrl: {
+              label: LocalizationValue;
+            };
+          };
+        };
       };
     };
     confirmation: {
