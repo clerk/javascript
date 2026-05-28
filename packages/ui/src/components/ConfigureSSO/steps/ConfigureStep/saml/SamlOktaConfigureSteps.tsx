@@ -1,6 +1,20 @@
 import React, { type JSX } from 'react';
 
-import { Col, descriptors, Heading, localizationKeys, Text } from '@/customizables';
+import {
+  Badge,
+  Col,
+  descriptors,
+  Flex,
+  Heading,
+  localizationKeys,
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
+} from '@/customizables';
 import { ClipboardInput } from '@/elements/ClipboardInput';
 import { useCardState } from '@/elements/contexts';
 import { Form } from '@/elements/Form';
@@ -11,7 +25,6 @@ import { useConfigureSSO } from '../../../ConfigureSSOContext';
 import { Step } from '../../../elements/Step';
 import { useWizard, Wizard } from '../../../elements/Wizard';
 import { InnerStepCounter } from '../../../elements/Wizard/InnerStepCounter';
-import { AttributeMappingTable, type AttributeMappingTableConfig } from './shared/AttributeMappingTable';
 import {
   applySamlSubmitError,
   buildSamlConfigurationPayload,
@@ -19,8 +32,8 @@ import {
   type IdentityProviderConfigurationFormProps,
 } from './shared/IdentityProviderConfigurationForm';
 import {
-  type IdpConfigurationMode,
   IdentityProviderConfigurationModes,
+  type IdpConfigurationMode,
 } from './shared/IdentityProviderConfigurationModes';
 
 export const SamlOktaConfigureSteps = (): JSX.Element => {
@@ -261,49 +274,88 @@ const SamlOktaCreateAppStep = (): JSX.Element => {
   );
 };
 
-const OKTA_ATTRIBUTE_MAPPING: AttributeMappingTableConfig = {
-  columns: {
-    first: localizationKeys(
-      'configureSSO.configureStep.samlOkta.attributeMappingStep.attributeMappingTable.columns.name',
-    ),
-    second: localizationKeys(
-      'configureSSO.configureStep.samlOkta.attributeMappingStep.attributeMappingTable.columns.expression',
-    ),
-  },
-  monoFirst: true,
-  rows: [
-    {
-      id: 'email',
-      isRequired: true,
-      first: localizationKeys(
-        'configureSSO.configureStep.samlOkta.attributeMappingStep.attributeMappingTable.rows.email.name',
-      ),
-      second: localizationKeys(
-        'configureSSO.configureStep.samlOkta.attributeMappingStep.attributeMappingTable.rows.email.expression',
-      ),
-    },
-    {
-      id: 'firstName',
-      isRequired: false,
-      first: localizationKeys(
-        'configureSSO.configureStep.samlOkta.attributeMappingStep.attributeMappingTable.rows.firstName.name',
-      ),
-      second: localizationKeys(
-        'configureSSO.configureStep.samlOkta.attributeMappingStep.attributeMappingTable.rows.firstName.expression',
-      ),
-    },
-    {
-      id: 'lastName',
-      isRequired: false,
-      first: localizationKeys(
-        'configureSSO.configureStep.samlOkta.attributeMappingStep.attributeMappingTable.rows.lastName.name',
-      ),
-      second: localizationKeys(
-        'configureSSO.configureStep.samlOkta.attributeMappingStep.attributeMappingTable.rows.lastName.expression',
-      ),
-    },
-  ],
+type OktaAttributeRow = {
+  id: 'email' | 'firstName' | 'lastName';
+  isRequired: boolean;
 };
+
+const OKTA_ATTRIBUTE_ROWS: ReadonlyArray<OktaAttributeRow> = [
+  { id: 'email', isRequired: true },
+  { id: 'firstName', isRequired: false },
+  { id: 'lastName', isRequired: false },
+];
+
+const OktaAttributeMappingTable = (): JSX.Element => (
+  <Table
+    elementDescriptor={descriptors.configureSSOAttributeMappingTable}
+    sx={theme => ({
+      'tr > th:first-of-type': { paddingInlineStart: theme.space.$4 },
+    })}
+  >
+    <Thead>
+      <Tr>
+        <Th>
+          <Text
+            sx={theme => ({ fontSize: theme.fontSizes.$xs })}
+            localizationKey={localizationKeys(
+              'configureSSO.configureStep.samlOkta.attributeMappingStep.attributeMappingTable.columns.name',
+            )}
+          />
+        </Th>
+        <Th>
+          <Text
+            sx={theme => ({ fontSize: theme.fontSizes.$xs })}
+            localizationKey={localizationKeys(
+              'configureSSO.configureStep.samlOkta.attributeMappingStep.attributeMappingTable.columns.expression',
+            )}
+          />
+        </Th>
+      </Tr>
+    </Thead>
+    <Tbody>
+      {OKTA_ATTRIBUTE_ROWS.map(row => (
+        <Tr key={row.id}>
+          <Td>
+            <Flex
+              as='span'
+              align='center'
+              sx={theme => ({ gap: theme.space.$2 })}
+            >
+              <Text
+                as='span'
+                sx={{ fontFamily: 'monospace' }}
+                localizationKey={localizationKeys(
+                  `configureSSO.configureStep.samlOkta.attributeMappingStep.attributeMappingTable.rows.${row.id}.name`,
+                )}
+              />
+              <Badge
+                elementDescriptor={descriptors.configureSSOAttributeMappingBadge}
+                elementId={descriptors.configureSSOAttributeMappingBadge.setId(
+                  row.isRequired ? 'required' : 'optional',
+                )}
+                colorScheme={row.isRequired ? 'warning' : 'primary'}
+                localizationKey={localizationKeys(
+                  row.isRequired
+                    ? 'configureSSO.configureStep.attributeMappingTable.badges.required'
+                    : 'configureSSO.configureStep.attributeMappingTable.badges.optional',
+                )}
+              />
+            </Flex>
+          </Td>
+          <Td>
+            <Text
+              as='span'
+              sx={{ fontFamily: 'monospace' }}
+              localizationKey={localizationKeys(
+                `configureSSO.configureStep.samlOkta.attributeMappingStep.attributeMappingTable.rows.${row.id}.expression`,
+              )}
+            />
+          </Td>
+        </Tr>
+      ))}
+    </Tbody>
+  </Table>
+);
 
 const SamlOktaAttributeMappingStep = (): JSX.Element => {
   const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
@@ -334,13 +386,6 @@ const SamlOktaAttributeMappingStep = (): JSX.Element => {
               colorScheme='secondary'
               localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.attributeMappingStep.step1')}
             />
-            {/*
-             * The actual name/expression pairs that step 2 refers to are
-             * rendered by the `AttributeMappingTable` immediately below this
-             * list — keeping them in a single tabular surface instead of an
-             * inline badge list matches the design (see Okta screenshot:
-             * "Create the following attribute mapping statements:" + table).
-             */}
             <Text
               elementDescriptor={descriptors.configureSSOInstructionsListItem}
               as='li'
@@ -349,7 +394,7 @@ const SamlOktaAttributeMappingStep = (): JSX.Element => {
             />
           </Col>
 
-          <AttributeMappingTable config={OKTA_ATTRIBUTE_MAPPING} />
+          <OktaAttributeMappingTable />
         </Step.Section>
       </Step.Body>
 

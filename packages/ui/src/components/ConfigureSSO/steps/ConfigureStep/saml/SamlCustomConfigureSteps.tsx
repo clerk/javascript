@@ -1,6 +1,20 @@
 import React, { type JSX } from 'react';
 
-import { Col, descriptors, Heading, localizationKeys, Text } from '@/customizables';
+import {
+  Badge,
+  Col,
+  descriptors,
+  Flex,
+  Heading,
+  localizationKeys,
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
+} from '@/customizables';
 import { ClipboardInput } from '@/elements/ClipboardInput';
 import { useCardState } from '@/elements/contexts';
 import { Form } from '@/elements/Form';
@@ -11,7 +25,6 @@ import { useConfigureSSO } from '../../../ConfigureSSOContext';
 import { Step } from '../../../elements/Step';
 import { useWizard, Wizard } from '../../../elements/Wizard';
 import { InnerStepCounter } from '../../../elements/Wizard/InnerStepCounter';
-import { AttributeMappingTable, type AttributeMappingTableConfig } from './shared/AttributeMappingTable';
 import {
   applySamlSubmitError,
   buildSamlConfigurationPayload,
@@ -151,48 +164,88 @@ const SamlCustomCreateAppStep = (): JSX.Element => {
   );
 };
 
-const CUSTOM_ATTRIBUTE_MAPPING: AttributeMappingTableConfig = {
-  columns: {
-    first: localizationKeys(
-      'configureSSO.configureStep.samlCustom.attributeMappingStep.attributeMappingTable.columns.userProfile',
-    ),
-    second: localizationKeys(
-      'configureSSO.configureStep.samlCustom.attributeMappingStep.attributeMappingTable.columns.attributeName',
-    ),
-  },
-  rows: [
-    {
-      id: 'email',
-      isRequired: true,
-      first: localizationKeys(
-        'configureSSO.configureStep.samlCustom.attributeMappingStep.attributeMappingTable.rows.email.userProfile',
-      ),
-      second: localizationKeys(
-        'configureSSO.configureStep.samlCustom.attributeMappingStep.attributeMappingTable.rows.email.attributeName',
-      ),
-    },
-    {
-      id: 'firstName',
-      isRequired: false,
-      first: localizationKeys(
-        'configureSSO.configureStep.samlCustom.attributeMappingStep.attributeMappingTable.rows.firstName.userProfile',
-      ),
-      second: localizationKeys(
-        'configureSSO.configureStep.samlCustom.attributeMappingStep.attributeMappingTable.rows.firstName.attributeName',
-      ),
-    },
-    {
-      id: 'lastName',
-      isRequired: false,
-      first: localizationKeys(
-        'configureSSO.configureStep.samlCustom.attributeMappingStep.attributeMappingTable.rows.lastName.userProfile',
-      ),
-      second: localizationKeys(
-        'configureSSO.configureStep.samlCustom.attributeMappingStep.attributeMappingTable.rows.lastName.attributeName',
-      ),
-    },
-  ],
+type CustomAttributeRow = {
+  id: 'email' | 'firstName' | 'lastName';
+  isRequired: boolean;
 };
+
+const CUSTOM_ATTRIBUTE_ROWS: ReadonlyArray<CustomAttributeRow> = [
+  { id: 'email', isRequired: true },
+  { id: 'firstName', isRequired: false },
+  { id: 'lastName', isRequired: false },
+];
+
+const CustomAttributeMappingTable = (): JSX.Element => (
+  <Table
+    elementDescriptor={descriptors.configureSSOAttributeMappingTable}
+    sx={theme => ({
+      'tr > th:first-of-type': { paddingInlineStart: theme.space.$4 },
+    })}
+  >
+    <Thead>
+      <Tr>
+        <Th>
+          <Text
+            sx={theme => ({ fontSize: theme.fontSizes.$xs })}
+            localizationKey={localizationKeys(
+              'configureSSO.configureStep.samlCustom.attributeMappingStep.attributeMappingTable.columns.userProfile',
+            )}
+          />
+        </Th>
+        <Th>
+          <Text
+            sx={theme => ({ fontSize: theme.fontSizes.$xs })}
+            localizationKey={localizationKeys(
+              'configureSSO.configureStep.samlCustom.attributeMappingStep.attributeMappingTable.columns.attributeName',
+            )}
+          />
+        </Th>
+      </Tr>
+    </Thead>
+    <Tbody>
+      {CUSTOM_ATTRIBUTE_ROWS.map(row => (
+        <Tr key={row.id}>
+          <Td>
+            <Flex
+              as='span'
+              align='center'
+              sx={theme => ({ gap: theme.space.$2 })}
+            >
+              <Text
+                as='span'
+                colorScheme='secondary'
+                localizationKey={localizationKeys(
+                  `configureSSO.configureStep.samlCustom.attributeMappingStep.attributeMappingTable.rows.${row.id}.userProfile`,
+                )}
+              />
+              <Badge
+                elementDescriptor={descriptors.configureSSOAttributeMappingBadge}
+                elementId={descriptors.configureSSOAttributeMappingBadge.setId(
+                  row.isRequired ? 'required' : 'optional',
+                )}
+                colorScheme={row.isRequired ? 'warning' : 'primary'}
+                localizationKey={localizationKeys(
+                  row.isRequired
+                    ? 'configureSSO.configureStep.attributeMappingTable.badges.required'
+                    : 'configureSSO.configureStep.attributeMappingTable.badges.optional',
+                )}
+              />
+            </Flex>
+          </Td>
+          <Td>
+            <Text
+              as='span'
+              sx={{ fontFamily: 'monospace' }}
+              localizationKey={localizationKeys(
+                `configureSSO.configureStep.samlCustom.attributeMappingStep.attributeMappingTable.rows.${row.id}.attributeName`,
+              )}
+            />
+          </Td>
+        </Tr>
+      ))}
+    </Tbody>
+  </Table>
+);
 
 const SamlCustomAttributeMappingStep = (): JSX.Element => {
   const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
@@ -207,7 +260,7 @@ const SamlCustomAttributeMappingStep = (): JSX.Element => {
             localizationKey={localizationKeys('configureSSO.configureStep.samlCustom.attributeMappingStep.paragraph')}
           />
 
-          <AttributeMappingTable config={CUSTOM_ATTRIBUTE_MAPPING} />
+          <CustomAttributeMappingTable />
         </Step.Section>
       </Step.Body>
 

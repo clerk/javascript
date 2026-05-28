@@ -1,6 +1,6 @@
 import React, { type JSX } from 'react';
 
-import { Col, descriptors, Heading, Text } from '@/customizables';
+import { Badge, Col, descriptors, Flex, Heading, Table, Tbody, Td, Text, Th, Thead, Tr } from '@/customizables';
 import { ClipboardInput } from '@/elements/ClipboardInput';
 import { useCardState } from '@/elements/contexts';
 import { Form } from '@/elements/Form';
@@ -12,7 +12,6 @@ import { useConfigureSSO } from '../../../ConfigureSSOContext';
 import { Step } from '../../../elements/Step';
 import { useWizard, Wizard } from '../../../elements/Wizard';
 import { InnerStepCounter } from '../../../elements/Wizard/InnerStepCounter';
-import { AttributeMappingTable, type AttributeMappingTableConfig } from './shared/AttributeMappingTable';
 import {
   applySamlSubmitError,
   buildSamlConfigurationPayload,
@@ -474,48 +473,88 @@ const SamlGoogleServiceProviderStep = (): JSX.Element => {
   );
 };
 
-const GOOGLE_ATTRIBUTE_MAPPING: AttributeMappingTableConfig = {
-  columns: {
-    first: localizationKeys(
-      'configureSSO.configureStep.samlGoogle.attributeMappingStep.attributeMappingTable.columns.googleAttribute',
-    ),
-    second: localizationKeys(
-      'configureSSO.configureStep.samlGoogle.attributeMappingStep.attributeMappingTable.columns.appAttribute',
-    ),
-  },
-  rows: [
-    {
-      id: 'email',
-      isRequired: true,
-      first: localizationKeys(
-        'configureSSO.configureStep.samlGoogle.attributeMappingStep.attributeMappingTable.rows.email.googleAttribute',
-      ),
-      second: localizationKeys(
-        'configureSSO.configureStep.samlGoogle.attributeMappingStep.attributeMappingTable.rows.email.appAttribute',
-      ),
-    },
-    {
-      id: 'firstName',
-      isRequired: false,
-      first: localizationKeys(
-        'configureSSO.configureStep.samlGoogle.attributeMappingStep.attributeMappingTable.rows.firstName.googleAttribute',
-      ),
-      second: localizationKeys(
-        'configureSSO.configureStep.samlGoogle.attributeMappingStep.attributeMappingTable.rows.firstName.appAttribute',
-      ),
-    },
-    {
-      id: 'lastName',
-      isRequired: false,
-      first: localizationKeys(
-        'configureSSO.configureStep.samlGoogle.attributeMappingStep.attributeMappingTable.rows.lastName.googleAttribute',
-      ),
-      second: localizationKeys(
-        'configureSSO.configureStep.samlGoogle.attributeMappingStep.attributeMappingTable.rows.lastName.appAttribute',
-      ),
-    },
-  ],
+type GoogleAttributeRow = {
+  id: 'email' | 'firstName' | 'lastName';
+  isRequired: boolean;
 };
+
+const GOOGLE_ATTRIBUTE_ROWS: ReadonlyArray<GoogleAttributeRow> = [
+  { id: 'email', isRequired: true },
+  { id: 'firstName', isRequired: false },
+  { id: 'lastName', isRequired: false },
+];
+
+const GoogleAttributeMappingTable = (): JSX.Element => (
+  <Table
+    elementDescriptor={descriptors.configureSSOAttributeMappingTable}
+    sx={theme => ({
+      'tr > th:first-of-type': { paddingInlineStart: theme.space.$4 },
+    })}
+  >
+    <Thead>
+      <Tr>
+        <Th>
+          <Text
+            sx={theme => ({ fontSize: theme.fontSizes.$xs })}
+            localizationKey={localizationKeys(
+              'configureSSO.configureStep.samlGoogle.attributeMappingStep.attributeMappingTable.columns.googleAttribute',
+            )}
+          />
+        </Th>
+        <Th>
+          <Text
+            sx={theme => ({ fontSize: theme.fontSizes.$xs })}
+            localizationKey={localizationKeys(
+              'configureSSO.configureStep.samlGoogle.attributeMappingStep.attributeMappingTable.columns.appAttribute',
+            )}
+          />
+        </Th>
+      </Tr>
+    </Thead>
+    <Tbody>
+      {GOOGLE_ATTRIBUTE_ROWS.map(row => (
+        <Tr key={row.id}>
+          <Td>
+            <Flex
+              as='span'
+              align='center'
+              sx={theme => ({ gap: theme.space.$2 })}
+            >
+              <Text
+                as='span'
+                colorScheme='secondary'
+                localizationKey={localizationKeys(
+                  `configureSSO.configureStep.samlGoogle.attributeMappingStep.attributeMappingTable.rows.${row.id}.googleAttribute`,
+                )}
+              />
+              <Badge
+                elementDescriptor={descriptors.configureSSOAttributeMappingBadge}
+                elementId={descriptors.configureSSOAttributeMappingBadge.setId(
+                  row.isRequired ? 'required' : 'optional',
+                )}
+                colorScheme={row.isRequired ? 'warning' : 'primary'}
+                localizationKey={localizationKeys(
+                  row.isRequired
+                    ? 'configureSSO.configureStep.attributeMappingTable.badges.required'
+                    : 'configureSSO.configureStep.attributeMappingTable.badges.optional',
+                )}
+              />
+            </Flex>
+          </Td>
+          <Td>
+            <Text
+              as='span'
+              sx={{ fontFamily: 'monospace' }}
+              localizationKey={localizationKeys(
+                `configureSSO.configureStep.samlGoogle.attributeMappingStep.attributeMappingTable.rows.${row.id}.appAttribute`,
+              )}
+            />
+          </Td>
+        </Tr>
+      ))}
+    </Tbody>
+  </Table>
+);
 
 const SamlGoogleAttributeMappingStep = (): JSX.Element => {
   const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
@@ -554,7 +593,7 @@ const SamlGoogleAttributeMappingStep = (): JSX.Element => {
             />
           </Col>
 
-          <AttributeMappingTable config={GOOGLE_ATTRIBUTE_MAPPING} />
+          <GoogleAttributeMappingTable />
         </Step.Section>
       </Step.Body>
 

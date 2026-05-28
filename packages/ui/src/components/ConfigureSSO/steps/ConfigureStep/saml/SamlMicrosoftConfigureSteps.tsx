@@ -1,9 +1,25 @@
 import React, { type JSX } from 'react';
 
-import { Box, Col, descriptors, Heading, localizationKeys, Text } from '@/customizables';
+import {
+  Badge,
+  Box,
+  Col,
+  descriptors,
+  Flex,
+  Heading,
+  localizationKeys,
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
+} from '@/customizables';
 import { ClipboardInput } from '@/elements/ClipboardInput';
 import { useCardState } from '@/elements/contexts';
 import { Form } from '@/elements/Form';
+import { Tooltip } from '@/elements/Tooltip';
 import { Checkmark, Clipboard } from '@/icons';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
@@ -11,7 +27,6 @@ import { useConfigureSSO } from '../../../ConfigureSSOContext';
 import { Step } from '../../../elements/Step';
 import { useWizard, Wizard } from '../../../elements/Wizard';
 import { InnerStepCounter } from '../../../elements/Wizard/InnerStepCounter';
-import { AttributeMappingTable, type AttributeMappingTableConfig } from './shared/AttributeMappingTable';
 import {
   applySamlSubmitError,
   buildSamlConfigurationPayload,
@@ -405,63 +420,126 @@ const SamlMicrosoftServiceProviderStep = (): JSX.Element => {
   );
 };
 
-const MICROSOFT_ATTRIBUTE_MAPPING: AttributeMappingTableConfig = {
-  columns: {
-    first: localizationKeys(
-      'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.columns.attribute',
-    ),
-    second: localizationKeys(
-      'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.columns.claimName',
-    ),
-    third: localizationKeys(
-      'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.columns.value',
-    ),
-  },
-  // Microsoft's default claim names are long URLs that don't fit the column;
-  // truncate them with an ellipsis and surface the full value in a tooltip.
-  truncateSecond: true,
-  rows: [
-    {
-      id: 'email',
-      isRequired: true,
-      first: localizationKeys(
-        'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.rows.email.attribute',
-      ),
-      second: localizationKeys(
-        'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.rows.email.claimName',
-      ),
-      third: localizationKeys(
-        'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.rows.email.value',
-      ),
-    },
-    {
-      id: 'firstName',
-      isRequired: false,
-      first: localizationKeys(
-        'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.rows.firstName.attribute',
-      ),
-      second: localizationKeys(
-        'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.rows.firstName.claimName',
-      ),
-      third: localizationKeys(
-        'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.rows.firstName.value',
-      ),
-    },
-    {
-      id: 'lastName',
-      isRequired: false,
-      first: localizationKeys(
-        'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.rows.lastName.attribute',
-      ),
-      second: localizationKeys(
-        'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.rows.lastName.claimName',
-      ),
-      third: localizationKeys(
-        'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.rows.lastName.value',
-      ),
-    },
-  ],
+type MicrosoftAttributeRow = {
+  id: 'email' | 'firstName' | 'lastName';
+  isRequired: boolean;
 };
+
+const MICROSOFT_ATTRIBUTE_ROWS: ReadonlyArray<MicrosoftAttributeRow> = [
+  { id: 'email', isRequired: true },
+  { id: 'firstName', isRequired: false },
+  { id: 'lastName', isRequired: false },
+];
+
+const MicrosoftAttributeMappingTable = (): JSX.Element => (
+  <Table
+    elementDescriptor={descriptors.configureSSOAttributeMappingTable}
+    sx={theme => ({
+      'tr > th:first-of-type': { paddingInlineStart: theme.space.$4 },
+    })}
+  >
+    <Thead>
+      <Tr>
+        <Th>
+          <Text
+            sx={theme => ({ fontSize: theme.fontSizes.$xs })}
+            localizationKey={localizationKeys(
+              'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.columns.attribute',
+            )}
+          />
+        </Th>
+        <Th>
+          <Text
+            sx={theme => ({ fontSize: theme.fontSizes.$xs })}
+            localizationKey={localizationKeys(
+              'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.columns.claimName',
+            )}
+          />
+        </Th>
+        <Th>
+          <Text
+            sx={theme => ({ fontSize: theme.fontSizes.$xs })}
+            localizationKey={localizationKeys(
+              'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.columns.value',
+            )}
+          />
+        </Th>
+      </Tr>
+    </Thead>
+    <Tbody>
+      {MICROSOFT_ATTRIBUTE_ROWS.map(row => {
+        const claimNameKey = localizationKeys(
+          `configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.rows.${row.id}.claimName`,
+        );
+
+        return (
+          <Tr key={row.id}>
+            {/*
+             * Keep the attribute name + badge on a single line. Without this,
+             * the next cell's `width: 100%` squeezes this one to its minimum
+             * intrinsic width, which causes "Email address" / "First name" /
+             * "Last name" to wrap onto two lines.
+             */}
+            <Td sx={{ whiteSpace: 'nowrap' }}>
+              <Flex
+                as='span'
+                align='center'
+                sx={theme => ({ gap: theme.space.$2 })}
+              >
+                <Text
+                  as='span'
+                  colorScheme='secondary'
+                  localizationKey={localizationKeys(
+                    `configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.rows.${row.id}.attribute`,
+                  )}
+                />
+                <Badge
+                  elementDescriptor={descriptors.configureSSOAttributeMappingBadge}
+                  elementId={descriptors.configureSSOAttributeMappingBadge.setId(
+                    row.isRequired ? 'required' : 'optional',
+                  )}
+                  colorScheme={row.isRequired ? 'warning' : 'primary'}
+                  localizationKey={localizationKeys(
+                    row.isRequired
+                      ? 'configureSSO.configureStep.attributeMappingTable.badges.required'
+                      : 'configureSSO.configureStep.attributeMappingTable.badges.optional',
+                  )}
+                />
+              </Flex>
+            </Td>
+            <Td sx={{ maxWidth: 0, width: '100%' }}>
+              <Tooltip.Root>
+                <Tooltip.Trigger>
+                  <Text
+                    as='span'
+                    sx={{
+                      fontFamily: 'monospace',
+                      display: 'block',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                    localizationKey={claimNameKey}
+                  />
+                </Tooltip.Trigger>
+                <Tooltip.Content text={claimNameKey} />
+              </Tooltip.Root>
+            </Td>
+            <Td>
+              <Text
+                as='span'
+                sx={{ fontFamily: 'monospace' }}
+                localizationKey={localizationKeys(
+                  `configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.rows.${row.id}.value`,
+                )}
+              />
+            </Td>
+          </Tr>
+        );
+      })}
+    </Tbody>
+  </Table>
+);
 
 const SamlMicrosoftAttributeMappingStep = (): JSX.Element => {
   const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
@@ -477,7 +555,7 @@ const SamlMicrosoftAttributeMappingStep = (): JSX.Element => {
             localizationKey={localizationKeys('configureSSO.configureStep.samlMicrosoft.attributeMappingStep.title')}
           />
 
-          <AttributeMappingTable config={MICROSOFT_ATTRIBUTE_MAPPING} />
+          <MicrosoftAttributeMappingTable />
 
           <Text
             as='p'
