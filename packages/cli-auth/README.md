@@ -27,13 +27,17 @@
 
 ## Getting Started
 
-`@clerk/cli-auth` implements the OAuth 2.0 Authorization Code + PKCE localhost-callback flow for adding [Clerk](https://clerk.com) authentication to Node.js command-line tools.
+`@clerk/cli-auth` is a set of building blocks for adding [Clerk](https://clerk.com) authentication to Node.js command-line tools.
+
+The package ships two entry points:
+
+- **`@clerk/cli-auth`** — sign-in and credential management in your CLI.
+- **`@clerk/cli-auth/server`** — verify CLI requests on your backend.
 
 ### Prerequisites
 
 - Node.js `>=20.9.0` or later
 - An existing Clerk application. [Create your account for free](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=clerk_cli_auth).
-- An OAuth Application registered with your Clerk instance (see [Setup](#setup) below)
 
 ### Installation
 
@@ -43,44 +47,31 @@ npm install @clerk/cli-auth
 
 ## Setup
 
-You need two things: an **OAuth Application** registered with a Clerk instance, and the `client_id` + issuer URL from it.
+Create an OAuth Application in your Clerk instance and grab its `client_id` and issuer URL.
 
-### 1. Create an OAuth Application
+### Create an OAuth Application
 
-Pick whichever path fits your workflow.
+In the [Clerk Dashboard](https://dashboard.clerk.com), go to **Configure → OAuth Applications → Create** and set:
 
-**Clerk Dashboard (recommended for most devs)** — in your dev instance, go to **Configure → OAuth Applications → Create**. Set:
+- **Name** — your CLI's name
+- **Redirect URI** — `http://127.0.0.1/callback`
+- **Public client (PKCE)** — enabled
+- **Scopes** — `profile email openid offline_access`
 
-- Name: your CLI's name
-- Redirect URI: `http://127.0.0.1/callback` (the CLI listens on a dynamic loopback port and sends the actual `http://127.0.0.1:{port}/callback` redirect URI during authorization)
-- Public client (PKCE): enabled
-- Scopes: `profile email openid offline_access`
+The dashboard returns a `client_id`. Pair it with your instance's Frontend API URL (e.g. `https://clerk.your-subdomain.accounts.dev` or your custom domain).
 
-**curl against BAPI** — if you prefer scripting. Replace `$SK` with your instance's secret key:
+If you prefer scripting, the same can be done with a `POST` to `https://api.clerk.com/v1/oauth_applications` — see the [Clerk Backend API reference](https://clerk.com/docs/reference/backend-api).
 
-```bash
-curl -X POST https://api.clerk.com/v1/oauth_applications \
-  -H "Authorization: Bearer $SK" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "my-cli",
-    "redirect_uris": ["http://127.0.0.1/callback"],
-    "public": true,
-    "pkce_required": true,
-    "scopes": "profile email openid offline_access"
-  }'
-```
+### Configure your CLI
 
-All paths return a JSON object with `client_id`. Grab it along with your instance's Frontend API URL (the issuer, e.g. `https://clerk.your-subdomain.accounts.dev` or a custom domain like `https://clerk.yourapp.com`).
-
-### 2. Configure your CLI
-
-```bash
-export CLERK_OAUTH_CLIENT_ID="..."   # from step 1
+```sh
+export CLERK_OAUTH_CLIENT_ID="..."
 export CLERK_ISSUER="https://clerk.your-subdomain.accounts.dev"
 ```
 
 ## Usage
+
+### Sign in
 
 ```ts
 import { ClerkCliAuth } from '@clerk/cli-auth';
@@ -93,41 +84,232 @@ const auth = new ClerkCliAuth({
   keychainService: 'my-cli',
 });
 
-// Opens a browser, starts a one-shot localhost listener, exchanges the code,
-// stores tokens in the OS keychain. Returns the token set and userinfo.
 const { tokens, user } = await auth.login();
+console.log(`Signed in as ${user.email}`);
+```
 
-// Returns the cached access token; auto-refreshes when within 30s of expiry.
+`login()` opens the user's browser, starts a one-shot localhost server, exchanges the authorization code for tokens, and stores the result in the OS keychain (with a `chmod 0600` file fallback). Pass `storage: 'memory'` for ephemeral sessions or `storage: 'file'` to skip the keychain entirely.
+
+### Get the current user
+
+```ts
+const me = await auth.whoami();
+if (me) {
+  console.log(`${me.name} <${me.email}>`);
+}
+```
+
+`whoami()` returns the live user info from Clerk. It auto-refreshes the access token when it's close to expiring and surfaces revocations immediately — there is no client-side cache.
+
+### Get an access token for API calls
+
+```ts
 const token = await auth.getAccessToken();
 
-// Reads the cached user. If no cache, fetches from /oauth/userinfo.
-const me = await auth.whoami();
+const res = await fetch('https://api.example.com/me', {
+  headers: { Authorization: `Bearer ${token}` },
+});
+```
 
-// Revokes the refresh token at the issuer, then clears keychain + cached userinfo.
-// Pass { revoke: false } to skip the network call (e.g. offline or token already expired).
+`getAccessToken()` returns the cached access token, refreshing it within 30 seconds of expiry. Returns `null` if the user isn't signed in.
+
+### Sign out
+
+`logout()` revokes the refresh token at Clerk's issuer, then clears the stored credentials. Pass `{ revoke: false }` to skip the network call when you're offline or the token is already expired — local credentials are cleared either way.
+
+```ts
 await auth.logout();
+await auth.logout({ revoke: false });
 ```
 
-## How the flow works
+### Accept API keys and machine tokens alongside OAuth
+
+CLIs that run in CI/CD, agents, or scripted environments often need to authenticate with a Clerk API key (`ak_*`) or machine-to-machine token (`mt_*`) instead of going through the browser. Configure the `apiKeys` block to enable this:
+
+```ts
+const auth = new ClerkCliAuth({
+  clientId: process.env.CLERK_OAUTH_CLIENT_ID!,
+  issuer: process.env.CLERK_ISSUER!,
+  apiKeys: {
+    identityEndpoint: 'https://myapp.com/api/cli/identity',
+    envVar: 'MYAPP_API_KEY',
+  },
+});
+
+// Look up the identity for a specific token (API key, machine token, or OAuth access token):
+const identity = await auth.verifyToken(process.env.MYAPP_API_KEY!);
+
+// Or let the SDK pick whichever credential is available:
+const { token, kind } = await auth.resolveToken({ tokenFromArg: argv.token });
+```
+
+`resolveToken()` checks for a credential in this order:
+
+1. The `tokenFromArg` you pass in (typically from a `--token` CLI flag).
+2. The environment variable named in `apiKeys.envVar`.
+3. The cached OAuth access token from `login()`.
+
+It returns `{ token, kind }`, where `kind` is one of `'session_token'`, `'api_key'`, `'m2m_token'`, or `'oauth_token'` (matching the Clerk Backend SDK's `TokenType`). Use it to branch logic per credential type:
+
+```ts
+const { token, kind } = await auth.resolveToken({ tokenFromArg: argv.token });
+
+// One call works for every kind — the server-side handler resolves the identity via the
+// matching verification path:
+const identity = await auth.verifyToken(token);
+
+if (kind === 'm2m_token') {
+  // ...e.g. attach the machine actor's org context to a log line
+}
+```
+
+Server-side verification of API keys and machine tokens happens at the `identityEndpoint` you host — see [Server-side](#server-side) for the implementation.
+
+## Server-side
+
+The `@clerk/cli-auth/server` entry point provides route handlers that verify incoming tokens against Clerk and return user info. It accepts every [Clerk Backend SDK](https://clerk.com/docs/references/backend/overview) token type:
+
+| `accepts` value   | Matching token format            |
+| ----------------- | -------------------------------- |
+| `'session_token'` | Clerk session JWTs               |
+| `'api_key'`       | `ak_*` Clerk API keys            |
+| `'m2m_token'`     | `mt_*` machine-to-machine tokens |
+| `'oauth_token'`   | `oat_*` OAuth access tokens      |
+| `'any'`           | Any of the above                 |
+
+### Bind a Clerk client
+
+Create a single `cliAuth` instance for your application:
+
+```ts
+// lib/clerk-cli.ts
+import { cliAuth } from '@clerk/cli-auth/server';
+import { clerkClient } from '@clerk/nextjs/server';
+
+export const { handle, verifyToken, verifyTokenFromRequest } = cliAuth({
+  client: clerkClient,
+});
+```
+
+`client` accepts either a resolved Clerk Backend SDK client or a factory function. Passing `clerkClient` from `@clerk/nextjs/server` directly works — the SDK calls it lazily on the first request and caches the result. You can also pass `clientConfig` (the same options `createClerkClient` accepts) to construct a client from a specific secret key. If neither is provided, the SDK builds one from `CLERK_SECRET_KEY`.
+
+### Identity endpoint
+
+Set `apiKeys.identityEndpoint` in your `ClerkCliAuth` constructor config to a backend route that returns the verified `Identity` for a token:
+
+```ts
+// app/api/cli/identity/route.ts
+import { handle } from '@/lib/clerk-cli';
+
+export const GET = handle({
+  accepts: ['api_key', 'm2m_token', 'oauth_token'],
+});
+```
+
+The handler reads `Authorization: Bearer <token>`, detects the token type, verifies it with Clerk, and returns a JSON `Identity` payload. This is what `auth.verifyToken()` calls from the CLI — once it's wired, `verifyToken()` works for API keys, machine tokens, and OAuth access tokens alike.
+
+### Protected resource endpoints
+
+Use `verifyTokenFromRequest` to add authentication to any other route your CLI calls:
+
+```ts
+// app/api/cli/projects/route.ts
+import { NextResponse } from 'next/server';
+import { verifyTokenFromRequest } from '@/lib/clerk-cli';
+
+export async function GET(request: Request) {
+  const tokenInfo = await verifyTokenFromRequest(request, {
+    accepts: ['api_key', 'm2m_token', 'oauth_token'],
+  });
+
+  const projects = await getProjectsForSubject(tokenInfo.subject);
+  return NextResponse.json({ projects });
+}
+```
+
+`verifyTokenFromRequest` throws on missing, invalid, or unaccepted tokens. The returned `tokenInfo` includes `subject`, `type`, optional `scopes`, and the verified `claims` payload — use any of these to authorize the request.
+
+### Customize verification and response
+
+Override `verifyToken` or `resolveAuthInfo` on `handle()` when the defaults aren't enough. Both callbacks receive `clerk` (the bound Clerk Backend SDK client) so you don't need to re-import or re-initialize it.
+
+Add an allowlist or alternate verifier:
+
+```ts
+export const GET = handle({
+  accepts: 'api_key',
+  verifyToken: async ({ token, type, request, clerk }) => {
+    if (!isAllowlisted(token)) {
+      throw new Error('Token not allowlisted');
+    }
+    const apiKey = await clerk.apiKeys.verify({ secret: token });
+    return { subject: apiKey.subject, type, scopes: apiKey.scopes };
+  },
+});
+```
+
+Enrich the response with profile and org data:
+
+```ts
+export const GET = handle({
+  accepts: ['api_key', 'oauth_token'],
+  resolveAuthInfo: async ({ tokenInfo, clerk }) => {
+    if (tokenInfo.type === 'oauth_token') {
+      const user = await clerk.users.getUser(tokenInfo.subject);
+      return {
+        sub: user.id,
+        email: user.primaryEmailAddress?.emailAddress,
+        name: `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim(),
+        picture: user.imageUrl,
+      };
+    }
+    return {
+      sub: tokenInfo.subject,
+      scopes: tokenInfo.scopes,
+      org_id: tokenInfo.claims?.org_id as string | undefined,
+    };
+  },
+});
+```
+
+`handle()` also accepts `client` and `clientConfig` to override the factory's Clerk client on a per-route basis — useful for multi-tenant applications.
+
+## Configuration reference
+
+### Storage
+
+`storage` controls how tokens are persisted between CLI invocations:
+
+- `'keychain'` (default) — OS credential manager (macOS Keychain, Windows Credential Manager, libsecret on Linux). Falls back to a `chmod 0600` JSON file at `~/.config/clerk-cli-auth/<environment>.json` if the keychain is unavailable.
+- `'file'` — file storage only, no keychain attempt.
+- `'memory'` — in-process only. Tokens are lost when the CLI exits.
+
+Pass a custom `keychainService` to namespace the keychain entries for your CLI, and `environment` to keep credentials for different Clerk instances separate (e.g. `'production'` vs `'staging'`).
+
+### Timeouts
+
+| Option             | Default            | Scope                                                                                                            |
+| ------------------ | ------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| `loginTimeoutMs`   | 120000 (2 minutes) | How long `login()` waits for the user to complete browser sign-in.                                               |
+| `requestTimeoutMs` | 30000 (30 seconds) | Per-request timeout for token exchange, refresh, revocation, `/oauth/userinfo`, and `identityEndpoint` requests. |
+
+Both fire `ClerkCliAuthError('timeout', ...)` when exceeded.
+
+## How the OAuth flow works
 
 ```
-1. CLI generates PKCE (code_verifier, code_challenge=S256(verifier)) + CSRF state.
-2. CLI binds a one-shot HTTP server on 127.0.0.1:0 (random port).
-3. CLI opens browser to:
+1. The CLI generates a PKCE code verifier, a SHA-256 code challenge, and a CSRF state value.
+2. The CLI binds an HTTP server on 127.0.0.1 at a random port.
+3. The CLI opens the user's browser to:
      {issuer}/oauth/authorize?client_id=...&code_challenge=...
-       &redirect_uri=http://127.0.0.1:{port}/callback&state=...
-       &code_challenge_method=S256
-4. User signs in via Clerk's hosted UI and approves consent.
-5. Clerk redirects the browser to http://127.0.0.1:{port}/callback?code=...&state=...
-6. Server validates state, responds with "You can close this tab", closes.
-7. CLI posts to {issuer}/oauth/token with grant_type=authorization_code + code_verifier.
-8. CLI stores the token set in the OS keychain (falls back to chmod 600 JSON file).
+       &redirect_uri=http://127.0.0.1:{port}/callback
+       &code_challenge_method=S256&state=...
+4. The user signs in through Clerk's hosted UI and grants consent.
+5. Clerk redirects the browser to the localhost server with `code` and `state`.
+6. The server validates `state`, responds with a "you can close this tab" page, and shuts down.
+7. The CLI exchanges the code for tokens at {issuer}/oauth/token with the PKCE verifier.
+8. The CLI stores the tokens in the configured credential store.
 ```
-
-## Known limitations
-
-- **Keychain path is tested structurally, not in CI.** Keychain access triggers OS credential-manager prompts in headless environments, so automated tests use memory and file stores. The keychain path is exercised end-to-end when consumers run against a real Clerk instance.
-- **Device Authorization Grant (RFC 8628) is not implemented.** The localhost-callback flow needs an open port, which doesn't work for CI, containers, or SSH sessions. If you need that, [open an issue](https://github.com/clerk/javascript/issues/new?assignees=&labels=needs-triage&projects=&template=feature_request.yml).
 
 ## Support
 
