@@ -204,29 +204,29 @@ The `@clerk/cli-auth/server` entry point provides route handlers that verify inc
 
 ### Bind a Clerk client
 
-Create a single `cliAuth` instance for your application:
+Create a single `cliAuth` instance for your application and pass it to `handle()` on each route:
 
 ```ts
 // lib/clerk-cli.ts
 import { cliAuth } from '@clerk/cli-auth/server';
 import { clerkClient } from '@clerk/nextjs/server';
 
-export const { handle, verifyToken, verifyTokenFromRequest } = cliAuth({
-  client: clerkClient,
-});
+export const auth = cliAuth({ client: clerkClient });
 ```
 
 `client` accepts either a resolved Clerk Backend SDK client or a factory function. Passing `clerkClient` from `@clerk/nextjs/server` directly works — the SDK calls it lazily on the first request and caches the result. You can also pass `clientConfig` (the same options `createClerkClient` accepts) to construct a client from a specific secret key. If neither is provided, the SDK builds one from `CLERK_SECRET_KEY`.
 
 ### Identity endpoint
 
-Set `identityEndpoint` in your `ClerkCliAuth` constructor config to a backend route that returns the verified `Identity` for a token:
+Wire the `handle()` route handler to your identity endpoint and pass it the `auth` instance:
 
 ```ts
 // app/api/cli/identity/route.ts
-import { handle } from '@/lib/clerk-cli';
+import { handle } from '@clerk/cli-auth/server';
+import { auth } from '@/lib/clerk-cli';
 
 export const GET = handle({
+  auth,
   accepts: ['api_key', 'm2m_token', 'oauth_token'],
 });
 ```
@@ -235,15 +235,15 @@ The handler reads `Authorization: Bearer <token>`, detects the token type, verif
 
 ### Protected resource endpoints
 
-Use `verifyTokenFromRequest` to add authentication to any other route your CLI calls:
+Use `auth.verifyTokenFromRequest()` to add authentication to any other route your CLI calls:
 
 ```ts
 // app/api/cli/projects/route.ts
 import { NextResponse } from 'next/server';
-import { verifyTokenFromRequest } from '@/lib/clerk-cli';
+import { auth } from '@/lib/clerk-cli';
 
 export async function GET(request: Request) {
-  const tokenInfo = await verifyTokenFromRequest(request, {
+  const tokenInfo = await auth.verifyTokenFromRequest(request, {
     accepts: ['api_key', 'm2m_token', 'oauth_token'],
   });
 
@@ -262,6 +262,7 @@ Add an allowlist or alternate verifier:
 
 ```ts
 export const GET = handle({
+  auth,
   accepts: 'api_key',
   verifyToken: async ({ token, type, request, clerk }) => {
     if (!isAllowlisted(token)) {
@@ -277,6 +278,7 @@ Enrich the response with profile and org data:
 
 ```ts
 export const GET = handle({
+  auth,
   accepts: ['api_key', 'oauth_token'],
   resolveAuthInfo: async ({ tokenInfo, clerk }) => {
     if (tokenInfo.type === 'oauth_token') {
@@ -297,7 +299,7 @@ export const GET = handle({
 });
 ```
 
-`handle()` also accepts `client` and `clientConfig` to override the factory's Clerk client on a per-route basis — useful for multi-tenant applications.
+For multi-tenant applications, create one `cliAuth()` instance per tenant (each bound to a different Clerk client) and pass the relevant instance to `handle()` on each route.
 
 ## Configuration reference
 

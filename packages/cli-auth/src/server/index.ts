@@ -1,5 +1,5 @@
 export { cliAuth } from './cli-auth';
-export { detectTokenType, isTokenTypeAccepted } from './detect-type';
+export { handle } from './handle';
 
 export type {
   AcceptsToken,
@@ -13,5 +13,7 @@ export type {
   VerifyTokenFn,
 } from './types';
 
-// Re-export the canonical TokenType from @clerk/backend so consumers don't have to dual-import.
-export { TokenType } from '@clerk/backend/internal';
+// Re-export the canonical `MachineTokenType` and `isTokenTypeAccepted` from `@clerk/backend`
+// so consumers don't have to dual-import.
+export { isTokenTypeAccepted, TokenType } from '@clerk/backend/internal';
+export type { MachineTokenType } from '@clerk/backend/internal';

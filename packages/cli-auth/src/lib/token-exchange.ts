@@ -1,6 +1,5 @@
 import { ClerkCliAuthError } from '../errors';
 import type { TokenSet, UserIdentity } from '../types';
-
 import { request } from './http';
 
 export interface ExchangeParams {

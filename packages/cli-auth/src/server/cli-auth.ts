@@ -1,44 +1,19 @@
 import { type ClerkClient, type ClerkOptions, createClerkClient } from '@clerk/backend';
-import type { TokenType } from '@clerk/backend/internal';
+import type { MachineTokenType } from '@clerk/backend/internal';
 
-import { ClerkCliAuthError, EXIT_CODE } from '../errors';
-import { detectTokenType, isTokenTypeAccepted } from './detect-type';
-import { resolveAuthInfo as defaultResolveAuthInfo, validateIdentity } from './resolve-auth';
+import { ClerkCliAuthError } from '../errors';
+import { resolveAuthInfo as defaultResolveAuthInfo } from './resolve-auth';
 import type {
+  AcceptsToken,
   CliAuthFactoryOptions,
   CliAuthInstance,
   ClientArg,
-  HandleOptions,
   ResolveAuthInfoContext,
   TokenInfo,
-  VerifyTokenContext,
-  VerifyTokenFn,
 } from './types';
-import { defaultVerifyToken, readBearer, runHandlePipeline } from './verify-token';
+import { readBearer, verifyTokenWithClerk } from './verify-token';
 
-function statusFor(code: string): number {
-  switch (code) {
-    case 'not_authenticated':
-    case 'verify_api_key':
-    case 'userinfo':
-      return 401;
-    case 'config':
-      return 500;
-    case 'timeout':
-      return 504;
-    default:
-      return 500;
-  }
-}
-
-function jsonError(error: ClerkCliAuthError): Response {
-  return Response.json(
-    { error: error.code, error_description: error.message, exit_code: error.exitCode ?? EXIT_CODE.GENERAL },
-    { status: statusFor(error.code) },
-  );
-}
-
-/** Build a getClerk thunk for the given factory/route options, with a single-flight cache. */
+/** Build a getClerk thunk for the given factory options, with a single-flight cache. */
 function makeClerkGetter(
   client: ClientArg | undefined,
   clientConfig: ClerkOptions | undefined,
@@ -85,7 +60,8 @@ function makeClerkGetter(
 
 /**
  * Factory: bind a Clerk Backend client (via `client`, `clientConfig`, or auto-built from
- * `CLERK_SECRET_KEY`) and return a set of helpers ready to drop into your routes.
+ * `CLERK_SECRET_KEY`) and return an instance with verifier helpers. Pair the instance with
+ * the standalone {@link handle} export to wire up route handlers.
  *
  * `client` accepts either a resolved `ClerkClient` or a factory function (sync or async)
  * — pass `@clerk/nextjs/server`'s `clerkClient` directly, no top-level `await` required.
@@ -96,86 +72,50 @@ function makeClerkGetter(
  * import { cliAuth } from '@clerk/cli-auth/server';
  * import { clerkClient } from '@clerk/nextjs/server';
  *
- * export const { handle, verifyToken, verifyTokenFromRequest, resolveAuthInfo } =
- *   cliAuth({ client: clerkClient });
+ * export const auth = cliAuth({ client: clerkClient });
  *
  * // app/api/cli/verify/route.ts
- * import { handle } from '@/lib/clerk-cli';
+ * import { handle } from '@clerk/cli-auth/server';
+ * import { auth } from '@/lib/clerk-cli';
  *
- * export const GET = handle({
- *   accepts: ['api_key', 'oauth_token'],
- *   // Optional per-route overrides:
- *   // client / clientConfig — different Clerk client for this route only
- *   // verifyToken: ({ token, type, request, clerk }) => ...
- *   // resolveAuthInfo: ({ tokenInfo, request, clerk }) => ...
- * });
+ * export const GET = handle({ auth, accepts: ['api_key', 'oauth_token'] });
+ *
+ * // Or use the primitive directly inside a custom protected route:
+ * const tokenInfo = await auth.verifyTokenFromRequest(request, { accepts: 'api_key' });
  * ```
  */
 export function cliAuth(options: CliAuthFactoryOptions = {}): CliAuthInstance {
-  const factoryGetClerk = makeClerkGetter(options.client, options.clientConfig);
+  const getClerk = makeClerkGetter(options.client, options.clientConfig);
 
-  async function verifyToken<T extends TokenType>(
-    ctx: Omit<VerifyTokenContext<T>, 'clerk'> & { clerk?: ClerkClient },
+  async function verifyToken<T extends MachineTokenType = MachineTokenType>(
+    token: string,
+    verifyOptions?: { accepts?: AcceptsToken },
   ): Promise<TokenInfo<T>> {
-    const clerk = ctx.clerk ?? (await factoryGetClerk());
-    return defaultVerifyToken({ ...ctx, clerk } as VerifyTokenContext<T>);
+    const info = await verifyTokenWithClerk(token, {
+      accepts: verifyOptions?.accepts,
+      clientConfig: options.clientConfig,
+    });
+    return info as TokenInfo<T>;
   }
 
-  async function verifyTokenFromRequest<T extends TokenType = TokenType>(
+  async function verifyTokenFromRequest<T extends MachineTokenType = MachineTokenType>(
     request: Request,
-    routeOptions: { accepts: HandleOptions['accepts'] },
+    verifyOptions?: { accepts?: AcceptsToken },
   ): Promise<TokenInfo<T>> {
     const token = readBearer(request);
-    const type = detectTokenType(token);
-    if (!isTokenTypeAccepted(type, routeOptions.accepts)) {
-      throw new ClerkCliAuthError('not_authenticated', `Token type "${type}" is not accepted by this endpoint.`);
-    }
-    return verifyToken({ token, type: type as T, request });
+    return verifyToken<T>(token, verifyOptions);
   }
 
-  function resolveAuthInfo<T extends TokenType>(
+  function resolveAuthInfo<T extends MachineTokenType>(
     ctx: Omit<ResolveAuthInfoContext<T>, 'clerk'> & { clerk?: ClerkClient },
   ): ReturnType<typeof defaultResolveAuthInfo> {
     return defaultResolveAuthInfo(ctx as ResolveAuthInfoContext<T>);
   }
 
-  function handle<T extends TokenType>(routeOptions: HandleOptions<T>): (request: Request) => Promise<Response> {
-    // Per-route client override gets its own getter; falls back to the factory's getter
-    // when neither override is supplied.
-    const routeGetClerk =
-      routeOptions.client || routeOptions.clientConfig
-        ? makeClerkGetter(routeOptions.client, routeOptions.clientConfig)
-        : factoryGetClerk;
-
-    return async function routeHandler(request: Request): Promise<Response> {
-      try {
-        const verifier: VerifyTokenFn<T> = routeOptions.verifyToken ?? defaultVerifyToken;
-
-        const { tokenInfo } = await runHandlePipeline<T>(request, {
-          accepts: routeOptions.accepts,
-          verifyToken: verifier,
-          getClerk: routeGetClerk,
-        });
-
-        const clerk = await routeGetClerk();
-        const resolver = routeOptions.resolveAuthInfo ?? defaultResolveAuthInfo;
-        const raw = await resolver({ tokenInfo, request, clerk });
-        const info = validateIdentity(raw);
-
-        return Response.json(info, { status: 200 });
-      } catch (error) {
-        if (error instanceof ClerkCliAuthError) {
-          return jsonError(error);
-        }
-        return jsonError(new ClerkCliAuthError('config', `Unexpected error: ${(error as Error).message}`));
-      }
-    };
-  }
-
   return {
-    handle,
     verifyToken,
     verifyTokenFromRequest,
     resolveAuthInfo,
+    getClerk,
   };
 }
