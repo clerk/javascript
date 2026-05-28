@@ -20,113 +20,9 @@ const path = require('path');
 const fs = require('fs');
 
 const CLERK_IOS_REPO = 'https://github.com/clerk/clerk-ios.git';
-const CLERK_IOS_VERSION = '1.1.3';
-const CLERK_IOS_REQUIREMENT = {
-  kind: 'exactVersion',
-  version: CLERK_IOS_VERSION,
-};
+const CLERK_IOS_VERSION = '1.0.0';
 
 const CLERK_MIN_IOS_VERSION = '17.0';
-
-const normalizeRepositoryURL = repositoryURL => String(repositoryURL || '').replace(/^"|"$/g, '');
-
-const isClerkIOSPackageReference = ref => normalizeRepositoryURL(ref?.repositoryURL) === CLERK_IOS_REPO;
-
-const removeObjectReference = (list, uuid) => {
-  if (!Array.isArray(list)) {
-    return;
-  }
-
-  for (let index = list.length - 1; index >= 0; index--) {
-    if (list[index]?.value === uuid) {
-      list.splice(index, 1);
-    }
-  }
-};
-
-const removeSwiftPackageProductDependencies = (xcodeProject, packageUuids) => {
-  const productDependencies = xcodeProject.hash.project.objects.XCSwiftPackageProductDependency || {};
-  const packageUuidSet = new Set(packageUuids);
-
-  for (const [productUuid, dependency] of Object.entries(productDependencies)) {
-    if (!packageUuidSet.has(dependency?.package)) {
-      continue;
-    }
-
-    delete productDependencies[productUuid];
-
-    const targets = xcodeProject.hash.project.objects.PBXNativeTarget || {};
-    for (const target of Object.values(targets)) {
-      removeObjectReference(target?.packageProductDependencies, productUuid);
-    }
-  }
-};
-
-const removeSwiftPackageReferences = (xcodeProject, packageUuids) => {
-  const packageReferences = xcodeProject.hash.project.objects.XCRemoteSwiftPackageReference || {};
-
-  for (const packageUuid of packageUuids) {
-    delete packageReferences[packageUuid];
-  }
-
-  const projects = xcodeProject.hash.project.objects.PBXProject || {};
-  for (const project of Object.values(projects)) {
-    for (const packageUuid of packageUuids) {
-      removeObjectReference(project?.packageReferences, packageUuid);
-    }
-  }
-
-  removeSwiftPackageProductDependencies(xcodeProject, packageUuids);
-};
-
-const findOrCreateClerkIOSPackageReference = xcodeProject => {
-  const packageReferences = xcodeProject.hash.project.objects.XCRemoteSwiftPackageReference;
-  const existingEntries = Object.entries(packageReferences).filter(([, ref]) => isClerkIOSPackageReference(ref));
-
-  if (existingEntries.length > 0) {
-    const [uuid, ref] = existingEntries[0];
-    ref.repositoryURL = CLERK_IOS_REPO;
-    ref.requirement = { ...CLERK_IOS_REQUIREMENT };
-
-    const duplicateUuids = existingEntries.slice(1).map(([duplicateUuid]) => duplicateUuid);
-    removeSwiftPackageReferences(xcodeProject, duplicateUuids);
-
-    return uuid;
-  }
-
-  const packageUuid = xcodeProject.generateUuid();
-  packageReferences[packageUuid] = {
-    isa: 'XCRemoteSwiftPackageReference',
-    repositoryURL: CLERK_IOS_REPO,
-    requirement: { ...CLERK_IOS_REQUIREMENT },
-  };
-  return packageUuid;
-};
-
-const findOrCreateSwiftPackageProductDependency = (xcodeProject, packageUuid, productName) => {
-  const productDependencies = xcodeProject.hash.project.objects.XCSwiftPackageProductDependency;
-  const existingEntry = Object.entries(productDependencies).find(
-    ([, dep]) => dep?.package === packageUuid && dep?.productName === productName,
-  );
-
-  if (existingEntry) {
-    return existingEntry[0];
-  }
-
-  const productUuid = xcodeProject.generateUuid();
-  productDependencies[productUuid] = {
-    isa: 'XCSwiftPackageProductDependency',
-    package: packageUuid,
-    productName,
-  };
-  return productUuid;
-};
-
-const addObjectReference = (list, uuid, comment) => {
-  if (!list.some(ref => ref.value === uuid)) {
-    list.push({ value: uuid, comment });
-  }
-};
 
 const withClerkIOS = config => {
   console.log('✅ Clerk iOS plugin loaded');
@@ -201,21 +97,42 @@ const withClerkIOS = config => {
       const targetUuid = targets.uuid;
       const targetName = targets.name;
 
+      // Add Swift Package reference to the project
+      const packageUuid = xcodeProject.generateUuid();
       const packageName = 'clerk-ios';
 
+      // Add package reference to XCRemoteSwiftPackageReference section
       if (!xcodeProject.hash.project.objects.XCRemoteSwiftPackageReference) {
         xcodeProject.hash.project.objects.XCRemoteSwiftPackageReference = {};
       }
 
-      const packageUuid = findOrCreateClerkIOSPackageReference(xcodeProject);
+      xcodeProject.hash.project.objects.XCRemoteSwiftPackageReference[packageUuid] = {
+        isa: 'XCRemoteSwiftPackageReference',
+        repositoryURL: CLERK_IOS_REPO,
+        requirement: {
+          kind: 'exactVersion',
+          version: CLERK_IOS_VERSION,
+        },
+      };
 
       // Add package product dependencies (ClerkKit + ClerkKitUI)
+      const productUuidKit = xcodeProject.generateUuid();
+      const productUuidKitUI = xcodeProject.generateUuid();
       if (!xcodeProject.hash.project.objects.XCSwiftPackageProductDependency) {
         xcodeProject.hash.project.objects.XCSwiftPackageProductDependency = {};
       }
 
-      const productUuidKit = findOrCreateSwiftPackageProductDependency(xcodeProject, packageUuid, 'ClerkKit');
-      const productUuidKitUI = findOrCreateSwiftPackageProductDependency(xcodeProject, packageUuid, 'ClerkKitUI');
+      xcodeProject.hash.project.objects.XCSwiftPackageProductDependency[productUuidKit] = {
+        isa: 'XCSwiftPackageProductDependency',
+        package: packageUuid,
+        productName: 'ClerkKit',
+      };
+
+      xcodeProject.hash.project.objects.XCSwiftPackageProductDependency[productUuidKitUI] = {
+        isa: 'XCSwiftPackageProductDependency',
+        package: packageUuid,
+        productName: 'ClerkKitUI',
+      };
 
       // Add package to project's package references
       const projectSection = xcodeProject.hash.project.objects.PBXProject;
@@ -226,7 +143,18 @@ const withClerkIOS = config => {
         project.packageReferences = [];
       }
 
-      addObjectReference(project.packageReferences, packageUuid, packageName);
+      // Check if package is already added
+      const alreadyAdded = project.packageReferences.some(ref => {
+        const refObj = xcodeProject.hash.project.objects.XCRemoteSwiftPackageReference[ref.value];
+        return refObj && refObj.repositoryURL === CLERK_IOS_REPO;
+      });
+
+      if (!alreadyAdded) {
+        project.packageReferences.push({
+          value: packageUuid,
+          comment: packageName,
+        });
+      }
 
       // Add package products to main app target
       const nativeTarget = xcodeProject.hash.project.objects.PBXNativeTarget[targetUuid];
@@ -234,8 +162,21 @@ const withClerkIOS = config => {
         nativeTarget.packageProductDependencies = [];
       }
 
-      addObjectReference(nativeTarget.packageProductDependencies, productUuidKit, 'ClerkKit');
-      addObjectReference(nativeTarget.packageProductDependencies, productUuidKitUI, 'ClerkKitUI');
+      const kitAlreadyAdded = nativeTarget.packageProductDependencies.some(dep => dep.value === productUuidKit);
+      if (!kitAlreadyAdded) {
+        nativeTarget.packageProductDependencies.push({
+          value: productUuidKit,
+          comment: 'ClerkKit',
+        });
+      }
+
+      const kitUIAlreadyAdded = nativeTarget.packageProductDependencies.some(dep => dep.value === productUuidKitUI);
+      if (!kitUIAlreadyAdded) {
+        nativeTarget.packageProductDependencies.push({
+          value: productUuidKitUI,
+          comment: 'ClerkKitUI',
+        });
+      }
 
       // Also add packages to ClerkExpo pod target if it exists
       const allTargets = xcodeProject.hash.project.objects.PBXNativeTarget;
@@ -245,8 +186,21 @@ const withClerkIOS = config => {
             target.packageProductDependencies = [];
           }
 
-          addObjectReference(target.packageProductDependencies, productUuidKit, 'ClerkKit');
-          addObjectReference(target.packageProductDependencies, productUuidKitUI, 'ClerkKitUI');
+          const podKitAdded = target.packageProductDependencies.some(dep => dep.value === productUuidKit);
+          if (!podKitAdded) {
+            target.packageProductDependencies.push({
+              value: productUuidKit,
+              comment: 'ClerkKit',
+            });
+          }
+
+          const podKitUIAdded = target.packageProductDependencies.some(dep => dep.value === productUuidKitUI);
+          if (!podKitUIAdded) {
+            target.packageProductDependencies.push({
+              value: productUuidKitUI,
+              comment: 'ClerkKitUI',
+            });
+          }
 
           console.log(`✅ Added ClerkKit and ClerkKitUI packages to ClerkExpo pod target`);
         }
@@ -762,13 +716,4 @@ const withClerkExpo = (config, props = {}) => {
 };
 
 module.exports = withClerkExpo;
-module.exports._testing = {
-  validateThemeJson,
-  isPlainObject,
-  VALID_COLOR_KEYS,
-  HEX_COLOR_REGEX,
-  CLERK_IOS_VERSION,
-  CLERK_IOS_REQUIREMENT,
-  findOrCreateClerkIOSPackageReference,
-  findOrCreateSwiftPackageProductDependency,
-};
+module.exports._testing = { validateThemeJson, isPlainObject, VALID_COLOR_KEYS, HEX_COLOR_REGEX };
