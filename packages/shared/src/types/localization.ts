@@ -1674,87 +1674,24 @@ export type __internal_LocalizationResource = {
             step1: LocalizationValue;
             step2: LocalizationValue;
             step3: LocalizationValue;
-            step4: LocalizationValue;
-            step5: LocalizationValue;
-          };
-        };
-        identityProviderMetadataStep: {
-          headerSubtitle: LocalizationValue;
-          modes: {
-            title: LocalizationValue;
-            ariaLabel: LocalizationValue;
-            metadataFile: LocalizationValue;
-            manual: LocalizationValue;
-          };
-          metadataFile: {
-            label: LocalizationValue;
-            description: LocalizationValue;
-            uploadFile: LocalizationValue;
-            replaceFile: LocalizationValue;
-            removeFile: LocalizationValue;
-            fileUploaded: LocalizationValue;
-          };
-          manual: {
-            description: LocalizationValue;
-            signOnUrl: {
+            step4: {
               label: LocalizationValue;
-              placeholder: LocalizationValue;
-            };
-            issuer: {
-              label: LocalizationValue;
-              placeholder: LocalizationValue;
-            };
-            signingCertificate: {
-              label: LocalizationValue;
-              uploadFile: LocalizationValue;
-              replaceFile: LocalizationValue;
-              removeFile: LocalizationValue;
-              fileUploaded: LocalizationValue;
+              subSteps: {
+                appName: LocalizationValue;
+                nonGallery: LocalizationValue;
+                create: LocalizationValue;
+              };
             };
           };
-        };
-        serviceProviderStep: {
-          headerSubtitle: LocalizationValue;
-          title: LocalizationValue;
-          paragraph: LocalizationValue;
-          serviceProviderFields: {
-            acsUrl: {
-              label: LocalizationValue;
-            };
-            spEntityId: {
-              label: LocalizationValue;
-            };
-          };
-          nameIdInstructions: {
-            step1: LocalizationValue;
-            step2: LocalizationValue;
-          };
-        };
-        attributeMappingStep: {
-          headerSubtitle: LocalizationValue;
-          paragraph: LocalizationValue;
-          step1: LocalizationValue;
-          step2: LocalizationValue;
-          attributeMappingTable: {
-            columns: {
-              googleAttribute: LocalizationValue;
-              appAttribute: LocalizationValue;
-            };
-            rows: {
-              email: { googleAttribute: LocalizationValue; appAttribute: LocalizationValue };
-              firstName: { googleAttribute: LocalizationValue; appAttribute: LocalizationValue };
-              lastName: { googleAttribute: LocalizationValue; appAttribute: LocalizationValue };
-            };
-          };
-        };
-        configureUserAccess: {
-          headerSubtitle: LocalizationValue;
           assignUsersInstructions: {
+            title: LocalizationValue;
             paragraph1: LocalizationValue;
             step1: LocalizationValue;
             step2: LocalizationValue;
             step3: LocalizationValue;
-            paragraph2: LocalizationValue;
+            step4: LocalizationValue;
+            step5: LocalizationValue;
+            step6: LocalizationValue;
           };
         };
       };

@@ -616,6 +616,40 @@ export const enUS: LocalizationResource = {
           },
         },
       },
+      samlMicrosoft: {
+        mainHeaderTitle: 'Configure Microsoft Entra',
+        createAppStep: {
+          headerSubtitle: 'Create a new enterprise application in your Azure portal',
+          createAppInstructions: {
+            title: 'Create a new enterprise application in Microsoft Entra',
+            step1: 'Sign in to Microsoft Azure Portal and go to <bold>Enterprise applications.</bold>',
+            step2:
+              "Click <bold>New application.</bold> You'll be redirected to the <bold>Browse Microsoft Entra Gallery</bold> page.",
+            step3: 'Select <bold>Create your own application.</bold>',
+            step4: {
+              label: 'In the modal that opens:',
+              subSteps: {
+                appName: 'Fill out your application name.',
+                nonGallery:
+                  "Select <bold>Integrate any other application you don't find in the gallery (Non-gallery)</bold>.",
+                create: 'Select <bold>Create</bold>.',
+              },
+            },
+          },
+          assignUsersInstructions: {
+            title: 'Assign your users or groups in Microsoft',
+            paragraph1: 'You need to assign users or groups before they can use it to log in.',
+            step1: 'In the <bold>Getting Started</bold> section, select the <bold>Assign users and groups.</bold>',
+            step2: "Select <bold>Add user/group.</bold> You'll be redirected to the <bold>Add Assignment page.</bold>",
+            step3: 'Select the <bold>None Selected link.</bold>',
+            step4:
+              'To assign a user to the enterprise app, you can either use the search field to find a user or select the checkbox next to the user in the table.',
+            step5:
+              "Select <bold>Select</bold> at the bottom of the page. You'll be redirected to the <bold>Add Assignment</bold> page.",
+            step6: 'Select <bold>Assign</bold> at the bottom of the page.',
+          },
+        },
+      },
     },
   },
   createOrganization: {
