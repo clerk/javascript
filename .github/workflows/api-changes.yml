@@ -148,6 +148,8 @@ jobs:
             --output "$GITHUB_WORKSPACE/.api-snapshots-baseline"
 
       - name: Detect API changes
+        env:
+          SNAPI_ANTHROPIC_API_KEY: ${{ secrets.SNAPI_ANTHROPIC_API_KEY }}
         run: |
           pnpm dlx --package "$SNAPI_PACKAGE" snapi detect \
             --baseline .api-snapshots-baseline \

@@ -674,6 +674,7 @@ export type ElementsConfig = {
   enterpriseConnectionButtonText: WithOptions;
 
   configureSSOHeader: WithOptions;
+  configureSSOMobileNavbar: WithOptions;
   configureSSOStepper: WithOptions;
   configureSSOStepperItem: WithOptions<string, ActiveState>;
   configureSSOStepperItemBullet: WithOptions<string, ActiveState>;
@@ -694,6 +695,7 @@ export type ElementsConfig = {
   configureSSOProviderGroupLabel: WithOptions<string>;
   configureSSOProviderGrid: WithOptions;
   configureSSOProviderCard: WithOptions<string, ActiveState>;
+  configureSSOProviderCardRadio: WithOptions<string>;
   configureSSOProviderCardIcon: WithOptions<string>;
   configureSSOProviderCardLabel: WithOptions<string>;
 

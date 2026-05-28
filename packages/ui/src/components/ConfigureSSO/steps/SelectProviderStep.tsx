@@ -3,7 +3,18 @@ import { useUser } from '@clerk/shared/react/index';
 import React from 'react';
 
 import type { LocalizationKey } from '@/customizables';
-import { Box, Col, descriptors, Flow, Grid, localizationKeys, Span, Text, useLocalizations } from '@/customizables';
+import {
+  Box,
+  Col,
+  descriptors,
+  Flow,
+  Grid,
+  localizationKeys,
+  RadioInput,
+  Span,
+  Text,
+  useLocalizations,
+} from '@/customizables';
 import { useCardState } from '@/elements/contexts';
 import { common, mqu } from '@/styledSystem';
 import { Alert } from '@/ui/elements/Alert';
@@ -95,7 +106,7 @@ export const SelectProviderStep = (): JSX.Element => {
                 key={group.id}
                 elementDescriptor={descriptors.configureSSOProviderGroup}
                 elementId={descriptors.configureSSOProviderGroup.setId(group.id)}
-                sx={theme => ({ gap: theme.space.$3 })}
+                gap={3}
               >
                 <Text
                   elementDescriptor={descriptors.configureSSOProviderGroupLabel}
@@ -178,53 +189,46 @@ const ProviderCard = ({ name, value, iconId, label, checked, onChange }: Provide
       elementDescriptor={descriptors.configureSSOProviderCard}
       elementId={descriptors.configureSSOProviderCard.setId(value)}
       isActive={checked}
-      sx={theme => ({
-        // Outline-button look (mirrors SimpleButton variant='outline' for visual continuity).
-        borderWidth: theme.borderWidths.$normal,
-        borderStyle: theme.borderStyles.$solid,
-        borderColor: theme.colors.$borderAlpha150,
-        borderRadius: theme.radii.$md,
-        color: theme.colors.$neutralAlpha600,
+      sx={t => ({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: theme.space.$2,
-        height: theme.sizes.$32,
-        padding: theme.space.$1x5,
-        backgroundColor: theme.colors.$colorBackground,
+        gap: t.space.$2,
+        height: t.sizes.$32,
+        padding: t.space.$1x5,
         cursor: 'pointer',
         position: 'relative',
-        '&:hover': { backgroundColor: theme.colors.$neutralAlpha50 },
-        // Keyboard focus indication — fires when the inner input is focused.
+        ...common.borderVariants(t).normal,
         '&:has(input:focus-visible)': {
-          ...common.focusRingStyles(theme),
-          borderColor: theme.colors.$borderAlpha300,
+          ...common.focusRingStyles(t),
+          borderColor: t.colors.$borderAlpha300,
         },
-        // Selected ring — CSS-driven via :checked so it survives focus changes.
+        '&:hover': {
+          backgroundColor: t.colors.$neutralAlpha50,
+        },
         '&:has(input:checked)': {
-          borderColor: theme.colors.$borderAlpha300,
-          ...common.focusRingStyles(theme),
+          backgroundColor: t.colors.$neutralAlpha50,
         },
       })}
     >
-      <input
-        type='radio'
+      <RadioInput
+        elementDescriptor={descriptors.configureSSOProviderCardRadio}
+        elementId={descriptors.configureSSOProviderCardRadio.setId(value)}
         name={name}
         value={value}
         checked={checked}
         onChange={onChange}
-        css={{
+        focusRing={false}
+        sx={theme => ({
           position: 'absolute',
-          width: '1px',
-          height: '1px',
-          padding: 0,
-          margin: '-1px',
-          overflow: 'hidden',
-          clip: 'rect(0,0,0,0)',
-          whiteSpace: 'nowrap',
-          borderWidth: 0,
-        }}
+          top: theme.space.$1x5,
+          insetInlineStart: theme.space.$1x5,
+          margin: 0,
+          width: 'fit-content',
+          boxShadow: 'none',
+          '&:hover': { boxShadow: 'none' },
+        })}
       />
 
       <Span
