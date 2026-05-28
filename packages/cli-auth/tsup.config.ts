@@ -9,6 +9,7 @@ export default defineConfig(overrideOptions => {
   return {
     entry: {
       index: './src/index.ts',
+      server: './src/server/index.ts',
     },
     format: ['cjs', 'esm'],
     bundle: true,
