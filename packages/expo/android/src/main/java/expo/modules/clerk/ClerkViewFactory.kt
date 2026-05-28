@@ -35,14 +35,6 @@ class ClerkViewFactory : ClerkViewFactoryInterface {
     }
   }
 
-  override fun createAuthIntent(context: Context, mode: String, dismissable: Boolean): Intent {
-    return Intent(context, ClerkAuthActivity::class.java).apply {
-      putExtra(ClerkExpoModule.EXTRA_MODE, mode)
-      putExtra(ClerkExpoModule.EXTRA_DISMISSABLE, dismissable)
-      storedPublishableKey?.let { putExtra(ClerkExpoModule.EXTRA_PUBLISHABLE_KEY, it) }
-    }
-  }
-
   override fun createUserProfileIntent(context: Context, dismissable: Boolean): Intent {
     return Intent(context, ClerkUserProfileActivity::class.java).apply {
       putExtra(ClerkExpoModule.EXTRA_DISMISSABLE, dismissable)

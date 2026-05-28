@@ -149,21 +149,6 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
     Self.readNativeDeviceToken()
   }
 
-  public func createAuthViewController(
-    mode: String,
-    dismissable: Bool,
-    completion: @escaping (Result<[String: Any], Error>) -> Void
-  ) -> UIViewController? {
-    let wrapper = ClerkAuthWrapperViewController(
-      mode: Self.authMode(from: mode),
-      dismissable: dismissable,
-      lightTheme: lightTheme,
-      darkTheme: darkTheme,
-      completion: completion
-    )
-    return wrapper
-  }
-
   public func createUserProfileViewController(
     dismissable: Bool,
     completion: @escaping (Result<[String: Any], Error>) -> Void
@@ -417,99 +402,6 @@ private struct ExpoKeychain {
       kSecAttrService as String: service,
       kSecAttrAccount as String: key,
     ]
-  }
-}
-
-// MARK: - Auth View Controller Wrapper
-
-class ClerkAuthWrapperViewController: UIHostingController<ClerkAuthWrapperView> {
-  private let completion: (Result<[String: Any], Error>) -> Void
-  private var authEventTask: Task<Void, Never>?
-  private var completionCalled = false
-
-  init(mode: AuthView.Mode, dismissable: Bool, lightTheme: ClerkTheme?, darkTheme: ClerkTheme?, completion: @escaping (Result<[String: Any], Error>) -> Void) {
-    self.completion = completion
-    let view = ClerkAuthWrapperView(mode: mode, dismissable: dismissable, lightTheme: lightTheme, darkTheme: darkTheme)
-    super.init(rootView: view)
-    self.modalPresentationStyle = .fullScreen
-    subscribeToAuthEvents()
-  }
-
-  @MainActor required dynamic init?(coder aDecoder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
-  }
-
-  deinit {
-    authEventTask?.cancel()
-  }
-
-  override func viewDidDisappear(_ animated: Bool) {
-    super.viewDidDisappear(animated)
-    if isBeingDismissed {
-      // Check if auth completed (session exists) vs user cancelled
-      if let session = Clerk.shared.session, session.id != initialSessionId {
-        completeOnce(.success(["sessionId": session.id, "type": "signIn"]))
-      } else {
-        completeOnce(.success(["cancelled": true]))
-      }
-    }
-  }
-
-  private func completeOnce(_ result: Result<[String: Any], Error>) {
-    guard !completionCalled else { return }
-    completionCalled = true
-    completion(result)
-  }
-
-  private var initialSessionId: String? = Clerk.shared.session?.id
-
-  private func subscribeToAuthEvents() {
-    authEventTask = Task { @MainActor [weak self] in
-      for await event in Clerk.shared.auth.events {
-        guard let self = self, !self.completionCalled else { return }
-        switch event {
-        case .signInCompleted(let signIn):
-          let sessionId = signIn.createdSessionId ?? Clerk.shared.session?.id
-          if let sessionId, sessionId != self.initialSessionId {
-            self.completeOnce(.success(["sessionId": sessionId, "type": "signIn"]))
-            self.dismiss(animated: true)
-          }
-        case .signUpCompleted(let signUp):
-          let sessionId = signUp.createdSessionId ?? Clerk.shared.session?.id
-          if let sessionId, sessionId != self.initialSessionId {
-            self.completeOnce(.success(["sessionId": sessionId, "type": "signUp"]))
-            self.dismiss(animated: true)
-          }
-        case .sessionChanged(_, let newSession):
-          if let sessionId = newSession?.id, sessionId != self.initialSessionId {
-            self.completeOnce(.success(["sessionId": sessionId, "type": "signIn"]))
-            self.dismiss(animated: true)
-          }
-        default:
-          break
-        }
-      }
-    }
-  }
-}
-
-struct ClerkAuthWrapperView: View {
-  let mode: AuthView.Mode
-  let dismissable: Bool
-  let lightTheme: ClerkTheme?
-  let darkTheme: ClerkTheme?
-
-  @Environment(\.colorScheme) private var colorScheme
-
-  var body: some View {
-    let view = AuthView(mode: mode, isDismissable: dismissable)
-      .environment(Clerk.shared)
-    let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
-    if let theme {
-      view.environment(\.clerkTheme, theme)
-    } else {
-      view
-    }
   }
 }
 

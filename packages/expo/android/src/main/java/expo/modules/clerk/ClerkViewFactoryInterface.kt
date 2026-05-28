@@ -14,13 +14,6 @@ interface ClerkViewFactoryInterface {
   suspend fun configure(context: Context, publishableKey: String)
 
   /**
-   * Create an Intent to launch the authentication activity.
-   * @param mode The auth mode: "signIn", "signUp", or "signInOrUp"
-   * @param dismissable Whether the user can dismiss the modal
-   */
-  fun createAuthIntent(context: Context, mode: String, dismissable: Boolean): Intent
-
-  /**
    * Create an Intent to launch the user profile activity.
    * @param dismissable Whether the user can dismiss the modal
    */
