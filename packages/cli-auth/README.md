@@ -51,16 +51,43 @@ Create an OAuth Application in your Clerk instance and grab its `client_id` and 
 
 ### Create an OAuth Application
 
-In the [Clerk Dashboard](https://dashboard.clerk.com), go to **Configure → OAuth Applications → Create** and set:
+Pick whichever path fits your workflow.
+
+**Clerk Dashboard** — in your dev instance, go to **Configure → OAuth Applications → Create** and set:
 
 - **Name** — your CLI's name
-- **Redirect URI** — `http://127.0.0.1/callback`
+- **Redirect URI** — `http://127.0.0.1/callback` (the CLI listens on a dynamic loopback port and sends the actual `http://127.0.0.1:{port}/callback` during authorization)
 - **Public client (PKCE)** — enabled
 - **Scopes** — `profile email openid offline_access`
 
-The dashboard returns a `client_id`. Pair it with your instance's Frontend API URL (e.g. `https://clerk.your-subdomain.accounts.dev` or your custom domain).
+**Clerk CLI** — if you have [`clerk`](https://clerk.com/cli) installed, this is the fastest path. Keychain-based auth, no secret key in the env:
 
-If you prefer scripting, the same can be done with a `POST` to `https://api.clerk.com/v1/oauth_applications` — see the [Clerk Backend API reference](https://clerk.com/docs/reference/backend-api).
+```sh
+clerk api /oauth_applications --instance <ins_...> -X POST --yes -d '{
+  "name": "my-cli",
+  "redirect_uris": ["http://127.0.0.1/callback"],
+  "public": true,
+  "pkce_required": true,
+  "scopes": "profile email openid offline_access"
+}'
+```
+
+**curl against BAPI** — if you'd rather script it directly. Replace `$SK` with your instance's secret key:
+
+```sh
+curl -X POST https://api.clerk.com/v1/oauth_applications \
+  -H "Authorization: Bearer $SK" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "my-cli",
+    "redirect_uris": ["http://127.0.0.1/callback"],
+    "public": true,
+    "pkce_required": true,
+    "scopes": "profile email openid offline_access"
+  }'
+```
+
+All three paths return a JSON object with `client_id`. Pair it with your instance's Frontend API URL (the issuer — e.g. `https://clerk.your-subdomain.accounts.dev` or a custom domain like `https://clerk.yourapp.com`).
 
 ### Configure your CLI
 
