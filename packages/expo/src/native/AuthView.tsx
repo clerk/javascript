@@ -1,59 +1,9 @@
-import { ClerkRuntimeError } from '@clerk/shared/error';
-import { useCallback, useRef } from 'react';
+import { useCallback } from 'react';
 import { Text, View } from 'react-native';
 
-import { CLERK_CLIENT_JWT_KEY } from '../constants';
-import { getClerkInstance } from '../provider/singleton';
 import NativeClerkAuthView from '../specs/NativeClerkAuthView';
-import { tokenCache } from '../token-cache';
-import { ClerkExpoModule as ClerkExpo, isNativeSupported } from '../utils/native-module';
+import { isNativeSupported } from '../utils/native-module';
 import type { AuthViewProps } from './AuthView.types';
-
-export async function syncNativeSession(sessionId: string): Promise<void> {
-  // Copy the native client's bearer token to the JS SDK's token cache
-  if (ClerkExpo?.getClientToken) {
-    const nativeClientToken = await ClerkExpo.getClientToken();
-    if (__DEV__) {
-      console.log(
-        '[syncNativeSession] getClientToken:',
-        nativeClientToken ? `${nativeClientToken.slice(0, 20)}...` : 'null',
-      );
-    }
-    if (nativeClientToken) {
-      await tokenCache?.saveToken(CLERK_CLIENT_JWT_KEY, nativeClientToken);
-    }
-  }
-
-  const clerkInstance = getClerkInstance();
-  if (!clerkInstance) {
-    throw new ClerkRuntimeError(
-      'Clerk instance is not available. Ensure <ClerkProvider> is mounted before using <AuthView>.',
-      { code: 'expo_auth_view_clerk_instance_not_available' },
-    );
-  }
-
-  // Reload resources using the native client's token
-  const clerkRecord = clerkInstance as unknown as Record<string, unknown>;
-  if (typeof clerkRecord.__internal_reloadInitialResources === 'function') {
-    if (__DEV__) {
-      console.log('[syncNativeSession] reloading initial resources...');
-    }
-    await (clerkRecord.__internal_reloadInitialResources as () => Promise<void>)();
-    if (__DEV__) {
-      console.log('[syncNativeSession] reload complete');
-    }
-  }
-
-  if (typeof clerkInstance.setActive === 'function') {
-    if (__DEV__) {
-      console.log('[syncNativeSession] calling setActive with session:', sessionId);
-    }
-    await clerkInstance.setActive({ session: sessionId });
-    if (__DEV__) {
-      console.log('[syncNativeSession] setActive complete');
-    }
-  }
-}
 
 /**
  * A pre-built native authentication component that handles sign-in and sign-up flows.
@@ -85,53 +35,13 @@ export async function syncNativeSession(sessionId: string): Promise<void> {
  * @see {@link https://clerk.com/docs/components/authentication/sign-in} Clerk Sign-In Documentation
  */
 export function AuthView({ mode = 'signInOrUp', isDismissable = false, onDismiss }: AuthViewProps) {
-  const authCompletedRef = useRef(false);
-
-  const syncSession = useCallback(async (sessionId: string) => {
-    if (authCompletedRef.current) {
-      return;
-    }
-
-    if (__DEV__) {
-      console.log('[AuthView] syncSession called with sessionId:', sessionId);
-    }
-
-    try {
-      await syncNativeSession(sessionId);
-      authCompletedRef.current = true;
-      if (__DEV__) {
-        console.log('[AuthView] syncSession succeeded');
-      }
-    } catch (err) {
-      if (__DEV__) {
-        console.error('[AuthView] Failed to sync session:', err);
-      }
-    }
-  }, []);
-
   const handleAuthEvent = useCallback(
-    async (event: { nativeEvent: { type: string; data: string } }) => {
-      const { type, data: rawData } = event.nativeEvent;
-      if (__DEV__) {
-        console.log('[AuthView] onAuthEvent:', type, rawData);
-      }
-      const data: Record<string, any> = typeof rawData === 'string' ? JSON.parse(rawData) : rawData;
-
-      if (type === 'dismissed') {
+    (event: { nativeEvent: { type: string } }) => {
+      if (event.nativeEvent.type === 'dismissed') {
         onDismiss?.();
-        return;
-      }
-
-      if (type === 'signInCompleted' || type === 'signUpCompleted') {
-        const sessionId = data?.sessionId;
-        if (sessionId) {
-          await syncSession(sessionId);
-        } else if (__DEV__) {
-          console.warn('[AuthView] Auth event received but no sessionId in data:', data);
-        }
       }
     },
-    [onDismiss, syncSession],
+    [onDismiss],
   );
 
   if (!isNativeSupported || !NativeClerkAuthView) {

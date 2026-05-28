@@ -9,10 +9,12 @@ import com.clerk.api.network.serialization.ClerkResult
 import com.clerk.api.ui.ClerkColors
 import com.clerk.api.ui.ClerkDesign
 import com.clerk.api.ui.ClerkTheme
+import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.WritableNativeMap
+import com.facebook.react.modules.core.DeviceEventManagerModule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.TimeoutCancellationException
@@ -34,7 +36,45 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
+    companion object {
+        private var sharedReactContext: ReactApplicationContext? = null
+        private var listenerCount = 0
+
+        fun emitAuthStateChange(type: String, sessionId: String?) {
+            if (listenerCount <= 0) {
+                return
+            }
+
+            val event = Arguments.createMap().apply {
+                putString("type", type)
+                if (sessionId == null) {
+                    putNull("sessionId")
+                } else {
+                    putString("sessionId", sessionId)
+                }
+            }
+
+            sharedReactContext
+                ?.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
+                ?.emit("onAuthStateChange", event)
+        }
+    }
+
+    init {
+        sharedReactContext = reactContext
+    }
+
     override fun getName(): String = "ClerkExpo"
+
+    @ReactMethod
+    override fun addListener(eventName: String) {
+        listenerCount += 1
+    }
+
+    @ReactMethod
+    override fun removeListeners(count: Double) {
+        listenerCount = maxOf(0, listenerCount - count.toInt())
+    }
 
     // MARK: - configure
 

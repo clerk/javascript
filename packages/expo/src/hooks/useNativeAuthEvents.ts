@@ -29,9 +29,8 @@ export interface UseNativeAuthEventsReturn {
  *
  * This provides reactive updates when the user signs in or out via native UI.
  * Events are emitted by the native module when:
- * - User completes sign-in (signInCompleted event from clerk-ios/clerk-android)
- * - User completes sign-up (signUpCompleted event from clerk-ios/clerk-android)
- * - User signs out (signedOut event from clerk-ios/clerk-android)
+ * - a native AuthView creates or activates a session
+ * - a native UserProfileView or UserButton signs out
  *
  * @example
  * ```tsx
@@ -63,7 +62,7 @@ export function useNativeAuthEvents(): UseNativeAuthEventsReturn {
     let subscription: { remove: () => void } | null = null;
 
     try {
-      const eventEmitter = new NativeEventEmitter(ClerkExpo as any);
+      const eventEmitter = new NativeEventEmitter(ClerkExpo);
 
       subscription = eventEmitter.addListener('onAuthStateChange', (event: NativeAuthStateEvent) => {
         if (__DEV__) {
