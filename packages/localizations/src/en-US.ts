@@ -669,6 +669,40 @@ export const enUS: LocalizationResource = {
             },
           },
         },
+        identityProviderMetadataStep: {
+          headerSubtitle: 'Configure identity provider metadata',
+          modes: {
+            title: 'Fill in your Microsoft Entra application details',
+            ariaLabel: 'Configuration ',
+            metadataUrl: 'Add via metadata',
+            manual: 'Configure manually',
+          },
+          metadataUrl: {
+            label: 'Metadata URL',
+            placeholder: 'Paste URL here...',
+            description:
+              'On the <bold>SAML-based Sign-on</bold> page, find the <bold>SAML Certificates</bold> section. Add the <bold>App Federation Metadata Url</bold> below.',
+          },
+          manual: {
+            description:
+              'On the <bold>SAML-based Sign-on</bold> page, find the <bold>SAML Certificates</bold> section. Retrieve these values and add them below.',
+            signOnUrl: {
+              label: 'Single Sign-On URL',
+              placeholder: 'Paste URL here...',
+            },
+            issuer: {
+              label: 'Issuer',
+              placeholder: 'Paste URL here...',
+            },
+            signingCertificate: {
+              label: 'Signing certificate',
+              uploadFile: 'Upload file',
+              replaceFile: 'Replace file',
+              removeFile: 'Remove file',
+              fileUploaded: 'File uploaded',
+            },
+          },
+        },
       },
     },
   },

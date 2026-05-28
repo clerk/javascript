@@ -1,7 +1,8 @@
-import { type JSX } from 'react';
+import React, { type JSX } from 'react';
 
 import { Box, Col, descriptors, Heading, localizationKeys, Text } from '@/customizables';
 import { ClipboardInput } from '@/elements/ClipboardInput';
+import { useCardState } from '@/elements/contexts';
 import { Form } from '@/elements/Form';
 import { Checkmark, Clipboard } from '@/icons';
 import { useFormControl } from '@/ui/utils/useFormControl';
@@ -10,6 +11,16 @@ import { useConfigureSSO } from '../../../ConfigureSSOContext';
 import { Step } from '../../../elements/Step';
 import { useWizard, Wizard } from '../../../elements/Wizard';
 import { InnerStepCounter } from '../../../elements/Wizard/InnerStepCounter';
+import {
+  applySamlSubmitError,
+  buildSamlConfigurationPayload,
+  IdentityProviderConfigurationForm,
+  type IdentityProviderConfigurationFormProps,
+} from './shared/IdentityProviderConfigurationForm';
+import {
+  IdentityProviderConfigurationModes,
+  type IdpConfigurationMode,
+} from './shared/IdentityProviderConfigurationModes';
 
 export const SamlMicrosoftConfigureSteps = (): JSX.Element => {
   return (
@@ -32,6 +43,18 @@ export const SamlMicrosoftConfigureSteps = (): JSX.Element => {
           <InnerStepCounter />
         </Step.Header>
         <SamlMicrosoftServiceProviderStep />
+      </Wizard.Step>
+
+      <Wizard.Step id='identity-provider-metadata'>
+        <Step.Header
+          title={localizationKeys('configureSSO.configureStep.samlMicrosoft.mainHeaderTitle')}
+          description={localizationKeys(
+            'configureSSO.configureStep.samlMicrosoft.identityProviderMetadataStep.headerSubtitle',
+          )}
+        >
+          <InnerStepCounter />
+        </Step.Header>
+        <SamlMicrosoftIdentityProviderMetadataStep />
       </Wizard.Step>
     </>
   );
@@ -365,6 +388,197 @@ const SamlMicrosoftServiceProviderStep = (): JSX.Element => {
         <Step.Footer.Continue
           onClick={() => goNext()}
           isDisabled={isLastStep}
+        />
+      </Step.Footer>
+    </>
+  );
+};
+
+const MICROSOFT_SAML_IDP_MODES = ['metadataUrl', 'manual'] as const satisfies readonly IdpConfigurationMode[];
+
+const SamlMicrosoftIdentityProviderMetadataStep = (): JSX.Element => {
+  const card = useCardState();
+  const { goNext, goPrev, isFirstStep } = useWizard();
+  const { enterpriseConnection, updateEnterpriseConnection } = useConfigureSSO();
+
+  const samlConnection = enterpriseConnection?.samlConnection;
+  const hasExistingConfig = Boolean(
+    samlConnection?.idpSsoUrl ||
+    samlConnection?.idpEntityId ||
+    samlConnection?.idpCertificate ||
+    samlConnection?.idpMetadataUrl,
+  );
+  const existingCertPresent = Boolean(samlConnection?.idpCertificate);
+
+  const [mode, setMode] = React.useState<IdpConfigurationMode>(hasExistingConfig ? 'manual' : 'metadataUrl');
+  const [certFile, setCertFile] = React.useState<File | null>(null);
+
+  const metadataUrlField = useFormControl('idpMetadataUrl', samlConnection?.idpMetadataUrl ?? '', {
+    type: 'text',
+    label: localizationKeys('configureSSO.configureStep.samlMicrosoft.identityProviderMetadataStep.metadataUrl.label'),
+    placeholder: localizationKeys(
+      'configureSSO.configureStep.samlMicrosoft.identityProviderMetadataStep.metadataUrl.placeholder',
+    ),
+    isRequired: true,
+  });
+
+  const signOnUrlField = useFormControl('idpSsoUrl', samlConnection?.idpSsoUrl ?? '', {
+    type: 'text',
+    label: localizationKeys(
+      'configureSSO.configureStep.samlMicrosoft.identityProviderMetadataStep.manual.signOnUrl.label',
+    ),
+    placeholder: localizationKeys(
+      'configureSSO.configureStep.samlMicrosoft.identityProviderMetadataStep.manual.signOnUrl.placeholder',
+    ),
+    isRequired: true,
+  });
+
+  const issuerField = useFormControl('idpEntityId', samlConnection?.idpEntityId ?? '', {
+    type: 'text',
+    label: localizationKeys(
+      'configureSSO.configureStep.samlMicrosoft.identityProviderMetadataStep.manual.issuer.label',
+    ),
+    placeholder: localizationKeys(
+      'configureSSO.configureStep.samlMicrosoft.identityProviderMetadataStep.manual.issuer.placeholder',
+    ),
+    isRequired: true,
+  });
+
+  const certificateField = useFormControl('idpCertificate', '', {
+    type: 'text',
+    label: localizationKeys(
+      'configureSSO.configureStep.samlMicrosoft.identityProviderMetadataStep.manual.signingCertificate.label',
+    ),
+    isRequired: true,
+  });
+
+  const trimmedMetadataUrl = metadataUrlField.value.trim();
+  const trimmedSignOnUrl = signOnUrlField.value.trim();
+  const trimmedIssuer = issuerField.value.trim();
+  const hasCert = certFile !== null || existingCertPresent;
+
+  const isValid =
+    mode === 'metadataUrl'
+      ? trimmedMetadataUrl.length > 0
+      : trimmedSignOnUrl.length > 0 && trimmedIssuer.length > 0 && hasCert;
+
+  const canSubmit = isValid && !card.isLoading;
+
+  const formProps: IdentityProviderConfigurationFormProps =
+    mode === 'metadataUrl'
+      ? {
+          mode: 'metadataUrl',
+          form: { field: metadataUrlField },
+          labels: {
+            description: localizationKeys(
+              'configureSSO.configureStep.samlMicrosoft.identityProviderMetadataStep.metadataUrl.description',
+            ),
+          },
+        }
+      : {
+          mode: 'manual',
+          form: {
+            signOnUrlField,
+            issuerField,
+            certificateField,
+            certFile,
+            onCertFileChange: setCertFile,
+            existingCertPresent,
+          },
+          labels: {
+            description: localizationKeys(
+              'configureSSO.configureStep.samlMicrosoft.identityProviderMetadataStep.manual.description',
+            ),
+            uploadFile: localizationKeys(
+              'configureSSO.configureStep.samlMicrosoft.identityProviderMetadataStep.manual.signingCertificate.uploadFile',
+            ),
+            replaceFile: localizationKeys(
+              'configureSSO.configureStep.samlMicrosoft.identityProviderMetadataStep.manual.signingCertificate.replaceFile',
+            ),
+            removeFile: localizationKeys(
+              'configureSSO.configureStep.samlMicrosoft.identityProviderMetadataStep.manual.signingCertificate.removeFile',
+            ),
+            fileUploaded: localizationKeys(
+              'configureSSO.configureStep.samlMicrosoft.identityProviderMetadataStep.manual.signingCertificate.fileUploaded',
+            ),
+          },
+        };
+
+  const handleContinue = async (): Promise<void> => {
+    if (!enterpriseConnection || !canSubmit) {
+      return;
+    }
+
+    card.setError(undefined);
+    card.setLoading();
+
+    try {
+      const saml = await buildSamlConfigurationPayload({
+        mode,
+        metadataUrl: { value: metadataUrlField.value },
+        manual: { signOnUrl: signOnUrlField.value, issuer: issuerField.value, certFile },
+      });
+
+      await updateEnterpriseConnection(enterpriseConnection.id, { saml });
+      void goNext();
+    } catch (err) {
+      if (mode === 'metadataUrl') {
+        applySamlSubmitError(err, card, metadataUrlField);
+      } else {
+        applySamlSubmitError(err, card, signOnUrlField, [issuerField, certificateField]);
+      }
+    } finally {
+      card.setIdle();
+    }
+  };
+
+  return (
+    <>
+      <Step.Body>
+        <Step.Section
+          fill
+          gap={5}
+        >
+          <Heading
+            elementDescriptor={descriptors.configureSSOInstructionsHeading}
+            as='h3'
+            textVariant='subtitle'
+            localizationKey={localizationKeys(
+              'configureSSO.configureStep.samlMicrosoft.identityProviderMetadataStep.modes.title',
+            )}
+          />
+          <IdentityProviderConfigurationModes
+            modes={MICROSOFT_SAML_IDP_MODES}
+            value={mode}
+            onChange={next => {
+              card.setError(undefined);
+              setMode(next);
+            }}
+            labels={{
+              ariaLabel: localizationKeys(
+                'configureSSO.configureStep.samlMicrosoft.identityProviderMetadataStep.modes.ariaLabel',
+              ),
+              metadataUrl: localizationKeys(
+                'configureSSO.configureStep.samlMicrosoft.identityProviderMetadataStep.modes.metadataUrl',
+              ),
+              manual: localizationKeys(
+                'configureSSO.configureStep.samlMicrosoft.identityProviderMetadataStep.modes.manual',
+              ),
+            }}
+          />
+          <IdentityProviderConfigurationForm {...formProps} />
+        </Step.Section>
+      </Step.Body>
+
+      <Step.Footer>
+        <Step.Footer.Previous
+          onClick={() => goPrev()}
+          isDisabled={isFirstStep || card.isLoading}
+        />
+        <Step.Footer.Continue
+          onClick={handleContinue}
+          isLoading={card.isLoading}
+          isDisabled={!canSubmit}
         />
       </Step.Footer>
     </>
