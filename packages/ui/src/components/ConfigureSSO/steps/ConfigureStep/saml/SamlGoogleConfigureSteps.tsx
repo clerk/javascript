@@ -1,7 +1,10 @@
 import React, { type JSX } from 'react';
 
 import { Col, descriptors, Heading, Text } from '@/customizables';
+import { ClipboardInput } from '@/elements/ClipboardInput';
 import { useCardState } from '@/elements/contexts';
+import { Form } from '@/elements/Form';
+import { Checkmark, Clipboard } from '@/icons';
 import { localizationKeys } from '@/localization';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
@@ -43,6 +46,16 @@ export const SamlGoogleConfigureSteps = (): JSX.Element => {
           <InnerStepCounter />
         </Step.Header>
         <SamlGoogleIdentityProviderMetadataStep />
+      </Wizard.Step>
+
+      <Wizard.Step id='service-provider'>
+        <Step.Header
+          title={localizationKeys('configureSSO.configureStep.samlGoogle.mainHeaderTitle')}
+          description={localizationKeys('configureSSO.configureStep.samlGoogle.serviceProviderStep.headerSubtitle')}
+        >
+          <InnerStepCounter />
+        </Step.Header>
+        <SamlGoogleServiceProviderStep />
       </Wizard.Step>
     </>
   );
@@ -328,6 +341,112 @@ const SamlGoogleIdentityProviderMetadataStep = (): JSX.Element => {
           onClick={handleContinue}
           isLoading={card.isLoading}
           isDisabled={!canSubmit}
+        />
+      </Step.Footer>
+    </>
+  );
+};
+
+const SamlGoogleServiceProviderStep = (): JSX.Element => {
+  const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
+  const { enterpriseConnection } = useConfigureSSO();
+
+  const acsUrl = enterpriseConnection?.samlConnection?.acsUrl ?? '';
+  const spEntityId = enterpriseConnection?.samlConnection?.spEntityId ?? '';
+
+  const acsUrlField = useFormControl('acsUrl', acsUrl, {
+    type: 'text',
+    label: localizationKeys(
+      'configureSSO.configureStep.samlGoogle.serviceProviderStep.serviceProviderFields.acsUrl.label',
+    ),
+    isRequired: false,
+  });
+  const spEntityIdField = useFormControl('spEntityId', spEntityId, {
+    type: 'text',
+    label: localizationKeys(
+      'configureSSO.configureStep.samlGoogle.serviceProviderStep.serviceProviderFields.spEntityId.label',
+    ),
+    isRequired: false,
+  });
+
+  return (
+    <>
+      <Step.Body>
+        <Step.Section sx={theme => ({ gap: theme.space.$5 })}>
+          <Col sx={theme => ({ gap: theme.space.$1x5 })}>
+            <Heading
+              elementDescriptor={descriptors.configureSSOInstructionsHeading}
+              as='h3'
+              textVariant='subtitle'
+              localizationKey={localizationKeys('configureSSO.configureStep.samlGoogle.serviceProviderStep.title')}
+            />
+            <Text
+              as='p'
+              colorScheme='secondary'
+              localizationKey={localizationKeys('configureSSO.configureStep.samlGoogle.serviceProviderStep.paragraph')}
+            />
+          </Col>
+
+          <Form.ControlRow elementId={acsUrlField.id}>
+            <Form.CommonInputWrapper {...acsUrlField.props}>
+              <ClipboardInput
+                value={acsUrl}
+                readOnly
+                copyIcon={Clipboard}
+                copiedIcon={Checkmark}
+              />
+            </Form.CommonInputWrapper>
+          </Form.ControlRow>
+
+          <Form.ControlRow elementId={spEntityIdField.id}>
+            <Form.CommonInputWrapper {...spEntityIdField.props}>
+              <ClipboardInput
+                value={spEntityId}
+                readOnly
+                copyIcon={Clipboard}
+                copiedIcon={Checkmark}
+              />
+            </Form.CommonInputWrapper>
+          </Form.ControlRow>
+
+          <Col
+            elementDescriptor={descriptors.configureSSOInstructionsList}
+            as='ul'
+            sx={theme => ({
+              gap: theme.space.$1x5,
+              margin: 0,
+              paddingInlineStart: theme.space.$5,
+              listStyleType: 'disc',
+            })}
+          >
+            <Text
+              elementDescriptor={descriptors.configureSSOInstructionsListItem}
+              as='li'
+              colorScheme='secondary'
+              localizationKey={localizationKeys(
+                'configureSSO.configureStep.samlGoogle.serviceProviderStep.nameIdInstructions.step1',
+              )}
+            />
+            <Text
+              elementDescriptor={descriptors.configureSSOInstructionsListItem}
+              as='li'
+              colorScheme='secondary'
+              localizationKey={localizationKeys(
+                'configureSSO.configureStep.samlGoogle.serviceProviderStep.nameIdInstructions.step2',
+              )}
+            />
+          </Col>
+        </Step.Section>
+      </Step.Body>
+
+      <Step.Footer>
+        <Step.Footer.Previous
+          onClick={() => goPrev()}
+          isDisabled={isFirstStep}
+        />
+        <Step.Footer.Continue
+          onClick={() => goNext()}
+          isDisabled={isLastStep}
         />
       </Step.Footer>
     </>

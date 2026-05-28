@@ -364,7 +364,7 @@ export const enUS: LocalizationResource = {
             paragraph1:
               'Once you have moved forward from the General Settings instructions, you will be presented with the Configure SAML page.',
             paragraph2:
-              'To configure your service provider (Clerk), you must add these two fields to your Okta application:',
+              'To configure your service provider, you must add these two fields to your Okta SAML application:',
             serviceProviderFields: {
               acsUrl: {
                 label: 'Single sign-on URL',
@@ -566,9 +566,10 @@ export const enUS: LocalizationResource = {
           },
         },
         serviceProviderStep: {
-          title: 'Add service provider configuration to Google Workspace',
+          headerSubtitle: 'Configure service provider',
+          title: 'Configure service provider',
           paragraph:
-            'To configure your service provider (Clerk), you must add these two fields to your Google Workspace SAML application:',
+            'To configure your service provider, you must add these two fields to your Google Workspace SAML application:',
           serviceProviderFields: {
             acsUrl: {
               label: 'ACS URL',

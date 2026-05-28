@@ -132,6 +132,7 @@ const MetadataFilePanel = ({ form, labels }: MetadataFilePanelProps): JSX.Elemen
       onFileChange={form.onFileChange}
       existingFilePresent={Boolean(form.existingFilePresent)}
       labels={labels}
+      accept='.xml'
     />
   </>
 );

@@ -1620,6 +1620,7 @@ export type __internal_LocalizationResource = {
           };
         };
         serviceProviderStep: {
+          headerSubtitle: LocalizationValue;
           title: LocalizationValue;
           paragraph: LocalizationValue;
           serviceProviderFields: {
