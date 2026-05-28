@@ -11,8 +11,6 @@ public var clerkViewFactory: ClerkViewFactoryProtocol?
 
 // Protocol that the app target implements to provide Clerk views
 public protocol ClerkViewFactoryProtocol {
-  func createUserProfileViewController(dismissable: Bool, completion: @escaping (Result<[String: Any], Error>) -> Void) -> UIViewController?
-
   // Inline rendering — returns UIViewController to preserve SwiftUI lifecycle
   func createAuthView(mode: String, dismissable: Bool, onEvent: @escaping (String, [String: Any]) -> Void) -> UIViewController?
   func createUserProfileView(dismissable: Bool, onEvent: @escaping (String, [String: Any]) -> Void) -> UIViewController?
@@ -64,21 +62,6 @@ class ClerkExpoModule: RCTEventEmitter {
     ])
   }
 
-  /// Returns the topmost presented view controller, avoiding deprecated `keyWindow`.
-  private static func topViewController() -> UIViewController? {
-    guard let scene = UIApplication.shared.connectedScenes
-      .compactMap({ $0 as? UIWindowScene })
-      .first(where: { $0.activationState == .foregroundActive }),
-      let rootVC = scene.windows.first(where: { $0.isKeyWindow })?.rootViewController
-    else { return nil }
-
-    var top = rootVC
-    while let presented = top.presentedViewController {
-      top = presented
-    }
-    return top
-  }
-
   // MARK: - configure
 
   @objc func configure(_ publishableKey: String,
@@ -96,39 +79,6 @@ class ClerkExpoModule: RCTEventEmitter {
         resolve(nil)
       } catch {
         reject("E_CONFIGURE_FAILED", error.localizedDescription, error)
-      }
-    }
-  }
-
-  // MARK: - presentUserProfile
-
-  @objc func presentUserProfile(_ options: NSDictionary,
-                                  resolve: @escaping RCTPromiseResolveBlock,
-                                  reject: @escaping RCTPromiseRejectBlock) {
-    guard let factory = clerkViewFactory else {
-      reject("E_NOT_INITIALIZED", "Clerk not initialized", nil)
-      return
-    }
-
-    let dismissable = options["dismissable"] as? Bool ?? true
-
-    DispatchQueue.main.async {
-      guard let vc = factory.createUserProfileViewController(dismissable: dismissable, completion: { result in
-        switch result {
-        case .success(let data):
-          resolve(data)
-        case .failure(let error):
-          reject("E_PROFILE_FAILED", error.localizedDescription, error)
-        }
-      }) else {
-        reject("E_CREATE_FAILED", "Could not create profile view controller", nil)
-        return
-      }
-
-      if let rootVC = Self.topViewController() {
-        rootVC.present(vc, animated: true)
-      } else {
-        reject("E_NO_ROOT_VC", "No root view controller available to present profile", nil)
       }
     }
   }
@@ -306,14 +256,16 @@ public class ClerkAuthNativeView: UIView {
 
 public class ClerkUserProfileNativeView: UIView {
   private var hostingController: UIViewController?
-  private var currentDismissable: Bool = true
+  private var currentDismissable: Bool = false
   private var hasInitialized: Bool = false
+  private var didSignOut = false
+  private var dismissalEventSent = false
 
   @objc var onProfileEvent: RCTBubblingEventBlock?
 
   @objc var isDismissable: NSNumber? {
     didSet {
-      currentDismissable = isDismissable?.boolValue ?? true
+      currentDismissable = isDismissable?.boolValue ?? false
       if hasInitialized { updateView() }
     }
   }
@@ -331,25 +283,32 @@ public class ClerkUserProfileNativeView: UIView {
     if window != nil && !hasInitialized {
       hasInitialized = true
       updateView()
+    } else if window == nil && hasInitialized && currentDismissable && !didSignOut && !dismissalEventSent {
+      dismissalEventSent = true
+      sendProfileEvent(type: "dismissed", data: [:])
     }
   }
 
+  private func sendProfileEvent(type: String, data: [String: Any]) {
+    let jsonData = (try? JSONSerialization.data(withJSONObject: data)) ?? Data()
+    let jsonString = String(data: jsonData, encoding: .utf8) ?? "{}"
+    onProfileEvent?(["type": type, "data": jsonString])
+  }
+
   private func updateView() {
-    // Remove old hosting controller
-    hostingController?.view.removeFromSuperview()
-    hostingController?.removeFromParent()
-    hostingController = nil
+    detachHostingController()
 
     guard let factory = clerkViewFactory else { return }
 
     guard let returnedController = factory.createUserProfileView(
       dismissable: currentDismissable,
       onEvent: { [weak self] eventName, data in
-        let jsonData = (try? JSONSerialization.data(withJSONObject: data)) ?? Data()
-        let jsonString = String(data: jsonData, encoding: .utf8) ?? "{}"
-        self?.onProfileEvent?(["type": eventName, "data": jsonString])
+        if eventName == "signedOut" {
+          self?.didSignOut = true
+        }
 
-        // Also emit module-level event for sign-out detection
+        self?.sendProfileEvent(type: eventName, data: data)
+
         if eventName == "signedOut" {
           let sessionId = data["sessionId"] as? String
           ClerkExpoModule.emitAuthStateChange(type: "signedOut", sessionId: sessionId)
@@ -357,19 +316,30 @@ public class ClerkUserProfileNativeView: UIView {
       }
     ) else { return }
 
+    attachHostingController(returnedController)
+  }
+
+  private func attachHostingController(_ controller: UIViewController) {
+    controller.view.frame = bounds
+    controller.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+
     if let parentVC = findViewController() {
-      parentVC.addChild(returnedController)
-      returnedController.view.frame = bounds
-      returnedController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-      addSubview(returnedController.view)
-      returnedController.didMove(toParent: parentVC)
-      hostingController = returnedController
+      parentVC.addChild(controller)
+      addSubview(controller.view)
+      controller.didMove(toParent: parentVC)
     } else {
-      returnedController.view.frame = bounds
-      returnedController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-      addSubview(returnedController.view)
-      hostingController = returnedController
+      addSubview(controller.view)
     }
+
+    hostingController = controller
+  }
+
+  private func detachHostingController() {
+    guard let controller = hostingController else { return }
+    controller.willMove(toParent: nil)
+    controller.view.removeFromSuperview()
+    controller.removeFromParent()
+    hostingController = nil
   }
 
   private func findViewController() -> UIViewController? {
