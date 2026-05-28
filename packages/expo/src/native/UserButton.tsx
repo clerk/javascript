@@ -1,9 +1,8 @@
-import { useClerk, useUser } from '@clerk/react';
-import { useEffect, useRef, useState } from 'react';
+import { useUser } from '@clerk/react';
+import { useEffect, useState } from 'react';
+import type { GestureResponderEvent, StyleProp, ViewStyle } from 'react-native';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { CLERK_CLIENT_JWT_KEY } from '../constants';
-import { tokenCache } from '../token-cache';
 import { ClerkExpoModule as ClerkExpo, isNativeSupported } from '../utils/native-module';
 
 // Raw result from native module (may vary by platform)
@@ -33,17 +32,26 @@ interface NativeUser {
 /**
  * Props for the UserButton component.
  */
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UserButtonProps {}
+export interface UserButtonProps {
+  /**
+   * Called when the button is pressed.
+   *
+   * Use this to present your own `UserProfileView` sheet, modal, or route.
+   */
+  onPress?: (event: GestureResponderEvent) => void;
+
+  /**
+   * Style applied to the button container.
+   */
+  style?: StyleProp<ViewStyle>;
+}
 
 /**
- * A pre-built native button component that displays the user's avatar and opens their profile.
+ * A pre-built button component that displays the user's avatar.
  *
  * `UserButton` renders a circular button showing the user's profile image (or initials if
- * no image is available). When tapped, it presents the native profile management modal.
- *
- * Sign-out is detected automatically and synced with the JS SDK, causing `useAuth()` to
- * update reactively. Use `useAuth()` in a `useEffect` to react to sign-out.
+ * no image is available). Use `onPress` to present your own `UserProfileView` sheet,
+ * modal, or route.
  *
  * @example Basic usage in a header
  * ```tsx
@@ -59,30 +67,32 @@ export interface UserButtonProps {}
  * }
  * ```
  *
- * @example Reacting to sign-out
+ * @example Presenting the profile in an app-owned modal
  * ```tsx
- * import { UserButton } from '@clerk/expo/native';
- * import { useAuth } from '@clerk/expo';
+ * import { UserButton, UserProfileView } from '@clerk/expo/native';
  *
  * export default function Header() {
- *   const { isSignedIn } = useAuth();
+ *   const [isProfileOpen, setIsProfileOpen] = useState(false);
  *
- *   useEffect(() => {
- *     if (!isSignedIn) router.replace('/sign-in');
- *   }, [isSignedIn]);
- *
- *   return <UserButton style={{ width: 40, height: 40 }} />;
+ *   return (
+ *     <>
+ *       <UserButton
+ *         onPress={() => setIsProfileOpen(true)}
+ *         style={{ width: 40, height: 40 }}
+ *       />
+ *       <Modal visible={isProfileOpen}>
+ *         <UserProfileView isDismissable />
+ *       </Modal>
+ *     </>
+ *   );
  * }
  * ```
  *
- * @see {@link UserProfileView} The profile view that opens when tapped
+ * @see {@link UserProfileView} The profile view to render in your own presentation surface
  * @see {@link https://clerk.com/docs/components/user/user-button} Clerk UserButton Documentation
  */
-export function UserButton(_props: UserButtonProps) {
+export function UserButton({ onPress, style }: UserButtonProps) {
   const [nativeUser, setNativeUser] = useState<NativeUser | null>(null);
-  const presentingRef = useRef(false);
-  const clerk = useClerk();
-  // Use the reactive user hook from clerk-react to observe sign-out state changes
   const { user: clerkUser } = useUser();
 
   // Fetch native user data on mount and when clerk user changes
@@ -124,87 +134,10 @@ export function UserButton(_props: UserButtonProps) {
         }
       : null);
 
-  const handlePress = async () => {
-    if (presentingRef.current) {
-      return;
-    }
-
-    if (!isNativeSupported || !ClerkExpo?.presentUserProfile) {
-      return;
-    }
-
-    presentingRef.current = true;
-    try {
-      // Track whether native had a session before the modal, so we can distinguish
-      // "user signed out from within the modal" from "native never had a session".
-      let hadNativeSessionBefore = false;
-
-      // If native doesn't have a session but JS does (e.g. user signed in via custom form),
-      // sync the JS SDK's bearer token to native and wait for it before presenting.
-      if (clerkUser && ClerkExpo?.getSession && ClerkExpo?.configure) {
-        const preCheck = (await ClerkExpo.getSession()) as NativeSessionResult | null;
-        hadNativeSessionBefore = !!(preCheck?.sessionId || preCheck?.session?.id);
-
-        if (!hadNativeSessionBefore) {
-          const bearerToken = (await tokenCache?.getToken(CLERK_CLIENT_JWT_KEY)) ?? null;
-          if (bearerToken) {
-            await ClerkExpo.configure(clerk.publishableKey, bearerToken);
-
-            // Re-check if configure produced a session
-            const postConfigure = (await ClerkExpo.getSession()) as NativeSessionResult | null;
-            hadNativeSessionBefore = !!(postConfigure?.sessionId || postConfigure?.session?.id);
-          }
-        }
-      }
-
-      await ClerkExpo.presentUserProfile({
-        dismissable: true,
-      });
-
-      // Check if native session still exists after modal closes.
-      // Only sign out the JS SDK if the native SDK HAD a session before the modal
-      // and now it's gone (meaning the user signed out from within the native UI).
-      // If native never had a session (e.g. force refresh didn't work), don't sign out JS.
-      const sessionCheck = (await ClerkExpo.getSession?.()) as NativeSessionResult | null;
-      const hasNativeSession = !!(sessionCheck?.sessionId || sessionCheck?.session?.id);
-
-      if (!hasNativeSession && hadNativeSessionBefore) {
-        // Clear local state immediately for instant UI feedback
-        setNativeUser(null);
-
-        // Clear native session explicitly (may already be cleared, but ensure it)
-        try {
-          await ClerkExpo.signOut?.();
-        } catch (e) {
-          if (__DEV__) {
-            console.warn('[UserButton] Native signOut error (may already be signed out):', e);
-          }
-        }
-
-        // Sign out from JS SDK to update isSignedIn state
-        if (clerk?.signOut) {
-          try {
-            await clerk.signOut();
-          } catch (e) {
-            if (__DEV__) {
-              console.warn('[UserButton] JS SDK signOut error:', e);
-            }
-          }
-        }
-      }
-    } catch (error) {
-      if (__DEV__) {
-        console.error('[UserButton] presentUserProfile failed:', error);
-      }
-    } finally {
-      presentingRef.current = false;
-    }
-  };
-
   // Show fallback when native modules aren't available
   if (!isNativeSupported || !ClerkExpo) {
     return (
-      <View style={styles.button}>
+      <View style={[styles.button, style]}>
         <Text style={styles.text}>?</Text>
       </View>
     );
@@ -212,8 +145,8 @@ export function UserButton(_props: UserButtonProps) {
 
   return (
     <TouchableOpacity
-      onPress={() => void handlePress()}
-      style={styles.button}
+      onPress={onPress}
+      style={[styles.button, style]}
     >
       {user?.imageUrl ? (
         <Image

@@ -1,10 +1,4 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
   <application>
-    <!-- Clerk User Profile Activity - hosts UserProfileView for account management -->
-    <activity
-      android:name="expo.modules.clerk.ClerkUserProfileActivity"
-      android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-      android:exported="false"
-      android:windowSoftInputMode="adjustResize" />
   </application>
 </manifest>

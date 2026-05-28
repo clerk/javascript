@@ -13,8 +13,8 @@ export interface UserProfileViewProps {
   /**
    * Whether the inline profile view shows a dismiss button.
    *
-   * This controls the native view's built-in dismiss button — it does not
-   * present a modal. To present a native modal, use the `useUserProfileModal()` hook.
+   * This controls the native view's built-in dismiss button. It does not present
+   * a modal; render `UserProfileView` inside your own `Modal`, sheet, or route.
    *
    * @default false
    */
@@ -24,6 +24,11 @@ export interface UserProfileViewProps {
    * Style applied to the container view.
    */
   style?: StyleProp<ViewStyle>;
+
+  /**
+   * Called when the user dismisses the native profile view.
+   */
+  onDismiss?: () => void;
 }
 
 /**
@@ -33,7 +38,7 @@ export interface UserProfileViewProps {
  * - **iOS**: clerk-ios (SwiftUI) - https://github.com/clerk/clerk-ios
  * - **Android**: clerk-android (Jetpack Compose) - https://github.com/clerk/clerk-android
  *
- * To present the profile as a native modal, use the `useUserProfileModal()` hook instead.
+ * To present the profile, render it inside your own `Modal`, sheet, or route.
  *
  * Sign-out is detected automatically and synced with the JS SDK. Use `useAuth()` in a
  * `useEffect` to react to sign-out.
@@ -56,13 +61,18 @@ export interface UserProfileViewProps {
  *
  * @see {@link https://clerk.com/docs/components/user/user-profile} Clerk UserProfile Documentation
  */
-export function UserProfileView({ isDismissable = false, style }: UserProfileViewProps) {
+export function UserProfileView({ isDismissable = false, style, onDismiss }: UserProfileViewProps) {
   const clerk = useClerk();
   const signOutTriggered = useRef(false);
 
   const handleProfileEvent = useCallback(
     async (event: { nativeEvent: { type: string; data: string } }) => {
       const { type } = event.nativeEvent;
+
+      if (type === 'dismissed') {
+        onDismiss?.();
+        return;
+      }
 
       if (type === 'signedOut' && !signOutTriggered.current) {
         signOutTriggered.current = true;
@@ -86,7 +96,7 @@ export function UserProfileView({ isDismissable = false, style }: UserProfileVie
         }
       }
     },
-    [clerk],
+    [clerk, onDismiss],
   );
 
   if (!isNativeSupported || !NativeClerkUserProfileView) {

@@ -4,7 +4,6 @@ import type { UnsafeObject } from 'react-native/Libraries/Types/CodegenTypesName
 
 export interface Spec extends TurboModule {
   configure(publishableKey: string, bearerToken: string | null): Promise<void>;
-  presentUserProfile(options: UnsafeObject): Promise<UnsafeObject | null>;
   getSession(): Promise<UnsafeObject | null>;
   getClientToken(): Promise<string | null>;
   signOut(): Promise<void>;
