@@ -42,15 +42,16 @@ export interface ClerkCliAuthConfig {
   requestTimeoutMs?: number;
   /** Injected opener for the browser step (for testing). Default: auto-detect. */
   openBrowser?: (url: string) => Promise<void>;
-  /** Enables Clerk API key (`ak_*`) auth alongside OAuth. */
+  /** Enables non-OAuth credential auth (API keys, machine tokens) alongside OAuth. */
   apiKeys?: {
     /**
-     * Backend endpoint that verifies an API key and returns the auth payload.
-     * Called with `Authorization: Bearer <key>`. API keys can't hit /oauth/userinfo —
-     * they need server-side verification (e.g. `clerk.apiKeys.verify()` in your backend).
+     * Backend endpoint that returns the verified `Identity` for a credential. Called with
+     * `Authorization: Bearer <token>`. The server is responsible for verifying the credential
+     * (e.g. via `clerk.apiKeys.verify()` from `@clerk/nextjs/server`) and responding with an
+     * `Identity` payload — verification stays server-side, never in the CLI.
      */
-    verifyEndpoint: string;
-    /** Env var to read an API key from (e.g. 'MYAPP_API_KEY'). */
+    identityEndpoint: string;
+    /** Env var to read a credential from (e.g. 'MYAPP_API_KEY'). */
     envVar: string;
   };
 }
@@ -65,12 +66,14 @@ export interface TokenSet {
 }
 
 /**
- * Identity payload returned by Clerk's /oauth/userinfo or an API key verify endpoint.
- * `sub` is the only guaranteed field; everything else depends on scopes and source.
+ * Verified identity payload returned by `/oauth/userinfo` or your `identityEndpoint`.
+ * `sub` is the only guaranteed field — it holds the Clerk subject id (`user_*`, `org_*`,
+ * `mch_*`, or `scim_*`). Every other field is optional and depends on the credential type
+ * and scopes (user-shaped fields like `email` only show up for user-scoped subjects).
  */
-export interface UserInfo {
+export interface Identity {
   sub: string;
-  /** Clerk user id. Returned by API key verify; OAuth userinfo puts it in `sub` instead. */
+  /** Clerk user id. Returned by identity endpoints; OAuth userinfo puts it in `sub` instead. */
   user_id?: string;
   email?: string;
   email_verified?: boolean;
@@ -93,5 +96,5 @@ export interface UserInfo {
 
 export interface LoginResult {
   tokens: TokenSet;
-  user: UserInfo;
+  user: Identity;
 }

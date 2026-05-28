@@ -13,6 +13,6 @@
 export { ClerkCliAuth } from './clerk-cli-auth';
 export * from './types';
 export * from './errors';
-export { fetchUserInfo, revokeToken } from './lib/token-exchange';
-export { verifyApiKey } from './lib/verify-api-key';
+export { fetchIdentity, revokeToken } from './lib/token-exchange';
+export { verifyToken } from './lib/verify-token';
 export { classifyToken, type TokenKind } from './lib/classify-token';

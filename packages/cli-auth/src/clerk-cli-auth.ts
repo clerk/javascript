@@ -5,9 +5,9 @@ import { startAuthServer } from './lib/auth-server';
 import { classifyToken, type TokenKind } from './lib/classify-token';
 import { createCredentialStore } from './lib/credential-store';
 import { generateCodeChallenge, generateCodeVerifier, generateState } from './lib/pkce';
-import { exchangeCodeForTokens, fetchUserInfo, refreshAccessToken, revokeToken } from './lib/token-exchange';
-import { verifyApiKey as verifyApiKeyRequest } from './lib/verify-api-key';
-import type { ClerkCliAuthConfig, CredentialStore, LoginResult, OAuthScope, TokenSet, UserInfo } from './types';
+import { exchangeCodeForTokens, fetchIdentity, refreshAccessToken, revokeToken } from './lib/token-exchange';
+import { verifyToken as verifyTokenRequest } from './lib/verify-token';
+import type { ClerkCliAuthConfig, CredentialStore, Identity, LoginResult, OAuthScope, TokenSet } from './types';
 
 const DEFAULT_SCOPES: OAuthScope[] = ['profile', 'email', 'openid', 'offline_access'];
 
@@ -124,7 +124,7 @@ export class ClerkCliAuth {
       });
 
       await this.setJson('tokens', tokens);
-      const user = await fetchUserInfo({
+      const user = await fetchIdentity({
         issuer: this.config.issuer,
         accessToken: tokens.accessToken,
         timeoutMs: this.config.requestTimeoutMs,
@@ -167,26 +167,26 @@ export class ClerkCliAuth {
     return nextTokens.accessToken;
   }
 
-  async whoami(): Promise<UserInfo | null> {
+  async whoami(): Promise<Identity | null> {
     const accessToken = await this.getAccessToken();
     if (!accessToken) {
       return null;
     }
 
-    return fetchUserInfo({
+    return fetchIdentity({
       issuer: this.config.issuer,
       accessToken,
       timeoutMs: this.config.requestTimeoutMs,
     });
   }
 
-  async verifyApiKey(apiKey: string): Promise<UserInfo> {
-    if (!this.config.apiKeys?.verifyEndpoint) {
-      throw new ClerkCliAuthError('config', 'apiKeys.verifyEndpoint is not configured.');
+  async verifyToken(token: string): Promise<Identity> {
+    if (!this.config.apiKeys?.identityEndpoint) {
+      throw new ClerkCliAuthError('config', 'apiKeys.identityEndpoint is not configured.');
     }
-    return verifyApiKeyRequest({
-      endpoint: this.config.apiKeys.verifyEndpoint,
-      apiKey,
+    return verifyTokenRequest({
+      endpoint: this.config.apiKeys.identityEndpoint,
+      token,
       timeoutMs: this.config.requestTimeoutMs,
     });
   }
