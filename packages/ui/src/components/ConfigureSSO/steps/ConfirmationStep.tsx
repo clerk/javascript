@@ -1,23 +1,17 @@
-import { useReverification } from '@clerk/shared/react';
+import { useOrganization, useReverification } from '@clerk/shared/react';
 import { useState } from 'react';
 
 import { Badge, Col, descriptors, Flex, Flow, Grid, Link, localizationKeys, Text } from '@/customizables';
-import { Action } from '@/elements/Action';
-import { useActionContext } from '@/elements/Action/ActionRoot';
-import { useCardState, withCardStateProvider } from '@/elements/contexts';
-import { Form } from '@/elements/Form';
-import { FormButtons } from '@/elements/FormButtons';
-import type { FormProps } from '@/elements/FormContainer';
-import { FormContainer } from '@/elements/FormContainer';
+import { useCardState } from '@/elements/contexts';
 import { ProfileSection } from '@/elements/Section';
 import { Switch } from '@/elements/Switch';
 import { mqu } from '@/styledSystem';
-import { useFormControl } from '@/ui/utils/useFormControl';
 import { handleError } from '@/utils/errorHandler';
 
 import { useConfigureSSO } from '../ConfigureSSOContext';
 import { Step } from '../elements/Step';
 import { useWizard } from '../elements/Wizard';
+import { ResetConnectionDialog } from '../ResetConnectionDialog';
 
 export const ConfirmationStep = (): JSX.Element => {
   return (
@@ -31,7 +25,7 @@ export const ConfirmationStep = (): JSX.Element => {
           <EnableSsoSection />
           <DomainSection />
           <ConfigurationDetailsSection />
-          <ResetConnectionSection />
+          <ResetConnectionRow />
         </Step.Body>
 
         <Step.Footer />
@@ -226,109 +220,34 @@ const ConfigurationDetailsSection = (): JSX.Element => {
   );
 };
 
-const ResetConnectionForm = withCardStateProvider((props: FormProps) => {
-  const { onReset, onSuccess } = props;
-  const card = useCardState();
-  const { enterpriseConnection, deleteEnterpriseConnection } = useConfigureSSO();
-  const { goToStep } = useWizard();
+const ResetConnectionRow = (): JSX.Element => {
+  const { organization } = useOrganization();
+  const [isOpen, setIsOpen] = useState(false);
 
-  const deleteConnection = useReverification((id: string) => deleteEnterpriseConnection(id));
-
-  const confirmationField = useFormControl('deleteConfirmation', '', {
-    type: 'text',
-    label: localizationKeys('configureSSO.confirmation.resetSection.confirmationFieldLabel', {
-      name: enterpriseConnection?.name ?? '',
-    }),
-    isRequired: true,
-    placeholder: enterpriseConnection?.name,
-  });
-
-  const canSubmit = Boolean(enterpriseConnection?.name && confirmationField.value === enterpriseConnection.name);
-
-  const onSubmit = async () => {
-    if (!enterpriseConnection || !canSubmit) {
-      return;
-    }
-
-    try {
-      await deleteConnection(enterpriseConnection.id);
-      onSuccess();
-      await goToStep('select-provider');
-    } catch (err) {
-      handleError(err as Error, [confirmationField], card.setError);
-    }
-  };
-
-  return (
-    <FormContainer
-      headerTitle={localizationKeys('configureSSO.confirmation.resetSection.title')}
-      sx={t => ({ gap: t.space.$0x5 })}
-    >
-      <Form.Root onSubmit={onSubmit}>
-        <Col gap={1}>
-          <Text
-            colorScheme='danger'
-            localizationKey={localizationKeys('configureSSO.confirmation.resetSection.warning')}
-          />
-        </Col>
-        <Form.ControlRow elementId={confirmationField.id}>
-          <Form.PlainInput
-            {...confirmationField.props}
-            ignorePasswordManager
-          />
-        </Form.ControlRow>
-        <FormButtons
-          submitLabel={localizationKeys('configureSSO.confirmation.resetSection.submitButton')}
-          colorScheme='danger'
-          isDisabled={!canSubmit}
-          onReset={onReset}
-        />
-      </Form.Root>
-    </FormContainer>
-  );
-});
-
-const ResetConnectionScreen = (): JSX.Element => {
-  const { close } = useActionContext();
-  return (
-    <ResetConnectionForm
-      onSuccess={close}
-      onReset={close}
-    />
-  );
-};
-
-const ResetConnectionSection = (): JSX.Element => {
   return (
     <ProfileSection.Root
       title={localizationKeys('configureSSO.confirmation.resetSection.title')}
       id='resetSso'
       sx={{ alignItems: 'center', [mqu.md]: { alignItems: 'flex-start' } }}
     >
-      <Action.Root>
-        <Action.Closed value='reset'>
-          <ProfileSection.Item
-            id='resetSso'
-            sx={{ paddingInlineStart: 0, marginInline: '-10px' }}
-          >
-            <Action.Trigger value='reset'>
-              <ProfileSection.Button
-                elementDescriptor={descriptors.configureSSOConfirmationResetButton}
-                id='resetSso'
-                variant='ghost'
-                colorScheme='danger'
-                localizationKey={localizationKeys('configureSSO.confirmation.resetSection.title')}
-              />
-            </Action.Trigger>
-          </ProfileSection.Item>
-        </Action.Closed>
-
-        <Action.Open value='reset'>
-          <Action.Card variant='destructive'>
-            <ResetConnectionScreen />
-          </Action.Card>
-        </Action.Open>
-      </Action.Root>
+      <ProfileSection.Item
+        id='resetSso'
+        sx={{ paddingInlineStart: 0, marginInline: '-10px' }}
+      >
+        <ProfileSection.Button
+          elementDescriptor={descriptors.configureSSOConfirmationResetButton}
+          id='resetSso'
+          variant='ghost'
+          colorScheme='danger'
+          localizationKey={localizationKeys('configureSSO.confirmation.resetSection.title')}
+          onClick={() => setIsOpen(true)}
+        />
+      </ProfileSection.Item>
+      <ResetConnectionDialog
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        confirmationValue={organization?.name ?? ''}
+      />
     </ProfileSection.Root>
   );
 };
