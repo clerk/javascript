@@ -7,7 +7,15 @@ import { createCredentialStore } from './lib/credential-store';
 import { generateCodeChallenge, generateCodeVerifier, generateState } from './lib/pkce';
 import { exchangeCodeForTokens, fetchIdentity, refreshAccessToken, revokeToken } from './lib/token-exchange';
 import { verifyToken as verifyTokenRequest } from './lib/verify-token';
-import type { ClerkCliAuthConfig, CredentialStore, Identity, LoginResult, OAuthScope, TokenSet } from './types';
+import type {
+  ClerkCliAuthConfig,
+  CredentialStore,
+  Identity,
+  LoginResult,
+  OAuthScope,
+  TokenSet,
+  UserIdentity,
+} from './types';
 
 const DEFAULT_SCOPES: OAuthScope[] = ['profile', 'email', 'openid', 'offline_access'];
 
@@ -171,7 +179,7 @@ export class ClerkCliAuth {
     return nextTokens.accessToken;
   }
 
-  async whoami(): Promise<Identity | null> {
+  async whoami(): Promise<UserIdentity | null> {
     const accessToken = await this.getAccessToken();
     if (!accessToken) {
       return null;

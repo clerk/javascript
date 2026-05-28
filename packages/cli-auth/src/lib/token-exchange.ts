@@ -1,5 +1,6 @@
 import { ClerkCliAuthError } from '../errors';
-import type { Identity, TokenSet } from '../types';
+import type { TokenSet, UserIdentity } from '../types';
+
 import { request } from './http';
 
 export interface ExchangeParams {
@@ -134,7 +135,7 @@ export async function revokeToken(params: RevokeParams): Promise<void> {
   });
 }
 
-export async function fetchIdentity(params: FetchIdentityParams): Promise<Identity> {
+export async function fetchIdentity(params: FetchIdentityParams): Promise<UserIdentity> {
   const { body: parsed } = await request(endpoint(params.issuer, '/oauth/userinfo'), {
     headers: { Authorization: `Bearer ${params.accessToken}` },
     errorCode: 'userinfo',
@@ -145,7 +146,8 @@ export async function fetchIdentity(params: FetchIdentityParams): Promise<Identi
     throw new ClerkCliAuthError('userinfo', 'Userinfo response was not JSON.');
   }
 
-  const identity = parsed as Identity;
+  // `/oauth/userinfo` returns a user subject per OAuth/OIDC spec.
+  const identity = parsed as UserIdentity;
   if (typeof identity.sub !== 'string' || identity.sub.length === 0) {
     throw new ClerkCliAuthError('userinfo', 'Userinfo response did not include sub.');
   }

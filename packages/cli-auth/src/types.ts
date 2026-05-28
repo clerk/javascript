@@ -67,14 +67,28 @@ export interface TokenSet {
 }
 
 /**
- * Verified identity payload returned by `/oauth/userinfo` or your `identityEndpoint`.
- * `sub` is the only guaranteed field — it holds the Clerk subject id (`user_*`, `org_*`,
- * `mch_*`, or `scim_*`). Every other field is optional and depends on the credential type
- * and scopes (user-shaped fields like `email` only show up for user-scoped subjects).
+ * Verified identity returned by `/oauth/userinfo` or your `identityEndpoint`. Discriminated
+ * by the `sub` prefix:
+ *
+ * - `user_*` → {@link UserIdentity} — a person (OAuth flows + user-scoped API keys)
+ * - `org_*` → {@link OrgIdentity} — an org (org-scoped API keys)
+ * - `mch_*` → {@link MachineIdentity} — a machine (M2M tokens, machine-scoped API keys)
+ * - `scim_*` → {@link ScimIdentity} — a SCIM directory resource
+ *
+ * Narrow via the {@link isUserIdentity} / {@link isOrgIdentity} / {@link isMachineIdentity} /
+ * {@link isScimIdentity} guards.
  */
-export interface Identity {
+export type Identity = UserIdentity | OrgIdentity | MachineIdentity | ScimIdentity;
+
+interface IdentityBase {
   sub: string;
-  /** Clerk user id. Returned by identity endpoints; OAuth userinfo puts it in `sub` instead. */
+  /** Arbitrary additional claims surfaced by the issuer or your identity endpoint. */
+  [key: string]: unknown;
+}
+
+/** A person — OAuth subjects and user-scoped API keys. */
+export interface UserIdentity extends IdentityBase {
+  /** Clerk user id. Returned by identity endpoints; OAuth `/oauth/userinfo` puts it in `sub` instead. */
   user_id?: string;
   email?: string;
   email_verified?: boolean;
@@ -86,16 +100,49 @@ export interface Identity {
   username?: string;
   public_metadata?: Record<string, unknown>;
   unsafe_metadata?: Record<string, unknown>;
-  /** Org context. Present for org-scoped API keys, or OAuth sessions where the user picked an org at consent. */
+  /** Org context. Present when the user authenticated in an org scope. */
   org_id?: string;
   org_slug?: string;
   org_name?: string;
   org_role?: string;
   org_permissions?: string[];
-  [key: string]: unknown;
+}
+
+/** An organization — org-scoped API keys. */
+export interface OrgIdentity extends IdentityBase {
+  org_id?: string;
+  org_slug?: string;
+  org_name?: string;
+}
+
+/** A machine — M2M tokens, machine-scoped API keys. */
+export type MachineIdentity = IdentityBase;
+
+/** A SCIM directory resource. */
+export type ScimIdentity = IdentityBase;
+
+/** True if `identity.sub` starts with `user_`. Narrows to {@link UserIdentity}. */
+export function isUserIdentity(identity: Identity): identity is UserIdentity {
+  return identity.sub.startsWith('user_');
+}
+
+/** True if `identity.sub` starts with `org_`. Narrows to {@link OrgIdentity}. */
+export function isOrgIdentity(identity: Identity): identity is OrgIdentity {
+  return identity.sub.startsWith('org_');
+}
+
+/** True if `identity.sub` starts with `mch_`. Narrows to {@link MachineIdentity}. */
+export function isMachineIdentity(identity: Identity): identity is MachineIdentity {
+  return identity.sub.startsWith('mch_');
+}
+
+/** True if `identity.sub` starts with `scim_`. Narrows to {@link ScimIdentity}. */
+export function isScimIdentity(identity: Identity): identity is ScimIdentity {
+  return identity.sub.startsWith('scim_');
 }
 
 export interface LoginResult {
   tokens: TokenSet;
-  user: Identity;
+  /** OAuth subjects are always users; typed accordingly. */
+  user: UserIdentity;
 }
