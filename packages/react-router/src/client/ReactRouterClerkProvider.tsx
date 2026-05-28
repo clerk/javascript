@@ -104,7 +104,7 @@ function ClerkProviderBase<TUi extends Ui = Ui>({ children, ...rest }: ClerkProv
       debug: __telemetryDebug,
     },
     unsafe_disableDevelopmentModeConsoleWarning:
-      __unsafeDisableDevelopmentModeConsoleWarning ||
+      __unsafeDisableDevelopmentModeConsoleWarning ??
       getPublicEnvVariables(undefined).unsafeDisableDevelopmentModeConsoleWarning,
   };
 
