@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { Box, descriptors, Flex, Icon, SimpleButton, Text, Span } from '@/customizables';
-import { ChevronRight, Checkmark } from '@/icons';
+import { Box, descriptors, Flex, Icon, SimpleButton, Span, Text } from '@/customizables';
+import { Checkmark, ChevronRight } from '@/icons';
 
 import type { StepperItemProps, StepperProps } from './types';
 
@@ -95,6 +95,7 @@ const Item = ({
               fontSize: theme.fontSizes.$xs,
               fontWeight: theme.fontWeights.$medium,
               color: theme.colors.$colorBackground,
+              lineHeight: '1rem',
             })}
           >
             {bullet}
