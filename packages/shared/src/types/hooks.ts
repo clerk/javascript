@@ -228,7 +228,7 @@ export type UseUserReturn =
        */
       isLoaded: false;
       /**
-       * Returns `true` if the user is signed in.
+       * Indicates whether the user is signed in.
        */
       isSignedIn: undefined;
       /**
