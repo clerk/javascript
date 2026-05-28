@@ -1,4 +1,11 @@
-import { type APIKey, type ClerkClient, createClerkClient, type M2MToken, type User } from '@clerk/backend';
+import {
+  type APIKey,
+  type ClerkClient,
+  createClerkClient,
+  type M2MToken,
+  type Machine,
+  type User,
+} from '@clerk/backend';
 
 import { cliAuth, type CliAuthInstance } from '../../server';
 
@@ -12,6 +19,8 @@ export interface IntegrationFixtures {
   auth: CliAuthInstance;
   user: User;
   apiKey: APIKey;
+  /** Throwaway machine created for this run. Deleted in `teardownFixtures`. */
+  machine: Machine;
   m2mTokenOpaque: M2MToken;
   m2mTokenJwt: M2MToken;
 }
@@ -29,9 +38,22 @@ export async function provisionFixtures(): Promise<IntegrationFixtures> {
   const clerk = createClerkClient({ secretKey: INTEGRATION_SECRET_KEY });
   const auth = cliAuth({ client: clerk });
 
-  // Unique-per-run email so reruns in parallel CI shards don't collide.
-  const email = `cli-auth-int+${Date.now()}-${Math.random().toString(36).slice(2, 8)}@example.com`;
-  const user = await clerk.users.createUser({ emailAddress: [email] });
+  // Unique-per-run identifier so reruns in parallel CI shards don't collide.
+  const slug = `${Date.now()}${Math.random().toString(36).slice(2, 8)}`;
+  let user;
+  try {
+    user = await clerk.users.createUser({
+      username: `cliauthint${slug}`,
+      password: `Test_${Math.random().toString(36).slice(2)}_${Date.now()}`,
+      skipPasswordChecks: true,
+    });
+  } catch (err) {
+    // Surface the BAPI validation errors so failures are actionable.
+    const detail = (err as { errors?: unknown }).errors;
+    throw new Error(
+      `clerk.users.createUser failed: ${(err as Error).message}${detail ? `\n${JSON.stringify(detail, null, 2)}` : ''}`,
+    );
+  }
 
   const apiKey = await clerk.apiKeys.create({
     name: `cli-auth integration ${Date.now()}`,
@@ -39,10 +61,15 @@ export async function provisionFixtures(): Promise<IntegrationFixtures> {
     scopes: ['cli:read'],
   });
 
-  const m2mTokenOpaque = await clerk.m2m.createToken({ tokenFormat: 'opaque' });
-  const m2mTokenJwt = await clerk.m2m.createToken({ tokenFormat: 'jwt' });
+  // Provision a throwaway machine + its secret so we can mint M2M tokens without
+  // depending on any env var beyond CLERK_SECRET_KEY. Deleted in `teardownFixtures`.
+  const machine = await clerk.machines.create({ name: `cli-auth integration ${slug}` });
+  const { secret: machineSecretKey } = await clerk.machines.getSecretKey(machine.id);
 
-  return { clerk, auth, user, apiKey, m2mTokenOpaque, m2mTokenJwt };
+  const m2mTokenOpaque = await clerk.m2m.createToken({ machineSecretKey, tokenFormat: 'opaque' });
+  const m2mTokenJwt = await clerk.m2m.createToken({ machineSecretKey, tokenFormat: 'jwt' });
+
+  return { clerk, auth, user, apiKey, machine, m2mTokenOpaque, m2mTokenJwt };
 }
 
 /** Tear down everything `provisionFixtures` created. Each step is best-effort. */
@@ -50,14 +77,10 @@ export async function teardownFixtures(fixtures: IntegrationFixtures | undefined
   if (!fixtures) {
     return;
   }
-  const { clerk, user, apiKey, m2mTokenOpaque, m2mTokenJwt } = fixtures;
+  const { clerk, user, apiKey, machine } = fixtures;
 
-  await Promise.allSettled([
-    clerk.apiKeys.delete(apiKey.id),
-    clerk.m2m.revokeToken({ m2mTokenId: m2mTokenOpaque.id }),
-    clerk.m2m.revokeToken({ m2mTokenId: m2mTokenJwt.id }),
-  ]);
-  // Delete the user last so any token references resolve cleanly during revoke.
+  // Deleting the machine cascades to its M2M tokens — no need to revoke them individually.
+  await Promise.allSettled([clerk.apiKeys.delete(apiKey.id), clerk.machines.delete(machine.id)]);
   await Promise.allSettled([clerk.users.deleteUser(user.id)]);
 }
 

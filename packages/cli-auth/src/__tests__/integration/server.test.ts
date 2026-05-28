@@ -143,7 +143,7 @@ describe.skipIf(skipWhenNoSecret)('cli-auth server integration', () => {
           // Replace the verifier with our own — still using the bound `clerk` to keep this
           // real. Asserts the override path correctly receives token + auto-detected type.
           expect(type).toBe('api_key');
-          const verified = await clerk.apiKeys.verify({ secret: token });
+          const verified = await clerk.apiKeys.verify(token);
           return { subject: verified.subject, type, scopes: verified.scopes };
         },
       });

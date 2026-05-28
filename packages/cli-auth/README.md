@@ -268,7 +268,7 @@ export const GET = handle({
     if (!isAllowlisted(token)) {
       throw new Error('Token not allowlisted');
     }
-    const apiKey = await clerk.apiKeys.verify({ secret: token });
+    const apiKey = await clerk.apiKeys.verify(token);
     return { subject: apiKey.subject, type, scopes: apiKey.scopes };
   },
 });
