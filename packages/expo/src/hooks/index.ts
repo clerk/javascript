@@ -19,4 +19,3 @@ export * from './useOAuth';
 export * from './useAuth';
 export * from './useNativeSession';
 export * from './useNativeAuthEvents';
-export * from './useUserProfileModal';
