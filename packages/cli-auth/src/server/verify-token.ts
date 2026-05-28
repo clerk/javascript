@@ -2,6 +2,7 @@ import type { ClerkClient } from '@clerk/backend';
 import { TokenType, type TokenType as TokenTypeT } from '@clerk/backend/internal';
 
 import { ClerkCliAuthError } from '../errors';
+
 import { detectTokenType, isTokenTypeAccepted } from './detect-type';
 import type { AcceptsToken, TokenInfo, VerifyTokenContext, VerifyTokenFn } from './types';
 
@@ -32,13 +33,7 @@ export async function defaultVerifyToken<T extends TokenTypeT>(ctx: VerifyTokenC
 
   if (ctx.type === TokenType.ApiKey) {
     try {
-      const apiKey = (await clerk.apiKeys.verify({ secret: ctx.token })) as unknown as {
-        subject: string;
-        scopes?: string[];
-        revoked?: boolean;
-        expired?: boolean;
-        claims?: Record<string, unknown>;
-      };
+      const apiKey = await clerk.apiKeys.verify({ secret: ctx.token });
       if (apiKey.revoked || apiKey.expired) {
         throw new ClerkCliAuthError('verify_api_key', 'API key revoked or expired.');
       }
@@ -46,7 +41,7 @@ export async function defaultVerifyToken<T extends TokenTypeT>(ctx: VerifyTokenC
         subject: apiKey.subject,
         type: ctx.type,
         scopes: apiKey.scopes,
-        claims: apiKey.claims,
+        claims: apiKey.claims ?? undefined,
       };
     } catch (error) {
       if (error instanceof ClerkCliAuthError) {
@@ -58,27 +53,31 @@ export async function defaultVerifyToken<T extends TokenTypeT>(ctx: VerifyTokenC
 
   // OAuth / M2M / session — delegate to authenticateRequest.
   try {
-    const state = (await clerk.authenticateRequest(ctx.request, { acceptsToken: [ctx.type] })) as unknown as {
-      isAuthenticated?: boolean;
-      reason?: string;
-      toAuth?: () => { subject?: string; userId?: string; scopes?: string[]; claims?: Record<string, unknown> } | null;
-    };
+    const state = await clerk.authenticateRequest(ctx.request, { acceptsToken: [ctx.type] });
     if (state.isAuthenticated === false) {
       throw new ClerkCliAuthError('not_authenticated', state.reason ?? 'Token rejected by Clerk.');
     }
-    const auth = state.toAuth?.();
+    const auth = state.toAuth();
     if (!auth) {
       throw new ClerkCliAuthError('not_authenticated', 'authenticateRequest returned no auth payload.');
     }
-    const subject = auth.subject ?? auth.userId;
-    if (typeof subject !== 'string' || !subject) {
+    // SessionAuthObject exposes `userId`; MachineAuthObject (oauth_token / m2m_token) exposes `subject`.
+    const subject =
+      'subject' in auth && typeof auth.subject === 'string'
+        ? auth.subject
+        : 'userId' in auth && typeof auth.userId === 'string'
+          ? auth.userId
+          : undefined;
+    if (!subject) {
       throw new ClerkCliAuthError('not_authenticated', 'Verified token had no subject.');
     }
+    const scopes = 'scopes' in auth && Array.isArray(auth.scopes) ? auth.scopes : undefined;
+    const claims = 'claims' in auth && auth.claims ? (auth.claims as Record<string, unknown>) : undefined;
     return {
       subject,
       type: ctx.type,
-      scopes: auth.scopes,
-      claims: auth.claims,
+      scopes,
+      claims,
     };
   } catch (error) {
     if (error instanceof ClerkCliAuthError) {
