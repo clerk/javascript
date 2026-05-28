@@ -535,13 +535,16 @@ export const enUS: LocalizationResource = {
           modes: {
             title: 'Fill in your Google Workspace application details',
             ariaLabel: 'Configuration ',
-            metadataUpload: 'Add via metadata',
+            metadataFile: 'Add via metadata',
             manual: 'Configure manually',
           },
-          metadataUpload: {
+          metadataFile: {
             label: 'IdP metadata',
-            uploadFile: 'Upload file',
             description: 'In your Google Workspace app, download the IdP metadata and upload it below.',
+            uploadFile: 'Upload file',
+            replaceFile: 'Replace file',
+            removeFile: 'Remove file',
+            fileUploaded: 'File uploaded',
           },
           manual: {
             description: 'In your Google Workspace app, retrieve these values.',

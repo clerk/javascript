@@ -1589,13 +1589,16 @@ export type __internal_LocalizationResource = {
           modes: {
             title: LocalizationValue;
             ariaLabel: LocalizationValue;
-            metadataUpload: LocalizationValue;
+            metadataFile: LocalizationValue;
             manual: LocalizationValue;
           };
-          metadataUpload: {
+          metadataFile: {
             label: LocalizationValue;
-            uploadFile: LocalizationValue;
             description: LocalizationValue;
+            uploadFile: LocalizationValue;
+            replaceFile: LocalizationValue;
+            removeFile: LocalizationValue;
+            fileUploaded: LocalizationValue;
           };
           manual: {
             description: LocalizationValue;
