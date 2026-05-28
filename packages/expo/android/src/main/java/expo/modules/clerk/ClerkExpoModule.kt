@@ -38,20 +38,17 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
     ActivityEventListener {
 
     companion object {
-        const val CLERK_AUTH_REQUEST_CODE = 9001
         const val CLERK_PROFILE_REQUEST_CODE = 9002
 
         // Intent extras
         const val EXTRA_DISMISSABLE = "dismissable"
         const val EXTRA_PUBLISHABLE_KEY = "publishableKey"
-        const val EXTRA_MODE = "mode"
 
         // Result extras
         const val RESULT_SESSION_ID = "sessionId"
         const val RESULT_CANCELLED = "cancelled"
 
         // Pending promises for activity results
-        private var pendingAuthPromise: Promise? = null
         private var pendingProfilePromise: Promise? = null
 
         // Store publishable key for passing to activities
@@ -159,40 +156,6 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
                 promise.reject("E_INIT_FAILED", "Failed to initialize Clerk SDK: ${e.message}", e)
             }
         }
-    }
-
-    // MARK: - presentAuth
-
-    @ReactMethod
-    override fun presentAuth(options: ReadableMap, promise: Promise) {
-        val activity = getCurrentActivity() ?: run {
-            promise.reject("E_ACTIVITY_UNAVAILABLE", "No activity available to present Clerk UI.")
-            return
-        }
-
-        if (!Clerk.isInitialized.value) {
-            promise.reject("E_NOT_INITIALIZED", "Clerk SDK is not initialized. Call configure() first.")
-            return
-        }
-
-        // Check if user is already signed in
-        if (Clerk.session != null) {
-            promise.reject("already_signed_in", "User is already signed in")
-            return
-        }
-
-        pendingAuthPromise?.reject("E_SUPERSEDED", "Auth presentation was superseded")
-        pendingAuthPromise = promise
-
-        val mode = if (options.hasKey("mode")) options.getString("mode") ?: "signInOrUp" else "signInOrUp"
-        val dismissable = if (options.hasKey("dismissable")) options.getBoolean("dismissable") else true
-
-        val intent = Intent(activity, ClerkAuthActivity::class.java).apply {
-            putExtra(EXTRA_MODE, mode)
-            putExtra(EXTRA_DISMISSABLE, dismissable)
-        }
-
-        activity.startActivityForResult(intent, CLERK_AUTH_REQUEST_CODE)
     }
 
     // MARK: - presentUserProfile
@@ -310,54 +273,12 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
 
     override fun onActivityResult(activity: Activity, requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
-            CLERK_AUTH_REQUEST_CODE -> handleAuthResult(resultCode, data)
             CLERK_PROFILE_REQUEST_CODE -> handleProfileResult(resultCode, data)
         }
     }
 
     override fun onNewIntent(intent: Intent) {
         // Not used
-    }
-
-    private fun handleAuthResult(resultCode: Int, data: Intent?) {
-        val promise = pendingAuthPromise ?: return
-        pendingAuthPromise = null
-
-        if (resultCode == Activity.RESULT_OK) {
-            val session = Clerk.session
-            val user = Clerk.user
-
-            val result = WritableNativeMap()
-
-            // Top-level sessionId for JS SDK compatibility (matches iOS response format)
-            result.putString("sessionId", session?.id)
-
-            session?.let {
-                val sessionMap = WritableNativeMap()
-                sessionMap.putString("id", it.id)
-                sessionMap.putString("status", it.status.name)
-                sessionMap.putString("userId", it.user?.id)
-                result.putMap("session", sessionMap)
-            }
-
-            user?.let {
-                val primaryEmail = it.emailAddresses?.find { e -> e.id == it.primaryEmailAddressId }
-
-                val userMap = WritableNativeMap()
-                userMap.putString("id", it.id)
-                userMap.putString("firstName", it.firstName)
-                userMap.putString("lastName", it.lastName)
-                userMap.putString("imageUrl", it.imageUrl)
-                userMap.putString("primaryEmailAddress", primaryEmail?.emailAddress)
-                result.putMap("user", userMap)
-            }
-
-            promise.resolve(result)
-        } else {
-            val result = WritableNativeMap()
-            result.putBoolean("cancelled", true)
-            promise.resolve(result)
-        }
     }
 
     private fun handleProfileResult(resultCode: Int, data: Intent?) {

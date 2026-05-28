@@ -11,8 +11,6 @@ public var clerkViewFactory: ClerkViewFactoryProtocol?
 
 // Protocol that the app target implements to provide Clerk views
 public protocol ClerkViewFactoryProtocol {
-  // Modal presentation helpers.
-  func createAuthViewController(mode: String, dismissable: Bool, completion: @escaping (Result<[String: Any], Error>) -> Void) -> UIViewController?
   func createUserProfileViewController(dismissable: Bool, completion: @escaping (Result<[String: Any], Error>) -> Void) -> UIViewController?
 
   // Inline rendering — returns UIViewController to preserve SwiftUI lifecycle
@@ -98,40 +96,6 @@ class ClerkExpoModule: RCTEventEmitter {
         resolve(nil)
       } catch {
         reject("E_CONFIGURE_FAILED", error.localizedDescription, error)
-      }
-    }
-  }
-
-  // MARK: - presentAuth
-
-  @objc func presentAuth(_ options: NSDictionary,
-                          resolve: @escaping RCTPromiseResolveBlock,
-                          reject: @escaping RCTPromiseRejectBlock) {
-    guard let factory = clerkViewFactory else {
-      reject("E_NOT_INITIALIZED", "Clerk not initialized", nil)
-      return
-    }
-
-    let mode = options["mode"] as? String ?? "signInOrUp"
-    let dismissable = options["dismissable"] as? Bool ?? true
-
-    DispatchQueue.main.async {
-      guard let vc = factory.createAuthViewController(mode: mode, dismissable: dismissable, completion: { result in
-        switch result {
-        case .success(let data):
-          resolve(data)
-        case .failure(let error):
-          reject("E_AUTH_FAILED", error.localizedDescription, error)
-        }
-      }) else {
-        reject("E_CREATE_FAILED", "Could not create auth view controller", nil)
-        return
-      }
-
-      if let rootVC = Self.topViewController() {
-        rootVC.present(vc, animated: true)
-      } else {
-        reject("E_NO_ROOT_VC", "No root view controller available to present auth", nil)
       }
     }
   }
