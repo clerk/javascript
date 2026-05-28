@@ -1,5 +1,5 @@
 import type { EnterpriseConnectionJSON, UserJSON } from '@clerk/shared/types';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { BaseResource } from '../internal';
 import { User } from '../User';
@@ -755,6 +755,226 @@ describe('User', () => {
       body: {
         unsafeMetadata: JSON.stringify({ theme: null }),
       },
+    });
+  });
+
+  describe('.update with metadata routing', () => {
+    beforeEach(() => {
+      // @ts-ignore
+      BaseResource.clerk = { publishableKey: 'pk_test_foo' };
+    });
+
+    it('calls PATCH /me only when no unsafeMetadata is provided', async () => {
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: {} }));
+
+      const user = new User({} as unknown as UserJSON);
+      await user.update({ firstName: 'Jane' });
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledTimes(1);
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith({
+        method: 'PATCH',
+        path: '/me',
+        body: { firstName: 'Jane' },
+      });
+    });
+
+    it('routes only-metadata updates to /me/metadata as an RFC 7396 merge patch', async () => {
+      // Server still reflects the locally-cached state; the reload returns
+      // the same metadata, so the diff is computed identically.
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockImplementation((opts: any) => {
+        if (opts.method === 'GET') {
+          return Promise.resolve({
+            response: { unsafe_metadata: { theme: 'dark', layout: 'compact' } },
+          });
+        }
+        return Promise.resolve({ response: {} });
+      });
+
+      // Seed current state: { theme: 'dark', layout: 'compact' }. Desired
+      // state drops `layout` and changes `theme` — the merge patch must
+      // null-delete `layout` to preserve replace semantics.
+      const user = new User({
+        unsafe_metadata: { theme: 'dark', layout: 'compact' },
+      } as unknown as UserJSON);
+
+      await user.update({ unsafeMetadata: { theme: 'light' } });
+
+      // Two calls now: a GET /me reload to refresh the diff baseline, then
+      // PATCH /me/metadata with the computed patch.
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledTimes(2);
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenNthCalledWith(
+        1,
+        expect.objectContaining({ method: 'GET', path: '/me' }),
+        expect.anything(),
+      );
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenNthCalledWith(2, {
+        method: 'PATCH',
+        path: '/me/metadata',
+        body: {
+          unsafeMetadata: JSON.stringify({ theme: 'light', layout: null }),
+        },
+      });
+    });
+
+    it('reloads before diffing so server-side mutations are not lost', async () => {
+      // The local cache thinks unsafeMetadata is { a: 1 }, but the server
+      // has actually drifted to { a: 1, b: 2 }. Without the pre-diff reload
+      // the SDK would compute mergePatch({ a: 1 }, { a: 99 }) = { a: 99 }
+      // and `b` would survive on the server, silently violating the
+      // caller's intended replace semantics.
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockImplementation((opts: any) => {
+        if (opts.method === 'GET') {
+          return Promise.resolve({
+            response: { unsafe_metadata: { a: 1, b: 2 } },
+          });
+        }
+        return Promise.resolve({ response: {} });
+      });
+
+      const user = new User({
+        unsafe_metadata: { a: 1 },
+      } as unknown as UserJSON);
+
+      await user.update({ unsafeMetadata: { a: 99 } });
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledTimes(2);
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenNthCalledWith(2, {
+        method: 'PATCH',
+        path: '/me/metadata',
+        body: {
+          // The patch null-deletes `b` because the reload surfaced it as a
+          // key the server has and the desired state does not.
+          unsafeMetadata: JSON.stringify({ a: 99, b: null }),
+        },
+      });
+    });
+
+    it('splits mixed calls: PATCH /me for non-metadata, then PATCH /me/metadata for metadata', async () => {
+      const calls: Array<{ method: string; path: string | undefined }> = [];
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockImplementation((opts: any) => {
+        calls.push({ method: opts.method, path: opts.path });
+        return Promise.resolve({ response: {} });
+      });
+
+      const user = new User({
+        unsafe_metadata: { foo: 'old' },
+      } as unknown as UserJSON);
+
+      await user.update({
+        firstName: 'Jane',
+        unsafeMetadata: { foo: 'new', bar: 'added' },
+      });
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledTimes(2);
+      expect(calls[0]).toEqual({ method: 'PATCH', path: '/me' });
+      expect(calls[1]).toEqual({ method: 'PATCH', path: '/me/metadata' });
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenNthCalledWith(1, {
+        method: 'PATCH',
+        path: '/me',
+        body: { firstName: 'Jane' },
+      });
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenNthCalledWith(2, {
+        method: 'PATCH',
+        path: '/me/metadata',
+        body: {
+          unsafeMetadata: JSON.stringify({ foo: 'new', bar: 'added' }),
+        },
+      });
+    });
+
+    it('makes only a reload call when desired metadata equals current (no PUT)', async () => {
+      // The pre-diff reload always runs, but if the fresh server state
+      // matches `desired` the computed patch is empty and we skip the PUT.
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockImplementation((opts: any) => {
+        if (opts.method === 'GET') {
+          return Promise.resolve({
+            response: { unsafe_metadata: { theme: 'dark' } },
+          });
+        }
+        return Promise.resolve({ response: {} });
+      });
+
+      const user = new User({
+        unsafe_metadata: { theme: 'dark' },
+      } as unknown as UserJSON);
+
+      await user.update({ unsafeMetadata: { theme: 'dark' } });
+
+      // Exactly one call: the reload. No PATCH /me/metadata.
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledTimes(1);
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith(
+        expect.objectContaining({ method: 'GET', path: '/me' }),
+        expect.anything(),
+      );
+    });
+
+    it('logs a deprecation warning when unsafeMetadata is passed to update()', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockImplementation((opts: any) => {
+        if (opts.method === 'GET') {
+          return Promise.resolve({ response: { unsafe_metadata: {} } });
+        }
+        return Promise.resolve({ response: {} });
+      });
+
+      const user = new User({} as unknown as UserJSON);
+      await user.update({ unsafeMetadata: { theme: 'dark' } });
+
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('user.update({ unsafeMetadata })'));
+
+      warnSpy.mockRestore();
+    });
+
+    it('does not log a deprecation warning when unsafeMetadata is not passed to update()', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: {} }));
+
+      const user = new User({} as unknown as UserJSON);
+      await user.update({ firstName: 'Jane' });
+
+      expect(warnSpy).not.toHaveBeenCalled();
+
+      warnSpy.mockRestore();
+    });
+
+    it('does not log a deprecation warning for production publishable keys', async () => {
+      // @ts-ignore
+      BaseResource.clerk = { publishableKey: 'pk_live_foo' };
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockImplementation((opts: any) => {
+        if (opts.method === 'GET') {
+          return Promise.resolve({ response: { unsafe_metadata: {} } });
+        }
+        return Promise.resolve({ response: {} });
+      });
+
+      const user = new User({} as unknown as UserJSON);
+      await user.update({ unsafeMetadata: { theme: 'dark' } });
+
+      expect(warnSpy).not.toHaveBeenCalled();
+
+      warnSpy.mockRestore();
     });
   });
 });
