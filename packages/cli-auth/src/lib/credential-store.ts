@@ -171,6 +171,8 @@ class KeychainCredentialStore implements CredentialStore {
 
       const entry = new keyring.Entry(this.service, this.account(key));
       entry.setPassword(value);
+      // Clear any stale fallback so a later keychain failure can't resurrect an old value.
+      await this.fallback.delete(key).catch(() => undefined);
     } catch (error) {
       this.warnFallback('set', error);
       await this.fallback.set(key, value);

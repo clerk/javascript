@@ -79,7 +79,7 @@ export class ClerkCliAuth {
       keychainService: config.keychainService ?? 'clerk-cli-auth',
       environment,
       callbackPort: config.callbackPort ?? 0,
-      timeoutMs: config.timeoutMs ?? 120_000,
+      requestTimeoutMs: config.requestTimeoutMs ?? 30_000,
       openBrowser: config.openBrowser,
       apiKeys: config.apiKeys,
     };
@@ -93,7 +93,6 @@ export class ClerkCliAuth {
     const server = await startAuthServer({
       expectedState: state,
       port: this.config.callbackPort,
-      timeoutMs: this.config.timeoutMs,
     });
 
     try {
@@ -119,14 +118,15 @@ export class ClerkCliAuth {
         code,
         codeVerifier,
         redirectUri: server.redirectUri,
+        timeoutMs: this.config.requestTimeoutMs,
       });
 
       await this.setJson('tokens', tokens);
       const user = await fetchUserInfo({
         issuer: this.config.issuer,
         accessToken: tokens.accessToken,
+        timeoutMs: this.config.requestTimeoutMs,
       });
-      await this.setJson('user', user);
 
       return { tokens, user };
     } finally {
@@ -154,6 +154,7 @@ export class ClerkCliAuth {
       clientId: this.config.clientId,
       refreshToken: tokens.refreshToken,
       scopes: this.config.scopes,
+      timeoutMs: this.config.requestTimeoutMs,
     });
     const nextTokens = {
       ...tokens,
@@ -165,22 +166,16 @@ export class ClerkCliAuth {
   }
 
   async whoami(): Promise<UserInfo | null> {
-    const cachedUser = await this.getJson<UserInfo>('user');
-    if (cachedUser) {
-      return cachedUser;
-    }
-
     const accessToken = await this.getAccessToken();
     if (!accessToken) {
       return null;
     }
 
-    const user = await fetchUserInfo({
+    return fetchUserInfo({
       issuer: this.config.issuer,
       accessToken,
+      timeoutMs: this.config.requestTimeoutMs,
     });
-    await this.setJson('user', user);
-    return user;
   }
 
   async verifyApiKey(apiKey: string): Promise<UserInfo> {
@@ -190,6 +185,7 @@ export class ClerkCliAuth {
     return verifyApiKeyRequest({
       endpoint: this.config.apiKeys.verifyEndpoint,
       apiKey,
+      timeoutMs: this.config.requestTimeoutMs,
     });
   }
 
@@ -227,6 +223,7 @@ export class ClerkCliAuth {
             clientId: this.config.clientId,
             token,
             tokenTypeHint: tokens.refreshToken ? 'refresh_token' : 'access_token',
+            timeoutMs: this.config.requestTimeoutMs,
           });
         } catch {
           // Revoke is best-effort — local cleanup proceeds regardless.
@@ -235,7 +232,7 @@ export class ClerkCliAuth {
     }
 
     try {
-      await Promise.all([this.config.storage.delete('tokens'), this.config.storage.delete('user')]);
+      await this.config.storage.delete('tokens');
     } catch (error) {
       throw storageError('clear stored credentials', error);
     }

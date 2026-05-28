@@ -1,5 +1,5 @@
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
-import type { AddressInfo } from 'node:net';
+import type { AddressInfo, Socket } from 'node:net';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
@@ -354,5 +354,41 @@ describe('ClerkCliAuth', () => {
     await auth.logout({ revoke: false });
     expect(revokeCalls).toBe(0);
     await expect(auth.getTokenSet()).resolves.toBeNull();
+  });
+
+  it('aborts with ClerkCliAuthError("timeout") when /oauth/userinfo exceeds requestTimeoutMs', async () => {
+    const hangingSockets: Socket[] = [];
+
+    const issuerServer = createServer((req, _res) => {
+      const url = new URL(req.url ?? '/', 'http://127.0.0.1');
+      if (url.pathname === '/oauth/userinfo') {
+        // Hold the socket open so the client times out instead of getting a response.
+        hangingSockets.push(req.socket);
+        return;
+      }
+      _res.writeHead(404).end();
+    });
+    servers.push(issuerServer);
+    await new Promise<void>(resolve => issuerServer.listen(0, '127.0.0.1', resolve));
+    const issuer = `http://127.0.0.1:${(issuerServer.address() as AddressInfo).port}`;
+
+    const auth = new ClerkCliAuth({
+      clientId: 'client_123',
+      issuer,
+      requestTimeoutMs: 50,
+      storage: seededStore({
+        tokens: { accessToken: 'access-token' },
+      }),
+    });
+
+    await expect(auth.whoami()).rejects.toMatchObject({
+      name: 'ClerkCliAuthError',
+      code: 'timeout',
+    });
+
+    // Drop the held sockets so the server can close cleanly in afterEach.
+    for (const socket of hangingSockets) {
+      socket.destroy();
+    }
   });
 });

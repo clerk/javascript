@@ -1,5 +1,6 @@
 import { ClerkCliAuthError } from '../errors';
 import type { TokenSet, UserInfo } from '../types';
+import { request } from './http';
 
 export interface ExchangeParams {
   issuer: string;
@@ -7,6 +8,7 @@ export interface ExchangeParams {
   code: string;
   codeVerifier: string;
   redirectUri: string;
+  timeoutMs?: number;
 }
 
 export interface RefreshParams {
@@ -14,11 +16,13 @@ export interface RefreshParams {
   clientId: string;
   refreshToken: string;
   scopes?: string[];
+  timeoutMs?: number;
 }
 
 export interface UserInfoParams {
   issuer: string;
   accessToken: string;
+  timeoutMs?: number;
 }
 
 export interface RevokeParams {
@@ -26,6 +30,7 @@ export interface RevokeParams {
   clientId: string;
   token: string;
   tokenTypeHint?: 'access_token' | 'refresh_token';
+  timeoutMs?: number;
 }
 
 interface OAuthTokenResponse {
@@ -39,30 +44,6 @@ interface OAuthTokenResponse {
 
 function endpoint(issuer: string, path: string): string {
   return `${issuer.replace(/\/+$/, '')}${path}`;
-}
-
-async function parseBody(response: Response): Promise<unknown> {
-  const contentType = response.headers.get('content-type') ?? '';
-  if (contentType.includes('application/json')) {
-    return response.json();
-  }
-  return response.text();
-}
-
-function messageFromBody(body: unknown, fallback: string): string {
-  if (typeof body === 'string' && body.trim()) {
-    return body.trim();
-  }
-  if (body && typeof body === 'object') {
-    const record = body as Record<string, unknown>;
-    for (const key of ['error_description', 'message', 'error']) {
-      const value = record[key];
-      if (typeof value === 'string' && value.trim()) {
-        return value.trim();
-      }
-    }
-  }
-  return fallback;
 }
 
 function mapTokenResponse(data: OAuthTokenResponse): TokenSet {
@@ -93,30 +74,14 @@ function mapTokenResponse(data: OAuthTokenResponse): TokenSet {
   return tokenSet;
 }
 
-async function requestTokens(issuer: string, body: URLSearchParams): Promise<TokenSet> {
-  let response: Response;
-  try {
-    response = await fetch(endpoint(issuer, '/oauth/token'), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: body.toString(),
-    });
-  } catch (error) {
-    throw new ClerkCliAuthError('token_exchange', `Token request failed: ${(error as Error).message}`);
-  }
-
-  let parsed: unknown;
-  try {
-    parsed = await parseBody(response);
-  } catch (error) {
-    throw new ClerkCliAuthError('token_exchange', `Token response could not be parsed: ${(error as Error).message}`);
-  }
-  if (!response.ok) {
-    throw new ClerkCliAuthError(
-      'token_exchange',
-      messageFromBody(parsed, `Token request failed with HTTP ${response.status}.`),
-    );
-  }
+async function requestTokens(issuer: string, body: URLSearchParams, timeoutMs?: number): Promise<TokenSet> {
+  const { body: parsed } = await request(endpoint(issuer, '/oauth/token'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: body.toString(),
+    errorCode: 'token_exchange',
+    timeoutMs,
+  });
 
   if (!parsed || typeof parsed !== 'object') {
     throw new ClerkCliAuthError('token_exchange', 'Token response was not JSON.');
@@ -134,7 +99,7 @@ export async function exchangeCodeForTokens(params: ExchangeParams): Promise<Tok
     redirect_uri: params.redirectUri,
   });
 
-  return requestTokens(params.issuer, body);
+  return requestTokens(params.issuer, body, params.timeoutMs);
 }
 
 export async function refreshAccessToken(params: RefreshParams): Promise<TokenSet> {
@@ -148,7 +113,7 @@ export async function refreshAccessToken(params: RefreshParams): Promise<TokenSe
     body.set('scope', params.scopes.join(' '));
   }
 
-  return requestTokens(params.issuer, body);
+  return requestTokens(params.issuer, body, params.timeoutMs);
 }
 
 export async function revokeToken(params: RevokeParams): Promise<void> {
@@ -160,48 +125,21 @@ export async function revokeToken(params: RevokeParams): Promise<void> {
     body.set('token_type_hint', params.tokenTypeHint);
   }
 
-  let response: Response;
-  try {
-    response = await fetch(endpoint(params.issuer, '/oauth/token/revoke'), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: body.toString(),
-    });
-  } catch (error) {
-    throw new ClerkCliAuthError('revoke', `Revoke request failed: ${(error as Error).message}`);
-  }
-
-  if (!response.ok) {
-    const parsed = await parseBody(response).catch(() => null);
-    throw new ClerkCliAuthError(
-      'revoke',
-      messageFromBody(parsed, `Revoke request failed with HTTP ${response.status}.`),
-    );
-  }
+  await request(endpoint(params.issuer, '/oauth/token/revoke'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: body.toString(),
+    errorCode: 'revoke',
+    timeoutMs: params.timeoutMs,
+  });
 }
 
 export async function fetchUserInfo(params: UserInfoParams): Promise<UserInfo> {
-  let response: Response;
-  try {
-    response = await fetch(endpoint(params.issuer, '/oauth/userinfo'), {
-      headers: { Authorization: `Bearer ${params.accessToken}` },
-    });
-  } catch (error) {
-    throw new ClerkCliAuthError('userinfo', `Userinfo request failed: ${(error as Error).message}`);
-  }
-
-  let parsed: unknown;
-  try {
-    parsed = await parseBody(response);
-  } catch (error) {
-    throw new ClerkCliAuthError('userinfo', `Userinfo response could not be parsed: ${(error as Error).message}`);
-  }
-  if (!response.ok) {
-    throw new ClerkCliAuthError(
-      'userinfo',
-      messageFromBody(parsed, `Userinfo request failed with HTTP ${response.status}.`),
-    );
-  }
+  const { body: parsed } = await request(endpoint(params.issuer, '/oauth/userinfo'), {
+    headers: { Authorization: `Bearer ${params.accessToken}` },
+    errorCode: 'userinfo',
+    timeoutMs: params.timeoutMs,
+  });
 
   if (!parsed || typeof parsed !== 'object') {
     throw new ClerkCliAuthError('userinfo', 'Userinfo response was not JSON.');

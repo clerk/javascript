@@ -36,8 +36,8 @@ export interface ClerkCliAuthConfig {
   environment?: string;
   /** Override the port the ephemeral callback server binds to. Default: 0 (random). */
   callbackPort?: number;
-  /** Callback server timeout in ms. Default: 120000 (2min). */
-  timeoutMs?: number;
+  /** Per-HTTP-request timeout in ms for token exchange, refresh, revoke, userinfo, and API key verification. Default: 30000 (30s). */
+  requestTimeoutMs?: number;
   /** Injected opener for the browser step (for testing). Default: auto-detect. */
   openBrowser?: (url: string) => Promise<void>;
   /** Enables Clerk API key (`ak_*`) auth alongside OAuth. */
