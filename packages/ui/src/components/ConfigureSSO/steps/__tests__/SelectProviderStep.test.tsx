@@ -102,13 +102,14 @@ describe('SelectProviderStep', () => {
     expect(screen.getByText(/We.*ll guide you through the detailed setup process next\./)).toBeInTheDocument();
   });
 
-  it('renders both SAML provider radios with their labels', async () => {
+  it('renders all SAML provider radios with their labels', async () => {
     resetMocks();
     const { wrapper } = await createFixtures();
     renderStep(wrapper);
 
     expect(screen.getByRole('radio', { name: 'Okta Workforce' })).toBeInTheDocument();
     expect(screen.getByRole('radio', { name: 'Custom SAML Provider' })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'Google Workspace' })).toBeInTheDocument();
   });
 
   it('loads each tile icon from img.clerk.com', async () => {
@@ -118,7 +119,7 @@ describe('SelectProviderStep', () => {
 
     // Emotion serializes sx into stylesheets, so we check both inline + the document's collected styles
     const iconSpans = Array.from(container.querySelectorAll('label span[aria-hidden]'));
-    expect(iconSpans).toHaveLength(2);
+    expect(iconSpans).toHaveLength(3);
 
     const collectedStyles = [
       ...Array.from(document.head.querySelectorAll('style')).map(s => s.textContent ?? ''),
@@ -127,6 +128,7 @@ describe('SelectProviderStep', () => {
 
     expect(collectedStyles).toMatch(/img\.clerk\.com\/static\/okta\.svg/);
     expect(collectedStyles).toMatch(/img\.clerk\.com\/static\/saml\.svg/);
+    expect(collectedStyles).toMatch(/img\.clerk\.com\/static\/google\.svg/);
   });
 
   it('disables Continue when no provider is selected', async () => {
