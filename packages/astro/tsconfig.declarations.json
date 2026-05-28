@@ -8,11 +8,5 @@
     "declarationDir": "./dist/types",
     "skipLibCheck": true
   },
-  "exclude": [
-    "node_modules",
-    "dist",
-    "build",
-    "src/astro-components/**/*.ts",
-    "**/__tests__/**/*"
-  ]
+  "exclude": ["node_modules", "dist", "build", "src/astro-components/**/*.ts", "**/__tests__/**/*"]
 }
