@@ -34,6 +34,7 @@ import {
   getTaskEndpoint,
   navigateIfTaskExists,
   warnMissingPendingTaskHandlers,
+  warnPendingSessionStatus,
 } from '@clerk/shared/internal/clerk-js/sessionTasks';
 import { warnings } from '@clerk/shared/internal/clerk-js/warnings';
 import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
@@ -2905,6 +2906,10 @@ export class Clerk implements ClerkInterface {
         );
       }
       eventBus.emit(events.TokenUpdate, { token: this.session?.lastActiveToken });
+    }
+
+    if (this.session?.status === 'pending') {
+      warnPendingSessionStatus(this.session);
     }
 
     if (!options?.__internal_dangerouslySkipEmit) {
