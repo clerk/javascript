@@ -294,7 +294,7 @@ export type UsePaymentElementReturn = {
    */
   reset: () => Promise<void>;
   /**
-   * A boolean that indicates if the payment form UI has been rendered and is ready for user input. This is useful for disabling a submit button until the form is interactive.
+   * Indicates whether the payment form UI has been rendered and is ready for user input. This is useful for disabling a submit button until the form is interactive.
    */
   isFormReady: boolean;
 } & (
@@ -306,7 +306,7 @@ export type UsePaymentElementReturn = {
         name: 'stripe';
       };
       /**
-       * A boolean that indicates if the underlying payment provider (e.g. Stripe) has been fully initialized.
+       * Indicates whether the underlying payment provider (e.g. Stripe) has been fully initialized.
        */
       isProviderReady: true;
     }

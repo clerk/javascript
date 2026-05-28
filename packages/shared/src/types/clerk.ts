@@ -261,7 +261,7 @@ export interface Clerk {
   sdkMetadata: SDKMetadata | undefined;
 
   /**
-   * Indicates if the `Clerk` object is ready for use. Set to `false` when the `status` is `"loading"`. Set to `true` when the `status` is `"ready"` or `"degraded"`.
+   * Indicates whether the `Clerk` object is ready for use. Set to `false` when the `status` is `"loading"`. Set to `true` when the `status` is `"ready"` or `"degraded"`.
    */
   loaded: boolean;
 
@@ -292,14 +292,14 @@ export interface Clerk {
   /** The current Clerk app's domain. Prefixed with `clerk.` on production if not already prefixed. Returns `""` when ran on the server. */
   domain: string;
 
-  /** Indicates if the instance is a satellite app. */
+  /** Indicates whether the instance is a satellite app. */
   isSatellite: boolean;
 
-  /** Indicates if the Clerk instance is running in a production or development environment. */
+  /** Indicates whether the Clerk instance is running in a production or development environment. */
   instanceType: InstanceType | undefined;
 
   /**
-   * Indicates if the instance is being loaded in a standard browser environment. Set to `false` on native platforms where cookies cannot be set. When `undefined`, Clerk assumes a standard browser.
+   * Indicates whether the instance is being loaded in a standard browser environment. Set to `false` on native platforms where cookies cannot be set. When `undefined`, Clerk assumes a standard browser.
    * @inline
    */
   isStandardBrowser: boolean | undefined;

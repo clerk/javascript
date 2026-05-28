@@ -191,11 +191,11 @@ export const useLocalCredentials = (): LocalCredentialsReturn => {
      */
     setCredentials,
     /**
-     * A Boolean that indicates if there are any credentials stored on the device.
+     * Indicates whether there are any credentials stored on the device.
      */
     hasCredentials: hasLocalAuthCredentials,
     /**
-     * A Boolean that indicates if the stored credentials belong to the signed in uer. When there is no signed-in user the value will always be `false`.
+     * Indicates whether the stored credentials belong to the signed in uer. When there is no signed-in user the value will always be `false`.
      */
     userOwnsCredentials,
     /**

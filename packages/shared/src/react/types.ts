@@ -24,15 +24,15 @@ export type PaginatedResources<T = unknown, Infinite = false> = {
    */
   error: ClerkAPIResponseError | null;
   /**
-   * A boolean that is `true` if there is an ongoing request and there is no fetched data.
+   * Indicates whether there is an ongoing request and there is no fetched data.
    */
   isLoading: boolean;
   /**
-   * A boolean that is `true` if there is an ongoing request or a revalidation.
+   * Indicates whether there is an ongoing request or a revalidation.
    */
   isFetching: boolean;
   /**
-   * A boolean that indicates the request failed.
+   * Indicates whether the request failed.
    */
   isError: boolean;
   /**
@@ -57,11 +57,11 @@ export type PaginatedResources<T = unknown, Infinite = false> = {
    */
   fetchNext: () => void;
   /**
-   * A boolean that indicates if there are available pages to be fetched.
+   * Indicates whether there are available pages to be fetched.
    */
   hasNextPage: boolean;
   /**
-   * A boolean that indicates if there are available pages to be fetched.
+   * Indicates whether there are available pages to be fetched.
    */
   hasPreviousPage: boolean;
   /**

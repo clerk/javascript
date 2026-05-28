@@ -11,7 +11,7 @@ import type { ClerkOptions } from './clerk';
 export type MultiDomainAndOrProxy =
   | {
       /**
-       * A boolean that indicates whether the application is a satellite application.
+       * Indicates whether the application is a satellite application.
        */
       isSatellite?: never;
       /**
@@ -37,7 +37,7 @@ export type MultiDomainAndOrProxy =
 export type MultiDomainAndOrProxyPrimitives =
   | {
       /**
-       * A boolean that indicates whether the application is a satellite application.
+       * Indicates whether the application is a satellite application.
        */
       isSatellite?: never;
       /**

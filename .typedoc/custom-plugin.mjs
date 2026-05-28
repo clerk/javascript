@@ -238,8 +238,7 @@ function getCatchAllReplacements() {
     },
     {
       pattern: /(?<![\[\w`#])`?((?:SignIn|SignUp)Errors)`?(?![\]\w`])/g,
-      replace: (/** @type {string} */ _match, /** @type {string} */ type) =>
-        `[\`${type}\`](/docs/reference/types/errors)`,
+      replace: (/** @type {string} */ _match, /** @type {string} */ type) => `[${type}](/docs/reference/types/errors)`,
     },
     {
       pattern: /(?<![\[\w`#])`?SignInFirstFactor`?(?![\]\w`])/g,
