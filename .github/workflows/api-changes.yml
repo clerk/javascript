@@ -13,12 +13,25 @@ on:
       - release/v4
       - release/core-2
     paths:
+      - 'packages/astro/**'
       - 'packages/backend/**'
+      - 'packages/chrome-extension/**'
       - 'packages/clerk-js/**'
+      - 'packages/expo/**'
+      - 'packages/expo-passkeys/**'
+      - 'packages/express/**'
+      - 'packages/fastify/**'
+      - 'packages/hono/**'
+      - 'packages/localizations/**'
       - 'packages/nextjs/**'
+      - 'packages/nuxt/**'
       - 'packages/react/**'
+      - 'packages/react-router/**'
       - 'packages/shared/**'
+      - 'packages/tanstack-react-start/**'
+      - 'packages/testing/**'
       - 'packages/ui/**'
+      - 'packages/vue/**'
       - 'snapi.config.json'
       - '.github/workflows/api-changes.yml'
 
@@ -32,12 +45,25 @@ concurrency:
 env:
   SNAPI_PACKAGE: https://pkg.pr.new/clerk/snapi/@clerk/snapi@d42ed8b7857f9254bbb2a6e9ead44d5e7b1aa60c
   SNAPI_FILTERS: >-
+    --filter=@clerk/astro
     --filter=@clerk/backend
+    --filter=@clerk/chrome-extension
     --filter=@clerk/clerk-js
+    --filter=@clerk/expo
+    --filter=@clerk/expo-passkeys
+    --filter=@clerk/express
+    --filter=@clerk/fastify
+    --filter=@clerk/hono
+    --filter=@clerk/localizations
     --filter=@clerk/nextjs
+    --filter=@clerk/nuxt
     --filter=@clerk/react
+    --filter=@clerk/react-router
     --filter=@clerk/shared
+    --filter=@clerk/tanstack-react-start
+    --filter=@clerk/testing
     --filter=@clerk/ui
+    --filter=@clerk/vue
 
 jobs:
   publish-baseline:

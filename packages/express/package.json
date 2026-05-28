@@ -62,6 +62,7 @@
   ],
   "scripts": {
     "build": "pnpm clean && tsup",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:pub": "pnpm dev -- --env.publish",
