@@ -203,9 +203,9 @@ export interface SignUpFuturePhoneCodeVerifyParams {
 /** @generateWithEmptyComment */
 export interface SignUpFutureSSOParams extends SignUpFutureAdditionalParams {
   /**
-   * The strategy to use for authentication.
+   * The strategy to use for authentication. Either [`OAuthStrategy`](https://clerk.com/docs/reference/types/oauth-strategy) or [`EnterpriseSSOStrategy`](https://clerk.com/docs/reference/types/enterprise-sso-strategy).
    */
-  strategy: OAuthStrategy | EnterpriseSSOStrategy;
+  strategy: string;
   /**
    * The URL or path to navigate to after the OAuth or SAML flow completes. Can be provided as a relative URL (such as `/dashboard`), in which case it will be prefixed with the base URL of the current page.
    */
