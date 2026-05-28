@@ -38,6 +38,35 @@ describe('M2MToken', () => {
       expect(token.updatedAt).toBe(1666648250 * 1000);
     });
 
+    it('preserves custom claims and excludes reserved JWT claims', () => {
+      const payload = {
+        iss: 'https://clerk.m2m.example.test',
+        sub: 'mch_2vYVtestTESTtestTESTtestTESTtest',
+        aud: ['mch_1xxxxx'],
+        exp: 1666648550,
+        iat: 1666648250,
+        nbf: 1666648240,
+        jti: 'mt_2xKa9Bgv7NxMRDFyQw8LpZ3cTmU1vHjE',
+        scopes: 'scope1 scope2',
+        permissions: ['read:users', 'read:orders'],
+        role: 'service',
+      };
+
+      const token = M2MToken.fromJwtPayload(payload);
+
+      expect(token.claims).toEqual({
+        permissions: ['read:users', 'read:orders'],
+        role: 'service',
+      });
+      // Reserved claims are mapped to dedicated fields, not leaked into `claims`.
+      expect(token.claims).not.toHaveProperty('iss');
+      expect(token.claims).not.toHaveProperty('sub');
+      expect(token.claims).not.toHaveProperty('aud');
+      expect(token.claims).not.toHaveProperty('scopes');
+      expect(token.claims).not.toHaveProperty('jti');
+      expect(token.scopes).toEqual(['scope1', 'scope2']);
+    });
+
     it('prefers scopes claim over aud when both are present', () => {
       const payload = {
         sub: 'mch_test',
