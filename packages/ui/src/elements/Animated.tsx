@@ -20,7 +20,7 @@ function useSafeAutoAnimate(): [(node: HTMLElement | null) => void] {
       controllerRef.current = null;
     }
     nodeRef.current = node;
-    if (node instanceof HTMLElement) {
+    if (node instanceof HTMLElement && typeof node.animate === 'function') {
       controllerRef.current = autoAnimate(node);
     }
   }, []);
