@@ -1,6 +1,6 @@
 import type { ClerkError } from '@clerk/shared/error';
 import type { State as StateInterface } from '@clerk/shared/types';
-import { computed, effect } from 'alien-signals';
+import { computed, effect, endBatch, startBatch } from 'alien-signals';
 
 import { eventBus } from './events';
 import type { BaseResource } from './resources/Base';
@@ -44,9 +44,7 @@ export class State implements StateInterface {
   __internal_computed = computed;
 
   constructor() {
-    eventBus.on('resource:update', this.onResourceUpdated);
-    eventBus.on('resource:error', this.onResourceError);
-    eventBus.on('resource:fetch', this.onResourceFetch);
+    eventBus.on('resource:state-change', this.onResourceStateChange);
 
     this._waitlistInstance = new Waitlist(null);
     this.waitlistResourceSignal({ resource: this._waitlistInstance });
@@ -56,54 +54,73 @@ export class State implements StateInterface {
     return this._waitlistInstance;
   }
 
-  private onResourceError = (payload: { resource: BaseResource; error: ClerkError | null }) => {
-    if (payload.resource instanceof SignIn) {
-      this.signInErrorSignal({ error: payload.error });
-    }
+  /**
+   * Handles all resource state changes. Uses startBatch/endBatch to ensure that
+   * error, fetchStatus, and resource signal writes from a single event are flushed
+   * as one notification (one React re-render).
+   *
+   * Resource-only events (from fromJSON during in-flight tasks) are skipped while
+   * fetchStatus is 'fetching'. Since fromJSON mutates the resource in place, the
+   * completion event from runAsyncResourceTask carries the same (already-updated)
+   * instance — so no data is lost.
+   */
+  private onResourceStateChange = (payload: {
+    resource: BaseResource;
+    error?: ClerkError | null;
+    fetchStatus?: 'idle' | 'fetching';
+  }) => {
+    const isResourceOnly = !('fetchStatus' in payload) && !('error' in payload);
 
-    if (payload.resource instanceof SignUp) {
-      this.signUpErrorSignal({ error: payload.error });
-    }
+    startBatch();
 
-    if (payload.resource instanceof Waitlist) {
-      this.waitlistErrorSignal({ error: payload.error });
-    }
-  };
-
-  private onResourceUpdated = (payload: { resource: BaseResource }) => {
-    if (payload.resource instanceof SignIn) {
-      const previousResource = this.signInResourceSignal().resource;
-      if (shouldIgnoreNullUpdate(previousResource, payload.resource)) {
-        return;
+    try {
+      if (payload.resource instanceof SignIn) {
+        if (isResourceOnly && this.signInFetchSignal().status === 'fetching') {
+          return;
+        }
+        if ('error' in payload) {
+          this.signInErrorSignal({ error: payload.error ?? null });
+        }
+        if ('fetchStatus' in payload) {
+          this.signInFetchSignal({ status: payload.fetchStatus ?? 'idle' });
+        }
+        const previousResource = this.signInResourceSignal().resource;
+        if (!shouldIgnoreNullUpdate(previousResource, payload.resource)) {
+          this.signInResourceSignal({ resource: payload.resource });
+        }
       }
-      this.signInResourceSignal({ resource: payload.resource });
-    }
 
-    if (payload.resource instanceof SignUp) {
-      const previousResource = this.signUpResourceSignal().resource;
-      if (shouldIgnoreNullUpdate(previousResource, payload.resource)) {
-        return;
+      if (payload.resource instanceof SignUp) {
+        if (isResourceOnly && this.signUpFetchSignal().status === 'fetching') {
+          return;
+        }
+        if ('error' in payload) {
+          this.signUpErrorSignal({ error: payload.error ?? null });
+        }
+        if ('fetchStatus' in payload) {
+          this.signUpFetchSignal({ status: payload.fetchStatus ?? 'idle' });
+        }
+        const previousResource = this.signUpResourceSignal().resource;
+        if (!shouldIgnoreNullUpdate(previousResource, payload.resource)) {
+          this.signUpResourceSignal({ resource: payload.resource });
+        }
       }
-      this.signUpResourceSignal({ resource: payload.resource });
-    }
 
-    if (payload.resource instanceof Waitlist) {
-      this._waitlistInstance = payload.resource;
-      this.waitlistResourceSignal({ resource: payload.resource });
-    }
-  };
-
-  private onResourceFetch = (payload: { resource: BaseResource; status: 'idle' | 'fetching' }) => {
-    if (payload.resource instanceof SignIn) {
-      this.signInFetchSignal({ status: payload.status });
-    }
-
-    if (payload.resource instanceof SignUp) {
-      this.signUpFetchSignal({ status: payload.status });
-    }
-
-    if (payload.resource instanceof Waitlist) {
-      this.waitlistFetchSignal({ status: payload.status });
+      if (payload.resource instanceof Waitlist) {
+        if (isResourceOnly && this.waitlistFetchSignal().status === 'fetching') {
+          return;
+        }
+        if ('error' in payload) {
+          this.waitlistErrorSignal({ error: payload.error ?? null });
+        }
+        if ('fetchStatus' in payload) {
+          this.waitlistFetchSignal({ status: payload.fetchStatus ?? 'idle' });
+        }
+        this._waitlistInstance = payload.resource;
+        this.waitlistResourceSignal({ resource: payload.resource });
+      }
+    } finally {
+      endBatch();
     }
   };
 }

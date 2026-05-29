@@ -3,8 +3,73 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { eventBus } from '../events';
 import { SignIn } from '../resources/SignIn';
 import { SignUp } from '../resources/SignUp';
-import { signInResourceSignal, signUpResourceSignal } from '../signals';
+import { signInFetchSignal, signInResourceSignal, signUpResourceSignal } from '../signals';
 import { State } from '../state';
+
+describe('Signal batching', () => {
+  let state: State;
+
+  beforeEach(() => {
+    signInResourceSignal({ resource: null });
+    signInFetchSignal({ status: 'idle' });
+    state = new State();
+  });
+
+  it('should produce at most 3 renders with clean fetchStatus transitions during an API call', async () => {
+    const signIn = new SignIn(null);
+    const snapshots: Array<{ fetchStatus: string; hasSignIn: boolean }> = [];
+
+    state.__internal_effect(() => {
+      const s = state.signInSignal();
+      snapshots.push({ fetchStatus: s.fetchStatus, hasSignIn: s.signIn !== null });
+    });
+
+    await signIn.__internal_future.password({ password: 'test123', identifier: 'test@example.com' }).catch(() => {
+      // Expected to fail since there's no real API
+    });
+
+    expect(snapshots.length).toBeLessThanOrEqual(3);
+
+    // fetchStatus follows a clean idle → fetching → idle progression
+    const transitions = snapshots.map(s => s.fetchStatus).filter((s, i, arr) => i === 0 || s !== arr[i - 1]);
+    expect(transitions).toEqual(['idle', 'fetching', 'idle']);
+  });
+
+  it('should skip resource-only updates while fetching and apply them on idle', () => {
+    const signIn = new SignIn({ id: 'signin_123', status: 'needs_identifier' } as any);
+
+    // Simulate fetchStatus: fetching (as runAsyncResourceTask would)
+    eventBus.emit('resource:state-change', { resource: signIn, error: null, fetchStatus: 'fetching' });
+    expect(signInFetchSignal().status).toBe('fetching');
+
+    // Simulate fromJSON updating the resource mid-flight (resource-only event)
+    eventBus.emit('resource:state-change', { resource: signIn });
+
+    // Resource signal should NOT have been updated — skipped while fetching
+    expect(signInResourceSignal().resource?.id).toBe('signin_123');
+
+    // Simulate task completion — resource is carried again with fetchStatus: idle
+    eventBus.emit('resource:state-change', { resource: signIn, error: null, fetchStatus: 'idle' });
+
+    // Now both resource and fetchStatus are consistent
+    expect(signInFetchSignal().status).toBe('idle');
+    expect(signInResourceSignal().resource).toBe(signIn);
+  });
+
+  it('should reflect new resource data immediately when no operation is in flight', () => {
+    let latestSignInId: string | undefined;
+
+    state.__internal_effect(() => {
+      latestSignInId = state.signInSignal().signIn?.id;
+    });
+
+    expect(latestSignInId).toBeUndefined();
+
+    new SignIn({ id: 'signin_123', status: 'needs_identifier' } as any);
+
+    expect(latestSignInId).toBe('signin_123');
+  });
+});
 
 describe('State', () => {
   let _state: State;
@@ -52,7 +117,7 @@ describe('State', () => {
         expect(existingSignUp.__internal_future.canBeDiscarded).toBe(false);
 
         // Act: Emit a resource update with a null SignUp (simulating client refresh with null sign_up)
-        const _nullSignUp = new SignUp(null);
+        new SignUp(null);
 
         // Assert: Signal should NOT be updated - should still have the existing SignUp
         expect(signUpResourceSignal().resource).toBe(existingSignUp);
@@ -96,11 +161,6 @@ describe('State', () => {
           resetSignUp: vi.fn().mockImplementation(function (this: typeof mockClient) {
             newSignUpFromReset = new SignUp(null);
             this.signUp = newSignUpFromReset;
-            // reset() emits resource:error to clear errors, but the signal update
-            // happens via resource:update when the new SignUp is created
-            eventBus.emit('resource:error', { resource: newSignUpFromReset, error: null });
-            // Emit resource:update to update the signal (simulating what happens in real flow)
-            eventBus.emit('resource:update', { resource: newSignUpFromReset });
           }),
         };
         SignUp.clerk = { client: mockClient } as any;
@@ -127,10 +187,10 @@ describe('State', () => {
 
       it('should allow resource update when new resource has an id (not a null update)', () => {
         // Arrange: Set up a SignUp with id
-        const _existingSignUp = new SignUp({ id: 'signup_123', status: 'missing_requirements' } as any);
+        new SignUp({ id: 'signup_123', status: 'missing_requirements' } as any);
         expect(signUpResourceSignal().resource?.id).toBe('signup_123');
 
-        // Act: Emit a resource update with a different SignUp that also has an id
+        // Act: Create a different SignUp that also has an id
         const newSignUp = new SignUp({ id: 'signup_456', status: 'complete' } as any);
 
         // Assert: Signal should be updated with the new SignUp
@@ -159,7 +219,7 @@ describe('State', () => {
         expect(existingSignIn.__internal_future.canBeDiscarded).toBe(false);
 
         // Act: Emit a resource update with a null SignIn (simulating client refresh with null sign_in)
-        const _nullSignIn = new SignIn(null);
+        new SignIn(null);
 
         // Assert: Signal should NOT be updated - should still have the existing SignIn
         expect(signInResourceSignal().resource).toBe(existingSignIn);
@@ -201,8 +261,6 @@ describe('State', () => {
           resetSignIn: vi.fn().mockImplementation(function (this: typeof mockClient) {
             newSignInFromReset = new SignIn(null);
             this.signIn = newSignInFromReset;
-            eventBus.emit('resource:error', { resource: newSignInFromReset, error: null });
-            eventBus.emit('resource:update', { resource: newSignInFromReset });
           }),
         };
         SignIn.clerk = { client: mockClient } as any;
@@ -210,7 +268,6 @@ describe('State', () => {
         // Create a SignIn with id
         const existingSignIn = new SignIn({ id: 'signin_123', status: 'needs_identifier' } as any);
         expect(signInResourceSignal().resource?.id).toBe('signin_123');
-        expect(existingSignIn.__internal_future.canBeDiscarded).toBe(false);
 
         // Act: Call reset()
         await existingSignIn.__internal_future.reset();
@@ -224,10 +281,10 @@ describe('State', () => {
 
       it('should allow resource update when new resource has an id (not a null update)', () => {
         // Arrange: Set up a SignIn with id
-        const _existingSignIn = new SignIn({ id: 'signin_123', status: 'needs_identifier' } as any);
+        new SignIn({ id: 'signin_123', status: 'needs_identifier' } as any);
         expect(signInResourceSignal().resource?.id).toBe('signin_123');
 
-        // Act: Emit a resource update with a different SignIn that also has an id
+        // Act: Create a different SignIn that also has an id
         const newSignIn = new SignIn({ id: 'signin_456', status: 'complete' } as any);
 
         // Assert: Signal should be updated with the new SignIn
@@ -240,19 +297,19 @@ describe('State', () => {
   describe('Edge cases', () => {
     it('should handle rapid successive updates correctly', () => {
       // First update with valid SignUp
-      const _signUp1 = new SignUp({ id: 'signup_1', status: 'missing_requirements' } as any);
+      new SignUp({ id: 'signup_1', status: 'missing_requirements' } as any);
       expect(signUpResourceSignal().resource?.id).toBe('signup_1');
 
       // Second update with another valid SignUp
-      const _signUp2 = new SignUp({ id: 'signup_2', status: 'missing_requirements' } as any);
+      new SignUp({ id: 'signup_2', status: 'missing_requirements' } as any);
       expect(signUpResourceSignal().resource?.id).toBe('signup_2');
 
       // Null update should be ignored
-      const _nullSignUp = new SignUp(null);
+      new SignUp(null);
       expect(signUpResourceSignal().resource?.id).toBe('signup_2');
 
       // Another valid update should work
-      const _signUp3 = new SignUp({ id: 'signup_3', status: 'complete' } as any);
+      new SignUp({ id: 'signup_3', status: 'complete' } as any);
       expect(signUpResourceSignal().resource?.id).toBe('signup_3');
     });
 
@@ -262,10 +319,47 @@ describe('State', () => {
       expect(signUpResourceSignal().resource?.id).toBe('signup_123');
 
       // Manually emit update with the same instance (simulating fromJSON on same instance)
-      eventBus.emit('resource:update', { resource: signUp });
+      eventBus.emit('resource:state-change', { resource: signUp });
 
       // Signal should still have the same instance
       expect(signUpResourceSignal().resource).toBe(signUp);
+    });
+  });
+
+  describe('Client.destroy()', () => {
+    it('should update signals when resources are replaced with null instances', async () => {
+      const mockSetActive = vi.fn().mockResolvedValue({});
+      SignIn.clerk = { setActive: mockSetActive, client: { sessions: [{ id: 'session_123' }] } } as any;
+
+      const existingSignIn = new SignIn({
+        id: 'signin_123',
+        status: 'complete',
+        created_session_id: 'session_123',
+      } as any);
+      expect(signInResourceSignal().resource).toBe(existingSignIn);
+
+      await existingSignIn.__internal_future.finalize();
+      expect(existingSignIn.__internal_future.canBeDiscarded).toBe(true);
+
+      // Simulates what Client.destroy() does — creating a null resource replaces the existing one
+      const nullSignIn = new SignIn(null);
+
+      expect(signInResourceSignal().resource).toBe(nullSignIn);
+      expect(signInResourceSignal().resource?.id).toBeUndefined();
+    });
+  });
+
+  describe('fetchStatus clearing on reset', () => {
+    it('should clear fetchStatus to idle when resource is reset during an in-flight fetch', () => {
+      const signIn = new SignIn({ id: 'signin_123', status: 'needs_identifier' } as any);
+      eventBus.emit('resource:state-change', { resource: signIn, error: null, fetchStatus: 'fetching' });
+      expect(signInFetchSignal().status).toBe('fetching');
+
+      // Reset replaces the resource and clears fetchStatus in one event
+      const nullSignIn = new SignIn(null);
+      eventBus.emit('resource:state-change', { resource: nullSignIn, error: null, fetchStatus: 'idle' });
+
+      expect(signInFetchSignal().status).toBe('idle');
     });
   });
 });

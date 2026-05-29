@@ -11,23 +11,27 @@ export async function runAsyncResourceTask<T>(
   resource: BaseResource,
   task: () => Promise<T>,
 ): Promise<{ result?: T; error: ClerkError | null }> {
-  eventBus.emit('resource:error', { resource, error: null });
-  eventBus.emit('resource:fetch', {
+  eventBus.emit('resource:state-change', {
     resource,
-    status: 'fetching',
+    error: null,
+    fetchStatus: 'fetching',
   });
 
   try {
     const result = await task();
+    eventBus.emit('resource:state-change', {
+      resource,
+      error: null,
+      fetchStatus: 'idle',
+    });
     return { result, error: null };
   } catch (err) {
-    eventBus.emit('resource:error', { resource, error: err });
+    eventBus.emit('resource:state-change', {
+      resource,
+      error: err,
+      fetchStatus: 'idle',
+    });
     // TODO @userland-errors:
     return { error: err };
-  } finally {
-    eventBus.emit('resource:fetch', {
-      resource,
-      status: 'idle',
-    });
   }
 }

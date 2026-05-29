@@ -106,13 +106,13 @@ export class Client extends BaseResource implements ClientResource {
   resetSignIn(): void {
     this.signIn = new SignIn(null);
     // Cast needed because this.signIn is typed as SignInResource (interface), not SignIn (class extending BaseResource)
-    eventBus.emit('resource:error', { resource: this.signIn as SignIn, error: null });
+    eventBus.emit('resource:state-change', { resource: this.signIn as SignIn, error: null, fetchStatus: 'idle' });
   }
 
   resetSignUp(): void {
     this.signUp = new SignUp(null);
     // Cast needed because this.signUp is typed as SignUpResource (interface), not SignUp (class extending BaseResource)
-    eventBus.emit('resource:error', { resource: this.signUp as SignUp, error: null });
+    eventBus.emit('resource:state-change', { resource: this.signUp as SignUp, error: null, fetchStatus: 'idle' });
   }
 
   clearCache(): void {
