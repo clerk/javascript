@@ -12,16 +12,19 @@ type M2MJwtPayload = {
   [key: string]: unknown;
 };
 
-// Registered JWT claims plus the Clerk-specific structural claims that
-// `fromJwtPayload` maps onto dedicated `M2MToken` fields. Everything else in
-// the payload is a user-defined custom claim and is surfaced through `claims`.
-const M2M_RESERVED_JWT_CLAIMS = new Set(['iss', 'sub', 'aud', 'exp', 'nbf', 'iat', 'jti', 'scopes']);
+// Structural claims that Clerk's machine-token service always adds when it mints
+// an M2M JWT. These are mapped onto dedicated `M2MToken` fields, so they are
+// stripped from `claims`. Everything else is a user-supplied custom claim and is
+// surfaced through `claims`, including `aud` and `scopes`, which the backend
+// treats as custom claims (they are neither reserved nor auto-added).
+const M2M_RESERVED_JWT_CLAIMS = new Set(['iss', 'sub', 'exp', 'nbf', 'iat', 'jti']);
 
 /**
  * Reconstructs the custom claims that were attached at token creation by
- * stripping the reserved JWT/M2M claims from the verified payload. Returns
- * `null` when no custom claims are present, matching the opaque-token path
- * where a token created without claims verifies back to `claims: null`.
+ * stripping the structural claims (see `M2M_RESERVED_JWT_CLAIMS`) from the
+ * verified payload. Returns `null` when no custom claims are present, matching
+ * the opaque-token path where a token created without claims verifies back to
+ * `claims: null`.
  */
 function extractCustomClaims(payload: M2MJwtPayload): Record<string, any> | null {
   const claims: Record<string, any> = {};

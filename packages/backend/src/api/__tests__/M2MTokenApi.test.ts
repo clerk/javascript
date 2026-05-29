@@ -475,7 +475,14 @@ describe('M2MToken', () => {
       });
       const result = await m2mApi.verify({ token: jwtToken });
 
-      expect(result.claims).toEqual({ permissions: ['read:users', 'read:orders'], role: 'service' });
+      // `aud` and `scopes` from the token are user-supplied custom claims and are
+      // preserved in `claims`; `scopes` additionally seeds the dedicated field.
+      expect(result.claims).toEqual({
+        aud: ['mch_1xxxxx', 'mch_2xxxxx'],
+        scopes: 'mch_1xxxxx mch_2xxxxx',
+        permissions: ['read:users', 'read:orders'],
+        role: 'service',
+      });
       expect(result.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
     });
 

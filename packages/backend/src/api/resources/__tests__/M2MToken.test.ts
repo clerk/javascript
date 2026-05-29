@@ -29,7 +29,9 @@ describe('M2MToken', () => {
       expect(token.id).toBe('mt_2xKa9Bgv7NxMRDFyQw8LpZ3cTmU1vHjE');
       expect(token.subject).toBe('mch_2vYVtestTESTtestTESTtestTESTtest');
       expect(token.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
-      expect(token.claims).toBeNull();
+      // `aud` is a user-supplied custom claim (the backend does not auto-add it),
+      // so it is surfaced through `claims` while also seeding the `scopes` field.
+      expect(token.claims).toEqual({ aud: ['mch_1xxxxx', 'mch_2xxxxx'] });
       expect(token.revoked).toBe(false);
       expect(token.revocationReason).toBeNull();
       expect(token.expired).toBe(false);
@@ -38,7 +40,7 @@ describe('M2MToken', () => {
       expect(token.updatedAt).toBe(1666648250 * 1000);
     });
 
-    it('preserves custom claims and excludes reserved JWT claims', () => {
+    it('preserves custom claims (including aud and scopes) and strips only structural claims', () => {
       const payload = {
         iss: 'https://clerk.m2m.example.test',
         sub: 'mch_2vYVtestTESTtestTESTtestTESTtest',
@@ -54,16 +56,23 @@ describe('M2MToken', () => {
 
       const token = M2MToken.fromJwtPayload(payload);
 
+      // `aud` and `scopes` are user-supplied custom claims in Clerk-issued M2M
+      // tokens (the backend neither reserves nor auto-adds them), so they are
+      // preserved in `claims` alongside any other custom claims.
       expect(token.claims).toEqual({
+        aud: ['mch_1xxxxx'],
+        scopes: 'scope1 scope2',
         permissions: ['read:users', 'read:orders'],
         role: 'service',
       });
-      // Reserved claims are mapped to dedicated fields, not leaked into `claims`.
+      // Structural claims are mapped to dedicated fields, not leaked into `claims`.
       expect(token.claims).not.toHaveProperty('iss');
       expect(token.claims).not.toHaveProperty('sub');
-      expect(token.claims).not.toHaveProperty('aud');
-      expect(token.claims).not.toHaveProperty('scopes');
+      expect(token.claims).not.toHaveProperty('exp');
+      expect(token.claims).not.toHaveProperty('nbf');
+      expect(token.claims).not.toHaveProperty('iat');
       expect(token.claims).not.toHaveProperty('jti');
+      // `scopes` is still derived onto the dedicated `scopes` field.
       expect(token.scopes).toEqual(['scope1', 'scope2']);
     });
 
