@@ -12,6 +12,7 @@ import { nuxt } from './nuxt';
 import { react } from './react';
 import { reactRouter } from './react-router';
 import { tanstack } from './tanstack';
+import { vinext } from './vinext';
 import { vue } from './vue';
 
 export const appConfigs = {
@@ -28,6 +29,7 @@ export const appConfigs = {
   astro,
   tanstack,
   nuxt,
+  vinext,
   vue,
   reactRouter,
   secrets: {

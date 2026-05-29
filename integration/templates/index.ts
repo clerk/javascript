@@ -23,6 +23,7 @@ export const templates = {
   'react-router-node': resolve(__dirname, './react-router-node'),
   'react-router-library': resolve(__dirname, './react-router-library'),
   'custom-flows-react-vite': resolve(__dirname, './custom-flows-react-vite'),
+  'vinext-app': resolve(__dirname, './vinext-app'),
   'chrome-extension-vite': resolve(__dirname, './chrome-extension-vite'),
 } as const;
 

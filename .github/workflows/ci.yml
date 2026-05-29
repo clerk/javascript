@@ -312,6 +312,7 @@ jobs:
             "vue",
             "nuxt",
             "react-router",
+            "vinext",
             "custom",
             "hono",
             "chrome-extension",
