@@ -2973,6 +2973,34 @@ describe('Clerk singleton', () => {
       expect(mockClerkUICtor).toHaveBeenCalled();
     });
 
+    it('attaches ui.ClerkUI to an already loaded instance without refetching initial resources', async () => {
+      const mockControls = { mountComponent: vi.fn() };
+      const mockClerkUIInstance = {
+        ensureMounted: vi.fn().mockResolvedValue(mockControls),
+      };
+      const mockClerkUICtor = vi.fn(() => mockClerkUIInstance);
+
+      mockClientFetch.mockClear();
+      mockEnvironmentFetch.mockClear();
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+
+      expect(mockClientFetch).toHaveBeenCalledTimes(1);
+      expect(mockEnvironmentFetch).toHaveBeenCalledTimes(1);
+
+      await sut.load({
+        ...mockedLoadOptions,
+        ui: { ClerkUI: mockClerkUICtor },
+      });
+      await Promise.resolve();
+
+      expect(mockClerkUICtor).toHaveBeenCalledTimes(1);
+      expect(mockClientFetch).toHaveBeenCalledTimes(1);
+      expect(mockEnvironmentFetch).toHaveBeenCalledTimes(1);
+      expect(() => sut.mountUserButton(document.createElement('div'))).not.toThrow();
+    });
+
     it('supports legacy clerkUICtor option for backwards compatibility', async () => {
       const mockClerkUIInstance = { mount: vi.fn() };
       const mockClerkUICtor = vi.fn(() => mockClerkUIInstance);
