@@ -10,13 +10,13 @@ import type { ClerkFastifyOptions } from './types';
 import { fastifyRequestToRequest, requestToProxyRequest } from './utils';
 
 export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
-  const frontendApiProxy = options.frontendApiProxy;
+  const { hookName: _hookName, frontendApiProxy, ...clerkOptions } = options;
   const proxyPath = stripTrailingSlashes(frontendApiProxy?.path ?? DEFAULT_PROXY_PATH) || DEFAULT_PROXY_PATH;
   const publishableKey = options.publishableKey || constants.PUBLISHABLE_KEY;
   const secretKey = options.secretKey || constants.SECRET_KEY;
   const apiUrl = options.apiUrl || apiUrlFromPublishableKey(publishableKey);
   const clerkClient = createClerkClient({
-    ...options,
+    ...clerkOptions,
     publishableKey,
     secretKey,
     machineSecretKey: options.machineSecretKey || constants.MACHINE_SECRET_KEY,
