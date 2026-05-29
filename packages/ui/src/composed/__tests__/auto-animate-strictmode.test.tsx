@@ -27,8 +27,9 @@ describe('auto-animate: destroy/recreate cycle (StrictMode simulation)', () => {
   beforeEach(() => {
     parentEl = document.createElement('div');
     document.body.appendChild(parentEl);
-    animateSpy = vi.spyOn(Element.prototype, 'animate');
-    animateSpy.mockClear();
+    animateSpy = vi
+      .spyOn(Element.prototype, 'animate')
+      .mockImplementation(() => ({ addEventListener: vi.fn(), cancel: vi.fn(), finished: Promise.resolve() }) as any);
   });
 
   afterEach(() => {
@@ -266,7 +267,9 @@ describe('useSafeAutoAnimate: prevents double-init on same DOM node', () => {
 
     // 2 MOs were created, but the first was disconnected by destroy()
     // So only 1 is active — adding a child should only trigger once
-    const animateSpy = vi.spyOn(Element.prototype, 'animate');
+    const animateSpy = vi
+      .spyOn(Element.prototype, 'animate')
+      .mockImplementation(() => ({ addEventListener: vi.fn(), cancel: vi.fn(), finished: Promise.resolve() }) as any);
     const child = document.createElement('div');
     el.appendChild(child);
 
@@ -299,8 +302,9 @@ describe('auto-animate: useAutoAnimate hook in StrictMode', () => {
   let animateSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
-    animateSpy = vi.spyOn(Element.prototype, 'animate');
-    animateSpy.mockClear();
+    animateSpy = vi
+      .spyOn(Element.prototype, 'animate')
+      .mockImplementation(() => ({ addEventListener: vi.fn(), cancel: vi.fn(), finished: Promise.resolve() }) as any);
   });
 
   afterEach(() => {
