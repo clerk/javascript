@@ -47,11 +47,7 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
 
             val event = Arguments.createMap().apply {
                 putString("type", type)
-                if (sessionId == null) {
-                    putNull("sessionId")
-                } else {
-                    putString("sessionId", sessionId)
-                }
+                putString("sessionId", sessionId)
             }
 
             sharedReactContext
