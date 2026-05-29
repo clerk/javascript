@@ -97,11 +97,22 @@ export const useSignUpContext = (): SignUpContextType => {
 
   const authQueryString = redirectUrls.toSearchParams().toString();
 
+  // In a combined-flow modal (openSignUp with CLERK_SIGN_IN_URL set, CLERK_SIGN_UP_URL unset,
+  // public signup mode) signUpUrl falls back to displayConfig.signUpUrl, which points to the
+  // accounts portal. Customers that dont use the accounts portal end up with a broken OAuth
+  // redirect_url. Anchor to options.signInUrl in that case: the create/sso-callback and
+  // create/verify routes are mounted under the SignIn tree (components/SignIn/index.tsx),
+  // so the callback resolves against the app origin and hits LazySignUpSSOCallback.
+  // isCombinedFlow guarantees options.signInUrl is set and relative, but we keep the guard
+  // for type narrowing.
+  const modalCallbackBaseUrl =
+    isCombinedFlow && ctx.routing === 'virtual' && options.signInUrl ? options.signInUrl : signUpUrl;
+
   const emailLinkRedirectUrl =
     ctx.emailLinkRedirectUrl ??
     buildRedirectUrl({
       routing: ctx.routing,
-      baseUrl: signUpUrl,
+      baseUrl: modalCallbackBaseUrl,
       authQueryString,
       path: ctx.path,
       endpoint: isCombinedFlow ? '/create' + MAGIC_LINK_VERIFY_PATH_ROUTE : MAGIC_LINK_VERIFY_PATH_ROUTE,
@@ -110,7 +121,7 @@ export const useSignUpContext = (): SignUpContextType => {
     ctx.ssoCallbackUrl ??
     buildRedirectUrl({
       routing: ctx.routing,
-      baseUrl: signUpUrl,
+      baseUrl: modalCallbackBaseUrl,
       authQueryString,
       path: ctx.path,
       endpoint: isCombinedFlow ? '/create' + SSO_CALLBACK_PATH_ROUTE : SSO_CALLBACK_PATH_ROUTE,
