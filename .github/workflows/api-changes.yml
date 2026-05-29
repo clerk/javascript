@@ -43,7 +43,7 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
-  SNAPI_PACKAGE: https://pkg.pr.new/clerk/snapi/@clerk/snapi@2479ffce1adb8ff5f1caf95509268774224c121d
+  SNAPI_PACKAGE: https://pkg.pr.new/clerk/snapi/@clerk/snapi@514c03fcbe776637f4882f266dfd4669dd8614f0
   SNAPI_FILTERS: >-
     --filter=@clerk/astro
     --filter=@clerk/backend
