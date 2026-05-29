@@ -1,22 +1,9 @@
 import { useOrganization, useReverification } from '@clerk/shared/react';
 import { useState } from 'react';
 
-import {
-  Badge,
-  Button,
-  Col,
-  descriptors,
-  Flex,
-  Flow,
-  Grid,
-  Heading,
-  Link,
-  localizationKeys,
-  Text,
-} from '@/customizables';
+import { Badge, Button, Col, descriptors, Flex, Flow, Grid, Link, localizationKeys, Text } from '@/customizables';
 import { useCardState } from '@/elements/contexts';
 import { Switch } from '@/elements/Switch';
-import { Alert } from '@/ui/elements/Alert';
 import { handleError } from '@/utils/errorHandler';
 
 import { useConfigureSSO } from '../ConfigureSSOContext';
@@ -34,56 +21,35 @@ export const ConfirmationStep = (): JSX.Element => {
         elementDescriptor={descriptors.configureSSOStep}
         elementId={descriptors.configureSSOStep.setId('confirmation')}
       >
+        <Step.Header
+          title={localizationKeys('configureSSO.confirmation.statusSection.title')}
+          badge={
+            <Badge
+              elementDescriptor={descriptors.configureSSOConfirmationStatusBadge}
+              elementId={descriptors.configureSSOConfirmationStatusBadge.setId(isActive ? 'active' : 'inactive')}
+              colorScheme={isActive ? 'success' : 'danger'}
+              localizationKey={
+                isActive
+                  ? localizationKeys('configureSSO.confirmation.statusSection.activeBadge')
+                  : localizationKeys('configureSSO.confirmation.statusSection.inactiveBadge')
+              }
+            />
+          }
+        />
+
         <Step.Body sx={t => ({ paddingInline: t.space.$6, paddingBlock: t.space.$5, gap: t.space.$5 })}>
-          <StatusHeader isActive={isActive} />
           <DetailsGrid />
         </Step.Body>
 
         <Step.Footer>
           {!isActive && (
-            <Alert
-              variant='info'
-              title={localizationKeys('configureSSO.confirmation.inactiveBanner.title')}
-              sx={{ flex: 1 }}
-            />
+            <Flex>
+              <Text title={localizationKeys('configureSSO.confirmation.inactiveBanner.title')} />
+            </Flex>
           )}
         </Step.Footer>
       </Step>
     </Flow.Part>
-  );
-};
-
-type StatusHeaderProps = {
-  isActive: boolean;
-};
-
-const StatusHeader = ({ isActive }: StatusHeaderProps): JSX.Element => {
-  return (
-    <Flex
-      align='center'
-      sx={t => ({
-        gap: t.space.$3,
-        paddingBlockEnd: t.space.$4,
-        borderBottomWidth: t.borderWidths.$normal,
-        borderBottomStyle: t.borderStyles.$solid,
-        borderBottomColor: t.colors.$borderAlpha100,
-      })}
-    >
-      <Heading
-        textVariant='h2'
-        localizationKey={localizationKeys('configureSSO.confirmation.statusSection.title')}
-      />
-      <Badge
-        elementDescriptor={descriptors.configureSSOConfirmationStatusBadge}
-        elementId={descriptors.configureSSOConfirmationStatusBadge.setId(isActive ? 'active' : 'inactive')}
-        colorScheme={isActive ? 'success' : 'danger'}
-        localizationKey={
-          isActive
-            ? localizationKeys('configureSSO.confirmation.statusSection.activeBadge')
-            : localizationKeys('configureSSO.confirmation.statusSection.inactiveBadge')
-        }
-      />
-    </Flex>
   );
 };
 
