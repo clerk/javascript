@@ -11,9 +11,10 @@ import { BaseResource } from '../../resources/internal';
 export class OAuthApplication implements OAuthApplicationNamespace {
   async getConsentInfo(params: GetOAuthConsentInfoParams): Promise<OAuthConsentInfo> {
     const { oauthClientId, scope, redirectUri } = params;
-    const search: Record<string, string> = {};
-    if (scope !== undefined) search.scope = scope;
-    if (redirectUri !== undefined) search.redirect_uri = redirectUri;
+    const search = {
+      ...(scope !== undefined && { scope }),
+      ...(redirectUri !== undefined && { redirect_uri: redirectUri }),
+    };
     const json = await BaseResource._fetch<OAuthConsentInfoJSON>(
       {
         method: 'GET',

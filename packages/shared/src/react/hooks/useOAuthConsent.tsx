@@ -61,10 +61,5 @@ export function useOAuthConsent(params: UseOAuthConsentParams): UseOAuthConsentR
 }
 
 function fetchConsentInfo(clerk: LoadedClerk, params: { oauthClientId: string; scope?: string; redirectUri?: string }) {
-  const { oauthClientId, scope, redirectUri } = params;
-  return clerk.oauthApplication.getConsentInfo({
-    oauthClientId,
-    ...(scope !== undefined && { scope }),
-    ...(redirectUri !== undefined && { redirectUri }),
-  });
+  return clerk.oauthApplication.getConsentInfo(params);
 }
