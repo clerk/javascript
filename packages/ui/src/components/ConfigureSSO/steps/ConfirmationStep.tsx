@@ -129,6 +129,7 @@ const DomainSection = (): JSX.Element | null => {
     <ProfileSection.Root
       title={localizationKeys('configureSSO.confirmation.domainSection.title')}
       id='ssoDomain'
+      sx={{ borderTopWidth: 0, paddingTop: 0 }}
     >
       <Link
         elementDescriptor={descriptors.configureSSOConfirmationDomainLink}
