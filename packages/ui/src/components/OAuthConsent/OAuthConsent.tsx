@@ -50,7 +50,7 @@ function _OAuthConsent() {
 
   // Public path: fetch via hook. Disabled on the accounts portal path
   // (which already has all data via context) to avoid a wasted FAPI request.
-  const redirectUri = getRedirectUriFromSearch();
+  const redirectUri = ctx.redirectUrl ?? getRedirectUriFromSearch();
   const { data, isLoading, error } = useOAuthConsent({
     oauthClientId,
     scope,
