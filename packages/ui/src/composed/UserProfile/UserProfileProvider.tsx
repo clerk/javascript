@@ -16,7 +16,6 @@ import { OptionsProvider } from '../../contexts/OptionsContext';
 import { UserProfileContext } from '../../contexts/components/UserProfile';
 import { AppearanceOverrides } from '../../elements/AppearanceOverrides';
 import type { Elements } from '../../internal/appearance';
-import { getModuleManager } from '../moduleManagerStore';
 import { createComposedRouter } from '../stubRouter';
 
 const fallbackModuleManager: ModuleManager = {
@@ -38,7 +37,7 @@ export const UserProfileProvider = (props: UserProfileProviderProps): ReactNode 
   const { isLoaded, user } = useUser();
 
   const environment = (clerk as any).__internal_environment as EnvironmentResource | null | undefined;
-  const moduleManager: ModuleManager = getModuleManager() ?? fallbackModuleManager;
+  const moduleManager: ModuleManager = (clerk as any).__internal_moduleManager ?? fallbackModuleManager;
   const router = useMemo(() => createComposedRouter(clerk.navigate), [clerk]);
 
   if (!isLoaded || !user || !environment) {

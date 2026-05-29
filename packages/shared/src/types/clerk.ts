@@ -245,6 +245,11 @@ export interface Clerk {
    */
   __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K];
 
+  /**
+   * @internal
+   */
+  __internal_moduleManager: import('../moduleManager').ModuleManager;
+
   frontendApi: string;
 
   /** Clerk Publishable Key string. */
