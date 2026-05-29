@@ -40,7 +40,16 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
   const supportEmail = useSupportEmail();
   const clerk = useClerk();
 
+  const factorChannel = 'channel' in props.factor ? props.factor.channel : undefined;
+  const normalizedFactorChannel = factorChannel === 'sms' ? undefined : factorChannel;
+  const normalizedVerificationChannel =
+    signIn.firstFactorVerification.channel === 'sms' ? undefined : signIn.firstFactorVerification.channel;
+  const hasPendingFactorVerification =
+    signIn.firstFactorVerification.status === 'unverified' &&
+    signIn.firstFactorVerification.strategy === props.factor.strategy &&
+    normalizedFactorChannel === normalizedVerificationChannel;
   const shouldAvoidPrepare = signIn.firstFactorVerification.status === 'verified' && props.factorAlreadyPrepared;
+  const shouldAvoidInitialPrepare = shouldAvoidPrepare || hasPendingFactorVerification;
 
   const cacheKey = useMemo(() => {
     const factor = props.factor;
@@ -82,7 +91,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
       .catch(err => handleError(err, [], card.setError));
   };
 
-  useFetch(shouldAvoidPrepare ? undefined : () => signIn?.prepareFirstFactor(props.factor), cacheKey, {
+  useFetch(shouldAvoidInitialPrepare ? undefined : () => signIn?.prepareFirstFactor(props.factor), cacheKey, {
     staleTime: 100,
     onSuccess: () => props.onFactorPrepare(),
     onError: err => handleError(err, [], card.setError),

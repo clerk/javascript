@@ -11,7 +11,10 @@ export const SignUpEmailCodeCard = () => {
   const card = useCardState();
 
   const emailVerificationStatus = signUp.verifications.emailAddress.status;
+  const hasPendingEmailCodeVerification =
+    emailVerificationStatus === 'unverified' && signUp.verifications.emailAddress.strategy === 'email_code';
   const shouldAvoidPrepare = !signUp.status || emailVerificationStatus === 'verified';
+  const shouldAvoidInitialPrepare = shouldAvoidPrepare || hasPendingEmailCodeVerification;
 
   const prepare = () => {
     if (shouldAvoidPrepare) {
@@ -24,7 +27,7 @@ export const SignUpEmailCodeCard = () => {
 
   // TODO: Introduce a useMutation to handle mutating requests
   useFetch(
-    shouldAvoidPrepare ? undefined : () => signUp.prepareEmailAddressVerification({ strategy: 'email_code' }),
+    shouldAvoidInitialPrepare ? undefined : () => signUp.prepareEmailAddressVerification({ strategy: 'email_code' }),
     {
       name: 'prepare',
       strategy: 'email_code',
