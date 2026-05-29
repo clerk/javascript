@@ -17,7 +17,6 @@ import { SubscriberTypeContext } from '../../contexts/components/SubscriberType'
 import { OrganizationProfileContext } from '../../contexts/components/OrganizationProfile';
 import { AppearanceOverrides } from '../../elements/AppearanceOverrides';
 import type { Elements } from '../../internal/appearance';
-import { getModuleManager } from '../moduleManagerStore';
 import { createComposedRouter } from '../stubRouter';
 
 const fallbackModuleManager: ModuleManager = {
@@ -40,7 +39,7 @@ export const OrganizationProfileProvider = (props: OrganizationProfileProviderPr
   const { organization } = useOrganization();
 
   const environment = (clerk as any).__internal_environment as EnvironmentResource | null | undefined;
-  const moduleManager: ModuleManager = getModuleManager() ?? fallbackModuleManager;
+  const moduleManager: ModuleManager = (clerk as any).__internal_moduleManager ?? fallbackModuleManager;
   const router = useMemo(() => createComposedRouter(clerk.navigate), [clerk]);
 
   if (!isLoaded || !user || !organization || !environment) {
