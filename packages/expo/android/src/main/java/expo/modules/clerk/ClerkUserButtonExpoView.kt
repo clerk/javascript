@@ -6,6 +6,7 @@ import android.widget.FrameLayout
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Recomposer
@@ -89,7 +90,7 @@ class ClerkUserButtonNativeView(context: Context) : FrameLayout(context) {
         }
       }
 
-      val content = @androidx.compose.runtime.Composable {
+      val userButtonContent: @Composable () -> Unit = {
         MaterialTheme {
           Box(
             modifier = Modifier.fillMaxSize(),
@@ -101,15 +102,16 @@ class ClerkUserButtonNativeView(context: Context) : FrameLayout(context) {
       }
 
       if (activity != null) {
+        // Compose content embedded in React Native needs Activity owners supplied explicitly.
         CompositionLocalProvider(
           LocalViewModelStoreOwner provides activity,
           LocalLifecycleOwner provides activity,
           LocalSavedStateRegistryOwner provides activity,
         ) {
-          content()
+          userButtonContent()
         }
       } else {
-        content()
+        userButtonContent()
       }
     }
   }

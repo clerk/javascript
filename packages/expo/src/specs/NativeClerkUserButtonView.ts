@@ -4,6 +4,6 @@ import codegenNativeComponent from 'react-native/Libraries/Utilities/codegenNati
 import type { HostComponent, ViewProps } from 'react-native';
 /* eslint-enable import/namespace, import/default, import/no-named-as-default, import/no-named-as-default-member, simple-import-sort/imports */
 
-type NativeProps = ViewProps;
+interface NativeProps extends ViewProps {}
 
 export default codegenNativeComponent<NativeProps>('ClerkUserButtonView') as HostComponent<NativeProps>;
