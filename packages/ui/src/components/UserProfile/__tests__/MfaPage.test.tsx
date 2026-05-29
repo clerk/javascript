@@ -6,13 +6,18 @@ import type {
   VerificationJSON,
 } from '@clerk/shared/types';
 import { act, waitFor } from '@testing-library/react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
+import { loadCountryCodeData } from '@/ui/elements/PhoneInput/countryCodeDataLoader';
 
 import { MfaSection } from '../MfaSection';
+
+beforeAll(async () => {
+  await loadCountryCodeData();
+});
 
 const { createFixtures } = bindCreateFixtures('UserProfile');
 
