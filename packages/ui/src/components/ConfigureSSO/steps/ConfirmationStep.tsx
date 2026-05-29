@@ -1,11 +1,22 @@
 import { useOrganization, useReverification } from '@clerk/shared/react';
 import { useState } from 'react';
 
-import { Badge, Col, descriptors, Flex, Flow, Grid, Link, localizationKeys, Text } from '@/customizables';
+import {
+  Badge,
+  Button,
+  Col,
+  descriptors,
+  Flex,
+  Flow,
+  Grid,
+  Heading,
+  Link,
+  localizationKeys,
+  Text,
+} from '@/customizables';
 import { useCardState } from '@/elements/contexts';
-import { ProfileSection } from '@/elements/Section';
 import { Switch } from '@/elements/Switch';
-import { mqu } from '@/styledSystem';
+import { Alert } from '@/ui/elements/Alert';
 import { handleError } from '@/utils/errorHandler';
 
 import { useConfigureSSO } from '../ConfigureSSOContext';
@@ -14,53 +25,97 @@ import { useWizard } from '../elements/Wizard';
 import { ResetConnectionDialog } from '../ResetConnectionDialog';
 
 export const ConfirmationStep = (): JSX.Element => {
+  const { enterpriseConnection } = useConfigureSSO();
+  const isActive = !!enterpriseConnection?.active;
+
   return (
     <Flow.Part part='ssoConfirmation'>
       <Step
         elementDescriptor={descriptors.configureSSOStep}
         elementId={descriptors.configureSSOStep.setId('confirmation')}
       >
-        <Step.Body sx={t => ({ paddingInline: t.space.$8, paddingBlock: t.space.$4 })}>
-          <SsoStatusSection />
-          <EnableSsoSection />
-          <DomainSection />
-          <ConfigurationDetailsSection />
-          <ResetConnectionRow />
+        <Step.Body sx={t => ({ paddingInline: t.space.$6, paddingBlock: t.space.$5, gap: t.space.$5 })}>
+          <StatusHeader isActive={isActive} />
+          <DetailsGrid />
         </Step.Body>
 
-        <Step.Footer />
+        <Step.Footer>
+          {!isActive && (
+            <Alert
+              variant='info'
+              title={localizationKeys('configureSSO.confirmation.inactiveBanner.title')}
+              sx={{ flex: 1 }}
+            />
+          )}
+        </Step.Footer>
       </Step>
     </Flow.Part>
   );
 };
 
-const SsoStatusSection = (): JSX.Element => {
-  const { enterpriseConnection } = useConfigureSSO();
-  const isActive = !!enterpriseConnection?.active;
+type StatusHeaderProps = {
+  isActive: boolean;
+};
 
+const StatusHeader = ({ isActive }: StatusHeaderProps): JSX.Element => {
   return (
-    <ProfileSection.Root
-      title={localizationKeys('configureSSO.confirmation.statusSection.title')}
-      id='ssoStatus'
-      sx={{ border: 0 }}
+    <Flex
+      align='center'
+      sx={t => ({
+        gap: t.space.$3,
+        paddingBlockEnd: t.space.$4,
+        borderBottomWidth: t.borderWidths.$normal,
+        borderBottomStyle: t.borderStyles.$solid,
+        borderBottomColor: t.colors.$borderAlpha100,
+      })}
     >
-      <Flex justify='start'>
-        <Badge
-          elementDescriptor={descriptors.configureSSOConfirmationStatusBadge}
-          elementId={descriptors.configureSSOConfirmationStatusBadge.setId(isActive ? 'active' : 'inactive')}
-          colorScheme={isActive ? 'success' : 'danger'}
-          localizationKey={
-            isActive
-              ? localizationKeys('configureSSO.confirmation.statusSection.activeBadge')
-              : localizationKeys('configureSSO.confirmation.statusSection.inactiveBadge')
-          }
-        />
-      </Flex>
-    </ProfileSection.Root>
+      <Heading
+        textVariant='h2'
+        localizationKey={localizationKeys('configureSSO.confirmation.statusSection.title')}
+      />
+      <Badge
+        elementDescriptor={descriptors.configureSSOConfirmationStatusBadge}
+        elementId={descriptors.configureSSOConfirmationStatusBadge.setId(isActive ? 'active' : 'inactive')}
+        colorScheme={isActive ? 'success' : 'danger'}
+        localizationKey={
+          isActive
+            ? localizationKeys('configureSSO.confirmation.statusSection.activeBadge')
+            : localizationKeys('configureSSO.confirmation.statusSection.inactiveBadge')
+        }
+      />
+    </Flex>
   );
 };
 
-const EnableSsoSection = (): JSX.Element => {
+const DetailsGrid = (): JSX.Element => {
+  return (
+    <Grid
+      sx={t => ({
+        width: '100%',
+        rowGap: t.space.$4,
+        columnGap: t.space.$4,
+        alignItems: 'center',
+        gridTemplateColumns: 'minmax(160px, 220px) minmax(0, 1fr)',
+      })}
+    >
+      <EnableSsoRow />
+      <DomainRow />
+      <ConfigurationDetailsRow />
+      <ConfigureAgainRow />
+      <ResetConnectionRow />
+    </Grid>
+  );
+};
+
+const RowLabel = ({ localizationKey }: { localizationKey: ReturnType<typeof localizationKeys> }): JSX.Element => (
+  <Text
+    as='label'
+    variant='subtitle'
+    localizationKey={localizationKey}
+  />
+);
+
+const EnableSsoRow = (): JSX.Element => {
   const { enterpriseConnection, updateEnterpriseConnection } = useConfigureSSO();
   const card = useCardState();
 
@@ -93,22 +148,19 @@ const EnableSsoSection = (): JSX.Element => {
   };
 
   return (
-    <ProfileSection.Root
-      title={localizationKeys('configureSSO.confirmation.enableSection.title')}
-      id='enableSso'
-      sx={t => ({ border: 0, paddingBlock: t.space.$2 })}
-    >
+    <>
+      <RowLabel localizationKey={localizationKeys('configureSSO.confirmation.enableSection.title')} />
       <Switch
         isChecked={isChecked}
         isDisabled={card.isLoading}
         onChange={active => void onActiveChange(active)}
         aria-label='Enable SSO'
       />
-    </ProfileSection.Root>
+    </>
   );
 };
 
-const DomainSection = (): JSX.Element | null => {
+const DomainRow = (): JSX.Element | null => {
   const { enterpriseConnection } = useConfigureSSO();
   const domain = enterpriseConnection?.domains?.[0];
 
@@ -118,11 +170,8 @@ const DomainSection = (): JSX.Element | null => {
   }
 
   return (
-    <ProfileSection.Root
-      title={localizationKeys('configureSSO.confirmation.domainSection.title')}
-      id='ssoDomain'
-      sx={{ border: 0 }}
-    >
+    <>
+      <RowLabel localizationKey={localizationKeys('configureSSO.confirmation.domainSection.title')} />
       <Link
         elementDescriptor={descriptors.configureSSOConfirmationDomainLink}
         href={`https://${domain}`}
@@ -134,89 +183,104 @@ const DomainSection = (): JSX.Element | null => {
           whiteSpace: 'nowrap',
           textOverflow: 'ellipsis',
           textDecoration: 'underline',
+          minWidth: 0,
         }}
       >
         {domain}
       </Link>
-    </ProfileSection.Root>
+    </>
   );
 };
 
-const ConfigurationDetailsSection = (): JSX.Element => {
+const ConfigurationDetailsRow = (): JSX.Element => {
   const { enterpriseConnection } = useConfigureSSO();
-  const { goToStep } = useWizard();
 
   // This will later be expanded to support OIDC connections as well
   const samlConnection = enterpriseConnection?.samlConnection;
 
   return (
-    <ProfileSection.Root
-      title={localizationKeys('configureSSO.confirmation.configurationSection.title')}
-      id='ssoConfiguration'
-      centered={false}
-    >
-      <Col gap={3}>
-        <Grid
-          gap={3}
-          sx={{ width: '100%', alignItems: 'center', gridTemplateColumns: '150px minmax(0, 1fr)' }}
+    <>
+      <RowLabel localizationKey={localizationKeys('configureSSO.confirmation.configurationSection.title')} />
+      <Grid
+        sx={t => ({
+          width: '100%',
+          rowGap: t.space.$3,
+          columnGap: t.space.$3,
+          alignItems: 'center',
+          gridTemplateColumns: 'minmax(120px, 160px) minmax(0, 1fr)',
+        })}
+      >
+        <Text
+          elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsLabel}
+          colorScheme='secondary'
+          localizationKey={localizationKeys('configureSSO.confirmation.configurationSection.ssoUrlLabel')}
+        />
+        <Link
+          elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsLink}
+          href={samlConnection?.idpSsoUrl ?? ''}
+          isExternal
+          title={samlConnection?.idpSsoUrl}
+          sx={{ display: 'block', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', minWidth: 0 }}
         >
-          <Text
-            elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsLabel}
-            colorScheme='secondary'
-            localizationKey={localizationKeys('configureSSO.confirmation.configurationSection.ssoUrlLabel')}
-          />
-          <Link
-            elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsLink}
-            href={samlConnection?.idpSsoUrl ?? ''}
-            isExternal
-            title={samlConnection?.idpSsoUrl}
-            sx={{ display: 'block', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}
-          >
-            {samlConnection?.idpSsoUrl}
-          </Link>
+          {samlConnection?.idpSsoUrl}
+        </Link>
 
-          <Text
-            elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsLabel}
-            colorScheme='secondary'
-            localizationKey={localizationKeys('configureSSO.confirmation.configurationSection.issuerLabel')}
-          />
-          <Text
-            elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsValue}
-            truncate
-            title={samlConnection?.idpEntityId}
-          >
-            {samlConnection?.idpEntityId}
-          </Text>
-
-          <Text
-            elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsLabel}
-            colorScheme='secondary'
-            localizationKey={localizationKeys('configureSSO.confirmation.configurationSection.certificateLabel')}
-          />
-          <Text
-            elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsValue}
-            truncate
-            title={samlConnection?.idpCertificate}
-          >
-            {samlConnection?.idpCertificate}
-          </Text>
-        </Grid>
-
-        <Flex
-          justify='start'
-          sx={t => ({ marginTop: t.space.$2, paddingInlineStart: 0, marginInline: '-10px' })}
+        <Text
+          elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsLabel}
+          colorScheme='secondary'
+          localizationKey={localizationKeys('configureSSO.confirmation.configurationSection.issuerLabel')}
+        />
+        <Text
+          elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsValue}
+          truncate
+          title={samlConnection?.idpEntityId}
         >
-          <ProfileSection.Button
+          {samlConnection?.idpEntityId}
+        </Text>
+
+        <Text
+          elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsLabel}
+          colorScheme='secondary'
+          localizationKey={localizationKeys('configureSSO.confirmation.configurationSection.certificateLabel')}
+        />
+        <Text
+          elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsValue}
+          truncate
+          title={samlConnection?.idpCertificate}
+        >
+          {samlConnection?.idpCertificate}
+        </Text>
+      </Grid>
+    </>
+  );
+};
+
+const ConfigureAgainRow = (): JSX.Element => {
+  const { goToStep } = useWizard();
+
+  return (
+    <>
+      <span aria-hidden />
+      <Col
+        sx={t => ({
+          paddingBlock: t.space.$2,
+          borderBottomWidth: t.borderWidths.$normal,
+          borderBottomStyle: t.borderStyles.$solid,
+          borderBottomColor: t.colors.$borderAlpha100,
+          gridColumn: '2 / -1',
+        })}
+      >
+        <Flex justify='start'>
+          <Button
             elementDescriptor={descriptors.configureSSOConfirmationReconfigureButton}
-            id='configureAgain'
+            variant='outline'
+            size='sm'
             onClick={() => goToStep('configure')}
-            variant='ghost'
-            colorScheme='primary'
             localizationKey={localizationKeys('configureSSO.confirmation.configurationSection.configureAgainLink')}
           />
         </Flex>
       </Col>
-    </ProfileSection.Root>
+    </>
   );
 };
 
@@ -225,30 +289,24 @@ const ResetConnectionRow = (): JSX.Element => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <ProfileSection.Root
-      title={localizationKeys('configureSSO.confirmation.resetSection.title')}
-      id='resetSso'
-      sx={{ alignItems: 'center', [mqu.md]: { alignItems: 'flex-start' } }}
-    >
-      <ProfileSection.Item
-        id='resetSso'
-        sx={{ paddingInlineStart: 0, marginInline: '-10px' }}
-      >
-        <ProfileSection.Button
+    <>
+      <RowLabel localizationKey={localizationKeys('configureSSO.confirmation.resetSection.title')} />
+      <Flex justify='start'>
+        <Button
           elementDescriptor={descriptors.configureSSOConfirmationResetButton}
-          id='resetSso'
-          variant='ghost'
+          variant='solid'
           colorScheme='danger'
-          localizationKey={localizationKeys('configureSSO.confirmation.resetSection.title')}
+          size='sm'
           onClick={() => setIsOpen(true)}
+          localizationKey={localizationKeys('configureSSO.confirmation.resetSection.title')}
         />
-      </ProfileSection.Item>
+      </Flex>
 
       <ResetConnectionDialog
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         confirmationValue={organization?.name ?? ''}
       />
-    </ProfileSection.Root>
+    </>
   );
 };

@@ -1799,6 +1799,9 @@ export type __internal_LocalizationResource = {
         confirmationFieldLabel: LocalizationValue<'name'>;
         submitButton: LocalizationValue;
       };
+      inactiveBanner: {
+        title: LocalizationValue;
+      };
     };
   };
   apiKeys: {

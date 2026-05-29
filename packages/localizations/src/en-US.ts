@@ -225,7 +225,10 @@ export const enUS: LocalizationResource = {
       statusSection: {
         activeBadge: 'Active',
         inactiveBadge: 'Inactive',
-        title: 'SSO Status',
+        title: 'SSO Successfully configured',
+      },
+      inactiveBanner: {
+        title: 'SSO is inactive and you need to enable it to authenticate',
       },
     },
     missingManageEnterpriseConnectionsPermission: {
