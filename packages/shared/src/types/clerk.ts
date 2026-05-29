@@ -332,7 +332,7 @@ export interface Clerk {
    * Entrypoint for Clerk's Signal API containing resource signals along with accessible versions of `computed()` and
    * `effect()` that can be used to subscribe to changes from Signals.
    *
-   * @internal
+   * @hidden
    * @experimental This experimental API is subject to change.
    */
   __internal_state: State;
@@ -350,7 +350,7 @@ export interface Clerk {
   telemetry: TelemetryCollector | undefined;
 
   /**
-   * @internal
+   * @hidden
    */
   __internal_country?: string | null;
 
@@ -375,13 +375,13 @@ export interface Clerk {
    * Opens the Clerk Checkout component in a drawer.
    *
    * @param props - Optional checkout configuration parameters.
-   * @internal
+   * @hidden
    */
   __internal_openCheckout: (props?: __internal_CheckoutProps) => void;
 
   /**
    * Closes the Clerk Checkout drawer.
-   * @internal
+   * @hidden
    */
   __internal_closeCheckout: () => void;
 
@@ -389,13 +389,13 @@ export interface Clerk {
    * Opens the Clerk PlanDetails drawer component in a drawer.
    *
    * @param props - `plan` or `planId` parameters are required.
-   * @internal
+   * @hidden
    */
   __internal_openPlanDetails: (props: __internal_PlanDetailsProps) => void;
 
   /**
    * Closes the Clerk PlanDetails drawer.
-   * @internal
+   * @hidden
    */
   __internal_closePlanDetails: () => void;
 
@@ -403,13 +403,13 @@ export interface Clerk {
    * Opens the Clerk SubscriptionDetails drawer component in a drawer.
    *
    * @param props - Optional configuration parameters.
-   * @internal
+   * @hidden
    */
   __internal_openSubscriptionDetails: (props?: __internal_SubscriptionDetailsProps) => void;
 
   /**
    * Closes the Clerk SubscriptionDetails drawer.
-   * @internal
+   * @hidden
    */
   __internal_closeSubscriptionDetails: () => void;
 
@@ -417,19 +417,19 @@ export interface Clerk {
    * Opens the Clerk UserVerification component in a modal.
    *
    * @param props - Optional user verification configuration parameters.
-   * @internal
+   * @hidden
    */
   __internal_openReverification: (props?: __internal_UserVerificationModalProps) => void;
 
   /**
    * Closes the Clerk user verification modal.
-   * @internal
+   * @hidden
    */
   __internal_closeReverification: () => void;
 
   /**
    * Attempts to enable a environment setting from a development instance, prompting if disabled.
-   * @internal
+   * @hidden
    */
   __internal_attemptToEnableEnvironmentSetting: (
     options: __internal_AttemptToEnableEnvironmentSettingParams,
@@ -437,13 +437,13 @@ export interface Clerk {
 
   /**
    * Opens the Clerk Enable Organizations prompt for development instance
-   * @internal
+   * @hidden
    */
   __internal_openEnableOrganizationsPrompt: (props: __internal_EnableOrganizationsPromptProps) => void;
 
   /**
    * Closes the Clerk Enable Organizations modal.
-   * @internal
+   * @hidden
    */
   __internal_closeEnableOrganizationsPrompt: () => void;
 
@@ -747,7 +747,7 @@ export interface Clerk {
    *
    * @param targetNode - Target node to mount the OAuth consent component.
    * @param oauthConsentProps - OAuth consent configuration parameters.
-   * @internal
+   * @hidden
    */
   __internal_mountOAuthConsent: (targetNode: HTMLDivElement, oauthConsentProps?: __internal_OAuthConsentProps) => void;
 
@@ -755,7 +755,7 @@ export interface Clerk {
    * Unmounts a OAuth consent component from the target element.
    *
    * @param targetNode - Target node to unmount the OAuth consent component from.
-   * @internal
+   * @hidden
    */
   __internal_unmountOAuthConsent: (targetNode: HTMLDivElement) => void;
 
@@ -1156,7 +1156,7 @@ export interface Clerk {
    * Internal flag indicating whether a `setActive` call is in progress. Used to prevent navigations from being
    * initiated outside of the Clerk class.
    *
-   * @internal
+   * @hidden
    */
   __internal_setActiveInProgress: boolean;
 
