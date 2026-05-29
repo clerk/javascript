@@ -67,6 +67,16 @@ export interface TokenSet {
 }
 
 /**
+ * Where a credential resolved by {@link ClerkCliAuth.resolveToken} came from. Lets
+ * callers branch on the *trust model* rather than the wire-level token type:
+ *
+ * - `'arg'` — passed in directly via `tokenFromArg` (typically a `--token` CLI flag)
+ * - `'env'` — read from the env var named by `tokenEnvVar`
+ * - `'oauth'` — cached from a prior `login()`; refreshable and revokable
+ */
+export type TokenSource = 'arg' | 'env' | 'oauth';
+
+/**
  * Verified identity returned by `/oauth/userinfo` or your `identityEndpoint`. Discriminated
  * by the `sub` prefix:
  *

@@ -2,7 +2,6 @@ import { spawn } from 'node:child_process';
 
 import { ClerkCliAuthError } from './errors';
 import { startAuthServer } from './lib/auth-server';
-import { classifyToken, type TokenKind } from './lib/classify-token';
 import { createCredentialStore } from './lib/credential-store';
 import { generateCodeChallenge, generateCodeVerifier, generateState } from './lib/pkce';
 import { exchangeCodeForTokens, fetchIdentity, refreshAccessToken, revokeToken } from './lib/token-exchange';
@@ -14,6 +13,7 @@ import type {
   LoginResult,
   OAuthScope,
   TokenSet,
+  TokenSource,
   UserIdentity,
 } from './types';
 
@@ -203,22 +203,26 @@ export class ClerkCliAuth {
     });
   }
 
-  async resolveToken(opts: { tokenFromArg?: string } = {}): Promise<{ token: string; kind: TokenKind }> {
+  /**
+   * Pick the credential the CLI should send. Returns the token plus where it came from,
+   * which lets callers branch on the *trust model* (refreshable OAuth vs. user-supplied
+   * env/arg) instead of having to introspect the bearer's shape.
+   *
+   * Resolution order: `tokenFromArg` → `tokenEnvVar` env var → cached OAuth session.
+   */
+  async resolveToken(opts: { tokenFromArg?: string } = {}): Promise<{ token: string; source: TokenSource }> {
     if (opts.tokenFromArg) {
-      return {
-        token: opts.tokenFromArg,
-        kind: classifyToken(opts.tokenFromArg),
-      };
+      return { token: opts.tokenFromArg, source: 'arg' };
     }
     if (this.config.tokenEnvVar) {
       const fromEnv = process.env[this.config.tokenEnvVar];
       if (fromEnv) {
-        return { token: fromEnv, kind: classifyToken(fromEnv) };
+        return { token: fromEnv, source: 'env' };
       }
     }
     const accessToken = await this.getAccessToken();
     if (accessToken) {
-      return { token: accessToken, kind: classifyToken(accessToken) };
+      return { token: accessToken, source: 'oauth' };
     }
 
     const envHint = this.config.tokenEnvVar ? ` or set $${this.config.tokenEnvVar}` : '';

@@ -149,9 +149,9 @@ await auth.logout();
 await auth.logout({ revoke: false });
 ```
 
-### Accept API keys and machine tokens alongside OAuth
+### Accept API keys alongside OAuth
 
-CLIs that run in CI/CD, agents, or scripted environments often need to authenticate with a Clerk API key (`ak_*`) or machine-to-machine token (`mt_*`) instead of going through the browser. Configure `identityEndpoint` (and optionally `tokenEnvVar`) to enable this:
+CLIs that run in CI/CD, agents, or scripted environments often need to authenticate with a Clerk API key (`ak_*`) instead of going through the browser. API keys can represent a user, an organization, or a machine identity — one credential type covers all three. Configure `identityEndpoint` (and optionally `tokenEnvVar`) to enable this:
 
 ```ts
 const auth = new ClerkCliAuth({
@@ -161,46 +161,44 @@ const auth = new ClerkCliAuth({
   tokenEnvVar: 'MYAPP_API_KEY',
 });
 
-// Look up the identity for a specific token (API key, machine token, or OAuth access token):
+// Look up the identity for a specific token (API key or OAuth access token):
 const identity = await auth.verifyToken(process.env.MYAPP_API_KEY!);
 
 // Or let the SDK pick whichever credential is available:
-const { token, kind } = await auth.resolveToken({ tokenFromArg: argv.token });
+const { token, source } = await auth.resolveToken({ tokenFromArg: argv.token });
 ```
 
 `resolveToken()` checks for a credential in this order:
 
-1. The `tokenFromArg` you pass in (typically from a `--token` CLI flag).
-2. The environment variable named in `tokenEnvVar`.
-3. The cached OAuth access token from `login()`.
+1. The `tokenFromArg` you pass in (typically from a `--token` CLI flag) → `source: 'arg'`.
+2. The environment variable named in `tokenEnvVar` → `source: 'env'`.
+3. The cached OAuth access token from `login()` → `source: 'oauth'`.
 
-It returns `{ token, kind }`, where `kind` is one of `'session_token'`, `'api_key'`, `'m2m_token'`, or `'oauth_token'` (matching the Clerk Backend SDK's `TokenType`). Use it to branch logic per credential type:
+`source` tells you where the credential came from — refreshable OAuth vs. a static value the user supplied — so you can branch on the trust model without introspecting the bearer's shape:
 
 ```ts
-const { token, kind } = await auth.resolveToken({ tokenFromArg: argv.token });
+const { token, source } = await auth.resolveToken({ tokenFromArg: argv.token });
 
-// One call works for every kind — the server-side handler resolves the identity via the
-// matching verification path:
+// One call works for every source — the server-side handler verifies and returns the
+// identity:
 const identity = await auth.verifyToken(token);
 
-if (kind === 'm2m_token') {
-  // ...e.g. attach the machine actor's org context to a log line
+if (source === 'oauth') {
+  // ...e.g. surface "logged in as <user>" UI; this credential is revokable via logout()
 }
 ```
 
-Server-side verification of API keys and machine tokens happens at the `identityEndpoint` you host — see [Server-side](#server-side) for the implementation.
+Server-side verification of API keys and OAuth tokens happens at the `identityEndpoint` you host — see [Server-side](#server-side) for the implementation.
 
 ## Server-side
 
-The `@clerk/cli-auth/server` entry point provides route handlers that verify incoming tokens against Clerk and return user info. It accepts every [Clerk Backend SDK](https://clerk.com/docs/references/backend/overview) token type:
+The `@clerk/cli-auth/server` entry point provides route handlers that verify incoming tokens against Clerk and return user info. The accepted token types are:
 
-| `accepts` value   | Matching token format            |
-| ----------------- | -------------------------------- |
-| `'session_token'` | Clerk session JWTs               |
-| `'api_key'`       | `ak_*` Clerk API keys            |
-| `'m2m_token'`     | `mt_*` machine-to-machine tokens |
-| `'oauth_token'`   | `oat_*` OAuth access tokens      |
-| `'any'`           | Any of the above                 |
+| `accepts` value | Matching token format                                          |
+| --------------- | -------------------------------------------------------------- |
+| `'api_key'`     | `ak_*` Clerk API keys (user, org, or machine subject)          |
+| `'oauth_token'` | `oat_*` opaque OAuth access tokens or `at+jwt` JWTs (RFC 9068) |
+| `'any'`         | Either of the above                                            |
 
 ### Bind a Clerk client
 
@@ -227,11 +225,11 @@ import { auth } from '@/lib/clerk-cli';
 
 export const GET = handle({
   auth,
-  accepts: ['api_key', 'm2m_token', 'oauth_token'],
+  accepts: ['api_key', 'oauth_token'],
 });
 ```
 
-The handler reads `Authorization: Bearer <token>`, detects the token type, verifies it with Clerk, and returns a JSON `Identity` payload. This is what `auth.verifyToken()` calls from the CLI — once it's wired, `verifyToken()` works for API keys, machine tokens, and OAuth access tokens alike.
+The handler reads `Authorization: Bearer <token>`, detects the token type, verifies it with Clerk, and returns a JSON `Identity` payload. This is what `auth.verifyToken()` calls from the CLI — once it's wired, `verifyToken()` works for API keys and OAuth access tokens alike.
 
 ### Protected resource endpoints
 
@@ -244,7 +242,7 @@ import { auth } from '@/lib/clerk-cli';
 
 export async function GET(request: Request) {
   const tokenInfo = await auth.verifyTokenFromRequest(request, {
-    accepts: ['api_key', 'm2m_token', 'oauth_token'],
+    accepts: ['api_key', 'oauth_token'],
   });
 
   const projects = await getProjectsForSubject(tokenInfo.subject);
@@ -298,8 +296,6 @@ export const GET = handle({
   },
 });
 ```
-
-For multi-tenant applications, create one `cliAuth()` instance per tenant (each bound to a different Clerk client) and pass the relevant instance to `handle()` on each route.
 
 ## Configuration reference
 

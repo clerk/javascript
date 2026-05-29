@@ -15,4 +15,3 @@ export * from './types';
 export * from './errors';
 export { fetchIdentity, revokeToken } from './lib/token-exchange';
 export { verifyToken } from './lib/verify-token';
-export { classifyToken, type TokenKind } from './lib/classify-token';
