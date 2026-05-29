@@ -1,7 +1,7 @@
 import { useOrganization, useReverification } from '@clerk/shared/react';
 import { useState } from 'react';
 
-import { AlertIcon, Badge, Button, descriptors, Flex, Flow, Grid, Link, localizationKeys, Text } from '@/customizables';
+import { AlertIcon, Badge, Button, descriptors, Flex, Flow, Link, localizationKeys, Text } from '@/customizables';
 import { useCardState } from '@/elements/contexts';
 import { ProfileSection } from '@/elements/Section';
 import { Switch } from '@/elements/Switch';
@@ -167,66 +167,67 @@ const ConfigurationDetailsSection = (): JSX.Element => {
       title={localizationKeys('configureSSO.confirmation.configurationSection.title')}
       centered={false}
     >
-      <Grid
-        sx={t => ({
-          width: '100%',
-          rowGap: t.space.$3,
-          columnGap: t.space.$3,
-          alignItems: 'center',
-          gridTemplateColumns: 'minmax(120px, 160px) minmax(0, 1fr)',
-        })}
-      >
-        <Text
-          elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsLabel}
-          colorScheme='secondary'
-          localizationKey={localizationKeys('configureSSO.confirmation.configurationSection.ssoUrlLabel')}
-        />
-        <Link
-          elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsLink}
-          href={samlConnection?.idpSsoUrl ?? ''}
-          isExternal
-          title={samlConnection?.idpSsoUrl}
-          sx={{ display: 'block', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', minWidth: 0 }}
-        >
-          {samlConnection?.idpSsoUrl}
-        </Link>
-
-        <Text
-          elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsLabel}
-          colorScheme='secondary'
-          localizationKey={localizationKeys('configureSSO.confirmation.configurationSection.issuerLabel')}
-        />
-        <Text
-          elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsValue}
-          truncate
-          title={samlConnection?.idpEntityId}
-        >
-          {samlConnection?.idpEntityId}
-        </Text>
-
-        <Text
-          elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsLabel}
-          colorScheme='secondary'
-          localizationKey={localizationKeys('configureSSO.confirmation.configurationSection.certificateLabel')}
-        />
-        <Text
-          elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsValue}
-          truncate
-          title={samlConnection?.idpCertificate}
-        >
-          {samlConnection?.idpCertificate}
-        </Text>
-
-        <Flex justify='start'>
-          <Button
-            elementDescriptor={descriptors.configureSSOConfirmationReconfigureButton}
-            variant='outline'
-            size='sm'
-            onClick={() => goToStep('configure')}
-            localizationKey={localizationKeys('configureSSO.confirmation.configurationSection.configureAgainLink')}
+      <ProfileSection.ItemList id='ssoConfiguration'>
+        <ProfileSection.Item id='ssoConfiguration'>
+          <Text
+            elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsLabel}
+            colorScheme='secondary'
+            localizationKey={localizationKeys('configureSSO.confirmation.configurationSection.ssoUrlLabel')}
           />
-        </Flex>
-      </Grid>
+          <Link
+            elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsLink}
+            href={samlConnection?.idpSsoUrl ?? ''}
+            isExternal
+            title={samlConnection?.idpSsoUrl}
+            sx={{ overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', minWidth: 0 }}
+          >
+            {samlConnection?.idpSsoUrl}
+          </Link>
+        </ProfileSection.Item>
+
+        <ProfileSection.Item id='ssoConfiguration'>
+          <Text
+            elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsLabel}
+            colorScheme='secondary'
+            localizationKey={localizationKeys('configureSSO.confirmation.configurationSection.issuerLabel')}
+          />
+          <Text
+            elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsValue}
+            truncate
+            title={samlConnection?.idpEntityId}
+          >
+            {samlConnection?.idpEntityId}
+          </Text>
+        </ProfileSection.Item>
+
+        <ProfileSection.Item id='ssoConfiguration'>
+          <Text
+            elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsLabel}
+            colorScheme='secondary'
+            localizationKey={localizationKeys('configureSSO.confirmation.configurationSection.certificateLabel')}
+          />
+          <Text
+            elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsValue}
+            truncate
+            title={samlConnection?.idpCertificate}
+          >
+            {samlConnection?.idpCertificate}
+          </Text>
+        </ProfileSection.Item>
+      </ProfileSection.ItemList>
+
+      <Flex
+        justify='start'
+        sx={t => ({ paddingInlineStart: t.space.$2x5 })}
+      >
+        <Button
+          elementDescriptor={descriptors.configureSSOConfirmationReconfigureButton}
+          variant='outline'
+          size='sm'
+          onClick={() => goToStep('configure')}
+          localizationKey={localizationKeys('configureSSO.confirmation.configurationSection.configureAgainLink')}
+        />
+      </Flex>
     </ProfileSection.Root>
   );
 };
