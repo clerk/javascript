@@ -93,8 +93,15 @@ function capturedAuthBindings(stmt: TSESTree.Statement, authNames: Set<string>):
     return null;
   }
 
-  // Only the first declarator counts: a later `await auth()` would be preceded
-  // by earlier declarators executing first.
+  // Require a single declarator: a multi-declarator statement such as
+  // `const { userId } = await auth(), side = doWork()` runs `side = doWork()`
+  // after the destructure but before the guard, so it must not be treated as
+  // protected (matching the rejection of any statement between destructure and
+  // guard).
+  if (stmt.declarations.length !== 1) {
+    return null;
+  }
+
   const decl = stmt.declarations[0];
   if (!decl) {
     return null;

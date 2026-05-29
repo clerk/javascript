@@ -1049,6 +1049,20 @@ ruleTester.run('require-auth-protection', rule, {
       errors: [{ messageId: 'missingProtect' }],
     },
     {
+      name: 'side effect in same declaration as auth() destructure is NOT accepted',
+      code: `
+        import { auth } from '@clerk/nextjs/server';
+        export default async function Page() {
+          const { userId } = await auth(), side = doWork();
+          if (userId === null) return null;
+          return <div />;
+        }
+      `,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+      errors: [{ messageId: 'missingProtect' }],
+    },
+    {
       name: 'preamble matched but with mixed non-preamble in same VariableDeclaration',
       code: `
         import { auth } from '@clerk/nextjs/server';
