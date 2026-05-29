@@ -93,29 +93,41 @@ export function buildPageLoadSnippet({
   }
 
   if (transitionEnabledOnThisPage()) {
-    // We must do the dynamic imports within the event listeners because otherwise we may race and miss initial astro:page-load
-    document.addEventListener('astro:before-swap', async (e) => {
-      const { swapFunctions } = await import('astro:transitions/client');
+    // Start loading eagerly without awaiting so both listeners share one module load.
+    // Listeners are registered synchronously here, which avoids the race where awaiting
+    // before addEventListener would cause us to miss the initial astro:page-load event.
+    const transitionClient = import('astro:transitions/client');
 
-      const clerkComponents = document.querySelector('#clerk-components');
-      // Keep the div element added by Clerk
-      if (clerkComponents) {
-        const clonedEl = clerkComponents.cloneNode(true);
-        e.newDocument.body.appendChild(clonedEl);
+    document.addEventListener('astro:before-swap', async (e) => {
+      const nextDocument = e.newDocument;
+      const nextHead = nextDocument?.head;
+      if (!nextDocument || !nextHead) {
+        return;
       }
 
-      e.swap = () => swapDocument(swapFunctions, e.newDocument);
+      const { swapFunctions } = await transitionClient;
+
+      e.swap = () => {
+        const clerkComponents = document.querySelector('#clerk-components');
+        // Move (not clone) the element so Clerk's React root stays bound to its host node
+        // across the body swap. Cloning produces a detached copy with no React associated,
+        // which breaks style injection on subsequent navigations.
+        if (clerkComponents) {
+          nextDocument.body.appendChild(clerkComponents);
+        }
+        swapDocument(swapFunctions, nextDocument);
+      };
     });
 
     document.addEventListener('astro:page-load', async (e) => {
-      const { navigate } = await import('astro:transitions/client');
+      const { navigate } = await transitionClient;
 
       await runInjectionScript({
         ...${params},
         routerPush: navigate,
         routerReplace: (url) => navigate(url, { history: 'replace' }),
       });
-    })
+    });
   } else {
     await runInjectionScript(${params});
   }`;

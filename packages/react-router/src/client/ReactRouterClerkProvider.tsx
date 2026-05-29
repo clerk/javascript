@@ -7,6 +7,7 @@ import {
   isSpaMode as _isSpaMode,
   warnForSsr,
 } from '../utils/assert';
+import { getPublicEnvVariables } from '../utils/env';
 import { ClerkReactRouterOptionsProvider } from './ReactRouterOptionsContext';
 import type { ClerkState, ReactRouterClerkProviderProps } from './types';
 import { useAwaitableNavigate } from './useAwaitableNavigate';
@@ -102,7 +103,9 @@ function ClerkProviderBase<TUi extends Ui = Ui>({ children, ...rest }: ClerkProv
       disabled: __telemetryDisabled,
       debug: __telemetryDebug,
     },
-    unsafe_disableDevelopmentModeConsoleWarning: __unsafeDisableDevelopmentModeConsoleWarning,
+    unsafe_disableDevelopmentModeConsoleWarning:
+      __unsafeDisableDevelopmentModeConsoleWarning ??
+      getPublicEnvVariables(undefined).unsafeDisableDevelopmentModeConsoleWarning,
   };
 
   const keylessProps = __keylessClaimUrl

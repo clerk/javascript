@@ -1021,6 +1021,7 @@ export type __internal_LocalizationResource = {
       members: LocalizationValue;
       billing: LocalizationValue;
       apiKeys: LocalizationValue;
+      selfServeSSO: LocalizationValue;
     };
     badge__unverified: LocalizationValue;
     badge__automaticInvitation: LocalizationValue;
@@ -1303,10 +1304,6 @@ export type __internal_LocalizationResource = {
     selectProviderStep: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
-      body: {
-        title: LocalizationValue;
-        description: LocalizationValue;
-      };
       saml: {
         groupLabel: LocalizationValue;
         okta: LocalizationValue;
@@ -1343,9 +1340,7 @@ export type __internal_LocalizationResource = {
       subtitle: LocalizationValue;
       error__noSuccessfulTestRun: LocalizationValue;
       testUrl: {
-        title: LocalizationValue;
-        subtitle: LocalizationValue;
-        actionLabel__copy: LocalizationValue;
+        actionLabel__open: LocalizationValue;
       };
       testResults: {
         title: LocalizationValue;
@@ -1354,6 +1349,10 @@ export type __internal_LocalizationResource = {
         status__success: LocalizationValue;
         status__failed: LocalizationValue;
         status__pending: LocalizationValue;
+        empty: {
+          title: LocalizationValue;
+          subtitle: LocalizationValue;
+        };
       };
       testRunDetails: {
         title: LocalizationValue;
@@ -1401,171 +1400,173 @@ export type __internal_LocalizationResource = {
       };
     };
     configureStep: {
-      spFields: {
-        acsUrl: {
-          label: LocalizationValue;
-        };
-        spEntityId: {
-          label: LocalizationValue;
-        };
-      };
-      attributeMapping: {
-        title: LocalizationValue;
-        paragraph: LocalizationValue;
-        columns: {
-          attribute: LocalizationValue;
-          claimName: LocalizationValue;
-          claimValue: LocalizationValue;
-        };
+      attributeMappingTable: {
         badges: {
           required: LocalizationValue;
           optional: LocalizationValue;
         };
-        rows: {
-          email: {
-            attribute: LocalizationValue;
-            claim: LocalizationValue;
-          };
-          firstName: {
-            attribute: LocalizationValue;
-            claim: LocalizationValue;
-          };
-          lastName: {
-            attribute: LocalizationValue;
-            claim: LocalizationValue;
-          };
-        };
       };
       samlOkta: {
-        headerTitle: LocalizationValue;
-        createApp: {
+        mainHeaderTitle: LocalizationValue;
+        createAppStep: {
           headerSubtitle: LocalizationValue;
-          title: LocalizationValue;
-          step1: LocalizationValue;
-          step2: LocalizationValue;
-          step3: LocalizationValue;
-          step4: LocalizationValue;
-          step5: LocalizationValue;
-        };
-        serviceProvider: {
-          title: LocalizationValue;
-          paragraph1: LocalizationValue;
-          paragraph2: LocalizationValue;
-        };
-        completeSamlIntegration: {
-          title: LocalizationValue;
-          step1: LocalizationValue;
-          step2: LocalizationValue;
-        };
-        configureAttributes: {
-          headerSubtitle: LocalizationValue;
-          step1: LocalizationValue;
-          step2: LocalizationValue;
-          pairs: {
-            conjunction: LocalizationValue;
-            email: {
-              name: LocalizationValue;
-              expression: LocalizationValue;
-            };
-            firstName: {
-              name: LocalizationValue;
-              expression: LocalizationValue;
-            };
-            lastName: {
-              name: LocalizationValue;
-              expression: LocalizationValue;
+          createAppInstructions: {
+            title: LocalizationValue;
+            step1: LocalizationValue;
+            step2: LocalizationValue;
+            step3: LocalizationValue;
+            step4: LocalizationValue;
+            step5: LocalizationValue;
+          };
+          serviceProviderInstructions: {
+            title: LocalizationValue;
+            paragraph1: LocalizationValue;
+            paragraph2: LocalizationValue;
+            serviceProviderFields: {
+              acsUrl: {
+                label: LocalizationValue;
+              };
+              spEntityId: {
+                label: LocalizationValue;
+              };
             };
           };
+          completeSamlIntegrationInstructions: {
+            title: LocalizationValue;
+            step1: LocalizationValue;
+            step2: LocalizationValue;
+          };
         };
-        assignUsers: {
+        attributeMappingStep: {
           headerSubtitle: LocalizationValue;
-          title: LocalizationValue;
           paragraph: LocalizationValue;
           step1: LocalizationValue;
           step2: LocalizationValue;
-          step3: LocalizationValue;
-          step4: LocalizationValue;
-          step5: LocalizationValue;
+          attributeMappingTable: {
+            columns: {
+              name: LocalizationValue;
+              expression: LocalizationValue;
+            };
+            rows: {
+              email: { name: LocalizationValue; expression: LocalizationValue };
+              firstName: { name: LocalizationValue; expression: LocalizationValue };
+              lastName: { name: LocalizationValue; expression: LocalizationValue };
+            };
+          };
         };
-        metadataUrl: {
+        assignUsersStep: {
           headerSubtitle: LocalizationValue;
-          label: LocalizationValue;
-          placeholder: LocalizationValue;
-          description: LocalizationValue;
+          assignUsersInstructions: {
+            title: LocalizationValue;
+            paragraph: LocalizationValue;
+            step1: LocalizationValue;
+            step2: LocalizationValue;
+            step3: LocalizationValue;
+            step4: LocalizationValue;
+            step5: LocalizationValue;
+          };
         };
-        modes: {
-          ariaLabel: LocalizationValue;
-          metadataUrl: LocalizationValue;
-          manual: LocalizationValue;
-        };
-        submitSamlConfig: {
-          title: LocalizationValue;
-        };
-        manual: {
-          description: LocalizationValue;
-          signOnUrl: {
+        identityProviderMetadataStep: {
+          headerSubtitle: LocalizationValue;
+          modes: {
+            title: LocalizationValue;
+            ariaLabel: LocalizationValue;
+            metadataUrl: LocalizationValue;
+            manual: LocalizationValue;
+          };
+          metadataUrl: {
             label: LocalizationValue;
             placeholder: LocalizationValue;
+            description: LocalizationValue;
           };
-          issuer: {
-            label: LocalizationValue;
-            placeholder: LocalizationValue;
-          };
-          signingCertificate: {
-            label: LocalizationValue;
-            uploadFile: LocalizationValue;
-            replaceFile: LocalizationValue;
-            removeFile: LocalizationValue;
-            fileUploaded: LocalizationValue;
+          manual: {
+            description: LocalizationValue;
+            signOnUrl: {
+              label: LocalizationValue;
+              placeholder: LocalizationValue;
+            };
+            issuer: {
+              label: LocalizationValue;
+              placeholder: LocalizationValue;
+            };
+            signingCertificate: {
+              label: LocalizationValue;
+              uploadFile: LocalizationValue;
+              replaceFile: LocalizationValue;
+              removeFile: LocalizationValue;
+              fileUploaded: LocalizationValue;
+            };
           };
         };
       };
       samlCustom: {
-        headerTitle: LocalizationValue;
-        createApp: {
+        mainHeaderTitle: LocalizationValue;
+        createAppStep: {
           headerSubtitle: LocalizationValue;
-          title: LocalizationValue;
-          subtitle: LocalizationValue;
+          createAppInstructions: {
+            title: LocalizationValue;
+            paragraph: LocalizationValue;
+          };
+          serviceProviderFields: {
+            acsUrl: {
+              label: LocalizationValue;
+            };
+            spEntityId: {
+              label: LocalizationValue;
+            };
+          };
         };
-        configureAttributes: {
+        attributeMappingStep: {
           headerSubtitle: LocalizationValue;
-          title: LocalizationValue;
+          paragraph: LocalizationValue;
+          attributeMappingTable: {
+            title: LocalizationValue;
+            columns: {
+              userProfile: LocalizationValue;
+              attributeName: LocalizationValue;
+            };
+            rows: {
+              email: { userProfile: LocalizationValue; attributeName: LocalizationValue };
+              firstName: { userProfile: LocalizationValue; attributeName: LocalizationValue };
+              lastName: { userProfile: LocalizationValue; attributeName: LocalizationValue };
+            };
+          };
         };
-        assignUsers: {
+        assignUsersStep: {
           headerSubtitle: LocalizationValue;
           title: LocalizationValue;
           paragraph: LocalizationValue;
         };
-        metadataUrl: {
+        identityProviderMetadataStep: {
           headerSubtitle: LocalizationValue;
-          label: LocalizationValue;
-          placeholder: LocalizationValue;
-          description: LocalizationValue;
-        };
-        modes: {
-          ariaLabel: LocalizationValue;
-          metadataUrl: LocalizationValue;
-          manual: LocalizationValue;
-        };
-        submitSamlConfig: {
-          title: LocalizationValue;
-        };
-        manual: {
-          description: LocalizationValue;
-          signOnUrl: {
+          modes: {
+            title: LocalizationValue;
+            ariaLabel: LocalizationValue;
+            metadataUrl: LocalizationValue;
+            manual: LocalizationValue;
+          };
+          metadataUrl: {
             label: LocalizationValue;
             placeholder: LocalizationValue;
+            description: LocalizationValue;
           };
-          issuer: {
-            label: LocalizationValue;
-            placeholder: LocalizationValue;
-          };
-          signingCertificate: {
-            label: LocalizationValue;
-            uploadFile: LocalizationValue;
-            replaceFile: LocalizationValue;
-            removeFile: LocalizationValue;
-            fileUploaded: LocalizationValue;
+          manual: {
+            description: LocalizationValue;
+            signOnUrl: {
+              label: LocalizationValue;
+              placeholder: LocalizationValue;
+            };
+            issuer: {
+              label: LocalizationValue;
+              placeholder: LocalizationValue;
+            };
+            signingCertificate: {
+              label: LocalizationValue;
+              uploadFile: LocalizationValue;
+              replaceFile: LocalizationValue;
+              removeFile: LocalizationValue;
+              fileUploaded: LocalizationValue;
+            };
           };
         };
       };

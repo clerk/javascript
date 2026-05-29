@@ -114,7 +114,7 @@ function isPaginated(payload: unknown): payload is PaginatedResponseJSON {
  * formats. Once BAPI Proxy is updated to return the standard `data` property format,
  * this function can be safely removed.
  *
- * @see https://clerk.com/docs/reference/backend-api/tag/m2m-tokens/get/m2m_tokens
+ * @see https://clerk.com/docs/reference/backend-api/tag/m2m-tokens/GET/m2m_tokens
  */
 function isM2MTokenResponse(payload: unknown): payload is { m2m_tokens: unknown[]; total_count: number } {
   if (!payload || typeof payload !== 'object' || !('m2m_tokens' in payload)) {

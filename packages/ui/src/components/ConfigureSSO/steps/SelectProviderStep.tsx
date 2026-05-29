@@ -3,7 +3,18 @@ import { useUser } from '@clerk/shared/react/index';
 import React from 'react';
 
 import type { LocalizationKey } from '@/customizables';
-import { Box, Col, descriptors, Flow, Grid, localizationKeys, Span, Text, useLocalizations } from '@/customizables';
+import {
+  Box,
+  Col,
+  descriptors,
+  Flow,
+  Grid,
+  localizationKeys,
+  RadioInput,
+  Span,
+  Text,
+  useLocalizations,
+} from '@/customizables';
 import { useCardState } from '@/elements/contexts';
 import { common, mqu } from '@/styledSystem';
 import { Alert } from '@/ui/elements/Alert';
@@ -42,8 +53,12 @@ const PROVIDER_GROUPS: ReadonlyArray<{
 
 export const SelectProviderStep = (): JSX.Element => {
   const { goToStep } = useWizard();
-  const { setProvider, createEnterpriseConnection } = useConfigureSSO();
-  const [selected, setSelected] = React.useState<ProviderType | null>(null);
+  const { provider, setProvider, createEnterpriseConnection } = useConfigureSSO();
+
+  // Re-hydrate from context so users returning from `verify-domain`
+  // (after picking a provider but needing to verify their email first)
+  // don't have to re-click their provider.
+  const [selected, setSelected] = React.useState<ProviderType | null>(provider ?? null);
   const { user } = useUser();
   const card = useCardState();
 
@@ -86,32 +101,23 @@ export const SelectProviderStep = (): JSX.Element => {
 
         <Step.Body>
           <Step.Section sx={theme => ({ gap: theme.space.$5 })}>
-            <Col sx={theme => ({ gap: theme.space.$1x5 })}>
-              <Text
-                as='p'
-                variant='subtitle'
-                localizationKey={localizationKeys('configureSSO.selectProviderStep.body.title')}
-              />
-
-              <Text
-                as='p'
-                colorScheme='secondary'
-                localizationKey={localizationKeys('configureSSO.selectProviderStep.body.description')}
-              />
-            </Col>
-
             {PROVIDER_GROUPS.map(group => (
               <Col
                 key={group.id}
-                sx={theme => ({ gap: theme.space.$3 })}
+                elementDescriptor={descriptors.configureSSOProviderGroup}
+                elementId={descriptors.configureSSOProviderGroup.setId(group.id)}
+                gap={3}
               >
                 <Text
+                  elementDescriptor={descriptors.configureSSOProviderGroupLabel}
+                  elementId={descriptors.configureSSOProviderGroupLabel.setId(group.id)}
                   as='label'
                   variant='subtitle'
                   localizationKey={group.label}
                 />
 
                 <Grid
+                  elementDescriptor={descriptors.configureSSOProviderGrid}
                   gap={3}
                   sx={{
                     gridTemplateColumns: 'repeat(2, 1fr)',
@@ -180,56 +186,54 @@ const ProviderCard = ({ name, value, iconId, label, checked, onChange }: Provide
   return (
     <Box
       as='label'
-      sx={theme => ({
-        // Outline-button look (mirrors SimpleButton variant='outline' for visual continuity).
-        borderWidth: theme.borderWidths.$normal,
-        borderStyle: theme.borderStyles.$solid,
-        borderColor: theme.colors.$borderAlpha150,
-        borderRadius: theme.radii.$md,
-        color: theme.colors.$neutralAlpha600,
+      elementDescriptor={descriptors.configureSSOProviderCard}
+      elementId={descriptors.configureSSOProviderCard.setId(value)}
+      isActive={checked}
+      sx={t => ({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: theme.space.$2,
-        height: theme.sizes.$32,
-        padding: theme.space.$1x5,
-        backgroundColor: theme.colors.$colorBackground,
+        gap: t.space.$2,
+        height: t.sizes.$32,
+        padding: t.space.$1x5,
         cursor: 'pointer',
         position: 'relative',
-        '&:hover': { backgroundColor: theme.colors.$neutralAlpha50 },
-        // Keyboard focus indication — fires when the inner input is focused.
+        ...common.borderVariants(t).normal,
         '&:has(input:focus-visible)': {
-          ...common.focusRingStyles(theme),
-          borderColor: theme.colors.$borderAlpha300,
+          ...common.focusRingStyles(t),
+          borderColor: t.colors.$borderAlpha300,
         },
-        // Selected ring — CSS-driven via :checked so it survives focus changes.
+        '&:hover': {
+          backgroundColor: t.colors.$neutralAlpha50,
+        },
         '&:has(input:checked)': {
-          borderColor: theme.colors.$borderAlpha300,
-          ...common.focusRingStyles(theme),
+          backgroundColor: t.colors.$neutralAlpha50,
         },
       })}
     >
-      <input
-        type='radio'
+      <RadioInput
+        elementDescriptor={descriptors.configureSSOProviderCardRadio}
+        elementId={descriptors.configureSSOProviderCardRadio.setId(value)}
         name={name}
         value={value}
         checked={checked}
         onChange={onChange}
-        css={{
+        focusRing={false}
+        sx={theme => ({
           position: 'absolute',
-          width: '1px',
-          height: '1px',
-          padding: 0,
-          margin: '-1px',
-          overflow: 'hidden',
-          clip: 'rect(0,0,0,0)',
-          whiteSpace: 'nowrap',
-          borderWidth: 0,
-        }}
+          top: theme.space.$1x5,
+          insetInlineStart: theme.space.$1x5,
+          margin: 0,
+          width: 'fit-content',
+          boxShadow: 'none',
+          '&:hover': { boxShadow: 'none' },
+        })}
       />
 
       <Span
+        elementDescriptor={descriptors.configureSSOProviderCardIcon}
+        elementId={descriptors.configureSSOProviderCardIcon.setId(value)}
         aria-hidden
         sx={theme => {
           const isMonochromatic = MONOCHROMATIC_PROVIDER_ICONS.has(iconId);
@@ -255,6 +259,8 @@ const ProviderCard = ({ name, value, iconId, label, checked, onChange }: Provide
       />
 
       <Text
+        elementDescriptor={descriptors.configureSSOProviderCardLabel}
+        elementId={descriptors.configureSSOProviderCardLabel.setId(value)}
         as='span'
         variant='body'
         sx={theme => ({ color: theme.colors.$colorForeground })}

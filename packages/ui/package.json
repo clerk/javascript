@@ -1,6 +1,6 @@
 {
   "name": "@clerk/ui",
-  "version": "1.13.0",
+  "version": "1.14.0",
   "description": "Internal package that contains the UI components for the Clerk frontend SDKs",
   "repository": {
     "type": "git",
@@ -71,6 +71,7 @@
   "scripts": {
     "build": "pnpm build:umd && pnpm build:esm && pnpm check:no-rhc && pnpm type-check",
     "build:analyze": "rspack build --config rspack.config.js --env production --env analyze --analyze",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
     "build:esm": "tsdown",
     "build:rsdoctor": "RSDOCTOR=true rspack build --config rspack.config.js --env production",
     "build:umd": "rspack build --config rspack.config.js --env production",
@@ -81,7 +82,7 @@
     "dev": "rspack serve --config rspack.config.js",
     "dev:origin": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:${PORT:-4011}",
     "dev:sandbox": "pnpm -w dev:sandbox",
-    "dev:sandbox:serve": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:4011",
+    "dev:sandbox:serve": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:${UI_PORT:-4011}",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint:attw": "attw --pack . --exclude-entrypoints themes/shadcn.css --profile esm-only",
