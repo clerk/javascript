@@ -40,7 +40,8 @@ Pod::Spec.new do |s|
   # because it uses `import ClerkKit` which is only available via SPM in the app target.
   s.source_files = "ClerkExpoModule.swift", "ClerkExpoModule.m",
                    "ClerkAuthViewManager.swift", "ClerkAuthViewManager.m",
-                   "ClerkUserProfileViewManager.swift", "ClerkUserProfileViewManager.m"
+                   "ClerkUserProfileViewManager.swift", "ClerkUserProfileViewManager.m",
+                   "ClerkOrganizationSwitcherViewManager.swift", "ClerkOrganizationSwitcherViewManager.m"
 
   install_modules_dependencies(s)
 end

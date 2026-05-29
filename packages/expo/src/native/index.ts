@@ -22,6 +22,7 @@
  * ## Components
  *
  * - {@link AuthView} - Authentication flow (sign-in/sign-up), renders inline
+ * - {@link OrganizationSwitcher} - Active organization switcher, renders inline
  * - {@link UserProfileView} - User profile and account management, renders inline
  * - {@link UserButton} - Avatar button that opens native profile modal
  *
@@ -30,6 +31,8 @@
 
 export { AuthView } from './AuthView';
 export type { AuthViewProps, AuthViewMode } from './AuthView.types';
+export { OrganizationSwitcher } from './OrganizationSwitcher';
+export type { OrganizationSwitcherProps } from './OrganizationSwitcher';
 export { UserButton } from './UserButton';
 export type { UserButtonProps } from './UserButton';
 export { UserProfileView } from './UserProfileView';
