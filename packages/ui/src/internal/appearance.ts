@@ -674,16 +674,73 @@ export type ElementsConfig = {
   enterpriseConnectionButtonText: WithOptions;
 
   configureSSOHeader: WithOptions;
+  configureSSOMobileNavbar: WithOptions;
   configureSSOStepper: WithOptions;
   configureSSOStepperItem: WithOptions<string, ActiveState>;
   configureSSOStepperItemBullet: WithOptions<string, ActiveState>;
   configureSSOStepperItemLabel: WithOptions<string>;
   configureSSOStepperSeparator: WithOptions;
   configureSSOStep: WithOptions<string>;
+  configureSSOStepHeader: WithOptions;
+  configureSSOStepHeaderTitle: WithOptions;
+  configureSSOStepHeaderDescription: WithOptions;
+  configureSSOStepBody: WithOptions;
+  configureSSOStepSection: WithOptions;
   configureSSOStepCounter: WithOptions;
   configureSSOFooter: WithOptions;
   configureSSOFooterPreviousButton: WithOptions;
   configureSSOFooterContinueButton: WithOptions;
+
+  configureSSOProviderGroup: WithOptions<string>;
+  configureSSOProviderGroupLabel: WithOptions<string>;
+  configureSSOProviderGrid: WithOptions;
+  configureSSOProviderCard: WithOptions<string, ActiveState>;
+  configureSSOProviderCardRadio: WithOptions<string>;
+  configureSSOProviderCardIcon: WithOptions<string>;
+  configureSSOProviderCardLabel: WithOptions<string>;
+
+  configureSSOVerifyDomainErrorRoot: WithOptions;
+  configureSSOVerifyDomainErrorIcon: WithOptions;
+  configureSSOVerifyDomainErrorTitle: WithOptions;
+  configureSSOVerifyDomainErrorSubtitle: WithOptions;
+  configureSSOEmailVerificationForm: WithOptions<string>;
+  configureSSOEmailVerificationIcon: WithOptions<string>;
+  configureSSOEmailVerificationTitle: WithOptions<string>;
+  configureSSOEmailVerificationSubtitle: WithOptions<string>;
+  configureSSOEmailVerificationInput: WithOptions<string>;
+  configureSSOEmailVerificationError: WithOptions;
+
+  configureSSOInstructionsHeading: WithOptions;
+  configureSSOInstructionsList: WithOptions;
+  configureSSOInstructionsListItem: WithOptions;
+  configureSSOAttributeMappingTable: WithOptions;
+  configureSSOAttributeMappingBadge: WithOptions<string>;
+  configureSSOCertificateUploadButton: WithOptions;
+  configureSSOCertificateFileBadge: WithOptions;
+  configureSSOCertificateFileName: WithOptions;
+  configureSSOCertificateRemoveButton: WithOptions;
+
+  configureSSOTestUrlOpenButton: WithOptions;
+  configureSSOTestRefreshButton: WithOptions;
+  configureSSOTestResultsTable: WithOptions;
+  configureSSOTestResultsRow: WithOptions;
+  configureSSOTestResultsEmpty: WithOptions;
+  configureSSOTestResultsLoadingSpinner: WithOptions;
+  configureSSOTestRunStatusBadge: WithOptions<string>;
+  configureSSOTestRunFullMessage: WithOptions;
+  configureSSOTestRunFullMessageCopyButton: WithOptions;
+  configureSSOTestRunHowToFixSection: WithOptions;
+  configureSSOTestRunHowToFixDocsLink: WithOptions;
+  configureSSOTestRunParsedUserInfo: WithOptions;
+  configureSSOTestError: WithOptions;
+
+  configureSSOConfirmationStatusBadge: WithOptions<string>;
+  configureSSOConfirmationDomainLink: WithOptions;
+  configureSSOConfirmationConfigDetailsLabel: WithOptions;
+  configureSSOConfirmationConfigDetailsValue: WithOptions;
+  configureSSOConfirmationConfigDetailsLink: WithOptions;
+  configureSSOConfirmationReconfigureButton: WithOptions;
+  configureSSOConfirmationResetButton: WithOptions;
 
   web3SolanaWalletButtonsRoot: WithOptions;
   web3SolanaWalletButtons: WithOptions;

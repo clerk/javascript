@@ -14,11 +14,11 @@
   <a href="https://clerk.com/docs">
     <img alt="Documentation" src="https://img.shields.io/badge/documentation-clerk-green.svg" />
   </a>
-  <a href="https://discord.com/invite/b5rXHjAg7A">
+  <a href="https://clerk.com/discord">
     <img alt="Discord" src="https://img.shields.io/discord/856971667393609759?color=7389D8&label&logo=discord&logoColor=ffffff" />
   </a>
-  <a href="https://twitter.com/clerk">
-    <img alt="Twitter" src="https://img.shields.io/twitter/url.svg?label=%40clerk&style=social&url=https%3A%2F%2Ftwitter.com%2Fclerk" />
+  <a href="https://x.com/clerk">
+    <img alt="Follow on X" src="https://img.shields.io/twitter/url.svg?label=%40clerk&style=social&url=https%3A%2F%2Fx.com%2Fclerk" />
   </a>
   <br />
   <br />

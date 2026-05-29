@@ -48,7 +48,7 @@ runs:
   steps:
     - name: Configure Turborepo
       id: turbo
-      uses: actions/github-script@v7
+      uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
       env:
         # envs are required to pass inputs to the script
         CACHE: ${{ inputs.turbo-cache }}
@@ -110,10 +110,10 @@ runs:
       run: echo $TURBO_ARGS
 
     - name: Install PNPM
-      uses: pnpm/action-setup@v4
+      uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
 
     - name: Setup NodeJS ${{ inputs.node-version }}
-      uses: useblacksmith/setup-node@v5
+      uses: useblacksmith/setup-node@65c6ca86fdeb0ab3d85e78f57e4f6a7e4780b391 # v5
       with:
         cache: ${{ inputs.cache-enabled == 'true' && 'pnpm' || '' }}
         node-version: ${{ inputs.node-version }}
@@ -139,7 +139,7 @@ runs:
 
     - name: Cache Playwright Binaries
       if: inputs.playwright-enabled == 'true' && inputs.cache-enabled == 'true'
-      uses: useblacksmith/cache@v5
+      uses: useblacksmith/cache@71c7c918062ba3861252d84b07fe5ab2a6b467a6 # v5
       id: playwright-cache
       with:
         path: ~/.cache/ms-playwright

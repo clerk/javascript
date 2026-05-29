@@ -4,7 +4,7 @@ import type { ClientJSON } from './JSON';
 import { Session } from './Session';
 
 /**
- * The Backend `Client` object is similar to the [`Client`](https://clerk.com/docs/reference/objects/client) object as it holds information about the authenticated sessions in the current device. However, the Backend `Client` object is different from the `Client` object in that it is used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/Clients#operation/GetClient) and is not directly accessible from the Frontend API.
+ * The Backend `Client` object is similar to the [`Client`](https://clerk.com/docs/reference/objects/client) object as it holds information about the authenticated sessions in the current device. However, the Backend `Client` object is different from the `Client` object in that it is used in the [Backend API](https://clerk.com/docs/reference/backend-api/model/Client) and is not directly accessible from the Frontend API.
  */
 export class Client {
   constructor(

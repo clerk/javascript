@@ -57,7 +57,7 @@ export const ProfileCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent
             icon={
               <Icon
                 icon={Close}
-                size='sm'
+                size='md'
               />
             }
             sx={t => ({

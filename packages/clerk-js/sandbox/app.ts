@@ -2,6 +2,7 @@ import { PageMocking, type MockScenario } from '@clerk/msw';
 import * as l from '../../localizations';
 import { dark, neobrutalism, shadcn, shadesOfPurple } from '../../ui/src/themes';
 import type { Clerk as ClerkType } from '../';
+import { initCommandPalette } from './cmdk';
 import * as scenarios from './scenarios';
 
 interface ComponentPropsControl {
@@ -176,6 +177,8 @@ window.AVAILABLE_SCENARIOS = AVAILABLE_SCENARIOS.reduce(
   {} as Record<AvailableScenario, AvailableScenario>,
 );
 
+initCommandPalette();
+
 const Clerk = window.Clerk;
 function assertClerkIsLoaded(c: ClerkType | undefined): asserts c is ClerkType {
   if (!c) {
@@ -186,7 +189,7 @@ function assertClerkIsLoaded(c: ClerkType | undefined): asserts c is ClerkType {
 function mountIndex(element: HTMLDivElement) {
   assertClerkIsLoaded(Clerk);
   const user = Clerk.user;
-  element.innerHTML = `<pre class="text-left whitespace-pre overflow-x-auto bg-white p-4 border border-gray-100 rounded-md text-sm"><code>${JSON.stringify({ user }, null, 2)}</code></pre>`;
+  element.innerHTML = `<pre class="text-left whitespace-pre overflow-x-auto text-muted-foreground p-4 border border-[var(--color-sidebar-border)] rounded-md text-sm"><code>${JSON.stringify({ user }, null, 2)}</code></pre>`;
 }
 
 function mountOpenButton(element: HTMLDivElement, label: string, openFn: (props: any) => void, props: any) {
@@ -278,6 +281,8 @@ async function initControls() {
     .addBinding(PARAMS, 'baseTheme', {
       options: {
         default: '',
+        clerk: 'clerk',
+        simple: 'simple',
         dark: 'dark',
         shadesOfPurple: 'shadesOfPurple',
         neobrutalism: 'neobrutalism',
@@ -301,8 +306,17 @@ async function initControls() {
   varFolder.addBinding(PARAMS, 'borderRadius').on('change', applyVariables);
   varFolder.addButton({ title: 'Reset' }).on('click', () => {
     Object.assign(PARAMS, VARIABLE_DEFAULTS);
+    for (const key of Object.keys(VARIABLE_DEFAULTS)) {
+      sessionStorage.removeItem(key);
+    }
     pane.refresh();
-    applyVariables();
+    const currentAppearance = Clerk.__internal_getOption('appearance') ?? {};
+    void Clerk.__internal_updateProps({
+      appearance: {
+        ...currentAppearance,
+        variables: undefined,
+      },
+    });
   });
 
   // Options folder
@@ -345,6 +359,8 @@ async function initControls() {
 }
 
 const themes: Record<string, unknown> = {
+  clerk: 'clerk',
+  simple: 'simple',
   dark,
   shadesOfPurple,
   neobrutalism,
@@ -467,8 +483,11 @@ void (async () => {
     }
 
     const initialVariables: Record<string, string> = {};
-    for (const [key, def] of Object.entries(VARIABLE_DEFAULTS)) {
-      initialVariables[key] = sessionStorage.getItem(key) ?? def;
+    for (const key of Object.keys(VARIABLE_DEFAULTS)) {
+      const stored = sessionStorage.getItem(key);
+      if (stored !== null) {
+        initialVariables[key] = stored;
+      }
     }
 
     const initialLocale = sessionStorage.getItem('localization') ?? 'enUS';
@@ -479,7 +498,11 @@ void (async () => {
       signUpUrl: '/sign-up',
       ui: { ClerkUI: window.__internal_ClerkUICtor },
       appearance: {
-        ...(initialTheme ? { theme: initialTheme } : { variables: initialVariables }),
+        ...(initialTheme
+          ? { theme: initialTheme }
+          : Object.keys(initialVariables).length > 0
+            ? { variables: initialVariables }
+            : {}),
         ...(Object.keys(initialAppearanceOptions).length ? { options: initialAppearanceOptions } : {}),
       },
       localization: l[initialLocale as keyof typeof l],
@@ -498,6 +521,10 @@ void (async () => {
 
     document.addEventListener('keydown', e => {
       if (e.key === '/') {
+        const target = e.target as HTMLElement | null;
+        if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+          return;
+        }
         leftSidebar?.classList.toggle('hidden');
         pane.hidden = !pane.hidden;
       }

@@ -21,7 +21,7 @@ Core Package Categories
 - **Platform Support**: Expo (React Native), Chrome Extension
 - **Backend**: `@clerk/backend` - Server-side utilities and JWT verification
 - **Shared Utilities**: `@clerk/shared`, `@clerk/types` - Common utilities and TypeScript types
-- **Developer Tools**: `@clerk/testing`, `@clerk/dev-cli`, `@clerk/upgrade`
+- **Developer Tools**: `@clerk/testing`, `@clerk/upgrade`
 
 Directory Structure
 

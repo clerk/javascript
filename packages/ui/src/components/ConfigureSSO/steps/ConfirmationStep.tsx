@@ -52,6 +52,8 @@ const SsoStatusSection = (): JSX.Element => {
     >
       <Flex justify='start'>
         <Badge
+          elementDescriptor={descriptors.configureSSOConfirmationStatusBadge}
+          elementId={descriptors.configureSSOConfirmationStatusBadge.setId(isActive ? 'active' : 'inactive')}
           colorScheme={isActive ? 'success' : 'danger'}
           localizationKey={
             isActive
@@ -128,6 +130,7 @@ const DomainSection = (): JSX.Element | null => {
       sx={{ border: 0 }}
     >
       <Link
+        elementDescriptor={descriptors.configureSSOConfirmationDomainLink}
         href={`https://${domain}`}
         isExternal
         title={domain}
@@ -164,10 +167,12 @@ const ConfigurationDetailsSection = (): JSX.Element => {
           sx={{ width: '100%', alignItems: 'center', gridTemplateColumns: '150px minmax(0, 1fr)' }}
         >
           <Text
+            elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsLabel}
             colorScheme='secondary'
             localizationKey={localizationKeys('configureSSO.confirmation.configurationSection.ssoUrlLabel')}
           />
           <Link
+            elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsLink}
             href={samlConnection?.idpSsoUrl ?? ''}
             isExternal
             title={samlConnection?.idpSsoUrl}
@@ -177,10 +182,12 @@ const ConfigurationDetailsSection = (): JSX.Element => {
           </Link>
 
           <Text
+            elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsLabel}
             colorScheme='secondary'
             localizationKey={localizationKeys('configureSSO.confirmation.configurationSection.issuerLabel')}
           />
           <Text
+            elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsValue}
             truncate
             title={samlConnection?.idpEntityId}
           >
@@ -188,10 +195,12 @@ const ConfigurationDetailsSection = (): JSX.Element => {
           </Text>
 
           <Text
+            elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsLabel}
             colorScheme='secondary'
             localizationKey={localizationKeys('configureSSO.confirmation.configurationSection.certificateLabel')}
           />
           <Text
+            elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsValue}
             truncate
             title={samlConnection?.idpCertificate}
           >
@@ -204,6 +213,7 @@ const ConfigurationDetailsSection = (): JSX.Element => {
           sx={t => ({ marginTop: t.space.$2, paddingInlineStart: 0, marginInline: '-10px' })}
         >
           <ProfileSection.Button
+            elementDescriptor={descriptors.configureSSOConfirmationReconfigureButton}
             id='configureAgain'
             onClick={() => goToStep('configure')}
             variant='ghost'
@@ -303,6 +313,7 @@ const ResetConnectionSection = (): JSX.Element => {
           >
             <Action.Trigger value='reset'>
               <ProfileSection.Button
+                elementDescriptor={descriptors.configureSSOConfirmationResetButton}
                 id='resetSso'
                 variant='ghost'
                 colorScheme='danger'
