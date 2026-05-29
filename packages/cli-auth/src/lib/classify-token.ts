@@ -4,16 +4,15 @@ import { decodeJwt } from '@clerk/backend/jwt';
 import { ClerkCliAuthError } from '../errors';
 
 /**
- * Token kind values. Re-export of `@clerk/backend`'s `MachineTokenType` —
- * `'api_key' | 'm2m_token' | 'oauth_token'`. Session tokens are intentionally
- * excluded; the CLI flow never holds a browser session credential.
+ * Token kinds cli-auth accepts as CLI credentials. Narrower than `@clerk/backend`'s
+ * `MachineTokenType` — we drop `m2m_token` because M2M tokens are minted by machines for
+ * server-to-server BAPI calls, not for a CLI user to send to a backend. For machine
+ * identities, use an API key with a `mch_*` subject instead.
  */
-export type TokenKind = MachineTokenType;
+export type TokenKind = Exclude<MachineTokenType, typeof TokenType.M2MToken>;
 
 const API_KEY_PREFIX = 'ak_';
-const M2M_TOKEN_PREFIX = 'mt_';
 const OAUTH_TOKEN_PREFIX = 'oat_';
-const M2M_SUBJECT_PREFIX = 'mch_';
 const JWT_FORMAT = /^[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]+$/;
 /** RFC 9068 OAuth 2.0 access token `typ` header values. */
 const OAUTH_JWT_TYP_VALUES = ['at+jwt', 'application/at+jwt'] as const;
@@ -23,40 +22,35 @@ function isJwtFormat(token: string): boolean {
 }
 
 /**
- * Classify a token by prefix or JWT claims. Mirrors `@clerk/backend`'s internal
- * `getMachineTokenType`:
+ * Classify a credential as an API key or an OAuth access token by prefix / JWT shape:
  *
- * - `ak_*` → `'api_key'`
- * - `mt_*` or JWT with `sub: mch_*` → `'m2m_token'`
+ * - `ak_*` → `'api_key'` (user/org/machine API keys all share this prefix)
  * - `oat_*` or JWT with `typ: at+jwt` (RFC 9068) → `'oauth_token'`
  *
- * Throws when the token doesn't match any known machine-token shape.
+ * Throws on M2M tokens (`mt_*` or `mch_` subject JWT) and on any unknown shape — M2M is
+ * intentionally rejected at the CLI boundary.
  */
 export function classifyToken(token: string): TokenKind {
   if (token.startsWith(API_KEY_PREFIX)) {
     return TokenType.ApiKey;
-  }
-  if (token.startsWith(M2M_TOKEN_PREFIX)) {
-    return TokenType.M2MToken;
   }
   if (token.startsWith(OAUTH_TOKEN_PREFIX)) {
     return TokenType.OAuthToken;
   }
   if (isJwtFormat(token)) {
     const result = decodeJwt(token) as {
-      data?: { header: { typ?: unknown }; payload: { sub?: unknown } };
+      data?: { header: { typ?: unknown } };
       errors?: unknown;
     };
     if (!result.errors && result.data) {
-      const sub = result.data.payload.sub;
-      if (typeof sub === 'string' && sub.startsWith(M2M_SUBJECT_PREFIX)) {
-        return TokenType.M2MToken;
-      }
       const typ = result.data.header.typ;
       if (typeof typ === 'string' && (OAUTH_JWT_TYP_VALUES as readonly string[]).includes(typ)) {
         return TokenType.OAuthToken;
       }
     }
   }
-  throw new ClerkCliAuthError('not_authenticated', 'Unable to determine token type for credential.');
+  throw new ClerkCliAuthError(
+    'not_authenticated',
+    'Unsupported credential. Expected an API key or OAuth access token.',
+  );
 }

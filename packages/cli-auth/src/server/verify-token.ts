@@ -1,10 +1,13 @@
-import type { ClerkOptions } from '@clerk/backend';
-import { isTokenTypeAccepted, type MachineTokenType, verifyMachineAuthToken } from '@clerk/backend/internal';
+import type { ClerkClient } from '@clerk/backend';
 
 import { ClerkCliAuthError } from '../errors';
+import type { TokenKind } from '../lib/classify-token';
 import type { AcceptsToken, TokenInfo } from './types';
 
 const BEARER_PREFIX = /^Bearer\s+/i;
+
+/** cli-auth's canonical accepted set — m2m and session are intentionally never accepted. */
+const DEFAULT_ACCEPTS: readonly TokenKind[] = ['api_key', 'oauth_token'] as const;
 
 export function readBearer(request: Request): string {
   const header = request.headers.get('authorization');
@@ -19,70 +22,52 @@ export function readBearer(request: Request): string {
 }
 
 /**
- * Build the `VerifyTokenOptions` payload `verifyMachineAuthToken` expects. The bound
- * `clientConfig` wins; otherwise we fall back to the env vars `@clerk/backend` itself reads.
+ * Normalize cli-auth's {@link AcceptsToken} to the `acceptsToken` array
+ * `@clerk/backend` expects. `'any'` collapses to the canonical narrowed set so session
+ * and m2m tokens are never accidentally accepted even when the caller asks for "any".
  */
-export function buildVerifyOptions(clientConfig: ClerkOptions | undefined): {
-  secretKey: string;
-  apiUrl?: string;
-  jwtKey?: string;
-} {
-  const secretKey = clientConfig?.secretKey ?? process.env.CLERK_SECRET_KEY;
-  if (!secretKey) {
-    throw new ClerkCliAuthError(
-      'config',
-      'cliAuth() needs a Clerk secret key. Pass `clientConfig.secretKey`, or set CLERK_SECRET_KEY in the env.',
-    );
+function normalizeAccepts(accepts: AcceptsToken | undefined): readonly TokenKind[] {
+  if (!accepts || accepts === 'any') {
+    return DEFAULT_ACCEPTS;
   }
-  return {
-    secretKey,
-    apiUrl: clientConfig?.apiUrl ?? process.env.CLERK_API_URL ?? undefined,
-    jwtKey: clientConfig?.jwtKey ?? process.env.CLERK_JWT_KEY ?? undefined,
-  };
+  return Array.isArray(accepts) ? accepts : [accepts as TokenKind];
 }
 
 /**
- * Default token verifier — delegates to `@clerk/backend`'s `verifyMachineAuthToken`, which
- * detects the token type internally (api_key / m2m_token / oauth_token) and verifies via
- * the appropriate Backend API endpoint or JWT path. Maps the result to {@link TokenInfo}.
+ * Default token verifier — delegates to `clerk.authenticateRequest`, which detects the
+ * token type, looks up the right verification primitive (BAPI for opaque, JWKs for JWTs),
+ * and returns an `AuthObject`. We narrow the result to the {@link TokenInfo} shape that
+ * downstream consumers (`resolveAuthInfo`, custom `verifyToken` overrides) work with.
  *
- * `accepts` (when provided) gates against the verified `tokenType`; tokens of an unaccepted
- * type fail with `not_authenticated`. Consumers can replace this entirely by passing a
- * `verifyToken` override to `handle()`.
+ * Consumers who want richer claims for JWT-shaped tokens (e.g. the full RFC 9068 payload)
+ * can decode the bearer inside a custom `resolveAuthInfo` callback — that hook receives
+ * the original `Request`, so the raw token is recoverable via `readBearer(request)`.
  */
 export async function verifyTokenWithClerk(
-  token: string,
-  options: { accepts?: AcceptsToken; clientConfig?: ClerkOptions },
+  request: Request,
+  options: { accepts?: AcceptsToken; clerk: ClerkClient },
 ): Promise<TokenInfo> {
-  const verifyOptions = buildVerifyOptions(options.clientConfig);
-  const result = await verifyMachineAuthToken(token, verifyOptions);
+  // Cli-auth is bearer-only — require the header up front so consumers get a clear
+  // "Missing Authorization header" rather than `authenticateRequest`'s
+  // `token-type-mismatch` reason after it falls through to cookie auth and fails.
+  readBearer(request);
 
-  const accepts: AcceptsToken = options.accepts ?? 'any';
-  if (!isTokenTypeAccepted(result.tokenType, accepts)) {
-    throw new ClerkCliAuthError(
-      'not_authenticated',
-      `Token type "${result.tokenType}" is not accepted by this endpoint.`,
-    );
+  const acceptsToken = normalizeAccepts(options.accepts);
+  const state = await options.clerk.authenticateRequest(request, { acceptsToken });
+  if (state.isAuthenticated === false) {
+    throw new ClerkCliAuthError('not_authenticated', state.reason ?? 'Token rejected.');
   }
 
-  if (result.errors) {
-    throw new ClerkCliAuthError('not_authenticated', result.errors[0].message);
-  }
+  const authObj = state.toAuth();
+  // `subject`, `scopes`, `tokenType` are top-level on every AuthenticatedMachineObject.
+  // `claims` is only present on the `api_key` arm of MachineObjectExtendedProperties —
+  // check the property at runtime to avoid leaking the type machinery here.
+  const claims = 'claims' in authObj && authObj.claims ? (authObj.claims as Record<string, unknown>) : undefined;
 
-  return mapVerifiedToken(result.data, result.tokenType);
-}
-
-interface VerifiedTokenLike {
-  subject: string;
-  scopes?: string[] | null;
-  claims?: Record<string, unknown> | null;
-}
-
-function mapVerifiedToken(data: VerifiedTokenLike, type: MachineTokenType): TokenInfo {
   return {
-    subject: data.subject,
-    type,
-    scopes: data.scopes ?? undefined,
-    claims: data.claims ?? undefined,
+    subject: authObj.subject,
+    type: authObj.tokenType as TokenKind,
+    scopes: authObj.scopes,
+    claims,
   };
 }

@@ -43,10 +43,10 @@ export interface ClerkCliAuthConfig {
   /** Injected opener for the browser step (for testing). Default: auto-detect. */
   openBrowser?: (url: string) => Promise<void>;
   /**
-   * Backend endpoint that returns the verified `Identity` for a credential (API key,
-   * machine token, or OAuth access token). Called with `Authorization: Bearer <token>`.
-   * The server is responsible for verifying the credential (e.g. via `clerk.apiKeys.verify()`
-   * from `@clerk/nextjs/server`) and responding with an `Identity` payload — verification
+   * Backend endpoint that returns the verified `Identity` for a credential (API key
+   * or OAuth access token). Called with `Authorization: Bearer <token>`. The server is
+   * responsible for verifying the credential (e.g. via `clerk.apiKeys.verify()` from
+   * `@clerk/nextjs/server`) and responding with an `Identity` payload — verification
    * stays server-side, never in the CLI. Setting this enables `verifyToken()`.
    */
   identityEndpoint?: string;

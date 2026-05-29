@@ -1,14 +1,14 @@
 import type { ClerkClient, ClerkOptions } from '@clerk/backend';
-import type { MachineTokenType } from '@clerk/backend/internal';
 
+import type { TokenKind } from '../lib/classify-token';
 import type { Identity } from '../types';
 
 /**
- * Which token types this endpoint accepts. Mirrors `@clerk/backend`'s `acceptsToken`:
- * a single {@link MachineTokenType}, a readonly tuple of them, or the literal `'any'`.
- * Session tokens are intentionally excluded — the CLI flow never holds one.
+ * Which token types this endpoint accepts: a single {@link TokenKind}, a readonly tuple of
+ * them, or the literal `'any'`. Narrower than `@clerk/backend`'s `acceptsToken` — m2m tokens
+ * and session tokens are both intentionally excluded from the CLI threat model.
  */
-export type AcceptsToken = MachineTokenType | readonly MachineTokenType[] | 'any';
+export type AcceptsToken = TokenKind | readonly TokenKind[] | 'any';
 
 /**
  * A Clerk Backend client, either resolved or wrapped in a factory. Passing the factory
@@ -21,10 +21,10 @@ export type ClientArg = ClerkClient | (() => ClerkClient | Promise<ClerkClient>)
  * Verified token payload. Returned by `verifyToken` / `verifyTokenFromRequest`
  * and passed into `resolveAuthInfo` as `tokenInfo`.
  */
-export interface TokenInfo<T extends MachineTokenType = MachineTokenType> {
+export interface TokenInfo<T extends TokenKind = TokenKind> {
   /** The verified token's subject — `user_*`, `org_*`, `mch_*`, or `scim_*`. */
   subject: string;
-  /** The verified token type (`api_key` | `m2m_token` | `oauth_token`). */
+  /** The verified token type (`api_key` | `oauth_token`). */
   type: T;
   /** Scopes attached to the token, when applicable. */
   scopes?: string[];
@@ -36,7 +36,7 @@ export interface TokenInfo<T extends MachineTokenType = MachineTokenType> {
  * Context passed to a `verifyToken` override. `token` is the raw, unverified bearer.
  * `type` is the auto-detected token type; `clerk` is the resolved Clerk Backend client.
  */
-export interface VerifyTokenContext<T extends MachineTokenType = MachineTokenType> {
+export interface VerifyTokenContext<T extends TokenKind = TokenKind> {
   /** Raw bearer token from the `Authorization` header. */
   token: string;
   /** Token type auto-detected from the token's prefix / JWT shape. */
@@ -52,7 +52,7 @@ export interface VerifyTokenContext<T extends MachineTokenType = MachineTokenTyp
  * downstream code reads `tokenInfo.subject` / `.claims`, the original `request`, and the
  * resolved Clerk Backend client.
  */
-export interface ResolveAuthInfoContext<T extends MachineTokenType = MachineTokenType> {
+export interface ResolveAuthInfoContext<T extends TokenKind = TokenKind> {
   /** The verified token, including subject, type, scopes, and claims. */
   tokenInfo: TokenInfo<T>;
   /** Original incoming `Request`. */
@@ -62,12 +62,12 @@ export interface ResolveAuthInfoContext<T extends MachineTokenType = MachineToke
 }
 
 /** A `verifyToken` callback returns a verified `TokenInfo` or throws on rejection. */
-export type VerifyTokenFn<T extends MachineTokenType = MachineTokenType> = (
+export type VerifyTokenFn<T extends TokenKind = TokenKind> = (
   ctx: VerifyTokenContext<T>,
 ) => Promise<TokenInfo<T>> | TokenInfo<T>;
 
 /** A `resolveAuthInfo` callback shapes the verified token into a `Identity` payload. */
-export type ResolveAuthInfoFn<T extends MachineTokenType = MachineTokenType> = (
+export type ResolveAuthInfoFn<T extends TokenKind = TokenKind> = (
   ctx: ResolveAuthInfoContext<T>,
 ) => Promise<Identity> | Identity;
 
@@ -91,7 +91,7 @@ export interface CliAuthFactoryOptions {
  * bind the route to via `auth`. Per-route Clerk client overrides aren't supported — make
  * another `cliAuth()` instance instead.
  */
-export interface HandleOptions<T extends MachineTokenType = MachineTokenType> {
+export interface HandleOptions<T extends TokenKind = TokenKind> {
   /** `cliAuth()` instance whose bound Clerk client and verifier/resolver this route should use. */
   auth: CliAuthInstance;
   /** Which token types this endpoint accepts. Rejects every other type with 401. Defaults to `'any'`. */
@@ -126,7 +126,7 @@ export interface CliAuthInstance {
    * Primitive verifier — raw bearer in, verified `TokenInfo` out. Auto-detects token type
    * via `@clerk/backend`'s `verifyMachineAuthToken`, optionally gating against `accepts`.
    */
-  verifyToken: <T extends MachineTokenType = MachineTokenType>(
+  verifyToken: <T extends TokenKind = TokenKind>(
     token: string,
     options?: { accepts?: AcceptsToken },
   ) => Promise<TokenInfo<T>>;
@@ -134,12 +134,12 @@ export interface CliAuthInstance {
    * Request-level verifier — reads `Authorization: Bearer <token>`, then defers to
    * `verifyToken(token, options)`.
    */
-  verifyTokenFromRequest: <T extends MachineTokenType = MachineTokenType>(
+  verifyTokenFromRequest: <T extends TokenKind = TokenKind>(
     request: Request,
     options?: { accepts?: AcceptsToken },
   ) => Promise<TokenInfo<T>>;
   /** Default resolver: project a verified `TokenInfo` into `Identity`. Sync today, but typed `Identity | Promise<Identity>` so consumer-supplied resolvers can be async. */
-  resolveAuthInfo: <T extends MachineTokenType>(
+  resolveAuthInfo: <T extends TokenKind>(
     ctx: Omit<ResolveAuthInfoContext<T>, 'clerk'> & { clerk?: ClerkClient },
   ) => Identity | Promise<Identity>;
   /** Resolve the bound Clerk Backend SDK client. Cached after the first call. */

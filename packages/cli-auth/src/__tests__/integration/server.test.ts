@@ -21,49 +21,33 @@ describe.skipIf(skipWhenNoSecret)('cli-auth server integration', () => {
     await teardownFixtures(fx);
   });
 
-  describe('auth.verifyToken', () => {
-    it('verifies an API key, returns TokenInfo with type=api_key + correct subject', async () => {
-      const secret = fx.apiKey.secret;
-      expect(secret).toBeTypeOf('string');
-      const info = await fx.auth.verifyToken(secret!);
+  describe('auth.verifyToken — API key per subject kind', () => {
+    it('verifies a user-scoped API key (subject = user_*)', async () => {
+      const info = await fx.auth.verifyToken(fx.userApiKey.secret!);
       expect(info.type).toBe('api_key');
       expect(info.subject).toBe(fx.user.id);
+      expect(info.subject).toMatch(/^user_/);
       expect(info.scopes).toEqual(expect.arrayContaining(['cli:read']));
     });
 
-    it('verifies an opaque M2M token, type=m2m_token, subject mch_*', async () => {
-      const token = fx.m2mTokenOpaque.token;
-      expect(token).toBeTypeOf('string');
-      expect(token!.startsWith('mt_')).toBe(true);
-      const info = await fx.auth.verifyToken(token!);
-      expect(info.type).toBe('m2m_token');
+    it('verifies an org-scoped API key (subject = org_*)', async () => {
+      const info = await fx.auth.verifyToken(fx.orgApiKey.secret!);
+      expect(info.type).toBe('api_key');
+      expect(info.subject).toBe(fx.org.id);
+      expect(info.subject).toMatch(/^org_/);
+    });
+
+    it('verifies a machine-scoped API key (subject = mch_*)', async () => {
+      const info = await fx.auth.verifyToken(fx.machineApiKey.secret!);
+      expect(info.type).toBe('api_key');
+      expect(info.subject).toBe(fx.machine.id);
       expect(info.subject).toMatch(/^mch_/);
-    });
-
-    it('verifies a JWT-shaped M2M token, type=m2m_token', async () => {
-      const token = fx.m2mTokenJwt.token;
-      expect(token).toBeTypeOf('string');
-      expect(token!.split('.').length).toBe(3);
-      const info = await fx.auth.verifyToken(token!);
-      expect(info.type).toBe('m2m_token');
-      expect(info.subject).toMatch(/^mch_/);
-    });
-
-    it('rejects when accepts gates out the verified type', async () => {
-      // M2M sent to an api_key-only verifier.
-      await expect(fx.auth.verifyToken(fx.m2mTokenOpaque.token!, { accepts: 'api_key' })).rejects.toThrow(
-        /not accepted/i,
-      );
-    });
-
-    it('throws on an unrecognized token', async () => {
-      await expect(fx.auth.verifyToken('not-a-real-token')).rejects.toThrow();
     });
   });
 
   describe('auth.verifyTokenFromRequest', () => {
     it('reads the Bearer header and verifies', async () => {
-      const req = bearerRequest(fx.apiKey.secret!);
+      const req = bearerRequest(fx.userApiKey.secret!);
       const info = await fx.auth.verifyTokenFromRequest(req, { accepts: 'api_key' });
       expect(info.subject).toBe(fx.user.id);
       expect(info.type).toBe('api_key');
@@ -73,50 +57,72 @@ describe.skipIf(skipWhenNoSecret)('cli-auth server integration', () => {
       const req = new Request('http://test.local/cli');
       await expect(fx.auth.verifyTokenFromRequest(req)).rejects.toThrow(/Authorization/);
     });
+  });
 
-    it('throws on an unaccepted type', async () => {
-      const req = bearerRequest(fx.m2mTokenOpaque.token!);
-      await expect(fx.auth.verifyTokenFromRequest(req, { accepts: 'api_key' })).rejects.toThrow(/not accepted/i);
+  describe('rejects credentials that are not API keys or OAuth tokens', () => {
+    it('rejects a raw unrecognized credential', async () => {
+      await expect(fx.auth.verifyToken('not-a-real-token')).rejects.toThrow();
+    });
+
+    it('rejects an unknown prefix', async () => {
+      await expect(fx.auth.verifyToken('xyz_unknown_prefix_token')).rejects.toThrow();
+    });
+
+    it('rejects an M2M-prefixed token (mt_*) — m2m is not a CLI credential', async () => {
+      // Fake mt_ value; we don't need a real M2M token to prove the gate. BAPI rejects it,
+      // and our code surfaces the rejection.
+      await expect(fx.auth.verifyToken('mt_not_a_real_m2m_token_value')).rejects.toThrow();
     });
   });
 
   describe('auth.resolveAuthInfo (default)', () => {
     it('projects subject + claims into Identity', async () => {
-      const info = await fx.auth.verifyToken(fx.apiKey.secret!);
-      const identity = await fx.auth.resolveAuthInfo({ tokenInfo: info, request: bearerRequest(fx.apiKey.secret!) });
+      const info = await fx.auth.verifyToken(fx.userApiKey.secret!);
+      const identity = await fx.auth.resolveAuthInfo({
+        tokenInfo: info,
+        request: bearerRequest(fx.userApiKey.secret!),
+      });
       expect(identity.sub).toBe(fx.user.id);
     });
   });
 
   describe('handle() end-to-end', () => {
-    it('200 with Identity body when a valid API key is sent', async () => {
+    it('200 with Identity body for a user-scoped API key', async () => {
       const route = handle({ auth: fx.auth, accepts: 'api_key' });
-      const res = await route(bearerRequest(fx.apiKey.secret!));
+      const res = await route(bearerRequest(fx.userApiKey.secret!));
       expect(res.status).toBe(200);
       const body = (await res.json()) as Identity;
       expect(body.sub).toBe(fx.user.id);
     });
 
-    it('200 with mch_ subject when a valid M2M token is sent', async () => {
-      const route = handle({ auth: fx.auth, accepts: 'm2m_token' });
-      const res = await route(bearerRequest(fx.m2mTokenOpaque.token!));
+    it('200 with Identity body for an org-scoped API key', async () => {
+      const route = handle({ auth: fx.auth, accepts: 'api_key' });
+      const res = await route(bearerRequest(fx.orgApiKey.secret!));
       expect(res.status).toBe(200);
       const body = (await res.json()) as Identity;
-      expect(body.sub).toMatch(/^mch_/);
+      expect(body.sub).toBe(fx.org.id);
     });
 
-    it('401 when an M2M token hits an api_key-only route', async () => {
+    it('200 with Identity body for a machine-scoped API key', async () => {
       const route = handle({ auth: fx.auth, accepts: 'api_key' });
-      const res = await route(bearerRequest(fx.m2mTokenOpaque.token!));
-      expect(res.status).toBe(401);
-      const body = (await res.json()) as { error: string };
-      expect(body.error).toBe('not_authenticated');
+      const res = await route(bearerRequest(fx.machineApiKey.secret!));
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as Identity;
+      expect(body.sub).toBe(fx.machine.id);
     });
 
     it('401 when no Authorization header is present', async () => {
       const route = handle({ auth: fx.auth, accepts: 'any' });
       const res = await route(new Request('http://test.local/cli'));
       expect(res.status).toBe(401);
+    });
+
+    it('401 for unsupported credential types', async () => {
+      const route = handle({ auth: fx.auth, accepts: 'any' });
+      const res = await route(bearerRequest('not-a-real-token'));
+      expect(res.status).toBe(401);
+      const body = (await res.json()) as { error: string };
+      expect(body.error).toBe('not_authenticated');
     });
 
     it('honors a custom resolveAuthInfo override', async () => {
@@ -128,7 +134,7 @@ describe.skipIf(skipWhenNoSecret)('cli-auth server integration', () => {
           custom_field: 'enriched',
         }),
       });
-      const res = await route(bearerRequest(fx.apiKey.secret!));
+      const res = await route(bearerRequest(fx.userApiKey.secret!));
       expect(res.status).toBe(200);
       const body = (await res.json()) as Identity & { custom_field?: string };
       expect(body.sub).toBe(fx.user.id);
@@ -147,7 +153,8 @@ describe.skipIf(skipWhenNoSecret)('cli-auth server integration', () => {
           return { subject: verified.subject, type, scopes: verified.scopes };
         },
       });
-      const res = await route(bearerRequest(fx.apiKey.secret!));
+
+      const res = await route(bearerRequest(fx.userApiKey.secret!));
       expect(res.status).toBe(200);
       const body = (await res.json()) as Identity;
       expect(body.sub).toBe(fx.user.id);

@@ -1,7 +1,7 @@
 import { type ClerkClient, type ClerkOptions, createClerkClient } from '@clerk/backend';
-import type { MachineTokenType } from '@clerk/backend/internal';
 
 import { ClerkCliAuthError } from '../errors';
+import type { TokenKind } from '../lib/classify-token';
 import { resolveAuthInfo as defaultResolveAuthInfo } from './resolve-auth';
 import type {
   AcceptsToken,
@@ -11,7 +11,12 @@ import type {
   ResolveAuthInfoContext,
   TokenInfo,
 } from './types';
-import { readBearer, verifyTokenWithClerk } from './verify-token';
+import { verifyTokenWithClerk } from './verify-token';
+
+/** Synthesize a Request so the bare-token verifier can reuse `clerk.authenticateRequest`. */
+function requestForToken(token: string): Request {
+  return new Request('http://cli-auth.local/verify', { headers: { Authorization: `Bearer ${token}` } });
+}
 
 /** Build a getClerk thunk for the given factory options, with a single-flight cache. */
 function makeClerkGetter(
@@ -87,26 +92,23 @@ function makeClerkGetter(
 export function cliAuth(options: CliAuthFactoryOptions = {}): CliAuthInstance {
   const getClerk = makeClerkGetter(options.client, options.clientConfig);
 
-  async function verifyToken<T extends MachineTokenType = MachineTokenType>(
-    token: string,
-    verifyOptions?: { accepts?: AcceptsToken },
-  ): Promise<TokenInfo<T>> {
-    const info = await verifyTokenWithClerk(token, {
-      accepts: verifyOptions?.accepts,
-      clientConfig: options.clientConfig,
-    });
-    return info as TokenInfo<T>;
-  }
-
-  async function verifyTokenFromRequest<T extends MachineTokenType = MachineTokenType>(
+  async function verifyTokenFromRequest<T extends TokenKind = TokenKind>(
     request: Request,
     verifyOptions?: { accepts?: AcceptsToken },
   ): Promise<TokenInfo<T>> {
-    const token = readBearer(request);
-    return verifyToken<T>(token, verifyOptions);
+    const clerk = await getClerk();
+    const info = await verifyTokenWithClerk(request, { accepts: verifyOptions?.accepts, clerk });
+    return info as TokenInfo<T>;
   }
 
-  function resolveAuthInfo<T extends MachineTokenType>(
+  async function verifyToken<T extends TokenKind = TokenKind>(
+    token: string,
+    verifyOptions?: { accepts?: AcceptsToken },
+  ): Promise<TokenInfo<T>> {
+    return verifyTokenFromRequest<T>(requestForToken(token), verifyOptions);
+  }
+
+  function resolveAuthInfo<T extends TokenKind>(
     ctx: Omit<ResolveAuthInfoContext<T>, 'clerk'> & { clerk?: ClerkClient },
   ): ReturnType<typeof defaultResolveAuthInfo> {
     return defaultResolveAuthInfo(ctx as ResolveAuthInfoContext<T>);

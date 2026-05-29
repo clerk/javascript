@@ -1,7 +1,5 @@
-import type { MachineTokenType } from '@clerk/backend/internal';
-
 import { ClerkCliAuthError, EXIT_CODE } from '../errors';
-import { classifyToken } from '../lib/classify-token';
+import { classifyToken, type TokenKind } from '../lib/classify-token';
 import { resolveAuthInfo as defaultResolveAuthInfo, validateIdentity } from './resolve-auth';
 import type { HandleOptions, TokenInfo } from './types';
 import { readBearer } from './verify-token';
@@ -28,7 +26,7 @@ function jsonError(error: ClerkCliAuthError): Response {
   );
 }
 
-async function verifyForHandle<T extends MachineTokenType>(
+async function verifyForHandle<T extends TokenKind>(
   request: Request,
   options: HandleOptions<T>,
 ): Promise<TokenInfo<T>> {
@@ -61,14 +59,14 @@ async function verifyForHandle<T extends MachineTokenType>(
  *
  * export const GET = handle({
  *   auth,
- *   accepts: ['api_key', 'm2m_token', 'oauth_token'],
+ *   accepts: ['api_key', 'oauth_token'],
  *   // Optional overrides:
  *   // verifyToken: ({ token, type, request, clerk }) => ...
  *   // resolveAuthInfo: ({ tokenInfo, request, clerk }) => ...
  * });
  * ```
  */
-export function handle<T extends MachineTokenType = MachineTokenType>(
+export function handle<T extends TokenKind = TokenKind>(
   options: HandleOptions<T>,
 ): (request: Request) => Promise<Response> {
   return async function routeHandler(request: Request): Promise<Response> {

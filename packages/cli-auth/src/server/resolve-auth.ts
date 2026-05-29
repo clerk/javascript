@@ -1,6 +1,5 @@
-import type { MachineTokenType } from '@clerk/backend/internal';
-
 import { ClerkCliAuthError } from '../errors';
+import type { TokenKind } from '../lib/classify-token';
 import type { Identity } from '../types';
 import type { ResolveAuthInfoContext, TokenInfo } from './types';
 
@@ -38,7 +37,7 @@ function extractSubject(tokenInfo: TokenInfo): string {
  * richer profile/org data (e.g. fetching the user via the bound Clerk client, or
  * pulling org claims out of an API key's `claims` bag).
  */
-export function resolveAuthInfo<T extends MachineTokenType>(ctx: ResolveAuthInfoContext<T>): Identity {
+export function resolveAuthInfo<T extends TokenKind>(ctx: ResolveAuthInfoContext<T>): Identity {
   const { tokenInfo } = ctx;
   const sub = extractSubject(tokenInfo);
 

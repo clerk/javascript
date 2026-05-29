@@ -13,7 +13,5 @@ export type {
   VerifyTokenFn,
 } from './types';
 
-// Re-export the canonical `MachineTokenType` and `isTokenTypeAccepted` from `@clerk/backend`
-// so consumers don't have to dual-import.
-export { isTokenTypeAccepted, TokenType } from '@clerk/backend/internal';
-export type { MachineTokenType } from '@clerk/backend/internal';
+// Cli-auth's narrowed `TokenKind` ('api_key' | 'oauth_token') — m2m is intentionally excluded.
+export type { TokenKind } from '../lib/classify-token';
