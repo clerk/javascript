@@ -99,11 +99,19 @@ jobs:
           pnpm dlx --package "$SNAPI_PACKAGE" snapi snapshot \
             --output "$GITHUB_WORKSPACE/.api-snapshots-baseline"
 
+      - name: Resolve snapi cache key
+        id: snapi-key
+        run: echo "ref=${SNAPI_PACKAGE##*@}" >> "$GITHUB_OUTPUT"
+
       - name: Save baseline to cache
         uses: actions/cache/save@v4
         with:
           path: .api-snapshots-baseline
-          key: snapi-baseline-${{ github.sha }}
+          # Fold the snapi commit into the key: a snapshot produced by one snapi
+          # version must not be reused by another, since discovery changes (e.g.
+          # wildcard subpath expansion) make the surfaces incomparable and the
+          # diff degenerates into thousands of phantom additions.
+          key: snapi-baseline-${{ steps.snapi-key.outputs.ref }}-${{ github.sha }}
 
   check-api:
     if: ${{ github.event_name == 'pull_request' && github.event.pull_request.draft == false }}
@@ -135,12 +143,19 @@ jobs:
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
+      - name: Resolve snapi cache key
+        id: snapi-key
+        run: echo "ref=${SNAPI_PACKAGE##*@}" >> "$GITHUB_OUTPUT"
+
       - name: Restore baseline from cache
         id: baseline-cache
         uses: actions/cache/restore@v4
         with:
           path: .api-snapshots-baseline
-          key: snapi-baseline-${{ github.event.pull_request.base.sha }}
+          # Keyed on the snapi commit too, so bumping snapi misses the stale
+          # baseline and the worktree fallback below rebuilds it with the same
+          # version the PR runs (see publish-baseline for the rationale).
+          key: snapi-baseline-${{ steps.snapi-key.outputs.ref }}-${{ github.event.pull_request.base.sha }}
 
       - name: Build current declarations
         run: pnpm turbo build:declarations $TURBO_ARGS $SNAPI_FILTERS
@@ -191,38 +206,67 @@ jobs:
           if-no-files-found: ignore
           retention-days: 5
 
-      - name: Build snapi comment body
-        if: always()
-        id: report
-        run: |
-          if [ ! -f api-changes-report.md ]; then
-            exit 0
-          fi
-          {
-            echo 'body<<SNAPI_REPORT_EOF'
-            echo '<!-- snapi-report -->'
-            if grep -q '## No API Changes Detected' api-changes-report.md; then
-              echo '**Snapi**: no API changes detected in `@clerk/backend`, `@clerk/clerk-js`, `@clerk/nextjs`, `@clerk/react`, `@clerk/shared`, `@clerk/ui`.'
-            else
-              cat api-changes-report.md
-            fi
-            echo 'SNAPI_REPORT_EOF'
-          } >> "$GITHUB_OUTPUT"
-
-      - name: Find existing snapi comment
-        if: always() && steps.report.outputs.body != ''
-        id: find-comment
-        uses: peter-evans/find-comment@3eae4d37986fb5a8592848f6a574fdf654e61f9e # v3.1.0
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          comment-author: 'github-actions[bot]'
-          body-includes: '<!-- snapi-report -->'
-
       - name: Post snapi report
-        if: always() && steps.report.outputs.body != ''
-        uses: peter-evans/create-or-update-comment@23ff15729ef2fc348714a3bb66d2f655ca9066f2 # v3.1.0
+        if: always()
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        env:
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         with:
-          comment-id: ${{ steps.find-comment.outputs.comment-id }}
-          issue-number: ${{ github.event.pull_request.number }}
-          body: ${{ steps.report.outputs.body }}
-          edit-mode: replace
+          script: |
+            const fs = require('fs');
+            const reportPath = 'api-changes-report.md';
+            if (!fs.existsSync(reportPath)) {
+              core.info('No snapi report found; skipping comment.');
+              return;
+            }
+
+            const marker = '<!-- snapi-report -->';
+            const report = fs.readFileSync(reportPath, 'utf-8');
+
+            let body;
+            if (report.includes('## No API Changes Detected')) {
+              body = `${marker}\n**Snapi**: no API changes detected across the tracked packages.`;
+            } else {
+              // GitHub rejects comment bodies over 65536 chars. Read the report
+              // from disk and post via the API so we never hit an arg-length
+              // limit, and truncate with a pointer to the full artifact when a
+              // genuinely large diff would overflow the comment.
+              const LIMIT = 64000;
+              const head = `${marker}\n`;
+              if (head.length + report.length <= LIMIT) {
+                body = head + report;
+              } else {
+                const notice =
+                  `\n\n> **Note**\n> Report truncated to fit GitHub's comment limit. ` +
+                  `The full report is attached as the \`api-changes-report\` artifact on ` +
+                  `[this run](${process.env.RUN_URL}).\n`;
+                const budget = LIMIT - head.length - notice.length;
+                body = head + report.slice(0, budget) + notice;
+              }
+            }
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              per_page: 100,
+            });
+            const existing = comments.find(
+              (c) => c.user?.type === 'Bot' && c.body && c.body.includes(marker),
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
