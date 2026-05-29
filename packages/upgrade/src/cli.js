@@ -46,6 +46,7 @@ const cli = meow(
       --dir              Directory to scan (defaults to current directory)
       --glob             Glob pattern for files to transform (defaults to **/*.{js,jsx,ts,tsx,mjs,cjs})
       --ignore           Directories/files to ignore (can be used multiple times)
+      --skip-gitignore   Do not use .gitignore files to exclude scan results
       --skip-upgrade     Skip the upgrade step
       --release          Name of the release you're upgrading to (e.g. core-3)
       --canary           Upgrade to the latest canary version instead of the stable release
@@ -72,6 +73,7 @@ const cli = meow(
       dryRun: { type: 'boolean', default: false },
       glob: { type: 'string', default: '**/*.(js|jsx|ts|tsx|mjs|cjs)' },
       ignore: { type: 'string', isMultiple: true },
+      skipGitignore: { type: 'boolean', default: false },
       release: { type: 'string' },
       sdk: { type: 'string' },
       canary: { type: 'boolean', default: false },
@@ -90,6 +92,7 @@ async function main() {
     dryRun: cli.flags.dryRun,
     glob: cli.flags.glob,
     ignore: cli.flags.ignore,
+    skipGitignore: cli.flags.skipGitignore,
     release: cli.flags.release,
     skipCodemods: cli.flags.skipCodemods,
     skipUpgrade: cli.flags.skipUpgrade,

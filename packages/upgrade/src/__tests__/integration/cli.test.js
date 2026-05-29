@@ -71,6 +71,7 @@ describe('CLI Integration', () => {
       expect(result.stdout).toContain('--sdk');
       expect(result.stdout).toContain('--dir');
       expect(result.stdout).toContain('--dry-run');
+      expect(result.stdout).toContain('--skip-gitignore');
       expect(result.stdout).toContain('--skip-upgrade');
       expect(result.stdout).toContain('--release');
       expect(result.stdout).toContain('--canary');
