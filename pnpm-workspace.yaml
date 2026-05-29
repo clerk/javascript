@@ -1,7 +1,6 @@
 packages:
   - packages/*
   - packages/electron-passkeys/npm/*
-  - playground/*
 
 catalogs:
   peer-react:
