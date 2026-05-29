@@ -14,7 +14,7 @@ vi.mock('../../jwt/verifyJwt', () => ({
 }));
 
 describe('authenticateRequest with cookie token', () => {
-  test('logs a warning when azp claim is missing but still returns signed-in', async () => {
+  test('warns once across repeated requests when azp claim is missing but still returns signed-in', async () => {
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
     const payload = {
@@ -35,20 +35,26 @@ describe('authenticateRequest with cookie token', () => {
       errors: undefined,
     });
 
-    const request = new Request('http://localhost:3000', {
-      headers: {
-        cookie: '__session=mock_token; __client_uat=1234567890',
-      },
-    });
+    const buildRequest = () =>
+      new Request('http://localhost:3000', {
+        headers: {
+          cookie: '__session=mock_token; __client_uat=1234567890',
+        },
+      });
 
     const options = {
       publishableKey: 'pk_live_Y2xlcmsuaW5zcGlyZWQucHVtYS03NC5sY2wuZGV2JA',
       secretKey: 'sk_live_deadbeef',
     };
 
-    const result = await authenticateRequest(request, options);
+    // A single azp-less cookie token is reused across every authenticated
+    // request, so the warning must not fire per request (issue #8231).
+    const first = await authenticateRequest(buildRequest(), options);
+    const second = await authenticateRequest(buildRequest(), options);
 
-    expect(result.isSignedIn).toBe(true);
+    expect(first.isSignedIn).toBe(true);
+    expect(second.isSignedIn).toBe(true);
+    expect(warnSpy).toHaveBeenCalledTimes(1);
     expect(warnSpy).toHaveBeenCalledWith(
       'Clerk: Session token from cookie is missing the azp claim. In a future version of Clerk, this token will be considered invalid. Please contact Clerk support if you see this warning.',
     );
