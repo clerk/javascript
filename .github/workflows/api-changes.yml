@@ -32,7 +32,7 @@ on:
       - 'packages/testing/**'
       - 'packages/ui/**'
       - 'packages/vue/**'
-      - 'snapi.config.json'
+      - 'break-check.config.json'
       - '.github/workflows/api-changes.yml'
 
 permissions:
@@ -43,8 +43,11 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
-  SNAPI_PACKAGE: https://pkg.pr.new/clerk/snapi/@clerk/snapi@d8abb511d1e28b688c8fc99aa9c1057e8f0fcb77
-  SNAPI_FILTERS: >-
+  # The tool was renamed snapi -> break-check (package @clerk/break-check, binary
+  # break-check, repo clerk/break-check). Pinned to a pkg.pr.new build of a
+  # specific commit on main.
+  BREAK_CHECK_PACKAGE: https://pkg.pr.new/clerk/break-check/@clerk/break-check@aa433ae78821569e741c5ea6803659164b445e30
+  BREAK_CHECK_FILTERS: >-
     --filter=@clerk/astro
     --filter=@clerk/backend
     --filter=@clerk/chrome-extension
@@ -92,26 +95,27 @@ jobs:
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Build declarations
-        run: pnpm turbo build:declarations $TURBO_ARGS $SNAPI_FILTERS
+        run: pnpm turbo build:declarations $TURBO_ARGS $BREAK_CHECK_FILTERS
 
       - name: Generate API snapshot
         run: |
-          pnpm dlx --package "$SNAPI_PACKAGE" snapi snapshot \
+          pnpm dlx --package "$BREAK_CHECK_PACKAGE" break-check snapshot \
             --output "$GITHUB_WORKSPACE/.api-snapshots-baseline"
 
-      - name: Resolve snapi cache key
-        id: snapi-key
-        run: echo "ref=${SNAPI_PACKAGE##*@}" >> "$GITHUB_OUTPUT"
+      - name: Resolve break-check cache key
+        id: break-check-key
+        run: echo "ref=${BREAK_CHECK_PACKAGE##*@}" >> "$GITHUB_OUTPUT"
 
       - name: Save baseline to cache
         uses: actions/cache/save@v4
         with:
           path: .api-snapshots-baseline
-          # Fold the snapi commit into the key: a snapshot produced by one snapi
-          # version must not be reused by another, since discovery changes (e.g.
-          # wildcard subpath expansion) make the surfaces incomparable and the
-          # diff degenerates into thousands of phantom additions.
-          key: snapi-baseline-${{ steps.snapi-key.outputs.ref }}-${{ github.sha }}
+          # Fold the break-check commit into the key: a snapshot produced by one
+          # break-check version must not be reused by another, since discovery
+          # changes (e.g. wildcard subpath expansion) make the surfaces
+          # incomparable and the diff degenerates into thousands of phantom
+          # additions.
+          key: break-check-baseline-${{ steps.break-check-key.outputs.ref }}-${{ github.sha }}
 
   check-api:
     if: ${{ github.event_name == 'pull_request' && github.event.pull_request.draft == false }}
@@ -143,22 +147,22 @@ jobs:
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
-      - name: Resolve snapi cache key
-        id: snapi-key
-        run: echo "ref=${SNAPI_PACKAGE##*@}" >> "$GITHUB_OUTPUT"
+      - name: Resolve break-check cache key
+        id: break-check-key
+        run: echo "ref=${BREAK_CHECK_PACKAGE##*@}" >> "$GITHUB_OUTPUT"
 
       - name: Restore baseline from cache
         id: baseline-cache
         uses: actions/cache/restore@v4
         with:
           path: .api-snapshots-baseline
-          # Keyed on the snapi commit too, so bumping snapi misses the stale
-          # baseline and the worktree fallback below rebuilds it with the same
-          # version the PR runs (see publish-baseline for the rationale).
-          key: snapi-baseline-${{ steps.snapi-key.outputs.ref }}-${{ github.event.pull_request.base.sha }}
+          # Keyed on the break-check commit too, so bumping break-check misses the
+          # stale baseline and the worktree fallback below rebuilds it with the
+          # same version the PR runs (see publish-baseline for the rationale).
+          key: break-check-baseline-${{ steps.break-check-key.outputs.ref }}-${{ github.event.pull_request.base.sha }}
 
       - name: Build current declarations
-        run: pnpm turbo build:declarations $TURBO_ARGS $SNAPI_FILTERS
+        run: pnpm turbo build:declarations $TURBO_ARGS $BREAK_CHECK_FILTERS
 
       - name: Fetch base commit
         if: steps.baseline-cache.outputs.cache-matched-key == ''
@@ -168,43 +172,44 @@ jobs:
         if: steps.baseline-cache.outputs.cache-matched-key == ''
         run: |
           mkdir -p .worktrees
-          git worktree add --detach .worktrees/snapi-baseline "${{ github.event.pull_request.base.sha }}"
-          # Snapshot the base ref with the coverage it actually had. Only seed
-          # the config when the base predates snapi entirely; otherwise packages
+          git worktree add --detach .worktrees/break-check-baseline "${{ github.event.pull_request.base.sha }}"
+          # Snapshot the base ref with the coverage it actually had. Only seed the
+          # config when the base predates break-check entirely; otherwise packages
           # newly added to coverage in this PR get diffed against a baseline that
           # never tracked them (every export reads as an addition), and the base
           # ref may not even build their declarations yet.
-          if [ ! -f .worktrees/snapi-baseline/snapi.config.json ]; then
-            cp snapi.config.json .worktrees/snapi-baseline/snapi.config.json
+          if [ ! -f .worktrees/break-check-baseline/break-check.config.json ]; then
+            cp break-check.config.json .worktrees/break-check-baseline/break-check.config.json
           fi
 
       - name: Install baseline dependencies
         if: steps.baseline-cache.outputs.cache-matched-key == ''
-        working-directory: .worktrees/snapi-baseline
+        working-directory: .worktrees/break-check-baseline
         run: pnpm install --frozen-lockfile
 
       - name: Build baseline declarations
         if: steps.baseline-cache.outputs.cache-matched-key == ''
-        working-directory: .worktrees/snapi-baseline
+        working-directory: .worktrees/break-check-baseline
         # --continue past per-package failures and don't fail the step: the base
         # ref may not build declarations for packages that only gained
-        # build:declarations support in this PR. snapi snapshots only the base's
-        # own coverage below, so a partial build is fine; a needed package that
-        # fails to build still surfaces when `snapi snapshot` finds no .d.ts.
-        run: pnpm turbo build:declarations $TURBO_ARGS $SNAPI_FILTERS --continue || true
+        # build:declarations support in this PR. break-check snapshots only the
+        # base's own coverage below, so a partial build is fine; a needed package
+        # that fails to build still surfaces when `break-check snapshot` finds no
+        # .d.ts.
+        run: pnpm turbo build:declarations $TURBO_ARGS $BREAK_CHECK_FILTERS --continue || true
 
       - name: Generate baseline API snapshots
         if: steps.baseline-cache.outputs.cache-matched-key == ''
-        working-directory: .worktrees/snapi-baseline
+        working-directory: .worktrees/break-check-baseline
         run: |
-          pnpm dlx --package "$SNAPI_PACKAGE" snapi snapshot \
+          pnpm dlx --package "$BREAK_CHECK_PACKAGE" break-check snapshot \
             --output "$GITHUB_WORKSPACE/.api-snapshots-baseline"
 
       - name: Detect API changes
         env:
-          SNAPI_ANTHROPIC_API_KEY: ${{ secrets.SNAPI_ANTHROPIC_API_KEY }}
+          BREAK_CHECK_ANTHROPIC_API_KEY: ${{ secrets.BREAK_CHECK_ANTHROPIC_API_KEY }}
         run: |
-          pnpm dlx --package "$SNAPI_PACKAGE" snapi detect \
+          pnpm dlx --package "$BREAK_CHECK_PACKAGE" break-check detect \
             --baseline .api-snapshots-baseline \
             --output api-changes-report.md \
             --fail-on-breaking
@@ -218,7 +223,7 @@ jobs:
           if-no-files-found: ignore
           retention-days: 5
 
-      - name: Post snapi report
+      - name: Post break-check report
         if: always()
         uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         env:
@@ -228,16 +233,16 @@ jobs:
             const fs = require('fs');
             const reportPath = 'api-changes-report.md';
             if (!fs.existsSync(reportPath)) {
-              core.info('No snapi report found; skipping comment.');
+              core.info('No break-check report found; skipping comment.');
               return;
             }
 
-            const marker = '<!-- snapi-report -->';
+            const marker = '<!-- break-check-report -->';
             const report = fs.readFileSync(reportPath, 'utf-8');
 
             let body;
             if (report.includes('## No API Changes Detected')) {
-              body = `${marker}\n**Snapi**: no API changes detected across the tracked packages.`;
+              body = `${marker}\n**Break Check**: no API changes detected across the tracked packages.`;
             } else {
               // GitHub rejects comment bodies over 65536 chars. Read the report
               // from disk and post via the API so we never hit an arg-length
