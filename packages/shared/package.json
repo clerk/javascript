@@ -120,8 +120,7 @@
     }
   },
   "files": [
-    "dist",
-    "scripts"
+    "dist"
   ],
   "scripts": {
     "build": "tsdown",
@@ -131,7 +130,6 @@
     "dev:pub": "pnpm dev -- --env.publish",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
-    "postinstall": "node ./scripts/postinstall.mjs",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16",
     "lint:publint": "publint",
@@ -143,8 +141,7 @@
     "@tanstack/query-core": "catalog:repo",
     "dequal": "2.0.3",
     "glob-to-regexp": "0.4.1",
-    "js-cookie": "3.0.7",
-    "std-env": "^3.9.0"
+    "js-cookie": "3.0.7"
   },
   "devDependencies": {
     "@base-org/account": "catalog:module-manager",
