@@ -52,6 +52,55 @@ describe('stripPrivateDataFromObject', () => {
     expect((result.organization as any)._raw.public_metadata).toEqual({ tier: 'enterprise' });
   });
 
+  it('recursively strips private_metadata nested under `_raw.organization_memberships`', () => {
+    const user = User.fromJSON({
+      id: 'user_1',
+      object: 'user',
+      private_metadata: { ssn: '000-00-0000' },
+      public_metadata: { plan: 'pro' },
+      email_addresses: [],
+      phone_numbers: [],
+      web3_wallets: [],
+      external_accounts: [],
+      enterprise_accounts: [],
+      organization_memberships: [
+        {
+          id: 'orgmem_1',
+          object: 'organization_membership',
+          role: 'admin',
+          permissions: [],
+          private_metadata: { membershipSecret: 'mem_secret' },
+          public_metadata: { seat: 'a' },
+          created_at: 1,
+          updated_at: 1,
+          organization: {
+            id: 'org_1',
+            object: 'organization',
+            name: 'Acme',
+            slug: 'acme',
+            private_metadata: { billingCustomerId: 'cus_secret' },
+            public_metadata: { tier: 'enterprise' },
+          },
+        },
+      ],
+    } as any);
+
+    const result = stripPrivateDataFromObject({ user });
+
+    const serialized = JSON.stringify(result);
+    expect(serialized).not.toContain('000-00-0000');
+    expect(serialized).not.toContain('mem_secret');
+    expect(serialized).not.toContain('cus_secret');
+
+    const membership = (result.user as any)._raw.organization_memberships[0];
+    expect(membership).not.toHaveProperty('private_metadata');
+    expect(membership.organization).not.toHaveProperty('private_metadata');
+
+    // Public metadata throughout the nested payload is intentionally preserved.
+    expect(membership.public_metadata).toEqual({ seat: 'a' });
+    expect(membership.organization.public_metadata).toEqual({ tier: 'enterprise' });
+  });
+
   it('does not mutate the original resource `raw` payload', () => {
     const user = User.fromJSON({
       id: 'user_1',

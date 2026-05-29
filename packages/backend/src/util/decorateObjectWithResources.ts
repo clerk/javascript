@@ -63,14 +63,36 @@ function prunePrivateMetadata(resource?: { private_metadata?: any; privateMetada
     }
     // Backend resources (`User`, `Organization`) retain the full Backend API
     // payload on the enumerable `_raw` property, which still contains
-    // `private_metadata`. Strip it from a shallow clone so the original
-    // resource (and its `raw` getter) is left untouched.
+    // `private_metadata`. The payload is also nested (e.g. a `User`'s
+    // `organization_memberships[*]` each carry their own `private_metadata`
+    // and a nested `organization.private_metadata`), so redact recursively on
+    // a deep clone — leaving the original resource (and its `raw` getter)
+    // untouched.
     if ('_raw' in resource && resource['_raw']) {
-      const raw = { ...resource['_raw'] };
-      delete raw['private_metadata'];
-      resource['_raw'] = raw;
+      resource['_raw'] = redactPrivateMetadataDeep(resource['_raw']);
     }
   }
 
   return resource;
+}
+
+/**
+ * Returns a deep clone of `value` with every `private_metadata` / `privateMetadata`
+ * property removed at any depth.
+ */
+function redactPrivateMetadataDeep(value: any): any {
+  if (Array.isArray(value)) {
+    return value.map(redactPrivateMetadataDeep);
+  }
+  if (value && typeof value === 'object') {
+    const clone: Record<string, any> = {};
+    for (const key of Object.keys(value)) {
+      if (key === 'private_metadata' || key === 'privateMetadata') {
+        continue;
+      }
+      clone[key] = redactPrivateMetadataDeep(value[key]);
+    }
+    return clone;
+  }
+  return value;
 }
