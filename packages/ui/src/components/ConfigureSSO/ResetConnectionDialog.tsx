@@ -25,6 +25,33 @@ type ResetConnectionDialogProps = {
   confirmationValue: string;
 };
 
+export const ResetConnectionDialog = (props: ResetConnectionDialogProps): JSX.Element | null => {
+  const { contentRef } = useConfigureSSO();
+
+  if (!props.isOpen) {
+    return null;
+  }
+
+  return (
+    <Modal
+      handleClose={props.onClose}
+      canCloseModal={false}
+      portalRoot={contentRef}
+      containerSx={t => ({
+        alignItems: 'center',
+        position: 'absolute',
+        inset: 0,
+        width: 'auto',
+        height: 'auto',
+        backgroundColor: 'inherit',
+        backdropFilter: `blur(${t.sizes.$2})`,
+      })}
+    >
+      <ResetConnectionDialogContent {...props} />
+    </Modal>
+  );
+};
+
 const ResetConnectionDialogContent = withCardStateProvider((props: ResetConnectionDialogProps) => {
   const { onClose, confirmationValue } = props;
   const card = useCardState();
@@ -60,8 +87,8 @@ const ResetConnectionDialogContent = withCardStateProvider((props: ResetConnecti
   };
 
   return (
-    <Card.Root>
-      <Card.Content>
+    <Card.Root sx={t => ({ borderRadius: t.radii.$md })}>
+      <Card.Content sx={t => ({ textAlign: 'start', padding: t.sizes.$5 })}>
         <FormContainer
           headerTitle={localizationKeys('configureSSO.resetConnectionDialog.title')}
           headerSubtitle={localizationKeys('configureSSO.resetConnectionDialog.subtitle')}
@@ -95,28 +122,3 @@ const ResetConnectionDialogContent = withCardStateProvider((props: ResetConnecti
     </Card.Root>
   );
 });
-
-export const ResetConnectionDialog = (props: ResetConnectionDialogProps): JSX.Element | null => {
-  const { contentRef } = useConfigureSSO();
-
-  if (!props.isOpen) {
-    return null;
-  }
-
-  return (
-    <Modal
-      handleClose={props.onClose}
-      canCloseModal={false}
-      portalRoot={contentRef}
-      containerSx={{
-        alignItems: 'center',
-        position: 'absolute',
-        inset: 0,
-        width: 'auto',
-        height: 'auto',
-      }}
-    >
-      <ResetConnectionDialogContent {...props} />
-    </Modal>
-  );
-};

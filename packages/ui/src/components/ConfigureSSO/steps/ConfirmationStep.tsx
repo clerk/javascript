@@ -243,6 +243,7 @@ const ResetConnectionRow = (): JSX.Element => {
           onClick={() => setIsOpen(true)}
         />
       </ProfileSection.Item>
+
       <ResetConnectionDialog
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
