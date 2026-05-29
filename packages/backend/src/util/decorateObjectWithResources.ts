@@ -52,7 +52,7 @@ export function stripPrivateDataFromObject<T extends WithResources<object>>(auth
   return { ...authObject, user, organization };
 }
 
-function prunePrivateMetadata(resource?: { private_metadata: any } | { privateMetadata: any } | null) {
+function prunePrivateMetadata(resource?: { private_metadata?: any; privateMetadata?: any; _raw?: any } | null) {
   // Delete sensitive private metadata from resource before rendering in SSR
   if (resource) {
     if ('privateMetadata' in resource) {
@@ -60,6 +60,15 @@ function prunePrivateMetadata(resource?: { private_metadata: any } | { privateMe
     }
     if ('private_metadata' in resource) {
       delete resource['private_metadata'];
+    }
+    // Backend resources (`User`, `Organization`) retain the full Backend API
+    // payload on the enumerable `_raw` property, which still contains
+    // `private_metadata`. Strip it from a shallow clone so the original
+    // resource (and its `raw` getter) is left untouched.
+    if ('_raw' in resource && resource['_raw']) {
+      const raw = { ...resource['_raw'] };
+      delete raw['private_metadata'];
+      resource['_raw'] = raw;
     }
   }
 
