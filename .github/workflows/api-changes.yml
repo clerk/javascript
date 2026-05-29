@@ -134,6 +134,13 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
+          # Pin the "current" side of the diff to the PR head, not the
+          # refs/pull/N/merge ref checkout resolves by default. The merge ref is
+          # the head merged into the moving tip of the base branch, so once main
+          # advances it absorbs unrelated changes and break-check reports them as
+          # this PR's own (clerk/break-check#32). The baseline is already pinned
+          # to base.sha (cache key + worktree fallback below).
+          ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 100
           fetch-tags: false
           filter: 'blob:none'
