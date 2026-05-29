@@ -95,12 +95,12 @@ export interface ClientResource extends ClerkResource {
   updatedAt: Date | null;
   /**
    * Sends a CAPTCHA token to the client.
-   * @internal
+   * @hidden
    */
   __internal_sendCaptchaToken: (params: unknown) => Promise<ClientResource>;
   /**
    * Converts the client to a snapshot.
-   * @internal
+   * @hidden
    */
   __internal_toSnapshot: () => ClientJSONSnapshot;
 }
