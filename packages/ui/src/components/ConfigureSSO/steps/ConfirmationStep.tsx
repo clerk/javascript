@@ -38,11 +38,13 @@ export const ConfirmationStep = (): JSX.Element => {
           }
         />
 
-        <Step.Body sx={t => ({ paddingInline: t.space.$6, paddingBlock: t.space.$5, gap: t.space.$5 })}>
-          <EnableSsoSection />
-          <DomainSection />
-          <ConfigurationDetailsSection />
-          <ResetConnectionSection />
+        <Step.Body>
+          <Step.Section>
+            <EnableSsoSection />
+            <DomainSection />
+            <ConfigurationDetailsSection />
+            <ResetConnectionSection />
+          </Step.Section>
         </Step.Body>
 
         <Step.Footer>
@@ -103,8 +105,9 @@ const EnableSsoSection = (): JSX.Element => {
 
   return (
     <ProfileSection.Root
-      title={localizationKeys('configureSSO.confirmation.enableSection.title')}
       id='enableSso'
+      title={localizationKeys('configureSSO.confirmation.enableSection.title')}
+      sx={{ borderTopWidth: 0, paddingTop: 0 }}
     >
       <Switch
         isChecked={isChecked}
@@ -127,8 +130,8 @@ const DomainSection = (): JSX.Element | null => {
 
   return (
     <ProfileSection.Root
-      title={localizationKeys('configureSSO.confirmation.domainSection.title')}
       id='ssoDomain'
+      title={localizationKeys('configureSSO.confirmation.domainSection.title')}
       sx={{ borderTopWidth: 0, paddingTop: 0 }}
     >
       <Link
@@ -160,8 +163,8 @@ const ConfigurationDetailsSection = (): JSX.Element => {
 
   return (
     <ProfileSection.Root
-      title={localizationKeys('configureSSO.confirmation.configurationSection.title')}
       id='ssoConfiguration'
+      title={localizationKeys('configureSSO.confirmation.configurationSection.title')}
       centered={false}
     >
       <Grid
@@ -213,17 +216,17 @@ const ConfigurationDetailsSection = (): JSX.Element => {
         >
           {samlConnection?.idpCertificate}
         </Text>
-      </Grid>
 
-      <Flex justify='start'>
-        <Button
-          elementDescriptor={descriptors.configureSSOConfirmationReconfigureButton}
-          variant='outline'
-          size='sm'
-          onClick={() => goToStep('configure')}
-          localizationKey={localizationKeys('configureSSO.confirmation.configurationSection.configureAgainLink')}
-        />
-      </Flex>
+        <Flex justify='start'>
+          <Button
+            elementDescriptor={descriptors.configureSSOConfirmationReconfigureButton}
+            variant='outline'
+            size='sm'
+            onClick={() => goToStep('configure')}
+            localizationKey={localizationKeys('configureSSO.confirmation.configurationSection.configureAgainLink')}
+          />
+        </Flex>
+      </Grid>
     </ProfileSection.Root>
   );
 };
