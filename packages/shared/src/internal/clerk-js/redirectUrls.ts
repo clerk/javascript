@@ -1,7 +1,7 @@
 import { applyFunctionToObj, filterProps, removeUndefined } from '../../object';
 import type { ClerkOptions, RedirectOptions } from '../../types';
 import { camelToSnake } from '../../underscore';
-import { isAllowedRedirect, relativeToAbsoluteUrl } from './url';
+import { isAllowedRedirect, isFAPIInitiatedFlowPath, relativeToAbsoluteUrl } from './url';
 
 type ComponentMode = 'modal' | 'mounted';
 
@@ -98,6 +98,15 @@ export class RedirectUrls {
   #getRedirectUrl(prefix: 'signIn' | 'signUp') {
     const forceKey = `${prefix}ForceRedirectUrl` as const;
     const fallbackKey = `${prefix}FallbackRedirectUrl` as const;
+
+    // FAPI-initiated flow redirect URLs (e.g. /oauth/authorize/continue) must
+    // take highest priority to ensure the IDP authorization flow completes.
+    // Without this, a configured signInForceRedirectUrl would override the
+    // redirect_url needed to resume the OAuth IDP flow after sign-in.
+    const fapiRedirectUrl = this.fromSearchParams.redirectUrl;
+    if (fapiRedirectUrl && isFAPIInitiatedFlowPath(fapiRedirectUrl)) {
+      return fapiRedirectUrl;
+    }
 
     let result;
     // Prioritize forceRedirectUrl
