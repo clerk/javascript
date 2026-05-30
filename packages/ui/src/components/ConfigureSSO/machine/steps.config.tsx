@@ -1,0 +1,104 @@
+import type React from 'react';
+
+import type { LocalizationKey } from '@/customizables';
+
+import type { WizardFacts } from '../data/deriveFacts';
+import { ConfigureStep, ConfirmationStep, SelectProviderStep, TestConfigurationStep, VerifyDomainStep } from '../steps';
+import type { WizardStepId } from '../types';
+import * as guards from './guards';
+import type { SubmitCtx, SubmitResult } from './submit';
+import { submitSelectProvider } from './submit';
+
+/**
+ * Static description of a single wizard step. The array of these is the single
+ * source of truth the reducer, breadcrumb, and footer driver all read from —
+ * replacing the JSX-order-as-truth shape in `ConfigureSSO.tsx`.
+ *
+ * This config references each step's Body component but never renders it; the
+ * machine stays pure and the wiring sub-item is responsible for mounting bodies.
+ */
+export interface StepConfig {
+  /**
+   * Stable identifier, matching {@link WizardStepId}.
+   */
+  id: WizardStepId;
+  /**
+   * Breadcrumb label. Plain string today (no localization keys exist for the
+   * step labels yet); typed to also accept a `LocalizationKey` once they do.
+   */
+  label?: LocalizationKey | string;
+  /**
+   * The step's body component. Referenced, never rendered, by the machine.
+   */
+  Body: React.ComponentType;
+  /**
+   * Whether the step participates in the flow at all for the given facts. A
+   * disabled step is filtered out of the enabled-steps list entirely (the
+   * reducer never lands on it, NEXT/BACK skip past it, GOTO is a no-op).
+   */
+  enabled?: (f: WizardFacts) => boolean;
+  /**
+   * Whether the step is already satisfied. NEXT skips fulfilled steps; GOTO
+   * ignores this and jumps regardless.
+   */
+  fulfilled?: (f: WizardFacts) => boolean;
+  /**
+   * Whether the step is a terminal/dead-end state (e.g. the domain is taken by
+   * another org) for the given facts.
+   */
+  terminal?: (f: WizardFacts) => boolean;
+  /**
+   * Optional submit handler invoked by the footer driver when the step's
+   * primary action fires.
+   */
+  onSubmit?: (ctx: SubmitCtx) => Promise<SubmitResult>;
+  /**
+   * Whether the step exposes a "reset" affordance back to provider selection.
+   */
+  showReset?: boolean;
+}
+
+/**
+ * The ordered, single source of truth for the ConfigureSSO wizard's steps.
+ *
+ * Order here is the canonical flow order. `enabled`/`fulfilled`/`terminal` are
+ * evaluated against {@link WizardFacts} by the reducer; bodies are mounted by
+ * the wiring sub-item.
+ */
+export const STEPS: readonly StepConfig[] = [
+  {
+    id: 'select-provider',
+    Body: SelectProviderStep,
+    // Only a step while there's no connection yet — creating one removes it
+    // from the flow so navigation can never bubble back into provider choice.
+    enabled: f => !f.hasConnection,
+    onSubmit: submitSelectProvider,
+  },
+  {
+    id: 'verify-domain',
+    label: 'Verify domain',
+    Body: VerifyDomainStep,
+    fulfilled: guards.verifyDomainFulfilled,
+    terminal: f => f.isDomainTakenByOtherOrg,
+    showReset: true,
+  },
+  {
+    id: 'configure',
+    label: 'Configure',
+    Body: ConfigureStep,
+    fulfilled: guards.configureFulfilled,
+    showReset: true,
+  },
+  {
+    id: 'test',
+    label: 'Test',
+    Body: TestConfigurationStep,
+    fulfilled: guards.testFulfilled,
+    showReset: true,
+  },
+  {
+    id: 'confirmation',
+    label: 'Confirmation',
+    Body: ConfirmationStep,
+  },
+] as const;
