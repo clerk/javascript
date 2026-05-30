@@ -53,12 +53,14 @@ const PROVIDER_GROUPS: ReadonlyArray<{
 
 export const SelectProviderStep = (): JSX.Element => {
   const { goToStep } = useWizard();
-  const { provider, setProvider, createEnterpriseConnection } = useConfigureSSO();
+  const { provider, setProvider, createEnterpriseConnection, facts } = useConfigureSSO();
 
   // Re-hydrate from context so users returning from `verify-domain`
   // (after picking a provider but needing to verify their email first)
   // don't have to re-click their provider.
   const [selected, setSelected] = React.useState<ProviderType | null>(provider ?? null);
+  // `useUser` stays for `primaryEmailAddress`, still needed as a mutation input
+  // to `createEnterpriseConnection`; the verified-check reads derived facts.
   const { user } = useUser();
   const card = useCardState();
 
@@ -70,9 +72,8 @@ export const SelectProviderStep = (): JSX.Element => {
     setProvider(selected);
 
     const primaryEmailAddress = user?.primaryEmailAddress;
-    const hasVerifiedPrimaryEmailAddress = primaryEmailAddress?.verification.status === 'verified';
 
-    if (!primaryEmailAddress || !hasVerifiedPrimaryEmailAddress) {
+    if (!primaryEmailAddress || !facts.isPrimaryEmailVerified) {
       void goToStep('verify-domain');
       return;
     }

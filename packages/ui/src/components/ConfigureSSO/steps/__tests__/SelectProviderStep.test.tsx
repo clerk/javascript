@@ -30,16 +30,6 @@ vi.mock('../../elements/Wizard', () => ({
 const setProvider = vi.fn();
 const createEnterpriseConnection = vi.fn();
 
-vi.mock('../../ConfigureSSOContext', () => ({
-  useConfigureSSO: () => ({
-    enterpriseConnection: undefined,
-    provider: undefined,
-    setProvider,
-    createEnterpriseConnection,
-    initialStepId: 'select-provider',
-  }),
-}));
-
 const userMockState = vi.hoisted(() => ({
   current: {
     primaryEmailAddress: {
@@ -52,6 +42,21 @@ const userMockState = vi.hoisted(() => ({
       verification: { status: 'verified' | 'unverified' };
     };
   } | null,
+}));
+
+vi.mock('../../ConfigureSSOContext', () => ({
+  useConfigureSSO: () => ({
+    enterpriseConnection: undefined,
+    provider: undefined,
+    setProvider,
+    createEnterpriseConnection,
+    initialStepId: 'select-provider',
+    // Mirrors `deriveFacts`: the verified-check the step branches on now reads
+    // derived facts instead of re-deriving from `useUser`.
+    facts: {
+      isPrimaryEmailVerified: userMockState.current?.primaryEmailAddress?.verification.status === 'verified',
+    },
+  }),
 }));
 
 vi.mock('@clerk/shared/react/index', async importOriginal => {

@@ -49,6 +49,17 @@ export interface ConfigureSSOData {
    * doesn't belong to the org they're currently configuring
    */
   isDomainTakenByOtherOrg: boolean;
+  /**
+   * The single set of derived booleans the wizard makes decisions from,
+   * computed once upstream by `useConfigureSSOData`. Steps read display gates
+   * from here instead of re-deriving from `useUser`/`useSession`.
+   */
+  facts: WizardFacts;
+  /**
+   * Re-runs the successful-test-run probe so `facts.hasSuccessfulTestRun`
+   * reflects a run that just completed.
+   */
+  refreshTestRuns: () => Promise<unknown>;
 }
 
 interface ConfigureSSOProviderProps {
@@ -63,6 +74,10 @@ interface ConfigureSSOProviderProps {
    * to the active organization.
    */
   session: SignedInSessionResource | null | undefined;
+  /**
+   * Re-runs the successful-test-run probe owned by `useConfigureSSOData`.
+   */
+  refreshTestRuns: () => Promise<unknown>;
   contentRef: React.RefObject<HTMLDivElement>;
   createEnterpriseConnection: UseUserEnterpriseConnectionsReturn['createEnterpriseConnection'];
   updateEnterpriseConnection: UseUserEnterpriseConnectionsReturn['updateEnterpriseConnection'];
@@ -76,6 +91,7 @@ export const ConfigureSSOProvider = ({
   enterpriseConnection,
   facts,
   session,
+  refreshTestRuns,
   contentRef,
   createEnterpriseConnection: createEnterpriseConnectionApi,
   updateEnterpriseConnection,
@@ -122,6 +138,8 @@ export const ConfigureSSOProvider = ({
       initialStepId,
       enterpriseConnection,
       isDomainTakenByOtherOrg,
+      facts,
+      refreshTestRuns,
       createEnterpriseConnection,
       updateEnterpriseConnection,
       deleteEnterpriseConnection,
@@ -135,6 +153,8 @@ export const ConfigureSSOProvider = ({
       updateEnterpriseConnection,
       deleteEnterpriseConnection,
       isDomainTakenByOtherOrg,
+      facts,
+      refreshTestRuns,
     ],
   );
 

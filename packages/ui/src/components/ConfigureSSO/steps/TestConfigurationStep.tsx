@@ -47,7 +47,7 @@ const TEST_RESULTS_TABLE_COLUMN_COUNT = 3;
 
 export const TestConfigurationStep = (): JSX.Element => {
   const { goNext, goPrev } = useWizard();
-  const { enterpriseConnection } = useConfigureSSO();
+  const { enterpriseConnection, facts, refreshTestRuns } = useConfigureSSO();
   const card = useCardState();
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -71,6 +71,9 @@ export const TestConfigurationStep = (): JSX.Element => {
   const handleTestRunCreated = () => {
     setCurrentPage(1);
     void revalidateTestRuns();
+    // Keep the centralized success probe (`facts.hasSuccessfulTestRun`) in sync
+    // with the run that just completed so the Continue gate reflects it.
+    void refreshTestRuns();
   };
 
   return (
@@ -179,7 +182,7 @@ export const TestConfigurationStep = (): JSX.Element => {
         <Step.Footer>
           <Step.Footer.Previous onClick={() => goPrev()} />
           <ContinueTestSsoStepButton
-            enterpriseConnectionId={enterpriseConnection?.id}
+            hasSuccessfulTestRun={facts.hasSuccessfulTestRun}
             onContinue={() => void goNext()}
           />
         </Step.Footer>
@@ -189,52 +192,28 @@ export const TestConfigurationStep = (): JSX.Element => {
 };
 
 type ContinueTestSsoStepButtonProps = {
-  enterpriseConnectionId: string | undefined;
+  hasSuccessfulTestRun: boolean;
   onContinue: () => void;
 };
 
 const ContinueTestSsoStepButton = ({
-  enterpriseConnectionId,
+  hasSuccessfulTestRun,
   onContinue,
 }: ContinueTestSsoStepButtonProps): JSX.Element => {
-  const { user } = useUser();
   const { t } = useLocalizations();
   const card = useCardState();
-  const [isValidating, setIsValidating] = useState(false);
 
-  const handleContinue = async () => {
-    if (!user || !enterpriseConnectionId) {
-      return;
-    }
-
-    setIsValidating(true);
+  const handleContinue = () => {
     card.setError(undefined);
 
-    try {
-      const result = await user.getEnterpriseConnectionTestRuns(enterpriseConnectionId, {
-        initialPage: 1,
-        pageSize: 1,
-        status: ['success'],
-      });
-
-      if (result.data.length > 0) {
-        onContinue();
-      } else {
-        card.setError(t(localizationKeys('configureSSO.testConfigurationStep.error__noSuccessfulTestRun')));
-      }
-    } catch (err) {
-      handleError(err as Error, [], card.setError);
-    } finally {
-      setIsValidating(false);
+    if (hasSuccessfulTestRun) {
+      onContinue();
+    } else {
+      card.setError(t(localizationKeys('configureSSO.testConfigurationStep.error__noSuccessfulTestRun')));
     }
   };
 
-  return (
-    <Step.Footer.Continue
-      onClick={() => void handleContinue()}
-      isLoading={isValidating}
-    />
-  );
+  return <Step.Footer.Continue onClick={handleContinue} />;
 };
 
 type TestResultsTableProps = {

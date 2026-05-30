@@ -52,6 +52,7 @@ export const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObjec
     session,
     enterpriseConnection,
     facts,
+    refreshTestRuns,
     createEnterpriseConnection,
     updateEnterpriseConnection,
     deleteEnterpriseConnection,
@@ -68,6 +69,7 @@ export const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObjec
       <ConfigureSSOProvider
         facts={facts}
         session={session}
+        refreshTestRuns={refreshTestRuns}
         enterpriseConnection={enterpriseConnection}
         contentRef={contentRef}
         createEnterpriseConnection={createEnterpriseConnection}

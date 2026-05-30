@@ -1,4 +1,4 @@
-import { useReverification, useSession, useUser } from '@clerk/shared/react';
+import { useReverification, useUser } from '@clerk/shared/react';
 import type { EmailAddressResource } from '@clerk/shared/types';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -26,8 +26,7 @@ import { InnerStepCounter } from '../elements/Wizard/InnerStepCounter';
 
 export const VerifyDomainStep = (): JSX.Element => {
   const { user } = useUser();
-  const { session } = useSession();
-  const { enterpriseConnection } = useConfigureSSO();
+  const { enterpriseConnection, facts } = useConfigureSSO();
   const { t } = useLocalizations();
   const { goNext: outerGoNext } = useWizard();
 
@@ -37,10 +36,7 @@ export const VerifyDomainStep = (): JSX.Element => {
 
   // The user's domain is already wired to an enterprise connection that
   // doesn't belong to the org they're currently configuring
-  const activeOrganizationId = session?.lastActiveOrganizationId ?? null;
-  const isDomainTakenByOtherOrg = Boolean(
-    isVerified && enterpriseConnection && enterpriseConnection.organizationId !== activeOrganizationId,
-  );
+  const { isDomainTakenByOtherOrg } = facts;
 
   const wasVerifiedOnMountRef = useRef(isVerified);
   const emailAddressRef = useRef<EmailAddressResource | undefined>(emailToVerify);

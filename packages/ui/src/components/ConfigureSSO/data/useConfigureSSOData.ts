@@ -8,7 +8,7 @@ import type {
 } from '@clerk/shared/types';
 
 import { deriveFacts, type WizardFacts } from './deriveFacts';
-import { useTestRunsController } from './useTestRunsController';
+import { type TestRunsController, useTestRunsController } from './useTestRunsController';
 
 export interface ConfigureSSOData {
   /**
@@ -28,6 +28,11 @@ export interface ConfigureSSOData {
    * The single set of derived booleans the wizard makes decisions from.
    */
   facts: WizardFacts;
+  /**
+   * Re-runs the successful-test-run probe so derived facts (e.g.
+   * `facts.hasSuccessfulTestRun`) pick up a run that just completed.
+   */
+  refreshTestRuns: TestRunsController['refresh'];
   /**
    * Raw mutation passed through unchanged (no reverification wrapping yet).
    */
@@ -66,7 +71,11 @@ export const useConfigureSSOData = (): ConfigureSSOData => {
   // Currently FAPI only supports one enterprise connection per user
   const enterpriseConnection = enterpriseConnections?.[0];
 
-  const { hasSuccessfulTestRun, isLoadingInitial: isLoadingTestRuns } = useTestRunsController(enterpriseConnection);
+  const {
+    hasSuccessfulTestRun,
+    isLoadingInitial: isLoadingTestRuns,
+    refresh: refreshTestRuns,
+  } = useTestRunsController(enterpriseConnection);
 
   const { user } = useUser();
   const { session } = useSession();
@@ -87,6 +96,7 @@ export const useConfigureSSOData = (): ConfigureSSOData => {
     organization,
     enterpriseConnection,
     facts,
+    refreshTestRuns,
     createEnterpriseConnection,
     updateEnterpriseConnection,
     deleteEnterpriseConnection,
