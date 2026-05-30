@@ -168,11 +168,15 @@ const ConfigurationDetailsSection = (): JSX.Element => {
       centered={false}
     >
       <ProfileSection.ItemList id='ssoConfiguration'>
-        <ProfileSection.Item id='ssoConfiguration'>
+        <ProfileSection.Item
+          id='ssoConfiguration'
+          sx={t => ({ justifyContent: 'start', gap: t.space.$4 })}
+        >
           <Text
             elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsLabel}
             colorScheme='secondary'
             localizationKey={localizationKeys('configureSSO.confirmation.configurationSection.ssoUrlLabel')}
+            sx={t => ({ width: t.space.$30, flexShrink: 0, whiteSpace: 'nowrap' })}
           />
           <Link
             elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsLink}
@@ -185,31 +189,41 @@ const ConfigurationDetailsSection = (): JSX.Element => {
           </Link>
         </ProfileSection.Item>
 
-        <ProfileSection.Item id='ssoConfiguration'>
+        <ProfileSection.Item
+          id='ssoConfiguration'
+          sx={t => ({ justifyContent: 'start', gap: t.space.$4 })}
+        >
           <Text
             elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsLabel}
             colorScheme='secondary'
             localizationKey={localizationKeys('configureSSO.confirmation.configurationSection.issuerLabel')}
+            sx={t => ({ width: t.space.$30, flexShrink: 0, whiteSpace: 'nowrap' })}
           />
           <Text
             elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsValue}
             truncate
             title={samlConnection?.idpEntityId}
+            sx={{ minWidth: 0 }}
           >
             {samlConnection?.idpEntityId}
           </Text>
         </ProfileSection.Item>
 
-        <ProfileSection.Item id='ssoConfiguration'>
+        <ProfileSection.Item
+          id='ssoConfiguration'
+          sx={t => ({ justifyContent: 'start', gap: t.space.$4 })}
+        >
           <Text
             elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsLabel}
             colorScheme='secondary'
             localizationKey={localizationKeys('configureSSO.confirmation.configurationSection.certificateLabel')}
+            sx={t => ({ width: t.space.$30, flexShrink: 0, whiteSpace: 'nowrap' })}
           />
           <Text
             elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsValue}
             truncate
             title={samlConnection?.idpCertificate}
+            sx={{ minWidth: 0 }}
           >
             {samlConnection?.idpCertificate}
           </Text>
