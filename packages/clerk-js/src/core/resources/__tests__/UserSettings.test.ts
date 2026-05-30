@@ -275,6 +275,56 @@ describe('UserSettings', () => {
     expect(sut.authenticatableSocialStrategies).toEqual(['oauth_facebook']);
   });
 
+  it('returns available attributes (enabled or used for first/second factor)', function () {
+    const sut = new UserSettings({
+      attributes: {
+        email_address: {
+          enabled: true,
+          required: false,
+          used_for_first_factor: true,
+          first_factors: ['email_code'],
+          used_for_second_factor: false,
+          second_factors: [],
+          verifications: ['email_code'],
+          verify_at_sign_up: true,
+        },
+        phone_number: {
+          enabled: false,
+          required: false,
+          used_for_first_factor: true,
+          first_factors: ['phone_code'],
+          used_for_second_factor: false,
+          second_factors: [],
+          verifications: ['phone_code'],
+          verify_at_sign_up: false,
+        },
+        username: {
+          enabled: false,
+          required: false,
+          used_for_first_factor: false,
+          first_factors: [],
+          used_for_second_factor: false,
+          second_factors: [],
+          verifications: [],
+          verify_at_sign_up: false,
+        },
+        password: {
+          enabled: false,
+          required: false,
+          used_for_first_factor: false,
+          first_factors: [],
+          used_for_second_factor: true,
+          second_factors: [],
+          verifications: [],
+          verify_at_sign_up: false,
+        },
+      },
+    } as any as UserSettingsJSON);
+
+    const res = sut.availableAttributes;
+    expect(res).toEqual(['email_address', 'phone_number', 'password']);
+  });
+
   it('returns enabled standard form attributes', function () {
     const sut = new UserSettings({
       attributes: {
