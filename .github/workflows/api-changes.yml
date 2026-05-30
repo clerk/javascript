@@ -181,11 +181,15 @@ jobs:
           mkdir -p .worktrees
           git worktree add --detach .worktrees/break-check-baseline "${{ github.event.pull_request.base.sha }}"
           # Snapshot the base ref with the coverage it actually had. Only seed the
-          # config when the base predates break-check entirely; otherwise packages
+          # config when the base tracks no coverage at all; otherwise packages
           # newly added to coverage in this PR get diffed against a baseline that
-          # never tracked them (every export reads as an addition), and the base
-          # ref may not even build their declarations yet.
-          if [ ! -f .worktrees/break-check-baseline/break-check.config.json ]; then
+          # never tracked them (every export reads as a phantom change against the
+          # base's bundled .d.ts), and the base ref may not even build their
+          # declarations yet. A base from before this rename still names its config
+          # snapi.config.json, so check both names. This reads the base's real
+          # coverage; it is not rename-compat, and goes no-op once main carries
+          # break-check.config.json.
+          if [ ! -f .worktrees/break-check-baseline/break-check.config.json ] && [ ! -f .worktrees/break-check-baseline/snapi.config.json ]; then
             cp break-check.config.json .worktrees/break-check-baseline/break-check.config.json
           fi
 
