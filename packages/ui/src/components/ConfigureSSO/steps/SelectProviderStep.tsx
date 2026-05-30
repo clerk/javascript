@@ -53,14 +53,19 @@ const PROVIDER_GROUPS: ReadonlyArray<{
 
 export const SelectProviderStep = (): JSX.Element => {
   const { goToStep } = useWizard();
-  const { provider, setProvider, createEnterpriseConnection, facts } = useConfigureSSO();
+  const {
+    provider,
+    setProvider,
+    mutations: { createConnection },
+    facts,
+  } = useConfigureSSO();
 
   // Re-hydrate from context so users returning from `verify-domain`
   // (after picking a provider but needing to verify their email first)
   // don't have to re-click their provider.
   const [selected, setSelected] = React.useState<ProviderType | null>(provider ?? null);
   // `useUser` stays for `primaryEmailAddress`, still needed as a mutation input
-  // to `createEnterpriseConnection`; the verified-check reads derived facts.
+  // to `createConnection`; the verified-check reads derived facts.
   const { user } = useUser();
   const card = useCardState();
 
@@ -78,12 +83,18 @@ export const SelectProviderStep = (): JSX.Element => {
       return;
     }
 
-    // Otherwise, set the provider and create the enterprise connection
+    // Otherwise, set the provider and create the enterprise connection. The
+    // create mutation is reverification-wrapped upstream; the card loading
+    // lifecycle stays here so the Continue button reflects the in-flight call.
+    card.setLoading();
+
     try {
-      await createEnterpriseConnection(selected, primaryEmailAddress);
+      await createConnection(selected, primaryEmailAddress);
     } catch (err) {
       handleError(err as Error, [], card.setError);
       return;
+    } finally {
+      card.setIdle();
     }
 
     void goToStep('configure');

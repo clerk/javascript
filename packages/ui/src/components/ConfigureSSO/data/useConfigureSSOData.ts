@@ -1,5 +1,4 @@
 import { __internal_useUserEnterpriseConnections, useOrganization, useSession, useUser } from '@clerk/shared/react';
-import type { UseUserEnterpriseConnectionsReturn } from '@clerk/shared/react/index';
 import type {
   EnterpriseConnectionResource,
   OrganizationResource,
@@ -8,6 +7,7 @@ import type {
 } from '@clerk/shared/types';
 
 import { deriveFacts, type WizardFacts } from './deriveFacts';
+import { type ConfigureSSOMutations, useConfigureSSOMutations } from './useConfigureSSOMutations';
 import { type TestRunsController, useTestRunsController } from './useTestRunsController';
 
 export interface ConfigureSSOData {
@@ -34,17 +34,11 @@ export interface ConfigureSSOData {
    */
   refreshTestRuns: TestRunsController['refresh'];
   /**
-   * Raw mutation passed through unchanged (no reverification wrapping yet).
+   * Every connection-domain mutation the wizard performs, pre-wrapped in
+   * `useReverification`. Bundled into one object so the provider takes a single
+   * prop instead of three raw mutation handles.
    */
-  createEnterpriseConnection: UseUserEnterpriseConnectionsReturn['createEnterpriseConnection'];
-  /**
-   * Raw mutation passed through unchanged (no reverification wrapping yet).
-   */
-  updateEnterpriseConnection: UseUserEnterpriseConnectionsReturn['updateEnterpriseConnection'];
-  /**
-   * Raw mutation passed through unchanged (no reverification wrapping yet).
-   */
-  deleteEnterpriseConnection: UseUserEnterpriseConnectionsReturn['deleteEnterpriseConnection'];
+  mutations: ConfigureSSOMutations;
 }
 
 /**
@@ -57,7 +51,8 @@ export interface ConfigureSSOData {
  *
  * Loading is surfaced as a single `isLoading` flag so the caller can gate the
  * skeleton one level above the provider; the provider never sees a loading
- * state. Mutations are passed through unchanged.
+ * state. Connection mutations are bundled into a single reverification-wrapped
+ * `mutations` object via {@link useConfigureSSOMutations}.
  */
 export const useConfigureSSOData = (): ConfigureSSOData => {
   const {
@@ -89,6 +84,14 @@ export const useConfigureSSOData = (): ConfigureSSOData => {
     organization,
   });
 
+  const mutations = useConfigureSSOMutations({
+    user,
+    session,
+    createEnterpriseConnection,
+    updateEnterpriseConnection,
+    deleteEnterpriseConnection,
+  });
+
   return {
     isLoading: isLoadingEnterpriseConnections || isLoadingTestRuns,
     user,
@@ -97,8 +100,6 @@ export const useConfigureSSOData = (): ConfigureSSOData => {
     enterpriseConnection,
     facts,
     refreshTestRuns,
-    createEnterpriseConnection,
-    updateEnterpriseConnection,
-    deleteEnterpriseConnection,
+    mutations,
   };
 };

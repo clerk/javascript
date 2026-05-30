@@ -49,7 +49,11 @@ vi.mock('../../ConfigureSSOContext', () => ({
     enterpriseConnection: undefined,
     provider: undefined,
     setProvider,
-    createEnterpriseConnection,
+    // The step now reads the reverification-wrapped create mutation off the
+    // bundled `mutations` object instead of a raw `createEnterpriseConnection`.
+    mutations: {
+      createConnection: createEnterpriseConnection,
+    },
     initialStepId: 'select-provider',
     // Mirrors `deriveFacts`: the verified-check the step branches on now reads
     // derived facts instead of re-deriving from `useUser`.

@@ -1,4 +1,4 @@
-import { __internal_useEnterpriseConnectionTestRuns, useUser } from '@clerk/shared/react/index';
+import { __internal_useEnterpriseConnectionTestRuns } from '@clerk/shared/react/index';
 import type { EnterpriseConnectionTestRunResource } from '@clerk/shared/types';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
@@ -696,21 +696,22 @@ type OpenTestUrlButtonProps = {
 };
 
 const OpenTestUrlButton = ({ onTestRunCreated }: OpenTestUrlButtonProps): JSX.Element => {
-  const { user } = useUser();
   const card = useCardState();
-  const { enterpriseConnection } = useConfigureSSO();
+  const {
+    enterpriseConnection,
+    mutations: { createTestRun },
+  } = useConfigureSSO();
 
   const [isCreatingTestRun, setIsCreatingTestRun] = useState(false);
 
   const openTestRun = () => {
-    if (!user || !enterpriseConnection) {
+    if (!enterpriseConnection) {
       return;
     }
 
     setIsCreatingTestRun(true);
 
-    user
-      .createEnterpriseConnectionTestRun(enterpriseConnection.id)
+    createTestRun(enterpriseConnection.id)
       .then(({ url }) => {
         onTestRunCreated?.(url);
         // `noopener,noreferrer` so the IdP can't reach back into the dashboard

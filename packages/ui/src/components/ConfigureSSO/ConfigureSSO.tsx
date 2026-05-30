@@ -47,16 +47,7 @@ const AuthenticatedContent = withCoreUserGuard(() => {
 });
 
 export const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObject<HTMLDivElement> }) => {
-  const {
-    isLoading,
-    session,
-    enterpriseConnection,
-    facts,
-    refreshTestRuns,
-    createEnterpriseConnection,
-    updateEnterpriseConnection,
-    deleteEnterpriseConnection,
-  } = useConfigureSSOData();
+  const { isLoading, enterpriseConnection, facts, refreshTestRuns, mutations } = useConfigureSSOData();
 
   // Gate loading one level above the provider so the context never observes a
   // loading state.
@@ -68,13 +59,10 @@ export const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObjec
     <ConfigureSSOProtect>
       <ConfigureSSOProvider
         facts={facts}
-        session={session}
         refreshTestRuns={refreshTestRuns}
         enterpriseConnection={enterpriseConnection}
         contentRef={contentRef}
-        createEnterpriseConnection={createEnterpriseConnection}
-        updateEnterpriseConnection={updateEnterpriseConnection}
-        deleteEnterpriseConnection={deleteEnterpriseConnection}
+        mutations={mutations}
       >
         <ConfigureSSOSteps />
       </ConfigureSSOProvider>

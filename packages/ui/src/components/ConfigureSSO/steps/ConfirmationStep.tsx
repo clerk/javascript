@@ -1,4 +1,3 @@
-import { useReverification } from '@clerk/shared/react';
 import { useState } from 'react';
 
 import { Badge, Col, descriptors, Flex, Flow, Grid, Link, localizationKeys, Text } from '@/customizables';
@@ -67,12 +66,13 @@ const SsoStatusSection = (): JSX.Element => {
 };
 
 const EnableSsoSection = (): JSX.Element => {
-  const { enterpriseConnection, updateEnterpriseConnection } = useConfigureSSO();
+  const {
+    enterpriseConnection,
+    mutations: { setConnectionActive },
+  } = useConfigureSSO();
   const card = useCardState();
 
   const [isChecked, setIsChecked] = useState(!!enterpriseConnection?.active);
-
-  const updateActive = useReverification((id: string, active: boolean) => updateEnterpriseConnection(id, { active }));
 
   const onActiveChange = async (active: boolean) => {
     if (card.isLoading) {
@@ -86,7 +86,7 @@ const EnableSsoSection = (): JSX.Element => {
     try {
       // Enterprise connection is guaranteed to be set at this point
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const updated = await updateActive(enterpriseConnection!.id, active);
+      const updated = await setConnectionActive(enterpriseConnection!.id, active);
       if (updated) {
         setIsChecked(updated.active);
       }
@@ -229,10 +229,11 @@ const ConfigurationDetailsSection = (): JSX.Element => {
 const ResetConnectionForm = withCardStateProvider((props: FormProps) => {
   const { onReset, onSuccess } = props;
   const card = useCardState();
-  const { enterpriseConnection, deleteEnterpriseConnection } = useConfigureSSO();
+  const {
+    enterpriseConnection,
+    mutations: { deleteConnection },
+  } = useConfigureSSO();
   const { goToStep } = useWizard();
-
-  const deleteConnection = useReverification((id: string) => deleteEnterpriseConnection(id));
 
   const confirmationField = useFormControl('deleteConfirmation', '', {
     type: 'text',

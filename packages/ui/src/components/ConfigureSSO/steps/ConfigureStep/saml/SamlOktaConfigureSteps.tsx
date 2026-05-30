@@ -453,7 +453,10 @@ const SamlOktaAssignUsersStep = (): JSX.Element => {
 const SamlOktaIdentityProviderMetadataStep = (): JSX.Element => {
   const card = useCardState();
   const { goNext, goPrev, isFirstStep } = useWizard();
-  const { enterpriseConnection, updateEnterpriseConnection } = useConfigureSSO();
+  const {
+    enterpriseConnection,
+    mutations: { updateConnection },
+  } = useConfigureSSO();
 
   const controller = useIdentityProviderMetadataForm({
     metadataUrl: {
@@ -495,7 +498,7 @@ const SamlOktaIdentityProviderMetadataStep = (): JSX.Element => {
 
     try {
       const saml = await controller.buildSamlPayload();
-      await updateEnterpriseConnection(enterpriseConnection.id, { saml });
+      await updateConnection(enterpriseConnection.id, { saml });
       void goNext();
     } catch (err) {
       controller.applySubmitError(err, card);
