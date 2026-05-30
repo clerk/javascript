@@ -74,6 +74,7 @@ export const createLongRunningApps = () => {
     { id: 'tanstack.react-start', config: tanstack.reactStart, env: envs.withEmailCodes },
     { id: 'tanstack.react-start.withCustomRoles', config: tanstack.reactStart, env: envs.withCustomRoles },
     { id: 'tanstack.react-start.withEmailCodesProxy', config: tanstack.reactStart, env: envs.withEmailCodesProxy },
+    { id: 'tanstack.react-start.withPasskeys', config: tanstack.reactStart, env: envs.withPasskeys },
     { id: 'tanstack.react-start.withEnterpriseSso', config: tanstack.reactStart, env: envs.withEnterpriseSso },
 
     /**
