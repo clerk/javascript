@@ -1,15 +1,10 @@
 import type { UseUserEnterpriseConnectionsReturn } from '@clerk/shared/react/index';
-import { useSession, useUser } from '@clerk/shared/react/index';
-import type {
-  EmailAddressResource,
-  EnterpriseConnectionResource,
-  SignedInSessionResource,
-  UserResource,
-} from '@clerk/shared/types';
+import type { EmailAddressResource, EnterpriseConnectionResource, SignedInSessionResource } from '@clerk/shared/types';
 import React, { type PropsWithChildren, useCallback } from 'react';
 
 import { useCardState } from '@/elements/contexts';
 
+import type { WizardFacts } from './data/deriveFacts';
 import { deriveInitialStep } from './deriveInitialStep';
 import type { ProviderType, WizardStepId } from './types';
 
@@ -58,7 +53,16 @@ export interface ConfigureSSOData {
 
 interface ConfigureSSOProviderProps {
   enterpriseConnection: EnterpriseConnectionResource | undefined;
-  hasSuccessfulTestRun: boolean;
+  /**
+   * Derived booleans the wizard makes decisions from, computed upstream by
+   * `useConfigureSSOData`. The provider never derives state itself.
+   */
+  facts: WizardFacts;
+  /**
+   * Active session, injected from upstream. Used to scope created connections
+   * to the active organization.
+   */
+  session: SignedInSessionResource | null | undefined;
   contentRef: React.RefObject<HTMLDivElement>;
   createEnterpriseConnection: UseUserEnterpriseConnectionsReturn['createEnterpriseConnection'];
   updateEnterpriseConnection: UseUserEnterpriseConnectionsReturn['updateEnterpriseConnection'];
@@ -70,7 +74,8 @@ ConfigureSSOContext.displayName = 'ConfigureSSOContext';
 
 export const ConfigureSSOProvider = ({
   enterpriseConnection,
-  hasSuccessfulTestRun,
+  facts,
+  session,
   contentRef,
   createEnterpriseConnection: createEnterpriseConnectionApi,
   updateEnterpriseConnection,
@@ -80,11 +85,9 @@ export const ConfigureSSOProvider = ({
   const [provider, setProvider] = React.useState<ProviderType | undefined>(
     enterpriseConnection?.provider as ProviderType,
   );
-  const { session } = useSession();
-  const { user } = useUser();
   const card = useCardState();
 
-  const isDomainTakenByOtherOrg = checkDomainTakenByOtherOrg(user, session, enterpriseConnection);
+  const { isDomainTakenByOtherOrg, hasSuccessfulTestRun } = facts;
   const initialStepId = deriveInitialStep(enterpriseConnection, { isDomainTakenByOtherOrg, hasSuccessfulTestRun });
 
   const createEnterpriseConnection = useCallback(
@@ -144,21 +147,4 @@ export const useConfigureSSO = (): ConfigureSSOData => {
     throw new Error('useConfigureSSO called outside <ConfigureSSOProvider>.');
   }
   return ctx;
-};
-
-/**
- * Determines if the user's domain is already wired to an enterprise connection that
- * doesn't belong to the org they're currently configuring
- */
-const checkDomainTakenByOtherOrg = (
-  user: UserResource | null | undefined,
-  session: SignedInSessionResource | null | undefined,
-  enterpriseConnection: EnterpriseConnectionResource | undefined,
-): boolean => {
-  const emailToVerify =
-    user?.primaryEmailAddress ?? user?.emailAddresses?.find(e => e.verification.status !== 'verified');
-  const isVerified = emailToVerify?.verification.status === 'verified';
-  const activeOrganizationId = session?.lastActiveOrganizationId ?? null;
-
-  return Boolean(isVerified && enterpriseConnection && enterpriseConnection.organizationId !== activeOrganizationId);
 };

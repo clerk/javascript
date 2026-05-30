@@ -1,9 +1,5 @@
-import {
-  __internal_useEnterpriseConnectionTestRuns,
-  __internal_useUserEnterpriseConnections,
-  useSession,
-} from '@clerk/shared/react';
-import type { ConfigureSSOProps, EnterpriseConnectionResource } from '@clerk/shared/types';
+import { useSession } from '@clerk/shared/react';
+import type { ConfigureSSOProps } from '@clerk/shared/types';
 import React from 'react';
 
 import { useProtect } from '@/common';
@@ -18,6 +14,7 @@ import { ConfigureSSOProvider, useConfigureSSO } from './ConfigureSSOContext';
 import { ConfigureSSOHeader } from './ConfigureSSOHeader';
 import { ConfigureSSONavbar } from './ConfigureSSONavbar';
 import { ConfigureSSOSkeleton } from './ConfigureSSOSkeleton';
+import { useConfigureSSOData } from './data/useConfigureSSOData';
 import { ProfileCardFooter, ProfileCardHeader } from './elements/ProfileCard';
 import { Step } from './elements/Step';
 import { useWizard, Wizard } from './elements/Wizard';
@@ -51,18 +48,17 @@ const AuthenticatedContent = withCoreUserGuard(() => {
 
 export const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObject<HTMLDivElement> }) => {
   const {
-    data: enterpriseConnections,
-    isLoading: isLoadingEnterpriseConnections,
+    isLoading,
+    session,
+    enterpriseConnection,
+    facts,
     createEnterpriseConnection,
     updateEnterpriseConnection,
     deleteEnterpriseConnection,
-  } = __internal_useUserEnterpriseConnections({ enabled: true });
-  // Currently FAPI only supports one enterprise connection per user
-  const enterpriseConnection = enterpriseConnections?.[0];
+  } = useConfigureSSOData();
 
-  const { hasSuccessfulTestRun, isLoading: isLoadingTestRuns } = useHasSuccessfulTestRun(enterpriseConnection);
-
-  const isLoading = isLoadingEnterpriseConnections || isLoadingTestRuns;
+  // Gate loading one level above the provider so the context never observes a
+  // loading state.
   if (isLoading) {
     return <ConfigureSSOSkeleton />;
   }
@@ -70,7 +66,8 @@ export const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObjec
   return (
     <ConfigureSSOProtect>
       <ConfigureSSOProvider
-        hasSuccessfulTestRun={hasSuccessfulTestRun}
+        facts={facts}
+        session={session}
         enterpriseConnection={enterpriseConnection}
         contentRef={contentRef}
         createEnterpriseConnection={createEnterpriseConnection}
@@ -214,23 +211,6 @@ const ResetCardErrorOnStepChange = (): null => {
   }, [currentStep?.id, card]);
 
   return null;
-};
-
-/**
- * Fetches a single successful test run for the given connection on mount
- */
-const useHasSuccessfulTestRun = (
-  enterpriseConnection: EnterpriseConnectionResource | undefined,
-): { hasSuccessfulTestRun: boolean; isLoading: boolean } => {
-  const { data: successfulTestRuns, isLoading } = __internal_useEnterpriseConnectionTestRuns({
-    enterpriseConnectionId: enterpriseConnection?.id ?? null,
-    params: { initialPage: 1, pageSize: 1, status: ['success'] },
-  });
-
-  return {
-    hasSuccessfulTestRun: (successfulTestRuns?.length ?? 0) > 0,
-    isLoading,
-  };
 };
 
 export const ConfigureSSO: React.ComponentType<ConfigureSSOProps> = withCardStateProvider(ConfigureSSOInternal);
