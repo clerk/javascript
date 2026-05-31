@@ -514,6 +514,9 @@ importers:
 
   packages/cli-auth:
     dependencies:
+      '@clerk/backend':
+        specifier: workspace:^
+        version: link:../backend
       '@napi-rs/keyring':
         specifier: ^1.1.7
         version: 1.3.0
