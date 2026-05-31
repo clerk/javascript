@@ -36,6 +36,16 @@
         "default": "./dist/index.js"
       }
     },
+    "./server": {
+      "import": {
+        "types": "./dist/server.d.mts",
+        "default": "./dist/server.mjs"
+      },
+      "require": {
+        "types": "./dist/server.d.ts",
+        "default": "./dist/server.js"
+      }
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
@@ -53,9 +63,11 @@
     "lint:attw": "attw --pack . --profile node16",
     "lint:publint": "publint",
     "test": "vitest run",
+    "test:integration": "vitest run --config vitest.integration.config.mts",
     "test:watch": "vitest watch"
   },
   "dependencies": {
+    "@clerk/backend": "workspace:^",
     "@napi-rs/keyring": "^1.1.7",
     "tslib": "catalog:repo"
   },

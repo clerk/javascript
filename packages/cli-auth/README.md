@@ -27,7 +27,12 @@
 
 ## Getting Started
 
-`@clerk/cli-auth` is a set of building blocks for adding [Clerk](https://clerk.com) authentication to Node.js command-line tools. It handles browser-based OAuth sign-in, token storage, refresh, revocation, and credential resolution for API keys and OAuth access tokens.
+`@clerk/cli-auth` is a set of building blocks for adding [Clerk](https://clerk.com) authentication to Node.js command-line tools.
+
+The package ships two entry points:
+
+- **`@clerk/cli-auth`** — sign-in and credential management in your CLI.
+- **`@clerk/cli-auth/server`** — verify CLI requests on your backend.
 
 ### Prerequisites
 
@@ -183,11 +188,124 @@ if (source === 'oauth') {
 }
 ```
 
-### Backend verification
+Server-side verification of API keys and OAuth tokens happens at the `identityEndpoint` you host — see [Server-side](#server-side) for the implementation.
 
-`auth.verifyToken(token)` posts the bearer to your `identityEndpoint` and expects a JSON `Identity` response. The endpoint is responsible for verifying the token server-side (where your Clerk secret key lives) and returning the resolved subject.
+## Server-side
 
-A drop-in route handler that wraps `@clerk/backend`'s verification is shipping as a follow-up. Until then, host your own — verify API keys with `clerk.apiKeys.verify(token)` and OAuth tokens with `clerk.authenticateRequest(request, { acceptsToken: ['oauth_token'] })`, then respond with an `Identity` shape (`{ sub, ... }`).
+The `@clerk/cli-auth/server` entry point provides route handlers that verify incoming tokens against Clerk and return user info. The accepted token types are:
+
+| `accepts` value | Matching token format                                          |
+| --------------- | -------------------------------------------------------------- |
+| `'api_key'`     | `ak_*` Clerk API keys (user, org, or machine subject)          |
+| `'oauth_token'` | `oat_*` opaque OAuth access tokens or `at+jwt` JWTs (RFC 9068) |
+| `'any'`         | Either of the above                                            |
+
+### Bind a Clerk client
+
+Create a single `cliAuth` instance for your application:
+
+```ts
+// lib/clerk-cli.ts
+import { cliAuth } from '@clerk/cli-auth/server';
+import { clerkClient } from '@clerk/nextjs/server';
+
+export const auth = cliAuth({ client: clerkClient });
+```
+
+`client` accepts either a resolved Clerk Backend SDK client or a factory function. Passing `clerkClient` from `@clerk/nextjs/server` directly works — the SDK calls it lazily on the first request and caches the result. You can also pass `clientConfig` (the same options `createClerkClient` accepts) to construct a client from a specific secret key. If neither is provided, the SDK builds one from `CLERK_SECRET_KEY`.
+
+### Token verification
+
+The CLI verifies tokens by calling a backend endpoint you host. Build the endpoint with `handle()` from `@clerk/cli-auth/server`, then point the CLI's `identityEndpoint` at it.
+
+`handle()` returns a route handler. It reads `Authorization: Bearer <token>`, verifies the token with `clerk.authenticateRequest`, and responds with a JSON `Identity` payload.
+
+```ts
+// app/api/cli/identity/route.ts
+import { handle } from '@clerk/cli-auth/server';
+import { auth } from '@/lib/clerk-cli';
+
+export const GET = handle({ auth, accepts: ['api_key', 'oauth_token'] });
+```
+
+Drop it into any framework that uses the Fetch API (Next.js App Router, Hono, Cloudflare Workers, Bun, Deno, SvelteKit, Remix).
+
+### Protecting your own routes
+
+`handle()` is convenient when you just need the identity endpoint. For other routes the CLI calls — fetching data, running commands, etc. — use `auth.verifyTokenFromRequest()` directly inside your handler:
+
+```ts
+// app/api/cli/projects/route.ts
+import { NextResponse } from 'next/server';
+import { auth } from '@/lib/clerk-cli';
+
+export async function GET(request: Request) {
+  const tokenInfo = await auth.verifyTokenFromRequest(request, {
+    accepts: ['api_key', 'oauth_token'],
+  });
+
+  const projects = await db.projects.findMany({
+    where: { ownerId: tokenInfo.subject },
+  });
+
+  return NextResponse.json({ projects });
+}
+```
+
+`verifyTokenFromRequest` throws a `ClerkCliAuthError` if the header is missing, the token is invalid, or its type isn't in `accepts`. The returned `tokenInfo` has `subject`, `type`, `scopes`, and `claims` — use any of them to authorize the request.
+
+### Customize verification and response
+
+Override `verifyToken` or `resolveIdentity` on `handle()` when the defaults aren't enough. Both callbacks receive `clerk` (the bound Clerk Backend SDK client) so you don't need to re-import or re-initialize it.
+
+Add an allowlist or alternate verifier:
+
+```ts
+export const GET = handle({
+  auth,
+  accepts: 'api_key',
+  verifyToken: async ({ token, type, request, clerk }) => {
+    if (!isAllowlisted(token)) {
+      throw new Error('Token not allowlisted');
+    }
+    const apiKey = await clerk.apiKeys.verify(token);
+    return { subject: apiKey.subject, type, scopes: apiKey.scopes };
+  },
+});
+```
+
+Enrich the response with profile and org data:
+
+```ts
+export const GET = handle({
+  auth,
+  accepts: ['api_key', 'oauth_token'],
+  resolveIdentity: async ({ tokenInfo, clerk }) => {
+    if (tokenInfo.type === 'oauth_token') {
+      const user = await clerk.users.getUser(tokenInfo.subject);
+      return {
+        sub: user.id,
+        email: user.primaryEmailAddress?.emailAddress,
+        name: `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim(),
+        picture: user.imageUrl,
+      };
+    }
+    return {
+      sub: tokenInfo.subject,
+      scopes: tokenInfo.scopes,
+      org_id: tokenInfo.claims?.org_id as string | undefined,
+    };
+  },
+});
+```
+
+### Identity
+
+When the SDK resolves a token to its subject, the result is an `Identity`:
+
+```ts
+type Identity = UserIdentity | OrgIdentity | MachineIdentity | ScimIdentity;
+```
 
 ## Configuration reference
 
