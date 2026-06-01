@@ -3,7 +3,7 @@ import UIKit
 
 public class ClerkUserProfileNativeView: UIView {
   private lazy var hostingCoordinator = ClerkNativeHostingCoordinator(containerView: self)
-  private var currentDismissible: Bool = false
+  private var currentDismissible: Bool = true
   private var hasInitialized: Bool = false
   private var didSignOut = false
   private var dismissalEventSent = false
@@ -12,7 +12,7 @@ public class ClerkUserProfileNativeView: UIView {
 
   @objc var isDismissible: NSNumber? {
     didSet {
-      let newDismissible = isDismissible?.boolValue ?? false
+      let newDismissible = isDismissible?.boolValue ?? true
       guard newDismissible != currentDismissible else { return }
       currentDismissible = newDismissible
       if hasInitialized { updateView() }

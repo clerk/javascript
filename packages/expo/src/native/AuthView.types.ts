@@ -34,7 +34,7 @@ export interface AuthViewProps {
    * When `false`, the user must complete authentication to close the view.
    * Use this for flows where authentication is required to proceed.
    *
-   * @default false
+   * @default true
    */
   isDismissible?: boolean;
 
