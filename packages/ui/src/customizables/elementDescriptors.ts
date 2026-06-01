@@ -554,6 +554,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'configureSSOFooter',
   'configureSSOFooterPreviousButton',
   'configureSSOFooterContinueButton',
+  'configureSSOFooterResetButton',
 
   'configureSSOProviderGroup',
   'configureSSOProviderGroupLabel',

@@ -261,6 +261,7 @@ const SamlOktaCreateAppStep = (): JSX.Element => {
       </Step.Body>
 
       <Step.Footer>
+        <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
           isDisabled={isFirstStep}
@@ -399,6 +400,7 @@ const SamlOktaAttributeMappingStep = (): JSX.Element => {
       </Step.Body>
 
       <Step.Footer>
+        <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
           isDisabled={isFirstStep}
@@ -490,6 +492,7 @@ const SamlOktaAssignUsersStep = (): JSX.Element => {
       </Step.Body>
 
       <Step.Footer>
+        <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
           isDisabled={isFirstStep}
@@ -673,6 +676,7 @@ const SamlOktaIdentityProviderMetadataStep = (): JSX.Element => {
       </Step.Body>
 
       <Step.Footer>
+        <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
           isDisabled={isFirstStep || card.isLoading}

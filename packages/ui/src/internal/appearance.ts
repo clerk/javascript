@@ -690,6 +690,7 @@ export type ElementsConfig = {
   configureSSOFooter: WithOptions;
   configureSSOFooterPreviousButton: WithOptions;
   configureSSOFooterContinueButton: WithOptions;
+  configureSSOFooterResetButton: WithOptions;
 
   configureSSOProviderGroup: WithOptions<string>;
   configureSSOProviderGroupLabel: WithOptions<string>;
