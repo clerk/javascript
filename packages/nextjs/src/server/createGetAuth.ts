@@ -94,7 +94,7 @@ export const createSyncGetAuth = ({
  * > If you are using App Router, use the [`auth()` helper](https://clerk.com/docs/reference/nextjs/app-router/auth) instead.
  *
  * @param req - The Next.js request object.
- * @param [options] - An optional object that can be used to configure the behavior of the `getAuth()` function.
+ * @param [options] - An object that can be used to configure the behavior of the `getAuth()` function.
  * @param [options.secretKey] - A string that represents the Secret Key used to sign the session token. If not provided, the Secret Key is retrieved from the environment variable `CLERK_SECRET_KEY`.
  * @returns The `Auth` object. See the [Auth reference](https://clerk.com/docs/reference/backend/types/auth-object) for more information.
  *
