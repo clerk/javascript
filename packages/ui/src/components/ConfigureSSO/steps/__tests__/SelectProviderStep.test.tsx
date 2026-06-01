@@ -119,7 +119,7 @@ describe('SelectProviderStep', () => {
 
     // Emotion serializes sx into stylesheets, so we check both inline + the document's collected styles
     const iconSpans = Array.from(container.querySelectorAll('label span[aria-hidden]'));
-    expect(iconSpans).toHaveLength(3);
+    expect(iconSpans).toHaveLength(4);
 
     const collectedStyles = [
       ...Array.from(document.head.querySelectorAll('style')).map(s => s.textContent ?? ''),
