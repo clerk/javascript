@@ -4,7 +4,7 @@ import UIKit
 public class ClerkAuthNativeView: UIView {
   private lazy var hostingCoordinator = ClerkNativeHostingCoordinator(containerView: self)
   private var currentMode: String = "signInOrUp"
-  private var currentDismissable: Bool = false
+  private var currentDismissible: Bool = false
   private var hasInitialized: Bool = false
   private var didCompleteAuthentication: Bool = false
   private var dismissalEventSent: Bool = false
@@ -20,11 +20,11 @@ public class ClerkAuthNativeView: UIView {
     }
   }
 
-  @objc var isDismissable: NSNumber? {
+  @objc var isDismissible: NSNumber? {
     didSet {
-      let newDismissable = isDismissable?.boolValue ?? false
-      guard newDismissable != currentDismissable else { return }
-      currentDismissable = newDismissable
+      let newDismissible = isDismissible?.boolValue ?? false
+      guard newDismissible != currentDismissible else { return }
+      currentDismissible = newDismissible
       if hasInitialized { updateView() }
     }
   }
@@ -42,7 +42,7 @@ public class ClerkAuthNativeView: UIView {
     if window != nil && !hasInitialized {
       hasInitialized = true
       updateView()
-    } else if window == nil && hasInitialized && currentDismissable && !didCompleteAuthentication && !dismissalEventSent {
+    } else if window == nil && hasInitialized && currentDismissible && !didCompleteAuthentication && !dismissalEventSent {
       dismissalEventSent = true
       sendAuthEvent(type: .dismissed)
     }
@@ -57,7 +57,7 @@ public class ClerkAuthNativeView: UIView {
 
     guard let returnedController = factory.createAuthView(
       mode: currentMode,
-      dismissable: currentDismissable,
+      dismissible: currentDismissible,
       onEvent: { [weak self] event, data in
         if event.isAuthCompletion {
           self?.didCompleteAuthentication = true

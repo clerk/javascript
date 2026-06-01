@@ -35,7 +35,7 @@ import kotlinx.coroutines.launch
 private const val TAG = "ClerkUserProfileExpoView"
 
 class ClerkUserProfileNativeView(context: Context) : FrameLayout(context) {
-  var isDismissable: Boolean = true
+  var isDismissible: Boolean = true
 
   private val activity = ClerkAuthNativeView.findActivity(context)
 
@@ -68,7 +68,7 @@ class ClerkUserProfileNativeView(context: Context) : FrameLayout(context) {
   }
 
   fun setupView() {
-    Log.d(TAG, "setupView - isDismissable: $isDismissable")
+    Log.d(TAG, "setupView - isDismissible: $isDismissible")
 
     composeView.setContent {
       val session by Clerk.sessionFlow.collectAsStateWithLifecycle()

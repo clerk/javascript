@@ -15,9 +15,9 @@ class ClerkUserProfileViewManager : SimpleViewManager<ClerkUserProfileNativeView
     return ClerkUserProfileNativeView(reactContext)
   }
 
-  @ReactProp(name = "isDismissable")
-  override fun setIsDismissable(view: ClerkUserProfileNativeView, isDismissable: Boolean) {
-    view.isDismissable = isDismissable
+  @ReactProp(name = "isDismissible")
+  override fun setIsDismissible(view: ClerkUserProfileNativeView, isDismissible: Boolean) {
+    view.isDismissible = isDismissible
     view.setupView()
   }
 

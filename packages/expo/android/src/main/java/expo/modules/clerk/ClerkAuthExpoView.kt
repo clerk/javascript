@@ -39,7 +39,7 @@ private fun debugLog(tag: String, message: String) {
 
 class ClerkAuthNativeView(context: Context) : FrameLayout(context) {
   var mode: String = "signInOrUp"
-  var isDismissable: Boolean = true
+  var isDismissible: Boolean = true
 
   private val activity: ComponentActivity? = findActivity(context).also {
     // At cold start, ClerkExpoModule.configure() may run before React's
@@ -101,7 +101,7 @@ class ClerkAuthNativeView(context: Context) : FrameLayout(context) {
   private var authCompletedSent: Boolean = false
 
   fun setupView() {
-    debugLog(TAG, "setupView - mode: $mode, isDismissable: $isDismissable, activity: $activity")
+    debugLog(TAG, "setupView - mode: $mode, isDismissible: $isDismissible, activity: $activity")
 
     composeView.setContent {
       val session by Clerk.sessionFlow.collectAsStateWithLifecycle()

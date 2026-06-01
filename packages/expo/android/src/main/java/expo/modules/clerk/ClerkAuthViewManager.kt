@@ -21,9 +21,9 @@ class ClerkAuthViewManager : SimpleViewManager<ClerkAuthNativeView>(),
     view.setupView()
   }
 
-  @ReactProp(name = "isDismissable")
-  override fun setIsDismissable(view: ClerkAuthNativeView, isDismissable: Boolean) {
-    view.isDismissable = isDismissable
+  @ReactProp(name = "isDismissible")
+  override fun setIsDismissible(view: ClerkAuthNativeView, isDismissible: Boolean) {
+    view.isDismissible = isDismissible
     view.setupView()
   }
 

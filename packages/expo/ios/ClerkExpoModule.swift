@@ -12,8 +12,8 @@ public var clerkViewFactory: ClerkViewFactoryProtocol?
 // Protocol that the app target implements to provide Clerk views
 public protocol ClerkViewFactoryProtocol {
   // Inline rendering — returns UIViewController to preserve SwiftUI lifecycle
-  func createAuthView(mode: String, dismissable: Bool, onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void) -> UIViewController?
-  func createUserProfileView(dismissable: Bool, onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void) -> UIViewController?
+  func createAuthView(mode: String, dismissible: Bool, onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void) -> UIViewController?
+  func createUserProfileView(dismissible: Bool, onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void) -> UIViewController?
   func createUserButton(onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void) -> UIViewController?
 
   // SDK operations

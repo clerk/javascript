@@ -17,7 +17,7 @@ export interface UserProfileViewProps {
    *
    * @default false
    */
-  isDismissable?: boolean;
+  isDismissible?: boolean;
 
   /**
    * Style applied to the container view.
@@ -60,7 +60,7 @@ export interface UserProfileViewProps {
  *
  * @see {@link https://clerk.com/docs/components/user/user-profile} Clerk UserProfile Documentation
  */
-export function UserProfileView({ isDismissable = false, style, onDismiss }: UserProfileViewProps) {
+export function UserProfileView({ isDismissible = false, style, onDismiss }: UserProfileViewProps) {
   const handleProfileEvent = useCallback(
     (event: { nativeEvent: { type: string } }) => {
       if (event.nativeEvent.type === 'dismissed') {
@@ -85,7 +85,7 @@ export function UserProfileView({ isDismissable = false, style, onDismiss }: Use
   return (
     <NativeClerkUserProfileView
       style={[styles.container, style]}
-      isDismissable={isDismissable}
+      isDismissible={isDismissible}
       onProfileEvent={handleProfileEvent}
     />
   );

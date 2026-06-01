@@ -154,13 +154,13 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
 
   public func createAuthView(
     mode: String,
-    dismissable: Bool,
+    dismissible: Bool,
     onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
   ) -> UIViewController? {
     makeHostingController(
       rootView: ClerkInlineAuthWrapperView(
         mode: Self.authMode(from: mode),
-        dismissable: dismissable,
+        dismissible: dismissible,
         lightTheme: lightTheme,
         darkTheme: darkTheme,
         onEvent: onEvent
@@ -169,12 +169,12 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
   }
 
   public func createUserProfileView(
-    dismissable: Bool,
+    dismissible: Bool,
     onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
   ) -> UIViewController? {
     makeHostingController(
       rootView: ClerkInlineProfileWrapperView(
-        dismissable: dismissable,
+        dismissible: dismissible,
         lightTheme: lightTheme,
         darkTheme: darkTheme,
         onEvent: onEvent
@@ -444,7 +444,7 @@ struct ClerkInlineUserButtonWrapperView: View {
 
 struct ClerkInlineAuthWrapperView: View {
   let mode: AuthView.Mode
-  let dismissable: Bool
+  let dismissible: Bool
   let lightTheme: ClerkTheme?
   let darkTheme: ClerkTheme?
   let onEvent: (ClerkNativeViewEvent, [String: Any]) -> Void
@@ -462,7 +462,7 @@ struct ClerkInlineAuthWrapperView: View {
   }
 
   private var themedAuthView: some View {
-    let view = AuthView(mode: mode, isDismissable: dismissable)
+    let view = AuthView(mode: mode, isDismissable: dismissible)
       .environment(Clerk.shared)
     let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
     return Group {
@@ -506,7 +506,7 @@ struct ClerkInlineAuthWrapperView: View {
 // MARK: - Inline Profile View Wrapper (for embedded rendering)
 
 struct ClerkInlineProfileWrapperView: View {
-  let dismissable: Bool
+  let dismissible: Bool
   let lightTheme: ClerkTheme?
   let darkTheme: ClerkTheme?
   let onEvent: (ClerkNativeViewEvent, [String: Any]) -> Void
@@ -514,7 +514,7 @@ struct ClerkInlineProfileWrapperView: View {
   @Environment(\.colorScheme) private var colorScheme
 
   var body: some View {
-    let view = UserProfileView(isDismissable: dismissable)
+    let view = UserProfileView(isDismissable: dismissible)
       .environment(Clerk.shared)
     let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
     let themedView = Group {

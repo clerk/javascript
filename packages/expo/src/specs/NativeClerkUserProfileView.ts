@@ -8,7 +8,7 @@ import type { BubblingEventHandler } from 'react-native/Libraries/Types/CodegenT
 type ProfileEvent = Readonly<{ type: string }>;
 
 interface NativeProps extends ViewProps {
-  isDismissable?: boolean;
+  isDismissible?: boolean;
   onProfileEvent?: BubblingEventHandler<ProfileEvent>;
 }
 
