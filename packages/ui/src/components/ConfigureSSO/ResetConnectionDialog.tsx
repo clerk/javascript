@@ -1,6 +1,6 @@
 import { useReverification } from '@clerk/shared/react';
 
-import { Col, localizationKeys } from '@/customizables';
+import { Col, descriptors, localizationKeys } from '@/customizables';
 import { Card } from '@/elements/Card';
 import { useCardState, withCardStateProvider } from '@/elements/contexts';
 import { Form } from '@/elements/Form';
@@ -81,7 +81,10 @@ const ResetConnectionDialogContent = withCardStateProvider((props: ResetConnecti
   };
 
   return (
-    <Card.Root sx={t => ({ borderRadius: t.radii.$md })}>
+    <Card.Root
+      elementDescriptor={descriptors.configureSSOResetConnectionDialog}
+      sx={t => ({ borderRadius: t.radii.$md })}
+    >
       <Card.Content sx={t => ({ textAlign: 'start', padding: t.sizes.$5 })}>
         <FormContainer
           headerTitle={localizationKeys('configureSSO.resetConnectionDialog.title')}
@@ -93,17 +96,20 @@ const ResetConnectionDialogContent = withCardStateProvider((props: ResetConnecti
               <Form.ControlRow elementId={confirmationField.id}>
                 <Form.PlainInput
                   {...confirmationField.props}
+                  elementDescriptor={descriptors.configureSSOResetConnectionDialogConfirmationInput}
                   ignorePasswordManager
                 />
               </Form.ControlRow>
               <FormButtonContainer>
                 <Form.SubmitButton
+                  elementDescriptor={descriptors.configureSSOResetConnectionDialogSubmitButton}
                   block={false}
                   colorScheme='danger'
                   isDisabled={!canSubmit}
                   localizationKey={localizationKeys('configureSSO.resetConnectionDialog.resetButton')}
                 />
                 <Form.ResetButton
+                  elementDescriptor={descriptors.configureSSOResetConnectionDialogCancelButton}
                   block={false}
                   localizationKey={localizationKeys('configureSSO.resetConnectionDialog.cancelButton')}
                   onClick={onClose}

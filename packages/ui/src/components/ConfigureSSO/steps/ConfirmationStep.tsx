@@ -50,6 +50,7 @@ export const ConfirmationStep = (): JSX.Element => {
         <Step.Footer>
           {!isActive && (
             <Flex
+              elementDescriptor={descriptors.configureSSOConfirmationInactiveBanner}
               sx={{ flex: 1 }}
               align='center'
             >
