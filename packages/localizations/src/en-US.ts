@@ -523,11 +523,11 @@ export const enUS: LocalizationResource = {
           headerSubtitle: 'Create a new enterprise application in your Google Workspace',
           createAppInstructions: {
             title: 'Create a new enterprise application in Google Workspace',
-            step1: 'Sign in to Google Admin Portal',
-            step2: 'In the side navigation, under <bold>Apps</bold>, select <bold>Web and mobile apps</bold>',
-            step3: 'Click on the <bold>Add</bold> app button, and select <bold>Add custom SAML app</bold>',
+            step1: 'Sign in to Google Admin Portal.',
+            step2: 'In the side navigation, under <bold>Apps</bold>, select <bold>Web and mobile apps.</bold>',
+            step3: 'Click on the <bold>Add</bold> app button, and select <bold>Add custom SAML app.</bold>',
             step4: 'In the <bold>App details</bold> section, fill out the required <bold>App name</bold>.',
-            step5: 'Select the <bold>Continue</bold> button',
+            step5: 'Select the <bold>Continue</bold> button.',
           },
         },
         identityProviderMetadataStep: {
@@ -540,14 +540,14 @@ export const enUS: LocalizationResource = {
           },
           metadataFile: {
             label: 'IdP metadata',
-            description: 'In your Google Workspace app, download the IdP metadata and upload it below.',
+            description: 'In your Google Workspace application, download the IdP metadata and upload it below.',
             uploadFile: 'Upload file',
             replaceFile: 'Replace file',
             removeFile: 'Remove file',
             fileUploaded: 'File uploaded',
           },
           manual: {
-            description: 'In your Google Workspace app, retrieve these values.',
+            description: 'In your Google Workspace application, retrieve these values.',
             signOnUrl: {
               label: 'SSO URL',
               placeholder: 'Paste URL here...',
@@ -603,12 +603,12 @@ export const enUS: LocalizationResource = {
           },
         },
         configureUserAccess: {
-          headerSubtitle: 'Enable your Google Workspace SAML workspace',
+          headerSubtitle: 'Enable your Google Workspace SAML application',
           assignUsersInstructions: {
             paragraph1:
               "Once the configuration is complete in Google, you'll be redirected to the app's overview page.",
             step1: 'Open the <bold>User access</bold> section.',
-            step2: 'Select <bold>ON</bold> for everyone.',
+            step2: 'Select <bold>ON for everyone.</bold>',
             step3: 'Select <bold>Save</bold>.',
             paragraph2:
               'Google may take up to 24 hours to propagate these changes. The connection will remain inactive until they take effect.',
