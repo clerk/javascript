@@ -1146,18 +1146,16 @@ class SignInFuture implements SignInFutureResource {
       }
 
       // Reuse the existing sign-in by default so any state already attached to it carries
-      // into the SSO attempt (a ticket from `signIn.create({ strategy: 'ticket' })`, a
-      // discovered identifier, and so on). The one case we cannot reuse is when doing so
-      // would replay a stale provider redirect: an OAuth redirect URL only comes back from
-      // `_create` and cannot be refreshed in place, so if the resource already holds a
-      // pending verification for a different strategy than the one we're starting (e.g.
-      // `oauth_google` followed by `oauth_github`) we have to start fresh (SDK-75).
+      // into the SSO attempt (e.g. a ticket from `signIn.create({ strategy: 'ticket' })`,
+      // or a discovered identifier). OAuth is the exception: its redirect URL only comes
+      // back from `_create` and cannot be refreshed in place, so any redirect already
+      // lingering on the resource is stale. Reusing it would replay a previous attempt's
+      // redirect, including a retry of the same provider after an abandoned redirect
+      // (SDK-75), so whenever an OAuth call finds a pending redirect we start fresh.
       // `enterprise_sso` is always safe to reuse because the `prepare_first_factor` call
       // below refreshes its redirect against the existing sign-in.
-      const { strategy: pendingStrategy, externalVerificationRedirectURL: pendingRedirectUrl } =
-        this.#resource.firstFactorVerification;
-      const wouldReplayStaleRedirect =
-        strategy !== 'enterprise_sso' && !!pendingRedirectUrl && pendingStrategy !== strategy;
+      const hasPendingRedirect = !!this.#resource.firstFactorVerification.externalVerificationRedirectURL;
+      const wouldReplayStaleRedirect = strategy !== 'enterprise_sso' && hasPendingRedirect;
       const shouldCreateSignIn = !this.#resource.id || wouldReplayStaleRedirect;
 
       if (shouldCreateSignIn) {

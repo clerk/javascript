@@ -2390,6 +2390,85 @@ describe('SignIn', () => {
         expect(mockPopup.location.href).toBe('https://github.com/login/oauth/authorize');
       });
 
+      it('creates a fresh OAuth sign-in when retrying the same provider after an abandoned redirect (SDK-75)', async () => {
+        vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
+
+        const mockPopup = { location: { href: '' } } as Window;
+        const mockBuildUrlWithAuth = vi.fn().mockImplementation(url => {
+          if (url.startsWith('/')) {
+            return 'https://example.com' + url;
+          }
+          return url;
+        });
+
+        SignIn.clerk = {
+          buildUrlWithAuth: mockBuildUrlWithAuth,
+          buildUrl: vi.fn().mockImplementation(path => 'https://example.com' + path),
+          frontendApi: 'clerk.example.com',
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
+
+        const mockFetch = vi.fn();
+        mockFetch.mockResolvedValueOnce({
+          client: null,
+          response: {
+            id: 'signin_google_2',
+            first_factor_verification: {
+              status: 'unverified',
+              external_verification_redirect_url: 'https://accounts.google.com/o/oauth2/auth?attempt=2',
+            },
+          },
+        });
+        mockFetch.mockResolvedValueOnce({
+          client: null,
+          response: {
+            id: 'signin_google_2',
+            status: 'complete',
+          },
+        });
+        BaseResource._fetch = mockFetch;
+
+        vi.mocked(_futureAuthenticateWithPopup).mockImplementation((_clerk, params) => {
+          params.popup.location.href = params.externalVerificationRedirectURL.toString();
+          return Promise.resolve();
+        });
+
+        // Existing sign-in left over from a first, abandoned Google attempt (stale redirect).
+        const signIn = new SignIn({
+          id: 'signin_google_1',
+          object: 'sign_in',
+          status: 'needs_first_factor',
+          first_factor_verification: {
+            status: 'unverified',
+            strategy: 'oauth_google',
+            external_verification_redirect_url: 'https://accounts.google.com/o/oauth2/auth?attempt=1',
+          },
+        } as any);
+
+        const result = await signIn.__internal_future.sso({
+          strategy: 'oauth_google',
+          redirectUrl: 'https://complete.example.com',
+          redirectCallbackUrl: '/sso-callback',
+          popup: mockPopup,
+        });
+
+        // Same provider, but the stale redirect must not be replayed: a fresh sign-in is
+        // POSTed and we navigate to the new redirect rather than the abandoned one.
+        expect(result.error).toBeNull();
+        expect(mockFetch).toHaveBeenNthCalledWith(1, {
+          method: 'POST',
+          path: '/client/sign_ins',
+          body: expect.objectContaining({
+            strategy: 'oauth_google',
+          }),
+        });
+        expect(mockPopup.location.href).toBe('https://accounts.google.com/o/oauth2/auth?attempt=2');
+      });
+
       it('uses popup when provided', async () => {
         vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
 
