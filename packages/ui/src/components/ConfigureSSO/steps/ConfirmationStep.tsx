@@ -167,7 +167,10 @@ const ConfigurationDetailsSection = (): JSX.Element => {
       title={localizationKeys('configureSSO.confirmation.configurationSection.title')}
       centered={false}
     >
-      <ProfileSection.ItemList id='ssoConfiguration'>
+      <ProfileSection.ItemList
+        id='ssoConfiguration'
+        gap={4}
+      >
         <ProfileSection.Item
           id='ssoConfiguration'
           sx={t => ({ justifyContent: 'start', gap: t.space.$4 })}
@@ -176,7 +179,7 @@ const ConfigurationDetailsSection = (): JSX.Element => {
             elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsLabel}
             colorScheme='secondary'
             localizationKey={localizationKeys('configureSSO.confirmation.configurationSection.ssoUrlLabel')}
-            sx={t => ({ width: t.space.$30, flexShrink: 0, whiteSpace: 'nowrap' })}
+            sx={t => ({ width: t.space.$36, flexShrink: 0, whiteSpace: 'nowrap' })}
           />
           <Link
             elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsLink}
