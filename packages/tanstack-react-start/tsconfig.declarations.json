@@ -8,5 +8,6 @@
     "declarationMap": true,
     "sourceMap": false,
     "declarationDir": "./dist/types"
-  }
+  },
+  "exclude": ["node_modules", "dist", "**/__tests__/**/*", "**/*.test.ts", "**/*.test.tsx"]
 }
