@@ -13,9 +13,23 @@ interface RootProps {
    * external state (e.g., a server-state hook) and passes it down.
    */
   initialStepId?: string;
+  /**
+   * Terminal completion hook for the wizard's forward boundary. When the
+   * last step's `goNext` would otherwise fall through to a parent wizard
+   * (or have nowhere to go because there is no parent), `onComplete` is
+   * invoked instead. This is how a nested-delegating ConfigureSSO step
+   * (verify-domain, configure) advances the TOP-LEVEL state machine from
+   * its inner flow's terminal step: the host passes
+   * `onComplete={() => dispatch({ type: 'NEXT' })}` and the inner
+   * `goNext` bubbles into the machine rather than a parent wizard.
+   *
+   * Takes precedence over the parent-wizard fall-through so a nested wizard
+   * can opt into machine completion even while a parent context exists.
+   */
+  onComplete?: () => void;
 }
 
-const Root = ({ children, initialStepId }: RootProps): JSX.Element => {
+const Root = ({ children, initialStepId, onComplete }: RootProps): JSX.Element => {
   const parentWizard = React.useContext(WizardContext);
   const isNested = parentWizard !== null;
 
@@ -24,6 +38,7 @@ const Root = ({ children, initialStepId }: RootProps): JSX.Element => {
       parentWizard={parentWizard}
       isNested={isNested}
       initialStepId={initialStepId}
+      onComplete={onComplete}
     >
       {children}
     </RootInner>
@@ -34,10 +49,11 @@ interface RootInnerProps {
   parentWizard: WizardContextValue | null;
   isNested: boolean;
   initialStepId?: string;
+  onComplete?: () => void;
   children: React.ReactNode;
 }
 
-const RootInner = ({ parentWizard, isNested, initialStepId, children }: RootInnerProps): JSX.Element => {
+const RootInner = ({ parentWizard, isNested, initialStepId, onComplete, children }: RootInnerProps): JSX.Element => {
   // Stable registry of mounted Steps. Insertion order = JSX order =
   // display order
   const [activeSteps, setActiveSteps] = React.useState<WizardActiveStep[]>([]);
@@ -85,9 +101,14 @@ const RootInner = ({ parentWizard, isNested, initialStepId, children }: RootInne
       setCurrentStepId(next.id);
       return;
     }
-    // Inner-last-step: bubble to parent wizard
+    // Inner-last-step: complete into the host's state machine if it provided a
+    // terminal hook, otherwise bubble to a parent wizard (legacy fall-through).
+    if (onComplete) {
+      onComplete();
+      return;
+    }
     return parentWizard?.goNext();
-  }, [activeSteps, currentIndex, parentWizard]);
+  }, [activeSteps, currentIndex, parentWizard, onComplete]);
 
   const goPrev = React.useCallback(() => {
     if (currentIndex < 0) {

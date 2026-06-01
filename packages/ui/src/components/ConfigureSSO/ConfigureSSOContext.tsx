@@ -1,16 +1,14 @@
-import type { EnterpriseConnectionResource } from '@clerk/shared/types';
+import type { EmailAddressResource, EnterpriseConnectionResource } from '@clerk/shared/types';
 import React, { type PropsWithChildren } from 'react';
 
 import type { WizardFacts } from './data/deriveFacts';
 import type { ConfigureSSOMutations } from './data/useConfigureSSOMutations';
-import { deriveInitialStep } from './deriveInitialStep';
-import type { ProviderType, WizardStepId } from './types';
+import type { ProviderType } from './types';
 
 /**
  * Shared form state for the ConfigureSSO wizard, persisted across steps
  */
 export interface ConfigureSSOData {
-  initialStepId: WizardStepId;
   /**
    * The enterprise connection from the user's primary email address domain
    */
@@ -52,6 +50,13 @@ export interface ConfigureSSOData {
    * reflects a run that just completed.
    */
   refreshTestRuns: () => Promise<unknown>;
+  /**
+   * The user's primary email address, fetched once upstream by
+   * `useConfigureSSOData`. Threaded through so the central submit runner (and
+   * the steps) can derive the connection name without each calling `useUser`
+   * itself.
+   */
+  primaryEmailAddress: EmailAddressResource | undefined;
 }
 
 interface ConfigureSSOProviderProps {
@@ -72,6 +77,11 @@ interface ConfigureSSOProviderProps {
    * used to take individually.
    */
   mutations: ConfigureSSOMutations;
+  /**
+   * The user's primary email address, fetched once upstream by
+   * `useConfigureSSOData`.
+   */
+  primaryEmailAddress: EmailAddressResource | undefined;
 }
 
 const ConfigureSSOContext = React.createContext<ConfigureSSOData | null>(null);
@@ -83,36 +93,36 @@ export const ConfigureSSOProvider = ({
   refreshTestRuns,
   contentRef,
   mutations,
+  primaryEmailAddress,
   children,
 }: PropsWithChildren<ConfigureSSOProviderProps>): JSX.Element => {
   const [provider, setProvider] = React.useState<ProviderType | undefined>(
     enterpriseConnection?.provider as ProviderType,
   );
 
-  const { isDomainTakenByOtherOrg, hasSuccessfulTestRun } = facts;
-  const initialStepId = deriveInitialStep(enterpriseConnection, { isDomainTakenByOtherOrg, hasSuccessfulTestRun });
+  const { isDomainTakenByOtherOrg } = facts;
 
   const value = React.useMemo<ConfigureSSOData>(
     () => ({
       provider,
       contentRef,
       setProvider,
-      initialStepId,
       enterpriseConnection,
       isDomainTakenByOtherOrg,
       facts,
       refreshTestRuns,
       mutations,
+      primaryEmailAddress,
     }),
     [
       provider,
       contentRef,
-      initialStepId,
       enterpriseConnection,
       mutations,
       isDomainTakenByOtherOrg,
       facts,
       refreshTestRuns,
+      primaryEmailAddress,
     ],
   );
 

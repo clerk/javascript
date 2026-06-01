@@ -12,10 +12,13 @@ import {
   Text,
   useLocalizations,
 } from '@/customizables';
+import { useCardState } from '@/elements/contexts';
 import { ChevronLeft, ChevronRight } from '@/icons';
 import { common, type PropsOfComponent } from '@/styledSystem';
 
+import type { SubmitCtx, SubmitResult } from '../machine/submit';
 import { ProfileCardFooter } from './ProfileCard';
+import { useSubmitRunner } from './useSubmitRunner';
 
 type StepLayoutProps = PropsOfComponent<typeof Col>;
 
@@ -181,11 +184,73 @@ const FooterContinue = ({ onClick, isDisabled, isLoading, label = 'Continue' }: 
 };
 FooterContinue.displayName = 'Step.Footer.Continue';
 
+type FooterSubmitProps = {
+  /**
+   * The step's submit logic, sourced from its transition's `onSubmit`. Receives
+   * a {@link SubmitCtx} (facts, mutations, provider, nav) and returns a
+   * `SubmitResult`. The runner owns the lifecycle (clear error -> loading ->
+   * advance/jump or surface error -> idle); this handler only does the
+   * step-specific work (validate, call a mutation, decide where to go next).
+   *
+   * Omit it to advance linearly with a plain `NEXT` (e.g. the test step's
+   * Continue once its gate passes).
+   *
+   * It is NOT published anywhere — `Step.Footer.Submit` is rendered inside the
+   * step body and reads only what the step passes it. There is no action
+   * registry / sibling-footer handoff.
+   */
+  onSubmit?: (ctx: SubmitCtx) => Promise<SubmitResult> | SubmitResult;
+  /**
+   * Whether the primary action is currently allowed. Derived from the step's
+   * local state (e.g. `Boolean(selected)` or `facts.hasSuccessfulTestRun`). The
+   * button is additionally disabled while a submit is in flight.
+   */
+  canContinue: boolean;
+  /** Override label. Defaults to 'Continue'. */
+  label?: LocalizationKey | string;
+};
+
+/**
+ * The step's primary action. Renders the same Continue button as
+ * `Step.Footer.Continue`, but wires it to `useSubmitRunner` so the submit
+ * boilerplate (and navigation via the state machine) lives in exactly one
+ * place. The button owns its own in-flight state by reading `card.isLoading` —
+ * the step never threads loading flags through.
+ *
+ * Composes with the dumb `Step.Footer.Previous` (and `Step.Footer.Reset` paths
+ * elsewhere) as siblings inside `<Step.Footer>`:
+ *
+ * ```tsx
+ * <Step.Footer>
+ *   <Step.Footer.Previous onClick={() => dispatch({ type: 'BACK' })} />
+ *   <Step.Footer.Submit canContinue={Boolean(selected)} onSubmit={transition.onSubmit} />
+ * </Step.Footer>
+ * ```
+ *
+ * Previous stays presentational and independent; only Submit is coupled to the
+ * runner.
+ */
+const FooterSubmit = ({ onSubmit, canContinue, label = 'Continue' }: FooterSubmitProps): JSX.Element => {
+  const card = useCardState();
+  const run = useSubmitRunner();
+
+  return (
+    <FooterContinue
+      onClick={() => run(onSubmit)}
+      isLoading={card.isLoading}
+      isDisabled={!canContinue || card.isLoading}
+      label={label}
+    />
+  );
+};
+FooterSubmit.displayName = 'Step.Footer.Submit';
+
 const Footer = ({ children }: PropsWithChildren): JSX.Element => <ProfileCardFooter>{children}</ProfileCardFooter>;
 
 const FooterCompound = Object.assign(Footer, {
   Previous: FooterPrevious,
   Continue: FooterContinue,
+  Submit: FooterSubmit,
 });
 
 type StepCounterProps = {

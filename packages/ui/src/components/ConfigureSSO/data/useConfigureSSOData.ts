@@ -1,5 +1,6 @@
 import { __internal_useUserEnterpriseConnections, useOrganization, useSession, useUser } from '@clerk/shared/react';
 import type {
+  EmailAddressResource,
   EnterpriseConnectionResource,
   OrganizationResource,
   SignedInSessionResource,
@@ -39,6 +40,12 @@ export interface ConfigureSSOData {
    * prop instead of three raw mutation handles.
    */
   mutations: ConfigureSSOMutations;
+  /**
+   * The user's primary email address, used to derive the connection name on
+   * create. Threaded through so the submit runner and steps don't each call
+   * `useUser` for it.
+   */
+  primaryEmailAddress: EmailAddressResource | undefined;
 }
 
 /**
@@ -101,5 +108,6 @@ export const useConfigureSSOData = (): ConfigureSSOData => {
     facts,
     refreshTestRuns,
     mutations,
+    primaryEmailAddress: user?.primaryEmailAddress ?? undefined,
   };
 };
