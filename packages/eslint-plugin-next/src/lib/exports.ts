@@ -1,0 +1,158 @@
+/**
+ * Resolve a module's exports to the function target that will run when the framework dispatches.
+ */
+
+import type { TSESTree } from '@typescript-eslint/utils';
+
+export type FunctionNode =
+  | TSESTree.FunctionDeclaration
+  | TSESTree.FunctionExpression
+  | TSESTree.ArrowFunctionExpression;
+
+export type ExportTarget =
+  | { kind: 'function'; node: FunctionNode }
+  | { kind: 'imported'; source: string }
+  | { kind: 'unknown' };
+
+export interface NamedExportItem {
+  name: string;
+  target: ExportTarget;
+  reportNode: TSESTree.Node;
+}
+
+export function unwrapFunction(node: TSESTree.Node | null | undefined): FunctionNode | null {
+  if (!node) {
+    return null;
+  }
+  if (
+    node.type === 'FunctionDeclaration' ||
+    node.type === 'FunctionExpression' ||
+    node.type === 'ArrowFunctionExpression'
+  ) {
+    return node;
+  }
+  return null;
+}
+
+export function resolveLocalIdentifierTarget(programNode: TSESTree.Program, name: string): ExportTarget {
+  for (const stmt of programNode.body) {
+    if (stmt.type === 'FunctionDeclaration' && stmt.id && stmt.id.name === name) {
+      return { kind: 'function', node: stmt };
+    }
+    if (stmt.type === 'VariableDeclaration') {
+      for (const declarator of stmt.declarations) {
+        if (declarator.id.type !== 'Identifier' || declarator.id.name !== name) {
+          continue;
+        }
+        const initFn = unwrapFunction(declarator.init ?? undefined);
+        if (initFn) {
+          return { kind: 'function', node: initFn };
+        }
+        return { kind: 'unknown' };
+      }
+    }
+    if (stmt.type === 'ImportDeclaration') {
+      for (const spec of stmt.specifiers) {
+        if (spec.local && spec.local.name === name) {
+          return {
+            kind: 'imported',
+            source: stmt.source.value,
+          };
+        }
+      }
+    }
+  }
+  return { kind: 'unknown' };
+}
+
+export function resolveDefaultExportTarget(programNode: TSESTree.Program, declaration: TSESTree.Node): ExportTarget {
+  const direct = unwrapFunction(declaration);
+  if (direct) {
+    return { kind: 'function', node: direct };
+  }
+
+  if (declaration.type !== 'Identifier') {
+    return { kind: 'unknown' };
+  }
+
+  return resolveLocalIdentifierTarget(programNode, declaration.name);
+}
+
+function getExportedName(spec: TSESTree.ExportSpecifier): string | null {
+  const node = spec.exported;
+  if (node.type === 'Identifier') {
+    return node.name;
+  }
+  if (node.type === 'Literal' && typeof node.value === 'string') {
+    return node.value;
+  }
+  return null;
+}
+
+export function* iterateNamedExports(programNode: TSESTree.Program): Generator<NamedExportItem> {
+  for (const stmt of programNode.body) {
+    if (stmt.type !== 'ExportNamedDeclaration') {
+      continue;
+    }
+    // `export type { Foo }` — the whole statement is type-only
+    if (stmt.exportKind === 'type') {
+      continue;
+    }
+
+    if (stmt.declaration) {
+      const decl = stmt.declaration;
+      if (decl.type === 'FunctionDeclaration' && decl.id) {
+        yield {
+          name: decl.id.name,
+          target: { kind: 'function', node: decl },
+          reportNode: stmt,
+        };
+      } else if (decl.type === 'VariableDeclaration') {
+        for (const declarator of decl.declarations) {
+          if (declarator.id.type !== 'Identifier') {
+            continue;
+          }
+          const fn = unwrapFunction(declarator.init ?? undefined);
+          yield {
+            name: declarator.id.name,
+            target: fn ? { kind: 'function', node: fn } : { kind: 'unknown' },
+            reportNode: stmt,
+          };
+        }
+      }
+      continue;
+    }
+
+    for (const spec of stmt.specifiers) {
+      if (spec.type !== 'ExportSpecifier') {
+        continue;
+      }
+      // `export { type Foo }` — individual specifier is type-only
+      if (spec.exportKind === 'type') {
+        continue;
+      }
+      const exportedName = getExportedName(spec);
+      if (!exportedName) {
+        continue;
+      }
+
+      if (stmt.source) {
+        yield {
+          name: exportedName,
+          target: { kind: 'imported', source: stmt.source.value },
+          reportNode: stmt,
+        };
+        continue;
+      }
+
+      if (spec.local.type !== 'Identifier') {
+        continue;
+      }
+      yield {
+        name: exportedName,
+        target: resolveLocalIdentifierTarget(programNode, spec.local.name),
+        reportNode: stmt,
+      };
+    }
+  }
+}
