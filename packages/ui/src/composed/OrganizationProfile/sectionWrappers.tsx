@@ -1,4 +1,4 @@
-import { useContext, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 import { Protect } from '../../common';
 import {
@@ -7,18 +7,7 @@ import {
   OrganizationLeaveSection,
   OrganizationProfileSection,
 } from '../../components/OrganizationProfile/OrganizationGeneralPage';
-import { PageContext } from '../PageContext';
-
-function useRequirePage(componentName: string): boolean {
-  const page = useContext(PageContext);
-  if (!page) {
-    if (typeof __DEV__ !== 'undefined' && __DEV__) {
-      console.warn(`${componentName} must be used inside a page component (e.g. OrganizationProfile.General)`);
-    }
-    return false;
-  }
-  return true;
-}
+import { useRequirePage } from '../useRequirePage';
 
 export function GeneralOrganizationProfile(): ReactNode {
   if (!useRequirePage('GeneralOrganizationProfile')) return null;
