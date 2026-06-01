@@ -1,4 +1,6 @@
-import type { ClerkGlobalHookError } from '../errors/globalHookError';
+import type { ClerkGlobalHookError } from '@/errors/globalHookError';
+
+import type { ModuleManager } from '../moduleManager';
 import type { ClerkUIConstructor } from '../ui/types';
 import type { APIKeysNamespace } from './apiKeys';
 import type {
@@ -304,7 +306,7 @@ export interface Clerk {
   /**
    * @internal
    */
-  __internal_moduleManager: import('../moduleManager').ModuleManager;
+  __internal_moduleManager: ModuleManager;
 
   frontendApi: string;
 
