@@ -13,6 +13,7 @@ export function useSafeState<S>(initialState?: S | (() => S)) {
   const isMountedRef = React.useRef(true);
 
   React.useEffect(() => {
+    isMountedRef.current = true;
     return () => {
       isMountedRef.current = false;
     };

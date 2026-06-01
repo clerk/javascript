@@ -272,6 +272,7 @@ export class Clerk implements ClerkInterface {
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
   #publicEventBus = createClerkEventBus();
+  #moduleManager = new ModuleManager();
 
   get __internal_queryClient(): { __tag: 'clerk-rq-client'; client: QueryClient } | undefined {
     if (!this.#queryClient) {
@@ -538,7 +539,7 @@ export class Clerk implements ClerkInterface {
             () => this,
             () => this.environment,
             this.#options,
-            new ModuleManager(),
+            this.#moduleManager,
           ),
       );
     }
@@ -2914,6 +2915,10 @@ export class Clerk implements ClerkInterface {
 
   get __internal_environment(): EnvironmentResource | null | undefined {
     return this.environment;
+  }
+
+  get __internal_moduleManager() {
+    return this.#moduleManager;
   }
 
   // TODO: Fix this properly

@@ -4,8 +4,6 @@ import createCache from '@emotion/cache';
 import { CacheProvider, type SerializedStyles } from '@emotion/react';
 import React, { useMemo } from 'react';
 
-const el = document.querySelector('style#cl-style-insertion-point');
-
 type StyleCacheProviderProps = React.PropsWithChildren<{
   /** Optional nonce value for CSP (Content Security Policy) */
   nonce?: string;
@@ -15,6 +13,7 @@ type StyleCacheProviderProps = React.PropsWithChildren<{
 
 export const StyleCacheProvider = (props: StyleCacheProviderProps) => {
   const cache = useMemo(() => {
+    const el = typeof document !== 'undefined' ? document.querySelector('style#cl-style-insertion-point') : null;
     const emotionCache = createCache({
       key: 'cl-internal',
       prepend: props.cssLayerName ? false : !el,

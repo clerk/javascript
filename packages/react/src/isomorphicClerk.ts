@@ -822,6 +822,14 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   }
 
+  get __internal_moduleManager(): any {
+    if (this.clerkjs) {
+      return (this.clerkjs as any).__internal_moduleManager;
+    } else {
+      return undefined;
+    }
+  }
+
   get isSignedIn(): boolean {
     if (this.clerkjs) {
       return this.clerkjs.isSignedIn;

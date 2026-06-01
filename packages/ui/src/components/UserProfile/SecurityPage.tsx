@@ -28,7 +28,7 @@ export const SecurityPage = withCardStateProvider(() => {
     <ProfileCard.Page>
       <Col
         elementDescriptor={descriptors.page}
-        sx={t => ({ gap: t.space.$8 })}
+        sx={t => ({ gap: t.space.$8, isolation: 'isolate' })}
       >
         <Col
           elementDescriptor={descriptors.profilePage}
