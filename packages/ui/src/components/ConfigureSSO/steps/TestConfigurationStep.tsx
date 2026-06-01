@@ -177,6 +177,7 @@ export const TestConfigurationStep = (): JSX.Element => {
         ) : null}
 
         <Step.Footer>
+          <Step.Footer.Reset />
           <Step.Footer.Previous onClick={() => goPrev()} />
           <ContinueTestSsoStepButton
             enterpriseConnectionId={enterpriseConnection?.id}

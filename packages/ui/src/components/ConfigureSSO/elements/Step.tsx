@@ -1,4 +1,5 @@
-import { type PropsWithChildren, type ReactNode } from 'react';
+import { __internal_useOrganizationBase } from '@clerk/shared/react';
+import { type PropsWithChildren, type ReactNode, useState } from 'react';
 
 import {
   Badge,
@@ -9,12 +10,15 @@ import {
   Heading,
   Icon,
   type LocalizationKey,
+  localizationKeys,
   Text,
   useLocalizations,
 } from '@/customizables';
 import { ChevronLeft, ChevronRight } from '@/icons';
 import { common, type PropsOfComponent } from '@/styledSystem';
 
+import { useConfigureSSO } from '../ConfigureSSOContext';
+import { ResetConnectionDialog } from '../ResetConnectionDialog';
 import { ProfileCardFooter } from './ProfileCard';
 
 type StepLayoutProps = PropsOfComponent<typeof Col>;
@@ -188,11 +192,42 @@ const FooterContinue = ({ onClick, isDisabled, isLoading, label = 'Continue' }: 
 };
 FooterContinue.displayName = 'Step.Footer.Continue';
 
+const FooterReset = (): JSX.Element | null => {
+  const { enterpriseConnection } = useConfigureSSO();
+  const organization = __internal_useOrganizationBase();
+  const [isOpen, setIsOpen] = useState(false);
+
+  if (!enterpriseConnection) {
+    return null;
+  }
+
+  return (
+    <>
+      <Button
+        elementDescriptor={descriptors.configureSSOFooterResetButton}
+        variant='ghost'
+        size='sm'
+        colorScheme='danger'
+        onClick={() => setIsOpen(true)}
+        localizationKey={localizationKeys('configureSSO.confirmation.resetSection.title')}
+        sx={{ marginInlineEnd: 'auto' }}
+      />
+      <ResetConnectionDialog
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        confirmationValue={organization?.name ?? ''}
+      />
+    </>
+  );
+};
+FooterReset.displayName = 'Step.Footer.Reset';
+
 const Footer = ({ children }: PropsWithChildren): JSX.Element => <ProfileCardFooter>{children}</ProfileCardFooter>;
 
 const FooterCompound = Object.assign(Footer, {
   Previous: FooterPrevious,
   Continue: FooterContinue,
+  Reset: FooterReset,
 });
 
 type StepCounterProps = {

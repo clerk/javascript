@@ -274,6 +274,7 @@ const SamlMicrosoftCreateAppStep = (): JSX.Element => {
       </Step.Body>
 
       <Step.Footer>
+        <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
           isDisabled={isFirstStep}
@@ -407,6 +408,7 @@ const SamlMicrosoftServiceProviderStep = (): JSX.Element => {
       </Step.Body>
 
       <Step.Footer>
+        <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
           isDisabled={isFirstStep}
@@ -601,6 +603,7 @@ const SamlMicrosoftAttributeMappingStep = (): JSX.Element => {
       </Step.Body>
 
       <Step.Footer>
+        <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
           isDisabled={isFirstStep}
@@ -791,6 +794,7 @@ const SamlMicrosoftIdentityProviderMetadataStep = (): JSX.Element => {
       </Step.Body>
 
       <Step.Footer>
+        <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
           isDisabled={isFirstStep || card.isLoading}
