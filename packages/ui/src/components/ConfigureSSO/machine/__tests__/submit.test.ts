@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import type { WizardFacts } from '../../data/deriveFacts';
 import type { ConfigureSSOMutations } from '../../data/useConfigureSSOMutations';
-import type { ProviderType, WizardStepId } from '../../types';
+import type { WizardStepId } from '../../types';
 import type { SubmitCtx } from '../submit';
 import { submitSelectProvider, submitVerifyDomain } from '../submit';
 
@@ -37,9 +37,11 @@ const makeCtx = (overrides: Partial<SubmitCtx> = {}): SubmitCtx => ({
 });
 
 describe('submitSelectProvider', () => {
-  it('verified email → creates the connection and returns { ok: true }', async () => {
+  it('provider selected → creates the connection and returns { ok: true }', async () => {
+    // Under the new order verify-domain ran first, so the create is
+    // unconditional once a provider is chosen.
     const mutations = makeMutations();
-    const ctx = makeCtx({ facts: { ...baseFacts, isPrimaryEmailVerified: true }, mutations, provider: 'saml_okta' });
+    const ctx = makeCtx({ mutations, provider: 'saml_okta' });
 
     const result = await submitSelectProvider(ctx);
 
@@ -48,14 +50,16 @@ describe('submitSelectProvider', () => {
     expect(result).toEqual({ ok: true });
   });
 
-  it('unverified email → returns { ok: true } WITHOUT creating the connection', async () => {
+  it('always creates regardless of email-verified facts (verify-domain ran first)', async () => {
+    // The old isPrimaryEmailVerified branch is dead under the new order: even
+    // with the fact false, the create still fires.
     const mutations = makeMutations();
     const ctx = makeCtx({ facts: { ...baseFacts, isPrimaryEmailVerified: false }, mutations, provider: 'saml_custom' });
 
     const result = await submitSelectProvider(ctx);
 
     expect(ctx.setProvider).toHaveBeenCalledWith('saml_custom');
-    expect(mutations.createConnection).not.toHaveBeenCalled();
+    expect(mutations.createConnection).toHaveBeenCalledWith('saml_custom', ctx.primaryEmailAddress);
     expect(result).toEqual({ ok: true });
   });
 
@@ -73,7 +77,7 @@ describe('submitSelectProvider', () => {
   it('create throws → returns { ok: false, error }', async () => {
     const error = new Error('boom');
     const mutations = makeMutations({ createConnection: vi.fn().mockRejectedValue(error) });
-    const ctx = makeCtx({ facts: { ...baseFacts, isPrimaryEmailVerified: true }, mutations, provider: 'saml_okta' });
+    const ctx = makeCtx({ mutations, provider: 'saml_okta' });
 
     const result = await submitSelectProvider(ctx);
 
@@ -83,37 +87,13 @@ describe('submitSelectProvider', () => {
 });
 
 describe('submitVerifyDomain', () => {
-  it('no connection yet → creates the connection (unverified-path create point) and returns { ok: true }', async () => {
+  it('advances without creating (creation deferred to select-provider under the new order)', async () => {
     const mutations = makeMutations();
-    const ctx = makeCtx({ facts: { ...baseFacts, hasConnection: false }, mutations, provider: 'saml_okta' });
-
-    const result = await submitVerifyDomain(ctx);
-
-    expect(mutations.createConnection).toHaveBeenCalledWith('saml_okta', ctx.primaryEmailAddress);
-    expect(result).toEqual({ ok: true });
-  });
-
-  it('connection already exists → does not re-create, returns { ok: true }', async () => {
-    const mutations = makeMutations();
-    const ctx = makeCtx({ facts: { ...baseFacts, hasConnection: true }, mutations, provider: 'saml_okta' });
+    const ctx = makeCtx({ mutations, provider: 'saml_okta' });
 
     const result = await submitVerifyDomain(ctx);
 
     expect(mutations.createConnection).not.toHaveBeenCalled();
     expect(result).toEqual({ ok: true });
-  });
-
-  it('create throws → returns { ok: false, error }', async () => {
-    const error = new Error('boom');
-    const mutations = makeMutations({ createConnection: vi.fn().mockRejectedValue(error) });
-    const ctx = makeCtx({
-      facts: { ...baseFacts, hasConnection: false },
-      mutations,
-      provider: 'saml_okta' as ProviderType,
-    });
-
-    const result = await submitVerifyDomain(ctx);
-
-    expect(result).toEqual({ ok: false, error });
   });
 });

@@ -56,29 +56,22 @@ export interface SubmitCtx {
 /**
  * Submit handler for the select-provider step.
  *
- * Implements create-in-pre-configure-submit on the verified path:
+ * Under the new step order verify-domain runs first, so by the time the user
+ * reaches select-provider their domain/email is already verified — the create
+ * is unconditional:
  *   - No provider selected → `{ ok: false }` (footer surfaces the validation).
- *   - Provider selected, email verified → create the connection now, then
- *     `{ ok: true }`. The reducer's NEXT then skips the now-fulfilled
- *     verify-domain step and lands on configure.
- *   - Provider selected, email NOT verified → `{ ok: true }` WITHOUT creating;
- *     the reducer's NEXT lands on verify-domain (not fulfilled), where the
- *     unverified-path create happens after email verification.
+ *   - Provider selected → create the connection now, then `{ ok: true }`. The
+ *     reducer's NEXT advances into configure.
  *   - Create throws → `{ ok: false; error }`.
  */
 export const submitSelectProvider = async (ctx: SubmitCtx): Promise<SubmitResult> => {
-  const { provider, setProvider, facts, mutations, primaryEmailAddress } = ctx;
+  const { provider, setProvider, mutations, primaryEmailAddress } = ctx;
 
   if (!provider) {
     return { ok: false };
   }
 
   setProvider(provider);
-
-  if (!facts.isPrimaryEmailVerified) {
-    // Unverified path: defer creation to the verify-domain terminal submit.
-    return { ok: true };
-  }
 
   try {
     await mutations.createConnection(provider, primaryEmailAddress);
@@ -89,27 +82,17 @@ export const submitSelectProvider = async (ctx: SubmitCtx): Promise<SubmitResult
 };
 
 /**
- * Terminal submit of the verify-domain flow, fired after the user verifies
+ * Terminal submit of the verify-domain sub-flow, fired after the user verifies
  * their email.
  *
- * This is the unverified-path create point: the provider was chosen at
- * select-provider but the connection was deliberately not created because the
- * email wasn't verified yet. Once verification lands here, create the connection
- * (if one doesn't already exist) and report success.
+ * Under the new step order verify-domain runs before select-provider, so no
+ * connection exists yet at this point — creation is deferred to select-provider.
+ * This handler simply advances (`{ ok: true }`); it no longer touches
+ * `mutations.createConnection`.
  *
  * Wiring this handler into the nested verify sub-flow happens in a later
  * sub-item — here it is only defined.
  */
-export const submitVerifyDomain = async (ctx: SubmitCtx): Promise<SubmitResult> => {
-  const { facts, mutations, provider, primaryEmailAddress } = ctx;
-
-  if (!facts.hasConnection) {
-    try {
-      await mutations.createConnection(provider as ProviderType, primaryEmailAddress);
-    } catch (error) {
-      return { ok: false, error: error as ClerkAPIError | ClerkRuntimeError | string };
-    }
-  }
-
-  return { ok: true };
+export const submitVerifyDomain = (_ctx: SubmitCtx): Promise<SubmitResult> => {
+  return Promise.resolve({ ok: true });
 };

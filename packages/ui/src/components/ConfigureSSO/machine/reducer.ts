@@ -1,6 +1,6 @@
 import type { WizardFacts } from '../data/deriveFacts';
 import type { WizardStepId } from '../types';
-import { type StepConfig, STEPS } from './steps.config';
+import { type StepConfig, STEPS } from './transitions';
 
 /**
  * The pure state the ConfigureSSO machine tracks. No React, no resources — just
@@ -114,8 +114,12 @@ const advance = (state: MachineState, next: WizardStepId, direction: 1 | 0): Mac
  * Where the wizard mounts on (re)load, derived purely from facts. Mirrors the
  * precedence of the legacy `deriveInitialStep`:
  *   1. `isDomainTakenByOtherOrg` → `verify-domain` (terminal warning).
- *   2. Otherwise the first enabled, non-fulfilled step.
- *   3. Otherwise the last enabled step (everything fulfilled → confirmation).
+ *   2. `isConnectionActive` → `confirmation`. An active connection always lands
+ *      on confirmation, even when it was never successfully tested — matching
+ *      legacy `deriveInitialStep`, which short-circuits on `connection.active`
+ *      before checking config/test.
+ *   3. Otherwise the first enabled, non-fulfilled step.
+ *   4. Otherwise the last enabled step (everything fulfilled → confirmation).
  */
 export const initialState = (facts: WizardFacts): MachineState => {
   const steps = enabledSteps(facts);
@@ -123,6 +127,8 @@ export const initialState = (facts: WizardFacts): MachineState => {
   let target: WizardStepId;
   if (facts.isDomainTakenByOtherOrg) {
     target = 'verify-domain';
+  } else if (facts.isConnectionActive) {
+    target = 'confirmation';
   } else {
     const firstUnfulfilled = steps.find(s => !isFulfilled(s, facts));
     target = (firstUnfulfilled ?? steps[steps.length - 1]).id;

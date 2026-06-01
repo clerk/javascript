@@ -1,23 +1,20 @@
-import type React from 'react';
-
 import type { LocalizationKey } from '@/customizables';
 
 import type { WizardFacts } from '../data/deriveFacts';
-import { ConfigureStep, ConfirmationStep, SelectProviderStep, TestConfigurationStep, VerifyDomainStep } from '../steps';
 import type { WizardStepId } from '../types';
 import * as guards from './guards';
 import type { SubmitCtx, SubmitResult } from './submit';
 import { submitSelectProvider } from './submit';
 
 /**
- * Static description of a single wizard step. The array of these is the single
- * source of truth the reducer, breadcrumb, and footer driver all read from —
+ * Pure, view-free description of a single wizard step. The ordered array of
+ * these (`STEPS`) is the single source of truth the reducer reads from —
  * replacing the JSX-order-as-truth shape in `ConfigureSSO.tsx`.
  *
- * This config references each step's Body component but never renders it; the
- * machine stays pure and the wiring sub-item is responsible for mounting bodies.
+ * No React/view imports live here so the machine stays pure: the state→view
+ * edge is isolated in `stepBodies.tsx`, which the wiring sub-item renders from.
  */
-export interface StepConfig {
+export interface StepTransition {
   /**
    * Stable identifier, matching {@link WizardStepId}.
    */
@@ -27,10 +24,6 @@ export interface StepConfig {
    * step labels yet); typed to also accept a `LocalizationKey` once they do.
    */
   label?: LocalizationKey | string;
-  /**
-   * The step's body component. Referenced, never rendered, by the machine.
-   */
-  Body: React.ComponentType;
   /**
    * Whether the step participates in the flow at all for the given facts. A
    * disabled step is filtered out of the enabled-steps list entirely (the
@@ -59,46 +52,50 @@ export interface StepConfig {
 }
 
 /**
+ * Back-compat alias. The config used to be named `StepConfig` when it carried a
+ * `Body` component; the view edge now lives in `stepBodies.tsx`, leaving this a
+ * pure transition descriptor.
+ */
+export type StepConfig = StepTransition;
+
+/**
  * The ordered, single source of truth for the ConfigureSSO wizard's steps.
  *
- * Order here is the canonical flow order. `enabled`/`fulfilled`/`terminal` are
- * evaluated against {@link WizardFacts} by the reducer; bodies are mounted by
- * the wiring sub-item.
+ * Order here is the canonical flow order: verify-domain first (the user proves
+ * domain ownership / email verification before anything is created), then
+ * provider selection, configuration, testing, and confirmation.
+ * `enabled`/`fulfilled`/`terminal` are evaluated against {@link WizardFacts} by
+ * the reducer; bodies are mounted by the wiring sub-item from `stepBodies.tsx`.
  */
-export const STEPS: readonly StepConfig[] = [
+export const STEPS: readonly StepTransition[] = [
+  {
+    id: 'verify-domain',
+    label: 'Verify domain',
+    fulfilled: guards.verifyDomainFulfilled,
+    terminal: f => f.isDomainTakenByOtherOrg,
+    showReset: true,
+  },
   {
     id: 'select-provider',
-    Body: SelectProviderStep,
     // Only a step while there's no connection yet — creating one removes it
     // from the flow so navigation can never bubble back into provider choice.
     enabled: f => !f.hasConnection,
     onSubmit: submitSelectProvider,
   },
   {
-    id: 'verify-domain',
-    label: 'Verify domain',
-    Body: VerifyDomainStep,
-    fulfilled: guards.verifyDomainFulfilled,
-    terminal: f => f.isDomainTakenByOtherOrg,
-    showReset: true,
-  },
-  {
     id: 'configure',
     label: 'Configure',
-    Body: ConfigureStep,
     fulfilled: guards.configureFulfilled,
     showReset: true,
   },
   {
     id: 'test',
     label: 'Test',
-    Body: TestConfigurationStep,
     fulfilled: guards.testFulfilled,
     showReset: true,
   },
   {
     id: 'confirmation',
     label: 'Confirmation',
-    Body: ConfirmationStep,
   },
 ] as const;

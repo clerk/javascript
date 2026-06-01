@@ -25,27 +25,45 @@ const stateAt = (current: WizardStepId, history: WizardStepId[] = [current]): Ma
 describe('reduce', () => {
   describe('NEXT', () => {
     it('advances to the next non-fulfilled enabled step', () => {
-      // No connection, nothing fulfilled: select-provider → verify-domain.
-      const next = reduce(stateAt('select-provider'), { type: 'NEXT' }, facts());
-      expect(next.current).toBe('verify-domain');
+      // No connection, nothing fulfilled: verify-domain → select-provider.
+      const next = reduce(stateAt('verify-domain'), { type: 'NEXT' }, facts());
+      expect(next.current).toBe('select-provider');
       expect(next.direction).toBe(1);
-      expect(next.history).toEqual(['select-provider', 'verify-domain']);
+      expect(next.history).toEqual(['verify-domain', 'select-provider']);
     });
 
-    it('skips a fulfilled step when walking forward (verified email skips verify-domain)', () => {
-      // Verified email fulfills verify-domain → NEXT from select-provider lands
-      // on configure, skipping verify-domain entirely.
+    it('advances from select-provider to configure (verify-domain fulfilled)', () => {
+      // select-provider is enabled only while no connection exists; with a
+      // verified email verify-domain is fulfilled, so the next non-fulfilled
+      // enabled step ahead of select-provider is configure.
       const next = reduce(stateAt('select-provider'), { type: 'NEXT' }, facts({ isPrimaryEmailVerified: true }));
       expect(next.current).toBe('configure');
       expect(next.history).toEqual(['select-provider', 'configure']);
     });
 
+    it('NEXT is a no-op once the current step has been disabled by new facts', () => {
+      // Edge: if a connection now exists, select-provider is filtered out of the
+      // enabled set, so the machine can no longer be "at" it — NEXT stays put.
+      // The live driver navigates post-create via GOTO, not NEXT.
+      const start = stateAt('select-provider');
+      expect(reduce(start, { type: 'NEXT' }, facts({ hasConnection: true }))).toBe(start);
+    });
+
+    it('skips a fulfilled step when walking forward (verified email skips verify-domain)', () => {
+      // Verified email fulfills verify-domain. From verify-domain, NEXT lands on
+      // the next non-fulfilled step: select-provider.
+      const next = reduce(stateAt('verify-domain'), { type: 'NEXT' }, facts({ isPrimaryEmailVerified: true }));
+      expect(next.current).toBe('select-provider');
+      expect(next.history).toEqual(['verify-domain', 'select-provider']);
+    });
+
     it('skips multiple fulfilled steps in a row', () => {
-      // verify-domain + configure fulfilled → NEXT from select-provider → test.
+      // select-provider disabled (hasConnection) + configure fulfilled → NEXT
+      // from verify-domain → test.
       const next = reduce(
-        stateAt('select-provider'),
+        stateAt('verify-domain'),
         { type: 'NEXT' },
-        facts({ isPrimaryEmailVerified: true, hasMinimumIdPConfig: true }),
+        facts({ isPrimaryEmailVerified: true, hasConnection: true, hasMinimumIdPConfig: true }),
       );
       expect(next.current).toBe('test');
     });
@@ -63,24 +81,24 @@ describe('reduce', () => {
 
   describe('BACK', () => {
     it('pops history to the second-to-last entry', () => {
-      const start = stateAt('configure', ['select-provider', 'verify-domain', 'configure']);
+      const start = stateAt('configure', ['verify-domain', 'select-provider', 'configure']);
       const back = reduce(start, { type: 'BACK' }, facts());
-      expect(back.current).toBe('verify-domain');
+      expect(back.current).toBe('select-provider');
       expect(back.direction).toBe(-1);
-      expect(back.history).toEqual(['select-provider', 'verify-domain']);
+      expect(back.history).toEqual(['verify-domain', 'select-provider']);
     });
 
     it('is a no-op when there is no history to pop', () => {
-      const start = stateAt('select-provider');
+      const start = stateAt('verify-domain');
       expect(reduce(start, { type: 'BACK' }, facts())).toBe(start);
     });
 
     it('round-trips NEXT then BACK', () => {
-      const start = stateAt('select-provider');
+      const start = stateAt('verify-domain');
       const forward = reduce(start, { type: 'NEXT' }, facts());
       const back = reduce(forward, { type: 'BACK' }, facts());
-      expect(back.current).toBe('select-provider');
-      expect(back.history).toEqual(['select-provider']);
+      expect(back.current).toBe('verify-domain');
+      expect(back.history).toEqual(['verify-domain']);
     });
   });
 
@@ -122,8 +140,17 @@ describe('reduce', () => {
 describe('initialState', () => {
   const cases: Array<{ name: string; input: Partial<WizardFacts>; expected: WizardStepId }> = [
     {
-      name: 'no connection → select-provider',
+      // No connection + unverified email: verify-domain is first and not
+      // fulfilled, so the wizard mounts there.
+      name: 'no connection, unverified email → verify-domain',
       input: {},
+      expected: 'verify-domain',
+    },
+    {
+      // No connection but the email is already verified, so verify-domain is
+      // fulfilled and skipped; select-provider is the first non-fulfilled step.
+      name: 'no connection, verified email → select-provider',
+      input: { isPrimaryEmailVerified: true },
       expected: 'select-provider',
     },
     {
@@ -132,14 +159,30 @@ describe('initialState', () => {
       expected: 'verify-domain',
     },
     {
-      name: 'connection, verified, not configured → configure',
+      // Connection exists (select-provider disabled), verified, not configured →
+      // configure is the first non-fulfilled enabled step.
+      name: 'connection, verified, not configured (inactive) → configure',
       input: { hasConnection: true, isPrimaryEmailVerified: true },
       expected: 'configure',
     },
     {
-      name: 'connection, verified, configured, not tested → test',
+      name: 'connection, verified, configured, not tested (inactive) → test',
       input: { hasConnection: true, isPrimaryEmailVerified: true, hasMinimumIdPConfig: true },
       expected: 'test',
+    },
+    {
+      // Previously-uncovered case: an ACTIVE connection short-circuits to
+      // confirmation even though it was never successfully tested. Without the
+      // isConnectionActive short-circuit this wrongly landed on `test`.
+      name: 'connection, active, configured, NOT tested → confirmation (active short-circuit)',
+      input: {
+        hasConnection: true,
+        isPrimaryEmailVerified: true,
+        hasMinimumIdPConfig: true,
+        hasSuccessfulTestRun: false,
+        isConnectionActive: true,
+      },
+      expected: 'confirmation',
     },
     {
       name: 'connection, verified, configured, tested (active) → confirmation',
