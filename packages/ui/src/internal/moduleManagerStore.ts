@@ -2,7 +2,7 @@ import type { ModuleManager } from '@clerk/shared/moduleManager';
 
 let storedModuleManager: ModuleManager | undefined;
 
-export function setModuleManager(mm: ModuleManager): void {
+export function setModuleManager(mm: ModuleManager | undefined): void {
   storedModuleManager = mm;
 }
 

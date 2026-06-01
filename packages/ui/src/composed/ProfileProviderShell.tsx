@@ -3,26 +3,13 @@ import type { EnvironmentResource, LoadedClerk } from '@clerk/shared/types';
 import type { PropsWithChildren, ReactNode } from 'react';
 import { useMemo } from 'react';
 
-import { AppearanceProvider } from '@/ui/customizables/AppearanceContext';
-import { FlowMetadataProvider } from '@/ui/elements/contexts';
+import { ProfileRuntimeProvider } from '@/ui/components/Profile/ProfileRuntimeProvider';
 import type { Appearance } from '@/ui/internal/appearance';
-import { RouteContext } from '@/ui/router/RouteContext';
-import { InternalThemeProvider } from '@/ui/styledSystem';
-import { StyleCacheProvider } from '@/ui/styledSystem/StyleCacheProvider';
 
-import { EnvironmentProvider } from '../contexts/EnvironmentContext';
-import { ModuleManagerProvider } from '../contexts/ModuleManagerContext';
-import { OptionsProvider } from '../contexts/OptionsContext';
-import { AppearanceOverrides } from '../elements/AppearanceOverrides';
-import type { Elements } from '../internal/appearance';
 import { createComposedRouter } from './stubRouter';
 
 export const fallbackModuleManager: ModuleManager = {
   import: () => Promise.resolve(undefined) as any,
-};
-
-const composedOverrides: Elements = {
-  profilePageContent: { padding: 0 },
 };
 
 type ProfileProviderShellProps = PropsWithChildren<{
@@ -48,26 +35,16 @@ export function ProfileProviderShell({
   const router = useMemo(() => createComposedRouter(clerk.navigate), [clerk]);
 
   return (
-    <StyleCacheProvider>
-      <AppearanceProvider
-        appearanceKey={appearanceKey}
-        globalAppearance={globalAppearance}
-        appearance={appearance}
-      >
-        <FlowMetadataProvider flow={flow}>
-          <InternalThemeProvider>
-            <ModuleManagerProvider moduleManager={moduleManager}>
-              <OptionsProvider value={{}}>
-                <EnvironmentProvider value={environment}>
-                  <RouteContext.Provider value={router}>
-                    <AppearanceOverrides elements={composedOverrides}>{children}</AppearanceOverrides>
-                  </RouteContext.Provider>
-                </EnvironmentProvider>
-              </OptionsProvider>
-            </ModuleManagerProvider>
-          </InternalThemeProvider>
-        </FlowMetadataProvider>
-      </AppearanceProvider>
-    </StyleCacheProvider>
+    <ProfileRuntimeProvider
+      environment={environment}
+      moduleManager={moduleManager}
+      router={router}
+      appearanceKey={appearanceKey}
+      flow={flow}
+      globalAppearance={globalAppearance}
+      appearance={appearance}
+    >
+      {children}
+    </ProfileRuntimeProvider>
   );
 }

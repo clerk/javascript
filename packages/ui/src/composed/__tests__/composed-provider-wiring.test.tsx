@@ -2,12 +2,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useModuleManager } from '@/ui/contexts';
 import { useAppearance } from '@/ui/customizables/AppearanceContext';
+import { setModuleManager } from '@/ui/internal/moduleManagerStore';
 import { useRouter } from '@/ui/router';
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen } from '@/test/utils';
 
 import { clearFetchCache } from '../../hooks';
-import { setModuleManager } from '../moduleManagerStore';
 import { OrganizationProfileProvider } from '../OrganizationProfile/OrganizationProfileProvider';
 import { UserProfileProvider } from '../UserProfile/UserProfileProvider';
 
@@ -21,6 +21,16 @@ function ModuleManagerProbe() {
     <div
       data-testid='mm-probe'
       data-has-mm={!!mm}
+    />
+  );
+}
+
+function ModuleManagerIdentityProbe({ moduleManager }: { moduleManager: unknown }) {
+  const mm = useModuleManager();
+  return (
+    <div
+      data-testid='mm-identity-probe'
+      data-is-stored={mm === moduleManager}
     />
   );
 }
@@ -44,12 +54,13 @@ describe('UserProfileProvider wiring', () => {
   });
 
   afterEach(() => {
-    setModuleManager(undefined as any);
+    setModuleManager(undefined);
   });
 
   it('provides the stored moduleManager to children', async () => {
     const mockImport = vi.fn(() => Promise.resolve(undefined));
-    setModuleManager({ import: mockImport });
+    const storedModuleManager = { import: mockImport };
+    setModuleManager(storedModuleManager);
 
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'], first_name: 'Test', last_name: 'User' });
@@ -58,13 +69,35 @@ describe('UserProfileProvider wiring', () => {
 
     render(
       <UserProfileProvider>
+        <ModuleManagerIdentityProbe moduleManager={storedModuleManager} />
+      </UserProfileProvider>,
+      { wrapper },
+    );
+
+    const probe = screen.getByTestId('mm-identity-probe');
+    expect(probe.dataset.isStored).toBe('true');
+  });
+
+  it('does not require Clerk to expose a moduleManager internal', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'], first_name: 'Test', last_name: 'User' });
+    });
+    patchEnvironment(fixtures.clerk, fixtures.environment);
+    Object.defineProperty(fixtures.clerk, '__internal_moduleManager', {
+      get: () => {
+        throw new Error('composed profiles should not read Clerk.__internal_moduleManager');
+      },
+      configurable: true,
+    });
+
+    render(
+      <UserProfileProvider>
         <ModuleManagerProbe />
       </UserProfileProvider>,
       { wrapper },
     );
 
-    const probe = screen.getByTestId('mm-probe');
-    expect(probe.dataset.hasMm).toBe('true');
+    expect(screen.getByTestId('mm-probe').dataset.hasMm).toBe('true');
   });
 
   it('falls back to fallback moduleManager when store is empty', async () => {
@@ -185,12 +218,13 @@ describe('OrganizationProfileProvider wiring', () => {
   });
 
   afterEach(() => {
-    setModuleManager(undefined as any);
+    setModuleManager(undefined);
   });
 
   it('provides the stored moduleManager to children', async () => {
     const mockImport = vi.fn(() => Promise.resolve(undefined));
-    setModuleManager({ import: mockImport });
+    const storedModuleManager = { import: mockImport };
+    setModuleManager(storedModuleManager);
 
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
@@ -206,13 +240,13 @@ describe('OrganizationProfileProvider wiring', () => {
 
     render(
       <OrganizationProfileProvider>
-        <ModuleManagerProbe />
+        <ModuleManagerIdentityProbe moduleManager={storedModuleManager} />
       </OrganizationProfileProvider>,
       { wrapper },
     );
 
-    const probe = screen.getByTestId('mm-probe');
-    expect(probe.dataset.hasMm).toBe('true');
+    const probe = screen.getByTestId('mm-identity-probe');
+    expect(probe.dataset.isStored).toBe('true');
   });
 
   it('returns null when organization is not loaded', async () => {
