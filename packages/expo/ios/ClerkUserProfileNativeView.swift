@@ -3,18 +3,18 @@ import UIKit
 
 public class ClerkUserProfileNativeView: UIView {
   private lazy var hostingCoordinator = ClerkNativeHostingCoordinator(containerView: self)
-  private var currentDismissable: Bool = false
+  private var currentDismissible: Bool = false
   private var hasInitialized: Bool = false
   private var didSignOut = false
   private var dismissalEventSent = false
 
   @objc var onProfileEvent: RCTBubblingEventBlock?
 
-  @objc var isDismissable: NSNumber? {
+  @objc var isDismissible: NSNumber? {
     didSet {
-      let newDismissable = isDismissable?.boolValue ?? false
-      guard newDismissable != currentDismissable else { return }
-      currentDismissable = newDismissable
+      let newDismissible = isDismissible?.boolValue ?? false
+      guard newDismissible != currentDismissible else { return }
+      currentDismissible = newDismissible
       if hasInitialized { updateView() }
     }
   }
@@ -32,7 +32,7 @@ public class ClerkUserProfileNativeView: UIView {
     if window != nil && !hasInitialized {
       hasInitialized = true
       updateView()
-    } else if window == nil && hasInitialized && currentDismissable && !didSignOut && !dismissalEventSent {
+    } else if window == nil && hasInitialized && currentDismissible && !didSignOut && !dismissalEventSent {
       dismissalEventSent = true
       sendProfileEvent(type: .dismissed)
     }
@@ -46,7 +46,7 @@ public class ClerkUserProfileNativeView: UIView {
     guard let factory = clerkViewFactory else { return }
 
     guard let returnedController = factory.createUserProfileView(
-      dismissable: currentDismissable,
+      dismissible: currentDismissible,
       onEvent: { [weak self] event, data in
         if event == .signedOut {
           self?.didSignOut = true

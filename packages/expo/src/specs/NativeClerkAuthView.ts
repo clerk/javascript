@@ -9,7 +9,7 @@ type AuthEvent = Readonly<{ type: string }>;
 
 interface NativeProps extends ViewProps {
   mode?: string;
-  isDismissable?: boolean;
+  isDismissible?: boolean;
   onAuthEvent?: BubblingEventHandler<AuthEvent>;
 }
 

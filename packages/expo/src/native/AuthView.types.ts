@@ -36,7 +36,7 @@ export interface AuthViewProps {
    *
    * @default false
    */
-  isDismissable?: boolean;
+  isDismissible?: boolean;
 
   /**
    * Called when the user dismisses the native authentication view.
