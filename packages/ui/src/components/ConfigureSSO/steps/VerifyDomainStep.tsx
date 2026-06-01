@@ -119,6 +119,7 @@ export const VerifyDomainStep = (): JSX.Element => {
           </Step.Body>
 
           <Step.Footer>
+            <Step.Footer.Reset />
             <Step.Footer.Continue onClick={() => outerGoNext()} />
           </Step.Footer>
         </Step>
@@ -299,6 +300,7 @@ export const ProvideEmailStep = ({ emailAddressRef, preExistingEmailIdRef }: Pro
       </Step.Section>
 
       <Step.Footer>
+        <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
           isDisabled
@@ -416,6 +418,7 @@ export const EnterVerificationCodeStep = ({
       </Step.Section>
 
       <Step.Footer>
+        <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
           isDisabled={!!primaryEmailAddress}

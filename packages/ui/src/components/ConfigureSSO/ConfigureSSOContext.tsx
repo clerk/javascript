@@ -28,11 +28,7 @@ export interface ConfigureSSOData {
    * made on the Select Provider step.
    */
   provider: ProviderType | undefined;
-  /**
-   * Sets the local provider selection used by Select Provider before a
-   * connection has been created.
-   */
-  setProvider: (provider: ProviderType) => void;
+  setProvider: (provider: ProviderType | undefined) => void;
   /**
    * Ref to the scrollable content container of the wizard.
    */

@@ -43,7 +43,11 @@ const OrganizationSelfServeSSOPage = lazy(() =>
   })),
 );
 
-export const OrganizationProfileRoutes = () => {
+type OrganizationProfileRoutesProps = {
+  contentRef: React.RefObject<HTMLDivElement>;
+};
+
+export const OrganizationProfileRoutes = ({ contentRef }: OrganizationProfileRoutesProps) => {
   const {
     pages,
     isMembersPageRoot,
@@ -155,7 +159,7 @@ export const OrganizationProfileRoutes = () => {
             <Switch>
               <Route index>
                 <Suspense fallback={''}>
-                  <OrganizationSelfServeSSOPage />
+                  <OrganizationSelfServeSSOPage contentRef={contentRef} />
                 </Suspense>
               </Route>
             </Switch>

@@ -690,6 +690,7 @@ export type ElementsConfig = {
   configureSSOFooter: WithOptions;
   configureSSOFooterPreviousButton: WithOptions;
   configureSSOFooterContinueButton: WithOptions;
+  configureSSOFooterResetButton: WithOptions;
 
   configureSSOProviderGroup: WithOptions<string>;
   configureSSOProviderGroupLabel: WithOptions<string>;
@@ -739,8 +740,14 @@ export type ElementsConfig = {
   configureSSOConfirmationConfigDetailsLabel: WithOptions;
   configureSSOConfirmationConfigDetailsValue: WithOptions;
   configureSSOConfirmationConfigDetailsLink: WithOptions;
+  configureSSOConfirmationInactiveBanner: WithOptions;
   configureSSOConfirmationReconfigureButton: WithOptions;
   configureSSOConfirmationResetButton: WithOptions;
+
+  configureSSOResetConnectionDialog: WithOptions;
+  configureSSOResetConnectionDialogCancelButton: WithOptions;
+  configureSSOResetConnectionDialogConfirmationInput: WithOptions;
+  configureSSOResetConnectionDialogSubmitButton: WithOptions;
 
   web3SolanaWalletButtonsRoot: WithOptions;
   web3SolanaWalletButtons: WithOptions;
