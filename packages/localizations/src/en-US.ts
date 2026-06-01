@@ -225,7 +225,10 @@ export const enUS: LocalizationResource = {
       statusSection: {
         activeBadge: 'Active',
         inactiveBadge: 'Inactive',
-        title: 'SSO Status',
+        title: 'SSO Successfully configured',
+      },
+      inactiveBanner: {
+        title: 'SSO is inactive and you need to enable it to authenticate',
       },
     },
     missingManageEnterpriseConnectionsPermission: {
@@ -234,6 +237,15 @@ export const enUS: LocalizationResource = {
     },
     navbar: {
       title: 'Configure Single Sign-On (SSO)',
+    },
+    resetConnectionDialog: {
+      cancelButton: 'Cancel',
+      confirmationFieldLabel: 'Type "{{name}}" below to continue',
+      confirmationFieldPlaceholder: '{{name}}',
+      resetButton: 'Reset connection',
+      subtitle:
+        'Are you sure you want to reset the connection? This action is irreversible and you will have to configure all steps again',
+      title: 'Reset connection',
     },
     selectProviderStep: {
       title: 'Select your identity provider',

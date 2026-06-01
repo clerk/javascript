@@ -1301,6 +1301,14 @@ export type __internal_LocalizationResource = {
     navbar: {
       title: LocalizationValue;
     };
+    resetConnectionDialog: {
+      cancelButton: LocalizationValue;
+      confirmationFieldLabel: LocalizationValue<'name'>;
+      confirmationFieldPlaceholder: LocalizationValue<'name'>;
+      resetButton: LocalizationValue;
+      subtitle: LocalizationValue;
+      title: LocalizationValue;
+    };
     selectProviderStep: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
@@ -1790,6 +1798,9 @@ export type __internal_LocalizationResource = {
         warning: LocalizationValue;
         confirmationFieldLabel: LocalizationValue<'name'>;
         submitButton: LocalizationValue;
+      };
+      inactiveBanner: {
+        title: LocalizationValue;
       };
     };
   };

@@ -603,8 +603,14 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'configureSSOConfirmationConfigDetailsLabel',
   'configureSSOConfirmationConfigDetailsValue',
   'configureSSOConfirmationConfigDetailsLink',
+  'configureSSOConfirmationInactiveBanner',
   'configureSSOConfirmationReconfigureButton',
   'configureSSOConfirmationResetButton',
+
+  'configureSSOResetConnectionDialog',
+  'configureSSOResetConnectionDialogCancelButton',
+  'configureSSOResetConnectionDialogConfirmationInput',
+  'configureSSOResetConnectionDialogSubmitButton',
 
   'web3SolanaWalletButtonsRoot',
   'web3SolanaWalletButtons',

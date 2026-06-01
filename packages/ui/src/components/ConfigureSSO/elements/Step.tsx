@@ -1,4 +1,4 @@
-import { type PropsWithChildren } from 'react';
+import { type PropsWithChildren, type ReactNode } from 'react';
 
 import {
   Badge,
@@ -47,9 +47,10 @@ const Section = ({ fill, sx, ...props }: StepSectionProps): JSX.Element => (
 type StepHeaderProps = PropsWithChildren<{
   title: LocalizationKey | string;
   description?: LocalizationKey | string;
+  badge?: ReactNode;
 }>;
 
-const Header = ({ title, description, children }: StepHeaderProps): JSX.Element => {
+const Header = ({ title, description, badge, children }: StepHeaderProps): JSX.Element => {
   const { t } = useLocalizations();
   const titleText = typeof title === 'string' ? title : t(title);
   const descriptionText = description ? (typeof description === 'string' ? description : t(description)) : null;
@@ -69,12 +70,18 @@ const Header = ({ title, description, children }: StepHeaderProps): JSX.Element 
         sx={theme => ({ gap: theme.space.$4 })}
       >
         <Col sx={theme => ({ gap: theme.space.$2, minWidth: 0 })}>
-          <Heading
-            elementDescriptor={descriptors.configureSSOStepHeaderTitle}
-            textVariant='h2'
+          <Flex
+            align='center'
+            sx={t => ({ gap: t.space.$2, flexWrap: 'wrap' })}
           >
-            {titleText}
-          </Heading>
+            <Heading
+              elementDescriptor={descriptors.configureSSOStepHeaderTitle}
+              textVariant='h2'
+            >
+              {titleText}
+            </Heading>
+            {badge}
+          </Flex>
 
           {descriptionText && (
             <Text
