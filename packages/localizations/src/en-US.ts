@@ -242,6 +242,7 @@ export const enUS: LocalizationResource = {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',
         customSaml: 'Custom SAML Provider',
+        google: 'Google Workspace',
       },
       warning: 'Once a provider is selected you cannot change again until the configuration is over',
     },
@@ -359,11 +360,11 @@ export const enUS: LocalizationResource = {
             step5: 'Click <bold>Next</bold> to complete creating the application.',
           },
           serviceProviderInstructions: {
-            title: 'Configure service provider',
+            title: 'Add service provider configuration to Okta',
             paragraph1:
               'Once you have moved forward from the General Settings instructions, you will be presented with the Configure SAML page.',
             paragraph2:
-              'To configure your service provider (Clerk), you must add these two fields to your Okta application:',
+              'To configure your service provider, you must add these two fields to your Okta SAML application:',
             serviceProviderFields: {
               acsUrl: {
                 label: 'Single sign-on URL',
@@ -387,7 +388,7 @@ export const enUS: LocalizationResource = {
           step2: 'Select <bold>Add Expression</bold> for each row below, then enter the matching name and value:',
           attributeMappingTable: {
             columns: {
-              name: 'Name',
+              name: 'Attribute name',
               expression: 'Expression',
             },
             rows: {
@@ -513,6 +514,104 @@ export const enUS: LocalizationResource = {
               removeFile: 'Remove file',
               fileUploaded: 'File uploaded',
             },
+          },
+        },
+      },
+      samlGoogle: {
+        mainHeaderTitle: 'Configure Google Workspace',
+        createAppStep: {
+          headerSubtitle: 'Create a new enterprise application in your Google Workspace',
+          createAppInstructions: {
+            title: 'Create a new enterprise application in Google Workspace',
+            step1: 'Sign in to Google Admin Portal.',
+            step2: 'In the side navigation, under <bold>Apps</bold>, select <bold>Web and mobile apps.</bold>',
+            step3: 'Click on the <bold>Add</bold> app button, and select <bold>Add custom SAML app.</bold>',
+            step4: 'In the <bold>App details</bold> section, fill out the required <bold>App name</bold>.',
+            step5: 'Select the <bold>Continue</bold> button.',
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: 'Configure identity provider metadata',
+          modes: {
+            title: 'Fill in your Google Workspace application details',
+            ariaLabel: 'Configuration ',
+            metadataFile: 'Add via metadata',
+            manual: 'Configure manually',
+          },
+          metadataFile: {
+            label: 'IdP metadata',
+            description: 'In your Google Workspace application, download the IdP metadata and upload it below.',
+            uploadFile: 'Upload file',
+            replaceFile: 'Replace file',
+            removeFile: 'Remove file',
+            fileUploaded: 'File uploaded',
+          },
+          manual: {
+            description: 'In your Google Workspace application, retrieve these values.',
+            signOnUrl: {
+              label: 'SSO URL',
+              placeholder: 'Paste URL here...',
+            },
+            issuer: {
+              label: 'Entity ID',
+              placeholder: 'Paste URL here...',
+            },
+            signingCertificate: {
+              label: 'Signing certificate',
+              uploadFile: 'Upload file',
+              replaceFile: 'Replace file',
+              removeFile: 'Remove file',
+              fileUploaded: 'File uploaded',
+            },
+          },
+        },
+        serviceProviderStep: {
+          headerSubtitle: 'Configure service provider',
+          title: 'Configure service provider',
+          paragraph:
+            'To configure your service provider, you must add these two fields to your Google Workspace SAML application:',
+          serviceProviderFields: {
+            acsUrl: {
+              label: 'ACS URL',
+            },
+            spEntityId: {
+              label: 'Entity ID',
+            },
+          },
+          nameIdInstructions: {
+            step1:
+              'Under the <bold>Name ID</bold> section, select the <bold>Name ID</bold> format dropdown and select <bold>Email</bold>.',
+            step2: 'Select <bold>Continue</bold>',
+          },
+        },
+        attributeMappingStep: {
+          headerSubtitle: 'Map user attributes from Google Workspace to your application',
+          paragraph: 'We expect your SAML response to return the user’s email, first name and last name.',
+          step1: 'In the <bold>Google Admin Console</bold>, find the <bold>Attributes</bold> section.',
+          step2:
+            'Select <bold>Add mapping</bold> for each attribute, and enter the following Google and app attribute:',
+          attributeMappingTable: {
+            columns: {
+              googleAttribute: 'Google attribute',
+              appAttribute: 'App attribute',
+            },
+            rows: {
+              email: { googleAttribute: 'Primary email', appAttribute: 'email' },
+              firstName: { googleAttribute: 'First name', appAttribute: 'firstName' },
+              lastName: { googleAttribute: 'Last name', appAttribute: 'lastName' },
+            },
+          },
+        },
+        configureUserAccess: {
+          headerSubtitle: 'Enable your Google Workspace SAML application',
+          assignUsersInstructions: {
+            paragraph1:
+              "Once the configuration is complete in Google, you'll be redirected to the app's overview page.",
+            step1: 'Open the <bold>User access</bold> section.',
+            step2: 'Select <bold>ON for everyone.</bold>',
+            step3: 'Select <bold>Save</bold>.',
+            paragraph2:
+              'Google may take up to 24 hours to propagate these changes. The connection will remain inactive until they take effect.',
           },
         },
       },

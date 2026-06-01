@@ -47,6 +47,11 @@ const PROVIDER_GROUPS: ReadonlyArray<{
         label: localizationKeys('configureSSO.selectProviderStep.saml.customSaml'),
         iconId: 'saml',
       },
+      {
+        id: 'saml_google',
+        label: localizationKeys('configureSSO.selectProviderStep.saml.google'),
+        iconId: 'google',
+      },
     ],
   },
 ];

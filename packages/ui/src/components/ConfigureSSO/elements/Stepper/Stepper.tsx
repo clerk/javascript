@@ -95,6 +95,7 @@ const Item = ({
               fontSize: theme.fontSizes.$xs,
               fontWeight: theme.fontWeights.$medium,
               color: theme.colors.$colorBackground,
+              lineHeight: '1rem',
             })}
           >
             {bullet}
