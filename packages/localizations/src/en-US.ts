@@ -225,7 +225,10 @@ export const enUS: LocalizationResource = {
       statusSection: {
         activeBadge: 'Active',
         inactiveBadge: 'Inactive',
-        title: 'SSO Status',
+        title: 'SSO Successfully configured',
+      },
+      inactiveBanner: {
+        title: 'SSO is inactive and you need to enable it to authenticate',
       },
     },
     missingManageEnterpriseConnectionsPermission: {
@@ -235,6 +238,15 @@ export const enUS: LocalizationResource = {
     navbar: {
       title: 'Configure Single Sign-On (SSO)',
     },
+    resetConnectionDialog: {
+      cancelButton: 'Cancel',
+      confirmationFieldLabel: 'Type "{{name}}" below to continue',
+      confirmationFieldPlaceholder: '{{name}}',
+      resetButton: 'Reset connection',
+      subtitle:
+        'Are you sure you want to reset the connection? This action is irreversible and you will have to configure all steps again',
+      title: 'Reset connection',
+    },
     selectProviderStep: {
       title: 'Select your identity provider',
       subtitle: 'We’ll guide you through the detailed setup process next.',
@@ -243,6 +255,7 @@ export const enUS: LocalizationResource = {
         okta: 'Okta Workforce',
         customSaml: 'Custom SAML Provider',
         google: 'Google Workspace',
+        microsoft: 'Microsoft Entra (formerly AD)',
       },
       warning: 'Once a provider is selected you cannot change again until the configuration is over',
     },
@@ -612,6 +625,127 @@ export const enUS: LocalizationResource = {
             step3: 'Select <bold>Save</bold>.',
             paragraph2:
               'Google may take up to 24 hours to propagate these changes. The connection will remain inactive until they take effect.',
+          },
+        },
+      },
+      samlMicrosoft: {
+        mainHeaderTitle: 'Configure Microsoft Entra',
+        createAppStep: {
+          headerSubtitle: 'Create a new enterprise application in your Azure portal',
+          createAppInstructions: {
+            title: 'Create a new enterprise application in Microsoft Entra',
+            step1: 'Sign in to Microsoft Azure Portal and go to <bold>Enterprise applications.</bold>',
+            step2:
+              "Click <bold>New application.</bold> You'll be redirected to the <bold>Browse Microsoft Entra Gallery</bold> page.",
+            step3: 'Select <bold>Create your own application.</bold>',
+            step4: {
+              label: 'In the modal that opens:',
+              subSteps: {
+                appName: 'Fill out your application name.',
+                nonGallery:
+                  "Select <bold>Integrate any other application you don't find in the gallery (Non-gallery)</bold>.",
+                create: 'Select <bold>Create</bold>.',
+              },
+            },
+          },
+          assignUsersInstructions: {
+            title: 'Assign your users or groups in Microsoft',
+            paragraph1: 'You need to assign users or groups before they can use it to log in.',
+            step1: 'In the <bold>Getting Started</bold> section, select the <bold>Assign users and groups.</bold>',
+            step2: "Select <bold>Add user/group.</bold> You'll be redirected to the <bold>Add Assignment page.</bold>",
+            step3: 'Select the <bold>None Selected link.</bold>',
+            step4:
+              'To assign a user to the enterprise app, you can either use the search field to find a user or select the checkbox next to the user in the table.',
+            step5:
+              "Select <bold>Select</bold> at the bottom of the page. You'll be redirected to the <bold>Add Assignment</bold> page.",
+            step6: 'Select <bold>Assign</bold> at the bottom of the page.',
+          },
+        },
+        serviceProviderStep: {
+          headerSubtitle: 'Add service provider configuration to Microsoft Entra',
+          title: 'Configure service provider',
+          step1: 'In the side navigation, open the <bold>Manage</bold> dropdown and select Single sign-on.',
+          step2:
+            "In the <bold>Select a single sign-on</bold> method section, select <bold>SAML</bold>. You'll be redirected to the <bold>Set up Single Sign-On with SAML</bold> page.",
+          step3: 'Find the <bold>Basic SAML Configuration</bold> section.',
+          step4: 'Select <bold>Edit</bold>. The <bold>Basic SAML Configuration</bold> panel will open.',
+          step5:
+            'Add the following <bold>Identifier (Entity ID)</bold> and <bold>Reply URL (Assertion Consumer Service URL)</bold> values. These values will be saved automatically.',
+          step6: 'Select <bold>Save</bold> at the top of the panel. Close the panel.',
+          serviceProviderFields: {
+            acsUrl: {
+              label: 'Reply URL (Assertion Consumer Service URL)',
+            },
+            spEntityId: {
+              label: 'Identifier (Entity ID)',
+            },
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: 'Configure identity provider metadata',
+          modes: {
+            title: 'Fill in your Microsoft Entra application details',
+            ariaLabel: 'Configuration ',
+            metadataUrl: 'Add via metadata',
+            manual: 'Configure manually',
+          },
+          metadataUrl: {
+            label: 'Metadata URL',
+            placeholder: 'Paste URL here...',
+            description:
+              'On the <bold>SAML-based Sign-on</bold> page, find the <bold>SAML Certificates</bold> section. Add the <bold>App Federation Metadata Url</bold> below.',
+          },
+          manual: {
+            description:
+              'On the <bold>SAML-based Sign-on</bold> page, find the <bold>SAML Certificates</bold> section. Retrieve these values and add them below.',
+            signOnUrl: {
+              label: 'Single Sign-On URL',
+              placeholder: 'Paste URL here...',
+            },
+            issuer: {
+              label: 'Issuer',
+              placeholder: 'Paste URL here...',
+            },
+            signingCertificate: {
+              label: 'Signing certificate',
+              uploadFile: 'Upload file',
+              replaceFile: 'Replace file',
+              removeFile: 'Remove file',
+              fileUploaded: 'File uploaded',
+            },
+          },
+        },
+        attributeMappingStep: {
+          headerSubtitle: 'Map user attributes from Microsoft Entra to your application',
+          title: 'We expect your SAML responses to have the following specific attributes:',
+          paragraph:
+            "These are the defaults and probably won't need you to change them. However, many SAML configuration errors are due to incorrect attribute mappings, so it's worth double-checking. Here's how:",
+          step1: 'On the <bold>SAML-based Sign-on</bold> page, find the <bold>Attributes & Claims</bold> section.',
+          step2: 'Select <bold>Edit</bold>',
+          step3: 'Verify that the above three attributes and values are present.',
+          attributeMappingTable: {
+            columns: {
+              attribute: 'Attribute',
+              claimName: 'Claim name',
+              value: 'Value',
+            },
+            rows: {
+              email: {
+                attribute: 'Email address',
+                claimName: 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress',
+                value: 'user.mail',
+              },
+              firstName: {
+                attribute: 'First name',
+                claimName: 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname',
+                value: 'user.givenname',
+              },
+              lastName: {
+                attribute: 'Last name',
+                claimName: 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname',
+                value: 'user.surname',
+              },
+            },
           },
         },
       },
