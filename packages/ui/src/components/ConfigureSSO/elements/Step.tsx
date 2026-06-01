@@ -1,4 +1,4 @@
-import { useOrganization } from '@clerk/shared/react';
+import { __internal_useOrganizationBase } from '@clerk/shared/react';
 import { type PropsWithChildren, type ReactNode, useState } from 'react';
 
 import {
@@ -194,7 +194,7 @@ FooterContinue.displayName = 'Step.Footer.Continue';
 
 const FooterReset = (): JSX.Element | null => {
   const { enterpriseConnection } = useConfigureSSO();
-  const { organization } = useOrganization();
+  const organization = __internal_useOrganizationBase();
   const [isOpen, setIsOpen] = useState(false);
 
   if (!enterpriseConnection) {
