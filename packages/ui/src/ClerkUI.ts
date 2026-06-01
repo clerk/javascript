@@ -8,8 +8,8 @@ import type { ClerkUIInstance, ComponentControls as SharedComponentControls } fr
 import { isVersionAtLeast, parseVersion } from '@clerk/shared/versionCheck';
 
 import { type MountComponentRenderer, mountComponentRenderer } from './Components';
-import { setModuleManager } from './composed/moduleManagerStore';
 import { MIN_CLERK_JS_VERSION } from './constants';
+import { setModuleManager } from './internal/moduleManagerStore';
 
 /**
  * Core rendering engine for Clerk's prebuilt UI components.

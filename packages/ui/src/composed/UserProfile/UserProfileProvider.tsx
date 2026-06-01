@@ -3,6 +3,7 @@ import { useClerk, useUser } from '@clerk/shared/react';
 import type { EnvironmentResource, OAuthProvider, OAuthScope } from '@clerk/shared/types';
 import type { PropsWithChildren, ReactNode } from 'react';
 
+import { getModuleManager } from '@/ui/internal/moduleManagerStore';
 import type { Appearance } from '@/ui/internal/appearance';
 
 import { UserProfileContext } from '../../contexts/components/UserProfile';
@@ -19,7 +20,7 @@ export const UserProfileProvider = (props: UserProfileProviderProps): ReactNode 
   const { isLoaded, user } = useUser();
 
   const environment = (clerk as any).__internal_environment as EnvironmentResource | null | undefined;
-  const moduleManager: ModuleManager = (clerk as any).__internal_moduleManager ?? fallbackModuleManager;
+  const moduleManager: ModuleManager = getModuleManager() ?? fallbackModuleManager;
 
   if (!isLoaded || !user || !environment) {
     return null;
