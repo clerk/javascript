@@ -154,6 +154,7 @@ const SamlGoogleCreateAppStep = (): JSX.Element => {
       </Step.Body>
 
       <Step.Footer>
+        <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
           isDisabled={isFirstStep}
@@ -353,6 +354,7 @@ const SamlGoogleIdentityProviderMetadataStep = (): JSX.Element => {
       </Step.Body>
 
       <Step.Footer>
+        <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
           isDisabled={isFirstStep || card.isLoading}
@@ -460,6 +462,7 @@ const SamlGoogleServiceProviderStep = (): JSX.Element => {
       </Step.Body>
 
       <Step.Footer>
+        <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
           isDisabled={isFirstStep}
@@ -598,6 +601,7 @@ const SamlGoogleAttributeMappingStep = (): JSX.Element => {
       </Step.Body>
 
       <Step.Footer>
+        <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
           isDisabled={isFirstStep}
@@ -673,6 +677,7 @@ const SamlGoogleConfigureUserAccessStep = (): JSX.Element => {
       </Step.Body>
 
       <Step.Footer>
+        <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
           isDisabled={isFirstStep}
