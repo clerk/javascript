@@ -26,9 +26,6 @@ import androidx.savedstate.compose.LocalSavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.clerk.api.Clerk
 import com.clerk.ui.auth.AuthView
-import com.facebook.react.bridge.Arguments
-import com.facebook.react.bridge.ReactContext
-import com.facebook.react.uimanager.events.RCTEventEmitter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -42,7 +39,7 @@ private fun debugLog(tag: String, message: String) {
 
 class ClerkAuthNativeView(context: Context) : FrameLayout(context) {
   var mode: String = "signInOrUp"
-  var isDismissable: Boolean = true
+  var isDismissible: Boolean = true
 
   private val activity: ComponentActivity? = findActivity(context).also {
     // At cold start, ClerkExpoModule.configure() may run before React's
@@ -104,7 +101,7 @@ class ClerkAuthNativeView(context: Context) : FrameLayout(context) {
   private var authCompletedSent: Boolean = false
 
   fun setupView() {
-    debugLog(TAG, "setupView - mode: $mode, isDismissable: $isDismissable, activity: $activity")
+    debugLog(TAG, "setupView - mode: $mode, isDismissible: $isDismissible, activity: $activity")
 
     composeView.setContent {
       val session by Clerk.sessionFlow.collectAsStateWithLifecycle()
@@ -117,10 +114,7 @@ class ClerkAuthNativeView(context: Context) : FrameLayout(context) {
         if (currentSession != null && currentId != initialSessionId && !authCompletedSent) {
           debugLog(TAG, "Auth completed - new session: $currentId (initial: $initialSessionId)")
           authCompletedSent = true
-          sendEvent("signInCompleted", mapOf(
-            "sessionId" to currentSession.id,
-            "type" to "signIn"
-          ))
+          ClerkExpoModule.emitAuthStateChange("signedIn", currentSession.id)
         }
       }
 
@@ -154,22 +148,6 @@ class ClerkAuthNativeView(context: Context) : FrameLayout(context) {
         content()
       }
     }
-  }
-
-  private fun sendEvent(type: String, data: Map<String, Any?>) {
-    val reactContext = context as? ReactContext ?: return
-    val eventData = Arguments.createMap().apply {
-      putString("type", type)
-      // Serialize data as JSON string for codegen event
-      val jsonString = try {
-        org.json.JSONObject(data).toString()
-      } catch (e: Exception) {
-        "{}"
-      }
-      putString("data", jsonString)
-    }
-    reactContext.getJSModule(RCTEventEmitter::class.java)
-      .receiveEvent(id, "onAuthEvent", eventData)
   }
 
   companion object {

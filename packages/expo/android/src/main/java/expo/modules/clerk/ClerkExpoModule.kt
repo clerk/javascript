@@ -1,8 +1,6 @@
 package expo.modules.clerk
 
-import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -11,12 +9,12 @@ import com.clerk.api.network.serialization.ClerkResult
 import com.clerk.api.ui.ClerkColors
 import com.clerk.api.ui.ClerkDesign
 import com.clerk.api.ui.ClerkTheme
-import com.facebook.react.bridge.ActivityEventListener
+import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactMethod
-import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.bridge.WritableNativeMap
+import com.facebook.react.modules.core.DeviceEventManagerModule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.TimeoutCancellationException
@@ -34,37 +32,45 @@ private fun debugLog(tag: String, message: String) {
 }
 
 class ClerkExpoModule(reactContext: ReactApplicationContext) :
-    NativeClerkModuleSpec(reactContext),
-    ActivityEventListener {
-
-    companion object {
-        const val CLERK_AUTH_REQUEST_CODE = 9001
-        const val CLERK_PROFILE_REQUEST_CODE = 9002
-
-        // Intent extras
-        const val EXTRA_DISMISSABLE = "dismissable"
-        const val EXTRA_PUBLISHABLE_KEY = "publishableKey"
-        const val EXTRA_MODE = "mode"
-
-        // Result extras
-        const val RESULT_SESSION_ID = "sessionId"
-        const val RESULT_CANCELLED = "cancelled"
-
-        // Pending promises for activity results
-        private var pendingAuthPromise: Promise? = null
-        private var pendingProfilePromise: Promise? = null
-
-        // Store publishable key for passing to activities
-        private var publishableKey: String? = null
-    }
+    NativeClerkModuleSpec(reactContext) {
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
+    companion object {
+        private var sharedReactContext: ReactApplicationContext? = null
+        private var listenerCount = 0
+
+        fun emitAuthStateChange(type: String, sessionId: String?) {
+            if (listenerCount <= 0) {
+                return
+            }
+
+            val event = Arguments.createMap().apply {
+                putString("type", type)
+                putString("sessionId", sessionId)
+            }
+
+            sharedReactContext
+                ?.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
+                ?.emit("onAuthStateChange", event)
+        }
+    }
+
     init {
-        reactContext.addActivityEventListener(this)
+        sharedReactContext = reactContext
     }
 
     override fun getName(): String = "ClerkExpo"
+
+    @ReactMethod
+    override fun addListener(eventName: String) {
+        listenerCount += 1
+    }
+
+    @ReactMethod
+    override fun removeListeners(count: Double) {
+        listenerCount = maxOf(0, listenerCount - count.toInt())
+    }
 
     // MARK: - configure
 
@@ -72,8 +78,6 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
     override fun configure(pubKey: String, bearerToken: String?, promise: Promise) {
         coroutineScope.launch {
             try {
-                publishableKey = pubKey
-
                 if (!Clerk.isInitialized.value) {
                     // First-time initialization — write the bearer token to SharedPreferences
                     // before initializing so the SDK boots with the correct client.
@@ -95,10 +99,6 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
                     // cold start before React's host-resume sync — AuthView and
                     // UserProfile also call attachActivity() on mount as a backstop.
                     getCurrentActivity()?.let { Clerk.attachActivity(it) }
-                    // Theme loading is centralized here. ClerkViewFactory.configure()
-                    // and ClerkUserProfileActivity.onCreate() only call Clerk.initialize()
-                    // when Clerk is not yet initialized, so by the time they run
-                    // ClerkExpoModule has already set the custom theme.
                     // Must be set AFTER Clerk.initialize() because initialize()
                     // resets customTheme to its `theme` parameter (default null).
                     loadThemeFromAssets()
@@ -159,67 +159,6 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
                 promise.reject("E_INIT_FAILED", "Failed to initialize Clerk SDK: ${e.message}", e)
             }
         }
-    }
-
-    // MARK: - presentAuth
-
-    @ReactMethod
-    override fun presentAuth(options: ReadableMap, promise: Promise) {
-        val activity = getCurrentActivity() ?: run {
-            promise.reject("E_ACTIVITY_UNAVAILABLE", "No activity available to present Clerk UI.")
-            return
-        }
-
-        if (!Clerk.isInitialized.value) {
-            promise.reject("E_NOT_INITIALIZED", "Clerk SDK is not initialized. Call configure() first.")
-            return
-        }
-
-        // Check if user is already signed in
-        if (Clerk.session != null) {
-            promise.reject("already_signed_in", "User is already signed in")
-            return
-        }
-
-        pendingAuthPromise?.reject("E_SUPERSEDED", "Auth presentation was superseded")
-        pendingAuthPromise = promise
-
-        val mode = if (options.hasKey("mode")) options.getString("mode") ?: "signInOrUp" else "signInOrUp"
-        val dismissable = if (options.hasKey("dismissable")) options.getBoolean("dismissable") else true
-
-        val intent = Intent(activity, ClerkAuthActivity::class.java).apply {
-            putExtra(EXTRA_MODE, mode)
-            putExtra(EXTRA_DISMISSABLE, dismissable)
-        }
-
-        activity.startActivityForResult(intent, CLERK_AUTH_REQUEST_CODE)
-    }
-
-    // MARK: - presentUserProfile
-
-    @ReactMethod
-    override fun presentUserProfile(options: ReadableMap, promise: Promise) {
-        val activity = getCurrentActivity() ?: run {
-            promise.reject("E_ACTIVITY_UNAVAILABLE", "No activity available to present Clerk UI.")
-            return
-        }
-
-        if (!Clerk.isInitialized.value) {
-            promise.reject("E_NOT_INITIALIZED", "Clerk SDK is not initialized. Call configure() first.")
-            return
-        }
-
-        pendingProfilePromise?.reject("E_SUPERSEDED", "Profile presentation was superseded")
-        pendingProfilePromise = promise
-
-        val dismissable = if (options.hasKey("dismissable")) options.getBoolean("dismissable") else true
-
-        val intent = Intent(activity, ClerkUserProfileActivity::class.java).apply {
-            putExtra(EXTRA_DISMISSABLE, dismissable)
-            putExtra(EXTRA_PUBLISHABLE_KEY, publishableKey)
-        }
-
-        activity.startActivityForResult(intent, CLERK_PROFILE_REQUEST_CODE)
     }
 
     // MARK: - getSession
@@ -304,95 +243,6 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
                 promise.reject("E_SIGN_OUT_FAILED", e.message ?: "Sign out failed", e)
             }
         }
-    }
-
-    // MARK: - Activity Result Handling
-
-    override fun onActivityResult(activity: Activity, requestCode: Int, resultCode: Int, data: Intent?) {
-        when (requestCode) {
-            CLERK_AUTH_REQUEST_CODE -> handleAuthResult(resultCode, data)
-            CLERK_PROFILE_REQUEST_CODE -> handleProfileResult(resultCode, data)
-        }
-    }
-
-    override fun onNewIntent(intent: Intent) {
-        // Not used
-    }
-
-    private fun handleAuthResult(resultCode: Int, data: Intent?) {
-        val promise = pendingAuthPromise ?: return
-        pendingAuthPromise = null
-
-        if (resultCode == Activity.RESULT_OK) {
-            val session = Clerk.session
-            val user = Clerk.user
-
-            val result = WritableNativeMap()
-
-            // Top-level sessionId for JS SDK compatibility (matches iOS response format)
-            result.putString("sessionId", session?.id)
-
-            session?.let {
-                val sessionMap = WritableNativeMap()
-                sessionMap.putString("id", it.id)
-                sessionMap.putString("status", it.status.name)
-                sessionMap.putString("userId", it.user?.id)
-                result.putMap("session", sessionMap)
-            }
-
-            user?.let {
-                val primaryEmail = it.emailAddresses?.find { e -> e.id == it.primaryEmailAddressId }
-
-                val userMap = WritableNativeMap()
-                userMap.putString("id", it.id)
-                userMap.putString("firstName", it.firstName)
-                userMap.putString("lastName", it.lastName)
-                userMap.putString("imageUrl", it.imageUrl)
-                userMap.putString("primaryEmailAddress", primaryEmail?.emailAddress)
-                result.putMap("user", userMap)
-            }
-
-            promise.resolve(result)
-        } else {
-            val result = WritableNativeMap()
-            result.putBoolean("cancelled", true)
-            promise.resolve(result)
-        }
-    }
-
-    private fun handleProfileResult(resultCode: Int, data: Intent?) {
-        val promise = pendingProfilePromise ?: return
-        pendingProfilePromise = null
-
-        // Profile always returns current session state
-        val session = Clerk.session
-        val user = Clerk.user
-
-        val result = WritableNativeMap()
-
-        session?.let {
-            val sessionMap = WritableNativeMap()
-            sessionMap.putString("id", it.id)
-            sessionMap.putString("status", it.status.name)
-            sessionMap.putString("userId", it.user?.id)
-            result.putMap("session", sessionMap)
-        }
-
-        user?.let {
-            val primaryEmail = it.emailAddresses?.find { e -> e.id == it.primaryEmailAddressId }
-
-            val userMap = WritableNativeMap()
-            userMap.putString("id", it.id)
-            userMap.putString("firstName", it.firstName)
-            userMap.putString("lastName", it.lastName)
-            userMap.putString("imageUrl", it.imageUrl)
-            userMap.putString("primaryEmailAddress", primaryEmail?.emailAddress)
-            result.putMap("user", userMap)
-        }
-
-        result.putBoolean("dismissed", resultCode == Activity.RESULT_CANCELED)
-
-        promise.resolve(result)
     }
 
     // MARK: - Theme Loading

@@ -39,8 +39,13 @@ Pod::Spec.new do |s|
   # ClerkViewFactory.swift (with views) is injected into the app target by the config plugin
   # because it uses `import ClerkKit` which is only available via SPM in the app target.
   s.source_files = "ClerkExpoModule.swift", "ClerkExpoModule.m",
+                   "ClerkNativeEvent.swift", "ClerkNativeHostingCoordinator.swift",
+                   "ClerkAuthNativeView.swift",
                    "ClerkAuthViewManager.swift", "ClerkAuthViewManager.m",
-                   "ClerkUserProfileViewManager.swift", "ClerkUserProfileViewManager.m"
+                   "ClerkUserProfileNativeView.swift",
+                   "ClerkUserProfileViewManager.swift", "ClerkUserProfileViewManager.m",
+                   "ClerkUserButtonNativeView.swift",
+                   "ClerkUserButtonViewManager.swift", "ClerkUserButtonViewManager.m"
 
   install_modules_dependencies(s)
 end
