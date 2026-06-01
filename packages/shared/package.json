@@ -30,6 +30,7 @@
         "default": "./dist/runtime/internal/clerk-js/*.js"
       }
     },
+    "./_chunks/*": null,
     "./*": {
       "import": {
         "types": "./dist/runtime/*.d.mts",

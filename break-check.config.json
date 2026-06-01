@@ -23,5 +23,12 @@
   "snapshotDir": ".api-snapshots",
   "mainBranch": "main",
   "checkVersionBump": true,
-  "outputFormat": "markdown"
+  "outputFormat": "markdown",
+  "ignoreSubpaths": [
+    "./handleValueOrFn-BWsoUzyL",
+    "./index-CTKNTj8t",
+    "./moduleManager-BsmFyRrH",
+    "./url-BIKflgSC",
+    "./waitForElement-DZxkXjac"
+  ]
 }
