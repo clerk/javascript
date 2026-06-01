@@ -77,7 +77,7 @@ const resetMocks = () => {
 };
 
 describe('ResetConnectionDialog', () => {
-  it('returns null when isOpen is false', async () => {
+  it('does not render when `isOpen` is `false`', async () => {
     resetMocks();
     const { wrapper } = await createFixtures();
     renderDialog(wrapper, { isOpen: false });

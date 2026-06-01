@@ -16,12 +16,6 @@ import { useWizard } from './elements/Wizard';
 type ResetConnectionDialogProps = {
   isOpen: boolean;
   onClose: () => void;
-  /**
-   * The string the user must type to enable the destructive submit button.
-   * Today this is the organization name; long-term it may swap to the
-   * connection's domain — the dialog stays agnostic so callers own the
-   * canonical value.
-   */
   confirmationValue: string;
 };
 
