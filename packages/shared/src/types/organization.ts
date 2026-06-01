@@ -1,4 +1,15 @@
 import type { BillingPayerMethods } from './billing';
+import type { DeletedObjectResource } from './deletedObject';
+import type {
+  CreateOrganizationEnterpriseConnectionParams,
+  EnterpriseConnectionResource,
+  UpdateOrganizationEnterpriseConnectionParams,
+} from './enterpriseConnection';
+import type {
+  EnterpriseConnectionTestRunInitResource,
+  EnterpriseConnectionTestRunResource,
+  GetEnterpriseConnectionTestRunsParams,
+} from './enterpriseConnectionTestRun';
 import type { OrganizationDomainResource, OrganizationEnrollmentMode } from './organizationDomain';
 import type { OrganizationInvitationResource, OrganizationInvitationStatus } from './organizationInvitation';
 import type { OrganizationCustomRoleKey, OrganizationMembershipResource } from './organizationMembership';
@@ -7,6 +18,7 @@ import type { ClerkPaginatedResponse, ClerkPaginationParams } from './pagination
 import type { ClerkResource } from './resource';
 import type { RoleResource } from './role';
 import type { OrganizationJSONSnapshot } from './snapshots';
+import type { GetEnterpriseConnectionsParams } from './user';
 
 declare global {
   /**
@@ -64,6 +76,22 @@ export interface OrganizationResource extends ClerkResource, BillingPayerMethods
   removeMember: (userId: string) => Promise<OrganizationMembershipResource>;
   createDomain: (domainName: string) => Promise<OrganizationDomainResource>;
   getDomain: ({ domainId }: { domainId: string }) => Promise<OrganizationDomainResource>;
+  getEnterpriseConnections: (params?: GetEnterpriseConnectionsParams) => Promise<EnterpriseConnectionResource[]>;
+  createEnterpriseConnection: (
+    params: CreateOrganizationEnterpriseConnectionParams,
+  ) => Promise<EnterpriseConnectionResource>;
+  updateEnterpriseConnection: (
+    enterpriseConnectionId: string,
+    params: UpdateOrganizationEnterpriseConnectionParams,
+  ) => Promise<EnterpriseConnectionResource>;
+  deleteEnterpriseConnection: (enterpriseConnectionId: string) => Promise<DeletedObjectResource>;
+  createEnterpriseConnectionTestRun: (
+    enterpriseConnectionId: string,
+  ) => Promise<EnterpriseConnectionTestRunInitResource>;
+  getEnterpriseConnectionTestRuns: (
+    enterpriseConnectionId: string,
+    params?: GetEnterpriseConnectionTestRunsParams,
+  ) => Promise<ClerkPaginatedResponse<EnterpriseConnectionTestRunResource>>;
   destroy: () => Promise<void>;
   setLogo: (params: SetOrganizationLogoParams) => Promise<OrganizationResource>;
   __internal_toSnapshot: () => OrganizationJSONSnapshot;
