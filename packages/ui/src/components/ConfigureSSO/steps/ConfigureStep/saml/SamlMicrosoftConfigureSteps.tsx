@@ -522,7 +522,10 @@ const MicrosoftAttributeMappingTable = (): JSX.Element => (
                     localizationKey={claimNameKey}
                   />
                 </Tooltip.Trigger>
-                <Tooltip.Content text={claimNameKey} />
+                <Tooltip.Content
+                  text={claimNameKey}
+                  textSx={{ overflowWrap: 'anywhere' }}
+                />
               </Tooltip.Root>
             </Td>
             <Td>
