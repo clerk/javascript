@@ -34,7 +34,7 @@ import type { AuthViewProps } from './AuthView.types';
  *
  * @see {@link https://clerk.com/docs/components/authentication/sign-in} Clerk Sign-In Documentation
  */
-export function AuthView({ mode = 'signInOrUp', isDismissible = false, onDismiss }: AuthViewProps) {
+export function AuthView({ mode = 'signInOrUp', isDismissible = true, onDismiss }: AuthViewProps) {
   const handleAuthEvent = useCallback(
     (event: { nativeEvent: { type: string } }) => {
       if (event.nativeEvent.type === 'dismissed') {

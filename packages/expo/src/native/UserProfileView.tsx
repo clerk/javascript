@@ -15,7 +15,7 @@ export interface UserProfileViewProps {
    * This controls the native view's built-in dismiss button. It does not present
    * a modal; render `UserProfileView` inside your own `Modal`, sheet, or route.
    *
-   * @default false
+   * @default true
    */
   isDismissible?: boolean;
 
@@ -60,7 +60,7 @@ export interface UserProfileViewProps {
  *
  * @see {@link https://clerk.com/docs/components/user/user-profile} Clerk UserProfile Documentation
  */
-export function UserProfileView({ isDismissible = false, style, onDismiss }: UserProfileViewProps) {
+export function UserProfileView({ isDismissible = true, style, onDismiss }: UserProfileViewProps) {
   const handleProfileEvent = useCallback(
     (event: { nativeEvent: { type: string } }) => {
       if (event.nativeEvent.type === 'dismissed') {
