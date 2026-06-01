@@ -1,25 +1,35 @@
 import { useLocalizations } from '@/customizables';
 
+import { useConfigureSSO } from './ConfigureSSOContext';
 import { ProfileCardHeader } from './elements/ProfileCard';
 import { Stepper } from './elements/Stepper';
-import { useWizard } from './elements/Wizard';
+import { useWizardMachine } from './elements/WizardMachineContext';
+import { STEPS } from './machine/transitions';
 
+/**
+ * The wizard breadcrumb, driven by the pure state machine + transitions.
+ *
+ * Visible steps are the enabled steps for the current facts, minus
+ * `select-provider` (per design it never appears in the breadcrumb, even while
+ * it's an active step). Completion stays positional — exactly as the legacy
+ * `useWizard()`-backed header computed it (`index < currentIndex`) — so the
+ * breadcrumb's visual completion state is behavior-equivalent. The current step
+ * is `machine.current`; clicking a reachable item jumps via `GOTO`.
+ */
 export const ConfigureSSOHeader = (): JSX.Element => {
-  const { activeSteps, currentStep, goToStep } = useWizard();
+  const { facts } = useConfigureSSO();
+  const { current, dispatch } = useWizardMachine();
   const { t } = useLocalizations();
 
-  // `select-provider` is only mounted while there's no enterprise connection,
-  // but per design it should never appear in the visual breadcrumb regardless,
-  // so we always filter it out here
-  const visibleSteps = activeSteps.filter(step => step.id !== 'select-provider');
-  const currentIndex = visibleSteps.findIndex(step => step.id === currentStep?.id);
+  const visibleSteps = STEPS.filter(step => step.id !== 'select-provider' && (step.enabled?.(facts) ?? true));
+  const currentIndex = visibleSteps.findIndex(step => step.id === current);
 
   return (
     <ProfileCardHeader>
       <Stepper>
         {visibleSteps.map((step, index) => {
           const isCurrent = index === currentIndex;
-          const isCompleted = step.isCompleted ?? index < currentIndex;
+          const isCompleted = index < currentIndex;
           const isReachable = isCompleted || index <= currentIndex;
           const labelText = step.label ? (typeof step.label === 'string' ? step.label : t(step.label)) : '';
 
@@ -30,7 +40,7 @@ export const ConfigureSSOHeader = (): JSX.Element => {
               isCurrent={isCurrent}
               isCompleted={isCompleted}
               isReachable={isReachable}
-              onClick={() => void goToStep(step.id)}
+              onClick={() => dispatch({ type: 'GOTO', step: step.id })}
             >
               {labelText}
             </Stepper.Item>

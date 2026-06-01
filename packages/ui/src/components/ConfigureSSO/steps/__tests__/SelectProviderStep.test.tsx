@@ -6,65 +6,46 @@ import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen, waitFor } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
 
-const goNext = vi.fn();
-const goPrev = vi.fn();
-const goToStep = vi.fn();
+// Navigation is now the pure state machine: the step renders
+// `Step.Footer.Submit`, whose runner dispatches against the machine instead of
+// calling the legacy `useWizard().goToStep`. We assert on the dispatched events.
+const dispatch = vi.fn();
 
-vi.mock('../../elements/Wizard', () => ({
-  useWizard: () => ({
-    activeSteps: [],
-    currentStep: undefined,
-    currentIndex: -1,
-    totalSteps: 0,
-    isFirstStep: true,
-    isLastStep: false,
-    isNested: false,
-    goNext,
-    goPrev,
-    goToStep,
-    registerStep: vi.fn(),
-    unregisterStep: vi.fn(),
-  }),
+vi.mock('../../elements/WizardMachineContext', () => ({
+  useWizardMachine: () => ({ current: 'select-provider', direction: 0, dispatch }),
 }));
 
-const setProvider = vi.fn();
 const createEnterpriseConnection = vi.fn();
+
+// `provider` is owned by context now and pushed there on radio change. The
+// central `submitSelectProvider` (run by the footer) reads it off context, so
+// the mock tracks it through `setProvider` to mirror the real provider.
+const contextState = vi.hoisted(() => ({
+  provider: undefined as 'saml_okta' | 'saml_custom' | undefined,
+  primaryEmailAddress: { emailAddress: 'test@clerk.com' } as { emailAddress: string } | undefined,
+  isPrimaryEmailVerified: true,
+}));
+
+const setProvider = vi.fn((next: 'saml_okta' | 'saml_custom') => {
+  contextState.provider = next;
+});
 
 vi.mock('../../ConfigureSSOContext', () => ({
   useConfigureSSO: () => ({
     enterpriseConnection: undefined,
-    provider: undefined,
+    provider: contextState.provider,
     setProvider,
-    createEnterpriseConnection,
-    initialStepId: 'select-provider',
+    // The step (and the central submit runner) read the reverification-wrapped
+    // create mutation off the bundled `mutations` object.
+    mutations: {
+      createConnection: createEnterpriseConnection,
+    },
+    primaryEmailAddress: contextState.primaryEmailAddress,
+    facts: {
+      isPrimaryEmailVerified: contextState.isPrimaryEmailVerified,
+    },
   }),
 }));
-
-const userMockState = vi.hoisted(() => ({
-  current: {
-    primaryEmailAddress: {
-      emailAddress: 'test@clerk.com',
-      verification: { status: 'verified' as 'verified' | 'unverified' },
-    },
-  } as {
-    primaryEmailAddress?: {
-      emailAddress: string;
-      verification: { status: 'verified' | 'unverified' };
-    };
-  } | null,
-}));
-
-vi.mock('@clerk/shared/react/index', async importOriginal => {
-  const actual = await importOriginal<typeof import('@clerk/shared/react/index')>();
-  return {
-    ...actual,
-    useUser: () => ({
-      user: userMockState.current,
-      isLoaded: true,
-      isSignedIn: true,
-    }),
-  };
-});
 
 import { SelectProviderStep } from '../SelectProviderStep';
 
@@ -78,18 +59,13 @@ const renderStep = (
 };
 
 const resetMocks = () => {
-  goNext.mockReset();
-  goPrev.mockReset();
-  goToStep.mockReset();
-  setProvider.mockReset();
+  dispatch.mockReset();
+  setProvider.mockClear();
   createEnterpriseConnection.mockReset();
   createEnterpriseConnection.mockResolvedValue(undefined);
-  userMockState.current = {
-    primaryEmailAddress: {
-      emailAddress: 'test@clerk.com',
-      verification: { status: 'verified' },
-    },
-  };
+  contextState.provider = undefined;
+  contextState.primaryEmailAddress = { emailAddress: 'test@clerk.com' };
+  contextState.isPrimaryEmailVerified = true;
 };
 
 describe('SelectProviderStep', () => {
@@ -170,17 +146,19 @@ describe('SelectProviderStep', () => {
     expect(customSamlRadio).toBeChecked();
   });
 
-  it('records the provider and advances when Continue is clicked', async () => {
+  it('records the provider and dispatches GOTO configure when Continue is clicked', async () => {
     resetMocks();
     const callOrder: string[] = [];
-    setProvider.mockImplementation(() => {
+    setProvider.mockImplementation((next: 'saml_okta' | 'saml_custom') => {
+      contextState.provider = next;
       callOrder.push('setProvider');
     });
-    createEnterpriseConnection.mockImplementation(async () => {
+    createEnterpriseConnection.mockImplementation(() => {
       callOrder.push('createEnterpriseConnection');
+      return Promise.resolve(undefined);
     });
-    goToStep.mockImplementation(() => {
-      callOrder.push('goToStep');
+    dispatch.mockImplementation((event: { type: string }) => {
+      callOrder.push(`dispatch:${event.type}`);
     });
 
     const { wrapper } = await createFixtures();
@@ -190,12 +168,14 @@ describe('SelectProviderStep', () => {
     await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
 
     await waitFor(() => {
-      expect(goToStep).toHaveBeenCalledWith('configure');
+      expect(dispatch).toHaveBeenCalledWith({ type: 'GOTO', step: 'configure' });
     });
 
     expect(setProvider).toHaveBeenCalledWith('saml_okta');
-    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta', userMockState.current?.primaryEmailAddress);
-    expect(callOrder).toEqual(['setProvider', 'createEnterpriseConnection', 'goToStep']);
+    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta', contextState.primaryEmailAddress);
+    // setProvider fires on radio change and again inside the submit handler; the
+    // create then the GOTO are the tail of the order.
+    expect(callOrder.slice(-2)).toEqual(['createEnterpriseConnection', 'dispatch:GOTO']);
   });
 
   it('forwards the Custom SAML backend provider id when selected', async () => {
@@ -207,11 +187,11 @@ describe('SelectProviderStep', () => {
     await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
 
     await waitFor(() => {
-      expect(goToStep).toHaveBeenCalledWith('configure');
+      expect(dispatch).toHaveBeenCalledWith({ type: 'GOTO', step: 'configure' });
     });
 
     expect(setProvider).toHaveBeenCalledWith('saml_custom');
-    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_custom', userMockState.current?.primaryEmailAddress);
+    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_custom', contextState.primaryEmailAddress);
   });
 
   it('does not advance when failing to create enterprise connection', async () => {
@@ -229,10 +209,10 @@ describe('SelectProviderStep', () => {
     await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
 
     await waitFor(() => {
-      expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta', userMockState.current?.primaryEmailAddress);
+      expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta', contextState.primaryEmailAddress);
     });
 
-    expect(goToStep).not.toHaveBeenCalled();
+    expect(dispatch).not.toHaveBeenCalled();
   });
 
   it('disables Previous on the first step', async () => {
@@ -243,9 +223,12 @@ describe('SelectProviderStep', () => {
     expect(screen.getByRole('button', { name: /Previous/i })).toBeDisabled();
   });
 
-  it('routes to verify-domain when the user has no primary email address', async () => {
+  it('always creates and jumps to configure (verify-domain ran first, so no branch back)', async () => {
+    // Under the new step order the user reaches select-provider only after
+    // verify-domain, so the create is unconditional even if the verified fact is
+    // somehow false — there is no longer a branch back to verify-domain.
     resetMocks();
-    userMockState.current = {};
+    contextState.isPrimaryEmailVerified = false;
 
     const { wrapper } = await createFixtures();
     const { userEvent } = renderStep(wrapper);
@@ -254,33 +237,11 @@ describe('SelectProviderStep', () => {
     await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
 
     await waitFor(() => {
-      expect(goToStep).toHaveBeenCalledWith('verify-domain');
+      expect(dispatch).toHaveBeenCalledWith({ type: 'GOTO', step: 'configure' });
     });
 
     expect(setProvider).toHaveBeenCalledWith('saml_okta');
-    expect(createEnterpriseConnection).not.toHaveBeenCalled();
-  });
-
-  it('routes to verify-domain when the user has an unverified primary email address', async () => {
-    resetMocks();
-    userMockState.current = {
-      primaryEmailAddress: {
-        emailAddress: 'test@clerk.com',
-        verification: { status: 'unverified' },
-      },
-    };
-
-    const { wrapper } = await createFixtures();
-    const { userEvent } = renderStep(wrapper);
-
-    await userEvent.click(screen.getByRole('radio', { name: 'Okta Workforce' }));
-    await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
-
-    await waitFor(() => {
-      expect(goToStep).toHaveBeenCalledWith('verify-domain');
-    });
-
-    expect(setProvider).toHaveBeenCalledWith('saml_okta');
-    expect(createEnterpriseConnection).not.toHaveBeenCalled();
+    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta', contextState.primaryEmailAddress);
+    expect(dispatch).not.toHaveBeenCalledWith({ type: 'GOTO', step: 'verify-domain' });
   });
 });

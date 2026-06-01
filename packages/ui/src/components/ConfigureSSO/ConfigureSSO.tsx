@@ -1,15 +1,11 @@
-import {
-  __internal_useEnterpriseConnectionTestRuns,
-  __internal_useUserEnterpriseConnections,
-  useSession,
-} from '@clerk/shared/react';
-import type { ConfigureSSOProps, EnterpriseConnectionResource } from '@clerk/shared/types';
+import { useSession } from '@clerk/shared/react';
+import type { ConfigureSSOProps } from '@clerk/shared/types';
 import React from 'react';
 
 import { useProtect } from '@/common';
 import { withCoreUserGuard } from '@/contexts';
 import { Col, Flex, Flow, Heading, Icon, localizationKeys, Text } from '@/customizables';
-import { useCardState, withCardStateProvider } from '@/elements/contexts';
+import { withCardStateProvider } from '@/elements/contexts';
 import { ProfileCard } from '@/elements/ProfileCard';
 import { ExclamationTriangle } from '@/icons';
 import { Route, Switch } from '@/router';
@@ -18,10 +14,12 @@ import { ConfigureSSOProvider, useConfigureSSO } from './ConfigureSSOContext';
 import { ConfigureSSOHeader } from './ConfigureSSOHeader';
 import { ConfigureSSONavbar } from './ConfigureSSONavbar';
 import { ConfigureSSOSkeleton } from './ConfigureSSOSkeleton';
+import { useConfigureSSOData } from './data/useConfigureSSOData';
 import { ProfileCardFooter, ProfileCardHeader } from './elements/ProfileCard';
 import { Step } from './elements/Step';
-import { useWizard, Wizard } from './elements/Wizard';
-import { ConfigureStep, ConfirmationStep, SelectProviderStep, TestConfigurationStep, VerifyDomainStep } from './steps';
+import { useMachine } from './elements/useMachine';
+import { WizardMachineProvider } from './elements/WizardMachineContext';
+import { STEP_BODIES } from './machine/stepBodies';
 
 const ConfigureSSOInternal = () => {
   return (
@@ -50,19 +48,11 @@ const AuthenticatedContent = withCoreUserGuard(() => {
 });
 
 export const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObject<HTMLDivElement> }) => {
-  const {
-    data: enterpriseConnections,
-    isLoading: isLoadingEnterpriseConnections,
-    createEnterpriseConnection,
-    updateEnterpriseConnection,
-    deleteEnterpriseConnection,
-  } = __internal_useUserEnterpriseConnections({ enabled: true });
-  // Currently FAPI only supports one enterprise connection per user
-  const enterpriseConnection = enterpriseConnections?.[0];
+  const { isLoading, enterpriseConnection, facts, refreshTestRuns, mutations, primaryEmailAddress } =
+    useConfigureSSOData();
 
-  const { hasSuccessfulTestRun, isLoading: isLoadingTestRuns } = useHasSuccessfulTestRun(enterpriseConnection);
-
-  const isLoading = isLoadingEnterpriseConnections || isLoadingTestRuns;
+  // Gate loading one level above the provider so the context never observes a
+  // loading state.
   if (isLoading) {
     return <ConfigureSSOSkeleton />;
   }
@@ -70,12 +60,12 @@ export const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObjec
   return (
     <ConfigureSSOProtect>
       <ConfigureSSOProvider
-        hasSuccessfulTestRun={hasSuccessfulTestRun}
+        facts={facts}
+        refreshTestRuns={refreshTestRuns}
         enterpriseConnection={enterpriseConnection}
         contentRef={contentRef}
-        createEnterpriseConnection={createEnterpriseConnection}
-        updateEnterpriseConnection={updateEnterpriseConnection}
-        deleteEnterpriseConnection={deleteEnterpriseConnection}
+        mutations={mutations}
+        primaryEmailAddress={primaryEmailAddress}
       >
         <ConfigureSSOSteps />
       </ConfigureSSOProvider>
@@ -83,55 +73,31 @@ export const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObjec
   );
 };
 
+/**
+ * The wizard surface, driven by the pure state machine.
+ *
+ * `useMachine(facts)` owns where we are (`machine.current`) and how we got
+ * there; the only view edge is `STEP_BODIES[machine.current]`, which mounts the
+ * body for the active step. The machine is published via `WizardMachineProvider`
+ * (a sibling to `ConfigureSSOProvider`, mounted at the same level — no inner
+ * provider) so the header, footer, and steps read it.
+ *
+ * Steps no longer own routing: simple steps advance via `Step.Footer.Submit` ->
+ * `useSubmitRunner` -> `dispatch`, and the nested-delegating steps
+ * (verify-domain, configure) bubble their inner terminal step into the machine
+ * through an injected `onComplete`.
+ */
 const ConfigureSSOSteps = () => {
-  const { initialStepId, enterpriseConnection } = useConfigureSSO();
+  const { facts } = useConfigureSSO();
+  const machine = useMachine(facts);
+
+  const Body = STEP_BODIES[machine.current];
 
   return (
-    <Wizard initialStepId={initialStepId}>
-      <ResetCardErrorOnStepChange />
+    <WizardMachineProvider machine={machine}>
       <ConfigureSSOHeader />
-
-      {/*
-       * `select-provider` is only a wizard step while there's no enterprise
-       * connection yet — creating one unregisters this step, which:
-       *   1. Hides it from the breadcrumb (no need for a manual filter), and
-       *   2. Prevents `goPrev` from any later step (e.g. configure's first
-       *      substep) from ever bubbling back into provider selection.
-       */}
-      {!enterpriseConnection && (
-        <Wizard.Step id='select-provider'>
-          <SelectProviderStep />
-        </Wizard.Step>
-      )}
-
-      <Wizard.Step
-        id='verify-domain'
-        label='Verify domain'
-      >
-        <VerifyDomainStep />
-      </Wizard.Step>
-
-      <Wizard.Step
-        id='configure'
-        label='Configure'
-      >
-        <ConfigureStep />
-      </Wizard.Step>
-
-      <Wizard.Step
-        id='test'
-        label='Test'
-      >
-        <TestConfigurationStep />
-      </Wizard.Step>
-
-      <Wizard.Step
-        id='confirmation'
-        label='Confirmation'
-      >
-        <ConfirmationStep />
-      </Wizard.Step>
-    </Wizard>
+      <Body />
+    </WizardMachineProvider>
   );
 };
 
@@ -192,45 +158,5 @@ const MissingManageEnterpriseConnectionsPermission = () => (
     <ProfileCardFooter />
   </>
 );
-
-/**
- * Sentinel component rendered inside `<Wizard>`
- *
- * Clears any card-level error whenever the active step transitions, so a stale failure from one step
- * doesn't leak into the next
- */
-const ResetCardErrorOnStepChange = (): null => {
-  const { currentStep } = useWizard();
-  const card = useCardState();
-  const previousStepIdRef = React.useRef(currentStep?.id);
-
-  React.useEffect(() => {
-    if (previousStepIdRef.current === currentStep?.id) {
-      return;
-    }
-
-    previousStepIdRef.current = currentStep?.id;
-    card.setError(undefined);
-  }, [currentStep?.id, card]);
-
-  return null;
-};
-
-/**
- * Fetches a single successful test run for the given connection on mount
- */
-const useHasSuccessfulTestRun = (
-  enterpriseConnection: EnterpriseConnectionResource | undefined,
-): { hasSuccessfulTestRun: boolean; isLoading: boolean } => {
-  const { data: successfulTestRuns, isLoading } = __internal_useEnterpriseConnectionTestRuns({
-    enterpriseConnectionId: enterpriseConnection?.id ?? null,
-    params: { initialPage: 1, pageSize: 1, status: ['success'] },
-  });
-
-  return {
-    hasSuccessfulTestRun: (successfulTestRuns?.length ?? 0) > 0,
-    isLoading,
-  };
-};
 
 export const ConfigureSSO: React.ComponentType<ConfigureSSOProps> = withCardStateProvider(ConfigureSSOInternal);

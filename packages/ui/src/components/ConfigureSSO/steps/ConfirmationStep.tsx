@@ -1,4 +1,3 @@
-import { useReverification } from '@clerk/shared/react';
 import { useState } from 'react';
 
 import { Badge, Col, descriptors, Flex, Flow, Grid, Link, localizationKeys, Text } from '@/customizables';
@@ -17,7 +16,7 @@ import { handleError } from '@/utils/errorHandler';
 
 import { useConfigureSSO } from '../ConfigureSSOContext';
 import { Step } from '../elements/Step';
-import { useWizard } from '../elements/Wizard';
+import { useWizardMachine } from '../elements/WizardMachineContext';
 
 export const ConfirmationStep = (): JSX.Element => {
   return (
@@ -67,12 +66,13 @@ const SsoStatusSection = (): JSX.Element => {
 };
 
 const EnableSsoSection = (): JSX.Element => {
-  const { enterpriseConnection, updateEnterpriseConnection } = useConfigureSSO();
+  const {
+    enterpriseConnection,
+    mutations: { setConnectionActive },
+  } = useConfigureSSO();
   const card = useCardState();
 
   const [isChecked, setIsChecked] = useState(!!enterpriseConnection?.active);
-
-  const updateActive = useReverification((id: string, active: boolean) => updateEnterpriseConnection(id, { active }));
 
   const onActiveChange = async (active: boolean) => {
     if (card.isLoading) {
@@ -86,7 +86,7 @@ const EnableSsoSection = (): JSX.Element => {
     try {
       // Enterprise connection is guaranteed to be set at this point
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const updated = await updateActive(enterpriseConnection!.id, active);
+      const updated = await setConnectionActive(enterpriseConnection!.id, active);
       if (updated) {
         setIsChecked(updated.active);
       }
@@ -150,7 +150,7 @@ const DomainSection = (): JSX.Element | null => {
 
 const ConfigurationDetailsSection = (): JSX.Element => {
   const { enterpriseConnection } = useConfigureSSO();
-  const { goToStep } = useWizard();
+  const { dispatch } = useWizardMachine();
 
   // This will later be expanded to support OIDC connections as well
   const samlConnection = enterpriseConnection?.samlConnection;
@@ -215,7 +215,7 @@ const ConfigurationDetailsSection = (): JSX.Element => {
           <ProfileSection.Button
             elementDescriptor={descriptors.configureSSOConfirmationReconfigureButton}
             id='configureAgain'
-            onClick={() => goToStep('configure')}
+            onClick={() => dispatch({ type: 'GOTO', step: 'configure' })}
             variant='ghost'
             colorScheme='primary'
             localizationKey={localizationKeys('configureSSO.confirmation.configurationSection.configureAgainLink')}
@@ -229,10 +229,11 @@ const ConfigurationDetailsSection = (): JSX.Element => {
 const ResetConnectionForm = withCardStateProvider((props: FormProps) => {
   const { onReset, onSuccess } = props;
   const card = useCardState();
-  const { enterpriseConnection, deleteEnterpriseConnection } = useConfigureSSO();
-  const { goToStep } = useWizard();
-
-  const deleteConnection = useReverification((id: string) => deleteEnterpriseConnection(id));
+  const {
+    enterpriseConnection,
+    mutations: { deleteConnection },
+  } = useConfigureSSO();
+  const { dispatch } = useWizardMachine();
 
   const confirmationField = useFormControl('deleteConfirmation', '', {
     type: 'text',
@@ -253,7 +254,9 @@ const ResetConnectionForm = withCardStateProvider((props: FormProps) => {
     try {
       await deleteConnection(enterpriseConnection.id);
       onSuccess();
-      await goToStep('select-provider');
+      // RESET force-enables select-provider: `facts.hasConnection` won't have
+      // refetched after the delete, so a plain GOTO would be gated out.
+      dispatch({ type: 'RESET' });
     } catch (err) {
       handleError(err as Error, [confirmationField], card.setError);
     }

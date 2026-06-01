@@ -5,6 +5,7 @@ import { descriptors, Flow } from '@/customizables';
 import { useConfigureSSO } from '../../ConfigureSSOContext';
 import { Step } from '../../elements/Step';
 import { Wizard } from '../../elements/Wizard';
+import { useWizardMachine } from '../../elements/WizardMachineContext';
 import type { ProviderType } from '../../types';
 import { SamlCustomConfigureSteps } from './saml/SamlCustomConfigureSteps';
 import { SamlOktaConfigureSteps } from './saml/SamlOktaConfigureSteps';
@@ -16,6 +17,10 @@ const STEPS_BY_PROVIDER: Record<ProviderType, () => JSX.Element> = {
 
 export const ConfigureStep = (): JSX.Element | null => {
   const { provider } = useConfigureSSO();
+  // The inner SAML sub-step flow keeps its own nested <Wizard> (untouched —
+  // slated for the TXT rework). Only its terminal step advances the top-level
+  // machine, via the injected `onComplete`.
+  const { dispatch } = useWizardMachine();
 
   // Type guard, at this point the provider should have been defined
   if (!provider) {
@@ -35,7 +40,7 @@ export const ConfigureStep = (): JSX.Element | null => {
         elementDescriptor={descriptors.configureSSOStep}
         elementId={descriptors.configureSSOStep.setId('configure')}
       >
-        <Wizard>
+        <Wizard onComplete={() => dispatch({ type: 'NEXT' })}>
           <StepsByProvider />
         </Wizard>
       </Step>

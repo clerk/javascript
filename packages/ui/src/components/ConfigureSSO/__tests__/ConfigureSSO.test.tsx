@@ -67,4 +67,52 @@ describe('ConfigureSSO', () => {
       expect(queryByText(/you do not have permission to manage single sign-on/i)).not.toBeInTheDocument();
     });
   });
+
+  describe('state machine mounts on the right step', () => {
+    it('mounts on select-provider with a verified email and no connection', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEnterpriseSso({ selfServeSSO: true });
+        f.withEmailAddress();
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+      });
+
+      fixtures.clerk.user?.getEnterpriseConnections.mockResolvedValue([]);
+
+      const { findByText } = render(<ConfigureSSO />, { wrapper });
+
+      // Verified primary email fulfills verify-domain, so the machine skips it
+      // and lands on select-provider — the first non-fulfilled enabled step.
+      await findByText(/select your identity provider/i);
+    });
+
+    it('short-circuits to the confirmation step for an active connection', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEnterpriseSso({ selfServeSSO: true });
+        f.withEmailAddress();
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+      });
+
+      fixtures.clerk.user?.getEnterpriseConnections.mockResolvedValue([
+        {
+          id: 'ent_active',
+          name: 'clerk.com',
+          provider: 'saml_okta',
+          active: true,
+          organizationId: null,
+          domains: ['clerk.com'],
+          samlConnection: {
+            idpSsoUrl: 'https://idp.example.com/sso',
+            idpEntityId: 'https://idp.example.com/entity',
+            idpCertificate: 'CERT',
+          },
+        } as any,
+      ]);
+
+      const { findByText, queryByText } = render(<ConfigureSSO />, { wrapper });
+
+      // An active connection lands on confirmation even if never tested.
+      await findByText(/configuration/i);
+      expect(queryByText(/select your identity provider/i)).not.toBeInTheDocument();
+    });
+  });
 });

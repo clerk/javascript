@@ -1,4 +1,4 @@
-import { useReverification, useSession, useUser } from '@clerk/shared/react';
+import { useReverification, useUser } from '@clerk/shared/react';
 import type { EmailAddressResource } from '@clerk/shared/types';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -23,13 +23,17 @@ import { useConfigureSSO } from '../ConfigureSSOContext';
 import { Step } from '../elements/Step';
 import { useWizard, Wizard } from '../elements/Wizard';
 import { InnerStepCounter } from '../elements/Wizard/InnerStepCounter';
+import { useWizardMachine } from '../elements/WizardMachineContext';
 
 export const VerifyDomainStep = (): JSX.Element => {
   const { user } = useUser();
-  const { session } = useSession();
-  const { enterpriseConnection } = useConfigureSSO();
+  const { enterpriseConnection, facts } = useConfigureSSO();
   const { t } = useLocalizations();
-  const { goNext: outerGoNext } = useWizard();
+  // The top-level machine advances when this step completes. The inner
+  // provide-email → verify-email flow keeps its own nested <Wizard>; only its
+  // terminal step bubbles into the machine via the `onComplete` injected below.
+  const { dispatch } = useWizardMachine();
+  const completeStep = () => dispatch({ type: 'NEXT' });
 
   const emailToVerify =
     user?.primaryEmailAddress ?? user?.emailAddresses?.find(e => e.verification.status !== 'verified');
@@ -37,10 +41,7 @@ export const VerifyDomainStep = (): JSX.Element => {
 
   // The user's domain is already wired to an enterprise connection that
   // doesn't belong to the org they're currently configuring
-  const activeOrganizationId = session?.lastActiveOrganizationId ?? null;
-  const isDomainTakenByOtherOrg = Boolean(
-    isVerified && enterpriseConnection && enterpriseConnection.organizationId !== activeOrganizationId,
-  );
+  const { isDomainTakenByOtherOrg } = facts;
 
   const wasVerifiedOnMountRef = useRef(isVerified);
   const emailAddressRef = useRef<EmailAddressResource | undefined>(emailToVerify);
@@ -119,7 +120,7 @@ export const VerifyDomainStep = (): JSX.Element => {
           </Step.Body>
 
           <Step.Footer>
-            <Step.Footer.Continue onClick={() => outerGoNext()} />
+            <Step.Footer.Continue onClick={completeStep} />
           </Step.Footer>
         </Step>
       </Flow.Part>
@@ -132,7 +133,10 @@ export const VerifyDomainStep = (): JSX.Element => {
         elementDescriptor={descriptors.configureSSOStep}
         elementId={descriptors.configureSSOStep.setId('verify-domain')}
       >
-        <Wizard initialStepId={initialInnerStepIdRef.current}>
+        <Wizard
+          initialStepId={initialInnerStepIdRef.current}
+          onComplete={completeStep}
+        >
           <Step.Header
             title={t(localizationKeys('configureSSO.verifyEmailDomainStep.title'))}
             description={t(localizationKeys('configureSSO.verifyEmailDomainStep.subtitle'))}

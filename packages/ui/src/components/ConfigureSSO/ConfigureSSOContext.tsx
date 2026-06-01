@@ -1,23 +1,14 @@
-import type { UseUserEnterpriseConnectionsReturn } from '@clerk/shared/react/index';
-import { useSession, useUser } from '@clerk/shared/react/index';
-import type {
-  EmailAddressResource,
-  EnterpriseConnectionResource,
-  SignedInSessionResource,
-  UserResource,
-} from '@clerk/shared/types';
-import React, { type PropsWithChildren, useCallback } from 'react';
+import type { EmailAddressResource, EnterpriseConnectionResource } from '@clerk/shared/types';
+import React, { type PropsWithChildren } from 'react';
 
-import { useCardState } from '@/elements/contexts';
-
-import { deriveInitialStep } from './deriveInitialStep';
-import type { ProviderType, WizardStepId } from './types';
+import type { WizardFacts } from './data/deriveFacts';
+import type { ConfigureSSOMutations } from './data/useConfigureSSOMutations';
+import type { ProviderType } from './types';
 
 /**
  * Shared form state for the ConfigureSSO wizard, persisted across steps
  */
 export interface ConfigureSSOData {
-  initialStepId: WizardStepId;
   /**
    * The enterprise connection from the user's primary email address domain
    */
@@ -38,31 +29,59 @@ export interface ConfigureSSOData {
    */
   contentRef: React.RefObject<HTMLDivElement>;
   /**
-   * Creates a new enterprise connection
+   * Every connection-domain mutation the wizard performs, pre-wrapped in
+   * `useReverification`. Steps read these from context instead of wrapping
+   * inline or prop-drilling raw mutation handles.
    */
-  createEnterpriseConnection: (provider: ProviderType, primaryEmailAddress?: EmailAddressResource) => Promise<void>;
-  /**
-   * Updates an existing enterprise connection
-   */
-  updateEnterpriseConnection: UseUserEnterpriseConnectionsReturn['updateEnterpriseConnection'];
-  /**
-   * Deletes an enterprise connection
-   */
-  deleteEnterpriseConnection: UseUserEnterpriseConnectionsReturn['deleteEnterpriseConnection'];
+  mutations: ConfigureSSOMutations;
   /**
    * Determines if the user's domain is already wired to an enterprise connection that
    * doesn't belong to the org they're currently configuring
    */
   isDomainTakenByOtherOrg: boolean;
+  /**
+   * The single set of derived booleans the wizard makes decisions from,
+   * computed once upstream by `useConfigureSSOData`. Steps read display gates
+   * from here instead of re-deriving from `useUser`/`useSession`.
+   */
+  facts: WizardFacts;
+  /**
+   * Re-runs the successful-test-run probe so `facts.hasSuccessfulTestRun`
+   * reflects a run that just completed.
+   */
+  refreshTestRuns: () => Promise<unknown>;
+  /**
+   * The user's primary email address, fetched once upstream by
+   * `useConfigureSSOData`. Threaded through so the central submit runner (and
+   * the steps) can derive the connection name without each calling `useUser`
+   * itself.
+   */
+  primaryEmailAddress: EmailAddressResource | undefined;
 }
 
 interface ConfigureSSOProviderProps {
   enterpriseConnection: EnterpriseConnectionResource | undefined;
-  hasSuccessfulTestRun: boolean;
+  /**
+   * Derived booleans the wizard makes decisions from, computed upstream by
+   * `useConfigureSSOData`. The provider never derives state itself.
+   */
+  facts: WizardFacts;
+  /**
+   * Re-runs the successful-test-run probe owned by `useConfigureSSOData`.
+   */
+  refreshTestRuns: () => Promise<unknown>;
   contentRef: React.RefObject<HTMLDivElement>;
-  createEnterpriseConnection: UseUserEnterpriseConnectionsReturn['createEnterpriseConnection'];
-  updateEnterpriseConnection: UseUserEnterpriseConnectionsReturn['updateEnterpriseConnection'];
-  deleteEnterpriseConnection: UseUserEnterpriseConnectionsReturn['deleteEnterpriseConnection'];
+  /**
+   * The bundle of reverification-wrapped connection mutations, built upstream by
+   * `useConfigureSSOData`. Replaces the three raw mutation handles the provider
+   * used to take individually.
+   */
+  mutations: ConfigureSSOMutations;
+  /**
+   * The user's primary email address, fetched once upstream by
+   * `useConfigureSSOData`.
+   */
+  primaryEmailAddress: EmailAddressResource | undefined;
 }
 
 const ConfigureSSOContext = React.createContext<ConfigureSSOData | null>(null);
@@ -70,68 +89,40 @@ ConfigureSSOContext.displayName = 'ConfigureSSOContext';
 
 export const ConfigureSSOProvider = ({
   enterpriseConnection,
-  hasSuccessfulTestRun,
+  facts,
+  refreshTestRuns,
   contentRef,
-  createEnterpriseConnection: createEnterpriseConnectionApi,
-  updateEnterpriseConnection,
-  deleteEnterpriseConnection,
+  mutations,
+  primaryEmailAddress,
   children,
 }: PropsWithChildren<ConfigureSSOProviderProps>): JSX.Element => {
   const [provider, setProvider] = React.useState<ProviderType | undefined>(
     enterpriseConnection?.provider as ProviderType,
   );
-  const { session } = useSession();
-  const { user } = useUser();
-  const card = useCardState();
 
-  const isDomainTakenByOtherOrg = checkDomainTakenByOtherOrg(user, session, enterpriseConnection);
-  const initialStepId = deriveInitialStep(enterpriseConnection, { isDomainTakenByOtherOrg, hasSuccessfulTestRun });
-
-  const createEnterpriseConnection = useCallback(
-    async (provider: ProviderType, primaryEmailAddress?: EmailAddressResource): Promise<void> => {
-      const emailDomain = primaryEmailAddress?.emailAddress.split('@')[1];
-      const organizationId = session?.lastActiveOrganizationId ?? null;
-
-      if (!emailDomain) {
-        return;
-      }
-
-      card.setLoading();
-
-      try {
-        await createEnterpriseConnectionApi({
-          provider,
-          name: emailDomain,
-          organizationId,
-        });
-      } finally {
-        card.setIdle();
-      }
-    },
-    [card, session, createEnterpriseConnectionApi],
-  );
+  const { isDomainTakenByOtherOrg } = facts;
 
   const value = React.useMemo<ConfigureSSOData>(
     () => ({
       provider,
       contentRef,
       setProvider,
-      initialStepId,
       enterpriseConnection,
       isDomainTakenByOtherOrg,
-      createEnterpriseConnection,
-      updateEnterpriseConnection,
-      deleteEnterpriseConnection,
+      facts,
+      refreshTestRuns,
+      mutations,
+      primaryEmailAddress,
     }),
     [
       provider,
       contentRef,
-      initialStepId,
       enterpriseConnection,
-      createEnterpriseConnection,
-      updateEnterpriseConnection,
-      deleteEnterpriseConnection,
+      mutations,
       isDomainTakenByOtherOrg,
+      facts,
+      refreshTestRuns,
+      primaryEmailAddress,
     ],
   );
 
@@ -144,21 +135,4 @@ export const useConfigureSSO = (): ConfigureSSOData => {
     throw new Error('useConfigureSSO called outside <ConfigureSSOProvider>.');
   }
   return ctx;
-};
-
-/**
- * Determines if the user's domain is already wired to an enterprise connection that
- * doesn't belong to the org they're currently configuring
- */
-const checkDomainTakenByOtherOrg = (
-  user: UserResource | null | undefined,
-  session: SignedInSessionResource | null | undefined,
-  enterpriseConnection: EnterpriseConnectionResource | undefined,
-): boolean => {
-  const emailToVerify =
-    user?.primaryEmailAddress ?? user?.emailAddresses?.find(e => e.verification.status !== 'verified');
-  const isVerified = emailToVerify?.verification.status === 'verified';
-  const activeOrganizationId = session?.lastActiveOrganizationId ?? null;
-
-  return Boolean(isVerified && enterpriseConnection && enterpriseConnection.organizationId !== activeOrganizationId);
 };

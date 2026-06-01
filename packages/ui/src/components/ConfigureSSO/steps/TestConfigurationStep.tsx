@@ -1,4 +1,4 @@
-import { __internal_useEnterpriseConnectionTestRuns, useUser } from '@clerk/shared/react/index';
+import { __internal_useEnterpriseConnectionTestRuns } from '@clerk/shared/react/index';
 import type { EnterpriseConnectionTestRunResource } from '@clerk/shared/types';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
@@ -39,15 +39,16 @@ import { handleError } from '@/utils/errorHandler';
 
 import { useConfigureSSO } from '../ConfigureSSOContext';
 import { Step } from '../elements/Step';
-import { useWizard } from '../elements/Wizard';
+import { useWizardMachine } from '../elements/WizardMachineContext';
+import type { SubmitResult } from '../machine/submit';
 import { TestRunHowToFixSection } from './TestRunHowToFixSection';
 
 const TEST_RUNS_PAGE_SIZE = 5;
 const TEST_RESULTS_TABLE_COLUMN_COUNT = 3;
 
 export const TestConfigurationStep = (): JSX.Element => {
-  const { goNext, goPrev } = useWizard();
-  const { enterpriseConnection } = useConfigureSSO();
+  const { dispatch } = useWizardMachine();
+  const { enterpriseConnection, facts, refreshTestRuns } = useConfigureSSO();
   const card = useCardState();
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -71,6 +72,9 @@ export const TestConfigurationStep = (): JSX.Element => {
   const handleTestRunCreated = () => {
     setCurrentPage(1);
     void revalidateTestRuns();
+    // Keep the centralized success probe (`facts.hasSuccessfulTestRun`) in sync
+    // with the run that just completed so the Continue gate reflects it.
+    void refreshTestRuns();
   };
 
   return (
@@ -177,11 +181,8 @@ export const TestConfigurationStep = (): JSX.Element => {
         ) : null}
 
         <Step.Footer>
-          <Step.Footer.Previous onClick={() => goPrev()} />
-          <ContinueTestSsoStepButton
-            enterpriseConnectionId={enterpriseConnection?.id}
-            onContinue={() => void goNext()}
-          />
+          <Step.Footer.Previous onClick={() => dispatch({ type: 'BACK' })} />
+          <ContinueTestSsoStepButton hasSuccessfulTestRun={facts.hasSuccessfulTestRun} />
         </Step.Footer>
       </Step>
     </Flow.Part>
@@ -189,50 +190,30 @@ export const TestConfigurationStep = (): JSX.Element => {
 };
 
 type ContinueTestSsoStepButtonProps = {
-  enterpriseConnectionId: string | undefined;
-  onContinue: () => void;
+  hasSuccessfulTestRun: boolean;
 };
 
-const ContinueTestSsoStepButton = ({
-  enterpriseConnectionId,
-  onContinue,
-}: ContinueTestSsoStepButtonProps): JSX.Element => {
-  const { user } = useUser();
+const ContinueTestSsoStepButton = ({ hasSuccessfulTestRun }: ContinueTestSsoStepButtonProps): JSX.Element => {
   const { t } = useLocalizations();
-  const card = useCardState();
-  const [isValidating, setIsValidating] = useState(false);
 
-  const handleContinue = async () => {
-    if (!user || !enterpriseConnectionId) {
-      return;
+  // The button stays enabled so a user without a successful run still gets the
+  // inline validation message (matching legacy), rather than a silently
+  // disabled Continue. On success the runner advances with a plain NEXT;
+  // otherwise we surface the error and stay put.
+  const handleSubmit = (): SubmitResult => {
+    if (hasSuccessfulTestRun) {
+      return { ok: true };
     }
-
-    setIsValidating(true);
-    card.setError(undefined);
-
-    try {
-      const result = await user.getEnterpriseConnectionTestRuns(enterpriseConnectionId, {
-        initialPage: 1,
-        pageSize: 1,
-        status: ['success'],
-      });
-
-      if (result.data.length > 0) {
-        onContinue();
-      } else {
-        card.setError(t(localizationKeys('configureSSO.testConfigurationStep.error__noSuccessfulTestRun')));
-      }
-    } catch (err) {
-      handleError(err as Error, [], card.setError);
-    } finally {
-      setIsValidating(false);
-    }
+    return {
+      ok: false,
+      error: t(localizationKeys('configureSSO.testConfigurationStep.error__noSuccessfulTestRun')),
+    };
   };
 
   return (
-    <Step.Footer.Continue
-      onClick={() => void handleContinue()}
-      isLoading={isValidating}
+    <Step.Footer.Submit
+      onSubmit={handleSubmit}
+      canContinue
     />
   );
 };
@@ -717,21 +698,22 @@ type OpenTestUrlButtonProps = {
 };
 
 const OpenTestUrlButton = ({ onTestRunCreated }: OpenTestUrlButtonProps): JSX.Element => {
-  const { user } = useUser();
   const card = useCardState();
-  const { enterpriseConnection } = useConfigureSSO();
+  const {
+    enterpriseConnection,
+    mutations: { createTestRun },
+  } = useConfigureSSO();
 
   const [isCreatingTestRun, setIsCreatingTestRun] = useState(false);
 
   const openTestRun = () => {
-    if (!user || !enterpriseConnection) {
+    if (!enterpriseConnection) {
       return;
     }
 
     setIsCreatingTestRun(true);
 
-    user
-      .createEnterpriseConnectionTestRun(enterpriseConnection.id)
+    createTestRun(enterpriseConnection.id)
       .then(({ url }) => {
         onTestRunCreated?.(url);
         // `noopener,noreferrer` so the IdP can't reach back into the dashboard
