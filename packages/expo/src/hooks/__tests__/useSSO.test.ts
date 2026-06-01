@@ -93,7 +93,7 @@ describe('useSSO', () => {
     const { result } = renderHook(() => useSSO());
 
     await expect(result.current.startSSOFlow({ strategy: 'oauth_google' })).rejects.toThrow(
-      /Unable to load expo-auth-session and expo-web-browser.*Original error:/s,
+      /required for SSO: .+\. If they are not installed/s,
     );
   });
 });
