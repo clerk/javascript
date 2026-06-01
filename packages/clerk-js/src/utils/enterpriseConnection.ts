@@ -35,7 +35,6 @@ export function toEnterpriseConnectionBody(
 ): Record<string, unknown> {
   const body: Record<string, unknown> = {};
 
-  // Top-level fields. `provider` is only on Create, the rest are shared.
   setIfDefined(body, 'provider', (params as CreateOrganizationEnterpriseConnectionParams).provider);
   setIfDefined(body, 'name', params.name);
   if (!options.omitOrganizationId) {
