@@ -1145,12 +1145,20 @@ class SignInFuture implements SignInFutureResource {
         routes.actionCompleteRedirectUrl = wrappedRoutes.redirectUrl;
       }
 
-      // Enterprise SSO has a `prepare_first_factor` call below that runs against the
-      // existing sign-in and refreshes server state, so reuse is safe for ticket-based
-      // and identifier-discovery flows. OAuth strategies have no equivalent refresh —
-      // the redirect URL only comes back from `_create` — so reusing a stale resource
-      // would replay the previous provider's redirect (SDK-75). Always start fresh.
-      const shouldCreateSignIn = !this.#resource.id || strategy !== 'enterprise_sso';
+      // Reuse the existing sign-in by default so any state already attached to it carries
+      // into the SSO attempt (a ticket from `signIn.create({ strategy: 'ticket' })`, a
+      // discovered identifier, and so on). The one case we cannot reuse is when doing so
+      // would replay a stale provider redirect: an OAuth redirect URL only comes back from
+      // `_create` and cannot be refreshed in place, so if the resource already holds a
+      // pending verification for a different strategy than the one we're starting (e.g.
+      // `oauth_google` followed by `oauth_github`) we have to start fresh (SDK-75).
+      // `enterprise_sso` is always safe to reuse because the `prepare_first_factor` call
+      // below refreshes its redirect against the existing sign-in.
+      const { strategy: pendingStrategy, externalVerificationRedirectURL: pendingRedirectUrl } =
+        this.#resource.firstFactorVerification;
+      const wouldReplayStaleRedirect =
+        strategy !== 'enterprise_sso' && !!pendingRedirectUrl && pendingStrategy !== strategy;
+      const shouldCreateSignIn = !this.#resource.id || wouldReplayStaleRedirect;
 
       if (shouldCreateSignIn) {
         await this._create({

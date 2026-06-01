@@ -2163,6 +2163,42 @@ describe('SignIn', () => {
         });
       });
 
+      it('reuses an existing ticket sign-in when starting OAuth rather than creating a new one', async () => {
+        vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
+
+        SignIn.clerk = {
+          buildUrlWithAuth: vi.fn().mockReturnValue('https://example.com/sso-callback'),
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
+
+        const mockFetch = vi.fn().mockResolvedValueOnce({
+          client: null,
+          response: {
+            id: 'signin_ticket',
+            status: 'needs_first_factor',
+            supported_first_factors: [{ strategy: 'oauth_google' }],
+          },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn();
+        await signIn.__internal_future.ticket({ ticket: 'ticket_123' });
+        const result = await signIn.__internal_future.sso({
+          strategy: 'oauth_google',
+          redirectUrl: 'https://complete.example.com',
+          redirectCallbackUrl: '/sso-callback',
+        });
+
+        // The ticket sign-in carries no conflicting OAuth verification, so the OAuth call
+        // reuses it instead of POSTing a fresh `/client/sign_ins` (which would drop the ticket).
+        expect(result.error).toBeNull();
+        expect(mockFetch).toHaveBeenCalledTimes(1);
+      });
+
       it('reuses an existing enterprise SSO sign-in and uses the fresh redirect URL when retrying after an abandoned attempt', async () => {
         vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
 
