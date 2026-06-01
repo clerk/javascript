@@ -538,6 +538,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'enterpriseConnectionButtonText',
 
   'configureSSOHeader',
+  'configureSSOMobileNavbar',
   'configureSSOStepper',
   'configureSSOStepperItem',
   'configureSSOStepperItemBullet',
@@ -558,6 +559,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'configureSSOProviderGroupLabel',
   'configureSSOProviderGrid',
   'configureSSOProviderCard',
+  'configureSSOProviderCardRadio',
   'configureSSOProviderCardIcon',
   'configureSSOProviderCardLabel',
 

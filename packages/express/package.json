@@ -1,6 +1,6 @@
 {
   "name": "@clerk/express",
-  "version": "2.1.21",
+  "version": "2.1.22",
   "description": "Clerk server SDK for usage with Express",
   "keywords": [
     "clerk",
@@ -62,6 +62,7 @@
   ],
   "scripts": {
     "build": "pnpm clean && tsup",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:pub": "pnpm dev -- --env.publish",

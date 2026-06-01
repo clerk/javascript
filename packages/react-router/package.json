@@ -1,6 +1,6 @@
 {
   "name": "@clerk/react-router",
-  "version": "3.3.1",
+  "version": "3.3.2",
   "description": "Clerk SDK for React Router",
   "keywords": [
     "clerk",
@@ -86,6 +86,7 @@
   ],
   "scripts": {
     "build": "tsup",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
     "dev": "tsup --watch",
     "dev:pub": "pnpm dev -- --env.publish",
     "format": "node ../../scripts/format-package.mjs",
