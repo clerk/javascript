@@ -28,11 +28,6 @@ export interface ConfigureSSOData {
    * made on the Select Provider step.
    */
   provider: ProviderType | undefined;
-  /**
-   * Sets the local provider selection used by Select Provider before a
-   * connection has been created. Pass `undefined` to clear the selection
-   * (e.g. after deleting the connection from the reset dialog).
-   */
   setProvider: (provider: ProviderType | undefined) => void;
   /**
    * Ref to the scrollable content container of the wizard.

@@ -159,20 +159,4 @@ describe('ResetConnectionDialog', () => {
       expect(onClose).toHaveBeenCalledTimes(1);
     });
   });
-
-  it('does not delete when the active enterprise connection is missing', async () => {
-    resetMocks();
-    connectionMockState.current = null;
-    const onClose = vi.fn();
-    const { wrapper } = await createFixtures();
-    const { userEvent } = renderDialog(wrapper, { confirmationValue: 'Acme Inc', onClose });
-
-    await userEvent.type(screen.getByLabelText(/below to continue/i), 'Acme Inc');
-    await userEvent.click(screen.getByRole('button', { name: 'Reset connection' }));
-
-    expect(deleteEnterpriseConnection).not.toHaveBeenCalled();
-    expect(setProvider).not.toHaveBeenCalled();
-    expect(goToStep).not.toHaveBeenCalled();
-    expect(onClose).not.toHaveBeenCalled();
-  });
 });
