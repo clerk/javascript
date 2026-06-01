@@ -43,14 +43,19 @@ const PROVIDER_GROUPS: ReadonlyArray<{
     options: [
       { id: 'saml_okta', label: localizationKeys('configureSSO.selectProviderStep.saml.okta'), iconId: 'okta' },
       {
-        id: 'saml_custom',
-        label: localizationKeys('configureSSO.selectProviderStep.saml.customSaml'),
-        iconId: 'saml',
+        id: 'saml_microsoft',
+        label: localizationKeys('configureSSO.selectProviderStep.saml.microsoft'),
+        iconId: 'microsoft',
       },
       {
         id: 'saml_google',
         label: localizationKeys('configureSSO.selectProviderStep.saml.google'),
         iconId: 'google',
+      },
+      {
+        id: 'saml_custom',
+        label: localizationKeys('configureSSO.selectProviderStep.saml.customSaml'),
+        iconId: 'saml',
       },
     ],
   },

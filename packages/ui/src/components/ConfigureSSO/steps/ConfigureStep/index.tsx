@@ -6,12 +6,18 @@ import { useConfigureSSO } from '../../ConfigureSSOContext';
 import { Step } from '../../elements/Step';
 import { Wizard } from '../../elements/Wizard';
 import type { ProviderType } from '../../types';
-import { SamlCustomConfigureSteps, SamlGoogleConfigureSteps, SamlOktaConfigureSteps } from './saml';
+import {
+  SamlCustomConfigureSteps,
+  SamlGoogleConfigureSteps,
+  SamlMicrosoftConfigureSteps,
+  SamlOktaConfigureSteps,
+} from './saml';
 
 const STEPS_BY_PROVIDER: Record<ProviderType, () => JSX.Element> = {
   saml_custom: SamlCustomConfigureSteps,
   saml_okta: SamlOktaConfigureSteps,
   saml_google: SamlGoogleConfigureSteps,
+  saml_microsoft: SamlMicrosoftConfigureSteps,
 };
 
 export const ConfigureStep = (): JSX.Element | null => {
