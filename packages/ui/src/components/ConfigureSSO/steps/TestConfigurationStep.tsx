@@ -39,14 +39,15 @@ import { handleError } from '@/utils/errorHandler';
 
 import { useConfigureSSO } from '../ConfigureSSOContext';
 import { Step } from '../elements/Step';
-import { useWizard } from '../elements/Wizard';
+import { useWizardMachine } from '../elements/WizardMachineContext';
+import type { SubmitResult } from '../machine/submit';
 import { TestRunHowToFixSection } from './TestRunHowToFixSection';
 
 const TEST_RUNS_PAGE_SIZE = 5;
 const TEST_RESULTS_TABLE_COLUMN_COUNT = 3;
 
 export const TestConfigurationStep = (): JSX.Element => {
-  const { goNext, goPrev } = useWizard();
+  const { dispatch } = useWizardMachine();
   const { enterpriseConnection, facts, refreshTestRuns } = useConfigureSSO();
   const card = useCardState();
 
@@ -180,11 +181,8 @@ export const TestConfigurationStep = (): JSX.Element => {
         ) : null}
 
         <Step.Footer>
-          <Step.Footer.Previous onClick={() => goPrev()} />
-          <ContinueTestSsoStepButton
-            hasSuccessfulTestRun={facts.hasSuccessfulTestRun}
-            onContinue={() => void goNext()}
-          />
+          <Step.Footer.Previous onClick={() => dispatch({ type: 'BACK' })} />
+          <ContinueTestSsoStepButton hasSuccessfulTestRun={facts.hasSuccessfulTestRun} />
         </Step.Footer>
       </Step>
     </Flow.Part>
@@ -193,27 +191,31 @@ export const TestConfigurationStep = (): JSX.Element => {
 
 type ContinueTestSsoStepButtonProps = {
   hasSuccessfulTestRun: boolean;
-  onContinue: () => void;
 };
 
-const ContinueTestSsoStepButton = ({
-  hasSuccessfulTestRun,
-  onContinue,
-}: ContinueTestSsoStepButtonProps): JSX.Element => {
+const ContinueTestSsoStepButton = ({ hasSuccessfulTestRun }: ContinueTestSsoStepButtonProps): JSX.Element => {
   const { t } = useLocalizations();
-  const card = useCardState();
 
-  const handleContinue = () => {
-    card.setError(undefined);
-
+  // The button stays enabled so a user without a successful run still gets the
+  // inline validation message (matching legacy), rather than a silently
+  // disabled Continue. On success the runner advances with a plain NEXT;
+  // otherwise we surface the error and stay put.
+  const handleSubmit = (): SubmitResult => {
     if (hasSuccessfulTestRun) {
-      onContinue();
-    } else {
-      card.setError(t(localizationKeys('configureSSO.testConfigurationStep.error__noSuccessfulTestRun')));
+      return { ok: true };
     }
+    return {
+      ok: false,
+      error: t(localizationKeys('configureSSO.testConfigurationStep.error__noSuccessfulTestRun')),
+    };
   };
 
-  return <Step.Footer.Continue onClick={handleContinue} />;
+  return (
+    <Step.Footer.Submit
+      onSubmit={handleSubmit}
+      canContinue
+    />
+  );
 };
 
 type TestResultsTableProps = {

@@ -60,9 +60,14 @@ export interface SubmitCtx {
  * reaches select-provider their domain/email is already verified — the create
  * is unconditional:
  *   - No provider selected → `{ ok: false }` (footer surfaces the validation).
- *   - Provider selected → create the connection now, then `{ ok: true }`. The
- *     reducer's NEXT advances into configure.
+ *   - Provider selected → create the connection now, then jump to `configure`.
  *   - Create throws → `{ ok: false; error }`.
+ *
+ * The jump MUST be an explicit `goTo: 'configure'`, not a plain advance: a
+ * successful create flips `facts.hasConnection`, which disables `select-provider`
+ * (its `enabled` predicate is `!hasConnection`). Once disabled, the machine can
+ * no longer be "at" it, so a plain `NEXT` no-ops. `GOTO` bypasses `fulfilled`
+ * and lands on configure regardless.
  */
 export const submitSelectProvider = async (ctx: SubmitCtx): Promise<SubmitResult> => {
   const { provider, setProvider, mutations, primaryEmailAddress } = ctx;
@@ -75,7 +80,7 @@ export const submitSelectProvider = async (ctx: SubmitCtx): Promise<SubmitResult
 
   try {
     await mutations.createConnection(provider, primaryEmailAddress);
-    return { ok: true };
+    return { ok: true, goTo: 'configure' };
   } catch (error) {
     return { ok: false, error: error as ClerkAPIError | ClerkRuntimeError | string };
   }

@@ -23,12 +23,17 @@ import { useConfigureSSO } from '../ConfigureSSOContext';
 import { Step } from '../elements/Step';
 import { useWizard, Wizard } from '../elements/Wizard';
 import { InnerStepCounter } from '../elements/Wizard/InnerStepCounter';
+import { useWizardMachine } from '../elements/WizardMachineContext';
 
 export const VerifyDomainStep = (): JSX.Element => {
   const { user } = useUser();
   const { enterpriseConnection, facts } = useConfigureSSO();
   const { t } = useLocalizations();
-  const { goNext: outerGoNext } = useWizard();
+  // The top-level machine advances when this step completes. The inner
+  // provide-email → verify-email flow keeps its own nested <Wizard>; only its
+  // terminal step bubbles into the machine via the `onComplete` injected below.
+  const { dispatch } = useWizardMachine();
+  const completeStep = () => dispatch({ type: 'NEXT' });
 
   const emailToVerify =
     user?.primaryEmailAddress ?? user?.emailAddresses?.find(e => e.verification.status !== 'verified');
@@ -115,7 +120,7 @@ export const VerifyDomainStep = (): JSX.Element => {
           </Step.Body>
 
           <Step.Footer>
-            <Step.Footer.Continue onClick={() => outerGoNext()} />
+            <Step.Footer.Continue onClick={completeStep} />
           </Step.Footer>
         </Step>
       </Flow.Part>
@@ -128,7 +133,10 @@ export const VerifyDomainStep = (): JSX.Element => {
         elementDescriptor={descriptors.configureSSOStep}
         elementId={descriptors.configureSSOStep.setId('verify-domain')}
       >
-        <Wizard initialStepId={initialInnerStepIdRef.current}>
+        <Wizard
+          initialStepId={initialInnerStepIdRef.current}
+          onComplete={completeStep}
+        >
           <Step.Header
             title={t(localizationKeys('configureSSO.verifyEmailDomainStep.title'))}
             description={t(localizationKeys('configureSSO.verifyEmailDomainStep.subtitle'))}

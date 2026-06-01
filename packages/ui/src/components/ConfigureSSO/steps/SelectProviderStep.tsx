@@ -1,5 +1,4 @@
 import { iconImageUrl } from '@clerk/shared/constants';
-import { useUser } from '@clerk/shared/react/index';
 import React from 'react';
 
 import type { LocalizationKey } from '@/customizables';
@@ -18,11 +17,10 @@ import {
 import { useCardState } from '@/elements/contexts';
 import { common, mqu } from '@/styledSystem';
 import { Alert } from '@/ui/elements/Alert';
-import { handleError } from '@/utils/errorHandler';
 
 import { useConfigureSSO } from '../ConfigureSSOContext';
 import { Step } from '../elements/Step';
-import { useWizard } from '../elements/Wizard';
+import { submitSelectProvider } from '../machine/submit';
 import type { ProviderType } from '../types';
 
 /**
@@ -52,52 +50,19 @@ const PROVIDER_GROUPS: ReadonlyArray<{
 ];
 
 export const SelectProviderStep = (): JSX.Element => {
-  const { goToStep } = useWizard();
-  const {
-    provider,
-    setProvider,
-    mutations: { createConnection },
-    facts,
-  } = useConfigureSSO();
+  const { provider, setProvider } = useConfigureSSO();
 
-  // Re-hydrate from context so users returning from `verify-domain`
-  // (after picking a provider but needing to verify their email first)
-  // don't have to re-click their provider.
+  // Re-hydrate from context so users returning from another step don't have to
+  // re-click their provider. Pushing the selection straight into context on
+  // change keeps `ctx.provider` fresh for the central `submitSelectProvider`
+  // handler that the footer runs (it reads `provider` off context, not local
+  // state).
   const [selected, setSelected] = React.useState<ProviderType | null>(provider ?? null);
-  // `useUser` stays for `primaryEmailAddress`, still needed as a mutation input
-  // to `createConnection`; the verified-check reads derived facts.
-  const { user } = useUser();
   const card = useCardState();
 
-  const handleContinue = async () => {
-    if (!selected || !user) {
-      return;
-    }
-
-    setProvider(selected);
-
-    const primaryEmailAddress = user?.primaryEmailAddress;
-
-    if (!primaryEmailAddress || !facts.isPrimaryEmailVerified) {
-      void goToStep('verify-domain');
-      return;
-    }
-
-    // Otherwise, set the provider and create the enterprise connection. The
-    // create mutation is reverification-wrapped upstream; the card loading
-    // lifecycle stays here so the Continue button reflects the in-flight call.
-    card.setLoading();
-
-    try {
-      await createConnection(selected, primaryEmailAddress);
-    } catch (err) {
-      handleError(err as Error, [], card.setError);
-      return;
-    } finally {
-      card.setIdle();
-    }
-
-    void goToStep('configure');
+  const handleSelect = (next: ProviderType) => {
+    setSelected(next);
+    setProvider(next);
   };
 
   return (
@@ -146,7 +111,7 @@ export const SelectProviderStep = (): JSX.Element => {
                       iconId={option.iconId}
                       label={option.label}
                       checked={selected === option.id}
-                      onChange={() => setSelected(option.id)}
+                      onChange={() => handleSelect(option.id)}
                     />
                   ))}
                 </Grid>
@@ -171,10 +136,9 @@ export const SelectProviderStep = (): JSX.Element => {
         <Step.Footer>
           <Step.Footer.Previous isDisabled />
 
-          <Step.Footer.Continue
-            onClick={handleContinue}
-            isLoading={card.isLoading}
-            isDisabled={!selected}
+          <Step.Footer.Submit
+            onSubmit={submitSelectProvider}
+            canContinue={Boolean(selected)}
           />
         </Step.Footer>
       </Step>

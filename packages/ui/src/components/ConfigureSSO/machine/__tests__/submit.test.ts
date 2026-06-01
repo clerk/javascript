@@ -37,9 +37,11 @@ const makeCtx = (overrides: Partial<SubmitCtx> = {}): SubmitCtx => ({
 });
 
 describe('submitSelectProvider', () => {
-  it('provider selected → creates the connection and returns { ok: true }', async () => {
+  it('provider selected → creates the connection and jumps to configure', async () => {
     // Under the new order verify-domain ran first, so the create is
-    // unconditional once a provider is chosen.
+    // unconditional once a provider is chosen. The create flips
+    // `facts.hasConnection`, which disables select-provider, so the handler must
+    // jump with an explicit `goTo: 'configure'` (a plain NEXT would no-op).
     const mutations = makeMutations();
     const ctx = makeCtx({ mutations, provider: 'saml_okta' });
 
@@ -47,12 +49,12 @@ describe('submitSelectProvider', () => {
 
     expect(ctx.setProvider).toHaveBeenCalledWith('saml_okta');
     expect(mutations.createConnection).toHaveBeenCalledWith('saml_okta', ctx.primaryEmailAddress);
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ ok: true, goTo: 'configure' });
   });
 
   it('always creates regardless of email-verified facts (verify-domain ran first)', async () => {
     // The old isPrimaryEmailVerified branch is dead under the new order: even
-    // with the fact false, the create still fires.
+    // with the fact false, the create still fires and jumps to configure.
     const mutations = makeMutations();
     const ctx = makeCtx({ facts: { ...baseFacts, isPrimaryEmailVerified: false }, mutations, provider: 'saml_custom' });
 
@@ -60,7 +62,7 @@ describe('submitSelectProvider', () => {
 
     expect(ctx.setProvider).toHaveBeenCalledWith('saml_custom');
     expect(mutations.createConnection).toHaveBeenCalledWith('saml_custom', ctx.primaryEmailAddress);
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ ok: true, goTo: 'configure' });
   });
 
   it('no provider selected → returns { ok: false } without creating or setting provider', async () => {
