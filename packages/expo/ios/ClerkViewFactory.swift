@@ -155,7 +155,7 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
   public func createAuthView(
     mode: String,
     dismissable: Bool,
-    onEvent: @escaping (String, [String: Any]) -> Void
+    onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
   ) -> UIViewController? {
     makeHostingController(
       rootView: ClerkInlineAuthWrapperView(
@@ -170,7 +170,7 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
 
   public func createUserProfileView(
     dismissable: Bool,
-    onEvent: @escaping (String, [String: Any]) -> Void
+    onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
   ) -> UIViewController? {
     makeHostingController(
       rootView: ClerkInlineProfileWrapperView(
@@ -183,7 +183,7 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
   }
 
   public func createUserButton(
-    onEvent: @escaping (String, [String: Any]) -> Void
+    onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
   ) -> UIViewController? {
     makeHostingController(
       rootView: ClerkInlineUserButtonWrapperView(
@@ -410,7 +410,7 @@ private struct ExpoKeychain {
 struct ClerkInlineUserButtonWrapperView: View {
   let lightTheme: ClerkTheme?
   let darkTheme: ClerkTheme?
-  let onEvent: (String, [String: Any]) -> Void
+  let onEvent: (ClerkNativeViewEvent, [String: Any]) -> Void
 
   @Environment(\.colorScheme) private var colorScheme
 
@@ -431,7 +431,7 @@ struct ClerkInlineUserButtonWrapperView: View {
         for await event in Clerk.shared.auth.events {
           switch event {
           case .signedOut(let session):
-            onEvent("signedOut", ["sessionId": session.id])
+            onEvent(.signedOut, ["sessionId": session.id])
           default:
             break
           }
@@ -447,7 +447,7 @@ struct ClerkInlineAuthWrapperView: View {
   let dismissable: Bool
   let lightTheme: ClerkTheme?
   let darkTheme: ClerkTheme?
-  let onEvent: (String, [String: Any]) -> Void
+  let onEvent: (ClerkNativeViewEvent, [String: Any]) -> Void
 
   // Track initial session to detect new sign-ins (same approach as Android)
   @State private var initialSessionId: String? = Clerk.shared.session?.id
@@ -455,10 +455,10 @@ struct ClerkInlineAuthWrapperView: View {
 
   @Environment(\.colorScheme) private var colorScheme
 
-  private func sendAuthCompleted(sessionId: String, type: String) {
+  private func sendAuthCompleted(sessionId: String, type: ClerkNativeViewEvent) {
     guard !eventSent, sessionId != initialSessionId else { return }
     eventSent = true
-    onEvent(type, ["sessionId": sessionId, "type": type == "signUpCompleted" ? "signUp" : "signIn"])
+    onEvent(type, ["sessionId": sessionId, "type": type == .signUpCompleted ? "signUp" : "signIn"])
   }
 
   private var themedAuthView: some View {
@@ -480,7 +480,7 @@ struct ClerkInlineAuthWrapperView: View {
       // This is more reliable than auth.events which may not emit for inline AuthView sign-ins.
       .onChange(of: Clerk.shared.session?.id) { _, newSessionId in
         guard let sessionId = newSessionId else { return }
-        sendAuthCompleted(sessionId: sessionId, type: "signInCompleted")
+        sendAuthCompleted(sessionId: sessionId, type: .signInCompleted)
       }
       // Fallback: also listen to auth.events for signUp events and edge cases
       .task {
@@ -489,12 +489,12 @@ struct ClerkInlineAuthWrapperView: View {
           switch event {
           case .signInCompleted(let signIn):
             let sessionId = signIn.createdSessionId ?? Clerk.shared.session?.id
-            if let sessionId { sendAuthCompleted(sessionId: sessionId, type: "signInCompleted") }
+            if let sessionId { sendAuthCompleted(sessionId: sessionId, type: .signInCompleted) }
           case .signUpCompleted(let signUp):
             let sessionId = signUp.createdSessionId ?? Clerk.shared.session?.id
-            if let sessionId { sendAuthCompleted(sessionId: sessionId, type: "signUpCompleted") }
+            if let sessionId { sendAuthCompleted(sessionId: sessionId, type: .signUpCompleted) }
           case .sessionChanged(_, let newSession):
-            if let sessionId = newSession?.id { sendAuthCompleted(sessionId: sessionId, type: "signInCompleted") }
+            if let sessionId = newSession?.id { sendAuthCompleted(sessionId: sessionId, type: .signInCompleted) }
           default:
             break
           }
@@ -509,7 +509,7 @@ struct ClerkInlineProfileWrapperView: View {
   let dismissable: Bool
   let lightTheme: ClerkTheme?
   let darkTheme: ClerkTheme?
-  let onEvent: (String, [String: Any]) -> Void
+  let onEvent: (ClerkNativeViewEvent, [String: Any]) -> Void
 
   @Environment(\.colorScheme) private var colorScheme
 
@@ -529,7 +529,7 @@ struct ClerkInlineProfileWrapperView: View {
         for await event in Clerk.shared.auth.events {
           switch event {
           case .signedOut(let session):
-            onEvent("signedOut", ["sessionId": session.id])
+            onEvent(.signedOut, ["sessionId": session.id])
           default:
             break
           }
