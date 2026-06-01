@@ -57,7 +57,7 @@ export const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObjec
     updateEnterpriseConnection,
     deleteEnterpriseConnection,
   } = __internal_useOrganizationEnterpriseConnections({ enabled: true });
-  // Currently FAPI only supports one enterprise connection per user
+  // Currently the self-serve SSO UI flow only supports one enterprise connection per organization
   const enterpriseConnection = enterpriseConnections?.[0];
 
   const { hasSuccessfulTestRun, isLoading: isLoadingTestRuns } = useHasSuccessfulTestRun(enterpriseConnection);
