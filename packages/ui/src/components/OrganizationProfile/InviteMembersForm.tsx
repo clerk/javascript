@@ -187,6 +187,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
                   plan: currentPlan,
                   planPeriod: activeSubscriptionItem.planPeriod,
                   seatsQuantity: err.errors[0].meta?.seatsQuantity,
+                  priceId: activeSubscriptionItem.priceId,
                   portalRoot,
                 });
                 break;
