@@ -609,6 +609,7 @@ export interface BillingSubscriptionItemSeatsJSON {
    * The number of seats available. `null` means unlimited.
    */
   quantity: number | null;
+  tiers?: BillingPerUnitTotalTierJSON[];
 }
 
 /**

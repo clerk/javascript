@@ -9,6 +9,7 @@ import type {
 import { describe, expect, test } from 'vitest';
 
 import {
+  getIncludedSeatsUnitTier,
   getPaidSeatsUnitTier,
   getSeatsPerUnitTotal,
   organizationAndInvitationsExceedsPurchasedSeats,
@@ -157,6 +158,49 @@ describe('getPaidSeatsUnitTier', () => {
     };
 
     expect(getPaidSeatsUnitTier(unitPrice)).toBe(paidTier);
+  });
+});
+
+describe('getIncludedSeatsUnitTier', () => {
+  test('returns the included tier from a seats unit price with included seats', () => {
+    const includedTier = {
+      id: 'tier_included',
+      startsAtBlock: 1,
+      endsAfterBlock: 3,
+      feePerBlock: money(0),
+    };
+    const unitPrice: BillingPlanUnitPrice = {
+      name: 'seats',
+      blockSize: 1,
+      tiers: [
+        includedTier,
+        {
+          id: 'tier_paid',
+          startsAtBlock: 4,
+          endsAfterBlock: null,
+          feePerBlock: money(500),
+        },
+      ],
+    };
+
+    expect(getIncludedSeatsUnitTier(unitPrice)).toBe(includedTier);
+  });
+
+  test('returns null for paid-only seats unit prices', () => {
+    const unitPrice: BillingPlanUnitPrice = {
+      name: 'seats',
+      blockSize: 1,
+      tiers: [
+        {
+          id: 'tier_paid',
+          startsAtBlock: 1,
+          endsAfterBlock: null,
+          feePerBlock: money(500),
+        },
+      ],
+    };
+
+    expect(getIncludedSeatsUnitTier(unitPrice)).toBeNull();
   });
 });
 

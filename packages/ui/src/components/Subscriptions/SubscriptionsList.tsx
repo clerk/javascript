@@ -1,9 +1,15 @@
-import type { BillingPlanResource, BillingSubscriptionItemResource } from '@clerk/shared/types';
+import { useOrganization } from '@clerk/shared/react';
+import type {
+  BillingPlanResource,
+  BillingSubscriptionItemResource,
+  BillingSubscriptionResource,
+} from '@clerk/shared/types';
 import { Fragment, useMemo } from 'react';
 
 import { useProtect } from '@/ui/common/Gate';
 import { ProfileSection } from '@/ui/elements/Section';
 import { common } from '@/ui/styledSystem';
+import { getIncludedSeatsUnitTier, getPlanSeatLimit, getSeatUnitPrice } from '@/ui/utils/billingPlanSeats';
 
 import {
   normalizeFormatted,
@@ -34,7 +40,7 @@ export function SubscriptionsList({
 }) {
   const localizationRoot = useSubscriberTypeLocalizationRoot();
   const subscriberType = useSubscriberTypeContext();
-  const { subscriptionItems } = useSubscription();
+  const { subscriptionItems, data: subscription } = useSubscription();
   const canManageBilling =
     useProtect(has => has({ permission: 'org:sys_billing:manage' })) || subscriberType === 'user';
   const { navigate } = useRouter();
@@ -113,6 +119,7 @@ export function SubscriptionsList({
                 length={sortedSubscriptionItems.length}
               />
             ))}
+            {subscription?.nextPayment ? <SubscriptionOverviewRow nextPayment={subscription.nextPayment} /> : null}
           </Tbody>
         </Table>
       )}
@@ -164,6 +171,56 @@ export function SubscriptionsList({
   );
 }
 
+function SubscriptionOverviewRow({
+  nextPayment,
+}: {
+  nextPayment: NonNullable<BillingSubscriptionResource['nextPayment']>;
+}) {
+  return (
+    <Tr
+      sx={t => ({
+        background: common.mutedBackground(t),
+      })}
+    >
+      <Td sx={_ => ({ verticalAlign: 'top' })}>
+        <Text variant='subtitle'>Overview</Text>
+      </Td>
+      <Td
+        sx={_ => ({
+          textAlign: 'end',
+        })}
+      >
+        <Col
+          gap={1}
+          align='end'
+        >
+          <Text
+            variant='subtitle'
+            colorScheme='secondary'
+            localizationKey={localizationKeys('billing.billedMonthly')}
+          />
+          <Text
+            variant='h2'
+            sx={t => ({
+              color: t.colors.$colorForeground,
+            })}
+          >
+            {nextPayment.amount.currencySymbol}
+            {nextPayment.amount.amountFormatted}
+          </Text>
+          <Text
+            variant='subtitle'
+            colorScheme='secondary'
+            localizationKey={localizationKeys('badge__renewsAt', {
+              date: nextPayment.date,
+            })}
+          />
+        </Col>
+      </Td>
+    </Tr>
+  );
+}
+
 function SubscriptionItemRow({
   subscriptionItem,
   length,
@@ -174,12 +231,25 @@ function SubscriptionItemRow({
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const fee = subscriptionItem.planPeriod === 'annual' ? subscriptionItem.plan.annualFee! : subscriptionItem.plan.fee!;
   const { captionForSubscription } = usePlansContext();
+  const { organization } = useOrganization();
 
   const feeFormatted = useMemo(() => {
     return normalizeFormatted(fee.amountFormatted);
   }, [fee.amountFormatted]);
 
   const subItemSeatsQty = subscriptionItem.seats?.quantity;
+  const seatUnitPrice = getSeatUnitPrice(subscriptionItem.plan);
+  const includedSeatsUnitTier = getIncludedSeatsUnitTier(seatUnitPrice);
+  const planSeatLimit = getPlanSeatLimit(subscriptionItem.plan);
+  const includedSeats =
+    includedSeatsUnitTier?.endsAfterBlock != null && seatUnitPrice
+      ? includedSeatsUnitTier.endsAfterBlock * seatUnitPrice.blockSize
+      : null;
+  const includedSeatsUsed =
+    organization && includedSeats !== null
+      ? Math.min(organization.membersCount + organization.pendingInvitationsCount, includedSeats)
+      : null;
+  const seatsTotalTier = subscriptionItem.seats?.tiers?.find(t => t.total.amount > 0);
 
   return (
     <Fragment key={subscriptionItem.id}>
@@ -272,7 +342,7 @@ function SubscriptionItemRow({
             return {};
           }}
         >
-          <Td>
+          <Td sx={_ => ({ verticalAlign: 'top' })}>
             <Col gap={1}>
               <Flex
                 align='center'
@@ -300,14 +370,65 @@ function SubscriptionItemRow({
               textAlign: 'end',
             })}
           >
-            <Text
-              variant='subtitle'
-              localizationKey={
-                subItemSeatsQty === null
-                  ? localizationKeys('billing.pricingTable.seatCost.unlimitedSeats')
-                  : localizationKeys('billing.pricingTable.seatCost.upToSeats', { endsAfterBlock: subItemSeatsQty })
-              }
-            />
+            <Col
+              gap={1}
+              align='end'
+            >
+              {includedSeats !== null && includedSeatsUsed !== null ? (
+                <Text
+                  variant='subtitle'
+                  localizationKey={localizationKeys(
+                    'organizationProfile.billingPage.subscriptionsListSection.includedSeatsUsage',
+                    {
+                      seatsUsed: includedSeatsUsed,
+                      includedSeats,
+                    },
+                  )}
+                />
+              ) : null}
+              {planSeatLimit !== undefined ? (
+                <Text
+                  variant='subtitle'
+                  localizationKey={
+                    planSeatLimit === null
+                      ? localizationKeys('billing.pricingTable.seatCost.unlimitedSeats')
+                      : localizationKeys('billing.pricingTable.seatCost.upToSeats', { endsAfterBlock: planSeatLimit })
+                  }
+                />
+              ) : null}
+              {seatsTotalTier && seatsTotalTier.quantity ? (
+                <Text
+                  variant='subtitle'
+                  localizationKey={localizationKeys(
+                    'organizationProfile.billingPage.subscriptionsListSection.paidSeatsUsage',
+                    {
+                      seatsQuantity: seatsTotalTier.quantity,
+                      amount: `${seatsTotalTier.feePerBlock.currencySymbol}${seatsTotalTier.feePerBlock.amountFormatted}`,
+                    },
+                  )}
+                />
+              ) : null}
+              {seatsTotalTier ? (
+                <Text variant='subtitle'>
+                  {`${seatsTotalTier.total.currencySymbol}${seatsTotalTier.total.amountFormatted}`}
+                  <Span
+                    sx={t => ({
+                      color: t.colors.$colorMutedForeground,
+                      textTransform: 'lowercase',
+                      ':before': {
+                        content: '"/"',
+                        marginInline: t.space.$1,
+                      },
+                    })}
+                    localizationKey={
+                      subscriptionItem.planPeriod === 'annual'
+                        ? localizationKeys('billing.year')
+                        : localizationKeys('billing.month')
+                    }
+                  />
+                </Text>
+              ) : null}
+            </Col>
           </Td>
         </Tr>
       ) : null}

@@ -14,7 +14,7 @@ import type {
 
 import { unixEpochToDate } from '@/utils/date';
 
-import { billingCreditsFromJSON, billingMoneyAmountFromJSON } from '../../utils';
+import { billingCreditsFromJSON, billingMoneyAmountFromJSON, billingPerUnitTotalTierFromJSON } from '../../utils';
 import { Billing } from '../modules/billing/namespace';
 import { BaseResource, BillingPlan, DeletedObject } from './internal';
 
@@ -108,7 +108,12 @@ export class BillingSubscriptionItem extends BaseResource implements BillingSubs
     this.amount = data.amount ? billingMoneyAmountFromJSON(data.amount) : undefined;
     this.credit =
       data.credit && data.credit.amount ? { amount: billingMoneyAmountFromJSON(data.credit.amount) } : undefined;
-    this.seats = data.seats ? { quantity: data.seats.quantity } : undefined;
+    this.seats = data.seats
+      ? {
+          quantity: data.seats.quantity,
+          ...(data.seats.tiers ? { tiers: data.seats.tiers.map(billingPerUnitTotalTierFromJSON) } : {}),
+        }
+      : undefined;
 
     this.credits = data.credits ? billingCreditsFromJSON(data.credits) : undefined;
 

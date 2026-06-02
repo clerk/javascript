@@ -205,6 +205,7 @@ export type __internal_LocalizationResource = {
     switchToMonthlyWithPrice: LocalizationValue<'price' | 'currency'>;
     switchToAnnualWithAnnualPrice: LocalizationValue<'price' | 'currency'>;
     billedAnnually: LocalizationValue;
+    billedMonthly: LocalizationValue;
     billedMonthlyOnly: LocalizationValue;
     billedAnnuallyOnly: LocalizationValue;
     cancelFreeTrial: LocalizationValue<'plan'>;
@@ -1201,6 +1202,8 @@ export type __internal_LocalizationResource = {
         actionLabel__newSubscription: LocalizationValue;
         actionLabel__manageSubscription: LocalizationValue;
         actionLabel__switchPlan: LocalizationValue;
+        includedSeatsUsage: LocalizationValue<'seatsUsed' | 'includedSeats'>;
+        paidSeatsUsage: LocalizationValue<'seatsQuantity' | 'amount'>;
       };
       paymentHistorySection: {
         empty: LocalizationValue;

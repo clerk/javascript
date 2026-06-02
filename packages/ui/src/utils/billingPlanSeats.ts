@@ -137,6 +137,25 @@ export const getIncludedSeatsUnitTotalTier = (
   return null;
 };
 
+/**
+ * Given a plan unit price, return the unit price tier that represents included seats. If no tier is found, return null.
+ */
+export const getIncludedSeatsUnitTier = (unitPrice: BillingPlanUnitPrice | null): BillingPlanUnitPriceTier | null => {
+  if (!unitPrice) {
+    return null;
+  }
+
+  if (
+    unitPrice.tiers.length === 2 &&
+    unitPrice.tiers[0].feePerBlock.amount === 0 &&
+    unitPrice.tiers[1].feePerBlock.amount > 0
+  ) {
+    return unitPrice.tiers[0];
+  }
+
+  return null;
+};
+
 export const getPaidSeatsUnitTier = (unitPrice: BillingPlanUnitPrice | null): BillingPlanUnitPriceTier | null => {
   if (!unitPrice) {
     return null;
