@@ -223,6 +223,7 @@ jobs:
           pnpm dlx --package "$BREAK_CHECK_PACKAGE" break-check detect \
             --baseline .api-snapshots-baseline \
             --output api-changes-report.md \
+            --ai-apply-downgrades \
             --fail-on-breaking
 
       - name: Upload API changes report
