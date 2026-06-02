@@ -314,14 +314,13 @@ describe('UserProfile composed sections', () => {
   });
 
   describe('Account — section outside page', () => {
-    it('section without page renders null', async () => {
+    it('section without page throws', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withEmailAddress();
         f.withUser({ email_addresses: ['test@clerk.com'] });
       });
 
-      const { container } = render(<AccountEmails />, { wrapper });
-      expect(container.innerHTML).toBe('');
+      expect(() => render(<AccountEmails />, { wrapper })).toThrow();
     });
   });
 

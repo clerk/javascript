@@ -1,6 +1,7 @@
 import { useContext, type ReactNode } from 'react';
 
 import { Protect } from '../../common';
+import { assertContextExists } from '../../contexts/utils';
 import {
   OrganizationDeleteSection,
   OrganizationDomainsSection,
@@ -9,24 +10,19 @@ import {
 } from '../../components/OrganizationProfile/OrganizationGeneralPage';
 import { PageContext } from '../PageContext';
 
-function useRequirePage(componentName: string): boolean {
+function useAssertPage(componentName: string) {
   const page = useContext(PageContext);
-  if (!page) {
-    if (typeof __DEV__ !== 'undefined' && __DEV__) {
-      console.warn(`${componentName} must be used inside a page component (e.g. OrganizationProfile.General)`);
-    }
-    return false;
-  }
-  return true;
+  assertContextExists(page, componentName);
+  return page;
 }
 
 export function GeneralOrganizationProfile(): ReactNode {
-  if (!useRequirePage('GeneralOrganizationProfile')) return null;
+  useAssertPage('GeneralOrganizationProfile');
   return <OrganizationProfileSection />;
 }
 
 export function GeneralVerifiedDomains(): ReactNode {
-  if (!useRequirePage('GeneralVerifiedDomains')) return null;
+  useAssertPage('GeneralVerifiedDomains');
   return (
     <Protect permission='org:sys_domains:read'>
       <OrganizationDomainsSection />
@@ -35,11 +31,11 @@ export function GeneralVerifiedDomains(): ReactNode {
 }
 
 export function GeneralLeaveOrganization(): ReactNode {
-  if (!useRequirePage('GeneralLeaveOrganization')) return null;
+  useAssertPage('GeneralLeaveOrganization');
   return <OrganizationLeaveSection />;
 }
 
 export function GeneralDeleteOrganization(): ReactNode {
-  if (!useRequirePage('GeneralDeleteOrganization')) return null;
+  useAssertPage('GeneralDeleteOrganization');
   return <OrganizationDeleteSection />;
 }
