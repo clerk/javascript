@@ -188,8 +188,8 @@ export const ptPT: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: 'Contacte o administrador da sua organização para obter permissões para gerir ligações empresariais.',
-      title: 'Não tem permissão para gerir ligações empresariais',
+      subtitle: 'Contacte o administrador da sua organização para ampliar as suas permissões.',
+      title: 'Não tem permissão para gerir a autenticação única (SSO)',
     },
     navbar: {
       title: 'Configurar autenticação única (SSO)',
@@ -197,10 +197,6 @@ export const ptPT: LocalizationResource = {
     selectProviderStep: {
       title: 'Selecionar fornecedor',
       subtitle: 'Selecione o fornecedor para o qual vai configurar o SSO.',
-      body: {
-        title: 'Selecione o seu fornecedor de identidade',
-        description: 'Iremos guiá-lo pelo processo de configuração detalhado a seguir.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

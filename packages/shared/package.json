@@ -1,6 +1,6 @@
 {
   "name": "@clerk/shared",
-  "version": "4.13.1",
+  "version": "4.14.0",
   "description": "Internal package utils used by the Clerk SDKs",
   "repository": {
     "type": "git",
@@ -125,7 +125,6 @@
   ],
   "scripts": {
     "build": "tsdown",
-    "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
     "dev": "tsdown --watch src",
     "dev:pub": "pnpm dev -- --env.publish",

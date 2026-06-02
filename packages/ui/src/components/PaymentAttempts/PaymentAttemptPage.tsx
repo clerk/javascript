@@ -23,7 +23,7 @@ import {
   useLocalizations,
 } from '../../customizables';
 import { useClipboard } from '../../hooks';
-import { Check, Copy } from '../../icons';
+import { Checkmark, Copy } from '../../icons';
 import { useRouter } from '../../router';
 
 export const PaymentAttemptPage = () => {
@@ -286,7 +286,7 @@ function CopyButton({ text, copyLabel = 'Copy' }: { text: string; copyLabel?: st
     >
       <Icon
         size='sm'
-        icon={hasCopied ? Check : Copy}
+        icon={hasCopied ? Checkmark : Copy}
         aria-hidden
       />
     </Button>

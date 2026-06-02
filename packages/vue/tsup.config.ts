@@ -15,7 +15,7 @@ export default defineConfig(overrideOptions => {
     sourcemap: true,
     minify: false,
     dts: false,
-    onSuccess: shouldPublish ? 'pnpm build:dts && pkglab pub --ping' : 'pnpm build:dts',
+    onSuccess: shouldPublish ? 'pnpm build:declarations && pkglab pub --ping' : 'pnpm build:declarations',
     esbuildPlugins: [
       // Adds .vue files support
       vuePlugin(),
