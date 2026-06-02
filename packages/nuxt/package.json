@@ -79,7 +79,7 @@
   },
   "devDependencies": {
     "h3": "^1.15.4",
-    "nuxt": "^4.4.4",
+    "nuxt": "^4.4.6",
     "typescript": "catalog:repo",
     "vue": "catalog:repo"
   },
