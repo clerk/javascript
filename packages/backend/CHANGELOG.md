@@ -1,5 +1,25 @@
 # Change Log
 
+## 3.5.0
+
+### Minor Changes
+
+- Add support for new Backend API user endpoints: ([#8694](https://github.com/clerk/javascript/pull/8694)) by [@dmoerner](https://github.com/dmoerner)
+  - `users.replaceUserEmailAddress(userId, { emailAddress })` replaces all of a user's email addresses with a single verified, primary email address (`PUT /users/{user_id}/email_address`).
+  - `users.replaceUserPhoneNumber(userId, { phoneNumber })` replaces all of a user's phone numbers with a single verified, primary phone number (`PUT /users/{user_id}/phone_number`).
+  - `users.createUser` now accepts `banned` and `locked` parameters to create a user that is already banned or locked.
+
+### Patch Changes
+
+- Emit the "session token from cookie is missing the `azp` claim" warning once per process instead of on every authenticated request. An `azp`-less cookie token is reused across requests, so the previous unguarded `console.warn` could flood production logs. ([#8698](https://github.com/clerk/javascript/pull/8698)) by [@jacekradko](https://github.com/jacekradko)
+
+- Stop `authenticateRequest` from consuming the incoming request body, which previously left downstream handlers unable to read it (for example a Hono POST route calling `c.req.json()`). ([#8708](https://github.com/clerk/javascript/pull/8708)) by [@jacekradko](https://github.com/jacekradko)
+
+- Preserve custom claims when verifying JWT-format M2M tokens. `M2MToken.fromJwtPayload` previously hardcoded `claims` to `null`, so `client.m2m.verify()` (and request-level `auth()`) dropped any custom claims embedded in the token. Custom claims are now reconstructed from the verified payload by stripping only the structural claims the backend adds when minting the token (`iss`, `sub`, `exp`, `nbf`, `iat`, `jti`). User-supplied claims such as `aud` are preserved. Tokens without custom claims still return `claims: null`, consistent with the opaque-token path. ([#8697](https://github.com/clerk/javascript/pull/8697)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`afb75e6`](https://github.com/clerk/javascript/commit/afb75e68efa561ff18f6ae5359df1cf336e861a5), [`c3df67a`](https://github.com/clerk/javascript/commit/c3df67a231adff73fa36563718d9b94e6bb2a540), [`8d6bb56`](https://github.com/clerk/javascript/commit/8d6bb56de25692e0f9c350f16c8f45fbedaad2ac)]:
+  - @clerk/shared@4.14.1
+
 ## 3.4.14
 
 ### Patch Changes

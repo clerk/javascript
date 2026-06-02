@@ -1,5 +1,18 @@
 # Change Log
 
+## 3.3.1
+
+### Patch Changes
+
+- Preserve custom token cache method context when initializing the native Clerk singleton. ([#8713](https://github.com/clerk/javascript/pull/8713)) by [@mikepitre](https://github.com/mikepitre)
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.0.16` to `1.0.18`. This pulls in the fix from clerk-android [#671](https://github.com/clerk/clerk-android/pull/671), which sets the correct IME actions on the prebuilt auth input fields so pressing Enter/Return submits the form (e.g. "Continue") instead of inserting a newline. ([#8716](https://github.com/clerk/javascript/pull/8716)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`afb75e6`](https://github.com/clerk/javascript/commit/afb75e68efa561ff18f6ae5359df1cf336e861a5), [`c3df67a`](https://github.com/clerk/javascript/commit/c3df67a231adff73fa36563718d9b94e6bb2a540), [`8d6bb56`](https://github.com/clerk/javascript/commit/8d6bb56de25692e0f9c350f16c8f45fbedaad2ac)]:
+  - @clerk/shared@4.14.1
+  - @clerk/react@6.7.3
+  - @clerk/clerk-js@6.13.1
+
 ## 3.3.0
 
 ### Minor Changes
