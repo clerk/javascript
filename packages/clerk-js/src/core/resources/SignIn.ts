@@ -1145,7 +1145,20 @@ class SignInFuture implements SignInFutureResource {
         routes.actionCompleteRedirectUrl = wrappedRoutes.redirectUrl;
       }
 
-      if (!this.#resource.id) {
+      // Reuse the existing sign-in by default so any state already attached to it carries
+      // into the SSO attempt (e.g. a ticket from `signIn.create({ strategy: 'ticket' })`,
+      // or a discovered identifier). OAuth is the exception: its redirect URL only comes
+      // back from `_create` and cannot be refreshed in place, so any redirect already
+      // lingering on the resource is stale. Reusing it would replay a previous attempt's
+      // redirect, including a retry of the same provider after an abandoned redirect
+      // (SDK-75), so whenever an OAuth call finds a pending redirect we start fresh.
+      // `enterprise_sso` is always safe to reuse because the `prepare_first_factor` call
+      // below refreshes its redirect against the existing sign-in.
+      const hasPendingRedirect = !!this.#resource.firstFactorVerification.externalVerificationRedirectURL;
+      const wouldReplayStaleRedirect = strategy !== 'enterprise_sso' && hasPendingRedirect;
+      const shouldCreateSignIn = !this.#resource.id || wouldReplayStaleRedirect;
+
+      if (shouldCreateSignIn) {
         await this._create({
           strategy,
           ...routes,

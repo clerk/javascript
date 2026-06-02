@@ -1,5 +1,5 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
-import type { FieldId, UpdateMeEnterpriseConnectionParams } from '@clerk/shared/types';
+import type { FieldId, UpdateOrganizationEnterpriseConnectionParams } from '@clerk/shared/types';
 import React, { type JSX } from 'react';
 
 import {
@@ -180,7 +180,7 @@ type BuildSamlPayloadParams = {
   };
 };
 
-type SamlConfigurationPayload = NonNullable<UpdateMeEnterpriseConnectionParams['saml']>;
+type SamlConfigurationPayload = NonNullable<UpdateOrganizationEnterpriseConnectionParams['saml']>;
 
 export const buildSamlConfigurationPayload = async ({
   mode,
