@@ -209,6 +209,122 @@ describe('withClerkMiddleware(options)', () => {
     });
   });
 
+  test('skips handshake redirect when enableHandshake is false', async () => {
+    authenticateRequestMock.mockResolvedValueOnce({
+      status: 'handshake',
+      headers: new Headers({
+        location: 'https://fapi.example.com/v1/clients/handshake',
+        'x-clerk-auth-status': 'handshake',
+      }),
+      toAuth: () => ({
+        tokenType: 'session_token',
+      }),
+    });
+    const fastify = Fastify();
+    await fastify.register(clerkPlugin, { enableHandshake: false });
+
+    fastify.get('/', (request: FastifyRequest, reply: FastifyReply) => {
+      const auth = getAuth(request);
+      reply.send({ auth });
+    });
+
+    const response = await fastify.inject({
+      method: 'GET',
+      path: '/',
+      headers: {
+        cookie: '__clerk_handshake_nonce=deadbeef; __client_uat=1675692233',
+      },
+    });
+
+    expect(response.statusCode).toEqual(200);
+    expect(response.body).toEqual(JSON.stringify({ auth: { tokenType: 'session_token' } }));
+  });
+
+  test('still redirects for dev-browser-missing handshake even when enableHandshake is false', async () => {
+    authenticateRequestMock.mockResolvedValueOnce({
+      status: 'handshake',
+      reason: 'dev-browser-missing',
+      headers: new Headers({
+        location: 'https://fapi.example.com/v1/clients/handshake',
+        'x-clerk-auth-status': 'handshake',
+        'x-clerk-auth-reason': 'dev-browser-missing',
+      }),
+      toAuth: () => ({ tokenType: 'session_token' }),
+    });
+    const fastify = Fastify();
+    await fastify.register(clerkPlugin, { enableHandshake: false });
+
+    fastify.get('/', (_request: FastifyRequest, reply: FastifyReply) => {
+      reply.send({});
+    });
+
+    const response = await fastify.inject({
+      method: 'GET',
+      path: '/',
+      headers: { cookie: '__client_uat=1675692233' },
+    });
+
+    expect(response.statusCode).toEqual(307);
+    expect(response.headers.location).toEqual('https://fapi.example.com/v1/clients/handshake');
+  });
+
+  test('still redirects for dev-browser-sync handshake even when enableHandshake is false', async () => {
+    authenticateRequestMock.mockResolvedValueOnce({
+      status: 'handshake',
+      reason: 'dev-browser-sync',
+      headers: new Headers({
+        location: 'https://fapi.example.com/v1/clients/handshake',
+        'x-clerk-auth-status': 'handshake',
+        'x-clerk-auth-reason': 'dev-browser-sync',
+      }),
+      toAuth: () => ({ tokenType: 'session_token' }),
+    });
+    const fastify = Fastify();
+    await fastify.register(clerkPlugin, { enableHandshake: false });
+
+    fastify.get('/', (_request: FastifyRequest, reply: FastifyReply) => {
+      reply.send({});
+    });
+
+    const response = await fastify.inject({
+      method: 'GET',
+      path: '/',
+      headers: { cookie: '__client_uat=1675692233' },
+    });
+
+    expect(response.statusCode).toEqual(307);
+    expect(response.headers.location).toEqual('https://fapi.example.com/v1/clients/handshake');
+  });
+
+  test('strips handshake cookies and query params before authenticating when enableHandshake is false', async () => {
+    authenticateRequestMock.mockResolvedValueOnce({
+      headers: new Headers(),
+      toAuth: () => ({ tokenType: 'session_token' }),
+    });
+    const fastify = Fastify();
+    await fastify.register(clerkPlugin, { enableHandshake: false });
+
+    fastify.get('/', (_request: FastifyRequest, reply: FastifyReply) => {
+      reply.send({});
+    });
+
+    await fastify.inject({
+      method: 'GET',
+      path: '/?__clerk_handshake=token123&__clerk_handshake_nonce=nonce456&foo=bar',
+      headers: {
+        cookie: '__clerk_handshake=token123; __clerk_handshake_nonce=nonce456; __client_uat=1675692233',
+      },
+    });
+
+    const [req] = authenticateRequestMock.mock.calls[0];
+    expect(new URL(req.url).searchParams.has('__clerk_handshake')).toBe(false);
+    expect(new URL(req.url).searchParams.has('__clerk_handshake_nonce')).toBe(false);
+    expect(new URL(req.url).searchParams.get('foo')).toBe('bar');
+    expect(req.headers.get('cookie')).not.toContain('__clerk_handshake=');
+    expect(req.headers.get('cookie')).not.toContain('__clerk_handshake_nonce=');
+    expect(req.headers.get('cookie')).toContain('__client_uat=1675692233');
+  });
+
   test('exposes the runtime key clerk client instance on request.clerk', async () => {
     authenticateRequestMock.mockResolvedValueOnce({
       headers: new Headers(),

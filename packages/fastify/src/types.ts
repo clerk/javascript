@@ -27,4 +27,12 @@ export interface FrontendApiProxyOptions {
 export type ClerkFastifyOptions = ClerkOptions & {
   hookName?: (typeof ALLOWED_HOOKS)[number];
   frontendApiProxy?: FrontendApiProxyOptions;
+  /**
+   * Whether to enable the handshake flow for session verification.
+   * Disable this when using Clerk with a first-party API backend (e.g. a SPA calling
+   * a Fastify server) to prevent handshake nonce cookies set during OAuth callbacks
+   * from blocking authentication on subsequent API requests.
+   * @default true
+   */
+  enableHandshake?: boolean;
 };

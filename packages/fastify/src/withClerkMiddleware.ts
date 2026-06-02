@@ -9,6 +9,30 @@ import * as constants from './constants';
 import type { ClerkFastifyOptions } from './types';
 import { fastifyRequestToRequest, requestToProxyRequest } from './utils';
 
+function stripHandshakeCookiesAndParams(req: Request, cookieNames: string[]): Request {
+  const url = new URL(req.url);
+  for (const name of cookieNames) {
+    url.searchParams.delete(name);
+  }
+
+  const headers = new Headers(req.headers);
+  const cookieHeader = headers.get('cookie');
+  if (cookieHeader) {
+    const filtered = cookieHeader
+      .split(';')
+      .map(c => c.trim())
+      .filter(c => !cookieNames.some(name => c === name || c.startsWith(`${name}=`)))
+      .join('; ');
+    if (filtered) {
+      headers.set('cookie', filtered);
+    } else {
+      headers.delete('cookie');
+    }
+  }
+
+  return new Request(url.toString(), { method: req.method, headers });
+}
+
 export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
   const { hookName: _hookName, frontendApiProxy, ...clerkOptions } = options;
   const proxyPath = stripTrailingSlashes(frontendApiProxy?.path ?? DEFAULT_PROXY_PATH) || DEFAULT_PROXY_PATH;
@@ -26,6 +50,7 @@ export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
     userAgent: options.userAgent || `${constants.SDK_METADATA.name}@${constants.SDK_METADATA.version}`,
     sdkMetadata: options.sdkMetadata || constants.SDK_METADATA,
   });
+  const enableHandshake = options.enableHandshake ?? true;
 
   return async (fastifyRequest: FastifyRequest, reply: FastifyReply) => {
     // Handle Frontend API proxy requests and auto-derive proxyUrl
@@ -84,7 +109,11 @@ export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
       }
     }
 
-    const req = fastifyRequestToRequest(fastifyRequest);
+    let req = fastifyRequestToRequest(fastifyRequest);
+
+    if (!enableHandshake) {
+      req = stripHandshakeCookiesAndParams(req, [constants.Cookies.Handshake, constants.Cookies.HandshakeNonce]);
+    }
 
     const requestState = await clerkClient.authenticateRequest(req, {
       ...options,
@@ -98,8 +127,12 @@ export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
 
     const locationHeader = requestState.headers.get(constants.Headers.Location);
     if (locationHeader) {
-      return reply.code(307).send();
-    } else if (requestState.status === AuthStatus.Handshake) {
+      const isDevBrowserHandshake =
+        requestState.reason === 'dev-browser-missing' || requestState.reason === 'dev-browser-sync';
+      if (enableHandshake || isDevBrowserHandshake) {
+        return reply.code(307).send();
+      }
+    } else if (enableHandshake && requestState.status === AuthStatus.Handshake) {
       throw new Error('Clerk: handshake status without redirect');
     }
 
