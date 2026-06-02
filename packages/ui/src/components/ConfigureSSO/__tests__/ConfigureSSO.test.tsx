@@ -20,7 +20,7 @@ describe('ConfigureSSO', () => {
         });
       });
 
-      fixtures.clerk.user?.getEnterpriseConnections.mockResolvedValue([]);
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
 
       const { findByText, queryByText } = render(<ConfigureSSO />, { wrapper });
 
@@ -40,7 +40,7 @@ describe('ConfigureSSO', () => {
         });
       });
 
-      fixtures.clerk.user?.getEnterpriseConnections.mockResolvedValue([]);
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
 
       const { findByText, queryByText } = render(<ConfigureSSO />, { wrapper });
 
@@ -59,7 +59,7 @@ describe('ConfigureSSO', () => {
         f.withUser({ email_addresses: ['test@clerk.com'] });
       });
 
-      fixtures.clerk.user?.getEnterpriseConnections.mockResolvedValue([]);
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
 
       const { findByText, queryByText } = render(<ConfigureSSO />, { wrapper });
 
