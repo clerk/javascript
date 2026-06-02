@@ -46,7 +46,7 @@ env:
   # The tool was renamed snapi -> break-check (package @clerk/break-check, binary
   # break-check, repo clerk/break-check). Pinned to a pkg.pr.new build of a
   # specific commit on main.
-  BREAK_CHECK_PACKAGE: https://pkg.pr.new/clerk/break-check/@clerk/break-check@a4db93a68e43e45a71cc958cc4a722d91c5f62b2
+  BREAK_CHECK_PACKAGE: https://pkg.pr.new/clerk/break-check/@clerk/break-check@d2f9d6668b810bd185172a5b871a8ed2c266c2d9
   BREAK_CHECK_FILTERS: >-
     --filter=@clerk/astro
     --filter=@clerk/backend
