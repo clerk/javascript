@@ -179,7 +179,7 @@ const useCustomPages = (params: UseCustomPagesParams, options?: UseCustomPagesOp
   const customLinkLabelIconsPortals = useCustomElementPortal(customLinkLabelIcons);
 
   const customPages: CustomPage[] = [];
-  const customPagesPortals: React.ComponentType[] = [];
+  const customPagesPortals: Array<{ key: string; portal: React.ComponentType }> = [];
 
   validChildren.forEach((cp, index) => {
     if (isReorderItem(cp, reorderItemsLabels)) {
@@ -198,8 +198,8 @@ const useCustomPages = (params: UseCustomPagesParams, options?: UseCustomPagesOp
         unmount: unmountIcon,
       } = customPageLabelIconsPortals.find(p => p.id === (cp.portalId || index)) as UseCustomElementPortalReturn;
       customPages.push({ label: cp.label, url: cp.url, mount, unmount, mountIcon, unmountIcon });
-      customPagesPortals.push(contentPortal);
-      customPagesPortals.push(labelPortal);
+      customPagesPortals.push({ key: `content:${cp.portalId || index}`, portal: contentPortal });
+      customPagesPortals.push({ key: `label:${cp.portalId || index}`, portal: labelPortal });
       return;
     }
     if (isExternalLink(cp)) {
@@ -209,7 +209,7 @@ const useCustomPages = (params: UseCustomPagesParams, options?: UseCustomPagesOp
         unmount: unmountIcon,
       } = customLinkLabelIconsPortals.find(p => p.id === (cp.portalId || index)) as UseCustomElementPortalReturn;
       customPages.push({ label: cp.label, url: cp.url, mountIcon, unmountIcon });
-      customPagesPortals.push(labelPortal);
+      customPagesPortals.push({ key: `label:${cp.portalId || index}`, portal: labelPortal });
       return;
     }
   });

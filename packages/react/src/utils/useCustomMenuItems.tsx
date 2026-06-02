@@ -57,7 +57,7 @@ const useCustomMenuItems = ({
 }: UseCustomMenuItemsParams) => {
   const validChildren: CustomMenuItemType[] = [];
   const customMenuItems: CustomMenuItem[] = [];
-  const customMenuItemsPortals: React.ComponentType[] = [];
+  const customMenuItemsPortals: Array<{ key: string; portal: React.ComponentType }> = [];
   const portalIdCounts = new Map<string, number>();
 
   React.Children.forEach(children, child => {
@@ -181,7 +181,7 @@ const useCustomMenuItems = ({
         menuItem.open = mi.open;
       }
       customMenuItems.push(menuItem);
-      customMenuItemsPortals.push(iconPortal);
+      customMenuItemsPortals.push({ key: `icon:${mi.portalId || index}`, portal: iconPortal });
     }
     if (isExternalLink(mi)) {
       const {
@@ -195,7 +195,7 @@ const useCustomMenuItems = ({
         mountIcon,
         unmountIcon,
       });
-      customMenuItemsPortals.push(iconPortal);
+      customMenuItemsPortals.push({ key: `icon:${mi.portalId || index}`, portal: iconPortal });
     }
   });
 
