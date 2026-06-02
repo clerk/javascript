@@ -5,21 +5,47 @@ import type { WizardStepId } from './types';
 /**
  * Decides where the ConfigureSSO wizard should mount on (re)load based on
  * the current state of the user's enterprise connection.
- *
- * No connection → `select-provider`
- * Connection without SAML IdP metadata → `configure`
- * Connection with SAML IdP metadata → `confirmation`
- *
- * The `test` step is intentionally absent — we can't derive a "last test
- * passed" signal synchronously from the resource. Users can re-test from
- * Confirmation.
  */
-export const deriveInitialStep = (connection: EnterpriseConnectionResource | undefined): WizardStepId => {
-  if (!connection) {
+export const deriveInitialStep = (
+  enterpriseConnection: EnterpriseConnectionResource | undefined,
+  options: { isDomainTakenByOtherOrg: boolean; hasSuccessfulTestRun: boolean },
+): WizardStepId => {
+  const { isDomainTakenByOtherOrg, hasSuccessfulTestRun } = options;
+
+  // Go to the verify domain step in order to display warning
+  if (isDomainTakenByOtherOrg) {
+    return 'verify-domain';
+  }
+
+  // If no initial connection, go to the select provider step
+  if (!enterpriseConnection) {
     return 'select-provider';
   }
-  if (!connection.samlConnection?.idpSsoUrl) {
+
+  // Connection is enabled, go to the confirmation step
+  const isEnabled = enterpriseConnection?.active;
+  if (isEnabled) {
+    return 'confirmation';
+  }
+
+  const hasMinimumIdPConfiguration = checkHasMinimumIdPConfiguration(enterpriseConnection);
+
+  // If the connection hasn't finished configuring it, go to the configure step
+  // Connection exists, but is not enabled and hasn't finished configuring it
+  if (!hasMinimumIdPConfiguration) {
     return 'configure';
   }
+
+  // If the connection hasn't been tested, go to the test step
+  if (!hasSuccessfulTestRun) {
+    return 'test';
+  }
+
+  // Connection is disabled but has been tested and configured
   return 'confirmation';
+};
+
+// TODO - Update to support OpenID Connect
+const checkHasMinimumIdPConfiguration = (connection: EnterpriseConnectionResource): boolean => {
+  return Boolean(connection.samlConnection?.idpSsoUrl && connection.samlConnection?.idpEntityId);
 };

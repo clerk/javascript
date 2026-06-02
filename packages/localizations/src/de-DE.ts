@@ -186,9 +186,8 @@ export const deDE: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'Wenden Sie sich an Ihren Organisationsadministrator, um Berechtigungen zur Verwaltung von Enterprise-Verbindungen zu erhalten.',
-      title: 'Sie haben keine Berechtigung, Enterprise-Verbindungen zu verwalten',
+      subtitle: 'Wenden Sie sich an Ihren Organisationsadministrator, um Ihre Berechtigungen zu erweitern.',
+      title: 'Sie haben keine Berechtigung, Single Sign-On (SSO) zu verwalten',
     },
     navbar: {
       title: 'Single Sign-On (SSO) konfigurieren',
@@ -196,10 +195,6 @@ export const deDE: LocalizationResource = {
     selectProviderStep: {
       title: 'Anbieter auswählen',
       subtitle: 'Wählen Sie den Anbieter, für den Sie SSO einrichten möchten.',
-      body: {
-        title: 'Wählen Sie Ihren Identitätsanbieter',
-        description: 'Wir führen Sie als nächstes durch den detaillierten Einrichtungsprozess.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

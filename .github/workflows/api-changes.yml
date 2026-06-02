@@ -1,0 +1,300 @@
+name: API Changes
+
+on:
+  push:
+    branches:
+      - main
+      - release/v4
+      - release/core-2
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - main
+      - release/v4
+      - release/core-2
+    paths:
+      - 'packages/astro/**'
+      - 'packages/backend/**'
+      - 'packages/chrome-extension/**'
+      - 'packages/clerk-js/**'
+      - 'packages/expo/**'
+      - 'packages/expo-passkeys/**'
+      - 'packages/express/**'
+      - 'packages/fastify/**'
+      - 'packages/hono/**'
+      - 'packages/localizations/**'
+      - 'packages/nextjs/**'
+      - 'packages/nuxt/**'
+      - 'packages/react/**'
+      - 'packages/react-router/**'
+      - 'packages/shared/**'
+      - 'packages/tanstack-react-start/**'
+      - 'packages/testing/**'
+      - 'packages/ui/**'
+      - 'packages/vue/**'
+      - 'break-check.config.json'
+      - '.github/workflows/api-changes.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  # The tool was renamed snapi -> break-check (package @clerk/break-check, binary
+  # break-check, repo clerk/break-check). Pinned to a pkg.pr.new build of a
+  # specific commit on main.
+  BREAK_CHECK_PACKAGE: https://pkg.pr.new/clerk/break-check/@clerk/break-check@a4db93a68e43e45a71cc958cc4a722d91c5f62b2
+  BREAK_CHECK_FILTERS: >-
+    --filter=@clerk/astro
+    --filter=@clerk/backend
+    --filter=@clerk/chrome-extension
+    --filter=@clerk/clerk-js
+    --filter=@clerk/expo
+    --filter=@clerk/expo-passkeys
+    --filter=@clerk/express
+    --filter=@clerk/fastify
+    --filter=@clerk/hono
+    --filter=@clerk/localizations
+    --filter=@clerk/nextjs
+    --filter=@clerk/nuxt
+    --filter=@clerk/react
+    --filter=@clerk/react-router
+    --filter=@clerk/shared
+    --filter=@clerk/tanstack-react-start
+    --filter=@clerk/testing
+    --filter=@clerk/ui
+    --filter=@clerk/vue
+
+jobs:
+  publish-baseline:
+    if: github.event_name == 'push'
+    name: Publish API Baseline
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    continue-on-error: true
+    defaults:
+      run:
+        shell: bash
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          filter: 'blob:none'
+          show-progress: false
+
+      - name: Setup
+        uses: ./.github/actions/init-blacksmith
+        with:
+          cache-enabled: true
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+
+      - name: Build declarations
+        run: pnpm turbo build:declarations $TURBO_ARGS $BREAK_CHECK_FILTERS
+
+      - name: Generate API snapshot
+        run: |
+          pnpm dlx --package "$BREAK_CHECK_PACKAGE" break-check snapshot \
+            --output "$GITHUB_WORKSPACE/.api-snapshots-baseline"
+
+      - name: Resolve break-check cache key
+        id: break-check-key
+        run: echo "ref=${BREAK_CHECK_PACKAGE##*@}" >> "$GITHUB_OUTPUT"
+
+      - name: Save baseline to cache
+        uses: actions/cache/save@v4
+        with:
+          path: .api-snapshots-baseline
+          # Fold the break-check commit into the key: a snapshot produced by one
+          # break-check version must not be reused by another, since discovery
+          # changes (e.g. wildcard subpath expansion) make the surfaces
+          # incomparable and the diff degenerates into thousands of phantom
+          # additions.
+          key: break-check-baseline-${{ steps.break-check-key.outputs.ref }}-${{ github.sha }}
+
+  check-api:
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.draft == false }}
+    name: API Changes
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    continue-on-error: true
+    permissions:
+      contents: read
+      pull-requests: write
+    defaults:
+      run:
+        shell: bash
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          # Pin the "current" side of the diff to the PR head, not the
+          # refs/pull/N/merge ref checkout resolves by default. The merge ref is
+          # the head merged into the moving tip of the base branch, so once main
+          # advances it absorbs unrelated changes and break-check reports them as
+          # this PR's own (clerk/break-check#32). The baseline is already pinned
+          # to base.sha (cache key + worktree fallback below).
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 100
+          fetch-tags: false
+          filter: 'blob:none'
+          show-progress: false
+
+      - name: Setup
+        uses: ./.github/actions/init-blacksmith
+        with:
+          cache-enabled: true
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+
+      - name: Resolve break-check cache key
+        id: break-check-key
+        run: echo "ref=${BREAK_CHECK_PACKAGE##*@}" >> "$GITHUB_OUTPUT"
+
+      - name: Restore baseline from cache
+        id: baseline-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: .api-snapshots-baseline
+          # Keyed on the break-check commit too, so bumping break-check misses the
+          # stale baseline and the worktree fallback below rebuilds it with the
+          # same version the PR runs (see publish-baseline for the rationale).
+          key: break-check-baseline-${{ steps.break-check-key.outputs.ref }}-${{ github.event.pull_request.base.sha }}
+
+      - name: Build current declarations
+        run: pnpm turbo build:declarations $TURBO_ARGS $BREAK_CHECK_FILTERS
+
+      - name: Fetch base commit
+        if: steps.baseline-cache.outputs.cache-matched-key == ''
+        run: git fetch origin "${{ github.event.pull_request.base.sha }}" --depth=1
+
+      - name: Create baseline worktree
+        if: steps.baseline-cache.outputs.cache-matched-key == ''
+        run: |
+          mkdir -p .worktrees
+          git worktree add --detach .worktrees/break-check-baseline "${{ github.event.pull_request.base.sha }}"
+          # Snapshot the base ref with the coverage it actually had. Only seed the
+          # config when the base tracks no coverage at all; otherwise packages
+          # newly added to coverage in this PR get diffed against a baseline that
+          # never tracked them (every export reads as a phantom change against the
+          # base's bundled .d.ts), and the base ref may not even build their
+          # declarations yet. A base from before this rename still names its config
+          # snapi.config.json, so check both names. This reads the base's real
+          # coverage; it is not rename-compat, and goes no-op once main carries
+          # break-check.config.json.
+          if [ ! -f .worktrees/break-check-baseline/break-check.config.json ] && [ ! -f .worktrees/break-check-baseline/snapi.config.json ]; then
+            cp break-check.config.json .worktrees/break-check-baseline/break-check.config.json
+          fi
+
+      - name: Install baseline dependencies
+        if: steps.baseline-cache.outputs.cache-matched-key == ''
+        working-directory: .worktrees/break-check-baseline
+        run: pnpm install --frozen-lockfile
+
+      - name: Build baseline declarations
+        if: steps.baseline-cache.outputs.cache-matched-key == ''
+        working-directory: .worktrees/break-check-baseline
+        # --continue past per-package failures and don't fail the step: the base
+        # ref may not build declarations for packages that only gained
+        # build:declarations support in this PR. break-check snapshots only the
+        # base's own coverage below, so a partial build is fine; a needed package
+        # that fails to build still surfaces when `break-check snapshot` finds no
+        # .d.ts.
+        run: pnpm turbo build:declarations $TURBO_ARGS $BREAK_CHECK_FILTERS --continue || true
+
+      - name: Generate baseline API snapshots
+        if: steps.baseline-cache.outputs.cache-matched-key == ''
+        working-directory: .worktrees/break-check-baseline
+        run: |
+          pnpm dlx --package "$BREAK_CHECK_PACKAGE" break-check snapshot \
+            --output "$GITHUB_WORKSPACE/.api-snapshots-baseline"
+
+      - name: Detect API changes
+        env:
+          BREAK_CHECK_ANTHROPIC_API_KEY: ${{ secrets.BREAK_CHECK_ANTHROPIC_API_KEY }}
+        run: |
+          pnpm dlx --package "$BREAK_CHECK_PACKAGE" break-check detect \
+            --baseline .api-snapshots-baseline \
+            --output api-changes-report.md \
+            --fail-on-breaking
+
+      - name: Upload API changes report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: api-changes-report
+          path: api-changes-report.md
+          if-no-files-found: ignore
+          retention-days: 5
+
+      - name: Post break-check report
+        if: always()
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        env:
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        with:
+          script: |
+            const fs = require('fs');
+            const reportPath = 'api-changes-report.md';
+            if (!fs.existsSync(reportPath)) {
+              core.info('No break-check report found; skipping comment.');
+              return;
+            }
+
+            const marker = '<!-- break-check-report -->';
+            const report = fs.readFileSync(reportPath, 'utf-8');
+
+            let body;
+            if (report.includes('## No API Changes Detected')) {
+              body = `${marker}\n**Break Check**: no API changes detected across the tracked packages.`;
+            } else {
+              // GitHub rejects comment bodies over 65536 chars. Read the report
+              // from disk and post via the API so we never hit an arg-length
+              // limit, and truncate with a pointer to the full artifact when a
+              // genuinely large diff would overflow the comment.
+              const LIMIT = 64000;
+              const head = `${marker}\n`;
+              if (head.length + report.length <= LIMIT) {
+                body = head + report;
+              } else {
+                const notice =
+                  `\n\n> **Note**\n> Report truncated to fit GitHub's comment limit. ` +
+                  `The full report is attached as the \`api-changes-report\` artifact on ` +
+                  `[this run](${process.env.RUN_URL}).\n`;
+                const budget = LIMIT - head.length - notice.length;
+                body = head + report.slice(0, budget) + notice;
+              }
+            }
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              per_page: 100,
+            });
+            const existing = comments.find(
+              (c) => c.user?.type === 'Bot' && c.body && c.body.includes(marker),
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }

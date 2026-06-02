@@ -13,7 +13,7 @@ import type { LocalizationKey } from '../../customizables';
 import { Button, Col, descriptors, Flex, Flow, localizationKeys } from '../../customizables';
 import { useCardState } from '../../elements/contexts';
 import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
-import { ChatAltIcon, Email, Fingerprint, LinkIcon, LockClosedIcon, RequestAuthIcon } from '../../icons';
+import { Envelope, Fingerprint, Link, Lock, LockArrow, SpeechBubble } from '../../icons';
 import { SignInSocialButtons } from './SignInSocialButtons';
 import { useResetPasswordFactor } from './useResetPasswordFactor';
 import { withHavingTrouble } from './withHavingTrouble';
@@ -167,12 +167,12 @@ export function getButtonLabel(factor: SignInFactor): LocalizationKey {
 
 export function getButtonIcon(factor: SignInFactor) {
   const icons = {
-    email_link: LinkIcon,
-    email_code: Email,
-    phone_code: ChatAltIcon,
-    reset_password_email_code: RequestAuthIcon,
-    reset_password_phone_code: RequestAuthIcon,
-    password: LockClosedIcon,
+    email_link: Link,
+    email_code: Envelope,
+    phone_code: SpeechBubble,
+    reset_password_email_code: LockArrow,
+    reset_password_phone_code: LockArrow,
+    password: Lock,
     passkey: Fingerprint,
   } as const;
 

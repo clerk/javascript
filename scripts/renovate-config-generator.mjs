@@ -103,6 +103,22 @@ const defaultRules = [
     groupName: 'Remix monorepo',
     matchUpdateTypes: ['patch', 'minor', 'major'],
   },
+  {
+    matchManagers: ['github-actions'],
+    pinDigests: true,
+    groupName: 'GitHub Actions',
+    groupSlug: 'github-actions',
+    matchUpdateTypes: ['patch', 'minor', 'digest'],
+    semanticCommitScope: 'repo',
+    automerge: false,
+  },
+  {
+    matchManagers: ['github-actions'],
+    matchUpdateTypes: ['major'],
+    groupName: 'GitHub Actions (major)',
+    groupSlug: 'github-actions-major',
+    semanticCommitScope: 'repo',
+  },
 ];
 
 const getPackageNames = async () => {
@@ -187,7 +203,7 @@ const renovateConfig = {
     'integration/templates/**',
     'packages/upgrade/src/__tests__/fixtures/**',
   ],
-  includePaths: ['package.json', 'packages/**', 'pnpm-workspace.yaml'],
+  includePaths: ['.github/actions/**', '.github/workflows/**', 'package.json', 'packages/**', 'pnpm-workspace.yaml'],
   major: { dependencyDashboardApproval: true },
   minimumReleaseAge: '3 days',
   nvm: { enabled: false },

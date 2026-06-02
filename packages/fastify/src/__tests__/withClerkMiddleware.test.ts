@@ -6,7 +6,9 @@ import { clerkPlugin, getAuth } from '../index';
 
 const { authenticateRequestMock, createClerkClientMock, mockClerkClient } = vi.hoisted(() => {
   const authenticateRequestMock = vi.fn();
-  const mockClerkClient = { authenticateRequest: (...args: any) => authenticateRequestMock(...args) };
+  const mockClerkClient = {
+    authenticateRequest: (...args: any) => authenticateRequestMock(...args),
+  };
   const createClerkClientMock = vi.fn(() => mockClerkClient);
 
   return { authenticateRequestMock, createClerkClientMock, mockClerkClient };
@@ -16,7 +18,7 @@ vi.mock('@clerk/backend', async () => {
   const actual = await vi.importActual('@clerk/backend');
   return {
     ...actual,
-    createClerkClient: createClerkClientMock,
+    createClerkClient: (...args: any[]) => createClerkClientMock(...args),
   };
 });
 
@@ -54,6 +56,37 @@ describe('withClerkMiddleware(options)', () => {
       expect.objectContaining({
         secretKey: 'runtime_secret_key',
         publishableKey: 'runtime_publishable_key',
+      }),
+    );
+  });
+
+  test('creates the request client with an apiUrl derived from the runtime publishable key', async () => {
+    authenticateRequestMock.mockResolvedValueOnce({
+      headers: new Headers(),
+      toAuth: () => ({
+        tokenType: 'session_token',
+      }),
+    });
+    const fastify = Fastify();
+    await fastify.register(clerkPlugin, {
+      secretKey: 'runtime_secret_key',
+      publishableKey: 'pk_test_aW1tdW5lLWhhd2stNjUuY2xlcmsuYWNjb3VudHNzdGFnZS5kZXYk',
+    });
+
+    fastify.get('/', (_request: FastifyRequest, reply: FastifyReply) => {
+      reply.send({});
+    });
+
+    const response = await fastify.inject({
+      method: 'GET',
+      path: '/',
+    });
+
+    expect(response.statusCode).toEqual(200);
+    expect(createClerkClientMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        apiUrl: 'https://api.clerkstage.dev',
+        publishableKey: 'pk_test_aW1tdW5lLWhhd2stNjUuY2xlcmsuYWNjb3VudHNzdGFnZS5kZXYk',
       }),
     );
   });
@@ -292,13 +325,18 @@ describe('withClerkMiddleware(options)', () => {
     expect(req.headers.get('cookie')).toContain('__client_uat=1675692233');
   });
 
-  test('exposes the clerk client instance on request.clerk', async () => {
+  test('exposes the runtime key clerk client instance on request.clerk', async () => {
     authenticateRequestMock.mockResolvedValueOnce({
       headers: new Headers(),
-      toAuth: () => ({ tokenType: 'session_token' }),
+      toAuth: () => ({
+        tokenType: 'session_token',
+      }),
     });
     const fastify = Fastify();
-    await fastify.register(clerkPlugin);
+    await fastify.register(clerkPlugin, {
+      secretKey: 'runtime_secret_key',
+      publishableKey: 'runtime_publishable_key',
+    });
 
     let clerkOnRequest: unknown;
     fastify.get('/', (request: FastifyRequest, reply: FastifyReply) => {
@@ -306,9 +344,19 @@ describe('withClerkMiddleware(options)', () => {
       reply.send({});
     });
 
-    await fastify.inject({ method: 'GET', path: '/' });
+    const response = await fastify.inject({
+      method: 'GET',
+      path: '/',
+    });
 
+    expect(response.statusCode).toEqual(200);
     expect(clerkOnRequest).toBe(mockClerkClient);
+    expect(createClerkClientMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        secretKey: 'runtime_secret_key',
+        publishableKey: 'runtime_publishable_key',
+      }),
+    );
   });
 
   test('handles signout case by populating the req.auth', async () => {

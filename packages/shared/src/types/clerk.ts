@@ -664,20 +664,26 @@ export interface Clerk {
   /**
    * Mount a configure SSO component at the target element.
    *
-   * @experimental This method is in early access and may change in future releases.
-   *
    * @param targetNode - Target to mount the ConfigureSSO component.
    * @param props - Configuration parameters.
    */
-  __experimental_mountConfigureSSO: (targetNode: HTMLDivElement, props?: __experimental_ConfigureSSOProps) => void;
+  mountConfigureSSO: (targetNode: HTMLDivElement, props?: ConfigureSSOProps) => void;
 
   /**
    * Unmount a configure SSO component from the target element.
    * If there is no component mounted at the target node, results in a noop.
    *
-   * @experimental This method is in early access and may change in future releases.
-   *
    * @param targetNode - Target node to unmount the ConfigureSSO component from.
+   */
+  unmountConfigureSSO: (targetNode: HTMLDivElement) => void;
+
+  /**
+   * @deprecated Use `mountConfigureSSO` instead.
+   */
+  __experimental_mountConfigureSSO: (targetNode: HTMLDivElement, props?: ConfigureSSOProps) => void;
+
+  /**
+   * @deprecated Use `unmountConfigureSSO` instead.
    */
   __experimental_unmountConfigureSSO: (targetNode: HTMLDivElement) => void;
 
@@ -1638,6 +1644,7 @@ export type __internal_AttemptToEnableEnvironmentSettingParams = {
     | 'OrganizationList'
     | 'CreateOrganization'
     | 'TaskChooseOrganization'
+    | 'ConfigureSSO'
     | 'useOrganizationList'
     | 'useOrganization';
   onClose?: () => void;
@@ -2173,10 +2180,7 @@ export type APIKeysProps = {
   showDescription?: boolean;
 };
 
-/**
- * @experimental This type is in early access and may change in future releases.
- */
-export type __experimental_ConfigureSSOProps = {
+export type ConfigureSSOProps = {
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
@@ -2184,6 +2188,9 @@ export type __experimental_ConfigureSSOProps = {
    */
   appearance?: ClerkAppearanceTheme;
 };
+
+/** @deprecated Use `ConfigureSSOProps` instead. */
+export type __experimental_ConfigureSSOProps = ConfigureSSOProps;
 
 export type GetAPIKeysParams = ClerkPaginationParams<{
   subject?: string;

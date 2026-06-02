@@ -180,9 +180,8 @@ export const srRS: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'Kontaktirajte administratora vaše organizacije da biste dobili dozvole za upravljanje korporativnim vezama.',
-      title: 'Nemate dozvolu za upravljanje korporativnim vezama',
+      subtitle: 'Kontaktirajte administratora vaše organizacije da biste proširili svoje dozvole.',
+      title: 'Nemate dozvolu za upravljanje jedinstvenom prijavom (SSO)',
     },
     navbar: {
       title: 'Konfiguriši jedinstvenu prijavu (SSO)',
@@ -190,10 +189,6 @@ export const srRS: LocalizationResource = {
     selectProviderStep: {
       title: 'Izaberite provajdera',
       subtitle: 'Izaberite provajdera za koga ćete podesiti SSO.',
-      body: {
-        title: 'Izaberite svog provajdera identiteta',
-        description: 'Vodićemo vas kroz detaljan proces podešavanja u nastavku.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',
