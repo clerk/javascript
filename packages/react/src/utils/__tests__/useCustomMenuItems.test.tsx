@@ -156,7 +156,8 @@ describe('useUserButtonCustomMenuItems', () => {
 
     expect(result.current.customMenuItems).toHaveLength(2);
     expect(result.current.customMenuItemsPortals).toHaveLength(2);
-    expect(result.current.customMenuItemsPortals[0]).not.toBe(result.current.customMenuItemsPortals[1]);
+    expect(result.current.customMenuItemsPortals[0].portal).not.toBe(result.current.customMenuItemsPortals[1].portal);
+    expect(result.current.customMenuItemsPortals[0].key).not.toBe(result.current.customMenuItemsPortals[1].key);
   });
 
   it('keeps portal identity with the logical menu item when inserting before it', () => {
@@ -187,12 +188,14 @@ describe('useUserButtonCustomMenuItems', () => {
       },
     );
 
-    const secondItemIconPortal = result.current.customMenuItemsPortals[0];
+    const secondItemIconPortal = result.current.customMenuItemsPortals[0].portal;
+    const secondItemIconKey = result.current.customMenuItemsPortals[0].key;
 
     rerender({ includeFirstItem: true });
 
     expect(result.current.customMenuItems).toHaveLength(2);
-    expect(result.current.customMenuItemsPortals[0]).not.toBe(secondItemIconPortal);
-    expect(result.current.customMenuItemsPortals[1]).toBe(secondItemIconPortal);
+    expect(result.current.customMenuItemsPortals[0].portal).not.toBe(secondItemIconPortal);
+    expect(result.current.customMenuItemsPortals[1].portal).toBe(secondItemIconPortal);
+    expect(result.current.customMenuItemsPortals[1].key).toBe(secondItemIconKey);
   });
 });

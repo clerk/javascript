@@ -36,8 +36,12 @@ describe('useOrganizationProfileCustomPages', () => {
 
     expect(result.current.customPages).toHaveLength(2);
     expect(result.current.customPagesPortals).toHaveLength(4);
-    expect(result.current.customPagesPortals[0]).not.toBe(result.current.customPagesPortals[2]);
-    expect(result.current.customPagesPortals[1]).not.toBe(result.current.customPagesPortals[3]);
+    // Duplicate (same label+url, no key) pages get distinct portal identities...
+    expect(result.current.customPagesPortals[0].portal).not.toBe(result.current.customPagesPortals[2].portal);
+    expect(result.current.customPagesPortals[1].portal).not.toBe(result.current.customPagesPortals[3].portal);
+    // ...and distinct stable render keys.
+    const keys = result.current.customPagesPortals.map(p => p.key);
+    expect(new Set(keys).size).toBe(keys.length);
   });
 
   it('keeps portal identity with the logical custom page when inserting before it', () => {
@@ -70,15 +74,21 @@ describe('useOrganizationProfileCustomPages', () => {
       },
     );
 
-    const secondPageContentPortal = result.current.customPagesPortals[0];
-    const secondPageIconPortal = result.current.customPagesPortals[1];
+    const secondPageContentPortal = result.current.customPagesPortals[0].portal;
+    const secondPageContentKey = result.current.customPagesPortals[0].key;
+    const secondPageIconPortal = result.current.customPagesPortals[1].portal;
+    const secondPageIconKey = result.current.customPagesPortals[1].key;
 
     rerender({ includeFirstPage: true });
 
     expect(result.current.customPages).toHaveLength(2);
-    expect(result.current.customPagesPortals[0]).not.toBe(secondPageContentPortal);
-    expect(result.current.customPagesPortals[1]).not.toBe(secondPageIconPortal);
-    expect(result.current.customPagesPortals[2]).toBe(secondPageContentPortal);
-    expect(result.current.customPagesPortals[3]).toBe(secondPageIconPortal);
+    expect(result.current.customPagesPortals[0].portal).not.toBe(secondPageContentPortal);
+    expect(result.current.customPagesPortals[1].portal).not.toBe(secondPageIconPortal);
+    // The second page keeps BOTH its portal identity and its stable render key when it moves
+    // position, so CustomPortalsRenderer reconciles it as an update instead of a remount.
+    expect(result.current.customPagesPortals[2].portal).toBe(secondPageContentPortal);
+    expect(result.current.customPagesPortals[2].key).toBe(secondPageContentKey);
+    expect(result.current.customPagesPortals[3].portal).toBe(secondPageIconPortal);
+    expect(result.current.customPagesPortals[3].key).toBe(secondPageIconKey);
   });
 });

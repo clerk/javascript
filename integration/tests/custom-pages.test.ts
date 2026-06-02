@@ -171,6 +171,37 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
       });
     });
 
+    test('custom profile page survives a parent rerender without remounting', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+      await u.po.signIn.goTo();
+      await u.po.signIn.waitForMounted();
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+      await u.po.expect.toBeSignedIn();
+
+      await u.page.goToRelative(CUSTOM_PROFILE_PAGE);
+      await u.po.userProfile.waitForMounted();
+
+      // Open the custom page (Page 1)
+      const [profilePage] = await u.page.locator('button.cl-navbarButton__custom-page-0').all();
+      await profilePage.click();
+
+      // Local state lives inside the portaled custom page and starts at 0.
+      await u.page.waitForSelector('p[data-local-counter="1"]', { state: 'attached' });
+      await expect(u.page.locator('p[data-local-counter="1"]')).toHaveText('Local counter: 0');
+
+      // Mutate the local state to 2.
+      await u.page.locator('button[data-local-counter="1"]').click();
+      await u.page.locator('button[data-local-counter="1"]').click();
+      await expect(u.page.locator('p[data-local-counter="1"]')).toHaveText('Local counter: 2');
+
+      // Force a parent rerender: this re-creates the <UserProfile> element and reruns useCustomPages.
+      await u.page.locator('button[data-testid="rerender-parent"]').click();
+      await expect(u.page.locator('button[data-testid="rerender-parent"]')).toHaveText('Rerender parent: 1');
+
+      // The custom page must NOT remount, so its local state is preserved.
+      await expect(u.page.locator('p[data-local-counter="1"]')).toHaveText('Local counter: 2');
+    });
+
     test.describe('User Button with experimental asStandalone and asProvider', () => {
       test('items at the specified order', async ({ page, context }) => {
         const u = createTestUtils({ app, page, context });
