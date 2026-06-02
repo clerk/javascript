@@ -124,16 +124,7 @@ const Title = React.forwardRef<HTMLTableCellElement, TitleProps>(({ title, descr
             />
           ) : null}
           <Span localizationKey={title} />
-          {badge ? (
-            <Span
-              sx={{
-                display: 'inline-flex',
-                marginBlock: '-2px',
-              }}
-            >
-              {badge}
-            </Span>
-          ) : null}
+          {badge ? <Box>{badge}</Box> : null}
         </Span>
       ) : null}
       {descriptionElements.length > 0 ? (
