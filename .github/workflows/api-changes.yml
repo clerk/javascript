@@ -150,16 +150,53 @@ jobs:
         uses: ./.github/actions/init-blacksmith
         with:
           cache-enabled: true
+          turbo-summarize: 'true'
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
+      - name: Build current declarations
+        run: pnpm turbo build:declarations $TURBO_ARGS $BREAK_CHECK_FILTERS
+
+      # Gate the expensive snapshot/detect work on turbo's content hashing. We key on
+      # the per-package `#build` task (not `#build:declarations`): `build` is the task
+      # every tracked package has, and `build:declarations` dependsOn build with only a
+      # global tsconfig of its own, so a `#build` cache HIT means the package source and
+      # its whole ^build closure are unchanged and its emitted `.d.ts` is identical,
+      # whether declarations come from a separate tsc pass or straight out of the bundler
+      # (e.g. @clerk/shared via tsdown, which has no build:declarations task at all).
+      # Keying on build:declarations would go blind to such packages and could
+      # false-skip a real change in a leaf one as the tsc->bundler migration proceeds.
+      # Only a MISS pays for the baseline rebuild + break-check detect below; any
+      # uncertainty (missing summary, parse error, schema drift, cold cache) yields
+      # changed=true and runs detect.
+      - name: Determine API surface changed
+        id: gate
+        run: |
+          # shellcheck disable=SC2016
+          node -e '
+            const fs=require("fs"),p=require("path"),dir=".turbo/runs";
+            let changed=true; // default: when unsure, run detect
+            try {
+              const f=fs.readdirSync(dir).filter(n=>n.endsWith(".json")).map(n=>p.join(dir,n))
+                .map(n=>[n,fs.statSync(n).mtimeMs]).sort((a,b)=>b[1]-a[1])[0][0];
+              const s=JSON.parse(fs.readFileSync(f,"utf8"));
+              const builds=(s.tasks||[]).filter(t=>(t.taskId||"").endsWith("#build"));
+              // Only trust a "false" when we actually saw the build tasks and every one HIT.
+              changed = builds.length===0 || builds.some(t=>t.cache?.status!=="HIT");
+            } catch (e) { console.log("gate: falling back to changed=true:", e.message); }
+            fs.appendFileSync(process.env.GITHUB_OUTPUT,`changed=${changed}\n`);
+            console.log("tracked build cache miss / unknown:", changed);
+          '
+
       - name: Resolve break-check cache key
         id: break-check-key
+        if: steps.gate.outputs.changed == 'true'
         run: echo "ref=${BREAK_CHECK_PACKAGE##*@}" >> "$GITHUB_OUTPUT"
 
       - name: Restore baseline from cache
         id: baseline-cache
+        if: steps.gate.outputs.changed == 'true'
         uses: actions/cache/restore@v4
         with:
           path: .api-snapshots-baseline
@@ -168,15 +205,12 @@ jobs:
           # same version the PR runs (see publish-baseline for the rationale).
           key: break-check-baseline-${{ steps.break-check-key.outputs.ref }}-${{ github.event.pull_request.base.sha }}
 
-      - name: Build current declarations
-        run: pnpm turbo build:declarations $TURBO_ARGS $BREAK_CHECK_FILTERS
-
       - name: Fetch base commit
-        if: steps.baseline-cache.outputs.cache-matched-key == ''
+        if: steps.gate.outputs.changed == 'true' && steps.baseline-cache.outputs.cache-matched-key == ''
         run: git fetch origin "${{ github.event.pull_request.base.sha }}" --depth=1
 
       - name: Create baseline worktree
-        if: steps.baseline-cache.outputs.cache-matched-key == ''
+        if: steps.gate.outputs.changed == 'true' && steps.baseline-cache.outputs.cache-matched-key == ''
         run: |
           mkdir -p .worktrees
           git worktree add --detach .worktrees/break-check-baseline "${{ github.event.pull_request.base.sha }}"
@@ -194,12 +228,12 @@ jobs:
           fi
 
       - name: Install baseline dependencies
-        if: steps.baseline-cache.outputs.cache-matched-key == ''
+        if: steps.gate.outputs.changed == 'true' && steps.baseline-cache.outputs.cache-matched-key == ''
         working-directory: .worktrees/break-check-baseline
         run: pnpm install --frozen-lockfile
 
       - name: Build baseline declarations
-        if: steps.baseline-cache.outputs.cache-matched-key == ''
+        if: steps.gate.outputs.changed == 'true' && steps.baseline-cache.outputs.cache-matched-key == ''
         working-directory: .worktrees/break-check-baseline
         # --continue past per-package failures and don't fail the step: the base
         # ref may not build declarations for packages that only gained
@@ -210,13 +244,14 @@ jobs:
         run: pnpm turbo build:declarations $TURBO_ARGS $BREAK_CHECK_FILTERS --continue || true
 
       - name: Generate baseline API snapshots
-        if: steps.baseline-cache.outputs.cache-matched-key == ''
+        if: steps.gate.outputs.changed == 'true' && steps.baseline-cache.outputs.cache-matched-key == ''
         working-directory: .worktrees/break-check-baseline
         run: |
           pnpm dlx --package "$BREAK_CHECK_PACKAGE" break-check snapshot \
             --output "$GITHUB_WORKSPACE/.api-snapshots-baseline"
 
       - name: Detect API changes
+        if: steps.gate.outputs.changed == 'true'
         env:
           BREAK_CHECK_ANTHROPIC_API_KEY: ${{ secrets.BREAK_CHECK_ANTHROPIC_API_KEY }}
         run: |
@@ -224,6 +259,12 @@ jobs:
             --baseline .api-snapshots-baseline \
             --output api-changes-report.md \
             --fail-on-breaking
+
+      # Note: on the cache-hit skip path we intentionally post nothing. A turbo HIT is
+      # an inference that declarations did not change, not a break-check analysis, so a
+      # "no breaking changes" clearance would overclaim (e.g. a revert to an older
+      # still-cached state HITs the cache yet differs from base). The "no API changes"
+      # comment below is only ever posted when detect actually ran and found nothing.
 
       - name: Upload API changes report
         uses: actions/upload-artifact@v4
@@ -239,6 +280,7 @@ jobs:
         uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         env:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         with:
           script: |
             const fs = require('fs');
@@ -271,6 +313,14 @@ jobs:
                 const budget = LIMIT - head.length - notice.length;
                 body = head + report.slice(0, budget) + notice;
               }
+            }
+
+            // Stamp the head SHA detect actually ran on. Because cache-hit pushes are
+            // skipped silently (no comment update), this lets a reviewer see whether this
+            // comment reflects the current head or an earlier push.
+            const ranSha = (process.env.HEAD_SHA || '').slice(0, 7);
+            if (ranSha) {
+              body += `\n\n<sub>Last ran on \`${ranSha}\`. Pushes that change no tracked declarations (turbo cache hit) are skipped and don't update this comment.</sub>`;
             }
 
             const comments = await github.paginate(github.rest.issues.listComments, {
