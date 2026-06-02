@@ -150,44 +150,117 @@ jobs:
         uses: ./.github/actions/init-blacksmith
         with:
           cache-enabled: true
-          turbo-summarize: 'true'
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
-      - name: Build current declarations
-        run: pnpm turbo build:declarations $TURBO_ARGS $BREAK_CHECK_FILTERS
+      - name: Fetch base commit
+        run: git fetch origin "${{ github.event.pull_request.base.sha }}" --depth=1
 
-      # Gate the expensive snapshot/detect work on turbo's content hashing. We key on
-      # the per-package `#build` task (not `#build:declarations`): `build` is the task
-      # every tracked package has, and `build:declarations` dependsOn build with only a
-      # global tsconfig of its own, so a `#build` cache HIT means the package source and
-      # its whole ^build closure are unchanged and its emitted `.d.ts` is identical,
-      # whether declarations come from a separate tsc pass or straight out of the bundler
-      # (e.g. @clerk/shared via tsdown, which has no build:declarations task at all).
-      # Keying on build:declarations would go blind to such packages and could
-      # false-skip a real change in a leaf one as the tsc->bundler migration proceeds.
-      # Only a MISS pays for the baseline rebuild + break-check detect below; any
-      # uncertainty (missing summary, parse error, schema drift, cold cache) yields
-      # changed=true and runs detect.
+      - name: Create baseline worktree
+        run: |
+          mkdir -p .worktrees
+          git worktree add --detach .worktrees/break-check-baseline "${{ github.event.pull_request.base.sha }}"
+          # Snapshot the base ref with the coverage it actually had. Only seed the
+          # config when the base tracks no coverage at all; otherwise packages
+          # newly added to coverage in this PR get diffed against a baseline that
+          # never tracked them (every export reads as a phantom change against the
+          # base's bundled .d.ts), and the base ref may not even build their
+          # declarations yet. A base from before this rename still names its config
+          # snapi.config.json, so check both names. This reads the base's real
+          # coverage; it is not rename-compat, and goes no-op once main carries
+          # break-check.config.json.
+          if [ ! -f .worktrees/break-check-baseline/break-check.config.json ] && [ ! -f .worktrees/break-check-baseline/snapi.config.json ]; then
+            cp break-check.config.json .worktrees/break-check-baseline/break-check.config.json
+          fi
+
+      # Gate the expensive snapshot/detect work on turbo's content hashing, but compare
+      # the PR head against the pinned base SHA. A cache HIT only means an output already
+      # exists for the task hash; it does not prove the PR matches its base.
       - name: Determine API surface changed
         id: gate
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          # shellcheck disable=SC2016
-          node -e '
-            const fs=require("fs"),p=require("path"),dir=".turbo/runs";
-            let changed=true; // default: when unsure, run detect
+          node <<'EOF'
+            const cp = require('child_process');
+            const fs = require('fs');
+            const path = require('path');
+
+            const workspace = process.env.GITHUB_WORKSPACE;
+            const baseWorktree = path.join(workspace, '.worktrees/break-check-baseline');
+            const filters = process.env.BREAK_CHECK_FILTERS.trim().split(/\s+/);
+            const turbo = path.join(workspace, 'node_modules/.bin/turbo');
+            let changed = true; // default: when unsure, run detect
+
+            const parseTurboJson = output => {
+              const start = output.indexOf('{');
+              if (start === -1) {
+                throw new Error('turbo dry run did not produce JSON');
+              }
+              return JSON.parse(output.slice(start));
+            };
+
+            const runTurboDry = cwd => {
+              const output = cp.execFileSync(turbo, ['build:declarations', '--dry=json', ...filters], {
+                cwd,
+                encoding: 'utf8',
+                maxBuffer: 100 * 1024 * 1024,
+              });
+              return parseTurboJson(output);
+            };
+
+            const apiTaskHashes = summary => {
+              const entries = (summary.tasks || [])
+                .filter(t => {
+                  const taskId = t.taskId || '';
+                  return taskId.endsWith('#build') || taskId.endsWith('#build:declarations');
+                })
+                .map(t => [t.taskId, t.hash]);
+
+              if (entries.length === 0) {
+                throw new Error('turbo dry run contained no API task hashes');
+              }
+
+              return new Map(entries);
+            };
+
             try {
-              const f=fs.readdirSync(dir).filter(n=>n.endsWith(".json")).map(n=>p.join(dir,n))
-                .map(n=>[n,fs.statSync(n).mtimeMs]).sort((a,b)=>b[1]-a[1])[0][0];
-              const s=JSON.parse(fs.readFileSync(f,"utf8"));
-              const builds=(s.tasks||[]).filter(t=>(t.taskId||"").endsWith("#build"));
-              // Only trust a "false" when we actually saw the build tasks and every one HIT.
-              changed = builds.length===0 || builds.some(t=>t.cache?.status!=="HIT");
-            } catch (e) { console.log("gate: falling back to changed=true:", e.message); }
+              const changedFiles = cp
+                .execFileSync('git', ['diff', '--name-only', process.env.BASE_SHA, process.env.HEAD_SHA], {
+                  cwd: workspace,
+                  encoding: 'utf8',
+                })
+                .trim()
+                .split(/\n/)
+                .filter(Boolean);
+
+              const forcedFiles = changedFiles.filter(
+                f => f === 'break-check.config.json' || f === '.github/workflows/api-changes.yml',
+              );
+
+              if (forcedFiles.length > 0) {
+                console.log('gate: workflow/config changed; running detect:', forcedFiles.join(', '));
+              } else {
+                const head = apiTaskHashes(runTurboDry(workspace));
+                const base = apiTaskHashes(runTurboDry(baseWorktree));
+                const allTaskIds = new Set([...head.keys(), ...base.keys()]);
+
+                changed = [...allTaskIds].some(taskId => head.get(taskId) !== base.get(taskId));
+              }
+            } catch (e) {
+              console.log('gate: falling back to changed=true:', e.message);
+              changed = true;
+            }
+
             fs.appendFileSync(process.env.GITHUB_OUTPUT,`changed=${changed}\n`);
-            console.log("tracked build cache miss / unknown:", changed);
-          '
+            console.log('tracked API task hash changed / unknown:', changed);
+          EOF
+
+      - name: Build current declarations
+        if: steps.gate.outputs.changed == 'true'
+        run: pnpm turbo build:declarations $TURBO_ARGS $BREAK_CHECK_FILTERS
 
       - name: Resolve break-check cache key
         id: break-check-key
@@ -204,28 +277,6 @@ jobs:
           # stale baseline and the worktree fallback below rebuilds it with the
           # same version the PR runs (see publish-baseline for the rationale).
           key: break-check-baseline-${{ steps.break-check-key.outputs.ref }}-${{ github.event.pull_request.base.sha }}
-
-      - name: Fetch base commit
-        if: steps.gate.outputs.changed == 'true' && steps.baseline-cache.outputs.cache-matched-key == ''
-        run: git fetch origin "${{ github.event.pull_request.base.sha }}" --depth=1
-
-      - name: Create baseline worktree
-        if: steps.gate.outputs.changed == 'true' && steps.baseline-cache.outputs.cache-matched-key == ''
-        run: |
-          mkdir -p .worktrees
-          git worktree add --detach .worktrees/break-check-baseline "${{ github.event.pull_request.base.sha }}"
-          # Snapshot the base ref with the coverage it actually had. Only seed the
-          # config when the base tracks no coverage at all; otherwise packages
-          # newly added to coverage in this PR get diffed against a baseline that
-          # never tracked them (every export reads as a phantom change against the
-          # base's bundled .d.ts), and the base ref may not even build their
-          # declarations yet. A base from before this rename still names its config
-          # snapi.config.json, so check both names. This reads the base's real
-          # coverage; it is not rename-compat, and goes no-op once main carries
-          # break-check.config.json.
-          if [ ! -f .worktrees/break-check-baseline/break-check.config.json ] && [ ! -f .worktrees/break-check-baseline/snapi.config.json ]; then
-            cp break-check.config.json .worktrees/break-check-baseline/break-check.config.json
-          fi
 
       - name: Install baseline dependencies
         if: steps.gate.outputs.changed == 'true' && steps.baseline-cache.outputs.cache-matched-key == ''
@@ -261,11 +312,9 @@ jobs:
             --ai-apply-downgrades \
             --fail-on-breaking
 
-      # Note: on the cache-hit skip path we intentionally post nothing. A turbo HIT is
-      # an inference that declarations did not change, not a break-check analysis, so a
-      # "no breaking changes" clearance would overclaim (e.g. a revert to an older
-      # still-cached state HITs the cache yet differs from base). The "no API changes"
-      # comment below is only ever posted when detect actually ran and found nothing.
+      # Note: on the hash-equal skip path we intentionally post nothing. The "no API
+      # changes" comment below is only ever posted when detect actually ran and found
+      # nothing.
 
       - name: Upload API changes report
         uses: actions/upload-artifact@v4
@@ -316,12 +365,13 @@ jobs:
               }
             }
 
-            // Stamp the head SHA detect actually ran on. Because cache-hit pushes are
-            // skipped silently (no comment update), this lets a reviewer see whether this
-            // comment reflects the current head or an earlier push.
+            // Stamp the head SHA detect actually ran on. Because pushes whose tracked
+            // declarations match the base are skipped silently (no comment update), this
+            // lets a reviewer see whether this comment reflects the current head or an
+            // earlier push.
             const ranSha = (process.env.HEAD_SHA || '').slice(0, 7);
             if (ranSha) {
-              body += `\n\n<sub>Last ran on \`${ranSha}\`. Pushes that change no tracked declarations (turbo cache hit) are skipped and don't update this comment.</sub>`;
+              body += `\n\n<sub>Last ran on \`${ranSha}\`. Pushes that change no tracked declarations (no API surface change vs. base) are skipped and don't update this comment.</sub>`;
             }
 
             const comments = await github.paginate(github.rest.issues.listComments, {
