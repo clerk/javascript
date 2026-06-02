@@ -26,14 +26,15 @@ export const [MenuStateCtx, useMenuState] = createContextAndHook<MenuState>('Men
 type MenuProps = PropsWithChildren<Record<never, never>> & {
   elementId?: MenuId;
   popoverPlacement?: Placement;
+  popoverShouldFlip?: boolean;
 };
 
 export const Menu = withFloatingTree((props: MenuProps) => {
-  const { popoverPlacement = 'bottom-end', elementId, ...rest } = props;
+  const { popoverPlacement = 'bottom-end', popoverShouldFlip = true, elementId, ...rest } = props;
   const popoverCtx = usePopover({
     placement: popoverPlacement,
     offset: 8,
-    shoudFlip: true,
+    shoudFlip: popoverShouldFlip,
   });
 
   const value = React.useMemo(() => ({ value: { popoverCtx, elementId } }), [{ ...popoverCtx }, elementId]);

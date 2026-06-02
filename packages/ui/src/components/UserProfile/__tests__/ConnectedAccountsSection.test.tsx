@@ -119,6 +119,21 @@ describe('ConnectedAccountsSection ', () => {
   });
 
   describe('Add connection', () => {
+    it('filters available connections from the connect account menu', async () => {
+      const { wrapper } = await createFixtures(withoutConnections);
+
+      const { userEvent, getByText, getByRole, queryByText } = render(<ConnectedAccountsSection />, { wrapper });
+
+      await userEvent.click(getByText(/connect account/i));
+      getByText('Google');
+      getByText('GitHub');
+
+      await userEvent.type(getByRole('searchbox', { name: /search connected account providers/i }), 'git');
+
+      getByText('GitHub');
+      expect(queryByText('Google')).not.toBeInTheDocument();
+    });
+
     it('calls the appropriate function upon pressing the "connect" button', async () => {
       const { wrapper, fixtures } = await createFixtures(withoutConnections);
 

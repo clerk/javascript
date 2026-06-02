@@ -291,19 +291,24 @@ type ProfileSectionActionMenuProps = {
   destructive?: boolean;
   triggerLocalizationKey?: LocalizationKey;
   triggerSx?: ThemableCssProp;
+  menuSx?: ThemableCssProp;
   id: ProfileSectionId;
   onClick?: () => void;
+  popoverShouldFlip?: boolean;
 };
 
 export const ProfileSectionActionMenu = (props: ProfileSectionActionMenuProps) => {
-  const { children, triggerLocalizationKey, id, triggerSx, onClick } = props;
+  const { children, triggerLocalizationKey, id, triggerSx, menuSx, onClick, popoverShouldFlip } = props;
   return (
     <Flex
       sx={{
         position: 'relative',
       }}
     >
-      <Menu elementId={id}>
+      <Menu
+        elementId={id}
+        popoverShouldFlip={popoverShouldFlip}
+      >
         <MenuTrigger>
           <ProfileSectionArrowButton
             id={id}
@@ -322,10 +327,13 @@ export const ProfileSectionActionMenu = (props: ProfileSectionActionMenuProps) =
         </MenuTrigger>
         <MenuList
           asPortal={false}
-          sx={t => ({
-            width: '100%',
-            padding: t.space.$1,
-          })}
+          sx={[
+            t => ({
+              width: '100%',
+              padding: t.space.$1,
+            }),
+            menuSx,
+          ]}
         >
           {children}
         </MenuList>

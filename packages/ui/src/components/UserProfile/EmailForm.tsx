@@ -7,6 +7,7 @@ import type {
 import React from 'react';
 
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { Field } from '@/ui/elements/FieldControl';
 import { Form } from '@/ui/elements/Form';
 import { FormButtons } from '@/ui/elements/FormButtons';
 import type { FormProps } from '@/ui/elements/FormContainer';
@@ -16,6 +17,7 @@ import { useFormControl } from '@/ui/utils/useFormControl';
 
 import { useWizard, Wizard } from '../../common';
 import { useEnvironment } from '../../contexts';
+import { Col, Flex } from '../../customizables';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
 import { VerifyWithCode } from './VerifyWithCode';
@@ -27,9 +29,14 @@ type EmailFormProps = FormProps & {
   title?: LocalizationKey;
   subtitle?: LocalizationKey;
   disableAutoFocus?: boolean;
+  /**
+   * 'card' (default) renders the email entry step inside the standard FormContainer card.
+   * 'inline' renders a compact crossfading row: input on the left, save/cancel on the right.
+   */
+  variant?: 'card' | 'inline';
 };
 export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
-  const { emailId: id, onSuccess, onReset, disableAutoFocus = false } = props;
+  const { emailId: id, onSuccess, onReset, disableAutoFocus = false, variant = 'card' } = props;
   const card = useCardState();
   const { user } = useUser();
   const environment = useEnvironment();
@@ -69,24 +76,59 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
 
   return (
     <Wizard {...wizard.props}>
-      <FormContainer
-        headerTitle={props.title || localizationKeys('userProfile.emailAddressPage.title')}
-        headerSubtitle={props.subtitle || localizationKeys('userProfile.emailAddressPage.formHint')}
-      >
+      {variant === 'inline' ? (
+        // The crossfade + open/close orchestration lives in EmailsSection's
+        // AddEmailControl; here we only render the compact inline row.
         <Form.Root onSubmit={addEmail}>
-          <Form.ControlRow elementId={emailField.id}>
-            <Form.PlainInput
-              {...emailField.props}
-              autoFocus={!disableAutoFocus}
-            />
-          </Form.ControlRow>
-          <FormButtons
-            submitLabel={localizationKeys('userProfile.formButtonPrimary__add')}
-            isDisabled={!canSubmit}
-            onReset={onReset}
-          />
+          <Flex
+            gap={2}
+            sx={{ alignItems: 'flex-start', width: '100%' }}
+          >
+            <Col sx={{ flex: 1, minWidth: 0 }}>
+              <Field.Root
+                {...emailField.props}
+                autoFocus={!disableAutoFocus}
+              >
+                <Field.Input />
+                <Field.Feedback />
+              </Field.Root>
+            </Col>
+            <Flex>
+              <Form.SubmitButton
+                block={false}
+                size='sm'
+                isDisabled={!canSubmit}
+                localizationKey={localizationKeys('userProfile.formButtonPrimary__add')}
+              />
+              <Form.ResetButton
+                block={false}
+                size='sm'
+                onClick={onReset}
+                localizationKey={localizationKeys('userProfile.formButtonReset')}
+              />
+            </Flex>
+          </Flex>
         </Form.Root>
-      </FormContainer>
+      ) : (
+        <FormContainer
+          headerTitle={props.title || localizationKeys('userProfile.emailAddressPage.title')}
+          headerSubtitle={props.subtitle || localizationKeys('userProfile.emailAddressPage.formHint')}
+        >
+          <Form.Root onSubmit={addEmail}>
+            <Form.ControlRow elementId={emailField.id}>
+              <Form.PlainInput
+                {...emailField.props}
+                autoFocus={!disableAutoFocus}
+              />
+            </Form.ControlRow>
+            <FormButtons
+              submitLabel={localizationKeys('userProfile.formButtonPrimary__add')}
+              isDisabled={!canSubmit}
+              onReset={onReset}
+            />
+          </Form.Root>
+        </FormContainer>
+      )}
 
       <FormContainer
         headerTitle={localizationKeys('userProfile.emailAddressPage.verifyTitle')}
