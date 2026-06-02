@@ -877,23 +877,100 @@ export interface BillingCreditsJSON {
 }
 
 /**
+ * Details about a prorated discount applied when adding a seat mid-cycle. The discount covers the part of the
+ * billing period that has already passed, so the payer is only charged for the time remaining in the cycle.
+ */
+export interface BillingProrationDiscountDetailJSON {
+  amount: BillingMoneyAmountJSON;
+  cycle_days_passed: number;
+  cycle_days_total: number;
+  cycle_passed_percent: number;
+}
+
+/**
+ * Discounts applied to the checkout, such as prorated discounts for mid-cycle seat additions.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingCheckoutDiscountsJSON {
+  /**
+   * The prorated discount for the part of the billing period that has already passed when adding a seat mid-cycle.
+   * Unlike the proration credit (which refunds the unused remainder of a plan you already paid for), this discount
+   * means you are not charged for the portion of the new seat's cycle that has already elapsed.
+   */
+  proration: BillingProrationDiscountDetailJSON | null;
+  /**
+   * The total of all discounts applied to the checkout.
+   */
+  total: BillingMoneyAmountJSON;
+}
+
+/**
+ * Per-period renewal totals, describing what the subscription renewal charge will look like after the current checkout.
+ * Unlike the top-level checkout totals (which only reflect the items actively being purchased),
+ * this object contains the full renewal breakdown including all seats and the base plan fee.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingPerPeriodTotalsJSON {
+  subtotal: BillingMoneyAmountJSON;
+  base_fee: BillingMoneyAmountJSON;
+  tax_total: BillingMoneyAmountJSON;
+  grand_total: BillingMoneyAmountJSON;
+  /**
+   * Per-unit cost breakdown for the renewal period, covering all units purchased to date
+   * (not just the ones being added in this checkout).
+   */
+  per_unit_totals?: BillingPerUnitTotalJSON[];
+}
+
+/**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingCheckoutTotalsJSON {
   grand_total: BillingMoneyAmountJSON;
+  /**
+   * The price of items actively being purchased in this checkout, before taxes and discounts.
+   * When only adding seats mid-cycle, this reflects just the new seats and excludes the base plan fee and
+   * seats that were already paid for.
+   */
   subtotal: BillingMoneyAmountJSON;
+  /**
+   * The base plan fee portion of the totals, before per-unit charges and adjustments.
+   */
+  base_fee: BillingMoneyAmountJSON;
   tax_total: BillingMoneyAmountJSON;
   /**
-   * Per-unit cost breakdown for this checkout (for example, seats).
+   * Per-unit cost breakdown for items actively being purchased in this checkout (for example, seats being added).
+   * When only adding seats mid-cycle, this only covers the seats being added, not seats already paid for.
+   * Omitted when the checkout is not seat-based.
    */
   per_unit_totals?: BillingPerUnitTotalJSON[];
   total_due_now: BillingMoneyAmountJSON;
-  total_due_per_period: BillingMoneyAmountJSON;
+  /**
+   * Legacy credit field. Kept for backwards compatibility; prefer the unified `credits` breakdown.
+   */
   credit: BillingMoneyAmountJSON | null;
   credits: BillingCreditsJSON | null;
   account_credit: BillingMoneyAmountJSON | null;
   past_due: BillingMoneyAmountJSON | null;
   total_due_after_free_trial: BillingMoneyAmountJSON | null;
+  /**
+   * Discounts applied to this checkout such as mid-cycle prorated seat discounts.
+   * The key is always present; the value is `null` when no discounts apply.
+   */
+  discounts: BillingCheckoutDiscountsJSON | null;
+  /**
+   * The expected recurring payment for each future billing period.
+   * Kept for backwards compatibility. Prefer `totals_due_per_period` for the full breakdown.
+   */
+  total_due_per_period: BillingMoneyAmountJSON;
+  /**
+   * Full renewal period totals after this checkout completes.
+   * Contains the complete breakdown of what the next recurring charge will look like,
+   * including all seats and the base plan fee.
+   */
+  totals_due_per_period: BillingPerPeriodTotalsJSON;
 }
 
 /**
