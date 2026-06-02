@@ -59,6 +59,7 @@
   ],
   "scripts": {
     "build": "tsup",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
     "dev": "tsup --watch",
     "dev:pub": "pnpm dev -- --env.publish",
     "format": "node ../../scripts/format-package.mjs",

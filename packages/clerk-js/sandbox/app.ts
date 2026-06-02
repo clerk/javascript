@@ -281,6 +281,8 @@ async function initControls() {
     .addBinding(PARAMS, 'baseTheme', {
       options: {
         default: '',
+        clerk: 'clerk',
+        simple: 'simple',
         dark: 'dark',
         shadesOfPurple: 'shadesOfPurple',
         neobrutalism: 'neobrutalism',
@@ -357,6 +359,8 @@ async function initControls() {
 }
 
 const themes: Record<string, unknown> = {
+  clerk: 'clerk',
+  simple: 'simple',
   dark,
   shadesOfPurple,
   neobrutalism,

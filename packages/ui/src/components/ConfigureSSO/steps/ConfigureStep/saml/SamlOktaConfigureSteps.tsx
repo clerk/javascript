@@ -1,6 +1,20 @@
-import { type JSX } from 'react';
+import React, { type JSX } from 'react';
 
-import { Col, descriptors, Heading, localizationKeys, Text } from '@/customizables';
+import {
+  Badge,
+  Col,
+  descriptors,
+  Flex,
+  Heading,
+  localizationKeys,
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
+} from '@/customizables';
 import { ClipboardInput } from '@/elements/ClipboardInput';
 import { useCardState } from '@/elements/contexts';
 import { Form } from '@/elements/Form';
@@ -11,9 +25,16 @@ import { useConfigureSSO } from '../../../ConfigureSSOContext';
 import { Step } from '../../../elements/Step';
 import { useWizard, Wizard } from '../../../elements/Wizard';
 import { InnerStepCounter } from '../../../elements/Wizard/InnerStepCounter';
-import { AttributeMappingTable, type AttributeMappingTableConfig } from './shared/AttributeMappingTable';
-import { IdentityProviderMetadataForm } from './shared/IdentityProviderMetadataForm';
-import { useIdentityProviderMetadataForm } from './shared/useIdentityProviderMetadataForm';
+import {
+  applySamlSubmitError,
+  buildSamlConfigurationPayload,
+  IdentityProviderConfigurationForm,
+  type IdentityProviderConfigurationFormProps,
+} from './shared/IdentityProviderConfigurationForm';
+import {
+  IdentityProviderConfigurationModes,
+  type IdpConfigurationMode,
+} from './shared/IdentityProviderConfigurationModes';
 
 export const SamlOktaConfigureSteps = (): JSX.Element => {
   return (
@@ -240,6 +261,7 @@ const SamlOktaCreateAppStep = (): JSX.Element => {
       </Step.Body>
 
       <Step.Footer>
+        <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
           isDisabled={isFirstStep}
@@ -253,49 +275,88 @@ const SamlOktaCreateAppStep = (): JSX.Element => {
   );
 };
 
-const OKTA_ATTRIBUTE_MAPPING: AttributeMappingTableConfig = {
-  columns: {
-    first: localizationKeys(
-      'configureSSO.configureStep.samlOkta.attributeMappingStep.attributeMappingTable.columns.name',
-    ),
-    second: localizationKeys(
-      'configureSSO.configureStep.samlOkta.attributeMappingStep.attributeMappingTable.columns.expression',
-    ),
-  },
-  monoFirst: true,
-  rows: [
-    {
-      id: 'email',
-      isRequired: true,
-      first: localizationKeys(
-        'configureSSO.configureStep.samlOkta.attributeMappingStep.attributeMappingTable.rows.email.name',
-      ),
-      second: localizationKeys(
-        'configureSSO.configureStep.samlOkta.attributeMappingStep.attributeMappingTable.rows.email.expression',
-      ),
-    },
-    {
-      id: 'firstName',
-      isRequired: false,
-      first: localizationKeys(
-        'configureSSO.configureStep.samlOkta.attributeMappingStep.attributeMappingTable.rows.firstName.name',
-      ),
-      second: localizationKeys(
-        'configureSSO.configureStep.samlOkta.attributeMappingStep.attributeMappingTable.rows.firstName.expression',
-      ),
-    },
-    {
-      id: 'lastName',
-      isRequired: false,
-      first: localizationKeys(
-        'configureSSO.configureStep.samlOkta.attributeMappingStep.attributeMappingTable.rows.lastName.name',
-      ),
-      second: localizationKeys(
-        'configureSSO.configureStep.samlOkta.attributeMappingStep.attributeMappingTable.rows.lastName.expression',
-      ),
-    },
-  ],
+type OktaAttributeRow = {
+  id: 'email' | 'firstName' | 'lastName';
+  isRequired: boolean;
 };
+
+const OKTA_ATTRIBUTE_ROWS: ReadonlyArray<OktaAttributeRow> = [
+  { id: 'email', isRequired: true },
+  { id: 'firstName', isRequired: false },
+  { id: 'lastName', isRequired: false },
+];
+
+const OktaAttributeMappingTable = (): JSX.Element => (
+  <Table
+    elementDescriptor={descriptors.configureSSOAttributeMappingTable}
+    sx={theme => ({
+      'tr > th:first-of-type': { paddingInlineStart: theme.space.$4 },
+    })}
+  >
+    <Thead>
+      <Tr>
+        <Th>
+          <Text
+            sx={theme => ({ fontSize: theme.fontSizes.$xs })}
+            localizationKey={localizationKeys(
+              'configureSSO.configureStep.samlOkta.attributeMappingStep.attributeMappingTable.columns.name',
+            )}
+          />
+        </Th>
+        <Th>
+          <Text
+            sx={theme => ({ fontSize: theme.fontSizes.$xs })}
+            localizationKey={localizationKeys(
+              'configureSSO.configureStep.samlOkta.attributeMappingStep.attributeMappingTable.columns.expression',
+            )}
+          />
+        </Th>
+      </Tr>
+    </Thead>
+    <Tbody>
+      {OKTA_ATTRIBUTE_ROWS.map(row => (
+        <Tr key={row.id}>
+          <Td>
+            <Flex
+              as='span'
+              align='center'
+              sx={theme => ({ gap: theme.space.$2 })}
+            >
+              <Text
+                as='span'
+                sx={{ fontFamily: 'monospace' }}
+                localizationKey={localizationKeys(
+                  `configureSSO.configureStep.samlOkta.attributeMappingStep.attributeMappingTable.rows.${row.id}.name`,
+                )}
+              />
+              <Badge
+                elementDescriptor={descriptors.configureSSOAttributeMappingBadge}
+                elementId={descriptors.configureSSOAttributeMappingBadge.setId(
+                  row.isRequired ? 'required' : 'optional',
+                )}
+                colorScheme={row.isRequired ? 'warning' : 'primary'}
+                localizationKey={localizationKeys(
+                  row.isRequired
+                    ? 'configureSSO.configureStep.attributeMappingTable.badges.required'
+                    : 'configureSSO.configureStep.attributeMappingTable.badges.optional',
+                )}
+              />
+            </Flex>
+          </Td>
+          <Td>
+            <Text
+              as='span'
+              sx={{ fontFamily: 'monospace' }}
+              localizationKey={localizationKeys(
+                `configureSSO.configureStep.samlOkta.attributeMappingStep.attributeMappingTable.rows.${row.id}.expression`,
+              )}
+            />
+          </Td>
+        </Tr>
+      ))}
+    </Tbody>
+  </Table>
+);
 
 const SamlOktaAttributeMappingStep = (): JSX.Element => {
   const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
@@ -326,13 +387,6 @@ const SamlOktaAttributeMappingStep = (): JSX.Element => {
               colorScheme='secondary'
               localizationKey={localizationKeys('configureSSO.configureStep.samlOkta.attributeMappingStep.step1')}
             />
-            {/*
-             * The actual name/expression pairs that step 2 refers to are
-             * rendered by the `AttributeMappingTable` immediately below this
-             * list — keeping them in a single tabular surface instead of an
-             * inline badge list matches the design (see Okta screenshot:
-             * "Create the following attribute mapping statements:" + table).
-             */}
             <Text
               elementDescriptor={descriptors.configureSSOInstructionsListItem}
               as='li'
@@ -341,11 +395,12 @@ const SamlOktaAttributeMappingStep = (): JSX.Element => {
             />
           </Col>
 
-          <AttributeMappingTable config={OKTA_ATTRIBUTE_MAPPING} />
+          <OktaAttributeMappingTable />
         </Step.Section>
       </Step.Body>
 
       <Step.Footer>
+        <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
           isDisabled={isFirstStep}
@@ -437,6 +492,7 @@ const SamlOktaAssignUsersStep = (): JSX.Element => {
       </Step.Body>
 
       <Step.Footer>
+        <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
           isDisabled={isFirstStep}
@@ -450,40 +506,111 @@ const SamlOktaAssignUsersStep = (): JSX.Element => {
   );
 };
 
+const OKTA_IDP_MODES = ['metadataUrl', 'manual'] as const satisfies readonly IdpConfigurationMode[];
+
 const SamlOktaIdentityProviderMetadataStep = (): JSX.Element => {
   const card = useCardState();
   const { goNext, goPrev, isFirstStep } = useWizard();
   const { enterpriseConnection, updateEnterpriseConnection } = useConfigureSSO();
 
-  const controller = useIdentityProviderMetadataForm({
-    metadataUrl: {
-      label: localizationKeys('configureSSO.configureStep.samlOkta.identityProviderMetadataStep.metadataUrl.label'),
-      placeholder: localizationKeys(
-        'configureSSO.configureStep.samlOkta.identityProviderMetadataStep.metadataUrl.placeholder',
-      ),
-    },
-    manual: {
-      signOnUrl: {
-        label: localizationKeys(
-          'configureSSO.configureStep.samlOkta.identityProviderMetadataStep.manual.signOnUrl.label',
-        ),
-        placeholder: localizationKeys(
-          'configureSSO.configureStep.samlOkta.identityProviderMetadataStep.manual.signOnUrl.placeholder',
-        ),
-      },
-      issuer: {
-        label: localizationKeys('configureSSO.configureStep.samlOkta.identityProviderMetadataStep.manual.issuer.label'),
-        placeholder: localizationKeys(
-          'configureSSO.configureStep.samlOkta.identityProviderMetadataStep.manual.issuer.placeholder',
-        ),
-      },
-      signingCertificateLabel: localizationKeys(
-        'configureSSO.configureStep.samlOkta.identityProviderMetadataStep.manual.signingCertificate.label',
-      ),
-    },
+  const samlConnection = enterpriseConnection?.samlConnection;
+  const hasExistingConfig = Boolean(
+    samlConnection?.idpSsoUrl ||
+    samlConnection?.idpEntityId ||
+    samlConnection?.idpCertificate ||
+    samlConnection?.idpMetadataUrl,
+  );
+  const existingCertPresent = Boolean(samlConnection?.idpCertificate);
+
+  const [mode, setMode] = React.useState<IdpConfigurationMode>(hasExistingConfig ? 'manual' : 'metadataUrl');
+  const [certFile, setCertFile] = React.useState<File | null>(null);
+
+  const metadataUrlField = useFormControl('idpMetadataUrl', samlConnection?.idpMetadataUrl ?? '', {
+    type: 'text',
+    label: localizationKeys('configureSSO.configureStep.samlOkta.identityProviderMetadataStep.metadataUrl.label'),
+    placeholder: localizationKeys(
+      'configureSSO.configureStep.samlOkta.identityProviderMetadataStep.metadataUrl.placeholder',
+    ),
+    isRequired: true,
   });
 
-  const canSubmit = !card.isLoading && controller.isValid;
+  const signOnUrlField = useFormControl('idpSsoUrl', samlConnection?.idpSsoUrl ?? '', {
+    type: 'text',
+    label: localizationKeys('configureSSO.configureStep.samlOkta.identityProviderMetadataStep.manual.signOnUrl.label'),
+    placeholder: localizationKeys(
+      'configureSSO.configureStep.samlOkta.identityProviderMetadataStep.manual.signOnUrl.placeholder',
+    ),
+    isRequired: true,
+  });
+
+  const issuerField = useFormControl('idpEntityId', samlConnection?.idpEntityId ?? '', {
+    type: 'text',
+    label: localizationKeys('configureSSO.configureStep.samlOkta.identityProviderMetadataStep.manual.issuer.label'),
+    placeholder: localizationKeys(
+      'configureSSO.configureStep.samlOkta.identityProviderMetadataStep.manual.issuer.placeholder',
+    ),
+    isRequired: true,
+  });
+
+  const certificateField = useFormControl('idpCertificate', '', {
+    type: 'text',
+    label: localizationKeys(
+      'configureSSO.configureStep.samlOkta.identityProviderMetadataStep.manual.signingCertificate.label',
+    ),
+    isRequired: true,
+  });
+
+  const trimmedMetadataUrl = metadataUrlField.value.trim();
+  const trimmedSignOnUrl = signOnUrlField.value.trim();
+  const trimmedIssuer = issuerField.value.trim();
+  const hasCert = certFile !== null || existingCertPresent;
+
+  const isValid =
+    mode === 'metadataUrl'
+      ? trimmedMetadataUrl.length > 0
+      : trimmedSignOnUrl.length > 0 && trimmedIssuer.length > 0 && hasCert;
+
+  const canSubmit = isValid && !card.isLoading;
+
+  const formProps: IdentityProviderConfigurationFormProps =
+    mode === 'metadataUrl'
+      ? {
+          mode: 'metadataUrl',
+          form: { field: metadataUrlField },
+          labels: {
+            description: localizationKeys(
+              'configureSSO.configureStep.samlOkta.identityProviderMetadataStep.metadataUrl.description',
+            ),
+          },
+        }
+      : {
+          mode: 'manual',
+          form: {
+            signOnUrlField,
+            issuerField,
+            certificateField,
+            certFile,
+            onCertFileChange: setCertFile,
+            existingCertPresent,
+          },
+          labels: {
+            description: localizationKeys(
+              'configureSSO.configureStep.samlOkta.identityProviderMetadataStep.manual.description',
+            ),
+            uploadFile: localizationKeys(
+              'configureSSO.configureStep.samlOkta.identityProviderMetadataStep.manual.signingCertificate.uploadFile',
+            ),
+            replaceFile: localizationKeys(
+              'configureSSO.configureStep.samlOkta.identityProviderMetadataStep.manual.signingCertificate.replaceFile',
+            ),
+            removeFile: localizationKeys(
+              'configureSSO.configureStep.samlOkta.identityProviderMetadataStep.manual.signingCertificate.removeFile',
+            ),
+            fileUploaded: localizationKeys(
+              'configureSSO.configureStep.samlOkta.identityProviderMetadataStep.manual.signingCertificate.fileUploaded',
+            ),
+          },
+        };
 
   const handleContinue = async (): Promise<void> => {
     if (!enterpriseConnection || !canSubmit) {
@@ -494,11 +621,19 @@ const SamlOktaIdentityProviderMetadataStep = (): JSX.Element => {
     card.setLoading();
 
     try {
-      const saml = await controller.buildSamlPayload();
+      const saml = await buildSamlConfigurationPayload({
+        mode,
+        metadataUrl: { value: metadataUrlField.value },
+        manual: { signOnUrl: signOnUrlField.value, issuer: issuerField.value, certFile },
+      });
       await updateEnterpriseConnection(enterpriseConnection.id, { saml });
       void goNext();
     } catch (err) {
-      controller.applySubmitError(err, card);
+      if (mode === 'metadataUrl') {
+        applySamlSubmitError(err, card, metadataUrlField);
+      } else {
+        applySamlSubmitError(err, card, signOnUrlField, [issuerField, certificateField]);
+      }
     } finally {
       card.setIdle();
     }
@@ -519,51 +654,29 @@ const SamlOktaIdentityProviderMetadataStep = (): JSX.Element => {
               'configureSSO.configureStep.samlOkta.identityProviderMetadataStep.modes.title',
             )}
           />
-          <IdentityProviderMetadataForm
-            controller={controller}
-            modes={{
+          <IdentityProviderConfigurationModes
+            modes={OKTA_IDP_MODES}
+            value={mode}
+            onChange={next => {
+              card.setError(undefined);
+              setMode(next);
+            }}
+            labels={{
               ariaLabel: localizationKeys(
                 'configureSSO.configureStep.samlOkta.identityProviderMetadataStep.modes.ariaLabel',
               ),
-              metadataUrlLabel: localizationKeys(
+              metadataUrl: localizationKeys(
                 'configureSSO.configureStep.samlOkta.identityProviderMetadataStep.modes.metadataUrl',
               ),
-              manualLabel: localizationKeys(
-                'configureSSO.configureStep.samlOkta.identityProviderMetadataStep.modes.manual',
-              ),
-            }}
-            metadataUrl={{
-              description: localizationKeys(
-                'configureSSO.configureStep.samlOkta.identityProviderMetadataStep.metadataUrl.description',
-              ),
-            }}
-            manual={{
-              description: localizationKeys(
-                'configureSSO.configureStep.samlOkta.identityProviderMetadataStep.manual.description',
-              ),
-              signingCertificate: {
-                label: localizationKeys(
-                  'configureSSO.configureStep.samlOkta.identityProviderMetadataStep.manual.signingCertificate.label',
-                ),
-                uploadFile: localizationKeys(
-                  'configureSSO.configureStep.samlOkta.identityProviderMetadataStep.manual.signingCertificate.uploadFile',
-                ),
-                replaceFile: localizationKeys(
-                  'configureSSO.configureStep.samlOkta.identityProviderMetadataStep.manual.signingCertificate.replaceFile',
-                ),
-                removeFile: localizationKeys(
-                  'configureSSO.configureStep.samlOkta.identityProviderMetadataStep.manual.signingCertificate.removeFile',
-                ),
-                fileUploaded: localizationKeys(
-                  'configureSSO.configureStep.samlOkta.identityProviderMetadataStep.manual.signingCertificate.fileUploaded',
-                ),
-              },
+              manual: localizationKeys('configureSSO.configureStep.samlOkta.identityProviderMetadataStep.modes.manual'),
             }}
           />
+          <IdentityProviderConfigurationForm {...formProps} />
         </Step.Section>
       </Step.Body>
 
       <Step.Footer>
+        <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
           isDisabled={isFirstStep || card.isLoading}
