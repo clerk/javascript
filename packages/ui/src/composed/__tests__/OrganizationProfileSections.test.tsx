@@ -177,7 +177,7 @@ describe('OrganizationProfile composed sections', () => {
   });
 
   describe('General — section outside page', () => {
-    it('section without page renders null', async () => {
+    it('section without page throws', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({ email_addresses: ['test@clerk.com'], organization_memberships: [{ name: 'TestOrg' }] });
@@ -185,8 +185,7 @@ describe('OrganizationProfile composed sections', () => {
 
       fixtures.clerk.organization?.getDomains.mockReturnValue(Promise.resolve({ data: [], total_count: 0 }));
 
-      const { container } = render(<GeneralOrganizationProfile />, { wrapper });
-      expect(container.innerHTML).toBe('');
+      expect(() => render(<GeneralOrganizationProfile />, { wrapper })).toThrow();
     });
   });
 });

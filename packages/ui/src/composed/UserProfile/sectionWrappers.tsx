@@ -4,6 +4,7 @@ import { useContext, type ReactNode } from 'react';
 import { getSecondFactors } from '@/ui/utils/mfa';
 
 import { useEnvironment, useUserProfileContext } from '../../contexts';
+import { assertContextExists } from '../../contexts/utils';
 import { ActiveDevicesSection } from '../../components/UserProfile/ActiveDevicesSection';
 import { ConnectedAccountsSection } from '../../components/UserProfile/ConnectedAccountsSection';
 import { DeleteSection } from '../../components/UserProfile/DeleteSection';
@@ -18,26 +19,21 @@ import { UserProfileSection } from '../../components/UserProfile/UserProfileSect
 import { Web3Section } from '../../components/UserProfile/Web3Section';
 import { PageContext } from '../PageContext';
 
-function useRequirePage(componentName: string): boolean {
+function useAssertPage(componentName: string) {
   const page = useContext(PageContext);
-  if (!page) {
-    if (typeof __DEV__ !== 'undefined' && __DEV__) {
-      console.warn(`${componentName} must be used inside a page component (e.g. UserProfile.Account)`);
-    }
-    return false;
-  }
-  return true;
+  assertContextExists(page, componentName);
+  return page;
 }
 
 // --- Account sections ---
 
 export function AccountProfile(): ReactNode {
-  if (!useRequirePage('AccountProfile')) return null;
+  useAssertPage('AccountProfile');
   return <UserProfileSection />;
 }
 
 export function AccountUsername(): ReactNode {
-  if (!useRequirePage('AccountUsername')) return null;
+  useAssertPage('AccountUsername');
 
   const { attributes } = useEnvironment().userSettings;
   const { immutableAttributes } = useUserProfileContext();
@@ -49,7 +45,7 @@ export function AccountUsername(): ReactNode {
 }
 
 export function AccountEmails(): ReactNode {
-  if (!useRequirePage('AccountEmails')) return null;
+  useAssertPage('AccountEmails');
 
   const { attributes } = useEnvironment().userSettings;
   const { shouldAllowIdentificationCreation, immutableAttributes } = useUserProfileContext();
@@ -66,7 +62,7 @@ export function AccountEmails(): ReactNode {
 }
 
 export function AccountPhone(): ReactNode {
-  if (!useRequirePage('AccountPhone')) return null;
+  useAssertPage('AccountPhone');
 
   const { attributes } = useEnvironment().userSettings;
   const { shouldAllowIdentificationCreation, immutableAttributes } = useUserProfileContext();
@@ -83,7 +79,7 @@ export function AccountPhone(): ReactNode {
 }
 
 export function AccountConnectedAccounts(): ReactNode {
-  if (!useRequirePage('AccountConnectedAccounts')) return null;
+  useAssertPage('AccountConnectedAccounts');
 
   const { social } = useEnvironment().userSettings;
   const { shouldAllowIdentificationCreation } = useUserProfileContext();
@@ -94,7 +90,7 @@ export function AccountConnectedAccounts(): ReactNode {
 }
 
 export function AccountEnterpriseAccounts(): ReactNode {
-  if (!useRequirePage('AccountEnterpriseAccounts')) return null;
+  useAssertPage('AccountEnterpriseAccounts');
 
   const { enterpriseSSO } = useEnvironment().userSettings;
   const { user } = useUser();
@@ -105,7 +101,7 @@ export function AccountEnterpriseAccounts(): ReactNode {
 }
 
 export function AccountWeb3(): ReactNode {
-  if (!useRequirePage('AccountWeb3')) return null;
+  useAssertPage('AccountWeb3');
 
   const { attributes } = useEnvironment().userSettings;
   const { shouldAllowIdentificationCreation } = useUserProfileContext();
@@ -118,7 +114,7 @@ export function AccountWeb3(): ReactNode {
 // --- Security sections ---
 
 export function SecurityPassword(): ReactNode {
-  if (!useRequirePage('SecurityPassword')) return null;
+  useAssertPage('SecurityPassword');
 
   const { instanceIsPasswordBased } = useEnvironment().userSettings;
 
@@ -128,7 +124,7 @@ export function SecurityPassword(): ReactNode {
 }
 
 export function SecurityPasskeys(): ReactNode {
-  if (!useRequirePage('SecurityPasskeys')) return null;
+  useAssertPage('SecurityPasskeys');
 
   const { attributes } = useEnvironment().userSettings;
   const { shouldAllowIdentificationCreation } = useUserProfileContext();
@@ -139,7 +135,7 @@ export function SecurityPasskeys(): ReactNode {
 }
 
 export function SecurityMfa(): ReactNode {
-  if (!useRequirePage('SecurityMfa')) return null;
+  useAssertPage('SecurityMfa');
 
   const { attributes } = useEnvironment().userSettings;
 
@@ -149,12 +145,12 @@ export function SecurityMfa(): ReactNode {
 }
 
 export function SecurityActiveDevices(): ReactNode {
-  if (!useRequirePage('SecurityActiveDevices')) return null;
+  useAssertPage('SecurityActiveDevices');
   return <ActiveDevicesSection />;
 }
 
 export function SecurityDelete(): ReactNode {
-  if (!useRequirePage('SecurityDelete')) return null;
+  useAssertPage('SecurityDelete');
 
   const { user } = useUser();
 
