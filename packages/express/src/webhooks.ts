@@ -35,7 +35,7 @@ export * from '@clerk/backend/webhooks';
  *
  * @see {@link https://clerk.com/docs/webhooks/sync-data} to learn more about syncing Clerk data to your application using webhooks
  */
-export async function verifyWebhook(req: ExpressRequest, options?: VerifyWebhookOptions) {
+export async function verifyWebhook(req: ExpressRequest, options?: VerifyWebhookOptions | string) {
   const webRequest = incomingMessageToRequest(req);
   // Cloning instead of implementing the body inside incomingMessageToRequest
   // to make it more predictable
@@ -57,5 +57,14 @@ export async function verifyWebhook(req: ExpressRequest, options?: VerifyWebhook
   const clonedRequest = new Request(webRequest, {
     body: serializedBody,
   });
-  return verifyWebhookBase(clonedRequest, options);
+  // Allow passing the signing secret directly as a string shorthand.
+  const resolvedOptions = typeof options === 'string' ? { signingSecret: options } : options;
+  return verifyWebhookBase(clonedRequest, resolvedOptions);
+}
+
+/**
+ * Returns whether the incoming Express request carries Svix webhook headers.
+ */
+export function isWebhookRequest(req: ExpressRequest): boolean {
+  return Boolean(req.headers['svix-id']);
 }
