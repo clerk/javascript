@@ -48,7 +48,10 @@ export function ProfileProviderShell({
   const router = useMemo(() => createComposedRouter(clerk.navigate), [clerk]);
 
   return (
-    <StyleCacheProvider>
+    <StyleCacheProvider
+      nonce={(clerk as any).__internal_getOption('nonce')}
+      cssLayerName={globalAppearance?.cssLayerName}
+    >
       <AppearanceProvider
         appearanceKey={appearanceKey}
         globalAppearance={globalAppearance}
