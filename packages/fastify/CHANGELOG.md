@@ -1,5 +1,15 @@
 # Change Log
 
+## 3.1.33
+
+### Patch Changes
+
+- Fixed `clerkPlugin()` to honor `publishableKey` and `secretKey` passed in plugin options when authenticating Fastify requests. The plugin now also exposes `request.clerk`, which uses the same plugin keys and resolves the correct Clerk API host for non-production publishable keys. ([#8640](https://github.com/clerk/javascript/pull/8640)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`1c42351`](https://github.com/clerk/javascript/commit/1c42351fd7a77d7303a8652cca97d64b9ac9d129), [`1701e0f`](https://github.com/clerk/javascript/commit/1701e0f5da33ffd7b74f397f8727837ae1526516), [`afb75e6`](https://github.com/clerk/javascript/commit/afb75e68efa561ff18f6ae5359df1cf336e861a5), [`c3df67a`](https://github.com/clerk/javascript/commit/c3df67a231adff73fa36563718d9b94e6bb2a540), [`ff0cfef`](https://github.com/clerk/javascript/commit/ff0cfef67352662182365ce1329f54f41bb47812), [`be55c4e`](https://github.com/clerk/javascript/commit/be55c4e405777014dcca6de7624c5b6151157f4f), [`8d6bb56`](https://github.com/clerk/javascript/commit/8d6bb56de25692e0f9c350f16c8f45fbedaad2ac)]:
+  - @clerk/backend@3.5.0
+  - @clerk/shared@4.14.1
+
 ## 3.1.32
 
 ### Patch Changes
