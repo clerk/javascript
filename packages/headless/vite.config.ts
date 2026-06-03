@@ -22,6 +22,10 @@ export default defineConfig({
     },
     rollupOptions: {
       external: ['react', 'react-dom', 'react/jsx-runtime', '@floating-ui/react'],
+      output: {
+        preserveModules: true,
+        preserveModulesRoot: 'src',
+      },
     },
     sourcemap: true,
   },

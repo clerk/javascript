@@ -2,13 +2,13 @@ import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { axe } from '../../test-utils/axe';
-import { Dialog } from './dialog';
+import { Dialog } from './index';
 
 afterEach(() => cleanup());
 
-function renderDialog(props: Partial<React.ComponentProps<typeof Dialog>> = {}) {
+function renderDialog(props: Partial<React.ComponentProps<typeof Dialog.Root>> = {}) {
   return render(
-    <Dialog {...props}>
+    <Dialog.Root {...props}>
       <Dialog.Trigger>Open dialog</Dialog.Trigger>
       <Dialog.Backdrop>
         <Dialog.Popup>
@@ -18,7 +18,7 @@ function renderDialog(props: Partial<React.ComponentProps<typeof Dialog>> = {}) 
           <Dialog.Close>Close</Dialog.Close>
         </Dialog.Popup>
       </Dialog.Backdrop>
-    </Dialog>,
+    </Dialog.Root>,
   );
 }
 
@@ -178,12 +178,12 @@ describe('Dialog', () => {
     it('does not render popup when closed and Portal is omitted', async () => {
       const user = userEvent.setup();
       render(
-        <Dialog>
+        <Dialog.Root>
           <Dialog.Trigger>Open</Dialog.Trigger>
           <Dialog.Popup>
             <p>Popup content</p>
           </Dialog.Popup>
-        </Dialog>,
+        </Dialog.Root>,
       );
 
       expect(document.querySelector('[data-cl-slot="dialog-popup"]')).not.toBeInTheDocument();

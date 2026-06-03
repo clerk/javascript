@@ -1,3 +1,5 @@
+export * as Dialog from './parts';
+
 export type {
   DialogBackdropProps,
   DialogCloseProps,
@@ -7,5 +9,4 @@ export type {
   DialogProps,
   DialogTitleProps,
   DialogTriggerProps,
-} from './dialog';
-export { Dialog } from './dialog';
+} from './parts';
