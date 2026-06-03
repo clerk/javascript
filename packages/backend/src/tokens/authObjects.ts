@@ -170,6 +170,12 @@ const createDebug = (data: AuthObjectDebugData | undefined) => {
     const res = { ...data };
     res.secretKey = (res.secretKey || '').substring(0, 7);
     res.jwtKey = (res.jwtKey || '').substring(0, 7);
+    // Session and machine tokens are live bearer credentials, so only ever expose a
+    // short, non-reconstructable prefix here, the same way secretKey/jwtKey are handled
+    // above. Otherwise enabling debug logging would write usable tokens to logs.
+    res.sessionToken = (res.sessionToken || '').substring(0, 7);
+    res.tokenInHeader = (res.tokenInHeader || '').substring(0, 7);
+    res.sessionTokenInCookie = (res.sessionTokenInCookie || '').substring(0, 7);
     return { ...res };
   };
 };
