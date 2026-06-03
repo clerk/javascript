@@ -2,10 +2,11 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "declaration": true,
-    "declarationDir": "./dist",
     "declarationMap": true,
     "emitDeclarationOnly": true,
+    "outDir": "./dist",
+    "declarationDir": "./dist/types",
     "skipLibCheck": true
   },
-  "exclude": ["**/__tests__/**/*"]
+  "exclude": ["node_modules", "dist", "build", "src/astro-components/**/*.ts", "**/__tests__/**/*"]
 }

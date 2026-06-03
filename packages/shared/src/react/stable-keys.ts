@@ -74,6 +74,8 @@ const BILLING_PLANS_KEY = 'billing-plan';
 const BILLING_STATEMENTS_KEY = 'billing-statement';
 const USER_ENTERPRISE_CONNECTIONS_KEY = 'userEnterpriseConnections';
 const ENTERPRISE_CONNECTION_TEST_RUNS_KEY = 'enterpriseConnectionTestRuns';
+const ORGANIZATION_ENTERPRISE_CONNECTIONS_KEY = 'organizationEnterpriseConnections';
+const ORGANIZATION_ENTERPRISE_CONNECTION_TEST_RUNS_KEY = 'organizationEnterpriseConnectionTestRuns';
 
 export const INTERNAL_STABLE_KEYS = {
   PAYMENT_ATTEMPT_KEY,
@@ -81,6 +83,8 @@ export const INTERNAL_STABLE_KEYS = {
   BILLING_STATEMENTS_KEY,
   USER_ENTERPRISE_CONNECTIONS_KEY,
   ENTERPRISE_CONNECTION_TEST_RUNS_KEY,
+  ORGANIZATION_ENTERPRISE_CONNECTIONS_KEY,
+  ORGANIZATION_ENTERPRISE_CONNECTION_TEST_RUNS_KEY,
 } as const;
 
 export type __internal_ResourceCacheStableKey = (typeof INTERNAL_STABLE_KEYS)[keyof typeof INTERNAL_STABLE_KEYS];
