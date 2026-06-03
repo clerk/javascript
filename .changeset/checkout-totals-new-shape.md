@@ -3,7 +3,6 @@
 '@clerk/shared': patch
 '@clerk/ui': patch
 '@clerk/localizations': patch
-'@clerk/msw': patch
 ---
 
 Update checkout totals to support the new `totals` shape from the API:
