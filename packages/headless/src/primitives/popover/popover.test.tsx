@@ -2,13 +2,13 @@ import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { axe } from '../../test-utils/axe';
-import { Popover } from './popover';
+import { Popover } from './index';
 
 afterEach(() => cleanup());
 
-function renderPopover(props: Partial<React.ComponentProps<typeof Popover>> = {}) {
+function renderPopover(props: Partial<React.ComponentProps<typeof Popover.Root>> = {}) {
   return render(
-    <Popover {...props}>
+    <Popover.Root {...props}>
       <Popover.Trigger>Open popover</Popover.Trigger>
       <Popover.Positioner>
         <Popover.Popup>
@@ -18,7 +18,7 @@ function renderPopover(props: Partial<React.ComponentProps<typeof Popover>> = {}
           <Popover.Close>Close</Popover.Close>
         </Popover.Popup>
       </Popover.Positioner>
-    </Popover>,
+    </Popover.Root>,
   );
 }
 

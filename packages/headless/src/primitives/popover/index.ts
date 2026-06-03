@@ -1,3 +1,5 @@
+export * as Popover from './parts';
+
 export type {
   PopoverArrowProps,
   PopoverCloseProps,
@@ -8,5 +10,4 @@ export type {
   PopoverProps,
   PopoverTitleProps,
   PopoverTriggerProps,
-} from './popover';
-export { Popover } from './popover';
+} from './parts';
