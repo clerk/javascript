@@ -25,7 +25,7 @@ export const DialogScopedContext = createContext(false);
 export function useDialogContext() {
   const ctx = useContext(DialogContext);
   if (!ctx) {
-    throw new Error('Dialog compound components must be used within <Dialog>');
+    throw new Error('Dialog compound components must be used within <Dialog.Root>');
   }
   return ctx;
 }

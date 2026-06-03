@@ -13,7 +13,7 @@ A modal or non-modal dialog overlay. Handles focus trapping, scroll locking, ARI
 ```tsx
 import { Dialog } from '@/primitives/dialog';
 
-<Dialog>
+<Dialog.Root>
   <Dialog.Trigger>Open Dialog</Dialog.Trigger>
   <Dialog.Backdrop>
     <Dialog.Popup>
@@ -22,7 +22,7 @@ import { Dialog } from '@/primitives/dialog';
       <Dialog.Close>Cancel</Dialog.Close>
     </Dialog.Popup>
   </Dialog.Backdrop>
-</Dialog>;
+</Dialog.Root>;
 ```
 
 ### Controlled
@@ -30,25 +30,25 @@ import { Dialog } from '@/primitives/dialog';
 ```tsx
 const [open, setOpen] = useState(false);
 
-<Dialog
+<Dialog.Root
   open={open}
   onOpenChange={setOpen}
 >
   {/* ... */}
-</Dialog>;
+</Dialog.Root>;
 ```
 
 ### Non-modal
 
 ```tsx
-<Dialog modal={false}>{/* Focus is not trapped, page remains interactive */}</Dialog>
+<Dialog.Root modal={false}>{/* Focus is not trapped, page remains interactive */}</Dialog.Root>
 ```
 
 ## Parts
 
 | Part                 | Default Element | Description                                     |
 | -------------------- | --------------- | ----------------------------------------------- |
-| `Dialog`             | —               | Root context provider                           |
+| `Dialog.Root`        | —               | Root context provider                           |
 | `Dialog.Trigger`     | `<button>`      | Opens/closes the dialog on click                |
 | `Dialog.Portal`      | —               | Portals children (defaults to `document.body`)  |
 | `Dialog.Backdrop`    | `<div>`         | Overlay + focus manager host                    |
@@ -59,7 +59,7 @@ const [open, setOpen] = useState(false);
 
 ## Props
 
-### `Dialog` (root)
+### `Dialog.Root`
 
 | Prop           | Type                      | Default | Description                             |
 | -------------- | ------------------------- | ------- | --------------------------------------- |
