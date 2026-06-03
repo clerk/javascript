@@ -93,6 +93,17 @@ async function syncNativeClientToJs({
   if (typeof clerkInstance.__internal_reloadInitialResources === 'function') {
     await clerkInstance.__internal_reloadInitialResources();
   }
+
+  const nativeActiveSessionId = clerkInstance.client?.lastActiveSessionId;
+  const jsActiveSessionId = clerkInstance.session?.id;
+
+  if (
+    nativeActiveSessionId &&
+    nativeActiveSessionId !== jsActiveSessionId &&
+    typeof clerkInstance.setActive === 'function'
+  ) {
+    await clerkInstance.setActive({ session: nativeActiveSessionId });
+  }
 }
 
 /**

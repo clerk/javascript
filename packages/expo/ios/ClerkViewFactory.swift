@@ -461,14 +461,19 @@ struct ClerkInlineAuthWrapperView: View {
 
   // Track initial session to detect new sign-ins (same approach as Android)
   @State private var initialSessionId: String? = Clerk.shared.session?.id
-  @State private var authStateEventSent = false
+  @State private var refreshEventSent = false
 
   @Environment(\.colorScheme) private var colorScheme
 
-  private func emitSignedIn(sessionId: String) {
-    guard !authStateEventSent, sessionId != initialSessionId else { return }
-    authStateEventSent = true
+  private func emitRefreshClient() {
+    guard !refreshEventSent else { return }
+    refreshEventSent = true
     emitClerkNativeRefreshClient()
+  }
+
+  private func handleActiveSession(sessionId: String) {
+    guard sessionId != initialSessionId else { return }
+    emitRefreshClient()
     if dismissible {
       onEvent(.dismissed, [:])
     }
@@ -491,7 +496,7 @@ struct ClerkInlineAuthWrapperView: View {
     themedAuthView
       .onChange(of: Clerk.shared.client) { _, _ in
         guard let sessionId = Clerk.shared.session?.id else { return }
-        emitSignedIn(sessionId: sessionId)
+        handleActiveSession(sessionId: sessionId)
       }
   }
 }
