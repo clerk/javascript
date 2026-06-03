@@ -1,4 +1,3 @@
-import { useOrganization } from '@clerk/shared/react';
 import type {
   BillingPlanResource,
   BillingSubscriptionItemResource,
@@ -20,7 +19,21 @@ import {
   useSubscription,
 } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
-import { Col, Flex, Icon, localizationKeys, Span, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
+import {
+  Col,
+  Flex,
+  Icon,
+  localizationKeys,
+  Span,
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
+  useLocalizations,
+} from '../../customizables';
 import { ArrowsUpDown, CogFilled, Plans, Plus, Users } from '../../icons';
 import { useRouter } from '../../router';
 import { SubscriptionBadge } from './badge';
@@ -231,7 +244,7 @@ function SubscriptionItemRow({
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const fee = subscriptionItem.planPeriod === 'annual' ? subscriptionItem.plan.annualFee! : subscriptionItem.plan.fee!;
   const { captionForSubscription } = usePlansContext();
-  const { organization } = useOrganization();
+  const { t } = useLocalizations();
 
   const feeFormatted = useMemo(() => {
     return normalizeFormatted(fee.amountFormatted);
@@ -245,11 +258,23 @@ function SubscriptionItemRow({
     includedSeatsUnitTier?.endsAfterBlock != null && seatUnitPrice
       ? includedSeatsUnitTier.endsAfterBlock * seatUnitPrice.blockSize
       : null;
-  const includedSeatsUsed =
-    organization && includedSeats !== null
-      ? Math.min(organization.membersCount + organization.pendingInvitationsCount, includedSeats)
-      : null;
   const seatsTotalTier = subscriptionItem.seats?.tiers?.find(t => t.total.amount > 0);
+  const monthLabel = t(localizationKeys('billing.month')).toLowerCase();
+  const seatLimitAndIncludedSeatsLocalizationKey =
+    typeof planSeatLimit === 'number' && includedSeats !== null
+      ? localizationKeys('organizationProfile.billingPage.subscriptionsListSection.seatLimitAndIncludedSeats', {
+          seatLimit: planSeatLimit,
+          includedSeats,
+        })
+      : typeof planSeatLimit === 'number'
+        ? localizationKeys('organizationProfile.billingPage.subscriptionsListSection.seatLimit', {
+            seatLimit: planSeatLimit,
+          })
+        : includedSeats !== null
+          ? localizationKeys('organizationProfile.billingPage.subscriptionsListSection.includedSeatsUsage', {
+              includedSeats,
+            })
+          : null;
 
   return (
     <Fragment key={subscriptionItem.id}>
@@ -374,58 +399,20 @@ function SubscriptionItemRow({
               gap={1}
               align='end'
             >
-              {includedSeats !== null && includedSeatsUsed !== null ? (
+              {seatLimitAndIncludedSeatsLocalizationKey ? (
                 <Text
                   variant='subtitle'
-                  localizationKey={localizationKeys(
-                    'organizationProfile.billingPage.subscriptionsListSection.includedSeatsUsage',
-                    {
-                      seatsUsed: includedSeatsUsed,
-                      includedSeats,
-                    },
-                  )}
-                />
-              ) : null}
-              {planSeatLimit !== undefined ? (
-                <Text
-                  variant='subtitle'
-                  localizationKey={
-                    planSeatLimit === null
-                      ? localizationKeys('billing.pricingTable.seatCost.unlimitedSeats')
-                      : localizationKeys('billing.pricingTable.seatCost.upToSeats', { endsAfterBlock: planSeatLimit })
-                  }
+                  localizationKey={seatLimitAndIncludedSeatsLocalizationKey}
                 />
               ) : null}
               {seatsTotalTier && seatsTotalTier.quantity ? (
-                <Text
-                  variant='subtitle'
-                  localizationKey={localizationKeys(
-                    'organizationProfile.billingPage.subscriptionsListSection.paidSeatsUsage',
-                    {
-                      seatsQuantity: seatsTotalTier.quantity,
-                      amount: `${seatsTotalTier.feePerBlock.currencySymbol}${seatsTotalTier.feePerBlock.amountFormatted}`,
-                    },
-                  )}
-                />
-              ) : null}
-              {seatsTotalTier ? (
                 <Text variant='subtitle'>
-                  {`${seatsTotalTier.total.currencySymbol}${seatsTotalTier.total.amountFormatted}`}
-                  <Span
-                    sx={t => ({
-                      color: t.colors.$colorMutedForeground,
-                      textTransform: 'lowercase',
-                      ':before': {
-                        content: '"/"',
-                        marginInline: t.space.$1,
-                      },
-                    })}
-                    localizationKey={
-                      subscriptionItem.planPeriod === 'annual'
-                        ? localizationKeys('billing.year')
-                        : localizationKeys('billing.month')
-                    }
-                  />
+                  {t(
+                    localizationKeys('organizationProfile.billingPage.subscriptionsListSection.paidSeatsUsage', {
+                      seatsQuantity: seatsTotalTier.quantity,
+                      amount: `${seatsTotalTier.feePerBlock.currencySymbol}${seatsTotalTier.feePerBlock.amountFormatted} / ${monthLabel}`,
+                    }),
+                  )}
                 </Text>
               ) : null}
             </Col>
