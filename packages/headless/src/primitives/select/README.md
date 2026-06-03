@@ -13,7 +13,7 @@ A dropdown select component with keyboard navigation, typeahead, and optional it
 ```tsx
 import { Select } from '@/primitives/select';
 
-<Select>
+<Select.Root>
   <Select.Trigger>
     <Select.Value placeholder='Choose a fruit...' />
   </Select.Trigger>
@@ -33,7 +33,7 @@ import { Select } from '@/primitives/select';
       />
     </Select.Popup>
   </Select.Positioner>
-</Select>;
+</Select.Root>;
 ```
 
 ### Controlled
@@ -41,12 +41,12 @@ import { Select } from '@/primitives/select';
 ```tsx
 const [value, setValue] = useState('apple');
 
-<Select
+<Select.Root
   value={value}
   onValueChange={setValue}
 >
   {/* ... */}
-</Select>;
+</Select.Root>;
 ```
 
 ### With `items` for SSR label resolution
@@ -59,12 +59,12 @@ const items = [
   { value: 'banana', label: 'Banana' },
 ];
 
-<Select
+<Select.Root
   items={items}
   defaultValue='apple'
 >
   {/* Select.Value will display "Apple" even before Options mount */}
-</Select>;
+</Select.Root>;
 ```
 
 ### Disable item-to-trigger alignment
@@ -72,14 +72,14 @@ const items = [
 By default, the selected option visually aligns with the trigger. Disable this for standard dropdown positioning:
 
 ```tsx
-<Select alignItemWithTrigger={false}>{/* Uses standard Floating UI positioning */}</Select>
+<Select.Root alignItemWithTrigger={false}>{/* Uses standard Floating UI positioning */}</Select.Root>
 ```
 
 ## Parts
 
 | Part                | Default Element | Description                                |
 | ------------------- | --------------- | ------------------------------------------ |
-| `Select`            | —               | Root context provider                      |
+| `Select.Root`       | —               | Root context provider                      |
 | `Select.Trigger`    | `<button>`      | Toggles the dropdown on click              |
 | `Select.Value`      | `<span>`        | Displays the selected label or placeholder |
 | `Select.Portal`     | —               | Portals children (accepts `root` prop)     |
@@ -90,7 +90,7 @@ By default, the selected option visually aligns with the trigger. Disable this f
 
 ## Props
 
-### `Select` (root)
+### `Select.Root`
 
 | Prop                   | Type                      | Default          | Description                                                        |
 | ---------------------- | ------------------------- | ---------------- | ------------------------------------------------------------------ |

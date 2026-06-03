@@ -45,7 +45,7 @@ export const SelectContext = createContext<SelectContextValue | null>(null);
 export function useSelectContext() {
   const ctx = useContext(SelectContext);
   if (!ctx) {
-    throw new Error('Select compound components must be used within <Select>');
+    throw new Error('Select compound components must be used within <Select.Root>');
   }
   return ctx;
 }
