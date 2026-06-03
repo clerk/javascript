@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.clerk.api.Clerk
+import com.clerk.api.network.model.error.firstMessage
 import com.clerk.api.network.serialization.ClerkResult
 import com.clerk.api.ui.ClerkColors
 import com.clerk.api.ui.ClerkDesign
@@ -218,29 +219,32 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
         }
     }
 
-    // MARK: - signOut
+    // MARK: - refreshClient
 
     @ReactMethod
-    override fun signOut(promise: Promise) {
+    override fun refreshClient(promise: Promise) {
         if (!Clerk.isInitialized.value) {
-            // Clear DEVICE_TOKEN from SharedPreferences even when not initialized,
-            // so the next Clerk.initialize() doesn't boot with a stale client token.
-            reactApplicationContext.getSharedPreferences("clerk_preferences", Context.MODE_PRIVATE)
-                .edit()
-                .remove("DEVICE_TOKEN")
-                .apply()
             promise.resolve(null)
             return
         }
 
         coroutineScope.launch {
             try {
-                Clerk.auth.signOut()
-                // Client refresh after sign-out is handled by the clerk-android
-                // SDK (SignOutService.signOut calls Client.getSkippingClientId).
-                promise.resolve(null)
+                val deviceToken = Clerk.getDeviceToken()
+                if (deviceToken.isNullOrBlank()) {
+                    promise.resolve(null)
+                    return@launch
+                }
+
+                when (val result = Clerk.updateDeviceToken(deviceToken)) {
+                    is ClerkResult.Failure -> promise.reject(
+                        "E_REFRESH_CLIENT_FAILED",
+                        result.error?.firstMessage() ?: result.throwable?.message ?: "Client refresh failed"
+                    )
+                    is ClerkResult.Success -> promise.resolve(null)
+                }
             } catch (e: Exception) {
-                promise.reject("E_SIGN_OUT_FAILED", e.message ?: "Sign out failed", e)
+                promise.reject("E_REFRESH_CLIENT_FAILED", e.message ?: "Client refresh failed", e)
             }
         }
     }

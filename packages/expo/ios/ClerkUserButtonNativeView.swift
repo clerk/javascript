@@ -23,14 +23,7 @@ public class ClerkUserButtonNativeView: UIView {
   private func updateView() {
     guard let factory = clerkViewFactory else { return }
 
-    guard let returnedController = factory.createUserButton(
-      onEvent: { event, data in
-        if event == .signedOut {
-          let sessionId = data["sessionId"] as? String
-          ClerkExpoModule.emitAuthStateChange(type: .signedOut, sessionId: sessionId)
-        }
-      }
-    ) else { return }
+    guard let returnedController = factory.createUserButton() else { return }
 
     hostingCoordinator.attach(returnedController, clearBackground: true)
   }

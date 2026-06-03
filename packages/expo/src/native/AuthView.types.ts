@@ -39,7 +39,10 @@ export interface AuthViewProps {
   isDismissible?: boolean;
 
   /**
-   * Called when the user dismisses the native authentication view.
+   * Called when the native authentication view requests dismissal.
+   *
+   * This fires when the user dismisses the view, or when the native auth flow
+   * finishes and the app-owned presentation should close.
    */
   onDismiss?: () => void;
 }

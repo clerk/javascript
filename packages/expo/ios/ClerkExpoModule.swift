@@ -14,13 +14,13 @@ public protocol ClerkViewFactoryProtocol {
   // Inline rendering — returns UIViewController to preserve SwiftUI lifecycle
   func createAuthView(mode: String, dismissible: Bool, onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void) -> UIViewController?
   func createUserProfileView(dismissible: Bool, onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void) -> UIViewController?
-  func createUserButton(onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void) -> UIViewController?
+  func createUserButton() -> UIViewController?
 
   // SDK operations
   func configure(publishableKey: String, bearerToken: String?) async throws
   func getSession() async -> [String: Any]?
   func getClientToken() -> String?
-  func signOut() async throws
+  func refreshClient() async throws
 }
 
 // MARK: - Module
@@ -110,22 +110,23 @@ class ClerkExpoModule: RCTEventEmitter {
     resolve(factory.getClientToken())
   }
 
-  // MARK: - signOut
+  // MARK: - refreshClient
 
-  @objc func signOut(_ resolve: @escaping RCTPromiseResolveBlock,
-                      reject: @escaping RCTPromiseRejectBlock) {
+  @objc func refreshClient(_ resolve: @escaping RCTPromiseResolveBlock,
+                            reject: @escaping RCTPromiseRejectBlock) {
     guard let factory = clerkViewFactory else {
-      reject("E_NOT_INITIALIZED", "Clerk not initialized", nil)
+      resolve(nil)
       return
     }
 
     Task {
       do {
-        try await factory.signOut()
+        try await factory.refreshClient()
         resolve(nil)
       } catch {
-        reject("E_SIGN_OUT_FAILED", error.localizedDescription, error)
+        reject("E_REFRESH_CLIENT_FAILED", error.localizedDescription, error)
       }
     }
   }
+
 }

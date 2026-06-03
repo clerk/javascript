@@ -26,6 +26,9 @@ import androidx.savedstate.compose.LocalSavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.clerk.api.Clerk
 import com.clerk.ui.auth.AuthView
+import com.facebook.react.bridge.Arguments
+import com.facebook.react.bridge.ReactContext
+import com.facebook.react.uimanager.events.RCTEventEmitter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -99,6 +102,7 @@ class ClerkAuthNativeView(context: Context) : FrameLayout(context) {
   // session id inequality (not null-to-value) to detect new sign-ins.
   private var initialSessionId: String? = Clerk.session?.id
   private var authCompletedSent: Boolean = false
+  private var dismissalEventSent: Boolean = false
 
   fun setupView() {
     debugLog(TAG, "setupView - mode: $mode, isDismissible: $isDismissible, activity: $activity")
@@ -113,8 +117,7 @@ class ClerkAuthNativeView(context: Context) : FrameLayout(context) {
         val currentId = currentSession?.id
         if (currentSession != null && currentId != initialSessionId && !authCompletedSent) {
           debugLog(TAG, "Auth completed - new session: $currentId (initial: $initialSessionId)")
-          authCompletedSent = true
-          ClerkExpoModule.emitAuthStateChange("signedIn", currentSession.id)
+          emitAuthStateChange(currentSession.id)
         }
       }
 
@@ -127,7 +130,13 @@ class ClerkAuthNativeView(context: Context) : FrameLayout(context) {
           ) {
             AuthView(
               modifier = Modifier.fillMaxSize(),
-              clerkTheme = Clerk.customTheme
+              clerkTheme = Clerk.customTheme,
+              onAuthComplete = {
+                Clerk.session?.id?.let(::emitAuthStateChange)
+                if (isDismissible) {
+                  sendDismissEvent()
+                }
+              }
             )
           }
         }
@@ -159,5 +168,26 @@ class ClerkAuthNativeView(context: Context) : FrameLayout(context) {
       }
       return null
     }
+  }
+
+  private fun sendEvent(type: String) {
+    val reactContext = context as? ReactContext ?: return
+    val eventData = Arguments.createMap().apply {
+      putString("type", type)
+    }
+    reactContext.getJSModule(RCTEventEmitter::class.java)
+      .receiveEvent(id, "onAuthEvent", eventData)
+  }
+
+  private fun sendDismissEvent() {
+    if (dismissalEventSent) return
+    dismissalEventSent = true
+    sendEvent("dismissed")
+  }
+
+  private fun emitAuthStateChange(sessionId: String) {
+    if (authCompletedSent) return
+    authCompletedSent = true
+    ClerkExpoModule.emitAuthStateChange("signedIn", sessionId)
   }
 }

@@ -9,10 +9,10 @@ export interface Spec extends TurboModule {
   configure(publishableKey: string, bearerToken: string | null): Promise<void>;
   getSession(): Promise<UnsafeObject | null>;
   getClientToken(): Promise<string | null>;
+  refreshClient(): Promise<void>;
   // Required by NativeEventEmitter for internal native auth-state events.
   // This is not part of the public @clerk/expo API.
   removeListeners(count: number): void;
-  signOut(): Promise<void>;
 }
 
 export default TurboModuleRegistry.get<Spec>('ClerkExpo');

@@ -5,7 +5,6 @@ public class ClerkUserProfileNativeView: UIView {
   private lazy var hostingCoordinator = ClerkNativeHostingCoordinator(containerView: self)
   private var currentDismissible: Bool = true
   private var hasInitialized: Bool = false
-  private var didSignOut = false
   private var dismissalEventSent = false
 
   @objc var onProfileEvent: RCTBubblingEventBlock?
@@ -32,7 +31,7 @@ public class ClerkUserProfileNativeView: UIView {
     if window != nil && !hasInitialized {
       hasInitialized = true
       updateView()
-    } else if window == nil && hasInitialized && currentDismissible && !didSignOut && !dismissalEventSent {
+    } else if window == nil && hasInitialized && currentDismissible && !dismissalEventSent {
       dismissalEventSent = true
       sendProfileEvent(type: .dismissed)
     }
@@ -47,11 +46,11 @@ public class ClerkUserProfileNativeView: UIView {
 
     guard let returnedController = factory.createUserProfileView(
       dismissible: currentDismissible,
-      onEvent: { [weak self] event, data in
-        if event == .signedOut {
-          self?.didSignOut = true
-          let sessionId = data["sessionId"] as? String
-          ClerkExpoModule.emitAuthStateChange(type: .signedOut, sessionId: sessionId)
+      onEvent: { [weak self] event, _ in
+        if event == .dismissed {
+          guard self?.currentDismissible == true else { return }
+          self?.dismissalEventSent = true
+          self?.sendProfileEvent(type: .dismissed)
         }
       }
     ) else { return }

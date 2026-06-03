@@ -6,7 +6,6 @@ public class ClerkAuthNativeView: UIView {
   private var currentMode: String = "signInOrUp"
   private var currentDismissible: Bool = true
   private var hasInitialized: Bool = false
-  private var didCompleteAuthentication: Bool = false
   private var dismissalEventSent: Bool = false
 
   @objc var onAuthEvent: RCTBubblingEventBlock?
@@ -42,7 +41,7 @@ public class ClerkAuthNativeView: UIView {
     if window != nil && !hasInitialized {
       hasInitialized = true
       updateView()
-    } else if window == nil && hasInitialized && currentDismissible && !didCompleteAuthentication && !dismissalEventSent {
+    } else if window == nil && hasInitialized && currentDismissible && !dismissalEventSent {
       dismissalEventSent = true
       sendAuthEvent(type: .dismissed)
     }
@@ -58,11 +57,11 @@ public class ClerkAuthNativeView: UIView {
     guard let returnedController = factory.createAuthView(
       mode: currentMode,
       dismissible: currentDismissible,
-      onEvent: { [weak self] event, data in
-        if event.isAuthCompletion {
-          self?.didCompleteAuthentication = true
-          let sessionId = data["sessionId"] as? String
-          ClerkExpoModule.emitAuthStateChange(type: .signedIn, sessionId: sessionId)
+      onEvent: { [weak self] event, _ in
+        if event == .dismissed {
+          guard self?.currentDismissible == true else { return }
+          self?.dismissalEventSent = true
+          self?.sendAuthEvent(type: .dismissed)
         }
       }
     ) else { return }

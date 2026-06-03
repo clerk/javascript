@@ -127,27 +127,24 @@ function NativeSessionSync({
     if (!isSignedIn) {
       hasSyncedRef.current = false;
 
-      // Only propagate a JS sign-out after this provider has observed a signed-in
-      // JS state. On cold start, JS may briefly be signed out while native still
-      // has the persisted session that ClerkProvider is about to activate.
+      // Only refresh native after this provider has observed a signed-in JS state.
+      // On cold start, JS may briefly be signed out while native still has the
+      // persisted session that ClerkProvider is about to activate.
       if (isLoaded && wasSignedInRef.current) {
         wasSignedInRef.current = false;
 
-        const clearNativeSession = async () => {
+        const refreshNativeClient = async () => {
           const ClerkExpo = NativeClerkModule;
-          if (!ClerkExpo?.signOut || !ClerkExpo?.getSession) {
+          if (!ClerkExpo?.refreshClient) {
             return;
           }
 
-          const nativeSession = (await ClerkExpo.getSession()) as NativeSessionResult;
-          if (getNativeSessionId(nativeSession)) {
-            await ClerkExpo.signOut();
-          }
+          await ClerkExpo.refreshClient();
         };
 
-        void clearNativeSession().catch((error: unknown) => {
+        void refreshNativeClient().catch((error: unknown) => {
           if (__DEV__) {
-            console.warn('[NativeSessionSync] Failed to clear native session:', error);
+            console.warn('[NativeSessionSync] Failed to refresh native client:', error);
           }
         });
       } else if (isLoaded) {
@@ -357,7 +354,7 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
     clerkInstance,
   });
 
-  // Listen for native auth state changes and sync to JS SDK
+  // Listen for native auth state changes and refresh the opposite client.
   const { nativeAuthState } = useNativeAuthEvents();
 
   useEffect(() => {
@@ -383,8 +380,8 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
           const clerkAny = clerkInstance as any;
           if (typeof clerkAny.handleUnauthenticated === 'function') {
             await clerkAny.handleUnauthenticated();
-          } else if (clerkInstance.signOut) {
-            await clerkInstance.signOut();
+          } else if (__DEV__) {
+            console.warn('[ClerkProvider] Cannot sync native sign-out: handleUnauthenticated is unavailable.');
           }
         }
       } catch (error) {

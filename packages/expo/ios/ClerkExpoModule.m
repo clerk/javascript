@@ -14,7 +14,7 @@ RCT_EXTERN_METHOD(getSession:(RCTPromiseResolveBlock)resolve
 RCT_EXTERN_METHOD(getClientToken:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 
-RCT_EXTERN_METHOD(signOut:(RCTPromiseResolveBlock)resolve
+RCT_EXTERN_METHOD(refreshClient:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 
 @end
