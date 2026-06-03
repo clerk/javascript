@@ -16,7 +16,13 @@ import type {
   BillingPlanUnitPriceJSON,
   BillingStatementTotals,
   BillingStatementTotalsJSON,
+  BillingSubscriptionItemNextPayment,
+  BillingSubscriptionItemNextPaymentJSON,
+  BillingSubscriptionNextPayment,
+  BillingSubscriptionNextPaymentJSON,
 } from '@clerk/shared/types';
+
+import { unixEpochToDate } from './date';
 
 export const billingMoneyAmountFromJSON = (data: BillingMoneyAmountJSON): BillingMoneyAmount => {
   return {
@@ -38,6 +44,24 @@ const billingPerUnitTotalsFromJSON = (data: BillingPerUnitTotalJSON[]): BillingP
     })),
   }));
 };
+
+const billingNextPaymentFromJSON = (
+  data: BillingSubscriptionNextPaymentJSON | BillingSubscriptionItemNextPaymentJSON,
+) => {
+  return {
+    amount: billingMoneyAmountFromJSON(data.amount),
+    date: unixEpochToDate(data.date),
+    perUnitTotals: data.per_unit_totals ? billingPerUnitTotalsFromJSON(data.per_unit_totals) : undefined,
+  };
+};
+
+export const billingSubscriptionNextPaymentFromJSON = (
+  data: BillingSubscriptionNextPaymentJSON,
+): BillingSubscriptionNextPayment => billingNextPaymentFromJSON(data);
+
+export const billingSubscriptionItemNextPaymentFromJSON = (
+  data: BillingSubscriptionItemNextPaymentJSON,
+): BillingSubscriptionItemNextPayment => billingNextPaymentFromJSON(data);
 
 export const billingUnitPriceFromJSON = (unitPrice: BillingPlanUnitPriceJSON) => ({
   name: unitPrice.name,

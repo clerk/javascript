@@ -684,6 +684,47 @@ export type GetSubscriptionParams = {
 export type CancelSubscriptionParams = WithOptionalOrgType<unknown>;
 
 /**
+ * The `BillingSubscriptionNextPayment` type represents the upcoming payment details for a subscription or
+ * subscription item.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingSubscriptionNextPayment {
+  /**
+   * The amount of the next payment.
+   */
+  amount: BillingMoneyAmount;
+  /**
+   * The date when the next payment is due.
+   */
+  date: Date;
+  /**
+   * Per-unit cost breakdown for the next payment (for example, seats).
+   */
+  perUnitTotals?: BillingPerUnitTotal[];
+}
+
+/**
+ * The `BillingSubscriptionItemNextPayment` type represents the upcoming payment details for a subscription item.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingSubscriptionItemNextPayment {
+  /**
+   * The amount of the next payment.
+   */
+  amount: BillingMoneyAmount;
+  /**
+   * The date when the next payment is due.
+   */
+  date: Date;
+  /**
+   * Per-unit cost breakdown for the next payment (for example, seats).
+   */
+  perUnitTotals?: BillingPerUnitTotal[];
+}
+
+/**
  * The `BillingSubscriptionItemResource` type represents an item in a subscription.
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
@@ -730,6 +771,10 @@ export interface BillingSubscriptionItemResource extends ClerkResource {
    * The amount charged for the subscription item.
    */
   amount?: BillingMoneyAmount;
+  /**
+   * Information about the next payment for this subscription item.
+   */
+  nextPayment?: BillingSubscriptionItemNextPayment | null;
   /**
    * The credit from a previous purchase that is being applied to the subscription item.
    */
@@ -782,16 +827,7 @@ export interface BillingSubscriptionResource extends ClerkResource {
   /**
    * Information about the next payment, including the amount and the date it's due. Returns null if there is no upcoming payment.
    */
-  nextPayment?: {
-    /**
-     * The amount of the next payment.
-     */
-    amount: BillingMoneyAmount;
-    /**
-     * The date when the next payment is due.
-     */
-    date: Date;
-  };
+  nextPayment?: BillingSubscriptionNextPayment | null;
   /**
    * The date when the subscription became past due, or `null` if the subscription is not past due.
    */

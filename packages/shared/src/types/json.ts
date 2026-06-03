@@ -783,6 +783,12 @@ export interface BillingPaymentJSON extends ClerkResourceJSON {
   totals?: BillingPaymentTotalsJSON | null;
 }
 
+export interface BillingSubscriptionItemNextPaymentJSON {
+  amount: BillingMoneyAmountJSON;
+  date: number;
+  per_unit_totals?: BillingPerUnitTotalJSON[];
+}
+
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
@@ -812,6 +818,13 @@ export interface BillingSubscriptionItemJSON extends ClerkResourceJSON {
   canceled_at: number | null;
   past_due_at: number | null;
   is_free_trial: boolean;
+  next_payment?: BillingSubscriptionItemNextPaymentJSON | null;
+}
+
+export interface BillingSubscriptionNextPaymentJSON {
+  amount: BillingMoneyAmountJSON;
+  date: number;
+  per_unit_totals?: BillingPerUnitTotalJSON[];
 }
 
 /**
@@ -823,10 +836,7 @@ export interface BillingSubscriptionJSON extends ClerkResourceJSON {
   /**
    * Describes the details for the next payment cycle. It is `undefined` for subscription items that are cancelled or on the free plan.
    */
-  next_payment?: {
-    amount: BillingMoneyAmountJSON;
-    date: number;
-  };
+  next_payment?: BillingSubscriptionNextPaymentJSON;
   /**
    * Due to the free plan subscription item, the top level subscription can either be `active` or `past_due`.
    */
