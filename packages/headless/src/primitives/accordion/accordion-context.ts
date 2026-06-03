@@ -12,7 +12,7 @@ export const AccordionContext = createContext<AccordionContextValue | null>(null
 export function useAccordionContext() {
   const ctx = useContext(AccordionContext);
   if (!ctx) {
-    throw new Error('Accordion compound components must be used within <Accordion>');
+    throw new Error('Accordion compound components must be used within <Accordion.Root>');
   }
   return ctx;
 }
