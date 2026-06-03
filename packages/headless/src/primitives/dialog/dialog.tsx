@@ -257,10 +257,14 @@ export interface DialogPopupProps extends ComponentProps<'div'> {}
 
 function DialogPopup(props: DialogPopupProps) {
   const { render, ...otherProps } = props;
-  const { popupRef, refs, getFloatingProps, floatingContext, modal, labelId, descriptionId, transitionProps } =
+  const { popupRef, refs, getFloatingProps, floatingContext, modal, labelId, descriptionId, mounted, transitionProps } =
     useDialogContext();
 
   const combinedRef = useMergeRefs([popupRef, refs.setFloating]);
+
+  if (!mounted) {
+    return null;
+  }
 
   const defaultProps = {
     'data-cl-slot': 'dialog-popup',

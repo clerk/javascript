@@ -174,6 +174,26 @@ describe('Dialog', () => {
       renderDialog();
       expect(screen.queryByText('Dialog body content')).not.toBeInTheDocument();
     });
+
+    it('does not render popup when closed and Portal is omitted', async () => {
+      const user = userEvent.setup();
+      render(
+        <Dialog>
+          <Dialog.Trigger>Open</Dialog.Trigger>
+          <Dialog.Popup>
+            <p>Popup content</p>
+          </Dialog.Popup>
+        </Dialog>,
+      );
+
+      expect(document.querySelector('[data-cl-slot="dialog-popup"]')).not.toBeInTheDocument();
+      expect(screen.queryByText('Popup content')).not.toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: 'Open' }));
+
+      expect(document.querySelector('[data-cl-slot="dialog-popup"]')).toBeInTheDocument();
+      expect(screen.getByText('Popup content')).toBeInTheDocument();
+    });
   });
 
   describe('trigger state attributes', () => {
