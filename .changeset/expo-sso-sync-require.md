@@ -2,4 +2,4 @@
 '@clerk/expo': patch
 ---
 
-Load `expo-auth-session` and `expo-web-browser` in `useSSO` via synchronous `require()` instead of dynamic `import()`, which fails to resolve under Metro when `@expo/metro-runtime` is not set up at the app entry.
+Fix `useSSO()` in Expo apps that hit module loading failures when starting an SSO flow under Metro.
