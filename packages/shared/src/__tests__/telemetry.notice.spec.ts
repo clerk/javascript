@@ -4,21 +4,9 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { __resetTelemetryNoticeForTests, maybeShowTelemetryNotice } from '../telemetry/notice';
+import { automatedEnvironmentVariables } from '../utils/runtimeEnvironment';
 
-const CI_VARS = [
-  'CI',
-  'CONTINUOUS_INTEGRATION',
-  'BUILD_NUMBER',
-  'GITHUB_ACTIONS',
-  'GITLAB_CI',
-  'CIRCLECI',
-  'TRAVIS',
-  'BUILDKITE',
-  'JENKINS_URL',
-  'TF_BUILD',
-  'DRONE',
-  'CODEBUILD_BUILD_ID',
-];
+const CI_VARS = automatedEnvironmentVariables;
 
 function clearCIEnv() {
   for (const name of CI_VARS) {

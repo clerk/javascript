@@ -26,6 +26,7 @@
  */
 
 import { isTruthy } from '../underscore';
+import { automatedEnvironmentVariables } from '../utils/runtimeEnvironment';
 
 const PROCESS_FLAG = Symbol.for('@clerk/shared.telemetryNoticeShown');
 
@@ -33,21 +34,6 @@ const NOTICE_LINES = [
   'Attention: Clerk collects telemetry data from its SDKs when connected to development instances.',
   "The data collected is used to inform Clerk's product roadmap.",
   'To learn more, including how to opt-out from the telemetry program, visit: https://clerk.com/docs/telemetry.',
-];
-
-const CI_ENV_VARS = [
-  'CI',
-  'CONTINUOUS_INTEGRATION',
-  'BUILD_NUMBER',
-  'GITHUB_ACTIONS',
-  'GITLAB_CI',
-  'CIRCLECI',
-  'TRAVIS',
-  'BUILDKITE',
-  'JENKINS_URL',
-  'TF_BUILD',
-  'DRONE',
-  'CODEBUILD_BUILD_ID',
 ];
 
 function isServerRuntime(): boolean {
@@ -64,11 +50,15 @@ function isServerRuntime(): boolean {
   return true;
 }
 
+// Server-only notice: read process.env directly rather than going through
+// getEnvVariable(), which would pull the multi-runtime env resolver into the
+// clerk.browser.js bundle (it ships there via TelemetryCollector). We reuse the
+// shared CI env-var list so the set of detected providers stays in one place.
 function isCI(): boolean {
   if (typeof process === 'undefined' || !process.env) {
     return false;
   }
-  return CI_ENV_VARS.some(name => isTruthy(process.env[name]));
+  return automatedEnvironmentVariables.some(name => isTruthy(process.env[name]));
 }
 
 function hasSeen(): boolean {
