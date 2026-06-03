@@ -273,7 +273,7 @@ function PaymentAttemptBody({ paymentAttempt }: { paymentAttempt: BillingPayment
         >
           <LineItems.Title title={localizationKeys('billing.subtotal')} />
           <LineItems.Description
-            text={`${subscriptionItem.amount?.currencySymbol}${subscriptionItem.amount?.amountFormatted}`}
+            text={`${paymentAttempt.totals?.subtotal.currencySymbol}${paymentAttempt.totals?.subtotal.amountFormatted}`}
           />
         </LineItems.Group>
         {subscriptionItem.credits &&

@@ -44,6 +44,9 @@ export const CheckoutForm = withCardStateProvider(() => {
   const showProratedCredit = !!totals.credits?.proration?.amount && totals.credits.proration.amount.amount > 0;
   const showAccountCredits = !!totals.credits?.payer?.appliedAmount && totals.credits.payer.appliedAmount.amount > 0;
   const showPastDue = !!totals.pastDue?.amount && totals.pastDue.amount > 0;
+  const showProratedDiscount = !!totals.discounts?.proration?.amount && totals.discounts.proration.amount.amount > 0;
+  const showRenewalTotals =
+    !!totals.totalsDuePerPeriod && totals.totalsDuePerPeriod.grandTotal.amount !== totals.totalDueNow.amount;
   const showDowngradeInfo = !isImmediatePlanChange;
 
   const fee =
@@ -124,6 +127,14 @@ export const CheckoutForm = withCardStateProvider(() => {
             <LineItems.Title title={localizationKeys('billing.subtotal')} />
             <LineItems.Description text={`${totals.subtotal.currencySymbol}${totals.subtotal.amountFormatted}`} />
           </LineItems.Group>
+          {showProratedDiscount && (
+            <LineItems.Group variant='tertiary'>
+              <LineItems.Title title={localizationKeys('billing.proratedDiscount')} />
+              <LineItems.Description
+                text={`- ${totals.discounts?.proration?.amount.currencySymbol}${totals.discounts?.proration?.amount.amountFormatted}`}
+              />
+            </LineItems.Group>
+          )}
           {showProratedCredit && (
             <LineItems.Group variant='tertiary'>
               <LineItems.Title title={localizationKeys('billing.creditRemainder')} />
@@ -166,7 +177,7 @@ export const CheckoutForm = withCardStateProvider(() => {
                 text={`${totals.totalDueAfterFreeTrial.currencySymbol}${totals.totalDueAfterFreeTrial.amountFormatted}`}
               />
             </LineItems.Group>
-          ) : (
+          ) : showRenewalTotals ? null : (
             <LineItems.Group variant='tertiary'>
               <LineItems.Title title={localizationKeys('billing.checkout.totalDuePerPeriod')} />
               <LineItems.Description
@@ -179,6 +190,26 @@ export const CheckoutForm = withCardStateProvider(() => {
             <LineItems.Title title={localizationKeys('billing.totalDueToday')} />
             <LineItems.Description text={`${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`} />
           </LineItems.Group>
+
+          {showRenewalTotals && (
+            <>
+              <LineItems.Group
+                borderTop
+                variant='tertiary'
+              >
+                <LineItems.Title title={localizationKeys('billing.subtotalRenewal')} />
+                <LineItems.Description
+                  text={`${totals.totalsDuePerPeriod?.subtotal.currencySymbol}${totals.totalsDuePerPeriod?.subtotal.amountFormatted}`}
+                />
+              </LineItems.Group>
+              <LineItems.Group borderTop>
+                <LineItems.Title title={localizationKeys('billing.totalDuePerPeriod')} />
+                <LineItems.Description
+                  text={`${totals.totalsDuePerPeriod?.grandTotal.currencySymbol}${totals.totalsDuePerPeriod?.grandTotal.amountFormatted}`}
+                />
+              </LineItems.Group>
+            </>
+          )}
         </LineItems.Root>
       </Box>
 
