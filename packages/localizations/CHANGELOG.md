@@ -1,5 +1,45 @@
 # Change Log
 
+## 4.7.0
+
+### Minor Changes
+
+- Display "Single Sign-on (SSO)" section in `OrganizationProfile` if self-serve SSO is enabled on the current active organization ([#8600](https://github.com/clerk/javascript/pull/8600)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Add missing Bengali (India) (`bn-IN`) translations. Fills in previously untranslated keys across API keys, billing, checkout, organization profile, sign-in/sign-up, two-step verification (MFA) setup, and user profile. ([#8644](https://github.com/clerk/javascript/pull/8644)) by [@ANIBIT14](https://github.com/ANIBIT14)
+
+- Add missing Hindi (India) (`hi-IN`) translations. Fills in previously untranslated keys across API keys, billing, checkout, organization profile, sign-in/sign-up, two-step verification (MFA) setup, and user profile. ([#8645](https://github.com/clerk/javascript/pull/8645)) by [@ANIBIT14](https://github.com/ANIBIT14)
+
+- Add missing Malay (Malaysia) (`ms-MY`) translations. Fills in previously untranslated keys across API keys, billing, checkout, organization profile, sign-in/sign-up, two-step verification (MFA) setup, user button, and user profile. ([#8646](https://github.com/clerk/javascript/pull/8646)) by [@ANIBIT14](https://github.com/ANIBIT14)
+
+- Add missing Tamil (India) (`ta-IN`) translations. Fills in previously untranslated keys across API keys, billing, checkout, organization profile, sign-in/sign-up, two-step verification (MFA) setup, user button, and user profile. ([#8647](https://github.com/clerk/javascript/pull/8647)) by [@ANIBIT14](https://github.com/ANIBIT14)
+
+- Add missing Telugu (India) (`te-IN`) translations. Fills in previously untranslated keys across API keys, billing, checkout, organization profile, sign-in/sign-up, two-step verification (MFA) setup, user button, and user profile. ([#8648](https://github.com/clerk/javascript/pull/8648)) by [@ANIBIT14](https://github.com/ANIBIT14)
+
+- Introduce UX improvements for `<ConfigureSSO />` such as: ([#8601](https://github.com/clerk/javascript/pull/8601)) by [@LauraBeatris](https://github.com/LauraBeatris)
+  - Render attribute-mapping and service-provider field labels per IdP nomenclature
+  - Add "Open test URL" button and surface a clear empty state
+  - Expand the appearance descriptor surface across step content so developers can override styling
+
+- Updated dependencies [[`79cdd1f`](https://github.com/clerk/javascript/commit/79cdd1f9c9d8aa5d9a98d8d245b5f7f98c0cabb4), [`4d5027b`](https://github.com/clerk/javascript/commit/4d5027b15873dc6637e49f51142be64ef5f8e9bf), [`4e08924`](https://github.com/clerk/javascript/commit/4e089248a3dfdf99fc110c06b699a084d4e8a7ee), [`bcf0e77`](https://github.com/clerk/javascript/commit/bcf0e776231c6ec675d3a3a8bfd122513d3c57ef)]:
+  - @clerk/shared@4.14.0
+
+## 4.6.8
+
+### Patch Changes
+
+- Updated dependencies [[`a036ce8`](https://github.com/clerk/javascript/commit/a036ce8fef3b3ee2b49fd05d592b083ffc37f463)]:
+  - @clerk/shared@4.13.1
+
+## 4.6.7
+
+### Patch Changes
+
+- Updated dependencies [[`6eaf4d6`](https://github.com/clerk/javascript/commit/6eaf4d66fe0b21fb96a5cd19d61e6c3b2302ff97), [`1aab31e`](https://github.com/clerk/javascript/commit/1aab31e5070b7223402ff71f65a0d829bbc29cfd)]:
+  - @clerk/shared@4.13.0
+
 ## 4.6.6
 
 ### Patch Changes

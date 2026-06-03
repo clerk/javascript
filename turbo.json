@@ -36,7 +36,9 @@
     "GITHUB_TOKEN",
     "ACTIONS_RUNNER_DEBUG",
     "ACTIONS_STEP_DEBUG",
-    "VERCEL_AUTOMATION_BYPASS_SECRET"
+    "VERCEL_AUTOMATION_BYPASS_SECRET",
+    "PORT",
+    "UI_PORT"
   ],
   "tasks": {
     "build": {

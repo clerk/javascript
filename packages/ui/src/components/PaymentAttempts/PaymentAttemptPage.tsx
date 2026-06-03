@@ -4,6 +4,7 @@ import type { BillingSubscriptionItemResource } from '@clerk/shared/types';
 import { Alert } from '@/ui/elements/Alert';
 import { Header } from '@/ui/elements/Header';
 import { LineItems } from '@/ui/elements/LineItems';
+import { ProfileCard } from '@/ui/elements/ProfileCard';
 import { formatDate } from '@/ui/utils/formatDate';
 import { truncateWithEndVisible } from '@/ui/utils/truncateTextWithEndVisible';
 
@@ -22,7 +23,7 @@ import {
   useLocalizations,
 } from '../../customizables';
 import { useClipboard } from '../../hooks';
-import { Check, Copy } from '../../icons';
+import { Checkmark, Copy } from '../../icons';
 import { useRouter } from '../../router';
 
 export const PaymentAttemptPage = () => {
@@ -46,18 +47,20 @@ export const PaymentAttemptPage = () => {
 
   if (isLoading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-        <Spinner
-          colorScheme='primary'
-          sx={{ margin: 'auto', display: 'block' }}
-          elementDescriptor={descriptors.spinner}
-        />
-      </Box>
+      <ProfileCard.Page>
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+          <Spinner
+            colorScheme='primary'
+            sx={{ margin: 'auto', display: 'block' }}
+            elementDescriptor={descriptors.spinner}
+          />
+        </Box>
+      </ProfileCard.Page>
     );
   }
 
   return (
-    <>
+    <ProfileCard.Page>
       <Header.Root
         sx={t => ({
           borderBlockEndWidth: t.borderWidths.$normal,
@@ -194,7 +197,7 @@ export const PaymentAttemptPage = () => {
           </Box>
         </Box>
       )}
-    </>
+    </ProfileCard.Page>
   );
 };
 
@@ -283,7 +286,7 @@ function CopyButton({ text, copyLabel = 'Copy' }: { text: string; copyLabel?: st
     >
       <Icon
         size='sm'
-        icon={hasCopied ? Check : Copy}
+        icon={hasCopied ? Checkmark : Copy}
         aria-hidden
       />
     </Button>

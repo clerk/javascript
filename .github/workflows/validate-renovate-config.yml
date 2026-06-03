@@ -14,16 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Setup
-        id: config
-        uses: ./.github/actions/init
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
-          cache-enabled: true
-          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          turbo-team: ${{ vars.TURBO_TEAM }}
-          turbo-token: ${{ secrets.TURBO_TOKEN }}
+          persist-credentials: false
 
       - name: Validate Renovate Config
-        run: npx --yes --package renovate@latest renovate-config-validator
+        run: npx --yes --package renovate@43.150.0 renovate-config-validator

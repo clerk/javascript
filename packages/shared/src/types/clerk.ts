@@ -1652,6 +1652,7 @@ export type __internal_AttemptToEnableEnvironmentSettingParams = {
     | 'OrganizationList'
     | 'CreateOrganization'
     | 'TaskChooseOrganization'
+    | 'ConfigureSSO'
     | 'useOrganizationList'
     | 'useOrganization';
   onClose?: () => void;

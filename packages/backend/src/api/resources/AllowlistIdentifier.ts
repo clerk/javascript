@@ -2,7 +2,7 @@ import type { AllowlistIdentifierType } from './Enums';
 import type { AllowlistIdentifierJSON } from './JSON';
 
 /**
- * The Backend `AllowlistIdentifier` object represents an identifier that has been added to the allowlist of your application. The Backend `AllowlistIdentifier` object is used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/Allow-list-Block-list#operation/ListAllowlistIdentifiers) and is not directly accessible from the Frontend API.
+ * The Backend `AllowlistIdentifier` object represents an identifier that has been added to the allowlist of your application. The Backend `AllowlistIdentifier` object is used in the [Backend API](https://clerk.com/docs/reference/backend-api/model/AllowlistIdentifier) and is not directly accessible from the Frontend API.
  */
 export class AllowlistIdentifier {
   constructor(

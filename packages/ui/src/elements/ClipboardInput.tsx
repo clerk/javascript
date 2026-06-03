@@ -2,7 +2,7 @@ import type { ComponentType } from 'react';
 
 import { Button, descriptors, Flex, Icon, Input } from '../customizables';
 import { useClipboard } from '../hooks';
-import { Clipboard, TickShield } from '../icons';
+import { Clipboard, ShieldCheck } from '../icons';
 import type { PropsOfComponent } from '../styledSystem';
 
 type ClipboardInputProps = PropsOfComponent<typeof Input> & {
@@ -11,7 +11,7 @@ type ClipboardInputProps = PropsOfComponent<typeof Input> & {
 };
 
 export const ClipboardInput = (props: ClipboardInputProps) => {
-  const { id, value, copyIcon = Clipboard, copiedIcon = TickShield, sx, ...rest } = props;
+  const { id, value, copyIcon = Clipboard, copiedIcon = ShieldCheck, sx, ...rest } = props;
   const { onCopy, hasCopied } = useClipboard(value as string);
 
   return (
@@ -34,17 +34,17 @@ export const ClipboardInput = (props: ClipboardInputProps) => {
         sx={t => {
           return {
             position: 'absolute',
+            insetInlineEnd: t.space.$1,
             padding: 0,
-            insetInlineEnd: t.space.$0x5,
-            insetBlock: t.space.$0x5,
+            height: t.sizes.$6,
             aspectRatio: 1,
+            borderRadius: `calc(${t.radii.$md} - ${t.space.$1})`,
           };
         }}
       >
         <Icon
           elementDescriptor={descriptors.formFieldInputCopyToClipboardIcon}
           icon={hasCopied ? copiedIcon : copyIcon}
-          size='sm'
         />
       </Button>
     </Flex>

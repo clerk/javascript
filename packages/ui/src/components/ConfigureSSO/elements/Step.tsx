@@ -1,4 +1,5 @@
-import { type PropsWithChildren } from 'react';
+import { __internal_useOrganizationBase } from '@clerk/shared/react';
+import { type PropsWithChildren, type ReactNode, useState } from 'react';
 
 import {
   Badge,
@@ -9,12 +10,15 @@ import {
   Heading,
   Icon,
   type LocalizationKey,
+  localizationKeys,
   Text,
   useLocalizations,
 } from '@/customizables';
-import { CaretLeft, CaretRight } from '@/icons';
+import { ChevronLeft, ChevronRight } from '@/icons';
 import { common, type PropsOfComponent } from '@/styledSystem';
 
+import { useConfigureSSO } from '../ConfigureSSOContext';
+import { ResetConnectionDialog } from '../ResetConnectionDialog';
 import { ProfileCardFooter } from './ProfileCard';
 
 type StepLayoutProps = PropsOfComponent<typeof Col>;
@@ -38,6 +42,7 @@ type StepSectionProps = PropsOfComponent<typeof Col> & {
 
 const Section = ({ fill, sx, ...props }: StepSectionProps): JSX.Element => (
   <Col
+    elementDescriptor={descriptors.configureSSOStepSection}
     {...props}
     sx={[theme => ({ padding: theme.space.$5 }), fill && { flex: 1 }, sx]}
   />
@@ -46,15 +51,17 @@ const Section = ({ fill, sx, ...props }: StepSectionProps): JSX.Element => (
 type StepHeaderProps = PropsWithChildren<{
   title: LocalizationKey | string;
   description?: LocalizationKey | string;
+  badge?: ReactNode;
 }>;
 
-const Header = ({ title, description, children }: StepHeaderProps): JSX.Element => {
+const Header = ({ title, description, badge, children }: StepHeaderProps): JSX.Element => {
   const { t } = useLocalizations();
   const titleText = typeof title === 'string' ? title : t(title);
   const descriptionText = description ? (typeof description === 'string' ? description : t(description)) : null;
 
   return (
     <Section
+      elementDescriptor={descriptors.configureSSOStepHeader}
       sx={theme => ({
         borderBottomWidth: theme.borderWidths.$normal,
         borderBottomStyle: theme.borderStyles.$solid,
@@ -67,10 +74,22 @@ const Header = ({ title, description, children }: StepHeaderProps): JSX.Element 
         sx={theme => ({ gap: theme.space.$4 })}
       >
         <Col sx={theme => ({ gap: theme.space.$2, minWidth: 0 })}>
-          <Heading textVariant='h2'>{titleText}</Heading>
+          <Flex
+            align='center'
+            sx={t => ({ gap: t.space.$2, flexWrap: 'wrap' })}
+          >
+            <Heading
+              elementDescriptor={descriptors.configureSSOStepHeaderTitle}
+              textVariant='h2'
+            >
+              {titleText}
+            </Heading>
+            {badge}
+          </Flex>
 
           {descriptionText && (
             <Text
+              elementDescriptor={descriptors.configureSSOStepHeaderDescription}
               as='p'
               colorScheme='secondary'
             >
@@ -89,6 +108,7 @@ type StepBodyProps = PropsOfComponent<typeof Col>;
 
 const Body = ({ sx, ...props }: StepBodyProps): JSX.Element => (
   <Col
+    elementDescriptor={descriptors.configureSSOStepBody}
     as='main'
     {...props}
     sx={[
@@ -133,7 +153,7 @@ const FooterPrevious = ({ onClick, isDisabled, isLoading, label = 'Previous' }: 
       onClick={handleClick}
     >
       <Icon
-        icon={CaretLeft}
+        icon={ChevronLeft}
         size='sm'
         sx={t => ({ marginInlineEnd: t.space.$1 })}
       />
@@ -163,7 +183,7 @@ const FooterContinue = ({ onClick, isDisabled, isLoading, label = 'Continue' }: 
     >
       {labelText}
       <Icon
-        icon={CaretRight}
+        icon={ChevronRight}
         size='sm'
         sx={t => ({ marginInlineStart: t.space.$1 })}
       />
@@ -172,11 +192,42 @@ const FooterContinue = ({ onClick, isDisabled, isLoading, label = 'Continue' }: 
 };
 FooterContinue.displayName = 'Step.Footer.Continue';
 
+const FooterReset = (): JSX.Element | null => {
+  const { enterpriseConnection } = useConfigureSSO();
+  const organization = __internal_useOrganizationBase();
+  const [isOpen, setIsOpen] = useState(false);
+
+  if (!enterpriseConnection) {
+    return null;
+  }
+
+  return (
+    <>
+      <Button
+        elementDescriptor={descriptors.configureSSOFooterResetButton}
+        variant='ghost'
+        size='sm'
+        colorScheme='danger'
+        onClick={() => setIsOpen(true)}
+        localizationKey={localizationKeys('configureSSO.confirmation.resetSection.title')}
+        sx={{ marginInlineEnd: 'auto' }}
+      />
+      <ResetConnectionDialog
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        confirmationValue={organization?.name ?? ''}
+      />
+    </>
+  );
+};
+FooterReset.displayName = 'Step.Footer.Reset';
+
 const Footer = ({ children }: PropsWithChildren): JSX.Element => <ProfileCardFooter>{children}</ProfileCardFooter>;
 
 const FooterCompound = Object.assign(Footer, {
   Previous: FooterPrevious,
   Continue: FooterContinue,
+  Reset: FooterReset,
 });
 
 type StepCounterProps = {
