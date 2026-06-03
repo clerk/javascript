@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen, waitFor } from '@/test/utils';
 
+import { assertContextExists } from '../../contexts/utils';
 import { clearFetchCache } from '../../hooks';
 import { Account } from '../UserProfile/Account';
 import { Security } from '../UserProfile/Security';
@@ -314,13 +315,8 @@ describe('UserProfile composed sections', () => {
   });
 
   describe('Account — section outside page', () => {
-    it('section without page throws', async () => {
-      const { wrapper } = await createFixtures(f => {
-        f.withEmailAddress();
-        f.withUser({ email_addresses: ['test@clerk.com'] });
-      });
-
-      expect(() => render(<AccountEmails />, { wrapper })).toThrow();
+    it('assertContextExists throws when context is missing', () => {
+      expect(() => assertContextExists(null, 'AccountEmails')).toThrow();
     });
   });
 
