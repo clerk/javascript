@@ -525,7 +525,12 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       } else if (shouldLoadUi) {
         const ClerkUI = await this.getClerkUIEntryChunk();
         if (ClerkUI) {
-          await clerk.load({ ...this.options, ui: { ...this.options.ui, ClerkUI } });
+          const options = { ...this.options, ui: { ...this.options.ui, ClerkUI } };
+          if (clerk.__internal_attachClerkUI) {
+            clerk.__internal_attachClerkUI(ClerkUI, options);
+          } else {
+            await clerk.load(options);
+          }
         }
       }
       if (clerk.loaded) {

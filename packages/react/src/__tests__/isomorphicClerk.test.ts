@@ -245,11 +245,13 @@ describe('isomorphicClerk', () => {
 
     it('attaches UI before replaying premounts when global Clerk is already loaded', async () => {
       const mockLoad = vi.fn().mockResolvedValue(undefined);
+      const mockAttachClerkUI = vi.fn();
       const mockMountUserButton = vi.fn();
       const mockClerkInstance = {
         load: mockLoad,
         loaded: true,
         status: 'ready',
+        __internal_attachClerkUI: mockAttachClerkUI,
         mountUserButton: mockMountUserButton,
       };
       (global as any).Clerk = mockClerkInstance;
@@ -261,7 +263,9 @@ describe('isomorphicClerk', () => {
       await (clerk as any).getEntryChunks();
 
       expect(loadClerkUIScript).toHaveBeenCalled();
-      expect(mockLoad).toHaveBeenCalledWith(
+      expect(mockLoad).not.toHaveBeenCalled();
+      expect(mockAttachClerkUI).toHaveBeenCalledWith(
+        (global as any).__internal_ClerkUICtor,
         expect.objectContaining({
           ui: expect.objectContaining({
             ClerkUI: (global as any).__internal_ClerkUICtor,
@@ -269,7 +273,9 @@ describe('isomorphicClerk', () => {
         }),
       );
       expect(mockMountUserButton).toHaveBeenCalledWith(node, undefined);
-      expect(mockLoad.mock.invocationCallOrder[0]).toBeLessThan(mockMountUserButton.mock.invocationCallOrder[0]);
+      expect(mockAttachClerkUI.mock.invocationCallOrder[0]).toBeLessThan(
+        mockMountUserButton.mock.invocationCallOrder[0],
+      );
     });
 
     // ─── @clerk/react with bundled ui prop (e.g. user passes ui={ui} from @clerk/ui) ───

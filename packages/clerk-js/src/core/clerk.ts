@@ -137,7 +137,7 @@ import type {
   WaitlistResource,
   Web3Provider,
 } from '@clerk/shared/types';
-import type { ClerkUI } from '@clerk/shared/ui';
+import type { ClerkUI, ClerkUIConstructor } from '@clerk/shared/ui';
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
 import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
 import type { QueryClient } from '@tanstack/query-core';
@@ -518,13 +518,6 @@ export class Clerk implements ClerkInterface {
   public load = async (options?: ClerkOptions): Promise<void> => {
     debugLogger.info('load() start', {}, 'clerk');
     if (this.loaded) {
-      const legacy = options as Record<string, unknown> | undefined;
-      const hasClerkUI = Boolean(options?.ui?.ClerkUI || legacy?.clerkUICtor || legacy?.clerkUiCtor);
-      if (!this.#clerkUI && hasClerkUI) {
-        const nextOptions = this.#initOptions({ ...this.#options, ...options });
-        this.#options = nextOptions;
-        this.#initClerkUI();
-      }
       return;
     }
 
@@ -614,17 +607,34 @@ export class Clerk implements ClerkInterface {
     }
   };
 
-  #initClerkUI = (): void => {
-    if (this.#clerkUI || !this.#options.ui?.ClerkUI) {
+  __internal_attachClerkUI = (
+    ClerkUI: ClerkUIConstructor | Promise<ClerkUIConstructor>,
+    options?: ClerkOptions,
+  ): void => {
+    if (this.#clerkUI) {
       return;
     }
 
-    this.#clerkUI = Promise.resolve(this.#options.ui.ClerkUI).then(
+    const uiOptions = this.#initOptions({
+      ...this.#options,
+      ...options,
+      ui: { ...this.#options.ui, ...options?.ui, ClerkUI },
+    });
+
+    this.#initClerkUI(uiOptions);
+  };
+
+  #initClerkUI = (options = this.#options): void => {
+    if (this.#clerkUI || !options.ui?.ClerkUI) {
+      return;
+    }
+
+    this.#clerkUI = Promise.resolve(options.ui.ClerkUI).then(
       ClerkUI =>
         new ClerkUI(
           () => this,
           () => this.environment,
-          this.#options,
+          options,
           new ModuleManager(),
         ),
     );
