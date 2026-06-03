@@ -208,8 +208,8 @@ export const fiFI: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: 'Ota yhteyttä organisaatiosi järjestelmänvalvojaan saadaksesi oikeudet hallita yritysyhteyksiä.',
-      title: 'Sinulla ei ole oikeutta hallita yritysyhteyksiä',
+      subtitle: 'Ota yhteyttä organisaatiosi järjestelmänvalvojaan päivittääksesi oikeuksiasi.',
+      title: 'Sinulla ei ole oikeutta hallita kertakirjautumista (SSO)',
     },
     navbar: {
       title: 'Määritä kertakirjautuminen (SSO)',
@@ -217,10 +217,6 @@ export const fiFI: LocalizationResource = {
     selectProviderStep: {
       title: 'Valitse palveluntarjoaja',
       subtitle: 'Valitse palveluntarjoaja, jolle määrität SSO:n.',
-      body: {
-        title: 'Valitse henkilöllisyyden tarjoaja',
-        description: 'Opastamme sinut yksityiskohtaisen määritysprosessin läpi seuraavaksi.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',
