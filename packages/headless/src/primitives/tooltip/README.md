@@ -13,7 +13,7 @@ A floating label that appears on hover or focus. Non-interactive, used for suppl
 ```tsx
 import { Tooltip } from '@/primitives/tooltip';
 
-<Tooltip>
+<Tooltip.Root>
   <Tooltip.Trigger>
     <IconButton aria-label='Settings' />
   </Tooltip.Trigger>
@@ -23,7 +23,7 @@ import { Tooltip } from '@/primitives/tooltip';
       <Tooltip.Arrow />
     </Tooltip.Popup>
   </Tooltip.Positioner>
-</Tooltip>;
+</Tooltip.Root>;
 ```
 
 ### Controlled
@@ -31,30 +31,30 @@ import { Tooltip } from '@/primitives/tooltip';
 ```tsx
 const [open, setOpen] = useState(false);
 
-<Tooltip
+<Tooltip.Root
   open={open}
   onOpenChange={setOpen}
 >
   {/* ... */}
-</Tooltip>;
+</Tooltip.Root>;
 ```
 
 ### Custom Delay
 
 ```tsx
-<Tooltip
+<Tooltip.Root
   delay={500}
   closeDelay={100}
 >
   {/* Opens after 500ms hover, closes 100ms after leaving */}
-</Tooltip>
+</Tooltip.Root>
 ```
 
 ## Parts
 
 | Part                 | Default Element | Description                                      |
 | -------------------- | --------------- | ------------------------------------------------ |
-| `Tooltip`            | —               | Root context provider                            |
+| `Tooltip.Root`       | —               | Root context provider                            |
 | `Tooltip.Trigger`    | `<button>`      | Element that triggers the tooltip on hover/focus |
 | `Tooltip.Portal`     | —               | Portals children (accepts `root` prop)           |
 | `Tooltip.Positioner` | `<div>`         | Floating positioned container                    |
@@ -63,7 +63,7 @@ const [open, setOpen] = useState(false);
 
 ## Props
 
-### `Tooltip` (root)
+### `Tooltip.Root`
 
 | Prop           | Type                      | Default | Description                          |
 | -------------- | ------------------------- | ------- | ------------------------------------ |
