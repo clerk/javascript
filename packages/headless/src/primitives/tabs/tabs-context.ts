@@ -17,7 +17,7 @@ export const TabsContext = createContext<TabsContextValue | null>(null);
 export function useTabsContext() {
   const ctx = useContext(TabsContext);
   if (!ctx) {
-    throw new Error('Tabs compound components must be used within <Tabs>');
+    throw new Error('Tabs compound components must be used within <Tabs.Root>');
   }
   return ctx;
 }
