@@ -13,7 +13,7 @@ A floating panel anchored to a trigger element. Supports focus management, ARIA 
 ```tsx
 import { Popover } from '@/primitives/popover';
 
-<Popover>
+<Popover.Root>
   <Popover.Trigger>Settings</Popover.Trigger>
   <Popover.Positioner>
     <Popover.Popup>
@@ -23,7 +23,7 @@ import { Popover } from '@/primitives/popover';
       <Popover.Close>Done</Popover.Close>
     </Popover.Popup>
   </Popover.Positioner>
-</Popover>;
+</Popover.Root>;
 ```
 
 ### Controlled
@@ -31,25 +31,25 @@ import { Popover } from '@/primitives/popover';
 ```tsx
 const [open, setOpen] = useState(false);
 
-<Popover
+<Popover.Root
   open={open}
   onOpenChange={setOpen}
 >
   {/* ... */}
-</Popover>;
+</Popover.Root>;
 ```
 
 ### Modal Mode
 
 ```tsx
-<Popover modal>{/* Focus is trapped within the popover */}</Popover>
+<Popover.Root modal>{/* Focus is trapped within the popover */}</Popover.Root>
 ```
 
 ## Parts
 
 | Part                  | Default Element | Description                              |
 | --------------------- | --------------- | ---------------------------------------- |
-| `Popover`             | —               | Root context provider                    |
+| `Popover.Root`        | —               | Root context provider                    |
 | `Popover.Trigger`     | `<button>`      | Toggles the popover on click             |
 | `Popover.Portal`      | —               | Portals children (accepts `root` prop)   |
 | `Popover.Positioner`  | `<div>`         | Floating positioned container            |
@@ -61,7 +61,7 @@ const [open, setOpen] = useState(false);
 
 ## Props
 
-### `Popover` (root)
+### `Popover.Root`
 
 | Prop           | Type                      | Default    | Description                        |
 | -------------- | ------------------------- | ---------- | ---------------------------------- |
