@@ -2,13 +2,13 @@ import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { axe } from '../../test-utils/axe';
-import { Accordion } from './accordion';
+import { Accordion } from './index';
 
 afterEach(() => cleanup());
 
-function renderAccordion(props: Partial<React.ComponentProps<typeof Accordion>> = {}) {
+function renderAccordion(props: Partial<React.ComponentProps<typeof Accordion.Root>> = {}) {
   return render(
-    <Accordion {...props}>
+    <Accordion.Root {...props}>
       <Accordion.Item value='item1'>
         <Accordion.Header>
           <Accordion.Trigger>Section 1</Accordion.Trigger>
@@ -27,7 +27,7 @@ function renderAccordion(props: Partial<React.ComponentProps<typeof Accordion>> 
         </Accordion.Header>
         <Accordion.Panel>Content 3</Accordion.Panel>
       </Accordion.Item>
-    </Accordion>,
+    </Accordion.Root>,
   );
 }
 
@@ -219,7 +219,7 @@ describe('Accordion', () => {
       const onValueChange = vi.fn();
       const user = userEvent.setup();
       render(
-        <Accordion onValueChange={onValueChange}>
+        <Accordion.Root onValueChange={onValueChange}>
           <Accordion.Item
             value='item1'
             disabled
@@ -235,7 +235,7 @@ describe('Accordion', () => {
             </Accordion.Header>
             <Accordion.Panel>Content 2</Accordion.Panel>
           </Accordion.Item>
-        </Accordion>,
+        </Accordion.Root>,
       );
 
       await user.click(screen.getByRole('button', { name: 'Disabled' }));
@@ -247,7 +247,7 @@ describe('Accordion', () => {
 
     it('applies data-cl-disabled on item and trigger', () => {
       render(
-        <Accordion>
+        <Accordion.Root>
           <Accordion.Item
             value='item1'
             disabled
@@ -257,7 +257,7 @@ describe('Accordion', () => {
             </Accordion.Header>
             <Accordion.Panel>Content</Accordion.Panel>
           </Accordion.Item>
-        </Accordion>,
+        </Accordion.Root>,
       );
 
       const item = document.querySelector('[data-cl-slot="accordion-item"]');
@@ -337,7 +337,7 @@ describe('Accordion', () => {
     it('Home skips disabled triggers', async () => {
       const user = userEvent.setup();
       render(
-        <Accordion>
+        <Accordion.Root>
           <Accordion.Item
             value='item1'
             disabled
@@ -359,7 +359,7 @@ describe('Accordion', () => {
             </Accordion.Header>
             <Accordion.Panel>Content 3</Accordion.Panel>
           </Accordion.Item>
-        </Accordion>,
+        </Accordion.Root>,
       );
 
       const section3 = screen.getByRole('button', { name: 'Section 3' });
@@ -372,7 +372,7 @@ describe('Accordion', () => {
     it('End skips disabled triggers', async () => {
       const user = userEvent.setup();
       render(
-        <Accordion>
+        <Accordion.Root>
           <Accordion.Item value='item1'>
             <Accordion.Header>
               <Accordion.Trigger>Section 1</Accordion.Trigger>
@@ -394,7 +394,7 @@ describe('Accordion', () => {
             </Accordion.Header>
             <Accordion.Panel>Content 3</Accordion.Panel>
           </Accordion.Item>
-        </Accordion>,
+        </Accordion.Root>,
       );
 
       const section1 = screen.getByRole('button', { name: 'Section 1' });
