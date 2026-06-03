@@ -53,7 +53,12 @@ export class BillingSubscription extends BaseResource implements BillingSubscrip
     this.activeAt = unixEpochToDate(data.active_at);
     this.pastDueAt = data.past_due_at ? unixEpochToDate(data.past_due_at) : null;
 
-    this.nextPayment = data.next_payment ? billingSubscriptionNextPaymentFromJSON(data.next_payment) : undefined;
+    this.nextPayment =
+      data.next_payment === undefined
+        ? undefined
+        : data.next_payment === null
+          ? null
+          : billingSubscriptionNextPaymentFromJSON(data.next_payment);
 
     this.subscriptionItems = (data.subscription_items || []).map(item => new BillingSubscriptionItem(item));
     this.eligibleForFreeTrial = this.withDefault(data.eligible_for_free_trial, false);
