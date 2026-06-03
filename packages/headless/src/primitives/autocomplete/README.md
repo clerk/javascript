@@ -20,7 +20,7 @@ function MyAutocomplete() {
   const filtered = fruits.filter(f => f.toLowerCase().includes(inputValue.toLowerCase()));
 
   return (
-    <Autocomplete
+    <Autocomplete.Root
       inputValue={inputValue}
       onInputValueChange={setInputValue}
     >
@@ -36,7 +36,7 @@ function MyAutocomplete() {
           ))}
         </Autocomplete.Popup>
       </Autocomplete.Positioner>
-    </Autocomplete>
+    </Autocomplete.Root>
   );
 }
 ```
@@ -46,11 +46,11 @@ function MyAutocomplete() {
 Use `Autocomplete.List` when the autocomplete input lives inside an outer floating surface such as a Popover or Dialog. In this mode, the outer primitive owns placement and dismissal for the overall panel, while `Autocomplete` still owns the combobox/listbox semantics between the input and the results list.
 
 ```tsx
-<Popover>
+<Popover.Root>
   <Popover.Trigger>Pick a country</Popover.Trigger>
   <Popover.Positioner>
     <Popover.Popup>
-      <Autocomplete open>
+      <Autocomplete.Root open>
         <Autocomplete.Input
           placeholder='Search countries...'
           autoFocus
@@ -61,10 +61,10 @@ Use `Autocomplete.List` when the autocomplete input lives inside an outer floati
             label='United States'
           />
         </Autocomplete.List>
-      </Autocomplete>
+      </Autocomplete.Root>
     </Popover.Popup>
   </Popover.Positioner>
-</Popover>
+</Popover.Root>
 ```
 
 In this pattern, keep the outer `Popover` or `Dialog` as the source of truth for whether the panel is visible. `Autocomplete` should render the input and inline listbox inside that surface, and selecting an option can close the outer shell if desired.
@@ -73,7 +73,7 @@ In this pattern, keep the outer `Popover` or `Dialog` as the source of truth for
 
 | Part                      | Default Element | Description                              |
 | ------------------------- | --------------- | ---------------------------------------- |
-| `Autocomplete`            | —               | Root context provider                    |
+| `Autocomplete.Root`       | —               | Root context provider                    |
 | `Autocomplete.Input`      | `<input>`       | Text input that drives filtering         |
 | `Autocomplete.Portal`     | —               | Portals children (accepts `root` prop)   |
 | `Autocomplete.Positioner` | `<div>`         | Floating positioned container            |
@@ -84,7 +84,7 @@ In this pattern, keep the outer `Popover` or `Dialog` as the source of truth for
 
 ## Props
 
-### `Autocomplete` (root)
+### `Autocomplete.Root`
 
 | Prop                 | Type                      | Default          | Description                           |
 | -------------------- | ------------------------- | ---------------- | ------------------------------------- |
