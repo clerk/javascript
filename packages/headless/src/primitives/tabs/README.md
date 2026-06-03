@@ -13,7 +13,7 @@ A tabbed interface with automatic or manual activation, keyboard navigation, and
 ```tsx
 import { Tabs } from '@/primitives/tabs';
 
-<Tabs defaultValue='tab1'>
+<Tabs.Root defaultValue='tab1'>
   <Tabs.List>
     <Tabs.Tab value='tab1'>Account</Tabs.Tab>
     <Tabs.Tab value='tab2'>Security</Tabs.Tab>
@@ -23,7 +23,7 @@ import { Tabs } from '@/primitives/tabs';
   <Tabs.Panel value='tab1'>Account settings content</Tabs.Panel>
   <Tabs.Panel value='tab2'>Security settings content</Tabs.Panel>
   <Tabs.Panel value='tab3'>Notification preferences content</Tabs.Panel>
-</Tabs>;
+</Tabs.Root>;
 ```
 
 ### Controlled
@@ -36,7 +36,7 @@ const [value, setValue] = useState('tab1');
   onValueChange={setValue}
 >
   {/* ... */}
-</Tabs>;
+</Tabs.Root>;
 ```
 
 ### Manual Activation
@@ -44,20 +44,20 @@ const [value, setValue] = useState('tab1');
 By default, arrowing to a tab immediately activates it. Use `activationMode="manual"` to require Enter/Space:
 
 ```tsx
-<Tabs activationMode='manual'>{/* Arrow keys move focus, Enter/Space activates */}</Tabs>
+<Tabs.Root activationMode='manual'>{/* Arrow keys move focus, Enter/Space activates */}</Tabs.Root>
 ```
 
 ### Vertical Orientation
 
 ```tsx
-<Tabs orientation='vertical'>{/* Arrow Up/Down navigates instead of Left/Right */}</Tabs>
+<Tabs.Root orientation='vertical'>{/* Arrow Up/Down navigates instead of Left/Right */}</Tabs.Root>
 ```
 
 ## Parts
 
 | Part             | Default Element | Description                                        |
 | ---------------- | --------------- | -------------------------------------------------- |
-| `Tabs`           | —               | Root context provider                              |
+| `Tabs.Root`      | —               | Root context provider                              |
 | `Tabs.List`      | `<div>`         | Container for tabs (`role="tablist"`)              |
 | `Tabs.Tab`       | `<button>`      | A tab trigger inside `Tabs.List` (`role="tab"`)    |
 | `Tabs.Trigger`   | `<button>`      | Standalone tab trigger for use outside `Tabs.List` |
@@ -66,7 +66,7 @@ By default, arrowing to a tab immediately activates it. Use `activationMode="man
 
 ## Props
 
-### `Tabs` (root)
+### `Tabs.Root`
 
 | Prop             | Type                         | Default        | Description                               |
 | ---------------- | ---------------------------- | -------------- | ----------------------------------------- |
