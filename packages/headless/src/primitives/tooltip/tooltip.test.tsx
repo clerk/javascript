@@ -2,13 +2,13 @@ import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { axe } from '../../test-utils/axe';
-import { Tooltip } from './tooltip';
+import { Tooltip } from './index';
 
 afterEach(() => cleanup());
 
-function renderTooltip(props: Partial<React.ComponentProps<typeof Tooltip>> = {}) {
+function renderTooltip(props: Partial<React.ComponentProps<typeof Tooltip.Root>> = {}) {
   return render(
-    <Tooltip
+    <Tooltip.Root
       delay={0}
       {...props}
     >
@@ -16,7 +16,7 @@ function renderTooltip(props: Partial<React.ComponentProps<typeof Tooltip>> = {}
       <Tooltip.Positioner>
         <Tooltip.Popup>Tooltip content</Tooltip.Popup>
       </Tooltip.Positioner>
-    </Tooltip>,
+    </Tooltip.Root>,
   );
 }
 
@@ -246,18 +246,18 @@ describe('Tooltip', () => {
     function renderTooltipGroup() {
       return render(
         <Tooltip.Group delay={{ open: 0, close: 0 }}>
-          <Tooltip delay={0}>
+          <Tooltip.Root delay={0}>
             <Tooltip.Trigger>Button A</Tooltip.Trigger>
             <Tooltip.Positioner>
               <Tooltip.Popup>Tooltip A</Tooltip.Popup>
             </Tooltip.Positioner>
-          </Tooltip>
-          <Tooltip delay={0}>
+          </Tooltip.Root>
+          <Tooltip.Root delay={0}>
             <Tooltip.Trigger>Button B</Tooltip.Trigger>
             <Tooltip.Positioner>
               <Tooltip.Popup>Tooltip B</Tooltip.Popup>
             </Tooltip.Positioner>
-          </Tooltip>
+          </Tooltip.Root>
         </Tooltip.Group>,
       );
     }

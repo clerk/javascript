@@ -1,3 +1,5 @@
+export * as Tooltip from './parts';
+
 export type {
   TooltipArrowProps,
   TooltipGroupProps,
@@ -6,5 +8,4 @@ export type {
   TooltipPositionerProps,
   TooltipProps,
   TooltipTriggerProps,
-} from './tooltip';
-export { Tooltip } from './tooltip';
+} from './parts';
