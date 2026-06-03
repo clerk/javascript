@@ -2,13 +2,13 @@ import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { axe } from '../../test-utils/axe';
-import { Tabs } from './tabs';
+import { Tabs } from './index';
 
 afterEach(() => cleanup());
 
-function renderTabs(props: Partial<React.ComponentProps<typeof Tabs>> = {}) {
+function renderTabs(props: Partial<React.ComponentProps<typeof Tabs.Root>> = {}) {
   return render(
-    <Tabs
+    <Tabs.Root
       defaultValue='tab1'
       {...props}
     >
@@ -20,7 +20,7 @@ function renderTabs(props: Partial<React.ComponentProps<typeof Tabs>> = {}) {
       <Tabs.Panel value='tab1'>Account content</Tabs.Panel>
       <Tabs.Panel value='tab2'>Settings content</Tabs.Panel>
       <Tabs.Panel value='tab3'>Billing content</Tabs.Panel>
-    </Tabs>,
+    </Tabs.Root>,
   );
 }
 
@@ -233,7 +233,7 @@ describe('Tabs', () => {
     it('Home skips disabled tabs', async () => {
       const user = userEvent.setup();
       render(
-        <Tabs defaultValue='tab3'>
+        <Tabs.Root defaultValue='tab3'>
           <Tabs.List>
             <Tabs.Tab
               value='tab1'
@@ -247,7 +247,7 @@ describe('Tabs', () => {
           <Tabs.Panel value='tab1'>Panel 1</Tabs.Panel>
           <Tabs.Panel value='tab2'>Panel 2</Tabs.Panel>
           <Tabs.Panel value='tab3'>Panel 3</Tabs.Panel>
-        </Tabs>,
+        </Tabs.Root>,
       );
 
       await user.click(screen.getByText('Third'));
@@ -295,7 +295,7 @@ describe('Tabs', () => {
   describe('disabled tab', () => {
     function renderWithDisabled() {
       return render(
-        <Tabs defaultValue='tab1'>
+        <Tabs.Root defaultValue='tab1'>
           <Tabs.List>
             <Tabs.Tab value='tab1'>Account</Tabs.Tab>
             <Tabs.Tab
@@ -309,7 +309,7 @@ describe('Tabs', () => {
           <Tabs.Panel value='tab1'>Account content</Tabs.Panel>
           <Tabs.Panel value='tab2'>Settings content</Tabs.Panel>
           <Tabs.Panel value='tab3'>Billing content</Tabs.Panel>
-        </Tabs>,
+        </Tabs.Root>,
       );
     }
 
@@ -347,7 +347,7 @@ describe('Tabs', () => {
   describe('Tabs.Indicator', () => {
     function renderWithIndicator() {
       return render(
-        <Tabs defaultValue='tab1'>
+        <Tabs.Root defaultValue='tab1'>
           <Tabs.List style={{ position: 'relative' }}>
             <Tabs.Tab value='tab1'>Account</Tabs.Tab>
             <Tabs.Tab value='tab2'>Settings</Tabs.Tab>
@@ -355,7 +355,7 @@ describe('Tabs', () => {
           </Tabs.List>
           <Tabs.Panel value='tab1'>Account content</Tabs.Panel>
           <Tabs.Panel value='tab2'>Settings content</Tabs.Panel>
-        </Tabs>,
+        </Tabs.Root>,
       );
     }
 

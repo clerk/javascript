@@ -1,3 +1,5 @@
+export * as Tabs from './parts';
+
 export type {
   TabsIndicatorProps,
   TabsListProps,
@@ -5,5 +7,4 @@ export type {
   TabsProps,
   TabsTabProps,
   TabsTriggerProps,
-} from './tabs';
-export { Tabs } from './tabs';
+} from './parts';
