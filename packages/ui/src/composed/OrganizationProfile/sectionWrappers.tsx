@@ -1,28 +1,21 @@
-import { useContext, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 import { Protect } from '../../common';
-import { assertContextExists } from '../../contexts/utils';
 import {
   OrganizationDeleteSection,
   OrganizationDomainsSection,
   OrganizationLeaveSection,
   OrganizationProfileSection,
 } from '../../components/OrganizationProfile/OrganizationGeneralPage';
-import { PageContext } from '../PageContext';
-
-function useAssertPage(componentName: string) {
-  const page = useContext(PageContext);
-  assertContextExists(page, componentName);
-  return page;
-}
+import { useRequirePage } from '../useRequirePage';
 
 export function GeneralOrganizationProfile(): ReactNode {
-  useAssertPage('GeneralOrganizationProfile');
+  if (!useRequirePage('GeneralOrganizationProfile')) return null;
   return <OrganizationProfileSection />;
 }
 
 export function GeneralVerifiedDomains(): ReactNode {
-  useAssertPage('GeneralVerifiedDomains');
+  if (!useRequirePage('GeneralVerifiedDomains')) return null;
   return (
     <Protect permission='org:sys_domains:read'>
       <OrganizationDomainsSection />
@@ -31,11 +24,11 @@ export function GeneralVerifiedDomains(): ReactNode {
 }
 
 export function GeneralLeaveOrganization(): ReactNode {
-  useAssertPage('GeneralLeaveOrganization');
+  if (!useRequirePage('GeneralLeaveOrganization')) return null;
   return <OrganizationLeaveSection />;
 }
 
 export function GeneralDeleteOrganization(): ReactNode {
-  useAssertPage('GeneralDeleteOrganization');
+  if (!useRequirePage('GeneralDeleteOrganization')) return null;
   return <OrganizationDeleteSection />;
 }
