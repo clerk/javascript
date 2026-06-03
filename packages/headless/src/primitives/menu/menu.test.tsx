@@ -2,7 +2,7 @@ import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { axe } from '../../test-utils/axe';
-import { Menu } from './menu';
+import { Menu } from './index';
 
 afterEach(() => cleanup());
 
@@ -10,14 +10,14 @@ describe('Menu', () => {
   describe('slot attributes', () => {
     it('renders trigger with data-cl-slot', () => {
       render(
-        <Menu>
+        <Menu.Root>
           <Menu.Trigger>Actions</Menu.Trigger>
           <Menu.Positioner>
             <Menu.Popup>
               <Menu.Item label='Cut'>Cut</Menu.Item>
             </Menu.Popup>
           </Menu.Positioner>
-        </Menu>,
+        </Menu.Root>,
       );
       expect(screen.getByText('Actions')).toHaveAttribute('data-cl-slot', 'menu-trigger');
     });
@@ -25,7 +25,7 @@ describe('Menu', () => {
     it('renders all parts with correct slot attributes when open', async () => {
       const user = userEvent.setup();
       render(
-        <Menu>
+        <Menu.Root>
           <Menu.Trigger>Actions</Menu.Trigger>
           <Menu.Positioner>
             <Menu.Popup>
@@ -34,7 +34,7 @@ describe('Menu', () => {
               <Menu.Item label='Paste'>Paste</Menu.Item>
             </Menu.Popup>
           </Menu.Positioner>
-        </Menu>,
+        </Menu.Root>,
       );
 
       await user.click(screen.getByText('Actions'));
@@ -50,14 +50,14 @@ describe('Menu', () => {
     it('opens on trigger click', async () => {
       const user = userEvent.setup();
       render(
-        <Menu>
+        <Menu.Root>
           <Menu.Trigger>Actions</Menu.Trigger>
           <Menu.Positioner>
             <Menu.Popup>
               <Menu.Item label='Cut'>Cut</Menu.Item>
             </Menu.Popup>
           </Menu.Positioner>
-        </Menu>,
+        </Menu.Root>,
       );
 
       await user.click(screen.getByText('Actions'));
@@ -69,14 +69,14 @@ describe('Menu', () => {
     it('closes on trigger click when open', async () => {
       const user = userEvent.setup();
       render(
-        <Menu>
+        <Menu.Root>
           <Menu.Trigger>Actions</Menu.Trigger>
           <Menu.Positioner>
             <Menu.Popup>
               <Menu.Item label='Cut'>Cut</Menu.Item>
             </Menu.Popup>
           </Menu.Positioner>
-        </Menu>,
+        </Menu.Root>,
       );
 
       await user.click(screen.getByText('Actions'));
@@ -88,14 +88,14 @@ describe('Menu', () => {
     it('closes on Escape', async () => {
       const user = userEvent.setup();
       render(
-        <Menu>
+        <Menu.Root>
           <Menu.Trigger>Actions</Menu.Trigger>
           <Menu.Positioner>
             <Menu.Popup>
               <Menu.Item label='Cut'>Cut</Menu.Item>
             </Menu.Popup>
           </Menu.Positioner>
-        </Menu>,
+        </Menu.Root>,
       );
 
       await user.click(screen.getByText('Actions'));
@@ -108,7 +108,7 @@ describe('Menu', () => {
       const onClick = vi.fn();
       const user = userEvent.setup();
       render(
-        <Menu>
+        <Menu.Root>
           <Menu.Trigger>Actions</Menu.Trigger>
           <Menu.Positioner>
             <Menu.Popup>
@@ -120,7 +120,7 @@ describe('Menu', () => {
               </Menu.Item>
             </Menu.Popup>
           </Menu.Positioner>
-        </Menu>,
+        </Menu.Root>,
       );
 
       await user.click(screen.getByText('Actions'));
@@ -133,7 +133,7 @@ describe('Menu', () => {
     it('does not close on item click when closeOnClick=false', async () => {
       const user = userEvent.setup();
       render(
-        <Menu>
+        <Menu.Root>
           <Menu.Trigger>Actions</Menu.Trigger>
           <Menu.Positioner>
             <Menu.Popup>
@@ -145,7 +145,7 @@ describe('Menu', () => {
               </Menu.Item>
             </Menu.Popup>
           </Menu.Positioner>
-        </Menu>,
+        </Menu.Root>,
       );
 
       await user.click(screen.getByText('Actions'));
@@ -158,14 +158,14 @@ describe('Menu', () => {
       const onOpenChange = vi.fn();
       const user = userEvent.setup();
       render(
-        <Menu onOpenChange={onOpenChange}>
+        <Menu.Root onOpenChange={onOpenChange}>
           <Menu.Trigger>Actions</Menu.Trigger>
           <Menu.Positioner>
             <Menu.Popup>
               <Menu.Item label='Cut'>Cut</Menu.Item>
             </Menu.Popup>
           </Menu.Positioner>
-        </Menu>,
+        </Menu.Root>,
       );
 
       await user.click(screen.getByText('Actions'));
@@ -178,7 +178,7 @@ describe('Menu', () => {
       const onClick = vi.fn();
       const user = userEvent.setup();
       render(
-        <Menu>
+        <Menu.Root>
           <Menu.Trigger>Actions</Menu.Trigger>
           <Menu.Positioner>
             <Menu.Popup>
@@ -191,7 +191,7 @@ describe('Menu', () => {
               <Menu.Item label='Copy'>Copy</Menu.Item>
             </Menu.Popup>
           </Menu.Positioner>
-        </Menu>,
+        </Menu.Root>,
       );
 
       await user.click(screen.getByText('Actions'));
@@ -203,14 +203,14 @@ describe('Menu', () => {
     it('items are buttons with role=menuitem', async () => {
       const user = userEvent.setup();
       render(
-        <Menu>
+        <Menu.Root>
           <Menu.Trigger>Actions</Menu.Trigger>
           <Menu.Positioner>
             <Menu.Popup>
               <Menu.Item label='Cut'>Cut</Menu.Item>
             </Menu.Popup>
           </Menu.Positioner>
-        </Menu>,
+        </Menu.Root>,
       );
 
       await user.click(screen.getByText('Actions'));
@@ -225,7 +225,7 @@ describe('Menu', () => {
     it('marks disabled item with data-cl-disabled', async () => {
       const user = userEvent.setup();
       render(
-        <Menu>
+        <Menu.Root>
           <Menu.Trigger>Actions</Menu.Trigger>
           <Menu.Positioner>
             <Menu.Popup>
@@ -237,7 +237,7 @@ describe('Menu', () => {
               </Menu.Item>
             </Menu.Popup>
           </Menu.Positioner>
-        </Menu>,
+        </Menu.Root>,
       );
 
       await user.click(screen.getByText('Actions'));
@@ -248,7 +248,7 @@ describe('Menu', () => {
     it('disabled item has aria-disabled', async () => {
       const user = userEvent.setup();
       render(
-        <Menu>
+        <Menu.Root>
           <Menu.Trigger>Actions</Menu.Trigger>
           <Menu.Positioner>
             <Menu.Popup>
@@ -260,7 +260,7 @@ describe('Menu', () => {
               </Menu.Item>
             </Menu.Popup>
           </Menu.Positioner>
-        </Menu>,
+        </Menu.Root>,
       );
 
       await user.click(screen.getByText('Actions'));
@@ -271,7 +271,7 @@ describe('Menu', () => {
     it('does not close menu when clicking disabled item', async () => {
       const user = userEvent.setup();
       render(
-        <Menu>
+        <Menu.Root>
           <Menu.Trigger>Actions</Menu.Trigger>
           <Menu.Positioner>
             <Menu.Popup>
@@ -283,7 +283,7 @@ describe('Menu', () => {
               </Menu.Item>
             </Menu.Popup>
           </Menu.Positioner>
-        </Menu>,
+        </Menu.Root>,
       );
 
       await user.click(screen.getByText('Actions'));
@@ -297,7 +297,7 @@ describe('Menu', () => {
     it('navigates items with ArrowDown', async () => {
       const user = userEvent.setup();
       render(
-        <Menu>
+        <Menu.Root>
           <Menu.Trigger>Actions</Menu.Trigger>
           <Menu.Positioner>
             <Menu.Popup>
@@ -305,7 +305,7 @@ describe('Menu', () => {
               <Menu.Item label='Copy'>Copy</Menu.Item>
             </Menu.Popup>
           </Menu.Positioner>
-        </Menu>,
+        </Menu.Root>,
       );
 
       await user.click(screen.getByText('Actions'));
@@ -318,7 +318,7 @@ describe('Menu', () => {
     it('navigates items with ArrowUp from last to first', async () => {
       const user = userEvent.setup();
       render(
-        <Menu>
+        <Menu.Root>
           <Menu.Trigger>Actions</Menu.Trigger>
           <Menu.Positioner>
             <Menu.Popup>
@@ -326,7 +326,7 @@ describe('Menu', () => {
               <Menu.Item label='Copy'>Copy</Menu.Item>
             </Menu.Popup>
           </Menu.Positioner>
-        </Menu>,
+        </Menu.Root>,
       );
 
       await user.click(screen.getByText('Actions'));
@@ -339,7 +339,7 @@ describe('Menu', () => {
     it('Home moves to first item', async () => {
       const user = userEvent.setup();
       render(
-        <Menu>
+        <Menu.Root>
           <Menu.Trigger>Actions</Menu.Trigger>
           <Menu.Positioner>
             <Menu.Popup>
@@ -348,7 +348,7 @@ describe('Menu', () => {
               <Menu.Item label='Paste'>Paste</Menu.Item>
             </Menu.Popup>
           </Menu.Positioner>
-        </Menu>,
+        </Menu.Root>,
       );
 
       await user.click(screen.getByText('Actions'));
@@ -361,7 +361,7 @@ describe('Menu', () => {
     it('End moves to last item', async () => {
       const user = userEvent.setup();
       render(
-        <Menu>
+        <Menu.Root>
           <Menu.Trigger>Actions</Menu.Trigger>
           <Menu.Positioner>
             <Menu.Popup>
@@ -370,7 +370,7 @@ describe('Menu', () => {
               <Menu.Item label='Paste'>Paste</Menu.Item>
             </Menu.Popup>
           </Menu.Positioner>
-        </Menu>,
+        </Menu.Root>,
       );
 
       await user.click(screen.getByText('Actions'));
@@ -385,14 +385,14 @@ describe('Menu', () => {
     it('returns focus to trigger on close via Escape', async () => {
       const user = userEvent.setup();
       render(
-        <Menu>
+        <Menu.Root>
           <Menu.Trigger>Actions</Menu.Trigger>
           <Menu.Positioner>
             <Menu.Popup>
               <Menu.Item label='Cut'>Cut</Menu.Item>
             </Menu.Popup>
           </Menu.Positioner>
-        </Menu>,
+        </Menu.Root>,
       );
 
       await user.click(screen.getByText('Actions'));
@@ -404,14 +404,14 @@ describe('Menu', () => {
     it('returns focus to trigger on item click', async () => {
       const user = userEvent.setup();
       render(
-        <Menu>
+        <Menu.Root>
           <Menu.Trigger>Actions</Menu.Trigger>
           <Menu.Positioner>
             <Menu.Popup>
               <Menu.Item label='Cut'>Cut</Menu.Item>
             </Menu.Popup>
           </Menu.Positioner>
-        </Menu>,
+        </Menu.Root>,
       );
 
       await user.click(screen.getByText('Actions'));
@@ -425,14 +425,14 @@ describe('Menu', () => {
     it('trigger has aria-expanded', async () => {
       const user = userEvent.setup();
       render(
-        <Menu>
+        <Menu.Root>
           <Menu.Trigger>Actions</Menu.Trigger>
           <Menu.Positioner>
             <Menu.Popup>
               <Menu.Item label='Cut'>Cut</Menu.Item>
             </Menu.Popup>
           </Menu.Positioner>
-        </Menu>,
+        </Menu.Root>,
       );
 
       expect(screen.getByText('Actions')).toHaveAttribute('aria-expanded', 'false');
@@ -445,14 +445,14 @@ describe('Menu', () => {
     it('popup has role=menu', async () => {
       const user = userEvent.setup();
       render(
-        <Menu>
+        <Menu.Root>
           <Menu.Trigger>Actions</Menu.Trigger>
           <Menu.Positioner>
             <Menu.Popup>
               <Menu.Item label='Cut'>Cut</Menu.Item>
             </Menu.Popup>
           </Menu.Positioner>
-        </Menu>,
+        </Menu.Root>,
       );
 
       await user.click(screen.getByText('Actions'));
@@ -462,14 +462,14 @@ describe('Menu', () => {
 
     it('trigger has aria-haspopup', () => {
       render(
-        <Menu>
+        <Menu.Root>
           <Menu.Trigger>Actions</Menu.Trigger>
           <Menu.Positioner>
             <Menu.Popup>
               <Menu.Item label='Cut'>Cut</Menu.Item>
             </Menu.Popup>
           </Menu.Positioner>
-        </Menu>,
+        </Menu.Root>,
       );
       expect(screen.getByText('Actions')).toHaveAttribute('aria-haspopup');
     });
@@ -477,7 +477,7 @@ describe('Menu', () => {
     it('items have role=menuitem', async () => {
       const user = userEvent.setup();
       render(
-        <Menu>
+        <Menu.Root>
           <Menu.Trigger>Actions</Menu.Trigger>
           <Menu.Positioner>
             <Menu.Popup>
@@ -485,7 +485,7 @@ describe('Menu', () => {
               <Menu.Item label='Copy'>Copy</Menu.Item>
             </Menu.Popup>
           </Menu.Positioner>
-        </Menu>,
+        </Menu.Root>,
       );
 
       await user.click(screen.getByText('Actions'));
@@ -496,7 +496,7 @@ describe('Menu', () => {
     it('separator has role=separator', async () => {
       const user = userEvent.setup();
       render(
-        <Menu>
+        <Menu.Root>
           <Menu.Trigger>Actions</Menu.Trigger>
           <Menu.Positioner>
             <Menu.Popup>
@@ -505,7 +505,7 @@ describe('Menu', () => {
               <Menu.Item label='Paste'>Paste</Menu.Item>
             </Menu.Popup>
           </Menu.Positioner>
-        </Menu>,
+        </Menu.Root>,
       );
 
       await user.click(screen.getByText('Actions'));
@@ -518,22 +518,22 @@ describe('Menu', () => {
     it('renders submenu trigger as menuitem', async () => {
       const user = userEvent.setup();
       render(
-        <Menu>
+        <Menu.Root>
           <Menu.Trigger>Actions</Menu.Trigger>
           <Menu.Positioner>
             <Menu.Popup>
               <Menu.Item label='Cut'>Cut</Menu.Item>
-              <Menu>
+              <Menu.Root>
                 <Menu.Trigger>Share</Menu.Trigger>
                 <Menu.Positioner>
                   <Menu.Popup>
                     <Menu.Item label='Email'>Email</Menu.Item>
                   </Menu.Popup>
                 </Menu.Positioner>
-              </Menu>
+              </Menu.Root>
             </Menu.Popup>
           </Menu.Positioner>
-        </Menu>,
+        </Menu.Root>,
       );
 
       await user.click(screen.getByText('Actions'));
@@ -545,12 +545,12 @@ describe('Menu', () => {
 
     it('opens submenu via controlled open prop', () => {
       render(
-        <Menu defaultOpen>
+        <Menu.Root defaultOpen>
           <Menu.Trigger>Actions</Menu.Trigger>
           <Menu.Positioner>
             <Menu.Popup>
               <Menu.Item label='Cut'>Cut</Menu.Item>
-              <Menu defaultOpen>
+              <Menu.Root defaultOpen>
                 <Menu.Trigger>Share</Menu.Trigger>
                 <Menu.Positioner>
                   <Menu.Popup>
@@ -558,10 +558,10 @@ describe('Menu', () => {
                     <Menu.Item label='Slack'>Slack</Menu.Item>
                   </Menu.Popup>
                 </Menu.Positioner>
-              </Menu>
+              </Menu.Root>
             </Menu.Popup>
           </Menu.Positioner>
-        </Menu>,
+        </Menu.Root>,
       );
 
       expect(screen.getByText('Email')).toBeInTheDocument();
@@ -572,11 +572,11 @@ describe('Menu', () => {
       const onClick = vi.fn();
       const user = userEvent.setup();
       render(
-        <Menu defaultOpen>
+        <Menu.Root defaultOpen>
           <Menu.Trigger>Actions</Menu.Trigger>
           <Menu.Positioner>
             <Menu.Popup>
-              <Menu defaultOpen>
+              <Menu.Root defaultOpen>
                 <Menu.Trigger>Share</Menu.Trigger>
                 <Menu.Positioner>
                   <Menu.Popup>
@@ -588,10 +588,10 @@ describe('Menu', () => {
                     </Menu.Item>
                   </Menu.Popup>
                 </Menu.Positioner>
-              </Menu>
+              </Menu.Root>
             </Menu.Popup>
           </Menu.Positioner>
-        </Menu>,
+        </Menu.Root>,
       );
 
       await user.click(screen.getByText('Email'));
@@ -603,14 +603,14 @@ describe('Menu', () => {
   describe('positioner', () => {
     it('not rendered when closed', () => {
       render(
-        <Menu>
+        <Menu.Root>
           <Menu.Trigger>Actions</Menu.Trigger>
           <Menu.Positioner>
             <Menu.Popup>
               <Menu.Item label='Cut'>Cut</Menu.Item>
             </Menu.Popup>
           </Menu.Positioner>
-        </Menu>,
+        </Menu.Root>,
       );
 
       expect(document.querySelector('[data-cl-slot="menu-positioner"]')).not.toBeInTheDocument();
@@ -619,14 +619,14 @@ describe('Menu', () => {
     it('has data-cl-side when open', async () => {
       const user = userEvent.setup();
       render(
-        <Menu>
+        <Menu.Root>
           <Menu.Trigger>Actions</Menu.Trigger>
           <Menu.Positioner>
             <Menu.Popup>
               <Menu.Item label='Cut'>Cut</Menu.Item>
             </Menu.Popup>
           </Menu.Positioner>
-        </Menu>,
+        </Menu.Root>,
       );
 
       await user.click(screen.getByText('Actions'));
@@ -638,7 +638,7 @@ describe('Menu', () => {
   describe('accessibility (axe)', () => {
     it('has no violations when closed', async () => {
       const { container } = render(
-        <Menu>
+        <Menu.Root>
           <Menu.Trigger>Actions</Menu.Trigger>
           <Menu.Positioner>
             <Menu.Popup>
@@ -646,7 +646,7 @@ describe('Menu', () => {
               <Menu.Item label='Copy'>Copy</Menu.Item>
             </Menu.Popup>
           </Menu.Positioner>
-        </Menu>,
+        </Menu.Root>,
       );
       expect(await axe(container)).toHaveNoViolations();
     });
@@ -654,7 +654,7 @@ describe('Menu', () => {
     it('has no violations when open', async () => {
       const user = userEvent.setup();
       render(
-        <Menu>
+        <Menu.Root>
           <Menu.Trigger>Actions</Menu.Trigger>
           <Menu.Positioner>
             <Menu.Popup>
@@ -662,7 +662,7 @@ describe('Menu', () => {
               <Menu.Item label='Copy'>Copy</Menu.Item>
             </Menu.Popup>
           </Menu.Positioner>
-        </Menu>,
+        </Menu.Root>,
       );
 
       await user.click(screen.getByText('Actions'));
