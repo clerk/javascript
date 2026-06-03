@@ -1,0 +1,21 @@
+### `create()`
+
+Creates a new API key.
+
+Returns an [`APIKeyResource`](/docs/reference/types/api-key-resource) object that includes the `secret` property.
+> [!WARNING]
+> Make sure to store the API key secret immediately after creation, as it will not be available again.
+
+```typescript
+function create(params: CreateAPIKeyParams): Promise<APIKeyResource>
+```
+
+#### `CreateAPIKeyParams`
+
+
+| Property | Type | Description |
+| ------ | ------ | ------ |
+| <a id="description"></a> `description?` | `string` | The description of the API key. |
+| <a id="name"></a> `name` | `string` | The name of the API key. |
+| <a id="secondsuntilexpiration"></a> `secondsUntilExpiration?` | `number` | The number of seconds until the API key expires. Set to `null` or omit to create a key that never expires. |
+| <a id="subject"></a> `subject?` | `string` | The user or organization ID to associate the API key with. If not provided, defaults to the [Active Organization](!active-organization), then the current User. |

@@ -98,11 +98,11 @@ type internalStripeAppearance = {
  */
 export type PaymentElementProviderProps = {
   /**
-   * An optional checkout resource object. When provided, the payment element is scoped to the specific checkout session.
+   * A checkout resource object. When provided, the payment element is scoped to the specific checkout session.
    */
   checkout?: CheckoutFlowResource | BillingCheckoutResource | ReturnType<typeof useCheckout>['checkout'];
   /**
-   * An optional object to customize the appearance of the Stripe Payment Element. This allows you to match the form's styling to your application's theme.
+   * An object to customize the appearance of the Stripe Payment Element. This allows you to match the form's styling to your application's theme.
    */
   stripeAppearance?: internalStripeAppearance;
   /**
@@ -112,7 +112,7 @@ export type PaymentElementProviderProps = {
    */
   for?: ForPayerType;
   /**
-   * An optional description to display to the user within the payment element UI.
+   * A description to display to the user within the payment element UI.
    */
   paymentDescription?: string;
 };
@@ -294,7 +294,7 @@ export type UsePaymentElementReturn = {
    */
   reset: () => Promise<void>;
   /**
-   * A boolean that indicates if the payment form UI has been rendered and is ready for user input. This is useful for disabling a submit button until the form is interactive.
+   * Indicates whether the payment form UI has been rendered and is ready for user input. This is useful for disabling a submit button until the form is interactive.
    */
   isFormReady: boolean;
 } & (
@@ -306,7 +306,7 @@ export type UsePaymentElementReturn = {
         name: 'stripe';
       };
       /**
-       * A boolean that indicates if the underlying payment provider (e.g. Stripe) has been fully initialized.
+       * Indicates whether the underlying payment provider (e.g. Stripe) has been fully initialized.
        */
       isProviderReady: true;
     }

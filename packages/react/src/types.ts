@@ -53,11 +53,11 @@ export type ClerkProviderProps<TUi extends Ui = Ui> = Omit<
    */
   __internal_bypassMissingPublishableKey?: boolean;
   /**
-   * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
+   * An object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
    */
   appearance?: ExtractAppearanceType<TUi, Appearance>;
   /**
-   * Optional object to use the bundled Clerk UI instead of loading from CDN.
+   * An object to use the bundled Clerk UI instead of loading from CDN.
    * Import `ui` from `@clerk/ui` and pass it here to bundle the UI with your application.
    * When omitted, UI is loaded from Clerk's CDN.
    * Note: When `ui` is used, appearance is automatically typed based on the specific UI version.
