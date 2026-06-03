@@ -396,7 +396,7 @@ export const makeAuthObjectSerializable = <T extends Record<string, unknown>>(ob
  *
  * @param sessionId - The ID of the session
  * @param template - The JWT template name to use for token generation
- * @param expiresInSeconds - Optional expiration time in seconds for the token
+ * @param expiresInSeconds - The expiration time in seconds for the token
  * @returns A promise that resolves to the token string
  */
 type TokenFetcher = (sessionId: string, template?: string, expiresInSeconds?: number) => Promise<string>;
@@ -412,8 +412,7 @@ type CreateGetToken = (params: { sessionId: string; sessionToken: string; fetche
 /**
  * Creates a token retrieval function for authenticated sessions.
  *
- * This factory function returns a getToken function that can either return the raw session token
- * or generate a JWT using a specified template with optional custom expiration.
+ * This factory function returns a getToken function that can either return the raw session token or generate a JWT using a specified template with custom expiration.
  *
  * @param params - Configuration object
  * @param params.sessionId - The session ID for token generation
