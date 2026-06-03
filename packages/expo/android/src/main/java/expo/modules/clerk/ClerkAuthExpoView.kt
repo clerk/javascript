@@ -117,7 +117,7 @@ class ClerkAuthNativeView(context: Context) : FrameLayout(context) {
         val currentId = currentSession?.id
         if (currentSession != null && currentId != initialSessionId && !authCompletedSent) {
           debugLog(TAG, "Auth completed - new session: $currentId (initial: $initialSessionId)")
-          emitAuthStateChange(currentSession.id)
+          emitRefreshClient()
         }
       }
 
@@ -132,7 +132,9 @@ class ClerkAuthNativeView(context: Context) : FrameLayout(context) {
               modifier = Modifier.fillMaxSize(),
               clerkTheme = Clerk.customTheme,
               onAuthComplete = {
-                Clerk.session?.id?.let(::emitAuthStateChange)
+                if (Clerk.session?.id != null) {
+                  emitRefreshClient()
+                }
                 if (isDismissible) {
                   sendDismissEvent()
                 }
@@ -185,9 +187,9 @@ class ClerkAuthNativeView(context: Context) : FrameLayout(context) {
     sendEvent("dismissed")
   }
 
-  private fun emitAuthStateChange(sessionId: String) {
+  private fun emitRefreshClient() {
     if (authCompletedSent) return
     authCompletedSent = true
-    ClerkExpoModule.emitAuthStateChange("signedIn", sessionId)
+    ClerkExpoModule.emitRefreshClient()
   }
 }

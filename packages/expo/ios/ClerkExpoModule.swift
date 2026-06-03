@@ -41,7 +41,7 @@ class ClerkExpoModule: RCTEventEmitter {
   }
 
   override func supportedEvents() -> [String]! {
-    return ["onAuthStateChange"]
+    return ["refreshClient"]
   }
 
   override func startObserving() {
@@ -52,14 +52,11 @@ class ClerkExpoModule: RCTEventEmitter {
     ClerkExpoModule._hasListeners = false
   }
 
-  /// Emits an onAuthStateChange event to JS from anywhere in the native layer.
-  /// Used by native views to notify ClerkProvider of auth state changes.
-  static func emitAuthStateChange(type: ClerkNativeAuthStateEvent, sessionId: String?) {
+  /// Emits a refreshClient event to JS from anywhere in the native layer.
+  /// Used by native views to ask ClerkProvider to reload JS client state.
+  static func emitRefreshClient() {
     guard _hasListeners, let instance = sharedInstance else { return }
-    instance.sendEvent(withName: "onAuthStateChange", body: [
-      "type": type.rawValue,
-      "sessionId": sessionId as Any,
-    ])
+    instance.sendEvent(withName: "refreshClient", body: nil)
   }
 
   // MARK: - configure

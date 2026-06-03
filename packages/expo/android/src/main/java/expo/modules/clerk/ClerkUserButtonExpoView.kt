@@ -83,7 +83,7 @@ class ClerkUserButtonNativeView(context: Context) : FrameLayout(context) {
           } catch (e: Exception) {
             Log.w(USER_BUTTON_TAG, "Client refresh after UserButton sign-out failed: ${e.message}")
           }
-          ClerkExpoModule.emitAuthStateChange("signedOut", null)
+          ClerkExpoModule.emitRefreshClient()
         }
         if (session != null) {
           hadSession = true

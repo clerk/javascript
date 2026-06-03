@@ -10,7 +10,7 @@ Align `AuthView` dismissal with the native SDK lifecycle. App code now owns pres
 
 Separate native view events from auth-state sync events. Expo host views now forward only dismissal through the view event channel, while sign-in and sign-out updates use the internal native auth-state sync channel.
 
-When auth state changes on one side of the Expo bridge, the opposite client now refreshes from Clerk instead of issuing a second sign-out.
+When auth, session, or user state changes on one side of the Expo bridge, the opposite client now refreshes from Clerk instead of issuing a second sign-out. This keeps JS and native prebuilt components synced after native profile updates, foreground client refreshes, and sign-out.
 
 Align `UserButton` with the native Clerk SDKs by wrapping the platform-native user button, letting it present the user profile from the button itself.
 

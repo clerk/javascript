@@ -89,7 +89,7 @@ class ClerkUserProfileNativeView(context: Context) : FrameLayout(context) {
           } catch (e: Exception) {
             Log.w(TAG, "Client.getSkippingClientId() after UserProfile sign-out failed: ${e.message}")
           }
-          ClerkExpoModule.emitAuthStateChange("signedOut", null)
+          ClerkExpoModule.emitRefreshClient()
         }
         if (session != null) {
           hadSession = true

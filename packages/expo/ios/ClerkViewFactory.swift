@@ -17,6 +17,7 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
   private static let clerkLoadMaxAttempts = 30
   private static let clerkLoadIntervalNs: UInt64 = 100_000_000
   private static var clerkConfigured = false
+  private static var configuredPublishableKey: String?
 
   /// Parsed light and dark themes from Info.plist "ClerkTheme" dictionary.
   var lightTheme: ClerkTheme?
@@ -53,18 +54,37 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
 
   @MainActor
   public func configure(publishableKey: String, bearerToken: String? = nil) async throws {
+    if Self.shouldReconfigure(for: publishableKey) {
+      try await Clerk.reconfigure(publishableKey: publishableKey, options: Self.makeClerkOptions())
+      Self.clerkConfigured = true
+      Self.configuredPublishableKey = publishableKey
+
+      Self.syncTokenState(bearerToken: bearerToken)
+      if !(bearerToken?.isEmpty ?? true) {
+        _ = try? await Clerk.shared.refreshClient()
+      }
+
+      await Self.waitForLoadedSession()
+      return
+    }
+
     Self.syncTokenState(bearerToken: bearerToken)
 
     // If already configured with a new bearer token, refresh the client
     // to pick up the session associated with the device token we just wrote.
-    // Clerk.configure() is a no-op on subsequent calls, so we use refreshClient().
+    // Clerk.configure() is idempotent for the same publishable key, so use refreshClient().
     if Self.shouldRefreshConfiguredClient(for: bearerToken) {
       _ = try? await Clerk.shared.refreshClient()
       await Self.waitForLoadedSession()
       return
     }
 
+    if Self.clerkConfigured {
+      return
+    }
+
     Self.clerkConfigured = true
+    Self.configuredPublishableKey = publishableKey
     Clerk.configure(publishableKey: publishableKey, options: Self.makeClerkOptions())
 
     await Self.waitForLoadedSession()
@@ -94,6 +114,11 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
 
   private static func shouldRefreshConfiguredClient(for bearerToken: String?) -> Bool {
     clerkConfigured && !(bearerToken?.isEmpty ?? true)
+  }
+
+  private static func shouldReconfigure(for publishableKey: String) -> Bool {
+    guard clerkConfigured, let configuredPublishableKey else { return false }
+    return configuredPublishableKey != publishableKey
   }
 
   private static func makeClerkOptions() -> Clerk.Options {
@@ -419,15 +444,8 @@ struct ClerkInlineUserButtonWrapperView: View {
     }
     themedView
       .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-      .task {
-        for await event in Clerk.shared.auth.events {
-          switch event {
-          case .signedOut(let session):
-            emitClerkNativeAuthStateChange(type: .signedOut, sessionId: session.id)
-          default:
-            break
-          }
-        }
+      .onChange(of: Clerk.shared.client) { _, _ in
+        emitClerkNativeRefreshClient()
       }
   }
 }
@@ -450,7 +468,7 @@ struct ClerkInlineAuthWrapperView: View {
   private func emitSignedIn(sessionId: String) {
     guard !authStateEventSent, sessionId != initialSessionId else { return }
     authStateEventSent = true
-    emitClerkNativeAuthStateChange(type: .signedIn, sessionId: sessionId)
+    emitClerkNativeRefreshClient()
     if dismissible {
       onEvent(.dismissed, [:])
     }
@@ -471,29 +489,9 @@ struct ClerkInlineAuthWrapperView: View {
 
   var body: some View {
     themedAuthView
-      // Primary detection: observe Clerk.shared.session directly (matches Android's sessionFlow approach).
-      // This is more reliable than auth.events which may not emit for inline AuthView sign-ins.
-      .onChange(of: Clerk.shared.session?.id) { _, newSessionId in
-        guard let sessionId = newSessionId else { return }
+      .onChange(of: Clerk.shared.client) { _, _ in
+        guard let sessionId = Clerk.shared.session?.id else { return }
         emitSignedIn(sessionId: sessionId)
-      }
-      // Fallback: also listen to auth.events for edge cases.
-      .task {
-        for await event in Clerk.shared.auth.events {
-          guard !authStateEventSent else { continue }
-          switch event {
-          case .signInCompleted(let signIn):
-            let sessionId = signIn.createdSessionId ?? Clerk.shared.session?.id
-            if let sessionId { emitSignedIn(sessionId: sessionId) }
-          case .signUpCompleted(let signUp):
-            let sessionId = signUp.createdSessionId ?? Clerk.shared.session?.id
-            if let sessionId { emitSignedIn(sessionId: sessionId) }
-          case .sessionChanged(_, let newSession):
-            if let sessionId = newSession?.id { emitSignedIn(sessionId: sessionId) }
-          default:
-            break
-          }
-        }
       }
   }
 }
@@ -520,15 +518,8 @@ struct ClerkInlineProfileWrapperView: View {
       }
     }
     themedView
-      .task {
-        for await event in Clerk.shared.auth.events {
-          switch event {
-          case .signedOut(let session):
-            emitClerkNativeAuthStateChange(type: .signedOut, sessionId: session.id)
-          default:
-            break
-          }
-        }
+      .onChange(of: Clerk.shared.client) { _, _ in
+        emitClerkNativeRefreshClient()
       }
   }
 }

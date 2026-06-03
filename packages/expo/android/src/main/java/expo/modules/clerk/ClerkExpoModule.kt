@@ -7,9 +7,11 @@ import androidx.compose.ui.unit.dp
 import com.clerk.api.Clerk
 import com.clerk.api.network.model.error.firstMessage
 import com.clerk.api.network.serialization.ClerkResult
+import com.clerk.api.session.Session
 import com.clerk.api.ui.ClerkColors
 import com.clerk.api.ui.ClerkDesign
 import com.clerk.api.ui.ClerkTheme
+import com.clerk.api.user.User
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
@@ -18,7 +20,9 @@ import com.facebook.react.bridge.WritableNativeMap
 import com.facebook.react.modules.core.DeviceEventManagerModule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
@@ -36,29 +40,55 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
     NativeClerkModuleSpec(reactContext) {
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
+    private var clientStateObserverJob: Job? = null
+    private var lastObservedSessions: List<Session> = emptyList()
+    private var lastObservedSession: Session? = null
+    private var lastObservedUser: User? = null
+    private var configuredPublishableKey: String? = null
 
     companion object {
         private var sharedReactContext: ReactApplicationContext? = null
         private var listenerCount = 0
 
-        fun emitAuthStateChange(type: String, sessionId: String?) {
+        fun emitRefreshClient() {
             if (listenerCount <= 0) {
                 return
             }
 
-            val event = Arguments.createMap().apply {
-                putString("type", type)
-                putString("sessionId", sessionId)
-            }
-
             sharedReactContext
                 ?.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
-                ?.emit("onAuthStateChange", event)
+                ?.emit("refreshClient", Arguments.createMap())
         }
+
     }
 
     init {
         sharedReactContext = reactContext
+    }
+
+    private fun startClientStateObserver() {
+        if (clientStateObserverJob != null) {
+            return
+        }
+
+        lastObservedSessions = Clerk.sessionsFlow.value
+        lastObservedSession = Clerk.session
+        lastObservedUser = Clerk.user
+
+        clientStateObserverJob = coroutineScope.launch {
+            combine(Clerk.sessionsFlow, Clerk.sessionFlow, Clerk.userFlow) { sessions, session, user ->
+                Triple(sessions, session, user)
+            }.collect { (sessions, session, user) ->
+                if (sessions == lastObservedSessions && session == lastObservedSession && user == lastObservedUser) {
+                    return@collect
+                }
+
+                lastObservedSessions = sessions
+                lastObservedSession = session
+                lastObservedUser = user
+                emitRefreshClient()
+            }
+        }
     }
 
     override fun getName(): String = "ClerkExpo"
@@ -90,6 +120,7 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
                     }
 
                     Clerk.initialize(reactApplicationContext, pubKey)
+                    startClientStateObserver()
                     // clerk-android registers ActivityLifecycleCallbacks during
                     // initialize(), but in React Native MainActivity has already passed
                     // onResume() by the time <ClerkProvider> mounts and we reach this
@@ -132,13 +163,63 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
                     if (error != null) {
                         promise.reject("E_INIT_FAILED", "Failed to initialize Clerk SDK: ${error.message}")
                     } else {
+                        configuredPublishableKey = pubKey
                         promise.resolve(null)
                     }
                     return@launch
                 }
 
+                val activePublishableKey = configuredPublishableKey ?: Clerk.publishableKey
+                if (activePublishableKey != null && activePublishableKey != pubKey) {
+                    Clerk.switchConfiguration(reactApplicationContext, pubKey)
+                    startClientStateObserver()
+                    getCurrentActivity()?.let { Clerk.attachActivity(it) }
+                    loadThemeFromAssets()
+
+                    try {
+                        withTimeout(10_000L) {
+                            Clerk.isInitialized.first { it }
+                        }
+                    } catch (e: TimeoutCancellationException) {
+                        val initError = Clerk.initializationError.value
+                        val message = if (initError != null) {
+                            "Clerk reconfiguration timed out: ${initError.message}"
+                        } else {
+                            "Clerk reconfiguration timed out after 10 seconds"
+                        }
+                        promise.reject("E_TIMEOUT", message)
+                        return@launch
+                    }
+
+                    val error = Clerk.initializationError.value
+                    if (error != null) {
+                        promise.reject("E_RECONFIGURE_FAILED", "Failed to reconfigure Clerk SDK: ${error.message}")
+                        return@launch
+                    }
+
+                    if (!bearerToken.isNullOrEmpty()) {
+                        val result = Clerk.updateDeviceToken(bearerToken)
+                        if (result is ClerkResult.Failure) {
+                            debugLog(TAG, "configure - updateDeviceToken after reconfigure failed: ${result.error}")
+                        }
+
+                        try {
+                            withTimeout(5_000L) {
+                                Clerk.sessionFlow.first { it != null }
+                            }
+                        } catch (_: TimeoutCancellationException) {
+                            debugLog(TAG, "configure - session did not appear after reconfigure token update")
+                        }
+                    }
+
+                    configuredPublishableKey = pubKey
+                    promise.resolve(null)
+                    return@launch
+                }
+
                 // Already initialized — use the public SDK API to update
                 // the device token and trigger a client/environment refresh.
+                startClientStateObserver()
                 if (!bearerToken.isNullOrEmpty()) {
                     val result = Clerk.updateDeviceToken(bearerToken)
                     if (result is ClerkResult.Failure) {
