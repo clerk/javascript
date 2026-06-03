@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Box, descriptors, Flex, Icon, SimpleButton, Text } from '@/customizables';
+import { Box, descriptors, Flex, Icon, SimpleButton, Text, Span } from '@/customizables';
 import { ChevronRight, Checkmark } from '@/icons';
 
 import type { StepperItemProps, StepperProps } from './types';
@@ -18,8 +18,15 @@ const Root = ({ children }: StepperProps): JSX.Element => {
       })}
     >
       {items.map((child, index) => (
-        // eslint-disable-next-line react/no-array-index-key
-        <React.Fragment key={index}>
+        <Span
+          // eslint-disable-next-line react/no-array-index-key
+          key={index}
+          sx={theme => ({
+            display: 'flex',
+            alignItems: 'center',
+            gap: theme.space.$2,
+          })}
+        >
           {child}
           {index < items.length - 1 && (
             <Icon
@@ -29,7 +36,7 @@ const Root = ({ children }: StepperProps): JSX.Element => {
               colorScheme='neutral'
             />
           )}
-        </React.Fragment>
+        </Span>
       ))}
     </Flex>
   );
@@ -88,6 +95,7 @@ const Item = ({
               fontSize: theme.fontSizes.$xs,
               fontWeight: theme.fontWeights.$medium,
               color: theme.colors.$colorBackground,
+              lineHeight: '1rem',
             })}
           >
             {bullet}

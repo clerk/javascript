@@ -1,0 +1,27 @@
+{
+  "packages": [
+    "packages/astro",
+    "packages/backend",
+    "packages/chrome-extension",
+    "packages/clerk-js",
+    "packages/expo",
+    "packages/expo-passkeys",
+    "packages/express",
+    "packages/fastify",
+    "packages/hono",
+    "packages/localizations",
+    "packages/nextjs",
+    "packages/nuxt",
+    "packages/react",
+    "packages/react-router",
+    "packages/shared",
+    "packages/tanstack-react-start",
+    "packages/testing",
+    "packages/ui",
+    "packages/vue"
+  ],
+  "snapshotDir": ".api-snapshots",
+  "mainBranch": "main",
+  "checkVersionBump": true,
+  "outputFormat": "markdown"
+}

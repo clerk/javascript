@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "build": "FORCE_COLOR=1 turbo build --concurrency=${TURBO_CONCURRENCY:-80%}",
-    "build:declarations": "FORCE_COLOR=1 turbo build:declarations --concurrency=${TURBO_CONCURRENCY:-80%} --filter=@clerk/nextjs --filter=@clerk/react --filter=@clerk/shared",
+    "build:declarations": "FORCE_COLOR=1 turbo build:declarations --concurrency=${TURBO_CONCURRENCY:-80%} --filter=@clerk/nextjs --filter=@clerk/react",
     "bundlewatch": "turbo run bundlewatch",
     "changeset": "changeset",
     "changeset:empty": "pnpm changeset --empty",
@@ -166,6 +166,7 @@
       "react-dom": "catalog:react",
       "rolldown": "catalog:repo",
       "semver@<7.7.3": "7.7.4",
+      "tar@<7.5.11": "7.5.11",
       "undici-types@<7.16.0": "7.24.8",
       "utf-8-validate": "5.0.10"
     }

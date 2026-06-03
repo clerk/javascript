@@ -28,6 +28,7 @@ export type FieldId =
   | 'apiKeySecret'
   | 'idpCertificate'
   | 'idpEntityId'
+  | 'idpMetadata'
   | 'idpMetadataUrl'
   | 'idpSsoUrl'
   | 'acsUrl'

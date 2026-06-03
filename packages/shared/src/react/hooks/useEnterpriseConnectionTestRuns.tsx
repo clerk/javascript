@@ -104,6 +104,7 @@ function useEnterpriseConnectionTestRuns(
     },
     enabled: queryEnabled,
     refetchIntervalInBackground: false,
+    refetchOnWindowFocus: false,
   });
 
   const hasRows = (query.data?.data?.length ?? 0) > 0;
