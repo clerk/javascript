@@ -12,6 +12,7 @@ import { useNativeAuthEvents } from '../hooks/useNativeAuthEvents';
 import NativeClerkModule from '../specs/NativeClerkModule';
 import { tokenCache as defaultTokenCache } from '../token-cache';
 import { isNative, isWeb } from '../utils/runtime';
+import { maybeCompleteAuthSession } from './maybeCompleteAuthSession';
 import { getClerkInstance } from './singleton';
 import type { BuildClerkOptions } from './singleton/types';
 
@@ -371,18 +372,12 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
     void syncNativeAuthToJs();
   }, [nativeAuthState, clerkInstance]);
 
+  // Needed for `useOAuth` / `useSSO` to work correctly on web — must stay synchronous during render
+  // so the redirect URL is caught before children mount. Resolves to a no-op on native via the
+  // sibling `maybeCompleteAuthSession.ts`, which keeps Metro from statically bundling
+  // `expo-web-browser` (an optional peer) for native consumers.
   if (isWeb()) {
-    // This is needed in order for useOAuth to work correctly on web.
-    // Must stay synchronous during render to catch the redirect URL before children mount.
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const WebBrowser = require('expo-web-browser');
-      WebBrowser.maybeCompleteAuthSession();
-    } catch (e) {
-      if (__DEV__) {
-        console.warn('[ClerkProvider] expo-web-browser not available, OAuth/SSO on web will not work:', e);
-      }
-    }
+    maybeCompleteAuthSession();
   }
 
   return (
