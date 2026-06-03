@@ -25,11 +25,88 @@ vi.mock('../../../utils/captcha/CaptchaChallenge', () => ({
   })),
 }));
 
+// Import the mocked CaptchaChallenge after mocking
+import { CaptchaChallenge } from '../../../utils/captcha/CaptchaChallenge';
+
 describe('SignUp', () => {
   it('can be serialized with JSON.stringify', () => {
     const signUp = new SignUp();
     const snapshot = JSON.stringify(signUp);
     expect(snapshot).toBeDefined();
+  });
+
+  describe('create', () => {
+    beforeEach(() => {
+      SignUp.clerk = {
+        __unstable__environment: {
+          displayConfig: {
+            captchaOauthBypass: [],
+          },
+        },
+      } as any;
+    });
+
+    afterEach(() => {
+      vi.clearAllMocks();
+      vi.unstubAllGlobals();
+      SignUp.clerk = {} as any;
+    });
+
+    it('skips captcha challenge for oauth transfer when strategy is in captchaOauthBypass', async () => {
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: { id: 'signup_123', status: 'missing_requirements' },
+      });
+      BaseResource._fetch = mockFetch;
+      SignUp.clerk = {
+        client: {
+          signIn: {
+            firstFactorVerification: {
+              status: 'transferable',
+              strategy: 'oauth_google',
+            },
+          },
+        },
+        __unstable__environment: {
+          displayConfig: {
+            captchaOauthBypass: ['oauth_google', 'oauth_apple'],
+          },
+        },
+      } as any;
+
+      const signUp = new SignUp();
+      await signUp.create({ transfer: true });
+
+      expect(CaptchaChallenge).not.toHaveBeenCalled();
+    });
+
+    it('does not skip captcha challenge for enterprise_sso transfer', async () => {
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: { id: 'signup_123', status: 'missing_requirements' },
+      });
+      BaseResource._fetch = mockFetch;
+      SignUp.clerk = {
+        client: {
+          signIn: {
+            firstFactorVerification: {
+              status: 'transferable',
+              strategy: 'enterprise_sso',
+            },
+          },
+        },
+        __unstable__environment: {
+          displayConfig: {
+            captchaOauthBypass: [],
+          },
+        },
+      } as any;
+
+      const signUp = new SignUp();
+      await signUp.create({ transfer: true });
+
+      expect(CaptchaChallenge).toHaveBeenCalledWith(SignUp.clerk);
+    });
   });
 
   describe('SignUpFuture', () => {

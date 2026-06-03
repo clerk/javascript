@@ -182,13 +182,6 @@ export class SignUp extends BaseResource implements SignUpResource {
       finalParams = { ...finalParams, ...captchaParams };
     }
 
-    if (finalParams.transfer && this.shouldBypassCaptchaForAttempt(finalParams)) {
-      const strategy = SignUp.clerk.client?.signIn.firstFactorVerification.strategy;
-      if (strategy) {
-        finalParams = { ...finalParams, strategy: strategy as SignUpCreateParams['strategy'] };
-      }
-    }
-
     return this._basePost({
       path: this.pathRoot,
       body: normalizeUnsafeMetadata(finalParams),
@@ -562,22 +555,24 @@ export class SignUp extends BaseResource implements SignUpResource {
    * We delegate bot detection to the following providers, instead of relying on turnstile exclusively
    */
   protected shouldBypassCaptchaForAttempt(params: SignUpCreateParams) {
-    if (!params.strategy) {
-      return false;
-    }
-
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const captchaOauthBypass = SignUp.clerk.__unstable__environment!.displayConfig.captchaOauthBypass;
 
-    if (captchaOauthBypass.some(strategy => strategy === params.strategy)) {
-      return true;
-    }
-
+    // OAuth transfers: If we delegate captcha detection to the OAuth provider,
+    // do not show another captcha on sign up. The strategy lives on the sign in
+    // verification rather than on `params`, so this must be checked before any
+    // early return based on `params.strategy`.
     if (
       params.transfer &&
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       captchaOauthBypass.some(strategy => strategy === SignUp.clerk.client!.signIn.firstFactorVerification.strategy)
     ) {
+      return true;
+    }
+
+    // OAuth sign ups: If we delegate captcha detection to the OAuth provider,
+    // do not show another captcha on sign up.
+    if (params.strategy && captchaOauthBypass.some(strategy => strategy === params.strategy)) {
       return true;
     }
 
