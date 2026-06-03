@@ -55,7 +55,7 @@ import { withClerk } from './withClerk';
 
 type FallbackProp = {
   /**
-   * An optional element to render while the component is mounting.
+   * The element to render while the component is mounting.
    */
   fallback?: ReactNode;
 };
