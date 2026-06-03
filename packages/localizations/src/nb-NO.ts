@@ -154,7 +154,7 @@ export const nbNO: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Betalingsmetoder',
-    popular: 'Populær',
+    highlightedPlanBadge: 'Populær',
     pricingTable: {
       billingCycle: 'Faktureringsperiode',
       included: 'Inkludert',
@@ -209,11 +209,21 @@ export const nbNO: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: 'Kontakt organisasjonens administrator for å få tillatelser til å administrere bedriftstilkoblinger.',
-      title: 'Du har ikke tillatelse til å administrere bedriftstilkoblinger',
+      subtitle: 'Kontakt organisasjonens administrator for å oppgradere tillatelsene dine.',
+      title: 'Du har ikke tillatelse til å administrere enkeltpålogging (SSO)',
     },
     navbar: {
       title: 'Konfigurer enkeltpålogging (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Velg leverandør',
+      subtitle: 'Velg leverandøren du skal konfigurere SSO for.',
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Egendefinert SAML-leverandør',
+      },
+      warning: 'Når en leverandør er valgt, kan du ikke endre igjen før konfigurasjonen er ferdig',
     },
     verifyEmailDomainStep: {
       title: 'Verifiser e-postadresse',

@@ -31,7 +31,7 @@ jobs:
       - name: Get User Permission
         if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
         id: checkAccess
-        uses: actions-cool/check-user-permission@v2
+        uses: actions-cool/check-user-permission@c21884f3dda18dafc2f8b402fe807ccc9ec1aa5e # v2
         with:
           require: write
           username: ${{ github.triggering_actor }}
@@ -47,7 +47,6 @@ jobs:
 
   pre-checks:
     needs: [check-permissions]
-    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     name: Formatting | Dedupe | Changeset
     runs-on: "blacksmith-8vcpu-ubuntu-2204"
     defaults:
@@ -57,8 +56,9 @@ jobs:
 
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
+          persist-credentials: false
           fetch-depth: 100 # Enough for changeset status comparison, much faster than full history
           fetch-tags: false
           filter: "blob:none"
@@ -71,6 +71,7 @@ jobs:
         id: config
         uses: ./.github/actions/init-blacksmith
         with:
+          cache-enabled: true
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
@@ -82,7 +83,7 @@ jobs:
         run: pnpm format:check
 
       - name: Require Changeset
-        if: ${{ !(github.event_name == 'merge_group') }}
+        if: ${{ github.event_name != 'merge_group' && github.event.pull_request.draft == false }}
         run: |
           if [[ "${{ github.event.pull_request.user.login }}" = "clerk-cookie" || "${{ github.event.pull_request.user.login }}" = "renovate[bot]" ]]; then
             echo 'Skipping';
@@ -93,7 +94,6 @@ jobs:
 
   build-packages:
     needs: [check-permissions]
-    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     name: Build Packages
     runs-on: "blacksmith-8vcpu-ubuntu-2204"
     permissions:
@@ -108,8 +108,9 @@ jobs:
 
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
+          persist-credentials: false
           fetch-depth: 1
           fetch-tags: false
           filter: "blob:none"
@@ -119,6 +120,7 @@ jobs:
         id: config
         uses: ./.github/actions/init-blacksmith
         with:
+          cache-enabled: true
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
           turbo-team: ${{ vars.TURBO_TEAM }}
@@ -128,7 +130,7 @@ jobs:
         run: pnpm turbo build $TURBO_ARGS --only
 
       - name: Upload Turbo Summary
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: ${{ env.TURBO_SUMMARIZE == 'true' }}
         continue-on-error: true
         with:
@@ -138,7 +140,6 @@ jobs:
 
   static-analysis:
     needs: [check-permissions, build-packages]
-    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     name: Static analysis
     permissions:
       contents: read
@@ -154,8 +155,9 @@ jobs:
 
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
+          persist-credentials: false
           fetch-depth: 1
           fetch-tags: false
           filter: "blob:none"
@@ -165,6 +167,7 @@ jobs:
         id: config
         uses: ./.github/actions/init-blacksmith
         with:
+          cache-enabled: true
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
           turbo-team: ${{ vars.TURBO_TEAM }}
@@ -191,7 +194,7 @@ jobs:
         run: pnpm turbo lint $TURBO_ARGS
 
       - name: Upload Turbo Summary
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: ${{ env.TURBO_SUMMARIZE == 'true' }}
         continue-on-error: true
         with:
@@ -201,7 +204,6 @@ jobs:
 
   unit-tests:
     needs: [check-permissions, build-packages]
-    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     name: Unit Tests (${{ matrix.filter-label }})
     permissions:
       contents: read
@@ -228,8 +230,9 @@ jobs:
 
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
+          persist-credentials: false
           fetch-depth: 1
           fetch-tags: false
           filter: "blob:none"
@@ -239,6 +242,7 @@ jobs:
         id: config
         uses: ./.github/actions/init-blacksmith
         with:
+          cache-enabled: true
           # Ensures that all builds are cached appropriately with a consistent run name `Unit Tests (20)`.
           node-version: ${{ matrix.node-version }}
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
@@ -268,7 +272,7 @@ jobs:
           NODE_VERSION: ${{ matrix.node-version }}
 
       - name: Upload Turbo Summary
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: ${{ env.TURBO_SUMMARIZE == 'true' }}
         continue-on-error: true
         with:
@@ -278,9 +282,7 @@ jobs:
 
   integration-tests:
     needs: [check-permissions, build-packages]
-    if: >-
-      ${{ (github.event_name != 'pull_request' || github.event.pull_request.draft == false)
-      && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
     name: Integration Tests (${{ matrix.test-name }}, ${{ matrix.test-project }}${{ matrix.next-version && format(', {0}', matrix.next-version) || '' }})
     permissions:
       contents: read
@@ -338,8 +340,9 @@ jobs:
 
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
+          persist-credentials: false
           fetch-depth: 1
           fetch-tags: false
           filter: "blob:none"
@@ -349,6 +352,7 @@ jobs:
         id: config
         uses: ./.github/actions/init-blacksmith
         with:
+          cache-enabled: true
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
@@ -379,11 +383,15 @@ jobs:
           # from turbo.json, hiding real configuration errors.
           TASK_NAME="test:integration:${{ matrix.test-name }}"
           TURBO_STDERR=$(mktemp)
-          if ! TURBO_JSON=$(pnpm turbo run "$TASK_NAME" --dry=json 2>"$TURBO_STDERR"); then
+          if ! TURBO_RAW=$(pnpm turbo run "$TASK_NAME" --dry=json 2>"$TURBO_STDERR"); then
             echo "::error::Turbo task '$TASK_NAME' failed validation"
             cat "$TURBO_STDERR"
             exit 1
           fi
+
+          # pnpm can prepend non-JSON lines (e.g. `WARN  Unsupported engine: ...`)
+          # to stdout, which would break jq. Drop everything before the first `{`.
+          TURBO_JSON=$(printf '%s\n' "$TURBO_RAW" | awk '/^\{/{found=1} found')
 
           if ! TASK_COUNT=$(jq -er '.tasks | length' <<< "$TURBO_JSON"); then
             echo "::error::Turbo task '$TASK_NAME' returned invalid JSON or missing .tasks"
@@ -426,7 +434,7 @@ jobs:
         run: cd packages/astro && pnpm copy:components
 
       - name: Write all ENV certificates to files in integration/certs
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         env:
           INTEGRATION_CERTS: "${{secrets.INTEGRATION_CERTS}}"
           INTEGRATION_ROOT_CA: "${{secrets.INTEGRATION_ROOT_CA}}"
@@ -474,7 +482,7 @@ jobs:
 
       - name: Upload test-results
         if: ${{ cancelled() || failure() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ steps.sanitize.outputs.artifact-suffix }}${{ matrix.next-version && format('-next{0}', matrix.next-version) || '' }}
           path: test-results
@@ -482,7 +490,6 @@ jobs:
 
   pkg-pr-new:
     name: Publish with pkg-pr-new
-    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     needs: [check-permissions, build-packages]
     runs-on: "blacksmith-8vcpu-ubuntu-2204"
     defaults:
@@ -494,8 +501,9 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
+          persist-credentials: false
           fetch-depth: 1
           fetch-tags: false
           filter: "blob:none"
@@ -504,6 +512,7 @@ jobs:
       - name: Setup Node
         uses: ./.github/actions/init-blacksmith
         with:
+          cache-enabled: true
           turbo-enabled: true
           node-version: 24.15.0
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}

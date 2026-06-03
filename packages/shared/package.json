@@ -1,6 +1,6 @@
 {
   "name": "@clerk/shared",
-  "version": "4.10.2",
+  "version": "4.14.0",
   "description": "Internal package utils used by the Clerk SDKs",
   "repository": {
     "type": "git",
@@ -30,6 +30,7 @@
         "default": "./dist/internal/clerk-js/*.js"
       }
     },
+    "./_chunks/*": null,
     "./*": {
       "import": {
         "types": "./dist/*.d.mts",
@@ -135,7 +136,7 @@
     "@tanstack/query-core": "catalog:repo",
     "dequal": "2.0.3",
     "glob-to-regexp": "0.4.1",
-    "js-cookie": "3.0.5",
+    "js-cookie": "3.0.7",
     "std-env": "^3.9.0"
   },
   "devDependencies": {

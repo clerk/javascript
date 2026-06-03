@@ -141,7 +141,7 @@ export const elGR: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Μέθοδοι πληρωμής',
-    popular: 'Δημοφιλές',
+    highlightedPlanBadge: 'Δημοφιλές',
     pricingTable: {
       billingCycle: 'Κύκλος χρέωσης',
       included: 'Περιλαμβάνεται',
@@ -180,12 +180,21 @@ export const elGR: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'Επικοινωνήστε με τον διαχειριστή του οργανισμού σας για να αποκτήσετε άδειες διαχείρισης εταιρικών συνδέσεων.',
-      title: 'Δεν έχετε άδεια διαχείρισης εταιρικών συνδέσεων',
+      subtitle: 'Επικοινωνήστε με τον διαχειριστή του οργανισμού σας για να αναβαθμίσετε τις άδειές σας.',
+      title: 'Δεν έχετε άδεια διαχείρισης της Ενιαίας Σύνδεσης (SSO)',
     },
     navbar: {
       title: 'Διαμόρφωση Ενιαίας Σύνδεσης (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Επιλέξτε πάροχο',
+      subtitle: 'Επιλέξτε τον πάροχο για τον οποίο θα ρυθμίσετε SSO.',
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Προσαρμοσμένος πάροχος SAML',
+      },
+      warning: 'Μόλις επιλεγεί ένας πάροχος δεν μπορείτε να τον αλλάξετε μέχρι να ολοκληρωθεί η ρύθμιση',
     },
     verifyEmailDomainStep: {
       title: 'Επαλήθευση διεύθυνσης email',

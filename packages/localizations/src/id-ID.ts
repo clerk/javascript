@@ -141,7 +141,7 @@ export const idID: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -180,11 +180,21 @@ export const idID: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: 'Hubungi administrator organisasi Anda untuk mendapatkan izin mengelola koneksi enterprise.',
-      title: 'Anda tidak memiliki izin untuk mengelola koneksi enterprise',
+      subtitle: 'Hubungi administrator organisasi Anda untuk meningkatkan izin Anda.',
+      title: 'Anda tidak memiliki izin untuk mengelola Single Sign-On (SSO)',
     },
     navbar: {
       title: 'Konfigurasi Single Sign-On (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Pilih penyedia',
+      subtitle: 'Pilih penyedia yang akan Anda atur untuk SSO.',
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Penyedia SAML Khusus',
+      },
+      warning: 'Setelah penyedia dipilih, Anda tidak dapat mengubahnya lagi sampai konfigurasi selesai',
     },
     verifyEmailDomainStep: {
       title: 'Verifikasi alamat email',

@@ -141,7 +141,7 @@ export const trTR: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -180,11 +180,21 @@ export const trTR: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: 'Kurumsal bağlantıları yönetme izinleri almak için organizasyonunuzun yöneticisiyle iletişime geçin.',
-      title: 'Kurumsal bağlantıları yönetme izniniz yok',
+      subtitle: 'İzinlerinizi yükseltmek için organizasyonunuzun yöneticisiyle iletişime geçin.',
+      title: 'Tek Oturum Açmayı (SSO) yönetme izniniz yok',
     },
     navbar: {
       title: 'Tek Oturum Açmayı (SSO) Yapılandır',
+    },
+    selectProviderStep: {
+      title: 'Sağlayıcıyı seçin',
+      subtitle: "SSO'yu ayarlayacağınız sağlayıcıyı seçin.",
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Özel SAML Sağlayıcısı',
+      },
+      warning: 'Bir sağlayıcı seçildikten sonra yapılandırma bitene kadar tekrar değiştiremezsiniz',
     },
     verifyEmailDomainStep: {
       title: 'E-posta adresini doğrula',

@@ -141,7 +141,7 @@ export const mnMN: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -180,11 +180,21 @@ export const mnMN: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: 'Аж ахуйн нэгжийн холболтыг удирдах эрх авахын тулд байгууллагынхаа админтай холбогдоно уу.',
-      title: 'Танд аж ахуйн нэгжийн холболтыг удирдах эрх байхгүй байна',
+      subtitle: 'Эрхээ дээшлүүлэхийн тулд байгууллагынхаа админтай холбогдоно уу.',
+      title: 'Танд Нэгдсэн нэвтрэлт (SSO) удирдах эрх байхгүй байна',
     },
     navbar: {
       title: 'Нэгдсэн нэвтрэлт (SSO) тохируулах',
+    },
+    selectProviderStep: {
+      title: 'Үйлчилгээ үзүүлэгчийг сонгох',
+      subtitle: 'SSO тохируулах гэж буй үйлчилгээ үзүүлэгчээ сонгоно уу.',
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Хэрэглэгчийн тохируулсан SAML үйлчилгээ үзүүлэгч',
+      },
+      warning: 'Үйлчилгээ үзүүлэгчийг сонгосны дараа тохиргоо дуустал өөрчлөх боломжгүй',
     },
     verifyEmailDomainStep: {
       title: 'И-мэйл хаягийг баталгаажуулах',

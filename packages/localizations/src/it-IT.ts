@@ -147,7 +147,7 @@ export const itIT: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Metodi di pagamento',
-    popular: 'Popolare',
+    highlightedPlanBadge: 'Popolare',
     pricingTable: {
       billingCycle: 'Ciclo di fatturazione',
       included: 'Incluso',
@@ -186,12 +186,21 @@ export const itIT: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        "Contatta l'amministratore della tua organizzazione per ottenere i permessi per gestire le connessioni aziendali.",
-      title: 'Non hai il permesso di gestire le connessioni aziendali',
+      subtitle: "Contatta l'amministratore della tua organizzazione per ampliare i tuoi permessi.",
+      title: 'Non hai il permesso di gestire il Single Sign-On (SSO)',
     },
     navbar: {
       title: 'Configura Single Sign-On (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Seleziona provider',
+      subtitle: "Seleziona il provider per cui configurerai l'SSO.",
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Provider SAML personalizzato',
+      },
+      warning: 'Una volta selezionato un provider non potrai cambiarlo fino al termine della configurazione',
     },
     verifyEmailDomainStep: {
       title: 'Verifica indirizzo email',

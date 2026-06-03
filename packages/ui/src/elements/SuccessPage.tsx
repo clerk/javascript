@@ -1,7 +1,7 @@
 import React from 'react';
 
 import type { Flex } from '../customizables';
-import { Button, Col, descriptors, Text } from '../customizables';
+import { Button, Col, descriptors, Text, useAppearance } from '../customizables';
 import { useNavigateToFlowStart } from '../hooks';
 import type { LocalizationKey } from '../localization';
 import { localizationKeys } from '../localization';
@@ -23,6 +23,7 @@ type SuccessPageProps = Omit<PropsOfComponent<typeof Flex>, 'headerTitle' | 'tit
 export const SuccessPage = (props: SuccessPageProps) => {
   const { text, title, subtitle, finishLabel, onFinish, contents, finishButtonProps, headerBadgeText, ...rest } = props;
   const { navigateToFlowStart } = useNavigateToFlowStart();
+  const { autoFocus: optionAutoFocus } = useAppearance().parsedOptions;
 
   return (
     <Col
@@ -63,7 +64,7 @@ export const SuccessPage = (props: SuccessPageProps) => {
       {contents}
       <FormButtonContainer>
         <Button
-          autoFocus
+          autoFocus={optionAutoFocus}
           //Do we need a separate key here?
           localizationKey={finishLabel || localizationKeys('userProfile.formButtonPrimary__finish')}
           elementDescriptor={descriptors.formButtonPrimary}

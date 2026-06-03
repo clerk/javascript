@@ -141,7 +141,7 @@ export const esCR: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -180,12 +180,21 @@ export const esCR: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'Contacta al administrador de tu organización para obtener permisos para gestionar conexiones de empresa.',
-      title: 'No tenés permiso para gestionar conexiones de empresa',
+      subtitle: 'Contactá al administrador de tu organización para mejorar tus permisos.',
+      title: 'No tenés permiso para gestionar el inicio de sesión único (SSO)',
     },
     navbar: {
       title: 'Configurar inicio de sesión único (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Seleccionar proveedor',
+      subtitle: 'Selecciona el proveedor para el que vas a configurar SSO.',
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Proveedor SAML personalizado',
+      },
+      warning: 'Una vez que se selecciona un proveedor no puedes cambiarlo hasta que termine la configuración',
     },
     verifyEmailDomainStep: {
       title: 'Verificar correo electrónico',

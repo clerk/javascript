@@ -141,7 +141,7 @@ export const kkKZ: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -180,11 +180,21 @@ export const kkKZ: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: 'Корпоративтік қосылыстарды басқару рұқсаттарын алу үшін ұйым әкімшісіне хабарласыңыз.',
-      title: 'Сізде корпоративтік қосылыстарды басқаруға рұқсат жоқ',
+      subtitle: 'Рұқсаттарыңызды жаңарту үшін ұйым әкімшісіне хабарласыңыз.',
+      title: 'Сізде бірыңғай кіруді (SSO) басқаруға рұқсат жоқ',
     },
     navbar: {
       title: 'Бірыңғай кіруді конфигурациялау (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Провайдерді таңдау',
+      subtitle: 'SSO-ны баптамақшы провайдерді таңдаңыз.',
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Реттелетін SAML провайдері',
+      },
+      warning: 'Провайдер таңдалғаннан кейін, конфигурация аяқталғанша өзгерте алмайсыз',
     },
     verifyEmailDomainStep: {
       title: 'Электрондық пошта мекенжайын растау',

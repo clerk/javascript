@@ -141,7 +141,7 @@ export const zhCN: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -180,11 +180,21 @@ export const zhCN: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: '请联系您的组织管理员以获得管理企业连接的权限。',
-      title: '您无权管理企业连接',
+      subtitle: '请联系您的组织管理员以升级您的权限。',
+      title: '您无权管理单点登录 (SSO)',
     },
     navbar: {
       title: '配置单点登录 (SSO)',
+    },
+    selectProviderStep: {
+      title: '选择提供商',
+      subtitle: '选择您要为其设置 SSO 的提供商。',
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: '自定义 SAML 提供商',
+      },
+      warning: '选择提供商后,在配置完成之前无法再次更改',
     },
     verifyEmailDomainStep: {
       title: '验证电子邮件地址',

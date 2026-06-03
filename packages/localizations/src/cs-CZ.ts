@@ -145,7 +145,7 @@ export const csCZ: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Platební metody',
-    popular: 'Populární',
+    highlightedPlanBadge: 'Populární',
     pricingTable: {
       billingCycle: 'Fakturační cyklus',
       included: 'Zahrnuto',
@@ -184,11 +184,21 @@ export const csCZ: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: 'Kontaktujte správce vaší organizace, abyste získali oprávnění ke správě podnikových připojení.',
-      title: 'Nemáte oprávnění ke správě podnikových připojení',
+      subtitle: 'Kontaktujte správce vaší organizace pro rozšíření vašich oprávnění.',
+      title: 'Nemáte oprávnění ke správě jednotného přihlášení (SSO)',
     },
     navbar: {
       title: 'Nastavit jednotné přihlášení (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Vyberte poskytovatele',
+      subtitle: 'Vyberte poskytovatele, pro kterého budete nastavovat SSO.',
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Vlastní poskytovatel SAML',
+      },
+      warning: 'Jakmile vyberete poskytovatele, nelze ho změnit, dokud nebude konfigurace dokončena',
     },
     verifyEmailDomainStep: {
       title: 'Ověřit e-mailovou adresu',

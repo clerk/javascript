@@ -145,7 +145,7 @@ export const thTH: LocalizationResource = {
       },
     },
     paymentMethods__label: 'วิธีการชำระเงิน',
-    popular: 'ยอดนิยม',
+    highlightedPlanBadge: 'ยอดนิยม',
     pricingTable: {
       billingCycle: 'รอบการเรียกเก็บเงิน',
       included: 'รวมอยู่',
@@ -184,11 +184,21 @@ export const thTH: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: 'ติดต่อผู้ดูแลระบบขององค์กรของคุณเพื่อขอสิทธิ์ในการจัดการการเชื่อมต่อระดับองค์กร',
-      title: 'คุณไม่มีสิทธิ์จัดการการเชื่อมต่อระดับองค์กร',
+      subtitle: 'ติดต่อผู้ดูแลระบบขององค์กรของคุณเพื่ออัปเกรดสิทธิ์ของคุณ',
+      title: 'คุณไม่มีสิทธิ์จัดการการลงชื่อเข้าใช้แบบครั้งเดียว (SSO)',
     },
     navbar: {
       title: 'กำหนดค่าการลงชื่อเข้าใช้แบบครั้งเดียว (SSO)',
+    },
+    selectProviderStep: {
+      title: 'เลือกผู้ให้บริการ',
+      subtitle: 'เลือกผู้ให้บริการที่คุณจะตั้งค่า SSO ให้',
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'ผู้ให้บริการ SAML แบบกำหนดเอง',
+      },
+      warning: 'เมื่อเลือกผู้ให้บริการแล้วคุณไม่สามารถเปลี่ยนได้อีกจนกว่าการกำหนดค่าจะเสร็จสิ้น',
     },
     verifyEmailDomainStep: {
       title: 'ยืนยันที่อยู่อีเมล',

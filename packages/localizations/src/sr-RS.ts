@@ -141,7 +141,7 @@ export const srRS: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -180,12 +180,21 @@ export const srRS: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'Kontaktirajte administratora vaše organizacije da biste dobili dozvole za upravljanje korporativnim vezama.',
-      title: 'Nemate dozvolu za upravljanje korporativnim vezama',
+      subtitle: 'Kontaktirajte administratora vaše organizacije da biste proširili svoje dozvole.',
+      title: 'Nemate dozvolu za upravljanje jedinstvenom prijavom (SSO)',
     },
     navbar: {
       title: 'Konfiguriši jedinstvenu prijavu (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Izaberite provajdera',
+      subtitle: 'Izaberite provajdera za koga ćete podesiti SSO.',
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Prilagođeni SAML provajder',
+      },
+      warning: 'Kada se provajder izabere, ne možete ga ponovo menjati dok se konfiguracija ne završi',
     },
     verifyEmailDomainStep: {
       title: 'Potvrdi adresu e-pošte',

@@ -1,3 +1,5 @@
+import { randomBytes } from 'node:crypto';
+
 import type { EnterpriseConnection } from '@clerk/backend';
 import { expect, test } from '@playwright/test';
 
@@ -36,14 +38,17 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEnterpriseSso] })(
   ({ app }) => {
     test.describe.configure({ mode: 'serial' });
 
-    const testDomain = 'e2e-enterprise-test.dev';
+    // Per-run suffix so a failed afterAll on a previous run can't brick the shared
+    // long-running instance with a duplicate-domain 422 on the next run.
+    const runId = randomBytes(4).toString('hex');
+    const testDomain = `e2e-enterprise-test-${runId}.dev`;
     const fakeIdpHost = `fake-idp.${testDomain}`;
-    let enterpriseConnection: EnterpriseConnection;
+    let enterpriseConnection: EnterpriseConnection | undefined;
 
     test.beforeAll(async () => {
       const u = createTestUtils({ app });
       enterpriseConnection = await createActiveEnterpriseConnection(u.services.clerk, {
-        name: 'E2E Test SAML Connection',
+        name: `E2E Test SAML Connection ${runId}`,
         domain: testDomain,
         idpEntityId: `https://${fakeIdpHost}`,
         idpSsoUrl: `https://${fakeIdpHost}/sso`,
@@ -52,7 +57,11 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEnterpriseSso] })(
 
     test.afterAll(async () => {
       const u = createTestUtils({ app });
-      await u.services.clerk.enterpriseConnections.deleteEnterpriseConnection(enterpriseConnection.id);
+      // Guard against a failed beforeAll: without this, the TypeError here masks
+      // the real error from beforeAll in the Playwright report.
+      if (enterpriseConnection) {
+        await u.services.clerk.enterpriseConnections.deleteEnterpriseConnection(enterpriseConnection.id);
+      }
       await app.teardown();
     });
 

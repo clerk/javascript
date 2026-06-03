@@ -141,7 +141,7 @@ export const svSE: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -180,11 +180,21 @@ export const svSE: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: 'Kontakta administratören för din organisation för att få behörighet att hantera företagsanslutningar.',
-      title: 'Du har inte behörighet att hantera företagsanslutningar',
+      subtitle: 'Kontakta administratören för din organisation för att utöka dina behörigheter.',
+      title: 'Du har inte behörighet att hantera enkel inloggning (SSO)',
     },
     navbar: {
       title: 'Konfigurera enkel inloggning (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Välj leverantör',
+      subtitle: 'Välj den leverantör du ska konfigurera SSO för.',
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Anpassad SAML-leverantör',
+      },
+      warning: 'När en leverantör har valts kan du inte ändra igen förrän konfigurationen är klar',
     },
     verifyEmailDomainStep: {
       title: 'Verifiera e-postadress',

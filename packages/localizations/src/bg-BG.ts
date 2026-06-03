@@ -142,7 +142,7 @@ export const bgBG: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -181,12 +181,21 @@ export const bgBG: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'Свържете се с администратора на вашата организация, за да получите разрешения за управление на корпоративни връзки.',
-      title: 'Нямате разрешение да управлявате корпоративни връзки',
+      subtitle: 'Свържете се с администратора на вашата организация, за да повишите разрешенията си.',
+      title: 'Нямате разрешение да управлявате единен вход (SSO)',
     },
     navbar: {
       title: 'Конфигуриране на единен вход (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Изберете доставчик',
+      subtitle: 'Изберете доставчика, за който ще конфигурирате SSO.',
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Персонализиран SAML доставчик',
+      },
+      warning: 'След като изберете доставчик, не можете да го промените, докато конфигурацията не приключи',
     },
     verifyEmailDomainStep: {
       title: 'Потвърди имейл адреса',

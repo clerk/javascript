@@ -4,9 +4,9 @@ import type { DeletedObjectResource } from './deletedObject';
 import type { EmailAddressResource } from './emailAddress';
 import type { EnterpriseAccountResource } from './enterpriseAccount';
 import type {
-  CreateMeEnterpriseConnectionParams,
+  CreateOrganizationEnterpriseConnectionParams,
   EnterpriseConnectionResource,
-  UpdateMeEnterpriseConnectionParams,
+  UpdateOrganizationEnterpriseConnectionParams,
 } from './enterpriseConnection';
 import type {
   EnterpriseConnectionTestRunInitResource,
@@ -108,6 +108,7 @@ export interface UserResource extends ClerkResource, BillingPayerMethods {
   createdAt: Date | null;
 
   update: (params: UpdateUserParams) => Promise<UserResource>;
+  updateMetadata: (params: UpdateUserMetadataParams) => Promise<UserResource>;
   delete: () => Promise<void>;
   updatePassword: (params: UpdateUserPasswordParams) => Promise<UserResource>;
   removePassword: (params: RemoveUserPasswordParams) => Promise<UserResource>;
@@ -129,10 +130,12 @@ export interface UserResource extends ClerkResource, BillingPayerMethods {
   getOrganizationCreationDefaults: () => Promise<OrganizationCreationDefaultsResource>;
   leaveOrganization: (organizationId: string) => Promise<DeletedObjectResource>;
   getEnterpriseConnections: (params?: GetEnterpriseConnectionsParams) => Promise<EnterpriseConnectionResource[]>;
-  createEnterpriseConnection: (params: CreateMeEnterpriseConnectionParams) => Promise<EnterpriseConnectionResource>;
+  createEnterpriseConnection: (
+    params: CreateOrganizationEnterpriseConnectionParams,
+  ) => Promise<EnterpriseConnectionResource>;
   updateEnterpriseConnection: (
     enterpriseConnectionId: string,
-    params: UpdateMeEnterpriseConnectionParams,
+    params: UpdateOrganizationEnterpriseConnectionParams,
   ) => Promise<EnterpriseConnectionResource>;
   deleteEnterpriseConnection: (enterpriseConnectionId: string) => Promise<DeletedObjectResource>;
   createEnterpriseConnectionTestRun: (
@@ -186,6 +189,16 @@ type UpdateUserJSON = Pick<
 >;
 
 export type UpdateUserParams = Partial<SnakeToCamel<UpdateUserJSON>>;
+
+/**
+ * Parameters for {@link UserResource.updateMetadata}. Only `unsafeMetadata`
+ * is end-user-writable on the Frontend API and the field is required: the
+ * submitted value is deep-merged with the existing `unsafeMetadata`, and keys
+ * at any level whose value is `null` are removed.
+ */
+export type UpdateUserMetadataParams = {
+  unsafeMetadata: UserUnsafeMetadata;
+};
 
 export type UpdateUserPasswordParams = {
   newPassword: string;

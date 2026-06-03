@@ -141,7 +141,7 @@ export const enGB: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -180,16 +180,25 @@ export const enGB: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'Contact your organisation administrator in order to have permissions to manage enterprise connections.',
-      title: 'You do not have permission to manage enterprise connections',
+      subtitle: "Contact your organisation's administrator to upgrade your permissions.",
+      title: 'You do not have permission to manage Single Sign-On (SSO)',
     },
     navbar: {
       title: 'Configure Single Sign-On (SSO)',
     },
+    selectProviderStep: {
+      title: 'Select provider',
+      subtitle: 'Select the provider you are going to set up SSO for.',
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Custom SAML Provider',
+      },
+      warning: 'Once a provider is selected you cannot change again until the configuration is over',
+    },
     verifyEmailDomainStep: {
       title: 'Verify email address',
-      subtitle: 'Verify the email address you want to enable the enterprise connection on.',
+      subtitle: 'Verify the domain you want to enable the enterprise connection on.',
       addEmailAddress: {
         formTitle: 'We need your email',
         formSubtitle: 'In order to start we will need your email address',

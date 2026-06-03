@@ -141,7 +141,7 @@ export const beBY: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -180,12 +180,21 @@ export const beBY: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'Звярніцеся да адміністратара вашай арганізацыі, каб атрымаць дазволы на кіраванне карпаратыўнымі падключэннямі.',
-      title: 'У вас няма дазволу на кіраванне карпаратыўнымі падключэннямі',
+      subtitle: 'Звярніцеся да адміністратара вашай арганізацыі, каб павысіць вашы дазволы.',
+      title: 'У вас няма дазволу на кіраванне адзіным уваходам (SSO)',
     },
     navbar: {
       title: 'Налада адзінага ўваходу (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Выберыце правайдэра',
+      subtitle: 'Выберыце правайдэра, для якога вы будзеце наладжваць SSO.',
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Карыстальніцкі правайдэр SAML',
+      },
+      warning: 'Пасля выбару правайдэра вы не зможаце змяніць яго, пакуль не скончыце канфігурацыю',
     },
     verifyEmailDomainStep: {
       title: 'Пацвердзіць адрас электроннай пошты',

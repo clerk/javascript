@@ -145,7 +145,7 @@ export const viVN: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Phương thức thanh toán',
-    popular: 'Phổ biến',
+    highlightedPlanBadge: 'Phổ biến',
     pricingTable: {
       billingCycle: 'Chu kỳ thanh toán',
       included: 'Bao gồm',
@@ -184,11 +184,21 @@ export const viVN: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: 'Liên hệ với quản trị viên tổ chức của bạn để có quyền quản lý các kết nối doanh nghiệp.',
-      title: 'Bạn không có quyền quản lý các kết nối doanh nghiệp',
+      subtitle: 'Liên hệ với quản trị viên tổ chức của bạn để nâng cấp quyền của bạn.',
+      title: 'Bạn không có quyền quản lý đăng nhập một lần (SSO)',
     },
     navbar: {
       title: 'Cấu hình đăng nhập một lần (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Chọn nhà cung cấp',
+      subtitle: 'Chọn nhà cung cấp mà bạn sẽ thiết lập SSO cho.',
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Nhà cung cấp SAML tùy chỉnh',
+      },
+      warning: 'Khi đã chọn nhà cung cấp, bạn không thể thay đổi cho đến khi cấu hình hoàn tất',
     },
     verifyEmailDomainStep: {
       title: 'Xác minh địa chỉ email',

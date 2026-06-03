@@ -148,7 +148,7 @@ export const koKR: LocalizationResource = {
       },
     },
     paymentMethods__label: '결제 수단',
-    popular: '인기',
+    highlightedPlanBadge: '인기',
     pricingTable: {
       billingCycle: '결제 주기',
       included: '포함',
@@ -187,11 +187,21 @@ export const koKR: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: '엔터프라이즈 연결을 관리할 권한을 얻으려면 조직 관리자에게 문의하세요.',
-      title: '엔터프라이즈 연결을 관리할 권한이 없습니다',
+      subtitle: '권한을 업그레이드하려면 조직 관리자에게 문의하세요.',
+      title: '싱글 사인온(SSO)을 관리할 권한이 없습니다',
     },
     navbar: {
       title: '싱글 사인온(SSO) 구성',
+    },
+    selectProviderStep: {
+      title: '공급자 선택',
+      subtitle: 'SSO를 설정할 공급자를 선택하세요.',
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: '사용자 지정 SAML 공급자',
+      },
+      warning: '공급자를 선택하면 구성이 완료될 때까지 다시 변경할 수 없습니다',
     },
     verifyEmailDomainStep: {
       title: '이메일 주소 확인',

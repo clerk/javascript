@@ -184,7 +184,7 @@ describe('User', () => {
         provider: 'saml_okta',
         name: 'New SSO',
         organization_id: 'org_1',
-        saml: { idp_entity_id: 'https://idp.example.com' },
+        saml_idp_entity_id: 'https://idp.example.com',
       },
     });
 
@@ -291,13 +291,11 @@ describe('User', () => {
       body: {
         provider: 'saml_okta',
         name: 'New SSO',
-        saml: {
-          idp_entity_id: 'https://idp.example.com',
-          attribute_mapping: {
-            emailAddress: 'mail',
-            firstName: 'givenName',
-            'custom:role': 'role',
-          },
+        saml_idp_entity_id: 'https://idp.example.com',
+        saml_attribute_mapping: {
+          emailAddress: 'mail',
+          firstName: 'givenName',
+          'custom:role': 'role',
         },
       },
     });
@@ -359,11 +357,9 @@ describe('User', () => {
           CustomValue: 'y',
           nestedCamelKey: { innerCamelKey: 'z' },
         },
-        saml: {
-          attribute_mapping: {
-            emailAddress: 'mail',
-            firstName: 'givenName',
-          },
+        saml_attribute_mapping: {
+          emailAddress: 'mail',
+          firstName: 'givenName',
         },
       },
     });
@@ -725,6 +721,40 @@ describe('User', () => {
       method: 'POST',
       path: '/me/remove_password',
       body: params,
+    });
+  });
+
+  it('.updateMetadata triggers a PATCH to /me/metadata with stringified unsafe_metadata', async () => {
+    // @ts-ignore
+    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: {} }));
+
+    const user = new User({} as unknown as UserJSON);
+    await user.updateMetadata({ unsafeMetadata: { theme: 'dark', nested: { level: 1 } } });
+
+    // @ts-ignore
+    expect(BaseResource._fetch).toHaveBeenCalledWith({
+      method: 'PATCH',
+      path: '/me/metadata',
+      body: {
+        unsafeMetadata: JSON.stringify({ theme: 'dark', nested: { level: 1 } }),
+      },
+    });
+  });
+
+  it('.updateMetadata sends an explicit null patch when a key is being removed', async () => {
+    // @ts-ignore
+    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: {} }));
+
+    const user = new User({} as unknown as UserJSON);
+    await user.updateMetadata({ unsafeMetadata: { theme: null as unknown as undefined } });
+
+    // @ts-ignore
+    expect(BaseResource._fetch).toHaveBeenCalledWith({
+      method: 'PATCH',
+      path: '/me/metadata',
+      body: {
+        unsafeMetadata: JSON.stringify({ theme: null }),
+      },
     });
   });
 });

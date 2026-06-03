@@ -154,7 +154,7 @@ export const hrHR: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Načini plaćanja',
-    popular: 'Popularno',
+    highlightedPlanBadge: 'Popularno',
     pricingTable: {
       billingCycle: 'Obračunsko razdoblje',
       included: 'Uključeno',
@@ -209,12 +209,21 @@ export const hrHR: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'Obratite se administratoru vaše organizacije kako biste dobili dopuštenja za upravljanje poslovnim vezama.',
-      title: 'Nemate dopuštenje za upravljanje poslovnim vezama',
+      subtitle: 'Obratite se administratoru vaše organizacije kako biste nadogradili svoja dopuštenja.',
+      title: 'Nemate dopuštenje za upravljanje jedinstvenom prijavom (SSO)',
     },
     navbar: {
       title: 'Konfiguriraj jedinstvenu prijavu (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Odaberite pružatelja',
+      subtitle: 'Odaberite pružatelja za kojeg ćete postaviti SSO.',
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Prilagođeni SAML pružatelj',
+      },
+      warning: 'Nakon odabira pružatelja ne možete ga ponovno mijenjati dok konfiguracija ne završi',
     },
     verifyEmailDomainStep: {
       title: 'Potvrdi e-mail adresu',

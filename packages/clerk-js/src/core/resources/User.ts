@@ -5,7 +5,7 @@ import type {
   ClerkPaginatedResponse,
   CreateEmailAddressParams,
   CreateExternalAccountParams,
-  CreateMeEnterpriseConnectionParams,
+  CreateOrganizationEnterpriseConnectionParams,
   CreatePhoneNumberParams,
   CreateWeb3WalletParams,
   DeletedObjectJSON,
@@ -34,7 +34,8 @@ import type {
   SetProfileImageParams,
   TOTPJSON,
   TOTPResource,
-  UpdateMeEnterpriseConnectionParams,
+  UpdateOrganizationEnterpriseConnectionParams,
+  UpdateUserMetadataParams,
   UpdateUserParams,
   UpdateUserPasswordParams,
   UserJSON,
@@ -43,10 +44,10 @@ import type {
   VerifyTOTPParams,
   Web3WalletResource,
 } from '@clerk/shared/types';
-import { deepCamelToSnake } from '@clerk/shared/underscore';
 
 import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
 import { unixEpochToDate } from '../../utils/date';
+import { toEnterpriseConnectionBody } from '../../utils/enterpriseConnection';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { eventBus, events } from '../events';
 import { addPaymentMethod, getPaymentMethods, initializePaymentMethod } from '../modules/billing';
@@ -241,6 +242,13 @@ export class User extends BaseResource implements UserResource {
     });
   };
 
+  updateMetadata = (params: UpdateUserMetadataParams): Promise<UserResource> => {
+    return this._basePatch({
+      path: `${this.path()}/metadata`,
+      body: normalizeUnsafeMetadata(params),
+    });
+  };
+
   updatePassword = (params: UpdateUserPasswordParams): Promise<UserResource> => {
     return this._basePost({
       body: params,
@@ -329,13 +337,13 @@ export class User extends BaseResource implements UserResource {
   };
 
   createEnterpriseConnection = async (
-    params: CreateMeEnterpriseConnectionParams,
+    params: CreateOrganizationEnterpriseConnectionParams,
   ): Promise<EnterpriseConnectionResource> => {
     const json = (
       await BaseResource._fetch<EnterpriseConnectionJSON>({
         path: `${this.path()}/enterprise_connections`,
         method: 'POST',
-        body: toMeEnterpriseConnectionBody(params) as any,
+        body: toEnterpriseConnectionBody(params) as any,
       })
     )?.response as unknown as EnterpriseConnectionJSON;
 
@@ -344,13 +352,13 @@ export class User extends BaseResource implements UserResource {
 
   updateEnterpriseConnection = async (
     enterpriseConnectionId: string,
-    params: UpdateMeEnterpriseConnectionParams,
+    params: UpdateOrganizationEnterpriseConnectionParams,
   ): Promise<EnterpriseConnectionResource> => {
     const json = (
       await BaseResource._fetch<EnterpriseConnectionJSON>({
         path: `${this.path()}/enterprise_connections/${enterpriseConnectionId}`,
         method: 'PATCH',
-        body: toMeEnterpriseConnectionBody(params) as any,
+        body: toEnterpriseConnectionBody(params) as any,
       })
     )?.response as unknown as EnterpriseConnectionJSON;
 
@@ -545,31 +553,4 @@ export class User extends BaseResource implements UserResource {
       created_at: this.createdAt?.getTime() || null,
     };
   }
-}
-
-/**
- * Serializes `CreateMeEnterpriseConnectionParams` / `UpdateMeEnterpriseConnectionParams`
- * for the `/me/enterprise_connections` FAPI endpoints.
- *
- * Uses `deepCamelToSnake` but preserves `saml.attributeMapping` and `customAttributes` as-is. Their keys are
- * user-supplied data and must not be camel→snake transformed.
- */
-function toMeEnterpriseConnectionBody(
-  params: CreateMeEnterpriseConnectionParams | UpdateMeEnterpriseConnectionParams,
-): Record<string, unknown> {
-  const originalAttributeMapping =
-    params.saml && typeof params.saml === 'object' ? params.saml.attributeMapping : undefined;
-  const originalCustomAttributes = 'customAttributes' in params ? params.customAttributes : undefined;
-
-  const body = deepCamelToSnake(params) as Record<string, any>;
-
-  if (originalAttributeMapping !== undefined && body.saml && typeof body.saml === 'object') {
-    body.saml.attribute_mapping = originalAttributeMapping;
-  }
-
-  if (originalCustomAttributes !== undefined) {
-    body.custom_attributes = originalCustomAttributes;
-  }
-
-  return body;
 }

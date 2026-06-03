@@ -148,7 +148,7 @@ export const caES: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Mètodes de pagament',
-    popular: 'Popular',
+    highlightedPlanBadge: 'Popular',
     pricingTable: {
       billingCycle: 'Cicle de facturació',
       included: 'Inclòs',
@@ -187,12 +187,21 @@ export const caES: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        "Contacta amb l'administrador de la teva organització per obtenir permisos per gestionar connexions empresarials.",
-      title: 'No tens permís per gestionar connexions empresarials',
+      subtitle: "Contacta amb l'administrador de la teva organització per ampliar els teus permisos.",
+      title: "No tens permís per gestionar l'inici de sessió únic (SSO)",
     },
     navbar: {
       title: "Configura l'inici de sessió únic (SSO)",
+    },
+    selectProviderStep: {
+      title: 'Seleccioneu un proveïdor',
+      subtitle: 'Seleccioneu el proveïdor per al qual configurareu SSO.',
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Proveïdor SAML personalitzat',
+      },
+      warning: 'Un cop seleccionat un proveïdor no podreu canviar-lo fins que la configuració hagi finalitzat',
     },
     verifyEmailDomainStep: {
       title: 'Verifica el correu electrònic',

@@ -141,7 +141,7 @@ export const ruRU: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -180,12 +180,21 @@ export const ruRU: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'Обратитесь к администратору вашей организации, чтобы получить разрешения на управление корпоративными подключениями.',
-      title: 'У вас нет разрешения на управление корпоративными подключениями',
+      subtitle: 'Обратитесь к администратору вашей организации, чтобы расширить ваши разрешения.',
+      title: 'У вас нет разрешения на управление единым входом (SSO)',
     },
     navbar: {
       title: 'Настроить единый вход (SSO)',
+    },
+    selectProviderStep: {
+      title: 'Выберите поставщика',
+      subtitle: 'Выберите поставщика, для которого вы будете настраивать SSO.',
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Пользовательский поставщик SAML',
+      },
+      warning: 'После выбора поставщика вы не сможете изменить его до завершения настройки',
     },
     verifyEmailDomainStep: {
       title: 'Подтвердить адрес электронной почты',
