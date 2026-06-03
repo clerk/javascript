@@ -13,7 +13,7 @@ A vertically stacked set of collapsible sections. Supports single or multiple op
 ```tsx
 import { Accordion } from '@/primitives/accordion';
 
-<Accordion
+<Accordion.Root
   type='single'
   defaultValue={['item-1']}
 >
@@ -29,7 +29,7 @@ import { Accordion } from '@/primitives/accordion';
     </Accordion.Header>
     <Accordion.Panel>Content for section 2</Accordion.Panel>
   </Accordion.Item>
-</Accordion>;
+</Accordion.Root>;
 ```
 
 ### Controlled
@@ -37,19 +37,19 @@ import { Accordion } from '@/primitives/accordion';
 ```tsx
 const [value, setValue] = useState<string[]>(['item-1']);
 
-<Accordion
+<Accordion.Root
   value={value}
   onValueChange={setValue}
 >
   {/* ... */}
-</Accordion>;
+</Accordion.Root>;
 ```
 
 ## Parts
 
 | Part                | Default Element | Description                        |
 | ------------------- | --------------- | ---------------------------------- |
-| `Accordion`         | `<div>`         | Root wrapper, provides context     |
+| `Accordion.Root`    | `<div>`         | Root wrapper, provides context     |
 | `Accordion.Item`    | `<div>`         | Wraps a single collapsible section |
 | `Accordion.Header`  | `<h3>`          | Heading wrapper for the trigger    |
 | `Accordion.Trigger` | `<button>`      | Clickable toggle for its panel     |
@@ -57,7 +57,7 @@ const [value, setValue] = useState<string[]>(['item-1']);
 
 ## Props
 
-### `Accordion` (root)
+### `Accordion.Root`
 
 | Prop            | Type                        | Default      | Description                               |
 | --------------- | --------------------------- | ------------ | ----------------------------------------- |
