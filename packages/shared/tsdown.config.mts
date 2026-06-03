@@ -55,6 +55,23 @@ export default defineConfig(({ watch, env }) => {
       ],
       outDir: './dist/runtime',
       unbundle: false,
+      // Route rolldown's shared chunks into a nested `_chunks/` directory. The
+      // package's `"./*"` wildcard export resolves to `dist/runtime/*`, and
+      // break-check expands that surface with a single-segment `*`, so
+      // content-hashed internal chunks sitting flat in `dist/runtime` get
+      // enumerated as phantom public subpaths. Nesting them one level down keeps
+      // them out of that API-snapshot expansion; package subpath imports are
+      // blocked separately by the `./_chunks/*` null export.
+      outputOptions: options => {
+        const { chunkFileNames } = options;
+        return {
+          ...options,
+          chunkFileNames:
+            typeof chunkFileNames === 'function'
+              ? info => `_chunks/${chunkFileNames(info)}`
+              : `_chunks/${chunkFileNames ?? '[name]-[hash].js'}`,
+        };
+      },
     },
   ];
 });
