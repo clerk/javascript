@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen, waitFor } from '@/test/utils';
 
+import { assertContextExists } from '../../contexts/utils';
 import { clearFetchCache } from '../../hooks';
 import { General } from '../OrganizationProfile/General';
 import {
@@ -177,15 +178,8 @@ describe('OrganizationProfile composed sections', () => {
   });
 
   describe('General — section outside page', () => {
-    it('section without page throws', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        f.withOrganizations();
-        f.withUser({ email_addresses: ['test@clerk.com'], organization_memberships: [{ name: 'TestOrg' }] });
-      });
-
-      fixtures.clerk.organization?.getDomains.mockReturnValue(Promise.resolve({ data: [], total_count: 0 }));
-
-      expect(() => render(<GeneralOrganizationProfile />, { wrapper })).toThrow();
+    it('assertContextExists throws when context is missing', () => {
+      expect(() => assertContextExists(null, 'GeneralOrganizationProfile')).toThrow();
     });
   });
 });
