@@ -957,7 +957,6 @@ export interface BillingCheckoutTotalsJSON {
   total_due_after_free_trial: BillingMoneyAmountJSON | null;
   /**
    * Discounts applied to this checkout such as mid-cycle prorated seat discounts.
-   * The key is always present; the value is `null` when no discounts apply.
    */
   discounts: BillingCheckoutDiscountsJSON | null;
   /**
