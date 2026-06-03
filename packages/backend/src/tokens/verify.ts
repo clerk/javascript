@@ -261,7 +261,7 @@ export async function verifyMachineAuthToken(token: string, options: VerifyToken
       } as MachineTokenReturnType<never, MachineTokenVerificationError>;
     }
 
-    if (decodedResult.payload.sub.startsWith(M2M_SUBJECT_PREFIX)) {
+    if (typeof decodedResult.payload.sub === 'string' && decodedResult.payload.sub.startsWith(M2M_SUBJECT_PREFIX)) {
       return verifyM2MJwt(token, decodedResult, options);
     }
 
