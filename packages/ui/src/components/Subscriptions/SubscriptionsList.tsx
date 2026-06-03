@@ -132,7 +132,12 @@ export function SubscriptionsList({
                 length={sortedSubscriptionItems.length}
               />
             ))}
-            {subscription?.nextPayment ? <SubscriptionOverviewRow nextPayment={subscription.nextPayment} /> : null}
+            {subscription?.nextPayment ? (
+              <SubscriptionOverviewRow
+                nextPayment={subscription.nextPayment}
+                localizationRoot={localizationRoot}
+              />
+            ) : null}
           </Tbody>
         </Table>
       )}
@@ -186,8 +191,10 @@ export function SubscriptionsList({
 
 function SubscriptionOverviewRow({
   nextPayment,
+  localizationRoot,
 }: {
   nextPayment: NonNullable<BillingSubscriptionResource['nextPayment']>;
+  localizationRoot: ReturnType<typeof useSubscriberTypeLocalizationRoot>;
 }) {
   return (
     <Tr
@@ -196,7 +203,10 @@ function SubscriptionOverviewRow({
       })}
     >
       <Td sx={_ => ({ verticalAlign: 'top' })}>
-        <Text variant='subtitle'>Overview</Text>
+        <Text
+          variant='subtitle'
+          localizationKey={localizationKeys(`${localizationRoot}.billingPage.subscriptionsListSection.overview`)}
+        />
       </Td>
       <Td
         sx={_ => ({
@@ -207,11 +217,6 @@ function SubscriptionOverviewRow({
           gap={1}
           align='end'
         >
-          <Text
-            variant='subtitle'
-            colorScheme='secondary'
-            localizationKey={localizationKeys('billing.billedMonthly')}
-          />
           <Text
             variant='h2'
             sx={t => ({

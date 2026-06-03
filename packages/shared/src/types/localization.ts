@@ -964,6 +964,7 @@ export type __internal_LocalizationResource = {
         actionLabel__newSubscription: LocalizationValue;
         actionLabel__manageSubscription: LocalizationValue;
         actionLabel__switchPlan: LocalizationValue;
+        overview: LocalizationValue;
       };
       paymentHistorySection: {
         empty: LocalizationValue;
@@ -1206,6 +1207,7 @@ export type __internal_LocalizationResource = {
         actionLabel__manageSubscription: LocalizationValue;
         actionLabel__switchPlan: LocalizationValue;
         includedSeatsUsage: LocalizationValue<'includedSeats'>;
+        overview: LocalizationValue;
         paidSeatsUsage: LocalizationValue<'seatsQuantity' | 'amount'>;
         seatLimit: LocalizationValue<'seatLimit'>;
         seatLimitAndIncludedSeats: LocalizationValue<'seatLimit' | 'includedSeats'>;
