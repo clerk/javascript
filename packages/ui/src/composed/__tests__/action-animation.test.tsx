@@ -8,7 +8,8 @@ import { render, screen, waitFor } from '@/test/utils';
 
 import { clearFetchCache } from '../../hooks';
 import { Account } from '../UserProfile/Account';
-import { AccountEmails, AccountProfile } from '../UserProfile/sectionWrappers';
+import { AccountEmails } from '../UserProfile/AccountEmails';
+import { AccountProfile } from '../UserProfile/AccountProfile';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');
 
