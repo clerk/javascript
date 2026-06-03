@@ -27,7 +27,7 @@ export const TooltipContext = createContext<TooltipContextValue | null>(null);
 export function useTooltipContext() {
   const ctx = useContext(TooltipContext);
   if (!ctx) {
-    throw new Error('Tooltip compound components must be used within <Tooltip>');
+    throw new Error('Tooltip compound components must be used within <Tooltip.Root>');
   }
   return ctx;
 }
