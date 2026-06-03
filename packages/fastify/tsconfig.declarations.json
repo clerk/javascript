@@ -1,8 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "emitDeclarationOnly": true,
-    "skipLibCheck": true
-  },
-  "exclude": ["node_modules", "dist", "**/__tests__/**/*"]
-}
