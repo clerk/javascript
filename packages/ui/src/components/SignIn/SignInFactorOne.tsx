@@ -13,7 +13,7 @@ import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
 import type { AlternativeMethodsMode } from './AlternativeMethods';
 import { AlternativeMethods } from './AlternativeMethods';
-import { hasMultipleEnterpriseConnections } from './shared';
+import { hasMultipleEnterpriseConnections, SIGN_IN_RESET_PASSWORD_INTENT_PARAM } from './shared';
 import { SignInFactorOneAlternativePhoneCodeCard } from './SignInFactorOneAlternativePhoneCodeCard';
 import { SignInFactorOneEmailCodeCard } from './SignInFactorOneEmailCodeCard';
 import { SignInFactorOneEmailLinkCard } from './SignInFactorOneEmailLinkCard';
@@ -97,13 +97,17 @@ function SignInFactorOneInternal(): JSX.Element {
     supportedFirstFactors,
   });
 
-  const [showAllStrategies, setShowAllStrategies] = React.useState<boolean>(
-    () => !currentFactor || !factorHasLocalStrategy(currentFactor),
-  );
-
   const resetPasswordFactor = useResetPasswordFactor();
+  const resetPasswordIntent = router.queryParams[SIGN_IN_RESET_PASSWORD_INTENT_PARAM] === 'true';
 
-  const [showForgotPasswordStrategies, setShowForgotPasswordStrategies] = React.useState(false);
+  const [showAllStrategies, setShowAllStrategies] = React.useState<boolean>(() => {
+    const defaultShow = !currentFactor || !factorHasLocalStrategy(currentFactor);
+    return defaultShow || (resetPasswordIntent && !resetPasswordFactor);
+  });
+
+  const [showForgotPasswordStrategies, setShowForgotPasswordStrategies] = React.useState(
+    () => resetPasswordIntent && !!resetPasswordFactor,
+  );
 
   const [passwordErrorCode, setPasswordErrorCode] = React.useState<PasswordErrorCode | null>(null);
 
