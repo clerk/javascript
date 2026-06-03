@@ -1,4 +1,6 @@
 import type {
+  BillingCheckoutDiscounts,
+  BillingCheckoutDiscountsJSON,
   BillingCheckoutTotals,
   BillingCheckoutTotalsJSON,
   BillingCredits,
@@ -7,6 +9,8 @@ import type {
   BillingMoneyAmountJSON,
   BillingPaymentTotals,
   BillingPaymentTotalsJSON,
+  BillingPerPeriodTotals,
+  BillingPerPeriodTotalsJSON,
   BillingPerUnitTotal,
   BillingPerUnitTotalJSON,
   BillingPerUnitTotalTier,
@@ -82,6 +86,30 @@ export const billingCreditsFromJSON = (data: BillingCreditsJSON): BillingCredits
   };
 };
 
+const billingCheckoutDiscountsFromJSON = (data: BillingCheckoutDiscountsJSON): BillingCheckoutDiscounts => {
+  return {
+    proration: data.proration
+      ? {
+          amount: billingMoneyAmountFromJSON(data.proration.amount),
+          cycleDaysPassed: data.proration.cycle_days_passed,
+          cycleDaysTotal: data.proration.cycle_days_total,
+          cyclePassedPercent: data.proration.cycle_passed_percent,
+        }
+      : null,
+    total: billingMoneyAmountFromJSON(data.total),
+  };
+};
+
+const billingPerPeriodTotalsFromJSON = (data: BillingPerPeriodTotalsJSON): BillingPerPeriodTotals => {
+  return {
+    subtotal: billingMoneyAmountFromJSON(data.subtotal),
+    baseFee: billingMoneyAmountFromJSON(data.base_fee),
+    taxTotal: billingMoneyAmountFromJSON(data.tax_total),
+    grandTotal: billingMoneyAmountFromJSON(data.grand_total),
+    perUnitTotals: data.per_unit_totals ? billingPerUnitTotalsFromJSON(data.per_unit_totals) : undefined,
+  };
+};
+
 export const billingTotalsFromJSON = <T extends BillingStatementTotalsJSON | BillingCheckoutTotalsJSON>(
   data: T,
 ): T extends { total_due_now: BillingMoneyAmountJSON } ? BillingCheckoutTotals : BillingStatementTotals => {
@@ -91,6 +119,9 @@ export const billingTotalsFromJSON = <T extends BillingStatementTotalsJSON | Bil
     taxTotal: billingMoneyAmountFromJSON(data.tax_total),
   };
 
+  if ('base_fee' in data && data.base_fee) {
+    totals.baseFee = billingMoneyAmountFromJSON(data.base_fee);
+  }
   if ('past_due' in data) {
     totals.pastDue = data.past_due ? billingMoneyAmountFromJSON(data.past_due) : null;
   }
@@ -107,14 +138,23 @@ export const billingTotalsFromJSON = <T extends BillingStatementTotalsJSON | Bil
   if ('total_due_now' in data) {
     totals.totalDueNow = billingMoneyAmountFromJSON(data.total_due_now);
   }
-  if ('total_due_per_period' in data) {
-    totals.totalDuePerPeriod = billingMoneyAmountFromJSON(data.total_due_per_period);
-  }
 
   if ('total_due_after_free_trial' in data) {
     totals.totalDueAfterFreeTrial = data.total_due_after_free_trial
       ? billingMoneyAmountFromJSON(data.total_due_after_free_trial)
       : null;
+  }
+
+  if ('discounts' in data) {
+    totals.discounts = data.discounts ? billingCheckoutDiscountsFromJSON(data.discounts) : null;
+  }
+
+  if ('total_due_per_period' in data && data.total_due_per_period) {
+    totals.totalDuePerPeriod = billingMoneyAmountFromJSON(data.total_due_per_period);
+  }
+
+  if ('totals_due_per_period' in data && data.totals_due_per_period) {
+    totals.totalsDuePerPeriod = billingPerPeriodTotalsFromJSON(data.totals_due_per_period);
   }
 
   return totals as T extends { total_due_now: BillingMoneyAmountJSON } ? BillingCheckoutTotals : BillingStatementTotals;

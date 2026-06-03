@@ -862,15 +862,71 @@ export interface BillingCredits {
 }
 
 /**
+ * Details about a prorated discount applied when adding a seat mid-cycle. The discount covers the part of the
+ * billing period that has already passed, so the payer is only charged for the time remaining in the cycle.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingProrationDiscountDetail {
+  amount: BillingMoneyAmount;
+  cycleDaysPassed: number;
+  cycleDaysTotal: number;
+  cyclePassedPercent: number;
+}
+
+/**
+ * Discounts applied to the checkout, such as prorated discounts for mid-cycle seat additions.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingCheckoutDiscounts {
+  /**
+   * The prorated discount for the part of the billing period that has already passed when adding a seat mid-cycle.
+   * Unlike the proration credit (which refunds the unused remainder of a plan you already paid for), this discount
+   * means you are not charged for the portion of the new seat's cycle that has already elapsed.
+   */
+  proration: BillingProrationDiscountDetail | null;
+  /**
+   * The total of all discounts applied to the checkout.
+   */
+  total: BillingMoneyAmount;
+}
+
+/**
+ * Per-period renewal totals, describing what the subscription renewal charge will look like after the current checkout.
+ * Unlike the top-level checkout totals (which only reflect the items actively being purchased),
+ * this object contains the full renewal breakdown including all seats and the base plan fee.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingPerPeriodTotals {
+  subtotal: BillingMoneyAmount;
+  baseFee: BillingMoneyAmount;
+  taxTotal: BillingMoneyAmount;
+  grandTotal: BillingMoneyAmount;
+  /**
+   * Per-unit cost breakdown for the renewal period, covering all units purchased to date
+   * (not just the ones being added in this checkout).
+   */
+  perUnitTotals?: BillingPerUnitTotal[];
+}
+
+/**
  * The `BillingCheckoutTotals` type represents the total costs, taxes, and other pricing details for a checkout session.
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingCheckoutTotals {
   /**
-   * The price of the items or Plan before taxes, credits, or discounts are applied.
+   * The price of items actively being purchased in this checkout, before taxes and discounts.
+   * When only adding seats mid-cycle, this reflects just the new seats and excludes the base plan fee and
+   * seats that were already paid for.
    */
   subtotal: BillingMoneyAmount;
+  /**
+   * The base plan fee portion of the totals, before per-unit charges and adjustments.
+   */
+  baseFee?: BillingMoneyAmount;
   /**
    * The total amount for the checkout, including taxes and after credits/discounts are applied. This is the final amount due.
    */
@@ -880,7 +936,8 @@ export interface BillingCheckoutTotals {
    */
   taxTotal: BillingMoneyAmount;
   /**
-   * Per-unit cost breakdown for this checkout (for example, seats).
+   * Per-unit cost breakdown for items actively being purchased in this checkout (for example, seats being added).
+   * When only adding seats mid-cycle, this only covers the seats being added, not seats already paid for.
    */
   perUnitTotals?: BillingPerUnitTotal[];
   /**
@@ -904,6 +961,16 @@ export interface BillingCheckoutTotals {
    * The amount that becomes due after a free trial ends.
    */
   totalDueAfterFreeTrial: BillingMoneyAmount | null;
+  /**
+   * Discounts applied to this checkout such as mid-cycle prorated seat discounts.
+   */
+  discounts?: BillingCheckoutDiscounts | null;
+  /**
+   * Full renewal period totals after this checkout completes.
+   * Contains the complete breakdown of what the next recurring charge will look like,
+   * including all seats and the base plan fee.
+   */
+  totalsDuePerPeriod?: BillingPerPeriodTotals;
 }
 
 /**

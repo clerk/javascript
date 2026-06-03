@@ -1644,4 +1644,239 @@ describe('Checkout', () => {
       });
     });
   });
+
+  describe('differentiates between new subscriptions and mid-cycle seat additions in checkout totals', () => {
+    const proPlan = {
+      id: 'plan_totals',
+      name: 'Pro',
+      description: 'Pro plan',
+      features: [],
+      fee: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
+      annualFee: { amount: 12000, amountFormatted: '120.00', currency: 'USD', currencySymbol: '$' },
+      annualMonthlyFee: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
+      slug: 'pro',
+      avatarUrl: '',
+      publiclyVisible: true,
+      isDefault: true,
+      isRecurring: true,
+      hasBaseFee: false,
+      forPayerType: 'user',
+      freeTrialDays: 0,
+      freeTrialEnabled: false,
+    };
+
+    const money = (amount: number, amountFormatted: string) => ({
+      amount,
+      amountFormatted,
+      currency: 'USD',
+      currencySymbol: '$',
+    });
+
+    it('shows prorated discount and renewal totals for a mid-cycle seat addition', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+        f.withBilling();
+      });
+
+      fixtures.clerk.user?.getPaymentMethods.mockResolvedValue({ data: [], total_count: 0 });
+
+      fixtures.clerk.billing.startCheckout.mockResolvedValue({
+        id: 'chk_totals_proration',
+        status: 'needs_confirmation',
+        externalClientSecret: 'cs_test_totals_proration',
+        externalGatewayId: 'gw_test',
+        totals: {
+          subtotal: money(1500, '15.00'),
+          baseFee: money(0, '0.00'),
+          grandTotal: money(1000, '10.00'),
+          taxTotal: money(0, '0.00'),
+          credit: money(0, '0.00'),
+          pastDue: money(0, '0.00'),
+          totalDueNow: money(1000, '10.00'),
+          discounts: {
+            proration: {
+              amount: money(500, '5.00'),
+              cycleDaysPassed: 15,
+              cycleDaysTotal: 30,
+              cyclePassedPercent: 50,
+            },
+            total: money(500, '5.00'),
+          },
+          totalDuePerPeriod: money(3000, '30.00'),
+          totalsDuePerPeriod: {
+            subtotal: money(3000, '30.00'),
+            baseFee: money(0, '0.00'),
+            taxTotal: money(0, '0.00'),
+            grandTotal: money(3000, '30.00'),
+          },
+        },
+        isImmediatePlanChange: true,
+        planPeriod: 'month',
+        plan: proPlan,
+        paymentMethod: undefined,
+        confirm: vi.fn(),
+        freeTrialEndsAt: null,
+        needsPaymentMethod: false,
+      } as any);
+
+      const { getByRole, getByText } = render(
+        <Drawer.Root
+          open
+          onOpenChange={() => {}}
+        >
+          <Checkout
+            planId='plan_totals'
+            planPeriod='month'
+          />
+        </Drawer.Root>,
+        { wrapper },
+      );
+
+      await waitFor(() => {
+        expect(getByRole('heading', { name: 'Checkout' })).toBeVisible();
+      });
+
+      const proratedDiscountRow = getByText('Prorated discount').closest('.cl-lineItemsGroup');
+      expect(proratedDiscountRow).toBeInTheDocument();
+      expect(proratedDiscountRow).toHaveTextContent('- $5.00');
+
+      const subtotalRenewalRow = getByText('Subtotal per period').closest('.cl-lineItemsGroup');
+      expect(subtotalRenewalRow).toBeInTheDocument();
+      expect(subtotalRenewalRow).toHaveTextContent('$30.00');
+
+      const totalPerPeriodRow = getByText('Total per period').closest('.cl-lineItemsGroup');
+      expect(totalPerPeriodRow).toBeInTheDocument();
+      expect(totalPerPeriodRow).toHaveTextContent('$30.00');
+    });
+
+    it('hides renewal totals for a new subscription where the renewal equals the amount due now', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+        f.withBilling();
+      });
+
+      fixtures.clerk.user?.getPaymentMethods.mockResolvedValue({ data: [], total_count: 0 });
+
+      fixtures.clerk.billing.startCheckout.mockResolvedValue({
+        id: 'chk_totals_new_sub',
+        status: 'needs_confirmation',
+        externalClientSecret: 'cs_test_totals_new_sub',
+        externalGatewayId: 'gw_test',
+        totals: {
+          subtotal: money(1000, '10.00'),
+          baseFee: money(1000, '10.00'),
+          grandTotal: money(1000, '10.00'),
+          taxTotal: money(0, '0.00'),
+          credit: money(0, '0.00'),
+          pastDue: money(0, '0.00'),
+          totalDueNow: money(1000, '10.00'),
+          discounts: null,
+          totalDuePerPeriod: money(1000, '10.00'),
+          totalsDuePerPeriod: {
+            subtotal: money(1000, '10.00'),
+            baseFee: money(1000, '10.00'),
+            taxTotal: money(0, '0.00'),
+            grandTotal: money(1000, '10.00'),
+          },
+        },
+        isImmediatePlanChange: true,
+        planPeriod: 'month',
+        plan: proPlan,
+        paymentMethod: undefined,
+        confirm: vi.fn(),
+        freeTrialEndsAt: null,
+        needsPaymentMethod: false,
+      } as any);
+
+      const { getByRole, getByText, queryByText } = render(
+        <Drawer.Root
+          open
+          onOpenChange={() => {}}
+        >
+          <Checkout
+            planId='plan_totals'
+            planPeriod='month'
+          />
+        </Drawer.Root>,
+        { wrapper },
+      );
+
+      await waitFor(() => {
+        expect(getByRole('heading', { name: 'Checkout' })).toBeVisible();
+      });
+
+      // The "Total Due Today" row is still shown, but no renewal/discount rows are added
+      expect(getByText('Total Due Today')).toBeVisible();
+      expect(queryByText('Subtotal per period')).toBeNull();
+      expect(queryByText('Total per period')).toBeNull();
+      expect(queryByText('Prorated discount')).toBeNull();
+    });
+
+    it('hides the prorated discount row when the discount amount is zero', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+        f.withBilling();
+      });
+
+      fixtures.clerk.user?.getPaymentMethods.mockResolvedValue({ data: [], total_count: 0 });
+
+      fixtures.clerk.billing.startCheckout.mockResolvedValue({
+        id: 'chk_totals_zero_discount',
+        status: 'needs_confirmation',
+        externalClientSecret: 'cs_test_totals_zero_discount',
+        externalGatewayId: 'gw_test',
+        totals: {
+          subtotal: money(1000, '10.00'),
+          baseFee: money(0, '0.00'),
+          grandTotal: money(1000, '10.00'),
+          taxTotal: money(0, '0.00'),
+          credit: money(0, '0.00'),
+          pastDue: money(0, '0.00'),
+          totalDueNow: money(1000, '10.00'),
+          discounts: {
+            proration: {
+              amount: money(0, '0.00'),
+              cycleDaysPassed: 0,
+              cycleDaysTotal: 30,
+              cyclePassedPercent: 0,
+            },
+            total: money(0, '0.00'),
+          },
+          totalDuePerPeriod: money(1000, '10.00'),
+          totalsDuePerPeriod: {
+            subtotal: money(1000, '10.00'),
+            baseFee: money(0, '0.00'),
+            taxTotal: money(0, '0.00'),
+            grandTotal: money(1000, '10.00'),
+          },
+        },
+        isImmediatePlanChange: true,
+        planPeriod: 'month',
+        plan: proPlan,
+        paymentMethod: undefined,
+        confirm: vi.fn(),
+        freeTrialEndsAt: null,
+        needsPaymentMethod: false,
+      } as any);
+
+      const { getByRole, queryByText } = render(
+        <Drawer.Root
+          open
+          onOpenChange={() => {}}
+        >
+          <Checkout
+            planId='plan_totals'
+            planPeriod='month'
+          />
+        </Drawer.Root>,
+        { wrapper },
+      );
+
+      await waitFor(() => {
+        expect(getByRole('heading', { name: 'Checkout' })).toBeVisible();
+      });
+
+      expect(queryByText('Prorated discount')).toBeNull();
+    });
+  });
 });
