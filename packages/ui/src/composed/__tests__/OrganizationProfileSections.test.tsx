@@ -6,12 +6,10 @@ import { render, screen, waitFor } from '@/test/utils';
 import { assertContextExists } from '../../contexts/utils';
 import { clearFetchCache } from '../../hooks';
 import { General } from '../OrganizationProfile/General';
-import {
-  GeneralDeleteOrganization,
-  GeneralLeaveOrganization,
-  GeneralOrganizationProfile,
-  GeneralVerifiedDomains,
-} from '../OrganizationProfile/sectionWrappers';
+import { GeneralDeleteOrganization } from '../OrganizationProfile/GeneralDeleteOrganization';
+import { GeneralLeaveOrganization } from '../OrganizationProfile/GeneralLeaveOrganization';
+import { GeneralOrganizationProfile } from '../OrganizationProfile/GeneralOrganizationProfile';
+import { GeneralVerifiedDomains } from '../OrganizationProfile/GeneralVerifiedDomains';
 
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 

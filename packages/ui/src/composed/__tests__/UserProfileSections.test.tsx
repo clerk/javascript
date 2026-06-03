@@ -7,20 +7,18 @@ import { assertContextExists } from '../../contexts/utils';
 import { clearFetchCache } from '../../hooks';
 import { Account } from '../UserProfile/Account';
 import { Security } from '../UserProfile/Security';
-import {
-  AccountConnectedAccounts,
-  AccountEmails,
-  AccountEnterpriseAccounts,
-  AccountPhone,
-  AccountProfile,
-  AccountUsername,
-  AccountWeb3,
-  SecurityActiveDevices,
-  SecurityDelete,
-  SecurityMfa,
-  SecurityPasskeys,
-  SecurityPassword,
-} from '../UserProfile/sectionWrappers';
+import { AccountConnectedAccounts } from '../UserProfile/AccountConnectedAccounts';
+import { AccountEmails } from '../UserProfile/AccountEmails';
+import { AccountEnterpriseAccounts } from '../UserProfile/AccountEnterpriseAccounts';
+import { AccountPhone } from '../UserProfile/AccountPhone';
+import { AccountProfile } from '../UserProfile/AccountProfile';
+import { AccountUsername } from '../UserProfile/AccountUsername';
+import { AccountWeb3 } from '../UserProfile/AccountWeb3';
+import { SecurityActiveDevices } from '../UserProfile/SecurityActiveDevices';
+import { SecurityDelete } from '../UserProfile/SecurityDelete';
+import { SecurityMfa } from '../UserProfile/SecurityMfa';
+import { SecurityPasskeys } from '../UserProfile/SecurityPasskeys';
+import { SecurityPassword } from '../UserProfile/SecurityPassword';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');
 
