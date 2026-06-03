@@ -13,7 +13,7 @@ A dropdown menu with keyboard navigation, typeahead, and nested submenu support.
 ```tsx
 import { Menu } from '@/primitives/menu';
 
-<Menu>
+<Menu.Root>
   <Menu.Trigger>Actions</Menu.Trigger>
   <Menu.Positioner>
     <Menu.Popup>
@@ -32,20 +32,20 @@ import { Menu } from '@/primitives/menu';
       />
     </Menu.Popup>
   </Menu.Positioner>
-</Menu>;
+</Menu.Root>;
 ```
 
 ### Nested Submenus
 
-Nest a `<Menu>` inside a parent `<Menu>` — the nested trigger automatically renders as a `menuitem` and opens on hover with a safe polygon zone.
+Nest a `<Menu.Root>` inside a parent `<Menu.Root>` — the nested trigger automatically renders as a `menuitem` and opens on hover with a safe polygon zone.
 
 ```tsx
-<Menu>
+<Menu.Root>
   <Menu.Trigger>Actions</Menu.Trigger>
   <Menu.Positioner>
     <Menu.Popup>
       <Menu.Item label='Edit' />
-      <Menu>
+      <Menu.Root>
         <Menu.Trigger>Share</Menu.Trigger>
         <Menu.Positioner>
           <Menu.Popup>
@@ -53,10 +53,10 @@ Nest a `<Menu>` inside a parent `<Menu>` — the nested trigger automatically re
             <Menu.Item label='Email' />
           </Menu.Popup>
         </Menu.Positioner>
-      </Menu>
+      </Menu.Root>
     </Menu.Popup>
   </Menu.Positioner>
-</Menu>
+</Menu.Root>
 ```
 
 ### Controlled
@@ -64,19 +64,19 @@ Nest a `<Menu>` inside a parent `<Menu>` — the nested trigger automatically re
 ```tsx
 const [open, setOpen] = useState(false);
 
-<Menu
+<Menu.Root
   open={open}
   onOpenChange={setOpen}
 >
   {/* ... */}
-</Menu>;
+</Menu.Root>;
 ```
 
 ## Parts
 
 | Part              | Default Element | Description                            |
 | ----------------- | --------------- | -------------------------------------- |
-| `Menu`            | —               | Root context provider                  |
+| `Menu.Root`       | —               | Root context provider                  |
 | `Menu.Trigger`    | `<button>`      | Opens/closes the menu                  |
 | `Menu.Portal`     | —               | Portals children (accepts `root` prop) |
 | `Menu.Positioner` | `<div>`         | Floating positioned container          |
@@ -87,7 +87,7 @@ const [open, setOpen] = useState(false);
 
 ## Props
 
-### `Menu` (root)
+### `Menu.Root`
 
 | Prop           | Type                      | Default                                           | Description                        |
 | -------------- | ------------------------- | ------------------------------------------------- | ---------------------------------- |
