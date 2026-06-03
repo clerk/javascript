@@ -80,7 +80,7 @@ describe('FloatingTree integration', () => {
   describe('Select inside Dialog', () => {
     function SelectInDialog() {
       return (
-        <Dialog>
+        <Dialog.Root>
           <Dialog.Trigger>Open Dialog</Dialog.Trigger>
           <Dialog.Backdrop>
             <Dialog.Popup>
@@ -105,7 +105,7 @@ describe('FloatingTree integration', () => {
               </Select.Root>
             </Dialog.Popup>
           </Dialog.Backdrop>
-        </Dialog>
+        </Dialog.Root>
       );
     }
 
@@ -199,7 +199,7 @@ describe('FloatingTree integration', () => {
   describe('Popover inside Dialog', () => {
     function PopoverInDialog() {
       return (
-        <Dialog>
+        <Dialog.Root>
           <Dialog.Trigger>Open Dialog</Dialog.Trigger>
           <Dialog.Backdrop>
             <Dialog.Popup>
@@ -214,7 +214,7 @@ describe('FloatingTree integration', () => {
               </Popover.Root>
             </Dialog.Popup>
           </Dialog.Backdrop>
-        </Dialog>
+        </Dialog.Root>
       );
     }
 
