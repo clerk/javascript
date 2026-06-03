@@ -13,6 +13,7 @@ const fakeConsentInfo = {
   oauthApplicationUrl: 'https://example.com',
   clientId: 'client_test',
   state: 'abc',
+  redirectDomain: 'example.com',
   scopes: [
     { scope: 'openid', description: 'View your identity', requiresConsent: true },
     { scope: 'email', description: 'Access your email address', requiresConsent: true },
@@ -94,6 +95,7 @@ describe('OAuthConsent', () => {
 
     expect(getConsentInfo).toHaveBeenCalledWith({
       oauthClientId: 'client_test',
+      redirectUri: 'https://app.example/callback',
     });
   });
 
@@ -204,6 +206,7 @@ describe('OAuthConsent', () => {
       expect(getConsentInfo).toHaveBeenCalledWith({
         oauthClientId: 'override_id',
         scope: 'openid email',
+        redirectUri: 'https://app.example/callback',
       });
     });
   });
