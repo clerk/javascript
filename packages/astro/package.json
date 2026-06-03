@@ -1,6 +1,6 @@
 {
   "name": "@clerk/astro",
-  "version": "3.3.2",
+  "version": "3.3.3",
   "description": "Clerk SDK for Astro",
   "keywords": [
     "auth",
@@ -77,8 +77,8 @@
     "types.ts"
   ],
   "scripts": {
-    "build": "tsup --onSuccess \"pnpm build:dts\" && pnpm copy:components",
-    "build:dts": "tsc --emitDeclarationOnly --declaration",
+    "build": "tsup --onSuccess \"pnpm build:declarations\" && pnpm copy:components",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
     "copy:components": "rm -rf ./components && mkdir -p ./components/ && cp  -r ./src/astro-components/* ./components/ && cp ./src/types.ts ./",
     "dev": "tsup --watch",
     "dev:pub": "pnpm dev -- --env.publish",
