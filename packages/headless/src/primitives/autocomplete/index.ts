@@ -1,3 +1,4 @@
+export * as Autocomplete from './parts';
 export type {
   AutocompleteArrowProps,
   AutocompleteInputProps,
@@ -7,5 +8,4 @@ export type {
   AutocompletePortalProps,
   AutocompletePositionerProps,
   AutocompleteProps,
-} from './autocomplete';
-export { Autocomplete } from './autocomplete';
+} from './parts';

@@ -1,10 +1,10 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it } from 'vitest';
-import { Dialog } from '../primitives/dialog/dialog';
-import { Popover } from '../primitives/popover/popover';
-import { Select } from '../primitives/select/select';
-import { Tooltip } from '../primitives/tooltip/tooltip';
+import { Dialog } from '../primitives/dialog/index';
+import { Popover } from '../primitives/popover/index';
+import { Select } from '../primitives/select/index';
+import { Tooltip } from '../primitives/tooltip/index';
 
 afterEach(() => {
   cleanup();
@@ -20,12 +20,12 @@ describe('FloatingTree integration', () => {
   describe('Select inside Popover', () => {
     function SelectInPopover() {
       return (
-        <Popover>
+        <Popover.Root>
           <Popover.Trigger>Open Popover</Popover.Trigger>
           <Popover.Positioner>
             <Popover.Popup>
               <Popover.Title>Pick a fruit</Popover.Title>
-              <Select>
+              <Select.Root>
                 <Select.Trigger>
                   <Select.Value placeholder='Choose...' />
                 </Select.Trigger>
@@ -42,10 +42,10 @@ describe('FloatingTree integration', () => {
                     ))}
                   </Select.Popup>
                 </Select.Positioner>
-              </Select>
+              </Select.Root>
             </Popover.Popup>
           </Popover.Positioner>
-        </Popover>
+        </Popover.Root>
       );
     }
 
@@ -85,7 +85,7 @@ describe('FloatingTree integration', () => {
           <Dialog.Backdrop>
             <Dialog.Popup>
               <Dialog.Title>Select a fruit</Dialog.Title>
-              <Select>
+              <Select.Root>
                 <Select.Trigger>
                   <Select.Value placeholder='Choose...' />
                 </Select.Trigger>
@@ -102,7 +102,7 @@ describe('FloatingTree integration', () => {
                     ))}
                   </Select.Popup>
                 </Select.Positioner>
-              </Select>
+              </Select.Root>
             </Dialog.Popup>
           </Dialog.Backdrop>
         </Dialog>
@@ -128,22 +128,22 @@ describe('FloatingTree integration', () => {
   describe('Popover inside Popover', () => {
     function NestedPopover() {
       return (
-        <Popover>
+        <Popover.Root>
           <Popover.Trigger>Outer</Popover.Trigger>
           <Popover.Positioner>
             <Popover.Popup>
               <Popover.Title>Outer Content</Popover.Title>
-              <Popover>
+              <Popover.Root>
                 <Popover.Trigger>Inner</Popover.Trigger>
                 <Popover.Positioner>
                   <Popover.Popup>
                     <Popover.Title>Inner Content</Popover.Title>
                   </Popover.Popup>
                 </Popover.Positioner>
-              </Popover>
+              </Popover.Root>
             </Popover.Popup>
           </Popover.Positioner>
-        </Popover>
+        </Popover.Root>
       );
     }
 
@@ -165,20 +165,20 @@ describe('FloatingTree integration', () => {
   describe('Tooltip inside Popover', () => {
     function TooltipInPopover() {
       return (
-        <Popover>
+        <Popover.Root>
           <Popover.Trigger>Open Popover</Popover.Trigger>
           <Popover.Positioner>
             <Popover.Popup>
               <Popover.Title>Content</Popover.Title>
-              <Tooltip>
+              <Tooltip.Root>
                 <Tooltip.Trigger>Hover me</Tooltip.Trigger>
                 <Tooltip.Positioner>
                   <Tooltip.Popup>Tooltip text</Tooltip.Popup>
                 </Tooltip.Positioner>
-              </Tooltip>
+              </Tooltip.Root>
             </Popover.Popup>
           </Popover.Positioner>
-        </Popover>
+        </Popover.Root>
       );
     }
 
@@ -204,14 +204,14 @@ describe('FloatingTree integration', () => {
           <Dialog.Backdrop>
             <Dialog.Popup>
               <Dialog.Title>Dialog Content</Dialog.Title>
-              <Popover>
+              <Popover.Root>
                 <Popover.Trigger>Open Popover</Popover.Trigger>
                 <Popover.Positioner>
                   <Popover.Popup>
                     <Popover.Title>Popover Content</Popover.Title>
                   </Popover.Popup>
                 </Popover.Positioner>
-              </Popover>
+              </Popover.Root>
             </Dialog.Popup>
           </Dialog.Backdrop>
         </Dialog>

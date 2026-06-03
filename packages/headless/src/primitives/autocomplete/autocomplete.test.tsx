@@ -3,8 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { axe } from '../../test-utils/axe';
-import { Popover } from '../popover/popover';
-import { Autocomplete } from './autocomplete';
+import { Popover } from '../popover/index';
+import { Autocomplete } from './index';
 
 afterEach(() => cleanup());
 
@@ -26,7 +26,7 @@ function FilteredAutocomplete(
   const filtered = fruits.filter(f => f.label.toLowerCase().startsWith(inputValue.toLowerCase()));
 
   return (
-    <Autocomplete
+    <Autocomplete.Root
       inputValue={inputValue}
       onInputValueChange={v => {
         setInputValue(v);
@@ -48,13 +48,13 @@ function FilteredAutocomplete(
           ))}
         </Autocomplete.Popup>
       </Autocomplete.Positioner>
-    </Autocomplete>
+    </Autocomplete.Root>
   );
 }
 
-function StaticAutocomplete(props: Partial<React.ComponentProps<typeof Autocomplete>> = {}) {
+function StaticAutocomplete(props: Partial<React.ComponentProps<typeof Autocomplete.Root>> = {}) {
   return (
-    <Autocomplete {...props}>
+    <Autocomplete.Root {...props}>
       <Autocomplete.Input placeholder='Search fruits...' />
       <Autocomplete.Positioner>
         <Autocomplete.Popup>
@@ -69,7 +69,7 @@ function StaticAutocomplete(props: Partial<React.ComponentProps<typeof Autocompl
           ))}
         </Autocomplete.Popup>
       </Autocomplete.Positioner>
-    </Autocomplete>
+    </Autocomplete.Root>
   );
 }
 
@@ -345,7 +345,7 @@ describe('Autocomplete', () => {
     it('renders disabled option with data-cl-disabled', async () => {
       const user = userEvent.setup();
       render(
-        <Autocomplete defaultOpen>
+        <Autocomplete.Root defaultOpen>
           <Autocomplete.Input placeholder='Search...' />
           <Autocomplete.Positioner>
             <Autocomplete.Popup>
@@ -364,7 +364,7 @@ describe('Autocomplete', () => {
               </Autocomplete.Option>
             </Autocomplete.Popup>
           </Autocomplete.Positioner>
-        </Autocomplete>,
+        </Autocomplete.Root>,
       );
 
       const disabledOption = screen.getByText('Banana').closest('[data-cl-slot="autocomplete-option"]');
@@ -376,7 +376,7 @@ describe('Autocomplete', () => {
       const onValueChange = vi.fn();
       const user = userEvent.setup();
       render(
-        <Autocomplete
+        <Autocomplete.Root
           onValueChange={onValueChange}
           defaultOpen
         >
@@ -398,7 +398,7 @@ describe('Autocomplete', () => {
               </Autocomplete.Option>
             </Autocomplete.Popup>
           </Autocomplete.Positioner>
-        </Autocomplete>,
+        </Autocomplete.Root>,
       );
 
       await user.click(screen.getByText('Banana'));
@@ -413,7 +413,7 @@ describe('Autocomplete', () => {
       const filtered = fruits.filter(f => f.label.toLowerCase().startsWith(inputValue.toLowerCase()));
 
       return (
-        <Autocomplete
+        <Autocomplete.Root
           open
           value={props.value}
           inputValue={inputValue}
@@ -432,7 +432,7 @@ describe('Autocomplete', () => {
               </Autocomplete.Option>
             ))}
           </Autocomplete.List>
-        </Autocomplete>
+        </Autocomplete.Root>
       );
     }
 
@@ -585,7 +585,7 @@ describe('Autocomplete', () => {
       const filtered = fruits.filter(f => f.label.toLowerCase().startsWith(inputValue.toLowerCase()));
 
       return (
-        <Popover
+        <Popover.Root
           open={popoverOpen}
           onOpenChange={open => {
             setPopoverOpen(open);
@@ -595,7 +595,7 @@ describe('Autocomplete', () => {
           <Popover.Trigger>{selectedLabel || 'Pick a fruit...'}</Popover.Trigger>
           <Popover.Positioner>
             <Popover.Popup>
-              <Autocomplete
+              <Autocomplete.Root
                 open={popoverOpen}
                 value={selectedValue}
                 inputValue={inputValue}
@@ -620,10 +620,10 @@ describe('Autocomplete', () => {
                     </Autocomplete.Option>
                   ))}
                 </Autocomplete.List>
-              </Autocomplete>
+              </Autocomplete.Root>
             </Popover.Popup>
           </Popover.Positioner>
-        </Popover>
+        </Popover.Root>
       );
     }
 
@@ -728,7 +728,7 @@ describe('Autocomplete', () => {
       const filtered = manyFruits.filter(f => f.label.toLowerCase().startsWith(inputValue.toLowerCase()));
 
       return (
-        <Popover
+        <Popover.Root
           open={popoverOpen}
           onOpenChange={open => {
             setPopoverOpen(open);
@@ -738,7 +738,7 @@ describe('Autocomplete', () => {
           <Popover.Trigger>{selectedLabel || 'Pick a fruit...'}</Popover.Trigger>
           <Popover.Positioner>
             <Popover.Popup>
-              <Autocomplete
+              <Autocomplete.Root
                 open={popoverOpen}
                 value={selectedValue}
                 inputValue={inputValue}
@@ -763,10 +763,10 @@ describe('Autocomplete', () => {
                     </Autocomplete.Option>
                   ))}
                 </Autocomplete.List>
-              </Autocomplete>
+              </Autocomplete.Root>
             </Popover.Popup>
           </Popover.Positioner>
-        </Popover>
+        </Popover.Root>
       );
     }
 
@@ -819,7 +819,7 @@ describe('Autocomplete', () => {
       const filtered = fruits.filter(f => f.label.toLowerCase().startsWith(inputValue.toLowerCase()));
 
       return (
-        <Popover
+        <Popover.Root
           open={popoverOpen}
           onOpenChange={open => {
             setPopoverOpen(open);
@@ -829,7 +829,7 @@ describe('Autocomplete', () => {
           <Popover.Trigger>{selectedLabel || 'Pick a fruit...'}</Popover.Trigger>
           <Popover.Positioner>
             <Popover.Popup>
-              <Autocomplete
+              <Autocomplete.Root
                 open={popoverOpen}
                 value={selectedValue}
                 inputValue={inputValue}
@@ -854,10 +854,10 @@ describe('Autocomplete', () => {
                     </Autocomplete.Option>
                   ))}
                 </Autocomplete.List>
-              </Autocomplete>
+              </Autocomplete.Root>
             </Popover.Popup>
           </Popover.Positioner>
-        </Popover>
+        </Popover.Root>
       );
     }
 
@@ -1120,12 +1120,12 @@ describe('Autocomplete', () => {
     it('has no violations for the inline listbox inside a popover', async () => {
       const user = userEvent.setup();
       render(
-        <Popover defaultOpen>
+        <Popover.Root defaultOpen>
           <Popover.Trigger>Pick a fruit...</Popover.Trigger>
           <Popover.Positioner>
             <Popover.Popup>
               <Popover.Title>Fruit picker</Popover.Title>
-              <Autocomplete open>
+              <Autocomplete.Root open>
                 <Autocomplete.Input
                   placeholder='Search...'
                   autoFocus
@@ -1141,10 +1141,10 @@ describe('Autocomplete', () => {
                     </Autocomplete.Option>
                   ))}
                 </Autocomplete.List>
-              </Autocomplete>
+              </Autocomplete.Root>
             </Popover.Popup>
           </Popover.Positioner>
-        </Popover>,
+        </Popover.Root>,
       );
 
       await user.click(screen.getByRole('combobox'));
