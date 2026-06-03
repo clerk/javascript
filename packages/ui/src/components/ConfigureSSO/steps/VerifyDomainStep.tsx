@@ -22,6 +22,7 @@ import { handleError } from '@/utils/errorHandler';
 import { useConfigureSSO } from '../ConfigureSSOContext';
 import { Step } from '../elements/Step';
 import { useWizard, Wizard } from '../elements/Wizard';
+import { InnerStepCounter } from '../elements/Wizard/InnerStepCounter';
 
 export const VerifyDomainStep = (): JSX.Element => {
   const { user } = useUser();
@@ -118,6 +119,7 @@ export const VerifyDomainStep = (): JSX.Element => {
           </Step.Body>
 
           <Step.Footer>
+            <Step.Footer.Reset />
             <Step.Footer.Continue onClick={() => outerGoNext()} />
           </Step.Footer>
         </Step>
@@ -154,16 +156,6 @@ export const VerifyDomainStep = (): JSX.Element => {
         </Wizard>
       </Step>
     </Flow.Part>
-  );
-};
-
-const InnerStepCounter = (): JSX.Element => {
-  const { currentIndex, totalSteps } = useWizard();
-  return (
-    <Step.Counter
-      total={totalSteps}
-      current={currentIndex + 1}
-    />
   );
 };
 
@@ -308,6 +300,7 @@ export const ProvideEmailStep = ({ emailAddressRef, preExistingEmailIdRef }: Pro
       </Step.Section>
 
       <Step.Footer>
+        <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
           isDisabled
@@ -425,6 +418,7 @@ export const EnterVerificationCodeStep = ({
       </Step.Section>
 
       <Step.Footer>
+        <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
           isDisabled={!!primaryEmailAddress}

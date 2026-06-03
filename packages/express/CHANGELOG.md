@@ -1,5 +1,21 @@
 # Change Log
 
+## 2.1.23
+
+### Patch Changes
+
+- Updated dependencies [[`1c42351`](https://github.com/clerk/javascript/commit/1c42351fd7a77d7303a8652cca97d64b9ac9d129), [`1701e0f`](https://github.com/clerk/javascript/commit/1701e0f5da33ffd7b74f397f8727837ae1526516), [`afb75e6`](https://github.com/clerk/javascript/commit/afb75e68efa561ff18f6ae5359df1cf336e861a5), [`c3df67a`](https://github.com/clerk/javascript/commit/c3df67a231adff73fa36563718d9b94e6bb2a540), [`ff0cfef`](https://github.com/clerk/javascript/commit/ff0cfef67352662182365ce1329f54f41bb47812), [`86fd38f`](https://github.com/clerk/javascript/commit/86fd38f4e39ab89b6a9fbb7515a5d9b7b37aa3ab), [`be55c4e`](https://github.com/clerk/javascript/commit/be55c4e405777014dcca6de7624c5b6151157f4f), [`fb184de`](https://github.com/clerk/javascript/commit/fb184de6155d556c51e6f664ec42050eeefe68af), [`8d6bb56`](https://github.com/clerk/javascript/commit/8d6bb56de25692e0f9c350f16c8f45fbedaad2ac), [`43dfefa`](https://github.com/clerk/javascript/commit/43dfefaabf0bad1a6d92b75b1cb6de1860ea87e4), [`5fc7b21`](https://github.com/clerk/javascript/commit/5fc7b21573cab36b9184dd6277396f7c38b91e1f), [`c2ba134`](https://github.com/clerk/javascript/commit/c2ba1344db5fd50f1d4e04d01d0455f0181c8d96)]:
+  - @clerk/backend@3.5.0
+  - @clerk/shared@4.15.0
+
+## 2.1.22
+
+### Patch Changes
+
+- Updated dependencies [[`79cdd1f`](https://github.com/clerk/javascript/commit/79cdd1f9c9d8aa5d9a98d8d245b5f7f98c0cabb4), [`4d5027b`](https://github.com/clerk/javascript/commit/4d5027b15873dc6637e49f51142be64ef5f8e9bf), [`4e08924`](https://github.com/clerk/javascript/commit/4e089248a3dfdf99fc110c06b699a084d4e8a7ee), [`bcf0e77`](https://github.com/clerk/javascript/commit/bcf0e776231c6ec675d3a3a8bfd122513d3c57ef)]:
+  - @clerk/shared@4.14.0
+  - @clerk/backend@3.4.14
+
 ## 2.1.21
 
 ### Patch Changes

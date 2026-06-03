@@ -1,6 +1,6 @@
 {
   "name": "@clerk/vue",
-  "version": "2.3.1",
+  "version": "2.3.3",
   "description": "Clerk SDK for Vue",
   "keywords": [
     "clerk",
@@ -50,8 +50,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup --onSuccess \"pnpm build:dts\"",
-    "build:dts": "vue-tsc --declaration --emitDeclarationOnly -p tsconfig.build.json",
+    "build": "tsup --onSuccess \"pnpm build:declarations\"",
+    "build:declarations": "vue-tsc -p tsconfig.declarations.json",
     "dev": "tsup --watch",
     "dev:pub": "pnpm dev -- --env.publish",
     "format": "node ../../scripts/format-package.mjs",

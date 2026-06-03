@@ -1,6 +1,9 @@
 import type { Clerk } from '@clerk/clerk-js';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
+import type { TokenCache } from '../../../cache/types';
+import { CLERK_CLIENT_JWT_KEY } from '../../../constants';
+
 const mocks = vi.hoisted(() => {
   return {
     constructorSpy: vi.fn(),
@@ -238,5 +241,47 @@ describe('createClerkInstance', () => {
         proxyUrl: () => '/api/__clerk',
       }),
     ).toThrow(/`proxyUrl` must be a string/);
+  });
+
+  test('preserves tokenCache method context for class instances', async () => {
+    class InstanceTokenCache implements TokenCache {
+      private readonly tokens = new Map<string, string>();
+
+      getToken(key: string) {
+        return Promise.resolve(this.tokens.get(key) ?? null);
+      }
+
+      saveToken(key: string, token: string) {
+        this.tokens.set(key, token);
+        return Promise.resolve();
+      }
+    }
+
+    const tokenCache = new InstanceTokenCache();
+    await tokenCache.saveToken(CLERK_CLIENT_JWT_KEY, 'cached-token');
+
+    const createClerkInstance = await loadCreateClerkInstance();
+    const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
+    const clerk = getClerkInstance({
+      publishableKey: 'pk_test_123',
+      tokenCache,
+    }) as unknown as MockClerk;
+
+    const beforeRequest = clerk.__internal_onBeforeRequest.mock.calls[0][0];
+    const requestInit = {
+      headers: new Headers(),
+      url: new URL('https://clerk.example.com/v1/client'),
+    };
+    await beforeRequest(requestInit);
+
+    expect(requestInit.headers.get('authorization')).toBe('cached-token');
+
+    const afterResponse = clerk.__internal_onAfterResponse.mock.calls[0][0];
+    await afterResponse(requestInit, {
+      headers: new Headers({ authorization: 'fresh-token' }),
+      payload: null,
+    });
+
+    await expect(tokenCache.getToken(CLERK_CLIENT_JWT_KEY)).resolves.toBe('fresh-token');
   });
 });

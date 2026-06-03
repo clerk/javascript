@@ -1,11 +1,13 @@
 import { useOrganization } from '@clerk/shared/react';
-import { useRef } from 'react';
 
 import { ConfigureSSOContent } from '../ConfigureSSO/ConfigureSSO';
 
-export const OrganizationSelfServeSSOPage = () => {
+type OrganizationSelfServeSSOPageProps = {
+  contentRef: React.RefObject<HTMLDivElement>;
+};
+
+export const OrganizationSelfServeSSOPage = ({ contentRef }: OrganizationSelfServeSSOPageProps) => {
   const { organization } = useOrganization();
-  const contentRef = useRef<HTMLDivElement>(null);
 
   if (!organization) {
     // We should never reach this point, but we'll return null to make TS happy

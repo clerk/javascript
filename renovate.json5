@@ -275,65 +275,6 @@
     },
     {
       groupName: "[DEV] minor & patch dependencies",
-      groupSlug: "dev-cli-dev-minor",
-      matchFileNames: [
-        "packages/dev-cli/package.json",
-      ],
-      matchDepTypes: [
-        "devDependencies",
-      ],
-      matchUpdateTypes: [
-        "patch",
-        "minor",
-      ],
-      automerge: true,
-      semanticCommitScope: "dev-cli",
-    },
-    {
-      groupName: "[DEV] major dependencies",
-      groupSlug: "dev-cli-dev-major",
-      matchFileNames: [
-        "packages/dev-cli/package.json",
-      ],
-      matchDepTypes: [
-        "devDependencies",
-      ],
-      matchUpdateTypes: [
-        "major",
-      ],
-      semanticCommitScope: "dev-cli",
-    },
-    {
-      groupName: "minor & patch dependencies",
-      groupSlug: "dev-cli-prod-minor",
-      matchFileNames: [
-        "packages/dev-cli/package.json",
-      ],
-      matchDepTypes: [
-        "dependencies",
-      ],
-      matchUpdateTypes: [
-        "patch",
-        "minor",
-      ],
-      semanticCommitScope: "dev-cli",
-    },
-    {
-      groupName: "major dependencies",
-      groupSlug: "dev-cli-prod-major",
-      matchFileNames: [
-        "packages/dev-cli/package.json",
-      ],
-      matchDepTypes: [
-        "dependencies",
-      ],
-      matchUpdateTypes: [
-        "major",
-      ],
-      semanticCommitScope: "dev-cli",
-    },
-    {
-      groupName: "[DEV] minor & patch dependencies",
       groupSlug: "expo-dev-minor",
       matchFileNames: [
         "packages/expo/package.json",

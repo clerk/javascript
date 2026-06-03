@@ -113,7 +113,7 @@ const Title = React.forwardRef<HTMLTableCellElement, TitleProps>(({ title, descr
           sx={t => ({
             display: 'inline-flex',
             alignItems: 'center',
-            gap: t.space.$1,
+            gap: t.space.$2,
           })}
         >
           {icon ? (
@@ -124,7 +124,7 @@ const Title = React.forwardRef<HTMLTableCellElement, TitleProps>(({ title, descr
             />
           ) : null}
           <Span localizationKey={title} />
-          {badge}
+          {badge ? <Box>{badge}</Box> : null}
         </Span>
       ) : null}
       {descriptionElements.length > 0 ? (
