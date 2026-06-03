@@ -1,5 +1,18 @@
 # Change Log
 
+## 3.3.3
+
+### Patch Changes
+
+- Prevent keyless mode from activating in CI and other automated environments in framework SDKs. ([#8676](https://github.com/clerk/javascript/pull/8676)) by [@mwickett](https://github.com/mwickett)
+
+- Read `VITE_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING` on the client when React Router is used in SPA mode (or as a library). Previously the env-var shortcut only took effect through the SSR `rootAuthLoader`, so client-only setups had no way to suppress the development-keys warning without passing `unsafe_disableDevelopmentModeConsoleWarning` to `<ClerkProvider>` directly. ([#8682](https://github.com/clerk/javascript/pull/8682)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`1c42351`](https://github.com/clerk/javascript/commit/1c42351fd7a77d7303a8652cca97d64b9ac9d129), [`1701e0f`](https://github.com/clerk/javascript/commit/1701e0f5da33ffd7b74f397f8727837ae1526516), [`afb75e6`](https://github.com/clerk/javascript/commit/afb75e68efa561ff18f6ae5359df1cf336e861a5), [`c3df67a`](https://github.com/clerk/javascript/commit/c3df67a231adff73fa36563718d9b94e6bb2a540), [`ff0cfef`](https://github.com/clerk/javascript/commit/ff0cfef67352662182365ce1329f54f41bb47812), [`86fd38f`](https://github.com/clerk/javascript/commit/86fd38f4e39ab89b6a9fbb7515a5d9b7b37aa3ab), [`be55c4e`](https://github.com/clerk/javascript/commit/be55c4e405777014dcca6de7624c5b6151157f4f), [`fb184de`](https://github.com/clerk/javascript/commit/fb184de6155d556c51e6f664ec42050eeefe68af), [`8d6bb56`](https://github.com/clerk/javascript/commit/8d6bb56de25692e0f9c350f16c8f45fbedaad2ac), [`43dfefa`](https://github.com/clerk/javascript/commit/43dfefaabf0bad1a6d92b75b1cb6de1860ea87e4), [`5fc7b21`](https://github.com/clerk/javascript/commit/5fc7b21573cab36b9184dd6277396f7c38b91e1f), [`c2ba134`](https://github.com/clerk/javascript/commit/c2ba1344db5fd50f1d4e04d01d0455f0181c8d96)]:
+  - @clerk/backend@3.5.0
+  - @clerk/shared@4.15.0
+  - @clerk/react@6.7.3
+
 ## 3.3.2
 
 ### Patch Changes
