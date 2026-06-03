@@ -46,7 +46,7 @@ env:
   # The tool was renamed snapi -> break-check (package @clerk/break-check, binary
   # break-check, repo clerk/break-check). Pinned to a pkg.pr.new build of a
   # specific commit on main.
-  BREAK_CHECK_PACKAGE: https://pkg.pr.new/clerk/break-check/@clerk/break-check@a4db93a68e43e45a71cc958cc4a722d91c5f62b2
+  BREAK_CHECK_PACKAGE: https://pkg.pr.new/clerk/break-check/@clerk/break-check@aae2962cd76869d26dfc06e438c4af825827078b
   BREAK_CHECK_FILTERS: >-
     --filter=@clerk/astro
     --filter=@clerk/backend
@@ -154,29 +154,10 @@ jobs:
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
-      - name: Resolve break-check cache key
-        id: break-check-key
-        run: echo "ref=${BREAK_CHECK_PACKAGE##*@}" >> "$GITHUB_OUTPUT"
-
-      - name: Restore baseline from cache
-        id: baseline-cache
-        uses: actions/cache/restore@v4
-        with:
-          path: .api-snapshots-baseline
-          # Keyed on the break-check commit too, so bumping break-check misses the
-          # stale baseline and the worktree fallback below rebuilds it with the
-          # same version the PR runs (see publish-baseline for the rationale).
-          key: break-check-baseline-${{ steps.break-check-key.outputs.ref }}-${{ github.event.pull_request.base.sha }}
-
-      - name: Build current declarations
-        run: pnpm turbo build:declarations $TURBO_ARGS $BREAK_CHECK_FILTERS
-
       - name: Fetch base commit
-        if: steps.baseline-cache.outputs.cache-matched-key == ''
         run: git fetch origin "${{ github.event.pull_request.base.sha }}" --depth=1
 
       - name: Create baseline worktree
-        if: steps.baseline-cache.outputs.cache-matched-key == ''
         run: |
           mkdir -p .worktrees
           git worktree add --detach .worktrees/break-check-baseline "${{ github.event.pull_request.base.sha }}"
@@ -193,13 +174,117 @@ jobs:
             cp break-check.config.json .worktrees/break-check-baseline/break-check.config.json
           fi
 
+      # Gate the expensive snapshot/detect work on turbo's content hashing, but compare
+      # the PR head against the pinned base SHA. A cache HIT only means an output already
+      # exists for the task hash; it does not prove the PR matches its base.
+      - name: Determine API surface changed
+        id: gate
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          node <<'EOF'
+            const cp = require('child_process');
+            const fs = require('fs');
+            const path = require('path');
+
+            const workspace = process.env.GITHUB_WORKSPACE;
+            const baseWorktree = path.join(workspace, '.worktrees/break-check-baseline');
+            const filters = process.env.BREAK_CHECK_FILTERS.trim().split(/\s+/);
+            const turbo = path.join(workspace, 'node_modules/.bin/turbo');
+            let changed = true; // default: when unsure, run detect
+
+            const parseTurboJson = output => {
+              const start = output.indexOf('{');
+              if (start === -1) {
+                throw new Error('turbo dry run did not produce JSON');
+              }
+              return JSON.parse(output.slice(start));
+            };
+
+            const runTurboDry = cwd => {
+              const output = cp.execFileSync(turbo, ['build:declarations', '--dry=json', ...filters], {
+                cwd,
+                encoding: 'utf8',
+                maxBuffer: 100 * 1024 * 1024,
+              });
+              return parseTurboJson(output);
+            };
+
+            const apiTaskHashes = summary => {
+              const entries = (summary.tasks || [])
+                .filter(t => {
+                  const taskId = t.taskId || '';
+                  return taskId.endsWith('#build') || taskId.endsWith('#build:declarations');
+                })
+                .map(t => [t.taskId, t.hash]);
+
+              if (entries.length === 0) {
+                throw new Error('turbo dry run contained no API task hashes');
+              }
+
+              return new Map(entries);
+            };
+
+            try {
+              const changedFiles = cp
+                .execFileSync('git', ['diff', '--name-only', process.env.BASE_SHA, process.env.HEAD_SHA], {
+                  cwd: workspace,
+                  encoding: 'utf8',
+                })
+                .trim()
+                .split(/\n/)
+                .filter(Boolean);
+
+              const forcedFiles = changedFiles.filter(
+                f => f === 'break-check.config.json' || f === '.github/workflows/api-changes.yml',
+              );
+
+              if (forcedFiles.length > 0) {
+                console.log('gate: workflow/config changed; running detect:', forcedFiles.join(', '));
+              } else {
+                const head = apiTaskHashes(runTurboDry(workspace));
+                const base = apiTaskHashes(runTurboDry(baseWorktree));
+                const allTaskIds = new Set([...head.keys(), ...base.keys()]);
+
+                changed = [...allTaskIds].some(taskId => head.get(taskId) !== base.get(taskId));
+              }
+            } catch (e) {
+              console.log('gate: falling back to changed=true:', e.message);
+              changed = true;
+            }
+
+            fs.appendFileSync(process.env.GITHUB_OUTPUT,`changed=${changed}\n`);
+            console.log('tracked API task hash changed / unknown:', changed);
+          EOF
+
+      - name: Build current declarations
+        if: steps.gate.outputs.changed == 'true'
+        run: pnpm turbo build:declarations $TURBO_ARGS $BREAK_CHECK_FILTERS
+
+      - name: Resolve break-check cache key
+        id: break-check-key
+        if: steps.gate.outputs.changed == 'true'
+        run: echo "ref=${BREAK_CHECK_PACKAGE##*@}" >> "$GITHUB_OUTPUT"
+
+      - name: Restore baseline from cache
+        id: baseline-cache
+        if: steps.gate.outputs.changed == 'true'
+        uses: actions/cache/restore@v4
+        with:
+          path: .api-snapshots-baseline
+          # Keyed on the break-check commit too, so bumping break-check misses the
+          # stale baseline and the worktree fallback below rebuilds it with the
+          # same version the PR runs (see publish-baseline for the rationale).
+          key: break-check-baseline-${{ steps.break-check-key.outputs.ref }}-${{ github.event.pull_request.base.sha }}
+
       - name: Install baseline dependencies
-        if: steps.baseline-cache.outputs.cache-matched-key == ''
+        if: steps.gate.outputs.changed == 'true' && steps.baseline-cache.outputs.cache-matched-key == ''
         working-directory: .worktrees/break-check-baseline
         run: pnpm install --frozen-lockfile
 
       - name: Build baseline declarations
-        if: steps.baseline-cache.outputs.cache-matched-key == ''
+        if: steps.gate.outputs.changed == 'true' && steps.baseline-cache.outputs.cache-matched-key == ''
         working-directory: .worktrees/break-check-baseline
         # --continue past per-package failures and don't fail the step: the base
         # ref may not build declarations for packages that only gained
@@ -210,20 +295,26 @@ jobs:
         run: pnpm turbo build:declarations $TURBO_ARGS $BREAK_CHECK_FILTERS --continue || true
 
       - name: Generate baseline API snapshots
-        if: steps.baseline-cache.outputs.cache-matched-key == ''
+        if: steps.gate.outputs.changed == 'true' && steps.baseline-cache.outputs.cache-matched-key == ''
         working-directory: .worktrees/break-check-baseline
         run: |
           pnpm dlx --package "$BREAK_CHECK_PACKAGE" break-check snapshot \
             --output "$GITHUB_WORKSPACE/.api-snapshots-baseline"
 
       - name: Detect API changes
+        if: steps.gate.outputs.changed == 'true'
         env:
           BREAK_CHECK_ANTHROPIC_API_KEY: ${{ secrets.BREAK_CHECK_ANTHROPIC_API_KEY }}
         run: |
           pnpm dlx --package "$BREAK_CHECK_PACKAGE" break-check detect \
             --baseline .api-snapshots-baseline \
             --output api-changes-report.md \
+            --ai-apply-downgrades \
             --fail-on-breaking
+
+      # Note: on the hash-equal skip path we intentionally post nothing. The "no API
+      # changes" comment below is only ever posted when detect actually ran and found
+      # nothing.
 
       - name: Upload API changes report
         uses: actions/upload-artifact@v4
@@ -239,6 +330,7 @@ jobs:
         uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         env:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         with:
           script: |
             const fs = require('fs');
@@ -271,6 +363,15 @@ jobs:
                 const budget = LIMIT - head.length - notice.length;
                 body = head + report.slice(0, budget) + notice;
               }
+            }
+
+            // Stamp the head SHA detect actually ran on. Because pushes whose tracked
+            // declarations match the base are skipped silently (no comment update), this
+            // lets a reviewer see whether this comment reflects the current head or an
+            // earlier push.
+            const ranSha = (process.env.HEAD_SHA || '').slice(0, 7);
+            if (ranSha) {
+              body += `\n\n<sub>Last ran on \`${ranSha}\`. Pushes that change no tracked declarations (no API surface change vs. base) are skipped and don't update this comment.</sub>`;
             }
 
             const comments = await github.paginate(github.rest.issues.listComments, {

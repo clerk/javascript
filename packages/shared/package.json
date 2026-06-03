@@ -1,6 +1,6 @@
 {
   "name": "@clerk/shared",
-  "version": "4.14.0",
+  "version": "4.15.0",
   "description": "Internal package utils used by the Clerk SDKs",
   "repository": {
     "type": "git",
@@ -30,6 +30,7 @@
         "default": "./dist/runtime/internal/clerk-js/*.js"
       }
     },
+    "./_chunks/*": null,
     "./*": {
       "import": {
         "types": "./dist/runtime/*.d.mts",
@@ -120,18 +121,15 @@
     }
   },
   "files": [
-    "dist",
-    "scripts"
+    "dist"
   ],
   "scripts": {
     "build": "tsdown",
-    "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
     "dev": "tsdown --watch src",
     "dev:pub": "pnpm dev -- --env.publish",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
-    "postinstall": "node ./scripts/postinstall.mjs",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16",
     "lint:publint": "publint",
@@ -143,8 +141,7 @@
     "@tanstack/query-core": "catalog:repo",
     "dequal": "2.0.3",
     "glob-to-regexp": "0.4.1",
-    "js-cookie": "3.0.7",
-    "std-env": "^3.9.0"
+    "js-cookie": "3.0.7"
   },
   "devDependencies": {
     "@base-org/account": "catalog:module-manager",

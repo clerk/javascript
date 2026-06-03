@@ -27,7 +27,7 @@ const HOOK_NAME = 'useOAuthConsent';
 export function useOAuthConsent(params: UseOAuthConsentParams): UseOAuthConsentReturn {
   useAssertWrappedByClerkProvider(HOOK_NAME);
 
-  const { oauthClientId: oauthClientIdParam, scope, keepPreviousData = true, enabled = true } = params;
+  const { oauthClientId: oauthClientIdParam, scope, redirectUri, keepPreviousData = true, enabled = true } = params;
   const clerk = useClerkInstanceContext();
   const user = useUserBase();
 
@@ -39,6 +39,7 @@ export function useOAuthConsent(params: UseOAuthConsentParams): UseOAuthConsentR
     userId: user?.id ?? null,
     oauthClientId,
     scope,
+    redirectUri,
   });
 
   const hasClientId = oauthClientId.length > 0;
@@ -46,7 +47,7 @@ export function useOAuthConsent(params: UseOAuthConsentParams): UseOAuthConsentR
 
   const query = useClerkQuery({
     queryKey,
-    queryFn: () => fetchConsentInfo(clerk, { oauthClientId, scope }),
+    queryFn: () => fetchConsentInfo(clerk, { oauthClientId, scope, redirectUri }),
     enabled: queryEnabled,
     placeholderData: defineKeepPreviousDataFn(keepPreviousData && queryEnabled),
   });
@@ -59,7 +60,6 @@ export function useOAuthConsent(params: UseOAuthConsentParams): UseOAuthConsentR
   };
 }
 
-function fetchConsentInfo(clerk: LoadedClerk, params: { oauthClientId: string; scope?: string }) {
-  const { oauthClientId, scope } = params;
-  return clerk.oauthApplication.getConsentInfo(scope !== undefined ? { oauthClientId, scope } : { oauthClientId });
+function fetchConsentInfo(clerk: LoadedClerk, params: { oauthClientId: string; scope?: string; redirectUri?: string }) {
+  return clerk.oauthApplication.getConsentInfo(params);
 }
