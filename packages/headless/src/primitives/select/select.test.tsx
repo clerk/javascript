@@ -2,7 +2,7 @@ import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { axe } from '../../test-utils/axe';
-import { Select, type SelectItem } from './select';
+import { Select, type SelectItem } from './index';
 
 afterEach(() => cleanup());
 
@@ -12,10 +12,10 @@ const fruits: SelectItem[] = [
   { label: 'Cherry', value: 'cherry' },
 ];
 
-function renderSelect(props: Partial<React.ComponentProps<typeof Select>> = {}) {
+function renderSelect(props: Partial<React.ComponentProps<typeof Select.Root>> = {}) {
   const { children, ...rest } = props as Record<string, unknown>;
   return render(
-    <Select
+    <Select.Root
       items={fruits}
       alignItemWithTrigger={false}
       {...rest}
@@ -36,7 +36,7 @@ function renderSelect(props: Partial<React.ComponentProps<typeof Select>> = {}) 
           ))}
         </Select.Popup>
       </Select.Positioner>
-    </Select>,
+    </Select.Root>,
   );
 }
 
@@ -88,7 +88,7 @@ describe('Select', () => {
 
     it('falls back to raw value when no items provided', () => {
       render(
-        <Select
+        <Select.Root
           defaultValue='banana'
           alignItemWithTrigger={false}
         >
@@ -105,7 +105,7 @@ describe('Select', () => {
               </Select.Option>
             </Select.Popup>
           </Select.Positioner>
-        </Select>,
+        </Select.Root>,
       );
       const value = document.querySelector('[data-cl-slot="select-value"]');
       expect(value?.textContent).toBe('banana');
@@ -115,7 +115,7 @@ describe('Select', () => {
       const user = userEvent.setup();
       // No items prop — labels only known once options mount
       render(
-        <Select alignItemWithTrigger={false}>
+        <Select.Root alignItemWithTrigger={false}>
           <Select.Trigger>
             <Select.Value placeholder='Pick...' />
           </Select.Trigger>
@@ -129,7 +129,7 @@ describe('Select', () => {
               </Select.Option>
             </Select.Popup>
           </Select.Positioner>
-        </Select>,
+        </Select.Root>,
       );
 
       await user.click(screen.getByRole('combobox'));
@@ -222,7 +222,7 @@ describe('Select', () => {
 
       const user = userEvent.setup();
       render(
-        <Select
+        <Select.Root
           items={manyItems}
           alignItemWithTrigger={false}
         >
@@ -244,7 +244,7 @@ describe('Select', () => {
               </div>
             </Select.Popup>
           </Select.Positioner>
-        </Select>,
+        </Select.Root>,
       );
 
       await user.click(screen.getByRole('combobox'));
@@ -274,7 +274,7 @@ describe('Select', () => {
 
       const user = userEvent.setup();
       render(
-        <Select
+        <Select.Root
           items={manyItems}
           alignItemWithTrigger={false}
         >
@@ -296,7 +296,7 @@ describe('Select', () => {
               </div>
             </Select.Popup>
           </Select.Positioner>
-        </Select>,
+        </Select.Root>,
       );
 
       const trigger = screen.getByRole('combobox');
@@ -347,7 +347,7 @@ describe('Select', () => {
     it('renders disabled option with data-cl-disabled', async () => {
       const user = userEvent.setup();
       render(
-        <Select alignItemWithTrigger={false}>
+        <Select.Root alignItemWithTrigger={false}>
           <Select.Trigger>
             <Select.Value placeholder='Pick...' />
           </Select.Trigger>
@@ -368,7 +368,7 @@ describe('Select', () => {
               </Select.Option>
             </Select.Popup>
           </Select.Positioner>
-        </Select>,
+        </Select.Root>,
       );
 
       await user.click(screen.getByRole('combobox'));
@@ -382,7 +382,7 @@ describe('Select', () => {
       const onValueChange = vi.fn();
       const user = userEvent.setup();
       render(
-        <Select
+        <Select.Root
           onValueChange={onValueChange}
           alignItemWithTrigger={false}
         >
@@ -406,7 +406,7 @@ describe('Select', () => {
               </Select.Option>
             </Select.Popup>
           </Select.Positioner>
-        </Select>,
+        </Select.Root>,
       );
 
       await user.click(screen.getByRole('combobox'));
@@ -484,7 +484,7 @@ describe('Select', () => {
     it('defaults to true', () => {
       // Render without explicitly setting alignItemWithTrigger
       render(
-        <Select
+        <Select.Root
           items={fruits}
           defaultOpen
           defaultValue='banana'
@@ -505,7 +505,7 @@ describe('Select', () => {
               ))}
             </Select.Popup>
           </Select.Positioner>
-        </Select>,
+        </Select.Root>,
       );
 
       // The positioner should render (alignItemWithTrigger doesn't prevent rendering)
@@ -531,7 +531,7 @@ describe('Select', () => {
 
     it('aligns selected item with trigger vertically', async () => {
       render(
-        <Select
+        <Select.Root
           items={manyItems}
           defaultOpen
           defaultValue='item-10'
@@ -552,7 +552,7 @@ describe('Select', () => {
               ))}
             </Select.Popup>
           </Select.Positioner>
-        </Select>,
+        </Select.Root>,
       );
 
       const trigger = screen.getByRole('combobox');
@@ -574,7 +574,7 @@ describe('Select', () => {
           data-testid='scroll-container'
           style={{ height: '200px', overflow: 'auto', paddingTop: '300px' }}
         >
-          <Select
+          <Select.Root
             items={manyItems}
             defaultValue='item-5'
           >
@@ -594,7 +594,7 @@ describe('Select', () => {
                 ))}
               </Select.Popup>
             </Select.Positioner>
-          </Select>
+          </Select.Root>
           <div style={{ height: '500px' }} />
         </div>,
       );
@@ -620,7 +620,7 @@ describe('Select', () => {
   describe('accessibility (axe)', () => {
     it('has no violations when closed', async () => {
       const { container } = render(
-        <Select
+        <Select.Root
           items={fruits}
           alignItemWithTrigger={false}
         >
@@ -640,14 +640,14 @@ describe('Select', () => {
               ))}
             </Select.Popup>
           </Select.Positioner>
-        </Select>,
+        </Select.Root>,
       );
       expect(await axe(container)).toHaveNoViolations();
     });
 
     it('has no violations when open', async () => {
       render(
-        <Select
+        <Select.Root
           items={fruits}
           alignItemWithTrigger={false}
           defaultOpen
@@ -668,14 +668,14 @@ describe('Select', () => {
               ))}
             </Select.Popup>
           </Select.Positioner>
-        </Select>,
+        </Select.Root>,
       );
       expect(await axe(document.body, { rules: { region: { enabled: false } } })).toHaveNoViolations();
     });
 
     it('has no violations with a selected value', async () => {
       const { container } = render(
-        <Select
+        <Select.Root
           items={fruits}
           alignItemWithTrigger={false}
           defaultValue='banana'
@@ -696,7 +696,7 @@ describe('Select', () => {
               ))}
             </Select.Popup>
           </Select.Positioner>
-        </Select>,
+        </Select.Root>,
       );
       expect(await axe(container)).toHaveNoViolations();
     });

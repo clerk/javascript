@@ -1,3 +1,5 @@
+export * as Select from './parts';
+
 export type {
   SelectArrowProps,
   SelectItem,
@@ -8,5 +10,4 @@ export type {
   SelectProps,
   SelectTriggerProps,
   SelectValueProps,
-} from './select';
-export { Select } from './select';
+} from './parts';
