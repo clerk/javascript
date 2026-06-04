@@ -2917,10 +2917,6 @@ export class Clerk implements ClerkInterface {
     return this.environment;
   }
 
-  get __internal_moduleManager() {
-    return this.#moduleManager;
-  }
-
   // TODO: Fix this properly
   // eslint-disable-next-line @typescript-eslint/require-await
   __internal_setEnvironment = async (env: EnvironmentJSON) => {
