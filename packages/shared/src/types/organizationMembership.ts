@@ -45,16 +45,54 @@ declare global {
  * @interface
  */
 export interface OrganizationMembershipResource extends ClerkResource {
+  /**
+   * The unique identifier for the membership.
+   */
   id: string;
+  /**
+   * The [`Organization`](https://clerk.com/docs/reference/types/organization) object the membership belongs to.
+   */
   organization: OrganizationResource;
+  /**
+   * The [Permissions](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) the member has in the Organization.
+   */
   permissions: OrganizationPermissionKey[];
+  /**
+   * Metadata that can be read from both the [Frontend API](https://clerk.com/docs/reference/frontend-api){{ target: '_blank' }} and [Backend API](https://clerk.com/docs/reference/backend-api){{ target: '_blank' }}, but can be set only from the Backend API.
+   */
   publicMetadata: OrganizationMembershipPublicMetadata;
+  /**
+   * Public information about the user that this membership belongs to.
+   */
   publicUserData?: PublicUserData;
+  /**
+   * The [Role](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) of the member in the Organization.
+   */
   role: OrganizationCustomRoleKey;
+  /**
+   * The name of the [Role](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) of the member in the Organization.
+   */
   roleName: string;
+  /**
+   * The date when the membership was created.
+   */
   createdAt: Date;
+  /**
+   * The date when the membership was last updated.
+   */
   updatedAt: Date;
+  /**
+   * Deletes the membership, removing the user from the Organization.
+   *
+   * @returns A promise that resolves to the deleted [`OrganizationMembership`](https://clerk.com/docs/reference/types/organization-membership) object.
+   */
   destroy: () => Promise<OrganizationMembershipResource>;
+  /**
+   * Updates the member's [Role](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) in the Organization.
+   *
+   * @param updateParams - The parameters containing the new Role to assign to the member.
+   * @returns A promise that resolves to the updated [`OrganizationMembership`](https://clerk.com/docs/reference/types/organization-membership) object.
+   */
   update: (updateParams: UpdateOrganizationMembershipParams) => Promise<OrganizationMembershipResource>;
   /**
    * @internal
@@ -62,6 +100,11 @@ export interface OrganizationMembershipResource extends ClerkResource {
   __internal_toSnapshot: () => OrganizationMembershipJSONSnapshot;
 }
 
+/**
+ * `OrganizationCustomPermissionKey` is a type that represents a custom [Permission](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) in an Organization. It will be `string` unless the developer has provided their own types through [`ClerkAuthorization`](https://clerk.com/docs/guides/development/override-clerk-types-interfaces#example-custom-roles-and-permissions).
+ *
+ * @interface
+ */
 export type OrganizationCustomPermissionKey = ClerkAuthorization extends Placeholder
   ? ClerkAuthorization['permission'] extends string
     ? ClerkAuthorization['permission']
@@ -100,6 +143,12 @@ export type OrganizationPermissionKey = ClerkAuthorization extends Placeholder
     : Autocomplete<OrganizationSystemPermissionKey>
   : Autocomplete<OrganizationSystemPermissionKey>;
 
+/**
+ * The parameters for {@link OrganizationMembershipResource.update}.
+ */
 export type UpdateOrganizationMembershipParams = {
+  /**
+   * The [Role](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) to assign to the member.
+   */
   role: OrganizationCustomRoleKey;
 };

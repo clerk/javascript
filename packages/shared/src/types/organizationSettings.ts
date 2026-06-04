@@ -3,45 +3,135 @@ import type { OrganizationEnrollmentMode } from './organizationDomain';
 import type { ClerkResource } from './resource';
 import type { OrganizationSettingsJSONSnapshot } from './snapshots';
 
+/**
+ * The JSON representation of the {@link OrganizationSettingsResource} object, as returned by the
+ * [Frontend API](https://clerk.com/docs/reference/frontend-api).
+ */
 export interface OrganizationSettingsJSON extends ClerkResourceJSON {
   id: never;
   object: never;
+  /**
+   * Whether Organizations are enabled for the instance.
+   */
   enabled: boolean;
+  /**
+   * The maximum number of memberships allowed per Organization.
+   */
   max_allowed_memberships: number;
+  /**
+   * Whether users are required to select an Organization after signing in.
+   */
   force_organization_selection: boolean;
+  /**
+   * The Organization-related actions that are enabled for the instance.
+   */
   actions: {
+    /**
+     * Whether admins are allowed to delete Organizations.
+     */
     admin_delete: boolean;
   };
+  /**
+   * The settings that control Organization domains and member enrollment.
+   */
   domains: {
+    /**
+     * Whether Organization domains are enabled.
+     */
     enabled: boolean;
+    /**
+     * The enrollment modes that are available for Organization domains.
+     */
     enrollment_modes: OrganizationEnrollmentMode[];
+    /**
+     * The default Role assigned to users enrolled through a domain, or `null` if there is none.
+     */
     default_role: string | null;
   };
+  /**
+   * The settings that control Organization slugs.
+   */
   slug: {
+    /**
+     * Whether Organization slugs are disabled.
+     */
     disabled: boolean;
   };
+  /**
+   * The settings that control the defaults used when creating an Organization.
+   */
   organization_creation_defaults: {
+    /**
+     * Whether Organization creation defaults are enabled.
+     */
     enabled: boolean;
   };
 }
 
+/**
+ * The `OrganizationSettings` object holds the Organization-related settings configured for the instance.
+ *
+ * @interface
+ */
 export interface OrganizationSettingsResource extends ClerkResource {
+  /**
+   * Whether Organizations are enabled for the instance.
+   */
   enabled: boolean;
+  /**
+   * The maximum number of memberships allowed per Organization.
+   */
   maxAllowedMemberships: number;
+  /**
+   * Whether users are required to select an Organization after signing in.
+   */
   forceOrganizationSelection: boolean;
+  /**
+   * The Organization-related actions that are enabled for the instance.
+   */
   actions: {
+    /**
+     * Whether admins are allowed to delete Organizations.
+     */
     adminDelete: boolean;
   };
+  /**
+   * The settings that control Organization domains and member enrollment.
+   */
   domains: {
+    /**
+     * Whether Organization domains are enabled.
+     */
     enabled: boolean;
+    /**
+     * The enrollment modes that are available for Organization domains.
+     */
     enrollmentModes: OrganizationEnrollmentMode[];
+    /**
+     * The default Role assigned to users enrolled through a domain, or `null` if there is none.
+     */
     defaultRole: string | null;
   };
+  /**
+   * The settings that control Organization slugs.
+   */
   slug: {
+    /**
+     * Whether Organization slugs are disabled.
+     */
     disabled: boolean;
   };
+  /**
+   * The settings that control the defaults used when creating an Organization.
+   */
   organizationCreationDefaults: {
+    /**
+     * Whether Organization creation defaults are enabled.
+     */
     enabled: boolean;
   };
+  /**
+   * @internal
+   */
   __internal_toSnapshot: () => OrganizationSettingsJSONSnapshot;
 }
