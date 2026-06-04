@@ -52,6 +52,9 @@ describe('signedInAuthObject', () => {
     const mockAuthenticateContext = {
       tokenInHeader: 'eyJhbGciOiJSUzI1NiJ9.header-bearer.this-segment-must-never-be-logged',
       sessionTokenInCookie: 'eyJhbGciOiJSUzI1NiJ9.cookie-bearer.this-segment-must-never-be-logged',
+      refreshTokenInCookie: 'eyJhbGciOiJSUzI1NiJ9.refresh-bearer.this-segment-must-never-be-logged',
+      devBrowserToken: 'eyJhbGciOiJSUzI1NiJ9.devbrowser-bearer.this-segment-must-never-be-logged',
+      handshakeToken: 'eyJhbGciOiJSUzI1NiJ9.handshake-bearer.this-segment-must-never-be-logged',
     } as unknown as AuthenticateContext;
 
     const authObject = signedInAuthObject(mockAuthenticateContext, rawSessionToken, {
@@ -64,6 +67,9 @@ describe('signedInAuthObject', () => {
     expect(debug.sessionToken).toBe('eyJhbGc');
     expect(debug.tokenInHeader).toBe('eyJhbGc');
     expect(debug.sessionTokenInCookie).toBe('eyJhbGc');
+    expect(debug.refreshTokenInCookie).toBe('eyJhbGc');
+    expect(debug.devBrowserToken).toBe('eyJhbGc');
+    expect(debug.handshakeToken).toBe('eyJhbGc');
 
     // The full tokens must not be recoverable from the serialized debug payload.
     const serialized = JSON.stringify(debug);
