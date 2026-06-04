@@ -83,20 +83,15 @@ async function completeExternalAuthFlow({
   navigateOnSetActive: RunExternalAuthFlowBaseParams['navigateOnSetActive'];
   redirectUrl: string;
   redirectUrlComplete: string;
-  reload: (rotatingTokenNonce: string) => Promise<unknown>;
+  reload: (rotatingTokenNonce: string) => Promise<SignInResource | SignUpResource>;
   strategy: ExternalAuthStrategy;
 }) {
   await externalAuth.openExternal(externalVerificationRedirectURL);
 
   const callbackUrl = await externalAuth.waitForCallback({ strategy, intent, redirectUrl });
-  await reload(getRotatingTokenNonce(callbackUrl));
+  const reloaded = await reload(getRotatingTokenNonce(callbackUrl));
 
-  const completedSessionId =
-    intent === 'sign-in' && clerk.client?.signIn.status === 'complete'
-      ? clerk.client.signIn.createdSessionId
-      : intent === 'sign-up' && clerk.client?.signUp.status === 'complete'
-        ? clerk.client.signUp.createdSessionId
-        : null;
+  const completedSessionId = reloaded.status === 'complete' ? reloaded.createdSessionId : null;
 
   if (completedSessionId) {
     return clerk.setActive({
