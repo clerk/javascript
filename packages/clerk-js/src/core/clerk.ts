@@ -2443,6 +2443,14 @@ export class Clerk implements ClerkInterface {
       baseUrl: string;
       redirectUrl: string;
     }) => {
+      if (params.navigateOnSetActive) {
+        return params.navigateOnSetActive({
+          session,
+          redirectUrl,
+          decorateUrl: url => this.buildUrlWithAuth(url),
+        });
+      }
+
       if (!session.currentTask) {
         await this.navigate(redirectUrl);
         return;

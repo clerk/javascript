@@ -57,6 +57,7 @@ const SignInFactorOneEnterpriseConnectionsInternal = () => {
           firstFactorUrl: '../factor-one',
           secondFactorUrl: '../factor-two',
           resetPasswordUrl: '../reset-password',
+          navigateOnSetActive: ctx.navigateOnSetActive,
           unsafeMetadata: ctx.unsafeMetadata,
         },
         navigate,

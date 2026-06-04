@@ -325,6 +325,7 @@ describe('SignInStart', () => {
           firstFactorUrl: '../factor-one',
           secondFactorUrl: '../factor-two',
           resetPasswordUrl: '../reset-password',
+          navigateOnSetActive: expect.any(Function),
           unsafeMetadata: undefined,
         },
         expect.any(Function),

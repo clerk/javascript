@@ -1223,6 +1223,16 @@ export type HandleOAuthCallbackParams = TransferableOption &
      */
     reloadResource?: 'signIn' | 'signUp';
     /**
+     * Internal navigation hook used by Clerk UI to preserve custom post-activation routing behavior.
+     *
+     * @internal
+     */
+    navigateOnSetActive?: (opts: {
+      session: SessionResource;
+      redirectUrl: string;
+      decorateUrl: DecorateUrl;
+    }) => Promise<unknown>;
+    /**
      * Metadata that can be read and set from the frontend. Once the sign-up is complete, the value of this field will be automatically copied to the newly created user's unsafe metadata. One common use case for this attribute is to use it to implement custom fields that can be collected during sign-up and will automatically be attached to the created `User` object.
      */
     unsafeMetadata?: SignUpUnsafeMetadata;

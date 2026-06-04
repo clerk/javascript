@@ -59,6 +59,7 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
                 continueSignUpUrl: '../continue',
                 verifyEmailAddressUrl: '../verify-email-address',
                 verifyPhoneNumberUrl: '../verify-phone-number',
+                navigateOnSetActive: ctx.navigateOnSetActive,
                 unsafeMetadata: ctx.unsafeMetadata,
               },
               navigate,
