@@ -127,7 +127,7 @@ describe('SignInProtectCheck', () => {
 
     await waitFor(() => {
       expect(fixtures.signIn.submitProtectCheck).toHaveBeenCalled();
-      // Spec §5.3.4: reload to refresh stale local state before re-routing
+      // reload to refresh stale local state before re-routing
       expect(reloadMock).toHaveBeenCalled();
     });
   });

@@ -22,6 +22,7 @@ import { normalizeRoutingOptions } from '@/utils/normalizeRoutingOptions';
 
 import {
   LazySignUpContinue,
+  LazySignUpProtectCheck,
   LazySignUpSSOCallback,
   LazySignUpStart,
   LazySignUpVerifyEmail,
@@ -103,6 +104,12 @@ function SignInRoutes(): JSX.Element {
 
         {signInContext.isCombinedFlow && (
           <Route path='create'>
+            <Route
+              path='protect-check'
+              canActivate={clerk => !!clerk.client.signUp.protectCheck}
+            >
+              <LazySignUpProtectCheck />
+            </Route>
             <Route
               path='verify-email-address'
               canActivate={clerk => !!clerk.client.signUp.emailAddress}

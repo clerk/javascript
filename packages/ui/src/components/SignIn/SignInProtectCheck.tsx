@@ -19,15 +19,15 @@ import { useRouter } from '../../router';
  * Routes the user to the next step after a protect check has been resolved (or short-circuits
  * to the same route to handle a chained challenge).
  *
- * Per spec §4.3: after the gate clears, the client should retry the operation that was gated.
+ * After the gate clears, the client should retry the operation that was gated.
  * For most steps (factor-one/factor-two cards), the underlying card uses `useFetch` to call
  * `prepareFirstFactor`/`prepareSecondFactor` on mount, so navigating back is sufficient to
  * re-trigger the gated work.
  */
 function navigateNext(signIn: SignInResource, navigate: (to: string) => Promise<unknown>) {
   // Chained challenge — stay here and re-run the new challenge on next render. Both
-  // signals are checked: `protectCheck` is the authoritative field per spec §5.1, and
-  // `'needs_protect_check'` is the SDK-version-gated status from spec §2.2.2.
+  // signals are checked: `protectCheck` is the authoritative field, and
+  // `'needs_protect_check'` is the SDK-version-gated status.
   if (signIn.protectCheck || signIn.status === 'needs_protect_check') {
     return navigate('.');
   }
@@ -74,7 +74,7 @@ function SignInProtectCheckInternal(): JSX.Element {
     const abortController = new AbortController();
     let cancelled = false;
 
-    // Per spec §5.1.4: do not attempt to solve an expired challenge.
+    // Do not attempt to solve an expired challenge.
     // Reload the resource so the server can mint a fresh challenge before re-routing,
     // otherwise the local stale `signIn.protectCheck` would re-trigger this same effect
     // and loop indefinitely with no user feedback.
@@ -142,7 +142,7 @@ function SignInProtectCheckInternal(): JSX.Element {
           if (cancelled) {
             return;
           }
-          // Per spec §3.3, §5.3.4: protect_check_already_resolved is retry-safe.
+          // protect_check_already_resolved is retry-safe.
           // Reload to clear the stale local protectCheck; otherwise navigateNext would
           // see protectCheck still set and self-loop on this route.
           if (isClerkAPIResponseError(err) && err.errors?.[0]?.code === ERROR_CODES.PROTECT_CHECK_ALREADY_RESOLVED) {

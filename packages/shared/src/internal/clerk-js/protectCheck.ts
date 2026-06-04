@@ -32,9 +32,8 @@ type ScriptDefault = (container: HTMLDivElement, init: ScriptInitOptions) => Pro
  * Rejects:
  *   - Anything that fails URL parsing (relative paths, garbage strings)
  *   - Non-`https:` schemes — including `http:`, `data:`, `blob:`, `javascript:`. The server
- *     contract (FAPI spec §2.1) says the URL is always HTTPS, but the dynamic-import
- *     primitive accepts `data:`/`blob:` modules which would let a tampered response inject
- *     arbitrary code into the host page.
+ *     always returns an HTTPS URL, but the dynamic-import primitive accepts `data:`/`blob:`
+ *     modules which would let a tampered response inject arbitrary code into the host page.
  *   - URLs containing credentials (`user:pass@host`) — phishing surface, no legitimate use.
  *
  * Throws `ClerkRuntimeError` with code `protect_check_invalid_sdk_url`. We deliberately do
@@ -73,9 +72,9 @@ function assertValidSdkUrl(sdkUrl: string): URL {
  *   - Have a default export of the shape `(container, { token, uiHints, signal }) => Promise<string>`
  *   - Honor the `signal` to abort any pending work (best-effort)
  *
- * Per FAPI spec §5.2, only the spec-defined fields (`token`, optional `ui_hints`) are
- * surfaced to the script — the full sign-up/sign-in resource is intentionally NOT passed
- * to minimize the trust surface granted to third-party Protect scripts.
+ * Only the minimal fields (`token`, optional `ui_hints`) are surfaced to the script — the
+ * full sign-up/sign-in resource is intentionally NOT passed, to minimize the trust surface
+ * granted to third-party Protect scripts.
  *
  * Failure modes are surfaced as `ClerkRuntimeError` with one of:
  *   - `protect_check_invalid_sdk_url` — URL fails the safety checks above

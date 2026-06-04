@@ -41,8 +41,8 @@ export const completeSignUpFlow = ({
 
     const params = forwardClerkQueryParams();
 
-    // Per Protect spec §5.1: the protect_check field is the authoritative gating signal.
-    // Sign-up also surfaces it via missing_fields entry; treat either as equivalent.
+    // The protect_check field is the authoritative gating signal. Sign-up also surfaces it
+    // via a missing_fields entry; treat either as equivalent.
     const isProtectGated = !!signUp.protectCheck || signUp.missingFields.some(mf => mf === 'protect_check');
     if (isProtectGated && protectCheckPath) {
       return navigate(protectCheckPath, { searchParams: params });

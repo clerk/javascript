@@ -40,7 +40,7 @@ function SignUpProtectCheckInternal(): JSX.Element {
     const abortController = new AbortController();
     let cancelled = false;
 
-    // Per spec §5.1.4: do not attempt to solve an expired challenge.
+    // Do not attempt to solve an expired challenge.
     // Reload the resource so the server can mint a fresh challenge before re-routing,
     // otherwise the local stale `signUp.protectCheck` would re-trigger this same effect
     // and loop indefinitely with no user feedback.
@@ -84,7 +84,7 @@ function SignUpProtectCheckInternal(): JSX.Element {
         signUp: resource,
         verifyEmailPath: '../verify-email-address',
         verifyPhonePath: '../verify-phone-number',
-        protectCheckPath: '.', // Self-navigate handles chained challenges (spec §3.2b, §4.2)
+        protectCheckPath: '.', // Self-navigate so a chained challenge re-runs this same route
         continuePath: '../continue',
         handleComplete: () =>
           setActive({
@@ -113,7 +113,7 @@ function SignUpProtectCheckInternal(): JSX.Element {
           if (cancelled) {
             return;
           }
-          // Per spec §3.3, §5.3.4: protect_check_already_resolved is retry-safe.
+          // protect_check_already_resolved is retry-safe.
           // The server's resource state has moved past this gate; reload to pick up the
           // fresh state, then continue routing based on the actual current status rather
           // than stale local data.

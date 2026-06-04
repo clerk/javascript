@@ -31,8 +31,8 @@ function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>
   return useCallback(async (...args: Parameters<typeof authenticateWithPasskey>) => {
     try {
       const res = await authenticateWithPasskey(...args);
-      // Per spec §2.3 / §4: protect_check can fire on attempt_first_factor (which is what
-      // authenticateWithPasskey calls under the hood). Detect both the field and the
+      // A protect_check gate can fire on attempt_first_factor, which is what
+      // authenticateWithPasskey calls under the hood. Detect both the explicit field and the
       // SDK-version-gated status before dispatching on the underlying status.
       if (isSignInProtectGated(res)) {
         return navigate('../protect-check');

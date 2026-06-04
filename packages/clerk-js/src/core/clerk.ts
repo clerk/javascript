@@ -2469,8 +2469,9 @@ export class Clerk implements ClerkInterface {
       });
     }
 
-    // Per Protect spec §4.4: OAuth/SAML callbacks can result in a protect_check gate that
-    // surfaces on the next /v1/client read. Honor either the field or the status override.
+    // OAuth/SAML callbacks can resolve into a protect_check gate that surfaces on the next
+    // /v1/client read, so check for it here before continuing with the transfer logic below.
+    // Honor either the explicit `protectCheck` field or the `needs_protect_check` status override.
     if (si.protectCheck || si.status === 'needs_protect_check') {
       return navigateToSignInProtectCheck();
     }
