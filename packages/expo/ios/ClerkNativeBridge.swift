@@ -201,8 +201,7 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
       rootView: ClerkInlineProfileWrapperView(
         dismissible: dismissible,
         lightTheme: lightTheme,
-        darkTheme: darkTheme,
-        onEvent: onEvent
+        darkTheme: darkTheme
       ),
       onDismiss: dismissible ? { onEvent(.dismissed, [:]) } : nil
     )
@@ -516,7 +515,6 @@ struct ClerkInlineProfileWrapperView: View {
   let dismissible: Bool
   let lightTheme: ClerkTheme?
   let darkTheme: ClerkTheme?
-  let onEvent: (ClerkNativeViewEvent, [String: Any]) -> Void
 
   @Environment(\.colorScheme) private var colorScheme
 

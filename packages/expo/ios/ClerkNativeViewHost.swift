@@ -18,8 +18,6 @@ public class ClerkNativeViewHost: UIView {
     if window != nil && !hasInitialized {
       hasInitialized = true
       updateHostedView()
-    } else if window == nil && hasInitialized {
-      didDetachAfterInitialization()
     }
   }
 
@@ -36,8 +34,6 @@ public class ClerkNativeViewHost: UIView {
   func makeHostedController() -> UIViewController? {
     nil
   }
-
-  func didDetachAfterInitialization() {}
 
   var clearsHostedViewBackground: Bool {
     false

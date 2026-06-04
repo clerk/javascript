@@ -3,7 +3,6 @@ import UIKit
 
 public class ClerkUserProfileNativeView: ClerkNativeViewHost {
   private var currentDismissible: Bool = true
-  private var dismissalEventSent = false
 
   @objc var onProfileEvent: RCTBubblingEventBlock?
 
@@ -13,13 +12,6 @@ public class ClerkUserProfileNativeView: ClerkNativeViewHost {
       guard newDismissible != currentDismissible else { return }
       currentDismissible = newDismissible
       setNeedsHostedViewUpdate()
-    }
-  }
-
-  override func didDetachAfterInitialization() {
-    if currentDismissible && !dismissalEventSent {
-      dismissalEventSent = true
-      sendProfileEvent(type: .dismissed)
     }
   }
 
@@ -35,7 +27,6 @@ public class ClerkUserProfileNativeView: ClerkNativeViewHost {
       onEvent: { [weak self] event, _ in
         if event == .dismissed {
           guard self?.currentDismissible == true else { return }
-          self?.dismissalEventSent = true
           self?.sendProfileEvent(type: .dismissed)
         }
       }
