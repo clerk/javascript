@@ -8,7 +8,6 @@ import type { ClerkUIInstance, ComponentControls as SharedComponentControls } fr
 import { isVersionAtLeast, parseVersion } from '@clerk/shared/versionCheck';
 
 import { type MountComponentRenderer, mountComponentRenderer } from './Components';
-import { setModuleManager } from './composed/moduleManagerStore';
 import { MIN_CLERK_JS_VERSION } from './constants';
 
 /**
@@ -79,7 +78,6 @@ export class ClerkUI implements ClerkUIInstance {
       }
     }
 
-    setModuleManager(moduleManager);
     this.#componentRenderer = mountComponentRenderer(getClerk, getEnvironment, options, moduleManager);
   }
 
