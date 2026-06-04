@@ -46,7 +46,9 @@ export const CheckoutForm = withCardStateProvider(() => {
   const showPastDue = !!totals.pastDue?.amount && totals.pastDue.amount > 0;
   const showProratedDiscount = !!totals.discounts?.proration?.amount && totals.discounts.proration.amount.amount > 0;
   const showRenewalTotals =
-    !!totals.totalsDuePerPeriod && totals.totalsDuePerPeriod.grandTotal.amount !== totals.totalDueNow.amount;
+    !!totals.totalsDuePerPeriod &&
+    totals.totalDueNow &&
+    totals.totalsDuePerPeriod.grandTotal.amount !== totals.totalDueNow.amount;
   const showDowngradeInfo = !isImmediatePlanChange;
 
   const fee =
@@ -177,19 +179,23 @@ export const CheckoutForm = withCardStateProvider(() => {
                 text={`${totals.totalDueAfterFreeTrial.currencySymbol}${totals.totalDueAfterFreeTrial.amountFormatted}`}
               />
             </LineItems.Group>
-          ) : showRenewalTotals ? null : (
+          ) : showRenewalTotals ? null : totals.totalDuePerPeriod ? (
             <LineItems.Group variant='tertiary'>
               <LineItems.Title title={localizationKeys('billing.checkout.totalDuePerPeriod')} />
               <LineItems.Description
                 text={`${totals.totalDuePerPeriod.currencySymbol}${totals.totalDuePerPeriod.amountFormatted}`}
               />
             </LineItems.Group>
-          )}
+          ) : null}
 
-          <LineItems.Group borderTop>
-            <LineItems.Title title={localizationKeys('billing.totalDueToday')} />
-            <LineItems.Description text={`${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`} />
-          </LineItems.Group>
+          {totals.totalDueNow ? (
+            <LineItems.Group borderTop>
+              <LineItems.Title title={localizationKeys('billing.totalDueToday')} />
+              <LineItems.Description
+                text={`${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`}
+              />
+            </LineItems.Group>
+          ) : null}
 
           {showRenewalTotals && (
             <>
@@ -436,7 +442,7 @@ const useSubmitLabel = () => {
     return localizationKeys('billing.startFreeTrial');
   }
 
-  if (totals.totalDueNow.amount > 0) {
+  if (totals.totalDueNow && totals.totalDueNow.amount > 0) {
     return localizationKeys('billing.pay', {
       amount: `${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`,
     });
