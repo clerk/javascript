@@ -7,24 +7,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Recomposer
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.AndroidUiDispatcher
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.savedstate.compose.LocalSavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.clerk.api.Clerk
-import com.clerk.api.network.model.client.Client
 import com.clerk.ui.userprofile.UserProfileView
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.ReactContext
@@ -71,31 +64,6 @@ class ClerkUserProfileNativeView(context: Context) : FrameLayout(context) {
     Log.d(TAG, "setupView - isDismissible: $isDismissible")
 
     composeView.setContent {
-      val session by Clerk.sessionFlow.collectAsStateWithLifecycle()
-
-      var hadSession by remember { mutableStateOf(Clerk.session != null) }
-
-      LaunchedEffect(session) {
-        if (hadSession && session == null) {
-          Log.d(TAG, "Sign-out detected")
-          // Refresh the client from the server to clear any stale in-progress
-          // signIn/signUp state. Without this, when the AuthView re-mounts after
-          // sign-out it routes to the "Get help" fallback because the previous
-          // user's signIn is still in Clerk.client. Clerk.auth.signOut() (called
-          // internally by UserProfileView) only clears session/user state, not
-          // the in-progress signIn.
-          try {
-            Client.getSkippingClientId()
-          } catch (e: Exception) {
-            Log.w(TAG, "Client.getSkippingClientId() after UserProfile sign-out failed: ${e.message}")
-          }
-          ClerkExpoModule.emitRefreshClient()
-        }
-        if (session != null) {
-          hadSession = true
-        }
-      }
-
       val content = @androidx.compose.runtime.Composable {
         MaterialTheme {
           Surface(

@@ -9,16 +9,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Recomposer
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.AndroidUiDispatcher
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
@@ -96,31 +93,12 @@ class ClerkAuthNativeView(context: Context) : FrameLayout(context) {
     super.onDetachedFromWindow()
   }
 
-  // Track the initial session to detect new sign-ins. Captured at construction
-  // time, but may capture a stale session if the view is mounted before signOut
-  // has finished clearing local state — so the LaunchedEffect below uses
-  // session id inequality (not null-to-value) to detect new sign-ins.
-  private var initialSessionId: String? = Clerk.session?.id
-  private var authCompletedSent: Boolean = false
   private var dismissalEventSent: Boolean = false
 
   fun setupView() {
     debugLog(TAG, "setupView - mode: $mode, isDismissible: $isDismissible, activity: $activity")
 
     composeView.setContent {
-      val session by Clerk.sessionFlow.collectAsStateWithLifecycle()
-
-      // Detect auth completion: any session that's different from the one we
-      // started with (captures fresh sign-ins, sign-in-after-sign-out, etc.)
-      LaunchedEffect(session) {
-        val currentSession = session
-        val currentId = currentSession?.id
-        if (currentSession != null && currentId != initialSessionId && !authCompletedSent) {
-          debugLog(TAG, "Auth completed - new session: $currentId (initial: $initialSessionId)")
-          emitRefreshClient()
-        }
-      }
-
       // Provide the Activity as ViewModelStoreOwner so Clerk's viewModel() calls work
       val content = @androidx.compose.runtime.Composable {
         MaterialTheme {
@@ -132,9 +110,6 @@ class ClerkAuthNativeView(context: Context) : FrameLayout(context) {
               modifier = Modifier.fillMaxSize(),
               clerkTheme = Clerk.customTheme,
               onAuthComplete = {
-                if (Clerk.session?.id != null) {
-                  emitRefreshClient()
-                }
                 if (isDismissible) {
                   sendDismissEvent()
                 }
@@ -185,11 +160,5 @@ class ClerkAuthNativeView(context: Context) : FrameLayout(context) {
     if (dismissalEventSent) return
     dismissalEventSent = true
     sendEvent("dismissed")
-  }
-
-  private fun emitRefreshClient() {
-    if (authCompletedSent) return
-    authCompletedSent = true
-    ClerkExpoModule.emitRefreshClient()
   }
 }

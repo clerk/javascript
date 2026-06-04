@@ -5,13 +5,12 @@ import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.clerk.api.Clerk
+import com.clerk.api.network.model.client.Client
 import com.clerk.api.network.model.error.firstMessage
 import com.clerk.api.network.serialization.ClerkResult
-import com.clerk.api.session.Session
 import com.clerk.api.ui.ClerkColors
 import com.clerk.api.ui.ClerkDesign
 import com.clerk.api.ui.ClerkTheme
-import com.clerk.api.user.User
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
@@ -22,7 +21,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
@@ -41,9 +39,7 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
     private var clientStateObserverJob: Job? = null
-    private var lastObservedSessions: List<Session> = emptyList()
-    private var lastObservedSession: Session? = null
-    private var lastObservedUser: User? = null
+    private var lastObservedClient: Client? = null
     private var configuredPublishableKey: String? = null
 
     companion object {
@@ -71,21 +67,15 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
             return
         }
 
-        lastObservedSessions = Clerk.sessionsFlow.value
-        lastObservedSession = Clerk.session
-        lastObservedUser = Clerk.user
+        lastObservedClient = Clerk.clientFlow.value
 
         clientStateObserverJob = coroutineScope.launch {
-            combine(Clerk.sessionsFlow, Clerk.sessionFlow, Clerk.userFlow) { sessions, session, user ->
-                Triple(sessions, session, user)
-            }.collect { (sessions, session, user) ->
-                if (sessions == lastObservedSessions && session == lastObservedSession && user == lastObservedUser) {
+            Clerk.clientFlow.collect { client ->
+                if (client == lastObservedClient) {
                     return@collect
                 }
 
-                lastObservedSessions = sessions
-                lastObservedSession = session
-                lastObservedUser = user
+                lastObservedClient = client
                 emitRefreshClient()
             }
         }
@@ -311,13 +301,7 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
 
         coroutineScope.launch {
             try {
-                val deviceToken = Clerk.getDeviceToken()
-                if (deviceToken.isNullOrBlank()) {
-                    promise.resolve(null)
-                    return@launch
-                }
-
-                when (val result = Clerk.updateDeviceToken(deviceToken)) {
+                when (val result = Clerk.refreshClient()) {
                     is ClerkResult.Failure -> promise.reject(
                         "E_REFRESH_CLIENT_FAILED",
                         result.error?.firstMessage() ?: result.throwable?.message ?: "Client refresh failed"
