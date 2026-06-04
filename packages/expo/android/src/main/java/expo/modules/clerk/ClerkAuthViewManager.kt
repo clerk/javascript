@@ -17,8 +17,8 @@ class ClerkAuthViewManager : SimpleViewManager<ClerkAuthNativeView>(),
 
   @ReactProp(name = "mode")
   override fun setMode(view: ClerkAuthNativeView, mode: String?) {
-    view.mode = mode ?: "signInOrUp"
-    view.setupView()
+    // clerk-android AuthView does not currently expose a public mode parameter.
+    // Keep this generated prop setter as an intentional no-op for cross-platform API parity.
   }
 
   @ReactProp(name = "isDismissible")

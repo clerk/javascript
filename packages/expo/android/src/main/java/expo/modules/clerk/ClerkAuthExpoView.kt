@@ -24,7 +24,6 @@ private fun debugLog(tag: String, message: String) {
 }
 
 class ClerkAuthNativeView(context: Context) : ClerkComposeNativeViewHost(context) {
-  var mode: String = "signInOrUp"
   var isDismissible: Boolean = true
 
   init {
@@ -54,7 +53,7 @@ class ClerkAuthNativeView(context: Context) : ClerkComposeNativeViewHost(context
 
   @Composable
   override fun Content() {
-    debugLog(TAG, "setupView - mode: $mode, isDismissible: $isDismissible, activity: $activity")
+    debugLog(TAG, "setupView - isDismissible: $isDismissible, activity: $activity")
 
     MaterialTheme {
       Surface(

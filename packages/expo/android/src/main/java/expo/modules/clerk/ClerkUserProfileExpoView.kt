@@ -16,6 +16,7 @@ import com.facebook.react.uimanager.events.RCTEventEmitter
 private const val TAG = "ClerkUserProfileExpoView"
 
 class ClerkUserProfileNativeView(context: Context) : ClerkComposeNativeViewHost(context) {
+  // clerk-android UserProfileView dismissibility is controlled by its onDismiss callback.
   var isDismissible: Boolean = true
 
   @Composable

@@ -39,14 +39,13 @@ Pod::Spec.new do |s|
   # ClerkNativeBridge.swift is injected into the app target by the config plugin
   # because it uses `import ClerkKit` which is only available via SPM in the app target.
   s.source_files = "ClerkExpoModule.swift", "ClerkExpoModule.m",
-                   "ClerkNativeEvent.swift", "ClerkNativeHostingCoordinator.swift",
                    "ClerkNativeViewHost.swift",
                    "ClerkAuthNativeView.swift",
-                   "ClerkAuthViewManager.swift", "ClerkAuthViewManager.m",
+                   "ClerkAuthViewManager.m",
                    "ClerkUserProfileNativeView.swift",
-                   "ClerkUserProfileViewManager.swift", "ClerkUserProfileViewManager.m",
+                   "ClerkUserProfileViewManager.m",
                    "ClerkUserButtonNativeView.swift",
-                   "ClerkUserButtonViewManager.swift", "ClerkUserButtonViewManager.m"
+                   "ClerkUserButtonViewManager.m"
 
   install_modules_dependencies(s)
 end

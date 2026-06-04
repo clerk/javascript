@@ -1,3 +1,4 @@
+import React
 import UIKit
 
 public class ClerkUserButtonNativeView: ClerkNativeViewHost {
@@ -9,5 +10,17 @@ public class ClerkUserButtonNativeView: ClerkNativeViewHost {
 
   override var clearsHostedViewBackground: Bool {
     true
+  }
+}
+
+@objc(ClerkUserButtonViewManager)
+class ClerkUserButtonViewManager: RCTViewManager {
+
+  override static func requiresMainQueueSetup() -> Bool {
+    return true
+  }
+
+  override func view() -> UIView! {
+    return ClerkUserButtonNativeView()
   }
 }
