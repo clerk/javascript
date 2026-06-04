@@ -531,7 +531,10 @@ function SignInStartInternal(): JSX.Element {
 
   const handleForgotPasswordClick: React.MouseEventHandler = e => {
     e.preventDefault();
-    if (!identifierField.value.trim()) {
+    // Surface the same native required-field validation as the Continue button
+    // when the identifier is missing
+    const form = e.currentTarget.closest('form');
+    if (form && !form.reportValidity()) {
       return;
     }
     void signInWithFields([identifierField], { resetPasswordIntent: true });
