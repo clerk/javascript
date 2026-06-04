@@ -247,7 +247,7 @@ export interface SessionResource extends ClerkResource {
    */
   actor: ActClaim | null;
   /**
-   * When the session's actor claim has `type: 'agent'`, this property exposes information about the agent and [Agent Task](https://clerk.com/docs/reference/objects/agent-task) that was used to create the session.
+   * When the session's actor claim has `type: 'agent'`, this property exposes information about the agent and [Agent Task](https://clerk.com/docs/reference/types/agent-task) that was used to create the session.
    */
   agent: AgentActClaim | null;
   /**
