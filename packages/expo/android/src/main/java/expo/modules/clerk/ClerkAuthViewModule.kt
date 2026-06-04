@@ -67,12 +67,9 @@ class ClerkAuthNativeView(context: Context, appContext: AppContext) : ClerkCompo
         AuthView(
           modifier = Modifier.fillMaxSize(),
           clerkTheme = Clerk.customTheme,
-          isDismissable = isDismissible,
-          onDismiss = if (isDismissible) ::sendDismissEvent else null,
+          onDismiss = ::sendDismissEvent,
           onAuthComplete = {
-            if (isDismissible) {
-              sendDismissEvent()
-            }
+            sendDismissEvent()
           },
         )
       }
@@ -104,6 +101,9 @@ class ClerkAuthViewModule : Module() {
       }
 
       Prop("isDismissible") { view: ClerkAuthNativeView, isDismissible: Boolean ->
+        // clerk-android does not expose the iOS-parity isDismissible API yet.
+        // Accept the prop for cross-platform RN API shape, and pass it through
+        // once the native SDK owns this behavior.
         view.isDismissible = isDismissible
       }
 

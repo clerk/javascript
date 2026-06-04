@@ -60,6 +60,9 @@ class ClerkUserProfileViewModule : Module() {
       Events("onProfileEvent")
 
       Prop("isDismissible") { view: ClerkUserProfileNativeView, isDismissible: Boolean ->
+        // clerk-android does not expose the iOS-parity isDismissible API yet.
+        // Accept the prop for cross-platform RN API shape, and pass it through
+        // once the native SDK owns this behavior.
         view.isDismissible = isDismissible
       }
 
