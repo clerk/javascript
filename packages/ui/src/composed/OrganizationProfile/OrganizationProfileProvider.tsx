@@ -1,9 +1,9 @@
-import type { ModuleManager } from '@clerk/shared/moduleManager';
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type { EnvironmentResource, OAuthProvider, OAuthScope } from '@clerk/shared/types';
 import type { PropsWithChildren, ReactNode } from 'react';
 
 import type { Appearance } from '@/ui/internal/appearance';
+import { getModuleManager } from '@/ui/internal/moduleManagerStore';
 
 import { SubscriberTypeContext } from '../../contexts/components/SubscriberType';
 import { OrganizationProfileContext } from '../../contexts/components/OrganizationProfile';
@@ -21,7 +21,7 @@ export const OrganizationProfileProvider = (props: OrganizationProfileProviderPr
   const { organization } = useOrganization();
 
   const environment = (clerk as any).__internal_environment as EnvironmentResource | null | undefined;
-  const moduleManager: ModuleManager = (clerk as any).__internal_moduleManager ?? fallbackModuleManager;
+  const moduleManager = getModuleManager(clerk) ?? fallbackModuleManager;
 
   if (!isLoaded || !user || !organization || !environment) {
     return null;

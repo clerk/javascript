@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useModuleManager } from '@/ui/contexts';
 import { useAppearance } from '@/ui/customizables/AppearanceContext';
+import { setModuleManager } from '@/ui/internal/moduleManagerStore';
 import { useRouter } from '@/ui/router';
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen } from '@/test/utils';
@@ -12,10 +13,6 @@ import { UserProfileProvider } from '../UserProfile/UserProfileProvider';
 
 function patchEnvironment(clerk: any, env: any) {
   Object.defineProperty(clerk, '__internal_environment', { value: env, configurable: true });
-}
-
-function patchModuleManager(clerk: any, mm: any) {
-  Object.defineProperty(clerk, '__internal_moduleManager', { value: mm, configurable: true });
 }
 
 function ModuleManagerProbe() {
@@ -46,14 +43,14 @@ describe('UserProfileProvider wiring', () => {
     clearFetchCache();
   });
 
-  it('provides the moduleManager from clerk to children', async () => {
+  it('provides the moduleManager from the store to children', async () => {
     const mockImport = vi.fn(() => Promise.resolve(undefined));
 
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'], first_name: 'Test', last_name: 'User' });
     });
     patchEnvironment(fixtures.clerk, fixtures.environment);
-    patchModuleManager(fixtures.clerk, { import: mockImport });
+    setModuleManager(fixtures.clerk, { import: mockImport });
 
     render(
       <UserProfileProvider>
@@ -66,7 +63,7 @@ describe('UserProfileProvider wiring', () => {
     expect(probe.dataset.hasMm).toBe('true');
   });
 
-  it('falls back to fallback moduleManager when clerk has no moduleManager', async () => {
+  it('falls back to fallback moduleManager when store has no entry for clerk', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'], first_name: 'Test', last_name: 'User' });
     });
@@ -175,7 +172,7 @@ describe('OrganizationProfileProvider wiring', () => {
     clearFetchCache();
   });
 
-  it('provides the moduleManager from clerk to children', async () => {
+  it('provides the moduleManager from the store to children', async () => {
     const mockImport = vi.fn(() => Promise.resolve(undefined));
 
     const { wrapper, fixtures } = await createFixtures(f => {
@@ -188,7 +185,7 @@ describe('OrganizationProfileProvider wiring', () => {
       });
     });
     patchEnvironment(fixtures.clerk, fixtures.environment);
-    patchModuleManager(fixtures.clerk, { import: mockImport });
+    setModuleManager(fixtures.clerk, { import: mockImport });
     fixtures.clerk.organization?.getDomains.mockReturnValue(Promise.resolve({ data: [], total_count: 0 }));
 
     render(
