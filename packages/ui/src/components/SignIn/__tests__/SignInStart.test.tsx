@@ -314,11 +314,22 @@ describe('SignInStart', () => {
         });
       });
       expect(fixtures.signIn.authenticateWithRedirect).not.toHaveBeenCalled();
-      expect(fixtures.clerk.setActive).toHaveBeenCalledWith({
-        session: 'sess_external',
-        navigate: expect.any(Function),
-      });
-      expect(fixtures.clerk.handleRedirectCallback).not.toHaveBeenCalled();
+      expect(fixtures.clerk.handleRedirectCallback).toHaveBeenCalledWith(
+        {
+          signUpUrl: 'https://dashboard.clerk.com/sign-up',
+          signInUrl: 'https://dashboard.clerk.com/sign-in',
+          signInForceRedirectUrl: '/',
+          signUpForceRedirectUrl: '/',
+          continueSignUpUrl: 'https://dashboard.clerk.com/sign-up#/continue',
+          transferable: true,
+          firstFactorUrl: '../factor-one',
+          secondFactorUrl: '../factor-two',
+          resetPasswordUrl: '../reset-password',
+          unsafeMetadata: undefined,
+        },
+        expect.any(Function),
+      );
+      expect(fixtures.clerk.setActive).not.toHaveBeenCalled();
     });
   });
 

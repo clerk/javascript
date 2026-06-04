@@ -4,7 +4,6 @@ import React from 'react';
 
 import { useCardState } from '@/ui/elements/contexts';
 import { handleError } from '@/ui/utils/errorHandler';
-import { finalizeNativeRedirectResult } from '@/ui/utils/nativeRedirectResult';
 import { originPrefersPopup } from '@/ui/utils/originPrefersPopup';
 import { web3CallbackErrorHandler } from '@/ui/utils/web3CallbackErrorHandler';
 
@@ -39,7 +38,7 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
       oauthCallback={async (strategy: OAuthStrategy) => {
         if (externalAuth) {
           try {
-            const res = await signUp.__experimental_authenticateWithNativeRedirect({
+            await signUp.__experimental_authenticateWithNativeRedirect({
               strategy,
               redirectUrl,
               redirectUrlComplete,
@@ -50,9 +49,8 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
               oidcPrompt: ctx.oidcPrompt,
             });
 
-            return finalizeNativeRedirectResult({
-              clerk,
-              handleRedirectCallbackParams: {
+            return clerk.handleRedirectCallback(
+              {
                 signUpUrl: ctx.signUpUrl,
                 signInUrl: ctx.signInUrl,
                 signUpForceRedirectUrl: ctx.afterSignUpUrl,
@@ -64,10 +62,7 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
                 unsafeMetadata: ctx.unsafeMetadata,
               },
               navigate,
-              navigateOnSetActive: ctx.navigateOnSetActive,
-              redirectUrlComplete,
-              resource: res,
-            });
+            );
           } catch (err) {
             return handleError(err as Error, [], card.setError);
           }

@@ -38,7 +38,6 @@ import { useLoadingStatus } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useTotalEnabledAuthMethods } from '../../hooks/useTotalEnabledAuthMethods';
 import { useRouter } from '../../router';
-import { finalizeNativeRedirectResult } from '../../utils/nativeRedirectResult';
 import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
 import { hasMultipleEnterpriseConnections, useHandleAuthenticateWithPasskey } from './shared';
 import { SignInAlternativePhoneCodePhoneNumberCard } from './SignInAlternativePhoneCodePhoneNumberCard';
@@ -418,7 +417,7 @@ function SignInStartInternal(): JSX.Element {
     const redirectUrlComplete = ctx.afterSignInUrl || '/';
 
     if (externalAuth) {
-      const res = await signIn.__experimental_authenticateWithNativeRedirect({
+      await signIn.__experimental_authenticateWithNativeRedirect({
         strategy: 'enterprise_sso',
         redirectUrl,
         redirectUrlComplete,
@@ -427,9 +426,8 @@ function SignInStartInternal(): JSX.Element {
         oidcPrompt: ctx.oidcPrompt,
       });
 
-      return finalizeNativeRedirectResult({
-        clerk,
-        handleRedirectCallbackParams: {
+      return clerk.handleRedirectCallback(
+        {
           signUpUrl: ctx.signUpUrl,
           signInUrl: ctx.signInUrl,
           signInForceRedirectUrl: ctx.afterSignInUrl,
@@ -442,10 +440,7 @@ function SignInStartInternal(): JSX.Element {
           unsafeMetadata: ctx.unsafeMetadata,
         },
         navigate,
-        navigateOnSetActive: ctx.navigateOnSetActive,
-        redirectUrlComplete,
-        resource: res,
-      });
+      );
     }
 
     return signIn.authenticateWithRedirect({

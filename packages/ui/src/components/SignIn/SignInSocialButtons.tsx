@@ -14,7 +14,6 @@ import { useCardState } from '../../elements/contexts';
 import type { SocialButtonsProps } from '../../elements/SocialButtons';
 import { SocialButtons } from '../../elements/SocialButtons';
 import { useRouter } from '../../router';
-import { finalizeNativeRedirectResult } from '../../utils/nativeRedirectResult';
 
 export type SignInSocialButtonsProps = SocialButtonsProps & {
   onAlternativePhoneCodeProviderClick?: (channel: PhoneCodeChannel) => void;
@@ -59,7 +58,7 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
       oauthCallback={async strategy => {
         if (externalAuth) {
           try {
-            const res = await signIn.__experimental_authenticateWithNativeRedirect({
+            await signIn.__experimental_authenticateWithNativeRedirect({
               strategy,
               redirectUrl,
               redirectUrlComplete,
@@ -67,9 +66,8 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
               oidcPrompt: ctx.oidcPrompt,
             });
 
-            return finalizeNativeRedirectResult({
-              clerk,
-              handleRedirectCallbackParams: {
+            return clerk.handleRedirectCallback(
+              {
                 signUpUrl: ctx.signUpUrl,
                 signInUrl: ctx.signInUrl,
                 signInForceRedirectUrl: ctx.afterSignInUrl,
@@ -82,10 +80,7 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
                 unsafeMetadata: ctx.unsafeMetadata,
               },
               navigate,
-              navigateOnSetActive: ctx.navigateOnSetActive,
-              redirectUrlComplete,
-              resource: res,
-            });
+            );
           } catch (err) {
             return handleError(err);
           }

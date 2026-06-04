@@ -8,7 +8,6 @@ import { Flow, localizationKeys } from '@/ui/customizables';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { useRouter } from '@/ui/router';
 import type { AvailableComponentProps } from '@/ui/types';
-import { finalizeNativeRedirectResult } from '@/ui/utils/nativeRedirectResult';
 
 import { hasMultipleEnterpriseConnections } from './shared';
 
@@ -37,7 +36,7 @@ const SignInFactorOneEnterpriseConnectionsInternal = () => {
     const redirectUrlComplete = ctx.afterSignInUrl || '/';
 
     if (externalAuth) {
-      const res = await signIn.__experimental_authenticateWithNativeRedirect({
+      await signIn.__experimental_authenticateWithNativeRedirect({
         strategy: 'enterprise_sso',
         redirectUrl,
         redirectUrlComplete,
@@ -47,9 +46,8 @@ const SignInFactorOneEnterpriseConnectionsInternal = () => {
         oidcPrompt: ctx.oidcPrompt,
       });
 
-      await finalizeNativeRedirectResult({
-        clerk,
-        handleRedirectCallbackParams: {
+      await clerk.handleRedirectCallback(
+        {
           signUpUrl: ctx.signUpUrl,
           signInUrl: ctx.signInUrl,
           signInForceRedirectUrl: ctx.afterSignInUrl,
@@ -62,10 +60,7 @@ const SignInFactorOneEnterpriseConnectionsInternal = () => {
           unsafeMetadata: ctx.unsafeMetadata,
         },
         navigate,
-        navigateOnSetActive: ctx.navigateOnSetActive,
-        redirectUrlComplete,
-        resource: res,
-      });
+      );
       return;
     }
 

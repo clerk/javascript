@@ -8,7 +8,6 @@ import { withCardStateProvider } from '@/ui/elements/contexts';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
 import { useFetch } from '@/ui/hooks';
 import { useRouter } from '@/ui/router';
-import { finalizeNativeRedirectResult } from '@/ui/utils/nativeRedirectResult';
 
 const SignUpEnterpriseConnectionsInternal = () => {
   const clerk = useClerk();
@@ -26,7 +25,7 @@ const SignUpEnterpriseConnectionsInternal = () => {
     const redirectUrlComplete = ctx.afterSignUpUrl || '/';
 
     if (externalAuth) {
-      const res = await signUp.__experimental_authenticateWithNativeRedirect({
+      await signUp.__experimental_authenticateWithNativeRedirect({
         strategy: 'enterprise_sso',
         redirectUrl,
         redirectUrlComplete,
@@ -37,9 +36,8 @@ const SignUpEnterpriseConnectionsInternal = () => {
         oidcPrompt: ctx.oidcPrompt,
       });
 
-      await finalizeNativeRedirectResult({
-        clerk,
-        handleRedirectCallbackParams: {
+      await clerk.handleRedirectCallback(
+        {
           signUpUrl: ctx.signUpUrl,
           signInUrl: ctx.signInUrl,
           signUpForceRedirectUrl: ctx.afterSignUpUrl,
@@ -51,10 +49,7 @@ const SignUpEnterpriseConnectionsInternal = () => {
           unsafeMetadata: ctx.unsafeMetadata,
         },
         navigate,
-        navigateOnSetActive: ctx.navigateOnSetActive,
-        redirectUrlComplete,
-        resource: res,
-      });
+      );
       return;
     }
 
