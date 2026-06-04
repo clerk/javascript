@@ -15,10 +15,15 @@ public class ClerkNativeViewHost: UIView {
   override public func didMoveToWindow() {
     super.didMoveToWindow()
 
-    if window != nil && !hasInitialized {
-      hasInitialized = true
-      updateHostedView()
+    guard window != nil else {
+      hostingCoordinator.detach()
+      hasInitialized = false
+      return
     }
+
+    guard !hasInitialized else { return }
+    hasInitialized = true
+    updateHostedView()
   }
 
   override public func layoutSubviews() {

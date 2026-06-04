@@ -1,4 +1,3 @@
-import { EventEmitter } from 'expo';
 import { useEffect, useState } from 'react';
 import { NativeEventEmitter, Platform } from 'react-native';
 
@@ -39,7 +38,7 @@ export function useNativeClientEvents(): UseNativeClientEventsReturn {
     try {
       const eventEmitter: RefreshClientEventEmitter =
         Platform.OS === 'android'
-          ? (new EventEmitter(ClerkExpo as never) as unknown as RefreshClientEventEmitter)
+          ? (ClerkExpo as RefreshClientEventEmitter)
           : (new NativeEventEmitter(ClerkExpo) as RefreshClientEventEmitter);
 
       subscription = eventEmitter.addListener('refreshClient', () => {

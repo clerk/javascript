@@ -1,9 +1,11 @@
-import { useCallback } from 'react';
+import { type ComponentProps, type ReactElement, useCallback } from 'react';
 import { Text, View } from 'react-native';
 
 import NativeClerkAuthView from '../specs/NativeClerkAuthView';
 import { isNativeSupported } from '../utils/native-module';
 import type { AuthViewProps } from './AuthView.types';
+
+type AuthNativeEvent = Parameters<NonNullable<ComponentProps<typeof NativeClerkAuthView>['onAuthEvent']>>[0];
 
 /**
  * A pre-built native authentication component that handles sign-in and sign-up flows.
@@ -34,9 +36,9 @@ import type { AuthViewProps } from './AuthView.types';
  *
  * @see {@link https://clerk.com/docs/components/authentication/sign-in} Clerk Sign-In Documentation
  */
-export function AuthView({ mode = 'signInOrUp', isDismissible = true, onDismiss }: AuthViewProps) {
+export function AuthView({ mode = 'signInOrUp', isDismissible = true, onDismiss }: AuthViewProps): ReactElement {
   const handleAuthEvent = useCallback(
-    (event: { nativeEvent: { type: string } }) => {
+    (event: AuthNativeEvent) => {
       if (event.nativeEvent.type === 'dismissed') {
         onDismiss?.();
       }

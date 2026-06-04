@@ -7,6 +7,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.ViewModelStoreOwner
 import com.clerk.api.Clerk
 import com.clerk.ui.userprofile.UserProfileView
 import expo.modules.kotlin.AppContext
@@ -26,6 +28,17 @@ class ClerkUserProfileNativeView(context: Context, appContext: AppContext) : Cle
   // clerk-android UserProfileView dismissibility is controlled by its onDismiss callback.
   var isDismissible: Boolean = true
   private val onProfileEvent by EventDispatcher()
+
+  private val viewModelStoreOwner = object : ViewModelStoreOwner {
+    private val store = ViewModelStore()
+    override val viewModelStore: ViewModelStore = store
+  }
+
+  override fun localViewModelStoreOwner(): ViewModelStoreOwner = viewModelStoreOwner
+
+  override fun onHostDetachedFromWindow() {
+    viewModelStoreOwner.viewModelStore.clear()
+  }
 
   @Composable
   override fun Content() {

@@ -53,6 +53,16 @@ const SDK_METADATA = {
   version: PACKAGE_VERSION,
 };
 
+type SyncableClerkInstance = {
+  addListener?: (listener: (payload?: unknown) => void, options?: { skipInitialEmit?: boolean }) => () => void;
+  addOnLoaded?: (listener: () => void) => void;
+  client?: { lastActiveSessionId?: string | null } | null;
+  loaded?: boolean;
+  session?: { id?: string | null } | null;
+  setActive?: (params: { session: string }) => void | Promise<void>;
+  __internal_reloadInitialResources?: () => void | Promise<void>;
+};
+
 async function waitForNativeClientToken(): Promise<string | null> {
   const ClerkExpo = NativeClerkModule;
   if (!ClerkExpo?.getClientToken) {
@@ -85,9 +95,9 @@ async function syncNativeClientToJs({
   clerkInstance,
   tokenCache,
 }: {
-  clerkInstance: any;
+  clerkInstance: SyncableClerkInstance;
   tokenCache: TokenCache | undefined;
-}) {
+}): Promise<void> {
   const nativeClientToken = await waitForNativeClientToken();
   const effectiveTokenCache = tokenCache ?? defaultTokenCache;
 
@@ -121,11 +131,11 @@ function NativeClientSync({
   publishableKey,
   tokenCache,
 }: {
-  clerkInstance: any;
+  clerkInstance: SyncableClerkInstance | null;
   isSyncingNativeClientToJsRef: MutableRefObject<boolean>;
   publishableKey: string;
   tokenCache: TokenCache | undefined;
-}) {
+}): null {
   const isRefreshingNativeFromJsRef = useRef(false);
   // Use the provided tokenCache, falling back to the default SecureStore cache
   const effectiveTokenCache = tokenCache ?? defaultTokenCache;
@@ -143,7 +153,7 @@ function NativeClientSync({
 
         isRefreshingNativeFromJsRef.current = true;
 
-        const refreshNativeFromJsClient = async () => {
+        const refreshNativeFromJsClient = async (): Promise<void> => {
           const ClerkExpo = NativeClerkModule;
           if (!ClerkExpo) {
             return;
@@ -185,7 +195,7 @@ function useNativeSessionBootstrap({
   isSyncingNativeClientToJsRef: MutableRefObject<boolean>;
   publishableKey: string;
   tokenCache: TokenCache | undefined;
-  clerkInstance: any;
+  clerkInstance: SyncableClerkInstance | null;
 }) {
   const initStartedRef = useRef(false);
   const sessionSyncedRef = useRef(false);
