@@ -1,6 +1,5 @@
 import type { ClerkGlobalHookError } from '@/errors/globalHookError';
 
-import type { ModuleManager } from '../moduleManager';
 import type { ClerkUIConstructor } from '../ui/types';
 import type { APIKeysNamespace } from './apiKeys';
 import type {
@@ -302,11 +301,6 @@ export interface Clerk {
    * Pass `useStaticAllowlistOnly: true` to opt out of the customer extension.
    */
   __internal_windowNavigate: (to: URL | string, opts?: { useStaticAllowlistOnly?: boolean }) => void;
-
-  /**
-   * @internal
-   */
-  __internal_moduleManager: ModuleManager;
 
   frontendApi: string;
 
