@@ -1,4 +1,4 @@
-// ClerkViewFactory - Provides Clerk view controllers to the ClerkExpo module
+// ClerkNativeBridge - Provides app-target Clerk SDK operations and SwiftUI view controllers to ClerkExpo.
 // This file is injected into the app target by the config plugin.
 // It uses `import ClerkKit` (SPM) which is only accessible from the app target.
 
@@ -7,12 +7,12 @@ import SwiftUI
 import Security
 import ClerkKit
 import ClerkKitUI
-import ClerkExpo  // Import the pod to access ClerkViewFactoryProtocol
+import ClerkExpo  // Import the pod to access ClerkNativeBridgeProtocol
 
-// MARK: - View Factory Implementation
+// MARK: - Native Bridge Implementation
 
-public final class ClerkViewFactory: ClerkViewFactoryProtocol {
-  public static let shared = ClerkViewFactory()
+public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
+  public static let shared = ClerkNativeBridge()
 
   private static let clerkLoadMaxAttempts = 30
   private static let clerkLoadIntervalNs: UInt64 = 100_000_000
@@ -46,10 +46,10 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
     return ExpoKeychain(service: service)
   }
 
-  // Register this factory with the ClerkExpo module
+  // Register this app-target bridge with the ClerkExpo module.
   @MainActor public static func register() {
     shared.loadThemes()
-    clerkViewFactory = shared
+    clerkNativeBridge = shared
   }
 
   @MainActor
@@ -177,7 +177,7 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
 
   // MARK: - Inline View Creation
 
-  public func createAuthView(
+  public func makeAuthViewController(
     mode: String,
     dismissible: Bool,
     onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
@@ -193,7 +193,7 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
     )
   }
 
-  public func createUserProfileView(
+  public func makeUserProfileViewController(
     dismissible: Bool,
     onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
   ) -> UIViewController? {
@@ -207,7 +207,7 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
     )
   }
 
-  public func createUserButton() -> UIViewController? {
+  public func makeUserButtonViewController() -> UIViewController? {
     makeHostingController(
       rootView: ClerkInlineUserButtonWrapperView(
         lightTheme: lightTheme,

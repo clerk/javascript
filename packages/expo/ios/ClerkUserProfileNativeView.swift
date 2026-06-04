@@ -28,9 +28,9 @@ public class ClerkUserProfileNativeView: ClerkNativeViewHost {
   }
 
   override func makeHostedController() -> UIViewController? {
-    guard let factory = clerkViewFactory else { return nil }
+    guard let bridge = clerkNativeBridge else { return nil }
 
-    return factory.createUserProfileView(
+    return bridge.makeUserProfileViewController(
       dismissible: currentDismissible,
       onEvent: { [weak self] event, _ in
         if event == .dismissed {

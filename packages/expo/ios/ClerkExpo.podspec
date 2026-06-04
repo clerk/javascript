@@ -36,7 +36,7 @@ Pod::Spec.new do |s|
   }
 
   # Only include the module files in the pod (both Swift and ObjC bridges).
-  # ClerkViewFactory.swift (with views) is injected into the app target by the config plugin
+  # ClerkNativeBridge.swift is injected into the app target by the config plugin
   # because it uses `import ClerkKit` which is only available via SPM in the app target.
   s.source_files = "ClerkExpoModule.swift", "ClerkExpoModule.m",
                    "ClerkNativeEvent.swift", "ClerkNativeHostingCoordinator.swift",

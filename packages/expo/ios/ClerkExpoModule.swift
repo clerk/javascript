@@ -1,20 +1,20 @@
 // ClerkExpoModule - Native module for Clerk integration
 // This module provides the configure function, session sync, and native view bridges.
-// SwiftUI Clerk views are created by the app target through ClerkViewFactory because
+// SwiftUI Clerk views are created by the app target through ClerkNativeBridge because
 // the Clerk SDK (SPM) isn't accessible from the CocoaPods-backed React Native pod.
 
 import UIKit
 import React
 
-// Global registry for the Clerk view factory (set by app target at startup)
-public var clerkViewFactory: ClerkViewFactoryProtocol?
+// Global registry for the app-target native bridge (set by the app target at startup)
+public var clerkNativeBridge: ClerkNativeBridgeProtocol?
 
-// Protocol that the app target implements to provide Clerk views
-public protocol ClerkViewFactoryProtocol {
+// Protocol that the app target implements to provide Clerk SDK operations and SwiftUI views.
+public protocol ClerkNativeBridgeProtocol {
   // Inline rendering — returns UIViewController to preserve SwiftUI lifecycle
-  func createAuthView(mode: String, dismissible: Bool, onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void) -> UIViewController?
-  func createUserProfileView(dismissible: Bool, onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void) -> UIViewController?
-  func createUserButton() -> UIViewController?
+  func makeAuthViewController(mode: String, dismissible: Bool, onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void) -> UIViewController?
+  func makeUserProfileViewController(dismissible: Bool, onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void) -> UIViewController?
+  func makeUserButtonViewController() -> UIViewController?
 
   // SDK operations
   func configure(publishableKey: String, bearerToken: String?) async throws
@@ -65,14 +65,14 @@ class ClerkExpoModule: RCTEventEmitter {
                         bearerToken: String?,
                         resolve: @escaping RCTPromiseResolveBlock,
                         reject: @escaping RCTPromiseRejectBlock) {
-    guard let factory = clerkViewFactory else {
-      reject("E_NOT_INITIALIZED", "Clerk not initialized. Make sure ClerkViewFactory is registered.", nil)
+    guard let bridge = clerkNativeBridge else {
+      reject("E_NOT_INITIALIZED", "Clerk not initialized. Make sure ClerkNativeBridge is registered.", nil)
       return
     }
 
     Task {
       do {
-        try await factory.configure(publishableKey: publishableKey, bearerToken: bearerToken)
+        try await bridge.configure(publishableKey: publishableKey, bearerToken: bearerToken)
         resolve(nil)
       } catch {
         reject("E_CONFIGURE_FAILED", error.localizedDescription, error)
@@ -84,13 +84,13 @@ class ClerkExpoModule: RCTEventEmitter {
 
   @objc func getSession(_ resolve: @escaping RCTPromiseResolveBlock,
                          reject: @escaping RCTPromiseRejectBlock) {
-    guard let factory = clerkViewFactory else {
+    guard let bridge = clerkNativeBridge else {
       resolve(nil)
       return
     }
 
     Task {
-      let session = await factory.getSession()
+      let session = await bridge.getSession()
       resolve(session)
     }
   }
@@ -99,26 +99,26 @@ class ClerkExpoModule: RCTEventEmitter {
 
   @objc func getClientToken(_ resolve: @escaping RCTPromiseResolveBlock,
                               reject: @escaping RCTPromiseRejectBlock) {
-    guard let factory = clerkViewFactory else {
+    guard let bridge = clerkNativeBridge else {
       resolve(nil)
       return
     }
 
-    resolve(factory.getClientToken())
+    resolve(bridge.getClientToken())
   }
 
   // MARK: - refreshClient
 
   @objc func refreshClient(_ resolve: @escaping RCTPromiseResolveBlock,
                             reject: @escaping RCTPromiseRejectBlock) {
-    guard let factory = clerkViewFactory else {
+    guard let bridge = clerkNativeBridge else {
       resolve(nil)
       return
     }
 
     Task {
       do {
-        try await factory.refreshClient()
+        try await bridge.refreshClient()
         resolve(nil)
       } catch {
         reject("E_REFRESH_CLIENT_FAILED", error.localizedDescription, error)

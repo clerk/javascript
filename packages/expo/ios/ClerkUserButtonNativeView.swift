@@ -2,9 +2,9 @@ import UIKit
 
 public class ClerkUserButtonNativeView: ClerkNativeViewHost {
   override func makeHostedController() -> UIViewController? {
-    guard let factory = clerkViewFactory else { return nil }
+    guard let bridge = clerkNativeBridge else { return nil }
 
-    return factory.createUserButton()
+    return bridge.makeUserButtonViewController()
   }
 
   override var clearsHostedViewBackground: Bool {
