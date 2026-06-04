@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useModuleManager } from '@/ui/contexts';
 import { useAppearance } from '@/ui/customizables/AppearanceContext';
@@ -7,12 +7,15 @@ import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen } from '@/test/utils';
 
 import { clearFetchCache } from '../../hooks';
-import { setModuleManager } from '../moduleManagerStore';
 import { OrganizationProfileProvider } from '../OrganizationProfile/OrganizationProfileProvider';
 import { UserProfileProvider } from '../UserProfile/UserProfileProvider';
 
 function patchEnvironment(clerk: any, env: any) {
   Object.defineProperty(clerk, '__internal_environment', { value: env, configurable: true });
+}
+
+function patchModuleManager(clerk: any, mm: any) {
+  Object.defineProperty(clerk, '__internal_moduleManager', { value: mm, configurable: true });
 }
 
 function ModuleManagerProbe() {
@@ -43,18 +46,14 @@ describe('UserProfileProvider wiring', () => {
     clearFetchCache();
   });
 
-  afterEach(() => {
-    setModuleManager(undefined as any);
-  });
-
-  it('provides the stored moduleManager to children', async () => {
+  it('provides the moduleManager from clerk to children', async () => {
     const mockImport = vi.fn(() => Promise.resolve(undefined));
-    setModuleManager({ import: mockImport });
 
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'], first_name: 'Test', last_name: 'User' });
     });
     patchEnvironment(fixtures.clerk, fixtures.environment);
+    patchModuleManager(fixtures.clerk, { import: mockImport });
 
     render(
       <UserProfileProvider>
@@ -67,7 +66,7 @@ describe('UserProfileProvider wiring', () => {
     expect(probe.dataset.hasMm).toBe('true');
   });
 
-  it('falls back to fallback moduleManager when store is empty', async () => {
+  it('falls back to fallback moduleManager when clerk has no moduleManager', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'], first_name: 'Test', last_name: 'User' });
     });
@@ -85,8 +84,6 @@ describe('UserProfileProvider wiring', () => {
   });
 
   it('provides a router that delegates to clerk.navigate', async () => {
-    setModuleManager({ import: vi.fn(() => Promise.resolve(undefined)) });
-
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'], first_name: 'Test', last_name: 'User' });
     });
@@ -105,8 +102,6 @@ describe('UserProfileProvider wiring', () => {
   });
 
   it('returns null when user is not loaded', async () => {
-    setModuleManager({ import: vi.fn(() => Promise.resolve(undefined)) });
-
     const { wrapper, fixtures } = await createFixtures();
     patchEnvironment(fixtures.clerk, fixtures.environment);
 
@@ -121,8 +116,6 @@ describe('UserProfileProvider wiring', () => {
   });
 
   it('cascades globalAppearance from ClerkProvider into composed theme', async () => {
-    setModuleManager({ import: vi.fn(() => Promise.resolve(undefined)) });
-
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'], first_name: 'Test', last_name: 'User' });
     });
@@ -159,8 +152,6 @@ describe('UserProfileProvider wiring', () => {
   });
 
   it('returns null when environment is missing', async () => {
-    setModuleManager({ import: vi.fn(() => Promise.resolve(undefined)) });
-
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'], first_name: 'Test', last_name: 'User' });
     });
@@ -184,13 +175,8 @@ describe('OrganizationProfileProvider wiring', () => {
     clearFetchCache();
   });
 
-  afterEach(() => {
-    setModuleManager(undefined as any);
-  });
-
-  it('provides the stored moduleManager to children', async () => {
+  it('provides the moduleManager from clerk to children', async () => {
     const mockImport = vi.fn(() => Promise.resolve(undefined));
-    setModuleManager({ import: mockImport });
 
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
@@ -202,6 +188,7 @@ describe('OrganizationProfileProvider wiring', () => {
       });
     });
     patchEnvironment(fixtures.clerk, fixtures.environment);
+    patchModuleManager(fixtures.clerk, { import: mockImport });
     fixtures.clerk.organization?.getDomains.mockReturnValue(Promise.resolve({ data: [], total_count: 0 }));
 
     render(
@@ -216,8 +203,6 @@ describe('OrganizationProfileProvider wiring', () => {
   });
 
   it('returns null when organization is not loaded', async () => {
-    setModuleManager({ import: vi.fn(() => Promise.resolve(undefined)) });
-
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'], first_name: 'Test', last_name: 'User' });
     });
