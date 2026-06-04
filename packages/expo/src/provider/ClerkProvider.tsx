@@ -131,7 +131,7 @@ function NativeClientSync({
   publishableKey,
   tokenCache,
 }: {
-  clerkInstance: SyncableClerkInstance | null;
+  clerkInstance: SyncableClerkInstance | null | undefined;
   isSyncingNativeClientToJsRef: MutableRefObject<boolean>;
   publishableKey: string;
   tokenCache: TokenCache | undefined;
