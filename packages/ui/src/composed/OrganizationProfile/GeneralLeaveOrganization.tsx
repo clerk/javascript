@@ -1,9 +1,4 @@
-import type { ReactNode } from 'react';
-
 import { OrganizationLeaveSection } from '../../components/OrganizationProfile/OrganizationGeneralPage';
-import { useRequirePage } from '../useRequirePage';
+import { createSection } from '../createSection';
 
-export function GeneralLeaveOrganization(): ReactNode {
-  if (!useRequirePage('GeneralLeaveOrganization')) return null;
-  return <OrganizationLeaveSection />;
-}
+export const GeneralLeaveOrganization = createSection('GeneralLeaveOrganization', OrganizationLeaveSection);

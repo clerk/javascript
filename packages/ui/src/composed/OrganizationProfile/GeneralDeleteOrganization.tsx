@@ -1,9 +1,4 @@
-import type { ReactNode } from 'react';
-
 import { OrganizationDeleteSection } from '../../components/OrganizationProfile/OrganizationGeneralPage';
-import { useRequirePage } from '../useRequirePage';
+import { createSection } from '../createSection';
 
-export function GeneralDeleteOrganization(): ReactNode {
-  if (!useRequirePage('GeneralDeleteOrganization')) return null;
-  return <OrganizationDeleteSection />;
-}
+export const GeneralDeleteOrganization = createSection('GeneralDeleteOrganization', OrganizationDeleteSection);

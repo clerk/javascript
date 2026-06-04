@@ -3,7 +3,6 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen, waitFor } from '@/test/utils';
 
-import { assertContextExists } from '../../contexts/utils';
 import { clearFetchCache } from '../../hooks';
 import { General } from '../OrganizationProfile/General';
 import { GeneralDeleteOrganization } from '../OrganizationProfile/GeneralDeleteOrganization';
@@ -176,8 +175,15 @@ describe('OrganizationProfile composed sections', () => {
   });
 
   describe('General — section outside page', () => {
-    it('assertContextExists throws when context is missing', () => {
-      expect(() => assertContextExists(null, 'GeneralOrganizationProfile')).toThrow();
+    it('useRequirePage throws when rendered outside a page component', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+      });
+
+      expect(() => render(<GeneralOrganizationProfile />, { wrapper })).toThrow(
+        '<GeneralOrganizationProfile> must be rendered inside a page component',
+      );
     });
   });
 });

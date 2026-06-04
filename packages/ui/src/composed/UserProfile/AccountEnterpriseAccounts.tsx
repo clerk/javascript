@@ -1,9 +1,4 @@
-import type { ReactNode } from 'react';
+import { AccountEnterpriseAccounts as Section } from '../../components/UserProfile/AccountSections';
+import { createSection } from '../createSection';
 
-import { AccountEnterpriseAccounts as AccountEnterpriseAccountsSection } from '../../components/UserProfile/AccountSections';
-import { useRequirePage } from '../useRequirePage';
-
-export function AccountEnterpriseAccounts(): ReactNode {
-  if (!useRequirePage('AccountEnterpriseAccounts')) return null;
-  return <AccountEnterpriseAccountsSection />;
-}
+export const AccountEnterpriseAccounts = createSection('AccountEnterpriseAccounts', Section);

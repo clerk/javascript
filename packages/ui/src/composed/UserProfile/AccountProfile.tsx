@@ -1,9 +1,4 @@
-import type { ReactNode } from 'react';
-
 import { UserProfileSection } from '../../components/UserProfile/UserProfileSection';
-import { useRequirePage } from '../useRequirePage';
+import { createSection } from '../createSection';
 
-export function AccountProfile(): ReactNode {
-  if (!useRequirePage('AccountProfile')) return null;
-  return <UserProfileSection />;
-}
+export const AccountProfile = createSection('AccountProfile', UserProfileSection);

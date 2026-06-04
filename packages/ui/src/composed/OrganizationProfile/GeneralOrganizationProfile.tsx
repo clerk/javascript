@@ -1,9 +1,4 @@
-import type { ReactNode } from 'react';
-
 import { OrganizationProfileSection } from '../../components/OrganizationProfile/OrganizationGeneralPage';
-import { useRequirePage } from '../useRequirePage';
+import { createSection } from '../createSection';
 
-export function GeneralOrganizationProfile(): ReactNode {
-  if (!useRequirePage('GeneralOrganizationProfile')) return null;
-  return <OrganizationProfileSection />;
-}
+export const GeneralOrganizationProfile = createSection('GeneralOrganizationProfile', OrganizationProfileSection);

@@ -1,9 +1,4 @@
-import type { ReactNode } from 'react';
+import { SecurityMfa as Section } from '../../components/UserProfile/SecuritySections';
+import { createSection } from '../createSection';
 
-import { SecurityMfa as SecurityMfaSection } from '../../components/UserProfile/SecuritySections';
-import { useRequirePage } from '../useRequirePage';
-
-export function SecurityMfa(): ReactNode {
-  if (!useRequirePage('SecurityMfa')) return null;
-  return <SecurityMfaSection />;
-}
+export const SecurityMfa = createSection('SecurityMfa', Section);

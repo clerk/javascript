@@ -1,9 +1,4 @@
-import type { ReactNode } from 'react';
-
 import { ActiveDevicesSection } from '../../components/UserProfile/ActiveDevicesSection';
-import { useRequirePage } from '../useRequirePage';
+import { createSection } from '../createSection';
 
-export function SecurityActiveDevices(): ReactNode {
-  if (!useRequirePage('SecurityActiveDevices')) return null;
-  return <ActiveDevicesSection />;
-}
+export const SecurityActiveDevices = createSection('SecurityActiveDevices', ActiveDevicesSection);
