@@ -13,24 +13,10 @@ const composedDir = resolve(__dirname, '..');
 const userProfileDir = join(composedDir, 'UserProfile');
 const orgProfileDir = join(composedDir, 'OrganizationProfile');
 
-function readFile(path: string): string {
-  return readFileSync(path, 'utf-8');
-}
+const SECTION_PREFIX = /^(Account|Security|General)[A-Z]/;
 
 function getSectionFiles(dir: string): string[] {
-  return readdirSync(dir).filter(
-    f =>
-      f.endsWith('.tsx') &&
-      f !== 'index.tsx' &&
-      !f.includes('Provider') &&
-      !f.includes('Account.tsx') &&
-      !f.includes('Security.tsx') &&
-      !f.includes('General.tsx') &&
-      !f.includes('Billing.tsx') &&
-      !f.includes('APIKeys.tsx') &&
-      !f.includes('Members.tsx') &&
-      !f.includes('ConfigureSSO.tsx'),
-  );
+  return readdirSync(dir).filter(f => f.endsWith('.tsx') && SECTION_PREFIX.test(f));
 }
 
 describe('tree-shaking: parts.ts only re-exports', () => {
@@ -39,7 +25,7 @@ describe('tree-shaking: parts.ts only re-exports', () => {
     ['OrganizationProfile', orgProfileDir],
   ] as const) {
     it(`${label}/parts.ts contains only re-export statements`, () => {
-      const content = readFile(join(dir, 'parts.ts'));
+      const content = readFileSync(join(dir, 'parts.ts'), 'utf-8');
       const lines = content
         .split('\n')
         .map(l => l.trim())
@@ -65,7 +51,7 @@ describe('tree-shaking: section files are self-contained', () => {
 
     for (const file of files) {
       it(`${label}/${file} does not import from sibling section files`, () => {
-        const content = readFile(join(dir, file));
+        const content = readFileSync(join(dir, file), 'utf-8');
         const importLines = content.split('\n').filter(l => l.startsWith('import'));
 
         for (const imp of importLines) {
