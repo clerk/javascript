@@ -284,6 +284,63 @@ describe('SignInStart', () => {
         });
       });
     });
+
+    it('uses the configured external auth transport for OAuth sign-in', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withSocialProvider({ provider: 'google' });
+      });
+
+      const externalAuth = {
+        getRedirectUrl: vi.fn(() => Promise.resolve('myapp://auth/callback')),
+        openExternal: vi.fn(() => Promise.resolve()),
+        waitForCallback: vi.fn(() => Promise.resolve('myapp://auth/callback?rotating_token_nonce=test-nonce')),
+      };
+      fixtures.options.experimental = { externalAuth };
+      fixtures.signIn.create.mockImplementationOnce(async () => {
+        fixtures.signIn.firstFactorVerification.status = 'unverified';
+        fixtures.signIn.firstFactorVerification.externalVerificationRedirectURL = new URL(
+          'https://accounts.example/sso',
+        );
+        return fixtures.signIn as SignInResource;
+      });
+      const reloadSpy = vi.spyOn(fixtures.signIn, 'reload').mockResolvedValueOnce(fixtures.signIn as SignInResource);
+
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.click(screen.getByText('Continue with Google'));
+
+      await waitFor(() => {
+        expect(externalAuth.getRedirectUrl).toHaveBeenCalledWith({
+          strategy: 'oauth_google',
+          intent: 'sign-in',
+          redirectUrl: 'http://localhost:3000/#/sso-callback',
+          redirectUrlComplete: '/',
+        });
+      });
+      expect(fixtures.signIn.create).toHaveBeenCalledWith({
+        strategy: 'oauth_google',
+        identifier: undefined,
+        redirectUrl: 'myapp://auth/callback',
+        actionCompleteRedirectUrl: '/',
+        oidcPrompt: undefined,
+      });
+      expect(fixtures.signIn.authenticateWithRedirect).not.toHaveBeenCalled();
+      expect(externalAuth.openExternal).toHaveBeenCalledWith(new URL('https://accounts.example/sso'));
+      expect(externalAuth.waitForCallback).toHaveBeenCalledWith({
+        strategy: 'oauth_google',
+        intent: 'sign-in',
+        redirectUrl: 'myapp://auth/callback',
+      });
+      expect(reloadSpy).toHaveBeenCalledWith({ rotatingTokenNonce: 'test-nonce' });
+      expect(fixtures.clerk.handleRedirectCallback).toHaveBeenCalledWith(
+        expect.objectContaining({
+          reloadResource: 'signIn',
+          firstFactorUrl: '../factor-one',
+          secondFactorUrl: '../factor-two',
+          resetPasswordUrl: '../reset-password',
+        }),
+        fixtures.router.navigate,
+      );
+    });
   });
 
   describe('navigation', () => {

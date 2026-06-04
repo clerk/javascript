@@ -4,10 +4,11 @@ import React from 'react';
 
 import { useCardState } from '@/ui/elements/contexts';
 import { handleError } from '@/ui/utils/errorHandler';
+import { runExternalSignUpFlow } from '@/ui/utils/externalAuthFlow';
 import { originPrefersPopup } from '@/ui/utils/originPrefersPopup';
 import { web3CallbackErrorHandler } from '@/ui/utils/web3CallbackErrorHandler';
 
-import { useCoreSignUp, useSignUpContext } from '../../contexts';
+import { useCoreSignUp, useOptions, useSignUpContext } from '../../contexts';
 import type { SocialButtonsProps } from '../../elements/SocialButtons';
 import { SocialButtons } from '../../elements/SocialButtons';
 import { useRouter } from '../../router';
@@ -23,6 +24,7 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
   const { navigate } = useRouter();
   const card = useCardState();
   const ctx = useSignUpContext();
+  const externalAuth = useOptions().experimental?.externalAuth;
   const signUp = useCoreSignUp();
   const redirectUrl = ctx.ssoCallbackUrl;
   const redirectUrlComplete = ctx.afterSignUpUrl || '/';
@@ -33,8 +35,35 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
     <SocialButtons
       {...rest}
       showLastAuthenticationStrategy={false}
-      idleAfterDelay={!shouldUsePopup}
+      idleAfterDelay={!shouldUsePopup && !externalAuth}
       oauthCallback={(strategy: OAuthStrategy) => {
+        if (externalAuth) {
+          return runExternalSignUpFlow({
+            clerk,
+            continueSignUp,
+            externalAuth,
+            handleRedirectCallbackParams: {
+              signUpUrl: ctx.signUpUrl,
+              signInUrl: ctx.signInUrl,
+              signUpForceRedirectUrl: ctx.afterSignUpUrl,
+              signInForceRedirectUrl: ctx.afterSignInUrl,
+              secondFactorUrl: ctx.secondFactorUrl,
+              continueSignUpUrl: '../continue',
+              verifyEmailAddressUrl: '../verify-email-address',
+              verifyPhoneNumberUrl: '../verify-phone-number',
+              unsafeMetadata: ctx.unsafeMetadata,
+            },
+            legalAccepted: props.legalAccepted,
+            navigate,
+            oidcPrompt: ctx.oidcPrompt,
+            redirectUrl,
+            redirectUrlComplete,
+            signUp,
+            strategy,
+            unsafeMetadata: ctx.unsafeMetadata,
+          }).catch(err => handleError(err, [], card.setError));
+        }
+
         if (shouldUsePopup) {
           // We create the popup window here with the `about:blank` URL since some browsers will block popups that are
           // opened within async functions. The `signUpWithPopup` method handles setting the URL of the popup.

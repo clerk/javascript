@@ -9,11 +9,12 @@ import { handleError as _handleError } from '@/ui/utils/errorHandler';
 import { originPrefersPopup } from '@/ui/utils/originPrefersPopup';
 import { web3CallbackErrorHandler } from '@/ui/utils/web3CallbackErrorHandler';
 
-import { useCoreSignIn, useSignInContext } from '../../contexts';
+import { useCoreSignIn, useOptions, useSignInContext } from '../../contexts';
 import { useCardState } from '../../elements/contexts';
 import type { SocialButtonsProps } from '../../elements/SocialButtons';
 import { SocialButtons } from '../../elements/SocialButtons';
 import { useRouter } from '../../router';
+import { runExternalSignInFlow } from '../../utils/externalAuthFlow';
 
 export type SignInSocialButtonsProps = SocialButtonsProps & {
   onAlternativePhoneCodeProviderClick?: (channel: PhoneCodeChannel) => void;
@@ -24,6 +25,7 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
   const { navigate } = useRouter();
   const card = useCardState();
   const ctx = useSignInContext();
+  const externalAuth = useOptions().experimental?.externalAuth;
   const signIn = useCoreSignIn();
   const redirectUrl = ctx.ssoCallbackUrl;
   const redirectUrlComplete = ctx.afterSignInUrl || '/';
@@ -53,8 +55,33 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
     <SocialButtons
       {...rest}
       showLastAuthenticationStrategy
-      idleAfterDelay={!shouldUsePopup}
+      idleAfterDelay={!shouldUsePopup && !externalAuth}
       oauthCallback={strategy => {
+        if (externalAuth) {
+          return runExternalSignInFlow({
+            clerk,
+            externalAuth,
+            handleRedirectCallbackParams: {
+              signUpUrl: ctx.signUpUrl,
+              signInUrl: ctx.signInUrl,
+              signInForceRedirectUrl: ctx.afterSignInUrl,
+              signUpForceRedirectUrl: ctx.afterSignUpUrl,
+              continueSignUpUrl: ctx.signUpContinueUrl,
+              transferable: ctx.transferable,
+              firstFactorUrl: '../factor-one',
+              secondFactorUrl: '../factor-two',
+              resetPasswordUrl: '../reset-password',
+              unsafeMetadata: ctx.unsafeMetadata,
+            },
+            navigate,
+            oidcPrompt: ctx.oidcPrompt,
+            redirectUrl,
+            redirectUrlComplete,
+            signIn,
+            strategy,
+          }).catch(err => handleError(err));
+        }
+
         if (shouldUsePopup) {
           // We create the popup window here with the `about:blank` URL since some browsers will block popups that are
           // opened within async functions. The `signInWithPopup` method handles setting the URL of the popup.

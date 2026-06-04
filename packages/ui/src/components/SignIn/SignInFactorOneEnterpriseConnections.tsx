@@ -3,10 +3,12 @@ import type { ComponentType } from 'react';
 
 import { withRedirect } from '@/ui/common';
 import { ChooseEnterpriseConnectionCard } from '@/ui/common/ChooseEnterpriseConnectionCard';
-import { useCoreSignIn, useSignInContext } from '@/ui/contexts';
+import { useCoreSignIn, useOptions, useSignInContext } from '@/ui/contexts';
 import { Flow, localizationKeys } from '@/ui/customizables';
 import { withCardStateProvider } from '@/ui/elements/contexts';
+import { useRouter } from '@/ui/router';
 import type { AvailableComponentProps } from '@/ui/types';
+import { runExternalSignInFlow } from '@/ui/utils/externalAuthFlow';
 
 import { hasMultipleEnterpriseConnections } from './shared';
 
@@ -16,6 +18,8 @@ import { hasMultipleEnterpriseConnections } from './shared';
 const SignInFactorOneEnterpriseConnectionsInternal = () => {
   const ctx = useSignInContext();
   const clerk = useClerk();
+  const { navigate } = useRouter();
+  const externalAuth = useOptions().experimental?.externalAuth;
   const signIn = clerk.client.signIn;
 
   if (!hasMultipleEnterpriseConnections(signIn.supportedFirstFactors)) {
@@ -28,11 +32,39 @@ const SignInFactorOneEnterpriseConnectionsInternal = () => {
     name: ff.enterpriseConnectionName,
   }));
 
-  const handleEnterpriseSSO = (enterpriseConnectionId: string) => {
+  const handleEnterpriseSSO = async (enterpriseConnectionId: string) => {
     const redirectUrl = ctx.ssoCallbackUrl;
     const redirectUrlComplete = ctx.afterSignInUrl || '/';
 
-    return signIn.authenticateWithRedirect({
+    if (externalAuth) {
+      await runExternalSignInFlow({
+        clerk,
+        continueSignIn: true,
+        enterpriseConnectionId,
+        externalAuth,
+        handleRedirectCallbackParams: {
+          signUpUrl: ctx.signUpUrl,
+          signInUrl: ctx.signInUrl,
+          signInForceRedirectUrl: ctx.afterSignInUrl,
+          signUpForceRedirectUrl: ctx.afterSignUpUrl,
+          continueSignUpUrl: ctx.signUpContinueUrl,
+          transferable: ctx.transferable,
+          firstFactorUrl: '../factor-one',
+          secondFactorUrl: '../factor-two',
+          resetPasswordUrl: '../reset-password',
+          unsafeMetadata: ctx.unsafeMetadata,
+        },
+        navigate,
+        oidcPrompt: ctx.oidcPrompt,
+        redirectUrl,
+        redirectUrlComplete,
+        signIn,
+        strategy: 'enterprise_sso',
+      });
+      return;
+    }
+
+    await signIn.authenticateWithRedirect({
       strategy: 'enterprise_sso',
       redirectUrl,
       redirectUrlComplete,

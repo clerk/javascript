@@ -31,13 +31,14 @@ import {
   withRedirectToAfterSignIn,
   withRedirectToSignInTask,
 } from '../../common';
-import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
+import { useCoreSignIn, useEnvironment, useOptions, useSignInContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import { CaptchaElement } from '../../elements/CaptchaElement';
 import { useLoadingStatus } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useTotalEnabledAuthMethods } from '../../hooks/useTotalEnabledAuthMethods';
 import { useRouter } from '../../router';
+import { runExternalSignInFlow } from '../../utils/externalAuthFlow';
 import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
 import { hasMultipleEnterpriseConnections, useHandleAuthenticateWithPasskey } from './shared';
 import { SignInAlternativePhoneCodePhoneNumberCard } from './SignInAlternativePhoneCodePhoneNumberCard';
@@ -85,6 +86,7 @@ function SignInStartInternal(): JSX.Element {
   const signIn = useCoreSignIn();
   const { navigate } = useRouter();
   const ctx = useSignInContext();
+  const externalAuth = useOptions().experimental?.externalAuth;
   const { afterSignInUrl, signUpUrl, waitlistUrl, isCombinedFlow, navigateOnSetActive } = ctx;
   const supportEmail = useSupportEmail();
   const totalEnabledAuthMethods = useTotalEnabledAuthMethods();
@@ -414,6 +416,32 @@ function SignInStartInternal(): JSX.Element {
   const authenticateWithEnterpriseSSO = async () => {
     const redirectUrl = ctx.ssoCallbackUrl;
     const redirectUrlComplete = ctx.afterSignInUrl || '/';
+
+    if (externalAuth) {
+      return runExternalSignInFlow({
+        clerk,
+        continueSignIn: true,
+        externalAuth,
+        handleRedirectCallbackParams: {
+          signUpUrl: ctx.signUpUrl,
+          signInUrl: ctx.signInUrl,
+          signInForceRedirectUrl: ctx.afterSignInUrl,
+          signUpForceRedirectUrl: ctx.afterSignUpUrl,
+          continueSignUpUrl: ctx.signUpContinueUrl,
+          transferable: ctx.transferable,
+          firstFactorUrl: '../factor-one',
+          secondFactorUrl: '../factor-two',
+          resetPasswordUrl: '../reset-password',
+          unsafeMetadata: ctx.unsafeMetadata,
+        },
+        navigate,
+        oidcPrompt: ctx.oidcPrompt,
+        redirectUrl,
+        redirectUrlComplete,
+        signIn,
+        strategy: 'enterprise_sso',
+      });
+    }
 
     return signIn.authenticateWithRedirect({
       strategy: 'enterprise_sso',
