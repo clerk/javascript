@@ -115,7 +115,7 @@ export async function runExternalSignInFlow({
       strategy,
       identifier,
       redirectUrl: externalRedirectUrl,
-      actionCompleteRedirectUrl: redirectUrlComplete,
+      actionCompleteRedirectUrl: externalRedirectUrl,
       oidcPrompt,
     });
   }
@@ -124,7 +124,7 @@ export async function runExternalSignInFlow({
     await signIn.prepareFirstFactor({
       strategy,
       redirectUrl: externalRedirectUrl,
-      actionCompleteRedirectUrl: redirectUrlComplete,
+      actionCompleteRedirectUrl: externalRedirectUrl,
       oidcPrompt,
       enterpriseConnectionId,
     });
@@ -174,7 +174,7 @@ export async function runExternalSignUpFlow({
   const authParams = {
     strategy,
     redirectUrl: externalRedirectUrl,
-    actionCompleteRedirectUrl: redirectUrlComplete,
+    actionCompleteRedirectUrl: externalRedirectUrl,
     unsafeMetadata,
     emailAddress,
     legalAccepted,

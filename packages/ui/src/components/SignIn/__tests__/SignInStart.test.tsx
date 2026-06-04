@@ -320,7 +320,7 @@ describe('SignInStart', () => {
         strategy: 'oauth_google',
         identifier: undefined,
         redirectUrl: 'myapp://auth/callback',
-        actionCompleteRedirectUrl: '/',
+        actionCompleteRedirectUrl: 'myapp://auth/callback',
         oidcPrompt: undefined,
       });
       expect(fixtures.signIn.authenticateWithRedirect).not.toHaveBeenCalled();
