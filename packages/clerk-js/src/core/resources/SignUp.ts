@@ -8,6 +8,7 @@ import type {
   AttemptPhoneNumberVerificationParams,
   AttemptVerificationParams,
   AttemptWeb3WalletVerificationParams,
+  AuthenticateWithNativeRedirectParams,
   AuthenticateWithPopupParams,
   AuthenticateWithRedirectParams,
   AuthenticateWithWeb3Params,
@@ -465,6 +466,71 @@ export class SignUp extends BaseResource implements SignUpResource {
     return _authenticateWithPopup(SignUp.clerk, 'signUp', this.authenticateWithRedirectOrPopup, params, url => {
       popup.location.href = url instanceof URL ? url.toString() : url;
     });
+  };
+
+  public __experimental_authenticateWithNativeRedirect = async (
+    params: AuthenticateWithNativeRedirectParams & {
+      unsafeMetadata?: SignUpUnsafeMetadata;
+    },
+  ): Promise<SignUpResource> => {
+    const {
+      strategy,
+      redirectUrl,
+      redirectUrlComplete,
+      continueSignUp = false,
+      unsafeMetadata,
+      emailAddress,
+      legalAccepted,
+      oidcPrompt,
+      enterpriseConnectionId,
+      transport,
+    } = params;
+
+    const nativeRedirectUrl = await transport.getRedirectUrl({
+      strategy,
+      intent: 'sign-up',
+      redirectUrl,
+      redirectUrlComplete,
+    });
+
+    const authenticate = () => {
+      const authParams = {
+        strategy,
+        redirectUrl: nativeRedirectUrl,
+        actionCompleteRedirectUrl: nativeRedirectUrl,
+        unsafeMetadata,
+        emailAddress,
+        legalAccepted,
+        oidcPrompt,
+        enterpriseConnectionId,
+      };
+      return continueSignUp && this.id ? this.update(authParams) : this.create(authParams);
+    };
+
+    await authenticate().catch(async e => {
+      if (isClerkAPIResponseError(e) && isCaptchaError(e)) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        await SignUp.clerk.__internal_environment!.reload();
+        return authenticate();
+      }
+      throw e;
+    });
+
+    const { status, externalVerificationRedirectURL } = this.verifications.externalAccount;
+
+    if (status !== 'unverified' || !externalVerificationRedirectURL) {
+      clerkInvalidFAPIResponse(status, SignUp.fapiClient.buildEmailAddress('support'));
+    }
+
+    await transport.openExternal(externalVerificationRedirectURL);
+    const callbackUrl = await transport.waitForCallback({
+      strategy,
+      intent: 'sign-up',
+      redirectUrl: nativeRedirectUrl,
+    });
+    const rotatingTokenNonce = new URL(callbackUrl).searchParams.get('rotating_token_nonce') || '';
+
+    return this.reload({ rotatingTokenNonce });
   };
 
   update = (params: SignUpUpdateParams): Promise<SignUpResource> => {

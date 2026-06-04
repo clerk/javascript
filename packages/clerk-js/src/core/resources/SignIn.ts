@@ -12,6 +12,7 @@ import { Poller } from '@clerk/shared/poller';
 import type {
   AttemptFirstFactorParams,
   AttemptSecondFactorParams,
+  AuthenticateWithNativeRedirectParams,
   AuthenticateWithPasskeyParams,
   AuthenticateWithPopupParams,
   AuthenticateWithRedirectParams,
@@ -390,6 +391,64 @@ export class SignIn extends BaseResource implements SignInResource {
     return _authenticateWithPopup(SignIn.clerk, 'signIn', this.authenticateWithRedirectOrPopup, params, url => {
       popup.location.href = url.toString();
     });
+  };
+
+  public __experimental_authenticateWithNativeRedirect = async (
+    params: AuthenticateWithNativeRedirectParams,
+  ): Promise<SignInResource> => {
+    const {
+      strategy,
+      redirectUrl,
+      redirectUrlComplete,
+      identifier,
+      oidcPrompt,
+      continueSignIn,
+      enterpriseConnectionId,
+      transport,
+    } = params || {};
+
+    const nativeRedirectUrl = await transport.getRedirectUrl({
+      strategy,
+      intent: 'sign-in',
+      redirectUrl,
+      redirectUrlComplete,
+    });
+
+    if (!this.id || !continueSignIn) {
+      await this.create({
+        strategy,
+        identifier,
+        redirectUrl: nativeRedirectUrl,
+        actionCompleteRedirectUrl: nativeRedirectUrl,
+        oidcPrompt,
+      });
+    }
+
+    if (strategy === 'enterprise_sso') {
+      await this.prepareFirstFactor({
+        strategy,
+        redirectUrl: nativeRedirectUrl,
+        actionCompleteRedirectUrl: nativeRedirectUrl,
+        oidcPrompt,
+        enterpriseConnectionId,
+      });
+    }
+
+    const { status, externalVerificationRedirectURL } = this.firstFactorVerification;
+
+    if (status !== 'unverified' || !externalVerificationRedirectURL) {
+      clerkInvalidFAPIResponse(status, SignIn.fapiClient.buildEmailAddress('support'));
+    }
+
+    await transport.openExternal(externalVerificationRedirectURL);
+    const callbackUrl = await transport.waitForCallback({
+      strategy,
+      intent: 'sign-in',
+      redirectUrl: nativeRedirectUrl,
+    });
+    const rotatingTokenNonce = new URL(callbackUrl).searchParams.get('rotating_token_nonce') || '';
+
+    return this.reload({ rotatingTokenNonce });
   };
 
   public authenticateWithWeb3 = async (params: AuthenticateWithWeb3Params): Promise<SignInResource> => {

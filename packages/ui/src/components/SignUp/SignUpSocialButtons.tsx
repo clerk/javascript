@@ -4,7 +4,7 @@ import React from 'react';
 
 import { useCardState } from '@/ui/elements/contexts';
 import { handleError } from '@/ui/utils/errorHandler';
-import { runExternalSignUpFlow } from '@/ui/utils/externalAuthFlow';
+import { finalizeNativeRedirectResult } from '@/ui/utils/nativeRedirectResult';
 import { originPrefersPopup } from '@/ui/utils/originPrefersPopup';
 import { web3CallbackErrorHandler } from '@/ui/utils/web3CallbackErrorHandler';
 
@@ -36,33 +36,41 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
       {...rest}
       showLastAuthenticationStrategy={false}
       idleAfterDelay={!shouldUsePopup && !externalAuth}
-      oauthCallback={(strategy: OAuthStrategy) => {
+      oauthCallback={async (strategy: OAuthStrategy) => {
         if (externalAuth) {
-          return runExternalSignUpFlow({
-            clerk,
-            continueSignUp,
-            externalAuth,
-            handleRedirectCallbackParams: {
-              signUpUrl: ctx.signUpUrl,
-              signInUrl: ctx.signInUrl,
-              signUpForceRedirectUrl: ctx.afterSignUpUrl,
-              signInForceRedirectUrl: ctx.afterSignInUrl,
-              secondFactorUrl: ctx.secondFactorUrl,
-              continueSignUpUrl: '../continue',
-              verifyEmailAddressUrl: '../verify-email-address',
-              verifyPhoneNumberUrl: '../verify-phone-number',
+          try {
+            const res = await signUp.__experimental_authenticateWithNativeRedirect({
+              strategy,
+              redirectUrl,
+              redirectUrlComplete,
+              continueSignUp,
+              transport: externalAuth,
               unsafeMetadata: ctx.unsafeMetadata,
-            },
-            legalAccepted: props.legalAccepted,
-            navigate,
-            navigateOnSetActive: ctx.navigateOnSetActive,
-            oidcPrompt: ctx.oidcPrompt,
-            redirectUrl,
-            redirectUrlComplete,
-            signUp,
-            strategy,
-            unsafeMetadata: ctx.unsafeMetadata,
-          }).catch(err => handleError(err, [], card.setError));
+              legalAccepted: props.legalAccepted,
+              oidcPrompt: ctx.oidcPrompt,
+            });
+
+            return finalizeNativeRedirectResult({
+              clerk,
+              handleRedirectCallbackParams: {
+                signUpUrl: ctx.signUpUrl,
+                signInUrl: ctx.signInUrl,
+                signUpForceRedirectUrl: ctx.afterSignUpUrl,
+                signInForceRedirectUrl: ctx.afterSignInUrl,
+                secondFactorUrl: ctx.secondFactorUrl,
+                continueSignUpUrl: '../continue',
+                verifyEmailAddressUrl: '../verify-email-address',
+                verifyPhoneNumberUrl: '../verify-phone-number',
+                unsafeMetadata: ctx.unsafeMetadata,
+              },
+              navigate,
+              navigateOnSetActive: ctx.navigateOnSetActive,
+              redirectUrlComplete,
+              resource: res,
+            });
+          } catch (err) {
+            return handleError(err as Error, [], card.setError);
+          }
         }
 
         if (shouldUsePopup) {

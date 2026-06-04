@@ -27,6 +27,7 @@ import type {
   AfterMultiSessionSingleSignOutUrl,
   AfterSignOutUrl,
   NewSubscriptionRedirectUrl,
+  NativeRedirectTransport,
   RedirectOptions,
   RedirectUrlProp,
   SignInFallbackRedirectUrl,
@@ -40,7 +41,7 @@ import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
 import type { ClientJSONSnapshot, EnvironmentJSONSnapshot } from './snapshots';
 import type { State } from './state';
-import type { EnterpriseSSOStrategy, OAuthStrategy, Web3Strategy } from './strategies';
+import type { Web3Strategy } from './strategies';
 import type { TelemetryCollector } from './telemetry';
 import type { UserResource } from './user';
 import type { Autocomplete, DeepPartial, DeepSnakeToCamel, Without } from './utils';
@@ -1275,29 +1276,6 @@ export type ClerkOptionsNavigation =
       routerDebug?: boolean;
     };
 
-type Awaitable<T> = T | Promise<T>;
-
-/**
- * Runtime-provided transport for OAuth/SAML verification flows in environments
- * where Clerk's web redirect and popup transports are not appropriate.
- *
- * @experimental This API is subject to change.
- */
-export type ExternalAuthFlow = {
-  getRedirectUrl: (params: {
-    strategy: OAuthStrategy | EnterpriseSSOStrategy;
-    intent: 'sign-in' | 'sign-up';
-    redirectUrl: string;
-    redirectUrlComplete: string;
-  }) => Awaitable<string>;
-  openExternal: (url: URL) => Awaitable<void>;
-  waitForCallback: (params: {
-    strategy: OAuthStrategy | EnterpriseSSOStrategy;
-    intent: 'sign-in' | 'sign-up';
-    redirectUrl: string;
-  }) => Awaitable<string>;
-};
-
 /** @generateWithEmptyComment */
 type ClerkUnsafeOptions = {
   /**
@@ -1462,7 +1440,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
          *
          * @experimental This API is subject to change.
          */
-        externalAuth: ExternalAuthFlow;
+        externalAuth: NativeRedirectTransport;
       },
       Record<string, any>
     >;

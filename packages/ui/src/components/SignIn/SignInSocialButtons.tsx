@@ -14,7 +14,7 @@ import { useCardState } from '../../elements/contexts';
 import type { SocialButtonsProps } from '../../elements/SocialButtons';
 import { SocialButtons } from '../../elements/SocialButtons';
 import { useRouter } from '../../router';
-import { runExternalSignInFlow } from '../../utils/externalAuthFlow';
+import { finalizeNativeRedirectResult } from '../../utils/nativeRedirectResult';
 
 export type SignInSocialButtonsProps = SocialButtonsProps & {
   onAlternativePhoneCodeProviderClick?: (channel: PhoneCodeChannel) => void;
@@ -56,31 +56,39 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
       {...rest}
       showLastAuthenticationStrategy
       idleAfterDelay={!shouldUsePopup && !externalAuth}
-      oauthCallback={strategy => {
+      oauthCallback={async strategy => {
         if (externalAuth) {
-          return runExternalSignInFlow({
-            clerk,
-            externalAuth,
-            handleRedirectCallbackParams: {
-              signUpUrl: ctx.signUpUrl,
-              signInUrl: ctx.signInUrl,
-              signInForceRedirectUrl: ctx.afterSignInUrl,
-              signUpForceRedirectUrl: ctx.afterSignUpUrl,
-              continueSignUpUrl: ctx.signUpContinueUrl,
-              transferable: ctx.transferable,
-              firstFactorUrl: '../factor-one',
-              secondFactorUrl: '../factor-two',
-              resetPasswordUrl: '../reset-password',
-              unsafeMetadata: ctx.unsafeMetadata,
-            },
-            navigate,
-            navigateOnSetActive: ctx.navigateOnSetActive,
-            oidcPrompt: ctx.oidcPrompt,
-            redirectUrl,
-            redirectUrlComplete,
-            signIn,
-            strategy,
-          }).catch(err => handleError(err));
+          try {
+            const res = await signIn.__experimental_authenticateWithNativeRedirect({
+              strategy,
+              redirectUrl,
+              redirectUrlComplete,
+              transport: externalAuth,
+              oidcPrompt: ctx.oidcPrompt,
+            });
+
+            return finalizeNativeRedirectResult({
+              clerk,
+              handleRedirectCallbackParams: {
+                signUpUrl: ctx.signUpUrl,
+                signInUrl: ctx.signInUrl,
+                signInForceRedirectUrl: ctx.afterSignInUrl,
+                signUpForceRedirectUrl: ctx.afterSignUpUrl,
+                continueSignUpUrl: ctx.signUpContinueUrl,
+                transferable: ctx.transferable,
+                firstFactorUrl: '../factor-one',
+                secondFactorUrl: '../factor-two',
+                resetPasswordUrl: '../reset-password',
+                unsafeMetadata: ctx.unsafeMetadata,
+              },
+              navigate,
+              navigateOnSetActive: ctx.navigateOnSetActive,
+              redirectUrlComplete,
+              resource: res,
+            });
+          } catch (err) {
+            return handleError(err);
+          }
         }
 
         if (shouldUsePopup) {

@@ -8,7 +8,7 @@ import { Flow, localizationKeys } from '@/ui/customizables';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { useRouter } from '@/ui/router';
 import type { AvailableComponentProps } from '@/ui/types';
-import { runExternalSignInFlow } from '@/ui/utils/externalAuthFlow';
+import { finalizeNativeRedirectResult } from '@/ui/utils/nativeRedirectResult';
 
 import { hasMultipleEnterpriseConnections } from './shared';
 
@@ -37,11 +37,18 @@ const SignInFactorOneEnterpriseConnectionsInternal = () => {
     const redirectUrlComplete = ctx.afterSignInUrl || '/';
 
     if (externalAuth) {
-      await runExternalSignInFlow({
-        clerk,
+      const res = await signIn.__experimental_authenticateWithNativeRedirect({
+        strategy: 'enterprise_sso',
+        redirectUrl,
+        redirectUrlComplete,
         continueSignIn: true,
         enterpriseConnectionId,
-        externalAuth,
+        transport: externalAuth,
+        oidcPrompt: ctx.oidcPrompt,
+      });
+
+      await finalizeNativeRedirectResult({
+        clerk,
         handleRedirectCallbackParams: {
           signUpUrl: ctx.signUpUrl,
           signInUrl: ctx.signInUrl,
@@ -56,11 +63,8 @@ const SignInFactorOneEnterpriseConnectionsInternal = () => {
         },
         navigate,
         navigateOnSetActive: ctx.navigateOnSetActive,
-        oidcPrompt: ctx.oidcPrompt,
-        redirectUrl,
         redirectUrlComplete,
-        signIn,
-        strategy: 'enterprise_sso',
+        resource: res,
       });
       return;
     }

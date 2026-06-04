@@ -7,7 +7,11 @@ import type {
   VerificationJSON,
 } from './json';
 import type { ValidatePasswordCallbacks } from './passwords';
-import type { AuthenticateWithPopupParams, AuthenticateWithRedirectParams } from './redirects';
+import type {
+  AuthenticateWithNativeRedirectParams,
+  AuthenticateWithPopupParams,
+  AuthenticateWithRedirectParams,
+} from './redirects';
 import type { ClerkResource } from './resource';
 import type {
   AttemptFirstFactorParams,
@@ -66,6 +70,13 @@ export interface SignInResource extends ClerkResource {
   authenticateWithRedirect: (params: AuthenticateWithRedirectParams) => Promise<void>;
 
   authenticateWithPopup: (params: AuthenticateWithPopupParams) => Promise<void>;
+
+  /**
+   * @experimental This API is subject to change.
+   */
+  __experimental_authenticateWithNativeRedirect: (
+    params: AuthenticateWithNativeRedirectParams,
+  ) => Promise<SignInResource>;
 
   authenticateWithWeb3: (params: AuthenticateWithWeb3Params) => Promise<SignInResource>;
 

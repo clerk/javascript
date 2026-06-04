@@ -38,7 +38,7 @@ import { useLoadingStatus } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useTotalEnabledAuthMethods } from '../../hooks/useTotalEnabledAuthMethods';
 import { useRouter } from '../../router';
-import { runExternalSignInFlow } from '../../utils/externalAuthFlow';
+import { finalizeNativeRedirectResult } from '../../utils/nativeRedirectResult';
 import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
 import { hasMultipleEnterpriseConnections, useHandleAuthenticateWithPasskey } from './shared';
 import { SignInAlternativePhoneCodePhoneNumberCard } from './SignInAlternativePhoneCodePhoneNumberCard';
@@ -418,10 +418,17 @@ function SignInStartInternal(): JSX.Element {
     const redirectUrlComplete = ctx.afterSignInUrl || '/';
 
     if (externalAuth) {
-      return runExternalSignInFlow({
-        clerk,
+      const res = await signIn.__experimental_authenticateWithNativeRedirect({
+        strategy: 'enterprise_sso',
+        redirectUrl,
+        redirectUrlComplete,
         continueSignIn: true,
-        externalAuth,
+        transport: externalAuth,
+        oidcPrompt: ctx.oidcPrompt,
+      });
+
+      return finalizeNativeRedirectResult({
+        clerk,
         handleRedirectCallbackParams: {
           signUpUrl: ctx.signUpUrl,
           signInUrl: ctx.signInUrl,
@@ -436,11 +443,8 @@ function SignInStartInternal(): JSX.Element {
         },
         navigate,
         navigateOnSetActive: ctx.navigateOnSetActive,
-        oidcPrompt: ctx.oidcPrompt,
-        redirectUrl,
         redirectUrlComplete,
-        signIn,
-        strategy: 'enterprise_sso',
+        resource: res,
       });
     }
 

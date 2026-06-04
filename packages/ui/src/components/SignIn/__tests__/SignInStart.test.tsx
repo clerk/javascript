@@ -1,6 +1,5 @@
 import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
-import type { SignInResource } from '@clerk/shared/types';
 import { waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -296,45 +295,25 @@ describe('SignInStart', () => {
         waitForCallback: vi.fn(() => Promise.resolve('myapp://auth/callback?rotating_token_nonce=test-nonce')),
       };
       fixtures.options.experimental = { externalAuth };
-      fixtures.signIn.create.mockImplementationOnce(async () => {
-        fixtures.signIn.firstFactorVerification.status = 'unverified';
-        fixtures.signIn.firstFactorVerification.externalVerificationRedirectURL = new URL(
-          'https://accounts.example/sso',
-        );
-        return fixtures.signIn as SignInResource;
-      });
-      const reloadSpy = vi.spyOn(fixtures.signIn, 'reload').mockImplementationOnce(async () => {
+      fixtures.signIn.__experimental_authenticateWithNativeRedirect.mockImplementationOnce(async () => {
         fixtures.signIn.status = 'complete';
         fixtures.signIn.createdSessionId = 'sess_external';
-        return fixtures.signIn as SignInResource;
+        return fixtures.signIn;
       });
 
       const { userEvent } = render(<SignInStart />, { wrapper });
       await userEvent.click(screen.getByText('Continue with Google'));
 
       await waitFor(() => {
-        expect(externalAuth.getRedirectUrl).toHaveBeenCalledWith({
+        expect(fixtures.signIn.__experimental_authenticateWithNativeRedirect).toHaveBeenCalledWith({
           strategy: 'oauth_google',
-          intent: 'sign-in',
           redirectUrl: 'http://localhost:3000/#/sso-callback',
           redirectUrlComplete: '/',
+          transport: externalAuth,
+          oidcPrompt: undefined,
         });
       });
-      expect(fixtures.signIn.create).toHaveBeenCalledWith({
-        strategy: 'oauth_google',
-        identifier: undefined,
-        redirectUrl: 'myapp://auth/callback',
-        actionCompleteRedirectUrl: 'myapp://auth/callback',
-        oidcPrompt: undefined,
-      });
       expect(fixtures.signIn.authenticateWithRedirect).not.toHaveBeenCalled();
-      expect(externalAuth.openExternal).toHaveBeenCalledWith(new URL('https://accounts.example/sso'));
-      expect(externalAuth.waitForCallback).toHaveBeenCalledWith({
-        strategy: 'oauth_google',
-        intent: 'sign-in',
-        redirectUrl: 'myapp://auth/callback',
-      });
-      expect(reloadSpy).toHaveBeenCalledWith({ rotatingTokenNonce: 'test-nonce' });
       expect(fixtures.clerk.setActive).toHaveBeenCalledWith({
         session: 'sess_external',
         navigate: expect.any(Function),

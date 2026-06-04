@@ -8,7 +8,7 @@ import { withCardStateProvider } from '@/ui/elements/contexts';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
 import { useFetch } from '@/ui/hooks';
 import { useRouter } from '@/ui/router';
-import { runExternalSignUpFlow } from '@/ui/utils/externalAuthFlow';
+import { finalizeNativeRedirectResult } from '@/ui/utils/nativeRedirectResult';
 
 const SignUpEnterpriseConnectionsInternal = () => {
   const clerk = useClerk();
@@ -26,11 +26,19 @@ const SignUpEnterpriseConnectionsInternal = () => {
     const redirectUrlComplete = ctx.afterSignUpUrl || '/';
 
     if (externalAuth) {
-      await runExternalSignUpFlow({
-        clerk,
+      const res = await signUp.__experimental_authenticateWithNativeRedirect({
+        strategy: 'enterprise_sso',
+        redirectUrl,
+        redirectUrlComplete,
         continueSignUp: true,
         enterpriseConnectionId,
-        externalAuth,
+        transport: externalAuth,
+        unsafeMetadata: ctx.unsafeMetadata,
+        oidcPrompt: ctx.oidcPrompt,
+      });
+
+      await finalizeNativeRedirectResult({
+        clerk,
         handleRedirectCallbackParams: {
           signUpUrl: ctx.signUpUrl,
           signInUrl: ctx.signInUrl,
@@ -44,12 +52,8 @@ const SignUpEnterpriseConnectionsInternal = () => {
         },
         navigate,
         navigateOnSetActive: ctx.navigateOnSetActive,
-        oidcPrompt: ctx.oidcPrompt,
-        redirectUrl,
         redirectUrlComplete,
-        signUp,
-        strategy: 'enterprise_sso',
-        unsafeMetadata: ctx.unsafeMetadata,
+        resource: res,
       });
       return;
     }
