@@ -9,6 +9,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.clerk.api.Clerk
 import com.clerk.ui.userbutton.UserButton
+import com.facebook.react.uimanager.SimpleViewManager
+import com.facebook.react.uimanager.ThemedReactContext
 
 class ClerkUserButtonNativeView(context: Context) : ClerkComposeNativeViewHost(context) {
   init {
@@ -30,5 +32,14 @@ class ClerkUserButtonNativeView(context: Context) : ClerkComposeNativeViewHost(c
         UserButton(clerkTheme = Clerk.customTheme)
       }
     }
+  }
+}
+
+class ClerkUserButtonViewManager : SimpleViewManager<ClerkUserButtonNativeView>() {
+
+  override fun getName(): String = "ClerkUserButtonView"
+
+  override fun createViewInstance(reactContext: ThemedReactContext): ClerkUserButtonNativeView {
+    return ClerkUserButtonNativeView(reactContext)
   }
 }
