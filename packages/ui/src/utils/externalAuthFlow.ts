@@ -80,13 +80,7 @@ async function completeExternalAuthFlow({
   const callbackUrl = await externalAuth.waitForCallback({ strategy, intent, redirectUrl });
   await reload(getRotatingTokenNonce(callbackUrl));
 
-  return clerk.handleRedirectCallback(
-    {
-      ...handleRedirectCallbackParams,
-      reloadResource: intent === 'sign-in' ? 'signIn' : 'signUp',
-    },
-    navigate,
-  );
+  return clerk.handleRedirectCallback(handleRedirectCallbackParams, navigate);
 }
 
 export async function runExternalSignInFlow({

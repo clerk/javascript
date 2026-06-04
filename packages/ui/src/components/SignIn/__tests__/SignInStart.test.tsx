@@ -332,8 +332,11 @@ describe('SignInStart', () => {
       });
       expect(reloadSpy).toHaveBeenCalledWith({ rotatingTokenNonce: 'test-nonce' });
       expect(fixtures.clerk.handleRedirectCallback).toHaveBeenCalledWith(
+        expect.not.objectContaining({ reloadResource: 'signIn' }),
+        fixtures.router.navigate,
+      );
+      expect(fixtures.clerk.handleRedirectCallback).toHaveBeenCalledWith(
         expect.objectContaining({
-          reloadResource: 'signIn',
           firstFactorUrl: '../factor-one',
           secondFactorUrl: '../factor-two',
           resetPasswordUrl: '../reset-password',
