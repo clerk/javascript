@@ -2,7 +2,6 @@ package expo.modules.clerk
 
 import android.content.Context
 import android.content.ContextWrapper
-import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -16,10 +15,12 @@ import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.savedstate.compose.LocalSavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
+import expo.modules.kotlin.AppContext
+import expo.modules.kotlin.views.ExpoView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-abstract class ClerkComposeNativeViewHost(context: Context) : FrameLayout(context) {
+abstract class ClerkComposeNativeViewHost(context: Context, appContext: AppContext) : ExpoView(context, appContext) {
   protected val activity: ComponentActivity? = findActivity(context)
 
   private var recomposer: Recomposer? = null

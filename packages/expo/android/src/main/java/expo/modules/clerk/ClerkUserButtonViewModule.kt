@@ -9,10 +9,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.clerk.api.Clerk
 import com.clerk.ui.userbutton.UserButton
-import com.facebook.react.uimanager.SimpleViewManager
-import com.facebook.react.uimanager.ThemedReactContext
+import expo.modules.kotlin.AppContext
+import expo.modules.kotlin.modules.Module
+import expo.modules.kotlin.modules.ModuleDefinition
 
-class ClerkUserButtonNativeView(context: Context) : ClerkComposeNativeViewHost(context) {
+class ClerkUserButtonNativeView(context: Context, appContext: AppContext) : ClerkComposeNativeViewHost(context, appContext) {
   init {
     activity?.let { Clerk.attachActivity(it) }
   }
@@ -35,11 +36,10 @@ class ClerkUserButtonNativeView(context: Context) : ClerkComposeNativeViewHost(c
   }
 }
 
-class ClerkUserButtonViewManager : SimpleViewManager<ClerkUserButtonNativeView>() {
+class ClerkUserButtonViewModule : Module() {
+  override fun definition() = ModuleDefinition {
+    Name("ClerkUserButtonView")
 
-  override fun getName(): String = "ClerkUserButtonView"
-
-  override fun createViewInstance(reactContext: ThemedReactContext): ClerkUserButtonNativeView {
-    return ClerkUserButtonNativeView(reactContext)
+    View(ClerkUserButtonNativeView::class) {}
   }
 }

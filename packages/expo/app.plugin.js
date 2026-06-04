@@ -6,8 +6,8 @@
  * 1. iOS is configured with Swift Package Manager dependency for clerk-ios
  * 2. Android is configured with packaging exclusions for dependencies
  *
- * Native modules are registered via react-native.config.js and standard
- * React Native autolinking (RCTViewManager / ReactPackage).
+ * Native modules are registered via Expo Modules autolinking on Android and
+ * React Native autolinking on iOS (RCTViewManager).
  */
 const {
   withXcodeProject,
@@ -551,8 +551,8 @@ const withClerkGoogleSignIn = config => {
  * 2. Android gets packaging exclusions for dependency conflicts
  * 3. Google Sign-In URL scheme is configured (if env var is set)
  *
- * Native modules are registered via react-native.config.js and standard
- * React Native autolinking (RCTViewManager / ReactPackage).
+ * Native modules are registered via Expo Modules autolinking on Android and
+ * React Native autolinking on iOS (RCTViewManager).
  */
 /**
  * Write ClerkKeychainService to Info.plist when keychainService is provided.

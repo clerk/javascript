@@ -11,16 +11,12 @@ import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import com.clerk.api.Clerk
 import com.clerk.ui.auth.AuthView
-import com.facebook.react.bridge.Arguments
-import com.facebook.react.bridge.ReactContext
-import com.facebook.react.common.MapBuilder
-import com.facebook.react.uimanager.SimpleViewManager
-import com.facebook.react.uimanager.ThemedReactContext
-import com.facebook.react.uimanager.events.RCTEventEmitter
-import com.facebook.react.uimanager.annotations.ReactProp
-import com.facebook.react.viewmanagers.ClerkAuthViewManagerInterface
+import expo.modules.kotlin.AppContext
+import expo.modules.kotlin.modules.Module
+import expo.modules.kotlin.modules.ModuleDefinition
+import expo.modules.kotlin.viewevent.EventDispatcher
 
-private const val TAG = "ClerkAuthExpoView"
+private const val TAG = "ClerkAuthViewModule"
 
 private fun debugLog(tag: String, message: String) {
   if (BuildConfig.DEBUG) {
@@ -28,8 +24,11 @@ private fun debugLog(tag: String, message: String) {
   }
 }
 
-class ClerkAuthNativeView(context: Context) : ClerkComposeNativeViewHost(context) {
+class ClerkAuthNativeView(context: Context, appContext: AppContext) : ClerkComposeNativeViewHost(context, appContext) {
   var isDismissible: Boolean = true
+  var mode: String? = null
+
+  private val onAuthEvent by EventDispatcher()
 
   init {
     // At cold start, ClerkExpoModule.configure() may run before React's
@@ -81,12 +80,7 @@ class ClerkAuthNativeView(context: Context) : ClerkComposeNativeViewHost(context
   }
 
   private fun sendEvent(type: String) {
-    val reactContext = context as? ReactContext ?: return
-    val eventData = Arguments.createMap().apply {
-      putString("type", type)
-    }
-    reactContext.getJSModule(RCTEventEmitter::class.java)
-      .receiveEvent(id, "onAuthEvent", eventData)
+    onAuthEvent(mapOf("type" to type))
   }
 
   private fun sendDismissEvent() {
@@ -96,33 +90,27 @@ class ClerkAuthNativeView(context: Context) : ClerkComposeNativeViewHost(context
   }
 }
 
-class ClerkAuthViewManager : SimpleViewManager<ClerkAuthNativeView>(),
-    ClerkAuthViewManagerInterface<ClerkAuthNativeView> {
+class ClerkAuthViewModule : Module() {
+  override fun definition() = ModuleDefinition {
+    Name("ClerkAuthView")
 
-  override fun getName(): String = "ClerkAuthView"
+    View(ClerkAuthNativeView::class) {
+      Events("onAuthEvent")
 
-  override fun createViewInstance(reactContext: ThemedReactContext): ClerkAuthNativeView {
-    return ClerkAuthNativeView(reactContext)
-  }
+      Prop("mode") { view: ClerkAuthNativeView, mode: String? ->
+        // clerk-android AuthView does not currently expose a public mode parameter.
+        // Keep this prop as an intentional no-op for cross-platform API parity.
+        view.mode = mode
+      }
 
-  @ReactProp(name = "mode")
-  override fun setMode(view: ClerkAuthNativeView, mode: String?) {
-    // clerk-android AuthView does not currently expose a public mode parameter.
-    // Keep this generated prop setter as an intentional no-op for cross-platform API parity.
-  }
+      Prop("isDismissible") { view: ClerkAuthNativeView, isDismissible: Boolean ->
+        view.isDismissible = isDismissible
+      }
 
-  @ReactProp(name = "isDismissible")
-  override fun setIsDismissible(view: ClerkAuthNativeView, isDismissible: Boolean) {
-    view.isDismissible = isDismissible
-    view.setupView()
-  }
+      OnViewDidUpdateProps { view: ClerkAuthNativeView ->
+        view.setupView()
+      }
 
-  override fun getExportedCustomBubblingEventTypeConstants(): MutableMap<String, Any>? {
-    return MapBuilder.builder<String, Any>()
-      .put("onAuthEvent", MapBuilder.of(
-        "phasedRegistrationNames",
-        MapBuilder.of("bubbled", "onAuthEvent")
-      ))
-      .build() as MutableMap<String, Any>
+    }
   }
 }
