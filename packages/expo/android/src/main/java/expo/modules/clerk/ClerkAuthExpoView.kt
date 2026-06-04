@@ -1,33 +1,19 @@
 package expo.modules.clerk
 
 import android.content.Context
-import android.content.ContextWrapper
 import android.util.Log
-import android.widget.FrameLayout
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.Recomposer
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.AndroidUiDispatcher
-import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.setViewTreeLifecycleOwner
-import androidx.lifecycle.setViewTreeViewModelStoreOwner
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
-import androidx.savedstate.compose.LocalSavedStateRegistryOwner
-import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.clerk.api.Clerk
 import com.clerk.ui.auth.AuthView
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.ReactContext
 import com.facebook.react.uimanager.events.RCTEventEmitter
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 private const val TAG = "ClerkAuthExpoView"
 
@@ -37,17 +23,14 @@ private fun debugLog(tag: String, message: String) {
   }
 }
 
-class ClerkAuthNativeView(context: Context) : FrameLayout(context) {
+class ClerkAuthNativeView(context: Context) : ClerkComposeNativeViewHost(context) {
   var mode: String = "signInOrUp"
   var isDismissible: Boolean = true
 
-  private val activity: ComponentActivity? = findActivity(context).also {
+  init {
     // At cold start, ClerkExpoModule.configure() may run before React's
-    // host-resume sync — meaning getCurrentActivity() returns null there.
-    // This view's construction is a reliable second hook: we know the Activity
-    // is available (we just walked the context to find it) and we're about to
-    // render Google sign-in / passkey buttons that need it.
-    if (it != null) Clerk.attachActivity(it)
+    // host-resume sync, so this view's construction is a reliable second hook.
+    activity?.let { Clerk.attachActivity(it) }
   }
 
   // Per-view ViewModelStoreOwner so the AuthView's ViewModels (including its
@@ -60,90 +43,34 @@ class ClerkAuthNativeView(context: Context) : FrameLayout(context) {
     override val viewModelStore: ViewModelStore = store
   }
 
-  private var recomposer: Recomposer? = null
-  private var recomposerJob: kotlinx.coroutines.Job? = null
-
-  private val composeView = ComposeView(context).also { view ->
-    activity?.let { act ->
-      view.setViewTreeLifecycleOwner(act)
-      view.setViewTreeViewModelStoreOwner(act)
-      view.setViewTreeSavedStateRegistryOwner(act)
-
-      // Create an explicit Recomposer to bypass windowRecomposer resolution.
-      // In Compose 1.7+, windowRecomposer looks at rootView which may not have
-      // lifecycle owners in React Native Fabric's detached view trees.
-      val recomposerContext = AndroidUiDispatcher.Main
-      val newRecomposer = Recomposer(recomposerContext)
-      recomposer = newRecomposer
-      view.setParentCompositionContext(newRecomposer)
-      val scope = CoroutineScope(recomposerContext + kotlinx.coroutines.SupervisorJob())
-      recomposerJob = scope.coroutineContext[kotlinx.coroutines.Job]
-      scope.launch {
-        newRecomposer.runRecomposeAndApplyChanges()
-      }
-    }
-    addView(view, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
-  }
-
-  override fun onDetachedFromWindow() {
-    recomposer?.cancel()
-    recomposerJob?.cancel()
-    // Clear our per-view ViewModelStore so any AuthView ViewModels are GC'd.
-    viewModelStoreOwner.viewModelStore.clear()
-    super.onDetachedFromWindow()
-  }
-
   private var dismissalEventSent: Boolean = false
 
-  fun setupView() {
-    debugLog(TAG, "setupView - mode: $mode, isDismissible: $isDismissible, activity: $activity")
+  override fun localViewModelStoreOwner(): ViewModelStoreOwner = viewModelStoreOwner
 
-    composeView.setContent {
-      // Provide the Activity as ViewModelStoreOwner so Clerk's viewModel() calls work
-      val content = @androidx.compose.runtime.Composable {
-        MaterialTheme {
-          Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
-          ) {
-            AuthView(
-              modifier = Modifier.fillMaxSize(),
-              clerkTheme = Clerk.customTheme,
-              onAuthComplete = {
-                if (isDismissible) {
-                  sendDismissEvent()
-                }
-              }
-            )
-          }
-        }
-      }
-
-      if (activity != null) {
-        CompositionLocalProvider(
-          // Per-view ViewModelStore so AuthView's navigation state doesn't
-          // leak between mounts within the same MainActivity lifetime.
-          LocalViewModelStoreOwner provides viewModelStoreOwner,
-          LocalLifecycleOwner provides activity,
-          LocalSavedStateRegistryOwner provides activity,
-        ) {
-          content()
-        }
-      } else {
-        Log.e(TAG, "No ComponentActivity found!")
-        content()
-      }
-    }
+  override fun onHostDetachedFromWindow() {
+    // Clear our per-view ViewModelStore so any AuthView ViewModels are GC'd.
+    viewModelStoreOwner.viewModelStore.clear()
   }
 
-  companion object {
-    fun findActivity(context: Context): ComponentActivity? {
-      var ctx: Context? = context
-      while (ctx != null) {
-        if (ctx is ComponentActivity) return ctx
-        ctx = (ctx as? ContextWrapper)?.baseContext
+  @Composable
+  override fun Content() {
+    debugLog(TAG, "setupView - mode: $mode, isDismissible: $isDismissible, activity: $activity")
+
+    MaterialTheme {
+      Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
+      ) {
+        AuthView(
+          modifier = Modifier.fillMaxSize(),
+          clerkTheme = Clerk.customTheme,
+          onAuthComplete = {
+            if (isDismissible) {
+              sendDismissEvent()
+            }
+          }
+        )
       }
-      return null
     }
   }
 

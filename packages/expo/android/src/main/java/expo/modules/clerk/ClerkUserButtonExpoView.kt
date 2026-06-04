@@ -1,53 +1,18 @@
 package expo.modules.clerk
 
 import android.content.Context
-import android.widget.FrameLayout
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.Recomposer
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.AndroidUiDispatcher
-import androidx.compose.ui.platform.ComposeView
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.setViewTreeLifecycleOwner
-import androidx.lifecycle.setViewTreeViewModelStoreOwner
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
-import androidx.savedstate.compose.LocalSavedStateRegistryOwner
-import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.clerk.api.Clerk
 import com.clerk.ui.userbutton.UserButton
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
-class ClerkUserButtonNativeView(context: Context) : FrameLayout(context) {
-  private val activity = ClerkAuthNativeView.findActivity(context).also {
-    if (it != null) Clerk.attachActivity(it)
-  }
-
-  private var recomposer: Recomposer? = null
-  private var recomposerJob: kotlinx.coroutines.Job? = null
-
-  private val composeView = ComposeView(context).also { view ->
-    activity?.let { act ->
-      view.setViewTreeLifecycleOwner(act)
-      view.setViewTreeViewModelStoreOwner(act)
-      view.setViewTreeSavedStateRegistryOwner(act)
-
-      val recomposerContext = AndroidUiDispatcher.Main
-      val newRecomposer = Recomposer(recomposerContext)
-      recomposer = newRecomposer
-      view.setParentCompositionContext(newRecomposer)
-      val scope = CoroutineScope(recomposerContext + kotlinx.coroutines.SupervisorJob())
-      recomposerJob = scope.coroutineContext[kotlinx.coroutines.Job]
-      scope.launch {
-        newRecomposer.runRecomposeAndApplyChanges()
-      }
-    }
-    addView(view, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+class ClerkUserButtonNativeView(context: Context) : ClerkComposeNativeViewHost(context) {
+  init {
+    activity?.let { Clerk.attachActivity(it) }
   }
 
   override fun onAttachedToWindow() {
@@ -55,36 +20,14 @@ class ClerkUserButtonNativeView(context: Context) : FrameLayout(context) {
     setupView()
   }
 
-  override fun onDetachedFromWindow() {
-    recomposer?.cancel()
-    recomposerJob?.cancel()
-    super.onDetachedFromWindow()
-  }
-
-  private fun setupView() {
-    composeView.setContent {
-      val userButtonContent: @Composable () -> Unit = {
-        MaterialTheme {
-          Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center,
-          ) {
-            UserButton(clerkTheme = Clerk.customTheme)
-          }
-        }
-      }
-
-      if (activity != null) {
-        // Compose content embedded in React Native needs Activity owners supplied explicitly.
-        CompositionLocalProvider(
-          LocalViewModelStoreOwner provides activity,
-          LocalLifecycleOwner provides activity,
-          LocalSavedStateRegistryOwner provides activity,
-        ) {
-          userButtonContent()
-        }
-      } else {
-        userButtonContent()
+  @Composable
+  override fun Content() {
+    MaterialTheme {
+      Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
+      ) {
+        UserButton(clerkTheme = Clerk.customTheme)
       }
     }
   }

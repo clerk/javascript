@@ -1,11 +1,9 @@
 import React
 import UIKit
 
-public class ClerkAuthNativeView: UIView {
-  private lazy var hostingCoordinator = ClerkNativeHostingCoordinator(containerView: self)
+public class ClerkAuthNativeView: ClerkNativeViewHost {
   private var currentMode: String = "signInOrUp"
   private var currentDismissible: Bool = true
-  private var hasInitialized: Bool = false
   private var dismissalEventSent: Bool = false
 
   @objc var onAuthEvent: RCTBubblingEventBlock?
@@ -15,7 +13,7 @@ public class ClerkAuthNativeView: UIView {
       let newMode = (mode as String?) ?? "signInOrUp"
       guard newMode != currentMode else { return }
       currentMode = newMode
-      if hasInitialized { updateView() }
+      setNeedsHostedViewUpdate()
     }
   }
 
@@ -24,24 +22,12 @@ public class ClerkAuthNativeView: UIView {
       let newDismissible = isDismissible?.boolValue ?? true
       guard newDismissible != currentDismissible else { return }
       currentDismissible = newDismissible
-      if hasInitialized { updateView() }
+      setNeedsHostedViewUpdate()
     }
   }
 
-  override public init(frame: CGRect) {
-    super.init(frame: frame)
-  }
-
-  public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
-  }
-
-  override public func didMoveToWindow() {
-    super.didMoveToWindow()
-    if window != nil && !hasInitialized {
-      hasInitialized = true
-      updateView()
-    } else if window == nil && hasInitialized && currentDismissible && !dismissalEventSent {
+  override func didDetachAfterInitialization() {
+    if currentDismissible && !dismissalEventSent {
       dismissalEventSent = true
       sendAuthEvent(type: .dismissed)
     }
@@ -51,10 +37,10 @@ public class ClerkAuthNativeView: UIView {
     onAuthEvent?(["type": type.rawValue])
   }
 
-  private func updateView() {
-    guard let factory = clerkViewFactory else { return }
+  override func makeHostedController() -> UIViewController? {
+    guard let factory = clerkViewFactory else { return nil }
 
-    guard let returnedController = factory.createAuthView(
+    return factory.createAuthView(
       mode: currentMode,
       dismissible: currentDismissible,
       onEvent: { [weak self] event, _ in
@@ -64,13 +50,6 @@ public class ClerkAuthNativeView: UIView {
           self?.sendAuthEvent(type: .dismissed)
         }
       }
-    ) else { return }
-
-    hostingCoordinator.attach(returnedController)
-  }
-
-  override public func layoutSubviews() {
-    super.layoutSubviews()
-    hostingCoordinator.layout()
+    )
   }
 }

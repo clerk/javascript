@@ -40,6 +40,7 @@ Pod::Spec.new do |s|
   # because it uses `import ClerkKit` which is only available via SPM in the app target.
   s.source_files = "ClerkExpoModule.swift", "ClerkExpoModule.m",
                    "ClerkNativeEvent.swift", "ClerkNativeHostingCoordinator.swift",
+                   "ClerkNativeViewHost.swift",
                    "ClerkAuthNativeView.swift",
                    "ClerkAuthViewManager.swift", "ClerkAuthViewManager.m",
                    "ClerkUserProfileNativeView.swift",

@@ -1,10 +1,8 @@
 import React
 import UIKit
 
-public class ClerkUserProfileNativeView: UIView {
-  private lazy var hostingCoordinator = ClerkNativeHostingCoordinator(containerView: self)
+public class ClerkUserProfileNativeView: ClerkNativeViewHost {
   private var currentDismissible: Bool = true
-  private var hasInitialized: Bool = false
   private var dismissalEventSent = false
 
   @objc var onProfileEvent: RCTBubblingEventBlock?
@@ -14,24 +12,12 @@ public class ClerkUserProfileNativeView: UIView {
       let newDismissible = isDismissible?.boolValue ?? true
       guard newDismissible != currentDismissible else { return }
       currentDismissible = newDismissible
-      if hasInitialized { updateView() }
+      setNeedsHostedViewUpdate()
     }
   }
 
-  override public init(frame: CGRect) {
-    super.init(frame: frame)
-  }
-
-  public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
-  }
-
-  override public func didMoveToWindow() {
-    super.didMoveToWindow()
-    if window != nil && !hasInitialized {
-      hasInitialized = true
-      updateView()
-    } else if window == nil && hasInitialized && currentDismissible && !dismissalEventSent {
+  override func didDetachAfterInitialization() {
+    if currentDismissible && !dismissalEventSent {
       dismissalEventSent = true
       sendProfileEvent(type: .dismissed)
     }
@@ -41,10 +27,10 @@ public class ClerkUserProfileNativeView: UIView {
     onProfileEvent?(["type": type.rawValue])
   }
 
-  private func updateView() {
-    guard let factory = clerkViewFactory else { return }
+  override func makeHostedController() -> UIViewController? {
+    guard let factory = clerkViewFactory else { return nil }
 
-    guard let returnedController = factory.createUserProfileView(
+    return factory.createUserProfileView(
       dismissible: currentDismissible,
       onEvent: { [weak self] event, _ in
         if event == .dismissed {
@@ -53,13 +39,6 @@ public class ClerkUserProfileNativeView: UIView {
           self?.sendProfileEvent(type: .dismissed)
         }
       }
-    ) else { return }
-
-    hostingCoordinator.attach(returnedController)
-  }
-
-  override public func layoutSubviews() {
-    super.layoutSubviews()
-    hostingCoordinator.layout()
+    )
   }
 }
