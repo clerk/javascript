@@ -3,11 +3,7 @@ import type { BillingPayerMethods } from './billing';
 import type { DeletedObjectResource } from './deletedObject';
 import type { EmailAddressResource } from './emailAddress';
 import type { EnterpriseAccountResource } from './enterpriseAccount';
-import type {
-  CreateOrganizationEnterpriseConnectionParams,
-  EnterpriseConnectionResource,
-  UpdateOrganizationEnterpriseConnectionParams,
-} from './enterpriseConnection';
+import type { EnterpriseConnectionResource } from './enterpriseConnection';
 import type {
   EnterpriseConnectionTestRunInitResource,
   EnterpriseConnectionTestRunResource,
@@ -307,14 +303,6 @@ export interface UserResource extends ClerkResource, BillingPayerMethods {
    */
   leaveOrganization: (organizationId: string) => Promise<DeletedObjectResource>;
   getEnterpriseConnections: (params?: GetEnterpriseConnectionsParams) => Promise<EnterpriseConnectionResource[]>;
-  createEnterpriseConnection: (
-    params: CreateOrganizationEnterpriseConnectionParams,
-  ) => Promise<EnterpriseConnectionResource>;
-  updateEnterpriseConnection: (
-    enterpriseConnectionId: string,
-    params: UpdateOrganizationEnterpriseConnectionParams,
-  ) => Promise<EnterpriseConnectionResource>;
-  deleteEnterpriseConnection: (enterpriseConnectionId: string) => Promise<DeletedObjectResource>;
   createEnterpriseConnectionTestRun: (
     enterpriseConnectionId: string,
   ) => Promise<EnterpriseConnectionTestRunInitResource>;
