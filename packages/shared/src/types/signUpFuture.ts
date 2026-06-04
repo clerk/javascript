@@ -203,7 +203,7 @@ export interface SignUpFuturePhoneCodeVerifyParams {
 /** @generateWithEmptyComment */
 export interface SignUpFutureSSOParams extends SignUpFutureAdditionalParams {
   /**
-   * The strategy to use for authentication. Either [`OAuthStrategy`](https://clerk.com/docs/reference/types/oauth-strategy) or [`EnterpriseSSOStrategy`](https://clerk.com/docs/reference/types/enterprise-sso-strategy).
+   * The strategy to use for authentication. Either [`OAuthStrategy`](https://clerk.com/docs/reference/types/sso#o-auth-strategy) or [`EnterpriseSSOStrategy`](https://clerk.com/docs/reference/types/sso#enterprise-sso-strategy).
    */
   strategy: string;
   /**

@@ -335,7 +335,7 @@ function getCatchAllReplacements() {
     },
     {
       pattern: /(?<![\[\w`#])`?UserResource`?(?![\]\w`])/g,
-      replace: '[`UserResource`](/docs/reference/objects/user)',
+      replace: '[UserResource](/docs/reference/objects/user)',
     },
     {
       pattern: /(?<![\[\w`#])`?LastAuthenticationStrategy`?(?![\]\w`])/g,
