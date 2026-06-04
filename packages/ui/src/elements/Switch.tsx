@@ -53,6 +53,7 @@ export const Switch = forwardRef<HTMLDivElement, SwitchProps>(
         align='center'
         as='label'
         sx={t => ({
+          position: 'relative',
           isolation: 'isolate',
           width: 'fit-content',
           '&:has(input:focus-visible) > input + span': {
@@ -73,6 +74,7 @@ export const Switch = forwardRef<HTMLDivElement, SwitchProps>(
           aria-labelledby={ariaLabelledBy}
           style={{
             ...common.visuallyHidden(),
+            inset: 0,
           }}
         />
         <Flex
