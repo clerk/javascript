@@ -74,6 +74,14 @@ async function waitForNativeClientToken(): Promise<string | null> {
   return null;
 }
 
+async function syncClientTokenToCache(tokenCache: TokenCache | undefined, clientToken: string | null): Promise<void> {
+  if (clientToken) {
+    await tokenCache?.saveToken(CLERK_CLIENT_JWT_KEY, clientToken);
+  } else {
+    await tokenCache?.clearToken?.(CLERK_CLIENT_JWT_KEY);
+  }
+}
+
 async function syncNativeClientToJs({
   clerkInstance,
   tokenCache,
@@ -84,12 +92,7 @@ async function syncNativeClientToJs({
   const nativeClientToken = await waitForNativeClientToken();
   const effectiveTokenCache = tokenCache ?? defaultTokenCache;
 
-  if (nativeClientToken) {
-    await effectiveTokenCache?.saveToken(CLERK_CLIENT_JWT_KEY, nativeClientToken);
-  } else {
-    await effectiveTokenCache?.clearToken?.(CLERK_CLIENT_JWT_KEY);
-  }
-
+  await syncClientTokenToCache(effectiveTokenCache, nativeClientToken);
   if (typeof clerkInstance.__internal_reloadInitialResources === 'function') {
     await clerkInstance.__internal_reloadInitialResources();
   }
