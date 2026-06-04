@@ -68,11 +68,13 @@ class ClerkAuthNativeView(context: Context) : ClerkComposeNativeViewHost(context
         AuthView(
           modifier = Modifier.fillMaxSize(),
           clerkTheme = Clerk.customTheme,
+          isDismissable = isDismissible,
+          onDismiss = if (isDismissible) ::sendDismissEvent else null,
           onAuthComplete = {
             if (isDismissible) {
               sendDismissEvent()
             }
-          }
+          },
         )
       }
     }

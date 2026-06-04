@@ -187,9 +187,9 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
         mode: Self.authMode(from: mode),
         dismissible: dismissible,
         lightTheme: lightTheme,
-        darkTheme: darkTheme,
-        onEvent: onEvent
-      )
+        darkTheme: darkTheme
+      ),
+      onDismiss: dismissible ? { onEvent(.dismissed, [:]) } : nil
     )
   }
 
@@ -203,7 +203,8 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
         lightTheme: lightTheme,
         darkTheme: darkTheme,
         onEvent: onEvent
-      )
+      ),
+      onDismiss: dismissible ? { onEvent(.dismissed, [:]) } : nil
     )
   }
 
@@ -327,8 +328,11 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
     return ClerkTheme.Design(borderRadius: CGFloat(radius))
   }
 
-  private func makeHostingController<Content: View>(rootView: Content) -> UIViewController {
-    let hostingController = UIHostingController(rootView: rootView)
+  private func makeHostingController<Content: View>(
+    rootView: Content,
+    onDismiss: (() -> Void)? = nil
+  ) -> UIViewController {
+    let hostingController = ClerkNativeHostingController(rootView: rootView, onDismiss: onDismiss)
     hostingController.view.backgroundColor = .clear
     return hostingController
   }
@@ -457,25 +461,8 @@ struct ClerkInlineAuthWrapperView: View {
   let dismissible: Bool
   let lightTheme: ClerkTheme?
   let darkTheme: ClerkTheme?
-  let onEvent: (ClerkNativeViewEvent, [String: Any]) -> Void
-
-  // Track initial session to detect new sign-ins (same approach as Android)
-  @State private var initialSessionId: String? = Clerk.shared.session?.id
-  @State private var isDismissing = false
 
   @Environment(\.colorScheme) private var colorScheme
-
-  private func dismissIfNeeded() {
-    guard dismissible, !isDismissing else { return }
-    isDismissing = true
-    onEvent(.dismissed, [:])
-  }
-
-  private func handleActiveSession(sessionId: String) {
-    guard sessionId != initialSessionId else { return }
-    emitClerkNativeRefreshClient()
-    dismissIfNeeded()
-  }
 
   private var themedAuthView: some View {
     let view = AuthView(mode: mode, isDismissable: dismissible)
@@ -493,9 +480,33 @@ struct ClerkInlineAuthWrapperView: View {
   var body: some View {
     themedAuthView
       .onChange(of: Clerk.shared.client) { _, _ in
-        guard let sessionId = Clerk.shared.session?.id else { return }
-        handleActiveSession(sessionId: sessionId)
+        emitClerkNativeRefreshClient()
       }
+  }
+}
+
+private final class ClerkNativeHostingController<Content: View>: UIHostingController<Content> {
+  private let onDismiss: (() -> Void)?
+  private var didSendDismiss = false
+
+  init(rootView: Content, onDismiss: (() -> Void)? = nil) {
+    self.onDismiss = onDismiss
+    super.init(rootView: rootView)
+  }
+
+  @MainActor @preconcurrency required dynamic init?(coder aDecoder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
+  override func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
+    sendDismissIfNeeded()
+    super.dismiss(animated: flag, completion: completion)
+  }
+
+  private func sendDismissIfNeeded() {
+    guard !didSendDismiss else { return }
+    didSendDismiss = true
+    onDismiss?()
   }
 }
 
