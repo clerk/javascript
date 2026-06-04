@@ -3,8 +3,6 @@ package expo.modules.clerk
 import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModelStore
@@ -59,22 +57,15 @@ class ClerkAuthNativeView(context: Context, appContext: AppContext) : ClerkCompo
   override fun Content() {
     debugLog(TAG, "setupView - isDismissible: $isDismissible, activity: $activity")
 
-    MaterialTheme {
-      Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-      ) {
-        AuthView(
-          modifier = Modifier.fillMaxSize(),
-          clerkTheme = Clerk.customTheme,
-          isDismissable = isDismissible,
-          onDismiss = ::sendDismissEvent,
-          onAuthComplete = {
-            sendDismissEvent()
-          },
-        )
-      }
-    }
+    AuthView(
+      modifier = Modifier.fillMaxSize(),
+      clerkTheme = Clerk.customTheme,
+      isDismissable = isDismissible,
+      onDismiss = ::sendDismissEvent,
+      onAuthComplete = {
+        sendDismissEvent()
+      },
+    )
   }
 
   private fun sendEvent(type: String) {

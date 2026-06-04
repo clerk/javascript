@@ -3,7 +3,6 @@ package expo.modules.clerk
 import android.content.Context
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,13 +24,11 @@ class ClerkUserButtonNativeView(context: Context, appContext: AppContext) : Cler
 
   @Composable
   override fun Content() {
-    MaterialTheme {
-      Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-      ) {
-        UserButton(clerkTheme = Clerk.customTheme)
-      }
+    Box(
+      modifier = Modifier.fillMaxSize(),
+      contentAlignment = Alignment.Center,
+    ) {
+      UserButton(clerkTheme = Clerk.customTheme)
     }
   }
 }

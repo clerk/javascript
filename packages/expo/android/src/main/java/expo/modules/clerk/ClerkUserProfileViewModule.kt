@@ -3,8 +3,6 @@ package expo.modules.clerk
 import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModelStore
@@ -44,20 +42,13 @@ class ClerkUserProfileNativeView(context: Context, appContext: AppContext) : Cle
   override fun Content() {
     debugLog(TAG, "setupView - isDismissible: $isDismissible")
 
-    MaterialTheme {
-      Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-      ) {
-        UserProfileView(
-          clerkTheme = Clerk.customTheme,
-          onDismiss = {
-            debugLog(TAG, "Profile dismissed")
-            sendEvent("dismissed")
-          }
-        )
+    UserProfileView(
+      clerkTheme = Clerk.customTheme,
+      onDismiss = {
+        debugLog(TAG, "Profile dismissed")
+        sendEvent("dismissed")
       }
-    }
+    )
   }
 
   private fun sendEvent(type: String) {

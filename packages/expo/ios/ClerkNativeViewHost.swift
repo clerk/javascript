@@ -40,13 +40,9 @@ public class ClerkNativeViewHost: UIView {
     nil
   }
 
-  var clearsHostedViewBackground: Bool {
-    false
-  }
-
   private func updateHostedView() {
     guard let controller = makeHostedController() else { return }
-    hostingCoordinator.attach(controller, clearBackground: clearsHostedViewBackground)
+    hostingCoordinator.attach(controller)
   }
 }
 
@@ -58,16 +54,13 @@ private final class ClerkNativeHostingCoordinator {
     self.containerView = containerView
   }
 
-  func attach(_ controller: UIViewController, clearBackground: Bool = false) {
+  func attach(_ controller: UIViewController) {
     detach()
 
     guard let containerView else { return }
 
     controller.view.frame = containerView.bounds
     controller.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-    if clearBackground {
-      controller.view.backgroundColor = .clear
-    }
 
     if let parentVC = findViewController(from: containerView) {
       parentVC.addChild(controller)

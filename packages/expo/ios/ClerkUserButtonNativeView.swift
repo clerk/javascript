@@ -7,10 +7,6 @@ public class ClerkUserButtonNativeView: ClerkNativeViewHost {
 
     return bridge.makeUserButtonViewController()
   }
-
-  override var clearsHostedViewBackground: Bool {
-    true
-  }
 }
 
 @objc(ClerkUserButtonViewManager)
