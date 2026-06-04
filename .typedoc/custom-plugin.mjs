@@ -176,7 +176,7 @@ export function applyRelativeLinkReplacements(contents) {
 function getCatchAllReplacements() {
   return [
     {
-      pattern: /(?<![`[\]])\bClerkAPIResponseError\b(?![\]\(])/g,
+      pattern: /(?<![\[\w`#])`?ClerkAPIResponseError`?(?![\]\w`])/g,
       replace: '[ClerkAPIResponseError](/docs/reference/types/clerk-api-response-error)',
     },
     {
@@ -204,7 +204,7 @@ function getCatchAllReplacements() {
       replace: '[ExternalAccountResource](/docs/reference/types/external-account)',
     },
     {
-      pattern: /(?<![#])`LoadedClerk`/g,
+      pattern: /(?<![\[\w`#])`?LoadedClerk`?(?![\]\w`])/g,
       replace: '[Clerk](/docs/reference/objects/clerk)',
     },
     {
@@ -230,7 +230,7 @@ function getCatchAllReplacements() {
       replace: '[SessionStatusClaim](/docs/reference/types/session-status)',
     },
     {
-      pattern: /(?<![`#[\]])\bSetActiveParams\b(?![\]\(])/g,
+      pattern: /(?<![\[\w`#])`?SetActiveParams`?(?![\]\w`])/g,
       replace: '[SetActiveParams](/docs/reference/types/set-active-params)',
     },
     {
@@ -258,11 +258,11 @@ function getCatchAllReplacements() {
       replace: '[SignedInSessionResource](/docs/reference/objects/session)',
     },
     {
-      pattern: /(?<![#])`SignInRedirectOptions`/g,
+      pattern: /(?<![\[\w`#])`?SignInRedirectOptions`?(?![\]\w`])/g,
       replace: '[SignInRedirectOptions](/docs/reference/types/sign-in-redirect-options)',
     },
     {
-      pattern: /(?<![#])`SignUpRedirectOptions`/g,
+      pattern: /(?<![\[\w`#])`?SignUpRedirectOptions`?(?![\]\w`])/g,
       replace: '[SignUpRedirectOptions](/docs/reference/types/sign-up-redirect-options)',
     },
     {
@@ -274,7 +274,7 @@ function getCatchAllReplacements() {
       replace: '[SignUpVerificationResource](/docs/reference/types/sign-up-verification-resource)',
     },
     {
-      pattern: /(?<![#])`SignUpUnsafeMetadata`/g,
+      pattern: /(?<![\[\w`#])`?SignUpUnsafeMetadata`?(?![\]\w`])/g,
       replace: '[SignUpUnsafeMetadata](/docs/reference/types/metadata#sign-up-unsafe-metadata)',
     },
     {
@@ -282,7 +282,7 @@ function getCatchAllReplacements() {
       replace: '[SignUpFutureResource](/docs/reference/objects/sign-up-future)',
     },
     {
-      pattern: /(?<![#])`TasksRedirectOptions`/g,
+      pattern: /(?<![\[\w`#])`?TasksRedirectOptions`?(?![\]\w`])/g,
       replace: '[TasksRedirectOptions](/docs/reference/types/redirect-options)',
     },
     {
@@ -294,30 +294,30 @@ function getCatchAllReplacements() {
       replace: '[OrganizationResource](/docs/reference/objects/organization)',
     },
     {
-      pattern: /(?<![#])`OrganizationPrivateMetadata`/g,
+      pattern: /(?<![\[\w`#])`?OrganizationPrivateMetadata`?(?![\]\w`])/g,
       replace: '[OrganizationPrivateMetadata](/docs/reference/types/metadata#organization-private-metadata)',
     },
     {
-      pattern: /(?<![#])`OrganizationPublicMetadata`/g,
+      pattern: /(?<![\[\w`#])`?OrganizationPublicMetadata`?(?![\]\w`])/g,
       replace: '[OrganizationPublicMetadata](/docs/reference/types/metadata#organization-public-metadata)',
     },
     {
-      pattern: /(?<![#])`OrganizationInvitationPrivateMetadata`/g,
+      pattern: /(?<![\[\w`#])`?OrganizationInvitationPrivateMetadata`?(?![\]\w`])/g,
       replace:
         '[OrganizationInvitationPrivateMetadata](/docs/reference/types/metadata#organization-invitation-private-metadata)',
     },
     {
-      pattern: /(?<![#])`OrganizationInvitationPublicMetadata`/g,
+      pattern: /(?<![\[\w`#])`?OrganizationInvitationPublicMetadata`?(?![\]\w`])/g,
       replace:
         '[OrganizationInvitationPublicMetadata](/docs/reference/types/metadata#organization-invitation-public-metadata)',
     },
     {
-      pattern: /(?<![#])`OrganizationMembershipPrivateMetadata`/g,
+      pattern: /(?<![\[\w`#])`?OrganizationMembershipPrivateMetadata`?(?![\]\w`])/g,
       replace:
         '[OrganizationMembershipPrivateMetadata](/docs/reference/types/metadata#organization-membership-private-metadata)',
     },
     {
-      pattern: /(?<![#])`OrganizationMembershipPublicMetadata`/g,
+      pattern: /(?<![\[\w`#])`?OrganizationMembershipPublicMetadata`?(?![\]\w`])/g,
       replace:
         '[OrganizationMembershipPublicMetadata](/docs/reference/types/metadata#organization-membership-public-metadata)',
     },
