@@ -509,6 +509,45 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       expect(result.errors).toBeDefined();
       expect(result.errors?.[0].message).toContain('expired');
     });
+
+    // Regression: `decodedResult.payload.sub.startsWith(...)` previously threw a
+    // TypeError for a missing or non-string `sub` before OAuth verification ran, so a
+    // crafted at+jwt bearer token surfaced as an unhandled error in request auth.
+    it.each([
+      ['a missing', undefined],
+      ['a null', null],
+      ['a numeric', 123],
+      ['an object', {}],
+    ] as Array<[string, unknown]>)(
+      'classifies an at+jwt token with %s sub as OAuth instead of throwing',
+      async (_label, sub) => {
+        server.use(
+          http.get(
+            'https://api.clerk.test/v1/jwks',
+            validateHeaders(() => {
+              return HttpResponse.json(mockJwks);
+            }),
+          ),
+        );
+
+        const payload: Record<string, unknown> = { ...mockOAuthAccessTokenJwtPayload };
+        if (sub === undefined) {
+          delete payload.sub;
+        } else {
+          payload.sub = sub;
+        }
+
+        const oauthJwt = await createSignedOAuthJwt(payload as typeof mockOAuthAccessTokenJwtPayload, 'at+jwt');
+
+        const result = await verifyMachineAuthToken(oauthJwt, {
+          apiUrl: 'https://api.clerk.test',
+          secretKey: 'a-valid-key',
+        });
+
+        // Reaching a typed OAuth result proves the M2M `sub` check no longer throws.
+        expect(result.tokenType).toBe('oauth_token');
+      },
+    );
   });
 
   describe('verifyM2MToken with JWT', () => {
