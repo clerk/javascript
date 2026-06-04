@@ -551,11 +551,11 @@ export const viVN: LocalizationResource = {
     },
   },
   organizationSwitcher: {
-    action__closeOrganizationSwitcher: 'Đóng bộ chuyển đổi tổ chức',
+    action__closeOrganizationSwitcher: 'Đóng menu chuyển đổi tổ chức',
     action__createOrganization: 'Tạo tổ chức',
     action__invitationAccept: 'Tham gia',
     action__manageOrganization: 'Quản lý',
-    action__openOrganizationSwitcher: 'Mở bộ chuyển đổi tổ chức',
+    action__openOrganizationSwitcher: 'Mở menu chuyển đổi tổ chức',
     action__suggestionsAccept: 'Yêu cầu tham gia',
     notSelected: 'Không có tổ chức được chọn',
     personalWorkspace: 'Tài khoản cá nhân',
@@ -1003,7 +1003,7 @@ export const viVN: LocalizationResource = {
         infoText__unableToScan:
           'Thiết lập một phương thức đăng nhập mới trong ứng dụng xác thực của bạn và nhập Khóa được cung cấp bên dưới.',
         inputLabel__unableToScan1:
-          'Đảm bảo rằng Mật khẩu dựa trên thời gian hoặc Mật khẩu một lần đã được bật, sau đó hoàn tất việc liên kết tài khoản của bạn.',
+          'Đảm bảo rằng Mã dựa trên thời gian hoặc Mã một lần đã được bật, sau đó hoàn tất việc liên kết tài khoản của bạn.',
       },
       success: {
         finishButton: 'Tiếp tục',
@@ -1072,7 +1072,7 @@ export const viVN: LocalizationResource = {
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded:
-      'Bạn đã đạt đến giới hạn số lượng thành viên tổ chức, bao gồm cả các lời mời đang chờ xử lý.',
+      'Bạn đã đạt đến giới hạn {{maxAllowed}} thành viên tổ chức, bao gồm cả các lời mời đang chờ xử lý.',
     organization_minimum_permissions_needed: undefined,
     organization_not_found_or_unauthorized:
       'Bạn không còn là thành viên của tổ chức này. Vui lòng chọn hoặc tạo một tổ chức khác.',
