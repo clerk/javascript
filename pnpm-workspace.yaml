@@ -22,10 +22,10 @@ catalogs:
     vue: 3.5.33
     zx: 8.8.5
   rspack:
-    '@rspack/cli': 2.0.0
-    '@rspack/core': 2.0.0
-    '@rspack/dev-server': 2.0.0
-    '@rspack/plugin-react-refresh': 2.0.0
+    '@rspack/cli': 2.0.6
+    '@rspack/core': 2.0.6
+    '@rspack/dev-server': 2.0.3
+    '@rspack/plugin-react-refresh': 2.0.1
   module-manager:
     '@base-org/account': 2.0.1
     '@coinbase/wallet-sdk': 4.3.7
@@ -45,8 +45,6 @@ minimumReleaseAgeExclude:
   - '@modelcontextprotocol/sdk@1.26.0'
   # Renovate security update: esbuild@0.25.0
   - esbuild@0.25.0
-  # TODO: remove once rspack 2.0.0 is >48h old (published 2026-04-22)
-  - '@rspack/*'
   # Renovate security update: astro@6.1.6
   - astro@6.1.6
 
