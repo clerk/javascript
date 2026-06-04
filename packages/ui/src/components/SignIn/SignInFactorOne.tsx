@@ -62,6 +62,18 @@ function determineAlternativeMethodsMode(
   return 'forgot';
 }
 
+function removeSignInResetPasswordIntentParam(): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  const url = new URL(window.location.href);
+  if (url.searchParams.has(SIGN_IN_RESET_PASSWORD_INTENT_PARAM)) {
+    url.searchParams.delete(SIGN_IN_RESET_PASSWORD_INTENT_PARAM);
+    window.history.replaceState(window.history.state, '', url);
+  }
+}
+
 function SignInFactorOneInternal(): JSX.Element {
   const { __internal_setActiveInProgress } = useClerk();
   const signIn = useCoreSignIn();
@@ -163,10 +175,17 @@ function SignInFactorOneInternal(): JSX.Element {
     const canGoBack = factorHasLocalStrategy(currentFactor) && !passwordErrorCode;
 
     const toggle = showAllStrategies ? toggleAllStrategies : toggleForgotPasswordStrategies;
-    const backHandler = () => {
+    const leaveAlternativeMethods = () => {
+      // This search param only exists if the user clicked "Forgot password?" on the
+      // start page, it's a way to go directly to the password reset screen.
+      // If it does exist, we want to remove it on exit so refresh works correctly after.
+      removeSignInResetPasswordIntentParam();
+      toggle?.();
+    };
+    const backHandler: React.MouseEventHandler<Element> = () => {
       card.setError(undefined);
       setPasswordErrorCode(null);
-      toggle?.();
+      leaveAlternativeMethods();
     };
 
     const mode = determineAlternativeMethodsMode(showForgotPasswordStrategies, passwordErrorCode);
@@ -177,7 +196,7 @@ function SignInFactorOneInternal(): JSX.Element {
         onBackLinkClick={canGoBack ? backHandler : undefined}
         onFactorSelected={f => {
           selectFactor(f);
-          toggle?.();
+          leaveAlternativeMethods();
         }}
         currentFactor={currentFactor}
       />
