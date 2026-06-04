@@ -1,5 +1,46 @@
 # @clerk/ui
 
+## 1.15.0
+
+### Minor Changes
+
+- Internal `<ConfigureSSO />` refactor to call new org-scoped enterprise connections FAPI endpoints, replacing the `/me/` deprecated scope. ([#8671](https://github.com/clerk/javascript/pull/8671)) by [@iagodahlem](https://github.com/iagodahlem)
+
+### Patch Changes
+
+- Add support for Google Workspace SAML provider to self-serve SSO ([#8690](https://github.com/clerk/javascript/pull/8690)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Layer architecture for configure steps per IdP and protocol on `<ConfigureSSO />` ([#8651](https://github.com/clerk/javascript/pull/8651)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Reworks the `<ConfigureSSO />` confirmation step and adds a dedicated reset connection dialog: ([#8706](https://github.com/clerk/javascript/pull/8706)) by [@iagodahlem](https://github.com/iagodahlem)
+  - Introduces `<ResetConnectionDialog />` — a modal-based, type-to-confirm dialog scoped to the wizard container that replaces the inline reset confirmation card. Wraps the destructive delete behind `useReverification`, clears the local provider selection, and rewinds the wizard to provider selection on success.
+  - Restyles the confirmation step body: unified status header with an inline `Active` / `Inactive` badge, grouped Enable SSO and Domain rows, two-column configuration details rendered through `ProfileSection.ItemList`, outlined `Configure again`, destructive `Reset connection`, and an inactive-state banner inside the step footer.
+  - `Step.Header` now accepts a `badge` prop so a step can render an inline status pill next to its title without crowding the right-aligned children slot.
+  - `OrganizationProfile` forwards the shared content ref to `<ConfigureSSO />` so the new dialog portals into the wizard chrome when the component is embedded inside the organization profile.
+
+- "Fix rendering issue for free trial badge." ([#8712](https://github.com/clerk/javascript/pull/8712)) by [@l-armstrong](https://github.com/l-armstrong)
+
+- Fix the legal consent checkbox growing in size when its label wraps to a second line while using the `simple` theme. The checkbox is now aligned to the start of the row so it no longer stretches to match the label height. ([#8705](https://github.com/clerk/javascript/pull/8705)) by [@dmoerner](https://github.com/dmoerner)
+
+- Avoid sending duplicate verification codes when persisted email or phone code verifications are already pending. ([#8548](https://github.com/clerk/javascript/pull/8548)) by [@jacekradko](https://github.com/jacekradko)
+
+- Adds a wizard-wide reset connection entry on the `<ConfigureSSO />` step footers: ([#8711](https://github.com/clerk/javascript/pull/8711)) by [@iagodahlem](https://github.com/iagodahlem)
+  - New `Step.Footer.Reset` compound part that renders a destructive ghost button on the leading edge of the footer and opens the existing `ResetConnectionDialog`. The slot owns its own open state and gates itself on the current enterprise connection, so it stays hidden on the provider selection step.
+  - Wires the reset entry into the Verify Domain, Configure (Okta and Custom SAML), and Test steps so the reset action is reachable from anywhere in the wizard. The confirmation step keeps its in-body destructive button.
+  - Exposes a `configureSSOFooterResetButton` element descriptor so the new button surface can be themed via appearance customizations.
+
+- Fix stepper chevron wrapping in `<ConfigureSSO />` ([#8693](https://github.com/clerk/javascript/pull/8693)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add support for Microsoft Entra SAML provider to self-serve SSO ([#8695](https://github.com/clerk/javascript/pull/8695)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Add mobile support for `<ConfigureSSO />` navbar to display application name, logo and organization name ([#8675](https://github.com/clerk/javascript/pull/8675)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Scope the `UserProfile` active-devices fetch cache by `user.id` so a session switch or sign-out/sign-in on a shared device no longer renders the previous user's device activity (IP, location, browser/device) from the module-scoped cache. ([#8703](https://github.com/clerk/javascript/pull/8703)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`afb75e6`](https://github.com/clerk/javascript/commit/afb75e68efa561ff18f6ae5359df1cf336e861a5), [`c3df67a`](https://github.com/clerk/javascript/commit/c3df67a231adff73fa36563718d9b94e6bb2a540), [`86fd38f`](https://github.com/clerk/javascript/commit/86fd38f4e39ab89b6a9fbb7515a5d9b7b37aa3ab), [`8d6bb56`](https://github.com/clerk/javascript/commit/8d6bb56de25692e0f9c350f16c8f45fbedaad2ac), [`43dfefa`](https://github.com/clerk/javascript/commit/43dfefaabf0bad1a6d92b75b1cb6de1860ea87e4), [`5fc7b21`](https://github.com/clerk/javascript/commit/5fc7b21573cab36b9184dd6277396f7c38b91e1f), [`c2ba134`](https://github.com/clerk/javascript/commit/c2ba1344db5fd50f1d4e04d01d0455f0181c8d96)]:
+  - @clerk/localizations@4.7.1
+  - @clerk/shared@4.15.0
+
 ## 1.14.0
 
 ### Minor Changes
