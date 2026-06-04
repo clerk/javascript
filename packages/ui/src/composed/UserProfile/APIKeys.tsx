@@ -1,6 +1,6 @@
-import { lazy, Suspense, type ReactNode } from 'react';
+import { lazy, type ReactNode } from 'react';
 
-import { CardStateProvider } from '../../elements/contexts';
+import { APIKeysSection } from '../APIKeysSection';
 
 const APIKeysPage = lazy(() =>
   import('../../components/UserProfile/APIKeysPage').then(m => ({
@@ -8,10 +8,4 @@ const APIKeysPage = lazy(() =>
   })),
 );
 
-export const APIKeys = (): ReactNode => (
-  <CardStateProvider>
-    <Suspense fallback={''}>
-      <APIKeysPage />
-    </Suspense>
-  </CardStateProvider>
-);
+export const APIKeys = (): ReactNode => <APIKeysSection page={APIKeysPage} />;

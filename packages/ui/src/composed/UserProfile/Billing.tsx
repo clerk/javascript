@@ -1,7 +1,6 @@
-import { lazy, Suspense, type ReactNode } from 'react';
+import { lazy, type ReactNode } from 'react';
 
-import { RouteContext } from '../../router/RouteContext';
-import { useBillingRouter } from '../useBillingRouter';
+import { BillingSection } from '../BillingSection';
 
 const BillingPage = lazy(() =>
   import('../../components/UserProfile/BillingPage').then(m => ({
@@ -27,27 +26,11 @@ const PaymentAttemptPage = lazy(() =>
   })),
 );
 
-export const Billing = (): ReactNode => {
-  const { router, route } = useBillingRouter();
-
-  let content: ReactNode;
-  switch (route.page) {
-    case 'plans':
-      content = <PlansPage />;
-      break;
-    case 'statement':
-      content = <StatementPage />;
-      break;
-    case 'payment-attempt':
-      content = <PaymentAttemptPage />;
-      break;
-    default:
-      content = <BillingPage />;
-  }
-
-  return (
-    <RouteContext.Provider value={router}>
-      <Suspense fallback={''}>{content}</Suspense>
-    </RouteContext.Provider>
-  );
-};
+export const Billing = (): ReactNode => (
+  <BillingSection
+    billing={BillingPage}
+    plans={PlansPage}
+    statement={StatementPage}
+    paymentAttempt={PaymentAttemptPage}
+  />
+);

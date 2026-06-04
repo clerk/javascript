@@ -1,9 +1,4 @@
-import type { ReactNode } from 'react';
+import { SecurityDelete as Section } from '../../components/UserProfile/SecuritySections';
+import { createSection } from '../createSection';
 
-import { SecurityDelete as SecurityDeleteSection } from '../../components/UserProfile/SecuritySections';
-import { useRequirePage } from '../useRequirePage';
-
-export function SecurityDelete(): ReactNode {
-  if (!useRequirePage('SecurityDelete')) return null;
-  return <SecurityDeleteSection />;
-}
+export const SecurityDelete = createSection('SecurityDelete', Section);

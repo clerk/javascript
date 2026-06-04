@@ -1,5 +1,5 @@
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
-import type { EnvironmentResource, OAuthProvider, OAuthScope } from '@clerk/shared/types';
+import type { EnvironmentResource } from '@clerk/shared/types';
 import type { PropsWithChildren, ReactNode } from 'react';
 
 import type { Appearance } from '@/ui/internal/appearance';
@@ -11,7 +11,6 @@ import { ProfileProviderShell, fallbackModuleManager } from '../ProfileProviderS
 
 type OrganizationProfileProviderProps = PropsWithChildren<{
   appearance?: Appearance;
-  additionalOAuthScopes?: Partial<Record<OAuthProvider, OAuthScope[]>>;
 }>;
 
 export const OrganizationProfileProvider = (props: OrganizationProfileProviderProps): ReactNode => {

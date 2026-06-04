@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import type { RouteContextValue } from '../router/RouteContext';
 import { stubRouter } from './stubRouter';
@@ -64,29 +64,32 @@ export function useBillingRouter(): { router: RouteContextValue; route: BillingR
   const [route, setRoute] = useState<BillingRoute>({ page: 'billing' });
   const [queryParams, setQueryParams] = useState<Record<string, string>>({});
 
-  const router: RouteContextValue = {
-    ...stubRouter,
-    currentPath: pathFromRoute(route),
-    params: paramsFromRoute(route),
-    queryParams,
-    queryString: new URLSearchParams(queryParams).toString(),
-    navigate: async (to: string, options?: { searchParams?: URLSearchParams }) => {
-      try {
-        const url = new URL(to);
-        if (url.origin !== window.location.origin) {
-          window.location.href = to;
-          return;
+  const router: RouteContextValue = useMemo(
+    () => ({
+      ...stubRouter,
+      currentPath: pathFromRoute(route),
+      params: paramsFromRoute(route),
+      queryParams,
+      queryString: new URLSearchParams(queryParams).toString(),
+      navigate: async (to: string, options?: { searchParams?: URLSearchParams }) => {
+        try {
+          const url = new URL(to);
+          if (url.origin !== window.location.origin) {
+            window.location.href = to;
+            return;
+          }
+        } catch {}
+        const newRoute = resolveNavigation(route, to);
+        setRoute(newRoute);
+        if (options?.searchParams) {
+          setQueryParams(Object.fromEntries(options.searchParams.entries()));
+        } else if (newRoute.page !== route.page) {
+          setQueryParams({});
         }
-      } catch {}
-      const newRoute = resolveNavigation(route, to);
-      setRoute(newRoute);
-      if (options?.searchParams) {
-        setQueryParams(Object.fromEntries(options.searchParams.entries()));
-      } else if (newRoute.page !== route.page) {
-        setQueryParams({});
-      }
-    },
-  };
+      },
+    }),
+    [route, queryParams],
+  );
 
   return { router, route };
 }

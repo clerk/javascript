@@ -1,9 +1,4 @@
-import type { ReactNode } from 'react';
+import { AccountEmails as Section } from '../../components/UserProfile/AccountSections';
+import { createSection } from '../createSection';
 
-import { AccountEmails as AccountEmailsSection } from '../../components/UserProfile/AccountSections';
-import { useRequirePage } from '../useRequirePage';
-
-export function AccountEmails(): ReactNode {
-  if (!useRequirePage('AccountEmails')) return null;
-  return <AccountEmailsSection />;
-}
+export const AccountEmails = createSection('AccountEmails', Section);
