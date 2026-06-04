@@ -1,0 +1,11 @@
+---
+import type { ConfigureSSOProps } from '@clerk/shared/types';
+type Props = ConfigureSSOProps;
+
+import InternalUIComponentRenderer from './InternalUIComponentRenderer.astro';
+---
+
+<InternalUIComponentRenderer
+  {...Astro.props}
+  component='configure-sso'
+/>

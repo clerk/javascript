@@ -97,3 +97,68 @@ export interface EnterpriseOAuthConfigResource {
   createdAt: Date | null;
   updatedAt: Date | null;
 }
+
+export type OrganizationEnterpriseConnectionProvider =
+  | 'saml_custom'
+  | 'saml_okta'
+  | 'saml_google'
+  | 'saml_microsoft'
+  | 'oidc_custom'
+  | 'oidc_github_enterprise'
+  | 'oidc_gitlab';
+
+/** @deprecated Use `OrganizationEnterpriseConnectionProvider` instead. */
+export type MeEnterpriseConnectionProvider = OrganizationEnterpriseConnectionProvider;
+
+export type OrganizationEnterpriseConnectionSamlInput = {
+  idpEntityId?: string | null;
+  idpSsoUrl?: string | null;
+  idpCertificate?: string | null;
+  idpMetadataUrl?: string | null;
+  idpMetadata?: string | null;
+  attributeMapping?: Record<string, unknown> | null;
+  allowSubdomains?: boolean | null;
+  allowIdpInitiated?: boolean | null;
+  forceAuthn?: boolean | null;
+};
+
+/** @deprecated Use `OrganizationEnterpriseConnectionSamlInput` instead. */
+export type MeEnterpriseConnectionSamlInput = OrganizationEnterpriseConnectionSamlInput;
+
+export type OrganizationEnterpriseConnectionOidcInput = {
+  clientId?: string | null;
+  clientSecret?: string | null;
+  discoveryUrl?: string | null;
+  authUrl?: string | null;
+  tokenUrl?: string | null;
+  userInfoUrl?: string | null;
+  requiresPkce?: boolean | null;
+};
+
+/** @deprecated Use `OrganizationEnterpriseConnectionOidcInput` instead. */
+export type MeEnterpriseConnectionOidcInput = OrganizationEnterpriseConnectionOidcInput;
+
+export type CreateOrganizationEnterpriseConnectionParams = {
+  provider: OrganizationEnterpriseConnectionProvider;
+  name: string;
+  organizationId?: string | null;
+  saml?: OrganizationEnterpriseConnectionSamlInput | null;
+  oidc?: OrganizationEnterpriseConnectionOidcInput | null;
+};
+
+/** @deprecated Use `CreateOrganizationEnterpriseConnectionParams` instead. */
+export type CreateMeEnterpriseConnectionParams = CreateOrganizationEnterpriseConnectionParams;
+
+export type UpdateOrganizationEnterpriseConnectionParams = {
+  name?: string | null;
+  active?: boolean | null;
+  syncUserAttributes?: boolean | null;
+  disableAdditionalIdentifications?: boolean | null;
+  organizationId?: string | null;
+  customAttributes?: Record<string, unknown> | null;
+  saml?: OrganizationEnterpriseConnectionSamlInput | null;
+  oidc?: OrganizationEnterpriseConnectionOidcInput | null;
+};
+
+/** @deprecated Use `UpdateOrganizationEnterpriseConnectionParams` instead. */
+export type UpdateMeEnterpriseConnectionParams = UpdateOrganizationEnterpriseConnectionParams;

@@ -12,6 +12,7 @@ import { useNativeAuthEvents } from '../hooks/useNativeAuthEvents';
 import NativeClerkModule from '../specs/NativeClerkModule';
 import { tokenCache as defaultTokenCache } from '../token-cache';
 import { isNative, isWeb } from '../utils/runtime';
+import { maybeCompleteAuthSession } from './maybeCompleteAuthSession';
 import { getClerkInstance } from './singleton';
 import type { BuildClerkOptions } from './singleton/types';
 
@@ -70,7 +71,7 @@ function NativeSessionSync({
   publishableKey: string;
   tokenCache: TokenCache | undefined;
 }) {
-  const { isSignedIn } = useAuth();
+  const { isSignedIn, isLoaded } = useAuth();
   const hasSyncedRef = useRef(false);
   // Use the provided tokenCache, falling back to the default SecureStore cache
   const effectiveTokenCache = tokenCache ?? defaultTokenCache;
@@ -79,15 +80,20 @@ function NativeSessionSync({
     if (!isSignedIn) {
       hasSyncedRef.current = false;
 
-      // Clear the native session so native components (UserButton, etc.)
-      // don't continue showing a signed-in state after JS-side sign out.
-      const ClerkExpo = NativeClerkModule;
-      if (ClerkExpo?.signOut) {
-        void ClerkExpo.signOut().catch((error: unknown) => {
-          if (__DEV__) {
-            console.warn('[NativeSessionSync] Failed to clear native session:', error);
-          }
-        });
+      // Only call native signOut when Clerk has fully loaded and confirmed
+      // the user is actually signed out. Without this check, a JS reload
+      // (e.g. pressing R in Expo) triggers signOut during the loading phase
+      // (when isSignedIn is undefined), which revokes the session server-side
+      // and clears all keychain items, forcing the user to log in again.
+      if (isLoaded) {
+        const ClerkExpo = NativeClerkModule;
+        if (ClerkExpo?.signOut) {
+          void ClerkExpo.signOut().catch((error: unknown) => {
+            if (__DEV__) {
+              console.warn('[NativeSessionSync] Failed to clear native session:', error);
+            }
+          });
+        }
       }
 
       return;
@@ -130,7 +136,7 @@ function NativeSessionSync({
     };
 
     void syncToNative();
-  }, [isSignedIn, publishableKey, effectiveTokenCache]);
+  }, [isSignedIn, isLoaded, publishableKey, effectiveTokenCache]);
 
   return null;
 }
@@ -366,18 +372,12 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
     void syncNativeAuthToJs();
   }, [nativeAuthState, clerkInstance]);
 
+  // Needed for `useOAuth` / `useSSO` to work correctly on web — must stay synchronous during render
+  // so the redirect URL is caught before children mount. Resolves to a no-op on native via the
+  // sibling `maybeCompleteAuthSession.ts`, which keeps Metro from statically bundling
+  // `expo-web-browser` (an optional peer) for native consumers.
   if (isWeb()) {
-    // This is needed in order for useOAuth to work correctly on web.
-    // Must stay synchronous during render to catch the redirect URL before children mount.
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const WebBrowser = require('expo-web-browser');
-      WebBrowser.maybeCompleteAuthSession();
-    } catch (e) {
-      if (__DEV__) {
-        console.warn('[ClerkProvider] expo-web-browser not available, OAuth/SSO on web will not work:', e);
-      }
-    }
+    maybeCompleteAuthSession();
   }
 
   return (

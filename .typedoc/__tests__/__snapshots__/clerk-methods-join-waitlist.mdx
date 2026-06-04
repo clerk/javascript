@@ -1,0 +1,14 @@
+### `joinWaitlist()`
+
+Create a new waitlist entry programmatically. Requires that you set your app's sign-up mode to [**Waitlist**](/docs/guides/secure/restricting-access#waitlist) in the Clerk Dashboard.
+
+```typescript
+function joinWaitlist(params: JoinWaitlistParams): Promise<WaitlistResource>
+```
+
+#### `JoinWaitlistParams`
+
+
+| Property | Type | Description |
+| ------ | ------ | ------ |
+| <a id="emailaddress"></a> `emailAddress` | `string` | The email address of the user to add to the waitlist. |

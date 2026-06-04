@@ -148,7 +148,7 @@ export const caES: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Mètodes de pagament',
-    popular: 'Popular',
+    highlightedPlanBadge: 'Popular',
     pricingTable: {
       billingCycle: 'Cicle de facturació',
       included: 'Inclòs',
@@ -184,6 +184,49 @@ export const caES: LocalizationResource = {
     viewFeatures: 'Veure funcions',
     viewPayment: 'Veure pagament',
     year: 'Any',
+  },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: "Contacta amb l'administrador de la teva organització per ampliar els teus permisos.",
+      title: "No tens permís per gestionar l'inici de sessió únic (SSO)",
+    },
+    navbar: {
+      title: "Configura l'inici de sessió únic (SSO)",
+    },
+    selectProviderStep: {
+      title: 'Seleccioneu un proveïdor',
+      subtitle: 'Seleccioneu el proveïdor per al qual configurareu SSO.',
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Proveïdor SAML personalitzat',
+      },
+      warning: 'Un cop seleccionat un proveïdor no podreu canviar-lo fins que la configuració hagi finalitzat',
+    },
+    verifyEmailDomainStep: {
+      title: 'Verifica el correu electrònic',
+      subtitle: "Verifica l'adreça de correu electrònic on vols habilitar la connexió empresarial.",
+      addEmailAddress: {
+        formTitle: 'Necessitem el teu correu',
+        formSubtitle: 'Per començar necessitem la teva adreça de correu electrònic',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'Adreça de correu electrònic',
+      },
+      emailCode: {
+        formTitle: "Verifica l'adreça de correu electrònic",
+        formSubtitle: 'Introdueix el codi de verificació enviat a {{identifier}}',
+        resendButton: 'No has rebut el codi? Reenvia',
+        verified: {
+          title: 'Hem rebut el teu correu',
+          subtitle: 'Has verificat la teva adreça de correu electrònic amb el següent correu',
+          inputLabel: 'Adreça de correu electrònic verificada',
+        },
+      },
+      domainTaken: {
+        title: 'Aquest domini ({{domain}}) ja té una connexió SSO',
+        subtitle: "Contacta amb l'administrador de l'aplicació per obtenir accés a través de la connexió existent.",
+      },
+    },
   },
   createOrganization: {
     formButtonSubmit: 'Crea organització',

@@ -1,7 +1,7 @@
 import type { BillingPaymentMethodResource, RemoveFunctions } from '@clerk/shared/types';
 
 import { Badge, descriptors, Flex, Icon, localizationKeys, Text } from '../../customizables';
-import { CreditCard, GenericPayment } from '../../icons';
+import { Archive, CreditCard } from '../../icons';
 
 export const PaymentMethodRow = ({
   paymentMethod,
@@ -16,7 +16,7 @@ export const PaymentMethodRow = ({
       elementDescriptor={descriptors.paymentMethodRow}
     >
       <Icon
-        icon={paymentMethod.paymentType === 'card' ? CreditCard : GenericPayment}
+        icon={paymentMethod.paymentType === 'card' ? CreditCard : Archive}
         sx={t => ({ alignSelf: 'center', color: t.colors.$colorMutedForeground })}
         elementDescriptor={descriptors.paymentMethodRowIcon}
       />

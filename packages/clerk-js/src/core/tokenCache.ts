@@ -5,6 +5,7 @@ import { TokenId } from '@/utils/tokenId';
 
 import { POLLER_INTERVAL_IN_MS } from './auth/SessionCookiePoller';
 import { Token } from './resources/internal';
+import { pickFreshestJwt } from './tokenFreshness';
 
 /**
  * Identifies a cached token entry by tokenId and optional audience.
@@ -288,11 +289,10 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
       const result = get({ tokenId: data.tokenId });
       if (result) {
         const existingToken = await result.entry.tokenResolver;
-        const existingIat = existingToken.jwt?.claims?.iat;
-        if (existingIat && existingIat >= iat) {
+        if (pickFreshestJwt(existingToken, token) === existingToken) {
           debugLogger.debug(
-            'Ignoring older token broadcast',
-            { existingIat, incomingIat: iat, tabId, tokenId: data.tokenId, traceId: data.traceId },
+            'Ignoring staler token broadcast',
+            { tokenId: data.tokenId, traceId: data.traceId },
             'tokenCache',
           );
           return;
@@ -379,7 +379,9 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
     entry.tokenResolver
       .then(newToken => {
         // If this entry was overwritten by a newer set() call while our promise
-        // was pending, bail out to avoid installing orphaned timers.
+        // was pending, bail out to avoid installing orphaned timers. Monotonic
+        // replacement is enforced at the read sites (cookie + broadcast + Session)
+        // where the user-visible state lives.
         if (cache.get(key) !== value) {
           return;
         }

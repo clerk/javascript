@@ -98,6 +98,7 @@ export type FlowMetadata = {
     | 'planDetails'
     | 'pricingTable'
     | 'apiKeys'
+    | 'configureSSO'
     | 'oauthConsent'
     | 'subscriptionDetails'
     | 'tasks'
@@ -133,6 +134,13 @@ export type FlowMetadata = {
     | 'enterpriseConnections'
     | 'organizationCreationDisabled'
     | 'methodSelectionMFA'
+    | 'provideEmail'
+    | 'selectProvider'
+    | 'verifyDomain'
+    | 'configureCreateApp'
+    | 'configureMapAttributes'
+    | 'testSso'
+    | 'ssoConfirmation'
     | 'protectCheck';
 };
 

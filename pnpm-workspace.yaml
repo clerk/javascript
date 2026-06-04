@@ -12,6 +12,7 @@ catalogs:
     react-dom: 18.3.1
   repo:
     '@swc/helpers': 0.5.21
+    '@tanstack/query-core': ^5.100.6
     core-js: 3.47.0
     rolldown: 1.0.0-beta.47
     tsdown: 0.15.7
@@ -39,13 +40,12 @@ minimumReleaseAgeExclude:
   - '@clerk/*'
   - 'pkglab'
   - 'pkglab-*'
-  # CVE-2026-23869: React Server Components DoS
-  - 'next@15.5.15'
-  - '@next/*'
   # Renovate security update: @modelcontextprotocol/sdk@1.26.0
   - '@modelcontextprotocol/sdk@1.26.0'
   # Renovate security update: esbuild@0.25.0
   - esbuild@0.25.0
+  # Renovate security update: astro@6.1.6
+  - astro@6.1.6
 
 trustPolicy: no-downgrade
 trustPolicyExclude:

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/react",
-  "version": "6.4.5",
+  "version": "6.7.3",
   "description": "Clerk React library",
   "keywords": [
     "clerk",
@@ -89,7 +89,6 @@
   ],
   "scripts": {
     "build": "tsup",
-    "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:pub": "pnpm dev --env.publish",

@@ -66,6 +66,9 @@ export const ObjectType = {
   TotalCount: 'total_count',
   TestingToken: 'testing_token',
   Role: 'role',
+  RoleSet: 'role_set',
+  RoleSetItem: 'role_set_item',
+  RoleSetMigration: 'role_set_migration',
   Permission: 'permission',
   BillingPayer: 'commerce_payer',
   BillingPaymentAttempt: 'commerce_payment_attempt',
@@ -377,6 +380,53 @@ export interface OrganizationJSON extends ClerkResourceJSON {
   created_by?: string;
   created_at: number;
   updated_at: number;
+  last_active_at?: number;
+  missing_member_with_elevated_permissions?: boolean;
+  role_set_key?: string | null;
+}
+
+export interface RoleSetItemJSON {
+  object: typeof ObjectType.RoleSetItem;
+  id: string;
+  name: string;
+  key: string;
+  description: string | null;
+  members_count?: number | null;
+  has_members?: boolean | null;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface RoleSetMigrationJSON {
+  object: typeof ObjectType.RoleSetMigration;
+  id: string;
+  organization_id: string | null;
+  instance_id: string;
+  source_role_set_id: string;
+  dest_role_set_id: string | null;
+  trigger_type: string;
+  status: string;
+  migrated_members: number;
+  mappings: Record<string, string> | null;
+  started_at?: number;
+  completed_at?: number;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface RoleSetJSON {
+  object: typeof ObjectType.RoleSet;
+  id: string;
+  name: string;
+  key: string;
+  description: string | null;
+  roles: RoleSetItemJSON[];
+  default_role: RoleSetItemJSON | null;
+  creator_role: RoleSetItemJSON | null;
+  type: 'initial' | 'custom';
+  role_set_migration: RoleSetMigrationJSON | null;
+  created_at: number;
+  updated_at: number;
 }
 
 export interface OrganizationDomainJSON extends ClerkResourceJSON {
@@ -549,6 +599,10 @@ export interface SignInTokenJSON extends ClerkResourceJSON {
 export interface AgentTaskJSON extends ClerkResourceJSON {
   object: typeof ObjectType.AgentTask;
   agent_id: string;
+  agent_task_id: string;
+  /**
+   * @deprecated Use `agent_task_id` instead.
+   */
   task_id: string;
   url: string;
 }

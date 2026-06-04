@@ -1,4 +1,5 @@
 // @ts-check - Enable TypeScript checks for safer MDX post-processing and link rewriting
+import { Converter } from 'typedoc';
 import { MarkdownPageEvent } from 'typedoc-plugin-markdown';
 
 /**
@@ -36,6 +37,8 @@ const FILES_WITHOUT_HEADINGS = [
   'payment-element-props.mdx',
   'use-organization-creation-defaults-return.mdx',
   'use-organization-creation-defaults-params.mdx',
+  'use-o-auth-consent-params.mdx',
+  'use-o-auth-consent-return.mdx',
 ];
 
 /**
@@ -60,12 +63,16 @@ const LINK_REPLACEMENTS = [
   ['user-resource', '/docs/reference/objects/user'],
   ['session-status-claim', '/docs/reference/types/session-status'],
   ['user-organization-invitation-resource', '/docs/reference/types/user-organization-invitation'],
+  ['organization-custom-role-key', '/docs/reference/types/organization-custom-role-key'],
   ['organization-membership-resource', '/docs/reference/types/organization-membership'],
   ['organization-suggestion-resource', '/docs/reference/types/organization-suggestion'],
   ['organization-resource', '/docs/reference/objects/organization'],
   ['organization-domain-resource', '/docs/reference/types/organization-domain-resource'],
   ['organization-invitation-resource', '/docs/reference/types/organization-invitation'],
   ['organization-membership-request-resource', '/docs/reference/types/organization-membership-request'],
+  ['o-auth-consent-info', '/docs/reference/types/oauth-consent-info'],
+  ['o-auth-consent-scope', '/docs/reference/types/oauth-consent-scope'],
+  ['o-auth-strategy', '/docs/reference/types/sso#o-auth-strategy'],
   ['session', '/docs/reference/backend/types/backend-session'],
   ['session-activity', '/docs/reference/backend/types/backend-session-activity'],
   ['organization', '/docs/reference/backend/types/backend-organization'],
@@ -74,6 +81,14 @@ const LINK_REPLACEMENTS = [
   ['identification-link', '/docs/reference/backend/types/backend-identification-link'],
   ['verification', '/docs/reference/backend/types/backend-verification'],
   ['email-address', '/docs/reference/backend/types/backend-email-address'],
+  ['enterprise-account', '/docs/reference/backend/types/backend-enterprise-account'],
+  ['enterprise-account-connection', '/docs/reference/backend/types/backend-enterprise-account-connection'],
+  ['enterprise-connection', '/docs/reference/backend/types/backend-enterprise-connection'],
+  ['enterprise-connection-oauth-config', '/docs/reference/backend/types/backend-enterprise-connection-oauth-config'],
+  [
+    'enterprise-connection-saml-connection',
+    '/docs/reference/backend/types/backend-enterprise-connection-saml-connection',
+  ],
   ['external-account', '/docs/reference/backend/types/backend-external-account'],
   ['phone-number', '/docs/reference/backend/types/backend-phone-number'],
   ['saml-account', '/docs/reference/backend/types/backend-saml-account'],
@@ -85,20 +100,34 @@ const LINK_REPLACEMENTS = [
   ['billing-payment-method-resource', '/docs/reference/types/billing-payment-method-resource'],
   ['billing-payer-resource', '/docs/reference/types/billing-payer-resource'],
   ['billing-plan-resource', '/docs/reference/types/billing-plan-resource'],
+  ['billing-plan-unit-price', '/docs/reference/types/billing-plan-unit-price'],
+  ['billing-plan-unit-price-tier', '/docs/reference/types/billing-plan-unit-price-tier'],
   ['billing-checkout-totals', '/docs/reference/types/billing-checkout-totals'],
   ['billing-checkout-resource', '/docs/reference/types/billing-checkout-resource'],
   ['billing-money-amount', '/docs/reference/types/billing-money-amount'],
+  ['billing-per-unit-total', '/docs/reference/types/billing-per-unit-total'],
+  ['billing-per-unit-total-tier', '/docs/reference/types/billing-per-unit-total-tier'],
   ['billing-subscription-item-resource', '/docs/reference/types/billing-subscription-item-resource'],
+  ['billing-subscription-item-seats', '/docs/reference/types/billing-subscription-item-seats'],
   ['feature-resource', '/docs/reference/types/feature-resource'],
   ['billing-statement-group', '/docs/reference/types/billing-statement-group'],
   ['billing-statement-resource', '/docs/reference/types/billing-statement-resource'],
   ['billing-subscription-resource', '/docs/reference/types/billing-subscription-resource'],
   ['clerk-api-response-error', '/docs/reference/types/clerk-api-response-error'],
+  ['clerk-api-error', '/docs/reference/types/clerk-api-error'],
   ['billing-statement-totals', '/docs/reference/types/billing-statement-totals'],
   ['billing-payment-resource', '/docs/reference/types/billing-payment-resource'],
   ['deleted-object-resource', '/docs/reference/types/deleted-object-resource'],
   ['checkout-flow-resource', '/docs/reference/hooks/use-checkout#checkout-flow-resource'],
   ['organization-creation-defaults-resource', '#organization-creation-defaults-resource'],
+  ['billing-namespace', '/docs/reference/objects/billing'],
+  ['api-keys-namespace', '/docs/reference/objects/api-keys'],
+  ['client-resource', '/docs/reference/objects/client'],
+  ['redirect-options', '/docs/reference/types/redirect-options'],
+  ['handle-o-auth-callback-params', '/docs/reference/types/handle-o-auth-callback-params'],
+  ['session-task', '/docs/reference/types/session-task'],
+  ['public-user-data', '/docs/reference/types/public-user-data'],
+  ['session-status', '/docs/reference/types/session-status'],
 ];
 
 /**
@@ -117,106 +146,208 @@ const LINK_REPLACEMENTS = [
 function getRelativeLinkReplacements() {
   return LINK_REPLACEMENTS.map(([fileName, newPath]) => {
     return {
-      // Match both path and optional anchor
-      pattern: new RegExp(`\\((?:(?:\\.{1,2}\\/)+[^()]*?|)${fileName}\\.mdx(#[^)]+)?\\)`, 'g'),
+      // Match both flat links and nested object-doc links
+      // Also matches optional anchors (#)
+      pattern: new RegExp(`\\((?:(?:\\.{1,2}\\/)+[^()]*?|)(?:${fileName}\\/)?${fileName}\\.mdx(#[^)]+)?\\)`, 'g'),
       // Preserve the anchor in replacement if it exists
       replace: (/** @type {string} */ _match, anchor = '') => `(${newPath}${anchor})`,
     };
   });
 }
 
+/**
+ * First pass of `MarkdownPageEvent.END`: rewrite `(foo.mdx)` / relative paths to `/docs/...` (see {@link LINK_REPLACEMENTS}).
+ * Used by `extract-methods.mjs`, which does not go through the renderer hook.
+ *
+ * @param {string} contents
+ */
+export function applyRelativeLinkReplacements(contents) {
+  if (!contents) {
+    return contents;
+  }
+  let out = contents;
+  for (const { pattern, replace } of getRelativeLinkReplacements()) {
+    // @ts-ignore — string | function
+    out = out.replace(pattern, replace);
+  }
+  return out;
+}
+
 function getCatchAllReplacements() {
   return [
     {
-      pattern: /(?<![\[\w`])`Appearance`\\<`Theme`\\>/g,
-      replace: '[`Appearance<Theme>`](/docs/guides/customizing-clerk/appearance-prop/overview)',
+      pattern: /(?<![\[\w`#])`?ClerkAPIResponseError`?(?![\]\w`])/g,
+      replace: '[ClerkAPIResponseError](/docs/reference/types/clerk-api-response-error)',
     },
     {
-      pattern: /\(CreateOrganizationParams\)/g,
+      pattern: /(?<![\[\w`#])`?APIKeysNamespace`?(?![\]\w`])/g,
+      replace: '[APIKeys](/docs/reference/objects/api-keys)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`Appearance`\\<`Theme`\\>/g,
+      replace: '[Appearance<Theme>](/docs/guides/customizing-clerk/appearance-prop/overview)',
+    },
+    {
+      pattern: /(?<![#])\(CreateOrganizationParams\)/g,
       replace: '([CreateOrganizationParams](#create-organization-params))',
     },
     {
-      pattern: /`LoadedClerk`/g,
+      pattern: /(?<![\[\w`#])`?EmailAddressResource`?(?![\]\w`])/g,
+      replace: '[EmailAddressResource](/docs/reference/types/email-address)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?EnterpriseAccountResource`?(?![\]\w`])/g,
+      replace: '[EnterpriseAccountResource](/docs/reference/types/enterprise-account)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?ExternalAccountResource`?(?![\]\w`])/g,
+      replace: '[ExternalAccountResource](/docs/reference/types/external-account)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?LoadedClerk`?(?![\]\w`])/g,
       replace: '[Clerk](/docs/reference/objects/clerk)',
     },
     {
-      pattern: /(?<![\[\w`])`?LocalizationResource`?(?![\]\w`])/g,
-      replace: '[`LocalizationResource`](/docs/guides/customizing-clerk/localization)',
+      pattern: /(?<![\[\w`#])`?LocalizationResource`?(?![\]\w`])/g,
+      replace: '[LocalizationResource](/docs/guides/customizing-clerk/localization)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?PasskeyResource`?(?![\]\w`])/g,
+      replace: '[PasskeyResource](/docs/reference/types/passkey-resource)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?PhoneNumberResource`?(?![\]\w`])/g,
+      replace: '[PhoneNumberResource](/docs/reference/types/phone-number)',
     },
     {
       // SessionResource appears in plain text, with an array next to it, with backticks, etc.
       // e.g. `SessionResource[]`
-      pattern: /(?<![`[\]])\bSessionResource(\[\])?\b(?![\]\)`])/g,
-      replace: '[`SessionResource`](/docs/reference/objects/session)$1',
+      pattern: /(?<![`#[\]])\bSessionResource(\[\])?\b(?![\]\)`])/g,
+      replace: '[SessionResource](/docs/reference/objects/session)$1',
     },
     {
-      pattern: /(?<![\[\w`])`?SessionStatusClaim`?(?![\]\w`])/g,
-      replace: '[`SessionStatusClaim`](/docs/reference/types/session-status)',
+      pattern: /(?<![\[\w`#])`?SessionStatusClaim`?(?![\]\w`])/g,
+      replace: '[SessionStatusClaim](/docs/reference/types/session-status)',
     },
     {
-      pattern: /(?<![`[\]])\bSetActiveParams\b(?![\]\(])/g,
+      pattern: /(?<![\[\w`#])`?SetActiveParams`?(?![\]\w`])/g,
       replace: '[SetActiveParams](/docs/reference/types/set-active-params)',
     },
     {
-      pattern: /(?<![\[\w`])`?SignInResource`?(?![\]\w`])/g,
-      replace: '[`SignInResource`](/docs/reference/objects/sign-in)',
+      pattern: /(?<![\[\w`#])`?SignInResource`?(?![\]\w`])/g,
+      replace: '[SignInResource](/docs/reference/objects/sign-in)',
     },
     {
-      pattern: /(?<![\[\w`])`?((?:SignIn|SignUp)Errors)`?(?![\]\w`])/g,
-      replace: (/** @type {string} */ _match, /** @type {string} */ type) =>
-        `[\`${type}\`](/docs/reference/types/errors)`,
+      pattern: /(?<![\[\w`#])`?((?:SignIn|SignUp)Errors)`?(?![\]\w`])/g,
+      replace: (/** @type {string} */ _match, /** @type {string} */ type) => `[${type}](/docs/reference/types/errors)`,
     },
     {
-      pattern: /(?<![\[\w`])`?SignInFutureResource`?(?![\]\w`])/g,
-      replace: '[`SignInFutureResource`](/docs/reference/objects/sign-in-future)',
+      pattern: /(?<![\[\w`#])`?SignInFirstFactor`?(?![\]\w`])/g,
+      replace: '[SignInFirstFactor](/docs/reference/types/sign-in-first-factor)',
     },
     {
-      pattern: /(?<![\[\w`])`?SignedInSessionResource`?(?![\]\w`])/g,
-      replace: '[`SignedInSessionResource`](/docs/reference/objects/session)',
+      pattern: /(?<![\[\w`#])`?SignInFutureResource`?(?![\]\w`])/g,
+      replace: '[SignInFutureResource](/docs/reference/objects/sign-in-future)',
     },
     {
-      pattern: /(?<![\[\w`])`?SignUpResource`?(?![\]\w`])/g,
-      replace: '[`SignUpResource`](/docs/reference/objects/sign-up)',
+      pattern: /(?<![\[\w`#])`?SignInSecondFactor`?(?![\]\w`])/g,
+      replace: '[SignInSecondFactor](/docs/reference/types/sign-in-second-factor)',
     },
     {
-      pattern: /(?<![\[\w`])`?SignUpFutureResource`?(?![\]\w`])/g,
-      replace: '[`SignUpFutureResource`](/docs/reference/objects/sign-up-future)',
+      pattern: /(?<![\[\w`#])`?SignedInSessionResource`?(?![\]\w`])/g,
+      replace: '[SignedInSessionResource](/docs/reference/objects/session)',
     },
     {
-      pattern: /(?<![\[\w`])`?OrganizationResource`?(?![\]\w`])/g,
-      replace: '[`OrganizationResource`](/docs/reference/objects/organization)',
+      pattern: /(?<![\[\w`#])`?SignInRedirectOptions`?(?![\]\w`])/g,
+      replace: '[SignInRedirectOptions](/docs/reference/types/sign-in-redirect-options)',
     },
     {
-      pattern: /`OrganizationPrivateMetadata`/g,
-      replace: '[`OrganizationPrivateMetadata`](/docs/reference/types/metadata#organization-private-metadata)',
+      pattern: /(?<![\[\w`#])`?SignUpRedirectOptions`?(?![\]\w`])/g,
+      replace: '[SignUpRedirectOptions](/docs/reference/types/sign-up-redirect-options)',
     },
     {
-      pattern: /OrganizationPublicMetadata/g,
+      pattern: /(?<![\[\w`#])`?SignUpResource`?(?![\]\w`])/g,
+      replace: '[SignUpResource](/docs/reference/objects/sign-up)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?SignUpVerificationResource`?(?![\]\w`])/g,
+      replace: '[SignUpVerificationResource](/docs/reference/types/sign-up-verification-resource)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?SignUpUnsafeMetadata`?(?![\]\w`])/g,
+      replace: '[SignUpUnsafeMetadata](/docs/reference/types/metadata#sign-up-unsafe-metadata)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?SignUpFutureResource`?(?![\]\w`])/g,
+      replace: '[SignUpFutureResource](/docs/reference/objects/sign-up-future)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?TasksRedirectOptions`?(?![\]\w`])/g,
+      replace: '[TasksRedirectOptions](/docs/reference/types/redirect-options)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?OAuthStrategy`?(?![\]\w`])/g,
+      replace: '[OAuthStrategy](/docs/reference/types/sso#o-auth-strategy)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?OrganizationResource`?(?![\]\w`])/g,
+      replace: '[OrganizationResource](/docs/reference/objects/organization)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?OrganizationPrivateMetadata`?(?![\]\w`])/g,
+      replace: '[OrganizationPrivateMetadata](/docs/reference/types/metadata#organization-private-metadata)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?OrganizationPublicMetadata`?(?![\]\w`])/g,
       replace: '[OrganizationPublicMetadata](/docs/reference/types/metadata#organization-public-metadata)',
     },
     {
-      pattern: /`OrganizationInvitationPrivateMetadata`/g,
+      pattern: /(?<![\[\w`#])`?OrganizationInvitationPrivateMetadata`?(?![\]\w`])/g,
       replace:
-        '[`OrganizationInvitationPrivateMetadata`](/docs/reference/types/metadata#organization-invitation-private-metadata)',
+        '[OrganizationInvitationPrivateMetadata](/docs/reference/types/metadata#organization-invitation-private-metadata)',
     },
     {
-      pattern: /`OrganizationInvitationPublicMetadata`/g,
+      pattern: /(?<![\[\w`#])`?OrganizationInvitationPublicMetadata`?(?![\]\w`])/g,
       replace:
-        '[`OrganizationInvitationPublicMetadata`](/docs/reference/types/metadata#organization-invitation-public-metadata)',
+        '[OrganizationInvitationPublicMetadata](/docs/reference/types/metadata#organization-invitation-public-metadata)',
     },
     {
-      pattern: /`OrganizationMembershipPrivateMetadata`/g,
+      pattern: /(?<![\[\w`#])`?OrganizationMembershipPrivateMetadata`?(?![\]\w`])/g,
       replace:
-        '[`OrganizationMembershipPrivateMetadata`](/docs/reference/types/metadata#organization-membership-private-metadata)',
+        '[OrganizationMembershipPrivateMetadata](/docs/reference/types/metadata#organization-membership-private-metadata)',
     },
     {
-      pattern: /`OrganizationMembershipPublicMetadata`/g,
+      pattern: /(?<![\[\w`#])`?OrganizationMembershipPublicMetadata`?(?![\]\w`])/g,
       replace:
-        '[`OrganizationMembershipPublicMetadata`](/docs/reference/types/metadata#organization-membership-public-metadata)',
+        '[OrganizationMembershipPublicMetadata](/docs/reference/types/metadata#organization-membership-public-metadata)',
     },
     {
-      pattern: /(?<![\[\w`])`?UserResource`?(?![\]\w`])/g,
-      replace: '[`UserResource`](/docs/reference/objects/user)',
+      pattern: /(?<![\[\w`#])`?UserPrivateMetadata`?(?![\]\w`])/g,
+      replace: '[UserPrivateMetadata](/docs/reference/types/metadata#user-private-metadata)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?UserPublicMetadata`?(?![\]\w`])/g,
+      replace: '[UserPublicMetadata](/docs/reference/types/metadata#user-public-metadata)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?UserUnsafeMetadata`?(?![\]\w`])/g,
+      replace: '[UserUnsafeMetadata](/docs/reference/types/metadata#user-unsafe-metadata)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?UserResource`?(?![\]\w`])/g,
+      replace: '[UserResource](/docs/reference/objects/user)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?LastAuthenticationStrategy`?(?![\]\w`])/g,
+      replace: '[LastAuthenticationStrategy](/docs/reference/types/last-authentication-strategy)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?Web3WalletResource`?(?![\]\w`])/g,
+      replace: '[Web3WalletResource](/docs/reference/types/web3-wallet)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?VerificationResource`?(?![\]\w`])/g,
+      replace: '[VerificationResource](/docs/reference/types/verification-resource)',
     },
     {
       /**
@@ -251,27 +382,112 @@ function getCatchAllReplacements() {
   ];
 }
 
+/** CommonMark ATX heading: optional indent, 1–6 `#`, then space or end — entire line is left unchanged. */
+const ATX_HEADING_LINE = /^\s{0,3}#{1,6}(?:\s|$)/;
+
+/** Private-use placeholders — must not appear in real MDX and must not match catch-all patterns. */
+const PIPE_CODE_PH = /\uE000(\d+)\uE001/g;
+
+/**
+ * Inline code that contains a pipe (e.g. `` `a \\| b` `` or `` `a | b` ``) cannot receive link replacements without breaking MDX. Replace those whole spans with placeholders, run catch-alls, then restore.
+ *
+ * @param {string} line
+ * @returns {{ text: string, placeholders: string[] }}
+ */
+function protectPipeDelimitedInlineCodeSpans(line) {
+  /** @type {string[]} */
+  const placeholders = [];
+  const text = line.replace(/`([^`\n]*)`/g, (full, inner) => {
+    if (!inner.includes('|')) {
+      return full;
+    }
+    const id = placeholders.length;
+    placeholders.push(full);
+    return `\uE000${id}\uE001`;
+  });
+  return { text, placeholders };
+}
+
+/**
+ * @param {string} text
+ * @param {string[]} placeholders
+ */
+function restoreProtectedInlineCodeSpans(text, placeholders) {
+  return text.replace(PIPE_CODE_PH, (_, /** @type {string} */ i) => placeholders[Number(i)] ?? '');
+}
+
+/**
+ * Remove the Properties section (heading + table) from reference object pages (e.g. `shared/clerk/clerk.mdx`); the table body (no heading) is copied into `shared/<object>/properties.mdx` by `extract-methods.mjs`.
+ *
+ * @param {string} contents
+ */
+export function stripReferenceObjectPropertiesSection(contents) {
+  if (!contents) {
+    return contents;
+  }
+  const stripped = contents.replace(/\r\n/g, '\n').replace(/\n## Properties\n+[\s\S]*$/, '');
+  return stripped.trimEnd() + '\n';
+}
+
+/**
+ * Second pass of `MarkdownPageEvent.END` (after {@link applyRelativeLinkReplacements}).
+ * Used by `extract-methods.mjs`, which writes MDX outside TypeDoc and never hits that hook.
+ *
+ * Skips ATX heading lines (`#` … `######`) so titles like `#### SetActiveParams` are never linkified.
+ * (A lone `(?<!#)` in regex is not enough: heading text is separated from `###` by spaces.)
+ *
+ * Skips inline code spans that contain `|` (union / enum style like `` `v1 \\| v2` ``) so link rules do
+ * not run inside them — otherwise MDX breaks.
+ *
+ * @param {string} contents
+ */
+export function applyCatchAllMdReplacements(contents) {
+  if (!contents) {
+    return contents;
+  }
+  return contents
+    .split('\n')
+    .map(
+      /** @param {string} line */ line => {
+        if (ATX_HEADING_LINE.test(line.replace(/\r$/, ''))) {
+          return line;
+        }
+        const { text: withPh, placeholders } = protectPipeDelimitedInlineCodeSpans(line);
+        let out = withPh;
+        for (const { pattern, replace } of getCatchAllReplacements()) {
+          // @ts-ignore — string | function
+          out = out.replace(pattern, replace);
+        }
+        return restoreProtectedInlineCodeSpans(out, placeholders);
+      },
+    )
+    .join('\n');
+}
+
 /**
  * @param {import('typedoc-plugin-markdown').MarkdownApplication} app
  */
 export function load(app) {
+  /**
+   * `@generateWithEmptyComment` exists only to make "intentionally undocumented" explicit at the source.
+   * Strip it from the model post-resolve so the markdown plugin sees a comment indistinguishable from `/** *​/` —
+   * otherwise the table renderer treats the modifier as content and drops the `-` placeholder in the description column.
+   */
+  app.converter.on(Converter.EVENT_RESOLVE_END, context => {
+    for (const reflection of Object.values(context.project.reflections)) {
+      reflection.comment?.modifierTags?.delete('@generateWithEmptyComment');
+    }
+  });
+
   app.renderer.on(MarkdownPageEvent.END, output => {
     const fileName = output.url.split('/').pop();
-    const linkReplacements = getRelativeLinkReplacements();
 
-    for (const { pattern, replace } of linkReplacements) {
-      if (output.contents) {
-        output.contents = output.contents.replace(pattern, replace);
-      }
+    if (output.contents) {
+      output.contents = applyRelativeLinkReplacements(output.contents);
     }
 
-    const catchAllReplacements = getCatchAllReplacements();
-
-    for (const { pattern, replace } of catchAllReplacements) {
-      if (output.contents) {
-        // @ts-ignore - Mixture of string and function replacements
-        output.contents = output.contents.replace(pattern, replace);
-      }
+    if (output.contents) {
+      output.contents = applyCatchAllMdReplacements(output.contents);
     }
 
     if (fileName) {
