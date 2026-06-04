@@ -718,7 +718,7 @@ export const viVN: LocalizationResource = {
       title: 'Kiểm tra email của bạn',
     },
     enterpriseConnections: {
-      subtitle: 'Chọn tài khoản doanh nghiệp mà bạn muốn tiếp tục.',
+      subtitle: 'Chọn tài khoản doanh nghiệp bạn muốn dùng để tiếp tục.',
       title: 'Chọn tài khoản doanh nghiệp của bạn',
     },
     forgotPassword: {
@@ -855,7 +855,7 @@ export const viVN: LocalizationResource = {
       },
     },
     enterpriseConnections: {
-      subtitle: 'Chọn tài khoản doanh nghiệp mà bạn muốn tiếp tục.',
+      subtitle: 'Chọn tài khoản doanh nghiệp bạn muốn dùng để tiếp tục.',
       title: 'Chọn tài khoản doanh nghiệp của bạn',
     },
     legalConsent: {
@@ -947,7 +947,7 @@ export const viVN: LocalizationResource = {
     formButtonPrimary: 'Đặt lại mật khẩu',
     signOut: {
       actionLink: 'Đăng xuất',
-      actionText: 'Đã đăng nhập với tên {{identifier}}',
+      actionText: 'Đã đăng nhập với tư cách {{identifier}}',
     },
     subtitle: 'Tài khoản của bạn yêu cầu mật khẩu mới trước khi bạn có thể tiếp tục',
     title: 'Đặt lại mật khẩu của bạn',
@@ -956,7 +956,7 @@ export const viVN: LocalizationResource = {
     badge: 'Thiết lập xác minh hai bước',
     signOut: {
       actionLink: 'Đăng xuất',
-      actionText: 'Đã đăng nhập với tên {{identifier}}',
+      actionText: 'Đã đăng nhập với tư cách {{identifier}}',
     },
     smsCode: {
       addPhone: {
@@ -994,7 +994,7 @@ export const viVN: LocalizationResource = {
     },
     totpCode: {
       addAuthenticatorApp: {
-        buttonAbleToScan__nonPrimary: 'Quét mã QR thay thế',
+        buttonAbleToScan__nonPrimary: 'Thay vào đó, quét mã QR',
         buttonUnableToScan__nonPrimary: 'Không thể quét mã QR?',
         formButtonPrimary: 'Tiếp tục',
         formButtonReset: 'Hủy',
