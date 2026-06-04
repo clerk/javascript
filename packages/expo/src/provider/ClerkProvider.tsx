@@ -195,7 +195,7 @@ function useNativeSessionBootstrap({
   isSyncingNativeClientToJsRef: MutableRefObject<boolean>;
   publishableKey: string;
   tokenCache: TokenCache | undefined;
-  clerkInstance: SyncableClerkInstance | null;
+  clerkInstance: SyncableClerkInstance | null | undefined;
 }) {
   const initStartedRef = useRef(false);
   const sessionSyncedRef = useRef(false);
