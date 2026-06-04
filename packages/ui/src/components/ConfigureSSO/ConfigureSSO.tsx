@@ -1,0 +1,236 @@
+import {
+  __internal_useOrganizationEnterpriseConnections,
+  __internal_useOrganizationEnterpriseConnectionTestRuns,
+  useSession,
+} from '@clerk/shared/react';
+import type { ConfigureSSOProps, EnterpriseConnectionResource } from '@clerk/shared/types';
+import React from 'react';
+
+import { useProtect } from '@/common';
+import { withCoreUserGuard } from '@/contexts';
+import { Col, Flex, Flow, Heading, Icon, localizationKeys, Text } from '@/customizables';
+import { useCardState, withCardStateProvider } from '@/elements/contexts';
+import { ProfileCard } from '@/elements/ProfileCard';
+import { ExclamationTriangle } from '@/icons';
+import { Route, Switch } from '@/router';
+
+import { ConfigureSSOProvider, useConfigureSSO } from './ConfigureSSOContext';
+import { ConfigureSSOHeader } from './ConfigureSSOHeader';
+import { ConfigureSSONavbar } from './ConfigureSSONavbar';
+import { ConfigureSSOSkeleton } from './ConfigureSSOSkeleton';
+import { ProfileCardFooter, ProfileCardHeader } from './elements/ProfileCard';
+import { Step } from './elements/Step';
+import { useWizard, Wizard } from './elements/Wizard';
+import { ConfigureStep, ConfirmationStep, SelectProviderStep, TestConfigurationStep, VerifyDomainStep } from './steps';
+
+const ConfigureSSOInternal = () => {
+  return (
+    <Flow.Root flow='configureSSO'>
+      <Switch>
+        <Route>
+          <AuthenticatedContent />
+        </Route>
+      </Switch>
+    </Flow.Root>
+  );
+};
+
+const AuthenticatedContent = withCoreUserGuard(() => {
+  const contentRef = React.useRef<HTMLDivElement>(null);
+
+  return (
+    <ProfileCard.Root
+      sx={t => ({ display: 'grid', gridTemplateColumns: '1fr 3fr', height: t.sizes.$176, overflow: 'hidden' })}
+    >
+      <ConfigureSSONavbar contentRef={contentRef}>
+        <ConfigureSSOContent contentRef={contentRef} />
+      </ConfigureSSONavbar>
+    </ProfileCard.Root>
+  );
+});
+
+export const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObject<HTMLDivElement> }) => {
+  const {
+    data: enterpriseConnections,
+    isLoading: isLoadingEnterpriseConnections,
+    createEnterpriseConnection,
+    updateEnterpriseConnection,
+    deleteEnterpriseConnection,
+  } = __internal_useOrganizationEnterpriseConnections({ enabled: true });
+  // Currently the self-serve SSO UI flow only supports one enterprise connection per organization
+  const enterpriseConnection = enterpriseConnections?.[0];
+
+  const { hasSuccessfulTestRun, isLoading: isLoadingTestRuns } = useHasSuccessfulTestRun(enterpriseConnection);
+
+  const isLoading = isLoadingEnterpriseConnections || isLoadingTestRuns;
+  if (isLoading) {
+    return <ConfigureSSOSkeleton />;
+  }
+
+  return (
+    <ConfigureSSOProtect>
+      <ConfigureSSOProvider
+        hasSuccessfulTestRun={hasSuccessfulTestRun}
+        enterpriseConnection={enterpriseConnection}
+        contentRef={contentRef}
+        createEnterpriseConnection={createEnterpriseConnection}
+        updateEnterpriseConnection={updateEnterpriseConnection}
+        deleteEnterpriseConnection={deleteEnterpriseConnection}
+      >
+        <ConfigureSSOSteps />
+      </ConfigureSSOProvider>
+    </ConfigureSSOProtect>
+  );
+};
+
+const ConfigureSSOSteps = () => {
+  const { initialStepId, enterpriseConnection } = useConfigureSSO();
+
+  return (
+    <Wizard initialStepId={initialStepId}>
+      <ResetCardErrorOnStepChange />
+      <ConfigureSSOHeader />
+
+      {/*
+       * `select-provider` is only a wizard step while there's no enterprise
+       * connection yet — creating one unregisters this step, which:
+       *   1. Hides it from the breadcrumb (no need for a manual filter), and
+       *   2. Prevents `goPrev` from any later step (e.g. configure's first
+       *      substep) from ever bubbling back into provider selection.
+       */}
+      {!enterpriseConnection && (
+        <Wizard.Step id='select-provider'>
+          <SelectProviderStep />
+        </Wizard.Step>
+      )}
+
+      <Wizard.Step
+        id='verify-domain'
+        label='Verify domain'
+      >
+        <VerifyDomainStep />
+      </Wizard.Step>
+
+      <Wizard.Step
+        id='configure'
+        label='Configure'
+      >
+        <ConfigureStep />
+      </Wizard.Step>
+
+      <Wizard.Step
+        id='test'
+        label='Test'
+      >
+        <TestConfigurationStep />
+      </Wizard.Step>
+
+      <Wizard.Step
+        id='confirmation'
+        label='Confirmation'
+      >
+        <ConfirmationStep />
+      </Wizard.Step>
+    </Wizard>
+  );
+};
+
+const ConfigureSSOProtect = ({ children }: { children: React.ReactNode }) => {
+  const { session } = useSession();
+  const isPersonalWorkspace = !session?.lastActiveOrganizationId;
+  const canManageEnterpriseConnections = useProtect(
+    has => isPersonalWorkspace || has({ permission: 'org:sys_entconns:manage' }),
+  );
+
+  if (!canManageEnterpriseConnections) {
+    return <MissingManageEnterpriseConnectionsPermission />;
+  }
+
+  return children;
+};
+
+const MissingManageEnterpriseConnectionsPermission = () => (
+  <>
+    <ProfileCardHeader />
+
+    <Step.Body>
+      <Step.Section
+        sx={{ flex: 1 }}
+        align='center'
+        justify='center'
+      >
+        <Flex
+          align='center'
+          justify='center'
+          sx={t => ({ flex: 1, padding: t.space.$8 })}
+        >
+          <Col
+            align='center'
+            sx={t => ({ gap: t.space.$2, textAlign: 'center', maxWidth: t.sizes.$94 })}
+          >
+            <Icon
+              icon={ExclamationTriangle}
+              sx={t => ({ width: t.sizes.$8, height: t.sizes.$8, color: t.colors.$neutralAlpha600 })}
+            />
+            <Heading
+              localizationKey={localizationKeys('configureSSO.missingManageEnterpriseConnectionsPermission.title')}
+              textVariant='h1'
+              sx={t => ({ fontSize: t.fontSizes.$lg, textWrap: 'balance' })}
+            />
+            <Text
+              as='p'
+              variant='body'
+              colorScheme='secondary'
+              localizationKey={localizationKeys('configureSSO.missingManageEnterpriseConnectionsPermission.subtitle')}
+              sx={{ textWrap: 'balance' }}
+            />
+          </Col>
+        </Flex>
+      </Step.Section>
+    </Step.Body>
+
+    <ProfileCardFooter />
+  </>
+);
+
+/**
+ * Sentinel component rendered inside `<Wizard>`
+ *
+ * Clears any card-level error whenever the active step transitions, so a stale failure from one step
+ * doesn't leak into the next
+ */
+const ResetCardErrorOnStepChange = (): null => {
+  const { currentStep } = useWizard();
+  const card = useCardState();
+  const previousStepIdRef = React.useRef(currentStep?.id);
+
+  React.useEffect(() => {
+    if (previousStepIdRef.current === currentStep?.id) {
+      return;
+    }
+
+    previousStepIdRef.current = currentStep?.id;
+    card.setError(undefined);
+  }, [currentStep?.id, card]);
+
+  return null;
+};
+
+/**
+ * Fetches a single successful test run for the given connection on mount
+ */
+const useHasSuccessfulTestRun = (
+  enterpriseConnection: EnterpriseConnectionResource | undefined,
+): { hasSuccessfulTestRun: boolean; isLoading: boolean } => {
+  const { data: successfulTestRuns, isLoading } = __internal_useOrganizationEnterpriseConnectionTestRuns({
+    enterpriseConnectionId: enterpriseConnection?.id ?? null,
+    params: { initialPage: 1, pageSize: 1, status: ['success'] },
+  });
+
+  return {
+    hasSuccessfulTestRun: (successfulTestRuns?.length ?? 0) > 0,
+    isLoading,
+  };
+};
+
+export const ConfigureSSO: React.ComponentType<ConfigureSSOProps> = withCardStateProvider(ConfigureSSOInternal);

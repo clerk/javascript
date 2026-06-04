@@ -7,14 +7,10 @@ export interface OrganizationDomainVerification {
   expiresAt: Date;
 }
 
-/**
- * @inline
- */
+/** @inline */
 export type OrganizationDomainVerificationStatus = 'unverified' | 'verified';
 
-/**
- * @inline
- */
+/** @inline */
 export type OrganizationEnrollmentMode = 'manual_invitation' | 'automatic_invitation' | 'automatic_suggestion';
 
 /**

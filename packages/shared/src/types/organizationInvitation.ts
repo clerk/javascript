@@ -34,7 +34,5 @@ export interface OrganizationInvitationResource extends ClerkResource {
   revoke: () => Promise<OrganizationInvitationResource>;
 }
 
-/**
- * @inline
- */
+/** @inline */
 export type OrganizationInvitationStatus = 'pending' | 'accepted' | 'revoked' | 'expired';

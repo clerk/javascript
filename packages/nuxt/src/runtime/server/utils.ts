@@ -2,7 +2,8 @@ import type { AuthObject } from '@clerk/backend';
 import { makeAuthObjectSerializable, stripPrivateDataFromObject } from '@clerk/backend/internal';
 import type { InitialState } from '@clerk/shared/types';
 import type { H3Event } from 'h3';
-import { getRequestHeaders, getRequestProtocol } from 'h3';
+
+import { getRequestHeaders, getRequestProtocol } from '#imports';
 
 /**
  * Converts an H3 event into a Fetch Request object.

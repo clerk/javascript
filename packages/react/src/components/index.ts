@@ -1,7 +1,9 @@
 export {
   APIKeys,
+  ConfigureSSO,
   CreateOrganization,
   GoogleOneTap,
+  OAuthConsent,
   OrganizationList,
   OrganizationProfile,
   OrganizationSwitcher,

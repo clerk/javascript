@@ -2,8 +2,10 @@ import { getFullName } from '@clerk/shared/internal/clerk-js/user';
 import type {
   BackupCodeJSON,
   BackupCodeResource,
+  ClerkPaginatedResponse,
   CreateEmailAddressParams,
   CreateExternalAccountParams,
+  CreateOrganizationEnterpriseConnectionParams,
   CreatePhoneNumberParams,
   CreateWeb3WalletParams,
   DeletedObjectJSON,
@@ -12,9 +14,15 @@ import type {
   EnterpriseAccountResource,
   EnterpriseConnectionJSON,
   EnterpriseConnectionResource,
+  EnterpriseConnectionTestRunInitJSON,
+  EnterpriseConnectionTestRunInitResource,
+  EnterpriseConnectionTestRunJSON,
+  EnterpriseConnectionTestRunResource,
+  EnterpriseConnectionTestRunsPaginatedJSON,
   ExternalAccountJSON,
   ExternalAccountResource,
   GetEnterpriseConnectionsParams,
+  GetEnterpriseConnectionTestRunsParams,
   GetOrganizationMemberships,
   GetUserOrganizationInvitationsParams,
   GetUserOrganizationSuggestionsParams,
@@ -26,6 +34,8 @@ import type {
   SetProfileImageParams,
   TOTPJSON,
   TOTPResource,
+  UpdateOrganizationEnterpriseConnectionParams,
+  UpdateUserMetadataParams,
   UpdateUserParams,
   UpdateUserPasswordParams,
   UserJSON,
@@ -35,7 +45,9 @@ import type {
   Web3WalletResource,
 } from '@clerk/shared/types';
 
+import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
 import { unixEpochToDate } from '../../utils/date';
+import { toEnterpriseConnectionBody } from '../../utils/enterpriseConnection';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { eventBus, events } from '../events';
 import { addPaymentMethod, getPaymentMethods, initializePaymentMethod } from '../modules/billing';
@@ -46,6 +58,7 @@ import {
   EmailAddress,
   EnterpriseAccount,
   EnterpriseConnection,
+  EnterpriseConnectionTestRun,
   ExternalAccount,
   Image,
   OrganizationMembership,
@@ -229,6 +242,13 @@ export class User extends BaseResource implements UserResource {
     });
   };
 
+  updateMetadata = (params: UpdateUserMetadataParams): Promise<UserResource> => {
+    return this._basePatch({
+      path: `${this.path()}/metadata`,
+      body: normalizeUnsafeMetadata(params),
+    });
+  };
+
   updatePassword = (params: UpdateUserPasswordParams): Promise<UserResource> => {
     return this._basePost({
       body: params,
@@ -314,6 +334,85 @@ export class User extends BaseResource implements UserResource {
     )?.response as unknown as EnterpriseConnectionJSON[];
 
     return (json || []).map(connection => new EnterpriseConnection(connection));
+  };
+
+  createEnterpriseConnection = async (
+    params: CreateOrganizationEnterpriseConnectionParams,
+  ): Promise<EnterpriseConnectionResource> => {
+    const json = (
+      await BaseResource._fetch<EnterpriseConnectionJSON>({
+        path: `${this.path()}/enterprise_connections`,
+        method: 'POST',
+        body: toEnterpriseConnectionBody(params) as any,
+      })
+    )?.response as unknown as EnterpriseConnectionJSON;
+
+    return new EnterpriseConnection(json);
+  };
+
+  updateEnterpriseConnection = async (
+    enterpriseConnectionId: string,
+    params: UpdateOrganizationEnterpriseConnectionParams,
+  ): Promise<EnterpriseConnectionResource> => {
+    const json = (
+      await BaseResource._fetch<EnterpriseConnectionJSON>({
+        path: `${this.path()}/enterprise_connections/${enterpriseConnectionId}`,
+        method: 'PATCH',
+        body: toEnterpriseConnectionBody(params) as any,
+      })
+    )?.response as unknown as EnterpriseConnectionJSON;
+
+    return new EnterpriseConnection(json);
+  };
+
+  deleteEnterpriseConnection = async (enterpriseConnectionId: string): Promise<DeletedObjectResource> => {
+    const json = (
+      await BaseResource._fetch<DeletedObjectJSON>({
+        path: `${this.path()}/enterprise_connections/${enterpriseConnectionId}`,
+        method: 'DELETE',
+      })
+    )?.response as unknown as DeletedObjectJSON;
+
+    return new DeletedObject(json);
+  };
+
+  createEnterpriseConnectionTestRun = async (
+    enterpriseConnectionId: string,
+  ): Promise<EnterpriseConnectionTestRunInitResource> => {
+    const json = (
+      await BaseResource._fetch({
+        path: `${this.path()}/enterprise_connections/${enterpriseConnectionId}/test_runs`,
+        method: 'POST',
+      })
+    )?.response as unknown as EnterpriseConnectionTestRunInitJSON;
+
+    return { url: json.url };
+  };
+
+  getEnterpriseConnectionTestRuns = async (
+    enterpriseConnectionId: string,
+    params?: GetEnterpriseConnectionTestRunsParams,
+  ): Promise<ClerkPaginatedResponse<EnterpriseConnectionTestRunResource>> => {
+    const { status, ...rest } = params || {};
+    const search = convertPageToOffsetSearchParams(rest);
+    if (status?.length) {
+      for (const s of status) {
+        search.append('status', s);
+      }
+    }
+
+    const res = await BaseResource._fetch({
+      path: `${this.path()}/enterprise_connections/${enterpriseConnectionId}/test_runs`,
+      method: 'GET',
+      search,
+    });
+
+    const payload = res?.response as unknown as EnterpriseConnectionTestRunsPaginatedJSON | undefined;
+
+    return {
+      total_count: payload?.total_count ?? 0,
+      data: (payload?.data ?? []).map((row: EnterpriseConnectionTestRunJSON) => new EnterpriseConnectionTestRun(row)),
+    };
   };
 
   initializePaymentMethod: typeof initializePaymentMethod = params => {

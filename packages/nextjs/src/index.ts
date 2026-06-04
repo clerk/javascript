@@ -23,8 +23,10 @@ export {
  */
 export {
   APIKeys,
+  ConfigureSSO,
   CreateOrganization,
   GoogleOneTap,
+  OAuthConsent,
   OrganizationList,
   OrganizationProfile,
   OrganizationSwitcher,
@@ -52,6 +54,7 @@ export {
   useAuth,
   useClerk,
   useEmailLink,
+  useOAuthConsent,
   useOrganization,
   useOrganizationCreationDefaults,
   useOrganizationList,
