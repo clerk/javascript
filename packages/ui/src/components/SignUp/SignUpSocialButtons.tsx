@@ -55,6 +55,7 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
             },
             legalAccepted: props.legalAccepted,
             navigate,
+            navigateOnSetActive: ctx.navigateOnSetActive,
             oidcPrompt: ctx.oidcPrompt,
             redirectUrl,
             redirectUrlComplete,

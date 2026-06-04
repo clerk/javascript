@@ -1,9 +1,11 @@
 import type {
+  DecorateUrl,
   EnterpriseSSOStrategy,
   ExternalAuthFlow,
   HandleOAuthCallbackParams,
   LoadedClerk,
   OAuthStrategy,
+  SessionResource,
   SignInResource,
   SignUpResource,
 } from '@clerk/shared/types';
@@ -19,6 +21,11 @@ type RunExternalAuthFlowBaseParams = {
   redirectUrl: string;
   redirectUrlComplete: string;
   navigate: RouteContextValue['navigate'];
+  navigateOnSetActive: (opts: {
+    session: SessionResource;
+    redirectUrl: string;
+    decorateUrl: DecorateUrl;
+  }) => Promise<unknown>;
   handleRedirectCallbackParams: HandleOAuthCallbackParams;
   oidcPrompt?: string;
   enterpriseConnectionId?: string;
@@ -61,7 +68,9 @@ async function completeExternalAuthFlow({
   handleRedirectCallbackParams,
   intent,
   navigate,
+  navigateOnSetActive,
   redirectUrl,
+  redirectUrlComplete,
   reload,
   strategy,
 }: {
@@ -71,7 +80,9 @@ async function completeExternalAuthFlow({
   handleRedirectCallbackParams: HandleOAuthCallbackParams;
   intent: 'sign-in' | 'sign-up';
   navigate: RouteContextValue['navigate'];
+  navigateOnSetActive: RunExternalAuthFlowBaseParams['navigateOnSetActive'];
   redirectUrl: string;
+  redirectUrlComplete: string;
   reload: (rotatingTokenNonce: string) => Promise<unknown>;
   strategy: ExternalAuthStrategy;
 }) {
@@ -79,6 +90,22 @@ async function completeExternalAuthFlow({
 
   const callbackUrl = await externalAuth.waitForCallback({ strategy, intent, redirectUrl });
   await reload(getRotatingTokenNonce(callbackUrl));
+
+  const completedSessionId =
+    intent === 'sign-in' && clerk.client?.signIn.status === 'complete'
+      ? clerk.client.signIn.createdSessionId
+      : intent === 'sign-up' && clerk.client?.signUp.status === 'complete'
+        ? clerk.client.signUp.createdSessionId
+        : null;
+
+  if (completedSessionId) {
+    return clerk.setActive({
+      session: completedSessionId,
+      navigate: async ({ session, decorateUrl }) => {
+        await navigateOnSetActive({ session, redirectUrl: redirectUrlComplete, decorateUrl });
+      },
+    });
+  }
 
   return clerk.handleRedirectCallback(handleRedirectCallbackParams, navigate);
 }
@@ -91,6 +118,7 @@ export async function runExternalSignInFlow({
   handleRedirectCallbackParams,
   identifier,
   navigate,
+  navigateOnSetActive,
   oidcPrompt,
   redirectUrl,
   redirectUrlComplete,
@@ -136,7 +164,9 @@ export async function runExternalSignInFlow({
     handleRedirectCallbackParams,
     intent: 'sign-in',
     navigate,
+    navigateOnSetActive,
     redirectUrl: externalRedirectUrl,
+    redirectUrlComplete,
     reload: rotatingTokenNonce => signIn.reload({ rotatingTokenNonce }),
     strategy,
   });
@@ -151,6 +181,7 @@ export async function runExternalSignUpFlow({
   handleRedirectCallbackParams,
   legalAccepted,
   navigate,
+  navigateOnSetActive,
   oidcPrompt,
   redirectUrl,
   redirectUrlComplete,
@@ -190,7 +221,9 @@ export async function runExternalSignUpFlow({
     handleRedirectCallbackParams,
     intent: 'sign-up',
     navigate,
+    navigateOnSetActive,
     redirectUrl: externalRedirectUrl,
+    redirectUrlComplete,
     reload: rotatingTokenNonce => signUp.reload({ rotatingTokenNonce }),
     strategy,
   });

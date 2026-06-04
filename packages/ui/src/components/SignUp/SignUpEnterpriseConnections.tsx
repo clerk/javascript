@@ -43,6 +43,7 @@ const SignUpEnterpriseConnectionsInternal = () => {
           unsafeMetadata: ctx.unsafeMetadata,
         },
         navigate,
+        navigateOnSetActive: ctx.navigateOnSetActive,
         oidcPrompt: ctx.oidcPrompt,
         redirectUrl,
         redirectUrlComplete,

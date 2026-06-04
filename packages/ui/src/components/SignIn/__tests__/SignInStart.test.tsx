@@ -303,7 +303,11 @@ describe('SignInStart', () => {
         );
         return fixtures.signIn as SignInResource;
       });
-      const reloadSpy = vi.spyOn(fixtures.signIn, 'reload').mockResolvedValueOnce(fixtures.signIn as SignInResource);
+      const reloadSpy = vi.spyOn(fixtures.signIn, 'reload').mockImplementationOnce(async () => {
+        fixtures.signIn.status = 'complete';
+        fixtures.signIn.createdSessionId = 'sess_external';
+        return fixtures.signIn as SignInResource;
+      });
 
       const { userEvent } = render(<SignInStart />, { wrapper });
       await userEvent.click(screen.getByText('Continue with Google'));
@@ -331,18 +335,11 @@ describe('SignInStart', () => {
         redirectUrl: 'myapp://auth/callback',
       });
       expect(reloadSpy).toHaveBeenCalledWith({ rotatingTokenNonce: 'test-nonce' });
-      expect(fixtures.clerk.handleRedirectCallback).toHaveBeenCalledWith(
-        expect.not.objectContaining({ reloadResource: 'signIn' }),
-        fixtures.router.navigate,
-      );
-      expect(fixtures.clerk.handleRedirectCallback).toHaveBeenCalledWith(
-        expect.objectContaining({
-          firstFactorUrl: '../factor-one',
-          secondFactorUrl: '../factor-two',
-          resetPasswordUrl: '../reset-password',
-        }),
-        fixtures.router.navigate,
-      );
+      expect(fixtures.clerk.setActive).toHaveBeenCalledWith({
+        session: 'sess_external',
+        navigate: expect.any(Function),
+      });
+      expect(fixtures.clerk.handleRedirectCallback).not.toHaveBeenCalled();
     });
   });
 
