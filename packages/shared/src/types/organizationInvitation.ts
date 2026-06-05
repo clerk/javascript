@@ -18,7 +18,7 @@ declare global {
 }
 
 /**
- * The `OrganizationInvitation` object is the model around an invitation to join an Organization.
+ * The `OrganizationInvitation` object is the model around [an invitation to join an Organization](https://clerk.com/docs/guides/organizations/add-members/invitations).
  *
  * @interface
  */

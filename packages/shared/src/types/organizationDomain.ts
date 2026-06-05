@@ -1,7 +1,7 @@
 import type { ClerkResource } from './resource';
 
 /**
- * Holds the verification details of an Organization's Verified Domain.
+ * Holds the verification details of an Organization's [Verified Domain](https://clerk.com/docs/guides/organizations/add-members/verified-domains).
  */
 export interface OrganizationDomainVerification {
   /**
