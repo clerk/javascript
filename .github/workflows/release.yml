@@ -50,7 +50,7 @@ jobs:
           # clerk-cookie. With the default GITHUB_TOKEN, GitHub suppresses
           # the resulting `synchronize` events and CI never runs on Release
           # PR updates — forcing a manual close/reopen to re-trigger.
-          token: ${{ secrets.CLERK_COOKIE_PAT }}
+          token: ${{ secrets.OPEN_EXPO_PR_GH_TOKEN }}
 
       - name: Setup
         id: config
@@ -77,7 +77,7 @@ jobs:
           # Workaround for https://github.com/changesets/changesets/issues/421
           version: pnpm version-packages
         env:
-          GITHUB_TOKEN: ${{ secrets.CLERK_COOKIE_PAT }}
+          GITHUB_TOKEN: ${{ secrets.OPEN_EXPO_PR_GH_TOKEN }}
           HUSKY: "0"
           NPM_CONFIG_PROVENANCE: true
 
@@ -89,7 +89,7 @@ jobs:
           result-encoding: string
           retries: 3
           retry-exempt-status-codes: 400,401
-          github-token: ${{ secrets.CLERK_COOKIE_PAT }}
+          github-token: ${{ secrets.OPEN_EXPO_PR_GH_TOKEN }}
           script: |
             const preMode = require("fs").existsSync("./.changeset/pre.json");
             if (!preMode) {
@@ -130,7 +130,7 @@ jobs:
           result-encoding: string
           retries: 3
           retry-exempt-status-codes: 400,401
-          github-token: ${{ secrets.CLERK_COOKIE_PAT }}
+          github-token: ${{ secrets.OPEN_EXPO_PR_GH_TOKEN }}
           script: |
             const { execSync } = require('child_process');
 
@@ -285,7 +285,7 @@ jobs:
           result-encoding: string
           retries: 3
           retry-exempt-status-codes: 400,401
-          github-token: ${{ secrets.CLERK_COOKIE_PAT }}
+          github-token: ${{ secrets.OPEN_EXPO_PR_GH_TOKEN }}
           script: |
             const clerkjsVersion = require('./packages/clerk-js/package.json').version;
             const clerkUiVersion = require('./packages/ui/package.json').version;
@@ -351,7 +351,7 @@ jobs:
           result-encoding: string
           retries: 3
           retry-exempt-status-codes: 400,401
-          github-token: ${{ secrets.CLERK_COOKIE_PAT }}
+          github-token: ${{ secrets.OPEN_EXPO_PR_GH_TOKEN }}
           script: |
             try {
               const { data } = await github.rest.orgs.getMembershipForUser({
