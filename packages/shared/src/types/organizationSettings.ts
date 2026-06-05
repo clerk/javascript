@@ -88,7 +88,7 @@ export interface OrganizationSettingsResource extends ClerkResource {
     enabled: boolean;
   };
   /**
-   * @internal
+   * @hidden
    */
   __internal_toSnapshot: () => OrganizationSettingsJSONSnapshot;
 }

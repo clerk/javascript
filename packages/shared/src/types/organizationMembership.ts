@@ -91,7 +91,7 @@ export interface OrganizationMembershipResource extends ClerkResource {
    */
   update: (updateParams: UpdateOrganizationMembershipParams) => Promise<OrganizationMembershipResource>;
   /**
-   * @internal
+   * @hidden
    */
   __internal_toSnapshot: () => OrganizationMembershipJSONSnapshot;
 }
