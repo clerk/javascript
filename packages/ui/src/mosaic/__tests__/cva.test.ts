@@ -278,7 +278,7 @@ describe('cva', () => {
     }));
 
     const res = styles({ size: 'sm' })(mockTheme);
-    expect(res).toEqual({ color: 'oklch(0.205 0 0)', padding: 'calc(0.25rem * 2)' });
+    expect(res).toEqual({ color: 'light-dark(oklch(0.205 0 0), oklch(0.922 0 0))', padding: 'calc(0.25rem * 2)' });
   });
 
   it('returns base styles only when no variants provided and no defaults', () => {
