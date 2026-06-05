@@ -11,7 +11,7 @@ export const buttonStyles = cva(theme => ({
     paddingInline: theme.spacing(2),
     paddingBlock: theme.spacing(1),
     gap: theme.spacing(2),
-    borderRadius: theme.radius.md,
+    borderRadius: theme.rounded.md,
     fontWeight: 500,
     ...theme.text('sm'),
     cursor: 'pointer',
