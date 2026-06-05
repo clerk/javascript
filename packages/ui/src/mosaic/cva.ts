@@ -2,7 +2,7 @@ import { fastDeepMergeAndReplace } from '@clerk/shared/utils';
 
 import type { MosaicTheme } from './variables';
 
-type StyleRule = Record<string, any>;
+export type StyleRule = Record<string, any>;
 
 type Variants = Record<string, Record<string, StyleRule | null>>;
 
@@ -22,23 +22,28 @@ type CvaConfig<V extends Variants> = {
 };
 
 type CvaFn<V extends Variants> = {
-  (props?: VariantPropsOf<V>): (theme: MosaicTheme) => StyleRule;
+  (props?: VariantPropsOf<V> & { sx?: StyleRule }): (theme: MosaicTheme) => StyleRule;
 };
 
-export type VariantProps<T extends (...args: any) => any> = T extends CvaFn<infer V> ? VariantPropsOf<V> : never;
+export type VariantProps<T extends (...args: any) => any> =
+  T extends CvaFn<infer V> ? VariantPropsOf<V> & { sx?: StyleRule } : never;
 
 export function cva<V extends Variants>(config: CvaConfig<V>): CvaFn<V>;
 export function cva<V extends Variants>(configFn: (theme: MosaicTheme) => CvaConfig<V>): CvaFn<V>;
 export function cva<V extends Variants>(configOrFn: CvaConfig<V> | ((theme: MosaicTheme) => CvaConfig<V>)): CvaFn<V> {
-  return ((props: VariantPropsOf<V> = {} as VariantPropsOf<V>) =>
+  return ((props: VariantPropsOf<V> & { sx?: StyleRule } = {} as VariantPropsOf<V>) =>
     (theme: MosaicTheme): StyleRule => {
+      const { sx, ...variantProps } = props;
       const config = typeof configOrFn === 'function' ? configOrFn(theme) : configOrFn;
       const { base, variants = {} as V, compoundVariants = [], defaultVariants = {} } = config;
-      const resolved = resolveVariants(variants, props, defaultVariants);
+      const resolved = resolveVariants(variants, variantProps, defaultVariants);
       const computedStyles: StyleRule = {};
       applyBase(computedStyles, base);
       applyVariantRules(computedStyles, resolved, variants);
       applyCompoundRules(computedStyles, resolved, compoundVariants);
+      if (sx) {
+        fastDeepMergeAndReplace(sx, computedStyles);
+      }
       sanitizeCssVariables(computedStyles);
       return computedStyles;
     }) as CvaFn<V>;
