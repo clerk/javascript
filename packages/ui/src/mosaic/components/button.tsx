@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { cva, type VariantProps } from './cva';
-import { useMosaicTheme } from './MosaicProvider';
+import { cva, type VariantProps } from '../cva';
+import { useMosaicTheme } from '../MosaicProvider';
 
 export const buttonStyles = cva(theme => ({
   base: {
