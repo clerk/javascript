@@ -22,7 +22,6 @@ export type VariantProps<T extends (...args: any) => any> =
   T extends CvaFn<infer V> ? VariantPropsOf<V> & { sx?: SxProp } : never;
 
 // ─── Internal Types ───────────────────────────────────────────────────────────
-
 type Variants = Record<string, Record<string, StyleRule | null>>;
 
 /** Converts `'true' | 'false'` string literal keys to `boolean` so callers pass real booleans. */

@@ -55,7 +55,6 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
       disabled={disabled || false}
       type='button'
       {...rest}
-      className='button'
       css={styles({ color, size, disabled, sx })(theme)}
     >
       {children}
