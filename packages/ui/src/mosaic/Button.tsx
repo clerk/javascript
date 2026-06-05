@@ -24,7 +24,7 @@ const styles = cva(theme => ({
     },
   },
   variants: {
-    intent: {
+    color: {
       primary: {
         backgroundColor: theme.color.primary,
         color: theme.color.primaryForeground,
@@ -41,13 +41,13 @@ const styles = cva(theme => ({
       true: { opacity: 0.5, cursor: 'not-allowed', pointerEvents: 'none' as const },
     },
   },
-  defaultVariants: { intent: 'primary', size: 'md', disabled: false },
+  defaultVariants: { color: 'primary', size: 'md', disabled: false },
 }));
 
 type ButtonProps = React.ComponentPropsWithRef<'button'> & VariantProps<typeof styles>;
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function MosaicButton(props, ref) {
-  const { intent, size, disabled, children, ...rest } = props;
+  const { color, size, disabled, children, ...rest } = props;
   const theme = useMosaicTheme();
   return (
     <button
@@ -55,7 +55,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
       disabled={disabled || false}
       type='button'
       {...rest}
-      css={styles({ intent, size, disabled })(theme)}
+      css={styles({ color, size, disabled })(theme)}
     >
       {children}
     </button>
