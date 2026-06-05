@@ -1,6 +1,5 @@
 import { describe, expect, expectTypeOf, it } from 'vitest';
 
-import { createCssVariables } from '../../styledSystem/createCssVariables';
 import { cva } from '../cva';
 import type { SxProp, VariantProps } from '../cva';
 import { defaultMosaicVariables, resolveVariables } from '../variables';
@@ -229,27 +228,6 @@ describe('cva', () => {
 
     const res = styles({ size: 'md', color: 'green' })(mockTheme);
     expect(res).toEqual({ fontSize: 16, backgroundColor: 'gainsboro' });
-  });
-
-  it('sanitizes CSS variable keys', () => {
-    const { color } = createCssVariables('color');
-    const styles = cva({
-      variants: {
-        size: {
-          sm: { [color]: 'blue', fontSize: 12 },
-        },
-        intent: {
-          primary: { backgroundColor: color },
-        },
-      },
-    });
-
-    const res = styles({ size: 'sm', intent: 'primary' })(mockTheme);
-    expect(res).toEqual({
-      fontSize: 12,
-      '--color': 'blue',
-      backgroundColor: color,
-    });
   });
 
   it('works with a static config (no theme function)', () => {
@@ -596,32 +574,6 @@ describe('compound variants', () => {
 
     const res = styles({ color: 'primary' })(mockTheme);
     expect(res['&:hover']).toEqual({ backgroundColor: 'blue', color: 'white' });
-  });
-});
-
-describe('sanitizeCssVariables', () => {
-  it('sanitizes CSS variable keys inside nested pseudo-selectors', () => {
-    const { color } = createCssVariables('color');
-    const styles = cva({
-      variants: {
-        v: { a: { '&:hover': { [color]: 'red' } } },
-      },
-    });
-
-    const res = styles({ v: 'a' })(mockTheme);
-    expect(res['&:hover']).toEqual({ '--color': 'red' });
-  });
-
-  it('sanitizes CSS variable keys at multiple nesting levels', () => {
-    const { color, bg } = createCssVariables('color', 'bg');
-    const styles = cva({
-      base: { [bg]: 'white', '&:hover': { [color]: 'black' } },
-      variants: {},
-    });
-
-    const res = styles()(mockTheme);
-    expect(res['--bg']).toBe('white');
-    expect(res['&:hover']).toEqual({ '--color': 'black' });
   });
 });
 

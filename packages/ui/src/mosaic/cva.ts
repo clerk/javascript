@@ -52,7 +52,6 @@ export function cva<V extends Variants>(configOrFn: CvaConfig<V> | ((theme: Mosa
         const sxStyles = typeof sx === 'function' ? sx(theme) : sx;
         fastDeepMergeAndReplace(sxStyles, computedStyles);
       }
-      sanitizeCssVariables(computedStyles);
       return computedStyles;
     }) as CvaFn<V>;
 }
@@ -83,15 +82,4 @@ function compoundMatches(cv: Record<string, any>, resolved: Record<string, strin
     }
   }
   return true;
-}
-
-function sanitizeCssVariables(styles: StyleRule) {
-  for (const key in styles) {
-    if (key.startsWith('var(')) {
-      styles[key.slice(4, -1)] = styles[key];
-      delete styles[key];
-    } else if (styles[key] !== null && typeof styles[key] === 'object') {
-      sanitizeCssVariables(styles[key]);
-    }
-  }
 }
