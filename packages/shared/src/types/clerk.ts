@@ -701,6 +701,22 @@ export interface Clerk {
   unmountPricingTable: (targetNode: HTMLDivElement) => void;
 
   /**
+   * Mounts the experimental MosaicOrganizationProfile component at the target element.
+   * @param targetNode Target node to mount the MosaicOrganizationProfile component.
+   * @param props configuration parameters.
+   */
+  __experimental_mountMosaicOrganizationProfile: (
+    targetNode: HTMLDivElement,
+    props?: __experimental_MosaicOrganizationProfileProps,
+  ) => void;
+
+  /**
+   * Unmounts the experimental MosaicOrganizationProfile component from the target element.
+   * @param targetNode Target node to unmount the MosaicOrganizationProfile component from.
+   */
+  __experimental_unmountMosaicOrganizationProfile: (targetNode: HTMLDivElement) => void;
+
+  /**
    * Mount an API keys component at the target element.
    *
    * @param targetNode - Target to mount the APIKeys component.
@@ -2285,6 +2301,10 @@ type PortalRoot = HTMLElement | null | undefined;
 
 /** @generateWithEmptyComment */
 export type PricingTableProps = PricingTableBaseProps & PricingTableDefaultProps;
+
+export type __experimental_MosaicOrganizationProfileProps = {
+  appearance?: ClerkAppearanceTheme;
+};
 
 /** @generateWithEmptyComment */
 export type APIKeysProps = {

@@ -1,4 +1,5 @@
 import type {
+  __experimental_MosaicOrganizationProfileProps,
   __internal_CheckoutProps,
   __internal_PlanDetailsProps,
   __internal_SubscriptionDetailsProps,
@@ -69,7 +70,8 @@ export type AvailableComponentProps =
   | OAuthConsentProps
   | TaskChooseOrganizationProps
   | TaskResetPasswordProps
-  | TaskSetupMFAProps;
+  | TaskSetupMFAProps
+  | __experimental_MosaicOrganizationProfileProps;
 
 type ComponentMode = 'modal' | 'mounted';
 type SignInMode = 'modal' | 'redirect';
@@ -235,6 +237,10 @@ export type PlanDetailsCtx = __internal_PlanDetailsProps & {
   componentName: 'PlanDetails';
 };
 
+export type __experimental_MosaicOrganizationProfileCtx = __experimental_MosaicOrganizationProfileProps & {
+  componentName: '__experimental_MosaicOrganizationProfile';
+};
+
 export type AvailableComponentCtx =
   | SignInCtx
   | SignUpCtx
@@ -257,5 +263,6 @@ export type AvailableComponentCtx =
   | PlanDetailsCtx
   | TaskChooseOrganizationCtx
   | TaskResetPasswordCtx
-  | TaskSetupMFACtx;
+  | TaskSetupMFACtx
+  | __experimental_MosaicOrganizationProfileCtx;
 export type AvailableComponentName = AvailableComponentCtx['componentName'];

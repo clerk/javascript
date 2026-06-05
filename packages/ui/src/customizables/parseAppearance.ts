@@ -28,7 +28,11 @@ type PublicAppearanceTopLevelKey = Exclude<
 export type AppearanceCascade = {
   globalAppearance?: Appearance;
   appearance?: Appearance;
-  appearanceKey: PublicAppearanceTopLevelKey | 'impersonationFab' | 'enableOrganizationsPrompt';
+  appearanceKey:
+    | PublicAppearanceTopLevelKey
+    | 'impersonationFab'
+    | 'enableOrganizationsPrompt'
+    | '__experimental_mosaicOrganizationProfile';
 };
 
 export type ParsedAppearance = {
