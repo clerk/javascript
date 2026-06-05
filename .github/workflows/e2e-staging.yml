@@ -277,6 +277,11 @@ jobs:
         timeout-minutes: 25
         run: pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
         env:
+          # Staging e2e validates the LIVE staging deploy, which is not a turbo input
+          # (the cache key is integration/** + env). Force re-execution so a cached green
+          # pass can't stand in for an untested deploy, and so the Playwright JSON report
+          # is regenerated every run instead of being skipped on a `>>> FULL TURBO` hit.
+          TURBO_FORCE: 'true'
           E2E_DEBUG: '1'
           E2E_STAGING: '1'
           E2E_WORKERS: '2'
