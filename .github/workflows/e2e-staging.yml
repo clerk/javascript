@@ -33,7 +33,11 @@ permissions:
   actions: write
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.inputs.ref || github.event.client_payload.ref || 'main' }}
+  # Key on the clerk_go commit being validated rather than the (effectively always "main")
+  # ref, so distinct staging deploys no longer cancel each other and each commit can report
+  # its own result. Duplicate dispatches for the SAME commit still de-dupe; manual dispatches
+  # without a commit SHA fall back to the unique run_id and are never cancelled.
+  group: ${{ github.workflow }}-${{ github.event.inputs.clerk-go-commit-sha || github.event.client_payload.clerk-go-commit-sha || github.run_id }}
   cancel-in-progress: true
 
 jobs:
@@ -118,7 +122,9 @@ jobs:
     defaults:
       run:
         shell: bash
-    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_LONG && fromJSON(vars.TIMEOUT_MINUTES_LONG) || 15 }}
+    # Must stay above the 25-minute "Run Integration Tests" step budget below, otherwise the
+    # job-level cap kills the run mid-suite and reports a misleading timeout/cancellation.
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_LONG && fromJSON(vars.TIMEOUT_MINUTES_LONG) || 30 }}
 
     strategy:
       fail-fast: false
@@ -292,6 +298,17 @@ jobs:
           name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ steps.inputs.outputs.artifact-suffix }}
           path: test-results
           retention-days: 1
+
+      # Always upload the machine-readable report (even on success) so downstream
+      # reporting/classification can run regardless of the leg's pass/fail outcome.
+      - name: Upload Playwright JSON report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: playwright-report-${{ github.run_id }}-${{ github.run_attempt }}-${{ steps.inputs.outputs.artifact-suffix }}
+          path: playwright-report/results.json
+          if-no-files-found: ignore
+          retention-days: 3
 
   report:
     name: Report Results
