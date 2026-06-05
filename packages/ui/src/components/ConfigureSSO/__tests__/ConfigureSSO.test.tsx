@@ -67,4 +67,67 @@ describe('ConfigureSSO', () => {
       expect(queryByText(/you do not have permission to manage single sign-on/i)).not.toBeInTheDocument();
     });
   });
+
+  describe('state machine mounts on the right step', () => {
+    it('mounts on select-provider with a verified email and no connection', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEnterpriseSso({ selfServeSSO: true });
+        f.withEmailAddress();
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', permissions: ['org:sys_entconns:manage'] }],
+        });
+      });
+
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
+
+      const { findByText } = render(<ConfigureSSO />, { wrapper });
+
+      // Verified primary email fulfills verify-domain, so the machine skips it
+      // and lands on select-provider — the first non-fulfilled enabled step.
+      await findByText(/select your identity provider/i);
+    });
+
+    it('short-circuits to the confirmation step for an active connection', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEnterpriseSso({ selfServeSSO: true });
+        f.withEmailAddress();
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', permissions: ['org:sys_entconns:manage'] }],
+        });
+      });
+
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([
+        {
+          id: 'ent_active',
+          name: 'clerk.com',
+          provider: 'saml_okta',
+          active: true,
+          // Owned by the active organization (matches the membership above), so
+          // the domain is not "taken by another org" and the machine can
+          // short-circuit to confirmation.
+          organizationId: 'Org1',
+          domains: ['clerk.com'],
+          samlConnection: {
+            idpSsoUrl: 'https://idp.example.com/sso',
+            idpEntityId: 'https://idp.example.com/entity',
+            idpCertificate: 'CERT',
+          },
+        } as any,
+      ]);
+      fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
+        data: [],
+        total_count: 0,
+      } as any);
+
+      const { findByText, queryByText } = render(<ConfigureSSO />, { wrapper });
+
+      // An active connection lands on confirmation even if never tested.
+      await findByText(/configuration/i);
+      expect(queryByText(/select your identity provider/i)).not.toBeInTheDocument();
+    });
+  });
 });
