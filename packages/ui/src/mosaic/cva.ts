@@ -40,9 +40,14 @@ export function cva<V extends Variants>(configOrFn: CvaConfig<V> | ((theme: Mosa
       const { base, variants = {} as V, compoundVariants = [], defaultVariants = {} } = config;
       const resolved = resolveVariants(variants, variantProps, defaultVariants);
       const computedStyles: StyleRule = {};
-      applyBase(computedStyles, base);
-      applyVariantRules(computedStyles, resolved, variants);
-      applyCompoundRules(computedStyles, resolved, compoundVariants);
+      if (base) fastDeepMergeAndReplace(base, computedStyles);
+      for (const key in resolved) {
+        const rule = variants[key]?.[resolved[key]];
+        if (rule) fastDeepMergeAndReplace(rule, computedStyles);
+      }
+      for (const cv of compoundVariants) {
+        if (compoundMatches(cv, resolved)) fastDeepMergeAndReplace(cv.css, computedStyles);
+      }
       if (sx) {
         const sxStyles = typeof sx === 'function' ? sx(theme) : sx;
         fastDeepMergeAndReplace(sxStyles, computedStyles);
@@ -65,33 +70,6 @@ function resolveVariants(
     }
   }
   return resolved;
-}
-
-function applyBase(target: StyleRule, base?: StyleRule) {
-  if (base && typeof base === 'object') {
-    fastDeepMergeAndReplace(base, target);
-  }
-}
-
-function applyVariantRules(target: StyleRule, resolved: Record<string, string>, variants: Variants) {
-  for (const key in resolved) {
-    const variantStyles = variants[key]?.[resolved[key]];
-    if (variantStyles) {
-      fastDeepMergeAndReplace(variantStyles, target);
-    }
-  }
-}
-
-function applyCompoundRules(
-  target: StyleRule,
-  resolved: Record<string, string>,
-  compoundVariants: Array<Record<string, any>>,
-) {
-  for (const cv of compoundVariants) {
-    if (compoundMatches(cv, resolved)) {
-      fastDeepMergeAndReplace(cv.css, target);
-    }
-  }
 }
 
 function compoundMatches(cv: Record<string, any>, resolved: Record<string, string>): boolean {
