@@ -8,7 +8,7 @@ import { Fragment, useMemo } from 'react';
 import { useProtect } from '@/ui/common/Gate';
 import { ProfileSection } from '@/ui/elements/Section';
 import { common } from '@/ui/styledSystem';
-import { getIncludedSeatsUnitTier, getPlanSeatLimit, getSeatUnitPrice } from '@/ui/utils/billingPlanSeats';
+import { getSeatLimitAndIncludedSeatsLocalizationKey } from '@/ui/utils/billingPlanSeats';
 
 import {
   normalizeFormatted,
@@ -256,30 +256,9 @@ function SubscriptionItemRow({
   }, [fee.amountFormatted]);
 
   const subItemSeatsQty = subscriptionItem.seats?.quantity;
-  const seatUnitPrice = getSeatUnitPrice(subscriptionItem.plan);
-  const includedSeatsUnitTier = getIncludedSeatsUnitTier(seatUnitPrice);
-  const planSeatLimit = getPlanSeatLimit(subscriptionItem.plan);
-  const includedSeats =
-    includedSeatsUnitTier?.endsAfterBlock != null && seatUnitPrice
-      ? includedSeatsUnitTier.endsAfterBlock * seatUnitPrice.blockSize
-      : null;
   const seatsTotalTier = subscriptionItem.seats?.tiers?.find(t => t.total.amount > 0);
   const monthLabel = t(localizationKeys('billing.month')).toLowerCase();
-  const seatLimitAndIncludedSeatsLocalizationKey =
-    typeof planSeatLimit === 'number' && includedSeats !== null
-      ? localizationKeys('organizationProfile.billingPage.subscriptionsListSection.seatLimitAndIncludedSeats', {
-          seatLimit: planSeatLimit,
-          includedSeats,
-        })
-      : typeof planSeatLimit === 'number'
-        ? localizationKeys('organizationProfile.billingPage.subscriptionsListSection.seatLimit', {
-            seatLimit: planSeatLimit,
-          })
-        : includedSeats !== null
-          ? localizationKeys('organizationProfile.billingPage.subscriptionsListSection.includedSeatsUsage', {
-              includedSeats,
-            })
-          : null;
+  const seatLimitAndIncludedSeatsLocalizationKey = getSeatLimitAndIncludedSeatsLocalizationKey(subscriptionItem.plan);
 
   return (
     <Fragment key={subscriptionItem.id}>

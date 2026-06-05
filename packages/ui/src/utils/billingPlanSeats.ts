@@ -9,6 +9,8 @@ import type {
   OrganizationResource,
 } from '@clerk/shared/types';
 
+import { type LocalizationKey, localizationKeys } from '../localization';
+
 /**
  * Given a plan, return the unit price for seats.
  */
@@ -189,6 +191,41 @@ export const getPlanSeatLimit = (plan: BillingPlanResource): number | null | und
 
   const lastTier = seatUnitPrice.tiers[seatUnitPrice.tiers.length - 1];
   return lastTier.endsAfterBlock != null ? lastTier.endsAfterBlock * seatUnitPrice.blockSize : null;
+};
+
+export const getSeatLimitAndIncludedSeatsLocalizationKey = (plan: BillingPlanResource): LocalizationKey | null => {
+  const seatUnitPrice = getSeatUnitPrice(plan);
+  const includedSeatsUnitTier = getIncludedSeatsUnitTier(seatUnitPrice);
+  const planSeatLimit = getPlanSeatLimit(plan);
+  const includedSeats =
+    includedSeatsUnitTier?.endsAfterBlock != null && seatUnitPrice
+      ? includedSeatsUnitTier.endsAfterBlock * seatUnitPrice.blockSize
+      : null;
+
+  // plan has a seat limit and included seats
+  if (typeof planSeatLimit === 'number' && includedSeats !== null) {
+    return localizationKeys('organizationProfile.billingPage.subscriptionsListSection.seatLimitAndIncludedSeats', {
+      seatLimit: planSeatLimit,
+      includedSeats,
+    });
+  }
+
+  // plan only has a seat limit
+  if (typeof planSeatLimit === 'number') {
+    return localizationKeys('organizationProfile.billingPage.subscriptionsListSection.seatLimit', {
+      seatLimit: planSeatLimit,
+    });
+  }
+
+  // plan only has included seats
+  if (includedSeats !== null) {
+    return localizationKeys('organizationProfile.billingPage.subscriptionsListSection.includedSeatsUsage', {
+      includedSeats,
+    });
+  }
+
+  // plan doesn't have a seat limit or included seats
+  return null;
 };
 
 /**
