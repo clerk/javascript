@@ -10,7 +10,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign up f
     await app.teardown();
   });
 
-  test('sign up with email and password', async ({ page, context }) => {
+  test('sign up with email and password @smoke', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     const fakeUser = u.services.users.createFakeUser({
       fictionalEmail: true,

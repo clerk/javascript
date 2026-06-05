@@ -46,7 +46,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign out 
     await mainTab.po.expect.toBeSignedOut({ timeOut: 2 * 1_000 });
   });
 
-  test('sign out persisting client', async ({ page, context }) => {
+  test('sign out persisting client @smoke', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.setIdentifier(fakeUser.email);

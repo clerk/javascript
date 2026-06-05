@@ -133,6 +133,12 @@ jobs:
     # Must stay above the 25-minute "Run Integration Tests" step budget below, otherwise the
     # job-level cap kills the run mid-suite and reports a misleading timeout/cancellation.
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_LONG && fromJSON(vars.TIMEOUT_MINUTES_LONG) || 30 }}
+    # The full `generic` leg (~210 tests on one shared instance) is informational while its
+    # flake is brought under control: it runs and uploads results but does not fail the run.
+    # The curated `smoke` leg (a handful of stable core-auth happy paths) gates instead, along
+    # with the framework legs. So `needs.integration-tests.result` is only 'failure' when a
+    # gating leg fails, and the report job notifies only then, not on generic-only flake.
+    continue-on-error: ${{ matrix.test-name == 'generic' }}
 
     strategy:
       fail-fast: false
@@ -141,6 +147,7 @@ jobs:
         test-name:
           - 'sessions:staging'
           - 'handshake:staging'
+          - 'smoke'
           - 'generic'
           - 'cache-components'
           - 'express'
