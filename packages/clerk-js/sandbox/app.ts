@@ -38,6 +38,7 @@ const AVAILABLE_COMPONENTS = [
   'taskChooseOrganization',
   'taskResetPassword',
   'taskSetupMFA',
+  '__experimental_mosaicOrganizationProfile',
 ] as const;
 type AvailableComponent = (typeof AVAILABLE_COMPONENTS)[number];
 
@@ -157,6 +158,7 @@ const componentControls: Record<AvailableComponent, ComponentPropsControl> = {
   taskChooseOrganization: buildComponentControls('taskChooseOrganization'),
   taskResetPassword: buildComponentControls('taskResetPassword'),
   taskSetupMFA: buildComponentControls('taskSetupMFA'),
+  __experimental_mosaicOrganizationProfile: buildComponentControls('__experimental_mosaicOrganizationProfile'),
 };
 
 declare global {
@@ -414,6 +416,10 @@ void (async () => {
       mount: 'mountTaskSetupMFA',
       component: 'taskSetupMFA',
       defaultProps: { redirectUrlComplete: '/user-profile' },
+    },
+    '/mosaic-organization-profile': {
+      mount: '__experimental_mountMosaicOrganizationProfile',
+      component: '__experimental_mosaicOrganizationProfile',
     },
   };
 

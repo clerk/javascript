@@ -1,3 +1,4 @@
+export * from './__experimental_MosaicOrganizationProfile';
 export * from './APIKeys';
 export * from './Checkout';
 export * from './ConfigureSSO';
