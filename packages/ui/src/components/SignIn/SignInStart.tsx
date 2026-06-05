@@ -417,7 +417,7 @@ function SignInStartInternal(): JSX.Element {
     const redirectUrlComplete = ctx.afterSignInUrl || '/';
 
     if (externalAuth) {
-      await signIn.__experimental_authenticateWithNativeRedirect({
+      const signInResult = await signIn.__experimental_authenticateWithNativeRedirect({
         strategy: 'enterprise_sso',
         redirectUrl,
         redirectUrlComplete,
@@ -426,7 +426,8 @@ function SignInStartInternal(): JSX.Element {
         oidcPrompt: ctx.oidcPrompt,
       });
 
-      return clerk.handleRedirectCallback(
+      return clerk.__internal_handleRedirectCallbackWithResource(
+        signInResult,
         {
           signUpUrl: ctx.signUpUrl,
           signInUrl: ctx.signInUrl,

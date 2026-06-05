@@ -1065,6 +1065,17 @@ export interface Clerk {
   ) => Promise<unknown>;
 
   /**
+   * Completes a custom OAuth or SAML redirect flow using an already refreshed SignIn or SignUp resource.
+   *
+   * @internal
+   */
+  __internal_handleRedirectCallbackWithResource: (
+    signInOrUp: SignInResource | SignUpResource,
+    params: HandleOAuthCallbackParams | HandleSamlCallbackParams,
+    customNavigate?: (to: string) => Promise<unknown>,
+  ) => Promise<unknown>;
+
+  /**
    * Completes an email link verification flow started by `Clerk.client.signIn.createEmailLinkFlow` or `Clerk.client.signUp.createEmailLinkFlow`, by processing the verification results from the redirect URL query parameters. This method should be called after the user is redirected back from visiting the verification link in their email.
    * @param params - Allows you to define the URLs where the user should be redirected to on successful verification or pending/completed sign-up or sign-in attempts. If the email link is successfully verified on another device, there's a callback function parameter that allows custom code execution.
    * @param customNavigate - A function that overrides Clerk's default navigation behavior, allowing custom handling of navigation during sign-up and sign-in flows.

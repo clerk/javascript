@@ -36,7 +36,7 @@ const SignInFactorOneEnterpriseConnectionsInternal = () => {
     const redirectUrlComplete = ctx.afterSignInUrl || '/';
 
     if (externalAuth) {
-      await signIn.__experimental_authenticateWithNativeRedirect({
+      const signInResult = await signIn.__experimental_authenticateWithNativeRedirect({
         strategy: 'enterprise_sso',
         redirectUrl,
         redirectUrlComplete,
@@ -46,7 +46,8 @@ const SignInFactorOneEnterpriseConnectionsInternal = () => {
         oidcPrompt: ctx.oidcPrompt,
       });
 
-      await clerk.handleRedirectCallback(
+      await clerk.__internal_handleRedirectCallbackWithResource(
+        signInResult,
         {
           signUpUrl: ctx.signUpUrl,
           signInUrl: ctx.signInUrl,

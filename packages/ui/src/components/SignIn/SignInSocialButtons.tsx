@@ -58,7 +58,7 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
       oauthCallback={async strategy => {
         if (externalAuth) {
           try {
-            await signIn.__experimental_authenticateWithNativeRedirect({
+            const signInResult = await signIn.__experimental_authenticateWithNativeRedirect({
               strategy,
               redirectUrl,
               redirectUrlComplete,
@@ -66,7 +66,8 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
               oidcPrompt: ctx.oidcPrompt,
             });
 
-            return clerk.handleRedirectCallback(
+            return clerk.__internal_handleRedirectCallbackWithResource(
+              signInResult,
               {
                 signUpUrl: ctx.signUpUrl,
                 signInUrl: ctx.signInUrl,

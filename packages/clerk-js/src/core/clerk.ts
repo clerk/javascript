@@ -2619,6 +2619,29 @@ export class Clerk implements ClerkInterface {
     });
   };
 
+  public __internal_handleRedirectCallbackWithResource = async (
+    signInOrUp: SignInResource | SignUpResource,
+    params: HandleOAuthCallbackParams = {},
+    customNavigate?: (to: string) => Promise<unknown>,
+  ): Promise<unknown> => {
+    if (!this.loaded || !this.environment || !this.client) {
+      return;
+    }
+
+    const { signIn: currentSignIn, signUp: currentSignUp } = this.client;
+    const signIn = 'identifier' in (signInOrUp || {}) ? (signInOrUp as SignInResource) : currentSignIn;
+    const signUp = 'missingFields' in (signInOrUp || {}) ? (signInOrUp as SignUpResource) : currentSignUp;
+
+    const navigate = (to: string) =>
+      customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
+
+    return this._handleRedirectCallback(params, {
+      signUp,
+      signIn,
+      navigate,
+    });
+  };
+
   // TODO: Deprecate this one, and mark it as internal. Is there actual benefit for external developers to use this ? Should they ever reach for it ?
   public handleUnauthenticated = async (opts = { broadcast: true }): Promise<unknown> => {
     if (!this.client || !this.session) {
