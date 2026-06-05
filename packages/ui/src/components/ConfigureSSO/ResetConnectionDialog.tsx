@@ -1,5 +1,3 @@
-import { useReverification } from '@clerk/shared/react';
-
 import { Col, descriptors, localizationKeys } from '@/customizables';
 import { Card } from '@/elements/Card';
 import { useCardState, withCardStateProvider } from '@/elements/contexts';
@@ -49,10 +47,11 @@ export const ResetConnectionDialog = (props: ResetConnectionDialogProps): JSX.El
 const ResetConnectionDialogContent = withCardStateProvider((props: ResetConnectionDialogProps) => {
   const { onClose, confirmationValue } = props;
   const card = useCardState();
-  const { enterpriseConnection, deleteEnterpriseConnection, setProvider } = useConfigureSSO();
+  const {
+    enterpriseConnection,
+    mutations: { deleteConnection },
+  } = useConfigureSSO();
   const { goToStep } = useWizard();
-
-  const deleteConnection = useReverification((id: string) => deleteEnterpriseConnection(id));
 
   const confirmationField = useFormControl('deleteConfirmation', '', {
     type: 'text',
@@ -72,8 +71,11 @@ const ResetConnectionDialogContent = withCardStateProvider((props: ResetConnecti
 
     try {
       await deleteConnection(enterpriseConnection.id);
-      setProvider(undefined);
-      await goToStep('select-provider');
+      // The delete revalidates the source, dropping `hasConnection`, so every
+      // later step's entry guard fails. Jump back to the entry step
+      // (`verify-domain`, guard-less ⇒ always reachable). `goToStep` resolves
+      // against the TOP-LEVEL wizard because this dialog renders under it.
+      goToStep('verify-domain');
       onClose();
     } catch (err) {
       handleError(err as Error, [confirmationField], card.setError);

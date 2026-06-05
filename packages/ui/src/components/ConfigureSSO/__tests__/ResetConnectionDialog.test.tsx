@@ -5,26 +5,15 @@ import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen, waitFor } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
 
+// The dialog rewinds the TOP-LEVEL wizard to the entry step via
+// `goToStep('verify-domain')` after the delete (the entry step is guard-less, so
+// it is always reachable once `hasConnection` drops).
 const goToStep = vi.fn();
 
 vi.mock('../elements/Wizard', () => ({
-  useWizard: () => ({
-    activeSteps: [],
-    currentStep: undefined,
-    currentIndex: -1,
-    totalSteps: 0,
-    isFirstStep: true,
-    isLastStep: false,
-    isNested: false,
-    goNext: vi.fn(),
-    goPrev: vi.fn(),
-    goToStep,
-    registerStep: vi.fn(),
-    unregisterStep: vi.fn(),
-  }),
+  useWizard: () => ({ goToStep }),
 }));
 
-const setProvider = vi.fn();
 const deleteEnterpriseConnection = vi.fn();
 
 const connectionMockState = vi.hoisted(() => ({
@@ -34,14 +23,12 @@ const connectionMockState = vi.hoisted(() => ({
 vi.mock('../ConfigureSSOContext', () => ({
   useConfigureSSO: () => ({
     enterpriseConnection: connectionMockState.current,
-    provider: undefined,
-    setProvider,
-    deleteEnterpriseConnection,
-    initialStepId: 'confirmation',
     contentRef: { current: null },
-    createEnterpriseConnection: vi.fn(),
-    updateEnterpriseConnection: vi.fn(),
-    isDomainTakenByOtherOrg: false,
+    // The dialog reads the reverification-wrapped delete mutation off the
+    // bundled `mutations` object instead of a raw `deleteEnterpriseConnection`.
+    mutations: {
+      deleteConnection: deleteEnterpriseConnection,
+    },
   }),
 }));
 
@@ -69,10 +56,8 @@ const renderDialog = (
 
 const resetMocks = () => {
   goToStep.mockReset();
-  setProvider.mockReset();
   deleteEnterpriseConnection.mockReset();
   deleteEnterpriseConnection.mockResolvedValue({} as DeletedObjectResource);
-  goToStep.mockResolvedValue(undefined);
   connectionMockState.current = { id: 'idn_connection_1' };
 };
 
@@ -141,7 +126,7 @@ describe('ResetConnectionDialog', () => {
     expect(deleteEnterpriseConnection).not.toHaveBeenCalled();
   });
 
-  it('deletes the connection, clears the provider, rewinds the wizard, and closes on a successful submit', async () => {
+  it('deletes the connection, rewinds the wizard to the entry step, and closes on a successful submit', async () => {
     resetMocks();
     const onClose = vi.fn();
     const { wrapper } = await createFixtures();
@@ -153,8 +138,7 @@ describe('ResetConnectionDialog', () => {
     await waitFor(() => {
       expect(deleteEnterpriseConnection).toHaveBeenCalledWith('idn_connection_1');
     });
-    expect(setProvider).toHaveBeenCalledWith(undefined);
-    expect(goToStep).toHaveBeenCalledWith('select-provider');
+    expect(goToStep).toHaveBeenCalledWith('verify-domain');
     await waitFor(() => {
       expect(onClose).toHaveBeenCalledTimes(1);
     });
