@@ -1,6 +1,6 @@
 import { fastDeepMergeAndReplace } from '@clerk/shared/utils';
 
-import type { MosaicTheme } from './tokens';
+import type { MosaicTheme } from './variables';
 
 type StyleRule = Record<string, any>;
 

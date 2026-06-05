@@ -1,8 +1,7 @@
 import React from 'react';
 
-import { parseVariables } from './parseVariables';
-import { defaultMosaicTokens } from './tokens';
-import type { MosaicTheme, MosaicVariables } from './tokens';
+import { defaultMosaicVariables, resolveVariables } from './variables';
+import type { MosaicTheme, MosaicVariables } from './variables';
 
 const MosaicThemeContext = React.createContext<MosaicTheme | null>(null);
 
@@ -12,7 +11,7 @@ export interface MosaicProviderProps {
 }
 
 export function MosaicProvider({ children, variables }: MosaicProviderProps) {
-  const theme = React.useMemo(() => parseVariables(defaultMosaicTokens, variables), [variables]);
+  const theme = React.useMemo(() => resolveVariables(defaultMosaicVariables, variables), [variables]);
   return <MosaicThemeContext.Provider value={theme}>{children}</MosaicThemeContext.Provider>;
 }
 

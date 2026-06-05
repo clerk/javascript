@@ -8,7 +8,9 @@ const styles = cva(theme => ({
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: theme.spacing.sm,
+    paddingInline: theme.spacing(2),
+    paddingBlock: theme.spacing(1),
+    gap: theme.spacing(2),
     borderRadius: theme.radius.md,
     fontWeight: 500,
     fontSize: '0.875rem',
@@ -17,7 +19,7 @@ const styles = cva(theme => ({
     border: 'none',
     transition: 'background-color 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s',
     '&:focus-visible': {
-      outline: `2px solid ${theme.color.ring}`,
+      outline: `2px solid ${theme.alpha(theme.color.primary, 50)}`,
       outlineOffset: '2px',
     },
   },
@@ -25,34 +27,20 @@ const styles = cva(theme => ({
     intent: {
       primary: {
         backgroundColor: theme.color.primary,
-        color: theme.color.primaryContrast,
-        '&:hover': { backgroundColor: theme.color.primaryHover },
-        '&:active': { backgroundColor: theme.color.primaryActive },
-      },
-      outline: {
-        backgroundColor: 'transparent',
-        color: theme.color.fg,
-        border: `1px solid ${theme.color.border}`,
-        '&:hover': { backgroundColor: theme.color.surface },
-      },
-      ghost: {
-        backgroundColor: 'transparent',
-        color: theme.color.fg,
-        '&:hover': { backgroundColor: theme.color.surface },
+        color: theme.color.primaryForeground,
+        '&:hover': { backgroundColor: theme.alpha(theme.color.primary, 80) },
+        '&:active': { backgroundColor: theme.alpha(theme.color.primary, 70) },
       },
     },
     size: {
-      sm: { padding: `${theme.spacing.xs} ${theme.spacing.sm}`, fontSize: '0.75rem' },
-      md: { padding: `${theme.spacing.sm} ${theme.spacing.md}`, fontSize: '0.875rem' },
+      sm: { padding: `${theme.spacing(1)} ${theme.spacing(2)}`, fontSize: '0.75rem' },
+      md: { padding: `${theme.spacing(2)} ${theme.spacing(4)}`, fontSize: '0.875rem' },
     },
     disabled: {
       false: null,
       true: { opacity: 0.5, cursor: 'not-allowed', pointerEvents: 'none' as const },
     },
   },
-  compoundVariants: [
-    { intent: 'primary', disabled: false, css: { '&:hover': { backgroundColor: theme.color.primaryHover } } },
-  ],
   defaultVariants: { intent: 'primary', size: 'md', disabled: false },
 }));
 

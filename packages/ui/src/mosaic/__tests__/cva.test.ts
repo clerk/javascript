@@ -3,32 +3,10 @@ import { describe, expect, it } from 'vitest';
 import { createCssVariables } from '../../styledSystem/createCssVariables';
 import { cva } from '../cva';
 import type { VariantProps } from '../cva';
-import type { MosaicTheme } from '../tokens';
+import { defaultMosaicVariables, resolveVariables } from '../variables';
+import type { MosaicTheme } from '../variables';
 
-const mockTheme = Object.freeze({
-  color: {
-    primary: '#6C47FF',
-    primaryHover: '#5A38E0',
-    primaryContrast: '#FFFFFF',
-    danger: '#EF4444',
-    bg: '#FFFFFF',
-    fg: '#111111',
-    fgMuted: '#6B7280',
-    border: '#E5E5E5',
-  },
-  spacing: {
-    xs: '0.25rem',
-    sm: '0.5rem',
-    md: '1rem',
-    lg: '1.5rem',
-  },
-  radius: {
-    sm: '0.25rem',
-    md: '0.375rem',
-    lg: '0.5rem',
-    full: '9999px',
-  },
-} as const) satisfies MosaicTheme;
+const mockTheme: MosaicTheme = resolveVariables(defaultMosaicVariables);
 
 describe('cva', () => {
   it('applies base styles when no variants are selected', () => {
@@ -290,17 +268,17 @@ describe('cva', () => {
 
   it('accesses MosaicTheme values in config function', () => {
     const styles = cva(theme => ({
-      base: { color: theme.color.fg },
+      base: { color: theme.color.primary },
       variants: {
         size: {
-          sm: { padding: theme.spacing.sm },
-          md: { padding: theme.spacing.md },
+          sm: { padding: theme.spacing(2) },
+          md: { padding: theme.spacing(4) },
         },
       },
     }));
 
     const res = styles({ size: 'sm' })(mockTheme);
-    expect(res).toEqual({ color: '#111111', padding: '0.5rem' });
+    expect(res).toEqual({ color: 'oklch(0.205 0 0)', padding: 'calc(0.25rem * 2)' });
   });
 
   it('returns base styles only when no variants provided and no defaults', () => {
