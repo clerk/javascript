@@ -360,22 +360,51 @@ jobs:
             echo "sdk-source=${PAYLOAD_SDK_SOURCE:-latest}" >> $GITHUB_OUTPUT
           fi
 
-      - name: Notify Slack on failure
+      - name: Validate ref
+        env:
+          REF: ${{ steps.inputs.outputs.ref }}
+        run: |
+          if [[ ! "$REF" =~ ^(main|release/.*)$ ]]; then
+            echo "::error::Ref '$REF' is not allowed. Only 'main' and 'release/*' branches are permitted."
+            exit 1
+          fi
+
+      - name: Checkout Repo
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+          ref: ${{ steps.inputs.outputs.ref }}
+          sparse-checkout: scripts/classify-e2e-results.mjs
+          fetch-depth: 1
+
+      - name: Download Playwright reports
+        # Tolerate a run that produced no report artifacts (e.g. a cancelled run) so the
+        # report job still completes; the classifier handles an empty reports directory.
+        continue-on-error: true
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          pattern: playwright-report-*
+          path: reports
+
+      # Classify every leg's results (infra-flake vs candidate regression vs flaky) and write a
+      # digest to the job summary. Runs on every result, including when the gating legs pass, so
+      # the informational generic leg's breakdown is always visible. Never fails the build.
+      - name: Classify results
+        id: classify
+        env:
+          E2E_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          E2E_RUN_REF: ${{ steps.inputs.outputs.ref }}
+          E2E_SDK_SOURCE: ${{ steps.inputs.outputs.sdk-source }}
+          E2E_CLERK_GO_SHA: ${{ steps.inputs.outputs.clerk-go-commit-sha }}
+        run: node scripts/classify-e2e-results.mjs reports --slack-payload "$RUNNER_TEMP/e2e-slack-payload.json"
+
+      # Notify only on a gating-leg failure (smoke + the framework legs); the informational
+      # generic leg's flake never pings here. The message is the classified digest from above.
+      - name: Notify Slack on gating failure
         if: ${{ needs.integration-tests.result == 'failure' && steps.inputs.outputs.notify-slack == 'true' }}
         uses: slackapi/slack-github-action@e28cf165c92ffef168d23c5c9000cffc8a25e117 # v1.24.0
         with:
-          payload: |
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*:red_circle: Staging E2E tests failed*\n*Repo:* `${{ github.repository }}`\n*Ref:* `${{ steps.inputs.outputs.ref }}`\n*SDK:* `${{ steps.inputs.outputs.sdk-source }}`\n*clerk_go commit:* `${{ steps.inputs.outputs.clerk-go-commit-sha || 'N/A' }}`\n*Run:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View logs>"
-                  }
-                }
-              ]
-            }
+          payload-file-path: ${{ runner.temp }}/e2e-slack-payload.json
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.STAGING_E2E_SLACK_WEBHOOK_URL }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
