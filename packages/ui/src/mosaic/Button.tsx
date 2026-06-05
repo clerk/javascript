@@ -19,7 +19,7 @@ const styles = cva(theme => ({
     border: 'none',
     transition: 'background-color 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s',
     '&:focus-visible': {
-      outline: `2px solid ${theme.alpha(theme.color.primary, 50)}`,
+      outline: `2px solid ${theme.alpha('primary', 50)}`,
       outlineOffset: '2px',
     },
   },
@@ -28,8 +28,8 @@ const styles = cva(theme => ({
       primary: {
         backgroundColor: theme.color.primary,
         color: theme.color.primaryForeground,
-        '&:hover': { backgroundColor: theme.alpha(theme.color.primary, 80) },
-        '&:active': { backgroundColor: theme.alpha(theme.color.primary, 70) },
+        '&:hover': { backgroundColor: theme.alpha('primary', 80) },
+        '&:active': { backgroundColor: theme.alpha('primary', 70) },
       },
     },
     size: {
