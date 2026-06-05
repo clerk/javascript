@@ -3,14 +3,15 @@ import type { ClerkResource } from './resource';
 
 declare global {
   /**
-   * If you want to provide custom types for the organizationInvitation.publicMetadata
-   * object, simply redeclare this rule in the global namespace.
-   * Every OrganizationInvitation object will use the provided type.
+   * If you want to provide custom types for the organizationInvitation.publicMetadata object, simply redeclare this rule in the global namespace. Every `OrganizationInvitation` will use the provided type.
    */
   interface OrganizationInvitationPublicMetadata {
     [k: string]: unknown;
   }
 
+  /**
+   * If you want to provide custom types for the organizationInvitation.privateMetadata object, simply redeclare this rule in the global namespace. Every `OrganizationInvitation` will use the provided type.
+   */
   interface OrganizationInvitationPrivateMetadata {
     [k: string]: unknown;
   }

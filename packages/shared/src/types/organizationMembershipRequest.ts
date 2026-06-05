@@ -9,38 +9,38 @@ import type { PublicUserData } from './session';
  */
 export interface OrganizationMembershipRequestResource extends ClerkResource {
   /**
-   * The unique identifier for the membership request.
+   * The unique identifier for the Membership Request.
    */
   id: string;
   /**
-   * The ID of the Organization the request is for.
+   * The ID of the Organization the Membership Request is for.
    */
   organizationId: string;
   /**
-   * The current status of the membership request.
+   * The current status.
    */
   status: OrganizationInvitationStatus;
   /**
-   * Public information about the user that created the membership request.
+   * Public information about the user that created the Membership Request.
    */
   publicUserData: PublicUserData;
   /**
-   * The date when the membership request was created.
+   * The date when the Membership Request was created.
    */
   createdAt: Date;
   /**
-   * The date when the membership request was last updated.
+   * The date when the Membership Request was last updated.
    */
   updatedAt: Date;
 
   /**
-   * Accepts the membership request, adding the user to the Organization.
+   * Accepts the Membership Request, adding the user to the Organization.
    *
    * @returns A promise that resolves to the accepted [`OrganizationMembershipRequest`](https://clerk.com/docs/reference/types/organization-membership-request) object.
    */
   accept: () => Promise<OrganizationMembershipRequestResource>;
   /**
-   * Rejects the membership request, declining the user's request to join the Organization.
+   * Rejects the Membership Request, declining the user's request to join the Organization.
    *
    * @returns A promise that resolves to the rejected [`OrganizationMembershipRequest`](https://clerk.com/docs/reference/types/organization-membership-request) object.
    */

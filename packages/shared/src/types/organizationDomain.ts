@@ -1,8 +1,7 @@
 import type { ClerkResource } from './resource';
 
 /**
- * Holds the verification details of an organization domain, describing how and whether the domain's
- * ownership has been confirmed.
+ * Holds the verification details of an Organization's Verified Domain.
  */
 export interface OrganizationDomainVerification {
   /**
@@ -32,27 +31,22 @@ export type OrganizationDomainVerificationStatus = 'unverified' | 'verified';
 /**
  * Determines how users are enrolled into an organization once their email address matches a verified domain.
  *
- * - `manual_invitation`: No automatic enrollment. Users with a matching email
- *   domain are not given any invitation or suggestion; an admin must invite
- *   them manually.
- * - `automatic_invitation`: Users with a matching email domain automatically
- *   receive a pending invitation (assigned the org's default role) which they
- *   can accept to join.
- * - `automatic_suggestion`: Users with a matching email domain automatically
- *   receive a suggestion to join, which they can request.
+ * - `manual_invitation`: No automatic enrollment. Users with a matching email domain are not given any invitation or suggestion; an admin must invite them manually.
+ * - `automatic_invitation`: Users with a matching email domain automatically receive a pending invitation (assigned the org's default role) which they can accept to join.
+ * - `automatic_suggestion`: Users with a matching email domain automatically receive a suggestion to join, which they can request.
  *
  * @inline
  */
 export type OrganizationEnrollmentMode = 'manual_invitation' | 'automatic_invitation' | 'automatic_suggestion';
 
 /**
- * The `OrganizationDomain` object is the model around an organization domain.
+ * The `OrganizationDomain` object is the model around an Organization's Verified Domain.
  *
  * @interface
  */
 export interface OrganizationDomainResource extends ClerkResource {
   /**
-   * The unique identifier for the organization domain.
+   * The unique identifier for the Verified Domain.
    */
   id: string;
   /**
@@ -60,11 +54,11 @@ export interface OrganizationDomainResource extends ClerkResource {
    */
   name: string;
   /**
-   * The ID of the organization that the domain belongs to.
+   * The ID of the Organization that the Verified Domain belongs to.
    */
   organizationId: string;
   /**
-   * The enrollment mode that determines how matching users are added to the organization.
+   * The enrollment mode that determines how matching users are added to the Organization.
    */
   enrollmentMode: OrganizationEnrollmentMode;
   /**
@@ -107,13 +101,13 @@ export interface OrganizationDomainResource extends ClerkResource {
    */
   attemptAffiliationVerification: (params: AttemptAffiliationVerificationParams) => Promise<OrganizationDomainResource>;
   /**
-   * Deletes the organization domain.
+   * Deletes the Organization's Verified Domain.
    *
-   * @returns A promise that resolves once the domain has been deleted.
+   * @returns A promise that resolves once the Verified Domain has been deleted.
    */
   delete: () => Promise<void>;
   /**
-   * Updates the enrollment mode of the organization domain.
+   * Updates the enrollment mode of the Organization's Verified Domain.
    *
    * @param params - The parameters containing the new enrollment mode and whether to delete pending invitations or suggestions.
    * @returns A promise that resolves to the updated `OrganizationDomain` object.
@@ -121,9 +115,7 @@ export interface OrganizationDomainResource extends ClerkResource {
   updateEnrollmentMode: (params: UpdateEnrollmentModeParams) => Promise<OrganizationDomainResource>;
 }
 
-/**
- * The parameters for {@link OrganizationDomainResource.prepareAffiliationVerification}.
- */
+/** @generateWithEmptyComment */
 export type PrepareAffiliationVerificationParams = {
   /**
    * The email address, belonging to the domain, that the verification code is sent to.
@@ -131,9 +123,7 @@ export type PrepareAffiliationVerificationParams = {
   affiliationEmailAddress: string;
 };
 
-/**
- * The parameters for {@link OrganizationDomainResource.attemptAffiliationVerification}.
- */
+/** @generateWithEmptyComment */
 export type AttemptAffiliationVerificationParams = {
   /**
    * The verification code that was sent to the affiliation email address.
@@ -141,9 +131,7 @@ export type AttemptAffiliationVerificationParams = {
   code: string;
 };
 
-/**
- * The parameters for {@link OrganizationDomainResource.updateEnrollmentMode}.
- */
+/** @generateWithEmptyComment */
 export type UpdateEnrollmentModeParams = Pick<OrganizationDomainResource, 'enrollmentMode'> & {
   /**
    * Whether to delete any pending invitations or suggestions that were created by the previous enrollment mode.

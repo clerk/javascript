@@ -21,18 +21,14 @@ declare global {
 
 declare global {
   /**
-   * If you want to provide custom types for the organizationMembership.publicMetadata
-   * object, simply redeclare this rule in the global namespace.
-   * Every OrganizationMembership object will use the provided type.
+   * If you want to provide custom types for the organizationMembership.publicMetadata object, simply redeclare this rule in the global namespace. Every `OrganizationMembership` will use the provided type.
    */
   interface OrganizationMembershipPublicMetadata {
     [k: string]: unknown;
   }
 
   /**
-   * If you want to provide custom types for the organizationMembership.publicMetadata
-   * object, simply redeclare this rule in the global namespace.
-   * Every OrganizationMembership object will use the provided type.
+   * If you want to provide custom types for the organizationMembership.privateMetadata object, simply redeclare this rule in the global namespace. Every `OrganizationMembership` will use the provided type.
    */
   interface OrganizationMembershipPrivateMetadata {
     [k: string]: unknown;
@@ -40,17 +36,17 @@ declare global {
 }
 
 /**
- * The `OrganizationMembership` object is the model around an organization membership entity and describes the relationship between users and organizations.
+ * The `OrganizationMembership` object is the model around an Organization Membership entity and describes the relationship between users and Organizations.
  *
  * @interface
  */
 export interface OrganizationMembershipResource extends ClerkResource {
   /**
-   * The unique identifier for the membership.
+   * The unique identifier for the Membership.
    */
   id: string;
   /**
-   * The [`Organization`](https://clerk.com/docs/reference/types/organization) object the membership belongs to.
+   * The [`Organization`](https://clerk.com/docs/reference/types/organization) object the Membership belongs to.
    */
   organization: OrganizationResource;
   /**
@@ -62,7 +58,7 @@ export interface OrganizationMembershipResource extends ClerkResource {
    */
   publicMetadata: OrganizationMembershipPublicMetadata;
   /**
-   * Public information about the user that this membership belongs to.
+   * Public information about the user that this Membership belongs to.
    */
   publicUserData?: PublicUserData;
   /**
@@ -82,7 +78,7 @@ export interface OrganizationMembershipResource extends ClerkResource {
    */
   updatedAt: Date;
   /**
-   * Deletes the membership, removing the user from the Organization.
+   * Deletes the Membership, removing the user from the Organization.
    *
    * @returns A promise that resolves to the deleted [`OrganizationMembership`](https://clerk.com/docs/reference/types/organization-membership) object.
    */
@@ -143,9 +139,7 @@ export type OrganizationPermissionKey = ClerkAuthorization extends Placeholder
     : Autocomplete<OrganizationSystemPermissionKey>
   : Autocomplete<OrganizationSystemPermissionKey>;
 
-/**
- * The parameters for {@link OrganizationMembershipResource.update}.
- */
+/** @generateWithEmptyComment */
 export type UpdateOrganizationMembershipParams = {
   /**
    * The [Role](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) to assign to the member.
