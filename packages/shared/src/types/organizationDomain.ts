@@ -28,19 +28,11 @@ type OrganizationDomainVerificationStrategy = 'email_code';
 /** @inline */
 export type OrganizationDomainVerificationStatus = 'unverified' | 'verified';
 
-/**
- * Determines how users are enrolled into an organization once their email address matches a verified domain.
- *
- * - `manual_invitation`: No automatic enrollment. Users with a matching email domain are not given any invitation or suggestion; an admin must invite them manually.
- * - `automatic_invitation`: Users with a matching email domain automatically receive a pending invitation (assigned the org's default role) which they can accept to join.
- * - `automatic_suggestion`: Users with a matching email domain automatically receive a suggestion to join, which they can request.
- *
- * @inline
- */
+/** @inline */
 export type OrganizationEnrollmentMode = 'manual_invitation' | 'automatic_invitation' | 'automatic_suggestion';
 
 /**
- * The `OrganizationDomain` object is the model around an Organization's Verified Domain.
+ * The `OrganizationDomain` object is the model around an Organization's [Verified Domain](https://clerk.com/docs/guides/organizations/add-members/verified-domains).
  *
  * @interface
  */
@@ -59,6 +51,12 @@ export interface OrganizationDomainResource extends ClerkResource {
   organizationId: string;
   /**
    * The enrollment mode that determines how matching users are added to the Organization.
+   *
+   * <ul>
+   *  <li>`manual_invitation`: No automatic enrollment. Users with a matching email domain are not given any [invitation](https://clerk.com/docs/guides/organizations/add-members/verified-domains#automatic-invitations) or [suggestion](https://clerk.com/docs/guides/organizations/add-members/verified-domains#automatic-suggestions); an admin must invite them manually.</li>
+   *  <li>`automatic_invitation`: Users with a matching email domain automatically receive a pending [invitation](https://clerk.com/docs/reference/types/organizationinvitation) (assigned the Organization's default role) which they can accept to join.</li>
+   *  <li>`automatic_suggestion`: Users with a matching email domain automatically receive a [suggestion](https://clerk.com/docs/guides/organizations/add-members/verified-domains#automatic-suggestions) to join, which they can request.</li>
+   * </ul>
    */
   enrollmentMode: OrganizationEnrollmentMode;
   /**
@@ -78,11 +76,11 @@ export interface OrganizationDomainResource extends ClerkResource {
    */
   affiliationEmailAddress: string | null;
   /**
-   * The total number of pending invitations associated with this domain.
+   * The total number of pending [invitations](https://clerk.com/docs/reference/types/organizationinvitation) associated with this domain.
    */
   totalPendingInvitations: number;
   /**
-   * The total number of pending suggestions associated with this domain.
+   * The total number of pending [suggestions](https://clerk.com/docs/reference/types/organizationsuggestion) associated with this domain.
    */
   totalPendingSuggestions: number;
   /**
@@ -101,13 +99,13 @@ export interface OrganizationDomainResource extends ClerkResource {
    */
   attemptAffiliationVerification: (params: AttemptAffiliationVerificationParams) => Promise<OrganizationDomainResource>;
   /**
-   * Deletes the Organization's Verified Domain.
+   * Deletes the Verified Domain.
    *
    * @returns A promise that resolves once the Verified Domain has been deleted.
    */
   delete: () => Promise<void>;
   /**
-   * Updates the enrollment mode of the Organization's Verified Domain.
+   * Updates the enrollment mode of the Verified Domain.
    *
    * @param params - The parameters containing the new enrollment mode and whether to delete pending invitations or suggestions.
    * @returns A promise that resolves to the updated `OrganizationDomain` object.
@@ -134,7 +132,7 @@ export type AttemptAffiliationVerificationParams = {
 /** @generateWithEmptyComment */
 export type UpdateEnrollmentModeParams = Pick<OrganizationDomainResource, 'enrollmentMode'> & {
   /**
-   * Whether to delete any pending invitations or suggestions that were created by the previous enrollment mode.
+   * Whether to delete any pending [invitations](https://clerk.com/docs/reference/types/organizationinvitation) or [suggestions](https://clerk.com/docs/reference/types/organizationsuggestion) that were created by the previous enrollment mode.
    */
   deletePending?: boolean;
 };

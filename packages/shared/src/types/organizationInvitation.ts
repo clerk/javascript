@@ -3,14 +3,14 @@ import type { ClerkResource } from './resource';
 
 declare global {
   /**
-   * If you want to provide custom types for the organizationInvitation.publicMetadata object, simply redeclare this rule in the global namespace. Every `OrganizationInvitation` will use the provided type.
+   * If you want to provide custom types for the `organizationInvitation.publicMetadata` object, simply redeclare this rule in the global namespace. Every `OrganizationInvitation` will use the provided type.
    */
   interface OrganizationInvitationPublicMetadata {
     [k: string]: unknown;
   }
 
   /**
-   * If you want to provide custom types for the organizationInvitation.privateMetadata object, simply redeclare this rule in the global namespace. Every `OrganizationInvitation` will use the provided type.
+   * If you want to provide custom types for the `organizationInvitation.privateMetadata` object, simply redeclare this rule in the global namespace. Every `OrganizationInvitation` will use the provided type.
    */
   interface OrganizationInvitationPrivateMetadata {
     [k: string]: unknown;
@@ -18,7 +18,7 @@ declare global {
 }
 
 /**
- * The `OrganizationInvitation` object is the model around an Organization invitation.
+ * The `OrganizationInvitation` object is the model around an invitation to join an Organization.
  *
  * @interface
  */
@@ -67,9 +67,5 @@ export interface OrganizationInvitationResource extends ClerkResource {
   revoke: () => Promise<OrganizationInvitationResource>;
 }
 
-/**
- * The current status of an Organization invitation.
- *
- * @inline
- */
+/** @inline */
 export type OrganizationInvitationStatus = 'pending' | 'accepted' | 'revoked' | 'expired';

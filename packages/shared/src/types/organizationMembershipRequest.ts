@@ -3,7 +3,7 @@ import type { ClerkResource } from './resource';
 import type { PublicUserData } from './session';
 
 /**
- * The `OrganizationMembershipRequest` object is the model that describes the request of a user to join an organization.
+ * The `OrganizationMembershipRequest` object is the model that describes [the request of a user to join an Organization](https://clerk.com/docs/guides/organizations/add-members/verified-domains#membership-requests).
  *
  * @interface
  */
@@ -17,7 +17,7 @@ export interface OrganizationMembershipRequestResource extends ClerkResource {
    */
   organizationId: string;
   /**
-   * The current status.
+   * The current status of the Membership Request.
    */
   status: OrganizationInvitationStatus;
   /**

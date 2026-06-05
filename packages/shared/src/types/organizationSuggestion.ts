@@ -1,14 +1,10 @@
 import type { ClerkResource } from './resource';
 
-/**
- * The current status of an Organization suggestion.
- *
- * @inline
- */
+/** @inline */
 export type OrganizationSuggestionStatus = 'pending' | 'accepted';
 
 /**
- * The `OrganizationSuggestion` object is the model around a suggestion to join an Organization.
+ * The `OrganizationSuggestion` object is the model around [a suggestion to join an Organization](https://clerk.com/docs/guides/organizations/add-members/verified-domains#automatic-suggestions).
  *
  * @interface
  */
