@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, expectTypeOf, it } from 'vitest';
 
 import { createCssVariables } from '../../styledSystem/createCssVariables';
 import { cva } from '../cva';
-import type { VariantProps } from '../cva';
+import type { SxProp, VariantProps } from '../cva';
 import { defaultMosaicVariables, resolveVariables } from '../variables';
 import type { MosaicTheme } from '../variables';
 
@@ -383,5 +383,387 @@ describe('cva', () => {
 
     const res = styles({ type: 'subtitle', size: 'md' })(mockTheme);
     expect(res).toEqual({ color: 'green', fontSize: 16 });
+  });
+
+  it('preserves nested pseudo-selectors from variant styles', () => {
+    const styles = cva({
+      base: { display: 'flex' },
+      variants: {
+        color: {
+          primary: {
+            backgroundColor: 'blue',
+            '&:hover': { backgroundColor: 'darkblue' },
+          },
+        },
+      },
+    });
+
+    const res = styles({ color: 'primary' })(mockTheme);
+    expect(res).toEqual({
+      display: 'flex',
+      backgroundColor: 'blue',
+      '&:hover': { backgroundColor: 'darkblue' },
+    });
+  });
+});
+
+describe('variant styles with explicitly undefined props (regression: key-in-props bug)', () => {
+  // Mirrors the shape of a real component that destructures all props before passing to cva —
+  // the resulting object has keys present but set to undefined, which must still fall back to defaults.
+  const componentStyles = cva(theme => ({
+    variants: {
+      color: {
+        primary: {
+          backgroundColor: theme.color.primary,
+          '&:hover': { backgroundColor: theme.mix('primary', 'primaryForeground', 12) },
+          '&:active': { backgroundColor: theme.mix('primary', 'primaryForeground', 24) },
+        },
+      },
+      size: { sm: { fontSize: theme.text('sm').fontSize }, md: { fontSize: theme.text('base').fontSize } },
+      disabled: { false: null, true: { opacity: 0.5, pointerEvents: 'none' } },
+    },
+    defaultVariants: { color: 'primary', size: 'md', disabled: false },
+  }));
+
+  it('hover and active styles are present when all props are explicitly undefined', () => {
+    const res = componentStyles({ color: undefined, size: undefined, disabled: undefined })(mockTheme);
+    expect(res['&:hover']).toBeDefined();
+    expect(res['&:active']).toBeDefined();
+  });
+});
+
+describe('resolveVariants via cva', () => {
+  it('falls back to default variant when prop is explicitly undefined', () => {
+    const styles = cva({
+      variants: {
+        color: {
+          primary: { backgroundColor: 'blue', '&:hover': { backgroundColor: 'darkblue' } },
+        },
+      },
+      defaultVariants: { color: 'primary' },
+    });
+
+    const res = styles({ color: undefined })(mockTheme);
+    expect(res).toEqual({ backgroundColor: 'blue', '&:hover': { backgroundColor: 'darkblue' } });
+  });
+
+  it('applies defined props while falling back to defaults for undefined ones', () => {
+    const styles = cva({
+      variants: {
+        size: { sm: { fontSize: 12 }, md: { fontSize: 16 } },
+        color: { blue: { backgroundColor: 'blue' }, red: { backgroundColor: 'red' } },
+      },
+      defaultVariants: { size: 'md', color: 'blue' },
+    });
+
+    const res = styles({ size: undefined, color: 'red' })(mockTheme);
+    expect(res).toEqual({ fontSize: 16, backgroundColor: 'red' });
+  });
+
+  it('applies boolean default variant with non-null false styles', () => {
+    const styles = cva({
+      variants: {
+        disabled: {
+          false: { cursor: 'pointer' },
+          true: { opacity: 0.5, cursor: 'not-allowed' },
+        },
+      },
+      defaultVariants: { disabled: false },
+    });
+
+    const res = styles()(mockTheme);
+    expect(res).toEqual({ cursor: 'pointer' });
+  });
+
+  it('applies boolean default variant with explicit undefined', () => {
+    const styles = cva({
+      variants: {
+        disabled: {
+          false: { cursor: 'pointer' },
+          true: { opacity: 0.5, cursor: 'not-allowed' },
+        },
+      },
+      defaultVariants: { disabled: false },
+    });
+
+    const res = styles({ disabled: undefined })(mockTheme);
+    expect(res).toEqual({ cursor: 'pointer' });
+  });
+});
+
+describe('sx prop', () => {
+  it('applies sx plain object, overriding variant styles', () => {
+    const styles = cva({
+      variants: {
+        color: { primary: { backgroundColor: 'blue', color: 'white' } },
+      },
+    });
+
+    const res = styles({ color: 'primary', sx: { backgroundColor: 'red' } })(mockTheme);
+    expect(res).toEqual({ backgroundColor: 'red', color: 'white' });
+  });
+
+  it('applies sx as a function receiving the theme', () => {
+    const styles = cva({
+      base: { display: 'flex' },
+      variants: {},
+    });
+
+    const res = styles({ sx: theme => ({ color: theme.color.primary }) })(mockTheme);
+    expect(res).toEqual({ display: 'flex', color: mockTheme.color.primary });
+  });
+
+  it('sx overrides base styles', () => {
+    const styles = cva({
+      base: { display: 'flex', gap: 8 },
+      variants: {},
+    });
+
+    const res = styles({ sx: { gap: 16 } })(mockTheme);
+    expect(res).toEqual({ display: 'flex', gap: 16 });
+  });
+
+  it('sx merges nested pseudo-selectors rather than replacing them', () => {
+    const styles = cva({
+      variants: {
+        color: {
+          primary: { backgroundColor: 'blue', '&:hover': { backgroundColor: 'darkblue' } },
+        },
+      },
+    });
+
+    const res = styles({ color: 'primary', sx: { '&:hover': { opacity: 0.9 } } })(mockTheme);
+    expect(res['&:hover']).toEqual({ backgroundColor: 'darkblue', opacity: 0.9 });
+  });
+
+  it('sx overrides conflicting pseudo-selector leaf values', () => {
+    const styles = cva({
+      variants: {
+        color: {
+          primary: { '&:hover': { backgroundColor: 'blue', color: 'white' } },
+        },
+      },
+    });
+
+    const res = styles({ color: 'primary', sx: { '&:hover': { backgroundColor: 'red' } } })(mockTheme);
+    expect(res['&:hover']).toEqual({ backgroundColor: 'red', color: 'white' });
+  });
+});
+
+describe('compound variants', () => {
+  it('applies multiple matching compound variants in order, merging them', () => {
+    const styles = cva({
+      variants: {
+        size: { sm: { fontSize: 12 } },
+        color: { primary: { backgroundColor: 'blue' } },
+      },
+      compoundVariants: [
+        { size: 'sm', color: 'primary', css: { borderRadius: 4 } },
+        { size: 'sm', color: 'primary', css: { padding: 8 } },
+      ],
+    });
+
+    const res = styles({ size: 'sm', color: 'primary' })(mockTheme);
+    expect(res.borderRadius).toBe(4);
+    expect(res.padding).toBe(8);
+  });
+
+  it('later compound variant overrides earlier one on conflicting property', () => {
+    const styles = cva({
+      variants: {
+        size: { sm: { fontSize: 12 } },
+        color: { primary: { backgroundColor: 'blue' } },
+      },
+      compoundVariants: [
+        { size: 'sm', color: 'primary', css: { borderRadius: 4 } },
+        { size: 'sm', color: 'primary', css: { borderRadius: 8 } },
+      ],
+    });
+
+    const res = styles({ size: 'sm', color: 'primary' })(mockTheme);
+    expect(res.borderRadius).toBe(8);
+  });
+
+  it('compound variant pseudo-selector deep-merges with existing variant pseudo-selector', () => {
+    const styles = cva({
+      variants: {
+        color: { primary: { '&:hover': { backgroundColor: 'blue' } } },
+        disabled: { false: null, true: { opacity: 0.5 } },
+      },
+      compoundVariants: [{ color: 'primary', disabled: false, css: { '&:hover': { color: 'white' } } }],
+      defaultVariants: { disabled: false },
+    });
+
+    const res = styles({ color: 'primary' })(mockTheme);
+    expect(res['&:hover']).toEqual({ backgroundColor: 'blue', color: 'white' });
+  });
+});
+
+describe('sanitizeCssVariables', () => {
+  it('sanitizes CSS variable keys inside nested pseudo-selectors', () => {
+    const { color } = createCssVariables('color');
+    const styles = cva({
+      variants: {
+        v: { a: { '&:hover': { [color]: 'red' } } },
+      },
+    });
+
+    const res = styles({ v: 'a' })(mockTheme);
+    expect(res['&:hover']).toEqual({ '--color': 'red' });
+  });
+
+  it('sanitizes CSS variable keys at multiple nesting levels', () => {
+    const { color, bg } = createCssVariables('color', 'bg');
+    const styles = cva({
+      base: { [bg]: 'white', '&:hover': { [color]: 'black' } },
+      variants: {},
+    });
+
+    const res = styles()(mockTheme);
+    expect(res['--bg']).toBe('white');
+    expect(res['&:hover']).toEqual({ '--color': 'black' });
+  });
+});
+
+describe('type safety', () => {
+  describe('SxProp', () => {
+    it('accepts a plain style object', () => {
+      const _sx: SxProp = { color: 'red', padding: 8 };
+      void _sx;
+    });
+
+    it('accepts a function that receives MosaicTheme', () => {
+      const _sx: SxProp = (theme: MosaicTheme) => ({ color: theme.color.primary });
+      void _sx;
+    });
+
+    it('rejects non-object/function values', () => {
+      // @ts-expect-error - string is not a valid SxProp
+      const _a: SxProp = 'red';
+      // @ts-expect-error - number is not a valid SxProp
+      const _b: SxProp = 42;
+      void [_a, _b];
+    });
+
+    it('sx function parameter is typed as MosaicTheme, not any', () => {
+      const _sx: SxProp = theme => {
+        // @ts-expect-error - nonexistent color key
+        void theme.color.nonexistent;
+        return {};
+      };
+      void _sx;
+    });
+  });
+
+  describe('MosaicTheme helpers', () => {
+    it('spacing returns a typed template literal, not string', () => {
+      expectTypeOf(mockTheme.spacing(4)).toEqualTypeOf<'calc(0.25rem * 4)'>();
+    });
+
+    it('text returns exact fontSize and lineHeight literal types', () => {
+      expectTypeOf(mockTheme.text('sm')).toEqualTypeOf<{
+        fontSize: '0.875rem';
+        lineHeight: 'calc(1.25 / 0.875)';
+      }>();
+    });
+
+    it('alpha returns a typed template literal', () => {
+      expectTypeOf(
+        mockTheme.alpha('primary', 50),
+      ).toEqualTypeOf<'color-mix(in oklab, light-dark(oklch(0.205 0 0), oklch(0.922 0 0)) 50%, transparent)'>();
+    });
+
+    it('mix returns a typed template literal', () => {
+      expectTypeOf(
+        mockTheme.mix('primary', 'primaryForeground', 12),
+      ).toEqualTypeOf<'color-mix(in oklab, light-dark(oklch(0.205 0 0), oklch(0.922 0 0)), light-dark(oklch(0.985 0 0), oklch(0.205 0 0)) 12%)'>();
+    });
+
+    it('rejects invalid keys on theme helpers', () => {
+      // Wrapped in a never-called function so TS checks types without executing
+      () => {
+        // @ts-expect-error - nonexistent color key
+        mockTheme.alpha('nonexistent', 50);
+        // @ts-expect-error - nonexistent color key
+        mockTheme.mix('primary', 'nonexistent', 10);
+        // @ts-expect-error - nonexistent fontSize key
+        mockTheme.text('4xl');
+      };
+    });
+  });
+
+  describe('VariantProps boolean unwrapping', () => {
+    it('exposes boolean type for true/false variant keys, not string literals', () => {
+      const styles = cva({
+        variants: {
+          disabled: { false: null, true: { opacity: 0.5 } },
+        },
+      });
+      type Props = VariantProps<typeof styles>;
+
+      expectTypeOf<Props['disabled']>().toEqualTypeOf<boolean | undefined>();
+
+      // @ts-expect-error - string 'true' is not assignable to boolean
+      const _invalid: Props = { disabled: 'true' };
+      void _invalid;
+    });
+  });
+
+  describe('cva theme-function overload', () => {
+    it('rejects invalid theme property access inside config function', () => {
+      cva((_theme: MosaicTheme) => ({
+        // @ts-expect-error - nonexistent color key
+        base: { color: _theme.color.nonexistent },
+        variants: {},
+      }));
+    });
+  });
+
+  describe('defaultVariants', () => {
+    it('accepts valid variant values', () => {
+      cva({
+        variants: {
+          color: { primary: { backgroundColor: 'blue' }, secondary: { backgroundColor: 'gray' } },
+          disabled: { false: null, true: { opacity: 0.5 } },
+        },
+        defaultVariants: { color: 'primary', disabled: false },
+      });
+    });
+
+    it('rejects an invalid value for a variant key', () => {
+      cva({
+        variants: {
+          color: { primary: { backgroundColor: 'blue' }, secondary: { backgroundColor: 'gray' } },
+        },
+        defaultVariants: {
+          // @ts-expect-error - 'danger' is not a valid color variant value
+          color: 'danger',
+        },
+      });
+    });
+
+    it('rejects an unknown variant key', () => {
+      cva({
+        variants: {
+          color: { primary: { backgroundColor: 'blue' } },
+        },
+        defaultVariants: {
+          // @ts-expect-error - 'size' is not a declared variant
+          size: 'sm',
+        },
+      });
+    });
+
+    it('rejects a string for a boolean variant', () => {
+      cva({
+        variants: {
+          disabled: { false: null, true: { opacity: 0.5 } },
+        },
+        defaultVariants: {
+          // @ts-expect-error - 'false' string is not assignable to boolean
+          disabled: 'false',
+        },
+      });
+    });
   });
 });

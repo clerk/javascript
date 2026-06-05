@@ -59,7 +59,7 @@ function resolveVariants(
 ): Record<string, string> {
   const resolved: Record<string, string> = {};
   for (const key in variants) {
-    const value = key in props ? props[key] : defaults[key];
+    const value = props[key] !== undefined ? props[key] : defaults[key];
     if (value !== undefined) {
       resolved[key] = typeof value === 'boolean' ? String(value) : value;
     }
@@ -112,6 +112,8 @@ function sanitizeCssVariables(styles: StyleRule) {
     if (key.startsWith('var(')) {
       styles[key.slice(4, -1)] = styles[key];
       delete styles[key];
+    } else if (styles[key] !== null && typeof styles[key] === 'object') {
+      sanitizeCssVariables(styles[key]);
     }
   }
 }
