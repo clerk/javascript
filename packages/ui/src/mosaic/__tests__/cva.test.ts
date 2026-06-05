@@ -256,7 +256,11 @@ describe('cva', () => {
     }));
 
     const res = styles({ size: 'sm' })(mockTheme);
+<<<<<<< HEAD
     expect(res).toEqual({ color: 'light-dark(oklch(0.205 0 0), oklch(0.922 0 0))', padding: 'calc(0.25rem * 2)' });
+=======
+    expect(res).toEqual({ color: 'oklch(0.205 0 0)', padding: 'calc(0.25rem * 2)' });
+>>>>>>> b66b94fbd1 (refactor parseVariables to resolveVariables)
   });
 
   it('returns base styles only when no variants provided and no defaults', () => {

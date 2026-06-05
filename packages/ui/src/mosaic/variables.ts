@@ -82,6 +82,23 @@ function merge(target: Record<string, unknown>, overrides: Record<string, unknow
   const result: Record<string, unknown> = { ...target };
   for (const k in overrides) {
     if (DANGEROUS_KEYS.has(k)) continue;
+
+export type MosaicVariables = {
+  [K in keyof MosaicTokens]?: MosaicTokens[K] extends string ? string : { [J in keyof MosaicTokens[K]]?: string };
+};
+
+export type MosaicTheme = Omit<MosaicTokens, 'spacing'> & {
+  readonly spacing: <N extends number>(n: N) => `calc(${MosaicTokens['spacing']} * ${N})`;
+  readonly alpha: <C extends string, O extends number>(
+    color: C,
+    opacity: O,
+  ) => `color-mix(in oklab, ${C} ${O}%, transparent)`;
+};
+
+function merge(target: Record<string, unknown>, overrides: Record<string, unknown>): Record<string, unknown> {
+  const result: Record<string, unknown> = { ...target };
+  for (const k in overrides) {
+    if (DANGEROUS_KEYS.has(k)) continue;
     const value = overrides[k];
     if (value === undefined) continue;
     result[k] =

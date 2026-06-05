@@ -23,6 +23,7 @@ export interface MosaicProviderProps {
   cssLayerName?: string;
 }
 
+<<<<<<< HEAD
 export function MosaicProvider({ children, variables, nonce, cssLayerName }: MosaicProviderProps) {
   const theme = React.useMemo(() => resolveVariables(defaultMosaicVariables, variables), [variables]);
   const cache = React.useMemo(() => {
@@ -54,6 +55,11 @@ export function MosaicProvider({ children, variables, nonce, cssLayerName }: Mos
       <CacheProvider value={cache}>{children}</CacheProvider>
     </MosaicThemeContext.Provider>
   );
+=======
+export function MosaicProvider({ children, variables }: MosaicProviderProps) {
+  const theme = React.useMemo(() => resolveVariables(defaultMosaicVariables, variables), [variables]);
+  return <MosaicThemeContext.Provider value={theme}>{children}</MosaicThemeContext.Provider>;
+>>>>>>> b66b94fbd1 (refactor parseVariables to resolveVariables)
 }
 
 export function useMosaicTheme(): MosaicTheme {
