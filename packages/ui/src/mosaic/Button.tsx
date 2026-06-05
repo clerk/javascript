@@ -13,8 +13,7 @@ export const buttonStyles = cva(theme => ({
     gap: theme.spacing(2),
     borderRadius: theme.radius.md,
     fontWeight: 500,
-    fontSize: '0.875rem',
-    lineHeight: '1.25rem',
+    ...theme.text('sm'),
     cursor: 'pointer',
     border: 'none',
     transition: 'background-color 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s',
@@ -33,8 +32,8 @@ export const buttonStyles = cva(theme => ({
       },
     },
     size: {
-      sm: { padding: `${theme.spacing(0.2)} ${theme.spacing(2)}`, fontSize: '0.75rem' },
-      md: { padding: `${theme.spacing(2)} ${theme.spacing(4)}`, fontSize: '0.875rem' },
+      sm: { padding: `${theme.spacing(0.2)} ${theme.spacing(2)}`, ...theme.text('xs') },
+      md: { padding: `${theme.spacing(2)} ${theme.spacing(4)}`, ...theme.text('sm') },
     },
     disabled: {
       false: null,
