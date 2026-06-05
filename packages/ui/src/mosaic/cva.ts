@@ -69,7 +69,7 @@ function resolveVariants(
 
 function applyBase(target: StyleRule, base?: StyleRule) {
   if (base && typeof base === 'object') {
-    Object.assign(target, base);
+    fastDeepMergeAndReplace(base, target);
   }
 }
 

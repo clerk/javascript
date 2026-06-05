@@ -52,7 +52,7 @@ export type MosaicTheme = Omit<MosaicTokens, 'spacing' | 'fontSize'> & {
 function merge(target: Record<string, unknown>, overrides: Record<string, unknown>): Record<string, unknown> {
   const result: Record<string, unknown> = { ...target };
   for (const k in overrides) {
-    if (k === '__proto__' || k === 'constructor' || k === 'prototype') break;
+    if (k === '__proto__' || k === 'constructor' || k === 'prototype') continue;
     const value = overrides[k];
     if (value === undefined) continue;
     result[k] =

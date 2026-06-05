@@ -306,7 +306,7 @@ describe('cva', () => {
       },
     });
 
-    const res = styles({ size: 'sm', unknownProp: 'value' } as any)(mockTheme);
+    const res = styles({ size: 'sm', unknownProp: 'value' } as unknown as VariantProps<typeof styles>)(mockTheme);
     expect(res).toEqual({ display: 'flex', fontSize: 12 });
   });
 

@@ -15,17 +15,18 @@ Once migration is complete, the old system is removed and Mosaic becomes the sol
 The token type is derived from the default values — not a hand-written interface:
 
 ```ts
-// packages/ui/src/mosaic/tokens.ts
-export const defaultMosaicTokens = Object.freeze({
-  color: { primary: '#6C47FF', fg: '#111111', ... },
-  spacing: { xs: '0.25rem', sm: '0.5rem', md: '1rem', ... },
-  radius: { sm: '0.25rem', md: '0.375rem', ... },
+// packages/ui/src/mosaic/variables.ts
+export const defaultMosaicVariables = Object.freeze({
+  color: { primary: '...', primaryForeground: '...', ... },
+  spacing: '0.25rem',
+  radius: { xs: '0.125rem', sm: '0.25rem', md: '0.375rem', ... },
+  fontSize: { xs: { size: '0.75rem', lineHeight: '...' }, ... },
 } as const);
 
-export type MosaicTheme = typeof defaultMosaicTokens;
+export type MosaicTokens = typeof defaultMosaicVariables;
 ```
 
-This guarantees the type matches runtime. Adding a token to `defaultMosaicTokens` automatically updates `MosaicTheme` — no manual sync.
+This guarantees the type matches runtime. Adding a token to `defaultMosaicVariables` automatically updates `MosaicTokens` — no manual sync.
 
 ### MosaicVariables
 
@@ -40,13 +41,13 @@ export interface MosaicVariables {
 }
 ```
 
-### parseVariables
+### resolveVariables
 
 Transforms `MosaicVariables` into a resolved `MosaicTheme`. A single `colorPrimary` override fans out into `primaryHover`, `primaryActive`, `primaryMuted`, etc.
 
 ```ts
-// packages/ui/src/mosaic/parseVariables.ts
-export function parseVariables(defaults: MosaicTheme, variables?: MosaicVariables): MosaicTheme;
+// packages/ui/src/mosaic/variables.ts
+export function resolveVariables(defaults: MosaicTokens, variables?: MosaicVariables): MosaicTheme;
 ```
 
 ## Theme delivery
@@ -70,7 +71,7 @@ import { useMosaicTheme } from '../mosaic/MosaicProvider';
 
 function MyComponent() {
   const theme = useMosaicTheme();
-  return <div css={{ color: theme.color.fg, padding: theme.spacing.md }} />;
+  return <div css={{ color: theme.color.primary, padding: theme.spacing }} />;
 }
 ```
 
@@ -90,12 +91,12 @@ What we keep: `css` prop (with plain objects), `keyframes`, `Global`, style seri
 
 Appearance overrides merge lowest-to-highest priority:
 
-1. Default tokens (`defaultMosaicTokens`)
+1. Default tokens (`defaultMosaicVariables`)
 2. Base theme overrides (prebuilt themes)
 3. Global appearance overrides
 4. Component-level appearance overrides
 
-`MosaicProvider` accepts `variables` prop and runs them through `parseVariables`.
+`MosaicProvider` accepts `variables` and resolves them via `resolveVariables`.
 
 ## CVA utility
 
@@ -217,7 +218,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
 
 ### Provider tree
 
-```
+```text
 StyleCacheProvider (shared Emotion cache)
 └── AppearanceProvider (existing)
     └── InternalThemeProvider (existing — Emotion ThemeProvider)
@@ -258,10 +259,9 @@ To migrate a component from the old system to Mosaic:
 
 ## Files
 
-| File                               | Purpose                                                     |
-| ---------------------------------- | ----------------------------------------------------------- |
-| `src/mosaic/tokens.ts`             | `MosaicTheme` type, `MosaicVariables`, default token values |
-| `src/mosaic/parseVariables.ts`     | Variables → resolved theme                                  |
-| `src/mosaic/MosaicProvider.tsx`    | Provider + `useMosaicTheme()` hook                          |
-| `src/mosaic/cva.ts`                | CVA variant utility + `VariantProps` type                   |
-| `src/mosaic/__tests__/cva.test.ts` | CVA test suite                                              |
+| File                               | Purpose                                                      |
+| ---------------------------------- | ------------------------------------------------------------ |
+| `src/mosaic/variables.ts`          | Token types, `MosaicVariables`, `resolveVariables`, defaults |
+| `src/mosaic/MosaicProvider.tsx`    | Provider + `useMosaicTheme()` hook                           |
+| `src/mosaic/cva.ts`                | CVA variant utility + `VariantProps` type                    |
+| `src/mosaic/__tests__/cva.test.ts` | CVA test suite                                               |

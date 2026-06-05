@@ -7,7 +7,12 @@ import React from 'react';
 import { defaultMosaicVariables, resolveVariables } from './variables';
 import type { MosaicTheme, MosaicVariables } from './variables';
 
-const el = document.querySelector('style#cl-mosaic-style-insertion-point');
+const getInsertionPoint = (): HTMLElement | null => {
+  if (typeof document === 'undefined') {
+    return null;
+  }
+  return document.querySelector('style#cl-mosaic-style-insertion-point');
+};
 
 const MosaicThemeContext = React.createContext<MosaicTheme | null>(null);
 
@@ -21,11 +26,12 @@ export interface MosaicProviderProps {
 export function MosaicProvider({ children, variables, nonce, cssLayerName }: MosaicProviderProps) {
   const theme = React.useMemo(() => resolveVariables(defaultMosaicVariables, variables), [variables]);
   const cache = React.useMemo(() => {
+    const el = getInsertionPoint();
     const emotionCache = createCache({
       key: 'cl-mosaic',
       stylisPlugins: [],
       prepend: cssLayerName ? false : !el,
-      insertionPoint: el ? (el as HTMLElement) : undefined,
+      insertionPoint: el ?? undefined,
       nonce,
     });
 
