@@ -10,48 +10,63 @@ permissions:
   contents: read
   issues: read
   pull-requests: read
+  statuses: write
 
 jobs:
   check-major-bump:
     if: ${{ github.event_name == 'pull_request' || github.event.issue.pull_request }}
     runs-on: ubuntu-latest
     steps:
-      - name: Check for major changesets
-        id: check_major
+      - name: Check for unapproved major changesets
         uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           script: |
+            const STATUS_CONTEXT = 'Major Version Check';
             const prNumber = context.payload?.pull_request?.number || context.payload?.issue?.number;
 
-            // Get list of files changed in the PR
-            const { data: files } = await github.rest.pulls.listFiles({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: prNumber,
-            });
-
+            // Resolve the PR so we have its head SHA. issue_comment runs are tied to the
+            // default branch, so the implicit job check-run lands on main rather than the PR
+            // head. We post an explicit commit status to the PR head instead, so the required
+            // context updates correctly no matter which event triggered the run (e.g. the
+            // re-run after an "!allow-major" comment).
             let pullRequest = context.payload.pull_request;
-
             if (!pullRequest) {
-              // Fetch the pull request data
-              const pullRequestData = await github.rest.pulls.get({
+              const { data } = await github.rest.pulls.get({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 pull_number: prNumber,
               });
-              pullRequest = pullRequestData.data;
+              pullRequest = data;
             }
+            const headSha = pullRequest.head.sha;
 
-            // Check if any changeset files indicate a major bump
+            const setStatus = (state, description) =>
+              github.rest.repos.createCommitStatus({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                sha: headSha,
+                context: STATUS_CONTEXT,
+                state,
+                description,
+                target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+              });
+
+            // Check if any changeset files indicate a major bump.
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+              per_page: 100,
+            });
+
             let hasMajorChangeset = false;
             for (const file of files) {
               if (file.filename.startsWith('.changeset/') && file.status !== 'removed') {
-                // Fetch the contents of the changeset file
                 const { data: changesetContent } = await github.rest.repos.getContent({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   path: file.filename,
-                  ref: pullRequest.head.sha,
+                  ref: headSha,
                 });
 
                 const content = Buffer.from(changesetContent.content, changesetContent.encoding).toString();
@@ -59,61 +74,54 @@ jobs:
                 // Only check for "major" in the YAML frontmatter section (between --- markers)
                 // This avoids false positives from descriptive text mentioning "major"
                 const frontmatterMatch = content.match(/^---\r?\n([\s\S]*?)\r?\n---\s*$/m);
-                if (frontmatterMatch) {
-                  const frontmatter = frontmatterMatch[1];
-                  if (/:\s*["']?major["']?/.test(frontmatter)) {
-                    hasMajorChangeset = true;
-                    break;
-                  }
+                if (frontmatterMatch && /:\s*["']?major["']?/.test(frontmatterMatch[1])) {
+                  hasMajorChangeset = true;
+                  break;
                 }
               }
             }
 
-            core.setOutput('has_major_changeset', hasMajorChangeset);
+            if (!hasMajorChangeset) {
+              await setStatus('success', 'No major version bump detected.');
+              console.log('No major changeset detected.');
+              return;
+            }
 
-      - name: Check if major version bump is allowed
-        if: steps.check_major.outputs.has_major_changeset == 'true'
-        id: check_approval
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
-        with:
-          script: |
-            const prNumber = context.payload?.pull_request?.number || context.payload?.issue?.number;
-            const org = context.repo.owner;
-
-            // Get all comments on the PR
-            const { data: comments } = await github.rest.issues.listComments({
+            // A major bump is present: require an "!allow-major" comment from an org member.
+            const comments = await github.paginate(github.rest.issues.listComments, {
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: prNumber,
+              per_page: 100,
             });
 
             let approvalFound = false;
             for (const comment of comments) {
               if (comment.body.trim().toLowerCase() === '!allow-major') {
-                const username = comment.user.login;
-
-                // Check if the user is a public member of the organization
                 try {
                   const { status } = await github.rest.orgs.checkMembershipForUser({
-                    org,
-                    username,
+                    org: context.repo.owner,
+                    username: comment.user.login,
                   });
-
                   if (status === 204) {
                     approvalFound = true;
                     break;
                   }
                 } catch (error) {
-                  if (error.status !== 204) {
-                    // User is not a public member
-                    continue;
-                  }
+                  // Not a public org member; keep looking.
+                  continue;
                 }
               }
             }
 
-            if (!approvalFound) {
-              core.setFailed('Major version bump requires approval from an organization member by commenting "!allow-major" on the PR.');
-            } else {
+            if (approvalFound) {
+              await setStatus('success', 'Major version bump approved by an organization member.');
               console.log('Major version bump approved by an organization member.');
+            } else {
+              // The red "Major Version Check" commit status on the PR head is the gate. We keep
+              // the job itself green so that the success status posted by a later "!allow-major"
+              // re-run (an issue_comment run, whose implicit check-run lands on main, not the PR
+              // head) isn't shadowed by a stale red job check-run that never clears.
+              await setStatus('failure', 'Major bump needs an "!allow-major" comment from an org member.');
+              core.warning('Major version bump requires approval from an organization member by commenting "!allow-major" on the PR.');
             }
