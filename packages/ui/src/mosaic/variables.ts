@@ -42,7 +42,7 @@ export type MosaicVariables = {
 
 /**
  * Resolved theme object passed to `cva` config functions and `sx` props.
- * Raw `spacing` and `fontSize` tokens are replaced with typed helper functions.
+ * Raw `spacing` and `text` tokens are replaced with typed helper functions.
  *
  * @example
  * cva(theme => ({
@@ -53,7 +53,7 @@ export type MosaicVariables = {
  *   },
  * }))
  */
-export type MosaicTheme = Omit<MosaicTokens, 'spacing' | 'fontSize'> & {
+export type MosaicTheme = Omit<MosaicTokens, 'spacing' | 'text'> & {
   /** Returns `calc(<base> * N)` for the given multiplier. */
   readonly spacing: <N extends number>(n: N) => `calc(${MosaicTokens['spacing']} * ${N})`;
   /** Mixes a theme color with `transparent` at the given opacity percentage. */
