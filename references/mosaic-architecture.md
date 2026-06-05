@@ -2,7 +2,7 @@
 
 ## Overview
 
-Mosaic is the next-generation design system for Clerk's UI components, replacing the existing Emotion-based theming system. Both systems coexist during migration — Mosaic lives under `packages/ui/src/mosaic/` as a self-contained module that doesn't touch any existing code.
+Mosaic is the next-generation design system for Clerk's UI components, replacing the existing styled system. Both systems coexist during migration — Mosaic lives under `packages/ui/src/mosaic/` as a self-contained module that doesn't touch any existing code.
 
 Mosaic uses Emotion for CSS-in-JS but delivers theme tokens via its own React context (not Emotion's `ThemeProvider`). This avoids type conflicts with the existing system's `InternalTheme` augmentation on Emotion's global `Theme` interface.
 
@@ -26,28 +26,24 @@ export const defaultMosaicVariables = Object.freeze({
 export type MosaicTokens = typeof defaultMosaicVariables;
 ```
 
-This guarantees the type matches runtime. Adding a token to `defaultMosaicVariables` automatically updates `MosaicTokens` — no manual sync.
+### MosaicTheme helpers
 
-### MosaicVariables
-
-User-facing customization knobs passed to `MosaicProvider`:
+`MosaicTheme` includes computed helpers alongside static tokens:
 
 ```ts
-export interface MosaicVariables {
-  colorPrimary?: string;
-  colorDanger?: string;
-  colorBackground?: string;
-  borderRadius?: string;
-}
-```
+const theme = useMosaicTheme();
 
-### resolveVariables
+// spacing(n) — multiply base spacing by n
+theme.spacing(2); // "calc(0.25rem * 2)"
 
-Transforms `MosaicVariables` into a resolved `MosaicTheme`. A single `colorPrimary` override fans out into `primaryHover`, `primaryActive`, `primaryMuted`, etc.
+// alpha(color, opacity) — apply opacity via color-mix
+theme.alpha('primary', 80); // "color-mix(in oklab, <primary-value> 80%, transparent)"
 
-```ts
-// packages/ui/src/mosaic/variables.ts
-export function resolveVariables(defaults: MosaicTokens, variables?: MosaicVariables): MosaicTheme;
+// mix(colorA, colorB, percentage) — blend colors via color-mix
+theme.mix('primary', 'primaryForeground', 50); // "color-mix(in oklab, <primary>, <primaryForeground> 50%)"
+
+// text(key) — typography scale with fontSize + lineHeight
+theme.text('sm'); // { fontSize: '0.875rem', lineHeight: '...' }
 ```
 
 ## Theme delivery
@@ -59,7 +55,7 @@ Single provider that handles cascade and theme delivery:
 ```tsx
 import { MosaicProvider } from '../mosaic/MosaicProvider';
 
-<MosaicProvider variables={{ colorPrimary: 'hotpink' }}>{children}</MosaicProvider>;
+<MosaicProvider>{children}</MosaicProvider>;
 ```
 
 ### useMosaicTheme
@@ -71,7 +67,7 @@ import { useMosaicTheme } from '../mosaic/MosaicProvider';
 
 function MyComponent() {
   const theme = useMosaicTheme();
-  return <div css={{ color: theme.color.primary, padding: theme.spacing }} />;
+  return <div css={{ color: theme.color.primary, padding: theme.spacing(4) }} />;
 }
 ```
 
@@ -135,7 +131,7 @@ const styles = cva(theme => ({
   base: { borderRadius: theme.radius.md },
   variants: {
     intent: {
-      primary: { background: theme.color.primary, color: theme.color.primaryContrast },
+      primary: { background: theme.color.primary, color: theme.color.primary },
       outline: { background: 'transparent', border: `1px solid ${theme.color.border}` },
     },
   },
