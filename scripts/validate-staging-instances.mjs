@@ -35,6 +35,67 @@ function isIgnored(path) {
   return IGNORED_PATHS.some(pattern => pattern.test(path));
 }
 
+// ── Gating policy ────────────────────────────────────────────────────────────
+
+/**
+ * Functional configuration that must match between a production instance and its
+ * staging mirror for the e2e suite to be meaningful. A mismatch on any of these
+ * paths fails the gate in strict mode; every other difference is reported as
+ * informational drift and never blocks. Keep this list tight: only config that
+ * actually changes which auth flows are possible belongs here.
+ */
+const CRITICAL_PATHS = [
+  // An auth attribute (email_address, phone_number, username, ...) toggled on/off.
+  /^user_settings\.attributes\.[^.]+\.enabled$/,
+  // The phone-code channel set (sms / whatsapp), which drives alternate-channel UIs.
+  /^user_settings\.attributes\.phone_number\.channels$/,
+  // Enabled auth strategies / factors for an attribute.
+  /^user_settings\.attributes\.[^.]+\.(first_factors|second_factors|verifications)$/,
+  // A social provider enabled/disabled, or wholly added/removed.
+  /^user_settings\.social\.[^.]+(\.enabled)?$/,
+  // Password policy, which affects password sign-in / sign-up flows.
+  /^user_settings\.password_settings\..+/,
+];
+
+/**
+ * Known, intentionally-tolerated critical drift that should NOT fail the gate, so
+ * that NEW drift still does. Each entry needs a `path` (string or RegExp), an
+ * optional `instance` name to scope it, and a `reason` (ideally a tracking link).
+ * Prefer fixing the staging instance over adding entries here.
+ */
+const ACCEPTED_DRIFT = [
+  // e.g. { instance: 'with-whatsapp-phone-code', path: 'user_settings.attributes.phone_number.channels',
+  //        reason: 'WhatsApp channel not yet provisioned on staging (CLERK-XXXX)' },
+];
+
+function isCriticalPath(path) {
+  return CRITICAL_PATHS.some(pattern => pattern.test(path));
+}
+
+function isAcceptedDrift(instanceName, path, acceptedDrift = ACCEPTED_DRIFT) {
+  return acceptedDrift.some(entry => {
+    if (entry.instance !== undefined && entry.instance !== instanceName) return false;
+    return typeof entry.path === 'string' ? entry.path === path : entry.path.test(path);
+  });
+}
+
+/**
+ * Split a pair's mismatches into blocking (critical and not accepted) and
+ * informational. Pure and side-effect free for testability.
+ */
+function classifyMismatches(instanceName, mismatches, acceptedDrift = ACCEPTED_DRIFT) {
+  const blocking = [];
+  const informational = [];
+  for (const m of mismatches) {
+    if (isCriticalPath(m.path) && !isAcceptedDrift(instanceName, m.path, acceptedDrift)) {
+      blocking.push(m);
+    } else {
+      informational.push(m);
+    }
+  }
+  return { blocking, informational };
+}
+
 // ── Key loading ──────────────────────────────────────────────────────────────
 
 function loadKeys(envVar, filePath) {
@@ -311,7 +372,7 @@ function printReport(name, mismatches) {
 
 // ── Main ─────────────────────────────────────────────────────────────────────
 
-async function main() {
+async function main({ strict = ['1', 'true'].includes(process.env.STAGING_VALIDATE_STRICT) } = {}) {
   const { keys: prodKeys, errors: prodErrors } = loadKeys('INTEGRATION_INSTANCE_KEYS', 'integration/.keys.json');
   for (const err of prodErrors) console.error(`⚠️  Production keys: ${err}`);
   if (!prodKeys) {
@@ -367,6 +428,8 @@ async function main() {
 
   let mismatchCount = 0;
   let fetchFailCount = 0;
+  let blockingTotal = 0;
+  const blockingByInstance = [];
 
   for (const pair of validPairs) {
     const prodDomain = parseFapiDomain(pair.prod.pk);
@@ -386,6 +449,12 @@ async function main() {
     mismatches = collapseAttributeMismatches(mismatches);
     mismatches = collapseSocialMismatches(mismatches);
 
+    const { blocking } = classifyMismatches(pair.name, mismatches);
+    if (blocking.length > 0) {
+      blockingTotal += blocking.length;
+      blockingByInstance.push({ name: pair.name, paths: blocking.map(m => m.path) });
+    }
+
     if (mismatches.length > 0) mismatchCount++;
     printReport(pair.name, mismatches);
   }
@@ -397,12 +466,32 @@ async function main() {
   const matchedCount = validPairs.length - mismatchCount - fetchFailCount;
   if (matchedCount > 0) parts.push(`${matchedCount} matched`);
   console.log(`Summary: ${parts.join(', ')} (${validPairs.length} total)`);
+
+  // Gating: only mismatches on critical config block, and only in strict mode.
+  // Fetch failures and cosmetic drift never fail the build, to avoid false reds.
+  if (blockingTotal > 0) {
+    console.log('');
+    console.log(
+      `❌ ${blockingTotal} blocking mismatch(es) on critical config across ${blockingByInstance.length} instance(s):`,
+    );
+    for (const { name, paths } of blockingByInstance) {
+      for (const p of paths) console.log(`   - ${name}: ${p}`);
+    }
+    if (strict) {
+      console.error(
+        '\nStaging instance config has drifted on critical paths. Fix the staging instance(s) or add an accepted-drift entry.',
+      );
+      process.exit(1);
+    }
+    console.log('\n(Report-only: set STAGING_VALIDATE_STRICT=1 or pass --strict to fail the build on the above.)');
+  }
 }
 
 // Allow importing functions for testing while still being executable
 const isDirectRun = process.argv[1] === fileURLToPath(import.meta.url);
 if (isDirectRun) {
-  main().catch(err => {
+  const strict = ['1', 'true'].includes(process.env.STAGING_VALIDATE_STRICT) || process.argv.includes('--strict');
+  main({ strict }).catch(err => {
     console.error('Unexpected error:', err);
     process.exit(0);
   });
@@ -416,5 +505,8 @@ export {
   collapseAttributeMismatches,
   collapseSocialMismatches,
   compareEnvironments,
+  isCriticalPath,
+  isAcceptedDrift,
+  classifyMismatches,
   main,
 };
