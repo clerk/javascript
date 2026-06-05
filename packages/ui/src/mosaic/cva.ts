@@ -2,18 +2,37 @@ import { fastDeepMergeAndReplace } from '@clerk/shared/utils';
 
 import type { MosaicTheme } from './variables';
 
+// ─── Public Types ─────────────────────────────────────────────────────────────
+
+/** A plain CSS-in-JS style object: property names as camelCase or selector strings (e.g. `'&:hover'`). */
 export type StyleRule = Record<string, any>;
 
+/** Per-instance style override — either a static object or a function that receives the resolved theme. */
 export type SxProp = StyleRule | ((theme: MosaicTheme) => StyleRule);
+
+/**
+ * Extracts the variant prop types from a `cva` result, including `sx`.
+ *
+ * @example
+ * const buttonStyles = cva({ variants: { size: { sm: {}, md: {} } } });
+ * type ButtonStyleProps = VariantProps<typeof buttonStyles>;
+ * // { size?: 'sm' | 'md'; sx?: SxProp }
+ */
+export type VariantProps<T extends (...args: any) => any> =
+  T extends CvaFn<infer V> ? VariantPropsOf<V> & { sx?: SxProp } : never;
+
+// ─── Internal Types ───────────────────────────────────────────────────────────
 
 type Variants = Record<string, Record<string, StyleRule | null>>;
 
+/** Converts `'true' | 'false'` string literal keys to `boolean` so callers pass real booleans. */
 type UnwrapBooleanVariant<T> = T extends 'true' | 'false' ? boolean : T;
 
 type VariantPropsOf<V extends Variants> = {
   [K in keyof V]?: UnwrapBooleanVariant<keyof V[K]>;
 };
 
+/** A compound variant entry: all variant conditions plus a `css` block applied when they all match. */
 type CompoundVariant<V extends Variants> = VariantPropsOf<V> & { css: StyleRule };
 
 type CvaConfig<V extends Variants> = {
@@ -23,13 +42,38 @@ type CvaConfig<V extends Variants> = {
   defaultVariants?: VariantPropsOf<V>;
 };
 
+/** The curried function returned by `cva`: receives variant props, returns a theme → StyleRule resolver. */
 type CvaFn<V extends Variants> = {
   (props?: VariantPropsOf<V> & { sx?: SxProp }): (theme: MosaicTheme) => StyleRule;
 };
 
-export type VariantProps<T extends (...args: any) => any> =
-  T extends CvaFn<infer V> ? VariantPropsOf<V> & { sx?: SxProp } : never;
+// ─── cva ──────────────────────────────────────────────────────────────────────
 
+/**
+ * Defines a component's styles as a set of composable variants.
+ *
+ * Accepts either a static config object or a function that receives the resolved `MosaicTheme`,
+ * allowing token values to be used directly in variant definitions.
+ *
+ * Styles are applied in order: base → variants → compound variants → sx.
+ * Each layer deep-merges into the previous, so nested selectors (e.g. `'&:hover'`) accumulate
+ * rather than replace.
+ *
+ * @example
+ * const buttonStyles = cva(theme => ({
+ *   base: { borderRadius: theme.radius.md },
+ *   variants: {
+ *     size: {
+ *       sm: { ...theme.text('xs') },
+ *       md: { ...theme.text('sm') },
+ *     },
+ *   },
+ *   defaultVariants: { size: 'md' },
+ * }));
+ *
+ * // In a component:
+ * css={buttonStyles({ size: 'sm', sx: { opacity: 0.8 } })(theme)}
+ */
 export function cva<V extends Variants>(config: CvaConfig<V>): CvaFn<V>;
 export function cva<V extends Variants>(configFn: (theme: MosaicTheme) => CvaConfig<V>): CvaFn<V>;
 export function cva<V extends Variants>(configOrFn: CvaConfig<V> | ((theme: MosaicTheme) => CvaConfig<V>)): CvaFn<V> {
@@ -56,6 +100,9 @@ export function cva<V extends Variants>(configOrFn: CvaConfig<V> | ((theme: Mosa
     }) as CvaFn<V>;
 }
 
+// ─── Internal ─────────────────────────────────────────────────────────────────
+
+/** Resolves each variant axis to a string key, preferring explicit props over defaults. Booleans are stringified to match variant map keys. */
 function resolveVariants(
   variants: Variants,
   props: Record<string, any>,
@@ -71,6 +118,7 @@ function resolveVariants(
   return resolved;
 }
 
+/** Returns true when all conditions in a compound variant entry match the resolved variant set. */
 function compoundMatches(cv: Record<string, any>, resolved: Record<string, string>): boolean {
   for (const key in cv) {
     if (key === 'css') {
