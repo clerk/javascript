@@ -38,7 +38,7 @@ const styles = cva(theme => ({
     },
     disabled: {
       false: null,
-      true: { opacity: 0.5, cursor: 'not-allowed', pointerEvents: 'none' as const },
+      true: { opacity: 0.5, cursor: 'not-allowed', pointerEvents: 'none' },
     },
   },
   defaultVariants: { color: 'primary', size: 'md', disabled: false },
