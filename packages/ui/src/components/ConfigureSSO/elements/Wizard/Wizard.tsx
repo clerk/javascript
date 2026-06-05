@@ -1,193 +1,93 @@
 import React from 'react';
 
-import type { WizardActiveStep, WizardContextValue, WizardStepProps } from './types';
+import type { WizardConfig } from './reducer';
+import type { WizardStepConfig } from './types';
+import { useWizardMachine } from './useWizardMachine';
 import { useWizard, WizardContext } from './WizardContext';
 
-interface RootProps {
-  children: React.ReactNode;
+interface WizardProps {
   /**
-   * Initial active step id. When provided, the wizard mounts with this
-   * step active. When omitted, the first registered step becomes the
-   * default — useful when steps are statically known and order is the
-   * source of truth, or when the host derives the initial step from
-   * external state (e.g., a server-state hook) and passes it down.
+   * The step graph, declared explicitly as a body-less config array. Each entry
+   * is a navigable position: `id` + an optional inline entry `guard`, `hidden`,
+   * and breadcrumb `label`. The array *is* the graph (order, guards, breadcrumb
+   * labels/visibility) — there is no `React.Children` walking and no
+   * `<Wizard.Step>` component. Rendering is declarative: the children decide
+   * what to show per step via `<Wizard.Match id>`.
+   */
+  steps: WizardStepConfig[];
+  /**
+   * Mount on this step instead of the guard-derived initial step. Used by
+   * linear nested flows that resume from an externally-decided position.
    */
   initialStepId?: string;
+  /**
+   * Declarative children rendered inside the wizard context. Persistent chrome
+   * (breadcrumb, shared sub-flow header) is a plain child; per-step bodies are
+   * `<Wizard.Match id>` children that render only when their step is active.
+   */
+  children?: React.ReactNode;
 }
 
-const Root = ({ children, initialStepId }: RootProps): JSX.Element => {
+/**
+ * Generic, declarative wizard primitive — UI-less, state-driven.
+ *
+ * Steps are declared as an explicit, body-less config array (`steps`): each
+ * entry is one navigable position with an `id` and an optional inline entry
+ * `guard` + `hidden` + breadcrumb `label`. The graph is the array itself —
+ * known synchronously, with no effect-timed registration and no `React.Children`
+ * walking. It feeds a domain-agnostic state machine in the same render pass.
+ *
+ * Rendering is declarative and lives in `children`: persistent chrome (the
+ * breadcrumb, a shared sub-flow header) is a normal child, and each step's body
+ * is a `<Wizard.Match id>` child that reads `current` from context and renders
+ * its children only when active. `<Wizard.Match>` is render-only — it never
+ * registers or builds the graph; the `steps` array already did.
+ *
+ * The machine is hidden: consumers read navigation via `useWizard()` only
+ * (`goNext` / `goPrev` / `goToStep` + the derived `current` / `activeSteps` /
+ * `isFirstStep` / `isLastStep`). Conditional flow is expressed by each step's
+ * inline entry `guard` — a pure "may navigation land here right now?" predicate
+ * applied uniformly by init / `goNext` / `goPrev` / `goToStep` / the stepper.
+ * Steps are never added to or removed from the graph; they are only gated. Inner
+ * sub-flows nest another `<Wizard>` inside a step body; their forward boundary
+ * falls through to the parent wizard — a nested last-step `goNext` advances the
+ * parent automatically, while a guard-blocked mid-flow next is a hard stop.
+ */
+const WizardRoot = ({ steps, initialStepId, children }: WizardProps): JSX.Element => {
   const parentWizard = React.useContext(WizardContext);
-  const isNested = parentWizard !== null;
 
-  return (
-    <RootInner
-      parentWizard={parentWizard}
-      isNested={isNested}
-      initialStepId={initialStepId}
-    >
-      {children}
-    </RootInner>
-  );
-};
+  // The config the pure reducer reads. The body-less `steps` array is the
+  // descriptor verbatim — no body stripping; guards are inline on each entry.
+  // Memoized on the steps config so the machine's render-time ref always
+  // mirrors the latest inputs.
+  const config = React.useMemo<WizardConfig>(() => ({ descriptors: steps }), [steps]);
 
-interface RootInnerProps {
-  parentWizard: WizardContextValue | null;
-  isNested: boolean;
-  initialStepId?: string;
-  children: React.ReactNode;
-}
-
-const RootInner = ({ parentWizard, isNested, initialStepId, children }: RootInnerProps): JSX.Element => {
-  // Stable registry of mounted Steps. Insertion order = JSX order =
-  // display order
-  const [activeSteps, setActiveSteps] = React.useState<WizardActiveStep[]>([]);
-  // Active step id. Defaults to the first registered step's id when
-  // `initialStepId` is omitted; otherwise mounts with the explicit id.
-  const [currentStepId, setCurrentStepId] = React.useState<string | undefined>(initialStepId);
-
-  const registerStep = React.useCallback((step: WizardActiveStep) => {
-    setActiveSteps(prev => {
-      const existingIndex = prev.findIndex(s => s.id === step.id);
-      if (existingIndex >= 0) {
-        const existing = prev[existingIndex];
-        if (existing.label === step.label && existing.isCompleted === step.isCompleted) {
-          return prev;
-        }
-        // Update descriptor in place to preserve declaration order
-        const next = prev.slice();
-        next[existingIndex] = step;
-        return next;
-      }
-      return [...prev, step];
-    });
-    // First registered step becomes the default active step
-    setCurrentStepId(prev => prev ?? step.id);
-  }, []);
-
-  const unregisterStep = React.useCallback((id: string) => {
-    setActiveSteps(prev => (prev.some(s => s.id === id) ? prev.filter(s => s.id !== id) : prev));
-    setCurrentStepId(prev => (prev === id ? undefined : prev));
-  }, []);
-
-  const currentStep = React.useMemo(() => activeSteps.find(s => s.id === currentStepId), [activeSteps, currentStepId]);
-
-  const currentIndex = React.useMemo(
-    () => (currentStep ? activeSteps.findIndex(s => s.id === currentStep.id) : -1),
-    [activeSteps, currentStep],
-  );
-
-  const goNext = React.useCallback(() => {
-    if (currentIndex < 0) {
-      return;
-    }
-    const next = activeSteps[currentIndex + 1];
-    if (next) {
-      setCurrentStepId(next.id);
-      return;
-    }
-    // Inner-last-step: bubble to parent wizard
-    return parentWizard?.goNext();
-  }, [activeSteps, currentIndex, parentWizard]);
-
-  const goPrev = React.useCallback(() => {
-    if (currentIndex < 0) {
-      return;
-    }
-    const prev = activeSteps[currentIndex - 1];
-    if (prev) {
-      setCurrentStepId(prev.id);
-      return;
-    }
-    return parentWizard?.goPrev();
-  }, [activeSteps, currentIndex, parentWizard]);
-
-  const goToStep = React.useCallback(
-    (id: string) => {
-      if (activeSteps.some(s => s.id === id)) {
-        setCurrentStepId(id);
-      }
-    },
-    [activeSteps],
-  );
-
-  const value = React.useMemo<WizardContextValue>(
-    () => ({
-      activeSteps,
-      currentStep,
-      currentIndex,
-      totalSteps: activeSteps.length,
-      isNested,
-      isFirstStep: currentIndex <= 0 && (!parentWizard || parentWizard.isFirstStep),
-      isLastStep: currentIndex === activeSteps.length - 1 && (!parentWizard || parentWizard.isLastStep),
-      goNext,
-      goPrev,
-      goToStep,
-      registerStep,
-      unregisterStep,
-    }),
-    [
-      activeSteps,
-      currentStep,
-      currentIndex,
-      isNested,
-      parentWizard,
-      goNext,
-      goPrev,
-      goToStep,
-      registerStep,
-      unregisterStep,
-    ],
-  );
+  const value = useWizardMachine({ config, parentWizard, initialStepId });
 
   return <WizardContext.Provider value={value}>{children}</WizardContext.Provider>;
 };
 
-const Step = ({ id, label, isCompleted, children }: WizardStepProps): JSX.Element | null => {
-  const { registerStep, unregisterStep, currentStep } = useWizard();
+interface WizardMatchProps {
+  /**
+   * The step id this branch renders for. Children render only while the wizard's
+   * active step matches this id; otherwise `null`.
+   */
+  id: string;
+  children?: React.ReactNode;
+}
 
-  // Update the descriptor on every prop change. Uses `useLayoutEffect`
-  // so registration commits before paint — keeps the first-frame
-  // flicker imperceptible
-  React.useLayoutEffect(() => {
-    registerStep({ id, label, isCompleted });
-  }, [id, label, isCompleted, registerStep]);
-
-  // Separate unmount-only cleanup so descriptor updates above don't
-  // transiently remove the step from the registry
-  React.useLayoutEffect(() => {
-    return () => unregisterStep(id);
-  }, [id, unregisterStep]);
-
-  if (currentStep?.id !== id) {
+/**
+ * Declarative, render-only branch: renders its `children` only when the active
+ * wizard step matches `id`, else `null`. A pure conditional render — it does NOT
+ * register a step or build the graph (the `steps` config array already did).
+ */
+const Match = ({ id, children }: WizardMatchProps): JSX.Element | null => {
+  const { current } = useWizard();
+  if (current !== id) {
     return null;
   }
   return <>{children}</>;
 };
-Step.displayName = 'Wizard.Step';
+Match.displayName = 'Wizard.Match';
 
-/**
- * Declarative wizard primitive — UI-less, state-driven.
- *
- * Steps are written as JSX children: render a `<Wizard.Step>` for
- * each step and toggle visibility with regular conditional
- * expressions (`{cond && <Step>...</Step>}`).
- *
- * Steps register themselves with the parent wizard on mount via
- * effect, so the wizard's `activeSteps` list always reflects exactly
- * what's currently rendered. Inner sub-steps are declared by nesting
- * another `<Wizard>` inside a step's body.
- *
- * The Wizard root renders `{children}` directly — no chrome, no
- * routing, no layout wrapper. Header, Footer, and any step indicator
- * are provided by the host layout via `useWizard()`. Each step owns
- * its own footer via `<Step.Footer>`, which reads the nearest wizard
- * via `useWizard()` so nested-wizard fall-through works automatically.
- *
- * When mounted without `initialStepId`, the wizard defaults to the
- * first registered step. When `initialStepId` is provided, the wizard
- * starts on that step instead — useful for resuming a flow from
- * server-derived state.
- */
-export const Wizard = Object.assign(Root, {
-  Step,
-});
+export const Wizard = Object.assign(WizardRoot, { Match });
