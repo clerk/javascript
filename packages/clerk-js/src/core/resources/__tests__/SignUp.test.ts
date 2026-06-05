@@ -799,6 +799,147 @@ describe('SignUp', () => {
         );
       });
 
+      it('includes browser locale when creating a new signup', async () => {
+        vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
+        vi.stubGlobal('navigator', { language: 'fr-FR' });
+
+        const mockBuildUrlWithAuth = vi.fn().mockReturnValue('https://example.com/sso-callback');
+        SignUp.clerk = {
+          buildUrlWithAuth: mockBuildUrlWithAuth,
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
+
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: {
+            id: 'signup_123',
+            verifications: {
+              externalAccount: {
+                status: 'unverified',
+                externalVerificationRedirectURL: 'https://sso.example.com/auth',
+              },
+            },
+          },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp();
+        await signUp.__internal_future.sso({
+          strategy: 'oauth_google',
+          redirectUrl: '/complete',
+          redirectCallbackUrl: '/sso-callback',
+        });
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'POST',
+            path: '/client/sign_ups',
+            body: expect.objectContaining({
+              strategy: 'oauth_google',
+              locale: 'fr-FR',
+            }),
+          }),
+        );
+      });
+
+      it('prefers an explicitly provided locale over the browser locale', async () => {
+        vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
+        vi.stubGlobal('navigator', { language: 'fr-FR' });
+
+        const mockBuildUrlWithAuth = vi.fn().mockReturnValue('https://example.com/sso-callback');
+        SignUp.clerk = {
+          buildUrlWithAuth: mockBuildUrlWithAuth,
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
+
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: {
+            id: 'signup_123',
+            verifications: {
+              externalAccount: {
+                status: 'unverified',
+                externalVerificationRedirectURL: 'https://sso.example.com/auth',
+              },
+            },
+          },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp();
+        await signUp.__internal_future.sso({
+          strategy: 'oauth_google',
+          redirectUrl: '/complete',
+          redirectCallbackUrl: '/sso-callback',
+          locale: 'el-GR',
+        });
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'POST',
+            path: '/client/sign_ups',
+            body: expect.objectContaining({
+              strategy: 'oauth_google',
+              locale: 'el-GR',
+            }),
+          }),
+        );
+      });
+
+      it('does not inject browser locale when continuing an existing signup', async () => {
+        vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
+        vi.stubGlobal('navigator', { language: 'fr-FR' });
+
+        const mockBuildUrlWithAuth = vi.fn().mockReturnValue('https://example.com/sso-callback');
+        SignUp.clerk = {
+          buildUrlWithAuth: mockBuildUrlWithAuth,
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
+
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: {
+            id: 'signup_123',
+            verifications: {
+              externalAccount: {
+                status: 'unverified',
+                externalVerificationRedirectURL: 'https://sso.example.com/auth',
+              },
+            },
+          },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp({ id: 'signup_123' } as any);
+        await signUp.__internal_future.sso({
+          strategy: 'oauth_google',
+          redirectUrl: '/complete',
+          redirectCallbackUrl: '/sso-callback',
+        });
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'PATCH',
+            path: '/client/sign_ups/signup_123',
+            body: expect.not.objectContaining({
+              locale: expect.anything(),
+            }),
+          }),
+        );
+      });
+
       it('continues an existing sign up via the resource URL', async () => {
         vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
 
@@ -1281,6 +1422,63 @@ describe('SignUp', () => {
         // Verify error is returned without retry
         expect(result.error).toBeTruthy();
       });
+
+      it('passes locale and name params through to the created signup', async () => {
+        vi.stubGlobal('navigator', { language: 'fr-FR' });
+
+        const mockFetch = vi
+          .fn()
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signup_123',
+              verifications: {
+                web3_wallet: { status: 'unverified' },
+              },
+            },
+          })
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signup_123',
+              verifications: {
+                web3_wallet: { status: 'unverified', message: 'nonce_123' },
+              },
+            },
+          })
+          .mockResolvedValueOnce({
+            client: null,
+            response: { id: 'signup_123', status: 'complete' },
+          });
+        BaseResource._fetch = mockFetch;
+
+        const utilsModule = await import('../../../utils');
+        vi.spyOn(utilsModule, 'web3').mockReturnValue({
+          getMetamaskIdentifier: vi.fn().mockResolvedValue('0x1234567890123456789012345678901234567890'),
+          generateSignatureWithMetamask: vi.fn().mockResolvedValue('signature_123'),
+        } as any);
+
+        const signUp = new SignUp();
+        await signUp.__internal_future.web3({
+          strategy: 'web3_metamask_signature',
+          firstName: 'Vitalik',
+          lastName: 'Nakamoto',
+          locale: 'el-GR',
+        });
+
+        expect(mockFetch).toHaveBeenNthCalledWith(
+          1,
+          expect.objectContaining({
+            method: 'POST',
+            path: '/client/sign_ups',
+            body: expect.objectContaining({
+              firstName: 'Vitalik',
+              lastName: 'Nakamoto',
+              locale: 'el-GR',
+            }),
+          }),
+        );
+      });
     });
 
     describe('password', () => {
@@ -1355,6 +1553,77 @@ describe('SignUp', () => {
         const result = await signUp.__internal_future.password({ password: 'test-password-123' });
 
         expect(result).toHaveProperty('error', null);
+      });
+
+      it('includes browser locale when creating a new signup', async () => {
+        vi.stubGlobal('navigator', { language: 'fr-FR' });
+
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_123', status: 'missing_requirements' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp();
+        await signUp.__internal_future.password({ password: 'test-password-123' });
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'POST',
+            path: '/client/sign_ups',
+            body: expect.objectContaining({
+              strategy: 'password',
+              locale: 'fr-FR',
+            }),
+          }),
+        );
+      });
+
+      it('prefers an explicitly provided locale over the browser locale', async () => {
+        vi.stubGlobal('navigator', { language: 'fr-FR' });
+
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_123', status: 'missing_requirements' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp();
+        await signUp.__internal_future.password({ password: 'test-password-123', locale: 'el-GR' });
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'POST',
+            path: '/client/sign_ups',
+            body: expect.objectContaining({
+              strategy: 'password',
+              locale: 'el-GR',
+            }),
+          }),
+        );
+      });
+
+      it('does not inject browser locale when updating an existing signup', async () => {
+        vi.stubGlobal('navigator', { language: 'fr-FR' });
+
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_123', status: 'missing_requirements' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp({ id: 'signup_123' } as any);
+        await signUp.__internal_future.password({ password: 'test-password-123' });
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'PATCH',
+            path: '/client/sign_ups/signup_123',
+            body: expect.not.objectContaining({
+              locale: expect.anything(),
+            }),
+          }),
+        );
       });
     });
 
