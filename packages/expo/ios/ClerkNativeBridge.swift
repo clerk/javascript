@@ -4,6 +4,7 @@
 
 import UIKit
 import SwiftUI
+import Observation
 import Security
 import ClerkKit
 import ClerkKitUI
@@ -22,6 +23,9 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
   /// Parsed light and dark themes from Info.plist "ClerkTheme" dictionary.
   var lightTheme: ClerkTheme?
   var darkTheme: ClerkTheme?
+
+  private var clientObservationGeneration = 0
+  private var lastObservedClient: Client?
 
   private enum KeychainKey {
     static let jsClientJWT = "__clerk_client_jwt"
@@ -58,6 +62,7 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
       try await Clerk.reconfigure(publishableKey: publishableKey, options: Self.makeClerkOptions())
       Self.clerkConfigured = true
       Self.configuredPublishableKey = publishableKey
+      startClientObserver(reset: true)
 
       Self.syncTokenState(bearerToken: bearerToken)
       if !(bearerToken?.isEmpty ?? true) {
@@ -74,20 +79,54 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
     // to pick up the session associated with the device token we just wrote.
     // Clerk.configure() is idempotent for the same publishable key, so use refreshClient().
     if Self.shouldRefreshConfiguredClient(for: bearerToken) {
+      startClientObserver()
       _ = try? await Clerk.shared.refreshClient()
       await Self.waitForLoadedSession()
       return
     }
 
     if Self.clerkConfigured {
+      startClientObserver()
       return
     }
 
     Self.clerkConfigured = true
     Self.configuredPublishableKey = publishableKey
     Clerk.configure(publishableKey: publishableKey, options: Self.makeClerkOptions())
+    startClientObserver()
 
     await Self.waitForLoadedSession()
+  }
+
+  @MainActor
+  private func startClientObserver(reset: Bool = false) {
+    guard reset || clientObservationGeneration == 0 else { return }
+
+    clientObservationGeneration += 1
+    let generation = clientObservationGeneration
+    lastObservedClient = Clerk.shared.client
+    observeClient(generation: generation)
+  }
+
+  @MainActor
+  private func observeClient(generation: Int) {
+    withObservationTracking {
+      _ = Clerk.shared.client
+    } onChange: { [weak self] in
+      Task { @MainActor [weak self] in
+        await Task.yield()
+
+        guard let self, generation == self.clientObservationGeneration else { return }
+
+        let newClient = Clerk.shared.client
+        if newClient != self.lastObservedClient {
+          self.lastObservedClient = newClient
+          emitClerkNativeRefreshClient()
+        }
+
+        self.observeClient(generation: generation)
+      }
+    }
   }
 
   private static func syncTokenState(bearerToken: String?) {
@@ -447,9 +486,6 @@ struct ClerkInlineUserButtonWrapperView: View {
     }
     themedView
       .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-      .onChange(of: Clerk.shared.client) { _, _ in
-        emitClerkNativeRefreshClient()
-      }
   }
 }
 
@@ -478,9 +514,6 @@ struct ClerkInlineAuthWrapperView: View {
 
   var body: some View {
     themedAuthView
-      .onChange(of: Clerk.shared.client) { _, _ in
-        emitClerkNativeRefreshClient()
-      }
   }
 }
 
@@ -530,8 +563,5 @@ struct ClerkInlineProfileWrapperView: View {
       }
     }
     themedView
-      .onChange(of: Clerk.shared.client) { _, _ in
-        emitClerkNativeRefreshClient()
-      }
   }
 }
