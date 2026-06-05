@@ -3,7 +3,7 @@ import React from 'react';
 import { cva, type VariantProps } from './cva';
 import { useMosaicTheme } from './MosaicProvider';
 
-const styles = cva(theme => ({
+export const buttonStyles = cva(theme => ({
   base: {
     display: 'inline-flex',
     alignItems: 'center',
@@ -44,7 +44,7 @@ const styles = cva(theme => ({
   defaultVariants: { color: 'primary', size: 'md', disabled: false },
 }));
 
-type ButtonProps = React.ComponentPropsWithRef<'button'> & VariantProps<typeof styles>;
+export type ButtonProps = React.ComponentPropsWithRef<'button'> & VariantProps<typeof buttonStyles>;
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function MosaicButton(props, ref) {
   const { color, size, disabled, sx, children, ...rest } = props;
@@ -55,7 +55,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
       disabled={disabled || false}
       type='button'
       {...rest}
-      css={styles({ color, size, disabled, sx })(theme)}
+      css={buttonStyles({ color, size, disabled, sx })(theme)}
     >
       {children}
     </button>
