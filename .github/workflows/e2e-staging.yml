@@ -301,13 +301,17 @@ jobs:
 
       # Always upload the machine-readable report (even on success) so downstream
       # reporting/classification can run regardless of the leg's pass/fail outcome.
+      # The json reporter's outputFile is resolved relative to the Playwright config
+      # directory (integration/), not the repo root, so the report lands under
+      # integration/playwright-report/. Keep that prefix here. `warn` (not `ignore`)
+      # so a future path regression surfaces in the logs instead of failing silently.
       - name: Upload Playwright JSON report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: playwright-report-${{ github.run_id }}-${{ github.run_attempt }}-${{ steps.inputs.outputs.artifact-suffix }}
-          path: playwright-report/results.json
-          if-no-files-found: ignore
+          path: integration/playwright-report/results.json
+          if-no-files-found: warn
           retention-days: 3
 
   report:
