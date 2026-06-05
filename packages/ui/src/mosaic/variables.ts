@@ -1,3 +1,6 @@
+// ─── Token Defaults ──────────────────────────────────────────────────────────
+
+/** Baseline design token values. Every Mosaic theme starts from this object. */
 export const defaultMosaicVariables = Object.freeze({
   color: {
     primary: 'light-dark(oklch(0.205 0 0), oklch(0.922 0 0))',
@@ -21,8 +24,12 @@ export const defaultMosaicVariables = Object.freeze({
   },
 } as const);
 
+/** Structural type of the raw token tree, inferred from `defaultMosaicVariables`. */
 export type MosaicTokens = typeof defaultMosaicVariables;
 
+// ─── Public Types ─────────────────────────────────────────────────────────────
+
+/** Partial token overrides accepted by `MosaicProvider`. Any subset of the token tree can be supplied. */
 export type MosaicVariables = {
   [K in keyof MosaicTokens]?: MosaicTokens[K] extends string
     ? string
@@ -33,26 +40,48 @@ export type MosaicVariables = {
       };
 };
 
+/**
+ * Resolved theme object passed to `cva` config functions and `sx` props.
+ * Raw `spacing` and `fontSize` tokens are replaced with typed helper functions.
+ *
+ * @example
+ * cva(theme => ({
+ *   base: {
+ *     padding: theme.spacing(2),       // 'calc(0.25rem * 2)'
+ *     color: theme.alpha('primary', 50), // 'color-mix(in oklab, ..., transparent)'
+ *     ...theme.text('sm'),             // { fontSize, lineHeight }
+ *   },
+ * }))
+ */
 export type MosaicTheme = Omit<MosaicTokens, 'spacing' | 'fontSize'> & {
+  /** Returns `calc(<base> * N)` for the given multiplier. */
   readonly spacing: <N extends number>(n: N) => `calc(${MosaicTokens['spacing']} * ${N})`;
+  /** Mixes a theme color with `transparent` at the given opacity percentage. */
   readonly alpha: <K extends keyof MosaicTokens['color'], O extends number>(
     color: K,
     opacity: O,
   ) => `color-mix(in oklab, ${MosaicTokens['color'][K]} ${O}%, transparent)`;
+  /** Blends two theme colors at the given percentage using `color-mix`. */
   readonly mix: <A extends keyof MosaicTokens['color'], B extends keyof MosaicTokens['color'], P extends number>(
     a: A,
     b: B,
     percentage: P,
   ) => `color-mix(in oklab, ${MosaicTokens['color'][A]}, ${MosaicTokens['color'][B]} ${P}%)`;
+  /** Returns `{ fontSize, lineHeight }` for a named type-scale step. */
   readonly text: <K extends keyof MosaicTokens['fontSize']>(
     key: K,
   ) => { fontSize: MosaicTokens['fontSize'][K]['size']; lineHeight: MosaicTokens['fontSize'][K]['lineHeight'] };
 };
 
+// ─── Internal ─────────────────────────────────────────────────────────────────
+
+const DANGEROUS_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
+
+/** Immutable deep merge — returns a new object without mutating either argument. */
 function merge(target: Record<string, unknown>, overrides: Record<string, unknown>): Record<string, unknown> {
   const result: Record<string, unknown> = { ...target };
   for (const k in overrides) {
-    if (k === '__proto__' || k === 'constructor' || k === 'prototype') continue;
+    if (DANGEROUS_KEYS.has(k)) continue;
     const value = overrides[k];
     if (value === undefined) continue;
     result[k] =
@@ -63,6 +92,7 @@ function merge(target: Record<string, unknown>, overrides: Record<string, unknow
   return result;
 }
 
+/** Merges token overrides into the defaults and attaches the `MosaicTheme` helper functions. */
 export function resolveVariables(defaults: MosaicTokens, variables?: MosaicVariables): MosaicTheme {
   const tokens = variables ? (merge(defaults, variables) as MosaicTokens) : defaults;
   return {

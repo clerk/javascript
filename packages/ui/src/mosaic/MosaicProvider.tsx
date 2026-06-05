@@ -38,7 +38,7 @@ export function MosaicProvider({ children, variables, nonce, cssLayerName }: Mos
     if (cssLayerName) {
       const prevInsert = emotionCache.insert.bind(emotionCache);
       emotionCache.insert = (selector: string, serialized: SerializedStyles, sheet: any, shouldCache: boolean) => {
-        if (serialized && typeof serialized.styles === 'string' && !serialized.styles.startsWith('@layer')) {
+        if (serialized && typeof serialized.styles === 'string') {
           const newSerialized = { ...serialized };
           newSerialized.styles = `@layer ${cssLayerName} {${serialized.styles}}`;
           return prevInsert(selector, newSerialized, sheet, shouldCache);
