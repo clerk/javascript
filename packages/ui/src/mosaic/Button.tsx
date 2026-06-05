@@ -47,7 +47,7 @@ const styles = cva(theme => ({
 type ButtonProps = React.ComponentPropsWithRef<'button'> & VariantProps<typeof styles>;
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function MosaicButton(props, ref) {
-  const { color, size, disabled, children, ...rest } = props;
+  const { color, size, disabled, sx, children, ...rest } = props;
   const theme = useMosaicTheme();
   return (
     <button
@@ -55,7 +55,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
       disabled={disabled || false}
       type='button'
       {...rest}
-      css={styles({ color, size, disabled })(theme)}
+      className='button'
+      css={styles({ color, size, disabled, sx })(theme)}
     >
       {children}
     </button>
