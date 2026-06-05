@@ -14,13 +14,13 @@ export const defaultMosaicVariables = Object.freeze({
     lg: '0.5rem',
     full: 'calc(infinity * 1px)',
   },
-  fontSize: {
-    xs: { size: '0.75rem', lineHeight: 'calc(1 / 0.75)' },
-    sm: { size: '0.875rem', lineHeight: 'calc(1.25 / 0.875)' },
-    base: { size: '1rem', lineHeight: 'calc(1.5 / 1)' },
-    lg: { size: '1.125rem', lineHeight: 'calc(1.75 / 1.125)' },
-    xl: { size: '1.25rem', lineHeight: 'calc(1.75 / 1.25)' },
-    '2xl': { size: '1.5rem', lineHeight: 'calc(2 / 1.5)' },
+  text: {
+    xs: { fontSize: '0.75rem', lineHeight: 'calc(1 / 0.75)' },
+    sm: { fontSize: '0.875rem', lineHeight: 'calc(1.25 / 0.875)' },
+    base: { fontSize: '1rem', lineHeight: 'calc(1.5 / 1)' },
+    lg: { fontSize: '1.125rem', lineHeight: 'calc(1.75 / 1.125)' },
+    xl: { fontSize: '1.25rem', lineHeight: 'calc(1.75 / 1.25)' },
+    '2xl': { fontSize: '1.5rem', lineHeight: 'calc(2 / 1.5)' },
   },
 } as const);
 
@@ -68,9 +68,9 @@ export type MosaicTheme = Omit<MosaicTokens, 'spacing' | 'fontSize'> & {
     percentage: P,
   ) => `color-mix(in oklab, ${MosaicTokens['color'][A]}, ${MosaicTokens['color'][B]} ${P}%)`;
   /** Returns `{ fontSize, lineHeight }` for a named type-scale step. */
-  readonly text: <K extends keyof MosaicTokens['fontSize']>(
+  readonly text: <K extends keyof MosaicTokens['text']>(
     key: K,
-  ) => { fontSize: MosaicTokens['fontSize'][K]['size']; lineHeight: MosaicTokens['fontSize'][K]['lineHeight'] };
+  ) => { fontSize: MosaicTokens['text'][K]['fontSize']; lineHeight: MosaicTokens['text'][K]['lineHeight'] };
 };
 
 // ─── Internal ─────────────────────────────────────────────────────────────────
@@ -105,9 +105,9 @@ export function resolveVariables(defaults: MosaicTokens, variables?: MosaicVaria
       b: B,
       percentage: P,
     ) => `color-mix(in oklab, ${tokens.color[a]}, ${tokens.color[b]} ${percentage}%)`) as MosaicTheme['mix'],
-    text: (<K extends keyof MosaicTokens['fontSize']>(key: K) => ({
-      fontSize: tokens.fontSize[key].size,
-      lineHeight: tokens.fontSize[key].lineHeight,
+    text: (<K extends keyof MosaicTokens['text']>(key: K) => ({
+      fontSize: tokens.text[key].fontSize,
+      lineHeight: tokens.text[key].lineHeight,
     })) as MosaicTheme['text'],
   };
 }
