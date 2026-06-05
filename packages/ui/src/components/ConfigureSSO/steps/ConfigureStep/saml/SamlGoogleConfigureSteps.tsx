@@ -10,7 +10,7 @@ import { useFormControl } from '@/ui/utils/useFormControl';
 
 import { useConfigureSSO } from '../../../ConfigureSSOContext';
 import { Step } from '../../../elements/Step';
-import { useWizard, Wizard } from '../../../elements/Wizard';
+import { useWizard, Wizard, type WizardStepConfig } from '../../../elements/Wizard';
 import { InnerStepCounter } from '../../../elements/Wizard/InnerStepCounter';
 import {
   applySamlSubmitError,
@@ -23,61 +23,38 @@ import {
   type IdpConfigurationMode,
 } from './shared/IdentityProviderConfigurationModes';
 
+const GOOGLE_STEPS: WizardStepConfig[] = [
+  { id: 'create-app' },
+  { id: 'identity-provider-metadata' },
+  { id: 'service-provider' },
+  { id: 'attribute-mapping' },
+  { id: 'configure-user-access' },
+];
+
 export const SamlGoogleConfigureSteps = (): JSX.Element => {
   return (
-    <>
-      <Wizard.Step id='create-app'>
-        <Step.Header
-          title={localizationKeys('configureSSO.configureStep.samlGoogle.mainHeaderTitle')}
-          description={localizationKeys('configureSSO.configureStep.samlGoogle.createAppStep.headerSubtitle')}
-        >
-          <InnerStepCounter />
-        </Step.Header>
+    // Linear, guard-less sub-flow: mount on the first step. (Entry guards drive
+    // furthest-reachable init, which would otherwise land the last step here.)
+    <Wizard
+      steps={GOOGLE_STEPS}
+      initialStepId={GOOGLE_STEPS[0].id}
+    >
+      <Wizard.Match id='create-app'>
         <SamlGoogleCreateAppStep />
-      </Wizard.Step>
-
-      <Wizard.Step id='identity-provider-metadata'>
-        <Step.Header
-          title={localizationKeys('configureSSO.configureStep.samlGoogle.mainHeaderTitle')}
-          description={localizationKeys(
-            'configureSSO.configureStep.samlGoogle.identityProviderMetadataStep.headerSubtitle',
-          )}
-        >
-          <InnerStepCounter />
-        </Step.Header>
+      </Wizard.Match>
+      <Wizard.Match id='identity-provider-metadata'>
         <SamlGoogleIdentityProviderMetadataStep />
-      </Wizard.Step>
-
-      <Wizard.Step id='service-provider'>
-        <Step.Header
-          title={localizationKeys('configureSSO.configureStep.samlGoogle.mainHeaderTitle')}
-          description={localizationKeys('configureSSO.configureStep.samlGoogle.serviceProviderStep.headerSubtitle')}
-        >
-          <InnerStepCounter />
-        </Step.Header>
+      </Wizard.Match>
+      <Wizard.Match id='service-provider'>
         <SamlGoogleServiceProviderStep />
-      </Wizard.Step>
-
-      <Wizard.Step id='attribute-mapping'>
-        <Step.Header
-          title={localizationKeys('configureSSO.configureStep.samlGoogle.mainHeaderTitle')}
-          description={localizationKeys('configureSSO.configureStep.samlGoogle.attributeMappingStep.headerSubtitle')}
-        >
-          <InnerStepCounter />
-        </Step.Header>
+      </Wizard.Match>
+      <Wizard.Match id='attribute-mapping'>
         <SamlGoogleAttributeMappingStep />
-      </Wizard.Step>
-
-      <Wizard.Step id='configure-user-access'>
-        <Step.Header
-          title={localizationKeys('configureSSO.configureStep.samlGoogle.mainHeaderTitle')}
-          description={localizationKeys('configureSSO.configureStep.samlGoogle.configureUserAccess.headerSubtitle')}
-        >
-          <InnerStepCounter />
-        </Step.Header>
+      </Wizard.Match>
+      <Wizard.Match id='configure-user-access'>
         <SamlGoogleConfigureUserAccessStep />
-      </Wizard.Step>
-    </>
+      </Wizard.Match>
+    </Wizard>
   );
 };
 
@@ -86,6 +63,13 @@ const SamlGoogleCreateAppStep = (): JSX.Element => {
 
   return (
     <>
+      <Step.Header
+        title={localizationKeys('configureSSO.configureStep.samlGoogle.mainHeaderTitle')}
+        description={localizationKeys('configureSSO.configureStep.samlGoogle.createAppStep.headerSubtitle')}
+      >
+        <InnerStepCounter />
+      </Step.Header>
+
       <Step.Body>
         <Step.Section sx={theme => ({ gap: theme.space.$5 })}>
           <Col sx={theme => ({ gap: theme.space.$1x5 })}>
@@ -154,7 +138,6 @@ const SamlGoogleCreateAppStep = (): JSX.Element => {
       </Step.Body>
 
       <Step.Footer>
-        <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
           isDisabled={isFirstStep}
@@ -173,7 +156,10 @@ const GOOGLE_IDP_MODES = ['metadataFile', 'manual'] as const satisfies readonly 
 const SamlGoogleIdentityProviderMetadataStep = (): JSX.Element => {
   const card = useCardState();
   const { goNext, goPrev, isFirstStep } = useWizard();
-  const { enterpriseConnection, updateEnterpriseConnection } = useConfigureSSO();
+  const {
+    enterpriseConnection,
+    mutations: { updateConnection },
+  } = useConfigureSSO();
 
   const samlConnection = enterpriseConnection?.samlConnection;
   const hasExistingManualConfig = Boolean(
@@ -302,7 +288,7 @@ const SamlGoogleIdentityProviderMetadataStep = (): JSX.Element => {
         manual: { signOnUrl: signOnUrlField.value, issuer: issuerField.value, certFile },
       });
 
-      await updateEnterpriseConnection(enterpriseConnection.id, { saml });
+      await updateConnection(enterpriseConnection.id, { saml });
       void goNext();
     } catch (err) {
       if (mode === 'metadataFile') {
@@ -317,6 +303,15 @@ const SamlGoogleIdentityProviderMetadataStep = (): JSX.Element => {
 
   return (
     <>
+      <Step.Header
+        title={localizationKeys('configureSSO.configureStep.samlGoogle.mainHeaderTitle')}
+        description={localizationKeys(
+          'configureSSO.configureStep.samlGoogle.identityProviderMetadataStep.headerSubtitle',
+        )}
+      >
+        <InnerStepCounter />
+      </Step.Header>
+
       <Step.Body>
         <Step.Section
           fill
@@ -354,7 +349,6 @@ const SamlGoogleIdentityProviderMetadataStep = (): JSX.Element => {
       </Step.Body>
 
       <Step.Footer>
-        <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
           isDisabled={isFirstStep || card.isLoading}
@@ -393,6 +387,13 @@ const SamlGoogleServiceProviderStep = (): JSX.Element => {
 
   return (
     <>
+      <Step.Header
+        title={localizationKeys('configureSSO.configureStep.samlGoogle.mainHeaderTitle')}
+        description={localizationKeys('configureSSO.configureStep.samlGoogle.serviceProviderStep.headerSubtitle')}
+      >
+        <InnerStepCounter />
+      </Step.Header>
+
       <Step.Body>
         <Step.Section sx={theme => ({ gap: theme.space.$5 })}>
           <Col sx={theme => ({ gap: theme.space.$1x5 })}>
@@ -462,7 +463,6 @@ const SamlGoogleServiceProviderStep = (): JSX.Element => {
       </Step.Body>
 
       <Step.Footer>
-        <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
           isDisabled={isFirstStep}
@@ -564,6 +564,13 @@ const SamlGoogleAttributeMappingStep = (): JSX.Element => {
 
   return (
     <>
+      <Step.Header
+        title={localizationKeys('configureSSO.configureStep.samlGoogle.mainHeaderTitle')}
+        description={localizationKeys('configureSSO.configureStep.samlGoogle.attributeMappingStep.headerSubtitle')}
+      >
+        <InnerStepCounter />
+      </Step.Header>
+
       <Step.Body>
         <Step.Section sx={theme => ({ gap: theme.space.$3 })}>
           <Text
@@ -601,7 +608,6 @@ const SamlGoogleAttributeMappingStep = (): JSX.Element => {
       </Step.Body>
 
       <Step.Footer>
-        <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
           isDisabled={isFirstStep}
@@ -620,6 +626,13 @@ const SamlGoogleConfigureUserAccessStep = (): JSX.Element => {
 
   return (
     <>
+      <Step.Header
+        title={localizationKeys('configureSSO.configureStep.samlGoogle.mainHeaderTitle')}
+        description={localizationKeys('configureSSO.configureStep.samlGoogle.configureUserAccess.headerSubtitle')}
+      >
+        <InnerStepCounter />
+      </Step.Header>
+
       <Step.Body>
         <Step.Section sx={theme => ({ gap: theme.space.$3 })}>
           <Text
@@ -677,7 +690,6 @@ const SamlGoogleConfigureUserAccessStep = (): JSX.Element => {
       </Step.Body>
 
       <Step.Footer>
-        <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
           isDisabled={isFirstStep}

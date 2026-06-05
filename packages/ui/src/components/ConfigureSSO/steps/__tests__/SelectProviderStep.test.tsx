@@ -6,65 +6,44 @@ import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen, waitFor } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
 
+// Navigation goes through the generic wizard facade. The step owns a local
+// `handleContinue` that calls the create mutation then `useWizard().goNext`.
+// We assert on those nav calls.
 const goNext = vi.fn();
-const goPrev = vi.fn();
-const goToStep = vi.fn();
 
 vi.mock('../../elements/Wizard', () => ({
-  useWizard: () => ({
-    activeSteps: [],
-    currentStep: undefined,
-    currentIndex: -1,
-    totalSteps: 0,
-    isFirstStep: true,
-    isLastStep: false,
-    isNested: false,
-    goNext,
-    goPrev,
-    goToStep,
-    registerStep: vi.fn(),
-    unregisterStep: vi.fn(),
-  }),
+  useWizard: () => ({ current: 'select-provider', goNext }),
 }));
 
-const setProvider = vi.fn();
 const createEnterpriseConnection = vi.fn();
+
+// Provider is sourced from the connection aggregate (organizationEnterpriseConnection.provider)
+// rather than a context-level setProvider. The step uses goNext (not goToStep)
+// after a successful create.
+const contextState = vi.hoisted(() => ({
+  provider: undefined as 'saml_okta' | 'saml_custom' | undefined,
+  primaryEmailAddress: { emailAddress: 'test@clerk.com' } as { emailAddress: string } | undefined,
+  isPrimaryEmailVerified: true,
+}));
 
 vi.mock('../../ConfigureSSOContext', () => ({
   useConfigureSSO: () => ({
     enterpriseConnection: undefined,
-    provider: undefined,
-    setProvider,
-    createEnterpriseConnection,
-    initialStepId: 'select-provider',
+    // The step's local `handleContinue` reads the reverification-wrapped create
+    // mutation off the bundled `mutations` object.
+    mutations: {
+      createConnection: createEnterpriseConnection,
+    },
+    primaryEmailAddress: contextState.primaryEmailAddress,
+    // Provider is sourced from the aggregate; the step no longer reads a
+    // context-level setProvider — verify-domain runs first, so the create is
+    // unconditional.
+    organizationEnterpriseConnection: {
+      provider: contextState.provider,
+      isPrimaryEmailVerified: () => contextState.isPrimaryEmailVerified,
+    },
   }),
 }));
-
-const userMockState = vi.hoisted(() => ({
-  current: {
-    primaryEmailAddress: {
-      emailAddress: 'test@clerk.com',
-      verification: { status: 'verified' as 'verified' | 'unverified' },
-    },
-  } as {
-    primaryEmailAddress?: {
-      emailAddress: string;
-      verification: { status: 'verified' | 'unverified' };
-    };
-  } | null,
-}));
-
-vi.mock('@clerk/shared/react/index', async importOriginal => {
-  const actual = await importOriginal<typeof import('@clerk/shared/react/index')>();
-  return {
-    ...actual,
-    useUser: () => ({
-      user: userMockState.current,
-      isLoaded: true,
-      isSignedIn: true,
-    }),
-  };
-});
 
 import { SelectProviderStep } from '../SelectProviderStep';
 
@@ -79,17 +58,11 @@ const renderStep = (
 
 const resetMocks = () => {
   goNext.mockReset();
-  goPrev.mockReset();
-  goToStep.mockReset();
-  setProvider.mockReset();
   createEnterpriseConnection.mockReset();
   createEnterpriseConnection.mockResolvedValue(undefined);
-  userMockState.current = {
-    primaryEmailAddress: {
-      emailAddress: 'test@clerk.com',
-      verification: { status: 'verified' },
-    },
-  };
+  contextState.provider = undefined;
+  contextState.primaryEmailAddress = { emailAddress: 'test@clerk.com' };
+  contextState.isPrimaryEmailVerified = true;
 };
 
 describe('SelectProviderStep', () => {
@@ -172,17 +145,15 @@ describe('SelectProviderStep', () => {
     expect(customSamlRadio).toBeChecked();
   });
 
-  it('records the provider and advances when Continue is clicked', async () => {
+  it('records the provider and jumps to configure when Continue is clicked', async () => {
     resetMocks();
     const callOrder: string[] = [];
-    setProvider.mockImplementation(() => {
-      callOrder.push('setProvider');
-    });
-    createEnterpriseConnection.mockImplementation(async () => {
+    createEnterpriseConnection.mockImplementation(() => {
       callOrder.push('createEnterpriseConnection');
+      return Promise.resolve(undefined);
     });
-    goToStep.mockImplementation(() => {
-      callOrder.push('goToStep');
+    goNext.mockImplementation(() => {
+      callOrder.push('goNext');
     });
 
     const { wrapper } = await createFixtures();
@@ -192,12 +163,12 @@ describe('SelectProviderStep', () => {
     await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
 
     await waitFor(() => {
-      expect(goToStep).toHaveBeenCalledWith('configure');
+      expect(goNext).toHaveBeenCalled();
     });
 
-    expect(setProvider).toHaveBeenCalledWith('saml_okta');
-    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta', userMockState.current?.primaryEmailAddress);
-    expect(callOrder).toEqual(['setProvider', 'createEnterpriseConnection', 'goToStep']);
+    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta', contextState.primaryEmailAddress);
+    // The create then the goNext are the tail of the call order.
+    expect(callOrder.slice(-2)).toEqual(['createEnterpriseConnection', 'goNext']);
   });
 
   it('forwards the Custom SAML backend provider id when selected', async () => {
@@ -209,11 +180,10 @@ describe('SelectProviderStep', () => {
     await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
 
     await waitFor(() => {
-      expect(goToStep).toHaveBeenCalledWith('configure');
+      expect(goNext).toHaveBeenCalled();
     });
 
-    expect(setProvider).toHaveBeenCalledWith('saml_custom');
-    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_custom', userMockState.current?.primaryEmailAddress);
+    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_custom', contextState.primaryEmailAddress);
   });
 
   it('does not advance when failing to create enterprise connection', async () => {
@@ -231,10 +201,10 @@ describe('SelectProviderStep', () => {
     await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
 
     await waitFor(() => {
-      expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta', userMockState.current?.primaryEmailAddress);
+      expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta', contextState.primaryEmailAddress);
     });
 
-    expect(goToStep).not.toHaveBeenCalled();
+    expect(goNext).not.toHaveBeenCalled();
   });
 
   it('disables Previous on the first step', async () => {
@@ -245,9 +215,12 @@ describe('SelectProviderStep', () => {
     expect(screen.getByRole('button', { name: /Previous/i })).toBeDisabled();
   });
 
-  it('routes to verify-domain when the user has no primary email address', async () => {
+  it('always creates and jumps to configure (verify-domain ran first, so no branch back)', async () => {
+    // Under the new step order the user reaches select-provider only after
+    // verify-domain, so the create is unconditional even if the verified fact is
+    // somehow false — there is no longer a branch back to verify-domain.
     resetMocks();
-    userMockState.current = {};
+    contextState.isPrimaryEmailVerified = false;
 
     const { wrapper } = await createFixtures();
     const { userEvent } = renderStep(wrapper);
@@ -256,33 +229,9 @@ describe('SelectProviderStep', () => {
     await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
 
     await waitFor(() => {
-      expect(goToStep).toHaveBeenCalledWith('verify-domain');
+      expect(goNext).toHaveBeenCalled();
     });
 
-    expect(setProvider).toHaveBeenCalledWith('saml_okta');
-    expect(createEnterpriseConnection).not.toHaveBeenCalled();
-  });
-
-  it('routes to verify-domain when the user has an unverified primary email address', async () => {
-    resetMocks();
-    userMockState.current = {
-      primaryEmailAddress: {
-        emailAddress: 'test@clerk.com',
-        verification: { status: 'unverified' },
-      },
-    };
-
-    const { wrapper } = await createFixtures();
-    const { userEvent } = renderStep(wrapper);
-
-    await userEvent.click(screen.getByRole('radio', { name: 'Okta Workforce' }));
-    await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
-
-    await waitFor(() => {
-      expect(goToStep).toHaveBeenCalledWith('verify-domain');
-    });
-
-    expect(setProvider).toHaveBeenCalledWith('saml_okta');
-    expect(createEnterpriseConnection).not.toHaveBeenCalled();
+    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta', contextState.primaryEmailAddress);
   });
 });

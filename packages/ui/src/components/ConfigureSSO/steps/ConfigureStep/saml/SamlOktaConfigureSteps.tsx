@@ -23,7 +23,7 @@ import { useFormControl } from '@/ui/utils/useFormControl';
 
 import { useConfigureSSO } from '../../../ConfigureSSOContext';
 import { Step } from '../../../elements/Step';
-import { useWizard, Wizard } from '../../../elements/Wizard';
+import { useWizard, Wizard, type WizardStepConfig } from '../../../elements/Wizard';
 import { InnerStepCounter } from '../../../elements/Wizard/InnerStepCounter';
 import {
   applySamlSubmitError,
@@ -36,51 +36,34 @@ import {
   type IdpConfigurationMode,
 } from './shared/IdentityProviderConfigurationModes';
 
+const OKTA_STEPS: WizardStepConfig[] = [
+  { id: 'create-app' },
+  { id: 'attribute-mapping' },
+  { id: 'assign-users' },
+  { id: 'identity-provider-metadata' },
+];
+
 export const SamlOktaConfigureSteps = (): JSX.Element => {
   return (
-    <>
-      <Wizard.Step id='create-app'>
-        <Step.Header
-          title={localizationKeys('configureSSO.configureStep.samlOkta.mainHeaderTitle')}
-          description={localizationKeys('configureSSO.configureStep.samlOkta.createAppStep.headerSubtitle')}
-        >
-          <InnerStepCounter />
-        </Step.Header>
+    // Linear, guard-less sub-flow: mount on the first step. (Entry guards drive
+    // furthest-reachable init, which would otherwise land the last step here.)
+    <Wizard
+      steps={OKTA_STEPS}
+      initialStepId={OKTA_STEPS[0].id}
+    >
+      <Wizard.Match id='create-app'>
         <SamlOktaCreateAppStep />
-      </Wizard.Step>
-
-      <Wizard.Step id='attribute-mapping'>
-        <Step.Header
-          title={localizationKeys('configureSSO.configureStep.samlOkta.mainHeaderTitle')}
-          description={localizationKeys('configureSSO.configureStep.samlOkta.attributeMappingStep.headerSubtitle')}
-        >
-          <InnerStepCounter />
-        </Step.Header>
+      </Wizard.Match>
+      <Wizard.Match id='attribute-mapping'>
         <SamlOktaAttributeMappingStep />
-      </Wizard.Step>
-
-      <Wizard.Step id='assign-users'>
-        <Step.Header
-          title={localizationKeys('configureSSO.configureStep.samlOkta.mainHeaderTitle')}
-          description={localizationKeys('configureSSO.configureStep.samlOkta.assignUsersStep.headerSubtitle')}
-        >
-          <InnerStepCounter />
-        </Step.Header>
+      </Wizard.Match>
+      <Wizard.Match id='assign-users'>
         <SamlOktaAssignUsersStep />
-      </Wizard.Step>
-
-      <Wizard.Step id='identity-provider-metadata'>
-        <Step.Header
-          title={localizationKeys('configureSSO.configureStep.samlOkta.mainHeaderTitle')}
-          description={localizationKeys(
-            'configureSSO.configureStep.samlOkta.identityProviderMetadataStep.headerSubtitle',
-          )}
-        >
-          <InnerStepCounter />
-        </Step.Header>
+      </Wizard.Match>
+      <Wizard.Match id='identity-provider-metadata'>
         <SamlOktaIdentityProviderMetadataStep />
-      </Wizard.Step>
-    </>
+      </Wizard.Match>
+    </Wizard>
   );
 };
 
@@ -108,6 +91,13 @@ const SamlOktaCreateAppStep = (): JSX.Element => {
 
   return (
     <>
+      <Step.Header
+        title={localizationKeys('configureSSO.configureStep.samlOkta.mainHeaderTitle')}
+        description={localizationKeys('configureSSO.configureStep.samlOkta.createAppStep.headerSubtitle')}
+      >
+        <InnerStepCounter />
+      </Step.Header>
+
       <Step.Body>
         <Step.Section sx={theme => ({ gap: theme.space.$5 })}>
           <Col sx={theme => ({ gap: theme.space.$1x5 })}>
@@ -261,7 +251,6 @@ const SamlOktaCreateAppStep = (): JSX.Element => {
       </Step.Body>
 
       <Step.Footer>
-        <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
           isDisabled={isFirstStep}
@@ -363,6 +352,13 @@ const SamlOktaAttributeMappingStep = (): JSX.Element => {
 
   return (
     <>
+      <Step.Header
+        title={localizationKeys('configureSSO.configureStep.samlOkta.mainHeaderTitle')}
+        description={localizationKeys('configureSSO.configureStep.samlOkta.attributeMappingStep.headerSubtitle')}
+      >
+        <InnerStepCounter />
+      </Step.Header>
+
       <Step.Body>
         <Step.Section sx={theme => ({ gap: theme.space.$3 })}>
           <Text
@@ -400,7 +396,6 @@ const SamlOktaAttributeMappingStep = (): JSX.Element => {
       </Step.Body>
 
       <Step.Footer>
-        <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
           isDisabled={isFirstStep}
@@ -419,6 +414,13 @@ const SamlOktaAssignUsersStep = (): JSX.Element => {
 
   return (
     <>
+      <Step.Header
+        title={localizationKeys('configureSSO.configureStep.samlOkta.mainHeaderTitle')}
+        description={localizationKeys('configureSSO.configureStep.samlOkta.assignUsersStep.headerSubtitle')}
+      >
+        <InnerStepCounter />
+      </Step.Header>
+
       <Step.Body>
         <Step.Section sx={theme => ({ gap: theme.space.$3 })}>
           <Heading
@@ -492,7 +494,6 @@ const SamlOktaAssignUsersStep = (): JSX.Element => {
       </Step.Body>
 
       <Step.Footer>
-        <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
           isDisabled={isFirstStep}
@@ -511,7 +512,10 @@ const OKTA_IDP_MODES = ['metadataUrl', 'manual'] as const satisfies readonly Idp
 const SamlOktaIdentityProviderMetadataStep = (): JSX.Element => {
   const card = useCardState();
   const { goNext, goPrev, isFirstStep } = useWizard();
-  const { enterpriseConnection, updateEnterpriseConnection } = useConfigureSSO();
+  const {
+    enterpriseConnection,
+    mutations: { updateConnection },
+  } = useConfigureSSO();
 
   const samlConnection = enterpriseConnection?.samlConnection;
   const hasExistingConfig = Boolean(
@@ -626,7 +630,7 @@ const SamlOktaIdentityProviderMetadataStep = (): JSX.Element => {
         metadataUrl: { value: metadataUrlField.value },
         manual: { signOnUrl: signOnUrlField.value, issuer: issuerField.value, certFile },
       });
-      await updateEnterpriseConnection(enterpriseConnection.id, { saml });
+      await updateConnection(enterpriseConnection.id, { saml });
       void goNext();
     } catch (err) {
       if (mode === 'metadataUrl') {
@@ -641,6 +645,15 @@ const SamlOktaIdentityProviderMetadataStep = (): JSX.Element => {
 
   return (
     <>
+      <Step.Header
+        title={localizationKeys('configureSSO.configureStep.samlOkta.mainHeaderTitle')}
+        description={localizationKeys(
+          'configureSSO.configureStep.samlOkta.identityProviderMetadataStep.headerSubtitle',
+        )}
+      >
+        <InnerStepCounter />
+      </Step.Header>
+
       <Step.Body>
         <Step.Section
           fill
@@ -676,7 +689,6 @@ const SamlOktaIdentityProviderMetadataStep = (): JSX.Element => {
       </Step.Body>
 
       <Step.Footer>
-        <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
           isDisabled={isFirstStep || card.isLoading}

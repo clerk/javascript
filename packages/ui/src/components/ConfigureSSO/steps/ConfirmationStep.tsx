@@ -1,4 +1,4 @@
-import { useOrganization, useReverification } from '@clerk/shared/react';
+import { useOrganization } from '@clerk/shared/react';
 import { useState } from 'react';
 
 import { AlertIcon, Badge, Button, Col, descriptors, Flex, Flow, Link, localizationKeys, Text } from '@/customizables';
@@ -73,12 +73,13 @@ export const ConfirmationStep = (): JSX.Element => {
 };
 
 const EnableSsoSection = (): JSX.Element => {
-  const { enterpriseConnection, updateEnterpriseConnection } = useConfigureSSO();
+  const {
+    enterpriseConnection,
+    mutations: { setConnectionActive },
+  } = useConfigureSSO();
   const card = useCardState();
 
   const [isChecked, setIsChecked] = useState(!!enterpriseConnection?.active);
-
-  const updateActive = useReverification((id: string, active: boolean) => updateEnterpriseConnection(id, { active }));
 
   const onActiveChange = async (active: boolean) => {
     if (card.isLoading) {
@@ -92,7 +93,7 @@ const EnableSsoSection = (): JSX.Element => {
     try {
       // Enterprise connection is guaranteed to be set at this point
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const updated = await updateActive(enterpriseConnection!.id, active);
+      const updated = await setConnectionActive(enterpriseConnection!.id, active);
       if (updated) {
         setIsChecked(updated.active);
       }
@@ -239,9 +240,10 @@ const ConfigurationDetailsSection = (): JSX.Element => {
         <Flex justify='start'>
           <Button
             elementDescriptor={descriptors.configureSSOConfirmationReconfigureButton}
+            id='configureAgain'
+            onClick={() => goToStep('configure')}
             variant='outline'
             size='sm'
-            onClick={() => goToStep('configure')}
             localizationKey={localizationKeys('configureSSO.confirmation.configurationSection.configureAgainLink')}
           />
         </Flex>

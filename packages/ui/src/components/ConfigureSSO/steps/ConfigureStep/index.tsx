@@ -4,7 +4,6 @@ import { descriptors, Flow } from '@/customizables';
 
 import { useConfigureSSO } from '../../ConfigureSSOContext';
 import { Step } from '../../elements/Step';
-import { Wizard } from '../../elements/Wizard';
 import type { ProviderType } from '../../types';
 import {
   SamlCustomConfigureSteps,
@@ -21,18 +20,19 @@ const STEPS_BY_PROVIDER: Record<ProviderType, () => JSX.Element> = {
 };
 
 export const ConfigureStep = (): JSX.Element | null => {
-  const { provider } = useConfigureSSO();
+  const { organizationEnterpriseConnection: c } = useConfigureSSO();
 
   // Type guard, at this point the provider should have been defined
-  if (!provider) {
+  if (!c.provider) {
     return null;
   }
 
   // Type guard to ensure steps are provided
   // If a new provider is added to the select step, then build will fail ahead of runtime
-  const StepsByProvider = STEPS_BY_PROVIDER[provider];
+  const StepsByProvider = STEPS_BY_PROVIDER[c.provider];
+
   if (!StepsByProvider) {
-    throw new Error(`No steps found for provider: ${provider}`);
+    throw new Error(`No steps found for provider: ${c.provider}`);
   }
 
   return (
@@ -41,9 +41,7 @@ export const ConfigureStep = (): JSX.Element | null => {
         elementDescriptor={descriptors.configureSSOStep}
         elementId={descriptors.configureSSOStep.setId('configure')}
       >
-        <Wizard>
-          <StepsByProvider />
-        </Wizard>
+        <StepsByProvider />
       </Step>
     </Flow.Part>
   );

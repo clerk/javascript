@@ -1,5 +1,4 @@
 import { iconImageUrl } from '@clerk/shared/constants';
-import { useUser } from '@clerk/shared/react/index';
 import React from 'react';
 
 import type { LocalizationKey } from '@/customizables';
@@ -62,40 +61,51 @@ const PROVIDER_GROUPS: ReadonlyArray<{
 ];
 
 export const SelectProviderStep = (): JSX.Element => {
-  const { goToStep } = useWizard();
-  const { provider, setProvider, createEnterpriseConnection } = useConfigureSSO();
+  const {
+    primaryEmailAddress,
+    organizationEnterpriseConnection: c,
+    mutations: { createConnection },
+  } = useConfigureSSO();
+  const { goNext } = useWizard();
 
-  // Re-hydrate from context so users returning from `verify-domain`
-  // (after picking a provider but needing to verify their email first)
-  // don't have to re-click their provider.
-  const [selected, setSelected] = React.useState<ProviderType | null>(provider ?? null);
-  const { user } = useUser();
+  // Re-hydrate from context so users returning from another step don't have to
+  // re-click their provider.
+  const [selected, setSelected] = React.useState<ProviderType | null>(c.provider ?? null);
   const card = useCardState();
 
-  const handleContinue = async () => {
-    if (!selected || !user) {
+  const handleSelect = (next: ProviderType) => {
+    setSelected(next);
+  };
+
+  // Under the entry-guard graph verify-domain runs first, so by the time the
+  // user reaches select-provider their domain is verified. On a fresh start the
+  // create is unconditional; a plain `goNext` then lands `configure` because the
+  // resolved create flips the aggregate's `hasConnection`, satisfying
+  // `configure`'s entry guard. On revisit a connection already exists, so we
+  // never re-create — `goNext` alone advances.
+  const handleContinue = async (): Promise<void> => {
+    if (!selected) {
       return;
     }
 
-    setProvider(selected);
-
-    const primaryEmailAddress = user?.primaryEmailAddress;
-    const hasVerifiedPrimaryEmailAddress = primaryEmailAddress?.verification.status === 'verified';
-
-    if (!primaryEmailAddress || !hasVerifiedPrimaryEmailAddress) {
-      void goToStep('verify-domain');
+    // Connection already created on a prior visit: don't re-create, just
+    // advance — `configure`'s guard already holds.
+    if (c.hasConnection) {
+      goNext();
       return;
     }
 
-    // Otherwise, set the provider and create the enterprise connection
+    card.setError(undefined);
+    card.setLoading();
+
     try {
-      await createEnterpriseConnection(selected, primaryEmailAddress);
+      await createConnection(selected, primaryEmailAddress);
+      goNext();
     } catch (err) {
       handleError(err as Error, [], card.setError);
-      return;
+    } finally {
+      card.setIdle();
     }
-
-    void goToStep('configure');
   };
 
   return (
@@ -144,7 +154,7 @@ export const SelectProviderStep = (): JSX.Element => {
                       iconId={option.iconId}
                       label={option.label}
                       checked={selected === option.id}
-                      onChange={() => setSelected(option.id)}
+                      onChange={() => handleSelect(option.id)}
                     />
                   ))}
                 </Grid>
@@ -172,7 +182,7 @@ export const SelectProviderStep = (): JSX.Element => {
           <Step.Footer.Continue
             onClick={handleContinue}
             isLoading={card.isLoading}
-            isDisabled={!selected}
+            isDisabled={!selected || card.isLoading}
           />
         </Step.Footer>
       </Step>

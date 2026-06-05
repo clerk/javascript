@@ -1,7 +1,6 @@
-import { __internal_useOrganizationEnterpriseConnectionTestRuns, useOrganization } from '@clerk/shared/react/index';
 import type { EnterpriseConnectionTestRunResource } from '@clerk/shared/types';
 import type { ReactNode } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import type { LocalizationKey } from '@/customizables';
 import {
@@ -40,29 +39,54 @@ import { handleError } from '@/utils/errorHandler';
 import { useConfigureSSO } from '../ConfigureSSOContext';
 import { Step } from '../elements/Step';
 import { useWizard } from '../elements/Wizard';
+import { TEST_RUNS_PAGE_SIZE } from '../hooks/useEnterpriseConnectionTestRuns';
 import { TestRunHowToFixSection } from './TestRunHowToFixSection';
 
-const TEST_RUNS_PAGE_SIZE = 5;
 const TEST_RESULTS_TABLE_COLUMN_COUNT = 3;
 
 export const TestConfigurationStep = (): JSX.Element => {
-  const { goNext, goPrev } = useWizard();
-  const { enterpriseConnection } = useConfigureSSO();
+  const { goPrev, isInitialStep } = useWizard();
+  const { organizationEnterpriseConnection: c, testRuns } = useConfigureSSO();
   const card = useCardState();
 
-  const [currentPage, setCurrentPage] = useState(1);
-
   const {
-    data: testRuns,
+    rows,
     totalCount,
     isLoading: areTestRunsLoading,
     isFetching: areTestRunsFetching,
     isPolling,
-    revalidate: revalidateTestRuns,
-  } = __internal_useOrganizationEnterpriseConnectionTestRuns({
-    enterpriseConnectionId: enterpriseConnection?.id ?? null,
-    params: { initialPage: currentPage, pageSize: TEST_RUNS_PAGE_SIZE },
-  });
+    page: currentPage,
+    setPage: setCurrentPage,
+    refresh: refreshTestRuns,
+    activate: activateTestRuns,
+  } = testRuns;
+
+  // Entering the test step wakes the test-runs source on the fresh-start path
+  // (no connection at initial load → the queries were kept dormant through
+  // create/configure so a mid-flow create never flashed the full skeleton).
+  // `activate()` is a no-op when a connection existed at initial load, where the
+  // queries already fetched on load. Once active, loading surfaces at the table
+  // level (`isFetching`), never the global skeleton.
+  //
+  // The wizard's initial load already fetched the test-runs (covered by the
+  // full skeleton) for the existing-connection case, so landing on the test
+  // step on that first load must NOT refetch. Navigating INTO the step later
+  // (forward, back, or breadcrumb) should refetch so the table reflects any run
+  // kicked off elsewhere — that refetch surfaces as the table-level `isFetching`
+  // spinner, never the full skeleton.
+  //
+  // The step only mounts while it is the current step, so this runs once per
+  // entry. `isInitialStep` is the wizard's own "no navigation yet" signal, read
+  // at mount: this fires a mount-driven activation + data refresh, it is NOT
+  // syncing state via an effect. Empty deps → mount-only, so re-renders never
+  // re-fire.
+  useEffect(() => {
+    activateTestRuns();
+    if (!isInitialStep) {
+      void refreshTestRuns();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const isRefreshingTestRuns = areTestRunsFetching && !areTestRunsLoading;
   const showRefreshLogsSpinner = useSpinDelay(isRefreshingTestRuns);
@@ -70,7 +94,11 @@ export const TestConfigurationStep = (): JSX.Element => {
 
   const handleTestRunCreated = () => {
     setCurrentPage(1);
-    void revalidateTestRuns();
+    // Refetch the single source: the visible list (so the new run shows up and
+    // polling arms) and the success probe (so the aggregate's
+    // `hasSuccessfulTestRun()` and the Continue gate reflect the run that just
+    // completed).
+    void refreshTestRuns();
   };
 
   return (
@@ -114,7 +142,7 @@ export const TestConfigurationStep = (): JSX.Element => {
                 variant='bordered'
                 colorScheme='secondary'
                 size='xs'
-                onClick={() => void revalidateTestRuns()}
+                onClick={() => void refreshTestRuns()}
                 isDisabled={showRefreshLogsSpinner}
                 sx={t => ({ gap: t.space.$1x5 })}
               >
@@ -141,7 +169,7 @@ export const TestConfigurationStep = (): JSX.Element => {
 
             <Col sx={{ flex: 1, minHeight: 0 }}>
               <TestResultsTable
-                rows={testRuns ?? []}
+                rows={rows}
                 isPolling={isPolling}
                 isLoading={areTestRunsLoading}
                 page={currentPage}
@@ -177,12 +205,8 @@ export const TestConfigurationStep = (): JSX.Element => {
         ) : null}
 
         <Step.Footer>
-          <Step.Footer.Reset />
           <Step.Footer.Previous onClick={() => goPrev()} />
-          <ContinueTestSsoStepButton
-            enterpriseConnectionId={enterpriseConnection?.id}
-            onContinue={() => void goNext()}
-          />
+          <ContinueTestSsoStepButton hasSuccessfulTestRun={c.hasSuccessfulTestRun()} />
         </Step.Footer>
       </Step>
     </Flow.Part>
@@ -190,52 +214,28 @@ export const TestConfigurationStep = (): JSX.Element => {
 };
 
 type ContinueTestSsoStepButtonProps = {
-  enterpriseConnectionId: string | undefined;
-  onContinue: () => void;
+  hasSuccessfulTestRun: boolean;
 };
 
-const ContinueTestSsoStepButton = ({
-  enterpriseConnectionId,
-  onContinue,
-}: ContinueTestSsoStepButtonProps): JSX.Element => {
-  const { organization } = useOrganization();
+const ContinueTestSsoStepButton = ({ hasSuccessfulTestRun }: ContinueTestSsoStepButtonProps): JSX.Element => {
   const { t } = useLocalizations();
   const card = useCardState();
-  const [isValidating, setIsValidating] = useState(false);
+  const { goNext } = useWizard();
 
-  const handleContinue = async () => {
-    if (!organization || !enterpriseConnectionId) {
+  // The button stays enabled so a user without a successful run still gets the
+  // inline validation message (matching legacy), rather than a silently
+  // disabled Continue. On success we advance; otherwise we surface the error
+  // and stay put.
+  const handleContinue = (): void => {
+    if (hasSuccessfulTestRun) {
+      card.setError(undefined);
+      goNext();
       return;
     }
-
-    setIsValidating(true);
-    card.setError(undefined);
-
-    try {
-      const result = await organization.getEnterpriseConnectionTestRuns(enterpriseConnectionId, {
-        initialPage: 1,
-        pageSize: 1,
-        status: ['success'],
-      });
-
-      if (result.data.length > 0) {
-        onContinue();
-      } else {
-        card.setError(t(localizationKeys('configureSSO.testConfigurationStep.error__noSuccessfulTestRun')));
-      }
-    } catch (err) {
-      handleError(err as Error, [], card.setError);
-    } finally {
-      setIsValidating(false);
-    }
+    card.setError(t(localizationKeys('configureSSO.testConfigurationStep.error__noSuccessfulTestRun')));
   };
 
-  return (
-    <Step.Footer.Continue
-      onClick={() => void handleContinue()}
-      isLoading={isValidating}
-    />
-  );
+  return <Step.Footer.Continue onClick={handleContinue} />;
 };
 
 type TestResultsTableProps = {
@@ -718,21 +718,22 @@ type OpenTestUrlButtonProps = {
 };
 
 const OpenTestUrlButton = ({ onTestRunCreated }: OpenTestUrlButtonProps): JSX.Element => {
-  const { organization } = useOrganization();
   const card = useCardState();
-  const { enterpriseConnection } = useConfigureSSO();
+  const {
+    enterpriseConnection,
+    mutations: { createTestRun },
+  } = useConfigureSSO();
 
   const [isCreatingTestRun, setIsCreatingTestRun] = useState(false);
 
   const openTestRun = () => {
-    if (!organization || !enterpriseConnection) {
+    if (!enterpriseConnection) {
       return;
     }
 
     setIsCreatingTestRun(true);
 
-    organization
-      .createEnterpriseConnectionTestRun(enterpriseConnection.id)
+    createTestRun(enterpriseConnection.id)
       .then(({ url }) => {
         onTestRunCreated?.(url);
         // `noopener,noreferrer` so the IdP can't reach back into the dashboard
