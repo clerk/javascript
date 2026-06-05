@@ -4,6 +4,7 @@ import UIKit
 public class ClerkAuthNativeView: ClerkNativeViewHost {
   private var currentMode: String = "signInOrUp"
   private var currentDismissible: Bool = true
+  private var didSendDismiss = false
 
   @objc var onAuthEvent: RCTBubblingEventBlock?
 
@@ -29,6 +30,21 @@ public class ClerkAuthNativeView: ClerkNativeViewHost {
     onAuthEvent?(["type": type.rawValue])
   }
 
+  private func sendDismissIfNeeded() {
+    // SwiftUI dismissals detach the hosted view without calling UIKit dismiss().
+    guard currentDismissible, !didSendDismiss else { return }
+    didSendDismiss = true
+    sendAuthEvent(type: .dismissed)
+  }
+
+  override func hostedViewDidAttachToWindow() {
+    didSendDismiss = false
+  }
+
+  override func hostedViewDidDetachFromWindow() {
+    sendDismissIfNeeded()
+  }
+
   override func makeHostedController() -> UIViewController? {
     guard let bridge = clerkNativeBridge else { return nil }
 
@@ -37,8 +53,7 @@ public class ClerkAuthNativeView: ClerkNativeViewHost {
       dismissible: currentDismissible,
       onEvent: { [weak self] event, _ in
         if event == .dismissed {
-          guard self?.currentDismissible == true else { return }
-          self?.sendAuthEvent(type: .dismissed)
+          self?.sendDismissIfNeeded()
         }
       }
     )

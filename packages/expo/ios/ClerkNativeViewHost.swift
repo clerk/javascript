@@ -16,6 +16,9 @@ public class ClerkNativeViewHost: UIView {
     super.didMoveToWindow()
 
     guard window != nil else {
+      if hasInitialized {
+        hostedViewDidDetachFromWindow()
+      }
       hostingCoordinator.detach()
       hasInitialized = false
       return
@@ -23,6 +26,7 @@ public class ClerkNativeViewHost: UIView {
 
     guard !hasInitialized else { return }
     hasInitialized = true
+    hostedViewDidAttachToWindow()
     updateHostedView()
   }
 
@@ -39,6 +43,11 @@ public class ClerkNativeViewHost: UIView {
   func makeHostedController() -> UIViewController? {
     nil
   }
+
+  // Subclasses can observe attach/detach without making this host know about their RN event props.
+  func hostedViewDidAttachToWindow() {}
+
+  func hostedViewDidDetachFromWindow() {}
 
   private func updateHostedView() {
     guard let controller = makeHostedController() else { return }

@@ -3,6 +3,7 @@ import UIKit
 
 public class ClerkUserProfileNativeView: ClerkNativeViewHost {
   private var currentDismissible: Bool = true
+  private var didSendDismiss = false
 
   @objc var onProfileEvent: RCTBubblingEventBlock?
 
@@ -19,6 +20,21 @@ public class ClerkUserProfileNativeView: ClerkNativeViewHost {
     onProfileEvent?(["type": type.rawValue])
   }
 
+  private func sendDismissIfNeeded() {
+    // SwiftUI dismissals detach the hosted view without calling UIKit dismiss().
+    guard currentDismissible, !didSendDismiss else { return }
+    didSendDismiss = true
+    sendProfileEvent(type: .dismissed)
+  }
+
+  override func hostedViewDidAttachToWindow() {
+    didSendDismiss = false
+  }
+
+  override func hostedViewDidDetachFromWindow() {
+    sendDismissIfNeeded()
+  }
+
   override func makeHostedController() -> UIViewController? {
     guard let bridge = clerkNativeBridge else { return nil }
 
@@ -26,8 +42,7 @@ public class ClerkUserProfileNativeView: ClerkNativeViewHost {
       dismissible: currentDismissible,
       onEvent: { [weak self] event, _ in
         if event == .dismissed {
-          guard self?.currentDismissible == true else { return }
-          self?.sendProfileEvent(type: .dismissed)
+          self?.sendDismissIfNeeded()
         }
       }
     )
