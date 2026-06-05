@@ -28,12 +28,12 @@ const styles = cva(theme => ({
       primary: {
         backgroundColor: theme.color.primary,
         color: theme.color.primaryForeground,
-        '&:hover': { backgroundColor: theme.alpha('primary', 80) },
-        '&:active': { backgroundColor: theme.alpha('primary', 70) },
+        '&:hover': { backgroundColor: theme.mix('primary', 'primaryForeground', 12) },
+        '&:active': { backgroundColor: theme.mix('primary', 'primaryForeground', 24) },
       },
     },
     size: {
-      sm: { padding: `${theme.spacing(1)} ${theme.spacing(2)}`, fontSize: '0.75rem' },
+      sm: { padding: `${theme.spacing(0.2)} ${theme.spacing(2)}`, fontSize: '0.75rem' },
       md: { padding: `${theme.spacing(2)} ${theme.spacing(4)}`, fontSize: '0.875rem' },
     },
     disabled: {

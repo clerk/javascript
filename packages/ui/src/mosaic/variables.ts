@@ -25,6 +25,11 @@ export type MosaicTheme = Omit<MosaicTokens, 'spacing'> & {
     color: K,
     opacity: O,
   ) => `color-mix(in oklab, ${MosaicTokens['color'][K]} ${O}%, transparent)`;
+  readonly mix: <A extends keyof MosaicTokens['color'], B extends keyof MosaicTokens['color'], P extends number>(
+    a: A,
+    b: B,
+    percentage: P,
+  ) => `color-mix(in oklab, ${MosaicTokens['color'][A]}, ${MosaicTokens['color'][B]} ${P}%)`;
 };
 
 function merge(target: Record<string, unknown>, overrides: Record<string, unknown>): Record<string, unknown> {
@@ -48,5 +53,10 @@ export function resolveVariables(defaults: MosaicTokens, variables?: MosaicVaria
     spacing: (<N extends number>(n: N) => `calc(${tokens.spacing} * ${n})`) as MosaicTheme['spacing'],
     alpha: (<K extends keyof MosaicTokens['color'], O extends number>(color: K, opacity: O) =>
       `color-mix(in oklab, ${tokens.color[color]} ${opacity}%, transparent)`) as MosaicTheme['alpha'],
+    mix: (<A extends keyof MosaicTokens['color'], B extends keyof MosaicTokens['color'], P extends number>(
+      a: A,
+      b: B,
+      percentage: P,
+    ) => `color-mix(in oklab, ${tokens.color[a]}, ${tokens.color[b]} ${percentage}%)`) as MosaicTheme['mix'],
   };
 }
