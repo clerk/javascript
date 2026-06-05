@@ -906,6 +906,9 @@ class SignUpFuture implements SignUpFutureResource {
       if (this.#resource.id) {
         await this.#resource.__internal_basePatch({ body });
       } else {
+        // Inject browser locale only when creating the sign-up, so an existing
+        // sign-up's locale is not overwritten on update.
+        body.locale = params.locale ?? getBrowserLocale();
         await this.#resource.__internal_basePost({ path: this.#resource.pathRoot, body });
       }
     });

@@ -1255,6 +1255,77 @@ describe('SignUp', () => {
 
         expect(result).toHaveProperty('error', null);
       });
+
+      it('includes browser locale when creating a new signup', async () => {
+        vi.stubGlobal('navigator', { language: 'fr-FR' });
+
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_123', status: 'missing_requirements' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp();
+        await signUp.__internal_future.password({ password: 'test-password-123' });
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'POST',
+            path: '/client/sign_ups',
+            body: expect.objectContaining({
+              strategy: 'password',
+              locale: 'fr-FR',
+            }),
+          }),
+        );
+      });
+
+      it('prefers an explicitly provided locale over the browser locale', async () => {
+        vi.stubGlobal('navigator', { language: 'fr-FR' });
+
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_123', status: 'missing_requirements' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp();
+        await signUp.__internal_future.password({ password: 'test-password-123', locale: 'el-GR' });
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'POST',
+            path: '/client/sign_ups',
+            body: expect.objectContaining({
+              strategy: 'password',
+              locale: 'el-GR',
+            }),
+          }),
+        );
+      });
+
+      it('does not inject browser locale when updating an existing signup', async () => {
+        vi.stubGlobal('navigator', { language: 'fr-FR' });
+
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_123', status: 'missing_requirements' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp({ id: 'signup_123' } as any);
+        await signUp.__internal_future.password({ password: 'test-password-123' });
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'PATCH',
+            path: '/client/sign_ups/signup_123',
+            body: expect.not.objectContaining({
+              locale: expect.anything(),
+            }),
+          }),
+        );
+      });
     });
 
     describe('ticket', () => {
