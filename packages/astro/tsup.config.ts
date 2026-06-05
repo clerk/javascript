@@ -21,7 +21,7 @@ export default defineConfig(overrideOptions => {
     ],
     dts: true,
     minify: false,
-    onSuccess: shouldPublish ? 'pnpm build:dts && pkglab pub --ping' : 'pnpm build:dts',
+    onSuccess: shouldPublish ? 'pnpm build:declarations && pkglab pub --ping' : 'pnpm build:declarations',
     define: {
       PACKAGE_NAME: `"${name}"`,
       PACKAGE_VERSION: `"${version}"`,

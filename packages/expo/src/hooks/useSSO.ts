@@ -47,17 +47,22 @@ export function useSSO() {
       };
     }
 
-    // Dynamically import expo-auth-session and expo-web-browser only when needed
-    // eslint-disable-next-line @typescript-eslint/consistent-type-imports -- dynamic import of optional dependency
+    // Load via synchronous require() instead of import(): Metro inlines require() into the main
+    // bundle, while import() emits an async chunk that fails to resolve without @expo/metro-runtime.
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports -- type-only annotation for optional dependency
     let AuthSession: typeof import('expo-auth-session');
-    // eslint-disable-next-line @typescript-eslint/consistent-type-imports -- dynamic import of optional dependency
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports -- type-only annotation for optional dependency
     let WebBrowserModule: typeof import('expo-web-browser');
     try {
-      [AuthSession, WebBrowserModule] = await Promise.all([import('expo-auth-session'), import('expo-web-browser')]);
-    } catch {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      AuthSession = require('expo-auth-session');
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      WebBrowserModule = require('expo-web-browser');
+    } catch (err) {
       return errorThrower.throw(
-        'expo-auth-session and expo-web-browser are required for SSO. ' +
-          'Install them: npx expo install expo-auth-session expo-web-browser',
+        `Unable to load expo-auth-session and expo-web-browser, which are required for SSO: ${
+          err instanceof Error ? err.message : 'Unknown error'
+        }. If they are not installed, run: npx expo install expo-auth-session expo-web-browser`,
       );
     }
 
@@ -67,7 +72,7 @@ export function useSSO() {
      * Creates a redirect URL based on the application platform
      * It must be whitelisted, either via Clerk Dashboard, or BAPI, in order
      * to include the `rotating_token_nonce` on SSO callback
-     * @ref https://clerk.com/docs/reference/backend-api/tag/Redirect-URLs#operation/CreateRedirectURL
+     * @ref https://clerk.com/docs/reference/backend-api/tag/redirect-urls/POST/redirect_urls
      */
     const redirectUrl =
       startSSOFlowParams.redirectUrl ??

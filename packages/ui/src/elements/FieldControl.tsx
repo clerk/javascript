@@ -255,14 +255,18 @@ const CheckboxLabel = (props: { description?: string | LocalizationKey }) => {
   );
 };
 
-const InputElement = forwardRef<HTMLInputElement>((_, ref) => {
+type InputElementProps = {
+  elementDescriptor?: ElementDescriptor;
+};
+
+const InputElement = forwardRef<HTMLInputElement, InputElementProps>(({ elementDescriptor }, ref) => {
   const { t } = useLocalizations();
   const formField = useFormField();
   const { placeholder, ...inputProps } = sanitizeInputProps(formField);
   return (
     <Input
       ref={ref}
-      elementDescriptor={descriptors.formFieldInput}
+      elementDescriptor={elementDescriptor || descriptors.formFieldInput}
       elementId={descriptors.formFieldInput.setId(formField.fieldId)}
       {...inputProps}
       placeholder={t(placeholder)}

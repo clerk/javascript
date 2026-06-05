@@ -6,7 +6,7 @@ import { makeResponsive } from './makeResponsive';
 import { sanitizeDomProps } from './sanitizeDomProps';
 
 export * from './Flow';
-export { AppearanceProvider, useAppearance } from './AppearanceContext';
+export { AppearanceContext, AppearanceProvider, useAppearance } from './AppearanceContext';
 export { descriptors } from './elementDescriptors';
 export { localizationKeys, useLocalizations } from '../localization';
 export type { LocalizationKey } from '../localization';

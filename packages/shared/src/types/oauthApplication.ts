@@ -19,6 +19,7 @@ export interface OAuthConsentInfoJSON extends ClerkResourceJSON {
   oauth_application_url: string;
   client_id: string;
   state: string;
+  redirect_domain: string | null;
   scopes: OAuthConsentScopeJSON[];
 }
 
@@ -69,6 +70,12 @@ export type OAuthConsentInfo = {
    */
   state: string;
   /**
+   * The PSL-resolved registrable domain of the redirect URI for display on the consent screen.
+   * Null when no redirect URI was provided, when it is not registered for the application,
+   * or when it points to an IP address or localhost.
+   */
+  redirectDomain: string | null;
+  /**
    * A list of scopes the application is requesting, with descriptions and consent requirements.
    */
   scopes: OAuthConsentScope[];
@@ -79,6 +86,8 @@ export type GetOAuthConsentInfoParams = {
   oauthClientId: string;
   /** A space-delimited scope string from the authorize request. */
   scope?: string;
+  /** The redirect URI from the authorize request. When provided, the backend returns a PSL-resolved `redirectDomain`. */
+  redirectUri?: string;
 };
 
 /**

@@ -674,16 +674,80 @@ export type ElementsConfig = {
   enterpriseConnectionButtonText: WithOptions;
 
   configureSSOHeader: WithOptions;
+  configureSSOMobileNavbar: WithOptions;
   configureSSOStepper: WithOptions;
   configureSSOStepperItem: WithOptions<string, ActiveState>;
   configureSSOStepperItemBullet: WithOptions<string, ActiveState>;
   configureSSOStepperItemLabel: WithOptions<string>;
   configureSSOStepperSeparator: WithOptions;
   configureSSOStep: WithOptions<string>;
+  configureSSOStepHeader: WithOptions;
+  configureSSOStepHeaderTitle: WithOptions;
+  configureSSOStepHeaderDescription: WithOptions;
+  configureSSOStepBody: WithOptions;
+  configureSSOStepSection: WithOptions;
   configureSSOStepCounter: WithOptions;
   configureSSOFooter: WithOptions;
   configureSSOFooterPreviousButton: WithOptions;
   configureSSOFooterContinueButton: WithOptions;
+  configureSSOFooterResetButton: WithOptions;
+
+  configureSSOProviderGroup: WithOptions<string>;
+  configureSSOProviderGroupLabel: WithOptions<string>;
+  configureSSOProviderGrid: WithOptions;
+  configureSSOProviderCard: WithOptions<string, ActiveState>;
+  configureSSOProviderCardRadio: WithOptions<string>;
+  configureSSOProviderCardIcon: WithOptions<string>;
+  configureSSOProviderCardLabel: WithOptions<string>;
+
+  configureSSOVerifyDomainErrorRoot: WithOptions;
+  configureSSOVerifyDomainErrorIcon: WithOptions;
+  configureSSOVerifyDomainErrorTitle: WithOptions;
+  configureSSOVerifyDomainErrorSubtitle: WithOptions;
+  configureSSOEmailVerificationForm: WithOptions<string>;
+  configureSSOEmailVerificationIcon: WithOptions<string>;
+  configureSSOEmailVerificationTitle: WithOptions<string>;
+  configureSSOEmailVerificationSubtitle: WithOptions<string>;
+  configureSSOEmailVerificationInput: WithOptions<string>;
+  configureSSOEmailVerificationError: WithOptions;
+
+  configureSSOInstructionsHeading: WithOptions;
+  configureSSOInstructionsList: WithOptions;
+  configureSSOInstructionsListItem: WithOptions;
+  configureSSOAttributeMappingTable: WithOptions;
+  configureSSOAttributeMappingBadge: WithOptions<string>;
+  configureSSOCertificateUploadButton: WithOptions;
+  configureSSOCertificateFileBadge: WithOptions;
+  configureSSOCertificateFileName: WithOptions;
+  configureSSOCertificateRemoveButton: WithOptions;
+
+  configureSSOTestUrlOpenButton: WithOptions;
+  configureSSOTestRefreshButton: WithOptions;
+  configureSSOTestResultsTable: WithOptions;
+  configureSSOTestResultsRow: WithOptions;
+  configureSSOTestResultsEmpty: WithOptions;
+  configureSSOTestResultsLoadingSpinner: WithOptions;
+  configureSSOTestRunStatusBadge: WithOptions<string>;
+  configureSSOTestRunFullMessage: WithOptions;
+  configureSSOTestRunFullMessageCopyButton: WithOptions;
+  configureSSOTestRunHowToFixSection: WithOptions;
+  configureSSOTestRunHowToFixDocsLink: WithOptions;
+  configureSSOTestRunParsedUserInfo: WithOptions;
+  configureSSOTestError: WithOptions;
+
+  configureSSOConfirmationStatusBadge: WithOptions<string>;
+  configureSSOConfirmationDomainLink: WithOptions;
+  configureSSOConfirmationConfigDetailsLabel: WithOptions;
+  configureSSOConfirmationConfigDetailsValue: WithOptions;
+  configureSSOConfirmationConfigDetailsLink: WithOptions;
+  configureSSOConfirmationInactiveBanner: WithOptions;
+  configureSSOConfirmationReconfigureButton: WithOptions;
+  configureSSOConfirmationResetButton: WithOptions;
+
+  configureSSOResetConnectionDialog: WithOptions;
+  configureSSOResetConnectionDialogCancelButton: WithOptions;
+  configureSSOResetConnectionDialogConfirmationInput: WithOptions;
+  configureSSOResetConnectionDialogSubmitButton: WithOptions;
 
   web3SolanaWalletButtonsRoot: WithOptions;
   web3SolanaWalletButtons: WithOptions;
@@ -869,7 +933,7 @@ export type BaseTheme = (BaseThemeTaggedType | 'clerk' | 'simple') & { cssLayerN
 export type Theme = {
   /**
    * A theme used as the base theme for the components.
-   * For further customisation, you can use the {@link Theme.options}, {@link Theme.variables} and {@link Theme.elements} props.
+   * For further customization, you can use the {@link Theme.options}, {@link Theme.variables} and {@link Theme.elements} props.
    *
    * Supports both object-based themes and string-based themes:
    *
@@ -1002,6 +1066,26 @@ export type Options = {
    * @default true
    */
   autoFocus?: boolean;
+
+  /**
+   * Controls the visual elevation of card-based components.
+   *
+   * - `'raised'` (default) — the card renders with its border, box-shadow, border-radius, and padding.
+   * - `'flush'` — removes the card border, box-shadow, border-radius, outer padding, and footer
+   *   background so the component sits flat against its container.
+   *
+   * Applies to all card-based components including `<SignIn />`, `<SignUp />`,
+   * `<Waitlist />`, `<CreateOrganization />`, `<OrganizationList />`,
+   * `<OAuthConsent />`, `<UserVerification />`, and session task components.
+   *
+   * Does **not** affect profile components (`<UserProfile />`, `<OrganizationProfile />`)
+   * or popover components (`<UserButton />`, `<OrganizationSwitcher />`), which always render as raised.
+   *
+   * When a component is opened as a modal, it always renders as raised regardless of this setting.
+   *
+   * @default 'raised'
+   */
+  elevation?: 'raised' | 'flush';
 };
 
 export type CaptchaAppearanceOptions = {

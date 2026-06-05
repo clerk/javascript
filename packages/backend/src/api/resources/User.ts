@@ -6,7 +6,7 @@ import { PhoneNumber } from './PhoneNumber';
 import { Web3Wallet } from './Web3Wallet';
 
 /**
- * The Backend `User` object is similar to the `User` object as it holds information about a user of your application, such as their unique identifier, name, email addresses, phone numbers, and more. However, the Backend `User` object is different from the `User` object in that it is used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/Users#operation/GetUser){{ target: '_blank' }} and is not directly accessible from the Frontend API.
+ * The Backend `User` object is similar to the `User` object as it holds information about a user of your application, such as their unique identifier, name, email addresses, phone numbers, and more. However, the Backend `User` object is different from the `User` object in that it is used in the [Backend API](https://clerk.com/docs/reference/backend-api/model/User){{ target: '_blank' }} and is not directly accessible from the Frontend API.
  */
 export class User {
   private _raw: UserJSON | null = null;

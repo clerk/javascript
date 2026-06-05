@@ -1,5 +1,62 @@
 # Change Log
 
+## 4.15.0
+
+### Minor Changes
+
+- Internal `<ConfigureSSO />` refactor to call new org-scoped enterprise connections FAPI endpoints, replacing the `/me/` deprecated scope. ([#8671](https://github.com/clerk/javascript/pull/8671)) by [@iagodahlem](https://github.com/iagodahlem)
+
+### Patch Changes
+
+- Add support for Google Workspace SAML provider to self-serve SSO ([#8690](https://github.com/clerk/javascript/pull/8690)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Layer architecture for configure steps per IdP and protocol on `<ConfigureSSO />` ([#8651](https://github.com/clerk/javascript/pull/8651)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Prevent keyless mode from activating in CI and other automated environments in framework SDKs. ([#8676](https://github.com/clerk/javascript/pull/8676)) by [@mwickett](https://github.com/mwickett)
+
+- Add support for Microsoft Entra SAML provider to self-serve SSO ([#8695](https://github.com/clerk/javascript/pull/8695)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Replace the telemetry `postinstall` script with a one-time runtime notice, printed once per process on server runtimes (Node, excluding CI) when the telemetry collector boots against a development instance. Drops the `std-env` dependency. ([#8549](https://github.com/clerk/javascript/pull/8549)) by [@jacekradko](https://github.com/jacekradko)
+
+  Removing `postinstall` improves the package's supply-chain posture: `@clerk/shared` no longer executes arbitrary code at install time, aligning with package-manager defaults that increasingly disable install scripts.
+
+  Browser-only applications with no server-side Clerk runtime (e.g. a Vite SPA) will not surface an in-band notice. Telemetry behavior and opt-out (`telemetry={false}` or `*_CLERK_TELEMETRY_DISABLED`) are unchanged; disclosure for these setups is provided at https://clerk.com/docs/telemetry.
+
+- Nest rolldown's shared build chunks under `dist/runtime/_chunks/` instead of emitting them flat next to the entry points. The package exposes `"./*"`, which resolves to `dist/runtime/*`, so the content-hashed internal chunks were being picked up by API-diff tooling whenever a chunk hash shifted. Entry and type resolution are unchanged; the chunks are still referenced by relative path, and external `./_chunks/*` package subpaths are blocked. ([#8717](https://github.com/clerk/javascript/pull/8717)) by [@jacekradko](https://github.com/jacekradko)
+
+## 4.14.0
+
+### Minor Changes
+
+- Display "Single Sign-on (SSO)" section in `OrganizationProfile` if self-serve SSO is enabled on the current active organization ([#8600](https://github.com/clerk/javascript/pull/8600)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Guard `ConfigureSSO` based on active organization ([#8613](https://github.com/clerk/javascript/pull/8613)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Treat terminal user-state 403 responses as unauthenticated in ClerkJS. ([#8649](https://github.com/clerk/javascript/pull/8649)) by [@jacekradko](https://github.com/jacekradko)
+
+- Introduce UX improvements for `<ConfigureSSO />` such as: ([#8601](https://github.com/clerk/javascript/pull/8601)) by [@LauraBeatris](https://github.com/LauraBeatris)
+  - Render attribute-mapping and service-provider field labels per IdP nomenclature
+  - Add "Open test URL" button and surface a clear empty state
+  - Expand the appearance descriptor surface across step content so developers can override styling
+
+## 4.13.1
+
+### Patch Changes
+
+- Bump `js-cookie` to `3.0.7` to address GHSA-qjx8-664m-686j. ([#8630](https://github.com/clerk/javascript/pull/8630)) by [@jacekradko](https://github.com/jacekradko)
+
+## 4.13.0
+
+### Minor Changes
+
+- Remove `<ConfigureSSO />` from experimental path ([#8588](https://github.com/clerk/javascript/pull/8588)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Remove internal tag from publicly re-exported error helpers ([#8598](https://github.com/clerk/javascript/pull/8598)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 4.12.2
 
 ### Patch Changes

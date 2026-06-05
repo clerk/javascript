@@ -28,6 +28,8 @@ const PopoverCardRoot = React.forwardRef<
         elementDescriptor={[descriptors.popoverBox, elementDescriptor as ElementDescriptor]}
         {...rest}
         ref={ref}
+        // Popover cards always render as raised — flush is scoped to simple card components
+        elevation='raised'
         sx={[
           t => ({
             width: t.sizes.$94,
