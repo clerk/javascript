@@ -160,11 +160,11 @@ function NativeClientSync({
           }
 
           const bearerToken = (await effectiveTokenCache?.getToken(CLERK_CLIENT_JWT_KEY)) ?? null;
-          if (bearerToken && ClerkExpo.configure) {
+          if (bearerToken) {
+            // configure writes the token and refreshes native client state.
             await ClerkExpo.configure(publishableKey, bearerToken);
-          }
-
-          if (ClerkExpo.refreshClient) {
+          } else {
+            // No token to push; ask native to reload its current client.
             await ClerkExpo.refreshClient();
           }
         };
