@@ -115,7 +115,7 @@ const billingPeriodTotalsFromJSON = (data: BillingPeriodTotalsJSON): BillingPeri
 export const billingTotalsFromJSON = (data: BillingTotalsJSON): BillingTotals => {
   return {
     subtotal: billingMoneyAmountFromJSON(data.subtotal),
-    baseFee: billingMoneyAmountFromJSON(data.base_fee),
+    baseFee: data.base_fee ? billingMoneyAmountFromJSON(data.base_fee) : null,
     taxTotal: billingMoneyAmountFromJSON(data.tax_total),
     grandTotal: billingMoneyAmountFromJSON(data.grand_total),
     totalDueAfterFreeTrial: data.total_due_after_free_trial

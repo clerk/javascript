@@ -958,7 +958,7 @@ export interface BillingPeriodTotals {
  */
 export interface BillingTotals {
   subtotal: BillingMoneyAmount;
-  baseFee: BillingMoneyAmount;
+  baseFee: BillingMoneyAmount | null;
   taxTotal: BillingMoneyAmount;
   grandTotal: BillingMoneyAmount;
   totalDueAfterFreeTrial?: BillingMoneyAmount | null;

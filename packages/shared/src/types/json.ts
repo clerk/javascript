@@ -789,7 +789,7 @@ export interface BillingPaymentJSON extends ClerkResourceJSON {
 
 export interface BillingTotalsJSON {
   subtotal: BillingMoneyAmountJSON;
-  base_fee: BillingMoneyAmountJSON;
+  base_fee: BillingMoneyAmountJSON | null;
   tax_total: BillingMoneyAmountJSON;
   grand_total: BillingMoneyAmountJSON;
   total_due_after_free_trial?: BillingMoneyAmountJSON | null;
