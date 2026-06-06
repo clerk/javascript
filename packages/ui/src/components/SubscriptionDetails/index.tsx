@@ -513,7 +513,7 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
 const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionItemResource }) => {
   const { t } = useLocalizations();
   const subItemSeatsQty = subscription.seats?.quantity;
-  const seatsTotalTier = subscription.seats?.tiers?.find(tier => tier.total.amount > 0);
+  const firstPaidSeatTier = subscription.seats?.tiers?.find(tier => tier.total.amount > 0);
   const monthLabel = t(localizationKeys('billing.month')).toLowerCase();
   const seatLimitAndIncludedSeatsLocalizationKey = getSeatLimitAndIncludedSeatsLocalizationKey(subscription.plan);
 
@@ -636,12 +636,12 @@ const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionI
                   localizationKey={seatLimitAndIncludedSeatsLocalizationKey}
                 />
               ) : null}
-              {seatsTotalTier && seatsTotalTier.quantity ? (
+              {firstPaidSeatTier && firstPaidSeatTier.quantity ? (
                 <Text variant='subtitle'>
                   {t(
                     localizationKeys('organizationProfile.billingPage.subscriptionsListSection.paidSeatsUsage', {
-                      seatsQuantity: seatsTotalTier.quantity,
-                      amount: `${seatsTotalTier.feePerBlock.currencySymbol}${seatsTotalTier.feePerBlock.amountFormatted} / ${monthLabel}`,
+                      seatsQuantity: firstPaidSeatTier.quantity,
+                      amount: `${firstPaidSeatTier.feePerBlock.currencySymbol}${firstPaidSeatTier.feePerBlock.amountFormatted} / ${monthLabel}`,
                     }),
                   )}
                 </Text>
