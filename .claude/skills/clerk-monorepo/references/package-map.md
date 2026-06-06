@@ -15,29 +15,29 @@ browser directly), **adapter** (framework SDK), **ui/i18n**, **tooling**. The "B
 two packages whose runtime is pushed into apps pinned to older SDKs, so they carry the strict
 backwards-compatibility contract (see `breaking-changes.md`).
 
-| Package                       | Category        | BC  | Purpose                                                                                                                                          |
-| ----------------------------- | --------------- | --- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `@clerk/shared`               | foundational    |     | Internal utilities used by all SDKs (storage, events, React helpers). Hosts the shared types as `@clerk/shared/types`. Most-depended-on package. |
-| `@clerk/backend`              | foundational    |     | Backend API REST client, JWT verification, webhook helpers. Used by every server adapter.                                                        |
-| `@clerk/clerk-js`             | browser-runtime | ⚠️  | The browser runtime (script tag). Bundles the hosted UI. Backwards-compat sensitive.                                                             |
-| `@clerk/ui`                   | ui              | ⚠️  | React components powering the hosted sign-in / sign-up flows. Consumed by `clerk-js`. Backwards-compat sensitive.                                |
-| `@clerk/react`                | adapter (core)  |     | React hooks and context (`useAuth`, `useUser`, `useOrganization`, ...). Shared by the React-based adapters.                                      |
-| `@clerk/nextjs`               | adapter         |     | Next.js SDK: middleware, route handlers, server components.                                                                                      |
-| `@clerk/express`              | adapter         |     | Express middleware and server helpers.                                                                                                           |
-| `@clerk/fastify`              | adapter         |     | Fastify plugin.                                                                                                                                  |
-| `@clerk/hono`                 | adapter         |     | Hono SDK (edge / serverless).                                                                                                                    |
-| `@clerk/astro`                | adapter         |     | Astro integration (components + server utilities).                                                                                               |
-| `@clerk/nuxt`                 | adapter         |     | Nuxt module (Vue).                                                                                                                               |
-| `@clerk/vue`                  | adapter         |     | Vue 3 composables and components.                                                                                                                |
-| `@clerk/react-router`         | adapter         |     | React Router v7 SDK.                                                                                                                             |
-| `@clerk/tanstack-react-start` | adapter         |     | TanStack React Start SDK.                                                                                                                        |
-| `@clerk/expo`                 | adapter         |     | React Native / Expo SDK.                                                                                                                         |
-| `@clerk/expo-passkeys`        | adapter         |     | Passkeys companion library for Expo.                                                                                                             |
-| `@clerk/chrome-extension`     | browser-runtime |     | SDK for Chrome extension contexts.                                                                                                               |
-| `@clerk/localizations`        | ui/i18n         |     | Translation strings for the UI components. Consumed by `ui`.                                                                                     |
-| `@clerk/testing`              | tooling         |     | E2E test helpers for consumers (Playwright + Cypress).                                                                                           |
-| `@clerk/msw`                  | tooling         |     | MSW request handlers for mocking the Clerk API in tests. Private (not published).                                                                |
-| `@clerk/upgrade`              | tooling         |     | CLI codemod tool for upgrading consumers between SDK versions.                                                                                   |
+| Package                       | Category        | BC  | Purpose                                                                                                                                                                        |
+| ----------------------------- | --------------- | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `@clerk/shared`               | foundational    |     | Internal utilities used by all SDKs (storage, events, React helpers). Hosts the shared types as `@clerk/shared/types`. Most-depended-on package.                               |
+| `@clerk/backend`              | foundational    |     | Backend API REST client, JWT verification, webhook helpers. Used by every server adapter.                                                                                      |
+| `@clerk/clerk-js`             | browser-runtime | ⚠️  | The browser runtime (script tag). Backwards-compat sensitive.                                                                                                                  |
+| `@clerk/ui`                   | ui              | ⚠️  | React components for the hosted sign-in / sign-up flows (`packages/ui/src/components`). Consumed by the react/astro/vue/chrome-extension adapters. Backwards-compat sensitive. |
+| `@clerk/react`                | adapter (core)  |     | React hooks and context (`useAuth`, `useUser`, `useOrganization`, ...). Shared by the React-based adapters.                                                                    |
+| `@clerk/nextjs`               | adapter         |     | Next.js SDK: middleware, route handlers, server components.                                                                                                                    |
+| `@clerk/express`              | adapter         |     | Express middleware and server helpers.                                                                                                                                         |
+| `@clerk/fastify`              | adapter         |     | Fastify plugin.                                                                                                                                                                |
+| `@clerk/hono`                 | adapter         |     | Hono SDK (edge / serverless).                                                                                                                                                  |
+| `@clerk/astro`                | adapter         |     | Astro integration (components + server utilities).                                                                                                                             |
+| `@clerk/nuxt`                 | adapter         |     | Nuxt module (Vue).                                                                                                                                                             |
+| `@clerk/vue`                  | adapter         |     | Vue 3 composables and components.                                                                                                                                              |
+| `@clerk/react-router`         | adapter         |     | React Router v7 SDK.                                                                                                                                                           |
+| `@clerk/tanstack-react-start` | adapter         |     | TanStack React Start SDK.                                                                                                                                                      |
+| `@clerk/expo`                 | adapter         |     | React Native / Expo SDK.                                                                                                                                                       |
+| `@clerk/expo-passkeys`        | adapter         |     | Passkeys companion library for Expo.                                                                                                                                           |
+| `@clerk/chrome-extension`     | browser-runtime |     | SDK for Chrome extension contexts.                                                                                                                                             |
+| `@clerk/localizations`        | ui/i18n         |     | Translation strings for the UI components. Consumed by `ui`.                                                                                                                   |
+| `@clerk/testing`              | tooling         |     | E2E test helpers for consumers (Playwright + Cypress).                                                                                                                         |
+| `@clerk/msw`                  | tooling         |     | MSW request handlers for mocking the Clerk API in tests. Private (not published).                                                                                              |
+| `@clerk/upgrade`              | tooling         |     | CLI codemod tool for upgrading consumers between SDK versions.                                                                                                                 |
 
 Tests: `pnpm turbo test --filter=@clerk/<name>` (or `pnpm --filter @clerk/<name> test` after a
 build). Most packages use vitest; `@clerk/backend` runs a multi-runtime suite (node + edge +
@@ -52,9 +52,10 @@ cloudflare). A few packages (`localizations`, `expo-passkeys`, `msw`) have no un
                 |               |
           @clerk/react     server helpers
            /   |   \
-   nextjs  react-router  expo ...        (framework adapters, consume react + backend + shared)
-                |
-         @clerk/clerk-js  ──bundles──▶  @clerk/ui  ──uses──▶  @clerk/localizations
+   nextjs  react-router  expo ...        (framework adapters: consume react + backend + shared)
+
+   @clerk/ui  ──uses──▶  @clerk/localizations    (UI components; consumed by react / astro / vue / chrome-extension)
+   @clerk/clerk-js                               (standalone browser runtime, script tag; delivered alongside @clerk/ui)
 ```
 
 Practical consequence: a change to `@clerk/shared` or `@clerk/backend` fans out widely. Build and
@@ -68,10 +69,13 @@ test the consumers, not just the package you edited. After editing `shared`, a
 ## Change X, touch Y
 
 - **A React hook (`useAuth`, `useUser`, `useOrganization`, ...)**: `packages/react/src`. Changes
-  propagate to `nextjs`, `react-router`, `tanstack-react-start`, `expo` (all consume `@clerk/react`).
-- **The hosted sign-in / sign-up UI (components, layout)**: `packages/ui/src`. Strings live in
-  `packages/localizations/src`. `clerk-js` bundles `ui`, so it propagates automatically. Watch with
-  `pnpm dev:fe-libs`. For the theming/appearance system specifically, read
+  propagate to `nextjs`, `react-router`, `tanstack-react-start`, `expo`, `chrome-extension` (all
+  consume `@clerk/react`; note `expo` wraps `useAuth` rather than just re-exporting it).
+- **The hosted sign-in / sign-up UI (components, layout)**: `packages/ui/src/components` (`@clerk/ui`).
+  Strings live in `packages/localizations/src`. `@clerk/ui` is consumed by the
+  `react`/`astro`/`vue`/`chrome-extension` adapters; its compiled runtime is delivered alongside
+  `clerk-js` (both are backwards-compat sensitive), though `clerk-js` does not declare it as a package
+  dependency. Watch with `pnpm dev:fe-libs`. For the theming/appearance system specifically, read
   `references/theming-architecture.md`.
 - **Backend token verification / JWT / Backend API client**: `packages/backend/src` (JWT logic under
   `packages/backend/src/jwt`). Every server adapter depends on this.

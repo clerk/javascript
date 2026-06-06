@@ -11,7 +11,8 @@ description: >-
 
 # Working in the clerk/javascript monorepo
 
-This is Clerk's JavaScript SDK monorepo: 21 published `@clerk/*` packages managed with pnpm
+This is Clerk's JavaScript SDK monorepo: 21 packages (20 published `@clerk/*` plus the private
+`@clerk/msw`) managed with pnpm
 workspaces and Turborepo. Read this before building, testing, committing, or touching anything
 under `packages/`.
 
@@ -69,13 +70,15 @@ pnpm dev:fe-libs      # clerk-js + ui + shared
 pnpm dev:js           # clerk-js only
 pnpm dev:sandbox      # rspack sandbox for previewing UI components
 
-# Run one package's unit tests (builds deps first via turbo)
+# Run one package's unit tests (builds the package and its deps first)
 pnpm turbo test --filter=@clerk/backend
 # Faster, after a full build, for tight iteration:
 pnpm --filter @clerk/backend test
 
-# Run a single test file (vitest matches by filename substring)
+# Run a single test file (vitest packages match by filename substring)
 pnpm --filter @clerk/shared test -- run path/to/file.test.ts
+# @clerk/backend runs a multi-runtime suite (run-s), so target one runtime for a single file:
+pnpm --filter @clerk/backend test:node -- path/to/file.test.ts
 
 # Quality gates (CI runs these)
 pnpm lint
@@ -113,7 +116,8 @@ Each rule below restates `AGENTS.md`; the parenthetical is how it is enforced.
 - **`clerk-js` and `ui` must stay backwards-compatible across non-major releases.** A new `clerk-js`
   runtime loads into apps still pinned to an _older_ framework SDK (`@clerk/nextjs`, etc.), so
   removing or renaming anything an older SDK calls breaks those apps in production. (`break-check`
-  via `.github/workflows/api-changes.yml`.)
+  flags API-surface changes in `api-changes.yml`, but that check is informational; shipping such a
+  change means a `major`, gated by `major-version-check.yml`.)
 - **Changes to the core `Clerk` class API (`packages/clerk-js/src/core/clerk.ts`) require a major
   version** and `!allow-major` approval. (`.github/workflows/major-version-check.yml`.) APIs prefixed
   `__internal_` or exported from an `/experimental` subpath are exempt from SemVer guarantees.
@@ -141,17 +145,18 @@ major + `!allow-major`, and `break-check` will flag it:
 3. Changing the `Clerk` class public surface in `core/clerk.ts`?
 4. Renaming/removing something an older SDK version still calls at runtime?
 
-If the symbol is `__internal_`-prefixed or under `/experimental`, it is exempt. Full decision matrix:
+If the symbol is `__internal_`/`__experimental_`-prefixed or under `/experimental`, it is exempt.
+Full decision matrix:
 [`references/breaking-changes.md`](references/breaking-changes.md).
 
 ## Deeper references
 
-- `AGENTS.md` — the canonical hard rules (authority for this skill).
-- `docs/CONTRIBUTING.md` — full setup, testing, JSDoc/Typedoc, changeset writing.
-- `docs/PUBLISH.md` — release process: stable, canary, snapshot, backport, `!allow-major`.
-- `docs/CICD.md` — CI/CD pipeline and automated releases.
-- `docs/SECURITY.md` — vulnerability reporting (do **not** open public issues).
-- `references/theming-architecture.md` — deep dive on the `@clerk/ui` appearance/theming system.
+- `AGENTS.md`: the canonical hard rules (authority for this skill).
+- `docs/CONTRIBUTING.md`: full setup, testing, JSDoc/Typedoc, changeset writing.
+- `docs/PUBLISH.md`: release process (stable, canary, snapshot, backport, `!allow-major`).
+- `docs/CICD.md`: CI/CD pipeline and automated releases.
+- `docs/SECURITY.md`: vulnerability reporting (do **not** open public issues).
+- `references/theming-architecture.md`: deep dive on the `@clerk/ui` appearance/theming system.
 - Bundled: [`setup-and-footguns.md`](references/setup-and-footguns.md),
   [`package-map.md`](references/package-map.md),
   [`breaking-changes.md`](references/breaking-changes.md).
