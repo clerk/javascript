@@ -77,12 +77,22 @@ type CvaFn<V extends Variants> = {
 export function cva<V extends Variants>(config: CvaConfig<V>): CvaFn<V>;
 export function cva<V extends Variants>(configFn: (theme: MosaicTheme) => CvaConfig<V>): CvaFn<V>;
 export function cva<V extends Variants>(configOrFn: CvaConfig<V> | ((theme: MosaicTheme) => CvaConfig<V>)): CvaFn<V> {
+  const configCache = typeof configOrFn === 'function' ? new WeakMap<MosaicTheme, CvaConfig<V>>() : null;
   return ((props: VariantPropsOf<V> & { sx?: SxProp } = {} as VariantPropsOf<V>) =>
     (theme: MosaicTheme): StyleRule => {
-      const { sx, ...variantProps } = props;
-      const config = typeof configOrFn === 'function' ? configOrFn(theme) : configOrFn;
+      let config: CvaConfig<V>;
+      if (configCache) {
+        let cached = configCache.get(theme);
+        if (!cached) {
+          cached = (configOrFn as (theme: MosaicTheme) => CvaConfig<V>)(theme);
+          configCache.set(theme, cached);
+        }
+        config = cached;
+      } else {
+        config = configOrFn as CvaConfig<V>;
+      }
       const { base, variants = {} as V, compoundVariants = [], defaultVariants = {} } = config;
-      const resolved = resolveVariants(variants, variantProps, defaultVariants);
+      const resolved = resolveVariants(variants, props, defaultVariants);
       const computedStyles: StyleRule = {};
       if (base) fastDeepMergeAndReplace(base, computedStyles);
       for (const key in resolved) {
@@ -92,8 +102,8 @@ export function cva<V extends Variants>(configOrFn: CvaConfig<V> | ((theme: Mosa
       for (const cv of compoundVariants) {
         if (compoundMatches(cv, resolved)) fastDeepMergeAndReplace(cv.css, computedStyles);
       }
-      if (sx) {
-        const sxStyles = typeof sx === 'function' ? sx(theme) : sx;
+      if (props.sx) {
+        const sxStyles = typeof props.sx === 'function' ? props.sx(theme) : props.sx;
         fastDeepMergeAndReplace(sxStyles, computedStyles);
       }
       return computedStyles;
