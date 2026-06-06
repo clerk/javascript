@@ -1069,7 +1069,7 @@ export interface Clerk {
    *
    * @internal
    */
-  __internal_handleRedirectCallbackWithResource: (
+  __experimental_handleNativeRedirectCallback: (
     signInOrUp: SignInResource | SignUpResource,
     params: HandleOAuthCallbackParams | HandleSamlCallbackParams,
     customNavigate?: (to: string) => Promise<unknown>,

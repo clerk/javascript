@@ -21,6 +21,7 @@ import { LoadingCard } from '@/ui/elements/LoadingCard';
 import { SocialButtonsReversibleContainerWithDivider } from '@/ui/elements/ReversibleContainer';
 import { handleError } from '@/ui/utils/errorHandler';
 import { isMobileDevice } from '@/ui/utils/isMobileDevice';
+import { authenticateWithNativeRedirect } from '@/ui/utils/nativeRedirect';
 import type { FormControlState } from '@/ui/utils/useFormControl';
 import { buildRequest, useFormControl } from '@/ui/utils/useFormControl';
 
@@ -417,18 +418,18 @@ function SignInStartInternal(): JSX.Element {
     const redirectUrlComplete = ctx.afterSignInUrl || '/';
 
     if (externalAuth) {
-      const signInResult = await signIn.__experimental_authenticateWithNativeRedirect({
-        strategy: 'enterprise_sso',
-        redirectUrl,
-        redirectUrlComplete,
-        continueSignIn: true,
-        transport: externalAuth,
-        oidcPrompt: ctx.oidcPrompt,
-      });
-
-      return clerk.__internal_handleRedirectCallbackWithResource(
-        signInResult,
-        {
+      return authenticateWithNativeRedirect({
+        clerk,
+        resource: signIn,
+        params: {
+          strategy: 'enterprise_sso',
+          redirectUrl,
+          redirectUrlComplete,
+          continueSignIn: true,
+          transport: externalAuth,
+          oidcPrompt: ctx.oidcPrompt,
+        },
+        callbackParams: {
           signUpUrl: ctx.signUpUrl,
           signInUrl: ctx.signInUrl,
           signInForceRedirectUrl: ctx.afterSignInUrl,
@@ -442,7 +443,7 @@ function SignInStartInternal(): JSX.Element {
           unsafeMetadata: ctx.unsafeMetadata,
         },
         navigate,
-      );
+      });
     }
 
     return signIn.authenticateWithRedirect({

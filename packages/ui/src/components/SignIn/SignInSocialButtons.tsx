@@ -6,6 +6,7 @@ import type { PhoneCodeChannel } from '@clerk/shared/types';
 import React from 'react';
 
 import { handleError as _handleError } from '@/ui/utils/errorHandler';
+import { authenticateWithNativeRedirect } from '@/ui/utils/nativeRedirect';
 import { originPrefersPopup } from '@/ui/utils/originPrefersPopup';
 import { web3CallbackErrorHandler } from '@/ui/utils/web3CallbackErrorHandler';
 
@@ -58,17 +59,17 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
       oauthCallback={async strategy => {
         if (externalAuth) {
           try {
-            const signInResult = await signIn.__experimental_authenticateWithNativeRedirect({
-              strategy,
-              redirectUrl,
-              redirectUrlComplete,
-              transport: externalAuth,
-              oidcPrompt: ctx.oidcPrompt,
-            });
-
-            return clerk.__internal_handleRedirectCallbackWithResource(
-              signInResult,
-              {
+            return authenticateWithNativeRedirect({
+              clerk,
+              resource: signIn,
+              params: {
+                strategy,
+                redirectUrl,
+                redirectUrlComplete,
+                transport: externalAuth,
+                oidcPrompt: ctx.oidcPrompt,
+              },
+              callbackParams: {
                 signUpUrl: ctx.signUpUrl,
                 signInUrl: ctx.signInUrl,
                 signInForceRedirectUrl: ctx.afterSignInUrl,
@@ -82,7 +83,7 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
                 unsafeMetadata: ctx.unsafeMetadata,
               },
               navigate,
-            );
+            });
           } catch (err) {
             return handleError(err);
           }

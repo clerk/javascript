@@ -314,7 +314,7 @@ describe('SignInStart', () => {
         });
       });
       expect(fixtures.signIn.authenticateWithRedirect).not.toHaveBeenCalled();
-      expect(fixtures.clerk.__internal_handleRedirectCallbackWithResource).toHaveBeenCalledWith(
+      expect(fixtures.clerk.__experimental_handleNativeRedirectCallback).toHaveBeenCalledWith(
         fixtures.signIn,
         {
           signUpUrl: 'https://dashboard.clerk.com/sign-up',

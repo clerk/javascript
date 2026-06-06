@@ -4,6 +4,7 @@ import React from 'react';
 
 import { useCardState } from '@/ui/elements/contexts';
 import { handleError } from '@/ui/utils/errorHandler';
+import { authenticateWithNativeRedirect } from '@/ui/utils/nativeRedirect';
 import { originPrefersPopup } from '@/ui/utils/originPrefersPopup';
 import { web3CallbackErrorHandler } from '@/ui/utils/web3CallbackErrorHandler';
 
@@ -38,20 +39,20 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
       oauthCallback={async (strategy: OAuthStrategy) => {
         if (externalAuth) {
           try {
-            const signUpResult = await signUp.__experimental_authenticateWithNativeRedirect({
-              strategy,
-              redirectUrl,
-              redirectUrlComplete,
-              continueSignUp,
-              transport: externalAuth,
-              unsafeMetadata: ctx.unsafeMetadata,
-              legalAccepted: props.legalAccepted,
-              oidcPrompt: ctx.oidcPrompt,
-            });
-
-            return clerk.__internal_handleRedirectCallbackWithResource(
-              signUpResult,
-              {
+            return authenticateWithNativeRedirect({
+              clerk,
+              resource: signUp,
+              params: {
+                strategy,
+                redirectUrl,
+                redirectUrlComplete,
+                continueSignUp,
+                transport: externalAuth,
+                unsafeMetadata: ctx.unsafeMetadata,
+                legalAccepted: props.legalAccepted,
+                oidcPrompt: ctx.oidcPrompt,
+              },
+              callbackParams: {
                 signUpUrl: ctx.signUpUrl,
                 signInUrl: ctx.signInUrl,
                 signUpForceRedirectUrl: ctx.afterSignUpUrl,
@@ -64,7 +65,7 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
                 unsafeMetadata: ctx.unsafeMetadata,
               },
               navigate,
-            );
+            });
           } catch (err) {
             return handleError(err as Error, [], card.setError);
           }

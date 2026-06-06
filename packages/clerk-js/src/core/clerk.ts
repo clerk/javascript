@@ -2619,7 +2619,7 @@ export class Clerk implements ClerkInterface {
     });
   };
 
-  public __internal_handleRedirectCallbackWithResource = async (
+  public __experimental_handleNativeRedirectCallback = async (
     signInOrUp: SignInResource | SignUpResource,
     params: HandleOAuthCallbackParams = {},
     customNavigate?: (to: string) => Promise<unknown>,

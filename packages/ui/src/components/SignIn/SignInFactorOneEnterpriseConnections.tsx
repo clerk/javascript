@@ -8,6 +8,7 @@ import { Flow, localizationKeys } from '@/ui/customizables';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { useRouter } from '@/ui/router';
 import type { AvailableComponentProps } from '@/ui/types';
+import { authenticateWithNativeRedirect } from '@/ui/utils/nativeRedirect';
 
 import { hasMultipleEnterpriseConnections } from './shared';
 
@@ -36,19 +37,19 @@ const SignInFactorOneEnterpriseConnectionsInternal = () => {
     const redirectUrlComplete = ctx.afterSignInUrl || '/';
 
     if (externalAuth) {
-      const signInResult = await signIn.__experimental_authenticateWithNativeRedirect({
-        strategy: 'enterprise_sso',
-        redirectUrl,
-        redirectUrlComplete,
-        continueSignIn: true,
-        enterpriseConnectionId,
-        transport: externalAuth,
-        oidcPrompt: ctx.oidcPrompt,
-      });
-
-      await clerk.__internal_handleRedirectCallbackWithResource(
-        signInResult,
-        {
+      await authenticateWithNativeRedirect({
+        clerk,
+        resource: signIn,
+        params: {
+          strategy: 'enterprise_sso',
+          redirectUrl,
+          redirectUrlComplete,
+          continueSignIn: true,
+          enterpriseConnectionId,
+          transport: externalAuth,
+          oidcPrompt: ctx.oidcPrompt,
+        },
+        callbackParams: {
           signUpUrl: ctx.signUpUrl,
           signInUrl: ctx.signInUrl,
           signInForceRedirectUrl: ctx.afterSignInUrl,
@@ -62,7 +63,7 @@ const SignInFactorOneEnterpriseConnectionsInternal = () => {
           unsafeMetadata: ctx.unsafeMetadata,
         },
         navigate,
-      );
+      });
       return;
     }
 
