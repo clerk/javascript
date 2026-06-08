@@ -279,6 +279,14 @@ function PaymentAttemptBody({ paymentAttempt }: { paymentAttempt: BillingPayment
             text={`${paymentAttempt.totals?.subtotal.currencySymbol}${paymentAttempt.totals?.subtotal.amountFormatted}`}
           />
         </LineItems.Group>
+        {paymentAttempt.totals?.discounts?.proration && paymentAttempt.totals.discounts.proration.amount.amount > 0 && (
+          <LineItems.Group variant='tertiary'>
+            <LineItems.Title title={localizationKeys('billing.proratedDiscount')} />
+            <LineItems.Description
+              text={`- ${paymentAttempt.totals.discounts.proration.amount.currencySymbol}${paymentAttempt.totals.discounts.proration.amount.amountFormatted}`}
+            />
+          </LineItems.Group>
+        )}
         {subscriptionItem.credits &&
           subscriptionItem.credits.proration &&
           subscriptionItem.credits.proration.amount.amount > 0 && (

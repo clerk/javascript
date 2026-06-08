@@ -97,6 +97,39 @@ describe('billingPaymentTotalsFromJSON', () => {
     expect(billingPaymentTotalsFromJSON(data).baseFee?.amount).toBe(1000);
   });
 
+  it('maps discounts when present', () => {
+    const data: BillingPaymentTotalsJSON = {
+      subtotal: moneyJSON(500),
+      grand_total: moneyJSON(484),
+      tax_total: moneyJSON(0),
+      discounts: {
+        proration: {
+          amount: moneyJSON(16),
+          cycle_days_passed: 1,
+          cycle_days_total: 30,
+          cycle_passed_percent: 3,
+        },
+        total: moneyJSON(16),
+      },
+    };
+
+    const totals = billingPaymentTotalsFromJSON(data);
+
+    expect(totals.discounts?.proration?.amount.amount).toBe(16);
+    expect(totals.discounts?.proration?.cycleDaysPassed).toBe(1);
+    expect(totals.discounts?.total.amount).toBe(16);
+  });
+
+  it('defaults discounts to null when absent', () => {
+    const data: BillingPaymentTotalsJSON = {
+      subtotal: moneyJSON(500),
+      grand_total: moneyJSON(500),
+      tax_total: moneyJSON(0),
+    };
+
+    expect(billingPaymentTotalsFromJSON(data).discounts).toBeNull();
+  });
+
   it('maps per_unit_totals tiers with snake_case → camelCase conversion', () => {
     const data: BillingPaymentTotalsJSON = {
       subtotal: moneyJSON(5000),

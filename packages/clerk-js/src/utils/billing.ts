@@ -71,6 +71,7 @@ export const billingPaymentTotalsFromJSON = (data: BillingPaymentTotalsJSON): Bi
     taxTotal: billingMoneyAmountFromJSON(data.tax_total),
     baseFee: data.base_fee ? billingMoneyAmountFromJSON(data.base_fee) : null,
     perUnitTotals: data.per_unit_totals ? billingPerUnitTotalsFromJSON(data.per_unit_totals) : undefined,
+    discounts: data.discounts ? billingDiscountsFromJSON(data.discounts) : null,
   };
 };
 
