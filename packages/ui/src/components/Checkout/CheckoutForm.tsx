@@ -51,13 +51,6 @@ export const CheckoutForm = withCardStateProvider(() => {
     totals.totalsDuePerPeriod.grandTotal.amount !== totals.totalDueNow.amount;
   const showDowngradeInfo = !isImmediatePlanChange;
 
-  const fee =
-    planPeriod === 'month'
-      ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        plan.fee!
-      : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        plan.annualMonthlyFee!;
-
   const seatPerUnitTotal = getCheckoutSeatUnitTotal(totals);
   const includedSeatsTier = getIncludedSeatsUnitTotalTier(seatPerUnitTotal);
   const paidSeatsTier = getPaidSeatsUnitTotalTier(seatPerUnitTotal);
@@ -106,11 +99,13 @@ export const CheckoutForm = withCardStateProvider(() => {
                 ) : null
               }
             />
-            <LineItems.Description
-              prefix={planPeriod === 'annual' ? 'x12' : undefined}
-              text={`${fee.currencySymbol}${fee.amountFormatted}`}
-              suffix={localizationKeys('billing.checkout.perMonth')}
-            />
+            {totals.baseFee ? (
+              <LineItems.Description
+                prefix={planPeriod === 'annual' ? 'x12' : undefined}
+                text={`${totals.baseFee.currencySymbol}${totals.baseFee.amountFormatted}`}
+                suffix={localizationKeys('billing.checkout.perMonth')}
+              />
+            ) : null}
           </LineItems.Group>
           {paidSeatsTier && paidSeatsTier.quantity !== null && (
             <LineItems.Group borderTop>
