@@ -1,3 +1,5 @@
+'use client';
+
 import type { PropsWithChildren, ReactNode } from 'react';
 
 import { CardStateProvider, useCardState } from '@/ui/elements/contexts';

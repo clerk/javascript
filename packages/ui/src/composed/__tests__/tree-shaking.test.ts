@@ -4,9 +4,11 @@ import { describe, expect, it } from 'vitest';
 
 /**
  * Each composed section lives in its own file so bundlers can tree-shake
- * unused sections. parts.ts must only re-export from per-file modules —
- * never import section components directly. If these invariants break,
- * importing one section will pull in every section.
+ * unused sections. The namespace barrel (index.tsx) imports each leaf
+ * individually so property-access tree-shaking on `UserProfile.X` /
+ * `OrganizationProfile.X` can drop unused leaves under `sideEffects: false`.
+ * Leaves must not import siblings — that would couple sections and defeat
+ * dead-code elimination.
  */
 
 const composedDir = resolve(__dirname, '..');
@@ -19,20 +21,26 @@ function getSectionFiles(dir: string): string[] {
   return readdirSync(dir).filter(f => f.endsWith('.tsx') && SECTION_PREFIX.test(f));
 }
 
-describe('tree-shaking: parts.ts only re-exports', () => {
+describe('tree-shaking: namespace barrel imports each leaf individually', () => {
   for (const [label, dir] of [
     ['UserProfile', userProfileDir],
     ['OrganizationProfile', orgProfileDir],
   ] as const) {
-    it(`${label}/parts.ts contains only re-export statements`, () => {
-      const content = readFileSync(join(dir, 'parts.ts'), 'utf-8');
-      const lines = content
-        .split('\n')
-        .map(l => l.trim())
-        .filter(l => l.length > 0);
+    const indexPath = join(dir, 'index.tsx');
 
-      for (const line of lines) {
-        expect(line).toMatch(/^export \{.+\} from '.+';$/);
+    it(`${label}/index.tsx does not use \`export *\``, () => {
+      const content = readFileSync(indexPath, 'utf-8');
+      expect(content).not.toMatch(/export\s+\*/);
+    });
+
+    it(`${label}/index.tsx imports each leaf via a direct relative path`, () => {
+      const content = readFileSync(indexPath, 'utf-8');
+      const importLines = content.split('\n').filter(l => l.trim().startsWith('import'));
+      expect(importLines.length).toBeGreaterThan(0);
+      for (const line of importLines) {
+        const match = line.match(/from\s+['"](.+)['"]/);
+        if (!match) continue;
+        expect(match[1]).toMatch(/^\.\/[^./]+$/);
       }
     });
   }

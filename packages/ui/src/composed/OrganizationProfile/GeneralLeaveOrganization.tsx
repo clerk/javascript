@@ -1,3 +1,5 @@
+'use client';
+
 import { OrganizationLeaveSection } from '../../components/OrganizationProfile/OrganizationGeneralPage';
 import { createSection } from '../createSection';
 

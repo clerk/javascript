@@ -1,3 +1,5 @@
+'use client';
+
 import { lazy, type ReactNode } from 'react';
 
 import { APIKeysSection } from '../APIKeysSection';

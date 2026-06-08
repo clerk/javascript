@@ -1,3 +1,5 @@
+'use client';
+
 import { useRef, type ReactNode } from 'react';
 
 import type { Elements } from '../../internal/appearance';
