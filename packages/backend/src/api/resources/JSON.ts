@@ -840,7 +840,7 @@ export interface RoleJSON extends ClerkResourceJSON {
   object: typeof ObjectType.Role;
   key: string;
   name: string;
-  description: string;
+  description: string | null;
   permissions: PermissionJSON[];
   is_creator_eligible: boolean;
   created_at: number;
