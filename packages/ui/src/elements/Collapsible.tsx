@@ -75,8 +75,10 @@ export function Collapsible({ open, children, sx }: CollapsibleProps): JSX.Eleme
         }),
         sx,
       ]}
-      // @ts-ignore - inert not yet in React types
-      inert={!open ? '' : undefined}
+      // @ts-ignore - inert not in Box prop types
+      // Use a non-empty string so React 18.3 serializes the attribute and React 19 treats it as
+      // truthy; passing `''` warns under React 19 and `true` is stripped under React 18.3.
+      inert={!open ? 'true' : undefined}
     >
       <Box
         elementDescriptor={descriptors.collapsibleInner}
