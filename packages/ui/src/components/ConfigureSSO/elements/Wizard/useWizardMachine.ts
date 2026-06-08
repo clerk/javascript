@@ -3,6 +3,23 @@ import React from 'react';
 import { guardHolds, initialState, reduce, type WizardConfig, type WizardEvent, type WizardState } from './reducer';
 import type { WizardActiveStep, WizardContextValue } from './types';
 
+/**
+ * Resolve the seed step: honor an explicit `preferred` id (nested resume) only
+ * when it names a real descriptor whose entry guard holds; otherwise fall back
+ * to the guard-derived furthest-reachable initial step. Guards against an
+ * invalid `initialStepId` seeding the machine onto a step that isn't in the
+ * graph (which would dead-lock NEXT/PREV with no clamp to recover).
+ */
+const resolveInitial = (cfg: WizardConfig, preferred?: string): WizardState => {
+  if (preferred) {
+    const target = cfg.descriptors.find(d => d.id === preferred);
+    if (target && guardHolds(target)) {
+      return { current: preferred, direction: 0, hasNavigated: false };
+    }
+  }
+  return initialState(cfg);
+};
+
 interface UseWizardMachineArgs {
   config: WizardConfig;
   parentWizard: WizardContextValue | null;
@@ -42,11 +59,11 @@ export const useWizardMachine = ({
   const isNested = parentWizard !== null;
 
   // Seed lazily so the wizard mounts on the right step in a single render pass:
-  // an explicit `initialStepId` wins (nested resume); otherwise the
-  // furthest-reachable guard-derived initial step.
-  const [state, setState] = React.useState<WizardState>(() =>
-    initialStepId ? { current: initialStepId, direction: 0, hasNavigated: false } : initialState(config),
-  );
+  // a VALID explicit `initialStepId` wins (nested resume); otherwise the
+  // furthest-reachable guard-derived initial step. `resolveInitial` rejects an
+  // id that names no descriptor (or whose guard is false) so an invalid seed
+  // can't park the machine on a step outside the graph.
+  const [state, setState] = React.useState<WizardState>(() => resolveInitial(config, initialStepId));
 
   // Render-updated mirrors so the stable handlers below always see the freshest
   // config / parent / callback without taking them as deps (which would churn
@@ -72,17 +89,18 @@ export const useWizardMachine = ({
 
   // Reachability invariant (adjust-state-during-render — NOT a useEffect): if the
   // active step's entry guard no longer holds (e.g. the connection backing it was
-  // deleted from a footer reset, or revoked elsewhere), the wizard is sitting on an
-  // impossible step. Re-seat to the furthest-reachable step — the SAME derivation
-  // used on mount (initialState). React discards this render and re-renders before
-  // paint, so the impossible frame never shows. Do NOT "fix" this by adding a
-  // goToStep: navigation here is emergent from the guard state, by design. The
-  // strict condition (current descriptor exists, its guard is false, and the
-  // re-seated step differs) makes it a provably one-shot — initialState always
-  // lands on a guard-passing step, so it cannot loop.
+  // deleted from a footer reset, or revoked elsewhere), OR the active id names no
+  // descriptor at all (an invalid seed, or a step removed from the graph), the
+  // wizard is sitting on an impossible step. Re-seat to the furthest-reachable
+  // step — the SAME derivation used on mount (initialState). React discards this
+  // render and re-renders before paint, so the impossible frame never shows. Do
+  // NOT "fix" this by adding a goToStep: navigation here is emergent from the
+  // guard state, by design. The condition (current descriptor is missing or its
+  // guard is false, and the re-seated step differs) makes it a provably one-shot
+  // — initialState always lands on a guard-passing step, so it cannot loop.
   if (!isNested) {
     const currentDescriptor = config.descriptors.find(d => d.id === state.current);
-    if (currentDescriptor && !guardHolds(currentDescriptor)) {
+    if (!currentDescriptor || !guardHolds(currentDescriptor)) {
       const seated = initialState(config);
       if (seated.current !== state.current) {
         setState(seated);

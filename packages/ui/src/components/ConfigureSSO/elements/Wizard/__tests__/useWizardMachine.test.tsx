@@ -60,6 +60,29 @@ describe('useWizardMachine — initial seeding', () => {
     });
     expect(result.current.current).toBe('a');
   });
+
+  it('falls back to the guard-derived step when initialStepId names no descriptor', () => {
+    // An invalid seed must NOT park the machine on a step outside the graph
+    // (which would dead-lock NEXT/PREV). resolveInitial rejects it and falls
+    // back to initialState — here the furthest contiguously-reachable step.
+    const { result } = renderMachine({
+      config: cfg([{ id: 'a' }, { id: 'b', guard: () => true }, { id: 'c', guard: () => false }]),
+      initialStepId: 'does-not-exist',
+    });
+    expect(result.current.current).toBe('b');
+  });
+
+  it('seats on a nested-style valid initialStepId (the guard-less first inner step)', () => {
+    // Nested SAML/verify sub-wizards resume on their first inner step, which is
+    // guard-less so guardHolds is true — resolveInitial honors it verbatim, no
+    // fallback. Guards regressing nested mounts back to initialState.
+    const { result } = renderMachine({
+      config: cfg([{ id: 'n0' }, { id: 'n1', guard: () => true }]),
+      parentWizard: makeParent(),
+      initialStepId: 'n0',
+    });
+    expect(result.current.current).toBe('n0');
+  });
 });
 
 describe('useWizardMachine — sequential guard-gated navigation', () => {
@@ -226,6 +249,29 @@ describe('useWizardMachine — reachability clamp (self-correct on a broken guar
       });
     });
     expect(result.current.current).toBe('a');
+  });
+
+  it('re-seats to the furthest-reachable step when the active step id is no longer in the descriptors', () => {
+    // Seed (validly) on 'c'. The step is then removed from the graph entirely, so
+    // `current` names no descriptor — an impossible position the guard check alone
+    // (which only fires when the descriptor EXISTS) would miss, dead-locking the
+    // machine. The widened clamp (`!currentDescriptor || !guardHolds`) catches the
+    // missing id and re-seats to the furthest-reachable surviving step (b).
+    const { result, rerender } = renderMachine({
+      config: cfg([{ id: 'a' }, { id: 'b', guard: () => true }, { id: 'c', guard: () => true }]),
+      initialStepId: 'c',
+    });
+    expect(result.current.current).toBe('c');
+
+    act(() => {
+      rerender({
+        config: cfg([{ id: 'a' }, { id: 'b', guard: () => true }]), // 'c' removed
+        parentWizard: null,
+        initialStepId: 'c',
+        onStepChange: undefined,
+      });
+    });
+    expect(result.current.current).toBe('b');
   });
 
   it('does NOT move when a guard goes TRUE while the active step still holds (create-style change)', () => {
