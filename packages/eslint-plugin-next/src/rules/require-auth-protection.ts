@@ -56,11 +56,11 @@ const rule: Rule.RuleModule = {
     ],
     messages: {
       missingProtect:
-        'Expected `await auth.protect()` at the top of {{subject}} in a protected folder. Add the call to the top of the function, move the file into a public folder, or configure this folder as public.',
+        'Expected `await auth.protect()` at the top of {{subject}} in a folder configured as protected. Add the call to the top of the function, move the file into a public folder, or configure this folder as public.',
       exportImported:
         "This {{subject}} is exported from '{{source}}'. The rule cannot follow imports across files. Add a wrapper with `await auth.protect()`, or ensure the imported function calls it and add an eslint-disable comment with a reason.",
       unverifiableExport:
-        'This {{subject}} could not be verified as protected, likely because it is assigned from a call expression (e.g. `const handler = withAuth(impl)`). Inline a function literal that calls `await auth.protect()`, or add an eslint-disable comment with a reason.',
+        'This {{subject}} could not be verified as being protected, likely because it is assigned from a call expression (e.g. `const handler = withAuth(impl)`). Inline a function literal that calls `await auth.protect()`, or add an eslint-disable comment with a reason.',
       unlistedMixedScopeLayout:
         "This {{fileKind}} at '{{folder}}/' wraps both protected and public descendants but is not listed in `mixedScopeLayouts`. Either add '{{folder}}' to the list to acknowledge the mixed scope, or restructure so the {{fileKind}} wraps only public or protected descendants.",
     },
