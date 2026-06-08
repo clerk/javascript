@@ -245,7 +245,21 @@ function checkServerFunctions(
   checkedFunctions: WeakSet<FunctionNode>,
 ): void {
   for (const { name, target, reportNode } of iterateNamedExports(programNode)) {
+    if (name === 'default') {
+      continue;
+    }
     checkMissingProtect(context, reportNode, target, `Server Function '${name}'`, authNames, checkedFunctions);
+  }
+  const defaultExport = resolveDefaultExport(programNode);
+  if (defaultExport) {
+    checkMissingProtect(
+      context,
+      defaultExport.reportNode,
+      defaultExport.target,
+      'Server Function',
+      authNames,
+      checkedFunctions,
+    );
   }
   // `export *` can re-export Server Functions we can't see across files.
   for (const { source, reportNode } of iterateExportAllDeclarations(programNode)) {

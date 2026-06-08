@@ -459,6 +459,19 @@ ruleTester.run('require-auth-protection', rule, {
       options: [config],
     },
     {
+      name: 'default Server Function with protect call',
+      code: `
+        'use server';
+        import { auth } from '@clerk/nextjs/server';
+        export default async function deleteUser(id) {
+          await auth.protect();
+          return id;
+        }
+      `,
+      filename: abs('app/admin/users/actions.ts'),
+      options: [config],
+    },
+    {
       name: 'Server Function namespace re-export is not treated as individual functions',
       code: `
         'use server';
@@ -970,6 +983,18 @@ ruleTester.run('require-auth-protection', rule, {
       errors: [{ messageId: 'missingProtect' }],
     },
     {
+      name: 'default Server Function missing protect',
+      code: `
+        'use server';
+        export default async function deleteUser(id) {
+          return id;
+        }
+      `,
+      filename: abs('app/admin/users/actions.ts'),
+      options: [config],
+      errors: [{ messageId: 'missingProtect', data: { subject: 'Server Function' } }],
+    },
+    {
       name: 'Server Function declared above and re-exported via specifier, missing protect',
       code: `
         'use server';
@@ -1018,6 +1043,24 @@ ruleTester.run('require-auth-protection', rule, {
           messageId: 'exportImported',
           data: {
             subject: "Server Function 'deleteUser'",
+            source: './implementations',
+          },
+        },
+      ],
+    },
+    {
+      name: 'default Server Function re-exported from another module with source',
+      code: `
+        'use server';
+        export { default } from './implementations';
+      `,
+      filename: abs('app/admin/users/actions.ts'),
+      options: [config],
+      errors: [
+        {
+          messageId: 'exportImported',
+          data: {
+            subject: 'Server Function',
             source: './implementations',
           },
         },
