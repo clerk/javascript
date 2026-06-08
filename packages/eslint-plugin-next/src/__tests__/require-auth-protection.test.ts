@@ -1053,7 +1053,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/dashboard/page.tsx'),
       options: [config],
-      errors: [{ messageId: 'missingProtect', data: { subject: 'Server Function' } }],
+      errors: [{ messageId: 'missingProtect', data: { subject: 'Inline Server Function' } }],
     },
     {
       name: 'protected non-resource module with inline Server Function missing protect',
@@ -1068,7 +1068,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/admin/users/users-panel.tsx'),
       options: [config],
-      errors: [{ messageId: 'missingProtect', data: { subject: 'Server Function' } }],
+      errors: [{ messageId: 'missingProtect', data: { subject: 'Inline Server Function' } }],
     },
     {
       name: 'protected-only layout without protect call',
