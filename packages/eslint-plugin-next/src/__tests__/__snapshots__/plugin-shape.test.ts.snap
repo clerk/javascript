@@ -1,9 +1,0 @@
-// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
-
-exports[`@clerk/eslint-plugin-next public shape > exposes a stable set of configs 1`] = `[]`;
-
-exports[`@clerk/eslint-plugin-next public shape > exposes a stable set of rules 1`] = `
-[
-  "require-auth-protection",
-]
-`;
