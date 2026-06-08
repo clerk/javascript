@@ -173,7 +173,10 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
               break;
             }
 
-            const activeSubscriptionItem = subscriptionItems.find(si => si.status === 'active');
+            // we want the "current" subscription item, which can have either "active" or "past_due" status
+            const activeSubscriptionItem = subscriptionItems.find(
+              si => si.status === 'active' || si.status === 'past_due',
+            );
             if (activeSubscriptionItem) {
               const currentPlan = activeSubscriptionItem.plan;
               const currentPlanAndPriceSupportsDesiredSeatQuantity = plans.some(
