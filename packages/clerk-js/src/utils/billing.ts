@@ -13,6 +13,8 @@ import type {
   BillingPeriodTotalsJSON,
   BillingPerUnitTotal,
   BillingPerUnitTotalJSON,
+  BillingPerUnitTotalTier,
+  BillingPerUnitTotalTierJSON,
   BillingPlanUnitPriceJSON,
   BillingStatementTotals,
   BillingStatementTotalsJSON,
@@ -35,15 +37,19 @@ export const billingMoneyAmountFromJSON = (data: BillingMoneyAmountJSON): Billin
   };
 };
 
+export const billingPerUnitTotalTierFromJSON = (data: BillingPerUnitTotalTierJSON): BillingPerUnitTotalTier => {
+  return {
+    quantity: data.quantity,
+    feePerBlock: billingMoneyAmountFromJSON(data.fee_per_block),
+    total: billingMoneyAmountFromJSON(data.total),
+  };
+};
+
 const billingPerUnitTotalsFromJSON = (data: BillingPerUnitTotalJSON[]): BillingPerUnitTotal[] => {
   return data.map(unitTotal => ({
     name: unitTotal.name,
     blockSize: unitTotal.block_size,
-    tiers: unitTotal.tiers.map(tier => ({
-      quantity: tier.quantity,
-      feePerBlock: billingMoneyAmountFromJSON(tier.fee_per_block),
-      total: billingMoneyAmountFromJSON(tier.total),
-    })),
+    tiers: unitTotal.tiers.map(billingPerUnitTotalTierFromJSON),
   }));
 };
 

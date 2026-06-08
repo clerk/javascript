@@ -233,6 +233,7 @@ export interface BillingSubscriptionItemSeats {
    * The seat limit active while the parent subscription item was active. `null` means unlimited.
    */
   quantity: number | null;
+  tiers?: BillingPerUnitTotalTier[];
 }
 
 /**
