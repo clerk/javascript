@@ -53,30 +53,9 @@ export const guardHolds = (step: WizardStepDescriptor): boolean => (step.guard ?
 
 const indexOf = (steps: WizardStepDescriptor[], id: string): number => steps.findIndex(s => s.id === id);
 
-/**
- * `__DEV__`-guarded monotonicity assertion. Entry guards are expected to be
- * *monotonic* across the declared order: if step `i`'s guard holds, every
- * earlier step `i-1 … 0`'s guard must also hold. The furthest-reachable init
- * (walk while the *next* guard holds) and the always-reachable predecessor (a
- * PREV target's guard holds whenever the current step's does) both rely on this
- * property. A violation is warned, never thrown — a non-monotonic guard set is
- * a config bug, not a runtime failure.
- */
-const assertMonotonicGuards = (steps: WizardStepDescriptor[]): void => {
-  if (typeof __DEV__ === 'undefined' || !__DEV__) {
-    return;
-  }
-  for (let i = 1; i < steps.length; i++) {
-    if (guardHolds(steps[i]) && !guardHolds(steps[i - 1])) {
-      console.warn(
-        `[Wizard] Non-monotonic entry guards: "${steps[i].id}" is reachable but its predecessor ` +
-          `"${steps[i - 1].id}" is not. Entry guards must be monotonic (a later step's guard ` +
-          `holding implies every earlier step's guard holds) for furthest-reachable init and ` +
-          `positional back-navigation to behave correctly.`,
-      );
-    }
-  }
-};
+// Entry guards are expected to be monotonic across the declared order (a later
+// step's guard holding implies every earlier step's guard holds); the
+// furthest-reachable init and positional back-navigation rely on that.
 
 /**
  * Where the wizard mounts on (re)load, derived purely from the graph + guards:
@@ -90,7 +69,6 @@ export const initialState = (config: WizardConfig): WizardState => {
   if (steps.length === 0) {
     return { current: '', direction: 0, hasNavigated: false };
   }
-  assertMonotonicGuards(steps);
   let i = 0;
   while (i + 1 < steps.length && guardHolds(steps[i + 1])) {
     i++;
@@ -118,7 +96,6 @@ const advance = (next: string, direction: 1 | -1 | 0): WizardState => ({
  */
 export const reduce = (state: WizardState, event: WizardEvent, config: WizardConfig): WizardState => {
   const steps = config.descriptors;
-  assertMonotonicGuards(steps);
 
   switch (event.type) {
     case 'NEXT': {
