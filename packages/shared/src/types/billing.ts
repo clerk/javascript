@@ -563,6 +563,10 @@ export interface BillingPaymentTotals {
    * Per-unit cost breakdown for this payment (for example, seats).
    */
   perUnitTotals?: BillingPerUnitTotal[];
+  /**
+   * Discounts applied to this payment such as mid-cycle prorated seat discounts. `null` when no discounts apply.
+   */
+  discounts?: BillingDiscounts | null;
 }
 
 /**

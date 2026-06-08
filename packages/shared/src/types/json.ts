@@ -765,6 +765,10 @@ export interface BillingPaymentTotalsJSON {
   tax_total: BillingMoneyAmountJSON;
   base_fee?: BillingMoneyAmountJSON | null;
   per_unit_totals?: BillingPerUnitTotalJSON[];
+  /**
+   * Discounts applied to this payment such as mid-cycle prorated seat discounts. `null` when no discounts apply.
+   */
+  discounts?: BillingDiscountsJSON | null;
 }
 
 /**
