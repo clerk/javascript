@@ -7,12 +7,12 @@ import { CardStateProvider } from '@/ui/elements/contexts';
 // The Google sub-flow's first step (create-app) reads only `useWizard()`, so the
 // flow can mount without the full ConfigureSSO context. The context is mocked
 // thin to satisfy any incidental reads — including the footer `Step.Footer.Reset`
-// affordance, which reads `connectionState.hasConnection` and self-hides here
-// since there is no connection in this isolated render.
+// affordance, which reads `organizationEnterpriseConnection.hasConnection` and
+// self-hides here since there is no connection in this isolated render.
 vi.mock('../../../../ConfigureSSOContext', () => ({
   useConfigureSSO: () => ({
     enterpriseConnection: undefined,
-    connectionState: { hasConnection: false },
+    organizationEnterpriseConnection: { hasConnection: false },
     provider: 'saml_google',
     mutations: {},
   }),

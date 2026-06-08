@@ -25,7 +25,7 @@ import { ConfigureStep, ConfirmationStep, SelectProviderStep, TestConfigurationS
  * test satisfied, so a live connection short-circuits straight to confirmation.
  */
 export const ConfigureSSOSteps = (): JSX.Element => {
-  const { connectionState: c } = useConfigureSSO();
+  const { organizationEnterpriseConnection: c } = useConfigureSSO();
   const card = useCardState();
 
   const steps = React.useMemo<WizardStepConfig[]>(

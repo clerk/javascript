@@ -46,7 +46,7 @@ const TEST_RESULTS_TABLE_COLUMN_COUNT = 3;
 
 export const TestConfigurationStep = (): JSX.Element => {
   const { goPrev, isInitialStep } = useWizard();
-  const { connectionState: c, testRuns } = useConfigureSSO();
+  const { organizationEnterpriseConnection: c, testRuns } = useConfigureSSO();
   const card = useCardState();
 
   const {

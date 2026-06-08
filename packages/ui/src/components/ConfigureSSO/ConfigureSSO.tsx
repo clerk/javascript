@@ -45,8 +45,14 @@ const AuthenticatedContent = withCoreUserGuard(() => {
 });
 
 export const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObject<HTMLDivElement> }) => {
-  const { isLoading, enterpriseConnection, connectionState, testRuns, mutations, primaryEmailAddress } =
-    useOrganizationEnterpriseConnection();
+  const {
+    isLoading,
+    enterpriseConnection,
+    organizationEnterpriseConnection,
+    testRuns,
+    mutations,
+    primaryEmailAddress,
+  } = useOrganizationEnterpriseConnection();
 
   // Gate loading one level above the provider so the context never observes a
   // loading state. The single test-run source is part of this initial fetch
@@ -59,7 +65,7 @@ export const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObjec
   return (
     <ConfigureSSOProtect>
       <ConfigureSSOProvider
-        connectionState={connectionState}
+        organizationEnterpriseConnection={organizationEnterpriseConnection}
         testRuns={testRuns}
         enterpriseConnection={enterpriseConnection}
         contentRef={contentRef}

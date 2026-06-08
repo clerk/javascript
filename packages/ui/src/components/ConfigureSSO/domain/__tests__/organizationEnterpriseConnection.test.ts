@@ -5,7 +5,10 @@ import type {
 } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
-import { deriveEnterpriseConnectionState, isEnterpriseConnectionConfigured } from '../enterpriseConnectionState';
+import {
+  isEnterpriseConnectionConfigured,
+  organizationEnterpriseConnection,
+} from '../organizationEnterpriseConnection';
 
 const makeSamlConnection = (overrides: Partial<SamlAccountConnectionResource> = {}): SamlAccountConnectionResource =>
   ({
@@ -42,17 +45,17 @@ const fullyConfiguredSaml = makeSamlConnection({
   idpMetadataUrl: 'https://idp.example.com/metadata',
 });
 
-// Builds the derived state with sensible defaults; each test overrides what it
-// cares about.
-const derive = (overrides: Partial<Parameters<typeof deriveEnterpriseConnectionState>[0]> = {}) =>
-  deriveEnterpriseConnectionState({
+// Builds the entity with sensible defaults; each test overrides what it cares
+// about.
+const derive = (overrides: Partial<Parameters<typeof organizationEnterpriseConnection>[0]> = {}) =>
+  organizationEnterpriseConnection({
     connection: undefined,
     primaryEmail: makeEmail('verified'),
     hasSuccessfulTestRun: false,
     ...overrides,
   });
 
-describe('deriveEnterpriseConnectionState', () => {
+describe('organizationEnterpriseConnection', () => {
   describe('hasConnection', () => {
     it('undefined connection → false', () => {
       expect(derive({ connection: undefined }).hasConnection).toBe(false);
@@ -141,12 +144,29 @@ describe('deriveEnterpriseConnectionState', () => {
     });
   });
 
-  it('returns a plain object (no behaviour methods)', () => {
-    const state = derive();
-    expect(typeof state.isActive).toBe('boolean');
-    expect(typeof state.hasMinimumConfiguration).toBe('boolean');
-    expect(typeof state.isPrimaryEmailVerified).toBe('boolean');
-    expect(typeof state.hasSuccessfulTestRun).toBe('boolean');
+  it('is pure: identical inputs produce a deep-equal entity', () => {
+    const connection = makeConnection({ samlConnection: fullyConfiguredSaml, active: true });
+    const primaryEmail = makeEmail('verified');
+    const inputs = { connection, primaryEmail, hasSuccessfulTestRun: true } as const;
+
+    expect(organizationEnterpriseConnection(inputs)).toEqual(organizationEnterpriseConnection(inputs));
+  });
+
+  it('carries the expected field values for a fully configured connection', () => {
+    const entity = derive({
+      connection: makeConnection({ provider: 'saml_custom', samlConnection: fullyConfiguredSaml, active: true }),
+      primaryEmail: makeEmail('verified'),
+      hasSuccessfulTestRun: true,
+    });
+
+    expect(entity).toEqual({
+      provider: 'saml_custom',
+      hasConnection: true,
+      isActive: true,
+      hasMinimumConfiguration: true,
+      isPrimaryEmailVerified: true,
+      hasSuccessfulTestRun: true,
+    });
   });
 });
 

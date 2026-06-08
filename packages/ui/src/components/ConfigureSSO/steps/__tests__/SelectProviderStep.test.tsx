@@ -17,9 +17,9 @@ vi.mock('../../elements/Wizard', () => ({
 
 const createEnterpriseConnection = vi.fn();
 
-// Provider is sourced from the derived connection state (connectionState.provider)
-// rather than a context-level setProvider. The step uses goNext (not goToStep)
-// after a successful create.
+// Provider is sourced from the connection entity
+// (organizationEnterpriseConnection.provider) rather than a context-level
+// setProvider. The step uses goNext (not goToStep) after a successful create.
 const contextState = vi.hoisted(() => ({
   provider: undefined as 'saml_okta' | 'saml_custom' | undefined,
   primaryEmailAddress: { emailAddress: 'test@clerk.com' } as { emailAddress: string } | undefined,
@@ -35,10 +35,10 @@ vi.mock('../../ConfigureSSOContext', () => ({
       createConnection: createEnterpriseConnection,
     },
     primaryEmailAddress: contextState.primaryEmailAddress,
-    // Provider is sourced from the derived state; the step no longer reads a
+    // Provider is sourced from the connection entity; the step no longer reads a
     // context-level setProvider — verify-domain runs first, so the create is
     // unconditional.
-    connectionState: {
+    organizationEnterpriseConnection: {
       provider: contextState.provider,
       isPrimaryEmailVerified: contextState.isPrimaryEmailVerified,
     },

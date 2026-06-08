@@ -40,11 +40,11 @@ vi.mock('../../ConfigureSSOContext', () => ({
   useConfigureSSO: () => ({
     enterpriseConnection: { id: 'ent_1' },
     contentRef: { current: null },
-    // The step reads `hasSuccessfulTestRun` as a field off the derived connection
-    // state; a getter keeps the mock deriving it from the current rows so the
-    // Continue gate reflects them on every render. `hasConnection: false` keeps
-    // the footer `Step.Footer.Reset` self-hidden in this isolated render.
-    connectionState: {
+    // The step reads `hasSuccessfulTestRun` as a field off the connection entity;
+    // a getter keeps the mock deriving it from the current rows so the Continue
+    // gate reflects them on every render. `hasConnection: false` keeps the footer
+    // `Step.Footer.Reset` self-hidden in this isolated render.
+    organizationEnterpriseConnection: {
       hasConnection: false,
       get hasSuccessfulTestRun() {
         return testRunsSource.rows.some(r => r.status === 'success');

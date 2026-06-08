@@ -15,10 +15,10 @@ import type {
 import { useMemo, useRef } from 'react';
 
 import {
-  deriveEnterpriseConnectionState,
-  type EnterpriseConnectionState,
   isEnterpriseConnectionConfigured,
-} from '../domain/enterpriseConnectionState';
+  type OrganizationEnterpriseConnection,
+  organizationEnterpriseConnection as buildOrganizationEnterpriseConnection,
+} from '../domain/organizationEnterpriseConnection';
 import {
   type EnterpriseConnectionMutations,
   useEnterpriseConnectionMutations,
@@ -50,11 +50,12 @@ export interface UseOrganizationEnterpriseConnectionResult {
    */
   primaryEmailAddress: EmailAddressResource | undefined;
   /**
-   * The pure derived-state snapshot the wizard makes every flow decision from —
-   * composes the connection, the admin's email verification, and the test-run
-   * state. Built once here from the raw inputs.
+   * The active organization's SSO-config domain entity — the immutable value
+   * object the wizard makes every flow decision from, composing the connection,
+   * the admin's email verification, and the test-run fact. Built once here from
+   * the raw inputs.
    */
-  connectionState: EnterpriseConnectionState;
+  organizationEnterpriseConnection: OrganizationEnterpriseConnection;
   /**
    * Every connection-domain mutation, pre-wrapped in `useReverification`.
    */
@@ -162,8 +163,8 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
   //   - configure completes (`hasMinimumConfiguration`) → fires, surfacing as
   //     table-level loading because `hadInitialConnection` is false.
   //
-  // Computed from the raw connection (not `connectionState`, which depends on
-  // the test-run probe below — reading it here would be circular).
+  // Computed from the raw connection (not the built entity, which depends on the
+  // test-run probe below — reading it here would be circular).
   const testRunsActive =
     isEnterpriseConnectionConfigured(enterpriseConnection) || Boolean(enterpriseConnection?.active);
 
@@ -220,11 +221,11 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
   const primaryEmail =
     user?.primaryEmailAddress ?? user?.emailAddresses?.find(e => e.verification.status !== 'verified');
 
-  // The single pure derived-state snapshot everything downstream reads decisions
-  // from, keyed on the raw inputs so it is only rebuilt when one of them changes.
-  const connectionState = useMemo<EnterpriseConnectionState>(
+  // The single domain entity everything downstream reads decisions from, keyed
+  // on the raw inputs so it is only rebuilt when one of them changes.
+  const organizationEnterpriseConnection = useMemo<OrganizationEnterpriseConnection>(
     () =>
-      deriveEnterpriseConnectionState({
+      buildOrganizationEnterpriseConnection({
         connection: enterpriseConnection,
         primaryEmail,
         hasSuccessfulTestRun,
@@ -244,7 +245,7 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
     isLoading: isLoadingEnterpriseConnections || (hadInitialConnection && isLoadingTestRuns),
     enterpriseConnection,
     primaryEmailAddress,
-    connectionState,
+    organizationEnterpriseConnection,
     mutations,
     testRuns,
   };
