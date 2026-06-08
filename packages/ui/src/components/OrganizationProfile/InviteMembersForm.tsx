@@ -162,8 +162,8 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
           try {
             const { data: plans } = await clerk.billing.getPlans({
               for: 'organization',
-              org_id: organization.id,
-              min_seats: err.errors[0].meta?.seatsQuantity,
+              orgId: organization.id,
+              minSeats: err.errors[0].meta?.seatsQuantity,
             });
 
             if (plans.length === 0) {

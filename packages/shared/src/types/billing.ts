@@ -140,8 +140,8 @@ export type GetPlansParams = ClerkPaginationParams<{
    * The type of payer for the Plans.
    */
   for?: ForPayerType;
-  org_id?: string;
-  min_seats?: number;
+  orgId?: string;
+  minSeats?: number;
 }>;
 
 /**
