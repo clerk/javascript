@@ -94,10 +94,10 @@ describe('composed style cache sharing', () => {
     patchEnvironment(fixtures.clerk, fixtures.environment);
 
     const expectedNonce = 'test-nonce-abc123';
-    const originalGetOption = fixtures.clerk.__internal_getOption;
+    const originalGetOption = fixtures.clerk.__internal_getOption.bind(fixtures.clerk);
     fixtures.clerk.__internal_getOption = (key: string) => {
       if (key === 'nonce') return expectedNonce;
-      return originalGetOption?.(key);
+      return originalGetOption(key);
     };
 
     render(
