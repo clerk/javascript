@@ -115,6 +115,12 @@ function useOrganizationEnterpriseConnectionTestRuns(
 
   const [shouldPoll, setShouldPoll] = useState(false);
 
+  useEffect(() => {
+    // Polling intent is scoped to the current connection — clear it when the
+    // connection changes so a reset/recreate doesn't inherit a stale armed poll.
+    setShouldPoll(false);
+  }, [enterpriseConnectionId]);
+
   const query = useClerkQuery({
     queryKey,
     queryFn: () => {
