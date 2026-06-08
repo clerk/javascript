@@ -136,6 +136,7 @@ import type {
   WaitlistProps,
   WaitlistResource,
   Web3Provider,
+  NativeOAuthHandler,
 } from '@clerk/shared/types';
 import type { ClerkUI } from '@clerk/shared/ui';
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
@@ -254,6 +255,7 @@ export class Clerk implements ClerkInterface {
   protected environment?: EnvironmentResource | null;
 
   #queryClient: QueryClient | undefined;
+  #nativeOAuthHandler: NativeOAuthHandler | null = null;
   #publishableKey = '';
   #domain: DomainOrProxyUrl['domain'];
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
@@ -272,6 +274,14 @@ export class Clerk implements ClerkInterface {
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
   #publicEventBus = createClerkEventBus();
+
+  get __internal_hasNativeOAuthHandler(): boolean {
+    return this.#nativeOAuthHandler !== null;
+  }
+
+  __internal_getNativeOAuthHandler(): NativeOAuthHandler | null {
+    return this.#nativeOAuthHandler;
+  }
 
   get __internal_queryClient(): { __tag: 'clerk-rq-client'; client: QueryClient } | undefined {
     if (!this.#queryClient) {
@@ -609,6 +619,9 @@ export class Clerk implements ClerkInterface {
         });
       }
       this.#protect?.load(this.environment as Environment);
+
+      this.#nativeOAuthHandler = options?.__internal_nativeOAuthHandler ?? null;
+
       debugLogger.info('load() complete', {}, 'clerk');
     } catch (error) {
       this.#publicEventBus.emit(clerkEvents.Status, 'error');
@@ -2322,6 +2335,29 @@ export class Clerk implements ClerkInterface {
     });
   };
 
+  public __internal_handleNativeOAuthCallback = async (
+    signInOrUp: SignInResource | SignUpResource,
+    params: HandleOAuthCallbackParams,
+    customNavigate?: (to: string) => Promise<unknown>,
+  ): Promise<unknown> => {
+    if (!this.loaded || !this.environment || !this.client) {
+      return;
+    }
+    const { signIn: _signIn, signUp: _signUp } = this.client;
+
+    const signIn = 'identifier' in (signInOrUp || {}) ? (signInOrUp as SignInResource) : _signIn;
+    const signUp = 'missingFields' in (signInOrUp || {}) ? (signInOrUp as SignUpResource) : _signUp;
+
+    const navigate = (to: string) =>
+      customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
+
+    return this._handleRedirectCallback(params, {
+      signUp,
+      signIn,
+      navigate,
+    });
+  };
+
   private _handleRedirectCallback = async (
     params: HandleOAuthCallbackParams,
     {
@@ -2608,29 +2644,6 @@ export class Clerk implements ClerkInterface {
       return;
     }
     const { signIn, signUp } = this.client;
-
-    const navigate = (to: string) =>
-      customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
-
-    return this._handleRedirectCallback(params, {
-      signUp,
-      signIn,
-      navigate,
-    });
-  };
-
-  public __experimental_handleNativeRedirectCallback = async (
-    signInOrUp: SignInResource | SignUpResource,
-    params: HandleOAuthCallbackParams = {},
-    customNavigate?: (to: string) => Promise<unknown>,
-  ): Promise<unknown> => {
-    if (!this.loaded || !this.environment || !this.client) {
-      return;
-    }
-
-    const { signIn: currentSignIn, signUp: currentSignUp } = this.client;
-    const signIn = 'identifier' in (signInOrUp || {}) ? (signInOrUp as SignInResource) : currentSignIn;
-    const signUp = 'missingFields' in (signInOrUp || {}) ? (signInOrUp as SignUpResource) : currentSignUp;
 
     const navigate = (to: string) =>
       customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);

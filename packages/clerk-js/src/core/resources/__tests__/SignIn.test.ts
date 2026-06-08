@@ -2057,11 +2057,24 @@ describe('SignIn', () => {
         vi.unstubAllGlobals();
       });
 
-      it('prepares OAuth for native redirect', async () => {
+      it('uses transport getRedirectUrl when external auth transport is active', async () => {
         const externalVerificationRedirectURL = new URL('https://accounts.example.com/oauth');
+        const nativeCallbackUrl = 'myapp://sso-callback?rotating_token_nonce=test-nonce';
+        const mockTransport = {
+          getRedirectUrl: vi.fn().mockResolvedValue('myapp://sso-callback'),
+          open: vi.fn().mockResolvedValue({ callbackUrl: nativeCallbackUrl }),
+        };
+
+        SignIn.clerk = {
+          buildUrlWithAuth: vi.fn().mockReturnValue('https://web-app.com/sso-callback'),
+          __internal_getNativeOAuthHandler: () => mockTransport,
+          __internal_handleNativeOAuthCallback: vi.fn().mockResolvedValue(undefined),
+          __internal_environment: {
+            displayConfig: { captchaOauthBypass: [] },
+          },
+        } as any;
 
         const signIn = new SignIn();
-
         vi.spyOn(signIn, 'create').mockImplementation(async () => {
           signIn.firstFactorVerification = {
             status: 'unverified',
@@ -2069,27 +2082,41 @@ describe('SignIn', () => {
           } as any;
           return signIn;
         });
+        vi.spyOn(signIn, 'reload').mockResolvedValue(signIn);
 
-        const res = await signIn.__experimental_authenticateWithNativeRedirect({
+        await signIn.authenticateWithRedirect({
           strategy: 'oauth_google',
           identifier: 'user@example.com',
-          redirectUrl: 'myapp://sso-callback',
+          redirectUrl: 'http://web-app.com/sso-callback',
           redirectUrlComplete: '/after-sign-in',
         });
 
+        expect(SignIn.clerk.__internal_handleNativeOAuthCallback).toHaveBeenCalledWith(signIn, {});
         expect(signIn.create).toHaveBeenCalledWith({
           strategy: 'oauth_google',
           identifier: 'user@example.com',
           redirectUrl: 'myapp://sso-callback',
           actionCompleteRedirectUrl: 'myapp://sso-callback',
-          oidcPrompt: undefined,
         });
-        expect(res).toBe(signIn);
-        expect(signIn.firstFactorVerification.externalVerificationRedirectURL).toBe(externalVerificationRedirectURL);
+        expect(mockTransport.open).toHaveBeenCalledWith(externalVerificationRedirectURL);
       });
 
-      it('continues enterprise SSO for native redirect', async () => {
+      it('uses transport getRedirectUrl for enterprise SSO when transport is active', async () => {
         const externalVerificationRedirectURL = new URL('https://sso.example.com/auth');
+        const nativeCallbackUrl = 'myapp://sso-callback?rotating_token_nonce=test-nonce';
+        const mockTransport = {
+          getRedirectUrl: vi.fn().mockResolvedValue('myapp://sso-callback'),
+          open: vi.fn().mockResolvedValue({ callbackUrl: nativeCallbackUrl }),
+        };
+
+        SignIn.clerk = {
+          buildUrlWithAuth: vi.fn().mockReturnValue('https://web-app.com/sso-callback'),
+          __internal_getNativeOAuthHandler: () => mockTransport,
+          __internal_handleNativeOAuthCallback: vi.fn().mockResolvedValue(undefined),
+          __internal_environment: {
+            displayConfig: { captchaOauthBypass: [] },
+          },
+        } as any;
 
         const signIn = new SignIn({ id: 'signin_123', status: 'needs_first_factor' } as any);
         vi.spyOn(signIn, 'create');
@@ -2100,15 +2127,17 @@ describe('SignIn', () => {
           } as any;
           return signIn;
         });
+        vi.spyOn(signIn, 'reload').mockResolvedValue(signIn);
 
-        await signIn.__experimental_authenticateWithNativeRedirect({
+        await signIn.authenticateWithRedirect({
           strategy: 'enterprise_sso',
           continueSignIn: true,
           enterpriseConnectionId: 'ec_123',
-          redirectUrl: 'myapp://sso-callback',
+          redirectUrl: 'http://web-app.com/sso-callback',
           redirectUrlComplete: '/',
         });
 
+        expect(SignIn.clerk.__internal_handleNativeOAuthCallback).toHaveBeenCalledWith(signIn, {});
         expect(signIn.create).not.toHaveBeenCalled();
         expect(signIn.prepareFirstFactor).toHaveBeenCalledWith({
           strategy: 'enterprise_sso',
@@ -2117,7 +2146,7 @@ describe('SignIn', () => {
           oidcPrompt: undefined,
           enterpriseConnectionId: 'ec_123',
         });
-        expect(signIn.firstFactorVerification.externalVerificationRedirectURL).toBe(externalVerificationRedirectURL);
+        expect(mockTransport.open).toHaveBeenCalledWith(externalVerificationRedirectURL);
       });
 
       it('creates signIn with enterprise_sso strategy and prepares first factor', async () => {

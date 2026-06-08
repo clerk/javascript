@@ -1,5 +1,11 @@
 import { inBrowser } from '@clerk/shared/browser';
-import { type ClerkError, ClerkRuntimeError, isCaptchaError, isClerkAPIResponseError } from '@clerk/shared/error';
+import {
+  ClerkAPIResponseError,
+  type ClerkError,
+  ClerkRuntimeError,
+  isCaptchaError,
+  isClerkAPIResponseError,
+} from '@clerk/shared/error';
 import { createValidatePassword } from '@clerk/shared/internal/clerk-js/passwords/password';
 import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { Poller } from '@clerk/shared/poller';
@@ -8,9 +14,10 @@ import type {
   AttemptPhoneNumberVerificationParams,
   AttemptVerificationParams,
   AttemptWeb3WalletVerificationParams,
-  AuthenticateWithNativeRedirectParams,
   AuthenticateWithPopupParams,
   AuthenticateWithRedirectParams,
+  NativeOAuthHandler,
+  HandleOAuthCallbackParams,
   AuthenticateWithWeb3Params,
   CaptchaWidgetType,
   CreateEmailLinkFlowReturn,
@@ -67,6 +74,57 @@ import {
 } from '../errors';
 import { eventBus } from '../events';
 import { BaseResource, SignUpVerifications } from './internal';
+
+function throwIfNativeCallbackHasError(callbackUrl: string): void {
+  const url = new URL(callbackUrl);
+  const code =
+    url.searchParams.get('clerk_error_code') ??
+    url.searchParams.get('error_code') ??
+    url.searchParams.get('code') ??
+    url.searchParams.get('error');
+  if (!code) return;
+  const message =
+    url.searchParams.get('clerk_error_message') ??
+    url.searchParams.get('error_message') ??
+    url.searchParams.get('message') ??
+    url.searchParams.get('error_description') ??
+    code;
+  const longMessage =
+    url.searchParams.get('clerk_error_long_message') ??
+    url.searchParams.get('long_message') ??
+    url.searchParams.get('longMessage') ??
+    undefined;
+  const statusStr =
+    url.searchParams.get('clerk_error_status') ??
+    url.searchParams.get('error_status') ??
+    url.searchParams.get('status');
+  const status = statusStr && Number.isInteger(Number(statusStr)) ? Number(statusStr) : 400;
+  throw new ClerkAPIResponseError(longMessage || message, {
+    status,
+    data: [{ code, message, long_message: longMessage }],
+  });
+}
+
+function throwIfSignUpVerificationError(error: import('@clerk/shared/types').ClerkAPIError | null | undefined): void {
+  if (!error) return;
+  throw new ClerkAPIResponseError(error.longMessage || error.message, {
+    status: 400,
+    data: [
+      {
+        code: error.code,
+        message: error.message,
+        long_message: error.longMessage,
+        meta: {
+          param_name: error.meta?.paramName,
+          session_id: error.meta?.sessionId,
+          email_addresses: error.meta?.emailAddresses,
+          identifiers: error.meta?.identifiers,
+          zxcvbn: error.meta?.zxcvbn,
+        },
+      },
+    ],
+  });
+}
 
 declare global {
   interface Window {
@@ -395,6 +453,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     },
     navigateCallback: (url: URL | string) => void,
   ): Promise<void> => {
+    const transport = SignUp.clerk.__internal_getNativeOAuthHandler();
     const {
       redirectUrl,
       redirectUrlComplete,
@@ -407,13 +466,19 @@ export class SignUp extends BaseResource implements SignUpResource {
       enterpriseConnectionId,
     } = params;
 
-    const redirectUrlWithAuthToken = SignUp.clerk.buildUrlWithAuth(redirectUrl);
+    // For native transports, override the redirectUrl with the host runtime's deep-link URL.
+    // actionCompleteRedirectUrl must also point to the deep-link: FAPI uses it (not redirectUrl)
+    // when sign-up completes immediately, and we need the deep-link to fire in both cases.
+    const effectiveRedirectUrl = transport
+      ? String(await transport.getRedirectUrl())
+      : SignUp.clerk.buildUrlWithAuth(redirectUrl);
+    const effectiveActionCompleteRedirectUrl = transport ? effectiveRedirectUrl : redirectUrlComplete;
 
     const authenticateFn = () => {
       const authParams = {
         strategy,
-        redirectUrl: redirectUrlWithAuthToken,
-        actionCompleteRedirectUrl: redirectUrlComplete,
+        redirectUrl: effectiveRedirectUrl,
+        actionCompleteRedirectUrl: effectiveActionCompleteRedirectUrl,
         unsafeMetadata,
         emailAddress,
         legalAccepted,
@@ -439,9 +504,44 @@ export class SignUp extends BaseResource implements SignUpResource {
     const { status, externalVerificationRedirectURL } = externalAccount;
 
     if (status === 'unverified' && !!externalVerificationRedirectURL) {
-      navigateCallback(externalVerificationRedirectURL);
+      if (transport) {
+        await this.#handleWithTransport(transport, externalVerificationRedirectURL, params);
+      } else {
+        navigateCallback(externalVerificationRedirectURL);
+      }
     } else {
       clerkInvalidFAPIResponse(status, SignUp.fapiClient.buildEmailAddress('support'));
+    }
+  };
+
+  #handleWithTransport = async (
+    transport: NativeOAuthHandler,
+    externalVerificationRedirectURL: URL,
+    params: AuthenticateWithRedirectParams,
+  ): Promise<void> => {
+    const { callbackUrl } = await transport.open(externalVerificationRedirectURL);
+    throwIfNativeCallbackHasError(callbackUrl);
+
+    const nonce = new URL(callbackUrl).searchParams.get('rotating_token_nonce');
+    const callbackParams = (params.__internal_nativeCallbackParams ?? {}) as HandleOAuthCallbackParams;
+
+    if (nonce) {
+      await this.reload({ rotatingTokenNonce: nonce });
+      throwIfSignUpVerificationError(this.verifications.externalAccount.error);
+      await SignUp.clerk.__internal_handleNativeOAuthCallback(this, callbackParams);
+    } else {
+      const TIMEOUT_MS = 3_000;
+      const INTERVAL_MS = 250;
+      const startedAt = Date.now();
+      await this.reload();
+      while (!this.verifications.externalAccount.error && Date.now() - startedAt < TIMEOUT_MS) {
+        await new Promise(resolve => setTimeout(resolve, INTERVAL_MS));
+        await this.reload();
+      }
+      throwIfSignUpVerificationError(this.verifications.externalAccount.error);
+      throw new ClerkRuntimeError('Unable to complete authentication. Please try again.', {
+        code: 'native_redirect_incomplete',
+      });
     }
   };
 
@@ -466,54 +566,6 @@ export class SignUp extends BaseResource implements SignUpResource {
     return _authenticateWithPopup(SignUp.clerk, 'signUp', this.authenticateWithRedirectOrPopup, params, url => {
       popup.location.href = url instanceof URL ? url.toString() : url;
     });
-  };
-
-  public __experimental_authenticateWithNativeRedirect = async (
-    params: AuthenticateWithNativeRedirectParams & {
-      unsafeMetadata?: SignUpUnsafeMetadata;
-    },
-  ): Promise<SignUpResource> => {
-    const {
-      strategy,
-      redirectUrl,
-      continueSignUp = false,
-      unsafeMetadata,
-      emailAddress,
-      legalAccepted,
-      oidcPrompt,
-      enterpriseConnectionId,
-    } = params;
-
-    const authenticate = () => {
-      const authParams = {
-        strategy,
-        redirectUrl,
-        actionCompleteRedirectUrl: redirectUrl,
-        unsafeMetadata,
-        emailAddress,
-        legalAccepted,
-        oidcPrompt,
-        enterpriseConnectionId,
-      };
-      return continueSignUp && this.id ? this.update(authParams) : this.create(authParams);
-    };
-
-    await authenticate().catch(async e => {
-      if (isClerkAPIResponseError(e) && isCaptchaError(e)) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        await SignUp.clerk.__internal_environment!.reload();
-        return authenticate();
-      }
-      throw e;
-    });
-
-    const { status, externalVerificationRedirectURL } = this.verifications.externalAccount;
-
-    if (status !== 'unverified' || !externalVerificationRedirectURL) {
-      clerkInvalidFAPIResponse(status, SignUp.fapiClient.buildEmailAddress('support'));
-    }
-
-    return this;
   };
 
   update = (params: SignUpUpdateParams): Promise<SignUpResource> => {

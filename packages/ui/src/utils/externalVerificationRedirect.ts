@@ -1,26 +1,23 @@
-import type { ClerkElectronBridge, ExternalAccountResource, UserResource } from '@clerk/shared/types';
+import type { ExternalAccountResource, NativeOAuthHandler, UserResource } from '@clerk/shared/types';
 
-import { openExternalAndWaitForCallback, throwIfNativeRedirectCallbackHasError } from './nativeRedirectCallback';
+import { throwIfNativeRedirectCallbackHasError } from './nativeRedirectCallback';
 
 type CreateExternalAccount = (redirectUrl: string) => Promise<ExternalAccountResource | undefined>;
 
-export async function connectExternalAccountWithElectron(opts: {
-  bridge: ClerkElectronBridge;
+export async function connectExternalAccountWithTransport(opts: {
+  transport: NativeOAuthHandler;
   createExternalAccount: CreateExternalAccount;
   user: UserResource;
 }): Promise<void> {
-  const redirectUrl = await opts.bridge.getRedirectUrl();
+  const redirectUrl = await opts.transport.getRedirectUrl();
   const externalAccount = await opts.createExternalAccount(redirectUrl);
+  const verificationUrl = externalAccount?.verification?.externalVerificationRedirectURL;
 
-  const callbackUrl = await openExternalAndWaitForCallback(
-    opts.bridge,
-    externalAccount?.verification?.externalVerificationRedirectURL,
-  );
-
-  if (!callbackUrl) {
+  if (!verificationUrl) {
     return;
   }
 
+  const { callbackUrl } = await opts.transport.open(verificationUrl);
   throwIfNativeRedirectCallbackHasError(callbackUrl);
 
   // The reloaded user surfaces any stored verification error inline on the connected-account row,

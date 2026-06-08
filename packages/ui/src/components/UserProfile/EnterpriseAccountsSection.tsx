@@ -1,6 +1,7 @@
 import { appendModalState } from '@clerk/shared/internal/clerk-js/queryStateParams';
 import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { __internal_useUserEnterpriseConnections, useReverification, useUser } from '@clerk/shared/react';
+import { useClerk } from '@clerk/shared/react';
 import type { EnterpriseAccountResource, EnterpriseConnectionResource, OAuthProvider } from '@clerk/shared/types';
 import { Fragment, useState } from 'react';
 
@@ -8,21 +9,21 @@ import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { ProfileSection } from '@/ui/elements/Section';
 import { handleError } from '@/ui/utils/errorHandler';
+import { connectExternalAccountWithTransport } from '@/ui/utils/externalVerificationRedirect';
 import { sleep } from '@/ui/utils/sleep';
 
 import { ProviderIcon } from '../../common';
 import { useUserProfileContext } from '../../contexts';
 import { Badge, Box, descriptors, Flex, localizationKeys, Text } from '../../customizables';
 import { Action } from '../../elements/Action';
-import { useElectronExternalAuth } from '../../hooks';
 const EnterpriseConnectMenuButton = (props: { connection: EnterpriseConnectionResource }) => {
   const { connection } = props;
+  const clerk = useClerk();
   const card = useCardState();
   const { user } = useUser();
   const { componentName, mode } = useUserProfileContext();
   const isModal = mode === 'modal';
   const loadingKey = `enterprise_${connection.id}`;
-  const electronAuth = useElectronExternalAuth();
 
   const createExternalAccount = useReverification((nativeRedirectUrl?: string) => {
     const redirectUrl = isModal ? appendModalState({ url: window.location.href, componentName }) : window.location.href;
@@ -40,10 +41,11 @@ const EnterpriseConnectMenuButton = (props: { connection: EnterpriseConnectionRe
 
     card.setLoading(loadingKey);
 
-    if (electronAuth) {
-      return electronAuth
-        .connectExternalAccount({ createExternalAccount, user })
-        .finally(() => card.setIdle(loadingKey));
+    const transport = clerk.__internal_getNativeOAuthHandler();
+    if (transport) {
+      return connectExternalAccountWithTransport({ transport, createExternalAccount, user }).finally(() =>
+        card.setIdle(loadingKey),
+      );
     }
 
     return createExternalAccount()

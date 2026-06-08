@@ -1,4 +1,4 @@
-import type { Clerk, ClerkElectronBridge } from '@clerk/shared/types';
+import type { Clerk } from '@clerk/shared/types';
 import type { ClerkUIConstructor } from '@clerk/shared/ui';
 
 declare module '*.svg' {
@@ -20,6 +20,5 @@ declare global {
      * This is injected by the @clerk/ui browser bundle.
      */
     __internal_ClerkUICtor?: ClerkUIConstructor;
-    __clerk_internal_electron?: ClerkElectronBridge;
   }
 }

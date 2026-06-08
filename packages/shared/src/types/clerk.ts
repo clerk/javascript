@@ -1053,23 +1053,23 @@ export interface Clerk {
   ) => Promise<unknown>;
 
   /**
+   * Completes an OAuth or SAML callback using the provided sign-in or sign-up resource.
+   *
+   * @internal
+   */
+  __internal_handleNativeOAuthCallback: (
+    signInOrUp: SignInResource | SignUpResource,
+    params: HandleOAuthCallbackParams,
+    customNavigate?: (to: string) => Promise<unknown>,
+  ) => Promise<unknown>;
+
+  /**
    * Completes a custom OAuth or SAML redirect flow that was started by calling [`SignIn.authenticateWithRedirect(params)`](https://clerk.com/docs/reference/objects/sign-in) or [`SignUp.authenticateWithRedirect(params)`](https://clerk.com/docs/reference/objects/sign-up).
    *
    * @param params - Additional props that define where the user will be redirected to at the end of a successful OAuth or SAML flow.
    * @param customNavigate - A function that overrides Clerk's default navigation behavior, allowing custom handling of navigation during sign-up and sign-in flows.
    */
   handleRedirectCallback: (
-    params: HandleOAuthCallbackParams | HandleSamlCallbackParams,
-    customNavigate?: (to: string) => Promise<unknown>,
-  ) => Promise<unknown>;
-
-  /**
-   * Completes a custom OAuth or SAML redirect flow using an already refreshed SignIn or SignUp resource.
-   *
-   * @internal
-   */
-  __experimental_handleNativeRedirectCallback: (
-    signInOrUp: SignInResource | SignUpResource,
     params: HandleOAuthCallbackParams | HandleSamlCallbackParams,
     customNavigate?: (to: string) => Promise<unknown>,
   ) => Promise<unknown>;
@@ -1188,6 +1188,20 @@ export interface Clerk {
    * This API is in early access and may change in future releases.
    */
   __experimental_checkout: __experimental_CheckoutFunction;
+
+  /**
+   * Whether a native OAuth handler (e.g. for Electron) has been registered.
+   *
+   * @internal
+   */
+  __internal_hasNativeOAuthHandler: boolean;
+
+  /**
+   * Returns the registered native OAuth handler, or null when none is registered.
+   *
+   * @internal
+   */
+  __internal_getNativeOAuthHandler(): import('./electron').NativeOAuthHandler | null;
 }
 
 /** @generateWithEmptyComment */
@@ -1488,6 +1502,17 @@ export type ClerkOptions = ClerkOptionsNavigation &
      * @default undefined
      */
     taskUrls?: Partial<Record<SessionTask['key'], string>>;
+
+    /**
+     * Provide a handler for OAuth/SSO flows in environments where a browser redirect or popup
+     * cannot be used (e.g. Electron, Tauri). When set, Clerk uses the handler's `getRedirectUrl`
+     * as the FAPI `redirectUrl` and calls `open` instead of navigating the browser.
+     *
+     * Intended for use by native desktop SDK wrappers such as `@clerk/electron`.
+     *
+     * @internal
+     */
+    __internal_nativeOAuthHandler?: import('./electron').NativeOAuthHandler;
   };
 
 /** @inline */

@@ -10,7 +10,6 @@ import { web3CallbackErrorHandler } from '@/ui/utils/web3CallbackErrorHandler';
 import { useCoreSignUp, useSignUpContext } from '../../contexts';
 import type { SocialButtonsProps } from '../../elements/SocialButtons';
 import { SocialButtons } from '../../elements/SocialButtons';
-import { useElectronExternalAuth } from '../../hooks/useElectronExternalAuth';
 import { useRouter } from '../../router';
 
 export type SignUpSocialButtonsProps = SocialButtonsProps & {
@@ -24,7 +23,6 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
   const { navigate } = useRouter();
   const card = useCardState();
   const ctx = useSignUpContext();
-  const electronAuth = useElectronExternalAuth();
   const signUp = useCoreSignUp();
   const redirectUrl = ctx.ssoCallbackUrl;
   const redirectUrlComplete = ctx.afterSignUpUrl || '/';
@@ -35,35 +33,8 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
     <SocialButtons
       {...rest}
       showLastAuthenticationStrategy={false}
-      idleAfterDelay={!shouldUsePopup && !electronAuth}
+      idleAfterDelay={!shouldUsePopup && !clerk.__internal_hasNativeOAuthHandler}
       oauthCallback={async (strategy: OAuthStrategy) => {
-        if (electronAuth) {
-          return electronAuth.authenticate({
-            resource: signUp,
-            params: {
-              strategy,
-              redirectUrl,
-              redirectUrlComplete,
-              continueSignUp,
-              unsafeMetadata: ctx.unsafeMetadata,
-              legalAccepted: props.legalAccepted,
-              oidcPrompt: ctx.oidcPrompt,
-            },
-            callbackParams: {
-              signUpUrl: ctx.signUpUrl,
-              signInUrl: ctx.signInUrl,
-              signUpForceRedirectUrl: ctx.afterSignUpUrl,
-              signInForceRedirectUrl: ctx.afterSignInUrl,
-              secondFactorUrl: ctx.secondFactorUrl,
-              continueSignUpUrl: '../continue',
-              verifyEmailAddressUrl: '../verify-email-address',
-              verifyPhoneNumberUrl: '../verify-phone-number',
-              navigateOnSetActive: ctx.navigateOnSetActive,
-              unsafeMetadata: ctx.unsafeMetadata,
-            },
-          });
-        }
-
         if (shouldUsePopup) {
           // We create the popup window here with the `about:blank` URL since some browsers will block popups that are
           // opened within async functions. The `signUpWithPopup` method handles setting the URL of the popup.
@@ -99,8 +70,23 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
             unsafeMetadata: ctx.unsafeMetadata,
             legalAccepted: props.legalAccepted,
             oidcPrompt: ctx.oidcPrompt,
+            __internal_nativeCallbackParams: {
+              signUpUrl: ctx.signUpUrl,
+              signInUrl: ctx.signInUrl,
+              signUpForceRedirectUrl: ctx.afterSignUpUrl,
+              signInForceRedirectUrl: ctx.afterSignInUrl,
+              secondFactorUrl: ctx.secondFactorUrl,
+              continueSignUpUrl: '../continue',
+              verifyEmailAddressUrl: '../verify-email-address',
+              verifyPhoneNumberUrl: '../verify-phone-number',
+              navigateOnSetActive: ctx.navigateOnSetActive,
+              unsafeMetadata: ctx.unsafeMetadata,
+            },
           })
-          .catch(err => handleError(err, [], card.setError));
+          .catch(err => {
+            handleError(err, [], card.setError);
+            throw err;
+          });
       }}
       web3Callback={strategy => {
         if (strategy === 'web3_solana_signature') {

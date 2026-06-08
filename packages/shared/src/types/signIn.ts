@@ -7,11 +7,7 @@ import type {
   VerificationJSON,
 } from './json';
 import type { ValidatePasswordCallbacks } from './passwords';
-import type {
-  AuthenticateWithNativeRedirectParams,
-  AuthenticateWithPopupParams,
-  AuthenticateWithRedirectParams,
-} from './redirects';
+import type { AuthenticateWithPopupParams, AuthenticateWithRedirectParams } from './redirects';
 import type { ClerkResource } from './resource';
 import type {
   AttemptFirstFactorParams,
@@ -70,19 +66,6 @@ export interface SignInResource extends ClerkResource {
   authenticateWithRedirect: (params: AuthenticateWithRedirectParams) => Promise<void>;
 
   authenticateWithPopup: (params: AuthenticateWithPopupParams) => Promise<void>;
-
-  /**
-   * Starts an OAuth or SAML authentication attempt for native redirect transports.
-   *
-   * This prepares the SignIn resource and returns it with an external verification
-   * redirect URL. The caller is responsible for opening that URL outside the current
-   * browser context, waiting for the native callback, and completing the callback.
-   *
-   * @experimental This API is subject to change.
-   */
-  __experimental_authenticateWithNativeRedirect: (
-    params: AuthenticateWithNativeRedirectParams,
-  ) => Promise<SignInResource>;
 
   authenticateWithWeb3: (params: AuthenticateWithWeb3Params) => Promise<SignInResource>;
 

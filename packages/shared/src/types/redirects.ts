@@ -80,6 +80,17 @@ export type AuthenticateWithRedirectParams = {
    * @experimental
    */
   enterpriseConnectionId?: string;
+
+  /**
+   * Post-callback routing params used by the native OAuth flow (e.g. Electron) when no
+   * dedicated sso-callback route mounts to supply them from React context. Ignored when
+   * `__internal_nativeOAuthHandler` is not registered. Typed loosely to avoid a circular
+   * dependency with clerk.ts; the internal caller casts to `HandleOAuthCallbackParams` before
+   * passing to `handleRedirectCallback`.
+   *
+   * @internal
+   */
+  __internal_nativeCallbackParams?: Record<string, unknown>;
 };
 
 export type AuthenticateWithPopupParams = AuthenticateWithRedirectParams & { popup: Window | null };

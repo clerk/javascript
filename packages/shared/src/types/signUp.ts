@@ -1,11 +1,7 @@
 import type { AttemptEmailAddressVerificationParams, PrepareEmailAddressVerificationParams } from './emailAddress';
 import type { ValidatePasswordCallbacks } from './passwords';
 import type { AttemptPhoneNumberVerificationParams, PreparePhoneNumberVerificationParams } from './phoneNumber';
-import type {
-  AuthenticateWithNativeRedirectParams,
-  AuthenticateWithPopupParams,
-  AuthenticateWithRedirectParams,
-} from './redirects';
+import type { AuthenticateWithPopupParams, AuthenticateWithRedirectParams } from './redirects';
 import type { ClerkResource } from './resource';
 import type {
   AttemptVerificationParams,
@@ -100,19 +96,6 @@ export interface SignUpResource extends ClerkResource {
   authenticateWithPopup: (
     params: AuthenticateWithPopupParams & { unsafeMetadata?: SignUpUnsafeMetadata },
   ) => Promise<void>;
-
-  /**
-   * Starts an OAuth or SAML authentication attempt for native redirect transports.
-   *
-   * This prepares the SignUp resource and returns it with an external verification
-   * redirect URL. The caller is responsible for opening that URL outside the current
-   * browser context, waiting for the native callback, and completing the callback.
-   *
-   * @experimental This API is subject to change.
-   */
-  __experimental_authenticateWithNativeRedirect: (
-    params: AuthenticateWithNativeRedirectParams & { unsafeMetadata?: SignUpUnsafeMetadata },
-  ) => Promise<SignUpResource>;
 
   authenticateWithWeb3: (
     params: AuthenticateWithWeb3Params & {

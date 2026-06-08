@@ -1,5 +1,6 @@
 import { appendModalState } from '@clerk/shared/internal/clerk-js/queryStateParams';
 import { useReverification, useUser } from '@clerk/shared/react';
+import { useClerk } from '@clerk/shared/react';
 import type { ExternalAccountResource, OAuthProvider, OAuthScope, OAuthStrategy } from '@clerk/shared/types';
 import { Fragment, useState } from 'react';
 
@@ -8,13 +9,14 @@ import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { ProfileSection } from '@/ui/elements/Section';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import { handleError } from '@/ui/utils/errorHandler';
+import { connectExternalAccountWithTransport } from '@/ui/utils/externalVerificationRedirect';
 
 import { ProviderIcon } from '../../common';
 import { useUserProfileContext } from '../../contexts';
 import { Box, Button, descriptors, Flex, localizationKeys, Text } from '../../customizables';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
-import { useElectronExternalAuth, useEnabledThirdPartyProviders } from '../../hooks';
+import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
 import type { PropsOfComponent } from '../../styledSystem';
 import { AddConnectedAccount } from './ConnectedAccountsMenu';
@@ -97,9 +99,9 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
   const { additionalOAuthScopes, componentName, mode } = useUserProfileContext();
   const { navigate } = useRouter();
   const { user } = useUser();
+  const clerk = useClerk();
   const card = useCardState();
   const accountId = account.id;
-  const electronAuth = useElectronExternalAuth();
 
   const isModal = mode === 'modal';
   const redirectUrl = isModal
@@ -135,26 +137,26 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
     : fallbackErrorMessage;
 
   const reconnect = async () => {
-    const redirectUrl = isModal ? appendModalState({ url: window.location.href, componentName }) : window.location.href;
+    const webRedirectUrl = isModal
+      ? appendModalState({ url: window.location.href, componentName })
+      : window.location.href;
 
     try {
-      if (electronAuth) {
-        await electronAuth.connectExternalAccount({
-          createExternalAccount: nativeRedirectUrl => {
-            if (reauthorizationRequired) {
-              return account.reauthorize({ additionalScopes, redirectUrl: nativeRedirectUrl });
-            }
-
-            return createExternalAccount(nativeRedirectUrl);
-          },
-          user,
-        });
+      const transport = clerk.__internal_getNativeOAuthHandler();
+      if (transport) {
+        const createWithTransport = (nativeRedirectUrl: string) => {
+          if (reauthorizationRequired) {
+            return account.reauthorize({ additionalScopes, redirectUrl: nativeRedirectUrl });
+          }
+          return createExternalAccount(nativeRedirectUrl);
+        };
+        await connectExternalAccountWithTransport({ transport, createExternalAccount: createWithTransport, user });
         return;
       }
 
       let response: ExternalAccountResource | undefined;
       if (reauthorizationRequired) {
-        response = await account.reauthorize({ additionalScopes, redirectUrl });
+        response = await account.reauthorize({ additionalScopes, redirectUrl: webRedirectUrl });
       } else {
         response = await createExternalAccount();
       }

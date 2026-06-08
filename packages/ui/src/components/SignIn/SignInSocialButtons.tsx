@@ -13,7 +13,6 @@ import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { useCardState } from '../../elements/contexts';
 import type { SocialButtonsProps } from '../../elements/SocialButtons';
 import { SocialButtons } from '../../elements/SocialButtons';
-import { useElectronExternalAuth } from '../../hooks/useElectronExternalAuth';
 import { useRouter } from '../../router';
 
 export type SignInSocialButtonsProps = SocialButtonsProps & {
@@ -25,7 +24,6 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
   const { navigate } = useRouter();
   const card = useCardState();
   const ctx = useSignInContext();
-  const electronAuth = useElectronExternalAuth();
   const signIn = useCoreSignIn();
   const redirectUrl = ctx.ssoCallbackUrl;
   const redirectUrlComplete = ctx.afterSignInUrl || '/';
@@ -48,40 +46,16 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
       }
     }
 
-    return _handleError(err, [], card.setError);
+    _handleError(err, [], card.setError);
+    throw err;
   };
 
   return (
     <SocialButtons
       {...rest}
       showLastAuthenticationStrategy
-      idleAfterDelay={!shouldUsePopup && !electronAuth}
+      idleAfterDelay={!shouldUsePopup && !clerk.__internal_hasNativeOAuthHandler}
       oauthCallback={async strategy => {
-        if (electronAuth) {
-          return electronAuth.authenticate({
-            resource: signIn,
-            params: {
-              strategy,
-              redirectUrl,
-              redirectUrlComplete,
-              oidcPrompt: ctx.oidcPrompt,
-            },
-            callbackParams: {
-              signUpUrl: ctx.signUpUrl,
-              signInUrl: ctx.signInUrl,
-              signInForceRedirectUrl: ctx.afterSignInUrl,
-              signUpForceRedirectUrl: ctx.afterSignUpUrl,
-              continueSignUpUrl: ctx.signUpContinueUrl,
-              transferable: ctx.transferable,
-              firstFactorUrl: '../factor-one',
-              secondFactorUrl: '../factor-two',
-              resetPasswordUrl: '../reset-password',
-              navigateOnSetActive: ctx.navigateOnSetActive,
-              unsafeMetadata: ctx.unsafeMetadata,
-            },
-          });
-        }
-
         if (shouldUsePopup) {
           // We create the popup window here with the `about:blank` URL since some browsers will block popups that are
           // opened within async functions. The `signInWithPopup` method handles setting the URL of the popup.
@@ -100,7 +74,25 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
         }
 
         return signIn
-          .authenticateWithRedirect({ strategy, redirectUrl, redirectUrlComplete, oidcPrompt: ctx.oidcPrompt })
+          .authenticateWithRedirect({
+            strategy,
+            redirectUrl,
+            redirectUrlComplete,
+            oidcPrompt: ctx.oidcPrompt,
+            __internal_nativeCallbackParams: {
+              signUpUrl: ctx.signUpUrl,
+              signInUrl: ctx.signInUrl,
+              signInForceRedirectUrl: ctx.afterSignInUrl,
+              signUpForceRedirectUrl: ctx.afterSignUpUrl,
+              continueSignUpUrl: ctx.signUpContinueUrl,
+              transferable: ctx.transferable,
+              firstFactorUrl: '../factor-one',
+              secondFactorUrl: '../factor-two',
+              resetPasswordUrl: '../reset-password',
+              navigateOnSetActive: ctx.navigateOnSetActive,
+              unsafeMetadata: ctx.unsafeMetadata,
+            },
+          })
           .catch(err => handleError(err));
       }}
       web3Callback={strategy => {

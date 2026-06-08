@@ -1,27 +1,29 @@
 import { appendModalState } from '@clerk/shared/internal/clerk-js/queryStateParams';
 import { useReverification, useUser } from '@clerk/shared/react';
+import { useClerk } from '@clerk/shared/react';
 import type { OAuthProvider, OAuthStrategy } from '@clerk/shared/types';
 
 import { useCardState } from '@/ui/elements/contexts';
 import { ProfileSection } from '@/ui/elements/Section';
 import { handleError } from '@/ui/utils/errorHandler';
+import { connectExternalAccountWithTransport } from '@/ui/utils/externalVerificationRedirect';
 import { sleep } from '@/ui/utils/sleep';
 
 import { ProviderIcon } from '../../common';
 import { useUserProfileContext } from '../../contexts';
 import { descriptors, localizationKeys } from '../../customizables';
-import { useElectronExternalAuth, useEnabledThirdPartyProviders } from '../../hooks';
+import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
 
 const ConnectMenuButton = (props: { strategy: OAuthStrategy; onClick?: () => void }) => {
   const { strategy } = props;
+  const clerk = useClerk();
   const card = useCardState();
   const { user } = useUser();
   const { navigate } = useRouter();
   const { strategyToDisplayData } = useEnabledThirdPartyProviders();
   const { additionalOAuthScopes, componentName, mode } = useUserProfileContext();
   const isModal = mode === 'modal';
-  const electronAuth = useElectronExternalAuth();
 
   const createExternalAccount = useReverification((nativeRedirectUrl?: string) => {
     const socialProvider = strategy.replace('oauth_', '') as OAuthProvider;
@@ -42,11 +44,13 @@ const ConnectMenuButton = (props: { strategy: OAuthStrategy; onClick?: () => voi
       return;
     }
 
-    // TODO: Decide if we should keep using this strategy
-    // If yes, refactor and cleanup:
     card.setLoading(strategy);
-    if (electronAuth) {
-      return electronAuth.connectExternalAccount({ createExternalAccount, user }).finally(() => card.setIdle(strategy));
+
+    const transport = clerk.__internal_getNativeOAuthHandler();
+    if (transport) {
+      return connectExternalAccountWithTransport({ transport, createExternalAccount, user }).finally(() =>
+        card.setIdle(strategy),
+      );
     }
 
     return createExternalAccount()

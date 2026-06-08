@@ -604,11 +604,24 @@ describe('SignUp', () => {
         SignUp.clerk = {} as any;
       });
 
-      it('prepares OAuth for native redirect', async () => {
+      it('uses transport getRedirectUrl when external auth transport is active', async () => {
         const externalVerificationRedirectURL = new URL('https://accounts.example.com/oauth');
+        const nativeCallbackUrl = 'myapp://sso-callback?rotating_token_nonce=test-nonce';
+        const mockTransport = {
+          getRedirectUrl: vi.fn().mockResolvedValue('myapp://sso-callback'),
+          open: vi.fn().mockResolvedValue({ callbackUrl: nativeCallbackUrl }),
+        };
+
+        SignUp.clerk = {
+          buildUrlWithAuth: vi.fn().mockReturnValue('https://web-app.com/sso-callback'),
+          __internal_getNativeOAuthHandler: () => mockTransport,
+          __internal_handleNativeOAuthCallback: vi.fn().mockResolvedValue(undefined),
+          __internal_environment: {
+            displayConfig: { captchaOauthBypass: [] },
+          },
+        } as any;
 
         const signUp = new SignUp();
-
         vi.spyOn(signUp, 'create').mockImplementation(async () => {
           signUp.verifications.externalAccount = {
             status: 'unverified',
@@ -616,15 +629,17 @@ describe('SignUp', () => {
           } as any;
           return signUp;
         });
+        vi.spyOn(signUp, 'reload').mockResolvedValue(signUp);
 
-        const res = await signUp.__experimental_authenticateWithNativeRedirect({
+        await signUp.authenticateWithRedirect({
           strategy: 'oauth_google',
-          redirectUrl: 'myapp://sso-callback',
+          redirectUrl: 'http://web-app.com/sso-callback',
           redirectUrlComplete: '/',
           unsafeMetadata: { plan: 'pro' },
           legalAccepted: true,
         });
 
+        expect(SignUp.clerk.__internal_handleNativeOAuthCallback).toHaveBeenCalledWith(signUp, {});
         expect(signUp.create).toHaveBeenCalledWith({
           strategy: 'oauth_google',
           redirectUrl: 'myapp://sso-callback',
@@ -635,14 +650,25 @@ describe('SignUp', () => {
           oidcPrompt: undefined,
           enterpriseConnectionId: undefined,
         });
-        expect(res).toBe(signUp);
-        expect(signUp.verifications.externalAccount.externalVerificationRedirectURL).toBe(
-          externalVerificationRedirectURL,
-        );
+        expect(mockTransport.open).toHaveBeenCalledWith(externalVerificationRedirectURL);
       });
 
-      it('continues sign up for native redirect', async () => {
+      it('uses transport getRedirectUrl when continuing a sign-up with external auth', async () => {
         const externalVerificationRedirectURL = new URL('https://accounts.example.com/oauth');
+        const nativeCallbackUrl = 'myapp://sso-callback?rotating_token_nonce=test-nonce';
+        const mockTransport = {
+          getRedirectUrl: vi.fn().mockResolvedValue('myapp://sso-callback'),
+          open: vi.fn().mockResolvedValue({ callbackUrl: nativeCallbackUrl }),
+        };
+
+        SignUp.clerk = {
+          buildUrlWithAuth: vi.fn().mockReturnValue('https://web-app.com/sso-callback'),
+          __internal_getNativeOAuthHandler: () => mockTransport,
+          __internal_handleNativeOAuthCallback: vi.fn().mockResolvedValue(undefined),
+          __internal_environment: {
+            displayConfig: { captchaOauthBypass: [] },
+          },
+        } as any;
 
         const signUp = new SignUp({ id: 'signup_123', status: 'missing_requirements' } as any);
         vi.spyOn(signUp, 'create');
@@ -653,14 +679,16 @@ describe('SignUp', () => {
           } as any;
           return signUp;
         });
+        vi.spyOn(signUp, 'reload').mockResolvedValue(signUp);
 
-        await signUp.__experimental_authenticateWithNativeRedirect({
+        await signUp.authenticateWithRedirect({
           strategy: 'oauth_google',
-          redirectUrl: 'myapp://sso-callback',
+          redirectUrl: 'http://web-app.com/sso-callback',
           redirectUrlComplete: '/',
           continueSignUp: true,
         });
 
+        expect(SignUp.clerk.__internal_handleNativeOAuthCallback).toHaveBeenCalledWith(signUp, {});
         expect(signUp.create).not.toHaveBeenCalled();
         expect(signUp.update).toHaveBeenCalledWith({
           strategy: 'oauth_google',
@@ -672,9 +700,7 @@ describe('SignUp', () => {
           oidcPrompt: undefined,
           enterpriseConnectionId: undefined,
         });
-        expect(signUp.verifications.externalAccount.externalVerificationRedirectURL).toBe(
-          externalVerificationRedirectURL,
-        );
+        expect(mockTransport.open).toHaveBeenCalledWith(externalVerificationRedirectURL);
       });
 
       it('handles relative redirectUrl by converting to absolute', async () => {

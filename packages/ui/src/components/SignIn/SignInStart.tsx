@@ -421,6 +421,19 @@ function SignInStartInternal(): JSX.Element {
       redirectUrlComplete,
       oidcPrompt: ctx.oidcPrompt,
       continueSignIn: true,
+      __internal_nativeCallbackParams: {
+        signUpUrl: ctx.signUpUrl,
+        signInUrl: ctx.signInUrl,
+        signInForceRedirectUrl: ctx.afterSignInUrl,
+        signUpForceRedirectUrl: ctx.afterSignUpUrl,
+        continueSignUpUrl: ctx.signUpContinueUrl,
+        transferable: ctx.transferable,
+        firstFactorUrl: '../factor-one',
+        secondFactorUrl: '../factor-two',
+        resetPasswordUrl: '../reset-password',
+        navigateOnSetActive: ctx.navigateOnSetActive,
+        unsafeMetadata: ctx.unsafeMetadata,
+      },
     });
   };
 

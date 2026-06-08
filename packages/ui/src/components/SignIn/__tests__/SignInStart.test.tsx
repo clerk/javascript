@@ -285,96 +285,65 @@ describe('SignInStart', () => {
       });
     });
 
-    it('uses the Electron bridge for OAuth sign-in', async () => {
+    it('passes native callback params to authenticateWithRedirect when external auth transport is active', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withSocialProvider({ provider: 'google' });
       });
 
-      const electron = {
-        getRedirectUrl: vi.fn(() => Promise.resolve('myapp://auth/callback')),
-        openExternal: vi.fn(() => Promise.resolve()),
-        waitForRedirectCallback: vi.fn(() => Promise.resolve('myapp://auth/callback?rotating_token_nonce=test-nonce')),
-      };
-      window.__clerk_internal_electron = electron;
-      fixtures.clerk.__experimental_handleNativeRedirectCallback.mockResolvedValueOnce(undefined);
-      fixtures.signIn.__experimental_authenticateWithNativeRedirect.mockImplementationOnce(async () => {
-        fixtures.signIn.status = 'complete';
-        fixtures.signIn.createdSessionId = 'sess_external';
-        fixtures.signIn.firstFactorVerification.externalVerificationRedirectURL = new URL(
-          'https://accounts.example.com',
-        );
-        return fixtures.signIn;
+      // Simulate the transport being registered (normally happens in clerk.load() when bridge is present).
+      Object.defineProperty(fixtures.clerk, '__internal_hasNativeOAuthHandler', {
+        get: () => true,
+        configurable: true,
       });
-      vi.spyOn(fixtures.signIn, 'reload').mockResolvedValueOnce(fixtures.signIn);
 
       render(<SignInStart />, { wrapper });
       fireEvent.click(screen.getByText('Continue with Google'));
 
       await waitFor(() => {
-        expect(fixtures.signIn.__experimental_authenticateWithNativeRedirect).toHaveBeenCalledWith({
-          strategy: 'oauth_google',
-          redirectUrl: 'myapp://auth/callback',
-          redirectUrlComplete: '/',
-          oidcPrompt: undefined,
-        });
+        expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledWith(
+          expect.objectContaining({
+            strategy: 'oauth_google',
+            __internal_nativeCallbackParams: expect.objectContaining({
+              signInUrl: 'https://dashboard.clerk.com/sign-in',
+              signUpUrl: 'https://dashboard.clerk.com/sign-up',
+              signInForceRedirectUrl: '/',
+              signUpForceRedirectUrl: '/',
+              transferable: true,
+              firstFactorUrl: '../factor-one',
+              secondFactorUrl: '../factor-two',
+              resetPasswordUrl: '../reset-password',
+              navigateOnSetActive: expect.any(Function),
+              unsafeMetadata: undefined,
+            }),
+          }),
+        );
       });
-      expect(electron.openExternal).toHaveBeenCalledWith('https://accounts.example.com/');
-      expect(electron.waitForRedirectCallback).toHaveBeenCalled();
-      expect(fixtures.signIn.reload).toHaveBeenCalledWith({ rotatingTokenNonce: 'test-nonce' });
-      expect(fixtures.signIn.authenticateWithRedirect).not.toHaveBeenCalled();
-      expect(fixtures.clerk.__experimental_handleNativeRedirectCallback).toHaveBeenCalledWith(
-        fixtures.signIn,
-        {
-          signUpUrl: 'https://dashboard.clerk.com/sign-up',
-          signInUrl: 'https://dashboard.clerk.com/sign-in',
-          signInForceRedirectUrl: '/',
-          signUpForceRedirectUrl: '/',
-          continueSignUpUrl: 'https://dashboard.clerk.com/sign-up#/continue',
-          transferable: true,
-          firstFactorUrl: '../factor-one',
-          secondFactorUrl: '../factor-two',
-          resetPasswordUrl: '../reset-password',
-          navigateOnSetActive: expect.any(Function),
-          unsafeMetadata: undefined,
-        },
-        expect.any(Function),
-      );
-      expect(fixtures.clerk.setActive).not.toHaveBeenCalled();
     });
 
-    it('clears the Electron OAuth sign-in loading state when the callback has no nonce or error', async () => {
+    it('clears the loading state when native OAuth sign-in fails', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withSocialProvider({ provider: 'google' });
       });
 
-      const electron = {
-        getRedirectUrl: vi.fn(() => Promise.resolve('myapp://auth/callback')),
-        openExternal: vi.fn(() => Promise.resolve()),
-        waitForRedirectCallback: vi.fn(() => Promise.resolve('myapp://auth/callback')),
-      };
-      window.__clerk_internal_electron = electron;
-      fixtures.signIn.__experimental_authenticateWithNativeRedirect.mockImplementationOnce(async () => {
-        fixtures.signIn.firstFactorVerification.externalVerificationRedirectURL = new URL(
-          'https://accounts.example.com',
-        );
-        return fixtures.signIn;
+      // Simulate the transport being registered so idleAfterDelay is disabled.
+      Object.defineProperty(fixtures.clerk, '__internal_hasNativeOAuthHandler', {
+        get: () => true,
+        configurable: true,
       });
-      vi.spyOn(fixtures.signIn, 'reload').mockResolvedValueOnce(fixtures.signIn);
+
+      fixtures.signIn.authenticateWithRedirect.mockRejectedValueOnce(
+        new ClerkAPIResponseError('Unable to complete authentication', {
+          data: [{ code: 'native_redirect_incomplete', message: 'Native redirect incomplete', long_message: '' }],
+          status: 400,
+        }),
+      );
 
       render(<SignInStart />, { wrapper });
       fireEvent.click(screen.getByText('Continue with Google'));
 
       await waitFor(() => {
-        expect(electron.openExternal).toHaveBeenCalledWith('https://accounts.example.com/');
+        expect(screen.getByText('Continue with Google').closest('button')).not.toBeDisabled();
       });
-      await waitFor(
-        () => {
-          expect(screen.getByText('Continue with Google').closest('button')).not.toBeDisabled();
-        },
-        { timeout: 6_000 },
-      );
-      expect(fixtures.signIn.reload).toHaveBeenCalledWith();
-      expect(fixtures.clerk.__experimental_handleNativeRedirectCallback).not.toHaveBeenCalled();
     });
   });
 
@@ -451,12 +420,14 @@ describe('SignInStart', () => {
       await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
       await userEvent.click(screen.getByText('Continue'));
       expect(fixtures.signIn.create).toHaveBeenCalled();
-      expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledWith({
-        strategy: 'enterprise_sso',
-        redirectUrl: 'http://localhost:3000/#/sso-callback',
-        redirectUrlComplete: '/',
-        continueSignIn: true,
-      });
+      expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledWith(
+        expect.objectContaining({
+          strategy: 'enterprise_sso',
+          redirectUrl: 'http://localhost:3000/#/sso-callback',
+          redirectUrlComplete: '/',
+          continueSignIn: true,
+        }),
+      );
     });
   });
 
