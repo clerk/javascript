@@ -204,7 +204,7 @@ FooterContinue.displayName = 'Step.Footer.Continue';
  * footers, which have their own (linear) wizard. That is what kills the old
  * per-step nested-binding trap.
  *
- * `marginInlineStart: 'auto'` pushes it to the far-left of the `justify='end'`
+ * `marginInlineEnd: 'auto'` pushes it to the far-left of the `justify='end'`
  * footer row, matching the prior destructive affordance.
  */
 const FooterReset = (): JSX.Element | null => {
@@ -225,7 +225,7 @@ const FooterReset = (): JSX.Element | null => {
         colorScheme='danger'
         onClick={() => setIsOpen(true)}
         localizationKey={localizationKeys('configureSSO.confirmation.resetSection.title')}
-        sx={{ marginInlineStart: 'auto' }}
+        sx={{ marginInlineEnd: 'auto' }}
       />
       <ResetConnectionDialog
         isOpen={isOpen}
