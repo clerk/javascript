@@ -1,13 +1,72 @@
-import type { BillingMoneyAmountJSON, BillingPaymentTotalsJSON } from '@clerk/shared/types';
+import type {
+  BillingMoneyAmountJSON,
+  BillingPaymentTotalsJSON,
+  BillingSubscriptionItemNextPaymentJSON,
+  BillingSubscriptionNextPaymentJSON,
+  BillingTotalsJSON,
+} from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
-import { billingPaymentTotalsFromJSON } from '../billing';
+import {
+  billingPaymentTotalsFromJSON,
+  billingSubscriptionItemNextPaymentFromJSON,
+  billingSubscriptionNextPaymentFromJSON,
+} from '../billing';
 
 const moneyJSON = (amount: number): BillingMoneyAmountJSON => ({
   amount,
   amount_formatted: (amount / 100).toFixed(2),
   currency: 'USD',
   currency_symbol: '$',
+});
+
+const nextPaymentTotalsJSON = (): BillingTotalsJSON => ({
+  subtotal: moneyJSON(5000),
+  base_fee: moneyJSON(1000),
+  tax_total: moneyJSON(500),
+  grand_total: moneyJSON(5500),
+  credits: {
+    proration: null,
+    payer: {
+      remaining_balance: moneyJSON(2000),
+      applied_amount: moneyJSON(1000),
+    },
+    total: moneyJSON(1000),
+  },
+  discounts: {
+    proration: {
+      amount: moneyJSON(500),
+      cycle_days_passed: 15,
+      cycle_days_total: 30,
+      cycle_passed_percent: 50,
+    },
+    total: moneyJSON(500),
+  },
+  total_due_after_free_trial: null,
+  credit: null,
+  past_due: null,
+  total_due_now: moneyJSON(4500),
+  per_unit_totals: [
+    {
+      name: 'seats',
+      block_size: 1,
+      tiers: [{ quantity: 5, fee_per_block: moneyJSON(1000), total: moneyJSON(5000) }],
+    },
+  ],
+  totals_due_per_period: {
+    subtotal: moneyJSON(10000),
+    base_fee: moneyJSON(1000),
+    tax_total: moneyJSON(1000),
+    grand_total: moneyJSON(11000),
+    per_unit_totals: [
+      {
+        name: 'seats',
+        block_size: 1,
+        tiers: [{ quantity: 10, fee_per_block: moneyJSON(1000), total: moneyJSON(10000) }],
+      },
+    ],
+  },
+  total_due_per_period: moneyJSON(11000),
 });
 
 describe('billingPaymentTotalsFromJSON', () => {
@@ -66,5 +125,102 @@ describe('billingPaymentTotalsFromJSON', () => {
       total: { amount: 5000 },
     });
     expect(totals.perUnitTotals?.[0].tiers[1].quantity).toBeNull();
+  });
+});
+
+describe('billingSubscriptionNextPaymentFromJSON', () => {
+  it('maps amount, date, and per_unit_totals', () => {
+    const data: BillingSubscriptionNextPaymentJSON = {
+      amount: moneyJSON(5000),
+      date: 1_609_459_200_000,
+      per_unit_totals: [
+        {
+          name: 'seats',
+          block_size: 1,
+          tiers: [{ quantity: 5, fee_per_block: moneyJSON(1000), total: moneyJSON(5000) }],
+        },
+      ],
+      totals: nextPaymentTotalsJSON(),
+    };
+
+    const nextPayment = billingSubscriptionNextPaymentFromJSON(data);
+
+    expect(nextPayment.amount.amount).toBe(5000);
+    expect(nextPayment.date).toEqual(new Date('2021-01-01T00:00:00.000Z'));
+    expect(nextPayment.perUnitTotals?.[0]).toMatchObject({
+      name: 'seats',
+      blockSize: 1,
+      tiers: [{ quantity: 5, feePerBlock: { amount: 1000 }, total: { amount: 5000 } }],
+    });
+    expect(nextPayment.totals).toMatchObject({
+      subtotal: { amount: 5000 },
+      baseFee: { amount: 1000 },
+      taxTotal: { amount: 500 },
+      grandTotal: { amount: 5500 },
+      totalDueAfterFreeTrial: null,
+      credit: null,
+      pastDue: null,
+      totalDueNow: { amount: 4500 },
+      totalDuePerPeriod: { amount: 11000 },
+      credits: {
+        payer: {
+          remainingBalance: { amount: 2000 },
+          appliedAmount: { amount: 1000 },
+        },
+        total: { amount: 1000 },
+      },
+      discounts: {
+        proration: {
+          amount: { amount: 500 },
+          cycleDaysPassed: 15,
+          cycleDaysTotal: 30,
+          cyclePassedPercent: 50,
+        },
+        total: { amount: 500 },
+      },
+      perUnitTotals: [{ name: 'seats', blockSize: 1 }],
+      totalsDuePerPeriod: {
+        subtotal: { amount: 10000 },
+        baseFee: { amount: 1000 },
+        taxTotal: { amount: 1000 },
+        grandTotal: { amount: 11000 },
+        perUnitTotals: [{ name: 'seats', blockSize: 1 }],
+      },
+    });
+  });
+});
+
+describe('billingSubscriptionItemNextPaymentFromJSON', () => {
+  it('maps amount, date, and per_unit_totals', () => {
+    const data: BillingSubscriptionItemNextPaymentJSON = {
+      amount: moneyJSON(5000),
+      date: 1_609_459_200_000,
+      per_unit_totals: [
+        {
+          name: 'seats',
+          block_size: 1,
+          tiers: [{ quantity: 5, fee_per_block: moneyJSON(1000), total: moneyJSON(5000) }],
+        },
+      ],
+      totals: nextPaymentTotalsJSON(),
+    };
+
+    const nextPayment = billingSubscriptionItemNextPaymentFromJSON(data);
+
+    expect(nextPayment.amount.amount).toBe(5000);
+    expect(nextPayment.date).toEqual(new Date('2021-01-01T00:00:00.000Z'));
+    expect(nextPayment.perUnitTotals?.[0]).toMatchObject({
+      name: 'seats',
+      blockSize: 1,
+      tiers: [{ quantity: 5, feePerBlock: { amount: 1000 }, total: { amount: 5000 } }],
+    });
+    expect(nextPayment.totals).toMatchObject({
+      subtotal: { amount: 5000 },
+      baseFee: { amount: 1000 },
+      totalDueNow: { amount: 4500 },
+      credits: { total: { amount: 1000 } },
+      discounts: { total: { amount: 500 } },
+      perUnitTotals: [{ name: 'seats', blockSize: 1 }],
+    });
   });
 });

@@ -1,16 +1,16 @@
 import type {
-  BillingCheckoutDiscounts,
-  BillingCheckoutDiscountsJSON,
   BillingCheckoutTotals,
   BillingCheckoutTotalsJSON,
   BillingCredits,
   BillingCreditsJSON,
+  BillingDiscounts,
+  BillingDiscountsJSON,
   BillingMoneyAmount,
   BillingMoneyAmountJSON,
   BillingPaymentTotals,
   BillingPaymentTotalsJSON,
-  BillingPerPeriodTotals,
-  BillingPerPeriodTotalsJSON,
+  BillingPeriodTotals,
+  BillingPeriodTotalsJSON,
   BillingPerUnitTotal,
   BillingPerUnitTotalJSON,
   BillingPerUnitTotalTier,
@@ -18,7 +18,15 @@ import type {
   BillingPlanUnitPriceJSON,
   BillingStatementTotals,
   BillingStatementTotalsJSON,
+  BillingSubscriptionItemNextPayment,
+  BillingSubscriptionItemNextPaymentJSON,
+  BillingSubscriptionNextPayment,
+  BillingSubscriptionNextPaymentJSON,
+  BillingTotals,
+  BillingTotalsJSON,
 } from '@clerk/shared/types';
+
+import { unixEpochToDate } from './date';
 
 export const billingMoneyAmountFromJSON = (data: BillingMoneyAmountJSON): BillingMoneyAmount => {
   return {
@@ -86,7 +94,7 @@ export const billingCreditsFromJSON = (data: BillingCreditsJSON): BillingCredits
   };
 };
 
-const billingCheckoutDiscountsFromJSON = (data: BillingCheckoutDiscountsJSON): BillingCheckoutDiscounts => {
+const billingDiscountsFromJSON = (data: BillingDiscountsJSON): BillingDiscounts => {
   return {
     proration: data.proration
       ? {
@@ -100,7 +108,7 @@ const billingCheckoutDiscountsFromJSON = (data: BillingCheckoutDiscountsJSON): B
   };
 };
 
-const billingPerPeriodTotalsFromJSON = (data: BillingPerPeriodTotalsJSON): BillingPerPeriodTotals => {
+const billingPeriodTotalsFromJSON = (data: BillingPeriodTotalsJSON): BillingPeriodTotals => {
   return {
     subtotal: billingMoneyAmountFromJSON(data.subtotal),
     baseFee: billingMoneyAmountFromJSON(data.base_fee),
@@ -110,7 +118,48 @@ const billingPerPeriodTotalsFromJSON = (data: BillingPerPeriodTotalsJSON): Billi
   };
 };
 
-export const billingTotalsFromJSON = <T extends BillingStatementTotalsJSON | BillingCheckoutTotalsJSON>(
+export const billingTotalsFromJSON = (data: BillingTotalsJSON): BillingTotals => {
+  return {
+    subtotal: billingMoneyAmountFromJSON(data.subtotal),
+    baseFee: data.base_fee ? billingMoneyAmountFromJSON(data.base_fee) : null,
+    taxTotal: billingMoneyAmountFromJSON(data.tax_total),
+    grandTotal: billingMoneyAmountFromJSON(data.grand_total),
+    totalDueAfterFreeTrial: data.total_due_after_free_trial
+      ? billingMoneyAmountFromJSON(data.total_due_after_free_trial)
+      : null,
+    credit: data.credit ? billingMoneyAmountFromJSON(data.credit) : data.credit,
+    credits: data.credits ? billingCreditsFromJSON(data.credits) : null,
+    discounts: data.discounts ? billingDiscountsFromJSON(data.discounts) : null,
+    pastDue: data.past_due ? billingMoneyAmountFromJSON(data.past_due) : data.past_due,
+    totalDueNow: data.total_due_now ? billingMoneyAmountFromJSON(data.total_due_now) : undefined,
+    perUnitTotals: data.per_unit_totals ? billingPerUnitTotalsFromJSON(data.per_unit_totals) : undefined,
+    totalsDuePerPeriod: data.totals_due_per_period
+      ? billingPeriodTotalsFromJSON(data.totals_due_per_period)
+      : undefined,
+    totalDuePerPeriod: data.total_due_per_period ? billingMoneyAmountFromJSON(data.total_due_per_period) : undefined,
+  };
+};
+
+const billingNextPaymentFromJSON = (
+  data: BillingSubscriptionNextPaymentJSON | BillingSubscriptionItemNextPaymentJSON,
+) => {
+  return {
+    amount: billingMoneyAmountFromJSON(data.amount),
+    date: unixEpochToDate(data.date),
+    perUnitTotals: data.per_unit_totals ? billingPerUnitTotalsFromJSON(data.per_unit_totals) : undefined,
+    totals: data.totals ? billingTotalsFromJSON(data.totals) : undefined,
+  };
+};
+
+export const billingSubscriptionNextPaymentFromJSON = (
+  data: BillingSubscriptionNextPaymentJSON,
+): BillingSubscriptionNextPayment => billingNextPaymentFromJSON(data);
+
+export const billingSubscriptionItemNextPaymentFromJSON = (
+  data: BillingSubscriptionItemNextPaymentJSON,
+): BillingSubscriptionItemNextPayment => billingNextPaymentFromJSON(data);
+
+export const billingStatementTotalsFromJSON = <T extends BillingStatementTotalsJSON | BillingCheckoutTotalsJSON>(
   data: T,
 ): T extends { total_due_now: BillingMoneyAmountJSON } ? BillingCheckoutTotals : BillingStatementTotals => {
   const totals: Partial<BillingCheckoutTotals & BillingStatementTotals> = {
@@ -146,7 +195,7 @@ export const billingTotalsFromJSON = <T extends BillingStatementTotalsJSON | Bil
   }
 
   if ('discounts' in data) {
-    totals.discounts = data.discounts ? billingCheckoutDiscountsFromJSON(data.discounts) : null;
+    totals.discounts = data.discounts ? billingDiscountsFromJSON(data.discounts) : null;
   }
 
   if ('total_due_per_period' in data && data.total_due_per_period) {
@@ -154,7 +203,7 @@ export const billingTotalsFromJSON = <T extends BillingStatementTotalsJSON | Bil
   }
 
   if ('totals_due_per_period' in data && data.totals_due_per_period) {
-    totals.totalsDuePerPeriod = billingPerPeriodTotalsFromJSON(data.totals_due_per_period);
+    totals.totalsDuePerPeriod = billingPeriodTotalsFromJSON(data.totals_due_per_period);
   }
 
   return totals as T extends { total_due_now: BillingMoneyAmountJSON } ? BillingCheckoutTotals : BillingStatementTotals;
