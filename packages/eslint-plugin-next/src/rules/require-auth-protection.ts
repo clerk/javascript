@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
 import type { TSESTree } from '@typescript-eslint/utils';
 import type { Rule } from 'eslint';
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
 /**
  * Resolve a module's exports to the function target that will run when the framework dispatches.
  */

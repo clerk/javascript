@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
 /**
  * AST detection for "is this function protected at its top?"
  */

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
 /**
  * Utilities for classifying a file by path, kind, and module-level directives.
  */
