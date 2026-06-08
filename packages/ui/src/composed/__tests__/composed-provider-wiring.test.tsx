@@ -1,6 +1,8 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { setModuleManager as setModuleManagerShared } from '@clerk/shared/moduleManager';
+import { act } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { useModuleManager } from '@/ui/contexts';
+import { useModuleManager, useOptions } from '@/ui/contexts';
 import { useAppearance } from '@/ui/customizables/AppearanceContext';
 import { setModuleManager } from '@/ui/internal/moduleManagerStore';
 import { useRouter } from '@/ui/router';
@@ -98,6 +100,85 @@ describe('UserProfileProvider wiring', () => {
     expect(probe.dataset.hasBaseNavigate).toBe('true');
   });
 
+  describe('router.currentPath reactivity', () => {
+    let originalPath: string;
+
+    beforeEach(() => {
+      originalPath = window.location.pathname;
+    });
+
+    afterEach(() => {
+      window.history.replaceState(null, '', originalPath);
+    });
+
+    function CurrentPathProbe() {
+      const router = useRouter();
+      return (
+        <div
+          data-testid='path-probe'
+          data-current={router.currentPath}
+        />
+      );
+    }
+
+    it('updates router.currentPath on popstate so navigation-keyed effects re-fire', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+      });
+      patchEnvironment(fixtures.clerk, fixtures.environment);
+
+      window.history.replaceState(null, '', '/page-a');
+
+      render(
+        <UserProfileProvider>
+          <CurrentPathProbe />
+        </UserProfileProvider>,
+        { wrapper },
+      );
+
+      expect(screen.getByTestId('path-probe').dataset.current).toBe('/page-a');
+
+      act(() => {
+        window.history.pushState(null, '', '/page-b');
+        window.dispatchEvent(new PopStateEvent('popstate'));
+      });
+
+      expect(screen.getByTestId('path-probe').dataset.current).toBe('/page-b');
+    });
+  });
+
+  // Registering through @clerk/shared/moduleManager is the same channel
+  // clerk-js's constructor uses (`setModuleManager(this, this.#moduleManager)`),
+  // so a passing test here proves composed UserProfile picks up the
+  // bootstrap-registered moduleManager without `<ClerkProvider ui={ui} />`.
+  it('resolves a moduleManager registered through @clerk/shared, not just via ClerkUI', async () => {
+    const mockImport = vi.fn(() => Promise.resolve(undefined));
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+    });
+    patchEnvironment(fixtures.clerk, fixtures.environment);
+    setModuleManagerShared(fixtures.clerk, { import: mockImport } as any);
+
+    function ModuleManagerIdentityProbe() {
+      const mm = useModuleManager();
+      return (
+        <div
+          data-testid='mm-identity-probe'
+          data-is-mock={String(mm?.import === mockImport)}
+        />
+      );
+    }
+
+    render(
+      <UserProfileProvider>
+        <ModuleManagerIdentityProbe />
+      </UserProfileProvider>,
+      { wrapper },
+    );
+
+    expect(screen.getByTestId('mm-identity-probe').dataset.isMock).toBe('true');
+  });
+
   it('returns null when user is not loaded', async () => {
     const { wrapper, fixtures } = await createFixtures();
     patchEnvironment(fixtures.clerk, fixtures.environment);
@@ -146,6 +227,43 @@ describe('UserProfileProvider wiring', () => {
     const probe = screen.getByTestId('appearance-probe');
     // #ff0000 = hsla(0, 100%, 50%, 1) — the global appearance should cascade
     expect(probe.dataset.colorPrimary).toBe('hsla(0, 100%, 50%, 1)');
+  });
+
+  it('threads localization from ClerkProvider into composed OptionsProvider', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'], first_name: 'Test', last_name: 'User' });
+    });
+    patchEnvironment(fixtures.clerk, fixtures.environment);
+
+    const expectedLocalization = { locale: 'fr-FR', signIn: { start: { title: 'Bienvenue' } } };
+    const expectedSupportEmail = 'help@clerk.dev';
+    fixtures.clerk.__internal_getOption = vi.fn((key: string) => {
+      if (key === 'localization') return expectedLocalization;
+      if (key === 'supportEmail') return expectedSupportEmail;
+      return undefined;
+    });
+
+    function OptionsProbe() {
+      const options = useOptions();
+      return (
+        <div
+          data-testid='options-probe'
+          data-locale={(options.localization as any)?.locale ?? ''}
+          data-support-email={options.supportEmail ?? ''}
+        />
+      );
+    }
+
+    render(
+      <UserProfileProvider>
+        <OptionsProbe />
+      </UserProfileProvider>,
+      { wrapper },
+    );
+
+    const probe = screen.getByTestId('options-probe');
+    expect(probe.dataset.locale).toBe('fr-FR');
+    expect(probe.dataset.supportEmail).toBe(expectedSupportEmail);
   });
 
   it('returns null when environment is missing', async () => {

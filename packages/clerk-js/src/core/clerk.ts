@@ -39,6 +39,7 @@ import { warnings } from '@clerk/shared/internal/clerk-js/warnings';
 import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import { logger } from '@clerk/shared/logger';
+import { setModuleManager } from '@clerk/shared/moduleManager';
 import { CLERK_NETLIFY_CACHE_BUST_PARAM } from '@clerk/shared/netlifyCacheHandler';
 import {
   AUTO_PROXY_PATH,
@@ -471,6 +472,11 @@ export class Clerk implements ClerkInterface {
     this.environment = Environment.getInstance();
     this.#instanceType = publishableKey.instanceType;
     this.#publishableKey = key;
+
+    // Register the internal ModuleManager so @clerk/ui can resolve it without
+    // depending on @clerk/ui's ClerkUI being mounted. Keeps the clerk-js public
+    // ABI unchanged (opaque WeakMap storage rather than a class member).
+    setModuleManager(this, this.#moduleManager);
 
     this.#fapiClient = createFapiClient({
       domain: this.domain,
