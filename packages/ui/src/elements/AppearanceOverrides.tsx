@@ -7,8 +7,9 @@ export const AppearanceOverrides = ({ elements, children }: { elements: Elements
   const appearance = useAppearance();
 
   const augmented = React.useMemo(() => {
-    const newParsedElements = [appearance.parsedElements[0], elements, ...appearance.parsedElements.slice(1)];
-    return { ...appearance, parsedElements: newParsedElements };
+    // position 0 is the base theme; overrides slot in immediately above it
+    const [base, ...rest] = appearance.parsedElements;
+    return { ...appearance, parsedElements: [base, elements, ...rest] };
   }, [appearance, elements]);
 
   return <AppearanceContext.Provider value={{ value: augmented }}>{children}</AppearanceContext.Provider>;
