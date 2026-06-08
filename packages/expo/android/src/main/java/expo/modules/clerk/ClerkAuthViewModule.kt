@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import com.clerk.api.Clerk
+import com.clerk.ui.auth.AuthMode
 import com.clerk.ui.auth.AuthView
 import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.modules.Module
@@ -55,12 +56,13 @@ class ClerkAuthNativeView(context: Context, appContext: AppContext) : ClerkCompo
 
   @Composable
   override fun Content() {
-    debugLog(TAG, "setupView - isDismissible: $isDismissible, activity: $activity")
+    debugLog(TAG, "setupView - mode: $mode, isDismissible: $isDismissible, activity: $activity")
 
     AuthView(
       modifier = Modifier.fillMaxSize(),
       clerkTheme = Clerk.customTheme,
-      isDismissable = isDismissible,
+      mode = authMode(mode),
+      isDismissible = isDismissible,
       onDismiss = ::sendDismissEvent,
       onAuthComplete = {
         sendDismissEvent()
@@ -77,6 +79,12 @@ class ClerkAuthNativeView(context: Context, appContext: AppContext) : ClerkCompo
     dismissalEventSent = true
     sendEvent("dismissed")
   }
+
+  private fun authMode(mode: String?): AuthMode = when (mode) {
+    "signIn" -> AuthMode.SignIn
+    "signUp" -> AuthMode.SignUp
+    else -> AuthMode.SignInOrUp
+  }
 }
 
 class ClerkAuthViewModule : Module() {
@@ -87,8 +95,6 @@ class ClerkAuthViewModule : Module() {
       Events("onAuthEvent")
 
       Prop("mode") { view: ClerkAuthNativeView, mode: String? ->
-        // clerk-android AuthView does not currently expose a public mode parameter.
-        // Keep this prop as an intentional no-op for cross-platform API parity.
         view.mode = mode
       }
 

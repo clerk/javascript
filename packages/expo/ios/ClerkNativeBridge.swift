@@ -500,7 +500,7 @@ struct ClerkInlineAuthWrapperView: View {
   @Environment(\.colorScheme) private var colorScheme
 
   private var themedAuthView: some View {
-    let view = AuthView(mode: mode, isDismissable: dismissible)
+    let view = AuthView(mode: mode, isDismissible: dismissible)
       .environment(Clerk.shared)
     let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
     return Group {
@@ -552,7 +552,7 @@ struct ClerkInlineProfileWrapperView: View {
   @Environment(\.colorScheme) private var colorScheme
 
   var body: some View {
-    let view = UserProfileView(isDismissable: dismissible)
+    let view = UserProfileView(isDismissible: dismissible)
       .environment(Clerk.shared)
     let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
     let themedView = Group {
