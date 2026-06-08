@@ -2,7 +2,6 @@ import { getFullName } from '@clerk/shared/internal/clerk-js/user';
 import type {
   BackupCodeJSON,
   BackupCodeResource,
-  ClerkPaginatedResponse,
   CreateEmailAddressParams,
   CreateExternalAccountParams,
   CreatePhoneNumberParams,
@@ -13,15 +12,9 @@ import type {
   EnterpriseAccountResource,
   EnterpriseConnectionJSON,
   EnterpriseConnectionResource,
-  EnterpriseConnectionTestRunInitJSON,
-  EnterpriseConnectionTestRunInitResource,
-  EnterpriseConnectionTestRunJSON,
-  EnterpriseConnectionTestRunResource,
-  EnterpriseConnectionTestRunsPaginatedJSON,
   ExternalAccountJSON,
   ExternalAccountResource,
   GetEnterpriseConnectionsParams,
-  GetEnterpriseConnectionTestRunsParams,
   GetOrganizationMemberships,
   GetUserOrganizationInvitationsParams,
   GetUserOrganizationSuggestionsParams,
@@ -43,7 +36,6 @@ import type {
   Web3WalletResource,
 } from '@clerk/shared/types';
 
-import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
 import { unixEpochToDate } from '../../utils/date';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { eventBus, events } from '../events';
@@ -55,7 +47,6 @@ import {
   EmailAddress,
   EnterpriseAccount,
   EnterpriseConnection,
-  EnterpriseConnectionTestRun,
   ExternalAccount,
   Image,
   OrganizationMembership,
@@ -331,45 +322,6 @@ export class User extends BaseResource implements UserResource {
     )?.response as unknown as EnterpriseConnectionJSON[];
 
     return (json || []).map(connection => new EnterpriseConnection(connection));
-  };
-
-  createEnterpriseConnectionTestRun = async (
-    enterpriseConnectionId: string,
-  ): Promise<EnterpriseConnectionTestRunInitResource> => {
-    const json = (
-      await BaseResource._fetch({
-        path: `${this.path()}/enterprise_connections/${enterpriseConnectionId}/test_runs`,
-        method: 'POST',
-      })
-    )?.response as unknown as EnterpriseConnectionTestRunInitJSON;
-
-    return { url: json.url };
-  };
-
-  getEnterpriseConnectionTestRuns = async (
-    enterpriseConnectionId: string,
-    params?: GetEnterpriseConnectionTestRunsParams,
-  ): Promise<ClerkPaginatedResponse<EnterpriseConnectionTestRunResource>> => {
-    const { status, ...rest } = params || {};
-    const search = convertPageToOffsetSearchParams(rest);
-    if (status?.length) {
-      for (const s of status) {
-        search.append('status', s);
-      }
-    }
-
-    const res = await BaseResource._fetch({
-      path: `${this.path()}/enterprise_connections/${enterpriseConnectionId}/test_runs`,
-      method: 'GET',
-      search,
-    });
-
-    const payload = res?.response as unknown as EnterpriseConnectionTestRunsPaginatedJSON | undefined;
-
-    return {
-      total_count: payload?.total_count ?? 0,
-      data: (payload?.data ?? []).map((row: EnterpriseConnectionTestRunJSON) => new EnterpriseConnectionTestRun(row)),
-    };
   };
 
   initializePaymentMethod: typeof initializePaymentMethod = params => {
