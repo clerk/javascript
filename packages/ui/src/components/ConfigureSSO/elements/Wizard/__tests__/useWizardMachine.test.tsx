@@ -29,12 +29,18 @@ const renderMachine = (args: {
   config: WizardConfig;
   parentWizard?: WizardContextValue | null;
   initialStepId?: string;
+  onStepChange?: (stepId: string) => void;
 }) =>
   renderHook(
-    ({ config, parentWizard, initialStepId }) =>
-      useWizardMachine({ config, parentWizard: parentWizard ?? null, initialStepId }),
+    ({ config, parentWizard, initialStepId, onStepChange }) =>
+      useWizardMachine({ config, parentWizard: parentWizard ?? null, initialStepId, onStepChange }),
     {
-      initialProps: { config: args.config, parentWizard: args.parentWizard ?? null, initialStepId: args.initialStepId },
+      initialProps: {
+        config: args.config,
+        parentWizard: args.parentWizard ?? null,
+        initialStepId: args.initialStepId,
+        onStepChange: args.onStepChange,
+      },
     },
   );
 
@@ -174,5 +180,60 @@ describe('useWizardMachine — first/last and reachability derivations', () => {
     const byId = Object.fromEntries(result.current.activeSteps.map(s => [s.id, s.isCompleted]));
     expect(byId.a).toBe(true);
     expect(byId.b).toBe(false);
+  });
+});
+
+describe('useWizardMachine — onStepChange', () => {
+  it('fires with the new step id on a goNext / goPrev / goToStep that changes current', () => {
+    const onStepChange = vi.fn();
+    const { result } = renderMachine({
+      config: cfg([{ id: 'a' }, { id: 'b', guard: () => true }, { id: 'c', guard: () => true }]),
+      initialStepId: 'a',
+      onStepChange,
+    });
+
+    act(() => result.current.goNext()); // a -> b
+    expect(onStepChange).toHaveBeenLastCalledWith('b');
+
+    act(() => result.current.goToStep('c')); // b -> c
+    expect(onStepChange).toHaveBeenLastCalledWith('c');
+
+    act(() => result.current.goPrev()); // c -> b
+    expect(onStepChange).toHaveBeenLastCalledWith('b');
+
+    expect(onStepChange).toHaveBeenCalledTimes(3);
+  });
+
+  it('does NOT fire on a guard-blocked no-op (current did not change)', () => {
+    const onStepChange = vi.fn();
+    const { result } = renderMachine({
+      // a is entry, b is gated out. init stays on a; goNext is a hard stop.
+      config: cfg([{ id: 'a' }, { id: 'b', guard: () => false }]),
+      onStepChange,
+    });
+
+    act(() => result.current.goNext()); // blocked
+    act(() => result.current.goToStep('b')); // blocked
+    act(() => result.current.goToStep('a')); // already current → no-op
+    expect(onStepChange).not.toHaveBeenCalled();
+  });
+
+  it('fires on the parent when a nested terminal goNext bubbles through its dispatch', () => {
+    // The parent is a real machine so its dispatch path runs `onStepChange`.
+    const parentOnStepChange = vi.fn();
+    const { result: parent } = renderMachine({
+      config: cfg([{ id: 'p0' }, { id: 'p1', guard: () => true }]),
+      initialStepId: 'p0',
+      onStepChange: parentOnStepChange,
+    });
+
+    // A single-step nested machine: its only step is terminal, so goNext bubbles.
+    const { result: nested } = renderMachine({
+      config: cfg([{ id: 'only' }]),
+      parentWizard: parent.current,
+    });
+
+    act(() => nested.current.goNext()); // bubbles to parent.goNext: p0 -> p1
+    expect(parentOnStepChange).toHaveBeenLastCalledWith('p1');
   });
 });

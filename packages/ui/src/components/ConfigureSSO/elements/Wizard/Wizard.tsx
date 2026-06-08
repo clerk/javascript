@@ -21,6 +21,15 @@ interface WizardProps {
    */
   initialStepId?: string;
   /**
+   * Fired with the new step id whenever a transition actually changes the active
+   * step (`goNext` / `goPrev` / `goToStep`). Fired from the dispatch handler, not
+   * a `useEffect` — so a host can react to a step change (e.g. clear a card-level
+   * error) without a state-sync effect. Only the top-level wizard passes this; a
+   * nested terminal bubble advances through the parent's dispatch, so it fires
+   * there too.
+   */
+  onStepChange?: (stepId: string) => void;
+  /**
    * Declarative children rendered inside the wizard context. Persistent chrome
    * (breadcrumb, shared sub-flow header) is a plain child; per-step bodies are
    * `<Wizard.Match id>` children that render only when their step is active.
@@ -53,7 +62,7 @@ interface WizardProps {
  * falls through to the parent wizard — a nested last-step `goNext` advances the
  * parent automatically, while a guard-blocked mid-flow next is a hard stop.
  */
-const WizardRoot = ({ steps, initialStepId, children }: WizardProps): JSX.Element => {
+const WizardRoot = ({ steps, initialStepId, onStepChange, children }: WizardProps): JSX.Element => {
   const parentWizard = React.useContext(WizardContext);
 
   // The config the pure reducer reads. The body-less `steps` array is the
@@ -62,7 +71,7 @@ const WizardRoot = ({ steps, initialStepId, children }: WizardProps): JSX.Elemen
   // mirrors the latest inputs.
   const config = React.useMemo<WizardConfig>(() => ({ descriptors: steps }), [steps]);
 
-  const value = useWizardMachine({ config, parentWizard, initialStepId });
+  const value = useWizardMachine({ config, parentWizard, initialStepId, onStepChange });
 
   return <WizardContext.Provider value={value}>{children}</WizardContext.Provider>;
 };

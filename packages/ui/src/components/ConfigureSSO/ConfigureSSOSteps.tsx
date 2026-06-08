@@ -4,7 +4,7 @@ import { useCardState } from '@/elements/contexts';
 
 import { useConfigureSSO } from './ConfigureSSOContext';
 import { ConfigureSSOHeader } from './ConfigureSSOHeader';
-import { useWizard, type WizardStepConfig } from './elements/Wizard';
+import { type WizardStepConfig } from './elements/Wizard';
 import { Wizard } from './elements/Wizard';
 import { ConfigureStep, ConfirmationStep, SelectProviderStep, TestConfigurationStep, VerifyDomainStep } from './steps';
 
@@ -26,6 +26,7 @@ import { ConfigureStep, ConfirmationStep, SelectProviderStep, TestConfigurationS
  */
 export const ConfigureSSOSteps = (): JSX.Element => {
   const { connectionState: c, resetEpoch } = useConfigureSSO();
+  const card = useCardState();
 
   const steps = React.useMemo<WizardStepConfig[]>(
     () => [
@@ -42,12 +43,17 @@ export const ConfigureSSOSteps = (): JSX.Element => {
   // `initialState` re-derives the furthest-reachable step for the now-no-
   // connection state. Create does NOT bump the epoch, so the create path keeps
   // its plain `goNext` (no remount, no create-flash).
+  //
+  // `onStepChange` clears any card-level error whenever the active top-level step
+  // actually changes, so a stale failure from one step doesn't leak into the next
+  // on a breadcrumb jump or back-nav. The wizard fires it from its dispatch
+  // handler — no wizard-level `useEffect` involved.
   return (
     <Wizard
       key={resetEpoch}
       steps={steps}
+      onStepChange={() => card.setError(undefined)}
     >
-      <ResetCardErrorOnStepChange />
       <ConfigureSSOHeader />
 
       <Wizard.Match id='verify-domain'>
@@ -71,33 +77,4 @@ export const ConfigureSSOSteps = (): JSX.Element => {
       </Wizard.Match>
     </Wizard>
   );
-};
-
-/**
- * Clears any card-level error whenever the active top-level step changes, so a
- * stale failure from one step doesn't leak into the next on a breadcrumb jump
- * or back-nav. This is a NAV-DRIVEN side-effect (a transition handler), not
- * state-sync to props — it reacts to `current` flipping, nothing else.
- *
- * NOTE (for review): kept as a minimal equivalent of the old sentinel. Without
- * it, a card error set on one step (e.g. the test step's "no successful run")
- * survives a breadcrumb jump to another step. Flagging it since it is the one
- * remaining wizard-level effect; if step bodies are made to own their own error
- * reset on entry this could be dropped.
- */
-const ResetCardErrorOnStepChange = (): null => {
-  const { current } = useWizard();
-  const card = useCardState();
-  const previousStepIdRef = React.useRef(current);
-
-  React.useEffect(() => {
-    if (previousStepIdRef.current === current) {
-      return;
-    }
-
-    previousStepIdRef.current = current;
-    card.setError(undefined);
-  }, [current, card]);
-
-  return null;
 };
