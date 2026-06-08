@@ -42,9 +42,9 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "tsdown",
     "clean": "rimraf ./dist",
-    "dev": "tsup --watch",
+    "dev": "tsdown --watch",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
@@ -59,7 +59,7 @@
     "@typescript-eslint/parser": "8.58.0",
     "@typescript-eslint/utils": "8.58.0",
     "eslint": "9.31.0",
-    "tsup": "catalog:repo",
+    "tsdown": "catalog:repo",
     "typescript": "catalog:repo",
     "vitest": "3.2.4"
   },
