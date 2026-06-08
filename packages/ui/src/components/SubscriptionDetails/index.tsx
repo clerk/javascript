@@ -20,6 +20,7 @@ import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Drawer, useDrawerContext } from '@/ui/elements/Drawer';
 import { LineItems } from '@/ui/elements/LineItems';
 import { handleError } from '@/ui/utils/errorHandler';
+import { getSeatLimitAndIncludedSeatsLocalizationKey } from '@/ui/utils/billingPlanSeats';
 import { formatDate } from '@/ui/utils/formatDate';
 
 import {
@@ -511,6 +512,10 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
 // New component for individual subscription cards
 const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionItemResource }) => {
   const { t } = useLocalizations();
+  const subItemSeatsQty = subscription.seats?.quantity;
+  const firstPaidSeatTier = subscription.seats?.tiers?.find(tier => tier.total.amount > 0);
+  const monthLabel = t(localizationKeys('billing.month')).toLowerCase();
+  const seatLimitAndIncludedSeatsLocalizationKey = getSeatLimitAndIncludedSeatsLocalizationKey(subscription.plan);
 
   const fee =
     subscription.planPeriod === 'month'
@@ -604,16 +609,13 @@ const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionI
         </Flex>
       </Col>
 
-      {subscription.seats ? (
+      {typeof subItemSeatsQty !== 'undefined' ? (
         <DetailRow
           variant='header'
           labelNode={
-            <Text
-              sx={t => ({
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: t.space.$1,
-              })}
+            <Flex
+              align='center'
+              gap={1}
             >
               <Icon
                 icon={Users}
@@ -621,14 +623,30 @@ const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionI
                 colorScheme='neutral'
               />
               <Text localizationKey={localizationKeys('billing.seats')} />
-            </Text>
+            </Flex>
           }
-          value={
-            subscription.seats.quantity === null
-              ? localizationKeys('billing.pricingTable.seatCost.unlimitedSeats')
-              : localizationKeys('billing.pricingTable.seatCost.upToSeats', {
-                  endsAfterBlock: subscription.seats.quantity,
-                })
+          valueNode={
+            <Col
+              gap={1}
+              align='end'
+            >
+              {seatLimitAndIncludedSeatsLocalizationKey ? (
+                <Text
+                  variant='subtitle'
+                  localizationKey={seatLimitAndIncludedSeatsLocalizationKey}
+                />
+              ) : null}
+              {firstPaidSeatTier && firstPaidSeatTier.quantity ? (
+                <Text variant='subtitle'>
+                  {t(
+                    localizationKeys('organizationProfile.billingPage.subscriptionsListSection.paidSeatsUsage', {
+                      seatsQuantity: firstPaidSeatTier.quantity,
+                      amount: `${firstPaidSeatTier.feePerBlock.currencySymbol}${firstPaidSeatTier.feePerBlock.amountFormatted} / ${monthLabel}`,
+                    }),
+                  )}
+                </Text>
+              ) : null}
+            </Col>
           }
         />
       ) : null}
@@ -683,17 +701,19 @@ const DetailRow = ({
   label,
   labelNode,
   value,
+  valueNode,
   variant,
 }: {
   label?: LocalizationKey;
   labelNode?: React.ReactNode;
-  value: string | LocalizationKey;
+  value?: string | LocalizationKey;
+  valueNode?: React.ReactNode;
   variant?: 'header';
 }) => (
   <Flex
     elementDescriptor={descriptors.subscriptionDetailsDetailRow}
     justify='between'
-    align='center'
+    align={valueNode ? 'start' : 'center'}
     sx={t => ({
       paddingInline: t.space.$3,
       paddingBlock: t.space.$3,
@@ -714,19 +734,21 @@ const DetailRow = ({
       />
     ) : null}
     {labelNode ? labelNode : null}
-    {typeof value === 'string' ? (
+    {valueNode ? (
+      valueNode
+    ) : typeof value === 'string' ? (
       <Text
         elementDescriptor={descriptors.subscriptionDetailsDetailRowValue}
         colorScheme='secondary'
       >
         {value}
       </Text>
-    ) : (
+    ) : value ? (
       <Text
         localizationKey={value}
         elementDescriptor={descriptors.subscriptionDetailsDetailRowValue}
         colorScheme='secondary'
       />
-    )}
+    ) : null}
   </Flex>
 );
