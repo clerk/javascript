@@ -1,8 +1,7 @@
-import { isClerkAPIResponseError, isClerkRuntimeError } from '@clerk/shared/error';
+import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { describe, expect, it, vi } from 'vitest';
 
 import {
-  createNativeRedirectCancelledError,
   getRotatingTokenNonceFromNativeRedirectCallback,
   throwIfNativeRedirectCallbackHasError,
   waitForNativeRedirectCallback,
@@ -70,13 +69,6 @@ describe('nativeRedirectCallback', () => {
 
   it('returns null when the callback has no rotating token nonce', () => {
     expect(getRotatingTokenNonceFromNativeRedirectCallback('myapp://callback')).toBeNull();
-  });
-
-  it('creates an abandoned native redirect error', () => {
-    const err = createNativeRedirectCancelledError();
-
-    expect(isClerkRuntimeError(err)).toBe(true);
-    expect(err).toMatchObject({ code: 'native_redirect_cancelled' });
   });
 
   it('captures bridge callback rejections without creating an unhandled rejection race', async () => {

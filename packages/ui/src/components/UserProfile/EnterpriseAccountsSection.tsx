@@ -14,7 +14,7 @@ import { ProviderIcon } from '../../common';
 import { useUserProfileContext } from '../../contexts';
 import { Badge, Box, descriptors, Flex, localizationKeys, Text } from '../../customizables';
 import { Action } from '../../elements/Action';
-import { useNativeExternalAuth } from '../../hooks';
+import { useElectronExternalAuth } from '../../hooks';
 const EnterpriseConnectMenuButton = (props: { connection: EnterpriseConnectionResource }) => {
   const { connection } = props;
   const card = useCardState();
@@ -22,7 +22,7 @@ const EnterpriseConnectMenuButton = (props: { connection: EnterpriseConnectionRe
   const { componentName, mode } = useUserProfileContext();
   const isModal = mode === 'modal';
   const loadingKey = `enterprise_${connection.id}`;
-  const nativeAuth = useNativeExternalAuth();
+  const electronAuth = useElectronExternalAuth();
 
   const createExternalAccount = useReverification((nativeRedirectUrl?: string) => {
     const redirectUrl = isModal ? appendModalState({ url: window.location.href, componentName }) : window.location.href;
@@ -40,8 +40,10 @@ const EnterpriseConnectMenuButton = (props: { connection: EnterpriseConnectionRe
 
     card.setLoading(loadingKey);
 
-    if (nativeAuth) {
-      return nativeAuth.connectExternalAccount({ createExternalAccount, user }).finally(() => card.setIdle(loadingKey));
+    if (electronAuth) {
+      return electronAuth
+        .connectExternalAccount({ createExternalAccount, user })
+        .finally(() => card.setIdle(loadingKey));
     }
 
     return createExternalAccount()

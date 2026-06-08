@@ -13,7 +13,7 @@ import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { useCardState } from '../../elements/contexts';
 import type { SocialButtonsProps } from '../../elements/SocialButtons';
 import { SocialButtons } from '../../elements/SocialButtons';
-import { useNativeExternalAuth } from '../../hooks/useNativeExternalAuth';
+import { useElectronExternalAuth } from '../../hooks/useElectronExternalAuth';
 import { useRouter } from '../../router';
 
 export type SignInSocialButtonsProps = SocialButtonsProps & {
@@ -25,7 +25,7 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
   const { navigate } = useRouter();
   const card = useCardState();
   const ctx = useSignInContext();
-  const nativeAuth = useNativeExternalAuth();
+  const electronAuth = useElectronExternalAuth();
   const signIn = useCoreSignIn();
   const redirectUrl = ctx.ssoCallbackUrl;
   const redirectUrlComplete = ctx.afterSignInUrl || '/';
@@ -55,10 +55,10 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
     <SocialButtons
       {...rest}
       showLastAuthenticationStrategy
-      idleAfterDelay={!shouldUsePopup && !nativeAuth}
+      idleAfterDelay={!shouldUsePopup && !electronAuth}
       oauthCallback={async strategy => {
-        if (nativeAuth) {
-          return nativeAuth.authenticate({
+        if (electronAuth) {
+          return electronAuth.authenticate({
             resource: signIn,
             params: {
               strategy,

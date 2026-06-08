@@ -10,7 +10,7 @@ import { sleep } from '@/ui/utils/sleep';
 import { ProviderIcon } from '../../common';
 import { useUserProfileContext } from '../../contexts';
 import { descriptors, localizationKeys } from '../../customizables';
-import { useEnabledThirdPartyProviders, useNativeExternalAuth } from '../../hooks';
+import { useEnabledThirdPartyProviders, useElectronExternalAuth } from '../../hooks';
 import { useRouter } from '../../router';
 
 const ConnectMenuButton = (props: { strategy: OAuthStrategy; onClick?: () => void }) => {
@@ -21,7 +21,7 @@ const ConnectMenuButton = (props: { strategy: OAuthStrategy; onClick?: () => voi
   const { strategyToDisplayData } = useEnabledThirdPartyProviders();
   const { additionalOAuthScopes, componentName, mode } = useUserProfileContext();
   const isModal = mode === 'modal';
-  const nativeAuth = useNativeExternalAuth();
+  const electronAuth = useElectronExternalAuth();
 
   const createExternalAccount = useReverification((nativeRedirectUrl?: string) => {
     const socialProvider = strategy.replace('oauth_', '') as OAuthProvider;
@@ -45,8 +45,8 @@ const ConnectMenuButton = (props: { strategy: OAuthStrategy; onClick?: () => voi
     // TODO: Decide if we should keep using this strategy
     // If yes, refactor and cleanup:
     card.setLoading(strategy);
-    if (nativeAuth) {
-      return nativeAuth.connectExternalAccount({ createExternalAccount, user }).finally(() => card.setIdle(strategy));
+    if (electronAuth) {
+      return electronAuth.connectExternalAccount({ createExternalAccount, user }).finally(() => card.setIdle(strategy));
     }
 
     return createExternalAccount()

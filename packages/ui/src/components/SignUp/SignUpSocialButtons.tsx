@@ -10,7 +10,7 @@ import { web3CallbackErrorHandler } from '@/ui/utils/web3CallbackErrorHandler';
 import { useCoreSignUp, useSignUpContext } from '../../contexts';
 import type { SocialButtonsProps } from '../../elements/SocialButtons';
 import { SocialButtons } from '../../elements/SocialButtons';
-import { useNativeExternalAuth } from '../../hooks/useNativeExternalAuth';
+import { useElectronExternalAuth } from '../../hooks/useElectronExternalAuth';
 import { useRouter } from '../../router';
 
 export type SignUpSocialButtonsProps = SocialButtonsProps & {
@@ -24,7 +24,7 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
   const { navigate } = useRouter();
   const card = useCardState();
   const ctx = useSignUpContext();
-  const nativeAuth = useNativeExternalAuth();
+  const electronAuth = useElectronExternalAuth();
   const signUp = useCoreSignUp();
   const redirectUrl = ctx.ssoCallbackUrl;
   const redirectUrlComplete = ctx.afterSignUpUrl || '/';
@@ -35,10 +35,10 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
     <SocialButtons
       {...rest}
       showLastAuthenticationStrategy={false}
-      idleAfterDelay={!shouldUsePopup && !nativeAuth}
+      idleAfterDelay={!shouldUsePopup && !electronAuth}
       oauthCallback={async (strategy: OAuthStrategy) => {
-        if (nativeAuth) {
-          return nativeAuth.authenticate({
+        if (electronAuth) {
+          return electronAuth.authenticate({
             resource: signUp,
             params: {
               strategy,

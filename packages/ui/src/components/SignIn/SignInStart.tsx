@@ -34,7 +34,7 @@ import {
 import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import { CaptchaElement } from '../../elements/CaptchaElement';
-import { useLoadingStatus, useNativeExternalAuth } from '../../hooks';
+import { useLoadingStatus, useElectronExternalAuth } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useTotalEnabledAuthMethods } from '../../hooks/useTotalEnabledAuthMethods';
 import { useRouter } from '../../router';
@@ -85,7 +85,7 @@ function SignInStartInternal(): JSX.Element {
   const signIn = useCoreSignIn();
   const { navigate } = useRouter();
   const ctx = useSignInContext();
-  const nativeAuth = useNativeExternalAuth();
+  const electronAuth = useElectronExternalAuth();
   const { afterSignInUrl, signUpUrl, waitlistUrl, isCombinedFlow, navigateOnSetActive } = ctx;
   const supportEmail = useSupportEmail();
   const totalEnabledAuthMethods = useTotalEnabledAuthMethods();
@@ -416,10 +416,10 @@ function SignInStartInternal(): JSX.Element {
     const redirectUrl = ctx.ssoCallbackUrl;
     const redirectUrlComplete = ctx.afterSignInUrl || '/';
 
-    if (nativeAuth) {
+    if (electronAuth) {
       // Let `attemptToRecoverFromSignInError` own error handling (it silently recovers
       // session-exists / instant-password errors), so the hook must not surface them on the card.
-      return nativeAuth.authenticate(
+      return electronAuth.authenticate(
         {
           resource: signIn,
           params: {

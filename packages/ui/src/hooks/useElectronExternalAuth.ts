@@ -45,9 +45,9 @@ type AuthenticateOptions = {
   surfaceErrorOnCard?: boolean;
 };
 
-export type NativeExternalAuth = {
+export type ElectronExternalAuth = {
   /**
-   * Drives a sign-in/sign-up/enterprise-SSO OAuth flow through the native bridge. Rejects on failure
+   * Drives a sign-in/sign-up/enterprise-SSO OAuth flow through the Electron bridge. Rejects on failure
    * (after surfacing the error on the card, unless `surfaceErrorOnCard` is `false`) so callers such
    * as the social buttons can reset their loading state from the rejection.
    */
@@ -56,7 +56,7 @@ export type NativeExternalAuth = {
     options?: AuthenticateOptions,
   ) => Promise<unknown>;
   /**
-   * Connects or reauthorizes an external account through the native bridge. Errors are surfaced on
+   * Connects or reauthorizes an external account through the Electron bridge. Errors are surfaced on
    * the card and swallowed (not rethrown), since the connected-account UIs reset their own loading
    * state from a `finally`.
    */
@@ -64,15 +64,18 @@ export type NativeExternalAuth = {
 };
 
 /**
- * Bridges Clerk's prebuilt OAuth/enterprise-SSO entry points to the native (Electron) deep-link flow.
+ * Bridges Clerk's prebuilt OAuth/enterprise-SSO entry points to the Electron deep-link flow (open the
+ * system browser, wait for the `clerk://` callback, resume with the rotating token nonce).
  *
- * Returns `null` in non-native environments so callers fall back to the web redirect/popup flows.
- * When a native bridge is present it returns helpers that own the bridge, router, and card-level
- * error handling, keeping the call sites free of native-specific branching.
+ * Returns `null` when no Electron bridge is present so callers fall back to the web redirect/popup
+ * flows. When the bridge exists it returns helpers that own the bridge, router, and card-level error
+ * handling, keeping the call sites free of Electron-specific branching. The underlying transport
+ * (`authenticateWithNativeRedirect`) is named for the mechanism and stays runtime-agnostic; this hook
+ * is the Electron-specific entry point to it.
  *
  * @experimental
  */
-export function useNativeExternalAuth(): NativeExternalAuth | null {
+export function useElectronExternalAuth(): ElectronExternalAuth | null {
   const clerk = useClerk();
   const card = useCardState();
   const { navigate } = useRouter();

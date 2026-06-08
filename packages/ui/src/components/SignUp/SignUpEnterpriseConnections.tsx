@@ -6,12 +6,12 @@ import { useSignUpContext } from '@/ui/contexts';
 import { Flow, localizationKeys } from '@/ui/customizables';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
-import { useFetch, useNativeExternalAuth } from '@/ui/hooks';
+import { useFetch, useElectronExternalAuth } from '@/ui/hooks';
 
 const SignUpEnterpriseConnectionsInternal = () => {
   const clerk = useClerk();
   const ctx = useSignUpContext();
-  const nativeAuth = useNativeExternalAuth();
+  const electronAuth = useElectronExternalAuth();
 
   const signUp = clerk.client.signUp;
   const { data: enterpriseConnections, isLoading } = useFetch(signUp?.__experimental_getEnterpriseConnections, {
@@ -22,8 +22,8 @@ const SignUpEnterpriseConnectionsInternal = () => {
     const redirectUrl = ctx.ssoCallbackUrl;
     const redirectUrlComplete = ctx.afterSignUpUrl || '/';
 
-    if (nativeAuth) {
-      await nativeAuth.authenticate({
+    if (electronAuth) {
+      await electronAuth.authenticate({
         resource: signUp,
         params: {
           strategy: 'enterprise_sso',

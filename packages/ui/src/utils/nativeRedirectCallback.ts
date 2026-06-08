@@ -91,16 +91,6 @@ export function getRotatingTokenNonceFromNativeRedirectCallback(callbackUrl: str
 }
 
 /**
- * Thrown when the native browser flow is abandoned (the window was closed or the bridge timed out)
- * before any callback was received. This is intentionally swallowed by the UI error handler.
- */
-export function createNativeRedirectCancelledError(): ClerkRuntimeError {
-  return new ClerkRuntimeError('Native redirect verification was cancelled or did not complete.', {
-    code: 'native_redirect_cancelled',
-  });
-}
-
-/**
  * Thrown when a callback was received but the verification neither succeeded nor reported an error
  * (an unexpected state). Unlike a cancellation, this is surfaced to the user so the flow never ends
  * silently.

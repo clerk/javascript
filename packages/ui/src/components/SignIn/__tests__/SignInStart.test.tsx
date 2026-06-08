@@ -17,8 +17,6 @@ describe('SignInStart', () => {
   const originalGetComputedStyle = window.getComputedStyle;
   const originalLocation = window.location;
   const originalHistory = window.history;
-  const originalProcessDescriptor = Object.getOwnPropertyDescriptor(window, 'process');
-  const originalUserAgentDescriptor = Object.getOwnPropertyDescriptor(window.navigator, 'userAgent');
   const mockGetComputedStyle = vi.fn();
 
   beforeEach(() => {
@@ -54,14 +52,6 @@ describe('SignInStart', () => {
       configurable: true,
     });
     delete (window as any).__clerk_internal_electron;
-    if (originalProcessDescriptor) {
-      Object.defineProperty(window, 'process', originalProcessDescriptor);
-    } else {
-      delete (window as any).process;
-    }
-    if (originalUserAgentDescriptor) {
-      Object.defineProperty(window.navigator, 'userAgent', originalUserAgentDescriptor);
-    }
   });
 
   it('renders the component', async () => {
@@ -305,15 +295,6 @@ describe('SignInStart', () => {
         openExternal: vi.fn(() => Promise.resolve()),
         waitForRedirectCallback: vi.fn(() => Promise.resolve('myapp://auth/callback?rotating_token_nonce=test-nonce')),
       };
-      Object.defineProperty(window, 'process', {
-        value: { ...(process as any), type: 'renderer' },
-        writable: true,
-        configurable: true,
-      });
-      Object.defineProperty(window.navigator, 'userAgent', {
-        value: 'Electron',
-        configurable: true,
-      });
       window.__clerk_internal_electron = electron;
       fixtures.clerk.__experimental_handleNativeRedirectCallback.mockResolvedValueOnce(undefined);
       fixtures.signIn.__experimental_authenticateWithNativeRedirect.mockImplementationOnce(async () => {
@@ -371,15 +352,6 @@ describe('SignInStart', () => {
         openExternal: vi.fn(() => Promise.resolve()),
         waitForRedirectCallback: vi.fn(() => Promise.resolve('myapp://auth/callback')),
       };
-      Object.defineProperty(window, 'process', {
-        value: { ...(process as any), type: 'renderer' },
-        writable: true,
-        configurable: true,
-      });
-      Object.defineProperty(window.navigator, 'userAgent', {
-        value: 'Electron',
-        configurable: true,
-      });
       window.__clerk_internal_electron = electron;
       fixtures.signIn.__experimental_authenticateWithNativeRedirect.mockImplementationOnce(async () => {
         fixtures.signIn.firstFactorVerification.externalVerificationRedirectURL = new URL(

@@ -6,7 +6,7 @@ import { ChooseEnterpriseConnectionCard } from '@/ui/common/ChooseEnterpriseConn
 import { useCoreSignIn, useSignInContext } from '@/ui/contexts';
 import { Flow, localizationKeys } from '@/ui/customizables';
 import { withCardStateProvider } from '@/ui/elements/contexts';
-import { useNativeExternalAuth } from '@/ui/hooks/useNativeExternalAuth';
+import { useElectronExternalAuth } from '@/ui/hooks/useElectronExternalAuth';
 import type { AvailableComponentProps } from '@/ui/types';
 
 import { hasMultipleEnterpriseConnections } from './shared';
@@ -17,7 +17,7 @@ import { hasMultipleEnterpriseConnections } from './shared';
 const SignInFactorOneEnterpriseConnectionsInternal = () => {
   const ctx = useSignInContext();
   const clerk = useClerk();
-  const nativeAuth = useNativeExternalAuth();
+  const electronAuth = useElectronExternalAuth();
   const signIn = clerk.client.signIn;
 
   if (!hasMultipleEnterpriseConnections(signIn.supportedFirstFactors)) {
@@ -34,8 +34,8 @@ const SignInFactorOneEnterpriseConnectionsInternal = () => {
     const redirectUrl = ctx.ssoCallbackUrl;
     const redirectUrlComplete = ctx.afterSignInUrl || '/';
 
-    if (nativeAuth) {
-      await nativeAuth.authenticate({
+    if (electronAuth) {
+      await electronAuth.authenticate({
         resource: signIn,
         params: {
           strategy: 'enterprise_sso',
