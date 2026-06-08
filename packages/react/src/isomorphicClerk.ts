@@ -2,6 +2,7 @@ import { inBrowser } from '@clerk/shared/browser';
 import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
 import { ALLOWED_PROTOCOLS, windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { loadClerkJSScript, loadClerkUIScript } from '@clerk/shared/loadClerkJsScript';
+import { getModuleManager, setModuleManager } from '@clerk/shared/moduleManager';
 import type {
   __internal_AttemptToEnableEnvironmentSettingParams,
   __internal_AttemptToEnableEnvironmentSettingResult,
@@ -666,6 +667,16 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
 
     this.clerkjs = clerkjs;
+
+    // clerk-js registers its ModuleManager against `this` (the inner Clerk
+    // instance) in its constructor. Composed/subcomponent code reads it via
+    // `getModuleManager(useClerk())`, which returns this wrapper — so without
+    // this propagation the WeakMap lookup misses and dynamic-imported
+    // features (Coinbase Wallet, Base, Stripe, zxcvbn) fall back to a no-op.
+    const mm = getModuleManager(clerkjs);
+    if (mm) {
+      setModuleManager(this, mm);
+    }
 
     this.premountMethodCalls.forEach(cb => cb());
     this.premountAddListenerCalls.forEach((listenerExtras, listener) => {

@@ -165,10 +165,19 @@ describe('UserProfileProvider wiring', () => {
     });
   });
 
-  // Registering through @clerk/shared/moduleManager is the same channel
-  // clerk-js's constructor uses (`setModuleManager(this, this.#moduleManager)`),
-  // so a passing test here proves composed UserProfile picks up the
-  // bootstrap-registered moduleManager without `<ClerkProvider ui={ui} />`.
+  // Validates the read channel only: UserProfileProvider resolves
+  // moduleManager via @clerk/shared/moduleManager keyed by `useClerk()`.
+  //
+  // Caveat: in this test `fixtures.clerk` is both the WeakMap key (we
+  // register against it directly) and the value `useClerk()` returns
+  // through the wrapper, so identity matches trivially. In production
+  // those identities differ — clerk-js's constructor registers against
+  // the inner clerk-js Clerk, while `useClerk()` returns the
+  // IsomorphicClerk wrapper. That cross-identity propagation is covered
+  // by packages/react/src/__tests__/isomorphicClerk.test.ts —
+  // "propagates moduleManager from loaded clerkjs to the isomorphic
+  // wrapper". Don't read this test as end-to-end coverage of the
+  // composed UserProfile wiring in a real Clerk SDK app.
   it('resolves a moduleManager registered through @clerk/shared, not just via ClerkUI', async () => {
     const mockImport = vi.fn(() => Promise.resolve(undefined));
     const { wrapper, fixtures } = await createFixtures(f => {
