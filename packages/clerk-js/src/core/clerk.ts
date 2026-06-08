@@ -275,6 +275,20 @@ export class Clerk implements ClerkInterface {
   #publicEventBus = createClerkEventBus();
   #moduleManager = new ModuleManager();
 
+  /**
+   * Cross-bundle handle to the ModuleManager. clerk-js is loaded standalone
+   * from the CDN with its own inlined @clerk/shared, so the module-scoped
+   * WeakMap in @clerk/shared/moduleManager cannot be observed by consumers
+   * that import @clerk/shared from node_modules (e.g. @clerk/react,
+   * @clerk/ui). This getter is how IsomorphicClerk forwards the manager
+   * across that boundary.
+   *
+   * @internal
+   */
+  get __internal_moduleManager(): ModuleManager {
+    return this.#moduleManager;
+  }
+
   get __internal_queryClient(): { __tag: 'clerk-rq-client'; client: QueryClient } | undefined {
     if (!this.#queryClient) {
       void import('./query-core')
@@ -473,9 +487,12 @@ export class Clerk implements ClerkInterface {
     this.#instanceType = publishableKey.instanceType;
     this.#publishableKey = key;
 
-    // Register the internal ModuleManager so @clerk/ui can resolve it without
-    // depending on @clerk/ui's ClerkUI being mounted. Keeps the clerk-js public
-    // ABI unchanged (opaque WeakMap storage rather than a class member).
+    // Register the ModuleManager in the @clerk/shared WeakMap as well, so any
+    // code path that already has the same @clerk/shared module instance as
+    // clerk-js (rare in practice — clerk-js bundles its own) can resolve it
+    // without going through the getter. The getter (`__internal_moduleManager`
+    // below) is the cross-bundle channel that actually matters: IsomorphicClerk
+    // and other framework-SDK wrappers reach into clerk-js through it.
     setModuleManager(this, this.#moduleManager);
 
     this.#fapiClient = createFapiClient({

@@ -644,12 +644,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
     this.clerkjs = clerkjs;
 
-    // clerk-js registers its ModuleManager against `this` (the inner Clerk
-    // instance) in its constructor. Composed/subcomponent code reads it via
-    // `getModuleManager(useClerk())`, which returns this wrapper — so without
-    // this propagation the WeakMap lookup misses and dynamic-imported
-    // features (Coinbase Wallet, Base, Stripe, zxcvbn) fall back to a no-op.
-    const mm = getModuleManager(clerkjs);
+    // Forward clerk-js's ModuleManager onto this wrapper so composed/
+    // subcomponent UserProfile (which reads `getModuleManager(useClerk())`)
+    // can resolve it. Prefer the `__internal_moduleManager` getter — clerk-js
+    // ships standalone with its own inlined @clerk/shared, so its own WeakMap
+    // is invisible to the node_modules @clerk/shared this code uses. The
+    // getter is the public cross-bundle channel; the WeakMap fallback covers
+    // any code path that happens to share a @clerk/shared instance with the
+    // running clerk-js (rare).
+    const mm = clerkjs.__internal_moduleManager ?? getModuleManager(clerkjs);
     if (mm) {
       setModuleManager(this, mm);
     }

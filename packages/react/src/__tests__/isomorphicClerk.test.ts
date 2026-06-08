@@ -45,13 +45,35 @@ describe('isomorphicClerk', () => {
 
   // Regression: composed/subcomponent UserProfile reads moduleManager via
   // `getModuleManager(useClerk())`. `useClerk()` returns the IsomorphicClerk
-  // wrapper, but clerk-js registers the moduleManager against the inner Clerk
-  // instance in its constructor (`setModuleManager(this, this.#moduleManager)`).
-  // Without propagation, the WeakMap lookup misses and composed UserProfile
-  // falls back to a no-op manager — breaking every dynamic-imported feature
-  // (Coinbase Wallet, Base, Stripe, zxcvbn) with a confusing 422 / silent
-  // failure downstream. This test pins the propagation contract.
-  it('propagates moduleManager from loaded clerkjs to the isomorphic wrapper', () => {
+  // wrapper, so the manager must be reachable from the wrapper's identity.
+  //
+  // Two channels need to work — the cross-bundle case is the one that
+  // actually matters in production:
+  //
+  //   1. Cross-bundle: clerk-js ships standalone from the CDN with its own
+  //      inlined @clerk/shared, so its module-scoped WeakMap is invisible
+  //      to the node_modules @clerk/shared the SDKs use. The handoff goes
+  //      through the `__internal_moduleManager` getter on Clerk.
+  //   2. Same-bundle: when clerk-js and the SDK happen to share a
+  //      @clerk/shared instance, the WeakMap registration is visible too.
+  //      Rare but worth keeping as a fallback.
+  //
+  // Without propagation, every dynamic-imported feature (Coinbase Wallet,
+  // Base, Stripe, zxcvbn) falls back to a no-op manager.
+  it('propagates moduleManager via __internal_moduleManager getter (cross-bundle channel)', () => {
+    const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+    const mm = { import: vi.fn(() => Promise.resolve(undefined)) };
+    const innerClerk: any = {
+      addListener: vi.fn(),
+      __internal_moduleManager: mm,
+    };
+
+    (isomorphicClerk as any).replayInterceptedInvocations(innerClerk);
+
+    expect(getModuleManager(isomorphicClerk)).toBe(mm);
+  });
+
+  it('propagates moduleManager via @clerk/shared WeakMap (same-bundle fallback)', () => {
     const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
     const innerClerk: any = {
       addListener: vi.fn(),
@@ -59,8 +81,6 @@ describe('isomorphicClerk', () => {
     const mm = { import: vi.fn(() => Promise.resolve(undefined)) };
     setModuleManager(innerClerk, mm);
 
-    // Simulate the post-load handoff path (replayInterceptedInvocations runs
-    // once clerk-js finishes hydrating).
     (isomorphicClerk as any).replayInterceptedInvocations(innerClerk);
 
     expect(getModuleManager(isomorphicClerk)).toBe(mm);
