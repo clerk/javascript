@@ -2,7 +2,7 @@
 import type { TSESTree } from '@typescript-eslint/utils';
 import type { Rule } from 'eslint';
 
-import type { ExportTarget } from '../lib/exports.js';
+import type { ExportTarget, FunctionNode } from '../lib/exports.js';
 import { iterateExportAllDeclarations, iterateNamedExports, resolveDefaultExport } from '../lib/exports.js';
 import {
   type FileKind,
@@ -84,24 +84,36 @@ const rule: Rule.RuleModule = {
 
     const fileKind = getFileKind(filename);
 
+    let authNames = new Set<string>();
+    let shouldCheckInlineServerFunctions = false;
+    // Keeps track of which functions have already been checked to avoid
+    // program visitor and function visitors performing duplicate checks.
+    const checkedFunctions = new WeakSet<FunctionNode>();
+
     return {
       Program(programNode) {
         const ast = programNode as TSESTree.Program;
         const isServerFunction = isServerFunctionModule(ast);
+        const isClient = isClientModule(ast);
+
+        const sourceClass = classifyFolder(folder, config);
+        if (sourceClass !== 'protected') {
+          return;
+        }
+
+        // This needs to be before the other bailouts. It sets up state
+        // necessary for the independent function visitors to work.
+        authNames = findAuthLocalNames(ast);
+        shouldCheckInlineServerFunctions = !isClient;
+
         if (!fileKind && !isServerFunction) {
           return;
         }
 
-        const isClient = isClientModule(ast);
         if (
           isClient &&
           (fileKind === 'page' || fileKind === 'layout' || fileKind === 'template' || fileKind === 'default')
         ) {
-          return;
-        }
-
-        const sourceClass = classifyFolder(folder, config);
-        if (sourceClass !== 'protected') {
           return;
         }
 
@@ -110,15 +122,40 @@ const rule: Rule.RuleModule = {
           return;
         }
 
-        const authNames = findAuthLocalNames(ast);
-
         if (fileKind === 'page' || fileKind === 'layout' || fileKind === 'template' || fileKind === 'default') {
-          checkDefaultExport(context, ast, fileKind, authNames);
+          checkDefaultExport(context, ast, fileKind, authNames, checkedFunctions);
         } else if (fileKind === 'route') {
-          checkRouteHandlers(context, ast, authNames);
+          checkRouteHandlers(context, ast, authNames, checkedFunctions);
         } else if (isServerFunction) {
-          checkServerFunctions(context, ast, authNames);
+          checkServerFunctions(context, ast, authNames, checkedFunctions);
         }
+      },
+      FunctionDeclaration(node) {
+        checkInlineServerFunction(
+          context,
+          node as TSESTree.FunctionDeclaration,
+          authNames,
+          shouldCheckInlineServerFunctions,
+          checkedFunctions,
+        );
+      },
+      FunctionExpression(node) {
+        checkInlineServerFunction(
+          context,
+          node as TSESTree.FunctionExpression,
+          authNames,
+          shouldCheckInlineServerFunctions,
+          checkedFunctions,
+        );
+      },
+      ArrowFunctionExpression(node) {
+        checkInlineServerFunction(
+          context,
+          node as TSESTree.ArrowFunctionExpression,
+          authNames,
+          shouldCheckInlineServerFunctions,
+          checkedFunctions,
+        );
       },
     };
   },
@@ -155,6 +192,7 @@ function checkMissingProtect(
   target: ExportTarget,
   subject: string,
   authNames: Set<string>,
+  checkedFunctions?: WeakSet<FunctionNode>,
 ): void {
   if (target.kind === 'imported') {
     context.report({
@@ -165,6 +203,7 @@ function checkMissingProtect(
     return;
   }
   if (target.kind === 'function') {
+    checkedFunctions?.add(target.node);
     if (!hasProtectAtTop(target.node, authNames)) {
       context.report({
         node: reportNode,
@@ -181,12 +220,17 @@ function checkMissingProtect(
   });
 }
 
-function checkRouteHandlers(context: Rule.RuleContext, programNode: TSESTree.Program, authNames: Set<string>): void {
+function checkRouteHandlers(
+  context: Rule.RuleContext,
+  programNode: TSESTree.Program,
+  authNames: Set<string>,
+  checkedFunctions: WeakSet<FunctionNode>,
+): void {
   for (const { name, target, reportNode } of iterateNamedExports(programNode)) {
     if (!HTTP_METHODS.has(name)) {
       continue;
     }
-    checkMissingProtect(context, reportNode, target, `${name} handler`, authNames);
+    checkMissingProtect(context, reportNode, target, `${name} handler`, authNames, checkedFunctions);
   }
   // `export *` could re-export an HTTP-method handler we can't see across files
   for (const { source, reportNode } of iterateExportAllDeclarations(programNode)) {
@@ -194,9 +238,14 @@ function checkRouteHandlers(context: Rule.RuleContext, programNode: TSESTree.Pro
   }
 }
 
-function checkServerFunctions(context: Rule.RuleContext, programNode: TSESTree.Program, authNames: Set<string>): void {
+function checkServerFunctions(
+  context: Rule.RuleContext,
+  programNode: TSESTree.Program,
+  authNames: Set<string>,
+  checkedFunctions: WeakSet<FunctionNode>,
+): void {
   for (const { name, target, reportNode } of iterateNamedExports(programNode)) {
-    checkMissingProtect(context, reportNode, target, `Server Function '${name}'`, authNames);
+    checkMissingProtect(context, reportNode, target, `Server Function '${name}'`, authNames, checkedFunctions);
   }
   // `export *` can re-export Server Functions we can't see across files.
   for (const { source, reportNode } of iterateExportAllDeclarations(programNode)) {
@@ -209,11 +258,51 @@ function checkDefaultExport(
   programNode: TSESTree.Program,
   fileKind: FileKind,
   authNames: Set<string>,
+  checkedFunctions: WeakSet<FunctionNode>,
 ): void {
   const defaultExport = resolveDefaultExport(programNode);
   if (!defaultExport) {
     return;
   }
 
-  checkMissingProtect(context, defaultExport.reportNode, defaultExport.target, fileKind, authNames);
+  checkMissingProtect(context, defaultExport.reportNode, defaultExport.target, fileKind, authNames, checkedFunctions);
+}
+
+function hasUseServerDirective(fn: FunctionNode): boolean {
+  const body = fn.body;
+  if (!body || body.type !== 'BlockStatement') {
+    return false;
+  }
+
+  for (const stmt of body.body) {
+    if (stmt.type !== 'ExpressionStatement') {
+      return false;
+    }
+    if (typeof stmt.directive !== 'string') {
+      return false;
+    }
+    if (stmt.directive === 'use server') {
+      return true;
+    }
+  }
+  return false;
+}
+
+function checkInlineServerFunction(
+  context: Rule.RuleContext,
+  fn: FunctionNode,
+  authNames: Set<string>,
+  shouldCheckInlineServerFunctions: boolean,
+  checkedFunctions: WeakSet<FunctionNode>,
+): void {
+  if (!shouldCheckInlineServerFunctions || checkedFunctions.has(fn) || !hasUseServerDirective(fn)) {
+    return;
+  }
+  if (!hasProtectAtTop(fn, authNames)) {
+    context.report({
+      node: fn,
+      messageId: 'missingProtect',
+      data: { subject: 'Inline Server Function' },
+    });
+  }
 }

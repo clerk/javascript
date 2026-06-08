@@ -524,6 +524,86 @@ ruleTester.run('require-auth-protection', rule, {
       options: [config],
     },
     {
+      name: 'protected page with protected inline Server Function',
+      code: `
+        import { auth } from '@clerk/nextjs/server';
+        export default async function Page() {
+          await auth.protect();
+          async function updateUser() {
+            'use server';
+            await auth.protect();
+            return 1;
+          }
+          return <form action={updateUser} />;
+        }
+      `,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+    },
+    {
+      name: 'protected non-resource module with protected inline Server Function',
+      code: `
+        import { auth } from '@clerk/nextjs/server';
+        export function UsersPanel() {
+          async function updateUser() {
+            'use server';
+            await auth.protect();
+            return 1;
+          }
+          return <form action={updateUser} />;
+        }
+      `,
+      // Note how this is not page.tsx etc
+      filename: abs('app/admin/users/users-panel.tsx'),
+      options: [config],
+    },
+    {
+      name: 'protected inline Server Function with manual auth guard',
+      code: `
+        import { auth } from '@clerk/nextjs/server';
+        export function UsersPanel() {
+          async function updateUser() {
+            'use server';
+            const { userId } = await auth();
+            if (userId === null) return null;
+            return 1;
+          }
+          return <form action={updateUser} />;
+        }
+      `,
+      filename: abs('app/admin/users/users-panel.tsx'),
+      options: [config],
+    },
+    {
+      name: 'public folder inline Server Function without protect call',
+      code: `
+        export default function SignIn() {
+          async function submit() {
+            'use server';
+            return 1;
+          }
+          return <form action={submit} />;
+        }
+      `,
+      filename: abs('app/(routes)/(unauthenticated)/sign-in/page.tsx'),
+      options: [config],
+    },
+    {
+      name: "'use client' module with nested use server directive is skipped",
+      code: `
+        'use client';
+        export function ClientWidget() {
+          async function submit() {
+            'use server';
+            return 1;
+          }
+          return <button formAction={submit}>Save</button>;
+        }
+      `,
+      filename: abs('app/dashboard/client-widget.tsx'),
+      options: [config],
+    },
+    {
       name: 'file outside app/ is ignored entirely',
       code: `
         export default function Foo() {
@@ -957,6 +1037,38 @@ ruleTester.run('require-auth-protection', rule, {
           data: { subject: 'Server Functions', source: './implementations' },
         },
       ],
+    },
+    {
+      name: 'protected page with inline Server Function missing protect',
+      code: `
+        import { auth } from '@clerk/nextjs/server';
+        export default async function Page() {
+          await auth.protect();
+          async function updateUser() {
+            'use server';
+            return 1;
+          }
+          return <form action={updateUser} />;
+        }
+      `,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+      errors: [{ messageId: 'missingProtect', data: { subject: 'Server Function' } }],
+    },
+    {
+      name: 'protected non-resource module with inline Server Function missing protect',
+      code: `
+        export function UsersPanel() {
+          async function updateUser() {
+            'use server';
+            return 1;
+          }
+          return <form action={updateUser} />;
+        }
+      `,
+      filename: abs('app/admin/users/users-panel.tsx'),
+      options: [config],
+      errors: [{ messageId: 'missingProtect', data: { subject: 'Server Function' } }],
     },
     {
       name: 'protected-only layout without protect call',
