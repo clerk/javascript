@@ -19,6 +19,7 @@ import { unixEpochToDate } from '@/utils/date';
 import {
   billingCreditsFromJSON,
   billingMoneyAmountFromJSON,
+  billingPerUnitTotalTierFromJSON,
   billingSubscriptionItemNextPaymentFromJSON,
   billingSubscriptionNextPaymentFromJSON,
 } from '../../utils';
