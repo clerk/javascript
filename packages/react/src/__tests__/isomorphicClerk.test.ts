@@ -1,4 +1,5 @@
 import { loadClerkJSScript, loadClerkUIScript } from '@clerk/shared/loadClerkJsScript';
+import { getModuleManager, setModuleManager } from '@clerk/shared/moduleManager';
 import type { Resources, UnsubscribeCallback } from '@clerk/shared/types';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -40,6 +41,29 @@ describe('isomorphicClerk', () => {
     expect(() => {
       new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
     }).not.toThrow();
+  });
+
+  // Regression: composed/subcomponent UserProfile reads moduleManager via
+  // `getModuleManager(useClerk())`. `useClerk()` returns the IsomorphicClerk
+  // wrapper, but clerk-js registers the moduleManager against the inner Clerk
+  // instance in its constructor (`setModuleManager(this, this.#moduleManager)`).
+  // Without propagation, the WeakMap lookup misses and composed UserProfile
+  // falls back to a no-op manager — breaking every dynamic-imported feature
+  // (Coinbase Wallet, Base, Stripe, zxcvbn) with a confusing 422 / silent
+  // failure downstream. This test pins the propagation contract.
+  it('propagates moduleManager from loaded clerkjs to the isomorphic wrapper', () => {
+    const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+    const innerClerk: any = {
+      addListener: vi.fn(),
+    };
+    const mm = { import: vi.fn(() => Promise.resolve(undefined)) };
+    setModuleManager(innerClerk, mm);
+
+    // Simulate the post-load handoff path (replayInterceptedInvocations runs
+    // once clerk-js finishes hydrating).
+    (isomorphicClerk as any).replayInterceptedInvocations(innerClerk);
+
+    expect(getModuleManager(isomorphicClerk)).toBe(mm);
   });
 
   it('updates props asynchronously after clerkjs has loaded', async () => {

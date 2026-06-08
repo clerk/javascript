@@ -1,3 +1,4 @@
+import { ClerkRuntimeError } from '@clerk/shared/error';
 import { createWeb3 } from '@clerk/shared/internal/clerk-js/web3';
 import { useReverification, useUser } from '@clerk/shared/react';
 import type { Web3Provider, Web3Strategy } from '@clerk/shared/types';
@@ -54,6 +55,16 @@ export const AddWeb3WalletActionMenu = () => {
 
       if (!user) {
         throw new Error('user is not defined');
+      }
+
+      // `getWeb3Identifier` returns '' when the wallet provider (or its dynamic
+      // import) is unavailable. Posting an empty string yields an unhelpful 422
+      // from FAPI (`form_param_nil` on `web3_wallet`); surface the missing-
+      // provider state locally instead.
+      if (!identifier) {
+        throw new ClerkRuntimeError('A Web3 Wallet extension cannot be found. Please install one to continue.', {
+          code: 'web3_missing_identifier',
+        });
       }
 
       let web3Wallet = await createWeb3Wallet(identifier);
