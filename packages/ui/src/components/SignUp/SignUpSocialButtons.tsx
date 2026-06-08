@@ -4,13 +4,13 @@ import React from 'react';
 
 import { useCardState } from '@/ui/elements/contexts';
 import { handleError } from '@/ui/utils/errorHandler';
-import { authenticateWithNativeRedirect } from '@/ui/utils/nativeRedirect';
 import { originPrefersPopup } from '@/ui/utils/originPrefersPopup';
 import { web3CallbackErrorHandler } from '@/ui/utils/web3CallbackErrorHandler';
 
-import { useCoreSignUp, useOptions, useSignUpContext } from '../../contexts';
+import { useCoreSignUp, useSignUpContext } from '../../contexts';
 import type { SocialButtonsProps } from '../../elements/SocialButtons';
 import { SocialButtons } from '../../elements/SocialButtons';
+import { useNativeExternalAuth } from '../../hooks/useNativeExternalAuth';
 import { useRouter } from '../../router';
 
 export type SignUpSocialButtonsProps = SocialButtonsProps & {
@@ -24,7 +24,7 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
   const { navigate } = useRouter();
   const card = useCardState();
   const ctx = useSignUpContext();
-  const externalAuth = useOptions().experimental?.externalAuth;
+  const nativeAuth = useNativeExternalAuth();
   const signUp = useCoreSignUp();
   const redirectUrl = ctx.ssoCallbackUrl;
   const redirectUrlComplete = ctx.afterSignUpUrl || '/';
@@ -35,40 +35,33 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
     <SocialButtons
       {...rest}
       showLastAuthenticationStrategy={false}
-      idleAfterDelay={!shouldUsePopup && !externalAuth}
+      idleAfterDelay={!shouldUsePopup && !nativeAuth}
       oauthCallback={async (strategy: OAuthStrategy) => {
-        if (externalAuth) {
-          try {
-            return authenticateWithNativeRedirect({
-              clerk,
-              resource: signUp,
-              params: {
-                strategy,
-                redirectUrl,
-                redirectUrlComplete,
-                continueSignUp,
-                transport: externalAuth,
-                unsafeMetadata: ctx.unsafeMetadata,
-                legalAccepted: props.legalAccepted,
-                oidcPrompt: ctx.oidcPrompt,
-              },
-              callbackParams: {
-                signUpUrl: ctx.signUpUrl,
-                signInUrl: ctx.signInUrl,
-                signUpForceRedirectUrl: ctx.afterSignUpUrl,
-                signInForceRedirectUrl: ctx.afterSignInUrl,
-                secondFactorUrl: ctx.secondFactorUrl,
-                continueSignUpUrl: '../continue',
-                verifyEmailAddressUrl: '../verify-email-address',
-                verifyPhoneNumberUrl: '../verify-phone-number',
-                navigateOnSetActive: ctx.navigateOnSetActive,
-                unsafeMetadata: ctx.unsafeMetadata,
-              },
-              navigate,
-            });
-          } catch (err) {
-            return handleError(err as Error, [], card.setError);
-          }
+        if (nativeAuth) {
+          return nativeAuth.authenticate({
+            resource: signUp,
+            params: {
+              strategy,
+              redirectUrl,
+              redirectUrlComplete,
+              continueSignUp,
+              unsafeMetadata: ctx.unsafeMetadata,
+              legalAccepted: props.legalAccepted,
+              oidcPrompt: ctx.oidcPrompt,
+            },
+            callbackParams: {
+              signUpUrl: ctx.signUpUrl,
+              signInUrl: ctx.signInUrl,
+              signUpForceRedirectUrl: ctx.afterSignUpUrl,
+              signInForceRedirectUrl: ctx.afterSignInUrl,
+              secondFactorUrl: ctx.secondFactorUrl,
+              continueSignUpUrl: '../continue',
+              verifyEmailAddressUrl: '../verify-email-address',
+              verifyPhoneNumberUrl: '../verify-phone-number',
+              navigateOnSetActive: ctx.navigateOnSetActive,
+              unsafeMetadata: ctx.unsafeMetadata,
+            },
+          });
         }
 
         if (shouldUsePopup) {

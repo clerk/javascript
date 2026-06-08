@@ -6,14 +6,14 @@ import type { PhoneCodeChannel } from '@clerk/shared/types';
 import React from 'react';
 
 import { handleError as _handleError } from '@/ui/utils/errorHandler';
-import { authenticateWithNativeRedirect } from '@/ui/utils/nativeRedirect';
 import { originPrefersPopup } from '@/ui/utils/originPrefersPopup';
 import { web3CallbackErrorHandler } from '@/ui/utils/web3CallbackErrorHandler';
 
-import { useCoreSignIn, useOptions, useSignInContext } from '../../contexts';
+import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { useCardState } from '../../elements/contexts';
 import type { SocialButtonsProps } from '../../elements/SocialButtons';
 import { SocialButtons } from '../../elements/SocialButtons';
+import { useNativeExternalAuth } from '../../hooks/useNativeExternalAuth';
 import { useRouter } from '../../router';
 
 export type SignInSocialButtonsProps = SocialButtonsProps & {
@@ -25,7 +25,7 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
   const { navigate } = useRouter();
   const card = useCardState();
   const ctx = useSignInContext();
-  const externalAuth = useOptions().experimental?.externalAuth;
+  const nativeAuth = useNativeExternalAuth();
   const signIn = useCoreSignIn();
   const redirectUrl = ctx.ssoCallbackUrl;
   const redirectUrlComplete = ctx.afterSignInUrl || '/';
@@ -55,38 +55,31 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
     <SocialButtons
       {...rest}
       showLastAuthenticationStrategy
-      idleAfterDelay={!shouldUsePopup && !externalAuth}
+      idleAfterDelay={!shouldUsePopup && !nativeAuth}
       oauthCallback={async strategy => {
-        if (externalAuth) {
-          try {
-            return authenticateWithNativeRedirect({
-              clerk,
-              resource: signIn,
-              params: {
-                strategy,
-                redirectUrl,
-                redirectUrlComplete,
-                transport: externalAuth,
-                oidcPrompt: ctx.oidcPrompt,
-              },
-              callbackParams: {
-                signUpUrl: ctx.signUpUrl,
-                signInUrl: ctx.signInUrl,
-                signInForceRedirectUrl: ctx.afterSignInUrl,
-                signUpForceRedirectUrl: ctx.afterSignUpUrl,
-                continueSignUpUrl: ctx.signUpContinueUrl,
-                transferable: ctx.transferable,
-                firstFactorUrl: '../factor-one',
-                secondFactorUrl: '../factor-two',
-                resetPasswordUrl: '../reset-password',
-                navigateOnSetActive: ctx.navigateOnSetActive,
-                unsafeMetadata: ctx.unsafeMetadata,
-              },
-              navigate,
-            });
-          } catch (err) {
-            return handleError(err);
-          }
+        if (nativeAuth) {
+          return nativeAuth.authenticate({
+            resource: signIn,
+            params: {
+              strategy,
+              redirectUrl,
+              redirectUrlComplete,
+              oidcPrompt: ctx.oidcPrompt,
+            },
+            callbackParams: {
+              signUpUrl: ctx.signUpUrl,
+              signInUrl: ctx.signInUrl,
+              signInForceRedirectUrl: ctx.afterSignInUrl,
+              signUpForceRedirectUrl: ctx.afterSignUpUrl,
+              continueSignUpUrl: ctx.signUpContinueUrl,
+              transferable: ctx.transferable,
+              firstFactorUrl: '../factor-one',
+              secondFactorUrl: '../factor-two',
+              resetPasswordUrl: '../reset-password',
+              navigateOnSetActive: ctx.navigateOnSetActive,
+              unsafeMetadata: ctx.unsafeMetadata,
+            },
+          });
         }
 
         if (shouldUsePopup) {

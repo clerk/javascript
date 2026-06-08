@@ -476,28 +476,19 @@ export class SignUp extends BaseResource implements SignUpResource {
     const {
       strategy,
       redirectUrl,
-      redirectUrlComplete,
       continueSignUp = false,
       unsafeMetadata,
       emailAddress,
       legalAccepted,
       oidcPrompt,
       enterpriseConnectionId,
-      transport,
     } = params;
-
-    const nativeRedirectUrl = await transport.getRedirectUrl({
-      strategy,
-      intent: 'sign-up',
-      redirectUrl,
-      redirectUrlComplete,
-    });
 
     const authenticate = () => {
       const authParams = {
         strategy,
-        redirectUrl: nativeRedirectUrl,
-        actionCompleteRedirectUrl: nativeRedirectUrl,
+        redirectUrl,
+        actionCompleteRedirectUrl: redirectUrl,
         unsafeMetadata,
         emailAddress,
         legalAccepted,
@@ -522,15 +513,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       clerkInvalidFAPIResponse(status, SignUp.fapiClient.buildEmailAddress('support'));
     }
 
-    await transport.openExternal(externalVerificationRedirectURL);
-    const callbackUrl = await transport.waitForCallback({
-      strategy,
-      intent: 'sign-up',
-      redirectUrl: nativeRedirectUrl,
-    });
-    const rotatingTokenNonce = new URL(callbackUrl).searchParams.get('rotating_token_nonce') || '';
-
-    return this.reload({ rotatingTokenNonce });
+    return this;
   };
 
   update = (params: SignUpUpdateParams): Promise<SignUpResource> => {

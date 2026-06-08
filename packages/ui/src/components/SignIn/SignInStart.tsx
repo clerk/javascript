@@ -21,7 +21,6 @@ import { LoadingCard } from '@/ui/elements/LoadingCard';
 import { SocialButtonsReversibleContainerWithDivider } from '@/ui/elements/ReversibleContainer';
 import { handleError } from '@/ui/utils/errorHandler';
 import { isMobileDevice } from '@/ui/utils/isMobileDevice';
-import { authenticateWithNativeRedirect } from '@/ui/utils/nativeRedirect';
 import type { FormControlState } from '@/ui/utils/useFormControl';
 import { buildRequest, useFormControl } from '@/ui/utils/useFormControl';
 
@@ -32,10 +31,10 @@ import {
   withRedirectToAfterSignIn,
   withRedirectToSignInTask,
 } from '../../common';
-import { useCoreSignIn, useEnvironment, useOptions, useSignInContext } from '../../contexts';
+import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import { CaptchaElement } from '../../elements/CaptchaElement';
-import { useLoadingStatus } from '../../hooks';
+import { useLoadingStatus, useNativeExternalAuth } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useTotalEnabledAuthMethods } from '../../hooks/useTotalEnabledAuthMethods';
 import { useRouter } from '../../router';
@@ -86,7 +85,7 @@ function SignInStartInternal(): JSX.Element {
   const signIn = useCoreSignIn();
   const { navigate } = useRouter();
   const ctx = useSignInContext();
-  const externalAuth = useOptions().experimental?.externalAuth;
+  const nativeAuth = useNativeExternalAuth();
   const { afterSignInUrl, signUpUrl, waitlistUrl, isCombinedFlow, navigateOnSetActive } = ctx;
   const supportEmail = useSupportEmail();
   const totalEnabledAuthMethods = useTotalEnabledAuthMethods();
@@ -417,33 +416,35 @@ function SignInStartInternal(): JSX.Element {
     const redirectUrl = ctx.ssoCallbackUrl;
     const redirectUrlComplete = ctx.afterSignInUrl || '/';
 
-    if (externalAuth) {
-      return authenticateWithNativeRedirect({
-        clerk,
-        resource: signIn,
-        params: {
-          strategy: 'enterprise_sso',
-          redirectUrl,
-          redirectUrlComplete,
-          continueSignIn: true,
-          transport: externalAuth,
-          oidcPrompt: ctx.oidcPrompt,
+    if (nativeAuth) {
+      // Let `attemptToRecoverFromSignInError` own error handling (it silently recovers
+      // session-exists / instant-password errors), so the hook must not surface them on the card.
+      return nativeAuth.authenticate(
+        {
+          resource: signIn,
+          params: {
+            strategy: 'enterprise_sso',
+            redirectUrl,
+            redirectUrlComplete,
+            continueSignIn: true,
+            oidcPrompt: ctx.oidcPrompt,
+          },
+          callbackParams: {
+            signUpUrl: ctx.signUpUrl,
+            signInUrl: ctx.signInUrl,
+            signInForceRedirectUrl: ctx.afterSignInUrl,
+            signUpForceRedirectUrl: ctx.afterSignUpUrl,
+            continueSignUpUrl: ctx.signUpContinueUrl,
+            transferable: ctx.transferable,
+            firstFactorUrl: '../factor-one',
+            secondFactorUrl: '../factor-two',
+            resetPasswordUrl: '../reset-password',
+            navigateOnSetActive: ctx.navigateOnSetActive,
+            unsafeMetadata: ctx.unsafeMetadata,
+          },
         },
-        callbackParams: {
-          signUpUrl: ctx.signUpUrl,
-          signInUrl: ctx.signInUrl,
-          signInForceRedirectUrl: ctx.afterSignInUrl,
-          signUpForceRedirectUrl: ctx.afterSignUpUrl,
-          continueSignUpUrl: ctx.signUpContinueUrl,
-          transferable: ctx.transferable,
-          firstFactorUrl: '../factor-one',
-          secondFactorUrl: '../factor-two',
-          resetPasswordUrl: '../reset-password',
-          navigateOnSetActive: ctx.navigateOnSetActive,
-          unsafeMetadata: ctx.unsafeMetadata,
-        },
-        navigate,
-      });
+        { surfaceErrorOnCard: false },
+      );
     }
 
     return signIn.authenticateWithRedirect({

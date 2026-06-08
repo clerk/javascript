@@ -2057,18 +2057,10 @@ describe('SignIn', () => {
         vi.unstubAllGlobals();
       });
 
-      it('authenticates OAuth with the native redirect transport', async () => {
+      it('prepares OAuth for native redirect', async () => {
         const externalVerificationRedirectURL = new URL('https://accounts.example.com/oauth');
-        const transport = {
-          getRedirectUrl: vi.fn().mockResolvedValue('http://127.0.0.1:45789/sso-callback'),
-          openExternal: vi.fn().mockResolvedValue(undefined),
-          waitForCallback: vi
-            .fn()
-            .mockResolvedValue('http://127.0.0.1:45789/sso-callback?rotating_token_nonce=nonce_123'),
-        };
 
         const signIn = new SignIn();
-        const reloadedSignIn = new SignIn({ id: 'signin_123', status: 'complete' } as any);
 
         vi.spyOn(signIn, 'create').mockImplementation(async () => {
           signIn.firstFactorVerification = {
@@ -2077,48 +2069,27 @@ describe('SignIn', () => {
           } as any;
           return signIn;
         });
-        vi.spyOn(signIn, 'reload').mockResolvedValue(reloadedSignIn);
 
         const res = await signIn.__experimental_authenticateWithNativeRedirect({
           strategy: 'oauth_google',
           identifier: 'user@example.com',
-          redirectUrl: '/sso-callback',
-          redirectUrlComplete: '/',
-          transport,
+          redirectUrl: 'myapp://sso-callback',
+          redirectUrlComplete: '/after-sign-in',
         });
 
-        expect(transport.getRedirectUrl).toHaveBeenCalledWith({
-          strategy: 'oauth_google',
-          intent: 'sign-in',
-          redirectUrl: '/sso-callback',
-          redirectUrlComplete: '/',
-        });
         expect(signIn.create).toHaveBeenCalledWith({
           strategy: 'oauth_google',
           identifier: 'user@example.com',
-          redirectUrl: 'http://127.0.0.1:45789/sso-callback',
-          actionCompleteRedirectUrl: 'http://127.0.0.1:45789/sso-callback',
+          redirectUrl: 'myapp://sso-callback',
+          actionCompleteRedirectUrl: 'myapp://sso-callback',
           oidcPrompt: undefined,
         });
-        expect(transport.openExternal).toHaveBeenCalledWith(externalVerificationRedirectURL);
-        expect(transport.waitForCallback).toHaveBeenCalledWith({
-          strategy: 'oauth_google',
-          intent: 'sign-in',
-          redirectUrl: 'http://127.0.0.1:45789/sso-callback',
-        });
-        expect(signIn.reload).toHaveBeenCalledWith({ rotatingTokenNonce: 'nonce_123' });
-        expect(res).toBe(reloadedSignIn);
+        expect(res).toBe(signIn);
+        expect(signIn.firstFactorVerification.externalVerificationRedirectURL).toBe(externalVerificationRedirectURL);
       });
 
-      it('continues enterprise SSO with the native redirect transport', async () => {
+      it('continues enterprise SSO for native redirect', async () => {
         const externalVerificationRedirectURL = new URL('https://sso.example.com/auth');
-        const transport = {
-          getRedirectUrl: vi.fn().mockResolvedValue('http://127.0.0.1:45789/sso-callback'),
-          openExternal: vi.fn().mockResolvedValue(undefined),
-          waitForCallback: vi
-            .fn()
-            .mockResolvedValue('http://127.0.0.1:45789/sso-callback?rotating_token_nonce=nonce_456'),
-        };
 
         const signIn = new SignIn({ id: 'signin_123', status: 'needs_first_factor' } as any);
         vi.spyOn(signIn, 'create');
@@ -2129,27 +2100,24 @@ describe('SignIn', () => {
           } as any;
           return signIn;
         });
-        vi.spyOn(signIn, 'reload').mockResolvedValue(signIn);
 
         await signIn.__experimental_authenticateWithNativeRedirect({
           strategy: 'enterprise_sso',
           continueSignIn: true,
           enterpriseConnectionId: 'ec_123',
-          redirectUrl: '/sso-callback',
+          redirectUrl: 'myapp://sso-callback',
           redirectUrlComplete: '/',
-          transport,
         });
 
         expect(signIn.create).not.toHaveBeenCalled();
         expect(signIn.prepareFirstFactor).toHaveBeenCalledWith({
           strategy: 'enterprise_sso',
-          redirectUrl: 'http://127.0.0.1:45789/sso-callback',
-          actionCompleteRedirectUrl: 'http://127.0.0.1:45789/sso-callback',
+          redirectUrl: 'myapp://sso-callback',
+          actionCompleteRedirectUrl: 'myapp://sso-callback',
           oidcPrompt: undefined,
           enterpriseConnectionId: 'ec_123',
         });
-        expect(transport.openExternal).toHaveBeenCalledWith(externalVerificationRedirectURL);
-        expect(signIn.reload).toHaveBeenCalledWith({ rotatingTokenNonce: 'nonce_456' });
+        expect(signIn.firstFactorVerification.externalVerificationRedirectURL).toBe(externalVerificationRedirectURL);
       });
 
       it('creates signIn with enterprise_sso strategy and prepares first factor', async () => {

@@ -75,8 +75,11 @@ export const handleError: HandleError = (err, fieldStates, setGlobalError) => {
     return handleClerkApiError(err, fieldStates, setGlobalError);
   }
 
-  if (isClerkRuntimeError(err) && err.code === 'reverification_cancelled') {
-    // Don't log or display an error for cancelled reverification, the user simply closed the modal.
+  if (
+    isClerkRuntimeError(err) &&
+    (err.code === 'reverification_cancelled' || err.code === 'native_redirect_cancelled')
+  ) {
+    // Don't log or display an error for user-abandoned flows.
     return;
   }
 

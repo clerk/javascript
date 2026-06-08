@@ -604,18 +604,10 @@ describe('SignUp', () => {
         SignUp.clerk = {} as any;
       });
 
-      it('authenticates OAuth with the native redirect transport', async () => {
+      it('prepares OAuth for native redirect', async () => {
         const externalVerificationRedirectURL = new URL('https://accounts.example.com/oauth');
-        const transport = {
-          getRedirectUrl: vi.fn().mockResolvedValue('http://127.0.0.1:45789/sso-callback'),
-          openExternal: vi.fn().mockResolvedValue(undefined),
-          waitForCallback: vi
-            .fn()
-            .mockResolvedValue('http://127.0.0.1:45789/sso-callback?rotating_token_nonce=nonce_123'),
-        };
 
         const signUp = new SignUp();
-        const reloadedSignUp = new SignUp({ id: 'signup_123', status: 'complete' } as any);
 
         vi.spyOn(signUp, 'create').mockImplementation(async () => {
           signUp.verifications.externalAccount = {
@@ -624,52 +616,33 @@ describe('SignUp', () => {
           } as any;
           return signUp;
         });
-        vi.spyOn(signUp, 'reload').mockResolvedValue(reloadedSignUp);
 
         const res = await signUp.__experimental_authenticateWithNativeRedirect({
           strategy: 'oauth_google',
-          redirectUrl: '/sso-callback',
+          redirectUrl: 'myapp://sso-callback',
           redirectUrlComplete: '/',
-          transport,
           unsafeMetadata: { plan: 'pro' },
           legalAccepted: true,
         });
 
-        expect(transport.getRedirectUrl).toHaveBeenCalledWith({
-          strategy: 'oauth_google',
-          intent: 'sign-up',
-          redirectUrl: '/sso-callback',
-          redirectUrlComplete: '/',
-        });
         expect(signUp.create).toHaveBeenCalledWith({
           strategy: 'oauth_google',
-          redirectUrl: 'http://127.0.0.1:45789/sso-callback',
-          actionCompleteRedirectUrl: 'http://127.0.0.1:45789/sso-callback',
+          redirectUrl: 'myapp://sso-callback',
+          actionCompleteRedirectUrl: 'myapp://sso-callback',
           unsafeMetadata: { plan: 'pro' },
           emailAddress: undefined,
           legalAccepted: true,
           oidcPrompt: undefined,
           enterpriseConnectionId: undefined,
         });
-        expect(transport.openExternal).toHaveBeenCalledWith(externalVerificationRedirectURL);
-        expect(transport.waitForCallback).toHaveBeenCalledWith({
-          strategy: 'oauth_google',
-          intent: 'sign-up',
-          redirectUrl: 'http://127.0.0.1:45789/sso-callback',
-        });
-        expect(signUp.reload).toHaveBeenCalledWith({ rotatingTokenNonce: 'nonce_123' });
-        expect(res).toBe(reloadedSignUp);
+        expect(res).toBe(signUp);
+        expect(signUp.verifications.externalAccount.externalVerificationRedirectURL).toBe(
+          externalVerificationRedirectURL,
+        );
       });
 
-      it('continues sign up with the native redirect transport', async () => {
+      it('continues sign up for native redirect', async () => {
         const externalVerificationRedirectURL = new URL('https://accounts.example.com/oauth');
-        const transport = {
-          getRedirectUrl: vi.fn().mockResolvedValue('http://127.0.0.1:45789/sso-callback'),
-          openExternal: vi.fn().mockResolvedValue(undefined),
-          waitForCallback: vi
-            .fn()
-            .mockResolvedValue('http://127.0.0.1:45789/sso-callback?rotating_token_nonce=nonce_456'),
-        };
 
         const signUp = new SignUp({ id: 'signup_123', status: 'missing_requirements' } as any);
         vi.spyOn(signUp, 'create');
@@ -680,29 +653,28 @@ describe('SignUp', () => {
           } as any;
           return signUp;
         });
-        vi.spyOn(signUp, 'reload').mockResolvedValue(signUp);
 
         await signUp.__experimental_authenticateWithNativeRedirect({
           strategy: 'oauth_google',
-          redirectUrl: '/sso-callback',
+          redirectUrl: 'myapp://sso-callback',
           redirectUrlComplete: '/',
           continueSignUp: true,
-          transport,
         });
 
         expect(signUp.create).not.toHaveBeenCalled();
         expect(signUp.update).toHaveBeenCalledWith({
           strategy: 'oauth_google',
-          redirectUrl: 'http://127.0.0.1:45789/sso-callback',
-          actionCompleteRedirectUrl: 'http://127.0.0.1:45789/sso-callback',
+          redirectUrl: 'myapp://sso-callback',
+          actionCompleteRedirectUrl: 'myapp://sso-callback',
           unsafeMetadata: undefined,
           emailAddress: undefined,
           legalAccepted: undefined,
           oidcPrompt: undefined,
           enterpriseConnectionId: undefined,
         });
-        expect(transport.openExternal).toHaveBeenCalledWith(externalVerificationRedirectURL);
-        expect(signUp.reload).toHaveBeenCalledWith({ rotatingTokenNonce: 'nonce_456' });
+        expect(signUp.verifications.externalAccount.externalVerificationRedirectURL).toBe(
+          externalVerificationRedirectURL,
+        );
       });
 
       it('handles relative redirectUrl by converting to absolute', async () => {

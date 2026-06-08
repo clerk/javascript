@@ -396,30 +396,14 @@ export class SignIn extends BaseResource implements SignInResource {
   public __experimental_authenticateWithNativeRedirect = async (
     params: AuthenticateWithNativeRedirectParams,
   ): Promise<SignInResource> => {
-    const {
-      strategy,
-      redirectUrl,
-      redirectUrlComplete,
-      identifier,
-      oidcPrompt,
-      continueSignIn,
-      enterpriseConnectionId,
-      transport,
-    } = params || {};
-
-    const nativeRedirectUrl = await transport.getRedirectUrl({
-      strategy,
-      intent: 'sign-in',
-      redirectUrl,
-      redirectUrlComplete,
-    });
+    const { strategy, redirectUrl, identifier, oidcPrompt, continueSignIn, enterpriseConnectionId } = params || {};
 
     if (!this.id || !continueSignIn) {
       await this.create({
         strategy,
         identifier,
-        redirectUrl: nativeRedirectUrl,
-        actionCompleteRedirectUrl: nativeRedirectUrl,
+        redirectUrl,
+        actionCompleteRedirectUrl: redirectUrl,
         oidcPrompt,
       });
     }
@@ -427,8 +411,8 @@ export class SignIn extends BaseResource implements SignInResource {
     if (strategy === 'enterprise_sso') {
       await this.prepareFirstFactor({
         strategy,
-        redirectUrl: nativeRedirectUrl,
-        actionCompleteRedirectUrl: nativeRedirectUrl,
+        redirectUrl,
+        actionCompleteRedirectUrl: redirectUrl,
         oidcPrompt,
         enterpriseConnectionId,
       });
@@ -440,15 +424,7 @@ export class SignIn extends BaseResource implements SignInResource {
       clerkInvalidFAPIResponse(status, SignIn.fapiClient.buildEmailAddress('support'));
     }
 
-    await transport.openExternal(externalVerificationRedirectURL);
-    const callbackUrl = await transport.waitForCallback({
-      strategy,
-      intent: 'sign-in',
-      redirectUrl: nativeRedirectUrl,
-    });
-    const rotatingTokenNonce = new URL(callbackUrl).searchParams.get('rotating_token_nonce') || '';
-
-    return this.reload({ rotatingTokenNonce });
+    return this;
   };
 
   public authenticateWithWeb3 = async (params: AuthenticateWithWeb3Params): Promise<SignInResource> => {

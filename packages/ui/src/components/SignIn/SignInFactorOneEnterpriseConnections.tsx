@@ -3,12 +3,11 @@ import type { ComponentType } from 'react';
 
 import { withRedirect } from '@/ui/common';
 import { ChooseEnterpriseConnectionCard } from '@/ui/common/ChooseEnterpriseConnectionCard';
-import { useCoreSignIn, useOptions, useSignInContext } from '@/ui/contexts';
+import { useCoreSignIn, useSignInContext } from '@/ui/contexts';
 import { Flow, localizationKeys } from '@/ui/customizables';
 import { withCardStateProvider } from '@/ui/elements/contexts';
-import { useRouter } from '@/ui/router';
+import { useNativeExternalAuth } from '@/ui/hooks/useNativeExternalAuth';
 import type { AvailableComponentProps } from '@/ui/types';
-import { authenticateWithNativeRedirect } from '@/ui/utils/nativeRedirect';
 
 import { hasMultipleEnterpriseConnections } from './shared';
 
@@ -18,8 +17,7 @@ import { hasMultipleEnterpriseConnections } from './shared';
 const SignInFactorOneEnterpriseConnectionsInternal = () => {
   const ctx = useSignInContext();
   const clerk = useClerk();
-  const { navigate } = useRouter();
-  const externalAuth = useOptions().experimental?.externalAuth;
+  const nativeAuth = useNativeExternalAuth();
   const signIn = clerk.client.signIn;
 
   if (!hasMultipleEnterpriseConnections(signIn.supportedFirstFactors)) {
@@ -36,9 +34,8 @@ const SignInFactorOneEnterpriseConnectionsInternal = () => {
     const redirectUrl = ctx.ssoCallbackUrl;
     const redirectUrlComplete = ctx.afterSignInUrl || '/';
 
-    if (externalAuth) {
-      await authenticateWithNativeRedirect({
-        clerk,
+    if (nativeAuth) {
+      await nativeAuth.authenticate({
         resource: signIn,
         params: {
           strategy: 'enterprise_sso',
@@ -46,7 +43,6 @@ const SignInFactorOneEnterpriseConnectionsInternal = () => {
           redirectUrlComplete,
           continueSignIn: true,
           enterpriseConnectionId,
-          transport: externalAuth,
           oidcPrompt: ctx.oidcPrompt,
         },
         callbackParams: {
@@ -62,7 +58,6 @@ const SignInFactorOneEnterpriseConnectionsInternal = () => {
           navigateOnSetActive: ctx.navigateOnSetActive,
           unsafeMetadata: ctx.unsafeMetadata,
         },
-        navigate,
       });
       return;
     }

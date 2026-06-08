@@ -17,6 +17,8 @@ describe('SignInStart', () => {
   const originalGetComputedStyle = window.getComputedStyle;
   const originalLocation = window.location;
   const originalHistory = window.history;
+  const originalProcessDescriptor = Object.getOwnPropertyDescriptor(window, 'process');
+  const originalUserAgentDescriptor = Object.getOwnPropertyDescriptor(window.navigator, 'userAgent');
   const mockGetComputedStyle = vi.fn();
 
   beforeEach(() => {
@@ -51,6 +53,15 @@ describe('SignInStart', () => {
       writable: true,
       configurable: true,
     });
+    delete (window as any).__clerk_internal_electron;
+    if (originalProcessDescriptor) {
+      Object.defineProperty(window, 'process', originalProcessDescriptor);
+    } else {
+      delete (window as any).process;
+    }
+    if (originalUserAgentDescriptor) {
+      Object.defineProperty(window.navigator, 'userAgent', originalUserAgentDescriptor);
+    }
   });
 
   it('renders the component', async () => {
@@ -284,35 +295,51 @@ describe('SignInStart', () => {
       });
     });
 
-    it('uses the configured external auth transport for OAuth sign-in', async () => {
+    it('uses the Electron bridge for OAuth sign-in', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withSocialProvider({ provider: 'google' });
       });
 
-      const externalAuth = {
+      const electron = {
         getRedirectUrl: vi.fn(() => Promise.resolve('myapp://auth/callback')),
         openExternal: vi.fn(() => Promise.resolve()),
-        waitForCallback: vi.fn(() => Promise.resolve('myapp://auth/callback?rotating_token_nonce=test-nonce')),
+        waitForRedirectCallback: vi.fn(() => Promise.resolve('myapp://auth/callback?rotating_token_nonce=test-nonce')),
       };
-      fixtures.options.experimental = { externalAuth };
+      Object.defineProperty(window, 'process', {
+        value: { ...(process as any), type: 'renderer' },
+        writable: true,
+        configurable: true,
+      });
+      Object.defineProperty(window.navigator, 'userAgent', {
+        value: 'Electron',
+        configurable: true,
+      });
+      window.__clerk_internal_electron = electron;
+      fixtures.clerk.__experimental_handleNativeRedirectCallback.mockResolvedValueOnce(undefined);
       fixtures.signIn.__experimental_authenticateWithNativeRedirect.mockImplementationOnce(async () => {
         fixtures.signIn.status = 'complete';
         fixtures.signIn.createdSessionId = 'sess_external';
+        fixtures.signIn.firstFactorVerification.externalVerificationRedirectURL = new URL(
+          'https://accounts.example.com',
+        );
         return fixtures.signIn;
       });
+      vi.spyOn(fixtures.signIn, 'reload').mockResolvedValueOnce(fixtures.signIn);
 
-      const { userEvent } = render(<SignInStart />, { wrapper });
-      await userEvent.click(screen.getByText('Continue with Google'));
+      render(<SignInStart />, { wrapper });
+      fireEvent.click(screen.getByText('Continue with Google'));
 
       await waitFor(() => {
         expect(fixtures.signIn.__experimental_authenticateWithNativeRedirect).toHaveBeenCalledWith({
           strategy: 'oauth_google',
-          redirectUrl: 'http://localhost:3000/#/sso-callback',
+          redirectUrl: 'myapp://auth/callback',
           redirectUrlComplete: '/',
-          transport: externalAuth,
           oidcPrompt: undefined,
         });
       });
+      expect(electron.openExternal).toHaveBeenCalledWith('https://accounts.example.com/');
+      expect(electron.waitForRedirectCallback).toHaveBeenCalled();
+      expect(fixtures.signIn.reload).toHaveBeenCalledWith({ rotatingTokenNonce: 'test-nonce' });
       expect(fixtures.signIn.authenticateWithRedirect).not.toHaveBeenCalled();
       expect(fixtures.clerk.__experimental_handleNativeRedirectCallback).toHaveBeenCalledWith(
         fixtures.signIn,
@@ -332,6 +359,50 @@ describe('SignInStart', () => {
         expect.any(Function),
       );
       expect(fixtures.clerk.setActive).not.toHaveBeenCalled();
+    });
+
+    it('clears the Electron OAuth sign-in loading state when the callback has no nonce or error', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withSocialProvider({ provider: 'google' });
+      });
+
+      const electron = {
+        getRedirectUrl: vi.fn(() => Promise.resolve('myapp://auth/callback')),
+        openExternal: vi.fn(() => Promise.resolve()),
+        waitForRedirectCallback: vi.fn(() => Promise.resolve('myapp://auth/callback')),
+      };
+      Object.defineProperty(window, 'process', {
+        value: { ...(process as any), type: 'renderer' },
+        writable: true,
+        configurable: true,
+      });
+      Object.defineProperty(window.navigator, 'userAgent', {
+        value: 'Electron',
+        configurable: true,
+      });
+      window.__clerk_internal_electron = electron;
+      fixtures.signIn.__experimental_authenticateWithNativeRedirect.mockImplementationOnce(async () => {
+        fixtures.signIn.firstFactorVerification.externalVerificationRedirectURL = new URL(
+          'https://accounts.example.com',
+        );
+        return fixtures.signIn;
+      });
+      vi.spyOn(fixtures.signIn, 'reload').mockResolvedValueOnce(fixtures.signIn);
+
+      render(<SignInStart />, { wrapper });
+      fireEvent.click(screen.getByText('Continue with Google'));
+
+      await waitFor(() => {
+        expect(electron.openExternal).toHaveBeenCalledWith('https://accounts.example.com/');
+      });
+      await waitFor(
+        () => {
+          expect(screen.getByText('Continue with Google').closest('button')).not.toBeDisabled();
+        },
+        { timeout: 6_000 },
+      );
+      expect(fixtures.signIn.reload).toHaveBeenCalledWith();
+      expect(fixtures.clerk.__experimental_handleNativeRedirectCallback).not.toHaveBeenCalled();
     });
   });
 

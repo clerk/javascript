@@ -10,7 +10,7 @@ import { sleep } from '@/ui/utils/sleep';
 import { ProviderIcon } from '../../common';
 import { useUserProfileContext } from '../../contexts';
 import { descriptors, localizationKeys } from '../../customizables';
-import { useEnabledThirdPartyProviders } from '../../hooks';
+import { useEnabledThirdPartyProviders, useNativeExternalAuth } from '../../hooks';
 import { useRouter } from '../../router';
 
 const ConnectMenuButton = (props: { strategy: OAuthStrategy; onClick?: () => void }) => {
@@ -21,8 +21,9 @@ const ConnectMenuButton = (props: { strategy: OAuthStrategy; onClick?: () => voi
   const { strategyToDisplayData } = useEnabledThirdPartyProviders();
   const { additionalOAuthScopes, componentName, mode } = useUserProfileContext();
   const isModal = mode === 'modal';
+  const nativeAuth = useNativeExternalAuth();
 
-  const createExternalAccount = useReverification(() => {
+  const createExternalAccount = useReverification((nativeRedirectUrl?: string) => {
     const socialProvider = strategy.replace('oauth_', '') as OAuthProvider;
     const redirectUrl = isModal
       ? appendModalState({ url: window.location.href, componentName, socialProvider: socialProvider })
@@ -31,7 +32,7 @@ const ConnectMenuButton = (props: { strategy: OAuthStrategy; onClick?: () => voi
 
     return user?.createExternalAccount({
       strategy,
-      redirectUrl,
+      redirectUrl: nativeRedirectUrl || redirectUrl,
       additionalScopes,
     });
   });
@@ -44,6 +45,10 @@ const ConnectMenuButton = (props: { strategy: OAuthStrategy; onClick?: () => voi
     // TODO: Decide if we should keep using this strategy
     // If yes, refactor and cleanup:
     card.setLoading(strategy);
+    if (nativeAuth) {
+      return nativeAuth.connectExternalAccount({ createExternalAccount, user }).finally(() => card.setIdle(strategy));
+    }
+
     return createExternalAccount()
       .then(res => {
         if (res && res.verification?.externalVerificationRedirectURL) {

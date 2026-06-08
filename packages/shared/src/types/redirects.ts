@@ -1,7 +1,5 @@
 import type { EnterpriseSSOStrategy, OAuthStrategy } from './strategies';
 
-type Awaitable<T> = T | Promise<T>;
-
 /** @generateWithEmptyComment */
 export type AfterSignOutUrl = {
   /**
@@ -87,32 +85,9 @@ export type AuthenticateWithRedirectParams = {
 export type AuthenticateWithPopupParams = AuthenticateWithRedirectParams & { popup: Window | null };
 
 /**
- * Runtime-provided transport for OAuth/SAML verification flows in native-like
- * environments where Clerk's web redirect and popup transports are not appropriate.
- *
  * @experimental This API is subject to change.
  */
-export type NativeRedirectTransport = {
-  getRedirectUrl: (params: {
-    strategy: OAuthStrategy | EnterpriseSSOStrategy;
-    intent: 'sign-in' | 'sign-up';
-    redirectUrl: string;
-    redirectUrlComplete: string;
-  }) => Awaitable<string>;
-  openExternal: (url: URL) => Awaitable<void>;
-  waitForCallback: (params: {
-    strategy: OAuthStrategy | EnterpriseSSOStrategy;
-    intent: 'sign-in' | 'sign-up';
-    redirectUrl: string;
-  }) => Awaitable<string>;
-};
-
-/**
- * @experimental This API is subject to change.
- */
-export type AuthenticateWithNativeRedirectParams = AuthenticateWithRedirectParams & {
-  transport: NativeRedirectTransport;
-};
+export type AuthenticateWithNativeRedirectParams = AuthenticateWithRedirectParams;
 
 /** @generateWithEmptyComment */
 export type RedirectUrlProp = {

@@ -27,7 +27,6 @@ import type {
   AfterMultiSessionSingleSignOutUrl,
   AfterSignOutUrl,
   NewSubscriptionRedirectUrl,
-  NativeRedirectTransport,
   RedirectOptions,
   RedirectUrlProp,
   SignInFallbackRedirectUrl,
@@ -1454,14 +1453,6 @@ export type ClerkOptions = ClerkOptionsNavigation &
          * directly with the provided Clerk instance. Used by React Native / Expo.
          */
         runtimeEnvironment: 'headless';
-        /**
-         * Provides a runtime-specific transport for OAuth/SAML verification flows.
-         * Useful for desktop shells that need to open the system browser and receive
-         * the provider callback through a custom scheme or loopback URL.
-         *
-         * @experimental This API is subject to change.
-         */
-        externalAuth: NativeRedirectTransport;
       },
       Record<string, any>
     >;

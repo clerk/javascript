@@ -13,6 +13,7 @@ export type * from './customPages';
 export type * from './deletedObject';
 export type * from './devtools';
 export type * from './displayConfig';
+export type * from './electron';
 export type * from './elementIds';
 export type * from './emailAddress';
 export type * from './enterpriseAccount';

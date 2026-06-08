@@ -14,7 +14,7 @@ import { useUserProfileContext } from '../../contexts';
 import { Box, Button, descriptors, Flex, localizationKeys, Text } from '../../customizables';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
-import { useEnabledThirdPartyProviders } from '../../hooks';
+import { useEnabledThirdPartyProviders, useNativeExternalAuth } from '../../hooks';
 import { useRouter } from '../../router';
 import type { PropsOfComponent } from '../../styledSystem';
 import { AddConnectedAccount } from './ConnectedAccountsMenu';
@@ -99,6 +99,7 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
   const { user } = useUser();
   const card = useCardState();
   const accountId = account.id;
+  const nativeAuth = useNativeExternalAuth();
 
   const isModal = mode === 'modal';
   const redirectUrl = isModal
@@ -108,11 +109,11 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
       })
     : window.location.href;
 
-  const createExternalAccount = useReverification(() =>
+  const createExternalAccount = useReverification((nativeRedirectUrl?: string) =>
     user?.createExternalAccount({
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       strategy: account.verification!.strategy as OAuthStrategy,
-      redirectUrl,
+      redirectUrl: nativeRedirectUrl || redirectUrl,
       additionalScopes,
     }),
   );
@@ -137,6 +138,20 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
     const redirectUrl = isModal ? appendModalState({ url: window.location.href, componentName }) : window.location.href;
 
     try {
+      if (nativeAuth) {
+        await nativeAuth.connectExternalAccount({
+          createExternalAccount: nativeRedirectUrl => {
+            if (reauthorizationRequired) {
+              return account.reauthorize({ additionalScopes, redirectUrl: nativeRedirectUrl });
+            }
+
+            return createExternalAccount(nativeRedirectUrl);
+          },
+          user,
+        });
+        return;
+      }
+
       let response: ExternalAccountResource | undefined;
       if (reauthorizationRequired) {
         response = await account.reauthorize({ additionalScopes, redirectUrl });

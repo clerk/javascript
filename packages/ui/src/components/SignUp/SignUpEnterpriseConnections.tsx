@@ -2,19 +2,16 @@ import { useClerk } from '@clerk/shared/react/index';
 
 import { withRedirectToAfterSignUp } from '@/ui/common';
 import { ChooseEnterpriseConnectionCard } from '@/ui/common/ChooseEnterpriseConnectionCard';
-import { useOptions, useSignUpContext } from '@/ui/contexts';
+import { useSignUpContext } from '@/ui/contexts';
 import { Flow, localizationKeys } from '@/ui/customizables';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
-import { useFetch } from '@/ui/hooks';
-import { useRouter } from '@/ui/router';
-import { authenticateWithNativeRedirect } from '@/ui/utils/nativeRedirect';
+import { useFetch, useNativeExternalAuth } from '@/ui/hooks';
 
 const SignUpEnterpriseConnectionsInternal = () => {
   const clerk = useClerk();
   const ctx = useSignUpContext();
-  const { navigate } = useRouter();
-  const externalAuth = useOptions().experimental?.externalAuth;
+  const nativeAuth = useNativeExternalAuth();
 
   const signUp = clerk.client.signUp;
   const { data: enterpriseConnections, isLoading } = useFetch(signUp?.__experimental_getEnterpriseConnections, {
@@ -25,9 +22,8 @@ const SignUpEnterpriseConnectionsInternal = () => {
     const redirectUrl = ctx.ssoCallbackUrl;
     const redirectUrlComplete = ctx.afterSignUpUrl || '/';
 
-    if (externalAuth) {
-      await authenticateWithNativeRedirect({
-        clerk,
+    if (nativeAuth) {
+      await nativeAuth.authenticate({
         resource: signUp,
         params: {
           strategy: 'enterprise_sso',
@@ -35,7 +31,6 @@ const SignUpEnterpriseConnectionsInternal = () => {
           redirectUrlComplete,
           continueSignUp: true,
           enterpriseConnectionId,
-          transport: externalAuth,
           unsafeMetadata: ctx.unsafeMetadata,
           oidcPrompt: ctx.oidcPrompt,
         },
@@ -51,7 +46,6 @@ const SignUpEnterpriseConnectionsInternal = () => {
           navigateOnSetActive: ctx.navigateOnSetActive,
           unsafeMetadata: ctx.unsafeMetadata,
         },
-        navigate,
       });
       return;
     }

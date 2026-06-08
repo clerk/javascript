@@ -72,6 +72,12 @@ export interface SignInResource extends ClerkResource {
   authenticateWithPopup: (params: AuthenticateWithPopupParams) => Promise<void>;
 
   /**
+   * Starts an OAuth or SAML authentication attempt for native redirect transports.
+   *
+   * This prepares the SignIn resource and returns it with an external verification
+   * redirect URL. The caller is responsible for opening that URL outside the current
+   * browser context, waiting for the native callback, and completing the callback.
+   *
    * @experimental This API is subject to change.
    */
   __experimental_authenticateWithNativeRedirect: (

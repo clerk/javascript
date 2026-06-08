@@ -1,8 +1,7 @@
 ---
 "@clerk/shared": minor
 "@clerk/ui": minor
-"@clerk/react": minor
 "@clerk/clerk-js": minor
 ---
 
-Add an experimental `externalAuth` option to `ClerkProvider` for non-browser runtimes to provide custom OAuth and SSO transport. When configured, Clerk's prebuilt sign-in and sign-up components use the provided transport instead of web redirects or popups.
+Add experimental native redirect support for Electron SSO flows. Clerk's prebuilt sign-in, sign-up, and connected-account UI can use an internal Electron preload bridge to open external verification URLs and resume after the native callback.
