@@ -291,7 +291,9 @@ const withClerkIOS = config => {
 
           // Check if file is already in the Xcode project references
           const fileReferences = xcodeProject.hash.project.objects.PBXFileReference || {};
-          const alreadyExists = Object.values(fileReferences).some(ref => ref && ref.path === fileName);
+          const alreadyExists = Object.values(fileReferences).some(
+            ref => ref && (ref.path === fileName || ref.path === relativePath || ref.name === fileName),
+          );
 
           if (alreadyExists) {
             // File is already in project, but we still copied the latest version

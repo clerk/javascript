@@ -59,7 +59,7 @@ type SyncableClerkInstance = {
   client?: { lastActiveSessionId?: string | null } | null;
   loaded?: boolean;
   session?: { id?: string | null } | null;
-  setActive?: (params: { session: string }) => void | Promise<void>;
+  setActive?: (params: { session: string; navigate?: () => void | Promise<void> }) => void | Promise<void>;
   __internal_reloadInitialResources?: () => void | Promise<void>;
 };
 
@@ -114,7 +114,13 @@ async function syncNativeClientToJs({
     nativeActiveSessionId !== jsActiveSessionId &&
     typeof clerkInstance.setActive === 'function'
   ) {
-    await clerkInstance.setActive({ session: nativeActiveSessionId });
+    await clerkInstance.setActive({
+      session: nativeActiveSessionId,
+      // Native AuthView owns pending session-task navigation. Passing a no-op
+      // navigate callback tells Clerk JS that the task is handled without
+      // routing away from the native flow.
+      navigate: async () => {},
+    });
   }
 }
 
