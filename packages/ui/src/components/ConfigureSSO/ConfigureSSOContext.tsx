@@ -45,17 +45,6 @@ export interface ConfigureSSOData {
    * derive the connection name without each calling `useUser` itself.
    */
   primaryEmailAddress: EmailAddressResource | undefined;
-  /**
-   * Deletes the current connection. Reset does NOT navigate: once the delete
-   * revalidates the source and drops `hasConnection`, the active step's entry
-   * guard breaks and the wizard self-corrects, re-seating to the
-   * furthest-reachable step (the same `initialState` derivation it uses on
-   * mount). Reads the reverification-wrapped `deleteConnection` mutation off the
-   * bundle. A no-op when there is no connection. Reset affordances call this
-   * instead of `useWizard().goToStep`, so they work from ANY footer (including
-   * nested SAML configure footers) without binding to a nested wizard.
-   */
-  resetConnection: () => Promise<void>;
 }
 
 interface ConfigureSSOProviderProps {
@@ -96,21 +85,6 @@ export const ConfigureSSOProvider = ({
   primaryEmailAddress,
   children,
 }: PropsWithChildren<ConfigureSSOProviderProps>): JSX.Element => {
-  const { deleteConnection } = mutations;
-  const connectionId = enterpriseConnection?.id;
-
-  // Reset is pure deletion — no navigation. Deleting revalidates the source and
-  // drops `hasConnection`, which breaks the active step's entry guard; the
-  // wizard self-corrects in its render phase, re-seating to the
-  // furthest-reachable step (verified email → select-provider; unverified →
-  // verify-domain). Never a hardcoded step, never a remount.
-  const resetConnection = React.useCallback(async () => {
-    if (!connectionId) {
-      return;
-    }
-    await deleteConnection(connectionId);
-  }, [connectionId, deleteConnection]);
-
   const value = React.useMemo<ConfigureSSOData>(
     () => ({
       contentRef,
@@ -119,9 +93,8 @@ export const ConfigureSSOProvider = ({
       testRuns,
       mutations,
       primaryEmailAddress,
-      resetConnection,
     }),
-    [contentRef, enterpriseConnection, mutations, connectionState, testRuns, primaryEmailAddress, resetConnection],
+    [contentRef, enterpriseConnection, mutations, connectionState, testRuns, primaryEmailAddress],
   );
 
   return <ConfigureSSOContext.Provider value={value}>{children}</ConfigureSSOContext.Provider>;

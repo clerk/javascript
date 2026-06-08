@@ -5,12 +5,13 @@ import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen, waitFor } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
 
-// The dialog no longer touches the wizard. On confirm it calls the context
-// `resetConnection()` — a pure delete, no navigation — and the wizard
-// self-corrects to the furthest-reachable step once the active step's guard
-// breaks. That lets the dialog be triggered from ANY footer (including nested
-// SAML configure footers) without binding to a nested wizard.
-const resetConnection = vi.fn();
+// The dialog no longer touches the wizard. On confirm it calls the
+// reverification-wrapped `mutations.deleteConnection(id)` directly — a pure
+// delete, no navigation — and the wizard self-corrects to the
+// furthest-reachable step once the active step's guard breaks. That lets the
+// dialog be triggered from ANY footer (including nested SAML configure footers)
+// without binding to a nested wizard.
+const deleteConnection = vi.fn();
 
 const connectionMockState = vi.hoisted(() => ({
   current: { id: 'idn_connection_1' } as Partial<EnterpriseConnectionResource> | null,
@@ -20,9 +21,9 @@ vi.mock('../ConfigureSSOContext', () => ({
   useConfigureSSO: () => ({
     enterpriseConnection: connectionMockState.current,
     contentRef: { current: null },
-    // The dialog's confirm calls the context `resetConnection`, which owns the
-    // reverification-wrapped delete. No navigation — the wizard self-corrects.
-    resetConnection,
+    // The dialog's confirm calls the reverification-wrapped `deleteConnection`
+    // mutation directly. No navigation — the wizard self-corrects.
+    mutations: { deleteConnection },
   }),
 }));
 
@@ -49,8 +50,8 @@ const renderDialog = (
 };
 
 const resetMocks = () => {
-  resetConnection.mockReset();
-  resetConnection.mockResolvedValue(undefined);
+  deleteConnection.mockReset();
+  deleteConnection.mockResolvedValue(undefined);
   connectionMockState.current = { id: 'idn_connection_1' };
 };
 
@@ -116,7 +117,7 @@ describe('ResetConnectionDialog', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
     expect(onClose).toHaveBeenCalledTimes(1);
-    expect(resetConnection).not.toHaveBeenCalled();
+    expect(deleteConnection).not.toHaveBeenCalled();
   });
 
   it('resets the connection (delete + re-derive) and closes on a successful submit', async () => {
@@ -129,8 +130,9 @@ describe('ResetConnectionDialog', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Reset connection' }));
 
     await waitFor(() => {
-      expect(resetConnection).toHaveBeenCalledTimes(1);
+      expect(deleteConnection).toHaveBeenCalledTimes(1);
     });
+    expect(deleteConnection).toHaveBeenCalledWith('idn_connection_1');
     await waitFor(() => {
       expect(onClose).toHaveBeenCalledTimes(1);
     });

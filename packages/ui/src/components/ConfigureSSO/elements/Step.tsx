@@ -197,12 +197,12 @@ FooterContinue.displayName = 'Step.Footer.Continue';
  * there is no connection (so it only shows on configure / test / confirmation,
  * never on verify-domain / select-provider).
  *
- * It deliberately does NOT call `useWizard()`. The confirm path calls the
- * context `resetConnection()` (a pure delete; the wizard then self-corrects to
- * the furthest-reachable step when the active step's guard breaks), so this
- * works from ANY footer — including the nested SAML configure footers, which
- * have their own (linear) wizard. That is what kills the old per-step
- * nested-binding trap.
+ * It deliberately does NOT call `useWizard()`. The confirm path deletes the
+ * connection directly via the context mutation (a pure delete; the wizard then
+ * self-corrects to the furthest-reachable step when the active step's guard
+ * breaks), so this works from ANY footer — including the nested SAML configure
+ * footers, which have their own (linear) wizard. That is what kills the old
+ * per-step nested-binding trap.
  *
  * `marginInlineStart: 'auto'` pushes it to the far-left of the `justify='end'`
  * footer row, matching the prior destructive affordance.

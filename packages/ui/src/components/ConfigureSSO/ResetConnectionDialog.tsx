@@ -46,7 +46,7 @@ export const ResetConnectionDialog = (props: ResetConnectionDialogProps): JSX.El
 const ResetConnectionDialogContent = withCardStateProvider((props: ResetConnectionDialogProps) => {
   const { onClose, confirmationValue } = props;
   const card = useCardState();
-  const { enterpriseConnection, resetConnection } = useConfigureSSO();
+  const { enterpriseConnection, mutations } = useConfigureSSO();
 
   const confirmationField = useFormControl('deleteConfirmation', '', {
     type: 'text',
@@ -65,12 +65,13 @@ const ResetConnectionDialogContent = withCardStateProvider((props: ResetConnecti
     }
 
     try {
-      // `resetConnection` deletes the connection — a pure delete, no navigation.
-      // Dropping `hasConnection` breaks the active step's entry guard, so the
-      // wizard self-corrects to the furthest-reachable step. No `useWizard()`
-      // here — that lets this dialog be triggered from ANY footer (including the
-      // nested SAML configure footers) without binding to a nested wizard.
-      await resetConnection();
+      // Reset is a pure delete — no navigation. Dropping `hasConnection` breaks
+      // the active step's entry guard, so the wizard self-corrects to the
+      // furthest-reachable step. The mutation is already reverification-wrapped.
+      // No `useWizard()` here — that lets this dialog be triggered from ANY
+      // footer (including the nested SAML configure footers) without binding to
+      // a nested wizard.
+      await mutations.deleteConnection(enterpriseConnection.id);
       onClose();
     } catch (err) {
       handleError(err as Error, [confirmationField], card.setError);

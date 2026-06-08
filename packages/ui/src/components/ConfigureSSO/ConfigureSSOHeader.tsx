@@ -14,7 +14,7 @@ import { useWizard } from './elements/Wizard';
  * the guard-driven `isReachable` flag (the same predicate `goToStep` checks), so
  * a disabled breadcrumb item and a blocked jump always agree. Completion stays
  * positional. The reset affordance now lives in the step footers
- * (`Step.Footer.Reset`), which drive it off the context `resetConnection()`
+ * (`Step.Footer.Reset`), which delete the connection via the context mutation
  * rather than a wizard binding.
  */
 export const ConfigureSSOHeader = (): JSX.Element => {
