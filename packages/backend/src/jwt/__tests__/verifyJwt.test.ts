@@ -106,13 +106,41 @@ describe('verifyJwt(jwt, options)', () => {
     expect(data).toEqual(mockJwtPayload);
   });
 
-  it('returns the valid JWT payload if valid key & issuer method & azp is given', async () => {
+  it('returns the valid JWT payload if valid key & issuer list & azp is given', async () => {
     const inputVerifyJwtOptions = {
       key: mockJwks.keys[0],
-      issuer: (iss: string) => iss.startsWith('https://clerk'),
+      issuer: ['https://clerk.other-app.com', mockJwtPayload.iss],
       authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
     };
     const { data } = await verifyJwt(mockJwt, inputVerifyJwtOptions);
+    expect(data).toEqual(mockJwtPayload);
+  });
+
+  it('returns an error if the issuer string does not match the iss claim', async () => {
+    const { errors: [error] = [] } = await verifyJwt(mockJwt, {
+      key: mockJwks.keys[0],
+      issuer: 'https://clerk.another-app.com',
+      authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
+    });
+    expect(error?.reason).toBe('token-invalid-issuer');
+    expect(error?.message).toContain('Invalid JWT issuer claim (iss)');
+  });
+
+  it('returns an error if no issuer in the list matches the iss claim', async () => {
+    const { errors: [error] = [] } = await verifyJwt(mockJwt, {
+      key: mockJwks.keys[0],
+      issuer: ['https://clerk.another-app.com', 'https://clerk.other-app.com'],
+      authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
+    });
+    expect(error?.reason).toBe('token-invalid-issuer');
+  });
+
+  it('does not validate the iss claim when no issuer is provided', async () => {
+    const { data, errors } = await verifyJwt(mockJwt, {
+      key: mockJwks.keys[0],
+      authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
+    });
+    expect(errors).toBeUndefined();
     expect(data).toEqual(mockJwtPayload);
   });
 

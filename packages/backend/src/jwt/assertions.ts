@@ -1,8 +1,6 @@
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../errors';
 import { algs } from './algorithms';
 
-export type IssuerResolver = string | ((iss: string) => boolean);
-
 const isArrayString = (s: unknown): s is string[] => {
   return Array.isArray(s) && s.length > 0 && s.every(a => typeof a === 'string');
 };
@@ -92,6 +90,23 @@ export const assertAuthorizedPartiesClaim = (azp?: string, authorizedParties?: s
     throw new TokenVerificationError({
       reason: TokenVerificationErrorReason.TokenInvalidAuthorizedParties,
       message: `Invalid JWT Authorized party claim (azp) ${JSON.stringify(azp)}. Expected "${authorizedParties}".`,
+    });
+  }
+};
+
+export const assertIssuerClaim = (iss: unknown, issuer?: string | string[]) => {
+  // No issuer configured, skip validation. Preserves the default behavior, matching how
+  // the audience and authorized parties claims are only checked when an option is provided.
+  const issuerList = [issuer].flat().filter(i => !!i);
+  if (issuerList.length === 0) {
+    return;
+  }
+
+  if (typeof iss !== 'string' || !issuerList.includes(iss)) {
+    throw new TokenVerificationError({
+      action: TokenVerificationErrorAction.EnsureClerkJWT,
+      reason: TokenVerificationErrorReason.TokenInvalidIssuer,
+      message: `Invalid JWT issuer claim (iss) ${JSON.stringify(iss)}. Expected "${issuerList}".`,
     });
   }
 };

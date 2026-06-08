@@ -68,6 +68,28 @@ describe('tokens.verify(token, options)', () => {
     expect(data).toEqual(mockJwtPayload);
   });
 
+  it('rejects the token when the provided issuer option does not match the iss claim', async () => {
+    server.use(
+      http.get(
+        'https://api.clerk.test/v1/jwks',
+        validateHeaders(() => {
+          return HttpResponse.json(mockJwks);
+        }),
+      ),
+    );
+
+    const { data, errors } = await verifyToken(mockJwt, {
+      apiUrl: 'https://api.clerk.test',
+      secretKey: 'a-valid-key',
+      authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
+      issuer: 'https://clerk.another-app.com',
+      skipJwksCache: true,
+    });
+
+    expect(data).toBeUndefined();
+    expect(errors?.[0].reason).toBe('token-invalid-issuer');
+  });
+
   it('verifies the token by fetching the JWKs from Backend API when secretKey is provided', async () => {
     server.use(
       http.get(
@@ -589,6 +611,31 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       expect(data.id).toBe('mt_2xKa9Bgv7NxMRDFyQw8LpZ3cTmU1vHjE');
       expect(data.subject).toBe('mch_2vYVtestTESTtestTESTtestTESTtest');
       expect(data.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
+    });
+
+    it('ignores a session-token issuer option when verifying an M2M JWT', async () => {
+      server.use(
+        http.get(
+          'https://api.clerk.test/v1/jwks',
+          validateHeaders(() => {
+            return HttpResponse.json(mockJwks);
+          }),
+        ),
+      );
+
+      const m2mJwt = await createSignedM2MJwt();
+
+      // issuer targets session tokens; machine tokens carry a different iss and must not be
+      // rejected by it (claim options must not leak through verifyMachineAuthToken).
+      const result = await verifyMachineAuthToken(m2mJwt, {
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+        issuer: 'https://clerk.inspired.puma-74.lcl.dev',
+      });
+
+      expect(result.tokenType).toBe('m2m_token');
+      expect(result.errors).toBeUndefined();
+      expect(result.data).toBeDefined();
     });
 
     it('rejects M2M JWT with alg: none', async () => {
