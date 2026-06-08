@@ -122,8 +122,8 @@ export function ProfileProviderShell({
   );
   const options = useMemo(
     () => ({
-      localization: (clerk as any).__internal_getOption('localization'),
-      supportEmail: (clerk as any).__internal_getOption('supportEmail'),
+      localization: clerk.__internal_getOption('localization'),
+      supportEmail: clerk.__internal_getOption('supportEmail'),
     }),
     [clerk],
   );
@@ -131,6 +131,7 @@ export function ProfileProviderShell({
   return (
     <SharedStyleCacheProvider
       clerk={clerk}
+      // nonce lives on IsomorphicClerkOptions, not ClerkOptions, so the typed K-constraint rejects it
       nonce={(clerk as any).__internal_getOption('nonce')}
       cssLayerName={normalizedGlobalAppearance?.cssLayerName}
     >

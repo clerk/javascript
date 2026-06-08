@@ -9,7 +9,7 @@ type BillingRoute =
   | { page: 'statement'; statementId: string }
   | { page: 'payment-attempt'; paymentAttemptId: string };
 
-function resolveNavigation(_currentRoute: BillingRoute, to: string): BillingRoute {
+function resolveNavigation(to: string): BillingRoute {
   let path = to;
   while (path.startsWith('../')) {
     path = path.slice(3);
@@ -79,7 +79,7 @@ export function useBillingRouter(): { router: RouteContextValue; route: BillingR
             return;
           }
         } catch {}
-        const newRoute = resolveNavigation(route, to);
+        const newRoute = resolveNavigation(to);
         setRoute(newRoute);
         if (options?.searchParams) {
           setQueryParams(Object.fromEntries(options.searchParams.entries()));
