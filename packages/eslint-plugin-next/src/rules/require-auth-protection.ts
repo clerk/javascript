@@ -3,7 +3,7 @@ import type { TSESTree } from '@typescript-eslint/utils';
 import type { Rule } from 'eslint';
 
 import type { ExportTarget } from '../lib/exports.js';
-import { iterateNamedExports, resolveDefaultExportTarget } from '../lib/exports.js';
+import { iterateExportAllDeclarations, iterateNamedExports, resolveDefaultExport } from '../lib/exports.js';
 import {
   type FileKind,
   getFileKind,
@@ -188,11 +188,19 @@ function checkRouteHandlers(context: Rule.RuleContext, programNode: TSESTree.Pro
     }
     checkMissingProtect(context, reportNode, target, `${name} handler`, authNames);
   }
+  // `export *` could re-export an HTTP-method handler we can't see across files
+  for (const { source, reportNode } of iterateExportAllDeclarations(programNode)) {
+    checkMissingProtect(context, reportNode, { kind: 'imported', source }, 'route handlers', authNames);
+  }
 }
 
 function checkServerActions(context: Rule.RuleContext, programNode: TSESTree.Program, authNames: Set<string>): void {
   for (const { name, target, reportNode } of iterateNamedExports(programNode)) {
     checkMissingProtect(context, reportNode, target, `server action '${name}'`, authNames);
+  }
+  // `export *` is also server functions and we can't them see across files
+  for (const { source, reportNode } of iterateExportAllDeclarations(programNode)) {
+    checkMissingProtect(context, reportNode, { kind: 'imported', source }, 'server actions', authNames);
   }
 }
 
@@ -202,14 +210,10 @@ function checkDefaultExport(
   fileKind: FileKind,
   authNames: Set<string>,
 ): void {
-  const defaultExport = programNode.body.find(
-    (n): n is TSESTree.ExportDefaultDeclaration => n.type === 'ExportDefaultDeclaration',
-  );
+  const defaultExport = resolveDefaultExport(programNode);
   if (!defaultExport) {
     return;
   }
 
-  const target = resolveDefaultExportTarget(programNode, defaultExport.declaration);
-
-  checkMissingProtect(context, defaultExport, target, fileKind, authNames);
+  checkMissingProtect(context, defaultExport.reportNode, defaultExport.target, fileKind, authNames);
 }

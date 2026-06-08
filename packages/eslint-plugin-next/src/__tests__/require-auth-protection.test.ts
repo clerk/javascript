@@ -122,6 +122,19 @@ ruleTester.run('require-auth-protection', rule, {
       options: [config],
     },
     {
+      name: 'protected page exporting local as default via specifier (`export { Page as default }`)',
+      code: `
+        import { auth } from '@clerk/nextjs/server';
+        async function Page() {
+          await auth.protect();
+          return <div />;
+        }
+        export { Page as default };
+      `,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+    },
+    {
       name: 'manual check: userId === null with redirect',
       code: `
         import { auth } from '@clerk/nextjs/server';
@@ -421,6 +434,14 @@ ruleTester.run('require-auth-protection', rule, {
       options: [config],
     },
     {
+      name: 'route handler namespace re-export is not treated as a top-level handler',
+      code: `
+        export * as handlers from './handlers';
+      `,
+      filename: abs('app/api/things/route.ts'),
+      options: [config],
+    },
+    {
       name: 'server action module with use server, all exports protected',
       code: `
         'use server';
@@ -433,6 +454,15 @@ ruleTester.run('require-auth-protection', rule, {
           await auth.protect();
           return id;
         }
+      `,
+      filename: abs('app/admin/users/actions.ts'),
+      options: [config],
+    },
+    {
+      name: 'server action namespace re-export is not treated as individual actions',
+      code: `
+        'use server';
+        export * as actions from './implementations';
       `,
       filename: abs('app/admin/users/actions.ts'),
       options: [config],
@@ -684,6 +714,36 @@ ruleTester.run('require-auth-protection', rule, {
       errors: [{ messageId: 'missingProtect' }],
     },
     {
+      name: 'protected page exporting local as default via specifier, missing protect',
+      code: `
+        async function Page() {
+          return <div>Hello</div>;
+        }
+        export { Page as default };
+      `,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+      errors: [{ messageId: 'missingProtect' }],
+    },
+    {
+      name: 'protected page re-exporting default from another module (`export { default } from`)',
+      code: `
+        export { default } from './Page';
+      `,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+      errors: [{ messageId: 'exportImported', data: { subject: 'page', source: './Page' } }],
+    },
+    {
+      name: 'protected page re-exporting local as default from another module (`export { Page as default } from`)',
+      code: `
+        export { Page as default } from './Page';
+      `,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+      errors: [{ messageId: 'exportImported', data: { subject: 'page', source: './Page' } }],
+    },
+    {
       name: 'protected page with protect call inside Suspense (not top-level)',
       code: `
         import { auth } from '@clerk/nextjs/server';
@@ -799,6 +859,20 @@ ruleTester.run('require-auth-protection', rule, {
       errors: [{ messageId: 'unverifiableExport', data: { subject: 'POST handler' } }],
     },
     {
+      name: 'route handlers re-exported via `export *` cannot be verified',
+      code: `
+        export * from './handlers';
+      `,
+      filename: abs('app/api/things/route.ts'),
+      options: [config],
+      errors: [
+        {
+          messageId: 'exportImported',
+          data: { subject: 'route handlers', source: './handlers' },
+        },
+      ],
+    },
+    {
       name: 'protected server action module with one export missing protect',
       code: `
         'use server';
@@ -866,6 +940,21 @@ ruleTester.run('require-auth-protection', rule, {
             subject: "server action 'deleteUser'",
             source: './implementations',
           },
+        },
+      ],
+    },
+    {
+      name: 'server actions re-exported via `export *` cannot be verified',
+      code: `
+        'use server';
+        export * from './implementations';
+      `,
+      filename: abs('app/admin/users/actions.ts'),
+      options: [config],
+      errors: [
+        {
+          messageId: 'exportImported',
+          data: { subject: 'server actions', source: './implementations' },
         },
       ],
     },
