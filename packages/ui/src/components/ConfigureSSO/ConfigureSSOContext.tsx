@@ -45,6 +45,22 @@ export interface ConfigureSSOData {
    * derive the connection name without each calling `useUser` itself.
    */
   primaryEmailAddress: EmailAddressResource | undefined;
+  /**
+   * A monotonically-increasing counter bumped once per reset. The top-level
+   * `<Wizard>` is keyed on it, so a bump remounts the wizard and re-derives the
+   * furthest-reachable step for the now-no-connection state. Create never bumps
+   * it, so the create path keeps using a plain `goNext` (no remount, no flash).
+   */
+  resetEpoch: number;
+  /**
+   * Deletes the current connection, then bumps {@link resetEpoch} so the keyed
+   * top-level wizard remounts and re-derives the furthest-reachable step. Reads
+   * the reverification-wrapped `deleteConnection` mutation off the bundle. A
+   * no-op when there is no connection. Reset affordances call this instead of
+   * `useWizard().goToStep`, so they work from ANY footer (including nested SAML
+   * configure footers) without binding to a nested wizard.
+   */
+  resetConnection: () => Promise<void>;
 }
 
 interface ConfigureSSOProviderProps {
@@ -84,6 +100,25 @@ export const ConfigureSSOProvider = ({
   primaryEmailAddress,
   children,
 }: PropsWithChildren<ConfigureSSOProviderProps>): JSX.Element => {
+  // Bumped once per reset. The keyed top-level `<Wizard>` remounts on a bump and
+  // re-derives the furthest-reachable step for the now-no-connection state.
+  const [resetEpoch, setResetEpoch] = React.useState(0);
+
+  const { deleteConnection } = mutations;
+  const connectionId = enterpriseConnection?.id;
+
+  const resetConnection = React.useCallback(async () => {
+    if (!connectionId) {
+      return;
+    }
+    await deleteConnection(connectionId);
+    // The delete revalidates the source, dropping `hasConnection`. Bumping the
+    // epoch remounts the keyed wizard, whose `initialState` re-derives the
+    // furthest-reachable step (verified email → select-provider; unverified →
+    // verify-domain) — never a hardcoded step, never a blank pane.
+    setResetEpoch(e => e + 1);
+  }, [connectionId, deleteConnection]);
+
   const value = React.useMemo<ConfigureSSOData>(
     () => ({
       contentRef,
@@ -92,8 +127,19 @@ export const ConfigureSSOProvider = ({
       testRuns,
       mutations,
       primaryEmailAddress,
+      resetEpoch,
+      resetConnection,
     }),
-    [contentRef, enterpriseConnection, mutations, organizationEnterpriseConnection, testRuns, primaryEmailAddress],
+    [
+      contentRef,
+      enterpriseConnection,
+      mutations,
+      organizationEnterpriseConnection,
+      testRuns,
+      primaryEmailAddress,
+      resetEpoch,
+      resetConnection,
+    ],
   );
 
   return <ConfigureSSOContext.Provider value={value}>{children}</ConfigureSSOContext.Provider>;

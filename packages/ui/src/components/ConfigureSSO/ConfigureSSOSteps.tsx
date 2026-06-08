@@ -25,7 +25,7 @@ import { ConfigureStep, ConfirmationStep, SelectProviderStep, TestConfigurationS
  * test satisfied, so a live connection short-circuits straight to confirmation.
  */
 export const ConfigureSSOSteps = (): JSX.Element => {
-  const { organizationEnterpriseConnection: c } = useConfigureSSO();
+  const { organizationEnterpriseConnection: c, resetEpoch } = useConfigureSSO();
 
   const steps = React.useMemo<WizardStepConfig[]>(
     () => [
@@ -38,8 +38,15 @@ export const ConfigureSSOSteps = (): JSX.Element => {
     [c],
   );
 
+  // Keyed on `resetEpoch`: a reset bumps the epoch, remounting the wizard so its
+  // `initialState` re-derives the furthest-reachable step for the now-no-
+  // connection state. Create does NOT bump the epoch, so the create path keeps
+  // its plain `goNext` (no remount, no create-flash).
   return (
-    <Wizard steps={steps}>
+    <Wizard
+      key={resetEpoch}
+      steps={steps}
+    >
       <ResetCardErrorOnStepChange />
       <ConfigureSSOHeader />
 

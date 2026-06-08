@@ -9,7 +9,6 @@ import { useFormControl } from '@/ui/utils/useFormControl';
 import { handleError } from '@/utils/errorHandler';
 
 import { useConfigureSSO } from './ConfigureSSOContext';
-import { useWizard } from './elements/Wizard';
 
 type ResetConnectionDialogProps = {
   isOpen: boolean;
@@ -47,11 +46,7 @@ export const ResetConnectionDialog = (props: ResetConnectionDialogProps): JSX.El
 const ResetConnectionDialogContent = withCardStateProvider((props: ResetConnectionDialogProps) => {
   const { onClose, confirmationValue } = props;
   const card = useCardState();
-  const {
-    enterpriseConnection,
-    mutations: { deleteConnection },
-  } = useConfigureSSO();
-  const { goToStep } = useWizard();
+  const { enterpriseConnection, resetConnection } = useConfigureSSO();
 
   const confirmationField = useFormControl('deleteConfirmation', '', {
     type: 'text',
@@ -70,12 +65,12 @@ const ResetConnectionDialogContent = withCardStateProvider((props: ResetConnecti
     }
 
     try {
-      await deleteConnection(enterpriseConnection.id);
-      // The delete revalidates the source, dropping `hasConnection`, so every
-      // later step's entry guard fails. Jump back to the entry step
-      // (`verify-domain`, guard-less ⇒ always reachable). `goToStep` resolves
-      // against the TOP-LEVEL wizard because this dialog renders under it.
-      goToStep('verify-domain');
+      // `resetConnection` deletes the connection and bumps the reset epoch, which
+      // remounts the keyed top-level wizard so it re-derives the furthest-
+      // reachable step for the now-no-connection state. No `useWizard()` here —
+      // that lets this dialog be triggered from ANY footer (including the nested
+      // SAML configure footers) without binding to a nested wizard.
+      await resetConnection();
       onClose();
     } catch (err) {
       handleError(err as Error, [confirmationField], card.setError);

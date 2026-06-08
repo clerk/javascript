@@ -48,6 +48,7 @@ export const ConfirmationStep = (): JSX.Element => {
         </Step.Body>
 
         <Step.Footer>
+          <Step.Footer.Reset />
           {!isActive && (
             <Flex
               elementDescriptor={descriptors.configureSSOConfirmationInactiveBanner}
