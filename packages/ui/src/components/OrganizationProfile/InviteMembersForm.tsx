@@ -164,6 +164,8 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
               for: 'organization',
               orgId: organization.id,
               minSeats: err.errors[0].meta?.seatsQuantity,
+              // TODO(billing): update to multiple calls
+              pageSize: 500,
             });
 
             if (plans.length === 0) {

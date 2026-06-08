@@ -355,7 +355,6 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
       await expect(u.po.checkout.root.getByText('Free trial')).toBeHidden();
 
       await expect(matchLineItem(u.po.checkout.root, 'Total Due after')).toBeHidden();
-      await expect(matchLineItem(u.po.checkout.root, 'Subtotal', '$999.00')).toBeVisible();
       await expect(matchLineItem(u.po.checkout.root, 'Total Due Today', '$999.00')).toBeVisible();
       expect(await countLineItems(u.po.checkout.root)).toBe(3);
 

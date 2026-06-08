@@ -124,6 +124,7 @@ describe('PaymentElement Localization', () => {
     },
     totals: {
       subtotal: { amount: 1000, amountFormatted: '$10.00', currency: 'usd', currencySymbol: '$' },
+      baseFee: { amount: 1000, amountFormatted: '$10.00', currency: 'usd', currencySymbol: '$' },
       grandTotal: { amount: 1000, amountFormatted: '$10.00', currency: 'usd', currencySymbol: '$' },
       taxTotal: { amount: 0, amountFormatted: '$0.00', currency: 'usd', currencySymbol: '$' },
       totalDueNow: { amount: 1000, amountFormatted: '$10.00', currency: 'usd', currencySymbol: '$' },
@@ -135,6 +136,7 @@ describe('PaymentElement Localization', () => {
         payer: null,
         total: { amount: 0, amountFormatted: '$0.00', currency: 'usd', currencySymbol: '$' },
       },
+      discounts: null,
       pastDue: { amount: 0, amountFormatted: '$0.00', currency: 'usd', currencySymbol: '$' },
     },
     status: 'needs_confirmation' as const,
