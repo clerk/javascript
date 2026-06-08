@@ -576,19 +576,25 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return undefined;
     }
 
-    await loadClerkUIScript({
-      ...this.options,
-      publishableKey: this.#publishableKey,
-      proxyUrl: this.proxyUrl,
-      domain: this.domain,
-      nonce: this.options.nonce,
-    });
+    // Skip the remote UI loader in no-RHC builds (e.g. Chrome extensions) so the CDN script
+    // injector is dead-code-eliminated from the bundle, mirroring getClerkJsEntryChunk.
+    if (!__BUILD_DISABLE_RHC__) {
+      await loadClerkUIScript({
+        ...this.options,
+        publishableKey: this.#publishableKey,
+        proxyUrl: this.proxyUrl,
+        domain: this.domain,
+        nonce: this.options.nonce,
+      });
 
-    if (!global.__internal_ClerkUICtor) {
-      throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
+      if (!global.__internal_ClerkUICtor) {
+        throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
+      }
+
+      return global.__internal_ClerkUICtor;
     }
 
-    return global.__internal_ClerkUICtor;
+    return undefined;
   }
 
   public on: Clerk['on'] = (...args) => {
