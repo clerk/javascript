@@ -58,15 +58,12 @@ export const TestConfigurationStep = (): JSX.Element => {
     page: currentPage,
     setPage: setCurrentPage,
     refresh: refreshTestRuns,
-    activate: activateTestRuns,
   } = testRuns;
 
-  // Entering the test step wakes the test-runs source on the fresh-start path
-  // (no connection at initial load → the queries were kept dormant through
-  // create/configure so a mid-flow create never flashed the full skeleton).
-  // `activate()` is a no-op when a connection existed at initial load, where the
-  // queries already fetched on load. Once active, loading surfaces at the table
-  // level (`isFetching`), never the global skeleton.
+  // The test-runs source activates itself upstream the moment the connection is
+  // configured (the same condition that makes this step reachable), so the step
+  // no longer has to wake it on entry — by the time we land here it is already
+  // live.
   //
   // The wizard's initial load already fetched the test-runs (covered by the
   // full skeleton) for the existing-connection case, so landing on the test
@@ -77,11 +74,9 @@ export const TestConfigurationStep = (): JSX.Element => {
   //
   // The step only mounts while it is the current step, so this runs once per
   // entry. `isInitialStep` is the wizard's own "no navigation yet" signal, read
-  // at mount: this fires a mount-driven activation + data refresh, it is NOT
-  // syncing state via an effect. Empty deps → mount-only, so re-renders never
-  // re-fire.
+  // at mount: this fires a mount-driven data refresh, it is NOT syncing state
+  // via an effect. Empty deps → mount-only, so re-renders never re-fire.
   useEffect(() => {
-    activateTestRuns();
     if (!isInitialStep) {
       void refreshTestRuns();
     }

@@ -68,6 +68,19 @@ export interface EnterpriseConnectionState {
 }
 
 /**
+ * Whether the connection carries the minimum identity-provider configuration
+ * required to advance past the configure step (currently a SAML IdP SSO URL +
+ * entity ID). A pure predicate over the raw connection — it reads no derived
+ * state, so it is safe to use both inside {@link deriveEnterpriseConnectionState}
+ * and to gate the test-runs source upstream without a circular dependency on
+ * the derived snapshot.
+ */
+// TODO - Update to support OpenID Connect
+export const isEnterpriseConnectionConfigured = (
+  connection: EnterpriseConnectionResource | null | undefined,
+): boolean => Boolean(connection?.samlConnection?.idpSsoUrl && connection?.samlConnection?.idpEntityId);
+
+/**
  * Builds the {@link EnterpriseConnectionState} from the raw inputs gathered in
  * `useOrganizationEnterpriseConnection`. Pure: identical inputs yield identical
  * state.
@@ -80,8 +93,7 @@ export const deriveEnterpriseConnectionState = ({
   provider: connection?.provider as ProviderType | undefined,
   hasConnection: Boolean(connection),
   isActive: Boolean(connection?.active),
-  // TODO - Update to support OpenID Connect
-  hasMinimumConfiguration: Boolean(connection?.samlConnection?.idpSsoUrl && connection?.samlConnection?.idpEntityId),
+  hasMinimumConfiguration: isEnterpriseConnectionConfigured(connection),
   isPrimaryEmailVerified: primaryEmail?.verification?.status === 'verified',
   hasSuccessfulTestRun,
 });

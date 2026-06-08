@@ -12,9 +12,13 @@ import type {
   SignedInSessionResource,
   UserResource,
 } from '@clerk/shared/types';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef } from 'react';
 
-import { deriveEnterpriseConnectionState, type EnterpriseConnectionState } from '../domain/enterpriseConnectionState';
+import {
+  deriveEnterpriseConnectionState,
+  type EnterpriseConnectionState,
+  isEnterpriseConnectionConfigured,
+} from '../domain/enterpriseConnectionState';
 import {
   type EnterpriseConnectionMutations,
   useEnterpriseConnectionMutations,
@@ -28,7 +32,7 @@ export interface UseOrganizationEnterpriseConnectionResult {
    *
    * Test-runs contribute to this only when a connection was present at first
    * load (they're fetched as part of that initial load). On the fresh-start
-   * path they are dormant until the Test step activates them, so creating a
+   * path they stay dormant until the connection is configured, so creating a
    * connection mid-flow never re-flashes the global skeleton.
    */
   isLoading: boolean;
@@ -61,8 +65,8 @@ export interface UseOrganizationEnterpriseConnectionResult {
    * exists at initial load it's fetched as part of that load, so a cold landing
    * on the test step is covered by the full skeleton; re-entering the step later
    * refetches via {@link TestRunsView.refresh}. On the fresh-start path the
-   * queries stay dormant until {@link TestRunsView.activate} is called on Test
-   * step entry, after which loading is table-level only.
+   * queries stay dormant until the connection is configured, after which loading
+   * is table-level only.
    */
   testRuns: TestRunsView;
 }
@@ -109,17 +113,6 @@ export interface TestRunsView {
    * pass `{ armPolling: true }` after the user kicks off a run.
    */
   refresh: (options?: RefreshTestRunsOptions) => Promise<unknown>;
-  /**
-   * Activate the test-runs queries for the fresh-start path. When there was no
-   * connection at initial load the queries stay dormant (so creating a
-   * connection mid-flow doesn't fire a fetch and flash the global skeleton);
-   * the Test step calls this on entry to wake them, after which loading surfaces
-   * at the table level (`isFetching`) rather than as the full skeleton.
-   *
-   * No-op when a connection was present at initial load — the queries are
-   * already active there.
-   */
-  activate: () => void;
 }
 
 /**
@@ -157,17 +150,22 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
   }
   const hadInitialConnection = hadInitialConnectionRef.current === true;
 
-  // Set once when the user lands on the Test step (event-driven, never an
-  // effect that syncs to props). Used only on the fresh-start path to wake the
-  // test-runs queries that were kept dormant through create/configure.
-  const [testStepActivated, setTestStepActivated] = useState(false);
-  const activateTestStep = useCallback(() => setTestStepActivated(true), []);
-
-  // Existing connection at load → active immediately (fires on load, gates the
-  // initial skeleton, drives the `tested` guard). No connection at load →
-  // dormant until the Test step activates, so a mid-flow create does NOT fire
-  // the test-runs queries and flash the global skeleton.
-  const testRunsActive = hadInitialConnection || testStepActivated;
+  // The test-runs source is relevant exactly when the connection is configured —
+  // the same condition that makes the Test step reachable
+  // (`hasMinimumConfiguration || isActive`). Deriving activation straight from
+  // the connection drops the imperative activate-on-mount ceremony:
+  //   - existing connection at load → configured (or active) → fires on load,
+  //     gates the initial skeleton, drives the `tested` guard;
+  //   - fresh start with no connection, or a connection created but not yet
+  //     configured → dormant, so a mid-flow create does NOT fire the test-runs
+  //     queries and flash the global skeleton;
+  //   - configure completes (`hasMinimumConfiguration`) → fires, surfacing as
+  //     table-level loading because `hadInitialConnection` is false.
+  //
+  // Computed from the raw connection (not `connectionState`, which depends on
+  // the test-run probe below — reading it here would be circular).
+  const testRunsActive =
+    isEnterpriseConnectionConfigured(enterpriseConnection) || Boolean(enterpriseConnection?.active);
 
   const {
     hasSuccessfulTestRun,
@@ -204,7 +202,6 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
       page: testRunPage,
       setPage: setTestRunPage,
       refresh: refreshTestRuns,
-      activate: activateTestStep,
     }),
     [
       testRunRows,
@@ -215,7 +212,6 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
       testRunPage,
       setTestRunPage,
       refreshTestRuns,
-      activateTestStep,
     ],
   );
 
@@ -242,8 +238,9 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
     organization,
     // Test-runs gate the full skeleton only when a connection was present at
     // first load — that case fetches them as part of the initial load. On the
-    // fresh-start path they are dormant until the Test step activates them, and
-    // landing there shows table-level loading, never the global skeleton.
+    // fresh-start path they stay dormant until the connection is configured, and
+    // landing on the test step then shows table-level loading, never the global
+    // skeleton.
     isLoading: isLoadingEnterpriseConnections || (hadInitialConnection && isLoadingTestRuns),
     enterpriseConnection,
     primaryEmailAddress,

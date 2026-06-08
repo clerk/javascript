@@ -1,4 +1,4 @@
-import { act, renderHook } from '@testing-library/react';
+import { renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // The umbrella hook composes several `@clerk/shared/react` hooks. We mock the
@@ -6,10 +6,26 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 // underlying test-runs query report, and can assert how the umbrella gates the
 // test-runs query's `enabled` and folds its loading into the global gate.
 
+// A connection shaped enough for the umbrella's gating: the derived
+// "configured" predicate reads `samlConnection.idpSsoUrl` + `idpEntityId`, and
+// the active path reads `active`.
+type MockConnection = {
+  id: string;
+  active?: boolean;
+  samlConnection?: { idpSsoUrl?: string; idpEntityId?: string } | null;
+};
+
+const configuredConnection = (id: string): MockConnection => ({
+  id,
+  samlConnection: { idpSsoUrl: 'https://idp.example.com/sso', idpEntityId: 'https://idp.example.com/entity' },
+});
+
+const unconfiguredConnection = (id: string): MockConnection => ({ id, samlConnection: null });
+
 // Mutable state the connection-source mock reads from, so a test can flip from
 // "no connection at load" to "connection created mid-flow" between renders.
 const connectionsState = vi.hoisted(() => ({
-  data: [] as Array<{ id: string }>,
+  data: [] as MockConnection[],
   isLoading: false,
 }));
 
@@ -63,21 +79,30 @@ beforeEach(() => {
 const lastTwoCalls = () => testRunsState.calls.slice(-2);
 
 describe('useOrganizationEnterpriseConnection — test-runs gating', () => {
-  it('(a) existing connection at load → test-runs active and contribute to the global isLoading', () => {
-    connectionsState.data = [{ id: 'ent_1' }];
+  it('(a) existing configured connection at load → test-runs active and contribute to the global isLoading', () => {
+    connectionsState.data = [configuredConnection('ent_1')];
     testRunsState.isLoading = true;
 
     const { result } = renderHook(() => useOrganizationEnterpriseConnection());
 
-    // Both underlying queries (probe + list) are enabled from the first render.
+    // A configured connection existed at load → both underlying queries (probe +
+    // list) are enabled from the first render.
     expect(lastTwoCalls()).toEqual([{ enabled: true }, { enabled: true }]);
-    // A connection existed at load, so the cold test-runs load gates the full
-    // skeleton.
+    // …so the cold test-runs load gates the full skeleton (hadInitialConnection).
     expect(result.current.isLoading).toBe(true);
     expect(result.current.testRuns.isLoading).toBe(true);
   });
 
-  it('(b) no connection at load → test-runs inactive after a mid-flow create, and never gate the global skeleton', () => {
+  it('(a2) active (but unconfigured) connection at load → test-runs active via the isActive path', () => {
+    connectionsState.data = [{ id: 'ent_active', active: true, samlConnection: null }];
+
+    const { result } = renderHook(() => useOrganizationEnterpriseConnection());
+
+    expect(lastTwoCalls()).toEqual([{ enabled: true }, { enabled: true }]);
+    expect(result.current.isLoading).toBe(false);
+  });
+
+  it('(b) fresh start: no connection → dormant; connection created but NOT yet configured → still dormant, never gating the global skeleton', () => {
     connectionsState.data = [];
     testRunsState.isLoading = true;
 
@@ -87,40 +112,41 @@ describe('useOrganizationEnterpriseConnection — test-runs gating', () => {
     expect(lastTwoCalls()).toEqual([{ enabled: false }, { enabled: false }]);
     expect(result.current.isLoading).toBe(false);
 
-    // A connection appears mid-flow (the create on the fresh-start path).
-    connectionsState.data = [{ id: 'ent_new' }];
+    // A connection appears mid-flow but is not yet configured (the create on the
+    // fresh-start path, before the configure step fills in the SAML fields).
+    connectionsState.data = [unconfiguredConnection('ent_new')];
     rerender();
 
-    // The query stays dormant — creating the connection must NOT fire it…
+    // The query stays dormant — creating an unconfigured connection must NOT
+    // fire it…
     expect(lastTwoCalls()).toEqual([{ enabled: false }, { enabled: false }]);
     // …and the global gate never folds in test-runs on this path, even though
     // the underlying flag would say loading were it enabled.
     expect(result.current.isLoading).toBe(false);
   });
 
-  it('(c) after Test-step activation → test-runs active, with loading at the table level (isFetching), not the global skeleton', () => {
+  it('(c) fresh start: once the connection is configured → test-runs active, with loading at the table level (isFetching), not the global skeleton', () => {
     connectionsState.data = [];
 
     const { result, rerender } = renderHook(() => useOrganizationEnterpriseConnection());
 
-    // Connection created mid-flow; still dormant until the Test step activates.
-    connectionsState.data = [{ id: 'ent_new' }];
+    // Connection created mid-flow but unconfigured → still dormant.
+    connectionsState.data = [unconfiguredConnection('ent_new')];
     rerender();
     expect(lastTwoCalls()).toEqual([{ enabled: false }, { enabled: false }]);
 
-    // The Test step calls `activate()` on entry. A background list fetch is now
+    // The configure step fills in the SAML fields. A background list fetch is now
     // in flight (table-level), but it is not a cold load.
     testRunsState.isFetching = true;
-    act(() => {
-      result.current.testRuns.activate();
-    });
+    connectionsState.data = [configuredConnection('ent_new')];
+    rerender();
 
-    // Now active → both queries fire.
+    // Now configured → both queries fire.
     expect(lastTwoCalls()).toEqual([{ enabled: true }, { enabled: true }]);
     // Loading is table-level only…
     expect(result.current.testRuns.isFetching).toBe(true);
     // …and the global skeleton stays down: no connection at initial load, so
-    // test-runs never gate it.
+    // test-runs never gate it (no flash on configure → test).
     expect(result.current.isLoading).toBe(false);
   });
 

@@ -32,7 +32,6 @@ const testRunsSource = vi.hoisted(() => ({
   page: 1,
   setPage: vi.fn(),
   refresh: vi.fn(() => Promise.resolve()),
-  activate: vi.fn(),
 }));
 
 const createTestRun = vi.fn(() => Promise.resolve({ url: 'https://idp.example.com/test' }));
@@ -82,7 +81,6 @@ beforeEach(() => {
   testRunsSource.setPage.mockReset();
   testRunsSource.refresh.mockReset();
   testRunsSource.refresh.mockImplementation(() => Promise.resolve());
-  testRunsSource.activate.mockReset();
   testRunsSource.rows = [];
   testRunsSource.totalCount = 0;
   testRunsSource.isLoading = false;
@@ -122,29 +120,9 @@ describe('TestConfigurationStep', () => {
     await screen.findByText('No test results');
     // The initial ConfigureSSO load already fetched the test-runs (full
     // skeleton covered it), so the step must not refetch on initial entry.
+    // Activation is no longer the step's job — the source wakes itself upstream
+    // the moment the connection is configured.
     expect(testRunsSource.refresh).not.toHaveBeenCalled();
-  });
-
-  it('activates the test-runs source on entry on the initial load (without refetching)', async () => {
-    // Fresh-start path lands here via navigation, but even on the initial entry
-    // the step must wake the dormant source. Activation is a no-op when a
-    // connection existed at load; refetch is still gated on initial entry.
-    wizardState.isInitialStep = true;
-    const { wrapper } = await createFixtures();
-
-    renderStep(wrapper);
-
-    await waitFor(() => expect(testRunsSource.activate).toHaveBeenCalledTimes(1));
-    expect(testRunsSource.refresh).not.toHaveBeenCalled();
-  });
-
-  it('activates the test-runs source when navigated into the test step later', async () => {
-    wizardState.isInitialStep = false;
-    const { wrapper } = await createFixtures();
-
-    renderStep(wrapper);
-
-    await waitFor(() => expect(testRunsSource.activate).toHaveBeenCalledTimes(1));
   });
 
   it('refetches once when navigated into the test step later', async () => {

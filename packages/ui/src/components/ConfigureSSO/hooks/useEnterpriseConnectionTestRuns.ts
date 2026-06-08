@@ -101,12 +101,14 @@ export interface EnterpriseConnectionTestRuns {
  * - `isFetching` — any in-flight *list* fetch, with previously-loaded rows kept
  *   visible (`keepPreviousData` semantics) → table-level loading on re-entry.
  *
- * `active` gates *both* underlying queries. The umbrella hook keeps it `true`
- * for the existing-connection-at-load case (so test-runs fetch on first load,
- * cover the full skeleton, and drive the `tested` guard) but `false` on the
- * fresh-start path until the user actually lands on the Test step — so merely
- * *creating* a connection mid-flow does not fire a test-runs fetch and flash
- * the global skeleton for a connection that provably has zero runs.
+ * `active` gates *both* underlying queries. The umbrella hook derives it
+ * straight from the connection — `true` once the connection is configured (or
+ * active), which is also when the Test step becomes reachable. So an existing,
+ * configured connection at load fetches test-runs on first load (covering the
+ * full skeleton and driving the `tested` guard), while on the fresh-start path
+ * a connection that is merely *created* but not yet configured stays `false` —
+ * no test-runs fetch fires to flash the global skeleton for a connection that
+ * provably has zero runs.
  */
 export const useEnterpriseConnectionTestRuns = (
   connection: EnterpriseConnectionResource | undefined,

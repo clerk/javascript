@@ -5,7 +5,7 @@ import type {
 } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
-import { deriveEnterpriseConnectionState } from '../enterpriseConnectionState';
+import { deriveEnterpriseConnectionState, isEnterpriseConnectionConfigured } from '../enterpriseConnectionState';
 
 const makeSamlConnection = (overrides: Partial<SamlAccountConnectionResource> = {}): SamlAccountConnectionResource =>
   ({
@@ -147,5 +147,34 @@ describe('deriveEnterpriseConnectionState', () => {
     expect(typeof state.hasMinimumConfiguration).toBe('boolean');
     expect(typeof state.isPrimaryEmailVerified).toBe('boolean');
     expect(typeof state.hasSuccessfulTestRun).toBe('boolean');
+  });
+});
+
+describe('isEnterpriseConnectionConfigured', () => {
+  it('undefined connection → false', () => {
+    expect(isEnterpriseConnectionConfigured(undefined)).toBe(false);
+  });
+  it('null connection → false', () => {
+    expect(isEnterpriseConnectionConfigured(null)).toBe(false);
+  });
+  it('no saml config → false', () => {
+    expect(isEnterpriseConnectionConfigured(makeConnection({ samlConnection: null }))).toBe(false);
+  });
+  it('empty saml config → false', () => {
+    expect(isEnterpriseConnectionConfigured(makeConnection({ samlConnection: makeSamlConnection() }))).toBe(false);
+  });
+  it('idpSsoUrl only → false', () => {
+    expect(
+      isEnterpriseConnectionConfigured(
+        makeConnection({ samlConnection: makeSamlConnection({ idpSsoUrl: 'https://idp.example.com/sso' }) }),
+      ),
+    ).toBe(false);
+  });
+  it('idpSsoUrl + idpEntityId present → true', () => {
+    expect(isEnterpriseConnectionConfigured(makeConnection({ samlConnection: fullyConfiguredSaml }))).toBe(true);
+  });
+  it('matches the derived `hasMinimumConfiguration` field', () => {
+    const connection = makeConnection({ samlConnection: fullyConfiguredSaml });
+    expect(isEnterpriseConnectionConfigured(connection)).toBe(derive({ connection }).hasMinimumConfiguration);
   });
 });
