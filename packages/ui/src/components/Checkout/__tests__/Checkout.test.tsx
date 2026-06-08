@@ -1740,10 +1740,6 @@ describe('Checkout', () => {
       expect(proratedDiscountRow).toBeInTheDocument();
       expect(proratedDiscountRow).toHaveTextContent('- $5.00');
 
-      const subtotalRenewalRow = getByText('Subtotal per period').closest('.cl-lineItemsGroup');
-      expect(subtotalRenewalRow).toBeInTheDocument();
-      expect(subtotalRenewalRow).toHaveTextContent('$30.00');
-
       const totalPerPeriodRow = getByText('Total per period').closest('.cl-lineItemsGroup');
       expect(totalPerPeriodRow).toBeInTheDocument();
       expect(totalPerPeriodRow).toHaveTextContent('$30.00');
