@@ -302,6 +302,11 @@ export interface UserResource extends ClerkResource, BillingPayerMethods {
    * @returns A [`DeletedObjectResource`](https://clerk.com/docs/reference/types/deleted-object-resource) object.
    */
   leaveOrganization: (organizationId: string) => Promise<DeletedObjectResource>;
+  /**
+   * Get the enterprise connections for the current user. This method is not intended for public use.
+   * Currently some customers use this to get enterprise connections for account linking purposes.
+   * @hidden
+   */
   getEnterpriseConnections: (params?: GetEnterpriseConnectionsParams) => Promise<EnterpriseConnectionResource[]>;
   createEnterpriseConnectionTestRun: (
     enterpriseConnectionId: string,
