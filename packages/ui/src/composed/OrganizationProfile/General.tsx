@@ -1,3 +1,5 @@
+'use client';
+
 import type { PropsWithChildren, ReactNode } from 'react';
 
 import { ProfileCard } from '@/ui/elements/ProfileCard';

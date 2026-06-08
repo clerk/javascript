@@ -1,3 +1,5 @@
+'use client';
+
 import { useClerk, useUser } from '@clerk/shared/react';
 import type { EnvironmentResource, OAuthProvider, OAuthScope } from '@clerk/shared/types';
 import type { PropsWithChildren, ReactNode } from 'react';

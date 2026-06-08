@@ -1,3 +1,5 @@
+'use client';
+
 import { Suspense, type ComponentType, type ReactNode } from 'react';
 
 import { CardStateProvider } from '../elements/contexts';

@@ -1,3 +1,5 @@
+'use client';
+
 // Composed UserProfile / OrganizationProfile mount outside the clerk-js portal
 // tree, so this shell rebuilds the providers normally split between
 // `LazyProviders` and `LazyComponentRenderer` / `LazyModalRenderer` in
