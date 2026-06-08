@@ -4,10 +4,10 @@ import { retry } from '@clerk/shared/retry';
 import type {
   BillingCheckoutJSON,
   BillingCheckoutResource,
-  BillingTotals,
   BillingPayerResource,
   BillingPaymentMethodResource,
   BillingSubscriptionPlanPeriod,
+  BillingTotals,
   CheckoutFlowFinalizeParams,
   CheckoutFlowResource,
   CheckoutFlowResourceNonStrict,
