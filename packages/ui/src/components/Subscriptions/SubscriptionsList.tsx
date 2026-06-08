@@ -196,6 +196,10 @@ function SubscriptionOverviewRow({
   nextPayment: NonNullable<BillingSubscriptionResource['nextPayment']>;
   localizationRoot: ReturnType<typeof useSubscriberTypeLocalizationRoot>;
 }) {
+  if (!nextPayment.totals) {
+    return null;
+  }
+
   return (
     <Tr
       sx={t => ({
@@ -223,8 +227,8 @@ function SubscriptionOverviewRow({
               color: t.colors.$colorForeground,
             })}
           >
-            {nextPayment.amount.currencySymbol}
-            {nextPayment.amount.amountFormatted}
+            {nextPayment.totals.grandTotal.currencySymbol}
+            {nextPayment.totals.grandTotal.amountFormatted}
           </Text>
           <Text
             variant='subtitle'
