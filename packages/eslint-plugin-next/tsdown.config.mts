@@ -10,9 +10,7 @@ export default defineConfig({
   minify: false,
   sourcemap: true,
   dts: true,
-  transform: {
-    define: {
-      PACKAGE_VERSION: `"${pkgJson.version}"`,
-    },
+  define: {
+    PACKAGE_VERSION: `"${pkgJson.version}"`,
   },
 });
