@@ -14,7 +14,7 @@ import { useUserProfileContext } from '../../contexts';
 import { Box, Button, descriptors, Flex, localizationKeys, Text } from '../../customizables';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
-import { useEnabledThirdPartyProviders, useElectronExternalAuth } from '../../hooks';
+import { useElectronExternalAuth, useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
 import type { PropsOfComponent } from '../../styledSystem';
 import { AddConnectedAccount } from './ConnectedAccountsMenu';

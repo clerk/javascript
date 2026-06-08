@@ -10,7 +10,7 @@ import { sleep } from '@/ui/utils/sleep';
 import { ProviderIcon } from '../../common';
 import { useUserProfileContext } from '../../contexts';
 import { descriptors, localizationKeys } from '../../customizables';
-import { useEnabledThirdPartyProviders, useElectronExternalAuth } from '../../hooks';
+import { useElectronExternalAuth, useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
 
 const ConnectMenuButton = (props: { strategy: OAuthStrategy; onClick?: () => void }) => {
