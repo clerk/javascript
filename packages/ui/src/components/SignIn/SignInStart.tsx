@@ -34,7 +34,7 @@ import {
 import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import { CaptchaElement } from '../../elements/CaptchaElement';
-import { useLoadingStatus, useElectronExternalAuth } from '../../hooks';
+import { useLoadingStatus } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useTotalEnabledAuthMethods } from '../../hooks/useTotalEnabledAuthMethods';
 import { useRouter } from '../../router';
@@ -85,7 +85,6 @@ function SignInStartInternal(): JSX.Element {
   const signIn = useCoreSignIn();
   const { navigate } = useRouter();
   const ctx = useSignInContext();
-  const electronAuth = useElectronExternalAuth();
   const { afterSignInUrl, signUpUrl, waitlistUrl, isCombinedFlow, navigateOnSetActive } = ctx;
   const supportEmail = useSupportEmail();
   const totalEnabledAuthMethods = useTotalEnabledAuthMethods();
@@ -415,37 +414,6 @@ function SignInStartInternal(): JSX.Element {
   const authenticateWithEnterpriseSSO = async () => {
     const redirectUrl = ctx.ssoCallbackUrl;
     const redirectUrlComplete = ctx.afterSignInUrl || '/';
-
-    if (electronAuth) {
-      // Let `attemptToRecoverFromSignInError` own error handling (it silently recovers
-      // session-exists / instant-password errors), so the hook must not surface them on the card.
-      return electronAuth.authenticate(
-        {
-          resource: signIn,
-          params: {
-            strategy: 'enterprise_sso',
-            redirectUrl,
-            redirectUrlComplete,
-            continueSignIn: true,
-            oidcPrompt: ctx.oidcPrompt,
-          },
-          callbackParams: {
-            signUpUrl: ctx.signUpUrl,
-            signInUrl: ctx.signInUrl,
-            signInForceRedirectUrl: ctx.afterSignInUrl,
-            signUpForceRedirectUrl: ctx.afterSignUpUrl,
-            continueSignUpUrl: ctx.signUpContinueUrl,
-            transferable: ctx.transferable,
-            firstFactorUrl: '../factor-one',
-            secondFactorUrl: '../factor-two',
-            resetPasswordUrl: '../reset-password',
-            navigateOnSetActive: ctx.navigateOnSetActive,
-            unsafeMetadata: ctx.unsafeMetadata,
-          },
-        },
-        { surfaceErrorOnCard: false },
-      );
-    }
 
     return signIn.authenticateWithRedirect({
       strategy: 'enterprise_sso',

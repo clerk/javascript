@@ -6,7 +6,6 @@ import { ChooseEnterpriseConnectionCard } from '@/ui/common/ChooseEnterpriseConn
 import { useCoreSignIn, useSignInContext } from '@/ui/contexts';
 import { Flow, localizationKeys } from '@/ui/customizables';
 import { withCardStateProvider } from '@/ui/elements/contexts';
-import { useElectronExternalAuth } from '@/ui/hooks/useElectronExternalAuth';
 import type { AvailableComponentProps } from '@/ui/types';
 
 import { hasMultipleEnterpriseConnections } from './shared';
@@ -17,7 +16,6 @@ import { hasMultipleEnterpriseConnections } from './shared';
 const SignInFactorOneEnterpriseConnectionsInternal = () => {
   const ctx = useSignInContext();
   const clerk = useClerk();
-  const electronAuth = useElectronExternalAuth();
   const signIn = clerk.client.signIn;
 
   if (!hasMultipleEnterpriseConnections(signIn.supportedFirstFactors)) {
@@ -30,39 +28,11 @@ const SignInFactorOneEnterpriseConnectionsInternal = () => {
     name: ff.enterpriseConnectionName,
   }));
 
-  const handleEnterpriseSSO = async (enterpriseConnectionId: string) => {
+  const handleEnterpriseSSO = (enterpriseConnectionId: string) => {
     const redirectUrl = ctx.ssoCallbackUrl;
     const redirectUrlComplete = ctx.afterSignInUrl || '/';
 
-    if (electronAuth) {
-      await electronAuth.authenticate({
-        resource: signIn,
-        params: {
-          strategy: 'enterprise_sso',
-          redirectUrl,
-          redirectUrlComplete,
-          continueSignIn: true,
-          enterpriseConnectionId,
-          oidcPrompt: ctx.oidcPrompt,
-        },
-        callbackParams: {
-          signUpUrl: ctx.signUpUrl,
-          signInUrl: ctx.signInUrl,
-          signInForceRedirectUrl: ctx.afterSignInUrl,
-          signUpForceRedirectUrl: ctx.afterSignUpUrl,
-          continueSignUpUrl: ctx.signUpContinueUrl,
-          transferable: ctx.transferable,
-          firstFactorUrl: '../factor-one',
-          secondFactorUrl: '../factor-two',
-          resetPasswordUrl: '../reset-password',
-          navigateOnSetActive: ctx.navigateOnSetActive,
-          unsafeMetadata: ctx.unsafeMetadata,
-        },
-      });
-      return;
-    }
-
-    await signIn.authenticateWithRedirect({
+    return signIn.authenticateWithRedirect({
       strategy: 'enterprise_sso',
       redirectUrl,
       redirectUrlComplete,
