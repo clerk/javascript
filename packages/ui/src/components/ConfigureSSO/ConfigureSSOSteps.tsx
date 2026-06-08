@@ -8,19 +8,7 @@ import { type WizardStepConfig } from './elements/Wizard';
 import { Wizard } from './elements/Wizard';
 import { ConfigureStep, ConfirmationStep, SelectProviderStep, TestConfigurationStep, VerifyDomainStep } from './steps';
 
-/**
- * The ConfigureSSO step graph the entry-guard `<Wizard>` derives its machine
- * from. Each inline `guard` is an entry precondition, so the wizard mounts on
- * the furthest step a contiguous run of holding guards reaches, and the
- * breadcrumb gates jumps to the same predicate. `verify-domain` is the entry
- * step (no guard); `select-provider` has no `label`, so it stays off the
- * breadcrumb while remaining a real navigable position.
- *
- * Guards are intentionally monotonic (a later guard holding implies every
- * earlier one) — relied on by furthest-reachable init and positional back-nav.
- * An active connection counts configure + test satisfied, short-circuiting
- * straight to confirmation.
- */
+/** The ConfigureSSO step graph the entry-guard `<Wizard>` derives its machine from. */
 export const ConfigureSSOSteps = (): JSX.Element => {
   const { organizationEnterpriseConnection: c } = useConfigureSSO();
   const card = useCardState();
