@@ -3,16 +3,7 @@ import type { BillingPayerMethods } from './billing';
 import type { DeletedObjectResource } from './deletedObject';
 import type { EmailAddressResource } from './emailAddress';
 import type { EnterpriseAccountResource } from './enterpriseAccount';
-import type {
-  CreateOrganizationEnterpriseConnectionParams,
-  EnterpriseConnectionResource,
-  UpdateOrganizationEnterpriseConnectionParams,
-} from './enterpriseConnection';
-import type {
-  EnterpriseConnectionTestRunInitResource,
-  EnterpriseConnectionTestRunResource,
-  GetEnterpriseConnectionTestRunsParams,
-} from './enterpriseConnectionTestRun';
+import type { EnterpriseConnectionResource } from './enterpriseConnection';
 import type { ExternalAccountResource } from './externalAccount';
 import type { ImageResource } from './image';
 import type { UserJSON } from './json';
@@ -306,22 +297,12 @@ export interface UserResource extends ClerkResource, BillingPayerMethods {
    * @returns A [`DeletedObjectResource`](https://clerk.com/docs/reference/types/deleted-object-resource) object.
    */
   leaveOrganization: (organizationId: string) => Promise<DeletedObjectResource>;
+  /**
+   * Get the enterprise connections for the current user. This method is not intended for public use.
+   * Currently some customers use this to get enterprise connections for account linking purposes.
+   * @hidden
+   */
   getEnterpriseConnections: (params?: GetEnterpriseConnectionsParams) => Promise<EnterpriseConnectionResource[]>;
-  createEnterpriseConnection: (
-    params: CreateOrganizationEnterpriseConnectionParams,
-  ) => Promise<EnterpriseConnectionResource>;
-  updateEnterpriseConnection: (
-    enterpriseConnectionId: string,
-    params: UpdateOrganizationEnterpriseConnectionParams,
-  ) => Promise<EnterpriseConnectionResource>;
-  deleteEnterpriseConnection: (enterpriseConnectionId: string) => Promise<DeletedObjectResource>;
-  createEnterpriseConnectionTestRun: (
-    enterpriseConnectionId: string,
-  ) => Promise<EnterpriseConnectionTestRunInitResource>;
-  getEnterpriseConnectionTestRuns: (
-    enterpriseConnectionId: string,
-    params?: GetEnterpriseConnectionTestRunsParams,
-  ) => Promise<ClerkPaginatedResponse<EnterpriseConnectionTestRunResource>>;
   /**
    * Generates a TOTP secret for a user that can be used to register the application on the user's authenticator app of choice. If this method is called again (while still unverified), it replaces the previously generated secret.
    * @returns A [`TOTPResource`](https://clerk.com/docs/reference/types/totp-resource) object.
