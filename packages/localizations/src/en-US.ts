@@ -150,7 +150,7 @@ export const enUS: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Payment Methods',
-    popular: 'Popular',
+    highlightedPlanBadge: 'Popular',
     pricingTable: {
       billingCycle: 'Billing cycle',
       included: 'Included',
@@ -211,31 +211,67 @@ export const enUS: LocalizationResource = {
     yearPerUnit: 'Year per {{unitName}}',
   },
   configureSSO: {
+    confirmation: {
+      configurationSection: {
+        certificateLabel: 'Certificate',
+        configureAgainLink: 'Configure again',
+        issuerLabel: 'Issuer',
+        ssoUrlLabel: 'Sign on URL',
+        title: 'Configuration details',
+      },
+      domainSection: {
+        title: 'Domain',
+      },
+      enableSection: {
+        title: 'Enable SSO',
+      },
+      resetSection: {
+        confirmationFieldLabel: 'Type "{{name}}" to confirm',
+        submitButton: 'Reset connection',
+        title: 'Reset connection',
+        warning:
+          'This will permanently remove the SSO configuration. Members will no longer be able to sign in with SSO.',
+      },
+      statusSection: {
+        activeBadge: 'Active',
+        inactiveBadge: 'Inactive',
+        title: 'SSO Successfully configured',
+      },
+      inactiveBanner: {
+        title: 'SSO is inactive and you need to enable it to authenticate',
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'Contact your organization administrator in order to have permissions to manage enterprise connections.',
-      title: 'You do not have permission to manage enterprise connections',
+      subtitle: "Contact your organization's administrator to upgrade your permissions.",
+      title: 'You do not have permission to manage Single Sign-on (SSO)',
     },
     navbar: {
       title: 'Configure Single Sign-On (SSO)',
     },
+    resetConnectionDialog: {
+      cancelButton: 'Cancel',
+      confirmationFieldLabel: 'Type "{{name}}" below to continue',
+      confirmationFieldPlaceholder: '{{name}}',
+      resetButton: 'Reset connection',
+      subtitle:
+        'Are you sure you want to reset the connection? This action is irreversible and you will have to configure all steps again',
+      title: 'Reset connection',
+    },
     selectProviderStep: {
-      title: 'Select provider',
-      subtitle: 'Select the provider you are going to setup SSO for.',
-      body: {
-        title: 'Select your identity provider',
-        description: "We'll guide you through the detailed setup process next.",
-      },
+      title: 'Select your identity provider',
+      subtitle: 'We’ll guide you through the detailed setup process next.',
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',
         customSaml: 'Custom SAML Provider',
+        google: 'Google Workspace',
+        microsoft: 'Microsoft Entra (formerly AD)',
       },
       warning: 'Once a provider is selected you cannot change again until the configuration is over',
     },
     verifyEmailDomainStep: {
       title: 'Verify email address',
-      subtitle: 'Verify the email address you want to enable the enterprise connection on.',
+      subtitle: 'Verify the domain you want to enable the enterprise connection on.',
       addEmailAddress: {
         formTitle: 'We need your email',
         formSubtitle: 'In order to start we will need your email address',
@@ -257,97 +293,470 @@ export const enUS: LocalizationResource = {
         subtitle: "Contact the application's administrator to get access through the existing connection.",
       },
     },
-    configureStep: {
-      spFields: {
-        acsUrl: {
-          label: 'Single sign-on URL',
-        },
-        spEntityId: {
-          label: 'Audience URI',
+    testConfigurationStep: {
+      title: 'Test your SSO connection',
+      subtitle: 'Authenticate using the test SSO URL to verify you configured the connection correctly.',
+      error__noSuccessfulTestRun:
+        'You need at least one successful test run before you can continue. Generate a test SSO URL and complete the sign-in flow.',
+      testUrl: {
+        actionLabel__open: 'Open test URL',
+      },
+      testResults: {
+        title: 'Your test results',
+        actionLabel__refresh: 'Refresh logs',
+        polling: 'Waiting for the test run to complete…',
+        status__success: 'Success',
+        status__failed: 'Failed',
+        status__pending: 'Pending',
+        empty: {
+          title: 'No test results',
+          subtitle: 'Use the button above to start running tests',
         },
       },
-      attributeMapping: {
-        title: 'We expect your SAML responses to have the following specific attributes:',
-        paragraph:
-          "These are the defaults and probably won't need you to change them. However, many SAML configuration errors are due to incorrect attribute mappings, so it's worth double-checking. Here's how:",
-        columns: {
-          attribute: 'Attribute',
-          claimName: 'Claim Name',
+      testRunDetails: {
+        title: 'Test run',
+        runDetails: {
+          sectionTitle: 'Run details',
+          timestamp: 'Timestamp',
+          status: 'Status',
+          errorCode: 'Error code',
+          fullMessage: 'Full message',
+          actionLabel__copy: 'Copy message',
+          actionLabel__copied: 'Copied',
         },
+        parsedUserInfo: {
+          sectionTitle: 'Parsed user info',
+          email: 'Email',
+          firstName: 'First name',
+        },
+        howToFix: {
+          sectionTitle: 'How to fix',
+          actionLabel__viewDocumentation: 'View documentation',
+          saml_user_attribute_missing: {
+            intro: 'To fix this error, follow these steps:',
+            step1: "Access your identity provider's configuration dashboard.",
+            step2: "Navigate to your application's SAML settings or attribute mapping configuration.",
+            step3: "Ensure that the 'mail' attribute is properly mapped to the user's email address field.",
+          },
+          saml_response_relaystate_missing: {
+            description:
+              'Check that your identity provider is correctly returning the RelayState parameter that was sent in the original request.',
+          },
+          saml_email_address_domain_mismatch: {
+            description:
+              'Verify that the user is signing in with an email address that matches one of the allowed domains for this connection. If you need to add additional domains, update the allowed domains in your connection settings.',
+          },
+          oauth_access_denied: {
+            description:
+              "This error occurs when the user clicked Cancel or Deny on the OAuth provider's authorization screen, or the provider rejected the authorization request. Verify that the OAuth application credentials (Client ID and Client Secret) are correctly configured.",
+          },
+          oauth_token_exchange_error: {
+            description:
+              "Verify that your OAuth application's Client ID and Client Secret are correctly configured and match the credentials from your OAuth provider's dashboard.",
+          },
+          oauth_fetch_user_error: {
+            intro: 'To fix this error, follow these steps:',
+            step1:
+              'Verify that the OAuth scopes configured in your connection settings include the necessary permissions to read user profile information.',
+            step2: 'Ensure that the user info endpoint URL is correctly configured.',
+          },
+        },
+      },
+    },
+    configureStep: {
+      attributeMappingTable: {
         badges: {
           required: 'Required',
           optional: 'Optional',
         },
-        rows: {
-          email: {
-            attribute: 'Email address',
-            claim: 'user.email',
+      },
+      samlOkta: {
+        mainHeaderTitle: 'Configure Okta Workforce',
+        createAppStep: {
+          headerSubtitle: 'Create a new enterprise application in your Okta Dashboard',
+          createAppInstructions: {
+            title: 'Create a new enterprise application in Okta',
+            step1: 'Sign in to Okta and go to <bold>Admin → Applications.</bold>',
+            step2: 'Click <bold>Create App Integration.</bold>',
+            step3: 'Select <bold>SAML 2.0.</bold>',
+            step4: 'Fill in the General Settings (App name is required).',
+            step5: 'Click <bold>Next</bold> to complete creating the application.',
           },
-          firstName: {
-            attribute: 'First Name',
-            claim: 'user.firstName',
+          serviceProviderInstructions: {
+            title: 'Add service provider configuration to Okta',
+            paragraph1:
+              'Once you have moved forward from the General Settings instructions, you will be presented with the Configure SAML page.',
+            paragraph2:
+              'To configure your service provider, you must add these two fields to your Okta SAML application:',
+            serviceProviderFields: {
+              acsUrl: {
+                label: 'Single sign-on URL',
+              },
+              spEntityId: {
+                label: 'Audience URI (SP Entity ID)',
+              },
+            },
           },
-          lastName: {
-            attribute: 'Last Name',
-            claim: 'user.lastName',
+          completeSamlIntegrationInstructions: {
+            title: 'Complete SAML integration',
+            step1: 'Select <bold>This is an internal app that we have created</bold> from the options menu.',
+            step2: 'Complete the form with any comments and select <bold>"Finish"</bold>.',
+          },
+        },
+        attributeMappingStep: {
+          headerSubtitle: 'Map user attributes from Okta to your application',
+          paragraph: 'We expect your SAML responses to have the following specific attributes:',
+          step1:
+            'Open the <bold>Sign On</bold> tab of your Okta application and locate the <bold>Attribute Statements</bold> section. If you don’t see it, click <bold>Show legacy configuration</bold>, then <bold>Edit</bold>.',
+          step2: 'Select <bold>Add Expression</bold> for each row below, then enter the matching name and value:',
+          attributeMappingTable: {
+            columns: {
+              name: 'Attribute name',
+              expression: 'Expression',
+            },
+            rows: {
+              email: { name: 'mail', expression: 'user.mail' },
+              firstName: { name: 'firstName', expression: 'user.firstName' },
+              lastName: { name: 'lastName', expression: 'user.lastName' },
+            },
+          },
+        },
+        assignUsersStep: {
+          headerSubtitle: 'Assign users to the enterprise application',
+          assignUsersInstructions: {
+            title: 'Assign selected user or group in Okta',
+            paragraph:
+              'You need to assign users or groups to your enterprise application before they can use it to sign in.',
+            step1: 'In the Okta dashboard, select the <bold>Assignments</bold> tab.',
+            step2:
+              'Select the <bold>Assign</bold> dropdown. You can either select <bold>Assign to people</bold> or <bold>Assign to groups</bold>.',
+            step3: 'In the search field, enter the user or group of users that you want to assign to the application.',
+            step4: 'Select the <bold>Assign</bold> button next to the user or group that you want to assign.',
+            step5: 'Select the <bold>Done</bold> button to complete the assignment.',
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: 'Configure identity provider metadata',
+          modes: {
+            title: 'Fill in your Okta SAML application details',
+            ariaLabel: 'Configuration ',
+            metadataUrl: 'Add via metadata',
+            manual: 'Configure manually',
+          },
+          metadataUrl: {
+            label: 'Metadata URL',
+            placeholder: 'Paste URL here...',
+            description: 'In your Okta SAML app, go to the Sign On tab and retrieve the metadata URL. Paste it below.',
+          },
+          manual: {
+            description: 'In your Okta SAML app, go to the Sign On tab and retrieve these values.',
+            signOnUrl: {
+              label: 'Single Sign-On URL',
+              placeholder: 'Paste URL here...',
+            },
+            issuer: {
+              label: 'Issuer',
+              placeholder: 'Paste URL here...',
+            },
+            signingCertificate: {
+              label: 'X.509 certificate',
+              uploadFile: 'Upload file',
+              replaceFile: 'Replace file',
+              removeFile: 'Remove file',
+              fileUploaded: 'File uploaded',
+            },
           },
         },
       },
-      samlOkta: {
-        title: 'Configure Okta Workforce',
-        subtitle: 'Create a new enterprise application in your Okta Dashboard',
-        createApp: {
-          title: 'Create a new enterprise application in Okta',
-          step1: 'Sign in to Okta and go to Admin → Applications.',
-          step2: 'Click Create App Integration.',
-          step3: 'Select SAML 2.0.',
-          step4: 'Fill in the General Settings (App name is required).',
-          step5: 'Click Next to complete creating the application.',
-        },
-        serviceProvider: {
-          title: 'Configure service provider',
-          paragraph1:
-            'Once you have moved forward from the General Settings instructions, you will be presented with the Configure SAML page.',
-          paragraph2:
-            'To configure your service provider (Clerk), you must add these two fields to your Okta application:',
-        },
-        completeSamlIntegration: {
-          title: 'Complete SAML integration',
-          step1: 'Select This is an internal app that we have created from the options menu.',
-          step2: 'Complete the form with any comments and select "Finish".',
-        },
-        configureAttributes: {
-          step1: 'In the Okta dashboard, find the Attribute Statements section.',
-          step2: 'Select Add Expression for each attribute, and enter the following name and expression pairs:',
-          pairs: {
-            conjunction: ' and ',
-            email: {
-              name: 'mail',
-              expression: 'user.profile.mail',
+      samlCustom: {
+        mainHeaderTitle: 'Configure your identity provider (IdP)',
+        createAppStep: {
+          headerSubtitle: 'Create a new enterprise application in your identity provider’s admin dashboard',
+          createAppInstructions: {
+            title: 'Create a SAML application on your identity provider',
+            paragraph:
+              'In your identity provider’s admin dashboard, create a new SAML 2.0 application and use the following service provider details:',
+          },
+          serviceProviderFields: {
+            acsUrl: {
+              label: 'Assertion consumer service (ACS) URL',
             },
-            firstName: {
-              name: 'firstName',
-              expression: 'user.profile.firstName',
-            },
-            lastName: {
-              name: 'lastName',
-              expression: 'user.profile.lastName',
+            spEntityId: {
+              label: 'Service provider entity ID',
             },
           },
         },
-        assignUsers: {
-          title: 'Assign selected user or group in Okta',
-          paragraph: 'You need to assign users or groups to your enterprise app before they can use it to sign in.',
-          step1: 'In the Okta dashboard, select the Assignments tab.',
-          step2: 'Select the Assign dropdown. You can either select Assign to people or Assign to groups.',
-          step3: 'In the search field, enter the user or group of users that you want to assign to the application.',
-          step4: 'Select the Assign button next to the user or group that you want to assign.',
-          step5: 'Select the Done button to complete the assignment.',
+        attributeMappingStep: {
+          headerSubtitle: 'Map user attributes from your identity provider to your application.',
+          paragraph: 'We expect your SAML response to return the user’s email, first name and last name.',
+          attributeMappingTable: {
+            columns: {
+              userProfile: 'Identity Provider User Profile',
+              attributeName: 'Attribute Name',
+            },
+            rows: {
+              email: { userProfile: 'Primary email', attributeName: 'email' },
+              firstName: { userProfile: 'First name', attributeName: 'firstName' },
+              lastName: { userProfile: 'Last name', attributeName: 'lastName' },
+            },
+          },
         },
-        metadataUrl: {
-          label: 'Metadata URL',
-          placeholder: 'Paste URL here...',
-          description: 'In your Okta SAML app, go to the Sign On tab and retrieve the metadata URL. Paste it below.',
+        assignUsersStep: {
+          headerSubtitle: 'Assign users to the enterprise application',
+          title: 'Assign selected user or group',
+          paragraph:
+            'You need to assign users or groups to your enterprise application before they can use it to sign in.',
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: 'Configure identity provider metadata',
+          modes: {
+            title: 'Fill in your SAML application details',
+            ariaLabel: 'Configuration ',
+            metadataUrl: 'Add via metadata',
+            manual: 'Configure manually',
+          },
+          metadataUrl: {
+            label: 'Metadata URL',
+            placeholder: 'Paste URL here...',
+            description: 'In your enterprise application, retrieve the metadata URL. Paste it below.',
+          },
+          manual: {
+            description: 'In your SAML application, retrieve these values.',
+            signOnUrl: {
+              label: 'Single Sign-On URL',
+              placeholder: 'Paste URL here...',
+            },
+            issuer: {
+              label: 'Issuer',
+              placeholder: 'Paste URL here...',
+            },
+            signingCertificate: {
+              label: 'X.509 certificate',
+              uploadFile: 'Upload file',
+              replaceFile: 'Replace file',
+              removeFile: 'Remove file',
+              fileUploaded: 'File uploaded',
+            },
+          },
+        },
+      },
+      samlGoogle: {
+        mainHeaderTitle: 'Configure Google Workspace',
+        createAppStep: {
+          headerSubtitle: 'Create a new enterprise application in your Google Workspace',
+          createAppInstructions: {
+            title: 'Create a new enterprise application in Google Workspace',
+            step1: 'Sign in to Google Admin Portal.',
+            step2: 'In the side navigation, under <bold>Apps</bold>, select <bold>Web and mobile apps.</bold>',
+            step3: 'Click on the <bold>Add</bold> app button, and select <bold>Add custom SAML app.</bold>',
+            step4: 'In the <bold>App details</bold> section, fill out the required <bold>App name</bold>.',
+            step5: 'Select the <bold>Continue</bold> button.',
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: 'Configure identity provider metadata',
+          modes: {
+            title: 'Fill in your Google Workspace application details',
+            ariaLabel: 'Configuration ',
+            metadataFile: 'Add via metadata',
+            manual: 'Configure manually',
+          },
+          metadataFile: {
+            label: 'IdP metadata',
+            description: 'In your Google Workspace application, download the IdP metadata and upload it below.',
+            uploadFile: 'Upload file',
+            replaceFile: 'Replace file',
+            removeFile: 'Remove file',
+            fileUploaded: 'File uploaded',
+          },
+          manual: {
+            description: 'In your Google Workspace application, retrieve these values.',
+            signOnUrl: {
+              label: 'SSO URL',
+              placeholder: 'Paste URL here...',
+            },
+            issuer: {
+              label: 'Entity ID',
+              placeholder: 'Paste URL here...',
+            },
+            signingCertificate: {
+              label: 'Signing certificate',
+              uploadFile: 'Upload file',
+              replaceFile: 'Replace file',
+              removeFile: 'Remove file',
+              fileUploaded: 'File uploaded',
+            },
+          },
+        },
+        serviceProviderStep: {
+          headerSubtitle: 'Configure service provider',
+          title: 'Configure service provider',
+          paragraph:
+            'To configure your service provider, you must add these two fields to your Google Workspace SAML application:',
+          serviceProviderFields: {
+            acsUrl: {
+              label: 'ACS URL',
+            },
+            spEntityId: {
+              label: 'Entity ID',
+            },
+          },
+          nameIdInstructions: {
+            step1:
+              'Under the <bold>Name ID</bold> section, select the <bold>Name ID</bold> format dropdown and select <bold>Email</bold>.',
+            step2: 'Select <bold>Continue</bold>',
+          },
+        },
+        attributeMappingStep: {
+          headerSubtitle: 'Map user attributes from Google Workspace to your application',
+          paragraph: 'We expect your SAML response to return the user’s email, first name and last name.',
+          step1: 'In the <bold>Google Admin Console</bold>, find the <bold>Attributes</bold> section.',
+          step2:
+            'Select <bold>Add mapping</bold> for each attribute, and enter the following Google and app attribute:',
+          attributeMappingTable: {
+            columns: {
+              googleAttribute: 'Google attribute',
+              appAttribute: 'App attribute',
+            },
+            rows: {
+              email: { googleAttribute: 'Primary email', appAttribute: 'email' },
+              firstName: { googleAttribute: 'First name', appAttribute: 'firstName' },
+              lastName: { googleAttribute: 'Last name', appAttribute: 'lastName' },
+            },
+          },
+        },
+        configureUserAccess: {
+          headerSubtitle: 'Enable your Google Workspace SAML application',
+          assignUsersInstructions: {
+            paragraph1:
+              "Once the configuration is complete in Google, you'll be redirected to the app's overview page.",
+            step1: 'Open the <bold>User access</bold> section.',
+            step2: 'Select <bold>ON for everyone.</bold>',
+            step3: 'Select <bold>Save</bold>.',
+            paragraph2:
+              'Google may take up to 24 hours to propagate these changes. The connection will remain inactive until they take effect.',
+          },
+        },
+      },
+      samlMicrosoft: {
+        mainHeaderTitle: 'Configure Microsoft Entra',
+        createAppStep: {
+          headerSubtitle: 'Create a new enterprise application in your Azure portal',
+          createAppInstructions: {
+            title: 'Create a new enterprise application in Microsoft Entra',
+            step1: 'Sign in to Microsoft Azure Portal and go to <bold>Enterprise applications.</bold>',
+            step2:
+              "Click <bold>New application.</bold> You'll be redirected to the <bold>Browse Microsoft Entra Gallery</bold> page.",
+            step3: 'Select <bold>Create your own application.</bold>',
+            step4: {
+              label: 'In the modal that opens:',
+              subSteps: {
+                appName: 'Fill out your application name.',
+                nonGallery:
+                  "Select <bold>Integrate any other application you don't find in the gallery (Non-gallery)</bold>.",
+                create: 'Select <bold>Create</bold>.',
+              },
+            },
+          },
+          assignUsersInstructions: {
+            title: 'Assign your users or groups in Microsoft',
+            paragraph1: 'You need to assign users or groups before they can use it to log in.',
+            step1: 'In the <bold>Getting Started</bold> section, select the <bold>Assign users and groups.</bold>',
+            step2: "Select <bold>Add user/group.</bold> You'll be redirected to the <bold>Add Assignment page.</bold>",
+            step3: 'Select the <bold>None Selected link.</bold>',
+            step4:
+              'To assign a user to the enterprise app, you can either use the search field to find a user or select the checkbox next to the user in the table.',
+            step5:
+              "Select <bold>Select</bold> at the bottom of the page. You'll be redirected to the <bold>Add Assignment</bold> page.",
+            step6: 'Select <bold>Assign</bold> at the bottom of the page.',
+          },
+        },
+        serviceProviderStep: {
+          headerSubtitle: 'Add service provider configuration to Microsoft Entra',
+          title: 'Configure service provider',
+          step1: 'In the side navigation, open the <bold>Manage</bold> dropdown and select Single sign-on.',
+          step2:
+            "In the <bold>Select a single sign-on</bold> method section, select <bold>SAML</bold>. You'll be redirected to the <bold>Set up Single Sign-On with SAML</bold> page.",
+          step3: 'Find the <bold>Basic SAML Configuration</bold> section.',
+          step4: 'Select <bold>Edit</bold>. The <bold>Basic SAML Configuration</bold> panel will open.',
+          step5:
+            'Add the following <bold>Identifier (Entity ID)</bold> and <bold>Reply URL (Assertion Consumer Service URL)</bold> values. These values will be saved automatically.',
+          step6: 'Select <bold>Save</bold> at the top of the panel. Close the panel.',
+          serviceProviderFields: {
+            acsUrl: {
+              label: 'Reply URL (Assertion Consumer Service URL)',
+            },
+            spEntityId: {
+              label: 'Identifier (Entity ID)',
+            },
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: 'Configure identity provider metadata',
+          modes: {
+            title: 'Fill in your Microsoft Entra application details',
+            ariaLabel: 'Configuration ',
+            metadataUrl: 'Add via metadata',
+            manual: 'Configure manually',
+          },
+          metadataUrl: {
+            label: 'Metadata URL',
+            placeholder: 'Paste URL here...',
+            description:
+              'On the <bold>SAML-based Sign-on</bold> page, find the <bold>SAML Certificates</bold> section. Add the <bold>App Federation Metadata Url</bold> below.',
+          },
+          manual: {
+            description:
+              'On the <bold>SAML-based Sign-on</bold> page, find the <bold>SAML Certificates</bold> section. Retrieve these values and add them below.',
+            signOnUrl: {
+              label: 'Single Sign-On URL',
+              placeholder: 'Paste URL here...',
+            },
+            issuer: {
+              label: 'Issuer',
+              placeholder: 'Paste URL here...',
+            },
+            signingCertificate: {
+              label: 'Signing certificate',
+              uploadFile: 'Upload file',
+              replaceFile: 'Replace file',
+              removeFile: 'Remove file',
+              fileUploaded: 'File uploaded',
+            },
+          },
+        },
+        attributeMappingStep: {
+          headerSubtitle: 'Map user attributes from Microsoft Entra to your application',
+          title: 'We expect your SAML responses to have the following specific attributes:',
+          paragraph:
+            "These are the defaults and probably won't need you to change them. However, many SAML configuration errors are due to incorrect attribute mappings, so it's worth double-checking. Here's how:",
+          step1: 'On the <bold>SAML-based Sign-on</bold> page, find the <bold>Attributes & Claims</bold> section.',
+          step2: 'Select <bold>Edit</bold>',
+          step3: 'Verify that the above three attributes and values are present.',
+          attributeMappingTable: {
+            columns: {
+              attribute: 'Attribute',
+              claimName: 'Claim name',
+              value: 'Value',
+            },
+            rows: {
+              email: {
+                attribute: 'Email address',
+                claimName: 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress',
+                value: 'user.mail',
+              },
+              firstName: {
+                attribute: 'First name',
+                claimName: 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname',
+                value: 'user.givenname',
+              },
+              lastName: {
+                attribute: 'Last name',
+                claimName: 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname',
+                value: 'user.surname',
+              },
+            },
+          },
         },
       },
     },
@@ -606,6 +1015,7 @@ export const enUS: LocalizationResource = {
     navbar: {
       apiKeys: 'API keys',
       billing: 'Billing',
+      selfServeSSO: 'Single Sign-On (SSO)',
       description: 'Manage your organization.',
       general: 'General',
       members: 'Members',

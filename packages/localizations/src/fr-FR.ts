@@ -149,7 +149,7 @@ export const frFR: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Méthodes de paiement',
-    popular: 'Populaire',
+    highlightedPlanBadge: 'Populaire',
     pricingTable: {
       billingCycle: 'Cycle de facturation',
       included: 'Inclus',
@@ -188,9 +188,8 @@ export const frFR: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        "Contactez l'administrateur de votre organisation afin d'obtenir les permissions pour gérer les connexions d'entreprise.",
-      title: "Vous n'avez pas la permission de gérer les connexions d'entreprise",
+      subtitle: "Contactez l'administrateur de votre organisation pour étendre vos permissions.",
+      title: "Vous n'avez pas la permission de gérer l'authentification unique (SSO)",
     },
     navbar: {
       title: "Configurer l'authentification unique (SSO)",
@@ -198,10 +197,6 @@ export const frFR: LocalizationResource = {
     selectProviderStep: {
       title: 'Sélectionner un fournisseur',
       subtitle: 'Sélectionnez le fournisseur pour lequel vous allez configurer le SSO.',
-      body: {
-        title: "Sélectionnez votre fournisseur d'identité",
-        description: 'Nous vous guiderons ensuite à travers le processus de configuration détaillé.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

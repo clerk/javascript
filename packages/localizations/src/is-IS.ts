@@ -150,7 +150,7 @@ export const isIS: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Greiðslumátar',
-    popular: 'Vinsælt',
+    highlightedPlanBadge: 'Vinsælt',
     pricingTable: {
       billingCycle: 'Greiðslutímabil',
       included: 'Innifalið',
@@ -208,9 +208,8 @@ export const isIS: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'Hafðu samband við stjórnanda fyrirtækisins þíns til að fá heimildir til að stjórna fyrirtækjatengingum.',
-      title: 'Þú hefur ekki heimild til að stjórna fyrirtækjatengingum',
+      subtitle: 'Hafðu samband við stjórnanda fyrirtækisins þíns til að uppfæra heimildir þínar.',
+      title: 'Þú hefur ekki heimild til að stjórna einnar innskráningar (SSO)',
     },
     navbar: {
       title: 'Stilla einnar innskráningar (SSO)',
@@ -218,10 +217,6 @@ export const isIS: LocalizationResource = {
     selectProviderStep: {
       title: 'Veldu þjónustuaðila',
       subtitle: 'Veldu þjónustuaðilann sem þú ætlar að setja upp SSO fyrir.',
-      body: {
-        title: 'Veldu auðkennisþjónustuaðila þinn',
-        description: 'Við munum leiðbeina þér í gegnum ítarlegt uppsetningarferli næst.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

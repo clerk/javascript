@@ -1,3 +1,4 @@
+/* eslint-disable turbo/no-undeclared-env-vars */
 import { expect, test } from '@playwright/test';
 
 import type { Application } from '../models/application';
@@ -6,6 +7,14 @@ import type { FakeUser } from '../testUtils';
 import { createTestUtils } from '../testUtils';
 
 test.describe('sign up and sign in with WhatsApp phone code @generic', () => {
+  // The WhatsApp alternate phone-code channel is not provisioned on the staging
+  // instance, so the WhatsApp sign-up button never renders there and every test in
+  // this suite times out deterministically (no amount of retrying helps). Unlike the
+  // long-running-app suites, this test builds its own app via `app.withEnv(...)` and
+  // therefore bypasses the `isStagingReady` graceful-skip. Skip it explicitly on
+  // staging until the channel is enabled on the staging mirror.
+  test.skip(process.env.E2E_STAGING === '1', 'WhatsApp channel is not enabled on the staging instance');
+
   const configs = [appConfigs.next.appRouter];
 
   configs.forEach(config => {

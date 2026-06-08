@@ -147,7 +147,7 @@ export const roRO: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Metode de plată',
-    popular: 'Popular',
+    highlightedPlanBadge: 'Popular',
     pricingTable: {
       billingCycle: 'Ciclu de facturare',
       included: 'Inclus',
@@ -186,9 +186,8 @@ export const roRO: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'Contactați administratorul organizației dumneavoastră pentru a obține permisiuni de gestionare a conexiunilor de întreprindere.',
-      title: 'Nu aveți permisiunea să gestionați conexiunile de întreprindere',
+      subtitle: 'Contactați administratorul organizației dumneavoastră pentru a vă extinde permisiunile.',
+      title: 'Nu aveți permisiunea să gestionați autentificarea unică (SSO)',
     },
     navbar: {
       title: 'Configurați autentificarea unică (SSO)',
@@ -196,10 +195,6 @@ export const roRO: LocalizationResource = {
     selectProviderStep: {
       title: 'Selectați furnizorul',
       subtitle: 'Selectați furnizorul pentru care veți configura SSO.',
-      body: {
-        title: 'Selectați furnizorul de identitate',
-        description: 'Vă vom ghida în continuare prin procesul de configurare detaliat.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

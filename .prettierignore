@@ -23,3 +23,6 @@ packages/clerk-js/src/core/resources/index.ts
 packages/shared/src/compiled
 /**/CHANGELOG.md
 renovate.json5
+# Frozen snapshots of TypeDoc-generated MDX; must match raw `extract-methods.mjs` output.
+.typedoc/__tests__/__snapshots__/
+CLAUDE.md

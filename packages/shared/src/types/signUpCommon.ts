@@ -22,8 +22,10 @@ import type {
 import type { SnakeToCamel } from './utils';
 import type { VerificationResource } from './verification';
 
+/** @inline */
 export type SignUpStatus = 'missing_requirements' | 'complete' | 'abandoned';
 
+/** @inline */
 export type SignUpField = SignUpAttributeField | SignUpIdentificationField;
 
 export type PrepareVerificationParams =
@@ -64,9 +66,11 @@ export type AttemptVerificationParams =
       signature: string;
     };
 
+/** @inline */
 export type SignUpAttributeField = FirstNameAttribute | LastNameAttribute | PasswordAttribute | LegalAcceptedAttribute;
 
 // TODO: SignUpVerifiableField or SignUpIdentifier?
+/** @inline */
 export type SignUpVerifiableField =
   | UsernameIdentifier
   | EmailAddressIdentifier
@@ -75,6 +79,7 @@ export type SignUpVerifiableField =
   | Web3WalletIdentifier;
 
 // TODO: Does it make sense that the identification *field* holds a *strategy*?
+/** @inline */
 export type SignUpIdentificationField = SignUpVerifiableField | OAuthStrategy | EnterpriseSSOStrategy;
 
 // TODO: Replace with discriminated union type

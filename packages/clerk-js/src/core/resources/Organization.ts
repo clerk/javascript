@@ -2,8 +2,20 @@ import type {
   AddMemberParams,
   ClerkPaginatedResponse,
   ClerkResourceReloadParams,
+  CreateOrganizationEnterpriseConnectionParams,
   CreateOrganizationParams,
+  DeletedObjectJSON,
+  DeletedObjectResource,
+  EnterpriseConnectionJSON,
+  EnterpriseConnectionResource,
+  EnterpriseConnectionTestRunInitJSON,
+  EnterpriseConnectionTestRunInitResource,
+  EnterpriseConnectionTestRunJSON,
+  EnterpriseConnectionTestRunResource,
+  EnterpriseConnectionTestRunsPaginatedJSON,
   GetDomainsParams,
+  GetEnterpriseConnectionsParams,
+  GetEnterpriseConnectionTestRunsParams,
   GetInvitationsParams,
   GetMembershipRequestParams,
   GetMemberships,
@@ -23,13 +35,22 @@ import type {
   RoleJSON,
   SetOrganizationLogoParams,
   UpdateMembershipParams,
+  UpdateOrganizationEnterpriseConnectionParams,
   UpdateOrganizationParams,
 } from '@clerk/shared/types';
 
 import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
 import { unixEpochToDate } from '../../utils/date';
+import { toEnterpriseConnectionBody } from '../../utils/enterpriseConnection';
 import { addPaymentMethod, getPaymentMethods, initializePaymentMethod } from '../modules/billing';
-import { BaseResource, OrganizationInvitation, OrganizationMembership } from './internal';
+import {
+  BaseResource,
+  DeletedObject,
+  EnterpriseConnection,
+  EnterpriseConnectionTestRun,
+  OrganizationInvitation,
+  OrganizationMembership,
+} from './internal';
 import { OrganizationDomain } from './OrganizationDomain';
 import { OrganizationMembershipRequest } from './OrganizationMembershipRequest';
 import { Role } from './Role';
@@ -49,6 +70,7 @@ export class Organization extends BaseResource implements OrganizationResource {
   membersCount = 0;
   pendingInvitationsCount = 0;
   maxAllowedMemberships!: number;
+  selfServeSSOEnabled = false;
 
   constructor(data: OrganizationJSON | OrganizationJSONSnapshot) {
     super();
@@ -139,6 +161,107 @@ export class Organization extends BaseResource implements OrganizationResource {
       })
     )?.response as unknown as OrganizationDomainJSON;
     return new OrganizationDomain(json);
+  };
+
+  getEnterpriseConnections = async (
+    params?: GetEnterpriseConnectionsParams,
+  ): Promise<EnterpriseConnectionResource[]> => {
+    const { withOrganizationAccountLinking } = params || {};
+
+    const json = (
+      await BaseResource._fetch({
+        path: `/organizations/${this.id}/enterprise_connections`,
+        method: 'GET',
+        ...(withOrganizationAccountLinking !== undefined
+          ? {
+              search: {
+                with_organization_account_linking: String(withOrganizationAccountLinking),
+              },
+            }
+          : {}),
+      })
+    )?.response as unknown as EnterpriseConnectionJSON[];
+
+    return (json || []).map(connection => new EnterpriseConnection(connection));
+  };
+
+  createEnterpriseConnection = async (
+    params: CreateOrganizationEnterpriseConnectionParams,
+  ): Promise<EnterpriseConnectionResource> => {
+    const json = (
+      await BaseResource._fetch<EnterpriseConnectionJSON>({
+        path: `/organizations/${this.id}/enterprise_connections`,
+        method: 'POST',
+        body: toEnterpriseConnectionBody(params, { omitOrganizationId: true }) as any,
+      })
+    )?.response as unknown as EnterpriseConnectionJSON;
+
+    return new EnterpriseConnection(json);
+  };
+
+  updateEnterpriseConnection = async (
+    enterpriseConnectionId: string,
+    params: UpdateOrganizationEnterpriseConnectionParams,
+  ): Promise<EnterpriseConnectionResource> => {
+    const json = (
+      await BaseResource._fetch<EnterpriseConnectionJSON>({
+        path: `/organizations/${this.id}/enterprise_connections/${enterpriseConnectionId}`,
+        method: 'PATCH',
+        body: toEnterpriseConnectionBody(params, { omitOrganizationId: true }) as any,
+      })
+    )?.response as unknown as EnterpriseConnectionJSON;
+
+    return new EnterpriseConnection(json);
+  };
+
+  deleteEnterpriseConnection = async (enterpriseConnectionId: string): Promise<DeletedObjectResource> => {
+    const json = (
+      await BaseResource._fetch<DeletedObjectJSON>({
+        path: `/organizations/${this.id}/enterprise_connections/${enterpriseConnectionId}`,
+        method: 'DELETE',
+      })
+    )?.response as unknown as DeletedObjectJSON;
+
+    return new DeletedObject(json);
+  };
+
+  createEnterpriseConnectionTestRun = async (
+    enterpriseConnectionId: string,
+  ): Promise<EnterpriseConnectionTestRunInitResource> => {
+    const json = (
+      await BaseResource._fetch({
+        path: `/organizations/${this.id}/enterprise_connections/${enterpriseConnectionId}/test_runs`,
+        method: 'POST',
+      })
+    )?.response as unknown as EnterpriseConnectionTestRunInitJSON;
+
+    return { url: json.url };
+  };
+
+  getEnterpriseConnectionTestRuns = async (
+    enterpriseConnectionId: string,
+    params?: GetEnterpriseConnectionTestRunsParams,
+  ): Promise<ClerkPaginatedResponse<EnterpriseConnectionTestRunResource>> => {
+    const { status, ...rest } = params || {};
+    const search = convertPageToOffsetSearchParams(rest);
+    if (status?.length) {
+      for (const s of status) {
+        search.append('status', s);
+      }
+    }
+
+    const res = await BaseResource._fetch({
+      path: `/organizations/${this.id}/enterprise_connections/${enterpriseConnectionId}/test_runs`,
+      method: 'GET',
+      search,
+    });
+
+    const payload = res?.response as unknown as EnterpriseConnectionTestRunsPaginatedJSON | undefined;
+
+    return {
+      total_count: payload?.total_count ?? 0,
+      data: (payload?.data ?? []).map((row: EnterpriseConnectionTestRunJSON) => new EnterpriseConnectionTestRun(row)),
+    };
   };
 
   getMembershipRequests = async (
@@ -303,6 +426,7 @@ export class Organization extends BaseResource implements OrganizationResource {
     this.pendingInvitationsCount = data.pending_invitations_count || 0;
     this.maxAllowedMemberships = data.max_allowed_memberships || 0;
     this.adminDeleteEnabled = data.admin_delete_enabled || false;
+    this.selfServeSSOEnabled = data.self_serve_sso_enabled || false;
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
     return this;
@@ -321,6 +445,7 @@ export class Organization extends BaseResource implements OrganizationResource {
       pending_invitations_count: this.pendingInvitationsCount,
       max_allowed_memberships: this.maxAllowedMemberships,
       admin_delete_enabled: this.adminDeleteEnabled,
+      self_serve_sso_enabled: this.selfServeSSOEnabled,
       created_at: this.createdAt.getTime(),
       updated_at: this.updatedAt.getTime(),
     };

@@ -141,7 +141,7 @@ export const nlNL: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -180,9 +180,8 @@ export const nlNL: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'Neem contact op met de beheerder van je organisatie om toestemming te krijgen voor het beheren van enterprise-verbindingen.',
-      title: 'Je hebt geen toestemming om enterprise-verbindingen te beheren',
+      subtitle: 'Neem contact op met de beheerder van je organisatie om je rechten uit te breiden.',
+      title: 'Je hebt geen toestemming om single sign-on (SSO) te beheren',
     },
     navbar: {
       title: 'Single sign-on (SSO) configureren',
@@ -190,10 +189,6 @@ export const nlNL: LocalizationResource = {
     selectProviderStep: {
       title: 'Provider selecteren',
       subtitle: 'Selecteer de provider waarvoor je SSO gaat instellen.',
-      body: {
-        title: 'Selecteer je identiteitsprovider',
-        description: 'We begeleiden je hierna door het gedetailleerde installatieproces.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

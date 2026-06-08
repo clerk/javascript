@@ -141,7 +141,7 @@ export const heIL: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -180,8 +180,8 @@ export const heIL: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: 'פנה למנהל הארגון שלך כדי לקבל הרשאות לניהול חיבורים ארגוניים.',
-      title: 'אין לך הרשאה לנהל חיבורים ארגוניים',
+      subtitle: 'פנה למנהל הארגון שלך כדי לשדרג את ההרשאות שלך.',
+      title: 'אין לך הרשאה לנהל כניסה אחידה (SSO)',
     },
     navbar: {
       title: 'הגדרת כניסה אחידה (SSO)',
@@ -189,10 +189,6 @@ export const heIL: LocalizationResource = {
     selectProviderStep: {
       title: 'בחר ספק',
       subtitle: 'בחר את הספק שעבורו תגדיר SSO.',
-      body: {
-        title: 'בחר את ספק הזהות שלך',
-        description: 'נדריך אותך בתהליך ההגדרה המפורט בהמשך.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/testing",
-  "version": "2.0.27",
+  "version": "2.0.35",
   "description": "Utilities to help you create E2E test suites for apps using Clerk",
   "keywords": [
     "auth",
@@ -67,6 +67,7 @@
   ],
   "scripts": {
     "build": "tsup --env.NODE_ENV production",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:pub": "pnpm dev -- --env.publish",

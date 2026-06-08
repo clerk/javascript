@@ -1,7 +1,7 @@
 import type {
-  __experimental_ConfigureSSOProps,
   __internal_OAuthConsentProps,
   APIKeysProps,
+  ConfigureSSOProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
   OrganizationListProps,
@@ -55,7 +55,7 @@ import { withClerk } from './withClerk';
 
 type FallbackProp = {
   /**
-   * An optional element to render while the component is mounting.
+   * The element to render while the component is mounting.
    */
   fallback?: ReactNode;
 };
@@ -127,8 +127,8 @@ type OrganizationSwitcherPropsWithoutCustomPages = Without<
 const CustomPortalsRenderer = (props: CustomPortalsRendererProps) => {
   return (
     <>
-      {props?.customPagesPortals?.map((portal, index) => createElement(portal, { key: index }))}
-      {props?.customMenuItemsPortals?.map((portal, index) => createElement(portal, { key: index }))}
+      {props?.customPagesPortals?.map(({ key, portal }) => createElement(portal, { key }))}
+      {props?.customMenuItemsPortals?.map(({ key, portal }) => createElement(portal, { key }))}
     </>
   );
 };
@@ -645,11 +645,8 @@ export const APIKeys = withClerk(
   { component: 'ApiKeys', renderWhileLoading: true },
 );
 
-/**
- * @experimental This component is in early access and may change in future releases.
- */
 export const ConfigureSSO = withClerk(
-  ({ clerk, component, fallback, ...props }: WithClerkProp<__experimental_ConfigureSSOProps & FallbackProp>) => {
+  ({ clerk, component, fallback, ...props }: WithClerkProp<ConfigureSSOProps & FallbackProp>) => {
     const mountingStatus = useWaitForComponentMount(component);
     const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
 
@@ -663,8 +660,8 @@ export const ConfigureSSO = withClerk(
         {clerk.loaded && (
           <ClerkHostRenderer
             component={component}
-            mount={clerk.__experimental_mountConfigureSSO}
-            unmount={clerk.__experimental_unmountConfigureSSO}
+            mount={clerk.mountConfigureSSO}
+            unmount={clerk.unmountConfigureSSO}
             updateProps={(clerk as any).__internal_updateProps}
             props={props}
             rootProps={rendererRootProps}

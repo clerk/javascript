@@ -141,7 +141,7 @@ export const skSK: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -180,9 +180,8 @@ export const skSK: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'Kontaktujte správcu vašej organizácie, aby ste získali oprávnenia na spravovanie podnikových pripojení.',
-      title: 'Nemáte oprávnenie spravovať podnikové pripojenia',
+      subtitle: 'Kontaktujte správcu vašej organizácie pre rozšírenie vašich oprávnení.',
+      title: 'Nemáte oprávnenie spravovať jednotné prihlasovanie (SSO)',
     },
     navbar: {
       title: 'Nastaviť jednotné prihlasovanie (SSO)',
@@ -190,10 +189,6 @@ export const skSK: LocalizationResource = {
     selectProviderStep: {
       title: 'Vyberte poskytovateľa',
       subtitle: 'Vyberte poskytovateľa, pre ktorého budete nastavovať SSO.',
-      body: {
-        title: 'Vyberte si svojho poskytovateľa identity',
-        description: 'Následne vás prevedieme podrobným procesom nastavenia.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

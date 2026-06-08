@@ -141,7 +141,7 @@ export const ukUA: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -180,9 +180,8 @@ export const ukUA: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'Зверніться до адміністратора вашої організації, щоб отримати дозвіл на керування корпоративними підключеннями.',
-      title: 'У вас немає дозволу на керування корпоративними підключеннями',
+      subtitle: 'Зверніться до адміністратора вашої організації, щоб розширити ваші дозволи.',
+      title: 'У вас немає дозволу на керування єдиним входом (SSO)',
     },
     navbar: {
       title: 'Налаштувати єдиний вхід (SSO)',
@@ -190,10 +189,6 @@ export const ukUA: LocalizationResource = {
     selectProviderStep: {
       title: 'Виберіть постачальника',
       subtitle: 'Виберіть постачальника, для якого ви налаштовуватимете SSO.',
-      body: {
-        title: 'Виберіть вашого постачальника ідентифікації',
-        description: 'Далі ми проведемо вас через детальний процес налаштування.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

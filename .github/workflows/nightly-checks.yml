@@ -19,8 +19,9 @@ jobs:
 
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
+          persist-credentials: false
           fetch-depth: 1
           fetch-tags: false
           filter: "blob:none"
@@ -30,6 +31,7 @@ jobs:
         id: config
         uses: ./.github/actions/init
         with:
+          cache-enabled: true
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
@@ -107,7 +109,7 @@ jobs:
       # Upload test artifacts if tests failed
       - name: Upload Test Artifacts
         if: steps.integration_tests.outputs.exit_code != '0'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: test-artifacts-${{ matrix.test-name }}
           path: |
@@ -118,7 +120,7 @@ jobs:
 
       - name: Report Status
         if: always()
-        uses: ravsamhq/notify-slack-action@v1
+        uses: ravsamhq/notify-slack-action@4ed28566c2bdcdaee6dca2b46b9666d01b4ed8a4 # v1
         with:
           status: ${{ steps.integration_tests.outputs.exit_code == '0' && 'success' || 'failure' }}
           notify_when: "failure"

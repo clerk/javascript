@@ -1,14 +1,11 @@
-import type {
-  BillingPlanResource,
-  BillingSubscriptionItemResource,
-  BillingSubscriptionResource,
-} from '@clerk/shared/types';
+import type { BillingSubscriptionItemResource, BillingSubscriptionResource } from '@clerk/shared/types';
 import { Fragment, useMemo } from 'react';
 
 import { useProtect } from '@/ui/common/Gate';
 import { ProfileSection } from '@/ui/elements/Section';
 import { common } from '@/ui/styledSystem';
 import { getSeatLimitAndIncludedSeatsLocalizationKey } from '@/ui/utils/billingPlanSeats';
+import { isManageableSubscriptionItem } from '@/ui/utils/billingSubscription';
 
 import {
   normalizeFormatted,
@@ -34,11 +31,9 @@ import {
   Tr,
   useLocalizations,
 } from '../../customizables';
-import { ArrowsUpDown, CogFilled, Plans, Plus, Users } from '../../icons';
+import { ArrowUpDown, Cog, Files, Plus, Users } from '../../icons';
 import { useRouter } from '../../router';
 import { SubscriptionBadge } from './badge';
-
-const isFreePlan = (plan: BillingPlanResource) => !plan.hasBaseFee;
 
 export function SubscriptionsList({
   title,
@@ -64,11 +59,12 @@ export function SubscriptionsList({
     (commerceSettings.billing.user.hasPaidPlans && subscriberType === 'user') ||
     (commerceSettings.billing.organization.hasPaidPlans && subscriberType === 'organization');
 
-  const hasActiveFreePlan = useMemo(() => {
-    return subscriptionItems.some(sub => isFreePlan(sub.plan) && sub.status === 'active');
-  }, [subscriptionItems]);
+  const hasManageableSubscription = useMemo(
+    () => subscriptionItems.some(isManageableSubscriptionItem),
+    [subscriptionItems],
+  );
 
-  const isManageButtonVisible = canManageBilling && !hasActiveFreePlan && subscriptionItems.length > 0;
+  const isManageButtonVisible = canManageBilling && hasManageableSubscription;
 
   const sortedSubscriptionItems = useMemo(
     () =>
@@ -154,7 +150,7 @@ export function SubscriptionsList({
                 width: isManageButtonVisible ? 'unset' : undefined,
               }),
             ]}
-            leftIcon={subscriptionItems.length > 0 ? ArrowsUpDown : Plus}
+            leftIcon={subscriptionItems.length > 0 ? ArrowUpDown : Plus}
             rightIcon={null}
             leftIconSx={t => ({
               width: t.sizes.$4,
@@ -176,7 +172,7 @@ export function SubscriptionsList({
               }),
             ]}
             rightIcon={null}
-            leftIcon={CogFilled}
+            leftIcon={Cog}
             leftIconSx={t => ({
               width: t.sizes.$4,
               height: t.sizes.$4,
@@ -284,7 +280,7 @@ function SubscriptionItemRow({
               gap={1}
             >
               <Icon
-                icon={Plans}
+                icon={Files}
                 sx={t => ({
                   width: t.sizes.$4,
                   height: t.sizes.$4,

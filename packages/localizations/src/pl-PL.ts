@@ -141,7 +141,7 @@ export const plPL: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -180,9 +180,8 @@ export const plPL: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'Skontaktuj się z administratorem swojej organizacji, aby uzyskać uprawnienia do zarządzania połączeniami korporacyjnymi.',
-      title: 'Nie masz uprawnień do zarządzania połączeniami korporacyjnymi',
+      subtitle: 'Skontaktuj się z administratorem swojej organizacji, aby rozszerzyć swoje uprawnienia.',
+      title: 'Nie masz uprawnień do zarządzania logowaniem jednokrotnym (SSO)',
     },
     navbar: {
       title: 'Skonfiguruj logowanie jednokrotne (SSO)',
@@ -190,10 +189,6 @@ export const plPL: LocalizationResource = {
     selectProviderStep: {
       title: 'Wybierz dostawcę',
       subtitle: 'Wybierz dostawcę, dla którego skonfigurujesz SSO.',
-      body: {
-        title: 'Wybierz swojego dostawcę tożsamości',
-        description: 'Następnie przeprowadzimy Cię przez szczegółowy proces konfiguracji.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

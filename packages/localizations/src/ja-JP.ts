@@ -152,7 +152,7 @@ export const jaJP: LocalizationResource = {
       },
     },
     paymentMethods__label: '支払い方法',
-    popular: '人気',
+    highlightedPlanBadge: '人気',
     pricingTable: {
       billingCycle: '請求サイクル',
       included: '含まれる内容',
@@ -191,8 +191,8 @@ export const jaJP: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: 'エンタープライズ接続を管理する権限を取得するには、組織の管理者にお問い合わせください。',
-      title: 'エンタープライズ接続を管理する権限がありません',
+      subtitle: '権限をアップグレードするには、組織の管理者にお問い合わせください。',
+      title: 'シングルサインオン（SSO）を管理する権限がありません',
     },
     navbar: {
       title: 'シングルサインオン（SSO）を設定',
@@ -200,10 +200,6 @@ export const jaJP: LocalizationResource = {
     selectProviderStep: {
       title: 'プロバイダーを選択',
       subtitle: 'SSOを設定するプロバイダーを選択してください。',
-      body: {
-        title: 'IDプロバイダーを選択してください',
-        description: '次に、詳細な設定プロセスをご案内します。',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

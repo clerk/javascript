@@ -599,6 +599,10 @@ export interface SignInTokenJSON extends ClerkResourceJSON {
 export interface AgentTaskJSON extends ClerkResourceJSON {
   object: typeof ObjectType.AgentTask;
   agent_id: string;
+  agent_task_id: string;
+  /**
+   * @deprecated Use `agent_task_id` instead.
+   */
   task_id: string;
   url: string;
 }
@@ -836,7 +840,7 @@ export interface RoleJSON extends ClerkResourceJSON {
   object: typeof ObjectType.Role;
   key: string;
   name: string;
-  description: string;
+  description: string | null;
   permissions: PermissionJSON[];
   is_creator_eligible: boolean;
   created_at: number;

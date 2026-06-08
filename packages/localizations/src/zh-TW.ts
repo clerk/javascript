@@ -147,7 +147,7 @@ export const zhTW: LocalizationResource = {
       },
     },
     paymentMethods__label: '付款方式',
-    popular: '熱門',
+    highlightedPlanBadge: '熱門',
     pricingTable: {
       billingCycle: '計費週期',
       included: '包含',
@@ -186,8 +186,8 @@ export const zhTW: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: '請聯絡您的組織管理員以取得管理企業連線的權限。',
-      title: '您沒有管理企業連線的權限',
+      subtitle: '請聯絡您的組織管理員以升級您的權限。',
+      title: '您沒有管理單一登入 (SSO) 的權限',
     },
     navbar: {
       title: '設定單一登入 (SSO)',
@@ -195,10 +195,6 @@ export const zhTW: LocalizationResource = {
     selectProviderStep: {
       title: '選擇提供者',
       subtitle: '選擇您要為其設定 SSO 的提供者。',
-      body: {
-        title: '選擇您的身分提供者',
-        description: '接下來我們將引導您完成詳細的設定流程。',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

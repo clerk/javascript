@@ -154,7 +154,7 @@ export const huHU: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Fizetési módok',
-    popular: 'Népszerű',
+    highlightedPlanBadge: 'Népszerű',
     pricingTable: {
       billingCycle: 'Számlázási ciklus',
       included: 'Tartalmazza',
@@ -209,9 +209,8 @@ export const huHU: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'Vegye fel a kapcsolatot szervezete adminisztrátorával, hogy jogosultságot kapjon a vállalati kapcsolatok kezelésére.',
-      title: 'Nincs jogosultsága vállalati kapcsolatok kezelésére',
+      subtitle: 'Vegye fel a kapcsolatot szervezete adminisztrátorával a jogosultságai bővítéséhez.',
+      title: 'Nincs jogosultsága az egyszeri bejelentkezés (SSO) kezelésére',
     },
     navbar: {
       title: 'Egyszeri bejelentkezés (SSO) beállítása',
@@ -219,10 +218,6 @@ export const huHU: LocalizationResource = {
     selectProviderStep: {
       title: 'Szolgáltató kiválasztása',
       subtitle: 'Válassza ki azt a szolgáltatót, amelyhez beállítja az SSO-t.',
-      body: {
-        title: 'Válassza ki az identitásszolgáltatóját',
-        description: 'Ezután végigvezetjük a részletes beállítási folyamaton.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

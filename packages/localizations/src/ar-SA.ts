@@ -141,7 +141,7 @@ export const arSA: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -180,8 +180,8 @@ export const arSA: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle: 'تواصل مع مسؤول مؤسستك للحصول على أذونات لإدارة الاتصالات المؤسسية.',
-      title: 'ليس لديك إذن لإدارة الاتصالات المؤسسية',
+      subtitle: 'تواصل مع مسؤول مؤسستك لترقية أذوناتك.',
+      title: 'ليس لديك إذن لإدارة تسجيل الدخول الموحد (SSO)',
     },
     navbar: {
       title: 'تكوين تسجيل الدخول الموحد (SSO)',
@@ -189,10 +189,6 @@ export const arSA: LocalizationResource = {
     selectProviderStep: {
       title: 'اختر المزود',
       subtitle: 'اختر المزود الذي ستقوم بإعداد تسجيل الدخول الموحد (SSO) له.',
-      body: {
-        title: 'اختر مزود الهوية الخاص بك',
-        description: 'سنرشدك خلال عملية الإعداد التفصيلية بعد ذلك.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

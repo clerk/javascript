@@ -13,6 +13,7 @@ import {
   Link,
   localizationKeys,
   Text,
+  useAppearance,
   useLocalizations,
 } from '../customizables';
 import type { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
@@ -33,6 +34,7 @@ type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placehol
 
 const Root = (props: PropsWithChildren<FormControlProps>) => {
   const card = useCardState();
+  const { autoFocus: optionAutoFocus } = useAppearance().parsedOptions;
   const { children, isDisabled: isDisabledProp, ...restProps } = props;
 
   const isDisabled = isDisabledProp || card.isLoading;
@@ -40,6 +42,7 @@ const Root = (props: PropsWithChildren<FormControlProps>) => {
   const ctxProps = {
     ...restProps,
     isDisabled,
+    autoFocus: optionAutoFocus && restProps.autoFocus,
   };
 
   return <FormFieldContextProvider {...ctxProps}>{children}</FormFieldContextProvider>;
@@ -252,14 +255,18 @@ const CheckboxLabel = (props: { description?: string | LocalizationKey }) => {
   );
 };
 
-const InputElement = forwardRef<HTMLInputElement>((_, ref) => {
+type InputElementProps = {
+  elementDescriptor?: ElementDescriptor;
+};
+
+const InputElement = forwardRef<HTMLInputElement, InputElementProps>(({ elementDescriptor }, ref) => {
   const { t } = useLocalizations();
   const formField = useFormField();
   const { placeholder, ...inputProps } = sanitizeInputProps(formField);
   return (
     <Input
       ref={ref}
-      elementDescriptor={descriptors.formFieldInput}
+      elementDescriptor={elementDescriptor || descriptors.formFieldInput}
       elementId={descriptors.formFieldInput.setId(formField.fieldId)}
       {...inputProps}
       placeholder={t(placeholder)}

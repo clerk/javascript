@@ -141,7 +141,7 @@ export const elGR: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Μέθοδοι πληρωμής',
-    popular: 'Δημοφιλές',
+    highlightedPlanBadge: 'Δημοφιλές',
     pricingTable: {
       billingCycle: 'Κύκλος χρέωσης',
       included: 'Περιλαμβάνεται',
@@ -180,9 +180,8 @@ export const elGR: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'Επικοινωνήστε με τον διαχειριστή του οργανισμού σας για να αποκτήσετε άδειες διαχείρισης εταιρικών συνδέσεων.',
-      title: 'Δεν έχετε άδεια διαχείρισης εταιρικών συνδέσεων',
+      subtitle: 'Επικοινωνήστε με τον διαχειριστή του οργανισμού σας για να αναβαθμίσετε τις άδειές σας.',
+      title: 'Δεν έχετε άδεια διαχείρισης της Ενιαίας Σύνδεσης (SSO)',
     },
     navbar: {
       title: 'Διαμόρφωση Ενιαίας Σύνδεσης (SSO)',
@@ -190,10 +189,6 @@ export const elGR: LocalizationResource = {
     selectProviderStep: {
       title: 'Επιλέξτε πάροχο',
       subtitle: 'Επιλέξτε τον πάροχο για τον οποίο θα ρυθμίσετε SSO.',
-      body: {
-        title: 'Επιλέξτε τον πάροχο ταυτότητάς σας',
-        description: 'Θα σας καθοδηγήσουμε στη λεπτομερή διαδικασία ρύθμισης στη συνέχεια.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

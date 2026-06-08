@@ -110,6 +110,12 @@ const common = ({ mode, variant, disableRHC = false }) => {
             chunks: 'all',
             enforce: true,
           },
+          queryCoreVendor: {
+            test: /[\\/]node_modules[\\/](@tanstack\/query-core)[\\/]/,
+            name: 'query-core-vendors',
+            chunks: 'all',
+            enforce: true,
+          },
           defaultVendors: {
             minChunks: 1,
             test: module => {
@@ -428,7 +434,7 @@ const devConfig = ({ mode, env }) => {
             template: './sandbox/template.html',
             inject: false,
             templateParameters: {
-              uiScriptUrl: 'http://localhost:4011/npm/ui.browser.js',
+              uiScriptUrl: `http://localhost:${process.env.UI_PORT || 4011}/npm/ui.browser.js`,
             },
           }),
       ].filter(Boolean),

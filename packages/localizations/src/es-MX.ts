@@ -142,7 +142,7 @@ export const esMX: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -181,9 +181,8 @@ export const esMX: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'Contacta al administrador de tu organización para obtener permisos para administrar conexiones de empresa.',
-      title: 'No tienes permiso para administrar conexiones de empresa',
+      subtitle: 'Contacta al administrador de tu organización para ampliar tus permisos.',
+      title: 'No tienes permiso para administrar el inicio de sesión único (SSO)',
     },
     navbar: {
       title: 'Configurar inicio de sesión único (SSO)',
@@ -191,10 +190,6 @@ export const esMX: LocalizationResource = {
     selectProviderStep: {
       title: 'Seleccionar proveedor',
       subtitle: 'Selecciona el proveedor para el que vas a configurar SSO.',
-      body: {
-        title: 'Selecciona tu proveedor de identidad',
-        description: 'Te guiaremos a través del proceso de configuración detallado a continuación.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

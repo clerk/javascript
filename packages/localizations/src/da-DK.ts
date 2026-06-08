@@ -141,7 +141,7 @@ export const daDK: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    popular: undefined,
+    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
@@ -180,9 +180,8 @@ export const daDK: LocalizationResource = {
   },
   configureSSO: {
     missingManageEnterpriseConnectionsPermission: {
-      subtitle:
-        'Kontakt din organisations administrator for at få tilladelse til at administrere virksomhedsforbindelser.',
-      title: 'Du har ikke tilladelse til at administrere virksomhedsforbindelser',
+      subtitle: 'Kontakt din organisations administrator for at opgradere dine tilladelser.',
+      title: 'Du har ikke tilladelse til at administrere single sign-on (SSO)',
     },
     navbar: {
       title: 'Konfigurer single sign-on (SSO)',
@@ -190,10 +189,6 @@ export const daDK: LocalizationResource = {
     selectProviderStep: {
       title: 'Vælg udbyder',
       subtitle: 'Vælg den udbyder, du vil opsætte SSO for.',
-      body: {
-        title: 'Vælg din identitetsudbyder',
-        description: 'Vi guider dig gennem den detaljerede opsætningsproces næste gang.',
-      },
       saml: {
         groupLabel: 'SAML',
         okta: 'Okta Workforce',

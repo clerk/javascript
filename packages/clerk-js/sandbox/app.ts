@@ -2,6 +2,7 @@ import { PageMocking, type MockScenario } from '@clerk/msw';
 import * as l from '../../localizations';
 import { dark, neobrutalism, shadcn, shadesOfPurple } from '../../ui/src/themes';
 import type { Clerk as ClerkType } from '../';
+import { initCommandPalette } from './cmdk';
 import * as scenarios from './scenarios';
 
 interface ComponentPropsControl {
@@ -43,18 +44,32 @@ type AvailableComponent = (typeof AVAILABLE_COMPONENTS)[number];
 const AVAILABLE_SCENARIOS = Object.keys(scenarios) as (keyof typeof scenarios)[];
 type AvailableScenario = (typeof AVAILABLE_SCENARIOS)[number];
 
-function fillLocalizationSelect() {
-  const select = document.getElementById('localizationSelect') as HTMLSelectElement;
+const COLOR_DEFAULTS: Record<string, string> = {
+  colorPrimary: '#2F3037',
+  colorNeutral: '#000000',
+  colorBackground: '#ffffff',
+  colorPrimaryForeground: '#ffffff',
+  colorDanger: '#EF4444',
+  colorSuccess: '#22C543',
+  colorWarning: '#F36B16',
+  colorForeground: '#212126',
+  colorMutedForeground: '#747686',
+  colorInputForeground: '#000000',
+  colorInput: '#ffffff',
+  colorShimmer: '#ffffff',
+};
 
-  for (const locale of AVAILABLE_LOCALES) {
-    if (locale === 'enUS') {
-      select.add(new Option(locale, locale, true, true));
-      continue;
-    }
+const VARIABLE_DEFAULTS: Record<string, string> = {
+  ...COLOR_DEFAULTS,
+  spacing: '1rem',
+  borderRadius: '0.375rem',
+};
 
-    select.add(new Option(locale, locale));
-  }
-}
+const OTHER_DEFAULTS = {
+  localization: 'enUS',
+  elevation: 'raised' as const,
+  devWarnings: true,
+};
 
 function getScenario(): (() => MockScenario) | null {
   const scenarioName = localStorage.getItem(`${COMPONENT_PROPS_NAMESPACE}-scenario`);
@@ -162,6 +177,8 @@ window.AVAILABLE_SCENARIOS = AVAILABLE_SCENARIOS.reduce(
   {} as Record<AvailableScenario, AvailableScenario>,
 );
 
+initCommandPalette();
+
 const Clerk = window.Clerk;
 function assertClerkIsLoaded(c: ClerkType | undefined): asserts c is ClerkType {
   if (!c) {
@@ -172,24 +189,13 @@ function assertClerkIsLoaded(c: ClerkType | undefined): asserts c is ClerkType {
 function mountIndex(element: HTMLDivElement) {
   assertClerkIsLoaded(Clerk);
   const user = Clerk.user;
-  element.innerHTML = `<pre class="text-left whitespace-pre overflow-x-auto bg-white p-4 border border-gray-100 rounded-md text-sm"><code>${JSON.stringify({ user }, null, 2)}</code></pre>`;
+  element.innerHTML = `<pre class="text-left whitespace-pre overflow-x-auto text-muted-foreground p-4 border border-[var(--color-sidebar-border)] rounded-md text-sm"><code>${JSON.stringify({ user }, null, 2)}</code></pre>`;
 }
 
-function mountOpenSignInButton(element: HTMLDivElement, props: any) {
+function mountOpenButton(element: HTMLDivElement, label: string, openFn: (props: any) => void, props: any) {
   const button = document.createElement('button');
-  button.textContent = 'Open Sign In';
-  button.onclick = () => {
-    Clerk?.openSignIn(props);
-  };
-  element.appendChild(button);
-}
-
-function mountOpenSignUpButton(element: HTMLDivElement, props: any) {
-  const button = document.createElement('button');
-  button.textContent = 'Open Sign Up';
-  button.onclick = () => {
-    Clerk?.openSignUp(props);
-  };
+  button.textContent = label;
+  button.onclick = () => openFn(props);
   element.appendChild(button);
 }
 
@@ -202,197 +208,164 @@ function addCurrentRouteIndicator(currentRoute: string) {
   link.setAttribute('aria-current', 'page');
 }
 
-function appearanceVariableOptions() {
+async function initControls() {
   assertClerkIsLoaded(Clerk);
 
-  const resetVariablesBtn = document.getElementById('resetVariablesBtn');
+  const { Pane } = (await import(
+    /* webpackIgnore: true */ 'https://cdn.jsdelivr.net/npm/tweakpane@4.0.5/dist/tweakpane.js'
+  )) as any;
 
-  const variableInputIds = [
-    'colorPrimary',
-    'colorNeutral',
-    'colorBackground',
-    'colorPrimaryForeground',
-    'colorForeground',
-    'colorDanger',
-    'colorSuccess',
-    'colorWarning',
-    'colorMutedForeground',
-    'colorInputForeground',
-    'colorInput',
-    'colorShimmer',
-    'spacing',
-    'borderRadius',
-  ] as const;
+  const PARAMS: Record<string, any> = {};
+  for (const [key, def] of Object.entries(VARIABLE_DEFAULTS)) {
+    PARAMS[key] = sessionStorage.getItem(key) ?? def;
+  }
+  PARAMS.baseTheme = sessionStorage.getItem('baseTheme') ?? '';
+  PARAMS.darkMode = document.documentElement.classList.contains('dark');
+  PARAMS.localization = sessionStorage.getItem('localization') ?? OTHER_DEFAULTS.localization;
+  PARAMS.elevation = sessionStorage.getItem('elevation') ?? OTHER_DEFAULTS.elevation;
+  PARAMS.devWarnings = sessionStorage.getItem('devWarnings') !== 'off';
 
-  const variableInputs = variableInputIds.reduce(
-    (acc, id) => {
-      const element = document.getElementById(id) as HTMLInputElement | null;
-      if (!element) {
-        throw new Error(`Could not find input element with id: ${id}`);
-      }
-      acc[id] = element;
-      return acc;
-    },
-    {} as Record<(typeof variableInputIds)[number], HTMLInputElement>,
-  );
+  const pane = new Pane({ title: 'Controls', expanded: false });
 
-  Object.entries(variableInputs).forEach(([key, input]) => {
-    const savedColor = sessionStorage.getItem(key);
-    if (savedColor) {
-      input.value = savedColor;
+  const applyVariables = () => {
+    const vars: Record<string, string> = {};
+    for (const key of Object.keys(VARIABLE_DEFAULTS)) {
+      sessionStorage.setItem(key, PARAMS[key]);
+      vars[key] = PARAMS[key];
     }
-  });
-
-  const updateVariables = () => {
     void Clerk.__internal_updateProps({
       appearance: {
-        // Preserve existing appearance properties like baseTheme
         ...Clerk.__internal_getOption('appearance'),
-        variables: Object.fromEntries(
-          Object.entries(variableInputs).map(([key, input]) => {
-            sessionStorage.setItem(key, input.value);
-            return [key, input.value];
-          }),
-        ),
+        variables: vars,
       },
     });
   };
 
-  Object.values(variableInputs).forEach(input => {
-    input.addEventListener('change', updateVariables);
-  });
-
-  resetVariablesBtn?.addEventListener('click', () => {
-    Object.values(variableInputs).forEach(input => {
-      input.value = input.defaultValue;
-    });
-    updateVariables();
-  });
-
-  return { updateVariables };
-}
-
-function otherOptions() {
-  assertClerkIsLoaded(Clerk);
-
-  const resetOtherOptionsBtn = document.getElementById('resetOtherOptionsBtn');
-
-  const otherOptionsInputs: Record<string, HTMLSelectElement> = {
-    localization: document.getElementById('localizationSelect') as HTMLSelectElement,
-  };
-
-  Object.entries(otherOptionsInputs).forEach(([key, input]) => {
-    const savedValue = sessionStorage.getItem(key);
-    if (savedValue) {
-      input.value = savedValue;
-    }
-  });
-
-  const updateOtherOptions = () => {
+  const applyTheme = () => {
+    sessionStorage.setItem('baseTheme', PARAMS.baseTheme);
+    const currentAppearance = Clerk.__internal_getOption('appearance') ?? {};
     void Clerk.__internal_updateProps({
-      options: Object.fromEntries(
-        Object.entries(otherOptionsInputs).map(([key, input]) => {
-          sessionStorage.setItem(key, input.value);
-
-          if (key === 'localization') {
-            return [key, l[input.value as keyof typeof l]];
-          }
-
-          return [key, input.value];
-        }),
-      ),
+      appearance: {
+        ...currentAppearance,
+        theme: PARAMS.baseTheme ? themes[PARAMS.baseTheme] : undefined,
+      },
     });
   };
 
-  Object.values(otherOptionsInputs).forEach(input => {
-    input.addEventListener('change', updateOtherOptions);
+  const applyLocalization = () => {
+    sessionStorage.setItem('localization', PARAMS.localization);
+    void Clerk.__internal_updateProps({
+      options: { localization: l[PARAMS.localization as keyof typeof l] },
+    });
+  };
+
+  const applyAppearanceOptions = () => {
+    sessionStorage.setItem('elevation', PARAMS.elevation);
+    sessionStorage.setItem('devWarnings', PARAMS.devWarnings ? 'on' : 'off');
+    const currentAppearance = Clerk.__internal_getOption('appearance') ?? {};
+    void Clerk.__internal_updateProps({
+      appearance: {
+        ...currentAppearance,
+        options: {
+          ...(currentAppearance as any).options,
+          elevation: PARAMS.elevation as 'raised' | 'flush',
+          unsafe_disableDevelopmentModeWarnings: !PARAMS.devWarnings,
+        },
+      },
+    });
+  };
+
+  // Theme folder
+  const themeFolder = pane.addFolder({ title: 'Theme', expanded: false });
+  themeFolder
+    .addBinding(PARAMS, 'baseTheme', {
+      options: {
+        default: '',
+        clerk: 'clerk',
+        simple: 'simple',
+        dark: 'dark',
+        shadesOfPurple: 'shadesOfPurple',
+        neobrutalism: 'neobrutalism',
+        shadcn: 'shadcn',
+      },
+    })
+    .on('change', applyTheme);
+  themeFolder.addButton({ title: 'Reset' }).on('click', () => {
+    PARAMS.baseTheme = '';
+    sessionStorage.removeItem('baseTheme');
+    pane.refresh();
+    applyTheme();
   });
 
-  resetOtherOptionsBtn?.addEventListener('click', () => {
-    otherOptionsInputs.localization.value = 'enUS';
-    updateOtherOptions();
+  // Variables folder
+  const varFolder = pane.addFolder({ title: 'Variables' });
+  for (const key of Object.keys(COLOR_DEFAULTS)) {
+    varFolder.addBinding(PARAMS, key).on('change', applyVariables);
+  }
+  varFolder.addBinding(PARAMS, 'spacing').on('change', applyVariables);
+  varFolder.addBinding(PARAMS, 'borderRadius').on('change', applyVariables);
+  varFolder.addButton({ title: 'Reset' }).on('click', () => {
+    Object.assign(PARAMS, VARIABLE_DEFAULTS);
+    for (const key of Object.keys(VARIABLE_DEFAULTS)) {
+      sessionStorage.removeItem(key);
+    }
+    pane.refresh();
+    const currentAppearance = Clerk.__internal_getOption('appearance') ?? {};
+    void Clerk.__internal_updateProps({
+      appearance: {
+        ...currentAppearance,
+        variables: undefined,
+      },
+    });
   });
 
-  return { updateOtherOptions };
+  // Options folder
+  const otherFolder = pane.addFolder({ title: 'Options', expanded: false });
+  const localeOptions: Record<string, string> = {};
+  for (const locale of AVAILABLE_LOCALES) {
+    localeOptions[locale] = locale;
+  }
+  otherFolder.addBinding(PARAMS, 'localization', { options: localeOptions }).on('change', applyLocalization);
+  otherFolder
+    .addBinding(PARAMS, 'elevation', { options: { raised: 'raised' as const, flush: 'flush' as const } })
+    .on('change', applyAppearanceOptions);
+  otherFolder.addBinding(PARAMS, 'devWarnings').on('change', applyAppearanceOptions);
+  otherFolder.addButton({ title: 'Reset' }).on('click', () => {
+    PARAMS.localization = OTHER_DEFAULTS.localization;
+    PARAMS.elevation = OTHER_DEFAULTS.elevation;
+    PARAMS.devWarnings = OTHER_DEFAULTS.devWarnings;
+    sessionStorage.removeItem('localization');
+    sessionStorage.removeItem('elevation');
+    sessionStorage.removeItem('devWarnings');
+    pane.refresh();
+    applyLocalization();
+    applyAppearanceOptions();
+  });
+
+  // Page folder
+  const pageFolder = pane.addFolder({ title: 'Page', expanded: false });
+  pageFolder.addBinding(PARAMS, 'darkMode', { label: 'Dark mode' }).on('change', (ev: any) => {
+    document.documentElement.classList.toggle('dark', ev.value);
+    localStorage.setItem('clerk-js-sandbox-dark-mode', ev.value ? 'on' : 'off');
+  });
+  pageFolder.addButton({ title: 'Reset' }).on('click', () => {
+    PARAMS.darkMode = false;
+    document.documentElement.classList.remove('dark');
+    localStorage.removeItem('clerk-js-sandbox-dark-mode');
+    pane.refresh();
+  });
+
+  return { pane, applyVariables, applyTheme, applyLocalization, applyAppearanceOptions };
 }
 
 const themes: Record<string, unknown> = {
+  clerk: 'clerk',
+  simple: 'simple',
   dark,
   shadesOfPurple,
   neobrutalism,
   shadcn,
 };
-
-function themeSelector() {
-  assertClerkIsLoaded(Clerk);
-
-  const themeSelect = document.getElementById('themeSelect') as HTMLSelectElement;
-
-  const savedTheme = sessionStorage.getItem('baseTheme') ?? '';
-  themeSelect.value = savedTheme;
-
-  const updateTheme = () => {
-    const themeName = themeSelect.value;
-    sessionStorage.setItem('baseTheme', themeName);
-
-    const currentAppearance = Clerk.__internal_getOption('appearance') ?? {};
-    void Clerk.__internal_updateProps({
-      appearance: {
-        ...currentAppearance,
-        theme: themeName ? themes[themeName] : undefined,
-      },
-    });
-  };
-
-  themeSelect.addEventListener('change', updateTheme);
-
-  return { updateTheme };
-}
-
-type Preset = { elements: Record<string, any>; options?: Record<string, any>; variables?: Record<string, any> };
-
-function presetToAppearance(preset: Preset | undefined) {
-  if (!preset) return {};
-  return {
-    elements: preset.elements,
-    ...(preset.options ? { options: preset.options } : {}),
-    ...(preset.variables ? { variables: preset.variables } : {}),
-  };
-}
-
-const presets: Record<string, Preset> = {};
-
-function presetSelector() {
-  assertClerkIsLoaded(Clerk);
-
-  const presetSelect = document.getElementById('presetSelect') as HTMLSelectElement;
-
-  // Populate dropdown from presets map
-  for (const name of Object.keys(presets)) {
-    presetSelect.add(new Option(name, name));
-  }
-
-  const savedPreset = sessionStorage.getItem('preset') ?? '';
-  presetSelect.value = savedPreset;
-
-  const updatePreset = () => {
-    const presetName = presetSelect.value;
-    sessionStorage.setItem('preset', presetName);
-
-    const currentAppearance = Clerk.__internal_getOption('appearance') ?? {};
-    void Clerk.__internal_updateProps({
-      appearance: {
-        ...currentAppearance,
-        elements: {},
-        ...presetToAppearance(presetName ? presets[presetName] : undefined),
-      },
-    });
-  };
-
-  presetSelect.addEventListener('change', updatePreset);
-
-  return { updatePreset };
-}
 
 const urlParams = new URL(window.location.href).searchParams;
 for (const [component, encodedProps] of urlParams.entries()) {
@@ -407,55 +380,45 @@ for (const [component, encodedProps] of urlParams.entries()) {
 
 void (async () => {
   assertClerkIsLoaded(Clerk);
-  fillLocalizationSelect();
-  const { updateVariables } = appearanceVariableOptions();
-  const { updateTheme } = themeSelector();
-  const { updatePreset } = presetSelector();
-  const { updateOtherOptions } = otherOptions();
-
-  const sidebars = document.querySelectorAll('[data-sidebar]');
-  document.addEventListener('keydown', e => {
-    if (e.key === '/') {
-      sidebars.forEach(s => s.classList.toggle('hidden'));
-    }
-  });
 
   const app = document.getElementById('app') as HTMLDivElement;
 
-  const routes = {
-    '/': () => {
-      mountIndex(app);
+  const mountableRoutes: Record<
+    string,
+    { mount: string; component: AvailableComponent; defaultProps?: Record<string, unknown> }
+  > = {
+    '/sign-in': { mount: 'mountSignIn', component: 'signIn' },
+    '/sign-up': { mount: 'mountSignUp', component: 'signUp' },
+    '/user-avatar': { mount: 'mountUserAvatar', component: 'userAvatar' },
+    '/user-button': { mount: 'mountUserButton', component: 'userButton' },
+    '/user-profile': { mount: 'mountUserProfile', component: 'userProfile' },
+    '/create-organization': { mount: 'mountCreateOrganization', component: 'createOrganization' },
+    '/organization-list': { mount: 'mountOrganizationList', component: 'organizationList' },
+    '/organization-profile': { mount: 'mountOrganizationProfile', component: 'organizationProfile' },
+    '/organization-switcher': { mount: 'mountOrganizationSwitcher', component: 'organizationSwitcher' },
+    '/waitlist': { mount: 'mountWaitlist', component: 'waitlist' },
+    '/pricing-table': { mount: 'mountPricingTable', component: 'pricingTable' },
+    '/api-keys': { mount: 'mountAPIKeys', component: 'apiKeys' },
+    '/configure-sso': { mount: 'mountConfigureSSO', component: 'configureSSO' },
+    '/task-choose-organization': {
+      mount: 'mountTaskChooseOrganization',
+      component: 'taskChooseOrganization',
+      defaultProps: { redirectUrlComplete: '/user-profile' },
     },
-    '/sign-in': () => {
-      Clerk.mountSignIn(app, componentControls.signIn.getProps() ?? {});
+    '/task-reset-password': {
+      mount: 'mountTaskResetPassword',
+      component: 'taskResetPassword',
+      defaultProps: { redirectUrlComplete: '/user-profile' },
     },
-    '/sign-up': () => {
-      Clerk.mountSignUp(app, componentControls.signUp.getProps() ?? {});
+    '/task-setup-mfa': {
+      mount: 'mountTaskSetupMFA',
+      component: 'taskSetupMFA',
+      defaultProps: { redirectUrlComplete: '/user-profile' },
     },
-    '/user-avatar': () => {
-      Clerk.mountUserAvatar(app, componentControls.userAvatar.getProps() ?? {});
-    },
-    '/user-button': () => {
-      Clerk.mountUserButton(app, componentControls.userButton.getProps() ?? {});
-    },
-    '/user-profile': () => {
-      Clerk.mountUserProfile(app, componentControls.userProfile.getProps() ?? {});
-    },
-    '/create-organization': () => {
-      Clerk.mountCreateOrganization(app, componentControls.createOrganization.getProps() ?? {});
-    },
-    '/organization-list': () => {
-      Clerk.mountOrganizationList(app, componentControls.organizationList.getProps() ?? {});
-    },
-    '/organization-profile': () => {
-      Clerk.mountOrganizationProfile(app, componentControls.organizationProfile.getProps() ?? {});
-    },
-    '/organization-switcher': () => {
-      Clerk.mountOrganizationSwitcher(app, componentControls.organizationSwitcher.getProps() ?? {});
-    },
-    '/waitlist': () => {
-      Clerk.mountWaitlist(app, componentControls.waitlist.getProps() ?? {});
-    },
+  };
+
+  const routes: Record<string, () => void> = {
+    '/': () => mountIndex(app),
     '/keyless': () => {
       void Clerk.__internal_updateProps({
         options: {
@@ -463,15 +426,6 @@ void (async () => {
           __internal_keyless_copyInstanceKeysUrl: 'https://dashboard.clerk.com',
         },
       });
-    },
-    '/pricing-table': () => {
-      Clerk.mountPricingTable(app, componentControls.pricingTable.getProps() ?? {});
-    },
-    '/api-keys': () => {
-      Clerk.mountAPIKeys(app, componentControls.apiKeys.getProps() ?? {});
-    },
-    '/configure-sso': () => {
-      Clerk.__experimental_mountConfigureSSO(app, componentControls.configureSSO.getProps() ?? {});
     },
     '/oauth-consent': () => {
       const searchParams = new URLSearchParams(window.location.search);
@@ -489,37 +443,17 @@ void (async () => {
         },
       );
     },
-    '/task-choose-organization': () => {
-      Clerk.mountTaskChooseOrganization(
-        app,
-        componentControls.taskChooseOrganization.getProps() ?? {
-          redirectUrlComplete: '/user-profile',
-        },
-      );
-    },
-    '/task-reset-password': () => {
-      Clerk.mountTaskResetPassword(
-        app,
-        componentControls.taskResetPassword.getProps() ?? {
-          redirectUrlComplete: '/user-profile',
-        },
-      );
-    },
-    '/task-setup-mfa': () => {
-      Clerk.mountTaskSetupMFA(
-        app,
-        componentControls.taskSetupMFA.getProps() ?? {
-          redirectUrlComplete: '/user-profile',
-        },
-      );
-    },
-    '/open-sign-in': () => {
-      mountOpenSignInButton(app, componentControls.signIn.getProps() ?? {});
-    },
-    '/open-sign-up': () => {
-      mountOpenSignUpButton(app, componentControls.signUp.getProps() ?? {});
-    },
+    '/open-sign-in': () =>
+      mountOpenButton(app, 'Open Sign In', p => Clerk?.openSignIn(p), componentControls.signIn.getProps() ?? {}),
+    '/open-sign-up': () =>
+      mountOpenButton(app, 'Open Sign Up', p => Clerk?.openSignUp(p), componentControls.signUp.getProps() ?? {}),
   };
+
+  for (const [path, { mount, component, defaultProps }] of Object.entries(mountableRoutes)) {
+    routes[path] = () => {
+      (Clerk as any)[mount](app, componentControls[component].getProps() ?? defaultProps ?? {});
+    };
+  }
 
   const route = window.location.pathname as keyof typeof routes;
   if (route in routes) {
@@ -538,8 +472,25 @@ void (async () => {
 
     const initialThemeName = sessionStorage.getItem('baseTheme') ?? '';
     const initialTheme = initialThemeName ? themes[initialThemeName] : undefined;
-    const initialPresetName = sessionStorage.getItem('preset') ?? '';
-    const initialPreset = initialPresetName ? presets[initialPresetName] : undefined;
+    const initialElevation = sessionStorage.getItem('elevation') as 'raised' | 'flush' | null;
+    const initialDevWarnings = sessionStorage.getItem('devWarnings');
+    const initialAppearanceOptions: Record<string, unknown> = {};
+    if (initialElevation) {
+      initialAppearanceOptions.elevation = initialElevation;
+    }
+    if (initialDevWarnings === 'off') {
+      initialAppearanceOptions.unsafe_disableDevelopmentModeWarnings = true;
+    }
+
+    const initialVariables: Record<string, string> = {};
+    for (const key of Object.keys(VARIABLE_DEFAULTS)) {
+      const stored = sessionStorage.getItem(key);
+      if (stored !== null) {
+        initialVariables[key] = stored;
+      }
+    }
+
+    const initialLocale = sessionStorage.getItem('localization') ?? 'enUS';
 
     await Clerk.load({
       ...(componentControls.clerk.getProps() ?? {}),
@@ -547,19 +498,37 @@ void (async () => {
       signUpUrl: '/sign-up',
       ui: { ClerkUI: window.__internal_ClerkUICtor },
       appearance: {
-        ...(initialTheme ? { theme: initialTheme } : {}),
-        ...presetToAppearance(initialPreset),
+        ...(initialTheme
+          ? { theme: initialTheme }
+          : Object.keys(initialVariables).length > 0
+            ? { variables: initialVariables }
+            : {}),
+        ...(Object.keys(initialAppearanceOptions).length ? { options: initialAppearanceOptions } : {}),
       },
+      localization: l[initialLocale as keyof typeof l],
     });
     renderCurrentRoute();
-    updateTheme();
-    updatePreset();
-    // Only apply sandbox variable overrides when using the default theme.
-    // Prebuilt themes (raw, dark, etc.) define their own variables.
-    if (!initialTheme) {
-      updateVariables();
-    }
-    updateOtherOptions();
+    const { pane } = await initControls();
+
+    const leftSidebar = document.querySelector('[data-sidebar]') as HTMLElement;
+    const sidebarToggle = document.getElementById('sidebarToggle');
+
+    const toggleSidebar = () => {
+      leftSidebar?.classList.toggle('max-lg:hidden');
+    };
+
+    sidebarToggle?.addEventListener('click', toggleSidebar);
+
+    document.addEventListener('keydown', e => {
+      if (e.key === '/') {
+        const target = e.target as HTMLElement | null;
+        if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+          return;
+        }
+        leftSidebar?.classList.toggle('hidden');
+        pane.hidden = !pane.hidden;
+      }
+    });
   } else {
     console.error(`Unknown route: "${route}".`);
   }
