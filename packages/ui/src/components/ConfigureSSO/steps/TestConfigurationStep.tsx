@@ -46,7 +46,7 @@ const TEST_RESULTS_TABLE_COLUMN_COUNT = 3;
 
 export const TestConfigurationStep = (): JSX.Element => {
   const { goPrev, isInitialStep } = useWizard();
-  const { organizationEnterpriseConnection: c, testRuns } = useConfigureSSO();
+  const { connectionState: c, testRuns } = useConfigureSSO();
   const card = useCardState();
 
   const {
@@ -95,8 +95,8 @@ export const TestConfigurationStep = (): JSX.Element => {
   const handleTestRunCreated = () => {
     setCurrentPage(1);
     // Refetch the single source: the visible list (so the new run shows up and
-    // polling arms) and the success probe (so the aggregate's
-    // `hasSuccessfulTestRun()` and the Continue gate reflect the run that just
+    // polling arms) and the success probe (so the derived state's
+    // `hasSuccessfulTestRun` and the Continue gate reflect the run that just
     // completed).
     void refreshTestRuns();
   };
@@ -207,7 +207,7 @@ export const TestConfigurationStep = (): JSX.Element => {
         <Step.Footer>
           <Step.Footer.Reset />
           <Step.Footer.Previous onClick={() => goPrev()} />
-          <ContinueTestSsoStepButton hasSuccessfulTestRun={c.hasSuccessfulTestRun()} />
+          <ContinueTestSsoStepButton hasSuccessfulTestRun={c.hasSuccessfulTestRun} />
         </Step.Footer>
       </Step>
     </Flow.Part>

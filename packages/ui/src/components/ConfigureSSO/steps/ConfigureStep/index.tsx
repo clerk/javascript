@@ -20,7 +20,7 @@ const STEPS_BY_PROVIDER: Record<ProviderType, () => JSX.Element> = {
 };
 
 export const ConfigureStep = (): JSX.Element | null => {
-  const { organizationEnterpriseConnection: c } = useConfigureSSO();
+  const { connectionState: c } = useConfigureSSO();
 
   // Type guard, at this point the provider should have been defined
   if (!c.provider) {

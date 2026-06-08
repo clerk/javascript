@@ -207,11 +207,11 @@ FooterContinue.displayName = 'Step.Footer.Continue';
  * footer row, matching the prior destructive affordance.
  */
 const FooterReset = (): JSX.Element | null => {
-  const { organizationEnterpriseConnection: c } = useConfigureSSO();
+  const { connectionState } = useConfigureSSO();
   const organization = __internal_useOrganizationBase();
   const [isOpen, setIsOpen] = useState(false);
 
-  if (!c.hasConnection) {
+  if (!connectionState.hasConnection) {
     return null;
   }
 

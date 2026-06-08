@@ -41,10 +41,15 @@ vi.mock('../../ConfigureSSOContext', () => ({
   useConfigureSSO: () => ({
     enterpriseConnection: { id: 'ent_1' },
     contentRef: { current: null },
-    // The step reads `hasSuccessfulTestRun()` off the domain aggregate; the mock
-    // derives it from the current rows so the Continue gate reflects them.
-    organizationEnterpriseConnection: {
-      hasSuccessfulTestRun: () => testRunsSource.rows.some(r => r.status === 'success'),
+    // The step reads `hasSuccessfulTestRun` as a field off the derived connection
+    // state; a getter keeps the mock deriving it from the current rows so the
+    // Continue gate reflects them on every render. `hasConnection: false` keeps
+    // the footer `Step.Footer.Reset` self-hidden in this isolated render.
+    connectionState: {
+      hasConnection: false,
+      get hasSuccessfulTestRun() {
+        return testRunsSource.rows.some(r => r.status === 'success');
+      },
     },
     testRuns: testRunsSource,
     mutations: { createTestRun },
@@ -170,7 +175,7 @@ describe('TestConfigurationStep', () => {
   });
 
   it('advances on Continue once there is a successful test run', async () => {
-    // A success row flips the aggregate's `hasSuccessfulTestRun()` (derived in
+    // A success row flips the derived state's `hasSuccessfulTestRun` (derived in
     // the mocked context from the rows), so the step-local Continue gate passes
     // and the wizard advances.
     testRunsSource.rows = [aRow({ id: 'run_1', status: 'success' })];

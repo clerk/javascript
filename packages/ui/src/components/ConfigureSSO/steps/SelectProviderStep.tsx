@@ -63,7 +63,7 @@ const PROVIDER_GROUPS: ReadonlyArray<{
 export const SelectProviderStep = (): JSX.Element => {
   const {
     primaryEmailAddress,
-    organizationEnterpriseConnection: c,
+    connectionState: c,
     mutations: { createConnection },
   } = useConfigureSSO();
   const { goNext } = useWizard();

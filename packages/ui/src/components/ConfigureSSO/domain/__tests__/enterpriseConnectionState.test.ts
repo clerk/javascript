@@ -5,7 +5,7 @@ import type {
 } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
-import { OrganizationEnterpriseConnection } from '../organizationEnterpriseConnection';
+import { deriveEnterpriseConnectionState } from '../enterpriseConnectionState';
 
 const makeSamlConnection = (overrides: Partial<SamlAccountConnectionResource> = {}): SamlAccountConnectionResource =>
   ({
@@ -42,106 +42,110 @@ const fullyConfiguredSaml = makeSamlConnection({
   idpMetadataUrl: 'https://idp.example.com/metadata',
 });
 
-// Builds an aggregate with sensible defaults; each test overrides what it cares
-// about.
-const aggregate = (overrides: Partial<Parameters<typeof OrganizationEnterpriseConnection.create>[0]> = {}) =>
-  OrganizationEnterpriseConnection.create({
+// Builds the derived state with sensible defaults; each test overrides what it
+// cares about.
+const derive = (overrides: Partial<Parameters<typeof deriveEnterpriseConnectionState>[0]> = {}) =>
+  deriveEnterpriseConnectionState({
     connection: undefined,
     primaryEmail: makeEmail('verified'),
     hasSuccessfulTestRun: false,
     ...overrides,
   });
 
-describe('OrganizationEnterpriseConnection aggregate', () => {
+describe('deriveEnterpriseConnectionState', () => {
   describe('hasConnection', () => {
     it('undefined connection → false', () => {
-      expect(aggregate({ connection: undefined }).hasConnection).toBe(false);
+      expect(derive({ connection: undefined }).hasConnection).toBe(false);
     });
     it('null connection → false', () => {
-      expect(aggregate({ connection: null }).hasConnection).toBe(false);
+      expect(derive({ connection: null }).hasConnection).toBe(false);
     });
     it('connection present → true', () => {
-      expect(aggregate({ connection: makeConnection() }).hasConnection).toBe(true);
+      expect(derive({ connection: makeConnection() }).hasConnection).toBe(true);
     });
   });
 
   describe('provider', () => {
     it('undefined connection → undefined', () => {
-      expect(aggregate({ connection: undefined }).provider).toBeUndefined();
+      expect(derive({ connection: undefined }).provider).toBeUndefined();
     });
     it('connection → its provider', () => {
-      expect(aggregate({ connection: makeConnection({ provider: 'saml_custom' }) }).provider).toBe('saml_custom');
+      expect(derive({ connection: makeConnection({ provider: 'saml_custom' }) }).provider).toBe('saml_custom');
     });
   });
 
   describe('isActive', () => {
     it('undefined connection → false', () => {
-      expect(aggregate({ connection: undefined }).isActive()).toBe(false);
+      expect(derive({ connection: undefined }).isActive).toBe(false);
     });
     it('null connection → false', () => {
-      expect(aggregate({ connection: null }).isActive()).toBe(false);
+      expect(derive({ connection: null }).isActive).toBe(false);
     });
     it('inactive connection → false', () => {
-      expect(aggregate({ connection: makeConnection({ active: false }) }).isActive()).toBe(false);
+      expect(derive({ connection: makeConnection({ active: false }) }).isActive).toBe(false);
     });
     it('active connection → true', () => {
-      expect(aggregate({ connection: makeConnection({ active: true }) }).isActive()).toBe(true);
+      expect(derive({ connection: makeConnection({ active: true }) }).isActive).toBe(true);
     });
   });
 
   describe('hasMinimumConfiguration', () => {
     it('undefined connection → false', () => {
-      expect(aggregate({ connection: undefined }).hasMinimumConfiguration()).toBe(false);
+      expect(derive({ connection: undefined }).hasMinimumConfiguration).toBe(false);
     });
     it('no saml config → false', () => {
-      expect(aggregate({ connection: makeConnection({ samlConnection: null }) }).hasMinimumConfiguration()).toBe(false);
+      expect(derive({ connection: makeConnection({ samlConnection: null }) }).hasMinimumConfiguration).toBe(false);
     });
     it('empty saml config → false', () => {
       expect(
-        aggregate({ connection: makeConnection({ samlConnection: makeSamlConnection() }) }).hasMinimumConfiguration(),
+        derive({ connection: makeConnection({ samlConnection: makeSamlConnection() }) }).hasMinimumConfiguration,
       ).toBe(false);
     });
     it('saml idpSsoUrl + idpEntityId present → true', () => {
       expect(
-        aggregate({ connection: makeConnection({ samlConnection: fullyConfiguredSaml }) }).hasMinimumConfiguration(),
+        derive({ connection: makeConnection({ samlConnection: fullyConfiguredSaml }) }).hasMinimumConfiguration,
       ).toBe(true);
     });
     it('saml idpSsoUrl only → false', () => {
       expect(
-        aggregate({
+        derive({
           connection: makeConnection({
             samlConnection: makeSamlConnection({ idpSsoUrl: 'https://idp.example.com/sso' }),
           }),
-        }).hasMinimumConfiguration(),
+        }).hasMinimumConfiguration,
       ).toBe(false);
     });
   });
 
   describe('isPrimaryEmailVerified', () => {
     it('undefined email → false', () => {
-      expect(aggregate({ primaryEmail: undefined }).isPrimaryEmailVerified()).toBe(false);
+      expect(derive({ primaryEmail: undefined }).isPrimaryEmailVerified).toBe(false);
     });
     it('null email → false', () => {
-      expect(aggregate({ primaryEmail: null }).isPrimaryEmailVerified()).toBe(false);
+      expect(derive({ primaryEmail: null }).isPrimaryEmailVerified).toBe(false);
     });
     it('unverified email → false', () => {
-      expect(aggregate({ primaryEmail: makeEmail('unverified') }).isPrimaryEmailVerified()).toBe(false);
+      expect(derive({ primaryEmail: makeEmail('unverified') }).isPrimaryEmailVerified).toBe(false);
     });
     it('verified email → true', () => {
-      expect(aggregate({ primaryEmail: makeEmail('verified') }).isPrimaryEmailVerified()).toBe(true);
+      expect(derive({ primaryEmail: makeEmail('verified') }).isPrimaryEmailVerified).toBe(true);
     });
   });
 
   describe('hasSuccessfulTestRun', () => {
     it('false input → false', () => {
-      expect(aggregate({ hasSuccessfulTestRun: false }).hasSuccessfulTestRun()).toBe(false);
+      expect(derive({ hasSuccessfulTestRun: false }).hasSuccessfulTestRun).toBe(false);
     });
     it('true input → true', () => {
-      expect(aggregate({ hasSuccessfulTestRun: true }).hasSuccessfulTestRun()).toBe(true);
+      expect(derive({ hasSuccessfulTestRun: true }).hasSuccessfulTestRun).toBe(true);
     });
   });
 
-  it('returns a frozen object', () => {
-    expect(Object.isFrozen(aggregate())).toBe(true);
+  it('returns a plain object (no behaviour methods)', () => {
+    const state = derive();
+    expect(typeof state.isActive).toBe('boolean');
+    expect(typeof state.hasMinimumConfiguration).toBe('boolean');
+    expect(typeof state.isPrimaryEmailVerified).toBe('boolean');
+    expect(typeof state.hasSuccessfulTestRun).toBe('boolean');
   });
 });

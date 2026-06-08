@@ -14,10 +14,7 @@ import type {
 } from '@clerk/shared/types';
 import { useCallback, useMemo, useRef, useState } from 'react';
 
-import {
-  OrganizationEnterpriseConnection as OrganizationEnterpriseConnectionAggregateFactory,
-  type OrganizationEnterpriseConnectionAggregate,
-} from '../domain/organizationEnterpriseConnection';
+import { deriveEnterpriseConnectionState, type EnterpriseConnectionState } from '../domain/enterpriseConnectionState';
 import {
   type EnterpriseConnectionMutations,
   useEnterpriseConnectionMutations,
@@ -49,11 +46,11 @@ export interface UseOrganizationEnterpriseConnectionResult {
    */
   primaryEmailAddress: EmailAddressResource | undefined;
   /**
-   * The pure domain aggregate the wizard makes every flow decision from —
+   * The pure derived-state snapshot the wizard makes every flow decision from —
    * composes the connection, the admin's email verification, and the test-run
    * state. Built once here from the raw inputs.
    */
-  organizationEnterpriseConnection: OrganizationEnterpriseConnectionAggregate;
+  connectionState: EnterpriseConnectionState;
   /**
    * Every connection-domain mutation, pre-wrapped in `useReverification`.
    */
@@ -227,11 +224,11 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
   const primaryEmail =
     user?.primaryEmailAddress ?? user?.emailAddresses?.find(e => e.verification.status !== 'verified');
 
-  // The single pure aggregate everything downstream reads decisions from, keyed
-  // on the raw inputs so it is only rebuilt when one of them changes.
-  const organizationEnterpriseConnection = useMemo<OrganizationEnterpriseConnectionAggregate>(
+  // The single pure derived-state snapshot everything downstream reads decisions
+  // from, keyed on the raw inputs so it is only rebuilt when one of them changes.
+  const connectionState = useMemo<EnterpriseConnectionState>(
     () =>
-      OrganizationEnterpriseConnectionAggregateFactory.create({
+      deriveEnterpriseConnectionState({
         connection: enterpriseConnection,
         primaryEmail,
         hasSuccessfulTestRun,
@@ -250,7 +247,7 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
     isLoading: isLoadingEnterpriseConnections || (hadInitialConnection && isLoadingTestRuns),
     enterpriseConnection,
     primaryEmailAddress,
-    organizationEnterpriseConnection,
+    connectionState,
     mutations,
     testRuns,
   };

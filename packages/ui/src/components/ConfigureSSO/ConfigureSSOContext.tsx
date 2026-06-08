@@ -1,7 +1,7 @@
 import type { EmailAddressResource, EnterpriseConnectionResource } from '@clerk/shared/types';
 import React, { type PropsWithChildren } from 'react';
 
-import type { OrganizationEnterpriseConnectionAggregate } from './domain/organizationEnterpriseConnection';
+import type { EnterpriseConnectionState } from './domain/enterpriseConnectionState';
 import type { EnterpriseConnectionMutations } from './hooks/useEnterpriseConnectionMutations';
 import type { TestRunsView } from './hooks/useOrganizationEnterpriseConnection';
 
@@ -27,12 +27,12 @@ export interface ConfigureSSOData {
    */
   mutations: EnterpriseConnectionMutations;
   /**
-   * The pure domain aggregate the wizard makes every flow decision from, built
-   * once upstream by `useOrganizationEnterpriseConnection`. The guards in
+   * The pure derived-state snapshot the wizard makes every flow decision from,
+   * built once upstream by `useOrganizationEnterpriseConnection`. The guards in
    * `ConfigureSSOSteps` and the steps read display gates off this instead of
    * re-deriving from `useUser`/`useSession`.
    */
-  organizationEnterpriseConnection: OrganizationEnterpriseConnectionAggregate;
+  connectionState: EnterpriseConnectionState;
   /**
    * The single source of test-run state — the paginated list, page cursor, and
    * table-level loading — owned by `useOrganizationEnterpriseConnection`. The
@@ -66,10 +66,11 @@ export interface ConfigureSSOData {
 interface ConfigureSSOProviderProps {
   enterpriseConnection: EnterpriseConnectionResource | undefined;
   /**
-   * The pure domain aggregate the wizard makes decisions from, built upstream by
-   * `useOrganizationEnterpriseConnection`. The provider never derives state itself.
+   * The pure derived-state snapshot the wizard makes decisions from, built
+   * upstream by `useOrganizationEnterpriseConnection`. The provider never
+   * derives state itself.
    */
-  organizationEnterpriseConnection: OrganizationEnterpriseConnectionAggregate;
+  connectionState: EnterpriseConnectionState;
   /**
    * The single test-run source (list + page + table loading) owned by
    * `useOrganizationEnterpriseConnection`.
@@ -93,7 +94,7 @@ ConfigureSSOContext.displayName = 'ConfigureSSOContext';
 
 export const ConfigureSSOProvider = ({
   enterpriseConnection,
-  organizationEnterpriseConnection,
+  connectionState,
   testRuns,
   contentRef,
   mutations,
@@ -123,7 +124,7 @@ export const ConfigureSSOProvider = ({
     () => ({
       contentRef,
       enterpriseConnection,
-      organizationEnterpriseConnection,
+      connectionState,
       testRuns,
       mutations,
       primaryEmailAddress,
@@ -134,7 +135,7 @@ export const ConfigureSSOProvider = ({
       contentRef,
       enterpriseConnection,
       mutations,
-      organizationEnterpriseConnection,
+      connectionState,
       testRuns,
       primaryEmailAddress,
       resetEpoch,

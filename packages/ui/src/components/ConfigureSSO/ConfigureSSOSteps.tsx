@@ -25,15 +25,15 @@ import { ConfigureStep, ConfirmationStep, SelectProviderStep, TestConfigurationS
  * test satisfied, so a live connection short-circuits straight to confirmation.
  */
 export const ConfigureSSOSteps = (): JSX.Element => {
-  const { organizationEnterpriseConnection: c, resetEpoch } = useConfigureSSO();
+  const { connectionState: c, resetEpoch } = useConfigureSSO();
 
   const steps = React.useMemo<WizardStepConfig[]>(
     () => [
       { id: 'verify-domain', label: 'Verify domain' },
-      { id: 'select-provider', guard: () => c.isPrimaryEmailVerified() },
-      { id: 'configure', label: 'Configure', guard: () => c.isPrimaryEmailVerified() && c.hasConnection },
-      { id: 'test', label: 'Test', guard: () => c.hasMinimumConfiguration() || c.isActive() },
-      { id: 'confirmation', label: 'Confirmation', guard: () => c.hasSuccessfulTestRun() || c.isActive() },
+      { id: 'select-provider', guard: () => c.isPrimaryEmailVerified },
+      { id: 'configure', label: 'Configure', guard: () => c.isPrimaryEmailVerified && c.hasConnection },
+      { id: 'test', label: 'Test', guard: () => c.hasMinimumConfiguration || c.isActive },
+      { id: 'confirmation', label: 'Confirmation', guard: () => c.hasSuccessfulTestRun || c.isActive },
     ],
     [c],
   );
