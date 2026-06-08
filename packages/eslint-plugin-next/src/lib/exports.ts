@@ -168,7 +168,7 @@ export function* iterateExportAllDeclarations(programNode: TSESTree.Program): Ge
       continue;
     }
     // `export * as name from '...'` exposes a namespace binding, not top-level
-    // route handlers or server actions.
+    // route handlers or Server Functions.
     if (stmt.exported) {
       continue;
     }

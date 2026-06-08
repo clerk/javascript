@@ -73,7 +73,7 @@ function hasTopLevelDirective(programNode: TSESTree.Program, name: string): bool
   return false;
 }
 
-export function isServerActionModule(programNode: TSESTree.Program): boolean {
+export function isServerFunctionModule(programNode: TSESTree.Program): boolean {
   return hasTopLevelDirective(programNode, 'use server');
 }
 

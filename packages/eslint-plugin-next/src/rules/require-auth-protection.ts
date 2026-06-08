@@ -9,7 +9,7 @@ import {
   getFileKind,
   getRelativeFolder,
   isClientModule,
-  isServerActionModule,
+  isServerFunctionModule,
 } from '../lib/file-info.js';
 import type { ClassifyOptions } from '../lib/match-folders.js';
 import { classifyFolder, hasDescendantsMatching } from '../lib/match-folders.js';
@@ -87,8 +87,8 @@ const rule: Rule.RuleModule = {
     return {
       Program(programNode) {
         const ast = programNode as TSESTree.Program;
-        const isAction = isServerActionModule(ast);
-        if (!fileKind && !isAction) {
+        const isServerFunction = isServerFunctionModule(ast);
+        if (!fileKind && !isServerFunction) {
           return;
         }
 
@@ -116,8 +116,8 @@ const rule: Rule.RuleModule = {
           checkDefaultExport(context, ast, fileKind, authNames);
         } else if (fileKind === 'route') {
           checkRouteHandlers(context, ast, authNames);
-        } else if (isAction) {
-          checkServerActions(context, ast, authNames);
+        } else if (isServerFunction) {
+          checkServerFunctions(context, ast, authNames);
         }
       },
     };
@@ -194,13 +194,13 @@ function checkRouteHandlers(context: Rule.RuleContext, programNode: TSESTree.Pro
   }
 }
 
-function checkServerActions(context: Rule.RuleContext, programNode: TSESTree.Program, authNames: Set<string>): void {
+function checkServerFunctions(context: Rule.RuleContext, programNode: TSESTree.Program, authNames: Set<string>): void {
   for (const { name, target, reportNode } of iterateNamedExports(programNode)) {
-    checkMissingProtect(context, reportNode, target, `server action '${name}'`, authNames);
+    checkMissingProtect(context, reportNode, target, `Server Function '${name}'`, authNames);
   }
-  // `export *` is also server functions and we can't them see across files
+  // `export *` can re-export Server Functions we can't see across files.
   for (const { source, reportNode } of iterateExportAllDeclarations(programNode)) {
-    checkMissingProtect(context, reportNode, { kind: 'imported', source }, 'server actions', authNames);
+    checkMissingProtect(context, reportNode, { kind: 'imported', source }, 'Server Functions', authNames);
   }
 }
 

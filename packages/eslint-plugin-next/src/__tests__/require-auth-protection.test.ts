@@ -442,7 +442,7 @@ ruleTester.run('require-auth-protection', rule, {
       options: [config],
     },
     {
-      name: 'server action module with use server, all exports protected',
+      name: 'Server Function module with use server, all exports protected',
       code: `
         'use server';
         import { auth } from '@clerk/nextjs/server';
@@ -459,7 +459,7 @@ ruleTester.run('require-auth-protection', rule, {
       options: [config],
     },
     {
-      name: 'server action namespace re-export is not treated as individual actions',
+      name: 'Server Function namespace re-export is not treated as individual functions',
       code: `
         'use server';
         export * as actions from './implementations';
@@ -468,7 +468,7 @@ ruleTester.run('require-auth-protection', rule, {
       options: [config],
     },
     {
-      name: 'server action declared above and re-exported via specifier',
+      name: 'Server Function declared above and re-exported via specifier',
       code: `
         'use server';
         import { auth } from '@clerk/nextjs/server';
@@ -482,7 +482,7 @@ ruleTester.run('require-auth-protection', rule, {
       options: [config],
     },
     {
-      name: 'server action exported under a different name via `as`',
+      name: 'Server Function exported under a different name via `as`',
       code: `
         'use server';
         import { auth } from '@clerk/nextjs/server';
@@ -496,7 +496,7 @@ ruleTester.run('require-auth-protection', rule, {
       options: [config],
     },
     {
-      name: 'type-only exports via `export type { ... }` are not treated as server actions',
+      name: 'type-only exports via `export type { ... }` are not treated as Server Functions',
       code: `
         'use server';
         import { auth } from '@clerk/nextjs/server';
@@ -510,7 +510,7 @@ ruleTester.run('require-auth-protection', rule, {
       options: [config],
     },
     {
-      name: 'type-only exports via `export { type ... }` are not treated as server actions',
+      name: 'type-only exports via `export { type ... }` are not treated as Server Functions',
       code: `
         'use server';
         import { auth } from '@clerk/nextjs/server';
@@ -873,7 +873,7 @@ ruleTester.run('require-auth-protection', rule, {
       ],
     },
     {
-      name: 'protected server action module with one export missing protect',
+      name: 'protected Server Function module with one export missing protect',
       code: `
         'use server';
         import { auth } from '@clerk/nextjs/server';
@@ -890,7 +890,7 @@ ruleTester.run('require-auth-protection', rule, {
       errors: [{ messageId: 'missingProtect' }],
     },
     {
-      name: 'server action declared above and re-exported via specifier, missing protect',
+      name: 'Server Function declared above and re-exported via specifier, missing protect',
       code: `
         'use server';
         async function deleteUser(id) {
@@ -903,12 +903,12 @@ ruleTester.run('require-auth-protection', rule, {
       errors: [
         {
           messageId: 'missingProtect',
-          data: { subject: "server action 'deleteUser'" },
+          data: { subject: "Server Function 'deleteUser'" },
         },
       ],
     },
     {
-      name: 'server action specifier export resolves to HOF (unknown), reported as unverifiable',
+      name: 'Server Function specifier export resolves to HOF (unknown), reported as unverifiable',
       code: `
         'use server';
         import { withAuth } from '@/lib/with-auth';
@@ -921,12 +921,12 @@ ruleTester.run('require-auth-protection', rule, {
       errors: [
         {
           messageId: 'unverifiableExport',
-          data: { subject: "server action 'deleteUser'" },
+          data: { subject: "Server Function 'deleteUser'" },
         },
       ],
     },
     {
-      name: 'server action re-exported from another module via specifier with source',
+      name: 'Server Function re-exported from another module via specifier with source',
       code: `
         'use server';
         export { deleteUser } from './implementations';
@@ -937,14 +937,14 @@ ruleTester.run('require-auth-protection', rule, {
         {
           messageId: 'exportImported',
           data: {
-            subject: "server action 'deleteUser'",
+            subject: "Server Function 'deleteUser'",
             source: './implementations',
           },
         },
       ],
     },
     {
-      name: 'server actions re-exported via `export *` cannot be verified',
+      name: 'Server Functions re-exported via `export *` cannot be verified',
       code: `
         'use server';
         export * from './implementations';
@@ -954,7 +954,7 @@ ruleTester.run('require-auth-protection', rule, {
       errors: [
         {
           messageId: 'exportImported',
-          data: { subject: 'server actions', source: './implementations' },
+          data: { subject: 'Server Functions', source: './implementations' },
         },
       ],
     },
