@@ -37,6 +37,8 @@ ESLint rules to help with Clerk patterns in the Next.js App Router.
 
 Currently contains a single rule to help enforce protecting resources where they are used. Instead of relying on a proxy matcher, you declare which folders are protected and the `require-auth-protection` rule flags any `page`, `layout`, `template`, `default`, `route`, or Server Action under those folders that doesn't guard itself.
 
+Client components are not checked by the rule. These can only get privileged access through other protected resources, or via external API calls which are assumed to be separately protected.
+
 The rule only detects protected or not, which corresponds to signed in/signed out. You are still responsible for making sure the checks are _correct_ and that the user has the correct permissions to access the resource.
 
 > The config **declares intent for tooling — it does not guard anything at runtime.** Protection only happens when each resource calls `await auth.protect()` (or an equivalent check). This rule verifies that it does.
