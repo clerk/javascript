@@ -2149,6 +2149,58 @@ describe('SignIn', () => {
         expect(mockTransport.open).toHaveBeenCalledWith(externalVerificationRedirectURL);
       });
 
+      it('resets the sign-in attempt after surfacing a native OAuth verification error', async () => {
+        const externalVerificationRedirectURL = new URL('https://accounts.example.com/oauth');
+        const mockTransport = {
+          getRedirectUrl: vi.fn().mockResolvedValue('myapp://sso-callback'),
+          open: vi.fn().mockResolvedValue({ callbackUrl: 'myapp://sso-callback' }),
+        };
+        const resetSignIn = vi.fn();
+
+        SignIn.clerk = {
+          buildUrlWithAuth: vi.fn().mockReturnValue('https://web-app.com/sso-callback'),
+          __internal_getNativeOAuthHandler: () => mockTransport,
+          __internal_environment: {
+            displayConfig: { captchaOauthBypass: [] },
+          },
+          client: {
+            resetSignIn,
+          },
+        } as any;
+
+        const signIn = new SignIn();
+        vi.spyOn(signIn, 'create').mockImplementation(async () => {
+          signIn.firstFactorVerification = {
+            status: 'unverified',
+            externalVerificationRedirectURL,
+          } as any;
+          return signIn;
+        });
+        vi.spyOn(signIn, 'reload').mockImplementation(async () => {
+          signIn.firstFactorVerification = {
+            status: 'failed',
+            error: {
+              code: 'oauth_access_denied',
+              message: 'You did not grant access to your Google account.',
+              longMessage: 'You did not grant access to your Google account.',
+            },
+          } as any;
+          return signIn;
+        });
+
+        await expect(
+          signIn.authenticateWithRedirect({
+            strategy: 'oauth_google',
+            redirectUrl: 'http://web-app.com/sso-callback',
+            redirectUrlComplete: '/',
+          }),
+        ).rejects.toMatchObject({
+          errors: [expect.objectContaining({ code: 'oauth_access_denied' })],
+        });
+
+        expect(resetSignIn).toHaveBeenCalled();
+      });
+
       it('creates signIn with enterprise_sso strategy and prepares first factor', async () => {
         vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
 

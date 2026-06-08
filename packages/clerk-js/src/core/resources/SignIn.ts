@@ -130,9 +130,11 @@ function throwIfNativeCallbackHasError(callbackUrl: string): void {
   });
 }
 
-function throwIfSignInVerificationError(error: import('@clerk/shared/types').ClerkAPIError | null | undefined): void {
-  if (!error) return;
-  throw new ClerkAPIResponseError(error.longMessage || error.message, {
+function createSignInVerificationError(
+  error: import('@clerk/shared/types').ClerkAPIError | null | undefined,
+): ClerkAPIResponseError | null {
+  if (!error) return null;
+  return new ClerkAPIResponseError(error.longMessage || error.message, {
     status: 400,
     data: [
       {
@@ -149,6 +151,13 @@ function throwIfSignInVerificationError(error: import('@clerk/shared/types').Cle
       },
     ],
   });
+}
+
+function throwIfSignInVerificationError(error: import('@clerk/shared/types').ClerkAPIError | null | undefined): void {
+  const clerkError = createSignInVerificationError(error);
+  if (clerkError) {
+    throw clerkError;
+  }
 }
 
 export class SignIn extends BaseResource implements SignInResource {
@@ -467,7 +476,11 @@ export class SignIn extends BaseResource implements SignInResource {
         await new Promise(resolve => setTimeout(resolve, INTERVAL_MS));
         await this.reload();
       }
-      throwIfSignInVerificationError(this.firstFactorVerification.error);
+      const verificationError = createSignInVerificationError(this.firstFactorVerification.error);
+      if (verificationError) {
+        SignIn.clerk.client?.resetSignIn();
+        throw verificationError;
+      }
       throw new ClerkRuntimeError('Unable to complete authentication. Please try again.', {
         code: 'native_redirect_incomplete',
       });

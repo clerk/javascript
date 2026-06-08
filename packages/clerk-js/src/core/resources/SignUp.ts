@@ -105,9 +105,11 @@ function throwIfNativeCallbackHasError(callbackUrl: string): void {
   });
 }
 
-function throwIfSignUpVerificationError(error: import('@clerk/shared/types').ClerkAPIError | null | undefined): void {
-  if (!error) return;
-  throw new ClerkAPIResponseError(error.longMessage || error.message, {
+function createSignUpVerificationError(
+  error: import('@clerk/shared/types').ClerkAPIError | null | undefined,
+): ClerkAPIResponseError | null {
+  if (!error) return null;
+  return new ClerkAPIResponseError(error.longMessage || error.message, {
     status: 400,
     data: [
       {
@@ -124,6 +126,13 @@ function throwIfSignUpVerificationError(error: import('@clerk/shared/types').Cle
       },
     ],
   });
+}
+
+function throwIfSignUpVerificationError(error: import('@clerk/shared/types').ClerkAPIError | null | undefined): void {
+  const clerkError = createSignUpVerificationError(error);
+  if (clerkError) {
+    throw clerkError;
+  }
 }
 
 declare global {
@@ -538,7 +547,11 @@ export class SignUp extends BaseResource implements SignUpResource {
         await new Promise(resolve => setTimeout(resolve, INTERVAL_MS));
         await this.reload();
       }
-      throwIfSignUpVerificationError(this.verifications.externalAccount.error);
+      const verificationError = createSignUpVerificationError(this.verifications.externalAccount.error);
+      if (verificationError) {
+        SignUp.clerk.client?.resetSignUp();
+        throw verificationError;
+      }
       throw new ClerkRuntimeError('Unable to complete authentication. Please try again.', {
         code: 'native_redirect_incomplete',
       });

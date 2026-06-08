@@ -703,6 +703,58 @@ describe('SignUp', () => {
         expect(mockTransport.open).toHaveBeenCalledWith(externalVerificationRedirectURL);
       });
 
+      it('resets the sign-up attempt after surfacing a native OAuth verification error', async () => {
+        const externalVerificationRedirectURL = new URL('https://accounts.example.com/oauth');
+        const mockTransport = {
+          getRedirectUrl: vi.fn().mockResolvedValue('myapp://sso-callback'),
+          open: vi.fn().mockResolvedValue({ callbackUrl: 'myapp://sso-callback' }),
+        };
+        const resetSignUp = vi.fn();
+
+        SignUp.clerk = {
+          buildUrlWithAuth: vi.fn().mockReturnValue('https://web-app.com/sso-callback'),
+          __internal_getNativeOAuthHandler: () => mockTransport,
+          __internal_environment: {
+            displayConfig: { captchaOauthBypass: [] },
+          },
+          client: {
+            resetSignUp,
+          },
+        } as any;
+
+        const signUp = new SignUp();
+        vi.spyOn(signUp, 'create').mockImplementation(async () => {
+          signUp.verifications.externalAccount = {
+            status: 'unverified',
+            externalVerificationRedirectURL,
+          } as any;
+          return signUp;
+        });
+        vi.spyOn(signUp, 'reload').mockImplementation(async () => {
+          signUp.verifications.externalAccount = {
+            status: 'failed',
+            error: {
+              code: 'oauth_access_denied',
+              message: 'You did not grant access to your Google account.',
+              longMessage: 'You did not grant access to your Google account.',
+            },
+          } as any;
+          return signUp;
+        });
+
+        await expect(
+          signUp.authenticateWithRedirect({
+            strategy: 'oauth_google',
+            redirectUrl: 'http://web-app.com/sso-callback',
+            redirectUrlComplete: '/',
+          }),
+        ).rejects.toMatchObject({
+          errors: [expect.objectContaining({ code: 'oauth_access_denied' })],
+        });
+
+        expect(resetSignUp).toHaveBeenCalled();
+      });
+
       it('handles relative redirectUrl by converting to absolute', async () => {
         vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
 
