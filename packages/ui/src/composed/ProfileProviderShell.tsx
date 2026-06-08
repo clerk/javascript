@@ -12,7 +12,7 @@ import { CacheProvider, type SerializedStyles } from '@emotion/react';
 import type { ModuleManager } from '@clerk/shared/moduleManager';
 import type { EnvironmentResource, LoadedClerk } from '@clerk/shared/types';
 import type { PropsWithChildren, ReactNode } from 'react';
-import { useMemo, useSyncExternalStore } from 'react';
+import { useMemo } from 'react';
 
 import { AppearanceProvider } from '@/ui/customizables/AppearanceContext';
 import { FlowMetadataProvider } from '@/ui/elements/contexts';
@@ -32,20 +32,6 @@ import { createComposedRouter } from './stubRouter';
 export const fallbackModuleManager: ModuleManager = {
   import: () => Promise.resolve(undefined) as any,
 };
-
-function subscribeToPopstate(callback: () => void): () => void {
-  if (typeof window === 'undefined') return () => {};
-  window.addEventListener('popstate', callback);
-  return () => window.removeEventListener('popstate', callback);
-}
-
-function getPathname(): string {
-  return typeof window !== 'undefined' ? window.location.pathname : '';
-}
-
-function getSSRPathname(): string {
-  return '';
-}
 
 const composedOverrides: Elements = {
   profilePageContent: { padding: 0 },
@@ -108,12 +94,12 @@ export function ProfileProviderShell({
   globalAppearance,
   appearance,
 }: ProfileProviderShellProps): ReactNode {
-  // Tracks the consumer app's URL so router.currentPath changes drive effects in
-  // CardStateProvider (errors) and ProfileCardContent (scroll restore). popstate
-  // catches back/forward; pushState navigations propagate through the consumer's
-  // own re-renders, which re-read the snapshot.
-  const currentPath = useSyncExternalStore(subscribeToPopstate, getPathname, getSSRPathname);
-  const router = useMemo(() => createComposedRouter(clerk.navigate, currentPath), [clerk, currentPath]);
+  // currentPath is left empty: composed has no Clerk-internal navigation. Each
+  // section owns its own CardStateProvider, so errors clear on section unmount
+  // (single-section mounting). Side-by-side sections keep independent error
+  // state — a consumer URL change wouldn't be a meaningful signal to clear
+  // either, so observing it would only cause spurious clears.
+  const router = useMemo(() => createComposedRouter(clerk.navigate), [clerk]);
   // Match the portal path's normalization (Components.tsx:209) so a cssLayerName
   // nested inside appearance.theme gets hoisted to top-level for @layer wrapping.
   const normalizedGlobalAppearance = useMemo(

@@ -1,6 +1,8 @@
+import { renderHook, act } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { createComposedRouter, stubRouter } from '../stubRouter';
+import { useBillingRouter } from '../useBillingRouter';
 
 describe('createComposedRouter', () => {
   it('navigate delegates to clerkNavigate for same-origin paths', async () => {
@@ -47,12 +49,64 @@ describe('createComposedRouter', () => {
   });
 });
 
+describe('createComposedRouter — AIO-only APIs throw in dev', () => {
+  it('matches() throws', () => {
+    const router = createComposedRouter(vi.fn());
+    expect(() => router.matches('/foo')).toThrow(/not supported inside composed sections/);
+  });
+
+  it('refresh() throws', () => {
+    const router = createComposedRouter(vi.fn());
+    expect(() => router.refresh()).toThrow(/not supported inside composed sections/);
+  });
+
+  it('getMatchData() throws', () => {
+    const router = createComposedRouter(vi.fn());
+    expect(() => router.getMatchData('/foo')).toThrow(/not supported inside composed sections/);
+  });
+});
+
 describe('stubRouter fallback', () => {
   it('is created with window.location.assign as navigator', () => {
     // stubRouter is a pre-built instance that delegates to window.location.assign.
     // We can't spy on window.location.assign in jsdom, but we verify it's a valid router.
     expect(stubRouter.navigate).toBeDefined();
     expect(stubRouter.baseNavigate).toBeDefined();
+  });
+});
+
+describe('useBillingRouter — in-memory by design', () => {
+  // Composed billing routing is purely React state — the consumer owns the
+  // page URL. Trade-off: back/forward, refresh, and deep-links do not preserve
+  // sub-route or tab state. These tests pin that decision.
+
+  let originalHash: string;
+
+  afterEach(() => {
+    window.location.hash = originalHash ?? '';
+  });
+
+  it('navigate() does not touch window.location.hash', async () => {
+    originalHash = window.location.hash;
+    const { result } = renderHook(() => useBillingRouter());
+
+    await act(async () => {
+      await result.current.router.navigate('plans');
+    });
+
+    expect(window.location.hash).toBe(originalHash);
+    expect(result.current.route.page).toBe('plans');
+  });
+
+  it('navigate() does not push a history entry', async () => {
+    const before = window.history.length;
+    const { result } = renderHook(() => useBillingRouter());
+
+    await act(async () => {
+      await result.current.router.navigate('statement/abc');
+    });
+
+    expect(window.history.length).toBe(before);
   });
 });
 

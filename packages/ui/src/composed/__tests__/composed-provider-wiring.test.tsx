@@ -100,7 +100,11 @@ describe('UserProfileProvider wiring', () => {
     expect(probe.dataset.hasBaseNavigate).toBe('true');
   });
 
-  describe('router.currentPath reactivity', () => {
+  // The shell does NOT track the host app URL. Composed has no Clerk-internal
+  // navigation between sections (consumer remounts <UserProfile.X>), so there's
+  // no meaningful currentPath to snapshot — and observing the consumer's URL
+  // would just trigger spurious navigation-keyed effects.
+  describe('router.currentPath is decoupled from the host URL', () => {
     let originalPath: string;
 
     beforeEach(() => {
@@ -121,7 +125,7 @@ describe('UserProfileProvider wiring', () => {
       );
     }
 
-    it('updates router.currentPath on popstate so navigation-keyed effects re-fire', async () => {
+    it('does not snapshot window.location.pathname into router.currentPath', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withUser({ email_addresses: ['test@clerk.com'] });
       });
@@ -136,14 +140,28 @@ describe('UserProfileProvider wiring', () => {
         { wrapper },
       );
 
-      expect(screen.getByTestId('path-probe').dataset.current).toBe('/page-a');
+      expect(screen.getByTestId('path-probe').dataset.current).toBe('');
+    });
+
+    it('does not update router.currentPath on popstate', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+      });
+      patchEnvironment(fixtures.clerk, fixtures.environment);
+
+      render(
+        <UserProfileProvider>
+          <CurrentPathProbe />
+        </UserProfileProvider>,
+        { wrapper },
+      );
 
       act(() => {
         window.history.pushState(null, '', '/page-b');
         window.dispatchEvent(new PopStateEvent('popstate'));
       });
 
-      expect(screen.getByTestId('path-probe').dataset.current).toBe('/page-b');
+      expect(screen.getByTestId('path-probe').dataset.current).toBe('');
     });
   });
 
