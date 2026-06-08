@@ -6,10 +6,10 @@ import { render, screen, waitFor } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
 
 // The dialog no longer touches the wizard. On confirm it calls the context
-// `resetConnection()` — delete + reset-epoch bump — which remounts the keyed
-// top-level wizard so it re-derives the furthest-reachable step. That lets the
-// dialog be triggered from ANY footer (including nested SAML configure footers)
-// without binding to a nested wizard.
+// `resetConnection()` — a pure delete, no navigation — and the wizard
+// self-corrects to the furthest-reachable step once the active step's guard
+// breaks. That lets the dialog be triggered from ANY footer (including nested
+// SAML configure footers) without binding to a nested wizard.
 const resetConnection = vi.fn();
 
 const connectionMockState = vi.hoisted(() => ({
@@ -21,7 +21,7 @@ vi.mock('../ConfigureSSOContext', () => ({
     enterpriseConnection: connectionMockState.current,
     contentRef: { current: null },
     // The dialog's confirm calls the context `resetConnection`, which owns the
-    // reverification-wrapped delete plus the reset-epoch bump.
+    // reverification-wrapped delete. No navigation — the wizard self-corrects.
     resetConnection,
   }),
 }));

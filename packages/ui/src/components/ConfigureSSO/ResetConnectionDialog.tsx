@@ -65,11 +65,11 @@ const ResetConnectionDialogContent = withCardStateProvider((props: ResetConnecti
     }
 
     try {
-      // `resetConnection` deletes the connection and bumps the reset epoch, which
-      // remounts the keyed top-level wizard so it re-derives the furthest-
-      // reachable step for the now-no-connection state. No `useWizard()` here —
-      // that lets this dialog be triggered from ANY footer (including the nested
-      // SAML configure footers) without binding to a nested wizard.
+      // `resetConnection` deletes the connection — a pure delete, no navigation.
+      // Dropping `hasConnection` breaks the active step's entry guard, so the
+      // wizard self-corrects to the furthest-reachable step. No `useWizard()`
+      // here — that lets this dialog be triggered from ANY footer (including the
+      // nested SAML configure footers) without binding to a nested wizard.
       await resetConnection();
       onClose();
     } catch (err) {

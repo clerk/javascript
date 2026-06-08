@@ -85,6 +85,26 @@ export const useWizardMachine = ({
   const stateRef = React.useRef(state);
   stateRef.current = state;
 
+  // Reachability invariant (adjust-state-during-render — NOT a useEffect): if the
+  // active step's entry guard no longer holds (e.g. the connection backing it was
+  // deleted from a footer reset, or revoked elsewhere), the wizard is sitting on an
+  // impossible step. Re-seat to the furthest-reachable step — the SAME derivation
+  // used on mount (initialState). React discards this render and re-renders before
+  // paint, so the impossible frame never shows. Do NOT "fix" this by adding a
+  // goToStep: navigation here is emergent from the guard state, by design. The
+  // strict condition (current descriptor exists, its guard is false, and the
+  // re-seated step differs) makes it a provably one-shot — initialState always
+  // lands on a guard-passing step, so it cannot loop.
+  if (!isNested) {
+    const currentDescriptor = config.descriptors.find(d => d.id === state.current);
+    if (currentDescriptor && !guardHolds(currentDescriptor)) {
+      const seated = initialState(config);
+      if (seated.current !== state.current) {
+        setState(seated);
+      }
+    }
+  }
+
   // Position of `current` in the static descriptor array — the basis for both
   // first/last detection and the boundary-bubble decision below.
   const indexOfCurrent = (s: WizardState, cfg: WizardConfig): number =>

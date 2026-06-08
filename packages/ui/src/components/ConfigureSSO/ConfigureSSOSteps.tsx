@@ -25,7 +25,7 @@ import { ConfigureStep, ConfirmationStep, SelectProviderStep, TestConfigurationS
  * test satisfied, so a live connection short-circuits straight to confirmation.
  */
 export const ConfigureSSOSteps = (): JSX.Element => {
-  const { connectionState: c, resetEpoch } = useConfigureSSO();
+  const { connectionState: c } = useConfigureSSO();
   const card = useCardState();
 
   const steps = React.useMemo<WizardStepConfig[]>(
@@ -39,10 +39,10 @@ export const ConfigureSSOSteps = (): JSX.Element => {
     [c],
   );
 
-  // Keyed on `resetEpoch`: a reset bumps the epoch, remounting the wizard so its
-  // `initialState` re-derives the furthest-reachable step for the now-no-
-  // connection state. Create does NOT bump the epoch, so the create path keeps
-  // its plain `goNext` (no remount, no create-flash).
+  // Reset does NOT remount the wizard. Deleting the connection breaks the active
+  // step's entry guard, and the machine self-corrects in its render phase,
+  // re-seating to the furthest-reachable step (the same `initialState`
+  // derivation it uses on mount) — no key, no remount, no create-flash.
   //
   // `onStepChange` clears any card-level error whenever the active top-level step
   // actually changes, so a stale failure from one step doesn't leak into the next
@@ -50,7 +50,6 @@ export const ConfigureSSOSteps = (): JSX.Element => {
   // handler — no wizard-level `useEffect` involved.
   return (
     <Wizard
-      key={resetEpoch}
       steps={steps}
       onStepChange={() => card.setError(undefined)}
     >

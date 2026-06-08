@@ -183,6 +183,131 @@ describe('useWizardMachine — first/last and reachability derivations', () => {
   });
 });
 
+describe('useWizardMachine — reachability clamp (self-correct on a broken guard)', () => {
+  it('re-seats to the furthest-reachable step when the active step guard breaks between renders', () => {
+    // Start with c reachable; the machine seeds on c (furthest reachable).
+    let cOpen = true;
+    const open = () => cOpen;
+    const config = cfg([{ id: 'a' }, { id: 'b', guard: () => true }, { id: 'c', guard: open }]);
+    const { result, rerender } = renderMachine({ config });
+    expect(result.current.current).toBe('c');
+
+    // The connection backing c is deleted: c's guard now breaks. Re-render with a
+    // fresh config object so the memo sees new descriptors. The machine notices
+    // its active step is impossible and re-seats to the furthest-reachable step
+    // (b — a + b still reachable, c gated out).
+    cOpen = false;
+    act(() => {
+      rerender({
+        config: cfg([{ id: 'a' }, { id: 'b', guard: () => true }, { id: 'c', guard: open }]),
+        parentWizard: null,
+        initialStepId: undefined,
+        onStepChange: undefined,
+      });
+    });
+    expect(result.current.current).toBe('b');
+  });
+
+  it('re-seats all the way to the entry step when every later guard breaks', () => {
+    let unlocked = true;
+    const gate = () => unlocked;
+    const { result, rerender } = renderMachine({
+      config: cfg([{ id: 'a' }, { id: 'b', guard: gate }, { id: 'c', guard: gate }]),
+    });
+    expect(result.current.current).toBe('c');
+
+    unlocked = false;
+    act(() => {
+      rerender({
+        config: cfg([{ id: 'a' }, { id: 'b', guard: gate }, { id: 'c', guard: gate }]),
+        parentWizard: null,
+        initialStepId: undefined,
+        onStepChange: undefined,
+      });
+    });
+    expect(result.current.current).toBe('a');
+  });
+
+  it('does NOT move when a guard goes TRUE while the active step still holds (create-style change)', () => {
+    // Seed on a; b is gated out. Opening b later (a guard going TRUE) must not
+    // yank the user forward — a's guard still holds, so there is nothing to fix.
+    let bOpen = false;
+    const bGuard = () => bOpen;
+    const { result, rerender } = renderMachine({
+      config: cfg([{ id: 'a' }, { id: 'b', guard: bGuard }]),
+      initialStepId: 'a',
+    });
+    expect(result.current.current).toBe('a');
+
+    bOpen = true;
+    act(() => {
+      rerender({
+        config: cfg([{ id: 'a' }, { id: 'b', guard: bGuard }]),
+        parentWizard: null,
+        initialStepId: 'a',
+        onStepChange: undefined,
+      });
+    });
+    // a still holds — no clamp. The user advances only via an explicit goNext.
+    expect(result.current.current).toBe('a');
+  });
+
+  it('is a provably one-shot: the clamp re-seats to a guard-passing step and does not loop or re-fire', () => {
+    let cOpen = true;
+    const open = () => cOpen;
+    const { result, rerender } = renderMachine({
+      config: cfg([{ id: 'a' }, { id: 'b', guard: () => true }, { id: 'c', guard: open }]),
+    });
+    expect(result.current.current).toBe('c');
+
+    cOpen = false;
+    act(() => {
+      rerender({
+        config: cfg([{ id: 'a' }, { id: 'b', guard: () => true }, { id: 'c', guard: open }]),
+        parentWizard: null,
+        initialStepId: undefined,
+        onStepChange: undefined,
+      });
+    });
+    // Lands on a guard-passing step (b). A subsequent render with the same broken
+    // config does NOT move it again — b's guard holds, so the clamp is inert.
+    expect(result.current.current).toBe('b');
+    act(() => {
+      rerender({
+        config: cfg([{ id: 'a' }, { id: 'b', guard: () => true }, { id: 'c', guard: open }]),
+        parentWizard: null,
+        initialStepId: undefined,
+        onStepChange: undefined,
+      });
+    });
+    expect(result.current.current).toBe('b');
+  });
+
+  it('does not clamp a nested wizard (isNested) even when its active guard breaks', () => {
+    // A nested machine is guard-less in practice, but the clamp is gated on
+    // !isNested regardless: a nested wizard never re-seats, it bubbles instead.
+    let open = true;
+    const gate = () => open;
+    const { result, rerender } = renderMachine({
+      config: cfg([{ id: 'n0' }, { id: 'n1', guard: gate }]),
+      parentWizard: makeParent(),
+    });
+    expect(result.current.current).toBe('n1');
+
+    open = false;
+    act(() => {
+      rerender({
+        config: cfg([{ id: 'n0' }, { id: 'n1', guard: gate }]),
+        parentWizard: makeParent(),
+        initialStepId: undefined,
+        onStepChange: undefined,
+      });
+    });
+    // Nested: no clamp. current stays put despite the broken guard.
+    expect(result.current.current).toBe('n1');
+  });
+});
+
 describe('useWizardMachine — onStepChange', () => {
   it('fires with the new step id on a goNext / goPrev / goToStep that changes current', () => {
     const onStepChange = vi.fn();
