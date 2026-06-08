@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { createComposedRouter, stubRouter } from '../stubRouter';
 
@@ -53,5 +53,25 @@ describe('stubRouter fallback', () => {
     // We can't spy on window.location.assign in jsdom, but we verify it's a valid router.
     expect(stubRouter.navigate).toBeDefined();
     expect(stubRouter.baseNavigate).toBeDefined();
+  });
+});
+
+describe('createComposedRouter — SSR safety', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('resolve() does not throw when window is undefined', () => {
+    vi.stubGlobal('window', undefined);
+
+    const router = createComposedRouter(vi.fn());
+    expect(() => router.resolve('/some-path')).not.toThrow();
+    expect(router.resolve('/some-path').pathname).toBe('/some-path');
+  });
+
+  it('stubRouter.navigate is a no-op (does not throw) when window is undefined', async () => {
+    vi.stubGlobal('window', undefined);
+
+    await expect(stubRouter.navigate('/foo')).resolves.toBeUndefined();
   });
 });

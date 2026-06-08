@@ -1,13 +1,18 @@
 import type { RouteContextValue } from '../router/RouteContext';
 
-export function createComposedRouter(clerkNavigate: (to: string) => Promise<unknown> | void): RouteContextValue {
+const SSR_BASE = 'http://localhost/';
+
+export function createComposedRouter(
+  clerkNavigate: (to: string) => Promise<unknown> | void,
+  currentPath: string = '',
+): RouteContextValue {
   return {
     basePath: '',
     startPath: '',
     flowStartPath: '',
     fullPath: '',
     indexPath: '',
-    currentPath: '',
+    currentPath,
     matches: () => false,
     navigate: async (to: string) => {
       await clerkNavigate(to);
@@ -15,7 +20,7 @@ export function createComposedRouter(clerkNavigate: (to: string) => Promise<unkn
     baseNavigate: async (toURL: URL) => {
       await clerkNavigate(toURL.href);
     },
-    resolve: (to: string) => new URL(to, window.location.href),
+    resolve: (to: string) => new URL(to, typeof window !== 'undefined' ? window.location.href : SSR_BASE),
     refresh: () => {},
     params: {},
     queryString: '',
@@ -25,6 +30,8 @@ export function createComposedRouter(clerkNavigate: (to: string) => Promise<unkn
 }
 
 export const stubRouter: RouteContextValue = createComposedRouter(to => {
-  window.location.assign(to);
+  if (typeof window !== 'undefined') {
+    window.location.assign(to);
+  }
   return Promise.resolve();
 });
