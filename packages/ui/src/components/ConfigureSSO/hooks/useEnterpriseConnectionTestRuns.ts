@@ -2,23 +2,15 @@ import { __internal_useOrganizationEnterpriseConnectionTestRuns } from '@clerk/s
 import type { EnterpriseConnectionResource, EnterpriseConnectionTestRunResource } from '@clerk/shared/types';
 import { useCallback, useState } from 'react';
 
-/**
- * Page size for the paginated test-run list the Test step renders. The success
- * probe is a separate single-row, success-filtered query.
- */
+/** Page size for the paginated list; the success probe is a separate query. */
 export const TEST_RUNS_PAGE_SIZE = 5;
 
-/**
- * Options for {@link EnterpriseConnectionTestRuns.refresh}.
- */
 export interface RefreshTestRunsOptions {
   /**
-   * Whether to arm polling for the first record when the list is still empty.
-   *
-   * The entry/pagination refetch leaves this `false`: landing on the Test step
-   * with a freshly-configured, zero-run connection must NOT arm polling merely
-   * because the list happens to be empty. Polling is armed only after the user
-   * actually kicks off a run, by calling `refresh({ armPolling: true })`.
+   * Arm polling for the first record while the list is still empty. The
+   * entry/pagination refetch leaves this `false`: landing on the Test step with
+   * a freshly-configured, zero-run connection must NOT arm polling merely
+   * because the list is empty. Only the user kicking off a run sets it `true`.
    *
    * @default false
    */
@@ -27,88 +19,49 @@ export interface RefreshTestRunsOptions {
 
 export interface EnterpriseConnectionTestRuns {
   /**
-   * Whether the connection has at least one successful test run. Derived from a
-   * dedicated success-filtered probe (`status: ['success'], pageSize: 1`), not
-   * from the visible page of the list — so it stays correct regardless of which
-   * page the table is showing.
+   * Derived from a dedicated success-filtered probe (`status: ['success'],
+   * pageSize: 1`), NOT the visible list page — so it stays correct regardless of
+   * which page the table shows.
    */
   hasSuccessfulTestRun: boolean;
-  /**
-   * `true` only on the very first load, when there is no data to show yet.
-   * Drives the full skeleton: the wizard's global fetch always covers the
-   * test-run probe + list, so a cold load that lands on the test step shows the
-   * skeleton rather than refetching.
-   */
+  /** First load only (no data yet) → drives the full skeleton. */
   isLoading: boolean;
   /**
-   * `true` whenever a list fetch is in flight, including background refetches
-   * that keep the previously-loaded rows visible. Re-entering the test step
-   * later drives only the table's loading indicator off this, not the full
-   * skeleton.
+   * Any list fetch in flight, including background refetches that keep prior
+   * rows visible → drives only the table loading indicator, not the skeleton.
    */
   isFetching: boolean;
-  /**
-   * The current page of test runs the table renders.
-   */
   rows: EnterpriseConnectionTestRunResource[];
-  /**
-   * Total number of test runs across all pages, for pagination.
-   */
   totalCount: number;
-  /**
-   * `true` while the list is actively polling for the first record to appear
-   * after a freshly created run.
-   */
   isPolling: boolean;
-  /**
-   * The current (1-based) page of the test-run list.
-   */
   page: number;
-  /**
-   * Move the test-run list to a specific page. Owned here, beside the query it
-   * drives, so the Test step never spins up a second fetch to paginate.
-   */
   setPage: (page: number) => void;
   /**
-   * Force a refetch of both the success probe and the visible list page so
-   * derived state (e.g. `hasSuccessfulTestRun`) and the table reflect a run that
-   * just completed. Keeps the previously-loaded data visible while in flight
-   * (`isFetching`).
-   *
-   * By default this does NOT arm polling — an entry/pagination refetch on an
-   * empty list must not start polling on its own. Pass `{ armPolling: true }`
-   * after the user kicks off a run so the list polls until the new record lands.
+   * Refetches both the success probe and the visible list page, keeping prior
+   * data visible while in flight (`isFetching`). Does NOT arm polling by default
+   * — an entry/pagination refetch on an empty list must not start polling on its
+   * own. Pass `{ armPolling: true }` after the user kicks off a run.
    */
   refresh: (options?: RefreshTestRunsOptions) => Promise<unknown>;
 }
 
 /**
- * The single source of enterprise-connection test-run state for the flow.
+ * The single source of test-run state. Owns BOTH test-run concerns so the Test
+ * step never issues its own fetch:
  *
- * It owns *both* test-run concerns so the Test step never spins up a second
- * fetch:
+ * - the **success probe** (`status: ['success'], pageSize: 1`) →
+ *   `hasSuccessfulTestRun`;
+ * - the **paginated list** the table renders, plus the page cursor.
  *
- * - the **success probe** — "has this connection ever passed a test run?"
- *   (`status: ['success'], pageSize: 1`) → `hasSuccessfulTestRun`;
- * - the **paginated list** the Test step's table renders (`page`, `pageSize`),
- *   along with the page cursor itself.
+ * Two loading signals separate a cold load from a background refetch: `isLoading`
+ * (first load only → full skeleton) vs `isFetching` (any in-flight LIST fetch
+ * with prior rows kept via `keepPreviousData` → table-level loading on re-entry).
  *
- * Two distinct loading signals let callers tell a cold first load apart from a
- * background refetch:
- *
- * - `isLoading` — first load only (no data yet), across either query → full
- *   skeleton.
- * - `isFetching` — any in-flight *list* fetch, with previously-loaded rows kept
- *   visible (`keepPreviousData` semantics) → table-level loading on re-entry.
- *
- * `active` gates *both* underlying queries. The umbrella hook derives it
- * straight from the connection — `true` once the connection is configured (or
- * active), which is also when the Test step becomes reachable. So an existing,
- * configured connection at load fetches test-runs on first load (covering the
- * full skeleton and driving the `tested` guard), while on the fresh-start path
- * a connection that is merely *created* but not yet configured stays `false` —
- * no test-runs fetch fires to flash the global skeleton for a connection that
- * provably has zero runs.
+ * `active` gates BOTH queries. The umbrella hook derives it from the connection
+ * — `true` once configured (or active), which is also when the Test step becomes
+ * reachable. So an existing configured connection fetches on first load (covering
+ * the skeleton + the `tested` guard), while a merely-created-not-yet-configured
+ * connection stays `false`, never flashing the global skeleton for zero runs.
  */
 export const useEnterpriseConnectionTestRuns = (
   connection: EnterpriseConnectionResource | undefined,

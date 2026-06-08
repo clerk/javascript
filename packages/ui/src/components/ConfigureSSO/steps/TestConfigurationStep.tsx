@@ -60,22 +60,14 @@ export const TestConfigurationStep = (): JSX.Element => {
     refresh: refreshTestRuns,
   } = testRuns;
 
-  // The test-runs source activates itself upstream the moment the connection is
-  // configured (the same condition that makes this step reachable), so the step
-  // no longer has to wake it on entry — by the time we land here it is already
-  // live.
-  //
-  // The wizard's initial load already fetched the test-runs (covered by the
-  // full skeleton) for the existing-connection case, so landing on the test
-  // step on that first load must NOT refetch. Navigating INTO the step later
-  // (forward, back, or breadcrumb) should refetch so the table reflects any run
-  // kicked off elsewhere — that refetch surfaces as the table-level `isFetching`
-  // spinner, never the full skeleton.
-  //
-  // The step only mounts while it is the current step, so this runs once per
-  // entry. `isInitialStep` is the wizard's own "no navigation yet" signal, read
-  // at mount: this fires a mount-driven data refresh, it is NOT syncing state
-  // via an effect. Empty deps → mount-only, so re-renders never re-fire.
+  // The test-runs source is already live by the time we land here (it activates
+  // upstream when the connection is configured). The initial load already
+  // fetched them for the existing-connection case, so the FIRST landing must NOT
+  // refetch; navigating INTO the step later (forward/back/breadcrumb) should, so
+  // the table reflects a run kicked off elsewhere — surfacing as the table-level
+  // `isFetching` spinner, never the full skeleton. `isInitialStep` is the
+  // wizard's "no navigation yet" signal; the step only mounts while current, so
+  // empty deps make this a mount-driven refresh (not state-sync), once per entry.
   useEffect(() => {
     if (!isInitialStep) {
       void refreshTestRuns();

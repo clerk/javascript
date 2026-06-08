@@ -3,44 +3,33 @@ import React from 'react';
 import { guardHolds, initialState, reduce, type WizardConfig, type WizardEvent, type WizardState } from './reducer';
 import type { WizardActiveStep, WizardContextValue } from './types';
 
-/**
- * Inputs the host wizard wires the machine to. The `config` carries the step
- * descriptors (the body-less `steps` config array, verbatim) — each descriptor
- * holds its own inline entry guard, so there is no separate guards record.
- * `parentWizard` and `initialStepId` support nested sub-flows and resume.
- */
 interface UseWizardMachineArgs {
   config: WizardConfig;
   parentWizard: WizardContextValue | null;
-  /**
-   * Mount on this step instead of the guard-derived initial step. Used by
-   * linear nested flows that resume from an externally-decided position.
-   */
+  /** Mount here instead of the guard-derived initial step (nested resume). */
   initialStepId?: string;
   /**
-   * Fired with the new step id from the dispatch handler whenever a transition
-   * actually changes the active step. Read from a render-updated ref so
-   * `dispatch`'s identity stays stable.
+   * Fired from the dispatch handler when a transition changes the active step.
+   * Read from a render-updated ref so `dispatch`'s identity stays stable.
    */
   onStepChange?: (stepId: string) => void;
 }
 
 /**
  * Domain-agnostic wizard state machine. `reducer.ts` is the pure
- * `(state, event, config) => state` function; this hook is the React seam that
- * owns the live state and reduces against the current config at dispatch time.
+ * `(state, event, config) => state`; this hook is the React seam that owns the
+ * live state and reduces against the current config at dispatch time.
  *
- * Navigation is sequential and entry-guard-gated: a `goNext`/`goPrev` advances
- * exactly one declaration slot iff the target step's entry guard holds. A
- * guard-blocked mid-flow nav is a HARD STOP (a true no-op — never a bubble).
- * Bubbling to `parentWizard` happens ONLY from a scope boundary: the terminal
- * position for `goNext`, the first position for `goPrev`. That is how a nested
- * sub-flow's last step advances the top-level wizard (no completion callback);
- * a top-level wizard treats a boundary nav as a no-op.
+ * Navigation is sequential and entry-guard-gated: `goNext`/`goPrev` advances one
+ * slot iff the target's guard holds; a guard-blocked mid-flow nav is a HARD STOP
+ * (true no-op, never a bubble). Bubbling to `parentWizard` happens ONLY from a
+ * scope boundary — terminal position for `goNext`, first for `goPrev` — which is
+ * how a nested sub-flow's last step advances the parent. A top-level wizard
+ * treats a boundary nav as a no-op.
  *
- * `configRef`/`stateRef` are mirrored during render (not via `useEffect`) so the
+ * `configRef`/`stateRef` are mirrored during render (not a `useEffect`) so the
  * stable `dispatch` always sees the freshest config/state. The parent
- * fall-through runs in the handler body, never inside a `setState` updater:
+ * fall-through runs in the handler body, NEVER inside a `setState` updater:
  * calling the parent's `setState` from a child updater triggers React's "cannot
  * update a component while rendering a different component" warning.
  */
@@ -59,19 +48,15 @@ export const useWizardMachine = ({
     initialStepId ? { current: initialStepId, direction: 0, hasNavigated: false } : initialState(config),
   );
 
-  // Render-updated mirror of the latest config so the stable dispatch below
-  // always reduces against the freshest descriptors/guards.
+  // Render-updated mirrors so the stable handlers below always see the freshest
+  // config / parent / callback without taking them as deps (which would churn
+  // `dispatch`/`goNext`/`goPrev` identity every render).
   const configRef = React.useRef(config);
   configRef.current = config;
 
-  // Read the parent from a ref so dispatch identity stays stable while still
-  // bubbling to the freshest parent wizard.
   const parentRef = React.useRef(parentWizard);
   parentRef.current = parentWizard;
 
-  // Render-updated mirror of the `onStepChange` callback so the stable handlers
-  // below can fire the freshest callback without taking it as a dependency (which
-  // would churn `dispatch`/`goNext`/`goPrev` identity every render).
   const onStepChangeRef = React.useRef(onStepChange);
   onStepChangeRef.current = onStepChange;
 

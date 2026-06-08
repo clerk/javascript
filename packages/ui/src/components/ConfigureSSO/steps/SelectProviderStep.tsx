@@ -77,12 +77,9 @@ export const SelectProviderStep = (): JSX.Element => {
     setSelected(next);
   };
 
-  // Under the entry-guard graph verify-domain runs first, so by the time the
-  // user reaches select-provider their domain is verified. On a fresh start the
-  // create is unconditional; a plain `goNext` then lands `configure` because the
-  // resolved create flips the aggregate's `hasConnection`, satisfying
-  // `configure`'s entry guard. On revisit a connection already exists, so we
-  // never re-create — `goNext` alone advances.
+  // On a fresh start the create is unconditional, then `goNext` lands `configure`
+  // because the resolved create flips `hasConnection`, satisfying its guard. On
+  // revisit a connection already exists, so we never re-create — `goNext` alone.
   const handleContinue = async (): Promise<void> => {
     if (!selected) {
       return;

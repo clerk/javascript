@@ -124,13 +124,11 @@ const Body = ({ sx, ...props }: StepBodyProps): JSX.Element => (
 );
 
 type FooterButtonProps = {
-  /** Click handler. Required — the buttons have no default behavior. */
+  /** The buttons have no default behavior — wire navigation here. */
   onClick?: () => void | Promise<unknown>;
-  /** Disabled state. */
   isDisabled?: boolean;
-  /** Loading state. */
   isLoading?: boolean;
-  /** Override label. Defaults to 'Previous' / 'Continue'. */
+  /** Defaults to 'Previous' / 'Continue'. */
   label?: LocalizationKey | string;
 };
 

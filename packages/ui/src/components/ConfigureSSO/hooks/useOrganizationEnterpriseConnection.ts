@@ -27,92 +27,40 @@ import { type RefreshTestRunsOptions, useEnterpriseConnectionTestRuns } from './
 
 export interface UseOrganizationEnterpriseConnectionResult {
   /**
-   * Whether the upstream data is still loading. Consumers gate the skeleton on
-   * this one level above the provider so the context never observes loading.
-   *
-   * Test-runs contribute to this only when a connection was present at first
-   * load (they're fetched as part of that initial load). On the fresh-start
-   * path they stay dormant until the connection is configured, so creating a
-   * connection mid-flow never re-flashes the global skeleton.
+   * Consumers gate the skeleton on this ONE level above the provider so the
+   * context never observes loading. Test-runs contribute only when a connection
+   * was present at first load; on the fresh-start path they stay dormant until
+   * configured, so a mid-flow create never re-flashes the global skeleton.
    */
   isLoading: boolean;
   user: UserResource | null | undefined;
   session: SignedInSessionResource | null | undefined;
   organization: OrganizationResource | null | undefined;
-  /**
-   * The enterprise connection for the active organization. FAPI currently
-   * supports a single enterprise connection per organization.
-   */
+  /** FAPI currently supports a single connection per organization. */
   enterpriseConnection: EnterpriseConnectionResource | undefined;
-  /**
-   * The user's primary email address, used to derive the connection name on
-   * create. Surfaced here so consumers don't each reach for `useUser`.
-   */
+  /** Used to derive the connection name on create. */
   primaryEmailAddress: EmailAddressResource | undefined;
-  /**
-   * The active organization's SSO-config domain entity — the immutable value
-   * object the wizard makes every flow decision from, composing the connection,
-   * the admin's email verification, and the test-run fact. Built once here from
-   * the raw inputs.
-   */
+  /** The domain entity the wizard makes every flow decision from. */
   organizationEnterpriseConnection: OrganizationEnterpriseConnection;
-  /**
-   * Every connection-domain mutation, pre-wrapped in `useReverification`.
-   */
   mutations: EnterpriseConnectionMutations;
-  /**
-   * The single source of test-run state — the paginated list the Test step
-   * renders plus the page cursor and table-level loading. When a connection
-   * exists at initial load it's fetched as part of that load, so a cold landing
-   * on the test step is covered by the full skeleton; re-entering the step later
-   * refetches via {@link TestRunsView.refresh}. On the fresh-start path the
-   * queries stay dormant until the connection is configured, after which loading
-   * is table-level only.
-   */
   testRuns: TestRunsView;
 }
 
 /**
- * The Test step's view onto the single test-run source: the visible page of
- * rows, pagination cursor, and table-level loading signals. Lives on the
- * umbrella hook so the step reads it from context instead of issuing its own
- * fetch.
+ * The Test step's view onto the single test-run source. Lives on the umbrella
+ * hook so the step reads it from context instead of issuing its own fetch.
  */
 export interface TestRunsView {
-  /**
-   * The current page of test runs the table renders.
-   */
   rows: EnterpriseConnectionTestRunResource[];
-  /**
-   * Total number of test runs across all pages, for pagination.
-   */
   totalCount: number;
-  /**
-   * `true` only on the cold first load (drives the full skeleton upstream).
-   */
+  /** Cold first load only → drives the full skeleton upstream. */
   isLoading: boolean;
-  /**
-   * `true` while a background list refetch is in flight with previous rows kept
-   * visible — drives the table spinner on re-entry, never the full skeleton.
-   */
+  /** Background list refetch with prior rows kept → table spinner, not skeleton. */
   isFetching: boolean;
-  /**
-   * `true` while polling for a freshly created run to appear.
-   */
   isPolling: boolean;
-  /**
-   * The current (1-based) page.
-   */
   page: number;
-  /**
-   * Move the list to a specific page (drives the single source's fetch).
-   */
   setPage: (page: number) => void;
-  /**
-   * Force a refetch of the visible page (and the success probe), keeping
-   * previous rows visible while in flight. By default this does not arm polling;
-   * pass `{ armPolling: true }` after the user kicks off a run.
-   */
+  /** Pass `{ armPolling: true }` after the user kicks off a run. */
   refresh: (options?: RefreshTestRunsOptions) => Promise<unknown>;
 }
 

@@ -22,13 +22,12 @@ const STEPS_BY_PROVIDER: Record<ProviderType, () => JSX.Element> = {
 export const ConfigureStep = (): JSX.Element | null => {
   const { organizationEnterpriseConnection: c } = useConfigureSSO();
 
-  // Type guard, at this point the provider should have been defined
+  // Type guard: the provider should be defined by the time we reach configure.
   if (!c.provider) {
     return null;
   }
 
-  // Type guard to ensure steps are provided
-  // If a new provider is added to the select step, then build will fail ahead of runtime
+  // Adding a provider to the select step without a mapping here fails the build.
   const StepsByProvider = STEPS_BY_PROVIDER[c.provider];
 
   if (!StepsByProvider) {

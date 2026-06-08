@@ -29,35 +29,20 @@ import type { ProviderType } from '../types';
  */
 export interface EnterpriseConnectionMutations {
   /**
-   * Creates a new enterprise connection for the user's primary email domain,
-   * scoped to the active organization (inferred from the org-scoped endpoint's
-   * URL path). Derives the connection name from the email domain. Resolves to
-   * `undefined` without creating when no primary email address is available (no
-   * domain to derive a name from).
+   * Derives the connection name from the email domain; resolves to `undefined`
+   * without creating when no primary email is available.
    */
   createConnection: (
     provider: ProviderType,
     primaryEmailAddress?: EmailAddressResource,
   ) => Promise<EnterpriseConnectionResource | undefined>;
-  /**
-   * Updates an existing enterprise connection (e.g. its SAML IdP metadata).
-   */
   updateConnection: (
     id: string,
     params: UpdateOrganizationEnterpriseConnectionParams,
   ) => Promise<EnterpriseConnectionResource | undefined>;
-  /**
-   * Toggles the `active` flag on an enterprise connection.
-   */
   setConnectionActive: (id: string, active: boolean) => Promise<EnterpriseConnectionResource | undefined>;
-  /**
-   * Permanently deletes an enterprise connection.
-   */
   deleteConnection: (id: string) => Promise<DeletedObjectResource | undefined>;
-  /**
-   * Kicks off a new identity-provider test run for an enterprise connection and
-   * resolves with the test-run URL to open.
-   */
+  /** Resolves with the test-run URL to open. */
   createTestRun: (id: string) => Promise<EnterpriseConnectionTestRunInitResource>;
 }
 
@@ -69,15 +54,10 @@ export interface UseEnterpriseConnectionMutationsParams {
 }
 
 /**
- * Returns the {@link EnterpriseConnectionMutations} surface — every
- * enterprise-connection write the flow needs, bundled into one stable, memoized
- * object of reverification-wrapped functions.
- *
- * Takes the raw mutation handles from the source enterprise-connections query
- * plus the active `organization` the create/test-run flows need, and returns a
- * stable memoized object of {@link useReverification}-wrapped functions. Each
- * returned function owns only reverification and the connection name derivation;
- * the calling UI keeps its own loading/error lifecycle.
+ * Returns the {@link EnterpriseConnectionMutations} surface: a stable, memoized
+ * object of {@link useReverification}-wrapped writes. Each function owns only
+ * reverification and the name derivation; the calling UI keeps its own
+ * loading/error lifecycle.
  */
 export const useEnterpriseConnectionMutations = ({
   organization,

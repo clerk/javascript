@@ -9,20 +9,17 @@ import { Wizard } from './elements/Wizard';
 import { ConfigureStep, ConfirmationStep, SelectProviderStep, TestConfigurationStep, VerifyDomainStep } from './steps';
 
 /**
- * The ConfigureSSO step graph the generic entry-guard `<Wizard>` derives its
- * machine from. Order is array order; each step's inline `guard` is an *entry
- * precondition* — "may navigation land here right now?" — so the furthest step
- * a contiguous run of holding guards reaches is where the wizard mounts, and
- * the breadcrumb gates jumps to the same predicate.
+ * The ConfigureSSO step graph the entry-guard `<Wizard>` derives its machine
+ * from. Each inline `guard` is an entry precondition, so the wizard mounts on
+ * the furthest step a contiguous run of holding guards reaches, and the
+ * breadcrumb gates jumps to the same predicate. `verify-domain` is the entry
+ * step (no guard); `select-provider` has no `label`, so it stays off the
+ * breadcrumb while remaining a real navigable position.
  *
- * `verify-domain` is the entry step (no guard ⇒ always reachable).
- * `select-provider` carries no `label`, so it is off the breadcrumb while still
- * a real navigable position (it replaces the old `hidden` provider step).
- *
- * Guards are intentionally monotonic across the order: a later guard holding
- * implies every earlier one does, which is what the furthest-reachable init and
- * positional back-navigation rely on. An active connection counts configure +
- * test satisfied, so a live connection short-circuits straight to confirmation.
+ * Guards are intentionally monotonic (a later guard holding implies every
+ * earlier one) — relied on by furthest-reachable init and positional back-nav.
+ * An active connection counts configure + test satisfied, short-circuiting
+ * straight to confirmation.
  */
 export const ConfigureSSOSteps = (): JSX.Element => {
   const { organizationEnterpriseConnection: c } = useConfigureSSO();

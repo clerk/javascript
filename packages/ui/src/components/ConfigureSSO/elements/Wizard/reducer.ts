@@ -1,32 +1,20 @@
 import type { WizardStepDescriptor } from './types';
 
 /**
- * The pure state a generic wizard tracks: where we are, the direction of the
- * last transition (for animation), and whether any navigation has happened.
- *
- * The engine is domain-agnostic — it knows nothing about ConfigureSSO. The step
- * graph (`descriptors`) is passed in; each descriptor carries its own inline
- * entry guard, so the reducer never needs a separate guards record.
- *
- * Navigation is *positional and sequential*: there is no visited history. PREV
- * walks one declaration slot back; the entry guard decides whether navigation
- * may land on the target.
+ * The pure state a generic, domain-agnostic wizard tracks. The step graph
+ * (`descriptors`) is passed in; each descriptor carries its own inline entry
+ * guard, so there is no separate guards record. Navigation is positional and
+ * sequential — no visited history; the entry guard decides whether navigation
+ * may land on a target.
  */
 export interface WizardState {
-  /**
-   * The id of the currently active step.
-   */
   current: string;
-  /**
-   * Direction of the last transition: `1` forward, `-1` back, `0` for jumps /
-   * initial mount. Drives enter/exit animation only.
-   */
+  /** `1` forward, `-1` back, `0` jump/initial. Drives animation only. */
   direction: 1 | -1 | 0;
   /**
-   * Latched `true` the first time any navigation event (`NEXT`/`PREV`/`GOTO`)
-   * produces a transition, and never flips back to `false`. Lets the host tell
-   * "still on the initial mount step" apart from "navigated back to it", which
-   * a positional index alone cannot.
+   * Latched `true` on the first transition, never flipped back. Separates "still
+   * on the initial mount step" from "navigated back to it" — which a positional
+   * index alone cannot.
    */
   hasNavigated: boolean;
 }
@@ -34,20 +22,17 @@ export interface WizardState {
 export type WizardEvent = { type: 'NEXT' } | { type: 'PREV' } | { type: 'GOTO'; step: string };
 
 /**
- * Everything the pure reducer needs besides its own state. Passed as an
- * argument (not closed over) so the reducer stays pure and the React seam can
- * always feed it the freshest descriptors. Guards live inline on the
- * descriptors — there is no separate guards record.
+ * Everything the pure reducer needs besides its own state. Passed as an argument
+ * (not closed over) so the reducer stays pure and the React seam can feed it the
+ * freshest descriptors.
  */
 export interface WizardConfig {
   descriptors: WizardStepDescriptor[];
 }
 
 /**
- * Resolve a step's inline entry guard: "may navigation land on this step right
- * now?". A step with no `guard` is always enterable (the entry step). Note the
- * default flips TRUE here — an omitted guard means "no precondition", not
- * "blocked".
+ * Resolve a step's inline entry guard. An omitted `guard` defaults TRUE — "no
+ * precondition" (the entry step), not "blocked".
  */
 export const guardHolds = (step: WizardStepDescriptor): boolean => (step.guard ? step.guard() : true);
 

@@ -2,48 +2,30 @@ import type { LocalizationKey } from '@/customizables';
 
 /**
  * One navigable position in a `<Wizard>`, declared as a plain config object in
- * the `steps` array passed to the primitive. The graph is the array itself —
- * there is no `React.Children` walking and no `<Wizard.Step>` component.
+ * the `steps` array. The graph IS the array — no `React.Children` walking, no
+ * `<Wizard.Step>` component. Each entry is registration only (order, guard,
+ * label/visibility) and carries NO body; rendering is declarative via
+ * `<Wizard.Match id>`.
  *
- * Each entry is *registration only* — order, entry guard, and breadcrumb
- * label/visibility. It carries NO body: rendering is declarative via
- * `<Wizard.Match id>` children, which read `current` from context and render
- * their children only when the active step matches. The reducer consumes this
- * array verbatim (no body stripping).
- *
- * A step's `guard` is an *entry precondition*: a pure predicate answering "may
- * navigation LAND on this step right now?". It is applied uniformly by init,
- * `goNext`, `goPrev`, `goToStep`, and the breadcrumb stepper. It is NOT a
- * "skip if already satisfied" flag — guards never cause a step to be skipped on
- * forward navigation; they only block landing on a step whose precondition is
- * not yet met.
+ * `guard` is an *entry precondition* ("may navigation LAND here right now?"),
+ * NOT a "skip if already satisfied" flag — it only blocks landing on a step
+ * whose precondition is unmet, never causes a step to be skipped.
  */
 export interface WizardStepConfig {
-  /**
-   * Stable identifier for the step. Used as a React key, for `goToStep(id)`,
-   * for `<Wizard.Match id>` matching, and as the step's position in the graph.
-   */
+  /** Stable id: React key, `goToStep(id)`, `<Wizard.Match id>`, graph position. */
   id: string;
-  /**
-   * Label shown in the breadcrumb at the top of the wizard. Only outermost
-   * steps need a label — inner steps reuse their parent's breadcrumb entry.
-   */
+  /** Breadcrumb label. Only outermost steps need one; inner steps reuse the parent's. */
   label?: LocalizationKey | string;
   /**
-   * Inline entry-precondition predicate: "may navigation land on this step
-   * right now?". Evaluated uniformly by init / `goNext` / `goPrev` /
-   * `goToStep` / the stepper. OMITTED ⇒ resolves TRUE (always enterable — the
-   * entry step). Guards are expected to be *monotonic* across the declared
-   * order (a later step's guard holding implies every earlier step's guard
-   * holds); the furthest-reachable init and the always-reachable predecessor
-   * both rely on that.
+   * Inline entry-precondition predicate: "may navigation land on this step right
+   * now?". Evaluated uniformly by init / `goNext` / `goPrev` / `goToStep` / the
+   * stepper. OMITTED ⇒ TRUE (always enterable — the entry step). Guards are
+   * expected to be *monotonic* across the declared order (a later guard holding
+   * implies every earlier one holds); the furthest-reachable init and the
+   * always-reachable predecessor both rely on that.
    */
   guard?: () => boolean;
-  /**
-   * Hide this step from the breadcrumb while keeping it in the navigable graph.
-   * Used for steps that are real positions but should not surface as a
-   * breadcrumb entry (e.g. provider selection).
-   */
+  /** Hide from the breadcrumb while keeping the step in the navigable graph. */
   hidden?: boolean;
 }
 
@@ -75,76 +57,40 @@ export interface WizardActiveStep {
 }
 
 export interface WizardContextValue {
-  /**
-   * The id of the currently active step.
-   */
   current: string;
-  /**
-   * The breadcrumb-facing steps: non-hidden descriptors, in declaration order.
-   * Always known synchronously — derived from the steps config before `current`
-   * is resolved.
-   */
+  /** Non-hidden descriptors in declaration order, known synchronously. */
   activeSteps: WizardActiveStep[];
-  /**
-   * The currently active step's breadcrumb descriptor, or `undefined` when the
-   * active step is hidden / out of the breadcrumb set.
-   */
+  /** `undefined` when the active step is hidden / off the breadcrumb. */
   currentStep: WizardActiveStep | undefined;
-  /**
-   * Index of `current` within `activeSteps`. `-1` if the active step is hidden
-   * or not in the breadcrumb set.
-   */
+  /** Index of `current` within `activeSteps`; `-1` if hidden/off-breadcrumb. */
   currentIndex: number;
-  /**
-   * Direction of the last transition (`1` forward, `-1` back, `0` jump/initial).
-   * Drives enter/exit animation only.
-   */
+  /** `1` forward, `-1` back, `0` jump/initial. Drives animation only. */
   direction: 1 | -1 | 0;
-  /**
-   * Convenience: `activeSteps.length`.
-   */
   totalSteps: number;
   /**
-   * `true` while the wizard still sits on the step it first mounted on and no
-   * navigation has happened yet (`NEXT`/`PREV`/`GOTO` all clear it). Lets a step
-   * tell "we landed here on the initial load" apart from "we navigated in
-   * later", without inspecting any navigation history. Used to drive
-   * load-once-then-refetch-on-entry data semantics.
+   * `true` while still on the mount step with no navigation yet — separates
+   * "landed here on initial load" from "navigated in later" without inspecting
+   * history. Drives load-once-then-refetch-on-entry data semantics.
    */
   isInitialStep: boolean;
-  /**
-   * `true` when this wizard is rendered inside another wizard. The outermost
-   * wizard owns the breadcrumb / footer chrome; nested wizards just contribute
-   * their own active step bodies.
-   */
+  /** `true` when rendered inside another wizard (parent owns the chrome). */
   isNested: boolean;
-  /**
-   * `true` when the user is at the very first position inside *this* wizard
-   * scope and there is no parent wizard to fall back on.
-   */
+  /** First position in THIS scope, with no parent to fall back on. */
   isFirstStep: boolean;
-  /**
-   * `true` when the user is at the very last position inside *this* wizard
-   * scope and there is no parent wizard to fall back on.
-   */
+  /** Last position in THIS scope, with no parent to fall back on. */
   isLastStep: boolean;
   /**
-   * Navigate forward one slot. Advances to the immediately-next step iff its
-   * entry guard holds (a sequential, one-slot move — no skip-satisfied walk). A
-   * guard-blocked mid-flow next is a hard stop. From the terminal position,
-   * falls through to the parent wizard's `goNext` (so a nested sub-flow's last
-   * step advances the parent); a no-op when there is no parent.
+   * Advance one slot iff the next step's entry guard holds (sequential, no
+   * skip-satisfied walk). A guard-blocked mid-flow next is a hard stop. From the
+   * terminal position, falls through to the parent's `goNext` (so a nested
+   * sub-flow's last step advances the parent); no-op when there is no parent.
    */
   goNext: () => void;
-  /**
-   * Navigate backward one slot positionally (no history). Advances to the
-   * immediately-previous step iff its entry guard holds. From the first
-   * position, falls through to the parent wizard's `goPrev`.
-   */
+  /** Mirror of `goNext` backward (positional, no history). */
   goPrev: () => void;
   /**
-   * Jump to a specific step by `id` iff its entry guard holds. No-op if the id
-   * is not a step, is already current, or its guard does not hold.
+   * Jump by `id` iff its entry guard holds. No-op if unknown, already current,
+   * or guard-blocked.
    */
   goToStep: (id: string) => void;
 }

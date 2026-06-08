@@ -169,8 +169,8 @@ export const ProvideEmailStep = ({ emailAddressRef, preExistingEmailIdRef }: Pro
   const { user } = useUser();
   const card = useCardState();
   const { t } = useLocalizations();
-  // Pre-fill with whatever email the parent is currently tracking so navigating back from the
-  // verify step shows the user what they previously submitted instead of an empty field.
+  // Pre-fill from the parent's tracked email so navigating back from the verify
+  // step shows what was previously submitted instead of an empty field.
   const [email, setEmail] = useState(() => emailAddressRef.current?.emailAddress ?? '');
   const createEmailAddress = useReverification((value: string) => user?.createEmailAddress({ email: value }));
 
