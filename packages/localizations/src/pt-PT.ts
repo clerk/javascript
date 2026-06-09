@@ -204,29 +204,9 @@ export const ptPT: LocalizationResource = {
       },
       warning: 'Depois de um fornecedor ser selecionado não pode ser alterado até que a configuração esteja terminada',
     },
-    verifyEmailDomainStep: {
-      title: 'Verificar endereço de e-mail',
-      subtitle: 'Verifique o endereço de e-mail no qual pretende ativar a ligação empresarial.',
-      addEmailAddress: {
-        formTitle: 'Precisamos do seu e-mail',
-        formSubtitle: 'Para começar, precisaremos do seu endereço de e-mail',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'Endereço de e-mail',
-      },
-      emailCode: {
-        formTitle: 'Verifique o seu endereço de e-mail',
-        formSubtitle: 'Introduza o código de verificação enviado para {{identifier}}',
-        resendButton: 'Não recebeu um código? Reenviar',
-        verified: {
-          title: 'Recebemos o seu e-mail',
-          subtitle: 'Verificou o seu endereço de e-mail com o seguinte e-mail',
-          inputLabel: 'Endereço de e-mail verificado',
-        },
-      },
-      domainTaken: {
-        title: 'Este domínio ({{domain}}) já possui uma ligação SSO',
-        subtitle: 'Contacte o administrador da aplicação para obter acesso através da ligação existente.',
-      },
+    verifyDomainStep: {
+      title: 'Verificar domínio',
+      subtitle: 'Especifique e verifique o domínio para configurar o SSO.',
     },
   },
   createOrganization: {

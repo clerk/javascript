@@ -202,30 +202,9 @@ export const itIT: LocalizationResource = {
       },
       warning: 'Una volta selezionato un provider non potrai cambiarlo fino al termine della configurazione',
     },
-    verifyEmailDomainStep: {
-      title: 'Verifica indirizzo email',
-      subtitle: "Verifica l'indirizzo email su cui vuoi abilitare la connessione aziendale.",
-      addEmailAddress: {
-        formTitle: 'Abbiamo bisogno della tua email',
-        formSubtitle: 'Per iniziare avremo bisogno del tuo indirizzo email',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'Indirizzo email',
-      },
-      emailCode: {
-        formTitle: 'Verifica il tuo indirizzo email',
-        formSubtitle: 'Inserisci il codice di verifica inviato a {{identifier}}',
-        resendButton: 'Non hai ricevuto il codice? Invia di nuovo',
-        verified: {
-          title: 'Abbiamo ricevuto la tua email',
-          subtitle: 'Hai verificato il tuo indirizzo email con la seguente email',
-          inputLabel: 'Indirizzo email verificato',
-        },
-      },
-      domainTaken: {
-        title: 'Questo dominio ({{domain}}) ha già una connessione SSO',
-        subtitle:
-          "Contatta l'amministratore dell'applicazione per ottenere l'accesso tramite la connessione esistente.",
-      },
+    verifyDomainStep: {
+      title: 'Verifica dominio',
+      subtitle: "Specifica e verifica il dominio per cui configurare l'SSO.",
     },
   },
   createOrganization: {

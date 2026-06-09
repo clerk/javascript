@@ -203,29 +203,9 @@ export const ptBR: LocalizationResource = {
       warning:
         'Depois que um provedor for selecionado, você não poderá alterá-lo até que a configuração seja concluída',
     },
-    verifyEmailDomainStep: {
-      title: 'Verificar endereço de e-mail',
-      subtitle: 'Verifique o endereço de e-mail no qual deseja habilitar a conexão empresarial.',
-      addEmailAddress: {
-        formTitle: 'Precisamos do seu e-mail',
-        formSubtitle: 'Para começar, precisaremos do seu endereço de e-mail',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'Endereço de e-mail',
-      },
-      emailCode: {
-        formTitle: 'Verifique seu endereço de e-mail',
-        formSubtitle: 'Digite o código de verificação enviado para {{identifier}}',
-        resendButton: 'Não recebeu um código? Reenviar',
-        verified: {
-          title: 'Recebemos seu e-mail',
-          subtitle: 'Você verificou seu endereço de e-mail com o seguinte e-mail',
-          inputLabel: 'Endereço de e-mail verificado',
-        },
-      },
-      domainTaken: {
-        title: 'Este domínio ({{domain}}) já possui uma conexão SSO',
-        subtitle: 'Entre em contato com o administrador da aplicação para obter acesso por meio da conexão existente.',
-      },
+    verifyDomainStep: {
+      title: 'Verificar domínio',
+      subtitle: 'Especifique e verifique o domínio para configurar o SSO.',
     },
   },
   createOrganization: {

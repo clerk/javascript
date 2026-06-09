@@ -196,29 +196,9 @@ export const arSA: LocalizationResource = {
       },
       warning: 'بمجرد اختيار المزود لا يمكنك التغيير مرة أخرى حتى انتهاء التكوين',
     },
-    verifyEmailDomainStep: {
-      title: 'التحقق من البريد الإلكتروني',
-      subtitle: 'تحقق من عنوان البريد الإلكتروني الذي تريد تفعيل اتصال المؤسسة عليه.',
-      addEmailAddress: {
-        formTitle: 'نحتاج إلى بريدك الإلكتروني',
-        formSubtitle: 'للبدء، نحتاج إلى عنوان بريدك الإلكتروني',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'عنوان البريد الإلكتروني',
-      },
-      emailCode: {
-        formTitle: 'تحقق من عنوان بريدك الإلكتروني',
-        formSubtitle: 'أدخل رمز التحقق المرسل إلى {{identifier}}',
-        resendButton: 'لم تتلقَّ الرمز؟ إعادة الإرسال',
-        verified: {
-          title: 'لقد تلقينا بريدك الإلكتروني',
-          subtitle: 'لقد تحققت من عنوان بريدك الإلكتروني التالي',
-          inputLabel: 'عنوان البريد الإلكتروني الذي تم التحقق منه',
-        },
-      },
-      domainTaken: {
-        title: 'هذا النطاق ({{domain}}) لديه بالفعل اتصال SSO',
-        subtitle: 'تواصل مع مسؤول التطبيق للحصول على الوصول من خلال الاتصال الحالي.',
-      },
+    verifyDomainStep: {
+      title: 'التحقق من النطاق',
+      subtitle: 'حدد النطاق وتحقق منه لإعداد الدخول الموحّد (SSO).',
     },
   },
   createOrganization: {

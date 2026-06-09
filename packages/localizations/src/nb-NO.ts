@@ -225,29 +225,9 @@ export const nbNO: LocalizationResource = {
       },
       warning: 'Når en leverandør er valgt, kan du ikke endre igjen før konfigurasjonen er ferdig',
     },
-    verifyEmailDomainStep: {
-      title: 'Verifiser e-postadresse',
-      subtitle: 'Verifiser e-postadressen du vil aktivere virksomhetstilkoblingen på.',
-      addEmailAddress: {
-        formTitle: 'Vi trenger e-posten din',
-        formSubtitle: 'For å starte trenger vi e-postadressen din',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'E-postadresse',
-      },
-      emailCode: {
-        formTitle: 'Verifiser e-postadressen din',
-        formSubtitle: 'Skriv inn verifiseringskoden som ble sendt til {{identifier}}',
-        resendButton: 'Mottok du ingen kode? Send på nytt',
-        verified: {
-          title: 'Vi mottok e-posten din',
-          subtitle: 'Du har verifisert e-postadressen din med følgende e-post',
-          inputLabel: 'Verifisert e-postadresse',
-        },
-      },
-      domainTaken: {
-        title: 'Dette domenet ({{domain}}) har allerede en SSO-tilkobling',
-        subtitle: 'Kontakt programmets administrator for å få tilgang via den eksisterende tilkoblingen.',
-      },
+    verifyDomainStep: {
+      title: 'Verifiser domene',
+      subtitle: 'Angi og verifiser domenet du vil konfigurere SSO for.',
     },
   },
   createOrganization: {

@@ -202,29 +202,9 @@ export const zhTW: LocalizationResource = {
       },
       warning: '選擇提供者後,在設定完成之前無法再次變更',
     },
-    verifyEmailDomainStep: {
-      title: '驗證電子郵件地址',
-      subtitle: '驗證您想要啟用企業連線的電子郵件地址。',
-      addEmailAddress: {
-        formTitle: '我們需要您的電子郵件',
-        formSubtitle: '為了開始，我們需要您的電子郵件地址',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: '電子郵件地址',
-      },
-      emailCode: {
-        formTitle: '驗證您的電子郵件地址',
-        formSubtitle: '輸入發送到 {{identifier}} 的驗證碼',
-        resendButton: '沒有收到驗證碼？重新發送',
-        verified: {
-          title: '我們已收到您的電子郵件',
-          subtitle: '您已使用以下電子郵件驗證了您的電子郵件地址',
-          inputLabel: '已驗證的電子郵件地址',
-        },
-      },
-      domainTaken: {
-        title: '此網域 ({{domain}}) 已存在 SSO 連線',
-        subtitle: '請聯絡應用程式管理員，透過現有連線取得存取權限。',
-      },
+    verifyDomainStep: {
+      title: '驗證網域',
+      subtitle: '指定並驗證要設定 SSO 的網域。',
     },
   },
   createOrganization: {

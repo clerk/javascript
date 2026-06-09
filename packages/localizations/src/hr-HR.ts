@@ -225,29 +225,9 @@ export const hrHR: LocalizationResource = {
       },
       warning: 'Nakon odabira pružatelja ne možete ga ponovno mijenjati dok konfiguracija ne završi',
     },
-    verifyEmailDomainStep: {
-      title: 'Potvrdi e-mail adresu',
-      subtitle: 'Potvrdite e-mail adresu na kojoj želite omogućiti poslovnu vezu.',
-      addEmailAddress: {
-        formTitle: 'Treba nam vaš e-mail',
-        formSubtitle: 'Za početak ćemo trebati vašu e-mail adresu',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'E-mail adresa',
-      },
-      emailCode: {
-        formTitle: 'Potvrdite svoju e-mail adresu',
-        formSubtitle: 'Unesite verifikacijski kod poslan na {{identifier}}',
-        resendButton: 'Niste primili kod? Pošalji ponovno',
-        verified: {
-          title: 'Primili smo vaš e-mail',
-          subtitle: 'Potvrdili ste svoju e-mail adresu sljedećim e-mailom',
-          inputLabel: 'Potvrđena e-mail adresa',
-        },
-      },
-      domainTaken: {
-        title: 'Ova domena ({{domain}}) već ima SSO vezu',
-        subtitle: 'Kontaktirajte administratora aplikacije kako biste dobili pristup putem postojeće veze.',
-      },
+    verifyDomainStep: {
+      title: 'Potvrdi domenu',
+      subtitle: 'Navedite i potvrdite domenu za koju želite konfigurirati SSO.',
     },
   },
   createOrganization: {

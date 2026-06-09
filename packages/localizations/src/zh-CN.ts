@@ -196,29 +196,9 @@ export const zhCN: LocalizationResource = {
       },
       warning: '选择提供商后,在配置完成之前无法再次更改',
     },
-    verifyEmailDomainStep: {
-      title: '验证电子邮件地址',
-      subtitle: '验证您想要启用企业连接的电子邮件地址。',
-      addEmailAddress: {
-        formTitle: '我们需要您的电子邮件',
-        formSubtitle: '为了开始，我们需要您的电子邮件地址',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: '电子邮件地址',
-      },
-      emailCode: {
-        formTitle: '验证您的电子邮件地址',
-        formSubtitle: '输入发送到 {{identifier}} 的验证码',
-        resendButton: '没有收到验证码？重新发送',
-        verified: {
-          title: '我们已收到您的电子邮件',
-          subtitle: '您已使用以下电子邮件验证了您的电子邮件地址',
-          inputLabel: '已验证的电子邮件地址',
-        },
-      },
-      domainTaken: {
-        title: '此域名 ({{domain}}) 已存在 SSO 连接',
-        subtitle: '请联系应用程序管理员，通过现有连接获取访问权限。',
-      },
+    verifyDomainStep: {
+      title: '验证域名',
+      subtitle: '指定并验证要配置 SSO 的域名。',
     },
   },
   createOrganization: {

@@ -196,30 +196,9 @@ export const nlNL: LocalizationResource = {
       },
       warning: 'Zodra een provider is geselecteerd, kun je deze niet meer wijzigen totdat de configuratie is voltooid',
     },
-    verifyEmailDomainStep: {
-      title: 'E-mailadres verifiëren',
-      subtitle: 'Verifieer het e-mailadres waarop je de enterprise-verbinding wilt inschakelen.',
-      addEmailAddress: {
-        formTitle: 'We hebben je e-mail nodig',
-        formSubtitle: 'Om te beginnen hebben we je e-mailadres nodig',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'E-mailadres',
-      },
-      emailCode: {
-        formTitle: 'Verifieer je e-mailadres',
-        formSubtitle: 'Voer de verificatiecode in die is verzonden naar {{identifier}}',
-        resendButton: 'Geen code ontvangen? Opnieuw verzenden',
-        verified: {
-          title: 'We hebben je e-mail ontvangen',
-          subtitle: 'Je hebt je e-mailadres geverifieerd met de volgende e-mail',
-          inputLabel: 'Geverifieerd e-mailadres',
-        },
-      },
-      domainTaken: {
-        title: 'Dit domein ({{domain}}) heeft al een SSO-verbinding',
-        subtitle:
-          'Neem contact op met de beheerder van de applicatie om toegang te krijgen via de bestaande verbinding.',
-      },
+    verifyDomainStep: {
+      title: 'Domein verifiëren',
+      subtitle: 'Geef het domein op en verifieer het om SSO te configureren.',
     },
   },
   createOrganization: {

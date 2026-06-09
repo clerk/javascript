@@ -203,29 +203,9 @@ export const koKR: LocalizationResource = {
       },
       warning: '공급자를 선택하면 구성이 완료될 때까지 다시 변경할 수 없습니다',
     },
-    verifyEmailDomainStep: {
-      title: '이메일 주소 확인',
-      subtitle: '엔터프라이즈 연결을 활성화하려는 이메일 주소를 확인하세요.',
-      addEmailAddress: {
-        formTitle: '이메일이 필요합니다',
-        formSubtitle: '시작하려면 이메일 주소가 필요합니다',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: '이메일 주소',
-      },
-      emailCode: {
-        formTitle: '이메일 주소를 확인하세요',
-        formSubtitle: '{{identifier}}(으)로 전송된 인증 코드를 입력하세요',
-        resendButton: '코드를 받지 못하셨나요? 다시 보내기',
-        verified: {
-          title: '이메일을 받았습니다',
-          subtitle: '다음 이메일로 이메일 주소를 확인했습니다',
-          inputLabel: '확인된 이메일 주소',
-        },
-      },
-      domainTaken: {
-        title: '이 도메인 ({{domain}}) 에는 이미 SSO 연결이 있습니다',
-        subtitle: '기존 연결을 통해 접근 권한을 받으려면 애플리케이션 관리자에게 문의하세요.',
-      },
+    verifyDomainStep: {
+      title: '도메인 확인',
+      subtitle: 'SSO를 구성할 도메인을 지정하고 확인하세요.',
     },
   },
   createOrganization: {

@@ -197,29 +197,9 @@ export const bgBG: LocalizationResource = {
       },
       warning: 'След като изберете доставчик, не можете да го промените, докато конфигурацията не приключи',
     },
-    verifyEmailDomainStep: {
-      title: 'Потвърди имейл адреса',
-      subtitle: 'Потвърдете имейл адреса, на който искате да активирате корпоративната връзка.',
-      addEmailAddress: {
-        formTitle: 'Нуждаем се от вашия имейл',
-        formSubtitle: 'За да започнем, ще ни е необходим вашият имейл адрес',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'Имейл адрес',
-      },
-      emailCode: {
-        formTitle: 'Потвърдете имейл адреса си',
-        formSubtitle: 'Въведете кода за потвърждение, изпратен на {{identifier}}',
-        resendButton: 'Не получихте код? Изпрати отново',
-        verified: {
-          title: 'Получихме имейла ви',
-          subtitle: 'Потвърдихте имейл адреса си със следния имейл',
-          inputLabel: 'Потвърден имейл адрес',
-        },
-      },
-      domainTaken: {
-        title: 'Този домейн ({{domain}}) вече има SSO връзка',
-        subtitle: 'Свържете се с администратора на приложението, за да получите достъп чрез съществуващата връзка.',
-      },
+    verifyDomainStep: {
+      title: 'Потвърди домейна',
+      subtitle: 'Посочете и потвърдете домейна, за който да конфигурирате SSO.',
     },
   },
   createOrganization: {

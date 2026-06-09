@@ -225,29 +225,9 @@ export const huHU: LocalizationResource = {
       },
       warning: 'Miután kiválasztotta a szolgáltatót, nem módosíthatja, amíg a konfiguráció be nem fejeződik',
     },
-    verifyEmailDomainStep: {
-      title: 'E-mail-cím megerősítése',
-      subtitle: 'Erősítse meg azt az e-mail-címet, amelyen engedélyezni szeretné a vállalati kapcsolatot.',
-      addEmailAddress: {
-        formTitle: 'Szükségünk van az e-mail-címére',
-        formSubtitle: 'A kezdéshez szükségünk lesz az e-mail-címére',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'E-mail-cím',
-      },
-      emailCode: {
-        formTitle: 'Erősítse meg az e-mail-címét',
-        formSubtitle: 'Adja meg a {{identifier}} címre küldött ellenőrző kódot',
-        resendButton: 'Nem kapott kódot? Küldés újra',
-        verified: {
-          title: 'Megkaptuk az e-mailjét',
-          subtitle: 'Megerősítette az e-mail-címét az alábbi e-maillel',
-          inputLabel: 'Megerősített e-mail-cím',
-        },
-      },
-      domainTaken: {
-        title: 'Ez a domain ({{domain}}) már rendelkezik SSO-kapcsolattal',
-        subtitle: 'A meglévő kapcsolaton keresztüli hozzáférés érdekében forduljon az alkalmazás rendszergazdájához.',
-      },
+    verifyDomainStep: {
+      title: 'Tartomány megerősítése',
+      subtitle: 'Adja meg és erősítse meg a tartományt, amelyhez az SSO-t szeretné beállítani.',
     },
   },
   createOrganization: {

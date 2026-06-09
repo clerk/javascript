@@ -200,29 +200,9 @@ export const thTH: LocalizationResource = {
       },
       warning: 'เมื่อเลือกผู้ให้บริการแล้วคุณไม่สามารถเปลี่ยนได้อีกจนกว่าการกำหนดค่าจะเสร็จสิ้น',
     },
-    verifyEmailDomainStep: {
-      title: 'ยืนยันที่อยู่อีเมล',
-      subtitle: 'ยืนยันที่อยู่อีเมลที่คุณต้องการเปิดใช้งานการเชื่อมต่อองค์กร',
-      addEmailAddress: {
-        formTitle: 'เราต้องการอีเมลของคุณ',
-        formSubtitle: 'เพื่อเริ่มต้น เราต้องการที่อยู่อีเมลของคุณ',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'ที่อยู่อีเมล',
-      },
-      emailCode: {
-        formTitle: 'ยืนยันที่อยู่อีเมลของคุณ',
-        formSubtitle: 'ป้อนรหัสยืนยันที่ส่งไปยัง {{identifier}}',
-        resendButton: 'ไม่ได้รับรหัส? ส่งใหม่',
-        verified: {
-          title: 'เราได้รับอีเมลของคุณแล้ว',
-          subtitle: 'คุณได้ยืนยันที่อยู่อีเมลของคุณด้วยอีเมลต่อไปนี้',
-          inputLabel: 'ที่อยู่อีเมลที่ยืนยันแล้ว',
-        },
-      },
-      domainTaken: {
-        title: 'โดเมนนี้ ({{domain}}) มีการเชื่อมต่อ SSO อยู่แล้ว',
-        subtitle: 'ติดต่อผู้ดูแลระบบของแอปพลิเคชันเพื่อขอเข้าถึงผ่านการเชื่อมต่อที่มีอยู่',
-      },
+    verifyDomainStep: {
+      title: 'ยืนยันโดเมน',
+      subtitle: 'ระบุและยืนยันโดเมนที่ต้องการกำหนดค่า SSO',
     },
   },
   createOrganization: {

@@ -224,30 +224,9 @@ export const fiFI: LocalizationResource = {
       },
       warning: 'Kun palveluntarjoaja on valittu, et voi vaihtaa sitä ennen kuin määritys on valmis',
     },
-    verifyEmailDomainStep: {
-      title: 'Vahvista sähköpostiosoite',
-      subtitle: 'Vahvista sähköpostiosoite, jolle haluat ottaa yritysyhteyden käyttöön.',
-      addEmailAddress: {
-        formTitle: 'Tarvitsemme sähköpostiosi',
-        formSubtitle: 'Aloittaaksemme tarvitsemme sähköpostiosoitteesi',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'Sähköpostiosoite',
-      },
-      emailCode: {
-        formTitle: 'Vahvista sähköpostiosoitteesi',
-        formSubtitle: 'Anna vahvistuskoodi, joka lähetettiin osoitteeseen {{identifier}}',
-        resendButton: 'Etkö saanut koodia? Lähetä uudelleen',
-        verified: {
-          title: 'Saimme sähköpostisi',
-          subtitle: 'Olet vahvistanut sähköpostiosoitteesi seuraavalla sähköpostilla',
-          inputLabel: 'Vahvistettu sähköpostiosoite',
-        },
-      },
-      domainTaken: {
-        title: 'Tällä verkkotunnuksella ({{domain}}) on jo SSO-yhteys',
-        subtitle:
-          'Ota yhteyttä sovelluksen järjestelmänvalvojaan saadaksesi käyttöoikeudet olemassa olevan yhteyden kautta.',
-      },
+    verifyDomainStep: {
+      title: 'Vahvista verkkotunnus',
+      subtitle: 'Määritä ja vahvista verkkotunnus, jolle SSO määritetään.',
     },
   },
   createOrganization: {

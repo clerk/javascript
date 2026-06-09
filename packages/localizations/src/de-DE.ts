@@ -203,30 +203,9 @@ export const deDE: LocalizationResource = {
       warning:
         'Sobald ein Anbieter ausgewählt ist, können Sie ihn nicht mehr ändern, bis die Konfiguration abgeschlossen ist',
     },
-    verifyEmailDomainStep: {
-      title: 'E-Mail-Adresse verifizieren',
-      subtitle: 'Verifizieren Sie die E-Mail-Adresse, für die Sie die Unternehmensverbindung aktivieren möchten.',
-      addEmailAddress: {
-        formTitle: 'Wir benötigen Ihre E-Mail',
-        formSubtitle: 'Um zu beginnen, benötigen wir Ihre E-Mail-Adresse',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'E-Mail-Adresse',
-      },
-      emailCode: {
-        formTitle: 'Verifizieren Sie Ihre E-Mail-Adresse',
-        formSubtitle: 'Geben Sie den an {{identifier}} gesendeten Verifizierungscode ein',
-        resendButton: 'Keinen Code erhalten? Erneut senden',
-        verified: {
-          title: 'Wir haben Ihre E-Mail erhalten',
-          subtitle: 'Sie haben Ihre E-Mail-Adresse mit der folgenden E-Mail verifiziert',
-          inputLabel: 'Verifizierte E-Mail-Adresse',
-        },
-      },
-      domainTaken: {
-        title: 'Diese Domain ({{domain}}) hat bereits eine SSO-Verbindung',
-        subtitle:
-          'Wenden Sie sich an den Administrator der Anwendung, um über die bestehende Verbindung Zugriff zu erhalten.',
-      },
+    verifyDomainStep: {
+      title: 'Domain verifizieren',
+      subtitle: 'Geben Sie die Domain an und verifizieren Sie sie, um SSO zu konfigurieren.',
     },
   },
   createOrganization: {

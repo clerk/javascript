@@ -207,29 +207,9 @@ export const jaJP: LocalizationResource = {
       },
       warning: 'プロバイダーを選択すると、設定が完了するまで変更できません',
     },
-    verifyEmailDomainStep: {
-      title: 'メールアドレスを確認',
-      subtitle: 'エンタープライズ接続を有効にしたいメールアドレスを確認します。',
-      addEmailAddress: {
-        formTitle: 'メールアドレスが必要です',
-        formSubtitle: '開始するにはメールアドレスが必要です',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'メールアドレス',
-      },
-      emailCode: {
-        formTitle: 'メールアドレスを確認',
-        formSubtitle: '{{identifier}} に送信された確認コードを入力してください',
-        resendButton: 'コードを受け取っていませんか？再送信',
-        verified: {
-          title: 'メールを受け取りました',
-          subtitle: '次のメールでメールアドレスを確認しました',
-          inputLabel: '確認済みメールアドレス',
-        },
-      },
-      domainTaken: {
-        title: 'このドメイン ({{domain}}) にはすでに SSO 接続が存在します',
-        subtitle: '既存の接続を通じてアクセスを取得するには、アプリケーションの管理者にお問い合わせください。',
-      },
+    verifyDomainStep: {
+      title: 'ドメインを確認',
+      subtitle: 'SSO を設定するドメインを指定して確認します。',
     },
   },
   createOrganization: {

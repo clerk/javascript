@@ -269,29 +269,9 @@ export const enUS: LocalizationResource = {
       },
       warning: 'Once a provider is selected you cannot change again until the configuration is over',
     },
-    verifyEmailDomainStep: {
-      title: 'Verify email address',
-      subtitle: 'Verify the domain you want to enable the enterprise connection on.',
-      addEmailAddress: {
-        formTitle: 'We need your email',
-        formSubtitle: 'In order to start we will need your email address',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'Email address',
-      },
-      emailCode: {
-        formTitle: 'Verify your email address',
-        formSubtitle: 'Enter the verification code sent to {{identifier}}',
-        resendButton: "Didn't receive a code? Resend",
-        verified: {
-          title: 'We got your email',
-          subtitle: "You've verified your email address with the following email",
-          inputLabel: 'Verified email address',
-        },
-      },
-      domainTaken: {
-        title: 'This domain ({{domain}}) already has an SSO connection',
-        subtitle: "Contact the application's administrator to get access through the existing connection.",
-      },
+    verifyDomainStep: {
+      title: 'Verify domain',
+      subtitle: 'Specify and verify the domain to configure SSO for.',
     },
     testConfigurationStep: {
       title: 'Test your SSO connection',
