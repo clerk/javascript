@@ -64,7 +64,7 @@ export function mergeProps(a: Record<string, unknown>, b: Record<string, unknown
       };
     } else if (key === 'style' && a.style && bVal) {
       merged.style = { ...(a.style as object), ...(bVal as object) };
-    } else if (key === 'className' && a.className && bVal) {
+    } else if (key === 'className' && typeof a.className === 'string' && typeof bVal === 'string') {
       merged.className = `${a.className} ${bVal}`;
     } else {
       merged[key] = bVal;
