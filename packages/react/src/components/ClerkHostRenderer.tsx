@@ -75,17 +75,18 @@ export class ClerkHostRenderer extends React.PureComponent<
     // Remove children and customPages from props before comparing
     // children might hold circular references which deepEqual can't handle
     // and the implementation of customPages relies on props getting new references
-    const prevProps = without(_prevProps.props, 'customPages', 'customMenuItems', 'children');
-    const newProps = without(this.props.props, 'customPages', 'customMenuItems', 'children');
+    const prevProps = without(_prevProps.props || {}, 'customPages', 'customMenuItems', 'children');
+    const newProps = without(this.props.props || {}, 'customPages', 'customMenuItems', 'children');
 
     // instead, we simply use the length of customPages to determine if it changed or not
-    const customPagesChanged = prevProps.customPages?.length !== newProps.customPages?.length;
-    const customMenuItemsChanged = prevProps.customMenuItems?.length !== newProps.customMenuItems?.length;
+    const customPagesChanged = _prevProps.props?.customPages?.length !== this.props.props?.customPages?.length;
+    const customMenuItemsChanged =
+      _prevProps.props?.customMenuItems?.length !== this.props.props?.customMenuItems?.length;
 
     // Strip out mountIcon and unmountIcon handlers since they're always generated as new function references,
     // which would cause unnecessary re-renders in deep equality checks
-    const prevMenuItemsWithoutHandlers = stripMenuItemIconHandlers(_prevProps.props.customMenuItems);
-    const newMenuItemsWithoutHandlers = stripMenuItemIconHandlers(this.props.props.customMenuItems);
+    const prevMenuItemsWithoutHandlers = stripMenuItemIconHandlers(_prevProps.props?.customMenuItems);
+    const newMenuItemsWithoutHandlers = stripMenuItemIconHandlers(this.props.props?.customMenuItems);
 
     if (
       !isDeeplyEqual(prevProps, newProps) ||
