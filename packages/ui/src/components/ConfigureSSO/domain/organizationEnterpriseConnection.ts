@@ -1,6 +1,20 @@
-import type { EmailAddressResource, EnterpriseConnectionResource } from '@clerk/shared/types';
+import type { EmailAddressResource, EnterpriseConnectionResource, UserResource } from '@clerk/shared/types';
 
 import type { ProviderType } from '../types';
+
+/**
+ * The email whose domain backs the connection: the user's primary address if
+ * present, otherwise the first address they have not yet verified (the one they
+ * are working through). The single source of this rule — the domain entity, the
+ * reachability guards, and the verify-domain step all read it from here, so they
+ * can never drift. Pure: a plain function over the user resource, no React.
+ *
+ * The two branches converge today because FAPI promotes the first verified
+ * address to primary; keeping the rule in one place means any future divergence
+ * stays consistent across every call site.
+ */
+export const connectionBackingEmail = (user: UserResource | null | undefined): EmailAddressResource | undefined =>
+  user?.primaryEmailAddress ?? user?.emailAddresses?.find(e => e.verification.status !== 'verified');
 
 /**
  * The inputs {@link organizationEnterpriseConnection} composes. Every field is a

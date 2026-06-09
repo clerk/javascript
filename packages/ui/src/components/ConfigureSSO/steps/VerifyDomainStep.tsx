@@ -19,6 +19,7 @@ import { Form } from '@/elements/Form';
 import { DuotoneAtSymbol } from '@/icons';
 import { handleError } from '@/utils/errorHandler';
 
+import { connectionBackingEmail } from '../domain/organizationEnterpriseConnection';
 import { Step } from '../elements/Step';
 import { useWizard, Wizard, type WizardStepConfig } from '../elements/Wizard';
 import { InnerStepCounter } from '../elements/Wizard/InnerStepCounter';
@@ -77,8 +78,7 @@ export const VerifyDomainStep = (): JSX.Element => {
   // directly via `completeStep`.
   const { goNext: completeStep } = useWizard();
 
-  const emailToVerify =
-    user?.primaryEmailAddress ?? user?.emailAddresses?.find(e => e.verification.status !== 'verified');
+  const emailToVerify = connectionBackingEmail(user);
   const isVerified = emailToVerify?.verification.status === 'verified';
 
   const wasVerifiedOnMountRef = useRef(isVerified);

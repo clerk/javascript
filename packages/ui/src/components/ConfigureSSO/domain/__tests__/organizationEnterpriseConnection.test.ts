@@ -2,10 +2,12 @@ import type {
   EmailAddressResource,
   EnterpriseConnectionResource,
   SamlAccountConnectionResource,
+  UserResource,
 } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
 import {
+  connectionBackingEmail,
   isEnterpriseConnectionConfigured,
   organizationEnterpriseConnection,
 } from '../organizationEnterpriseConnection';
@@ -196,5 +198,37 @@ describe('isEnterpriseConnectionConfigured', () => {
   it('matches the derived `hasMinimumConfiguration` field', () => {
     const connection = makeConnection({ samlConnection: fullyConfiguredSaml });
     expect(isEnterpriseConnectionConfigured(connection)).toBe(derive({ connection }).hasMinimumConfiguration);
+  });
+});
+
+describe('connectionBackingEmail', () => {
+  const email = (id: string, status: 'verified' | 'unverified'): EmailAddressResource =>
+    ({ id, emailAddress: `${id}@acme.com`, verification: { status } }) as EmailAddressResource;
+
+  const makeUser = (overrides: Partial<UserResource>): UserResource => overrides as UserResource;
+
+  it('returns the primary email when one is present', () => {
+    const primary = email('primary', 'verified');
+    const unverified = email('other', 'unverified');
+    const user = makeUser({ primaryEmailAddress: primary, emailAddresses: [primary, unverified] });
+    expect(connectionBackingEmail(user)).toBe(primary);
+  });
+
+  it('falls back to the first unverified address when there is no primary', () => {
+    const unverified = email('pending', 'unverified');
+    const verified = email('done', 'verified');
+    const user = makeUser({ primaryEmailAddress: null, emailAddresses: [verified, unverified] });
+    expect(connectionBackingEmail(user)).toBe(unverified);
+  });
+
+  it('returns undefined when there is no primary and every address is verified', () => {
+    const verified = email('done', 'verified');
+    const user = makeUser({ primaryEmailAddress: null, emailAddresses: [verified] });
+    expect(connectionBackingEmail(user)).toBeUndefined();
+  });
+
+  it('returns undefined for a null or undefined user', () => {
+    expect(connectionBackingEmail(null)).toBeUndefined();
+    expect(connectionBackingEmail(undefined)).toBeUndefined();
   });
 });
