@@ -5,6 +5,8 @@ import { TOKEN_CACHE_CHANNELS } from '../../shared/ipc';
 import type { TokenStorage } from '../../shared/types';
 import { setupTokenCacheIpcHandlers } from '../ipc-handlers';
 
+const ipcEvent = {} as Electron.IpcMainInvokeEvent;
+
 vi.mock('electron', () => ({
   ipcMain: {
     handle: vi.fn(),
@@ -40,9 +42,9 @@ describe('setupTokenCacheIpcHandlers', () => {
     const saveTokenHandler = vi.mocked(ipcMain.handle).mock.calls[1][1];
     const clearTokenHandler = vi.mocked(ipcMain.handle).mock.calls[2][1];
 
-    await expect(getTokenHandler({} as any, 'token-key')).resolves.toBe('jwt');
-    await saveTokenHandler({} as any, 'token-key', 'jwt');
-    await clearTokenHandler({} as any, 'token-key');
+    await expect(getTokenHandler(ipcEvent, 'token-key')).resolves.toBe('jwt');
+    await saveTokenHandler(ipcEvent, 'token-key', 'jwt');
+    await clearTokenHandler(ipcEvent, 'token-key');
 
     expect(storage.getItem).toHaveBeenCalledWith('token-key');
     expect(storage.setItem).toHaveBeenCalledWith('token-key', 'jwt');
