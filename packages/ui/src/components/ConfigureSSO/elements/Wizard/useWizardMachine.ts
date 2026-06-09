@@ -33,7 +33,11 @@ interface UseWizardMachineArgs {
  * live state and reduces against the current config at dispatch time.
  *
  * Navigation is sequential and entry-guard-gated: `goNext`/`goPrev` advances one
- * slot iff the target's guard holds; a guard-blocked mid-flow nav is a HARD STOP
+ * slot when the target's guard holds. A guard-blocked mid-flow `goNext` does NOT
+ * hard-stop — it DEFERS: the call parks a pending forward advance (see
+ * `pendingNextFrom`) that the render-phase resolver completes once the next
+ * guard becomes satisfied while still on this step (an explicit `goPrev`/
+ * `goToStep` abandons it). A guard-blocked mid-flow `goPrev` is still a HARD STOP
  * (true no-op, never a bubble). Bubbling to `parentWizard` happens ONLY from a
  * scope boundary — terminal position for `goNext`, first for `goPrev` — which is
  * how a nested sub-flow's last step advances the parent. A top-level wizard

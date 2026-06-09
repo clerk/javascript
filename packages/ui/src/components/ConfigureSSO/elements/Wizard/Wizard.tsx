@@ -27,7 +27,9 @@ interface WizardProps {
  * each step's inline `guard` (applied uniformly by init / nav / stepper); steps
  * are never added or removed, only gated. Inner sub-flows nest another `<Wizard>`
  * whose forward boundary falls through to the parent (a nested last-step `goNext`
- * advances the parent; a guard-blocked mid-flow next is a hard stop).
+ * advances the parent). A guard-blocked mid-flow `goNext` does not hard-stop: it
+ * parks a deferred advance that resolves once the next guard becomes satisfied
+ * while still on the step (abandoned by an explicit `goPrev`/`goToStep`).
  */
 const WizardRoot = ({ steps, initialStepId, children }: WizardProps): JSX.Element => {
   const parentWizard = React.useContext(WizardContext);

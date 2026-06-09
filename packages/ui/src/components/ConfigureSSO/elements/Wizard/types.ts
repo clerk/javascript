@@ -80,10 +80,18 @@ export interface WizardContextValue {
   /** Last position in THIS scope, with no parent to fall back on. */
   isLastStep: boolean;
   /**
-   * Advance one slot iff the next step's entry guard holds (sequential, no
-   * skip-satisfied walk). A guard-blocked mid-flow next is a hard stop. From the
-   * terminal position, falls through to the parent's `goNext` (so a nested
+   * Advance one slot when the next step's entry guard holds (sequential, no
+   * skip-satisfied walk) — immediately if it already holds, otherwise as soon as
+   * it becomes satisfied while still on this step (a deferred advance: the call
+   * parks a pending forward move that resolves on a later render once the guard
+   * holds). An explicit `goPrev`/`goToStep` abandons that pending advance. From
+   * the terminal position, falls through to the parent's `goNext` (so a nested
    * sub-flow's last step advances the parent); no-op when there is no parent.
+   *
+   * Call-site rule: only call `goNext` after the action that satisfies the next
+   * guard (submit-then-advance), or pre-check the condition first. Calling it on
+   * an ungated click parks a deferred advance that fires later without a user
+   * gesture once the guard happens to hold.
    */
   goNext: () => void;
   /** Mirror of `goNext` backward (positional, no history). */
