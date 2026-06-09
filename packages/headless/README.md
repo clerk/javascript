@@ -47,7 +47,7 @@ All primitives follow the same compound component pattern. They emit zero styles
 
 ## Architecture
 
-- **Compound components** via `Object.assign` — each primitive is a single export with dot-accessed parts (`Select.Trigger`, `Select.Popup`, etc.)
+- **Compound components** — each primitive exports a namespace (e.g. `Select.Trigger`, `Select.Popup`) backed by per-part files so unused parts tree-shake out
 - **`renderElement`** — every part uses this instead of returning JSX directly, enabling consumer `render` prop overrides and automatic state-to-data-attribute mapping
 - **`data-cl-*` attributes** — structural (`data-cl-slot`), state (`data-cl-open`, `data-cl-selected`, `data-cl-active`), and animation lifecycle (`data-cl-starting-style`, `data-cl-ending-style`)
 - **CSS-driven animations** — the transition system uses `data-cl-*` attributes and the Web Animations API (`getAnimations().finished`) so all timing lives in CSS
