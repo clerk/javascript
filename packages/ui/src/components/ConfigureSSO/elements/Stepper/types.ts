@@ -1,7 +1,7 @@
 import type React from 'react';
 
 export interface StepperItemProps {
-  /** Replaced by a check icon when `isCompleted && !isCurrent`. */
+  /** The number shown in the bullet */
   bullet: number;
   isCurrent?: boolean;
   isCompleted?: boolean;

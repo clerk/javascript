@@ -69,6 +69,7 @@ describe('ConfigureSSO', () => {
   });
 
   describe('state machine mounts on the right step', () => {
+    // TODO: replace with a TXT domain-verification case (ORGS-1594)
     it('mounts on select-provider with a verified email and no connection', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEnterpriseSso({ selfServeSSO: true });
@@ -128,6 +129,49 @@ describe('ConfigureSSO', () => {
       // An active connection lands on confirmation even if never tested.
       await findByText(/configuration/i);
       expect(queryByText(/select your identity provider/i)).not.toBeInTheDocument();
+    });
+
+    it('mounts on the test step for a configured-but-inactive connection with no successful test run', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEnterpriseSso({ selfServeSSO: true });
+        f.withEmailAddress();
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', permissions: ['org:sys_entconns:manage'] }],
+        });
+      });
+
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([
+        {
+          id: 'ent_configured',
+          name: 'clerk.com',
+          provider: 'saml_okta',
+          // Configured (idp SSO URL + entity id ⇒ hasMinimumConfiguration) but
+          // not yet activated, so the test step's guard holds.
+          active: false,
+          organizationId: 'Org1',
+          domains: ['clerk.com'],
+          samlConnection: {
+            idpSsoUrl: 'https://idp.example.com/sso',
+            idpEntityId: 'https://idp.example.com/entity',
+            idpCertificate: 'CERT',
+          },
+        } as any,
+      ]);
+      // No successful run yet, so the confirmation guard fails and the
+      // furthest-reachable step is `test`.
+      fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
+        data: [],
+        total_count: 0,
+      } as any);
+
+      const { findByText, queryByText } = render(<ConfigureSSO />, { wrapper });
+
+      // Configured + inactive + no successful run ⇒ lands on the test step, not
+      // confirmation.
+      await findByText(/test your sso connection/i);
+      expect(queryByText(/configuration details/i)).not.toBeInTheDocument();
     });
   });
 });
