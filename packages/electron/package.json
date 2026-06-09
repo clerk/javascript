@@ -44,6 +44,16 @@
         "default": "./dist/cjs/preload/index.js"
       }
     },
+    "./storage": {
+      "import": {
+        "types": "./dist/types/storage/index.d.ts",
+        "default": "./dist/esm/storage/index.js"
+      },
+      "require": {
+        "types": "./dist/types/storage/index.d.ts",
+        "default": "./dist/cjs/storage/index.js"
+      }
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/cjs/index.js",
@@ -71,7 +81,18 @@
     "tslib": "catalog:repo"
   },
   "devDependencies": {
-    "@types/node": "^22.19.17"
+    "@types/node": "^22.19.17",
+    "electron": "^39.2.6",
+    "electron-store": "^8.2.0"
+  },
+  "peerDependencies": {
+    "electron": ">=28",
+    "electron-store": "^8.2.0"
+  },
+  "peerDependenciesMeta": {
+    "electron-store": {
+      "optional": true
+    }
   },
   "engines": {
     "node": ">=20.9.0"
