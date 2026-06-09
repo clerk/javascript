@@ -1,6 +1,6 @@
 import type { EnterpriseConnectionTestRunResource } from '@clerk/shared/types';
 import type { ReactNode } from 'react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import type { LocalizationKey } from '@/customizables';
 import {
@@ -45,7 +45,7 @@ import { TestRunHowToFixSection } from './TestRunHowToFixSection';
 const TEST_RESULTS_TABLE_COLUMN_COUNT = 3;
 
 export const TestConfigurationStep = (): JSX.Element => {
-  const { goPrev, isInitialStep } = useWizard();
+  const { goPrev } = useWizard();
   const { organizationEnterpriseConnection: c, testRuns } = useConfigureSSO();
   const card = useCardState();
 
@@ -60,32 +60,19 @@ export const TestConfigurationStep = (): JSX.Element => {
     refresh: refreshTestRuns,
   } = testRuns;
 
-  // The test-runs source is already live by the time we land here (it activates
-  // upstream when the connection is configured). The initial load already
-  // fetched them for the existing-connection case, so the FIRST landing must NOT
-  // refetch; navigating INTO the step later (forward/back/breadcrumb) should, so
-  // the table reflects a run kicked off elsewhere — surfacing as the table-level
-  // `isFetching` spinner, never the full skeleton. `isInitialStep` is the
-  // wizard's "no navigation yet" signal; the step only mounts while current, so
-  // empty deps make this a mount-driven refresh (not state-sync), once per entry.
-  useEffect(() => {
-    if (!isInitialStep) {
-      void refreshTestRuns();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const isRefreshingTestRuns = areTestRunsFetching && !areTestRunsLoading;
   const showRefreshLogsSpinner = useSpinDelay(isRefreshingTestRuns);
   const pageCount = totalCount ? Math.ceil(totalCount / TEST_RUNS_PAGE_SIZE) : 0;
 
   const handleTestRunCreated = () => {
     setCurrentPage(1);
-    // Refetch the single source: the visible list (so the new run shows up and
-    // polling arms) and the success probe (so the derived state's
-    // `hasSuccessfulTestRun` and the Continue gate reflect the run that just
-    // completed).
-    void refreshTestRuns();
+    // Refetch the single source and ARM polling: the list refetch starts the
+    // empty→first-row poll (self-cancels the instant a row lands) so the new run
+    // surfaces on its own, and the success probe refresh keeps the derived
+    // `hasSuccessfulTestRun` / Continue gate in sync once the run completes. The
+    // "Refresh logs" button stays a one-shot refresh (no arm) — a manual refresh
+    // must not start a perpetual poll.
+    void refreshTestRuns({ armPolling: true });
   };
 
   return (

@@ -3,20 +3,16 @@ import type { ReactElement } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { render, screen, waitFor } from '@/test/utils';
+import { render, screen } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
 
 // The Test step reads navigation through the generic wizard facade. `goPrev`
-// drives the Previous button and `goNext` the (gated) Continue button;
-// `isInitialStep` is the signal that tells the step whether we landed here on
-// the initial ConfigureSSO load (no refetch) or navigated in later (refetch the
-// table). The mock lets each test choose.
-const wizardState = vi.hoisted(() => ({ isInitialStep: true }));
+// drives the Previous button and `goNext` the (gated) Continue button.
 const goPrev = vi.fn();
 const goNext = vi.fn();
 
 vi.mock('../../elements/Wizard', () => ({
-  useWizard: () => ({ goPrev, goNext, isInitialStep: wizardState.isInitialStep }),
+  useWizard: () => ({ goPrev, goNext }),
 }));
 
 // The single test-run source, owned upstream by
@@ -87,7 +83,6 @@ beforeEach(() => {
   testRunsSource.isFetching = false;
   testRunsSource.isPolling = false;
   testRunsSource.page = 1;
-  wizardState.isInitialStep = true;
 });
 
 describe('TestConfigurationStep', () => {
@@ -111,35 +106,24 @@ describe('TestConfigurationStep', () => {
     expect(await screen.findByText('No test results')).toBeInTheDocument();
   });
 
-  it('does NOT refetch when landing on the test step on the initial load', async () => {
-    wizardState.isInitialStep = true;
+  it('does NOT refetch on mount in either entry case', async () => {
     const { wrapper } = await createFixtures();
 
     renderStep(wrapper);
 
     await screen.findByText('No test results');
-    // The initial ConfigureSSO load already fetched the test-runs (full
-    // skeleton covered it), so the step must not refetch on initial entry.
-    // Activation is no longer the step's job — the source wakes itself upstream
-    // the moment the connection is configured.
+    // The test-run queries live in the umbrella hook ABOVE the step, so they do
+    // not unmount on leaving and re-fetch on re-entry. The initial ConfigureSSO
+    // load already fetched them (full skeleton covered it), and a kicked-off run
+    // arms its own poll, so the data stays fresh while navigating away. The step
+    // therefore never refetches on mount — neither on the initial load nor on a
+    // later navigation into the step.
     expect(testRunsSource.refresh).not.toHaveBeenCalled();
-  });
-
-  it('refetches once when navigated into the test step later', async () => {
-    wizardState.isInitialStep = false;
-    const { wrapper } = await createFixtures();
-
-    renderStep(wrapper);
-
-    // Navigating in (not the initial load) refetches the single source → the
-    // table-level loading path, not the full skeleton.
-    await waitFor(() => expect(testRunsSource.refresh).toHaveBeenCalledTimes(1));
   });
 
   it('drives the table spinner off isFetching while keeping prior rows visible', async () => {
     // A background list refetch is in flight (isFetching) but it is not a cold
     // load (isLoading false) and previous rows are kept visible.
-    wizardState.isInitialStep = false;
     testRunsSource.rows = [aRow({ id: 'run_1', parsedUserInfo: { emailAddress: 'alice@clerk.com' } })];
     testRunsSource.totalCount = 1;
     testRunsSource.isFetching = true;
