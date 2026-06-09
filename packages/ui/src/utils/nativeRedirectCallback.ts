@@ -1,4 +1,5 @@
-import { ClerkAPIResponseError, ClerkRuntimeError } from '@clerk/shared/error';
+import { ClerkAPIResponseError } from '@clerk/shared/error';
+import type { ClerkAPIError } from '@clerk/shared/types';
 
 const ERROR_CODE_PARAM_NAMES = ['clerk_error_code', 'error_code', 'code', 'error'] as const;
 const ERROR_MESSAGE_PARAM_NAMES = ['clerk_error_message', 'error_message', 'message', 'error_description'] as const;
@@ -49,17 +50,41 @@ export function throwIfNativeRedirectCallbackHasError(callbackUrl: string): void
   });
 }
 
-export function getRotatingTokenNonceFromNativeRedirectCallback(callbackUrl: string): string | null {
-  return new URL(callbackUrl).searchParams.get('rotating_token_nonce');
+/**
+ * Native OAuth callbacks can return to the app without a rotating token nonce when the
+ * provider stores an error on the pending sign-in/sign-up resource. Surface that resource
+ * error through the same API response error path used by regular resource requests.
+ */
+export function createNativeRedirectResourceError(error: ClerkAPIError): ClerkAPIResponseError {
+  return new ClerkAPIResponseError(error.longMessage || error.message, {
+    status: 400,
+    data: [
+      {
+        code: error.code,
+        message: error.message,
+        long_message: error.longMessage,
+        meta: {
+          param_name: error.meta?.paramName,
+          session_id: error.meta?.sessionId,
+          email_addresses: error.meta?.emailAddresses,
+          identifiers: error.meta?.identifiers,
+          zxcvbn: error.meta?.zxcvbn,
+          plan: error.meta?.plan,
+          is_plan_upgrade_possible: error.meta?.isPlanUpgradePossible,
+        },
+      },
+    ],
+  });
 }
 
-/**
- * Thrown when a callback was received but the verification neither succeeded nor reported an error
- * (an unexpected state). Unlike a cancellation, this is surfaced to the user so the flow never ends
- * silently.
- */
-export function createNativeRedirectIncompleteError(): ClerkRuntimeError {
-  return new ClerkRuntimeError('Unable to complete authentication. Please try again.', {
-    code: 'native_redirect_incomplete',
-  });
+export function throwIfNativeRedirectResourceHasError(error: ClerkAPIError | null | undefined): void {
+  if (!error) {
+    return;
+  }
+
+  throw createNativeRedirectResourceError(error);
+}
+
+export function getRotatingTokenNonceFromNativeRedirectCallback(callbackUrl: string): string | null {
+  return new URL(callbackUrl).searchParams.get('rotating_token_nonce');
 }

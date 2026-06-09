@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import {
   getRotatingTokenNonceFromNativeRedirectCallback,
   throwIfNativeRedirectCallbackHasError,
+  throwIfNativeRedirectResourceHasError,
 } from '../nativeRedirectCallback';
 
 describe('nativeRedirectCallback', () => {
@@ -68,5 +69,37 @@ describe('nativeRedirectCallback', () => {
 
   it('returns null when the callback has no rotating token nonce', () => {
     expect(getRotatingTokenNonceFromNativeRedirectCallback('myapp://callback')).toBeNull();
+  });
+
+  it('wraps resource verification errors as Clerk API response errors', () => {
+    let err: unknown;
+
+    try {
+      throwIfNativeRedirectResourceHasError({
+        code: 'oauth_access_denied',
+        message: 'Access denied',
+        longMessage: 'You did not grant access',
+        meta: {
+          sessionId: 'sess_123',
+        },
+      });
+    } catch (e) {
+      err = e;
+    }
+
+    expect(isClerkAPIResponseError(err)).toBe(true);
+    expect(err).toMatchObject({
+      status: 400,
+      errors: [
+        {
+          code: 'oauth_access_denied',
+          message: 'Access denied',
+          longMessage: 'You did not grant access',
+          meta: {
+            sessionId: 'sess_123',
+          },
+        },
+      ],
+    });
   });
 });

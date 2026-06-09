@@ -85,10 +85,12 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
               navigateOnSetActive: ctx.navigateOnSetActive,
               unsafeMetadata: ctx.unsafeMetadata,
             },
-          }).catch(err => {
-            handleError(err, [], card.setError);
-            throw err;
-          });
+          })
+            .catch(err => {
+              handleError(err, [], card.setError);
+              throw err;
+            })
+            .finally(() => card.setIdle());
         }
 
         return signUp

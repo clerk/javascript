@@ -130,7 +130,6 @@ function SignInStartInternal(): JSX.Element {
   });
 
   const [alternativePhoneCodeProvider, setAlternativePhoneCodeProvider] = useState<PhoneCodeChannelData | null>(null);
-
   const showAlternativePhoneCodeProviders = userSettings.alternativePhoneCodeChannels.length > 0;
 
   const onAlternativePhoneCodeUseAnotherMethod = () => {
@@ -259,7 +258,7 @@ function SignInStartInternal(): JSX.Element {
         // This is necessary because there's a brief delay between initiating the SSO flow
         // and the actual redirect to the external Identity Provider
         const isRedirectingToSSOProvider = !!hasOnlyEnterpriseSSOFirstFactors(signIn);
-        if (isRedirectingToSSOProvider) {
+        if (isRedirectingToSSOProvider && !clerk.__internal_hasNativeOAuthHandler) {
           return;
         }
 

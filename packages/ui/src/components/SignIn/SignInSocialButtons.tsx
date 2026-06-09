@@ -95,7 +95,9 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
               navigateOnSetActive: ctx.navigateOnSetActive,
               unsafeMetadata: ctx.unsafeMetadata,
             },
-          }).catch(err => handleError(err));
+          })
+            .catch(err => handleError(err))
+            .finally(() => card.setIdle());
         }
 
         return signIn

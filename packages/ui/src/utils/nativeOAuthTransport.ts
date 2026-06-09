@@ -9,12 +9,12 @@ import type {
 } from '@clerk/shared/types';
 
 import {
-  createNativeRedirectIncompleteError,
+  createNativeRedirectResourceError,
   getRotatingTokenNonceFromNativeRedirectCallback,
   throwIfNativeRedirectCallbackHasError,
 } from './nativeRedirectCallback';
 
-type ClerkForNativeOAuth = Pick<LoadedClerk, '__internal_handleNativeOAuthCallback' | 'client'>;
+type ClerkForNativeOAuth = Pick<LoadedClerk, '__internal_handleNativeOAuthCallback'>;
 
 type NativeSignInTransportOpts = {
   transport: NativeOAuthHandler;
@@ -62,10 +62,18 @@ export async function authenticateSignInWithNativeTransport(opts: NativeSignInTr
   if (nonce) {
     await opts.signIn.reload({ rotatingTokenNonce: nonce });
     await opts.clerk.__internal_handleNativeOAuthCallback(opts.signIn, opts.callbackParams);
-  } else {
-    opts.clerk.client?.resetSignIn();
-    throw createNativeRedirectIncompleteError();
+    return;
   }
+
+  await opts.signIn.reload();
+  const error = opts.signIn.firstFactorVerification.error;
+  if (error) {
+    const nativeRedirectError = createNativeRedirectResourceError(error);
+    await opts.signIn.create({});
+    throw nativeRedirectError;
+  }
+
+  await opts.clerk.__internal_handleNativeOAuthCallback(opts.signIn, opts.callbackParams);
 }
 
 type NativeSignUpTransportOpts = {
@@ -114,8 +122,16 @@ export async function authenticateSignUpWithNativeTransport(opts: NativeSignUpTr
   if (nonce) {
     await opts.signUp.reload({ rotatingTokenNonce: nonce });
     await opts.clerk.__internal_handleNativeOAuthCallback(opts.signUp, opts.callbackParams);
-  } else {
-    opts.clerk.client?.resetSignUp();
-    throw createNativeRedirectIncompleteError();
+    return;
   }
+
+  await opts.signUp.reload();
+  const error = opts.signUp.verifications.externalAccount.error;
+  if (error) {
+    const nativeRedirectError = createNativeRedirectResourceError(error);
+    await opts.signUp.create({});
+    throw nativeRedirectError;
+  }
+
+  await opts.clerk.__internal_handleNativeOAuthCallback(opts.signUp, opts.callbackParams);
 }

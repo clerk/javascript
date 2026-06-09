@@ -337,6 +337,9 @@ describe('SignInStart', () => {
           }),
         );
       });
+      await waitFor(() => {
+        expect(screen.getByText('Continue with Google').closest('button')).not.toBeDisabled();
+      });
       expect(fixtures.signIn.authenticateWithRedirect).not.toHaveBeenCalled();
     });
 
