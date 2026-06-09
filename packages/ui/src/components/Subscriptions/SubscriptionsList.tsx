@@ -202,7 +202,7 @@ function SubscriptionOverviewRow({
         background: common.mutedBackground(t),
       })}
     >
-      <Td sx={_ => ({ verticalAlign: 'top' })}>
+      <Td sx={{ verticalAlign: 'top' }}>
         <Text
           variant='subtitle'
           localizationKey={localizationKeys(`${localizationRoot}.billingPage.subscriptionsListSection.overview`)}
