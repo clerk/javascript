@@ -8,7 +8,7 @@ import { useDialogContext } from './dialog-context';
 export type DialogPopupProps = ComponentProps<'div'>;
 
 export function DialogPopup(props: DialogPopupProps) {
-  const { render, ...otherProps } = props;
+  const { render, ref: consumerRef, ...otherProps } = props;
   const { popupRef, refs, getFloatingProps, floatingContext, modal, labelId, descriptionId, mounted, transitionProps } =
     useDialogContext();
 
@@ -16,7 +16,7 @@ export function DialogPopup(props: DialogPopupProps) {
   // a stable callback that doesn't use `this`, so the unbound-method check is a
   // false positive here.
   // eslint-disable-next-line @typescript-eslint/unbound-method
-  const combinedRef = useMergeRefs([popupRef, refs.setFloating]);
+  const combinedRef = useMergeRefs([popupRef, refs.setFloating, consumerRef]);
 
   if (!mounted) {
     return null;
