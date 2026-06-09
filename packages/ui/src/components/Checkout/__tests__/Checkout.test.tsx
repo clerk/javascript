@@ -1801,8 +1801,8 @@ describe('Checkout', () => {
         expect(getByRole('heading', { name: 'Checkout' })).toBeVisible();
       });
 
-      // The "Total Due Today" row is still shown, but no renewal/discount rows are added
-      expect(getByText('Total Due Today')).toBeVisible();
+      // The "Total due today" row is still shown, but no renewal/discount rows are added
+      expect(getByText('Total due today')).toBeVisible();
       expect(queryByText('Subtotal per period')).toBeNull();
       expect(queryByText('Total per period')).toBeNull();
       expect(queryByText('Prorated discount')).toBeNull();
