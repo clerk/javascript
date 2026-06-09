@@ -11,6 +11,7 @@ export default defineConfig(overrideOptions => {
 
   const options: Options = {
     format: 'cjs',
+    fixedExtension: false,
     outDir: './dist',
     entry: ['./src/**/*.{ts,tsx,js,jsx}', '!./src/**/*.test.{ts,tsx}', '!./src/**/__tests__/**'],
     bundle: false,
