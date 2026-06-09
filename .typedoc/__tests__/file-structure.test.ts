@@ -2,10 +2,7 @@ import { readdir } from 'fs/promises';
 import { join, relative } from 'path';
 import { describe, expect, it } from 'vitest';
 
-// Same function as in custom-router.mjs
-function toKebabCase(str: string) {
-  return str.replace(/((?<=[a-z\d])[A-Z]|(?<=[A-Z\d])[A-Z](?=[a-z]))/g, '-$1').toLowerCase();
-}
+import { toUrlSlug } from '../slug.mjs';
 
 const OUTPUT_LOCATION = `${process.cwd()}/docs`;
 
@@ -47,11 +44,29 @@ describe('Typedoc output', () => {
 
   it('should only have these nested folders', async () => {
     const folders = await scanDirectory('directory');
-    const nestedFolders = folders.filter(folder => !isTopLevelPath(folder));
+    const nestedFolders = folders.filter(folder => !isTopLevelPath(folder)).sort((a, b) => a.localeCompare(b));
 
     expect(nestedFolders).toMatchInlineSnapshot(`
       [
         "react/legacy",
+        "shared/api-key-resource",
+        "shared/api-key-resource/methods",
+        "shared/billing-namespace",
+        "shared/billing-namespace/methods",
+        "shared/clerk",
+        "shared/clerk/methods",
+        "shared/client-resource",
+        "shared/client-resource/methods",
+        "shared/organization-resource",
+        "shared/organization-resource/methods",
+        "shared/session-resource",
+        "shared/session-resource/methods",
+        "shared/sign-in-future-resource",
+        "shared/sign-in-future-resource/methods",
+        "shared/sign-up-future-resource",
+        "shared/sign-up-future-resource/methods",
+        "shared/user-resource",
+        "shared/user-resource/methods",
       ]
     `);
   });
@@ -64,7 +79,7 @@ describe('Typedoc output', () => {
   });
   it('should only contain kebab-cased files', async () => {
     const files = await scanDirectory('file');
-    const incorrectFiles = files.filter(file => file !== toKebabCase(file));
+    const incorrectFiles = files.filter(file => file !== toUrlSlug(file));
 
     expect(incorrectFiles).toHaveLength(0);
   });

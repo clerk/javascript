@@ -58,7 +58,7 @@ class AuthenticateContext implements AuthenticateContext {
   private originalFrontendApi: string = '';
 
   /**
-   * Retrieves the session token from either the cookie or the header.
+   * Gets the session token from either the cookie or the header.
    *
    * @returns {string | undefined} The session token if available, otherwise undefined.
    */
