@@ -124,13 +124,11 @@ const Body = ({ sx, ...props }: StepBodyProps): JSX.Element => (
 );
 
 type FooterButtonProps = {
-  /** Click handler. Required — the buttons have no default behavior. */
+  /** The buttons have no default behavior — wire navigation here. */
   onClick?: () => void | Promise<unknown>;
-  /** Disabled state. */
   isDisabled?: boolean;
-  /** Loading state. */
   isLoading?: boolean;
-  /** Override label. Defaults to 'Previous' / 'Continue'. */
+  /** Defaults to 'Previous' / 'Continue'. */
   label?: LocalizationKey | string;
 };
 
@@ -192,12 +190,27 @@ const FooterContinue = ({ onClick, isDisabled, isLoading, label = 'Continue' }: 
 };
 FooterContinue.displayName = 'Step.Footer.Continue';
 
+/**
+ * The destructive reset affordance, rendered in a step footer. Self-hides while
+ * there is no connection (so it only shows on configure / test / confirmation,
+ * never on verify-domain / select-provider).
+ *
+ * It deliberately does NOT call `useWizard()`. The confirm path deletes the
+ * connection directly via the context mutation (a pure delete; the wizard then
+ * self-corrects to the furthest-reachable step when the active step's guard
+ * breaks), so this works from ANY footer — including the nested SAML configure
+ * footers, which have their own (linear) wizard. That is what kills the old
+ * per-step nested-binding trap.
+ *
+ * `marginInlineEnd: 'auto'` pushes it to the far-left of the `justify='end'`
+ * footer row, matching the prior destructive affordance.
+ */
 const FooterReset = (): JSX.Element | null => {
-  const { enterpriseConnection } = useConfigureSSO();
+  const { organizationEnterpriseConnection: c } = useConfigureSSO();
   const organization = __internal_useOrganizationBase();
   const [isOpen, setIsOpen] = useState(false);
 
-  if (!enterpriseConnection) {
+  if (!c.hasConnection) {
     return null;
   }
 

@@ -35,9 +35,17 @@ export function toEnterpriseConnectionBody(
 ): Record<string, unknown> {
   const body: Record<string, unknown> = {};
 
-  // Top-level fields. `provider` is only on Create, the rest are shared.
+  // Top-level fields. `provider` and `domains` are only on Create, the rest are shared.
   setIfDefined(body, 'provider', (params as CreateOrganizationEnterpriseConnectionParams).provider);
   setIfDefined(body, 'name', params.name);
+  // `domains` is an array of FQDN strings. The form serializer downstream emits
+  // each element as a repeated `domains` form field (e.g. `domains=a.com&domains=b.com`),
+  // matching how the backend parses repeated form params. An omitted or empty
+  // array is not sent, keeping older callers backwards-compatible.
+  const domains = (params as CreateOrganizationEnterpriseConnectionParams).domains;
+  if (domains && domains.length > 0) {
+    body.domains = domains;
+  }
   if (!options.omitOrganizationId) {
     setIfDefined(body, 'organization_id', params.organizationId);
   }
