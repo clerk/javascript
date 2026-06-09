@@ -13,6 +13,7 @@ export default defineConfig({
       entry: {
         'primitives/dialog/index': 'src/primitives/dialog/index.ts',
         'utils/index': 'src/utils/index.ts',
+        'hooks/index': 'src/hooks/index.ts',
         'hooks/use-controllable-state': 'src/hooks/use-controllable-state.ts',
         'hooks/use-transition': 'src/hooks/use-transition.ts',
         'hooks/use-transition-status': 'src/hooks/use-transition-status.ts',

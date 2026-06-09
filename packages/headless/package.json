@@ -9,6 +9,10 @@
       "import": "./dist/primitives/dialog/index.js",
       "types": "./dist/primitives/dialog/index.d.ts"
     },
+    "./hooks": {
+      "import": "./dist/hooks/index.js",
+      "types": "./dist/hooks/index.d.ts"
+    },
     "./utils": {
       "import": "./dist/utils/index.js",
       "types": "./dist/utils/index.d.ts"
@@ -17,6 +21,7 @@
   "scripts": {
     "build": "rm -rf dist && vite build",
     "dev": "vite build --watch",
+    "lint": "eslint src",
     "test": "vitest"
   },
   "dependencies": {
