@@ -347,7 +347,7 @@ function SubscriptionItemRow({
             return {};
           }}
         >
-          <Td sx={_ => ({ verticalAlign: 'top' })}>
+          <Td sx={{ verticalAlign: 'top' }}>
             <Col gap={1}>
               <Flex
                 align='center'
