@@ -25,11 +25,6 @@ interface UseWizardMachineArgs {
   parentWizard: WizardContextValue | null;
   /** Mount here instead of the guard-derived initial step (nested resume). */
   initialStepId?: string;
-  /**
-   * Fired from the dispatch handler when a transition changes the active step.
-   * Read from a render-updated ref so `dispatch`'s identity stays stable.
-   */
-  onStepChange?: (stepId: string) => void;
 }
 
 /**
@@ -50,12 +45,7 @@ interface UseWizardMachineArgs {
  * calling the parent's `setState` from a child updater triggers React's "cannot
  * update a component while rendering a different component" warning.
  */
-export const useWizardMachine = ({
-  config,
-  parentWizard,
-  initialStepId,
-  onStepChange,
-}: UseWizardMachineArgs): WizardContextValue => {
+export const useWizardMachine = ({ config, parentWizard, initialStepId }: UseWizardMachineArgs): WizardContextValue => {
   const isNested = parentWizard !== null;
 
   // Seed lazily so the wizard mounts on the right step in a single render pass:
@@ -84,9 +74,6 @@ export const useWizardMachine = ({
 
   const parentRef = React.useRef(parentWizard);
   parentRef.current = parentWizard;
-
-  const onStepChangeRef = React.useRef(onStepChange);
-  onStepChangeRef.current = onStepChange;
 
   // Render-updated mirror of the live state so the stable handlers below can
   // read the current state in their body (and decide whether a transition is a
@@ -150,18 +137,6 @@ export const useWizardMachine = ({
   const indexOfCurrent = (s: WizardState, cfg: WizardConfig): number =>
     cfg.descriptors.findIndex(d => d.id === s.current);
 
-  // Commit a transition: persist the new state and, when the active step
-  // actually changed, fire `onStepChange` from the HANDLER (not a `useEffect`,
-  // not inside the `setState` updater — a `setState` updater must stay pure).
-  // Reads the callback off the render-updated ref so handler identity stays
-  // stable.
-  const commit = (prev: WizardState, next: WizardState): void => {
-    setState(next);
-    if (next !== prev && next.current !== prev.current) {
-      onStepChangeRef.current?.(next.current);
-    }
-  };
-
   const goNext = React.useCallback(() => {
     const prev = stateRef.current;
     const cfg = configRef.current;
@@ -169,7 +144,7 @@ export const useWizardMachine = ({
     if (next !== prev) {
       // Advanced immediately. Any pending deferred advance is now moot.
       setPendingNextFrom(null);
-      commit(prev, next);
+      setState(next);
       return;
     }
     // No transition. Distinguish a scope boundary (terminal position — bubble to
@@ -182,8 +157,7 @@ export const useWizardMachine = ({
       // Bubble unchanged — the parent itself defers if ITS next guard hasn't
       // caught up yet (the configure→test case: the nested SAML metadata step is
       // terminal, so its advance bubbles, and the parent defers test until the
-      // updateConnection revalidate lands). The parent's own dispatch fires its
-      // `onStepChange`.
+      // updateConnection revalidate lands).
       parentRef.current?.goNext();
       return;
     }
@@ -212,13 +186,13 @@ export const useWizardMachine = ({
       }
       return;
     }
-    commit(prev, next);
+    setState(next);
   }, []);
 
   const dispatch = React.useCallback((event: WizardEvent) => {
     const prev = stateRef.current;
     const next = reduce(prev, event, configRef.current);
-    commit(prev, next);
+    setState(next);
   }, []);
 
   const goToStep = React.useCallback(

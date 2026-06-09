@@ -10,13 +10,6 @@ interface WizardProps {
   steps: WizardStepConfig[];
   /** Mount here instead of the guard-derived initial step (nested resume). */
   initialStepId?: string;
-  /**
-   * Fired from the dispatch handler (not a `useEffect`) when a transition changes
-   * the active step, so a host can react (e.g. clear a card error) without a
-   * state-sync effect. Only the top-level wizard passes this; a nested terminal
-   * bubble advances through the parent's dispatch, so it fires there too.
-   */
-  onStepChange?: (stepId: string) => void;
   children?: React.ReactNode;
 }
 
@@ -36,13 +29,13 @@ interface WizardProps {
  * whose forward boundary falls through to the parent (a nested last-step `goNext`
  * advances the parent; a guard-blocked mid-flow next is a hard stop).
  */
-const WizardRoot = ({ steps, initialStepId, onStepChange, children }: WizardProps): JSX.Element => {
+const WizardRoot = ({ steps, initialStepId, children }: WizardProps): JSX.Element => {
   const parentWizard = React.useContext(WizardContext);
 
   // The body-less `steps` array is the reducer's descriptor set verbatim.
   const config = React.useMemo<WizardConfig>(() => ({ descriptors: steps }), [steps]);
 
-  const value = useWizardMachine({ config, parentWizard, initialStepId, onStepChange });
+  const value = useWizardMachine({ config, parentWizard, initialStepId });
 
   return <WizardContext.Provider value={value}>{children}</WizardContext.Provider>;
 };

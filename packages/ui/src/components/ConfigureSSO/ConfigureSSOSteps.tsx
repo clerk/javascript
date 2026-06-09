@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useCardState } from '@/elements/contexts';
+import { CardStateProvider } from '@/elements/contexts';
 
 import { useConfigureSSO } from './ConfigureSSOContext';
 import { ConfigureSSOHeader } from './ConfigureSSOHeader';
@@ -11,7 +11,6 @@ import { ConfigureStep, ConfirmationStep, SelectProviderStep, TestConfigurationS
 /** The ConfigureSSO step graph the entry-guard `<Wizard>` derives its machine from. */
 export const ConfigureSSOSteps = (): JSX.Element => {
   const { organizationEnterpriseConnection: c } = useConfigureSSO();
-  const card = useCardState();
 
   const steps = React.useMemo<WizardStepConfig[]>(
     () => [
@@ -29,35 +28,47 @@ export const ConfigureSSOSteps = (): JSX.Element => {
   // re-seating to the furthest-reachable step (the same `initialState`
   // derivation it uses on mount) — no key, no remount, no create-flash.
   //
-  // `onStepChange` clears any card-level error whenever the active top-level step
-  // actually changes, so a stale failure from one step doesn't leak into the next
-  // on a breadcrumb jump or back-nav. The wizard fires it from its dispatch
-  // handler — no wizard-level `useEffect` involved.
+  // Each top-level step owns its own `CardStateProvider`, so a card-level error
+  // raised on one step lives in that step's scope only. When the wizard moves
+  // (a breadcrumb jump, back-nav, or an emergent clamp/reset re-seat), the
+  // departed step unmounts and its card state — error and all — goes with it;
+  // the step we land on mounts a fresh, clean card scope. No cross-step error
+  // bleed, and no wizard-level callback needed to clear it. The root provider on
+  // `ConfigureSSO` stays as an ancestor for shared elements; these step-level
+  // providers shadow it. Context flows through portals, so the footer/dialog
+  // subtrees resolve to their step's provider.
   return (
-    <Wizard
-      steps={steps}
-      onStepChange={() => card.setError(undefined)}
-    >
+    <Wizard steps={steps}>
       <ConfigureSSOHeader />
 
       <Wizard.Match id='verify-domain'>
-        <VerifyDomainStep />
+        <CardStateProvider>
+          <VerifyDomainStep />
+        </CardStateProvider>
       </Wizard.Match>
 
       <Wizard.Match id='select-provider'>
-        <SelectProviderStep />
+        <CardStateProvider>
+          <SelectProviderStep />
+        </CardStateProvider>
       </Wizard.Match>
 
       <Wizard.Match id='configure'>
-        <ConfigureStep />
+        <CardStateProvider>
+          <ConfigureStep />
+        </CardStateProvider>
       </Wizard.Match>
 
       <Wizard.Match id='test'>
-        <TestConfigurationStep />
+        <CardStateProvider>
+          <TestConfigurationStep />
+        </CardStateProvider>
       </Wizard.Match>
 
       <Wizard.Match id='confirmation'>
-        <ConfirmationStep />
+        <CardStateProvider>
+          <ConfirmationStep />
+        </CardStateProvider>
       </Wizard.Match>
     </Wizard>
   );
