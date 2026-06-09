@@ -1,4 +1,5 @@
 import type {
+  ClerkAPIError,
   EnterpriseSSOStrategy,
   HandleOAuthCallbackParams,
   LoadedClerk,
@@ -15,6 +16,36 @@ import {
 } from './nativeRedirectCallback';
 
 type ClerkForNativeOAuth = Pick<LoadedClerk, '__internal_handleNativeOAuthCallback'>;
+
+type CompleteNativeOAuthCallbackOpts = {
+  callbackUrl: string;
+  reloadWithNonce: (nonce: string) => Promise<unknown>;
+  reload: () => Promise<unknown>;
+  getError: () => ClerkAPIError | null | undefined;
+  reset: () => Promise<unknown>;
+  handleCallback: () => Promise<unknown>;
+};
+
+async function completeNativeOAuthCallback(opts: CompleteNativeOAuthCallbackOpts): Promise<void> {
+  throwIfNativeRedirectCallbackHasError(opts.callbackUrl);
+
+  const nonce = getRotatingTokenNonceFromNativeRedirectCallback(opts.callbackUrl);
+  if (nonce) {
+    await opts.reloadWithNonce(nonce);
+    await opts.handleCallback();
+    return;
+  }
+
+  await opts.reload();
+  const error = opts.getError();
+  if (error) {
+    const nativeRedirectError = createNativeRedirectResourceError(error);
+    await opts.reset();
+    throw nativeRedirectError;
+  }
+
+  await opts.handleCallback();
+}
 
 type NativeSignInTransportOpts = {
   transport: NativeOAuthHandler;
@@ -56,24 +87,14 @@ export async function authenticateSignInWithNativeTransport(opts: NativeSignInTr
   }
 
   const { callbackUrl } = await opts.transport.open(verificationUrl);
-  throwIfNativeRedirectCallbackHasError(callbackUrl);
-
-  const nonce = getRotatingTokenNonceFromNativeRedirectCallback(callbackUrl);
-  if (nonce) {
-    await opts.signIn.reload({ rotatingTokenNonce: nonce });
-    await opts.clerk.__internal_handleNativeOAuthCallback(opts.signIn, opts.callbackParams);
-    return;
-  }
-
-  await opts.signIn.reload();
-  const error = opts.signIn.firstFactorVerification.error;
-  if (error) {
-    const nativeRedirectError = createNativeRedirectResourceError(error);
-    await opts.signIn.create({});
-    throw nativeRedirectError;
-  }
-
-  await opts.clerk.__internal_handleNativeOAuthCallback(opts.signIn, opts.callbackParams);
+  await completeNativeOAuthCallback({
+    callbackUrl,
+    reloadWithNonce: nonce => opts.signIn.reload({ rotatingTokenNonce: nonce }),
+    reload: () => opts.signIn.reload(),
+    getError: () => opts.signIn.firstFactorVerification.error,
+    reset: () => opts.signIn.create({}),
+    handleCallback: () => opts.clerk.__internal_handleNativeOAuthCallback(opts.signIn, opts.callbackParams),
+  });
 }
 
 type NativeSignUpTransportOpts = {
@@ -116,22 +137,12 @@ export async function authenticateSignUpWithNativeTransport(opts: NativeSignUpTr
   }
 
   const { callbackUrl } = await opts.transport.open(verificationUrl);
-  throwIfNativeRedirectCallbackHasError(callbackUrl);
-
-  const nonce = getRotatingTokenNonceFromNativeRedirectCallback(callbackUrl);
-  if (nonce) {
-    await opts.signUp.reload({ rotatingTokenNonce: nonce });
-    await opts.clerk.__internal_handleNativeOAuthCallback(opts.signUp, opts.callbackParams);
-    return;
-  }
-
-  await opts.signUp.reload();
-  const error = opts.signUp.verifications.externalAccount.error;
-  if (error) {
-    const nativeRedirectError = createNativeRedirectResourceError(error);
-    await opts.signUp.create({});
-    throw nativeRedirectError;
-  }
-
-  await opts.clerk.__internal_handleNativeOAuthCallback(opts.signUp, opts.callbackParams);
+  await completeNativeOAuthCallback({
+    callbackUrl,
+    reloadWithNonce: nonce => opts.signUp.reload({ rotatingTokenNonce: nonce }),
+    reload: () => opts.signUp.reload(),
+    getError: () => opts.signUp.verifications.externalAccount.error,
+    reset: () => opts.signUp.create({}),
+    handleCallback: () => opts.clerk.__internal_handleNativeOAuthCallback(opts.signUp, opts.callbackParams),
+  });
 }

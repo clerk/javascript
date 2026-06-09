@@ -77,14 +77,6 @@ export function createNativeRedirectResourceError(error: ClerkAPIError): ClerkAP
   });
 }
 
-export function throwIfNativeRedirectResourceHasError(error: ClerkAPIError | null | undefined): void {
-  if (!error) {
-    return;
-  }
-
-  throw createNativeRedirectResourceError(error);
-}
-
 export function getRotatingTokenNonceFromNativeRedirectCallback(callbackUrl: string): string | null {
   return new URL(callbackUrl).searchParams.get('rotating_token_nonce');
 }

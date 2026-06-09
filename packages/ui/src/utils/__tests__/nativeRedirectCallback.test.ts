@@ -2,9 +2,9 @@ import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { describe, expect, it } from 'vitest';
 
 import {
+  createNativeRedirectResourceError,
   getRotatingTokenNonceFromNativeRedirectCallback,
   throwIfNativeRedirectCallbackHasError,
-  throwIfNativeRedirectResourceHasError,
 } from '../nativeRedirectCallback';
 
 describe('nativeRedirectCallback', () => {
@@ -75,7 +75,7 @@ describe('nativeRedirectCallback', () => {
     let err: unknown;
 
     try {
-      throwIfNativeRedirectResourceHasError({
+      throw createNativeRedirectResourceError({
         code: 'oauth_access_denied',
         message: 'Access denied',
         longMessage: 'You did not grant access',

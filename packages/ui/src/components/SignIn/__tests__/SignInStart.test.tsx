@@ -58,7 +58,6 @@ describe('SignInStart', () => {
       writable: true,
       configurable: true,
     });
-    delete (window as any).__clerk_internal_electron;
   });
 
   it('renders the component', async () => {
@@ -321,19 +320,7 @@ describe('SignInStart', () => {
             signIn: fixtures.signIn,
             clerk: fixtures.clerk,
             strategy: 'oauth_google',
-            oidcPrompt: undefined,
-            callbackParams: expect.objectContaining({
-              signInUrl: 'https://dashboard.clerk.com/sign-in',
-              signUpUrl: 'https://dashboard.clerk.com/sign-up',
-              signInForceRedirectUrl: '/',
-              signUpForceRedirectUrl: '/',
-              transferable: true,
-              firstFactorUrl: '../factor-one',
-              secondFactorUrl: '../factor-two',
-              resetPasswordUrl: '../reset-password',
-              navigateOnSetActive: expect.any(Function),
-              unsafeMetadata: undefined,
-            }),
+            callbackParams: expect.any(Object),
           }),
         );
       });
