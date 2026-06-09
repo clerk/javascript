@@ -206,6 +206,223 @@ describe('useWizardMachine — first/last and reachability derivations', () => {
   });
 });
 
+describe('useWizardMachine — deferred goNext (submit-then-advance race)', () => {
+  it('advances immediately when the next guard already holds (no defer)', () => {
+    const { result } = renderMachine({
+      config: cfg([{ id: 'a' }, { id: 'b', guard: () => true }]),
+      initialStepId: 'a',
+    });
+    expect(result.current.current).toBe('a');
+    act(() => result.current.goNext());
+    // Guard held at call time → advanced in the same tick, nothing pending.
+    expect(result.current.current).toBe('b');
+  });
+
+  it('does NOT advance while the next guard is unmet, then advances once the guard updates between renders (deferred resolution)', () => {
+    // Models the create/submit → advance race: `goNext` fires while the next
+    // step's guard still reads false (React has not re-rendered with the fresh
+    // config yet). It must NOT no-op — it parks a pending advance and resolves it
+    // on a later render once the guard flips true.
+    let bOpen = false;
+    const bGuard = () => bOpen;
+    const { result, rerender } = renderMachine({
+      config: cfg([{ id: 'a' }, { id: 'b', guard: bGuard }]),
+      initialStepId: 'a',
+    });
+    expect(result.current.current).toBe('a');
+
+    // goNext while b is gated out: a is NOT terminal, so it defers (does not
+    // bubble, does not advance yet).
+    act(() => result.current.goNext());
+    expect(result.current.current).toBe('a');
+
+    // The awaited mutation lands: b's guard now holds. A re-render with a fresh
+    // config object lets the render-phase resolver re-reduce NEXT and advance.
+    bOpen = true;
+    act(() => {
+      rerender({
+        config: cfg([{ id: 'a' }, { id: 'b', guard: bGuard }]),
+        parentWizard: null,
+        initialStepId: 'a',
+        onStepChange: undefined,
+      });
+    });
+    expect(result.current.current).toBe('b');
+  });
+
+  it('keeps a pending advance across an intermediate render where the guard is still unmet', () => {
+    // The resolver must NOT clear a pending advance just because it could not
+    // advance this render — clearing early would re-open the race. It stays
+    // pending until the guard finally holds.
+    let bOpen = false;
+    const bGuard = () => bOpen;
+    const { result, rerender } = renderMachine({
+      config: cfg([{ id: 'a' }, { id: 'b', guard: bGuard }]),
+      initialStepId: 'a',
+    });
+    act(() => result.current.goNext()); // defers, b still gated out
+    expect(result.current.current).toBe('a');
+
+    // An unrelated re-render while b is STILL gated out: pending must survive.
+    act(() => {
+      rerender({
+        config: cfg([{ id: 'a' }, { id: 'b', guard: bGuard }]),
+        parentWizard: null,
+        initialStepId: 'a',
+        onStepChange: undefined,
+      });
+    });
+    expect(result.current.current).toBe('a');
+
+    // Now the guard opens → the still-pending advance resolves.
+    bOpen = true;
+    act(() => {
+      rerender({
+        config: cfg([{ id: 'a' }, { id: 'b', guard: bGuard }]),
+        parentWizard: null,
+        initialStepId: 'a',
+        onStepChange: undefined,
+      });
+    });
+    expect(result.current.current).toBe('b');
+  });
+
+  it('abandons a pending advance when the user goPrev before it resolves', () => {
+    let bOpen = false;
+    const bGuard = () => bOpen;
+    const { result, rerender } = renderMachine({
+      // Seed on b so there is room to step back to a, then defer forward from a.
+      config: cfg([{ id: 'a' }, { id: 'b', guard: bGuard }, { id: 'c', guard: () => false }]),
+      initialStepId: 'a',
+    });
+    expect(result.current.current).toBe('a');
+
+    // Open b so goNext lands on b; then defer the b→c advance (c gated out).
+    bOpen = true;
+    act(() => {
+      rerender({
+        config: cfg([{ id: 'a' }, { id: 'b', guard: bGuard }, { id: 'c', guard: () => false }]),
+        parentWizard: null,
+        initialStepId: 'a',
+        onStepChange: undefined,
+      });
+    });
+    act(() => result.current.goNext()); // a -> b (immediate)
+    expect(result.current.current).toBe('b');
+    act(() => result.current.goNext()); // b -> c blocked → defers (b not terminal)
+    expect(result.current.current).toBe('b');
+
+    // User steps back BEFORE the pending advance could resolve: it is abandoned.
+    act(() => result.current.goPrev()); // b -> a
+    expect(result.current.current).toBe('a');
+
+    // Even if c later opens, the abandoned pending must NOT yank the user forward.
+    act(() => {
+      rerender({
+        config: cfg([{ id: 'a' }, { id: 'b', guard: bGuard }, { id: 'c', guard: () => true }]),
+        parentWizard: null,
+        initialStepId: 'a',
+        onStepChange: undefined,
+      });
+    });
+    expect(result.current.current).toBe('a');
+  });
+
+  it('abandons a pending advance when the user goToStep before it resolves', () => {
+    const { result } = renderMachine({
+      // a entry, b gated out (defer target), c reachable for the jump.
+      config: cfg([{ id: 'a' }, { id: 'b', guard: () => false }, { id: 'c', guard: () => true }]),
+      initialStepId: 'a',
+    });
+    expect(result.current.current).toBe('a');
+    act(() => result.current.goNext()); // a -> b blocked → defers
+    expect(result.current.current).toBe('a');
+    // An explicit jump abandons the pending advance.
+    act(() => result.current.goToStep('c'));
+    expect(result.current.current).toBe('c');
+  });
+
+  it('a nested TERMINAL goNext bubbles and the PARENT defers, then resolves (configure→test case)', () => {
+    // The nested SAML metadata step is terminal: its goNext bubbles to the
+    // parent. The parent's next guard (test) has not caught up to the just-
+    // resolved updateConnection yet, so the PARENT defers and resolves on its
+    // own next render.
+    let testOpen = false;
+    const testGuard = () => testOpen;
+    const { result: parent, rerender: rerenderParent } = renderMachine({
+      config: cfg([{ id: 'configure' }, { id: 'test', guard: testGuard }]),
+      initialStepId: 'configure',
+    });
+    expect(parent.current.current).toBe('configure');
+
+    // Single-step nested machine: its only step is terminal, so goNext bubbles.
+    const { result: nested } = renderMachine({
+      config: cfg([{ id: 'idp-metadata' }]),
+      parentWizard: parent.current,
+    });
+
+    // Nested terminal goNext bubbles to parent.goNext while `test` is still gated
+    // out → the parent defers (does not advance yet).
+    act(() => nested.current.goNext());
+    expect(parent.current.current).toBe('configure');
+
+    // The revalidate lands: `test` guard now holds. The parent's resolver
+    // advances on its next render.
+    testOpen = true;
+    act(() => {
+      rerenderParent({
+        config: cfg([{ id: 'configure' }, { id: 'test', guard: testGuard }]),
+        parentWizard: null,
+        initialStepId: 'configure',
+        onStepChange: undefined,
+      });
+    });
+    expect(parent.current.current).toBe('test');
+  });
+
+  it('the clamp and the deferred resolver coexist: a pending advance clears when the active step becomes unreachable', () => {
+    // While a forward advance is pending, the connection backing the current step
+    // is deleted (its guard breaks). The clamp re-seats current to the furthest-
+    // reachable step; the deferred resolver then sees `pendingNextFrom !==
+    // state.current` and abandons the pending advance — no double-setState fight,
+    // no stale forward jump.
+    let bOpen = true;
+    const bGuard = () => bOpen;
+    const { result, rerender } = renderMachine({
+      // Seed on b (furthest reachable); c gated out so a forward goNext defers.
+      config: cfg([{ id: 'a' }, { id: 'b', guard: bGuard }, { id: 'c', guard: () => false }]),
+    });
+    expect(result.current.current).toBe('b');
+
+    act(() => result.current.goNext()); // b -> c blocked → defers from b
+    expect(result.current.current).toBe('b');
+
+    // b's guard breaks: the clamp re-seats to a, and the pending advance (parked
+    // at b) is abandoned because current no longer equals b.
+    bOpen = false;
+    act(() => {
+      rerender({
+        config: cfg([{ id: 'a' }, { id: 'b', guard: bGuard }, { id: 'c', guard: () => false }]),
+        parentWizard: null,
+        initialStepId: undefined,
+        onStepChange: undefined,
+      });
+    });
+    expect(result.current.current).toBe('a');
+
+    // A further render does not resurrect the abandoned advance (c still gated).
+    act(() => {
+      rerender({
+        config: cfg([{ id: 'a' }, { id: 'b', guard: bGuard }, { id: 'c', guard: () => false }]),
+        parentWizard: null,
+        initialStepId: undefined,
+        onStepChange: undefined,
+      });
+    });
+    expect(result.current.current).toBe('a');
+  });
+});
+
 describe('useWizardMachine — reachability clamp (self-correct on a broken guard)', () => {
   it('re-seats to the furthest-reachable step when the active step guard breaks between renders', () => {
     // Start with c reachable; the machine seeds on c (furthest reachable).

@@ -65,6 +65,17 @@ export const useWizardMachine = ({
   // can't park the machine on a step outside the graph.
   const [state, setState] = React.useState<WizardState>(() => resolveInitial(config, initialStepId));
 
+  // Seam state for a DEFERRED forward advance. A submit-then-advance step
+  // (`await createConnection(); goNext()`) resolves its await with the cache
+  // already fresh, but React has not re-rendered yet, so `goNext`'s
+  // `configRef.current` is the PRIOR render's config and the next step's guard
+  // still reads false. Rather than no-op (the old race — the user had to click
+  // twice), `goNext` records the position it tried to advance FROM here, and the
+  // render-phase resolver below re-reduces NEXT against the FRESH `config` once
+  // the awaited revalidate lands (typically the very next render). `null` ⇒ no
+  // pending advance.
+  const [pendingNextFrom, setPendingNextFrom] = React.useState<string | null>(null);
+
   // Render-updated mirrors so the stable handlers below always see the freshest
   // config / parent / callback without taking them as deps (which would churn
   // `dispatch`/`goNext`/`goPrev` identity every render).
@@ -108,6 +119,32 @@ export const useWizardMachine = ({
     }
   }
 
+  // Deferred-advance resolver (adjust-state-during-render — NOT a useEffect, the
+  // SAME sanctioned pattern as the clamp above; runs AFTER it so the clamp wins
+  // if `current` just became unreachable). When `goNext` could not advance
+  // because the next step's guard had not caught up to a just-resolved mutation,
+  // it parked the from-position in `pendingNextFrom`. Re-reduce NEXT against the
+  // FRESH `config` this render:
+  //   - the user navigated elsewhere (current moved off the parked position) →
+  //     abandon the pending advance;
+  //   - NEXT now advances (the awaited revalidate landed, guard holds) → commit
+  //     it and clear;
+  //   - NEXT still blocked (data not in yet) → keep pending; a later render
+  //     (the awaited revalidate guarantees one in the happy path) resolves it.
+  // Deliberately no auto-clear on "still blocked": clearing early would re-open
+  // the very race this fixes.
+  if (pendingNextFrom !== null) {
+    if (pendingNextFrom !== state.current) {
+      setPendingNextFrom(null);
+    } else {
+      const advanced = reduce(state, { type: 'NEXT' }, config);
+      if (advanced !== state) {
+        setState(advanced);
+        setPendingNextFrom(null);
+      }
+    }
+  }
+
   // Position of `current` in the static descriptor array — the basis for both
   // first/last detection and the boundary-bubble decision below.
   const indexOfCurrent = (s: WizardState, cfg: WizardConfig): number =>
@@ -129,24 +166,39 @@ export const useWizardMachine = ({
     const prev = stateRef.current;
     const cfg = configRef.current;
     const next = reduce(prev, { type: 'NEXT' }, cfg);
-    if (next === prev) {
-      // No transition. Distinguish a scope boundary (terminal position — bubble
-      // to the parent so a nested sub-flow's last step advances the parent)
-      // from a guard-BLOCKED mid-flow next (a hard stop — a true no-op). A
-      // blocked next also returns same-ref, so we MUST check the position: only
-      // the terminal slot may bubble. The parent's own dispatch fires its
-      // `onStepChange`, so a nested terminal advance still notifies the parent.
-      const i = indexOfCurrent(prev, cfg);
-      const isTerminal = i === cfg.descriptors.length - 1;
-      if (isTerminal) {
-        parentRef.current?.goNext();
-      }
+    if (next !== prev) {
+      // Advanced immediately. Any pending deferred advance is now moot.
+      setPendingNextFrom(null);
+      commit(prev, next);
       return;
     }
-    commit(prev, next);
+    // No transition. Distinguish a scope boundary (terminal position — bubble to
+    // the parent so a nested sub-flow's last step advances the parent) from a
+    // guard-BLOCKED mid-flow next. A blocked next also returns same-ref, so we
+    // MUST check the position to tell them apart.
+    const i = indexOfCurrent(prev, cfg);
+    const isTerminal = i === cfg.descriptors.length - 1;
+    if (isTerminal) {
+      // Bubble unchanged — the parent itself defers if ITS next guard hasn't
+      // caught up yet (the configure→test case: the nested SAML metadata step is
+      // terminal, so its advance bubbles, and the parent defers test until the
+      // updateConnection revalidate lands). The parent's own dispatch fires its
+      // `onStepChange`.
+      parentRef.current?.goNext();
+      return;
+    }
+    // Guard-BLOCKED mid-flow next. Instead of a hard stop, DEFER: a
+    // submit-then-advance handler awaited its mutation + revalidate, so the cache
+    // is fresh but this render's config is stale. Park the from-position; the
+    // render-phase resolver re-reduces NEXT against the fresh config next render
+    // and advances once the guard holds. An explicit nav (goPrev/goToStep) before
+    // then abandons it.
+    setPendingNextFrom(prev.current);
   }, []);
 
   const goPrev = React.useCallback(() => {
+    // Any explicit navigation abandons a pending forward advance.
+    setPendingNextFrom(null);
     const prev = stateRef.current;
     const cfg = configRef.current;
     const next = reduce(prev, { type: 'PREV' }, cfg);
@@ -169,7 +221,14 @@ export const useWizardMachine = ({
     commit(prev, next);
   }, []);
 
-  const goToStep = React.useCallback((id: string) => dispatch({ type: 'GOTO', step: id }), [dispatch]);
+  const goToStep = React.useCallback(
+    (id: string) => {
+      // Any explicit navigation abandons a pending forward advance.
+      setPendingNextFrom(null);
+      dispatch({ type: 'GOTO', step: id });
+    },
+    [dispatch],
+  );
 
   const current = state.current;
 
