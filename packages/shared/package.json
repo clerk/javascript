@@ -126,8 +126,8 @@
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16",
     "lint:publint": "publint",
-    "test": "vitest",
-    "test:ci": "vitest --maxWorkers=70%",
+    "test": "vitest run",
+    "test:ci": "vitest run --maxWorkers=70%",
     "test:coverage": "vitest --collectCoverage && open coverage/lcov-report/index.html"
   },
   "dependencies": {

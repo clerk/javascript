@@ -74,7 +74,7 @@
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
-    "test": "vitest"
+    "test": "vitest run"
   },
   "dependencies": {
     "@clerk/backend": "workspace:^",
