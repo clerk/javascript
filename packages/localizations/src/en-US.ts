@@ -275,6 +275,11 @@ export const enUS: LocalizationResource = {
       formFieldLabel__domain: 'Domains',
       formFieldInputPlaceholder__domain: 'Type your domain here and click add to start',
       formButtonPrimary__add: 'Add',
+      txtRecordInstructions: {
+        paragraph1: 'Add this TXT record to your DNS provider.',
+        paragraph2:
+          "We'll verify automatically once the record is live. This usually takes under a minute, though updating an existing TXT record may take a bit longer.",
+      },
     },
     testConfigurationStep: {
       title: 'Test your SSO connection',

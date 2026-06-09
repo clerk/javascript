@@ -1373,6 +1373,10 @@ export type __internal_LocalizationResource = {
       formFieldLabel__domain: LocalizationValue;
       formFieldInputPlaceholder__domain: LocalizationValue;
       formButtonPrimary__add: LocalizationValue;
+      txtRecordInstructions: {
+        paragraph1: LocalizationValue;
+        paragraph2: LocalizationValue;
+      };
     };
     testConfigurationStep: {
       title: LocalizationValue;
