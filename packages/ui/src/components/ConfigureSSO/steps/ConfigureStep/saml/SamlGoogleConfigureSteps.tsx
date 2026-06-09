@@ -172,6 +172,13 @@ const SamlGoogleIdentityProviderMetadataStep = (): JSX.Element => {
   const [mode, setMode] = React.useState<IdpConfigurationMode>(hasExistingManualConfig ? 'manual' : 'metadataFile');
   const [metadataFile, setMetadataFile] = React.useState<File | null>(null);
   const [certFile, setCertFile] = React.useState<File | null>(null);
+  // Step-LOCAL submit state for the Continue button. `goNext` bubbles to the
+  // parent (this is the terminal nested step) and the parent DEFERS the
+  // configure→test advance until the updateConnection revalidate lands. Keeping
+  // the loading local — and NOT resetting it on success — holds the button
+  // loading straight through that deferred transition; the advance unmounts this
+  // nested step, ending the loading with no idle flash on the shared card.
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const metadataFileField = useFormControl('idpMetadata', '', {
     type: 'text',
@@ -215,7 +222,7 @@ const SamlGoogleIdentityProviderMetadataStep = (): JSX.Element => {
   const isValid =
     mode === 'metadataFile' ? hasMetadataFile : trimmedSignOnUrl.length > 0 && trimmedIssuer.length > 0 && hasCert;
 
-  const canSubmit = isValid && !card.isLoading;
+  const canSubmit = isValid && !isSubmitting;
 
   const formProps: IdentityProviderConfigurationFormProps =
     mode === 'metadataFile'
@@ -280,7 +287,7 @@ const SamlGoogleIdentityProviderMetadataStep = (): JSX.Element => {
     }
 
     card.setError(undefined);
-    card.setLoading();
+    setIsSubmitting(true);
 
     try {
       const saml = await buildSamlConfigurationPayload({
@@ -290,6 +297,9 @@ const SamlGoogleIdentityProviderMetadataStep = (): JSX.Element => {
       });
 
       await updateConnection(enterpriseConnection.id, { saml });
+      // `goNext` bubbles to the parent, which DEFERS the advance to `test` until
+      // the revalidate lands. The button STAYS loading and this nested step
+      // unmounts when that deferred advance resolves — do NOT reset on success.
       void goNext();
     } catch (err) {
       if (mode === 'metadataFile') {
@@ -297,8 +307,8 @@ const SamlGoogleIdentityProviderMetadataStep = (): JSX.Element => {
       } else {
         applySamlSubmitError(err, card, signOnUrlField, [issuerField, certificateField]);
       }
-    } finally {
-      card.setIdle();
+      // Re-enable ONLY on error — there is no advance to unmount the button.
+      setIsSubmitting(false);
     }
   };
 
@@ -353,11 +363,11 @@ const SamlGoogleIdentityProviderMetadataStep = (): JSX.Element => {
         <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
-          isDisabled={isFirstStep || card.isLoading}
+          isDisabled={isFirstStep || isSubmitting}
         />
         <Step.Footer.Continue
           onClick={handleContinue}
-          isLoading={card.isLoading}
+          isLoading={isSubmitting}
           isDisabled={!canSubmit}
         />
       </Step.Footer>

@@ -73,6 +73,15 @@ export const SelectProviderStep = (): JSX.Element => {
   const [selected, setSelected] = React.useState<ProviderType | null>(c.provider ?? null);
   const card = useCardState();
 
+  // Step-LOCAL submit state for the Continue button. `goNext` now DEFERS the
+  // advance until the next step's guard catches up to the just-resolved create
+  // (the wizard machine resolves it on the next render), so the shared card
+  // loading would otherwise leak into the next step as an idle flash. Keeping
+  // the loading local — and NOT resetting it on success — holds the button in
+  // its loading state straight through the transition; the deferred advance
+  // unmounts this step, which ends the loading visually with no idle frame.
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+
   const handleSelect = (next: ProviderType) => {
     setSelected(next);
   };
@@ -86,22 +95,25 @@ export const SelectProviderStep = (): JSX.Element => {
     }
 
     // Connection already created on a prior visit: don't re-create, just
-    // advance — `configure`'s guard already holds.
+    // advance — `configure`'s guard already holds, so this advances immediately
+    // (no submit, no loading).
     if (c.hasConnection) {
       goNext();
       return;
     }
 
     card.setError(undefined);
-    card.setLoading();
+    setIsSubmitting(true);
 
     try {
       await createConnection(selected, primaryEmailAddress);
+      // `goNext` defers; the button STAYS loading and this step unmounts when
+      // the deferred advance lands. Do NOT reset `isSubmitting` on success.
       goNext();
     } catch (err) {
       handleError(err as Error, [], card.setError);
-    } finally {
-      card.setIdle();
+      // Re-enable the button ONLY on error — there is no advance to unmount it.
+      setIsSubmitting(false);
     }
   };
 
@@ -178,8 +190,8 @@ export const SelectProviderStep = (): JSX.Element => {
 
           <Step.Footer.Continue
             onClick={handleContinue}
-            isLoading={card.isLoading}
-            isDisabled={!selected || card.isLoading}
+            isLoading={isSubmitting}
+            isDisabled={!selected || isSubmitting}
           />
         </Step.Footer>
       </Step>
