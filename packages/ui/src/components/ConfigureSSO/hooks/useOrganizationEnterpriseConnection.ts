@@ -18,10 +18,9 @@ import type {
 import { useMemo, useRef } from 'react';
 
 import {
-  connectionBackingEmail,
+  organizationEnterpriseConnection as buildOrganizationEnterpriseConnection,
   isEnterpriseConnectionConfigured,
   type OrganizationEnterpriseConnection,
-  organizationEnterpriseConnection as buildOrganizationEnterpriseConnection,
 } from '../domain/organizationEnterpriseConnection';
 import type { ProviderType } from '../types';
 import { type RefreshTestRunsOptions, useEnterpriseConnectionTestRuns } from './useEnterpriseConnectionTestRuns';
@@ -183,6 +182,7 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
       return createEnterpriseConnection({
         provider,
         name: emailDomain,
+        // TODO -> Add organization domains to the connection
         domains: [emailDomain],
       });
     };
@@ -239,20 +239,17 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
     ],
   );
 
-  // The email whose domain backs the connection — the single domain rule, shared
-  // with the verify-domain step so the guards and the UI never disagree.
-  const primaryEmail = connectionBackingEmail(user);
-
   // The single domain entity everything downstream reads decisions from, keyed
   // on the raw inputs so it is only rebuilt when one of them changes.
   const organizationEnterpriseConnection = useMemo<OrganizationEnterpriseConnection>(
     () =>
       buildOrganizationEnterpriseConnection({
         connection: enterpriseConnection,
-        primaryEmail,
+        // TODO -> Add organization domains to the connection
+        domains: ['clerk.dev'],
         hasSuccessfulTestRun,
       }),
-    [enterpriseConnection, primaryEmail, hasSuccessfulTestRun],
+    [enterpriseConnection, hasSuccessfulTestRun],
   );
 
   return {

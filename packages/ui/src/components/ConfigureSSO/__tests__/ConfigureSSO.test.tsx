@@ -69,31 +69,9 @@ describe('ConfigureSSO', () => {
   });
 
   describe('state machine mounts on the right step', () => {
-    it('mounts on verify-domain when the primary email is unverified and there is no connection', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        f.withEnterpriseSso({ selfServeSSO: true });
-        f.withEmailAddress();
-        f.withOrganizations();
-        f.withUser({
-          // An unverified primary email fails `select-provider`'s guard
-          // (`isPrimaryEmailVerified`), so the furthest-reachable step is the
-          // verify-domain entry step rather than select-provider.
-          email_addresses: [{ email_address: 'test@clerk.com', verification: { status: 'unverified' } }],
-          organization_memberships: [{ name: 'Org1', permissions: ['org:sys_entconns:manage'] }],
-        });
-      });
+    // TODO: Add test for TXT domain-verification case (ORGS-1594)
+    // When there are pending organization domains, the machine should mount on the verify-domain step
 
-      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
-
-      const { findByRole, queryByText } = render(<ConfigureSSO />, { wrapper });
-
-      // The verify-domain step header is the only step rendered; select-provider
-      // is gated out behind the unverified email.
-      await findByRole('heading', { name: /verify email address/i });
-      expect(queryByText(/select your identity provider/i)).not.toBeInTheDocument();
-    });
-
-    // TODO: replace with a TXT domain-verification case (ORGS-1594)
     it('mounts on select-provider with a verified email and no connection', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEnterpriseSso({ selfServeSSO: true });

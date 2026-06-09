@@ -40,7 +40,6 @@ export interface OrganizationEnterpriseConnection {
   readonly hasConnection: boolean;
   readonly isActive: boolean;
   readonly hasMinimumConfiguration: boolean;
-  readonly isPrimaryEmailVerified: boolean;
   readonly hasSuccessfulTestRun: boolean;
   readonly status: OrganizationEnterpriseConnectionStatus;
 }
@@ -73,7 +72,6 @@ const connectionStatus = ({
 
 export const organizationEnterpriseConnection = ({
   connection,
-  primaryEmail,
   hasSuccessfulTestRun,
 }: OrganizationEnterpriseConnectionInput): OrganizationEnterpriseConnection => {
   const hasConnection = Boolean(connection);
@@ -85,7 +83,6 @@ export const organizationEnterpriseConnection = ({
     hasConnection,
     isActive,
     hasMinimumConfiguration,
-    isPrimaryEmailVerified: primaryEmail?.verification?.status === 'verified',
     hasSuccessfulTestRun,
     status: connectionStatus({ hasConnection, isActive, hasMinimumConfiguration, hasSuccessfulTestRun }),
   };

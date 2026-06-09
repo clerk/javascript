@@ -23,7 +23,6 @@ const createEnterpriseConnection = vi.fn();
 const contextState = vi.hoisted(() => ({
   provider: undefined as 'saml_okta' | 'saml_custom' | undefined,
   primaryEmailAddress: { emailAddress: 'test@clerk.com' } as { emailAddress: string } | undefined,
-  isPrimaryEmailVerified: true,
 }));
 
 vi.mock('../../ConfigureSSOContext', () => ({
@@ -40,7 +39,6 @@ vi.mock('../../ConfigureSSOContext', () => ({
     // unconditional.
     organizationEnterpriseConnection: {
       provider: contextState.provider,
-      isPrimaryEmailVerified: contextState.isPrimaryEmailVerified,
     },
   }),
 }));
@@ -62,7 +60,6 @@ const resetMocks = () => {
   createEnterpriseConnection.mockResolvedValue(undefined);
   contextState.provider = undefined;
   contextState.primaryEmailAddress = { emailAddress: 'test@clerk.com' };
-  contextState.isPrimaryEmailVerified = true;
 };
 
 describe('SelectProviderStep', () => {
@@ -216,11 +213,11 @@ describe('SelectProviderStep', () => {
   });
 
   it('always creates and jumps to configure (verify-domain ran first, so no branch back)', async () => {
+    // TODO -> Update with organization domains verification
     // Under the new step order the user reaches select-provider only after
     // verify-domain, so the create is unconditional even if the verified fact is
     // somehow false — there is no longer a branch back to verify-domain.
     resetMocks();
-    contextState.isPrimaryEmailVerified = false;
 
     const { wrapper } = await createFixtures();
     const { userEvent } = renderStep(wrapper);

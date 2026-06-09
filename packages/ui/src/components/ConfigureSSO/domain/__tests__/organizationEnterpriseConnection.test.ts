@@ -122,21 +122,6 @@ describe('organizationEnterpriseConnection', () => {
     });
   });
 
-  describe('isPrimaryEmailVerified', () => {
-    it('undefined email → false', () => {
-      expect(derive({ primaryEmail: undefined }).isPrimaryEmailVerified).toBe(false);
-    });
-    it('null email → false', () => {
-      expect(derive({ primaryEmail: null }).isPrimaryEmailVerified).toBe(false);
-    });
-    it('unverified email → false', () => {
-      expect(derive({ primaryEmail: makeEmail('unverified') }).isPrimaryEmailVerified).toBe(false);
-    });
-    it('verified email → true', () => {
-      expect(derive({ primaryEmail: makeEmail('verified') }).isPrimaryEmailVerified).toBe(true);
-    });
-  });
-
   describe('hasSuccessfulTestRun', () => {
     it('false input → false', () => {
       expect(derive({ hasSuccessfulTestRun: false }).hasSuccessfulTestRun).toBe(false);
@@ -214,8 +199,7 @@ describe('organizationEnterpriseConnection', () => {
 
   it('is pure: identical inputs produce a deep-equal entity', () => {
     const connection = makeConnection({ samlConnection: fullyConfiguredSaml, active: true });
-    const primaryEmail = makeEmail('verified');
-    const inputs = { connection, primaryEmail, hasSuccessfulTestRun: true } as const;
+    const inputs = { connection, hasSuccessfulTestRun: true } as const;
 
     expect(organizationEnterpriseConnection(inputs)).toEqual(organizationEnterpriseConnection(inputs));
   });
@@ -232,7 +216,6 @@ describe('organizationEnterpriseConnection', () => {
       hasConnection: true,
       isActive: true,
       hasMinimumConfiguration: true,
-      isPrimaryEmailVerified: true,
       hasSuccessfulTestRun: true,
       status: 'active',
     });
