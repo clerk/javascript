@@ -11,7 +11,7 @@ import {
   useInteractions,
   useRole,
 } from '@floating-ui/react';
-import { type ReactNode, useMemo, useRef, useState } from 'react';
+import { type ReactNode, useId, useMemo, useRef } from 'react';
 
 import { useControllableState } from '../../hooks/use-controllable-state';
 import { useTransition } from '../../hooks/use-transition';
@@ -32,8 +32,8 @@ function DialogInner(props: DialogProps) {
 
   const [open, setOpen] = useControllableState(props.open, props.defaultOpen ?? false, props.onOpenChange);
 
-  const [labelId, setLabelId] = useState<string | undefined>();
-  const [descriptionId, setDescriptionId] = useState<string | undefined>();
+  const labelId = useId();
+  const descriptionId = useId();
 
   const popupRef = useRef<HTMLDivElement | null>(null);
 
@@ -68,8 +68,6 @@ function DialogInner(props: DialogProps) {
       modal,
       labelId,
       descriptionId,
-      setLabelId,
-      setDescriptionId,
       mounted,
       transitionProps,
     }),

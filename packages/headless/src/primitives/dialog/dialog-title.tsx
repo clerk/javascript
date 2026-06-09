@@ -1,25 +1,17 @@
 'use client';
 
-import { useId, useLayoutEffect } from 'react';
-
 import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
 import { useDialogContext } from './dialog-context';
 
-export type DialogTitleProps = ComponentProps<'h2'>;
+export type DialogTitleProps = Omit<ComponentProps<'h2'>, 'id'>;
 
 export function DialogTitle(props: DialogTitleProps) {
   const { render, ...otherProps } = props;
-  const { setLabelId } = useDialogContext();
-  const id = useId();
-
-  useLayoutEffect(() => {
-    setLabelId(id);
-    return () => setLabelId(undefined);
-  }, [id, setLabelId]);
+  const { labelId } = useDialogContext();
 
   const defaultProps = {
     'data-cl-slot': 'dialog-title',
-    id,
+    id: labelId,
   };
 
   return renderElement({

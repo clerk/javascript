@@ -12,10 +12,8 @@ export interface DialogContextValue {
   getFloatingProps: UseInteractionsReturn['getFloatingProps'];
   popupRef: React.RefObject<HTMLDivElement | null>;
   modal: boolean;
-  labelId: string | undefined;
-  descriptionId: string | undefined;
-  setLabelId: React.Dispatch<React.SetStateAction<string | undefined>>;
-  setDescriptionId: React.Dispatch<React.SetStateAction<string | undefined>>;
+  labelId: string;
+  descriptionId: string;
   mounted: boolean;
   transitionProps: TransitionProps;
 }
