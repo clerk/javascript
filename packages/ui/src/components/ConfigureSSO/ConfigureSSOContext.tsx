@@ -2,8 +2,7 @@ import type { EmailAddressResource, EnterpriseConnectionResource } from '@clerk/
 import React, { type PropsWithChildren } from 'react';
 
 import type { OrganizationEnterpriseConnection } from './domain/organizationEnterpriseConnection';
-import type { EnterpriseConnectionMutations } from './hooks/useEnterpriseConnectionMutations';
-import type { TestRunsView } from './hooks/useOrganizationEnterpriseConnection';
+import type { EnterpriseConnectionMutations, TestRunsView } from './hooks/useOrganizationEnterpriseConnection';
 
 /**
  * Shared state for the ConfigureSSO wizard, persisted across steps. Everything

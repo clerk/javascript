@@ -1,3 +1,4 @@
+import type { EmailAddressResource } from '@clerk/shared/types';
 import { renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -38,13 +39,21 @@ const testRunsState = vi.hoisted(() => ({
   isFetching: false,
 }));
 
+// Stable spies for the source mutations so a test can assert what the umbrella
+// hook forwards to the underlying create/update/delete handles.
+const mutationSpies = vi.hoisted(() => ({
+  create: vi.fn(),
+  update: vi.fn(),
+  delete: vi.fn(),
+}));
+
 vi.mock('@clerk/shared/react', () => ({
   __internal_useOrganizationEnterpriseConnections: () => ({
     data: connectionsState.data,
     isLoading: connectionsState.isLoading,
-    createEnterpriseConnection: vi.fn(),
-    updateEnterpriseConnection: vi.fn(),
-    deleteEnterpriseConnection: vi.fn(),
+    createEnterpriseConnection: mutationSpies.create,
+    updateEnterpriseConnection: mutationSpies.update,
+    deleteEnterpriseConnection: mutationSpies.delete,
   }),
   __internal_useOrganizationEnterpriseConnectionTestRuns: (params: { enabled?: boolean }) => {
     testRunsState.calls.push({ enabled: params.enabled });
@@ -60,7 +69,6 @@ vi.mock('@clerk/shared/react', () => ({
       revalidate: vi.fn(() => Promise.resolve()),
     };
   },
-  useReverification: (fn: unknown) => fn,
   useUser: () => ({ user: { primaryEmailAddress: { emailAddress: 'admin@clerk.com' }, emailAddresses: [] } }),
   useSession: () => ({ session: { id: 'sess_1' } }),
   useOrganization: () => ({ organization: { id: 'org_1' } }),
@@ -74,6 +82,9 @@ beforeEach(() => {
   testRunsState.calls = [];
   testRunsState.isLoading = false;
   testRunsState.isFetching = false;
+  mutationSpies.create.mockReset();
+  mutationSpies.update.mockReset();
+  mutationSpies.delete.mockReset();
 });
 
 const lastTwoCalls = () => testRunsState.calls.slice(-2);
@@ -156,5 +167,36 @@ describe('useOrganizationEnterpriseConnection — test-runs gating', () => {
     const { result } = renderHook(() => useOrganizationEnterpriseConnection());
 
     expect(result.current.isLoading).toBe(true);
+  });
+});
+
+describe('useOrganizationEnterpriseConnection — mutations', () => {
+  const emailAddress = (address: string) => ({ emailAddress: address }) as EmailAddressResource;
+
+  it('createConnection derives the name from the email domain and forwards it (no organizationId in body)', async () => {
+    const { result } = renderHook(() => useOrganizationEnterpriseConnection());
+
+    await result.current.mutations.createConnection('saml_okta', emailAddress('admin@acme.com'));
+
+    expect(mutationSpies.create).toHaveBeenCalledTimes(1);
+    expect(mutationSpies.create).toHaveBeenCalledWith({
+      provider: 'saml_okta',
+      name: 'acme.com',
+    });
+  });
+
+  it('createConnection resolves to undefined without creating when no email is available', async () => {
+    const { result } = renderHook(() => useOrganizationEnterpriseConnection());
+
+    await expect(result.current.mutations.createConnection('saml_okta', undefined)).resolves.toBeUndefined();
+    expect(mutationSpies.create).not.toHaveBeenCalled();
+  });
+
+  it('setConnectionActive forwards only the active flag to update', async () => {
+    const { result } = renderHook(() => useOrganizationEnterpriseConnection());
+
+    await result.current.mutations.setConnectionActive('ent_1', true);
+
+    expect(mutationSpies.update).toHaveBeenCalledWith('ent_1', { active: true });
   });
 });

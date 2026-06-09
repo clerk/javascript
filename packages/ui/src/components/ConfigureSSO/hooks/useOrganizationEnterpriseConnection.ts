@@ -5,11 +5,14 @@ import {
   useUser,
 } from '@clerk/shared/react';
 import type {
+  DeletedObjectResource,
   EmailAddressResource,
   EnterpriseConnectionResource,
+  EnterpriseConnectionTestRunInitResource,
   EnterpriseConnectionTestRunResource,
   OrganizationResource,
   SignedInSessionResource,
+  UpdateOrganizationEnterpriseConnectionParams,
   UserResource,
 } from '@clerk/shared/types';
 import { useMemo, useRef } from 'react';
@@ -19,11 +22,39 @@ import {
   type OrganizationEnterpriseConnection,
   organizationEnterpriseConnection as buildOrganizationEnterpriseConnection,
 } from '../domain/organizationEnterpriseConnection';
-import {
-  type EnterpriseConnectionMutations,
-  useEnterpriseConnectionMutations,
-} from './useEnterpriseConnectionMutations';
+import type { ProviderType } from '../types';
 import { type RefreshTestRunsOptions, useEnterpriseConnectionTestRuns } from './useEnterpriseConnectionTestRuns';
+
+/**
+ * The full set of enterprise-connection mutations.
+ *
+ * The org-scoped enterprise-connection FAPI endpoints carry no
+ * `EnsureReverification` middleware (that lived on the old `/me` scope), so
+ * `session_reverification_required` never fires here and these writes call the
+ * underlying handles directly — no `useReverification` wrapping.
+ *
+ * This surface is intentionally connection-domain only: it carries no wizard,
+ * step, or navigation concepts, so it can be lifted into a reusable hook for
+ * custom self-serve SSO flows.
+ */
+export interface EnterpriseConnectionMutations {
+  /**
+   * Derives the connection name from the email domain; resolves to `undefined`
+   * without creating when no primary email is available.
+   */
+  createConnection: (
+    provider: ProviderType,
+    primaryEmailAddress?: EmailAddressResource,
+  ) => Promise<EnterpriseConnectionResource | undefined>;
+  updateConnection: (
+    id: string,
+    params: UpdateOrganizationEnterpriseConnectionParams,
+  ) => Promise<EnterpriseConnectionResource | undefined>;
+  setConnectionActive: (id: string, active: boolean) => Promise<EnterpriseConnectionResource | undefined>;
+  deleteConnection: (id: string) => Promise<DeletedObjectResource | undefined>;
+  /** Resolves with the test-run URL to open. */
+  createTestRun: (id: string) => Promise<EnterpriseConnectionTestRunInitResource>;
+}
 
 export interface UseOrganizationEnterpriseConnectionResult {
   /**
@@ -134,12 +165,53 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
 
   const primaryEmailAddress = user?.primaryEmailAddress ?? undefined;
 
-  const mutations = useEnterpriseConnectionMutations({
-    organization,
-    createEnterpriseConnection,
-    updateEnterpriseConnection,
-    deleteEnterpriseConnection,
-  });
+  // The connection-domain mutations, defined inline here so the umbrella hook
+  // owns the single mutation surface. The org-scoped FAPI endpoints have no
+  // reverification middleware, so these call the underlying handles directly.
+  const mutations = useMemo<EnterpriseConnectionMutations>(() => {
+    const createConnection: EnterpriseConnectionMutations['createConnection'] = (provider, primaryEmail) => {
+      const emailDomain = primaryEmail?.emailAddress.split('@')[1];
+
+      if (!emailDomain) {
+        return Promise.resolve(undefined);
+      }
+
+      // The organization is inferred from the URL path on the org-scoped
+      // endpoint, so we don't pass `organizationId` in the body.
+      return createEnterpriseConnection({
+        provider,
+        name: emailDomain,
+      });
+    };
+
+    const updateConnection: EnterpriseConnectionMutations['updateConnection'] = (id, params) =>
+      updateEnterpriseConnection(id, params);
+
+    const setConnectionActive: EnterpriseConnectionMutations['setConnectionActive'] = (id, active) =>
+      updateEnterpriseConnection(id, { active });
+
+    const deleteConnection: EnterpriseConnectionMutations['deleteConnection'] = id => deleteEnterpriseConnection(id);
+
+    const createTestRun: EnterpriseConnectionMutations['createTestRun'] = id => {
+      // The flow never reaches the test step without an active organization;
+      // guard so the fetcher stays well-typed without leaking an `undefined`
+      // organization.
+      if (!organization) {
+        throw new Error(
+          'useOrganizationEnterpriseConnection.createTestRun called before the organization resource was loaded.',
+        );
+      }
+      return organization.createEnterpriseConnectionTestRun(id);
+    };
+
+    return {
+      createConnection,
+      updateConnection,
+      setConnectionActive,
+      deleteConnection,
+      createTestRun,
+    };
+  }, [organization, createEnterpriseConnection, updateEnterpriseConnection, deleteEnterpriseConnection]);
 
   const testRuns = useMemo<TestRunsView>(
     () => ({
