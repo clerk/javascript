@@ -38,11 +38,6 @@ export type {
   UseUserEnterpriseConnectionsParams,
   UseUserEnterpriseConnectionsReturn,
 } from './useUserEnterpriseConnections';
-export { __internal_useEnterpriseConnectionTestRuns } from './useEnterpriseConnectionTestRuns';
-export type {
-  UseEnterpriseConnectionTestRunsParams,
-  UseEnterpriseConnectionTestRunsReturn,
-} from './useEnterpriseConnectionTestRuns';
 export { __internal_useOrganizationEnterpriseConnections } from './useOrganizationEnterpriseConnections';
 export type {
   UseOrganizationEnterpriseConnectionsParams,
