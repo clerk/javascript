@@ -2,6 +2,7 @@
   "files": [
     { "path": "./dist/ui.browser.js", "maxSize": "42KB" },
     { "path": "./dist/ui.legacy.browser.js", "maxSize": "84KB" },
+    { "path": "./dist/ui.shared.browser.js", "maxSize": "40KB" },
     { "path": "./dist/framework*.js", "maxSize": "44KB" },
     { "path": "./dist/vendors*.js", "maxSize": "73KB" },
     { "path": "./dist/ui-common*.js", "maxSize": "130KB" },
@@ -32,6 +33,6 @@
     { "path": "./dist/op-plans-page*.js", "maxSize": "3KB" },
     { "path": "./dist/statement-page*.js", "maxSize": "5KB" },
     { "path": "./dist/payment-attempt-page*.js", "maxSize": "4KB" },
-    { "path": "./dist/web3-solana-wallet-buttons*.js", "maxSize": "88KB" }
+    { "path": "./dist/web3-solana-wallet-buttons*.js", "maxSize": "85KB" }
   ]
 }

@@ -57,9 +57,24 @@ export interface TelemetryLogEntry {
   readonly userId?: string;
 }
 
+/**
+ * @inline
+ */
 export interface TelemetryCollector {
+  /**
+   * Indicates whether telemetry is enabled.
+   */
   isEnabled: boolean;
+  /**
+   * If `true`, telemetry events are only logged to the console and not sent to Clerk.
+   */
   isDebug: boolean;
+  /**
+   * Records a telemetry event.
+   */
   record(event: TelemetryEventRaw): void;
+  /**
+   * Records a telemetry log entry.
+   */
   recordLog(entry: TelemetryLogEntry): void;
 }

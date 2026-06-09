@@ -399,7 +399,7 @@ void (async () => {
     '/waitlist': { mount: 'mountWaitlist', component: 'waitlist' },
     '/pricing-table': { mount: 'mountPricingTable', component: 'pricingTable' },
     '/api-keys': { mount: 'mountAPIKeys', component: 'apiKeys' },
-    '/configure-sso': { mount: 'mountConfigureSSO', component: 'configureSSO' },
+    '/configure-sso': { mount: '__internal_mountConfigureSSO', component: 'configureSSO' },
     '/task-choose-organization': {
       mount: 'mountTaskChooseOrganization',
       component: 'taskChooseOrganization',
