@@ -16,10 +16,12 @@ export function useControllableState<T>(
 ): [T, (value: T) => void] {
   const [uncontrolled, setUncontrolled] = useState(defaultValue);
   const value = controlled !== undefined ? controlled : uncontrolled;
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally keyed on `controlled !== undefined` to avoid re-creating when the controlled value changes
+
   const setValue = useCallback(
     (next: T) => {
-      if (controlled === undefined) setUncontrolled(next);
+      if (controlled === undefined) {
+        setUncontrolled(next);
+      }
       onChange?.(next);
     },
     [controlled !== undefined, onChange],

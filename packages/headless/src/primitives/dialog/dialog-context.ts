@@ -1,5 +1,6 @@
 import type { ExtendedRefs, FloatingContext, ReferenceType, UseInteractionsReturn } from '@floating-ui/react';
 import { createContext, useContext } from 'react';
+
 import type { TransitionProps } from '../../hooks/use-transition';
 
 export interface DialogContextValue {

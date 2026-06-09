@@ -1,6 +1,7 @@
 import { act, renderHook } from '@testing-library/react';
 import { createRef, type RefObject } from 'react';
 import { describe, expect, it, vi } from 'vitest';
+
 import { useAnimationsFinished } from './use-animations-finished';
 
 function createMockElement(
@@ -63,7 +64,7 @@ describe('useAnimationsFinished', () => {
 
     // After animations finish, change getAnimations to return empty
     el.getAnimations = vi.fn(() => [] as unknown as Animation[]);
-    await act(async () => resolveAnim());
+    await act(() => resolveAnim());
 
     expect(callback).toHaveBeenCalledTimes(1);
   });
@@ -89,7 +90,7 @@ describe('useAnimationsFinished', () => {
     expect(secondCallback).toHaveBeenCalledTimes(1);
 
     // Resolve first animation — its callback should NOT fire
-    await act(async () => resolveFirst());
+    await act(() => resolveFirst());
     expect(firstCallback).not.toHaveBeenCalled();
   });
 

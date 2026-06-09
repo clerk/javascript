@@ -1,10 +1,11 @@
 'use client';
 
 import { useId, useLayoutEffect } from 'react';
-import { useDialogContext } from './dialog-context';
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
 
-export interface DialogDescriptionProps extends ComponentProps<'p'> {}
+import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { useDialogContext } from './dialog-context';
+
+export type DialogDescriptionProps = ComponentProps<'p'>;
 
 export function DialogDescription(props: DialogDescriptionProps) {
   const { render, ...otherProps } = props;

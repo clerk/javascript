@@ -130,7 +130,9 @@ export function renderElement<
 >(params: RenderElementParamsBase<Tag, State> & { enabled?: boolean }): React.ReactElement | null {
   const { defaultTagName, render, enabled = true, state, stateAttributesMapping, props } = params;
 
-  if (!enabled) return null;
+  if (!enabled) {
+    return null;
+  }
 
   // Build data attributes from state
   let dataAttrs: Record<string, string> = {};

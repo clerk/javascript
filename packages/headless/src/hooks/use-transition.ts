@@ -1,6 +1,7 @@
 'use client';
 
 import { type CSSProperties, type RefObject, useEffect, useMemo } from 'react';
+
 import { useAnimationsFinished } from './use-animations-finished';
 import { type TransitionStatus, useTransitionStatus } from './use-transition-status';
 
@@ -42,7 +43,9 @@ export function useTransition({ open, ref }: UseTransitionOptions): UseTransitio
   const runOnAnimationsFinished = useAnimationsFinished(ref, open);
 
   useEffect(() => {
-    if (transitionStatus !== 'ending') return;
+    if (transitionStatus !== 'ending') {
+      return;
+    }
     runOnAnimationsFinished(() => {
       setMounted(false);
     });

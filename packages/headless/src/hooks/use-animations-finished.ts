@@ -41,7 +41,9 @@ export function useAnimationsFinished(ref: RefObject<HTMLElement | null>, open: 
       }
 
       const runCheck = () => {
-        if (signal.aborted) return;
+        if (signal.aborted) {
+          return;
+        }
         const animations = element.getAnimations();
         if (animations.length === 0) {
           // Called synchronously (from useEffect or MutationObserver) —
@@ -51,13 +53,17 @@ export function useAnimationsFinished(ref: RefObject<HTMLElement | null>, open: 
         }
         Promise.all(animations.map(a => a.finished))
           .then(() => {
-            if (signal.aborted) return;
+            if (signal.aborted) {
+              return;
+            }
             // Called from a microtask — flushSync forces synchronous unmount
             // so there's no flash of the element in its final animated state.
             flushSync(callback);
           })
           .catch(() => {
-            if (signal.aborted) return;
+            if (signal.aborted) {
+              return;
+            }
             // An animation was cancelled. If new animations are running, wait
             // for those instead; otherwise we're done.
             const current = element.getAnimations();

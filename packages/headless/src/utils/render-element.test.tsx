@@ -1,5 +1,6 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+
 import { mergeProps, renderElement } from './render-element';
 
 afterEach(() => {
@@ -22,7 +23,7 @@ describe('mergeProps', () => {
     const second = vi.fn();
     const result = mergeProps<'button'>({ onClick: first }, { onClick: second });
 
-    (result.onClick as Function)();
+    (result.onClick as (...args: unknown[]) => void)();
 
     expect(first).toHaveBeenCalledTimes(1);
     expect(second).toHaveBeenCalledTimes(1);
@@ -61,7 +62,7 @@ describe('renderElement', () => {
       props: { 'data-testid': 'test', children: 'hello' },
     });
 
-    render(element!);
+    render(element);
 
     const el = screen.getByTestId('test');
     expect(el.tagName).toBe('SPAN');
@@ -75,7 +76,7 @@ describe('renderElement', () => {
       props: { 'data-testid': 'test', children: 'content' },
     });
 
-    render(element!);
+    render(element);
 
     const el = screen.getByTestId('test');
     expect(el.tagName).toBe('ARTICLE');
@@ -98,7 +99,7 @@ describe('renderElement', () => {
       props: { 'data-testid': 'test', children: 'visible' },
     });
 
-    render(element!);
+    render(element);
 
     expect(screen.getByTestId('test')).toBeInTheDocument();
   });
@@ -113,7 +114,7 @@ describe('renderElement', () => {
       props: { 'data-testid': 'test' },
     });
 
-    render(element!);
+    render(element);
 
     const el = screen.getByTestId('test');
     expect(el).toHaveAttribute('data-cl-open', '');
@@ -130,7 +131,7 @@ describe('renderElement', () => {
       props: { 'data-testid': 'test' },
     });
 
-    render(element!);
+    render(element);
 
     const el = screen.getByTestId('test');
     expect(el).toHaveAttribute('data-cl-closed', '');
@@ -147,7 +148,7 @@ describe('renderElement', () => {
       props: { 'data-testid': 'test' },
     });
 
-    render(element!);
+    render(element);
 
     const el = screen.getByTestId('test');
     expect(el).not.toHaveAttribute('data-cl-selected');
@@ -165,7 +166,7 @@ describe('renderElement', () => {
       props: { 'data-testid': 'test' },
     });
 
-    render(element!);
+    render(element);
 
     const el = screen.getByTestId('test');
     expect(el).toHaveAttribute('data-cl-selected', '');
@@ -183,7 +184,7 @@ describe('renderElement', () => {
       props: { 'data-testid': 'test', 'data-cl-open': 'should-be-overridden' },
     });
 
-    render(element!);
+    render(element);
 
     const el = screen.getByTestId('test');
     expect(el).toHaveAttribute('data-cl-open', '');

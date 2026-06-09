@@ -1,5 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { useTransitionStatus } from './use-transition-status';
 
 describe('useTransitionStatus', () => {

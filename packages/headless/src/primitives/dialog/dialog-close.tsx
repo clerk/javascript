@@ -1,9 +1,9 @@
 'use client';
 
-import { useDialogContext } from './dialog-context';
 import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { useDialogContext } from './dialog-context';
 
-export interface DialogCloseProps extends ComponentProps<'button'> {}
+export type DialogCloseProps = ComponentProps<'button'>;
 
 export function DialogClose(props: DialogCloseProps) {
   const { render, ...otherProps } = props;

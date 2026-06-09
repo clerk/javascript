@@ -39,7 +39,9 @@ export function useTransitionStatus(open: boolean) {
   // After the browser has painted the 'starting' frame, remove it so the CSS
   // transition fires toward the element's resting style.
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      return;
+    }
     const id = requestAnimationFrame(() => {
       setTransitionStatus(undefined);
     });

@@ -2,6 +2,7 @@
 
 import { FloatingPortal } from '@floating-ui/react';
 import type { ReactNode } from 'react';
+
 import { DialogScopedContext, useDialogContext } from './dialog-context';
 
 export interface DialogPortalProps {
@@ -13,7 +14,9 @@ export function DialogPortal(props: DialogPortalProps) {
   const { mounted } = useDialogContext();
   const isScoped = props.root != null;
 
-  if (!mounted) return null;
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <FloatingPortal root={props.root}>

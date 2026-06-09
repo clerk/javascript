@@ -1,6 +1,7 @@
 import { act, renderHook } from '@testing-library/react';
 import type { RefObject } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { useTransition } from './use-transition';
 
 describe('useTransition', () => {

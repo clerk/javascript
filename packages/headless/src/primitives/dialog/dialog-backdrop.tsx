@@ -2,8 +2,9 @@
 
 import { FloatingOverlay } from '@floating-ui/react';
 import { useContext } from 'react';
-import { DialogScopedContext, useDialogContext } from './dialog-context';
+
 import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { DialogScopedContext, useDialogContext } from './dialog-context';
 
 export interface DialogBackdropProps extends ComponentProps<'div'> {
   /** When true, locks body scroll while the dialog is open. Default: true */
