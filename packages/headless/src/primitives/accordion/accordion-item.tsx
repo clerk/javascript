@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+
 import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
 import { AccordionItemContext, type AccordionItemContextValue, useAccordionContext } from './accordion-context';
 

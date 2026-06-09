@@ -1,23 +1,30 @@
 'use client';
 
+import { useMergeRefs } from '@floating-ui/react';
 import { type RefObject, useLayoutEffect, useRef, useState } from 'react';
+
 import { useTransition } from '../../hooks/use-transition';
 import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
 import { useAccordionItemContext } from './accordion-context';
 
-export interface AccordionPanelProps extends ComponentProps<'div'> {}
+export type AccordionPanelProps = ComponentProps<'div'>;
 
 export function AccordionPanel(props: AccordionPanelProps) {
-  const { render, ...otherProps } = props;
+  const { render, ref: consumerRef, ...otherProps } = props;
   const { open, triggerId, panelId } = useAccordionItemContext();
 
   const panelRef = useRef<HTMLElement | null>(null);
+  // Merge the consumer ref with the internal panelRef so passing a ref does not
+  // clobber the ref the panel relies on for height measurement.
+  const combinedRef = useMergeRefs([panelRef, consumerRef]);
   const [height, setHeight] = useState<number | undefined>(undefined);
 
   // Track whether open has ever transitioned from true→false.
   // Until that happens, skip enter animations (prevents animate-on-load).
   const hasBeenClosed = useRef(false);
-  if (!open) hasBeenClosed.current = true;
+  if (!open) {
+    hasBeenClosed.current = true;
+  }
 
   const { mounted, transitionProps } = useTransition({
     open,
@@ -26,10 +33,14 @@ export function AccordionPanel(props: AccordionPanelProps) {
 
   // Measure the content height and keep it in sync via ResizeObserver
   useLayoutEffect(() => {
-    if (!mounted) return;
+    if (!mounted) {
+      return;
+    }
 
     const panel = panelRef.current;
-    if (!panel) return;
+    if (!panel) {
+      return;
+    }
 
     // Measure scrollHeight of the panel's content
     const measure = () => {
@@ -61,13 +72,18 @@ export function AccordionPanel(props: AccordionPanelProps) {
     id: panelId,
     role: 'region' as const,
     'aria-labelledby': triggerId,
-    ref: panelRef,
+    ref: combinedRef,
     ...effectiveTransitionProps,
     style: {
       '--cl-accordion-panel-height': height != null ? `${height}px` : undefined,
       ...effectiveTransitionProps.style,
     },
   };
+
+  const merged = mergeProps<'div'>(defaultProps, otherProps);
+  // The wired id is owned by the primitive: a consumer-supplied id must not
+  // override it, or the trigger/panel aria pairing would silently break.
+  merged.id = panelId;
 
   return renderElement({
     defaultTagName: 'div',
@@ -77,6 +93,6 @@ export function AccordionPanel(props: AccordionPanelProps) {
     stateAttributesMapping: {
       open: (v: boolean): Record<string, string> | null => (v ? { 'data-cl-open': '' } : { 'data-cl-closed': '' }),
     },
-    props: mergeProps<'div'>(defaultProps, otherProps),
+    props: merged,
   });
 }

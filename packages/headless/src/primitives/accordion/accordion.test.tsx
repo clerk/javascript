@@ -1,6 +1,7 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+
 import { axe } from '../../test-utils/axe';
 import { Accordion } from './index';
 
@@ -162,6 +163,26 @@ describe('Accordion', () => {
       const panel = document.querySelector('[data-cl-slot="accordion-panel"]');
 
       expect(panel).toHaveAttribute('aria-labelledby', trigger.getAttribute('id'));
+    });
+
+    it('keeps trigger/panel association intact when a custom id is passed to the trigger', () => {
+      render(
+        <Accordion.Root defaultValue={['item1']}>
+          <Accordion.Item value='item1'>
+            <Accordion.Header>
+              <Accordion.Trigger id='consumer-trigger-id'>Section 1</Accordion.Trigger>
+            </Accordion.Header>
+            <Accordion.Panel>Content 1</Accordion.Panel>
+          </Accordion.Item>
+        </Accordion.Root>,
+      );
+      const trigger = screen.getByRole('button', { name: 'Section 1' });
+      const panel = document.querySelector('[data-cl-slot="accordion-panel"]');
+
+      // The wired ids are owned by the primitive: a consumer-supplied id must
+      // not silently break the aria pairing between trigger and panel.
+      expect(panel).toHaveAttribute('aria-labelledby', trigger.getAttribute('id'));
+      expect(trigger).toHaveAttribute('aria-controls', panel?.getAttribute('id'));
     });
 
     it('panel has role=region', () => {

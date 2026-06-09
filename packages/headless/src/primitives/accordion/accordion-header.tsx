@@ -2,7 +2,7 @@
 
 import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
 
-export interface AccordionHeaderProps extends ComponentProps<'h3'> {}
+export type AccordionHeaderProps = ComponentProps<'h3'>;
 
 export function AccordionHeader(props: AccordionHeaderProps) {
   const { render, ...otherProps } = props;
