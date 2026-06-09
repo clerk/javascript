@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from '@testing-library/react';
+import { act, cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -425,6 +425,67 @@ describe('Tabs', () => {
       renderWithIndicator();
       const indicator = screen.getByTestId('indicator');
       expect(indicator.style.transition).toBe('none');
+    });
+  });
+
+  describe('Tabs.Indicator resize tracking (B1)', () => {
+    it('re-measures the active tab when it resizes without a tab change', () => {
+      // Capture every ResizeObserver the tree creates so the test can drive it.
+      const observers: Array<{ cb: ResizeObserverCallback; targets: Element[] }> = [];
+      class MockResizeObserver {
+        cb: ResizeObserverCallback;
+        targets: Element[] = [];
+        constructor(cb: ResizeObserverCallback) {
+          this.cb = cb;
+          observers.push(this);
+        }
+        observe(el: Element) {
+          this.targets.push(el);
+        }
+        unobserve() {}
+        disconnect() {}
+      }
+      vi.stubGlobal('ResizeObserver', MockResizeObserver);
+
+      try {
+        render(
+          <Tabs.Root defaultValue='tab1'>
+            <Tabs.List style={{ position: 'relative' }}>
+              <Tabs.Tab value='tab1'>Account</Tabs.Tab>
+              <Tabs.Tab value='tab2'>Settings</Tabs.Tab>
+              <Tabs.Indicator data-testid='indicator' />
+            </Tabs.List>
+            <Tabs.Panel value='tab1'>Account content</Tabs.Panel>
+            <Tabs.Panel value='tab2'>Settings content</Tabs.Panel>
+          </Tabs.Root>,
+        );
+
+        const indicator = screen.getByTestId('indicator');
+        const list = document.querySelector('[data-cl-slot="tabs-list"]') as HTMLElement;
+
+        // The indicator should have registered an observer for its active tab.
+        expect(observers.length).toBeGreaterThan(0);
+
+        // Simulate the active tab growing (e.g. font load / container resize)
+        // with no tab-selection change.
+        const rect = (left: number, width: number) =>
+          ({ left, top: 0, right: left + width, bottom: 20, width, height: 20, x: left, y: 0, toJSON() {} }) as DOMRect;
+        list.getBoundingClientRect = () => rect(0, 400);
+        for (const tab of document.querySelectorAll('[data-cl-slot="tabs-tab"]')) {
+          (tab as HTMLElement).getBoundingClientRect = () => rect(0, 250);
+        }
+
+        // Fire every observer the tree created.
+        act(() => {
+          for (const o of observers) {
+            o.cb([], o as unknown as ResizeObserver);
+          }
+        });
+
+        expect(indicator.style.getPropertyValue('--cl-tab-width')).toBe('250px');
+      } finally {
+        vi.unstubAllGlobals();
+      }
     });
   });
 
