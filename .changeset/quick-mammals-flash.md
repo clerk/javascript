@@ -1,6 +1,7 @@
 ---
 '@clerk/ui': patch
 '@clerk/shared': patch
+'@clerk/clerk-js': patch
 ---
 
 Internal refactor for self-serve SSO wizard navigation to leverage a guard-based state machine.
