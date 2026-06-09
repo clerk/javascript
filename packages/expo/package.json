@@ -183,9 +183,6 @@
   "codegenConfig": {
     "name": "ClerkExpoSpec",
     "type": "all",
-    "jsSrcsDir": "src/specs",
-    "android": {
-      "javaPackageName": "expo.modules.clerk"
-    }
+    "jsSrcsDir": "src/specs"
   }
 }
