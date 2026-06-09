@@ -208,11 +208,7 @@ function SubscriptionOverviewRow({
           localizationKey={localizationKeys(`${localizationRoot}.billingPage.subscriptionsListSection.overview`)}
         />
       </Td>
-      <Td
-        sx={_ => ({
-          textAlign: 'end',
-        })}
-      >
+      <Td sx={{ textAlign: 'end' }}>
         <Col
           gap={1}
           align='end'
