@@ -177,10 +177,12 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
       }
 
       // The organization is inferred from the URL path on the org-scoped
-      // endpoint, so we don't pass `organizationId` in the body.
+      // endpoint, so we don't pass `organizationId` in the body. `domains` is
+      // required by the create endpoint and is derived from the email domain.
       return createEnterpriseConnection({
         provider,
         name: emailDomain,
+        domains: [emailDomain],
       });
     };
 

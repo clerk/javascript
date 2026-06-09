@@ -173,7 +173,7 @@ describe('useOrganizationEnterpriseConnection — test-runs gating', () => {
 describe('useOrganizationEnterpriseConnection — mutations', () => {
   const emailAddress = (address: string) => ({ emailAddress: address }) as EmailAddressResource;
 
-  it('createConnection derives the name from the email domain and forwards it (no organizationId in body)', async () => {
+  it('createConnection derives name + domains from the email domain and forwards them (no organizationId in body)', async () => {
     const { result } = renderHook(() => useOrganizationEnterpriseConnection());
 
     await result.current.mutations.createConnection('saml_okta', emailAddress('admin@acme.com'));
@@ -182,6 +182,7 @@ describe('useOrganizationEnterpriseConnection — mutations', () => {
     expect(mutationSpies.create).toHaveBeenCalledWith({
       provider: 'saml_okta',
       name: 'acme.com',
+      domains: ['acme.com'],
     });
   });
 
