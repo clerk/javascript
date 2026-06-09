@@ -1377,6 +1377,14 @@ export type __internal_LocalizationResource = {
         paragraph1: LocalizationValue;
         paragraph2: LocalizationValue;
       };
+      txtRecordTable: {
+        columns: {
+          domain: LocalizationValue;
+          type: LocalizationValue;
+          hostName: LocalizationValue;
+          value: LocalizationValue;
+        };
+      };
     };
     testConfigurationStep: {
       title: LocalizationValue;

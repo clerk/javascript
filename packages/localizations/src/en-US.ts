@@ -280,6 +280,14 @@ export const enUS: LocalizationResource = {
         paragraph2:
           "We'll verify automatically once the record is live. This usually takes under a minute, though updating an existing TXT record may take a bit longer.",
       },
+      txtRecordTable: {
+        columns: {
+          domain: 'Domain',
+          type: 'Type',
+          hostName: 'Host / Name',
+          value: 'Value',
+        },
+      },
     },
     testConfigurationStep: {
       title: 'Test your SSO connection',
