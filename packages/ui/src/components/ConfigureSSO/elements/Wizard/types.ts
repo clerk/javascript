@@ -25,8 +25,6 @@ export interface WizardStepConfig {
    * always-reachable predecessor both rely on that.
    */
   guard?: () => boolean;
-  /** Hide from the breadcrumb while keeping the step in the navigable graph. */
-  hidden?: boolean;
 }
 
 /**
@@ -37,8 +35,10 @@ export interface WizardStepConfig {
 export type WizardStepDescriptor = WizardStepConfig;
 
 /**
- * A breadcrumb-facing view of an in-flow step: the non-hidden descriptors, in
- * declaration order, with their resolved completion and reachability state.
+ * A breadcrumb-facing view of an in-flow step: the descriptors in declaration
+ * order, with their resolved completion and reachability state. Whether a step
+ * shows in the breadcrumb is a render concern (the header filters on `label`),
+ * not a property of the descriptor.
  */
 export interface WizardActiveStep {
   id: string;
@@ -58,11 +58,11 @@ export interface WizardActiveStep {
 
 export interface WizardContextValue {
   current: string;
-  /** Non-hidden descriptors in declaration order, known synchronously. */
+  /** All descriptors in declaration order, known synchronously. */
   activeSteps: WizardActiveStep[];
-  /** `undefined` when the active step is hidden / off the breadcrumb. */
+  /** The active step's view; `undefined` only if `current` names no descriptor. */
   currentStep: WizardActiveStep | undefined;
-  /** Index of `current` within `activeSteps`; `-1` if hidden/off-breadcrumb. */
+  /** Index of `current` within `activeSteps`; `-1` if it names no descriptor. */
   currentIndex: number;
   /** `1` forward, `-1` back, `0` jump/initial. Drives animation only. */
   direction: 1 | -1 | 0;

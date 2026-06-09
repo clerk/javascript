@@ -17,11 +17,11 @@ interface WizardProps {
  * Generic, declarative, UI-less wizard primitive.
  *
  * Steps are a body-less config array (`steps`): each entry is one navigable
- * position with an `id` + optional inline `guard` / `hidden` / `label`. The
- * graph IS the array — known synchronously, no `React.Children` walking, no
- * effect-timed registration — and feeds a domain-agnostic machine in the same
- * render pass. Rendering lives in `children`: chrome is a normal child, each
- * step body is a render-only `<Wizard.Match id>`.
+ * position with an `id` + optional inline `guard` / `label`. The graph IS the
+ * array — known synchronously, no `React.Children` walking, no effect-timed
+ * registration — and feeds a domain-agnostic machine in the same render pass.
+ * Rendering lives in `children`: chrome is a normal child, each step body is a
+ * render-only `<Wizard.Match id>`.
  *
  * The machine is hidden behind `useWizard()`. Conditional flow is expressed by
  * each step's inline `guard` (applied uniformly by init / nav / stepper); steps

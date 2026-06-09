@@ -210,32 +210,30 @@ export const useWizardMachine = ({ config, parentWizard, initialStepId }: UseWiz
 
   const current = state.current;
 
-  // Breadcrumb-facing active steps: non-hidden descriptors, in declaration
-  // order. Derived synchronously from the live descriptors — known before
-  // `current` is resolved, so there is no inconsistency window. Each item
-  // carries `isCompleted` (POSITIONAL: sits before current in declaration
-  // order) and `isReachable` (GUARD-DRIVEN: its entry guard holds now — the
-  // single source the stepper binds `isDisabled = !isReachable` to and the same
-  // predicate `goToStep` checks).
+  // Breadcrumb-facing active steps: every descriptor, in declaration order.
+  // Derived synchronously from the live descriptors — known before `current` is
+  // resolved, so there is no inconsistency window. Each item carries
+  // `isCompleted` (POSITIONAL: sits before current in declaration order) and
+  // `isReachable` (GUARD-DRIVEN: its entry guard holds now — the single source
+  // the stepper binds `isDisabled = !isReachable` to and the same predicate
+  // `goToStep` checks). Whether an item appears in the breadcrumb is the header's
+  // call (it filters on `label`), not the machine's.
   const activeSteps = React.useMemo<WizardActiveStep[]>(() => {
     const descriptors = config.descriptors;
     const currentDescriptorIndex = descriptors.findIndex(s => s.id === current);
-    return descriptors
-      .map((s, descriptorIndex) => ({ s, descriptorIndex }))
-      .filter(({ s }) => !s.hidden)
-      .map(({ s, descriptorIndex }) => ({
-        id: s.id,
-        label: s.label,
-        isCompleted: currentDescriptorIndex >= 0 && descriptorIndex < currentDescriptorIndex,
-        isReachable: guardHolds(s),
-      }));
+    return descriptors.map((s, descriptorIndex) => ({
+      id: s.id,
+      label: s.label,
+      isCompleted: currentDescriptorIndex >= 0 && descriptorIndex < currentDescriptorIndex,
+      isReachable: guardHolds(s),
+    }));
   }, [config, current]);
 
   const currentIndex = activeSteps.findIndex(s => s.id === current);
   const currentStep = currentIndex >= 0 ? activeSteps[currentIndex] : undefined;
 
-  // Position within the full (navigable) descriptor set, including hidden steps
-  // — used for first/last detection so a hidden step still bounds the flow.
+  // Position within the full descriptor set — used for first/last detection so a
+  // step bounds the flow regardless of whether it shows in the breadcrumb.
   const navigable = config.descriptors;
   const navIndex = navigable.findIndex(s => s.id === current);
 

@@ -176,7 +176,7 @@ describe('useWizardMachine — first/last and reachability derivations', () => {
     expect(result.current.isLastStep).toBe(false);
   });
 
-  it('activeSteps.isReachable equals guardHolds(step) for each non-hidden step', () => {
+  it('activeSteps.isReachable equals guardHolds(step) for each step', () => {
     const open = () => true;
     const closed = () => false;
     const { result } = renderMachine({
@@ -188,11 +188,11 @@ describe('useWizardMachine — first/last and reachability derivations', () => {
     expect(byId.c).toBe(false); // closed
   });
 
-  it('hidden steps are excluded from activeSteps but still bound first/last', () => {
+  it('activeSteps contains every descriptor in declaration order', () => {
     const { result } = renderMachine({
-      config: cfg([{ id: 'hidden', hidden: true }, { id: 'a' }, { id: 'b', guard: () => true }]),
+      config: cfg([{ id: 'a' }, { id: 'b' }, { id: 'c', guard: () => true }]),
     });
-    expect(result.current.activeSteps.map(s => s.id)).toEqual(['a', 'b']);
+    expect(result.current.activeSteps.map(s => s.id)).toEqual(['a', 'b', 'c']);
   });
 
   it('isCompleted is positional (steps before current in declaration order)', () => {
