@@ -6,10 +6,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { fireEvent, mockWebAuthn, render, screen } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
+import { authenticateSignInWithNativeTransport } from '@/ui/utils/nativeOAuthTransport';
 
 import { OptionsProvider } from '../../../contexts';
 import { AppearanceProvider } from '../../../customizables';
 import { SignInStart } from '../SignInStart';
+
+vi.mock('@/ui/utils/nativeOAuthTransport', () => ({
+  authenticateSignInWithNativeTransport: vi.fn().mockResolvedValue(undefined),
+}));
 
 const { createFixtures } = bindCreateFixtures('SignIn');
 
@@ -20,6 +25,8 @@ describe('SignInStart', () => {
   const mockGetComputedStyle = vi.fn();
 
   beforeEach(() => {
+    vi.mocked(authenticateSignInWithNativeTransport).mockResolvedValue(undefined);
+
     // Mock window.getComputedStyle
     mockGetComputedStyle.mockReset();
     mockGetComputedStyle.mockReturnValue({
@@ -285,12 +292,20 @@ describe('SignInStart', () => {
       });
     });
 
-    it('passes native callback params to authenticateWithRedirect when external auth transport is active', async () => {
+    it('uses native OAuth transport when registered', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withSocialProvider({ provider: 'google' });
       });
 
-      // Simulate the transport being registered (normally happens in clerk.load() when bridge is present).
+      const transport = {
+        getRedirectUrl: vi.fn().mockResolvedValue('myapp://sso-callback'),
+        open: vi.fn(),
+      };
+
+      Object.defineProperty(fixtures.clerk, '__internal_getNativeOAuthHandler', {
+        value: () => transport,
+        configurable: true,
+      });
       Object.defineProperty(fixtures.clerk, '__internal_hasNativeOAuthHandler', {
         get: () => true,
         configurable: true,
@@ -300,10 +315,14 @@ describe('SignInStart', () => {
       fireEvent.click(screen.getByText('Continue with Google'));
 
       await waitFor(() => {
-        expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledWith(
+        expect(authenticateSignInWithNativeTransport).toHaveBeenCalledWith(
           expect.objectContaining({
+            transport,
+            signIn: fixtures.signIn,
+            clerk: fixtures.clerk,
             strategy: 'oauth_google',
-            __internal_nativeCallbackParams: expect.objectContaining({
+            oidcPrompt: undefined,
+            callbackParams: expect.objectContaining({
               signInUrl: 'https://dashboard.clerk.com/sign-in',
               signUpUrl: 'https://dashboard.clerk.com/sign-up',
               signInForceRedirectUrl: '/',
@@ -318,6 +337,7 @@ describe('SignInStart', () => {
           }),
         );
       });
+      expect(fixtures.signIn.authenticateWithRedirect).not.toHaveBeenCalled();
     });
 
     it('clears the loading state when native OAuth sign-in fails', async () => {
@@ -325,13 +345,21 @@ describe('SignInStart', () => {
         f.withSocialProvider({ provider: 'google' });
       });
 
-      // Simulate the transport being registered so idleAfterDelay is disabled.
+      const transport = {
+        getRedirectUrl: vi.fn().mockResolvedValue('myapp://sso-callback'),
+        open: vi.fn(),
+      };
+
+      Object.defineProperty(fixtures.clerk, '__internal_getNativeOAuthHandler', {
+        value: () => transport,
+        configurable: true,
+      });
       Object.defineProperty(fixtures.clerk, '__internal_hasNativeOAuthHandler', {
         get: () => true,
         configurable: true,
       });
 
-      fixtures.signIn.authenticateWithRedirect.mockRejectedValueOnce(
+      vi.mocked(authenticateSignInWithNativeTransport).mockRejectedValueOnce(
         new ClerkAPIResponseError('Unable to complete authentication', {
           data: [{ code: 'native_redirect_incomplete', message: 'Native redirect incomplete', long_message: '' }],
           status: 400,

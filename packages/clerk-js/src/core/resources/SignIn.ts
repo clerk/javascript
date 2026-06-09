@@ -1,5 +1,5 @@
 import { inBrowser } from '@clerk/shared/browser';
-import { ClerkAPIResponseError, type ClerkError, ClerkRuntimeError, ClerkWebAuthnError } from '@clerk/shared/error';
+import { type ClerkError, ClerkRuntimeError, ClerkWebAuthnError } from '@clerk/shared/error';
 import {
   convertJSONToPublicKeyRequestOptions,
   serializePublicKeyCredentialAssertion,
@@ -15,8 +15,6 @@ import type {
   AuthenticateWithPasskeyParams,
   AuthenticateWithPopupParams,
   AuthenticateWithRedirectParams,
-  NativeOAuthHandler,
-  HandleOAuthCallbackParams,
   AuthenticateWithWeb3Params,
   CaptchaWidgetType,
   ClientTrustState,
@@ -99,66 +97,6 @@ import {
 } from '../errors';
 import { eventBus } from '../events';
 import { BaseResource, UserData, Verification } from './internal';
-
-function throwIfNativeCallbackHasError(callbackUrl: string): void {
-  const url = new URL(callbackUrl);
-  const code =
-    url.searchParams.get('clerk_error_code') ??
-    url.searchParams.get('error_code') ??
-    url.searchParams.get('code') ??
-    url.searchParams.get('error');
-  if (!code) return;
-  const message =
-    url.searchParams.get('clerk_error_message') ??
-    url.searchParams.get('error_message') ??
-    url.searchParams.get('message') ??
-    url.searchParams.get('error_description') ??
-    code;
-  const longMessage =
-    url.searchParams.get('clerk_error_long_message') ??
-    url.searchParams.get('long_message') ??
-    url.searchParams.get('longMessage') ??
-    undefined;
-  const statusStr =
-    url.searchParams.get('clerk_error_status') ??
-    url.searchParams.get('error_status') ??
-    url.searchParams.get('status');
-  const status = statusStr && Number.isInteger(Number(statusStr)) ? Number(statusStr) : 400;
-  throw new ClerkAPIResponseError(longMessage || message, {
-    status,
-    data: [{ code, message, long_message: longMessage }],
-  });
-}
-
-function createSignInVerificationError(
-  error: import('@clerk/shared/types').ClerkAPIError | null | undefined,
-): ClerkAPIResponseError | null {
-  if (!error) return null;
-  return new ClerkAPIResponseError(error.longMessage || error.message, {
-    status: 400,
-    data: [
-      {
-        code: error.code,
-        message: error.message,
-        long_message: error.longMessage,
-        meta: {
-          param_name: error.meta?.paramName,
-          session_id: error.meta?.sessionId,
-          email_addresses: error.meta?.emailAddresses,
-          identifiers: error.meta?.identifiers,
-          zxcvbn: error.meta?.zxcvbn,
-        },
-      },
-    ],
-  });
-}
-
-function throwIfSignInVerificationError(error: import('@clerk/shared/types').ClerkAPIError | null | undefined): void {
-  const clerkError = createSignInVerificationError(error);
-  if (clerkError) {
-    throw clerkError;
-  }
-}
 
 export class SignIn extends BaseResource implements SignInResource {
   pathRoot = '/client/sign_ins';
@@ -406,17 +344,10 @@ export class SignIn extends BaseResource implements SignInResource {
     params: AuthenticateWithRedirectParams,
     navigateCallback: (url: URL | string) => void,
   ): Promise<void> => {
-    const transport = SignIn.clerk.__internal_getNativeOAuthHandler();
     const { strategy, redirectUrlComplete, identifier, oidcPrompt, continueSignIn, enterpriseConnectionId } =
       params || {};
-    // For native transports, override the redirectUrl with the host runtime's deep-link URL
-    // so FAPI sends the callback back through the OS instead of the web SSO-callback route.
-    // actionCompleteRedirectUrl must also point to the deep-link: FAPI uses it (not redirectUrl)
-    // when sign-in completes immediately, and we need the deep-link to fire in both cases.
-    const redirectUrl = transport
-      ? String(await transport.getRedirectUrl())
-      : SignIn.clerk.buildUrlWithAuth(params.redirectUrl);
-    const actionCompleteRedirectUrl = transport ? redirectUrl : redirectUrlComplete;
+    const redirectUrl = SignIn.clerk.buildUrlWithAuth(params.redirectUrl);
+    const actionCompleteRedirectUrl = redirectUrlComplete;
 
     if (!this.id || !continueSignIn) {
       await this.create({
@@ -440,50 +371,9 @@ export class SignIn extends BaseResource implements SignInResource {
     const { status, externalVerificationRedirectURL } = this.firstFactorVerification;
 
     if (status === 'unverified' && externalVerificationRedirectURL) {
-      if (transport) {
-        await this.#handleWithTransport(transport, externalVerificationRedirectURL, params);
-      } else {
-        navigateCallback(externalVerificationRedirectURL);
-      }
+      navigateCallback(externalVerificationRedirectURL);
     } else {
       clerkInvalidFAPIResponse(status, SignIn.fapiClient.buildEmailAddress('support'));
-    }
-  };
-
-  #handleWithTransport = async (
-    transport: NativeOAuthHandler,
-    externalVerificationRedirectURL: URL,
-    params: AuthenticateWithRedirectParams,
-  ): Promise<void> => {
-    const { callbackUrl } = await transport.open(externalVerificationRedirectURL);
-    throwIfNativeCallbackHasError(callbackUrl);
-
-    const nonce = new URL(callbackUrl).searchParams.get('rotating_token_nonce');
-    const callbackParams = (params.__internal_nativeCallbackParams ?? {}) as HandleOAuthCallbackParams;
-
-    if (nonce) {
-      await this.reload({ rotatingTokenNonce: nonce });
-      throwIfSignInVerificationError(this.firstFactorVerification.error);
-      await SignIn.clerk.__internal_handleNativeOAuthCallback(this, callbackParams);
-    } else {
-      // No nonce: provider returned without success. FAPI stores the error on the verification
-      // so reload until it appears, then surface it.
-      const TIMEOUT_MS = 3_000;
-      const INTERVAL_MS = 250;
-      const startedAt = Date.now();
-      await this.reload();
-      while (!this.firstFactorVerification.error && Date.now() - startedAt < TIMEOUT_MS) {
-        await new Promise(resolve => setTimeout(resolve, INTERVAL_MS));
-        await this.reload();
-      }
-      const verificationError = createSignInVerificationError(this.firstFactorVerification.error);
-      if (verificationError) {
-        SignIn.clerk.client?.resetSignIn();
-        throw verificationError;
-      }
-      throw new ClerkRuntimeError('Unable to complete authentication. Please try again.', {
-        code: 'native_redirect_incomplete',
-      });
     }
   };
 

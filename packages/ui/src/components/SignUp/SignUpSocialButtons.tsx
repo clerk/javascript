@@ -4,6 +4,7 @@ import React from 'react';
 
 import { useCardState } from '@/ui/elements/contexts';
 import { handleError } from '@/ui/utils/errorHandler';
+import { authenticateSignUpWithNativeTransport } from '@/ui/utils/nativeOAuthTransport';
 import { originPrefersPopup } from '@/ui/utils/originPrefersPopup';
 import { web3CallbackErrorHandler } from '@/ui/utils/web3CallbackErrorHandler';
 
@@ -61,16 +62,18 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
             .catch(err => handleError(err, [], card.setError));
         }
 
-        return signUp
-          .authenticateWithRedirect({
-            continueSignUp,
-            redirectUrl,
-            redirectUrlComplete,
+        const transport = clerk.__internal_getNativeOAuthHandler();
+        if (transport) {
+          return authenticateSignUpWithNativeTransport({
+            transport,
+            signUp,
+            clerk,
             strategy,
+            continueSignUp,
             unsafeMetadata: ctx.unsafeMetadata,
             legalAccepted: props.legalAccepted,
             oidcPrompt: ctx.oidcPrompt,
-            __internal_nativeCallbackParams: {
+            callbackParams: {
               signUpUrl: ctx.signUpUrl,
               signInUrl: ctx.signInUrl,
               signUpForceRedirectUrl: ctx.afterSignUpUrl,
@@ -82,6 +85,21 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
               navigateOnSetActive: ctx.navigateOnSetActive,
               unsafeMetadata: ctx.unsafeMetadata,
             },
+          }).catch(err => {
+            handleError(err, [], card.setError);
+            throw err;
+          });
+        }
+
+        return signUp
+          .authenticateWithRedirect({
+            continueSignUp,
+            redirectUrl,
+            redirectUrlComplete,
+            strategy,
+            unsafeMetadata: ctx.unsafeMetadata,
+            legalAccepted: props.legalAccepted,
+            oidcPrompt: ctx.oidcPrompt,
           })
           .catch(err => {
             handleError(err, [], card.setError);

@@ -6,6 +6,7 @@ import type { PhoneCodeChannel } from '@clerk/shared/types';
 import React from 'react';
 
 import { handleError as _handleError } from '@/ui/utils/errorHandler';
+import { authenticateSignInWithNativeTransport } from '@/ui/utils/nativeOAuthTransport';
 import { originPrefersPopup } from '@/ui/utils/originPrefersPopup';
 import { web3CallbackErrorHandler } from '@/ui/utils/web3CallbackErrorHandler';
 
@@ -73,13 +74,15 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
             .catch(err => handleError(err));
         }
 
-        return signIn
-          .authenticateWithRedirect({
+        const transport = clerk.__internal_getNativeOAuthHandler();
+        if (transport) {
+          return authenticateSignInWithNativeTransport({
+            transport,
+            signIn,
+            clerk,
             strategy,
-            redirectUrl,
-            redirectUrlComplete,
             oidcPrompt: ctx.oidcPrompt,
-            __internal_nativeCallbackParams: {
+            callbackParams: {
               signUpUrl: ctx.signUpUrl,
               signInUrl: ctx.signInUrl,
               signInForceRedirectUrl: ctx.afterSignInUrl,
@@ -92,6 +95,15 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
               navigateOnSetActive: ctx.navigateOnSetActive,
               unsafeMetadata: ctx.unsafeMetadata,
             },
+          }).catch(err => handleError(err));
+        }
+
+        return signIn
+          .authenticateWithRedirect({
+            strategy,
+            redirectUrl,
+            redirectUrlComplete,
+            oidcPrompt: ctx.oidcPrompt,
           })
           .catch(err => handleError(err));
       }}

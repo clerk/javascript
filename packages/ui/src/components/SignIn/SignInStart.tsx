@@ -21,6 +21,7 @@ import { LoadingCard } from '@/ui/elements/LoadingCard';
 import { SocialButtonsReversibleContainerWithDivider } from '@/ui/elements/ReversibleContainer';
 import { handleError } from '@/ui/utils/errorHandler';
 import { isMobileDevice } from '@/ui/utils/isMobileDevice';
+import { authenticateSignInWithNativeTransport } from '@/ui/utils/nativeOAuthTransport';
 import type { FormControlState } from '@/ui/utils/useFormControl';
 import { buildRequest, useFormControl } from '@/ui/utils/useFormControl';
 
@@ -415,25 +416,37 @@ function SignInStartInternal(): JSX.Element {
     const redirectUrl = ctx.ssoCallbackUrl;
     const redirectUrlComplete = ctx.afterSignInUrl || '/';
 
+    const transport = clerk.__internal_getNativeOAuthHandler();
+    if (transport) {
+      return authenticateSignInWithNativeTransport({
+        transport,
+        signIn,
+        clerk,
+        strategy: 'enterprise_sso',
+        continueSignIn: true,
+        oidcPrompt: ctx.oidcPrompt,
+        callbackParams: {
+          signUpUrl: ctx.signUpUrl,
+          signInUrl: ctx.signInUrl,
+          signInForceRedirectUrl: ctx.afterSignInUrl,
+          signUpForceRedirectUrl: ctx.afterSignUpUrl,
+          continueSignUpUrl: ctx.signUpContinueUrl,
+          transferable: ctx.transferable,
+          firstFactorUrl: '../factor-one',
+          secondFactorUrl: '../factor-two',
+          resetPasswordUrl: '../reset-password',
+          navigateOnSetActive: ctx.navigateOnSetActive,
+          unsafeMetadata: ctx.unsafeMetadata,
+        },
+      });
+    }
+
     return signIn.authenticateWithRedirect({
       strategy: 'enterprise_sso',
       redirectUrl,
       redirectUrlComplete,
       oidcPrompt: ctx.oidcPrompt,
       continueSignIn: true,
-      __internal_nativeCallbackParams: {
-        signUpUrl: ctx.signUpUrl,
-        signInUrl: ctx.signInUrl,
-        signInForceRedirectUrl: ctx.afterSignInUrl,
-        signUpForceRedirectUrl: ctx.afterSignUpUrl,
-        continueSignUpUrl: ctx.signUpContinueUrl,
-        transferable: ctx.transferable,
-        firstFactorUrl: '../factor-one',
-        secondFactorUrl: '../factor-two',
-        resetPasswordUrl: '../reset-password',
-        navigateOnSetActive: ctx.navigateOnSetActive,
-        unsafeMetadata: ctx.unsafeMetadata,
-      },
     });
   };
 
