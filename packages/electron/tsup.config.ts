@@ -9,7 +9,7 @@ export default defineConfig(overrideOptions => {
   const shouldPublish = !!overrideOptions.env?.publish;
 
   const common: Options = {
-    entry: ['./src/index.ts', './src/preload/index.ts'],
+    entry: ['./src/index.ts', './src/preload/index.ts', './src/storage/index.ts'],
     bundle: true,
     clean: true,
     minify: false,
