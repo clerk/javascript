@@ -1,7 +1,7 @@
 <!doctype html>
 <html class="h-full font-sans antialiased">
   <head>
-    <title>clerk-js Sandbox</title>
+    <title>clerk-js Mosaic Sandbox</title>
     <meta charset="utf-8" />
     <meta
       name="viewport"
@@ -204,9 +204,10 @@
           />
         </svg>
         <div
-          class="bg-sidebar-accent text-sidebar-muted-foreground ring-sidebar-border mt-0.5 rounded-full px-2 py-1 text-[0.625rem]/3 font-medium ring-1 ring-inset"
+          class="bg-sidebar-accent text-sidebar-muted-foreground ring-sidebar-border mt-0.5 flex items-center gap-1.5 rounded-full px-2 py-1 text-[0.625rem]/3 font-medium ring-1 ring-inset"
         >
-          UI Component Sandbox
+          Mosaic Sandbox
+          <span class="rounded-full bg-sidebar-accent-strong px-1.5 py-0.5 text-[0.5rem]/none font-semibold uppercase tracking-wide">WIP</span>
         </div>
         <button
           id="sidebarCollapse"
@@ -232,122 +233,32 @@
         </button>
       </header>
       <nav class="flex flex-col gap-4">
-        <nav-group label="Get Started">
-          <nav-link
-            href="/"
-            label="Home"
-          ></nav-link>
-        </nav-group>
-        <nav-group label="Auth">
-          <nav-link
-            href="/sign-in"
-            label="Sign In"
-            component="<SignIn />"
-          ></nav-link>
-          <nav-link
-            href="/sign-up"
-            label="Sign Up"
-            component="<SignUp />"
-          ></nav-link>
-          <nav-link
-            href="/waitlist"
-            label="Waitlist"
-            component="<Waitlist />"
-          ></nav-link>
-          <nav-link
-            href="/oauth-consent"
-            label="OAuth Consent"
-            component="<OAuthConsent />"
-          ></nav-link>
-          <nav-link
-            href="/api-keys"
-            label="API Keys"
-            component="<APIKeys />"
-          ></nav-link>
-        </nav-group>
-        <nav-group label="User">
-          <nav-link
-            href="/user-avatar"
-            label="User Avatar"
-            component="<UserAvatar />"
-          ></nav-link>
-          <nav-link
-            href="/user-button"
-            label="User Button"
-            component="<UserButton />"
-          ></nav-link>
-          <nav-link
-            href="/user-profile"
-            label="User Profile"
-            component="<UserProfile />"
-          ></nav-link>
-        </nav-group>
-        <nav-group label="Orgs">
-          <nav-link
-            href="/create-organization"
-            label="Create Org"
-            component="<CreateOrganization />"
-          ></nav-link>
-          <nav-link
-            href="/organization-list"
-            label="Org List"
-            component="<OrganizationList />"
-          ></nav-link>
-          <nav-link
-            href="/organization-profile"
-            label="Org Profile"
-            component="<OrganizationProfile />"
-          ></nav-link>
-          <nav-link
-            href="/organization-switcher"
-            label="Org Switcher"
-            component="<OrganizationSwitcher />"
-          ></nav-link>
-          <nav-link
-            href="/configure-sso"
-            label="Configure SSO"
-            component="<ConfigureSSO />"
-          ></nav-link>
-        </nav-group>
-        <nav-group label="Tasks">
-          <nav-link
-            href="/task-choose-organization"
-            label="Choose Org"
-            component="<TaskChooseOrganization />"
-          ></nav-link>
-          <nav-link
-            href="/task-setup-mfa"
-            label="Setup MFA"
-            component="<TaskSetupMFA />"
-          ></nav-link>
-        </nav-group>
-        <nav-group label="Billing">
-          <nav-link
-            href="/pricing-table"
-            label="Pricing Table"
-            component="<PricingTable />"
-          ></nav-link>
-        </nav-group>
-        <nav-group label="Other">
-          <nav-link
-            href="/keyless"
-            label="Keyless"
-            component="<Keyless />"
-          ></nav-link>
-          <nav-link
-            href="/open-sign-in"
-            label="Open sign in"
-          ></nav-link>
-          <nav-link
-            href="/open-sign-up"
-            label="Open sign up"
-          ></nav-link>
-        </nav-group>
-        <nav-group label="Design System">
+        <a
+          href="/"
+          class="group flex items-center gap-2 rounded-md px-2 py-1 text-xs/relaxed text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="size-3.5 shrink-0"
+            aria-hidden="true"
+          >
+            <path d="M5 12l14 0" />
+            <path d="M5 12l6 6" />
+            <path d="M5 12l6 -6" />
+          </svg>
+          <span class="min-w-0 truncate">Back to Sandbox</span>
+        </a>
+        <nav-group label="AIOs / Panel-based">
           <nav-link
             href="/mosaic.html"
-            label="✦ Mosaic"
-            component="WIP"
+            label="Org Profile"
+            component="<__experimental_MosaicOrganizationProfile />"
           ></nav-link>
         </nav-group>
       </nav>

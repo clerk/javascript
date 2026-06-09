@@ -417,7 +417,7 @@ void (async () => {
       component: 'taskSetupMFA',
       defaultProps: { redirectUrlComplete: '/user-profile' },
     },
-    '/mosaic-organization-profile': {
+    '/mosaic.html': {
       mount: '__experimental_mountMosaicOrganizationProfile',
       component: '__experimental_mosaicOrganizationProfile',
     },

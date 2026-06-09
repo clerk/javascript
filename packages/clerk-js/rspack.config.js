@@ -262,6 +262,16 @@ const prodConfig = ({ mode, env, analysis }) => {
                 uiScriptUrl: './ui.browser.js',
               },
             }),
+            new rspack.HtmlRspackPlugin({
+              minify: false,
+              filename: 'mosaic.html',
+              template: './sandbox/mosaic-template.html',
+              inject: false,
+              hash: true,
+              templateParameters: {
+                uiScriptUrl: './ui.browser.js',
+              },
+            }),
           ],
         }
       : {},
@@ -432,6 +442,16 @@ const devConfig = ({ mode, env }) => {
           new rspack.HtmlRspackPlugin({
             minify: false,
             template: './sandbox/template.html',
+            inject: false,
+            templateParameters: {
+              uiScriptUrl: `http://localhost:${process.env.UI_PORT || 4011}/npm/ui.browser.js`,
+            },
+          }),
+        isSandbox &&
+          new rspack.HtmlRspackPlugin({
+            minify: false,
+            filename: 'mosaic.html',
+            template: './sandbox/mosaic-template.html',
             inject: false,
             templateParameters: {
               uiScriptUrl: `http://localhost:${process.env.UI_PORT || 4011}/npm/ui.browser.js`,
