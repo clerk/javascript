@@ -1370,10 +1370,9 @@ export type __internal_LocalizationResource = {
     verifyDomainStep: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
-      domainTaken: {
-        title: LocalizationValue<'domain'>;
-        subtitle: LocalizationValue;
-      };
+      formFieldLabel__domain: LocalizationValue;
+      formFieldInputPlaceholder__domain: LocalizationValue;
+      formButtonPrimary__add: LocalizationValue;
     };
     testConfigurationStep: {
       title: LocalizationValue;

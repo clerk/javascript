@@ -272,6 +272,9 @@ export const enUS: LocalizationResource = {
     verifyDomainStep: {
       title: 'Verify domain',
       subtitle: 'Specify and verify the domain to configure SSO for.',
+      formFieldLabel__domain: 'Domains',
+      formFieldInputPlaceholder__domain: 'Type your domain here and click add to start',
+      formButtonPrimary__add: 'Add',
     },
     testConfigurationStep: {
       title: 'Test your SSO connection',
