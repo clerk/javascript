@@ -744,7 +744,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     });
 
     this.premountConfigureSSONodes.forEach((props, node) => {
-      clerkjs.mountConfigureSSO(node, props);
+      clerkjs.__internal_mountConfigureSSO(node, props);
     });
 
     this.premountOAuthConsentNodes.forEach((props, node) => {
@@ -1283,34 +1283,20 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  mountConfigureSSO = (node: HTMLDivElement, props?: ConfigureSSOProps): void => {
+  __internal_mountConfigureSSO = (node: HTMLDivElement, props?: ConfigureSSOProps): void => {
     if (this.clerkjs && this.loaded) {
-      this.clerkjs.mountConfigureSSO(node, props);
+      this.clerkjs.__internal_mountConfigureSSO(node, props);
     } else {
       this.premountConfigureSSONodes.set(node, props);
     }
   };
 
-  unmountConfigureSSO = (node: HTMLDivElement): void => {
+  __internal_unmountConfigureSSO = (node: HTMLDivElement): void => {
     if (this.clerkjs && this.loaded) {
-      this.clerkjs.unmountConfigureSSO(node);
+      this.clerkjs.__internal_unmountConfigureSSO(node);
     } else {
       this.premountConfigureSSONodes.delete(node);
     }
-  };
-
-  /**
-   * @deprecated Use `mountConfigureSSO` instead.
-   */
-  __experimental_mountConfigureSSO = (node: HTMLDivElement, props?: ConfigureSSOProps): void => {
-    this.mountConfigureSSO(node, props);
-  };
-
-  /**
-   * @deprecated Use `unmountConfigureSSO` instead.
-   */
-  __experimental_unmountConfigureSSO = (node: HTMLDivElement): void => {
-    this.unmountConfigureSSO(node);
   };
 
   __internal_mountOAuthConsent = (node: HTMLDivElement, props?: OAuthConsentProps) => {
