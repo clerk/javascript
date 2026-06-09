@@ -274,6 +274,34 @@ describe('Popover', () => {
     });
   });
 
+  describe('consumer ref forwarding', () => {
+    it('forwards a consumer ref on Trigger (host button shape)', () => {
+      const ref = createRef<HTMLButtonElement>();
+      render(
+        <Popover.Root>
+          <Popover.Trigger ref={ref}>Open popover</Popover.Trigger>
+        </Popover.Root>,
+      );
+
+      expect(ref.current).toBeInstanceOf(HTMLButtonElement);
+      expect(ref.current).toHaveAttribute('data-cl-slot', 'popover-trigger');
+    });
+
+    it('forwards a consumer ref on Positioner (FloatingFocusManager wrapper shape)', () => {
+      const ref = createRef<HTMLDivElement>();
+      render(
+        <Popover.Root defaultOpen>
+          <Popover.Trigger>Open popover</Popover.Trigger>
+          <Popover.Positioner ref={ref}>
+            <Popover.Popup>content</Popover.Popup>
+          </Popover.Positioner>
+        </Popover.Root>,
+      );
+
+      expect(ref.current).toHaveAttribute('data-cl-slot', 'popover-positioner');
+    });
+  });
+
   describe('Arrow ref', () => {
     it('merges a consumer ref with the internal arrow ref', () => {
       const ref = createRef<SVGSVGElement>();

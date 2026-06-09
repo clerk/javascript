@@ -8,7 +8,7 @@ export interface TabsContextValue {
   tabsId: string;
   registerTab: (value: string, element: HTMLElement | null) => void;
   getTabElement: (value: string) => HTMLElement | null;
-  listRef: React.RefObject<HTMLElement | null>;
+  listRef: React.RefObject<HTMLElement>;
   direction: 1 | -1;
 }
 

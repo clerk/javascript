@@ -1,7 +1,7 @@
 'use client';
 
 import { useMergeRefs } from '@floating-ui/react';
-import { useLayoutEffect, useRef } from 'react';
+import React, { useLayoutEffect, useRef } from 'react';
 
 import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
 import { useTabsContext } from './tabs-context';
@@ -11,11 +11,11 @@ export interface TabsTriggerProps extends ComponentProps<'button'> {
   disabled?: boolean;
 }
 
-export function TabsTrigger(props: TabsTriggerProps) {
-  const { render, ref: consumerRef, value: tabValue, disabled, ...otherProps } = props;
+export const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(function TabsTrigger(props, ref) {
+  const { render, value: tabValue, disabled, ...otherProps } = props;
   const { value: selectedValue, setValue, tabsId, registerTab } = useTabsContext();
   const triggerRef = useRef<HTMLButtonElement | null>(null);
-  const combinedRef = useMergeRefs([triggerRef, consumerRef]);
+  const combinedRef = useMergeRefs([triggerRef, ref]);
 
   const isSelected = selectedValue === tabValue;
   const tabId = `${tabsId}-tab-${tabValue}`;
@@ -62,4 +62,4 @@ export function TabsTrigger(props: TabsTriggerProps) {
     },
     props: merged,
   });
-}
+});

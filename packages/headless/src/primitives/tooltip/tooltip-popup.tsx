@@ -1,17 +1,18 @@
 'use client';
 
 import { useMergeRefs } from '@floating-ui/react';
+import React from 'react';
 
 import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
 import { useTooltipContext } from './tooltip-context';
 
 export type TooltipPopupProps = ComponentProps<'div'>;
 
-export function TooltipPopup(props: TooltipPopupProps) {
-  const { render, ref: consumerRef, ...otherProps } = props;
+export const TooltipPopup = React.forwardRef<HTMLDivElement, TooltipPopupProps>(function TooltipPopup(props, ref) {
+  const { render, ...otherProps } = props;
   const { popupRef, transitionProps } = useTooltipContext();
 
-  const combinedRef = useMergeRefs([popupRef, consumerRef]);
+  const combinedRef = useMergeRefs([popupRef, ref]);
 
   const defaultProps = {
     'data-cl-slot': 'tooltip-popup',
@@ -24,4 +25,4 @@ export function TooltipPopup(props: TooltipPopupProps) {
     render,
     props: mergeProps<'div'>(defaultProps, otherProps),
   });
-}
+});

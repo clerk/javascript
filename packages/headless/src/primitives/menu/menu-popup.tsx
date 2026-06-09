@@ -1,17 +1,18 @@
 'use client';
 
 import { useMergeRefs } from '@floating-ui/react';
+import React from 'react';
 
 import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
 import { useMenuContext } from './menu-context';
 
 export type MenuPopupProps = ComponentProps<'div'>;
 
-export function MenuPopup(props: MenuPopupProps) {
-  const { render, ref: consumerRef, ...otherProps } = props;
+export const MenuPopup = React.forwardRef<HTMLDivElement, MenuPopupProps>(function MenuPopup(props, ref) {
+  const { render, ...otherProps } = props;
   const { popupRef, transitionProps } = useMenuContext();
 
-  const combinedRef = useMergeRefs([popupRef, consumerRef]);
+  const combinedRef = useMergeRefs([popupRef, ref]);
 
   const defaultProps = {
     'data-cl-slot': 'menu-popup',
@@ -24,4 +25,4 @@ export function MenuPopup(props: MenuPopupProps) {
     render,
     props: mergeProps<'div'>(defaultProps, otherProps),
   });
-}
+});

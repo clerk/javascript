@@ -23,7 +23,7 @@ export function TabsRoot(props: TabsProps) {
   const tabsId = useId();
   const tabElementsRef = useRef<Map<string, HTMLElement>>(new Map());
   const tabOrderRef = useRef<string[]>([]);
-  const listRef = useRef<HTMLElement | null>(null);
+  const listRef = useRef<HTMLElement>(null);
   const valueRef = useRef(value);
   valueRef.current = value;
 

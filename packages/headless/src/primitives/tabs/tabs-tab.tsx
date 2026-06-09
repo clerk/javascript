@@ -11,15 +11,15 @@ export interface TabsTabProps extends ComponentProps<'button'> {
   disabled?: boolean;
 }
 
-export function TabsTab(props: TabsTabProps) {
-  const { render, ref: consumerRef, value: tabValue, disabled, children, ...otherProps } = props;
+export const TabsTab = React.forwardRef<HTMLButtonElement, TabsTabProps>(function TabsTab(props, ref) {
+  const { render, value: tabValue, disabled, children, ...otherProps } = props;
   const { value: selectedValue, setValue, activationMode, tabsId, registerTab } = useTabsContext();
 
   const isSelected = selectedValue === tabValue;
   const tabId = `${tabsId}-tab-${tabValue}`;
   const panelId = `${tabsId}-panel-${tabValue}`;
   const internalRef = useRef<HTMLButtonElement | null>(null);
-  const combinedRef = useMergeRefs([internalRef, consumerRef]);
+  const combinedRef = useMergeRefs([internalRef, ref]);
 
   useLayoutEffect(() => {
     registerTab(tabValue, internalRef.current);
@@ -92,4 +92,4 @@ export function TabsTab(props: TabsTabProps) {
       {children}
     </CompositeItem>
   );
-}
+});

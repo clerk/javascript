@@ -1,7 +1,7 @@
 'use client';
 
 import { useMergeRefs } from '@floating-ui/react';
-import { useRef } from 'react';
+import React, { useRef } from 'react';
 
 import { useTransition } from '../../hooks/use-transition';
 import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
@@ -13,8 +13,8 @@ export interface TabsPanelProps extends ComponentProps<'div'> {
   shouldForceMount?: boolean;
 }
 
-export function TabsPanel(props: TabsPanelProps) {
-  const { render, ref: consumerRef, value: panelValue, shouldForceMount, ...otherProps } = props;
+export const TabsPanel = React.forwardRef<HTMLDivElement, TabsPanelProps>(function TabsPanel(props, ref) {
+  const { render, value: panelValue, shouldForceMount, ...otherProps } = props;
   const { value: selectedValue, tabsId, direction } = useTabsContext();
 
   const isSelected = selectedValue === panelValue;
@@ -24,7 +24,7 @@ export function TabsPanel(props: TabsPanelProps) {
   const panelRef = useRef<HTMLDivElement | null>(null);
   // Merge the consumer ref with the internal panelRef so passing a ref does not
   // clobber the ref the panel relies on for transition tracking.
-  const combinedRef = useMergeRefs([panelRef, consumerRef]);
+  const combinedRef = useMergeRefs([panelRef, ref]);
   const { transitionProps } = useTransition({
     open: isSelected,
     ref: panelRef,
@@ -80,4 +80,4 @@ export function TabsPanel(props: TabsPanelProps) {
     },
     props: merged,
   });
-}
+});

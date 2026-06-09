@@ -9,7 +9,6 @@ import {
   type Middleware,
   offset,
   type Placement,
-  type RefObject,
   shift,
   size,
   useClick,
@@ -22,7 +21,7 @@ import {
   useRole,
   useTypeahead,
 } from '@floating-ui/react';
-import { type ReactNode, useCallback, useMemo, useRef, useState } from 'react';
+import { type ReactNode, type RefObject, useCallback, useMemo, useRef, useState } from 'react';
 
 import { useControllableState } from '../../hooks/use-controllable-state';
 import { useTransition } from '../../hooks/use-transition';

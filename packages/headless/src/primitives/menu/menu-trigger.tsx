@@ -1,15 +1,15 @@
 'use client';
 
 import { useListItem, useMergeRefs } from '@floating-ui/react';
-import type React from 'react';
+import React from 'react';
 
 import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
 import { useMenuContext } from './menu-context';
 
 export type MenuTriggerProps = ComponentProps<'button'>;
 
-export function MenuTrigger(props: MenuTriggerProps) {
-  const { render, ref: consumerRef, ...otherProps } = props;
+export const MenuTrigger = React.forwardRef<HTMLButtonElement, MenuTriggerProps>(function MenuTrigger(props, ref) {
+  const { render, ...otherProps } = props;
   const { open, isNested, refs, getReferenceProps, parentContext } = useMenuContext();
 
   const item = useListItem();
@@ -18,7 +18,7 @@ export function MenuTrigger(props: MenuTriggerProps) {
   // a stable callback that doesn't use `this`, so the unbound-method check is a
   // false positive here.
   // eslint-disable-next-line @typescript-eslint/unbound-method
-  const mergedRef = useMergeRefs([refs.setReference, isNested ? item.ref : null, consumerRef ?? null]);
+  const mergedRef = useMergeRefs([refs.setReference, isNested ? item.ref : null, ref ?? null]);
 
   const state = { open };
 
@@ -50,4 +50,4 @@ export function MenuTrigger(props: MenuTriggerProps) {
     },
     props: mergeProps<'button'>(defaultProps, otherProps),
   });
-}
+});

@@ -1,7 +1,7 @@
 'use client';
 
 import { useFloatingTree, useListItem, useMergeRefs } from '@floating-ui/react';
-import type React from 'react';
+import React from 'react';
 
 import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
 import { useMenuContext } from './menu-context';
@@ -12,14 +12,14 @@ export interface MenuItemProps extends ComponentProps<'button'> {
   closeOnClick?: boolean;
 }
 
-export function MenuItem(props: MenuItemProps) {
-  const { render, ref: consumerRef, label, disabled, closeOnClick = true, ...otherProps } = props;
+export const MenuItem = React.forwardRef<HTMLButtonElement, MenuItemProps>(function MenuItem(props, ref) {
+  const { render, label, disabled, closeOnClick = true, ...otherProps } = props;
   const { activeIndex, getItemProps } = useMenuContext();
   const tree = useFloatingTree();
   const item = useListItem({ label: disabled ? null : label });
   const isActive = item.index === activeIndex;
 
-  const combinedRef = useMergeRefs([item.ref, consumerRef]);
+  const combinedRef = useMergeRefs([item.ref, ref]);
 
   const state = {
     active: isActive,
@@ -52,4 +52,4 @@ export function MenuItem(props: MenuItemProps) {
     },
     props: mergeProps<'button'>(defaultProps, otherProps),
   });
-}
+});

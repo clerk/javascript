@@ -1,5 +1,6 @@
 import { act, cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { createRef } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { axe } from '../../test-utils/axe';
@@ -535,6 +536,28 @@ describe('Tabs', () => {
     it('has no violations with vertical orientation', async () => {
       const { container } = renderTabs({ orientation: 'vertical' });
       expect(await axe(container)).toHaveNoViolations();
+    });
+  });
+
+  describe('consumer ref forwarding', () => {
+    it('forwards a consumer ref on Tab (CompositeItem shape)', () => {
+      const ref = createRef<HTMLButtonElement>();
+      render(
+        <Tabs.Root defaultValue='tab1'>
+          <Tabs.List>
+            <Tabs.Tab
+              value='tab1'
+              ref={ref}
+            >
+              One
+            </Tabs.Tab>
+          </Tabs.List>
+          <Tabs.Panel value='tab1'>content</Tabs.Panel>
+        </Tabs.Root>,
+      );
+
+      expect(ref.current).toBeInstanceOf(HTMLButtonElement);
+      expect(ref.current).toHaveAttribute('data-cl-slot', 'tabs-tab');
     });
   });
 
