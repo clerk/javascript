@@ -17,38 +17,22 @@ export interface OrganizationEnterpriseConnectionInput {
 
 /**
  * The active organization's SSO-config domain entity: an immutable, pure value
- * object the wizard makes every flow decision from. A snapshot of flattened
- * booleans/values, never mutated in place, knowing nothing about React.
+ * object the wizard makes every flow decision from. A snapshot of flattened booleans/values.
  */
 export interface OrganizationEnterpriseConnection {
   readonly provider: ProviderType | undefined;
   readonly hasConnection: boolean;
   readonly isActive: boolean;
-  /**
-   * The minimum IdP config to advance past the configure step (currently a SAML
-   * IdP SSO URL + entity ID).
-   */
-  // TODO - Update to support OpenID Connect
   readonly hasMinimumConfiguration: boolean;
   readonly isPrimaryEmailVerified: boolean;
   readonly hasSuccessfulTestRun: boolean;
 }
 
-/**
- * Whether the connection has the minimum IdP config to advance past configure.
- * A pure predicate over the RAW connection (no derived state) — so it is safe
- * both inside {@link organizationEnterpriseConnection} and to gate the test-runs
- * source upstream without a circular dependency on the built entity.
- */
 // TODO - Update to support OpenID Connect
 export const isEnterpriseConnectionConfigured = (
   connection: EnterpriseConnectionResource | null | undefined,
 ): boolean => Boolean(connection?.samlConnection?.idpSsoUrl && connection?.samlConnection?.idpEntityId);
 
-/**
- * Builds the {@link OrganizationEnterpriseConnection} entity from the raw inputs.
- * Pure: identical inputs yield a deep-equal immutable value object.
- */
 export const organizationEnterpriseConnection = ({
   connection,
   primaryEmail,

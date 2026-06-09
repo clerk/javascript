@@ -37,9 +37,7 @@ export type UseOrganizationEnterpriseConnectionTestRunsParams = {
   /**
    * When `true`, a background refetch keeps the previously-loaded page visible
    * (`isFetching` stays `true`, `isLoading` does not flip back to `true`) instead
-   * of clearing to a cold-load state. Mirrors the `keepPreviousData` option on
-   * `__internal_useOrganizationEnterpriseConnections` so paginating an
-   * existing-at-load list never tears the surrounding UI down to a skeleton.
+   * of clearing to a cold-load state.
    *
    * @default false
    */
