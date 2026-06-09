@@ -3,6 +3,7 @@
 '@clerk/clerk-js': minor
 '@clerk/shared': minor
 '@clerk/react': minor
+'@clerk/testing': minor
 '@clerk/ui': minor
 ---
 
