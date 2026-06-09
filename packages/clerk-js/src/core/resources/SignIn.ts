@@ -78,6 +78,7 @@ import {
 import { debugLogger } from '@/utils/debug';
 
 import { getBrowserLocale, web3 } from '../../utils';
+import { getNativeRedirectUrl, nativeRedirectCallback } from '../../utils/authenticateWithNative';
 import {
   _authenticateWithPopup,
   _futureAuthenticateWithPopup,
@@ -342,13 +343,16 @@ export class SignIn extends BaseResource implements SignInResource {
 
   private authenticateWithRedirectOrPopup = async (
     params: AuthenticateWithRedirectParams,
-    navigateCallback: (url: URL | string) => void,
+    navigateCallback: (url: URL | string) => void | Promise<unknown>,
   ): Promise<void> => {
     const { strategy, redirectUrlComplete, identifier, oidcPrompt, continueSignIn, enterpriseConnectionId } =
       params || {};
-    const actionCompleteRedirectUrl = redirectUrlComplete;
 
-    const redirectUrl = SignIn.clerk.buildUrlWithAuth(params.redirectUrl);
+    // When a native OAuth handler is registered, FAPI must return to the native callback URL for both
+    // the post-provider redirect and the post-completion redirect; otherwise the web URLs are used.
+    const nativeRedirectUrl = await getNativeRedirectUrl(SignIn.clerk);
+    const redirectUrl = nativeRedirectUrl ?? SignIn.clerk.buildUrlWithAuth(params.redirectUrl);
+    const actionCompleteRedirectUrl = nativeRedirectUrl ?? redirectUrlComplete;
 
     if (!this.id || !continueSignIn) {
       await this.create({
@@ -372,13 +376,24 @@ export class SignIn extends BaseResource implements SignInResource {
     const { status, externalVerificationRedirectURL } = this.firstFactorVerification;
 
     if (status === 'unverified' && externalVerificationRedirectURL) {
-      navigateCallback(externalVerificationRedirectURL);
+      await navigateCallback(externalVerificationRedirectURL);
     } else {
       clerkInvalidFAPIResponse(status, SignIn.fapiClient.buildEmailAddress('support'));
     }
   };
 
   public authenticateWithRedirect = async (params: AuthenticateWithRedirectParams): Promise<void> => {
+    const clerk = SignIn.clerk;
+
+    // When a native OAuth handler is registered (e.g. Electron), drive the verification through the
+    // system browser instead of a web redirect, then resume the standard callback handling in place.
+    if (clerk.__internal_nativeOAuthHandler) {
+      return this.authenticateWithRedirectOrPopup(
+        params,
+        nativeRedirectCallback(clerk, 'signIn', params.redirectUrlComplete),
+      );
+    }
+
     return this.authenticateWithRedirectOrPopup(params, windowNavigate);
   };
 

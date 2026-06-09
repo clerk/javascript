@@ -43,6 +43,7 @@ export type * from './organizationMembership';
 export type * from './organizationMembershipRequest';
 export type * from './organizationSettings';
 export type * from './organizationSuggestion';
+export type * from './nativeOAuth';
 export type * from './pagination';
 export type * from './passkey';
 export type * from './passwords';

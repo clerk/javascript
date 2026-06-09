@@ -210,6 +210,16 @@ describe('Clerk singleton', () => {
         expect(mockSession.touch).toHaveBeenCalledWith({ intent: 'select_session' });
       });
 
+      it('assigns __internal_nativeOAuthHandler from options on load', async () => {
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [] }));
+        const handler = { getRedirectUrl: vi.fn(), open: vi.fn() };
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load({ __internal_nativeOAuthHandler: handler } as any);
+
+        expect(sut.__internal_nativeOAuthHandler).toBe(handler);
+      });
+
       describe('with `touchSession` set to false', () => {
         it('calls session.touch by default outside of focus window event', async () => {
           mockSession.touch.mockReturnValue(Promise.resolve());

@@ -49,6 +49,7 @@ import type {
 import { debugLogger } from '@/utils/debug';
 
 import { getBrowserLocale, getClerkQueryParam, web3 } from '../../utils';
+import { getNativeRedirectUrl, nativeRedirectCallback } from '../../utils/authenticateWithNative';
 import {
   _authenticateWithPopup,
   _futureAuthenticateWithPopup,
@@ -392,7 +393,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     params: AuthenticateWithRedirectParams & {
       unsafeMetadata?: SignUpUnsafeMetadata;
     },
-    navigateCallback: (url: URL | string) => void,
+    navigateCallback: (url: URL | string) => void | Promise<unknown>,
   ): Promise<void> => {
     const {
       redirectUrl,
@@ -406,13 +407,16 @@ export class SignUp extends BaseResource implements SignUpResource {
       enterpriseConnectionId,
     } = params;
 
-    const redirectUrlWithAuthToken = SignUp.clerk.buildUrlWithAuth(redirectUrl);
+    // When a native OAuth handler is registered, FAPI must return to the native callback URL for both
+    // the post-provider redirect and the post-completion redirect; otherwise the web URLs are used.
+    const nativeRedirectUrl = await getNativeRedirectUrl(SignUp.clerk);
+    const redirectUrlWithAuthToken = nativeRedirectUrl ?? SignUp.clerk.buildUrlWithAuth(redirectUrl);
 
     const authenticateFn = () => {
       const authParams = {
         strategy,
         redirectUrl: redirectUrlWithAuthToken,
-        actionCompleteRedirectUrl: redirectUrlComplete,
+        actionCompleteRedirectUrl: nativeRedirectUrl ?? redirectUrlComplete,
         unsafeMetadata,
         emailAddress,
         legalAccepted,
@@ -438,7 +442,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     const { status, externalVerificationRedirectURL } = externalAccount;
 
     if (status === 'unverified' && !!externalVerificationRedirectURL) {
-      navigateCallback(externalVerificationRedirectURL);
+      await navigateCallback(externalVerificationRedirectURL);
     } else {
       clerkInvalidFAPIResponse(status, SignUp.fapiClient.buildEmailAddress('support'));
     }
@@ -449,6 +453,17 @@ export class SignUp extends BaseResource implements SignUpResource {
       unsafeMetadata?: SignUpUnsafeMetadata;
     },
   ): Promise<void> => {
+    const clerk = SignUp.clerk;
+
+    // When a native OAuth handler is registered (e.g. Electron), drive the verification through the
+    // system browser instead of a web redirect, then resume the standard callback handling in place.
+    if (clerk.__internal_nativeOAuthHandler) {
+      return this.authenticateWithRedirectOrPopup(
+        params,
+        nativeRedirectCallback(clerk, 'signUp', params.redirectUrlComplete),
+      );
+    }
+
     return this.authenticateWithRedirectOrPopup(params, windowNavigate);
   };
 

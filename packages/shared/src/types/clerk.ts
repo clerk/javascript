@@ -18,6 +18,7 @@ import type { InstanceType } from './instance';
 import type { DisplayThemeJSON } from './json';
 import type { LocalizationResource } from './localization';
 import type { DomainOrProxyUrl, MultiDomainAndOrProxy } from './multiDomain';
+import type { NativeOAuthHandler } from './nativeOAuth';
 import type { OAuthProvider, OAuthScope } from './oauth';
 import type { OAuthApplicationNamespace } from './oauthApplication';
 import type { OrganizationResource } from './organization';
@@ -865,6 +866,25 @@ export interface Clerk {
   __internal_addNavigationListener: (callback: () => void) => UnsubscribeCallback;
 
   /**
+   * The runtime-agnostic native OAuth handler resolved from the `__internal_nativeOAuthHandler` option.
+   * Used by native shells (e.g. Electron) where the embedding webview cannot complete a standard web
+   * redirect. When present, Clerk routes its prebuilt-component OAuth flows through this handler instead
+   * of a web redirect or popup. When `undefined` (the default), Clerk's web flows are used unchanged.
+   *
+   * @internal
+   */
+  __internal_nativeOAuthHandler?: NativeOAuthHandler;
+
+  /**
+   * Opens an external account verification URL (returned by `User.createExternalAccount`) using the
+   * registered native OAuth transport, then reloads the user with the resulting rotating token nonce.
+   * Intended for prebuilt connected-account flows in native shells. Assumes a transport is registered.
+   *
+   * @internal
+   */
+  __internal_authenticateWithNativeExternalAccount: (externalVerificationRedirectURL: URL) => Promise<void>;
+
+  /**
    * A method used to set the current session and/or Organization for the client. Accepts a [`SetActiveParams`](https://clerk.com/docs/reference/types/set-active-params) object.
    *
    * If the session param is `null`, the active session is deleted.
@@ -1214,6 +1234,14 @@ export type HandleOAuthCallbackParams = TransferableOption &
      */
     reloadResource?: 'signIn' | 'signUp';
     /**
+     * A rotating token nonce returned by a native (system-browser) OAuth callback. When present, the
+     * resource named by `reloadResource` is reloaded with this nonce so the verified state can be read
+     * from a context that does not share the system browser's cookies. Unused by standard web flows.
+     *
+     * @internal
+     */
+    rotatingTokenNonce?: string;
+    /**
      * Metadata that can be read and set from the frontend. Once the sign-up is complete, the value of this field will be automatically copied to the newly created user's unsafe metadata. One common use case for this attribute is to use it to implement custom fields that can be collected during sign-up and will automatically be attached to the created `User` object.
      */
     unsafeMetadata?: SignUpUnsafeMetadata;
@@ -1331,6 +1359,14 @@ export type ClerkOptions = ClerkOptionsNavigation &
      * Indicates whether ClerkJS is loaded with the assumption that cookies can be set (browser setup). On native platforms this value must be set to `false`.
      */
     standardBrowser?: boolean;
+    /**
+     * A runtime-agnostic handler that performs OAuth/SSO verification in the system browser. Provided by
+     * native SDKs (e.g. a future `@clerk/electron`) where the embedding webview cannot complete a web
+     * redirect. When omitted (the default), Clerk's web redirect and popup flows are used unchanged.
+     *
+     * @internal
+     */
+    __internal_nativeOAuthHandler?: NativeOAuthHandler;
     /**
      * The support email address for display in authentication screens. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
      */

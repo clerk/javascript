@@ -1,5 +1,5 @@
 import { appendModalState } from '@clerk/shared/internal/clerk-js/queryStateParams';
-import { useReverification, useUser } from '@clerk/shared/react';
+import { useClerk, useReverification, useUser } from '@clerk/shared/react';
 import type { OAuthProvider, OAuthStrategy } from '@clerk/shared/types';
 
 import { useCardState } from '@/ui/elements/contexts';
@@ -16,6 +16,7 @@ import { useRouter } from '../../router';
 const ConnectMenuButton = (props: { strategy: OAuthStrategy; onClick?: () => void }) => {
   const { strategy } = props;
   const card = useCardState();
+  const clerk = useClerk();
   const { user } = useUser();
   const { navigate } = useRouter();
   const { strategyToDisplayData } = useEnabledThirdPartyProviders();
@@ -46,10 +47,21 @@ const ConnectMenuButton = (props: { strategy: OAuthStrategy; onClick?: () => voi
     card.setLoading(strategy);
     return createExternalAccount()
       .then(res => {
-        if (res && res.verification?.externalVerificationRedirectURL) {
-          void sleep(2000).then(() => card.setIdle(strategy));
-          void navigate(res.verification.externalVerificationRedirectURL.href);
+        const externalVerificationRedirectURL = res?.verification?.externalVerificationRedirectURL;
+        if (!externalVerificationRedirectURL) {
+          return;
         }
+
+        // In native shells (e.g. Electron) a registered transport completes verification in the system
+        // browser and reloads the user in place, so we never navigate the renderer away.
+        if (clerk.__internal_nativeOAuthHandler) {
+          return clerk
+            .__internal_authenticateWithNativeExternalAccount(externalVerificationRedirectURL)
+            .then(() => card.setIdle(strategy));
+        }
+
+        void sleep(2000).then(() => card.setIdle(strategy));
+        void navigate(externalVerificationRedirectURL.href);
       })
       .catch(err => {
         handleError(err, [], card.setError);

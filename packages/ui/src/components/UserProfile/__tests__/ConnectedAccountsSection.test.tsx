@@ -1,6 +1,6 @@
 import type { ExternalAccountResource } from '@clerk/shared/types';
 import { act, waitFor } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen } from '@/test/utils';
@@ -133,6 +133,48 @@ describe('ConnectedAccountsSection ', () => {
         strategy: 'oauth_google',
         additionalScopes: [],
       });
+    });
+  });
+
+  describe('Native OAuth transport', () => {
+    it('routes through the native transport instead of navigating when one is registered', async () => {
+      const { wrapper, fixtures } = await createFixtures(withoutConnections);
+
+      const externalVerificationRedirectURL = new URL('https://sso.example.com/auth');
+      fixtures.clerk.user?.createExternalAccount.mockResolvedValue({
+        verification: { externalVerificationRedirectURL },
+      } as any);
+      (fixtures.clerk as any).__internal_nativeOAuthHandler = { getRedirectUrl: vi.fn(), open: vi.fn() };
+      (fixtures.clerk.__internal_authenticateWithNativeExternalAccount as any).mockResolvedValue(undefined);
+
+      const { userEvent, getByText } = render(<ConnectedAccountsSection />, { wrapper });
+
+      await userEvent.click(getByText(/connect account/i));
+      await waitFor(() => getByText('Google'));
+      await userEvent.click(getByText(/Google/i));
+
+      await waitFor(() =>
+        expect(fixtures.clerk.__internal_authenticateWithNativeExternalAccount).toHaveBeenCalledWith(
+          externalVerificationRedirectURL,
+        ),
+      );
+    });
+
+    it('does not use the native transport on the web when none is registered', async () => {
+      const { wrapper, fixtures } = await createFixtures(withoutConnections);
+
+      fixtures.clerk.user?.createExternalAccount.mockResolvedValue({
+        verification: { externalVerificationRedirectURL: new URL('https://sso.example.com/auth') },
+      } as any);
+
+      const { userEvent, getByText } = render(<ConnectedAccountsSection />, { wrapper });
+
+      await userEvent.click(getByText(/connect account/i));
+      await waitFor(() => getByText('Google'));
+      await userEvent.click(getByText(/Google/i));
+
+      await waitFor(() => expect(fixtures.clerk.user?.createExternalAccount).toHaveBeenCalled());
+      expect(fixtures.clerk.__internal_authenticateWithNativeExternalAccount).not.toHaveBeenCalled();
     });
   });
 

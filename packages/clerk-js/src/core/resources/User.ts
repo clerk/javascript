@@ -36,6 +36,7 @@ import type {
   Web3WalletResource,
 } from '@clerk/shared/types';
 
+import { getNativeRedirectUrl } from '../../utils/authenticateWithNative';
 import { unixEpochToDate } from '../../utils/date';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { eventBus, events } from '../events';
@@ -163,13 +164,17 @@ export class User extends BaseResource implements UserResource {
   createExternalAccount = async (params: CreateExternalAccountParams): Promise<ExternalAccountResource> => {
     const { strategy, redirectUrl, additionalScopes, enterpriseConnectionId } = params || {};
 
+    // In native shells the OAuth flow must return through the native callback URL, not a web route the
+    // system browser cannot reach. Connected accounts have a single redirect field.
+    const effectiveRedirectUrl = (await getNativeRedirectUrl(User.clerk)) ?? redirectUrl;
+
     const json = (
       await BaseResource._fetch<ExternalAccountJSON>({
         path: '/me/external_accounts',
         method: 'POST',
         body: {
           strategy,
-          redirect_url: redirectUrl,
+          redirect_url: effectiveRedirectUrl,
           additional_scope: additionalScopes,
           enterprise_connection_id: enterpriseConnectionId,
         } as any,

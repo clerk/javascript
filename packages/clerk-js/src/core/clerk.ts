@@ -96,6 +96,7 @@ import type {
   ListenerCallback,
   ListenerOptions,
   LoadedClerk,
+  NativeOAuthHandler,
   NavigateOptions,
   OAuthApplicationNamespace,
   OrganizationListProps,
@@ -166,6 +167,7 @@ import {
   stripOrigin,
   web3,
 } from '../utils';
+import { _authenticateWithNative } from '../utils/authenticateWithNative';
 import { CLERK_ENVIRONMENT_STORAGE_ENTRY, SafeLocalStorage } from '../utils/localStorage';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
 import { AuthCookieService } from './auth/AuthCookieService';
@@ -316,6 +318,8 @@ export class Clerk implements ClerkInterface {
   public __internal_isWebAuthnSupported: (() => boolean) | undefined;
   public __internal_isWebAuthnAutofillSupported: (() => Promise<boolean>) | undefined;
   public __internal_isWebAuthnPlatformAuthenticatorSupported: (() => Promise<boolean>) | undefined;
+
+  public __internal_nativeOAuthHandler: NativeOAuthHandler | undefined;
 
   public __internal_setActiveInProgress = false;
 
@@ -529,6 +533,10 @@ export class Clerk implements ClerkInterface {
     }
 
     this.#options = this.#initOptions(options);
+
+    // A native SDK (e.g. Electron) supplies an OAuth handler via options; resources and prebuilt
+    // components read it from this field to route verification through the system browser.
+    this.__internal_nativeOAuthHandler = this.#options.__internal_nativeOAuthHandler;
 
     // Initialize ClerkUI if it was provided
     if (this.#options.ui?.ClerkUI) {
@@ -2331,11 +2339,15 @@ export class Clerk implements ClerkInterface {
     // to ensure that we have the latest state. This operation can fail when we try reloading a resource that doesn't
     // exist (such as when reloading a signIn resource during a signUp attempt), but this can be safely ignored.
     if (!window.opener && params.reloadResource) {
+      // A `rotatingTokenNonce` is supplied by native (system-browser) OAuth callbacks, where the
+      // verified state lives in a context that does not share this window's cookies. Reloading with
+      // the nonce lets us read that state. Standard web flows omit it and reload normally.
+      const reloadParams = params.rotatingTokenNonce ? { rotatingTokenNonce: params.rotatingTokenNonce } : undefined;
       try {
         if (params.reloadResource === 'signIn') {
-          await signIn.reload();
+          await signIn.reload(reloadParams);
         } else if (params.reloadResource === 'signUp') {
-          await signUp.reload();
+          await signUp.reload(reloadParams);
         }
       } catch {
         // This catch intentionally left blank.
@@ -2578,6 +2590,15 @@ export class Clerk implements ClerkInterface {
     }
 
     return navigateToSignIn();
+  };
+
+  public __internal_authenticateWithNativeExternalAccount = async (
+    externalVerificationRedirectURL: URL,
+  ): Promise<void> => {
+    await _authenticateWithNative(this, {
+      externalVerificationRedirectURL,
+      resume: ({ rotatingTokenNonce }) => this.user?.reload({ rotatingTokenNonce }) ?? Promise.resolve(),
+    });
   };
 
   public handleRedirectCallback = async (

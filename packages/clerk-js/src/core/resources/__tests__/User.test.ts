@@ -42,6 +42,51 @@ describe('User', () => {
     });
   });
 
+  it('uses the native redirect URL when a native OAuth handler is registered', async () => {
+    const externalAccountJSON = {
+      object: 'external_account',
+      provider: 'dropbox',
+      verification: {
+        external_verification_redirect_url: 'https://www.example.com',
+      },
+    };
+
+    // @ts-ignore
+    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: externalAccountJSON }));
+
+    const getRedirectUrl = vi.fn().mockResolvedValue('clerk://sso-callback');
+    // @ts-ignore - resources resolve the native handler from the shared static clerk instance.
+    User.clerk = { __internal_nativeOAuthHandler: { getRedirectUrl, open: vi.fn() } } as any;
+
+    const user = new User({
+      email_addresses: [],
+      phone_numbers: [],
+      web3_wallets: [],
+      external_accounts: [],
+    } as unknown as UserJSON);
+
+    await user.createExternalAccount({
+      strategy: 'oauth_dropbox',
+      redirectUrl: 'https://www.example.com',
+      additionalScopes: ['view'],
+    });
+
+    expect(getRedirectUrl).toHaveBeenCalledTimes(1);
+    // @ts-ignore
+    expect(BaseResource._fetch).toHaveBeenCalledWith({
+      method: 'POST',
+      path: '/me/external_accounts',
+      body: {
+        redirect_url: 'clerk://sso-callback',
+        strategy: 'oauth_dropbox',
+        additional_scope: ['view'],
+      },
+    });
+
+    // @ts-ignore - reset the shared static so later tests see no handler.
+    User.clerk = undefined;
+  });
+
   it('creates an external account with enterprise connection id', async () => {
     const externalAccountJSON = {
       object: 'external_account',
