@@ -35,6 +35,7 @@ export function TabsRoot(props: TabsProps) {
       }
     } else {
       tabElementsRef.current.delete(tabValue);
+      tabOrderRef.current = tabOrderRef.current.filter(v => v !== tabValue);
     }
   }, []);
 
@@ -46,7 +47,7 @@ export function TabsRoot(props: TabsProps) {
     (newValue: string) => {
       const prevIndex = tabOrderRef.current.indexOf(valueRef.current);
       const nextIndex = tabOrderRef.current.indexOf(newValue);
-      if (prevIndex !== -1 && nextIndex !== -1) {
+      if (prevIndex !== -1 && nextIndex !== -1 && nextIndex !== prevIndex) {
         setDirection(nextIndex > prevIndex ? 1 : -1);
       }
       setValueRaw(newValue);

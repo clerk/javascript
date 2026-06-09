@@ -1,5 +1,6 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { createRef } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { axe } from '../../test-utils/axe';
@@ -270,6 +271,25 @@ describe('Popover', () => {
     it('has no violations when open', async () => {
       renderPopover({ defaultOpen: true });
       expect(await axe(document.body, { rules: { region: { enabled: false } } })).toHaveNoViolations();
+    });
+  });
+
+  describe('Arrow ref', () => {
+    it('merges a consumer ref with the internal arrow ref', () => {
+      const ref = createRef<SVGSVGElement>();
+      render(
+        <Popover.Root defaultOpen>
+          <Popover.Trigger>Open popover</Popover.Trigger>
+          <Popover.Positioner>
+            <Popover.Popup>
+              <Popover.Arrow ref={ref} />
+            </Popover.Popup>
+          </Popover.Positioner>
+        </Popover.Root>,
+      );
+
+      expect(ref.current).not.toBeNull();
+      expect(ref.current).toHaveAttribute('data-cl-slot', 'popover-arrow');
     });
   });
 });

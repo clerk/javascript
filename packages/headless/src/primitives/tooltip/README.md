@@ -52,14 +52,15 @@ const [open, setOpen] = useState(false);
 
 ## Parts
 
-| Part                 | Default Element | Description                                      |
-| -------------------- | --------------- | ------------------------------------------------ |
-| `Tooltip.Root`       | —               | Root context provider                            |
-| `Tooltip.Trigger`    | `<button>`      | Element that triggers the tooltip on hover/focus |
-| `Tooltip.Portal`     | —               | Portals children (accepts `root` prop)           |
-| `Tooltip.Positioner` | `<div>`         | Floating positioned container                    |
-| `Tooltip.Popup`      | `<div>`         | The visible tooltip content                      |
-| `Tooltip.Arrow`      | `<svg>`         | Optional arrow pointing at the trigger           |
+| Part                 | Default Element | Description                                                              |
+| -------------------- | --------------- | ------------------------------------------------------------------------ |
+| `Tooltip.Root`       | —               | Root context provider                                                    |
+| `Tooltip.Group`      | —               | Shares an open/close delay across grouped tooltips for instant switching |
+| `Tooltip.Trigger`    | `<button>`      | Element that triggers the tooltip on hover/focus                         |
+| `Tooltip.Portal`     | —               | Portals children (accepts `root` prop)                                   |
+| `Tooltip.Positioner` | `<div>`         | Floating positioned container                                            |
+| `Tooltip.Popup`      | `<div>`         | The visible tooltip content                                              |
+| `Tooltip.Arrow`      | `<svg>`         | Optional arrow pointing at the trigger                                   |
 
 ## Props
 
@@ -107,7 +108,7 @@ Middleware stack: `offset` -> `flip` -> `shift` -> `arrow` -> CSS vars. Repositi
 - **No `FloatingFocusManager`** — tooltips do not receive or trap focus. This is correct per ARIA guidelines.
 - **Nested tooltips are supported** via `FloatingTree`.
 - **`Tooltip.Trigger` wraps its child** — if your trigger is already a button, the `render` prop can forward props to it instead of wrapping.
-- **For tooltip clusters** (e.g. toolbar buttons), consider adding `FloatingDelayGroup` support for instant switching between tooltips.
+- **For tooltip clusters** (e.g. toolbar buttons), wrap them in `Tooltip.Group` to share an open/close delay so moving between triggers switches tooltips instantly. Accepts `delay` (`number | { open?, close? }`) and `timeoutMs` props.
 
 ## ARIA
 

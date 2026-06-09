@@ -1181,4 +1181,29 @@ describe('Autocomplete', () => {
       expect(await axe(document.body, { rules: { region: { enabled: false } } })).toHaveNoViolations();
     });
   });
+
+  describe('option id protection', () => {
+    it('does not let a consumer id override the primitive-owned option id', () => {
+      render(
+        <Autocomplete.Root defaultOpen>
+          <Autocomplete.Input placeholder='Search fruits...' />
+          <Autocomplete.Positioner>
+            <Autocomplete.Popup>
+              <Autocomplete.Option
+                value='apple'
+                label='Apple'
+                id='consumer-id'
+              >
+                Apple
+              </Autocomplete.Option>
+            </Autocomplete.Popup>
+          </Autocomplete.Positioner>
+        </Autocomplete.Root>,
+      );
+
+      const option = screen.getByRole('option');
+      expect(option.id).not.toBe('consumer-id');
+      expect(option.id).not.toBe('');
+    });
+  });
 });

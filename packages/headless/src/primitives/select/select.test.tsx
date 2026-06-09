@@ -739,4 +739,61 @@ describe('Select', () => {
       expect(await axe(container)).toHaveNoViolations();
     });
   });
+
+  describe('option button type', () => {
+    it('renders options with type="button" so they do not submit a wrapping form', () => {
+      renderSelect({ defaultOpen: true });
+      const options = screen.getAllByRole('option');
+      expect(options).toHaveLength(3);
+      for (const option of options) {
+        expect(option).toHaveAttribute('type', 'button');
+      }
+    });
+  });
+
+  describe('Home/End navigation honors aria-disabled value', () => {
+    it('treats aria-disabled="false" as enabled when pressing Home', async () => {
+      const user = userEvent.setup();
+      render(
+        <Select.Root
+          items={fruits}
+          alignItemWithTrigger={false}
+        >
+          <Select.Trigger>
+            <Select.Value placeholder='Pick a fruit...' />
+          </Select.Trigger>
+          <Select.Positioner>
+            <Select.Popup>
+              <Select.Option
+                value='apple'
+                label='Apple'
+                aria-disabled={false}
+              >
+                Apple
+              </Select.Option>
+              <Select.Option
+                value='banana'
+                label='Banana'
+              >
+                Banana
+              </Select.Option>
+              <Select.Option
+                value='cherry'
+                label='Cherry'
+              >
+                Cherry
+              </Select.Option>
+            </Select.Popup>
+          </Select.Positioner>
+        </Select.Root>,
+      );
+
+      await user.click(screen.getByRole('combobox'));
+      await user.keyboard('{Home}');
+
+      const options = screen.getAllByRole('option');
+      expect(options[0]).toHaveAttribute('aria-disabled', 'false');
+      expect(options[0]).toHaveAttribute('data-cl-active');
+    });
+  });
 });

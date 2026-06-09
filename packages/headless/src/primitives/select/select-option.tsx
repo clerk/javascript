@@ -41,6 +41,7 @@ export function SelectOption(props: SelectOptionProps) {
 
   const defaultProps = {
     'data-cl-slot': 'select-option',
+    type: 'button' as const,
     ref: combinedRef,
     role: 'option' as const,
     'aria-selected': isSelected,

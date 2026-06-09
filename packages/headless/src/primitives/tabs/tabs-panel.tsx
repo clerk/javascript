@@ -51,7 +51,11 @@ export function TabsPanel(props: TabsPanelProps) {
     role: 'tabpanel' as const,
     'aria-labelledby': tabId,
     tabIndex: 0,
-    inert: !isSelected ? '' : undefined,
+    // `inert` must be a truthy string, not a boolean or empty string, to stay
+    // correct across React 18 and 19: React 18 drops a boolean `true` and React
+    // 19 treats `''` as falsy. `'true'` renders the (presence-based) attribute in
+    // both. Matches the existing pattern in packages/ui PricingTableMatrix.
+    inert: !isSelected ? 'true' : undefined,
     hidden: !isSelected && !shouldForceMount ? true : undefined,
     ref: combinedRef,
     ...(shouldForceMount

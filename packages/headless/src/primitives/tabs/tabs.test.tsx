@@ -537,4 +537,59 @@ describe('Tabs', () => {
       expect(await axe(container)).toHaveNoViolations();
     });
   });
+
+  describe('inert state', () => {
+    it('marks deselected panels inert and leaves the selected panel interactive', () => {
+      renderTabs({ defaultValue: 'tab1' });
+
+      const selected = screen.getByText('Account content');
+      const deselected = screen.getByText('Settings content');
+
+      expect(selected).not.toHaveAttribute('inert');
+      expect(deselected).toHaveAttribute('inert');
+    });
+  });
+
+  describe('transition direction', () => {
+    function renderForceMounted() {
+      return render(
+        <Tabs.Root
+          defaultValue='tab1'
+          activationMode='manual'
+        >
+          <Tabs.List>
+            <Tabs.Tab value='tab1'>One</Tabs.Tab>
+            <Tabs.Tab value='tab2'>Two</Tabs.Tab>
+          </Tabs.List>
+          <Tabs.Panel
+            value='tab1'
+            shouldForceMount
+          >
+            One content
+          </Tabs.Panel>
+          <Tabs.Panel
+            value='tab2'
+            shouldForceMount
+          >
+            Two content
+          </Tabs.Panel>
+        </Tabs.Root>,
+      );
+    }
+
+    it('does not flip direction backward when re-selecting the active tab', async () => {
+      const user = userEvent.setup();
+      renderForceMounted();
+
+      const panel = screen.getByText('Two content');
+
+      // Moving forward to tab2 sets direction = 1.
+      await user.click(screen.getByRole('tab', { name: 'Two' }));
+      expect(panel.style.getPropertyValue('--cl-tab-transition-direction')).toBe('1');
+
+      // Re-selecting the already-active tab must not flip direction to -1.
+      await user.click(screen.getByRole('tab', { name: 'Two' }));
+      expect(panel.style.getPropertyValue('--cl-tab-transition-direction')).toBe('1');
+    });
+  });
 });

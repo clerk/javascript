@@ -1,5 +1,6 @@
 import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { createRef } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { axe } from '../../test-utils/axe';
@@ -327,6 +328,26 @@ describe('Tooltip', () => {
 
       // First tooltip should no longer be visible
       expect(screen.queryByText('Tooltip A')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Arrow ref', () => {
+    it('merges a consumer ref with the internal arrow ref', () => {
+      const ref = createRef<SVGSVGElement>();
+      render(
+        <Tooltip.Root defaultOpen>
+          <Tooltip.Trigger>Hover me</Tooltip.Trigger>
+          <Tooltip.Positioner>
+            <Tooltip.Popup>
+              Tooltip content
+              <Tooltip.Arrow ref={ref} />
+            </Tooltip.Popup>
+          </Tooltip.Positioner>
+        </Tooltip.Root>,
+      );
+
+      expect(ref.current).not.toBeNull();
+      expect(ref.current).toHaveAttribute('data-cl-slot', 'tooltip-arrow');
     });
   });
 });

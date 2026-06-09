@@ -1,14 +1,17 @@
 'use client';
 
-import { FloatingArrow } from '@floating-ui/react';
+import { FloatingArrow, useMergeRefs } from '@floating-ui/react';
 import React from 'react';
 
 import { usePopoverContext } from './popover-context';
 
 export type PopoverArrowProps = React.ComponentPropsWithRef<typeof FloatingArrow>;
 
-export function PopoverArrow(props: PopoverArrowProps) {
+export const PopoverArrow = React.forwardRef<SVGSVGElement, PopoverArrowProps>(function PopoverArrow(props, ref) {
   const { floatingContext, arrowRef, placement } = usePopoverContext();
+  // Merge the consumer ref with the primitive-owned arrowRef so passing a ref
+  // does not clobber the ref FloatingArrow relies on for positioning.
+  const combinedRef = useMergeRefs([arrowRef, ref]);
   const side = placement.split('-')[0];
 
   return (
@@ -16,8 +19,8 @@ export function PopoverArrow(props: PopoverArrowProps) {
       data-cl-slot='popover-arrow'
       data-cl-side={side}
       {...props}
-      ref={arrowRef}
+      ref={combinedRef}
       context={floatingContext}
     />
   );
-}
+});

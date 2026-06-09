@@ -57,6 +57,11 @@ export function AutocompleteOption(props: AutocompleteOptionProps) {
     }) as React.ComponentPropsWithRef<'div'>),
   };
 
+  const merged = mergeProps<'div'>(defaultProps, otherProps);
+  // The option id is owned by the primitive and drives the input's
+  // aria-activedescendant linkage: a consumer-supplied id must not override it.
+  merged.id = id;
+
   return renderElement({
     defaultTagName: 'div',
     render,
@@ -66,6 +71,6 @@ export function AutocompleteOption(props: AutocompleteOptionProps) {
       active: (v: boolean) => (v ? { 'data-cl-active': '' } : null),
       disabled: (v: boolean) => (v ? { 'data-cl-disabled': '' } : null),
     },
-    props: mergeProps<'div'>(defaultProps, otherProps),
+    props: merged,
   });
 }
