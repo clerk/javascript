@@ -674,6 +674,7 @@ export type ElementsConfig = {
   enterpriseConnectionButtonText: WithOptions;
 
   configureSSOHeader: WithOptions;
+  configureSSOMobileNavbar: WithOptions;
   configureSSOStepper: WithOptions;
   configureSSOStepperItem: WithOptions<string, ActiveState>;
   configureSSOStepperItemBullet: WithOptions<string, ActiveState>;
@@ -689,6 +690,7 @@ export type ElementsConfig = {
   configureSSOFooter: WithOptions;
   configureSSOFooterPreviousButton: WithOptions;
   configureSSOFooterContinueButton: WithOptions;
+  configureSSOFooterResetButton: WithOptions;
 
   configureSSOProviderGroup: WithOptions<string>;
   configureSSOProviderGroupLabel: WithOptions<string>;
@@ -738,8 +740,14 @@ export type ElementsConfig = {
   configureSSOConfirmationConfigDetailsLabel: WithOptions;
   configureSSOConfirmationConfigDetailsValue: WithOptions;
   configureSSOConfirmationConfigDetailsLink: WithOptions;
+  configureSSOConfirmationInactiveBanner: WithOptions;
   configureSSOConfirmationReconfigureButton: WithOptions;
   configureSSOConfirmationResetButton: WithOptions;
+
+  configureSSOResetConnectionDialog: WithOptions;
+  configureSSOResetConnectionDialogCancelButton: WithOptions;
+  configureSSOResetConnectionDialogConfirmationInput: WithOptions;
+  configureSSOResetConnectionDialogSubmitButton: WithOptions;
 
   web3SolanaWalletButtonsRoot: WithOptions;
   web3SolanaWalletButtons: WithOptions;
@@ -925,7 +933,7 @@ export type BaseTheme = (BaseThemeTaggedType | 'clerk' | 'simple') & { cssLayerN
 export type Theme = {
   /**
    * A theme used as the base theme for the components.
-   * For further customisation, you can use the {@link Theme.options}, {@link Theme.variables} and {@link Theme.elements} props.
+   * For further customization, you can use the {@link Theme.options}, {@link Theme.variables} and {@link Theme.elements} props.
    *
    * Supports both object-based themes and string-based themes:
    *

@@ -3,10 +3,8 @@ import { isDevelopmentFromPublishableKey } from '@clerk/shared/keys';
 import type {
   BackupCodeJSON,
   BackupCodeResource,
-  ClerkPaginatedResponse,
   CreateEmailAddressParams,
   CreateExternalAccountParams,
-  CreateMeEnterpriseConnectionParams,
   CreatePhoneNumberParams,
   CreateWeb3WalletParams,
   DeletedObjectJSON,
@@ -15,15 +13,9 @@ import type {
   EnterpriseAccountResource,
   EnterpriseConnectionJSON,
   EnterpriseConnectionResource,
-  EnterpriseConnectionTestRunInitJSON,
-  EnterpriseConnectionTestRunInitResource,
-  EnterpriseConnectionTestRunJSON,
-  EnterpriseConnectionTestRunResource,
-  EnterpriseConnectionTestRunsPaginatedJSON,
   ExternalAccountJSON,
   ExternalAccountResource,
   GetEnterpriseConnectionsParams,
-  GetEnterpriseConnectionTestRunsParams,
   GetOrganizationMemberships,
   GetUserOrganizationInvitationsParams,
   GetUserOrganizationSuggestionsParams,
@@ -35,7 +27,6 @@ import type {
   SetProfileImageParams,
   TOTPJSON,
   TOTPResource,
-  UpdateMeEnterpriseConnectionParams,
   UpdateUserMetadataParams,
   UpdateUserParams,
   UpdateUserPasswordParams,
@@ -46,7 +37,6 @@ import type {
   Web3WalletResource,
 } from '@clerk/shared/types';
 
-import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
 import { unixEpochToDate } from '../../utils/date';
 import { computeMergePatch } from '../../utils/mergePatch';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
@@ -59,7 +49,6 @@ import {
   EmailAddress,
   EnterpriseAccount,
   EnterpriseConnection,
-  EnterpriseConnectionTestRun,
   ExternalAccount,
   Image,
   OrganizationMembership,
@@ -379,85 +368,6 @@ export class User extends BaseResource implements UserResource {
     return (json || []).map(connection => new EnterpriseConnection(connection));
   };
 
-  createEnterpriseConnection = async (
-    params: CreateMeEnterpriseConnectionParams,
-  ): Promise<EnterpriseConnectionResource> => {
-    const json = (
-      await BaseResource._fetch<EnterpriseConnectionJSON>({
-        path: `${this.path()}/enterprise_connections`,
-        method: 'POST',
-        body: toMeEnterpriseConnectionBody(params) as any,
-      })
-    )?.response as unknown as EnterpriseConnectionJSON;
-
-    return new EnterpriseConnection(json);
-  };
-
-  updateEnterpriseConnection = async (
-    enterpriseConnectionId: string,
-    params: UpdateMeEnterpriseConnectionParams,
-  ): Promise<EnterpriseConnectionResource> => {
-    const json = (
-      await BaseResource._fetch<EnterpriseConnectionJSON>({
-        path: `${this.path()}/enterprise_connections/${enterpriseConnectionId}`,
-        method: 'PATCH',
-        body: toMeEnterpriseConnectionBody(params) as any,
-      })
-    )?.response as unknown as EnterpriseConnectionJSON;
-
-    return new EnterpriseConnection(json);
-  };
-
-  deleteEnterpriseConnection = async (enterpriseConnectionId: string): Promise<DeletedObjectResource> => {
-    const json = (
-      await BaseResource._fetch<DeletedObjectJSON>({
-        path: `${this.path()}/enterprise_connections/${enterpriseConnectionId}`,
-        method: 'DELETE',
-      })
-    )?.response as unknown as DeletedObjectJSON;
-
-    return new DeletedObject(json);
-  };
-
-  createEnterpriseConnectionTestRun = async (
-    enterpriseConnectionId: string,
-  ): Promise<EnterpriseConnectionTestRunInitResource> => {
-    const json = (
-      await BaseResource._fetch({
-        path: `${this.path()}/enterprise_connections/${enterpriseConnectionId}/test_runs`,
-        method: 'POST',
-      })
-    )?.response as unknown as EnterpriseConnectionTestRunInitJSON;
-
-    return { url: json.url };
-  };
-
-  getEnterpriseConnectionTestRuns = async (
-    enterpriseConnectionId: string,
-    params?: GetEnterpriseConnectionTestRunsParams,
-  ): Promise<ClerkPaginatedResponse<EnterpriseConnectionTestRunResource>> => {
-    const { status, ...rest } = params || {};
-    const search = convertPageToOffsetSearchParams(rest);
-    if (status?.length) {
-      for (const s of status) {
-        search.append('status', s);
-      }
-    }
-
-    const res = await BaseResource._fetch({
-      path: `${this.path()}/enterprise_connections/${enterpriseConnectionId}/test_runs`,
-      method: 'GET',
-      search,
-    });
-
-    const payload = res?.response as unknown as EnterpriseConnectionTestRunsPaginatedJSON | undefined;
-
-    return {
-      total_count: payload?.total_count ?? 0,
-      data: (payload?.data ?? []).map((row: EnterpriseConnectionTestRunJSON) => new EnterpriseConnectionTestRun(row)),
-    };
-  };
-
   initializePaymentMethod: typeof initializePaymentMethod = params => {
     return initializePaymentMethod(params);
   };
@@ -595,71 +505,5 @@ export class User extends BaseResource implements UserResource {
       updated_at: this.updatedAt?.getTime() || null,
       created_at: this.createdAt?.getTime() || null,
     };
-  }
-}
-
-/**
- * Serializes `CreateMeEnterpriseConnectionParams` / `UpdateMeEnterpriseConnectionParams`
- * for the `/me/enterprise_connections` FAPI endpoints.
- *
- * The handler expects a flat form body where SAML and OIDC fields are
- * prefixed (e.g. `saml_idp_metadata_url`, `oidc_client_id`) rather
- * than nested under `saml`/`oidc` objects. `attribute_mapping` and
- * `custom_attributes` stay as object values and are JSON-stringified
- * by the form serializer downstream — their inner keys are
- * user-supplied data and must not be camel→snake transformed.
- */
-function toMeEnterpriseConnectionBody(
-  params: CreateMeEnterpriseConnectionParams | UpdateMeEnterpriseConnectionParams,
-): Record<string, unknown> {
-  const body: Record<string, unknown> = {};
-
-  // Top-level fields. `provider` is only on Create, the rest are shared
-  setIfDefined(body, 'provider', (params as CreateMeEnterpriseConnectionParams).provider);
-  setIfDefined(body, 'name', params.name);
-  setIfDefined(body, 'organization_id', params.organizationId);
-  setIfDefined(body, 'active', (params as UpdateMeEnterpriseConnectionParams).active);
-  setIfDefined(body, 'sync_user_attributes', (params as UpdateMeEnterpriseConnectionParams).syncUserAttributes);
-  setIfDefined(
-    body,
-    'disable_additional_identifications',
-    (params as UpdateMeEnterpriseConnectionParams).disableAdditionalIdentifications,
-  );
-  setIfDefined(body, 'custom_attributes', (params as UpdateMeEnterpriseConnectionParams).customAttributes);
-
-  if (params.saml) {
-    setIfDefined(body, 'saml_idp_entity_id', params.saml.idpEntityId);
-    setIfDefined(body, 'saml_idp_sso_url', params.saml.idpSsoUrl);
-    setIfDefined(body, 'saml_idp_certificate', params.saml.idpCertificate);
-    setIfDefined(body, 'saml_idp_metadata_url', params.saml.idpMetadataUrl);
-    setIfDefined(body, 'saml_idp_metadata', params.saml.idpMetadata);
-    setIfDefined(body, 'saml_attribute_mapping', params.saml.attributeMapping);
-    setIfDefined(body, 'saml_allow_subdomains', params.saml.allowSubdomains);
-    setIfDefined(body, 'saml_allow_idp_initiated', params.saml.allowIdpInitiated);
-    setIfDefined(body, 'saml_force_authn', params.saml.forceAuthn);
-  }
-
-  if (params.oidc) {
-    setIfDefined(body, 'oidc_client_id', params.oidc.clientId);
-    setIfDefined(body, 'oidc_client_secret', params.oidc.clientSecret);
-    setIfDefined(body, 'oidc_discovery_url', params.oidc.discoveryUrl);
-    setIfDefined(body, 'oidc_auth_url', params.oidc.authUrl);
-    setIfDefined(body, 'oidc_token_url', params.oidc.tokenUrl);
-    setIfDefined(body, 'oidc_user_info_url', params.oidc.userInfoUrl);
-    setIfDefined(body, 'oidc_requires_pkce', params.oidc.requiresPkce);
-  }
-
-  return body;
-}
-
-/**
- * Adds `value` under `key` only when the caller actually provided it.
- * Mirrors the SDK's existing semantics: `undefined` means "don't send
- * this field"; `null` is forwarded so users can explicitly clear a
- * value via the form-encoded body
- */
-function setIfDefined(target: Record<string, unknown>, key: string, value: unknown): void {
-  if (value !== undefined) {
-    target[key] = value;
   }
 }

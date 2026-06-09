@@ -1,4 +1,4 @@
-import type { UseUserEnterpriseConnectionsReturn } from '@clerk/shared/react/index';
+import type { UseOrganizationEnterpriseConnectionsReturn } from '@clerk/shared/react/index';
 import { useSession, useUser } from '@clerk/shared/react/index';
 import type {
   EmailAddressResource,
@@ -28,11 +28,7 @@ export interface ConfigureSSOData {
    * made on the Select Provider step.
    */
   provider: ProviderType | undefined;
-  /**
-   * Sets the local provider selection used by Select Provider before a
-   * connection has been created.
-   */
-  setProvider: (provider: ProviderType) => void;
+  setProvider: (provider: ProviderType | undefined) => void;
   /**
    * Ref to the scrollable content container of the wizard.
    */
@@ -44,11 +40,11 @@ export interface ConfigureSSOData {
   /**
    * Updates an existing enterprise connection
    */
-  updateEnterpriseConnection: UseUserEnterpriseConnectionsReturn['updateEnterpriseConnection'];
+  updateEnterpriseConnection: UseOrganizationEnterpriseConnectionsReturn['updateEnterpriseConnection'];
   /**
    * Deletes an enterprise connection
    */
-  deleteEnterpriseConnection: UseUserEnterpriseConnectionsReturn['deleteEnterpriseConnection'];
+  deleteEnterpriseConnection: UseOrganizationEnterpriseConnectionsReturn['deleteEnterpriseConnection'];
   /**
    * Determines if the user's domain is already wired to an enterprise connection that
    * doesn't belong to the org they're currently configuring
@@ -60,9 +56,9 @@ interface ConfigureSSOProviderProps {
   enterpriseConnection: EnterpriseConnectionResource | undefined;
   hasSuccessfulTestRun: boolean;
   contentRef: React.RefObject<HTMLDivElement>;
-  createEnterpriseConnection: UseUserEnterpriseConnectionsReturn['createEnterpriseConnection'];
-  updateEnterpriseConnection: UseUserEnterpriseConnectionsReturn['updateEnterpriseConnection'];
-  deleteEnterpriseConnection: UseUserEnterpriseConnectionsReturn['deleteEnterpriseConnection'];
+  createEnterpriseConnection: UseOrganizationEnterpriseConnectionsReturn['createEnterpriseConnection'];
+  updateEnterpriseConnection: UseOrganizationEnterpriseConnectionsReturn['updateEnterpriseConnection'];
+  deleteEnterpriseConnection: UseOrganizationEnterpriseConnectionsReturn['deleteEnterpriseConnection'];
 }
 
 const ConfigureSSOContext = React.createContext<ConfigureSSOData | null>(null);
@@ -90,7 +86,6 @@ export const ConfigureSSOProvider = ({
   const createEnterpriseConnection = useCallback(
     async (provider: ProviderType, primaryEmailAddress?: EmailAddressResource): Promise<void> => {
       const emailDomain = primaryEmailAddress?.emailAddress.split('@')[1];
-      const organizationId = session?.lastActiveOrganizationId ?? null;
 
       if (!emailDomain) {
         return;
@@ -99,16 +94,17 @@ export const ConfigureSSOProvider = ({
       card.setLoading();
 
       try {
+        // The organization is inferred from the URL path on the org-scoped
+        // endpoint, so we don't need to pass `organizationId` in the body.
         await createEnterpriseConnectionApi({
           provider,
           name: emailDomain,
-          organizationId,
         });
       } finally {
         card.setIdle();
       }
     },
-    [card, session, createEnterpriseConnectionApi],
+    [card, createEnterpriseConnectionApi],
   );
 
   const value = React.useMemo<ConfigureSSOData>(

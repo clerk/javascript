@@ -35,7 +35,7 @@ type UseAuthOptions = PendingSessionOptions | undefined | null;
  * @unionReturnHeadings
  * ["Loading", "Signed out", "Signed in (no active organization)", "Signed in (with active organization)"]
  *
- * @param [options] - An object containing options for the `useAuth()` hook. `treatPendingAsSignedOut` is a boolean that indicates whether pending sessions are considered as signed out or not. Defaults to `true`.
+ * @param [options] - An object containing options for the `useAuth()` hook. `treatPendingAsSignedOut` indicates whether pending sessions are considered as signed out or not. Defaults to `true`.
  *
  * @function
  *

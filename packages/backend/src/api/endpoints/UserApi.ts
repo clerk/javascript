@@ -5,9 +5,11 @@ import { joinPaths } from '../../util/path';
 import { deprecated } from '../../util/shared';
 import type {
   DeletedObject,
+  EmailAddress,
   OauthAccessToken,
   OrganizationInvitation,
   OrganizationMembership,
+  PhoneNumber,
   User,
 } from '../resources';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
@@ -99,6 +101,10 @@ type CreateUserParams = {
   totpSecret?: string;
   backupCodes?: string[];
   createdAt?: Date;
+  /** When set to `true`, the user is created already banned and cannot sign in. Requires the same plan support as the ban user endpoint. */
+  banned?: boolean;
+  /** When set to `true`, the user is created already locked. Requires the user lockout feature to be enabled on the instance. */
+  locked?: boolean;
 } & UserMetadataParams &
   (UserPasswordHashingParams | object);
 
@@ -238,6 +244,16 @@ type SetPasswordCompromisedParams = {
   revokeAllSessions?: boolean;
 };
 
+type ReplaceUserEmailAddressParams = {
+  /** The new email address. Must adhere to the RFC 5322 specification for email address format. */
+  emailAddress: string;
+};
+
+type ReplaceUserPhoneNumberParams = {
+  /** The new phone number. Must adhere to the E.164 standard for phone number format. */
+  phoneNumber: string;
+};
+
 type UserID = {
   userId: string;
 };
@@ -310,6 +326,26 @@ export class UserAPI extends AbstractAPI {
       method: 'PUT',
       path: joinPaths(basePath, userId, 'metadata'),
       bodyParams: { publicMetadata, privateMetadata, unsafeMetadata },
+    });
+  }
+
+  public async replaceUserEmailAddress(userId: string, params: ReplaceUserEmailAddressParams) {
+    this.requireId(userId);
+
+    return this.request<EmailAddress>({
+      method: 'PUT',
+      path: joinPaths(basePath, userId, 'email_address'),
+      bodyParams: params,
+    });
+  }
+
+  public async replaceUserPhoneNumber(userId: string, params: ReplaceUserPhoneNumberParams) {
+    this.requireId(userId);
+
+    return this.request<PhoneNumber>({
+      method: 'PUT',
+      path: joinPaths(basePath, userId, 'phone_number'),
+      bodyParams: params,
     });
   }
 

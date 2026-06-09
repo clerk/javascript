@@ -1,4 +1,4 @@
-import { __internal_useEnterpriseConnectionTestRuns, useUser } from '@clerk/shared/react/index';
+import { __internal_useOrganizationEnterpriseConnectionTestRuns, useOrganization } from '@clerk/shared/react/index';
 import type { EnterpriseConnectionTestRunResource } from '@clerk/shared/types';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
@@ -59,7 +59,7 @@ export const TestConfigurationStep = (): JSX.Element => {
     isFetching: areTestRunsFetching,
     isPolling,
     revalidate: revalidateTestRuns,
-  } = __internal_useEnterpriseConnectionTestRuns({
+  } = __internal_useOrganizationEnterpriseConnectionTestRuns({
     enterpriseConnectionId: enterpriseConnection?.id ?? null,
     params: { initialPage: currentPage, pageSize: TEST_RUNS_PAGE_SIZE },
   });
@@ -177,6 +177,7 @@ export const TestConfigurationStep = (): JSX.Element => {
         ) : null}
 
         <Step.Footer>
+          <Step.Footer.Reset />
           <Step.Footer.Previous onClick={() => goPrev()} />
           <ContinueTestSsoStepButton
             enterpriseConnectionId={enterpriseConnection?.id}
@@ -197,13 +198,13 @@ const ContinueTestSsoStepButton = ({
   enterpriseConnectionId,
   onContinue,
 }: ContinueTestSsoStepButtonProps): JSX.Element => {
-  const { user } = useUser();
+  const { organization } = useOrganization();
   const { t } = useLocalizations();
   const card = useCardState();
   const [isValidating, setIsValidating] = useState(false);
 
   const handleContinue = async () => {
-    if (!user || !enterpriseConnectionId) {
+    if (!organization || !enterpriseConnectionId) {
       return;
     }
 
@@ -211,7 +212,7 @@ const ContinueTestSsoStepButton = ({
     card.setError(undefined);
 
     try {
-      const result = await user.getEnterpriseConnectionTestRuns(enterpriseConnectionId, {
+      const result = await organization.getEnterpriseConnectionTestRuns(enterpriseConnectionId, {
         initialPage: 1,
         pageSize: 1,
         status: ['success'],
@@ -717,20 +718,20 @@ type OpenTestUrlButtonProps = {
 };
 
 const OpenTestUrlButton = ({ onTestRunCreated }: OpenTestUrlButtonProps): JSX.Element => {
-  const { user } = useUser();
+  const { organization } = useOrganization();
   const card = useCardState();
   const { enterpriseConnection } = useConfigureSSO();
 
   const [isCreatingTestRun, setIsCreatingTestRun] = useState(false);
 
   const openTestRun = () => {
-    if (!user || !enterpriseConnection) {
+    if (!organization || !enterpriseConnection) {
       return;
     }
 
     setIsCreatingTestRun(true);
 
-    user
+    organization
       .createEnterpriseConnectionTestRun(enterpriseConnection.id)
       .then(({ url }) => {
         onTestRunCreated?.(url);

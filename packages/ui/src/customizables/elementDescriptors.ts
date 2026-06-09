@@ -538,6 +538,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'enterpriseConnectionButtonText',
 
   'configureSSOHeader',
+  'configureSSOMobileNavbar',
   'configureSSOStepper',
   'configureSSOStepperItem',
   'configureSSOStepperItemBullet',
@@ -553,6 +554,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'configureSSOFooter',
   'configureSSOFooterPreviousButton',
   'configureSSOFooterContinueButton',
+  'configureSSOFooterResetButton',
 
   'configureSSOProviderGroup',
   'configureSSOProviderGroupLabel',
@@ -602,8 +604,14 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'configureSSOConfirmationConfigDetailsLabel',
   'configureSSOConfirmationConfigDetailsValue',
   'configureSSOConfirmationConfigDetailsLink',
+  'configureSSOConfirmationInactiveBanner',
   'configureSSOConfirmationReconfigureButton',
   'configureSSOConfirmationResetButton',
+
+  'configureSSOResetConnectionDialog',
+  'configureSSOResetConnectionDialogCancelButton',
+  'configureSSOResetConnectionDialogConfirmationInput',
+  'configureSSOResetConnectionDialogSubmitButton',
 
   'web3SolanaWalletButtonsRoot',
   'web3SolanaWalletButtons',

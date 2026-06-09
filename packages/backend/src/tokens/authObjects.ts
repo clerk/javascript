@@ -170,6 +170,19 @@ const createDebug = (data: AuthObjectDebugData | undefined) => {
     const res = { ...data };
     res.secretKey = (res.secretKey || '').substring(0, 7);
     res.jwtKey = (res.jwtKey || '').substring(0, 7);
+    // Session and machine tokens are live bearer credentials, so only ever expose a
+    // short, non-reconstructable prefix here, the same way secretKey/jwtKey are handled
+    // above. Otherwise enabling debug logging would write usable tokens to logs.
+    // This also covers the bearer fields carried on AuthenticateContext, which is spread
+    // wholesale into the debug payload by signedInAuthObject: the refresh token is the
+    // most sensitive of these, and the dev-browser/handshake tokens are short-lived but
+    // still credentials.
+    res.sessionToken = (res.sessionToken || '').substring(0, 7);
+    res.tokenInHeader = (res.tokenInHeader || '').substring(0, 7);
+    res.sessionTokenInCookie = (res.sessionTokenInCookie || '').substring(0, 7);
+    res.refreshTokenInCookie = (res.refreshTokenInCookie || '').substring(0, 7);
+    res.devBrowserToken = (res.devBrowserToken || '').substring(0, 7);
+    res.handshakeToken = (res.handshakeToken || '').substring(0, 7);
     return { ...res };
   };
 };
@@ -390,7 +403,7 @@ export const makeAuthObjectSerializable = <T extends Record<string, unknown>>(ob
  *
  * @param sessionId - The ID of the session
  * @param template - The JWT template name to use for token generation
- * @param expiresInSeconds - Optional expiration time in seconds for the token
+ * @param expiresInSeconds - The expiration time in seconds for the token
  * @returns A promise that resolves to the token string
  */
 type TokenFetcher = (sessionId: string, template?: string, expiresInSeconds?: number) => Promise<string>;
@@ -406,8 +419,7 @@ type CreateGetToken = (params: { sessionId: string; sessionToken: string; fetche
 /**
  * Creates a token retrieval function for authenticated sessions.
  *
- * This factory function returns a getToken function that can either return the raw session token
- * or generate a JWT using a specified template with optional custom expiration.
+ * This factory function returns a getToken function that can either return the raw session token or generate a JWT using a specified template with custom expiration.
  *
  * @param params - Configuration object
  * @param params.sessionId - The session ID for token generation
