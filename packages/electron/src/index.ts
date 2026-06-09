@@ -1,2 +1,2 @@
-// TODO: Implement the Clerk SDK for the Electron main process.
-export const SDK_NAME = PACKAGE_NAME;
+export { setupMain } from './main/setup-main';
+export type { TokenStorage } from './shared/types';
