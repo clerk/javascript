@@ -203,7 +203,7 @@ export const enUS: LocalizationResource = {
     switchToMonthly: 'Switch to monthly',
     switchToMonthlyWithPrice: 'Switch to monthly {{currency}}{{price}} / month',
     totalDue: 'Total due',
-    totalDueToday: 'Total Due Today',
+    totalDueToday: 'Total due today',
     viewFeatures: 'View features',
     viewPayment: 'View payment',
     year: 'Year',
