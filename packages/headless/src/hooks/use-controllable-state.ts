@@ -15,16 +15,17 @@ export function useControllableState<T>(
   onChange?: (value: T) => void,
 ): [T, (value: T) => void] {
   const [uncontrolled, setUncontrolled] = useState(defaultValue);
-  const value = controlled !== undefined ? controlled : uncontrolled;
+  const isControlled = controlled !== undefined;
+  const value = isControlled ? controlled : uncontrolled;
 
   const setValue = useCallback(
     (next: T) => {
-      if (controlled === undefined) {
+      if (!isControlled) {
         setUncontrolled(next);
       }
       onChange?.(next);
     },
-    [controlled !== undefined, onChange],
+    [isControlled, onChange],
   );
   return [value, setValue];
 }
