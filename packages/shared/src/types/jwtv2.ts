@@ -197,7 +197,13 @@ export type ActClaimType = 'agent';
  * @inline
  */
 export interface ActClaim {
+  /**
+   * The identifier for the user that is impersonating the current user.
+   */
   sub: string;
+  /**
+   * The type of the actor.
+   */
   type?: ActClaimType;
   [x: string]: unknown;
 }

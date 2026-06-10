@@ -15,6 +15,8 @@ type CurrentUserOptions = PendingSessionOptions;
  * - uses the [`GET /v1/users/{user_id}`](https://clerk.com/docs/reference/backend-api/tag/users/GET/users/%7Buser_id%7D) endpoint.
  * - counts towards the [Backend API request rate limit](https://clerk.com/docs/guides/how-clerk-works/system-limits).
  *
+ * @param opts - Options to configure the behavior of the helper.
+ *
  * @example
  * ```tsx {{ filename: 'app/page.tsx' }}
  * import { currentUser } from '@clerk/nextjs/server'

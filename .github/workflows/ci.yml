@@ -138,6 +138,49 @@ jobs:
           path: .turbo/runs
           retention-days: 5
 
+  bundle-size:
+    needs: [check-permissions, build-packages]
+    name: Bundle size
+    permissions:
+      contents: read
+    runs-on: "blacksmith-8vcpu-ubuntu-2204"
+    defaults:
+      run:
+        shell: bash
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          fetch-tags: false
+          filter: "blob:none"
+          show-progress: false
+
+      - name: Setup
+        id: config
+        uses: ./.github/actions/init-blacksmith
+        with:
+          cache-enabled: true
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+
+      # No continue-on-error: an over-budget chunk fails this job, which is the gate.
+      # Enforcement rides on this job's exit code, not the `bundlewatch` commit status
+      # (which collides across packages and can be masked by a sibling's pass).
+      - name: Check size using bundlewatch
+        env:
+          BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.BUNDLEWATCH_GITHUB_TOKEN }}
+          CI_BRANCH: ${{ github.ref }}
+          CI_BRANCH_BASE: refs/heads/main
+          CI_COMMIT_SHA: ${{ github.event_name == 'merge_group' && github.event.merge_group.head_sha || github.event.pull_request.head.sha }}
+          CI_REPO_NAME: ${{ vars.REPO_NAME }}
+          CI_REPO_OWNER: ${{ vars.REPO_OWNER }}
+        run: pnpm turbo bundlewatch $TURBO_ARGS
+
   static-analysis:
     needs: [check-permissions, build-packages]
     name: Static analysis
@@ -172,17 +215,6 @@ jobs:
           turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
-
-      - name: Check size using bundlewatch
-        continue-on-error: true
-        env:
-          BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.BUNDLEWATCH_GITHUB_TOKEN }}
-          CI_BRANCH: ${{ github.ref	}}
-          CI_BRANCH_BASE: refs/heads/main
-          CI_COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
-          CI_REPO_NAME: ${{ vars.REPO_NAME }}
-          CI_REPO_OWNER: ${{ vars.REPO_OWNER }}
-        run: pnpm turbo bundlewatch $TURBO_ARGS
 
       - name: Lint packages using publint
         run: pnpm turbo lint:publint $TURBO_ARGS

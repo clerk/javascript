@@ -1,6 +1,6 @@
 {
   "name": "@clerk/expo",
-  "version": "3.3.0",
+  "version": "3.3.1",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -172,6 +172,9 @@
     },
     "expo-web-browser": {
       "optional": true
+    },
+    "react-dom": {
+      "optional": true
     }
   },
   "engines": {
@@ -183,9 +186,6 @@
   "codegenConfig": {
     "name": "ClerkExpoSpec",
     "type": "all",
-    "jsSrcsDir": "src/specs",
-    "android": {
-      "javaPackageName": "expo.modules.clerk"
-    }
+    "jsSrcsDir": "src/specs"
   }
 }

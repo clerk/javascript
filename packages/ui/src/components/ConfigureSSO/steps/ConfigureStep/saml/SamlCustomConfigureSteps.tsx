@@ -23,7 +23,7 @@ import { useFormControl } from '@/ui/utils/useFormControl';
 
 import { useConfigureSSO } from '../../../ConfigureSSOContext';
 import { Step } from '../../../elements/Step';
-import { useWizard, Wizard } from '../../../elements/Wizard';
+import { useWizard, Wizard, type WizardStepConfig } from '../../../elements/Wizard';
 import { InnerStepCounter } from '../../../elements/Wizard/InnerStepCounter';
 import {
   applySamlSubmitError,
@@ -36,51 +36,37 @@ import {
   type IdpConfigurationMode,
 } from './shared/IdentityProviderConfigurationModes';
 
+const CUSTOM_STEPS: WizardStepConfig[] = [
+  { id: 'create-app' },
+  { id: 'attribute-mapping' },
+  { id: 'assign-users' },
+  { id: 'identity-provider-metadata' },
+];
+
 export const SamlCustomConfigureSteps = (): JSX.Element => {
   return (
-    <>
-      <Wizard.Step id='create-app'>
-        <Step.Header
-          title={localizationKeys('configureSSO.configureStep.samlCustom.mainHeaderTitle')}
-          description={localizationKeys('configureSSO.configureStep.samlCustom.createAppStep.headerSubtitle')}
-        >
-          <InnerStepCounter />
-        </Step.Header>
+    // Linear, guard-less sub-flow: mount on the first step. (Entry guards drive
+    // furthest-reachable init, which would otherwise land the last step here.)
+    <Wizard
+      steps={CUSTOM_STEPS}
+      initialStepId={CUSTOM_STEPS[0].id}
+    >
+      <Wizard.Match id='create-app'>
         <SamlCustomCreateAppStep />
-      </Wizard.Step>
+      </Wizard.Match>
 
-      <Wizard.Step id='attribute-mapping'>
-        <Step.Header
-          title={localizationKeys('configureSSO.configureStep.samlCustom.mainHeaderTitle')}
-          description={localizationKeys('configureSSO.configureStep.samlCustom.attributeMappingStep.headerSubtitle')}
-        >
-          <InnerStepCounter />
-        </Step.Header>
+      <Wizard.Match id='attribute-mapping'>
         <SamlCustomAttributeMappingStep />
-      </Wizard.Step>
+      </Wizard.Match>
 
-      <Wizard.Step id='assign-users'>
-        <Step.Header
-          title={localizationKeys('configureSSO.configureStep.samlCustom.mainHeaderTitle')}
-          description={localizationKeys('configureSSO.configureStep.samlCustom.assignUsersStep.headerSubtitle')}
-        >
-          <InnerStepCounter />
-        </Step.Header>
+      <Wizard.Match id='assign-users'>
         <SamlCustomAssignUsersStep />
-      </Wizard.Step>
+      </Wizard.Match>
 
-      <Wizard.Step id='identity-provider-metadata'>
-        <Step.Header
-          title={localizationKeys('configureSSO.configureStep.samlCustom.mainHeaderTitle')}
-          description={localizationKeys(
-            'configureSSO.configureStep.samlCustom.identityProviderMetadataStep.headerSubtitle',
-          )}
-        >
-          <InnerStepCounter />
-        </Step.Header>
+      <Wizard.Match id='identity-provider-metadata'>
         <SamlCustomIdentityProviderMetadataStep />
-      </Wizard.Step>
-    </>
+      </Wizard.Match>
+    </Wizard>
   );
 };
 
@@ -106,6 +92,13 @@ const SamlCustomCreateAppStep = (): JSX.Element => {
 
   return (
     <>
+      <Step.Header
+        title={localizationKeys('configureSSO.configureStep.samlCustom.mainHeaderTitle')}
+        description={localizationKeys('configureSSO.configureStep.samlCustom.createAppStep.headerSubtitle')}
+      >
+        <InnerStepCounter />
+      </Step.Header>
+
       <Step.Body>
         <Step.Section sx={theme => ({ gap: theme.space.$5 })}>
           <Col sx={theme => ({ gap: theme.space.$1x5 })}>
@@ -147,6 +140,45 @@ const SamlCustomCreateAppStep = (): JSX.Element => {
               />
             </Form.CommonInputWrapper>
           </Form.ControlRow>
+        </Step.Section>
+      </Step.Body>
+
+      <Step.Footer>
+        <Step.Footer.Reset />
+        <Step.Footer.Previous
+          onClick={() => goPrev()}
+          isDisabled={isFirstStep}
+        />
+        <Step.Footer.Continue
+          onClick={() => goNext()}
+          isDisabled={isLastStep}
+        />
+      </Step.Footer>
+    </>
+  );
+};
+
+const SamlCustomAttributeMappingStep = (): JSX.Element => {
+  const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
+
+  return (
+    <>
+      <Step.Header
+        title={localizationKeys('configureSSO.configureStep.samlCustom.mainHeaderTitle')}
+        description={localizationKeys('configureSSO.configureStep.samlCustom.attributeMappingStep.headerSubtitle')}
+      >
+        <InnerStepCounter />
+      </Step.Header>
+
+      <Step.Body>
+        <Step.Section sx={theme => ({ gap: theme.space.$3 })}>
+          <Text
+            as='p'
+            colorScheme='secondary'
+            localizationKey={localizationKeys('configureSSO.configureStep.samlCustom.attributeMappingStep.paragraph')}
+          />
+
+          <CustomAttributeMappingTable />
         </Step.Section>
       </Step.Body>
 
@@ -248,43 +280,18 @@ const CustomAttributeMappingTable = (): JSX.Element => (
   </Table>
 );
 
-const SamlCustomAttributeMappingStep = (): JSX.Element => {
-  const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
-
-  return (
-    <>
-      <Step.Body>
-        <Step.Section sx={theme => ({ gap: theme.space.$3 })}>
-          <Text
-            as='p'
-            colorScheme='secondary'
-            localizationKey={localizationKeys('configureSSO.configureStep.samlCustom.attributeMappingStep.paragraph')}
-          />
-
-          <CustomAttributeMappingTable />
-        </Step.Section>
-      </Step.Body>
-
-      <Step.Footer>
-        <Step.Footer.Reset />
-        <Step.Footer.Previous
-          onClick={() => goPrev()}
-          isDisabled={isFirstStep}
-        />
-        <Step.Footer.Continue
-          onClick={() => goNext()}
-          isDisabled={isLastStep}
-        />
-      </Step.Footer>
-    </>
-  );
-};
-
 const SamlCustomAssignUsersStep = (): JSX.Element => {
   const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
 
   return (
     <>
+      <Step.Header
+        title={localizationKeys('configureSSO.configureStep.samlCustom.mainHeaderTitle')}
+        description={localizationKeys('configureSSO.configureStep.samlCustom.assignUsersStep.headerSubtitle')}
+      >
+        <InnerStepCounter />
+      </Step.Header>
+
       <Step.Body>
         <Step.Section sx={theme => ({ gap: theme.space.$3 })}>
           <Heading
@@ -321,7 +328,10 @@ const CUSTOM_SAML_IDP_MODES = ['metadataUrl', 'manual'] as const satisfies reado
 const SamlCustomIdentityProviderMetadataStep = (): JSX.Element => {
   const card = useCardState();
   const { goNext, goPrev, isFirstStep } = useWizard();
-  const { enterpriseConnection, updateEnterpriseConnection } = useConfigureSSO();
+  const {
+    enterpriseConnection,
+    mutations: { updateConnection },
+  } = useConfigureSSO();
 
   const samlConnection = enterpriseConnection?.samlConnection;
   const hasExistingConfig = Boolean(
@@ -334,6 +344,13 @@ const SamlCustomIdentityProviderMetadataStep = (): JSX.Element => {
 
   const [mode, setMode] = React.useState<IdpConfigurationMode>(hasExistingConfig ? 'manual' : 'metadataUrl');
   const [certFile, setCertFile] = React.useState<File | null>(null);
+  // Step-LOCAL submit state for the Continue button. `goNext` bubbles to the
+  // parent (this is the terminal nested step) and the parent DEFERS the
+  // configure→test advance until the updateConnection revalidate lands. Keeping
+  // the loading local — and NOT resetting it on success — holds the button
+  // loading straight through that deferred transition; the advance unmounts this
+  // nested step, ending the loading with no idle flash on the shared card.
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const metadataUrlField = useFormControl('idpMetadataUrl', samlConnection?.idpMetadataUrl ?? '', {
     type: 'text',
@@ -382,7 +399,7 @@ const SamlCustomIdentityProviderMetadataStep = (): JSX.Element => {
       ? trimmedMetadataUrl.length > 0
       : trimmedSignOnUrl.length > 0 && trimmedIssuer.length > 0 && hasCert;
 
-  const canSubmit = isValid && !card.isLoading;
+  const canSubmit = isValid && !isSubmitting;
 
   const formProps: IdentityProviderConfigurationFormProps =
     mode === 'metadataUrl'
@@ -430,7 +447,7 @@ const SamlCustomIdentityProviderMetadataStep = (): JSX.Element => {
     }
 
     card.setError(undefined);
-    card.setLoading();
+    setIsSubmitting(true);
 
     try {
       const saml = await buildSamlConfigurationPayload({
@@ -439,7 +456,10 @@ const SamlCustomIdentityProviderMetadataStep = (): JSX.Element => {
         manual: { signOnUrl: signOnUrlField.value, issuer: issuerField.value, certFile },
       });
 
-      await updateEnterpriseConnection(enterpriseConnection.id, { saml });
+      await updateConnection(enterpriseConnection.id, { saml });
+      // `goNext` bubbles to the parent, which DEFERS the advance to `test` until
+      // the revalidate lands. The button STAYS loading and this nested step
+      // unmounts when that deferred advance resolves — do NOT reset on success.
       void goNext();
     } catch (err) {
       if (mode === 'metadataUrl') {
@@ -447,13 +467,22 @@ const SamlCustomIdentityProviderMetadataStep = (): JSX.Element => {
       } else {
         applySamlSubmitError(err, card, signOnUrlField, [issuerField, certificateField]);
       }
-    } finally {
-      card.setIdle();
+      // Re-enable ONLY on error — there is no advance to unmount the button.
+      setIsSubmitting(false);
     }
   };
 
   return (
     <>
+      <Step.Header
+        title={localizationKeys('configureSSO.configureStep.samlCustom.mainHeaderTitle')}
+        description={localizationKeys(
+          'configureSSO.configureStep.samlCustom.identityProviderMetadataStep.headerSubtitle',
+        )}
+      >
+        <InnerStepCounter />
+      </Step.Header>
+
       <Step.Body>
         <Step.Section
           fill
@@ -494,11 +523,11 @@ const SamlCustomIdentityProviderMetadataStep = (): JSX.Element => {
         <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
-          isDisabled={isFirstStep || card.isLoading}
+          isDisabled={isFirstStep || isSubmitting}
         />
         <Step.Footer.Continue
           onClick={handleContinue}
-          isLoading={card.isLoading}
+          isLoading={isSubmitting}
           isDisabled={!canSubmit}
         />
       </Step.Footer>
