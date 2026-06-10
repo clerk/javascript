@@ -8,17 +8,22 @@ import { Modal } from '@/elements/Modal';
 import { useFormControl } from '@/ui/utils/useFormControl';
 import { handleError } from '@/utils/errorHandler';
 
-import { useConfigureSSO } from './ConfigureSSOContext';
-
 type ResetConnectionDialogProps = {
   isOpen: boolean;
   onClose: () => void;
+  /** The value the user must type to confirm (the organization name). */
   confirmationValue: string;
+  /**
+   * The host-bound delete action, awaited on confirm before the dialog closes.
+   * The dialog is context-free: hosts (wizard footers, the Security page
+   * overview) bind the connection id and mutation themselves.
+   */
+  onDelete: () => Promise<unknown>;
+  /** The host's scrollable content container — the modal portals into it. */
+  contentRef: React.RefObject<HTMLDivElement>;
 };
 
 export const ResetConnectionDialog = (props: ResetConnectionDialogProps): JSX.Element | null => {
-  const { contentRef } = useConfigureSSO();
-
   if (!props.isOpen) {
     return null;
   }
@@ -27,7 +32,7 @@ export const ResetConnectionDialog = (props: ResetConnectionDialogProps): JSX.El
     <Modal
       handleClose={props.onClose}
       canCloseModal={false}
-      portalRoot={contentRef}
+      portalRoot={props.contentRef}
       containerSx={t => ({
         alignItems: 'center',
         position: 'absolute',
@@ -44,9 +49,8 @@ export const ResetConnectionDialog = (props: ResetConnectionDialogProps): JSX.El
 };
 
 const ResetConnectionDialogContent = withCardStateProvider((props: ResetConnectionDialogProps) => {
-  const { onClose, confirmationValue } = props;
+  const { onClose, onDelete, confirmationValue } = props;
   const card = useCardState();
-  const { enterpriseConnection, mutations } = useConfigureSSO();
 
   const confirmationField = useFormControl('deleteConfirmation', '', {
     type: 'text',
@@ -60,18 +64,19 @@ const ResetConnectionDialogContent = withCardStateProvider((props: ResetConnecti
   const canSubmit = Boolean(confirmationValue && confirmationField.value === confirmationValue);
 
   const onSubmit = async () => {
-    if (!enterpriseConnection || !canSubmit) {
+    if (!canSubmit) {
       return;
     }
 
     try {
-      // Reset is a pure delete — no navigation. Dropping `hasConnection` breaks
-      // the active step's entry guard, so the wizard self-corrects to the
-      // furthest-reachable step. The mutation is already reverification-wrapped.
-      // No `useWizard()` here — that lets this dialog be triggered from ANY
-      // footer (including the nested SAML configure footers) without binding to
-      // a nested wizard.
-      await mutations.deleteConnection(enterpriseConnection.id);
+      // Reset is a pure delete — no navigation. The host binds the delete
+      // mutation; in the wizard, dropping `hasConnection` breaks the active
+      // step's entry guard and the machine self-corrects to the
+      // furthest-reachable step. No `useWizard()` (or any context) here — that
+      // lets this dialog be triggered from ANY footer (including the nested
+      // SAML configure footers) and from the Security page overview without
+      // binding to a wizard.
+      await onDelete();
       onClose();
     } catch (err) {
       handleError(err as Error, [confirmationField], card.setError);

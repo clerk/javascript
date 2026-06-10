@@ -1,33 +1,18 @@
-import type { EnterpriseConnectionResource } from '@clerk/shared/types';
 import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen, waitFor } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
 
-// The dialog no longer touches the wizard. On confirm it calls the
-// reverification-wrapped `mutations.deleteConnection(id)` directly — a pure
-// delete, no navigation — and the wizard self-corrects to the
-// furthest-reachable step once the active step's guard breaks. That lets the
-// dialog be triggered from ANY footer (including nested SAML configure footers)
-// without binding to a nested wizard.
-const deleteConnection = vi.fn();
-
-const connectionMockState = vi.hoisted(() => ({
-  current: { id: 'idn_connection_1' } as Partial<EnterpriseConnectionResource> | null,
-}));
-
-vi.mock('../ConfigureSSOContext', () => ({
-  useConfigureSSO: () => ({
-    enterpriseConnection: connectionMockState.current,
-    contentRef: { current: null },
-    // The dialog's confirm calls the reverification-wrapped `deleteConnection`
-    // mutation directly. No navigation — the wizard self-corrects.
-    mutations: { deleteConnection },
-  }),
-}));
-
 import { ResetConnectionDialog } from '../ResetConnectionDialog';
+
+// The dialog is context-free. On confirm it awaits the host-bound `onDelete`
+// action — a pure delete, no navigation — and in the wizard the machine
+// self-corrects to the furthest-reachable step once the active step's guard
+// breaks. That lets the dialog be triggered from ANY footer (including nested
+// SAML configure footers) and from the Security page overview without binding
+// to a wizard.
+const deleteConnection = vi.fn();
 
 const { createFixtures } = bindCreateFixtures('ConfigureSSO');
 
@@ -42,6 +27,8 @@ const renderDialog = (
         isOpen={props.isOpen ?? true}
         onClose={onClose}
         confirmationValue={props.confirmationValue ?? 'Acme Inc'}
+        onDelete={() => deleteConnection('idn_connection_1')}
+        contentRef={{ current: null }}
       />
     </CardStateProvider>,
     { wrapper },
@@ -52,7 +39,6 @@ const renderDialog = (
 const resetMocks = () => {
   deleteConnection.mockReset();
   deleteConnection.mockResolvedValue(undefined);
-  connectionMockState.current = { id: 'idn_connection_1' };
 };
 
 describe('ResetConnectionDialog', () => {

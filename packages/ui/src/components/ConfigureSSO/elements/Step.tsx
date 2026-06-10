@@ -206,7 +206,7 @@ FooterContinue.displayName = 'Step.Footer.Continue';
  * footer row, matching the prior destructive affordance.
  */
 const FooterReset = (): JSX.Element | null => {
-  const { organizationEnterpriseConnection: c } = useConfigureSSO();
+  const { organizationEnterpriseConnection: c, enterpriseConnection, mutations, contentRef } = useConfigureSSO();
   const organization = __internal_useOrganizationBase();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -229,6 +229,11 @@ const FooterReset = (): JSX.Element | null => {
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         confirmationValue={organization?.name ?? ''}
+        // The footer self-hides without a connection (`hasConnection` above),
+        // so the resource is guaranteed to be set at this point.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        onDelete={() => mutations.deleteConnection(enterpriseConnection!.id)}
+        contentRef={contentRef}
       />
     </>
   );
