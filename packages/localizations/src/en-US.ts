@@ -999,7 +999,7 @@ export const enUS: LocalizationResource = {
     navbar: {
       apiKeys: 'API keys',
       billing: 'Billing',
-      selfServeSSO: 'Single Sign-On (SSO)',
+      security: 'Security',
       description: 'Manage your organization.',
       general: 'General',
       members: 'Members',
