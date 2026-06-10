@@ -2472,13 +2472,21 @@ export class Clerk implements ClerkInterface {
     // OAuth/SAML callbacks can resolve into a protect_check gate that surfaces on the next
     // /v1/client read, so check for it here before continuing with the transfer logic below.
     // Honor either the explicit `protectCheck` field or the `needs_protect_check` status override.
-    if (si.protectCheck || si.status === 'needs_protect_check') {
+    //
+    // Scope to the callback's intent: an abandoned sign-in keeps serializing its pending
+    // `protect_check` on the client for up to a day (and a later sign-up doesn't clear it in
+    // multi-session mode), so an unscoped check would route a *sign-up* callback into the stale
+    // sign-in's challenge. We only consult `si` here unless this is explicitly a sign-up callback.
+    // Transfers are unaffected: the `signIn.create({ transfer })` path below checks its own fresh
+    // response for the gate.
+    if (params.reloadResource !== 'signUp' && (si.protectCheck || si.status === 'needs_protect_check')) {
       return navigateToSignInProtectCheck();
     }
 
     // The sign-up resource can be gated the same way (e.g. a callback that resolves straight into a
-    // gated sign-up). Route to the sign-up challenge before the transfer/missing-fields logic below.
-    if (su.protectCheck) {
+    // gated sign-up). Scope to the sign-up intent for the symmetric reason — a stale sign-up's gate
+    // shouldn't hijack a sign-in callback.
+    if (params.reloadResource !== 'signIn' && su.protectCheck) {
       return navigateToSignUpProtectCheck();
     }
 

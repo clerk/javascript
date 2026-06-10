@@ -7,7 +7,17 @@ import { Header } from '@/ui/elements/Header';
 
 import { withRedirectToAfterSignIn } from '../../common';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
-import { Box, Button, Col, descriptors, Flow, localizationKeys, useLocalizations } from '../../customizables';
+import {
+  Box,
+  Button,
+  Col,
+  descriptors,
+  Flex,
+  Flow,
+  localizationKeys,
+  Spinner,
+  useLocalizations,
+} from '../../customizables';
 import { useProtectCheckRunner } from '../../hooks/useProtectCheckRunner';
 import { useRouter } from '../../router';
 
@@ -94,10 +104,23 @@ function SignInProtectCheckInternal(): JSX.Element {
             <Box
               ref={containerRef}
               id='clerk-protect-check'
+              aria-busy={isRunning}
               style={{ display: 'block', alignSelf: 'center', minHeight: '60px' }}
             />
             {isRunning && !hasError ? (
-              <Box style={{ alignSelf: 'center' }}>{t(localizationKeys('signIn.protectCheck.loading'))}</Box>
+              <Flex
+                direction='col'
+                center
+                gap={4}
+                aria-live='polite'
+              >
+                <Spinner
+                  size='lg'
+                  colorScheme='primary'
+                  elementDescriptor={descriptors.spinner}
+                />
+                <Box>{t(localizationKeys('signIn.protectCheck.loading'))}</Box>
+              </Flex>
             ) : null}
             {hasError ? (
               <Button

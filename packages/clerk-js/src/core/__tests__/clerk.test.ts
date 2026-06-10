@@ -2123,6 +2123,97 @@ describe('Clerk singleton', () => {
         expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/reset-password');
       });
     });
+
+    it('does not route a sign-up callback into a stale sign-in protect_check gate', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+          onWindowLocationHost: () => false,
+        }),
+      );
+
+      // An abandoned sign-in keeps serializing its pending protect_check on the client.
+      const staleSignIn = new SignIn({
+        status: 'needs_protect_check',
+        identifier: 'user@example.com',
+        first_factor_verification: null,
+        second_factor_verification: null,
+        user_data: null,
+        created_session_id: null,
+        created_user_id: null,
+        protect_check: { status: 'pending', token: 'stale-token', sdk_url: 'https://example.com/sdk.js' },
+      } as any as SignInJSON);
+      const completeSignUp = new SignUp({ status: 'complete', created_session_id: 'sess_signup' } as any as SignUpJSON);
+      // The intent-driven reload at the top of the handler is a no-op here; keep the state stable.
+      (staleSignIn as any).reload = vi.fn().mockResolvedValue(staleSignIn);
+      (completeSignUp as any).reload = vi.fn().mockResolvedValue(completeSignUp);
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: staleSignIn,
+          signUp: completeSignUp,
+        }),
+      );
+
+      const mockSetActive = vi.fn();
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+      sut.setActive = mockSetActive;
+
+      await sut.handleRedirectCallback({ reloadResource: 'signUp' });
+
+      await waitFor(() => {
+        // Completes the sign-up rather than routing into the stale sign-in's challenge.
+        expect(mockSetActive).toHaveBeenCalled();
+        expect(mockNavigate).not.toHaveBeenCalledWith('/sign-in#/protect-check');
+      });
+    });
+
+    it('routes a sign-in callback to the protect-check gate', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+          onWindowLocationHost: () => false,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn({
+            status: 'needs_protect_check',
+            identifier: 'user@example.com',
+            first_factor_verification: null,
+            second_factor_verification: null,
+            user_data: null,
+            created_session_id: null,
+            created_user_id: null,
+            protect_check: { status: 'pending', token: 'fresh-token', sdk_url: 'https://example.com/sdk.js' },
+          } as any as SignInJSON),
+          signUp: new SignUp(null),
+        }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+
+      await sut.handleRedirectCallback();
+
+      await waitFor(() => {
+        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/protect-check');
+      });
+    });
   });
 
   describe('.handleEmailLinkVerification()', () => {

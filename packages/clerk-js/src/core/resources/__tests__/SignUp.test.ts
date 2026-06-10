@@ -1790,6 +1790,14 @@ describe('SignUp', () => {
   });
 
   describe('protectCheck', () => {
+    const originalFetch = BaseResource._fetch;
+
+    afterEach(() => {
+      // Restore the patched _fetch so the mock can't leak into any block added below.
+      BaseResource._fetch = originalFetch;
+      vi.clearAllMocks();
+    });
+
     it('deserializes protect_check from JSON', () => {
       const signUp = new SignUp({
         id: 'signup_123',
@@ -2015,6 +2023,7 @@ describe('SignUp', () => {
       expect(mockFetch).toHaveBeenCalledWith(
         expect.objectContaining({
           method: 'PATCH',
+          path: '/client/sign_ups/signup_123/protect_check',
           body: { proof_token: 'proof-abc' },
         }),
       );
