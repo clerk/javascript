@@ -178,6 +178,21 @@ ruleTester.run('require-auth-protection', rule, {
       options: [config],
     },
     {
+      name: 'manual check: userId === null in block, with immediate return',
+      code: `
+        import { auth } from '@clerk/nextjs/server';
+        export default async function Page() {
+          const { userId } = await auth();
+          if (userId === null) {
+            return null;
+          }
+          return <div />;
+        }
+      `,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+    },
+    {
       name: 'manual check: !isAuthenticated with return',
       code: `
         import { auth } from '@clerk/nextjs/server';
@@ -1370,6 +1385,23 @@ ruleTester.run('require-auth-protection', rule, {
         export default async function Page() {
           const { userId } = await auth();
           if (userId === null) console.log('uh oh');
+          return <div />;
+        }
+      `,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+      errors: [{ messageId: 'missingProtect' }],
+    },
+    {
+      name: 'manual check: work before exit in consequent block is NOT accepted',
+      code: `
+        import { auth } from '@clerk/nextjs/server';
+        export default async function Page() {
+          const { userId } = await auth();
+          if (userId === null) {
+            await db.write({ event: 'unauth-access', userId });
+            return null;
+          }
           return <div />;
         }
       `,

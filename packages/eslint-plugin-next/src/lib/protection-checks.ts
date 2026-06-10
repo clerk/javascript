@@ -193,31 +193,32 @@ function isExitCall(expr: TSESTree.Expression | null | undefined): boolean {
   return EXIT_FUNCTIONS.has(expr.callee.name);
 }
 
+function statementExits(stmt: TSESTree.Statement | null | undefined): boolean {
+  if (!stmt) {
+    return false;
+  }
+  if (stmt.type === 'ReturnStatement') {
+    return true;
+  }
+  if (stmt.type === 'ThrowStatement') {
+    return true;
+  }
+  if (stmt.type === 'ExpressionStatement') {
+    return isExitCall(stmt.expression);
+  }
+  return false;
+}
+
 function consequentExits(consequent: TSESTree.Statement | null | undefined): boolean {
   if (!consequent) {
     return false;
   }
-  if (consequent.type === 'ReturnStatement') {
+  if (statementExits(consequent)) {
     return true;
-  }
-  if (consequent.type === 'ThrowStatement') {
-    return true;
-  }
-  if (consequent.type === 'ExpressionStatement') {
-    return isExitCall(consequent.expression);
   }
   if (consequent.type === 'BlockStatement') {
-    for (const stmt of consequent.body) {
-      if (stmt.type === 'ReturnStatement') {
-        return true;
-      }
-      if (stmt.type === 'ThrowStatement') {
-        return true;
-      }
-      if (stmt.type === 'ExpressionStatement' && isExitCall(stmt.expression)) {
-        return true;
-      }
-    }
+    const first = nextExecutable(consequent.body, 0);
+    return statementExits(consequent.body[first]);
   }
   return false;
 }

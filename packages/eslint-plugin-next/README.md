@@ -32,6 +32,8 @@
 > This lint rule is experimental, but should already be working well.
 >
 > We encourage trying it out and getting in touch with us about your experience.
+>
+> If you try it out, pin your version as we might do breaking changes in minors before v1.
 
 ESLint rules to help with Clerk patterns in the Next.js App Router.
 
