@@ -2,8 +2,15 @@
 
 import dynamic from 'next/dynamic';
 
+import { getModuleBySlug } from '@/lib/registry';
+
+import { PlaygroundProvider } from './PlaygroundContext';
+import { ViewSource } from './ViewSource';
+
 const docModules: Record<string, React.ComponentType> = {
   button: dynamic(() => import('../stories/button.mdx')),
+  input: dynamic(() => import('../stories/input.mdx')),
+  collapsible: dynamic(() => import('../stories/collapsible.mdx')),
 };
 
 interface DocsViewerProps {
@@ -15,9 +22,21 @@ export function DocsViewer({ slug }: DocsViewerProps) {
   if (!DocContent) {
     return <div className='text-muted-foreground p-8 text-sm'>No docs found for &quot;{slug}&quot;.</div>;
   }
+  const meta = getModuleBySlug(slug)?.meta;
   return (
-    <article className='prose mx-auto max-w-3xl p-8'>
-      <DocContent />
-    </article>
+    // Keyed by slug so navigating between components resets the playground state.
+    <PlaygroundProvider
+      key={slug}
+      meta={meta}
+    >
+      <article className='prose relative mx-auto max-w-3xl p-8'>
+        {meta?.source ? (
+          <div className='absolute right-8 top-8'>
+            <ViewSource source={meta.source} />
+          </div>
+        ) : null}
+        <DocContent />
+      </article>
+    </PlaygroundProvider>
   );
 }
