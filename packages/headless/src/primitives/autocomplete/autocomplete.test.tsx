@@ -984,6 +984,32 @@ describe('Autocomplete', () => {
       expect(input).toHaveAttribute('aria-activedescendant', active?.getAttribute('id'));
     });
 
+    it('jumps to selected item on reopen even when it was filtered away before closing', async () => {
+      const user = userEvent.setup();
+      render(<AutocompleteInPopoverFull />);
+
+      // Select Banana
+      await user.click(screen.getByText('Pick a fruit...'));
+      await user.click(screen.getByText('Banana'));
+
+      // Reopen
+      await user.click(screen.getByText('Banana'));
+
+      // Filter to only Banana (Banana is now at index 0)
+      const input = screen.getByPlaceholderText('Search...');
+      await user.type(input, 'b');
+
+      // Close with Escape (selectedIndex is 0 due to filtering)
+      await user.keyboard('{Escape}');
+
+      // Reopen — input is cleared, all 4 options visible
+      await user.click(screen.getByText('Banana'));
+
+      // Banana (index 1) should be active, not Apple (index 0)
+      const active = document.querySelector('[data-cl-slot="autocomplete-option"][data-cl-active]');
+      expect(active).toHaveTextContent('Banana');
+    });
+
     it('clears input on reopen after Escape', async () => {
       const user = userEvent.setup();
       render(<AutocompleteInPopoverFull />);
