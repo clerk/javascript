@@ -392,6 +392,9 @@ importers:
       '@clerk/react':
         specifier: workspace:^
         version: link:../react
+      '@clerk/shared':
+        specifier: workspace:^
+        version: link:../shared
       '@clerk/ui':
         specifier: workspace:^
         version: link:../ui
@@ -520,17 +523,14 @@ importers:
       '@clerk/react':
         specifier: workspace:^
         version: link:../react
-      '@clerk/shared':
-        specifier: workspace:^
-        version: link:../shared
       '@clerk/ui':
         specifier: workspace:^
         version: link:../ui
       react:
-        specifier: catalog:peer-react
+        specifier: 18.3.1
         version: 18.3.1
       react-dom:
-        specifier: catalog:peer-react
+        specifier: 18.3.1
         version: 18.3.1(react@18.3.1)
       tslib:
         specifier: catalog:repo
