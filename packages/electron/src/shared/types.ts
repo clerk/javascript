@@ -8,10 +8,25 @@ export type TokenStorage = {
 
 export type SetupMainOptions = {
   storage: TokenStorage;
+  /**
+   * Registers the custom scheme used to serve the Electron renderer from a stable origin.
+   */
+  renderer?: RendererSchemeOptions;
 };
 
 export type SetupMainReturn = {
   cleanup: () => void;
+};
+
+export type RendererSchemeOptions = {
+  /**
+   * Custom scheme used for the renderer origin.
+   */
+  scheme: string;
+  /**
+   * Custom host used for the renderer origin.
+   */
+  host: string;
 };
 
 export type TokenCache = {

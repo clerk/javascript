@@ -1,5 +1,21 @@
+import { protocol } from 'electron';
+
 import type { SetupMainOptions, SetupMainReturn } from '../shared/types';
 import { setupTokenCacheIpcHandlers } from './ipc-handlers';
+
+function assertValidRendererOriginConfig(renderer: NonNullable<SetupMainOptions['renderer']>): void {
+  if (renderer.scheme.includes(':') || renderer.scheme.includes('/')) {
+    throw new Error(
+      'Clerk: renderer.scheme must be a scheme name like "my-app", not a URL or protocol like "my-app://".',
+    );
+  }
+
+  if (renderer.host.includes(':') || renderer.host.includes('/')) {
+    throw new Error(
+      'Clerk: renderer.host must be a host name like "renderer", not a URL or origin like "my-app://renderer".',
+    );
+  }
+}
 
 export function setupMain(options: SetupMainOptions): SetupMainReturn {
   if (!options.storage) {
@@ -9,6 +25,23 @@ export function setupMain(options: SetupMainOptions): SetupMainReturn {
   }
 
   const cleanupTokenPersistence = setupTokenCacheIpcHandlers(options.storage);
+
+  if (options.renderer) {
+    assertValidRendererOriginConfig(options.renderer);
+
+    protocol.registerSchemesAsPrivileged([
+      {
+        scheme: options.renderer.scheme,
+        privileges: {
+          standard: true,
+          secure: true,
+          supportFetchAPI: true,
+          corsEnabled: true,
+          stream: true,
+        },
+      },
+    ]);
+  }
 
   return {
     cleanup() {
