@@ -30,6 +30,20 @@ export interface OrganizationEnterpriseConnectionInput {
 }
 
 /**
+ * The display-facing summary of the connection lifecycle — the state model the
+ * Security page's badge/states read from. The wizard's navigation guards keep
+ * reading the raw booleans; this only collapses them into one label for UI that
+ * talks about the connection as a whole.
+ *
+ * - `unconfigured` — no connection exists yet.
+ * - `in_progress` — a connection exists but is mid-configuration, or configured
+ *   but not yet successfully tested.
+ * - `inactive` — fully built and successfully tested, just toggled off.
+ * - `active` — the connection is live.
+ */
+export type OrganizationEnterpriseConnectionStatus = 'unconfigured' | 'in_progress' | 'active' | 'inactive';
+
+/**
  * The active organization's SSO-config domain entity: an immutable, pure value
  * object the wizard makes every flow decision from. A snapshot of flattened booleans/values.
  */
@@ -40,6 +54,8 @@ export interface OrganizationEnterpriseConnection {
   readonly hasMinimumConfiguration: boolean;
   readonly isPrimaryEmailVerified: boolean;
   readonly hasSuccessfulTestRun: boolean;
+  /** The lifecycle summary derived from the booleans above — see {@link OrganizationEnterpriseConnectionStatus}. */
+  readonly status: OrganizationEnterpriseConnectionStatus;
 }
 
 // TODO - Update to support OpenID Connect
@@ -47,15 +63,52 @@ export const isEnterpriseConnectionConfigured = (
   connection: EnterpriseConnectionResource | null | undefined,
 ): boolean => Boolean(connection?.samlConnection?.idpSsoUrl && connection?.samlConnection?.idpEntityId);
 
+/**
+ * Collapses the lifecycle booleans into the display-facing status. Precedence,
+ * first match wins:
+ *
+ * 1. no connection → `unconfigured`
+ * 2. connection active → `active` (activation trumps configuration/test state)
+ * 3. minimally configured AND successfully tested → `inactive` (fully built, toggled off)
+ * 4. otherwise → `in_progress` (mid-configuration, or configured but not yet successfully tested)
+ */
+const connectionStatus = ({
+  hasConnection,
+  isActive,
+  hasMinimumConfiguration,
+  hasSuccessfulTestRun,
+}: Pick<
+  OrganizationEnterpriseConnection,
+  'hasConnection' | 'isActive' | 'hasMinimumConfiguration' | 'hasSuccessfulTestRun'
+>): OrganizationEnterpriseConnectionStatus => {
+  if (!hasConnection) {
+    return 'unconfigured';
+  }
+  if (isActive) {
+    return 'active';
+  }
+  if (hasMinimumConfiguration && hasSuccessfulTestRun) {
+    return 'inactive';
+  }
+  return 'in_progress';
+};
+
 export const organizationEnterpriseConnection = ({
   connection,
   primaryEmail,
   hasSuccessfulTestRun,
-}: OrganizationEnterpriseConnectionInput): OrganizationEnterpriseConnection => ({
-  provider: connection?.provider as ProviderType | undefined,
-  hasConnection: Boolean(connection),
-  isActive: Boolean(connection?.active),
-  hasMinimumConfiguration: isEnterpriseConnectionConfigured(connection),
-  isPrimaryEmailVerified: primaryEmail?.verification?.status === 'verified',
-  hasSuccessfulTestRun,
-});
+}: OrganizationEnterpriseConnectionInput): OrganizationEnterpriseConnection => {
+  const hasConnection = Boolean(connection);
+  const isActive = Boolean(connection?.active);
+  const hasMinimumConfiguration = isEnterpriseConnectionConfigured(connection);
+
+  return {
+    provider: connection?.provider as ProviderType | undefined,
+    hasConnection,
+    isActive,
+    hasMinimumConfiguration,
+    isPrimaryEmailVerified: primaryEmail?.verification?.status === 'verified',
+    hasSuccessfulTestRun,
+    status: connectionStatus({ hasConnection, isActive, hasMinimumConfiguration, hasSuccessfulTestRun }),
+  };
+};

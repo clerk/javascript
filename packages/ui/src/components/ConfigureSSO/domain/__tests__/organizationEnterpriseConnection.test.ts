@@ -146,6 +146,74 @@ describe('organizationEnterpriseConnection', () => {
     });
   });
 
+  describe('status', () => {
+    it('undefined connection → unconfigured', () => {
+      expect(derive({ connection: undefined }).status).toBe('unconfigured');
+    });
+    it('null connection → unconfigured', () => {
+      expect(derive({ connection: null }).status).toBe('unconfigured');
+    });
+    it('created but unconfigured connection → in_progress', () => {
+      expect(derive({ connection: makeConnection({ samlConnection: null }) }).status).toBe('in_progress');
+    });
+    it('partially configured connection → in_progress', () => {
+      expect(
+        derive({
+          connection: makeConnection({
+            samlConnection: makeSamlConnection({ idpSsoUrl: 'https://idp.example.com/sso' }),
+          }),
+        }).status,
+      ).toBe('in_progress');
+    });
+    it('configured but not yet successfully tested → in_progress', () => {
+      expect(
+        derive({
+          connection: makeConnection({ samlConnection: fullyConfiguredSaml, active: false }),
+          hasSuccessfulTestRun: false,
+        }).status,
+      ).toBe('in_progress');
+    });
+    it('successfully tested but not minimally configured → in_progress', () => {
+      // `inactive` requires BOTH minimum configuration and a successful run; a
+      // stray successful run on an unconfigured connection stays in_progress.
+      expect(
+        derive({
+          connection: makeConnection({ samlConnection: null, active: false }),
+          hasSuccessfulTestRun: true,
+        }).status,
+      ).toBe('in_progress');
+    });
+    it('configured + successfully tested + not active → inactive', () => {
+      expect(
+        derive({
+          connection: makeConnection({ samlConnection: fullyConfiguredSaml, active: false }),
+          hasSuccessfulTestRun: true,
+        }).status,
+      ).toBe('inactive');
+    });
+    it('active connection → active', () => {
+      expect(derive({ connection: makeConnection({ samlConnection: fullyConfiguredSaml, active: true }) }).status).toBe(
+        'active',
+      );
+    });
+    it('active wins over configured + successfully tested', () => {
+      expect(
+        derive({
+          connection: makeConnection({ samlConnection: fullyConfiguredSaml, active: true }),
+          hasSuccessfulTestRun: true,
+        }).status,
+      ).toBe('active');
+    });
+    it('active wins even for an unconfigured, untested connection', () => {
+      expect(
+        derive({
+          connection: makeConnection({ samlConnection: null, active: true }),
+          hasSuccessfulTestRun: false,
+        }).status,
+      ).toBe('active');
+    });
+  });
+
   it('is pure: identical inputs produce a deep-equal entity', () => {
     const connection = makeConnection({ samlConnection: fullyConfiguredSaml, active: true });
     const primaryEmail = makeEmail('verified');
@@ -168,6 +236,7 @@ describe('organizationEnterpriseConnection', () => {
       hasMinimumConfiguration: true,
       isPrimaryEmailVerified: true,
       hasSuccessfulTestRun: true,
+      status: 'active',
     });
   });
 });
