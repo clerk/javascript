@@ -3,7 +3,7 @@
 import { useMergeRefs } from '@floating-ui/react';
 import React from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, mergeProps, renderElement } from '../../utils';
 import { useDialogContext } from './dialog-context';
 
 export type DialogTriggerProps = ComponentProps<'button'>;

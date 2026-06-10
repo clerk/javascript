@@ -11,14 +11,15 @@ function renderDialog(props: Partial<React.ComponentProps<typeof Dialog.Root>> =
   return render(
     <Dialog.Root {...props}>
       <Dialog.Trigger>Open dialog</Dialog.Trigger>
-      <Dialog.Backdrop>
+      <Dialog.Backdrop />
+      <Dialog.Viewport>
         <Dialog.Popup>
           <Dialog.Title>Dialog Title</Dialog.Title>
           <Dialog.Description>Some dialog description</Dialog.Description>
           <p>Dialog body content</p>
           <Dialog.Close>Close</Dialog.Close>
         </Dialog.Popup>
-      </Dialog.Backdrop>
+      </Dialog.Viewport>
     </Dialog.Root>,
   );
 }
@@ -35,6 +36,7 @@ describe('Dialog', () => {
       renderDialog({ defaultOpen: true });
 
       expect(document.querySelector('[data-cl-slot="dialog-backdrop"]')).toBeInTheDocument();
+      expect(document.querySelector('[data-cl-slot="dialog-viewport"]')).toBeInTheDocument();
       expect(document.querySelector('[data-cl-slot="dialog-popup"]')).toBeInTheDocument();
       expect(document.querySelector('[data-cl-slot="dialog-title"]')).toBeInTheDocument();
       expect(document.querySelector('[data-cl-slot="dialog-description"]')).toBeInTheDocument();
@@ -156,6 +158,21 @@ describe('Dialog', () => {
 
       const backdrop = document.querySelector('[data-cl-slot="dialog-backdrop"]');
       expect(backdrop).toHaveAttribute('data-cl-open', '');
+    });
+
+    it('applies data-cl-open on viewport when open', async () => {
+      const user = userEvent.setup();
+      renderDialog();
+
+      await user.click(screen.getByRole('button', { name: 'Open dialog' }));
+
+      const viewport = document.querySelector('[data-cl-slot="dialog-viewport"]');
+      expect(viewport).toHaveAttribute('data-cl-open', '');
+    });
+
+    it('viewport is not rendered when closed', () => {
+      renderDialog();
+      expect(document.querySelector('[data-cl-slot="dialog-viewport"]')).not.toBeInTheDocument();
     });
   });
 
