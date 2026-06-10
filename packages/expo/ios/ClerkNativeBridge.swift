@@ -1,26 +1,31 @@
-// ClerkViewFactory - Provides Clerk view controllers to the ClerkExpo module
+// ClerkNativeBridge - Provides app-target Clerk SDK operations and SwiftUI view controllers to ClerkExpo.
 // This file is injected into the app target by the config plugin.
 // It uses `import ClerkKit` (SPM) which is only accessible from the app target.
 
 import UIKit
 import SwiftUI
+import Observation
 import Security
 import ClerkKit
 import ClerkKitUI
-import ClerkExpo  // Import the pod to access ClerkViewFactoryProtocol
+import ClerkExpo  // Import the pod to access ClerkNativeBridgeProtocol
 
-// MARK: - View Factory Implementation
+// MARK: - Native Bridge Implementation
 
-public final class ClerkViewFactory: ClerkViewFactoryProtocol {
-  public static let shared = ClerkViewFactory()
+public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
+  public static let shared = ClerkNativeBridge()
 
   private static let clerkLoadMaxAttempts = 30
   private static let clerkLoadIntervalNs: UInt64 = 100_000_000
   private static var clerkConfigured = false
+  private static var configuredPublishableKey: String?
 
   /// Parsed light and dark themes from Info.plist "ClerkTheme" dictionary.
   var lightTheme: ClerkTheme?
   var darkTheme: ClerkTheme?
+
+  private var clientObservationGeneration = 0
+  private var lastObservedClient: Client?
 
   private enum KeychainKey {
     static let jsClientJWT = "__clerk_client_jwt"
@@ -45,28 +50,83 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
     return ExpoKeychain(service: service)
   }
 
-  // Register this factory with the ClerkExpo module
+  // Register this app-target bridge with the ClerkExpo module.
   @MainActor public static func register() {
     shared.loadThemes()
-    clerkViewFactory = shared
+    clerkNativeBridge = shared
   }
 
   @MainActor
   public func configure(publishableKey: String, bearerToken: String? = nil) async throws {
+    if Self.shouldReconfigure(for: publishableKey) {
+      try await Clerk.reconfigure(publishableKey: publishableKey, options: Self.makeClerkOptions())
+      Self.clerkConfigured = true
+      Self.configuredPublishableKey = publishableKey
+      startClientObserver(reset: true)
+
+      Self.syncTokenState(bearerToken: bearerToken)
+      if !(bearerToken?.isEmpty ?? true) {
+        _ = try? await Clerk.shared.refreshClient()
+      }
+
+      await Self.waitForLoadedSession()
+      return
+    }
+
     Self.syncTokenState(bearerToken: bearerToken)
 
     // If already configured with a new bearer token, refresh the client
     // to pick up the session associated with the device token we just wrote.
-    // Clerk.configure() is a no-op on subsequent calls, so we use refreshClient().
+    // Clerk.configure() is idempotent for the same publishable key, so use refreshClient().
     if Self.shouldRefreshConfiguredClient(for: bearerToken) {
+      startClientObserver()
       _ = try? await Clerk.shared.refreshClient()
+      await Self.waitForLoadedSession()
+      return
+    }
+
+    if Self.clerkConfigured {
+      startClientObserver()
       return
     }
 
     Self.clerkConfigured = true
+    Self.configuredPublishableKey = publishableKey
     Clerk.configure(publishableKey: publishableKey, options: Self.makeClerkOptions())
+    startClientObserver()
 
     await Self.waitForLoadedSession()
+  }
+
+  @MainActor
+  private func startClientObserver(reset: Bool = false) {
+    guard reset || clientObservationGeneration == 0 else { return }
+
+    clientObservationGeneration += 1
+    let generation = clientObservationGeneration
+    lastObservedClient = Clerk.shared.client
+    observeClient(generation: generation)
+  }
+
+  @MainActor
+  private func observeClient(generation: Int) {
+    withObservationTracking {
+      _ = Clerk.shared.client
+    } onChange: { [weak self] in
+      Task { @MainActor [weak self] in
+        await Task.yield()
+
+        guard let self, generation == self.clientObservationGeneration else { return }
+
+        let newClient = Clerk.shared.client
+        if newClient != self.lastObservedClient {
+          self.lastObservedClient = newClient
+          emitClerkNativeRefreshClient()
+        }
+
+        self.observeClient(generation: generation)
+      }
+    }
   }
 
   private static func syncTokenState(bearerToken: String?) {
@@ -95,6 +155,11 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
     clerkConfigured && !(bearerToken?.isEmpty ?? true)
   }
 
+  private static func shouldReconfigure(for publishableKey: String) -> Bool {
+    guard clerkConfigured, let configuredPublishableKey else { return false }
+    return configuredPublishableKey != publishableKey
+  }
+
   private static func makeClerkOptions() -> Clerk.Options {
     guard let service = keychainService else {
       return .init()
@@ -107,7 +172,7 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
     // Wait for Clerk to finish loading (cached data + API refresh).
     // The static configure() fires off async refreshes; poll until loaded.
     for _ in 0..<clerkLoadMaxAttempts {
-      if Clerk.shared.isLoaded && Clerk.shared.session != nil {
+      if Clerk.shared.isLoaded && Clerk.shared.session != nil && Clerk.shared.user != nil {
         return
       }
       try? await Task.sleep(nanoseconds: clerkLoadIntervalNs)
@@ -149,62 +214,43 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
     Self.readNativeDeviceToken()
   }
 
-  public func createAuthViewController(
-    mode: String,
-    dismissable: Bool,
-    completion: @escaping (Result<[String: Any], Error>) -> Void
-  ) -> UIViewController? {
-    let wrapper = ClerkAuthWrapperViewController(
-      mode: Self.authMode(from: mode),
-      dismissable: dismissable,
-      lightTheme: lightTheme,
-      darkTheme: darkTheme,
-      completion: completion
-    )
-    return wrapper
-  }
-
-  public func createUserProfileViewController(
-    dismissable: Bool,
-    completion: @escaping (Result<[String: Any], Error>) -> Void
-  ) -> UIViewController? {
-    let wrapper = ClerkProfileWrapperViewController(
-      dismissable: dismissable,
-      lightTheme: lightTheme,
-      darkTheme: darkTheme,
-      completion: completion
-    )
-    return wrapper
-  }
-
   // MARK: - Inline View Creation
 
-  public func createAuthView(
+  public func makeAuthViewController(
     mode: String,
-    dismissable: Bool,
-    onEvent: @escaping (String, [String: Any]) -> Void
+    dismissible: Bool,
+    onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
   ) -> UIViewController? {
     makeHostingController(
       rootView: ClerkInlineAuthWrapperView(
         mode: Self.authMode(from: mode),
-        dismissable: dismissable,
+        dismissible: dismissible,
         lightTheme: lightTheme,
-        darkTheme: darkTheme,
-        onEvent: onEvent
-      )
+        darkTheme: darkTheme
+      ),
+      onDismiss: dismissible ? { onEvent(.dismissed, [:]) } : nil
     )
   }
 
-  public func createUserProfileView(
-    dismissable: Bool,
-    onEvent: @escaping (String, [String: Any]) -> Void
+  public func makeUserProfileViewController(
+    dismissible: Bool,
+    onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
   ) -> UIViewController? {
     makeHostingController(
       rootView: ClerkInlineProfileWrapperView(
-        dismissable: dismissable,
+        dismissible: dismissible,
         lightTheme: lightTheme,
-        darkTheme: darkTheme,
-        onEvent: onEvent
+        darkTheme: darkTheme
+      ),
+      onDismiss: dismissible ? { onEvent(.dismissed, [:]) } : nil
+    )
+  }
+
+  public func makeUserButtonViewController() -> UIViewController? {
+    makeHostingController(
+      rootView: ClerkInlineUserButtonWrapperView(
+        lightTheme: lightTheme,
+        darkTheme: darkTheme
       )
     )
   }
@@ -218,14 +264,10 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
   }
 
   @MainActor
-  public func signOut() async throws {
-    if Self.clerkConfigured {
-      defer { Clerk.clearAllKeychainItems() }
-      if let sessionId = Clerk.shared.session?.id {
-        try await Clerk.shared.auth.signOut(sessionId: sessionId)
-      }
-    }
-    Self.clerkConfigured = false
+  public func refreshClient() async throws {
+    guard Self.clerkConfigured else { return }
+    _ = try await Clerk.shared.refreshClient()
+    await Self.waitForLoadedSession()
   }
 
   private static func authMode(from mode: String) -> AuthView.Mode {
@@ -324,8 +366,11 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
     return ClerkTheme.Design(borderRadius: CGFloat(radius))
   }
 
-  private func makeHostingController<Content: View>(rootView: Content) -> UIViewController {
-    let hostingController = UIHostingController(rootView: rootView)
+  private func makeHostingController<Content: View>(
+    rootView: Content,
+    onDismiss: (() -> Void)? = nil
+  ) -> UIViewController {
+    let hostingController = ClerkNativeHostingController(rootView: rootView, onDismiss: onDismiss)
     hostingController.view.backgroundColor = .clear
     return hostingController
   }
@@ -420,167 +465,27 @@ private struct ExpoKeychain {
   }
 }
 
-// MARK: - Auth View Controller Wrapper
+// MARK: - Inline User Button Wrapper (for embedded rendering)
 
-class ClerkAuthWrapperViewController: UIHostingController<ClerkAuthWrapperView> {
-  private let completion: (Result<[String: Any], Error>) -> Void
-  private var authEventTask: Task<Void, Never>?
-  private var completionCalled = false
+struct ClerkInlineUserButtonWrapperView: View {
+  let lightTheme: ClerkTheme?
+  let darkTheme: ClerkTheme?
 
-  init(mode: AuthView.Mode, dismissable: Bool, lightTheme: ClerkTheme?, darkTheme: ClerkTheme?, completion: @escaping (Result<[String: Any], Error>) -> Void) {
-    self.completion = completion
-    let view = ClerkAuthWrapperView(mode: mode, dismissable: dismissable, lightTheme: lightTheme, darkTheme: darkTheme)
-    super.init(rootView: view)
-    self.modalPresentationStyle = .fullScreen
-    subscribeToAuthEvents()
-  }
+  @Environment(\.colorScheme) private var colorScheme
 
-  @MainActor required dynamic init?(coder aDecoder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
-  }
-
-  deinit {
-    authEventTask?.cancel()
-  }
-
-  override func viewDidDisappear(_ animated: Bool) {
-    super.viewDidDisappear(animated)
-    if isBeingDismissed {
-      // Check if auth completed (session exists) vs user cancelled
-      if let session = Clerk.shared.session, session.id != initialSessionId {
-        completeOnce(.success(["sessionId": session.id, "type": "signIn"]))
+  var body: some View {
+    let view = UserButton()
+      .environment(Clerk.shared)
+    let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
+    let themedView = Group {
+      if let theme {
+        view.environment(\.clerkTheme, theme)
       } else {
-        completeOnce(.success(["cancelled": true]))
+        view
       }
     }
-  }
-
-  private func completeOnce(_ result: Result<[String: Any], Error>) {
-    guard !completionCalled else { return }
-    completionCalled = true
-    completion(result)
-  }
-
-  private var initialSessionId: String? = Clerk.shared.session?.id
-
-  private func subscribeToAuthEvents() {
-    authEventTask = Task { @MainActor [weak self] in
-      for await event in Clerk.shared.auth.events {
-        guard let self = self, !self.completionCalled else { return }
-        switch event {
-        case .signInCompleted(let signIn):
-          let sessionId = signIn.createdSessionId ?? Clerk.shared.session?.id
-          if let sessionId, sessionId != self.initialSessionId {
-            self.completeOnce(.success(["sessionId": sessionId, "type": "signIn"]))
-            self.dismiss(animated: true)
-          }
-        case .signUpCompleted(let signUp):
-          let sessionId = signUp.createdSessionId ?? Clerk.shared.session?.id
-          if let sessionId, sessionId != self.initialSessionId {
-            self.completeOnce(.success(["sessionId": sessionId, "type": "signUp"]))
-            self.dismiss(animated: true)
-          }
-        case .sessionChanged(_, let newSession):
-          if let sessionId = newSession?.id, sessionId != self.initialSessionId {
-            self.completeOnce(.success(["sessionId": sessionId, "type": "signIn"]))
-            self.dismiss(animated: true)
-          }
-        default:
-          break
-        }
-      }
-    }
-  }
-}
-
-struct ClerkAuthWrapperView: View {
-  let mode: AuthView.Mode
-  let dismissable: Bool
-  let lightTheme: ClerkTheme?
-  let darkTheme: ClerkTheme?
-
-  @Environment(\.colorScheme) private var colorScheme
-
-  var body: some View {
-    let view = AuthView(mode: mode, isDismissable: dismissable)
-      .environment(Clerk.shared)
-    let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
-    if let theme {
-      view.environment(\.clerkTheme, theme)
-    } else {
-      view
-    }
-  }
-}
-
-// MARK: - Profile View Controller Wrapper
-
-class ClerkProfileWrapperViewController: UIHostingController<ClerkProfileWrapperView> {
-  private let completion: (Result<[String: Any], Error>) -> Void
-  private var authEventTask: Task<Void, Never>?
-  private var completionCalled = false
-
-  init(dismissable: Bool, lightTheme: ClerkTheme?, darkTheme: ClerkTheme?, completion: @escaping (Result<[String: Any], Error>) -> Void) {
-    self.completion = completion
-    let view = ClerkProfileWrapperView(dismissable: dismissable, lightTheme: lightTheme, darkTheme: darkTheme)
-    super.init(rootView: view)
-    self.modalPresentationStyle = .fullScreen
-    subscribeToAuthEvents()
-  }
-
-  @MainActor required dynamic init?(coder aDecoder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
-  }
-
-  deinit {
-    authEventTask?.cancel()
-  }
-
-  override func viewDidDisappear(_ animated: Bool) {
-    super.viewDidDisappear(animated)
-    if isBeingDismissed {
-      completeOnce(.success(["dismissed": true]))
-    }
-  }
-
-  private func completeOnce(_ result: Result<[String: Any], Error>) {
-    guard !completionCalled else { return }
-    completionCalled = true
-    completion(result)
-  }
-
-  private func subscribeToAuthEvents() {
-    authEventTask = Task { @MainActor [weak self] in
-      for await event in Clerk.shared.auth.events {
-        guard let self = self, !self.completionCalled else { return }
-        switch event {
-        case .signedOut(let session):
-          self.completeOnce(.success(["sessionId": session.id]))
-          self.dismiss(animated: true)
-        default:
-          break
-        }
-      }
-    }
-  }
-}
-
-struct ClerkProfileWrapperView: View {
-  let dismissable: Bool
-  let lightTheme: ClerkTheme?
-  let darkTheme: ClerkTheme?
-
-  @Environment(\.colorScheme) private var colorScheme
-
-  var body: some View {
-    let view = UserProfileView(isDismissable: dismissable)
-      .environment(Clerk.shared)
-    let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
-    if let theme {
-      view.environment(\.clerkTheme, theme)
-    } else {
-      view
-    }
+    themedView
+      .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
   }
 }
 
@@ -588,25 +493,14 @@ struct ClerkProfileWrapperView: View {
 
 struct ClerkInlineAuthWrapperView: View {
   let mode: AuthView.Mode
-  let dismissable: Bool
+  let dismissible: Bool
   let lightTheme: ClerkTheme?
   let darkTheme: ClerkTheme?
-  let onEvent: (String, [String: Any]) -> Void
-
-  // Track initial session to detect new sign-ins (same approach as Android)
-  @State private var initialSessionId: String? = Clerk.shared.session?.id
-  @State private var eventSent = false
 
   @Environment(\.colorScheme) private var colorScheme
 
-  private func sendAuthCompleted(sessionId: String, type: String) {
-    guard !eventSent, sessionId != initialSessionId else { return }
-    eventSent = true
-    onEvent(type, ["sessionId": sessionId, "type": type == "signUpCompleted" ? "signUp" : "signIn"])
-  }
-
   private var themedAuthView: some View {
-    let view = AuthView(mode: mode, isDismissable: dismissable)
+    let view = AuthView(mode: mode, isDismissible: dismissible)
       .environment(Clerk.shared)
     let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
     return Group {
@@ -620,45 +514,45 @@ struct ClerkInlineAuthWrapperView: View {
 
   var body: some View {
     themedAuthView
-      // Primary detection: observe Clerk.shared.session directly (matches Android's sessionFlow approach).
-      // This is more reliable than auth.events which may not emit for inline AuthView sign-ins.
-      .onChange(of: Clerk.shared.session?.id) { _, newSessionId in
-        guard let sessionId = newSessionId else { return }
-        sendAuthCompleted(sessionId: sessionId, type: "signInCompleted")
-      }
-      // Fallback: also listen to auth.events for signUp events and edge cases
-      .task {
-        for await event in Clerk.shared.auth.events {
-          guard !eventSent else { continue }
-          switch event {
-          case .signInCompleted(let signIn):
-            let sessionId = signIn.createdSessionId ?? Clerk.shared.session?.id
-            if let sessionId { sendAuthCompleted(sessionId: sessionId, type: "signInCompleted") }
-          case .signUpCompleted(let signUp):
-            let sessionId = signUp.createdSessionId ?? Clerk.shared.session?.id
-            if let sessionId { sendAuthCompleted(sessionId: sessionId, type: "signUpCompleted") }
-          case .sessionChanged(_, let newSession):
-            if let sessionId = newSession?.id { sendAuthCompleted(sessionId: sessionId, type: "signInCompleted") }
-          default:
-            break
-          }
-        }
-      }
+  }
+}
+
+private final class ClerkNativeHostingController<Content: View>: UIHostingController<Content> {
+  private let onDismiss: (() -> Void)?
+  private var didSendDismiss = false
+
+  init(rootView: Content, onDismiss: (() -> Void)? = nil) {
+    self.onDismiss = onDismiss
+    super.init(rootView: rootView)
+  }
+
+  @MainActor @preconcurrency required dynamic init?(coder aDecoder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
+  override func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
+    sendDismissIfNeeded()
+    super.dismiss(animated: flag, completion: completion)
+  }
+
+  private func sendDismissIfNeeded() {
+    guard !didSendDismiss else { return }
+    didSendDismiss = true
+    onDismiss?()
   }
 }
 
 // MARK: - Inline Profile View Wrapper (for embedded rendering)
 
 struct ClerkInlineProfileWrapperView: View {
-  let dismissable: Bool
+  let dismissible: Bool
   let lightTheme: ClerkTheme?
   let darkTheme: ClerkTheme?
-  let onEvent: (String, [String: Any]) -> Void
 
   @Environment(\.colorScheme) private var colorScheme
 
   var body: some View {
-    let view = UserProfileView(isDismissable: dismissable)
+    let view = UserProfileView(isDismissible: dismissible)
       .environment(Clerk.shared)
     let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
     let themedView = Group {
@@ -669,15 +563,5 @@ struct ClerkInlineProfileWrapperView: View {
       }
     }
     themedView
-      .task {
-        for await event in Clerk.shared.auth.events {
-          switch event {
-          case .signedOut(let session):
-            onEvent("signedOut", ["sessionId": session.id])
-          default:
-            break
-          }
-        }
-      }
   }
 }
