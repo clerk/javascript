@@ -367,7 +367,7 @@ describe('Collapsible', () => {
   });
 
   describe('Inert Attribute', () => {
-    it('sets inert to empty string when open={false}', async () => {
+    it('sets inert when open={false}', async () => {
       const { wrapper } = await createFixtures();
       const { container, rerender } = render(<Collapsible open>Content</Collapsible>, { wrapper });
 
@@ -375,7 +375,8 @@ describe('Collapsible', () => {
       rerender(<Collapsible open={false}>Content</Collapsible>);
 
       const element = container.querySelector('.cl-collapsible') as HTMLElement;
-      expect(element).toHaveAttribute('inert', '');
+      // Check presence only — React 18 renders inert="true", React 19 normalises to inert=""
+      expect(element).toHaveAttribute('inert');
     });
 
     it('does not set inert when open={true}', async () => {

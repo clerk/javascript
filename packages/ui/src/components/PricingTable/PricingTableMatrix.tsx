@@ -265,7 +265,6 @@ export function PricingTableMatrix({
                                   }),
                                   feePeriodNoticeAnimation,
                                 ]}
-                                // @ts-ignore - Needed until React 19 support
                                 inert={planPeriod !== 'annual' ? 'true' : undefined}
                               >
                                 <Box

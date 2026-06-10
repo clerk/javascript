@@ -75,8 +75,7 @@ export function Collapsible({ open, children, sx }: CollapsibleProps): JSX.Eleme
         }),
         sx,
       ]}
-      // @ts-ignore - inert not yet in React types
-      inert={!open ? '' : undefined}
+      inert={!open ? 'true' : undefined}
     >
       <Box
         elementDescriptor={descriptors.collapsibleInner}

@@ -1,6 +1,14 @@
 import type { Clerk } from '@clerk/shared/types';
 import type { ClerkUIConstructor } from '@clerk/shared/ui';
 
+declare module 'react' {
+  interface HTMLAttributes<T> {
+    // `inert` landed in @types/react v19; augment for React 18 compatibility.
+    // Use 'true' (truthy string) — '' is falsy in React 19 and won't set the attribute.
+    inert?: 'true' | undefined;
+  }
+}
+
 declare module '*.svg' {
   const value: React.FC<React.SVGAttributes<SVGElement>>;
   export default value;

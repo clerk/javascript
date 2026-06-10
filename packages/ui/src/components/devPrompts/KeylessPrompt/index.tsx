@@ -506,7 +506,7 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
       </button>
       <div
         id={id}
-        {...(!isOpen && { inert: '' as any })}
+        {...(!isOpen && { inert: 'true' })}
         css={css`
           ${CSS_RESET};
           display: grid;
