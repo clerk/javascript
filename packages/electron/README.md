@@ -31,10 +31,29 @@
 > [!WARNING]
 > `@clerk/electron` is under active development and is not yet ready for production use. The API is incomplete and subject to change.
 
-This package exposes two entrypoints, targeting Electron's distinct runtime contexts:
+This package exposes entrypoints for Electron's distinct runtime contexts:
 
 - `@clerk/electron` — for use in the Electron **main** process.
 - `@clerk/electron/preload` — for use in Electron **preload** scripts.
+- `@clerk/electron/react` — for use in the Electron **renderer** process.
+- `@clerk/electron/storage` — default token storage backed by `electron-store`.
+
+```ts
+// main.ts
+import { setupMain } from '@clerk/electron';
+import { storage } from '@clerk/electron/storage';
+
+setupMain({
+  storage: storage(),
+});
+```
+
+```tsx
+// renderer.tsx
+import { ClerkProvider } from '@clerk/electron/react';
+
+<ClerkProvider publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}>{/* ... */}</ClerkProvider>;
+```
 
 ## Support
 
