@@ -1,7 +1,7 @@
 'use client';
 
-import type React from 'react';
 import { MosaicProvider } from '@clerk/ui/mosaic/MosaicProvider';
+import type React from 'react';
 
 import { generateKnobs, initKnobValues } from '@/lib/generateKnobs';
 import type { StoryModule } from '@/lib/types';

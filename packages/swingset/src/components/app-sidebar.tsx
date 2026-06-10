@@ -1,9 +1,9 @@
 'use client';
 
-import * as React from 'react';
+import { ChevronRightIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ChevronRightIcon } from 'lucide-react';
+import * as React from 'react';
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {

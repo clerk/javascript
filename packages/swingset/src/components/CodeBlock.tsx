@@ -32,15 +32,17 @@ export function CodeBlock({ children, className }: CodeBlockProps) {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    getHighlighter().then(hl => {
+    void getHighlighter().then(hl => {
       setHtml(hl.codeToHtml(code, { lang, theme: 'css-variables' }));
     });
   }, [code, lang]);
 
   function copy() {
-    navigator.clipboard.writeText(code).then(() => {
+    void navigator.clipboard.writeText(code).then(() => {
       setCopied(true);
-      if (timerRef.current) clearTimeout(timerRef.current);
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
       timerRef.current = setTimeout(() => setCopied(false), 2000);
     });
   }
@@ -48,6 +50,7 @@ export function CodeBlock({ children, className }: CodeBlockProps) {
   return (
     <div className='not-prose group relative my-4 overflow-hidden rounded-lg border border-white/10 bg-[var(--shiki-background)] text-sm'>
       <button
+        type='button'
         onClick={copy}
         className='absolute right-2 top-2 z-10 rounded bg-white/10 px-2 py-1 text-xs text-white/60 opacity-0 transition-opacity hover:bg-white/20 hover:text-white group-hover:opacity-100'
       >

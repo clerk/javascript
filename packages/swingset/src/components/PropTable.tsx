@@ -23,7 +23,8 @@ export function PropTable({ meta, extra = [] }: PropTableProps) {
       const isBoolean = keys.every(k => k === 'true' || k === 'false');
       const type = isBoolean ? 'boolean' : keys.map(k => `'${k}'`).join(' | ');
       const def = defaults[name];
-      const defDisplay = def !== undefined ? (isBoolean ? String(def) : `'${String(def)}'`) : undefined;
+      const defDisplay =
+        def !== undefined ? (isBoolean ? String(def as boolean) : `'${String(def as string)}'`) : undefined;
       return { name, type, default: defDisplay };
     }),
     ...extra,

@@ -1,6 +1,5 @@
 // Import stories explicitly to control order and avoid type casting through unknown.
-import { Disabled, Primary, Sizes, meta as buttonMeta } from '../stories/button.stories';
-
+import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
 import { toSlug } from './slug';
 import type { StoryModule } from './types';
 

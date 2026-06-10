@@ -14,7 +14,9 @@ interface KnobPanelProps {
 
 export function KnobPanel({ knobs, values, onChange }: KnobPanelProps) {
   const entries = Object.entries(knobs);
-  if (entries.length === 0) return null;
+  if (entries.length === 0) {
+    return null;
+  }
 
   return (
     <div className='flex flex-col gap-3 p-3'>

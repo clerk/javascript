@@ -1,13 +1,13 @@
+import './globals.css';
+
 import type { Metadata } from 'next';
-import type React from 'react';
 import { Geist } from 'next/font/google';
 import Script from 'next/script';
+import type React from 'react';
 
-import { ThemeProvider } from '@/components/ThemeProvider';
 import { ClientRoot } from '@/components/ClientRoot';
+import { ThemeProvider } from '@/components/ThemeProvider';
 import { cn } from '@/lib/utils';
-
-import './globals.css';
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
 

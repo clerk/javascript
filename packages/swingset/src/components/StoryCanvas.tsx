@@ -1,10 +1,9 @@
 'use client';
 
-import type React from 'react';
-import { useEffect, useState } from 'react';
-
 import { MosaicProvider } from '@clerk/ui/mosaic/MosaicProvider';
 import type { MosaicVariables } from '@clerk/ui/mosaic/variables';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { generateKnobs, initKnobValues } from '@/lib/generateKnobs';
