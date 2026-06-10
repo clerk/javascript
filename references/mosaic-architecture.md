@@ -45,6 +45,7 @@ theme.mix('primary', 'primaryForeground', 50); // "color-mix(in oklab, <primary>
 // text(key) — typography scale with fontSize + lineHeight
 theme.text('sm'); // { fontSize: '0.875rem', lineHeight: '...' }
 ```
+```
 
 ## Theme delivery
 
