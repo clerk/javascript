@@ -3,6 +3,7 @@ import React from 'react';
 import { cva, type VariantProps } from '../cva';
 import { useMosaicTheme } from '../MosaicProvider';
 
+/** CVA style definition for `Button` variants (`intent`, `size`, `disabled`). */
 export const buttonStyles = cva(theme => ({
   base: {
     display: 'inline-flex',
@@ -43,8 +44,10 @@ export const buttonStyles = cva(theme => ({
   defaultVariants: { intent: 'primary', size: 'md', disabled: false },
 }));
 
+/** Props for {@link Button}. */
 export type ButtonProps = React.ComponentPropsWithRef<'button'> & VariantProps<typeof buttonStyles>;
 
+/** Styled mosaic Button component with `intent`, `size`, and `disabled` variants. */
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function MosaicButton(props, ref) {
   const { intent, size, disabled, sx, children, ...rest } = props;
   const theme = useMosaicTheme();

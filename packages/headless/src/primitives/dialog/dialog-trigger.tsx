@@ -6,8 +6,10 @@ import React from 'react';
 import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils';
 import { useDialogContext } from './dialog-context';
 
+/** Props for {@link DialogTrigger}. */
 export type DialogTriggerProps = ComponentProps<'button'>;
 
+/** Button that opens the dialog. Wired to Floating UI's reference element for ARIA and interaction handling. */
 export const DialogTrigger = React.forwardRef<HTMLButtonElement, DialogTriggerProps>(
   function DialogTrigger(props, ref) {
     const { render, ...otherProps } = props;

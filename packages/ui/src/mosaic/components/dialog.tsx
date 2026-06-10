@@ -91,6 +91,7 @@ const Title = styled(Primitive.Title, titleStyles);
 const Description = styled(Primitive.Description, descriptionStyles);
 const Close = styled(Primitive.Close, closeStyles);
 
+/** Styled mosaic Dialog components built on headless Dialog primitives. */
 export const Dialog: {
   Root: typeof Primitive.Root;
   Trigger: typeof Primitive.Trigger;

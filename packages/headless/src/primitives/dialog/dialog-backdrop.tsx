@@ -5,8 +5,10 @@ import React from 'react';
 import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils';
 import { useDialogContext } from './dialog-context';
 
+/** Props for {@link DialogBackdrop}. */
 export type DialogBackdropProps = ComponentProps<'div'>;
 
+/** Semi-transparent overlay surface rendered behind the dialog. Does not own scroll-lock or positioning — use `Dialog.Viewport` for those. */
 export const DialogBackdrop = React.forwardRef<HTMLDivElement, DialogBackdropProps>(
   function DialogBackdrop(props, ref) {
     const { render, ...otherProps } = props;
