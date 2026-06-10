@@ -514,6 +514,24 @@ importers:
 
   packages/electron:
     dependencies:
+      '@clerk/clerk-js':
+        specifier: workspace:^
+        version: link:../clerk-js
+      '@clerk/react':
+        specifier: workspace:^
+        version: link:../react
+      '@clerk/shared':
+        specifier: workspace:^
+        version: link:../shared
+      '@clerk/ui':
+        specifier: workspace:^
+        version: link:../ui
+      react:
+        specifier: catalog:peer-react
+        version: 18.3.1
+      react-dom:
+        specifier: catalog:peer-react
+        version: 18.3.1(react@18.3.1)
       tslib:
         specifier: catalog:repo
         version: 2.8.1

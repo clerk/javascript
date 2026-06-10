@@ -54,6 +54,16 @@
         "default": "./dist/cjs/storage/index.js"
       }
     },
+    "./react": {
+      "import": {
+        "types": "./dist/types/react/index.d.ts",
+        "default": "./dist/esm/react/index.js"
+      },
+      "require": {
+        "types": "./dist/types/react/index.d.ts",
+        "default": "./dist/cjs/react/index.js"
+      }
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/cjs/index.js",
@@ -78,6 +88,10 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@clerk/clerk-js": "workspace:^",
+    "@clerk/react": "workspace:^",
+    "@clerk/shared": "workspace:^",
+    "@clerk/ui": "workspace:^",
     "tslib": "catalog:repo"
   },
   "devDependencies": {
@@ -87,10 +101,15 @@
   },
   "peerDependencies": {
     "electron": ">=28",
-    "electron-store": "^8.2.0"
+    "electron-store": "^8.2.0",
+    "react": "catalog:peer-react",
+    "react-dom": "catalog:peer-react"
   },
   "peerDependenciesMeta": {
     "electron-store": {
+      "optional": true
+    },
+    "react-dom": {
       "optional": true
     }
   },
