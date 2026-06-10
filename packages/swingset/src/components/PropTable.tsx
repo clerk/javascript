@@ -1,5 +1,6 @@
 'use client';
 
+import { Badge } from '@/components/ui/badge';
 import type { StoryMeta } from '@/lib/types';
 
 import { KnobControl } from './KnobControl';
@@ -54,9 +55,12 @@ export function PropTable({ meta, extra = [] }: PropTableProps) {
           return (
             <tr key={row.name}>
               <td>
-                <code className='border-border bg-muted text-foreground inline-block rounded-md border px-1.5 py-0.5 font-mono text-xs leading-tight'>
+                <Badge
+                  variant='secondary'
+                  className='font-mono'
+                >
                   {row.name}
-                </code>
+                </Badge>
               </td>
               <td>
                 <code>{row.type}</code>
