@@ -94,6 +94,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@clerk/headless": "workspace:^",
     "@clerk/localizations": "workspace:^",
     "@clerk/shared": "workspace:^",
     "@emotion/cache": "11.11.0",

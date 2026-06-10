@@ -1053,6 +1053,9 @@ importers:
 
   packages/ui:
     dependencies:
+      '@clerk/headless':
+        specifier: workspace:^
+        version: link:../headless
       '@clerk/localizations':
         specifier: workspace:^
         version: link:../localizations
