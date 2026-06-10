@@ -2352,6 +2352,7 @@ export class Clerk implements ClerkInterface {
       externalAccountErrorCode: externalAccount.error?.code,
       externalAccountSessionId: externalAccount.error?.meta?.sessionId,
       sessionId: signUp.createdSessionId,
+      protectCheck: signUp.protectCheck,
     };
 
     const si = {
@@ -2401,7 +2402,18 @@ export class Clerk implements ClerkInterface {
         ),
     );
 
+    const navigateToSignUpProtectCheck = makeNavigate(
+      buildURL({ base: displayConfig.signUpUrl, hashPath: '/protect-check' }, { stringify: true }),
+    );
+
     const navigateToNextStepSignUp = ({ missingFields }: { missingFields: SignUpField[] }) => {
+      // A protect-gated sign-up always carries 'protect_check' in missing_fields, so this gate
+      // check must run BEFORE the generic missing-fields short-circuit below — otherwise the
+      // OAuth/SAML callback would land on /continue instead of the challenge.
+      if (signUp.protectCheck || missingFields.includes('protect_check')) {
+        return navigateToSignUpProtectCheck();
+      }
+
       if (missingFields.length) {
         return navigateToContinueSignUp();
       }
@@ -2462,6 +2474,12 @@ export class Clerk implements ClerkInterface {
     // Honor either the explicit `protectCheck` field or the `needs_protect_check` status override.
     if (si.protectCheck || si.status === 'needs_protect_check') {
       return navigateToSignInProtectCheck();
+    }
+
+    // The sign-up resource can be gated the same way (e.g. a callback that resolves straight into a
+    // gated sign-up). Route to the sign-up challenge before the transfer/missing-fields logic below.
+    if (su.protectCheck) {
+      return navigateToSignUpProtectCheck();
     }
 
     const userExistsButNeedsToSignIn =
@@ -2718,6 +2736,7 @@ export class Clerk implements ClerkInterface {
     strategy,
     legalAccepted,
     secondFactorUrl,
+    protectCheckUrl,
     walletName,
   }: ClerkAuthenticateWithWeb3Params): Promise<void> => {
     if (!this.client || !this.environment) {
@@ -2760,6 +2779,10 @@ export class Clerk implements ClerkInterface {
       secondFactorUrl || buildURL({ base: displayConfig.signInUrl, hashPath: '/factor-two' }, { stringify: true }),
     );
 
+    const navigateToSignInProtectCheck = makeNavigate(
+      protectCheckUrl || buildURL({ base: displayConfig.signInUrl, hashPath: '/protect-check' }, { stringify: true }),
+    );
+
     const navigateToContinueSignUp = makeNavigate(
       signUpContinueUrl ||
         buildURL(
@@ -2772,6 +2795,7 @@ export class Clerk implements ClerkInterface {
     );
 
     let signInOrSignUp: SignInResource | SignUpResource;
+    let viaSignUp = false;
     try {
       signInOrSignUp = await this.client.signIn.authenticateWithWeb3({
         identifier,
@@ -2781,6 +2805,7 @@ export class Clerk implements ClerkInterface {
       });
     } catch (err) {
       if (isError(err, ERROR_CODES.FORM_IDENTIFIER_NOT_FOUND)) {
+        viaSignUp = true;
         signInOrSignUp = await this.client.signUp.authenticateWithWeb3({
           identifier,
           generateSignature,
@@ -2793,7 +2818,10 @@ export class Clerk implements ClerkInterface {
         if (
           signUpContinueUrl &&
           signInOrSignUp.status === 'missing_requirements' &&
-          signInOrSignUp.verifications.web3Wallet.status === 'verified'
+          signInOrSignUp.verifications.web3Wallet.status === 'verified' &&
+          // A protect_check gate also surfaces as missing_requirements; don't skip past it into
+          // the continue step. The gate is handled by the sign-up protect-check route instead.
+          !signInOrSignUp.protectCheck
         ) {
           await navigateToContinueSignUp();
         }
@@ -2813,6 +2841,14 @@ export class Clerk implements ClerkInterface {
         navigate: this.navigate,
       });
     };
+
+    // A Clerk Protect challenge can gate the inline web3 sign-in (no redirect happens, so the
+    // centralized _handleRedirectCallback check never runs). Route to the sign-in protect-check
+    // card before the status switch below, otherwise the user is stranded on the wallet step.
+    if (!viaSignUp && (signInOrSignUp.protectCheck || signInOrSignUp.status === 'needs_protect_check')) {
+      await navigateToSignInProtectCheck();
+      return;
+    }
 
     switch (signInOrSignUp.status) {
       case 'needs_second_factor':

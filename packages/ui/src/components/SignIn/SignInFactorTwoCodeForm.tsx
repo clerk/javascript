@@ -14,7 +14,7 @@ import { localizationKeys, Text } from '../../customizables';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import type { LocalizationKey } from '../../localization';
 import { useRouter } from '../../router';
-import { isSignInProtectGated } from './handleProtectCheck';
+import { navigateOnSignInProtectGate } from './handleProtectCheck';
 import { isResetPasswordStrategy } from './utils';
 
 export type SignInFactorTwoCodeCard = Pick<VerificationCodeCardProps, 'onShowAlternativeMethodsClicked'> & {
@@ -85,8 +85,8 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
       .attemptSecondFactor({ strategy: props.factor.strategy, code })
       .then(async res => {
         await resolve();
-        if (isSignInProtectGated(res)) {
-          return navigate('../protect-check');
+        if (navigateOnSignInProtectGate(res, navigate, '../protect-check')) {
+          return;
         }
         switch (res.status) {
           case 'complete':
@@ -101,8 +101,6 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
                 await navigateOnSetActive({ session, redirectUrl: afterSignInUrl, decorateUrl });
               },
             });
-          case 'needs_protect_check':
-            return navigate('../protect-check');
           default:
             return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
         }

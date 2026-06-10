@@ -75,6 +75,13 @@ function SignUpRoutes(): JSX.Element {
         </Route>
         <Route path='continue'>
           <Route
+            path='protect-check'
+            canActivate={clerk => !!clerk.client.signUp.protectCheck}
+          >
+            {/* Under `continue`, the continue index is `..`, not `../continue`. */}
+            <SignUpProtectCheck continuePath='..' />
+          </Route>
+          <Route
             path='verify-email-address'
             canActivate={clerk => !!clerk.client.signUp.emailAddress}
           >

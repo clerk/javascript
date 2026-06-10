@@ -11,12 +11,22 @@ import { handleError } from '@/ui/utils/errorHandler';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
-import { isSignInProtectGated } from './handleProtectCheck';
+import { navigateOnSignInProtectGate } from './handleProtectCheck';
 
 /** Search param set when navigating from the start page "Forgot password?" action. */
 export const SIGN_IN_RESET_PASSWORD_INTENT_PARAM = '__clerk_reset_password';
 
-function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>) {
+/**
+ * @param onSecondFactor - invoked when the passkey attempt resolves to a second factor.
+ * @param protectCheckPath - route to the protect-check card relative to the caller's mount.
+ *   Defaults to the factor-one mount (`'../protect-check'`); `SignInStart` (index route) must pass
+ *   `'protect-check'`, otherwise an autofill-triggered, gated passkey sign-in dead-ends at the app
+ *   root instead of `/sign-in/protect-check`.
+ */
+function useHandleAuthenticateWithPasskey(
+  onSecondFactor: () => Promise<unknown>,
+  protectCheckPath = '../protect-check',
+) {
   const card = useCardState();
   // @ts-expect-error -- private method for the time being
   const { setActive, __internal_navigateWithError } = useClerk();
@@ -35,10 +45,9 @@ function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>
     try {
       const res = await authenticateWithPasskey(...args);
       // A protect_check gate can fire on attempt_first_factor, which is what
-      // authenticateWithPasskey calls under the hood. Detect both the explicit field and the
-      // SDK-version-gated status before dispatching on the underlying status.
-      if (isSignInProtectGated(res)) {
-        return navigate('../protect-check');
+      // authenticateWithPasskey calls under the hood.
+      if (navigateOnSignInProtectGate(res, navigate, protectCheckPath)) {
+        return;
       }
       switch (res.status) {
         case 'complete':
@@ -50,8 +59,6 @@ function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>
           });
         case 'needs_second_factor':
           return onSecondFactor();
-        case 'needs_protect_check':
-          return navigate('../protect-check');
         default:
           return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
       }

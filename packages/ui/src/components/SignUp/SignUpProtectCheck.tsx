@@ -1,5 +1,6 @@
 import { useClerk } from '@clerk/shared/react';
-import type { SignUpResource } from '@clerk/shared/types';
+import type { SignUpProps, SignUpResource } from '@clerk/shared/types';
+import type { ComponentType } from 'react';
 
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
@@ -12,7 +13,26 @@ import { useProtectCheckRunner } from '../../hooks/useProtectCheckRunner';
 import { useRouter } from '../../router';
 import { completeSignUpFlow } from './util';
 
-function SignUpProtectCheckInternal(): JSX.Element {
+/**
+ * Continuation paths default to the standalone `/sign-up/protect-check` mount. When the card is
+ * mounted deeper (e.g. `continue/protect-check` or the combined-flow `create/.../protect-check`),
+ * the nested route passes overrides so a resolved gate routes within the correct subtree instead
+ * of dead-ending. The verify/self paths resolve correctly from every mount; only `continuePath`
+ * differs (the `continue` index is `..`, not `../continue`, once we're already under `continue`).
+ */
+type SignUpProtectCheckProps = Partial<SignUpProps> & {
+  verifyEmailPath?: string;
+  verifyPhonePath?: string;
+  continuePath?: string;
+  protectCheckPath?: string;
+};
+
+function SignUpProtectCheckInternal({
+  verifyEmailPath = '../verify-email-address',
+  verifyPhonePath = '../verify-phone-number',
+  continuePath = '../continue',
+  protectCheckPath = '.',
+}: SignUpProtectCheckProps = {}): JSX.Element {
   const card = useCardState();
   const { t } = useLocalizations();
   const signUp = useCoreSignUp();
@@ -35,10 +55,10 @@ function SignUpProtectCheckInternal(): JSX.Element {
       }
       await completeSignUpFlow({
         signUp: updatedSignUp,
-        verifyEmailPath: '../verify-email-address',
-        verifyPhonePath: '../verify-phone-number',
-        protectCheckPath: '.', // Self-navigate so a chained challenge re-runs this same route
-        continuePath: '../continue',
+        verifyEmailPath,
+        verifyPhonePath,
+        protectCheckPath, // Defaults to '.' so a chained challenge re-runs this same route
+        continuePath,
         handleComplete: () =>
           setActive({
             session: updatedSignUp.createdSessionId,
@@ -86,4 +106,9 @@ function SignUpProtectCheckInternal(): JSX.Element {
   );
 }
 
-export const SignUpProtectCheck = withRedirectToAfterSignUp(withCardStateProvider(SignUpProtectCheckInternal));
+// The redirect HOC widens props back to the shared component-props union; re-expose the path
+// overrides so nested route mounts (continue/protect-check, create/continue/protect-check) can
+// pass them.
+export const SignUpProtectCheck = withRedirectToAfterSignUp(
+  withCardStateProvider(SignUpProtectCheckInternal),
+) as ComponentType<SignUpProtectCheckProps>;

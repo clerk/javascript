@@ -39,7 +39,7 @@ import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useTotalEnabledAuthMethods } from '../../hooks/useTotalEnabledAuthMethods';
 import { useRouter } from '../../router';
 import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
-import { isSignInProtectGated } from './handleProtectCheck';
+import { navigateOnSignInProtectGate } from './handleProtectCheck';
 import {
   hasMultipleEnterpriseConnections,
   SIGN_IN_RESET_PASSWORD_INTENT_PARAM,
@@ -57,7 +57,7 @@ const useAutoFillPasskey = () => {
   const [isSupported, setIsSupported] = useState(false);
   const { navigate } = useRouter();
   const onSecondFactor = () => navigate('factor-two');
-  const authenticateWithPasskey = useHandleAuthenticateWithPasskey(onSecondFactor);
+  const authenticateWithPasskey = useHandleAuthenticateWithPasskey(onSecondFactor, 'protect-check');
   const { userSettings } = useEnvironment();
   const { passkeySettings, attributes } = userSettings;
 
@@ -104,7 +104,7 @@ function SignInStartInternal(): JSX.Element {
    */
   const { isWebAuthnAutofillSupported } = useAutoFillPasskey();
   const onSecondFactor = () => navigate('factor-two');
-  const authenticateWithPasskey = useHandleAuthenticateWithPasskey(onSecondFactor);
+  const authenticateWithPasskey = useHandleAuthenticateWithPasskey(onSecondFactor, 'protect-check');
   const isWebSupported = isWebAuthnSupported();
 
   const onlyPhoneNumberInitialValueExists =
@@ -229,8 +229,8 @@ function SignInStartInternal(): JSX.Element {
         ticket: organizationTicket,
       })
       .then(res => {
-        if (isSignInProtectGated(res)) {
-          return navigate('protect-check');
+        if (navigateOnSignInProtectGate(res, navigate, 'protect-check')) {
+          return;
         }
         switch (res.status) {
           case 'needs_first_factor': {
@@ -244,8 +244,6 @@ function SignInStartInternal(): JSX.Element {
             return navigate('factor-two');
           case 'needs_client_trust':
             return navigate('client-trust');
-          case 'needs_protect_check':
-            return navigate('protect-check');
           case 'complete':
             removeClerkQueryParam('__clerk_ticket');
             return clerk.setActive({
@@ -389,8 +387,8 @@ function SignInStartInternal(): JSX.Element {
     try {
       const res = await safePasswordSignInForEnterpriseSSOInstance(signIn.create(buildSignInParams(fields)), fields);
 
-      if (isSignInProtectGated(res)) {
-        return navigate('protect-check');
+      if (navigateOnSignInProtectGate(res, navigate, 'protect-check')) {
+        return;
       }
 
       switch (res.status) {
@@ -416,8 +414,6 @@ function SignInStartInternal(): JSX.Element {
           return navigate('factor-two');
         case 'needs_client_trust':
           return navigate('client-trust');
-        case 'needs_protect_check':
-          return navigate('protect-check');
         case 'complete':
           return clerk.setActive({
             session: res.createdSessionId,

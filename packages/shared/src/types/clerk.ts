@@ -2719,6 +2719,10 @@ export interface ClerkAuthenticateWithWeb3Params {
    */
   secondFactorUrl?: string;
   /**
+   * The URL to navigate to if a Clerk Protect challenge gates the flow.
+   */
+  protectCheckUrl?: string;
+  /**
    * The name of the wallet to use for authentication.
    */
   walletName?: string;
