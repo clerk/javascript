@@ -37,6 +37,12 @@ export type KnobValues = Record<string, string | boolean | number>;
 export interface StoryMeta {
   group: string;
   title: string;
+  /**
+   * Path to the file that exports the documented component, relative to the monorepo
+   * root (e.g. `packages/ui/src/mosaic/components/button.tsx`). Rendered as a "View
+   * source" link to the file on GitHub. See `lib/source.ts`.
+   */
+  source?: string;
   styles?: {
     _variants: Record<string, Record<string, unknown>>;
     _defaultVariants?: Record<string, unknown>;

@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
+    "@clerk/headless": "workspace:*",
     "@clerk/ui": "workspace:*",
     "@emotion/react": "^11.11.1",
     "@tailwindcss/typography": "^0.5.19",

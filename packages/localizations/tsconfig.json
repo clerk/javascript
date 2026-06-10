@@ -13,7 +13,8 @@
     "declarationMap": true,
     "outDir": "dist",
     "resolveJsonModule": true,
-    "declarationDir": "dist/types"
+    "declarationDir": "dist/types",
+    "rootDir": "./src"
   },
   "include": ["src"],
   "exclude": ["node_modules", "tmp", "dist", "**/dist/**"]

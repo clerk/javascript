@@ -1,5 +1,5 @@
 import { PageMocking, type MockScenario } from '@clerk/msw';
-import * as l from '../../localizations';
+import * as l from '../../localizations/src';
 import { dark, neobrutalism, shadcn, shadesOfPurple } from '../../ui/src/themes';
 import type { Clerk as ClerkType } from '../';
 import { initCommandPalette } from './cmdk';
