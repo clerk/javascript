@@ -101,7 +101,7 @@ Use `resources` to disable whole resource groups when a project only wants this 
 }
 ```
 
-We recommend leaving all as true, but switching some off can be useful during incremental migrations.
+We recommend leaving all as true, but switching some off can be useful during incremental migrations. This configuration also scopes suggestions and bulk-fix tooling: disabled resource groups are not reported by the rule, so they will not receive editor quick-fixes or bulk-applied fixes.
 
 ## What counts as protected
 
@@ -132,6 +132,10 @@ export default async function Page() {
 ```
 
 General protection must happen at the top of the function, but additional narrowing auth checks can happen further down.
+
+## Suggestions
+
+For each unprotected resource it flags, the rule offers an editor quick-fix suggestion that inserts `await auth.protect()` at the top of the function (making it `async` and adding the `import { auth } from '@clerk/nextjs/server'` import if needed). Suggestions are opt-in: they appear in your editor's quick-fix menu and are not applied by `eslint --fix`, since adding a protection check changes runtime behavior.
 
 ## Implementation details
 

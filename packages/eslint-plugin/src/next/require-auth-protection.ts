@@ -1,16 +1,22 @@
 /* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
-import type { TSESTree } from '@typescript-eslint/utils';
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import type { Rule } from 'eslint';
 
 import type { ExportTarget, FunctionNode } from './lib/exports';
 import { iterateExportAllDeclarations, iterateNamedExports, resolveDefaultExport } from './lib/exports';
 import { type FileKind, getFileKind, getRelativeFolder, isClientModule, isServerFunctionModule } from './lib/file-info';
+import { buildAuthProtectFixes } from './lib/fixers';
 import type { ClassifyOptions } from './lib/match-folders';
 import { classifyFolder, hasDescendantsMatching } from './lib/match-folders';
 import { resolveProjectRoot } from './lib/project-root';
 import { findAuthLocalNames, hasProtectAtTop } from './lib/protection-checks';
 
-export type MessageId = 'missingProtect' | 'exportImported' | 'unverifiableExport' | 'unlistedMixedScopeLayout';
+export type MessageId =
+  | 'missingProtect'
+  | 'addAuthProtect'
+  | 'exportImported'
+  | 'unverifiableExport'
+  | 'unlistedMixedScopeLayout';
 
 interface ResourceOptions {
   /** Route handler files, such as `route.ts`. */
@@ -52,6 +58,7 @@ const DEFAULT_RESOURCES: NormalizedResourceOptions = {
 const rule: Rule.RuleModule = {
   meta: {
     type: 'problem',
+    hasSuggestions: true,
     docs: {
       description: 'Require `await auth.protect()` in App Router resources under protected folders',
     },
@@ -89,6 +96,7 @@ const rule: Rule.RuleModule = {
     messages: {
       missingProtect:
         'Expected `await auth.protect()` at the top of {{subject}} in a folder configured as protected. Add the call to the top of the function, move the file into a public folder, or configure this folder as public.',
+      addAuthProtect: 'Add `await auth.protect()` to the top of this {{subject}}.',
       exportImported:
         "This {{subject}} is exported from '{{source}}'. The rule cannot follow imports across files. Add a wrapper with `await auth.protect()`, or ensure the imported function calls it and add an eslint-disable comment with a reason.",
       unverifiableExport:
@@ -257,6 +265,7 @@ function checkMissingProtect(
         node: getMissingProtectReportNode(target.node, reportNode),
         messageId: 'missingProtect',
         data: { subject },
+        suggest: buildAddAuthProtectSuggestion(context, target.node, subject, authNames),
       });
     }
     return;
@@ -365,6 +374,30 @@ function checkInlineServerFunction(
       node: getMissingProtectReportNode(fn, fn),
       messageId: 'missingProtect',
       data: { subject: 'Inline Server Function' },
+      suggest: buildAddAuthProtectSuggestion(context, fn, 'Inline Server Function', authNames),
     });
   }
+}
+
+function buildAddAuthProtectSuggestion(
+  context: Rule.RuleContext,
+  fn: FunctionNode,
+  subject: string,
+  authNames: Set<string>,
+): Rule.SuggestionReportDescriptor[] {
+  const sourceCode = context.sourceCode;
+  return [
+    {
+      messageId: 'addAuthProtect',
+      data: { subject },
+      fix(fixer) {
+        return buildAuthProtectFixes({
+          fixer: fixer as unknown as TSESLint.RuleFixer,
+          sourceCode: sourceCode as unknown as TSESLint.SourceCode,
+          fn,
+          authNames,
+        }) as unknown as Rule.Fix[];
+      },
+    },
+  ];
 }

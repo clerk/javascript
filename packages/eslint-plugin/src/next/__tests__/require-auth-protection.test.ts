@@ -32,6 +32,59 @@ const config = {
   public: ['app/(routes)/(unauthenticated)/**'],
 };
 
+// The rule offers an `addAuthProtect` suggestion for every `missingProtect`
+// report, and ESLint's RuleTester requires each suggestion to declare its
+// `output`. Rather than hand-maintaining a fixed snapshot on every detection
+// case (this test file is about detection, not the fix), derive the expected
+// suggestion output from the rule itself and attach it per error. Exact
+// suggestion outputs are asserted in require-auth-protection.suggestions.test.ts.
+// RuleTester still independently verifies each suggestion produces valid syntax.
+const suggestionLinter = new Linter({ cwd: projectRoot });
+
+function lintMessages(testCase: RuleTester.InvalidTestCase): LinterTypes.LintMessage[] {
+  return suggestionLinter.verify(
+    testCase.code,
+    {
+      files: ['**/*.{js,jsx,ts,tsx,mjs,cjs}'],
+      languageOptions: {
+        parser: tsParser as unknown as LinterTypes.Parser,
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        parserOptions: { ecmaFeatures: { jsx: true } },
+      },
+      plugins: { '@clerk/next': { rules: { 'require-auth-protection': rule } } },
+      rules: { '@clerk/next/require-auth-protection': ['error', ...((testCase.options ?? []) as unknown[])] },
+    } as unknown as LinterTypes.Config,
+    typeof testCase.filename === 'string' ? testCase.filename : undefined,
+  );
+}
+
+function attachSuggestionOutputs(cases: RuleTester.InvalidTestCase[]): RuleTester.InvalidTestCase[] {
+  return cases.map(testCase => {
+    if (!Array.isArray(testCase.errors)) {
+      return testCase;
+    }
+    const messages = lintMessages(testCase).filter(m => m.ruleId === '@clerk/next/require-auth-protection');
+    const errors = testCase.errors.map((error, index) => {
+      const suggestions = messages[index]?.suggestions;
+      if (typeof error === 'string' || !suggestions || suggestions.length === 0) {
+        return error;
+      }
+      return {
+        ...error,
+        suggestions: suggestions.map(suggestion => ({
+          messageId: suggestion.messageId,
+          output:
+            testCase.code.slice(0, suggestion.fix.range[0]) +
+            suggestion.fix.text +
+            testCase.code.slice(suggestion.fix.range[1]),
+        })),
+      };
+    });
+    return { ...testCase, errors };
+  });
+}
+
 ruleTester.run('require-auth-protection', rule, {
   valid: [
     {
@@ -932,7 +985,7 @@ ruleTester.run('require-auth-protection', rule, {
     },
   ],
 
-  invalid: [
+  invalid: attachSuggestionOutputs([
     {
       name: 'protected page missing protect call',
       code: `
@@ -1709,7 +1762,7 @@ ruleTester.run('require-auth-protection', rule, {
       ],
       errors: [{ messageId: 'missingProtect' }],
     },
-  ],
+  ]),
 });
 
 describe('require-auth-protection schema validation', () => {
