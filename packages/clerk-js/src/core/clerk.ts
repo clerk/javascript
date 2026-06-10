@@ -102,7 +102,6 @@ import type {
   OrganizationProfileProps,
   OrganizationResource,
   OrganizationSwitcherProps,
-  __experimental_MosaicOrganizationProfileProps,
   PricingTableProps,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
@@ -1352,28 +1351,6 @@ export class Clerk implements ClerkInterface {
   };
 
   public unmountPricingTable = (node: HTMLDivElement): void => {
-    void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
-  };
-
-  public __experimental_mountMosaicOrganizationProfile = (
-    node: HTMLDivElement,
-    props?: __experimental_MosaicOrganizationProfileProps,
-  ): void => {
-    this.assertComponentsReady(this.#clerkUI);
-    const component = '__experimental_MosaicOrganizationProfile';
-    void this.#clerkUI
-      .then(ui => ui.ensureMounted({ preloadHint: component }))
-      .then(controls =>
-        controls.mountComponent({
-          name: component,
-          appearanceKey: '__experimental_mosaicOrganizationProfile',
-          node,
-          props,
-        }),
-      );
-  };
-
-  public __experimental_unmountMosaicOrganizationProfile = (node: HTMLDivElement): void => {
     void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 

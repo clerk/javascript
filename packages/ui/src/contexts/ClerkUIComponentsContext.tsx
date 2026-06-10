@@ -1,5 +1,4 @@
 import type {
-  __experimental_MosaicOrganizationProfileProps,
   APIKeysProps,
   ConfigureSSOProps,
   OAuthConsentProps,
@@ -14,7 +13,6 @@ import type { ReactNode } from 'react';
 
 import type { AvailableComponentName, AvailableComponentProps } from '../types';
 import {
-  __experimental_MosaicOrganizationProfileContext,
   APIKeysContext,
   ConfigureSSOContext,
   CreateOrganizationContext,
@@ -177,14 +175,6 @@ export function ComponentContextProvider({
             {children}
           </SessionTasksContext.Provider>
         </TaskSetupMFAContext.Provider>
-      );
-    case '__experimental_MosaicOrganizationProfile':
-      return (
-        <__experimental_MosaicOrganizationProfileContext.Provider
-          value={{ componentName, ...(props as __experimental_MosaicOrganizationProfileProps) }}
-        >
-          {children}
-        </__experimental_MosaicOrganizationProfileContext.Provider>
       );
     default:
       throw new Error(`Unknown component context: ${componentName}`);

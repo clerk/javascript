@@ -33,8 +33,6 @@ const componentImportPaths = {
   OAuthConsent: () => import(/* webpackChunkName: "oauthConsent" */ '../components/OAuthConsent/OAuthConsent'),
   EnableOrganizationsPrompt: () =>
     import(/* webpackChunkName: "enableOrganizationsPrompt" */ '../components/devPrompts/EnableOrganizationsPrompt'),
-  __experimental_MosaicOrganizationProfile: () =>
-    import(/* webpackChunkName: "mosaicOrganizationProfile" */ '../components/MosaicOrganizationProfile'),
 } as const;
 
 export const SignIn = lazy(() => componentImportPaths.SignIn().then(module => ({ default: module.SignIn })));
@@ -157,12 +155,6 @@ export const SessionTasks = lazy(() =>
   componentImportPaths.SessionTasks().then(module => ({ default: module.SessionTasks })),
 );
 
-export const __experimental_MosaicOrganizationProfile = lazy(() =>
-  componentImportPaths.__experimental_MosaicOrganizationProfile().then(module => ({
-    default: module.MosaicOrganizationProfile,
-  })),
-);
-
 export const preloadComponent = async (component: unknown) => {
   return componentImportPaths[component as keyof typeof componentImportPaths]?.();
 };
@@ -199,7 +191,6 @@ export const ClerkComponents = {
   TaskChooseOrganization,
   TaskResetPassword,
   TaskSetupMFA,
-  __experimental_MosaicOrganizationProfile,
 };
 
 export type ClerkComponentName = keyof typeof ClerkComponents;
