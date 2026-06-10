@@ -1,5 +1,4 @@
 ---
-"@clerk/headless": patch
 "@clerk/ui": patch
 ---
 
