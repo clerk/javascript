@@ -27,11 +27,13 @@ import { useClipboard } from '@/hooks';
 import { Checkmark, Clipboard } from '@/icons';
 import { useFormControl } from '@/utils/useFormControl';
 
+import { useConfigureSSO } from '../ConfigureSSOContext';
 import { Step } from '../elements/Step';
 import { InnerStepCounter } from '../elements/Wizard/InnerStepCounter';
 
 export const VerifyDomainsStep = (): JSX.Element => {
   const { t } = useLocalizations();
+  const { organizationDomains } = useConfigureSSO();
 
   // TODO: replace with the enterprise connection domain API
   const [domains, setDomains] = useState<string[]>([]);
@@ -77,19 +79,24 @@ export const VerifyDomainsStep = (): JSX.Element => {
               )}
             </Col>
 
-            {/* TODO -> Only render when there is existing organization domains */}
-            <Col sx={t => ({ gap: t.space.$3 })}>
-              <Col sx={t => ({ gap: t.space.$4 })}>
-                <Text
-                  localizationKey={localizationKeys('configureSSO.verifyDomainsStep.txtRecordInstructions.paragraph1')}
-                />
-                <Text
-                  localizationKey={localizationKeys('configureSSO.verifyDomainsStep.txtRecordInstructions.paragraph2')}
-                />
-              </Col>
+            {!!organizationDomains?.length && (
+              <Col sx={t => ({ gap: t.space.$3 })}>
+                <Col sx={t => ({ gap: t.space.$4 })}>
+                  <Text
+                    localizationKey={localizationKeys(
+                      'configureSSO.verifyDomainsStep.txtRecordInstructions.paragraph1',
+                    )}
+                  />
+                  <Text
+                    localizationKey={localizationKeys(
+                      'configureSSO.verifyDomainsStep.txtRecordInstructions.paragraph2',
+                    )}
+                  />
+                </Col>
 
-              <TxtRecordTable />
-            </Col>
+                <TxtRecordTable />
+              </Col>
+            )}
           </Step.Section>
         </Step.Body>
       </Step>
@@ -198,6 +205,7 @@ const TxtRecordTable = (): JSX.Element => {
                 align='center'
                 sx={t => ({ gap: t.space.$2 })}
               >
+                {/* TODO -> Add animated transition once the status changes */}
                 {record.status === 'verified' ? (
                   <Icon
                     icon={Checkmark}

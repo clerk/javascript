@@ -548,6 +548,7 @@ export const enUS_v4: any = {
     badge__automaticInvitation: 'Automatic invitations',
     badge__automaticSuggestion: 'Automatic suggestions',
     badge__manualInvitation: 'No automatic enrollment',
+    badge__enterpriseSso: 'Enterprise SSO',
     start: {
       headerTitle__members: 'Members',
       headerTitle__settings: 'Settings',
