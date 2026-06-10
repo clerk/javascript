@@ -1,3 +1,4 @@
+import type { OrganizationDomainResource } from '@clerk/shared/types';
 import type React from 'react';
 import { useState } from 'react';
 
@@ -21,6 +22,7 @@ import {
   useLocalizations,
 } from '@/customizables';
 import { Alert } from '@/elements/Alert';
+import { useCardState } from '@/elements/contexts';
 import { Field } from '@/elements/FieldControl';
 import { Form } from '@/elements/Form';
 import { TagPill } from '@/elements/TagInput';
@@ -32,6 +34,7 @@ import { useFormControl } from '@/utils/useFormControl';
 import { useConfigureSSO } from '../ConfigureSSOContext';
 import { Step } from '../elements/Step';
 import { InnerStepCounter } from '../elements/Wizard/InnerStepCounter';
+import { useWizard } from '../elements/Wizard/WizardContext';
 
 export const VerifyDomainsStep = (): JSX.Element => {
   const { t } = useLocalizations();
@@ -39,20 +42,24 @@ export const VerifyDomainsStep = (): JSX.Element => {
     organizationDomains,
     organizationDomainMutations: { createDomain, revalidate },
   } = useConfigureSSO();
-
-  const [error, setError] = useState<string | undefined>(undefined);
+  const { goPrev, goNext, isFirstStep, isLastStep } = useWizard();
+  const card = useCardState();
 
   const handleCreateDomain = async (domain: string) => {
-    setError(undefined);
+    card.setError(undefined);
 
     try {
       await createDomain(domain);
     } catch (err) {
       const apiError = getGlobalError(err as Error) ?? getFieldError(err as Error);
-      setError(apiError ? getClerkAPIErrorMessage(apiError) : (err as Error).message);
+      card.setError(apiError ? getClerkAPIErrorMessage(apiError) : (err as Error).message);
       throw err;
     }
   };
+
+  const hasAllDomainsVerified =
+    organizationDomains?.length &&
+    organizationDomains?.every(domain => domain.ownershipVerification?.status === 'verified');
 
   return (
     <Flow.Part part='verifyDomain'>
@@ -70,7 +77,10 @@ export const VerifyDomainsStep = (): JSX.Element => {
         <Step.Body>
           <Step.Section sx={t => ({ gap: t.space.$5 })}>
             <Col>
-              <DomainsField onSubmit={handleCreateDomain} />
+              <DomainsField
+                onSubmit={handleCreateDomain}
+                organizationDomains={organizationDomains}
+              />
 
               {!!organizationDomains?.length && (
                 <Flex
@@ -81,6 +91,7 @@ export const VerifyDomainsStep = (): JSX.Element => {
                     <TagPill
                       key={domain.id}
                       onRemoveClick={() => {
+                        // TODO ORGS-1623 - Add dialog for domain deletion confirmation
                         void domain.delete().then(() => revalidate());
                       }}
                     >
@@ -90,10 +101,10 @@ export const VerifyDomainsStep = (): JSX.Element => {
                 </Flex>
               )}
 
-              {error && (
+              {card.error && (
                 <Alert
                   variant='danger'
-                  title={error}
+                  title={card.error}
                   sx={t => ({ marginTop: t.space.$4 })}
                 />
               )}
@@ -114,17 +125,34 @@ export const VerifyDomainsStep = (): JSX.Element => {
                   />
                 </Col>
 
-                <TxtRecordTable />
+                <TxtRecordTable organizationDomains={organizationDomains} />
               </Col>
             )}
           </Step.Section>
         </Step.Body>
+
+        <Step.Footer>
+          <Step.Footer.Previous
+            onClick={() => goPrev()}
+            isDisabled={isFirstStep}
+          />
+          <Step.Footer.Continue
+            onClick={() => goNext()}
+            isDisabled={isLastStep || !hasAllDomainsVerified}
+          />
+        </Step.Footer>
       </Step>
     </Flow.Part>
   );
 };
 
-const DomainsField = ({ onSubmit }: { onSubmit: (domain: string) => Promise<void> }): JSX.Element => {
+const DomainsField = ({
+  onSubmit,
+  organizationDomains,
+}: {
+  onSubmit: (domain: string) => Promise<void>;
+  organizationDomains: OrganizationDomainResource[] | undefined;
+}): JSX.Element => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const domainField = useFormControl('domain', '', {
     type: 'text',
@@ -133,7 +161,7 @@ const DomainsField = ({ onSubmit }: { onSubmit: (domain: string) => Promise<void
   });
 
   const domain = domainField.value.trim().toLowerCase();
-  const canSubmit = isValidDomain(domain) && !isSubmitting;
+  const canSubmit = isValidDomain(domain) && !organizationDomains?.some(d => d.name === domain) && !isSubmitting;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -196,24 +224,11 @@ const DomainsField = ({ onSubmit }: { onSubmit: (domain: string) => Promise<void
 const DOMAIN_REGEX = /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/i;
 const isValidDomain = (value: string): boolean => DOMAIN_REGEX.test(value);
 
-const txtRecordsMock = [
-  {
-    domain: 'test.com',
-    type: 'TXT',
-    name: '@',
-    value: 'hellooo-domain-verification-axxn86=sdfsdfsdfsdfdsf',
-    status: 'pending',
-  },
-  {
-    domain: 'acme.com',
-    type: 'TXT',
-    name: '@',
-    value: 'hellooo2-domain-verification-axxn86=sdfsdfsdfsdfdsf',
-    status: 'verified',
-  },
-];
-
-const TxtRecordTable = (): JSX.Element => {
+const TxtRecordTable = ({
+  organizationDomains,
+}: {
+  organizationDomains: OrganizationDomainResource[] | undefined;
+}): JSX.Element => {
   return (
     <Table>
       <Thead>
@@ -225,42 +240,56 @@ const TxtRecordTable = (): JSX.Element => {
         </Tr>
       </Thead>
       <Tbody>
-        {txtRecordsMock.map(record => (
-          <Tr key={record.domain}>
-            <Td>
-              <Flex
-                as='span'
-                align='center'
-                sx={t => ({ gap: t.space.$2 })}
-              >
-                {/* TODO -> Add animated transition once the status changes */}
-                {record.status === 'verified' ? (
-                  <Icon
-                    icon={Checkmark}
-                    colorScheme='success'
-                    sx={t => ({ flexShrink: 0, width: t.sizes.$3, height: t.sizes.$3 })}
-                  />
+        {organizationDomains?.map(domain => {
+          const ownershipVerification = domain.ownershipVerification;
+          const isVerified = ownershipVerification?.status === 'verified';
+
+          return (
+            <Tr key={domain.id}>
+              <Td>
+                <Flex
+                  as='span'
+                  align='center'
+                  sx={t => ({ gap: t.space.$2 })}
+                >
+                  {/* TODO -> Add animated transition once the status changes */}
+                  {isVerified ? (
+                    <Icon
+                      icon={Checkmark}
+                      colorScheme='success'
+                      sx={t => ({ flexShrink: 0, width: t.sizes.$3, height: t.sizes.$3 })}
+                    />
+                  ) : (
+                    <Spinner
+                      size='xs'
+                      colorScheme='neutral'
+                      sx={{ flexShrink: 0 }}
+                    />
+                  )}
+                  <Text as='span'>{domain.name}</Text>
+                </Flex>
+              </Td>
+              <Td>
+                <Text as='span'>TXT</Text>
+              </Td>
+              <Td>
+                <Text as='span'>{ownershipVerification?.txtRecordName ?? '—'}</Text>
+              </Td>
+              <Td sx={{ width: '50%', maxWidth: '1px' }}>
+                {ownershipVerification?.txtRecordValue ? (
+                  <TxtRecordValueCell value={ownershipVerification.txtRecordValue} />
                 ) : (
-                  <Spinner
-                    size='xs'
-                    colorScheme='neutral'
-                    sx={{ flexShrink: 0 }}
-                  />
+                  <Text
+                    as='span'
+                    colorScheme='secondary'
+                  >
+                    —
+                  </Text>
                 )}
-                <Text as='span'>{record.domain}</Text>
-              </Flex>
-            </Td>
-            <Td>
-              <Text as='span'>{record.type}</Text>
-            </Td>
-            <Td>
-              <Text as='span'>{record.name}</Text>
-            </Td>
-            <Td sx={{ width: '50%', maxWidth: '1px' }}>
-              <TxtRecordValueCell value={record.value} />
-            </Td>
-          </Tr>
-        ))}
+              </Td>
+            </Tr>
+          );
+        })}
       </Tbody>
     </Table>
   );

@@ -6,7 +6,6 @@ import {
 } from '@clerk/shared/react';
 import type {
   DeletedObjectResource,
-  EmailAddressResource,
   EnterpriseConnectionResource,
   EnterpriseConnectionTestRunInitResource,
   EnterpriseConnectionTestRunResource,
@@ -39,13 +38,9 @@ import { type RefreshTestRunsOptions, useEnterpriseConnectionTestRuns } from './
  */
 export interface EnterpriseConnectionMutations {
   /**
-   * Derives the connection name from the email domain; resolves to `undefined`
-   * without creating when no primary email is available.
+   * Creates a new enterprise connection for the active organization.
    */
-  createConnection: (
-    provider: ProviderType,
-    primaryEmailAddress?: EmailAddressResource,
-  ) => Promise<EnterpriseConnectionResource | undefined>;
+  createConnection: (provider: ProviderType, domains?: string[]) => Promise<EnterpriseConnectionResource | undefined>;
   updateConnection: (
     id: string,
     params: UpdateOrganizationEnterpriseConnectionParams,
@@ -162,7 +157,7 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
   const { organization } = useOrganization();
 
   const enterpriseConnectionMutations = useMemo<EnterpriseConnectionMutations>(() => {
-    const createConnection: EnterpriseConnectionMutations['createConnection'] = provider => {
+    const createConnection: EnterpriseConnectionMutations['createConnection'] = (provider, domains) => {
       const primaryEmailAddress = user?.primaryEmailAddress;
       const emailDomain = primaryEmailAddress?.emailAddress.split('@')[1];
 
@@ -173,7 +168,7 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
       return createEnterpriseConnection({
         provider,
         name: connectionName,
-        domains: ['clerk.dev'],
+        domains,
       });
     };
 
