@@ -10,7 +10,16 @@ import { ViewSource } from './ViewSource';
 const docModules: Record<string, React.ComponentType> = {
   button: dynamic(() => import('../stories/button.mdx')),
   input: dynamic(() => import('../stories/input.mdx')),
+  // Headless primitives — alphabetical.
+  accordion: dynamic(() => import('../stories/accordion.mdx')),
+  autocomplete: dynamic(() => import('../stories/autocomplete.mdx')),
   collapsible: dynamic(() => import('../stories/collapsible.mdx')),
+  dialog: dynamic(() => import('../stories/dialog.mdx')),
+  menu: dynamic(() => import('../stories/menu.mdx')),
+  popover: dynamic(() => import('../stories/popover.mdx')),
+  select: dynamic(() => import('../stories/select.mdx')),
+  tabs: dynamic(() => import('../stories/tabs.mdx')),
+  tooltip: dynamic(() => import('../stories/tooltip.mdx')),
 };
 
 interface DocsViewerProps {
