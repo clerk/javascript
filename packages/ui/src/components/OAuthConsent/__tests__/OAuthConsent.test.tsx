@@ -393,7 +393,7 @@ describe('OAuthConsent', () => {
       });
     });
 
-    it('does not display user:org:read in the scopes list', async () => {
+    it('displays user:org:read in the scopes list', async () => {
       const { wrapper, fixtures, props } = await createFixtures(f => {
         f.withUser({
           email_addresses: ['jane@example.com'],
@@ -410,7 +410,7 @@ describe('OAuthConsent', () => {
       const { queryByText } = render(<OAuthConsent />, { wrapper });
 
       await waitFor(() => {
-        expect(queryByText('Access your organizations')).toBeNull();
+        expect(queryByText('Access your organizations')).toBeVisible();
       });
     });
 

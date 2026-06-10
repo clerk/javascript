@@ -675,6 +675,9 @@ importers:
       react-dom:
         specifier: 18.3.1
         version: 18.3.1(react@18.3.1)
+      rollup-plugin-preserve-directives:
+        specifier: ^0.4.0
+        version: 0.4.0(rollup@4.60.2)
       typescript:
         specifier: catalog:repo
         version: 5.8.3
@@ -12704,6 +12707,11 @@ packages:
     resolution: {integrity: sha512-Mid74GckX1OeFAOYz9KuXeWYhq3xkXbMziYIC+ULVdUzPTG9y70OBSBQDQn9hQP8u/AfhuYw1R0BSg15nBI4Dg==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
+
+  rollup-plugin-preserve-directives@0.4.0:
+    resolution: {integrity: sha512-gx4nBxYm5BysmEQS+e2tAMrtFxrGvk+Pe5ppafRibQi0zlW7VYAbEGk6IKDw9sJGPdFWgVTE0o4BU4cdG0Fylg==}
+    peerDependencies:
+      rollup: 2.x || 3.x || 4.x
 
   rollup-plugin-visualizer@7.0.1:
     resolution: {integrity: sha512-UJUT4+1Ho4OcWmPYU3sYXgUqI8B8Ayfe06MX7y0qCJ1K8aGoKtR/NDd/2nZqM7ADkrzny+I99Ul7GgyoiVNAgg==}
@@ -29525,6 +29533,12 @@ snapshots:
     transitivePeerDependencies:
       - '@emnapi/core'
       - '@emnapi/runtime'
+
+  rollup-plugin-preserve-directives@0.4.0(rollup@4.60.2):
+    dependencies:
+      '@rollup/pluginutils': 5.3.0(rollup@4.60.2)
+      magic-string: 0.30.21
+      rollup: 4.60.2
 
   rollup-plugin-visualizer@7.0.1(rolldown@1.0.0-beta.47(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))(rollup@4.60.2):
     dependencies:
