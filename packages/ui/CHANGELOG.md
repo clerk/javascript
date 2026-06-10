@@ -1,5 +1,29 @@
 # @clerk/ui
 
+## 1.15.1
+
+### Patch Changes
+
+- Fix Chrome-specific scroll jump when toggling the billing period switch on the pricing table. ([#8742](https://github.com/clerk/javascript/pull/8742)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix a circular import in the styled-system that could crash module initialization under bundler configurations with tree-shaking disabled. ([#8754](https://github.com/clerk/javascript/pull/8754)) by [@jacekradko](https://github.com/jacekradko)
+
+- Internal refactor for self-serve SSO wizard navigation to leverage a guard-based state machine. ([#8715](https://github.com/clerk/javascript/pull/8715)) by [@iagodahlem](https://github.com/iagodahlem)
+
+  It makes the step navigation more predictable: the step you land on (including after a reload) and which steps you can move to are derived from the connection's state, the connection reset flow lands you on the right step.
+
+- Correctly display OAuth consent redirect domains for known multi-label public suffixes. ([#8700](https://github.com/clerk/javascript/pull/8700)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix modal backdrop appearing light in dark mode ([#8743](https://github.com/clerk/javascript/pull/8743)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add a "Forgot password?" action on the sign-in start page when the password field is shown. This improves the account recovery UX when strict user enumeration protection is enabled. ([#8733](https://github.com/clerk/javascript/pull/8733)) by [@Ephem](https://github.com/Ephem)
+
+- Add and improve JSDoc comments across public types and methods to support generated reference documentation for the `/objects` docs section. Exports a few previously-internal types (`OnEventListener`, `OffEventListener`, `ClerkOptionsNavigation`) so they can be referenced from the generated docs. ([#8276](https://github.com/clerk/javascript/pull/8276)) by [@alexisintech](https://github.com/alexisintech)
+
+- Updated dependencies [[`2d6670c`](https://github.com/clerk/javascript/commit/2d6670c6c05c59901709283921b5d65c43f3a676), [`af706e3`](https://github.com/clerk/javascript/commit/af706e35420a16c028fd34b70dd50d663d42e006), [`032632c`](https://github.com/clerk/javascript/commit/032632c6982297e53e28559b59b4a435de4c9adc), [`0fece6f`](https://github.com/clerk/javascript/commit/0fece6ff5d2b1babb59a285dbce9d46723e33d73), [`b295af3`](https://github.com/clerk/javascript/commit/b295af3d5bb12e09a502cae4a935d2e7f5d35d5c), [`8e1bd48`](https://github.com/clerk/javascript/commit/8e1bd48a91dc07751493f41416d2a68b89e114cc), [`90bc732`](https://github.com/clerk/javascript/commit/90bc732143e907051f2cefab8a31283e3d985126)]:
+  - @clerk/shared@4.16.0
+  - @clerk/localizations@4.7.2
+
 ## 1.15.0
 
 ### Minor Changes
