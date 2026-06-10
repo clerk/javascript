@@ -176,7 +176,7 @@ describe('useOrganizationEnterpriseConnection — mutations', () => {
   it('createConnection derives name + domains from the email domain and forwards them (no organizationId in body)', async () => {
     const { result } = renderHook(() => useOrganizationEnterpriseConnection());
 
-    await result.current.mutations.createConnection('saml_okta', emailAddress('admin@acme.com'));
+    await result.current.enterpriseConnectionMutations.createConnection('saml_okta', emailAddress('admin@acme.com'));
 
     expect(mutationSpies.create).toHaveBeenCalledTimes(1);
     expect(mutationSpies.create).toHaveBeenCalledWith({
@@ -189,14 +189,16 @@ describe('useOrganizationEnterpriseConnection — mutations', () => {
   it('createConnection resolves to undefined without creating when no email is available', async () => {
     const { result } = renderHook(() => useOrganizationEnterpriseConnection());
 
-    await expect(result.current.mutations.createConnection('saml_okta', undefined)).resolves.toBeUndefined();
+    await expect(
+      result.current.enterpriseConnectionMutations.createConnection('saml_okta', undefined),
+    ).resolves.toBeUndefined();
     expect(mutationSpies.create).not.toHaveBeenCalled();
   });
 
   it('setConnectionActive forwards only the active flag to update', async () => {
     const { result } = renderHook(() => useOrganizationEnterpriseConnection());
 
-    await result.current.mutations.setConnectionActive('ent_1', true);
+    await result.current.enterpriseConnectionMutations.setConnectionActive('ent_1', true);
 
     expect(mutationSpies.update).toHaveBeenCalledWith('ent_1', { active: true });
   });

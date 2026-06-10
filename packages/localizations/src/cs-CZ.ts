@@ -203,6 +203,22 @@ export const csCZ: LocalizationResource = {
     verifyDomainsStep: {
       title: 'Ověřit doménu',
       subtitle: 'Zadejte a ověřte doménu, pro kterou chcete nakonfigurovat SSO.',
+      formFieldLabel__domain: 'Domény',
+      formFieldInputPlaceholder__domain: 'Zde zadejte svou doménu a kliknutím na přidat začněte',
+      formButtonPrimary__add: 'Přidat',
+      txtRecordInstructions: {
+        paragraph1: 'Přidejte tento záznam TXT u svého poskytovatele DNS.',
+        paragraph2:
+          'Jakmile bude záznam aktivní, ověříme jej automaticky. Obvykle to trvá méně než minutu, i když aktualizace stávajícího záznamu TXT může chvíli trvat déle.',
+      },
+      txtRecordTable: {
+        columns: {
+          domain: 'Doména',
+          type: 'Typ',
+          hostName: 'Host / Název',
+          value: 'Hodnota',
+        },
+      },
     },
   },
   createOrganization: {

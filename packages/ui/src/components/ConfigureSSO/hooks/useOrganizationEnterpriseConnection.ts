@@ -71,7 +71,7 @@ export interface UseOrganizationEnterpriseConnectionResult {
   enterpriseConnection: EnterpriseConnectionResource | undefined;
   /** The domain entity the wizard makes every flow decision from. */
   organizationEnterpriseConnection: OrganizationEnterpriseConnection;
-  mutations: EnterpriseConnectionMutations;
+  enterpriseConnectionMutations: EnterpriseConnectionMutations;
   testRuns: TestRunsView;
 }
 
@@ -161,13 +161,18 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
   const { session } = useSession();
   const { organization } = useOrganization();
 
-  const mutations = useMemo<EnterpriseConnectionMutations>(() => {
+  const enterpriseConnectionMutations = useMemo<EnterpriseConnectionMutations>(() => {
     const createConnection: EnterpriseConnectionMutations['createConnection'] = provider => {
+      const primaryEmailAddress = user?.primaryEmailAddress;
+      const emailDomain = primaryEmailAddress?.emailAddress.split('@')[1];
+
+      // Connection name will always be defined due to the organization name
+      // Soon this logic will be moved to the Frontend API
+      const connectionName = emailDomain ?? organization?.name ?? '';
+
       return createEnterpriseConnection({
         provider,
-        // TODO -> Define name
-        name: 'clerk.dev',
-        // TODO -> Add organization domains to the connection
+        name: connectionName,
         domains: ['clerk.dev'],
       });
     };
@@ -249,7 +254,7 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
     isLoading: isLoadingEnterpriseConnections || (hadInitialConnection && isLoadingTestRuns),
     enterpriseConnection,
     organizationEnterpriseConnection,
-    mutations,
+    enterpriseConnectionMutations,
     testRuns,
   };
 };

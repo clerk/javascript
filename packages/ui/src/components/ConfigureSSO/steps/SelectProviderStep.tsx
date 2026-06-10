@@ -57,7 +57,7 @@ const PROVIDER_GROUPS: ReadonlyArray<{
 export const SelectProviderStep = (): JSX.Element => {
   const {
     organizationEnterpriseConnection: c,
-    mutations: { createConnection },
+    enterpriseConnectionMutations: { createConnection },
   } = useConfigureSSO();
   const { goNext } = useWizard();
 

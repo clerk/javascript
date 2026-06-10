@@ -10,6 +10,7 @@ import { ProfileCard } from '@/elements/ProfileCard';
 import { ExclamationTriangle } from '@/icons';
 import { Route, Switch } from '@/router';
 
+import type { OrganizationDomainMutations } from './ConfigureSSOContext';
 import { ConfigureSSONavbar } from './ConfigureSSONavbar';
 import { ConfigureSSOSkeleton } from './ConfigureSSOSkeleton';
 import { ConfigureSSOWizard } from './ConfigureSSOWizard';
@@ -49,12 +50,24 @@ const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObject<HTMLD
     enterpriseConnection,
     organizationEnterpriseConnection,
     testRuns,
-    mutations,
+    enterpriseConnectionMutations,
   } = useOrganizationEnterpriseConnection();
 
-  const { isLoading: isLoadingOrganizationDomains, data: organizationDomains } = __internal_useOrganizationDomains({
+  const {
+    isLoading: isLoadingOrganizationDomains,
+    data: organizationDomains,
+    createDomain,
+    prepareOwnershipVerification,
+    attemptOwnershipVerification,
+    revalidate,
+  } = __internal_useOrganizationDomains({
     enrollmentMode: 'enterprise_sso',
   });
+
+  const organizationDomainMutations = React.useMemo<OrganizationDomainMutations>(
+    () => ({ createDomain, prepareOwnershipVerification, attemptOwnershipVerification, revalidate }),
+    [createDomain, prepareOwnershipVerification, attemptOwnershipVerification, revalidate],
+  );
 
   const isLoading = isLoadingEnterpriseConnection || isLoadingOrganizationDomains;
   if (isLoading) {
@@ -68,7 +81,8 @@ const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObject<HTMLD
         testRuns={testRuns}
         enterpriseConnection={enterpriseConnection}
         contentRef={contentRef}
-        mutations={mutations}
+        enterpriseConnectionMutations={enterpriseConnectionMutations}
+        organizationDomainMutations={organizationDomainMutations}
         organizationDomains={organizationDomains}
       />
     </ConfigureSSOProtect>

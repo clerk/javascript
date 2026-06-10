@@ -76,7 +76,7 @@ export const ConfirmationStep = (): JSX.Element => {
 const EnableSsoSection = (): JSX.Element => {
   const {
     enterpriseConnection,
-    mutations: { setConnectionActive },
+    enterpriseConnectionMutations: { setConnectionActive },
   } = useConfigureSSO();
   const card = useCardState();
 

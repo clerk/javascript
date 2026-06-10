@@ -200,6 +200,22 @@ export const bgBG: LocalizationResource = {
     verifyDomainsStep: {
       title: 'Потвърди домейна',
       subtitle: 'Посочете и потвърдете домейна, за който да конфигурирате SSO.',
+      formFieldLabel__domain: 'Домейни',
+      formFieldInputPlaceholder__domain: 'Въведете домейна си тук и щракнете върху добавяне, за да започнете',
+      formButtonPrimary__add: 'Добави',
+      txtRecordInstructions: {
+        paragraph1: 'Добавете този TXT запис при своя DNS доставчик.',
+        paragraph2:
+          'Ще го потвърдим автоматично, щом записът се активира. Това обикновено отнема под минута, въпреки че актуализирането на съществуващ TXT запис може да отнеме малко повече време.',
+      },
+      txtRecordTable: {
+        columns: {
+          domain: 'Домейн',
+          type: 'Тип',
+          hostName: 'Хост / Име',
+          value: 'Стойност',
+        },
+      },
     },
   },
   createOrganization: {

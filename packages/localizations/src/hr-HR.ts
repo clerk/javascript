@@ -228,6 +228,22 @@ export const hrHR: LocalizationResource = {
     verifyDomainsStep: {
       title: 'Potvrdi domenu',
       subtitle: 'Navedite i potvrdite domenu za koju želite konfigurirati SSO.',
+      formFieldLabel__domain: 'Domene',
+      formFieldInputPlaceholder__domain: 'Ovdje upišite svoju domenu i kliknite dodaj za početak',
+      formButtonPrimary__add: 'Dodaj',
+      txtRecordInstructions: {
+        paragraph1: 'Dodajte ovaj TXT zapis kod svog DNS pružatelja.',
+        paragraph2:
+          'Automatski ćemo ga provjeriti čim zapis postane aktivan. To obično traje manje od minute, iako ažuriranje postojećeg TXT zapisa može potrajati nešto dulje.',
+      },
+      txtRecordTable: {
+        columns: {
+          domain: 'Domena',
+          type: 'Vrsta',
+          hostName: 'Host / Naziv',
+          value: 'Vrijednost',
+        },
+      },
     },
   },
   createOrganization: {

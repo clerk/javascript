@@ -29,8 +29,8 @@ vi.mock('../../ConfigureSSOContext', () => ({
   useConfigureSSO: () => ({
     enterpriseConnection: undefined,
     // The step's local `handleContinue` reads the reverification-wrapped create
-    // mutation off the bundled `mutations` object.
-    mutations: {
+    // mutation off the bundled `enterpriseConnectionMutations` object.
+    enterpriseConnectionMutations: {
       createConnection: createEnterpriseConnection,
     },
     primaryEmailAddress: contextState.primaryEmailAddress,

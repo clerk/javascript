@@ -5,6 +5,19 @@ import type { OrganizationEnterpriseConnection } from './domain/organizationEnte
 import type { EnterpriseConnectionMutations, TestRunsView } from './hooks/useOrganizationEnterpriseConnection';
 
 /**
+ * Domain-scoped mutations for the active organization's domains, sourced from
+ * `__internal_useOrganizationDomains`. Kept separate from the
+ * connection-scoped `EnterpriseConnectionMutations` so the two surfaces stay
+ * decoupled and can be lifted independently.
+ */
+export interface OrganizationDomainMutations {
+  createDomain: (name: string) => Promise<OrganizationDomainResource | undefined>;
+  prepareOwnershipVerification: (domain: OrganizationDomainResource) => Promise<OrganizationDomainResource | undefined>;
+  attemptOwnershipVerification: (domain: OrganizationDomainResource) => Promise<OrganizationDomainResource | undefined>;
+  revalidate: () => Promise<void>;
+}
+
+/**
  * Shared state for the ConfigureSSO wizard, persisted across steps. Everything
  * is sourced from the umbrella `useOrganizationEnterpriseConnection` hook one
  * level up, so the context never observes a loading state and the steps read
@@ -14,7 +27,8 @@ export interface ConfigureSSOData {
   enterpriseConnection: EnterpriseConnectionResource | undefined;
   /** Ref to the wizard's scrollable content container. */
   contentRef: React.RefObject<HTMLDivElement>;
-  mutations: EnterpriseConnectionMutations;
+  enterpriseConnectionMutations: EnterpriseConnectionMutations;
+  organizationDomainMutations: OrganizationDomainMutations;
   organizationEnterpriseConnection: OrganizationEnterpriseConnection;
   testRuns: TestRunsView;
   organizationDomains: OrganizationDomainResource[] | undefined;
@@ -26,7 +40,8 @@ interface ConfigureSSOProviderProps {
   testRuns: TestRunsView;
   organizationDomains: OrganizationDomainResource[] | undefined;
   contentRef: React.RefObject<HTMLDivElement>;
-  mutations: EnterpriseConnectionMutations;
+  enterpriseConnectionMutations: EnterpriseConnectionMutations;
+  organizationDomainMutations: OrganizationDomainMutations;
 }
 
 const ConfigureSSOContext = React.createContext<ConfigureSSOData | null>(null);
@@ -38,7 +53,8 @@ export const ConfigureSSOProvider = ({
   testRuns,
   organizationDomains,
   contentRef,
-  mutations,
+  enterpriseConnectionMutations,
+  organizationDomainMutations,
   children,
 }: PropsWithChildren<ConfigureSSOProviderProps>): JSX.Element => {
   const value = React.useMemo<ConfigureSSOData>(
@@ -48,9 +64,18 @@ export const ConfigureSSOProvider = ({
       organizationEnterpriseConnection,
       testRuns,
       organizationDomains,
-      mutations,
+      enterpriseConnectionMutations,
+      organizationDomainMutations,
     }),
-    [contentRef, enterpriseConnection, mutations, organizationEnterpriseConnection, testRuns, organizationDomains],
+    [
+      contentRef,
+      enterpriseConnectionMutations,
+      organizationDomainMutations,
+      organizationEnterpriseConnection,
+      testRuns,
+      organizationDomains,
+      enterpriseConnection,
+    ],
   );
 
   return <ConfigureSSOContext.Provider value={value}>{children}</ConfigureSSOContext.Provider>;

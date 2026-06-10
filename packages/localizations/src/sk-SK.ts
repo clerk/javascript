@@ -199,6 +199,22 @@ export const skSK: LocalizationResource = {
     verifyDomainsStep: {
       title: 'Overiť doménu',
       subtitle: 'Zadajte a overte doménu, pre ktorú chcete nakonfigurovať SSO.',
+      formFieldLabel__domain: 'Domény',
+      formFieldInputPlaceholder__domain: 'Sem zadajte svoju doménu a kliknutím na pridať začnite',
+      formButtonPrimary__add: 'Pridať',
+      txtRecordInstructions: {
+        paragraph1: 'Pridajte tento záznam TXT u svojho poskytovateľa DNS.',
+        paragraph2:
+          'Po sprístupnení záznamu ho overíme automaticky. Zvyčajne to trvá menej než minútu, hoci aktualizácia existujúceho záznamu TXT môže trvať o niečo dlhšie.',
+      },
+      txtRecordTable: {
+        columns: {
+          domain: 'Doména',
+          type: 'Typ',
+          hostName: 'Hostiteľ / Názov',
+          value: 'Hodnota',
+        },
+      },
     },
   },
   createOrganization: {
