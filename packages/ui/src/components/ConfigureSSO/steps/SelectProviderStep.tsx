@@ -1,5 +1,4 @@
 import { iconImageUrl } from '@clerk/shared/constants';
-import { useUser } from '@clerk/shared/react/index';
 import React from 'react';
 
 import type { LocalizationKey } from '@/customizables';
@@ -62,40 +61,60 @@ const PROVIDER_GROUPS: ReadonlyArray<{
 ];
 
 export const SelectProviderStep = (): JSX.Element => {
-  const { goToStep } = useWizard();
-  const { provider, setProvider, createEnterpriseConnection } = useConfigureSSO();
+  const {
+    primaryEmailAddress,
+    organizationEnterpriseConnection: c,
+    mutations: { createConnection },
+  } = useConfigureSSO();
+  const { goNext } = useWizard();
 
-  // Re-hydrate from context so users returning from `verify-domain`
-  // (after picking a provider but needing to verify their email first)
-  // don't have to re-click their provider.
-  const [selected, setSelected] = React.useState<ProviderType | null>(provider ?? null);
-  const { user } = useUser();
+  // Re-hydrate from context so users returning from another step don't have to
+  // re-click their provider.
+  const [selected, setSelected] = React.useState<ProviderType | null>(c.provider ?? null);
   const card = useCardState();
 
-  const handleContinue = async () => {
-    if (!selected || !user) {
+  // Step-LOCAL submit state for the Continue button. `goNext` now DEFERS the
+  // advance until the next step's guard catches up to the just-resolved create
+  // (the wizard machine resolves it on the next render), so the shared card
+  // loading would otherwise leak into the next step as an idle flash. Keeping
+  // the loading local — and NOT resetting it on success — holds the button in
+  // its loading state straight through the transition; the deferred advance
+  // unmounts this step, which ends the loading visually with no idle frame.
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+
+  const handleSelect = (next: ProviderType) => {
+    setSelected(next);
+  };
+
+  // On a fresh start the create is unconditional, then `goNext` lands `configure`
+  // because the resolved create flips `hasConnection`, satisfying its guard. On
+  // revisit a connection already exists, so we never re-create — `goNext` alone.
+  const handleContinue = async (): Promise<void> => {
+    if (!selected) {
       return;
     }
 
-    setProvider(selected);
-
-    const primaryEmailAddress = user?.primaryEmailAddress;
-    const hasVerifiedPrimaryEmailAddress = primaryEmailAddress?.verification.status === 'verified';
-
-    if (!primaryEmailAddress || !hasVerifiedPrimaryEmailAddress) {
-      void goToStep('verify-domain');
+    // Connection already created on a prior visit: don't re-create, just
+    // advance — `configure`'s guard already holds, so this advances immediately
+    // (no submit, no loading).
+    if (c.hasConnection) {
+      goNext();
       return;
     }
 
-    // Otherwise, set the provider and create the enterprise connection
+    card.setError(undefined);
+    setIsSubmitting(true);
+
     try {
-      await createEnterpriseConnection(selected, primaryEmailAddress);
+      await createConnection(selected, primaryEmailAddress);
+      // `goNext` defers; the button STAYS loading and this step unmounts when
+      // the deferred advance lands. Do NOT reset `isSubmitting` on success.
+      goNext();
     } catch (err) {
       handleError(err as Error, [], card.setError);
-      return;
+      // Re-enable the button ONLY on error — there is no advance to unmount it.
+      setIsSubmitting(false);
     }
-
-    void goToStep('configure');
   };
 
   return (
@@ -144,7 +163,7 @@ export const SelectProviderStep = (): JSX.Element => {
                       iconId={option.iconId}
                       label={option.label}
                       checked={selected === option.id}
-                      onChange={() => setSelected(option.id)}
+                      onChange={() => handleSelect(option.id)}
                     />
                   ))}
                 </Grid>
@@ -171,8 +190,8 @@ export const SelectProviderStep = (): JSX.Element => {
 
           <Step.Footer.Continue
             onClick={handleContinue}
-            isLoading={card.isLoading}
-            isDisabled={!selected}
+            isLoading={isSubmitting}
+            isDisabled={!selected || isSubmitting}
           />
         </Step.Footer>
       </Step>

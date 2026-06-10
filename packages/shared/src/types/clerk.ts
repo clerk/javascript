@@ -79,6 +79,8 @@ export type __experimental_CheckoutOptions = {
   for?: ForPayerType;
   planPeriod: BillingSubscriptionPlanPeriod;
   planId: string;
+  seatsQuantity?: number;
+  priceId?: string;
 };
 
 export type CheckoutErrors = {
@@ -721,26 +723,18 @@ export interface Clerk {
    *
    * @param targetNode - Target to mount the ConfigureSSO component.
    * @param props - Configuration parameters.
+   * @hidden
    */
-  mountConfigureSSO: (targetNode: HTMLDivElement, props?: ConfigureSSOProps) => void;
+  __internal_mountConfigureSSO: (targetNode: HTMLDivElement, props?: ConfigureSSOProps) => void;
 
   /**
    * Unmount a configure SSO component from the target element.
    * If there is no component mounted at the target node, results in a noop.
    *
    * @param targetNode - Target node to unmount the ConfigureSSO component from.
+   * @hidden
    */
-  unmountConfigureSSO: (targetNode: HTMLDivElement) => void;
-
-  /**
-   * @deprecated Use `mountConfigureSSO` instead.
-   */
-  __experimental_mountConfigureSSO: (targetNode: HTMLDivElement, props?: ConfigureSSOProps) => void;
-
-  /**
-   * @deprecated Use `unmountConfigureSSO` instead.
-   */
-  __experimental_unmountConfigureSSO: (targetNode: HTMLDivElement) => void;
+  __internal_unmountConfigureSSO: (targetNode: HTMLDivElement) => void;
 
   /**
    * Mounts a OAuth consent component at the target element.
@@ -2314,15 +2308,15 @@ export type APIKeysProps = {
   showDescription?: boolean;
 };
 
+/**
+ * @internal
+ */
 export type ConfigureSSOProps = {
   /**
    * Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided). See the [`Appearance`](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.
    */
   appearance?: ClerkAppearanceTheme;
 };
-
-/** @deprecated Use `ConfigureSSOProps` instead. */
-export type __experimental_ConfigureSSOProps = ConfigureSSOProps;
 
 /** @generateWithEmptyComment */
 export type GetAPIKeysParams = ClerkPaginationParams<{
@@ -2378,6 +2372,8 @@ export type __internal_CheckoutProps = {
   appearance?: ClerkAppearanceTheme;
   planId?: string;
   planPeriod?: BillingSubscriptionPlanPeriod;
+  seatsQuantity?: number;
+  priceId?: string;
   for?: ForPayerType;
   onSubscriptionComplete?: () => void;
   portalId?: string;
@@ -2398,6 +2394,8 @@ export type __experimental_CheckoutButtonProps = {
   planId: string;
   planPeriod?: BillingSubscriptionPlanPeriod;
   for?: ForPayerType;
+  seatsQuantity?: number;
+  priceId?: string;
   onSubscriptionComplete?: () => void;
   checkoutProps?: {
     appearance?: ClerkAppearanceTheme;

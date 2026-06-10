@@ -14,7 +14,7 @@ async function asyncSearchRHC(name, search, regex = false) {
   const flag = regex ? 'E' : 'F';
   const cmd = () =>
     targetType === 'directory'
-      ? $`grep -${flag}q --include=\\*.js --include=\\*.mjs ${search} ${target}`
+      ? $`grep -r${flag}q --include=\\*.js --include=\\*.mjs ${search} ${target}`
       : $`grep -${flag}q ${search} ${target}`;
 
   if ((await cmd().exitCode) === 0) {
