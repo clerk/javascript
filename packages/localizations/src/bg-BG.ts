@@ -197,7 +197,7 @@ export const bgBG: LocalizationResource = {
       },
       warning: 'След като изберете доставчик, не можете да го промените, докато конфигурацията не приключи',
     },
-    verifyDomainStep: {
+    verifyDomainsStep: {
       title: 'Потвърди домейна',
       subtitle: 'Посочете и потвърдете домейна, за който да конфигурирате SSO.',
     },

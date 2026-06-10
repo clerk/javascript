@@ -204,7 +204,7 @@ export const ptPT: LocalizationResource = {
       },
       warning: 'Depois de um fornecedor ser selecionado não pode ser alterado até que a configuração esteja terminada',
     },
-    verifyDomainStep: {
+    verifyDomainsStep: {
       title: 'Verificar domínio',
       subtitle: 'Especifique e verifique o domínio para configurar o SSO.',
     },

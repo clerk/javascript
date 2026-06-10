@@ -196,9 +196,25 @@ export const daDK: LocalizationResource = {
       },
       warning: 'Når en udbyder er valgt, kan du ikke ændre den, før konfigurationen er færdig',
     },
-    verifyDomainStep: {
+    verifyDomainsStep: {
       title: 'Bekræft domæne',
       subtitle: 'Angiv og bekræft det domæne, du vil konfigurere SSO for.',
+      formFieldLabel__domain: 'Domæner',
+      formFieldInputPlaceholder__domain: 'Skriv dit domæne her, og klik på tilføj for at starte',
+      formButtonPrimary__add: 'Tilføj',
+      txtRecordInstructions: {
+        paragraph1: 'Tilføj denne TXT-post hos din DNS-udbyder.',
+        paragraph2:
+          'Vi verificerer automatisk, når posten er aktiv. Dette tager normalt under et minut, men opdatering af en eksisterende TXT-post kan tage lidt længere tid.',
+      },
+      txtRecordTable: {
+        columns: {
+          domain: 'Domæne',
+          type: 'Type',
+          hostName: 'Host / Navn',
+          value: 'Værdi',
+        },
+      },
     },
   },
   createOrganization: {

@@ -196,7 +196,7 @@ export const srRS: LocalizationResource = {
       },
       warning: 'Kada se provajder izabere, ne možete ga ponovo menjati dok se konfiguracija ne završi',
     },
-    verifyDomainStep: {
+    verifyDomainsStep: {
       title: 'Potvrdi domen',
       subtitle: 'Navedite i potvrdite domen za koji želite da konfigurišete SSO.',
     },

@@ -196,9 +196,25 @@ export const mnMN: LocalizationResource = {
       },
       warning: 'Үйлчилгээ үзүүлэгчийг сонгосны дараа тохиргоо дуустал өөрчлөх боломжгүй',
     },
-    verifyDomainStep: {
+    verifyDomainsStep: {
       title: 'Домэйныг баталгаажуулах',
       subtitle: 'SSO тохируулах домэйныг зааж, баталгаажуулна уу.',
+      formFieldLabel__domain: 'Домэйн',
+      formFieldInputPlaceholder__domain: 'Домэйнээ энд бичээд эхлэхийн тулд нэмэх дээр дарна уу',
+      formButtonPrimary__add: 'Нэмэх',
+      txtRecordInstructions: {
+        paragraph1: 'Энэ TXT бичлэгийг DNS үйлчилгээ үзүүлэгчдээ нэмнэ үү.',
+        paragraph2:
+          'Бичлэг идэвхэжсэн даруйд бид автоматаар баталгаажуулна. Энэ нь ихэвчлэн нэг минутаас бага хугацаа авдаг ч одоо байгаа TXT бичлэгийг шинэчлэхэд арай удаан хугацаа шаардагдаж магадгүй.',
+      },
+      txtRecordTable: {
+        columns: {
+          domain: 'Домэйн',
+          type: 'Төрөл',
+          hostName: 'Хост / Нэр',
+          value: 'Утга',
+        },
+      },
     },
   },
   createOrganization: {

@@ -581,7 +581,7 @@ export const enUS_v4: any = {
         subtitle:
           'Allow users to join the organization automatically or request to join based on a verified email domain.',
         primaryButton: 'Add domain',
-        unverifiedDomain_menuAction__verify: 'Verify domain',
+        unverifiedDomain_menuAction__verify: 'Verify domains',
         unverifiedDomain_menuAction__remove: 'Delete domain',
       },
     },
@@ -591,7 +591,7 @@ export const enUS_v4: any = {
         'Add the domain to verify. Users with email addresses at this domain can join the organization automatically or request to join.',
     },
     verifyDomainPage: {
-      title: 'Verify domain',
+      title: 'Verify domains',
       subtitle: 'The domain {{domainName}} needs to be verified via email.',
       subtitleVerificationCodeScreen: 'A verification code was sent to {{emailAddress}}. Enter the code to continue.',
       formTitle: 'Verification code',

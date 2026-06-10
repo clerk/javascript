@@ -225,9 +225,25 @@ export const nbNO: LocalizationResource = {
       },
       warning: 'Når en leverandør er valgt, kan du ikke endre igjen før konfigurasjonen er ferdig',
     },
-    verifyDomainStep: {
+    verifyDomainsStep: {
       title: 'Verifiser domene',
       subtitle: 'Angi og verifiser domenet du vil konfigurere SSO for.',
+      formFieldLabel__domain: 'Domener',
+      formFieldInputPlaceholder__domain: 'Skriv inn domenet ditt her, og klikk på legg til for å starte',
+      formButtonPrimary__add: 'Legg til',
+      txtRecordInstructions: {
+        paragraph1: 'Legg til denne TXT-posten hos DNS-leverandøren din.',
+        paragraph2:
+          'Vi verifiserer automatisk når posten er aktiv. Dette tar vanligvis under ett minutt, men oppdatering av en eksisterende TXT-post kan ta litt lengre tid.',
+      },
+      txtRecordTable: {
+        columns: {
+          domain: 'Domene',
+          type: 'Type',
+          hostName: 'Vert / Navn',
+          value: 'Verdi',
+        },
+      },
     },
   },
   createOrganization: {

@@ -202,7 +202,7 @@ export const roRO: LocalizationResource = {
       },
       warning: 'Odată ce un furnizor este selectat, nu îl puteți schimba până când configurația nu este finalizată',
     },
-    verifyDomainStep: {
+    verifyDomainsStep: {
       title: 'Verifică domeniul',
       subtitle: 'Specifică și verifică domeniul pentru care configurezi SSO.',
     },

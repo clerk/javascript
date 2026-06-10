@@ -196,9 +196,25 @@ export const arSA: LocalizationResource = {
       },
       warning: 'بمجرد اختيار المزود لا يمكنك التغيير مرة أخرى حتى انتهاء التكوين',
     },
-    verifyDomainStep: {
+    verifyDomainsStep: {
       title: 'التحقق من النطاق',
       subtitle: 'حدد النطاق وتحقق منه لإعداد الدخول الموحّد (SSO).',
+      formFieldLabel__domain: 'النطاقات',
+      formFieldInputPlaceholder__domain: 'اكتب نطاقك هنا وانقر على إضافة للبدء',
+      formButtonPrimary__add: 'إضافة',
+      txtRecordInstructions: {
+        paragraph1: 'أضف سجل TXT هذا إلى موفّر DNS الخاص بك.',
+        paragraph2:
+          'سنتحقق تلقائيًا بمجرد أن يصبح السجل نشطًا. عادةً ما يستغرق ذلك أقل من دقيقة، رغم أن تحديث سجل TXT موجود قد يستغرق وقتًا أطول قليلاً.',
+      },
+      txtRecordTable: {
+        columns: {
+          domain: 'النطاق',
+          type: 'النوع',
+          hostName: 'المضيف / الاسم',
+          value: 'القيمة',
+        },
+      },
     },
   },
   createOrganization: {

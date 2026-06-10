@@ -203,9 +203,25 @@ export const caES: LocalizationResource = {
       },
       warning: 'Un cop seleccionat un proveïdor no podreu canviar-lo fins que la configuració hagi finalitzat',
     },
-    verifyDomainStep: {
+    verifyDomainsStep: {
       title: 'Verifica el domini',
       subtitle: "Especifica i verifica el domini per configurar l'SSO.",
+      formFieldLabel__domain: 'Dominis',
+      formFieldInputPlaceholder__domain: 'Escriu aquí el teu domini i fes clic a Afegeix per començar',
+      formButtonPrimary__add: 'Afegeix',
+      txtRecordInstructions: {
+        paragraph1: 'Afegeix aquest registre TXT al teu proveïdor de DNS.',
+        paragraph2:
+          "Ho verificarem automàticament un cop el registre estigui actiu. Normalment triga menys d'un minut, tot i que actualitzar un registre TXT existent pot trigar una mica més.",
+      },
+      txtRecordTable: {
+        columns: {
+          domain: 'Domini',
+          type: 'Tipus',
+          hostName: 'Amfitrió / Nom',
+          value: 'Valor',
+        },
+      },
     },
   },
   createOrganization: {

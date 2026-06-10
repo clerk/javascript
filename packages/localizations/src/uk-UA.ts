@@ -196,9 +196,25 @@ export const ukUA: LocalizationResource = {
       },
       warning: 'Після вибору постачальника ви не зможете змінити його, доки не буде завершено налаштування',
     },
-    verifyDomainStep: {
+    verifyDomainsStep: {
       title: 'Підтвердити домен',
       subtitle: 'Вкажіть і підтвердьте домен для налаштування SSO.',
+      formFieldLabel__domain: 'Домени',
+      formFieldInputPlaceholder__domain: 'Введіть свій домен тут і натисніть «Додати», щоб почати',
+      formButtonPrimary__add: 'Додати',
+      txtRecordInstructions: {
+        paragraph1: 'Додайте цей TXT-запис до вашого DNS-провайдера.',
+        paragraph2:
+          'Ми перевіримо автоматично, щойно запис стане активним. Зазвичай це займає менше хвилини, хоча оновлення наявного TXT-запису може зайняти трохи більше часу.',
+      },
+      txtRecordTable: {
+        columns: {
+          domain: 'Домен',
+          type: 'Тип',
+          hostName: "Хост / Ім'я",
+          value: 'Значення',
+        },
+      },
     },
   },
   createOrganization: {
@@ -519,7 +535,7 @@ export const ukUA: LocalizationResource = {
       resendButton: "Didn't receive a code? Resend",
       subtitle: 'The domain {{domainName}} needs to be verified via email.',
       subtitleVerificationCodeScreen: 'A verification code was sent to {{emailAddress}}. Enter the code to continue.',
-      title: 'Verify domain',
+      title: 'Verify domains',
     },
   },
   organizationSwitcher: {

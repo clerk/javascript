@@ -207,9 +207,25 @@ export const jaJP: LocalizationResource = {
       },
       warning: 'プロバイダーを選択すると、設定が完了するまで変更できません',
     },
-    verifyDomainStep: {
+    verifyDomainsStep: {
       title: 'ドメインを確認',
       subtitle: 'SSO を設定するドメインを指定して確認します。',
+      formFieldLabel__domain: 'ドメイン',
+      formFieldInputPlaceholder__domain: 'ここにドメインを入力し、「追加」をクリックして開始します',
+      formButtonPrimary__add: '追加',
+      txtRecordInstructions: {
+        paragraph1: 'この TXT レコードを DNS プロバイダーに追加します。',
+        paragraph2:
+          'レコードが有効になると、自動的に確認します。通常は 1 分以内に完了しますが、既存の TXT レコードを更新する場合は少し時間がかかることがあります。',
+      },
+      txtRecordTable: {
+        columns: {
+          domain: 'ドメイン',
+          type: 'タイプ',
+          hostName: 'ホスト / 名前',
+          value: '値',
+        },
+      },
     },
   },
   createOrganization: {

@@ -225,9 +225,25 @@ export const huHU: LocalizationResource = {
       },
       warning: 'Miután kiválasztotta a szolgáltatót, nem módosíthatja, amíg a konfiguráció be nem fejeződik',
     },
-    verifyDomainStep: {
+    verifyDomainsStep: {
       title: 'Tartomány megerősítése',
       subtitle: 'Adja meg és erősítse meg a tartományt, amelyhez az SSO-t szeretné beállítani.',
+      formFieldLabel__domain: 'Tartományok',
+      formFieldInputPlaceholder__domain: 'Írja be ide a tartományát, majd kattintson a Hozzáadás gombra a kezdéshez',
+      formButtonPrimary__add: 'Hozzáadás',
+      txtRecordInstructions: {
+        paragraph1: 'Adja hozzá ezt a TXT-rekordot a DNS-szolgáltatójához.',
+        paragraph2:
+          'Automatikusan ellenőrizzük, amint a rekord élesedik. Ez általában kevesebb mint egy percet vesz igénybe, bár egy meglévő TXT-rekord frissítése egy kicsit tovább tarthat.',
+      },
+      txtRecordTable: {
+        columns: {
+          domain: 'Tartomány',
+          type: 'Típus',
+          hostName: 'Gazdagép / Név',
+          value: 'Érték',
+        },
+      },
     },
   },
   createOrganization: {

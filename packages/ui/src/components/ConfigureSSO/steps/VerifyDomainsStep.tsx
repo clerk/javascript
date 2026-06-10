@@ -30,7 +30,7 @@ import { useFormControl } from '@/utils/useFormControl';
 import { Step } from '../elements/Step';
 import { InnerStepCounter } from '../elements/Wizard/InnerStepCounter';
 
-export const VerifyDomainStep = (): JSX.Element => {
+export const VerifyDomainsStep = (): JSX.Element => {
   const { t } = useLocalizations();
 
   // TODO: replace with the enterprise connection domain API
@@ -43,8 +43,8 @@ export const VerifyDomainStep = (): JSX.Element => {
         elementId={descriptors.configureSSOStep.setId('verify-domain')}
       >
         <Step.Header
-          title={t(localizationKeys('configureSSO.verifyDomainStep.title'))}
-          description={t(localizationKeys('configureSSO.verifyDomainStep.subtitle'))}
+          title={t(localizationKeys('configureSSO.verifyDomainsStep.title'))}
+          description={t(localizationKeys('configureSSO.verifyDomainsStep.subtitle'))}
         >
           <InnerStepCounter />
         </Step.Header>
@@ -81,10 +81,10 @@ export const VerifyDomainStep = (): JSX.Element => {
             <Col sx={t => ({ gap: t.space.$3 })}>
               <Col sx={t => ({ gap: t.space.$4 })}>
                 <Text
-                  localizationKey={localizationKeys('configureSSO.verifyDomainStep.txtRecordInstructions.paragraph1')}
+                  localizationKey={localizationKeys('configureSSO.verifyDomainsStep.txtRecordInstructions.paragraph1')}
                 />
                 <Text
-                  localizationKey={localizationKeys('configureSSO.verifyDomainStep.txtRecordInstructions.paragraph2')}
+                  localizationKey={localizationKeys('configureSSO.verifyDomainsStep.txtRecordInstructions.paragraph2')}
                 />
               </Col>
 
@@ -100,8 +100,8 @@ export const VerifyDomainStep = (): JSX.Element => {
 const DomainsField = ({ onSubmit }: { onSubmit: (domain: string) => void }): JSX.Element => {
   const domainField = useFormControl('domain', '', {
     type: 'text',
-    label: localizationKeys('configureSSO.verifyDomainStep.formFieldLabel__domain'),
-    placeholder: localizationKeys('configureSSO.verifyDomainStep.formFieldInputPlaceholder__domain'),
+    label: localizationKeys('configureSSO.verifyDomainsStep.formFieldLabel__domain'),
+    placeholder: localizationKeys('configureSSO.verifyDomainsStep.formFieldInputPlaceholder__domain'),
   });
 
   const domain = domainField.value.trim().toLowerCase();
@@ -142,7 +142,7 @@ const DomainsField = ({ onSubmit }: { onSubmit: (domain: string) => void }): JSX
               variant='bordered'
               colorScheme='secondary'
               isDisabled={!canSubmit}
-              localizationKey={localizationKeys('configureSSO.verifyDomainStep.formButtonPrimary__add')}
+              localizationKey={localizationKeys('configureSSO.verifyDomainsStep.formButtonPrimary__add')}
               sx={{ flexShrink: 0 }}
             />
           </Flex>

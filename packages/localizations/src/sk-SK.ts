@@ -196,7 +196,7 @@ export const skSK: LocalizationResource = {
       },
       warning: 'Po výbere poskytovateľa ho nemôžete zmeniť, kým sa konfigurácia neukončí',
     },
-    verifyDomainStep: {
+    verifyDomainsStep: {
       title: 'Overiť doménu',
       subtitle: 'Zadajte a overte doménu, pre ktorú chcete nakonfigurovať SSO.',
     },

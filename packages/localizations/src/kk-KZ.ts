@@ -196,9 +196,25 @@ export const kkKZ: LocalizationResource = {
       },
       warning: 'Провайдер таңдалғаннан кейін, конфигурация аяқталғанша өзгерте алмайсыз',
     },
-    verifyDomainStep: {
+    verifyDomainsStep: {
       title: 'Доменді растау',
       subtitle: 'SSO теңшеу үшін доменді көрсетіп, растаңыз.',
+      formFieldLabel__domain: 'Домендер',
+      formFieldInputPlaceholder__domain: 'Доменіңізді осы жерге енгізіп, бастау үшін «Қосу» түймесін басыңыз',
+      formButtonPrimary__add: 'Қосу',
+      txtRecordInstructions: {
+        paragraph1: 'Бұл TXT жазбасын DNS провайдеріңізге қосыңыз.',
+        paragraph2:
+          'Жазба белсенді болған бойда біз оны автоматты түрде тексереміз. Әдетте бұл бір минуттан аз уақыт алады, бірақ бар TXT жазбасын жаңарту сәл көбірек уақыт алуы мүмкін.',
+      },
+      txtRecordTable: {
+        columns: {
+          domain: 'Домен',
+          type: 'Түрі',
+          hostName: 'Хост / Атау',
+          value: 'Мән',
+        },
+      },
     },
   },
   createOrganization: {

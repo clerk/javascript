@@ -202,9 +202,25 @@ export const itIT: LocalizationResource = {
       },
       warning: 'Una volta selezionato un provider non potrai cambiarlo fino al termine della configurazione',
     },
-    verifyDomainStep: {
+    verifyDomainsStep: {
       title: 'Verifica dominio',
       subtitle: "Specifica e verifica il dominio per cui configurare l'SSO.",
+      formFieldLabel__domain: 'Domini',
+      formFieldInputPlaceholder__domain: 'Digita qui il tuo dominio e clicca su Aggiungi per iniziare',
+      formButtonPrimary__add: 'Aggiungi',
+      txtRecordInstructions: {
+        paragraph1: 'Aggiungi questo record TXT al tuo provider DNS.',
+        paragraph2:
+          "Verificheremo automaticamente una volta che il record sarà attivo. Di solito richiede meno di un minuto, anche se l'aggiornamento di un record TXT esistente potrebbe richiedere un po' più di tempo.",
+      },
+      txtRecordTable: {
+        columns: {
+          domain: 'Dominio',
+          type: 'Tipo',
+          hostName: 'Host / Nome',
+          value: 'Valore',
+        },
+      },
     },
   },
   createOrganization: {

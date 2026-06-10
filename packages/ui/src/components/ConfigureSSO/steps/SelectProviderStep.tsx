@@ -56,7 +56,6 @@ const PROVIDER_GROUPS: ReadonlyArray<{
 
 export const SelectProviderStep = (): JSX.Element => {
   const {
-    primaryEmailAddress,
     organizationEnterpriseConnection: c,
     mutations: { createConnection },
   } = useConfigureSSO();
@@ -78,7 +77,7 @@ export const SelectProviderStep = (): JSX.Element => {
 
     if (c.hasConnection) {
       // TODO ORGS-1607 - Support changing the provider
-      goNext();
+      void goNext();
       return;
     }
 
@@ -86,7 +85,8 @@ export const SelectProviderStep = (): JSX.Element => {
     setIsSubmitting(true);
 
     try {
-      await createConnection(selected, primaryEmailAddress);
+      // TODO -> Add organization domains to the connection
+      await createConnection(selected);
       void goNext();
     } catch (err) {
       handleError(err as Error, [], card.setError);

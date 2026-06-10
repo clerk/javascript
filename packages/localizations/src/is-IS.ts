@@ -224,9 +224,25 @@ export const isIS: LocalizationResource = {
       },
       warning: 'Þegar þjónustuaðili hefur verið valinn er ekki hægt að breyta aftur fyrr en stillingu er lokið',
     },
-    verifyDomainStep: {
+    verifyDomainsStep: {
       title: 'Staðfesta lén',
       subtitle: 'Tilgreindu og staðfestu lénið sem þú vilt stilla SSO fyrir.',
+      formFieldLabel__domain: 'Lén',
+      formFieldInputPlaceholder__domain: 'Skrifaðu lénið þitt hér og smelltu á bæta við til að byrja',
+      formButtonPrimary__add: 'Bæta við',
+      txtRecordInstructions: {
+        paragraph1: 'Bættu þessari TXT-færslu við hjá DNS-þjónustuaðilanum þínum.',
+        paragraph2:
+          'Við staðfestum sjálfkrafa um leið og færslan er virk. Þetta tekur yfirleitt innan við mínútu, en það getur tekið aðeins lengri tíma að uppfæra TXT-færslu sem fyrir er.',
+      },
+      txtRecordTable: {
+        columns: {
+          domain: 'Lén',
+          type: 'Tegund',
+          hostName: 'Hýsill / Nafn',
+          value: 'Gildi',
+        },
+      },
     },
   },
   createOrganization: {

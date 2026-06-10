@@ -269,9 +269,9 @@ export const enUS: LocalizationResource = {
       },
       warning: 'Once a provider is selected you cannot change again until the configuration is over',
     },
-    verifyDomainStep: {
-      title: 'Verify domain',
-      subtitle: 'Specify and verify the domain to configure SSO for.',
+    verifyDomainsStep: {
+      title: 'Verify domains',
+      subtitle: 'Specify and verify the domains to configure SSO for.',
       formFieldLabel__domain: 'Domains',
       formFieldInputPlaceholder__domain: 'Type your domain here and click add to start',
       formButtonPrimary__add: 'Add',
@@ -1138,7 +1138,7 @@ export const enUS: LocalizationResource = {
       resendButton: "Didn't receive a code? Resend",
       subtitle: 'The domain {{domainName}} needs to be verified via email.',
       subtitleVerificationCodeScreen: 'A verification code was sent to {{emailAddress}}. Enter the code to continue.',
-      title: 'Verify domain',
+      title: 'Verify domains',
     },
   },
   organizationSwitcher: {

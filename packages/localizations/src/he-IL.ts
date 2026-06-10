@@ -196,9 +196,25 @@ export const heIL: LocalizationResource = {
       },
       warning: 'לאחר בחירת ספק לא ניתן לשנות אותו עד לסיום ההגדרה',
     },
-    verifyDomainStep: {
+    verifyDomainsStep: {
       title: 'אימות דומיין',
       subtitle: 'ציין ואמת את הדומיין שעבורו ברצונך להגדיר SSO.',
+      formFieldLabel__domain: 'דומיינים',
+      formFieldInputPlaceholder__domain: 'הקלד את הדומיין שלך כאן ולחץ על הוסף כדי להתחיל',
+      formButtonPrimary__add: 'הוסף',
+      txtRecordInstructions: {
+        paragraph1: 'הוסף רשומת TXT זו לספק ה-DNS שלך.',
+        paragraph2:
+          'אנו נאמת באופן אוטומטי ברגע שהרשומה תהיה פעילה. בדרך כלל זה לוקח פחות מדקה, אם כי עדכון רשומת TXT קיימת עשוי להימשך מעט יותר.',
+      },
+      txtRecordTable: {
+        columns: {
+          domain: 'דומיין',
+          type: 'סוג',
+          hostName: 'מארח / שם',
+          value: 'ערך',
+        },
+      },
     },
   },
   createOrganization: {

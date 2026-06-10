@@ -204,9 +204,25 @@ export const msMY: LocalizationResource = {
       },
       warning: 'Setelah pembekal dipilih anda tidak boleh menukar lagi sehingga konfigurasi selesai',
     },
-    verifyDomainStep: {
+    verifyDomainsStep: {
       title: 'Sahkan domain',
       subtitle: 'Nyatakan dan sahkan domain untuk mengkonfigurasi SSO.',
+      formFieldLabel__domain: 'Domain',
+      formFieldInputPlaceholder__domain: 'Taip domain anda di sini dan klik tambah untuk bermula',
+      formButtonPrimary__add: 'Tambah',
+      txtRecordInstructions: {
+        paragraph1: 'Tambahkan rekod TXT ini kepada penyedia DNS anda.',
+        paragraph2:
+          'Kami akan mengesahkan secara automatik sebaik sahaja rekod aktif. Ini biasanya mengambil masa kurang daripada seminit, walaupun mengemas kini rekod TXT sedia ada mungkin mengambil masa sedikit lebih lama.',
+      },
+      txtRecordTable: {
+        columns: {
+          domain: 'Domain',
+          type: 'Jenis',
+          hostName: 'Hos / Nama',
+          value: 'Nilai',
+        },
+      },
     },
   },
   createOrganization: {

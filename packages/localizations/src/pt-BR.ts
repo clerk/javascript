@@ -203,9 +203,25 @@ export const ptBR: LocalizationResource = {
       warning:
         'Depois que um provedor for selecionado, você não poderá alterá-lo até que a configuração seja concluída',
     },
-    verifyDomainStep: {
+    verifyDomainsStep: {
       title: 'Verificar domínio',
       subtitle: 'Especifique e verifique o domínio para configurar o SSO.',
+      formFieldLabel__domain: 'Domínios',
+      formFieldInputPlaceholder__domain: 'Digite seu domínio aqui e clique em Adicionar para começar',
+      formButtonPrimary__add: 'Adicionar',
+      txtRecordInstructions: {
+        paragraph1: 'Adicione este registro TXT ao seu provedor de DNS.',
+        paragraph2:
+          'Verificaremos automaticamente assim que o registro estiver ativo. Isso geralmente leva menos de um minuto, embora atualizar um registro TXT existente possa demorar um pouco mais.',
+      },
+      txtRecordTable: {
+        columns: {
+          domain: 'Domínio',
+          type: 'Tipo',
+          hostName: 'Host / Nome',
+          value: 'Valor',
+        },
+      },
     },
   },
   createOrganization: {

@@ -196,7 +196,7 @@ export const plPL: LocalizationResource = {
       },
       warning: 'Po wybraniu dostawcy nie można go ponownie zmienić aż do zakończenia konfiguracji',
     },
-    verifyDomainStep: {
+    verifyDomainsStep: {
       title: 'Zweryfikuj domenę',
       subtitle: 'Określ i zweryfikuj domenę, dla której chcesz skonfigurować SSO.',
     },

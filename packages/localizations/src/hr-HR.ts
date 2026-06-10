@@ -225,7 +225,7 @@ export const hrHR: LocalizationResource = {
       },
       warning: 'Nakon odabira pružatelja ne možete ga ponovno mijenjati dok konfiguracija ne završi',
     },
-    verifyDomainStep: {
+    verifyDomainsStep: {
       title: 'Potvrdi domenu',
       subtitle: 'Navedite i potvrdite domenu za koju želite konfigurirati SSO.',
     },

@@ -204,9 +204,25 @@ export const taIN: LocalizationResource = {
       },
       warning: 'வழங்குநரைத் தேர்ந்தெடுத்த பிறகு, கட்டமைப்பு முடியும் வரை மீண்டும் மாற்ற முடியாது',
     },
-    verifyDomainStep: {
+    verifyDomainsStep: {
       title: 'டொமைனை சரிபார்க்கவும்',
       subtitle: 'SSO ஐ உள்ளமைக்க டொமைனைக் குறிப்பிட்டு சரிபார்க்கவும்.',
+      formFieldLabel__domain: 'டொமைன்கள்',
+      formFieldInputPlaceholder__domain: 'உங்கள் டொமைனை இங்கே தட்டச்சு செய்து, தொடங்க சேர் என்பதைக் கிளிக் செய்யவும்',
+      formButtonPrimary__add: 'சேர்',
+      txtRecordInstructions: {
+        paragraph1: 'இந்த TXT பதிவை உங்கள் DNS வழங்குநரில் சேர்க்கவும்.',
+        paragraph2:
+          'பதிவு செயலில் வந்தவுடன் நாங்கள் தானாகவே சரிபார்ப்போம். இது பொதுவாக ஒரு நிமிடத்திற்குள் முடிந்துவிடும், இருப்பினும் ஏற்கனவே உள்ள TXT பதிவைப் புதுப்பிக்க சற்று அதிக நேரம் ஆகலாம்.',
+      },
+      txtRecordTable: {
+        columns: {
+          domain: 'டொமைன்',
+          type: 'வகை',
+          hostName: 'ஹோஸ்ட் / பெயர்',
+          value: 'மதிப்பு',
+        },
+      },
     },
   },
   createOrganization: {

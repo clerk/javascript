@@ -196,9 +196,26 @@ export const elGR: LocalizationResource = {
       },
       warning: 'Μόλις επιλεγεί ένας πάροχος δεν μπορείτε να τον αλλάξετε μέχρι να ολοκληρωθεί η ρύθμιση',
     },
-    verifyDomainStep: {
+    verifyDomainsStep: {
       title: 'Επαλήθευση τομέα',
       subtitle: 'Καθορίστε και επαληθεύστε τον τομέα για τη διαμόρφωση του SSO.',
+      formFieldLabel__domain: 'Τομείς',
+      formFieldInputPlaceholder__domain:
+        'Πληκτρολογήστε τον τομέα σας εδώ και κάντε κλικ στο «Προσθήκη» για να ξεκινήσετε',
+      formButtonPrimary__add: 'Προσθήκη',
+      txtRecordInstructions: {
+        paragraph1: 'Προσθέστε αυτήν την εγγραφή TXT στον πάροχο DNS σας.',
+        paragraph2:
+          'Θα επαληθεύσουμε αυτόματα μόλις η εγγραφή τεθεί σε ισχύ. Αυτό συνήθως διαρκεί λιγότερο από ένα λεπτό, αν και η ενημέρωση μιας υπάρχουσας εγγραφής TXT ενδέχεται να διαρκέσει λίγο περισσότερο.',
+      },
+      txtRecordTable: {
+        columns: {
+          domain: 'Τομέας',
+          type: 'Τύπος',
+          hostName: 'Κεντρικός υπολογιστής / Όνομα',
+          value: 'Τιμή',
+        },
+      },
     },
   },
   createOrganization: {

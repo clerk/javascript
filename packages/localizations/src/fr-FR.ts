@@ -205,9 +205,25 @@ export const frFR: LocalizationResource = {
       warning:
         "Une fois un fournisseur sélectionné, vous ne pourrez plus en changer jusqu'à la fin de la configuration",
     },
-    verifyDomainStep: {
+    verifyDomainsStep: {
       title: 'Vérifier le domaine',
       subtitle: 'Spécifiez et vérifiez le domaine pour lequel configurer le SSO.',
+      formFieldLabel__domain: 'Domaines',
+      formFieldInputPlaceholder__domain: 'Saisissez votre domaine ici et cliquez sur Ajouter pour commencer',
+      formButtonPrimary__add: 'Ajouter',
+      txtRecordInstructions: {
+        paragraph1: 'Ajoutez cet enregistrement TXT à votre fournisseur DNS.',
+        paragraph2:
+          "Nous vérifierons automatiquement une fois l'enregistrement actif. Cela prend généralement moins d'une minute, bien que la mise à jour d'un enregistrement TXT existant puisse prendre un peu plus de temps.",
+      },
+      txtRecordTable: {
+        columns: {
+          domain: 'Domaine',
+          type: 'Type',
+          hostName: 'Hôte / Nom',
+          value: 'Valeur',
+        },
+      },
     },
   },
   createOrganization: {

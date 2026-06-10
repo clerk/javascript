@@ -200,7 +200,7 @@ export const csCZ: LocalizationResource = {
       },
       warning: 'Jakmile vyberete poskytovatele, nelze ho změnit, dokud nebude konfigurace dokončena',
     },
-    verifyDomainStep: {
+    verifyDomainsStep: {
       title: 'Ověřit doménu',
       subtitle: 'Zadejte a ověřte doménu, pro kterou chcete nakonfigurovat SSO.',
     },
