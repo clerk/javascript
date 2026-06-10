@@ -7,7 +7,7 @@ import { ConfigureSSO } from '../ConfigureSSO';
 
 // Integration coverage for the wizard's navigation contract at the rendered-
 // component level — the real `ConfigureSSO` → `useOrganizationEnterpriseConnection`
-// → `ConfigureSSOSteps` → `<Wizard>` → `useWizardMachine` → step wiring, driven
+// → `ConfigureSSOWizard` → `<Wizard>` → `useWizardMachine` → step wiring, driven
 // only through the connection data the (auto-mocked) FAPI handles return. The
 // machine-level behaviours (defer/resolve, clamp) are unit-tested in
 // `useWizardMachine.test.tsx`; these tests prove those behaviours hold when the

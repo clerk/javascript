@@ -37,7 +37,7 @@ const AuthenticatedContent = withCoreUserGuard(() => {
       sx={t => ({ display: 'grid', gridTemplateColumns: '1fr 3fr', height: t.sizes.$176, overflow: 'hidden' })}
     >
       <ConfigureSSONavbar contentRef={contentRef}>
-        <StandaloneConfigureSSOContent contentRef={contentRef} />
+        <ConfigureSSOContent contentRef={contentRef} />
       </ConfigureSSONavbar>
     </ProfileCard.Root>
   );
@@ -49,7 +49,7 @@ const AuthenticatedContent = withCoreUserGuard(() => {
  * `ConfigureSSOWizard` — mirroring what the Security page does for the
  * `OrganizationProfile` mount.
  */
-const StandaloneConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObject<HTMLDivElement> }) => {
+const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObject<HTMLDivElement> }) => {
   const {
     isLoading,
     enterpriseConnection,
