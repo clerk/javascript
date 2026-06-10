@@ -407,6 +407,10 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       expect(data.type).toBe('oauth_token');
       expect(data.subject).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
       expect(data.scopes).toEqual(['read:foo', 'write:bar']);
+      // Timestamps are exposed in milliseconds, matching M2MToken and the API JSON shape
+      expect(data.expiration).toBe(mockOAuthAccessTokenJwtPayload.exp * 1000);
+      expect(data.createdAt).toBe(mockOAuthAccessTokenJwtPayload.iat * 1000);
+      expect(data.updatedAt).toBe(mockOAuthAccessTokenJwtPayload.iat * 1000);
     });
 
     it('fails if JWT type is not at+jwt or application/at+jwt', async () => {
