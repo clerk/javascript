@@ -1,4 +1,4 @@
-import type { EmailAddressResource, EnterpriseConnectionResource } from '@clerk/shared/types';
+import type { EnterpriseConnectionResource, OrganizationDomainResource } from '@clerk/shared/types';
 import React, { type PropsWithChildren } from 'react';
 
 import type { OrganizationEnterpriseConnection } from './domain/organizationEnterpriseConnection';
@@ -17,16 +17,16 @@ export interface ConfigureSSOData {
   mutations: EnterpriseConnectionMutations;
   organizationEnterpriseConnection: OrganizationEnterpriseConnection;
   testRuns: TestRunsView;
-  primaryEmailAddress: EmailAddressResource | undefined;
+  organizationDomains: OrganizationDomainResource[] | undefined;
 }
 
 interface ConfigureSSOProviderProps {
   enterpriseConnection: EnterpriseConnectionResource | undefined;
   organizationEnterpriseConnection: OrganizationEnterpriseConnection;
   testRuns: TestRunsView;
+  organizationDomains: OrganizationDomainResource[] | undefined;
   contentRef: React.RefObject<HTMLDivElement>;
   mutations: EnterpriseConnectionMutations;
-  primaryEmailAddress: EmailAddressResource | undefined;
 }
 
 const ConfigureSSOContext = React.createContext<ConfigureSSOData | null>(null);
@@ -36,9 +36,9 @@ export const ConfigureSSOProvider = ({
   enterpriseConnection,
   organizationEnterpriseConnection,
   testRuns,
+  organizationDomains,
   contentRef,
   mutations,
-  primaryEmailAddress,
   children,
 }: PropsWithChildren<ConfigureSSOProviderProps>): JSX.Element => {
   const value = React.useMemo<ConfigureSSOData>(
@@ -47,10 +47,10 @@ export const ConfigureSSOProvider = ({
       enterpriseConnection,
       organizationEnterpriseConnection,
       testRuns,
+      organizationDomains,
       mutations,
-      primaryEmailAddress,
     }),
-    [contentRef, enterpriseConnection, mutations, organizationEnterpriseConnection, testRuns, primaryEmailAddress],
+    [contentRef, enterpriseConnection, mutations, organizationEnterpriseConnection, testRuns, organizationDomains],
   );
 
   return <ConfigureSSOContext.Provider value={value}>{children}</ConfigureSSOContext.Provider>;

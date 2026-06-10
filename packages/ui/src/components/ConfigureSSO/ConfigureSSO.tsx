@@ -1,4 +1,4 @@
-import { useSession } from '@clerk/shared/react';
+import { __internal_useOrganizationDomains, useSession } from '@clerk/shared/react';
 import type { ConfigureSSOProps } from '@clerk/shared/types';
 import React from 'react';
 
@@ -45,15 +45,18 @@ const AuthenticatedContent = withCoreUserGuard(() => {
 
 const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObject<HTMLDivElement> }) => {
   const {
-    isLoading,
+    isLoading: isLoadingEnterpriseConnection,
     enterpriseConnection,
     organizationEnterpriseConnection,
     testRuns,
     mutations,
-    primaryEmailAddress,
   } = useOrganizationEnterpriseConnection();
 
-  // Gate loading above the provider so the context never observes a loading state.
+  const { isLoading: isLoadingOrganizationDomains, data: organizationDomains } = __internal_useOrganizationDomains({
+    enrollmentMode: 'enterprise_sso',
+  });
+
+  const isLoading = isLoadingEnterpriseConnection || isLoadingOrganizationDomains;
   if (isLoading) {
     return <ConfigureSSOSkeleton />;
   }
@@ -66,7 +69,7 @@ const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObject<HTMLD
         enterpriseConnection={enterpriseConnection}
         contentRef={contentRef}
         mutations={mutations}
-        primaryEmailAddress={primaryEmailAddress}
+        organizationDomains={organizationDomains}
       />
     </ConfigureSSOProtect>
   );

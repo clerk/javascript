@@ -1,6 +1,5 @@
 import { useCallback } from 'react';
 
-import type { ClerkPaginatedResponse } from '../../types/pagination';
 import type { GetDomainsParams } from '../../types/organization';
 import type { OrganizationDomainResource, OrganizationEnrollmentMode } from '../../types/organizationDomain';
 import { useClerkInstanceContext } from '../contexts';
@@ -107,7 +106,7 @@ function useOrganizationDomains(params: UseOrganizationDomainsParams = {}): UseO
     [revalidate],
   );
 
-  const response = query.data as ClerkPaginatedResponse<OrganizationDomainResource> | undefined;
+  const response = query.data;
 
   return {
     data: response?.data,

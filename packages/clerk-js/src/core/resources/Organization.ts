@@ -134,11 +134,17 @@ export class Organization extends BaseResource implements OrganizationResource {
   getDomains = async (
     getDomainParams?: GetDomainsParams,
   ): Promise<ClerkPaginatedResponse<OrganizationDomainResource>> => {
+    const { enrollmentMode, ...rest } = getDomainParams || {};
+    const search = convertPageToOffsetSearchParams(rest);
+    if (enrollmentMode) {
+      search.set('enrollment_mode', enrollmentMode);
+    }
+
     return await BaseResource._fetch(
       {
         path: `/organizations/${this.id}/domains`,
         method: 'GET',
-        search: convertPageToOffsetSearchParams(getDomainParams),
+        search,
       },
       {
         forceUpdateClient: true,

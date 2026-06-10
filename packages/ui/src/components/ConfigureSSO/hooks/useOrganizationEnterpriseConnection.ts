@@ -69,8 +69,6 @@ export interface UseOrganizationEnterpriseConnectionResult {
   organization: OrganizationResource | null | undefined;
   /** FAPI currently supports a single connection per organization. */
   enterpriseConnection: EnterpriseConnectionResource | undefined;
-  /** Used to derive the connection name on create. */
-  primaryEmailAddress: EmailAddressResource | undefined;
   /** The domain entity the wizard makes every flow decision from. */
   organizationEnterpriseConnection: OrganizationEnterpriseConnection;
   mutations: EnterpriseConnectionMutations;
@@ -163,27 +161,14 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
   const { session } = useSession();
   const { organization } = useOrganization();
 
-  const primaryEmailAddress = user?.primaryEmailAddress ?? undefined;
-
-  // The connection-domain mutations, defined inline here so the umbrella hook
-  // owns the single mutation surface. The org-scoped FAPI endpoints have no
-  // reverification middleware, so these call the underlying handles directly.
   const mutations = useMemo<EnterpriseConnectionMutations>(() => {
-    const createConnection: EnterpriseConnectionMutations['createConnection'] = (provider, primaryEmail) => {
-      const emailDomain = primaryEmail?.emailAddress.split('@')[1];
-
-      if (!emailDomain) {
-        return Promise.resolve(undefined);
-      }
-
-      // The organization is inferred from the URL path on the org-scoped
-      // endpoint, so we don't pass `organizationId` in the body. `domains` is
-      // required by the create endpoint and is derived from the email domain.
+    const createConnection: EnterpriseConnectionMutations['createConnection'] = provider => {
       return createEnterpriseConnection({
         provider,
-        name: emailDomain,
+        // TODO -> Define name
+        name: 'clerk.dev',
         // TODO -> Add organization domains to the connection
-        domains: [emailDomain],
+        domains: ['clerk.dev'],
       });
     };
 
@@ -263,7 +248,6 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
     // skeleton.
     isLoading: isLoadingEnterpriseConnections || (hadInitialConnection && isLoadingTestRuns),
     enterpriseConnection,
-    primaryEmailAddress,
     organizationEnterpriseConnection,
     mutations,
     testRuns,

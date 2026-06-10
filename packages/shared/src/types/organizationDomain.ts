@@ -71,7 +71,11 @@ export interface OrganizationDomainOwnershipVerification {
 }
 
 /** @inline */
-export type OrganizationEnrollmentMode = 'manual_invitation' | 'automatic_invitation' | 'automatic_suggestion';
+export type OrganizationEnrollmentMode =
+  | 'manual_invitation'
+  | 'automatic_invitation'
+  | 'automatic_suggestion'
+  | 'enterprise_sso';
 
 /**
  * The `OrganizationDomain` object is the model around an Organization's [Verified Domain](https://clerk.com/docs/guides/organizations/add-members/verified-domains).
