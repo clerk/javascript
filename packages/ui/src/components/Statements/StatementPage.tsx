@@ -140,6 +140,12 @@ export const StatementPage = () => {
                             </SimpleButton>
                           }
                         />
+                        {item.totals?.discounts?.proration && item.totals.discounts.proration.amount.amount > 0 ? (
+                          <Statement.SectionContentDetailsListItem
+                            label={localizationKeys('billing.proratedDiscount')}
+                            value={`(${item.totals.discounts.proration.amount.currencySymbol}${item.totals.discounts.proration.amount.amountFormatted})`}
+                          />
+                        ) : null}
                         {item.subscriptionItem.credits &&
                         item.subscriptionItem.credits.proration &&
                         item.subscriptionItem.credits.proration.amount.amount > 0 ? (
