@@ -1,11 +1,13 @@
 // Import stories explicitly to control order and avoid type casting through unknown.
 import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
+import { meta as tooltipMeta, Options as TooltipOptions } from '../stories/tooltip.stories';
 import { toSlug } from './slug';
 import type { StoryModule } from './types';
 
 const buttonModule: StoryModule = { meta: buttonMeta, Primary, Sizes, Disabled };
+const tooltipModule: StoryModule = { meta: tooltipMeta, Options: TooltipOptions };
 
-export const registry: StoryModule[] = [buttonModule];
+export const registry: StoryModule[] = [buttonModule, tooltipModule];
 
 export interface RegistryEntry {
   mod: StoryModule;

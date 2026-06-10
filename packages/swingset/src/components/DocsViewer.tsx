@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 
 const docModules: Record<string, React.ComponentType> = {
   button: dynamic(() => import('../stories/button.mdx')),
+  tooltip: dynamic(() => import('../stories/tooltip.mdx')),
 };
 
 interface DocsViewerProps {

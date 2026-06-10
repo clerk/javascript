@@ -1,0 +1,33 @@
+import * as TooltipStories from './tooltip.stories';
+
+# Tooltip
+
+The `Tooltip` component reveals a small label when its trigger is hovered or focused. It wraps any trigger element and positions the bubble with the `side` variant. Focus and blur bubble up from the trigger, so the tooltip is keyboard-accessible without extra wiring.
+
+## Options
+
+<Story
+  name='Options'
+  storyModule={TooltipStories}
+/>
+
+## Usage
+
+```tsx
+import { Tooltip } from '@clerk/ui/mosaic/components/tooltip';
+import { Button } from '@clerk/ui/mosaic/components/button';
+
+<Tooltip
+  content='Tooltip content'
+  side='top'
+>
+  <Button>Hover me</Button>
+</Tooltip>;
+```
+
+## Props
+
+<PropTable
+  meta={TooltipStories.meta}
+  extra={[{ name: 'content', type: 'React.ReactNode' }]}
+/>
