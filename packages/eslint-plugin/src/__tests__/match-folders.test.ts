@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { classifyFolder, hasDescendantsMatching, literalPrefix, matchPath, specificity } from '../lib/match-folders.js';
+import { classifyFolder, hasDescendantsMatching, literalPrefix, matchPath, specificity } from '../lib/match-folders';
 
 describe('matchPath', () => {
   it('matches literal segments', () => {

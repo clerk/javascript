@@ -1,7 +1,7 @@
 {
-  "name": "@clerk/eslint-plugin-next",
+  "name": "@clerk/eslint-plugin",
   "version": "0.0.0",
-  "description": "ESLint plugin for enforcing Clerk auth protection in Next.js App Router resources.",
+  "description": "ESLint plugin for enforcing Clerk patterns across JavaScript frameworks.",
   "keywords": [
     "auth",
     "authentication",
@@ -19,7 +19,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/clerk/javascript.git",
-    "directory": "packages/eslint-plugin-next"
+    "directory": "packages/eslint-plugin"
   },
   "license": "MIT",
   "author": "Clerk",

@@ -5,7 +5,7 @@ import type { Linter as LinterTypes } from 'eslint';
 import { Linter, RuleTester } from 'eslint';
 import { describe, expect, it } from 'vitest';
 
-import rule, { type RuleOptions } from '../rules/require-auth-protection.js';
+import rule, { type RuleOptions } from '../rules/next/require-auth-protection';
 
 RuleTester.describe = describe;
 RuleTester.it = it;

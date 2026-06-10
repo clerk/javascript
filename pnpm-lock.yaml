@@ -515,7 +515,7 @@ importers:
         specifier: ^5.10.0
         version: 5.10.0
 
-  packages/eslint-plugin-next:
+  packages/eslint-plugin:
     devDependencies:
       '@types/node':
         specifier: ^22.19.17

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { getRelativeFolder } from '../lib/file-info.js';
+import { getRelativeFolder } from '../lib/file-info';
 
 describe('getRelativeFolder', () => {
   it('roots at the `app` segment for a root-level App Router', () => {

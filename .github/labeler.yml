@@ -20,9 +20,9 @@ elements:
   - changed-files:
       - any-glob-to-any-file: packages/elements/**
 
-eslint-plugin-next:
+eslint-plugin:
   - changed-files:
-      - any-glob-to-any-file: packages/eslint-plugin-next/**
+      - any-glob-to-any-file: packages/eslint-plugin/**
 
 expo:
   - changed-files:

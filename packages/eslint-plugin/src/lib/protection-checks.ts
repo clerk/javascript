@@ -5,7 +5,7 @@
 
 import type { TSESTree } from '@typescript-eslint/utils';
 
-import type { FunctionNode } from './exports.js';
+import type { FunctionNode } from './exports';
 
 const CLERK_AUTH_SOURCE = '@clerk/nextjs/server';
 
