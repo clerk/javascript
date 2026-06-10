@@ -14,14 +14,14 @@ interface VariablesPanelProps {
 
 export function VariablesPanel({ variables, onChange }: VariablesPanelProps) {
   const colors = defaultMosaicVariables.color;
-  const radii = defaultMosaicVariables.radius;
+  const radii = defaultMosaicVariables.rounded;
 
   function setColor(key: keyof typeof colors, value: string) {
     onChange({ ...variables, color: { ...variables.color, [key]: value } });
   }
 
-  function setRadius(key: keyof typeof radii, value: string) {
-    onChange({ ...variables, radius: { ...variables.radius, [key]: value } });
+  function setRounded(key: keyof typeof radii, value: string) {
+    onChange({ ...variables, rounded: { ...variables.rounded, [key]: value } });
   }
 
   function setSpacing(value: string) {
@@ -76,15 +76,15 @@ export function VariablesPanel({ variables, onChange }: VariablesPanelProps) {
                 className='flex items-center gap-3'
               >
                 <Label
-                  htmlFor={`var-radius-${key}`}
+                  htmlFor={`var-rounded-${key}`}
                   className='text-muted-foreground w-32 shrink-0 text-xs'
                 >
-                  radius.{key}
+                  rounded.{key}
                 </Label>
                 <Input
-                  id={`var-radius-${key}`}
-                  value={(variables.radius as Record<string, string>)?.[key] ?? radii[key]}
-                  onChange={e => setRadius(key, e.target.value)}
+                  id={`var-rounded-${key}`}
+                  value={(variables.rounded as Record<string, string>)?.[key] ?? radii[key]}
+                  onChange={e => setRounded(key, e.target.value)}
                   className='h-7 font-mono text-xs'
                 />
               </div>

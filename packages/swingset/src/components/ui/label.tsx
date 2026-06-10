@@ -4,6 +4,7 @@ import * as React from 'react';
 
 import { cn } from '@/lib/utils';
 
+// eslint-disable-next-line jsx-a11y/label-has-associated-control
 function Label({ className, ...props }: React.ComponentProps<'label'>) {
   return (
     <label

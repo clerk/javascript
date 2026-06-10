@@ -17,7 +17,9 @@ function variantToKnob(key: string, options: Record<string, unknown>, defaultVal
 }
 
 export function generateKnobs(meta: StoryMeta): KnobRecord {
-  if (!meta.styles?._variants) return {};
+  if (!meta.styles?._variants) {
+    return {};
+  }
 
   const variants = meta.styles._variants as VariantMap;
   const defaults = meta.styles._defaultVariants ?? {};

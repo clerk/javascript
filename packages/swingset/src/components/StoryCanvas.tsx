@@ -2,6 +2,7 @@
 
 import type React from 'react';
 import { useEffect, useState } from 'react';
+
 import { MosaicProvider } from '@clerk/ui/mosaic/MosaicProvider';
 import type { MosaicVariables } from '@clerk/ui/mosaic/variables';
 
@@ -26,11 +27,13 @@ export function StoryCanvas({ componentSlug, storySlug }: StoryCanvasProps) {
   const [variables, setVariables] = useState<MosaicVariables>({});
 
   useEffect(() => {
-    if (!found) return;
+    if (!found) {
+      return;
+    }
     const nextKnobs = generateKnobs(found.mod.meta);
     setKnobs(nextKnobs);
     setKnobValues(initKnobValues(nextKnobs));
-  }, [componentSlug, storySlug]);
+  }, [found, componentSlug, storySlug]);
 
   if (!found) {
     return <div className='text-muted-foreground p-8 text-sm'>Story not found.</div>;

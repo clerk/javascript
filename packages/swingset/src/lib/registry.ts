@@ -1,8 +1,8 @@
-import type { StoryModule } from './types';
-import { toSlug } from './slug';
-
 // Import stories explicitly to control order and avoid type casting through unknown.
-import { meta as buttonMeta, Primary, Sizes, Disabled } from '../stories/button.stories';
+import { Disabled, Primary, Sizes, meta as buttonMeta } from '../stories/button.stories';
+
+import { toSlug } from './slug';
+import type { StoryModule } from './types';
 
 const buttonModule: StoryModule = { meta: buttonMeta, Primary, Sizes, Disabled };
 
@@ -16,10 +16,16 @@ export interface RegistryEntry {
 /** Find a story by component slug (from meta.title) and story slug (from export name). */
 export function findStory(componentSlug: string, storySlug: string): RegistryEntry | null {
   for (const mod of registry) {
-    if (toSlug(mod.meta.title) !== componentSlug) continue;
+    if (toSlug(mod.meta.title) !== componentSlug) {
+      continue;
+    }
     for (const [exportName, value] of Object.entries(mod)) {
-      if (exportName === 'meta') continue;
-      if (typeof value !== 'function') continue;
+      if (exportName === 'meta') {
+        continue;
+      }
+      if (typeof value !== 'function') {
+        continue;
+      }
       if (toSlug(exportName) === storySlug) {
         return { mod, storyName: exportName };
       }
@@ -40,12 +46,17 @@ export function getSidebarGroups(): Array<{
 
   for (const mod of registry) {
     const { group, title } = mod.meta;
-    if (!groupMap.has(group)) groupMap.set(group, []);
-    groupMap.get(group)!.push({
-      mod,
-      componentSlug: toSlug(title),
-      names: getStoryNames(mod),
-    });
+    if (!groupMap.has(group)) {
+      groupMap.set(group, []);
+    }
+    const groupStories = groupMap.get(group);
+    if (groupStories) {
+      groupStories.push({
+        mod,
+        componentSlug: toSlug(title),
+        names: getStoryNames(mod),
+      });
+    }
   }
 
   return Array.from(groupMap.entries()).map(([group, stories]) => ({ group, stories }));
