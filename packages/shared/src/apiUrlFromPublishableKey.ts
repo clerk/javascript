@@ -8,11 +8,11 @@ import {
 } from './constants';
 import { parsePublishableKey } from './keys';
 
-// The return type is annotated explicitly so the declaration emit stays
-// deterministic. An inferred union's member order comes from TypeScript's
-// global type-id assignment, which shifts as unrelated code changes and made
-// break-check report phantom diffs for this export. These literals mirror the
-// *_API_URL constants returned below; tsc errors here if a value ever drifts.
+// Explicit return type per the repo TypeScript guideline for public APIs,
+// written as literals because `typeof CONST` would pull a hashed `_chunks/*`
+// import into the published d.ts. The literals mirror the *_API_URL constants
+// returned below (tsc errors here if a value drifts), and the pinned order
+// keeps the declaration emit deterministic where inference is not.
 /**
  * Get the correct API url based on the publishable key.
  *
