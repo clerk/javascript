@@ -81,11 +81,19 @@ function useOrganizationDomains(params: UseOrganizationDomainsParams = {}): UseO
 
   const createDomain = useCallback(
     async (name: string) => {
-      const created = await organization?.createDomain(name);
+      let created = await organization?.createDomain(name);
+
+      // When organization gets created with enterprise_sso enrollment mode
+      // then promote the new domain and issue a TXT ownership challenge so it can be verified over DNS
+      if (created && enrollmentMode === 'enterprise_sso') {
+        created = await created.updateEnrollmentMode({ enrollmentMode: 'enterprise_sso' });
+        created = await created.prepareOwnershipVerification();
+      }
+
       await revalidate();
       return created;
     },
-    [organization, revalidate],
+    [organization, revalidate, enrollmentMode],
   );
 
   const prepareOwnershipVerification = useCallback(

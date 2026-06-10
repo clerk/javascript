@@ -20,11 +20,13 @@ import {
   Tr,
   useLocalizations,
 } from '@/customizables';
+import { Alert } from '@/elements/Alert';
 import { Field } from '@/elements/FieldControl';
 import { Form } from '@/elements/Form';
 import { TagPill } from '@/elements/TagInput';
 import { useClipboard } from '@/hooks';
 import { Checkmark, Clipboard } from '@/icons';
+import { getClerkAPIErrorMessage, getFieldError, getGlobalError } from '@/utils/errorHandler';
 import { useFormControl } from '@/utils/useFormControl';
 
 import { useConfigureSSO } from '../ConfigureSSOContext';
@@ -33,10 +35,24 @@ import { InnerStepCounter } from '../elements/Wizard/InnerStepCounter';
 
 export const VerifyDomainsStep = (): JSX.Element => {
   const { t } = useLocalizations();
-  const { organizationDomains } = useConfigureSSO();
+  const {
+    organizationDomains,
+    organizationDomainMutations: { createDomain, revalidate },
+  } = useConfigureSSO();
 
-  // TODO: replace with the enterprise connection domain API
-  const [domains, setDomains] = useState<string[]>([]);
+  const [error, setError] = useState<string | undefined>(undefined);
+
+  const handleCreateDomain = async (domain: string) => {
+    setError(undefined);
+
+    try {
+      await createDomain(domain);
+    } catch (err) {
+      const apiError = getGlobalError(err as Error) ?? getFieldError(err as Error);
+      setError(apiError ? getClerkAPIErrorMessage(apiError) : (err as Error).message);
+      throw err;
+    }
+  };
 
   return (
     <Flow.Part part='verifyDomain'>
@@ -54,28 +70,32 @@ export const VerifyDomainsStep = (): JSX.Element => {
         <Step.Body>
           <Step.Section sx={t => ({ gap: t.space.$5 })}>
             <Col>
-              {/* TODO -> Trigger mutation to add domain */}
-              <DomainsField
-                onSubmit={domain => {
-                  setDomains(prev => [...prev, domain]);
-                }}
-              />
+              <DomainsField onSubmit={handleCreateDomain} />
 
-              {domains.length > 0 && (
+              {!!organizationDomains?.length && (
                 <Flex
                   wrap='wrap'
                   sx={t => ({ gap: t.space.$2, marginTop: t.space.$4 })}
                 >
-                  {domains.map(domain => (
+                  {organizationDomains.map(domain => (
                     <TagPill
-                      key={domain}
-                      /* TODO -> Trigger mutation to remove domain */
-                      onRemoveClick={() => setDomains(prev => prev.filter(d => d !== domain))}
+                      key={domain.id}
+                      onRemoveClick={() => {
+                        void domain.delete().then(() => revalidate());
+                      }}
                     >
-                      {domain}
+                      {domain.name}
                     </TagPill>
                   ))}
                 </Flex>
+              )}
+
+              {error && (
+                <Alert
+                  variant='danger'
+                  title={error}
+                  sx={t => ({ marginTop: t.space.$4 })}
+                />
               )}
             </Col>
 
@@ -104,7 +124,8 @@ export const VerifyDomainsStep = (): JSX.Element => {
   );
 };
 
-const DomainsField = ({ onSubmit }: { onSubmit: (domain: string) => void }): JSX.Element => {
+const DomainsField = ({ onSubmit }: { onSubmit: (domain: string) => Promise<void> }): JSX.Element => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const domainField = useFormControl('domain', '', {
     type: 'text',
     label: localizationKeys('configureSSO.verifyDomainsStep.formFieldLabel__domain'),
@@ -112,7 +133,7 @@ const DomainsField = ({ onSubmit }: { onSubmit: (domain: string) => void }): JSX
   });
 
   const domain = domainField.value.trim().toLowerCase();
-  const canSubmit = isValidDomain(domain);
+  const canSubmit = isValidDomain(domain) && !isSubmitting;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -121,7 +142,13 @@ const DomainsField = ({ onSubmit }: { onSubmit: (domain: string) => void }): JSX
       return;
     }
 
-    onSubmit(domain);
+    setIsSubmitting(true);
+    void onSubmit(domain)
+      .then(() => domainField.setValue(''))
+      .catch(() => {
+        // The parent surfaces the failure; keep the entered value so the user can correct it.
+      })
+      .finally(() => setIsSubmitting(false));
   };
 
   return (
@@ -149,6 +176,7 @@ const DomainsField = ({ onSubmit }: { onSubmit: (domain: string) => void }): JSX
               variant='bordered'
               colorScheme='secondary'
               isDisabled={!canSubmit}
+              isLoading={isSubmitting}
               localizationKey={localizationKeys('configureSSO.verifyDomainsStep.formButtonPrimary__add')}
               sx={{ flexShrink: 0 }}
             />
