@@ -9,7 +9,6 @@
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     "lib": ["ES2023", "DOM"],
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
       "@clerk/ui/mosaic": ["../ui/src/mosaic"],
