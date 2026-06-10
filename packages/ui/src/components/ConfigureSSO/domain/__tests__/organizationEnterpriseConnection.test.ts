@@ -174,8 +174,6 @@ describe('organizationEnterpriseConnection', () => {
       ).toBe('in_progress');
     });
     it('successfully tested but not minimally configured → in_progress', () => {
-      // `inactive` requires BOTH minimum configuration and a successful run; a
-      // stray successful run on an unconfigured connection stays in_progress.
       expect(
         derive({
           connection: makeConnection({ samlConnection: null, active: false }),

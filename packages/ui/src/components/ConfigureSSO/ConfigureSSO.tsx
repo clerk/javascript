@@ -43,12 +43,6 @@ const AuthenticatedContent = withCoreUserGuard(() => {
   );
 });
 
-/**
- * The standalone mount's data owner: fetches through the umbrella hook, gates
- * loading and permission, and injects the resolved data into the pure
- * `ConfigureSSOWizard` — mirroring what the Security page does for the
- * `OrganizationProfile` mount.
- */
 const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObject<HTMLDivElement> }) => {
   const {
     isLoading,
@@ -59,10 +53,7 @@ const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObject<HTMLD
     primaryEmailAddress,
   } = useOrganizationEnterpriseConnection();
 
-  // Gate loading one level above the provider so the context never observes a
-  // loading state. The single test-run source is part of this initial fetch
-  // when a connection exists at load, so a cold landing on the test step is
-  // covered by the full skeleton here.
+  // Gate loading above the provider so the context never observes a loading state.
   if (isLoading) {
     return <ConfigureSSOSkeleton />;
   }
@@ -81,11 +72,7 @@ const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObject<HTMLD
   );
 };
 
-/**
- * Permission gate shared by the wizard's hosts: renders the missing-permission
- * state unless the active organization membership can manage enterprise
- * connections (personal workspaces pass — there is no membership to check).
- */
+/** Permission gate shared by the wizard's hosts — personal workspaces pass, since there is no membership to check. */
 export const ConfigureSSOProtect = ({ children }: { children: React.ReactNode }) => {
   const { session } = useSession();
   const isPersonalWorkspace = !session?.lastActiveOrganizationId;

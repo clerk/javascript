@@ -23,24 +23,12 @@ export const connectionBackingEmail = (user: UserResource | null | undefined): E
 export interface OrganizationEnterpriseConnectionInput {
   /** FAPI currently supports a single connection per organization. */
   connection: EnterpriseConnectionResource | null | undefined;
-  /** The email address whose domain backs the connection. */
   primaryEmail: EmailAddressResource | null | undefined;
   /** Probed upstream — not a property of the connection resource itself. */
   hasSuccessfulTestRun: boolean;
 }
 
-/**
- * The display-facing summary of the connection lifecycle — the state model the
- * Security page's badge/states read from. The wizard's navigation guards keep
- * reading the raw booleans; this only collapses them into one label for UI that
- * talks about the connection as a whole.
- *
- * - `unconfigured` — no connection exists yet.
- * - `in_progress` — a connection exists but is mid-configuration, or configured
- *   but not yet successfully tested.
- * - `inactive` — fully built and successfully tested, just toggled off.
- * - `active` — the connection is live.
- */
+/** Display-facing lifecycle summary — the wizard's navigation guards keep reading the raw booleans. */
 export type OrganizationEnterpriseConnectionStatus = 'unconfigured' | 'in_progress' | 'active' | 'inactive';
 
 /**
@@ -54,7 +42,6 @@ export interface OrganizationEnterpriseConnection {
   readonly hasMinimumConfiguration: boolean;
   readonly isPrimaryEmailVerified: boolean;
   readonly hasSuccessfulTestRun: boolean;
-  /** The lifecycle summary derived from the booleans above — see {@link OrganizationEnterpriseConnectionStatus}. */
   readonly status: OrganizationEnterpriseConnectionStatus;
 }
 
@@ -63,15 +50,6 @@ export const isEnterpriseConnectionConfigured = (
   connection: EnterpriseConnectionResource | null | undefined,
 ): boolean => Boolean(connection?.samlConnection?.idpSsoUrl && connection?.samlConnection?.idpEntityId);
 
-/**
- * Collapses the lifecycle booleans into the display-facing status. Precedence,
- * first match wins:
- *
- * 1. no connection → `unconfigured`
- * 2. connection active → `active` (activation trumps configuration/test state)
- * 3. minimally configured AND successfully tested → `inactive` (fully built, toggled off)
- * 4. otherwise → `in_progress` (mid-configuration, or configured but not yet successfully tested)
- */
 const connectionStatus = ({
   hasConnection,
   isActive,
