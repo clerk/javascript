@@ -1376,6 +1376,7 @@ export const enUS: LocalizationResource = {
     },
     protectCheck: {
       loading: 'Loading…',
+      retryButton: 'Try again',
       subtitle: 'Please wait while we verify your request.',
       title: 'Verifying your request',
     },
@@ -1477,6 +1478,7 @@ export const enUS: LocalizationResource = {
     },
     protectCheck: {
       loading: 'Loading…',
+      retryButton: 'Try again',
       subtitle: 'Please wait while we verify your request.',
       title: 'Verifying your request',
     },
@@ -1677,6 +1679,9 @@ export const enUS: LocalizationResource = {
     protect_check_invalid_sdk_url: "Verification couldn't start. Please contact support.",
     protect_check_script_load_failed:
       "Couldn't load verification. This may be caused by a network issue or a Content Security Policy that blocks the verification script. Please try again or contact support.",
+    protect_check_timed_out: "Verification didn't complete in time. Please try again.",
+    protect_check_unsupported_environment:
+      "Verification isn't supported in this environment. Please continue in a standard browser or contact support.",
     session_exists: undefined,
     web3_missing_identifier: 'A Web3 Wallet extension cannot be found. Please install one to continue.',
     web3_signature_request_rejected: 'You have rejected the signature request. Please try again to continue.',

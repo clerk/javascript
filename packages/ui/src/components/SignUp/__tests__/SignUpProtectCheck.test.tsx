@@ -4,7 +4,7 @@ import { waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { render } from '@/test/utils';
+import { fireEvent, render } from '@/test/utils';
 
 import { SignUpProtectCheck } from '../SignUpProtectCheck';
 
@@ -167,5 +167,61 @@ describe('SignUpProtectCheck', () => {
 
     await waitFor(() => expect(mockExecute).toHaveBeenCalled());
     expect(fixtures.signUp.submitProtectCheck).not.toHaveBeenCalled();
+  });
+
+  it('finalizes the session when an already_resolved reload reveals a complete status', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.startSignUpWithProtectCheck();
+    });
+    mockExecute.mockResolvedValue('proof-abc');
+    fixtures.signUp.submitProtectCheck.mockRejectedValue(
+      new ClerkAPIResponseError('Already resolved', {
+        data: [{ code: 'protect_check_already_resolved', message: 'Already resolved', long_message: '' }],
+        status: 400,
+        clerkTraceId: 'trace_123',
+      }),
+    );
+    const reloadMock = vi.fn().mockImplementation(async () => {
+      (fixtures.signUp as any).status = 'complete';
+      (fixtures.signUp as any).createdSessionId = 'sess_done';
+      (fixtures.signUp as any).protectCheck = null;
+      (fixtures.signUp as any).missingFields = [];
+      return fixtures.signUp;
+    });
+    (fixtures.signUp as any).reload = reloadMock;
+
+    render(<SignUpProtectCheck />, { wrapper });
+
+    await waitFor(() => {
+      expect(reloadMock).toHaveBeenCalled();
+      expect(fixtures.clerk.setActive).toHaveBeenCalled();
+    });
+  });
+
+  it('shows a retry control after a failure and re-runs the challenge when clicked', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.startSignUpWithProtectCheck();
+    });
+    mockExecute
+      .mockRejectedValueOnce(
+        new ClerkRuntimeError('Protect check script failed to load', { code: 'protect_check_script_load_failed' }),
+      )
+      .mockResolvedValue('proof-retry');
+    fixtures.signUp.submitProtectCheck.mockResolvedValue({
+      status: 'complete',
+      protectCheck: null,
+      createdSessionId: 'sess_123',
+    } as unknown as SignUpResource);
+
+    const { findByRole } = render(<SignUpProtectCheck />, { wrapper });
+
+    // Target the button by role: the error message itself also contains "try again".
+    const retryButton = await findByRole('button', { name: /try again/i });
+    fireEvent.click(retryButton);
+
+    await waitFor(() => {
+      expect(mockExecute).toHaveBeenCalledTimes(2);
+      expect(fixtures.signUp.submitProtectCheck).toHaveBeenCalledWith({ proofToken: 'proof-retry' });
+    });
   });
 });

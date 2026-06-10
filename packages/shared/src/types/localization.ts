@@ -413,6 +413,7 @@ export type __internal_LocalizationResource = {
       title: LocalizationValue;
       subtitle: LocalizationValue;
       loading: LocalizationValue;
+      retryButton: LocalizationValue;
     };
   };
   signIn: {
@@ -600,6 +601,7 @@ export type __internal_LocalizationResource = {
       title: LocalizationValue;
       subtitle: LocalizationValue;
       loading: LocalizationValue;
+      retryButton: LocalizationValue;
     };
   };
   reverification: {
@@ -2002,6 +2004,8 @@ type UnstableErrors = WithParamName<{
   protect_check_invalid_script: LocalizationValue;
   protect_check_invalid_sdk_url: LocalizationValue;
   protect_check_script_load_failed: LocalizationValue;
+  protect_check_timed_out: LocalizationValue;
+  protect_check_unsupported_environment: LocalizationValue;
   form_identifier_not_found: LocalizationValue;
   captcha_unavailable: LocalizationValue;
   captcha_invalid: LocalizationValue;

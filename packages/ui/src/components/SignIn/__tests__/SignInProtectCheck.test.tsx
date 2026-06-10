@@ -4,7 +4,7 @@ import { waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { render } from '@/test/utils';
+import { fireEvent, render } from '@/test/utils';
 
 import { SignInProtectCheck } from '../SignInProtectCheck';
 
@@ -196,5 +196,62 @@ describe('SignInProtectCheck', () => {
 
     await waitFor(() => expect(mockExecute).toHaveBeenCalled());
     expect(fixtures.signIn.submitProtectCheck).not.toHaveBeenCalled();
+  });
+
+  it('finalizes the session when an already_resolved reload reveals a complete status', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.startSignInWithProtectCheck();
+    });
+    mockExecute.mockResolvedValue('proof-abc');
+    fixtures.signIn.submitProtectCheck.mockRejectedValue(
+      new ClerkAPIResponseError('Already resolved', {
+        data: [{ code: 'protect_check_already_resolved', message: 'Already resolved', long_message: '' }],
+        status: 400,
+        clerkTraceId: 'trace_123',
+      }),
+    );
+    // The reload surfaces a sign-in that has progressed straight to `complete`.
+    const reloadMock = vi.fn().mockImplementation(async () => {
+      (fixtures.signIn as any).status = 'complete';
+      (fixtures.signIn as any).createdSessionId = 'sess_done';
+      (fixtures.signIn as any).protectCheck = null;
+      return fixtures.signIn;
+    });
+    (fixtures.signIn as any).reload = reloadMock;
+
+    render(<SignInProtectCheck />, { wrapper });
+
+    // Must finalize (setActive), not bounce to the start form with an unactivated session.
+    await waitFor(() => {
+      expect(reloadMock).toHaveBeenCalled();
+      expect(fixtures.clerk.setActive).toHaveBeenCalled();
+    });
+  });
+
+  it('shows a retry control after a failure and re-runs the challenge when clicked', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.startSignInWithProtectCheck();
+    });
+    mockExecute
+      .mockRejectedValueOnce(
+        new ClerkRuntimeError('Protect check script failed to load', { code: 'protect_check_script_load_failed' }),
+      )
+      .mockResolvedValue('proof-retry');
+    fixtures.signIn.submitProtectCheck.mockResolvedValue({
+      status: 'needs_first_factor',
+      protectCheck: null,
+      createdSessionId: null,
+    } as unknown as SignInResource);
+
+    const { findByRole } = render(<SignInProtectCheck />, { wrapper });
+
+    // Target the button by role: the error message itself also contains "try again".
+    const retryButton = await findByRole('button', { name: /try again/i });
+    fireEvent.click(retryButton);
+
+    await waitFor(() => {
+      expect(mockExecute).toHaveBeenCalledTimes(2);
+      expect(fixtures.signIn.submitProtectCheck).toHaveBeenCalledWith({ proofToken: 'proof-retry' });
+    });
   });
 });
