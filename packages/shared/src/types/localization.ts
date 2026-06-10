@@ -1130,6 +1130,29 @@ export type __internal_LocalizationResource = {
       messageLine2: LocalizationValue;
       successMessage: LocalizationValue;
     };
+    securityPage: {
+      title: LocalizationValue;
+      ssoSection: {
+        title: LocalizationValue;
+        badge__unconfigured: LocalizationValue;
+        badge__inProgress: LocalizationValue;
+        badge__active: LocalizationValue;
+        badge__inactive: LocalizationValue;
+        description: LocalizationValue;
+        description__configured: LocalizationValue;
+        startedNotFinished: LocalizationValue;
+        primaryButton__startConfiguration: LocalizationValue;
+        primaryButton__continueConfiguration: LocalizationValue;
+        enableSsoLabel: LocalizationValue;
+        providerLabel: LocalizationValue;
+        domainLabel: LocalizationValue;
+        signOnUrlLabel: LocalizationValue;
+        issuerLabel: LocalizationValue;
+        certificateLabel: LocalizationValue;
+        menuAction__edit: LocalizationValue;
+        menuAction__delete: LocalizationValue;
+      };
+    };
     membersPage: {
       detailsTitle__emptyRow: LocalizationValue;
       action__invite: LocalizationValue;
