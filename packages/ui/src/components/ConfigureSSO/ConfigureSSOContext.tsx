@@ -4,12 +4,6 @@ import React, { type PropsWithChildren } from 'react';
 import type { OrganizationEnterpriseConnection } from './domain/organizationEnterpriseConnection';
 import type { EnterpriseConnectionMutations, TestRunsView } from './hooks/useOrganizationEnterpriseConnection';
 
-/**
- * Domain-scoped mutations for the active organization's domains, sourced from
- * `__internal_useOrganizationDomains`. Kept separate from the
- * connection-scoped `EnterpriseConnectionMutations` so the two surfaces stay
- * decoupled and can be lifted independently.
- */
 export interface OrganizationDomainMutations {
   createDomain: (name: string) => Promise<OrganizationDomainResource | undefined>;
   prepareOwnershipVerification: (domain: OrganizationDomainResource) => Promise<OrganizationDomainResource | undefined>;

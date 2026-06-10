@@ -230,8 +230,6 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
     () =>
       buildOrganizationEnterpriseConnection({
         connection: enterpriseConnection,
-        // TODO -> Add organization domains to the connection
-        domains: ['clerk.dev'],
         hasSuccessfulTestRun,
       }),
     [enterpriseConnection, hasSuccessfulTestRun],

@@ -7,6 +7,25 @@ import { ConfigureSSO } from '../ConfigureSSO';
 
 const { createFixtures } = bindCreateFixtures('ConfigureSSO');
 
+const verifiedDomain = {
+  id: 'dmn_verified',
+  name: 'clerk.com',
+  organizationId: 'Org1',
+  enrollmentMode: 'enterprise_sso',
+  ownershipVerification: { status: 'verified', strategy: 'txt' },
+} as any;
+
+const unverifiedDomain = {
+  id: 'dmn_unverified',
+  name: 'clerk.com',
+  organizationId: 'Org1',
+  enrollmentMode: 'enterprise_sso',
+  ownershipVerification: { status: 'unverified', strategy: 'txt' },
+} as any;
+
+const mockOrganizationDomains = (fixtures: any, domains: any[]) =>
+  fixtures.clerk.organization?.getDomains.mockResolvedValue({ data: domains, total_count: domains.length } as any);
+
 describe('ConfigureSSO', () => {
   describe('within an organization', () => {
     it('shows a warning if the active organization membership lacks the manage enterprise connections permission', async () => {
@@ -41,6 +60,7 @@ describe('ConfigureSSO', () => {
       });
 
       fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
+      mockOrganizationDomains(fixtures, [verifiedDomain]);
 
       const { findByText, queryByText } = render(<ConfigureSSO />, { wrapper });
 
@@ -63,16 +83,16 @@ describe('ConfigureSSO', () => {
 
       const { findByText, queryByText } = render(<ConfigureSSO />, { wrapper });
 
-      await findByText(/select your identity provider/i);
+      // No active organization ⇒ no organization domains to verify, so the wizard
+      // renders its first step (verify-domain). The point of this test is that the
+      // wizard renders at all without the manage-permission gate.
+      await findByText(/specify and verify the domains/i);
       expect(queryByText(/you do not have permission to manage single sign-on/i)).not.toBeInTheDocument();
     });
   });
 
   describe('state machine mounts on the right step', () => {
-    // TODO: Add test for TXT domain-verification case (ORGS-1594)
-    // When there are pending organization domains, the machine should mount on the verify-domain step
-
-    it('mounts on select-provider with a verified email and no connection', async () => {
+    it('mounts on select-provider when all organization domains are verified and there is no connection', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEnterpriseSso({ selfServeSSO: true });
         f.withEmailAddress();
@@ -84,12 +104,33 @@ describe('ConfigureSSO', () => {
       });
 
       fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
+      mockOrganizationDomains(fixtures, [verifiedDomain]);
 
       const { findByText } = render(<ConfigureSSO />, { wrapper });
 
-      // Verified primary email fulfills verify-domain, so the machine skips it
-      // and lands on select-provider — the first non-fulfilled enabled step.
+      // verify-domain is fulfilled by the verified domains, so the machine skips
+      // it and lands on select-provider — the first non-fulfilled enabled step.
       await findByText(/select your identity provider/i);
+    });
+
+    it('stays on verify-domain when not all organization domains are verified', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEnterpriseSso({ selfServeSSO: true });
+        f.withEmailAddress();
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', permissions: ['org:sys_entconns:manage'] }],
+        });
+      });
+
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
+      mockOrganizationDomains(fixtures, [unverifiedDomain]);
+
+      const { findByText, queryByText } = render(<ConfigureSSO />, { wrapper });
+
+      await findByText(/specify and verify the domains/i);
+      expect(queryByText(/select your identity provider/i)).not.toBeInTheDocument();
     });
 
     it('short-circuits to the confirmation step for an active connection', async () => {
@@ -121,6 +162,7 @@ describe('ConfigureSSO', () => {
           },
         } as any,
       ]);
+      mockOrganizationDomains(fixtures, [verifiedDomain]);
       fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
         data: [],
         total_count: 0,
@@ -161,6 +203,7 @@ describe('ConfigureSSO', () => {
           },
         } as any,
       ]);
+      mockOrganizationDomains(fixtures, [verifiedDomain]);
       // No successful run yet, so the confirmation guard fails and the
       // furthest-reachable step is `test`.
       fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
@@ -203,6 +246,7 @@ describe('ConfigureSSO', () => {
           },
         } as any,
       ]);
+      mockOrganizationDomains(fixtures, [verifiedDomain]);
       // A successful run satisfies the confirmation guard (`hasSuccessfulTestRun`)
       // even though the connection is still inactive — the success-filtered probe
       // returns a row, so the furthest-reachable step clears `test` and lands on

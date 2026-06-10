@@ -23,7 +23,6 @@ export const connectionBackingEmail = (user: UserResource | null | undefined): E
 export interface OrganizationEnterpriseConnectionInput {
   /** FAPI currently supports a single connection per organization. */
   connection: EnterpriseConnectionResource | null | undefined;
-  primaryEmail: EmailAddressResource | null | undefined;
   /** Probed upstream — not a property of the connection resource itself. */
   hasSuccessfulTestRun: boolean;
 }

@@ -28,8 +28,8 @@ import { Form } from '@/elements/Form';
 import { TagPill } from '@/elements/TagInput';
 import { useClipboard } from '@/hooks';
 import { Checkmark, Clipboard } from '@/icons';
-import { getClerkAPIErrorMessage, getFieldError, getGlobalError } from '@/utils/errorHandler';
-import { useFormControl } from '@/utils/useFormControl';
+import { useFormControl } from '@/ui/utils/useFormControl';
+import { handleError } from '@/utils/errorHandler';
 
 import { useConfigureSSO } from '../ConfigureSSOContext';
 import { Step } from '../elements/Step';
@@ -50,10 +50,8 @@ export const VerifyDomainsStep = (): JSX.Element => {
 
     try {
       await createDomain(domain);
-    } catch (err) {
-      const apiError = getGlobalError(err as Error) ?? getFieldError(err as Error);
-      card.setError(apiError ? getClerkAPIErrorMessage(apiError) : (err as Error).message);
-      throw err;
+    } catch (err: any) {
+      handleError(err, [], card.setError);
     }
   };
 
@@ -146,6 +144,15 @@ export const VerifyDomainsStep = (): JSX.Element => {
   );
 };
 
+/**
+ * Matches a bare domain such as `example.com` or `sub.example.co.uk`.
+ * Each label must start and end with an alphanumeric character and a valid
+ * TLD of at least two letters is required. Protocols, paths, ports, spaces
+ * and single-label hostnames are rejected.
+ */
+const DOMAIN_REGEX = /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/i;
+const isValidDomain = (value: string): boolean => DOMAIN_REGEX.test(value);
+
 const DomainsField = ({
   onSubmit,
   organizationDomains,
@@ -173,9 +180,6 @@ const DomainsField = ({
     setIsSubmitting(true);
     void onSubmit(domain)
       .then(() => domainField.setValue(''))
-      .catch(() => {
-        // The parent surfaces the failure; keep the entered value so the user can correct it.
-      })
       .finally(() => setIsSubmitting(false));
   };
 
@@ -214,15 +218,6 @@ const DomainsField = ({
     </Form.Root>
   );
 };
-
-/**
- * Matches a bare domain such as `example.com` or `sub.example.co.uk`.
- * Each label must start and end with an alphanumeric character and a valid
- * TLD of at least two letters is required. Protocols, paths, ports, spaces
- * and single-label hostnames are rejected.
- */
-const DOMAIN_REGEX = /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/i;
-const isValidDomain = (value: string): boolean => DOMAIN_REGEX.test(value);
 
 const TxtRecordTable = ({
   organizationDomains,

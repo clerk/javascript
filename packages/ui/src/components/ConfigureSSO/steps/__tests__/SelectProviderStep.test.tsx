@@ -17,26 +17,24 @@ vi.mock('../../elements/Wizard', () => ({
 
 const createEnterpriseConnection = vi.fn();
 
+const VERIFIED_DOMAINS = [{ name: 'clerk.com' }, { name: 'example.com' }];
+const VERIFIED_DOMAIN_NAMES = VERIFIED_DOMAINS.map(domain => domain.name);
+
 // Provider is sourced from the connection entity
 // (organizationEnterpriseConnection.provider) rather than a context-level
 // setProvider. The step uses goNext (not goToStep) after a successful create.
 const contextState = vi.hoisted(() => ({
   provider: undefined as 'saml_okta' | 'saml_custom' | undefined,
-  primaryEmailAddress: { emailAddress: 'test@clerk.com' } as { emailAddress: string } | undefined,
+  organizationDomains: [{ name: 'clerk.com' }, { name: 'example.com' }] as Array<{ name: string }> | undefined,
 }));
 
 vi.mock('../../ConfigureSSOContext', () => ({
   useConfigureSSO: () => ({
     enterpriseConnection: undefined,
-    // The step's local `handleContinue` reads the reverification-wrapped create
-    // mutation off the bundled `enterpriseConnectionMutations` object.
     enterpriseConnectionMutations: {
       createConnection: createEnterpriseConnection,
     },
-    primaryEmailAddress: contextState.primaryEmailAddress,
-    // Provider is sourced from the connection entity; the step no longer reads a
-    // context-level setProvider — verify-domain runs first, so the create is
-    // unconditional.
+    organizationDomains: contextState.organizationDomains,
     organizationEnterpriseConnection: {
       provider: contextState.provider,
     },
@@ -59,7 +57,7 @@ const resetMocks = () => {
   createEnterpriseConnection.mockReset();
   createEnterpriseConnection.mockResolvedValue(undefined);
   contextState.provider = undefined;
-  contextState.primaryEmailAddress = { emailAddress: 'test@clerk.com' };
+  contextState.organizationDomains = [{ name: 'clerk.com' }, { name: 'example.com' }];
 };
 
 describe('SelectProviderStep', () => {
@@ -163,7 +161,7 @@ describe('SelectProviderStep', () => {
       expect(goNext).toHaveBeenCalled();
     });
 
-    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta', contextState.primaryEmailAddress);
+    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta', VERIFIED_DOMAIN_NAMES);
     // The create then the goNext are the tail of the call order.
     expect(callOrder.slice(-2)).toEqual(['createEnterpriseConnection', 'goNext']);
   });
@@ -180,7 +178,7 @@ describe('SelectProviderStep', () => {
       expect(goNext).toHaveBeenCalled();
     });
 
-    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_custom', contextState.primaryEmailAddress);
+    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_custom', VERIFIED_DOMAIN_NAMES);
   });
 
   it('does not advance when failing to create enterprise connection', async () => {
@@ -198,7 +196,7 @@ describe('SelectProviderStep', () => {
     await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
 
     await waitFor(() => {
-      expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta', contextState.primaryEmailAddress);
+      expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta', VERIFIED_DOMAIN_NAMES);
     });
 
     expect(goNext).not.toHaveBeenCalled();
@@ -212,11 +210,7 @@ describe('SelectProviderStep', () => {
     expect(screen.getByRole('button', { name: /Previous/i })).toBeDisabled();
   });
 
-  it('always creates and jumps to configure (verify-domain ran first, so no branch back)', async () => {
-    // TODO -> Update with organization domains verification
-    // Under the new step order the user reaches select-provider only after
-    // verify-domain, so the create is unconditional even if the verified fact is
-    // somehow false — there is no longer a branch back to verify-domain.
+  it('forwards the verified organization domain names to createConnection', async () => {
     resetMocks();
 
     const { wrapper } = await createFixtures();
@@ -229,6 +223,6 @@ describe('SelectProviderStep', () => {
       expect(goNext).toHaveBeenCalled();
     });
 
-    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta', contextState.primaryEmailAddress);
+    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta', VERIFIED_DOMAIN_NAMES);
   });
 });
