@@ -13,7 +13,12 @@ export interface MenuItemProps extends ComponentProps<'button'> {
 }
 
 export const MenuItem = React.forwardRef<HTMLButtonElement, MenuItemProps>(function MenuItem(props, ref) {
-  const { render, label, disabled, closeOnClick = true, ...otherProps } = props;
+  const { render, label, disabled, closeOnClick = true, onClick: consumerOnClick, ...otherProps } = props;
+  // When disabled, omit the consumer onClick entirely so mergeProps doesn't chain it.
+  // When not disabled, add it back only if it's a function (avoids spreading onClick: undefined
+  // which would overwrite the internal getItemProps handler via mergeProps).
+  const safeOtherProps =
+    !disabled && typeof consumerOnClick === 'function' ? { ...otherProps, onClick: consumerOnClick } : otherProps;
   const { activeIndex, getItemProps } = useMenuContext();
   const tree = useFloatingTree();
   const item = useListItem({ label: disabled ? null : label });
@@ -50,6 +55,6 @@ export const MenuItem = React.forwardRef<HTMLButtonElement, MenuItemProps>(funct
       active: (v: boolean) => (v ? { 'data-cl-active': '' } : null),
       disabled: (v: boolean) => (v ? { 'data-cl-disabled': '' } : null),
     },
-    props: mergeProps<'button'>(defaultProps, otherProps),
+    props: mergeProps<'button'>(defaultProps, safeOtherProps),
   });
 });

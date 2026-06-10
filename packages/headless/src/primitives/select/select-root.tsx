@@ -138,14 +138,22 @@ function SelectInner(props: SelectProps) {
     ref: popupRef,
   });
 
+  const isControlled = props.value !== undefined;
+
   const handleSelect = useCallback(
     (value: string, index: number) => {
       setSelectedValue(value);
       setSelectedIndex(index);
-      setSelectedLabel(valueToLabelRef.current.get(value) ?? value);
+      // In controlled mode the parent decides whether to accept the new value.
+      // If they reject it, selectedValue rolls back but selectedLabel would not,
+      // showing a stale label. Only cache the label in uncontrolled mode where
+      // the value always persists after selection.
+      if (!isControlled) {
+        setSelectedLabel(valueToLabelRef.current.get(value) ?? value);
+      }
       setOpen(false);
     },
-    [setSelectedValue, setOpen],
+    [isControlled, setSelectedValue, setOpen],
   );
 
   const handleTypeaheadMatch = useCallback(

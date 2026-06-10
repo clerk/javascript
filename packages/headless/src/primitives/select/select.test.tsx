@@ -239,6 +239,45 @@ describe('Select', () => {
     });
   });
 
+  describe('controlled value', () => {
+    it('does not display a stale label when the controlled parent rejects the change', async () => {
+      const user = userEvent.setup();
+      // The parent keeps `value` pinned to 'apple' and ignores onValueChange,
+      // so the displayed label must stay "Apple" even after clicking "Banana".
+      render(
+        <Select.Root
+          items={fruits}
+          alignItemWithTrigger={false}
+          value='apple'
+          onValueChange={() => {}}
+        >
+          <Select.Trigger>
+            <Select.Value placeholder='Pick a fruit...' />
+          </Select.Trigger>
+          <Select.Positioner>
+            <Select.Popup>
+              {fruits.map(({ label, value }) => (
+                <Select.Option
+                  key={value}
+                  value={value}
+                  label={label}
+                >
+                  {label}
+                </Select.Option>
+              ))}
+            </Select.Popup>
+          </Select.Positioner>
+        </Select.Root>,
+      );
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(screen.getByText('Banana'));
+
+      const value = document.querySelector('[data-cl-slot="select-value"]');
+      expect(value?.textContent).toBe('Apple');
+    });
+  });
+
   describe('keyboard navigation', () => {
     it('navigates options with arrow keys', async () => {
       const user = userEvent.setup();

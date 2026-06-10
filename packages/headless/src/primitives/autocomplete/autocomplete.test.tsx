@@ -181,7 +181,7 @@ describe('Autocomplete', () => {
       const user = userEvent.setup();
       render(<FilteredAutocomplete />);
 
-      const input = screen.getByPlaceholderText('Search fruits...');
+      const input = screen.getByPlaceholderText('Search fruits...') as HTMLInputElement;
       await user.type(input, 'b');
       await user.click(screen.getByText('Banana'));
 
@@ -241,7 +241,7 @@ describe('Autocomplete', () => {
       const user = userEvent.setup();
       render(<FilteredAutocomplete />);
 
-      const input = screen.getByPlaceholderText('Search fruits...');
+      const input = screen.getByPlaceholderText('Search fruits...') as HTMLInputElement;
       await user.type(input, 'b');
       await user.keyboard('{Enter}');
 
@@ -403,6 +403,43 @@ describe('Autocomplete', () => {
       await user.click(screen.getByText('Banana'));
 
       expect(onValueChange).not.toHaveBeenCalledWith('banana');
+    });
+
+    it('does not select a disabled option via Enter', async () => {
+      const onValueChange = vi.fn();
+      const user = userEvent.setup();
+      render(
+        <Autocomplete.Root onValueChange={onValueChange}>
+          <Autocomplete.Input placeholder='Search...' />
+          <Autocomplete.Positioner>
+            <Autocomplete.Popup>
+              <Autocomplete.Option
+                value='apple'
+                label='Apple'
+                disabled
+              >
+                Apple
+              </Autocomplete.Option>
+              <Autocomplete.Option
+                value='banana'
+                label='Banana'
+              >
+                Banana
+              </Autocomplete.Option>
+            </Autocomplete.Popup>
+          </Autocomplete.Positioner>
+        </Autocomplete.Root>,
+      );
+
+      const input = screen.getByPlaceholderText('Search...');
+      // Typing opens the list and highlights the first option (the disabled "Apple").
+      await user.type(input, 'a');
+      const active = document.querySelector('[data-cl-slot="autocomplete-option"][data-cl-active]');
+      expect(active).toHaveTextContent('Apple');
+
+      await user.keyboard('{Enter}');
+
+      expect(onValueChange).not.toHaveBeenCalled();
     });
   });
 
@@ -911,7 +948,7 @@ describe('Autocomplete', () => {
 
       await user.click(screen.getByText('Pick a fruit...'));
 
-      const input = screen.getByPlaceholderText('Search...');
+      const input = screen.getByPlaceholderText('Search...') as HTMLInputElement;
       expect(document.activeElement).toBe(input);
       expect(input.value).toBe('');
     });
@@ -925,7 +962,7 @@ describe('Autocomplete', () => {
 
       await user.click(screen.getByText('Cherry'));
 
-      const input = screen.getByPlaceholderText('Search...');
+      const input = screen.getByPlaceholderText('Search...') as HTMLInputElement;
       expect(document.activeElement).toBe(input);
       expect(input.value).toBe('');
     });

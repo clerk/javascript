@@ -23,6 +23,10 @@ export interface PopoverContextValue {
   modal: boolean;
   labelId: string;
   descriptionId: string;
+  hasTitle: boolean;
+  hasDescription: boolean;
+  setHasTitle: (v: boolean) => void;
+  setHasDescription: (v: boolean) => void;
   mounted: boolean;
   transitionProps: TransitionProps;
 }

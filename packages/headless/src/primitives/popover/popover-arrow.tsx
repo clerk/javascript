@@ -5,7 +5,7 @@ import React from 'react';
 
 import { usePopoverContext } from './popover-context';
 
-export type PopoverArrowProps = React.ComponentPropsWithRef<typeof FloatingArrow>;
+export type PopoverArrowProps = Omit<React.ComponentPropsWithRef<typeof FloatingArrow>, 'context'>;
 
 export const PopoverArrow = React.forwardRef<SVGSVGElement, PopoverArrowProps>(function PopoverArrow(props, ref) {
   const { floatingContext, arrowRef, placement } = usePopoverContext();

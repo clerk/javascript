@@ -137,7 +137,7 @@ Accepts all `FloatingArrow` props. `ref` and `context` are injected automaticall
 | `Escape`          | Close the popup                       |
 | Type a character  | Jump to matching option (typeahead)   |
 
-Typeahead also works while the popup is closed — it changes the selected value directly.
+Typeahead is active only while the popup is open. It highlights the matching option; pressing Enter or Space then selects it.
 
 ## Data Attributes
 

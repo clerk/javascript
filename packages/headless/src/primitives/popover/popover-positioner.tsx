@@ -21,6 +21,8 @@ export const PopoverPositioner = React.forwardRef<HTMLDivElement, PopoverPositio
       modal,
       labelId,
       descriptionId,
+      hasTitle,
+      hasDescription,
     } = usePopoverContext();
 
     const side = placement.split('-')[0];
@@ -36,8 +38,8 @@ export const PopoverPositioner = React.forwardRef<HTMLDivElement, PopoverPositio
       'data-cl-side': side,
       ref: combinedRef,
       style: floatingStyles,
-      'aria-labelledby': labelId,
-      'aria-describedby': descriptionId,
+      ...(hasTitle && { 'aria-labelledby': labelId }),
+      ...(hasDescription && { 'aria-describedby': descriptionId }),
       ...(getFloatingProps() as React.ComponentPropsWithRef<'div'>),
     };
 

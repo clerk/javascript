@@ -318,6 +318,32 @@ describe('Menu', () => {
 
       expect(screen.getByText('Actions')).toHaveAttribute('data-cl-open', '');
     });
+
+    it('does not fire the consumer onClick when clicking a disabled item', async () => {
+      const onClick = vi.fn();
+      const user = userEvent.setup();
+      render(
+        <Menu.Root>
+          <Menu.Trigger>Actions</Menu.Trigger>
+          <Menu.Positioner>
+            <Menu.Popup>
+              <Menu.Item
+                label='Delete'
+                disabled
+                onClick={onClick}
+              >
+                Delete
+              </Menu.Item>
+            </Menu.Popup>
+          </Menu.Positioner>
+        </Menu.Root>,
+      );
+
+      await user.click(screen.getByText('Actions'));
+      await user.click(screen.getByText('Delete'));
+
+      expect(onClick).not.toHaveBeenCalled();
+    });
   });
 
   describe('keyboard navigation', () => {

@@ -17,7 +17,7 @@ import {
   useInteractions,
   useRole,
 } from '@floating-ui/react';
-import { type ReactNode, useId, useMemo, useRef } from 'react';
+import { type ReactNode, useCallback, useId, useMemo, useRef, useState } from 'react';
 
 import { useControllableState } from '../../hooks/use-controllable-state';
 import { useTransition } from '../../hooks/use-transition';
@@ -42,6 +42,10 @@ function PopoverInner(props: PopoverProps) {
 
   const labelId = useId();
   const descriptionId = useId();
+  const [hasTitle, setHasTitle] = useState(false);
+  const [hasDescription, setHasDescription] = useState(false);
+  const setHasTitleCb = useCallback((v: boolean) => setHasTitle(v), []);
+  const setHasDescriptionCb = useCallback((v: boolean) => setHasDescription(v), []);
 
   const arrowRef = useRef<SVGSVGElement | null>(null);
   const popupRef = useRef<HTMLDivElement | null>(null);
@@ -96,6 +100,10 @@ function PopoverInner(props: PopoverProps) {
       modal,
       labelId,
       descriptionId,
+      hasTitle,
+      hasDescription,
+      setHasTitle: setHasTitleCb,
+      setHasDescription: setHasDescriptionCb,
       mounted,
       transitionProps,
     }),
@@ -111,6 +119,10 @@ function PopoverInner(props: PopoverProps) {
       modal,
       labelId,
       descriptionId,
+      hasTitle,
+      hasDescription,
+      setHasTitleCb,
+      setHasDescriptionCb,
       mounted,
       transitionProps,
     ],

@@ -5,7 +5,7 @@ import React from 'react';
 
 import { useTooltipContext } from './tooltip-context';
 
-export type TooltipArrowProps = React.ComponentPropsWithRef<typeof FloatingArrow>;
+export type TooltipArrowProps = Omit<React.ComponentPropsWithRef<typeof FloatingArrow>, 'context'>;
 
 export const TooltipArrow = React.forwardRef<SVGSVGElement, TooltipArrowProps>(function TooltipArrow(props, ref) {
   const { floatingContext, arrowRef, placement } = useTooltipContext();

@@ -167,6 +167,44 @@ describe('Popover', () => {
       expect(title).toHaveTextContent('Popover Title');
       expect(desc).toHaveTextContent('Some description');
     });
+
+    it('omits aria-labelledby and aria-describedby when no Title or Description is rendered', () => {
+      // Title and Description are optional. When absent, the positioner must not
+      // emit dangling idrefs pointing at elements that were never rendered.
+      render(
+        <Popover.Root defaultOpen>
+          <Popover.Trigger>Open popover</Popover.Trigger>
+          <Popover.Positioner>
+            <Popover.Popup>
+              <p>Popover content</p>
+            </Popover.Popup>
+          </Popover.Positioner>
+        </Popover.Root>,
+      );
+
+      const positioner = document.querySelector('[data-cl-slot="popover-positioner"]');
+      expect(positioner).not.toHaveAttribute('aria-labelledby');
+      expect(positioner).not.toHaveAttribute('aria-describedby');
+    });
+
+    it('sets only aria-labelledby when a Title is rendered without a Description', () => {
+      render(
+        <Popover.Root defaultOpen>
+          <Popover.Trigger>Open popover</Popover.Trigger>
+          <Popover.Positioner>
+            <Popover.Popup>
+              <Popover.Title>Popover Title</Popover.Title>
+              <p>Popover content</p>
+            </Popover.Popup>
+          </Popover.Positioner>
+        </Popover.Root>,
+      );
+
+      const positioner = document.querySelector('[data-cl-slot="popover-positioner"]');
+      const title = document.querySelector('[data-cl-slot="popover-title"]');
+      expect(positioner).toHaveAttribute('aria-labelledby', title?.getAttribute('id'));
+      expect(positioner).not.toHaveAttribute('aria-describedby');
+    });
   });
 
   describe('animation lifecycle', () => {

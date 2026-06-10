@@ -27,12 +27,15 @@ export const AutocompleteOption = React.forwardRef<HTMLDivElement, AutocompleteO
     const isActive = activeIndex === index;
 
     useEffect(() => {
-      valuesByIndexRef.current.set(index, value);
+      const map = valuesByIndexRef.current;
+      if (!disabled) {
+        map.set(index, value);
+      }
       registerSelectedIndex(index, value);
       return () => {
-        valuesByIndexRef.current.delete(index);
+        map.delete(index);
       };
-    }, [index, value, valuesByIndexRef, registerSelectedIndex]);
+    }, [index, value, disabled, valuesByIndexRef, registerSelectedIndex]);
 
     const state = {
       selected: isSelected,
