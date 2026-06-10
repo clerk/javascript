@@ -10,10 +10,9 @@ import { ProfileCard } from '@/elements/ProfileCard';
 import { ExclamationTriangle } from '@/icons';
 import { Route, Switch } from '@/router';
 
-import { ConfigureSSOProvider } from './ConfigureSSOContext';
 import { ConfigureSSONavbar } from './ConfigureSSONavbar';
 import { ConfigureSSOSkeleton } from './ConfigureSSOSkeleton';
-import { ConfigureSSOSteps } from './ConfigureSSOSteps';
+import { ConfigureSSOWizard } from './ConfigureSSOWizard';
 import { ProfileCardFooter, ProfileCardHeader } from './elements/ProfileCard';
 import { Step } from './elements/Step';
 import { useOrganizationEnterpriseConnection } from './hooks/useOrganizationEnterpriseConnection';
@@ -38,13 +37,19 @@ const AuthenticatedContent = withCoreUserGuard(() => {
       sx={t => ({ display: 'grid', gridTemplateColumns: '1fr 3fr', height: t.sizes.$176, overflow: 'hidden' })}
     >
       <ConfigureSSONavbar contentRef={contentRef}>
-        <ConfigureSSOContent contentRef={contentRef} />
+        <StandaloneConfigureSSOContent contentRef={contentRef} />
       </ConfigureSSONavbar>
     </ProfileCard.Root>
   );
 });
 
-export const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObject<HTMLDivElement> }) => {
+/**
+ * The standalone mount's data owner: fetches through the umbrella hook, gates
+ * loading and permission, and injects the resolved data into the pure
+ * `ConfigureSSOWizard` — mirroring what the Security page does for the
+ * `OrganizationProfile` mount.
+ */
+const StandaloneConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObject<HTMLDivElement> }) => {
   const {
     isLoading,
     enterpriseConnection,
@@ -64,21 +69,24 @@ export const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObjec
 
   return (
     <ConfigureSSOProtect>
-      <ConfigureSSOProvider
+      <ConfigureSSOWizard
         organizationEnterpriseConnection={organizationEnterpriseConnection}
         testRuns={testRuns}
         enterpriseConnection={enterpriseConnection}
         contentRef={contentRef}
         mutations={mutations}
         primaryEmailAddress={primaryEmailAddress}
-      >
-        <ConfigureSSOSteps />
-      </ConfigureSSOProvider>
+      />
     </ConfigureSSOProtect>
   );
 };
 
-const ConfigureSSOProtect = ({ children }: { children: React.ReactNode }) => {
+/**
+ * Permission gate shared by the wizard's hosts: renders the missing-permission
+ * state unless the active organization membership can manage enterprise
+ * connections (personal workspaces pass — there is no membership to check).
+ */
+export const ConfigureSSOProtect = ({ children }: { children: React.ReactNode }) => {
   const { session } = useSession();
   const isPersonalWorkspace = !session?.lastActiveOrganizationId;
   const canManageEnterpriseConnections = useProtect(
