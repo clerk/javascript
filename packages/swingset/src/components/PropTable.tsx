@@ -1,4 +1,9 @@
+'use client';
+
 import type { StoryMeta } from '@/lib/types';
+
+import { KnobControl } from './KnobControl';
+import { usePlayground } from './PlaygroundContext';
 
 interface ExtraProp {
   name: string;
@@ -14,6 +19,7 @@ interface PropTableProps {
 const SX_ROW: ExtraProp = { name: 'sx', type: 'StyleRule | (theme) => StyleRule' };
 
 export function PropTable({ meta, extra = [] }: PropTableProps) {
+  const playground = usePlayground();
   const variants = meta.styles?._variants ?? {};
   const defaults = meta.styles?._defaultVariants ?? {};
 
@@ -37,21 +43,39 @@ export function PropTable({ meta, extra = [] }: PropTableProps) {
         <tr>
           <th>Prop</th>
           <th>Type</th>
-          <th>Default</th>
+          <th>Value</th>
         </tr>
       </thead>
       <tbody>
-        {rows.map(row => (
-          <tr key={row.name}>
-            <td>
-              <code>{row.name}</code>
-            </td>
-            <td>
-              <code>{row.type}</code>
-            </td>
-            <td>{row.default !== undefined ? <code>{row.default}</code> : '—'}</td>
-          </tr>
-        ))}
+        {rows.map(row => {
+          // Variant props become live controls (seeded with their default); everything
+          // else (sx, extra props) stays a static default cell.
+          const knob = playground?.knobs[row.name];
+          return (
+            <tr key={row.name}>
+              <td>
+                <code>{row.name}</code>
+              </td>
+              <td>
+                <code>{row.type}</code>
+              </td>
+              <td>
+                {knob && playground ? (
+                  <KnobControl
+                    id={`prop-${row.name}`}
+                    def={knob}
+                    value={playground.values[row.name]}
+                    onChange={v => playground.setValue(row.name, v)}
+                  />
+                ) : row.default !== undefined ? (
+                  <code>{row.default}</code>
+                ) : (
+                  '—'
+                )}
+              </td>
+            </tr>
+          );
+        })}
       </tbody>
     </table>
   );

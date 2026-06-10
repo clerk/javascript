@@ -7,6 +7,7 @@ import type { StoryMeta } from '@/lib/types';
 export const meta: StoryMeta = {
   group: 'Components',
   title: 'Input',
+  source: 'packages/ui/src/mosaic/components/input.tsx',
   styles: inputStyles,
 };
 
