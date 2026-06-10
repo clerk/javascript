@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { defaultMosaicVariables, resolveVariables } from '../variables';
-import { alpha, hover } from '../utils';
+import { alpha, hover, motionSafe } from '../utils';
 
 describe('hover', () => {
   it('wraps styles in @media (hover: hover) and &:hover', () => {
@@ -18,6 +18,14 @@ describe('hover', () => {
       '@media (hover: hover)': {
         '&:hover': styles,
       },
+    });
+  });
+});
+
+describe('motionSafe', () => {
+  it('wraps styles in @media (prefers-reduced-motion: no-preference)', () => {
+    expect(motionSafe({ transition: 'transform 200ms ease' })).toEqual({
+      '@media (prefers-reduced-motion: no-preference)': { transition: 'transform 200ms ease' },
     });
   });
 });
