@@ -156,6 +156,16 @@ export type GetPlansParams = ClerkPaginationParams<{
    * The type of payer for the Plans.
    */
   for?: ForPayerType;
+  /**
+   * The organization ID to fetch plans for (needs to match the current active organization ID). Providing this
+   * parameter will populate the `availablePrices` field with the prices that are available to the
+   * authenticated organization.
+   */
+  orgId?: string;
+  /**
+   * The minimum number of seats that the returned plans needs to support.
+   */
+  minSeats?: number;
 }>;
 
 /**
@@ -227,6 +237,11 @@ export interface BillingPlanResource extends ClerkResource {
    */
   unitPrices?: BillingPlanUnitPrice[];
   /**
+   * The prices that are available to be used to checkout for the associated plan. Can be used to select
+   * non-default prices.
+   */
+  availablePrices?: BillingPlanPrice[];
+  /**
    * The number of days of the free trial for the Plan. `null` if the Plan does not have a free trial.
    */
   freeTrialDays: number | null;
@@ -246,6 +261,10 @@ export interface BillingSubscriptionItemSeats {
    * The seat limit active while the parent subscription item was active. `null` means unlimited.
    */
   quantity: number | null;
+  /**
+   * The tier-level breakdown of seats for this subscription item.
+   */
+  tiers?: BillingPerUnitTotalTier[];
 }
 
 /**
@@ -290,6 +309,34 @@ export interface BillingPlanUnitPrice {
    * Tiers that define how each block range is priced.
    */
   tiers: BillingPlanUnitPriceTier[];
+}
+
+/**
+ * The `BillingPlanPrice` type represents a specific possible price for a given Clerk Billing Plan.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingPlanPrice {
+  /**
+   * The ID of the price
+   */
+  id: string;
+  /**
+   * The monthly price or `null` if the price is not monthly.
+   */
+  fee: BillingMoneyAmount | null;
+  /**
+   * The effective monthly price when billed annually or `null` if the price is not annual.
+   */
+  annualMonthlyFee: BillingMoneyAmount | null;
+  /**
+   * Whether this price is the default price for the plan it's associated with.
+   */
+  isDefault: boolean;
+  /**
+   * The individual unit prices applicable to this price.
+   */
+  unitPrices?: BillingPlanUnitPrice[];
 }
 
 /**
@@ -524,6 +571,39 @@ export type BillingPaymentChargeType = 'checkout' | 'recurring';
 export type BillingPaymentStatus = 'pending' | 'paid' | 'failed';
 
 /**
+ * The `BillingPaymentTotals` type represents the per-payment cost breakdown, including any base fee
+ * and per-unit (for example, seats) subtotals.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingPaymentTotals {
+  /**
+   * The price of the items before taxes, credits, or discounts are applied.
+   */
+  subtotal: BillingMoneyAmount;
+  /**
+   * The total amount for the payment, including taxes and after credits/discounts are applied.
+   */
+  grandTotal: BillingMoneyAmount;
+  /**
+   * The amount of tax included in the payment.
+   */
+  taxTotal: BillingMoneyAmount;
+  /**
+   * The flat base fee charged on top of any per-unit fees.
+   */
+  baseFee?: BillingMoneyAmount | null;
+  /**
+   * Per-unit cost breakdown for this payment (for example, seats).
+   */
+  perUnitTotals?: BillingPerUnitTotal[];
+  /**
+   * Discounts applied to this payment such as mid-cycle prorated seat discounts. `null` when no discounts apply.
+   */
+  discounts?: BillingDiscounts | null;
+}
+
+/**
  * The `BillingPaymentResource` type represents a payment attempt for a user or Organization.
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
@@ -565,6 +645,11 @@ export interface BillingPaymentResource extends ClerkResource {
    * The current status of the payment.
    */
   status: BillingPaymentStatus;
+  /**
+   * Per-payment breakdown with optional base fee and per-unit (for example, seats) subtotals.
+   * Absent on older responses.
+   */
+  totals?: BillingPaymentTotals | null;
 }
 
 /**
@@ -665,6 +750,54 @@ export type GetSubscriptionParams = {
 export type CancelSubscriptionParams = WithOptionalOrgType<unknown>;
 
 /**
+ * The `BillingSubscriptionNextPayment` type represents the upcoming payment details for a subscription.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingSubscriptionNextPayment {
+  /**
+   * The amount of the next payment.
+   */
+  amount: BillingMoneyAmount;
+  /**
+   * The date when the next payment is due.
+   */
+  date: Date;
+  /**
+   * Per-unit cost breakdown for the next payment (for example, seats).
+   */
+  perUnitTotals?: BillingPerUnitTotal[];
+  /**
+   * Full cost breakdown for the next payment.
+   */
+  totals?: BillingTotals;
+}
+
+/**
+ * The `BillingSubscriptionItemNextPayment` type represents the upcoming payment details for a subscription item.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingSubscriptionItemNextPayment {
+  /**
+   * The amount of the next payment.
+   */
+  amount: BillingMoneyAmount;
+  /**
+   * The date when the next payment is due.
+   */
+  date: Date;
+  /**
+   * Per-unit cost breakdown for the next payment (for example, seats).
+   */
+  perUnitTotals?: BillingPerUnitTotal[];
+  /**
+   * Full cost breakdown for the next payment.
+   */
+  totals?: BillingTotals;
+}
+
+/**
  * The `BillingSubscriptionItemResource` type represents an item in a subscription.
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
@@ -682,6 +815,10 @@ export interface BillingSubscriptionItemResource extends ClerkResource {
    * The billing period for the subscription item.
    */
   planPeriod: BillingSubscriptionPlanPeriod;
+  /**
+   * The ID of the price that this subscription item is associated with.
+   */
+  priceId: string;
   /**
    * The status of the subscription item.
    */
@@ -710,6 +847,10 @@ export interface BillingSubscriptionItemResource extends ClerkResource {
    * The amount charged for the subscription item.
    */
   amount?: BillingMoneyAmount;
+  /**
+   * Information about the next payment for this subscription item.
+   */
+  nextPayment?: BillingSubscriptionItemNextPayment | null;
   /**
    * The credit from a previous purchase that is being applied to the subscription item.
    */
@@ -762,16 +903,7 @@ export interface BillingSubscriptionResource extends ClerkResource {
   /**
    * Information about the next payment, including the amount and the date it's due. Returns null if there is no upcoming payment.
    */
-  nextPayment?: {
-    /**
-     * The amount of the next payment.
-     */
-    amount: BillingMoneyAmount;
-    /**
-     * The date when the next payment is due.
-     */
-    date: Date;
-  };
+  nextPayment?: BillingSubscriptionNextPayment | null;
   /**
    * The date when the subscription became past due, or `null` if the subscription is not past due.
    */
@@ -841,15 +973,156 @@ export interface BillingCredits {
 }
 
 /**
+ * Details about a prorated discount applied when adding a seat mid-cycle. The discount covers the part of the
+ * billing period that has already passed, so the payer is only charged for the time remaining in the cycle.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingProrationDiscount {
+  /**
+   * The amount of the proration discount.
+   */
+  amount: BillingMoneyAmount;
+  /**
+   * The number of days that have passed in the billing cycle for which this proration discount represents.
+   */
+  cycleDaysPassed: number;
+  /**
+   * The total number of days in the billing cycle.
+   */
+  cycleDaysTotal: number;
+  /**
+   * The percentage of the billing cycle that has passed.
+   */
+  cyclePassedPercent: number;
+}
+
+/**
+ * Discounts applied to the checkout, such as prorated discounts for mid-cycle seat additions.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingDiscounts {
+  /**
+   * The prorated discount for the part of the billing period that has already passed when adding a seat mid-cycle.
+   * Unlike the proration credit (which refunds the unused remainder of a plan you already paid for), this discount
+   * means you are not charged for the portion of the new seat's cycle that has already elapsed.
+   */
+  proration: BillingProrationDiscount | null;
+  /**
+   * The total of all discounts applied to the checkout.
+   */
+  total: BillingMoneyAmount;
+}
+
+/**
+ * Per-period renewal totals, describing what the subscription renewal charge will look like after the current checkout.
+ * Unlike the top-level checkout totals (which only reflect the items actively being purchased),
+ * this object contains the full renewal breakdown including all seats and the base plan fee.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingPeriodTotals {
+  /**
+   * The subtotal for the billing period.
+   */
+  subtotal: BillingMoneyAmount;
+  /**
+   * The base fee for the billing period.
+   */
+  baseFee: BillingMoneyAmount;
+  /**
+   * The tax total for the billing period.
+   */
+  taxTotal: BillingMoneyAmount;
+  /**
+   * The grand total for the billing period.
+   */
+  grandTotal: BillingMoneyAmount;
+  /**
+   * Per-unit cost breakdown for the renewal period, covering all units purchased to date
+   * (not just the ones being added in this checkout).
+   */
+  perUnitTotals?: BillingPerUnitTotal[];
+}
+
+/**
+ * The `BillingTotals` type represents a granular breakdown of the total amount that will be charged, either during
+ * checkout or at renewal.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingTotals {
+  /**
+   * Subtotal before adjustments
+   */
+  subtotal: BillingMoneyAmount;
+  /**
+   * Base fee component before per-unit charges and adjustments
+   */
+  baseFee: BillingMoneyAmount | null;
+  /**
+   * Total tax amount
+   */
+  taxTotal: BillingMoneyAmount;
+  /**
+   * Grand total amount
+   */
+  grandTotal: BillingMoneyAmount;
+  /**
+   * Total amount due after free trial ends
+   */
+  totalDueAfterFreeTrial?: BillingMoneyAmount | null;
+  /**
+   * Credit amount
+   */
+  credit?: BillingMoneyAmount | null;
+  /**
+   * Unified credits breakdown
+   */
+  credits: BillingCredits | null;
+  /**
+   * Information about the discounts applied to the payment
+   */
+  discounts: BillingDiscounts | null;
+  /**
+   * Past due amount
+   */
+  pastDue?: BillingMoneyAmount | null;
+  /**
+   * Total amount due now
+   */
+  totalDueNow?: BillingMoneyAmount;
+  /**
+   * Per-unit total breakdown (for example, seats)
+   */
+  perUnitTotals?: BillingPerUnitTotal[];
+  /**
+   * Per-period renewal totals, broken down granularly
+   */
+  totalsDuePerPeriod?: BillingPeriodTotals;
+  /**
+   * The expected total payment for each future billing period
+   */
+  totalDuePerPeriod?: BillingMoneyAmount;
+}
+
+/**
  * The `BillingCheckoutTotals` type represents the total costs, taxes, and other pricing details for a checkout session.
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingCheckoutTotals {
   /**
-   * The price of the items or Plan before taxes, credits, or discounts are applied.
+   * The price of items actively being purchased in this checkout, before taxes and discounts.
+   * When only adding seats mid-cycle, this reflects just the new seats and excludes the base plan fee and
+   * seats that were already paid for.
    */
   subtotal: BillingMoneyAmount;
+  /**
+   * The base plan fee portion of the totals, before per-unit charges and adjustments.
+   */
+  baseFee?: BillingMoneyAmount;
   /**
    * The total amount for the checkout, including taxes and after credits/discounts are applied. This is the final amount due.
    */
@@ -859,13 +1132,18 @@ export interface BillingCheckoutTotals {
    */
   taxTotal: BillingMoneyAmount;
   /**
-   * Per-unit cost breakdown for this checkout (for example, seats).
+   * Per-unit cost breakdown for items actively being purchased in this checkout (for example, seats being added).
+   * When only adding seats mid-cycle, this only covers the seats being added, not seats already paid for.
    */
   perUnitTotals?: BillingPerUnitTotal[];
   /**
    * The amount that needs to be immediately paid to complete the checkout.
    */
   totalDueNow: BillingMoneyAmount;
+  /**
+   * The amount that will be charged per period for this subscription.
+   */
+  totalDuePerPeriod: BillingMoneyAmount;
   /**
    * Any credits (like account balance or promo credits) that are being applied to the checkout.
    */
@@ -879,6 +1157,16 @@ export interface BillingCheckoutTotals {
    * The amount that becomes due after a free trial ends.
    */
   totalDueAfterFreeTrial: BillingMoneyAmount | null;
+  /**
+   * Discounts applied to this checkout such as mid-cycle prorated seat discounts.
+   */
+  discounts?: BillingDiscounts | null;
+  /**
+   * Full renewal period totals after this checkout completes.
+   * Contains the complete breakdown of what the next recurring charge will look like,
+   * including all seats and the base plan fee.
+   */
+  totalsDuePerPeriod?: BillingPeriodTotals;
 }
 
 /**
@@ -915,6 +1203,14 @@ export type CreateCheckoutParams = WithOptionalOrgType<{
    * The billing period for the Plan.
    */
   planPeriod: BillingSubscriptionPlanPeriod;
+  /**
+   * The number of total seats to check out for
+   */
+  seatsQuantity?: number;
+  /**
+   * The specific price ID to check out for, used when the desired price ID is not the current default price
+   */
+  priceId?: string;
 }>;
 
 /**
@@ -994,7 +1290,7 @@ export interface BillingCheckoutResource extends ClerkResource {
   /**
    * The total costs, taxes, and other pricing details for the checkout.
    */
-  totals: BillingCheckoutTotals;
+  totals: BillingTotals;
   /**
    * A function to confirm and finalize the checkout process, usually after payment information has been provided and validated. [Learn more.](#confirm)
    */
@@ -1093,7 +1389,7 @@ interface CheckoutFlowProperties {
   /**
    * The total costs, taxes, and other pricing details for the checkout.
    */
-  totals: BillingCheckoutTotals;
+  totals: BillingTotals;
   /**
    * Whether the plan change will take effect immediately after checkout.
    */

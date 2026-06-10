@@ -1,14 +1,15 @@
 'use client';
 
 import { FloatingFocusManager, useMergeRefs } from '@floating-ui/react';
+import React from 'react';
 
 import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
 import { useDialogContext } from './dialog-context';
 
 export type DialogPopupProps = ComponentProps<'div'>;
 
-export function DialogPopup(props: DialogPopupProps) {
-  const { render, ref: consumerRef, ...otherProps } = props;
+export const DialogPopup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function DialogPopup(props, ref) {
+  const { render, ...otherProps } = props;
   const { popupRef, refs, getFloatingProps, floatingContext, modal, labelId, descriptionId, mounted, transitionProps } =
     useDialogContext();
 
@@ -16,7 +17,7 @@ export function DialogPopup(props: DialogPopupProps) {
   // a stable callback that doesn't use `this`, so the unbound-method check is a
   // false positive here.
   // eslint-disable-next-line @typescript-eslint/unbound-method
-  const combinedRef = useMergeRefs([popupRef, refs.setFloating, consumerRef]);
+  const combinedRef = useMergeRefs([popupRef, refs.setFloating, ref]);
 
   if (!mounted) {
     return null;
@@ -43,4 +44,4 @@ export function DialogPopup(props: DialogPopupProps) {
       })}
     </FloatingFocusManager>
   );
-}
+});

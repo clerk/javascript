@@ -1,3 +1,4 @@
+import preserveDirectives from 'rollup-plugin-preserve-directives';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 
@@ -12,6 +13,13 @@ export default defineConfig({
     lib: {
       entry: {
         'primitives/accordion/index': 'src/primitives/accordion/index.ts',
+        'primitives/tabs/index': 'src/primitives/tabs/index.ts',
+        'primitives/tooltip/index': 'src/primitives/tooltip/index.ts',
+        'primitives/popover/index': 'src/primitives/popover/index.ts',
+        'primitives/select/index': 'src/primitives/select/index.ts',
+        'primitives/menu/index': 'src/primitives/menu/index.ts',
+        'primitives/autocomplete/index': 'src/primitives/autocomplete/index.ts',
+        'primitives/collapsible/index': 'src/primitives/collapsible/index.ts',
         'primitives/dialog/index': 'src/primitives/dialog/index.ts',
         'utils/index': 'src/utils/index.ts',
         'hooks/index': 'src/hooks/index.ts',
@@ -24,9 +32,22 @@ export default defineConfig({
     },
     rollupOptions: {
       external: ['react', 'react-dom', 'react/jsx-runtime', '@floating-ui/react'],
+      // Preserve module-level directives such as `'use client'`. Rollup otherwise
+      // strips them when bundling (emitting a warning), which would drop the
+      // client boundary for React Server Component consumers of the primitives.
+      plugins: [preserveDirectives()],
       output: {
         preserveModules: true,
         preserveModulesRoot: 'src',
+      },
+      // Rollup still warns that it ignored the directives during bundling even
+      // though preserveDirectives re-attaches them to the output chunks. Silence
+      // the now-expected noise (recommended by the plugin).
+      onwarn(warning, warn) {
+        if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
+          return;
+        }
+        warn(warning);
       },
     },
     sourcemap: true,

@@ -1,5 +1,19 @@
 # @clerk/astro
 
+## 3.4.0
+
+### Minor Changes
+
+- Remove the `<ConfigureSSO />` component from the public API in favor of usage within `OrganizationProfile` ([#8779](https://github.com/clerk/javascript/pull/8779)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  Removing these exports has no breaking changes impact on production applications, as <ConfigureSSO /> was never released as a GA component
+
+### Patch Changes
+
+- Updated dependencies [[`2d6670c`](https://github.com/clerk/javascript/commit/2d6670c6c05c59901709283921b5d65c43f3a676), [`e7cb503`](https://github.com/clerk/javascript/commit/e7cb503e1903ee8046ad43062b9d78a8f0097bb7), [`af706e3`](https://github.com/clerk/javascript/commit/af706e35420a16c028fd34b70dd50d663d42e006), [`48b187d`](https://github.com/clerk/javascript/commit/48b187d26cf5887b9c986f1b986f532bbe518a11), [`27c4d75`](https://github.com/clerk/javascript/commit/27c4d750e067d54bc60e6c21d6f416e326cd77fc), [`955e998`](https://github.com/clerk/javascript/commit/955e9988b1609e50e1286e6af7447edacc4f6acc), [`032632c`](https://github.com/clerk/javascript/commit/032632c6982297e53e28559b59b4a435de4c9adc), [`0fece6f`](https://github.com/clerk/javascript/commit/0fece6ff5d2b1babb59a285dbce9d46723e33d73), [`b295af3`](https://github.com/clerk/javascript/commit/b295af3d5bb12e09a502cae4a935d2e7f5d35d5c), [`27c4d75`](https://github.com/clerk/javascript/commit/27c4d750e067d54bc60e6c21d6f416e326cd77fc), [`8e1bd48`](https://github.com/clerk/javascript/commit/8e1bd48a91dc07751493f41416d2a68b89e114cc)]:
+  - @clerk/shared@4.16.0
+  - @clerk/backend@3.6.0
+
 ## 3.3.3
 
 ### Patch Changes
