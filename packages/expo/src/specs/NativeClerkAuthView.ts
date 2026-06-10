@@ -5,11 +5,11 @@ import type { HostComponent, ViewProps } from 'react-native';
 import type { BubblingEventHandler } from 'react-native/Libraries/Types/CodegenTypes';
 /* eslint-enable import/namespace, import/default, import/no-named-as-default, import/no-named-as-default-member, simple-import-sort/imports */
 
-type AuthEvent = Readonly<{ type: string; data: string }>;
+type AuthEvent = Readonly<{ type: string }>;
 
 interface NativeProps extends ViewProps {
   mode?: string;
-  isDismissable?: boolean;
+  isDismissible?: boolean;
   onAuthEvent?: BubblingEventHandler<AuthEvent>;
 }
 

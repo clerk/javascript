@@ -172,6 +172,9 @@
     },
     "expo-web-browser": {
       "optional": true
+    },
+    "react-dom": {
+      "optional": true
     }
   },
   "engines": {
@@ -183,9 +186,6 @@
   "codegenConfig": {
     "name": "ClerkExpoSpec",
     "type": "all",
-    "jsSrcsDir": "src/specs",
-    "android": {
-      "javaPackageName": "expo.modules.clerk"
-    }
+    "jsSrcsDir": "src/specs"
   }
 }

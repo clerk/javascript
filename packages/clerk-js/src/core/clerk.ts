@@ -1460,8 +1460,9 @@ export class Clerk implements ClerkInterface {
    *
    * @param targetNode Target to mount the ConfigureSSO component.
    * @param props Configuration parameters.
+   * @hidden
    */
-  public mountConfigureSSO = (node: HTMLDivElement, props?: ConfigureSSOProps) => {
+  public __internal_mountConfigureSSO = (node: HTMLDivElement, props?: ConfigureSSOProps) => {
     const { isEnabled: isOrganizationsEnabled } = this.__internal_attemptToEnableEnvironmentSetting({
       for: 'organizations',
       caller: 'ConfigureSSO',
@@ -1525,23 +1526,10 @@ export class Clerk implements ClerkInterface {
    * If there is no component mounted at the target node, results in a noop.
    *
    * @param targetNode Target node to unmount the ConfigureSSO component from.
+   * @hidden
    */
-  public unmountConfigureSSO = (node: HTMLDivElement) => {
+  public __internal_unmountConfigureSSO = (node: HTMLDivElement) => {
     void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
-  };
-
-  /**
-   * @deprecated Use `mountConfigureSSO` instead.
-   */
-  public __experimental_mountConfigureSSO = (node: HTMLDivElement, props?: ConfigureSSOProps) => {
-    return this.mountConfigureSSO(node, props);
-  };
-
-  /**
-   * @deprecated Use `unmountConfigureSSO` instead.
-   */
-  public __experimental_unmountConfigureSSO = (node: HTMLDivElement) => {
-    return this.unmountConfigureSSO(node);
   };
 
   public mountTaskChooseOrganization = (node: HTMLDivElement, props?: TaskChooseOrganizationProps) => {

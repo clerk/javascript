@@ -1,7 +1,6 @@
 import type {
   __internal_OAuthConsentProps,
   APIKeysProps,
-  ConfigureSSOProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
   OrganizationListProps,
@@ -127,8 +126,8 @@ type OrganizationSwitcherPropsWithoutCustomPages = Without<
 const CustomPortalsRenderer = (props: CustomPortalsRendererProps) => {
   return (
     <>
-      {props?.customPagesPortals?.map((portal, index) => createElement(portal, { key: index }))}
-      {props?.customMenuItemsPortals?.map((portal, index) => createElement(portal, { key: index }))}
+      {props?.customPagesPortals?.map(({ key, portal }) => createElement(portal, { key }))}
+      {props?.customMenuItemsPortals?.map(({ key, portal }) => createElement(portal, { key }))}
     </>
   );
 };
@@ -643,34 +642,6 @@ export const APIKeys = withClerk(
     );
   },
   { component: 'ApiKeys', renderWhileLoading: true },
-);
-
-export const ConfigureSSO = withClerk(
-  ({ clerk, component, fallback, ...props }: WithClerkProp<ConfigureSSOProps & FallbackProp>) => {
-    const mountingStatus = useWaitForComponentMount(component);
-    const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
-
-    const rendererRootProps = {
-      ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
-    };
-
-    return (
-      <>
-        {shouldShowFallback && fallback}
-        {clerk.loaded && (
-          <ClerkHostRenderer
-            component={component}
-            mount={clerk.mountConfigureSSO}
-            unmount={clerk.unmountConfigureSSO}
-            updateProps={(clerk as any).__internal_updateProps}
-            props={props}
-            rootProps={rendererRootProps}
-          />
-        )}
-      </>
-    );
-  },
-  { component: 'ConfigureSSO', renderWhileLoading: true },
 );
 
 export const OAuthConsent = withClerk(
