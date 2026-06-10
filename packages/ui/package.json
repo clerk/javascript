@@ -94,7 +94,6 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@clerk/headless": "workspace:^",
     "@clerk/localizations": "workspace:^",
     "@clerk/shared": "workspace:^",
     "@emotion/cache": "11.11.0",
@@ -113,6 +112,7 @@
     "qrcode.react": "4.2.0"
   },
   "devDependencies": {
+    "@clerk/headless": "workspace:^",
     "@floating-ui/react-dom": "^2.1.8",
     "@rsdoctor/rspack-plugin": "^0.4.13",
     "@rspack/cli": "catalog:rspack",
