@@ -1069,7 +1069,7 @@ importers:
         specifier: 11.11.1
         version: 11.11.1(@types/react@18.3.28)(react@18.3.1)
       '@floating-ui/react':
-        specifier: 0.27.12
+        specifier: catalog:repo
         version: 0.27.12(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@formkit/auto-animate':
         specifier: ^0.8.2
