@@ -54,7 +54,9 @@ export function PropTable({ meta, extra = [] }: PropTableProps) {
           return (
             <tr key={row.name}>
               <td>
-                <code>{row.name}</code>
+                <code className='border-border bg-muted text-foreground inline-block rounded-md border px-1.5 py-0.5 font-mono text-xs leading-tight'>
+                  {row.name}
+                </code>
               </td>
               <td>
                 <code>{row.type}</code>

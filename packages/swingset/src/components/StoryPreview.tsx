@@ -3,6 +3,7 @@
 import { MosaicProvider } from '@clerk/ui/mosaic/MosaicProvider';
 import { RotateCcwIcon, SlidersHorizontalIcon } from 'lucide-react';
 import type React from 'react';
+import { useState } from 'react';
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { generateKnobs, initKnobValues } from '@/lib/generateKnobs';
@@ -25,6 +26,7 @@ interface StoryPreviewProps {
 export function StoryPreview({ name, storyModule }: StoryPreviewProps) {
   const StoryComp = storyModule[name] as React.ComponentType<Record<string, unknown>>;
   const playground = usePlayground();
+  const [variablesOpen, setVariablesOpen] = useState(false);
 
   if (!StoryComp) {
     return (
@@ -37,7 +39,11 @@ export function StoryPreview({ name, storyModule }: StoryPreviewProps) {
   const variables = playground?.variables ?? {};
 
   return (
-    <Collapsible className='not-prose border-border bg-background my-4 overflow-hidden rounded-lg border'>
+    <Collapsible
+      open={variablesOpen}
+      onOpenChange={setVariablesOpen}
+      className='not-prose border-border bg-background my-4 overflow-hidden rounded-lg border'
+    >
       <div className='flex items-center justify-end border-b px-2 py-1.5'>
         <button
           type='button'
@@ -56,11 +62,21 @@ export function StoryPreview({ name, storyModule }: StoryPreviewProps) {
         </MosaicProvider>
       </div>
 
-      <div className='flex items-center justify-start border-t px-2 py-1.5'>
-        <CollapsibleTrigger className='text-muted-foreground hover:text-foreground flex items-center gap-1 rounded px-2 py-1 text-xs'>
+      <div className='flex items-center justify-start gap-1 border-t px-2 py-1.5'>
+        <CollapsibleTrigger className='text-muted-foreground hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground flex items-center gap-1 rounded px-2 py-1 text-xs'>
           <SlidersHorizontalIcon className='size-3' />
           Variables
         </CollapsibleTrigger>
+        {variablesOpen && playground ? (
+          <button
+            type='button'
+            onClick={() => playground.setVariables({})}
+            className='text-muted-foreground hover:text-foreground flex items-center gap-1 rounded px-2 py-1 text-xs'
+          >
+            <RotateCcwIcon className='size-3' />
+            Reset
+          </button>
+        ) : null}
       </div>
 
       {playground ? (
