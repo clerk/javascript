@@ -383,7 +383,13 @@ const DetailRow = ({ id, label, children }: DetailRowProps): JSX.Element => (
       localizationKey={label}
       sx={{ flexShrink: 0, whiteSpace: 'nowrap' }}
     />
-    {children}
+    <Flex
+      justify='end'
+      // Bounds the value side to the remaining row width so chips truncate instead of overflowing the card.
+      sx={{ flex: '1 1 0', minWidth: 0 }}
+    >
+      {children}
+    </Flex>
   </Flex>
 );
 

@@ -151,6 +151,39 @@ describe('OrganizationSecurityPage', () => {
         expect(screen.getByText(domain)).toBeInTheDocument();
       }
     });
+
+    it('renders long SAML values as truncating chips with full-value tooltips', async () => {
+      const longSsoUrl = `https://idp.example.com/sso/${'a'.repeat(280)}`;
+      const longCertificate = 'MIIC'.repeat(75);
+      const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
+
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([
+        configuredConnection({
+          active: true,
+          samlConnection: {
+            idpSsoUrl: longSsoUrl,
+            idpEntityId: 'https://idp.example.com/entity',
+            idpCertificate: longCertificate,
+          },
+        }),
+      ]);
+      fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
+        data: [{ id: 'run_1', status: 'success' }],
+        total_count: 1,
+      } as any);
+
+      renderPage(wrapper);
+
+      const ssoLink = await screen.findByRole('link', { name: longSsoUrl });
+      expect(ssoLink).toHaveAttribute('href', longSsoUrl);
+      // The full value stays reachable via the tooltip once the chip truncates visually.
+      expect(ssoLink).toHaveAttribute('title', longSsoUrl);
+      expect(ssoLink).toHaveStyle({ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' });
+
+      const certificate = screen.getByText(longCertificate);
+      expect(certificate).toHaveAttribute('title', longCertificate);
+      expect(certificate).toHaveStyle({ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' });
+    });
   });
 
   describe('view switching', () => {
