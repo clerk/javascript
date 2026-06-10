@@ -32,7 +32,11 @@ export function StoryCanvas({ componentSlug, storySlug }: StoryCanvasProps) {
     const nextKnobs = generateKnobs(found.mod.meta);
     setKnobs(nextKnobs);
     setKnobValues(initKnobValues(nextKnobs));
-  }, [found, componentSlug, storySlug]);
+    // `found` is derived synchronously from the slugs each render and is a fresh
+    // object every time, so depending on it would re-run this effect on every
+    // render. Depend on the stable slug strings instead.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [componentSlug, storySlug]);
 
   if (!found) {
     return <div className='text-muted-foreground p-8 text-sm'>Story not found.</div>;
