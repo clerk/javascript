@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils';
 import { useDialogContext } from './dialog-context';
 
 export type DialogBackdropProps = ComponentProps<'div'>;
@@ -22,7 +22,7 @@ export const DialogBackdrop = React.forwardRef<HTMLDivElement, DialogBackdropPro
       'data-cl-slot': 'dialog-backdrop',
       ref,
       ...transitionProps,
-    } as React.ComponentPropsWithRef<'div'>;
+    } satisfies DefaultProps<'div'>;
 
     return renderElement({
       defaultTagName: 'div',

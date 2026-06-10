@@ -1,10 +1,9 @@
 'use client';
 
 import { useListItem, useMergeRefs } from '@floating-ui/react';
-import type React from 'react';
 import { useEffect } from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils/render-element';
 import { useSelectContext } from './select-context';
 
 export interface SelectOptionProps extends ComponentProps<'button'> {
@@ -39,21 +38,25 @@ export function SelectOption(props: SelectOptionProps) {
     disabled: !!disabled,
   };
 
-  const defaultProps = {
+  const ownProps = {
     'data-cl-slot': 'select-option',
-    type: 'button' as const,
+    type: 'button',
     ref: combinedRef,
-    role: 'option' as const,
+    role: 'option',
     'aria-selected': isSelected,
     'aria-disabled': disabled || undefined,
     tabIndex: isActive ? 0 : -1,
-    ...(getItemProps({
+  } satisfies DefaultProps<'button'>;
+
+  const defaultProps = {
+    ...ownProps,
+    ...getItemProps({
       onClick() {
         if (!disabled) {
           handleSelect(value, index);
         }
       },
-    }) as React.ComponentPropsWithRef<'button'>),
+    }),
   };
 
   return renderElement({

@@ -3,7 +3,7 @@
 import { useMergeRefs } from '@floating-ui/react';
 import React from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils';
 import { useDialogContext } from './dialog-context';
 
 export type DialogTriggerProps = ComponentProps<'button'>;
@@ -21,12 +21,13 @@ export const DialogTrigger = React.forwardRef<HTMLButtonElement, DialogTriggerPr
 
     const state = { open };
 
-    const defaultProps = {
-      type: 'button' as const,
+    const ownProps = {
+      type: 'button',
       'data-cl-slot': 'dialog-trigger',
       ref: combinedRef,
-      ...(getReferenceProps() as React.ComponentPropsWithRef<'button'>),
-    };
+    } satisfies DefaultProps<'button'>;
+
+    const defaultProps = { ...ownProps, ...getReferenceProps() };
 
     return renderElement({
       defaultTagName: 'button',

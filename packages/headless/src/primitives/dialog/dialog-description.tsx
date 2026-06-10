@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils';
 import { useDialogContext } from './dialog-context';
 
 export type DialogDescriptionProps = Omit<ComponentProps<'p'>, 'id'>;
@@ -16,7 +16,7 @@ export const DialogDescription = React.forwardRef<HTMLParagraphElement, DialogDe
       'data-cl-slot': 'dialog-description',
       id: descriptionId,
       ref,
-    } as React.ComponentPropsWithRef<'p'>;
+    } satisfies DefaultProps<'p'>;
 
     return renderElement({
       defaultTagName: 'p',

@@ -3,7 +3,7 @@
 import { useListItem, useMergeRefs } from '@floating-ui/react';
 import React from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils/render-element';
 import { useMenuContext } from './menu-context';
 
 export type MenuTriggerProps = ComponentProps<'button'>;
@@ -30,16 +30,17 @@ export const MenuTrigger = React.forwardRef<HTMLButtonElement, MenuTriggerProps>
     referenceProps = getReferenceProps();
   }
 
-  const defaultProps = {
-    type: 'button' as const,
+  const ownProps = {
+    type: 'button',
     'data-cl-slot': 'menu-trigger',
     ref: mergedRef,
     ...(isNested && {
-      role: 'menuitem' as const,
+      role: 'menuitem',
       tabIndex: parentContext?.activeIndex === item.index ? 0 : -1,
     }),
-    ...(referenceProps as React.ComponentPropsWithRef<'button'>),
-  };
+  } satisfies DefaultProps<'button'>;
+
+  const defaultProps = { ...ownProps, ...referenceProps };
 
   return renderElement({
     defaultTagName: 'button',

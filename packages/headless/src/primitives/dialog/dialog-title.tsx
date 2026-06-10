@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils';
 import { useDialogContext } from './dialog-context';
 
 export type DialogTitleProps = Omit<ComponentProps<'h2'>, 'id'>;
@@ -15,7 +15,7 @@ export const DialogTitle = React.forwardRef<HTMLHeadingElement, DialogTitleProps
     'data-cl-slot': 'dialog-title',
     id: labelId,
     ref,
-  } as React.ComponentPropsWithRef<'h2'>;
+  } satisfies DefaultProps<'h2'>;
 
   return renderElement({
     defaultTagName: 'h2',

@@ -3,7 +3,7 @@
 import { FloatingOverlay } from '@floating-ui/react';
 import React from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils';
 import { useDialogContext } from './dialog-context';
 
 export interface DialogViewportProps extends ComponentProps<'div'> {
@@ -26,7 +26,7 @@ export const DialogViewport = React.forwardRef<HTMLDivElement, DialogViewportPro
       'data-cl-slot': 'dialog-viewport',
       ref,
       ...transitionProps,
-    } as React.ComponentPropsWithRef<'div'>;
+    } satisfies DefaultProps<'div'>;
 
     return (
       <FloatingOverlay lockScroll={lockScroll}>
