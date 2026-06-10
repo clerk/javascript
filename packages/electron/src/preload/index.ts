@@ -1,7 +1,10 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
+import { setupPasskeysPreload } from '../passkeys/preload';
 import { OAUTH_TRANSPORT_CHANNELS, TOKEN_CACHE_CHANNELS } from '../shared/ipc';
 import type { OAuthTransport, TokenCache } from '../shared/types';
+
+export { setupPasskeysPreload };
 
 /**
  * Exposes Clerk's Electron bridge from the preload script to the renderer.

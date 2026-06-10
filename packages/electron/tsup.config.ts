@@ -9,8 +9,15 @@ export default defineConfig(overrideOptions => {
   const shouldPublish = !!overrideOptions.env?.publish;
 
   const common: Options = {
-    entry: ['./src/index.ts', './src/preload/index.ts', './src/react/index.tsx', './src/storage/index.ts'],
+    entry: [
+      './src/index.ts',
+      './src/preload/index.ts',
+      './src/react/index.tsx',
+      './src/storage/index.ts',
+      './src/passkeys/index.ts',
+    ],
     bundle: true,
+    external: ['@clerk/electron-passkeys'],
     clean: true,
     minify: false,
     sourcemap: true,
