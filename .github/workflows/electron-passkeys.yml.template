@@ -1,0 +1,105 @@
+name: Electron Passkeys Native Build
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'packages/electron-passkeys/**'
+      - '.github/workflows/electron-passkeys.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build ${{ matrix.settings.target }}
+    runs-on: ${{ matrix.settings.host }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        settings:
+          - host: macos-14
+            target: aarch64-apple-darwin
+          - host: macos-14
+            target: x86_64-apple-darwin
+          - host: windows-latest
+            target: x86_64-pc-windows-msvc
+          - host: windows-latest
+            target: aarch64-pc-windows-msvc
+    defaults:
+      run:
+        working-directory: packages/electron-passkeys
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.settings.target }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: packages/electron-passkeys
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+        working-directory: .
+
+      - name: Build native module
+        run: pnpm build --target ${{ matrix.settings.target }}
+
+      - name: Smoke test (host-native targets only)
+        if: matrix.settings.target == 'aarch64-apple-darwin' || matrix.settings.target == 'x86_64-pc-windows-msvc'
+        run: node -e "const m = require('./index.js'); console.log('isAvailable:', m.isAvailable(), 'capabilities:', JSON.stringify(m.capabilities()))"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bindings-${{ matrix.settings.target }}
+          path: packages/electron-passkeys/electron-passkeys.*.node
+          if-no-files-found: error
+
+  package:
+    name: Assemble platform packages
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: packages/electron-passkeys
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - uses: pnpm/action-setup@v4
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+        working-directory: .
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: packages/electron-passkeys/artifacts
+
+      - name: Move binaries into per-platform npm packages
+        run: pnpm artifacts
+
+      - name: Verify every platform package contains its binary
+        run: |
+          for dir in npm/*/; do
+            count=$(find "$dir" -name '*.node' | wc -l)
+            if [ "$count" -ne 1 ]; then
+              echo "::error::$dir is missing its .node binary — publishing it would ship an empty package"
+              exit 1
+            fi
+            (cd "$dir" && npm pack --dry-run)
+          done

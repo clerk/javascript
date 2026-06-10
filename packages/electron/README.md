@@ -37,11 +37,12 @@ This package exposes entrypoints for Electron's distinct runtime contexts:
 - `@clerk/electron/preload` — for use in Electron **preload** scripts.
 - `@clerk/electron/react` — for use in the Electron **renderer** process.
 - `@clerk/electron/storage` — default token storage backed by `electron-store`.
+- `@clerk/electron/passkeys` — passkey (WebAuthn) support for the **renderer** process.
 
 ```ts
 // main.ts
 import { app, BrowserWindow, net, protocol } from 'electron';
-import { createClerkBridge } from '@clerk/electron';
+import { createClerkBridge, setupPasskeysMain } from '@clerk/electron';
 import { storage } from '@clerk/electron/storage';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -53,6 +54,8 @@ createClerkBridge({
     host: 'renderer',
   },
 });
+
+setupPasskeysMain();
 
 app.whenReady().then(() => {
   protocol.handle('my-app', request => {
@@ -76,9 +79,10 @@ In `my-app://renderer/sign-in`, `my-app` is the scheme, `renderer` is the host, 
 
 ```ts
 // preload.ts
-import { exposeClerkBridge } from '@clerk/electron/preload';
+import { exposeClerkBridge, setupPasskeysPreload } from '@clerk/electron/preload';
 
 exposeClerkBridge();
+setupPasskeysPreload();
 ```
 
 ```tsx
@@ -150,6 +154,65 @@ app.whenReady().then(() => {
 
 > [!NOTE]
 > Loading the renderer from a dev server (such as Vite) requires looser rules for HMR: add `'unsafe-eval'` to `script-src` and your dev server's origin to `connect-src` (for example, `ws://localhost:<port> http://localhost:<port>`). Many apps skip CSP during development and apply it only to packaged builds.
+
+## Passkeys
+
+Passkey support works in two modes, selected automatically per request:
+
+- **Renderer mode** — when your window loads content over `https://` from an origin that matches your passkey RP ID, the renderer's built-in Chromium WebAuthn is used. Credentials are synced by the OS/browser ecosystem (Windows Hello works out of the box; Touch ID on macOS requires Electron ≥ 42 and [`app.configureWebAuthn`](https://www.electronjs.org/docs/latest/api/app#appconfigurewebauthnoptions-macos)).
+- **Native mode** — when your window loads a local bundle (`file://` or a custom protocol), WebAuthn's origin checks reject the request, so the ceremony is routed over IPC to the main process and serviced by the OS WebAuthn APIs (AuthenticationServices on macOS, `webauthn.dll` on Windows) via the optional [`@clerk/electron-passkeys`](https://github.com/clerk/javascript/tree/main/packages/electron-passkeys) native module.
+
+### Setup
+
+Native mode requires the optional native module:
+
+```sh
+pnpm add @clerk/electron-passkeys
+```
+
+```ts
+// main process
+import { createClerkBridge, setupPasskeysMain } from '@clerk/electron';
+import { storage } from '@clerk/electron/storage';
+
+createClerkBridge({ storage: storage() });
+setupPasskeysMain();
+```
+
+```ts
+// preload script
+import { exposeClerkBridge, setupPasskeysPreload } from '@clerk/electron/preload';
+
+exposeClerkBridge();
+setupPasskeysPreload();
+```
+
+```ts
+// renderer process
+import { Clerk } from '@clerk/clerk-js';
+import { createPasskeyProvider } from '@clerk/electron/passkeys';
+
+const clerk = new Clerk(publishableKey);
+createPasskeyProvider(clerk); // optionally { mode: 'auto' | 'renderer' | 'native' }
+await clerk.load();
+```
+
+### macOS requirements for native mode
+
+Like passkeys on iOS, the macOS platform APIs require a verified association between your app and your domain:
+
+1. Serve an `apple-app-site-association` file from `https://<rp-domain>/.well-known/apple-app-site-association` (https, no redirect, `application/json`) listing your app: `{"webcredentials": {"apps": ["<TEAMID>.<bundle-id>"]}}`. The RP domain must be publicly reachable — Apple's CDN fetches it.
+2. Sign your app with `com.apple.developer.associated-domains` containing `webcredentials:<rp-domain>`. This is a _restricted_ entitlement: the build must embed a provisioning profile with the Associated Domains capability for the bundle ID, and the entitlements must also include `com.apple.application-identifier` and `com.apple.developer.team-identifier` matching the profile.
+
+Hard-won development-build checklist (each of these failure modes produces the same opaque "not associated with domain" error):
+
+- Sign with an **Apple Development** identity (`mac.type: development` in electron-builder) and a **macOS App Development** profile that includes your Mac; also install the profile on the machine (`~/Library/Developer/Xcode/UserData/Provisioning Profiles/<UUID>.provisionprofile`).
+- Copy `.app` bundles with `ditto`, never `cp -R` — `cp` breaks the bundle seal, and macOS silently ignores the entitlements of an app whose signature fails `codesign --verify --deep --strict`.
+- The system registers the domain association via `swcd` when the app launches; verify with `sudo swcutil show`. If state gets stuck, `sudo swcutil reset` and relaunch.
+- Prefer the default (production/CDN) association route. `?mode=developer` + `sudo swcutil developer-mode -e true` exists but is flaky in practice.
+- The system log tells the truth: `log stream --predicate 'process == "swcd" OR composedMessage CONTAINS "your.domain"'` while launching, and look for `taskgated-helper: allowing entitlement(s) ... due to provisioning profile`.
+
+Windows has no equivalent requirement. On Linux there is no native path; passkeys work in renderer mode only (including external security keys).
 
 ## Support
 
