@@ -40,13 +40,39 @@ This package exposes entrypoints for Electron's distinct runtime contexts:
 
 ```ts
 // main.ts
+import { app, BrowserWindow, net, protocol } from 'electron';
 import { setupMain } from '@clerk/electron';
 import { storage } from '@clerk/electron/storage';
+import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 setupMain({
   storage: storage(),
+  renderer: {
+    scheme: 'my-app',
+    host: 'renderer',
+  },
+});
+
+app.whenReady().then(() => {
+  protocol.handle('my-app', request => {
+    const url = new URL(request.url);
+    const file = url.pathname === '/' ? 'index.html' : url.pathname;
+
+    return net.fetch(pathToFileURL(join(__dirname, '../renderer', file)).toString());
+  });
+
+  const win = new BrowserWindow({
+    webPreferences: {
+      preload: join(__dirname, '../preload/index.js'),
+    },
+  });
+
+  win.loadURL('my-app://renderer/');
 });
 ```
+
+In `my-app://renderer/sign-in`, `my-app` is the scheme, `renderer` is the host, `my-app://renderer` is the origin, and `/sign-in` is the path. If your renderer uses path-based routing, serve every route from the same origin and fall back to your renderer entrypoint as needed.
 
 ```tsx
 // renderer.tsx

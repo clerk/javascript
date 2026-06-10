@@ -1,4 +1,4 @@
-import { ipcMain } from 'electron';
+import { ipcMain, protocol } from 'electron';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { TokenStorage } from '../../shared/types';
@@ -8,6 +8,9 @@ vi.mock('electron', () => ({
   ipcMain: {
     handle: vi.fn(),
     removeHandler: vi.fn(),
+  },
+  protocol: {
+    registerSchemesAsPrivileged: vi.fn(),
   },
 }));
 
@@ -31,6 +34,53 @@ describe('setupMain', () => {
     setupMain({ storage });
 
     expect(ipcMain.handle).toHaveBeenCalledTimes(3);
+  });
+
+  it('registers the configured renderer scheme as privileged before app ready', () => {
+    setupMain({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+    });
+
+    expect(protocol.registerSchemesAsPrivileged).toHaveBeenCalledWith([
+      {
+        scheme: 'my-app',
+        privileges: {
+          corsEnabled: true,
+          secure: true,
+          standard: true,
+          stream: true,
+          supportFetchAPI: true,
+        },
+      },
+    ]);
+  });
+
+  it('requires renderer.scheme to be a scheme name, not a URL', () => {
+    expect(() =>
+      setupMain({
+        storage,
+        renderer: {
+          host: 'renderer',
+          scheme: 'my-app://',
+        },
+      }),
+    ).toThrow('renderer.scheme must be a scheme name');
+  });
+
+  it('requires renderer.host to be a host name, not an origin', () => {
+    expect(() =>
+      setupMain({
+        storage,
+        renderer: {
+          host: 'my-app://renderer',
+          scheme: 'my-app',
+        },
+      }),
+    ).toThrow('renderer.host must be a host name');
   });
 
   it('returns a cleanup function for registered handlers', () => {
