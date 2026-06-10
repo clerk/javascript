@@ -149,7 +149,7 @@ export const frFR: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Méthodes de paiement',
-    popular: 'Populaire',
+    highlightedPlanBadge: 'Populaire',
     pricingTable: {
       billingCycle: 'Cycle de facturation',
       included: 'Inclus',
@@ -185,6 +185,50 @@ export const frFR: LocalizationResource = {
     viewFeatures: 'Voir les fonctionnalités',
     viewPayment: 'Voir le paiement',
     year: 'An',
+  },
+  configureSSO: {
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: "Contactez l'administrateur de votre organisation pour étendre vos permissions.",
+      title: "Vous n'avez pas la permission de gérer l'authentification unique (SSO)",
+    },
+    navbar: {
+      title: "Configurer l'authentification unique (SSO)",
+    },
+    selectProviderStep: {
+      title: 'Sélectionner un fournisseur',
+      subtitle: 'Sélectionnez le fournisseur pour lequel vous allez configurer le SSO.',
+      saml: {
+        groupLabel: 'SAML',
+        okta: 'Okta Workforce',
+        customSaml: 'Fournisseur SAML personnalisé',
+      },
+      warning:
+        "Une fois un fournisseur sélectionné, vous ne pourrez plus en changer jusqu'à la fin de la configuration",
+    },
+    verifyEmailDomainStep: {
+      title: "Vérifier l'adresse e-mail",
+      subtitle: "Vérifiez l'adresse e-mail sur laquelle vous souhaitez activer la connexion entreprise.",
+      addEmailAddress: {
+        formTitle: 'Nous avons besoin de votre e-mail',
+        formSubtitle: 'Pour commencer, nous aurons besoin de votre adresse e-mail',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'Adresse e-mail',
+      },
+      emailCode: {
+        formTitle: 'Vérifiez votre adresse e-mail',
+        formSubtitle: 'Entrez le code de vérification envoyé à {{identifier}}',
+        resendButton: "Vous n'avez pas reçu de code ? Renvoyer",
+        verified: {
+          title: 'Nous avons reçu votre e-mail',
+          subtitle: "Vous avez vérifié votre adresse e-mail avec l'e-mail suivant",
+          inputLabel: 'Adresse e-mail vérifiée',
+        },
+      },
+      domainTaken: {
+        title: "Ce domaine ({{domain}}) dispose déjà d'une connexion SSO",
+        subtitle: "Contactez l'administrateur de l'application pour obtenir l'accès via la connexion existante.",
+      },
+    },
   },
   createOrganization: {
     formButtonSubmit: 'Créer l’organisation',

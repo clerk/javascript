@@ -2,6 +2,7 @@ import { useOrganization } from '@clerk/shared/react';
 
 import { Header } from '@/ui/elements/Header';
 import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
+import { ProfileCard } from '@/ui/elements/ProfileCard';
 import { ProfileSection } from '@/ui/elements/Section';
 
 import { Protect, useProtect } from '../../common';
@@ -56,29 +57,31 @@ const DeleteOrganizationScreen = () => {
 
 export const OrganizationGeneralPage = () => {
   return (
-    <Col
-      elementDescriptor={descriptors.page}
-      sx={t => ({ gap: t.space.$8 })}
-    >
+    <ProfileCard.Page>
       <Col
-        elementDescriptor={descriptors.profilePage}
-        elementId={descriptors.profilePage.setId('organizationGeneral')}
+        elementDescriptor={descriptors.page}
+        sx={t => ({ gap: t.space.$8 })}
       >
-        <Header.Root>
-          <Header.Title
-            localizationKey={localizationKeys('organizationProfile.start.headerTitle__general')}
-            sx={t => ({ marginBottom: t.space.$4 })}
-            textVariant='h2'
-          />
-        </Header.Root>
-        <OrganizationProfileSection />
-        <Protect permission='org:sys_domains:read'>
-          <OrganizationDomainsSection />
-        </Protect>
-        <OrganizationLeaveSection />
-        <OrganizationDeleteSection />
+        <Col
+          elementDescriptor={descriptors.profilePage}
+          elementId={descriptors.profilePage.setId('organizationGeneral')}
+        >
+          <Header.Root>
+            <Header.Title
+              localizationKey={localizationKeys('organizationProfile.start.headerTitle__general')}
+              sx={t => ({ marginBottom: t.space.$4 })}
+              textVariant='h2'
+            />
+          </Header.Root>
+          <OrganizationProfileSection />
+          <Protect permission='org:sys_domains:read'>
+            <OrganizationDomainsSection />
+          </Protect>
+          <OrganizationLeaveSection />
+          <OrganizationDeleteSection />
+        </Col>
       </Col>
-    </Col>
+    </ProfileCard.Page>
   );
 };
 
@@ -162,7 +165,7 @@ const OrganizationDomainsSection = () => {
               <Text
                 localizationKey={localizationKeys('organizationProfile.profilePage.domainSection.subtitle')}
                 sx={t => ({
-                  paddingInlineStart: t.space.$9,
+                  paddingInlineStart: t.space.$8x5,
                 })}
                 colorScheme='secondary'
               />

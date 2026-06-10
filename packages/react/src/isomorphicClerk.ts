@@ -25,6 +25,7 @@ import type {
   ClerkOptions,
   ClerkStatus,
   ClientResource,
+  ConfigureSSOProps,
   CreateOrganizationParams,
   CreateOrganizationProps,
   DomainOrProxyUrl,
@@ -36,6 +37,7 @@ import type {
   ListenerOptions,
   LoadedClerk,
   OAuthApplicationNamespace,
+  OAuthConsentProps,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
@@ -158,6 +160,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountWaitlistNodes = new Map<HTMLDivElement, WaitlistProps | undefined>();
   private premountPricingTableNodes = new Map<HTMLDivElement, PricingTableProps | undefined>();
   private premountAPIKeysNodes = new Map<HTMLDivElement, APIKeysProps | undefined>();
+  private premountConfigureSSONodes = new Map<HTMLDivElement, ConfigureSSOProps | undefined>();
   private premountOAuthConsentNodes = new Map<HTMLDivElement, __internal_OAuthConsentProps | undefined>();
   private premountTaskChooseOrganizationNodes = new Map<HTMLDivElement, TaskChooseOrganizationProps | undefined>();
   private premountTaskResetPasswordNodes = new Map<HTMLDivElement, TaskResetPasswordProps | undefined>();
@@ -341,11 +344,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   get isStandardBrowser() {
     return this.clerkjs?.isStandardBrowser || this.options.standardBrowser || false;
-  }
-
-  get __internal_queryClient() {
-    // @ts-expect-error - __internal_queryClient is not typed
-    return this.clerkjs?.__internal_queryClient;
   }
 
   get isSatellite() {
@@ -578,19 +576,25 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return undefined;
     }
 
-    await loadClerkUIScript({
-      ...this.options,
-      publishableKey: this.#publishableKey,
-      proxyUrl: this.proxyUrl,
-      domain: this.domain,
-      nonce: this.options.nonce,
-    });
+    // Skip the remote UI loader in no-RHC builds (e.g. Chrome extensions) so the CDN script
+    // injector is dead-code-eliminated from the bundle, mirroring getClerkJsEntryChunk.
+    if (!__BUILD_DISABLE_RHC__) {
+      await loadClerkUIScript({
+        ...this.options,
+        publishableKey: this.#publishableKey,
+        proxyUrl: this.proxyUrl,
+        domain: this.domain,
+        nonce: this.options.nonce,
+      });
 
-    if (!global.__internal_ClerkUICtor) {
-      throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
+      if (!global.__internal_ClerkUICtor) {
+        throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
+      }
+
+      return global.__internal_ClerkUICtor;
     }
 
-    return global.__internal_ClerkUICtor;
+    return undefined;
   }
 
   public on: Clerk['on'] = (...args) => {
@@ -653,13 +657,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     this.#eventBus.internal.retrieveListeners('status')?.forEach(listener => {
       // Since clerkjs exists it will call `this.clerkjs.on('status', listener)`
       this.on('status', listener, { notify: true });
-    });
-
-    // @ts-expect-error - queryClientStatus is not typed
-    this.#eventBus.internal.retrieveListeners('queryClientStatus')?.forEach(listener => {
-      // Since clerkjs exists it will call `this.clerkjs.on('queryClientStatus', listener)`
-      // @ts-expect-error - queryClientStatus is not typed
-      this.on('queryClientStatus', listener, { notify: true });
     });
 
     if (this.preopenSignIn !== null) {
@@ -744,6 +741,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
     this.premountAPIKeysNodes.forEach((props, node) => {
       clerkjs.mountAPIKeys(node, props);
+    });
+
+    this.premountConfigureSSONodes.forEach((props, node) => {
+      clerkjs.__internal_mountConfigureSSO(node, props);
     });
 
     this.premountOAuthConsentNodes.forEach((props, node) => {
@@ -1282,7 +1283,23 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __internal_mountOAuthConsent = (node: HTMLDivElement, props?: __internal_OAuthConsentProps) => {
+  __internal_mountConfigureSSO = (node: HTMLDivElement, props?: ConfigureSSOProps): void => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.__internal_mountConfigureSSO(node, props);
+    } else {
+      this.premountConfigureSSONodes.set(node, props);
+    }
+  };
+
+  __internal_unmountConfigureSSO = (node: HTMLDivElement): void => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.__internal_unmountConfigureSSO(node);
+    } else {
+      this.premountConfigureSSONodes.delete(node);
+    }
+  };
+
+  __internal_mountOAuthConsent = (node: HTMLDivElement, props?: OAuthConsentProps) => {
     if (this.clerkjs && this.loaded) {
       this.clerkjs.__internal_mountOAuthConsent(node, props);
     } else {
@@ -1296,6 +1313,14 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     } else {
       this.premountOAuthConsentNodes.delete(node);
     }
+  };
+
+  mountOAuthConsent = (node: HTMLDivElement, props?: OAuthConsentProps) => {
+    this.__internal_mountOAuthConsent(node, props);
+  };
+
+  unmountOAuthConsent = (node: HTMLDivElement) => {
+    this.__internal_unmountOAuthConsent(node);
   };
 
   mountTaskChooseOrganization = (node: HTMLDivElement, props?: TaskChooseOrganizationProps): void => {

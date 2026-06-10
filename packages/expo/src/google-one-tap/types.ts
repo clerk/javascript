@@ -18,7 +18,7 @@ export type ConfigureParams = {
   iosClientId?: string;
 
   /**
-   * Optional hosted domain to restrict sign-in to a specific domain.
+   * The hosted domain to restrict sign-in to a specific domain.
    */
   hostedDomain?: string;
 

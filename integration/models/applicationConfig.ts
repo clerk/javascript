@@ -2,7 +2,7 @@ import * as path from 'node:path';
 
 import type { AccountlessApplication } from '@clerk/backend';
 
-import { constants } from '../constants';
+import { constants, TRUSTED_OVERRIDES } from '../constants';
 import { PKGLAB } from '../presets/utils';
 import { createLogger, fs } from '../scripts';
 import { application } from './application';
@@ -125,13 +125,22 @@ export const applicationConfig = () => {
             ? []
             : [...dependencies.entries()].filter(([, version]) => version === PKGLAB).map(([name]) => [name, 'latest']),
         );
+      const packageJsonPath = path.resolve(appDirPath, 'package.json');
+      const contents = await fs.readJSON(packageJsonPath);
       if (npmDeps.length > 0) {
-        const packageJsonPath = path.resolve(appDirPath, 'package.json');
         logger.info(`Modifying dependencies in "${packageJsonPath}"`);
-        const contents = await fs.readJSON(packageJsonPath);
         contents.dependencies = { ...contents.dependencies, ...Object.fromEntries(npmDeps) };
-        await fs.writeJSON(packageJsonPath, contents, { spaces: 2 });
       }
+      // Pin transitives to versions with pnpm "trustedPublisher" evidence so the
+      // isolated tmp install passes pnpm 10's trust-downgrade check.
+      contents.pnpm = {
+        ...(contents.pnpm ?? {}),
+        overrides: {
+          ...(contents.pnpm?.overrides ?? {}),
+          ...TRUSTED_OVERRIDES,
+        },
+      };
+      await fs.writeJSON(packageJsonPath, contents, { spaces: 2 });
 
       return application(self, appDirPath, appDirName, serverUrl);
     },

@@ -5,15 +5,16 @@
   "license": "MIT",
   "scripts": {
     "build": "FORCE_COLOR=1 turbo build --concurrency=${TURBO_CONCURRENCY:-80%}",
-    "build:declarations": "FORCE_COLOR=1 turbo build:declarations --concurrency=${TURBO_CONCURRENCY:-80%} --filter=@clerk/nextjs --filter=@clerk/react --filter=@clerk/shared",
+    "build:declarations": "FORCE_COLOR=1 turbo build:declarations --concurrency=${TURBO_CONCURRENCY:-80%} --filter=@clerk/nextjs",
     "bundlewatch": "turbo run bundlewatch",
     "changeset": "changeset",
     "changeset:empty": "pnpm changeset --empty",
     "clean": "turbo run clean",
     "dev": "TURBO_UI=0 FORCE_COLOR=1 turbo dev --filter=@clerk/* --filter=!@clerk/expo --filter=!@clerk/tanstack-react-start --filter=!@clerk/chrome-extension",
-    "dev:fe-libs": "TURBO_UI=0 FORCE_COLOR=1 turbo dev --filter=@clerk/clerk-js --filter=@clerk/ui",
+    "dev:fe-libs": "TURBO_UI=0 FORCE_COLOR=1 turbo dev --filter=@clerk/clerk-js --filter=@clerk/ui --filter=@clerk/shared",
     "dev:js": "TURBO_UI=0 FORCE_COLOR=1 turbo dev:current --filter=@clerk/clerk-js",
     "dev:sandbox": "TURBO_UI=0 FORCE_COLOR=1 turbo dev:sandbox:serve",
+    "dev:swingset": "pnpm --filter @clerk/shared build && TURBO_UI=0 FORCE_COLOR=1 turbo dev --filter=@clerk/swingset --filter=@clerk/shared",
     "format": "turbo format && node scripts/format-non-workspace.mjs",
     "format:check": "turbo format:check && node scripts/format-non-workspace.mjs --check",
     "preinstall": "npx only-allow pnpm",
@@ -77,7 +78,7 @@
     "@clerk/backend": "workspace:*",
     "@clerk/shared": "workspace:*",
     "@clerk/testing": "workspace:*",
-    "@commitlint/cli": "^20.5.0",
+    "@commitlint/cli": "^20.5.2",
     "@commitlint/config-conventional": "^20.5.0",
     "@eslint/eslintrc": "^3.3.5",
     "@eslint/js": "9.31.0",
@@ -140,20 +141,21 @@
     "tree-kill": "^1.2.2",
     "tsdown": "catalog:repo",
     "tsup": "catalog:repo",
-    "turbo": "^2.5.4",
+    "turbo": "^2.9.14",
     "typedoc": "0.28.5",
     "typedoc-plugin-markdown": "4.6.4",
     "typedoc-plugin-replace-text": "4.2.0",
     "typescript": "catalog:repo",
     "typescript-eslint": "8.58.0",
+    "unrun": "0.2.39",
     "uuid": "8.3.2",
     "vitest": "3.2.4",
     "zx": "catalog:repo"
   },
   "packageManager": "pnpm@10.33.0+sha512.10568bb4a6afb58c9eb3630da90cc9516417abebd3fabbe6739f0ae795728da1491e9db5a544c76ad8eb7570f5c4bb3d6c637b2cb41bfdcdb47fa823c8649319",
   "engines": {
-    "node": ">=22.11.0",
-    "pnpm": ">=10.17.1"
+    "node": ">=24.15.0",
+    "pnpm": ">=10.33.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
@@ -161,9 +163,13 @@
       "msw"
     ],
     "overrides": {
+      "chokidar@<5.0.0": "5.0.0",
       "react": "catalog:react",
       "react-dom": "catalog:react",
       "rolldown": "catalog:repo",
+      "semver@<7.7.3": "7.7.4",
+      "tar@<7.5.11": "7.5.11",
+      "undici-types@<7.16.0": "7.24.8",
       "utf-8-validate": "5.0.10"
     }
   }

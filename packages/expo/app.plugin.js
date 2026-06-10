@@ -6,8 +6,8 @@
  * 1. iOS is configured with Swift Package Manager dependency for clerk-ios
  * 2. Android is configured with packaging exclusions for dependencies
  *
- * Native modules are registered via react-native.config.js and standard
- * React Native autolinking (RCTViewManager / ReactPackage).
+ * Native modules are registered via Expo Modules autolinking on Android and
+ * React Native autolinking on iOS (RCTViewManager).
  */
 const {
   withXcodeProject,
@@ -20,7 +20,7 @@ const path = require('path');
 const fs = require('fs');
 
 const CLERK_IOS_REPO = 'https://github.com/clerk/clerk-ios.git';
-const CLERK_IOS_VERSION = '1.0.0';
+const CLERK_IOS_VERSION = '1.2.1';
 
 const CLERK_MIN_IOS_VERSION = '17.0';
 
@@ -214,7 +214,7 @@ const withClerkIOS = config => {
     return config;
   });
 
-  // Inject ClerkViewFactory.register() call into AppDelegate.swift
+  // Inject ClerkNativeBridge.register() call into AppDelegate.swift
   config = withDangerousMod(config, [
     'ios',
     async config => {
@@ -226,7 +226,7 @@ const withClerkIOS = config => {
         let contents = fs.readFileSync(appDelegatePath, 'utf8');
 
         // Check if already added
-        if (!contents.includes('ClerkViewFactory.register()')) {
+        if (!contents.includes('ClerkNativeBridge.register()')) {
           // Find the didFinishLaunchingWithOptions method and add the registration call
           // Look for the return statement in didFinishLaunching
           const pattern = /(func application\s*\([^)]*didFinishLaunchingWithOptions[^)]*\)[^{]*\{)/;
@@ -235,10 +235,10 @@ const withClerkIOS = config => {
           if (match) {
             // Insert after the opening brace of didFinishLaunching
             const insertPoint = match.index + match[0].length;
-            const registrationCode = '\n    // Register Clerk native views\n    ClerkViewFactory.register()\n';
+            const registrationCode = '\n    // Register Clerk native bridge\n    ClerkNativeBridge.register()\n';
             contents = contents.slice(0, insertPoint) + registrationCode + contents.slice(insertPoint);
             fs.writeFileSync(appDelegatePath, contents);
-            console.log('✅ Added ClerkViewFactory.register() to AppDelegate.swift');
+            console.log('✅ Added ClerkNativeBridge.register() to AppDelegate.swift');
           } else {
             console.warn('⚠️  Could not find didFinishLaunchingWithOptions in AppDelegate.swift');
           }
@@ -249,7 +249,7 @@ const withClerkIOS = config => {
     },
   ]);
 
-  // Then inject ClerkViewFactory.swift into the app target
+  // Then inject ClerkNativeBridge.swift into the app target
   // This is required because the file uses `import ClerkKit` which is only available
   // via SPM in the app target (CocoaPods targets can't see SPM packages)
   config = withXcodeProject(config, config => {
@@ -258,26 +258,26 @@ const withClerkIOS = config => {
       const projectName = config.modRequest.projectName;
       const iosProjectPath = path.join(platformProjectRoot, projectName);
 
-      // Find the ClerkViewFactory.swift source file using Node's module resolution,
+      // Find the ClerkNativeBridge.swift source file using Node's module resolution,
       // which handles arbitrary nesting depths in pnpm/yarn/npm workspaces.
       let sourceFile;
       try {
         const packageRoot = path.dirname(require.resolve('@clerk/expo/package.json'));
-        sourceFile = path.join(packageRoot, 'ios', 'ClerkViewFactory.swift');
+        sourceFile = path.join(packageRoot, 'ios', 'ClerkNativeBridge.swift');
       } catch {
         sourceFile = null;
       }
 
       if (sourceFile && fs.existsSync(sourceFile)) {
         // ALWAYS copy the file to ensure we have the latest version
-        const targetFile = path.join(iosProjectPath, 'ClerkViewFactory.swift');
+        const targetFile = path.join(iosProjectPath, 'ClerkNativeBridge.swift');
         fs.copyFileSync(sourceFile, targetFile);
-        console.log('✅ Copied ClerkViewFactory.swift to app target');
+        console.log('✅ Copied ClerkNativeBridge.swift to app target');
 
         // Add the file to the Xcode project manually
         const xcodeProject = config.modResults;
-        const relativePath = `${projectName}/ClerkViewFactory.swift`;
-        const fileName = 'ClerkViewFactory.swift';
+        const relativePath = `${projectName}/ClerkNativeBridge.swift`;
+        const fileName = 'ClerkNativeBridge.swift';
 
         try {
           // Get the main target
@@ -291,11 +291,13 @@ const withClerkIOS = config => {
 
           // Check if file is already in the Xcode project references
           const fileReferences = xcodeProject.hash.project.objects.PBXFileReference || {};
-          const alreadyExists = Object.values(fileReferences).some(ref => ref && ref.path === fileName);
+          const alreadyExists = Object.values(fileReferences).some(
+            ref => ref && (ref.path === fileName || ref.path === relativePath || ref.name === fileName),
+          );
 
           if (alreadyExists) {
             // File is already in project, but we still copied the latest version
-            console.log('✅ ClerkViewFactory.swift updated in app target');
+            console.log('✅ ClerkNativeBridge.swift updated in app target');
             return config;
           }
 
@@ -309,7 +311,7 @@ const withClerkIOS = config => {
             isa: 'PBXFileReference',
             lastKnownFileType: 'sourcecode.swift',
             name: fileName,
-            path: relativePath, // Use full relative path (projectName/ClerkViewFactory.swift)
+            path: relativePath, // Use full relative path (projectName/ClerkNativeBridge.swift)
             sourceTree: '"<group>"',
           };
 
@@ -379,16 +381,16 @@ const withClerkIOS = config => {
             console.warn('⚠️  Could not find main PBXGroup for project');
           }
 
-          console.log('✅ Added ClerkViewFactory.swift to Xcode project');
+          console.log('✅ Added ClerkNativeBridge.swift to Xcode project');
         } catch (addError) {
           console.error('❌ Error adding file to Xcode project:', addError.message);
           console.error(addError.stack);
         }
       } else {
-        console.warn('⚠️  ClerkViewFactory.swift not found, skipping injection');
+        console.warn('⚠️  ClerkNativeBridge.swift not found, skipping injection');
       }
     } catch (error) {
-      console.error('❌ Error injecting ClerkViewFactory.swift:', error.message);
+      console.error('❌ Error injecting ClerkNativeBridge.swift:', error.message);
     }
 
     return config;
@@ -551,8 +553,8 @@ const withClerkGoogleSignIn = config => {
  * 2. Android gets packaging exclusions for dependency conflicts
  * 3. Google Sign-In URL scheme is configured (if env var is set)
  *
- * Native modules are registered via react-native.config.js and standard
- * React Native autolinking (RCTViewManager / ReactPackage).
+ * Native modules are registered via Expo Modules autolinking on Android and
+ * React Native autolinking on iOS (RCTViewManager).
  */
 /**
  * Write ClerkKeychainService to Info.plist when keychainService is provided.

@@ -26,7 +26,6 @@ import { buildRequest, useFormControl } from '@/ui/utils/useFormControl';
 
 import type { SignInStartIdentifier } from '../../common';
 import {
-  buildSSOCallbackURL,
   getIdentifierControlDisplayValues,
   groupIdentifiers,
   withRedirectToAfterSignIn,
@@ -40,7 +39,11 @@ import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useTotalEnabledAuthMethods } from '../../hooks/useTotalEnabledAuthMethods';
 import { useRouter } from '../../router';
 import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
-import { hasMultipleEnterpriseConnections, useHandleAuthenticateWithPasskey } from './shared';
+import {
+  hasMultipleEnterpriseConnections,
+  SIGN_IN_RESET_PASSWORD_INTENT_PARAM,
+  useHandleAuthenticateWithPasskey,
+} from './shared';
 import { SignInAlternativePhoneCodePhoneNumberCard } from './SignInAlternativePhoneCodePhoneNumberCard';
 import { SignInSocialButtons } from './SignInSocialButtons';
 import {
@@ -82,7 +85,7 @@ function SignInStartInternal(): JSX.Element {
   const card = useCardState();
   const clerk = useClerk();
   const status = useLoadingStatus();
-  const { displayConfig, userSettings, authConfig } = useEnvironment();
+  const { userSettings, authConfig } = useEnvironment();
   const signIn = useCoreSignIn();
   const { navigate } = useRouter();
   const ctx = useSignInContext();
@@ -348,7 +351,10 @@ function SignInStartInternal(): JSX.Element {
     });
   };
 
-  const signInWithFields = async (...fields: Array<FormControlState<string>>) => {
+  const signInWithFields = async (
+    fields: Array<FormControlState<string>>,
+    options?: { resetPasswordIntent?: boolean },
+  ) => {
     // If the user has already selected an alternative phone code provider, we use that.
     const preferredAlternativePhoneChannel =
       alternativePhoneCodeProvider?.channel ||
@@ -386,6 +392,11 @@ function SignInStartInternal(): JSX.Element {
           break;
         case 'needs_first_factor': {
           if (!hasOnlyEnterpriseSSOFirstFactors(res) || hasMultipleEnterpriseConnections(res.supportedFirstFactors)) {
+            if (options?.resetPasswordIntent) {
+              return navigate('factor-one', {
+                searchParams: new URLSearchParams({ [SIGN_IN_RESET_PASSWORD_INTENT_PARAM]: 'true' }),
+              });
+            }
             return navigate('factor-one');
           }
 
@@ -413,7 +424,7 @@ function SignInStartInternal(): JSX.Element {
   };
 
   const authenticateWithEnterpriseSSO = async () => {
-    const redirectUrl = buildSSOCallbackURL(ctx, displayConfig.signInUrl);
+    const redirectUrl = ctx.ssoCallbackUrl;
     const redirectUrlComplete = ctx.afterSignInUrl || '/';
 
     return signIn.authenticateWithRedirect({
@@ -448,7 +459,7 @@ function SignInStartInternal(): JSX.Element {
     );
 
     if (instantPasswordError) {
-      await signInWithFields(identifierField);
+      await signInWithFields([identifierField]);
     } else if (sessionAlreadyExistsError) {
       await clerk.setActive({
         session: clerk.client.lastActiveSessionId,
@@ -483,7 +494,7 @@ function SignInStartInternal(): JSX.Element {
 
       clerk.client.signUp[attribute] = identifierField.value;
 
-      const redirectUrl = buildSSOCallbackURL(ctx, displayConfig.signUpUrl);
+      const redirectUrl = ctx.ssoCallbackUrl;
       const redirectUrlComplete = ctx.afterSignUpUrl || '/';
 
       return handleCombinedFlowTransfer({
@@ -515,7 +526,18 @@ function SignInStartInternal(): JSX.Element {
 
   const handleFirstPartySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    return signInWithFields(identifierField, instantPasswordField);
+    return signInWithFields([identifierField, instantPasswordField]);
+  };
+
+  const handleForgotPasswordClick: React.MouseEventHandler = e => {
+    e.preventDefault();
+    // Surface the same native required-field validation as the Continue button
+    // when the identifier is missing
+    const form = e.currentTarget.closest('form');
+    if (form && !form.reportValidity()) {
+      return;
+    }
+    void signInWithFields([identifierField], { resetPasswordIntent: true });
   };
 
   const DynamicField = useMemo(() => {
@@ -601,7 +623,10 @@ function SignInStartInternal(): JSX.Element {
                           isLastAuthenticationStrategy={isIdentifierLastAuthenticationStrategy}
                         />
                       </Form.ControlRow>
-                      <InstantPasswordRow field={passwordBasedInstance ? instantPasswordField : undefined} />
+                      <InstantPasswordRow
+                        field={passwordBasedInstance ? instantPasswordField : undefined}
+                        onForgotPasswordClick={handleForgotPasswordClick}
+                      />
                     </Col>
                     <Col center>
                       <CaptchaElement />
@@ -664,7 +689,13 @@ const hasOnlyEnterpriseSSOFirstFactors = (signIn: SignInResource): boolean => {
   return signIn.supportedFirstFactors.every(ff => ff.strategy === 'enterprise_sso');
 };
 
-const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> }) => {
+const InstantPasswordRow = ({
+  field,
+  onForgotPasswordClick,
+}: {
+  field?: FormControlState<'password'>;
+  onForgotPasswordClick?: React.MouseEventHandler;
+}) => {
   const [autofilled, setAutofilled] = useState(false);
   const ref = useRef<HTMLInputElement>(null);
   const show = !!(autofilled || field?.value);
@@ -707,6 +738,8 @@ const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> })
     >
       <Form.PasswordInput
         {...field.props}
+        actionLabel={show ? localizationKeys('formFieldAction__forgotPassword') : undefined}
+        onActionClicked={show ? onForgotPasswordClick : undefined}
         ref={ref}
         tabIndex={show ? undefined : -1}
       />

@@ -2,13 +2,13 @@ import { __internal_useOrganizationBase, useClerk } from '@clerk/shared/react';
 import type {
   __internal_CheckoutProps,
   __internal_SubscriptionDetailsProps,
-  BillingPlanResource,
   BillingSubscriptionItemResource,
 } from '@clerk/shared/types';
 import * as React from 'react';
 import { useCallback, useContext, useState } from 'react';
 
 import { Users } from '@/icons';
+import { common } from '@/styledSystem';
 import { useProtect } from '@/ui/common/Gate';
 import {
   SubscriptionDetailsContext,
@@ -19,7 +19,9 @@ import { CardAlert } from '@/ui/elements/Card/CardAlert';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Drawer, useDrawerContext } from '@/ui/elements/Drawer';
 import { LineItems } from '@/ui/elements/LineItems';
+import { isManageableSubscriptionItem } from '@/ui/utils/billingSubscription';
 import { handleError } from '@/ui/utils/errorHandler';
+import { getSeatLimitAndIncludedSeatsLocalizationKey } from '@/ui/utils/billingPlanSeats';
 import { formatDate } from '@/ui/utils/formatDate';
 
 import {
@@ -44,9 +46,6 @@ import {
   useLocalizations,
 } from '../../customizables';
 import { SubscriptionBadge } from '../Subscriptions/badge';
-import { common } from '@/styledSystem';
-
-const isFreePlan = (plan: BillingPlanResource) => !plan.hasBaseFee;
 
 // We cannot derive the state of confirmation modal from the existence subscription, as it will make the animation laggy when the confirmation closes.
 const SubscriptionForCancellationContext = React.createContext<{
@@ -376,14 +375,14 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
   const canOrgManageBilling = useProtect(has => has({ permission: 'org:sys_billing:manage' }));
   const canManageBilling = subscriberType === 'user' || canOrgManageBilling;
 
+  const isManageable = isManageableSubscriptionItem(subscription);
   const isSwitchable =
     ((subscription.planPeriod === 'month' && Boolean(subscription.plan.annualMonthlyFee)) ||
       (subscription.planPeriod === 'annual' && Boolean(subscription.plan.fee))) &&
     subscription.status !== 'past_due' &&
-    !subscription.plan.isDefault;
-  const isFree = isFreePlan(subscription.plan);
-  const isCancellable = subscription.canceledAt === null && !isFree;
-  const isReSubscribable = subscription.canceledAt !== null && !isFree;
+    isManageable;
+  const isCancellable = subscription.canceledAt === null && isManageable;
+  const isReSubscribable = subscription.canceledAt !== null && isManageable;
 
   const openCheckout = useCallback(
     (params?: __internal_CheckoutProps) => {
@@ -511,6 +510,10 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
 // New component for individual subscription cards
 const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionItemResource }) => {
   const { t } = useLocalizations();
+  const subItemSeatsQty = subscription.seats?.quantity;
+  const firstPaidSeatTier = subscription.seats?.tiers?.find(tier => tier.total.amount > 0);
+  const monthLabel = t(localizationKeys('billing.month')).toLowerCase();
+  const seatLimitAndIncludedSeatsLocalizationKey = getSeatLimitAndIncludedSeatsLocalizationKey(subscription.plan);
 
   const fee =
     subscription.planPeriod === 'month'
@@ -604,16 +607,13 @@ const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionI
         </Flex>
       </Col>
 
-      {subscription.seats ? (
+      {typeof subItemSeatsQty !== 'undefined' ? (
         <DetailRow
           variant='header'
           labelNode={
-            <Text
-              sx={t => ({
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: t.space.$1,
-              })}
+            <Flex
+              align='center'
+              gap={1}
             >
               <Icon
                 icon={Users}
@@ -621,14 +621,30 @@ const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionI
                 colorScheme='neutral'
               />
               <Text localizationKey={localizationKeys('billing.seats')} />
-            </Text>
+            </Flex>
           }
-          value={
-            subscription.seats.quantity === null
-              ? localizationKeys('billing.pricingTable.seatCost.unlimitedSeats')
-              : localizationKeys('billing.pricingTable.seatCost.upToSeats', {
-                  endsAfterBlock: subscription.seats.quantity,
-                })
+          valueNode={
+            <Col
+              gap={1}
+              align='end'
+            >
+              {seatLimitAndIncludedSeatsLocalizationKey ? (
+                <Text
+                  variant='subtitle'
+                  localizationKey={seatLimitAndIncludedSeatsLocalizationKey}
+                />
+              ) : null}
+              {firstPaidSeatTier && firstPaidSeatTier.quantity ? (
+                <Text variant='subtitle'>
+                  {t(
+                    localizationKeys('organizationProfile.billingPage.subscriptionsListSection.paidSeatsUsage', {
+                      seatsQuantity: firstPaidSeatTier.quantity,
+                      amount: `${firstPaidSeatTier.feePerBlock.currencySymbol}${firstPaidSeatTier.feePerBlock.amountFormatted} / ${monthLabel}`,
+                    }),
+                  )}
+                </Text>
+              ) : null}
+            </Col>
           }
         />
       ) : null}
@@ -683,17 +699,19 @@ const DetailRow = ({
   label,
   labelNode,
   value,
+  valueNode,
   variant,
 }: {
   label?: LocalizationKey;
   labelNode?: React.ReactNode;
-  value: string | LocalizationKey;
+  value?: string | LocalizationKey;
+  valueNode?: React.ReactNode;
   variant?: 'header';
 }) => (
   <Flex
     elementDescriptor={descriptors.subscriptionDetailsDetailRow}
     justify='between'
-    align='center'
+    align={valueNode ? 'start' : 'center'}
     sx={t => ({
       paddingInline: t.space.$3,
       paddingBlock: t.space.$3,
@@ -714,19 +732,21 @@ const DetailRow = ({
       />
     ) : null}
     {labelNode ? labelNode : null}
-    {typeof value === 'string' ? (
+    {valueNode ? (
+      valueNode
+    ) : typeof value === 'string' ? (
       <Text
         elementDescriptor={descriptors.subscriptionDetailsDetailRowValue}
         colorScheme='secondary'
       >
         {value}
       </Text>
-    ) : (
+    ) : value ? (
       <Text
         localizationKey={value}
         elementDescriptor={descriptors.subscriptionDetailsDetailRowValue}
         colorScheme='secondary'
       />
-    )}
+    ) : null}
   </Flex>
 );

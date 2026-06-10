@@ -26,6 +26,7 @@ import type {
   SetProfileImageParams,
   TOTPJSON,
   TOTPResource,
+  UpdateUserMetadataParams,
   UpdateUserParams,
   UpdateUserPasswordParams,
   UserJSON,
@@ -225,6 +226,13 @@ export class User extends BaseResource implements UserResource {
 
   update = (params: UpdateUserParams): Promise<UserResource> => {
     return this._basePatch({
+      body: normalizeUnsafeMetadata(params),
+    });
+  };
+
+  updateMetadata = (params: UpdateUserMetadataParams): Promise<UserResource> => {
+    return this._basePatch({
+      path: `${this.path()}/metadata`,
       body: normalizeUnsafeMetadata(params),
     });
   };

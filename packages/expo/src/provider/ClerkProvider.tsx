@@ -1,17 +1,17 @@
 import '../polyfills';
 
 import type { ClerkProviderProps as ReactClerkProviderProps } from '@clerk/react';
-import { useAuth } from '@clerk/react';
 import { InternalClerkProvider as ClerkReactProvider, type Ui } from '@clerk/react/internal';
-import { useEffect, useRef } from 'react';
+import { type MutableRefObject, useEffect, useRef } from 'react';
 import { Platform } from 'react-native';
 
 import type { TokenCache } from '../cache/types';
 import { CLERK_CLIENT_JWT_KEY } from '../constants';
-import { useNativeAuthEvents } from '../hooks/useNativeAuthEvents';
+import { useNativeClientEvents } from '../hooks/useNativeClientEvents';
 import NativeClerkModule from '../specs/NativeClerkModule';
 import { tokenCache as defaultTokenCache } from '../token-cache';
 import { isNative, isWeb } from '../utils/runtime';
+import { maybeCompleteAuthSession } from './maybeCompleteAuthSession';
 import { getClerkInstance } from './singleton';
 import type { BuildClerkOptions } from './singleton/types';
 
@@ -53,133 +53,163 @@ const SDK_METADATA = {
   version: PACKAGE_VERSION,
 };
 
-/**
- * Syncs JS SDK auth state to the native Clerk SDK.
- *
- * When a user authenticates via the JS SDK (custom sign-in forms, useSignIn, etc.)
- * rather than through native `<AuthView />`, the native SDK doesn't know about the
- * session. This component watches for JS auth state changes and pushes the bearer
- * token to the native SDK so native components (UserButton, UserProfileView) work.
- *
- * Must be rendered inside `ClerkReactProvider` so `useAuth()` has access to context.
- */
-function NativeSessionSync({
-  publishableKey,
-  tokenCache,
-}: {
-  publishableKey: string;
-  tokenCache: TokenCache | undefined;
-}) {
-  const { isSignedIn } = useAuth();
-  const hasSyncedRef = useRef(false);
-  // Use the provided tokenCache, falling back to the default SecureStore cache
-  const effectiveTokenCache = tokenCache ?? defaultTokenCache;
+type SyncableClerkInstance = {
+  addListener?: (listener: (payload?: unknown) => void, options?: { skipInitialEmit?: boolean }) => () => void;
+  addOnLoaded?: (listener: () => void) => void;
+  client?: { lastActiveSessionId?: string | null } | null;
+  loaded?: boolean;
+  session?: { id?: string | null } | null;
+  setActive?: (params: { session: string }) => void | Promise<void>;
+  __internal_reloadInitialResources?: () => void | Promise<void>;
+};
 
-  useEffect(() => {
-    if (!isSignedIn) {
-      hasSyncedRef.current = false;
+async function waitForNativeClientToken(): Promise<string | null> {
+  const ClerkExpo = NativeClerkModule;
+  if (!ClerkExpo?.getClientToken) {
+    return null;
+  }
 
-      // Clear the native session so native components (UserButton, etc.)
-      // don't continue showing a signed-in state after JS-side sign out.
-      const ClerkExpo = NativeClerkModule;
-      if (ClerkExpo?.signOut) {
-        void ClerkExpo.signOut().catch((error: unknown) => {
-          if (__DEV__) {
-            console.warn('[NativeSessionSync] Failed to clear native session:', error);
-          }
-        });
-      }
+  const maxAttempts = 30;
+  const intervalMs = 100;
 
-      return;
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const nativeClientToken = await ClerkExpo.getClientToken();
+    if (nativeClientToken) {
+      return nativeClientToken;
     }
-
-    if (hasSyncedRef.current) {
-      return;
-    }
-
-    const syncToNative = async () => {
-      try {
-        const ClerkExpo = NativeClerkModule;
-        if (!ClerkExpo?.configure || !ClerkExpo?.getSession) {
-          return;
-        }
-
-        // Check if native already has a session (e.g. auth via AuthView or initial load)
-        const nativeSession = (await ClerkExpo.getSession()) as {
-          sessionId?: string;
-          session?: { id: string };
-        } | null;
-        const hasNativeSession = !!(nativeSession?.sessionId || nativeSession?.session?.id);
-
-        if (hasNativeSession) {
-          hasSyncedRef.current = true;
-          return;
-        }
-
-        // Read the JS SDK's client JWT and push it to the native SDK
-        const bearerToken = (await effectiveTokenCache?.getToken(CLERK_CLIENT_JWT_KEY)) ?? null;
-        if (bearerToken) {
-          await ClerkExpo.configure(publishableKey, bearerToken);
-          hasSyncedRef.current = true;
-        }
-      } catch (error) {
-        if (__DEV__) {
-          console.warn('[NativeSessionSync] Failed to sync JS session to native:', error);
-        }
-      }
-    };
-
-    void syncToNative();
-  }, [isSignedIn, publishableKey, effectiveTokenCache]);
+    await new Promise(resolve => setTimeout(resolve, intervalMs));
+  }
 
   return null;
 }
 
-export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi>): JSX.Element {
-  const {
-    children,
-    tokenCache,
-    publishableKey,
-    proxyUrl,
-    domain,
-    __experimental_passkeys,
-    experimental,
-    __experimental_resourceCache,
-    ...rest
-  } = props;
-  const pk = publishableKey;
+async function syncClientTokenToCache(tokenCache: TokenCache | undefined, clientToken: string | null): Promise<void> {
+  if (clientToken) {
+    await tokenCache?.saveToken(CLERK_CLIENT_JWT_KEY, clientToken);
+  } else {
+    await tokenCache?.clearToken?.(CLERK_CLIENT_JWT_KEY);
+  }
+}
 
-  // Track pending native session to sync after clerk loads
-  const pendingNativeSessionRef = useRef<string | null>(null);
+async function syncNativeClientToJs({
+  clerkInstance,
+  tokenCache,
+}: {
+  clerkInstance: SyncableClerkInstance;
+  tokenCache: TokenCache | undefined;
+}): Promise<void> {
+  const nativeClientToken = await waitForNativeClientToken();
+  const effectiveTokenCache = tokenCache ?? defaultTokenCache;
+
+  await syncClientTokenToCache(effectiveTokenCache, nativeClientToken);
+  if (typeof clerkInstance.__internal_reloadInitialResources === 'function') {
+    await clerkInstance.__internal_reloadInitialResources();
+  }
+
+  const nativeActiveSessionId = clerkInstance.client?.lastActiveSessionId;
+  const jsActiveSessionId = clerkInstance.session?.id;
+
+  if (
+    nativeActiveSessionId &&
+    nativeActiveSessionId !== jsActiveSessionId &&
+    typeof clerkInstance.setActive === 'function'
+  ) {
+    await clerkInstance.setActive({ session: nativeActiveSessionId });
+  }
+}
+
+/**
+ * Syncs JS SDK client changes to the native Clerk SDK so native components
+ * (UserButton, UserProfileView) stay in sync after JS-owned resource changes.
+ *
+ * Must be rendered inside `ClerkReactProvider` so the Clerk instance has loaded
+ * resources to emit.
+ */
+function NativeClientSync({
+  clerkInstance,
+  isSyncingNativeClientToJsRef,
+  publishableKey,
+  tokenCache,
+}: {
+  clerkInstance: SyncableClerkInstance | null | undefined;
+  isSyncingNativeClientToJsRef: MutableRefObject<boolean>;
+  publishableKey: string;
+  tokenCache: TokenCache | undefined;
+}): null {
+  const isRefreshingNativeFromJsRef = useRef(false);
+  // Use the provided tokenCache, falling back to the default SecureStore cache
+  const effectiveTokenCache = tokenCache ?? defaultTokenCache;
+
+  useEffect(() => {
+    if (!clerkInstance || typeof clerkInstance.addListener !== 'function') {
+      return;
+    }
+
+    return clerkInstance.addListener(
+      () => {
+        if (isSyncingNativeClientToJsRef.current || isRefreshingNativeFromJsRef.current) {
+          return;
+        }
+
+        isRefreshingNativeFromJsRef.current = true;
+
+        const refreshNativeFromJsClient = async (): Promise<void> => {
+          const ClerkExpo = NativeClerkModule;
+          if (!ClerkExpo) {
+            return;
+          }
+
+          const bearerToken = (await effectiveTokenCache?.getToken(CLERK_CLIENT_JWT_KEY)) ?? null;
+          if (bearerToken) {
+            // configure writes the token and refreshes native client state.
+            await ClerkExpo.configure(publishableKey, bearerToken);
+          } else {
+            // No token to push; ask native to reload its current client.
+            await ClerkExpo.refreshClient();
+          }
+        };
+
+        void refreshNativeFromJsClient()
+          .catch((error: unknown) => {
+            if (__DEV__) {
+              console.warn('[NativeClientSync] Failed to refresh native client from JS client change:', error);
+            }
+          })
+          .finally(() => {
+            isRefreshingNativeFromJsRef.current = false;
+          });
+      },
+      { skipInitialEmit: true },
+    );
+  }, [clerkInstance, effectiveTokenCache, isSyncingNativeClientToJsRef, publishableKey]);
+
+  return null;
+}
+
+function useNativeSessionBootstrap({
+  isSyncingNativeClientToJsRef,
+  publishableKey,
+  tokenCache,
+  clerkInstance,
+}: {
+  isSyncingNativeClientToJsRef: MutableRefObject<boolean>;
+  publishableKey: string;
+  tokenCache: TokenCache | undefined;
+  clerkInstance: SyncableClerkInstance | null | undefined;
+}) {
   const initStartedRef = useRef(false);
   const sessionSyncedRef = useRef(false);
-  // Reset refs when publishable key changes (hot-swap support)
-  useEffect(() => {
-    pendingNativeSessionRef.current = null;
-    initStartedRef.current = false;
-    sessionSyncedRef.current = false;
-  }, [pk]);
-
-  // Get the Clerk instance for syncing
-  const clerkInstance = isNative()
-    ? getClerkInstance({
-        publishableKey: pk,
-        tokenCache,
-        proxyUrl,
-        domain,
-        __experimental_passkeys,
-        __experimental_resourceCache,
-      })
-    : null;
-
-  // Track whether the component is still mounted
   const isMountedRef = useRef(true);
 
-  // Configure native Clerk SDK and set up session sync callback
+  useEffect(() => {
+    initStartedRef.current = false;
+    sessionSyncedRef.current = false;
+  }, [publishableKey]);
+
   useEffect(() => {
     isMountedRef.current = true;
 
-    if ((Platform.OS === 'ios' || Platform.OS === 'android') && pk && !initStartedRef.current) {
+    if ((Platform.OS === 'ios' || Platform.OS === 'android') && publishableKey && !initStartedRef.current) {
       initStartedRef.current = true;
 
       const configureNativeClerk = async () => {
@@ -187,8 +217,6 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
           const ClerkExpo = NativeClerkModule;
 
           if (ClerkExpo?.configure) {
-            // Read the JS SDK's client JWT to sync with the native SDK.
-            // Use the user-provided tokenCache so custom caches are honored.
             const effectiveTokenCache = tokenCache ?? defaultTokenCache;
             let bearerToken: string | null = null;
             try {
@@ -199,54 +227,19 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
               }
             }
 
-            // Always configure the native SDK on launch, even without a token.
-            // The iOS SDK requires Clerk.configure() before Clerk.shared can be accessed.
-            // If we have a bearer token, pass it so the native SDK picks up the JS session.
-            await ClerkExpo.configure(pk, bearerToken);
+            await ClerkExpo.configure(publishableKey, bearerToken);
 
             if (!isMountedRef.current) {
               return;
             }
 
-            // Poll for native session (matching iOS's 3-second max wait)
-            const MAX_WAIT_MS = 3000;
-            const POLL_INTERVAL_MS = 100;
-            let sessionId: string | null = null;
-
-            for (let elapsed = 0; elapsed < MAX_WAIT_MS; elapsed += POLL_INTERVAL_MS) {
-              if (!isMountedRef.current) {
-                return;
-              }
-              if (ClerkExpo?.getSession) {
-                const nativeSession = (await ClerkExpo.getSession()) as {
-                  sessionId?: string;
-                  session?: { id: string };
-                } | null;
-                // Normalize: iOS returns { sessionId }, Android returns { session: { id } }
-                sessionId = nativeSession?.sessionId ?? nativeSession?.session?.id ?? null;
-                if (sessionId) {
-                  break;
-                }
-              }
-              await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
-            }
-
-            if (!isMountedRef.current) {
-              return;
-            }
-
-            if (sessionId && clerkInstance) {
-              pendingNativeSessionRef.current = sessionId;
-
-              // Wait for clerk to be loaded before syncing
-              const clerkAny = clerkInstance as any;
-
+            if (clerkInstance) {
               const waitForLoad = (): Promise<void> => {
                 return new Promise(resolve => {
-                  if (clerkAny.loaded) {
+                  if (clerkInstance.loaded) {
                     resolve();
-                  } else if (typeof clerkAny.addOnLoaded === 'function') {
-                    clerkAny.addOnLoaded(() => resolve());
+                  } else if (typeof clerkInstance.addOnLoaded === 'function') {
+                    clerkInstance.addOnLoaded(() => resolve());
                   } else {
                     if (__DEV__) {
                       console.warn('[ClerkProvider] Clerk instance has no loaded property or addOnLoaded method');
@@ -262,25 +255,16 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
                 return;
               }
 
-              if (!sessionSyncedRef.current && typeof clerkInstance.setActive === 'function') {
+              if (!sessionSyncedRef.current) {
                 sessionSyncedRef.current = true;
-                const pendingSession = pendingNativeSessionRef.current;
-
-                // If the native session is not in the client's sessions list,
-                // reload the client from the API so setActive can find it.
-                const sessionInClient = clerkInstance.client?.sessions?.some(
-                  (s: { id: string }) => s.id === pendingSession,
-                );
-                if (!sessionInClient && typeof clerkAny.__internal_reloadInitialResources === 'function') {
-                  await clerkAny.__internal_reloadInitialResources();
-                }
-
+                isSyncingNativeClientToJsRef.current = true;
                 try {
-                  await clerkInstance.setActive({ session: pendingSession });
-                } catch (err) {
-                  if (__DEV__) {
-                    console.error(`[ClerkProvider] Failed to sync native session:`, err);
-                  }
+                  await syncNativeClientToJs({
+                    clerkInstance,
+                    tokenCache,
+                  });
+                } finally {
+                  isSyncingNativeClientToJsRef.current = false;
                 }
               }
             }
@@ -308,76 +292,82 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
     return () => {
       isMountedRef.current = false;
     };
-  }, [pk, clerkInstance]);
+  }, [publishableKey, tokenCache, clerkInstance, isSyncingNativeClientToJsRef]);
 
-  // Listen for native auth state changes and sync to JS SDK
-  const { nativeAuthState } = useNativeAuthEvents();
+  return isMountedRef;
+}
+
+export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi>): JSX.Element {
+  const {
+    children,
+    tokenCache,
+    publishableKey,
+    proxyUrl,
+    domain,
+    __experimental_passkeys,
+    experimental,
+    __experimental_resourceCache,
+    ...rest
+  } = props;
+  const pk = publishableKey;
+
+  const clerkInstance = isNative()
+    ? getClerkInstance({
+        publishableKey: pk,
+        tokenCache,
+        proxyUrl,
+        domain,
+        __experimental_passkeys,
+        __experimental_resourceCache,
+      })
+    : null;
+
+  const isSyncingNativeClientToJsRef = useRef(false);
+  const isMountedRef = useNativeSessionBootstrap({
+    isSyncingNativeClientToJsRef,
+    publishableKey: pk,
+    tokenCache,
+    clerkInstance,
+  });
+
+  // Listen for native client events and reload JS from the client source of truth.
+  const { nativeClientEvent } = useNativeClientEvents();
 
   useEffect(() => {
-    if (!nativeAuthState || !clerkInstance) {
+    if (!nativeClientEvent || !clerkInstance) {
       return;
     }
 
-    const syncNativeAuthToJs = async () => {
+    const syncNativeClientStateToJs = async () => {
       try {
-        if (nativeAuthState.type === 'signedIn' && nativeAuthState.sessionId && clerkInstance.setActive) {
-          // Copy the native client's bearer token to the JS SDK's token cache
-          // so API requests use the native client (which has the session).
-          const ClerkExpo = NativeClerkModule;
-          if (ClerkExpo?.getClientToken) {
-            const nativeClientToken = await ClerkExpo.getClientToken();
-            if (nativeClientToken) {
-              const effectiveTokenCache = tokenCache ?? defaultTokenCache;
-              await effectiveTokenCache?.saveToken(CLERK_CLIENT_JWT_KEY, nativeClientToken);
-            }
-          }
-
-          // Ensure the session exists in the client before calling setActive
-          const sessionInClient = clerkInstance.client?.sessions?.some(
-            (s: { id: string }) => s.id === nativeAuthState.sessionId,
-          );
-          if (!sessionInClient) {
-            const clerkAny = clerkInstance as any;
-            if (typeof clerkAny.__internal_reloadInitialResources === 'function') {
-              await clerkAny.__internal_reloadInitialResources();
-            }
-            if (!isMountedRef.current) {
-              return;
-            }
-          }
-
-          if (!isMountedRef.current) {
-            return;
-          }
-          await clerkInstance.setActive({ session: nativeAuthState.sessionId });
-        } else if (nativeAuthState.type === 'signedOut' && clerkInstance.signOut) {
-          if (!isMountedRef.current) {
-            return;
-          }
-          await clerkInstance.signOut();
+        if (!isMountedRef.current) {
+          return;
+        }
+        isSyncingNativeClientToJsRef.current = true;
+        try {
+          await syncNativeClientToJs({
+            clerkInstance,
+            tokenCache,
+          });
+        } finally {
+          isSyncingNativeClientToJsRef.current = false;
         }
       } catch (error) {
         if (__DEV__) {
-          console.error(`[ClerkProvider] Failed to sync native auth state:`, error);
+          console.error(`[ClerkProvider] Failed to sync native client state:`, error);
         }
       }
     };
 
-    void syncNativeAuthToJs();
-  }, [nativeAuthState, clerkInstance]);
+    void syncNativeClientStateToJs();
+  }, [nativeClientEvent, clerkInstance, tokenCache, isMountedRef]);
 
+  // Needed for `useOAuth` / `useSSO` to work correctly on web — must stay synchronous during render
+  // so the redirect URL is caught before children mount. Resolves to a no-op on native via the
+  // sibling `maybeCompleteAuthSession.ts`, which keeps Metro from statically bundling
+  // `expo-web-browser` (an optional peer) for native consumers.
   if (isWeb()) {
-    // This is needed in order for useOAuth to work correctly on web.
-    // Must stay synchronous during render to catch the redirect URL before children mount.
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const WebBrowser = require('expo-web-browser');
-      WebBrowser.maybeCompleteAuthSession();
-    } catch (e) {
-      if (__DEV__) {
-        console.warn('[ClerkProvider] expo-web-browser not available, OAuth/SSO on web will not work:', e);
-      }
-    }
+    maybeCompleteAuthSession();
   }
 
   return (
@@ -400,7 +390,9 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
       }}
     >
       {isNative() && (
-        <NativeSessionSync
+        <NativeClientSync
+          clerkInstance={clerkInstance}
+          isSyncingNativeClientToJsRef={isSyncingNativeClientToJsRef}
           publishableKey={pk}
           tokenCache={tokenCache}
         />

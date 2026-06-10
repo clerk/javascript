@@ -434,7 +434,7 @@ const devConfig = ({ mode, env }) => {
             template: './sandbox/template.html',
             inject: false,
             templateParameters: {
-              uiScriptUrl: 'http://localhost:4011/npm/ui.browser.js',
+              uiScriptUrl: `http://localhost:${process.env.UI_PORT || 4011}/npm/ui.browser.js`,
             },
           }),
       ].filter(Boolean),
@@ -469,6 +469,7 @@ const devConfig = ({ mode, env }) => {
           type: 'memory',
         },
       },
+      lazyCompilation: false,
     };
   };
 

@@ -26,6 +26,7 @@ import { OrgSelect } from './OrgSelect';
 import { getForwardedParams, getOAuthConsentFromSearch, getRedirectDisplay, getRedirectUriFromSearch } from './utils';
 
 const OFFLINE_ACCESS_SCOPE = 'offline_access';
+const USER_ORG_READ_SCOPE = 'user:org:read';
 
 function _OAuthConsent() {
   const ctx = useOAuthConsentContext();
@@ -37,20 +38,7 @@ function _OAuthConsent() {
   } = useEnvironment();
   const [isUriModalOpen, setIsUriModalOpen] = useState(false);
 
-  const orgSelectionEnabled = !!(ctx.enableOrgSelection && organizationSettings.enabled);
-  const orgOptions = orgSelectionEnabled
-    ? (user?.organizationMemberships ?? []).map(m => ({
-        value: m.organization.id,
-        label: m.organization.name,
-        logoUrl: m.organization.imageUrl,
-      }))
-    : [];
-
-  const lastActiveOrgId = clerk.session?.lastActiveOrganizationId;
-  const defaultOrg = orgOptions.find(o => o.value === lastActiveOrgId)?.value ?? orgOptions[0]?.value ?? null;
-
   const [selectedOrg, setSelectedOrg] = useState<string | null>(null);
-  const effectiveOrg = selectedOrg ?? defaultOrg;
 
   // onAllow and onDeny are always provided as a pair by the accounts portal.
   const hasContextCallbacks = Boolean(ctx.onAllow || ctx.onDeny);
@@ -62,9 +50,11 @@ function _OAuthConsent() {
 
   // Public path: fetch via hook. Disabled on the accounts portal path
   // (which already has all data via context) to avoid a wasted FAPI request.
+  const redirectUri = ctx.redirectUrl ?? getRedirectUriFromSearch();
   const { data, isLoading, error } = useOAuthConsent({
     oauthClientId,
     scope,
+    redirectUri: redirectUri || undefined,
     // TODO: Remove this once account portal is refactored to use this component
     enabled: !hasContextCallbacks,
   });
@@ -81,10 +71,23 @@ function _OAuthConsent() {
   const oauthApplicationName = ctx.oauthApplicationName ?? data?.oauthApplicationName ?? '';
   const oauthApplicationLogoUrl = ctx.oauthApplicationLogoUrl ?? data?.oauthApplicationLogoUrl;
   const oauthApplicationUrl = ctx.oauthApplicationUrl ?? data?.oauthApplicationUrl;
-  const redirectUrl = ctx.redirectUrl ?? getRedirectUriFromSearch();
+  const redirectUrl = ctx.redirectUrl ?? redirectUri;
+
+  const hasOrgReadScope = scopes.some(s => s.scope === USER_ORG_READ_SCOPE);
+  const orgSelectionEnabled = !!(hasOrgReadScope && organizationSettings.enabled);
+  const orgOptions = orgSelectionEnabled
+    ? (user?.organizationMemberships ?? []).map(m => ({
+        value: m.organization.id,
+        label: m.organization.name,
+        logoUrl: m.organization.imageUrl,
+      }))
+    : [];
+  const lastActiveOrgId = clerk.session?.lastActiveOrganizationId;
+  const defaultOrg = orgOptions.find(o => o.value === lastActiveOrgId)?.value ?? orgOptions[0]?.value ?? null;
+  const effectiveOrg = selectedOrg ?? defaultOrg;
 
   const { t } = useLocalizations();
-  const domainAction = getRedirectDisplay(redirectUrl);
+  const domainAction = data?.redirectDomain ?? getRedirectDisplay(redirectUrl);
   const viewFullUrlText = t(localizationKeys('oauthConsent.viewFullUrl'));
 
   // Error states only apply to the public flow.

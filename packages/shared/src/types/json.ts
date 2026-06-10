@@ -393,6 +393,7 @@ export interface OrganizationJSON extends ClerkResourceJSON {
   pending_invitations_count: number;
   admin_delete_enabled: boolean;
   max_allowed_memberships: number;
+  self_serve_sso_enabled?: boolean;
 }
 
 export interface OrganizationMembershipJSON extends ClerkResourceJSON {
@@ -609,6 +610,10 @@ export interface BillingSubscriptionItemSeatsJSON {
    * The number of seats available. `null` means unlimited.
    */
   quantity: number | null;
+  /**
+   * The per-unit cost breakdown by pricing tier.
+   */
+  tiers?: BillingPerUnitTotalTierJSON[];
 }
 
 /**
@@ -663,6 +668,14 @@ export interface BillingPerUnitTotalJSON {
   tiers: BillingPerUnitTotalTierJSON[];
 }
 
+export interface BillingPriceJSON extends ClerkResourceJSON {
+  object: 'commerce_price';
+  fee: BillingMoneyAmountJSON | null;
+  annual_monthly_fee: BillingMoneyAmountJSON | null;
+  is_default: boolean;
+  unit_prices?: BillingPlanUnitPriceJSON[];
+}
+
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
@@ -688,6 +701,7 @@ export interface BillingPlanJSON extends ClerkResourceJSON {
    * Per-unit pricing tiers for this plan (for example, seats).
    */
   unit_prices?: BillingPlanUnitPriceJSON[];
+  available_prices?: BillingPriceJSON[];
 }
 
 /**
@@ -742,6 +756,23 @@ export interface BillingStatementGroupJSON extends ClerkResourceJSON {
 
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ *
+ * Per-payment cost breakdown including optional base fee and per-unit (for example, seats) subtotals.
+ */
+export interface BillingPaymentTotalsJSON {
+  subtotal: BillingMoneyAmountJSON;
+  grand_total: BillingMoneyAmountJSON;
+  tax_total: BillingMoneyAmountJSON;
+  base_fee?: BillingMoneyAmountJSON | null;
+  per_unit_totals?: BillingPerUnitTotalJSON[];
+  /**
+   * Discounts applied to this payment such as mid-cycle prorated seat discounts. `null` when no discounts apply.
+   */
+  discounts?: BillingDiscountsJSON | null;
+}
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingPaymentJSON extends ClerkResourceJSON {
   object: 'commerce_payment';
@@ -754,6 +785,34 @@ export interface BillingPaymentJSON extends ClerkResourceJSON {
   subscription_item: BillingSubscriptionItemJSON;
   charge_type: BillingPaymentChargeType;
   status: BillingPaymentStatus;
+  /**
+   * Per-payment breakdown with optional base fee and per-unit (for example, seats)
+   * subtotals. Absent on older responses.
+   */
+  totals?: BillingPaymentTotalsJSON | null;
+}
+
+export interface BillingTotalsJSON {
+  subtotal: BillingMoneyAmountJSON;
+  base_fee: BillingMoneyAmountJSON | null;
+  tax_total: BillingMoneyAmountJSON;
+  grand_total: BillingMoneyAmountJSON;
+  total_due_after_free_trial?: BillingMoneyAmountJSON | null;
+  credit?: BillingMoneyAmountJSON | null;
+  credits: BillingCreditsJSON | null;
+  discounts: BillingDiscountsJSON | null;
+  past_due?: BillingMoneyAmountJSON | null;
+  total_due_now?: BillingMoneyAmountJSON;
+  per_unit_totals?: BillingPerUnitTotalJSON[];
+  totals_due_per_period?: BillingPeriodTotalsJSON;
+  total_due_per_period?: BillingMoneyAmountJSON;
+}
+
+export interface BillingSubscriptionItemNextPaymentJSON {
+  amount: BillingMoneyAmountJSON;
+  date: number;
+  per_unit_totals?: BillingPerUnitTotalJSON[];
+  totals?: BillingTotalsJSON;
 }
 
 /**
@@ -774,6 +833,7 @@ export interface BillingSubscriptionItemJSON extends ClerkResourceJSON {
   credits?: BillingCreditsJSON;
   plan: BillingPlanJSON;
   plan_period: BillingSubscriptionPlanPeriod;
+  price_id: string;
   status: BillingSubscriptionStatus;
   created_at: number;
   period_start: number;
@@ -784,6 +844,14 @@ export interface BillingSubscriptionItemJSON extends ClerkResourceJSON {
   canceled_at: number | null;
   past_due_at: number | null;
   is_free_trial: boolean;
+  next_payment?: BillingSubscriptionItemNextPaymentJSON | null;
+}
+
+export interface BillingSubscriptionNextPaymentJSON {
+  amount: BillingMoneyAmountJSON;
+  date: number;
+  per_unit_totals?: BillingPerUnitTotalJSON[];
+  totals?: BillingTotalsJSON;
 }
 
 /**
@@ -793,12 +861,9 @@ export interface BillingSubscriptionJSON extends ClerkResourceJSON {
   object: 'commerce_subscription';
   id: string;
   /**
-   * Describes the details for the next payment cycle. It is `undefined` for subscription items that are cancelled or on the free plan.
+   * Describes the details for the next payment cycle. It is `undefined` for subscription items that are cancelled or on the free plan, and `null` when there is no upcoming payment.
    */
-  next_payment?: {
-    amount: BillingMoneyAmountJSON;
-    date: number;
-  };
+  next_payment?: BillingSubscriptionNextPaymentJSON | null;
   /**
    * Due to the free plan subscription item, the top level subscription can either be `active` or `past_due`.
    */
@@ -849,22 +914,99 @@ export interface BillingCreditsJSON {
 }
 
 /**
+ * Details about a prorated discount applied when adding a seat mid-cycle. The discount covers the part of the
+ * billing period that has already passed, so the payer is only charged for the time remaining in the cycle.
+ */
+export interface BillingProrationDiscountJSON {
+  amount: BillingMoneyAmountJSON;
+  cycle_days_passed: number;
+  cycle_days_total: number;
+  cycle_passed_percent: number;
+}
+
+/**
+ * Discounts applied to the checkout, such as prorated discounts for mid-cycle seat additions.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingDiscountsJSON {
+  /**
+   * The prorated discount for the part of the billing period that has already passed when adding a seat mid-cycle.
+   * Unlike the proration credit (which refunds the unused remainder of a plan you already paid for), this discount
+   * means you are not charged for the portion of the new seat's cycle that has already elapsed.
+   */
+  proration: BillingProrationDiscountJSON | null;
+  /**
+   * The total of all discounts applied to the checkout.
+   */
+  total: BillingMoneyAmountJSON;
+}
+
+/**
+ * Per-period renewal totals, describing what the subscription renewal charge will look like after the current checkout.
+ * Unlike the top-level checkout totals (which only reflect the items actively being purchased),
+ * this object contains the full renewal breakdown including all seats and the base plan fee.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingPeriodTotalsJSON {
+  subtotal: BillingMoneyAmountJSON;
+  base_fee: BillingMoneyAmountJSON;
+  tax_total: BillingMoneyAmountJSON;
+  grand_total: BillingMoneyAmountJSON;
+  /**
+   * Per-unit cost breakdown for the renewal period, covering all units purchased to date
+   * (not just the ones being added in this checkout).
+   */
+  per_unit_totals?: BillingPerUnitTotalJSON[];
+}
+
+/**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingCheckoutTotalsJSON {
   grand_total: BillingMoneyAmountJSON;
+  /**
+   * The price of items actively being purchased in this checkout, before taxes and discounts.
+   * When only adding seats mid-cycle, this reflects just the new seats and excludes the base plan fee and
+   * seats that were already paid for.
+   */
   subtotal: BillingMoneyAmountJSON;
+  /**
+   * The base plan fee portion of the totals, before per-unit charges and adjustments.
+   */
+  base_fee: BillingMoneyAmountJSON;
   tax_total: BillingMoneyAmountJSON;
   /**
-   * Per-unit cost breakdown for this checkout (for example, seats).
+   * Per-unit cost breakdown for items actively being purchased in this checkout (for example, seats being added).
+   * When only adding seats mid-cycle, this only covers the seats being added, not seats already paid for.
+   * Omitted when the checkout is not seat-based.
    */
   per_unit_totals?: BillingPerUnitTotalJSON[];
   total_due_now: BillingMoneyAmountJSON;
+  /**
+   * Legacy credit field. Kept for backwards compatibility; prefer the unified `credits` breakdown.
+   */
   credit: BillingMoneyAmountJSON | null;
   credits: BillingCreditsJSON | null;
   account_credit: BillingMoneyAmountJSON | null;
   past_due: BillingMoneyAmountJSON | null;
   total_due_after_free_trial: BillingMoneyAmountJSON | null;
+  /**
+   * Discounts applied to this checkout such as mid-cycle prorated seat discounts.
+   */
+  discounts: BillingDiscountsJSON | null;
+  /**
+   * The expected recurring payment for each future billing period.
+   * Kept for backwards compatibility. Prefer `totals_due_per_period` for the full breakdown.
+   */
+  total_due_per_period: BillingMoneyAmountJSON;
+  /**
+   * Full renewal period totals after this checkout completes.
+   * Contains the complete breakdown of what the next recurring charge will look like,
+   * including all seats and the base plan fee.
+   */
+  totals_due_per_period: BillingPeriodTotalsJSON;
 }
 
 /**
@@ -889,7 +1031,7 @@ export interface BillingCheckoutJSON extends ClerkResourceJSON {
   plan_period: BillingSubscriptionPlanPeriod;
   plan_period_start?: number;
   status: 'needs_confirmation' | 'completed';
-  totals: BillingCheckoutTotalsJSON;
+  totals: BillingTotalsJSON;
   is_immediate_plan_change: boolean;
   free_trial_ends_at?: number;
   payer: BillingPayerJSON;

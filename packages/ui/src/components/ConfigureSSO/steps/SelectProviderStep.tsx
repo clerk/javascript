@@ -1,0 +1,301 @@
+import { iconImageUrl } from '@clerk/shared/constants';
+import React from 'react';
+
+import type { LocalizationKey } from '@/customizables';
+import {
+  Box,
+  Col,
+  descriptors,
+  Flow,
+  Grid,
+  localizationKeys,
+  RadioInput,
+  Span,
+  Text,
+  useLocalizations,
+} from '@/customizables';
+import { useCardState } from '@/elements/contexts';
+import { common, mqu } from '@/styledSystem';
+import { Alert } from '@/ui/elements/Alert';
+import { handleError } from '@/utils/errorHandler';
+
+import { useConfigureSSO } from '../ConfigureSSOContext';
+import { Step } from '../elements/Step';
+import { useWizard } from '../elements/Wizard';
+import type { ProviderType } from '../types';
+
+/**
+ * Provider icons whose SVGs are monochromatic and should flip with the
+ * theme. Mirrors the SUPPORTS_MASK_IMAGE list in `common/ProviderIcon.tsx`
+ * — keep in sync if either grows.
+ */
+const MONOCHROMATIC_PROVIDER_ICONS: ReadonlySet<string> = new Set(['okta']);
+
+const PROVIDER_GROUPS: ReadonlyArray<{
+  id: 'saml';
+  label: LocalizationKey;
+  options: ReadonlyArray<{ id: ProviderType; label: LocalizationKey; iconId: string }>;
+}> = [
+  {
+    id: 'saml',
+    label: localizationKeys('configureSSO.selectProviderStep.saml.groupLabel'),
+    options: [
+      { id: 'saml_okta', label: localizationKeys('configureSSO.selectProviderStep.saml.okta'), iconId: 'okta' },
+      {
+        id: 'saml_microsoft',
+        label: localizationKeys('configureSSO.selectProviderStep.saml.microsoft'),
+        iconId: 'microsoft',
+      },
+      {
+        id: 'saml_google',
+        label: localizationKeys('configureSSO.selectProviderStep.saml.google'),
+        iconId: 'google',
+      },
+      {
+        id: 'saml_custom',
+        label: localizationKeys('configureSSO.selectProviderStep.saml.customSaml'),
+        iconId: 'saml',
+      },
+    ],
+  },
+];
+
+export const SelectProviderStep = (): JSX.Element => {
+  const {
+    primaryEmailAddress,
+    organizationEnterpriseConnection: c,
+    mutations: { createConnection },
+  } = useConfigureSSO();
+  const { goNext } = useWizard();
+
+  // Re-hydrate from context so users returning from another step don't have to
+  // re-click their provider.
+  const [selected, setSelected] = React.useState<ProviderType | null>(c.provider ?? null);
+  const card = useCardState();
+
+  // Step-LOCAL submit state for the Continue button. `goNext` now DEFERS the
+  // advance until the next step's guard catches up to the just-resolved create
+  // (the wizard machine resolves it on the next render), so the shared card
+  // loading would otherwise leak into the next step as an idle flash. Keeping
+  // the loading local — and NOT resetting it on success — holds the button in
+  // its loading state straight through the transition; the deferred advance
+  // unmounts this step, which ends the loading visually with no idle frame.
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+
+  const handleSelect = (next: ProviderType) => {
+    setSelected(next);
+  };
+
+  // On a fresh start the create is unconditional, then `goNext` lands `configure`
+  // because the resolved create flips `hasConnection`, satisfying its guard. On
+  // revisit a connection already exists, so we never re-create — `goNext` alone.
+  const handleContinue = async (): Promise<void> => {
+    if (!selected) {
+      return;
+    }
+
+    // Connection already created on a prior visit: don't re-create, just
+    // advance — `configure`'s guard already holds, so this advances immediately
+    // (no submit, no loading).
+    if (c.hasConnection) {
+      goNext();
+      return;
+    }
+
+    card.setError(undefined);
+    setIsSubmitting(true);
+
+    try {
+      await createConnection(selected, primaryEmailAddress);
+      // `goNext` defers; the button STAYS loading and this step unmounts when
+      // the deferred advance lands. Do NOT reset `isSubmitting` on success.
+      goNext();
+    } catch (err) {
+      handleError(err as Error, [], card.setError);
+      // Re-enable the button ONLY on error — there is no advance to unmount it.
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <Flow.Part part='selectProvider'>
+      <Step
+        elementDescriptor={descriptors.configureSSOStep}
+        elementId={descriptors.configureSSOStep.setId('select-provider')}
+      >
+        <Step.Header
+          title={localizationKeys('configureSSO.selectProviderStep.title')}
+          description={localizationKeys('configureSSO.selectProviderStep.subtitle')}
+        />
+
+        <Step.Body>
+          <Step.Section sx={theme => ({ gap: theme.space.$5 })}>
+            {PROVIDER_GROUPS.map(group => (
+              <Col
+                key={group.id}
+                elementDescriptor={descriptors.configureSSOProviderGroup}
+                elementId={descriptors.configureSSOProviderGroup.setId(group.id)}
+                gap={3}
+              >
+                <Text
+                  elementDescriptor={descriptors.configureSSOProviderGroupLabel}
+                  elementId={descriptors.configureSSOProviderGroupLabel.setId(group.id)}
+                  as='label'
+                  variant='subtitle'
+                  localizationKey={group.label}
+                />
+
+                <Grid
+                  elementDescriptor={descriptors.configureSSOProviderGrid}
+                  gap={3}
+                  sx={{
+                    gridTemplateColumns: 'repeat(2, 1fr)',
+                    [mqu.sm]: {
+                      gridTemplateColumns: '1fr',
+                    },
+                  }}
+                >
+                  {group.options.map(option => (
+                    <ProviderCard
+                      key={option.id}
+                      name='configure-sso-provider'
+                      value={option.id}
+                      iconId={option.iconId}
+                      label={option.label}
+                      checked={selected === option.id}
+                      onChange={() => handleSelect(option.id)}
+                    />
+                  ))}
+                </Grid>
+              </Col>
+            ))}
+
+            <Alert
+              variant='warning'
+              title={localizationKeys('configureSSO.selectProviderStep.warning')}
+            />
+
+            {card.error && (
+              <Alert
+                variant='danger'
+                title={card.error}
+                sx={t => ({ margin: t.space.$3 })}
+              />
+            )}
+          </Step.Section>
+        </Step.Body>
+
+        <Step.Footer>
+          <Step.Footer.Previous isDisabled />
+
+          <Step.Footer.Continue
+            onClick={handleContinue}
+            isLoading={isSubmitting}
+            isDisabled={!selected || isSubmitting}
+          />
+        </Step.Footer>
+      </Step>
+    </Flow.Part>
+  );
+};
+
+type ProviderCardProps = {
+  name: string;
+  value: string;
+  iconId: string;
+  label: LocalizationKey;
+  checked?: boolean;
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+};
+
+const ProviderCard = ({ name, value, iconId, label, checked, onChange }: ProviderCardProps): JSX.Element => {
+  const { t } = useLocalizations();
+  const labelText = t(label);
+
+  return (
+    <Box
+      as='label'
+      elementDescriptor={descriptors.configureSSOProviderCard}
+      elementId={descriptors.configureSSOProviderCard.setId(value)}
+      isActive={checked}
+      sx={t => ({
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: t.space.$2,
+        height: t.sizes.$32,
+        padding: t.space.$1x5,
+        cursor: 'pointer',
+        position: 'relative',
+        ...common.borderVariants(t).normal,
+        '&:has(input:focus-visible)': {
+          ...common.focusRingStyles(t),
+          borderColor: t.colors.$borderAlpha300,
+        },
+        '&:hover': {
+          backgroundColor: t.colors.$neutralAlpha50,
+        },
+        '&:has(input:checked)': {
+          backgroundColor: t.colors.$neutralAlpha50,
+        },
+      })}
+    >
+      <RadioInput
+        elementDescriptor={descriptors.configureSSOProviderCardRadio}
+        elementId={descriptors.configureSSOProviderCardRadio.setId(value)}
+        name={name}
+        value={value}
+        checked={checked}
+        onChange={onChange}
+        focusRing={false}
+        sx={theme => ({
+          position: 'absolute',
+          top: theme.space.$1x5,
+          insetInlineStart: theme.space.$1x5,
+          margin: 0,
+          width: 'fit-content',
+          boxShadow: 'none',
+          '&:hover': { boxShadow: 'none' },
+        })}
+      />
+
+      <Span
+        elementDescriptor={descriptors.configureSSOProviderCardIcon}
+        elementId={descriptors.configureSSOProviderCardIcon.setId(value)}
+        aria-hidden
+        sx={theme => {
+          const isMonochromatic = MONOCHROMATIC_PROVIDER_ICONS.has(iconId);
+          const baseSize = { width: theme.sizes.$8, height: theme.sizes.$8 };
+          if (isMonochromatic) {
+            return {
+              ...baseSize,
+              backgroundColor: theme.colors.$colorForeground,
+              maskImage: `url(${iconImageUrl(iconId)})`,
+              maskSize: 'contain',
+              maskPosition: 'center',
+              maskRepeat: 'no-repeat',
+            };
+          }
+          return {
+            ...baseSize,
+            backgroundImage: `url(${iconImageUrl(iconId)})`,
+            backgroundSize: 'contain',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+          };
+        }}
+      />
+
+      <Text
+        elementDescriptor={descriptors.configureSSOProviderCardLabel}
+        elementId={descriptors.configureSSOProviderCardLabel.setId(value)}
+        as='span'
+        variant='body'
+        sx={theme => ({ color: theme.colors.$colorForeground })}
+      >
+        {labelText}
+      </Text>
+    </Box>
+  );
+};

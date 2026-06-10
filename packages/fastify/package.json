@@ -1,6 +1,6 @@
 {
   "name": "@clerk/fastify",
-  "version": "3.1.15",
+  "version": "3.1.35",
   "description": "Clerk SDK for Fastify",
   "keywords": [
     "auth",
@@ -60,9 +60,9 @@
     "webhooks"
   ],
   "scripts": {
-    "build": "tsup --env.NODE_ENV production",
+    "build": "tsdown --env.NODE_ENV production",
     "clean": "rimraf ./dist",
-    "dev": "tsup --watch",
+    "dev": "tsdown --watch",
     "dev:pub": "pnpm dev -- --env.publish",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
@@ -75,8 +75,7 @@
   "dependencies": {
     "@clerk/backend": "workspace:^",
     "@clerk/shared": "workspace:^",
-    "cookies": "0.9.1",
-    "fastify-plugin": "^5.0.1"
+    "fastify-plugin": "^5.1.0"
   },
   "devDependencies": {
     "fastify": "^5.8.5"

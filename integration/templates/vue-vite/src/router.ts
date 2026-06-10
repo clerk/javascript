@@ -37,6 +37,11 @@ const routes = [
     component: () => import('./views/custom-pages/OrganizationProfile.vue'),
   },
   {
+    name: 'OrganizationProfile',
+    path: '/organization-profile',
+    component: () => import('./views/OrganizationProfile.vue'),
+  },
+  {
     name: 'PricingTable',
     path: '/pricing-table',
     component: () => import('./views/PricingTable.vue'),
@@ -119,7 +124,14 @@ const router = createRouter({
 
 router.beforeEach(async (to, _, next) => {
   const { isSignedIn, isLoaded } = useAuth();
-  const authenticatedPages = ['Profile', 'Admin', 'CustomUserProfile', 'CustomOrganizationProfile', 'UserAvatar'];
+  const authenticatedPages = [
+    'Profile',
+    'Admin',
+    'CustomUserProfile',
+    'CustomOrganizationProfile',
+    'OrganizationProfile',
+    'UserAvatar',
+  ];
 
   if (!isLoaded.value) {
     await waitForClerkJsLoaded(isLoaded);

@@ -73,6 +73,14 @@ export type UseCheckoutOptions = {
    * The ID of the Subscription Plan to check out (e.g. `cplan_xxx`).
    */
   planId: string;
+  /**
+   * The number of total seats to check out for
+   */
+  seatsQuantity?: number;
+  /**
+   * The specific price ID to check out for, used when the desired price ID is not the current default price
+   */
+  priceId?: string;
 };
 
 const [CheckoutContext, useCheckoutContext] = createContextAndHook<UseCheckoutOptions>('CheckoutContext');

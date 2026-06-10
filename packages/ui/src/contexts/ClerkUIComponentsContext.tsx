@@ -1,6 +1,7 @@
 import type {
-  __internal_OAuthConsentProps,
   APIKeysProps,
+  ConfigureSSOProps,
+  OAuthConsentProps,
   PricingTableProps,
   TaskChooseOrganizationProps,
   TaskResetPasswordProps,
@@ -13,6 +14,7 @@ import type { ReactNode } from 'react';
 import type { AvailableComponentName, AvailableComponentProps } from '../types';
 import {
   APIKeysContext,
+  ConfigureSSOContext,
   CreateOrganizationContext,
   GoogleOneTapContext,
   OAuthConsentContext,
@@ -114,12 +116,18 @@ export function ComponentContextProvider({
           {children}
         </APIKeysContext.Provider>
       );
+    case 'ConfigureSSO':
+      return (
+        <ConfigureSSOContext.Provider value={{ componentName, ...(props as ConfigureSSOProps) }}>
+          {children}
+        </ConfigureSSOContext.Provider>
+      );
     case 'OAuthConsent': {
       // Translate capital-A `oAuth*` props from the accounts portal into
       // the lowercase `oauth*` context shape the component reads.
       // The public `<OAuthConsent />` wrapper also forwards `oauthClientId`
       // and `scope` through the same path.
-      const p = props as __internal_OAuthConsentProps;
+      const p = props as OAuthConsentProps;
       return (
         <OAuthConsentContext.Provider
           value={{
@@ -134,7 +142,6 @@ export function ComponentContextProvider({
             onAllow: p.onAllow,
             onDeny: p.onDeny,
             appearance: p.appearance,
-            enableOrgSelection: (p as any).__internal_enableOrgSelection === true,
           }}
         >
           {children}

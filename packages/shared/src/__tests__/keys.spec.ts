@@ -10,13 +10,14 @@ import {
   isProductionFromSecretKey,
   isPublishableKey,
   parsePublishableKey,
+  publishableKeyFromHost,
 } from '../keys';
 
 describe('buildPublishableKey(frontendApi)', () => {
   const cases = [
-    ['fake-clerk-test.clerk.accounts.dev', 'pk_live_ZmFrZS1jbGVyay10ZXN0LmNsZXJrLmFjY291bnRzLmRldiQ='],
+    ['fake-clerk-test.clerk.accounts.dev', 'pk_live_ZmFrZS1jbGVyay10ZXN0LmNsZXJrLmFjY291bnRzLmRldiQ'],
     ['foo-bar-13.clerk.accounts.dev', 'pk_test_Zm9vLWJhci0xMy5jbGVyay5hY2NvdW50cy5kZXYk'],
-    ['clerk.boring.sawfly-91.lcl.dev', 'pk_test_Y2xlcmsuYm9yaW5nLnNhd2ZseS05MS5sY2wuZGV2JA=='],
+    ['clerk.boring.sawfly-91.lcl.dev', 'pk_test_Y2xlcmsuYm9yaW5nLnNhd2ZseS05MS5sY2wuZGV2JA'],
     ['clerk.boring.sawfly-91.lclclerk.com', 'pk_test_Y2xlcmsuYm9yaW5nLnNhd2ZseS05MS5sY2xjbGVyay5jb20k'],
   ];
 
@@ -36,7 +37,7 @@ describe('parsePublishableKey(key)', () => {
     ['', null],
     ['whatever', null],
     [
-      'pk_live_ZmFrZS1jbGVyay10ZXN0LmNsZXJrLmFjY291bnRzLmRldiQ=',
+      'pk_live_ZmFrZS1jbGVyay10ZXN0LmNsZXJrLmFjY291bnRzLmRldiQ',
       { instanceType: 'production', frontendApi: 'fake-clerk-test.clerk.accounts.dev' },
     ],
     [
@@ -242,6 +243,46 @@ describe('isProductionFromSecretKey(key)', () => {
   test.each(cases)('given %p as a secret key string, returns %p', (secretKeyStr, expected) => {
     const result = isProductionFromSecretKey(secretKeyStr);
     expect(result).toEqual(expected);
+  });
+});
+
+describe('publishableKeyFromHost(host, fallbackKey?)', () => {
+  it('derives a pk_live_ key from a production hostname', () => {
+    const result = publishableKeyFromHost('example.com');
+    expect(result).toMatch(/^pk_live_/);
+    expect(result).toBe(buildPublishableKey('clerk.example.com'));
+  });
+
+  it('lowercases the host before deriving', () => {
+    expect(publishableKeyFromHost('Example.COM')).toBe(publishableKeyFromHost('example.com'));
+  });
+
+  it('returns the fallbackKey as-is when it is a development key', () => {
+    const devKey = 'pk_test_Zm9vLWJhci0xMy5jbGVyay5hY2NvdW50cy5kZXYk';
+    expect(publishableKeyFromHost('localhost', devKey)).toBe(devKey);
+  });
+
+  it('derives from host when fallbackKey is a production key', () => {
+    const prodKey = 'pk_live_ZmFrZS1jbGVyay10ZXN0LmNsZXJrLmFjY291bnRzLmRldiQ=';
+    const result = publishableKeyFromHost('custom-domain.com', prodKey);
+    expect(result).toMatch(/^pk_live_/);
+    expect(result).toBe(buildPublishableKey('clerk.custom-domain.com'));
+  });
+
+  it('derives from host when no fallbackKey is provided', () => {
+    expect(publishableKeyFromHost('custom-domain.com')).toBe(buildPublishableKey('clerk.custom-domain.com'));
+  });
+
+  it('strips the port from the host before deriving', () => {
+    expect(publishableKeyFromHost('example.com:3000')).toBe(publishableKeyFromHost('example.com'));
+  });
+
+  it('strips the port even when combined with case normalization', () => {
+    expect(publishableKeyFromHost('Example.COM:8080')).toBe(publishableKeyFromHost('example.com'));
+  });
+
+  it('throws when host is empty', () => {
+    expect(() => publishableKeyFromHost('')).toThrow('Host must not be empty.');
   });
 });
 

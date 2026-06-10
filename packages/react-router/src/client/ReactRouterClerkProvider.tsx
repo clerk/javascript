@@ -7,11 +7,10 @@ import {
   isSpaMode as _isSpaMode,
   warnForSsr,
 } from '../utils/assert';
+import { getPublicEnvVariables } from '../utils/env';
 import { ClerkReactRouterOptionsProvider } from './ReactRouterOptionsContext';
 import type { ClerkState, ReactRouterClerkProviderProps } from './types';
 import { useAwaitableNavigate } from './useAwaitableNavigate';
-
-export * from '@clerk/react';
 
 const SDK_METADATA = {
   name: PACKAGE_NAME,
@@ -67,6 +66,7 @@ function ClerkProviderBase<TUi extends Ui = Ui>({ children, ...rest }: ClerkProv
     __prefetchUI,
     __telemetryDisabled,
     __telemetryDebug,
+    __unsafeDisableDevelopmentModeConsoleWarning,
     __keylessClaimUrl,
     __keylessApiKeysUrl,
   } = clerkState?.__internal_clerk_state || {};
@@ -101,6 +101,9 @@ function ClerkProviderBase<TUi extends Ui = Ui>({ children, ...rest }: ClerkProv
       disabled: __telemetryDisabled,
       debug: __telemetryDebug,
     },
+    unsafe_disableDevelopmentModeConsoleWarning:
+      __unsafeDisableDevelopmentModeConsoleWarning ??
+      getPublicEnvVariables(undefined).unsafeDisableDevelopmentModeConsoleWarning,
   };
 
   const keylessProps = __keylessClaimUrl

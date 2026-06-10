@@ -1,14 +1,27 @@
+import { useOAuthConsent as useOAuthConsentOriginal } from '@clerk/shared/react';
 import type { InternalClerkScriptProps } from '@clerk/shared/types';
-import type { Ui } from '@clerk/ui/internal';
 import type React from 'react';
 
+import { OAuthConsent as OAuthConsentOriginal } from './components/uiComponents';
 import { ClerkProvider } from './contexts/ClerkProvider';
-import type { ClerkProviderProps } from './types';
+import type { ClerkProviderProps, Ui } from './types';
 
+export { publishableKeyFromHost } from '@clerk/shared/keys';
 export { setErrorThrowerOptions } from './errors/errorThrower';
 export { MultisessionAppSupport } from './components/controlComponents';
-export { useOAuthConsent } from '@clerk/shared/react';
-export { OAuthConsent } from './components/uiComponents';
+
+/**
+ * @deprecated Import `useOAuthConsent` from `@clerk/react` instead.
+ */
+const useOAuthConsent = useOAuthConsentOriginal;
+export { useOAuthConsent };
+
+/**
+ * @deprecated Import `OAuthConsent` from `@clerk/react` instead.
+ */
+const OAuthConsent = OAuthConsentOriginal;
+export { OAuthConsent };
+
 export { useRoutingProps } from './hooks/useRoutingProps';
 export { useDerivedAuth } from './hooks/useAuth';
 export { IS_REACT_SHARED_VARIANT_COMPATIBLE } from './utils/versionCheck';
@@ -25,7 +38,7 @@ export {
   setClerkJsLoadingErrorPackageName,
 } from '@clerk/shared/loadClerkJsScript';
 
-export type { Ui } from '@clerk/ui/internal';
+export type { Ui } from './types';
 
 export type { InternalClerkScriptProps } from '@clerk/shared/types';
 

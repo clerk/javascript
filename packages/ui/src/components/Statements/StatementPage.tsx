@@ -2,6 +2,7 @@ import { __internal_useStatementQuery } from '@clerk/shared/react/index';
 
 import { Alert } from '@/ui/elements/Alert';
 import { Header } from '@/ui/elements/Header';
+import { ProfileCard } from '@/ui/elements/ProfileCard';
 import { formatDate } from '@/ui/utils/formatDate';
 
 import { useSubscriberTypeContext, useSubscriberTypeLocalizationRoot } from '../../contexts/components';
@@ -15,7 +16,7 @@ import {
   Spinner,
   useLocalizations,
 } from '../../customizables';
-import { ArrowRightIcon, Plus, RotateLeftRight } from '../../icons';
+import { ArrowRight, Plus, RotateLeftRight } from '../../icons';
 import { useRouter } from '../../router';
 import { Statement } from './Statement';
 
@@ -38,18 +39,20 @@ export const StatementPage = () => {
 
   if (isLoading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-        <Spinner
-          colorScheme='primary'
-          sx={{ margin: 'auto', display: 'block' }}
-          elementDescriptor={descriptors.spinner}
-        />
-      </Box>
+      <ProfileCard.Page>
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+          <Spinner
+            colorScheme='primary'
+            sx={{ margin: 'auto', display: 'block' }}
+            elementDescriptor={descriptors.spinner}
+          />
+        </Box>
+      </ProfileCard.Page>
     );
   }
 
   return (
-    <>
+    <ProfileCard.Page>
       <Header.Root
         sx={t => ({
           borderBlockEndWidth: t.borderWidths.$normal,
@@ -130,13 +133,19 @@ export const StatementPage = () => {
                             >
                               <Span localizationKey={localizationKeys('billing.viewPayment')} />
                               <Icon
-                                icon={ArrowRightIcon}
+                                icon={ArrowRight}
                                 size='sm'
                                 aria-hidden
                               />
                             </SimpleButton>
                           }
                         />
+                        {item.totals?.discounts?.proration && item.totals.discounts.proration.amount.amount > 0 ? (
+                          <Statement.SectionContentDetailsListItem
+                            label={localizationKeys('billing.proratedDiscount')}
+                            value={`(${item.totals.discounts.proration.amount.currencySymbol}${item.totals.discounts.proration.amount.amountFormatted})`}
+                          />
+                        ) : null}
                         {item.subscriptionItem.credits &&
                         item.subscriptionItem.credits.proration &&
                         item.subscriptionItem.credits.proration.amount.amount > 0 ? (
@@ -170,6 +179,6 @@ export const StatementPage = () => {
           />
         </Statement.Root>
       )}
-    </>
+    </ProfileCard.Page>
   );
 };

@@ -238,6 +238,7 @@ describe('AppearanceProvider options flows', () => {
             showOptionalFields: false,
             socialButtonsPlacement: 'bottom',
             socialButtonsVariant: 'iconButton',
+            elevation: 'flush',
           },
         }}
       >
@@ -255,6 +256,7 @@ describe('AppearanceProvider options flows', () => {
     expect(result.current.parsedOptions.showOptionalFields).toBe(false);
     expect(result.current.parsedOptions.socialButtonsPlacement).toBe('bottom');
     expect(result.current.parsedOptions.socialButtonsVariant).toBe('iconButton');
+    expect(result.current.parsedOptions.elevation).toBe('flush');
   });
 
   it('sets the parsedOptions correctly from the appearance prop', () => {
@@ -272,6 +274,7 @@ describe('AppearanceProvider options flows', () => {
             showOptionalFields: true,
             socialButtonsPlacement: 'top',
             socialButtonsVariant: 'blockButton',
+            elevation: 'flush',
           },
         }}
       >
@@ -289,6 +292,7 @@ describe('AppearanceProvider options flows', () => {
     expect(result.current.parsedOptions.showOptionalFields).toBe(true);
     expect(result.current.parsedOptions.socialButtonsPlacement).toBe('top');
     expect(result.current.parsedOptions.socialButtonsVariant).toBe('blockButton');
+    expect(result.current.parsedOptions.elevation).toBe('flush');
   });
 
   it('sets the parsedOptions correctly from the globalAppearance and appearance prop', () => {
@@ -306,6 +310,7 @@ describe('AppearanceProvider options flows', () => {
             showOptionalFields: false,
             socialButtonsPlacement: 'bottom',
             socialButtonsVariant: 'iconButton',
+            elevation: 'flush',
           },
         }}
         appearance={{
@@ -319,6 +324,7 @@ describe('AppearanceProvider options flows', () => {
             showOptionalFields: true,
             socialButtonsPlacement: 'top',
             socialButtonsVariant: 'blockButton',
+            elevation: 'raised',
           },
         }}
       >
@@ -336,6 +342,7 @@ describe('AppearanceProvider options flows', () => {
     expect(result.current.parsedOptions.showOptionalFields).toBe(true);
     expect(result.current.parsedOptions.socialButtonsPlacement).toBe('top');
     expect(result.current.parsedOptions.socialButtonsVariant).toBe('blockButton');
+    expect(result.current.parsedOptions.elevation).toBe('raised');
   });
 
   it('removes the base theme when simpleStyles is passed to globalAppearance', () => {
