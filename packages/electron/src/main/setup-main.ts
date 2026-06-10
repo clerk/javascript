@@ -1,6 +1,5 @@
 import type { SetupMainOptions, SetupMainReturn } from '../shared/types';
 import { setupTokenCacheIpcHandlers } from './ipc-handlers';
-import { setupClerkRequestInterception } from './request-interceptor';
 
 export function setupMain(options: SetupMainOptions): SetupMainReturn {
   if (!options.storage) {
@@ -10,8 +9,6 @@ export function setupMain(options: SetupMainOptions): SetupMainReturn {
   }
 
   const cleanupTokenPersistence = setupTokenCacheIpcHandlers(options.storage);
-
-  setupClerkRequestInterception(options.publishableKey);
 
   return {
     cleanup() {

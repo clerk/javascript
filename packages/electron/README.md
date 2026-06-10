@@ -45,7 +45,6 @@ import { storage } from '@clerk/electron/storage';
 
 setupMain({
   storage: storage(),
-  publishableKey: import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,
 });
 ```
 

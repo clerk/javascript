@@ -11,10 +11,6 @@ vi.mock('electron', () => ({
   },
 }));
 
-vi.mock('../request-interceptor', () => ({
-  setupClerkRequestInterception: vi.fn(),
-}));
-
 describe('setupMain', () => {
   const missingStorage = {} as Parameters<typeof setupMain>[0];
   const storage: TokenStorage = {
