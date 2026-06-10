@@ -2,6 +2,7 @@ import React from 'react';
 
 import { cva, type VariantProps } from './cva';
 import { useMosaicTheme } from './MosaicProvider';
+import { hover } from './utils';
 
 export const buttonStyles = cva(theme => ({
   base: {
@@ -27,7 +28,7 @@ export const buttonStyles = cva(theme => ({
       primary: {
         backgroundColor: theme.color.primary,
         color: theme.color.primaryForeground,
-        '&:hover': { backgroundColor: theme.mix('primary', 'primaryForeground', 12) },
+        ...hover({ backgroundColor: theme.mix('primary', 'primaryForeground', 12) }),
         '&:active': { backgroundColor: theme.mix('primary', 'primaryForeground', 24) },
       },
     },
