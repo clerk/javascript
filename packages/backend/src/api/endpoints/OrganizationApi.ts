@@ -394,7 +394,7 @@ export class OrganizationAPI extends AbstractAPI {
   ) {
     this.requireId(organizationId);
 
-    return this.request<OrganizationInvitation[]>({
+    return this.request<PaginatedResourceResponse<OrganizationInvitation[]>>({
       method: 'POST',
       path: joinPaths(basePath, organizationId, 'invitations', 'bulk'),
       bodyParams: params,

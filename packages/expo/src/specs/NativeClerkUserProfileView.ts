@@ -5,10 +5,10 @@ import type { HostComponent, ViewProps } from 'react-native';
 import type { BubblingEventHandler } from 'react-native/Libraries/Types/CodegenTypes';
 /* eslint-enable import/namespace, import/default, import/no-named-as-default, import/no-named-as-default-member, simple-import-sort/imports */
 
-type ProfileEvent = Readonly<{ type: string; data: string }>;
+type ProfileEvent = Readonly<{ type: string }>;
 
 interface NativeProps extends ViewProps {
-  isDismissable?: boolean;
+  isDismissible?: boolean;
   onProfileEvent?: BubblingEventHandler<ProfileEvent>;
 }
 

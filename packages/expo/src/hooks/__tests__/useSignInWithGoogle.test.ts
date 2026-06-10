@@ -52,7 +52,7 @@ vi.mock('../../specs/NativeClerkModule', () => {
       configure: vi.fn(),
       getSession: vi.fn(),
       getClientToken: vi.fn(),
-      signOut: vi.fn(),
+      refreshClient: vi.fn(),
     },
   };
 });

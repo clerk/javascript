@@ -13,4 +13,5 @@ Clerk's JavaScript SDK and library monorepo.
 ## References
 
 - For questions about theming, appearance customization, or the styled system, see `references/theming-architecture.md`.
+- For the Mosaic design system (tokens, CVA utility, `MosaicProvider`, migration from existing system), see `references/mosaic-architecture.md`.
 - For dev setup, testing, JSDoc/Typedoc, publishing, changesets, and commit conventions, see `docs/CONTRIBUTING.md`.
