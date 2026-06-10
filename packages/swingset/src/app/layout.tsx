@@ -22,13 +22,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       suppressHydrationWarning
       className={cn('font-sans', geist.variable)}
     >
-      {process.env.NODE_ENV === 'development' && (
-        <Script
-          src='//unpkg.com/react-grab/dist/index.global.js'
-          crossOrigin='anonymous'
-          strategy='beforeInteractive'
-        />
-      )}
+      <head>
+        {process.env.NODE_ENV === 'development' && (
+          <Script
+            src='//unpkg.com/react-grab/dist/index.global.js'
+            crossOrigin='anonymous'
+            strategy='beforeInteractive'
+          />
+        )}
+      </head>
       <body className='antialiased'>
         <ThemeProvider>
           <ClientRoot>{children}</ClientRoot>

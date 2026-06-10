@@ -1,11 +1,18 @@
 // Import stories explicitly to control order and avoid type casting through unknown.
 import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
+import { meta as collapsibleMeta } from '../stories/collapsible.stories';
 import { toSlug } from './slug';
 import type { StoryModule } from './types';
 
 const buttonModule: StoryModule = { meta: buttonMeta, Primary, Sizes, Disabled };
 
-export const registry: StoryModule[] = [buttonModule];
+// Headless primitives are documented as overview-only: the registry entry carries
+// just `meta` (no story functions), so the sidebar shows a single "Overview" link and
+// no interactive knob canvas. The overview's live demos come from `<Story>` embeds in
+// the MDX, which import the stories module directly (not through this registry).
+const collapsibleModule: StoryModule = { meta: collapsibleMeta };
+
+export const registry: StoryModule[] = [buttonModule, collapsibleModule];
 
 export interface RegistryEntry {
   mod: StoryModule;

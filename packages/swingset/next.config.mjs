@@ -29,6 +29,8 @@ const nextConfig = {
   },
   webpack(config) {
     config.resolve.alias['@clerk/ui/mosaic'] = resolve(__dirname, '../ui/src/mosaic');
+    // Consume @clerk/headless primitives from source (no dist build needed), mirroring Mosaic.
+    config.resolve.alias['@clerk/headless'] = resolve(__dirname, '../headless/src/primitives');
     return config;
   },
 };
