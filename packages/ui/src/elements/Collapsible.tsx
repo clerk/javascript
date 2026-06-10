@@ -1,4 +1,4 @@
-import { type PropsWithChildren, useEffect, useState } from 'react';
+import { type PropsWithChildren, useEffect, useState, version as reactVersion } from 'react';
 
 import { Box, descriptors, useAppearance } from '../customizables';
 import { usePrefersReducedMotion } from '../hooks';
@@ -8,6 +8,10 @@ type CollapsibleProps = PropsWithChildren<{
   open: boolean;
   sx?: ThemableCssProp;
 }>;
+
+// React 19 wants a real boolean for `inert`; React 18.3 strips booleans and only
+// keeps the attribute when given a string. Compute the renderable value once.
+const inertValue: true | '' = parseInt(reactVersion, 10) >= 19 ? true : '';
 
 // Register custom property for animatable mask size
 if (typeof CSS !== 'undefined' && 'registerProperty' in CSS) {
@@ -75,8 +79,12 @@ export function Collapsible({ open, children, sx }: CollapsibleProps): JSX.Eleme
         }),
         sx,
       ]}
-      // @ts-ignore - inert not yet in React types
-      inert={!open ? '' : undefined}
+      // @ts-ignore - inert not in Box prop types
+      // React 19 treats `inert` as a real boolean DOM attribute (pass `true` to set,
+      // `undefined` to omit) and warns on string values. React 18.3 strips the
+      // boolean and only renders `inert` when given a string. There's no single
+      // value that's clean on both; branch on React's runtime version.
+      inert={!open ? inertValue : undefined}
     >
       <Box
         elementDescriptor={descriptors.collapsibleInner}

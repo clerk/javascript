@@ -1,5 +1,6 @@
 import type { ClerkGlobalHookError } from '@/errors/globalHookError';
 
+import type { ModuleManager } from '../moduleManager';
 import type { ClerkUIConstructor } from '../ui/types';
 import type { APIKeysNamespace } from './apiKeys';
 import type {
@@ -282,6 +283,18 @@ export interface Clerk {
    * @internal
    */
   __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K];
+
+  /**
+   * Internal handle to the bundled ModuleManager. Exposed so framework SDK
+   * wrappers (e.g. IsomorphicClerk) can forward it to composed UI components
+   * that need dynamic-imported modules (Coinbase Wallet, Base, Stripe, zxcvbn).
+   * Crosses bundle boundaries that the @clerk/shared module-scoped WeakMap
+   * cannot — clerk-js inlines its own @clerk/shared, so its WeakMap is
+   * invisible to consumers loading @clerk/shared from node_modules.
+   *
+   * @internal
+   */
+  __internal_moduleManager: ModuleManager;
 
   frontendApi: string;
 

@@ -1,6 +1,7 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
 import { loadClerkJSScript, loadClerkUIScript } from '@clerk/shared/loadClerkJsScript';
+import { getModuleManager, type ModuleManager, setModuleManager } from '@clerk/shared/moduleManager';
 import type {
   __internal_AttemptToEnableEnvironmentSettingParams,
   __internal_AttemptToEnableEnvironmentSettingResult,
@@ -265,6 +266,17 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
    */
   public __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K] | undefined {
     return this.clerkjs?.__internal_getOption ? this.clerkjs?.__internal_getOption(key) : this.options[key];
+  }
+
+  /**
+   * Proxies to the inner Clerk instance's ModuleManager. Returns `undefined`
+   * before clerk-js has loaded; composed UI components read this through the
+   * shared WeakMap channel populated in `replayInterceptedInvocations`.
+   *
+   * @internal
+   */
+  public get __internal_moduleManager() {
+    return this.clerkjs?.__internal_moduleManager as ModuleManager;
   }
 
   constructor(options: IsomorphicClerkOptions) {
@@ -648,6 +660,19 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
 
     this.clerkjs = clerkjs;
+
+    // Forward clerk-js's ModuleManager onto this wrapper so composed/
+    // subcomponent UserProfile (which reads `getModuleManager(useClerk())`)
+    // can resolve it. Prefer the `__internal_moduleManager` getter — clerk-js
+    // ships standalone with its own inlined @clerk/shared, so its own WeakMap
+    // is invisible to the node_modules @clerk/shared this code uses. The
+    // getter is the public cross-bundle channel; the WeakMap fallback covers
+    // any code path that happens to share a @clerk/shared instance with the
+    // running clerk-js (rare).
+    const mm = clerkjs.__internal_moduleManager ?? getModuleManager(clerkjs);
+    if (mm) {
+      setModuleManager(this, mm);
+    }
 
     this.premountMethodCalls.forEach(cb => cb());
     this.premountAddListenerCalls.forEach((listenerExtras, listener) => {

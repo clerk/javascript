@@ -1,13 +1,12 @@
 import { useOrganization } from '@clerk/shared/react';
 
-import { Header } from '@/ui/elements/Header';
 import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
 import { ProfileCard } from '@/ui/elements/ProfileCard';
 import { ProfileSection } from '@/ui/elements/Section';
 
 import { Protect, useProtect } from '../../common';
 import { useEnvironment } from '../../contexts';
-import { Col, descriptors, localizationKeys, Text } from '../../customizables';
+import { Col, localizationKeys, Text } from '../../customizables';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { DeleteOrganizationForm, LeaveOrganizationForm } from './ActionConfirmationPage';
@@ -58,34 +57,22 @@ const DeleteOrganizationScreen = () => {
 export const OrganizationGeneralPage = () => {
   return (
     <ProfileCard.Page>
-      <Col
-        elementDescriptor={descriptors.page}
-        sx={t => ({ gap: t.space.$8 })}
+      <ProfileCard.PageSection
+        pageId='organizationGeneral'
+        titleKey={localizationKeys('organizationProfile.start.headerTitle__general')}
       >
-        <Col
-          elementDescriptor={descriptors.profilePage}
-          elementId={descriptors.profilePage.setId('organizationGeneral')}
-        >
-          <Header.Root>
-            <Header.Title
-              localizationKey={localizationKeys('organizationProfile.start.headerTitle__general')}
-              sx={t => ({ marginBottom: t.space.$4 })}
-              textVariant='h2'
-            />
-          </Header.Root>
-          <OrganizationProfileSection />
-          <Protect permission='org:sys_domains:read'>
-            <OrganizationDomainsSection />
-          </Protect>
-          <OrganizationLeaveSection />
-          <OrganizationDeleteSection />
-        </Col>
-      </Col>
+        <OrganizationProfileSection />
+        <Protect permission='org:sys_domains:read'>
+          <OrganizationDomainsSection />
+        </Protect>
+        <OrganizationLeaveSection />
+        <OrganizationDeleteSection />
+      </ProfileCard.PageSection>
     </ProfileCard.Page>
   );
 };
 
-const OrganizationProfileSection = () => {
+export const OrganizationProfileSection = () => {
   const { organization } = useOrganization();
 
   if (!organization) {
@@ -134,7 +121,7 @@ const OrganizationProfileSection = () => {
   );
 };
 
-const OrganizationDomainsSection = () => {
+export const OrganizationDomainsSection = () => {
   const { organizationSettings } = useEnvironment();
   const { organization } = useOrganization();
 
@@ -183,7 +170,7 @@ const OrganizationDomainsSection = () => {
   );
 };
 
-const OrganizationLeaveSection = () => {
+export const OrganizationLeaveSection = () => {
   const { organization } = useOrganization();
 
   if (!organization) {
@@ -229,7 +216,7 @@ const OrganizationLeaveSection = () => {
   );
 };
 
-const OrganizationDeleteSection = () => {
+export const OrganizationDeleteSection = () => {
   const { organization } = useOrganization();
   const canDeleteOrganization = useProtect({ permission: 'org:sys_profile:delete' });
 
