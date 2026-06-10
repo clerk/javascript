@@ -59,8 +59,9 @@ export function CodeBlock({ children, className }: CodeBlockProps) {
       {html ? (
         // safe: shiki output is developer-controlled source code
         <div
+          onClick={copy}
           dangerouslySetInnerHTML={{ __html: html }}
-          className='[&>pre]:overflow-auto [&>pre]:bg-transparent [&>pre]:p-4'
+          className='[&>pre]:cursor-pointer [&>pre]:overflow-auto [&>pre]:bg-transparent [&>pre]:p-4'
         />
       ) : (
         <pre className='overflow-auto p-4 text-[var(--shiki-foreground)]'>

@@ -1,11 +1,9 @@
 'use client';
 
-import { ChevronRightIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import * as React from 'react';
 
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
   Sidebar,
   SidebarContent,
@@ -19,8 +17,6 @@ import {
   SidebarRail,
 } from '@/components/ui/sidebar';
 import { getSidebarGroups } from '@/lib/registry';
-import { toSlug } from '@/lib/slug';
-import { cn } from '@/lib/utils';
 
 const groups = getSidebarGroups();
 
@@ -62,72 +58,37 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <span className='text-sidebar-foreground/70 text-[10px] font-medium'>Mosaic - Swingset</span>
       </SidebarHeader>
       <SidebarContent className='gap-0'>
-        {groups.map(({ group, stories }) => (
-          <div
+        {groups.map(({ group, components }) => (
+          <SidebarGroup
             key={group}
+            className='py-1'
             data-section={group}
           >
-            <div className='text-sidebar-foreground/50 px-4 pb-0 pt-4 text-[10px] font-semibold uppercase tracking-wider'>
+            <SidebarGroupLabel className='text-sidebar-foreground/50 h-auto px-2 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-wider'>
               {group}
-            </div>
-            {stories.map(({ mod, componentSlug, names }) => {
-              const docsHref = `/components/${componentSlug}`;
-              const isOpen = pathname.startsWith(docsHref);
-
-              return (
-                <Collapsible
-                  key={mod.meta.title}
-                  defaultOpen={isOpen}
-                  className='group/collapsible'
-                >
-                  <SidebarGroup className='py-0.5'>
-                    <SidebarGroupLabel
-                      className={cn(
-                        'group/label text-sidebar-foreground/70 hover:text-brand h-7 cursor-pointer gap-1 text-[10px] font-medium [&>svg]:size-2.5',
-                        isOpen && 'text-brand',
-                      )}
-                      render={<CollapsibleTrigger />}
-                    >
-                      {mod.meta.title}
-                      <ChevronRightIcon className='group-data-open/collapsible:rotate-90 transition-transform' />
-                    </SidebarGroupLabel>
-                    <CollapsibleContent>
-                      <SidebarGroupContent className='ml-1'>
-                        <SidebarMenu>
-                          <SidebarMenuItem>
-                            <SidebarMenuButton
-                              className='h-auto justify-between py-1 text-xs leading-relaxed'
-                              isActive={pathname === docsHref}
-                              render={<Link href={docsHref} />}
-                            >
-                              <span className='truncate'>Overview</span>
-                              <span className='text-sidebar-foreground/50 shrink-0 font-mono text-[10px] leading-none'>
-                                {`<${mod.meta.title} />`}
-                              </span>
-                            </SidebarMenuButton>
-                          </SidebarMenuItem>
-                          {names.map(name => {
-                            const href = `/components/${componentSlug}/${toSlug(name)}`;
-                            return (
-                              <SidebarMenuItem key={name}>
-                                <SidebarMenuButton
-                                  className='h-auto py-1 text-xs leading-relaxed'
-                                  isActive={pathname === href}
-                                  render={<Link href={href} />}
-                                >
-                                  {name}
-                                </SidebarMenuButton>
-                              </SidebarMenuItem>
-                            );
-                          })}
-                        </SidebarMenu>
-                      </SidebarGroupContent>
-                    </CollapsibleContent>
-                  </SidebarGroup>
-                </Collapsible>
-              );
-            })}
-          </div>
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {components.map(({ mod, componentSlug }) => {
+                  const href = `/components/${componentSlug}`;
+                  return (
+                    <SidebarMenuItem key={mod.meta.title}>
+                      <SidebarMenuButton
+                        className='h-auto justify-between py-1 text-xs leading-relaxed'
+                        isActive={pathname === href}
+                        render={<Link href={href} />}
+                      >
+                        <span className='truncate'>{mod.meta.title}</span>
+                        <span className='text-sidebar-foreground/50 shrink-0 font-mono text-[10px] leading-none'>
+                          {`<${mod.meta.title} />`}
+                        </span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
         ))}
       </SidebarContent>
       <SidebarRail />
