@@ -37,6 +37,9 @@ export interface ProtectCheckResource {
   status: 'pending';
   token: string;
   sdkUrl: string;
+  /**
+   * Unix epoch timestamp in **milliseconds** at which the challenge expires.
+   */
   expiresAt?: number;
   uiHints?: Record<string, string>;
 }

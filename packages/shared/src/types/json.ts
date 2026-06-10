@@ -153,6 +153,9 @@ export interface ProtectCheckJSON {
   status: 'pending';
   token: string;
   sdk_url: string;
+  /**
+   * Unix epoch timestamp in **milliseconds** at which the challenge expires.
+   */
   expires_at?: number;
   ui_hints?: Record<string, string>;
 }
