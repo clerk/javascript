@@ -5,23 +5,22 @@ import React, { type RefObject, useLayoutEffect, useRef, useState } from 'react'
 
 import { useTransition } from '../../hooks/use-transition';
 import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
-import { useAccordionItemContext } from './accordion-context';
+import { useCollapsibleContext } from './collapsible-context';
 
-export type AccordionPanelProps = ComponentProps<'div'>;
+export type CollapsiblePanelProps = ComponentProps<'div'>;
 
-export const AccordionPanel = React.forwardRef<HTMLDivElement, AccordionPanelProps>(
-  function AccordionPanel(props, ref) {
+export const CollapsiblePanel = React.forwardRef<HTMLDivElement, CollapsiblePanelProps>(
+  function CollapsiblePanel(props, ref) {
     const { render, ...otherProps } = props;
-    const { open, triggerId, panelId } = useAccordionItemContext();
+    const { open, triggerId, panelId } = useCollapsibleContext();
 
     const panelRef = useRef<HTMLElement | null>(null);
     // Merge the consumer ref with the internal panelRef so passing a ref does not
     // clobber the ref the panel relies on for height measurement.
     const combinedRef = useMergeRefs([panelRef, ref]);
     const [height, setHeight] = useState<number | undefined>(undefined);
+    const [width, setWidth] = useState<number | undefined>(undefined);
 
-    // Track whether open has ever transitioned from true→false.
-    // Until that happens, skip enter animations (prevents animate-on-load).
     const hasBeenClosed = useRef(false);
     if (!open) {
       hasBeenClosed.current = true;
@@ -32,7 +31,6 @@ export const AccordionPanel = React.forwardRef<HTMLDivElement, AccordionPanelPro
       ref: panelRef as RefObject<HTMLElement>,
     });
 
-    // Measure the content height and keep it in sync via ResizeObserver
     useLayoutEffect(() => {
       if (!mounted) {
         return;
@@ -43,15 +41,14 @@ export const AccordionPanel = React.forwardRef<HTMLDivElement, AccordionPanelPro
         return;
       }
 
-      // Measure scrollHeight of the panel's content
       const measure = () => {
         setHeight(panel.scrollHeight);
+        setWidth(panel.scrollWidth);
       };
 
       measure();
 
       const ro = new ResizeObserver(measure);
-      // Observe children mutations that affect height
       ro.observe(panel, { box: 'border-box' });
 
       return () => ro.disconnect();
@@ -59,7 +56,6 @@ export const AccordionPanel = React.forwardRef<HTMLDivElement, AccordionPanelPro
 
     const state = { open };
 
-    // Skip enter animation for panels that have never been closed
     const effectiveTransitionProps = !hasBeenClosed.current
       ? {
           ...transitionProps,
@@ -69,14 +65,15 @@ export const AccordionPanel = React.forwardRef<HTMLDivElement, AccordionPanelPro
       : transitionProps;
 
     const defaultProps: Record<string, unknown> = {
-      'data-cl-slot': 'accordion-panel',
+      'data-cl-slot': 'collapsible-panel',
       id: panelId,
       role: 'region' as const,
       'aria-labelledby': triggerId,
       ref: combinedRef,
       ...effectiveTransitionProps,
       style: {
-        '--cl-accordion-panel-height': height != null ? `${height}px` : undefined,
+        '--collapsible-panel-height': height != null ? `${height}px` : undefined,
+        '--collapsible-panel-width': width != null ? `${width}px` : undefined,
         ...effectiveTransitionProps.style,
       },
     };

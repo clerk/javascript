@@ -4,14 +4,14 @@ import { useMergeRefs } from '@floating-ui/react';
 import React from 'react';
 
 import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
-import { useDialogContext } from './dialog-context';
+import { usePopoverContext } from './popover-context';
 
-export type DialogTriggerProps = ComponentProps<'button'>;
+export type PopoverTriggerProps = ComponentProps<'button'>;
 
-export const DialogTrigger = React.forwardRef<HTMLButtonElement, DialogTriggerProps>(
-  function DialogTrigger(props, ref) {
+export const PopoverTrigger = React.forwardRef<HTMLButtonElement, PopoverTriggerProps>(
+  function PopoverTrigger(props, ref) {
     const { render, ...otherProps } = props;
-    const { open, refs, getReferenceProps } = useDialogContext();
+    const { open, refs, getReferenceProps } = usePopoverContext();
 
     // floating-ui types `setReference` as a method signature, but at runtime it's
     // a stable callback that doesn't use `this`, so the unbound-method check is a
@@ -23,7 +23,7 @@ export const DialogTrigger = React.forwardRef<HTMLButtonElement, DialogTriggerPr
 
     const defaultProps = {
       type: 'button' as const,
-      'data-cl-slot': 'dialog-trigger',
+      'data-cl-slot': 'popover-trigger',
       ref: combinedRef,
       ...(getReferenceProps() as React.ComponentPropsWithRef<'button'>),
     };
