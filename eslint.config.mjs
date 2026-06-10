@@ -386,7 +386,7 @@ export default tseslint.config([
       'react/jsx-sort-props': 'warn',
       'react/no-array-index-key': 'warn',
       'react/no-unstable-nested-components': 'warn',
-      'react/no-unknown-property': ['error', { ignore: ['css', 'inert'] }], // Emotion; inert not in React 18 types
+      'react/no-unknown-property': ['error', { ignore: ['css'] }], // Emotion
       'react/self-closing-comp': 'warn',
       'react/prop-types': 'off',
       'react/react-in-jsx-scope': 'off',
