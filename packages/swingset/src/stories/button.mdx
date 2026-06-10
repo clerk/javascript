@@ -1,0 +1,43 @@
+import * as ButtonStories from './button.stories';
+
+# Button
+
+The `Button` component is the primary action element in Mosaic. It supports color and size variants and uses Emotion CSS-in-JS for styling via the Mosaic CVA utility.
+
+## Default
+
+<Story
+  name='Primary'
+  storyModule={ButtonStories}
+/>
+
+## Sizes
+
+<Story
+  name='Sizes'
+  storyModule={ButtonStories}
+/>
+
+## Disabled
+
+<Story
+  name='Disabled'
+  storyModule={ButtonStories}
+/>
+
+## Usage
+
+```tsx
+import { Button } from '@clerk/ui/mosaic/components/button';
+
+<Button
+  color='primary'
+  size='md'
+>
+  Click me
+</Button>;
+```
+
+## Props
+
+<PropTable meta={ButtonStories.meta} />
