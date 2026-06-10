@@ -23,7 +23,7 @@ export interface DialogViewportProps extends ComponentProps<'div'> {
 export const DialogViewport = React.forwardRef<HTMLDivElement, DialogViewportProps>(
   function DialogViewport(props, ref) {
     const { render, lockScroll = true, ...otherProps } = props;
-    const { open, mounted, transitionProps } = useDialogContext();
+    const { open, mounted, transitionProps, modal } = useDialogContext();
 
     if (!mounted) {
       return null;
@@ -35,10 +35,14 @@ export const DialogViewport = React.forwardRef<HTMLDivElement, DialogViewportPro
       'data-cl-slot': 'dialog-viewport',
       ref,
       ...transitionProps,
+      style: modal ? undefined : { pointerEvents: 'auto' as const },
     } satisfies DefaultProps<'div'>;
 
     return (
-      <FloatingOverlay lockScroll={lockScroll}>
+      <FloatingOverlay
+        lockScroll={lockScroll}
+        style={modal ? undefined : { pointerEvents: 'none' }}
+      >
         {renderElement({
           defaultTagName: 'div',
           render,

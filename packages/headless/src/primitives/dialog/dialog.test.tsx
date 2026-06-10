@@ -236,6 +236,35 @@ describe('Dialog', () => {
       // Focus should be trapped inside the dialog
       expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
+
+    it('non-modal dialog allows background interaction', async () => {
+      const onBackgroundClick = vi.fn();
+      const user = userEvent.setup();
+      render(
+        <>
+          <button onClick={onBackgroundClick}>Background button</button>
+          <Dialog.Root modal={false}>
+            <Dialog.Trigger>Open dialog</Dialog.Trigger>
+            <Dialog.Backdrop />
+            <Dialog.Viewport>
+              <Dialog.Popup>
+                <Dialog.Title>Dialog Title</Dialog.Title>
+                <Dialog.Close>Close</Dialog.Close>
+              </Dialog.Popup>
+            </Dialog.Viewport>
+          </Dialog.Root>
+        </>,
+      );
+
+      await user.click(screen.getByRole('button', { name: 'Open dialog' }));
+
+      const viewport = document.querySelector('[data-cl-slot="dialog-viewport"]');
+      expect(viewport).toHaveStyle({ pointerEvents: 'auto' });
+      expect(viewport?.parentElement).toHaveStyle({ pointerEvents: 'none' });
+
+      await user.click(screen.getByRole('button', { name: 'Background button' }));
+      expect(onBackgroundClick).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('focus management', () => {
