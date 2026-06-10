@@ -8,6 +8,12 @@ const storeGet = vi.fn();
 const storeSet = vi.fn();
 const storeDelete = vi.fn();
 
+type AsyncSafeStorage = {
+  encryptStringAsync: (value: string) => Promise<Buffer>;
+  decryptStringAsync: (encrypted: Buffer) => Promise<{ result: string; shouldReEncrypt: boolean }>;
+  isAsyncEncryptionAvailable: () => Promise<boolean>;
+};
+
 // `safeStorage` starts empty; each test installs only the methods for the backend it exercises.
 // This mirrors reality: Electron < 42 has no async methods at all, so `resolveCipher` only takes the
 // async path when both the methods exist and `isAsyncEncryptionAvailable()` confirms it.
@@ -24,6 +30,7 @@ vi.mock('electron-store', () => ({
 }));
 
 const ss = safeStorage as unknown as Record<string, unknown>;
+const asyncSafeStorage = safeStorage as typeof safeStorage & AsyncSafeStorage;
 
 /** Installs the synchronous `safeStorage` API. */
 function installSync({ available = true }: { available?: boolean } = {}) {
@@ -134,20 +141,20 @@ describe('getItem', () => {
       installSync();
       installAsync();
       storeGet.mockReturnValue(`enc:${Buffer.from('cipher').toString('base64')}`);
-      vi.mocked(safeStorage.decryptStringAsync).mockResolvedValue({ result: 'jwt', shouldReEncrypt: false });
+      vi.mocked(asyncSafeStorage.decryptStringAsync).mockResolvedValue({ result: 'jwt', shouldReEncrypt: false });
 
       await expect(storage().getItem('token-key')).resolves.toBe('jwt');
-      expect(safeStorage.decryptStringAsync).toHaveBeenCalledWith(Buffer.from('cipher'));
+      expect(asyncSafeStorage.decryptStringAsync).toHaveBeenCalledWith(Buffer.from('cipher'));
     });
 
     it('re-encrypts and re-saves when the OS key has rotated (shouldReEncrypt)', async () => {
       installSync();
       installAsync();
       storeGet.mockReturnValue(`enc:${Buffer.from('old-cipher').toString('base64')}`);
-      vi.mocked(safeStorage.decryptStringAsync).mockResolvedValue({ result: 'jwt', shouldReEncrypt: true });
+      vi.mocked(asyncSafeStorage.decryptStringAsync).mockResolvedValue({ result: 'jwt', shouldReEncrypt: true });
 
       await expect(storage().getItem('token-key')).resolves.toBe('jwt');
-      expect(safeStorage.encryptStringAsync).toHaveBeenCalledWith('jwt');
+      expect(asyncSafeStorage.encryptStringAsync).toHaveBeenCalledWith('jwt');
       expect(storeSet).toHaveBeenCalledWith('token-key', `enc:${Buffer.from('enc(jwt)').toString('base64')}`);
     });
 
@@ -155,7 +162,7 @@ describe('getItem', () => {
       installSync();
       installAsync();
       storeGet.mockReturnValue(`enc:${Buffer.from('cipher').toString('base64')}`);
-      vi.mocked(safeStorage.decryptStringAsync).mockRejectedValue(new Error('decrypt failed'));
+      vi.mocked(asyncSafeStorage.decryptStringAsync).mockRejectedValue(new Error('decrypt failed'));
 
       await expect(storage().getItem('token-key')).resolves.toBeNull();
       expect(storeDelete).not.toHaveBeenCalled();
@@ -170,7 +177,7 @@ describe('getItem', () => {
       await expect(storage().getItem('token-key')).resolves.toBe('jwt');
       expect(safeStorage.decryptString).toHaveBeenCalledWith(Buffer.from('cipher'));
       // Critical: calling the async crypto while unavailable crashes the process on Electron 42.x.
-      expect(safeStorage.decryptStringAsync).not.toHaveBeenCalled();
+      expect(asyncSafeStorage.decryptStringAsync).not.toHaveBeenCalled();
     });
   });
 });
@@ -191,7 +198,7 @@ describe('setItem', () => {
 
     await storage().setItem('token-key', 'jwt');
 
-    expect(safeStorage.encryptStringAsync).toHaveBeenCalledWith('jwt');
+    expect(asyncSafeStorage.encryptStringAsync).toHaveBeenCalledWith('jwt');
     expect(storeSet).toHaveBeenCalledWith('token-key', `enc:${Buffer.from('enc(jwt)').toString('base64')}`);
   });
 
@@ -202,7 +209,7 @@ describe('setItem', () => {
     await storage().setItem('token-key', 'jwt');
 
     expect(safeStorage.encryptString).toHaveBeenCalledWith('jwt');
-    expect(safeStorage.encryptStringAsync).not.toHaveBeenCalled();
+    expect(asyncSafeStorage.encryptStringAsync).not.toHaveBeenCalled();
     expect(storeSet).toHaveBeenCalledWith('token-key', `enc:${Buffer.from('enc(jwt)').toString('base64')}`);
   });
 
@@ -290,7 +297,7 @@ describe('setItem', () => {
     await storage().setItem('token-key', 'jwt');
 
     expect(safeStorage.encryptString).toHaveBeenCalledWith('jwt');
-    expect(safeStorage.encryptStringAsync).not.toHaveBeenCalled();
+    expect(asyncSafeStorage.encryptStringAsync).not.toHaveBeenCalled();
   });
 });
 
