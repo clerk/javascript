@@ -1,9 +1,9 @@
-import type { Options } from 'tsup';
-import { defineConfig } from 'tsup';
+import type { Options } from 'tsdown';
+import { defineConfig } from 'tsdown';
 
-import { runAfterLast } from '../../scripts/utils';
-import { version as clerkJsVersion } from '../clerk-js/package.json';
-import { name, version } from './package.json';
+import { runAfterLast } from '../../scripts/utils.ts';
+import clerkJsPkgJson from '../clerk-js/package.json' with { type: 'json' };
+import pkgJson from './package.json' with { type: 'json' };
 
 export default defineConfig(overrideOptions => {
   const isWatch = !!overrideOptions.watch;
@@ -11,17 +11,17 @@ export default defineConfig(overrideOptions => {
 
   const options: Options = {
     format: 'cjs',
+    fixedExtension: false,
     outDir: './dist',
     entry: ['./src/**/*.{ts,tsx,js,jsx}', '!./src/**/*.test.{ts,tsx}', '!./src/**/__tests__/**'],
     bundle: false,
     clean: true,
     minify: false,
     sourcemap: true,
-    legacyOutput: true,
     define: {
-      PACKAGE_NAME: `"${name}"`,
-      PACKAGE_VERSION: `"${version}"`,
-      JS_PACKAGE_VERSION: `"${clerkJsVersion}"`,
+      PACKAGE_NAME: `"${pkgJson.name}"`,
+      PACKAGE_VERSION: `"${pkgJson.version}"`,
+      JS_PACKAGE_VERSION: `"${clerkJsPkgJson.version}"`,
       __DEV__: `${isWatch}`,
     },
   };

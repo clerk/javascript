@@ -9,8 +9,6 @@ import type { TanstackStartClerkProviderProps } from './types';
 import { useAwaitableNavigate } from './useAwaitableNavigate';
 import { mergeWithPublicEnvs, parseUrlForNavigation, pickFromClerkInitState } from './utils';
 
-export * from '@clerk/react';
-
 const SDK_METADATA = {
   name: PACKAGE_NAME,
   version: PACKAGE_VERSION,
