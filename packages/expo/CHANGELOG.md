@@ -1,5 +1,34 @@
 # Change Log
 
+## 3.4.0
+
+### Minor Changes
+
+- Update Expo's beta native prebuilt components to more closely match the behavior of Clerk's native iOS and Android SDKs. ([#8699](https://github.com/clerk/javascript/pull/8699)) by [@mikepitre](https://github.com/mikepitre)
+
+  Previously, native auth and profile views relied on Expo-specific presentation behavior. `AuthView` and `UserProfileView` are now app-presented components, with dismissal handled through `onDismiss`. This also improves session synchronization between Clerk's JavaScript and native layers.
+
+  **Note:** This includes native changes, so rebuild your native app after upgrading (`expo prebuild --clean` or a new EAS build).
+
+### Patch Changes
+
+- Bump the native SDKs pulled into Expo: `clerk-ios` to `1.2.0`. ([#8745](https://github.com/clerk/javascript/pull/8745)) by [@mikepitre](https://github.com/mikepitre)
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.0.26` to `1.0.28`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.0.28. ([#8780](https://github.com/clerk/javascript/pull/8780)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Make `react-dom` an optional peer dependency so native Expo apps can install Clerk without pulling in a React DOM version they do not use. ([#8789](https://github.com/clerk/javascript/pull/8789)) by [@mikepitre](https://github.com/mikepitre)
+
+- Fix `useSSO()` in Expo apps that hit module loading failures when starting an SSO flow under Metro. ([#8720](https://github.com/clerk/javascript/pull/8720)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix Expo native builds that could fail when `expo-web-browser` is not installed but `ClerkProvider` is imported. ([#8607](https://github.com/clerk/javascript/pull/8607)) by [@chriscanin](https://github.com/chriscanin)
+
+- Add and improve JSDoc comments across public types and methods to support generated reference documentation for the `/objects` docs section. Exports a few previously-internal types (`OnEventListener`, `OffEventListener`, `ClerkOptionsNavigation`) so they can be referenced from the generated docs. ([#8276](https://github.com/clerk/javascript/pull/8276)) by [@alexisintech](https://github.com/alexisintech)
+
+- Updated dependencies [[`83f50f6`](https://github.com/clerk/javascript/commit/83f50f68619205f16541439fd27ca653686ba6df), [`2d6670c`](https://github.com/clerk/javascript/commit/2d6670c6c05c59901709283921b5d65c43f3a676), [`83f50f6`](https://github.com/clerk/javascript/commit/83f50f68619205f16541439fd27ca653686ba6df), [`af706e3`](https://github.com/clerk/javascript/commit/af706e35420a16c028fd34b70dd50d663d42e006), [`032632c`](https://github.com/clerk/javascript/commit/032632c6982297e53e28559b59b4a435de4c9adc), [`0fece6f`](https://github.com/clerk/javascript/commit/0fece6ff5d2b1babb59a285dbce9d46723e33d73), [`b295af3`](https://github.com/clerk/javascript/commit/b295af3d5bb12e09a502cae4a935d2e7f5d35d5c), [`0c854c3`](https://github.com/clerk/javascript/commit/0c854c356cb95d9f56bf002df1beeefe0ec4f31a), [`eb5c02d`](https://github.com/clerk/javascript/commit/eb5c02d7f36e4b3a9fafbf62384445f9a6a823cf), [`8e1bd48`](https://github.com/clerk/javascript/commit/8e1bd48a91dc07751493f41416d2a68b89e114cc)]:
+  - @clerk/react@6.8.0
+  - @clerk/clerk-js@6.15.0
+  - @clerk/shared@4.16.0
+
 ## 3.3.1
 
 ### Patch Changes
