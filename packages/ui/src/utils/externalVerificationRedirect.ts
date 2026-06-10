@@ -1,7 +1,5 @@
 import type { ExternalAccountResource, NativeOAuthHandler, UserResource } from '@clerk/shared/types';
 
-import { throwIfNativeRedirectCallbackHasError } from './nativeRedirectCallback';
-
 type CreateExternalAccount = (redirectUrl: string) => Promise<ExternalAccountResource | undefined>;
 
 export async function connectExternalAccountWithTransport(opts: {
@@ -17,8 +15,7 @@ export async function connectExternalAccountWithTransport(opts: {
     return;
   }
 
-  const { callbackUrl } = await opts.transport.open(verificationUrl);
-  throwIfNativeRedirectCallbackHasError(callbackUrl);
+  await opts.transport.open(verificationUrl);
 
   // The reloaded user surfaces any stored verification error inline on the connected-account row,
   // matching the web flow.

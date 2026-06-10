@@ -350,8 +350,8 @@ describe('SignInStart', () => {
       });
 
       vi.mocked(authenticateSignInWithNativeTransport).mockRejectedValueOnce(
-        new ClerkAPIResponseError('Unable to complete authentication', {
-          data: [{ code: 'native_redirect_incomplete', message: 'Native redirect incomplete', long_message: '' }],
+        new ClerkAPIResponseError('Unable to complete authentication.', {
+          data: [{ code: 'oauth_error', message: 'Unable to complete authentication.', long_message: '' }],
           status: 400,
         }),
       );

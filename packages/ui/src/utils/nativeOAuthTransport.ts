@@ -1,5 +1,4 @@
 import type {
-  ClerkAPIError,
   EnterpriseSSOStrategy,
   HandleOAuthCallbackParams,
   LoadedClerk,
@@ -9,41 +8,21 @@ import type {
   SignUpResource,
 } from '@clerk/shared/types';
 
-import {
-  createNativeRedirectResourceError,
-  getRotatingTokenNonceFromNativeRedirectCallback,
-  throwIfNativeRedirectCallbackHasError,
-} from './nativeRedirectCallback';
-
 type ClerkForNativeOAuth = Pick<LoadedClerk, '__internal_handleNativeOAuthCallback'>;
 
 type CompleteNativeOAuthCallbackOpts = {
   callbackUrl: string;
   reloadWithNonce: (nonce: string) => Promise<unknown>;
-  reload: () => Promise<unknown>;
-  getError: () => ClerkAPIError | null | undefined;
-  reset: () => Promise<unknown>;
   handleCallback: () => Promise<unknown>;
 };
 
 async function completeNativeOAuthCallback(opts: CompleteNativeOAuthCallbackOpts): Promise<void> {
-  throwIfNativeRedirectCallbackHasError(opts.callbackUrl);
-
-  const nonce = getRotatingTokenNonceFromNativeRedirectCallback(opts.callbackUrl);
-  if (nonce) {
-    await opts.reloadWithNonce(nonce);
-    await opts.handleCallback();
+  const nonce = new URL(opts.callbackUrl).searchParams.get('rotating_token_nonce');
+  if (!nonce) {
     return;
   }
 
-  await opts.reload();
-  const error = opts.getError();
-  if (error) {
-    const nativeRedirectError = createNativeRedirectResourceError(error);
-    await opts.reset();
-    throw nativeRedirectError;
-  }
-
+  await opts.reloadWithNonce(nonce);
   await opts.handleCallback();
 }
 
@@ -90,9 +69,6 @@ export async function authenticateSignInWithNativeTransport(opts: NativeSignInTr
   await completeNativeOAuthCallback({
     callbackUrl,
     reloadWithNonce: nonce => opts.signIn.reload({ rotatingTokenNonce: nonce }),
-    reload: () => opts.signIn.reload(),
-    getError: () => opts.signIn.firstFactorVerification.error,
-    reset: () => opts.signIn.create({}),
     handleCallback: () => opts.clerk.__internal_handleNativeOAuthCallback(opts.signIn, opts.callbackParams),
   });
 }
@@ -140,9 +116,6 @@ export async function authenticateSignUpWithNativeTransport(opts: NativeSignUpTr
   await completeNativeOAuthCallback({
     callbackUrl,
     reloadWithNonce: nonce => opts.signUp.reload({ rotatingTokenNonce: nonce }),
-    reload: () => opts.signUp.reload(),
-    getError: () => opts.signUp.verifications.externalAccount.error,
-    reset: () => opts.signUp.create({}),
     handleCallback: () => opts.clerk.__internal_handleNativeOAuthCallback(opts.signUp, opts.callbackParams),
   });
 }

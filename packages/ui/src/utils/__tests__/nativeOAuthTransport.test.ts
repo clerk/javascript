@@ -1,4 +1,3 @@
-import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { describe, expect, it, vi } from 'vitest';
 
 import { authenticateSignInWithNativeTransport, authenticateSignUpWithNativeTransport } from '../nativeOAuthTransport';
@@ -85,7 +84,7 @@ describe('authenticateSignInWithNativeTransport', () => {
     expect(clerk.__internal_handleNativeOAuthCallback).toHaveBeenCalledWith(signIn, {});
   });
 
-  it('handles callback URL with no nonce by reloading the signIn resource before continuing', async () => {
+  it('ignores callback URLs with no nonce until FAPI provides a native error contract', async () => {
     const externalVerificationRedirectURL = new URL('https://accounts.example.com/oauth');
     const transport = makeMockTransport('myapp://sso-callback');
     const clerk = makeMockClerk();
@@ -96,10 +95,7 @@ describe('authenticateSignInWithNativeTransport', () => {
       signIn.firstFactorVerification = { externalVerificationRedirectURL };
       return signIn;
     });
-    signIn.reload = vi.fn().mockImplementation(async () => {
-      signIn.firstFactorVerification = {};
-      return signIn;
-    });
+    signIn.reload = vi.fn().mockImplementation(async () => signIn);
 
     await authenticateSignInWithNativeTransport({
       transport,
@@ -109,76 +105,8 @@ describe('authenticateSignInWithNativeTransport', () => {
       callbackParams,
     });
 
-    expect(signIn.reload).toHaveBeenCalledWith();
-    expect(clerk.__internal_handleNativeOAuthCallback).toHaveBeenCalledWith(signIn, callbackParams);
-  });
-
-  it('throws the reloaded signIn verification error for callback URLs with no nonce', async () => {
-    const externalVerificationRedirectURL = new URL('https://accounts.example.com/oauth');
-    const transport = makeMockTransport('myapp://sso-callback');
-    const clerk = makeMockClerk();
-
-    const signIn = { id: undefined, firstFactorVerification: {} } as any;
-    signIn.create = vi.fn().mockImplementation(async () => {
-      signIn.firstFactorVerification = { externalVerificationRedirectURL };
-      return signIn;
-    });
-    signIn.reload = vi.fn().mockImplementation(async () => {
-      signIn.firstFactorVerification = {
-        error: {
-          code: 'oauth_access_denied',
-          message: 'You did not grant access to your Google account',
-          longMessage: 'You did not grant access to your Google account',
-        },
-      };
-      return signIn;
-    });
-
-    await expect(
-      authenticateSignInWithNativeTransport({
-        transport,
-        signIn,
-        clerk,
-        strategy: 'oauth_google',
-        callbackParams: {},
-      }),
-    ).rejects.toMatchObject({
-      status: 400,
-      errors: [
-        {
-          code: 'oauth_access_denied',
-          message: 'You did not grant access to your Google account',
-        },
-      ],
-    });
-
-    expect(signIn.reload).toHaveBeenCalledWith();
-    expect(signIn.create).toHaveBeenLastCalledWith({});
+    expect(signIn.reload).not.toHaveBeenCalled();
     expect(clerk.__internal_handleNativeOAuthCallback).not.toHaveBeenCalled();
-  });
-
-  it('propagates errors from callback URL error params', async () => {
-    const externalVerificationRedirectURL = new URL('https://accounts.example.com/oauth');
-    const transport = makeMockTransport(
-      'myapp://sso-callback?error_code=oauth_access_denied&error_message=Access%20denied',
-    );
-    const clerk = makeMockClerk();
-
-    const signIn = { id: undefined, firstFactorVerification: {} } as any;
-    signIn.create = vi.fn().mockImplementation(async () => {
-      signIn.firstFactorVerification = { externalVerificationRedirectURL };
-      return signIn;
-    });
-
-    await expect(
-      authenticateSignInWithNativeTransport({
-        transport,
-        signIn,
-        clerk,
-        strategy: 'oauth_google',
-        callbackParams: {},
-      }),
-    ).rejects.toSatisfy(isClerkAPIResponseError);
   });
 });
 
@@ -253,7 +181,7 @@ describe('authenticateSignUpWithNativeTransport', () => {
     expect(clerk.__internal_handleNativeOAuthCallback).toHaveBeenCalledWith(signUp, {});
   });
 
-  it('handles callback URL with no nonce by reloading the signUp resource before continuing', async () => {
+  it('ignores callback URLs with no nonce until FAPI provides a native error contract', async () => {
     const externalVerificationRedirectURL = new URL('https://accounts.example.com/oauth');
     const transport = makeMockTransport('myapp://sso-callback');
     const clerk = makeMockClerk();
@@ -264,10 +192,7 @@ describe('authenticateSignUpWithNativeTransport', () => {
       signUp.verifications.externalAccount = { externalVerificationRedirectURL };
       return signUp;
     });
-    signUp.reload = vi.fn().mockImplementation(async () => {
-      signUp.verifications.externalAccount = {};
-      return signUp;
-    });
+    signUp.reload = vi.fn().mockImplementation(async () => signUp);
 
     await authenticateSignUpWithNativeTransport({
       transport,
@@ -277,51 +202,7 @@ describe('authenticateSignUpWithNativeTransport', () => {
       callbackParams,
     });
 
-    expect(signUp.reload).toHaveBeenCalledWith();
-    expect(clerk.__internal_handleNativeOAuthCallback).toHaveBeenCalledWith(signUp, callbackParams);
-  });
-
-  it('throws the reloaded signUp verification error for callback URLs with no nonce', async () => {
-    const externalVerificationRedirectURL = new URL('https://accounts.example.com/oauth');
-    const transport = makeMockTransport('myapp://sso-callback');
-    const clerk = makeMockClerk();
-
-    const signUp = { id: undefined, verifications: { externalAccount: {} } } as any;
-    signUp.create = vi.fn().mockImplementation(async () => {
-      signUp.verifications.externalAccount = { externalVerificationRedirectURL };
-      return signUp;
-    });
-    signUp.reload = vi.fn().mockImplementation(async () => {
-      signUp.verifications.externalAccount = {
-        error: {
-          code: 'oauth_access_denied',
-          message: 'You did not grant access to your Google account',
-          longMessage: 'You did not grant access to your Google account',
-        },
-      };
-      return signUp;
-    });
-
-    await expect(
-      authenticateSignUpWithNativeTransport({
-        transport,
-        signUp,
-        clerk,
-        strategy: 'oauth_google',
-        callbackParams: {},
-      }),
-    ).rejects.toMatchObject({
-      status: 400,
-      errors: [
-        {
-          code: 'oauth_access_denied',
-          message: 'You did not grant access to your Google account',
-        },
-      ],
-    });
-
-    expect(signUp.reload).toHaveBeenCalledWith();
-    expect(signUp.create).toHaveBeenLastCalledWith({});
+    expect(signUp.reload).not.toHaveBeenCalled();
     expect(clerk.__internal_handleNativeOAuthCallback).not.toHaveBeenCalled();
   });
 });
