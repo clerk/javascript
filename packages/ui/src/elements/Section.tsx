@@ -1,4 +1,5 @@
 import type { ProfileSectionId } from '@clerk/shared/types';
+import type { ReactNode } from 'react';
 import { forwardRef, isValidElement, useLayoutEffect, useRef, useState } from 'react';
 
 import type { LocalizationKey } from '../customizables';
@@ -16,10 +17,12 @@ type ProfileSectionProps = Omit<PropsOfComponent<typeof Flex>, 'title'> & {
   titleId?: string;
   centered?: boolean;
   id: ProfileSectionId;
+  /** Optional badge rendered next to the section title in the header column. */
+  badge?: ReactNode;
 };
 
 const ProfileSectionRoot = (props: ProfileSectionProps) => {
-  const { title, titleId, centered = true, children, id, sx, ...rest } = props;
+  const { title, titleId, centered = true, children, id, sx, badge, ...rest } = props;
   const ref = useRef<HTMLDivElement | null>(null);
   const [height, setHeight] = useState(0);
 
@@ -93,7 +96,10 @@ const ProfileSectionRoot = (props: ProfileSectionProps) => {
           elementId={descriptors.profileSectionTitle.setId(id)}
           textElementDescriptor={descriptors.profileSectionTitleText}
           textElementId={descriptors.profileSectionTitleText.setId(id)}
-        />
+          sx={badge ? t => ({ alignItems: 'center', gap: t.space.$2 }) : undefined}
+        >
+          {badge}
+        </SectionHeader>
       </Col>
     </Flex>
   );
@@ -353,7 +359,7 @@ type SectionHeaderProps = PropsOfComponent<typeof Flex> & {
 };
 
 export const SectionHeader = (props: SectionHeaderProps) => {
-  const { textElementDescriptor, textElementId, textId, localizationKey, ...rest } = props;
+  const { textElementDescriptor, textElementId, textId, localizationKey, children, ...rest } = props;
   return (
     <Flex {...rest}>
       <Text
@@ -363,6 +369,7 @@ export const SectionHeader = (props: SectionHeaderProps) => {
         elementDescriptor={textElementDescriptor}
         elementId={textElementId}
       />
+      {children}
     </Flex>
   );
 };

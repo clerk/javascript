@@ -363,6 +363,19 @@ export type ElementsConfig = {
   organizationProfileMembersSearchInputIcon: WithOptions;
   organizationProfileMembersSearchInput: WithOptions;
 
+  organizationProfileSecuritySsoBadge: WithOptions<string>;
+  organizationProfileSecuritySsoDescription: WithOptions;
+  organizationProfileSecuritySsoInProgressNotice: WithOptions;
+  organizationProfileSecuritySsoConfigureButton: WithOptions<string>;
+  organizationProfileSecuritySsoEnableRow: WithOptions;
+  organizationProfileSecuritySsoEnableLabel: WithOptions;
+  organizationProfileSecuritySsoDetailRows: WithOptions;
+  organizationProfileSecuritySsoDetailRow: WithOptions<string>;
+  organizationProfileSecuritySsoDetailRowLabel: WithOptions<string>;
+  organizationProfileSecuritySsoDetailRowChip: WithOptions<string>;
+  organizationProfileSecuritySsoDetailRowLink: WithOptions<string>;
+  organizationProfileSecuritySsoProviderIcon: WithOptions;
+
   organizationListPreviewItems: WithOptions;
   organizationListPreviewItem: WithOptions;
   organizationListPreviewButton: WithOptions;
