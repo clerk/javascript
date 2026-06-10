@@ -1,5 +1,18 @@
 # Change Log
 
+## 3.4.1
+
+### Patch Changes
+
+- Bump the `clerk-ios` version pulled into Expo projects to `1.2.1`. ([#8801](https://github.com/clerk/javascript/pull/8801)) by [@mikepitre](https://github.com/mikepitre)
+
+- Remove React Native codegen warnings from Expo native auth components on iOS. ([#8800](https://github.com/clerk/javascript/pull/8800)) by [@mikepitre](https://github.com/mikepitre)
+
+- Updated dependencies [[`a5c7bc7`](https://github.com/clerk/javascript/commit/a5c7bc74dabfa78d4748516ccc252f68cae82264)]:
+  - @clerk/clerk-js@6.16.0
+  - @clerk/shared@4.17.0
+  - @clerk/react@6.9.0
+
 ## 3.4.0
 
 ### Minor Changes

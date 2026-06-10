@@ -1,5 +1,15 @@
 # Change Log
 
+## 2.1.25
+
+### Patch Changes
+
+- Fix an authentication bypass where a `req.auth` value set by another library (such as `express-jwt`, Passport, or `express-openid-connect`) caused `clerkMiddleware()` and `requireAuth()` to silently skip Clerk authentication, and `getAuth()` to return the unverified foreign value. Clerk now brands the `req.auth` handler it installs and only trusts that handler: `clerkMiddleware()` authenticates the request and overwrites a foreign `req.auth` (logging a warning when it does), and `getAuth()` throws its "middleware required" error instead of reading foreign data. ([#8804](https://github.com/clerk/javascript/pull/8804)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`a5c7bc7`](https://github.com/clerk/javascript/commit/a5c7bc74dabfa78d4748516ccc252f68cae82264)]:
+  - @clerk/shared@4.17.0
+  - @clerk/backend@3.6.1
+
 ## 2.1.24
 
 ### Patch Changes

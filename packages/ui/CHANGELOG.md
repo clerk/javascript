@@ -1,5 +1,30 @@
 # @clerk/ui
 
+## 1.16.0
+
+### Minor Changes
+
+- Add support for Clerk Billing plans with per-seat costs. ([#8629](https://github.com/clerk/javascript/pull/8629)) by [@dstaley](https://github.com/dstaley)
+  - New invite-to-checkout flow when inviting members while on a plan that uses per-seat costs.
+  - New localization values to support UI additions.
+  - Support for the `orgId` and `minSeats` parameters to `getPlans()`.
+  - Support for the `seatsQuantity` and `priceId` parameters to checkout creation.
+  - New `totals` field on payments.
+  - New `availablePrices` field on plans.
+  - New `nextPayment` field on subscription items.
+  - New `discounts` field on checkouts.
+  - Additional fields on `nextPayment` for more granularity.
+
+### Patch Changes
+
+- Display the scope description for `user:org:read` organization access in the OAuth Consent dialog so users understand organization membership information is being shared with the OAuth client. ([#8798](https://github.com/clerk/javascript/pull/8798)) by [@jfoshee](https://github.com/jfoshee)
+
+- Fix alignment of the domain section subtitle in the organization profile to match the button above it. ([#8795](https://github.com/clerk/javascript/pull/8795)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`a5c7bc7`](https://github.com/clerk/javascript/commit/a5c7bc74dabfa78d4748516ccc252f68cae82264)]:
+  - @clerk/localizations@4.8.0
+  - @clerk/shared@4.17.0
+
 ## 1.15.1
 
 ### Patch Changes
