@@ -54,10 +54,8 @@ describe('OrganizationSecurityPage', () => {
       ).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Start configuration' })).toBeInTheDocument();
 
-      // No configured-state affordances.
       expect(screen.queryByRole('switch')).not.toBeInTheDocument();
       expect(screen.queryByRole('button', { name: /open menu/i })).not.toBeInTheDocument();
-      // The wizard is not mounted.
       expect(screen.queryByText(/select your identity provider/i)).not.toBeInTheDocument();
     });
 
@@ -106,7 +104,6 @@ describe('OrganizationSecurityPage', () => {
       expect(ssoSwitch).toBeChecked();
       expect(ssoSwitch).toBeEnabled();
 
-      // Detail rows: gray label + right-aligned value per row.
       expect(screen.getByText('Provider')).toBeInTheDocument();
       expect(screen.getByText('Okta Workforce')).toBeInTheDocument();
       expect(screen.getByText('Domain')).toBeInTheDocument();
@@ -124,11 +121,9 @@ describe('OrganizationSecurityPage', () => {
       expect(screen.getByText('Certificate')).toBeInTheDocument();
       expect(screen.getByText('CERT')).toBeInTheDocument();
 
-      // The actions menu is available; the start/continue actions are not.
       expect(screen.getByRole('button', { name: /open menu/i })).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Start configuration' })).not.toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Continue configuration' })).not.toBeInTheDocument();
-      // The page lands on the overview, never directly on the wizard.
       expect(screen.queryByText(/configuration details/i)).not.toBeInTheDocument();
     });
 
@@ -168,7 +163,6 @@ describe('OrganizationSecurityPage', () => {
 
       await userEvent.click(await screen.findByRole('button', { name: 'Start configuration' }));
 
-      // A fresh start lands on the select-provider step.
       expect(await screen.findByText(/select your identity provider/i)).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Start configuration' })).not.toBeInTheDocument();
     });
@@ -189,7 +183,6 @@ describe('OrganizationSecurityPage', () => {
 
       // An active connection short-circuits the wizard to the confirmation step.
       expect(await screen.findByText(/configuration details/i)).toBeInTheDocument();
-      // The overview unmounted.
       expect(
         screen.queryByText('Configure SSO to require organization members to sign in through your identity provider'),
       ).not.toBeInTheDocument();
@@ -249,7 +242,6 @@ describe('OrganizationSecurityPage', () => {
 
       await userEvent.click(ssoSwitch);
 
-      // Optimistic flip + disabled while the mutation is in flight.
       expect(ssoSwitch).not.toBeChecked();
       expect(ssoSwitch).toBeDisabled();
       expect(fixtures.clerk.organization?.updateEnterpriseConnection).toHaveBeenCalledWith('ent_1', {
@@ -290,7 +282,6 @@ describe('OrganizationSecurityPage', () => {
 
       await userEvent.click(ssoSwitch);
 
-      // Rolled back to the server state, re-enabled, and the error surfaced.
       await waitFor(() => expect(ssoSwitch).toBeEnabled());
       expect(ssoSwitch).toBeChecked();
       expect(await screen.findByText('The connection could not be updated')).toBeInTheDocument();

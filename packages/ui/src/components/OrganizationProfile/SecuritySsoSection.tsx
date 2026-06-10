@@ -20,23 +20,14 @@ import type { EnterpriseConnectionMutations } from '../ConfigureSSO/hooks/useOrg
 import { ResetConnectionDialog } from '../ConfigureSSO/ResetConnectionDialog';
 import type { ProviderType } from '../ConfigureSSO/types';
 
-/**
- * Presentational, props-driven: the Security page owns the data (one
- * `useOrganizationEnterpriseConnection()` call) and injects everything the
- * overview needs here. No `useConfigureSSO` / wizard context below the page.
- */
+/** Props-driven: the Security page owns the data — no wizard context below the page. */
 type SecuritySsoSectionProps = {
-  /** The display-facing domain entity — `status` drives the per-state rendering. */
   connection: OrganizationEnterpriseConnection;
-  /** The raw connection resource backing the detail rows (provider, domains, SAML config). */
   enterpriseConnection: EnterpriseConnectionResource | undefined;
   setConnectionActive: EnterpriseConnectionMutations['setConnectionActive'];
   deleteConnection: EnterpriseConnectionMutations['deleteConnection'];
-  /** The delete dialog's type-to-confirm value. */
   organizationName: string;
-  /** The delete dialog's portal root. */
   contentRef: React.RefObject<HTMLDivElement>;
-  /** Start / Continue / Edit — the host switches the page to the wizard view. */
   onConfigure: () => void;
 };
 
@@ -66,14 +57,9 @@ const STATUS_BADGES: Record<
   },
 };
 
-/**
- * Provider icons whose SVGs are monochromatic and should flip with the theme.
- * Mirrors the SUPPORTS_MASK_IMAGE list in `common/ProviderIcon.tsx` and the
- * select-provider step — keep in sync if any of them grows.
- */
+/** Keep in sync with the select-provider step's MONOCHROMATIC_PROVIDER_ICONS. */
 const MONOCHROMATIC_PROVIDER_ICONS: ReadonlySet<string> = new Set(['okta']);
 
-/** Reuses the select-provider step's labels/icons so the overview can never disagree with the wizard. */
 const PROVIDER_PRESENTATION: Record<ProviderType, { label: LocalizationKey; iconId: string }> = {
   saml_okta: { label: localizationKeys('configureSSO.selectProviderStep.saml.okta'), iconId: 'okta' },
   saml_microsoft: { label: localizationKeys('configureSSO.selectProviderStep.saml.microsoft'), iconId: 'microsoft' },
@@ -122,8 +108,6 @@ export const SecuritySsoSection = (props: SecuritySsoSectionProps): JSX.Element 
       )}
 
       {isConfigured && (
-        // The toggle's optimistic error state lives in its own card scope so it
-        // can never bleed into another surface (the wizard steps own theirs).
         <CardStateProvider>
           <ConfiguredContent {...props} />
         </CardStateProvider>
@@ -133,7 +117,6 @@ export const SecuritySsoSection = (props: SecuritySsoSectionProps): JSX.Element 
 };
 
 type NotConfiguredContentProps = {
-  /** The in-progress "started but haven't finished" line, when applicable. */
   noticeKey?: LocalizationKey;
   primaryButtonKey: LocalizationKey;
   primaryButtonId: string;
@@ -310,8 +293,7 @@ const ConfiguredContent = (props: SecuritySsoSectionProps): JSX.Element => {
         isOpen={isResetDialogOpen}
         onClose={() => setIsResetDialogOpen(false)}
         confirmationValue={organizationName}
-        // This content only renders for a configured (active / inactive)
-        // connection, so the resource is guaranteed to be set at this point.
+        // A configured (active / inactive) connection guarantees the resource is set.
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         onDelete={() => deleteConnection(enterpriseConnection!.id)}
         contentRef={contentRef}
@@ -325,11 +307,6 @@ type EnableSsoToggleProps = Pick<
   'connection' | 'enterpriseConnection' | 'setConnectionActive'
 >;
 
-/**
- * Optimistic enable/disable toggle: flips immediately, reconciles with the
- * server response, and rolls back (surfacing a card error) on failure — the
- * same behavior as the wizard confirmation step's enable section.
- */
 const EnableSsoToggle = ({
   connection,
   enterpriseConnection,
@@ -350,8 +327,7 @@ const EnableSsoToggle = ({
     setIsChecked(active);
 
     try {
-      // The toggle only renders for a configured (active / inactive)
-      // connection, so the resource is guaranteed to be set at this point.
+      // A configured (active / inactive) connection guarantees the resource is set.
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const updated = await setConnectionActive(enterpriseConnection!.id, active);
       if (updated) {
@@ -373,9 +349,7 @@ const EnableSsoToggle = ({
     >
       <Switch
         isChecked={isChecked}
-        // The spec gates enabling on a successful test run; by construction the
-        // gate barely bites (an inactive status implies a successful test), but
-        // it guards the theoretical never-tested-yet-configured combination.
+        // The spec gates enabling on a successful test run.
         isDisabled={card.isLoading || (!connection.hasSuccessfulTestRun && !connection.isActive)}
         onChange={active => void onActiveChange(active)}
         aria-labelledby={labelId}
@@ -394,7 +368,6 @@ type DetailRowProps = PropsWithChildren<{
   label: LocalizationKey;
 }>;
 
-/** A single overview detail row: gray label on the left, right-aligned value. */
 const DetailRow = ({ id, label, children }: DetailRowProps): JSX.Element => (
   <Flex
     elementDescriptor={descriptors.organizationProfileSecuritySsoDetailRow}
@@ -469,7 +442,6 @@ const LinkChip = ({ id, href }: LinkChipProps): JSX.Element => (
   </Badge>
 );
 
-/** The provider mark, mask-rendered for monochromatic SVGs so it flips with the theme. */
 const ProviderIcon = ({ iconId }: { iconId: string }): JSX.Element => (
   <Span
     elementDescriptor={descriptors.organizationProfileSecuritySsoProviderIcon}

@@ -229,8 +229,7 @@ const FooterReset = (): JSX.Element | null => {
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         confirmationValue={organization?.name ?? ''}
-        // The footer self-hides without a connection (`hasConnection` above),
-        // so the resource is guaranteed to be set at this point.
+        // The footer self-hides without a connection (`hasConnection` above), so the resource is set.
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         onDelete={() => mutations.deleteConnection(enterpriseConnection!.id)}
         contentRef={contentRef}

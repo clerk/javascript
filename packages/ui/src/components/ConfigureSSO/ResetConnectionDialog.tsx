@@ -11,15 +11,8 @@ import { handleError } from '@/utils/errorHandler';
 type ResetConnectionDialogProps = {
   isOpen: boolean;
   onClose: () => void;
-  /** The value the user must type to confirm (the organization name). */
   confirmationValue: string;
-  /**
-   * The host-bound delete action, awaited on confirm before the dialog closes.
-   * The dialog is context-free: hosts (wizard footers, the Security page
-   * overview) bind the connection id and mutation themselves.
-   */
   onDelete: () => Promise<unknown>;
-  /** The host's scrollable content container — the modal portals into it. */
   contentRef: React.RefObject<HTMLDivElement>;
 };
 
@@ -69,13 +62,7 @@ const ResetConnectionDialogContent = withCardStateProvider((props: ResetConnecti
     }
 
     try {
-      // Reset is a pure delete — no navigation. The host binds the delete
-      // mutation; in the wizard, dropping `hasConnection` breaks the active
-      // step's entry guard and the machine self-corrects to the
-      // furthest-reachable step. No `useWizard()` (or any context) here — that
-      // lets this dialog be triggered from ANY footer (including the nested
-      // SAML configure footers) and from the Security page overview without
-      // binding to a wizard.
+      // A pure delete, no navigation — the wizard self-corrects once the active step's entry guard breaks.
       await onDelete();
       onClose();
     } catch (err) {

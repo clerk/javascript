@@ -6,12 +6,6 @@ import { CardStateProvider } from '@/ui/elements/contexts';
 
 import { ResetConnectionDialog } from '../ResetConnectionDialog';
 
-// The dialog is context-free. On confirm it awaits the host-bound `onDelete`
-// action — a pure delete, no navigation — and in the wizard the machine
-// self-corrects to the furthest-reachable step once the active step's guard
-// breaks. That lets the dialog be triggered from ANY footer (including nested
-// SAML configure footers) and from the Security page overview without binding
-// to a wizard.
 const deleteConnection = vi.fn();
 
 const { createFixtures } = bindCreateFixtures('ConfigureSSO');

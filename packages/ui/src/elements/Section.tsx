@@ -17,7 +17,6 @@ type ProfileSectionProps = Omit<PropsOfComponent<typeof Flex>, 'title'> & {
   titleId?: string;
   centered?: boolean;
   id: ProfileSectionId;
-  /** Optional badge rendered next to the section title in the header column. */
   badge?: ReactNode;
 };
 
