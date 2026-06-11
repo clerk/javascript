@@ -2,6 +2,7 @@ import type { ClerkPaginationRequest, OrganizationEnrollmentMode } from '@clerk/
 
 import { runtime } from '../../runtime';
 import { joinPaths } from '../../util/path';
+import { deprecated } from '../../util/shared';
 import type {
   Organization,
   OrganizationDomain,
@@ -45,7 +46,25 @@ type UpdateParams = {
   slug?: string;
   adminDeleteEnabled?: boolean;
   maxAllowedMemberships?: number;
-} & MetadataParams;
+
+  /**
+   * Metadata visible to your Frontend and Backend APIs.
+   *
+   * @deprecated Updating metadata via `updateOrganization` is deprecated. Use
+   * `updateOrganizationMetadata` for partial updates (deep merge) or
+   * `replaceOrganizationMetadata` for full replacement.
+   */
+  publicMetadata?: OrganizationPublicMetadata;
+
+  /**
+   * Metadata visible only to your Backend API.
+   *
+   * @deprecated Updating metadata via `updateOrganization` is deprecated. Use
+   * `updateOrganizationMetadata` for partial updates (deep merge) or
+   * `replaceOrganizationMetadata` for full replacement.
+   */
+  privateMetadata?: OrganizationPrivateMetadata;
+};
 
 type UpdateLogoParams = {
   file: Blob | File;
@@ -256,10 +275,38 @@ export class OrganizationAPI extends AbstractAPI {
 
   public async updateOrganization(organizationId: string, params: UpdateParams) {
     this.requireId(organizationId);
+
+    const { publicMetadata, privateMetadata, ...rest } = params;
+    const hasMetadata = publicMetadata !== undefined || privateMetadata !== undefined;
+    const hasRest = Object.keys(rest).length > 0;
+
+    if (hasMetadata) {
+      deprecated(
+        'updateOrganization(organizationId, { publicMetadata | privateMetadata })',
+        'Use updateOrganizationMetadata for partial updates (merge) or replaceOrganizationMetadata for full replacement.',
+      );
+    }
+
+    if (!hasMetadata) {
+      return this.request<Organization>({
+        method: 'PATCH',
+        path: joinPaths(basePath, organizationId),
+        bodyParams: rest,
+      });
+    }
+
+    if (hasRest) {
+      await this.request<Organization>({
+        method: 'PATCH',
+        path: joinPaths(basePath, organizationId),
+        bodyParams: rest,
+      });
+    }
+
     return this.request<Organization>({
-      method: 'PATCH',
-      path: joinPaths(basePath, organizationId),
-      bodyParams: params,
+      method: 'PUT',
+      path: joinPaths(basePath, organizationId, 'metadata'),
+      bodyParams: { publicMetadata, privateMetadata },
     });
   }
 
@@ -293,6 +340,21 @@ export class OrganizationAPI extends AbstractAPI {
 
     return this.request<Organization>({
       method: 'PATCH',
+      path: joinPaths(basePath, organizationId, 'metadata'),
+      bodyParams: params,
+    });
+  }
+
+  /**
+   * Replace an organization's metadata. Supplied fields are overwritten in full;
+   * fields omitted from `params` are left unchanged. Prefer
+   * `updateOrganizationMetadata` for partial updates with deep-merge semantics.
+   */
+  public async replaceOrganizationMetadata(organizationId: string, params: MetadataParams) {
+    this.requireId(organizationId);
+
+    return this.request<Organization>({
+      method: 'PUT',
       path: joinPaths(basePath, organizationId, 'metadata'),
       bodyParams: params,
     });

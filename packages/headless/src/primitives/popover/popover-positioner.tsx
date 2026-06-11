@@ -3,7 +3,7 @@
 import { FloatingFocusManager, useMergeRefs } from '@floating-ui/react';
 import React from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils/render-element';
 import { usePopoverContext } from './popover-context';
 
 export type PopoverPositionerProps = ComponentProps<'div'>;
@@ -33,15 +33,16 @@ export const PopoverPositioner = React.forwardRef<HTMLDivElement, PopoverPositio
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const combinedRef = useMergeRefs([refs.setFloating, ref]);
 
-    const defaultProps = {
+    const ownProps = {
       'data-cl-slot': 'popover-positioner',
       'data-cl-side': side,
       ref: combinedRef,
       style: floatingStyles,
       ...(hasTitle && { 'aria-labelledby': labelId }),
       ...(hasDescription && { 'aria-describedby': descriptionId }),
-      ...(getFloatingProps() as React.ComponentPropsWithRef<'div'>),
-    };
+    } satisfies DefaultProps<'div'>;
+
+    const defaultProps = { ...ownProps, ...getFloatingProps() };
 
     const element = renderElement({
       defaultTagName: 'div',
