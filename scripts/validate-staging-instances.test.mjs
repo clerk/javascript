@@ -346,6 +346,11 @@ describe('isCriticalPath', () => {
     expect(isCriticalPath('user_settings.password_settings.min_length')).toBe(true);
   });
 
+  it('flags captcha_enabled but not captcha_widget_type', () => {
+    expect(isCriticalPath('user_settings.sign_up.captcha_enabled')).toBe(true);
+    expect(isCriticalPath('user_settings.sign_up.captcha_widget_type')).toBe(false);
+  });
+
   it('does not flag cosmetic / non-critical paths', () => {
     expect(isCriticalPath('auth_config.single_session_mode')).toBe(false);
     expect(isCriticalPath('organization_settings.enabled')).toBe(false);
@@ -388,6 +393,16 @@ describe('classifyMismatches', () => {
     const mismatches = [{ path: 'user_settings.password_settings.min_length', prod: 8, staging: 6 }];
     const accepted = [{ path: /^user_settings\.password_settings\./, reason: 'x' }];
     expect(classifyMismatches('any', mismatches, accepted).blocking).toHaveLength(0);
+  });
+
+  it('blocks on captcha_enabled drift but not captcha_widget_type', () => {
+    const mismatches = [
+      { path: 'user_settings.sign_up.captcha_enabled', prod: false, staging: true },
+      { path: 'user_settings.sign_up.captcha_widget_type', prod: 'smart', staging: '' },
+    ];
+    const { blocking, informational } = classifyMismatches('with-legal-consent', mismatches);
+    expect(blocking.map(m => m.path)).toEqual(['user_settings.sign_up.captcha_enabled']);
+    expect(informational.map(m => m.path)).toEqual(['user_settings.sign_up.captcha_widget_type']);
   });
 });
 

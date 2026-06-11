@@ -55,6 +55,10 @@ const CRITICAL_PATHS = [
   /^user_settings\.social\.[^.]+(\.enabled)?$/,
   // Password policy, which affects password sign-in / sign-up flows.
   /^user_settings\.password_settings\..+/,
+  // Bot protection: an enabled captcha blocks every in-browser sign-up in
+  // headless CI unless the test carries a bypass token (widget type alone is
+  // inert while captcha is disabled, so it stays informational).
+  /^user_settings\.sign_up\.captcha_enabled$/,
 ];
 
 /**
