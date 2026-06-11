@@ -202,7 +202,7 @@ export const zhTW: LocalizationResource = {
       },
       warning: '選擇提供者後,在設定完成之前無法再次變更',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: '新增 SSO 網域',
       subtitle: '新增並驗證貴組織用於登入的網域的所有權。',
       formFieldLabel__domain: '網域',

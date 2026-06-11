@@ -196,7 +196,7 @@ export const kkKZ: LocalizationResource = {
       },
       warning: 'Провайдер таңдалғаннан кейін, конфигурация аяқталғанша өзгерте алмайсыз',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'SSO домендерін қосу',
       subtitle: 'Ұйымыңыз кіру үшін пайдаланатын домендердің меншігін қосып, растаңыз.',
       formFieldLabel__domain: 'Домендер',

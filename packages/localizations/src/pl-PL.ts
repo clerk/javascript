@@ -196,7 +196,7 @@ export const plPL: LocalizationResource = {
       },
       warning: 'Po wybraniu dostawcy nie można go ponownie zmienić aż do zakończenia konfiguracji',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'Dodaj domeny SSO',
       subtitle: 'Dodaj i zweryfikuj własność domen, których Twoja organizacja używa do logowania.',
       formFieldLabel__domain: 'Domeny',

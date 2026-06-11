@@ -203,7 +203,7 @@ export const ptBR: LocalizationResource = {
       warning:
         'Depois que um provedor for selecionado, você não poderá alterá-lo até que a configuração seja concluída',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'Adicionar domínios de SSO',
       subtitle: 'Adicione e verifique a propriedade dos domínios que sua organização usa para fazer login.',
       formFieldLabel__domain: 'Domínios',

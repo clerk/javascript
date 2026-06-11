@@ -204,7 +204,7 @@ export const taIN: LocalizationResource = {
       },
       warning: 'வழங்குநரைத் தேர்ந்தெடுத்த பிறகு, கட்டமைப்பு முடியும் வரை மீண்டும் மாற்ற முடியாது',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'SSO டொமைன்களைச் சேர்க்கவும்',
       subtitle: 'உங்கள் நிறுவனம் உள்நுழைய பயன்படுத்தும் டொமைன்களின் உரிமையைச் சேர்த்து சரிபார்க்கவும்.',
       formFieldLabel__domain: 'டொமைன்கள்',

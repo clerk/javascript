@@ -225,7 +225,7 @@ export const nbNO: LocalizationResource = {
       },
       warning: 'Når en leverandør er valgt, kan du ikke endre igjen før konfigurasjonen er ferdig',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'Legg til SSO-domener',
       subtitle: 'Legg til og bekreft eierskapet til domenene organisasjonen din bruker for å logge på.',
       formFieldLabel__domain: 'Domener',

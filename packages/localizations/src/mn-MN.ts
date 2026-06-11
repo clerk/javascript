@@ -196,7 +196,7 @@ export const mnMN: LocalizationResource = {
       },
       warning: 'Үйлчилгээ үзүүлэгчийг сонгосны дараа тохиргоо дуустал өөрчлөх боломжгүй',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'SSO домэйн нэмэх',
       subtitle: 'Танай байгууллагын нэвтрэхэд ашигладаг домэйнуудын эзэмшлийг нэмж баталгаажуулна уу.',
       formFieldLabel__domain: 'Домэйн',

@@ -30,7 +30,7 @@ import { useConfigureSSO } from '../ConfigureSSOContext';
 import { Step } from '../elements/Step';
 import { useWizard } from '../elements/Wizard/WizardContext';
 
-export const VerifyDomainsStep = (): JSX.Element => {
+export const OrganizationDomainsStep = (): JSX.Element => {
   const { t } = useLocalizations();
   const {
     organizationDomains,
@@ -55,14 +55,14 @@ export const VerifyDomainsStep = (): JSX.Element => {
     organizationDomains?.every(domain => domain.ownershipVerification?.status === 'verified');
 
   return (
-    <Flow.Part part='verifyDomain'>
+    <Flow.Part part='organizationDomains'>
       <Step
         elementDescriptor={descriptors.configureSSOStep}
         elementId={descriptors.configureSSOStep.setId('verify-domain')}
       >
         <Step.Header
-          title={t(localizationKeys('configureSSO.verifyDomainsStep.title'))}
-          description={t(localizationKeys('configureSSO.verifyDomainsStep.subtitle'))}
+          title={t(localizationKeys('configureSSO.organizationDomainsStep.title'))}
+          description={t(localizationKeys('configureSSO.organizationDomainsStep.subtitle'))}
         />
 
         <Step.Body>
@@ -148,8 +148,8 @@ const DomainsField = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const domainField = useFormControl('domain', '', {
     type: 'text',
-    label: localizationKeys('configureSSO.verifyDomainsStep.formFieldLabel__domain'),
-    placeholder: localizationKeys('configureSSO.verifyDomainsStep.formFieldInputPlaceholder__domain'),
+    label: localizationKeys('configureSSO.organizationDomainsStep.formFieldLabel__domain'),
+    placeholder: localizationKeys('configureSSO.organizationDomainsStep.formFieldInputPlaceholder__domain'),
   });
 
   const domain = domainField.value.trim().toLowerCase();
@@ -194,7 +194,7 @@ const DomainsField = ({
               colorScheme='secondary'
               isDisabled={!canSubmit}
               isLoading={isSubmitting}
-              localizationKey={localizationKeys('configureSSO.verifyDomainsStep.formButtonPrimary__add')}
+              localizationKey={localizationKeys('configureSSO.organizationDomainsStep.formButtonPrimary__add')}
               sx={{ flexShrink: 0 }}
             />
           </Flex>
@@ -249,8 +249,8 @@ const DomainCard = ({
             colorScheme={isVerified ? 'success' : 'danger'}
             localizationKey={
               isVerified
-                ? localizationKeys('configureSSO.verifyDomainsStep.domainCard.badge__verified')
-                : localizationKeys('configureSSO.verifyDomainsStep.domainCard.badge__unverified')
+                ? localizationKeys('configureSSO.organizationDomainsStep.domainCard.badge__verified')
+                : localizationKeys('configureSSO.organizationDomainsStep.domainCard.badge__unverified')
             }
           />
 
@@ -283,7 +283,7 @@ const DomainCard = ({
         <Text
           as='p'
           colorScheme='secondary'
-          localizationKey={localizationKeys('configureSSO.verifyDomainsStep.domainCard.verifiedAtLabel', {
+          localizationKey={localizationKeys('configureSSO.organizationDomainsStep.domainCard.verifiedAtLabel', {
             date: ownershipVerification.verifiedAt,
           })}
           sx={t => ({ padding: t.space.$4, paddingTop: 0 })}
@@ -308,7 +308,7 @@ const TxtRecord = ({
       <Text
         as='p'
         colorScheme='secondary'
-        localizationKey={localizationKeys('configureSSO.verifyDomainsStep.domainCard.txtRecord.instructions')}
+        localizationKey={localizationKeys('configureSSO.organizationDomainsStep.domainCard.txtRecord.instructions')}
         sx={t => ({ fontSize: t.fontSizes.$sm })}
       />
 
@@ -327,18 +327,18 @@ const TxtRecord = ({
       >
         {/* TODO -> Label name name need to use badge components */}
         <RecordEntry
-          label={localizationKeys('configureSSO.verifyDomainsStep.domainCard.txtRecord.typeLabel')}
+          label={localizationKeys('configureSSO.organizationDomainsStep.domainCard.txtRecord.typeLabel')}
           value='TXT'
         />
         <RecordEntry
-          label={localizationKeys('configureSSO.verifyDomainsStep.domainCard.txtRecord.hostLabel')}
+          label={localizationKeys('configureSSO.organizationDomainsStep.domainCard.txtRecord.hostLabel')}
           value={ownershipVerification?.txtRecordName ?? '@'}
         />
       </Flex>
 
       {/* TODO -> TXT record value needs to use a readonly input */}
       <RecordEntry
-        label={localizationKeys('configureSSO.verifyDomainsStep.domainCard.txtRecord.valueLabel')}
+        label={localizationKeys('configureSSO.organizationDomainsStep.domainCard.txtRecord.valueLabel')}
         value={ownershipVerification?.txtRecordValue ?? '—'}
         copyable={!!ownershipVerification?.txtRecordValue}
       />

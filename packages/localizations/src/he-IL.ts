@@ -196,7 +196,7 @@ export const heIL: LocalizationResource = {
       },
       warning: 'לאחר בחירת ספק לא ניתן לשנות אותו עד לסיום ההגדרה',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'הוספת דומיינים של SSO',
       subtitle: 'הוסף ואמת בעלות על הדומיינים שהארגון שלך משתמש בהם כדי להתחבר.',
       formFieldLabel__domain: 'דומיינים',

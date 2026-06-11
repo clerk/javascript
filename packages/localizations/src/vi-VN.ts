@@ -202,7 +202,7 @@ export const viVN: LocalizationResource = {
       },
       warning: 'Khi đã chọn nhà cung cấp, bạn không thể thay đổi cho đến khi cấu hình hoàn tất',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'Thêm tên miền SSO',
       subtitle: 'Thêm và xác minh quyền sở hữu các tên miền mà tổ chức của bạn dùng để đăng nhập.',
       formFieldLabel__domain: 'Tên miền',

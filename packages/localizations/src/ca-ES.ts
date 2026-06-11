@@ -203,7 +203,7 @@ export const caES: LocalizationResource = {
       },
       warning: 'Un cop seleccionat un proveïdor no podreu canviar-lo fins que la configuració hagi finalitzat',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'Afegeix dominis SSO',
       subtitle: 'Afegeix i verifica la propietat dels dominis que la teva organització utilitza per iniciar sessió.',
       formFieldLabel__domain: 'Dominis',

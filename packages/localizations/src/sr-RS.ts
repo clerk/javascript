@@ -196,7 +196,7 @@ export const srRS: LocalizationResource = {
       },
       warning: 'Kada se provajder izabere, ne možete ga ponovo menjati dok se konfiguracija ne završi',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'Dodaj SSO domene',
       subtitle: 'Dodajte i potvrdite vlasništvo nad domenima koje vaša organizacija koristi za prijavu.',
       formFieldLabel__domain: 'Domeni',

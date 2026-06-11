@@ -196,7 +196,7 @@ export const ruRU: LocalizationResource = {
       },
       warning: 'После выбора поставщика вы не сможете изменить его до завершения настройки',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'Добавить домены SSO',
       subtitle: 'Добавьте и подтвердите право собственности на домены, которые ваша организация использует для входа.',
       formFieldLabel__domain: 'Домены',

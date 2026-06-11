@@ -203,7 +203,7 @@ export const teIN: LocalizationResource = {
       },
       warning: 'ఒకసారి ప్రొవైడర్ ఎంచుకున్న తర్వాత, కాన్ఫిగరేషన్ ముగిసే వరకు మీరు మళ్లీ మార్చలేరు',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'SSO డొమైన్‌లను జోడించండి',
       subtitle: 'మీ సంస్థ సైన్ ఇన్ చేయడానికి ఉపయోగించే డొమైన్‌ల యాజమాన్యాన్ని జోడించి ధృవీకరించండి.',
       formFieldLabel__domain: 'డొమైన్‌లు',

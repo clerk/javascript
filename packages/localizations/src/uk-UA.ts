@@ -196,7 +196,7 @@ export const ukUA: LocalizationResource = {
       },
       warning: 'Після вибору постачальника ви не зможете змінити його, доки не буде завершено налаштування',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'Додати домени SSO',
       subtitle: 'Додайте та підтвердьте право власності на домени, які ваша організація використовує для входу.',
       formFieldLabel__domain: 'Домени',

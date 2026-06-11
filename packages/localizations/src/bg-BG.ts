@@ -197,7 +197,7 @@ export const bgBG: LocalizationResource = {
       },
       warning: 'След като изберете доставчик, не можете да го промените, докато конфигурацията не приключи',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'Добавяне на SSO домейни',
       subtitle: 'Добавете и потвърдете собствеността върху домейните, които вашата организация използва за вход.',
       formFieldLabel__domain: 'Домейни',

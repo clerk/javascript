@@ -203,7 +203,7 @@ export const koKR: LocalizationResource = {
       },
       warning: '공급자를 선택하면 구성이 완료될 때까지 다시 변경할 수 없습니다',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'SSO 도메인 추가',
       subtitle: '조직에서 로그인에 사용하는 도메인의 소유권을 추가하고 확인하세요.',
       formFieldLabel__domain: '도메인',

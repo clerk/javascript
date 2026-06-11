@@ -201,7 +201,7 @@ export const faIR: LocalizationResource = {
       },
       warning: 'پس از انتخاب یک ارائه‌دهنده، نمی‌توانید آن را تا پایان پیکربندی تغییر دهید',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'افزودن دامنه‌های SSO',
       subtitle: 'مالکیت دامنه‌هایی را که سازمان شما برای ورود استفاده می‌کند، اضافه و تأیید کنید.',
       formFieldLabel__domain: 'دامنه‌ها',

@@ -196,7 +196,7 @@ export const daDK: LocalizationResource = {
       },
       warning: 'Når en udbyder er valgt, kan du ikke ændre den, før konfigurationen er færdig',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'Tilføj SSO-domæner',
       subtitle: 'Tilføj og bekræft ejerskabet af de domæner, din organisation bruger til at logge ind.',
       formFieldLabel__domain: 'Domæner',

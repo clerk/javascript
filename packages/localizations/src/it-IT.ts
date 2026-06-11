@@ -202,7 +202,7 @@ export const itIT: LocalizationResource = {
       },
       warning: 'Una volta selezionato un provider non potrai cambiarlo fino al termine della configurazione',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'Aggiungi domini SSO',
       subtitle: 'Aggiungi e verifica la proprietà dei domini che la tua organizzazione utilizza per accedere.',
       formFieldLabel__domain: 'Domini',

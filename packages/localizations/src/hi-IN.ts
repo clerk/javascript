@@ -202,7 +202,7 @@ export const hiIN: LocalizationResource = {
       },
       warning: 'एक बार प्रदाता का चयन करने के बाद आप कॉन्फ़िगरेशन समाप्त होने तक इसे बदल नहीं सकते',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'SSO डोमेन जोड़ें',
       subtitle: 'अपने संगठन द्वारा साइन इन के लिए उपयोग किए जाने वाले डोमेन का स्वामित्व जोड़ें और सत्यापित करें।',
       formFieldLabel__domain: 'डोमेन',

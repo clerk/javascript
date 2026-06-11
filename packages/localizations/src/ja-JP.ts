@@ -207,7 +207,7 @@ export const jaJP: LocalizationResource = {
       },
       warning: 'プロバイダーを選択すると、設定が完了するまで変更できません',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'SSO ドメインを追加',
       subtitle: '組織がサインインに使用するドメインを追加し、所有権を確認します。',
       formFieldLabel__domain: 'ドメイン',

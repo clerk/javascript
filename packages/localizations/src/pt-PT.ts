@@ -204,7 +204,7 @@ export const ptPT: LocalizationResource = {
       },
       warning: 'Depois de um fornecedor ser selecionado não pode ser alterado até que a configuração esteja terminada',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'Adicionar domínios de SSO',
       subtitle: 'Adicione e verifique a propriedade dos domínios que a sua organização utiliza para iniciar sessão.',
       formFieldLabel__domain: 'Domínios',

@@ -200,7 +200,7 @@ export const csCZ: LocalizationResource = {
       },
       warning: 'Jakmile vyberete poskytovatele, nelze ho změnit, dokud nebude konfigurace dokončena',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'Přidat domény SSO',
       subtitle: 'Přidejte a ověřte vlastnictví domén, které vaše organizace používá k přihlášení.',
       formFieldLabel__domain: 'Domény',

@@ -196,7 +196,7 @@ export const arSA: LocalizationResource = {
       },
       warning: 'بمجرد اختيار المزود لا يمكنك التغيير مرة أخرى حتى انتهاء التكوين',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'إضافة نطاقات SSO',
       subtitle: 'أضِف نطاقات مؤسستك المستخدمة لتسجيل الدخول وتحقّق من ملكيتها.',
       formFieldLabel__domain: 'النطاقات',

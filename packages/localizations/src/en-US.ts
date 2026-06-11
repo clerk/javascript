@@ -269,7 +269,7 @@ export const enUS: LocalizationResource = {
       },
       warning: 'Once a provider is selected you cannot change again until the configuration is over',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'Add SSO domains',
       subtitle: 'Add and verify ownership of the domains your organization uses to sign in.',
       formFieldLabel__domain: 'Domains',

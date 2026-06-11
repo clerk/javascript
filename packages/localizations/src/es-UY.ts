@@ -196,7 +196,7 @@ export const esUY: LocalizationResource = {
       },
       warning: 'Una vez que se selecciona un proveedor no podés cambiarlo hasta que termine la configuración',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'Agregar dominios SSO',
       subtitle: 'Agregá y verificá la propiedad de los dominios que tu organización usa para iniciar sesión.',
       formFieldLabel__domain: 'Dominios',

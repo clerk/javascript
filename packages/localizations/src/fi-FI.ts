@@ -224,7 +224,7 @@ export const fiFI: LocalizationResource = {
       },
       warning: 'Kun palveluntarjoaja on valittu, et voi vaihtaa sitä ennen kuin määritys on valmis',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'Lisää SSO-verkkotunnuksia',
       subtitle: 'Lisää ja vahvista niiden verkkotunnusten omistajuus, joita organisaatiosi käyttää kirjautumiseen.',
       formFieldLabel__domain: 'Verkkotunnukset',

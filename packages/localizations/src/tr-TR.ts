@@ -196,7 +196,7 @@ export const trTR: LocalizationResource = {
       },
       warning: 'Bir sağlayıcı seçildikten sonra yapılandırma bitene kadar tekrar değiştiremezsiniz',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'SSO alan adları ekle',
       subtitle: 'Kuruluşunuzun oturum açmak için kullandığı alan adlarının sahipliğini ekleyin ve doğrulayın.',
       formFieldLabel__domain: 'Alan adları',

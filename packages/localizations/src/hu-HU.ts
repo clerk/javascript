@@ -225,7 +225,7 @@ export const huHU: LocalizationResource = {
       },
       warning: 'Miután kiválasztotta a szolgáltatót, nem módosíthatja, amíg a konfiguráció be nem fejeződik',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'SSO-tartományok hozzáadása',
       subtitle:
         'Adja hozzá és igazolja azon tartományok tulajdonjogát, amelyeket szervezete a bejelentkezéshez használ.',

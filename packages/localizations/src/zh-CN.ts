@@ -196,7 +196,7 @@ export const zhCN: LocalizationResource = {
       },
       warning: '选择提供商后,在配置完成之前无法再次更改',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: '添加 SSO 域名',
       subtitle: '添加并验证贵组织用于登录的域名的所有权。',
       formFieldLabel__domain: '域名',

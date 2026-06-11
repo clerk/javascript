@@ -205,7 +205,7 @@ export const frFR: LocalizationResource = {
       warning:
         "Une fois un fournisseur sélectionné, vous ne pourrez plus en changer jusqu'à la fin de la configuration",
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'Ajouter des domaines SSO',
       subtitle: 'Ajoutez et vérifiez la propriété des domaines que votre organisation utilise pour se connecter.',
       formFieldLabel__domain: 'Domaines',

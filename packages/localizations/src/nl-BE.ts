@@ -196,7 +196,7 @@ export const nlBE: LocalizationResource = {
       },
       warning: 'Zodra een provider is geselecteerd, kun je deze niet meer wijzigen totdat de configuratie is voltooid',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'SSO-domeinen toevoegen',
       subtitle: 'Voeg de domeinen toe die je organisatie gebruikt om aan te melden en verifieer het eigendom ervan.',
       formFieldLabel__domain: 'Domeinen',

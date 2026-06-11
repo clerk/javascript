@@ -196,7 +196,7 @@ export const svSE: LocalizationResource = {
       },
       warning: 'När en leverantör har valts kan du inte ändra igen förrän konfigurationen är klar',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'Lägg till SSO-domäner',
       subtitle: 'Lägg till och verifiera ägarskapet för de domäner som din organisation använder för att logga in.',
       formFieldLabel__domain: 'Domäner',

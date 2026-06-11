@@ -203,7 +203,7 @@ export const deDE: LocalizationResource = {
       warning:
         'Sobald ein Anbieter ausgewählt ist, können Sie ihn nicht mehr ändern, bis die Konfiguration abgeschlossen ist',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'SSO-Domains hinzufügen',
       subtitle:
         'Fügen Sie die Domains hinzu, die Ihre Organisation zur Anmeldung verwendet, und verifizieren Sie deren Eigentümerschaft.',

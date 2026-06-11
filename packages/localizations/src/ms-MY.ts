@@ -204,7 +204,7 @@ export const msMY: LocalizationResource = {
       },
       warning: 'Setelah pembekal dipilih anda tidak boleh menukar lagi sehingga konfigurasi selesai',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'Tambah domain SSO',
       subtitle: 'Tambah dan sahkan pemilikan domain yang digunakan organisasi anda untuk log masuk.',
       formFieldLabel__domain: 'Domain',

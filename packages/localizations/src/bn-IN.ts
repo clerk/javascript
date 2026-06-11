@@ -202,7 +202,7 @@ export const bnIN: LocalizationResource = {
       },
       warning: 'একবার প্রদানকারী নির্বাচন করার পরে, কনফিগারেশন শেষ না হওয়া পর্যন্ত আপনি আবার পরিবর্তন করতে পারবেন না',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'SSO ডোমেইন যোগ করুন',
       subtitle: 'আপনার প্রতিষ্ঠান সাইন ইন করতে যে ডোমেইনগুলি ব্যবহার করে তার মালিকানা যোগ করুন এবং যাচাই করুন।',
       formFieldLabel__domain: 'ডোমেইন',

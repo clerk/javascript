@@ -196,7 +196,7 @@ export const beBY: LocalizationResource = {
       },
       warning: 'Пасля выбару правайдэра вы не зможаце змяніць яго, пакуль не скончыце канфігурацыю',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'Дадаць дамены SSO',
       subtitle: 'Дадайце і пацвердзіце права ўласнасці на дамены, якія ваша арганізацыя выкарыстоўвае для ўваходу.',
       formFieldLabel__domain: 'Дамены',

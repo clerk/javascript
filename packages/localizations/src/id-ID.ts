@@ -196,7 +196,7 @@ export const idID: LocalizationResource = {
       },
       warning: 'Setelah penyedia dipilih, Anda tidak dapat mengubahnya lagi sampai konfigurasi selesai',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'Tambahkan domain SSO',
       subtitle: 'Tambahkan dan verifikasi kepemilikan domain yang digunakan organisasi Anda untuk masuk.',
       formFieldLabel__domain: 'Domain',

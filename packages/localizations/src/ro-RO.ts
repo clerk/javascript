@@ -202,7 +202,7 @@ export const roRO: LocalizationResource = {
       },
       warning: 'Odată ce un furnizor este selectat, nu îl puteți schimba până când configurația nu este finalizată',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'Adaugă domenii SSO',
       subtitle:
         'Adaugă și verifică dreptul de proprietate asupra domeniilor pe care organizația ta le folosește pentru autentificare.',

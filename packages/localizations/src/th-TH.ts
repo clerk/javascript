@@ -200,7 +200,7 @@ export const thTH: LocalizationResource = {
       },
       warning: 'เมื่อเลือกผู้ให้บริการแล้วคุณไม่สามารถเปลี่ยนได้อีกจนกว่าการกำหนดค่าจะเสร็จสิ้น',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'เพิ่มโดเมน SSO',
       subtitle: 'เพิ่มและยืนยันความเป็นเจ้าของโดเมนที่องค์กรของคุณใช้ในการลงชื่อเข้าใช้',
       formFieldLabel__domain: 'โดเมน',

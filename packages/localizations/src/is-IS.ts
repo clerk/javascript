@@ -224,7 +224,7 @@ export const isIS: LocalizationResource = {
       },
       warning: 'Þegar þjónustuaðili hefur verið valinn er ekki hægt að breyta aftur fyrr en stillingu er lokið',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'Bæta við SSO-lénum',
       subtitle: 'Bættu við og staðfestu eignarhald á lénunum sem fyrirtækið þitt notar til að skrá sig inn.',
       formFieldLabel__domain: 'Lén',

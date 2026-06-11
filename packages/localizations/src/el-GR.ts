@@ -196,7 +196,7 @@ export const elGR: LocalizationResource = {
       },
       warning: 'Μόλις επιλεγεί ένας πάροχος δεν μπορείτε να τον αλλάξετε μέχρι να ολοκληρωθεί η ρύθμιση',
     },
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: 'Προσθήκη τομέων SSO',
       subtitle: 'Προσθέστε και επαληθεύστε την κυριότητα των τομέων που χρησιμοποιεί ο οργανισμός σας για σύνδεση.',
       formFieldLabel__domain: 'Τομείς',

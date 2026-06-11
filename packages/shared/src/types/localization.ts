@@ -1368,7 +1368,7 @@ export type __internal_LocalizationResource = {
       };
       warning: LocalizationValue;
     };
-    verifyDomainsStep: {
+    organizationDomainsStep: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
       formFieldLabel__domain: LocalizationValue;
