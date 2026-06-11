@@ -10,7 +10,7 @@
     "moduleResolution": "bundler",
     "moduleDetection": "force",
     "module": "preserve",
-    "lib": ["ES2023", "DOM"],
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "jsx": "react-jsx",
     "isolatedModules": true,
     "forceConsistentCasingInFileNames": true,
@@ -19,5 +19,5 @@
     "noEmit": true
   },
   "include": ["src"],
-  "exclude": ["node_modules", "**/*.test.ts", "**/*.test.tsx"]
+  "exclude": ["node_modules"]
 }

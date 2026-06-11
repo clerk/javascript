@@ -332,7 +332,7 @@ export const CheckoutComplete = () => {
               localizationKey={
                 freeTrialEndsAt
                   ? localizationKeys('billing.checkout.title__trialSuccess')
-                  : totals.totalDueNow.amount > 0
+                  : totals.totalDueNow && totals.totalDueNow.amount > 0
                     ? localizationKeys('billing.checkout.title__paymentSuccessful')
                     : localizationKeys('billing.checkout.title__subscriptionSuccessful')
               }
@@ -387,7 +387,7 @@ export const CheckoutComplete = () => {
                 }),
               })}
               localizationKey={
-                totals.totalDueNow.amount > 0
+                totals.totalDueNow && totals.totalDueNow.amount > 0
                   ? localizationKeys('billing.checkout.description__paymentSuccessful')
                   : localizationKeys('billing.checkout.description__subscriptionSuccessful')
               }
@@ -417,10 +417,14 @@ export const CheckoutComplete = () => {
         })}
       >
         <LineItems.Root>
-          <LineItems.Group variant='secondary'>
-            <LineItems.Title title={localizationKeys('billing.checkout.lineItems.title__totalPaid')} />
-            <LineItems.Description text={`${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`} />
-          </LineItems.Group>
+          {totals.totalDueNow ? (
+            <LineItems.Group variant='secondary'>
+              <LineItems.Title title={localizationKeys('billing.checkout.lineItems.title__totalPaid')} />
+              <LineItems.Description
+                text={`${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`}
+              />
+            </LineItems.Group>
+          ) : null}
 
           {freeTrialEndsAt ? (
             <LineItems.Group variant='secondary'>
@@ -431,7 +435,7 @@ export const CheckoutComplete = () => {
           <LineItems.Group variant='secondary'>
             <LineItems.Title
               title={
-                totals.totalDueNow.amount > 0 || freeTrialEndsAt !== null
+                (totals.totalDueNow && totals.totalDueNow.amount > 0) || freeTrialEndsAt !== null
                   ? localizationKeys('billing.checkout.lineItems.title__paymentMethod')
                   : localizationKeys('billing.checkout.lineItems.title__subscriptionBegins')
               }
@@ -439,7 +443,7 @@ export const CheckoutComplete = () => {
 
             <LineItems.Description
               text={
-                totals.totalDueNow.amount > 0 || freeTrialEndsAt !== null
+                (totals.totalDueNow && totals.totalDueNow.amount > 0) || freeTrialEndsAt !== null
                   ? paymentMethod
                     ? paymentMethod.paymentType !== 'card'
                       ? paymentMethod.paymentType
