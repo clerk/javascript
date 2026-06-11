@@ -3,7 +3,7 @@
 import { MosaicProvider } from '@clerk/ui/mosaic/MosaicProvider';
 import { RotateCcwIcon, SlidersHorizontalIcon } from 'lucide-react';
 import type React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { generateKnobs, initKnobValues } from '@/lib/generateKnobs';
@@ -27,6 +27,8 @@ export function StoryPreview({ name, storyModule }: StoryPreviewProps) {
   const StoryComp = storyModule[name] as React.ComponentType<Record<string, unknown>>;
   const playground = usePlayground();
   const [variablesOpen, setVariablesOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   if (!StoryComp) {
     return (
@@ -57,13 +59,16 @@ export function StoryPreview({ name, storyModule }: StoryPreviewProps) {
       </div>
 
       <div className='flex min-h-40 items-center justify-center p-10'>
-        <MosaicProvider
-          appearance={{
-            variables,
-          }}
-        >
-          <StoryComp {...values} />
-        </MosaicProvider>
+        {mounted && (
+          <MosaicProvider
+            cssLayerName='components'
+            appearance={{
+              variables,
+            }}
+          >
+            <StoryComp {...values} />
+          </MosaicProvider>
+        )}
       </div>
 
       <div className='flex items-center justify-start gap-1 border-t px-2 py-1.5'>
