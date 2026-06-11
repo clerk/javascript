@@ -51,13 +51,15 @@ export function userAgentIsRobot(userAgent: string): boolean {
 
 /**
  * Resolves the `Navigator` object from either the DOM `window` (standard browsers)
- * or the global scope. Web/Service Workers — e.g. an MV3 extension background service
- * worker — have no `window`, but do expose a `WorkerNavigator` as `globalThis.navigator`
- * with the `onLine`/`userAgent` properties our heuristics rely on.
+ * or a Web/Service Worker global scope. An MV3 extension background service worker
+ * has no `window`, but runs inside a `WorkerGlobalScope` that exposes a
+ * `WorkerNavigator` as `self.navigator` with the `onLine`/`userAgent` properties
+ * our heuristics rely on.
  *
- * Returns `null` only when no navigator is available anywhere. We intentionally do NOT
- * treat the absence of a navigator as a valid environment — only a real navigator object
- * enables the browser/online heuristics below.
+ * We intentionally gate the worker fallback on a real `WorkerGlobalScope` rather than
+ * accepting any global `navigator`. Modern Node exposes `globalThis.navigator`, so a
+ * blanket global-navigator check would make Node SSR look like a browser; requiring a
+ * `WorkerGlobalScope` keeps SSR returning `null`.
  *
  * @returns
  */
@@ -65,8 +67,16 @@ function getNavigator(): Navigator | null {
   if (typeof window !== 'undefined' && window.navigator) {
     return window.navigator;
   }
-  if (typeof navigator !== 'undefined') {
-    return navigator;
+  const workerScope = globalThis as unknown as {
+    WorkerGlobalScope?: new (...args: never[]) => { navigator?: Navigator };
+    self?: { navigator?: Navigator };
+  };
+  if (
+    typeof workerScope.WorkerGlobalScope === 'function' &&
+    workerScope.self instanceof workerScope.WorkerGlobalScope &&
+    workerScope.self.navigator
+  ) {
+    return workerScope.self.navigator;
   }
   return null;
 }
