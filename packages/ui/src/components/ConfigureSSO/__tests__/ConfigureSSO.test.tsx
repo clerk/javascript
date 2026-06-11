@@ -86,7 +86,7 @@ describe('ConfigureSSO', () => {
       // No active organization ⇒ no organization domains to verify, so the wizard
       // renders its first step (verify-domain). The point of this test is that the
       // wizard renders at all without the manage-permission gate.
-      await findByText(/specify and verify the domains/i);
+      await findByText(/add and verify ownership of the domains/i);
       expect(queryByText(/you do not have permission to manage single sign-on/i)).not.toBeInTheDocument();
     });
   });
@@ -129,7 +129,7 @@ describe('ConfigureSSO', () => {
 
       const { findByText, queryByText } = render(<ConfigureSSO />, { wrapper });
 
-      await findByText(/specify and verify the domains/i);
+      await findByText(/add and verify ownership of the domains/i);
       expect(queryByText(/select your identity provider/i)).not.toBeInTheDocument();
     });
 

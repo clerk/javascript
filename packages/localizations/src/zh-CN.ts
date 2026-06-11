@@ -197,23 +197,11 @@ export const zhCN: LocalizationResource = {
       warning: '选择提供商后,在配置完成之前无法再次更改',
     },
     verifyDomainsStep: {
-      title: '验证域名',
-      subtitle: '指定并验证要配置 SSO 的域名。',
+      title: '添加 SSO 域名',
+      subtitle: '添加并验证贵组织用于登录的域名的所有权。',
       formFieldLabel__domain: '域名',
       formFieldInputPlaceholder__domain: '在此输入您的域名，然后点击添加即可开始',
       formButtonPrimary__add: '添加',
-      txtRecordInstructions: {
-        paragraph1: '将此 TXT 记录添加到您的 DNS 提供商。',
-        paragraph2: '记录生效后，我们会自动进行验证。这通常不到一分钟，但更新现有的 TXT 记录可能需要稍长时间。',
-      },
-      txtRecordTable: {
-        columns: {
-          domain: '域名',
-          type: '类型',
-          hostName: '主机 / 名称',
-          value: '值',
-        },
-      },
     },
   },
   createOrganization: {

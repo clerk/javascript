@@ -197,24 +197,11 @@ export const ruRU: LocalizationResource = {
       warning: 'После выбора поставщика вы не сможете изменить его до завершения настройки',
     },
     verifyDomainsStep: {
-      title: 'Подтвердить домен',
-      subtitle: 'Укажите и подтвердите домен для настройки SSO.',
+      title: 'Добавить домены SSO',
+      subtitle: 'Добавьте и подтвердите право собственности на домены, которые ваша организация использует для входа.',
       formFieldLabel__domain: 'Домены',
       formFieldInputPlaceholder__domain: 'Введите домен здесь и нажмите «Добавить», чтобы начать',
       formButtonPrimary__add: 'Добавить',
-      txtRecordInstructions: {
-        paragraph1: 'Добавьте эту TXT-запись к вашему DNS-провайдеру.',
-        paragraph2:
-          'Мы выполним проверку автоматически, как только запись станет активной. Обычно это занимает менее минуты, хотя обновление существующей TXT-записи может занять немного больше времени.',
-      },
-      txtRecordTable: {
-        columns: {
-          domain: 'Домен',
-          type: 'Тип',
-          hostName: 'Хост / Имя',
-          value: 'Значение',
-        },
-      },
     },
   },
   createOrganization: {

@@ -202,24 +202,11 @@ export const faIR: LocalizationResource = {
       warning: 'پس از انتخاب یک ارائه‌دهنده، نمی‌توانید آن را تا پایان پیکربندی تغییر دهید',
     },
     verifyDomainsStep: {
-      title: 'تأیید دامنه',
-      subtitle: 'دامنه‌ای را که می‌خواهید SSO برای آن پیکربندی شود، مشخص و تأیید کنید.',
+      title: 'افزودن دامنه‌های SSO',
+      subtitle: 'مالکیت دامنه‌هایی را که سازمان شما برای ورود استفاده می‌کند، اضافه و تأیید کنید.',
       formFieldLabel__domain: 'دامنه‌ها',
       formFieldInputPlaceholder__domain: 'دامنه خود را اینجا تایپ کنید و برای شروع روی افزودن کلیک کنید',
       formButtonPrimary__add: 'افزودن',
-      txtRecordInstructions: {
-        paragraph1: 'این رکورد TXT را به ارائه‌دهنده DNS خود اضافه کنید.',
-        paragraph2:
-          'به محض فعال شدن رکورد، به‌طور خودکار آن را تأیید می‌کنیم. این کار معمولاً کمتر از یک دقیقه طول می‌کشد، هرچند به‌روزرسانی یک رکورد TXT موجود ممکن است کمی بیشتر زمان ببرد.',
-      },
-      txtRecordTable: {
-        columns: {
-          domain: 'دامنه',
-          type: 'نوع',
-          hostName: 'میزبان / نام',
-          value: 'مقدار',
-        },
-      },
     },
   },
   createOrganization: {

@@ -203,24 +203,11 @@ export const hiIN: LocalizationResource = {
       warning: 'एक बार प्रदाता का चयन करने के बाद आप कॉन्फ़िगरेशन समाप्त होने तक इसे बदल नहीं सकते',
     },
     verifyDomainsStep: {
-      title: 'डोमेन सत्यापित करें',
-      subtitle: 'SSO कॉन्फ़िगर करने के लिए डोमेन निर्दिष्ट करें और सत्यापित करें।',
+      title: 'SSO डोमेन जोड़ें',
+      subtitle: 'अपने संगठन द्वारा साइन इन के लिए उपयोग किए जाने वाले डोमेन का स्वामित्व जोड़ें और सत्यापित करें।',
       formFieldLabel__domain: 'डोमेन',
       formFieldInputPlaceholder__domain: 'अपना डोमेन यहाँ टाइप करें और शुरू करने के लिए जोड़ें पर क्लिक करें',
       formButtonPrimary__add: 'जोड़ें',
-      txtRecordInstructions: {
-        paragraph1: 'इस TXT रिकॉर्ड को अपने DNS प्रदाता में जोड़ें।',
-        paragraph2:
-          'रिकॉर्ड सक्रिय होते ही हम स्वचालित रूप से सत्यापित कर देंगे। इसमें आमतौर पर एक मिनट से कम समय लगता है, हालाँकि किसी मौजूदा TXT रिकॉर्ड को अपडेट करने में थोड़ा अधिक समय लग सकता है।',
-      },
-      txtRecordTable: {
-        columns: {
-          domain: 'डोमेन',
-          type: 'प्रकार',
-          hostName: 'होस्ट / नाम',
-          value: 'मान',
-        },
-      },
     },
   },
   createOrganization: {

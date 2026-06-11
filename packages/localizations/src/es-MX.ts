@@ -198,24 +198,11 @@ export const esMX: LocalizationResource = {
       warning: 'Una vez que se selecciona un proveedor no puedes cambiarlo hasta que termine la configuración',
     },
     verifyDomainsStep: {
-      title: 'Verificar dominio',
-      subtitle: 'Especifica y verifica el dominio para configurar el SSO.',
+      title: 'Agregar dominios SSO',
+      subtitle: 'Agrega y verifica la propiedad de los dominios que tu organización usa para iniciar sesión.',
       formFieldLabel__domain: 'Dominios',
       formFieldInputPlaceholder__domain: 'Escribe aquí tu dominio y haz clic en Agregar para empezar',
       formButtonPrimary__add: 'Agregar',
-      txtRecordInstructions: {
-        paragraph1: 'Agrega este registro TXT a tu proveedor de DNS.',
-        paragraph2:
-          'Lo verificaremos automáticamente en cuanto el registro esté activo. Esto suele tardar menos de un minuto, aunque actualizar un registro TXT existente puede tardar un poco más.',
-      },
-      txtRecordTable: {
-        columns: {
-          domain: 'Dominio',
-          type: 'Tipo',
-          hostName: 'Host / Nombre',
-          value: 'Valor',
-        },
-      },
     },
   },
   createOrganization: {

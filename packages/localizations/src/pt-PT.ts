@@ -205,24 +205,11 @@ export const ptPT: LocalizationResource = {
       warning: 'Depois de um fornecedor ser selecionado não pode ser alterado até que a configuração esteja terminada',
     },
     verifyDomainsStep: {
-      title: 'Verificar domínio',
-      subtitle: 'Especifique e verifique o domínio para configurar o SSO.',
+      title: 'Adicionar domínios de SSO',
+      subtitle: 'Adicione e verifique a propriedade dos domínios que a sua organização utiliza para iniciar sessão.',
       formFieldLabel__domain: 'Domínios',
       formFieldInputPlaceholder__domain: 'Escreva aqui o seu domínio e clique em adicionar para começar',
       formButtonPrimary__add: 'Adicionar',
-      txtRecordInstructions: {
-        paragraph1: 'Adicione este registo TXT ao seu fornecedor de DNS.',
-        paragraph2:
-          'Verificaremos automaticamente assim que o registo estiver ativo. Normalmente demora menos de um minuto, embora a atualização de um registo TXT existente possa demorar um pouco mais.',
-      },
-      txtRecordTable: {
-        columns: {
-          domain: 'Domínio',
-          type: 'Tipo',
-          hostName: 'Anfitrião / Nome',
-          value: 'Valor',
-        },
-      },
     },
   },
   createOrganization: {

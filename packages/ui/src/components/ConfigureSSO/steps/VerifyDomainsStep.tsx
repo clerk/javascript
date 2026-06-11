@@ -3,6 +3,7 @@ import type React from 'react';
 import { useState } from 'react';
 
 import {
+  Badge,
   Box,
   Button,
   Col,
@@ -12,28 +13,21 @@ import {
   Icon,
   localizationKeys,
   Spinner,
-  Table,
-  Tbody,
-  Td,
   Text,
-  Th,
-  Thead,
-  Tr,
   useLocalizations,
 } from '@/customizables';
 import { Alert } from '@/elements/Alert';
 import { useCardState } from '@/elements/contexts';
 import { Field } from '@/elements/FieldControl';
 import { Form } from '@/elements/Form';
-import { TagPill } from '@/elements/TagInput';
 import { useClipboard } from '@/hooks';
-import { Checkmark, Clipboard } from '@/icons';
+import { Checkmark, Clipboard, Close } from '@/icons';
+import { common } from '@/styledSystem';
 import { useFormControl } from '@/ui/utils/useFormControl';
-import { handleError } from '@/utils/errorHandler';
+import { getFieldError, getGlobalError } from '@/utils/errorHandler';
 
 import { useConfigureSSO } from '../ConfigureSSOContext';
 import { Step } from '../elements/Step';
-import { InnerStepCounter } from '../elements/Wizard/InnerStepCounter';
 import { useWizard } from '../elements/Wizard/WizardContext';
 
 export const VerifyDomainsStep = (): JSX.Element => {
@@ -51,7 +45,8 @@ export const VerifyDomainsStep = (): JSX.Element => {
     try {
       await createDomain(domain);
     } catch (err: any) {
-      handleError(err, [], card.setError);
+      const apiError = getFieldError(err) ?? getGlobalError(err);
+      card.setError(apiError);
     }
   };
 
@@ -68,62 +63,52 @@ export const VerifyDomainsStep = (): JSX.Element => {
         <Step.Header
           title={t(localizationKeys('configureSSO.verifyDomainsStep.title'))}
           description={t(localizationKeys('configureSSO.verifyDomainsStep.subtitle'))}
-        >
-          <InnerStepCounter />
-        </Step.Header>
+        />
 
         <Step.Body>
-          <Step.Section sx={t => ({ gap: t.space.$5 })}>
-            <Col>
+          <Step.Section
+            fill
+            sx={t => ({ gap: t.space.$5, minHeight: 0 })}
+          >
+            <Col sx={t => ({ gap: t.space.$4 })}>
               <DomainsField
                 onSubmit={handleCreateDomain}
                 organizationDomains={organizationDomains}
               />
 
-              {!!organizationDomains?.length && (
-                <Flex
-                  wrap='wrap'
-                  sx={t => ({ gap: t.space.$2, marginTop: t.space.$4 })}
-                >
-                  {organizationDomains.map(domain => (
-                    <TagPill
-                      key={domain.id}
-                      onRemoveClick={() => {
-                        // TODO ORGS-1623 - Add dialog for domain deletion confirmation
-                        void domain.delete().then(() => revalidate());
-                      }}
-                    >
-                      {domain.name}
-                    </TagPill>
-                  ))}
-                </Flex>
-              )}
-
               {card.error && (
                 <Alert
                   variant='danger'
                   title={card.error}
-                  sx={t => ({ marginTop: t.space.$4 })}
                 />
               )}
             </Col>
 
             {!!organizationDomains?.length && (
-              <Col sx={t => ({ gap: t.space.$3 })}>
-                <Col sx={t => ({ gap: t.space.$4 })}>
-                  <Text
-                    localizationKey={localizationKeys(
-                      'configureSSO.verifyDomainsStep.txtRecordInstructions.paragraph1',
-                    )}
+              <Col
+                elementDescriptor={descriptors.configureSSOVerifyDomainList}
+                sx={t => ({
+                  gap: t.space.$3,
+                  flex: '0 1 auto',
+                  minHeight: 0,
+                  overflowY: 'auto',
+                  // Inset so card shadows/focus rings are not clipped by the
+                  // scroll container's overflow.
+                  marginInline: `calc(${t.space.$1} * -1)`,
+                  paddingInline: t.space.$1,
+                  ...common.unstyledScrollbar(t),
+                })}
+              >
+                {organizationDomains.map(domain => (
+                  <DomainCard
+                    key={domain.id}
+                    domain={domain}
+                    onRemove={() => {
+                      // TODO ORGS-1623 - Add dialog for domain deletion confirmation
+                      void domain.delete().then(() => revalidate());
+                    }}
                   />
-                  <Text
-                    localizationKey={localizationKeys(
-                      'configureSSO.verifyDomainsStep.txtRecordInstructions.paragraph2',
-                    )}
-                  />
-                </Col>
-
-                <TxtRecordTable organizationDomains={organizationDomains} />
+                ))}
               </Col>
             )}
           </Step.Section>
@@ -219,80 +204,157 @@ const DomainsField = ({
   );
 };
 
-const TxtRecordTable = ({
-  organizationDomains,
+const DomainCard = ({
+  domain,
+  onRemove,
 }: {
-  organizationDomains: OrganizationDomainResource[] | undefined;
+  domain: OrganizationDomainResource;
+  onRemove: () => void;
 }): JSX.Element => {
-  return (
-    <Table>
-      <Thead>
-        <Tr>
-          <Th>Domain</Th>
-          <Th>Type</Th>
-          <Th>Host / Name</Th>
-          <Th>Value</Th>
-        </Tr>
-      </Thead>
-      <Tbody>
-        {organizationDomains?.map(domain => {
-          const ownershipVerification = domain.ownershipVerification;
-          const isVerified = ownershipVerification?.status === 'verified';
+  const ownershipVerification = domain.ownershipVerification;
+  const isVerified = ownershipVerification?.status === 'verified';
+  const cardId = isVerified ? 'verified' : 'unverified';
 
-          return (
-            <Tr key={domain.id}>
-              <Td>
-                <Flex
-                  as='span'
-                  align='center'
-                  sx={t => ({ gap: t.space.$2 })}
-                >
-                  {/* TODO -> Add animated transition once the status changes */}
-                  {isVerified ? (
-                    <Icon
-                      icon={Checkmark}
-                      colorScheme='success'
-                      sx={t => ({ flexShrink: 0, width: t.sizes.$3, height: t.sizes.$3 })}
-                    />
-                  ) : (
-                    <Spinner
-                      size='xs'
-                      colorScheme='neutral'
-                      sx={{ flexShrink: 0 }}
-                    />
-                  )}
-                  <Text as='span'>{domain.name}</Text>
-                </Flex>
-              </Td>
-              <Td>
-                <Text as='span'>TXT</Text>
-              </Td>
-              <Td>
-                <Text as='span'>{ownershipVerification?.txtRecordName ?? '—'}</Text>
-              </Td>
-              <Td sx={{ width: '50%', maxWidth: '1px' }}>
-                {ownershipVerification?.txtRecordValue ? (
-                  <TxtRecordValueCell value={ownershipVerification.txtRecordValue} />
-                ) : (
-                  <Text
-                    as='span'
-                    colorScheme='secondary'
-                  >
-                    —
-                  </Text>
-                )}
-              </Td>
-            </Tr>
-          );
-        })}
-      </Tbody>
-    </Table>
+  return (
+    <Col
+      elementDescriptor={descriptors.configureSSOVerifyDomainCard}
+      elementId={descriptors.configureSSOVerifyDomainCard.setId(cardId)}
+      sx={t => ({
+        borderWidth: t.borderWidths.$normal,
+        borderStyle: t.borderStyles.$solid,
+        borderColor: t.colors.$borderAlpha150,
+        borderRadius: t.radii.$lg,
+        background: t.colors.$colorBackground,
+      })}
+    >
+      <Flex
+        align='center'
+        justify='between'
+        sx={t => ({ gap: t.space.$2, padding: t.space.$4, paddingBottom: t.space.$2 })}
+      >
+        <Flex
+          align='center'
+          sx={t => ({ gap: t.space.$2, minWidth: 0 })}
+        >
+          <Text
+            as='span'
+            sx={t => ({ fontWeight: t.fontWeights.$medium, overflow: 'hidden', textOverflow: 'ellipsis' })}
+          >
+            {domain.name}
+          </Text>
+
+          <Badge
+            elementDescriptor={descriptors.configureSSOVerifyDomainCardBadge}
+            elementId={descriptors.configureSSOVerifyDomainCardBadge.setId(cardId)}
+            colorScheme={isVerified ? 'success' : 'danger'}
+            localizationKey={
+              isVerified
+                ? localizationKeys('configureSSO.verifyDomainsStep.domainCard.badge__verified')
+                : localizationKeys('configureSSO.verifyDomainsStep.domainCard.badge__unverified')
+            }
+          />
+
+          {!isVerified && (
+            <Spinner
+              size='xs'
+              colorScheme='neutral'
+              sx={t => ({ flexShrink: 0, marginInlineStart: t.space.$1 })}
+            />
+          )}
+        </Flex>
+
+        <Button
+          elementDescriptor={descriptors.configureSSOVerifyDomainCardRemoveButton}
+          variant='ghost'
+          colorScheme='neutral'
+          aria-label='Remove domain'
+          onClick={onRemove}
+          sx={t => ({ flexShrink: 0, padding: t.space.$1 })}
+        >
+          <Icon
+            icon={Close}
+            sx={t => ({ width: t.sizes.$4, height: t.sizes.$4, color: t.colors.$colorMutedForeground })}
+          />
+        </Button>
+      </Flex>
+
+      {/* TODO -> Add height animation when verified */}
+      {ownershipVerification?.verifiedAt ? (
+        <Text
+          as='p'
+          colorScheme='secondary'
+          localizationKey={localizationKeys('configureSSO.verifyDomainsStep.domainCard.verifiedAtLabel', {
+            date: ownershipVerification.verifiedAt,
+          })}
+          sx={t => ({ padding: t.space.$4, paddingTop: 0 })}
+        />
+      ) : (
+        <TxtRecord ownershipVerification={ownershipVerification} />
+      )}
+    </Col>
   );
 };
 
-const TxtRecordValueCell = ({ value }: { value: string }): JSX.Element => {
-  const { onCopy, hasCopied } = useClipboard(value);
+const TxtRecord = ({
+  ownershipVerification,
+}: {
+  ownershipVerification: OrganizationDomainResource['ownershipVerification'];
+}): JSX.Element => {
+  return (
+    <Col
+      elementDescriptor={descriptors.configureSSOVerifyDomainCardTxtRecord}
+      sx={t => ({ gap: t.space.$3, paddingInline: t.space.$4, paddingBottom: t.space.$4 })}
+    >
+      <Text
+        as='p'
+        colorScheme='secondary'
+        localizationKey={localizationKeys('configureSSO.verifyDomainsStep.domainCard.txtRecord.instructions')}
+        sx={t => ({ fontSize: t.fontSizes.$sm })}
+      />
 
+      <Box
+        sx={t => ({
+          borderTopWidth: t.borderWidths.$normal,
+          borderTopStyle: t.borderStyles.$solid,
+          borderTopColor: t.colors.$borderAlpha100,
+          marginInline: `calc(${t.space.$4} * -1)`,
+        })}
+      />
+
+      <Flex
+        wrap='wrap'
+        sx={t => ({ gap: t.space.$6 })}
+      >
+        {/* TODO -> Label name name need to use badge components */}
+        <RecordEntry
+          label={localizationKeys('configureSSO.verifyDomainsStep.domainCard.txtRecord.typeLabel')}
+          value='TXT'
+        />
+        <RecordEntry
+          label={localizationKeys('configureSSO.verifyDomainsStep.domainCard.txtRecord.hostLabel')}
+          value={ownershipVerification?.txtRecordName ?? '@'}
+        />
+      </Flex>
+
+      {/* TODO -> TXT record value needs to use a readonly input */}
+      <RecordEntry
+        label={localizationKeys('configureSSO.verifyDomainsStep.domainCard.txtRecord.valueLabel')}
+        value={ownershipVerification?.txtRecordValue ?? '—'}
+        copyable={!!ownershipVerification?.txtRecordValue}
+      />
+    </Col>
+  );
+};
+
+const RecordEntry = ({
+  label,
+  value,
+  copyable = false,
+}: {
+  label: ReturnType<typeof localizationKeys>;
+  value: string;
+  copyable?: boolean;
+}): JSX.Element => {
   return (
     <Flex
       align='center'
@@ -301,19 +363,54 @@ const TxtRecordValueCell = ({ value }: { value: string }): JSX.Element => {
       <Text
         as='span'
         colorScheme='secondary'
-        title={value}
-        sx={{
-          fontFamily: 'monospace',
-          display: 'block',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-          minWidth: 0,
-          flex: 1,
-        }}
-      >
-        {value}
-      </Text>
+        localizationKey={label}
+        sx={t => ({ fontSize: t.fontSizes.$sm, flexShrink: 0 })}
+      />
+      {copyable ? <CopyableValue value={value} /> : <RecordChip>{value}</RecordChip>}
+    </Flex>
+  );
+};
+
+const RecordChip = ({ children }: { children: React.ReactNode }): JSX.Element => (
+  <Box
+    elementDescriptor={descriptors.configureSSOVerifyDomainCardTxtRecordValue}
+    sx={t => ({
+      borderWidth: t.borderWidths.$normal,
+      borderStyle: t.borderStyles.$solid,
+      borderColor: t.colors.$borderAlpha150,
+      borderRadius: t.radii.$md,
+      background: t.colors.$neutralAlpha50,
+      paddingInline: t.space.$1x5,
+      paddingBlock: t.space.$0x5,
+      minWidth: 0,
+    })}
+  >
+    <Text
+      as='span'
+      sx={t => ({
+        fontFamily: t.fonts.$buttons,
+        fontSize: t.fontSizes.$xs,
+        display: 'block',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+      })}
+    >
+      {children}
+    </Text>
+  </Box>
+);
+
+const CopyableValue = ({ value }: { value: string }): JSX.Element => {
+  const { onCopy, hasCopied } = useClipboard(value);
+
+  return (
+    <Flex
+      align='center'
+      title={value}
+      sx={t => ({ gap: t.space.$1, minWidth: 0, flex: 1 })}
+    >
+      <RecordChip>{value}</RecordChip>
       <Button
         colorScheme='secondary'
         aria-label='Copy value'

@@ -197,24 +197,11 @@ export const idID: LocalizationResource = {
       warning: 'Setelah penyedia dipilih, Anda tidak dapat mengubahnya lagi sampai konfigurasi selesai',
     },
     verifyDomainsStep: {
-      title: 'Verifikasi domain',
-      subtitle: 'Tentukan dan verifikasi domain untuk mengonfigurasi SSO.',
+      title: 'Tambahkan domain SSO',
+      subtitle: 'Tambahkan dan verifikasi kepemilikan domain yang digunakan organisasi Anda untuk masuk.',
       formFieldLabel__domain: 'Domain',
       formFieldInputPlaceholder__domain: 'Ketik domain Anda di sini dan klik tambah untuk memulai',
       formButtonPrimary__add: 'Tambah',
-      txtRecordInstructions: {
-        paragraph1: 'Tambahkan rekaman TXT ini ke penyedia DNS Anda.',
-        paragraph2:
-          'Kami akan memverifikasi secara otomatis setelah rekaman aktif. Ini biasanya memerlukan waktu kurang dari satu menit, meskipun memperbarui rekaman TXT yang sudah ada mungkin memerlukan waktu sedikit lebih lama.',
-      },
-      txtRecordTable: {
-        columns: {
-          domain: 'Domain',
-          type: 'Tipe',
-          hostName: 'Host / Nama',
-          value: 'Nilai',
-        },
-      },
     },
   },
   createOrganization: {

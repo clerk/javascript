@@ -226,24 +226,11 @@ export const hrHR: LocalizationResource = {
       warning: 'Nakon odabira pružatelja ne možete ga ponovno mijenjati dok konfiguracija ne završi',
     },
     verifyDomainsStep: {
-      title: 'Potvrdi domenu',
-      subtitle: 'Navedite i potvrdite domenu za koju želite konfigurirati SSO.',
+      title: 'Dodaj SSO domene',
+      subtitle: 'Dodajte i potvrdite vlasništvo nad domenama koje vaša organizacija koristi za prijavu.',
       formFieldLabel__domain: 'Domene',
       formFieldInputPlaceholder__domain: 'Ovdje upišite svoju domenu i kliknite dodaj za početak',
       formButtonPrimary__add: 'Dodaj',
-      txtRecordInstructions: {
-        paragraph1: 'Dodajte ovaj TXT zapis kod svog DNS pružatelja.',
-        paragraph2:
-          'Automatski ćemo ga provjeriti čim zapis postane aktivan. To obično traje manje od minute, iako ažuriranje postojećeg TXT zapisa može potrajati nešto dulje.',
-      },
-      txtRecordTable: {
-        columns: {
-          domain: 'Domena',
-          type: 'Vrsta',
-          hostName: 'Host / Naziv',
-          value: 'Vrijednost',
-        },
-      },
     },
   },
   createOrganization: {

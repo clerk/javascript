@@ -225,24 +225,11 @@ export const fiFI: LocalizationResource = {
       warning: 'Kun palveluntarjoaja on valittu, et voi vaihtaa sitä ennen kuin määritys on valmis',
     },
     verifyDomainsStep: {
-      title: 'Vahvista verkkotunnus',
-      subtitle: 'Määritä ja vahvista verkkotunnus, jolle SSO määritetään.',
+      title: 'Lisää SSO-verkkotunnuksia',
+      subtitle: 'Lisää ja vahvista niiden verkkotunnusten omistajuus, joita organisaatiosi käyttää kirjautumiseen.',
       formFieldLabel__domain: 'Verkkotunnukset',
       formFieldInputPlaceholder__domain: 'Kirjoita verkkotunnuksesi tähän ja aloita napsauttamalla Lisää',
       formButtonPrimary__add: 'Lisää',
-      txtRecordInstructions: {
-        paragraph1: 'Lisää tämä TXT-tietue DNS-palveluntarjoajallesi.',
-        paragraph2:
-          'Vahvistamme sen automaattisesti, kun tietue on aktiivinen. Tämä kestää yleensä alle minuutin, mutta olemassa olevan TXT-tietueen päivittäminen voi kestää hieman kauemmin.',
-      },
-      txtRecordTable: {
-        columns: {
-          domain: 'Verkkotunnus',
-          type: 'Tyyppi',
-          hostName: 'Isäntä / Nimi',
-          value: 'Arvo',
-        },
-      },
     },
   },
   createOrganization: {

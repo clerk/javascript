@@ -197,24 +197,11 @@ export const ukUA: LocalizationResource = {
       warning: 'Після вибору постачальника ви не зможете змінити його, доки не буде завершено налаштування',
     },
     verifyDomainsStep: {
-      title: 'Підтвердити домен',
-      subtitle: 'Вкажіть і підтвердьте домен для налаштування SSO.',
+      title: 'Додати домени SSO',
+      subtitle: 'Додайте та підтвердьте право власності на домени, які ваша організація використовує для входу.',
       formFieldLabel__domain: 'Домени',
       formFieldInputPlaceholder__domain: 'Введіть свій домен тут і натисніть «Додати», щоб почати',
       formButtonPrimary__add: 'Додати',
-      txtRecordInstructions: {
-        paragraph1: 'Додайте цей TXT-запис до вашого DNS-провайдера.',
-        paragraph2:
-          'Ми перевіримо автоматично, щойно запис стане активним. Зазвичай це займає менше хвилини, хоча оновлення наявного TXT-запису може зайняти трохи більше часу.',
-      },
-      txtRecordTable: {
-        columns: {
-          domain: 'Домен',
-          type: 'Тип',
-          hostName: "Хост / Ім'я",
-          value: 'Значення',
-        },
-      },
     },
   },
   createOrganization: {

@@ -197,24 +197,11 @@ export const svSE: LocalizationResource = {
       warning: 'När en leverantör har valts kan du inte ändra igen förrän konfigurationen är klar',
     },
     verifyDomainsStep: {
-      title: 'Verifiera domän',
-      subtitle: 'Ange och verifiera domänen som du vill konfigurera SSO för.',
+      title: 'Lägg till SSO-domäner',
+      subtitle: 'Lägg till och verifiera ägarskapet för de domäner som din organisation använder för att logga in.',
       formFieldLabel__domain: 'Domäner',
       formFieldInputPlaceholder__domain: 'Skriv din domän här och klicka på lägg till för att börja',
       formButtonPrimary__add: 'Lägg till',
-      txtRecordInstructions: {
-        paragraph1: 'Lägg till den här TXT-posten hos din DNS-leverantör.',
-        paragraph2:
-          'Vi verifierar automatiskt när posten är aktiv. Detta tar vanligtvis under en minut, men att uppdatera en befintlig TXT-post kan ta lite längre tid.',
-      },
-      txtRecordTable: {
-        columns: {
-          domain: 'Domän',
-          type: 'Typ',
-          hostName: 'Värd / Namn',
-          value: 'Värde',
-        },
-      },
     },
   },
   createOrganization: {

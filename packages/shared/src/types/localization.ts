@@ -1374,16 +1374,15 @@ export type __internal_LocalizationResource = {
       formFieldLabel__domain: LocalizationValue;
       formFieldInputPlaceholder__domain: LocalizationValue;
       formButtonPrimary__add: LocalizationValue;
-      txtRecordInstructions: {
-        paragraph1: LocalizationValue;
-        paragraph2: LocalizationValue;
-      };
-      txtRecordTable: {
-        columns: {
-          domain: LocalizationValue;
-          type: LocalizationValue;
-          hostName: LocalizationValue;
-          value: LocalizationValue;
+      domainCard: {
+        badge__verified: LocalizationValue;
+        badge__unverified: LocalizationValue;
+        verifiedAtLabel: LocalizationValue<'date'>;
+        txtRecord: {
+          instructions: LocalizationValue;
+          typeLabel: LocalizationValue;
+          hostLabel: LocalizationValue;
+          valueLabel: LocalizationValue;
         };
       };
     };

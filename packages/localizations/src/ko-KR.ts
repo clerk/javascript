@@ -204,24 +204,11 @@ export const koKR: LocalizationResource = {
       warning: '공급자를 선택하면 구성이 완료될 때까지 다시 변경할 수 없습니다',
     },
     verifyDomainsStep: {
-      title: '도메인 확인',
-      subtitle: 'SSO를 구성할 도메인을 지정하고 확인하세요.',
+      title: 'SSO 도메인 추가',
+      subtitle: '조직에서 로그인에 사용하는 도메인의 소유권을 추가하고 확인하세요.',
       formFieldLabel__domain: '도메인',
       formFieldInputPlaceholder__domain: '여기에 도메인을 입력하고 추가를 클릭하여 시작하세요',
       formButtonPrimary__add: '추가',
-      txtRecordInstructions: {
-        paragraph1: '이 TXT 레코드를 DNS 공급자에 추가하세요.',
-        paragraph2:
-          '레코드가 활성화되면 자동으로 확인합니다. 일반적으로 1분 이내에 완료되지만, 기존 TXT 레코드를 업데이트하는 경우 다소 시간이 걸릴 수 있습니다.',
-      },
-      txtRecordTable: {
-        columns: {
-          domain: '도메인',
-          type: '유형',
-          hostName: '호스트 / 이름',
-          value: '값',
-        },
-      },
     },
   },
   createOrganization: {

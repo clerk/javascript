@@ -197,24 +197,11 @@ export const nlBE: LocalizationResource = {
       warning: 'Zodra een provider is geselecteerd, kun je deze niet meer wijzigen totdat de configuratie is voltooid',
     },
     verifyDomainsStep: {
-      title: 'Domein verifiëren',
-      subtitle: 'Geef het domein op en verifieer het om SSO te configureren.',
+      title: 'SSO-domeinen toevoegen',
+      subtitle: 'Voeg de domeinen toe die je organisatie gebruikt om aan te melden en verifieer het eigendom ervan.',
       formFieldLabel__domain: 'Domeinen',
       formFieldInputPlaceholder__domain: 'Typ hier uw domein en klik op toevoegen om te beginnen',
       formButtonPrimary__add: 'Toevoegen',
-      txtRecordInstructions: {
-        paragraph1: 'Voeg dit TXT-record toe aan uw DNS-provider.',
-        paragraph2:
-          'We verifiëren automatisch zodra het record actief is. Dit duurt meestal minder dan een minuut, hoewel het bijwerken van een bestaand TXT-record iets langer kan duren.',
-      },
-      txtRecordTable: {
-        columns: {
-          domain: 'Domein',
-          type: 'Type',
-          hostName: 'Host / Naam',
-          value: 'Waarde',
-        },
-      },
     },
   },
   createOrganization: {

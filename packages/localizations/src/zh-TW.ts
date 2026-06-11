@@ -203,23 +203,11 @@ export const zhTW: LocalizationResource = {
       warning: '選擇提供者後,在設定完成之前無法再次變更',
     },
     verifyDomainsStep: {
-      title: '驗證網域',
-      subtitle: '指定並驗證要設定 SSO 的網域。',
+      title: '新增 SSO 網域',
+      subtitle: '新增並驗證貴組織用於登入的網域的所有權。',
       formFieldLabel__domain: '網域',
       formFieldInputPlaceholder__domain: '在此輸入您的網域，然後點選新增即可開始',
       formButtonPrimary__add: '新增',
-      txtRecordInstructions: {
-        paragraph1: '將此 TXT 記錄新增至您的 DNS 提供商。',
-        paragraph2: '記錄生效後，我們會自動進行驗證。這通常不到一分鐘，但更新現有的 TXT 記錄可能需要稍長時間。',
-      },
-      txtRecordTable: {
-        columns: {
-          domain: '網域',
-          type: '類型',
-          hostName: '主機 / 名稱',
-          value: '值',
-        },
-      },
     },
   },
   createOrganization: {

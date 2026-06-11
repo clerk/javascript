@@ -197,24 +197,11 @@ export const plPL: LocalizationResource = {
       warning: 'Po wybraniu dostawcy nie można go ponownie zmienić aż do zakończenia konfiguracji',
     },
     verifyDomainsStep: {
-      title: 'Zweryfikuj domenę',
-      subtitle: 'Określ i zweryfikuj domenę, dla której chcesz skonfigurować SSO.',
+      title: 'Dodaj domeny SSO',
+      subtitle: 'Dodaj i zweryfikuj własność domen, których Twoja organizacja używa do logowania.',
       formFieldLabel__domain: 'Domeny',
       formFieldInputPlaceholder__domain: 'Wpisz tutaj swoją domenę i kliknij dodaj, aby rozpocząć',
       formButtonPrimary__add: 'Dodaj',
-      txtRecordInstructions: {
-        paragraph1: 'Dodaj ten rekord TXT u swojego dostawcy DNS.',
-        paragraph2:
-          'Zweryfikujemy go automatycznie, gdy rekord będzie aktywny. Zwykle trwa to krócej niż minutę, choć aktualizacja istniejącego rekordu TXT może potrwać nieco dłużej.',
-      },
-      txtRecordTable: {
-        columns: {
-          domain: 'Domena',
-          type: 'Typ',
-          hostName: 'Host / Nazwa',
-          value: 'Wartość',
-        },
-      },
     },
   },
   createOrganization: {

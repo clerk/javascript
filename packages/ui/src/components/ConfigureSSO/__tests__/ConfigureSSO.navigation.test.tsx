@@ -69,7 +69,7 @@ describe('ConfigureSSO wizard navigation (integration)', () => {
 
     await findByText(/select your identity provider/i);
     // verify-domain was skipped, so its subtitle never renders
-    expect(queryByText(/specify and verify the domains/i)).not.toBeInTheDocument();
+    expect(queryByText(/add and verify ownership of the domains/i)).not.toBeInTheDocument();
   });
 
   // Contract rules 2 + 8: goNext defers when the next guard is not yet satisfied

@@ -197,24 +197,11 @@ export const enGB: LocalizationResource = {
       warning: 'Once a provider is selected you cannot change again until the configuration is over',
     },
     verifyDomainsStep: {
-      title: 'Verify domains',
-      subtitle: 'Specify and verify the domains to configure SSO for.',
+      title: 'Add SSO domains',
+      subtitle: 'Add and verify ownership of the domains your organisation uses to sign in.',
       formFieldLabel__domain: 'Domains',
       formFieldInputPlaceholder__domain: 'Type your domain here and click add to start',
       formButtonPrimary__add: 'Add',
-      txtRecordInstructions: {
-        paragraph1: 'Add this TXT record to your DNS provider.',
-        paragraph2:
-          "We'll verify automatically once the record is live. This usually takes under a minute, though updating an existing TXT record may take a bit longer.",
-      },
-      txtRecordTable: {
-        columns: {
-          domain: 'Domain',
-          type: 'Type',
-          hostName: 'Host / Name',
-          value: 'Value',
-        },
-      },
     },
   },
   createOrganization: {

@@ -201,24 +201,11 @@ export const csCZ: LocalizationResource = {
       warning: 'Jakmile vyberete poskytovatele, nelze ho změnit, dokud nebude konfigurace dokončena',
     },
     verifyDomainsStep: {
-      title: 'Ověřit doménu',
-      subtitle: 'Zadejte a ověřte doménu, pro kterou chcete nakonfigurovat SSO.',
+      title: 'Přidat domény SSO',
+      subtitle: 'Přidejte a ověřte vlastnictví domén, které vaše organizace používá k přihlášení.',
       formFieldLabel__domain: 'Domény',
       formFieldInputPlaceholder__domain: 'Zde zadejte svou doménu a kliknutím na přidat začněte',
       formButtonPrimary__add: 'Přidat',
-      txtRecordInstructions: {
-        paragraph1: 'Přidejte tento záznam TXT u svého poskytovatele DNS.',
-        paragraph2:
-          'Jakmile bude záznam aktivní, ověříme jej automaticky. Obvykle to trvá méně než minutu, i když aktualizace stávajícího záznamu TXT může chvíli trvat déle.',
-      },
-      txtRecordTable: {
-        columns: {
-          domain: 'Doména',
-          type: 'Typ',
-          hostName: 'Host / Název',
-          value: 'Hodnota',
-        },
-      },
     },
   },
   createOrganization: {

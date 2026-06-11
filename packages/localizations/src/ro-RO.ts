@@ -203,24 +203,12 @@ export const roRO: LocalizationResource = {
       warning: 'Odată ce un furnizor este selectat, nu îl puteți schimba până când configurația nu este finalizată',
     },
     verifyDomainsStep: {
-      title: 'Verifică domeniul',
-      subtitle: 'Specifică și verifică domeniul pentru care configurezi SSO.',
+      title: 'Adaugă domenii SSO',
+      subtitle:
+        'Adaugă și verifică dreptul de proprietate asupra domeniilor pe care organizația ta le folosește pentru autentificare.',
       formFieldLabel__domain: 'Domenii',
       formFieldInputPlaceholder__domain: 'Scrie aici domeniul tău și fă clic pe adaugă pentru a începe',
       formButtonPrimary__add: 'Adaugă',
-      txtRecordInstructions: {
-        paragraph1: 'Adaugă această înregistrare TXT la furnizorul tău DNS.',
-        paragraph2:
-          'Vom verifica automat de îndată ce înregistrarea este activă. De obicei durează mai puțin de un minut, deși actualizarea unei înregistrări TXT existente poate dura puțin mai mult.',
-      },
-      txtRecordTable: {
-        columns: {
-          domain: 'Domeniu',
-          type: 'Tip',
-          hostName: 'Gazdă / Nume',
-          value: 'Valoare',
-        },
-      },
     },
   },
   createOrganization: {

@@ -204,24 +204,12 @@ export const deDE: LocalizationResource = {
         'Sobald ein Anbieter ausgewählt ist, können Sie ihn nicht mehr ändern, bis die Konfiguration abgeschlossen ist',
     },
     verifyDomainsStep: {
-      title: 'Domain verifizieren',
-      subtitle: 'Geben Sie die Domain an und verifizieren Sie sie, um SSO zu konfigurieren.',
+      title: 'SSO-Domains hinzufügen',
+      subtitle:
+        'Fügen Sie die Domains hinzu, die Ihre Organisation zur Anmeldung verwendet, und verifizieren Sie deren Eigentümerschaft.',
       formFieldLabel__domain: 'Domains',
       formFieldInputPlaceholder__domain: 'Geben Sie hier Ihre Domain ein und klicken Sie zum Starten auf „Hinzufügen"',
       formButtonPrimary__add: 'Hinzufügen',
-      txtRecordInstructions: {
-        paragraph1: 'Fügen Sie diesen TXT-Eintrag bei Ihrem DNS-Anbieter hinzu.',
-        paragraph2:
-          'Wir verifizieren automatisch, sobald der Eintrag aktiv ist. Dies dauert in der Regel weniger als eine Minute, das Aktualisieren eines bestehenden TXT-Eintrags kann jedoch etwas länger dauern.',
-      },
-      txtRecordTable: {
-        columns: {
-          domain: 'Domain',
-          type: 'Typ',
-          hostName: 'Host / Name',
-          value: 'Wert',
-        },
-      },
     },
   },
   createOrganization: {

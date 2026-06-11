@@ -203,24 +203,11 @@ export const viVN: LocalizationResource = {
       warning: 'Khi đã chọn nhà cung cấp, bạn không thể thay đổi cho đến khi cấu hình hoàn tất',
     },
     verifyDomainsStep: {
-      title: 'Xác minh tên miền',
-      subtitle: 'Chỉ định và xác minh tên miền để cấu hình SSO.',
+      title: 'Thêm tên miền SSO',
+      subtitle: 'Thêm và xác minh quyền sở hữu các tên miền mà tổ chức của bạn dùng để đăng nhập.',
       formFieldLabel__domain: 'Tên miền',
       formFieldInputPlaceholder__domain: 'Nhập tên miền của bạn vào đây và nhấp vào thêm để bắt đầu',
       formButtonPrimary__add: 'Thêm',
-      txtRecordInstructions: {
-        paragraph1: 'Thêm bản ghi TXT này vào nhà cung cấp DNS của bạn.',
-        paragraph2:
-          'Chúng tôi sẽ tự động xác minh khi bản ghi hoạt động. Việc này thường mất chưa đến một phút, mặc dù việc cập nhật bản ghi TXT hiện có có thể mất thêm một chút thời gian.',
-      },
-      txtRecordTable: {
-        columns: {
-          domain: 'Tên miền',
-          type: 'Loại',
-          hostName: 'Máy chủ / Tên',
-          value: 'Giá trị',
-        },
-      },
     },
   },
   createOrganization: {

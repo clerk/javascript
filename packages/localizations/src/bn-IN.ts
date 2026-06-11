@@ -203,24 +203,11 @@ export const bnIN: LocalizationResource = {
       warning: 'একবার প্রদানকারী নির্বাচন করার পরে, কনফিগারেশন শেষ না হওয়া পর্যন্ত আপনি আবার পরিবর্তন করতে পারবেন না',
     },
     verifyDomainsStep: {
-      title: 'ডোমেইন যাচাই করুন',
-      subtitle: 'SSO কনফিগার করার জন্য ডোমেইনটি নির্দিষ্ট করুন এবং যাচাই করুন।',
+      title: 'SSO ডোমেইন যোগ করুন',
+      subtitle: 'আপনার প্রতিষ্ঠান সাইন ইন করতে যে ডোমেইনগুলি ব্যবহার করে তার মালিকানা যোগ করুন এবং যাচাই করুন।',
       formFieldLabel__domain: 'ডোমেইন',
       formFieldInputPlaceholder__domain: 'আপনার ডোমেইন এখানে টাইপ করুন এবং শুরু করতে যোগ করুন-এ ক্লিক করুন',
       formButtonPrimary__add: 'যোগ করুন',
-      txtRecordInstructions: {
-        paragraph1: 'এই TXT রেকর্ডটি আপনার DNS প্রদানকারীতে যোগ করুন।',
-        paragraph2:
-          'রেকর্ডটি সক্রিয় হলে আমরা স্বয়ংক্রিয়ভাবে যাচাই করব। এটি সাধারণত এক মিনিটেরও কম সময় নেয়, তবে কোনো বিদ্যমান TXT রেকর্ড আপডেট করতে কিছুটা বেশি সময় লাগতে পারে।',
-      },
-      txtRecordTable: {
-        columns: {
-          domain: 'ডোমেইন',
-          type: 'ধরন',
-          hostName: 'হোস্ট / নাম',
-          value: 'মান',
-        },
-      },
     },
   },
   createOrganization: {

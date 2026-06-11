@@ -180,7 +180,7 @@ export const TagInput = (props: TagInputProps) => {
 };
 
 type TagPillProps = React.PropsWithChildren<{ onRemoveClick: React.MouseEventHandler }>;
-export const TagPill = (props: TagPillProps) => {
+const TagPill = (props: TagPillProps) => {
   const { onRemoveClick, children, ...rest } = props;
 
   return (

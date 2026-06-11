@@ -197,24 +197,11 @@ export const beBY: LocalizationResource = {
       warning: 'Пасля выбару правайдэра вы не зможаце змяніць яго, пакуль не скончыце канфігурацыю',
     },
     verifyDomainsStep: {
-      title: 'Пацвердзіць дамен',
-      subtitle: 'Укажыце і пацвердзіце дамен для наладжвання SSO.',
+      title: 'Дадаць дамены SSO',
+      subtitle: 'Дадайце і пацвердзіце права ўласнасці на дамены, якія ваша арганізацыя выкарыстоўвае для ўваходу.',
       formFieldLabel__domain: 'Дамены',
       formFieldInputPlaceholder__domain: 'Увядзіце свой дамен тут і націсніце «Дадаць», каб пачаць',
       formButtonPrimary__add: 'Дадаць',
-      txtRecordInstructions: {
-        paragraph1: 'Дадайце гэты TXT-запіс да вашага DNS-правайдара.',
-        paragraph2:
-          'Мы праверым аўтаматычна, як толькі запіс стане актыўным. Звычайна гэта займае менш за хвіліну, хаця абнаўленне існуючага TXT-запісу можа заняць крыху больш часу.',
-      },
-      txtRecordTable: {
-        columns: {
-          domain: 'Дамен',
-          type: 'Тып',
-          hostName: 'Хост / Імя',
-          value: 'Значэнне',
-        },
-      },
     },
   },
   createOrganization: {

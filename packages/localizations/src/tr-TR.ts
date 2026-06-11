@@ -197,24 +197,11 @@ export const trTR: LocalizationResource = {
       warning: 'Bir sağlayıcı seçildikten sonra yapılandırma bitene kadar tekrar değiştiremezsiniz',
     },
     verifyDomainsStep: {
-      title: 'Alan adını doğrula',
-      subtitle: "SSO'yu yapılandırmak için alan adını belirtin ve doğrulayın.",
+      title: 'SSO alan adları ekle',
+      subtitle: 'Kuruluşunuzun oturum açmak için kullandığı alan adlarının sahipliğini ekleyin ve doğrulayın.',
       formFieldLabel__domain: 'Alan adları',
       formFieldInputPlaceholder__domain: 'Alan adınızı buraya yazın ve başlamak için Ekle düğmesine tıklayın',
       formButtonPrimary__add: 'Ekle',
-      txtRecordInstructions: {
-        paragraph1: 'Bu TXT kaydını DNS sağlayıcınıza ekleyin.',
-        paragraph2:
-          'Kayıt yayına girer girmez otomatik olarak doğrulayacağız. Bu genellikle bir dakikadan kısa sürer, ancak mevcut bir TXT kaydını güncellemek biraz daha uzun sürebilir.',
-      },
-      txtRecordTable: {
-        columns: {
-          domain: 'Alan adı',
-          type: 'Tür',
-          hostName: 'Ana bilgisayar / Ad',
-          value: 'Değer',
-        },
-      },
     },
   },
   createOrganization: {

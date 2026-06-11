@@ -201,24 +201,11 @@ export const thTH: LocalizationResource = {
       warning: 'เมื่อเลือกผู้ให้บริการแล้วคุณไม่สามารถเปลี่ยนได้อีกจนกว่าการกำหนดค่าจะเสร็จสิ้น',
     },
     verifyDomainsStep: {
-      title: 'ยืนยันโดเมน',
-      subtitle: 'ระบุและยืนยันโดเมนที่ต้องการกำหนดค่า SSO',
+      title: 'เพิ่มโดเมน SSO',
+      subtitle: 'เพิ่มและยืนยันความเป็นเจ้าของโดเมนที่องค์กรของคุณใช้ในการลงชื่อเข้าใช้',
       formFieldLabel__domain: 'โดเมน',
       formFieldInputPlaceholder__domain: 'พิมพ์โดเมนของคุณที่นี่แล้วคลิกเพิ่มเพื่อเริ่มต้น',
       formButtonPrimary__add: 'เพิ่ม',
-      txtRecordInstructions: {
-        paragraph1: 'เพิ่มระเบียน TXT นี้ไปยังผู้ให้บริการ DNS ของคุณ',
-        paragraph2:
-          'เราจะยืนยันโดยอัตโนมัติเมื่อระเบียนใช้งานได้แล้ว โดยปกติจะใช้เวลาไม่ถึงหนึ่งนาที แม้ว่าการอัปเดตระเบียน TXT ที่มีอยู่อาจใช้เวลานานขึ้นเล็กน้อย',
-      },
-      txtRecordTable: {
-        columns: {
-          domain: 'โดเมน',
-          type: 'ประเภท',
-          hostName: 'โฮสต์ / ชื่อ',
-          value: 'ค่า',
-        },
-      },
     },
   },
   createOrganization: {

@@ -197,24 +197,11 @@ export const srRS: LocalizationResource = {
       warning: 'Kada se provajder izabere, ne možete ga ponovo menjati dok se konfiguracija ne završi',
     },
     verifyDomainsStep: {
-      title: 'Potvrdi domen',
-      subtitle: 'Navedite i potvrdite domen za koji želite da konfigurišete SSO.',
+      title: 'Dodaj SSO domene',
+      subtitle: 'Dodajte i potvrdite vlasništvo nad domenima koje vaša organizacija koristi za prijavu.',
       formFieldLabel__domain: 'Domeni',
       formFieldInputPlaceholder__domain: 'Ovde unesite svoj domen i kliknite na dodaj da biste počeli',
       formButtonPrimary__add: 'Dodaj',
-      txtRecordInstructions: {
-        paragraph1: 'Dodajte ovaj TXT zapis kod svog DNS provajdera.',
-        paragraph2:
-          'Automatski ćemo ga proveriti čim zapis postane aktivan. To obično traje manje od minuta, iako ažuriranje postojećeg TXT zapisa može potrajati malo duže.',
-      },
-      txtRecordTable: {
-        columns: {
-          domain: 'Domen',
-          type: 'Tip',
-          hostName: 'Host / Naziv',
-          value: 'Vrednost',
-        },
-      },
     },
   },
   createOrganization: {
