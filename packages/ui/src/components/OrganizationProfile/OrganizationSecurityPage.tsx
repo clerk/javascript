@@ -2,11 +2,11 @@ import { useOrganization } from '@clerk/shared/react';
 
 import { ConfigureSSOContent } from '../ConfigureSSO/ConfigureSSO';
 
-type OrganizationSelfServeSSOPageProps = {
+type OrganizationSecurityPageProps = {
   contentRef: React.RefObject<HTMLDivElement>;
 };
 
-export const OrganizationSelfServeSSOPage = ({ contentRef }: OrganizationSelfServeSSOPageProps) => {
+export const OrganizationSecurityPage = ({ contentRef }: OrganizationSecurityPageProps) => {
   const { organization } = useOrganization();
 
   if (!organization) {
