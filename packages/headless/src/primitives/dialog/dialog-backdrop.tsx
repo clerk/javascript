@@ -1,46 +1,39 @@
 'use client';
 
-import { FloatingOverlay } from '@floating-ui/react';
-import { useContext } from 'react';
+import React from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
-import { DialogScopedContext, useDialogContext } from './dialog-context';
+import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils';
+import { useDialogContext } from './dialog-context';
 
-export interface DialogBackdropProps extends ComponentProps<'div'> {
-  /** When true, locks body scroll while the dialog is open. Default: true */
-  lockScroll?: boolean;
-}
+/** Props for {@link DialogBackdrop}. */
+export type DialogBackdropProps = ComponentProps<'div'>;
 
-export function DialogBackdrop(props: DialogBackdropProps) {
-  const { render, lockScroll = true, ...otherProps } = props;
-  const { open, mounted, transitionProps } = useDialogContext();
-  const scoped = useContext(DialogScopedContext);
+/** Semi-transparent overlay surface rendered behind the dialog. Does not own scroll-lock or positioning — use `Dialog.Viewport` for those. */
+export const DialogBackdrop = React.forwardRef<HTMLDivElement, DialogBackdropProps>(
+  function DialogBackdrop(props, ref) {
+    const { render, ...otherProps } = props;
+    const { open, mounted, transitionProps } = useDialogContext();
 
-  const state = { open };
+    if (!mounted) {
+      return null;
+    }
 
-  const defaultProps = {
-    'data-cl-slot': 'dialog-backdrop',
-    ...transitionProps,
-  } as React.ComponentPropsWithRef<'div'>;
+    const state = { open };
 
-  const backdropElement = renderElement({
-    defaultTagName: 'div',
-    render,
-    enabled: mounted,
-    state,
-    stateAttributesMapping: {
-      open: (v: boolean): Record<string, string> | null => (v ? { 'data-cl-open': '' } : { 'data-cl-closed': '' }),
-    },
-    props: mergeProps<'div'>(defaultProps, otherProps),
-  });
+    const defaultProps = {
+      'data-cl-slot': 'dialog-backdrop',
+      ref,
+      ...transitionProps,
+    } satisfies DefaultProps<'div'>;
 
-  if (scoped) {
-    return backdropElement;
-  }
-
-  if (!mounted) {
-    return null;
-  }
-
-  return <FloatingOverlay lockScroll={lockScroll}>{backdropElement}</FloatingOverlay>;
-}
+    return renderElement({
+      defaultTagName: 'div',
+      render,
+      state,
+      stateAttributesMapping: {
+        open: (v: boolean): Record<string, string> | null => (v ? { 'data-cl-open': '' } : { 'data-cl-closed': '' }),
+      },
+      props: mergeProps<'div'>(defaultProps, otherProps),
+    });
+  },
+);

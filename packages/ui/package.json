@@ -1,6 +1,6 @@
 {
   "name": "@clerk/ui",
-  "version": "1.16.0",
+  "version": "1.16.1",
   "description": "Internal package that contains the UI components for the Clerk frontend SDKs",
   "repository": {
     "type": "git",
@@ -98,7 +98,7 @@
     "@clerk/shared": "workspace:^",
     "@emotion/cache": "11.11.0",
     "@emotion/react": "11.11.1",
-    "@floating-ui/react": "0.27.12",
+    "@floating-ui/react": "catalog:repo",
     "@formkit/auto-animate": "^0.8.2",
     "@solana/wallet-adapter-base": "catalog:module-manager",
     "@solana/wallet-adapter-react": "catalog:module-manager",
@@ -112,6 +112,7 @@
     "qrcode.react": "4.2.0"
   },
   "devDependencies": {
+    "@clerk/headless": "workspace:^",
     "@floating-ui/react-dom": "^2.1.8",
     "@rsdoctor/rspack-plugin": "^0.4.13",
     "@rspack/cli": "catalog:rspack",

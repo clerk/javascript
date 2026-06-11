@@ -80,7 +80,7 @@ export interface OrganizationDomainResource extends ClerkResource {
    */
   totalPendingInvitations: number;
   /**
-   * The total number of pending [suggestions](https://clerk.com/docs/reference/types/organizationsuggestion) associated with this domain.
+   * The total number of pending [suggestions](https://clerk.com/docs/reference/types/organization-suggestion) associated with this domain.
    */
   totalPendingSuggestions: number;
   /**
