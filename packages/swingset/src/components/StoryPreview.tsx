@@ -57,7 +57,11 @@ export function StoryPreview({ name, storyModule }: StoryPreviewProps) {
       </div>
 
       <div className='flex min-h-40 items-center justify-center p-10'>
-        <MosaicProvider variables={variables}>
+        <MosaicProvider
+          appearance={{
+            variables,
+          }}
+        >
           <StoryComp {...values} />
         </MosaicProvider>
       </div>

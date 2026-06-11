@@ -1,11 +1,10 @@
 import React from 'react';
 
-import { cva, type VariantProps } from '../cva';
-import { useMosaicTheme } from '../MosaicProvider';
-import { hover } from '../utils';
+import { defineSlotRecipe, useRecipe } from '../slot-recipe';
+import type { RecipeVariantProps } from '../slot-recipe';
 
-/** CVA style definition for `Button` variants (`intent`, `size`, `disabled`). */
-export const buttonStyles = cva(theme => ({
+export const buttonRecipe = defineSlotRecipe(theme => ({
+  slot: 'button',
   base: {
     display: 'inline-flex',
     alignItems: 'center',
@@ -19,46 +18,47 @@ export const buttonStyles = cva(theme => ({
     cursor: 'pointer',
     border: 'none',
     transition: 'background-color 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s',
-    '&:focus-visible': {
+    _focusVisible: {
       outline: `2px solid ${theme.alpha('primary', 50)}`,
       outlineOffset: '2px',
     },
+    _disabled: { opacity: 0.5, cursor: 'not-allowed', pointerEvents: 'none' },
   },
   variants: {
     intent: {
       primary: {
         backgroundColor: theme.color.primary,
         color: theme.color.primaryForeground,
-        ...hover({ backgroundColor: theme.mix('primary', 'primaryForeground', 12) }),
-        '&:active': { backgroundColor: theme.mix('primary', 'primaryForeground', 24) },
+        _hover: { backgroundColor: theme.mix('primary', 'primaryForeground', 12) },
+        _active: { backgroundColor: theme.mix('primary', 'primaryForeground', 24) },
       },
     },
     size: {
       sm: { padding: `${theme.spacing(0.2)} ${theme.spacing(2)}`, ...theme.text('xs') },
       md: { padding: `${theme.spacing(2)} ${theme.spacing(4)}`, ...theme.text('sm') },
     },
-    disabled: {
-      false: null,
-      true: { opacity: 0.5, cursor: 'not-allowed', pointerEvents: 'none' },
-    },
   },
-  defaultVariants: { intent: 'primary', size: 'md', disabled: false },
+  defaultVariants: { intent: 'primary', size: 'md' },
 }));
 
-/** Props for {@link Button}. */
-export type ButtonProps = React.ComponentPropsWithRef<'button'> & VariantProps<typeof buttonStyles>;
+declare module '../registry' {
+  interface MosaicSlotRegistry {
+    button: true;
+  }
+}
 
-/** Styled mosaic Button component with `intent`, `size`, and `disabled` variants. */
+export type ButtonProps = React.ComponentPropsWithRef<'button'> & RecipeVariantProps<typeof buttonRecipe>;
+
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function MosaicButton(props, ref) {
   const { intent, size, disabled, sx, children, ...rest } = props;
-  const theme = useMosaicTheme();
+  const { root } = useRecipe(buttonRecipe, { variants: { intent, size }, state: { disabled: !!disabled }, sx });
   return (
     <button
       ref={ref}
       disabled={disabled || false}
       type='button'
       {...rest}
-      css={buttonStyles({ intent, size, disabled, sx })(theme)}
+      {...root}
     >
       {children}
     </button>
