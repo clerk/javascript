@@ -99,17 +99,30 @@ export function cva<V extends Variants = Record<never, never>>(
       } else {
         config = configOrFn as CvaConfig<V>;
       }
-      const { base, variants = {} as V, compoundVariants = [], defaultVariants = {} } = config;
-      const resolved = resolveVariants(variants, props, defaultVariants);
+      const { base, variants, compoundVariants, defaultVariants = EMPTY } = config;
       const computedStyles: StyleRule = {};
       if (base) fastDeepMergeAndReplace(base, computedStyles);
-      for (const key in resolved) {
-        const rule = variants[key]?.[resolved[key]];
+
+      // Resolve and merge each variant axis in a single pass. The `resolved` map is only
+      // needed to match compound variants, so it's built lazily — components without
+      // compound variants (the common case) skip the allocation entirely.
+      const hasCompounds = !!compoundVariants && compoundVariants.length > 0;
+      const resolved: Record<string, string> | null = hasCompounds ? {} : null;
+      for (const key in variants) {
+        const propValue = (props as Record<string, any>)[key];
+        const raw = propValue !== undefined ? propValue : defaultVariants[key];
+        if (raw === undefined) continue;
+        const value = typeof raw === 'boolean' ? String(raw) : raw;
+        const rule = variants[key][value];
         if (rule) fastDeepMergeAndReplace(rule, computedStyles);
+        if (resolved) resolved[key] = value;
       }
-      for (const cv of compoundVariants) {
-        if (compoundMatches(cv, resolved)) fastDeepMergeAndReplace(cv.css, computedStyles);
+      if (resolved) {
+        for (const cv of compoundVariants!) {
+          if (compoundMatches(cv, resolved)) fastDeepMergeAndReplace(cv.css, computedStyles);
+        }
       }
+
       if (props.sx) {
         const sxStyles = typeof props.sx === 'function' ? props.sx(theme) : props.sx;
         fastDeepMergeAndReplace(sxStyles, computedStyles);
@@ -145,21 +158,8 @@ export function cx(styles: StyleRule | ((theme: MosaicTheme) => StyleRule)): Cva
 
 // ─── Internal ─────────────────────────────────────────────────────────────────
 
-/** Resolves each variant axis to a string key, preferring explicit props over defaults. Booleans are stringified to match variant map keys. */
-function resolveVariants(
-  variants: Variants,
-  props: Record<string, any>,
-  defaults: Record<string, any>,
-): Record<string, string> {
-  const resolved: Record<string, string> = {};
-  for (const key in variants) {
-    const value = props[key] !== undefined ? props[key] : defaults[key];
-    if (value !== undefined) {
-      resolved[key] = typeof value === 'boolean' ? String(value) : value;
-    }
-  }
-  return resolved;
-}
+/** Shared empty defaults object — avoids allocating one per resolve when a config omits `defaultVariants`. */
+const EMPTY: Record<string, any> = {};
 
 /** Returns true when all conditions in a compound variant entry match the resolved variant set. */
 function compoundMatches(cv: Record<string, any>, resolved: Record<string, string>): boolean {
