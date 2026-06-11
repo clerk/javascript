@@ -46,7 +46,7 @@ export interface OrganizationMembershipResource extends ClerkResource {
    */
   id: string;
   /**
-   * The [`Organization`](https://clerk.com/docs/reference/types/organization) object the membership belongs to.
+   * The [`Organization`](https://clerk.com/docs/reference/objects/organization) object the membership belongs to.
    */
   organization: OrganizationResource;
   /**

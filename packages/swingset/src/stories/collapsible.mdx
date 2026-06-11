@@ -1,0 +1,94 @@
+import * as CollapsibleStories from './collapsible.stories';
+
+# Collapsible
+
+A single show/hide panel toggled by a button, from `@clerk/headless`. It is a
+**headless** primitive: it supplies behavior, state, ARIA wiring, and the
+expand/collapse animation lifecycle, but ships **no styles** — you bring your own
+CSS by targeting the `data-cl-*` attributes each part emits.
+
+## Example
+
+The demo below is intentionally unstyled — it renders the raw primitive so you can see
+its behavior and ARIA wiring. Click the trigger to expand and collapse.
+
+<Story
+  name='Default'
+  storyModule={CollapsibleStories}
+/>
+
+## Usage
+
+```tsx
+import { Collapsible } from '@clerk/headless/collapsible';
+
+<Collapsible.Root>
+  <Collapsible.Trigger>Toggle</Collapsible.Trigger>
+  <Collapsible.Panel>Hidden content</Collapsible.Panel>
+</Collapsible.Root>
+```
+
+### Controlled
+
+```tsx
+const [open, setOpen] = useState(false);
+
+<Collapsible.Root
+  open={open}
+  onOpenChange={setOpen}
+>
+  <Collapsible.Trigger>Toggle</Collapsible.Trigger>
+  <Collapsible.Panel>Hidden content</Collapsible.Panel>
+</Collapsible.Root>
+```
+
+## Parts
+
+| Part                  | Default Element | Description                        |
+| --------------------- | --------------- | ---------------------------------- |
+| `Collapsible.Root`    | `<div>`         | Root wrapper, provides context     |
+| `Collapsible.Trigger` | `<button>`      | Clickable toggle that opens/closes |
+| `Collapsible.Panel`   | `<div>`         | Collapsible content area           |
+
+All parts accept a `render` prop for polymorphic rendering and standard HTML
+attributes for their default element.
+
+## Props
+
+### `Collapsible.Root`
+
+| Prop                      | Type                                 | Default            | Description                        |
+| ------------------------- | ------------------------------------ | ------------------ | ---------------------------------- |
+| <code>open</code>         | <code>boolean</code>                 | —                  | Controlled open state              |
+| <code>defaultOpen</code>  | <code>boolean</code>                 | <code>false</code> | Initial open state (uncontrolled)  |
+| <code>onOpenChange</code> | <code>(open: boolean) => void</code> | —                  | Called when open state changes     |
+| <code>disabled</code>     | <code>boolean</code>                 | <code>false</code> | Prevents the trigger from toggling |
+
+`Collapsible.Trigger` and `Collapsible.Panel` take no additional props beyond
+standard HTML attributes for their default element.
+
+## Styling
+
+Each part emits `data-cl-*` attributes you can target with any CSS solution:
+
+| Attribute          | Applies To           | Description                      |
+| ------------------ | -------------------- | -------------------------------- |
+| `data-cl-slot`     | All parts            | Part identifier                  |
+| `data-cl-open`     | Root, Trigger, Panel | Present when the panel is open   |
+| `data-cl-closed`   | Root, Trigger, Panel | Present when the panel is closed |
+| `data-cl-disabled` | Root, Trigger        | Present when disabled            |
+
+`Collapsible.Panel` also exposes `--collapsible-panel-height` /
+`--collapsible-panel-width` (its measured dimensions) for height/width-based
+animations:
+
+```css
+[data-cl-slot='collapsible-panel'] {
+  overflow: hidden;
+  height: var(--collapsible-panel-height);
+  transition: height 200ms ease;
+}
+[data-cl-slot='collapsible-panel'][data-cl-closed] {
+  height: 0;
+}
+```
