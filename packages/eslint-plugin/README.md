@@ -111,9 +111,63 @@ export default async function Page() {
 }
 ```
 
-Recognized checks include `!isAuthenticated`, `isAuthenticated === false`, `userId === null`, and `sessionId === null` (from `auth()` imported as `@clerk/nextjs/server`). Client components (`'use client'`) are skipped.
-
 General protection must happen at the top of the function, but additional narrowing auth checks can happen further down.
+
+## Implementation details
+
+This section describes the exact details of how the lint rule works. You normally do no need to read or understand this if you only want to use the rule.
+
+Within folders that are configured as protected (and that eslint covers), this rule checks:
+
+- No files with `'use client'` at the top - Early bailout for these
+- The default export of `page`, `layout`, `template`, `default` files
+- All http verb exports of `route` files (`GET`, `POST` etc - API endpoints)
+- All exports of files with `'use server'` at the top (Server Functions)
+- All inline functions that has `'use server'` at the top of the function (Inline Server Functions)
+
+Notably, it does not:
+
+- Check `loading` or `error` files
+  - These normally don't use privileged resources, but if yours do, make sure you protect them
+- Check arbitrary Server Components
+  - Only the different page entrypoints listed above are checked
+  - If you are importing a Server Component doing privileged access into a non-protected page, like an admin panel on an otherwise public page, it should be guarded but the lint rule does not detect this
+
+At the top of the relevant async function, after any directives or TypeScript-only declarations, to count as protected the rule accepts these patterns:
+
+```tsx
+// -- Using the default .protect() behavior --
+await auth.protect()
+await (await auth()).protect()
+// Any kind of variable declaration is okay
+const { userId } = await auth.protect();
+
+// -- Custom handling --
+const { isAuthenticated, userId, sessionId } = await auth();
+// Any of these checks are okay
+// Note: For useAuth() on the client !userId can also mean
+// "loading", but here it's fine
+if (
+  !userId || userId == null || userId === null ||
+  !sessionId || sessionId == null || sessionId === null ||
+  !isAuthenticated
+) {
+  // It is fine to have arbitrary code here:
+  console.log('Unauthenticated');
+  // To count as protected, the function needs to have an
+  // unconditional "exit" at the top level, these count:
+  return;
+  throw;
+  // The Next.js versions of these functions throw errors
+  // and counts as exits, note that we match these by name,
+  // we do not currently trace them back to the real imports
+  redirect();
+  permanentRedirect();
+  notFound();
+  unauthorized();
+  forbidden();
+}
+```
 
 ## Support
 
@@ -125,9 +179,11 @@ We're open to all community contributions! Please read [our contribution guideli
 
 ## Security
 
-`@clerk/eslint-plugin` is a static analysis aid, not a runtime guard. It's provided to help you catch missing protections and it does error on the side of caution, but there are no guarantees there might not be edge cases it fails to detect.
+`@clerk/eslint-plugin` is a static analysis aid, not a runtime guard. It's provided to _help_ you catch missing protections and it does error on the side of caution, but there are no guarantees it will catch everything, there might be edge cases it does not catch.
 
-_For more information and to report security issues, please refer to our [security documentation](https://github.com/clerk/javascript/blob/main/docs/SECURITY.md)._
+We aim to fix bugs leading to false negatives promptly, but they are not considered vulnerabilities and will not lead to us posting advisories. You are free to file lint rule bugs via normal [GitHub issues](https://github.com/clerk/javascript/issues/new?assignees=&labels=needs-triage&projects=&template=BUG_REPORT.yml).
+
+_For more information and to report what you think is a security issue, please refer to our [security documentation](https://github.com/clerk/javascript/blob/main/docs/SECURITY.md)._
 
 ## License
 
