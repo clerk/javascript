@@ -2,16 +2,8 @@
 import { meta as accordionMeta } from '../stories/accordion.stories';
 import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
 import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
-import { Default as DestructiveDefault, meta as destructiveMeta } from '../stories/destructive.stories';
-import {
-  Default as LeaveOrganizationDefault,
-  meta as leaveOrganizationMeta,
-} from '../stories/leave-organization.stories';
-import {
-  Default as OrganizationProfileDefault,
-  meta as organizationProfileMeta,
-} from '../stories/organization-profile.stories';
 import { meta as collapsibleMeta } from '../stories/collapsible.stories';
+import { Default as DestructiveDefault, meta as destructiveMeta } from '../stories/destructive.stories';
 import { Default as DialogDefault, meta as dialogComponentMeta } from '../stories/dialog.component.stories';
 import { meta as dialogMeta } from '../stories/dialog.stories';
 import {
@@ -21,7 +13,15 @@ import {
   meta as inputMeta,
   Sizes as InputSizes,
 } from '../stories/input.stories';
+import {
+  Default as LeaveOrganizationDefault,
+  meta as leaveOrganizationMeta,
+} from '../stories/leave-organization.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
+import {
+  Default as OrganizationProfileDefault,
+  meta as organizationProfileMeta,
+} from '../stories/organization-profile.stories';
 import { meta as popoverMeta } from '../stories/popover.stories';
 import { meta as selectMeta } from '../stories/select.stories';
 import { meta as tabsMeta } from '../stories/tabs.stories';

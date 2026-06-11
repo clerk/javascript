@@ -1,8 +1,8 @@
 /** @jsxImportSource @emotion/react */
-import { useState } from 'react';
-
-import { Button } from '@clerk/ui/mosaic/components/button';
 import { Destructive } from '@clerk/ui/mosaic/block/destructive';
+import { Button } from '@clerk/ui/mosaic/components/button';
+import type { HTMLAttributes } from 'react';
+import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -11,6 +11,10 @@ export const meta: StoryMeta = {
   title: 'Destructive',
   source: 'packages/ui/src/mosaic/block/destructive.tsx',
 };
+
+function DestructiveTrigger(props: Omit<HTMLAttributes<HTMLElement>, 'color'>) {
+  return <Button {...props}>Leave organization</Button>;
+}
 
 export function Default() {
   const [open, setOpen] = useState(false);
@@ -25,7 +29,7 @@ export function Default() {
 
   return (
     <Destructive
-      trigger={props => <Button {...props}>Leave organization</Button>}
+      trigger={DestructiveTrigger}
       open={open}
       onOpenChange={setOpen}
       resourceType='organization'
