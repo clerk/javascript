@@ -106,6 +106,34 @@ describe('SignInFactorOne', () => {
         expect(fixtures.clerk.setActive).toHaveBeenCalled();
       });
     });
+
+    it('routes to the protect-check card when the first-factor attempt is gated by Clerk Protect', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword();
+        f.withPreferredSignInStrategy({ strategy: 'password' });
+        f.startSignInWithPhoneNumber({ supportPassword: true });
+      });
+      fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+      // A protect_check gate can fire on attempt_first_factor; the card must route to the gate
+      // instead of dispatching on the (now-irrelevant) underlying status.
+      fixtures.signIn.attemptFirstFactor.mockReturnValueOnce(
+        Promise.resolve({
+          status: 'needs_protect_check',
+          protectCheck: { status: 'pending', token: 'challenge-token', sdkUrl: 'https://protect.example.com/sdk.js' },
+        } as unknown as SignInResource),
+      );
+      const { userEvent } = render(<SignInFactorOne />, { wrapper });
+
+      await userEvent.type(screen.getByLabelText('Password'), '123456');
+      await userEvent.click(screen.getByText('Continue'));
+
+      await waitFor(() => {
+        expect(fixtures.router.navigate).toHaveBeenCalledWith('../protect-check');
+        // and must not fall through to a status-based route
+        expect(fixtures.clerk.setActive).not.toHaveBeenCalled();
+      });
+    });
   });
 
   describe('Selected First Factor Method', () => {
