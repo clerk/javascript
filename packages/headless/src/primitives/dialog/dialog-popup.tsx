@@ -3,11 +3,13 @@
 import { FloatingFocusManager, useMergeRefs } from '@floating-ui/react';
 import React from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils';
 import { useDialogContext } from './dialog-context';
 
+/** Props for {@link DialogPopup}. */
 export type DialogPopupProps = ComponentProps<'div'>;
 
+/** The dialog content container. Manages focus trapping via `FloatingFocusManager` and wires ARIA attributes from `Dialog.Title` and `Dialog.Description`. */
 export const DialogPopup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function DialogPopup(props, ref) {
   const { render, ...otherProps } = props;
   const { popupRef, refs, getFloatingProps, floatingContext, modal, labelId, descriptionId, mounted, transitionProps } =
@@ -23,19 +25,20 @@ export const DialogPopup = React.forwardRef<HTMLDivElement, DialogPopupProps>(fu
     return null;
   }
 
-  const defaultProps = {
+  const ownProps = {
     'data-cl-slot': 'dialog-popup',
     ref: combinedRef,
     'aria-labelledby': labelId,
     'aria-describedby': descriptionId,
-    ...(getFloatingProps() as React.ComponentPropsWithRef<'div'>),
-    ...transitionProps,
-  };
+  } satisfies DefaultProps<'div'>;
+
+  const defaultProps = { ...ownProps, ...getFloatingProps(), ...transitionProps };
 
   return (
     <FloatingFocusManager
       context={floatingContext}
       modal={modal}
+      outsideElementsInert={modal}
     >
       {renderElement({
         defaultTagName: 'div',

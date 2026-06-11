@@ -23,7 +23,9 @@ export type VariantProps<T extends (...args: any) => any> =
   T extends CvaFn<infer V> ? VariantPropsOf<V> & { sx?: SxProp } : never;
 
 // ─── Internal Types ───────────────────────────────────────────────────────────
-type Variants = Record<string, Record<string, StyleRule | null>>;
+
+/** Map of variant axis → variant value → style rule. Exposed so `styled` can type against `cva` results. */
+export type Variants = Record<string, Record<string, StyleRule | null>>;
 
 /** Converts `'true' | 'false'` string literal keys to `boolean` so callers pass real booleans. */
 type UnwrapBooleanVariant<T> = T extends 'true' | 'false' ? boolean : T;
@@ -43,7 +45,7 @@ type CvaConfig<V extends Variants> = {
 };
 
 /** The curried function returned by `cva`: receives variant props, returns a theme → StyleRule resolver. */
-type CvaFn<V extends Variants> = {
+export type CvaFn<V extends Variants> = {
   (props?: VariantPropsOf<V> & { sx?: SxProp }): (theme: MosaicTheme) => StyleRule;
   /** Variant definitions exposed for tooling. Not part of the public API. */
   _variants: V;

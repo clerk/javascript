@@ -9,4 +9,5 @@ export type {
   DialogProps,
   DialogTitleProps,
   DialogTriggerProps,
+  DialogViewportProps,
 } from './parts';

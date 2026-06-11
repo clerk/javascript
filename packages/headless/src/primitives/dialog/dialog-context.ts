@@ -19,7 +19,6 @@ export interface DialogContextValue {
 }
 
 export const DialogContext = createContext<DialogContextValue | null>(null);
-export const DialogScopedContext = createContext(false);
 
 export function useDialogContext() {
   const ctx = useContext(DialogContext);

@@ -3,7 +3,7 @@
 import { FloatingFocusManager, FloatingList, useMergeRefs } from '@floating-ui/react';
 import React from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils/render-element';
 import { useSelectContext } from './select-context';
 
 export type SelectPositionerProps = ComponentProps<'div'>;
@@ -52,15 +52,16 @@ export const SelectPositioner = React.forwardRef<HTMLDivElement, SelectPositione
           }
         }
       },
-    }) as React.ComponentPropsWithRef<'div'>;
+    });
 
-    const defaultProps = {
+    const ownProps = {
       'data-cl-slot': 'select-positioner',
       'data-cl-side': side,
       ref: combinedRef,
       style: floatingStyles,
-      ...floatingProps,
-    };
+    } satisfies DefaultProps<'div'>;
+
+    const defaultProps = { ...ownProps, ...floatingProps };
 
     const merged = mergeProps<'div'>(defaultProps, otherProps);
     // The listbox id is owned by floating-ui's listbox role: a consumer-supplied

@@ -4,6 +4,7 @@ import { cva, type VariantProps } from '../cva';
 import { useMosaicTheme } from '../MosaicProvider';
 import { hover } from '../utils';
 
+/** CVA style definition for `Button` variants (`intent`, `size`, `disabled`). */
 export const buttonStyles = cva(theme => ({
   base: {
     display: 'inline-flex',
@@ -24,7 +25,7 @@ export const buttonStyles = cva(theme => ({
     },
   },
   variants: {
-    color: {
+    intent: {
       primary: {
         backgroundColor: theme.color.primary,
         color: theme.color.primaryForeground,
@@ -41,13 +42,15 @@ export const buttonStyles = cva(theme => ({
       true: { opacity: 0.5, cursor: 'not-allowed', pointerEvents: 'none' },
     },
   },
-  defaultVariants: { color: 'primary', size: 'md', disabled: false },
+  defaultVariants: { intent: 'primary', size: 'md', disabled: false },
 }));
 
+/** Props for {@link Button}. */
 export type ButtonProps = React.ComponentPropsWithRef<'button'> & VariantProps<typeof buttonStyles>;
 
+/** Styled mosaic Button component with `intent`, `size`, and `disabled` variants. */
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function MosaicButton(props, ref) {
-  const { color, size, disabled, sx, children, ...rest } = props;
+  const { intent, size, disabled, sx, children, ...rest } = props;
   const theme = useMosaicTheme();
   return (
     <button
@@ -55,7 +58,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
       disabled={disabled || false}
       type='button'
       {...rest}
-      css={buttonStyles({ color, size, disabled, sx })(theme)}
+      css={buttonStyles({ intent, size, disabled, sx })(theme)}
     >
       {children}
     </button>
