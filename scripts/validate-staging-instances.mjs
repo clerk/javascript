@@ -25,8 +25,6 @@ const IGNORED_PATHS = [
   /\.id$/,
   /^auth_config\.id$/,
   /\.logo_url$/,
-  /\.captcha_enabled$/,
-  /\.captcha_widget_type$/,
   /\.enforce_hibp_on_sign_in$/,
   /\.disable_hibp$/,
 ];
@@ -416,5 +414,6 @@ export {
   collapseAttributeMismatches,
   collapseSocialMismatches,
   compareEnvironments,
+  isIgnored,
   main,
 };

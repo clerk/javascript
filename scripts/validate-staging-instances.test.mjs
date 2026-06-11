@@ -11,10 +11,28 @@ import {
   collapseSocialMismatches,
   diffObjects,
   fetchEnvironment,
+  isIgnored,
   loadKeys,
   main,
   parseFapiDomain,
 } from './validate-staging-instances.mjs';
+
+// ── isIgnored ───────────────────────────────────────────────────────────────
+
+describe('isIgnored', () => {
+  it('compares captcha settings (behavior-changing for headless e2e)', () => {
+    expect(isIgnored('user_settings.sign_up.captcha_enabled')).toBe(false);
+    expect(isIgnored('user_settings.sign_up.captcha_widget_type')).toBe(false);
+  });
+
+  it('still ignores ids, logo_url and hibp settings', () => {
+    expect(isIgnored('user_settings.social.oauth_google.id')).toBe(true);
+    expect(isIgnored('auth_config.id')).toBe(true);
+    expect(isIgnored('user_settings.social.oauth_google.logo_url')).toBe(true);
+    expect(isIgnored('user_settings.sign_in.enforce_hibp_on_sign_in')).toBe(true);
+    expect(isIgnored('user_settings.password_settings.disable_hibp')).toBe(true);
+  });
+});
 
 // ── loadKeys ────────────────────────────────────────────────────────────────
 
