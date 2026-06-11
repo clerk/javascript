@@ -143,14 +143,14 @@ function capturedAuthBindings(stmt: TSESTree.Statement, authNames: Set<string>):
 
 function isRecognizedAuthCheck(test: TSESTree.Expression, bindings: Set<AuthField>): boolean {
   if (test.type === 'UnaryExpression' && test.operator === '!') {
-    if (
+    // `!userId` / `!sessionId` / `!isAuthenticated`. On the server these fields
+    // are `string | null` / `boolean`, so the negation is equivalent to the
+    // explicit `=== null` / `=== false` checks. Both forms are accepted here.
+    return (
       test.argument.type === 'Identifier' &&
-      test.argument.name === 'isAuthenticated' &&
-      bindings.has('isAuthenticated')
-    ) {
-      return true;
-    }
-    return false;
+      AUTH_FIELDS.has(test.argument.name as AuthField) &&
+      bindings.has(test.argument.name as AuthField)
+    );
   }
 
   if (test.type !== 'BinaryExpression') {

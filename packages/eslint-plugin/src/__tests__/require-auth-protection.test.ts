@@ -222,6 +222,33 @@ ruleTester.run('require-auth-protection', rule, {
       options: [config],
     },
     {
+      name: 'manual check: !userId with return',
+      code: `
+        import { auth } from '@clerk/nextjs/server';
+        export default async function Page() {
+          const { userId } = await auth();
+          if (!userId) return null;
+          return <div />;
+        }
+      `,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+    },
+    {
+      name: 'manual check: !sessionId with redirect',
+      code: `
+        import { auth } from '@clerk/nextjs/server';
+        import { redirect } from 'next/navigation';
+        export default async function Page() {
+          const { sessionId } = await auth();
+          if (!sessionId) redirect('/sign-in');
+          return <div />;
+        }
+      `,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+    },
+    {
       name: 'manual check: isAuthenticated === false with throw',
       code: `
         import { auth } from '@clerk/nextjs/server';
@@ -1348,20 +1375,6 @@ ruleTester.run('require-auth-protection', rule, {
         }
       `,
       filename: abs('app/dashboard/[id]/page.tsx'),
-      options: [config],
-      errors: [{ messageId: 'missingProtect' }],
-    },
-    {
-      name: 'manual check: !userId is NOT accepted (less explicit than === null)',
-      code: `
-        import { auth } from '@clerk/nextjs/server';
-        export default async function Page() {
-          const { userId } = await auth();
-          if (!userId) return null;
-          return <div />;
-        }
-      `,
-      filename: abs('app/dashboard/page.tsx'),
       options: [config],
       errors: [{ messageId: 'missingProtect' }],
     },
