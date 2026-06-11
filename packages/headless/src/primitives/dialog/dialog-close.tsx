@@ -15,7 +15,6 @@ export const DialogClose = React.forwardRef<HTMLButtonElement, DialogCloseProps>
 
   const defaultProps = {
     type: 'button' as const,
-    'data-cl-slot': 'dialog-close',
     ref,
     onClick() {
       setOpen(false);
