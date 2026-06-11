@@ -112,7 +112,7 @@ describe('SignInFactorOne', () => {
         f.withEmailAddress();
         f.withPassword();
         f.withPreferredSignInStrategy({ strategy: 'password' });
-        f.startSignInWithPhoneNumber({ supportPassword: true });
+        f.startSignInWithEmailAddress({ supportPassword: true });
       });
       fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
       // A protect_check gate can fire on attempt_first_factor; the card must route to the gate
