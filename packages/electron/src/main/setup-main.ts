@@ -2,6 +2,7 @@ import { protocol } from 'electron';
 
 import type { SetupMainOptions, SetupMainReturn } from '../shared/types';
 import { setupTokenCacheIpcHandlers } from './ipc-handlers';
+import { setupOAuthTransportIpcHandlers } from './oauth-transport';
 
 function assertValidRendererOriginConfig(renderer: NonNullable<SetupMainOptions['renderer']>): void {
   if (renderer.scheme.includes(':') || renderer.scheme.includes('/')) {
@@ -25,6 +26,7 @@ export function setupMain(options: SetupMainOptions): SetupMainReturn {
   }
 
   const cleanupTokenPersistence = setupTokenCacheIpcHandlers(options.storage);
+  let cleanupOAuthTransport: (() => void) | undefined;
 
   if (options.renderer) {
     assertValidRendererOriginConfig(options.renderer);
@@ -41,11 +43,17 @@ export function setupMain(options: SetupMainOptions): SetupMainReturn {
         },
       },
     ]);
+
+    cleanupOAuthTransport = setupOAuthTransportIpcHandlers({
+      renderer: options.renderer,
+      callbackPath: options.callbackPath,
+    });
   }
 
   return {
     cleanup() {
       cleanupTokenPersistence();
+      cleanupOAuthTransport?.();
     },
   };
 }

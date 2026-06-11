@@ -5,6 +5,22 @@ import type { ReactNode } from 'react';
 
 import { createClerkInstance } from './create-clerk-instance';
 
+type OAuthTransport = {
+  getRedirectUrl: () => string | Promise<string>;
+  open: (url: URL) => Promise<{ callbackUrl: string }>;
+};
+
+const ElectronReactClerkProvider = ReactClerkProvider as unknown as (
+  props: ReactClerkProviderProps & {
+    Clerk: ReturnType<typeof createClerkInstance>;
+    __internal_oauthTransport?: OAuthTransport;
+    children: ReactNode;
+    publishableKey: string;
+    standardBrowser: false;
+    ui: typeof ui;
+  },
+) => JSX.Element;
+
 export type ClerkProviderProps = Omit<
   ReactClerkProviderProps,
   'Clerk' | 'children' | 'publishableKey' | 'standardBrowser' | 'ui'
@@ -16,19 +32,34 @@ export type ClerkProviderProps = Omit<
   publishableKey: string;
 };
 
+function createOAuthTransport(): OAuthTransport | undefined {
+  const bridge = window.__clerk_internal_electron?.oauthTransport;
+
+  if (!bridge) {
+    return undefined;
+  }
+
+  return {
+    getRedirectUrl: () => bridge.getRedirectUrl(),
+    open: url => bridge.open(url.href),
+  };
+}
+
 export function ClerkProvider({ children, publishableKey, ...props }: ClerkProviderProps): JSX.Element {
   const clerk = createClerkInstance(publishableKey);
+  const oauthTransport = createOAuthTransport();
 
   return (
-    <ReactClerkProvider
+    <ElectronReactClerkProvider
       {...props}
       Clerk={clerk}
+      __internal_oauthTransport={oauthTransport}
       publishableKey={publishableKey}
       standardBrowser={false}
       ui={ui}
     >
       {children}
-    </ReactClerkProvider>
+    </ElectronReactClerkProvider>
   );
 }
 

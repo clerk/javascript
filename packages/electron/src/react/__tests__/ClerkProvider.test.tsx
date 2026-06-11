@@ -44,6 +44,10 @@ describe('Electron ClerkProvider', () => {
     getToken: vi.fn(),
     saveToken: vi.fn(),
   };
+  const oauthTransport = {
+    getRedirectUrl: vi.fn(),
+    open: vi.fn(),
+  };
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -53,6 +57,7 @@ describe('Electron ClerkProvider', () => {
     vi.stubGlobal('window', {
       __clerk_internal_electron: {
         tokenCache,
+        oauthTransport,
       },
     });
   });
@@ -75,7 +80,29 @@ describe('Electron ClerkProvider', () => {
       ui: { ClerkUI: 'mock-ui' },
     });
     expect(capturedProviderProps?.Clerk).toBeDefined();
+    expect(capturedProviderProps?.__internal_oauthTransport).toEqual({
+      getRedirectUrl: expect.any(Function),
+      open: expect.any(Function),
+    });
     expect(capturedProviderProps?.__internal_nativeOAuthHandler).toBeUndefined();
+  });
+
+  it('registers an OAuth transport backed by the Electron bridge', async () => {
+    oauthTransport.getRedirectUrl.mockResolvedValue('my-app://renderer/sso-callback');
+    oauthTransport.open.mockResolvedValue({ callbackUrl: 'my-app://renderer/sso-callback?code=123' });
+
+    renderToStaticMarkup(<ClerkProvider publishableKey='pk_test_oauth'>App</ClerkProvider>);
+
+    const transport = capturedProviderProps?.__internal_oauthTransport as {
+      getRedirectUrl: () => Promise<string>;
+      open: (url: URL) => Promise<{ callbackUrl: string }>;
+    };
+
+    await expect(transport.getRedirectUrl()).resolves.toBe('my-app://renderer/sso-callback');
+    await expect(transport.open(new URL('https://accounts.example.com/oauth'))).resolves.toEqual({
+      callbackUrl: 'my-app://renderer/sso-callback?code=123',
+    });
+    expect(oauthTransport.open).toHaveBeenCalledWith('https://accounts.example.com/oauth');
   });
 
   it('adds native request params and Authorization from the Electron token cache', async () => {

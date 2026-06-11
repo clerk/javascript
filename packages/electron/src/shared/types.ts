@@ -12,6 +12,12 @@ export type SetupMainOptions = {
    * Registers the custom scheme used to serve the Electron renderer from a stable origin.
    */
   renderer?: RendererSchemeOptions;
+  /**
+   * Path under the renderer origin used as the OAuth callback URL.
+   *
+   * Defaults to `/sso-callback`.
+   */
+  callbackPath?: string;
 };
 
 export type SetupMainReturn = {
@@ -33,4 +39,9 @@ export type TokenCache = {
   getToken: (key: string) => Promise<string | null>;
   saveToken: (key: string, value: string) => Promise<void>;
   clearToken: (key: string) => Promise<void>;
+};
+
+export type OAuthTransport = {
+  getRedirectUrl: () => Promise<string>;
+  open: (url: string) => Promise<{ callbackUrl: string }>;
 };

@@ -1,4 +1,4 @@
-import type { TokenCache } from './shared/types';
+import type { OAuthTransport, TokenCache } from './shared/types';
 
 declare const PACKAGE_NAME: string;
 declare const PACKAGE_VERSION: string;
@@ -8,6 +8,7 @@ declare global {
   interface Window {
     __clerk_internal_electron?: {
       tokenCache: TokenCache;
+      oauthTransport: OAuthTransport;
     };
   }
 }
