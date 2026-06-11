@@ -5,7 +5,7 @@ import { useMosaicAppearance } from './appearance';
 import { expandConditions } from './conditions';
 import type { MosaicConditionKey } from './conditions';
 import { useMosaicTheme } from './MosaicProvider';
-import { resolveSlotCss } from './resolveSlot';
+import { resolveSlotClassName, resolveSlotCss } from './resolveSlot';
 import { defaultMosaicVariables, resolveVariables } from './variables';
 import type { MosaicTheme } from './variables';
 
@@ -36,6 +36,7 @@ export type SxProp = StyleRule | ((theme: MosaicTheme) => StyleRule);
 export interface SlotProps {
   'data-cl-slot': string;
   css: StyleRule;
+  className?: string;
   [dataAttr: string]: unknown;
 }
 
@@ -209,8 +210,15 @@ export function useRecipe<SlotKeys extends string, V>(
     for (const layer of resolveSlotCss(slotId, parsed)) {
       mergeInto(css, layer);
     }
+    const className = resolveSlotClassName(slotId, parsed);
 
-    result[slotKey] = { 'data-cl-slot': slotId, ...variantAttrs, ...stateAttrs, css: expandConditions(css) };
+    result[slotKey] = {
+      'data-cl-slot': slotId,
+      ...variantAttrs,
+      ...stateAttrs,
+      css: expandConditions(css),
+      ...(className !== undefined && { className }),
+    };
   }
   return result;
 }

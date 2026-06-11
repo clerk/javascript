@@ -4,7 +4,7 @@ import { useMosaicAppearance } from './appearance';
 import { expandConditions } from './conditions';
 import { useMosaicTheme } from './MosaicProvider';
 import type { MosaicSlotId } from './registry';
-import { resolveSlotCss } from './resolveSlot';
+import { resolveSlotClassName, resolveSlotCss } from './resolveSlot';
 import type { SlotProps, StyleRule, SxProp } from './slot-recipe';
 
 /** Options accepted by `useSlot`. */
@@ -30,7 +30,13 @@ export function useSlot(slot: MosaicSlotId | (string & {}), opts: UseSlotOptions
     fastDeepMergeAndReplace(layer, css);
   }
 
-  return { 'data-cl-slot': slot, ...stateToAttrs(opts.state), css: expandConditions(css) };
+  const className = resolveSlotClassName(slot, parsed);
+  return {
+    'data-cl-slot': slot,
+    ...stateToAttrs(opts.state),
+    css: expandConditions(css),
+    ...(className !== undefined && { className }),
+  };
 }
 
 /**

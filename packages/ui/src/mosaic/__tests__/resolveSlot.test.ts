@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type { ParsedMosaicElements } from '../appearance';
-import { resolveSlotCss } from '../resolveSlot';
+import { resolveSlotClassName, resolveSlotCss } from '../resolveSlot';
 
 describe('resolveSlotCss', () => {
   it('returns [] when there are no layers', () => {
@@ -43,5 +43,31 @@ describe('resolveSlotCss', () => {
   it('preserves nested state-attribute selectors', () => {
     const parsed: ParsedMosaicElements = [{ button: { color: 'red', '&[data-cl-disabled]': { opacity: 0.4 } } }];
     expect(resolveSlotCss('button', parsed)).toEqual([{ color: 'red', '&[data-cl-disabled]': { opacity: 0.4 } }]);
+  });
+});
+
+describe('resolveSlotClassName', () => {
+  it('returns undefined when no layers exist', () => {
+    expect(resolveSlotClassName('button', [])).toBeUndefined();
+  });
+
+  it('returns undefined when no string override exists', () => {
+    expect(resolveSlotClassName('button', [{ button: { color: 'red' } }])).toBeUndefined();
+  });
+
+  it('returns the className from a single layer', () => {
+    expect(resolveSlotClassName('button', [{ button: 'bg-red-500' }])).toBe('bg-red-500');
+  });
+
+  it('joins classNames from multiple layers space-separated', () => {
+    expect(resolveSlotClassName('button', [{ button: 'bg-red-500' }, { button: 'text-white' }])).toBe(
+      'bg-red-500 text-white',
+    );
+  });
+
+  it('skips object overrides and layers that miss the slot', () => {
+    expect(resolveSlotClassName('button', [{ button: { color: 'red' } }, { input: 'foo' }, { button: 'bar' }])).toBe(
+      'bar',
+    );
   });
 });

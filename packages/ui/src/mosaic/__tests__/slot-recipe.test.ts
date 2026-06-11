@@ -101,6 +101,23 @@ describe('defineSlotRecipe / useRecipe', () => {
     const { result } = renderHook(() => useRecipe(buttonRecipe), { wrapper: wrapper(appearance) });
     expect(result.current.root.css['&[data-cl-disabled]']).toEqual({ opacity: 0.2 });
   });
+
+  it('sets className on root when appearance has a string override', () => {
+    const appearance: MosaicAppearance = { elements: { button: 'bg-red-500' } };
+    const { result } = renderHook(() => useRecipe(buttonRecipe), { wrapper: wrapper(appearance) });
+    expect(result.current.root.className).toBe('bg-red-500');
+  });
+
+  it('joins className from global + scoped appearance layers', () => {
+    const appearance: MosaicAppearance = { elements: { button: 'bg-red-500', signIn: { button: 'text-white' } } };
+    const { result } = renderHook(() => useRecipe(buttonRecipe), { wrapper: wrapper(appearance, 'signIn') });
+    expect(result.current.root.className).toBe('bg-red-500 text-white');
+  });
+
+  it('omits className from SlotProps when no string override is set', () => {
+    const { result } = renderHook(() => useRecipe(buttonRecipe), { wrapper: wrapper() });
+    expect(result.current.root.className).toBeUndefined();
+  });
 });
 
 describe('conditions', () => {
@@ -207,6 +224,12 @@ describe('useSlot / slot sugar', () => {
   it('useSlot with no provider styling returns empty css and still emits the slot', () => {
     const { result } = renderHook(() => useSlot('avatarBox'), { wrapper: wrapper() });
     expect(result.current).toEqual({ 'data-cl-slot': 'avatarBox', css: {} });
+  });
+
+  it('useSlot sets className when appearance has a string override', () => {
+    const appearance: MosaicAppearance = { elements: { avatarBox: 'rounded-full' } };
+    const { result } = renderHook(() => useSlot('avatarBox'), { wrapper: wrapper(appearance) });
+    expect(result.current.className).toBe('rounded-full');
   });
 });
 

@@ -19,3 +19,18 @@ export function resolveSlotCss(slot: string, parsed: ParsedMosaicElements): Styl
   }
   return out;
 }
+
+/**
+ * Collects className string overrides for a slot from each appearance layer, joined by spaces.
+ * Returns `undefined` when no string overrides exist for the slot.
+ */
+export function resolveSlotClassName(slot: string, parsed: ParsedMosaicElements): string | undefined {
+  const parts: string[] = [];
+  for (const layer of parsed) {
+    const override = layer?.[slot];
+    if (typeof override === 'string' && override) {
+      parts.push(override);
+    }
+  }
+  return parts.length ? parts.join(' ') : undefined;
+}
