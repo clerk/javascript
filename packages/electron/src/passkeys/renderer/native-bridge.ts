@@ -22,7 +22,7 @@ export function getPasskeyBridge(): PasskeyBridge | undefined {
 
 const bridgeMissingError = () =>
   new ClerkWebAuthnError(
-    'Clerk: The native passkey bridge is not available. Call setupPasskeysPreload() in your preload script and setupPasskeysMain() in the main process.',
+    'Clerk: The native passkey bridge is not available. Pass `passkeys: true` to exposeClerkBridge() in your preload script and createClerkBridge() in the main process.',
     { code: 'passkey_not_supported' },
   );
 

@@ -35,7 +35,8 @@ const getHandler = (channel: string): Handler => {
 };
 
 const windowHandle = Buffer.from([1, 2, 3, 4]);
-const event = { sender: {} } as IpcMainInvokeEvent;
+const mainFrame = {};
+const event = { sender: { mainFrame }, senderFrame: mainFrame } as unknown as IpcMainInvokeEvent;
 
 const creationOptions = { challenge: 'abc', rp: { id: 'example.com', name: 'Example' } };
 const registrationJSON = { id: 'cred', rawId: 'cred', type: 'public-key', response: {} };
@@ -91,6 +92,16 @@ describe('setupPasskeysMain', () => {
     const result = await getHandler(PASSKEY_CHANNELS.create)(event, creationOptions);
 
     expect(result).toMatchObject({ ok: false, error: { code: 'not_supported' } });
+    expect(native.createCredential).not.toHaveBeenCalled();
+  });
+
+  it('rejects requests that do not originate from the main frame', async () => {
+    setupPasskeysMain();
+
+    const subframeEvent = { sender: { mainFrame }, senderFrame: {} } as unknown as IpcMainInvokeEvent;
+    const result = await getHandler(PASSKEY_CHANNELS.create)(subframeEvent, creationOptions);
+
+    expect(result).toMatchObject({ ok: false, error: { code: 'unknown' } });
     expect(native.createCredential).not.toHaveBeenCalled();
   });
 

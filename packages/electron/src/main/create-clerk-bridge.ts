@@ -3,6 +3,7 @@ import { protocol } from 'electron';
 import type { ClerkBridge, CreateClerkBridgeOptions } from '../shared/types';
 import { setupTokenCacheIpcHandlers } from './ipc-handlers';
 import { setupOAuthTransportIpcHandlers } from './oauth-transport';
+import { setupPasskeysMain } from './passkey-handlers';
 
 function assertValidRendererOriginConfig(renderer: NonNullable<CreateClerkBridgeOptions['renderer']>): void {
   if (renderer.scheme.includes(':') || renderer.scheme.includes('/')) {
@@ -34,6 +35,7 @@ export function createClerkBridge(options: CreateClerkBridgeOptions): ClerkBridg
 
   const cleanupTokenPersistence = setupTokenCacheIpcHandlers(options.storage);
   let cleanupOAuthTransport: (() => void) | undefined;
+  const passkeys = options.passkeys ? setupPasskeysMain() : null;
 
   if (options.renderer) {
     assertValidRendererOriginConfig(options.renderer);
@@ -60,6 +62,7 @@ export function createClerkBridge(options: CreateClerkBridgeOptions): ClerkBridg
     cleanup() {
       cleanupTokenPersistence();
       cleanupOAuthTransport?.();
+      passkeys?.cleanup();
     },
   };
 }

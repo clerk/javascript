@@ -110,6 +110,66 @@ describe('Electron ClerkProvider', () => {
     expect(oauthTransport.open).toHaveBeenCalledWith('https://accounts.example.com/oauth');
   });
 
+  it('does not wire passkeys unless they are provided', () => {
+    renderToStaticMarkup(<ClerkProvider publishableKey='pk_test_no_passkeys'>App</ClerkProvider>);
+
+    const clerk = capturedProviderProps?.Clerk as Record<string, unknown>;
+    expect(clerk.__internal_createPublicCredentials).toBeUndefined();
+    expect(clerk.__internal_getPublicCredentials).toBeUndefined();
+    expect(clerk.__internal_isWebAuthnSupported).toBeUndefined();
+  });
+
+  it('wires the provided passkey implementation into the Clerk instance', () => {
+    const passkeys = {
+      create: vi.fn(),
+      get: vi.fn(),
+      isSupported: vi.fn(),
+      isAutoFillSupported: vi.fn(),
+      isPlatformAuthenticatorSupported: vi.fn(),
+    };
+
+    renderToStaticMarkup(
+      <ClerkProvider
+        publishableKey='pk_test_with_passkeys'
+        passkeys={passkeys}
+      >
+        App
+      </ClerkProvider>,
+    );
+
+    const clerk = capturedProviderProps?.Clerk as Record<string, unknown>;
+    expect(clerk.__internal_createPublicCredentials).toBe(passkeys.create);
+    expect(clerk.__internal_getPublicCredentials).toBe(passkeys.get);
+    expect(clerk.__internal_isWebAuthnSupported).toBe(passkeys.isSupported);
+    expect(clerk.__internal_isWebAuthnAutofillSupported).toBe(passkeys.isAutoFillSupported);
+    expect(clerk.__internal_isWebAuthnPlatformAuthenticatorSupported).toBe(passkeys.isPlatformAuthenticatorSupported);
+  });
+
+  it('wires passkeys onto an instance that was cached without them', () => {
+    renderToStaticMarkup(<ClerkProvider publishableKey='pk_test_cached'>App</ClerkProvider>);
+    const cachedClerk = capturedProviderProps?.Clerk;
+
+    const passkeys = {
+      create: vi.fn(),
+      get: vi.fn(),
+      isSupported: vi.fn(),
+      isAutoFillSupported: vi.fn(),
+      isPlatformAuthenticatorSupported: vi.fn(),
+    };
+    renderToStaticMarkup(
+      <ClerkProvider
+        publishableKey='pk_test_cached'
+        passkeys={passkeys}
+      >
+        App
+      </ClerkProvider>,
+    );
+
+    const clerk = capturedProviderProps?.Clerk as Record<string, unknown>;
+    expect(clerk).toBe(cachedClerk);
+    expect(clerk.__internal_createPublicCredentials).toBe(passkeys.create);
+  });
+
   it('adds native request params and Authorization from the Electron token cache', async () => {
     tokenCache.getToken.mockResolvedValue('client-jwt');
     renderToStaticMarkup(<ClerkProvider publishableKey='pk_test_before_request'>App</ClerkProvider>);

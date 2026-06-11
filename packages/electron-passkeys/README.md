@@ -5,7 +5,7 @@ Native passkey (WebAuthn) support for [`@clerk/electron`](https://github.com/cle
 > [!WARNING]
 > This package is under active development and is not yet ready for production use.
 
-This package is a napi-rs native module loaded in the Electron **main** process by `setupPasskeysMain()` from `@clerk/electron`. You should not need to call it directly.
+This package is a napi-rs native module loaded in the Electron **main** process by `createClerkBridge({ passkeys: true })` from `@clerk/electron`. You should not need to call it directly.
 
 | Platform         | Backend                                              | Authenticators                           |
 | ---------------- | ---------------------------------------------------- | ---------------------------------------- |

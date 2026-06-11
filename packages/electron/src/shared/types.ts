@@ -15,6 +15,18 @@ export type CreateClerkBridgeOptions = {
    * Registers the custom scheme used to serve the Electron renderer from a stable origin.
    */
   renderer?: RendererSchemeOptions;
+  /**
+   * Registers the IPC handlers for native passkey ceremonies. Native support also requires
+   * the optional `@clerk/electron-passkeys` package and `exposeClerkBridge({ passkeys: true })`.
+   */
+  passkeys?: boolean;
+};
+
+export type ExposeClerkBridgeOptions = {
+  /**
+   * Exposes the native passkey bridge to the renderer. Requires `createClerkBridge({ passkeys: true })`.
+   */
+  passkeys?: boolean;
 };
 
 export type ClerkBridge = {

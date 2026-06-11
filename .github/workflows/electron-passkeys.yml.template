@@ -57,7 +57,7 @@ jobs:
 
       - name: Smoke test (host-native targets only)
         if: matrix.settings.target == 'aarch64-apple-darwin' || matrix.settings.target == 'x86_64-pc-windows-msvc'
-        run: node -e "const m = require('./index.js'); console.log('isAvailable:', m.isAvailable(), 'capabilities:', JSON.stringify(m.capabilities()))"
+        run: node -e "const m = require('./index.js'); console.log('isAvailable:', m.isAvailable(), 'capabilities:', JSON.stringify(m.capabilities())); if (!m.isAvailable()) throw new Error('the loader did not find the freshly built native binary');"
 
       - uses: actions/upload-artifact@v4
         with:

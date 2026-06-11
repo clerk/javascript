@@ -42,7 +42,7 @@ This package exposes entrypoints for Electron's distinct runtime contexts:
 ```ts
 // main.ts
 import { app, BrowserWindow, net, protocol } from 'electron';
-import { createClerkBridge, setupPasskeysMain } from '@clerk/electron';
+import { createClerkBridge } from '@clerk/electron';
 import { storage } from '@clerk/electron/storage';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -53,9 +53,8 @@ createClerkBridge({
     scheme: 'my-app',
     host: 'renderer',
   },
+  passkeys: true,
 });
-
-setupPasskeysMain();
 
 app.whenReady().then(() => {
   protocol.handle('my-app', request => {
@@ -79,17 +78,22 @@ In `my-app://renderer/sign-in`, `my-app` is the scheme, `renderer` is the host, 
 
 ```ts
 // preload.ts
-import { exposeClerkBridge, setupPasskeysPreload } from '@clerk/electron/preload';
+import { exposeClerkBridge } from '@clerk/electron/preload';
 
-exposeClerkBridge();
-setupPasskeysPreload();
+exposeClerkBridge({ passkeys: true });
 ```
 
 ```tsx
 // renderer.tsx
 import { ClerkProvider } from '@clerk/electron/react';
+import { passkeys } from '@clerk/electron/passkeys';
 
-<ClerkProvider publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}>{/* ... */}</ClerkProvider>;
+<ClerkProvider
+  publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
+  passkeys={passkeys}
+>
+  {/* ... */}
+</ClerkProvider>;
 ```
 
 ## Content Security Policy
@@ -172,28 +176,41 @@ pnpm add @clerk/electron-passkeys
 
 ```ts
 // main process
-import { createClerkBridge, setupPasskeysMain } from '@clerk/electron';
+import { createClerkBridge } from '@clerk/electron';
 import { storage } from '@clerk/electron/storage';
 
-createClerkBridge({ storage: storage() });
-setupPasskeysMain();
+createClerkBridge({ storage: storage(), passkeys: true });
 ```
 
 ```ts
 // preload script
-import { exposeClerkBridge, setupPasskeysPreload } from '@clerk/electron/preload';
+import { exposeClerkBridge } from '@clerk/electron/preload';
 
-exposeClerkBridge();
-setupPasskeysPreload();
+exposeClerkBridge({ passkeys: true });
 ```
 
+```tsx
+// renderer process (React)
+import { ClerkProvider } from '@clerk/electron/react';
+import { passkeys } from '@clerk/electron/passkeys';
+
+<ClerkProvider
+  publishableKey={publishableKey}
+  passkeys={passkeys}
+>
+  {/* ... */}
+</ClerkProvider>;
+```
+
+Passkey code is only bundled and initialized when you pass the `passkeys` prop. If you manage the Clerk instance yourself instead of using `ClerkProvider`, wire it up before `clerk.load()`:
+
 ```ts
-// renderer process
+// renderer process (vanilla)
 import { Clerk } from '@clerk/clerk-js';
 import { createPasskeyProvider } from '@clerk/electron/passkeys';
 
 const clerk = new Clerk(publishableKey);
-createPasskeyProvider(clerk); // optionally { mode: 'auto' | 'renderer' | 'native' }
+createPasskeyProvider(clerk);
 await clerk.load();
 ```
 

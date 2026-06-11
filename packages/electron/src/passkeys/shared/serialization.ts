@@ -79,7 +79,7 @@ export function deserializeCreationResponse(
       getTransports: () => credential.response.transports ?? [],
     },
     toJSON: () => credential,
-  };
+  } as PublicKeyCredentialWithAuthenticatorAttestationResponse & { toJSON: () => RegistrationResponseJSON };
 }
 
 export function deserializeRequestResponse(

@@ -1,17 +1,36 @@
 import { Clerk } from '@clerk/clerk-js';
 
+// Type-only import: the passkeys module is only bundled when the app imports
+// `@clerk/electron/passkeys` itself.
+import type { PasskeySupport } from '../passkeys';
+
 const CLERK_CLIENT_JWT_KEY = '__clerk_client_jwt';
 
 type ClerkInstance = InstanceType<typeof Clerk>;
 
 let cached: { instance: ClerkInstance; publishableKey: string } | null = null;
 
-export function createClerkInstance(publishableKey: string): ClerkInstance {
+function attachPasskeys(clerk: ClerkInstance, passkeys: PasskeySupport): void {
+  clerk.__internal_createPublicCredentials = passkeys.create;
+  clerk.__internal_getPublicCredentials = passkeys.get;
+  clerk.__internal_isWebAuthnSupported = passkeys.isSupported;
+  clerk.__internal_isWebAuthnAutofillSupported = passkeys.isAutoFillSupported;
+  clerk.__internal_isWebAuthnPlatformAuthenticatorSupported = passkeys.isPlatformAuthenticatorSupported;
+}
+
+export function createClerkInstance(publishableKey: string, passkeys?: PasskeySupport): ClerkInstance {
   if (cached?.publishableKey === publishableKey) {
+    if (passkeys) {
+      attachPasskeys(cached.instance, passkeys);
+    }
     return cached.instance;
   }
 
   const clerk = new Clerk(publishableKey);
+
+  if (passkeys) {
+    attachPasskeys(clerk, passkeys);
+  }
 
   clerk.__internal_onBeforeRequest(async request => {
     request.credentials = 'omit';

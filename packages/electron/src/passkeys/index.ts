@@ -62,7 +62,7 @@ const unsupportedReturn = <T>(): CredentialReturn<T> =>
   ({
     publicKeyCredential: null,
     error: new ClerkWebAuthnError(
-      'Clerk: Passkeys are not supported in this window. Serve the page from an https origin matching the RP ID, or set up the native passkey module (setupPasskeysMain/setupPasskeysPreload).',
+      'Clerk: Passkeys are not supported in this window. Serve the page from an https origin matching the RP ID, or enable the native passkey module with `passkeys: true` in createClerkBridge() and exposeClerkBridge().',
       { code: 'passkey_not_supported' },
     ),
   }) as CredentialReturn<T>;
@@ -144,6 +144,20 @@ export function createPasskeys(options?: CreatePasskeysOptions): PasskeySupport 
 
   return { create, get, isSupported, isAutoFillSupported, isPlatformAuthenticatorSupported };
 }
+
+/**
+ * Ready-to-use passkey implementation for the `ClerkProvider` `passkeys` prop.
+ * Chooses renderer or native WebAuthn automatically per request.
+ *
+ * @example
+ * ```tsx
+ * import { ClerkProvider } from '@clerk/electron/react';
+ * import { passkeys } from '@clerk/electron/passkeys';
+ *
+ * <ClerkProvider publishableKey={publishableKey} passkeys={passkeys} />
+ * ```
+ */
+export const passkeys: PasskeySupport = createPasskeys();
 
 /**
  * Wires passkey support into a Clerk instance. Call before `clerk.load()`.

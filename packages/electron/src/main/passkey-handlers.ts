@@ -33,7 +33,7 @@ function loadNativeModule(): Promise<NativePasskeysModule> {
     error => {
       nativeModulePromise = undefined;
       throw new Error(
-        'Clerk: setupPasskeysMain requires the optional @clerk/electron-passkeys package. Install it with your package manager to enable native passkey support.',
+        'Clerk: createClerkBridge({ passkeys: true }) requires the optional @clerk/electron-passkeys package. Install it with your package manager to enable native passkey support.',
         { cause: error },
       );
     },
@@ -72,6 +72,15 @@ async function invokeNative<T>(
     return {
       ok: false,
       error: { code: 'not_supported', message: 'Native passkeys are not supported on this platform.' },
+    };
+  }
+
+  // Subframes and webviews can host third-party content that must not be able
+  // to run credential ceremonies for the app's RP ID.
+  if (!event.senderFrame || event.senderFrame !== event.sender.mainFrame) {
+    return {
+      ok: false,
+      error: { code: 'unknown', message: "The passkey request did not originate from a window's main frame." },
     };
   }
 

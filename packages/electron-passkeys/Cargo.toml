@@ -37,6 +37,7 @@ objc2-authentication-services = { version = "0.3", default-features = false, fea
   "std",
   "ASFoundation",
   "ASAuthorization",
+  "ASAuthorizationError",
   "ASAuthorizationController",
   "ASAuthorizationCredential",
   "ASAuthorizationRequest",
@@ -53,6 +54,12 @@ objc2-authentication-services = { version = "0.3", default-features = false, fea
   "ASAuthorizationPlatformPublicKeyCredentialDescriptor",
   "ASAuthorizationSecurityKeyPublicKeyCredentialDescriptor",
   "ASAuthorizationPublicKeyCredentialParameters",
+] }
+
+# NSDictionary is only needed to build NSError fixtures in unit tests.
+[target.'cfg(target_os = "macos")'.dev-dependencies]
+objc2-foundation = { version = "0.3", default-features = false, features = [
+  "NSDictionary",
 ] }
 
 [target.'cfg(target_os = "windows")'.dependencies]

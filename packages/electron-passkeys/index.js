@@ -11,8 +11,10 @@ const PLATFORM_PACKAGES = {
 function loadNative() {
   const key = `${process.platform}-${process.arch}`;
 
-  // Local napi builds land next to this file.
-  const localBinary = join(__dirname, `electron-passkeys.${key}.node`);
+  // Local napi builds land next to this file; napi appends the ABI to the
+  // filename on Windows (e.g. electron-passkeys.win32-x64-msvc.node).
+  const localKey = process.platform === 'win32' ? `${key}-msvc` : key;
+  const localBinary = join(__dirname, `electron-passkeys.${localKey}.node`);
   if (existsSync(localBinary)) {
     return require(localBinary);
   }

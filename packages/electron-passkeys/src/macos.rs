@@ -15,7 +15,7 @@ use objc2::{
 use objc2_app_kit::{NSView, NSWindow};
 use objc2_authentication_services::{
     ASAuthorization, ASAuthorizationController, ASAuthorizationControllerDelegate,
-    ASAuthorizationControllerPresentationContextProviding,
+    ASAuthorizationControllerPresentationContextProviding, ASAuthorizationError, ASAuthorizationErrorDomain,
     ASAuthorizationPlatformPublicKeyCredentialDescriptor, ASAuthorizationPlatformPublicKeyCredentialProvider,
     ASAuthorizationPublicKeyCredentialParameters, ASAuthorizationRequest,
     ASAuthorizationSecurityKeyPublicKeyCredentialDescriptor,
@@ -170,20 +170,21 @@ impl CeremonyDelegate {
 }
 
 fn map_nserror(error: &NSError) -> (String, String) {
-    let domain = error.domain().to_string();
-    let code = error.code();
+    let domain = error.domain();
+    let code = ASAuthorizationError(error.code());
     let message = error.localizedDescription().to_string();
     let lowered = message.to_lowercase();
 
     let mapped = if lowered.contains("timed out") || lowered.contains("timeout") {
         "timeout"
-    } else if domain == "ASAuthorizationError" {
+    } else if &*domain == unsafe { ASAuthorizationErrorDomain } {
         match code {
-            // ASAuthorizationError.canceled
-            1001 => "cancelled",
+            ASAuthorizationError::Canceled => "cancelled",
             // ASAuthorizationError.failed also covers RP ID / associated-domain
             // mismatches, so use the localized description for classification.
-            1004 if lowered.contains("not associated") || lowered.contains("associated domain") => {
+            ASAuthorizationError::Failed
+                if lowered.contains("not associated") || lowered.contains("associated domain") =>
+            {
                 "invalid_rp"
             }
             _ => "unknown",
@@ -612,4 +613,53 @@ pub(crate) async fn create_credential(handle: usize, options: CreationOptions) -
 
 pub(crate) async fn get_credential(handle: usize, options: RequestOptions) -> String {
     run_ceremony(handle, move || build_get_requests(&options)).await
+}
+
+#[cfg(test)]
+mod tests {
+    use objc2::rc::Retained;
+    use objc2::runtime::AnyObject;
+    use objc2_authentication_services::{ASAuthorizationError, ASAuthorizationErrorDomain};
+    use objc2_foundation::{NSDictionary, NSError, NSLocalizedDescriptionKey, NSString};
+
+    use super::map_nserror;
+
+    fn authorization_error(code: ASAuthorizationError, description: Option<&str>) -> Retained<NSError> {
+        let user_info = description.map(|text| {
+            let value = NSString::from_str(text);
+            let object: &AnyObject = &value;
+            NSDictionary::from_slices(&[unsafe { NSLocalizedDescriptionKey }], &[object])
+        });
+        unsafe {
+            NSError::errorWithDomain_code_userInfo(ASAuthorizationErrorDomain, code.0, user_info.as_deref())
+        }
+    }
+
+    #[test]
+    fn maps_user_cancellation_to_cancelled() {
+        let error = authorization_error(ASAuthorizationError::Canceled, None);
+        assert_eq!(map_nserror(&error).0, "cancelled");
+    }
+
+    #[test]
+    fn maps_domain_association_failures_to_invalid_rp() {
+        let error = authorization_error(
+            ASAuthorizationError::Failed,
+            Some("Application with identifier ABC.com.example is not associated with domain example.com"),
+        );
+        assert_eq!(map_nserror(&error).0, "invalid_rp");
+    }
+
+    #[test]
+    fn maps_other_authorization_failures_to_unknown() {
+        let error = authorization_error(ASAuthorizationError::Unknown, None);
+        assert_eq!(map_nserror(&error).0, "unknown");
+    }
+
+    #[test]
+    fn maps_foreign_domains_to_unknown() {
+        let domain = NSString::from_str("com.example.SomeOtherDomain");
+        let error = unsafe { NSError::errorWithDomain_code_userInfo(&domain, 1001, None) };
+        assert_eq!(map_nserror(&error).0, "unknown");
+    }
 }
