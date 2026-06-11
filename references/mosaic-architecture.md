@@ -260,7 +260,7 @@ export type ButtonProps = React.ComponentPropsWithRef<'button'> & RecipeVariantP
 // → { color?: 'primary'; size?: 'sm' | 'md'; sx?: SxProp }
 ```
 
-Boolean variants (`{ true, false }`) infer as `boolean`; at runtime `true`/`false` are coerced to `'true'`/`'false'` for variant-map lookup. `null` variant values apply no styles.
+Boolean variants (`{ true, false }`) infer as `boolean`; at runtime `true`/`false` are coerced to `'true'`/`'false'` for variant-map lookup. Two distinct `null` cases: (1) when a variant map entry is `null`, `pickSlot` converts it to `undefined` and `mergeInto` skips falsy sources, so that entry contributes no styles; (2) when a variant prop is explicitly passed `null` at the call site, it is coerced to the string key `"null"` for recipe lookup — styles apply only if the recipe defines a `"null"` variant.
 
 ## Slot registry
 
