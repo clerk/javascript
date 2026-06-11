@@ -53,8 +53,9 @@
   "scripts": {
     "build": "rm -rf dist && vite build",
     "dev": "vite build --watch",
-    "lint": "eslint src",
-    "test": "vitest run"
+    "lint": "eslint src && pnpm typecheck",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@floating-ui/react": "catalog:repo"
