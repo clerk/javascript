@@ -25,7 +25,7 @@ export const buttonRecipe = defineSlotRecipe(theme => ({
     _disabled: { opacity: 0.5, cursor: 'not-allowed', pointerEvents: 'none' },
   },
   variants: {
-    intent: {
+    color: {
       primary: {
         backgroundColor: theme.color.primary,
         color: theme.color.primaryForeground,
@@ -38,7 +38,7 @@ export const buttonRecipe = defineSlotRecipe(theme => ({
       md: { padding: `${theme.spacing(2)} ${theme.spacing(4)}`, ...theme.text('sm') },
     },
   },
-  defaultVariants: { intent: 'primary', size: 'md' },
+  defaultVariants: { color: 'primary', size: 'md' },
 }));
 
 declare module '../registry' {
@@ -47,11 +47,12 @@ declare module '../registry' {
   }
 }
 
-export type ButtonProps = React.ComponentPropsWithRef<'button'> & RecipeVariantProps<typeof buttonRecipe>;
+export type ButtonProps = Omit<React.ComponentPropsWithRef<'button'>, 'color'> &
+  RecipeVariantProps<typeof buttonRecipe>;
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function MosaicButton(props, ref) {
-  const { intent, size, disabled, sx, children, ...rest } = props;
-  const { root } = useRecipe(buttonRecipe, { variants: { intent, size }, state: { disabled: !!disabled }, sx });
+  const { color, size, disabled, sx, children, ...rest } = props;
+  const { root } = useRecipe(buttonRecipe, { variants: { color, size }, state: { disabled: !!disabled }, sx });
   return (
     <button
       ref={ref}
