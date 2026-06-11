@@ -50,12 +50,34 @@ export function userAgentIsRobot(userAgent: string): boolean {
 }
 
 /**
+ * Resolves the `Navigator` object from either the DOM `window` (standard browsers)
+ * or the global scope. Web/Service Workers — e.g. an MV3 extension background service
+ * worker — have no `window`, but do expose a `WorkerNavigator` as `globalThis.navigator`
+ * with the `onLine`/`userAgent` properties our heuristics rely on.
+ *
+ * Returns `null` only when no navigator is available anywhere. We intentionally do NOT
+ * treat the absence of a navigator as a valid environment — only a real navigator object
+ * enables the browser/online heuristics below.
+ *
+ * @returns
+ */
+function getNavigator(): Navigator | null {
+  if (typeof window !== 'undefined' && window.navigator) {
+    return window.navigator;
+  }
+  if (typeof navigator !== 'undefined') {
+    return navigator;
+  }
+  return null;
+}
+
+/**
  * Checks if the current environment is a browser and the user agent is not a bot.
  *
  * @returns
  */
 export function isValidBrowser(): boolean {
-  const navigator = inBrowser() ? window?.navigator : null;
+  const navigator = getNavigator();
   if (!navigator) {
     return false;
   }
@@ -68,7 +90,7 @@ export function isValidBrowser(): boolean {
  * @returns
  */
 export function isBrowserOnline(): boolean {
-  const navigator = inBrowser() ? window?.navigator : null;
+  const navigator = getNavigator();
   if (!navigator) {
     return false;
   }

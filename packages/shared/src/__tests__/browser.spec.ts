@@ -38,12 +38,30 @@ describe('isValidBrowser', () => {
     vi.restoreAllMocks();
   });
 
-  it('returns false if not in browser', () => {
+  it('returns false when there is no window and no navigator (e.g. SSR)', () => {
     const windowSpy = vi.spyOn(global, 'window', 'get');
     // @ts-ignore - Test
     windowSpy.mockReturnValue(undefined);
+    const navigatorSpy = vi.spyOn(global, 'navigator', 'get');
+    // @ts-ignore - Test
+    navigatorSpy.mockReturnValue(undefined);
 
     expect(isValidBrowser()).toBe(false);
+  });
+
+  it('returns true in a service worker (no window) when a valid global navigator is present', () => {
+    // An MV3 background service worker has no `window`, but exposes a `WorkerNavigator`
+    // as the global `navigator`. In jsdom `navigator === window.navigator`, so the
+    // userAgent/webdriver spies still apply when accessed via the global.
+    const windowSpy = vi.spyOn(global, 'window', 'get');
+    // @ts-ignore - Test
+    windowSpy.mockReturnValue(undefined);
+    userAgentGetter.mockReturnValue(
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    );
+    webdriverGetter.mockReturnValue(false);
+
+    expect(isValidBrowser()).toBe(true);
   });
 
   it('returns true if in browser, navigator is not a bot, and webdriver is not enabled', () => {
@@ -131,6 +149,10 @@ describe('isValidBrowserOnline', () => {
     connectionGetter = vi.spyOn(window.navigator, 'connection', 'get');
   });
 
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it('returns TRUE if connection is online, navigator is online, has disabled webdriver, and not a bot', () => {
     userAgentGetter.mockReturnValue(
       'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/109.0',
@@ -206,5 +228,42 @@ describe('isValidBrowserOnline', () => {
     });
 
     expect(isValidBrowserOnline()).toBe(true);
+  });
+
+  it('returns TRUE in a service worker (no window) when the global navigator reports online', () => {
+    const windowSpy = vi.spyOn(global, 'window', 'get');
+    // @ts-ignore - Test
+    windowSpy.mockReturnValue(undefined);
+    userAgentGetter.mockReturnValue(
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    );
+    webdriverGetter.mockReturnValue(false);
+    onLineGetter.mockReturnValue(true);
+
+    expect(isValidBrowserOnline()).toBe(true);
+  });
+
+  it('returns FALSE in a service worker (no window) when the global navigator reports offline', () => {
+    const windowSpy = vi.spyOn(global, 'window', 'get');
+    // @ts-ignore - Test
+    windowSpy.mockReturnValue(undefined);
+    userAgentGetter.mockReturnValue(
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    );
+    webdriverGetter.mockReturnValue(false);
+    onLineGetter.mockReturnValue(false);
+
+    expect(isValidBrowserOnline()).toBe(false);
+  });
+
+  it('returns FALSE when there is no window and no navigator at all (e.g. SSR)', () => {
+    const windowSpy = vi.spyOn(global, 'window', 'get');
+    // @ts-ignore - Test
+    windowSpy.mockReturnValue(undefined);
+    const navigatorSpy = vi.spyOn(global, 'navigator', 'get');
+    // @ts-ignore - Test
+    navigatorSpy.mockReturnValue(undefined);
+
+    expect(isValidBrowserOnline()).toBe(false);
   });
 });
