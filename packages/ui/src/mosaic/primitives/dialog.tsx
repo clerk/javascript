@@ -2,12 +2,13 @@ import { Dialog as HeadlessDialog } from '@clerk/headless/dialog';
 import type { DialogPortalProps, DialogProps } from '@clerk/headless/dialog';
 import type { FunctionComponent } from 'react';
 
-import { withMosaicTheme } from './withMosaicTheme';
+import { withMosaicSlot } from './withMosaicSlot';
 
 /**
  * The headless dialog parts bridged into mosaic. Each styleable part is wrapped
- * with `withMosaicTheme`, which forwards its ref and adds the `sx` prop — the
- * bridged type is inferred, so there is nothing to hand-annotate per part.
+ * with `withMosaicSlot`, which forwards its ref and accepts the per-slot props a
+ * recipe produces (`css`, `data-cl-slot`, state attrs) — the bridged type is
+ * inferred, so there is nothing to hand-annotate per part.
  *
  * The structural parts (`Root`, `Portal`) render no element of their own and
  * pass through unchanged; they are cast to their public component types so the
@@ -16,12 +17,12 @@ import { withMosaicTheme } from './withMosaicTheme';
  */
 export const Dialog = {
   Root: HeadlessDialog.Root as FunctionComponent<DialogProps>,
-  Trigger: withMosaicTheme(HeadlessDialog.Trigger),
+  Trigger: withMosaicSlot(HeadlessDialog.Trigger),
   Portal: HeadlessDialog.Portal as FunctionComponent<DialogPortalProps>,
-  Backdrop: withMosaicTheme(HeadlessDialog.Backdrop),
-  Viewport: withMosaicTheme(HeadlessDialog.Viewport),
-  Popup: withMosaicTheme(HeadlessDialog.Popup),
-  Title: withMosaicTheme(HeadlessDialog.Title),
-  Description: withMosaicTheme(HeadlessDialog.Description),
-  Close: withMosaicTheme(HeadlessDialog.Close),
+  Backdrop: withMosaicSlot(HeadlessDialog.Backdrop),
+  Viewport: withMosaicSlot(HeadlessDialog.Viewport),
+  Popup: withMosaicSlot(HeadlessDialog.Popup),
+  Title: withMosaicSlot(HeadlessDialog.Title),
+  Description: withMosaicSlot(HeadlessDialog.Description),
+  Close: withMosaicSlot(HeadlessDialog.Close),
 };
