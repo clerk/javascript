@@ -1,6 +1,8 @@
-import { renderHook } from '@testing-library/react';
+import { render, renderHook } from '@testing-library/react';
 import React from 'react';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
+
+import { Button } from '../components/button';
 
 import type { MosaicAppearance } from '../appearance';
 import { parseMosaicAppearance, useMosaicAppearance } from '../appearance';
@@ -50,6 +52,36 @@ describe('MosaicProvider appearance context', () => {
   it('defaults to [] when standalone (no appearance)', () => {
     const { result } = renderHook(() => useMosaicAppearance());
     expect(result.current).toEqual([]);
+  });
+});
+
+function getMosaicStyles() {
+  return Array.from(document.querySelectorAll('style[data-emotion^="cl-mosaic"]'))
+    .map(el => el.textContent ?? '')
+    .join('\n');
+}
+
+describe('MosaicProvider cssLayerName', () => {
+  afterEach(() => {
+    document.querySelectorAll('style[data-emotion^="cl-mosaic"]').forEach(el => el.remove());
+  });
+
+  it('wraps component styles in @layer when cssLayerName is set', () => {
+    render(
+      <MosaicProvider cssLayerName='components'>
+        <Button>Test</Button>
+      </MosaicProvider>,
+    );
+    expect(getMosaicStyles()).toContain('@layer components');
+  });
+
+  it('does not wrap styles in @layer when cssLayerName is not set', () => {
+    render(
+      <MosaicProvider>
+        <Button>Test</Button>
+      </MosaicProvider>,
+    );
+    expect(getMosaicStyles()).not.toContain('@layer');
   });
 });
 

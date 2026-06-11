@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-restricted-imports
 import createCache from '@emotion/cache';
 // eslint-disable-next-line no-restricted-imports
-import { CacheProvider, type SerializedStyles } from '@emotion/react';
+import { CacheProvider } from '@emotion/react';
 import React from 'react';
 
 import { MosaicAppearanceProvider, parseMosaicAppearance } from './appearance';
@@ -41,20 +41,20 @@ export function MosaicProvider({ children, nonce, cssLayerName, appearance, scop
       nonce,
     });
 
-    if (cssLayerName) {
-      const prevInsert = emotionCache.insert.bind(emotionCache);
-      emotionCache.insert = (selector: string, serialized: SerializedStyles, sheet: any, shouldCache: boolean) => {
-        if (serialized && typeof serialized.styles === 'string') {
-          const newSerialized = { ...serialized };
-          newSerialized.styles = `@layer ${cssLayerName} {${serialized.styles}}`;
-          return prevInsert(selector, newSerialized, sheet, shouldCache);
-        }
-        return prevInsert(selector, serialized, sheet, shouldCache);
-      };
-    }
-
     return emotionCache;
   }, [nonce, cssLayerName]);
+
+  // Children inject styles via useInsertionEffect (fires children → parents).
+  // Ours fires after theirs, still before paint — no flash.
+  React.useInsertionEffect(() => {
+    if (!cssLayerName) return;
+    document.querySelectorAll<HTMLStyleElement>(`style[data-emotion^="${cache.key}"]`).forEach(el => {
+      if (el.textContent && !el.textContent.includes('@layer')) {
+        el.textContent = `@layer ${cssLayerName}{${el.textContent}}`;
+      }
+    });
+  });
+
   return (
     <MosaicThemeContext.Provider value={theme}>
       <MosaicAppearanceProvider value={parsedElements}>
