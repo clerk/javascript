@@ -1,5 +1,11 @@
 import { createClerkClient as backendCreateClerkClient } from '@clerk/backend';
-import { createAppPageObject, createPageObjects, type EnhancedPage } from '@clerk/testing/playwright/unstable';
+import { parsePublishableKey } from '@clerk/shared/keys';
+import {
+  createAppPageObject,
+  createPageObjects,
+  type EnhancedPage,
+  type PlaywrightSetupClerkTestingTokenOptions,
+} from '@clerk/testing/playwright/unstable';
 import type { Browser, BrowserContext, Page } from '@playwright/test';
 
 import type { Application } from '../models/application';
@@ -19,6 +25,50 @@ const createClerkClient = (app: Application) => {
     secretKey: app.env.privateVariables.get('CLERK_SECRET_KEY'),
     publishableKey: app.env.publicVariables.get('CLERK_PUBLISHABLE_KEY'),
   });
+};
+
+// One testing token per instance (keyed by publishable key), minted lazily on the first
+// FAPI request a test intercepts and shared across tests in this worker process.
+const testingTokenCache = new Map<string, Promise<string | undefined>>();
+
+const getTestingToken = (
+  app: Application,
+  clerkClient: ReturnType<typeof createClerkClient>,
+  publishableKey: string,
+): Promise<string | undefined> => {
+  let promise = testingTokenCache.get(publishableKey);
+  if (!promise) {
+    promise = clerkClient.testingTokens
+      .createTestingToken()
+      .then(({ token }) => token)
+      .catch(err => {
+        console.warn(
+          `Failed to mint a testing token for app "${app.name}". Falling back to the CLERK_TESTING_TOKEN env var.`,
+          err,
+        );
+        return undefined;
+      });
+    testingTokenCache.set(publishableKey, promise);
+  }
+  return promise;
+};
+
+// Builds per-app options so the testing-token bypass targets the instance THIS app talks
+// to, instead of the process-global CLERK_FAPI (which holds whichever app ran clerkSetup
+// last and silently misses every other instance, e.g. captcha-enabled ones).
+const createTestingTokenOptions = (
+  app: Application,
+  clerkClient: ReturnType<typeof createClerkClient>,
+): PlaywrightSetupClerkTestingTokenOptions | undefined => {
+  const publishableKey = app.env.publicVariables.get('CLERK_PUBLISHABLE_KEY');
+  const parsedKey = publishableKey ? parsePublishableKey(publishableKey) : null;
+  if (!publishableKey || parsedKey?.instanceType !== 'development') {
+    return undefined;
+  }
+  return {
+    frontendApiUrl: parsedKey.frontendApi,
+    testingToken: () => getTestingToken(app, clerkClient, publishableKey),
+  };
 };
 
 export type CreateAppPageObjectArgs = { page: Page; context: BrowserContext; browser: Browser };
@@ -49,7 +99,13 @@ export const createTestUtils = <
     return { services } as any;
   }
 
-  const pageObjects = createPageObjects({ page: params.page, useTestingToken, baseURL: app.serverUrl });
+  const testingTokenOptions = createTestingTokenOptions(app, clerkClient);
+  const pageObjects = createPageObjects({
+    page: params.page,
+    useTestingToken,
+    baseURL: app.serverUrl,
+    testingTokenOptions,
+  });
 
   const browserHelpers = {
     runInNewTab: async (
@@ -57,7 +113,10 @@ export const createTestUtils = <
     ) => {
       const u = createTestUtils({
         app,
-        page: createAppPageObject({ page: await context.newPage(), useTestingToken }, { baseURL: app.serverUrl }),
+        page: createAppPageObject(
+          { page: await context.newPage(), useTestingToken, testingTokenOptions },
+          { baseURL: app.serverUrl },
+        ),
       });
       await cb(u as any, context);
       return u;
@@ -71,7 +130,10 @@ export const createTestUtils = <
       const context = await browser.newContext();
       const u = createTestUtils({
         app,
-        page: createAppPageObject({ page: await context.newPage(), useTestingToken }, { baseURL: app.serverUrl }),
+        page: createAppPageObject(
+          { page: await context.newPage(), useTestingToken, testingTokenOptions },
+          { baseURL: app.serverUrl },
+        ),
       });
       await cb(u as any, context);
       return u;

@@ -48,6 +48,13 @@ export type SetupClerkTestingTokenOptions = {
    * Example: 'relieved-chamois-66.clerk.accounts.dev'
    */
   frontendApiUrl?: string;
+
+  /*
+   * The testing token to append to Frontend API requests.
+   * If provided, it takes precedence over the CLERK_TESTING_TOKEN environment variable.
+   * Useful when a test suite spans multiple Clerk instances, each needing its own token.
+   */
+  testingToken?: string;
 };
 
 export type ClerkSignInParams =

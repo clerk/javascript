@@ -3,13 +3,28 @@ import type { BrowserContext, Page } from '@playwright/test';
 import type { SetupClerkTestingTokenOptions } from '../common';
 import { ERROR_MISSING_FRONTEND_API_URL, TESTING_TOKEN_PARAM } from '../common';
 
+/**
+ * A function that lazily resolves a testing token. Returning `undefined` falls back to the
+ * `CLERK_TESTING_TOKEN` environment variable.
+ */
+export type TestingTokenProvider = () => string | undefined | Promise<string | undefined>;
+
+export type PlaywrightSetupClerkTestingTokenOptions = Omit<SetupClerkTestingTokenOptions, 'testingToken'> & {
+  /*
+   * The testing token to append to Frontend API requests, or a function that resolves it lazily.
+   * If provided, it takes precedence over the CLERK_TESTING_TOKEN environment variable.
+   * Useful when a test suite spans multiple Clerk instances, each needing its own token.
+   */
+  testingToken?: string | TestingTokenProvider;
+};
+
 type SetupClerkTestingTokenParams = {
   context?: BrowserContext;
   page?: Page;
-  options?: SetupClerkTestingTokenOptions;
+  options?: PlaywrightSetupClerkTestingTokenOptions;
 };
 
-const setupContexts = new WeakSet<BrowserContext>();
+const setupContexts = new WeakMap<BrowserContext, Set<string>>();
 
 const RETRYABLE_STATUS_CODES = new Set([429, 502, 503, 504]);
 const MAX_ROUTE_RETRIES = 3;
@@ -22,9 +37,10 @@ const JITTER_MAX_MS = 250;
  * @param params.context - The Playwright browser context object.
  * @param params.page - The Playwright page object.
  * @param params.options.frontendApiUrl - The frontend API URL for your Clerk dev instance, without the protocol.
+ * @param params.options.testingToken - The testing token to append, or a function that resolves it lazily. Takes precedence over the `CLERK_TESTING_TOKEN` environment variable.
  * @returns A promise that resolves when the bot protection bypass is set up.
  * @throws An error if the Frontend API URL is not provided.
- * @remarks Set the `CLERK_TESTING_DEBUG` environment variable to enable verbose logging of retry attempts and route handler registration.
+ * @remarks Set the `CLERK_TESTING_DEBUG` environment variable to enable verbose logging of retry attempts and route handler registration. Calling this again with the same frontend API URL on the same context is a no-op; calling it with a different frontend API URL registers an additional, independent bypass, so suites spanning multiple Clerk instances can set up one per instance.
  * @example
  * import { setupClerkTestingToken } from '@clerk/testing/playwright';
  *
@@ -42,26 +58,48 @@ export const setupClerkTestingToken = async ({ context, options, page }: SetupCl
     throw new Error('Either context or page must be provided to setup testing token');
   }
 
-  if (setupContexts.has(browserContext)) {
-    if (process.env.CLERK_TESTING_DEBUG) {
-      console.log('[Clerk Testing] Route handler already registered for this context, skipping duplicate setup');
-    }
-    return;
-  }
-
   const fapiUrl = options?.frontendApiUrl || process.env.CLERK_FAPI;
   if (!fapiUrl) {
     throw new Error(ERROR_MISSING_FRONTEND_API_URL);
   }
 
+  const setupHosts = setupContexts.get(browserContext) ?? new Set<string>();
+  if (setupHosts.has(fapiUrl)) {
+    if (process.env.CLERK_TESTING_DEBUG) {
+      console.log(
+        `[Clerk Testing] Route handler already registered for ${fapiUrl} on this context, skipping duplicate setup`,
+      );
+    }
+    return;
+  }
+
   const escapedFapiUrl = fapiUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const apiUrl = new RegExp(`^https://${escapedFapiUrl}/v1/.*?(\\?.*)?$`);
 
-  setupContexts.add(browserContext);
+  // Resolve the token once per registration, shared by every intercepted request.
+  let resolvedTokenPromise: Promise<string | undefined> | undefined;
+  const resolveTestingToken = () => {
+    if (!resolvedTokenPromise) {
+      const provided = options?.testingToken;
+      resolvedTokenPromise = Promise.resolve()
+        .then(() => (typeof provided === 'function' ? provided() : provided))
+        .catch(error => {
+          console.warn(
+            `[Clerk Testing] Failed to resolve the testing token for ${fapiUrl}. Falling back to the CLERK_TESTING_TOKEN environment variable.`,
+            error,
+          );
+          return undefined;
+        });
+    }
+    return resolvedTokenPromise;
+  };
+
+  setupHosts.add(fapiUrl);
+  setupContexts.set(browserContext, setupHosts);
   try {
     await browserContext.route(apiUrl, async route => {
       const originalUrl = new URL(route.request().url());
-      const testingToken = process.env.CLERK_TESTING_TOKEN;
+      const testingToken = (await resolveTestingToken()) ?? process.env.CLERK_TESTING_TOKEN;
 
       if (testingToken) {
         originalUrl.searchParams.set(TESTING_TOKEN_PARAM, testingToken);
@@ -130,7 +168,7 @@ export const setupClerkTestingToken = async ({ context, options, page }: SetupCl
       }
     });
   } catch (e) {
-    setupContexts.delete(browserContext);
+    setupHosts.delete(fapiUrl);
     throw e;
   }
 };

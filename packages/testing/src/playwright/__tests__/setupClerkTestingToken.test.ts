@@ -47,18 +47,19 @@ function createMockRoute(
 }
 
 function createMockContext() {
-  let routeHandler: ((route: Route) => Promise<void>) | undefined;
+  const registrations: { pattern: RegExp; handler: (route: Route) => Promise<void> }[] = [];
 
   const context = {
-    route: vi.fn((_pattern: RegExp, handler: (route: Route) => Promise<void>) => {
-      routeHandler = handler;
+    route: vi.fn((pattern: RegExp, handler: (route: Route) => Promise<void>) => {
+      registrations.push({ pattern, handler });
       return Promise.resolve();
     }),
   } as unknown as BrowserContext;
 
   return {
     context,
-    getRouteHandler: () => routeHandler,
+    getRouteHandler: () => registrations.at(-1)?.handler,
+    getRegistrations: () => registrations,
     getRouteCallCount: () => (context.route as ReturnType<typeof vi.fn>).mock.calls.length,
   };
 }
@@ -156,6 +157,129 @@ describe('setupClerkTestingToken', () => {
       await setupClerkTestingToken({ page });
 
       expect(getRouteCallCount()).toBe(1);
+    });
+
+    it('no-ops on a second call with the same explicit frontendApiUrl', async () => {
+      const { context, getRouteCallCount } = createMockContext();
+
+      await setupClerkTestingToken({ context, options: { frontendApiUrl: 'a.clerk.com' } });
+      await setupClerkTestingToken({ context, options: { frontendApiUrl: 'a.clerk.com' } });
+
+      expect(getRouteCallCount()).toBe(1);
+    });
+
+    it('registers an additional route for a different frontendApiUrl on the same context', async () => {
+      const { context, getRegistrations } = createMockContext();
+
+      await setupClerkTestingToken({ context, options: { frontendApiUrl: 'a.clerk.com' } });
+      await setupClerkTestingToken({ context, options: { frontendApiUrl: 'b.clerk.com' } });
+
+      const registrations = getRegistrations();
+      expect(registrations).toHaveLength(2);
+      expect(registrations[0].pattern.test('https://a.clerk.com/v1/client')).toBe(true);
+      expect(registrations[0].pattern.test('https://b.clerk.com/v1/client')).toBe(false);
+      expect(registrations[1].pattern.test('https://b.clerk.com/v1/client')).toBe(true);
+      expect(registrations[1].pattern.test('https://a.clerk.com/v1/client')).toBe(false);
+    });
+  });
+
+  describe('per-instance testing tokens', () => {
+    it('uses options.testingToken string over the env var', async () => {
+      const { context, getRouteHandler } = createMockContext();
+      await setupClerkTestingToken({ context, options: { testingToken: 'option_token' } });
+
+      const { route } = createMockRoute();
+      await getRouteHandler()!(route);
+
+      expect(route.fetch).toHaveBeenCalledWith({
+        url: expect.stringContaining('__clerk_testing_token=option_token'),
+      });
+    });
+
+    it('resolves an async testing token provider', async () => {
+      const { context, getRouteHandler } = createMockContext();
+      await setupClerkTestingToken({ context, options: { testingToken: () => Promise.resolve('provider_token') } });
+
+      const { route } = createMockRoute();
+      await getRouteHandler()!(route);
+
+      expect(route.fetch).toHaveBeenCalledWith({
+        url: expect.stringContaining('__clerk_testing_token=provider_token'),
+      });
+    });
+
+    it('invokes the provider once per registration across multiple requests', async () => {
+      const { context, getRouteHandler } = createMockContext();
+      const provider = vi.fn(() => Promise.resolve('provider_token'));
+      await setupClerkTestingToken({ context, options: { testingToken: provider } });
+
+      const handler = getRouteHandler()!;
+      await handler(createMockRoute().route);
+      await handler(createMockRoute().route);
+
+      expect(provider).toHaveBeenCalledTimes(1);
+    });
+
+    it('falls back to the env var and warns when the provider rejects', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const { context, getRouteHandler } = createMockContext();
+      await setupClerkTestingToken({
+        context,
+        options: { testingToken: () => Promise.reject(new Error('mint failed')) },
+      });
+
+      const { route, fulfilled } = createMockRoute();
+      await getRouteHandler()!(route);
+
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Failed to resolve the testing token'),
+        expect.any(Error),
+      );
+      expect(route.fetch).toHaveBeenCalledWith({
+        url: expect.stringContaining(`__clerk_testing_token=${TESTING_TOKEN}`),
+      });
+      expect(fulfilled[0].json.response.captcha_bypass).toBe(true);
+
+      warnSpy.mockRestore();
+    });
+
+    it('falls back to the env var when the provider resolves undefined', async () => {
+      const { context, getRouteHandler } = createMockContext();
+      await setupClerkTestingToken({ context, options: { testingToken: () => undefined } });
+
+      const { route } = createMockRoute();
+      await getRouteHandler()!(route);
+
+      expect(route.fetch).toHaveBeenCalledWith({
+        url: expect.stringContaining(`__clerk_testing_token=${TESTING_TOKEN}`),
+      });
+    });
+
+    it('appends each registration its own token when two instances share a context', async () => {
+      const { context, getRegistrations } = createMockContext();
+
+      await setupClerkTestingToken({
+        context,
+        options: { frontendApiUrl: 'a.clerk.com', testingToken: 'token_a' },
+      });
+      await setupClerkTestingToken({
+        context,
+        options: { frontendApiUrl: 'b.clerk.com', testingToken: () => Promise.resolve('token_b') },
+      });
+
+      const [first, second] = getRegistrations();
+
+      const routeA = createMockRoute({ url: 'https://a.clerk.com/v1/client' });
+      await first.handler(routeA.route);
+      expect(routeA.route.fetch).toHaveBeenCalledWith({
+        url: expect.stringContaining('__clerk_testing_token=token_a'),
+      });
+
+      const routeB = createMockRoute({ url: 'https://b.clerk.com/v1/client' });
+      await second.handler(routeB.route);
+      expect(routeB.route.fetch).toHaveBeenCalledWith({
+        url: expect.stringContaining('__clerk_testing_token=token_b'),
+      });
     });
   });
 
