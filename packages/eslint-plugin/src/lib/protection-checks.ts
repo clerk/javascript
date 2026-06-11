@@ -217,8 +217,12 @@ function consequentExits(consequent: TSESTree.Statement | null | undefined): boo
     return true;
   }
   if (consequent.type === 'BlockStatement') {
-    const first = nextExecutable(consequent.body, 0);
-    return statementExits(consequent.body[first]);
+    // A guaranteed top-level exit anywhere in the block is enough: the block
+    // only runs in the unauthenticated branch the developer is explicitly
+    // handling, and once it exits, the protected code below is unreachable for
+    // a signed-out user. Work the developer chooses to run before bailing
+    // (logging, cleanup, etc.) is their deliberate call, so we don't forbid it.
+    return consequent.body.some(statementExits);
   }
   return false;
 }
