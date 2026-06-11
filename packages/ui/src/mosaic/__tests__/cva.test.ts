@@ -1,6 +1,6 @@
 import { describe, expect, expectTypeOf, it } from 'vitest';
 
-import { cva } from '../cva';
+import { cva, cx } from '../cva';
 import type { SxProp, VariantProps } from '../cva';
 import { defaultMosaicVariables, resolveVariables } from '../variables';
 import type { MosaicTheme } from '../variables';
@@ -717,5 +717,41 @@ describe('type safety', () => {
         },
       });
     });
+  });
+});
+
+describe('cva without variants', () => {
+  it('applies base styles and merges sx', () => {
+    const styles = cva({ base: { color: 'red' } });
+    expect(styles({ sx: { opacity: 0.5 } })(mockTheme)).toEqual({ color: 'red', opacity: 0.5 });
+  });
+
+  it('exposes empty variant metadata for tooling', () => {
+    const styles = cva({ base: { color: 'red' } });
+    expect(styles._variants).toEqual({});
+    expect(styles._defaultVariants).toEqual({});
+  });
+});
+
+describe('cx', () => {
+  it('resolves a static style object', () => {
+    const styles = cx({ color: 'red' });
+    expect(styles()(mockTheme)).toEqual({ color: 'red' });
+  });
+
+  it('resolves a theme function', () => {
+    const styles = cx(theme => ({ color: theme.color.primary }));
+    expect(styles()(mockTheme)).toEqual({ color: mockTheme.color.primary });
+  });
+
+  it('merges sx over base styles', () => {
+    const styles = cx({ color: 'red', opacity: 1 });
+    expect(styles({ sx: { opacity: 0.5 } })(mockTheme)).toEqual({ color: 'red', opacity: 0.5 });
+  });
+
+  it('exposes empty variant metadata for tooling', () => {
+    const styles = cx({ color: 'red' });
+    expect(styles._variants).toEqual({});
+    expect(styles._defaultVariants).toEqual({});
   });
 });

@@ -37,7 +37,7 @@ type CompoundVariant<V extends Variants> = VariantPropsOf<V> & { css: StyleRule 
 
 type CvaConfig<V extends Variants> = {
   base?: StyleRule;
-  variants: V;
+  variants?: V;
   compoundVariants?: Array<CompoundVariant<V>>;
   defaultVariants?: VariantPropsOf<V>;
 };
@@ -78,9 +78,13 @@ type CvaFn<V extends Variants> = {
  * // In a component:
  * css={buttonStyles({ size: 'sm', sx: { opacity: 0.8 } })(theme)}
  */
-export function cva<V extends Variants>(config: CvaConfig<V>): CvaFn<V>;
-export function cva<V extends Variants>(configFn: (theme: MosaicTheme) => CvaConfig<V>): CvaFn<V>;
-export function cva<V extends Variants>(configOrFn: CvaConfig<V> | ((theme: MosaicTheme) => CvaConfig<V>)): CvaFn<V> {
+export function cva<V extends Variants = Record<never, never>>(config: CvaConfig<V>): CvaFn<V>;
+export function cva<V extends Variants = Record<never, never>>(
+  configFn: (theme: MosaicTheme) => CvaConfig<V>,
+): CvaFn<V>;
+export function cva<V extends Variants = Record<never, never>>(
+  configOrFn: CvaConfig<V> | ((theme: MosaicTheme) => CvaConfig<V>),
+): CvaFn<V> {
   const configCache = typeof configOrFn === 'function' ? new WeakMap<MosaicTheme, CvaConfig<V>>() : null;
   const fn = ((props: VariantPropsOf<V> & { sx?: SxProp } = {} as VariantPropsOf<V>) =>
     (theme: MosaicTheme): StyleRule => {
@@ -115,10 +119,28 @@ export function cva<V extends Variants>(configOrFn: CvaConfig<V> | ((theme: Mosa
 
   const resolvedConfig =
     typeof configOrFn === 'function' ? configOrFn(resolveVariables(defaultMosaicVariables)) : configOrFn;
-  fn._variants = resolvedConfig.variants;
+  fn._variants = (resolvedConfig.variants ?? {}) as V;
   fn._defaultVariants = (resolvedConfig.defaultVariants ?? {}) as VariantPropsOf<V>;
 
   return fn;
+}
+
+// ─── cx ─────────────────────────────────────────────────────────────────────--
+
+/**
+ * Sugar over `cva` for styles with no variants — just base rules plus `sx`.
+ *
+ * Equivalent to `cva({ base })` but skips the `base:` wrapper. The result is a
+ * full `cva` function (carries empty `_variants`/`_defaultVariants`), so it stays
+ * compatible with tooling that reads variant metadata.
+ *
+ * @example
+ * const boxStyles = cx(theme => ({ color: theme.color.primary }));
+ * // In a component:
+ * css={boxStyles({ sx: { opacity: 0.8 } })(theme)}
+ */
+export function cx(styles: StyleRule | ((theme: MosaicTheme) => StyleRule)): CvaFn<Record<never, never>> {
+  return typeof styles === 'function' ? cva(theme => ({ base: styles(theme) })) : cva({ base: styles });
 }
 
 // ─── Internal ─────────────────────────────────────────────────────────────────
