@@ -189,14 +189,12 @@ export const CheckoutForm = withCardStateProvider(() => {
           ) : null}
 
           {showRenewalTotals && (
-            <>
-              <LineItems.Group borderTop>
-                <LineItems.Title title={localizationKeys('billing.totalDuePerPeriod')} />
-                <LineItems.Description
-                  text={`${totals.totalsDuePerPeriod?.grandTotal.currencySymbol}${totals.totalsDuePerPeriod?.grandTotal.amountFormatted}`}
-                />
-              </LineItems.Group>
-            </>
+            <LineItems.Group borderTop>
+              <LineItems.Title title={localizationKeys('billing.totalDuePerPeriod')} />
+              <LineItems.Description
+                text={`${totals.totalsDuePerPeriod?.grandTotal.currencySymbol}${totals.totalsDuePerPeriod?.grandTotal.amountFormatted}`}
+              />
+            </LineItems.Group>
           )}
         </LineItems.Root>
       </Box>
@@ -414,6 +412,7 @@ export const PayWithTestPaymentMethod = () => {
 
 const useSubmitLabel = () => {
   const { checkout } = useCheckout();
+  const { seatsQuantity } = useCheckoutContext();
   const { status, freeTrialEndsAt, totals } = checkout;
 
   if (status === 'needs_initialization') {
@@ -421,6 +420,11 @@ const useSubmitLabel = () => {
   }
 
   if (freeTrialEndsAt) {
+    if (seatsQuantity && totals.totalDueNow) {
+      return localizationKeys('billing.pay', {
+        amount: `${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`,
+      });
+    }
     return localizationKeys('billing.startFreeTrial');
   }
 
