@@ -20,6 +20,7 @@ import { MyComponent, myComponentStyles } from '@clerk/ui/mosaic/components/my-c
 export const meta: StoryMeta = {
   group: 'Components',
   title: 'My Component',
+  source: 'packages/ui/src/mosaic/components/my-component.tsx', // repo-root path → "View source" link
   styles: myComponentStyles, // CVA style object — knobs auto-generated from _variants
 };
 
@@ -29,6 +30,8 @@ export function Default(props: Record<string, unknown>) {
 ```
 
 Knobs are generated automatically from the CVA `_variants` on the style object. Boolean variants (`true`/`false` keys) become toggles; all others become selects. Default values come from `defaultVariants`.
+
+`source` is the path to the component's exporting file relative to the monorepo root; `DocsViewer` renders it as a "View source" link to the file on GitHub (`lib/source.ts`).
 
 **2. Register in `src/lib/registry.ts`**
 
@@ -48,17 +51,23 @@ import * as Stories from './my-component.stories';
 
 # My Component
 
-<Story
+## Playground
+
+<Preview
   name='Default'
   storyModule={Stories}
 />
 
 ## Props
 
-| Prop                 | Type                   | Default                |
-| -------------------- | ---------------------- | ---------------------- |
-| <code>variant</code> | <code>'primary'</code> | <code>'primary'</code> |
+<PropTable meta={Stories.meta} />
 ```
+
+`<Preview>` renders the live component inline in the overview — there are no separate
+per-story pages. Its props are edited through the controls in the `<PropTable>` below it,
+and a collapsible Variables panel attached to the preview exposes Mosaic token overrides
+that re-theme it. Both share the page's playground state. Use `<Story name='Sizes' …>` for
+additional static demos of specific variations (no controls).
 
 Register in `src/components/DocsViewer.tsx`:
 
@@ -90,15 +99,20 @@ src/
   components/
     app-sidebar.tsx    Left nav (reads from registry)
     ClientRoot.tsx     SidebarProvider + breadcrumb header
-    DocsViewer.tsx     Renders MDX docs for /components/[slug]
-    StoryCanvas.tsx    Renders a story + knobs for /components/[slug]/[story]
-    KnobPanel.tsx      Auto-generated knob controls
-    VariablesPanel.tsx Mosaic CSS variable overrides
-    CodeBlock.tsx      Shiki syntax highlighter (css-variables theme)
+    DocsViewer.tsx       Renders MDX docs for /components/[slug]; provides PlaygroundContext
+    PlaygroundContext.tsx Shared per-page knob values + Mosaic variables
+    StoryPreview.tsx     Live <Preview> embed, props driven by the playground state
+    StoryEmbed.tsx       Static <Story> embed: a single variation, no controls
+    PropTable.tsx        Interactive props table — controls live in the Value column
+    KnobControl.tsx      A single auto-generated control (switch/select/input)
+    VariablesPanel.tsx   Mosaic CSS variable overrides (collapsible, attached to the preview)
+    CodeBlock.tsx        Shiki syntax highlighter (css-variables theme)
+    ViewSource.tsx       "View source" link to the component's file on GitHub
   lib/
     registry.ts        Story registry — add new stories here
     generateKnobs.ts   CVA _variants → knob definitions
     types.ts           StoryMeta, StoryModule, KnobDef etc.
     slug.ts            URL slug utilities
+    source.ts          Builds GitHub URLs from meta.source paths
   stories/             Story and MDX files
 ```

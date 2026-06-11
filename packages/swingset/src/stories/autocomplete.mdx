@@ -1,0 +1,127 @@
+import * as AutocompleteStories from './autocomplete.stories';
+
+# Autocomplete
+
+A text input paired with a filtered list of suggestions, from `@clerk/headless`. It is a
+**headless** primitive: it supplies input text, selected value, and open state, portalling,
+floating-ui positioning, virtual-focus keyboard navigation, and ARIA `combobox` wiring, but
+ships **no styles** — you bring your own CSS by targeting the `data-cl-*` attributes each
+part emits. It does **no filtering of its own**: you read `inputValue` and render the
+surviving options.
+
+## Example
+
+The demo below is intentionally unstyled — it renders the raw primitive so you can see its
+behavior and ARIA wiring. Type to filter the consumer-supplied list; arrow keys move the
+active option and Enter selects it.
+
+<Story
+  name='Default'
+  storyModule={AutocompleteStories}
+/>
+
+## Usage
+
+```tsx
+import { Autocomplete } from '@clerk/headless/autocomplete';
+
+const [inputValue, setInputValue] = useState('');
+const filtered = items.filter(item => item.toLowerCase().includes(inputValue.toLowerCase()));
+
+<Autocomplete.Root
+  inputValue={inputValue}
+  onInputValueChange={setInputValue}
+>
+  <Autocomplete.Input placeholder='Search…' />
+  <Autocomplete.Portal>
+    <Autocomplete.Positioner>
+      <Autocomplete.Popup>
+        <Autocomplete.List>
+          {filtered.map(item => (
+            <Autocomplete.Option
+              key={item}
+              value={item}
+              label={item}
+            >
+              {item}
+            </Autocomplete.Option>
+          ))}
+        </Autocomplete.List>
+      </Autocomplete.Popup>
+    </Autocomplete.Positioner>
+  </Autocomplete.Portal>
+</Autocomplete.Root>;
+```
+
+## Parts
+
+| Part                      | Default Element | Description                                                     |
+| ------------------------- | --------------- | --------------------------------------------------------------- |
+| `Autocomplete.Root`       | none (context)  | Owns input text, selected value, open state, and positioning    |
+| `Autocomplete.Input`      | `<input>`       | The combobox text input that drives filtering and navigation    |
+| `Autocomplete.Portal`     | none (portal)   | Portals its children; renders nothing until mounted             |
+| `Autocomplete.Positioner` | `<div>`         | Floating-positioned container                                   |
+| `Autocomplete.Popup`      | `<div>`         | Visual wrapper for the option list                              |
+| `Autocomplete.List`       | `<div>`         | Listbox container (use inline, inside another floating surface) |
+| `Autocomplete.Option`     | `<div>`         | A selectable option (`role="option"`)                           |
+| `Autocomplete.Arrow`      | `<svg>`         | Optional arrow pointing at the input                            |
+
+All rendered parts accept a `render` prop for polymorphic rendering and standard HTML
+attributes for their default element. `Autocomplete.Arrow` accepts floating-ui
+`FloatingArrow` props. Mounting `Autocomplete.List` switches the primitive into inline mode
+(Escape / outside press bubble to the parent floating surface instead of dismissing).
+
+## Props
+
+### `Autocomplete.Root`
+
+| Prop                            | Type                                 | Default                     | Description                               |
+| ------------------------------- | ------------------------------------ | --------------------------- | ----------------------------------------- |
+| <code>inputValue</code>         | <code>string</code>                  | —                           | Controlled input text                     |
+| <code>defaultInputValue</code>  | <code>string</code>                  | <code>''</code>             | Initial input text (uncontrolled)         |
+| <code>onInputValueChange</code> | <code>(value: string) => void</code> | —                           | Called when the input text changes        |
+| <code>value</code>              | <code>string</code>                  | —                           | Controlled selected value                 |
+| <code>defaultValue</code>       | <code>string</code>                  | —                           | Initial selected value (uncontrolled)     |
+| <code>onValueChange</code>      | <code>(value: string) => void</code> | —                           | Called when an option is selected         |
+| <code>open</code>               | <code>boolean</code>                 | —                           | Controlled open state                     |
+| <code>defaultOpen</code>        | <code>boolean</code>                 | <code>false</code>          | Initial open state (uncontrolled)         |
+| <code>onOpenChange</code>       | <code>(open: boolean) => void</code> | —                           | Called when the open state changes        |
+| <code>placement</code>          | <code>Placement</code>               | <code>'bottom-start'</code> | Placement relative to the input           |
+| <code>sideOffset</code>         | <code>number</code>                  | <code>4</code>              | Gap in px between the input and the popup |
+
+### `Autocomplete.Option`
+
+| Prop                  | Type                 | Default               | Description                              |
+| --------------------- | -------------------- | --------------------- | ---------------------------------------- |
+| <code>value</code>    | <code>string</code>  | — (required)          | The option's value                       |
+| <code>label</code>    | <code>string</code>  | falls back to `value` | Label written to the input when selected |
+| <code>disabled</code> | <code>boolean</code> | —                     | Prevent selection                        |
+
+`Autocomplete.Input`, `Autocomplete.Positioner`, `Autocomplete.Popup`, and
+`Autocomplete.List` take no additional props beyond standard HTML attributes for their
+default element. `Autocomplete.Portal` accepts `root`.
+
+## Styling
+
+Each part emits `data-cl-*` attributes you can target with any CSS solution:
+
+| Attribute          | Applies To        | Description                                        |
+| ------------------ | ----------------- | -------------------------------------------------- |
+| `data-cl-slot`     | All parts         | Part identifier                                    |
+| `data-cl-open`     | Input             | Present when the popup is open                     |
+| `data-cl-closed`   | Input             | Present when the popup is closed                   |
+| `data-cl-selected` | Option            | Present on the option matching the selected value  |
+| `data-cl-active`   | Option            | Present on the keyboard-highlighted option         |
+| `data-cl-disabled` | Option            | Present on a disabled option                       |
+| `data-cl-side`     | Positioner, Arrow | Resolved side: `top` / `bottom` / `left` / `right` |
+
+The positioner exposes anchor/viewport geometry as CSS variables (and sets an inline
+`width` matching the input and a `max-height` of the available viewport height):
+
+| Variable                | Description                                           |
+| ----------------------- | ----------------------------------------------------- |
+| `--cl-anchor-width`     | Input width                                           |
+| `--cl-anchor-height`    | Input height                                          |
+| `--cl-available-width`  | Available width between the anchor and viewport edge  |
+| `--cl-available-height` | Available height between the anchor and viewport edge |
+| `--cl-transform-origin` | `transform-origin` pointing back toward the anchor    |

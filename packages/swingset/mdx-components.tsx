@@ -3,6 +3,8 @@ import * as React from 'react';
 import { CodeBlock } from './src/components/CodeBlock';
 import { PropTable } from './src/components/PropTable';
 import { StoryEmbed } from './src/components/StoryEmbed';
+import { StoryPreview } from './src/components/StoryPreview';
+import { UsageBlock } from './src/components/UsageBlock';
 
 function PreBlock({ children }: { children?: React.ReactNode }) {
   if (React.isValidElement(children) && (children as React.ReactElement).type === 'code') {
@@ -20,6 +22,8 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ...components,
     pre: PreBlock,
     Story: StoryEmbed,
+    Preview: StoryPreview,
     PropTable,
+    Usage: UsageBlock,
   };
 }

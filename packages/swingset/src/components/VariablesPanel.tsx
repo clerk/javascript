@@ -3,7 +3,6 @@
 import type { MosaicVariables } from '@clerk/ui/mosaic/variables';
 import { defaultMosaicVariables } from '@clerk/ui/mosaic/variables';
 
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -30,21 +29,9 @@ export function VariablesPanel({ variables, onChange }: VariablesPanelProps) {
 
   return (
     <div className='flex flex-col gap-1'>
-      <div className='flex items-center justify-between gap-2 border-b px-3 py-2'>
-        <span className='text-muted-foreground text-[10px] font-semibold uppercase tracking-widest'>Variables</span>
-        <Button
-          variant='ghost'
-          size='sm'
-          className='text-muted-foreground h-6 px-2 text-xs'
-          onClick={() => onChange({})}
-        >
-          Reset
-        </Button>
-      </div>
-
       <div className='flex flex-col gap-4 p-3'>
         <section className='flex flex-col gap-2'>
-          <div className='text-muted-foreground text-[10px] font-semibold uppercase tracking-widest'>Colors</div>
+          <div className='text-brand text-[10px] font-semibold uppercase tracking-widest'>Colors</div>
           {(Object.keys(colors) as Array<keyof typeof colors>).map(key => (
             <div
               key={key}
@@ -52,7 +39,7 @@ export function VariablesPanel({ variables, onChange }: VariablesPanelProps) {
             >
               <Label
                 htmlFor={`var-color-${key}`}
-                className='text-muted-foreground w-32 shrink-0 text-xs'
+                className='text-muted-foreground w-32 shrink-0 font-mono text-[10px]'
               >
                 {key}
               </Label>
@@ -67,7 +54,7 @@ export function VariablesPanel({ variables, onChange }: VariablesPanelProps) {
         </section>
 
         <section className='flex flex-col gap-2'>
-          <div className='text-muted-foreground text-[10px] font-semibold uppercase tracking-widest'>Radius</div>
+          <div className='text-brand text-[10px] font-semibold uppercase tracking-widest'>Radius</div>
           {(Object.keys(radii) as Array<keyof typeof radii>)
             .filter(k => k !== 'full')
             .map(key => (
@@ -77,7 +64,7 @@ export function VariablesPanel({ variables, onChange }: VariablesPanelProps) {
               >
                 <Label
                   htmlFor={`var-rounded-${key}`}
-                  className='text-muted-foreground w-32 shrink-0 text-xs'
+                  className='text-muted-foreground w-32 shrink-0 font-mono text-[10px]'
                 >
                   rounded.{key}
                 </Label>
@@ -92,11 +79,11 @@ export function VariablesPanel({ variables, onChange }: VariablesPanelProps) {
         </section>
 
         <section className='flex flex-col gap-2'>
-          <div className='text-muted-foreground text-[10px] font-semibold uppercase tracking-widest'>Spacing</div>
+          <div className='text-brand text-[10px] font-semibold uppercase tracking-widest'>Spacing</div>
           <div className='flex items-center gap-3'>
             <Label
               htmlFor='var-spacing'
-              className='text-muted-foreground w-32 shrink-0 text-xs'
+              className='text-muted-foreground w-32 shrink-0 font-mono text-[10px]'
             >
               base unit
             </Label>

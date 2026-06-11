@@ -9,4 +9,14 @@ export default {
   singleQuote: true,
   tabWidth: 2,
   trailingComma: 'all',
+  overrides: [
+    {
+      // Leave fenced code samples in MDX docs exactly as authored. Without this,
+      // `semi: true` reformats the embedded code and re-adds trailing semicolons to
+      // JSX usage examples (e.g. `</Collapsible.Root>;`). Markdown prose and tables
+      // are still formatted as normal.
+      files: '*.mdx',
+      options: { embeddedLanguageFormatting: 'off' },
+    },
+  ],
 };
