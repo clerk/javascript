@@ -21,15 +21,7 @@ const STAGING_KEY_PREFIX = 'clerkstage-';
  * Paths to ignore during comparison — these are expected to differ between
  * production and staging environments.
  */
-const IGNORED_PATHS = [
-  /\.id$/,
-  /^auth_config\.id$/,
-  /\.logo_url$/,
-  /\.captcha_enabled$/,
-  /\.captcha_widget_type$/,
-  /\.enforce_hibp_on_sign_in$/,
-  /\.disable_hibp$/,
-];
+const IGNORED_PATHS = [/\.id$/, /^auth_config\.id$/, /\.logo_url$/, /\.enforce_hibp_on_sign_in$/, /\.disable_hibp$/];
 
 function isIgnored(path) {
   return IGNORED_PATHS.some(pattern => pattern.test(path));
@@ -509,6 +501,7 @@ export {
   collapseAttributeMismatches,
   collapseSocialMismatches,
   compareEnvironments,
+  isIgnored,
   isCriticalPath,
   isAcceptedDrift,
   classifyMismatches,

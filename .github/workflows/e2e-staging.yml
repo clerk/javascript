@@ -329,7 +329,9 @@ jobs:
 
   report:
     name: Report Results
-    needs: [integration-tests]
+    # validate-instances is needed so a strict-mode gate failure (which SKIPS all
+    # test legs rather than failing them) still reaches the Slack notification.
+    needs: [integration-tests, validate-instances]
     if: always()
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     defaults:
@@ -363,7 +365,7 @@ jobs:
           fi
 
       - name: Notify Slack on failure
-        if: ${{ needs.integration-tests.result == 'failure' && steps.inputs.outputs.notify-slack == 'true' }}
+        if: ${{ (needs.integration-tests.result == 'failure' || needs.validate-instances.result == 'failure') && steps.inputs.outputs.notify-slack == 'true' }}
         uses: slackapi/slack-github-action@e28cf165c92ffef168d23c5c9000cffc8a25e117 # v1.24.0
         with:
           payload: |

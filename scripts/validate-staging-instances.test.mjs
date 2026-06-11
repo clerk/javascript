@@ -10,13 +10,32 @@ import {
   classifyMismatches,
   collapseAttributeMismatches,
   collapseSocialMismatches,
+  compareEnvironments,
   diffObjects,
   fetchEnvironment,
   isCriticalPath,
+  isIgnored,
   loadKeys,
   main,
   parseFapiDomain,
 } from './validate-staging-instances.mjs';
+
+// ── isIgnored ───────────────────────────────────────────────────────────────
+
+describe('isIgnored', () => {
+  it('compares captcha settings (behavior-changing for headless e2e)', () => {
+    expect(isIgnored('user_settings.sign_up.captcha_enabled')).toBe(false);
+    expect(isIgnored('user_settings.sign_up.captcha_widget_type')).toBe(false);
+  });
+
+  it('still ignores ids, logo_url and hibp settings', () => {
+    expect(isIgnored('user_settings.social.oauth_google.id')).toBe(true);
+    expect(isIgnored('auth_config.id')).toBe(true);
+    expect(isIgnored('user_settings.social.oauth_google.logo_url')).toBe(true);
+    expect(isIgnored('user_settings.sign_in.enforce_hibp_on_sign_in')).toBe(true);
+    expect(isIgnored('user_settings.password_settings.disable_hibp')).toBe(true);
+  });
+});
 
 // ── loadKeys ────────────────────────────────────────────────────────────────
 
@@ -351,6 +370,21 @@ describe('isCriticalPath', () => {
     expect(isCriticalPath('user_settings.sign_up.captcha_widget_type')).toBe(false);
   });
 
+  it('no critical path is swallowed by the ignore filter before classification', () => {
+    const samples = [
+      'user_settings.attributes.phone_number.enabled',
+      'user_settings.attributes.phone_number.channels',
+      'user_settings.attributes.email_address.first_factors',
+      'user_settings.social.google.enabled',
+      'user_settings.password_settings.min_length',
+      'user_settings.sign_up.captcha_enabled',
+    ];
+    for (const path of samples) {
+      expect(isCriticalPath(path), path).toBe(true);
+      expect(isIgnored(path), path).toBe(false);
+    }
+  });
+
   it('does not flag cosmetic / non-critical paths', () => {
     expect(isCriticalPath('auth_config.single_session_mode')).toBe(false);
     expect(isCriticalPath('organization_settings.enabled')).toBe(false);
@@ -403,6 +437,14 @@ describe('classifyMismatches', () => {
     const { blocking, informational } = classifyMismatches('with-legal-consent', mismatches);
     expect(blocking.map(m => m.path)).toEqual(['user_settings.sign_up.captcha_enabled']);
     expect(informational.map(m => m.path)).toEqual(['user_settings.sign_up.captcha_widget_type']);
+  });
+
+  it('captcha_enabled drift survives the full compare-filter-classify pipeline', () => {
+    const prodEnv = { user_settings: { sign_up: { captcha_enabled: false } } };
+    const stagingEnv = { user_settings: { sign_up: { captcha_enabled: true } } };
+    const mismatches = compareEnvironments(prodEnv, stagingEnv).filter(m => !isIgnored(m.path));
+    const { blocking } = classifyMismatches('with-legal-consent', mismatches);
+    expect(blocking.map(m => m.path)).toEqual(['user_settings.sign_up.captcha_enabled']);
   });
 });
 
