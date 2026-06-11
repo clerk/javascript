@@ -1,13 +1,11 @@
 import { Platform } from 'react-native';
 
 import type {
-  AuthenticationResponseJSON,
   CredentialReturn,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
   PublicKeyCredentialWithAuthenticatorAttestationResponse,
-  RegistrationResponseJSON,
   SerializedPublicKeyCredentialCreationOptions,
   SerializedPublicKeyCredentialRequestOptions,
 } from './ClerkExpoPasskeys.types';

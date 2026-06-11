@@ -1,5 +1,36 @@
 # Change Log
 
+## 3.6.1
+
+### Patch Changes
+
+- Updated dependencies [[`a5c7bc7`](https://github.com/clerk/javascript/commit/a5c7bc74dabfa78d4748516ccc252f68cae82264)]:
+  - @clerk/shared@4.17.0
+
+## 3.6.0
+
+### Minor Changes
+
+- Add Backend API support for managing instance-level organization RBAC. `createClerkClient()` now exposes: ([#8774](https://github.com/clerk/javascript/pull/8774)) by [@dmoerner](https://github.com/dmoerner)
+  - `organizationPermissions` — list, get, create, update, and delete organization permissions.
+  - `organizationRoles` — list, get, create, update, and delete organization roles, plus assign/remove a permission to/from a role.
+  - `roleSets` — list, get, create, update, add roles to, replace a role in, and replace a role set.
+
+### Patch Changes
+
+- Fix the return type of `clerkClient.organizations.createOrganizationInvitationBulk()` to `PaginatedResourceResponse<OrganizationInvitation[]>`. The Backend API returns the bulk-created invitations in a `{ data, totalCount }` envelope (the same shape as `getOrganizationInvitationList()`), but the method was typed as `OrganizationInvitation[]`, which did not match the value returned at runtime. ([#8751](https://github.com/clerk/javascript/pull/8751)) by [@VihAMBR](https://github.com/VihAMBR)
+
+- Return `IdPOAuthAccessToken` timestamps in milliseconds when an OAuth access token is verified as a JWT. The `expiration`, `createdAt`, and `updatedAt` fields were previously populated with the JWT's raw second-based `exp`/`iat` values, making them inconsistent with the same fields on `M2MToken` and with the values returned when the token is fetched from the API. Comparing `expiration` against `Date.now()` now behaves as expected. The `expired` flag was already computed correctly and is unaffected. ([#8771](https://github.com/clerk/javascript/pull/8771)) by [@jacekradko](https://github.com/jacekradko)
+
+- Prevent an unhandled exception when verifying a machine token whose JWT payload has a missing or non-string `sub`. Such tokens are now classified and rejected with a typed verification error instead of throwing, so a crafted `Authorization` header can no longer surface as an unhandled error during request authentication. ([#8744](https://github.com/clerk/javascript/pull/8744)) by [@jacekradko](https://github.com/jacekradko)
+
+- Redact raw bearer credentials from the `auth` object's debug output. The debug payload (surfaced when an SDK enables middleware debug logging) previously included full session, machine, refresh, dev-browser and handshake tokens; each now exposes only a short, non-reconstructable prefix, matching how `secretKey` and `jwtKey` are already handled. ([#8744](https://github.com/clerk/javascript/pull/8744)) by [@jacekradko](https://github.com/jacekradko)
+
+- Add and improve JSDoc comments across public types and methods to support generated reference documentation for the `/objects` docs section. Exports a few previously-internal types (`OnEventListener`, `OffEventListener`, `ClerkOptionsNavigation`) so they can be referenced from the generated docs. ([#8276](https://github.com/clerk/javascript/pull/8276)) by [@alexisintech](https://github.com/alexisintech)
+
+- Updated dependencies [[`2d6670c`](https://github.com/clerk/javascript/commit/2d6670c6c05c59901709283921b5d65c43f3a676), [`af706e3`](https://github.com/clerk/javascript/commit/af706e35420a16c028fd34b70dd50d663d42e006), [`032632c`](https://github.com/clerk/javascript/commit/032632c6982297e53e28559b59b4a435de4c9adc), [`0fece6f`](https://github.com/clerk/javascript/commit/0fece6ff5d2b1babb59a285dbce9d46723e33d73), [`b295af3`](https://github.com/clerk/javascript/commit/b295af3d5bb12e09a502cae4a935d2e7f5d35d5c), [`8e1bd48`](https://github.com/clerk/javascript/commit/8e1bd48a91dc07751493f41416d2a68b89e114cc)]:
+  - @clerk/shared@4.16.0
+
 ## 3.5.0
 
 ### Minor Changes

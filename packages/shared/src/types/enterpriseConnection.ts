@@ -141,6 +141,8 @@ export type MeEnterpriseConnectionOidcInput = OrganizationEnterpriseConnectionOi
 export type CreateOrganizationEnterpriseConnectionParams = {
   provider: OrganizationEnterpriseConnectionProvider;
   name: string;
+  /** FQDN strings the connection authenticates. Required by the org-scoped create endpoint. */
+  domains?: string[];
   organizationId?: string | null;
   saml?: OrganizationEnterpriseConnectionSamlInput | null;
   oidc?: OrganizationEnterpriseConnectionOidcInput | null;
