@@ -44,17 +44,6 @@ export function MosaicProvider({ children, nonce, cssLayerName, appearance, scop
     return emotionCache;
   }, [nonce, cssLayerName]);
 
-  // Children inject styles via useInsertionEffect (fires children → parents).
-  // Ours fires after theirs, still before paint — no flash.
-  React.useInsertionEffect(() => {
-    if (!cssLayerName) return;
-    document.querySelectorAll<HTMLStyleElement>(`style[data-emotion^="${cache.key}"]`).forEach(el => {
-      if (el.textContent && !el.textContent.includes('@layer')) {
-        el.textContent = `@layer ${cssLayerName}{${el.textContent}}`;
-      }
-    });
-  });
-
   return (
     <MosaicThemeContext.Provider value={theme}>
       <MosaicAppearanceProvider value={parsedElements}>
