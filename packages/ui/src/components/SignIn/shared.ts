@@ -2,7 +2,7 @@ import { isClerkRuntimeError, isUserLockedError } from '@clerk/shared/error';
 import { clerkInvalidFAPIResponse } from '@clerk/shared/internal/clerk-js/errors';
 import { __internal_WebAuthnAbortService } from '@clerk/shared/internal/clerk-js/passkeys';
 import { useClerk } from '@clerk/shared/react';
-import type { EnterpriseSSOFactor, SignInFirstFactor } from '@clerk/shared/types';
+import type { EnterpriseSSOFactor, SignInFirstFactor, SignInResource } from '@clerk/shared/types';
 import { useCallback, useEffect } from 'react';
 
 import { useCardState } from '@/ui/elements/contexts';
@@ -26,7 +26,7 @@ export const SIGN_IN_RESET_PASSWORD_INTENT_PARAM = '__clerk_reset_password';
 function useHandleAuthenticateWithPasskey(
   onSecondFactor: () => Promise<unknown>,
   protectCheckPath = '../protect-check',
-) {
+): (...args: Parameters<SignInResource['authenticateWithPasskey']>) => Promise<unknown> {
   const card = useCardState();
   // @ts-expect-error -- private method for the time being
   const { setActive, __internal_navigateWithError } = useClerk();

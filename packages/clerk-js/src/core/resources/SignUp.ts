@@ -197,6 +197,14 @@ export class SignUp extends BaseResource implements SignUpResource {
     });
   };
 
+  /**
+   * Submits a proof token to resolve a Clerk Protect challenge (`protect_check`) during sign-up.
+   *
+   * @param params - The proof token parameters.
+   * @param params.proofToken - The proof token produced by the Protect challenge SDK.
+   * @returns A promise resolving to the updated `SignUp` resource (gate cleared, a chained
+   * challenge, or the completed flow).
+   */
   submitProtectCheck = (params: { proofToken: string }): Promise<SignUpResource> => {
     debugLogger.debug('SignUp.submitProtectCheck', { id: this.id });
     return this._basePatch({
@@ -1173,6 +1181,13 @@ class SignUpFuture implements SignUpFutureResource {
     });
   }
 
+  /**
+   * Submits a proof token to resolve a Clerk Protect challenge (`protect_check`) during sign-up.
+   *
+   * @param params - The proof token parameters.
+   * @param params.proofToken - The proof token produced by the Protect challenge SDK.
+   * @returns A promise resolving to `{ error }` — `null` on success, otherwise the encountered error.
+   */
   async submitProtectCheck(params: { proofToken: string }): Promise<{ error: ClerkError | null }> {
     return runAsyncResourceTask(this.#resource, async () => {
       await this.#resource.__internal_basePatch({

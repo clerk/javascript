@@ -89,6 +89,7 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
             strategy,
             secondFactorUrl: 'factor-two',
             protectCheckUrl: 'protect-check',
+            signUpProtectCheckUrl: ctx.isCombinedFlow ? 'create/protect-check' : undefined,
           })
           .catch(err => web3CallbackErrorHandler(err, card.setError));
       }}

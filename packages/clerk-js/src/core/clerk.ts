@@ -2745,6 +2745,7 @@ export class Clerk implements ClerkInterface {
     legalAccepted,
     secondFactorUrl,
     protectCheckUrl,
+    signUpProtectCheckUrl,
     walletName,
   }: ClerkAuthenticateWithWeb3Params): Promise<void> => {
     if (!this.client || !this.environment) {
@@ -2789,6 +2790,11 @@ export class Clerk implements ClerkInterface {
 
     const navigateToSignInProtectCheck = makeNavigate(
       protectCheckUrl || buildURL({ base: displayConfig.signInUrl, hashPath: '/protect-check' }, { stringify: true }),
+    );
+
+    const navigateToSignUpProtectCheck = makeNavigate(
+      signUpProtectCheckUrl ||
+        buildURL({ base: displayConfig.signUpUrl, hashPath: '/protect-check' }, { stringify: true }),
     );
 
     const navigateToContinueSignUp = makeNavigate(
@@ -2850,11 +2856,12 @@ export class Clerk implements ClerkInterface {
       });
     };
 
-    // A Clerk Protect challenge can gate the inline web3 sign-in (no redirect happens, so the
-    // centralized _handleRedirectCallback check never runs). Route to the sign-in protect-check
-    // card before the status switch below, otherwise the user is stranded on the wallet step.
-    if (!viaSignUp && (signInOrSignUp.protectCheck || signInOrSignUp.status === 'needs_protect_check')) {
-      await navigateToSignInProtectCheck();
+    // A Clerk Protect challenge can gate the inline web3 attempt (no redirect happens, so the
+    // centralized _handleRedirectCallback check never runs). Route to the challenge before the
+    // status switch below, otherwise the user is stranded on the wallet step. The sign-up fallback
+    // gates as `missing_requirements` + `protectCheck`, so it has no status branch below either.
+    if (signInOrSignUp.protectCheck || signInOrSignUp.status === 'needs_protect_check') {
+      await (viaSignUp ? navigateToSignUpProtectCheck : navigateToSignInProtectCheck)();
       return;
     }
 

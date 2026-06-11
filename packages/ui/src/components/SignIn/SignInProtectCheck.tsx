@@ -30,7 +30,7 @@ import { useRouter } from '../../router';
  * `prepareFirstFactor`/`prepareSecondFactor` on mount, so navigating back is sufficient to
  * re-trigger the gated work.
  */
-function navigateNext(signIn: SignInResource, navigate: (to: string) => Promise<unknown>) {
+function navigateNext(signIn: SignInResource, navigate: (to: string) => Promise<unknown>): Promise<unknown> {
   // Chained challenge — stay here and re-run the new challenge on next render. Both
   // signals are checked: `protectCheck` is the authoritative field, and
   // `'needs_protect_check'` is the SDK-version-gated status.
