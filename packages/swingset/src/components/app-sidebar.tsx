@@ -58,7 +58,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <span className='text-sidebar-foreground/70 text-[10px] font-medium'>Mosaic - Swingset</span>
       </SidebarHeader>
       <SidebarContent className='gap-0'>
-        {groups.map(({ group, components }) => (
+        {groups.map(({ group, groupSlug, components }) => (
           <SidebarGroup
             key={group}
             className='py-1'
@@ -70,7 +70,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarGroupContent>
               <SidebarMenu>
                 {components.map(({ mod, componentSlug }) => {
-                  const href = `/components/${componentSlug}`;
+                  const href = `/${groupSlug}/${componentSlug}`;
                   return (
                     <SidebarMenuItem key={mod.meta.title}>
                       <SidebarMenuButton
