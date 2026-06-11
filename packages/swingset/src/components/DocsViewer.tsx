@@ -38,7 +38,7 @@ export function DocsViewer({ slug }: DocsViewerProps) {
       key={slug}
       meta={meta}
     >
-      <article className='prose relative mx-auto max-w-3xl p-8'>
+      <article className='prose relative mx-auto w-full min-w-0 max-w-3xl p-8'>
         {meta?.source ? (
           <div className='absolute right-8 top-8'>
             <ViewSource source={meta.source} />
