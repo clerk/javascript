@@ -1,5 +1,56 @@
 # Change Log
 
+## 3.7.0
+
+### Minor Changes
+
+- Add `clerkClient.organizations.replaceOrganizationMetadata(organizationId, params)` for replacing an organization's metadata fields in full. ([#8787](https://github.com/clerk/javascript/pull/8787)) by [@brunol95](https://github.com/brunol95)
+
+  Use `replaceOrganizationMetadata` when the provided metadata should become the complete value for that metadata field:
+
+  ```ts
+  await clerkClient.organizations.replaceOrganizationMetadata(organizationId, {
+    publicMetadata: { plan: 'pro' },
+  });
+  ```
+
+  Use `clerkClient.organizations.updateOrganizationMetadata(organizationId, params)` when you want to partially update metadata with deep-merge semantics:
+
+  ```ts
+  await clerkClient.organizations.updateOrganizationMetadata(organizationId, {
+    publicMetadata: { onboardingComplete: true },
+  });
+  ```
+
+  The `publicMetadata` and `privateMetadata` parameters on `clerkClient.organizations.updateOrganization()` are now deprecated. They continue to work, but new code should use `updateOrganizationMetadata()` for partial updates or `replaceOrganizationMetadata()` for full replacement.
+
+- Add `clerkClient.users.replaceUserMetadata(userId, params)` for replacing a user's metadata fields in full. ([#8587](https://github.com/clerk/javascript/pull/8587)) by [@brunol95](https://github.com/brunol95)
+
+  Use `replaceUserMetadata` when the provided metadata should become the complete value for that metadata field:
+
+  ```ts
+  await clerkClient.users.replaceUserMetadata(userId, {
+    publicMetadata: { plan: 'pro' },
+  });
+  ```
+
+  Use `clerkClient.users.updateUserMetadata(userId, params)` when you want to partially update metadata with deep-merge semantics:
+
+  ```ts
+  await clerkClient.users.updateUserMetadata(userId, {
+    publicMetadata: { onboardingComplete: true },
+  });
+  ```
+
+  The `publicMetadata`, `privateMetadata`, and `unsafeMetadata` parameters on `clerkClient.users.updateUser()` are now deprecated. They continue to work, but new code should use `updateUserMetadata()` for partial updates or `replaceUserMetadata()` for full replacement.
+
+### Patch Changes
+
+- Migrate the build pipeline to tsdown and TypeScript 6.0. This is an internal tooling change with no intended changes to the public API or runtime behavior. ([#8177](https://github.com/clerk/javascript/pull/8177)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`f046c49`](https://github.com/clerk/javascript/commit/f046c491d99c880b61e335645ad3ced4fee602d8), [`b5fa9f6`](https://github.com/clerk/javascript/commit/b5fa9f6ab2f01f1bbf6de52e16b4c9d9516f966c), [`3d5b2fe`](https://github.com/clerk/javascript/commit/3d5b2fe959171770bb7e8493d8a204317b7101a7)]:
+  - @clerk/shared@4.17.1
+
 ## 3.6.1
 
 ### Patch Changes
