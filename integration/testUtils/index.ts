@@ -46,6 +46,9 @@ const getTestingToken = (
           `Failed to mint a testing token for app "${app.name}". Falling back to the CLERK_TESTING_TOKEN env var.`,
           err,
         );
+        // Evict so the next test re-attempts the mint; otherwise one transient
+        // failure would pin the env-var fallback for the whole worker process.
+        testingTokenCache.delete(publishableKey);
         return undefined;
       });
     testingTokenCache.set(publishableKey, promise);

@@ -40,7 +40,7 @@ const JITTER_MAX_MS = 250;
  * @param params.options.testingToken - The testing token to append, or a function that resolves it lazily. Takes precedence over the `CLERK_TESTING_TOKEN` environment variable.
  * @returns A promise that resolves when the bot protection bypass is set up.
  * @throws An error if the Frontend API URL is not provided.
- * @remarks Set the `CLERK_TESTING_DEBUG` environment variable to enable verbose logging of retry attempts and route handler registration. Calling this again with the same frontend API URL on the same context is a no-op; calling it with a different frontend API URL registers an additional, independent bypass, so suites spanning multiple Clerk instances can set up one per instance.
+ * @remarks Set the `CLERK_TESTING_DEBUG` environment variable to enable verbose logging of retry attempts and route handler registration. Calling this again with the same frontend API URL on the same context is a no-op and its options (including `testingToken`) are ignored; the first registration wins. Calling it with a different frontend API URL registers an additional, independent bypass, so suites spanning multiple Clerk instances can set up one per instance.
  * @example
  * import { setupClerkTestingToken } from '@clerk/testing/playwright';
  *

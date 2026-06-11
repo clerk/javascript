@@ -149,6 +149,25 @@ describe('setupClerkTestingToken', () => {
       expect(routeFn).toHaveBeenCalledTimes(2);
     });
 
+    it('rolls back only the failed host, keeping other hosts registered', async () => {
+      const routeFn = vi.fn();
+      routeFn.mockResolvedValueOnce(undefined);
+      routeFn.mockRejectedValueOnce(new Error('context closed'));
+      routeFn.mockResolvedValueOnce(undefined);
+
+      const context = { route: routeFn } as unknown as BrowserContext;
+
+      await setupClerkTestingToken({ context, options: { frontendApiUrl: 'a.clerk.com' } });
+      await expect(setupClerkTestingToken({ context, options: { frontendApiUrl: 'b.clerk.com' } })).rejects.toThrow(
+        'context closed',
+      );
+      // The failed host can retry; the successful host stays deduped.
+      await setupClerkTestingToken({ context, options: { frontendApiUrl: 'b.clerk.com' } });
+      await setupClerkTestingToken({ context, options: { frontendApiUrl: 'a.clerk.com' } });
+
+      expect(routeFn).toHaveBeenCalledTimes(3);
+    });
+
     it('resolves context from page when context is not provided', async () => {
       const { context, getRouteCallCount } = createMockContext();
       const page = { context: () => context } as any;
