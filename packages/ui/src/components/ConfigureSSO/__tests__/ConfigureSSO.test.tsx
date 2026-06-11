@@ -20,7 +20,7 @@ describe('ConfigureSSO', () => {
         });
       });
 
-      fixtures.clerk.user?.getEnterpriseConnections.mockResolvedValue([]);
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
 
       const { findByText, queryByText } = render(<ConfigureSSO />, { wrapper });
 
@@ -40,7 +40,7 @@ describe('ConfigureSSO', () => {
         });
       });
 
-      fixtures.clerk.user?.getEnterpriseConnections.mockResolvedValue([]);
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
 
       const { findByText, queryByText } = render(<ConfigureSSO />, { wrapper });
 
@@ -59,12 +59,189 @@ describe('ConfigureSSO', () => {
         f.withUser({ email_addresses: ['test@clerk.com'] });
       });
 
-      fixtures.clerk.user?.getEnterpriseConnections.mockResolvedValue([]);
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
 
       const { findByText, queryByText } = render(<ConfigureSSO />, { wrapper });
 
       await findByText(/select your identity provider/i);
       expect(queryByText(/you do not have permission to manage single sign-on/i)).not.toBeInTheDocument();
+    });
+  });
+
+  describe('state machine mounts on the right step', () => {
+    it('mounts on verify-domain when the primary email is unverified and there is no connection', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEnterpriseSso({ selfServeSSO: true });
+        f.withEmailAddress();
+        f.withOrganizations();
+        f.withUser({
+          // An unverified primary email fails `select-provider`'s guard
+          // (`isPrimaryEmailVerified`), so the furthest-reachable step is the
+          // verify-domain entry step rather than select-provider.
+          email_addresses: [{ email_address: 'test@clerk.com', verification: { status: 'unverified' } }],
+          organization_memberships: [{ name: 'Org1', permissions: ['org:sys_entconns:manage'] }],
+        });
+      });
+
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
+
+      const { findByRole, queryByText } = render(<ConfigureSSO />, { wrapper });
+
+      // The verify-domain step header is the only step rendered; select-provider
+      // is gated out behind the unverified email.
+      await findByRole('heading', { name: /verify email address/i });
+      expect(queryByText(/select your identity provider/i)).not.toBeInTheDocument();
+    });
+
+    // TODO: replace with a TXT domain-verification case (ORGS-1594)
+    it('mounts on select-provider with a verified email and no connection', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEnterpriseSso({ selfServeSSO: true });
+        f.withEmailAddress();
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', permissions: ['org:sys_entconns:manage'] }],
+        });
+      });
+
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
+
+      const { findByText } = render(<ConfigureSSO />, { wrapper });
+
+      // Verified primary email fulfills verify-domain, so the machine skips it
+      // and lands on select-provider — the first non-fulfilled enabled step.
+      await findByText(/select your identity provider/i);
+    });
+
+    it('short-circuits to the confirmation step for an active connection', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEnterpriseSso({ selfServeSSO: true });
+        f.withEmailAddress();
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', permissions: ['org:sys_entconns:manage'] }],
+        });
+      });
+
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([
+        {
+          id: 'ent_active',
+          name: 'clerk.com',
+          provider: 'saml_okta',
+          active: true,
+          // Owned by the active organization (matches the membership above), so
+          // the domain is not "taken by another org" and the machine can
+          // short-circuit to confirmation.
+          organizationId: 'Org1',
+          domains: ['clerk.com'],
+          samlConnection: {
+            idpSsoUrl: 'https://idp.example.com/sso',
+            idpEntityId: 'https://idp.example.com/entity',
+            idpCertificate: 'CERT',
+          },
+        } as any,
+      ]);
+      fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
+        data: [],
+        total_count: 0,
+      } as any);
+
+      const { findByText, queryByText } = render(<ConfigureSSO />, { wrapper });
+
+      // An active connection lands on confirmation even if never tested.
+      await findByText(/configuration/i);
+      expect(queryByText(/select your identity provider/i)).not.toBeInTheDocument();
+    });
+
+    it('mounts on the test step for a configured-but-inactive connection with no successful test run', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEnterpriseSso({ selfServeSSO: true });
+        f.withEmailAddress();
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', permissions: ['org:sys_entconns:manage'] }],
+        });
+      });
+
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([
+        {
+          id: 'ent_configured',
+          name: 'clerk.com',
+          provider: 'saml_okta',
+          // Configured (idp SSO URL + entity id ⇒ hasMinimumConfiguration) but
+          // not yet activated, so the test step's guard holds.
+          active: false,
+          organizationId: 'Org1',
+          domains: ['clerk.com'],
+          samlConnection: {
+            idpSsoUrl: 'https://idp.example.com/sso',
+            idpEntityId: 'https://idp.example.com/entity',
+            idpCertificate: 'CERT',
+          },
+        } as any,
+      ]);
+      // No successful run yet, so the confirmation guard fails and the
+      // furthest-reachable step is `test`.
+      fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
+        data: [],
+        total_count: 0,
+      } as any);
+
+      const { findByText, queryByText } = render(<ConfigureSSO />, { wrapper });
+
+      // Configured + inactive + no successful run ⇒ lands on the test step, not
+      // confirmation.
+      await findByText(/test your sso connection/i);
+      expect(queryByText(/configuration details/i)).not.toBeInTheDocument();
+    });
+
+    it('mounts on confirmation for a configured-but-inactive connection that has a successful test run', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEnterpriseSso({ selfServeSSO: true });
+        f.withEmailAddress();
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', permissions: ['org:sys_entconns:manage'] }],
+        });
+      });
+
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([
+        {
+          id: 'ent_tested',
+          name: 'clerk.com',
+          provider: 'saml_okta',
+          // Configured (idp SSO URL + entity id) but never activated.
+          active: false,
+          organizationId: 'Org1',
+          domains: ['clerk.com'],
+          samlConnection: {
+            idpSsoUrl: 'https://idp.example.com/sso',
+            idpEntityId: 'https://idp.example.com/entity',
+            idpCertificate: 'CERT',
+          },
+        } as any,
+      ]);
+      // A successful run satisfies the confirmation guard (`hasSuccessfulTestRun`)
+      // even though the connection is still inactive — the success-filtered probe
+      // returns a row, so the furthest-reachable step clears `test` and lands on
+      // confirmation. Distinct from the active short-circuit above (here
+      // `active: false`, so it is the test run — not activation — that carries the
+      // wizard past the test step).
+      fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
+        data: [{ id: 'run_1', status: 'success' }],
+        total_count: 1,
+      } as any);
+
+      const { findByText, queryByText } = render(<ConfigureSSO />, { wrapper });
+
+      // Lands on confirmation (the inactive badge + configuration details render),
+      // not the test step.
+      await findByText(/configuration details/i);
+      expect(queryByText(/test your sso connection/i)).not.toBeInTheDocument();
     });
   });
 });

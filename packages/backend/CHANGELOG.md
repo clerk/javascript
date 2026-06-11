@@ -1,5 +1,60 @@
 # Change Log
 
+## 3.6.1
+
+### Patch Changes
+
+- Updated dependencies [[`a5c7bc7`](https://github.com/clerk/javascript/commit/a5c7bc74dabfa78d4748516ccc252f68cae82264)]:
+  - @clerk/shared@4.17.0
+
+## 3.6.0
+
+### Minor Changes
+
+- Add Backend API support for managing instance-level organization RBAC. `createClerkClient()` now exposes: ([#8774](https://github.com/clerk/javascript/pull/8774)) by [@dmoerner](https://github.com/dmoerner)
+  - `organizationPermissions` — list, get, create, update, and delete organization permissions.
+  - `organizationRoles` — list, get, create, update, and delete organization roles, plus assign/remove a permission to/from a role.
+  - `roleSets` — list, get, create, update, add roles to, replace a role in, and replace a role set.
+
+### Patch Changes
+
+- Fix the return type of `clerkClient.organizations.createOrganizationInvitationBulk()` to `PaginatedResourceResponse<OrganizationInvitation[]>`. The Backend API returns the bulk-created invitations in a `{ data, totalCount }` envelope (the same shape as `getOrganizationInvitationList()`), but the method was typed as `OrganizationInvitation[]`, which did not match the value returned at runtime. ([#8751](https://github.com/clerk/javascript/pull/8751)) by [@VihAMBR](https://github.com/VihAMBR)
+
+- Return `IdPOAuthAccessToken` timestamps in milliseconds when an OAuth access token is verified as a JWT. The `expiration`, `createdAt`, and `updatedAt` fields were previously populated with the JWT's raw second-based `exp`/`iat` values, making them inconsistent with the same fields on `M2MToken` and with the values returned when the token is fetched from the API. Comparing `expiration` against `Date.now()` now behaves as expected. The `expired` flag was already computed correctly and is unaffected. ([#8771](https://github.com/clerk/javascript/pull/8771)) by [@jacekradko](https://github.com/jacekradko)
+
+- Prevent an unhandled exception when verifying a machine token whose JWT payload has a missing or non-string `sub`. Such tokens are now classified and rejected with a typed verification error instead of throwing, so a crafted `Authorization` header can no longer surface as an unhandled error during request authentication. ([#8744](https://github.com/clerk/javascript/pull/8744)) by [@jacekradko](https://github.com/jacekradko)
+
+- Redact raw bearer credentials from the `auth` object's debug output. The debug payload (surfaced when an SDK enables middleware debug logging) previously included full session, machine, refresh, dev-browser and handshake tokens; each now exposes only a short, non-reconstructable prefix, matching how `secretKey` and `jwtKey` are already handled. ([#8744](https://github.com/clerk/javascript/pull/8744)) by [@jacekradko](https://github.com/jacekradko)
+
+- Add and improve JSDoc comments across public types and methods to support generated reference documentation for the `/objects` docs section. Exports a few previously-internal types (`OnEventListener`, `OffEventListener`, `ClerkOptionsNavigation`) so they can be referenced from the generated docs. ([#8276](https://github.com/clerk/javascript/pull/8276)) by [@alexisintech](https://github.com/alexisintech)
+
+- Updated dependencies [[`2d6670c`](https://github.com/clerk/javascript/commit/2d6670c6c05c59901709283921b5d65c43f3a676), [`af706e3`](https://github.com/clerk/javascript/commit/af706e35420a16c028fd34b70dd50d663d42e006), [`032632c`](https://github.com/clerk/javascript/commit/032632c6982297e53e28559b59b4a435de4c9adc), [`0fece6f`](https://github.com/clerk/javascript/commit/0fece6ff5d2b1babb59a285dbce9d46723e33d73), [`b295af3`](https://github.com/clerk/javascript/commit/b295af3d5bb12e09a502cae4a935d2e7f5d35d5c), [`8e1bd48`](https://github.com/clerk/javascript/commit/8e1bd48a91dc07751493f41416d2a68b89e114cc)]:
+  - @clerk/shared@4.16.0
+
+## 3.5.0
+
+### Minor Changes
+
+- Add support for new Backend API user endpoints: ([#8694](https://github.com/clerk/javascript/pull/8694)) by [@dmoerner](https://github.com/dmoerner)
+  - `users.replaceUserEmailAddress(userId, { emailAddress })` replaces all of a user's email addresses with a single verified, primary email address (`PUT /users/{user_id}/email_address`).
+  - `users.replaceUserPhoneNumber(userId, { phoneNumber })` replaces all of a user's phone numbers with a single verified, primary phone number (`PUT /users/{user_id}/phone_number`).
+  - `users.createUser` now accepts `banned` and `locked` parameters to create a user that is already banned or locked.
+
+### Patch Changes
+
+- Emit the "session token from cookie is missing the `azp` claim" warning once per process instead of on every authenticated request. An `azp`-less cookie token is reused across requests, so the previous unguarded `console.warn` could flood production logs. ([#8698](https://github.com/clerk/javascript/pull/8698)) by [@jacekradko](https://github.com/jacekradko)
+
+- Stop `authenticateRequest` from consuming the incoming request body, which previously left downstream handlers unable to read it (for example a Hono POST route calling `c.req.json()`). ([#8708](https://github.com/clerk/javascript/pull/8708)) by [@jacekradko](https://github.com/jacekradko)
+
+- Prevent keyless mode from activating in CI and other automated environments in framework SDKs. ([#8676](https://github.com/clerk/javascript/pull/8676)) by [@mwickett](https://github.com/mwickett)
+
+- Preserve custom claims when verifying JWT-format M2M tokens. `M2MToken.fromJwtPayload` previously hardcoded `claims` to `null`, so `client.m2m.verify()` (and request-level `auth()`) dropped any custom claims embedded in the token. Custom claims are now reconstructed from the verified payload by stripping only the structural claims the backend adds when minting the token (`iss`, `sub`, `exp`, `nbf`, `iat`, `jti`). User-supplied claims such as `aud` are preserved. Tokens without custom claims still return `claims: null`, consistent with the opaque-token path. ([#8697](https://github.com/clerk/javascript/pull/8697)) by [@jacekradko](https://github.com/jacekradko)
+
+- Strip `private_metadata` from the backend resource `_raw` payload in `stripPrivateDataFromObject`, preventing it from leaking into `__clerk_ssr_state` when a `User`/`Organization` resource is passed to `buildClerkProps`. ([#8702](https://github.com/clerk/javascript/pull/8702)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`afb75e6`](https://github.com/clerk/javascript/commit/afb75e68efa561ff18f6ae5359df1cf336e861a5), [`c3df67a`](https://github.com/clerk/javascript/commit/c3df67a231adff73fa36563718d9b94e6bb2a540), [`86fd38f`](https://github.com/clerk/javascript/commit/86fd38f4e39ab89b6a9fbb7515a5d9b7b37aa3ab), [`8d6bb56`](https://github.com/clerk/javascript/commit/8d6bb56de25692e0f9c350f16c8f45fbedaad2ac), [`43dfefa`](https://github.com/clerk/javascript/commit/43dfefaabf0bad1a6d92b75b1cb6de1860ea87e4), [`5fc7b21`](https://github.com/clerk/javascript/commit/5fc7b21573cab36b9184dd6277396f7c38b91e1f), [`c2ba134`](https://github.com/clerk/javascript/commit/c2ba1344db5fd50f1d4e04d01d0455f0181c8d96)]:
+  - @clerk/shared@4.15.0
+
 ## 3.4.14
 
 ### Patch Changes

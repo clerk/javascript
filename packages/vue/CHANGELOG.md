@@ -1,5 +1,34 @@
 # @clerk/vue
 
+## 2.4.1
+
+### Patch Changes
+
+- Updated dependencies [[`a5c7bc7`](https://github.com/clerk/javascript/commit/a5c7bc74dabfa78d4748516ccc252f68cae82264)]:
+  - @clerk/shared@4.17.0
+
+## 2.4.0
+
+### Minor Changes
+
+- Remove the `<ConfigureSSO />` component from the public API in favor of usage within `OrganizationProfile` ([#8779](https://github.com/clerk/javascript/pull/8779)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  Removing these exports has no breaking changes impact on production applications, as <ConfigureSSO /> was never released as a GA component
+
+### Patch Changes
+
+- Add and improve JSDoc comments across public types and methods to support generated reference documentation for the `/objects` docs section. Exports a few previously-internal types (`OnEventListener`, `OffEventListener`, `ClerkOptionsNavigation`) so they can be referenced from the generated docs. ([#8276](https://github.com/clerk/javascript/pull/8276)) by [@alexisintech](https://github.com/alexisintech)
+
+- Updated dependencies [[`2d6670c`](https://github.com/clerk/javascript/commit/2d6670c6c05c59901709283921b5d65c43f3a676), [`af706e3`](https://github.com/clerk/javascript/commit/af706e35420a16c028fd34b70dd50d663d42e006), [`032632c`](https://github.com/clerk/javascript/commit/032632c6982297e53e28559b59b4a435de4c9adc), [`0fece6f`](https://github.com/clerk/javascript/commit/0fece6ff5d2b1babb59a285dbce9d46723e33d73), [`b295af3`](https://github.com/clerk/javascript/commit/b295af3d5bb12e09a502cae4a935d2e7f5d35d5c), [`8e1bd48`](https://github.com/clerk/javascript/commit/8e1bd48a91dc07751493f41416d2a68b89e114cc)]:
+  - @clerk/shared@4.16.0
+
+## 2.3.3
+
+### Patch Changes
+
+- Updated dependencies [[`afb75e6`](https://github.com/clerk/javascript/commit/afb75e68efa561ff18f6ae5359df1cf336e861a5), [`c3df67a`](https://github.com/clerk/javascript/commit/c3df67a231adff73fa36563718d9b94e6bb2a540), [`86fd38f`](https://github.com/clerk/javascript/commit/86fd38f4e39ab89b6a9fbb7515a5d9b7b37aa3ab), [`8d6bb56`](https://github.com/clerk/javascript/commit/8d6bb56de25692e0f9c350f16c8f45fbedaad2ac), [`43dfefa`](https://github.com/clerk/javascript/commit/43dfefaabf0bad1a6d92b75b1cb6de1860ea87e4), [`5fc7b21`](https://github.com/clerk/javascript/commit/5fc7b21573cab36b9184dd6277396f7c38b91e1f), [`c2ba134`](https://github.com/clerk/javascript/commit/c2ba1344db5fd50f1d4e04d01d0455f0181c8d96)]:
+  - @clerk/shared@4.15.0
+
 ## 2.3.2
 
 ### Patch Changes

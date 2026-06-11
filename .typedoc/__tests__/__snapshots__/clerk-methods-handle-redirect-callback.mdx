@@ -1,0 +1,15 @@
+### `handleRedirectCallback()`
+
+Completes a custom OAuth or SAML redirect flow that was started by calling [`SignIn.authenticateWithRedirect(params)`](/docs/reference/objects/sign-in) or [`SignUp.authenticateWithRedirect(params)`](/docs/reference/objects/sign-up).
+
+```typescript
+function handleRedirectCallback(params: HandleOAuthCallbackParams, customNavigate?: (to: string) => Promise<unknown>): Promise<unknown>
+```
+
+#### Parameters
+
+
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `params` | [`HandleOAuthCallbackParams`](/docs/reference/types/handle-o-auth-callback-params) | Additional props that define where the user will be redirected to at the end of a successful OAuth or SAML flow. |
+| `customNavigate?` | <code>(to: string) => Promise\<unknown\></code> | A function that overrides Clerk's default navigation behavior, allowing custom handling of navigation during sign-up and sign-in flows. |

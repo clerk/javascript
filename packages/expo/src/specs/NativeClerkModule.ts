@@ -3,12 +3,16 @@ import { TurboModuleRegistry } from 'react-native';
 import type { UnsafeObject } from 'react-native/Libraries/Types/CodegenTypesNamespace';
 
 export interface Spec extends TurboModule {
+  // Required by NativeEventEmitter for internal native client refresh events.
+  // This is not part of the public @clerk/expo API.
+  addListener(eventName: string): void;
   configure(publishableKey: string, bearerToken: string | null): Promise<void>;
-  presentAuth(options: UnsafeObject): Promise<UnsafeObject>;
-  presentUserProfile(options: UnsafeObject): Promise<UnsafeObject | null>;
   getSession(): Promise<UnsafeObject | null>;
   getClientToken(): Promise<string | null>;
-  signOut(): Promise<void>;
+  refreshClient(): Promise<void>;
+  // Required by NativeEventEmitter for internal native client refresh events.
+  // This is not part of the public @clerk/expo API.
+  removeListeners(count: number): void;
 }
 
 export default TurboModuleRegistry.get<Spec>('ClerkExpo');

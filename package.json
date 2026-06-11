@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "build": "FORCE_COLOR=1 turbo build --concurrency=${TURBO_CONCURRENCY:-80%}",
-    "build:declarations": "FORCE_COLOR=1 turbo build:declarations --concurrency=${TURBO_CONCURRENCY:-80%} --filter=@clerk/nextjs --filter=@clerk/react --filter=@clerk/shared",
+    "build:declarations": "FORCE_COLOR=1 turbo build:declarations --concurrency=${TURBO_CONCURRENCY:-80%} --filter=@clerk/nextjs",
     "bundlewatch": "turbo run bundlewatch",
     "changeset": "changeset",
     "changeset:empty": "pnpm changeset --empty",
@@ -14,6 +14,7 @@
     "dev:fe-libs": "TURBO_UI=0 FORCE_COLOR=1 turbo dev --filter=@clerk/clerk-js --filter=@clerk/ui --filter=@clerk/shared",
     "dev:js": "TURBO_UI=0 FORCE_COLOR=1 turbo dev:current --filter=@clerk/clerk-js",
     "dev:sandbox": "TURBO_UI=0 FORCE_COLOR=1 turbo dev:sandbox:serve",
+    "dev:swingset": "pnpm --filter @clerk/shared build && TURBO_UI=0 FORCE_COLOR=1 turbo dev --filter=@clerk/swingset --filter=@clerk/shared",
     "format": "turbo format && node scripts/format-non-workspace.mjs",
     "format:check": "turbo format:check && node scripts/format-non-workspace.mjs --check",
     "preinstall": "npx only-allow pnpm",
@@ -146,6 +147,7 @@
     "typedoc-plugin-replace-text": "4.2.0",
     "typescript": "catalog:repo",
     "typescript-eslint": "8.58.0",
+    "unrun": "0.2.39",
     "uuid": "8.3.2",
     "vitest": "3.2.4",
     "zx": "catalog:repo"

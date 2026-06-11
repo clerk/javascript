@@ -27,7 +27,8 @@
       // in order to make git merges easier
       // TODO: @nikos remove after v6 release
       "@/ui*": ["./src/*"]
-    }
+    },
+    "types": ["@rspack/core/module"]
   },
   "exclude": [
     "node_modules",

@@ -98,7 +98,7 @@ export interface EnterpriseOAuthConfigResource {
   updatedAt: Date | null;
 }
 
-export type MeEnterpriseConnectionProvider =
+export type OrganizationEnterpriseConnectionProvider =
   | 'saml_custom'
   | 'saml_okta'
   | 'saml_google'
@@ -107,7 +107,10 @@ export type MeEnterpriseConnectionProvider =
   | 'oidc_github_enterprise'
   | 'oidc_gitlab';
 
-export type MeEnterpriseConnectionSamlInput = {
+/** @deprecated Use `OrganizationEnterpriseConnectionProvider` instead. */
+export type MeEnterpriseConnectionProvider = OrganizationEnterpriseConnectionProvider;
+
+export type OrganizationEnterpriseConnectionSamlInput = {
   idpEntityId?: string | null;
   idpSsoUrl?: string | null;
   idpCertificate?: string | null;
@@ -119,7 +122,10 @@ export type MeEnterpriseConnectionSamlInput = {
   forceAuthn?: boolean | null;
 };
 
-export type MeEnterpriseConnectionOidcInput = {
+/** @deprecated Use `OrganizationEnterpriseConnectionSamlInput` instead. */
+export type MeEnterpriseConnectionSamlInput = OrganizationEnterpriseConnectionSamlInput;
+
+export type OrganizationEnterpriseConnectionOidcInput = {
   clientId?: string | null;
   clientSecret?: string | null;
   discoveryUrl?: string | null;
@@ -129,21 +135,32 @@ export type MeEnterpriseConnectionOidcInput = {
   requiresPkce?: boolean | null;
 };
 
-export type CreateMeEnterpriseConnectionParams = {
-  provider: MeEnterpriseConnectionProvider;
+/** @deprecated Use `OrganizationEnterpriseConnectionOidcInput` instead. */
+export type MeEnterpriseConnectionOidcInput = OrganizationEnterpriseConnectionOidcInput;
+
+export type CreateOrganizationEnterpriseConnectionParams = {
+  provider: OrganizationEnterpriseConnectionProvider;
   name: string;
+  /** FQDN strings the connection authenticates. Required by the org-scoped create endpoint. */
+  domains?: string[];
   organizationId?: string | null;
-  saml?: MeEnterpriseConnectionSamlInput | null;
-  oidc?: MeEnterpriseConnectionOidcInput | null;
+  saml?: OrganizationEnterpriseConnectionSamlInput | null;
+  oidc?: OrganizationEnterpriseConnectionOidcInput | null;
 };
 
-export type UpdateMeEnterpriseConnectionParams = {
+/** @deprecated Use `CreateOrganizationEnterpriseConnectionParams` instead. */
+export type CreateMeEnterpriseConnectionParams = CreateOrganizationEnterpriseConnectionParams;
+
+export type UpdateOrganizationEnterpriseConnectionParams = {
   name?: string | null;
   active?: boolean | null;
   syncUserAttributes?: boolean | null;
   disableAdditionalIdentifications?: boolean | null;
   organizationId?: string | null;
   customAttributes?: Record<string, unknown> | null;
-  saml?: MeEnterpriseConnectionSamlInput | null;
-  oidc?: MeEnterpriseConnectionOidcInput | null;
+  saml?: OrganizationEnterpriseConnectionSamlInput | null;
+  oidc?: OrganizationEnterpriseConnectionOidcInput | null;
 };
+
+/** @deprecated Use `UpdateOrganizationEnterpriseConnectionParams` instead. */
+export type UpdateMeEnterpriseConnectionParams = UpdateOrganizationEnterpriseConnectionParams;
