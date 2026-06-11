@@ -11,6 +11,7 @@ import { useCoreSignUp, useSignUpContext } from '../../contexts';
 import type { SocialButtonsProps } from '../../elements/SocialButtons';
 import { SocialButtons } from '../../elements/SocialButtons';
 import { useRouter } from '../../router';
+import { buildSignUpOAuthCallbackParams } from '../SignIn/buildOAuthCallbackParams';
 
 export type SignUpSocialButtonsProps = SocialButtonsProps & {
   continueSignUp?: boolean;
@@ -26,14 +27,16 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
   const signUp = useCoreSignUp();
   const redirectUrl = ctx.ssoCallbackUrl;
   const redirectUrlComplete = ctx.afterSignUpUrl || '/';
-  const shouldUsePopup = ctx.oauthFlow === 'popup' || (ctx.oauthFlow === 'auto' && originPrefersPopup());
+  const shouldUsePopup =
+    !clerk.__internal_hasOAuthTransport &&
+    (ctx.oauthFlow === 'popup' || (ctx.oauthFlow === 'auto' && originPrefersPopup()));
   const { continueSignUp = false, onAlternativePhoneCodeProviderClick, ...rest } = props;
 
   return (
     <SocialButtons
       {...rest}
       showLastAuthenticationStrategy={false}
-      idleAfterDelay={!shouldUsePopup}
+      idleAfterDelay={!shouldUsePopup && !clerk.__internal_hasOAuthTransport}
       oauthCallback={(strategy: OAuthStrategy) => {
         if (shouldUsePopup) {
           // We create the popup window here with the `about:blank` URL since some browsers will block popups that are
@@ -70,8 +73,17 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
             unsafeMetadata: ctx.unsafeMetadata,
             legalAccepted: props.legalAccepted,
             oidcPrompt: ctx.oidcPrompt,
+            __internal_callbackParams: {
+              ...buildSignUpOAuthCallbackParams(ctx),
+              navigateOnSetActive: ctx.navigateOnSetActive,
+            },
           })
-          .catch(err => handleError(err, [], card.setError));
+          .catch(err => {
+            handleError(err, [], card.setError);
+            if (clerk.__internal_hasOAuthTransport) {
+              card.setIdle();
+            }
+          });
       }}
       web3Callback={strategy => {
         if (strategy === 'web3_solana_signature') {

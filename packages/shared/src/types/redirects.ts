@@ -77,6 +77,15 @@ export type AuthenticateWithRedirectParams = {
   oidcPrompt?: string;
 
   /**
+   * Internal OAuth callback context, consumed only when an OAuth transport completes the
+   * flow in-process. Ignored by the web redirect/popup paths. Shape matches the params
+   * the prebuilt SSO callback route passes to `handleRedirectCallback`.
+   *
+   * @internal
+   */
+  __internal_callbackParams?: import('./clerk').HandleOAuthCallbackParams;
+
+  /**
    * @experimental
    */
   enterpriseConnectionId?: string;

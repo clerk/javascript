@@ -98,6 +98,7 @@ import type {
   LoadedClerk,
   NavigateOptions,
   OAuthApplicationNamespace,
+  OAuthTransport,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
@@ -269,6 +270,7 @@ export class Clerk implements ClerkInterface {
   #listeners: Array<(emission: Resources) => void> = [];
   #navigationListeners: Array<() => void> = [];
   #options: ClerkOptions = {};
+  #oauthTransport: OAuthTransport | null = null;
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
   #publicEventBus = createClerkEventBus();
@@ -293,6 +295,14 @@ export class Clerk implements ClerkInterface {
           client: this.#queryClient,
         }
       : undefined;
+  }
+
+  get __internal_hasOAuthTransport(): boolean {
+    return this.#oauthTransport !== null;
+  }
+
+  get __internal_oauthTransport(): OAuthTransport | null {
+    return this.#oauthTransport;
   }
 
   public __internal_getCachedResources:
@@ -529,6 +539,7 @@ export class Clerk implements ClerkInterface {
     }
 
     this.#options = this.#initOptions(options);
+    this.#oauthTransport = this.#options.__internal_oauthTransport ?? null;
 
     // Initialize ClerkUI if it was provided
     if (this.#options.ui?.ClerkUI) {
@@ -2285,7 +2296,7 @@ export class Clerk implements ClerkInterface {
     return null;
   };
 
-  public handleGoogleOneTapCallback = async (
+  public __internal_handleResourceCallback = async (
     signInOrUp: SignInResource | SignUpResource,
     params: HandleOAuthCallbackParams,
     customNavigate?: (to: string) => Promise<unknown>,
@@ -2308,6 +2319,14 @@ export class Clerk implements ClerkInterface {
       signIn,
       navigate,
     });
+  };
+
+  public handleGoogleOneTapCallback = async (
+    signInOrUp: SignInResource | SignUpResource,
+    params: HandleOAuthCallbackParams,
+    customNavigate?: (to: string) => Promise<unknown>,
+  ): Promise<unknown> => {
+    return this.__internal_handleResourceCallback(signInOrUp, params, customNavigate);
   };
 
   private _handleRedirectCallback = async (
@@ -2446,7 +2465,20 @@ export class Clerk implements ClerkInterface {
       return this.setActive({
         session: si.sessionId,
         navigate: async ({ session }) => {
-          await setActiveNavigate({ session, baseUrl: signInUrl, redirectUrl: redirectUrls.getAfterSignInUrl() });
+          if (params.navigateOnSetActive) {
+            await params.navigateOnSetActive({
+              session,
+              redirectUrl: redirectUrls.getAfterSignInUrl(),
+              decorateUrl: url => this.buildUrlWithAuth(url),
+            });
+            return;
+          }
+
+          await setActiveNavigate({
+            session,
+            baseUrl: signInUrl,
+            redirectUrl: redirectUrls.getAfterSignInUrl(),
+          });
         },
       });
     }
@@ -2461,7 +2493,20 @@ export class Clerk implements ClerkInterface {
           return this.setActive({
             session: res.createdSessionId,
             navigate: async ({ session }) => {
-              await setActiveNavigate({ session, baseUrl: signUpUrl, redirectUrl: redirectUrls.getAfterSignInUrl() });
+              if (params.navigateOnSetActive) {
+                await params.navigateOnSetActive({
+                  session,
+                  redirectUrl: redirectUrls.getAfterSignInUrl(),
+                  decorateUrl: url => this.buildUrlWithAuth(url),
+                });
+                return;
+              }
+
+              await setActiveNavigate({
+                session,
+                baseUrl: signUpUrl,
+                redirectUrl: redirectUrls.getAfterSignInUrl(),
+              });
             },
           });
         case 'needs_first_factor':
@@ -2512,7 +2557,20 @@ export class Clerk implements ClerkInterface {
           return this.setActive({
             session: res.createdSessionId,
             navigate: async ({ session }) => {
-              await setActiveNavigate({ session, baseUrl: signUpUrl, redirectUrl: redirectUrls.getAfterSignUpUrl() });
+              if (params.navigateOnSetActive) {
+                await params.navigateOnSetActive({
+                  session,
+                  redirectUrl: redirectUrls.getAfterSignUpUrl(),
+                  decorateUrl: url => this.buildUrlWithAuth(url),
+                });
+                return;
+              }
+
+              await setActiveNavigate({
+                session,
+                baseUrl: signUpUrl,
+                redirectUrl: redirectUrls.getAfterSignUpUrl(),
+              });
             },
           });
         case 'missing_requirements':
@@ -2526,7 +2584,20 @@ export class Clerk implements ClerkInterface {
       return this.setActive({
         session: su.sessionId,
         navigate: async ({ session }) => {
-          await setActiveNavigate({ session, baseUrl: signUpUrl, redirectUrl: redirectUrls.getAfterSignUpUrl() });
+          if (params.navigateOnSetActive) {
+            await params.navigateOnSetActive({
+              session,
+              redirectUrl: redirectUrls.getAfterSignUpUrl(),
+              decorateUrl: url => this.buildUrlWithAuth(url),
+            });
+            return;
+          }
+
+          await setActiveNavigate({
+            session,
+            baseUrl: signUpUrl,
+            redirectUrl: redirectUrls.getAfterSignUpUrl(),
+          });
         },
       });
     }
@@ -2552,6 +2623,15 @@ export class Clerk implements ClerkInterface {
         return this.setActive({
           session: sessionId,
           navigate: async ({ session }) => {
+            if (params.navigateOnSetActive) {
+              await params.navigateOnSetActive({
+                session,
+                redirectUrl: redirectUrls.getAfterSignInUrl(),
+                decorateUrl: url => this.buildUrlWithAuth(url),
+              });
+              return;
+            }
+
             await setActiveNavigate({
               session,
               baseUrl: suUserAlreadySignedIn ? signUpUrl : signInUrl,

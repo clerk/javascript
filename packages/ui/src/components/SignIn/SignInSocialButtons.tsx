@@ -14,6 +14,7 @@ import { useCardState } from '../../elements/contexts';
 import type { SocialButtonsProps } from '../../elements/SocialButtons';
 import { SocialButtons } from '../../elements/SocialButtons';
 import { useRouter } from '../../router';
+import { buildSignInOAuthCallbackParams } from './buildOAuthCallbackParams';
 
 export type SignInSocialButtonsProps = SocialButtonsProps & {
   onAlternativePhoneCodeProviderClick?: (channel: PhoneCodeChannel) => void;
@@ -27,7 +28,9 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
   const signIn = useCoreSignIn();
   const redirectUrl = ctx.ssoCallbackUrl;
   const redirectUrlComplete = ctx.afterSignInUrl || '/';
-  const shouldUsePopup = ctx.oauthFlow === 'popup' || (ctx.oauthFlow === 'auto' && originPrefersPopup());
+  const shouldUsePopup =
+    !clerk.__internal_hasOAuthTransport &&
+    (ctx.oauthFlow === 'popup' || (ctx.oauthFlow === 'auto' && originPrefersPopup()));
   const { onAlternativePhoneCodeProviderClick, ...rest } = props;
 
   const handleError = (err: any) => {
@@ -53,7 +56,7 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
     <SocialButtons
       {...rest}
       showLastAuthenticationStrategy
-      idleAfterDelay={!shouldUsePopup}
+      idleAfterDelay={!shouldUsePopup && !clerk.__internal_hasOAuthTransport}
       oauthCallback={strategy => {
         if (shouldUsePopup) {
           // We create the popup window here with the `about:blank` URL since some browsers will block popups that are
@@ -73,8 +76,23 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
         }
 
         return signIn
-          .authenticateWithRedirect({ strategy, redirectUrl, redirectUrlComplete, oidcPrompt: ctx.oidcPrompt })
-          .catch(err => handleError(err));
+          .authenticateWithRedirect({
+            strategy,
+            redirectUrl,
+            redirectUrlComplete,
+            oidcPrompt: ctx.oidcPrompt,
+            __internal_callbackParams: {
+              ...buildSignInOAuthCallbackParams(ctx),
+              navigateOnSetActive: ctx.navigateOnSetActive,
+            },
+          })
+          .catch(err => {
+            const res = handleError(err);
+            if (clerk.__internal_hasOAuthTransport) {
+              card.setIdle();
+            }
+            return res;
+          });
       }}
       web3Callback={strategy => {
         if (strategy === 'web3_solana_signature') {

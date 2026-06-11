@@ -1,5 +1,5 @@
 import { appendModalState } from '@clerk/shared/internal/clerk-js/queryStateParams';
-import { useReverification, useUser } from '@clerk/shared/react';
+import { useClerk, useReverification, useUser } from '@clerk/shared/react';
 import type { OAuthProvider, OAuthStrategy } from '@clerk/shared/types';
 
 import { useCardState } from '@/ui/elements/contexts';
@@ -16,27 +16,28 @@ import { useRouter } from '../../router';
 const ConnectMenuButton = (props: { strategy: OAuthStrategy; onClick?: () => void }) => {
   const { strategy } = props;
   const card = useCardState();
+  const clerk = useClerk();
   const { user } = useUser();
   const { navigate } = useRouter();
   const { strategyToDisplayData } = useEnabledThirdPartyProviders();
   const { additionalOAuthScopes, componentName, mode } = useUserProfileContext();
   const isModal = mode === 'modal';
 
-  const createExternalAccount = useReverification(() => {
+  const createExternalAccount = useReverification((redirectUrl: string) => {
     const socialProvider = strategy.replace('oauth_', '') as OAuthProvider;
-    const redirectUrl = isModal
-      ? appendModalState({ url: window.location.href, componentName, socialProvider: socialProvider })
-      : window.location.href;
+    const decoratedRedirectUrl = isModal
+      ? appendModalState({ url: redirectUrl, componentName, socialProvider })
+      : redirectUrl;
     const additionalScopes = additionalOAuthScopes ? additionalOAuthScopes[socialProvider] : [];
 
     return user?.createExternalAccount({
       strategy,
-      redirectUrl,
+      redirectUrl: decoratedRedirectUrl,
       additionalScopes,
     });
   });
 
-  const connect = () => {
+  const connect = async () => {
     if (!user) {
       return;
     }
@@ -44,17 +45,27 @@ const ConnectMenuButton = (props: { strategy: OAuthStrategy; onClick?: () => voi
     // TODO: Decide if we should keep using this strategy
     // If yes, refactor and cleanup:
     card.setLoading(strategy);
-    return createExternalAccount()
-      .then(res => {
-        if (res && res.verification?.externalVerificationRedirectURL) {
-          void sleep(2000).then(() => card.setIdle(strategy));
-          void navigate(res.verification.externalVerificationRedirectURL.href);
+    try {
+      if (clerk.__internal_oauthTransport) {
+        const res = await createExternalAccount(String(await clerk.__internal_oauthTransport.getRedirectUrl()));
+        const url = res?.verification?.externalVerificationRedirectURL;
+        if (url) {
+          await clerk.__internal_oauthTransport.open(url);
+          await user.reload();
         }
-      })
-      .catch(err => {
-        handleError(err, [], card.setError);
-        card.setIdle(strategy);
-      });
+        void sleep(2000).then(() => card.setIdle(strategy));
+        return;
+      }
+
+      const res = await createExternalAccount(window.location.href);
+      if (res && res.verification?.externalVerificationRedirectURL) {
+        void sleep(2000).then(() => card.setIdle(strategy));
+        void navigate(res.verification.externalVerificationRedirectURL.href);
+      }
+    } catch (err: any) {
+      handleError(err, [], card.setError);
+      card.setIdle(strategy);
+    }
   };
 
   return (
