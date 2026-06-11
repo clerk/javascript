@@ -1,5 +1,4 @@
-import type { ClerkError } from '@/errors/clerkError';
-
+import type { ClerkError } from '../errors/clerkError';
 import type { SetActiveNavigate } from './clerk';
 import type { DeletedObjectResource } from './deletedObject';
 import type { ClerkPaginatedResponse, ClerkPaginationParams } from './pagination';
@@ -158,9 +157,7 @@ export type GetPlansParams = ClerkPaginationParams<{
    */
   for?: ForPayerType;
   /**
-   * The organization ID to fetch plans for (needs to match the current active organization ID). Providing this
-   * parameter will populate the `availablePrices` field with the prices that are available to the
-   * authenticated organization.
+   * The organization ID to fetch plans for (needs to match the current [Active Organization](!active-organization) ID). Providing this parameter will populate the `availablePrices` field with the prices that are available to the authenticated organization.
    */
   orgId?: string;
   /**

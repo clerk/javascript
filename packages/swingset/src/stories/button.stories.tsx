@@ -7,6 +7,7 @@ import type { StoryMeta } from '@/lib/types';
 export const meta: StoryMeta = {
   group: 'Components',
   title: 'Button',
+  source: 'packages/ui/src/mosaic/components/button.tsx',
   styles: buttonStyles,
 };
 

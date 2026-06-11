@@ -147,6 +147,7 @@
     "typedoc-plugin-replace-text": "4.2.0",
     "typescript": "catalog:repo",
     "typescript-eslint": "8.58.0",
+    "unrun": "0.2.39",
     "uuid": "8.3.2",
     "vitest": "3.2.4",
     "zx": "catalog:repo"
