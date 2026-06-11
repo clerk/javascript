@@ -1221,31 +1221,31 @@ export type CreateCheckoutParams = WithOptionalOrgType<{
  */
 export type ConfirmCheckoutParams =
   | {
-    /**
-     * The ID of a saved payment method to use for this checkout.
-     */
-    paymentMethodId?: string;
-  }
+      /**
+       * The ID of a saved payment method to use for this checkout.
+       */
+      paymentMethodId?: string;
+    }
   | {
-    /**
-     * A token representing payment details, usually from a payment form. **Requires** `gateway` to be provided.
-     */
-    paymentToken?: string;
-    /**
-     * The payment gateway to use. **Required** if `paymentToken` or `useTestCard` is provided.
-     */
-    gateway?: PaymentGateway;
-  }
+      /**
+       * A token representing payment details, usually from a payment form. **Requires** `gateway` to be provided.
+       */
+      paymentToken?: string;
+      /**
+       * The payment gateway to use. **Required** if `paymentToken` or `useTestCard` is provided.
+       */
+      gateway?: PaymentGateway;
+    }
   | {
-    /**
-     * The payment gateway to use. **Required** if `paymentToken` or `useTestCard` is provided.
-     */
-    gateway?: PaymentGateway;
-    /**
-     * If true, uses a test card for the checkout. **Requires** `gateway` to be provided.
-     */
-    useTestCard?: boolean;
-  };
+      /**
+       * The payment gateway to use. **Required** if `paymentToken` or `useTestCard` is provided.
+       */
+      gateway?: PaymentGateway;
+      /**
+       * If true, uses a test card for the checkout. **Requires** `gateway` to be provided.
+       */
+      useTestCard?: boolean;
+    };
 
 /**
  * The `BillingCheckoutResource` type represents information about a checkout session.
