@@ -137,6 +137,34 @@ General protection must happen at the top of the function, but additional narrow
 
 For each unprotected resource it flags, the rule offers an editor quick-fix suggestion that inserts `await auth.protect()` at the top of the function (making it `async` and adding the `import { auth } from '@clerk/nextjs/server'` import if needed). Suggestions are opt-in: they appear in your editor's quick-fix menu and are not applied by `eslint --fix`, since adding a protection check changes runtime behavior.
 
+## Bulk auto-fixing
+
+> [!WARNING]
+> Applying these fixes changes the runtime behavior of your application — `await auth.protect()` enforces authentication where there potentially was none, or might override custom auth checks that were already in place. Always review the changes and test your application afterwards.
+
+Because the protection insertion is a suggestion rather than an autofix, `eslint --fix` deliberately won't apply it. To apply it across many files at once, use the bundled command, which lints with your existing ESLint config (so your protected/public globs are honored) and applies the suggestion to every resource it can safely fix:
+
+```sh
+# Fix everything under the current directory
+npx clerk-fix-auth-protection
+
+# Scope it, or preview without writing
+npx clerk-fix-auth-protection "app/**"
+npx clerk-fix-auth-protection --dry-run
+```
+
+Resources the rule can't safely fix on its own (imported/wrapped exports, unacknowledged mixed-scope layouts) are listed as needing manual attention, and the command exits non-zero when any remain (or when `--dry-run` would make changes), so it can gate CI.
+
+The same logic is available programmatically:
+
+```ts
+import { fixAuthProtection } from '@clerk/eslint-plugin/fix-auth-protection';
+
+const { fixed, unresolved } = await fixAuthProtection({
+  patterns: ['app/**'],
+  dryRun: false,
+});
+
 ## Implementation details
 
 This section describes the exact details of how the lint rule works. You normally do no need to read or understand this if you only want to use the rule.
