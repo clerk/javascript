@@ -35,7 +35,7 @@ export function ClientRoot({ children }: { children: React.ReactNode }) {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <header className='bg-background sticky top-0 flex h-12 shrink-0 items-center gap-2 border-b px-4'>
+        <header className='bg-background sticky top-0 z-10 flex h-12 shrink-0 items-center gap-2 border-b px-4'>
           <SidebarTrigger className='-ml-1' />
           <Separator
             orientation='vertical'
