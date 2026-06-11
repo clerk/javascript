@@ -2,6 +2,15 @@
 import { meta as accordionMeta } from '../stories/accordion.stories';
 import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
 import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
+import { Default as DestructiveDefault, meta as destructiveMeta } from '../stories/destructive.stories';
+import {
+  Default as LeaveOrganizationDefault,
+  meta as leaveOrganizationMeta,
+} from '../stories/leave-organization.stories';
+import {
+  Default as OrganizationProfileDefault,
+  meta as organizationProfileMeta,
+} from '../stories/organization-profile.stories';
 import { meta as collapsibleMeta } from '../stories/collapsible.stories';
 import { Default as DialogDefault, meta as dialogComponentMeta } from '../stories/dialog.component.stories';
 import { meta as dialogMeta } from '../stories/dialog.stories';
@@ -19,6 +28,10 @@ import { meta as tabsMeta } from '../stories/tabs.stories';
 import { meta as tooltipMeta } from '../stories/tooltip.stories';
 import { toSlug } from './slug';
 import type { StoryModule } from './types';
+
+const destructiveModule: StoryModule = { meta: destructiveMeta, Default: DestructiveDefault };
+const leaveOrganizationModule: StoryModule = { meta: leaveOrganizationMeta, Default: LeaveOrganizationDefault };
+const organizationProfileModule: StoryModule = { meta: organizationProfileMeta, Default: OrganizationProfileDefault };
 
 const buttonModule: StoryModule = { meta: buttonMeta, Primary, Sizes, Disabled };
 
@@ -40,6 +53,13 @@ const tabsModule: StoryModule = { meta: tabsMeta };
 const tooltipModule: StoryModule = { meta: tooltipMeta };
 
 export const registry: StoryModule[] = [
+  // AIO
+  organizationProfileModule,
+  // Sections
+  leaveOrganizationModule,
+  // Blocks
+  destructiveModule,
+  // Components
   buttonModule,
   inputModule,
   dialogComponentModule,

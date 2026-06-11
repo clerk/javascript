@@ -10,6 +10,15 @@ import { ViewSource } from './ViewSource';
 // MDX docs keyed by `group` slug → `component` slug. Group-aware so identically-named
 // entries (the headless `Dialog` primitive vs. the styled `Dialog` component) stay distinct.
 const docModules: Record<string, Record<string, React.ComponentType>> = {
+  aio: {
+    'organization-profile': dynamic(() => import('../stories/organization-profile.mdx')),
+  },
+  sections: {
+    'leave-organization': dynamic(() => import('../stories/leave-organization.mdx')),
+  },
+  blocks: {
+    destructive: dynamic(() => import('../stories/destructive.mdx')),
+  },
   components: {
     button: dynamic(() => import('../stories/button.mdx')),
     input: dynamic(() => import('../stories/input.mdx')),
