@@ -20,7 +20,7 @@ const path = require('path');
 const fs = require('fs');
 
 const CLERK_IOS_REPO = 'https://github.com/clerk/clerk-ios.git';
-const CLERK_IOS_VERSION = '1.2.1';
+const CLERK_IOS_VERSION = '1.2.2';
 
 const CLERK_MIN_IOS_VERSION = '17.0';
 
