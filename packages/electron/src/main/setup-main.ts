@@ -1,4 +1,4 @@
-import { app, protocol, session } from 'electron';
+import { protocol } from 'electron';
 
 import type { SetupMainOptions, SetupMainReturn } from '../shared/types';
 import { setupTokenCacheIpcHandlers } from './ipc-handlers';
@@ -17,61 +17,6 @@ function assertValidRendererOriginConfig(renderer: NonNullable<SetupMainOptions[
   }
 }
 
-const rendererRequestHeaderFilter = { urls: ['https://*/*'] };
-
-function findHeaderKey(headers: Record<string, string>, header: string): string | undefined {
-  return Object.keys(headers).find(key => key.toLowerCase() === header.toLowerCase());
-}
-
-function setupRendererRequestHeaders(renderer: NonNullable<SetupMainOptions['renderer']>): () => void {
-  const rendererOrigin = `${renderer.scheme}://${renderer.host}`;
-  let registered = false;
-  let disposed = false;
-
-  const listener = (
-    details: Electron.OnBeforeSendHeadersListenerDetails,
-    callback: (beforeSendResponse: Electron.BeforeSendResponse) => void,
-  ) => {
-    const url = new URL(details.url);
-    const originKey = findHeaderKey(details.requestHeaders, 'origin');
-    const authorizationKey = findHeaderKey(details.requestHeaders, 'authorization');
-
-    if (
-      url.searchParams.get('_is_native') === '1' &&
-      originKey &&
-      authorizationKey &&
-      details.requestHeaders[originKey] === rendererOrigin
-    ) {
-      delete details.requestHeaders[originKey];
-    }
-
-    callback({ requestHeaders: details.requestHeaders });
-  };
-
-  const register = () => {
-    if (disposed || registered) {
-      return;
-    }
-
-    session.defaultSession.webRequest.onBeforeSendHeaders(rendererRequestHeaderFilter, listener);
-    registered = true;
-  };
-
-  if (app.isReady()) {
-    register();
-  } else {
-    void app.whenReady().then(register);
-  }
-
-  return () => {
-    disposed = true;
-
-    if (registered) {
-      session.defaultSession.webRequest.onBeforeSendHeaders(rendererRequestHeaderFilter, null);
-    }
-  };
-}
-
 export function setupMain(options: SetupMainOptions): SetupMainReturn {
   if (!options.storage) {
     throw new Error(
@@ -80,8 +25,6 @@ export function setupMain(options: SetupMainOptions): SetupMainReturn {
   }
 
   const cleanupTokenPersistence = setupTokenCacheIpcHandlers(options.storage);
-
-  let cleanupRendererRequestHeaders = () => {};
 
   if (options.renderer) {
     assertValidRendererOriginConfig(options.renderer);
@@ -98,14 +41,11 @@ export function setupMain(options: SetupMainOptions): SetupMainReturn {
         },
       },
     ]);
-
-    cleanupRendererRequestHeaders = setupRendererRequestHeaders(options.renderer);
   }
 
   return {
     cleanup() {
       cleanupTokenPersistence();
-      cleanupRendererRequestHeaders();
     },
   };
 }

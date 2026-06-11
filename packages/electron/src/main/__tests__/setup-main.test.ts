@@ -1,4 +1,4 @@
-import { app, ipcMain, protocol, session } from 'electron';
+import { ipcMain, protocol } from 'electron';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { TokenStorage } from '../../shared/types';
@@ -9,19 +9,8 @@ vi.mock('electron', () => ({
     handle: vi.fn(),
     removeHandler: vi.fn(),
   },
-  app: {
-    isReady: vi.fn(() => true),
-    whenReady: vi.fn(() => Promise.resolve()),
-  },
   protocol: {
     registerSchemesAsPrivileged: vi.fn(),
-  },
-  session: {
-    defaultSession: {
-      webRequest: {
-        onBeforeSendHeaders: vi.fn(),
-      },
-    },
   },
 }));
 
@@ -70,41 +59,6 @@ describe('setupMain', () => {
     ]);
   });
 
-  it('strips the renderer Origin from native Clerk requests that use Authorization', () => {
-    setupMain({
-      storage,
-      renderer: {
-        host: 'renderer',
-        scheme: 'my-app',
-      },
-    });
-
-    expect(session.defaultSession.webRequest.onBeforeSendHeaders).toHaveBeenCalledWith(
-      { urls: ['https://*/*'] },
-      expect.any(Function),
-    );
-
-    const listener = vi.mocked(session.defaultSession.webRequest.onBeforeSendHeaders).mock.calls[0][1];
-    const callback = vi.fn();
-
-    listener(
-      {
-        requestHeaders: {
-          Authorization: 'Bearer jwt',
-          Origin: 'my-app://renderer',
-        },
-        url: 'https://frontend-api.clerk.dev/v1/client?_is_native=1',
-      } as Electron.OnBeforeSendHeadersListenerDetails,
-      callback,
-    );
-
-    expect(callback).toHaveBeenCalledWith({
-      requestHeaders: {
-        Authorization: 'Bearer jwt',
-      },
-    });
-  });
-
   it('requires renderer.scheme to be a scheme name, not a URL', () => {
     expect(() =>
       setupMain({
@@ -135,24 +89,5 @@ describe('setupMain', () => {
     clerk.cleanup();
 
     expect(ipcMain.removeHandler).toHaveBeenCalledTimes(3);
-  });
-
-  it('removes the renderer request header handler on cleanup', () => {
-    vi.mocked(app.isReady).mockReturnValue(true);
-
-    const clerk = setupMain({
-      storage,
-      renderer: {
-        host: 'renderer',
-        scheme: 'my-app',
-      },
-    });
-
-    clerk.cleanup();
-
-    expect(session.defaultSession.webRequest.onBeforeSendHeaders).toHaveBeenLastCalledWith(
-      { urls: ['https://*/*'] },
-      null,
-    );
   });
 });

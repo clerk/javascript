@@ -2,24 +2,16 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { setupMain } from '@clerk/electron';
+import { storage } from '@clerk/electron/storage';
 import { app, BrowserWindow, net, protocol } from 'electron';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const RENDERER_SCHEME = 'clerk-electron';
-const RENDERER_HOST = 'renderer';
+const RENDERER_SCHEME = 'clerk';
+const RENDERER_HOST = 'app';
 const rendererRoot = path.resolve(__dirname, 'dist');
-const tokens = new Map();
 
 const clerk = setupMain({
-  storage: {
-    getItem: key => tokens.get(key) ?? null,
-    setItem: (key, value) => {
-      tokens.set(key, value);
-    },
-    removeItem: key => {
-      tokens.delete(key);
-    },
-  },
+  storage: storage(),
   renderer: {
     scheme: RENDERER_SCHEME,
     host: RENDERER_HOST,
