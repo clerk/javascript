@@ -56,6 +56,15 @@ let hydration: Promise<void> | null = null;
  */
 export function ensureOrganization(): Promise<void> {
   if (!hydration) {
+    // Client-only load. On the server this promise never settles, so the boundary streams its
+    // fallback as-is — without it, the timer fires in Node, the resolved promise re-throws against
+    // the permanently-`null` server snapshot, and the boundary re-suspends in a loop (corrupting
+    // the subtree → `useId` hydration mismatch). The client owns the actual load.
+    if (typeof window === 'undefined') {
+      hydration = new Promise<void>(() => {});
+      return hydration;
+    }
+
     hydration = delay(LOAD_DELAY_MS).then(() => {
       organizationSignal({
         organization: {
