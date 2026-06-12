@@ -1,5 +1,33 @@
 # Change Log
 
+## 4.17.1
+
+### Patch Changes
+
+- Migrate the build pipeline to tsdown and TypeScript 6.0. This is an internal tooling change with no intended changes to the public API or runtime behavior. ([#8177](https://github.com/clerk/javascript/pull/8177)) by [@dstaley](https://github.com/dstaley)
+
+- Deprecate passing `unsafeMetadata` to `user.update()`. ([#8587](https://github.com/clerk/javascript/pull/8587)) by [@brunol95](https://github.com/brunol95)
+
+  Use `user.updateMetadata()` when you want to partially update unsafe metadata with deep-merge semantics:
+
+  ```ts
+  await user.updateMetadata({
+    unsafeMetadata: { onboardingComplete: true },
+  });
+  ```
+
+  `user.update({ unsafeMetadata })` continues to work for now and preserves its existing full-replacement behavior:
+
+  ```ts
+  await user.update({
+    unsafeMetadata: { theme: 'dark' },
+  });
+  ```
+
+  New code should prefer `user.updateMetadata({ unsafeMetadata })` for metadata-only updates.
+
+- Restore resolvable TypeScript declarations. Type declarations are now emitted per-module at stable public paths instead of being bundled into content-hashed internal chunk files. This fixes type resolution failures (or silent `any` degradation) in packages whose declarations reference `@clerk/shared` types, such as `@clerk/vue`, `@clerk/react`, `@clerk/ui`, and `@clerk/testing`, which previously pointed at unresolvable `@clerk/shared/_chunks/*` specifiers. ([#8811](https://github.com/clerk/javascript/pull/8811)) by [@jacekradko](https://github.com/jacekradko)
+
 ## 4.17.0
 
 ### Minor Changes
