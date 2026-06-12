@@ -32,6 +32,12 @@ export const buttonRecipe = defineSlotRecipe(theme => ({
         _hover: { backgroundColor: theme.mix('primary', 'primaryForeground', 12) },
         _active: { backgroundColor: theme.mix('primary', 'primaryForeground', 24) },
       },
+      destructive: {
+        backgroundColor: theme.color.destructive,
+        color: theme.color.destructiveForeground,
+        _hover: { backgroundColor: theme.mix('destructive', 'destructiveForeground', 12) },
+        _active: { backgroundColor: theme.mix('destructive', 'destructiveForeground', 24) },
+      },
     },
     size: {
       sm: { padding: `${theme.spacing(0.2)} ${theme.spacing(2)}`, ...theme.text('xs') },

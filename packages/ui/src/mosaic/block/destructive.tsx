@@ -51,7 +51,10 @@ export function Destructive({
               Are you sure you want to leave this {resourceType}? You will lose access to this {resourceType} and its
               applications.
             </Dialog.Description>
-            <form onSubmit={handleSubmit}>
+            <form
+              onSubmit={handleSubmit}
+              style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
+            >
               <label>
                 Type &quot;{resourceName}&quot; below to continue.
                 <Input
@@ -62,7 +65,9 @@ export function Destructive({
               </label>
               <Button
                 type='submit'
+                color='destructive'
                 disabled={!canSubmit}
+                sx={{ alignSelf: 'flex-start' }}
               >
                 {isDeleting ? 'Leaving…' : `Leave ${resourceType}`}
               </Button>

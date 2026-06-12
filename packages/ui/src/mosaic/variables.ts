@@ -7,6 +7,8 @@ export const defaultMosaicVariables = Object.freeze({
   color: {
     primary: 'light-dark(oklch(0.205 0 0), oklch(0.922 0 0))',
     primaryForeground: 'light-dark(oklch(0.985 0 0), oklch(0.205 0 0))',
+    destructive: 'light-dark(oklch(0.577 0.245 27.325), oklch(0.637 0.237 25.331))',
+    destructiveForeground: 'oklch(0.985 0 0)',
   },
   spacing: '0.25rem',
   rounded: {
