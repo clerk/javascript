@@ -3,7 +3,6 @@ import { app, ipcMain, shell } from 'electron';
 import { OAUTH_TRANSPORT_CHANNELS } from '../shared/ipc';
 import type { RendererSchemeOptions } from '../shared/types';
 
-const DEFAULT_CALLBACK_PATH = '/sso-callback';
 const CALLBACK_TIMEOUT_MS = 3 * 60 * 1000;
 
 type PendingOAuthFlow = {
@@ -14,19 +13,10 @@ type PendingOAuthFlow = {
 
 type OAuthTransportOptions = {
   renderer: RendererSchemeOptions;
-  callbackPath?: string;
 };
 
-function normalizeCallbackPath(callbackPath?: string): string {
-  if (!callbackPath) {
-    return DEFAULT_CALLBACK_PATH;
-  }
-
-  return callbackPath.startsWith('/') ? callbackPath : `/${callbackPath}`;
-}
-
 function buildRedirectUrl(options: OAuthTransportOptions): string {
-  return `${options.renderer.scheme}://${options.renderer.host}${normalizeCallbackPath(options.callbackPath)}`;
+  return `${options.renderer.scheme}://${options.renderer.host}/`;
 }
 
 function isMatchingCallbackUrl(url: string, redirectUrl: string): boolean {

@@ -131,21 +131,20 @@ describe('setupMain', () => {
     expect(app.setAsDefaultProtocolClient).toHaveBeenCalledWith('my-app');
   });
 
-  it('derives the OAuth callback URL from renderer origin and callbackPath', () => {
+  it('derives the OAuth callback URL from the renderer origin', () => {
     setupMain({
       storage,
       renderer: {
         host: 'renderer',
         scheme: 'my-app',
       },
-      callbackPath: '/oauth/callback',
     });
 
     const getRedirectUrlHandler = vi.mocked(ipcMain.handle).mock.calls.find(([channel]) => {
       return channel === OAUTH_TRANSPORT_CHANNELS.getRedirectUrl;
     })?.[1];
 
-    expect(getRedirectUrlHandler?.({} as Electron.IpcMainInvokeEvent)).toBe('my-app://renderer/oauth/callback');
+    expect(getRedirectUrlHandler?.({} as Electron.IpcMainInvokeEvent)).toBe('my-app://renderer/');
   });
 
   it('opens OAuth URLs externally and resolves with the matching deep-link callback URL', async () => {
@@ -167,12 +166,9 @@ describe('setupMain', () => {
       url: string,
     ) => void;
 
-    openUrlListener(
-      { preventDefault: vi.fn() } as unknown as Electron.Event,
-      'my-app://renderer/sso-callback?code=123',
-    );
+    openUrlListener({ preventDefault: vi.fn() } as unknown as Electron.Event, 'my-app://renderer/?code=123');
 
-    await expect(openPromise).resolves.toEqual({ callbackUrl: 'my-app://renderer/sso-callback?code=123' });
+    await expect(openPromise).resolves.toEqual({ callbackUrl: 'my-app://renderer/?code=123' });
     expect(shell.openExternal).toHaveBeenCalledWith('https://accounts.example.com/oauth');
   });
 });

@@ -87,8 +87,8 @@ describe('Electron ClerkProvider', () => {
   });
 
   it('registers an OAuth transport backed by the Electron bridge', async () => {
-    oauthTransport.getRedirectUrl.mockResolvedValue('my-app://renderer/sso-callback');
-    oauthTransport.open.mockResolvedValue({ callbackUrl: 'my-app://renderer/sso-callback?code=123' });
+    oauthTransport.getRedirectUrl.mockResolvedValue('my-app://renderer/');
+    oauthTransport.open.mockResolvedValue({ callbackUrl: 'my-app://renderer/?code=123' });
 
     renderToStaticMarkup(<ClerkProvider publishableKey='pk_test_oauth'>App</ClerkProvider>);
 
@@ -97,9 +97,9 @@ describe('Electron ClerkProvider', () => {
       open: (url: URL) => Promise<{ callbackUrl: string }>;
     };
 
-    await expect(transport.getRedirectUrl()).resolves.toBe('my-app://renderer/sso-callback');
+    await expect(transport.getRedirectUrl()).resolves.toBe('my-app://renderer/');
     await expect(transport.open(new URL('https://accounts.example.com/oauth'))).resolves.toEqual({
-      callbackUrl: 'my-app://renderer/sso-callback?code=123',
+      callbackUrl: 'my-app://renderer/?code=123',
     });
     expect(oauthTransport.open).toHaveBeenCalledWith('https://accounts.example.com/oauth');
   });

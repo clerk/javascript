@@ -12,12 +12,6 @@ export type SetupMainOptions = {
    * Registers the custom scheme used to serve the Electron renderer from a stable origin.
    */
   renderer?: RendererSchemeOptions;
-  /**
-   * Path under the renderer origin used as the OAuth callback URL.
-   *
-   * Defaults to `/sso-callback`.
-   */
-  callbackPath?: string;
 };
 
 export type SetupMainReturn = {

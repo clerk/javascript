@@ -46,7 +46,6 @@ export function setupMain(options: SetupMainOptions): SetupMainReturn {
 
     cleanupOAuthTransport = setupOAuthTransportIpcHandlers({
       renderer: options.renderer,
-      callbackPath: options.callbackPath,
     });
   }
 
