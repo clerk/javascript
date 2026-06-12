@@ -29,10 +29,20 @@ const mocks = vi.hoisted(() => {
       },
       setActive: vi.fn(),
     },
+    authState: {
+      isLoaded: true,
+      sessionId: null as string | null,
+    },
   };
 });
 
 vi.mock('../../polyfills', () => ({}));
+
+vi.mock('@clerk/react', () => {
+  return {
+    useAuth: () => mocks.authState,
+  };
+});
 
 vi.mock('@clerk/react/internal', () => {
   return {
@@ -117,6 +127,8 @@ describe('ClerkProvider native session notifications', () => {
     mocks.clerkInstance.addListener.mockReturnValue(vi.fn());
     mocks.clerkInstance.client.lastActiveSessionId = 'sess_native';
     mocks.clerkInstance.session.id = null;
+    mocks.authState.isLoaded = true;
+    mocks.authState.sessionId = null;
   });
 
   test('refreshes useNativeSession subscribers after initial native configure', async () => {
@@ -163,5 +175,59 @@ describe('ClerkProvider native session notifications', () => {
     expect(mocks.clerkInstance.__internal_reloadInitialResources).toHaveBeenCalled();
     expect(mocks.clerkInstance.setActive).toHaveBeenCalledWith({ session: 'sess_native' });
     expect(mocks.notifyNativeSessionChanged).toHaveBeenCalledTimes(1);
+  });
+
+  test('does not refresh native from JS when neither side has a client token', async () => {
+    mocks.tokenCache.getToken.mockResolvedValue(null);
+    mocks.getClientToken.mockResolvedValue(null);
+    mocks.clerkInstance.client.lastActiveSessionId = null;
+
+    render(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', null);
+    });
+    await waitFor(() => {
+      expect(mocks.tokenCache.getToken).toHaveBeenCalled();
+    });
+
+    expect(mocks.refreshClient).not.toHaveBeenCalled();
+  });
+
+  test('pushes the cached JS client token to native after JS sign-in', async () => {
+    mocks.tokenCache.getToken.mockResolvedValue(null);
+    mocks.getClientToken.mockResolvedValue(null);
+    mocks.clerkInstance.client.lastActiveSessionId = null;
+
+    const { rerender } = render(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', null);
+    });
+
+    mocks.configure.mockClear();
+    mocks.tokenCache.getToken.mockResolvedValue('client-token');
+    mocks.authState.sessionId = 'sess_js';
+
+    rerender(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', 'client-token');
+    });
   });
 });
