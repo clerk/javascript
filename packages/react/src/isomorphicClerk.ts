@@ -1553,8 +1553,12 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     params: HandleOAuthCallbackParams,
     customNavigate?: (to: string) => Promise<unknown>,
   ): Promise<unknown> => {
-    const clerkjs = await this.#waitForClerkJS();
-    return clerkjs.__internal_handleResourceCallback(signInOrUp, params, customNavigate);
+    const callback = () => this.clerkjs?.__internal_handleResourceCallback(signInOrUp, params, customNavigate);
+    if (this.clerkjs && this.loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('__internal_handleResourceCallback', callback);
+    }
   };
 
   handleEmailLinkVerification = async (params: HandleEmailLinkVerificationParams) => {
