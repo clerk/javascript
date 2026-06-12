@@ -13,7 +13,13 @@ public enum ClerkNativeViewEvent: String {
 }
 
 // Global registry for the app-target native bridge (set by the app target at startup)
-public var clerkNativeBridge: ClerkNativeBridgeProtocol?
+public var clerkNativeBridge: ClerkNativeBridgeProtocol? {
+  didSet {
+    if clerkNativeBridge != nil {
+      emitClerkNativeBridgeReady()
+    }
+  }
+}
 
 // Protocol that the app target implements to provide Clerk SDK operations and SwiftUI views.
 public protocol ClerkNativeBridgeProtocol {
@@ -27,6 +33,34 @@ public protocol ClerkNativeBridgeProtocol {
   func getSession() async -> [String: Any]?
   func getClientToken() async -> String?
   func refreshClient() async throws
+}
+
+public protocol ClerkNativeBridgeReadyObserver: AnyObject {
+  func clerkNativeBridgeDidBecomeReady()
+}
+
+private let clerkNativeBridgeReadyObservers = NSHashTable<AnyObject>.weakObjects()
+
+public func addClerkNativeBridgeReadyObserver(_ observer: ClerkNativeBridgeReadyObserver) {
+  clerkNativeBridgeReadyObservers.add(observer)
+}
+
+public func removeClerkNativeBridgeReadyObserver(_ observer: ClerkNativeBridgeReadyObserver) {
+  clerkNativeBridgeReadyObservers.remove(observer)
+}
+
+public func emitClerkNativeBridgeReady() {
+  let notifyObservers = {
+    for observer in clerkNativeBridgeReadyObservers.allObjects {
+      (observer as? ClerkNativeBridgeReadyObserver)?.clerkNativeBridgeDidBecomeReady()
+    }
+  }
+
+  if Thread.isMainThread {
+    notifyObservers()
+  } else {
+    DispatchQueue.main.async(execute: notifyObservers)
+  }
 }
 
 // MARK: - Module

@@ -1,13 +1,8 @@
 import UIKit
 
-public class ClerkNativeViewHost: UIView {
+public class ClerkNativeViewHost: UIView, ClerkNativeBridgeReadyObserver {
   private lazy var hostingCoordinator = ClerkNativeHostingCoordinator(containerView: self)
   private var hasInitialized: Bool = false
-  private var pendingHostedViewRetry: DispatchWorkItem?
-  private var hostedViewRetryCount = 0
-
-  private static let maxHostedViewRetryCount = 50
-  private static let hostedViewRetryDelay: TimeInterval = 0.1
 
   override public init(frame: CGRect) {
     super.init(frame: frame)
@@ -24,6 +19,7 @@ public class ClerkNativeViewHost: UIView {
       if hasInitialized {
         hostedViewDidDetachFromWindow()
       }
+      removeClerkNativeBridgeReadyObserver(self)
       hostingCoordinator.detach()
       hasInitialized = false
       return
@@ -31,6 +27,7 @@ public class ClerkNativeViewHost: UIView {
 
     guard !hasInitialized else { return }
     hasInitialized = true
+    addClerkNativeBridgeReadyObserver(self)
     hostedViewDidAttachToWindow()
     updateHostedView()
   }
@@ -42,7 +39,6 @@ public class ClerkNativeViewHost: UIView {
 
   func setNeedsHostedViewUpdate() {
     guard hasInitialized else { return }
-    hostedViewRetryCount = 0
     updateHostedView()
   }
 
@@ -55,31 +51,13 @@ public class ClerkNativeViewHost: UIView {
 
   func hostedViewDidDetachFromWindow() {}
 
-  private func updateHostedView() {
-    guard let controller = makeHostedController() else {
-      scheduleHostedViewRetry()
-      return
-    }
-
-    pendingHostedViewRetry?.cancel()
-    pendingHostedViewRetry = nil
-    hostedViewRetryCount = 0
-    hostingCoordinator.attach(controller)
+  public func clerkNativeBridgeDidBecomeReady() {
+    setNeedsHostedViewUpdate()
   }
 
-  private func scheduleHostedViewRetry() {
-    guard pendingHostedViewRetry == nil else { return }
-    guard hostedViewRetryCount < Self.maxHostedViewRetryCount else { return }
-
-    hostedViewRetryCount += 1
-    let workItem = DispatchWorkItem { [weak self] in
-      guard let self, self.hasInitialized else { return }
-      self.pendingHostedViewRetry = nil
-      self.updateHostedView()
-    }
-
-    pendingHostedViewRetry = workItem
-    DispatchQueue.main.asyncAfter(deadline: .now() + Self.hostedViewRetryDelay, execute: workItem)
+  private func updateHostedView() {
+    guard let controller = makeHostedController() else { return }
+    hostingCoordinator.attach(controller)
   }
 }
 

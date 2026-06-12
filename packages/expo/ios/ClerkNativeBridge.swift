@@ -53,6 +53,7 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
 
       let shouldWaitForSession = try await Self.syncTokenState(bearerToken: bearerToken)
       await Self.waitForLoadedSessionIfNeeded(shouldWaitForSession)
+      emitClerkNativeBridgeReady()
       return
     }
 
@@ -60,6 +61,7 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
       startClientObserver()
       let shouldWaitForSession = try await Self.syncTokenState(bearerToken: bearerToken)
       await Self.waitForLoadedSessionIfNeeded(shouldWaitForSession)
+      emitClerkNativeBridgeReady()
       return
     }
 
@@ -70,6 +72,7 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
 
     let shouldWaitForSession = try await Self.syncTokenState(bearerToken: bearerToken)
     await Self.waitForLoadedSessionIfNeeded(shouldWaitForSession)
+    emitClerkNativeBridgeReady()
   }
 
   @MainActor
@@ -208,6 +211,7 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
     guard Self.clerkConfigured else { return }
     _ = try await Clerk.shared.refreshClient()
     await Self.waitForLoadedSession()
+    emitClerkNativeBridgeReady()
   }
 
   private static func authMode(from mode: String) -> AuthView.Mode {
