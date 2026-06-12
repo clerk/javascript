@@ -2,6 +2,7 @@ import type {
   AddMemberParams,
   ClerkPaginatedResponse,
   ClerkResourceReloadParams,
+  CreateOrganizationDomainParams,
   CreateOrganizationEnterpriseConnectionParams,
   CreateOrganizationParams,
   DeletedObjectJSON,
@@ -24,6 +25,8 @@ import type {
   InviteMembersParams,
   OrganizationDomainJSON,
   OrganizationDomainResource,
+  OrganizationDomainsBulkOwnershipVerificationJSON,
+  OrganizationDomainsBulkOwnershipVerificationResource,
   OrganizationInvitationJSON,
   OrganizationInvitationResource,
   OrganizationJSON,
@@ -288,8 +291,46 @@ export class Organization extends BaseResource implements OrganizationResource {
     });
   };
 
-  createDomain = async (name: string): Promise<OrganizationDomainResource> => {
-    return OrganizationDomain.create(this.id, { name });
+  createDomain = async (
+    name: string,
+    params?: Pick<CreateOrganizationDomainParams, 'enrollmentMode'>,
+  ): Promise<OrganizationDomainResource> => {
+    return OrganizationDomain.create(this.id, { name, enrollmentMode: params?.enrollmentMode });
+  };
+
+  prepareOwnershipVerification = async (
+    domainIds: string[],
+  ): Promise<OrganizationDomainsBulkOwnershipVerificationResource> => {
+    return this.bulkOwnershipVerification('prepare_ownership_verification', domainIds);
+  };
+
+  attemptOwnershipVerification = async (
+    domainIds: string[],
+  ): Promise<OrganizationDomainsBulkOwnershipVerificationResource> => {
+    return this.bulkOwnershipVerification('attempt_ownership_verification', domainIds);
+  };
+
+  private bulkOwnershipVerification = async (
+    action: 'prepare_ownership_verification' | 'attempt_ownership_verification',
+    domainIds: string[],
+  ): Promise<OrganizationDomainsBulkOwnershipVerificationResource> => {
+    const { data, errors } = (
+      await BaseResource._fetch(
+        {
+          path: `/organizations/${this.id}/domains/${action}/bulk`,
+          method: 'POST',
+          body: { organization_domain_ids: domainIds } as any,
+        },
+        {
+          forceUpdateClient: true,
+        },
+      )
+    )?.response as unknown as OrganizationDomainsBulkOwnershipVerificationJSON;
+
+    return {
+      data: (data ?? []).map(domain => new OrganizationDomain(domain)),
+      errors: errors ?? [],
+    };
   };
 
   getMemberships: GetMemberships = async getMembershipsParams => {

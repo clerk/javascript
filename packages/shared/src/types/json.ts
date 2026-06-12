@@ -473,6 +473,26 @@ export interface OrganizationDomainJSON extends ClerkResourceJSON {
   total_pending_suggestions: number;
 }
 
+/**
+ * A per-domain failure entry returned by the bulk ownership verification
+ * endpoints, carrying the `organization_domain_id` and the API error code that
+ * caused it to be skipped.
+ */
+export interface OrganizationDomainBulkOwnershipVerificationErrorJSON {
+  id: string;
+  code: string;
+}
+
+/**
+ * Partial-success payload returned by the bulk `prepare`/`attempt`
+ * ownership verification endpoints. Each requested domain id lands in either
+ * `data` (with its current ownership state) or `errors`.
+ */
+export interface OrganizationDomainsBulkOwnershipVerificationJSON {
+  data: OrganizationDomainJSON[];
+  errors: OrganizationDomainBulkOwnershipVerificationErrorJSON[];
+}
+
 export interface RoleJSON extends ClerkResourceJSON {
   object: 'role';
   id: string;

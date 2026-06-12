@@ -61,11 +61,11 @@ export interface OrganizationDomainOwnershipVerification {
    */
   verifiedAt: Date | null;
   /**
-   * The fully qualified DNS name the org admin must publish the TXT record under. Present only immediately after `prepareOwnershipVerification`.
+   * The fully qualified DNS name the org admin must publish the TXT record under. Present only immediately after preparing ownership verification.
    */
   txtRecordName: string | null;
   /**
-   * The exact value the org admin must publish in the TXT record. Present only immediately after `prepareOwnershipVerification`.
+   * The exact value the org admin must publish in the TXT record. Present only immediately after preparing ownership verification.
    */
   txtRecordValue: string | null;
 }
@@ -155,18 +155,6 @@ export interface OrganizationDomainResource extends ClerkResource {
    */
   attemptAffiliationVerification: (params: AttemptAffiliationVerificationParams) => Promise<OrganizationDomainResource>;
   /**
-   * Begins the ownership verification flow by issuing a fresh TXT challenge for the domain. The returned domain's `ownershipVerification` carries the `txtRecordName` and `txtRecordValue` the org admin must publish.
-   *
-   * @returns A promise that resolves to the updated `OrganizationDomain` object.
-   */
-  prepareOwnershipVerification: () => Promise<OrganizationDomainResource>;
-  /**
-   * Completes the ownership verification flow by resolving the published TXT record for the domain.
-   *
-   * @returns A promise that resolves to the updated `OrganizationDomain` object.
-   */
-  attemptOwnershipVerification: () => Promise<OrganizationDomainResource>;
-  /**
    * Deletes the Verified Domain.
    *
    * @returns A promise that resolves once the Verified Domain has been deleted.
@@ -204,3 +192,50 @@ export type UpdateEnrollmentModeParams = Pick<OrganizationDomainResource, 'enrol
    */
   deletePending?: boolean;
 };
+
+/** @generateWithEmptyComment */
+export type CreateOrganizationDomainParams = {
+  /**
+   * The domain name, for example `clerk.com`.
+   */
+  name: string;
+  /**
+   * The enrollment mode that determines how matching users are added to the Organization. Defaults to `manual_invitation`.
+   */
+  enrollmentMode?: OrganizationEnrollmentMode;
+};
+
+/**
+ * A per-domain failure entry returned by the bulk ownership verification flows,
+ * carrying the id of the domain that was skipped and the API error code that
+ * caused it.
+ */
+export interface OrganizationDomainBulkOwnershipVerificationError {
+  /**
+   * The unique identifier of the Verified Domain that could not be processed.
+   */
+  id: string;
+  /**
+   * The API error code describing why the domain was skipped, for example `resource_not_found`.
+   */
+  code: string;
+}
+
+/**
+ * The partial-success result of a bulk ownership verification flow
+ * (`prepareOwnershipVerification`/`attemptOwnershipVerification`). Each
+ * requested domain lands in either `data` (with its current ownership state)
+ * or `errors`.
+ */
+export interface OrganizationDomainsBulkOwnershipVerificationResource {
+  /**
+   * The Verified Domains that were processed successfully. After
+   * `prepareOwnershipVerification`, each domain's `ownershipVerification`
+   * carries the `txtRecordName` and `txtRecordValue` to publish.
+   */
+  data: OrganizationDomainResource[];
+  /**
+   * The per-domain failures that were skipped without failing the whole batch.
+   */
+  errors: OrganizationDomainBulkOwnershipVerificationError[];
+}

@@ -1,4 +1,8 @@
-import type { EnterpriseConnectionResource, OrganizationDomainResource } from '@clerk/shared/types';
+import type {
+  EnterpriseConnectionResource,
+  OrganizationDomainResource,
+  OrganizationDomainsBulkOwnershipVerificationResource,
+} from '@clerk/shared/types';
 import React, { type PropsWithChildren } from 'react';
 
 import type { OrganizationEnterpriseConnection } from './domain/organizationEnterpriseConnection';
@@ -6,8 +10,12 @@ import type { EnterpriseConnectionMutations, TestRunsView } from './hooks/useOrg
 
 export interface OrganizationDomainMutations {
   createDomain: (name: string) => Promise<OrganizationDomainResource | undefined>;
-  prepareOwnershipVerification: (domain: OrganizationDomainResource) => Promise<OrganizationDomainResource | undefined>;
-  attemptOwnershipVerification: (domain: OrganizationDomainResource) => Promise<OrganizationDomainResource | undefined>;
+  prepareOwnershipVerification: (
+    domains: OrganizationDomainResource[],
+  ) => Promise<OrganizationDomainsBulkOwnershipVerificationResource | undefined>;
+  attemptOwnershipVerification: (
+    domains: OrganizationDomainResource[],
+  ) => Promise<OrganizationDomainsBulkOwnershipVerificationResource | undefined>;
   revalidate: () => Promise<void>;
 }
 

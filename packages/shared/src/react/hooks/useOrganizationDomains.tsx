@@ -1,7 +1,11 @@
 import { useCallback } from 'react';
 
 import type { GetDomainsParams } from '../../types/organization';
-import type { OrganizationDomainResource, OrganizationEnrollmentMode } from '../../types/organizationDomain';
+import type {
+  OrganizationDomainResource,
+  OrganizationDomainsBulkOwnershipVerificationResource,
+  OrganizationEnrollmentMode,
+} from '../../types/organizationDomain';
 import { useClerkInstanceContext } from '../contexts';
 import { defineKeepPreviousDataFn } from '../query/keep-previous-data';
 import { useClerkQueryClient } from '../query/use-clerk-query-client';
@@ -30,14 +34,19 @@ export type UseOrganizationDomainsReturn = {
    */
   createDomain: (name: string) => Promise<OrganizationDomainResource | undefined>;
   /**
-   * Issues a fresh TXT challenge for the given domain. The resolved domain's
-   * `ownershipVerification` carries the `txtRecordName` and `txtRecordValue`.
+   * Issues a fresh TXT challenge for each of the given domains in a single
+   * request. Each resolved domain's `ownershipVerification` carries the
+   * `txtRecordName` and `txtRecordValue`.
    */
-  prepareOwnershipVerification: (domain: OrganizationDomainResource) => Promise<OrganizationDomainResource | undefined>;
+  prepareOwnershipVerification: (
+    domains: OrganizationDomainResource[],
+  ) => Promise<OrganizationDomainsBulkOwnershipVerificationResource | undefined>;
   /**
-   * Resolves the published TXT record for the given domain to complete ownership verification.
+   * Resolves the published TXT records for the given domains to complete ownership verification.
    */
-  attemptOwnershipVerification: (domain: OrganizationDomainResource) => Promise<OrganizationDomainResource | undefined>;
+  attemptOwnershipVerification: (
+    domains: OrganizationDomainResource[],
+  ) => Promise<OrganizationDomainsBulkOwnershipVerificationResource | undefined>;
   revalidate: () => Promise<void>;
 };
 
@@ -81,13 +90,11 @@ function useOrganizationDomains(params: UseOrganizationDomainsParams = {}): UseO
 
   const createDomain = useCallback(
     async (name: string) => {
-      let created = await organization?.createDomain(name);
+      let created = await organization?.createDomain(name, enrollmentMode ? { enrollmentMode } : undefined);
 
-      // When organization gets created with enterprise_sso enrollment mode
-      // then promote the new domain and issue a TXT ownership challenge so it can be verified over DNS
       if (created && enrollmentMode === 'enterprise_sso') {
-        created = await created.updateEnrollmentMode({ enrollmentMode: 'enterprise_sso' });
-        created = await created.prepareOwnershipVerification();
+        const prepared = await organization?.prepareOwnershipVerification([created.id]);
+        created = prepared?.data[0] ?? created;
       }
 
       await revalidate();
@@ -97,21 +104,21 @@ function useOrganizationDomains(params: UseOrganizationDomainsParams = {}): UseO
   );
 
   const prepareOwnershipVerification = useCallback(
-    async (domain: OrganizationDomainResource) => {
-      const prepared = await domain.prepareOwnershipVerification();
+    async (domains: OrganizationDomainResource[]) => {
+      const prepared = await organization?.prepareOwnershipVerification(domains.map(domain => domain.id));
       await revalidate();
       return prepared;
     },
-    [revalidate],
+    [organization, revalidate],
   );
 
   const attemptOwnershipVerification = useCallback(
-    async (domain: OrganizationDomainResource) => {
-      const attempted = await domain.attemptOwnershipVerification();
+    async (domains: OrganizationDomainResource[]) => {
+      const attempted = await organization?.attemptOwnershipVerification(domains.map(domain => domain.id));
       await revalidate();
       return attempted;
     },
-    [revalidate],
+    [organization, revalidate],
   );
 
   const response = query.data;

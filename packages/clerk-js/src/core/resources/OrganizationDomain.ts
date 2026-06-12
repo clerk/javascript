@@ -1,5 +1,6 @@
 import type {
   AttemptAffiliationVerificationParams,
+  CreateOrganizationDomainParams,
   OrganizationDomainJSON,
   OrganizationDomainOwnershipVerification,
   OrganizationDomainResource,
@@ -31,12 +32,15 @@ export class OrganizationDomain extends BaseResource implements OrganizationDoma
     this.fromJSON(data);
   }
 
-  static async create(organizationId: string, { name }: { name: string }): Promise<OrganizationDomainResource> {
+  static async create(
+    organizationId: string,
+    { name, enrollmentMode }: CreateOrganizationDomainParams,
+  ): Promise<OrganizationDomainResource> {
     const json = (
       await BaseResource._fetch<OrganizationDomainJSON>({
         path: `/organizations/${organizationId}/domains`,
         method: 'POST',
-        body: { name } as any,
+        body: { name, enrollment_mode: enrollmentMode } as any,
       })
     )?.response as unknown as OrganizationDomainJSON;
     return new OrganizationDomain(json);
@@ -59,20 +63,6 @@ export class OrganizationDomain extends BaseResource implements OrganizationDoma
       path: `/organizations/${this.organizationId}/domains/${this.id}/attempt_affiliation_verification`,
       method: 'POST',
       body: params as any,
-    });
-  };
-
-  prepareOwnershipVerification = async (): Promise<OrganizationDomainResource> => {
-    return this._basePost({
-      path: `/organizations/${this.organizationId}/domains/${this.id}/prepare_ownership_verification`,
-      method: 'POST',
-    });
-  };
-
-  attemptOwnershipVerification = async (): Promise<OrganizationDomainResource> => {
-    return this._basePost({
-      path: `/organizations/${this.organizationId}/domains/${this.id}/attempt_ownership_verification`,
-      method: 'POST',
     });
   };
 
