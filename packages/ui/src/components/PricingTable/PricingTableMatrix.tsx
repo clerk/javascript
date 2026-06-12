@@ -4,6 +4,7 @@ import * as React from 'react';
 import { Avatar } from '@/ui/elements/Avatar';
 import { SegmentedControl } from '@/ui/elements/SegmentedControl';
 import { colors } from '@/ui/utils/colors';
+import { inertProps } from '@/ui/utils/inert';
 
 import { usePlansContext } from '../../contexts';
 import {
@@ -265,7 +266,7 @@ export function PricingTableMatrix({
                                   }),
                                   feePeriodNoticeAnimation,
                                 ]}
-                                inert={planPeriod !== 'annual' ? 'true' : undefined}
+                                {...inertProps(planPeriod !== 'annual')}
                               >
                                 <Box
                                   elementDescriptor={descriptors.pricingTableMatrixFeePeriodNoticeInner}

@@ -4,6 +4,7 @@ import { css } from '@emotion/react';
 import { type ReactNode, useId, useMemo, useState } from 'react';
 
 import { InternalThemeProvider } from '../../../styledSystem';
+import { inertProps } from '../../../utils/inert';
 import { handleDashboardUrlParsing } from '../shared';
 import { useDragToCorner } from './use-drag-to-corner';
 import { useRevalidateEnvironment } from './use-revalidate-environment';
@@ -506,7 +507,7 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
       </button>
       <div
         id={id}
-        {...(!isOpen && { inert: 'true' })}
+        {...inertProps(!isOpen)}
         css={css`
           ${CSS_RESET};
           display: grid;

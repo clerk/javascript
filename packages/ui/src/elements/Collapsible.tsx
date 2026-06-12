@@ -3,6 +3,7 @@ import { type PropsWithChildren, useEffect, useState } from 'react';
 import { Box, descriptors, useAppearance } from '../customizables';
 import { usePrefersReducedMotion } from '../hooks';
 import type { ThemableCssProp } from '../styledSystem';
+import { inertProps } from '../utils/inert';
 
 type CollapsibleProps = PropsWithChildren<{
   open: boolean;
@@ -75,7 +76,7 @@ export function Collapsible({ open, children, sx }: CollapsibleProps): JSX.Eleme
         }),
         sx,
       ]}
-      inert={!open ? 'true' : undefined}
+      {...inertProps(!open)}
     >
       <Box
         elementDescriptor={descriptors.collapsibleInner}

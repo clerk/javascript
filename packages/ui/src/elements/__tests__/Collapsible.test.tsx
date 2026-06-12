@@ -375,7 +375,8 @@ describe('Collapsible', () => {
       rerender(<Collapsible open={false}>Content</Collapsible>);
 
       const element = container.querySelector('.cl-collapsible') as HTMLElement;
-      // Check presence only — React 18 renders inert="true", React 19 normalises to inert=""
+      // Presence check only — `inertProps` emits the value each React major reflects
+      // (string '' on 18, boolean true on 19), both of which serialize to inert="".
       expect(element).toHaveAttribute('inert');
     });
 

@@ -512,7 +512,8 @@ describe('Tabs', () => {
       const panels = document.querySelectorAll('[data-cl-slot="tabs-panel"]');
       const inert = Array.from(panels).filter(p => p.hasAttribute('inert'));
       const notInert = Array.from(panels).filter(p => !p.hasAttribute('inert'));
-      // Presence check only — React 18 renders inert="true", React 19 normalises to inert=""
+      // Presence check only — `inertProps` emits the value each React major reflects
+      // (string '' on 18, boolean true on 19), both of which serialize to inert="".
       expect(inert).toHaveLength(2);
       expect(notInert).toHaveLength(1);
     });
