@@ -1,11 +1,13 @@
 // eslint-disable-next-line no-restricted-imports
 import createCache from '@emotion/cache';
 // eslint-disable-next-line no-restricted-imports
-import { CacheProvider, type SerializedStyles } from '@emotion/react';
+import { CacheProvider } from '@emotion/react';
 import React from 'react';
 
+import { MosaicAppearanceProvider, parseMosaicAppearance } from './appearance';
+import type { MosaicAppearance } from './appearance';
 import { defaultMosaicVariables, resolveVariables } from './variables';
-import type { MosaicTheme, MosaicVariables } from './variables';
+import type { MosaicTheme } from './variables';
 
 const getInsertionPoint = (): HTMLElement | null => {
   if (typeof document === 'undefined') {
@@ -18,13 +20,17 @@ const MosaicThemeContext = React.createContext<MosaicTheme | null>(null);
 
 export interface MosaicProviderProps {
   children: React.ReactNode;
-  variables?: MosaicVariables;
   nonce?: string;
   cssLayerName?: string;
+  /** Consumer overrides — `variables` (design tokens) + `elements` (per-slot styles), with optional per-flow scoping. */
+  appearance?: MosaicAppearance;
+  /** The active flow key (`'signIn'`, `'userButton'`, …) used to resolve scoped overrides. */
+  scope?: string;
 }
 
-export function MosaicProvider({ children, variables, nonce, cssLayerName }: MosaicProviderProps) {
-  const theme = React.useMemo(() => resolveVariables(defaultMosaicVariables, variables), [variables]);
+export function MosaicProvider({ children, nonce, cssLayerName, appearance, scope }: MosaicProviderProps) {
+  const theme = React.useMemo(() => resolveVariables(defaultMosaicVariables, appearance?.variables), [appearance]);
+  const parsedElements = React.useMemo(() => parseMosaicAppearance(appearance, scope), [appearance, scope]);
   const cache = React.useMemo(() => {
     const el = getInsertionPoint();
     const emotionCache = createCache({
@@ -35,23 +41,14 @@ export function MosaicProvider({ children, variables, nonce, cssLayerName }: Mos
       nonce,
     });
 
-    if (cssLayerName) {
-      const prevInsert = emotionCache.insert.bind(emotionCache);
-      emotionCache.insert = (selector: string, serialized: SerializedStyles, sheet: any, shouldCache: boolean) => {
-        if (serialized && typeof serialized.styles === 'string') {
-          const newSerialized = { ...serialized };
-          newSerialized.styles = `@layer ${cssLayerName} {${serialized.styles}}`;
-          return prevInsert(selector, newSerialized, sheet, shouldCache);
-        }
-        return prevInsert(selector, serialized, sheet, shouldCache);
-      };
-    }
-
     return emotionCache;
   }, [nonce, cssLayerName]);
+
   return (
     <MosaicThemeContext.Provider value={theme}>
-      <CacheProvider value={cache}>{children}</CacheProvider>
+      <MosaicAppearanceProvider value={parsedElements}>
+        <CacheProvider value={cache}>{children}</CacheProvider>
+      </MosaicAppearanceProvider>
     </MosaicThemeContext.Provider>
   );
 }

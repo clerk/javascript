@@ -25,7 +25,6 @@ export const DialogTrigger = React.forwardRef<HTMLButtonElement, DialogTriggerPr
 
     const ownProps = {
       type: 'button',
-      'data-cl-slot': 'dialog-trigger',
       ref: combinedRef,
     } satisfies DefaultProps<'button'>;
 

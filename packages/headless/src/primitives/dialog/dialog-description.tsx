@@ -15,7 +15,6 @@ export const DialogDescription = React.forwardRef<HTMLParagraphElement, DialogDe
     const { descriptionId } = useDialogContext();
 
     const defaultProps = {
-      'data-cl-slot': 'dialog-description',
       id: descriptionId,
       ref,
     } satisfies DefaultProps<'p'>;

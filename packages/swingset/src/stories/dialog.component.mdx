@@ -1,0 +1,63 @@
+import * as DialogStories from './dialog.component.stories';
+
+# Dialog
+
+The styled Mosaic `Dialog` — the headless `@clerk/headless` dialog primitives composed with
+Mosaic slot recipes. It inherits open state, portalling, focus management, dismissal (outside
+press / Escape), and ARIA wiring from the primitive, and adds Mosaic's themed styling for each
+part. Slot identity (`data-cl-slot`) is applied by this styled layer, not by the headless parts.
+
+## Example
+
+The trigger below is a Mosaic `Button`, wired in through the trigger's `render` prop. Open it,
+then press Escape or click the backdrop to dismiss.
+
+<Story
+  name='Default'
+  storyModule={DialogStories}
+/>
+
+## Usage
+
+```tsx
+import { Button } from '@clerk/ui/mosaic/components/button';
+import { Dialog } from '@clerk/ui/mosaic/components/dialog';
+
+<Dialog.Root>
+  <Dialog.Trigger render={props => <Button {...props}>Open dialog</Button>} />
+  <Dialog.Portal>
+    <Dialog.Backdrop />
+    <Dialog.Viewport>
+      <Dialog.Popup>
+        <Dialog.Title>Confirm action</Dialog.Title>
+        <Dialog.Description>Are you sure you want to proceed?</Dialog.Description>
+        <Dialog.Close>Cancel</Dialog.Close>
+      </Dialog.Popup>
+    </Dialog.Viewport>
+  </Dialog.Portal>
+</Dialog.Root>;
+```
+
+Any part accepts a `render` prop for polymorphic rendering — pass a function that receives the
+part's computed props and spreads them onto your element, as the trigger does with `Button`.
+
+## Parts
+
+| Part                 | Slot                 | Description                                             |
+| -------------------- | -------------------- | ------------------------------------------------------- |
+| `Dialog.Root`        | none (context)       | Owns open state, ARIA ids, and the transition lifecycle |
+| `Dialog.Trigger`     | `dialog-trigger`     | Toggles the dialog open on click                        |
+| `Dialog.Portal`      | none (portal)        | Portals its children; renders nothing until mounted     |
+| `Dialog.Backdrop`    | `dialog-backdrop`    | Themed overlay behind the dialog                        |
+| `Dialog.Viewport`    | `dialog-viewport`    | Fixed centering container; owns scroll lock             |
+| `Dialog.Popup`       | `dialog-popup`       | The dialog surface (`role="dialog"`, focus-trapped)     |
+| `Dialog.Title`       | `dialog-title`       | Heading; wired to the popup's `aria-labelledby`         |
+| `Dialog.Description` | `dialog-description` | Description; wired to the popup's `aria-describedby`    |
+| `Dialog.Close`       | `dialog-close`       | Closes the dialog on click                              |
+
+## Styling
+
+Each styled part is themed by the Mosaic dialog recipe and stays targetable through its
+`data-cl-slot` plus the state attributes the primitive emits (`data-cl-open`,
+`data-cl-starting-style`, `data-cl-ending-style`). Override per slot through
+`appearance.elements` — e.g. `{ 'dialog-popup': { borderRadius: 24 } }`.
