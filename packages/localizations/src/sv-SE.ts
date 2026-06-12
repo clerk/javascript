@@ -202,6 +202,22 @@ export const svSE: LocalizationResource = {
       formFieldLabel__domain: 'Domäner',
       formFieldInputPlaceholder__domain: 'Skriv din domän här och klicka på lägg till för att börja',
       formButtonPrimary__add: 'Lägg till',
+      domainSuggestion: {
+        messageLabel: 'Din e-post använder {{domain}}. Vill du lägga till den?',
+        formButtonPrimary__add: 'Lägg till {{domain}}',
+      },
+      domainCard: {
+        badge__verified: 'Verifierad',
+        badge__unverified: 'Overifierad',
+        verifiedAtLabel: "Verifierad den {{ date | shortDate('sv-SE') }}",
+        txtRecord: {
+          instructions:
+            'Lägg till den här TXT-posten hos din DNS-leverantör. Vi verifierar automatiskt när posten är aktiv.',
+          typeLabel: 'Typ',
+          hostLabel: 'Värd / Namn',
+          valueLabel: 'Värde',
+        },
+      },
     },
   },
   createOrganization: {

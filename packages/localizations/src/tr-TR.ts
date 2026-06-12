@@ -202,6 +202,22 @@ export const trTR: LocalizationResource = {
       formFieldLabel__domain: 'Alan adları',
       formFieldInputPlaceholder__domain: 'Alan adınızı buraya yazın ve başlamak için Ekle düğmesine tıklayın',
       formButtonPrimary__add: 'Ekle',
+      domainSuggestion: {
+        messageLabel: 'E-postanız {{domain}} kullanıyor. Eklemek ister misiniz?',
+        formButtonPrimary__add: '{{domain}} ekle',
+      },
+      domainCard: {
+        badge__verified: 'Doğrulandı',
+        badge__unverified: 'Doğrulanmadı',
+        verifiedAtLabel: "{{ date | shortDate('tr-TR') }} tarihinde doğrulandı",
+        txtRecord: {
+          instructions:
+            'Bu TXT kaydını DNS sağlayıcınıza ekleyin. Kayıt yayına girer girmez otomatik olarak doğrulayacağız.',
+          typeLabel: 'Tür',
+          hostLabel: 'Ana bilgisayar / Ad',
+          valueLabel: 'Değer',
+        },
+      },
     },
   },
   createOrganization: {

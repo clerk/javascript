@@ -206,6 +206,21 @@ export const thTH: LocalizationResource = {
       formFieldLabel__domain: 'โดเมน',
       formFieldInputPlaceholder__domain: 'พิมพ์โดเมนของคุณที่นี่แล้วคลิกเพิ่มเพื่อเริ่มต้น',
       formButtonPrimary__add: 'เพิ่ม',
+      domainSuggestion: {
+        messageLabel: 'อีเมลของคุณใช้ {{domain}} คุณต้องการเพิ่มหรือไม่?',
+        formButtonPrimary__add: 'เพิ่ม {{domain}}',
+      },
+      domainCard: {
+        badge__verified: 'ยืนยันแล้ว',
+        badge__unverified: 'ยังไม่ได้ยืนยัน',
+        verifiedAtLabel: "ยืนยันเมื่อ {{ date | shortDate('th-TH') }}",
+        txtRecord: {
+          instructions: 'เพิ่มระเบียน TXT นี้ไปยังผู้ให้บริการ DNS ของคุณ เราจะยืนยันโดยอัตโนมัติเมื่อระเบียนทำงาน',
+          typeLabel: 'ประเภท',
+          hostLabel: 'โฮสต์ / ชื่อ',
+          valueLabel: 'ค่า',
+        },
+      },
     },
   },
   createOrganization: {

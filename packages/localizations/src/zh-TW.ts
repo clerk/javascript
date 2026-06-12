@@ -208,6 +208,21 @@ export const zhTW: LocalizationResource = {
       formFieldLabel__domain: '網域',
       formFieldInputPlaceholder__domain: '在此輸入您的網域，然後點選新增即可開始',
       formButtonPrimary__add: '新增',
+      domainSuggestion: {
+        messageLabel: '您的電子郵件使用了 {{domain}}。是否要新增它？',
+        formButtonPrimary__add: '新增 {{domain}}',
+      },
+      domainCard: {
+        badge__verified: '已驗證',
+        badge__unverified: '未驗證',
+        verifiedAtLabel: "驗證於 {{ date | shortDate('zh-TW') }}",
+        txtRecord: {
+          instructions: '請將此 TXT 記錄新增至您的 DNS 供應商。記錄生效後，我們將自動進行驗證。',
+          typeLabel: '類型',
+          hostLabel: '主機 / 名稱',
+          valueLabel: '值',
+        },
+      },
     },
   },
   createOrganization: {

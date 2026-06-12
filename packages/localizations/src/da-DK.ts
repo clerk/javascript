@@ -202,6 +202,21 @@ export const daDK: LocalizationResource = {
       formFieldLabel__domain: 'Domæner',
       formFieldInputPlaceholder__domain: 'Skriv dit domæne her, og klik på tilføj for at starte',
       formButtonPrimary__add: 'Tilføj',
+      domainSuggestion: {
+        messageLabel: 'Din e-mail bruger {{domain}}. Vil du tilføje det?',
+        formButtonPrimary__add: 'Tilføj {{domain}}',
+      },
+      domainCard: {
+        badge__verified: 'Bekræftet',
+        badge__unverified: 'Ikke bekræftet',
+        verifiedAtLabel: "Bekræftet den {{ date | shortDate('da-DK') }}",
+        txtRecord: {
+          instructions: 'Tilføj denne TXT-post hos din DNS-udbyder. Vi bekræfter automatisk, så snart posten er aktiv.',
+          typeLabel: 'Type',
+          hostLabel: 'Vært / Navn',
+          valueLabel: 'Værdi',
+        },
+      },
     },
   },
   createOrganization: {

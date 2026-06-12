@@ -209,6 +209,22 @@ export const caES: LocalizationResource = {
       formFieldLabel__domain: 'Dominis',
       formFieldInputPlaceholder__domain: 'Escriu aquí el teu domini i fes clic a Afegeix per començar',
       formButtonPrimary__add: 'Afegeix',
+      domainSuggestion: {
+        messageLabel: 'El teu correu electrònic utilitza {{domain}}. Vols afegir-lo?',
+        formButtonPrimary__add: 'Afegeix {{domain}}',
+      },
+      domainCard: {
+        badge__verified: 'Verificat',
+        badge__unverified: 'Sense verificar',
+        verifiedAtLabel: "Verificat el {{ date | shortDate('ca-ES') }}",
+        txtRecord: {
+          instructions:
+            'Afegeix aquest registre TXT al teu proveïdor de DNS. El verificarem automàticament un cop el registre estigui actiu.',
+          typeLabel: 'Tipus',
+          hostLabel: 'Amfitrió / Nom',
+          valueLabel: 'Valor',
+        },
+      },
     },
   },
   createOrganization: {

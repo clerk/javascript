@@ -203,6 +203,22 @@ export const bgBG: LocalizationResource = {
       formFieldLabel__domain: 'Домейни',
       formFieldInputPlaceholder__domain: 'Въведете домейна си тук и щракнете върху добавяне, за да започнете',
       formButtonPrimary__add: 'Добави',
+      domainSuggestion: {
+        messageLabel: 'Вашият имейл използва {{domain}}. Искате ли да го добавите?',
+        formButtonPrimary__add: 'Добавяне на {{domain}}',
+      },
+      domainCard: {
+        badge__verified: 'Потвърден',
+        badge__unverified: 'Непотвърден',
+        verifiedAtLabel: "Потвърден на {{ date | shortDate('bg-BG') }}",
+        txtRecord: {
+          instructions:
+            'Добавете този TXT запис към вашия DNS доставчик. Ще потвърдим автоматично, след като записът стане активен.',
+          typeLabel: 'Тип',
+          hostLabel: 'Хост / Име',
+          valueLabel: 'Стойност',
+        },
+      },
     },
   },
   createOrganization: {

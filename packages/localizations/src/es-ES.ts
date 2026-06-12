@@ -208,6 +208,22 @@ export const esES: LocalizationResource = {
       formFieldLabel__domain: 'Dominios',
       formFieldInputPlaceholder__domain: 'Escribe aquí tu dominio y haz clic en Añadir para empezar',
       formButtonPrimary__add: 'Añadir',
+      domainSuggestion: {
+        messageLabel: 'Tu correo electrónico usa {{domain}}. ¿Quieres añadirlo?',
+        formButtonPrimary__add: 'Añadir {{domain}}',
+      },
+      domainCard: {
+        badge__verified: 'Verificado',
+        badge__unverified: 'Sin verificar',
+        verifiedAtLabel: "Verificado el {{ date | shortDate('es-ES') }}",
+        txtRecord: {
+          instructions:
+            'Añade este registro TXT a tu proveedor de DNS. Lo verificaremos automáticamente una vez que el registro esté activo.',
+          typeLabel: 'Tipo',
+          hostLabel: 'Host / Nombre',
+          valueLabel: 'Valor',
+        },
+      },
     },
   },
   createOrganization: {

@@ -210,6 +210,22 @@ export const ptPT: LocalizationResource = {
       formFieldLabel__domain: 'Domínios',
       formFieldInputPlaceholder__domain: 'Escreva aqui o seu domínio e clique em adicionar para começar',
       formButtonPrimary__add: 'Adicionar',
+      domainSuggestion: {
+        messageLabel: 'O seu e-mail utiliza {{domain}}. Pretende adicioná-lo?',
+        formButtonPrimary__add: 'Adicionar {{domain}}',
+      },
+      domainCard: {
+        badge__verified: 'Verificado',
+        badge__unverified: 'Não verificado',
+        verifiedAtLabel: "Verificado em {{ date | shortDate('pt-PT') }}",
+        txtRecord: {
+          instructions:
+            'Adicione este registo TXT ao seu fornecedor de DNS. Verificaremos automaticamente assim que o registo estiver ativo.',
+          typeLabel: 'Tipo',
+          hostLabel: 'Anfitrião / Nome',
+          valueLabel: 'Valor',
+        },
+      },
     },
   },
   createOrganization: {

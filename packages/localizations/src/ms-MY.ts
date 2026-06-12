@@ -210,6 +210,22 @@ export const msMY: LocalizationResource = {
       formFieldLabel__domain: 'Domain',
       formFieldInputPlaceholder__domain: 'Taip domain anda di sini dan klik tambah untuk bermula',
       formButtonPrimary__add: 'Tambah',
+      domainSuggestion: {
+        messageLabel: 'E-mel anda menggunakan {{domain}}. Adakah anda mahu menambahkannya?',
+        formButtonPrimary__add: 'Tambah {{domain}}',
+      },
+      domainCard: {
+        badge__verified: 'Disahkan',
+        badge__unverified: 'Belum disahkan',
+        verifiedAtLabel: "Disahkan pada {{ date | shortDate('ms-MY') }}",
+        txtRecord: {
+          instructions:
+            'Tambahkan rekod TXT ini kepada penyedia DNS anda. Kami akan mengesahkan secara automatik sebaik sahaja rekod aktif.',
+          typeLabel: 'Jenis',
+          hostLabel: 'Hos / Nama',
+          valueLabel: 'Nilai',
+        },
+      },
     },
   },
   createOrganization: {

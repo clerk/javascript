@@ -202,6 +202,22 @@ export const idID: LocalizationResource = {
       formFieldLabel__domain: 'Domain',
       formFieldInputPlaceholder__domain: 'Ketik domain Anda di sini dan klik tambah untuk memulai',
       formButtonPrimary__add: 'Tambah',
+      domainSuggestion: {
+        messageLabel: 'Email Anda menggunakan {{domain}}. Apakah Anda ingin menambahkannya?',
+        formButtonPrimary__add: 'Tambah {{domain}}',
+      },
+      domainCard: {
+        badge__verified: 'Terverifikasi',
+        badge__unverified: 'Belum terverifikasi',
+        verifiedAtLabel: "Diverifikasi pada {{ date | shortDate('id-ID') }}",
+        txtRecord: {
+          instructions:
+            'Tambahkan data TXT ini ke penyedia DNS Anda. Kami akan memverifikasi secara otomatis setelah data aktif.',
+          typeLabel: 'Tipe',
+          hostLabel: 'Host / Nama',
+          valueLabel: 'Nilai',
+        },
+      },
     },
   },
   createOrganization: {

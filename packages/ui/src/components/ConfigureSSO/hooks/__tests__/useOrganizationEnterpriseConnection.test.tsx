@@ -1,4 +1,3 @@
-import type { EmailAddressResource } from '@clerk/shared/types';
 import { renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -171,28 +170,33 @@ describe('useOrganizationEnterpriseConnection — test-runs gating', () => {
 });
 
 describe('useOrganizationEnterpriseConnection — mutations', () => {
-  const emailAddress = (address: string) => ({ emailAddress: address }) as EmailAddressResource;
-
-  it('createConnection derives name + domains from the email domain and forwards them (no organizationId in body)', async () => {
+  it('createConnection forwards the provider, the email-derived name, and the given verified domains (no organizationId in body)', async () => {
     const { result } = renderHook(() => useOrganizationEnterpriseConnection());
 
-    await result.current.enterpriseConnectionMutations.createConnection('saml_okta', emailAddress('admin@acme.com'));
+    await result.current.enterpriseConnectionMutations.createConnection('saml_okta', ['acme.com', 'example.com']);
+
+    expect(mutationSpies.create).toHaveBeenCalledTimes(1);
+    // `name` is derived from the active user's primary email domain
+    // (admin@clerk.com → clerk.com); `domains` are the verified organization
+    // domains passed straight through by the caller.
+    expect(mutationSpies.create).toHaveBeenCalledWith({
+      provider: 'saml_okta',
+      name: 'clerk.com',
+      domains: ['acme.com', 'example.com'],
+    });
+  });
+
+  it('createConnection forwards an omitted domains list unchanged', async () => {
+    const { result } = renderHook(() => useOrganizationEnterpriseConnection());
+
+    await result.current.enterpriseConnectionMutations.createConnection('saml_okta');
 
     expect(mutationSpies.create).toHaveBeenCalledTimes(1);
     expect(mutationSpies.create).toHaveBeenCalledWith({
       provider: 'saml_okta',
-      name: 'acme.com',
-      domains: ['acme.com'],
+      name: 'clerk.com',
+      domains: undefined,
     });
-  });
-
-  it('createConnection resolves to undefined without creating when no email is available', async () => {
-    const { result } = renderHook(() => useOrganizationEnterpriseConnection());
-
-    await expect(
-      result.current.enterpriseConnectionMutations.createConnection('saml_okta', undefined),
-    ).resolves.toBeUndefined();
-    expect(mutationSpies.create).not.toHaveBeenCalled();
   });
 
   it('setConnectionActive forwards only the active flag to update', async () => {

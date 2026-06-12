@@ -18,6 +18,7 @@ import {
   useLocalizations,
 } from '@/customizables';
 import { Alert } from '@/elements/Alert';
+import { Animated } from '@/elements/Animated';
 import { ClipboardInput } from '@/elements/ClipboardInput';
 import { useCardState } from '@/elements/contexts';
 import { Field } from '@/elements/FieldControl';
@@ -322,7 +323,12 @@ const DomainCard = ({
         >
           <Text
             as='span'
-            sx={t => ({ fontWeight: t.fontWeights.$medium, overflow: 'hidden', textOverflow: 'ellipsis' })}
+            sx={t => ({
+              fontWeight: t.fontWeights.$medium,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            })}
           >
             {domain.name}
           </Text>
@@ -362,18 +368,24 @@ const DomainCard = ({
         </Button>
       </Flex>
 
-      {ownershipVerification?.verifiedAt ? (
-        <Text
-          as='p'
-          colorScheme='secondary'
-          localizationKey={localizationKeys('configureSSO.organizationDomainsStep.domainCard.verifiedAtLabel', {
-            date: ownershipVerification.verifiedAt,
-          })}
-          sx={t => ({ padding: t.space.$4, paddingTop: 0 })}
-        />
-      ) : (
-        <TxtRecord ownershipVerification={ownershipVerification} />
-      )}
+      <Animated>
+        {ownershipVerification?.verifiedAt ? (
+          <Text
+            key='verified'
+            as='p'
+            colorScheme='secondary'
+            localizationKey={localizationKeys('configureSSO.organizationDomainsStep.domainCard.verifiedAtLabel', {
+              date: ownershipVerification.verifiedAt,
+            })}
+            sx={t => ({ padding: t.space.$4, paddingTop: 0 })}
+          />
+        ) : (
+          <TxtRecord
+            key='unverified'
+            ownershipVerification={ownershipVerification}
+          />
+        )}
+      </Animated>
     </Col>
   );
 };
@@ -429,6 +441,7 @@ const TxtRecord = ({
           sx={t => ({ fontSize: t.fontSizes.$sm, flexShrink: 0 })}
         />
         <ClipboardInput
+          elementDescriptor={descriptors.configureSSOVerifyDomainCardTxtRecordValue}
           value={ownershipVerification?.txtRecordValue ?? '—'}
           copyIcon={Clipboard}
           copiedIcon={Checkmark}

@@ -231,6 +231,22 @@ export const nbNO: LocalizationResource = {
       formFieldLabel__domain: 'Domener',
       formFieldInputPlaceholder__domain: 'Skriv inn domenet ditt her, og klikk på legg til for å starte',
       formButtonPrimary__add: 'Legg til',
+      domainSuggestion: {
+        messageLabel: 'E-posten din bruker {{domain}}. Vil du legge den til?',
+        formButtonPrimary__add: 'Legg til {{domain}}',
+      },
+      domainCard: {
+        badge__verified: 'Verifisert',
+        badge__unverified: 'Ikke verifisert',
+        verifiedAtLabel: "Verifisert den {{ date | shortDate('nb-NO') }}",
+        txtRecord: {
+          instructions:
+            'Legg til denne TXT-posten hos DNS-leverandøren din. Vi verifiserer automatisk når posten er aktiv.',
+          typeLabel: 'Type',
+          hostLabel: 'Vert / Navn',
+          valueLabel: 'Verdi',
+        },
+      },
     },
   },
   createOrganization: {

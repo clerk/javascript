@@ -210,6 +210,22 @@ export const taIN: LocalizationResource = {
       formFieldLabel__domain: 'டொமைன்கள்',
       formFieldInputPlaceholder__domain: 'உங்கள் டொமைனை இங்கே தட்டச்சு செய்து, தொடங்க சேர் என்பதைக் கிளிக் செய்யவும்',
       formButtonPrimary__add: 'சேர்',
+      domainSuggestion: {
+        messageLabel: 'உங்கள் மின்னஞ்சல் {{domain}} ஐப் பயன்படுத்துகிறது. அதைச் சேர்க்க விரும்புகிறீர்களா?',
+        formButtonPrimary__add: '{{domain}} ஐச் சேர்',
+      },
+      domainCard: {
+        badge__verified: 'சரிபார்க்கப்பட்டது',
+        badge__unverified: 'சரிபார்க்கப்படவில்லை',
+        verifiedAtLabel: "{{ date | shortDate('ta-IN') }} அன்று சரிபார்க்கப்பட்டது",
+        txtRecord: {
+          instructions:
+            'இந்த TXT பதிவை உங்கள் DNS வழங்குநரிடம் சேர்க்கவும். பதிவு செயலில் வந்தவுடன் நாங்கள் தானாகவே சரிபார்ப்போம்.',
+          typeLabel: 'வகை',
+          hostLabel: 'ஹோஸ்ட் / பெயர்',
+          valueLabel: 'மதிப்பு',
+        },
+      },
     },
   },
   createOrganization: {

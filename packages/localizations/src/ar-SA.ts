@@ -202,6 +202,21 @@ export const arSA: LocalizationResource = {
       formFieldLabel__domain: 'النطاقات',
       formFieldInputPlaceholder__domain: 'اكتب نطاقك هنا وانقر على إضافة للبدء',
       formButtonPrimary__add: 'إضافة',
+      domainSuggestion: {
+        messageLabel: 'بريدك الإلكتروني يستخدم {{domain}}. هل تريد إضافته؟',
+        formButtonPrimary__add: 'إضافة {{domain}}',
+      },
+      domainCard: {
+        badge__verified: 'تم التحقق',
+        badge__unverified: 'لم يتم التحقق',
+        verifiedAtLabel: "تم التحقق في {{ date | shortDate('en-US') }}",
+        txtRecord: {
+          instructions: 'أضِف سجل TXT هذا إلى مزوّد DNS الخاص بك. سنتحقق تلقائيًا بمجرد أن يصبح السجل نشطًا.',
+          typeLabel: 'النوع',
+          hostLabel: 'المضيف / الاسم',
+          valueLabel: 'القيمة',
+        },
+      },
     },
   },
   createOrganization: {

@@ -189,7 +189,7 @@ export interface OrganizationResource extends ClerkResource, BillingPayerMethods
    * request. Each resolved domain's `ownershipVerification` carries the
    * `txtRecordName` and `txtRecordValue` the org admin must publish. A single
    * bad domain does not fail the batch; it lands in `errors`.
-   * @returns An [`OrganizationDomainsBulkOwnershipVerificationResource`](https://clerk.com/docs/reference/types/organization-domain-resource) object.
+   * @returns An [`OrganizationDomainsBulkOwnershipVerificationResource`](https://clerk.com/docs/reference/types/organization-domains-bulk-ownership-verification-resource) object.
    * @param domainIds - The unique identifiers of the domains to prepare.
    */
   prepareOwnershipVerification: (domainIds: string[]) => Promise<OrganizationDomainsBulkOwnershipVerificationResource>;
@@ -197,7 +197,7 @@ export interface OrganizationResource extends ClerkResource, BillingPayerMethods
    * Resolves the published TXT record for each of the given domains in a single
    * request to complete ownership verification. A single bad domain does not
    * fail the batch; it lands in `errors`.
-   * @returns An [`OrganizationDomainsBulkOwnershipVerificationResource`](https://clerk.com/docs/reference/types/organization-domain-resource) object.
+   * @returns An [`OrganizationDomainsBulkOwnershipVerificationResource`](https://clerk.com/docs/reference/types/organization-domains-bulk-ownership-verification-resource) object.
    * @param domainIds - The unique identifiers of the domains to attempt.
    */
   attemptOwnershipVerification: (domainIds: string[]) => Promise<OrganizationDomainsBulkOwnershipVerificationResource>;

@@ -208,6 +208,22 @@ export const bnIN: LocalizationResource = {
       formFieldLabel__domain: 'ডোমেইন',
       formFieldInputPlaceholder__domain: 'আপনার ডোমেইন এখানে টাইপ করুন এবং শুরু করতে যোগ করুন-এ ক্লিক করুন',
       formButtonPrimary__add: 'যোগ করুন',
+      domainSuggestion: {
+        messageLabel: 'আপনার ইমেল {{domain}} ব্যবহার করে। আপনি কি এটি যোগ করতে চান?',
+        formButtonPrimary__add: '{{domain}} যোগ করুন',
+      },
+      domainCard: {
+        badge__verified: 'যাচাই করা হয়েছে',
+        badge__unverified: 'যাচাই করা হয়নি',
+        verifiedAtLabel: "{{ date | shortDate('bn-IN') }} তারিখে যাচাই করা হয়েছে",
+        txtRecord: {
+          instructions:
+            'আপনার DNS প্রদানকারীতে এই TXT রেকর্ডটি যোগ করুন। রেকর্ডটি সক্রিয় হলে আমরা স্বয়ংক্রিয়ভাবে যাচাই করব।',
+          typeLabel: 'ধরন',
+          hostLabel: 'হোস্ট / নাম',
+          valueLabel: 'মান',
+        },
+      },
     },
   },
   createOrganization: {

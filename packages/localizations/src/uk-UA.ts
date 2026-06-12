@@ -202,6 +202,22 @@ export const ukUA: LocalizationResource = {
       formFieldLabel__domain: 'Домени',
       formFieldInputPlaceholder__domain: 'Введіть свій домен тут і натисніть «Додати», щоб почати',
       formButtonPrimary__add: 'Додати',
+      domainSuggestion: {
+        messageLabel: 'Ваша електронна пошта використовує {{domain}}. Бажаєте додати його?',
+        formButtonPrimary__add: 'Додати {{domain}}',
+      },
+      domainCard: {
+        badge__verified: 'Підтверджено',
+        badge__unverified: 'Не підтверджено',
+        verifiedAtLabel: "Підтверджено {{ date | shortDate('uk-UA') }}",
+        txtRecord: {
+          instructions:
+            'Додайте цей TXT-запис до свого DNS-провайдера. Ми перевіримо його автоматично, щойно запис стане активним.',
+          typeLabel: 'Тип',
+          hostLabel: 'Хост / Імʼя',
+          valueLabel: 'Значення',
+        },
+      },
     },
   },
   createOrganization: {
@@ -522,7 +538,7 @@ export const ukUA: LocalizationResource = {
       resendButton: "Didn't receive a code? Resend",
       subtitle: 'The domain {{domainName}} needs to be verified via email.',
       subtitleVerificationCodeScreen: 'A verification code was sent to {{emailAddress}}. Enter the code to continue.',
-      title: 'Verify domains',
+      title: 'Verify domain',
     },
   },
   organizationSwitcher: {

@@ -231,6 +231,22 @@ export const hrHR: LocalizationResource = {
       formFieldLabel__domain: 'Domene',
       formFieldInputPlaceholder__domain: 'Ovdje upišite svoju domenu i kliknite dodaj za početak',
       formButtonPrimary__add: 'Dodaj',
+      domainSuggestion: {
+        messageLabel: 'Vaša e-pošta koristi {{domain}}. Želite li ga dodati?',
+        formButtonPrimary__add: 'Dodaj {{domain}}',
+      },
+      domainCard: {
+        badge__verified: 'Potvrđeno',
+        badge__unverified: 'Nepotvrđeno',
+        verifiedAtLabel: "Potvrđeno {{ date | shortDate('hr-HR') }}",
+        txtRecord: {
+          instructions:
+            'Dodajte ovaj TXT zapis kod svog DNS pružatelja. Automatski ćemo ga potvrditi čim zapis postane aktivan.',
+          typeLabel: 'Vrsta',
+          hostLabel: 'Host / Naziv',
+          valueLabel: 'Vrijednost',
+        },
+      },
     },
   },
   createOrganization: {

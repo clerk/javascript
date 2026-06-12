@@ -202,6 +202,22 @@ export const plPL: LocalizationResource = {
       formFieldLabel__domain: 'Domeny',
       formFieldInputPlaceholder__domain: 'Wpisz tutaj swoją domenę i kliknij dodaj, aby rozpocząć',
       formButtonPrimary__add: 'Dodaj',
+      domainSuggestion: {
+        messageLabel: 'Twój e-mail używa {{domain}}. Czy chcesz go dodać?',
+        formButtonPrimary__add: 'Dodaj {{domain}}',
+      },
+      domainCard: {
+        badge__verified: 'Zweryfikowano',
+        badge__unverified: 'Niezweryfikowano',
+        verifiedAtLabel: "Zweryfikowano {{ date | shortDate('pl-PL') }}",
+        txtRecord: {
+          instructions:
+            'Dodaj ten rekord TXT u swojego dostawcy DNS. Zweryfikujemy go automatycznie, gdy rekord stanie się aktywny.',
+          typeLabel: 'Typ',
+          hostLabel: 'Host / Nazwa',
+          valueLabel: 'Wartość',
+        },
+      },
     },
   },
   createOrganization: {

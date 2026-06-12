@@ -202,6 +202,22 @@ export const esCR: LocalizationResource = {
       formFieldLabel__domain: 'Dominios',
       formFieldInputPlaceholder__domain: 'Escribe aquí tu dominio y haz clic en Agregar para empezar',
       formButtonPrimary__add: 'Agregar',
+      domainSuggestion: {
+        messageLabel: 'Tu correo electrónico usa {{domain}}. ¿Quieres agregarlo?',
+        formButtonPrimary__add: 'Agregar {{domain}}',
+      },
+      domainCard: {
+        badge__verified: 'Verificado',
+        badge__unverified: 'Sin verificar',
+        verifiedAtLabel: "Verificado el {{ date | shortDate('es-CR') }}",
+        txtRecord: {
+          instructions:
+            'Agrega este registro TXT a tu proveedor de DNS. Lo verificaremos automáticamente una vez que el registro esté activo.',
+          typeLabel: 'Tipo',
+          hostLabel: 'Host / Nombre',
+          valueLabel: 'Valor',
+        },
+      },
     },
   },
   createOrganization: {

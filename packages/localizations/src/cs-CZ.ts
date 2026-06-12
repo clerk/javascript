@@ -206,6 +206,22 @@ export const csCZ: LocalizationResource = {
       formFieldLabel__domain: 'Domény',
       formFieldInputPlaceholder__domain: 'Zde zadejte svou doménu a kliknutím na přidat začněte',
       formButtonPrimary__add: 'Přidat',
+      domainSuggestion: {
+        messageLabel: 'Váš e-mail používá {{domain}}. Chcete jej přidat?',
+        formButtonPrimary__add: 'Přidat {{domain}}',
+      },
+      domainCard: {
+        badge__verified: 'Ověřeno',
+        badge__unverified: 'Neověřeno',
+        verifiedAtLabel: "Ověřeno {{ date | shortDate('cs-CZ') }}",
+        txtRecord: {
+          instructions:
+            'Přidejte tento záznam TXT u svého poskytovatele DNS. Jakmile bude záznam aktivní, automaticky jej ověříme.',
+          typeLabel: 'Typ',
+          hostLabel: 'Hostitel / Název',
+          valueLabel: 'Hodnota',
+        },
+      },
     },
   },
   createOrganization: {

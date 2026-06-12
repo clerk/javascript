@@ -230,6 +230,22 @@ export const isIS: LocalizationResource = {
       formFieldLabel__domain: 'Lén',
       formFieldInputPlaceholder__domain: 'Skrifaðu lénið þitt hér og smelltu á bæta við til að byrja',
       formButtonPrimary__add: 'Bæta við',
+      domainSuggestion: {
+        messageLabel: 'Tölvupósturinn þinn notar {{domain}}. Viltu bæta því við?',
+        formButtonPrimary__add: 'Bæta við {{domain}}',
+      },
+      domainCard: {
+        badge__verified: 'Staðfest',
+        badge__unverified: 'Óstaðfest',
+        verifiedAtLabel: "Staðfest {{ date | shortDate('is-IS') }}",
+        txtRecord: {
+          instructions:
+            'Bættu þessari TXT-færslu við DNS-þjónustuna þína. Við staðfestum sjálfkrafa um leið og færslan verður virk.',
+          typeLabel: 'Tegund',
+          hostLabel: 'Hýsill / Nafn',
+          valueLabel: 'Gildi',
+        },
+      },
     },
   },
   createOrganization: {

@@ -232,6 +232,22 @@ export const huHU: LocalizationResource = {
       formFieldLabel__domain: 'Tartományok',
       formFieldInputPlaceholder__domain: 'Írja be ide a tartományát, majd kattintson a Hozzáadás gombra a kezdéshez',
       formButtonPrimary__add: 'Hozzáadás',
+      domainSuggestion: {
+        messageLabel: 'Az e-mail-címe a következőt használja: {{domain}}. Szeretné hozzáadni?',
+        formButtonPrimary__add: '{{domain}} hozzáadása',
+      },
+      domainCard: {
+        badge__verified: 'Igazolva',
+        badge__unverified: 'Nincs igazolva',
+        verifiedAtLabel: "Igazolva: {{ date | shortDate('hu-HU') }}",
+        txtRecord: {
+          instructions:
+            'Adja hozzá ezt a TXT-rekordot a DNS-szolgáltatójához. Automatikusan igazoljuk, amint a rekord aktívvá válik.',
+          typeLabel: 'Típus',
+          hostLabel: 'Gazda / Név',
+          valueLabel: 'Érték',
+        },
+      },
     },
   },
   createOrganization: {

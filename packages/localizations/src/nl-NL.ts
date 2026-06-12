@@ -202,6 +202,22 @@ export const nlNL: LocalizationResource = {
       formFieldLabel__domain: 'Domeinen',
       formFieldInputPlaceholder__domain: 'Typ hier uw domein en klik op toevoegen om te beginnen',
       formButtonPrimary__add: 'Toevoegen',
+      domainSuggestion: {
+        messageLabel: 'Je e-mailadres gebruikt {{domain}}. Wil je het toevoegen?',
+        formButtonPrimary__add: '{{domain}} toevoegen',
+      },
+      domainCard: {
+        badge__verified: 'Geverifieerd',
+        badge__unverified: 'Niet geverifieerd',
+        verifiedAtLabel: "Geverifieerd op {{ date | shortDate('nl-NL') }}",
+        txtRecord: {
+          instructions:
+            'Voeg dit TXT-record toe aan je DNS-provider. We verifiëren het automatisch zodra het record actief is.',
+          typeLabel: 'Type',
+          hostLabel: 'Host / Naam',
+          valueLabel: 'Waarde',
+        },
+      },
     },
   },
   createOrganization: {

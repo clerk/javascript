@@ -16,7 +16,11 @@ export const EnrollmentBadge = (props: { organizationDomain: OrganizationDomainR
     return null;
   }
 
-  if (!(organizationDomain.verification && organizationDomain.verification.status === 'verified')) {
+  const isVerified =
+    organizationDomain.ownershipVerification?.status === 'verified' ||
+    organizationDomain.verification?.status === 'verified';
+
+  if (!isVerified) {
     return (
       <Badge
         localizationKey={localizationKeys('organizationProfile.badge__unverified')}

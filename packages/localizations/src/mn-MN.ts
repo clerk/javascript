@@ -202,6 +202,22 @@ export const mnMN: LocalizationResource = {
       formFieldLabel__domain: 'Домэйн',
       formFieldInputPlaceholder__domain: 'Домэйнээ энд бичээд эхлэхийн тулд нэмэх дээр дарна уу',
       formButtonPrimary__add: 'Нэмэх',
+      domainSuggestion: {
+        messageLabel: 'Таны имэйл {{domain}}-г ашиглаж байна. Үүнийг нэмэх үү?',
+        formButtonPrimary__add: '{{domain}} нэмэх',
+      },
+      domainCard: {
+        badge__verified: 'Баталгаажсан',
+        badge__unverified: 'Баталгаажаагүй',
+        verifiedAtLabel: "{{ date | shortDate('mn-MN') }}-нд баталгаажсан",
+        txtRecord: {
+          instructions:
+            'Энэ TXT бичлэгийг өөрийн DNS үйлчилгээ үзүүлэгчид нэмнэ үү. Бичлэг идэвхжсэний дараа бид автоматаар баталгаажуулна.',
+          typeLabel: 'Төрөл',
+          hostLabel: 'Хост / Нэр',
+          valueLabel: 'Утга',
+        },
+      },
     },
   },
   createOrganization: {

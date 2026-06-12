@@ -208,6 +208,22 @@ export const itIT: LocalizationResource = {
       formFieldLabel__domain: 'Domini',
       formFieldInputPlaceholder__domain: 'Digita qui il tuo dominio e clicca su Aggiungi per iniziare',
       formButtonPrimary__add: 'Aggiungi',
+      domainSuggestion: {
+        messageLabel: 'La tua email usa {{domain}}. Vuoi aggiungerlo?',
+        formButtonPrimary__add: 'Aggiungi {{domain}}',
+      },
+      domainCard: {
+        badge__verified: 'Verificato',
+        badge__unverified: 'Non verificato',
+        verifiedAtLabel: "Verificato il {{ date | shortDate('it-IT') }}",
+        txtRecord: {
+          instructions:
+            'Aggiungi questo record TXT al tuo provider DNS. Verificheremo automaticamente non appena il record sarà attivo.',
+          typeLabel: 'Tipo',
+          hostLabel: 'Host / Nome',
+          valueLabel: 'Valore',
+        },
+      },
     },
   },
   createOrganization: {

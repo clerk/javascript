@@ -202,6 +202,22 @@ export const kkKZ: LocalizationResource = {
       formFieldLabel__domain: 'Домендер',
       formFieldInputPlaceholder__domain: 'Доменіңізді осы жерге енгізіп, бастау үшін «Қосу» түймесін басыңыз',
       formButtonPrimary__add: 'Қосу',
+      domainSuggestion: {
+        messageLabel: 'Электрондық поштаңыз {{domain}} пайдаланады. Оны қосқыңыз келе ме?',
+        formButtonPrimary__add: '{{domain}} қосу',
+      },
+      domainCard: {
+        badge__verified: 'Расталған',
+        badge__unverified: 'Расталмаған',
+        verifiedAtLabel: "{{ date | shortDate('kk-KZ') }} күні расталды",
+        txtRecord: {
+          instructions:
+            'Бұл TXT жазбасын DNS провайдеріңізге қосыңыз. Жазба белсенді болған бойда біз оны автоматты түрде растаймыз.',
+          typeLabel: 'Түрі',
+          hostLabel: 'Хост / Атау',
+          valueLabel: 'Мән',
+        },
+      },
     },
   },
   createOrganization: {

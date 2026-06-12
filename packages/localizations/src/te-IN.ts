@@ -209,6 +209,22 @@ export const teIN: LocalizationResource = {
       formFieldLabel__domain: 'డొమైన్‌లు',
       formFieldInputPlaceholder__domain: 'మీ డొమైన్‌ను ఇక్కడ టైప్ చేసి, ప్రారంభించడానికి జోడించు క్లిక్ చేయండి',
       formButtonPrimary__add: 'జోడించు',
+      domainSuggestion: {
+        messageLabel: 'మీ ఇమెయిల్ {{domain}} ను ఉపయోగిస్తుంది. మీరు దీన్ని జోడించాలనుకుంటున్నారా?',
+        formButtonPrimary__add: '{{domain}} జోడించు',
+      },
+      domainCard: {
+        badge__verified: 'ధృవీకరించబడింది',
+        badge__unverified: 'ధృవీకరించబడలేదు',
+        verifiedAtLabel: "{{ date | shortDate('te-IN') }} న ధృవీకరించబడింది",
+        txtRecord: {
+          instructions:
+            'ఈ TXT రికార్డ్‌ను మీ DNS ప్రొవైడర్‌కు జోడించండి. రికార్డ్ సక్రియం అయిన వెంటనే మేము స్వయంచాలకంగా ధృవీకరిస్తాము.',
+          typeLabel: 'రకం',
+          hostLabel: 'హోస్ట్ / పేరు',
+          valueLabel: 'విలువ',
+        },
+      },
     },
   },
   createOrganization: {

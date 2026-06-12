@@ -202,6 +202,22 @@ export const ruRU: LocalizationResource = {
       formFieldLabel__domain: 'Домены',
       formFieldInputPlaceholder__domain: 'Введите домен здесь и нажмите «Добавить», чтобы начать',
       formButtonPrimary__add: 'Добавить',
+      domainSuggestion: {
+        messageLabel: 'Ваша электронная почта использует {{domain}}. Хотите добавить его?',
+        formButtonPrimary__add: 'Добавить {{domain}}',
+      },
+      domainCard: {
+        badge__verified: 'Подтверждён',
+        badge__unverified: 'Не подтверждён',
+        verifiedAtLabel: "Подтверждён {{ date | shortDate('ru-RU') }}",
+        txtRecord: {
+          instructions:
+            'Добавьте эту TXT-запись у своего DNS-провайдера. Мы проверим её автоматически, как только запись станет активной.',
+          typeLabel: 'Тип',
+          hostLabel: 'Хост / Имя',
+          valueLabel: 'Значение',
+        },
+      },
     },
   },
   createOrganization: {

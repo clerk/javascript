@@ -207,6 +207,22 @@ export const faIR: LocalizationResource = {
       formFieldLabel__domain: 'دامنه‌ها',
       formFieldInputPlaceholder__domain: 'دامنه خود را اینجا تایپ کنید و برای شروع روی افزودن کلیک کنید',
       formButtonPrimary__add: 'افزودن',
+      domainSuggestion: {
+        messageLabel: 'ایمیل شما از {{domain}} استفاده می‌کند. آیا می‌خواهید آن را اضافه کنید؟',
+        formButtonPrimary__add: 'افزودن {{domain}}',
+      },
+      domainCard: {
+        badge__verified: 'تأییدشده',
+        badge__unverified: 'تأییدنشده',
+        verifiedAtLabel: "تأیید‌شده در {{ date | shortDate('fa-IR') }}",
+        txtRecord: {
+          instructions:
+            'این رکورد TXT را به ارائه‌دهنده DNS خود اضافه کنید. به‌محض فعال شدن رکورد، به‌طور خودکار آن را تأیید می‌کنیم.',
+          typeLabel: 'نوع',
+          hostLabel: 'میزبان / نام',
+          valueLabel: 'مقدار',
+        },
+      },
     },
   },
   createOrganization: {

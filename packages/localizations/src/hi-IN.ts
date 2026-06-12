@@ -208,6 +208,22 @@ export const hiIN: LocalizationResource = {
       formFieldLabel__domain: 'डोमेन',
       formFieldInputPlaceholder__domain: 'अपना डोमेन यहाँ टाइप करें और शुरू करने के लिए जोड़ें पर क्लिक करें',
       formButtonPrimary__add: 'जोड़ें',
+      domainSuggestion: {
+        messageLabel: 'आपका ईमेल {{domain}} का उपयोग करता है। क्या आप इसे जोड़ना चाहते हैं?',
+        formButtonPrimary__add: '{{domain}} जोड़ें',
+      },
+      domainCard: {
+        badge__verified: 'सत्यापित',
+        badge__unverified: 'असत्यापित',
+        verifiedAtLabel: "{{ date | shortDate('hi-IN') }} को सत्यापित",
+        txtRecord: {
+          instructions:
+            'इस TXT रिकॉर्ड को अपने DNS प्रदाता में जोड़ें। रिकॉर्ड सक्रिय होते ही हम स्वतः सत्यापित कर देंगे।',
+          typeLabel: 'प्रकार',
+          hostLabel: 'होस्ट / नाम',
+          valueLabel: 'मान',
+        },
+      },
     },
   },
   createOrganization: {

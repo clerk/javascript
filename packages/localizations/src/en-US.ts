@@ -1141,7 +1141,7 @@ export const enUS: LocalizationResource = {
       resendButton: "Didn't receive a code? Resend",
       subtitle: 'The domain {{domainName}} needs to be verified via email.',
       subtitleVerificationCodeScreen: 'A verification code was sent to {{emailAddress}}. Enter the code to continue.',
-      title: 'Verify domains',
+      title: 'Verify domain',
     },
   },
   organizationSwitcher: {

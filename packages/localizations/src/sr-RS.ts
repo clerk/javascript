@@ -202,6 +202,22 @@ export const srRS: LocalizationResource = {
       formFieldLabel__domain: 'Domeni',
       formFieldInputPlaceholder__domain: 'Ovde unesite svoj domen i kliknite na dodaj da biste počeli',
       formButtonPrimary__add: 'Dodaj',
+      domainSuggestion: {
+        messageLabel: 'Vaša e-pošta koristi {{domain}}. Želite li da ga dodate?',
+        formButtonPrimary__add: 'Dodaj {{domain}}',
+      },
+      domainCard: {
+        badge__verified: 'Potvrđeno',
+        badge__unverified: 'Nepotvrđeno',
+        verifiedAtLabel: "Potvrđeno {{ date | shortDate('sr-RS') }}",
+        txtRecord: {
+          instructions:
+            'Dodajte ovaj TXT zapis kod svog DNS provajdera. Automatski ćemo ga potvrditi čim zapis postane aktivan.',
+          typeLabel: 'Tip',
+          hostLabel: 'Host / Naziv',
+          valueLabel: 'Vrednost',
+        },
+      },
     },
   },
   createOrganization: {

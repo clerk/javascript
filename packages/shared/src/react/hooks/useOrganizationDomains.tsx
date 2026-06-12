@@ -146,15 +146,14 @@ function useOrganizationDomains(params: UseOrganizationDomainsParams = {}): UseO
       return;
     }
 
-    // These ids are, by construction, the domains that are currently unverified.
-    const domainIds = unverifiedOwnershipKey.split(',');
-
     let cancelled = false;
     let timeoutId: ReturnType<typeof setTimeout>;
 
     const scheduleNext = () => {
       timeoutId = setTimeout(() => void runAttempt(), OWNERSHIP_VERIFICATION_POLL_INTERVAL_MS);
     };
+
+    const domainIds = unverifiedOwnershipKey.split(',');
 
     const runAttempt = async () => {
       const result = await organization.attemptOwnershipVerification(domainIds).catch((error: unknown) => {
@@ -166,7 +165,7 @@ function useOrganizationDomains(params: UseOrganizationDomainsParams = {}): UseO
       }
 
       // Refetch the domains list after every attempt so the UI reflects the
-      // latest ownership status.
+      // latest ownership status
       await revalidate();
       if (cancelled) {
         return;

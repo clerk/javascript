@@ -208,6 +208,22 @@ export const viVN: LocalizationResource = {
       formFieldLabel__domain: 'Tên miền',
       formFieldInputPlaceholder__domain: 'Nhập tên miền của bạn vào đây và nhấp vào thêm để bắt đầu',
       formButtonPrimary__add: 'Thêm',
+      domainSuggestion: {
+        messageLabel: 'Email của bạn sử dụng {{domain}}. Bạn có muốn thêm nó không?',
+        formButtonPrimary__add: 'Thêm {{domain}}',
+      },
+      domainCard: {
+        badge__verified: 'Đã xác minh',
+        badge__unverified: 'Chưa xác minh',
+        verifiedAtLabel: "Đã xác minh vào {{ date | shortDate('vi-VN') }}",
+        txtRecord: {
+          instructions:
+            'Thêm bản ghi TXT này vào nhà cung cấp DNS của bạn. Chúng tôi sẽ tự động xác minh khi bản ghi hoạt động.',
+          typeLabel: 'Loại',
+          hostLabel: 'Máy chủ / Tên',
+          valueLabel: 'Giá trị',
+        },
+      },
     },
   },
   createOrganization: {

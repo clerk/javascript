@@ -202,6 +202,21 @@ export const heIL: LocalizationResource = {
       formFieldLabel__domain: 'דומיינים',
       formFieldInputPlaceholder__domain: 'הקלד את הדומיין שלך כאן ולחץ על הוסף כדי להתחיל',
       formButtonPrimary__add: 'הוסף',
+      domainSuggestion: {
+        messageLabel: 'האימייל שלך משתמש ב-{{domain}}. האם ברצונך להוסיף אותו?',
+        formButtonPrimary__add: 'הוסף {{domain}}',
+      },
+      domainCard: {
+        badge__verified: 'מאומת',
+        badge__unverified: 'לא מאומת',
+        verifiedAtLabel: "אומת בתאריך {{ date | shortDate('he-IL') }}",
+        txtRecord: {
+          instructions: 'הוסף רשומת TXT זו אצל ספק ה-DNS שלך. נאמת אותה אוטומטית ברגע שהרשומה תהיה פעילה.',
+          typeLabel: 'סוג',
+          hostLabel: 'מארח / שם',
+          valueLabel: 'ערך',
+        },
+      },
     },
   },
   createOrganization: {

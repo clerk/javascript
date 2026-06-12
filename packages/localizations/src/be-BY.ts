@@ -202,6 +202,22 @@ export const beBY: LocalizationResource = {
       formFieldLabel__domain: 'Дамены',
       formFieldInputPlaceholder__domain: 'Увядзіце свой дамен тут і націсніце «Дадаць», каб пачаць',
       formButtonPrimary__add: 'Дадаць',
+      domainSuggestion: {
+        messageLabel: 'Ваша электронная пошта выкарыстоўвае {{domain}}. Хочаце дадаць яго?',
+        formButtonPrimary__add: 'Дадаць {{domain}}',
+      },
+      domainCard: {
+        badge__verified: 'Пацверджана',
+        badge__unverified: 'Не пацверджана',
+        verifiedAtLabel: "Пацверджана {{ date | shortDate('be-BY') }}",
+        txtRecord: {
+          instructions:
+            'Дадайце гэты TXT-запіс да вашага DNS-правайдара. Мы аўтаматычна выканаем праверку, як толькі запіс стане актыўным.',
+          typeLabel: 'Тып',
+          hostLabel: 'Хост / Імя',
+          valueLabel: 'Значэнне',
+        },
+      },
     },
   },
   createOrganization: {

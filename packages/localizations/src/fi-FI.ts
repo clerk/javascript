@@ -230,6 +230,22 @@ export const fiFI: LocalizationResource = {
       formFieldLabel__domain: 'Verkkotunnukset',
       formFieldInputPlaceholder__domain: 'Kirjoita verkkotunnuksesi tähän ja aloita napsauttamalla Lisää',
       formButtonPrimary__add: 'Lisää',
+      domainSuggestion: {
+        messageLabel: 'Sähköpostisi käyttää osoitetta {{domain}}. Haluatko lisätä sen?',
+        formButtonPrimary__add: 'Lisää {{domain}}',
+      },
+      domainCard: {
+        badge__verified: 'Vahvistettu',
+        badge__unverified: 'Vahvistamaton',
+        verifiedAtLabel: "Vahvistettu {{ date | shortDate('fi-FI') }}",
+        txtRecord: {
+          instructions:
+            'Lisää tämä TXT-tietue DNS-palveluntarjoajallesi. Vahvistamme sen automaattisesti, kun tietue on aktiivinen.',
+          typeLabel: 'Tyyppi',
+          hostLabel: 'Isäntä / Nimi',
+          valueLabel: 'Arvo',
+        },
+      },
     },
   },
   createOrganization: {

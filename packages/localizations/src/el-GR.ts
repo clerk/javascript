@@ -203,6 +203,22 @@ export const elGR: LocalizationResource = {
       formFieldInputPlaceholder__domain:
         'Πληκτρολογήστε τον τομέα σας εδώ και κάντε κλικ στο «Προσθήκη» για να ξεκινήσετε',
       formButtonPrimary__add: 'Προσθήκη',
+      domainSuggestion: {
+        messageLabel: 'Το email σας χρησιμοποιεί {{domain}}. Θέλετε να το προσθέσετε;',
+        formButtonPrimary__add: 'Προσθήκη {{domain}}',
+      },
+      domainCard: {
+        badge__verified: 'Επαληθευμένο',
+        badge__unverified: 'Μη επαληθευμένο',
+        verifiedAtLabel: "Επαληθεύτηκε στις {{ date | shortDate('el-GR') }}",
+        txtRecord: {
+          instructions:
+            'Προσθέστε αυτήν την εγγραφή TXT στον πάροχο DNS σας. Θα την επαληθεύσουμε αυτόματα μόλις η εγγραφή ενεργοποιηθεί.',
+          typeLabel: 'Τύπος',
+          hostLabel: 'Κεντρικός υπολογιστής / Όνομα',
+          valueLabel: 'Τιμή',
+        },
+      },
     },
   },
   createOrganization: {

@@ -209,6 +209,21 @@ export const koKR: LocalizationResource = {
       formFieldLabel__domain: '도메인',
       formFieldInputPlaceholder__domain: '여기에 도메인을 입력하고 추가를 클릭하여 시작하세요',
       formButtonPrimary__add: '추가',
+      domainSuggestion: {
+        messageLabel: '이메일이 {{domain}}을(를) 사용합니다. 추가하시겠습니까?',
+        formButtonPrimary__add: '{{domain}} 추가',
+      },
+      domainCard: {
+        badge__verified: '확인됨',
+        badge__unverified: '미확인',
+        verifiedAtLabel: "{{ date | shortDate('ko-KR') }}에 확인됨",
+        txtRecord: {
+          instructions: '이 TXT 레코드를 DNS 공급자에 추가하세요. 레코드가 활성화되면 자동으로 확인합니다.',
+          typeLabel: '유형',
+          hostLabel: '호스트 / 이름',
+          valueLabel: '값',
+        },
+      },
     },
   },
   createOrganization: {

@@ -202,6 +202,21 @@ export const zhCN: LocalizationResource = {
       formFieldLabel__domain: '域名',
       formFieldInputPlaceholder__domain: '在此输入您的域名，然后点击添加即可开始',
       formButtonPrimary__add: '添加',
+      domainSuggestion: {
+        messageLabel: '您的邮箱使用了 {{domain}}。是否要添加它？',
+        formButtonPrimary__add: '添加 {{domain}}',
+      },
+      domainCard: {
+        badge__verified: '已验证',
+        badge__unverified: '未验证',
+        verifiedAtLabel: "验证于 {{ date | shortDate('zh-CN') }}",
+        txtRecord: {
+          instructions: '将此 TXT 记录添加到您的 DNS 提供商。记录生效后，我们将自动进行验证。',
+          typeLabel: '类型',
+          hostLabel: '主机 / 名称',
+          valueLabel: '值',
+        },
+      },
     },
   },
   createOrganization: {

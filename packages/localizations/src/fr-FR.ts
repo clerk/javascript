@@ -211,6 +211,22 @@ export const frFR: LocalizationResource = {
       formFieldLabel__domain: 'Domaines',
       formFieldInputPlaceholder__domain: 'Saisissez votre domaine ici et cliquez sur Ajouter pour commencer',
       formButtonPrimary__add: 'Ajouter',
+      domainSuggestion: {
+        messageLabel: 'Votre e-mail utilise {{domain}}. Voulez-vous l’ajouter ?',
+        formButtonPrimary__add: 'Ajouter {{domain}}',
+      },
+      domainCard: {
+        badge__verified: 'Vérifié',
+        badge__unverified: 'Non vérifié',
+        verifiedAtLabel: "Vérifié le {{ date | shortDate('fr-FR') }}",
+        txtRecord: {
+          instructions:
+            'Ajoutez cet enregistrement TXT à votre fournisseur DNS. Nous le vérifierons automatiquement une fois l’enregistrement actif.',
+          typeLabel: 'Type',
+          hostLabel: 'Hôte / Nom',
+          valueLabel: 'Valeur',
+        },
+      },
     },
   },
   createOrganization: {

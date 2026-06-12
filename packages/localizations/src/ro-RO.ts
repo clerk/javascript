@@ -209,6 +209,22 @@ export const roRO: LocalizationResource = {
       formFieldLabel__domain: 'Domenii',
       formFieldInputPlaceholder__domain: 'Scrie aici domeniul tău și fă clic pe adaugă pentru a începe',
       formButtonPrimary__add: 'Adaugă',
+      domainSuggestion: {
+        messageLabel: 'E-mailul tău folosește {{domain}}. Vrei să-l adaugi?',
+        formButtonPrimary__add: 'Adaugă {{domain}}',
+      },
+      domainCard: {
+        badge__verified: 'Verificat',
+        badge__unverified: 'Neverificat',
+        verifiedAtLabel: "Verificat pe {{ date | shortDate('ro-RO') }}",
+        txtRecord: {
+          instructions:
+            'Adaugă această înregistrare TXT la furnizorul tău DNS. O vom verifica automat de îndată ce înregistrarea devine activă.',
+          typeLabel: 'Tip',
+          hostLabel: 'Gazdă / Nume',
+          valueLabel: 'Valoare',
+        },
+      },
     },
   },
   createOrganization: {

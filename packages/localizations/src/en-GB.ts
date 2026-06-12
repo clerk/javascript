@@ -202,6 +202,21 @@ export const enGB: LocalizationResource = {
       formFieldLabel__domain: 'Domains',
       formFieldInputPlaceholder__domain: 'Type your domain here and click add to start',
       formButtonPrimary__add: 'Add',
+      domainSuggestion: {
+        messageLabel: 'Your email uses {{domain}}. Do you want to add it?',
+        formButtonPrimary__add: 'Add {{domain}}',
+      },
+      domainCard: {
+        badge__verified: 'Verified',
+        badge__unverified: 'Unverified',
+        verifiedAtLabel: "Verified on {{ date | shortDate('en-GB') }}",
+        txtRecord: {
+          instructions: "Add this TXT record to your DNS provider. We'll verify automatically once the record is live.",
+          typeLabel: 'Type',
+          hostLabel: 'Host / Name',
+          valueLabel: 'Value',
+        },
+      },
     },
   },
   createOrganization: {
@@ -523,7 +538,7 @@ export const enGB: LocalizationResource = {
       resendButton: "Didn't receive a code? Resend",
       subtitle: 'The domain {{domainName}} needs to be verified via email.',
       subtitleVerificationCodeScreen: 'A verification code was sent to {{emailAddress}}. Enter the code to continue.',
-      title: 'Verify domains',
+      title: 'Verify domain',
     },
   },
   organizationSwitcher: {

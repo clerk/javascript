@@ -209,6 +209,22 @@ export const ptBR: LocalizationResource = {
       formFieldLabel__domain: 'Domínios',
       formFieldInputPlaceholder__domain: 'Digite seu domínio aqui e clique em Adicionar para começar',
       formButtonPrimary__add: 'Adicionar',
+      domainSuggestion: {
+        messageLabel: 'Seu e-mail usa {{domain}}. Deseja adicioná-lo?',
+        formButtonPrimary__add: 'Adicionar {{domain}}',
+      },
+      domainCard: {
+        badge__verified: 'Verificado',
+        badge__unverified: 'Não verificado',
+        verifiedAtLabel: "Verificado em {{ date | shortDate('pt-BR') }}",
+        txtRecord: {
+          instructions:
+            'Adicione este registro TXT ao seu provedor de DNS. Verificaremos automaticamente assim que o registro estiver ativo.',
+          typeLabel: 'Tipo',
+          hostLabel: 'Host / Nome',
+          valueLabel: 'Valor',
+        },
+      },
     },
   },
   createOrganization: {

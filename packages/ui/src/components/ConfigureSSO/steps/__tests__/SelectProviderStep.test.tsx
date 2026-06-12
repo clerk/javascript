@@ -10,9 +10,10 @@ import { CardStateProvider } from '@/ui/elements/contexts';
 // `handleContinue` that calls the create mutation then `useWizard().goNext`.
 // We assert on those nav calls.
 const goNext = vi.fn();
+const goPrev = vi.fn();
 
 vi.mock('../../elements/Wizard', () => ({
-  useWizard: () => ({ current: 'select-provider', goNext }),
+  useWizard: () => ({ current: 'select-provider', goNext, goPrev, isFirstStep: true }),
 }));
 
 const createEnterpriseConnection = vi.fn();
@@ -54,6 +55,7 @@ const renderStep = (
 
 const resetMocks = () => {
   goNext.mockReset();
+  goPrev.mockReset();
   createEnterpriseConnection.mockReset();
   createEnterpriseConnection.mockResolvedValue(undefined);
   contextState.provider = undefined;

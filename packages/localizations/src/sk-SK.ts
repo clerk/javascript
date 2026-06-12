@@ -202,6 +202,22 @@ export const skSK: LocalizationResource = {
       formFieldLabel__domain: 'Domény',
       formFieldInputPlaceholder__domain: 'Sem zadajte svoju doménu a kliknutím na pridať začnite',
       formButtonPrimary__add: 'Pridať',
+      domainSuggestion: {
+        messageLabel: 'Váš e-mail používa {{domain}}. Chcete ho pridať?',
+        formButtonPrimary__add: 'Pridať {{domain}}',
+      },
+      domainCard: {
+        badge__verified: 'Overené',
+        badge__unverified: 'Neoverené',
+        verifiedAtLabel: "Overené {{ date | shortDate('sk-SK') }}",
+        txtRecord: {
+          instructions:
+            'Pridajte tento záznam TXT u svojho poskytovateľa DNS. Hneď ako bude záznam aktívny, automaticky ho overíme.',
+          typeLabel: 'Typ',
+          hostLabel: 'Hostiteľ / Názov',
+          valueLabel: 'Hodnota',
+        },
+      },
     },
   },
   createOrganization: {
