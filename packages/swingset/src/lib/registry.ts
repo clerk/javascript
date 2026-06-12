@@ -28,6 +28,7 @@ import {
 } from '../stories/organization-profile.stories';
 import { meta as popoverMeta } from '../stories/popover.stories';
 import { meta as selectMeta } from '../stories/select.stories';
+import { Default as TabsComponentDefault, meta as tabsComponentMeta } from '../stories/tabs.component.stories';
 import { meta as tabsMeta } from '../stories/tabs.stories';
 import { meta as tooltipMeta } from '../stories/tooltip.stories';
 import { toSlug } from './slug';
@@ -43,6 +44,8 @@ const buttonModule: StoryModule = { meta: buttonMeta, Primary, Sizes, Disabled }
 const inputModule: StoryModule = { meta: inputMeta, Default, Sizes: InputSizes, Disabled: InputDisabled, Invalid };
 
 const dialogComponentModule: StoryModule = { meta: dialogComponentMeta, Default: DialogDefault };
+
+const tabsComponentModule: StoryModule = { meta: tabsComponentMeta, Default: TabsComponentDefault };
 
 // Headless primitives carry just `meta` (no story functions). Like every component
 // they're documented as a single overview page; their live demos come from `<Story>` /
@@ -69,6 +72,7 @@ export const registry: StoryModule[] = [
   buttonModule,
   inputModule,
   dialogComponentModule,
+  tabsComponentModule,
   // Primitives — alphabetical within the group.
   accordionModule,
   autocompleteModule,
