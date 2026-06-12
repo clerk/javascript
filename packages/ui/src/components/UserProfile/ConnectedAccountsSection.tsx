@@ -18,6 +18,7 @@ import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
 import type { PropsOfComponent } from '../../styledSystem';
 import { AddConnectedAccount } from './ConnectedAccountsMenu';
+import { getExternalVerificationRedirectURL, reloadUserAfterOAuthCallback } from './oauthTransport';
 import { RemoveConnectedAccountForm } from './RemoveResourceForm';
 
 type RemoveConnectedAccountScreenProps = { accountId: string };
@@ -140,19 +141,14 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
         response = await createExternalAccount(decoratedRedirectUrl);
       }
 
+      const url = getExternalVerificationRedirectURL(response);
       if (clerk.__internal_oauthTransport) {
-        const url = response?.verification?.externalVerificationRedirectURL;
-        if (url) {
-          await clerk.__internal_oauthTransport.open(url);
-          await user.reload();
-        }
+        const { callbackUrl } = await clerk.__internal_oauthTransport.open(url);
+        await reloadUserAfterOAuthCallback(user, callbackUrl);
         return;
       }
 
-      if (response) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        await navigate(response.verification!.externalVerificationRedirectURL?.href || '');
-      }
+      await navigate(url.href);
     } catch (err: any) {
       handleError(err, [], card.setError);
     }

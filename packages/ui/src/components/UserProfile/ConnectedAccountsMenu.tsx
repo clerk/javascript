@@ -12,6 +12,7 @@ import { useUserProfileContext } from '../../contexts';
 import { descriptors, localizationKeys } from '../../customizables';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
+import { getExternalVerificationRedirectURL, reloadUserAfterOAuthCallback } from './oauthTransport';
 
 const ConnectMenuButton = (props: { strategy: OAuthStrategy; onClick?: () => void }) => {
   const { strategy } = props;
@@ -48,20 +49,17 @@ const ConnectMenuButton = (props: { strategy: OAuthStrategy; onClick?: () => voi
     try {
       if (clerk.__internal_oauthTransport) {
         const res = await createExternalAccount(String(await clerk.__internal_oauthTransport.getRedirectUrl()));
-        const url = res?.verification?.externalVerificationRedirectURL;
-        if (url) {
-          await clerk.__internal_oauthTransport.open(url);
-          await user.reload();
-        }
+        const url = getExternalVerificationRedirectURL(res);
+        const { callbackUrl } = await clerk.__internal_oauthTransport.open(url);
+        await reloadUserAfterOAuthCallback(user, callbackUrl);
         void sleep(2000).then(() => card.setIdle(strategy));
         return;
       }
 
       const res = await createExternalAccount(window.location.href);
-      if (res && res.verification?.externalVerificationRedirectURL) {
-        void sleep(2000).then(() => card.setIdle(strategy));
-        void navigate(res.verification.externalVerificationRedirectURL.href);
-      }
+      const url = getExternalVerificationRedirectURL(res);
+      void sleep(2000).then(() => card.setIdle(strategy));
+      void navigate(url.href);
     } catch (err: any) {
       handleError(err, [], card.setError);
       card.setIdle(strategy);
