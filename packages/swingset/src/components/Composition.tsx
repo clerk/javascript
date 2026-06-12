@@ -27,7 +27,9 @@ function layerRank(layer: string): number {
 export function CompositionPanel({ pieces }: { pieces: CompositionPiece[] }) {
   const groups = new Map<string, CompositionPiece[]>();
   for (const piece of pieces) {
-    if (!groups.has(piece.layer)) groups.set(piece.layer, []);
+    if (!groups.has(piece.layer)) {
+      groups.set(piece.layer, []);
+    }
     groups.get(piece.layer)?.push(piece);
   }
 
