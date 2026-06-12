@@ -350,10 +350,8 @@ export class SignIn extends BaseResource implements SignInResource {
     const actionCompleteRedirectUrl = redirectUrlComplete;
 
     const redirectUrl = SignIn.clerk.buildUrlWithAuth(params.redirectUrl);
-    const hasPendingRedirect = !!this.firstFactorVerification.externalVerificationRedirectURL;
-    const wouldReplayStaleRedirect = strategy !== 'enterprise_sso' && hasPendingRedirect;
 
-    if (!this.id || !continueSignIn || wouldReplayStaleRedirect) {
+    if (!this.id || !continueSignIn) {
       await this.create({
         strategy,
         identifier,
