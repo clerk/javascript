@@ -8,7 +8,7 @@ import {
 } from '../buildOAuthCallbackParams';
 
 describe('buildSignInOAuthCallbackParams', () => {
-  it('produces exactly the params the SignIn sso-callback route passes today', () => {
+  it('returns params for the SignIn sso-callback route', () => {
     const ctx = {
       signUpUrl: '/sign-up',
       signInUrl: '/sign-in',
@@ -67,7 +67,7 @@ describe('buildSignInOAuthTransportCallbackParams', () => {
 });
 
 describe('buildSignUpOAuthCallbackParams', () => {
-  it('produces exactly the params the combined-flow SignUp sso-callback route passes today', () => {
+  it('returns params for the combined-flow SignUp sso-callback route', () => {
     const ctx = {
       signUpUrl: '/sign-up',
       signInUrl: '/sign-in',

@@ -19,12 +19,6 @@ type ClerkWithResourceCallback = {
   ) => Promise<unknown>;
 };
 
-/**
- * Drives an OAuth/SSO flow through a registered OAuth transport while reusing the
- * resource's redirect/popup orchestration unchanged.
- *
- * @internal
- */
 export async function _authenticateWithTransport(opts: {
   clerk: ClerkWithResourceCallback;
   transport: OAuthTransport;

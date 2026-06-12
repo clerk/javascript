@@ -3,10 +3,6 @@ import type { HandleOAuthCallbackParams } from '@clerk/shared/types';
 import type { SignInContextType } from '../../contexts/components/SignIn';
 import type { SignUpContextType } from '../../contexts/components/SignUp';
 
-/**
- * Exact callback params the SignIn `sso-callback` route passes to SSOCallback.
- * Excludes `navigateOnSetActive`, which is transport-only.
- */
 export function buildSignInOAuthCallbackParams(ctx: SignInContextType): HandleOAuthCallbackParams {
   return {
     signUpUrl: ctx.signUpUrl,
@@ -31,9 +27,6 @@ export function buildSignInOAuthTransportCallbackParams(ctx: SignInContextType):
   };
 }
 
-/**
- * Exact callback params the combined-flow SignUp `sso-callback` route passes to SSOCallback.
- */
 export function buildSignUpOAuthCallbackParams(ctx: SignUpContextType): HandleOAuthCallbackParams {
   return {
     signUpUrl: ctx.signUpUrl,
