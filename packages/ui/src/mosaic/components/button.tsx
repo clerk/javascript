@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { defineSlotRecipe, useRecipe } from '../slot-recipe';
 import type { RecipeVariantProps } from '../slot-recipe';
+import { defineSlotRecipe, useRecipe } from '../slot-recipe';
 
 export const buttonRecipe = defineSlotRecipe(theme => ({
   slot: 'button',
