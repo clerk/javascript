@@ -11,5 +11,5 @@ export const meta: StoryMeta = {
 };
 
 export function Default() {
-  return <LeaveOrganization resourceName="Alex's Organization" />;
+  return <LeaveOrganization />;
 }

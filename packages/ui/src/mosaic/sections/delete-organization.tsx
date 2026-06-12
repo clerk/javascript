@@ -3,18 +3,20 @@ import { useState } from 'react';
 import { Box } from '../components/box';
 import { Button } from '../components/button';
 import { Destructive } from '../block/destructive';
+import { useOrganization } from '../mock/use-organization';
 
-interface DeleteOrganizationProps {
-  resourceName: string;
-}
-
-export function DeleteOrganization({ resourceName }: DeleteOrganizationProps) {
+export function DeleteOrganization() {
+  const { isLoaded, organization } = useOrganization();
   const [open, setOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  if (!isLoaded || !organization) {
+    return <Box sx={t => ({ ...t.text('sm'), color: t.color.mutedForeground })}>Loading…</Box>;
+  }
+
   const handleDelete = async () => {
     setIsDeleting(true);
-    await new Promise<void>(resolve => setTimeout(resolve, 2000));
+    await organization.destroy();
     setIsDeleting(false);
     setOpen(false);
   };
@@ -76,7 +78,7 @@ export function DeleteOrganization({ resourceName }: DeleteOrganizationProps) {
           onOpenChange={setOpen}
           title='Delete organization'
           description='Are you sure you want to delete this organization?'
-          resourceName={resourceName}
+          resourceName={organization.name}
           primaryActionLabel='Delete organization'
           onDelete={handleDelete}
           isDeleting={isDeleting}

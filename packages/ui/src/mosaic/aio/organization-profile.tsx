@@ -3,11 +3,7 @@ import { DeleteOrganization } from '../sections/delete-organization';
 import { LeaveOrganization } from '../sections/leave-organization';
 import { alpha } from '../utils';
 
-interface OrganizationProfileProps {
-  resourceName: string;
-}
-
-export function OrganizationProfile({ resourceName }: OrganizationProfileProps) {
+export function OrganizationProfile() {
   return (
     <Box
       sx={t => ({
@@ -24,7 +20,7 @@ export function OrganizationProfile({ resourceName }: OrganizationProfileProps) 
       >
         Organization Profile
       </Box>
-      <LeaveOrganization resourceName={resourceName} />
+      <LeaveOrganization />
       <Box
         sx={t => ({
           height: '1px',
@@ -32,7 +28,7 @@ export function OrganizationProfile({ resourceName }: OrganizationProfileProps) 
           marginBlock: t.spacing(4),
         })}
       />
-      <DeleteOrganization resourceName={resourceName} />
+      <DeleteOrganization />
     </Box>
   );
 }

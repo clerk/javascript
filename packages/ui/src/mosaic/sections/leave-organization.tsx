@@ -3,18 +3,20 @@ import { useState } from 'react';
 import { Box } from '../components/box';
 import { Button } from '../components/button';
 import { Destructive } from '../block/destructive';
+import { useOrganization } from '../mock/use-organization';
 
-interface LeaveOrganizationProps {
-  resourceName: string;
-}
-
-export function LeaveOrganization({ resourceName }: LeaveOrganizationProps) {
+export function LeaveOrganization() {
+  const { isLoaded, organization, membership } = useOrganization();
   const [open, setOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const handleDelete = async () => {
+  if (!isLoaded || !organization || !membership) {
+    return <Box sx={t => ({ ...t.text('sm'), color: t.color.mutedForeground })}>Loading…</Box>;
+  }
+
+  const handleLeave = async () => {
     setIsDeleting(true);
-    await new Promise<void>(resolve => setTimeout(resolve, 2000));
+    await membership.destroy();
     setIsDeleting(false);
     setOpen(false);
   };
@@ -77,8 +79,8 @@ export function LeaveOrganization({ resourceName }: LeaveOrganizationProps) {
           title='Leave organization'
           description='Are you sure you want to leave this organization? You will lose access to this organization and its applications.'
           primaryActionLabel='Leave organization'
-          resourceName={resourceName}
-          onDelete={handleDelete}
+          resourceName={organization.name}
+          onDelete={handleLeave}
           isDeleting={isDeleting}
         />
       </Box>
