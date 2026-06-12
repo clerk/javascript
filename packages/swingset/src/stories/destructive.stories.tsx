@@ -13,7 +13,14 @@ export const meta: StoryMeta = {
 };
 
 function DestructiveTrigger(props: Omit<HTMLAttributes<HTMLElement>, 'color'>) {
-  return <Button {...props}>Leave organization</Button>;
+  return (
+    <Button
+      {...props}
+      color='destructive'
+    >
+      Leave organization
+    </Button>
+  );
 }
 
 export function Default() {

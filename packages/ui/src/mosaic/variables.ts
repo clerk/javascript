@@ -9,6 +9,8 @@ export const defaultMosaicVariables = Object.freeze({
     primaryForeground: 'light-dark(oklch(0.985 0 0), oklch(0.205 0 0))',
     destructive: 'light-dark(oklch(0.577 0.245 27.325), oklch(0.637 0.237 25.331))',
     destructiveForeground: 'oklch(0.985 0 0)',
+    muted: 'light-dark(oklch(0.97 0 0), oklch(0.269 0 0))',
+    mutedForeground: 'light-dark(oklch(0.556 0 0), oklch(0.708 0 0))',
   },
   spacing: '0.25rem',
   rounded: {
@@ -25,6 +27,12 @@ export const defaultMosaicVariables = Object.freeze({
     lg: { fontSize: '1.125rem', lineHeight: 'calc(1.75 / 1.125)' },
     xl: { fontSize: '1.25rem', lineHeight: 'calc(1.75 / 1.25)' },
     '2xl': { fontSize: '1.5rem', lineHeight: 'calc(2 / 1.5)' },
+  },
+  font: {
+    normal: 400,
+    medium: 500,
+    semibold: 600,
+    bold: 700,
   },
 } as const);
 

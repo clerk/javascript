@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import type { HTMLAttributes } from 'react';
 
+import { Box } from '../components/box';
 import { Button } from '../components/button';
 import { Dialog } from '../components/dialog';
 import { Input } from '../components/input';
@@ -9,7 +10,9 @@ interface DestructiveProps {
   trigger: (props: Omit<HTMLAttributes<HTMLElement>, 'color'>) => React.ReactNode;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  resourceType: string;
+  title: string;
+  description: string;
+  primaryActionLabel: string;
   resourceName: string;
   onDelete: () => void | Promise<void>;
   isDeleting: boolean;
@@ -19,7 +22,9 @@ export function Destructive({
   trigger,
   open,
   onOpenChange,
-  resourceType,
+  title,
+  description,
+  primaryActionLabel,
   resourceName,
   onDelete,
   isDeleting,
@@ -46,32 +51,50 @@ export function Destructive({
         <Dialog.Backdrop />
         <Dialog.Viewport>
           <Dialog.Popup>
-            <Dialog.Title>Leave {resourceType}</Dialog.Title>
-            <Dialog.Description>
-              Are you sure you want to leave this {resourceType}? You will lose access to this {resourceType} and its
-              applications.
-            </Dialog.Description>
-            <form
-              onSubmit={handleSubmit}
-              style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
+            <Dialog.Title>{title}</Dialog.Title>
+            <Dialog.Description>{description}</Dialog.Description>
+            <Box
+              render={p => (
+                <form
+                  {...p}
+                  onSubmit={handleSubmit}
+                />
+              )}
+              sx={t => ({
+                marginBlockStart: t.spacing(3),
+              })}
             >
-              <label>
+              <Box
+                render={p => <label {...p} />}
+                sx={t => ({
+                  ...t.text('sm'),
+                  fontWeight: t.font.medium,
+                })}
+              >
                 Type &quot;{resourceName}&quot; below to continue.
                 <Input
                   value={confirmValue}
                   onChange={e => setConfirmValue(e.target.value)}
                   disabled={isDeleting}
+                  sx={t => ({
+                    marginBlockStart: t.spacing(1),
+                  })}
                 />
-              </label>
-              <Button
-                type='submit'
-                color='destructive'
-                disabled={!canSubmit}
-                sx={{ alignSelf: 'flex-start' }}
+              </Box>
+              <Box
+                sx={t => ({
+                  marginBlockStart: t.spacing(4),
+                })}
               >
-                {isDeleting ? 'Leaving…' : `Leave ${resourceType}`}
-              </Button>
-            </form>
+                <Button
+                  type='submit'
+                  color='destructive'
+                  disabled={!canSubmit}
+                >
+                  {primaryActionLabel}
+                </Button>
+              </Box>
+            </Box>
           </Dialog.Popup>
         </Dialog.Viewport>
       </Dialog.Portal>

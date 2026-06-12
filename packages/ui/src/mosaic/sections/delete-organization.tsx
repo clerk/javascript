@@ -1,13 +1,14 @@
 import { useState } from 'react';
 
+import { Box } from '../components/box';
 import { Button } from '../components/button';
 import { Destructive } from '../block/destructive';
 
 interface DeleteOrganizationProps {
-  organizationName: string;
+  resourceName: string;
 }
 
-export function DeleteOrganization({ organizationName }: DeleteOrganizationProps) {
+export function DeleteOrganization({ resourceName }: DeleteOrganizationProps) {
   const [open, setOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -19,25 +20,68 @@ export function DeleteOrganization({ organizationName }: DeleteOrganizationProps
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.5rem' }}>
-      <h2 style={{ fontWeight: 700 }}>Delete organization</h2>
-      <p>Your organization will be permanently deleted and all members will lose access</p>
-      <Destructive
-        trigger={props => (
-          <Button
-            color='destructive'
-            {...props}
+    <Box
+      sx={t => ({
+        width: '100%',
+        containerType: 'inline-size',
+      })}
+    >
+      <Box
+        sx={t => ({
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          columnGap: t.spacing(10),
+          rowGap: t.spacing(4),
+          '@container (min-width: 600px)': {
+            flexDirection: 'row',
+          },
+        })}
+      >
+        <Box>
+          <Box
+            render={p => <h2 {...p} />}
+            sx={t => ({
+              ...t.text('base'),
+              fontWeight: t.font.semibold,
+            })}
           >
             Delete organization
-          </Button>
-        )}
-        open={open}
-        onOpenChange={setOpen}
-        resourceType='organization'
-        resourceName={organizationName}
-        onDelete={handleDelete}
-        isDeleting={isDeleting}
-      />
-    </div>
+          </Box>
+          <Box
+            render={p => <p {...p} />}
+            sx={t => ({
+              ...t.text('sm'),
+              textWrap: 'balance',
+              marginBlockStart: t.spacing(1),
+              color: t.color.mutedForeground,
+            })}
+          >
+            Your organization will be permanently deleted and all members will lose access
+          </Box>
+        </Box>
+        <Destructive
+          trigger={props => (
+            <Button
+              color='destructive'
+              {...props}
+              sx={{
+                flexShrink: 0,
+              }}
+            >
+              Delete organization
+            </Button>
+          )}
+          open={open}
+          onOpenChange={setOpen}
+          title='Delete organization'
+          description='Are you sure you want to delete this organization?'
+          resourceName={resourceName}
+          primaryActionLabel='Delete organization'
+          onDelete={handleDelete}
+          isDeleting={isDeleting}
+        />
+      </Box>
+    </Box>
   );
 }
