@@ -51,15 +51,15 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
       Self.configuredPublishableKey = publishableKey
       startClientObserver(reset: true)
 
-      try await Self.syncTokenState(bearerToken: bearerToken)
-      await Self.waitForLoadedSession()
+      let shouldWaitForSession = try await Self.syncTokenState(bearerToken: bearerToken)
+      await Self.waitForLoadedSessionIfNeeded(shouldWaitForSession)
       return
     }
 
     if Self.clerkConfigured {
       startClientObserver()
-      try await Self.syncTokenState(bearerToken: bearerToken)
-      await Self.waitForLoadedSession()
+      let shouldWaitForSession = try await Self.syncTokenState(bearerToken: bearerToken)
+      await Self.waitForLoadedSessionIfNeeded(shouldWaitForSession)
       return
     }
 
@@ -68,8 +68,8 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
     Clerk.configure(publishableKey: publishableKey, options: Self.makeClerkOptions())
     startClientObserver()
 
-    try await Self.syncTokenState(bearerToken: bearerToken)
-    await Self.waitForLoadedSession()
+    let shouldWaitForSession = try await Self.syncTokenState(bearerToken: bearerToken)
+    await Self.waitForLoadedSessionIfNeeded(shouldWaitForSession)
   }
 
   @MainActor
@@ -103,9 +103,13 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
     }
   }
 
-  private static func syncTokenState(bearerToken: String?) async throws {
-    guard let token = bearerToken, !token.isEmpty else { return }
+  @MainActor
+  private static func syncTokenState(bearerToken: String?) async throws -> Bool {
+    guard let token = bearerToken, !token.isEmpty else {
+      return Clerk.shared.deviceToken != nil
+    }
     _ = try await Clerk.shared.updateDeviceToken(token)
+    return true
   }
 
   private static func shouldReconfigure(for publishableKey: String) -> Bool {
@@ -133,6 +137,12 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
   }
 
   @MainActor
+  private static func waitForLoadedSessionIfNeeded(_ shouldWait: Bool) async {
+    guard shouldWait else { return }
+    await waitForLoadedSession()
+  }
+
+  @MainActor
   public func getClientToken() async -> String? {
     guard Self.clerkConfigured else { return nil }
     return Clerk.shared.deviceToken
@@ -145,7 +155,9 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
     dismissible: Bool,
     onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
   ) -> UIViewController? {
-    makeHostingController(
+    guard Self.clerkConfigured else { return nil }
+
+    return makeHostingController(
       rootView: ClerkInlineAuthWrapperView(
         mode: Self.authMode(from: mode),
         dismissible: dismissible,
@@ -160,7 +172,9 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
     dismissible: Bool,
     onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
   ) -> UIViewController? {
-    makeHostingController(
+    guard Self.clerkConfigured else { return nil }
+
+    return makeHostingController(
       rootView: ClerkInlineProfileWrapperView(
         dismissible: dismissible,
         lightTheme: lightTheme,
@@ -171,7 +185,9 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
   }
 
   public func makeUserButtonViewController() -> UIViewController? {
-    makeHostingController(
+    guard Self.clerkConfigured else { return nil }
+
+    return makeHostingController(
       rootView: ClerkInlineUserButtonWrapperView(
         lightTheme: lightTheme,
         darkTheme: darkTheme
