@@ -1,12 +1,11 @@
 // ClerkNativeBridge - Provides app-target Clerk SDK operations and SwiftUI view controllers to ClerkExpo.
 // This file is injected into the app target by the config plugin.
-// It uses `import ClerkKit` (SPM) which is only accessible from the app target.
+// It uses the ClerkKit Swift package, which is only accessible from the app target.
 
 import UIKit
 import SwiftUI
 import Observation
-import Security
-import ClerkKit
+@_spi(FrameworkIntegration) import ClerkKit
 import ClerkKitUI
 import ClerkExpo  // Import the pod to access ClerkNativeBridgeProtocol
 
@@ -27,13 +26,6 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
   private var clientObservationGeneration = 0
   private var lastObservedClient: Client?
 
-  private enum KeychainKey {
-    static let jsClientJWT = "__clerk_client_jwt"
-    static let nativeDeviceToken = "clerkDeviceToken"
-    static let cachedClient = "cachedClient"
-    static let cachedEnvironment = "cachedEnvironment"
-  }
-
   private init() {}
 
   /// Resolves the keychain service name, checking ClerkKeychainService in Info.plist first
@@ -43,11 +35,6 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
       return custom
     }
     return Bundle.main.bundleIdentifier
-  }
-
-  private static var keychain: ExpoKeychain? {
-    guard let service = keychainService, !service.isEmpty else { return nil }
-    return ExpoKeychain(service: service)
   }
 
   // Register this app-target bridge with the ClerkExpo module.
@@ -64,29 +51,15 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
       Self.configuredPublishableKey = publishableKey
       startClientObserver(reset: true)
 
-      Self.syncTokenState(bearerToken: bearerToken)
-      if !(bearerToken?.isEmpty ?? true) {
-        _ = try? await Clerk.shared.refreshClient()
-      }
-
-      await Self.waitForLoadedSession()
-      return
-    }
-
-    Self.syncTokenState(bearerToken: bearerToken)
-
-    // If already configured with a new bearer token, refresh the client
-    // to pick up the session associated with the device token we just wrote.
-    // Clerk.configure() is idempotent for the same publishable key, so use refreshClient().
-    if Self.shouldRefreshConfiguredClient(for: bearerToken) {
-      startClientObserver()
-      _ = try? await Clerk.shared.refreshClient()
+      try await Self.syncTokenState(bearerToken: bearerToken)
       await Self.waitForLoadedSession()
       return
     }
 
     if Self.clerkConfigured {
       startClientObserver()
+      try await Self.syncTokenState(bearerToken: bearerToken)
+      await Self.waitForLoadedSession()
       return
     }
 
@@ -95,6 +68,7 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
     Clerk.configure(publishableKey: publishableKey, options: Self.makeClerkOptions())
     startClientObserver()
 
+    try await Self.syncTokenState(bearerToken: bearerToken)
     await Self.waitForLoadedSession()
   }
 
@@ -129,30 +103,9 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
     }
   }
 
-  private static func syncTokenState(bearerToken: String?) {
-    // Sync JS SDK's client token to native keychain so both SDKs share the same client.
-    // This handles the case where the user signed in via JS SDK but the native SDK
-    // has no device token (e.g., after app reinstall or first launch).
-    if let token = bearerToken, !token.isEmpty {
-      let existingToken = readNativeDeviceToken()
-      writeNativeDeviceToken(token)
-
-      // If the device token changed (or didn't exist), clear stale cached client/environment.
-      // A previous launch may have cached an anonymous client (no device token), and the
-      // SDK would send both the new device token AND the stale client ID in API requests,
-      // causing a 400 error. Clearing the cache forces a fresh client fetch using only
-      // the device token.
-      if existingToken != token {
-        clearCachedClerkData()
-      }
-      return
-    }
-
-    syncJSTokenToNativeKeychainIfNeeded()
-  }
-
-  private static func shouldRefreshConfiguredClient(for bearerToken: String?) -> Bool {
-    clerkConfigured && !(bearerToken?.isEmpty ?? true)
+  private static func syncTokenState(bearerToken: String?) async throws {
+    guard let token = bearerToken, !token.isEmpty else { return }
+    _ = try await Clerk.shared.updateDeviceToken(token)
   }
 
   private static func shouldReconfigure(for publishableKey: String) -> Bool {
@@ -179,39 +132,9 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
     }
   }
 
-  /// Copies the JS SDK's client JWT from expo-secure-store to the native SDK's
-  /// keychain entry, but only if the native SDK doesn't already have a device token.
-  /// Both expo-secure-store and the native Clerk SDK use the iOS Keychain with the
-  /// bundle identifier as the service name, making cross-SDK token sharing possible.
-  private static func syncJSTokenToNativeKeychainIfNeeded() {
-    guard let keychain else { return }
-    guard keychain.string(forKey: KeychainKey.nativeDeviceToken) == nil else { return }
-    guard let jsToken = keychain.string(forKey: KeychainKey.jsClientJWT), !jsToken.isEmpty else { return }
-
-    keychain.set(jsToken, forKey: KeychainKey.nativeDeviceToken)
-  }
-
-  /// Reads the native device token from keychain, if present.
-  private static func readNativeDeviceToken() -> String? {
-    keychain?.string(forKey: KeychainKey.nativeDeviceToken)
-  }
-
-  /// Clears stale cached client and environment data from keychain.
-  /// This prevents the native SDK from loading a stale anonymous client
-  /// during initialization, which would conflict with a newly-synced device token.
-  private static func clearCachedClerkData() {
-    keychain?.delete(KeychainKey.cachedClient)
-    keychain?.delete(KeychainKey.cachedEnvironment)
-  }
-
-  /// Writes the provided bearer token as the native SDK's device token.
-  /// If the native SDK already has a device token, it is updated with the new value.
-  private static func writeNativeDeviceToken(_ token: String) {
-    keychain?.set(token, forKey: KeychainKey.nativeDeviceToken)
-  }
-
   public func getClientToken() -> String? {
-    Self.readNativeDeviceToken()
+    guard Self.clerkConfigured else { return nil }
+    return Clerk.shared.deviceToken
   }
 
   // MARK: - Inline View Creation
@@ -407,61 +330,6 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
     }
 
     return payload
-  }
-}
-
-private struct ExpoKeychain {
-  private let service: String
-
-  init(service: String) {
-    self.service = service
-  }
-
-  func string(forKey key: String) -> String? {
-    guard let data = data(forKey: key) else { return nil }
-    return String(data: data, encoding: .utf8)
-  }
-
-  func set(_ value: String, forKey key: String) {
-    guard let data = value.data(using: .utf8) else { return }
-
-    var addQuery = baseQuery(for: key)
-    addQuery[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
-    addQuery[kSecValueData as String] = data
-
-    let status = SecItemAdd(addQuery as CFDictionary, nil)
-    if status == errSecDuplicateItem {
-      let attributes: [String: Any] = [
-        kSecValueData as String: data,
-        kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
-      ]
-      SecItemUpdate(baseQuery(for: key) as CFDictionary, attributes as CFDictionary)
-    }
-  }
-
-  func delete(_ key: String) {
-    SecItemDelete(baseQuery(for: key) as CFDictionary)
-  }
-
-  private func data(forKey key: String) -> Data? {
-    var query = baseQuery(for: key)
-    query[kSecReturnData as String] = true
-    query[kSecMatchLimit as String] = kSecMatchLimitOne
-
-    var result: CFTypeRef?
-    guard SecItemCopyMatching(query as CFDictionary, &result) == errSecSuccess else {
-      return nil
-    }
-
-    return result as? Data
-  }
-
-  private func baseQuery(for key: String) -> [String: Any] {
-    [
-      kSecClass as String: kSecClassGenericPassword,
-      kSecAttrService as String: service,
-      kSecAttrAccount as String: key,
-    ]
   }
 }
 

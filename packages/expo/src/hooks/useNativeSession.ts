@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { ClerkExpoModule as ClerkExpo, isNativeSupported } from '../utils/native-module';
+import { addNativeSessionListener } from './nativeSessionEvents';
 
 // Native session data structure (normalized)
 interface NativeSessionData {
@@ -114,7 +115,13 @@ export function useNativeSession(): UseNativeSessionReturn {
 
   // Check native session on mount
   useEffect(() => {
-    refresh();
+    void refresh();
+  }, [refresh]);
+
+  useEffect(() => {
+    return addNativeSessionListener(() => {
+      void refresh();
+    });
   }, [refresh]);
 
   return {
