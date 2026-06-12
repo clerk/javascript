@@ -46,11 +46,12 @@ const ConnectMenuButton = (props: { strategy: OAuthStrategy; onClick?: () => voi
     // TODO: Decide if we should keep using this strategy
     // If yes, refactor and cleanup:
     card.setLoading(strategy);
+    const transport = clerk.__internal_oauthTransport;
     try {
-      if (clerk.__internal_oauthTransport) {
-        const res = await createExternalAccount(String(await clerk.__internal_oauthTransport.getRedirectUrl()));
+      if (transport) {
+        const res = await createExternalAccount(String(await transport.getRedirectUrl()));
         const url = getExternalVerificationRedirectURL(res);
-        const { callbackUrl } = await clerk.__internal_oauthTransport.open(url);
+        const { callbackUrl } = await transport.open(url);
         await reloadUserAfterOAuthCallback(user, callbackUrl);
         void sleep(2000).then(() => card.setIdle(strategy));
         return;

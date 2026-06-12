@@ -129,10 +129,9 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
     : fallbackErrorMessage;
 
   const reconnect = async () => {
+    const transport = clerk.__internal_oauthTransport;
     try {
-      const redirectUrl = clerk.__internal_oauthTransport
-        ? String(await clerk.__internal_oauthTransport.getRedirectUrl())
-        : window.location.href;
+      const redirectUrl = transport ? String(await transport.getRedirectUrl()) : window.location.href;
       const decoratedRedirectUrl = isModal ? appendModalState({ url: redirectUrl, componentName }) : redirectUrl;
       let response: ExternalAccountResource | undefined;
       if (reauthorizationRequired) {
@@ -142,8 +141,8 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
       }
 
       const url = getExternalVerificationRedirectURL(response);
-      if (clerk.__internal_oauthTransport) {
-        const { callbackUrl } = await clerk.__internal_oauthTransport.open(url);
+      if (transport) {
+        const { callbackUrl } = await transport.open(url);
         await reloadUserAfterOAuthCallback(user, callbackUrl);
         return;
       }
