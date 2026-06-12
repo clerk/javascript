@@ -13,6 +13,9 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   aio: {
     'organization-profile': dynamic(() => import('../stories/organization-profile.mdx')),
   },
+  panels: {
+    'organization-profile-general': dynamic(() => import('../stories/organization-profile-general.mdx')),
+  },
   sections: {
     'leave-organization': dynamic(() => import('../stories/leave-organization.mdx')),
     'delete-organization': dynamic(() => import('../stories/delete-organization.mdx')),

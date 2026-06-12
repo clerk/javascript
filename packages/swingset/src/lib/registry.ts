@@ -23,6 +23,10 @@ import {
 } from '../stories/leave-organization.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
 import {
+  Default as OrganizationProfileGeneralDefault,
+  meta as organizationProfileGeneralMeta,
+} from '../stories/organization-profile-general.stories';
+import {
   Default as OrganizationProfileDefault,
   meta as organizationProfileMeta,
 } from '../stories/organization-profile.stories';
@@ -38,6 +42,10 @@ const destructiveModule: StoryModule = { meta: destructiveMeta, Default: Destruc
 const leaveOrganizationModule: StoryModule = { meta: leaveOrganizationMeta, Default: LeaveOrganizationDefault };
 const deleteOrganizationModule: StoryModule = { meta: deleteOrganizationMeta, Default: DeleteOrganizationDefault };
 const organizationProfileModule: StoryModule = { meta: organizationProfileMeta, Default: OrganizationProfileDefault };
+const organizationProfileGeneralModule: StoryModule = {
+  meta: organizationProfileGeneralMeta,
+  Default: OrganizationProfileGeneralDefault,
+};
 
 const buttonModule: StoryModule = { meta: buttonMeta, Primary, Sizes, Disabled };
 
@@ -63,6 +71,8 @@ const tooltipModule: StoryModule = { meta: tooltipMeta };
 export const registry: StoryModule[] = [
   // AIO
   organizationProfileModule,
+  // Panels
+  organizationProfileGeneralModule,
   // Sections
   leaveOrganizationModule,
   deleteOrganizationModule,

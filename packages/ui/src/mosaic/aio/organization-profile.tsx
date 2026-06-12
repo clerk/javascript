@@ -1,8 +1,6 @@
 import { Box } from '../components/box';
 import { Tabs } from '../components/tabs';
-import { DeleteOrganization } from '../sections/delete-organization';
-import { LeaveOrganization } from '../sections/leave-organization';
-import { alpha } from '../utils';
+import { OrganizationProfileGeneral } from '../panels/organization-profile-general';
 
 export function OrganizationProfile() {
   return (
@@ -27,15 +25,7 @@ export function OrganizationProfile() {
           <Tabs.Tab value='members'>Members</Tabs.Tab>
         </Tabs.List>
         <Tabs.Panel value='general'>
-          <LeaveOrganization />
-          <Box
-            sx={t => ({
-              height: '1px',
-              background: alpha('#000', 10),
-              marginBlock: t.spacing(4),
-            })}
-          />
-          <DeleteOrganization />
+          <OrganizationProfileGeneral />
         </Tabs.Panel>
         <Tabs.Panel value='members'>
           <Box
