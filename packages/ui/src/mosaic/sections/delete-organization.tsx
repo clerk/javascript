@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import { Box } from '../components/box';
 import { Button } from '../components/button';
+import { SectionSkeleton } from '../components/section-skeleton';
 import { Destructive } from '../block/destructive';
 import { useOrganization } from '../mock/use-organization';
 
@@ -11,7 +12,7 @@ export function DeleteOrganization() {
   const [isDeleting, setIsDeleting] = useState(false);
 
   if (!isLoaded || !organization) {
-    return <Box sx={t => ({ ...t.text('sm'), color: t.color.mutedForeground })}>Loading…</Box>;
+    return <SectionSkeleton />;
   }
 
   const handleDelete = async () => {
