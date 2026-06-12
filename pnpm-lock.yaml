@@ -1086,9 +1086,6 @@ importers:
       '@swc/helpers':
         specifier: catalog:repo
         version: 0.5.21
-      alien-signals:
-        specifier: 2.0.6
-        version: 2.0.6
       copy-to-clipboard:
         specifier: 3.3.3
         version: 3.3.3
@@ -1141,6 +1138,9 @@ importers:
       '@types/webpack-env':
         specifier: ^1.18.8
         version: 1.18.8
+      alien-signals:
+        specifier: 2.0.6
+        version: 2.0.6
       bundlewatch:
         specifier: ^0.4.2
         version: 0.4.2
