@@ -1,5 +1,4 @@
-import { Suspense } from 'react';
-
+import { ClientSuspense } from '../components/client-suspense';
 import { Box } from '../components/box';
 import { SectionSkeleton } from '../components/section-skeleton';
 import { Tabs } from '../components/tabs';
@@ -32,9 +31,9 @@ export function OrganizationProfile() {
           <OrganizationProfileGeneral />
         </Tabs.Panel>
         <Tabs.Panel value='members'>
-          <Suspense fallback={<SectionSkeleton />}>
+          <ClientSuspense fallback={<SectionSkeleton />}>
             <OrganizationMembers />
-          </Suspense>
+          </ClientSuspense>
         </Tabs.Panel>
       </Tabs.Root>
     </Box>

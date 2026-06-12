@@ -1,5 +1,4 @@
-import { Suspense } from 'react';
-
+import { ClientSuspense } from '../components/client-suspense';
 import { Box } from '../components/box';
 import { SectionSkeleton } from '../components/section-skeleton';
 import { DeleteOrganization } from '../sections/delete-organization';
@@ -28,7 +27,7 @@ export function OrganizationProfileGeneral() {
     >
       {/* One boundary owns loading for the whole panel — both sections suspend on the shared
           org-hydration promise and resume on the same tick, no per-section `isLoaded` branch. */}
-      <Suspense
+      <ClientSuspense
         fallback={
           <>
             <SectionSkeleton />
@@ -40,7 +39,7 @@ export function OrganizationProfileGeneral() {
         <LeaveOrganization />
         <Divider />
         <DeleteOrganization />
-      </Suspense>
+      </ClientSuspense>
     </Box>
   );
 }
