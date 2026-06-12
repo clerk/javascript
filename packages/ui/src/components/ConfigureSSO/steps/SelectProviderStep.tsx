@@ -60,7 +60,7 @@ export const SelectProviderStep = (): JSX.Element => {
     enterpriseConnectionMutations: { createConnection },
     organizationDomains,
   } = useConfigureSSO();
-  const { goNext } = useWizard();
+  const { goNext, goPrev } = useWizard();
 
   const [selected, setSelected] = React.useState<ProviderType | null>(c.provider ?? null);
   const card = useCardState();
@@ -164,7 +164,7 @@ export const SelectProviderStep = (): JSX.Element => {
         </Step.Body>
 
         <Step.Footer>
-          <Step.Footer.Previous isDisabled />
+          <Step.Footer.Previous onClick={() => goPrev()} />
 
           <Step.Footer.Continue
             onClick={handleContinue}

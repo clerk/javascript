@@ -142,9 +142,12 @@ function useOrganizationDomains(params: UseOrganizationDomainsParams = {}): UseO
   // Poll `attempt_ownership_verification` for the outstanding unverified domains
   // until none remain.
   useEffect(() => {
-    if (!queryEnabled || !organization || unverifiedOwnershipDomainIds.length === 0) {
+    if (!queryEnabled || !organization || !unverifiedOwnershipKey) {
       return;
     }
+
+    // These ids are, by construction, the domains that are currently unverified.
+    const domainIds = unverifiedOwnershipKey.split(',');
 
     let cancelled = false;
     let timeoutId: ReturnType<typeof setTimeout>;
@@ -154,25 +157,29 @@ function useOrganizationDomains(params: UseOrganizationDomainsParams = {}): UseO
     };
 
     const runAttempt = async () => {
-      const result = await organization
-        .attemptOwnershipVerification(unverifiedOwnershipDomainIds)
-        .catch((error: unknown) => {
-          logger.warnOnce(`Clerk: failed to attempt organization domain ownership verification: ${error}`);
-          return undefined;
-        });
+      const result = await organization.attemptOwnershipVerification(domainIds).catch((error: unknown) => {
+        logger.warnOnce(`Clerk: failed to attempt organization domain ownership verification: ${error}`);
+        return undefined;
+      });
       if (cancelled) {
         return;
       }
 
-      const hasNewlyVerified = result?.data.some(domain => domain.ownershipVerification?.status === 'verified');
-      if (hasNewlyVerified) {
-        await revalidate();
+      // Refetch the domains list after every attempt so the UI reflects the
+      // latest ownership status.
+      await revalidate();
+      if (cancelled) {
         return;
       }
 
-      if (!cancelled) {
-        scheduleNext();
+      // Stop polling once every domain in the attempt response is verified
+      const allVerified =
+        !!result?.data.length && result.data.every(domain => domain.ownershipVerification?.status === 'verified');
+      if (allVerified) {
+        return;
       }
+
+      scheduleNext();
     };
 
     scheduleNext();
@@ -181,7 +188,8 @@ function useOrganizationDomains(params: UseOrganizationDomainsParams = {}): UseO
       cancelled = true;
       clearTimeout(timeoutId);
     };
-  }, [unverifiedOwnershipKey, unverifiedOwnershipDomainIds, queryEnabled, organization, revalidate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [unverifiedOwnershipKey, queryEnabled]);
 
   return {
     data: response?.data,
