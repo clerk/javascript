@@ -182,8 +182,23 @@ describe('Electron ClerkProvider', () => {
 
     expect(request.credentials).toBe('omit');
     expect(request.url.searchParams.get('_is_native')).toBe('1');
+    expect(request.url.searchParams.get('_electron_sdk_version')).toBe('0.0.0-test');
     expect(request.headers.get('Authorization')).toBe('Bearer client-jwt');
     expect(tokenCache.getToken).toHaveBeenCalledWith('__clerk_client_jwt');
+  });
+
+  it('adds the Electron SDK version query param when there is no cached token', async () => {
+    tokenCache.getToken.mockResolvedValue(null);
+    renderToStaticMarkup(<ClerkProvider publishableKey='pk_test_version_header'>App</ClerkProvider>);
+
+    const request = {
+      headers: new Headers(),
+      url: new URL('https://api.clerk.test/v1/client'),
+    };
+    await beforeRequest?.(request);
+
+    expect(request.url.searchParams.get('_electron_sdk_version')).toBe('0.0.0-test');
+    expect(request.headers.has('Authorization')).toBe(false);
   });
 
   it('stores Authorization response headers in the Electron token cache', async () => {
