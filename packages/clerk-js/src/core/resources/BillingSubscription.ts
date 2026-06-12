@@ -2,9 +2,11 @@ import type {
   BillingCredits,
   BillingMoneyAmount,
   BillingSubscriptionItemJSON,
+  BillingSubscriptionItemNextPayment,
   BillingSubscriptionItemResource,
   BillingSubscriptionItemSeats,
   BillingSubscriptionJSON,
+  BillingSubscriptionNextPayment,
   BillingSubscriptionPlanPeriod,
   BillingSubscriptionResource,
   BillingSubscriptionStatus,
@@ -14,7 +16,13 @@ import type {
 
 import { unixEpochToDate } from '@/utils/date';
 
-import { billingCreditsFromJSON, billingMoneyAmountFromJSON } from '../../utils';
+import {
+  billingCreditsFromJSON,
+  billingMoneyAmountFromJSON,
+  billingPerUnitTotalTierFromJSON,
+  billingSubscriptionItemNextPaymentFromJSON,
+  billingSubscriptionNextPaymentFromJSON,
+} from '../../utils';
 import { Billing } from '../modules/billing/namespace';
 import { BaseResource, BillingPlan, DeletedObject } from './internal';
 
@@ -25,10 +33,7 @@ export class BillingSubscription extends BaseResource implements BillingSubscrip
   createdAt!: Date;
   pastDueAt!: Date | null;
   updatedAt!: Date | null;
-  nextPayment?: {
-    amount: BillingMoneyAmount;
-    date: Date;
-  };
+  nextPayment?: BillingSubscriptionNextPayment | null;
   subscriptionItems!: BillingSubscriptionItemResource[];
   eligibleForFreeTrial!: boolean;
 
@@ -49,12 +54,12 @@ export class BillingSubscription extends BaseResource implements BillingSubscrip
     this.activeAt = unixEpochToDate(data.active_at);
     this.pastDueAt = data.past_due_at ? unixEpochToDate(data.past_due_at) : null;
 
-    if (data.next_payment) {
-      this.nextPayment = {
-        amount: billingMoneyAmountFromJSON(data.next_payment.amount),
-        date: unixEpochToDate(data.next_payment.date),
-      };
-    }
+    this.nextPayment =
+      data.next_payment === undefined
+        ? undefined
+        : data.next_payment === null
+          ? null
+          : billingSubscriptionNextPaymentFromJSON(data.next_payment);
 
     this.subscriptionItems = (data.subscription_items || []).map(item => new BillingSubscriptionItem(item));
     this.eligibleForFreeTrial = this.withDefault(data.eligible_for_free_trial, false);
@@ -66,6 +71,7 @@ export class BillingSubscriptionItem extends BaseResource implements BillingSubs
   id!: string;
   plan!: BillingPlan;
   planPeriod!: BillingSubscriptionPlanPeriod;
+  priceId!: string;
   status!: BillingSubscriptionStatus;
   createdAt!: Date;
   periodStart!: Date;
@@ -79,6 +85,7 @@ export class BillingSubscriptionItem extends BaseResource implements BillingSubs
   };
   seats?: BillingSubscriptionItemSeats;
   credits?: BillingCredits;
+  nextPayment?: BillingSubscriptionItemNextPayment | null;
   isFreeTrial!: boolean;
 
   constructor(data: BillingSubscriptionItemJSON) {
@@ -94,6 +101,7 @@ export class BillingSubscriptionItem extends BaseResource implements BillingSubs
     this.id = data.id;
     this.plan = new BillingPlan(data.plan);
     this.planPeriod = data.plan_period;
+    this.priceId = data.price_id;
     this.status = data.status;
 
     this.createdAt = unixEpochToDate(data.created_at);
@@ -106,9 +114,20 @@ export class BillingSubscriptionItem extends BaseResource implements BillingSubs
     this.amount = data.amount ? billingMoneyAmountFromJSON(data.amount) : undefined;
     this.credit =
       data.credit && data.credit.amount ? { amount: billingMoneyAmountFromJSON(data.credit.amount) } : undefined;
-    this.seats = data.seats ? { quantity: data.seats.quantity } : undefined;
+    this.seats = data.seats
+      ? {
+          quantity: data.seats.quantity,
+          ...(data.seats.tiers ? { tiers: data.seats.tiers.map(billingPerUnitTotalTierFromJSON) } : {}),
+        }
+      : undefined;
 
     this.credits = data.credits ? billingCreditsFromJSON(data.credits) : undefined;
+    this.nextPayment =
+      data.next_payment === undefined
+        ? undefined
+        : data.next_payment === null
+          ? null
+          : billingSubscriptionItemNextPaymentFromJSON(data.next_payment);
 
     this.isFreeTrial = this.withDefault(data.is_free_trial, false);
     return this;

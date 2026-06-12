@@ -1,6 +1,6 @@
-import { useReverification, useSession, useUser } from '@clerk/shared/react';
+import { useReverification, useUser } from '@clerk/shared/react';
 import type { EmailAddressResource } from '@clerk/shared/types';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 import {
   Col,
@@ -16,31 +16,70 @@ import {
 import { useFieldOTP } from '@/elements/CodeControl';
 import { useCardState } from '@/elements/contexts';
 import { Form } from '@/elements/Form';
-import { DuotoneAtSymbol, ExclamationTriangle } from '@/icons';
+import { DuotoneAtSymbol } from '@/icons';
 import { handleError } from '@/utils/errorHandler';
 
-import { useConfigureSSO } from '../ConfigureSSOContext';
+import { connectionBackingEmail } from '../domain/organizationEnterpriseConnection';
 import { Step } from '../elements/Step';
-import { useWizard, Wizard } from '../elements/Wizard';
+import { useWizard, Wizard, type WizardStepConfig } from '../elements/Wizard';
 import { InnerStepCounter } from '../elements/Wizard/InnerStepCounter';
+
+/**
+ * The per-instance refs the two inner sub-step bodies share, carried via context
+ * so the bodies can stay module-scope (stable identity avoids remounting the
+ * active step on every parent render).
+ */
+type VerifyDomainRefs = {
+  emailAddressRef: React.MutableRefObject<EmailAddressResource | undefined>;
+  preExistingEmailIdRef: React.MutableRefObject<string | undefined>;
+};
+
+const VerifyDomainRefsContext = createContext<VerifyDomainRefs | null>(null);
+
+const useVerifyDomainRefs = (): VerifyDomainRefs => {
+  const ctx = useContext(VerifyDomainRefsContext);
+  if (!ctx) {
+    throw new Error('useVerifyDomainRefs called outside of VerifyDomainStep');
+  }
+  return ctx;
+};
+
+const ProvideEmailBody = (): JSX.Element => {
+  const { emailAddressRef, preExistingEmailIdRef } = useVerifyDomainRefs();
+  return (
+    <Step.Body>
+      <ProvideEmailStep
+        emailAddressRef={emailAddressRef}
+        preExistingEmailIdRef={preExistingEmailIdRef}
+      />
+    </Step.Body>
+  );
+};
+
+const EnterVerificationCodeBody = (): JSX.Element | null => {
+  const { emailAddressRef } = useVerifyDomainRefs();
+  return (
+    <Step.Body>
+      <EnterVerificationCodeStep emailAddressRef={emailAddressRef} />
+    </Step.Body>
+  );
+};
+
+// Body-less inner-step graph; the bodies are rendered declaratively via
+// `<Wizard.Match>` below. Each body wraps its content in `Step.Body` and reads
+// its per-instance refs from context.
+const INNER_STEPS: WizardStepConfig[] = [{ id: 'provide-email' }, { id: 'verify-email-address' }];
 
 export const VerifyDomainStep = (): JSX.Element => {
   const { user } = useUser();
-  const { session } = useSession();
-  const { enterpriseConnection } = useConfigureSSO();
   const { t } = useLocalizations();
-  const { goNext: outerGoNext } = useWizard();
+  // The nested provide-email → verify-email <Wizard> bubbles its final `goNext`
+  // up to this top-level wizard; the already-verified branch advances it
+  // directly via `completeStep`.
+  const { goNext: completeStep } = useWizard();
 
-  const emailToVerify =
-    user?.primaryEmailAddress ?? user?.emailAddresses?.find(e => e.verification.status !== 'verified');
+  const emailToVerify = connectionBackingEmail(user);
   const isVerified = emailToVerify?.verification.status === 'verified';
-
-  // The user's domain is already wired to an enterprise connection that
-  // doesn't belong to the org they're currently configuring
-  const activeOrganizationId = session?.lastActiveOrganizationId ?? null;
-  const isDomainTakenByOtherOrg = Boolean(
-    isVerified && enterpriseConnection && enterpriseConnection.organizationId !== activeOrganizationId,
-  );
 
   const wasVerifiedOnMountRef = useRef(isVerified);
   const emailAddressRef = useRef<EmailAddressResource | undefined>(emailToVerify);
@@ -49,52 +88,12 @@ export const VerifyDomainStep = (): JSX.Element => {
     emailToVerify ? 'verify-email-address' : 'provide-email',
   );
 
-  if (isDomainTakenByOtherOrg) {
-    const conflictingDomain = enterpriseConnection?.domains[0] as string;
-
-    return (
-      <Flow.Part part='verifyDomain'>
-        <Step>
-          <Col
-            elementDescriptor={descriptors.configureSSOVerifyDomainErrorRoot}
-            justify='center'
-            align='center'
-            sx={t => ({ gap: t.space.$3, alignItems: 'center', flex: 1 })}
-          >
-            <Icon
-              elementDescriptor={descriptors.configureSSOVerifyDomainErrorIcon}
-              icon={ExclamationTriangle}
-              sx={t => ({
-                width: t.sizes.$8,
-                height: t.sizes.$8,
-                color: t.colors.$neutralAlpha600,
-              })}
-            />
-            <Col
-              gap={1}
-              sx={t => ({ textAlign: 'center', maxWidth: t.sizes.$94 })}
-            >
-              <Heading
-                elementDescriptor={descriptors.configureSSOVerifyDomainErrorTitle}
-                textVariant='h1'
-                sx={t => ({ fontSize: t.fontSizes.$lg, textWrap: 'balance' })}
-                localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.domainTaken.title', {
-                  domain: conflictingDomain,
-                })}
-              />
-              <Text
-                elementDescriptor={descriptors.configureSSOVerifyDomainErrorSubtitle}
-                as='p'
-                variant='body'
-                colorScheme='secondary'
-                localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.domainTaken.subtitle')}
-              />
-            </Col>
-          </Col>
-        </Step>
-      </Flow.Part>
-    );
-  }
+  // Memoized so the provider value identity is stable; declared before the
+  // early returns to keep the hook order unconditional.
+  const refs = React.useMemo<VerifyDomainRefs>(
+    () => ({ emailAddressRef, preExistingEmailIdRef }),
+    [emailAddressRef, preExistingEmailIdRef],
+  );
 
   if (wasVerifiedOnMountRef.current && emailToVerify?.emailAddress) {
     return (
@@ -119,8 +118,7 @@ export const VerifyDomainStep = (): JSX.Element => {
           </Step.Body>
 
           <Step.Footer>
-            <Step.Footer.Reset />
-            <Step.Footer.Continue onClick={() => outerGoNext()} />
+            <Step.Footer.Continue onClick={completeStep} />
           </Step.Footer>
         </Step>
       </Flow.Part>
@@ -133,27 +131,25 @@ export const VerifyDomainStep = (): JSX.Element => {
         elementDescriptor={descriptors.configureSSOStep}
         elementId={descriptors.configureSSOStep.setId('verify-domain')}
       >
-        <Wizard initialStepId={initialInnerStepIdRef.current}>
-          <Step.Header
-            title={t(localizationKeys('configureSSO.verifyEmailDomainStep.title'))}
-            description={t(localizationKeys('configureSSO.verifyEmailDomainStep.subtitle'))}
+        <VerifyDomainRefsContext.Provider value={refs}>
+          <Wizard
+            initialStepId={initialInnerStepIdRef.current}
+            steps={INNER_STEPS}
           >
-            <InnerStepCounter />
-          </Step.Header>
-
-          <Step.Body>
-            <Wizard.Step id='provide-email'>
-              <ProvideEmailStep
-                emailAddressRef={emailAddressRef}
-                preExistingEmailIdRef={preExistingEmailIdRef}
-              />
-            </Wizard.Step>
-
-            <Wizard.Step id='verify-email-address'>
-              <EnterVerificationCodeStep emailAddressRef={emailAddressRef} />
-            </Wizard.Step>
-          </Step.Body>
-        </Wizard>
+            <Step.Header
+              title={t(localizationKeys('configureSSO.verifyEmailDomainStep.title'))}
+              description={t(localizationKeys('configureSSO.verifyEmailDomainStep.subtitle'))}
+            >
+              <InnerStepCounter />
+            </Step.Header>
+            <Wizard.Match id='provide-email'>
+              <ProvideEmailBody />
+            </Wizard.Match>
+            <Wizard.Match id='verify-email-address'>
+              <EnterVerificationCodeBody />
+            </Wizard.Match>
+          </Wizard>
+        </VerifyDomainRefsContext.Provider>
       </Step>
     </Flow.Part>
   );
@@ -173,8 +169,8 @@ export const ProvideEmailStep = ({ emailAddressRef, preExistingEmailIdRef }: Pro
   const { user } = useUser();
   const card = useCardState();
   const { t } = useLocalizations();
-  // Pre-fill with whatever email the parent is currently tracking so navigating back from the
-  // verify step shows the user what they previously submitted instead of an empty field.
+  // Pre-fill from the parent's tracked email so navigating back from the verify
+  // step shows what was previously submitted instead of an empty field.
   const [email, setEmail] = useState(() => emailAddressRef.current?.emailAddress ?? '');
   const createEmailAddress = useReverification((value: string) => user?.createEmailAddress({ email: value }));
 
@@ -189,7 +185,7 @@ export const ProvideEmailStep = ({ emailAddressRef, preExistingEmailIdRef }: Pro
 
     // Same email address as previously submitted, skip the flow
     if (current && normalizeEmail(current.emailAddress) === normalizeEmail(submittedEmail)) {
-      await goNext();
+      goNext();
       return;
     }
 
@@ -212,7 +208,7 @@ export const ProvideEmailStep = ({ emailAddressRef, preExistingEmailIdRef }: Pro
         }
       }
 
-      await goNext();
+      goNext();
     } catch (err) {
       handleError(err as Error, [], card.setError);
     } finally {
@@ -300,7 +296,6 @@ export const ProvideEmailStep = ({ emailAddressRef, preExistingEmailIdRef }: Pro
       </Step.Section>
 
       <Step.Footer>
-        <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
           isDisabled
@@ -418,7 +413,6 @@ export const EnterVerificationCodeStep = ({
       </Step.Section>
 
       <Step.Footer>
-        <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
           isDisabled={!!primaryEmailAddress}

@@ -10,7 +10,7 @@ import type {
   TasksRedirectOptions,
 } from '@clerk/shared/types';
 import type { ClerkUIConstructor } from '@clerk/shared/ui';
-import type { Appearance, ExtractAppearanceType, Ui } from '@clerk/ui/internal';
+import type { Appearance, ExtractAppearanceType } from '@clerk/ui/internal';
 import type React from 'react';
 
 // Re-export types from @clerk/shared that are used by other modules
@@ -32,6 +32,15 @@ declare global {
     __clerk_domain?: Clerk['domain'];
     __internal_ClerkUICtor?: ClerkUIConstructor;
   }
+}
+
+// This is a redeclaration of the Ui type from @clerk/ui/internal, which prevents TypeScript from complaining that
+// there is a type mismatch between the Ui type from @clerk/ui/internal and the bundled Ui type from @clerk/react.
+export interface Ui<A = any> {
+  __brand?: '__clerkUI';
+  ClerkUI?: ClerkUIConstructor | Promise<ClerkUIConstructor>;
+  version?: string;
+  __appearanceType?: A;
 }
 
 /**

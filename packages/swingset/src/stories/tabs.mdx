@@ -1,0 +1,129 @@
+import * as TabsStories from './tabs.stories';
+
+# Tabs
+
+A set of layered sections where one panel is shown at a time, selected from a row of tabs,
+from `@clerk/headless`. It is a **headless** primitive: it supplies behavior, active-tab
+state, roving-tabindex keyboard navigation, an optional position-tracking indicator, and
+ARIA wiring, but ships **no styles** — you bring your own CSS by targeting the `data-cl-*`
+attributes each part emits.
+
+## Example
+
+The demo below is intentionally unstyled — it renders the raw primitive so you can see its
+behavior and ARIA wiring. Click a tab (or focus one and use the arrow keys) to swap the
+visible panel.
+
+<Story
+  name='Default'
+  storyModule={TabsStories}
+/>
+
+## Usage
+
+```tsx
+import { Tabs } from '@clerk/headless/tabs';
+
+<Tabs.Root defaultValue='tab1'>
+  <Tabs.List>
+    <Tabs.Tab value='tab1'>Account</Tabs.Tab>
+    <Tabs.Tab value='tab2'>Security</Tabs.Tab>
+    <Tabs.Indicator />
+  </Tabs.List>
+  <Tabs.Panel value='tab1'>Account content</Tabs.Panel>
+  <Tabs.Panel value='tab2'>Security content</Tabs.Panel>
+</Tabs.Root>;
+```
+
+### Controlled
+
+```tsx
+const [value, setValue] = useState('tab1');
+
+<Tabs.Root
+  value={value}
+  onValueChange={setValue}
+>
+  {/* list + panels */}
+</Tabs.Root>;
+```
+
+## Parts
+
+| Part             | Default Element | Description                                                        |
+| ---------------- | --------------- | ------------------------------------------------------------------ |
+| `Tabs.Root`      | none (context)  | Provides active-value state, orientation, and activation mode      |
+| `Tabs.List`      | `<div>`         | `role="tablist"` container; sets up roving-tabindex navigation     |
+| `Tabs.Tab`       | `<button>`      | A keyboard-navigable tab trigger inside `Tabs.List`                |
+| `Tabs.Trigger`   | `<button>`      | Standalone tab trigger for use outside `Tabs.List` (not roving)    |
+| `Tabs.Panel`     | `<div>`         | `role="tabpanel"`; hidden via the `hidden` attribute when inactive |
+| `Tabs.Indicator` | `<span>`        | Decorative element that tracks the active tab's position and size  |
+
+All rendered parts accept a `render` prop for polymorphic rendering and standard HTML
+attributes for their default element. `Tabs.Root` renders no element of its own.
+
+## Props
+
+### `Tabs.Root`
+
+| Prop                        | Type                                    | Default                   | Description                                           |
+| --------------------------- | --------------------------------------- | ------------------------- | ----------------------------------------------------- |
+| <code>value</code>          | <code>string</code>                     | —                         | Controlled active tab value                           |
+| <code>defaultValue</code>   | <code>string</code>                     | <code>''</code>           | Initial active tab (uncontrolled)                     |
+| <code>onValueChange</code>  | <code>(value: string) => void</code>    | —                         | Called when the active tab changes                    |
+| <code>orientation</code>    | <code>'horizontal' \| 'vertical'</code> | <code>'horizontal'</code> | Arrow-key navigation axis                             |
+| <code>activationMode</code> | <code>'automatic' \| 'manual'</code>    | <code>'automatic'</code>  | `automatic` selects on focus; `manual` on Enter/Space |
+
+### `Tabs.Tab` / `Tabs.Trigger`
+
+| Prop                  | Type                 | Default      | Description                                     |
+| --------------------- | -------------------- | ------------ | ----------------------------------------------- |
+| <code>value</code>    | <code>string</code>  | — (required) | Tab identifier; must match a `Tabs.Panel` value |
+| <code>disabled</code> | <code>boolean</code> | —            | Disable the tab (uses `aria-disabled`)          |
+
+### `Tabs.Panel`
+
+| Prop                          | Type                 | Default      | Description                                                                  |
+| ----------------------------- | -------------------- | ------------ | ---------------------------------------------------------------------------- |
+| <code>value</code>            | <code>string</code>  | — (required) | Must match a `Tabs.Tab` value                                                |
+| <code>shouldForceMount</code> | <code>boolean</code> | —            | Keep the panel in layout flow when inactive (enables enter/exit transitions) |
+
+`Tabs.List` and `Tabs.Indicator` take no additional props beyond standard HTML
+attributes for their default element.
+
+## Styling
+
+Each part emits `data-cl-*` attributes you can target with any CSS solution:
+
+| Attribute                | Applies To   | Description                                                      |
+| ------------------------ | ------------ | ---------------------------------------------------------------- |
+| `data-cl-slot`           | All parts    | Part identifier                                                  |
+| `data-cl-selected`       | Tab, Trigger | Present on the active tab                                        |
+| `data-cl-disabled`       | Tab, Trigger | Present when the tab is disabled                                 |
+| `data-cl-hidden`         | Panel        | Present when the panel is not selected                           |
+| `data-cl-open`           | Panel        | Present while open (force-mounted panels only)                   |
+| `data-cl-closed`         | Panel        | Present while mounted-but-deselected (force-mounted panels only) |
+| `data-cl-starting-style` | Panel        | Enter-animation first frame (force-mounted panels only)          |
+| `data-cl-ending-style`   | Panel        | Exit-animation frame (force-mounted panels only)                 |
+
+`Tabs.Indicator` is absolutely positioned and exposes the active tab's geometry as CSS
+variables (give `Tabs.List` `position: relative`):
+
+| Variable          | Description                             |
+| ----------------- | --------------------------------------- |
+| `--cl-tab-left`   | Active tab left offset relative to list |
+| `--cl-tab-width`  | Active tab width                        |
+| `--cl-tab-top`    | Active tab top offset relative to list  |
+| `--cl-tab-height` | Active tab height                       |
+
+A force-mounted `Tabs.Panel` also exposes `--cl-tab-transition-direction` (`1` when moving
+to a later tab, `-1` to an earlier one) for directional slide animations.
+
+```css
+[data-cl-slot='tabs-indicator'] {
+  position: absolute;
+  left: var(--cl-tab-left);
+  width: var(--cl-tab-width);
+  transition: left 200ms ease, width 200ms ease;
+}
+```

@@ -107,7 +107,7 @@ jobs:
 
       - name: Generate API snapshot
         run: |
-          npx --yes "@clerk/break-check@0.1.1" snapshot \
+          npx --yes "@clerk/break-check@0.4.0" snapshot \
             --output "$GITHUB_WORKSPACE/.api-snapshots-baseline"
 
       - name: Upload baseline artifact
@@ -172,9 +172,9 @@ jobs:
         run: echo "BREAK_CHECK_FILTERS=$BREAK_CHECK_FILTERS" >> "$GITHUB_ENV"
 
       - name: Break Check
-        uses: clerk/break-check@93e6163d6696ca437667562b31332e0c573692ab # v0.1.1
+        uses: clerk/break-check@703a7d9a6829b3ce164af20e5dbac37b7acb1725 # v0.4.0
         with:
-          break-check-version: '0.1.1'
+          break-check-version: '0.4.0'
           # The PR head is already checked out, so build it in place rather than
           # in a second head worktree.
           head-ref: ''

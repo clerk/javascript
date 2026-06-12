@@ -537,6 +537,29 @@ export default tseslint.config([
     },
   },
   {
+    name: 'packages/ui/mosaic',
+    files: ['packages/ui/src/mosaic/**/*'],
+    ignores: ['packages/ui/src/mosaic/utils.ts', 'packages/ui/src/mosaic/__tests__/**'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "Property > Literal.key[value='&:hover']",
+          message: "Use hover() from mosaic/utils instead of bare '&:hover'.",
+        },
+        {
+          selector: "Property > Literal.key[value='@media (hover: hover)']",
+          message: "Use hover() from mosaic/utils instead of raw '@media (hover: hover)'.",
+        },
+        {
+          selector: "Property > Literal.key[value='@media (prefers-reduced-motion: no-preference)']",
+          message:
+            "Use motionSafe() from mosaic/utils instead of raw '@media (prefers-reduced-motion: no-preference)'.",
+        },
+      ],
+    },
+  },
+  {
     name: 'packages - vitest',
     files: ['packages/*/src/**/*.test.{ts,tsx}'],
     rules: {

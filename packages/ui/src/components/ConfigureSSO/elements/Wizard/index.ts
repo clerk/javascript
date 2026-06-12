@@ -1,3 +1,3 @@
 export { Wizard } from './Wizard';
-export { useWizard } from './WizardContext';
-export type { WizardActiveStep, WizardContextValue, WizardStepProps } from './types';
+export { useWizard, WizardContext } from './WizardContext';
+export type { WizardActiveStep, WizardContextValue, WizardStepConfig, WizardStepDescriptor } from './types';

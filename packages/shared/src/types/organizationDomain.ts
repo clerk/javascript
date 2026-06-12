@@ -54,7 +54,7 @@ export interface OrganizationDomainResource extends ClerkResource {
    *
    * <ul>
    *  <li>`manual_invitation`: No automatic enrollment. Users with a matching email domain are not given any [invitation](https://clerk.com/docs/guides/organizations/add-members/verified-domains#automatic-invitations) or [suggestion](https://clerk.com/docs/guides/organizations/add-members/verified-domains#automatic-suggestions); an admin must invite them manually.</li>
-   *  <li>`automatic_invitation`: Users with a matching email domain automatically receive a pending [invitation](https://clerk.com/docs/reference/types/organizationinvitation) (assigned the Organization's default role) which they can accept to join.</li>
+   *  <li>`automatic_invitation`: Users with a matching email domain automatically receive a pending [invitation](https://clerk.com/docs/reference/types/organization-invitation) (assigned the Organization's default role) which they can accept to join.</li>
    *  <li>`automatic_suggestion`: Users with a matching email domain automatically receive a [suggestion](https://clerk.com/docs/guides/organizations/add-members/verified-domains#automatic-suggestions) to join, which they can request.</li>
    * </ul>
    */
@@ -76,11 +76,11 @@ export interface OrganizationDomainResource extends ClerkResource {
    */
   affiliationEmailAddress: string | null;
   /**
-   * The total number of pending [invitations](https://clerk.com/docs/reference/types/organizationinvitation) associated with this domain.
+   * The total number of pending [invitations](https://clerk.com/docs/reference/types/organization-invitation) associated with this domain.
    */
   totalPendingInvitations: number;
   /**
-   * The total number of pending [suggestions](https://clerk.com/docs/reference/types/organizationsuggestion) associated with this domain.
+   * The total number of pending [suggestions](https://clerk.com/docs/reference/types/organization-suggestion) associated with this domain.
    */
   totalPendingSuggestions: number;
   /**
@@ -132,7 +132,7 @@ export type AttemptAffiliationVerificationParams = {
 /** @generateWithEmptyComment */
 export type UpdateEnrollmentModeParams = Pick<OrganizationDomainResource, 'enrollmentMode'> & {
   /**
-   * Whether to delete any pending [invitations](https://clerk.com/docs/reference/types/organizationinvitation) or [suggestions](https://clerk.com/docs/reference/types/organizationsuggestion) that were created by the previous enrollment mode.
+   * Whether to delete any pending [invitations](https://clerk.com/docs/reference/types/organization-invitation) or [suggestions](https://clerk.com/docs/reference/types/organization-suggestion) that were created by the previous enrollment mode.
    */
   deletePending?: boolean;
 };

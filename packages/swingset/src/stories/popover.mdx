@@ -1,0 +1,132 @@
+import * as PopoverStories from './popover.stories';
+
+# Popover
+
+A floating panel anchored to a trigger, holding interactive content, from `@clerk/headless`.
+It is a **headless** primitive: it supplies open state, portalling, floating-ui positioning
+(flip/shift/arrow), focus management, dismissal (outside press / Escape), and ARIA wiring,
+but ships **no styles** — you bring your own CSS by targeting the `data-cl-*` attributes
+each part emits.
+
+## Example
+
+The demo below is intentionally unstyled — it renders the raw primitive so you can see its
+behavior and ARIA wiring. Open it; it anchors to the trigger and dismisses on outside press
+or Escape.
+
+<Story
+  name='Default'
+  storyModule={PopoverStories}
+/>
+
+## Usage
+
+```tsx
+import { Popover } from '@clerk/headless/popover';
+
+<Popover.Root>
+  <Popover.Trigger>Settings</Popover.Trigger>
+  <Popover.Portal>
+    <Popover.Positioner>
+      <Popover.Popup>
+        <Popover.Arrow />
+        <Popover.Title>Preferences</Popover.Title>
+        <Popover.Description>Adjust your settings below.</Popover.Description>
+        <Popover.Close>Done</Popover.Close>
+      </Popover.Popup>
+    </Popover.Positioner>
+  </Popover.Portal>
+</Popover.Root>;
+```
+
+### Controlled
+
+```tsx
+const [open, setOpen] = useState(false);
+
+<Popover.Root
+  open={open}
+  onOpenChange={setOpen}
+>
+  {/* trigger + portal */}
+</Popover.Root>;
+```
+
+## Parts
+
+| Part                  | Default Element | Description                                                    |
+| --------------------- | --------------- | -------------------------------------------------------------- |
+| `Popover.Root`        | none (context)  | Owns open state, positioning, and the focus/dismissal wiring   |
+| `Popover.Trigger`     | `<button>`      | Toggles the popover; acts as the positioning anchor            |
+| `Popover.Portal`      | none (portal)   | Portals its children; renders nothing until mounted            |
+| `Popover.Positioner`  | `<div>`         | Floating-positioned container (`role="dialog"`, focus manager) |
+| `Popover.Popup`       | `<div>`         | Visual content wrapper inside the positioner                   |
+| `Popover.Arrow`       | `<svg>`         | Optional arrow pointing at the anchor                          |
+| `Popover.Title`       | `<h2>`          | Heading; wires `aria-labelledby` on the positioner             |
+| `Popover.Description` | `<p>`           | Description; wires `aria-describedby` on the positioner        |
+| `Popover.Close`       | `<button>`      | Closes the popover on click                                    |
+
+All rendered parts accept a `render` prop for polymorphic rendering and standard HTML
+attributes for their default element. `Popover.Arrow` accepts floating-ui `FloatingArrow`
+props (`width`, `height`, `tipRadius`, …). `Popover.Portal` is optional.
+
+## Props
+
+### `Popover.Root`
+
+| Prop                      | Type                                 | Default               | Description                                                     |
+| ------------------------- | ------------------------------------ | --------------------- | --------------------------------------------------------------- |
+| <code>open</code>         | <code>boolean</code>                 | —                     | Controlled open state                                           |
+| <code>defaultOpen</code>  | <code>boolean</code>                 | <code>false</code>    | Initial open state (uncontrolled)                               |
+| <code>onOpenChange</code> | <code>(open: boolean) => void</code> | —                     | Called when the open state changes                              |
+| <code>placement</code>    | <code>Placement</code>               | <code>'bottom'</code> | Placement relative to the trigger (e.g. `'top'`, `'right-end'`) |
+| <code>sideOffset</code>   | <code>number</code>                  | <code>4</code>        | Gap in px between the trigger and the popup                     |
+| <code>modal</code>        | <code>boolean</code>                 | <code>false</code>    | Trap focus inside the popover                                   |
+
+### `Popover.Portal`
+
+| Prop              | Type                                                             | Default | Description         |
+| ----------------- | ---------------------------------------------------------------- | ------- | ------------------- |
+| <code>root</code> | <code>HTMLElement \| null \| RefObject&lt;HTMLElement&gt;</code> | —       | Portal mount target |
+
+`Popover.Trigger`, `Popover.Positioner`, `Popover.Popup`, `Popover.Title`,
+`Popover.Description`, and `Popover.Close` take no additional props beyond standard HTML
+attributes for their default element (`Title`/`Description` manage their own `id`).
+Alignment and collision padding are encoded in the single `placement` prop.
+
+## Styling
+
+Each part emits `data-cl-*` attributes you can target with any CSS solution:
+
+| Attribute                | Applies To        | Description                                        |
+| ------------------------ | ----------------- | -------------------------------------------------- |
+| `data-cl-slot`           | All parts         | Part identifier                                    |
+| `data-cl-open`           | Trigger, Popup    | Present when the popover is open                   |
+| `data-cl-closed`         | Trigger, Popup    | Present when closed (Popup stays mounted to exit)  |
+| `data-cl-side`           | Positioner, Arrow | Resolved side: `top` / `bottom` / `left` / `right` |
+| `data-cl-starting-style` | Popup             | Present on the entering frame                      |
+| `data-cl-ending-style`   | Popup             | Present during the exit animation                  |
+
+The positioner exposes anchor/viewport geometry as CSS variables for sizing and
+transform-origin-based animations:
+
+| Variable                | Description                                           |
+| ----------------------- | ----------------------------------------------------- |
+| `--cl-anchor-width`     | Trigger width                                         |
+| `--cl-anchor-height`    | Trigger height                                        |
+| `--cl-available-width`  | Available width between the anchor and viewport edge  |
+| `--cl-available-height` | Available height between the anchor and viewport edge |
+| `--cl-transform-origin` | `transform-origin` pointing back toward the anchor    |
+
+```css
+[data-cl-slot='popover-popup'] {
+  transform-origin: var(--cl-transform-origin);
+  opacity: 1;
+  transition: opacity 120ms ease, transform 120ms ease;
+}
+[data-cl-slot='popover-popup'][data-cl-starting-style],
+[data-cl-slot='popover-popup'][data-cl-ending-style] {
+  opacity: 0;
+  transform: scale(0.95);
+}
+```

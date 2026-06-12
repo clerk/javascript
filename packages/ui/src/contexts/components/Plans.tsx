@@ -96,8 +96,11 @@ export const usePlans = (params?: { mode: 'cache' }) => {
 type HandleSelectPlanProps = {
   plan: BillingPlanResource;
   planPeriod: BillingSubscriptionPlanPeriod;
+  seatsQuantity?: number;
+  priceId?: string;
   mode?: 'modal' | 'mounted';
   event?: React.MouseEvent<HTMLElement>;
+  portalRoot?: HTMLElement | null;
   appearance?: Appearance;
   newSubscriptionRedirectUrl?: string;
 };
@@ -334,14 +337,26 @@ export const usePlansContext = () => {
 
   // handle the selection of a plan, either by opening the subscription details or checkout
   const handleSelectPlan = useCallback(
-    ({ plan, planPeriod, mode = 'mounted', event, appearance, newSubscriptionRedirectUrl }: HandleSelectPlanProps) => {
-      const portalRoot = getClosestProfileScrollBox(mode, event);
+    ({
+      plan,
+      planPeriod,
+      seatsQuantity,
+      priceId,
+      mode = 'mounted',
+      event,
+      portalRoot: providedPortalRoot,
+      appearance,
+      newSubscriptionRedirectUrl,
+    }: HandleSelectPlanProps) => {
+      const portalRoot = providedPortalRoot ?? getClosestProfileScrollBox(mode, event);
 
       clerk.__internal_openCheckout({
         planId: plan.id,
         // if the plan doesn't support annual, use monthly
         planPeriod: determinePlanPeriod(plan, planPeriod),
         for: subscriberType,
+        seatsQuantity,
+        priceId,
         onSubscriptionComplete: () => {
           revalidateAll();
         },

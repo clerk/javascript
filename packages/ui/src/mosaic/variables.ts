@@ -1,3 +1,5 @@
+import { alpha } from './utils';
+
 // ─── Token Defaults ──────────────────────────────────────────────────────────
 
 /** Baseline design token values. Every Mosaic theme starts from this object. */
@@ -97,17 +99,17 @@ export function resolveVariables(defaults: MosaicTokens, variables?: MosaicVaria
   const tokens = variables ? (merge(defaults, variables) as MosaicTokens) : defaults;
   return {
     ...tokens,
-    spacing: (<N extends number>(n: N) => `calc(${tokens.spacing} * ${n})`) as MosaicTheme['spacing'],
+    spacing: (<N extends number>(n: N) => `calc(${tokens.spacing} * ${n})`) satisfies MosaicTheme['spacing'],
     alpha: (<K extends keyof MosaicTokens['color'], O extends number>(color: K, opacity: O) =>
-      `color-mix(in oklab, ${tokens.color[color]} ${opacity}%, transparent)`) as MosaicTheme['alpha'],
+      alpha(tokens.color[color], opacity)) as MosaicTheme['alpha'],
     mix: (<A extends keyof MosaicTokens['color'], B extends keyof MosaicTokens['color'], P extends number>(
       a: A,
       b: B,
       percentage: P,
-    ) => `color-mix(in oklab, ${tokens.color[a]}, ${tokens.color[b]} ${percentage}%)`) as MosaicTheme['mix'],
+    ) => `color-mix(in oklab, ${tokens.color[a]}, ${tokens.color[b]} ${percentage}%)`) satisfies MosaicTheme['mix'],
     text: (<K extends keyof MosaicTokens['text']>(key: K) => ({
       fontSize: tokens.text[key].fontSize,
       lineHeight: tokens.text[key].lineHeight,
-    })) as MosaicTheme['text'],
+    })) satisfies MosaicTheme['text'],
   };
 }

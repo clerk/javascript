@@ -1,5 +1,6 @@
 import { fastDeepMergeAndReplace } from '@clerk/shared/utils';
 
+import { defaultMosaicVariables, resolveVariables } from './variables';
 import type { MosaicTheme } from './variables';
 
 // ─── Public Types ─────────────────────────────────────────────────────────────
@@ -23,7 +24,8 @@ export type VariantProps<T extends (...args: any) => any> =
 
 // ─── Internal Types ───────────────────────────────────────────────────────────
 
-type Variants = Record<string, Record<string, StyleRule | null>>;
+/** Map of variant axis → variant value → style rule. Exposed so `styled` can type against `cva` results. */
+export type Variants = Record<string, Record<string, StyleRule | null>>;
 
 /** Converts `'true' | 'false'` string literal keys to `boolean` so callers pass real booleans. */
 type UnwrapBooleanVariant<T> = T extends 'true' | 'false' ? boolean : T;
@@ -43,8 +45,12 @@ type CvaConfig<V extends Variants> = {
 };
 
 /** The curried function returned by `cva`: receives variant props, returns a theme → StyleRule resolver. */
-type CvaFn<V extends Variants> = {
+export type CvaFn<V extends Variants> = {
   (props?: VariantPropsOf<V> & { sx?: SxProp }): (theme: MosaicTheme) => StyleRule;
+  /** Variant definitions exposed for tooling. Not part of the public API. */
+  _variants: V;
+  /** Default variant values exposed for tooling. Not part of the public API. */
+  _defaultVariants: VariantPropsOf<V>;
 };
 
 // ─── cva ──────────────────────────────────────────────────────────────────────
@@ -78,7 +84,7 @@ export function cva<V extends Variants>(config: CvaConfig<V>): CvaFn<V>;
 export function cva<V extends Variants>(configFn: (theme: MosaicTheme) => CvaConfig<V>): CvaFn<V>;
 export function cva<V extends Variants>(configOrFn: CvaConfig<V> | ((theme: MosaicTheme) => CvaConfig<V>)): CvaFn<V> {
   const configCache = typeof configOrFn === 'function' ? new WeakMap<MosaicTheme, CvaConfig<V>>() : null;
-  return ((props: VariantPropsOf<V> & { sx?: SxProp } = {} as VariantPropsOf<V>) =>
+  const fn = ((props: VariantPropsOf<V> & { sx?: SxProp } = {} as VariantPropsOf<V>) =>
     (theme: MosaicTheme): StyleRule => {
       let config: CvaConfig<V>;
       if (configCache) {
@@ -108,6 +114,13 @@ export function cva<V extends Variants>(configOrFn: CvaConfig<V> | ((theme: Mosa
       }
       return computedStyles;
     }) as CvaFn<V>;
+
+  const resolvedConfig =
+    typeof configOrFn === 'function' ? configOrFn(resolveVariables(defaultMosaicVariables)) : configOrFn;
+  fn._variants = resolvedConfig.variants;
+  fn._defaultVariants = (resolvedConfig.defaultVariants ?? {}) as VariantPropsOf<V>;
+
+  return fn;
 }
 
 // ─── Internal ─────────────────────────────────────────────────────────────────
