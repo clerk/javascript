@@ -18,7 +18,7 @@ function DestructiveTrigger(props: Omit<HTMLAttributes<HTMLElement>, 'color'>) {
       {...props}
       color='destructive'
     >
-      Leave organization
+      Delete organization
     </Button>
   );
 }
@@ -39,8 +39,10 @@ export function Default() {
       trigger={DestructiveTrigger}
       open={open}
       onOpenChange={setOpen}
-      resourceType='organization'
-      resourceName="Alex's Organization"
+      title='Delete organization'
+      description='Are you sure you want to delete this organization?'
+      primaryActionLabel='Delete organization'
+      resourceName='Example organization'
       onDelete={handleDelete}
       isDeleting={isDeleting}
     />
