@@ -86,8 +86,17 @@ export const setupClerkTestingToken = async ({ context, options, page }: SetupCl
               continue;
             }
 
+            // Diagnostics are best-effort: never let them prevent fulfilling the response.
+            let diagnostics = '';
+            try {
+              const headers = response.headers();
+              diagnostics = `\n  cf-ray: ${headers['cf-ray'] ?? 'n/a'}, retry-after: ${headers['retry-after'] ?? 'n/a'}, content-type: ${headers['content-type'] ?? 'n/a'}`;
+              diagnostics += `\n  body: ${(await response.text()).slice(0, 500)}`;
+            } catch {
+              // ignore
+            }
             console.warn(
-              `[Clerk Testing] FAPI request failed with status ${status} after ${MAX_ROUTE_RETRIES + 1} attempts: ${route.request().url()}`,
+              `[Clerk Testing] FAPI request failed with status ${status} after ${MAX_ROUTE_RETRIES + 1} attempts: ${route.request().url()}${diagnostics}`,
             );
             await route.fulfill({ response });
             return;
@@ -121,8 +130,7 @@ export const setupClerkTestingToken = async ({ context, options, page }: SetupCl
           }
 
           console.warn(
-            `[Clerk Testing] FAPI request failed after ${MAX_ROUTE_RETRIES + 1} attempts: ${route.request().url()}`,
-            error,
+            `[Clerk Testing] FAPI request failed after ${MAX_ROUTE_RETRIES + 1} attempts: ${route.request().url()} (${String(error)})`,
           );
           await route.continue({ url: urlString }).catch(console.error);
           return;

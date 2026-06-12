@@ -25,7 +25,7 @@ export type OrganizationProfileContextType = OrganizationProfileCtx & {
   isGeneralPageRoot: boolean;
   isBillingPageRoot: boolean;
   isAPIKeysPageRoot: boolean;
-  isSelfServeSsoPageRoot: boolean;
+  isSecurityPageRoot: boolean;
   shouldShowBilling: boolean;
   shouldShowSelfServeSSO: boolean;
 };
@@ -81,7 +81,7 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
   const isGeneralPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.GENERAL;
   const isBillingPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.BILLING;
   const isAPIKeysPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.API_KEYS;
-  const isSelfServeSsoPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.SELF_SERVE_SSO;
+  const isSecurityPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.SECURITY;
   const navigateToGeneralPageRoot = () =>
     navigate(isGeneralPageRoot ? '../' : isMembersPageRoot ? './organization-general' : '../organization-general');
 
@@ -95,7 +95,7 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
     isGeneralPageRoot,
     isBillingPageRoot,
     isAPIKeysPageRoot,
-    isSelfServeSsoPageRoot,
+    isSecurityPageRoot,
     shouldShowBilling,
     shouldShowSelfServeSSO,
   };

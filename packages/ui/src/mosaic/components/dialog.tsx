@@ -48,6 +48,7 @@ const dialogRecipe = defineSlotRecipe(theme => ({
       boxShadow: '0 10px 30px rgba(0,0,0,0.18)',
       display: 'flex',
       flexDirection: 'column',
+      gap: theme.spacing(3),
       transition: 'transform 150ms ease-out, opacity 150ms ease-out',
       '&[data-cl-starting-style], &[data-cl-ending-style]': {
         opacity: 0,
