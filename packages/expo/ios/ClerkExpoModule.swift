@@ -25,7 +25,7 @@ public protocol ClerkNativeBridgeProtocol {
   // SDK operations
   func configure(publishableKey: String, bearerToken: String?) async throws
   func getSession() async -> [String: Any]?
-  func getClientToken() -> String?
+  func getClientToken() async -> String?
   func refreshClient() async throws
 }
 
@@ -110,7 +110,10 @@ class ClerkExpoModule: RCTEventEmitter {
       return
     }
 
-    resolve(bridge.getClientToken())
+    Task {
+      let token = await bridge.getClientToken()
+      resolve(token)
+    }
   }
 
   // MARK: - refreshClient

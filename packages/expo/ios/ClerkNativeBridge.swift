@@ -132,7 +132,8 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
     }
   }
 
-  public func getClientToken() -> String? {
+  @MainActor
+  public func getClientToken() async -> String? {
     guard Self.clerkConfigured else { return nil }
     return Clerk.shared.deviceToken
   }
