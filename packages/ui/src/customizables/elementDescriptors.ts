@@ -579,6 +579,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'configureSSOVerifyDomainErrorTitle',
   'configureSSOVerifyDomainErrorSubtitle',
   'configureSSOVerifyDomainList',
+  'configureSSOVerifyDomainSuggestion',
   'configureSSOVerifyDomainCard',
   'configureSSOVerifyDomainCardBadge',
   'configureSSOVerifyDomainCardRemoveButton',

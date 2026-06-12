@@ -1374,6 +1374,10 @@ export type __internal_LocalizationResource = {
       formFieldLabel__domain: LocalizationValue;
       formFieldInputPlaceholder__domain: LocalizationValue;
       formButtonPrimary__add: LocalizationValue;
+      domainSuggestion: {
+        messageLabel: LocalizationValue<'domain'>;
+        formButtonPrimary__add: LocalizationValue<'domain'>;
+      };
       domainCard: {
         badge__verified: LocalizationValue;
         badge__unverified: LocalizationValue;

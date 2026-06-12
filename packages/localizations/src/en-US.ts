@@ -275,6 +275,10 @@ export const enUS: LocalizationResource = {
       formFieldLabel__domain: 'Domains',
       formFieldInputPlaceholder__domain: 'Type your domain here and click add to start',
       formButtonPrimary__add: 'Add',
+      domainSuggestion: {
+        messageLabel: 'Your email uses {{domain}}. Do you want to add it?',
+        formButtonPrimary__add: 'Add {{domain}}',
+      },
       domainCard: {
         badge__verified: 'Verified',
         badge__unverified: 'Unverified',

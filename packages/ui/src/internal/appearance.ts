@@ -715,6 +715,7 @@ export type ElementsConfig = {
   configureSSOVerifyDomainErrorTitle: WithOptions;
   configureSSOVerifyDomainErrorSubtitle: WithOptions;
   configureSSOVerifyDomainList: WithOptions;
+  configureSSOVerifyDomainSuggestion: WithOptions;
   configureSSOVerifyDomainCard: WithOptions<'verified' | 'unverified'>;
   configureSSOVerifyDomainCardBadge: WithOptions<'verified' | 'unverified'>;
   configureSSOVerifyDomainCardRemoveButton: WithOptions;

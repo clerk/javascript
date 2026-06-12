@@ -1,3 +1,4 @@
+import { useUser } from '@clerk/shared/react';
 import type { OrganizationDomainResource } from '@clerk/shared/types';
 import type React from 'react';
 import { useState } from 'react';
@@ -75,6 +76,8 @@ export const OrganizationDomainsStep = (): JSX.Element => {
                 onSubmit={handleCreateDomain}
                 organizationDomains={organizationDomains}
               />
+
+              {!organizationDomains?.length && <DomainSuggestion onSubmit={handleCreateDomain} />}
 
               {card.error && (
                 <Alert
@@ -201,6 +204,87 @@ const DomainsField = ({
         </Col>
       </Field.Root>
     </Form.Root>
+  );
+};
+
+const getEmailDomain = (email: string): string | null => email.split('@')[1]?.trim().toLowerCase() || null;
+
+const DomainSuggestion = ({ onSubmit }: { onSubmit: (domain: string) => Promise<void> }): JSX.Element | null => {
+  const { user } = useUser();
+  const [isDismissed, setIsDismissed] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const primaryEmail = user?.primaryEmailAddress?.emailAddress;
+  const domain = primaryEmail ? getEmailDomain(primaryEmail) : null;
+
+  if (!domain || isDismissed) {
+    return null;
+  }
+
+  const handleAdd = () => {
+    setIsSubmitting(true);
+    void onSubmit(domain)
+      .then(() => setIsDismissed(true))
+      .finally(() => setIsSubmitting(false));
+  };
+
+  return (
+    <Flex
+      elementDescriptor={descriptors.configureSSOVerifyDomainSuggestion}
+      align='center'
+      justify='between'
+      sx={t => ({
+        gap: t.space.$2,
+        paddingInline: t.space.$3,
+        paddingBlock: t.space.$1x5,
+        borderWidth: t.borderWidths.$normal,
+        borderStyle: t.borderStyles.$solid,
+        borderColor: t.colors.$borderAlpha150,
+        borderRadius: t.radii.$lg,
+        background: t.colors.$neutralAlpha50,
+      })}
+    >
+      <Flex
+        align='center'
+        sx={t => ({ gap: t.space.$3, minWidth: 0 })}
+      >
+        <Text
+          as='span'
+          colorScheme='secondary'
+          localizationKey={localizationKeys('configureSSO.organizationDomainsStep.domainSuggestion.messageLabel', {
+            domain,
+          })}
+          sx={t => ({ fontSize: t.fontSizes.$sm })}
+        />
+
+        <Button
+          variant='bordered'
+          colorScheme='secondary'
+          size='xs'
+          isLoading={isSubmitting}
+          onClick={handleAdd}
+          localizationKey={localizationKeys(
+            'configureSSO.organizationDomainsStep.domainSuggestion.formButtonPrimary__add',
+            { domain },
+          )}
+          sx={{ flexShrink: 0 }}
+        />
+      </Flex>
+
+      <Button
+        variant='ghost'
+        colorScheme='neutral'
+        aria-label='Dismiss domain suggestion'
+        isDisabled={isSubmitting}
+        onClick={() => setIsDismissed(true)}
+        sx={t => ({ flexShrink: 0, padding: t.space.$1 })}
+      >
+        <Icon
+          icon={Close}
+          sx={t => ({ width: t.sizes.$4, height: t.sizes.$4, color: t.colors.$colorMutedForeground })}
+        />
+      </Button>
+    </Flex>
   );
 };
 
