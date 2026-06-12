@@ -15,7 +15,7 @@ export function OrganizationProfileGeneral() {
       <Box
         sx={t => ({
           height: '1px',
-          background: alpha('#000', 10),
+          background: `light-dark(${alpha('#000', 10)},${alpha('#fff', 10)})`,
           marginBlock: t.spacing(4),
         })}
       />
