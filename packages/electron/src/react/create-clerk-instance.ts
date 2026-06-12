@@ -16,6 +16,7 @@ export function createClerkInstance(publishableKey: string): ClerkInstance {
   clerk.__internal_onBeforeRequest(async request => {
     request.credentials = 'omit';
     request.url?.searchParams.append('_is_native', '1');
+    request.url?.searchParams.append('_electron_sdk_version', PACKAGE_VERSION);
 
     const token = await window.__clerk_internal_electron?.tokenCache.getToken(CLERK_CLIENT_JWT_KEY);
     if (token) {
