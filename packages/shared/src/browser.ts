@@ -50,6 +50,17 @@ export function userAgentIsRobot(userAgent: string): boolean {
 }
 
 /**
+ * Server-side runtimes with worker-like globals self-identify in `navigator.userAgent`
+ * (`Cloudflare-Workers`, `Node.js/24`, `Deno/2.5.0`, `Bun/1.3.9`). Today workerd's `self`
+ * does not satisfy `instanceof WorkerGlobalScope` (even though it exposes the constructor),
+ * so the scope gate alone happens to exclude it, but that is an implementation detail of
+ * workerd's prototype chain, not a guarantee. Excluding self-identified server runtimes by
+ * user agent keeps these heuristics server-false even if such a runtime becomes fully
+ * spec-compliant about its worker scope.
+ */
+const serverRuntimeUserAgentRegex = /^(Cloudflare-Workers|Node\.js|Deno|Bun)\b/i;
+
+/**
  * Resolves the `Navigator` object from either the DOM `window` (standard browsers)
  * or a Web/Service Worker global scope. An MV3 extension background service worker
  * has no `window`, but runs inside a `WorkerGlobalScope` that exposes a
@@ -74,7 +85,8 @@ function getNavigator(): Navigator | null {
   if (
     typeof workerScope.WorkerGlobalScope === 'function' &&
     workerScope.self instanceof workerScope.WorkerGlobalScope &&
-    workerScope.self.navigator
+    workerScope.self.navigator &&
+    !serverRuntimeUserAgentRegex.test(workerScope.self.navigator.userAgent ?? '')
   ) {
     return workerScope.self.navigator;
   }

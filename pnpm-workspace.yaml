@@ -23,9 +23,10 @@ catalogs:
     vue: 3.5.33
     zx: 8.8.5
   rspack:
-    '@rspack/cli': 1.7.11
-    '@rspack/core': 1.7.11
-    '@rspack/plugin-react-refresh': 1.6.2
+    '@rspack/cli': 2.0.6
+    '@rspack/core': 2.0.6
+    '@rspack/dev-server': 2.0.3
+    '@rspack/plugin-react-refresh': 2.0.1
   module-manager:
     '@base-org/account': 2.0.1
     '@coinbase/wallet-sdk': 4.3.7
@@ -66,6 +67,8 @@ trustPolicyExclude:
   - 'undici@5.29.0 || 6.22.0'
   # Same idea, their 2.x publish process is more "trustworthy"
   - 'ua-parser-js@1.0.41'
+  # Same idea, the newer publish has weaker trust metadata than an older release.
+  - 'tinyclip@0.1.13'
   # Same idea, their 10.x publish process is more "trustworthy"
   - '@octokit/endpoint@9.0.6'
   # They experimented with provenance for some earlier versions
