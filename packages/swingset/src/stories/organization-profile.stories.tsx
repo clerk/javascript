@@ -6,6 +6,7 @@ import type { StoryMeta } from '@/lib/types';
 export const meta: StoryMeta = {
   group: 'AIO',
   title: 'OrganizationProfile',
+  label: 'Org Profile',
   source: 'packages/ui/src/mosaic/aio/organization-profile.tsx',
 };
 

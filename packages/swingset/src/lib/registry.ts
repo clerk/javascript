@@ -3,6 +3,10 @@ import { meta as accordionMeta } from '../stories/accordion.stories';
 import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
 import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
 import { meta as collapsibleMeta } from '../stories/collapsible.stories';
+import {
+  Default as DeleteOrganizationDefault,
+  meta as deleteOrganizationMeta,
+} from '../stories/delete-organization.stories';
 import { Default as DestructiveDefault, meta as destructiveMeta } from '../stories/destructive.stories';
 import { Default as DialogDefault, meta as dialogComponentMeta } from '../stories/dialog.component.stories';
 import { meta as dialogMeta } from '../stories/dialog.stories';
@@ -31,6 +35,7 @@ import type { StoryModule } from './types';
 
 const destructiveModule: StoryModule = { meta: destructiveMeta, Default: DestructiveDefault };
 const leaveOrganizationModule: StoryModule = { meta: leaveOrganizationMeta, Default: LeaveOrganizationDefault };
+const deleteOrganizationModule: StoryModule = { meta: deleteOrganizationMeta, Default: DeleteOrganizationDefault };
 const organizationProfileModule: StoryModule = { meta: organizationProfileMeta, Default: OrganizationProfileDefault };
 
 const buttonModule: StoryModule = { meta: buttonMeta, Primary, Sizes, Disabled };
@@ -57,6 +62,7 @@ export const registry: StoryModule[] = [
   organizationProfileModule,
   // Sections
   leaveOrganizationModule,
+  deleteOrganizationModule,
   // Blocks
   destructiveModule,
   // Components

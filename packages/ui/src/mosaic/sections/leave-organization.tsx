@@ -19,10 +19,18 @@ export function LeaveOrganization({ organizationName }: LeaveOrganizationProps) 
   };
 
   return (
-    <>
-      <h2>Leave organization</h2>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.5rem' }}>
+      <h2 style={{ fontWeight: 700 }}>Leave organization</h2>
+      <p>You will be removed from the organization and need to be invited back</p>
       <Destructive
-        trigger={props => <Button {...props}>Leave organization</Button>}
+        trigger={props => (
+          <Button
+            color='destructive'
+            {...props}
+          >
+            Leave organization
+          </Button>
+        )}
         open={open}
         onOpenChange={setOpen}
         resourceType='organization'
@@ -30,6 +38,6 @@ export function LeaveOrganization({ organizationName }: LeaveOrganizationProps) 
         onDelete={handleDelete}
         isDeleting={isDeleting}
       />
-    </>
+    </div>
   );
 }

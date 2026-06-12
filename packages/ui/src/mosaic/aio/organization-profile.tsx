@@ -1,4 +1,4 @@
-import { LeaveOrganization } from '../section/leave-organization';
+import { LeaveOrganization } from '../sections/leave-organization';
 
 interface OrganizationProfileProps {
   organizationName: string;

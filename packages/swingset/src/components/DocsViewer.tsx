@@ -15,6 +15,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   },
   sections: {
     'leave-organization': dynamic(() => import('../stories/leave-organization.mdx')),
+    'delete-organization': dynamic(() => import('../stories/delete-organization.mdx')),
   },
   blocks: {
     destructive: dynamic(() => import('../stories/destructive.mdx')),
