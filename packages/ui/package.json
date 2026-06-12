@@ -104,6 +104,7 @@
     "@solana/wallet-adapter-react": "catalog:module-manager",
     "@solana/wallet-standard": "catalog:module-manager",
     "@swc/helpers": "catalog:repo",
+    "@tanstack/react-query": "^5.100.6",
     "alien-signals": "2.0.6",
     "copy-to-clipboard": "3.3.3",
     "core-js": "catalog:repo",

@@ -2,25 +2,14 @@ import { useState } from 'react';
 
 import { Box } from '../components/box';
 import { Button } from '../components/button';
-import { SectionSkeleton } from '../components/section-skeleton';
 import { Destructive } from '../block/destructive';
-import { useOrganization } from '../mock/use-organization';
+import { useOrganization } from '../data/use-organization';
+import { useDeleteOrganization } from '../data/use-org-mutations';
 
 export function DeleteOrganization() {
-  const { isLoaded, organization } = useOrganization();
+  const { organization } = useOrganization(); // signal — non-null inside the Suspense boundary
+  const del = useDeleteOrganization(organization); // mutation — owns its own pending/error state
   const [open, setOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  if (!isLoaded || !organization) {
-    return <SectionSkeleton />;
-  }
-
-  const handleDelete = async () => {
-    setIsDeleting(true);
-    await organization.destroy();
-    setIsDeleting(false);
-    setOpen(false);
-  };
 
   return (
     <Box
@@ -81,8 +70,8 @@ export function DeleteOrganization() {
           description='Are you sure you want to delete this organization?'
           resourceName={organization.name}
           primaryActionLabel='Delete organization'
-          onDelete={handleDelete}
-          isDeleting={isDeleting}
+          onDelete={() => del.mutate(undefined, { onSuccess: () => setOpen(false) })}
+          isDeleting={del.isPending}
         />
       </Box>
     </Box>

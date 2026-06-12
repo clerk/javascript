@@ -1,6 +1,10 @@
+import { Suspense } from 'react';
+
 import { Box } from '../components/box';
+import { SectionSkeleton } from '../components/section-skeleton';
 import { Tabs } from '../components/tabs';
 import { OrganizationProfileGeneral } from '../panels/organization-profile-general';
+import { OrganizationMembers } from '../sections/organization-members';
 
 export function OrganizationProfile() {
   return (
@@ -28,16 +32,9 @@ export function OrganizationProfile() {
           <OrganizationProfileGeneral />
         </Tabs.Panel>
         <Tabs.Panel value='members'>
-          <Box
-            render={p => <h1 {...p} />}
-            sx={t => ({
-              ...t.text('base'),
-              fontWeight: t.font.medium,
-              textAlign: 'center',
-            })}
-          >
-            Members content
-          </Box>
+          <Suspense fallback={<SectionSkeleton />}>
+            <OrganizationMembers />
+          </Suspense>
         </Tabs.Panel>
       </Tabs.Root>
     </Box>
