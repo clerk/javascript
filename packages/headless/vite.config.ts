@@ -31,7 +31,7 @@ export default defineConfig({
       formats: ['es'],
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'react/jsx-runtime', '@floating-ui/react'],
+      external: ['react', 'react-dom', 'react/jsx-runtime', '@floating-ui/react', /^@clerk\/shared(\/.*)?$/],
       // Preserve module-level directives such as `'use client'`. Rollup otherwise
       // strips them when bundling (emitting a warning), which would drop the
       // client boundary for React Server Component consumers of the primitives.

@@ -1,9 +1,9 @@
+import { inertProps } from '@clerk/shared/inert';
 import { type PropsWithChildren, useEffect, useState } from 'react';
 
 import { Box, descriptors, useAppearance } from '../customizables';
 import { usePrefersReducedMotion } from '../hooks';
 import type { ThemableCssProp } from '../styledSystem';
-import { inertProps } from '../utils/inert';
 
 type CollapsibleProps = PropsWithChildren<{
   open: boolean;

@@ -1,10 +1,10 @@
+import { inertProps } from '@clerk/shared/inert';
 import type { BillingPlanResource, BillingSubscriptionPlanPeriod } from '@clerk/shared/types';
 import * as React from 'react';
 
 import { Avatar } from '@/ui/elements/Avatar';
 import { SegmentedControl } from '@/ui/elements/SegmentedControl';
 import { colors } from '@/ui/utils/colors';
-import { inertProps } from '@/ui/utils/inert';
 
 import { usePlansContext } from '../../contexts';
 import {

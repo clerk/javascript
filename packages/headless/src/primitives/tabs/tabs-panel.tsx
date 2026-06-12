@@ -1,10 +1,10 @@
 'use client';
 
+import { inertProps } from '@clerk/shared/inert';
 import { useMergeRefs } from '@floating-ui/react';
 import React, { useRef, version } from 'react';
 
 import { useTransition } from '../../hooks/use-transition';
-import { inertProps } from '../../utils/inert';
 import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
 import { useTabsContext } from './tabs-context';
 

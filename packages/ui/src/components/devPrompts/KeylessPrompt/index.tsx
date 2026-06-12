@@ -1,10 +1,10 @@
+import { inertProps } from '@clerk/shared/inert';
 import { useUser } from '@clerk/shared/react';
 // eslint-disable-next-line no-restricted-imports
 import { css } from '@emotion/react';
 import { type ReactNode, useId, useMemo, useState } from 'react';
 
 import { InternalThemeProvider } from '../../../styledSystem';
-import { inertProps } from '../../../utils/inert';
 import { handleDashboardUrlParsing } from '../shared';
 import { useDragToCorner } from './use-drag-to-corner';
 import { useRevalidateEnvironment } from './use-revalidate-environment';
