@@ -11,8 +11,8 @@ description: >-
 
 # Working in the clerk/javascript monorepo
 
-This is Clerk's JavaScript SDK monorepo: 21 packages (20 published `@clerk/*` plus the private
-`@clerk/msw`) managed with pnpm
+This is Clerk's JavaScript SDK monorepo: 23 packages (20 published `@clerk/*` plus the private
+`@clerk/msw`, `@clerk/headless`, and `@clerk/swingset`) managed with pnpm
 workspaces and Turborepo. Read this before building, testing, committing, or touching anything
 under `packages/`.
 
@@ -39,7 +39,7 @@ Full sequence, the 11 footguns, and the internal integration-test / 1Password se
 
 ## Package map: where does X live?
 
-The ~10 packages people touch most. Full 21-package table, the dependency pyramid, and the complete
+The ~10 packages people touch most. Full 23-package table, the dependency pyramid, and the complete
 "change X, touch Y" routing are in [`references/package-map.md`](references/package-map.md).
 
 | Package                | You change it when...                                                                                                                                       |
@@ -56,7 +56,7 @@ The ~10 packages people touch most. Full 21-package table, the dependency pyrami
 | `@clerk/testing`       | E2E helpers for consumers (Playwright / Cypress).                                                                                                           |
 
 > Heads-up: `packages/` may contain stale leftover dirs (`types`, `remix`, `themes`, `elements`, ...)
-> with only `dist/` and no `package.json`. Those are removed packages, not active ones. The
+> with only build artifacts and no `package.json`. Those are removed packages, not active ones. The
 > authoritative list is the git-tracked `packages/*/package.json` files.
 
 ## Dev-loop recipes
@@ -75,14 +75,16 @@ pnpm turbo test --filter=@clerk/backend
 # Faster, after a full build, for tight iteration:
 pnpm --filter @clerk/backend test
 
-# Run a single test file (vitest packages match by filename substring)
-pnpm --filter @clerk/shared test -- run path/to/file.test.ts
+# Run a single test file (vitest matches by filename substring). No `--` before the path:
+# pnpm forwards a literal `--` into the script and vitest then ignores the filter.
+pnpm --filter @clerk/shared test path/to/file.test.ts
 # @clerk/backend runs a multi-runtime suite (run-s), so target one runtime for a single file:
-pnpm --filter @clerk/backend test:node -- path/to/file.test.ts
+pnpm --filter @clerk/backend test:node path/to/file.test.ts
 
 # Quality gates (CI runs these)
 pnpm lint
-pnpm format            # also fixes non-workspace files like this skill
+pnpm format            # workspace packages plus root files, docs/, integration/, scripts/
+pnpm prettier --write '.claude/**/*.md'   # pnpm format does not cover .claude/; format skill files this way
 
 # Changesets
 pnpm changeset         # for package-affecting changes

@@ -35,19 +35,19 @@ reports here.
 
 ## Footguns
 
-| Trap                                                        | Symptom                                                                               | Fix                                                                                                 |
-| ----------------------------------------------------------- | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| System Node instead of 24.15                                | Build "passes" but `Cannot find module @clerk/...` or missing types appear later      | `node --version`; `nvm use` (`.nvmrc` pins 24.15.0)                                                 |
-| `pnpm install` before `corepack enable` (or using npm/yarn) | `preinstall` aborts with an "only pnpm allowed" error                                 | `corepack enable`, then `pnpm install`                                                              |
-| Installing from a package subdirectory                      | Workspace links incomplete; runtime `Cannot resolve @clerk/shared`                    | Always `pnpm install` from the repo root                                                            |
-| `pnpm dev` before `pnpm build`                              | Watch mode emits broken output; phantom type errors                                   | Run `pnpm build` once first, then `dev`                                                             |
-| Stale turbo cache after a Node/pnpm change                  | Old code runs, types do not update, unrelated tests fail                              | `pnpm nuke` (removes `.turbo`, `node_modules`, `dist`, coverage), then `pnpm install && pnpm build` |
-| `pnpm --filter <pkg> build/test` expecting deps to build    | Filtered pnpm scripts skip turbo's `^build`, so deps may be stale                     | Use `pnpm turbo build/test --filter=@clerk/<pkg>` to include dependencies                           |
-| Stale `@clerk/shared` / types after editing shared          | Type errors that "should not" exist in consumers                                      | `pnpm turbo build --filter=@clerk/shared`                                                           |
-| Editing the hosted UI but seeing no change                  | `ui` is bundled into `clerk-js`; you watched the wrong target                         | Use `pnpm dev:fe-libs` so `ui` + `clerk-js` rebuild together                                        |
-| Committing integration secrets                              | `integration/.env.local`, `.keys.json`, `.keys.staging.json`, or `certs/*.pem` leaked | These are generated/fetched locally and gitignored; never add them                                  |
-| Running integration tests without 1Password set up          | `pnpm integration:secrets` fails to read from 1Password                               | Install the `op` CLI and enable desktop-app integration (below)                                     |
-| First `pnpm install` "hangs"                                | Large monorepo, large lockfile                                                        | Expected for the first run; give it a few minutes before assuming failure                           |
+| Trap                                                        | Symptom                                                                                         | Fix                                                                                                                                                                |
+| ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| System Node instead of 24.15                                | Build "passes" but `Cannot find module @clerk/...` or missing types appear later                | `node --version`; `nvm use` (`.nvmrc` pins 24.15.0)                                                                                                                |
+| `pnpm install` before `corepack enable` (or using npm/yarn) | `preinstall` aborts with an "only pnpm allowed" error                                           | `corepack enable`, then `pnpm install`                                                                                                                             |
+| Installing from a package subdirectory                      | Workspace links incomplete; runtime `Cannot resolve @clerk/shared`                              | Always `pnpm install` from the repo root                                                                                                                           |
+| `pnpm dev` before `pnpm build`                              | Watch mode emits broken output; phantom type errors                                             | Run `pnpm build` once first, then `dev`                                                                                                                            |
+| Stale turbo cache after a Node/pnpm change                  | Old code runs, types do not update, unrelated tests fail                                        | `pnpm nuke` (removes `.turbo`, `node_modules`, `dist`, coverage), then `pnpm install && pnpm build`                                                                |
+| `pnpm --filter <pkg> build/test` expecting deps to build    | Filtered pnpm scripts skip turbo's `^build`, so deps may be stale                               | Use `pnpm turbo build/test --filter=@clerk/<pkg>` to include dependencies                                                                                          |
+| Stale `@clerk/shared` / types after editing shared          | Type errors that "should not" exist in consumers                                                | `pnpm turbo build --filter=@clerk/shared`                                                                                                                          |
+| Editing the hosted UI but seeing no change                  | `ui` ships as its own `ui.browser.js` loaded alongside `clerk-js`; you watched the wrong target | Use `pnpm dev:fe-libs` so `ui` + `clerk-js` rebuild together                                                                                                       |
+| Committing integration secrets                              | `integration/.env.local`, `.keys.json`, `.keys.staging.json`, or `certs/sessions*.pem` leaked   | Generated/fetched locally and gitignored; never add them. Under `certs/` only `sessions.pem` / `sessions-key.pem` are ignored, so keep other cert names out of git |
+| Running integration tests without 1Password set up          | `pnpm integration:secrets` fails to read from 1Password                                         | Install the `op` CLI and enable desktop-app integration (below)                                                                                                    |
+| First `pnpm install` "hangs"                                | Large monorepo, large lockfile                                                                  | Expected for the first run; give it a few minutes before assuming failure                                                                                          |
 
 ## Unit tests vs integration tests
 
@@ -81,6 +81,7 @@ pnpm test:integration:nextjs       # E2E_APP_ID=next.appRouter.* , @nextjs grep 
 pnpm test:integration:generic      # the broad react + next smoke suite
 ```
 
-Each `test:integration:*` script sets an `E2E_APP_ID` (which app template to run) and a Playwright
-`--grep @tag`. The full list is in root `package.json`. External contributors without these
+Most `test:integration:*` scripts set an `E2E_APP_ID` (which app template to run) and a Playwright
+`--grep @tag`; a few (`sessions`, `handshake`, `custom`, `machine`, `chrome-extension`) select their
+apps differently. The full list is in root `package.json`. External contributors without these
 credentials should rely on unit tests and the CI integration runs on their PR.

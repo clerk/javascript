@@ -62,12 +62,13 @@ exempt from the breaking-change rules above.
 
 - **`break-check`** (`.github/workflows/api-changes.yml`) diffs the public API surface
   (`.d.ts` declarations) and flags removals, renames, and signature changes. Treat it as a signal,
-  not a gate: that job currently runs `continue-on-error` with `--ai-apply-downgrades`, so it is
-  informational and can be downgraded. Still investigate anything it flags rather than assuming a
-  false positive.
-- **Major Version Check** (`.github/workflows/major-version-check.yml`) is the actual merge-blocking
-  gate for a major: a `major` changeset bump fails the check until a public org member comments
-  `!allow-major`. The exact comment commands (`!allow-major`, `!snapshot`, `!preview`) and when to
+  not a gate: the job runs `continue-on-error`, and an AI reviewer (`ai.applyDowngrades` in
+  `break-check.config.json`) can reclassify findings, so it is informational. Still investigate
+  anything it flags rather than assuming a false positive.
+- **Major Version Check** (`.github/workflows/major-version-check.yml`) is the gate for a major: a
+  `major` changeset bump fails the check until a public org member comments `!allow-major`. (It is
+  not yet in `main`'s required-checks list, so treat a red check as blocking even when the merge
+  button is not.) The exact comment commands (`!allow-major`, `!snapshot`, `!preview`) and when to
   use each are in `docs/PUBLISH.md`.
 
 ## If a breaking change is genuinely required

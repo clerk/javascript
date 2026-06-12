@@ -1,12 +1,13 @@
 # Package map
 
-The 21 active, git-tracked packages, the dependency shape, and the full "change X, touch Y" routing.
+The 23 active, git-tracked packages, the dependency shape, and the full "change X, touch Y" routing.
 `SKILL.md` has the short version (the ~10 packages people touch most).
 
 > The authoritative package list is the set of `packages/*/package.json` files tracked in git. The
 > `packages/` directory can also hold leftover build artifacts from **removed** packages (e.g.
-> `types`, `remix`, `themes`, `elements`, `agent-toolkit`, `dev-cli`) that contain only `dist/` and
-> no `package.json`. Those are not active packages and are not valid commit scopes.
+> `types`, `remix`, `themes`, `elements`, `agent-toolkit`, `dev-cli`) that contain only build output
+> (`dist/`, `node_modules/`, `.turbo/`) and no `package.json`. Those are not active packages and are
+> not valid commit scopes.
 
 ## All packages
 
@@ -21,6 +22,7 @@ backwards-compatibility contract (see `breaking-changes.md`).
 | `@clerk/backend`              | foundational    |     | Backend API REST client, JWT verification, webhook helpers. Used by every server adapter.                                                                                      |
 | `@clerk/clerk-js`             | browser-runtime | ⚠️  | The browser runtime (script tag). Backwards-compat sensitive.                                                                                                                  |
 | `@clerk/ui`                   | ui              | ⚠️  | React components for the hosted sign-in / sign-up flows (`packages/ui/src/components`). Consumed by the react/astro/vue/chrome-extension adapters. Backwards-compat sensitive. |
+| `@clerk/headless`             | ui              |     | Unstyled, accessible UI primitives (dialog, menu, popover, ...) consumed by `@clerk/ui`. Private (not published).                                                              |
 | `@clerk/react`                | adapter (core)  |     | React hooks and context (`useAuth`, `useUser`, `useOrganization`, ...). Shared by the React-based adapters.                                                                    |
 | `@clerk/nextjs`               | adapter         |     | Next.js SDK: middleware, route handlers, server components.                                                                                                                    |
 | `@clerk/express`              | adapter         |     | Express middleware and server helpers.                                                                                                                                         |
@@ -37,24 +39,24 @@ backwards-compatibility contract (see `breaking-changes.md`).
 | `@clerk/localizations`        | ui/i18n         |     | Translation strings for the UI components. Consumed by `ui`.                                                                                                                   |
 | `@clerk/testing`              | tooling         |     | E2E test helpers for consumers (Playwright + Cypress).                                                                                                                         |
 | `@clerk/msw`                  | tooling         |     | MSW request handlers for mocking the Clerk API in tests. Private (not published).                                                                                              |
+| `@clerk/swingset`             | tooling         |     | Component explorer for `@clerk/ui`'s Mosaic design system. Private (not published).                                                                                            |
 | `@clerk/upgrade`              | tooling         |     | CLI codemod tool for upgrading consumers between SDK versions.                                                                                                                 |
 
 Tests: `pnpm turbo test --filter=@clerk/<name>` (or `pnpm --filter @clerk/<name> test` after a
 build). Most packages use vitest; `@clerk/backend` runs a multi-runtime suite (node + edge +
-cloudflare). A few packages (`localizations`, `expo-passkeys`, `msw`) have no unit-test script.
+cloudflare). A few packages (`localizations`, `expo-passkeys`, `msw`, `swingset`) have no unit-test
+script.
 
 ## Dependency shape
 
 ```
                 @clerk/shared            (≈20 dependents, the base of the pyramid)
-                /     |     \
-       @clerk/types  utils  @clerk/backend   (≈10 dependents: every server adapter)
-                |               |
-          @clerk/react     server helpers
+                    /      \
+          @clerk/react   @clerk/backend  (≈10 dependents: every server adapter)
            /   |   \
    nextjs  react-router  expo ...        (framework adapters: consume react + backend + shared)
 
-   @clerk/ui  ──uses──▶  @clerk/localizations    (UI components; consumed by react / astro / vue / chrome-extension)
+   @clerk/ui  ──uses──▶  @clerk/localizations, @clerk/headless   (UI components; consumed by react / astro / vue / chrome-extension)
    @clerk/clerk-js                               (standalone browser runtime, script tag; delivered alongside @clerk/ui)
 ```
 
@@ -68,9 +70,11 @@ test the consumers, not just the package you edited. After editing `shared`, a
 
 ## Change X, touch Y
 
-- **A React hook (`useAuth`, `useUser`, `useOrganization`, ...)**: `packages/react/src`. Changes
-  propagate to `nextjs`, `react-router`, `tanstack-react-start`, `expo`, `chrome-extension` (all
-  consume `@clerk/react`; note `expo` wraps `useAuth` rather than just re-exporting it).
+- **A React hook**: `useAuth` is implemented in `packages/react/src`; most others (`useUser`,
+  `useOrganization`, ...) live in `packages/shared/src/react/hooks` and are re-exported by
+  `@clerk/react`. Changes propagate to `nextjs`, `react-router`, `tanstack-react-start`, `expo`,
+  `chrome-extension` (all consume `@clerk/react`; note `expo` wraps `useAuth` rather than just
+  re-exporting it).
 - **The hosted sign-in / sign-up UI (components, layout)**: `packages/ui/src/components` (`@clerk/ui`).
   Strings live in `packages/localizations/src`. `@clerk/ui` is consumed by the
   `react`/`astro`/`vue`/`chrome-extension` adapters; its compiled runtime is delivered alongside
