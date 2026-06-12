@@ -1,4 +1,4 @@
-import { ClerkProvider, Show, SignIn, UserButton, useAuth, useClerk, useSessionList } from '@clerk/electron/react';
+import { ClerkProvider, Show, SignIn, UserButton, useAuth } from '@clerk/electron/react';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
@@ -14,7 +14,6 @@ function App() {
       routerReplace={() => {}}
     >
       <main data-testid='electron-app'>
-        <NativeSessionActivator />
         <Show when='signed-out'>
           <SignIn />
         </Show>
@@ -25,26 +24,6 @@ function App() {
       </main>
     </ClerkProvider>
   );
-}
-
-function NativeSessionActivator() {
-  const clerk = useClerk();
-  const { sessionId } = useAuth();
-  const { isLoaded, sessions } = useSessionList();
-  const activatingRef = React.useRef(false);
-
-  React.useEffect(() => {
-    if (!isLoaded || sessionId || !sessions.length || activatingRef.current) {
-      return;
-    }
-
-    activatingRef.current = true;
-    void clerk.setActive({ session: sessions[0].id }).finally(() => {
-      activatingRef.current = false;
-    });
-  }, [clerk, isLoaded, sessionId, sessions]);
-
-  return null;
 }
 
 function AuthInfo() {
