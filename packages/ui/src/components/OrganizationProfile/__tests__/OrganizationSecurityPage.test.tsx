@@ -84,7 +84,7 @@ describe('OrganizationSecurityPage', () => {
       expect(screen.queryByRole('button', { name: /open menu/i })).not.toBeInTheDocument();
     });
 
-    it('renders the active state with the toggle on and the connection details', async () => {
+    it('renders the active state with the connection details', async () => {
       const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
 
       fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([configuredConnection({ active: true })]);
@@ -100,9 +100,7 @@ describe('OrganizationSecurityPage', () => {
         screen.getByText('Configure SSO to require organization members to sign in through your identity provider'),
       ).toBeInTheDocument();
 
-      const ssoSwitch = screen.getByRole('switch', { name: 'Enable SSO' });
-      expect(ssoSwitch).toBeChecked();
-      expect(ssoSwitch).toBeEnabled();
+      expect(screen.queryByRole('switch')).not.toBeInTheDocument();
 
       expect(screen.getByText('Provider')).toBeInTheDocument();
       expect(screen.getByText('Okta Workforce')).toBeInTheDocument();
@@ -127,7 +125,7 @@ describe('OrganizationSecurityPage', () => {
       expect(screen.queryByText(/configuration details/i)).not.toBeInTheDocument();
     });
 
-    it('renders the inactive state with the toggle off and a chip per domain', async () => {
+    it('renders the inactive state with a chip per domain', async () => {
       const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
 
       fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([
@@ -142,10 +140,8 @@ describe('OrganizationSecurityPage', () => {
 
       expect(await screen.findByText('Inactive')).toBeInTheDocument();
 
-      const ssoSwitch = screen.getByRole('switch', { name: 'Enable SSO' });
-      expect(ssoSwitch).not.toBeChecked();
-      // A successful test run satisfies the enable gate.
-      expect(ssoSwitch).toBeEnabled();
+      expect(screen.queryByRole('switch')).not.toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /open menu/i })).toBeInTheDocument();
 
       for (const domain of ['github.com', 'gmail.com', 'maps.com', 'another.com']) {
         expect(screen.getByText(domain)).toBeInTheDocument();
@@ -223,7 +219,46 @@ describe('OrganizationSecurityPage', () => {
   });
 
   describe('actions menu', () => {
-    it('lists Edit and Delete, and Delete opens the type-to-confirm reset dialog', async () => {
+    it('lists Edit, Deactivate, and Remove for an active connection', async () => {
+      const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
+
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([configuredConnection({ active: true })]);
+      fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
+        data: [],
+        total_count: 0,
+      } as any);
+
+      const { userEvent } = renderPage(wrapper);
+
+      await userEvent.click(await screen.findByRole('button', { name: /open menu/i }));
+
+      expect(screen.getByRole('menuitem', { name: 'Edit' })).toBeInTheDocument();
+      expect(screen.getByRole('menuitem', { name: 'Deactivate' })).toBeInTheDocument();
+      expect(screen.getByRole('menuitem', { name: 'Remove' })).toBeInTheDocument();
+      expect(screen.queryByRole('menuitem', { name: 'Activate' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('menuitem', { name: 'Delete' })).not.toBeInTheDocument();
+    });
+
+    it('lists Edit, Activate, and Remove for an inactive connection', async () => {
+      const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
+
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([configuredConnection()]);
+      fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
+        data: [{ id: 'run_1', status: 'success' }],
+        total_count: 1,
+      } as any);
+
+      const { userEvent } = renderPage(wrapper);
+
+      await userEvent.click(await screen.findByRole('button', { name: /open menu/i }));
+
+      expect(screen.getByRole('menuitem', { name: 'Edit' })).toBeInTheDocument();
+      expect(screen.getByRole('menuitem', { name: 'Activate' })).toBeInTheDocument();
+      expect(screen.getByRole('menuitem', { name: 'Remove' })).toBeInTheDocument();
+      expect(screen.queryByRole('menuitem', { name: 'Deactivate' })).not.toBeInTheDocument();
+    });
+
+    it('opens the type-to-confirm reset dialog from Remove', async () => {
       const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
 
       fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([configuredConnection({ active: true })]);
@@ -236,10 +271,8 @@ describe('OrganizationSecurityPage', () => {
       const { userEvent } = renderPage(wrapper);
 
       await userEvent.click(await screen.findByRole('button', { name: /open menu/i }));
-      expect(screen.getByRole('menuitem', { name: 'Edit' })).toBeInTheDocument();
-      const deleteItem = screen.getByRole('menuitem', { name: 'Delete' });
+      await userEvent.click(screen.getByRole('menuitem', { name: 'Remove' }));
 
-      await userEvent.click(deleteItem);
       expect(await screen.findByRole('heading', { name: 'Reset connection' })).toBeInTheDocument();
 
       // Type-to-confirm uses the organization name.
@@ -251,16 +284,17 @@ describe('OrganizationSecurityPage', () => {
         expect(fixtures.clerk.organization?.deleteEnterpriseConnection).toHaveBeenCalledWith('ent_1');
       });
     });
-  });
 
-  describe('Enable SSO toggle', () => {
-    it('flips optimistically, disables while saving, and settles on the server value', async () => {
+    it('deactivates directly from the menu, flipping the badge optimistically before settling', async () => {
       const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
 
-      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([configuredConnection({ active: true })]);
+      // The revalidation that follows the update returns the deactivated connection.
+      fixtures.clerk.organization?.getEnterpriseConnections
+        .mockResolvedValueOnce([configuredConnection({ active: true })])
+        .mockResolvedValue([configuredConnection()]);
       fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
-        data: [],
-        total_count: 0,
+        data: [{ id: 'run_1', status: 'success' }],
+        total_count: 1,
       } as any);
 
       let resolveUpdate!: (value: unknown) => void;
@@ -270,24 +304,61 @@ describe('OrganizationSecurityPage', () => {
 
       const { userEvent } = renderPage(wrapper);
 
-      const ssoSwitch = await screen.findByRole('switch', { name: 'Enable SSO' });
-      expect(ssoSwitch).toBeChecked();
+      expect(await screen.findByText('Active')).toBeInTheDocument();
 
-      await userEvent.click(ssoSwitch);
+      await userEvent.click(screen.getByRole('button', { name: /open menu/i }));
+      await userEvent.click(screen.getByRole('menuitem', { name: 'Deactivate' }));
 
-      expect(ssoSwitch).not.toBeChecked();
-      expect(ssoSwitch).toBeDisabled();
+      // The badge flips before the server confirms.
+      expect(screen.getByText('Inactive')).toBeInTheDocument();
+      expect(screen.queryByText('Active')).not.toBeInTheDocument();
       expect(fixtures.clerk.organization?.updateEnterpriseConnection).toHaveBeenCalledWith('ent_1', {
         active: false,
       });
 
       resolveUpdate({ active: false });
 
-      await waitFor(() => expect(ssoSwitch).toBeEnabled());
-      expect(ssoSwitch).not.toBeChecked();
+      // Settles on the revalidated connection.
+      await waitFor(() => expect(screen.getByText('Inactive')).toBeInTheDocument());
+      expect(screen.queryByText('Active')).not.toBeInTheDocument();
     });
 
-    it('rolls back the toggle and surfaces the error when the update fails', async () => {
+    it('activates directly from the menu, flipping the badge optimistically before settling', async () => {
+      const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
+
+      fixtures.clerk.organization?.getEnterpriseConnections
+        .mockResolvedValueOnce([configuredConnection()])
+        .mockResolvedValue([configuredConnection({ active: true })]);
+      fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
+        data: [{ id: 'run_1', status: 'success' }],
+        total_count: 1,
+      } as any);
+
+      let resolveUpdate!: (value: unknown) => void;
+      fixtures.clerk.organization?.updateEnterpriseConnection.mockImplementation(
+        () => new Promise(resolve => (resolveUpdate = resolve)) as any,
+      );
+
+      const { userEvent } = renderPage(wrapper);
+
+      expect(await screen.findByText('Inactive')).toBeInTheDocument();
+
+      await userEvent.click(screen.getByRole('button', { name: /open menu/i }));
+      await userEvent.click(screen.getByRole('menuitem', { name: 'Activate' }));
+
+      expect(screen.getByText('Active')).toBeInTheDocument();
+      expect(screen.queryByText('Inactive')).not.toBeInTheDocument();
+      expect(fixtures.clerk.organization?.updateEnterpriseConnection).toHaveBeenCalledWith('ent_1', {
+        active: true,
+      });
+
+      resolveUpdate({ active: true });
+
+      await waitFor(() => expect(screen.getByText('Active')).toBeInTheDocument());
+      expect(screen.queryByText('Inactive')).not.toBeInTheDocument();
+    });
+
+    it('rolls the badge back and surfaces the error when the update fails', async () => {
       const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
 
       fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([configuredConnection({ active: true })]);
@@ -310,14 +381,14 @@ describe('OrganizationSecurityPage', () => {
 
       const { userEvent } = renderPage(wrapper);
 
-      const ssoSwitch = await screen.findByRole('switch', { name: 'Enable SSO' });
-      expect(ssoSwitch).toBeChecked();
+      expect(await screen.findByText('Active')).toBeInTheDocument();
 
-      await userEvent.click(ssoSwitch);
+      await userEvent.click(screen.getByRole('button', { name: /open menu/i }));
+      await userEvent.click(screen.getByRole('menuitem', { name: 'Deactivate' }));
 
-      await waitFor(() => expect(ssoSwitch).toBeEnabled());
-      expect(ssoSwitch).toBeChecked();
       expect(await screen.findByText('The connection could not be updated')).toBeInTheDocument();
+      expect(screen.getByText('Active')).toBeInTheDocument();
+      expect(screen.queryByText('Inactive')).not.toBeInTheDocument();
     });
   });
 });

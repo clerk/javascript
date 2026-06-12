@@ -1077,10 +1077,11 @@ export const enUS: LocalizationResource = {
         description__configured:
           'Configure SSO to require organization members to sign in through your identity provider',
         domainLabel: 'Domain',
-        enableSsoLabel: 'Enable SSO',
         issuerLabel: 'Issuer',
-        menuAction__delete: 'Delete',
+        menuAction__activate: 'Activate',
+        menuAction__deactivate: 'Deactivate',
         menuAction__edit: 'Edit',
+        menuAction__remove: 'Remove',
         primaryButton__continueConfiguration: 'Continue configuration',
         primaryButton__startConfiguration: 'Start configuration',
         providerLabel: 'Provider',

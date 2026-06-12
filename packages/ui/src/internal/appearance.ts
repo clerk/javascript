@@ -367,8 +367,6 @@ export type ElementsConfig = {
   organizationProfileSecuritySsoDescription: WithOptions;
   organizationProfileSecuritySsoInProgressNotice: WithOptions;
   organizationProfileSecuritySsoConfigureButton: WithOptions<string>;
-  organizationProfileSecuritySsoEnableRow: WithOptions;
-  organizationProfileSecuritySsoEnableLabel: WithOptions;
   organizationProfileSecuritySsoDetailRows: WithOptions;
   organizationProfileSecuritySsoDetailRow: WithOptions<string>;
   organizationProfileSecuritySsoDetailRowLabel: WithOptions<string>;

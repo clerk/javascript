@@ -1,12 +1,11 @@
 import { iconImageUrl } from '@clerk/shared/constants';
 import type { EnterpriseConnectionResource } from '@clerk/shared/types';
 import type { PropsWithChildren } from 'react';
-import { useId, useState } from 'react';
+import { useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
 import { CardStateProvider, useCardState } from '@/ui/elements/contexts';
 import { ProfileSection } from '@/ui/elements/Section';
-import { Switch } from '@/ui/elements/Switch';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import { handleError } from '@/utils/errorHandler';
 
@@ -69,8 +68,14 @@ const PROVIDER_PRESENTATION: Record<ProviderType, { label: LocalizationKey; icon
 
 export const SecuritySsoSection = (props: SecuritySsoSectionProps): JSX.Element => {
   const { connection, onConfigure } = props;
-  const badge = STATUS_BADGES[connection.status];
+
+  // Mirrors an in-flight Activate / Deactivate so the badge and menu flip optimistically; cleared on settle.
+  const [optimisticActive, setOptimisticActive] = useState<boolean>();
+
   const isConfigured = connection.status === 'active' || connection.status === 'inactive';
+  const status: OrganizationEnterpriseConnectionStatus =
+    isConfigured && optimisticActive !== undefined ? (optimisticActive ? 'active' : 'inactive') : connection.status;
+  const badge = STATUS_BADGES[status];
 
   return (
     <ProfileSection.Root
@@ -86,7 +91,7 @@ export const SecuritySsoSection = (props: SecuritySsoSectionProps): JSX.Element 
         />
       }
     >
-      {connection.status === 'unconfigured' && (
+      {status === 'unconfigured' && (
         <NotConfiguredContent
           primaryButtonKey={localizationKeys(
             'organizationProfile.securityPage.ssoSection.primaryButton__startConfiguration',
@@ -96,7 +101,7 @@ export const SecuritySsoSection = (props: SecuritySsoSectionProps): JSX.Element 
         />
       )}
 
-      {connection.status === 'in_progress' && (
+      {status === 'in_progress' && (
         <NotConfiguredContent
           noticeKey={localizationKeys('organizationProfile.securityPage.ssoSection.startedNotFinished')}
           primaryButtonKey={localizationKeys(
@@ -109,7 +114,11 @@ export const SecuritySsoSection = (props: SecuritySsoSectionProps): JSX.Element 
 
       {isConfigured && (
         <CardStateProvider>
-          <ConfiguredContent {...props} />
+          <ConfiguredContent
+            {...props}
+            isActive={status === 'active'}
+            onOptimisticActiveChange={setOptimisticActive}
+          />
         </CardStateProvider>
       )}
     </ProfileSection.Root>
@@ -159,14 +168,52 @@ const NotConfiguredContent = ({
   </Col>
 );
 
-const ConfiguredContent = (props: SecuritySsoSectionProps): JSX.Element => {
-  const { connection, enterpriseConnection, deleteConnection, organizationName, contentRef, onConfigure } = props;
+type ConfiguredContentProps = SecuritySsoSectionProps & {
+  /** Effective activation — an in-flight optimistic flip included. */
+  isActive: boolean;
+  onOptimisticActiveChange: (active: boolean | undefined) => void;
+};
+
+const ConfiguredContent = (props: ConfiguredContentProps): JSX.Element => {
+  const {
+    connection,
+    enterpriseConnection,
+    setConnectionActive,
+    deleteConnection,
+    organizationName,
+    contentRef,
+    onConfigure,
+    isActive,
+    onOptimisticActiveChange,
+  } = props;
   const card = useCardState();
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
 
   const provider = connection.provider ? PROVIDER_PRESENTATION[connection.provider] : undefined;
   const domains = enterpriseConnection?.domains ?? [];
   const samlConnection = enterpriseConnection?.samlConnection;
+
+  const onSetActive = async (active: boolean) => {
+    if (card.isLoading) {
+      return;
+    }
+
+    card.setError(undefined);
+    card.setLoading();
+    onOptimisticActiveChange(active);
+
+    try {
+      // A configured (active / inactive) connection guarantees the resource is set.
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      await setConnectionActive(enterpriseConnection!.id, active);
+    } catch (err) {
+      handleError(err as Error, [], card.setError);
+    } finally {
+      // The mutation revalidates before resolving, so the settled entity drives the UI from here.
+      onOptimisticActiveChange(undefined);
+      card.setIdle();
+    }
+  };
 
   return (
     <Col gap={3}>
@@ -189,8 +236,19 @@ const ConfiguredContent = (props: SecuritySsoSectionProps): JSX.Element => {
               label: localizationKeys('organizationProfile.securityPage.ssoSection.menuAction__edit'),
               onClick: onConfigure,
             },
+            isActive
+              ? {
+                  label: localizationKeys('organizationProfile.securityPage.ssoSection.menuAction__deactivate'),
+                  isDisabled: card.isLoading,
+                  onClick: () => void onSetActive(false),
+                }
+              : {
+                  label: localizationKeys('organizationProfile.securityPage.ssoSection.menuAction__activate'),
+                  isDisabled: card.isLoading,
+                  onClick: () => void onSetActive(true),
+                },
             {
-              label: localizationKeys('organizationProfile.securityPage.ssoSection.menuAction__delete'),
+              label: localizationKeys('organizationProfile.securityPage.ssoSection.menuAction__remove'),
               isDestructive: true,
               onClick: () => setIsResetDialogOpen(true),
             },
@@ -200,17 +258,9 @@ const ConfiguredContent = (props: SecuritySsoSectionProps): JSX.Element => {
 
       <Card.Alert>{card.error}</Card.Alert>
 
-      <EnableSsoToggle
-        connection={connection}
-        enterpriseConnection={enterpriseConnection}
-        setConnectionActive={props.setConnectionActive}
-      />
-
       <Col
         elementDescriptor={descriptors.organizationProfileSecuritySsoDetailRows}
         gap={2}
-        // Indents the rows so the labels line up under the toggle's text label.
-        sx={t => ({ paddingInlineStart: t.space.$8 })}
       >
         {provider && (
           <DetailRow
@@ -299,67 +349,6 @@ const ConfiguredContent = (props: SecuritySsoSectionProps): JSX.Element => {
         contentRef={contentRef}
       />
     </Col>
-  );
-};
-
-type EnableSsoToggleProps = Pick<
-  SecuritySsoSectionProps,
-  'connection' | 'enterpriseConnection' | 'setConnectionActive'
->;
-
-const EnableSsoToggle = ({
-  connection,
-  enterpriseConnection,
-  setConnectionActive,
-}: EnableSsoToggleProps): JSX.Element => {
-  const card = useCardState();
-  const labelId = useId();
-
-  const [isChecked, setIsChecked] = useState(connection.isActive);
-
-  const onActiveChange = async (active: boolean) => {
-    if (card.isLoading) {
-      return;
-    }
-
-    card.setError(undefined);
-    card.setLoading();
-    setIsChecked(active);
-
-    try {
-      // A configured (active / inactive) connection guarantees the resource is set.
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const updated = await setConnectionActive(enterpriseConnection!.id, active);
-      if (updated) {
-        setIsChecked(updated.active);
-      }
-    } catch (err) {
-      setIsChecked(!active);
-      handleError(err as Error, [], card.setError);
-    } finally {
-      card.setIdle();
-    }
-  };
-
-  return (
-    <Flex
-      elementDescriptor={descriptors.organizationProfileSecuritySsoEnableRow}
-      align='center'
-      gap={2}
-    >
-      <Switch
-        isChecked={isChecked}
-        // The spec gates enabling on a successful test run.
-        isDisabled={card.isLoading || (!connection.hasSuccessfulTestRun && !connection.isActive)}
-        onChange={active => void onActiveChange(active)}
-        aria-labelledby={labelId}
-      />
-      <Text
-        elementDescriptor={descriptors.organizationProfileSecuritySsoEnableLabel}
-        id={labelId}
-        localizationKey={localizationKeys('organizationProfile.securityPage.ssoSection.enableSsoLabel')}
-      />
-    </Flex>
   );
 };
 

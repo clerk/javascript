@@ -1143,14 +1143,15 @@ export type __internal_LocalizationResource = {
         startedNotFinished: LocalizationValue;
         primaryButton__startConfiguration: LocalizationValue;
         primaryButton__continueConfiguration: LocalizationValue;
-        enableSsoLabel: LocalizationValue;
         providerLabel: LocalizationValue;
         domainLabel: LocalizationValue;
         signOnUrlLabel: LocalizationValue;
         issuerLabel: LocalizationValue;
         certificateLabel: LocalizationValue;
         menuAction__edit: LocalizationValue;
-        menuAction__delete: LocalizationValue;
+        menuAction__activate: LocalizationValue;
+        menuAction__deactivate: LocalizationValue;
+        menuAction__remove: LocalizationValue;
       };
     };
     membersPage: {
