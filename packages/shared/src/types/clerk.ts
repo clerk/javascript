@@ -2876,7 +2876,7 @@ export interface HeadlessBrowserClerk extends Clerk {
    *
    * When using the JavaScript SDK, you must call the `load()` method before using the `Clerk` object in your code. Refer to the [quickstart guide](https://clerk.com/docs/js-frontend/getting-started/quickstart) for more information.
    */
-  load: (opts?: Without<ClerkOptions, 'isSatellite'>) => Promise<void>;
+  load: (opts?: ClerkOptions) => Promise<void>;
   updateClient: (client: ClientResource) => void;
 }
 
