@@ -1,3 +1,4 @@
+import type { HandleOAuthCallbackParams } from './clerk';
 import type { EnterpriseSSOStrategy, OAuthStrategy } from './strategies';
 
 /** @generateWithEmptyComment */
@@ -83,7 +84,7 @@ export type AuthenticateWithRedirectParams = {
    *
    * @internal
    */
-  __internal_callbackParams?: import('./clerk').HandleOAuthCallbackParams;
+  __internal_callbackParams?: HandleOAuthCallbackParams;
 
   /**
    * @experimental

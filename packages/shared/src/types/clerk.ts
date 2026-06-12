@@ -19,6 +19,7 @@ import type { LocalizationResource } from './localization';
 import type { DomainOrProxyUrl, MultiDomainAndOrProxy } from './multiDomain';
 import type { OAuthProvider, OAuthScope } from './oauth';
 import type { OAuthApplicationNamespace } from './oauthApplication';
+import type { OAuthTransport } from './oauthTransport';
 import type { OrganizationResource } from './organization';
 import type { OrganizationCustomRoleKey } from './organizationMembership';
 import type { ClerkPaginationParams } from './pagination';
@@ -1057,7 +1058,7 @@ export interface Clerk {
    *
    * @internal
    */
-  __internal_oauthTransport: import('./oauthTransport').OAuthTransport | null;
+  __internal_oauthTransport: OAuthTransport | null;
 
   /**
    * Completes an OAuth/SAML callback using a sign-in or sign-up resource already in hand
@@ -1497,7 +1498,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      *
      * @internal
      */
-    __internal_oauthTransport?: import('./oauthTransport').OAuthTransport;
+    __internal_oauthTransport?: OAuthTransport;
 
     /**
      * Customize the URL paths users are redirected to after sign-in or sign-up when specific
