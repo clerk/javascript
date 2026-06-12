@@ -166,7 +166,7 @@ const commonForProdBrowser = ({ targets = 'last 2 years', useCoreJs = false } = 
     output: {
       path: path.resolve(__dirname, 'dist'),
       filename: '[name].js',
-      libraryTarget: 'umd',
+      library: { type: 'umd' },
       globalObject: 'globalThis',
     },
     module: {
@@ -265,7 +265,7 @@ const devConfig = (mode, env) => {
       publicPath: `${devUrl.origin}/npm/`,
       crossOriginLoading: 'anonymous',
       filename: `[name].js`,
-      libraryTarget: 'umd',
+      library: { type: 'umd' },
     },
     optimization: {
       minimize: false,
@@ -281,11 +281,8 @@ const devConfig = (mode, env) => {
       liveReload: false,
       client: { webSocketURL: `auto://${devUrl.host}/ws` },
     },
-    cache: false,
-    experiments: {
-      cache: {
-        type: 'memory',
-      },
+    cache: {
+      type: 'memory',
     },
     lazyCompilation: false,
     // Only externalize React when using the shared variant (e.g., with @clerk/react).
