@@ -33,12 +33,12 @@ export type SkeletonProps = Omit<BoxProps, 'sx' | 'children'> & {
  * Decorative only (`aria-hidden` + `inert`) — pair with an accessible loading
  * announcement at the container level if needed.
  */
+
 export function Skeleton({ children, width = '100%', height = '1rem', sx, ...rest }: SkeletonProps) {
   return (
     <Box
       aria-hidden
-      // @ts-expect-error `inert` typing varies by React version; the attribute is valid.
-      inert='true'
+      ref={el => el?.setAttribute('inert', '')}
       sx={t => ({
         borderRadius: t.rounded.md,
         animation: `${pulse} 2s cubic-bezier(0.4, 0, 0.6, 1) infinite`,
