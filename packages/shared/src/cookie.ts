@@ -39,6 +39,13 @@ export interface CookieAttributes {
   sameSite?: 'strict' | 'Strict' | 'lax' | 'Lax' | 'none' | 'None' | undefined;
 
   /**
+   * A Boolean indicating whether the cookie is partitioned per top-level
+   * site (CHIPS). js-cookie serializes it through the attribute passthrough;
+   * declared explicitly because Clerk sets it at several call sites.
+   */
+  partitioned?: boolean | undefined;
+
+  /**
    * An attribute which will be serialized, conformably to RFC 6265
    * section 5.2.
    */
@@ -74,7 +81,7 @@ export function createCookieHandler(cookieName: string) {
      *
      * @see https://github.com/js-cookie/js-cookie#basic-usage
      */
-    remove(cookieAttributes?: CookieAttributes) {
+    remove(cookieAttributes?: CookieAttributes): void {
       Cookies.remove(cookieName, cookieAttributes);
     },
   };
