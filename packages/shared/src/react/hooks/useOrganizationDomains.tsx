@@ -154,9 +154,6 @@ function useOrganizationDomains(params: UseOrganizationDomainsParams = {}): UseO
     };
 
     const runAttempt = async () => {
-      // Transient failures (network blips, DNS not yet propagated) are logged
-      // once and resolve to `undefined`, so they simply fall through to the
-      // next poll. `warnOnce` keeps this hot path from flooding the console.
       const result = await organization
         .attemptOwnershipVerification(unverifiedOwnershipDomainIds)
         .catch((error: unknown) => {
@@ -169,8 +166,6 @@ function useOrganizationDomains(params: UseOrganizationDomainsParams = {}): UseO
 
       const hasNewlyVerified = result?.data.some(domain => domain.ownershipVerification?.status === 'verified');
       if (hasNewlyVerified) {
-        // Refetch pulls the new state in; the effect re-runs with the smaller
-        // outstanding set (or stops entirely once all are verified).
         await revalidate();
         return;
       }

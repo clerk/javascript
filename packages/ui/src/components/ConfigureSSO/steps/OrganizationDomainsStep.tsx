@@ -409,7 +409,6 @@ const TxtRecord = ({
         wrap='wrap'
         sx={t => ({ gap: t.space.$6 })}
       >
-        {/* TODO -> Label name name need to use badge components */}
         <RecordEntry
           label={localizationKeys('configureSSO.organizationDomainsStep.domainCard.txtRecord.typeLabel')}
           value='TXT'
@@ -450,7 +449,35 @@ const RecordEntry = ({
         localizationKey={label}
         sx={t => ({ fontSize: t.fontSizes.$sm, flexShrink: 0 })}
       />
-      {copyable ? <CopyableValue value={value} /> : <RecordChip>{value}</RecordChip>}
+      {copyable ? (
+        <CopyableValue value={value} />
+      ) : (
+        <Badge
+          colorScheme='primary'
+          sx={t => ({
+            fontFamily: t.fonts.$buttons,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingBlock: t.space.$1,
+            paddingInline: t.space.$1x5,
+          })}
+        >
+          <Box
+            as='span'
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              lineHeight: 1,
+              textBoxTrim: 'trim-both',
+              textBoxEdge: 'cap alphabetic',
+            }}
+          >
+            {value}
+          </Box>
+        </Badge>
+      )}
     </Flex>
   );
 };

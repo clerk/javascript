@@ -4,26 +4,34 @@ import { CardStateProvider } from '@/elements/contexts';
 
 import { ConfigureSSOProvider } from './ConfigureSSOContext';
 import { ConfigureSSOHeader } from './ConfigureSSOHeader';
-import { type WizardStepConfig } from './elements/Wizard';
-import { Wizard } from './elements/Wizard';
-import { ConfigureStep, ConfirmationStep, SelectProviderStep, TestConfigurationStep, VerifyDomainStep } from './steps';
+import { Wizard, type WizardStepConfig } from './elements/Wizard';
+import {
+  ConfigureStep,
+  ConfirmationStep,
+  OrganizationDomainsStep,
+  SelectProviderStep,
+  TestConfigurationStep,
+} from './steps';
 
 export type ConfigureSSOWizardProps = Omit<ComponentProps<typeof ConfigureSSOProvider>, 'children'>;
 
 /** Pure, data-injected ConfigureSSO flow — hosts own fetching, loading, and permission gating. */
 export const ConfigureSSOWizard = (props: ConfigureSSOWizardProps): JSX.Element => {
-  // Guards read from props, not `useConfigureSSO()` — this component renders the provider, so the hook would throw here.
-  const { organizationEnterpriseConnection: c } = props;
+  const { organizationEnterpriseConnection: c, organizationDomains } = props;
+
+  const allDomainsVerified =
+    !!organizationDomains?.length &&
+    organizationDomains.every(domain => domain.ownershipVerification?.status === 'verified');
 
   const steps = React.useMemo<WizardStepConfig[]>(
     () => [
       { id: 'verify-domain', label: 'Verify domain' },
-      { id: 'select-provider', guard: () => c.isPrimaryEmailVerified },
-      { id: 'configure', label: 'Configure', guard: () => c.isPrimaryEmailVerified && c.hasConnection },
+      { id: 'select-provider', guard: () => allDomainsVerified },
+      { id: 'configure', label: 'Configure', guard: () => c.hasConnection },
       { id: 'test', label: 'Test', guard: () => c.hasMinimumConfiguration || c.isActive },
       { id: 'confirmation', label: 'Confirmation', guard: () => c.hasSuccessfulTestRun || c.isActive },
     ],
-    [c],
+    [c, allDomainsVerified],
   );
 
   // Each step owns a `CardStateProvider` so card errors stay scoped to their step and clear when it unmounts.
@@ -34,7 +42,7 @@ export const ConfigureSSOWizard = (props: ConfigureSSOWizardProps): JSX.Element 
 
         <Wizard.Match id='verify-domain'>
           <CardStateProvider>
-            <VerifyDomainStep />
+            <OrganizationDomainsStep />
           </CardStateProvider>
         </Wizard.Match>
 

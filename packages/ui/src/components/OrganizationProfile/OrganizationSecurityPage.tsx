@@ -1,11 +1,13 @@
-import { useOrganization } from '@clerk/shared/react';
+import { __internal_useOrganizationDomains, useOrganization } from '@clerk/shared/react';
 import { useState } from 'react';
 
 import { Header } from '@/ui/elements/Header';
 import { ProfileCard } from '@/ui/elements/ProfileCard';
 
+import React from 'react';
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import { ConfigureSSOProtect } from '../ConfigureSSO/ConfigureSSO';
+import type { OrganizationDomainMutations } from '../ConfigureSSO/ConfigureSSOContext';
 import { ConfigureSSOSkeleton } from '../ConfigureSSO/ConfigureSSOSkeleton';
 import { ConfigureSSOWizard } from '../ConfigureSSO/ConfigureSSOWizard';
 import { useOrganizationEnterpriseConnection } from '../ConfigureSSO/hooks/useOrganizationEnterpriseConnection';
@@ -29,19 +31,34 @@ export const OrganizationSecurityPage = ({ contentRef }: OrganizationSecurityPag
 /** Separate from the page so the connection hook only runs behind the organization check. */
 const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPageProps) => {
   const {
-    isLoading,
     organization,
+    isLoading: isLoadingEnterpriseConnection,
     enterpriseConnection,
     organizationEnterpriseConnection,
     testRuns,
-    mutations,
-    primaryEmailAddress,
+    enterpriseConnectionMutations,
   } = useOrganizationEnterpriseConnection();
 
   const [view, setView] = useState<'overview' | 'wizard'>('overview');
 
+  const {
+    isLoading: isLoadingOrganizationDomains,
+    data: organizationDomains,
+    createDomain,
+    prepareOwnershipVerification,
+    attemptOwnershipVerification,
+    revalidate,
+  } = __internal_useOrganizationDomains({
+    enrollmentMode: 'enterprise_sso',
+  });
+
+  const organizationDomainMutations = React.useMemo<OrganizationDomainMutations>(
+    () => ({ createDomain, prepareOwnershipVerification, attemptOwnershipVerification, revalidate }),
+    [createDomain, prepareOwnershipVerification, attemptOwnershipVerification, revalidate],
+  );
+
   // Gate loading above the provider so the context never observes a loading state.
-  if (isLoading) {
+  if (isLoadingEnterpriseConnection || isLoadingOrganizationDomains) {
     return <ConfigureSSOSkeleton />;
   }
 
@@ -67,8 +84,8 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
               <SecuritySsoSection
                 connection={organizationEnterpriseConnection}
                 enterpriseConnection={enterpriseConnection}
-                setConnectionActive={mutations.setConnectionActive}
-                deleteConnection={mutations.deleteConnection}
+                setConnectionActive={enterpriseConnectionMutations.setConnectionActive}
+                deleteConnection={enterpriseConnectionMutations.deleteConnection}
                 organizationName={organization?.name ?? ''}
                 contentRef={contentRef}
                 onConfigure={() => setView('wizard')}
@@ -82,8 +99,9 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
           testRuns={testRuns}
           enterpriseConnection={enterpriseConnection}
           contentRef={contentRef}
-          mutations={mutations}
-          primaryEmailAddress={primaryEmailAddress}
+          enterpriseConnectionMutations={enterpriseConnectionMutations}
+          organizationDomainMutations={organizationDomainMutations}
+          organizationDomains={organizationDomains}
         />
       )}
     </ConfigureSSOProtect>
