@@ -36,7 +36,7 @@ export async function _authenticateWithTransport(opts: {
   const redirectUrl = String(await opts.transport.getRedirectUrl());
 
   let verificationUrl: URL | string | undefined;
-  await opts.authenticateMethod({ ...opts.params, redirectUrl, redirectUrlComplete: redirectUrl }, url => {
+  await opts.authenticateMethod({ ...opts.params, redirectUrl }, url => {
     verificationUrl = url;
   });
 

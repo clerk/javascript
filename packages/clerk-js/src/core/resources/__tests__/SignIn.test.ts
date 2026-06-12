@@ -73,6 +73,51 @@ describe('SignIn', () => {
       expect(open).toHaveBeenCalledWith(new URL('https://provider.example/auth'));
       expect(handleResourceCallback).toHaveBeenCalledWith(signIn, { signInUrl: '/sign-in' });
     });
+
+    it('starts a new OAuth sign-in instead of replaying a stale redirect from a continued sign-in', async () => {
+      const open = vi.fn().mockResolvedValue({ callbackUrl: 'myapp://sso-callback' });
+      SignIn.clerk = {
+        buildUrlWithAuth: vi.fn(u => u),
+        __internal_oauthTransport: { getRedirectUrl: () => 'myapp://sso-callback', open },
+        __internal_handleResourceCallback: vi.fn().mockResolvedValue(undefined),
+        __internal_environment: { displayConfig: { captchaOauthBypass: [] } },
+      } as any;
+
+      const mockFetch = vi.fn().mockResolvedValueOnce({
+        client: null,
+        response: {
+          id: 'signin_456',
+          first_factor_verification: {
+            status: 'unverified',
+            external_verification_redirect_url: 'https://provider.example/fresh',
+          },
+        },
+      });
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn({
+        id: 'signin_123',
+        first_factor_verification: {
+          status: 'unverified',
+          external_verification_redirect_url: 'https://provider.example/stale',
+        },
+      } as any);
+
+      await signIn.authenticateWithRedirect({
+        strategy: 'oauth_google',
+        redirectUrl: '/sso-callback',
+        redirectUrlComplete: '/',
+        continueSignIn: true,
+      } as any);
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'POST',
+          path: '/client/sign_ins',
+        }),
+      );
+      expect(open).toHaveBeenCalledWith(new URL('https://provider.example/fresh'));
+    });
   });
 
   describe('signIn.create', () => {

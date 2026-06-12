@@ -14,7 +14,7 @@ import { useCardState } from '../../elements/contexts';
 import type { SocialButtonsProps } from '../../elements/SocialButtons';
 import { SocialButtons } from '../../elements/SocialButtons';
 import { useRouter } from '../../router';
-import { buildSignInOAuthCallbackParams } from './buildOAuthCallbackParams';
+import { buildSignInOAuthTransportCallbackParams } from './buildOAuthCallbackParams';
 
 export type SignInSocialButtonsProps = SocialButtonsProps & {
   onAlternativePhoneCodeProviderClick?: (channel: PhoneCodeChannel) => void;
@@ -82,7 +82,7 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
             redirectUrlComplete,
             oidcPrompt: ctx.oidcPrompt,
             __internal_callbackParams: {
-              ...buildSignInOAuthCallbackParams(ctx),
+              ...buildSignInOAuthTransportCallbackParams(ctx),
               navigateOnSetActive: ctx.navigateOnSetActive,
             },
           })

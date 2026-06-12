@@ -25,12 +25,12 @@ describe('_authenticateWithTransport', () => {
       transport,
       resource,
       authenticateMethod,
-      params: { strategy: 'oauth_google', redirectUrl: '/x', redirectUrlComplete: '/' } as any,
+      params: { strategy: 'oauth_google', redirectUrl: '/x', redirectUrlComplete: '/done' } as any,
       callbackParams,
     });
 
     expect(authenticateMethod).toHaveBeenCalledWith(
-      expect.objectContaining({ redirectUrl: 'myapp://sso-callback', redirectUrlComplete: 'myapp://sso-callback' }),
+      expect.objectContaining({ redirectUrl: 'myapp://sso-callback', redirectUrlComplete: '/done' }),
       expect.any(Function),
     );
     expect(transport.open).toHaveBeenCalledWith(new URL('https://provider.example/auth'));

@@ -11,7 +11,7 @@ import { useCoreSignUp, useSignUpContext } from '../../contexts';
 import type { SocialButtonsProps } from '../../elements/SocialButtons';
 import { SocialButtons } from '../../elements/SocialButtons';
 import { useRouter } from '../../router';
-import { buildSignUpOAuthCallbackParams } from '../SignIn/buildOAuthCallbackParams';
+import { buildSignUpOAuthTransportCallbackParams } from '../SignIn/buildOAuthCallbackParams';
 
 export type SignUpSocialButtonsProps = SocialButtonsProps & {
   continueSignUp?: boolean;
@@ -74,7 +74,7 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
             legalAccepted: props.legalAccepted,
             oidcPrompt: ctx.oidcPrompt,
             __internal_callbackParams: {
-              ...buildSignUpOAuthCallbackParams(ctx),
+              ...buildSignUpOAuthTransportCallbackParams(ctx),
               navigateOnSetActive: ctx.navigateOnSetActive,
             },
           })

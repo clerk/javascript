@@ -22,6 +22,15 @@ export function buildSignInOAuthCallbackParams(ctx: SignInContextType): HandleOA
   };
 }
 
+export function buildSignInOAuthTransportCallbackParams(ctx: SignInContextType): HandleOAuthCallbackParams {
+  return {
+    ...buildSignInOAuthCallbackParams(ctx),
+    firstFactorUrl: 'factor-one',
+    secondFactorUrl: 'factor-two',
+    resetPasswordUrl: 'reset-password',
+  };
+}
+
 /**
  * Exact callback params the combined-flow SignUp `sso-callback` route passes to SSOCallback.
  */
@@ -36,5 +45,14 @@ export function buildSignUpOAuthCallbackParams(ctx: SignUpContextType): HandleOA
     verifyEmailAddressUrl: '../verify-email-address',
     verifyPhoneNumberUrl: '../verify-phone-number',
     unsafeMetadata: ctx.unsafeMetadata,
+  };
+}
+
+export function buildSignUpOAuthTransportCallbackParams(ctx: SignUpContextType): HandleOAuthCallbackParams {
+  return {
+    ...buildSignUpOAuthCallbackParams(ctx),
+    continueSignUpUrl: 'continue',
+    verifyEmailAddressUrl: 'verify-email-address',
+    verifyPhoneNumberUrl: 'verify-phone-number',
   };
 }

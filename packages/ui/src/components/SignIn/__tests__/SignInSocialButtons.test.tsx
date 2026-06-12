@@ -46,6 +46,9 @@ describe('SignInSocialButtons', () => {
           strategy: 'oauth_google',
           __internal_callbackParams: expect.objectContaining({
             signInUrl: expect.any(String),
+            firstFactorUrl: 'factor-one',
+            secondFactorUrl: 'factor-two',
+            resetPasswordUrl: 'reset-password',
             navigateOnSetActive: expect.any(Function),
           }),
         }),
