@@ -65,7 +65,7 @@ describe('SignUpSocialButtons', () => {
           verifyEmailAddressUrl: 'verify-email-address',
           verifyPhoneNumberUrl: 'verify-phone-number',
           unsafeMetadata: { source: 'test' },
-          navigateOnSetActive: expect.any(Function),
+          __internal_navigateOnSetActive: expect.any(Function),
         }),
       });
     });

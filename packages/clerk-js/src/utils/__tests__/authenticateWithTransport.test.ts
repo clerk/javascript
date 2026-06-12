@@ -38,13 +38,13 @@ describe('_authenticateWithTransport', () => {
     expect(clerk.__internal_handleResourceCallback).toHaveBeenCalledWith(resource, callbackParams);
   });
 
-  it('skips reload when the callback URL has no nonce', async () => {
+  it('reloads without a nonce when the callback URL has no nonce', async () => {
     const clerk = makeClerk();
     const transport = {
       getRedirectUrl: vi.fn().mockResolvedValue('myapp://sso-callback'),
       open: vi.fn().mockResolvedValue({ callbackUrl: 'myapp://sso-callback' }),
     };
-    const resource = { reload: vi.fn() } as any;
+    const resource = { reload: vi.fn().mockResolvedValue(undefined) } as any;
     const authenticateMethod = vi.fn(async (_params, navigate) => navigate('https://provider.example/auth'));
 
     await _authenticateWithTransport({
@@ -56,7 +56,7 @@ describe('_authenticateWithTransport', () => {
       callbackParams: {},
     });
 
-    expect(resource.reload).not.toHaveBeenCalled();
+    expect(resource.reload).toHaveBeenCalledWith();
     expect(clerk.__internal_handleResourceCallback).toHaveBeenCalledWith(resource, {});
   });
 

@@ -2440,6 +2440,7 @@ export class Clerk implements ClerkInterface {
 
     const signInUrl = params.signInUrl || displayConfig.signInUrl;
     const signUpUrl = params.signUpUrl || displayConfig.signUpUrl;
+    const internalNavigateOnSetActive = params.__internal_navigateOnSetActive;
 
     const setActiveNavigate = async ({
       session,
@@ -2450,6 +2451,15 @@ export class Clerk implements ClerkInterface {
       baseUrl: string;
       redirectUrl: string;
     }) => {
+      if (internalNavigateOnSetActive) {
+        await internalNavigateOnSetActive({
+          session,
+          redirectUrl,
+          decorateUrl: url => this.buildUrlWithAuth(url),
+        });
+        return;
+      }
+
       if (!session.currentTask) {
         await this.navigate(redirectUrl);
         return;
@@ -2465,15 +2475,6 @@ export class Clerk implements ClerkInterface {
       return this.setActive({
         session: si.sessionId,
         navigate: async ({ session }) => {
-          if (params.navigateOnSetActive) {
-            await params.navigateOnSetActive({
-              session,
-              redirectUrl: redirectUrls.getAfterSignInUrl(),
-              decorateUrl: url => this.buildUrlWithAuth(url),
-            });
-            return;
-          }
-
           await setActiveNavigate({
             session,
             baseUrl: signInUrl,
@@ -2493,15 +2494,6 @@ export class Clerk implements ClerkInterface {
           return this.setActive({
             session: res.createdSessionId,
             navigate: async ({ session }) => {
-              if (params.navigateOnSetActive) {
-                await params.navigateOnSetActive({
-                  session,
-                  redirectUrl: redirectUrls.getAfterSignInUrl(),
-                  decorateUrl: url => this.buildUrlWithAuth(url),
-                });
-                return;
-              }
-
               await setActiveNavigate({
                 session,
                 baseUrl: signUpUrl,
@@ -2557,15 +2549,6 @@ export class Clerk implements ClerkInterface {
           return this.setActive({
             session: res.createdSessionId,
             navigate: async ({ session }) => {
-              if (params.navigateOnSetActive) {
-                await params.navigateOnSetActive({
-                  session,
-                  redirectUrl: redirectUrls.getAfterSignUpUrl(),
-                  decorateUrl: url => this.buildUrlWithAuth(url),
-                });
-                return;
-              }
-
               await setActiveNavigate({
                 session,
                 baseUrl: signUpUrl,
@@ -2584,15 +2567,6 @@ export class Clerk implements ClerkInterface {
       return this.setActive({
         session: su.sessionId,
         navigate: async ({ session }) => {
-          if (params.navigateOnSetActive) {
-            await params.navigateOnSetActive({
-              session,
-              redirectUrl: redirectUrls.getAfterSignUpUrl(),
-              decorateUrl: url => this.buildUrlWithAuth(url),
-            });
-            return;
-          }
-
           await setActiveNavigate({
             session,
             baseUrl: signUpUrl,
@@ -2623,15 +2597,6 @@ export class Clerk implements ClerkInterface {
         return this.setActive({
           session: sessionId,
           navigate: async ({ session }) => {
-            if (params.navigateOnSetActive) {
-              await params.navigateOnSetActive({
-                session,
-                redirectUrl: redirectUrls.getAfterSignInUrl(),
-                decorateUrl: url => this.buildUrlWithAuth(url),
-              });
-              return;
-            }
-
             await setActiveNavigate({
               session,
               baseUrl: suUserAlreadySignedIn ? signUpUrl : signInUrl,

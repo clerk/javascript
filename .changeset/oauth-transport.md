@@ -1,7 +1,8 @@
 ---
 '@clerk/shared': minor
 '@clerk/clerk-js': minor
+'@clerk/react': minor
 '@clerk/ui': minor
 ---
 
-Add an internal OAuth transport (`__internal_oauthTransport`) so native desktop SDK wrappers can run Clerk's prebuilt OAuth/SSO flows through a system browser. Existing redirect and popup behavior is unchanged when no transport is registered.
+Add internal OAuth transport support for native desktop SDK wrappers. Transport callbacks now reload the resource before callback handling, and OAuth retries with a pending provider redirect now start a fresh sign-in attempt.

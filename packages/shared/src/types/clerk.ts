@@ -1252,7 +1252,7 @@ export type HandleOAuthCallbackParams = TransferableOption &
      *
      * @internal
      */
-    navigateOnSetActive?: (opts: {
+    __internal_navigateOnSetActive?: (opts: {
       session: SessionResource;
       redirectUrl: string;
       decorateUrl: (url: string) => string;

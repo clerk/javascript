@@ -1240,7 +1240,7 @@ describe('Clerk singleton', () => {
       });
     });
 
-    it('uses navigateOnSetActive for completed sign in callbacks', async () => {
+    it('uses __internal_navigateOnSetActive for completed sign in callbacks', async () => {
       const sessionId = 'sess_123';
       const mockSession = { id: sessionId, currentTask: null };
       mockEnvironmentFetch.mockReturnValue(
@@ -1265,7 +1265,7 @@ describe('Clerk singleton', () => {
         }),
       );
 
-      const navigateOnSetActive = vi.fn(async ({ session, redirectUrl, decorateUrl }) => {
+      const internalNavigateOnSetActive = vi.fn(async ({ session, redirectUrl, decorateUrl }) => {
         expect(session).toBe(mockSession);
         expect(redirectUrl).toBe('http://test.host/after-sign-in');
         expect(decorateUrl('/decorated')).toBe('/decorated');
@@ -1278,18 +1278,18 @@ describe('Clerk singleton', () => {
 
       await sut.handleRedirectCallback({
         signInForceRedirectUrl: '/after-sign-in',
-        navigateOnSetActive,
+        __internal_navigateOnSetActive: internalNavigateOnSetActive,
       });
 
       expect(mockSetActive).toHaveBeenCalledWith({
         session: sessionId,
         navigate: expect.any(Function),
       });
-      expect(navigateOnSetActive).toHaveBeenCalledTimes(1);
+      expect(internalNavigateOnSetActive).toHaveBeenCalledTimes(1);
       expect(mockNavigate).not.toHaveBeenCalled();
     });
 
-    it('uses navigateOnSetActive for completed sign up callbacks', async () => {
+    it('uses __internal_navigateOnSetActive for completed sign up callbacks', async () => {
       const sessionId = 'sess_123';
       const mockSession = { id: sessionId, currentTask: null };
       mockEnvironmentFetch.mockReturnValue(
@@ -1314,7 +1314,7 @@ describe('Clerk singleton', () => {
         }),
       );
 
-      const navigateOnSetActive = vi.fn(async ({ session, redirectUrl, decorateUrl }) => {
+      const internalNavigateOnSetActive = vi.fn(async ({ session, redirectUrl, decorateUrl }) => {
         expect(session).toBe(mockSession);
         expect(redirectUrl).toBe('http://test.host/after-sign-up');
         expect(decorateUrl('/decorated')).toBe('/decorated');
@@ -1327,14 +1327,14 @@ describe('Clerk singleton', () => {
 
       await sut.handleRedirectCallback({
         signUpForceRedirectUrl: '/after-sign-up',
-        navigateOnSetActive,
+        __internal_navigateOnSetActive: internalNavigateOnSetActive,
       });
 
       expect(mockSetActive).toHaveBeenCalledWith({
         session: sessionId,
         navigate: expect.any(Function),
       });
-      expect(navigateOnSetActive).toHaveBeenCalledTimes(1);
+      expect(internalNavigateOnSetActive).toHaveBeenCalledTimes(1);
       expect(mockNavigate).not.toHaveBeenCalled();
     });
 

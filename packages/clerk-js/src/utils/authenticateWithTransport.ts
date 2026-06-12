@@ -45,6 +45,8 @@ export async function _authenticateWithTransport(opts: {
 
   if (nonce) {
     await opts.resource.reload({ rotatingTokenNonce: nonce });
+  } else {
+    await opts.resource.reload();
   }
 
   await opts.clerk.__internal_handleResourceCallback(opts.resource, opts.callbackParams);
