@@ -23,13 +23,13 @@ import {
 } from '../stories/leave-organization.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
 import {
-  Default as OrganizationProfileGeneralDefault,
-  meta as organizationProfileGeneralMeta,
-} from '../stories/organization-profile-general.stories';
-import {
   Default as OrganizationProfileDefault,
   meta as organizationProfileMeta,
 } from '../stories/organization-profile.stories';
+import {
+  Default as OrganizationProfileGeneralDefault,
+  meta as organizationProfileGeneralMeta,
+} from '../stories/organization-profile-general.stories';
 import { meta as popoverMeta } from '../stories/popover.stories';
 import { meta as selectMeta } from '../stories/select.stories';
 import { Default as TabsComponentDefault, meta as tabsComponentMeta } from '../stories/tabs.component.stories';
