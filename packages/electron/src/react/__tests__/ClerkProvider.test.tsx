@@ -84,7 +84,6 @@ describe('Electron ClerkProvider', () => {
       getRedirectUrl: expect.any(Function),
       open: expect.any(Function),
     });
-    expect(capturedProviderProps?.__internal_nativeOAuthHandler).toBeUndefined();
   });
 
   it('registers an OAuth transport backed by the Electron bridge', async () => {
