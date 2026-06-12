@@ -7,6 +7,7 @@ import { Platform } from 'react-native';
 
 import type { TokenCache } from '../cache/types';
 import { CLERK_CLIENT_JWT_KEY } from '../constants';
+import { notifyNativeSessionChanged } from '../hooks/nativeSessionEvents';
 import { useNativeClientEvents } from '../hooks/useNativeClientEvents';
 import NativeClerkModule from '../specs/NativeClerkModule';
 import { tokenCache as defaultTokenCache } from '../token-cache';
@@ -167,6 +168,7 @@ function NativeClientSync({
             // No token to push; ask native to reload its current client.
             await ClerkExpo.refreshClient();
           }
+          notifyNativeSessionChanged();
         };
 
         void refreshNativeFromJsClient()
@@ -232,6 +234,7 @@ function useNativeSessionBootstrap({
             if (!isMountedRef.current) {
               return;
             }
+            notifyNativeSessionChanged();
 
             if (clerkInstance) {
               const waitForLoad = (): Promise<void> => {
@@ -349,6 +352,7 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
             clerkInstance,
             tokenCache,
           });
+          notifyNativeSessionChanged();
         } finally {
           isSyncingNativeClientToJsRef.current = false;
         }
