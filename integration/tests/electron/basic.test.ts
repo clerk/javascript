@@ -16,7 +16,7 @@ test.describe('electron basic auth @electron', () => {
   });
 
   test.afterAll(async () => {
-    await fakeUser.deleteIfExists();
+    await fakeUser?.deleteIfExists();
   });
 
   test('signs in with email and password', async ({ electronPage }) => {
@@ -27,9 +27,7 @@ test.describe('electron basic auth @electron', () => {
 
     await signIn.setIdentifier(fakeUser.email);
     await signIn.continue();
-    const passField = signIn.getPasswordInput();
-    await passField.waitFor({ state: 'visible' });
-    await passField.fill(fakeUser.password);
+    await signIn.setPassword(fakeUser.password);
     await signIn.continue();
 
     await expect(electronPage.locator('[data-testid="user-id"]')).toHaveText(/^user_/, { timeout: 30_000 });
