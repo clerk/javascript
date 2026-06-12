@@ -1073,9 +1073,11 @@ export const enUS: LocalizationResource = {
         badge__inProgress: 'In Progress',
         badge__unconfigured: 'Unconfigured',
         certificateLabel: 'Certificate',
-        description: 'Configure to require organization members to sign in through your identity provider',
-        description__configured:
-          'Configure SSO to require organization members to sign in through your identity provider',
+        descriptionLine1:
+          'Let members sign in through your identity provider using their domain email. Members without a matching domain are unaffected.',
+        descriptionLine2:
+          'Anyone who signs in will be automatically added to this organization. New members will be assigned to {{role}}.',
+        descriptionLine2__noRole: 'Anyone who signs in will be automatically added to this organization.',
         domainLabel: 'Domain',
         issuerLabel: 'Issuer',
         menuAction__activate: 'Activate',
@@ -1086,7 +1088,6 @@ export const enUS: LocalizationResource = {
         primaryButton__startConfiguration: 'Start configuration',
         providerLabel: 'Provider',
         signOnUrlLabel: 'Sign on URL',
-        startedNotFinished: 'You have started a configuration but haven’t finished',
         title: 'SSO',
       },
       title: 'Security',

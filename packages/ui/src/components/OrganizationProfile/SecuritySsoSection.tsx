@@ -9,8 +9,10 @@ import { ProfileSection } from '@/ui/elements/Section';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import { handleError } from '@/utils/errorHandler';
 
+import { useEnvironment } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { Badge, Button, Col, descriptors, Flex, Link, localizationKeys, Span, Text } from '../../customizables';
+import { useFetchRoles, useLocalizeCustomRoles } from '../../hooks/useFetchRoles';
 import type {
   OrganizationEnterpriseConnection,
   OrganizationEnterpriseConnectionStatus,
@@ -103,7 +105,6 @@ export const SecuritySsoSection = (props: SecuritySsoSectionProps): JSX.Element 
 
       {status === 'in_progress' && (
         <NotConfiguredContent
-          noticeKey={localizationKeys('organizationProfile.securityPage.ssoSection.startedNotFinished')}
           primaryButtonKey={localizationKeys(
             'organizationProfile.securityPage.ssoSection.primaryButton__continueConfiguration',
           )}
@@ -126,14 +127,12 @@ export const SecuritySsoSection = (props: SecuritySsoSectionProps): JSX.Element 
 };
 
 type NotConfiguredContentProps = {
-  noticeKey?: LocalizationKey;
   primaryButtonKey: LocalizationKey;
   primaryButtonId: string;
   onConfigure: () => void;
 };
 
 const NotConfiguredContent = ({
-  noticeKey,
   primaryButtonKey,
   primaryButtonId,
   onConfigure,
@@ -142,20 +141,7 @@ const NotConfiguredContent = ({
     align='start'
     gap={4}
   >
-    <Col gap={2}>
-      <Text
-        elementDescriptor={descriptors.organizationProfileSecuritySsoDescription}
-        colorScheme='secondary'
-        localizationKey={localizationKeys('organizationProfile.securityPage.ssoSection.description')}
-      />
-      {noticeKey && (
-        <Text
-          elementDescriptor={descriptors.organizationProfileSecuritySsoInProgressNotice}
-          colorScheme='secondary'
-          localizationKey={noticeKey}
-        />
-      )}
-    </Col>
+    <SsoDescription />
 
     <Button
       elementDescriptor={descriptors.organizationProfileSecuritySsoConfigureButton}
@@ -167,6 +153,62 @@ const NotConfiguredContent = ({
     />
   </Col>
 );
+
+/**
+ * The display name of the role SSO-enrolled members are assigned — the environment's
+ * default member role, name-mapped when the roles list is readable.
+ */
+const useEnrollmentRoleName = (): string | undefined => {
+  const { organizationSettings } = useEnvironment();
+  const { options } = useFetchRoles();
+  const { localizeCustomRole } = useLocalizeCustomRoles();
+
+  // Mirrors the invite form's default-role resolution.
+  let roleKey = organizationSettings.domains.defaultRole ?? undefined;
+  if (!roleKey && options?.length === 1) {
+    roleKey = options[0].value;
+  }
+
+  if (!roleKey) {
+    return undefined;
+  }
+
+  return (
+    localizeCustomRole(roleKey) || options?.find(option => option.value === roleKey)?.label || humanizeRoleKey(roleKey)
+  );
+};
+
+/** `org:billing_admin` → `billing admin`. */
+const humanizeRoleKey = (roleKey: string): string => {
+  const lastSegment = roleKey.split(':').pop() ?? roleKey;
+  return lastSegment.replace(/[_-]+/g, ' ').trim() || roleKey;
+};
+
+const SsoDescription = (): JSX.Element => {
+  const roleName = useEnrollmentRoleName();
+
+  return (
+    <Col
+      gap={4}
+      sx={{ minWidth: 0 }}
+    >
+      <Text
+        elementDescriptor={descriptors.organizationProfileSecuritySsoDescription}
+        colorScheme='secondary'
+        localizationKey={localizationKeys('organizationProfile.securityPage.ssoSection.descriptionLine1')}
+      />
+      <Text
+        elementDescriptor={descriptors.organizationProfileSecuritySsoDescription}
+        colorScheme='secondary'
+        localizationKey={
+          roleName
+            ? localizationKeys('organizationProfile.securityPage.ssoSection.descriptionLine2', { role: roleName })
+            : localizationKeys('organizationProfile.securityPage.ssoSection.descriptionLine2__noRole')
+        }
+      />
+    </Col>
+  );
+};
 
 type ConfiguredContentProps = SecuritySsoSectionProps & {
   /** Effective activation — an in-flight optimistic flip included. */
@@ -216,18 +258,13 @@ const ConfiguredContent = (props: ConfiguredContentProps): JSX.Element => {
   };
 
   return (
-    <Col gap={3}>
+    <Col gap={4}>
       <Flex
         align='start'
         justify='between'
         gap={3}
       >
-        <Text
-          elementDescriptor={descriptors.organizationProfileSecuritySsoDescription}
-          colorScheme='secondary'
-          localizationKey={localizationKeys('organizationProfile.securityPage.ssoSection.description__configured')}
-          sx={{ minWidth: 0 }}
-        />
+        <SsoDescription />
 
         <ThreeDotsMenu
           elementId='sso'
@@ -261,6 +298,14 @@ const ConfiguredContent = (props: ConfiguredContentProps): JSX.Element => {
       <Col
         elementDescriptor={descriptors.organizationProfileSecuritySsoDetailRows}
         gap={2}
+        sx={t => ({
+          padding: t.space.$4,
+          backgroundColor: t.colors.$colorBackground,
+          borderWidth: t.borderWidths.$normal,
+          borderStyle: t.borderStyles.$solid,
+          borderColor: t.colors.$borderAlpha150,
+          borderRadius: t.radii.$lg,
+        })}
       >
         {provider && (
           <DetailRow

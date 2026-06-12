@@ -12,11 +12,18 @@ const withSecurityPageFixtures = (f: Parameters<Parameters<typeof createFixtures
   f.withEnterpriseSso({ selfServeSSO: true });
   f.withEmailAddress();
   f.withOrganizations();
+  f.withOrganizationDomains(undefined, 'org:member');
   f.withUser({
     email_addresses: ['test@clerk.com'],
     organization_memberships: [{ name: 'Org1', permissions: ['org:sys_entconns:manage'] }],
   });
 };
+
+const DESCRIPTION_LINE_1 =
+  'Let members sign in through your identity provider using their domain email. Members without a matching domain are unaffected.';
+// `org:member` renders through the humanized fallback — the fixture user cannot read the roles list.
+const DESCRIPTION_LINE_2 =
+  'Anyone who signs in will be automatically added to this organization. New members will be assigned to member.';
 
 const configuredConnection = (overrides: Record<string, unknown> = {}) =>
   ({
@@ -49,9 +56,8 @@ describe('OrganizationSecurityPage', () => {
       expect(await screen.findByRole('heading', { name: 'Security' })).toBeInTheDocument();
       expect(screen.getByText('SSO')).toBeInTheDocument();
       expect(screen.getByText('Unconfigured')).toBeInTheDocument();
-      expect(
-        screen.getByText('Configure to require organization members to sign in through your identity provider'),
-      ).toBeInTheDocument();
+      expect(screen.getByText(DESCRIPTION_LINE_1)).toBeInTheDocument();
+      expect(screen.getByText(DESCRIPTION_LINE_2)).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Start configuration' })).toBeInTheDocument();
 
       expect(screen.queryByRole('switch')).not.toBeInTheDocument();
@@ -74,10 +80,9 @@ describe('OrganizationSecurityPage', () => {
       renderPage(wrapper);
 
       expect(await screen.findByText('In Progress')).toBeInTheDocument();
-      expect(
-        screen.getByText('Configure to require organization members to sign in through your identity provider'),
-      ).toBeInTheDocument();
-      expect(screen.getByText(/you have started a configuration but haven.t finished/i)).toBeInTheDocument();
+      expect(screen.getByText(DESCRIPTION_LINE_1)).toBeInTheDocument();
+      expect(screen.getByText(DESCRIPTION_LINE_2)).toBeInTheDocument();
+      expect(screen.queryByText(/you have started a configuration/i)).not.toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Continue configuration' })).toBeInTheDocument();
 
       expect(screen.queryByRole('switch')).not.toBeInTheDocument();
@@ -96,9 +101,8 @@ describe('OrganizationSecurityPage', () => {
       renderPage(wrapper);
 
       expect(await screen.findByText('Active')).toBeInTheDocument();
-      expect(
-        screen.getByText('Configure SSO to require organization members to sign in through your identity provider'),
-      ).toBeInTheDocument();
+      expect(screen.getByText(DESCRIPTION_LINE_1)).toBeInTheDocument();
+      expect(screen.getByText(DESCRIPTION_LINE_2)).toBeInTheDocument();
 
       expect(screen.queryByRole('switch')).not.toBeInTheDocument();
 
@@ -212,9 +216,7 @@ describe('OrganizationSecurityPage', () => {
 
       // An active connection short-circuits the wizard to the confirmation step.
       expect(await screen.findByText(/configuration details/i)).toBeInTheDocument();
-      expect(
-        screen.queryByText('Configure SSO to require organization members to sign in through your identity provider'),
-      ).not.toBeInTheDocument();
+      expect(screen.queryByText(DESCRIPTION_LINE_1)).not.toBeInTheDocument();
     });
   });
 
@@ -389,6 +391,84 @@ describe('OrganizationSecurityPage', () => {
       expect(await screen.findByText('The connection could not be updated')).toBeInTheDocument();
       expect(screen.getByText('Active')).toBeInTheDocument();
       expect(screen.queryByText('Inactive')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('enrollment role', () => {
+    it("renders the default role's display name when the roles list is readable", async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEnterpriseSso({ selfServeSSO: true });
+        f.withEmailAddress();
+        f.withOrganizations();
+        f.withOrganizationDomains(undefined, 'org:member');
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [
+            { name: 'Org1', permissions: ['org:sys_entconns:manage', 'org:sys_memberships:read'] },
+          ],
+        });
+      });
+
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
+      fixtures.clerk.organization?.getRoles.mockResolvedValue({
+        total_count: 2,
+        data: [
+          { id: 'org:admin', key: 'org:admin', name: 'Admin' },
+          { id: 'org:member', key: 'org:member', name: 'Member' },
+        ],
+      } as any);
+
+      renderPage(wrapper);
+
+      expect(
+        await screen.findByText(
+          'Anyone who signs in will be automatically added to this organization. New members will be assigned to Member.',
+        ),
+      ).toBeInTheDocument();
+    });
+
+    it('falls back to a humanized role key when the roles list is not readable', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEnterpriseSso({ selfServeSSO: true });
+        f.withEmailAddress();
+        f.withOrganizations();
+        f.withOrganizationDomains(undefined, 'org:billing_admin');
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', permissions: ['org:sys_entconns:manage'] }],
+        });
+      });
+
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
+
+      renderPage(wrapper);
+
+      expect(
+        await screen.findByText(
+          'Anyone who signs in will be automatically added to this organization. New members will be assigned to billing admin.',
+        ),
+      ).toBeInTheDocument();
+    });
+
+    it('omits the role sentence when no default role is configured', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEnterpriseSso({ selfServeSSO: true });
+        f.withEmailAddress();
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', permissions: ['org:sys_entconns:manage'] }],
+        });
+      });
+
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
+
+      renderPage(wrapper);
+
+      expect(
+        await screen.findByText('Anyone who signs in will be automatically added to this organization.'),
+      ).toBeInTheDocument();
+      expect(screen.queryByText(/new members will be assigned to/i)).not.toBeInTheDocument();
     });
   });
 });

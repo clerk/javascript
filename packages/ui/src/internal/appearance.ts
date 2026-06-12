@@ -365,7 +365,6 @@ export type ElementsConfig = {
 
   organizationProfileSecuritySsoBadge: WithOptions<string>;
   organizationProfileSecuritySsoDescription: WithOptions;
-  organizationProfileSecuritySsoInProgressNotice: WithOptions;
   organizationProfileSecuritySsoConfigureButton: WithOptions<string>;
   organizationProfileSecuritySsoDetailRows: WithOptions;
   organizationProfileSecuritySsoDetailRow: WithOptions<string>;

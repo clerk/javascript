@@ -225,7 +225,6 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
 
   'organizationProfileSecuritySsoBadge',
   'organizationProfileSecuritySsoDescription',
-  'organizationProfileSecuritySsoInProgressNotice',
   'organizationProfileSecuritySsoConfigureButton',
   'organizationProfileSecuritySsoDetailRows',
   'organizationProfileSecuritySsoDetailRow',
