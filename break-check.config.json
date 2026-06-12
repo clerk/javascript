@@ -23,5 +23,8 @@
   "snapshotDir": ".api-snapshots",
   "mainBranch": "main",
   "checkVersionBump": true,
-  "outputFormat": "markdown"
+  "outputFormat": "markdown",
+  "ai": {
+    "applyDowngrades": true
+  }
 }

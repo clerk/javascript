@@ -165,7 +165,7 @@ const OrganizationDomainsSection = () => {
               <Text
                 localizationKey={localizationKeys('organizationProfile.profilePage.domainSection.subtitle')}
                 sx={t => ({
-                  paddingInlineStart: t.space.$9,
+                  paddingInlineStart: t.space.$8x5,
                 })}
                 colorScheme='secondary'
               />

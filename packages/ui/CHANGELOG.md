@@ -1,5 +1,66 @@
 # @clerk/ui
 
+## 1.16.1
+
+### Patch Changes
+
+- Fix checkout button label showing "Start free trial" when adding seats during a free trial period ([#8829](https://github.com/clerk/javascript/pull/8829)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+- Migrate the build pipeline to tsdown and TypeScript 6.0. This is an internal tooling change with no intended changes to the public API or runtime behavior. ([#8177](https://github.com/clerk/javascript/pull/8177)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`f046c49`](https://github.com/clerk/javascript/commit/f046c491d99c880b61e335645ad3ced4fee602d8), [`b5fa9f6`](https://github.com/clerk/javascript/commit/b5fa9f6ab2f01f1bbf6de52e16b4c9d9516f966c), [`3d5b2fe`](https://github.com/clerk/javascript/commit/3d5b2fe959171770bb7e8493d8a204317b7101a7)]:
+  - @clerk/localizations@4.8.1
+  - @clerk/shared@4.17.1
+
+## 1.16.0
+
+### Minor Changes
+
+- Add support for Clerk Billing plans with per-seat costs. ([#8629](https://github.com/clerk/javascript/pull/8629)) by [@dstaley](https://github.com/dstaley)
+  - New invite-to-checkout flow when inviting members while on a plan that uses per-seat costs.
+  - New localization values to support UI additions.
+  - Support for the `orgId` and `minSeats` parameters to `getPlans()`.
+  - Support for the `seatsQuantity` and `priceId` parameters to checkout creation.
+  - New `totals` field on payments.
+  - New `availablePrices` field on plans.
+  - New `nextPayment` field on subscription items.
+  - New `discounts` field on checkouts.
+  - Additional fields on `nextPayment` for more granularity.
+
+### Patch Changes
+
+- Display the scope description for `user:org:read` organization access in the OAuth Consent dialog so users understand organization membership information is being shared with the OAuth client. ([#8798](https://github.com/clerk/javascript/pull/8798)) by [@jfoshee](https://github.com/jfoshee)
+
+- Fix alignment of the domain section subtitle in the organization profile to match the button above it. ([#8795](https://github.com/clerk/javascript/pull/8795)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`a5c7bc7`](https://github.com/clerk/javascript/commit/a5c7bc74dabfa78d4748516ccc252f68cae82264)]:
+  - @clerk/localizations@4.8.0
+  - @clerk/shared@4.17.0
+
+## 1.15.1
+
+### Patch Changes
+
+- Fix Chrome-specific scroll jump when toggling the billing period switch on the pricing table. ([#8742](https://github.com/clerk/javascript/pull/8742)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix a circular import in the styled-system that could crash module initialization under bundler configurations with tree-shaking disabled. ([#8754](https://github.com/clerk/javascript/pull/8754)) by [@jacekradko](https://github.com/jacekradko)
+
+- Internal refactor for self-serve SSO wizard navigation to leverage a guard-based state machine. ([#8715](https://github.com/clerk/javascript/pull/8715)) by [@iagodahlem](https://github.com/iagodahlem)
+
+  It makes the step navigation more predictable: the step you land on (including after a reload) and which steps you can move to are derived from the connection's state, the connection reset flow lands you on the right step.
+
+- Correctly display OAuth consent redirect domains for known multi-label public suffixes. ([#8700](https://github.com/clerk/javascript/pull/8700)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix modal backdrop appearing light in dark mode ([#8743](https://github.com/clerk/javascript/pull/8743)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add a "Forgot password?" action on the sign-in start page when the password field is shown. This improves the account recovery UX when strict user enumeration protection is enabled. ([#8733](https://github.com/clerk/javascript/pull/8733)) by [@Ephem](https://github.com/Ephem)
+
+- Add and improve JSDoc comments across public types and methods to support generated reference documentation for the `/objects` docs section. Exports a few previously-internal types (`OnEventListener`, `OffEventListener`, `ClerkOptionsNavigation`) so they can be referenced from the generated docs. ([#8276](https://github.com/clerk/javascript/pull/8276)) by [@alexisintech](https://github.com/alexisintech)
+
+- Updated dependencies [[`2d6670c`](https://github.com/clerk/javascript/commit/2d6670c6c05c59901709283921b5d65c43f3a676), [`af706e3`](https://github.com/clerk/javascript/commit/af706e35420a16c028fd34b70dd50d663d42e006), [`032632c`](https://github.com/clerk/javascript/commit/032632c6982297e53e28559b59b4a435de4c9adc), [`0fece6f`](https://github.com/clerk/javascript/commit/0fece6ff5d2b1babb59a285dbce9d46723e33d73), [`b295af3`](https://github.com/clerk/javascript/commit/b295af3d5bb12e09a502cae4a935d2e7f5d35d5c), [`8e1bd48`](https://github.com/clerk/javascript/commit/8e1bd48a91dc07751493f41416d2a68b89e114cc), [`90bc732`](https://github.com/clerk/javascript/commit/90bc732143e907051f2cefab8a31283e3d985126)]:
+  - @clerk/shared@4.16.0
+  - @clerk/localizations@4.7.2
+
 ## 1.15.0
 
 ### Minor Changes

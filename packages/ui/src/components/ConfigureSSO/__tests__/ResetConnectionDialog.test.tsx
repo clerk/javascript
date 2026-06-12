@@ -1,31 +1,17 @@
-import type { DeletedObjectResource, EnterpriseConnectionResource } from '@clerk/shared/types';
+import type { EnterpriseConnectionResource } from '@clerk/shared/types';
 import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen, waitFor } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
 
-const goToStep = vi.fn();
-
-vi.mock('../elements/Wizard', () => ({
-  useWizard: () => ({
-    activeSteps: [],
-    currentStep: undefined,
-    currentIndex: -1,
-    totalSteps: 0,
-    isFirstStep: true,
-    isLastStep: false,
-    isNested: false,
-    goNext: vi.fn(),
-    goPrev: vi.fn(),
-    goToStep,
-    registerStep: vi.fn(),
-    unregisterStep: vi.fn(),
-  }),
-}));
-
-const setProvider = vi.fn();
-const deleteEnterpriseConnection = vi.fn();
+// The dialog no longer touches the wizard. On confirm it calls the
+// reverification-wrapped `mutations.deleteConnection(id)` directly — a pure
+// delete, no navigation — and the wizard self-corrects to the
+// furthest-reachable step once the active step's guard breaks. That lets the
+// dialog be triggered from ANY footer (including nested SAML configure footers)
+// without binding to a nested wizard.
+const deleteConnection = vi.fn();
 
 const connectionMockState = vi.hoisted(() => ({
   current: { id: 'idn_connection_1' } as Partial<EnterpriseConnectionResource> | null,
@@ -34,14 +20,10 @@ const connectionMockState = vi.hoisted(() => ({
 vi.mock('../ConfigureSSOContext', () => ({
   useConfigureSSO: () => ({
     enterpriseConnection: connectionMockState.current,
-    provider: undefined,
-    setProvider,
-    deleteEnterpriseConnection,
-    initialStepId: 'confirmation',
     contentRef: { current: null },
-    createEnterpriseConnection: vi.fn(),
-    updateEnterpriseConnection: vi.fn(),
-    isDomainTakenByOtherOrg: false,
+    // The dialog's confirm calls the reverification-wrapped `deleteConnection`
+    // mutation directly. No navigation — the wizard self-corrects.
+    mutations: { deleteConnection },
   }),
 }));
 
@@ -68,11 +50,8 @@ const renderDialog = (
 };
 
 const resetMocks = () => {
-  goToStep.mockReset();
-  setProvider.mockReset();
-  deleteEnterpriseConnection.mockReset();
-  deleteEnterpriseConnection.mockResolvedValue({} as DeletedObjectResource);
-  goToStep.mockResolvedValue(undefined);
+  deleteConnection.mockReset();
+  deleteConnection.mockResolvedValue(undefined);
   connectionMockState.current = { id: 'idn_connection_1' };
 };
 
@@ -138,10 +117,10 @@ describe('ResetConnectionDialog', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
     expect(onClose).toHaveBeenCalledTimes(1);
-    expect(deleteEnterpriseConnection).not.toHaveBeenCalled();
+    expect(deleteConnection).not.toHaveBeenCalled();
   });
 
-  it('deletes the connection, clears the provider, rewinds the wizard, and closes on a successful submit', async () => {
+  it('resets the connection (delete + re-derive) and closes on a successful submit', async () => {
     resetMocks();
     const onClose = vi.fn();
     const { wrapper } = await createFixtures();
@@ -151,10 +130,9 @@ describe('ResetConnectionDialog', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Reset connection' }));
 
     await waitFor(() => {
-      expect(deleteEnterpriseConnection).toHaveBeenCalledWith('idn_connection_1');
+      expect(deleteConnection).toHaveBeenCalledTimes(1);
     });
-    expect(setProvider).toHaveBeenCalledWith(undefined);
-    expect(goToStep).toHaveBeenCalledWith('select-provider');
+    expect(deleteConnection).toHaveBeenCalledWith('idn_connection_1');
     await waitFor(() => {
       expect(onClose).toHaveBeenCalledTimes(1);
     });
