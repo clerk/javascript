@@ -1,5 +1,6 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 
+import { logger } from '../../logger';
 import type { GetDomainsParams } from '../../types/organization';
 import type {
   OrganizationDomainResource,
@@ -13,6 +14,8 @@ import { useClerkQuery } from '../query/useQuery';
 import { useOrganizationBase } from './base/useOrganizationBase';
 import { useClearQueriesOnSignOut } from './useClearQueriesOnSignOut';
 import { useOrganizationDomainsCacheKeys } from './useOrganizationDomains.shared';
+
+const OWNERSHIP_VERIFICATION_POLL_INTERVAL_MS = 10_000;
 
 export type UseOrganizationDomainsParams = {
   enabled?: boolean;
@@ -122,6 +125,68 @@ function useOrganizationDomains(params: UseOrganizationDomainsParams = {}): UseO
   );
 
   const response = query.data;
+
+  const unverifiedOwnershipDomainIds = useMemo(
+    () =>
+      (response?.data ?? [])
+        .filter(
+          (domain: OrganizationDomainResource) =>
+            domain.ownershipVerification && domain.ownershipVerification.status !== 'verified',
+        )
+        .map((domain: OrganizationDomainResource) => domain.id),
+    [response?.data],
+  );
+
+  const unverifiedOwnershipKey = unverifiedOwnershipDomainIds.join(',');
+
+  // Poll `attempt_ownership_verification` for the outstanding unverified domains
+  // until none remain.
+  useEffect(() => {
+    if (!queryEnabled || !organization || unverifiedOwnershipDomainIds.length === 0) {
+      return;
+    }
+
+    let cancelled = false;
+    let timeoutId: ReturnType<typeof setTimeout>;
+
+    const scheduleNext = () => {
+      timeoutId = setTimeout(() => void runAttempt(), OWNERSHIP_VERIFICATION_POLL_INTERVAL_MS);
+    };
+
+    const runAttempt = async () => {
+      // Transient failures (network blips, DNS not yet propagated) are logged
+      // once and resolve to `undefined`, so they simply fall through to the
+      // next poll. `warnOnce` keeps this hot path from flooding the console.
+      const result = await organization
+        .attemptOwnershipVerification(unverifiedOwnershipDomainIds)
+        .catch((error: unknown) => {
+          logger.warnOnce(`Clerk: failed to attempt organization domain ownership verification: ${error}`);
+          return undefined;
+        });
+      if (cancelled) {
+        return;
+      }
+
+      const hasNewlyVerified = result?.data.some(domain => domain.ownershipVerification?.status === 'verified');
+      if (hasNewlyVerified) {
+        // Refetch pulls the new state in; the effect re-runs with the smaller
+        // outstanding set (or stops entirely once all are verified).
+        await revalidate();
+        return;
+      }
+
+      if (!cancelled) {
+        scheduleNext();
+      }
+    };
+
+    scheduleNext();
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timeoutId);
+    };
+  }, [unverifiedOwnershipKey, unverifiedOwnershipDomainIds, queryEnabled, organization, revalidate]);
 
   return {
     data: response?.data,
