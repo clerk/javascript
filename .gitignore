@@ -108,5 +108,8 @@ CLAUDE.local.md
 # Claude Code local settings (user-specific permissions)
 .claude/settings.local.json
 
+# Claude Code per-session runtime lock (not shareable)
+.claude/scheduled_tasks.lock
+
 # Git worktrees
 .worktrees

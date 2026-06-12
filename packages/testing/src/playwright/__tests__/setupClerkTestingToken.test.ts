@@ -311,6 +311,108 @@ describe('setupClerkTestingToken', () => {
       warnSpy.mockRestore();
     });
 
+    it('logs response diagnostics after exhausting retries on retryable status', async () => {
+      const { context, getRouteHandler } = createMockContext();
+      await setupClerkTestingToken({ context });
+
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      const route = {
+        request: () => ({ url: () => 'https://clerk.example.com/v1/client' }),
+        fetch: vi.fn(() =>
+          Promise.resolve({
+            status: () => 429,
+            headers: () => ({
+              'cf-ray': '8f7a2b3c4d5e6f70-IAD',
+              'retry-after': '12',
+              'content-type': 'application/json',
+            }),
+            text: () => Promise.resolve('{"errors":[{"code":"too_many_requests"}]}'),
+            json: () => Promise.resolve({}),
+          }),
+        ),
+        fulfill: vi.fn(() => Promise.resolve()),
+        continue: vi.fn(() => Promise.resolve()),
+      } as unknown as Route;
+
+      const handlerPromise = getRouteHandler()!(route);
+      await vi.advanceTimersByTimeAsync(60_000);
+      await handlerPromise;
+
+      expect(route.fulfill).toHaveBeenCalledTimes(1);
+      expect(warnSpy).toHaveBeenCalledTimes(1);
+      const warning = warnSpy.mock.calls[0][0] as string;
+      expect(warning).toContain('cf-ray: 8f7a2b3c4d5e6f70-IAD');
+      expect(warning).toContain('retry-after: 12');
+      expect(warning).toContain('content-type: application/json');
+      expect(warning).toContain('body: {"errors":[{"code":"too_many_requests"}]}');
+
+      warnSpy.mockRestore();
+    });
+
+    it('truncates long response bodies in diagnostics', async () => {
+      const { context, getRouteHandler } = createMockContext();
+      await setupClerkTestingToken({ context });
+
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      const route = {
+        request: () => ({ url: () => 'https://clerk.example.com/v1/client' }),
+        fetch: vi.fn(() =>
+          Promise.resolve({
+            status: () => 429,
+            headers: () => ({}),
+            text: () => Promise.resolve('x'.repeat(2000)),
+            json: () => Promise.resolve({}),
+          }),
+        ),
+        fulfill: vi.fn(() => Promise.resolve()),
+        continue: vi.fn(() => Promise.resolve()),
+      } as unknown as Route;
+
+      const handlerPromise = getRouteHandler()!(route);
+      await vi.advanceTimersByTimeAsync(60_000);
+      await handlerPromise;
+
+      expect(warnSpy).toHaveBeenCalledTimes(1);
+      const warning = warnSpy.mock.calls[0][0] as string;
+      expect(warning).toContain('cf-ray: n/a');
+      expect(warning).toContain(`body: ${'x'.repeat(500)}`);
+      expect(warning).not.toContain('x'.repeat(501));
+
+      warnSpy.mockRestore();
+    });
+
+    it('still fulfills the response when diagnostics cannot be read', async () => {
+      const { context, getRouteHandler } = createMockContext();
+      await setupClerkTestingToken({ context });
+
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      // No headers()/text() on the response: diagnostics are best-effort and must not break fulfillment.
+      const route = {
+        request: () => ({ url: () => 'https://clerk.example.com/v1/client' }),
+        fetch: vi.fn(() =>
+          Promise.resolve({
+            status: () => 429,
+            json: () => Promise.resolve({}),
+          }),
+        ),
+        fulfill: vi.fn(() => Promise.resolve()),
+        continue: vi.fn(() => Promise.resolve()),
+      } as unknown as Route;
+
+      const handlerPromise = getRouteHandler()!(route);
+      await vi.advanceTimersByTimeAsync(60_000);
+      await handlerPromise;
+
+      expect(route.fulfill).toHaveBeenCalledTimes(1);
+      expect(route.continue).not.toHaveBeenCalled();
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('failed with status 429 after 4 attempts'));
+
+      warnSpy.mockRestore();
+    });
+
     it('retries on thrown errors and warns after exhausting retries', async () => {
       const { context, getRouteHandler } = createMockContext();
       await setupClerkTestingToken({ context });
@@ -332,7 +434,10 @@ describe('setupClerkTestingToken', () => {
 
       expect(route.fetch).toHaveBeenCalledTimes(4);
       expect(route.continue).toHaveBeenCalledTimes(1);
-      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('failed after 4 attempts'), networkError);
+      expect(warnSpy).toHaveBeenCalledTimes(1);
+      const warning = warnSpy.mock.calls[0][0] as string;
+      expect(warning).toContain('failed after 4 attempts');
+      expect(warning).toContain('net::ERR_CONNECTION_REFUSED');
 
       warnSpy.mockRestore();
       errorSpy.mockRestore();

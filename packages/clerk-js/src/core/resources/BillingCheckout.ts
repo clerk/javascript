@@ -4,10 +4,10 @@ import { retry } from '@clerk/shared/retry';
 import type {
   BillingCheckoutJSON,
   BillingCheckoutResource,
-  BillingCheckoutTotals,
   BillingPayerResource,
   BillingPaymentMethodResource,
   BillingSubscriptionPlanPeriod,
+  BillingTotals,
   CheckoutFlowFinalizeParams,
   CheckoutFlowResource,
   CheckoutFlowResourceNonStrict,
@@ -34,7 +34,7 @@ export class BillingCheckout extends BaseResource implements BillingCheckoutReso
   planPeriod!: BillingSubscriptionPlanPeriod;
   planPeriodStart!: number | undefined;
   status!: 'needs_confirmation' | 'completed';
-  totals!: BillingCheckoutTotals;
+  totals!: BillingTotals;
   isImmediatePlanChange!: boolean;
   freeTrialEndsAt?: Date;
   payer!: BillingPayerResource;

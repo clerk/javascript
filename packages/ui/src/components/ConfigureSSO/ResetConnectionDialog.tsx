@@ -1,5 +1,3 @@
-import { useReverification } from '@clerk/shared/react';
-
 import { Col, descriptors, localizationKeys } from '@/customizables';
 import { Card } from '@/elements/Card';
 import { useCardState, withCardStateProvider } from '@/elements/contexts';
@@ -11,7 +9,6 @@ import { useFormControl } from '@/ui/utils/useFormControl';
 import { handleError } from '@/utils/errorHandler';
 
 import { useConfigureSSO } from './ConfigureSSOContext';
-import { useWizard } from './elements/Wizard';
 
 type ResetConnectionDialogProps = {
   isOpen: boolean;
@@ -49,10 +46,7 @@ export const ResetConnectionDialog = (props: ResetConnectionDialogProps): JSX.El
 const ResetConnectionDialogContent = withCardStateProvider((props: ResetConnectionDialogProps) => {
   const { onClose, confirmationValue } = props;
   const card = useCardState();
-  const { enterpriseConnection, deleteEnterpriseConnection, setProvider } = useConfigureSSO();
-  const { goToStep } = useWizard();
-
-  const deleteConnection = useReverification((id: string) => deleteEnterpriseConnection(id));
+  const { enterpriseConnection, mutations } = useConfigureSSO();
 
   const confirmationField = useFormControl('deleteConfirmation', '', {
     type: 'text',
@@ -71,9 +65,13 @@ const ResetConnectionDialogContent = withCardStateProvider((props: ResetConnecti
     }
 
     try {
-      await deleteConnection(enterpriseConnection.id);
-      setProvider(undefined);
-      await goToStep('select-provider');
+      // Reset is a pure delete — no navigation. Dropping `hasConnection` breaks
+      // the active step's entry guard, so the wizard self-corrects to the
+      // furthest-reachable step. The mutation is already reverification-wrapped.
+      // No `useWizard()` here — that lets this dialog be triggered from ANY
+      // footer (including the nested SAML configure footers) without binding to
+      // a nested wizard.
+      await mutations.deleteConnection(enterpriseConnection.id);
       onClose();
     } catch (err) {
       handleError(err as Error, [confirmationField], card.setError);

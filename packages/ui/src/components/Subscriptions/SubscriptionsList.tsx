@@ -1,9 +1,10 @@
-import type { BillingSubscriptionItemResource } from '@clerk/shared/types';
+import type { BillingSubscriptionItemResource, BillingSubscriptionResource } from '@clerk/shared/types';
 import { Fragment, useMemo } from 'react';
 
 import { useProtect } from '@/ui/common/Gate';
 import { ProfileSection } from '@/ui/elements/Section';
 import { common } from '@/ui/styledSystem';
+import { getSeatLimitAndIncludedSeatsLocalizationKey } from '@/ui/utils/billingPlanSeats';
 import { isManageableSubscriptionItem } from '@/ui/utils/billingSubscription';
 
 import {
@@ -15,7 +16,21 @@ import {
   useSubscription,
 } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
-import { Col, Flex, Icon, localizationKeys, Span, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
+import {
+  Col,
+  Flex,
+  Icon,
+  localizationKeys,
+  Span,
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
+  useLocalizations,
+} from '../../customizables';
 import { ArrowUpDown, Cog, Files, Plus, Users } from '../../icons';
 import { useRouter } from '../../router';
 import { SubscriptionBadge } from './badge';
@@ -33,7 +48,7 @@ export function SubscriptionsList({
 }) {
   const localizationRoot = useSubscriberTypeLocalizationRoot();
   const subscriberType = useSubscriberTypeContext();
-  const { subscriptionItems } = useSubscription();
+  const { subscriptionItems, data: subscription } = useSubscription();
   const canManageBilling =
     useProtect(has => has({ permission: 'org:sys_billing:manage' })) || subscriberType === 'user';
   const { navigate } = useRouter();
@@ -113,6 +128,12 @@ export function SubscriptionsList({
                 length={sortedSubscriptionItems.length}
               />
             ))}
+            {subscription?.nextPayment ? (
+              <SubscriptionOverviewRow
+                nextPayment={subscription.nextPayment}
+                localizationRoot={localizationRoot}
+              />
+            ) : null}
           </Tbody>
         </Table>
       )}
@@ -164,6 +185,56 @@ export function SubscriptionsList({
   );
 }
 
+function SubscriptionOverviewRow({
+  nextPayment,
+  localizationRoot,
+}: {
+  nextPayment: NonNullable<BillingSubscriptionResource['nextPayment']>;
+  localizationRoot: ReturnType<typeof useSubscriberTypeLocalizationRoot>;
+}) {
+  if (!nextPayment.totals) {
+    return null;
+  }
+
+  return (
+    <Tr
+      sx={t => ({
+        background: common.mutedBackground(t),
+      })}
+    >
+      <Td sx={{ verticalAlign: 'top' }}>
+        <Text
+          variant='subtitle'
+          localizationKey={localizationKeys(`${localizationRoot}.billingPage.subscriptionsListSection.overview`)}
+        />
+      </Td>
+      <Td sx={{ textAlign: 'end' }}>
+        <Col
+          gap={1}
+          align='end'
+        >
+          <Text
+            variant='h2'
+            sx={t => ({
+              color: t.colors.$colorForeground,
+            })}
+          >
+            {nextPayment.totals.grandTotal.currencySymbol}
+            {nextPayment.totals.grandTotal.amountFormatted}
+          </Text>
+          <Text
+            variant='subtitle'
+            colorScheme='secondary'
+            localizationKey={localizationKeys('badge__renewsAt', {
+              date: nextPayment.date,
+            })}
+          />
+        </Col>
+      </Td>
+    </Tr>
+  );
+}
+
 function SubscriptionItemRow({
   subscriptionItem,
   length,
@@ -174,12 +245,16 @@ function SubscriptionItemRow({
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const fee = subscriptionItem.planPeriod === 'annual' ? subscriptionItem.plan.annualFee! : subscriptionItem.plan.fee!;
   const { captionForSubscription } = usePlansContext();
+  const { t } = useLocalizations();
 
   const feeFormatted = useMemo(() => {
     return normalizeFormatted(fee.amountFormatted);
   }, [fee.amountFormatted]);
 
   const subItemSeatsQty = subscriptionItem.seats?.quantity;
+  const seatsTotalTier = subscriptionItem.seats?.tiers?.find(t => t.total.amount > 0);
+  const monthLabel = t(localizationKeys('billing.month')).toLowerCase();
+  const seatLimitAndIncludedSeatsLocalizationKey = getSeatLimitAndIncludedSeatsLocalizationKey(subscriptionItem.plan);
 
   return (
     <Fragment key={subscriptionItem.id}>
@@ -272,7 +347,7 @@ function SubscriptionItemRow({
             return {};
           }}
         >
-          <Td>
+          <Td sx={{ verticalAlign: 'top' }}>
             <Col gap={1}>
               <Flex
                 align='center'
@@ -300,14 +375,27 @@ function SubscriptionItemRow({
               textAlign: 'end',
             })}
           >
-            <Text
-              variant='subtitle'
-              localizationKey={
-                subItemSeatsQty === null
-                  ? localizationKeys('billing.pricingTable.seatCost.unlimitedSeats')
-                  : localizationKeys('billing.pricingTable.seatCost.upToSeats', { endsAfterBlock: subItemSeatsQty })
-              }
-            />
+            <Col
+              gap={1}
+              align='end'
+            >
+              {seatLimitAndIncludedSeatsLocalizationKey ? (
+                <Text
+                  variant='subtitle'
+                  localizationKey={seatLimitAndIncludedSeatsLocalizationKey}
+                />
+              ) : null}
+              {seatsTotalTier && seatsTotalTier.quantity ? (
+                <Text variant='subtitle'>
+                  {t(
+                    localizationKeys('organizationProfile.billingPage.subscriptionsListSection.paidSeatsUsage', {
+                      seatsQuantity: seatsTotalTier.quantity,
+                      amount: `${seatsTotalTier.feePerBlock.currencySymbol}${seatsTotalTier.feePerBlock.amountFormatted} / ${monthLabel}`,
+                    }),
+                  )}
+                </Text>
+              ) : null}
+            </Col>
           </Td>
         </Tr>
       ) : null}

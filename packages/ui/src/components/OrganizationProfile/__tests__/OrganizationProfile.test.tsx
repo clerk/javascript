@@ -5,7 +5,7 @@ import { bindCreateFixtures } from '@/test/create-fixtures';
 import { cleanup, render, screen, waitFor } from '@/test/utils';
 
 import { OrganizationProfile } from '../';
-import { OrganizationSelfServeSSOPage } from '../OrganizationSelfServeSSOPage';
+import { OrganizationSecurityPage } from '../OrganizationSecurityPage';
 
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 
@@ -495,7 +495,7 @@ describe('OrganizationProfile', () => {
       });
 
       render(<OrganizationProfile />, { wrapper });
-      expect(await screen.findByText('Single Sign-On (SSO)')).toBeDefined();
+      expect(await screen.findByText('Security')).toBeDefined();
     });
 
     it('does not include SSO when disabled at the instance level', async () => {
@@ -515,7 +515,7 @@ describe('OrganizationProfile', () => {
       });
 
       const { queryByText } = render(<OrganizationProfile />, { wrapper });
-      await waitFor(() => expect(queryByText('Single Sign-On (SSO)')).toBeNull());
+      await waitFor(() => expect(queryByText('Security')).toBeNull());
     });
 
     it('does not include SSO when the org has not opted in, even if the instance has it enabled', async () => {
@@ -535,7 +535,7 @@ describe('OrganizationProfile', () => {
       });
 
       const { queryByText } = render(<OrganizationProfile />, { wrapper });
-      await waitFor(() => expect(queryByText('Single Sign-On (SSO)')).toBeNull());
+      await waitFor(() => expect(queryByText('Security')).toBeNull());
     });
 
     it('includes SSO even when the user does not have the manage enterprise connections permission, but the page surfaces a warning', async () => {
@@ -557,10 +557,10 @@ describe('OrganizationProfile', () => {
       fixtures.clerk.user?.getEnterpriseConnections.mockResolvedValue([]);
 
       render(<OrganizationProfile />, { wrapper });
-      expect(await screen.findByText('Single Sign-On (SSO)')).toBeDefined();
+      expect(await screen.findByText('Security')).toBeDefined();
 
       cleanup();
-      render(<OrganizationSelfServeSSOPage />, { wrapper });
+      render(<OrganizationSecurityPage />, { wrapper });
       expect(await screen.findByText(/you do not have permission to manage single sign-on/i)).toBeDefined();
       expect(
         screen.queryByText(/contact your organization.*administrator to upgrade your permissions/i),
