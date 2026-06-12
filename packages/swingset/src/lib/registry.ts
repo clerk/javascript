@@ -3,6 +3,7 @@ import { meta as accordionMeta } from '../stories/accordion.stories';
 import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
 import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
 import { meta as collapsibleMeta } from '../stories/collapsible.stories';
+import { Default as DialogDefault, meta as dialogComponentMeta } from '../stories/dialog.component.stories';
 import { meta as dialogMeta } from '../stories/dialog.stories';
 import {
   Default,
@@ -23,6 +24,8 @@ const buttonModule: StoryModule = { meta: buttonMeta, Primary, Sizes, Disabled }
 
 const inputModule: StoryModule = { meta: inputMeta, Default, Sizes: InputSizes, Disabled: InputDisabled, Invalid };
 
+const dialogComponentModule: StoryModule = { meta: dialogComponentMeta, Default: DialogDefault };
+
 // Headless primitives carry just `meta` (no story functions). Like every component
 // they're documented as a single overview page; their live demos come from `<Story>` /
 // `<Preview>` embeds in the MDX, which import the stories module directly.
@@ -39,6 +42,7 @@ const tooltipModule: StoryModule = { meta: tooltipMeta };
 export const registry: StoryModule[] = [
   buttonModule,
   inputModule,
+  dialogComponentModule,
   // Primitives — alphabetical within the group.
   accordionModule,
   autocompleteModule,
@@ -51,13 +55,18 @@ export const registry: StoryModule[] = [
   tooltipModule,
 ];
 
-/** Look up a component's story module from its slug (derived from `meta.title`). */
-export function getModuleBySlug(slug: string): StoryModule | undefined {
-  return registry.find(mod => toSlug(mod.meta.title) === slug);
+/**
+ * Look up a component's story module by its group + component slug (both derived from `meta`).
+ * Group-aware so identically-titled entries in different groups (e.g. the headless `Dialog`
+ * primitive and the styled `Dialog` component) resolve to distinct pages.
+ */
+export function getModule(groupSlug: string, componentSlug: string): StoryModule | undefined {
+  return registry.find(mod => toSlug(mod.meta.group) === groupSlug && toSlug(mod.meta.title) === componentSlug);
 }
 
 export function getSidebarGroups(): Array<{
   group: string;
+  groupSlug: string;
   components: Array<{ mod: StoryModule; componentSlug: string }>;
 }> {
   const groupMap = new Map<string, Array<{ mod: StoryModule; componentSlug: string }>>();
@@ -70,5 +79,9 @@ export function getSidebarGroups(): Array<{
     groupMap.get(group)?.push({ mod, componentSlug: toSlug(title) });
   }
 
-  return Array.from(groupMap.entries()).map(([group, components]) => ({ group, components }));
+  return Array.from(groupMap.entries()).map(([group, components]) => ({
+    group,
+    groupSlug: toSlug(group),
+    components,
+  }));
 }

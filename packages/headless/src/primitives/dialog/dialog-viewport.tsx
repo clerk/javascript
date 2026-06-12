@@ -32,7 +32,6 @@ export const DialogViewport = React.forwardRef<HTMLDivElement, DialogViewportPro
     const state = { open };
 
     const defaultProps = {
-      'data-cl-slot': 'dialog-viewport',
       ref,
       ...transitionProps,
       style: modal ? undefined : { pointerEvents: 'auto' as const },

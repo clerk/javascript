@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import type { ButtonProps } from '@clerk/ui/mosaic/components/button';
-import { Button, buttonStyles } from '@clerk/ui/mosaic/components/button';
+import { Button, buttonRecipe } from '@clerk/ui/mosaic/components/button';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -8,7 +8,7 @@ export const meta: StoryMeta = {
   group: 'Components',
   title: 'Button',
   source: 'packages/ui/src/mosaic/components/button.tsx',
-  styles: buttonStyles,
+  styles: buttonRecipe,
 };
 
 // Story functions accept Record<string,unknown> (knob values) and cast to ButtonProps.
