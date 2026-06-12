@@ -18,10 +18,10 @@ import {
   useLocalizations,
 } from '@/customizables';
 import { Alert } from '@/elements/Alert';
+import { ClipboardInput } from '@/elements/ClipboardInput';
 import { useCardState } from '@/elements/contexts';
 import { Field } from '@/elements/FieldControl';
 import { Form } from '@/elements/Form';
-import { useClipboard } from '@/hooks';
 import { Checkmark, Clipboard, Close } from '@/icons';
 import { common } from '@/styledSystem';
 import { useFormControl } from '@/ui/utils/useFormControl';
@@ -362,7 +362,6 @@ const DomainCard = ({
         </Button>
       </Flex>
 
-      {/* TODO -> Add height animation when verified */}
       {ownershipVerification?.verifiedAt ? (
         <Text
           as='p'
@@ -419,25 +418,28 @@ const TxtRecord = ({
         />
       </Flex>
 
-      {/* TODO -> TXT record value needs to use a readonly input */}
-      <RecordEntry
-        label={localizationKeys('configureSSO.organizationDomainsStep.domainCard.txtRecord.valueLabel')}
-        value={ownershipVerification?.txtRecordValue ?? '—'}
-        copyable={!!ownershipVerification?.txtRecordValue}
-      />
+      <Flex
+        align='center'
+        sx={t => ({ gap: t.space.$2, minWidth: 0 })}
+      >
+        <Text
+          as='span'
+          colorScheme='secondary'
+          localizationKey={localizationKeys('configureSSO.organizationDomainsStep.domainCard.txtRecord.valueLabel')}
+          sx={t => ({ fontSize: t.fontSizes.$sm, flexShrink: 0 })}
+        />
+        <ClipboardInput
+          value={ownershipVerification?.txtRecordValue ?? '—'}
+          copyIcon={Clipboard}
+          copiedIcon={Checkmark}
+          sx={{ flex: 1, minWidth: 0 }}
+        />
+      </Flex>
     </Col>
   );
 };
 
-const RecordEntry = ({
-  label,
-  value,
-  copyable = false,
-}: {
-  label: ReturnType<typeof localizationKeys>;
-  value: string;
-  copyable?: boolean;
-}): JSX.Element => {
+const RecordEntry = ({ label, value }: { label: ReturnType<typeof localizationKeys>; value: string }): JSX.Element => {
   return (
     <Flex
       align='center'
@@ -449,90 +451,31 @@ const RecordEntry = ({
         localizationKey={label}
         sx={t => ({ fontSize: t.fontSizes.$sm, flexShrink: 0 })}
       />
-      {copyable ? (
-        <CopyableValue value={value} />
-      ) : (
-        <Badge
-          colorScheme='primary'
-          sx={t => ({
-            fontFamily: t.fonts.$buttons,
+      <Badge
+        colorScheme='primary'
+        sx={t => ({
+          fontFamily: t.fonts.$buttons,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          paddingBlock: t.space.$1,
+          paddingInline: t.space.$1x5,
+        })}
+      >
+        <Box
+          as='span'
+          sx={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            paddingBlock: t.space.$1,
-            paddingInline: t.space.$1x5,
-          })}
+            lineHeight: 1,
+            textBoxTrim: 'trim-both',
+            textBoxEdge: 'cap alphabetic',
+          }}
         >
-          <Box
-            as='span'
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              lineHeight: 1,
-              textBoxTrim: 'trim-both',
-              textBoxEdge: 'cap alphabetic',
-            }}
-          >
-            {value}
-          </Box>
-        </Badge>
-      )}
-    </Flex>
-  );
-};
-
-const RecordChip = ({ children }: { children: React.ReactNode }): JSX.Element => (
-  <Box
-    elementDescriptor={descriptors.configureSSOVerifyDomainCardTxtRecordValue}
-    sx={t => ({
-      borderWidth: t.borderWidths.$normal,
-      borderStyle: t.borderStyles.$solid,
-      borderColor: t.colors.$borderAlpha150,
-      borderRadius: t.radii.$md,
-      background: t.colors.$neutralAlpha50,
-      paddingInline: t.space.$1x5,
-      paddingBlock: t.space.$0x5,
-      minWidth: 0,
-    })}
-  >
-    <Text
-      as='span'
-      sx={t => ({
-        fontFamily: t.fonts.$buttons,
-        fontSize: t.fontSizes.$xs,
-        display: 'block',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
-      })}
-    >
-      {children}
-    </Text>
-  </Box>
-);
-
-const CopyableValue = ({ value }: { value: string }): JSX.Element => {
-  const { onCopy, hasCopied } = useClipboard(value);
-
-  return (
-    <Flex
-      align='center'
-      title={value}
-      sx={t => ({ gap: t.space.$1, minWidth: 0, flex: 1 })}
-    >
-      <RecordChip>{value}</RecordChip>
-      <Button
-        colorScheme='secondary'
-        aria-label='Copy value'
-        onClick={() => onCopy()}
-        sx={t => ({ flexShrink: 0, padding: t.space.$1 })}
-      >
-        <Icon
-          icon={hasCopied ? Checkmark : Clipboard}
-          sx={t => ({ width: t.sizes.$4, height: t.sizes.$4, color: t.colors.$colorMutedForeground })}
-        />
-      </Button>
+          {value}
+        </Box>
+      </Badge>
     </Flex>
   );
 };
