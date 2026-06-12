@@ -3,14 +3,14 @@ import { useSuspenseInfiniteQuery } from '@tanstack/react-query';
 import { Box } from '../components/box';
 import { Button } from '../components/button';
 import { membersQuery } from '../data/members-query';
-import { mosaicQueryClient } from '../data/query-client';
+import { getMosaicQueryClient } from '../data/query-client';
 import { useOrganization } from '../data/use-organization';
 
 export function OrganizationMembers() {
   const { organization } = useOrganization(); // signal: which org's members to load
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useSuspenseInfiniteQuery(
     membersQuery(organization.id),
-    mosaicQueryClient,
+    getMosaicQueryClient(),
   );
   const members = data.pages.flatMap(page => page.members);
 
