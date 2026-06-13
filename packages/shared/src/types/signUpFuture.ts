@@ -468,7 +468,8 @@ export interface SignUpFutureResource {
   readonly locale: string | null;
 
   /**
-   * The current protect check challenge, if one is pending.
+   * The current protect check challenge, if one is pending. Only populated when Protect mid-flow
+   * challenges are explicitly enabled for the instance; upgrading the SDK alone does not enable it.
    */
   readonly protectCheck: ProtectCheckResource | null;
 

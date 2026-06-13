@@ -38,6 +38,11 @@ import type { AuthenticateWithWeb3Params } from './web3Wallet';
 export interface SignInResource extends ClerkResource {
   /**
    * The current status of the sign-in.
+   *
+   * The `'needs_protect_check'` status is only returned when Protect mid-flow challenges are
+   * explicitly enabled for the instance; upgrading the SDK alone does not enable it. When
+   * surfaced, run the challenge described by `protectCheck` and resolve it via
+   * `submitProtectCheck()`. The pre-built components handle this automatically.
    */
   status: SignInStatus | null;
   /**
@@ -56,6 +61,8 @@ export interface SignInResource extends ClerkResource {
    * The current protect check challenge, if one is pending. Mid-flow fraud-prevention gate
    * issued by Clerk Protect. When non-null, the client must load the SDK at `sdkUrl`, run the
    * challenge with `token`, and submit the resulting proof token via `submitProtectCheck`.
+   * Only populated when Protect mid-flow challenges are explicitly enabled for the instance;
+   * upgrading the SDK alone does not enable it.
    */
   protectCheck: ProtectCheckResource | null;
 

@@ -14,9 +14,17 @@ SDK at `sdkUrl`, executing the challenge, and submitting the resulting proof tok
 `signUp.submitProtectCheck({ proofToken })` or `signIn.submitProtectCheck({ proofToken })`. The
 response may carry a chained challenge, which the SDK resolves iteratively.
 
-Sign-in adds a new `'needs_protect_check'` value to the `SignInStatus` union, surfaced when the
-server-side SDK-version gate is enabled. Clients should treat the `protectCheck` field as the
-authoritative gate signal and fall back to the status value for defense in depth.
+Sign-in adds a new `'needs_protect_check'` value to the `SignInStatus` union. **Upgrading this
+package is type-only and does not change runtime behavior**: the server returns the new status
+(and the `protectCheck` field) only for instances where Protect mid-flow challenges have been
+explicitly enabled — the feature is off by default and is not enabled for existing instances by
+upgrading. The server additionally only emits the new status value to SDK versions that
+understand it, so older clients never receive an unknown status.
+
+If an exhaustive `switch` on `signIn.status` flags the new value after upgrading, handle it by
+running the challenge described by `protectCheck` and submitting the proof via
+`submitProtectCheck()`. Clients should treat the `protectCheck` field as the authoritative gate
+signal and fall back to the status value for defense in depth.
 
 The pre-built `<SignIn />` and `<SignUp />` components handle the gate automatically by routing
 to a new `protect-check` route that runs the challenge SDK and resumes the flow on completion.

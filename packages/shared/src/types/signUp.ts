@@ -49,6 +49,13 @@ export interface SignUpResource extends ClerkResource {
   missingFields: SignUpField[];
   unverifiedFields: SignUpIdentificationField[];
   verifications: SignUpVerificationsResource;
+  /**
+   * The current protect check challenge, if one is pending. Mid-flow fraud-prevention gate
+   * issued by Clerk Protect. When non-null, the client must load the SDK at `sdkUrl`, run the
+   * challenge with `token`, and submit the resulting proof token via `submitProtectCheck`.
+   * Only populated when Protect mid-flow challenges are explicitly enabled for the instance;
+   * upgrading the SDK alone does not enable it.
+   */
   protectCheck: ProtectCheckResource | null;
 
   username: string | null;
