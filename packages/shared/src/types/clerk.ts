@@ -1396,7 +1396,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     allowedRedirectProtocols?: Array<string>;
     /**
-     * Indicates whether the application is a satellite application.
+     * Indicates whether the current application should behave as a satellite app. Unlike `domain`, which must be set in the [`Clerk` constructor](https://clerk.com/docs/reference/objects/clerk), `isSatellite` must be set in [`load()`](https://clerk.com/docs/reference/objects/clerk#load).
      */
     isSatellite?: boolean | ((url: URL) => boolean);
     /**
