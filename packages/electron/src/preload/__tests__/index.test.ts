@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { TOKEN_CACHE_CHANNELS } from '../../shared/ipc';
+import { OAUTH_TRANSPORT_CHANNELS, TOKEN_CACHE_CHANNELS } from '../../shared/ipc';
 import { setupPreload } from '../index';
 
 vi.mock('electron', () => ({
@@ -39,6 +39,10 @@ describe('setupPreload', () => {
         saveToken: expect.any(Function),
         clearToken: expect.any(Function),
       },
+      oauthTransport: {
+        getRedirectUrl: expect.any(Function),
+        open: expect.any(Function),
+      },
     });
   });
 
@@ -51,6 +55,10 @@ describe('setupPreload', () => {
       getToken: expect.any(Function),
       saveToken: expect.any(Function),
       clearToken: expect.any(Function),
+    });
+    expect(window.__clerk_internal_electron?.oauthTransport).toEqual({
+      getRedirectUrl: expect.any(Function),
+      open: expect.any(Function),
     });
   });
 
@@ -67,5 +75,21 @@ describe('setupPreload', () => {
     expect(ipcRenderer.invoke).toHaveBeenCalledWith(TOKEN_CACHE_CHANNELS.getToken, 'token-key');
     expect(ipcRenderer.invoke).toHaveBeenCalledWith(TOKEN_CACHE_CHANNELS.saveToken, 'token-key', 'jwt');
     expect(ipcRenderer.invoke).toHaveBeenCalledWith(TOKEN_CACHE_CHANNELS.clearToken, 'token-key');
+  });
+
+  it('forwards OAuth transport calls over IPC', async () => {
+    setupPreload();
+
+    const bridge = vi.mocked(contextBridge.exposeInMainWorld).mock
+      .calls[0][1] as typeof window.__clerk_internal_electron;
+
+    await bridge?.oauthTransport.getRedirectUrl();
+    await bridge?.oauthTransport.open('https://accounts.example.com/oauth');
+
+    expect(ipcRenderer.invoke).toHaveBeenCalledWith(OAUTH_TRANSPORT_CHANNELS.getRedirectUrl);
+    expect(ipcRenderer.invoke).toHaveBeenCalledWith(
+      OAUTH_TRANSPORT_CHANNELS.open,
+      'https://accounts.example.com/oauth',
+    );
   });
 });

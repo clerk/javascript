@@ -34,3 +34,8 @@ export type TokenCache = {
   saveToken: (key: string, value: string) => Promise<void>;
   clearToken: (key: string) => Promise<void>;
 };
+
+export type OAuthTransport = {
+  getRedirectUrl: () => Promise<string>;
+  open: (url: string) => Promise<{ callbackUrl: string }>;
+};
