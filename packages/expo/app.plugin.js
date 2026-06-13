@@ -19,8 +19,13 @@ const {
 const path = require('path');
 const fs = require('fs');
 
-const CLERK_IOS_REPO = 'https://github.com/clerk/clerk-ios.git';
-const CLERK_IOS_VERSION = '1.2.2';
+const {
+  CLERK_IOS_VERSION,
+  configureClerkIosSdkPackage,
+  getConfiguredClerkIosSdkPath,
+  resolveClerkIosSdkPath,
+  withLocalClerkAndroidSdk,
+} = require('./plugin/localNativeSdk');
 
 const CLERK_MIN_IOS_VERSION = '17.0';
 
@@ -85,8 +90,11 @@ const withClerkIOS = config => {
   // Then add the Swift Package dependency
   config = withXcodeProject(config, config => {
     const xcodeProject = config.modResults;
+    const shouldUseLocalClerkIos = Boolean(getConfiguredClerkIosSdkPath());
 
     try {
+      const localPackage = resolveClerkIosSdkPath(config);
+
       // Get the main app target
       const targets = xcodeProject.getFirstTarget();
       if (!targets) {
@@ -95,120 +103,22 @@ const withClerkIOS = config => {
       }
 
       const targetUuid = targets.uuid;
-      const targetName = targets.name;
 
-      // Add Swift Package reference to the project
-      const packageUuid = xcodeProject.generateUuid();
-      const packageName = 'clerk-ios';
-
-      // Add package reference to XCRemoteSwiftPackageReference section
-      if (!xcodeProject.hash.project.objects.XCRemoteSwiftPackageReference) {
-        xcodeProject.hash.project.objects.XCRemoteSwiftPackageReference = {};
+      const { addedToClerkExpoTarget } = configureClerkIosSdkPackage(xcodeProject, targetUuid, localPackage);
+      if (addedToClerkExpoTarget) {
+        console.log(`✅ Added ClerkKit and ClerkKitUI packages to ClerkExpo pod target`);
       }
 
-      xcodeProject.hash.project.objects.XCRemoteSwiftPackageReference[packageUuid] = {
-        isa: 'XCRemoteSwiftPackageReference',
-        repositoryURL: CLERK_IOS_REPO,
-        requirement: {
-          kind: 'exactVersion',
-          version: CLERK_IOS_VERSION,
-        },
-      };
-
-      // Add package product dependencies (ClerkKit + ClerkKitUI)
-      const productUuidKit = xcodeProject.generateUuid();
-      const productUuidKitUI = xcodeProject.generateUuid();
-      if (!xcodeProject.hash.project.objects.XCSwiftPackageProductDependency) {
-        xcodeProject.hash.project.objects.XCSwiftPackageProductDependency = {};
+      if (localPackage) {
+        console.log(`✅ Added local clerk-ios Swift package dependency (${localPackage.relativePath})`);
+      } else {
+        console.log(`✅ Added clerk-ios Swift package dependency (${CLERK_IOS_VERSION})`);
       }
-
-      xcodeProject.hash.project.objects.XCSwiftPackageProductDependency[productUuidKit] = {
-        isa: 'XCSwiftPackageProductDependency',
-        package: packageUuid,
-        productName: 'ClerkKit',
-      };
-
-      xcodeProject.hash.project.objects.XCSwiftPackageProductDependency[productUuidKitUI] = {
-        isa: 'XCSwiftPackageProductDependency',
-        package: packageUuid,
-        productName: 'ClerkKitUI',
-      };
-
-      // Add package to project's package references
-      const projectSection = xcodeProject.hash.project.objects.PBXProject;
-      const projectUuid = Object.keys(projectSection)[0];
-      const project = projectSection[projectUuid];
-
-      if (!project.packageReferences) {
-        project.packageReferences = [];
-      }
-
-      // Check if package is already added
-      const alreadyAdded = project.packageReferences.some(ref => {
-        const refObj = xcodeProject.hash.project.objects.XCRemoteSwiftPackageReference[ref.value];
-        return refObj && refObj.repositoryURL === CLERK_IOS_REPO;
-      });
-
-      if (!alreadyAdded) {
-        project.packageReferences.push({
-          value: packageUuid,
-          comment: packageName,
-        });
-      }
-
-      // Add package products to main app target
-      const nativeTarget = xcodeProject.hash.project.objects.PBXNativeTarget[targetUuid];
-      if (!nativeTarget.packageProductDependencies) {
-        nativeTarget.packageProductDependencies = [];
-      }
-
-      const kitAlreadyAdded = nativeTarget.packageProductDependencies.some(dep => dep.value === productUuidKit);
-      if (!kitAlreadyAdded) {
-        nativeTarget.packageProductDependencies.push({
-          value: productUuidKit,
-          comment: 'ClerkKit',
-        });
-      }
-
-      const kitUIAlreadyAdded = nativeTarget.packageProductDependencies.some(dep => dep.value === productUuidKitUI);
-      if (!kitUIAlreadyAdded) {
-        nativeTarget.packageProductDependencies.push({
-          value: productUuidKitUI,
-          comment: 'ClerkKitUI',
-        });
-      }
-
-      // Also add packages to ClerkExpo pod target if it exists
-      const allTargets = xcodeProject.hash.project.objects.PBXNativeTarget;
-      for (const [uuid, target] of Object.entries(allTargets)) {
-        if (target && target.name === 'ClerkExpo') {
-          if (!target.packageProductDependencies) {
-            target.packageProductDependencies = [];
-          }
-
-          const podKitAdded = target.packageProductDependencies.some(dep => dep.value === productUuidKit);
-          if (!podKitAdded) {
-            target.packageProductDependencies.push({
-              value: productUuidKit,
-              comment: 'ClerkKit',
-            });
-          }
-
-          const podKitUIAdded = target.packageProductDependencies.some(dep => dep.value === productUuidKitUI);
-          if (!podKitUIAdded) {
-            target.packageProductDependencies.push({
-              value: productUuidKitUI,
-              comment: 'ClerkKitUI',
-            });
-          }
-
-          console.log(`✅ Added ClerkKit and ClerkKitUI packages to ClerkExpo pod target`);
-        }
-      }
-
-      console.log(`✅ Added clerk-ios Swift package dependency (${CLERK_IOS_VERSION})`);
     } catch (error) {
       console.error('❌ Error adding clerk-ios package:', error.message);
+      if (shouldUseLocalClerkIos) {
+        throw error;
+      }
     }
 
     return config;
@@ -460,6 +370,8 @@ const withClerkIOS = config => {
  */
 const withClerkAndroid = config => {
   console.log('✅ Clerk Android plugin loaded');
+
+  config = withLocalClerkAndroidSdk(config);
 
   return withAppBuildGradle(config, modConfig => {
     let buildGradle = modConfig.modResults.contents;
@@ -718,4 +630,9 @@ const withClerkExpo = (config, props = {}) => {
 };
 
 module.exports = withClerkExpo;
-module.exports._testing = { validateThemeJson, isPlainObject, VALID_COLOR_KEYS, HEX_COLOR_REGEX };
+module.exports._testing = {
+  validateThemeJson,
+  isPlainObject,
+  VALID_COLOR_KEYS,
+  HEX_COLOR_REGEX,
+};

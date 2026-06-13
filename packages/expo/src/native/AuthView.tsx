@@ -1,11 +1,20 @@
-import { type ComponentProps, type ReactElement, useCallback } from 'react';
-import { Text, View } from 'react-native';
+import { type ReactElement, useCallback } from 'react';
+import { Text, View, type ViewProps } from 'react-native';
 
-import NativeClerkAuthView from '../specs/NativeClerkAuthView';
+import { getNativeClerkView } from '../specs/nativeView';
 import { isNativeSupported } from '../utils/native-module';
 import type { AuthViewProps } from './AuthView.types';
 
-type AuthNativeEvent = Parameters<NonNullable<ComponentProps<typeof NativeClerkAuthView>['onAuthEvent']>>[0];
+type AuthEvent = Readonly<{ type: string }>;
+type AuthNativeEvent = Readonly<{ nativeEvent: AuthEvent }>;
+
+interface NativeAuthViewProps extends ViewProps {
+  mode?: string;
+  isDismissible?: boolean;
+  onAuthEvent?: (event: AuthNativeEvent) => void;
+}
+
+const NativeClerkAuthView = getNativeClerkView<NativeAuthViewProps>('ClerkAuthView');
 
 /**
  * A pre-built native authentication component that handles sign-in and sign-up flows.

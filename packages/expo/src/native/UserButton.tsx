@@ -1,7 +1,9 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, type ViewProps } from 'react-native';
 
-import NativeClerkUserButtonView from '../specs/NativeClerkUserButtonView';
+import { getNativeClerkView } from '../specs/nativeView';
 import { isNativeSupported } from '../utils/native-module';
+
+const NativeClerkUserButtonView = getNativeClerkView<ViewProps>('ClerkUserButtonView');
 
 /**
  * A pre-built button component that displays the user's avatar.

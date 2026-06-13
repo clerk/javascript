@@ -1,9 +1,19 @@
 import { useCallback } from 'react';
-import type { StyleProp, ViewStyle } from 'react-native';
+import type { StyleProp, ViewProps, ViewStyle } from 'react-native';
 import { StyleSheet, Text, View } from 'react-native';
 
-import NativeClerkUserProfileView from '../specs/NativeClerkUserProfileView';
+import { getNativeClerkView } from '../specs/nativeView';
 import { isNativeSupported } from '../utils/native-module';
+
+type ProfileEvent = Readonly<{ type: string }>;
+type ProfileNativeEvent = Readonly<{ nativeEvent: ProfileEvent }>;
+
+interface NativeUserProfileViewProps extends ViewProps {
+  isDismissible?: boolean;
+  onProfileEvent?: (event: ProfileNativeEvent) => void;
+}
+
+const NativeClerkUserProfileView = getNativeClerkView<NativeUserProfileViewProps>('ClerkUserProfileView');
 
 /**
  * Props for the UserProfileView component.
@@ -62,7 +72,7 @@ export interface UserProfileViewProps {
  */
 export function UserProfileView({ isDismissible = true, style, onDismiss }: UserProfileViewProps) {
   const handleProfileEvent = useCallback(
-    (event: { nativeEvent: { type: string } }) => {
+    (event: ProfileNativeEvent) => {
       if (event.nativeEvent.type === 'dismissed') {
         onDismiss?.();
       }

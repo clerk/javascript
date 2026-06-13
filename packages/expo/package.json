@@ -95,6 +95,7 @@
     "experimental",
     "legacy",
     "src/specs",
+    "plugin",
     "expo-module.config.json",
     "react-native.config.js",
     "app.plugin.js",
