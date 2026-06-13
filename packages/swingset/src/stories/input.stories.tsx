@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import type { InputProps } from '@clerk/ui/mosaic/components/input';
-import { Input, inputStyles } from '@clerk/ui/mosaic/components/input';
+import { Input, inputRecipe } from '@clerk/ui/mosaic/components/input';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -8,7 +8,7 @@ export const meta: StoryMeta = {
   group: 'Components',
   title: 'Input',
   source: 'packages/ui/src/mosaic/components/input.tsx',
-  styles: inputStyles,
+  styles: inputRecipe,
 };
 
 function knobsAsProps(props: Record<string, unknown>) {

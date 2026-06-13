@@ -21,7 +21,6 @@ export const DialogBackdrop = React.forwardRef<HTMLDivElement, DialogBackdropPro
     const state = { open };
 
     const defaultProps = {
-      'data-cl-slot': 'dialog-backdrop',
       ref,
       ...transitionProps,
     } satisfies DefaultProps<'div'>;

@@ -1,5 +1,11 @@
 import { loadClerkJSScript, loadClerkUIScript } from '@clerk/shared/loadClerkJsScript';
-import type { Resources, UnsubscribeCallback } from '@clerk/shared/types';
+import type {
+  BrowserClerk,
+  HandleOAuthCallbackParams,
+  Resources,
+  SignInResource,
+  UnsubscribeCallback,
+} from '@clerk/shared/types';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { IsomorphicClerk } from '../isomorphicClerk';
@@ -124,6 +130,45 @@ describe('isomorphicClerk', () => {
 
     expect(listenerCallHistory).toEqual([]);
     expect(listenerCallHistory.length).toBe(0);
+  });
+
+  it('queues __internal_handleResourceCallback until clerk-js has loaded', async () => {
+    const signInOrUp = {} as unknown as SignInResource;
+    const params: HandleOAuthCallbackParams = { signInUrl: '/sign-in' };
+    const customNavigate = vi.fn();
+    const handleResourceCallback = vi.fn();
+    const clerkjs = {
+      addListener: vi.fn(),
+      loaded: true,
+      __internal_handleResourceCallback: handleResourceCallback,
+    } satisfies Pick<BrowserClerk, 'addListener' | 'loaded' | '__internal_handleResourceCallback'>;
+    const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+
+    await isomorphicClerk.__internal_handleResourceCallback(signInOrUp, params, customNavigate);
+
+    expect(handleResourceCallback).not.toHaveBeenCalled();
+
+    (isomorphicClerk as any).replayInterceptedInvocations(clerkjs);
+
+    expect(handleResourceCallback).toHaveBeenCalledWith(signInOrUp, params, customNavigate);
+  });
+
+  it('calls __internal_handleResourceCallback immediately after clerk-js has loaded', async () => {
+    const signInOrUp = {} as unknown as SignInResource;
+    const params: HandleOAuthCallbackParams = { signInUrl: '/sign-in' };
+    const customNavigate = vi.fn();
+    const handleResourceCallback = vi.fn().mockResolvedValue('done');
+    const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+
+    (isomorphicClerk as any).clerkjs = {
+      loaded: true,
+      __internal_handleResourceCallback: handleResourceCallback,
+    } satisfies Pick<BrowserClerk, 'loaded' | '__internal_handleResourceCallback'>;
+
+    await expect(isomorphicClerk.__internal_handleResourceCallback(signInOrUp, params, customNavigate)).resolves.toBe(
+      'done',
+    );
+    expect(handleResourceCallback).toHaveBeenCalledWith(signInOrUp, params, customNavigate);
   });
 
   describe('__internal_* URL precedence', () => {
