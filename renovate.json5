@@ -275,65 +275,6 @@
     },
     {
       groupName: "[DEV] minor & patch dependencies",
-      groupSlug: "electron-dev-minor",
-      matchFileNames: [
-        "packages/electron/package.json",
-      ],
-      matchDepTypes: [
-        "devDependencies",
-      ],
-      matchUpdateTypes: [
-        "patch",
-        "minor",
-      ],
-      automerge: true,
-      semanticCommitScope: "electron",
-    },
-    {
-      groupName: "[DEV] major dependencies",
-      groupSlug: "electron-dev-major",
-      matchFileNames: [
-        "packages/electron/package.json",
-      ],
-      matchDepTypes: [
-        "devDependencies",
-      ],
-      matchUpdateTypes: [
-        "major",
-      ],
-      semanticCommitScope: "electron",
-    },
-    {
-      groupName: "minor & patch dependencies",
-      groupSlug: "electron-prod-minor",
-      matchFileNames: [
-        "packages/electron/package.json",
-      ],
-      matchDepTypes: [
-        "dependencies",
-      ],
-      matchUpdateTypes: [
-        "patch",
-        "minor",
-      ],
-      semanticCommitScope: "electron",
-    },
-    {
-      groupName: "major dependencies",
-      groupSlug: "electron-prod-major",
-      matchFileNames: [
-        "packages/electron/package.json",
-      ],
-      matchDepTypes: [
-        "dependencies",
-      ],
-      matchUpdateTypes: [
-        "major",
-      ],
-      semanticCommitScope: "electron",
-    },
-    {
-      groupName: "[DEV] minor & patch dependencies",
       groupSlug: "expo-dev-minor",
       matchFileNames: [
         "packages/expo/package.json",
@@ -567,65 +508,6 @@
         "major",
       ],
       semanticCommitScope: "fastify",
-    },
-    {
-      groupName: "[DEV] minor & patch dependencies",
-      groupSlug: "headless-dev-minor",
-      matchFileNames: [
-        "packages/headless/package.json",
-      ],
-      matchDepTypes: [
-        "devDependencies",
-      ],
-      matchUpdateTypes: [
-        "patch",
-        "minor",
-      ],
-      automerge: true,
-      semanticCommitScope: "headless",
-    },
-    {
-      groupName: "[DEV] major dependencies",
-      groupSlug: "headless-dev-major",
-      matchFileNames: [
-        "packages/headless/package.json",
-      ],
-      matchDepTypes: [
-        "devDependencies",
-      ],
-      matchUpdateTypes: [
-        "major",
-      ],
-      semanticCommitScope: "headless",
-    },
-    {
-      groupName: "minor & patch dependencies",
-      groupSlug: "headless-prod-minor",
-      matchFileNames: [
-        "packages/headless/package.json",
-      ],
-      matchDepTypes: [
-        "dependencies",
-      ],
-      matchUpdateTypes: [
-        "patch",
-        "minor",
-      ],
-      semanticCommitScope: "headless",
-    },
-    {
-      groupName: "major dependencies",
-      groupSlug: "headless-prod-major",
-      matchFileNames: [
-        "packages/headless/package.json",
-      ],
-      matchDepTypes: [
-        "dependencies",
-      ],
-      matchUpdateTypes: [
-        "major",
-      ],
-      semanticCommitScope: "headless",
     },
     {
       groupName: "[DEV] minor & patch dependencies",
@@ -1098,65 +980,6 @@
         "major",
       ],
       semanticCommitScope: "shared",
-    },
-    {
-      groupName: "[DEV] minor & patch dependencies",
-      groupSlug: "swingset-dev-minor",
-      matchFileNames: [
-        "packages/swingset/package.json",
-      ],
-      matchDepTypes: [
-        "devDependencies",
-      ],
-      matchUpdateTypes: [
-        "patch",
-        "minor",
-      ],
-      automerge: true,
-      semanticCommitScope: "swingset",
-    },
-    {
-      groupName: "[DEV] major dependencies",
-      groupSlug: "swingset-dev-major",
-      matchFileNames: [
-        "packages/swingset/package.json",
-      ],
-      matchDepTypes: [
-        "devDependencies",
-      ],
-      matchUpdateTypes: [
-        "major",
-      ],
-      semanticCommitScope: "swingset",
-    },
-    {
-      groupName: "minor & patch dependencies",
-      groupSlug: "swingset-prod-minor",
-      matchFileNames: [
-        "packages/swingset/package.json",
-      ],
-      matchDepTypes: [
-        "dependencies",
-      ],
-      matchUpdateTypes: [
-        "patch",
-        "minor",
-      ],
-      semanticCommitScope: "swingset",
-    },
-    {
-      groupName: "major dependencies",
-      groupSlug: "swingset-prod-major",
-      matchFileNames: [
-        "packages/swingset/package.json",
-      ],
-      matchDepTypes: [
-        "dependencies",
-      ],
-      matchUpdateTypes: [
-        "major",
-      ],
-      semanticCommitScope: "swingset",
     },
     {
       groupName: "[DEV] minor & patch dependencies",
