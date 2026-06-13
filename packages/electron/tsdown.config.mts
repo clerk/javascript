@@ -1,0 +1,26 @@
+import { defineConfig } from 'tsdown';
+
+import pkgJson from './package.json' with { type: 'json' };
+
+export default defineConfig(overrideOptions => {
+  const isWatch = !!overrideOptions.watch;
+  const shouldPublish = !!overrideOptions.env?.publish;
+
+  return {
+    entry: {
+      index: './src/index.ts',
+    },
+    format: ['cjs', 'esm'],
+    fixedExtension: false,
+    clean: true,
+    minify: false,
+    sourcemap: true,
+    dts: true,
+    onSuccess: shouldPublish ? 'pkglab pub --ping' : undefined,
+    define: {
+      PACKAGE_NAME: `"${pkgJson.name}"`,
+      PACKAGE_VERSION: `"${pkgJson.version}"`,
+      __DEV__: `${isWatch}`,
+    },
+  };
+});

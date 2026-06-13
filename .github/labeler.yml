@@ -16,6 +16,10 @@ clerk-js:
   - changed-files:
       - any-glob-to-any-file: packages/clerk-js/**
 
+electron:
+  - changed-files:
+      - any-glob-to-any-file: packages/electron/**
+
 elements:
   - changed-files:
       - any-glob-to-any-file: packages/elements/**

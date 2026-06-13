@@ -275,6 +275,65 @@
     },
     {
       groupName: "[DEV] minor & patch dependencies",
+      groupSlug: "electron-dev-minor",
+      matchFileNames: [
+        "packages/electron/package.json",
+      ],
+      matchDepTypes: [
+        "devDependencies",
+      ],
+      matchUpdateTypes: [
+        "patch",
+        "minor",
+      ],
+      automerge: true,
+      semanticCommitScope: "electron",
+    },
+    {
+      groupName: "[DEV] major dependencies",
+      groupSlug: "electron-dev-major",
+      matchFileNames: [
+        "packages/electron/package.json",
+      ],
+      matchDepTypes: [
+        "devDependencies",
+      ],
+      matchUpdateTypes: [
+        "major",
+      ],
+      semanticCommitScope: "electron",
+    },
+    {
+      groupName: "minor & patch dependencies",
+      groupSlug: "electron-prod-minor",
+      matchFileNames: [
+        "packages/electron/package.json",
+      ],
+      matchDepTypes: [
+        "dependencies",
+      ],
+      matchUpdateTypes: [
+        "patch",
+        "minor",
+      ],
+      semanticCommitScope: "electron",
+    },
+    {
+      groupName: "major dependencies",
+      groupSlug: "electron-prod-major",
+      matchFileNames: [
+        "packages/electron/package.json",
+      ],
+      matchDepTypes: [
+        "dependencies",
+      ],
+      matchUpdateTypes: [
+        "major",
+      ],
+      semanticCommitScope: "electron",
+    },
+    {
+      groupName: "[DEV] minor & patch dependencies",
       groupSlug: "expo-dev-minor",
       matchFileNames: [
         "packages/expo/package.json",
