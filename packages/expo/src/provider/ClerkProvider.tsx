@@ -1,7 +1,7 @@
 import '../polyfills';
 
-import { useAuth } from '@clerk/react';
 import type { ClerkProviderProps as ReactClerkProviderProps } from '@clerk/react';
+import { useAuth } from '@clerk/react';
 import { InternalClerkProvider as ClerkReactProvider, type Ui } from '@clerk/react/internal';
 import { type MutableRefObject, useCallback, useEffect, useRef } from 'react';
 import { Platform } from 'react-native';
