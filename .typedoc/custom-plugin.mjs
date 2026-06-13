@@ -1,5 +1,5 @@
 // @ts-check - Enable TypeScript checks for safer MDX post-processing and link rewriting
-import { Converter } from 'typedoc';
+import { Converter, DeclarationReflection, ReflectionKind, ReflectionType, RendererEvent } from 'typedoc';
 import { MarkdownPageEvent } from 'typedoc-plugin-markdown';
 
 /**
@@ -465,6 +465,33 @@ export function applyCatchAllMdReplacements(contents) {
 }
 
 /**
+ * Walk a typedoc Type and return a flat list of property declarations to render as a merged table. Used by the `@expandProperties` flattener below to handle three shapes:
+ *   - intersection types: walk each constituent
+ *   - inline object literals (ReflectionType): take its declaration.children
+ *   - named references (ReferenceType): take the target's children plus any properties contributed via type arguments, which captures the `Foo<{ ... }>` instantiation pattern where typedoc otherwise loses the generic parameter at the alias boundary.
+ *
+ * @param {import('typedoc').SomeType | undefined} type
+ * @param {Map<string, import('typedoc').Reflection>} reflectionsByName lookup for cross-package refs whose `.reflection` is not linked
+ * @returns {import('typedoc').DeclarationReflection[]}
+ */
+function collectPropertiesFromType(type, reflectionsByName) {
+  if (!type) return [];
+  if (type.type === 'reflection') {
+    return type.declaration?.children ?? [];
+  }
+  if (type.type === 'intersection') {
+    return type.types.flatMap(t => collectPropertiesFromType(t, reflectionsByName));
+  }
+  if (type.type === 'reference') {
+    const target = type.reflection ?? reflectionsByName.get(type.name);
+    const targetChildren = target?.children ?? [];
+    const argChildren = (type.typeArguments ?? []).flatMap(t => collectPropertiesFromType(t, reflectionsByName));
+    return [...targetChildren, ...argChildren];
+  }
+  return [];
+}
+
+/**
  * @param {import('typedoc-plugin-markdown').MarkdownApplication} app
  */
 export function load(app) {
@@ -476,6 +503,49 @@ export function load(app) {
   app.converter.on(Converter.EVENT_RESOLVE_END, context => {
     for (const reflection of Object.values(context.project.reflections)) {
       reflection.comment?.modifierTags?.delete('@generateWithEmptyComment');
+    }
+  });
+
+  /**
+   * Flatten the `Foo<{...}>` generic-instantiation pattern into a single merged properties table when `Foo` opts in via `@expandProperties`. typedoc-plugin-markdown would otherwise render an empty page for these aliases because the resolved type is a `ReferenceType` with no inline declaration — see `member.declaration.js` in the plugin, which only walks `IntersectionType` sub-types and has no branch for top-level `ReferenceType`.
+   *
+   * Runs at `RendererEvent.BEGIN` rather than `EVENT_RESOLVE_END` because the resolve hook fires per package, and cross-package references (e.g. `@clerk/backend` types referencing `ClerkPaginationRequest` from `@clerk/shared`) only link up after typedoc merges packages.
+   *
+   * The opt-in tag lives on the wrapper type so we never accidentally flatten unrelated generic aliases (e.g. `SignInErrors = Errors<SignInFields>`).
+   */
+  app.renderer.on(RendererEvent.BEGIN, event => {
+    const all = Object.values(event.project.reflections);
+    const reflectionsByName = new Map();
+    for (const r of all) {
+      if (r.name && !reflectionsByName.has(r.name)) reflectionsByName.set(r.name, r);
+    }
+    const expandable = new Set();
+    for (const r of all) {
+      if (r.comment?.modifierTags?.has('@expandProperties')) {
+        expandable.add(r);
+        r.comment.modifierTags.delete('@expandProperties');
+      }
+    }
+    for (const reflection of all) {
+      if (
+        reflection.kindOf?.(ReflectionKind.TypeAlias) &&
+        reflection.type?.type === 'reference' &&
+        Array.isArray(reflection.type.typeArguments) &&
+        reflection.type.typeArguments.length > 0
+      ) {
+        const target = reflection.type.reflection ?? reflectionsByName.get(reflection.type.name);
+        if (!target || !expandable.has(target)) continue;
+        const merged = collectPropertiesFromType(reflection.type, reflectionsByName);
+        if (merged.length > 0) {
+          // typedoc's package-level `sort: 'alphabetical'` is applied during conversion, before
+          // our synthetic merge runs. Sort here to match the alphabetical ordering used by
+          // every other table in the docs.
+          merged.sort((a, b) => a.name.localeCompare(b.name));
+          const decl = new DeclarationReflection('__type', ReflectionKind.TypeLiteral, reflection);
+          decl.children = merged;
+          reflection.type = new ReflectionType(decl);
+        }
+      }
     }
   });
 

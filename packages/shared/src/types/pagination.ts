@@ -2,6 +2,7 @@
  * Pagination params in request
  *
  * @interface
+ * @expandProperties
  */
 export type ClerkPaginationRequest<T = object> = {
   /**
@@ -33,6 +34,7 @@ export interface ClerkPaginatedResponse<T> {
 
 /**
  * @interface
+ * @expandProperties
  */
 export type ClerkPaginationParams<T = object> = {
   /**

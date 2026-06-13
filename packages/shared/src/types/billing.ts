@@ -7,6 +7,8 @@ import type { ForceNull, RemoveFunctions, Simplify } from './utils';
 
 /**
  * Intersects `T` with an optional organization scope (`orgId`) for billing and related requests.
+ *
+ * @interface
  */
 export type WithOptionalOrgType<T> = T & {
   /**

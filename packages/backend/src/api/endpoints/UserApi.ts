@@ -18,43 +18,72 @@ import type { WithSign } from './util-types';
 
 const basePath = '/users';
 
-type UserCountParams = {
+/** @generateWithEmptyComment */
+export type UserCountParams = {
+  /** Counts users with emails that match the given query, via case-insensitive partial match. For example, `emailAddress=hello` will match a user with the email `HELLO@example.com`. Accepts up to 100 email addresses. */
   emailAddress?: string[];
+  /** Counts users with phone numbers that match the given query, via case-insensitive partial match. For example, `phoneNumber=555` will match a user with the phone number `+1555xxxxxxx`. Accepts up to 100 phone numbers. */
   phoneNumber?: string[];
+  /** Counts users with usernames that match the given query, via case-insensitive partial match. For example, `username=CoolUser` will match a user with the username `SomeCoolUser`. Accepts up to 100 usernames. */
   username?: string[];
+  /** Counts users with Web3 wallet addresses that match the given query, via case-insensitive partial match. For example, `web3Wallet=0x1234567890` will match a user with the Web3 wallet address `0x1234567890`. Accepts up to 100 Web3 wallet addresses. */
   web3Wallet?: string[];
+  /** Counts users matching the given query across email addresses, phone numbers, usernames, Web3 wallet addresses, user IDs, first names, and last names. Partial matches supported. For example, `query=hello` will match a user with the email `HELLO@example.com`. */
   query?: string;
+  /** Counts users with the specified user IDs. Accepts up to 100 user IDs. */
   userId?: string[];
+  /** Counts users with the specified external IDs. Accepts up to 100 external IDs. */
   externalId?: string[];
 };
 
-type UserListParams = ClerkPaginationRequest<
-  UserCountParams & {
-    orderBy?: WithSign<
-      | 'created_at'
-      | 'updated_at'
-      | 'email_address'
-      | 'web3wallet'
-      | 'first_name'
-      | 'last_name'
-      | 'phone_number'
-      | 'username'
-      | 'last_active_at'
-      | 'last_sign_in_at'
-    >;
-    /**
-     * @deprecated Use `lastActiveAtAfter` instead. This parameter will be removed in a future version.
-     */
-    last_active_at_since?: number;
-    lastActiveAtBefore?: number;
-    lastActiveAtAfter?: number;
-    createdAtBefore?: number;
-    createdAtAfter?: number;
-    lastSignInAtAfter?: number;
-    lastSignInAtBefore?: number;
-    organizationId?: string[];
-  }
->;
+/** @generateWithEmptyComment */
+export type UserListParams = ClerkPaginationRequest<{
+  /** Filters users with the specified email addresses. Accepts up to 100 email addresses. */
+  emailAddress?: string[];
+  /** Filters users with the specified phone numbers. Accepts up to 100 phone numbers. */
+  phoneNumber?: string[];
+  /** Filters users with the specified usernames. Accepts up to 100 usernames. */
+  username?: string[];
+  /** Filters users with the specified Web3 wallet addresses. Accepts up to 100 Web3 wallet addresses. */
+  web3Wallet?: string[];
+  /** Filters users matching the given query across email addresses, phone numbers, usernames, Web3 wallet addresses, user IDs, first names, and last names. Partial matches supported. */
+  query?: string;
+  /** Filters users with the specified user IDs. Accepts up to 100 user IDs. */
+  userId?: string[];
+  /** Filters users with the specified external IDs. Accepts up to 100 external IDs. */
+  externalId?: string[];
+  /** Returns users in a particular order. Prefix a value with `+` to sort in ascending order, or `-` to sort in descending order. Defaults to `-created_at`.*/
+  orderBy?: WithSign<
+    | 'created_at'
+    | 'updated_at'
+    | 'email_address'
+    | 'web3wallet'
+    | 'first_name'
+    | 'last_name'
+    | 'phone_number'
+    | 'username'
+    | 'last_active_at'
+    | 'last_sign_in_at'
+  >;
+  /**
+   * @deprecated Use `lastActiveAtAfter` instead. This parameter will be removed in a future version.
+   */
+  last_active_at_since?: number;
+  /** Filters users who were last active before the given date (with millisecond precision). */
+  lastActiveAtBefore?: number;
+  /** Filters users who were last active after the given date (with millisecond precision). */
+  lastActiveAtAfter?: number;
+  /** Filters users who were created before the given date (with millisecond precision). */
+  createdAtBefore?: number;
+  /** Filters users who were created after the given date (with millisecond precision). */
+  createdAtAfter?: number;
+  /** Filters users who were last signed in after the given date (with millisecond precision). */
+  lastSignInAtAfter?: number;
+  /** Filters users who were last signed in before the given date (with millisecond precision). */
+  lastSignInAtBefore?: number;
+  /** Filters users who are members of the specified organizations. Accepts up to 100 organization IDs. */
+  organizationId?: string[];
+}>;
 
 type UserMetadataParams = {
   publicMetadata?: UserPublicMetadata;
@@ -259,6 +288,10 @@ type UserID = {
 };
 
 export class UserAPI extends AbstractAPI {
+  /**
+   * Retrieves the list of users in your instance.
+   * @returns A [PaginatedResourceResponse](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property than contains an array of [`User`](https://clerk.com/docs/reference/backend/types/backend-user) objects, and a `totalCount` property that indicates the total number of users in your instance.
+   */
   public async getUserList(params: UserListParams = {}) {
     const { limit, offset, orderBy, ...userCountParams } = params;
     // TODO(dimkl): Temporary change to populate totalCount using a 2nd BAPI call to /users/count endpoint
@@ -275,6 +308,10 @@ export class UserAPI extends AbstractAPI {
     return { data, totalCount } as PaginatedResourceResponse<User[]>;
   }
 
+  /**
+   * Gets a [`User`](https://clerk.com/docs/reference/backend/types/backend-user) for the specified user ID.
+   * @param userId - The ID of the user to retrieve.
+   */
   public async getUser(userId: string) {
     this.requireId(userId);
     return this.request<User>({
@@ -395,6 +432,9 @@ export class UserAPI extends AbstractAPI {
     });
   }
 
+  /**
+   * Gets the total number of users in your instance.
+   */
   public async getCount(params: UserCountParams = {}) {
     return this.request<number>({
       method: 'GET',

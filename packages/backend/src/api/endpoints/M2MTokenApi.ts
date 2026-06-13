@@ -13,11 +13,7 @@ import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/m2m_tokens';
 
-/**
- * Format of the M2M token to create.
- * - 'opaque': Opaque token with mt_ prefix
- * - 'jwt': JWT signed with instance keys
- */
+/** @inline */
 export type M2MTokenFormat = 'opaque' | 'jwt';
 
 type GetM2MTokenListParams = ClerkPaginationRequest<{
@@ -61,6 +57,12 @@ type CreateM2MTokenParams = {
    */
   minRemainingTtlSeconds?: number;
   /**
+   * Format of the M2M token to create.
+   * <ul>
+   *  <li>'opaque': Opaque token with mt_ prefix</li>
+   *  <li>'jwt': JWT signed with instance keys</li>
+   * </ul>
+   *
    * @default 'opaque'
    */
   tokenFormat?: M2MTokenFormat;
