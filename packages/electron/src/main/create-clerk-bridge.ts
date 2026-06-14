@@ -1,10 +1,10 @@
 import { protocol } from 'electron';
 
-import type { SetupMainOptions, SetupMainReturn } from '../shared/types';
+import type { ClerkBridge, CreateClerkBridgeOptions } from '../shared/types';
 import { setupTokenCacheIpcHandlers } from './ipc-handlers';
 import { setupOAuthTransportIpcHandlers } from './oauth-transport';
 
-function assertValidRendererOriginConfig(renderer: NonNullable<SetupMainOptions['renderer']>): void {
+function assertValidRendererOriginConfig(renderer: NonNullable<CreateClerkBridgeOptions['renderer']>): void {
   if (renderer.scheme.includes(':') || renderer.scheme.includes('/')) {
     throw new Error(
       'Clerk: renderer.scheme must be a scheme name like "my-app", not a URL or protocol like "my-app://".',
@@ -18,10 +18,17 @@ function assertValidRendererOriginConfig(renderer: NonNullable<SetupMainOptions[
   }
 }
 
-export function setupMain(options: SetupMainOptions): SetupMainReturn {
+/**
+ * Creates the Clerk bridge for Electron's main process.
+ *
+ * The bridge owns Clerk's main-process IPC handlers, token persistence, and OAuth deep-link
+ * transport. Call this before creating renderer windows, and call the returned `cleanup` method
+ * when tearing down the app or test environment.
+ */
+export function createClerkBridge(options: CreateClerkBridgeOptions): ClerkBridge {
   if (!options.storage) {
     throw new Error(
-      'Clerk: setupMain requires a storage adapter. Pass setupMain({ storage: storage() }) from @clerk/electron/storage, or provide a custom storage adapter.',
+      'Clerk: createClerkBridge requires a storage adapter. Pass createClerkBridge({ storage: storage() }) from @clerk/electron/storage, or provide a custom storage adapter.',
     );
   }
 

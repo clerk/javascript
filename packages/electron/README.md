@@ -41,12 +41,12 @@ This package exposes entrypoints for Electron's distinct runtime contexts:
 ```ts
 // main.ts
 import { app, BrowserWindow, net, protocol } from 'electron';
-import { setupMain } from '@clerk/electron';
+import { createClerkBridge } from '@clerk/electron';
 import { storage } from '@clerk/electron/storage';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-setupMain({
+createClerkBridge({
   storage: storage(),
   renderer: {
     scheme: 'my-app',
@@ -73,6 +73,13 @@ app.whenReady().then(() => {
 ```
 
 In `my-app://renderer/sign-in`, `my-app` is the scheme, `renderer` is the host, `my-app://renderer` is the origin, and `/sign-in` is the path. If your renderer uses path-based routing, serve every route from the same origin and fall back to your renderer entrypoint as needed.
+
+```ts
+// preload.ts
+import { exposeClerkBridge } from '@clerk/electron/preload';
+
+exposeClerkBridge();
+```
 
 ```tsx
 // renderer.tsx

@@ -2,7 +2,7 @@ import { contextBridge, ipcRenderer } from 'electron';
 import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { OAUTH_TRANSPORT_CHANNELS, TOKEN_CACHE_CHANNELS } from '../../shared/ipc';
-import { setupPreload } from '../index';
+import { exposeClerkBridge } from '../index';
 
 vi.mock('electron', () => ({
   contextBridge: {
@@ -13,7 +13,7 @@ vi.mock('electron', () => ({
   },
 }));
 
-describe('setupPreload', () => {
+describe('exposeClerkBridge', () => {
   const originalContextIsolated = process.contextIsolated;
 
   beforeEach(() => {
@@ -31,7 +31,7 @@ describe('setupPreload', () => {
   });
 
   it('exposes the Clerk Electron bridge through contextBridge when context isolation is enabled', () => {
-    setupPreload();
+    exposeClerkBridge();
 
     expect(contextBridge.exposeInMainWorld).toHaveBeenCalledWith('__clerk_internal_electron', {
       tokenCache: {
@@ -49,7 +49,7 @@ describe('setupPreload', () => {
   it('exposes the Clerk Electron bridge on window when context isolation is disabled', () => {
     Object.defineProperty(process, 'contextIsolated', { configurable: true, value: false });
 
-    setupPreload();
+    exposeClerkBridge();
 
     expect(window.__clerk_internal_electron?.tokenCache).toEqual({
       getToken: expect.any(Function),
@@ -63,7 +63,7 @@ describe('setupPreload', () => {
   });
 
   it('forwards token cache calls over IPC', async () => {
-    setupPreload();
+    exposeClerkBridge();
 
     const bridge = vi.mocked(contextBridge.exposeInMainWorld).mock
       .calls[0][1] as typeof window.__clerk_internal_electron;
@@ -78,7 +78,7 @@ describe('setupPreload', () => {
   });
 
   it('forwards OAuth transport calls over IPC', async () => {
-    setupPreload();
+    exposeClerkBridge();
 
     const bridge = vi.mocked(contextBridge.exposeInMainWorld).mock
       .calls[0][1] as typeof window.__clerk_internal_electron;

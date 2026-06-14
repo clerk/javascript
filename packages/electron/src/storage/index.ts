@@ -108,7 +108,7 @@ async function resolveCipher(): Promise<Cipher | null> {
  * {@link safeStorage} API, which is backed by the OS keystore (Keychain on macOS, DPAPI on
  * Windows, libsecret/kwallet on Linux). It uses Electron 42's async `safeStorage` API only when it
  * reports itself available (which generally requires a code-signed app) and otherwise falls back to
- * the synchronous API. Pass the result to `setupMain({ storage: storage() })`.
+ * the synchronous API. Pass the result to `createClerkBridge({ storage: storage() })`.
  *
  * Behavior is secure by default: when OS encryption is unavailable the adapter does not persist
  * tokens (the user will be signed out on restart) unless {@link StorageOptions.unencryptedFallback}
@@ -116,10 +116,10 @@ async function resolveCipher(): Promise<Cipher | null> {
  *
  * @example
  * ```ts
- * import { setupMain } from '@clerk/electron';
+ * import { createClerkBridge } from '@clerk/electron';
  * import { storage } from '@clerk/electron/storage';
  *
- * setupMain({ storage: storage({ name: 'my-app-tokens' }) });
+ * createClerkBridge({ storage: storage({ name: 'my-app-tokens' }) });
  * ```
  */
 export function storage(options: StorageOptions = {}): TokenStorage {

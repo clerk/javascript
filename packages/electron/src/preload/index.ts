@@ -3,7 +3,13 @@ import { contextBridge, ipcRenderer } from 'electron';
 import { OAUTH_TRANSPORT_CHANNELS, TOKEN_CACHE_CHANNELS } from '../shared/ipc';
 import type { OAuthTransport, TokenCache } from '../shared/types';
 
-export function setupPreload(): void {
+/**
+ * Exposes Clerk's Electron bridge from the preload script to the renderer.
+ *
+ * Call this from an Electron preload script. It publishes a narrow internal bridge used by
+ * `@clerk/electron/react` for token storage and OAuth transport.
+ */
+export function exposeClerkBridge(): void {
   const tokenCache: TokenCache = {
     getToken: key => ipcRenderer.invoke(TOKEN_CACHE_CHANNELS.getToken, key),
     saveToken: (key, value) => ipcRenderer.invoke(TOKEN_CACHE_CHANNELS.saveToken, key, value),
