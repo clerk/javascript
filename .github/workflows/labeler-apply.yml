@@ -34,15 +34,35 @@ jobs:
           name: pr-number
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Read and validate PR number
+      - name: Resolve and verify PR number
         id: pr
-        run: |
-          number="$(cat number)"
-          if ! [[ "$number" =~ ^[0-9]+$ ]]; then
-            echo "::error::Invalid PR number from artifact: '$number'"
-            exit 1
-          fi
-          echo "number=$number" >> "$GITHUB_OUTPUT"
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        with:
+          script: |
+            const fs = require('fs');
+            const raw = fs.readFileSync('number', 'utf8').trim();
+            if (!/^[0-9]+$/.test(raw)) {
+              return core.setFailed(`Invalid PR number from artifact: '${raw}'`);
+            }
+            // The artifact comes from the untrusted pull_request leg, so its number
+            // could point at any PR. Bind it to the run that actually triggered this
+            // workflow_run before handing it to the privileged labeler: the claimed
+            // PR's head commit and head repository must match the trigger run.
+            const run = context.payload.workflow_run;
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: Number(raw),
+            });
+            if (pr.head.sha !== run.head_sha) {
+              return core.setFailed(`PR #${raw} head ${pr.head.sha} does not match triggering run head ${run.head_sha}`);
+            }
+            const prHeadRepo = pr.head.repo ? pr.head.repo.full_name : null;
+            const runHeadRepo = run.head_repository ? run.head_repository.full_name : null;
+            if (prHeadRepo !== runHeadRepo) {
+              return core.setFailed(`PR #${raw} head repo ${prHeadRepo} does not match triggering run head repo ${runHeadRepo}`);
+            }
+            core.setOutput('number', raw);
       - name: Check out trusted labeler config
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
