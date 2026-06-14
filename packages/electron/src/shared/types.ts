@@ -6,7 +6,10 @@ export type TokenStorage = {
   removeItem: (key: string) => Awaitable<void>;
 };
 
-export type SetupMainOptions = {
+export type CreateClerkBridgeOptions = {
+  /**
+   * Storage adapter used by the main process to persist Clerk tokens.
+   */
   storage: TokenStorage;
   /**
    * Registers the custom scheme used to serve the Electron renderer from a stable origin.
@@ -14,7 +17,10 @@ export type SetupMainOptions = {
   renderer?: RendererSchemeOptions;
 };
 
-export type SetupMainReturn = {
+export type ClerkBridge = {
+  /**
+   * Removes IPC handlers and listeners registered by `createClerkBridge`.
+   */
   cleanup: () => void;
 };
 

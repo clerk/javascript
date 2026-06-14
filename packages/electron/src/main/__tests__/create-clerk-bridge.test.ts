@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { OAUTH_TRANSPORT_CHANNELS } from '../../shared/ipc';
 import type { TokenStorage } from '../../shared/types';
-import { setupMain } from '../setup-main';
+import { createClerkBridge } from '../create-clerk-bridge';
 
 vi.mock('electron', () => ({
   app: {
@@ -23,8 +23,8 @@ vi.mock('electron', () => ({
   },
 }));
 
-describe('setupMain', () => {
-  const missingStorage = {} as Parameters<typeof setupMain>[0];
+describe('createClerkBridge', () => {
+  const missingStorage = {} as Parameters<typeof createClerkBridge>[0];
   const storage: TokenStorage = {
     getItem: vi.fn(),
     setItem: vi.fn(),
@@ -36,17 +36,17 @@ describe('setupMain', () => {
   });
 
   it('requires a storage adapter', () => {
-    expect(() => setupMain(missingStorage)).toThrow('setupMain requires a storage adapter');
+    expect(() => createClerkBridge(missingStorage)).toThrow('createClerkBridge requires a storage adapter');
   });
 
   it('sets up token persistence IPC handlers with the provided storage', () => {
-    setupMain({ storage });
+    createClerkBridge({ storage });
 
     expect(ipcMain.handle).toHaveBeenCalledTimes(3);
   });
 
   it('registers the configured renderer scheme as privileged before app ready', () => {
-    setupMain({
+    createClerkBridge({
       storage,
       renderer: {
         host: 'renderer',
@@ -70,7 +70,7 @@ describe('setupMain', () => {
 
   it('requires renderer.scheme to be a scheme name, not a URL', () => {
     expect(() =>
-      setupMain({
+      createClerkBridge({
         storage,
         renderer: {
           host: 'renderer',
@@ -82,7 +82,7 @@ describe('setupMain', () => {
 
   it('requires renderer.host to be a host name, not an origin', () => {
     expect(() =>
-      setupMain({
+      createClerkBridge({
         storage,
         renderer: {
           host: 'my-app://renderer',
@@ -93,7 +93,7 @@ describe('setupMain', () => {
   });
 
   it('returns a cleanup function for registered handlers', () => {
-    const clerk = setupMain({ storage });
+    const clerk = createClerkBridge({ storage });
 
     clerk.cleanup();
 
@@ -101,7 +101,7 @@ describe('setupMain', () => {
   });
 
   it('cleans up OAuth transport handlers when renderer origin is configured', () => {
-    const clerk = setupMain({
+    const clerk = createClerkBridge({
       storage,
       renderer: {
         host: 'renderer',
@@ -118,7 +118,7 @@ describe('setupMain', () => {
   });
 
   it('sets up OAuth transport IPC handlers when renderer origin is configured', () => {
-    setupMain({
+    createClerkBridge({
       storage,
       renderer: {
         host: 'renderer',
@@ -132,7 +132,7 @@ describe('setupMain', () => {
   });
 
   it('derives the OAuth callback URL from the renderer origin', () => {
-    setupMain({
+    createClerkBridge({
       storage,
       renderer: {
         host: 'renderer',
@@ -149,7 +149,7 @@ describe('setupMain', () => {
 
   it('opens OAuth URLs externally and resolves with the matching deep-link callback URL', async () => {
     vi.mocked(shell.openExternal).mockResolvedValue(undefined);
-    setupMain({
+    createClerkBridge({
       storage,
       renderer: {
         host: 'renderer',
