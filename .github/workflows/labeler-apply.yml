@@ -1,0 +1,55 @@
+name: Labeler (apply)
+
+# Privileged half of the labeler. Triggered by completion of the "Labeler" workflow,
+# so it always runs the base-branch copy of this file (a PR cannot modify it) with
+# write access. It reads the PR number from the trigger run's artifact, validates it,
+# checks out only the trusted base .github/labeler.yml, and applies labels via
+# actions/labeler driven by pr-number. Replaces the previous pull_request_target
+# trigger while preserving fork-PR labeling (SDK-80).
+
+on:
+  workflow_run:
+    workflows: [Labeler]
+    types:
+      - completed
+
+permissions: {}
+
+jobs:
+  apply:
+    name: Apply labels
+    if: >-
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success'
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_SHORT && fromJSON(vars.TIMEOUT_MINUTES_SHORT) || 3 }}
+    runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
+    permissions:
+      actions: read # download the artifact from the triggering run
+      contents: read # checkout the trusted base labeler config
+      pull-requests: write # apply labels
+    steps:
+      - name: Download PR number
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: pr-number
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Read and validate PR number
+        id: pr
+        run: |
+          number="$(cat number)"
+          if ! [[ "$number" =~ ^[0-9]+$ ]]; then
+            echo "::error::Invalid PR number from artifact: '$number'"
+            exit 1
+          fi
+          echo "number=$number" >> "$GITHUB_OUTPUT"
+      - name: Check out trusted labeler config
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          sparse-checkout: .github/labeler.yml
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+      - uses: actions/labeler@f27b608878404679385c85cfa523b85ccb86e213 # v6
+        with:
+          pr-number: ${{ steps.pr.outputs.number }}
+          configuration-path: .github/labeler.yml
