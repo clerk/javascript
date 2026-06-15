@@ -1389,6 +1389,13 @@ export type __internal_LocalizationResource = {
           valueLabel: LocalizationValue;
         };
       };
+      removeDomainDialog: {
+        title: LocalizationValue;
+        subtitle__active: LocalizationValue<'domain'>;
+        subtitle__inactive: LocalizationValue<'domain'>;
+        cancelButton: LocalizationValue;
+        removeButton: LocalizationValue;
+      };
     };
     testConfigurationStep: {
       title: LocalizationValue;

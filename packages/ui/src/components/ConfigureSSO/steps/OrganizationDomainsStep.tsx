@@ -32,17 +32,20 @@ import { useConfigureSSO } from '../ConfigureSSOContext';
 import { areAllOrganizationDomainsVerified } from '../domain/organizationEnterpriseConnection';
 import { Step } from '../elements/Step';
 import { useWizard } from '../elements/Wizard/WizardContext';
+import { RemoveDomainDialog } from '../RemoveDomainDialog';
 
 export const OrganizationDomainsStep = (): JSX.Element => {
   const { t } = useLocalizations();
   const {
     enterpriseConnection,
     organizationDomains,
+    contentRef,
     organizationDomainMutations: { createDomain, revalidate },
     enterpriseConnectionMutations: { updateConnection },
   } = useConfigureSSO();
   const { goPrev, goNext, isFirstStep, isLastStep } = useWizard();
   const card = useCardState();
+  const [domainToRemove, setDomainToRemove] = useState<OrganizationDomainResource | null>(null);
 
   const handleCreateDomain = async (domain: string) => {
     card.setError(undefined);
@@ -50,10 +53,6 @@ export const OrganizationDomainsStep = (): JSX.Element => {
     try {
       await createDomain(domain);
 
-      // When the connection already exists, keep its domain list in sync by
-      // patching the new domain onto it. On the fresh-start path the connection
-      // does not exist yet, so we only create the domain here and let the
-      // connection be created with all domains on the select-provider step.
       if (enterpriseConnection) {
         const domains = Array.from(new Set([...enterpriseConnection.domains, domain]));
         await updateConnection(enterpriseConnection.id, { domains });
@@ -62,6 +61,16 @@ export const OrganizationDomainsStep = (): JSX.Element => {
       const apiError = getFieldError(err) ?? getGlobalError(err);
       card.setError(apiError);
     }
+  };
+
+  const handleRemoveDomain = async (domain: OrganizationDomainResource) => {
+    if (enterpriseConnection) {
+      const domains = enterpriseConnection.domains.filter(name => name !== domain.name);
+      await updateConnection(enterpriseConnection.id, { domains });
+    }
+
+    await domain.delete();
+    await revalidate();
   };
 
   const hasAllDomainsVerified = areAllOrganizationDomainsVerified(organizationDomains);
@@ -117,10 +126,7 @@ export const OrganizationDomainsStep = (): JSX.Element => {
                   <DomainCard
                     key={domain.id}
                     domain={domain}
-                    onRemove={() => {
-                      // TODO ORGS-1623 - Add dialog for domain deletion confirmation
-                      void domain.delete().then(() => revalidate());
-                    }}
+                    onRemove={() => setDomainToRemove(domain)}
                   />
                 ))}
               </Col>
@@ -139,6 +145,17 @@ export const OrganizationDomainsStep = (): JSX.Element => {
           />
         </Step.Footer>
       </Step>
+
+      {domainToRemove && (
+        <RemoveDomainDialog
+          isOpen={!!domainToRemove}
+          onClose={() => setDomainToRemove(null)}
+          domain={domainToRemove.name}
+          isConnectionActive={Boolean(enterpriseConnection?.active)}
+          onRemove={() => handleRemoveDomain(domainToRemove)}
+          contentRef={contentRef}
+        />
+      )}
     </Flow.Part>
   );
 };

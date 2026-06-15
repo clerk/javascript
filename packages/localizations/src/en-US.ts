@@ -290,6 +290,14 @@ export const enUS: LocalizationResource = {
           valueLabel: 'Value',
         },
       },
+      removeDomainDialog: {
+        title: 'Removing domain',
+        subtitle__active:
+          "You're about to remove {{domain}} from this enterprise connection. Users won't be able to sign-in with {{domain}} anymore.",
+        subtitle__inactive: "You're about to remove {{domain}} from this enterprise connection.",
+        cancelButton: 'Cancel',
+        removeButton: 'Remove domain',
+      },
     },
     testConfigurationStep: {
       title: 'Test your SSO connection',
