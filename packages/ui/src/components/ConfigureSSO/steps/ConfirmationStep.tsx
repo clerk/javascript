@@ -254,6 +254,7 @@ const ConfigurationDetailsSection = (): JSX.Element => {
 };
 
 const ResetConnectionSection = (): JSX.Element => {
+  const { enterpriseConnection, mutations, contentRef } = useConfigureSSO();
   const { organization } = useOrganization();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -277,6 +278,10 @@ const ResetConnectionSection = (): JSX.Element => {
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         confirmationValue={organization?.name ?? ''}
+        // The confirmation step is only reachable with a connection, so the resource is set.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        onDelete={() => mutations.deleteConnection(enterpriseConnection!.id)}
+        contentRef={contentRef}
       />
     </ProfileSection.Root>
   );

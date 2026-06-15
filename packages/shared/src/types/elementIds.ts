@@ -53,6 +53,7 @@ export type ProfileSectionId =
   | 'manageVerifiedDomains'
   | 'subscriptionsList'
   | 'paymentMethods'
+  | 'sso'
   | 'ssoStatus'
   | 'enableSso'
   | 'ssoDomain'
@@ -61,7 +62,13 @@ export type ProfileSectionId =
   | 'resetSso'
   | 'testSsoUrl'
   | 'testResults';
-export type ProfilePageId = 'account' | 'security' | 'organizationGeneral' | 'organizationMembers' | 'billing';
+export type ProfilePageId =
+  | 'account'
+  | 'security'
+  | 'organizationGeneral'
+  | 'organizationMembers'
+  | 'organizationSecurity'
+  | 'billing';
 
 export type UserPreviewId = 'userButton' | 'personalWorkspace';
 export type OrganizationPreviewId =

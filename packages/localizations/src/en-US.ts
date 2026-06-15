@@ -1066,6 +1066,38 @@ export const enUS: LocalizationResource = {
       successMessage: '{{domain}} has been removed.',
       title: 'Remove domain',
     },
+    securityPage: {
+      removeDialog: {
+        confirmButton: 'Remove connection',
+        subtitle:
+          'Are you sure you want to remove the connection? This action is irreversible and deletes the connection and all of its configuration.',
+        title: 'Remove SSO connection',
+      },
+      ssoSection: {
+        badge__active: 'Active',
+        badge__inactive: 'Inactive',
+        badge__inProgress: 'In Progress',
+        badge__unconfigured: 'Unconfigured',
+        certificateLabel: 'Certificate',
+        descriptionLine1:
+          'Require members to sign in through your identity provider using their domain email. Members without a matching domain are unaffected.',
+        descriptionLine2:
+          'Anyone who signs in will be automatically added to this organization. New members will be assigned to {{role}}.',
+        descriptionLine2__noRole: 'Anyone who signs in will be automatically added to this organization.',
+        domainLabel: 'Domain',
+        issuerLabel: 'Issuer',
+        menuAction__activate: 'Activate',
+        menuAction__deactivate: 'Deactivate',
+        menuAction__edit: 'Edit',
+        menuAction__remove: 'Remove',
+        primaryButton__continueConfiguration: 'Continue configuration',
+        primaryButton__startConfiguration: 'Start configuration',
+        providerLabel: 'Provider',
+        signOnUrlLabel: 'Sign on URL',
+        title: 'SSO',
+      },
+      title: 'Security',
+    },
     start: {
       headerTitle__general: 'General',
       headerTitle__members: 'Members',
