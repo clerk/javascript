@@ -161,13 +161,14 @@ Resources the rule can't safely fix on its own (imported/wrapped exports, unackn
 
 The same logic is available programmatically:
 
-````ts
+```ts
 import { fixAuthProtection } from '@clerk/eslint-plugin/next/fix-auth-protection';
 
 const { fixed, unresolved } = await fixAuthProtection({
   patterns: ['app/**'],
   dryRun: false,
 });
+```
 
 ## Implementation details
 
@@ -222,7 +223,7 @@ if (
   unauthorized();
   forbidden();
 }
-````
+```
 
 ## Support
 
