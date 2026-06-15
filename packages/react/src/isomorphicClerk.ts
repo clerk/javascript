@@ -879,6 +879,14 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return this.clerkjs?.__internal_lastEmittedResources;
   }
 
+  get __internal_hasOAuthTransport(): boolean {
+    return this.clerkjs?.__internal_hasOAuthTransport || false;
+  }
+
+  get __internal_oauthTransport() {
+    return this.clerkjs?.__internal_oauthTransport || null;
+  }
+
   /**
    * `setActive` can be used to set the active session and/or organization.
    */
@@ -1538,6 +1546,20 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     } else {
       this.premountMethodCalls.set('handleGoogleOneTapCallback', callback);
     }
+  };
+
+  __internal_handleResourceCallback = async (
+    signInOrUp: SignInResource | SignUpResource,
+    params: HandleOAuthCallbackParams,
+    customNavigate?: (to: string) => Promise<unknown>,
+  ): Promise<unknown> => {
+    const callback = () => this.clerkjs?.__internal_handleResourceCallback(signInOrUp, params, customNavigate);
+    if (this.clerkjs && this.loaded) {
+      return callback();
+    }
+
+    this.premountMethodCalls.set('__internal_handleResourceCallback', callback);
+    return;
   };
 
   handleEmailLinkVerification = async (params: HandleEmailLinkVerificationParams) => {
