@@ -81,6 +81,57 @@ describe('useNativeSession', () => {
     expect(result.current.user?.id).toBe('user_456');
   });
 
+  test('applies native session event payload without fetching the session', async () => {
+    mocks.getSession.mockResolvedValue(null);
+
+    const { result } = renderHook(() => useNativeSession());
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
+
+    mocks.getSession.mockClear();
+
+    act(() => {
+      notifyNativeSessionChanged({
+        sessionId: 'sess_789',
+        user: { id: 'user_789' },
+      });
+    });
+
+    expect(result.current.isSignedIn).toBe(true);
+    expect(result.current.sessionId).toBe('sess_789');
+    expect(result.current.user?.id).toBe('user_789');
+    expect(mocks.getSession).not.toHaveBeenCalled();
+  });
+
+  test('applies native signed-out event payload without fetching the session', async () => {
+    mocks.getSession.mockResolvedValue({
+      sessionId: 'sess_123',
+      user: { id: 'user_123' },
+    });
+
+    const { result } = renderHook(() => useNativeSession());
+
+    await waitFor(() => {
+      expect(result.current.sessionId).toBe('sess_123');
+    });
+
+    mocks.getSession.mockClear();
+
+    act(() => {
+      notifyNativeSessionChanged({
+        sessionId: null,
+        user: null,
+      });
+    });
+
+    expect(result.current.isSignedIn).toBe(false);
+    expect(result.current.sessionId).toBeNull();
+    expect(result.current.user).toBeNull();
+    expect(mocks.getSession).not.toHaveBeenCalled();
+  });
+
   test('removes the native session listener on unmount', async () => {
     mocks.getSession.mockResolvedValue(null);
 

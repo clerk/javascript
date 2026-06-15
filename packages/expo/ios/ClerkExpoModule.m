@@ -17,4 +17,8 @@ RCT_EXTERN_METHOD(getClientToken:(RCTPromiseResolveBlock)resolve
 RCT_EXTERN_METHOD(refreshClient:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 
+RCT_EXTERN_METHOD(signOut:(NSString *)sessionId
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+
 @end

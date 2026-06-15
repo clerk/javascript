@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react';
 import { NativeEventEmitter, Platform } from 'react-native';
 
 import { ClerkExpoModule as ClerkExpo, isNativeSupported } from '../utils/native-module';
+import { notifyNativeSessionChanged, type NativeSessionSnapshot } from './nativeSessionEvents';
 
 /**
  * Local marker for a native client event.
  */
-interface NativeClientEvent {
+export interface NativeClientEvent extends NativeSessionSnapshot {
   issuedAt: number;
 }
 
@@ -19,7 +20,10 @@ type RefreshClientEventSubscription = {
 };
 
 type RefreshClientEventEmitter = {
-  addListener: (eventName: 'refreshClient', listener: () => void) => RefreshClientEventSubscription;
+  addListener: (
+    eventName: 'refreshClient',
+    listener: (snapshot?: NativeSessionSnapshot) => void,
+  ) => RefreshClientEventSubscription;
 };
 
 /**
@@ -41,8 +45,9 @@ export function useNativeClientEvents(): UseNativeClientEventsReturn {
           ? (ClerkExpo as RefreshClientEventEmitter)
           : (new NativeEventEmitter(ClerkExpo) as RefreshClientEventEmitter);
 
-      subscription = eventEmitter.addListener('refreshClient', () => {
-        setNativeClientEvent({ issuedAt: Date.now() });
+      subscription = eventEmitter.addListener('refreshClient', snapshot => {
+        notifyNativeSessionChanged(snapshot);
+        setNativeClientEvent({ issuedAt: Date.now(), ...snapshot });
       });
     } catch (error) {
       if (__DEV__) {

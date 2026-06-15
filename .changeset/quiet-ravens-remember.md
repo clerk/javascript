@@ -2,4 +2,4 @@
 '@clerk/expo': patch
 ---
 
-Fix iOS standalone session persistence after JS-owned sign-in by syncing the JS client token through ClerkKit's native device-token integration API, and keep `useNativeSession()` in sync after native client refreshes.
+Fix Expo native Clerk components and `useNativeSession()` staying stale when authentication changes between the JavaScript and native SDKs. JS-owned sign-in now hydrates native components on cold start, and sign-out from either JS or native updates the other side.

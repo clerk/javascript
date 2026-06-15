@@ -1,18 +1,14 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { ClerkExpoModule as ClerkExpo, isNativeSupported } from '../utils/native-module';
-import { addNativeSessionListener } from './nativeSessionEvents';
+import { addNativeSessionListener, type NativeSessionSnapshot } from './nativeSessionEvents';
+
+type NativeSessionUser = NonNullable<NativeSessionSnapshot['user']>;
 
 // Native session data structure (normalized)
 interface NativeSessionData {
   sessionId?: string;
-  user?: {
-    id: string;
-    firstName?: string;
-    lastName?: string;
-    imageUrl?: string;
-    primaryEmailAddress?: string;
-  };
+  user?: NativeSessionUser;
 }
 
 // Raw result from the native module (may vary by platform)
@@ -89,6 +85,13 @@ export function useNativeSession(): UseNativeSessionReturn {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [user, setUser] = useState<NativeSessionData['user'] | null>(null);
 
+  const applySnapshot = useCallback((snapshot: NativeSessionSnapshot | NativeSessionRawResult | null) => {
+    const id = snapshot?.sessionId ?? snapshot?.session?.id ?? null;
+    setSessionId(id);
+    setUser(snapshot?.user ?? null);
+    setIsLoading(false);
+  }, []);
+
   const refresh = useCallback(async () => {
     if (!isNativeSupported || !ClerkExpo?.getSession) {
       setIsLoading(false);
@@ -98,10 +101,7 @@ export function useNativeSession(): UseNativeSessionReturn {
     try {
       setIsLoading(true);
       const result = (await ClerkExpo.getSession()) as NativeSessionRawResult | null;
-      // Normalize: iOS returns { sessionId }, Android returns { session: { id } }
-      const id = result?.sessionId ?? result?.session?.id ?? null;
-      setSessionId(id);
-      setUser(result?.user ?? null);
+      applySnapshot(result);
     } catch (error) {
       if (__DEV__) {
         console.error('[useNativeSession] Error fetching native session:', error);
@@ -111,7 +111,7 @@ export function useNativeSession(): UseNativeSessionReturn {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [applySnapshot]);
 
   // Check native session on mount
   useEffect(() => {
@@ -119,10 +119,15 @@ export function useNativeSession(): UseNativeSessionReturn {
   }, [refresh]);
 
   useEffect(() => {
-    return addNativeSessionListener(() => {
+    return addNativeSessionListener(snapshot => {
+      if (snapshot) {
+        applySnapshot(snapshot);
+        return;
+      }
+
       void refresh();
     });
-  }, [refresh]);
+  }, [applySnapshot, refresh]);
 
   return {
     isAvailable: isNativeSupported && !!ClerkExpo,
