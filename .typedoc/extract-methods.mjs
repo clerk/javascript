@@ -35,7 +35,20 @@ import {
 } from './custom-plugin.mjs';
 import { isCallableInterfaceProperty } from './custom-theme.mjs';
 import { removeLineBreaks } from './markdown-helpers.mjs';
-import { REFERENCE_OBJECT_CONFIG } from './reference-objects.mjs';
+import { BACKEND_API_CONFIG, REFERENCE_OBJECT_CONFIG } from './reference-objects.mjs';
+
+/**
+ * `'reference'` (default): each `methods/<name>.mdx` opens with `### foo()` and uses an H4 `#### Parameters` heading — matches the reference-object pages that aggregate many methods.
+ * `'page'`: skip the method-name title and use an H2 `## Parameters` heading — for one-method-per-docs-page surfaces, like the backend API endpoints.
+ * @typedef {'reference' | 'page'} MethodFormat
+ */
+
+/** @param {string} pageUrl */
+function methodFormatForPageUrl(pageUrl) {
+  return pageUrl in BACKEND_API_CONFIG
+    ? /** @type {MethodFormat} */ ('page')
+    : /** @type {MethodFormat} */ ('reference');
+}
 import { toFileSlug } from './slug.mjs';
 import { isInlineModifierWithoutStandalonePage } from './standalone-page-tag.mjs';
 import { unwrapOptional } from './type-utils.mjs';
@@ -221,12 +234,51 @@ function getCallSignatureFromType(t, visitedReflectionIds) {
 }
 
 /**
+ * @param {import('typedoc').SignatureReflection} sig
+ */
+function signatureIsDeprecated(sig) {
+  const c = sig.comment;
+  if (!c) return false;
+  if (typeof c.hasModifier === 'function' && c.hasModifier('@deprecated')) return true;
+  return c.blockTags?.some(t => t.tag === '@deprecated') ?? false;
+}
+
+/**
+ * typedoc maps `@param paramName description` to `parameter.comment` during conversion of the
+ * signature that physically owns the JSDoc. With overloads + an implementation, the impl's `@param`
+ * tags don't transfer to overload parameters — even when typedoc copies the impl's comment onto
+ * each overload's `sig.comment.blockTags`. Without descriptions on `param.comment`, typedoc-plugin-markdown
+ * drops the Description column from the parameters table.
+ *
+ * Overlay missing parameter comments from any matching `@param` block tag on the signature comment
+ * so the rendered table shows the descriptions the author wrote on the implementation's JSDoc.
+ *
+ * @param {import('typedoc').SignatureReflection} sig
+ */
+function overlayParamCommentsFromSignatureBlockTags(sig) {
+  const params = sig.parameters;
+  if (!params?.length) return;
+  const blockTags = sig.comment?.blockTags;
+  if (!blockTags?.length) return;
+  for (const p of params) {
+    if (p.comment?.summary?.length) continue;
+    const tag = blockTags.find(t => t.tag === '@param' && t.name === p.name);
+    if (!tag?.content?.length) continue;
+    p.comment = new Comment(tag.content);
+  }
+}
+
+/**
  * @param {import('typedoc').DeclarationReflection} decl
  * @returns {import('typedoc').SignatureReflection | undefined}
  */
 function getPrimaryCallSignature(decl) {
   if (decl.signatures?.length) {
-    return decl.signatures[0];
+    // Prefer the first non-`@deprecated` overload. typedoc treats each overload as a separate
+    // signature, and selecting a deprecated one usually means rendering the form users shouldn't
+    // use — and (often) one whose JSDoc isn't where the canonical `@param` descriptions live.
+    const firstActive = decl.signatures.find(s => !signatureIsDeprecated(s));
+    return firstActive ?? decl.signatures[0];
   }
   const t = decl.type;
   if (t && 'declaration' in t && t.declaration?.signatures?.length) {
@@ -872,7 +924,10 @@ function nestedParameterRowsFromDocumentedProperties(param, ctx) {
     const summary = child.comment?.summary;
     const typeCell = child.type ? removeLineBreaksForTableCell(ctx.partials.someType(child.type)) : '`unknown`';
     const nestedNameCol = formatNestedParamNameColumn(param, child.name);
-    const nestedDesc = summary?.length ? displayPartsToString(summary).trim() || '—' : '—';
+    const nestedDescRaw = summary?.length ? displayPartsToString(summary).trim() || '—' : '—';
+    // Strip line breaks so multi-line `<ul>` / paragraph descriptions don't shatter the markdown
+    // table row (which must be a single line). Matches the treatment already applied to typeCell.
+    const nestedDesc = removeLineBreaksForTableCell(nestedDescRaw) ?? '—';
     rows.push(`| ${nestedNameCol} | ${typeCell} | ${nestedDesc} |`);
   }
   return rows;
@@ -981,7 +1036,12 @@ function isNominalParamTypeDocumented(typeDecl, props) {
  * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
  * @returns {string | undefined}
  */
-function trySingleNominalParameterTypeSection(sig, ctx) {
+/**
+ * @param {import('typedoc').SignatureReflection} sig
+ * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
+ * @param {number} [headingLevel] Defaults to 4 (reference-object format); pass 2 for page format.
+ */
+function trySingleNominalParameterTypeSection(sig, ctx, headingLevel = 4) {
   const params = sig.parameters ?? [];
   if (params.length !== 1) {
     return undefined;
@@ -1013,22 +1073,23 @@ function trySingleNominalParameterTypeSection(sig, ctx) {
   if (!tableMd?.trim()) {
     return undefined;
   }
-  return [markdownHeadingInlineCode(4, nominal.sectionTitle), '', tableMd, ''].join('\n');
+  return [markdownHeadingInlineCode(headingLevel, nominal.sectionTitle), '', tableMd, ''].join('\n');
 }
 
 /**
  * @param {import('typedoc').SignatureReflection} sig
  * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
  * @param {Map<string, import('typedoc').Type> | undefined} instantiationMap
+ * @param {number} [headingLevel] Defaults to 4 (reference-object format); pass 2 for page format.
  */
-function parametersMarkdownTable(sig, ctx, instantiationMap) {
+function parametersMarkdownTable(sig, ctx, instantiationMap, headingLevel = 4) {
   const sigForDisplay = signatureWithInstantiation(sig, instantiationMap);
   const params = sigForDisplay.parameters ?? [];
   if (params.length === 0) {
     return '';
   }
 
-  const singleNominal = trySingleNominalParameterTypeSection(sigForDisplay, ctx);
+  const singleNominal = trySingleNominalParameterTypeSection(sigForDisplay, ctx, headingLevel);
   if (singleNominal) {
     return singleNominal;
   }
@@ -1043,21 +1104,26 @@ function parametersMarkdownTable(sig, ctx, instantiationMap) {
     tableMd = `${tableMd.trimEnd()}\n${nested.join('\n')}\n`;
   }
 
-  return [markdownHeading(4, ReflectionKind.pluralString(ReflectionKind.Parameter)), '', tableMd, ''].join('\n');
+  return [markdownHeading(headingLevel, ReflectionKind.pluralString(ReflectionKind.Parameter)), '', tableMd, ''].join(
+    '\n',
+  );
 }
 
 /**
  * @param {import('typedoc').DeclarationReflection} decl
  * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
- * @param {{ qualifiedName?: string }} [options] Nested namespace methods use `parent.child` for headings / signatures.
+ * @param {{ qualifiedName?: string, methodFormat?: MethodFormat }} [options] Nested namespace methods use `parent.child` for headings / signatures.
  */
 function buildMethodMdx(decl, ctx, options = {}) {
   const name = options.qualifiedName ?? decl.name;
+  const methodFormat = options.methodFormat ?? 'reference';
   const sig = getPrimaryCallSignature(decl);
   if (!sig) {
     return '';
   }
-  const title = `### \`${name}()\``;
+  // `'page'` format renders one method per docs page, so the page is anchored by a containing file/heading upstream — no in-page `### foo()` title needed. `'reference'` format aggregates many methods on one page and uses `### foo()` to disambiguate them.
+  const title = methodFormat === 'page' ? '' : `### \`${name}()\``;
+  const paramsHeadingLevel = methodFormat === 'page' ? 2 : 4;
   /** Prefer the declaration comment (property-style methods document `addListener` on the property, not the signature). */
   const comment = decl.comment ?? sig.comment;
   let description = commentSummaryAndBody(comment);
@@ -1070,13 +1136,17 @@ function buildMethodMdx(decl, ctx, options = {}) {
   const skipParametersSection =
     Boolean(decl.comment?.hasModifier('@skipParametersSection')) ||
     Boolean(sig.comment?.hasModifier('@skipParametersSection'));
-  const paramsMd = skipParametersSection ? '' : parametersMarkdownTable(sig, ctx, instantiationMap);
+  if (!skipParametersSection) {
+    overlayParamCommentsFromSignatureBlockTags(sig);
+  }
+  const paramsMd = skipParametersSection ? '' : parametersMarkdownTable(sig, ctx, instantiationMap, paramsHeadingLevel);
 
   // Same post-process as `custom-plugin.mjs` `MarkdownPageEvent.END`: relative `.mdx` links, then catch-alls.
   // Skip the ```typescript``` fence so signatures stay plain code.
-  const head = applyCatchAllMdReplacements(applyRelativeLinkReplacements([title, '', description].join('\n')));
+  const headSource = title ? [title, '', description].join('\n') : description;
+  const head = applyCatchAllMdReplacements(applyRelativeLinkReplacements(headSource));
   const paramsProcessed = paramsMd ? applyCatchAllMdReplacements(applyRelativeLinkReplacements(paramsMd)) : '';
-  const chunks = [head, ts];
+  const chunks = head ? [head, ts] : [ts];
   if (paramsProcessed) {
     chunks.push(paramsProcessed);
   }
@@ -1156,9 +1226,10 @@ function processExtractMethodsNamespace(parentDecl, ctx, outDir) {
  * @param {import('typedoc').DeclarationReflection} decl
  * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
  * @param {string} outDir
+ * @param {MethodFormat} [methodFormat]
  * @returns {ExtractedFile[]}
  */
-function extractCallableMembersFromDeclaration(decl, ctx, outDir) {
+function extractCallableMembersFromDeclaration(decl, ctx, outDir, methodFormat = 'reference') {
   if (!decl.children) {
     return [];
   }
@@ -1176,7 +1247,7 @@ function extractCallableMembersFromDeclaration(decl, ctx, outDir) {
     }
 
     if (shouldExtractCallableMember(childDecl, ctx)) {
-      const mdx = buildMethodMdx(childDecl, ctx);
+      const mdx = buildMethodMdx(childDecl, ctx, { methodFormat });
       if (mdx) {
         const fileName = `${toFileSlug(child.name)}.mdx`;
         const filePath = path.join(outDir, fileName);
@@ -1189,16 +1260,24 @@ function extractCallableMembersFromDeclaration(decl, ctx, outDir) {
 
 /**
  * @param {import('typedoc-plugin-markdown').MarkdownPageEvent<import('typedoc').Reflection>} output
- * @returns {keyof typeof REFERENCE_OBJECT_CONFIG | undefined}
+ * @returns {string | undefined}
  */
 function matchReferenceObjectPageUrl(output) {
   if (!output.url) {
     return undefined;
   }
   const normalized = output.url.replace(/\\/g, '/');
-  return normalized in REFERENCE_OBJECT_CONFIG
-    ? /** @type {keyof typeof REFERENCE_OBJECT_CONFIG} */ (normalized)
-    : undefined;
+  if (normalized in REFERENCE_OBJECT_CONFIG) return normalized;
+  if (normalized in BACKEND_API_CONFIG) return normalized;
+  return undefined;
+}
+
+/** @param {string} pageUrl */
+function configEntryForPageUrl(pageUrl) {
+  return /** @type {import('./reference-objects.mjs').REFERENCE_OBJECT_CONFIG[keyof typeof REFERENCE_OBJECT_CONFIG]} */ (
+    REFERENCE_OBJECT_CONFIG[/** @type {keyof typeof REFERENCE_OBJECT_CONFIG} */ (pageUrl)] ??
+      BACKEND_API_CONFIG[/** @type {keyof typeof BACKEND_API_CONFIG} */ (pageUrl)]
+  );
 }
 
 /**
@@ -1216,7 +1295,8 @@ export function load(app) {
     if (!pageUrl) {
       return;
     }
-    const entry = REFERENCE_OBJECT_CONFIG[pageUrl];
+    const entry = configEntryForPageUrl(pageUrl);
+    const methodFormat = methodFormatForPageUrl(pageUrl);
     const decl = /** @type {import('typedoc').DeclarationReflection | undefined} */ (output.model);
     if (!decl?.children) {
       console.warn(`[extract-methods] No children on reflection for ${pageUrl}, skipping`);
@@ -1240,7 +1320,7 @@ export function load(app) {
     const outDir = path.join(objectDir, 'methods');
 
     /** @type {ExtractedFile[]} */
-    const methodFiles = extractCallableMembersFromDeclaration(decl, ctx, outDir);
+    const methodFiles = extractCallableMembersFromDeclaration(decl, ctx, outDir, methodFormat);
     const extraMethodInterfaces = 'extraMethodInterfaces' in entry ? entry.extraMethodInterfaces : undefined;
     if (Array.isArray(extraMethodInterfaces)) {
       for (const extra of extraMethodInterfaces) {
@@ -1249,7 +1329,7 @@ export function load(app) {
           console.warn(`[extract-methods] extraMethodInterfaces: could not find "${extra.symbol}" for ${pageUrl}`);
           continue;
         }
-        methodFiles.push(...extractCallableMembersFromDeclaration(extraDecl, ctx, outDir));
+        methodFiles.push(...extractCallableMembersFromDeclaration(extraDecl, ctx, outDir, methodFormat));
       }
     }
 

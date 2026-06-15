@@ -56,13 +56,26 @@ export const REFERENCE_OBJECT_CONFIG = {
   },
 };
 
-/** Stable iteration order matches key order in {@link REFERENCE_OBJECT_CONFIG}. */
-export const REFERENCE_OBJECTS_LIST = Object.keys(REFERENCE_OBJECT_CONFIG);
+/**
+ * Backend API endpoint pages: identical extraction machinery as {@link REFERENCE_OBJECT_CONFIG}, but each `methods/<name>.mdx` is written in **page format** — no `### foo()` title at the top, and the `Parameters` section uses an `## H2` heading. The reference-object format uses an H3 title + H4 parameters, which suits pages that aggregate many methods on a single resource. Backend API method files are consumed standalone (one method per docs page), so the heading levels need to shift accordingly.
+ */
+export const BACKEND_API_CONFIG = {
+  'backend/user-api/user-api.mdx': {
+    symbol: 'UserAPI',
+    declarationHint: 'api/endpoints/UserApi',
+  },
+};
+
+/** Stable iteration order matches key order in {@link REFERENCE_OBJECT_CONFIG} then {@link BACKEND_API_CONFIG}. */
+export const REFERENCE_OBJECTS_LIST = [...Object.keys(REFERENCE_OBJECT_CONFIG), ...Object.keys(BACKEND_API_CONFIG)];
 
 /**
  * Primary interface/class documented on each reference object page (used to resolve TypeDoc reflections).
- * Derived from {@link REFERENCE_OBJECT_CONFIG}; kept for callers that only need `pageUrl → symbol`.
+ * Includes both {@link REFERENCE_OBJECT_CONFIG} and {@link BACKEND_API_CONFIG} so the router applies the same folder-nesting rule to backend API pages.
  */
 export const REFERENCE_OBJECT_PAGE_SYMBOLS = Object.fromEntries(
-  Object.entries(REFERENCE_OBJECT_CONFIG).map(([url, { symbol }]) => [url, symbol]),
+  [...Object.entries(REFERENCE_OBJECT_CONFIG), ...Object.entries(BACKEND_API_CONFIG)].map(([url, { symbol }]) => [
+    url,
+    symbol,
+  ]),
 );

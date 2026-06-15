@@ -6,11 +6,11 @@
  */
 export type ClerkPaginationRequest<T = object> = {
   /**
-   * Maximum number of items returned per request.
+   * Maximum number of items returned per request. Must be an integer greater than zero and less than `501`. Can be used for paginating the results together with offset. Defaults to `10`.
    */
   limit?: number;
   /**
-   * This is the starting point for your fetched results.
+   * Skip the first `offset` items when paginating. Needs to be an integer greater or equal to zero. To be used in conjunction with `limit`. Defaults to `0`.
    */
   offset?: number;
 } & T;
