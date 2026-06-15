@@ -1,4 +1,9 @@
-import type { EmailAddressResource, EnterpriseConnectionResource, UserResource } from '@clerk/shared/types';
+import type {
+  EmailAddressResource,
+  EnterpriseConnectionResource,
+  OrganizationDomainResource,
+  UserResource,
+} from '@clerk/shared/types';
 
 import type { ProviderType } from '../types';
 
@@ -47,6 +52,9 @@ export interface OrganizationEnterpriseConnection {
 export const isEnterpriseConnectionConfigured = (
   connection: EnterpriseConnectionResource | null | undefined,
 ): boolean => Boolean(connection?.samlConnection?.idpSsoUrl && connection?.samlConnection?.idpEntityId);
+
+export const areAllOrganizationDomainsVerified = (domains: OrganizationDomainResource[] | null | undefined): boolean =>
+  !!domains?.length && domains.every(domain => domain.ownershipVerification?.status === 'verified');
 
 const connectionStatus = ({
   hasConnection,

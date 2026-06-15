@@ -4,6 +4,7 @@ import { CardStateProvider } from '@/elements/contexts';
 
 import { ConfigureSSOProvider } from './ConfigureSSOContext';
 import { ConfigureSSOHeader } from './ConfigureSSOHeader';
+import { areAllOrganizationDomainsVerified } from './domain/organizationEnterpriseConnection';
 import { Wizard, type WizardStepConfig } from './elements/Wizard';
 import {
   ConfigureStep,
@@ -19,9 +20,7 @@ export type ConfigureSSOWizardProps = Omit<ComponentProps<typeof ConfigureSSOPro
 export const ConfigureSSOWizard = (props: ConfigureSSOWizardProps): JSX.Element => {
   const { organizationEnterpriseConnection: c, organizationDomains } = props;
 
-  const allDomainsVerified =
-    !!organizationDomains?.length &&
-    organizationDomains.every(domain => domain.ownershipVerification?.status === 'verified');
+  const allDomainsVerified = areAllOrganizationDomainsVerified(organizationDomains);
 
   const steps = React.useMemo<WizardStepConfig[]>(
     () => [

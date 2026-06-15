@@ -1,12 +1,14 @@
 import type {
   EmailAddressResource,
   EnterpriseConnectionResource,
+  OrganizationDomainResource,
   SamlAccountConnectionResource,
   UserResource,
 } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
 import {
+  areAllOrganizationDomainsVerified,
   connectionBackingEmail,
   isEnterpriseConnectionConfigured,
   organizationEnterpriseConnection,
@@ -248,6 +250,37 @@ describe('isEnterpriseConnectionConfigured', () => {
   it('matches the derived `hasMinimumConfiguration` field', () => {
     const connection = makeConnection({ samlConnection: fullyConfiguredSaml });
     expect(isEnterpriseConnectionConfigured(connection)).toBe(derive({ connection }).hasMinimumConfiguration);
+  });
+});
+
+describe('areAllOrganizationDomainsVerified', () => {
+  const makeDomain = (status: 'verified' | 'unverified' | null): OrganizationDomainResource =>
+    ({
+      id: `dmn_${status}`,
+      name: 'acme.com',
+      ownershipVerification: status ? { status } : null,
+    }) as OrganizationDomainResource;
+
+  it('undefined domains → false', () => {
+    expect(areAllOrganizationDomainsVerified(undefined)).toBe(false);
+  });
+  it('null domains → false', () => {
+    expect(areAllOrganizationDomainsVerified(null)).toBe(false);
+  });
+  it('empty list → false', () => {
+    expect(areAllOrganizationDomainsVerified([])).toBe(false);
+  });
+  it('a single verified domain → true', () => {
+    expect(areAllOrganizationDomainsVerified([makeDomain('verified')])).toBe(true);
+  });
+  it('every domain verified → true', () => {
+    expect(areAllOrganizationDomainsVerified([makeDomain('verified'), makeDomain('verified')])).toBe(true);
+  });
+  it('any unverified domain → false', () => {
+    expect(areAllOrganizationDomainsVerified([makeDomain('verified'), makeDomain('unverified')])).toBe(false);
+  });
+  it('domain without ownership verification → false', () => {
+    expect(areAllOrganizationDomainsVerified([makeDomain(null)])).toBe(false);
   });
 });
 

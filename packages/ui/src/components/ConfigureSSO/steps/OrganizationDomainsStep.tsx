@@ -29,6 +29,7 @@ import { useFormControl } from '@/ui/utils/useFormControl';
 import { getFieldError, getGlobalError } from '@/utils/errorHandler';
 
 import { useConfigureSSO } from '../ConfigureSSOContext';
+import { areAllOrganizationDomainsVerified } from '../domain/organizationEnterpriseConnection';
 import { Step } from '../elements/Step';
 import { useWizard } from '../elements/Wizard/WizardContext';
 
@@ -52,9 +53,7 @@ export const OrganizationDomainsStep = (): JSX.Element => {
     }
   };
 
-  const hasAllDomainsVerified =
-    organizationDomains?.length &&
-    organizationDomains?.every(domain => domain.ownershipVerification?.status === 'verified');
+  const hasAllDomainsVerified = areAllOrganizationDomainsVerified(organizationDomains);
 
   return (
     <Flow.Part part='organizationDomains'>
