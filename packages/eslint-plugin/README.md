@@ -78,11 +78,12 @@ export default [
 
 ## Options
 
-| Option              | Type                  | Default  | Description                                                                                                                                                                     |
-| ------------------- | --------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `protected`         | `string[]` (required) | —        | Folder globs whose resources must be guarded.                                                                                                                                   |
-| `public`            | `string[]`            | `[]`     | Folder globs that are exempt.                                                                                                                                                   |
-| `mixedScopeLayouts` | `'auto' \| string[]`  | `'auto'` | Layouts/templates that intentionally wrap both protected and public descendants. `'auto'` allows them silently; a list requires each such folder to be acknowledged explicitly. |
+| Option              | Type                  | Default  | Description                                                                                                                                                                                              |
+| ------------------- | --------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `protected`         | `string[]` (required) | —        | Folder globs whose resources must be guarded.                                                                                                                                                            |
+| `public`            | `string[]`            | `[]`     | Folder globs that are exempt.                                                                                                                                                                            |
+| `mixedScopeLayouts` | `'auto' \| string[]`  | `'auto'` | Layouts/templates that intentionally wrap both protected and public descendants. `'auto'` allows them silently; a list requires each such folder to be acknowledged explicitly.                          |
+| `rootDir`           | `string`              | _(auto)_ | Directory folder globs are resolved against. Defaults to the nearest ancestor `eslint.config.*`, then ESLint `cwd`. Set to `import.meta.dirname` in your config file when auto-discovery is unavailable. |
 
 Globs use a minimal dialect — only `*` (single segment) and `**` (any depth). When a folder matches both `protected` and `public`, the most specific pattern wins, and `protected` wins ties.
 

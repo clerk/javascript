@@ -5,6 +5,7 @@ import type { Rule } from 'eslint';
 import type { ExportTarget, FunctionNode } from './lib/exports';
 import { iterateExportAllDeclarations, iterateNamedExports, resolveDefaultExport } from './lib/exports';
 import { type FileKind, getFileKind, getRelativeFolder, isClientModule, isServerFunctionModule } from './lib/file-info';
+import { resolveProjectRoot } from './lib/project-root';
 import type { ClassifyOptions } from './lib/match-folders';
 import { classifyFolder, hasDescendantsMatching } from './lib/match-folders';
 import { findAuthLocalNames, hasProtectAtTop } from './lib/protection-checks';
@@ -18,6 +19,13 @@ export interface RuleOptions {
   public?: string[];
   /** Layouts that wrap both protected and public descendants. */
   mixedScopeLayouts?: 'auto' | string[];
+  /**
+   * Directory paths are relativized against when resolving `app/...` folder
+   * globs. Defaults to the nearest ancestor `eslint.config.*` (same walk ESLint
+   * uses for config lookup), then ESLint `cwd`. Set to `import.meta.dirname` in
+   * your `eslint.config.mjs` when config discovery is unavailable.
+   */
+  rootDir?: string;
 }
 
 const HTTP_METHODS = new Set(['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD']);
@@ -44,6 +52,7 @@ const rule: Rule.RuleModule = {
               { type: 'array', items: { type: 'string' } },
             ],
           },
+          rootDir: { type: 'string' },
         },
         required: ['protected'],
         additionalProperties: false,
@@ -62,7 +71,7 @@ const rule: Rule.RuleModule = {
   },
 
   create(context) {
-    const filename = context.filename || context.getFilename?.();
+    const filename = context.physicalFilename ?? context.filename ?? context.getFilename?.();
     const cwd = context.cwd || context.getCwd?.();
     const options = (context.options[0] ?? {}) as Partial<RuleOptions>;
     const config: ClassifyOptions = {
@@ -71,7 +80,8 @@ const rule: Rule.RuleModule = {
     };
     const mixedScopeLayoutsOption = options.mixedScopeLayouts === undefined ? 'auto' : options.mixedScopeLayouts;
 
-    const folder = getRelativeFolder(filename, cwd);
+    const projectRoot = resolveProjectRoot(filename, { rootDir: options.rootDir, cwd });
+    const folder = getRelativeFolder(filename, projectRoot);
     if (!folder) {
       return {};
     }

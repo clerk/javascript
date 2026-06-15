@@ -11,11 +11,17 @@ describe('getRelativeFolder', () => {
     expect(getRelativeFolder('/proj/src/app/dashboard/page.tsx', '/proj')).toBe('app/dashboard');
   });
 
-  it('ignores a spurious `app` segment in the absolute prefix when `cwd` is provided', () => {
-    // Without cwd-relativization, the leading `/Users/app/...` would anchor the
+  it('ignores a spurious `app` segment in the absolute prefix when rooted at the project', () => {
+    // Without project-root relativization, the leading `/Users/app/...` would anchor the
     // folder at the wrong `app`. Relativizing against the project root fixes it.
     expect(getRelativeFolder('/Users/app/work/myproj/app/dashboard/page.tsx', '/Users/app/work/myproj')).toBe(
       'app/dashboard',
+    );
+  });
+
+  it('misclassifies when rooted at a parent directory that also contains an `app` segment', () => {
+    expect(getRelativeFolder('/Users/app/work/myproj/app/sign-in/page.tsx', '/Users')).toBe(
+      'app/work/myproj/app/sign-in',
     );
   });
 
@@ -32,17 +38,17 @@ describe('getRelativeFolder', () => {
     expect(getRelativeFolder('C:\\proj\\app\\dashboard\\page.tsx', 'C:\\proj')).toBe('app/dashboard');
   });
 
-  it('falls back to scanning the absolute path when the file is outside `cwd`', () => {
+  it('falls back to scanning the absolute path when the file is outside the project root', () => {
     // Mirrors how RuleTester lints in-memory code: the filename is absolute and
-    // not under the real cwd, so the absolute path is scanned for `app`.
+    // not under the project root, so the absolute path is scanned for `app`.
     expect(getRelativeFolder('/elsewhere/app/dashboard/page.tsx', '/proj')).toBe('app/dashboard');
   });
 
-  it('returns the project-relative folder when there is no `app` segment but the file is under cwd', () => {
+  it('returns the project-relative folder when there is no `app` segment but the file is under the project root', () => {
     expect(getRelativeFolder('/proj/utils/foo.ts', '/proj')).toBe('utils');
   });
 
-  it('returns null when there is no `app` segment and the file is outside cwd', () => {
+  it('returns null when there is no `app` segment and the file is outside the project root', () => {
     expect(getRelativeFolder('/elsewhere/utils/foo.ts', '/proj')).toBeNull();
   });
 

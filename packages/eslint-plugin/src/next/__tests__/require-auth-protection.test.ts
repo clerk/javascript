@@ -11,9 +11,8 @@ RuleTester.describe = describe;
 RuleTester.it = it;
 
 // `RuleTester` lints in-memory code, so no fixture files need to exist on disk.
-// The rule classifies a file by finding the `/app/` substring in its path
-// (`getRelativeFolder` uses `indexOf('/app/')`), so filenames are anchored under
-// a synthetic project root whose own path does not contain an `/app/` segment.
+// Filenames are anchored under a synthetic project root whose own path does not
+// contain a standalone `app` segment before the router directory.
 const projectRoot = '/clerk/apps/dashboard';
 const abs = (p: string) => path.posix.join(projectRoot, p);
 
@@ -1583,5 +1582,9 @@ describe('require-auth-protection schema validation', () => {
 
   it('accepts configs with `protected` set and other options omitted', () => {
     expect(() => lintWithOptions({ protected: ['app/**'] })).not.toThrow();
+  });
+
+  it('accepts an optional `rootDir`', () => {
+    expect(() => lintWithOptions({ protected: ['app/**'], rootDir: '/proj' })).not.toThrow();
   });
 });
