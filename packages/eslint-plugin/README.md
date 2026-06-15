@@ -148,12 +148,16 @@ Because the protection insertion is a suggestion rather than an autofix, `eslint
 # Fix everything under the current directory
 npx clerk-next-fix-auth-protection
 
-# Scope it, or preview without writing
-npx clerk-next-fix-auth-protection "app/**"
+# Preview without writing
 npx clerk-next-fix-auth-protection --dry-run
+
+# Scope fixes to a specific pattern, this will still
+# use protected/public from your ESLint config, but
+# can be useful to only fix a subset of your application
+npx clerk-next-fix-auth-protection "app/**"
 ```
 
-Resources the rule can't safely fix on its own (imported/wrapped exports, unacknowledged mixed-scope layouts) are listed as needing manual attention, and the command exits non-zero when any remain (or when `--dry-run` would make changes), so it can gate CI.
+Resources the rule can't safely fix on its own (imported/wrapped exports, unacknowledged mixed-scope layouts) are listed as needing manual attention, and the command exits non-zero when any remain (or when `--dry-run` would make changes).
 
 The same logic is available programmatically:
 
@@ -167,7 +171,7 @@ const { fixed, unresolved } = await fixAuthProtection({
 
 ## Implementation details
 
-This section describes the exact details of how the lint rule works. You normally do no need to read or understand this if you only want to use the rule.
+This section describes the exact details of how the lint rule works. You normally do not need to read or understand this if you only want to use the rule.
 
 Within folders that are configured as protected (and that eslint covers), this rule checks these resources when their resource group is enabled:
 
