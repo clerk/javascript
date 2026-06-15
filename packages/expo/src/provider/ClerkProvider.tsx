@@ -201,13 +201,13 @@ async function syncNativeClientToJs({
   clerkInstance,
   clearMissingNativeToken,
   nativeClientEvent,
-  skipNextJsSignOutRef,
+  skipNextJsAuthSyncRef,
   tokenCache,
 }: {
   clerkInstance: SyncableClerkInstance;
   clearMissingNativeToken: boolean;
   nativeClientEvent?: NativeClientEvent | null;
-  skipNextJsSignOutRef?: MutableRefObject<boolean>;
+  skipNextJsAuthSyncRef?: MutableRefObject<boolean>;
   tokenCache: TokenCache | undefined;
 }): Promise<void> {
   const nativeSessionIdFromEvent = clearMissingNativeToken
@@ -222,8 +222,8 @@ async function syncNativeClientToJs({
   let clearedJsSession = false;
 
   if (nativeSessionId === null && clerkInstance.session?.id && typeof clerkInstance.setActive === 'function') {
-    if (skipNextJsSignOutRef) {
-      skipNextJsSignOutRef.current = true;
+    if (skipNextJsAuthSyncRef) {
+      skipNextJsAuthSyncRef.current = true;
     }
     await clerkInstance.setActive({ session: null });
     clearedJsSession = true;
@@ -258,10 +258,13 @@ async function syncNativeClientToJs({
     nativeActiveSessionId !== jsActiveSessionId &&
     typeof clerkInstance.setActive === 'function'
   ) {
+    if (skipNextJsAuthSyncRef) {
+      skipNextJsAuthSyncRef.current = true;
+    }
     await clerkInstance.setActive({ session: nativeActiveSessionId });
   } else if (!nativeActiveSessionId && jsActiveSessionId && typeof clerkInstance.setActive === 'function') {
-    if (skipNextJsSignOutRef) {
-      skipNextJsSignOutRef.current = true;
+    if (skipNextJsAuthSyncRef) {
+      skipNextJsAuthSyncRef.current = true;
     }
     await clerkInstance.setActive({ session: null });
   }
@@ -278,13 +281,13 @@ function NativeClientSync({
   clerkInstance,
   isSyncingNativeClientToJsRef,
   publishableKey,
-  skipNextJsSignOutRef,
+  skipNextJsAuthSyncRef,
   tokenCache,
 }: {
   clerkInstance: SyncableClerkInstance | null | undefined;
   isSyncingNativeClientToJsRef: MutableRefObject<boolean>;
   publishableKey: string;
-  skipNextJsSignOutRef: MutableRefObject<boolean>;
+  skipNextJsAuthSyncRef: MutableRefObject<boolean>;
   tokenCache: TokenCache | undefined;
 }): null {
   const { isLoaded, sessionId } = useAuth();
@@ -298,10 +301,6 @@ function NativeClientSync({
 
   const queueNativeRefreshFromJs = useCallback(
     (options: NativeRefreshFromJsOptions): void => {
-      if (isSyncingNativeClientToJsRef.current && !options.waitForToken && !options.signOutNative) {
-        return;
-      }
-
       if (isRefreshingNativeFromJsRef.current && !options.signOutNative) {
         pendingNativeRefreshRef.current = options;
         return;
@@ -399,17 +398,17 @@ function NativeClientSync({
       return;
     }
 
+    if (skipNextJsAuthSyncRef.current) {
+      skipNextJsAuthSyncRef.current = false;
+      return;
+    }
+
     if (sessionId) {
       queueNativeRefreshFromJs({ waitForToken: true });
     } else if (previousSessionId) {
-      if (skipNextJsSignOutRef.current) {
-        skipNextJsSignOutRef.current = false;
-        return;
-      }
-
       queueNativeRefreshFromJs({ signOutNative: true, signOutSessionId: previousSessionId, waitForToken: false });
     }
-  }, [isLoaded, queueNativeRefreshFromJs, sessionId, skipNextJsSignOutRef]);
+  }, [isLoaded, queueNativeRefreshFromJs, sessionId, skipNextJsAuthSyncRef]);
 
   useEffect(() => {
     if (!clerkInstance || typeof clerkInstance.addListener !== 'function') {
@@ -418,6 +417,10 @@ function NativeClientSync({
 
     return clerkInstance.addListener(
       () => {
+        if (isSyncingNativeClientToJsRef.current) {
+          return;
+        }
+
         if (hasActiveJsSession(clerkInstance)) {
           queueNativeRefreshFromJs({ waitForToken: true });
         }
@@ -577,7 +580,7 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
     : null;
 
   const isSyncingNativeClientToJsRef = useRef(false);
-  const skipNextJsSignOutRef = useRef(false);
+  const skipNextJsAuthSyncRef = useRef(false);
   const isMountedRef = useNativeSessionBootstrap({
     isSyncingNativeClientToJsRef,
     publishableKey: pk,
@@ -604,7 +607,7 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
             clerkInstance,
             clearMissingNativeToken: true,
             nativeClientEvent,
-            skipNextJsSignOutRef,
+            skipNextJsAuthSyncRef,
             tokenCache,
           });
         } finally {
@@ -618,7 +621,7 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
     };
 
     void syncNativeClientStateToJs();
-  }, [nativeClientEvent, clerkInstance, tokenCache, isMountedRef, skipNextJsSignOutRef]);
+  }, [nativeClientEvent, clerkInstance, tokenCache, isMountedRef, skipNextJsAuthSyncRef]);
 
   // Needed for `useOAuth` / `useSSO` to work correctly on web — must stay synchronous during render
   // so the redirect URL is caught before children mount. Resolves to a no-op on native via the
@@ -652,7 +655,7 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
           clerkInstance={clerkInstance}
           isSyncingNativeClientToJsRef={isSyncingNativeClientToJsRef}
           publishableKey={pk}
-          skipNextJsSignOutRef={skipNextJsSignOutRef}
+          skipNextJsAuthSyncRef={skipNextJsAuthSyncRef}
           tokenCache={tokenCache}
         />
       )}
