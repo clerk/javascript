@@ -21,7 +21,6 @@ import type { EnterpriseConnectionMutations } from '../ConfigureSSO/hooks/useOrg
 import { ResetConnectionDialog } from '../ConfigureSSO/ResetConnectionDialog';
 import type { ProviderType } from '../ConfigureSSO/types';
 
-/** Props-driven: the Security page owns the data — no wizard context below the page. */
 type SecuritySsoSectionProps = {
   connection: OrganizationEnterpriseConnection;
   enterpriseConnection: EnterpriseConnectionResource | undefined;
@@ -58,7 +57,6 @@ const STATUS_BADGES: Record<
   },
 };
 
-/** Keep in sync with the select-provider step's MONOCHROMATIC_PROVIDER_ICONS. */
 const MONOCHROMATIC_PROVIDER_ICONS: ReadonlySet<string> = new Set(['okta']);
 
 const PROVIDER_PRESENTATION: Record<ProviderType, { label: LocalizationKey; iconId: string }> = {

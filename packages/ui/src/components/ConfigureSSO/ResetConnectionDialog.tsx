@@ -71,7 +71,6 @@ const ResetConnectionDialogContent = withCardStateProvider((props: ResetConnecti
     }
 
     try {
-      // A pure delete, no navigation — the wizard self-corrects once the active step's entry guard breaks.
       await onDelete();
       onClose();
     } catch (err) {
