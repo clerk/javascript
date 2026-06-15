@@ -307,15 +307,6 @@ const ConfiguredContent = (props: ConfiguredContentProps): JSX.Element => {
             />
           </DetailRow>
         )}
-
-        {samlConnection?.idpCertificate && (
-          <DetailRow
-            id='certificate'
-            label={localizationKeys('organizationProfile.securityPage.ssoSection.certificateLabel')}
-          >
-            <ValueChip id='certificate'>{samlConnection.idpCertificate}</ValueChip>
-          </DetailRow>
-        )}
       </Col>
 
       <ResetConnectionDialog

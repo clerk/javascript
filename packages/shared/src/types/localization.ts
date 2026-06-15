@@ -1153,7 +1153,6 @@ export type __internal_LocalizationResource = {
         domainLabel: LocalizationValue;
         signOnUrlLabel: LocalizationValue;
         issuerLabel: LocalizationValue;
-        certificateLabel: LocalizationValue;
         menuAction__edit: LocalizationValue;
         menuAction__activate: LocalizationValue;
         menuAction__deactivate: LocalizationValue;
@@ -1842,7 +1841,6 @@ export type __internal_LocalizationResource = {
         title: LocalizationValue;
         ssoUrlLabel: LocalizationValue;
         issuerLabel: LocalizationValue;
-        certificateLabel: LocalizationValue;
         configureAgainLink: LocalizationValue;
       };
       resetSection: {

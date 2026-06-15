@@ -213,7 +213,6 @@ export const enUS: LocalizationResource = {
   configureSSO: {
     confirmation: {
       configurationSection: {
-        certificateLabel: 'Certificate',
         configureAgainLink: 'Configure again',
         issuerLabel: 'Issuer',
         ssoUrlLabel: 'Sign on URL',
@@ -1085,7 +1084,6 @@ export const enUS: LocalizationResource = {
         badge__inactive: 'Inactive',
         badge__inProgress: 'In Progress',
         badge__unconfigured: 'Unconfigured',
-        certificateLabel: 'Certificate',
         descriptionLine1:
           'Require members to sign in through your identity provider using their domain email. Members without a matching domain are unaffected.',
         descriptionLine2:
