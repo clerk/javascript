@@ -1,0 +1,103 @@
+{
+  "name": "@clerk/form",
+  "version": "0.1.0",
+  "description": "Reactive form primitives for Clerk SDKs, built on nanostores.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/form"
+  },
+  "license": "MIT",
+  "author": "Clerk",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./react": {
+      "import": {
+        "types": "./dist/react/index.d.ts",
+        "default": "./dist/react/index.js"
+      },
+      "require": {
+        "types": "./dist/react/index.d.cts",
+        "default": "./dist/react/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "clean": "rimraf ./dist",
+    "dev": "tsdown --watch src",
+    "lint": "eslint src",
+    "size": "size-limit",
+    "size:why": "size-limit --why",
+    "test": "vitest run",
+    "test:ci": "vitest run --maxWorkers=70%",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "nanostores": "catalog:repo"
+  },
+  "devDependencies": {
+    "@size-limit/preset-small-lib": "catalog:repo",
+    "@testing-library/react": "^16.0.0",
+    "@types/react": "catalog:react",
+    "react": "catalog:react",
+    "react-dom": "catalog:react",
+    "rimraf": "6.0.1",
+    "size-limit": "catalog:repo",
+    "tsdown": "catalog:repo",
+    "typescript": "catalog:repo"
+  },
+  "peerDependencies": {
+    "react": "catalog:peer-react"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "size-limit": [
+    {
+      "name": "createForm",
+      "path": "dist/index.js",
+      "import": "{ createForm }",
+      "limit": "5 kB"
+    },
+    {
+      "name": "createForm + createField",
+      "path": "dist/index.js",
+      "import": "{ createForm, createField }",
+      "limit": "5 kB"
+    },
+    {
+      "name": "react: useForm",
+      "path": "dist/react/index.js",
+      "import": "{ useForm }",
+      "ignore": [
+        "react",
+        "react-dom"
+      ],
+      "limit": "5.5 kB"
+    }
+  ]
+}
