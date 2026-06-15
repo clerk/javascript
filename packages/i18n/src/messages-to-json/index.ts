@@ -17,7 +17,7 @@ function serialize(value: unknown): unknown {
     return value._type === 'params' || value._type === 'transform' ? value.template : value.forms;
   }
   if (value && typeof value === 'object') {
-    const out: Record<string, unknown> = {};
+    const out = Object.create(null) as Record<string, unknown>;
     for (const key of Object.keys(value as Record<string, unknown>)) {
       out[key] = serialize((value as Record<string, unknown>)[key]);
     }
@@ -38,9 +38,9 @@ function serialize(value: unknown): unknown {
  * ```
  */
 export function messagesToJSON(...messages: SourceStore[]): Record<string, unknown> {
-  const out: Record<string, unknown> = {};
+  const out = Object.create(null) as Record<string, unknown>;
   for (const { namespace, base } of messages) {
-    const ns = (out[namespace] ??= {}) as Record<string, unknown>;
+    const ns = (out[namespace] ??= Object.create(null)) as Record<string, unknown>;
     for (const key of Object.keys(base)) {
       ns[key] = serialize(base[key]);
     }

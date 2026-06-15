@@ -1,6 +1,7 @@
 {
   "name": "@clerk/i18n",
   "version": "0.1.0",
+  "private": true,
   "description": "Reactive i18n primitives for Clerk SDKs, built on nanostores.",
   "repository": {
     "type": "git",
