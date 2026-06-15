@@ -1,8 +1,7 @@
 import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import type { PaginationState } from './use-data-table';
-import { useDataTable } from './use-data-table';
+import { type PaginationState, useDataTable } from './use-data-table';
 
 type Person = { id: number; name: string; role: string };
 

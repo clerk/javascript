@@ -79,34 +79,30 @@ export interface UseDataTableReturn<TData> {
 export function useDataTable<TData>(opts: UseDataTableOptions<TData>): UseDataTableReturn<TData> {
   // ── State slices ────────────────────────────────────────────────────────────
 
-  const [sorting, setSortingRaw] = useControllableState(
-    opts.sorting,
-    opts.defaultSorting ?? [],
-    opts.onSortingChange ? (v: SortingState) => opts.onSortingChange!(v) : undefined,
-  );
+  const [sorting, setSortingRaw] = useControllableState(opts.sorting, opts.defaultSorting ?? [], opts.onSortingChange);
 
   const [columnFilters, setColumnFiltersRaw] = useControllableState(
     opts.columnFilters,
     opts.defaultColumnFilters ?? [],
-    opts.onColumnFiltersChange ? (v: ColumnFiltersState) => opts.onColumnFiltersChange!(v) : undefined,
+    opts.onColumnFiltersChange,
   );
 
   const [globalFilter, setGlobalFilterRaw] = useControllableState(
     opts.globalFilter,
     opts.defaultGlobalFilter ?? '',
-    opts.onGlobalFilterChange ? (v: string) => opts.onGlobalFilterChange!(v) : undefined,
+    opts.onGlobalFilterChange,
   );
 
   const [pagination, setPaginationRaw] = useControllableState(
     opts.pagination,
     opts.defaultPagination ?? { pageIndex: 0, pageSize: 10 },
-    opts.onPaginationChange ? (v: PaginationState) => opts.onPaginationChange!(v) : undefined,
+    opts.onPaginationChange,
   );
 
   const [rowSelection, setRowSelectionRaw] = useControllableState(
     opts.rowSelection,
     opts.defaultRowSelection ?? {},
-    opts.onRowSelectionChange ? (v: RowSelectionState) => opts.onRowSelectionChange!(v) : undefined,
+    opts.onRowSelectionChange,
   );
 
   // ── Updater-aware public setters ────────────────────────────────────────────
@@ -138,10 +134,11 @@ export function useDataTable<TData>(opts: UseDataTableOptions<TData>): UseDataTa
 
   // ── Rows ────────────────────────────────────────────────────────────────────
 
+  const { getRowId } = opts;
   const rows = useMemo<DataTableRow<TData>[]>(
     () =>
       opts.data.map((original, i) => {
-        const id = opts.getRowId ? opts.getRowId(original, i) : String(i);
+        const id = getRowId ? getRowId(original, i) : String(i);
         return {
           id,
           original,
@@ -149,7 +146,7 @@ export function useDataTable<TData>(opts: UseDataTableOptions<TData>): UseDataTa
           toggleSelected: () => setRowSelection(old => ({ ...old, [id]: !old[id] })),
         };
       }),
-    [opts.data, opts.getRowId, rowSelection, setRowSelection],
+    [opts.data, getRowId, rowSelection, setRowSelection],
   );
 
   // ── Pagination helpers ──────────────────────────────────────────────────────
