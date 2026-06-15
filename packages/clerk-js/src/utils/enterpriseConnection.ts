@@ -35,6 +35,7 @@ export function toEnterpriseConnectionBody(
 ): Record<string, unknown> {
   const body: Record<string, unknown> = {};
 
+  // Top-level fields. `provider` and `domains` are only on Create, the rest are shared.
   setIfDefined(body, 'provider', (params as CreateOrganizationEnterpriseConnectionParams).provider);
   setIfDefined(body, 'name', params.name);
   // `domains` is an array of FQDN strings. The form serializer downstream emits
