@@ -1,5 +1,5 @@
 import { appendModalState } from '@clerk/shared/internal/clerk-js/queryStateParams';
-import { useReverification, useUser } from '@clerk/shared/react';
+import { useClerk, useReverification, useUser } from '@clerk/shared/react';
 import type { ExternalAccountResource, OAuthProvider, OAuthScope, OAuthStrategy } from '@clerk/shared/types';
 import { Fragment, useState } from 'react';
 
@@ -18,6 +18,7 @@ import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
 import type { PropsOfComponent } from '../../styledSystem';
 import { AddConnectedAccount } from './ConnectedAccountsMenu';
+import { getExternalVerificationRedirectURL, reloadUserAfterOAuthCallback } from './oauthTransport';
 import { RemoveConnectedAccountForm } from './RemoveResourceForm';
 
 type RemoveConnectedAccountScreenProps = { accountId: string };
@@ -95,23 +96,24 @@ export const ConnectedAccountsSection = withCardStateProvider(
 
 const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => {
   const { additionalOAuthScopes, componentName, mode } = useUserProfileContext();
+  const clerk = useClerk();
   const { navigate } = useRouter();
   const { user } = useUser();
   const card = useCardState();
   const accountId = account.id;
 
   const isModal = mode === 'modal';
-  const redirectUrl = isModal
-    ? appendModalState({
-        url: window.location.href,
-        componentName,
-      })
-    : window.location.href;
+  const label = account.username || account.emailAddress;
+  const fallbackErrorMessage = account.verification?.error?.longMessage;
+  const additionalScopes = findAdditionalScopes(account, additionalOAuthScopes);
+  const reauthorizationRequired = additionalScopes.length > 0 && account.approvedScopes != '';
+  const shouldDisplayReconnect =
+    errorCodesForReconnect.includes(account.verification?.error?.code || '') || reauthorizationRequired;
+  const strategy = (account.verification?.strategy || `oauth_${account.provider}`) as OAuthStrategy;
 
-  const createExternalAccount = useReverification(() =>
+  const createExternalAccount = useReverification((redirectUrl: string) =>
     user?.createExternalAccount({
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      strategy: account.verification!.strategy as OAuthStrategy,
+      strategy,
       redirectUrl,
       additionalScopes,
     }),
@@ -122,32 +124,30 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
   if (!user) {
     return null;
   }
-  const label = account.username || account.emailAddress;
-  const fallbackErrorMessage = account.verification?.error?.longMessage;
-  const additionalScopes = findAdditionalScopes(account, additionalOAuthScopes);
-  const reauthorizationRequired = additionalScopes.length > 0 && account.approvedScopes != '';
-  const shouldDisplayReconnect =
-    errorCodesForReconnect.includes(account.verification?.error?.code || '') || reauthorizationRequired;
-
   const connectedAccountErrorMessage = shouldDisplayReconnect
     ? localizationKeys(`userProfile.start.connectedAccountsSection.subtitle__disconnected`)
     : fallbackErrorMessage;
 
   const reconnect = async () => {
-    const redirectUrl = isModal ? appendModalState({ url: window.location.href, componentName }) : window.location.href;
-
+    const transport = clerk.__internal_oauthTransport;
     try {
+      const redirectUrl = transport ? String(await transport.getRedirectUrl()) : window.location.href;
+      const decoratedRedirectUrl = isModal ? appendModalState({ url: redirectUrl, componentName }) : redirectUrl;
       let response: ExternalAccountResource | undefined;
       if (reauthorizationRequired) {
-        response = await account.reauthorize({ additionalScopes, redirectUrl });
+        response = await account.reauthorize({ additionalScopes, redirectUrl: decoratedRedirectUrl });
       } else {
-        response = await createExternalAccount();
+        response = await createExternalAccount(decoratedRedirectUrl);
       }
 
-      if (response) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        await navigate(response.verification!.externalVerificationRedirectURL?.href || '');
+      const url = getExternalVerificationRedirectURL(response);
+      if (transport) {
+        const { callbackUrl } = await transport.open(url);
+        await reloadUserAfterOAuthCallback(user, callbackUrl);
+        return;
       }
+
+      await navigate(url.href);
     } catch (err: any) {
       handleError(err, [], card.setError);
     }

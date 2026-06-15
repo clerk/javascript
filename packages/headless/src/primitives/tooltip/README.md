@@ -93,11 +93,12 @@ Accepts all `FloatingArrow` props. `ref` and `context` are injected automaticall
 
 ## Data Attributes
 
-| Attribute                         | Applies To        | Description                              |
-| --------------------------------- | ----------------- | ---------------------------------------- |
-| `data-cl-slot`                    | All parts         | Part identifier (e.g. `"tooltip-popup"`) |
-| `data-cl-open` / `data-cl-closed` | Trigger           | Open state                               |
-| `data-cl-side`                    | Positioner, Arrow | Resolved placement side                  |
+| Attribute                                         | Applies To        | Description                                               |
+| ------------------------------------------------- | ----------------- | --------------------------------------------------------- |
+| `data-cl-slot`                                    | All parts         | Part identifier (e.g. `"tooltip-popup"`)                  |
+| `data-cl-open` / `data-cl-closed`                 | Trigger, Popup    | Open/closed state                                         |
+| `data-cl-starting-style` / `data-cl-ending-style` | Popup             | Transition state — set during enter/exit animation frames |
+| `data-cl-side`                                    | Positioner, Arrow | Resolved placement side                                   |
 
 ## Positioning
 

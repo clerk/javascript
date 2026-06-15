@@ -23,11 +23,13 @@ export const connectionBackingEmail = (user: UserResource | null | undefined): E
 export interface OrganizationEnterpriseConnectionInput {
   /** FAPI currently supports a single connection per organization. */
   connection: EnterpriseConnectionResource | null | undefined;
-  /** The email address whose domain backs the connection. */
   primaryEmail: EmailAddressResource | null | undefined;
   /** Probed upstream — not a property of the connection resource itself. */
   hasSuccessfulTestRun: boolean;
 }
+
+/** Display-facing lifecycle summary — the wizard's navigation guards keep reading the raw booleans. */
+export type OrganizationEnterpriseConnectionStatus = 'unconfigured' | 'in_progress' | 'active' | 'inactive';
 
 /**
  * The active organization's SSO-config domain entity: an immutable, pure value
@@ -40,6 +42,7 @@ export interface OrganizationEnterpriseConnection {
   readonly hasMinimumConfiguration: boolean;
   readonly isPrimaryEmailVerified: boolean;
   readonly hasSuccessfulTestRun: boolean;
+  readonly status: OrganizationEnterpriseConnectionStatus;
 }
 
 // TODO - Update to support OpenID Connect
@@ -47,15 +50,43 @@ export const isEnterpriseConnectionConfigured = (
   connection: EnterpriseConnectionResource | null | undefined,
 ): boolean => Boolean(connection?.samlConnection?.idpSsoUrl && connection?.samlConnection?.idpEntityId);
 
+const connectionStatus = ({
+  hasConnection,
+  isActive,
+  hasMinimumConfiguration,
+  hasSuccessfulTestRun,
+}: Pick<
+  OrganizationEnterpriseConnection,
+  'hasConnection' | 'isActive' | 'hasMinimumConfiguration' | 'hasSuccessfulTestRun'
+>): OrganizationEnterpriseConnectionStatus => {
+  if (!hasConnection) {
+    return 'unconfigured';
+  }
+  if (isActive) {
+    return 'active';
+  }
+  if (hasMinimumConfiguration && hasSuccessfulTestRun) {
+    return 'inactive';
+  }
+  return 'in_progress';
+};
+
 export const organizationEnterpriseConnection = ({
   connection,
   primaryEmail,
   hasSuccessfulTestRun,
-}: OrganizationEnterpriseConnectionInput): OrganizationEnterpriseConnection => ({
-  provider: connection?.provider as ProviderType | undefined,
-  hasConnection: Boolean(connection),
-  isActive: Boolean(connection?.active),
-  hasMinimumConfiguration: isEnterpriseConnectionConfigured(connection),
-  isPrimaryEmailVerified: primaryEmail?.verification?.status === 'verified',
-  hasSuccessfulTestRun,
-});
+}: OrganizationEnterpriseConnectionInput): OrganizationEnterpriseConnection => {
+  const hasConnection = Boolean(connection);
+  const isActive = Boolean(connection?.active);
+  const hasMinimumConfiguration = isEnterpriseConnectionConfigured(connection);
+
+  return {
+    provider: connection?.provider as ProviderType | undefined,
+    hasConnection,
+    isActive,
+    hasMinimumConfiguration,
+    isPrimaryEmailVerified: primaryEmail?.verification?.status === 'verified',
+    hasSuccessfulTestRun,
+    status: connectionStatus({ hasConnection, isActive, hasMinimumConfiguration, hasSuccessfulTestRun }),
+  };
+};
