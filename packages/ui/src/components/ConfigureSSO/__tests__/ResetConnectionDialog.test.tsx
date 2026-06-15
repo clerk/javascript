@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
+import { localizationKeys } from '@/customizables';
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen, waitFor } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
@@ -12,7 +13,14 @@ const { createFixtures } = bindCreateFixtures('ConfigureSSO');
 
 const renderDialog = (
   wrapper: React.ComponentType<{ children?: React.ReactNode }>,
-  props: { isOpen?: boolean; onClose?: () => void; confirmationValue?: string } = {},
+  props: {
+    isOpen?: boolean;
+    onClose?: () => void;
+    confirmationValue?: string;
+    title?: ReturnType<typeof localizationKeys>;
+    subtitle?: ReturnType<typeof localizationKeys>;
+    confirmButtonLabel?: ReturnType<typeof localizationKeys>;
+  } = {},
 ) => {
   const onClose = props.onClose ?? vi.fn();
   const utils = render(
@@ -23,6 +31,9 @@ const renderDialog = (
         confirmationValue={props.confirmationValue ?? 'Acme Inc'}
         onDelete={() => deleteConnection('idn_connection_1')}
         contentRef={{ current: null }}
+        title={props.title}
+        subtitle={props.subtitle}
+        confirmButtonLabel={props.confirmButtonLabel}
       />
     </CardStateProvider>,
     { wrapper },
@@ -58,6 +69,25 @@ describe('ResetConnectionDialog', () => {
       ),
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Reset connection' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+  });
+
+  it('renders override copy when title, subtitle, and confirm label props are supplied', async () => {
+    resetMocks();
+    const { wrapper } = await createFixtures();
+    renderDialog(wrapper, {
+      confirmationValue: 'Acme Inc',
+      title: localizationKeys('organizationProfile.securityPage.removeDialog.title'),
+      subtitle: localizationKeys('organizationProfile.securityPage.removeDialog.subtitle'),
+      confirmButtonLabel: localizationKeys('organizationProfile.securityPage.removeDialog.confirmButton'),
+    });
+
+    expect(screen.getByRole('heading', { name: 'Remove SSO connection' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Reset connection' })).not.toBeInTheDocument();
+    expect(screen.getByText(/Are you sure you want to remove the connection\?/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Remove connection' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Reset connection' })).not.toBeInTheDocument();
+    // Type-to-confirm is unchanged by the override.
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
   });
 

@@ -1067,6 +1067,12 @@ export const enUS: LocalizationResource = {
       title: 'Remove domain',
     },
     securityPage: {
+      removeDialog: {
+        confirmButton: 'Remove connection',
+        subtitle:
+          'Are you sure you want to remove the connection? This action is irreversible and deletes the connection and all of its configuration.',
+        title: 'Remove SSO connection',
+      },
       ssoSection: {
         badge__active: 'Active',
         badge__inactive: 'Inactive',

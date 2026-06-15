@@ -1,3 +1,4 @@
+import type { LocalizationKey } from '@/customizables';
 import { Col, descriptors, localizationKeys } from '@/customizables';
 import { Card } from '@/elements/Card';
 import { useCardState, withCardStateProvider } from '@/elements/contexts';
@@ -14,6 +15,10 @@ type ResetConnectionDialogProps = {
   confirmationValue: string;
   onDelete: () => Promise<unknown>;
   contentRef: React.RefObject<HTMLDivElement>;
+  /** Defaults to the Reset copy; overridden when the dialog is reused for the Remove action. */
+  title?: LocalizationKey;
+  subtitle?: LocalizationKey;
+  confirmButtonLabel?: LocalizationKey;
 };
 
 export const ResetConnectionDialog = (props: ResetConnectionDialogProps): JSX.Element | null => {
@@ -43,6 +48,10 @@ export const ResetConnectionDialog = (props: ResetConnectionDialogProps): JSX.El
 
 const ResetConnectionDialogContent = withCardStateProvider((props: ResetConnectionDialogProps) => {
   const { onClose, onDelete, confirmationValue } = props;
+  const title = props.title ?? localizationKeys('configureSSO.resetConnectionDialog.title');
+  const subtitle = props.subtitle ?? localizationKeys('configureSSO.resetConnectionDialog.subtitle');
+  const confirmButtonLabel =
+    props.confirmButtonLabel ?? localizationKeys('configureSSO.resetConnectionDialog.resetButton');
   const card = useCardState();
 
   const confirmationField = useFormControl('deleteConfirmation', '', {
@@ -77,8 +86,8 @@ const ResetConnectionDialogContent = withCardStateProvider((props: ResetConnecti
     >
       <Card.Content sx={t => ({ textAlign: 'start', padding: t.sizes.$5 })}>
         <FormContainer
-          headerTitle={localizationKeys('configureSSO.resetConnectionDialog.title')}
-          headerSubtitle={localizationKeys('configureSSO.resetConnectionDialog.subtitle')}
+          headerTitle={title}
+          headerSubtitle={subtitle}
           sx={t => ({ gap: t.space.$4 })}
         >
           <Form.Root onSubmit={onSubmit}>
@@ -96,7 +105,7 @@ const ResetConnectionDialogContent = withCardStateProvider((props: ResetConnecti
                   block={false}
                   colorScheme='danger'
                   isDisabled={!canSubmit}
-                  localizationKey={localizationKeys('configureSSO.resetConnectionDialog.resetButton')}
+                  localizationKey={confirmButtonLabel}
                 />
                 <Form.ResetButton
                   elementDescriptor={descriptors.configureSSOResetConnectionDialogCancelButton}

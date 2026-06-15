@@ -1132,6 +1132,11 @@ export type __internal_LocalizationResource = {
     };
     securityPage: {
       title: LocalizationValue;
+      removeDialog: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+        confirmButton: LocalizationValue;
+      };
       ssoSection: {
         title: LocalizationValue;
         badge__unconfigured: LocalizationValue;
