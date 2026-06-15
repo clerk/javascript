@@ -148,7 +148,11 @@ describe('ClerkProvider native session notifications', () => {
     });
   });
 
-  test('refreshes useNativeSession subscribers after native client events sync back to JS', async () => {
+  test('activates the JS session after native signs in', async () => {
+    mocks.tokenCache.getToken.mockResolvedValue(null);
+    mocks.getClientToken.mockResolvedValue(null);
+    mocks.clerkInstance.client.lastActiveSessionId = null;
+
     const { rerender } = render(
       <ClerkProvider
         publishableKey='pk_test_123'
@@ -159,6 +163,12 @@ describe('ClerkProvider native session notifications', () => {
     await waitFor(() => {
       expect(mocks.notifyNativeSessionChanged).toHaveBeenCalled();
     });
+    expect(mocks.clerkInstance.setActive).not.toHaveBeenCalled();
+
+    mocks.getClientToken.mockResolvedValue('native-client-token');
+    mocks.clerkInstance.client.lastActiveSessionId = 'sess_native';
+    mocks.clerkInstance.__internal_reloadInitialResources.mockClear();
+    mocks.clerkInstance.setActive.mockClear();
     mocks.notifyNativeSessionChanged.mockClear();
 
     mocks.nativeClientEvent = { type: 'refreshClient' };
@@ -174,6 +184,44 @@ describe('ClerkProvider native session notifications', () => {
     });
     expect(mocks.clerkInstance.__internal_reloadInitialResources).toHaveBeenCalled();
     expect(mocks.clerkInstance.setActive).toHaveBeenCalledWith({ session: 'sess_native' });
+    expect(mocks.notifyNativeSessionChanged).toHaveBeenCalledTimes(1);
+  });
+
+  test('clears the JS active session after native signs out', async () => {
+    mocks.clerkInstance.client.lastActiveSessionId = 'sess_js';
+    mocks.clerkInstance.session.id = 'sess_js';
+    mocks.authState.sessionId = 'sess_js';
+
+    const { rerender } = render(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.notifyNativeSessionChanged).toHaveBeenCalled();
+    });
+    expect(mocks.clerkInstance.setActive).not.toHaveBeenCalled();
+
+    mocks.clerkInstance.client.lastActiveSessionId = null;
+    mocks.clerkInstance.__internal_reloadInitialResources.mockClear();
+    mocks.clerkInstance.setActive.mockClear();
+    mocks.notifyNativeSessionChanged.mockClear();
+
+    mocks.nativeClientEvent = { type: 'refreshClient' };
+    rerender(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.tokenCache.saveToken).toHaveBeenCalledWith(CLERK_CLIENT_JWT_KEY, 'native-client-token');
+    });
+    expect(mocks.clerkInstance.__internal_reloadInitialResources).toHaveBeenCalled();
+    expect(mocks.clerkInstance.setActive).toHaveBeenCalledWith({ session: null });
     expect(mocks.notifyNativeSessionChanged).toHaveBeenCalledTimes(1);
   });
 
@@ -229,5 +277,39 @@ describe('ClerkProvider native session notifications', () => {
     await waitFor(() => {
       expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', 'client-token');
     });
+  });
+
+  test('refreshes native after JS signs out', async () => {
+    mocks.authState.sessionId = 'sess_js';
+
+    const { rerender } = render(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', 'client-token');
+    });
+
+    mocks.configure.mockClear();
+    mocks.notifyNativeSessionChanged.mockClear();
+    mocks.refreshClient.mockClear();
+    mocks.tokenCache.getToken.mockResolvedValue(null);
+    mocks.authState.sessionId = null;
+
+    rerender(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.refreshClient).toHaveBeenCalled();
+    });
+    expect(mocks.configure).not.toHaveBeenCalled();
+    expect(mocks.notifyNativeSessionChanged).toHaveBeenCalled();
   });
 });
