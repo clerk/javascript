@@ -87,4 +87,24 @@ describe('preservePlatformSpecifiers', () => {
 
     expect(result).toBeNull();
   });
+
+  test('does not preserve explicitly extensioned specifiers', async () => {
+    const importer = createFile('src/index.ts');
+    createFile('src/foo.ts');
+    createFile('src/foo.ios.ts');
+    const plugin = preservePlatformSpecifiers();
+
+    const result = await (plugin.resolveId as Function).call(
+      {
+        resolve: async () => {
+          throw new Error('explicitly extensioned specifiers should not be resolved');
+        },
+      },
+      './foo.ts',
+      importer,
+      {},
+    );
+
+    expect(result).toBeNull();
+  });
 });

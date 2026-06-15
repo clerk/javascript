@@ -9,6 +9,10 @@ function hasPlatformSuffix(specifier: string) {
   return platformSuffixes.some(suffix => specifier.endsWith(suffix));
 }
 
+function hasSourceExtension(specifier: string) {
+  return sourceExtensions.some(extension => specifier.endsWith(extension));
+}
+
 function hasPlatformSibling(id: string) {
   const extension = sourceExtensions.find(ext => id.endsWith(ext));
 
@@ -42,7 +46,7 @@ export function preservePlatformSpecifiers(): Plugin {
   return {
     name: 'preserve-platform-specifiers',
     async resolveId(source, importer, options) {
-      if (!importer || !source.startsWith('.') || hasPlatformSuffix(source)) {
+      if (!importer || !source.startsWith('.') || hasSourceExtension(source) || hasPlatformSuffix(source)) {
         return null;
       }
 
