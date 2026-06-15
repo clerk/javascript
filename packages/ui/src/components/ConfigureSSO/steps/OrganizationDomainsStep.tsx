@@ -371,24 +371,26 @@ const DomainCard = ({
         </Button>
       </Flex>
 
-      <Animated>
-        {ownershipVerification?.verifiedAt ? (
-          <Text
-            key='verified'
-            as='p'
-            colorScheme='secondary'
-            localizationKey={localizationKeys('configureSSO.organizationDomainsStep.domainCard.verifiedAtLabel', {
-              date: ownershipVerification.verifiedAt,
-            })}
-            sx={t => ({ padding: t.space.$4, paddingTop: 0 })}
-          />
-        ) : (
-          <TxtRecord
-            key='unverified'
-            ownershipVerification={ownershipVerification}
-          />
-        )}
-      </Animated>
+      <Box sx={{ overflow: 'hidden' }}>
+        <Animated>
+          {ownershipVerification?.verifiedAt ? (
+            <Text
+              key='verified'
+              as='p'
+              colorScheme='secondary'
+              localizationKey={localizationKeys('configureSSO.organizationDomainsStep.domainCard.verifiedAtLabel', {
+                date: ownershipVerification.verifiedAt,
+              })}
+              sx={t => ({ padding: t.space.$4, paddingTop: 0 })}
+            />
+          ) : (
+            <TxtRecord
+              key='unverified'
+              ownershipVerification={ownershipVerification}
+            />
+          )}
+        </Animated>
+      </Box>
     </Col>
   );
 };
