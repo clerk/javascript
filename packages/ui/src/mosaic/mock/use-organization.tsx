@@ -1,7 +1,6 @@
-import { effect } from 'alien-signals';
-import { useSyncExternalStore } from 'react';
+import { useEffect, useState } from 'react';
 
-import { delay, MUTATION_DELAY_MS, orgLoadedSignal, startOrgLoad } from './organization-store';
+import { delay, LOAD_DELAY_MS, MUTATION_DELAY_MS } from './organization-store';
 
 /**
  * Mock `useOrganization` for prototyping Mosaic organization-profile components.
@@ -11,9 +10,8 @@ import { delay, MUTATION_DELAY_MS, orgLoadedSignal, startOrgLoad } from './organ
  * `{ isLoaded, organization, membership }` discriminated union where
  * `organization.destroy()` deletes the org and `membership.destroy()` leaves it.
  *
- * Loading state is read from a shared module-level signal via `useSyncExternalStore`,
- * the same bridge the real signal-based hooks use
- * (`packages/react/src/hooks/useClerkSignal.ts`). Simulated async only — no real SDK.
+ * Loading state is held in local component state and flips to "loaded" after a
+ * simulated delay. Simulated async only — no real SDK.
  */
 
 export interface MockOrganization {
@@ -39,18 +37,13 @@ export type UseOrganizationReturn =
   | { isLoaded: true; organization: MockOrganization | null; membership: MockMembership | null };
 
 export function useOrganization(): UseOrganizationReturn {
-  const isLoaded = useSyncExternalStore(
-    callback => {
-      startOrgLoad();
-      // effect re-runs whenever the signal changes; returns its dispose fn for cleanup.
-      return effect(() => {
-        orgLoadedSignal();
-        callback();
-      });
-    },
-    () => orgLoadedSignal(),
-    () => false, // server snapshot — stays unloaded, so SSR markup matches first client render.
-  );
+  // Starts `false` so SSR markup matches the first client render, then flips after the delay.
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoaded(true), LOAD_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, []);
 
   if (!isLoaded) {
     return { isLoaded: false, organization: undefined, membership: undefined };
