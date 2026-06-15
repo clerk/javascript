@@ -1,15 +1,15 @@
-import React from 'react';
+import type { HTMLAttributes } from 'react';
 
 import { Box } from '../components/box';
 import { Tabs } from '../components/tabs';
 import { OrganizationProfileGeneral } from '../panels/organization-profile-general';
-import type { RecipeVariantProps } from '../slot-recipe';
+import type { RecipeVariantProps, SlotProps } from '../slot-recipe';
 import { defineSlotRecipe, useRecipe } from '../slot-recipe';
 
 /**
- * One multi-slot recipe owns every layout of the Organization Profile AIO. The
- * `layout` variant only re-styles the structural slots (`body`, `nav`, `navItem`,
- * `content`) — the React tree below picks which slots actually render. Because the
+ * One multi-slot recipe owns every navigation pattern of the Organization Profile AIO. The
+ * `navigation` variant only re-styles the structural slots (`body`, `nav`, `content`)
+ * — the React tree below picks which slots actually render. Because the
  * variant axis lives on the recipe, it also surfaces automatically as a knob and a
  * `<PropTable>` row in swingset.
  */
@@ -19,7 +19,6 @@ export const organizationProfileRecipe = defineSlotRecipe(theme => ({
     header: { slot: 'organization-profile-header' },
     body: { slot: 'organization-profile-body' },
     nav: { slot: 'organization-profile-nav' },
-    navItem: { slot: 'organization-profile-nav-item' },
     content: { slot: 'organization-profile-content' },
   },
   base: {
@@ -31,13 +30,12 @@ export const organizationProfileRecipe = defineSlotRecipe(theme => ({
     },
     body: {},
     nav: {},
-    navItem: {},
     content: { minWidth: 0 },
   },
   variants: {
-    layout: {
+    navigation: {
       // Vertical nav rail beside the active panel.
-      sidebar: {
+      left: {
         body: {
           display: 'flex',
           flexDirection: 'row',
@@ -48,41 +46,23 @@ export const organizationProfileRecipe = defineSlotRecipe(theme => ({
           display: 'flex',
           flexDirection: 'column',
           gap: theme.spacing(1),
+          borderBottom: 'none',
           flexShrink: 0,
           width: '12rem',
         },
-        navItem: {
-          appearance: 'none',
-          textAlign: 'start',
-          background: 'transparent',
-          border: 'none',
-          borderRadius: theme.rounded.md,
-          paddingInline: theme.spacing(3),
-          paddingBlock: theme.spacing(2),
-          ...theme.text('sm'),
-          fontWeight: theme.font.medium,
-          color: theme.color.mutedForeground,
-          cursor: 'pointer',
-          transition: 'background-color 150ms, color 150ms',
-          _hover: { backgroundColor: theme.alpha('primary', 5) },
-          '&[data-cl-selected]': {
-            backgroundColor: theme.alpha('primary', 10),
-            color: theme.color.primary,
-          },
-        },
-        content: { flex: 1 },
+        content: { flex: 1, paddingBlock: 0 },
       },
       // Horizontal tab strip above the active panel. (default)
-      tabs: {
+      top: {
         body: { display: 'block' },
       },
       // No navigation chrome — every section is stacked in a single column.
-      'no-nav': {
+      none: {
         body: { display: 'flex', flexDirection: 'column', gap: theme.spacing(8) },
       },
     },
   },
-  defaultVariants: { layout: 'tabs' },
+  defaultVariants: { navigation: 'top' },
 }));
 
 declare module '../registry' {
@@ -91,14 +71,14 @@ declare module '../registry' {
     'organization-profile-header': true;
     'organization-profile-body': true;
     'organization-profile-nav': true;
-    'organization-profile-nav-item': true;
     'organization-profile-content': true;
   }
 }
 
 /**
  * The navigable sections of the Organization Profile. Declared once and consumed by
- * every layout so the available destinations stay identical regardless of `layout`.
+ * every navigation pattern so the available destinations stay identical regardless
+ * of `navigation`.
  */
 const SECTIONS = [
   { value: 'general', label: 'General', render: () => <OrganizationProfileGeneral /> },
@@ -122,28 +102,33 @@ function MembersPlaceholder() {
 
 export type OrganizationProfileProps = RecipeVariantProps<typeof organizationProfileRecipe>;
 
+type MosaicRenderProps = HTMLAttributes<HTMLElement> & Partial<SlotProps>;
+
+function mergeClassName(...classNames: Array<string | undefined>) {
+  const className = classNames.filter(Boolean).join(' ');
+  return className || undefined;
+}
+
 /**
  * The full Organization Profile AIO — assembles all organization-related sections
  * into a single view.
  *
- * @param layout - How the sections are navigated. `tabs` (default) renders a
- *   horizontal tab strip, `sidebar` renders a vertical nav rail beside the content,
- *   and `no-nav` stacks every section in one column with no navigation.
+ * @param navigation - Where section navigation renders. `top` (default) renders a
+ *   horizontal tab strip, `left` renders a vertical nav rail beside the content,
+ *   and `none` stacks every section in one column with no navigation.
  * @param sx - Per-instance style overrides merged onto the root element.
  */
 export function OrganizationProfile(props: OrganizationProfileProps) {
-  const { layout, sx } = props;
-  const s = useRecipe(organizationProfileRecipe, { variants: { layout }, sx });
+  const { navigation, sx } = props;
+  const s = useRecipe(organizationProfileRecipe, { variants: { navigation }, sx });
   // Mirror the recipe default so the React tree branches on a concrete value.
-  const activeLayout = layout ?? 'tabs';
-
-  const [active, setActive] = React.useState<(typeof SECTIONS)[number]['value']>(SECTIONS[0].value);
+  const activeNavigation = navigation ?? 'top';
 
   return (
     <div {...s.root}>
       <h1 {...s.header}>Organization Profile</h1>
 
-      {activeLayout === 'tabs' ? (
+      {activeNavigation === 'top' ? (
         <div {...s.body}>
           <Tabs.Root defaultValue={SECTIONS[0].value}>
             <Tabs.List>
@@ -166,23 +151,48 @@ export function OrganizationProfile(props: OrganizationProfileProps) {
             ))}
           </Tabs.Root>
         </div>
-      ) : activeLayout === 'sidebar' ? (
+      ) : activeNavigation === 'left' ? (
         <div {...s.body}>
-          <nav {...s.nav}>
+          <Tabs.Root
+            defaultValue={SECTIONS[0].value}
+            orientation='vertical'
+          >
+            <Tabs.List
+              render={(listProps: MosaicRenderProps) => (
+                <div
+                  {...s.nav}
+                  {...listProps}
+                  className={mergeClassName(listProps.className, s.nav.className)}
+                  css={[listProps.css, s.nav.css]}
+                />
+              )}
+            >
+              {SECTIONS.map(section => (
+                <Tabs.Tab
+                  key={section.value}
+                  value={section.value}
+                >
+                  {section.label}
+                </Tabs.Tab>
+              ))}
+            </Tabs.List>
             {SECTIONS.map(section => (
-              <button
+              <Tabs.Panel
                 key={section.value}
-                type='button'
-                onClick={() => setActive(section.value)}
-                {...s.navItem}
-                {...(active === section.value ? { 'data-cl-selected': '' } : {})}
-                aria-current={active === section.value ? 'page' : undefined}
+                value={section.value}
+                render={(panelProps: MosaicRenderProps) => (
+                  <div
+                    {...s.content}
+                    {...panelProps}
+                    className={mergeClassName(panelProps.className, s.content.className)}
+                    css={[panelProps.css, s.content.css]}
+                  />
+                )}
               >
-                {section.label}
-              </button>
+                {section.render()}
+              </Tabs.Panel>
             ))}
-          </nav>
-          <div {...s.content}>{SECTIONS.find(section => section.value === active)?.render()}</div>
+          </Tabs.Root>
         </div>
       ) : (
         <div {...s.body}>

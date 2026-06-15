@@ -23,29 +23,29 @@ export function Default(props: Record<string, unknown>) {
   return <OrganizationProfile {...knobsAsProps(props)} />;
 }
 
-export function Tabs(props: Record<string, unknown>) {
+export function Top(props: Record<string, unknown>) {
   return (
     <OrganizationProfile
       {...knobsAsProps(props)}
-      layout='tabs'
+      navigation='top'
     />
   );
 }
 
-export function Sidebar(props: Record<string, unknown>) {
+export function Left(props: Record<string, unknown>) {
   return (
     <OrganizationProfile
       {...knobsAsProps(props)}
-      layout='sidebar'
+      navigation='left'
     />
   );
 }
 
-export function NoNav(props: Record<string, unknown>) {
+export function None(props: Record<string, unknown>) {
   return (
     <OrganizationProfile
       {...knobsAsProps(props)}
-      layout='no-nav'
+      navigation='none'
     />
   );
 }

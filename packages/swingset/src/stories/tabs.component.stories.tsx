@@ -29,3 +29,26 @@ export function Default() {
     </Tabs.Root>
   );
 }
+
+export function Stacked() {
+  return (
+    <div style={{ display: 'flex', gap: 32, alignItems: 'flex-start' }}>
+      <Tabs.Root
+        defaultValue='account'
+        orientation='vertical'
+      >
+        <Tabs.List style={{ width: '12rem' }}>
+          <Tabs.Tab value='account'>Account</Tabs.Tab>
+          <Tabs.Tab value='password'>Password</Tabs.Tab>
+          <Tabs.Tab value='notifications'>Notifications</Tabs.Tab>
+          <Tabs.Indicator />
+        </Tabs.List>
+        <div style={{ flex: 1 }}>
+          <Tabs.Panel value='account'>Manage your account settings here.</Tabs.Panel>
+          <Tabs.Panel value='password'>Change your password here.</Tabs.Panel>
+          <Tabs.Panel value='notifications'>Choose what you get notified about.</Tabs.Panel>
+        </div>
+      </Tabs.Root>
+    </div>
+  );
+}
