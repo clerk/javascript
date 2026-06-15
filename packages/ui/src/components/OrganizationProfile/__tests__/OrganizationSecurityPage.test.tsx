@@ -260,7 +260,7 @@ describe('OrganizationSecurityPage', () => {
       expect(screen.queryByRole('menuitem', { name: 'Deactivate' })).not.toBeInTheDocument();
     });
 
-    it('opens the type-to-confirm reset dialog from Remove', async () => {
+    it('opens the type-to-confirm removal dialog with Remove-oriented copy from Remove', async () => {
       const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
 
       fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([configuredConnection({ active: true })]);
@@ -275,25 +275,81 @@ describe('OrganizationSecurityPage', () => {
       await userEvent.click(await screen.findByRole('button', { name: /open menu/i }));
       await userEvent.click(screen.getByRole('menuitem', { name: 'Remove' }));
 
-      expect(await screen.findByRole('heading', { name: 'Reset connection' })).toBeInTheDocument();
+      // The shared dialog renders the Remove copy here, not the wizard's Reset copy.
+      expect(await screen.findByRole('heading', { name: 'Remove SSO connection' })).toBeInTheDocument();
+      expect(screen.queryByRole('heading', { name: 'Reset connection' })).not.toBeInTheDocument();
+      expect(screen.getByText(/Are you sure you want to remove the connection\?/i)).toBeInTheDocument();
 
       // Type-to-confirm uses the organization name.
       await userEvent.type(screen.getByLabelText(/below to continue/i), 'Org1');
-      await waitFor(() => expect(screen.getByRole('button', { name: 'Reset connection' })).toBeEnabled());
-      await userEvent.click(screen.getByRole('button', { name: 'Reset connection' }));
+      await waitFor(() => expect(screen.getByRole('button', { name: 'Remove connection' })).toBeEnabled());
+      await userEvent.click(screen.getByRole('button', { name: 'Remove connection' }));
 
       await waitFor(() => {
         expect(fixtures.clerk.organization?.deleteEnterpriseConnection).toHaveBeenCalledWith('ent_1');
       });
     });
 
-    it('deactivates directly from the menu, flipping the badge optimistically before settling', async () => {
+    it('deactivates directly from the menu, settling on the revalidated connection', async () => {
       const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
 
       // The revalidation that follows the update returns the deactivated connection.
       fixtures.clerk.organization?.getEnterpriseConnections
         .mockResolvedValueOnce([configuredConnection({ active: true })])
         .mockResolvedValue([configuredConnection()]);
+      fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
+        data: [{ id: 'run_1', status: 'success' }],
+        total_count: 1,
+      } as any);
+      fixtures.clerk.organization?.updateEnterpriseConnection.mockResolvedValue({ active: false } as any);
+
+      const { userEvent } = renderPage(wrapper);
+
+      expect(await screen.findByText('Active')).toBeInTheDocument();
+
+      await userEvent.click(screen.getByRole('button', { name: /open menu/i }));
+      await userEvent.click(screen.getByRole('menuitem', { name: 'Deactivate' }));
+
+      expect(fixtures.clerk.organization?.updateEnterpriseConnection).toHaveBeenCalledWith('ent_1', {
+        active: false,
+      });
+
+      // The badge follows the revalidated entity, not an optimistic flip.
+      await waitFor(() => expect(screen.getByText('Inactive')).toBeInTheDocument());
+      expect(screen.queryByText('Active')).not.toBeInTheDocument();
+    });
+
+    it('activates directly from the menu, settling on the revalidated connection', async () => {
+      const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
+
+      fixtures.clerk.organization?.getEnterpriseConnections
+        .mockResolvedValueOnce([configuredConnection()])
+        .mockResolvedValue([configuredConnection({ active: true })]);
+      fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
+        data: [{ id: 'run_1', status: 'success' }],
+        total_count: 1,
+      } as any);
+      fixtures.clerk.organization?.updateEnterpriseConnection.mockResolvedValue({ active: true } as any);
+
+      const { userEvent } = renderPage(wrapper);
+
+      expect(await screen.findByText('Inactive')).toBeInTheDocument();
+
+      await userEvent.click(screen.getByRole('button', { name: /open menu/i }));
+      await userEvent.click(screen.getByRole('menuitem', { name: 'Activate' }));
+
+      expect(fixtures.clerk.organization?.updateEnterpriseConnection).toHaveBeenCalledWith('ent_1', {
+        active: true,
+      });
+
+      await waitFor(() => expect(screen.getByText('Active')).toBeInTheDocument());
+      expect(screen.queryByText('Inactive')).not.toBeInTheDocument();
+    });
+
+    it('disables the activation action while the update is in flight', async () => {
+      const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
+
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([configuredConnection({ active: true })]);
       fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
         data: [{ id: 'run_1', status: 'success' }],
         total_count: 1,
@@ -311,56 +367,14 @@ describe('OrganizationSecurityPage', () => {
       await userEvent.click(screen.getByRole('button', { name: /open menu/i }));
       await userEvent.click(screen.getByRole('menuitem', { name: 'Deactivate' }));
 
-      // The badge flips before the server confirms.
-      expect(screen.getByText('Inactive')).toBeInTheDocument();
-      expect(screen.queryByText('Active')).not.toBeInTheDocument();
-      expect(fixtures.clerk.organization?.updateEnterpriseConnection).toHaveBeenCalledWith('ent_1', {
-        active: false,
-      });
-
-      resolveUpdate({ active: false });
-
-      // Settles on the revalidated connection.
-      await waitFor(() => expect(screen.getByText('Inactive')).toBeInTheDocument());
-      expect(screen.queryByText('Active')).not.toBeInTheDocument();
-    });
-
-    it('activates directly from the menu, flipping the badge optimistically before settling', async () => {
-      const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
-
-      fixtures.clerk.organization?.getEnterpriseConnections
-        .mockResolvedValueOnce([configuredConnection()])
-        .mockResolvedValue([configuredConnection({ active: true })]);
-      fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
-        data: [{ id: 'run_1', status: 'success' }],
-        total_count: 1,
-      } as any);
-
-      let resolveUpdate!: (value: unknown) => void;
-      fixtures.clerk.organization?.updateEnterpriseConnection.mockImplementation(
-        () => new Promise(resolve => (resolveUpdate = resolve)) as any,
-      );
-
-      const { userEvent } = renderPage(wrapper);
-
-      expect(await screen.findByText('Inactive')).toBeInTheDocument();
-
+      // The update is still pending; the acting item is disabled when the menu is reopened.
       await userEvent.click(screen.getByRole('button', { name: /open menu/i }));
-      await userEvent.click(screen.getByRole('menuitem', { name: 'Activate' }));
-
-      expect(screen.getByText('Active')).toBeInTheDocument();
-      expect(screen.queryByText('Inactive')).not.toBeInTheDocument();
-      expect(fixtures.clerk.organization?.updateEnterpriseConnection).toHaveBeenCalledWith('ent_1', {
-        active: true,
-      });
+      await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Deactivate' })).toBeDisabled());
 
       resolveUpdate({ active: true });
-
-      await waitFor(() => expect(screen.getByText('Active')).toBeInTheDocument());
-      expect(screen.queryByText('Inactive')).not.toBeInTheDocument();
     });
 
-    it('rolls the badge back and surfaces the error when the update fails', async () => {
+    it('surfaces the error and keeps the entity state when the update fails', async () => {
       const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
 
       fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([configuredConnection({ active: true })]);
@@ -389,6 +403,7 @@ describe('OrganizationSecurityPage', () => {
       await userEvent.click(screen.getByRole('menuitem', { name: 'Deactivate' }));
 
       expect(await screen.findByText('The connection could not be updated')).toBeInTheDocument();
+      // The badge reads from the (unchanged) entity — no optimistic flip to roll back.
       expect(screen.getByText('Active')).toBeInTheDocument();
       expect(screen.queryByText('Inactive')).not.toBeInTheDocument();
     });

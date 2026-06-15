@@ -71,12 +71,10 @@ const PROVIDER_PRESENTATION: Record<ProviderType, { label: LocalizationKey; icon
 export const SecuritySsoSection = (props: SecuritySsoSectionProps): JSX.Element => {
   const { connection, onConfigure } = props;
 
-  // Mirrors an in-flight Activate / Deactivate so the badge and menu flip optimistically; cleared on settle.
-  const [optimisticActive, setOptimisticActive] = useState<boolean>();
-
   const isConfigured = connection.status === 'active' || connection.status === 'inactive';
-  const status: OrganizationEnterpriseConnectionStatus =
-    isConfigured && optimisticActive !== undefined ? (optimisticActive ? 'active' : 'inactive') : connection.status;
+
+  // The badge and menu read straight from the entity; revalidation drives the settled state.
+  const status: OrganizationEnterpriseConnectionStatus = connection.status;
   const badge = STATUS_BADGES[status];
 
   return (
@@ -118,7 +116,6 @@ export const SecuritySsoSection = (props: SecuritySsoSectionProps): JSX.Element 
           <ConfiguredContent
             {...props}
             isActive={status === 'active'}
-            onOptimisticActiveChange={setOptimisticActive}
           />
         </CardStateProvider>
       )}
@@ -154,66 +151,8 @@ const NotConfiguredContent = ({
   </Col>
 );
 
-/**
- * The display name of the role SSO-enrolled members are assigned — the environment's
- * default member role, name-mapped when the roles list is readable.
- */
-const useEnrollmentRoleName = (): string | undefined => {
-  const { organizationSettings } = useEnvironment();
-  const { options } = useFetchRoles();
-  const { localizeCustomRole } = useLocalizeCustomRoles();
-
-  // Mirrors the invite form's default-role resolution.
-  let roleKey = organizationSettings.domains.defaultRole ?? undefined;
-  if (!roleKey && options?.length === 1) {
-    roleKey = options[0].value;
-  }
-
-  if (!roleKey) {
-    return undefined;
-  }
-
-  return (
-    localizeCustomRole(roleKey) || options?.find(option => option.value === roleKey)?.label || humanizeRoleKey(roleKey)
-  );
-};
-
-/** `org:billing_admin` → `billing admin`. */
-const humanizeRoleKey = (roleKey: string): string => {
-  const lastSegment = roleKey.split(':').pop() ?? roleKey;
-  return lastSegment.replace(/[_-]+/g, ' ').trim() || roleKey;
-};
-
-const SsoDescription = (): JSX.Element => {
-  const roleName = useEnrollmentRoleName();
-
-  return (
-    <Col
-      gap={4}
-      sx={{ minWidth: 0 }}
-    >
-      <Text
-        elementDescriptor={descriptors.organizationProfileSecuritySsoDescription}
-        colorScheme='secondary'
-        localizationKey={localizationKeys('organizationProfile.securityPage.ssoSection.descriptionLine1')}
-      />
-      <Text
-        elementDescriptor={descriptors.organizationProfileSecuritySsoDescription}
-        colorScheme='secondary'
-        localizationKey={
-          roleName
-            ? localizationKeys('organizationProfile.securityPage.ssoSection.descriptionLine2', { role: roleName })
-            : localizationKeys('organizationProfile.securityPage.ssoSection.descriptionLine2__noRole')
-        }
-      />
-    </Col>
-  );
-};
-
 type ConfiguredContentProps = SecuritySsoSectionProps & {
-  /** Effective activation — an in-flight optimistic flip included. */
   isActive: boolean;
-  onOptimisticActiveChange: (active: boolean | undefined) => void;
 };
 
 const ConfiguredContent = (props: ConfiguredContentProps): JSX.Element => {
@@ -226,7 +165,6 @@ const ConfiguredContent = (props: ConfiguredContentProps): JSX.Element => {
     contentRef,
     onConfigure,
     isActive,
-    onOptimisticActiveChange,
   } = props;
   const card = useCardState();
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
@@ -242,17 +180,15 @@ const ConfiguredContent = (props: ConfiguredContentProps): JSX.Element => {
 
     card.setError(undefined);
     card.setLoading();
-    onOptimisticActiveChange(active);
 
     try {
       // A configured (active / inactive) connection guarantees the resource is set.
+      // The mutation revalidates before resolving, so the refreshed entity drives the settled UI.
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       await setConnectionActive(enterpriseConnection!.id, active);
     } catch (err) {
       handleError(err as Error, [], card.setError);
     } finally {
-      // The mutation revalidates before resolving, so the settled entity drives the UI from here.
-      onOptimisticActiveChange(undefined);
       card.setIdle();
     }
   };
@@ -299,7 +235,7 @@ const ConfiguredContent = (props: ConfiguredContentProps): JSX.Element => {
         elementDescriptor={descriptors.organizationProfileSecuritySsoDetailRows}
         gap={2}
         sx={t => ({
-          padding: t.space.$4,
+          padding: `${t.space.$3} ${t.space.$4}`,
           backgroundColor: t.colors.$colorBackground,
           borderWidth: t.borderWidths.$normal,
           borderStyle: t.borderStyles.$solid,
@@ -333,7 +269,7 @@ const ConfiguredContent = (props: ConfiguredContentProps): JSX.Element => {
           >
             <Flex
               justify='end'
-              align='center'
+              align='start'
               wrap='wrap'
               gap={1}
               sx={{ minWidth: 0 }}
@@ -388,6 +324,9 @@ const ConfiguredContent = (props: ConfiguredContentProps): JSX.Element => {
         isOpen={isResetDialogOpen}
         onClose={() => setIsResetDialogOpen(false)}
         confirmationValue={organizationName}
+        title={localizationKeys('organizationProfile.securityPage.removeDialog.title')}
+        subtitle={localizationKeys('organizationProfile.securityPage.removeDialog.subtitle')}
+        confirmButtonLabel={localizationKeys('organizationProfile.securityPage.removeDialog.confirmButton')}
         // A configured (active / inactive) connection guarantees the resource is set.
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         onDelete={() => deleteConnection(enterpriseConnection!.id)}
@@ -395,6 +334,62 @@ const ConfiguredContent = (props: ConfiguredContentProps): JSX.Element => {
       />
     </Col>
   );
+};
+
+const SsoDescription = (): JSX.Element => {
+  const roleName = useEnrollmentRoleName();
+
+  return (
+    <Col
+      gap={4}
+      sx={{ minWidth: 0 }}
+    >
+      <Text
+        elementDescriptor={descriptors.organizationProfileSecuritySsoDescription}
+        colorScheme='secondary'
+        localizationKey={localizationKeys('organizationProfile.securityPage.ssoSection.descriptionLine1')}
+      />
+      <Text
+        elementDescriptor={descriptors.organizationProfileSecuritySsoDescription}
+        colorScheme='secondary'
+        localizationKey={
+          roleName
+            ? localizationKeys('organizationProfile.securityPage.ssoSection.descriptionLine2', { role: roleName })
+            : localizationKeys('organizationProfile.securityPage.ssoSection.descriptionLine2__noRole')
+        }
+      />
+    </Col>
+  );
+};
+
+/**
+ * The display name of the role SSO-enrolled members are assigned — the environment's
+ * default member role, name-mapped when the roles list is readable.
+ */
+const useEnrollmentRoleName = (): string | undefined => {
+  const { organizationSettings } = useEnvironment();
+  const { options } = useFetchRoles();
+  const { localizeCustomRole } = useLocalizeCustomRoles();
+
+  // Mirrors the invite form's default-role resolution.
+  let roleKey = organizationSettings.domains.defaultRole ?? undefined;
+  if (!roleKey && options?.length === 1) {
+    roleKey = options[0].value;
+  }
+
+  if (!roleKey) {
+    return undefined;
+  }
+
+  return (
+    localizeCustomRole(roleKey) || options?.find(option => option.value === roleKey)?.label || humanizeRoleKey(roleKey)
+  );
+};
+
+/** `org:billing_admin` → `billing admin`. */
+const humanizeRoleKey = (roleKey: string): string => {
+  const lastSegment = roleKey.split(':').pop() ?? roleKey;
+  return lastSegment.replace(/[_-]+/g, ' ').trim() || roleKey;
 };
 
 type DetailRowProps = PropsWithChildren<{
@@ -439,7 +434,7 @@ const ValueChip = ({ id, children }: ValueChipProps): JSX.Element => (
     sx={{ maxWidth: '100%', minWidth: 0 }}
   >
     <Text
-      as='span'
+      as='p'
       variant='caption'
       truncate
       title={children}
@@ -462,6 +457,7 @@ const LinkChip = ({ id, href }: LinkChipProps): JSX.Element => (
     sx={{ maxWidth: '100%', minWidth: 0 }}
   >
     <Link
+      variant='caption'
       elementDescriptor={descriptors.organizationProfileSecuritySsoDetailRowLink}
       elementId={descriptors.organizationProfileSecuritySsoDetailRowLink.setId(id)}
       href={href}
