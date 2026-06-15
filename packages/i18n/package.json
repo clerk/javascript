@@ -42,23 +42,19 @@
     "clean": "rimraf ./dist",
     "dev": "tsdown --watch src",
     "lint": "eslint src",
-    "size": "size-limit",
-    "size:why": "size-limit --why",
     "test": "vitest run",
     "test:ci": "vitest run --maxWorkers=70%",
     "test:watch": "vitest"
   },
   "dependencies": {
-    "nanostores": "catalog:repo"
+    "nanostores": "1.3.0"
   },
   "devDependencies": {
-    "@size-limit/preset-small-lib": "catalog:repo",
     "@testing-library/react": "^16.0.0",
     "@types/react": "catalog:react",
     "react": "catalog:react",
     "react-dom": "catalog:react",
     "rimraf": "6.0.1",
-    "size-limit": "catalog:repo",
     "tsdown": "catalog:repo",
     "typescript": "catalog:repo"
   },
@@ -75,23 +71,5 @@
   },
   "publishConfig": {
     "access": "public"
-  },
-  "size-limit": [
-    {
-      "name": "createI18n",
-      "path": "dist/index.js",
-      "import": "{ createI18n }",
-      "limit": "2.2 kB"
-    },
-    {
-      "name": "react: useStore + Message",
-      "path": "dist/react/index.js",
-      "import": "{ useStore, Message }",
-      "ignore": [
-        "react",
-        "react-dom"
-      ],
-      "limit": "500 B"
-    }
-  ]
+  }
 }
