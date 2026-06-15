@@ -35,6 +35,7 @@ import { meta as selectMeta } from '../stories/select.stories';
 import { Default as TabsComponentDefault, meta as tabsComponentMeta } from '../stories/tabs.component.stories';
 import { meta as tabsMeta } from '../stories/tabs.stories';
 import { meta as tooltipMeta } from '../stories/tooltip.stories';
+import { meta as useDataTableMeta } from '../stories/use-data-table.stories';
 import { toSlug } from './slug';
 import type { StoryModule } from './types';
 
@@ -68,6 +69,8 @@ const selectModule: StoryModule = { meta: selectMeta };
 const tabsModule: StoryModule = { meta: tabsMeta };
 const tooltipModule: StoryModule = { meta: tooltipMeta };
 
+const useDataTableModule: StoryModule = { meta: useDataTableMeta };
+
 export const registry: StoryModule[] = [
   // AIO
   organizationProfileModule,
@@ -93,6 +96,8 @@ export const registry: StoryModule[] = [
   selectModule,
   tabsModule,
   tooltipModule,
+  // Hooks — alphabetical within the group.
+  useDataTableModule,
 ];
 
 /**
