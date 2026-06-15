@@ -2,7 +2,7 @@ import { fastDeepMergeAndReplace } from '@clerk/shared/utils';
 
 import { useMosaicAppearance } from './appearance';
 import { expandConditions } from './conditions';
-import { useMosaicTheme } from './MosaicProvider';
+import { useMosaicTheme } from './providers/mosaic-provider';
 import type { MosaicSlotId } from './registry';
 import { resolveSlotClassName, resolveSlotCss } from './resolveSlot';
 import type { SlotProps, StyleRule, SxProp } from './slot-recipe';

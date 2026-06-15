@@ -4,7 +4,7 @@ import type * as CSS from 'csstype';
 import { useMosaicAppearance } from './appearance';
 import { expandConditions } from './conditions';
 import type { MosaicConditionKey } from './conditions';
-import { useMosaicTheme } from './MosaicProvider';
+import { useMosaicTheme } from './providers/mosaic-provider';
 import { resolveSlotClassName, resolveSlotCss } from './resolveSlot';
 import { defaultMosaicVariables, resolveVariables } from './variables';
 import type { MosaicTheme } from './variables';

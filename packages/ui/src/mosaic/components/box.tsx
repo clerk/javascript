@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useMosaicTheme } from '../MosaicProvider';
+import { useMosaicTheme } from '../providers/mosaic-provider';
 import { Box as Primitive, type BoxProps as PrimitiveBoxProps } from '../primitives/box';
 import type { SxProp } from '../slot-recipe';
 
