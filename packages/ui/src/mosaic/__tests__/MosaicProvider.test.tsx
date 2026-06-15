@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { MosaicAppearance } from '../appearance';
 import { parseMosaicAppearance, useMosaicAppearance } from '../appearance';
-import { MosaicProvider, useMosaicTheme } from '../MosaicProvider';
+import { MosaicProvider, useMosaicTheme } from '../providers/mosaic-provider';
 
 const appearance: MosaicAppearance = {
   elements: {
@@ -42,7 +42,12 @@ describe('parseMosaicAppearance', () => {
 describe('MosaicProvider appearance context', () => {
   it('exposes [global, scoped] layers via useMosaicAppearance', () => {
     const { result } = renderHook(() => useMosaicAppearance(), {
-      wrapper: ({ children }) => React.createElement(MosaicProvider, { appearance, scope: 'signIn' }, children),
+      wrapper: ({ children }) =>
+        React.createElement(
+          MosaicProvider,
+          { appearance: { elements: appearance.elements, scope: 'signIn' } },
+          children,
+        ),
     });
     expect(result.current).toEqual([{ button: { color: 'green' } }, { button: { color: 'red' } }]);
   });

@@ -1,6 +1,6 @@
 'use client';
 
-import { MosaicProvider } from '@clerk/ui/mosaic/MosaicProvider';
+import { MosaicProvider } from '@clerk/ui/mosaic/providers/mosaic-provider';
 import { Layers2Icon } from 'lucide-react';
 import type React from 'react';
 import { useState } from 'react';
@@ -32,7 +32,15 @@ export function StoryEmbed({ name, storyModule, composition }: StoryEmbedProps) 
 
   const preview = (
     <div className='flex min-h-20 items-center justify-center p-6'>
-      <MosaicProvider>
+      <MosaicProvider
+        localization={{
+          overrides: {
+            organizationProfile: {
+              title: 'hello world',
+            },
+          },
+        }}
+      >
         <StoryComp {...defaultValues} />
       </MosaicProvider>
     </div>

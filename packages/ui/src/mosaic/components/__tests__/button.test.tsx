@@ -3,7 +3,7 @@ import React from 'react';
 import { describe, expect, it } from 'vitest';
 
 import type { MosaicAppearance } from '../../appearance';
-import { MosaicProvider } from '../../MosaicProvider';
+import { MosaicProvider } from '../../providers/mosaic-provider';
 import { Button } from '../button';
 
 /** Concatenates every inserted Emotion `<style>` rule (whitespace-stripped) for substring assertions. */
@@ -64,10 +64,7 @@ describe('Mosaic Button', () => {
       },
     };
     render(
-      <MosaicProvider
-        appearance={appearance}
-        scope='signIn'
-      >
+      <MosaicProvider appearance={{ ...appearance, scope: 'signIn' }}>
         <Button>Hi</Button>
       </MosaicProvider>,
     );
