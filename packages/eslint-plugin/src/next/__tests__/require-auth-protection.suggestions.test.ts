@@ -307,6 +307,34 @@ export default async function Page() {
       ],
     },
     {
+      name: 'namespace import before named import: merges auth into named import',
+      code: `import * as clerk from '@clerk/nextjs/server';
+import { currentUser } from '@clerk/nextjs/server';
+
+export default function Page() {
+  return null;
+}`,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+      errors: [
+        {
+          messageId: 'missingProtect',
+          suggestions: [
+            {
+              messageId: 'addAuthProtect',
+              output: `import * as clerk from '@clerk/nextjs/server';
+import { currentUser, auth } from '@clerk/nextjs/server';
+
+export default async function Page() {
+  await auth.protect();
+  return null;
+}`,
+            },
+          ],
+        },
+      ],
+    },
+    {
       name: 'existing await auth() destructure: merges .protect() into the call',
       code: `import { auth } from '@clerk/nextjs/server';
 

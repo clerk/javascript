@@ -232,7 +232,7 @@ function ensureAuthImportFix(
     if (last) {
       return fixer.insertTextAfter(last, ', auth');
     }
-    break;
+    continue;
   }
 
   const importText = `import { auth } from '${CLERK_AUTH_SOURCE}';`;
