@@ -73,9 +73,16 @@ export function createI18n($locale: ReadableStore<string>, options: CreateI18nOp
       inFlight++;
       $loading.set(true);
       return (
-        Promise.resolve(get(locale))
+        Promise.resolve()
+          .then(() => get(locale))
           .then(data => {
-            const merged: NamespaceData = Array.isArray(data) ? Object.assign({}, ...data) : (data ?? {});
+            const chunks = Array.isArray(data) ? data : [data ?? {}];
+            const merged = Object.create(null) as NamespaceData;
+            for (const chunk of chunks) {
+              for (const ns of Object.keys(chunk)) {
+                merged[ns] = Object.assign(merged[ns] ?? Object.create(null), chunk[ns]);
+              }
+            }
             const next: LocaleCache = { ...$resolved.get() };
             next[locale] = { ...next[locale], ...merged };
             $resolved.set(next);

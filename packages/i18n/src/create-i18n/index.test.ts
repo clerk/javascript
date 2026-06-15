@@ -158,8 +158,9 @@ describe('createI18n', () => {
 
       expect(i18n.loading.get()).toBe(false);
       $locale.set('fr');
-      expect(i18n.loading.get()).toBe(true); // fetch scheduled synchronously
+      expect(i18n.loading.get()).toBe(true); // loading flag flips synchronously
 
+      await Promise.resolve(); // allow the deferred get() call to run
       resolve({ common: { hi: 'Bonjour' } });
       await flush();
       expect(i18n.loading.get()).toBe(false);

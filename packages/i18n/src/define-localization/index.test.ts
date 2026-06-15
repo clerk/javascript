@@ -68,4 +68,13 @@ describe('defineLocalization', () => {
       common: { items: forms, cta: { ios: 'Tap', android: 'Click' } },
     });
   });
+
+  it('ignores dangerous prototype-polluting keys', () => {
+    const before = Object.prototype.hasOwnProperty('polluted');
+    defineLocalization({ __proto__: { polluted: true } } as never);
+    defineLocalization({ 'constructor.polluted': true } as never);
+    defineLocalization({ signIn: { __proto__: 'bad' } } as never);
+    expect(Object.prototype.hasOwnProperty('polluted')).toBe(before);
+    expect(({} as Record<string, unknown>).polluted).toBeUndefined();
+  });
 });
