@@ -33,6 +33,7 @@ public protocol ClerkNativeBridgeProtocol {
   func getSession() async -> [String: Any]?
   func getClientToken() async -> String?
   func refreshClient() async throws
+  func signOut(sessionId: String?) async throws
 }
 
 public protocol ClerkNativeBridgeReadyObserver: AnyObject {
@@ -94,9 +95,9 @@ class ClerkExpoModule: RCTEventEmitter {
 
   /// Emits a refreshClient event to JS from anywhere in the native layer.
   /// Used by native views to ask ClerkProvider to reload JS client state.
-  static func emitRefreshClient() {
+  static func emitRefreshClient(_ body: [String: Any]? = nil) {
     guard _hasListeners, let instance = sharedInstance else { return }
-    instance.sendEvent(withName: "refreshClient", body: nil)
+    instance.sendEvent(withName: "refreshClient", body: body ?? [:])
   }
 
   // MARK: - configure
@@ -169,9 +170,29 @@ class ClerkExpoModule: RCTEventEmitter {
     }
   }
 
+  // MARK: - signOut
+
+  @objc func signOut(_ sessionId: String?,
+                     resolve: @escaping RCTPromiseResolveBlock,
+                     reject: @escaping RCTPromiseRejectBlock) {
+    guard let bridge = clerkNativeBridge else {
+      resolve(nil)
+      return
+    }
+
+    Task {
+      do {
+        try await bridge.signOut(sessionId: sessionId)
+        resolve(nil)
+      } catch {
+        reject("E_SIGN_OUT_FAILED", error.localizedDescription, error)
+      }
+    }
+  }
+
 }
 
 /// Requests that ClerkProvider reload the JS client from native client state.
-public func emitClerkNativeRefreshClient() {
-  ClerkExpoModule.emitRefreshClient()
+public func emitClerkNativeRefreshClient(_ body: [String: Any]? = nil) {
+  ClerkExpoModule.emitRefreshClient(body)
 }

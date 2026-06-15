@@ -10,6 +10,7 @@ interface Spec {
   getSession(): Promise<NativeMap | null>;
   getClientToken(): Promise<string | null>;
   refreshClient(): Promise<void>;
+  signOut(sessionId: string | null): Promise<void>;
   removeListeners?(count: number): void;
 }
 

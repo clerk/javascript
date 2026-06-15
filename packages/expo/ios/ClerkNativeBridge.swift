@@ -24,9 +24,18 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
   var darkTheme: ClerkTheme?
 
   private var clientObservationGeneration = 0
-  private var lastObservedClient: Client?
+  private var lastObservedAuthState: AuthStateSnapshot?
+  private var authEventObservationTask: Swift.Task<Void, Never>?
 
   private init() {}
+
+  private struct AuthStateSnapshot: Equatable {
+    let clientId: String?
+    let sessionId: String?
+    let userId: String?
+    let sessionIds: [String]
+    let deviceToken: String?
+  }
 
   /// Resolves the keychain service name, checking ClerkKeychainService in Info.plist first
   /// (for extension apps sharing a keychain group), then falling back to the bundle identifier.
@@ -50,6 +59,7 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
       Self.clerkConfigured = true
       Self.configuredPublishableKey = publishableKey
       startClientObserver(reset: true)
+      startAuthEventObserver(reset: true)
 
       let shouldWaitForSession = try await Self.syncTokenState(bearerToken: bearerToken)
       await Self.waitForLoadedSessionIfNeeded(shouldWaitForSession)
@@ -59,6 +69,7 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
 
     if Self.clerkConfigured {
       startClientObserver()
+      startAuthEventObserver()
       let shouldWaitForSession = try await Self.syncTokenState(bearerToken: bearerToken)
       await Self.waitForLoadedSessionIfNeeded(shouldWaitForSession)
       emitClerkNativeBridgeReady()
@@ -69,6 +80,7 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
     Self.configuredPublishableKey = publishableKey
     Clerk.configure(publishableKey: publishableKey, options: Self.makeClerkOptions())
     startClientObserver()
+    startAuthEventObserver()
 
     let shouldWaitForSession = try await Self.syncTokenState(bearerToken: bearerToken)
     await Self.waitForLoadedSessionIfNeeded(shouldWaitForSession)
@@ -81,29 +93,93 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
 
     clientObservationGeneration += 1
     let generation = clientObservationGeneration
-    lastObservedClient = Clerk.shared.client
+    lastObservedAuthState = Self.authStateSnapshot()
     observeClient(generation: generation)
   }
 
   @MainActor
   private func observeClient(generation: Int) {
     withObservationTracking {
-      _ = Clerk.shared.client
+      _ = Self.authStateSnapshot()
     } onChange: { [weak self] in
       Task { @MainActor [weak self] in
         await Task.yield()
 
         guard let self, generation == self.clientObservationGeneration else { return }
 
-        let newClient = Clerk.shared.client
-        if newClient != self.lastObservedClient {
-          self.lastObservedClient = newClient
-          emitClerkNativeRefreshClient()
+        let newAuthState = Self.authStateSnapshot()
+        if newAuthState != self.lastObservedAuthState {
+          self.lastObservedAuthState = newAuthState
+          emitClerkNativeRefreshClient(Self.authStatePayload())
         }
 
         self.observeClient(generation: generation)
       }
     }
+  }
+
+  @MainActor
+  private func startAuthEventObserver(reset: Bool = false) {
+    if reset {
+      authEventObservationTask?.cancel()
+      authEventObservationTask = nil
+    }
+
+    guard authEventObservationTask == nil else { return }
+
+    authEventObservationTask = Swift.Task { @MainActor [weak self] in
+      for await event in Clerk.shared.auth.events {
+        await self?.handleAuthEvent(event)
+      }
+    }
+  }
+
+  @MainActor
+  private func handleAuthEvent(_ event: AuthEvent) async {
+    switch event {
+    case .sessionChanged(_, _), .signInCompleted(_), .signUpCompleted(_):
+      emitClerkNativeRefreshClient(Self.authStatePayload())
+    case .signedOut(_), .accountDeleted:
+      do {
+        _ = try await Clerk.shared.refreshClient()
+      } catch {
+        // The auth event still represents the latest user action; emit below so
+        // JS consumers can clear stale state even if the follow-up refresh fails.
+      }
+      emitClerkNativeRefreshClient(Self.authStatePayload())
+    case .signInNeedsContinuation(_), .signUpNeedsContinuation(_), .tokenRefreshed(_):
+      break
+    }
+  }
+
+  @MainActor
+  private static func authStateSnapshot() -> AuthStateSnapshot {
+    let client = Clerk.shared.client
+    let session = Clerk.shared.session
+
+    return AuthStateSnapshot(
+      clientId: client?.id,
+      sessionId: session?.id,
+      userId: Clerk.shared.user?.id,
+      sessionIds: client?.sessions.map(\.id) ?? [],
+      deviceToken: Clerk.shared.deviceToken
+    )
+  }
+
+  @MainActor
+  private static func authStatePayload() -> [String: Any] {
+    var payload: [String: Any] = [:]
+    payload["sessionId"] = Clerk.shared.session?.id ?? NSNull()
+    payload["clientToken"] = Clerk.shared.deviceToken ?? NSNull()
+
+    if let session = Clerk.shared.session {
+      payload.merge(sessionPayload(from: session, user: session.user ?? Clerk.shared.user)) { _, new in new }
+    } else {
+      payload["session"] = NSNull()
+      payload["user"] = NSNull()
+    }
+
+    return payload
   }
 
   @MainActor
@@ -133,6 +209,16 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
     // The static configure() fires off async refreshes; poll until loaded.
     for _ in 0..<clerkLoadMaxAttempts {
       if Clerk.shared.isLoaded && Clerk.shared.session != nil && Clerk.shared.user != nil {
+        return
+      }
+      try? await Task.sleep(nanoseconds: clerkLoadIntervalNs)
+    }
+  }
+
+  @MainActor
+  private static func waitForLoadedClient() async {
+    for _ in 0..<clerkLoadMaxAttempts {
+      if Clerk.shared.isLoaded {
         return
       }
       try? await Task.sleep(nanoseconds: clerkLoadIntervalNs)
@@ -210,7 +296,17 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
   public func refreshClient() async throws {
     guard Self.clerkConfigured else { return }
     _ = try await Clerk.shared.refreshClient()
-    await Self.waitForLoadedSession()
+    await Self.waitForLoadedClient()
+    emitClerkNativeBridgeReady()
+  }
+
+  @MainActor
+  public func signOut(sessionId: String?) async throws {
+    guard Self.clerkConfigured else { return }
+    try await Clerk.shared.auth.signOut(sessionId: sessionId)
+    _ = try await Clerk.shared.refreshClient()
+    await Self.waitForLoadedClient()
+    emitClerkNativeRefreshClient(Self.authStatePayload())
     emitClerkNativeBridgeReady()
   }
 

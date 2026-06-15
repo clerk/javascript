@@ -41,7 +41,8 @@ class ClerkExpoModule : Module() {
         private var sharedInstance: ClerkExpoModule? = null
 
         fun emitRefreshClient() {
-            sharedInstance?.sendEvent("refreshClient", emptyMap<String, Any?>())
+            val instance = sharedInstance ?: return
+            instance.sendEvent("refreshClient", instance.currentAuthStatePayload())
         }
     }
 
@@ -77,6 +78,10 @@ class ClerkExpoModule : Module() {
         AsyncFunction("refreshClient") { promise: Promise ->
             refreshClient(promise)
         }
+
+        AsyncFunction("signOut") { sessionId: String?, promise: Promise ->
+            signOut(sessionId, promise)
+        }
     }
 
     private val reactContext: Context?
@@ -99,6 +104,44 @@ class ClerkExpoModule : Module() {
                 emitRefreshClient()
             }
         }
+    }
+
+    private fun currentAuthStatePayload(): Map<String, Any?> {
+        val session = Clerk.session
+        val user = Clerk.user
+        val result = mutableMapOf<String, Any?>(
+            "sessionId" to session?.id,
+            "clientToken" to try {
+                Clerk.getDeviceToken()
+            } catch (e: Exception) {
+                debugLog(TAG, "currentAuthStatePayload - getDeviceToken failed: ${e.message}")
+                null
+            }
+        )
+
+        result["session"] = session?.let {
+            mapOf(
+                "id" to it.id,
+                "status" to it.status.name,
+                "userId" to it.user?.id
+            )
+        }
+
+        result["user"] = user?.let {
+            val primaryEmail = it.emailAddresses?.find { e -> e.id == it.primaryEmailAddressId }
+            val primaryPhone = it.phoneNumbers.find { p -> p.id == it.primaryPhoneNumberId }
+
+            mapOf(
+                "id" to it.id,
+                "firstName" to it.firstName,
+                "lastName" to it.lastName,
+                "imageUrl" to it.imageUrl,
+                "primaryEmailAddress" to primaryEmail?.emailAddress,
+                "primaryPhoneNumber" to primaryPhone?.phoneNumber
+            )
+        }
+
+        return result
     }
 
     // MARK: - configure
@@ -255,34 +298,7 @@ class ClerkExpoModule : Module() {
             return
         }
 
-        val session = Clerk.session
-        val user = Clerk.user
-
-        val result = mutableMapOf<String, Any?>()
-
-        session?.let {
-            result["session"] = mapOf(
-                "id" to it.id,
-                "status" to it.status.name,
-                "userId" to it.user?.id
-            )
-        }
-
-        user?.let {
-            val primaryEmail = it.emailAddresses?.find { e -> e.id == it.primaryEmailAddressId }
-            val primaryPhone = it.phoneNumbers.find { p -> p.id == it.primaryPhoneNumberId }
-
-            result["user"] = mapOf(
-                "id" to it.id,
-                "firstName" to it.firstName,
-                "lastName" to it.lastName,
-                "imageUrl" to it.imageUrl,
-                "primaryEmailAddress" to primaryEmail?.emailAddress,
-                "primaryPhoneNumber" to primaryPhone?.phoneNumber
-            )
-        }
-
-        promise.resolve(result)
+        promise.resolve(currentAuthStatePayload())
     }
 
     // MARK: - getClientToken
@@ -320,6 +336,33 @@ class ClerkExpoModule : Module() {
                 }
             } catch (e: Exception) {
                 promise.reject("E_REFRESH_CLIENT_FAILED", e.message ?: "Client refresh failed", e)
+            }
+        }
+    }
+
+    // MARK: - signOut
+
+    private fun signOut(sessionId: String?, promise: Promise) {
+        if (!Clerk.isInitialized.value) {
+            promise.resolve(null)
+            return
+        }
+
+        coroutineScope.launch {
+            try {
+                when (val result = Clerk.auth.signOut(sessionId = sessionId)) {
+                    is ClerkResult.Failure -> promise.reject(
+                        "E_SIGN_OUT_FAILED",
+                        result.error?.firstMessage() ?: result.throwable?.message ?: "Sign-out failed",
+                        null
+                    )
+                    is ClerkResult.Success -> {
+                        emitRefreshClient()
+                        promise.resolve(null)
+                    }
+                }
+            } catch (e: Exception) {
+                promise.reject("E_SIGN_OUT_FAILED", e.message ?: "Sign-out failed", e)
             }
         }
     }
