@@ -18,7 +18,7 @@ function serialize(value: unknown): unknown {
   }
   if (value && typeof value === 'object') {
     const out: Record<string, unknown> = {};
-    for (const key in value as Record<string, unknown>) {
+    for (const key of Object.keys(value as Record<string, unknown>)) {
       out[key] = serialize((value as Record<string, unknown>)[key]);
     }
     return out;
@@ -41,7 +41,7 @@ export function messagesToJSON(...messages: SourceStore[]): Record<string, unkno
   const out: Record<string, unknown> = {};
   for (const { namespace, base } of messages) {
     const ns = (out[namespace] ??= {}) as Record<string, unknown>;
-    for (const key in base) {
+    for (const key of Object.keys(base)) {
       ns[key] = serialize(base[key]);
     }
   }
