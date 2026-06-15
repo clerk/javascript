@@ -32,57 +32,14 @@ const config = {
   public: ['app/(routes)/(unauthenticated)/**'],
 };
 
-// The rule offers an `addAuthProtect` suggestion for every `missingProtect`
-// report, and ESLint's RuleTester requires each suggestion to declare its
-// `output`. Rather than hand-maintaining a fixed snapshot on every detection
-// case (this test file is about detection, not the fix), derive the expected
-// suggestion output from the rule itself and attach it per error. Exact
-// suggestion outputs are asserted in require-auth-protection.suggestions.test.ts.
-// RuleTester still independently verifies each suggestion produces valid syntax.
-const suggestionLinter = new Linter({ cwd: projectRoot });
-
-function lintMessages(testCase: RuleTester.InvalidTestCase): LinterTypes.LintMessage[] {
-  return suggestionLinter.verify(
-    testCase.code,
-    {
-      files: ['**/*.{js,jsx,ts,tsx,mjs,cjs}'],
-      languageOptions: {
-        parser: tsParser as unknown as LinterTypes.Parser,
-        ecmaVersion: 'latest',
-        sourceType: 'module',
-        parserOptions: { ecmaFeatures: { jsx: true } },
-      },
-      plugins: { '@clerk/next': { rules: { 'require-auth-protection': rule } } },
-      rules: { '@clerk/next/require-auth-protection': ['error', ...((testCase.options ?? []) as unknown[])] },
-    } as unknown as LinterTypes.Config,
-    typeof testCase.filename === 'string' ? testCase.filename : undefined,
-  );
-}
-
-function attachSuggestionOutputs(cases: RuleTester.InvalidTestCase[]): RuleTester.InvalidTestCase[] {
-  return cases.map(testCase => {
-    if (!Array.isArray(testCase.errors)) {
-      return testCase;
-    }
-    const messages = lintMessages(testCase).filter(m => m.ruleId === '@clerk/next/require-auth-protection');
-    const errors = testCase.errors.map((error, index) => {
-      const suggestions = messages[index]?.suggestions;
-      if (typeof error === 'string' || !suggestions || suggestions.length === 0) {
-        return error;
-      }
-      return {
-        ...error,
-        suggestions: suggestions.map(suggestion => ({
-          messageId: suggestion.messageId,
-          output:
-            testCase.code.slice(0, suggestion.fix.range[0]) +
-            suggestion.fix.text +
-            testCase.code.slice(suggestion.fix.range[1]),
-        })),
-      };
-    });
-    return { ...testCase, errors };
-  });
+// suggestions.test.ts already tests the suggestions, so we override with
+// count-only (`suggestions: 1`) to avoid asserting the fix
+function missingProtectError(data?: Record<string, string>): RuleTester.TestCaseError {
+  return {
+    messageId: 'missingProtect',
+    ...(data ? { data } : {}),
+    suggestions: 1,
+  } as unknown as RuleTester.TestCaseError;
 }
 
 ruleTester.run('require-auth-protection', rule, {
@@ -985,7 +942,7 @@ ruleTester.run('require-auth-protection', rule, {
     },
   ],
 
-  invalid: attachSuggestionOutputs([
+  invalid: [
     {
       name: 'protected page missing protect call',
       code: `
@@ -995,7 +952,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/dashboard/page.tsx'),
       options: [config],
-      errors: [{ messageId: 'missingProtect' }],
+      errors: [missingProtectError()],
     },
     {
       name: 'type-only auth import does not provide a runtime binding',
@@ -1032,7 +989,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/dashboard/page.tsx'),
       options: [config],
-      errors: [{ messageId: 'missingProtect' }],
+      errors: [missingProtectError()],
     },
     {
       name: 'await auth() in a later declarator does not count — earlier code ran first',
@@ -1046,7 +1003,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/dashboard/page.tsx'),
       options: [config],
-      errors: [{ messageId: 'missingProtect' }],
+      errors: [missingProtectError()],
     },
     {
       name: 'protected page with non-async default export',
@@ -1057,7 +1014,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/dashboard/page.tsx'),
       options: [config],
-      errors: [{ messageId: 'missingProtect' }],
+      errors: [missingProtectError()],
     },
     {
       name: 'protected page exporting local as default via specifier, missing protect',
@@ -1069,7 +1026,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/dashboard/page.tsx'),
       options: [config],
-      errors: [{ messageId: 'missingProtect' }],
+      errors: [missingProtectError()],
     },
     {
       name: 'protected page re-exporting default from another module (`export { default } from`)',
@@ -1108,7 +1065,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/dashboard/page.tsx'),
       options: [config],
-      errors: [{ messageId: 'missingProtect' }],
+      errors: [missingProtectError()],
     },
     {
       name: 'protected page with protect call after a return',
@@ -1121,7 +1078,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/dashboard/page.tsx'),
       options: [config],
-      errors: [{ messageId: 'missingProtect' }],
+      errors: [missingProtectError()],
     },
     {
       name: 'protected route handler with one method missing protect',
@@ -1137,7 +1094,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/api/things/route.ts'),
       options: [config],
-      errors: [{ messageId: 'missingProtect' }],
+      errors: [missingProtectError()],
     },
     {
       name: 'disabled serverComponentEntrypoints resource still checks route handlers',
@@ -1165,7 +1122,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/api/things/route.ts'),
       options: [config],
-      errors: [{ messageId: 'missingProtect', data: { subject: 'POST handler' } }],
+      errors: [missingProtectError({ subject: 'POST handler' })],
     },
     {
       name: 'route handler renamed via `as`, local missing protect (reported under exported name)',
@@ -1177,7 +1134,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/api/things/route.ts'),
       options: [config],
-      errors: [{ messageId: 'missingProtect', data: { subject: 'POST handler' } }],
+      errors: [missingProtectError({ subject: 'POST handler' })],
     },
     {
       name: 'route handler re-exported from another module via specifier with source',
@@ -1249,7 +1206,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/admin/users/actions.ts'),
       options: [config],
-      errors: [{ messageId: 'missingProtect' }],
+      errors: [missingProtectError()],
     },
     {
       name: 'default Server Function missing protect',
@@ -1261,7 +1218,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/admin/users/actions.ts'),
       options: [config],
-      errors: [{ messageId: 'missingProtect', data: { subject: 'Server Function' } }],
+      errors: [missingProtectError({ subject: 'Server Function' })],
     },
     {
       name: 'Server Function declared above and re-exported via specifier, missing protect',
@@ -1274,12 +1231,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/admin/users/actions.ts'),
       options: [config],
-      errors: [
-        {
-          messageId: 'missingProtect',
-          data: { subject: "Server Function 'deleteUser'" },
-        },
-      ],
+      errors: [missingProtectError({ subject: "Server Function 'deleteUser'" })],
     },
     {
       name: 'Server Function specifier export resolves to HOF (unknown), reported as unverifiable',
@@ -1365,7 +1317,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/dashboard/page.tsx'),
       options: [config],
-      errors: [{ messageId: 'missingProtect', data: { subject: 'Inline Server Function' } }],
+      errors: [missingProtectError({ subject: 'Inline Server Function' })],
     },
     {
       name: 'protected non-resource module with inline Server Function missing protect',
@@ -1380,7 +1332,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/admin/users/users-panel.tsx'),
       options: [config],
-      errors: [{ messageId: 'missingProtect', data: { subject: 'Inline Server Function' } }],
+      errors: [missingProtectError({ subject: 'Inline Server Function' })],
     },
     {
       name: 'protected-only layout without protect call',
@@ -1391,7 +1343,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/(routes)/(org-level)/apps/layout.tsx'),
       options: [config],
-      errors: [{ messageId: 'missingProtect' }],
+      errors: [missingProtectError()],
     },
     {
       name: 'protected-only template without protect call',
@@ -1402,7 +1354,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/(routes)/(org-level)/apps/template.tsx'),
       options: [config],
-      errors: [{ messageId: 'missingProtect' }],
+      errors: [missingProtectError()],
     },
     {
       name: 'mixed-scope template not listed in mixedScopeLayouts (explicit mode, warns)',
@@ -1458,7 +1410,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/dashboard/page.tsx'),
       options: [config],
-      errors: [{ messageId: 'missingProtect' }],
+      errors: [missingProtectError()],
     },
     {
       name: 'await params before protect is NOT accepted (no preamble allowlist)',
@@ -1472,7 +1424,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/dashboard/[id]/page.tsx'),
       options: [config],
-      errors: [{ messageId: 'missingProtect' }],
+      errors: [missingProtectError()],
     },
     {
       name: 'await searchParams before protect is NOT accepted (no preamble allowlist)',
@@ -1486,7 +1438,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/dashboard/page.tsx'),
       options: [config],
-      errors: [{ messageId: 'missingProtect' }],
+      errors: [missingProtectError()],
     },
     {
       name: 'await headers() before protect is NOT accepted (no preamble allowlist)',
@@ -1501,7 +1453,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/dashboard/page.tsx'),
       options: [config],
-      errors: [{ messageId: 'missingProtect' }],
+      errors: [missingProtectError()],
     },
     {
       name: 'directive followed by sync assignment before protect is NOT accepted',
@@ -1516,7 +1468,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/dashboard/page.tsx'),
       options: [config],
-      errors: [{ messageId: 'missingProtect' }],
+      errors: [missingProtectError()],
     },
     {
       name: 'voided prefetch before protect is NOT accepted (effectful, no await)',
@@ -1530,7 +1482,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/dashboard/page.tsx'),
       options: [config],
-      errors: [{ messageId: 'missingProtect' }],
+      errors: [missingProtectError()],
     },
     {
       name: 'synchronous assignment before protect is NOT accepted',
@@ -1544,7 +1496,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/dashboard/page.tsx'),
       options: [config],
-      errors: [{ messageId: 'missingProtect' }],
+      errors: [missingProtectError()],
     },
     {
       name: 'statement between auth() destructure and guard is NOT accepted',
@@ -1559,7 +1511,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/dashboard/page.tsx'),
       options: [config],
-      errors: [{ messageId: 'missingProtect' }],
+      errors: [missingProtectError()],
     },
     {
       name: 'side effect in same declaration as auth() destructure is NOT accepted',
@@ -1573,7 +1525,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/dashboard/page.tsx'),
       options: [config],
-      errors: [{ messageId: 'missingProtect' }],
+      errors: [missingProtectError()],
     },
     {
       name: 'preamble matched but with mixed non-preamble in same VariableDeclaration',
@@ -1587,7 +1539,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/dashboard/[id]/page.tsx'),
       options: [config],
-      errors: [{ messageId: 'missingProtect' }],
+      errors: [missingProtectError()],
     },
     {
       name: 'manual check: userId === undefined is NOT accepted (server userId is never undefined)',
@@ -1601,7 +1553,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/dashboard/page.tsx'),
       options: [config],
-      errors: [{ messageId: 'missingProtect' }],
+      errors: [missingProtectError()],
     },
     {
       name: 'manual check: orgId === null is NOT accepted (orgId can be null while signed in)',
@@ -1616,7 +1568,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/dashboard/page.tsx'),
       options: [config],
-      errors: [{ messageId: 'missingProtect' }],
+      errors: [missingProtectError()],
     },
     {
       name: 'manual check: consequent does not exit (just logs)',
@@ -1630,7 +1582,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/dashboard/page.tsx'),
       options: [config],
-      errors: [{ messageId: 'missingProtect' }],
+      errors: [missingProtectError()],
     },
     {
       name: 'manual check: only a conditional (non-guaranteed) exit in the guard block is NOT accepted',
@@ -1646,7 +1598,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/dashboard/page.tsx'),
       options: [config],
-      errors: [{ messageId: 'missingProtect' }],
+      errors: [missingProtectError()],
     },
     {
       name: 'manual check: awaited work between destructure and guard',
@@ -1661,7 +1613,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/dashboard/page.tsx'),
       options: [config],
-      errors: [{ messageId: 'missingProtect' }],
+      errors: [missingProtectError()],
     },
     {
       name: 'manual check: inverted condition (userId !== null)',
@@ -1675,7 +1627,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/dashboard/page.tsx'),
       options: [config],
-      errors: [{ messageId: 'missingProtect' }],
+      errors: [missingProtectError()],
     },
     {
       name: 'manual check: aliased destructure not recognized',
@@ -1689,7 +1641,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/dashboard/page.tsx'),
       options: [config],
-      errors: [{ messageId: 'missingProtect' }],
+      errors: [missingProtectError()],
     },
     {
       name: 'function declaration + identifier default export, function lacks protect',
@@ -1701,7 +1653,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/dashboard/page.tsx'),
       options: [config],
-      errors: [{ messageId: 'missingProtect' }],
+      errors: [missingProtectError()],
     },
     {
       name: 'imported and re-exported as default (rule cannot follow imports)',
@@ -1760,9 +1712,9 @@ ruleTester.run('require-auth-protection', rule, {
           public: [],
         },
       ],
-      errors: [{ messageId: 'missingProtect' }],
+      errors: [missingProtectError()],
     },
-  ]),
+  ],
 });
 
 describe('require-auth-protection schema validation', () => {
