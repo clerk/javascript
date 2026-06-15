@@ -141,7 +141,8 @@ const NotConfiguredContent = ({
     <Button
       elementDescriptor={descriptors.organizationProfileSecuritySsoConfigureButton}
       elementId={descriptors.organizationProfileSecuritySsoConfigureButton.setId(primaryButtonId)}
-      variant='outline'
+      variant='bordered'
+      colorScheme='secondary'
       size='sm'
       onClick={onConfigure}
       localizationKey={primaryButtonKey}
