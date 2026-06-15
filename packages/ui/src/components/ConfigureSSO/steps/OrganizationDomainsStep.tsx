@@ -36,8 +36,10 @@ import { useWizard } from '../elements/Wizard/WizardContext';
 export const OrganizationDomainsStep = (): JSX.Element => {
   const { t } = useLocalizations();
   const {
+    enterpriseConnection,
     organizationDomains,
     organizationDomainMutations: { createDomain, revalidate },
+    enterpriseConnectionMutations: { updateConnection },
   } = useConfigureSSO();
   const { goPrev, goNext, isFirstStep, isLastStep } = useWizard();
   const card = useCardState();
@@ -47,6 +49,15 @@ export const OrganizationDomainsStep = (): JSX.Element => {
 
     try {
       await createDomain(domain);
+
+      // When the connection already exists, keep its domain list in sync by
+      // patching the new domain onto it. On the fresh-start path the connection
+      // does not exist yet, so we only create the domain here and let the
+      // connection be created with all domains on the select-provider step.
+      if (enterpriseConnection) {
+        const domains = Array.from(new Set([...enterpriseConnection.domains, domain]));
+        await updateConnection(enterpriseConnection.id, { domains });
+      }
     } catch (err: any) {
       const apiError = getFieldError(err) ?? getGlobalError(err);
       card.setError(apiError);

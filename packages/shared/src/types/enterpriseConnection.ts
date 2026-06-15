@@ -153,6 +153,7 @@ export type CreateMeEnterpriseConnectionParams = CreateOrganizationEnterpriseCon
 
 export type UpdateOrganizationEnterpriseConnectionParams = {
   name?: string | null;
+  domains?: string[];
   active?: boolean | null;
   syncUserAttributes?: boolean | null;
   disableAdditionalIdentifications?: boolean | null;
