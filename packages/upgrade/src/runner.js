@@ -158,6 +158,10 @@ function loadMatchers(config, sdk) {
   });
 }
 
+/**
+ * Finds candidate files for scanner matchers, applying built-in ignores,
+ * user-provided ignores, and .gitignore entries unless disabled.
+ */
 async function getFilesToScan(cwd, options) {
   // NOTE: tinyglobby recommends shelling out to git for .gitignore support instead of
   // implementing it internally:

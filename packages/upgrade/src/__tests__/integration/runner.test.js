@@ -157,6 +157,20 @@ describe('runCodemods', () => {
 describe('runScans', () => {
   let fixture;
 
+  const createScanConfig = (matcher = /afterSignInUrl/g) => ({
+    changes: [
+      {
+        title: 'Test scan change',
+        matcher,
+        packages: ['*'],
+        category: 'breaking',
+        warning: false,
+        docsAnchor: 'test',
+        content: 'Test',
+      },
+    ],
+  });
+
   beforeEach(() => {
     fixture = createTempFixture('nextjs-v6');
   });
@@ -234,23 +248,10 @@ describe('runScans', () => {
   });
 
   it('scans extensionless node scripts as text files', async () => {
-    const config = await loadConfig('nextjs', 6);
-    config.changes = [
-      {
-        title: 'Test extensionless script',
-        matcher: /afterSignInUrl/g,
-        packages: ['*'],
-        category: 'breaking',
-        warning: false,
-        docsAnchor: 'test',
-        content: 'Test',
-      },
-    ];
-
     const content = '#!/usr/bin/env node\nafterSignInUrl\n';
     fs.writeFileSync(path.join(fixture.path, 'run'), content, 'utf8');
 
-    const results = await runScans(config, 'nextjs', {
+    const results = await runScans(createScanConfig(), 'nextjs', {
       dir: fixture.path,
       ignore: [],
     });
@@ -260,13 +261,13 @@ describe('runScans', () => {
   });
 
   it('skips binary files that are not covered by ignore globs', async () => {
-    const config = await loadConfig('nextjs', 6);
-    config.changes = config.changes.filter(change => change.matcher);
-
     const binaryPath = path.join(fixture.path, 'binary');
-    fs.writeFileSync(binaryPath, Buffer.from([0x7f, 0x45, 0x4c, 0x46, 0x00]));
+    fs.writeFileSync(
+      binaryPath,
+      Buffer.concat([Buffer.from([0x7f, 0x45, 0x4c, 0x46, 0x00]), Buffer.from('afterSignInUrl')]),
+    );
 
-    const results = await runScans(config, 'nextjs', { dir: fixture.path, ignore: [] });
+    const results = await runScans(createScanConfig(), 'nextjs', { dir: fixture.path, ignore: [] });
 
     const allInstances = results.flatMap(result => result.instances);
     const skipped = path.relative(process.cwd(), binaryPath);
@@ -277,16 +278,13 @@ describe('runScans', () => {
     // Guard as this test assumes git is available
     if (spawnSync('git', ['--version'], { stdio: 'ignore' }).status !== 0) return;
 
-    const config = await loadConfig('nextjs', 6);
-    config.changes = config.changes.filter(change => change.matcher);
-
     const gitPath = fs.mkdtempSync(path.join(fixture.path, 'gitignore-'));
 
     expect(spawnSync('git', ['init', '-q'], { cwd: gitPath, stdio: 'ignore' }).status).toBe(0);
     fs.writeFileSync(path.join(gitPath, '.gitignore'), 'run\n', 'utf8');
     fs.writeFileSync(path.join(gitPath, 'run'), '#!/usr/bin/env node\nafterSignInUrl\n', 'utf8');
 
-    const results = await runScans(config, 'nextjs', { dir: gitPath, ignore: [] });
+    const results = await runScans(createScanConfig(), 'nextjs', { dir: gitPath, ignore: [] });
 
     const skipped = path.relative(process.cwd(), path.join(gitPath, 'run'));
     expect(results.flatMap(result => result.instances).every(instance => instance.file !== skipped)).toBe(true);
@@ -296,16 +294,13 @@ describe('runScans', () => {
     // Guard as this test assumes git is available
     if (spawnSync('git', ['--version'], { stdio: 'ignore' }).status !== 0) return;
 
-    const config = await loadConfig('nextjs', 6);
-    config.changes = config.changes.filter(change => change.matcher);
-
     const gitPath = fs.mkdtempSync(path.join(fixture.path, 'gitignore-'));
 
     expect(spawnSync('git', ['init', '-q'], { cwd: gitPath, stdio: 'ignore' }).status).toBe(0);
     fs.writeFileSync(path.join(gitPath, '.gitignore'), 'run\n', 'utf8');
     fs.writeFileSync(path.join(gitPath, 'run'), '#!/usr/bin/env node\nafterSignInUrl\n', 'utf8');
 
-    const results = await runScans(config, 'nextjs', {
+    const results = await runScans(createScanConfig(), 'nextjs', {
       dir: gitPath,
       ignore: [],
       skipGitignore: true,
@@ -316,9 +311,6 @@ describe('runScans', () => {
   });
 
   it('falls back to normal scanning when git is not installed', async () => {
-    const config = await loadConfig('nextjs', 6);
-    config.changes = config.changes.filter(change => change.matcher);
-
     vi.mocked(execSync).mockImplementationOnce(() => {
       const error = new Error('spawnSync git ENOENT');
       error.code = 'ENOENT';
@@ -328,7 +320,7 @@ describe('runScans', () => {
     fs.writeFileSync(path.join(fixture.path, '.gitignore'), 'run\n', 'utf8');
     fs.writeFileSync(path.join(fixture.path, 'run'), '#!/usr/bin/env node\nafterSignInUrl\n', 'utf8');
 
-    const results = await runScans(config, 'nextjs', {
+    const results = await runScans(createScanConfig(), 'nextjs', {
       dir: fixture.path,
       ignore: [],
     });
@@ -338,9 +330,6 @@ describe('runScans', () => {
   });
 
   it('falls back to normal scanning when the directory is not a git repo', async () => {
-    const config = await loadConfig('nextjs', 6);
-    config.changes = config.changes.filter(change => change.matcher);
-
     vi.mocked(execSync).mockImplementationOnce(() => {
       const error = new Error('fatal: not a git repository');
       error.status = 128;
@@ -350,7 +339,7 @@ describe('runScans', () => {
     fs.writeFileSync(path.join(fixture.path, '.gitignore'), 'run\n', 'utf8');
     fs.writeFileSync(path.join(fixture.path, 'run'), '#!/usr/bin/env node\nafterSignInUrl\n', 'utf8');
 
-    const results = await runScans(config, 'nextjs', {
+    const results = await runScans(createScanConfig(), 'nextjs', {
       dir: fixture.path,
       ignore: [],
     });
