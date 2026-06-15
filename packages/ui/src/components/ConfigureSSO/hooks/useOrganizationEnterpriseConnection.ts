@@ -1,4 +1,5 @@
 import {
+  __internal_useOrganizationDomains,
   __internal_useOrganizationEnterpriseConnections,
   useOrganization,
   useSession,
@@ -9,6 +10,8 @@ import type {
   EnterpriseConnectionResource,
   EnterpriseConnectionTestRunInitResource,
   EnterpriseConnectionTestRunResource,
+  OrganizationDomainResource,
+  OrganizationDomainsBulkOwnershipVerificationResource,
   OrganizationResource,
   SignedInSessionResource,
   UpdateOrganizationEnterpriseConnectionParams,
@@ -38,9 +41,11 @@ import { type RefreshTestRunsOptions, useEnterpriseConnectionTestRuns } from './
  */
 export interface EnterpriseConnectionMutations {
   /**
-   * Creates a new enterprise connection for the active organization.
+   * Creates a new enterprise connection for the active organization. The
+   * verified organization domains are sourced from the hook itself, so callers
+   * never thread them through.
    */
-  createConnection: (provider: ProviderType, domains?: string[]) => Promise<EnterpriseConnectionResource | undefined>;
+  createConnection: (provider: ProviderType) => Promise<EnterpriseConnectionResource | undefined>;
   updateConnection: (
     id: string,
     params: UpdateOrganizationEnterpriseConnectionParams,
@@ -49,6 +54,17 @@ export interface EnterpriseConnectionMutations {
   deleteConnection: (id: string) => Promise<DeletedObjectResource | undefined>;
   /** Resolves with the test-run URL to open. */
   createTestRun: (id: string) => Promise<EnterpriseConnectionTestRunInitResource>;
+}
+
+export interface OrganizationDomainMutations {
+  createDomain: (name: string) => Promise<OrganizationDomainResource | undefined>;
+  prepareOwnershipVerification: (
+    domains: OrganizationDomainResource[],
+  ) => Promise<OrganizationDomainsBulkOwnershipVerificationResource | undefined>;
+  attemptOwnershipVerification: (
+    domains: OrganizationDomainResource[],
+  ) => Promise<OrganizationDomainsBulkOwnershipVerificationResource | undefined>;
+  revalidate: () => Promise<void>;
 }
 
 export interface UseOrganizationEnterpriseConnectionResult {
@@ -68,6 +84,8 @@ export interface UseOrganizationEnterpriseConnectionResult {
   organizationEnterpriseConnection: OrganizationEnterpriseConnection;
   enterpriseConnectionMutations: EnterpriseConnectionMutations;
   testRuns: TestRunsView;
+  organizationDomains: OrganizationDomainResource[] | undefined;
+  organizationDomainMutations: OrganizationDomainMutations;
 }
 
 /**
@@ -156,8 +174,27 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
   const { session } = useSession();
   const { organization } = useOrganization();
 
+  const {
+    isLoading: isLoadingOrganizationDomains,
+    data: organizationDomains,
+    createDomain,
+    prepareOwnershipVerification,
+    attemptOwnershipVerification,
+    revalidate: revalidateDomains,
+  } = __internal_useOrganizationDomains({ enrollmentMode: 'enterprise_sso' });
+
+  const organizationDomainMutations = useMemo<OrganizationDomainMutations>(
+    () => ({
+      createDomain,
+      prepareOwnershipVerification,
+      attemptOwnershipVerification,
+      revalidate: revalidateDomains,
+    }),
+    [createDomain, prepareOwnershipVerification, attemptOwnershipVerification, revalidateDomains],
+  );
+
   const enterpriseConnectionMutations = useMemo<EnterpriseConnectionMutations>(() => {
-    const createConnection: EnterpriseConnectionMutations['createConnection'] = (provider, domains) => {
+    const createConnection: EnterpriseConnectionMutations['createConnection'] = provider => {
       const primaryEmailAddress = user?.primaryEmailAddress;
       const emailDomain = primaryEmailAddress?.emailAddress.split('@')[1];
 
@@ -168,7 +205,7 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
       return createEnterpriseConnection({
         provider,
         name: connectionName,
-        domains,
+        domains: organizationDomains?.map(domain => domain.name),
       });
     };
 
@@ -199,7 +236,14 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
       deleteConnection,
       createTestRun,
     };
-  }, [organization, createEnterpriseConnection, updateEnterpriseConnection, deleteEnterpriseConnection]);
+  }, [
+    user,
+    organization,
+    organizationDomains,
+    createEnterpriseConnection,
+    updateEnterpriseConnection,
+    deleteEnterpriseConnection,
+  ]);
 
   const testRuns = useMemo<TestRunsView>(
     () => ({
@@ -243,11 +287,13 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
     // first load — that case fetches them as part of the initial load. On the
     // fresh-start path they stay dormant until the connection is configured, and
     // landing on the test step then shows table-level loading, never the global
-    // skeleton.
-    isLoading: isLoadingEnterpriseConnections || (hadInitialConnection && isLoadingTestRuns),
+    isLoading:
+      isLoadingEnterpriseConnections || isLoadingOrganizationDomains || (hadInitialConnection && isLoadingTestRuns),
     enterpriseConnection,
     organizationEnterpriseConnection,
     enterpriseConnectionMutations,
     testRuns,
+    organizationDomains,
+    organizationDomainMutations,
   };
 };

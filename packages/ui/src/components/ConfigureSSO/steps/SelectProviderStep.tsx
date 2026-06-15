@@ -58,7 +58,6 @@ export const SelectProviderStep = (): JSX.Element => {
   const {
     organizationEnterpriseConnection: c,
     enterpriseConnectionMutations: { createConnection },
-    organizationDomains,
   } = useConfigureSSO();
   const { goNext, goPrev, isFirstStep } = useWizard();
 
@@ -86,8 +85,7 @@ export const SelectProviderStep = (): JSX.Element => {
     setIsSubmitting(true);
 
     try {
-      const domains = organizationDomains?.map(domain => domain.name) ?? [];
-      await createConnection(selected, domains);
+      await createConnection(selected);
       void goNext();
     } catch (err) {
       handleError(err as Error, [], card.setError);

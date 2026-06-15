@@ -18,15 +18,11 @@ vi.mock('../../elements/Wizard', () => ({
 
 const createEnterpriseConnection = vi.fn();
 
-const VERIFIED_DOMAINS = [{ name: 'clerk.com' }, { name: 'example.com' }];
-const VERIFIED_DOMAIN_NAMES = VERIFIED_DOMAINS.map(domain => domain.name);
-
 // Provider is sourced from the connection entity
 // (organizationEnterpriseConnection.provider) rather than a context-level
 // setProvider. The step uses goNext (not goToStep) after a successful create.
 const contextState = vi.hoisted(() => ({
   provider: undefined as 'saml_okta' | 'saml_custom' | undefined,
-  organizationDomains: [{ name: 'clerk.com' }, { name: 'example.com' }] as Array<{ name: string }> | undefined,
 }));
 
 vi.mock('../../ConfigureSSOContext', () => ({
@@ -35,7 +31,6 @@ vi.mock('../../ConfigureSSOContext', () => ({
     enterpriseConnectionMutations: {
       createConnection: createEnterpriseConnection,
     },
-    organizationDomains: contextState.organizationDomains,
     organizationEnterpriseConnection: {
       provider: contextState.provider,
     },
@@ -59,7 +54,6 @@ const resetMocks = () => {
   createEnterpriseConnection.mockReset();
   createEnterpriseConnection.mockResolvedValue(undefined);
   contextState.provider = undefined;
-  contextState.organizationDomains = [{ name: 'clerk.com' }, { name: 'example.com' }];
 };
 
 describe('SelectProviderStep', () => {
@@ -163,7 +157,7 @@ describe('SelectProviderStep', () => {
       expect(goNext).toHaveBeenCalled();
     });
 
-    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta', VERIFIED_DOMAIN_NAMES);
+    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta');
     // The create then the goNext are the tail of the call order.
     expect(callOrder.slice(-2)).toEqual(['createEnterpriseConnection', 'goNext']);
   });
@@ -180,7 +174,7 @@ describe('SelectProviderStep', () => {
       expect(goNext).toHaveBeenCalled();
     });
 
-    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_custom', VERIFIED_DOMAIN_NAMES);
+    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_custom');
   });
 
   it('does not advance when failing to create enterprise connection', async () => {
@@ -198,7 +192,7 @@ describe('SelectProviderStep', () => {
     await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
 
     await waitFor(() => {
-      expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta', VERIFIED_DOMAIN_NAMES);
+      expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta');
     });
 
     expect(goNext).not.toHaveBeenCalled();
@@ -210,21 +204,5 @@ describe('SelectProviderStep', () => {
     renderStep(wrapper);
 
     expect(screen.getByRole('button', { name: /Previous/i })).toBeDisabled();
-  });
-
-  it('forwards the verified organization domain names to createConnection', async () => {
-    resetMocks();
-
-    const { wrapper } = await createFixtures();
-    const { userEvent } = renderStep(wrapper);
-
-    await userEvent.click(screen.getByRole('radio', { name: 'Okta Workforce' }));
-    await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
-
-    await waitFor(() => {
-      expect(goNext).toHaveBeenCalled();
-    });
-
-    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta', VERIFIED_DOMAIN_NAMES);
   });
 });

@@ -46,6 +46,11 @@ const mutationSpies = vi.hoisted(() => ({
   delete: vi.fn(),
 }));
 
+const domainsState = vi.hoisted(() => ({
+  data: undefined as Array<{ name: string }> | undefined,
+  isLoading: false,
+}));
+
 vi.mock('@clerk/shared/react', () => ({
   __internal_useOrganizationEnterpriseConnections: () => ({
     data: connectionsState.data,
@@ -53,6 +58,14 @@ vi.mock('@clerk/shared/react', () => ({
     createEnterpriseConnection: mutationSpies.create,
     updateEnterpriseConnection: mutationSpies.update,
     deleteEnterpriseConnection: mutationSpies.delete,
+  }),
+  __internal_useOrganizationDomains: () => ({
+    data: domainsState.data,
+    isLoading: domainsState.isLoading,
+    createDomain: vi.fn(),
+    prepareOwnershipVerification: vi.fn(),
+    attemptOwnershipVerification: vi.fn(),
+    revalidate: vi.fn(() => Promise.resolve()),
   }),
   __internal_useOrganizationEnterpriseConnectionTestRuns: (params: { enabled?: boolean }) => {
     testRunsState.calls.push({ enabled: params.enabled });
@@ -78,6 +91,8 @@ import { useOrganizationEnterpriseConnection } from '../useOrganizationEnterpris
 beforeEach(() => {
   connectionsState.data = [];
   connectionsState.isLoading = false;
+  domainsState.data = undefined;
+  domainsState.isLoading = false;
   testRunsState.calls = [];
   testRunsState.isLoading = false;
   testRunsState.isFetching = false;
@@ -170,10 +185,12 @@ describe('useOrganizationEnterpriseConnection — test-runs gating', () => {
 });
 
 describe('useOrganizationEnterpriseConnection — mutations', () => {
-  it('createConnection forwards the provider, the email-derived name, and the given verified domains (no organizationId in body)', async () => {
+  it('createConnection forwards the provider, the email-derived name, and the organization domain names (no organizationId in body)', async () => {
+    domainsState.data = [{ name: 'acme.com' }, { name: 'example.com' }];
+
     const { result } = renderHook(() => useOrganizationEnterpriseConnection());
 
-    await result.current.enterpriseConnectionMutations.createConnection('saml_okta', ['acme.com', 'example.com']);
+    await result.current.enterpriseConnectionMutations.createConnection('saml_okta');
 
     expect(mutationSpies.create).toHaveBeenCalledTimes(1);
     // `name` is derived from the active user's primary email domain
@@ -186,7 +203,9 @@ describe('useOrganizationEnterpriseConnection — mutations', () => {
     });
   });
 
-  it('createConnection forwards an omitted domains list unchanged', async () => {
+  it('createConnection forwards undefined domains when the organization has none', async () => {
+    domainsState.data = undefined;
+
     const { result } = renderHook(() => useOrganizationEnterpriseConnection());
 
     await result.current.enterpriseConnectionMutations.createConnection('saml_okta');

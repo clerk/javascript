@@ -1,23 +1,14 @@
-import type {
-  EnterpriseConnectionResource,
-  OrganizationDomainResource,
-  OrganizationDomainsBulkOwnershipVerificationResource,
-} from '@clerk/shared/types';
+import type { EnterpriseConnectionResource, OrganizationDomainResource } from '@clerk/shared/types';
 import React, { type PropsWithChildren } from 'react';
 
 import type { OrganizationEnterpriseConnection } from './domain/organizationEnterpriseConnection';
-import type { EnterpriseConnectionMutations, TestRunsView } from './hooks/useOrganizationEnterpriseConnection';
+import type {
+  EnterpriseConnectionMutations,
+  OrganizationDomainMutations,
+  TestRunsView,
+} from './hooks/useOrganizationEnterpriseConnection';
 
-export interface OrganizationDomainMutations {
-  createDomain: (name: string) => Promise<OrganizationDomainResource | undefined>;
-  prepareOwnershipVerification: (
-    domains: OrganizationDomainResource[],
-  ) => Promise<OrganizationDomainsBulkOwnershipVerificationResource | undefined>;
-  attemptOwnershipVerification: (
-    domains: OrganizationDomainResource[],
-  ) => Promise<OrganizationDomainsBulkOwnershipVerificationResource | undefined>;
-  revalidate: () => Promise<void>;
-}
+export type { OrganizationDomainMutations };
 
 /**
  * Shared state for the ConfigureSSO wizard, persisted across steps. Everything

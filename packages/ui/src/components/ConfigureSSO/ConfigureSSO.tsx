@@ -1,4 +1,4 @@
-import { __internal_useOrganizationDomains, useSession } from '@clerk/shared/react';
+import { useSession } from '@clerk/shared/react';
 import type { ConfigureSSOProps } from '@clerk/shared/types';
 import React from 'react';
 
@@ -10,7 +10,6 @@ import { ProfileCard } from '@/elements/ProfileCard';
 import { ExclamationTriangle } from '@/icons';
 import { Route, Switch } from '@/router';
 
-import type { OrganizationDomainMutations } from './ConfigureSSOContext';
 import { ConfigureSSONavbar } from './ConfigureSSONavbar';
 import { ConfigureSSOSkeleton } from './ConfigureSSOSkeleton';
 import { ConfigureSSOWizard } from './ConfigureSSOWizard';
@@ -46,30 +45,15 @@ const AuthenticatedContent = withCoreUserGuard(() => {
 
 const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObject<HTMLDivElement> }) => {
   const {
-    isLoading: isLoadingEnterpriseConnection,
+    isLoading,
     enterpriseConnection,
     organizationEnterpriseConnection,
     testRuns,
     enterpriseConnectionMutations,
+    organizationDomains,
+    organizationDomainMutations,
   } = useOrganizationEnterpriseConnection();
 
-  const {
-    isLoading: isLoadingOrganizationDomains,
-    data: organizationDomains,
-    createDomain,
-    prepareOwnershipVerification,
-    attemptOwnershipVerification,
-    revalidate,
-  } = __internal_useOrganizationDomains({
-    enrollmentMode: 'enterprise_sso',
-  });
-
-  const organizationDomainMutations = React.useMemo<OrganizationDomainMutations>(
-    () => ({ createDomain, prepareOwnershipVerification, attemptOwnershipVerification, revalidate }),
-    [createDomain, prepareOwnershipVerification, attemptOwnershipVerification, revalidate],
-  );
-
-  const isLoading = isLoadingEnterpriseConnection || isLoadingOrganizationDomains;
   if (isLoading) {
     return <ConfigureSSOSkeleton />;
   }

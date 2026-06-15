@@ -1,4 +1,4 @@
-import { __internal_useOrganizationDomains, useOrganization } from '@clerk/shared/react';
+import { useOrganization } from '@clerk/shared/react';
 import { useState } from 'react';
 
 import { Header } from '@/ui/elements/Header';
@@ -7,7 +7,6 @@ import { ProfileCard } from '@/ui/elements/ProfileCard';
 import React from 'react';
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import { ConfigureSSOProtect } from '../ConfigureSSO/ConfigureSSO';
-import type { OrganizationDomainMutations } from '../ConfigureSSO/ConfigureSSOContext';
 import { ConfigureSSOSkeleton } from '../ConfigureSSO/ConfigureSSOSkeleton';
 import { ConfigureSSOWizard } from '../ConfigureSSO/ConfigureSSOWizard';
 import { useOrganizationEnterpriseConnection } from '../ConfigureSSO/hooks/useOrganizationEnterpriseConnection';
@@ -32,33 +31,19 @@ export const OrganizationSecurityPage = ({ contentRef }: OrganizationSecurityPag
 const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPageProps) => {
   const {
     organization,
-    isLoading: isLoadingEnterpriseConnection,
+    isLoading,
     enterpriseConnection,
     organizationEnterpriseConnection,
     testRuns,
     enterpriseConnectionMutations,
+    organizationDomains,
+    organizationDomainMutations,
   } = useOrganizationEnterpriseConnection();
 
   const [view, setView] = useState<'overview' | 'wizard'>('overview');
 
-  const {
-    isLoading: isLoadingOrganizationDomains,
-    data: organizationDomains,
-    createDomain,
-    prepareOwnershipVerification,
-    attemptOwnershipVerification,
-    revalidate,
-  } = __internal_useOrganizationDomains({
-    enrollmentMode: 'enterprise_sso',
-  });
-
-  const organizationDomainMutations = React.useMemo<OrganizationDomainMutations>(
-    () => ({ createDomain, prepareOwnershipVerification, attemptOwnershipVerification, revalidate }),
-    [createDomain, prepareOwnershipVerification, attemptOwnershipVerification, revalidate],
-  );
-
   // Gate loading above the provider so the context never observes a loading state.
-  if (isLoadingEnterpriseConnection || isLoadingOrganizationDomains) {
+  if (isLoading) {
     return <ConfigureSSOSkeleton />;
   }
 
