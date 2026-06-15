@@ -1,3 +1,4 @@
+import { allTasks } from 'nanostores';
 import { describe, expect, it, vi } from 'vitest';
 
 import { atom } from '../atom';
@@ -102,6 +103,123 @@ describe('createI18n', () => {
     await flush();
     expect($msg.get().hi).toBe('Bonjour'); // from locale
     expect($msg.get().bye).toBe('Goodbye'); // from base
+  });
+
+  describe('load failures', () => {
+    // A failed load must be handled internally — never surfaced as an unhandled
+    // rejection. `allTasks()` (awaited during SSR) must still settle, and the
+    // standing locale subscription must not leak the rejection to the runtime.
+    it('handles a failed load without leaking an unhandled rejection (SSR-safe)', async () => {
+      const onUnhandled = vi.fn();
+      process.on('unhandledRejection', onUnhandled);
+      try {
+        const get = vi.fn(() => Promise.reject(new Error('boom')));
+        createI18n(atom('fr'), { get });
+
+        await expect(allTasks()).resolves.toBeUndefined();
+        await flush(); // let any unhandled rejection surface
+        expect(get).toHaveBeenCalledWith('fr');
+        expect(onUnhandled).not.toHaveBeenCalled();
+      } finally {
+        process.off('unhandledRejection', onUnhandled);
+      }
+    });
+
+    // A transient failure must not permanently poison a locale: a later switch
+    // back to it has to retry rather than reuse the dead promise.
+    it('retries a failed locale on a later switch', async () => {
+      const get = vi
+        .fn()
+        .mockRejectedValueOnce(new Error('network'))
+        .mockResolvedValueOnce({ common: { hi: 'Bonjour' } });
+      const $locale = atom('en');
+      const i18n = createI18n($locale, { get });
+      const $msg = i18n('common', { hi: 'Hello' });
+      $msg.subscribe(vi.fn()); // keep the computed live
+
+      $locale.set('fr');
+      await flush();
+      expect($msg.get().hi).toBe('Hello'); // failed load -> base fallback
+
+      $locale.set('en');
+      $locale.set('fr'); // switch back: must retry, not reuse the dead promise
+      await flush();
+      expect(get).toHaveBeenCalledTimes(2);
+      expect($msg.get().hi).toBe('Bonjour');
+    });
+  });
+
+  describe('loading', () => {
+    it('flips i18n.loading true during a fetch and false after it settles', async () => {
+      let resolve!: (v: { common: { hi: string } }) => void;
+      const get = vi.fn(() => new Promise<{ common: { hi: string } }>(r => (resolve = r)));
+      const $locale = atom('en');
+      const i18n = createI18n($locale, { get });
+
+      expect(i18n.loading.get()).toBe(false);
+      $locale.set('fr');
+      expect(i18n.loading.get()).toBe(true); // fetch scheduled synchronously
+
+      resolve({ common: { hi: 'Bonjour' } });
+      await flush();
+      expect(i18n.loading.get()).toBe(false);
+    });
+
+    it('resets loading to false after a failed load', async () => {
+      const get = vi.fn(() => Promise.reject(new Error('boom')));
+      const i18n = createI18n(atom('fr'), { get }); // non-base locale fetches on creation
+
+      expect(i18n.loading.get()).toBe(true);
+      await flush();
+      expect(i18n.loading.get()).toBe(false);
+    });
+  });
+
+  describe('params(count(...))', () => {
+    it('selects a plural form and substitutes both {count} and named params', () => {
+      const i18n = createI18n(atom('en'), { get: vi.fn() });
+      const $msg = i18n('pagination', {
+        page: params<{ category: string }>(
+          count({ one: 'One page in {category}', other: '{count} pages in {category}' }),
+        ),
+      });
+
+      const m = $msg.get();
+      expect(m.page(1, { category: 'robots' })).toBe('One page in robots');
+      expect(m.page(5, { category: 'robots' })).toBe('5 pages in robots');
+    });
+
+    it('accepts a partial plural-forms override', () => {
+      const $overrides = atom(defineLocalization({ pagination: { page: { other: '{count} pages → {category}' } } }));
+      const i18n = createI18n(atom('en'), { get: vi.fn(), overrides: $overrides });
+      const $msg = i18n('pagination', {
+        page: params<{ category: string }>(
+          count({ one: 'One page in {category}', other: '{count} pages in {category}' }),
+        ),
+      });
+
+      expect($msg.get().page(2, { category: 'bots' })).toBe('2 pages → bots');
+    });
+  });
+
+  describe('baseLocale', () => {
+    it('treats a custom baseLocale as the no-fetch locale', () => {
+      const get = vi.fn();
+      const i18n = createI18n(atom('ru'), { get, baseLocale: 'ru' });
+      const $msg = i18n('common', { hi: 'Privet' });
+
+      expect($msg.get().hi).toBe('Privet');
+      expect(get).not.toHaveBeenCalled();
+    });
+
+    it('fetches a non-base locale when baseLocale is customized', async () => {
+      const get = vi.fn(() => Promise.resolve({ common: { hi: 'Hello' } }));
+      const i18n = createI18n(atom('en'), { get, baseLocale: 'ru' });
+      i18n('common', { hi: 'Privet' });
+
+      await flush();
+      expect(get).toHaveBeenCalledWith('en');
+    });
   });
 
   describe('overrides', () => {

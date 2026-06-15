@@ -52,6 +52,18 @@ export interface CountMarker {
   readonly forms: PluralForms;
 }
 
+/**
+ * A pluralized message that also takes named params: `params(count(...))`. The
+ * resolved message is `(n, args) => string` — `n` selects the plural form, then
+ * `{count}` and the `{name}` placeholders are substituted. `P` is carried
+ * structurally (phantom) so the resolved arg shape can be inferred.
+ */
+export interface CountParamsMarker<P extends Record<string, string | number> = Record<string, string | number>> {
+  readonly _type: 'count-params';
+  readonly forms: PluralForms;
+  readonly __params?: P;
+}
+
 export interface TransformMarker<R = unknown> {
   readonly _type: 'transform';
   readonly fn: (locale: string, template: string) => R;
@@ -59,7 +71,7 @@ export interface TransformMarker<R = unknown> {
 }
 
 /** Any message marker. Used for runtime narrowing in `create-i18n`. */
-export type AnyMarker = ParamsMarker | CountMarker | TransformMarker;
+export type AnyMarker = ParamsMarker | CountMarker | CountParamsMarker | TransformMarker;
 
 // ---------------------------------------------------------------------------
 // `messageFormat` transform types
@@ -104,13 +116,15 @@ export type ParamsFn<T extends string> = [ExtractParams<T>] extends [never]
 export type MessageType<V> =
   V extends ParamsMarker<infer T>
     ? ParamsFn<T>
-    : V extends CountMarker
-      ? (n: number) => string
-      : V extends TransformMarker<infer R>
-        ? R
-        : V extends string
-          ? string
-          : V;
+    : V extends CountParamsMarker<infer P>
+      ? (n: number, args: P) => string
+      : V extends CountMarker
+        ? (n: number) => string
+        : V extends TransformMarker<infer R>
+          ? R
+          : V extends string
+            ? string
+            : V;
 
 /** Map a whole `base` definition object to its resolved messages object. */
 export type Messages<B> = { [K in keyof B]: MessageType<B[K]> };
@@ -130,7 +144,7 @@ export type OverrideInput = string | Partial<PluralForms> | Record<string, strin
 /** Map a single `base` value to the override input it accepts. */
 export type OverrideValue<V> = V extends ParamsMarker
   ? string
-  : V extends CountMarker
+  : V extends CountMarker | CountParamsMarker
     ? Partial<PluralForms>
     : V extends TransformMarker
       ? string

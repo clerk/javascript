@@ -44,7 +44,28 @@ Non-`en` locales are fetched lazily via `get`; until the data lands (or for any
 namespace missing from it) messages fall back to `base`. Each lazy load is
 registered as a nanostores [task](https://github.com/nanostores/nanostores#tasks),
 so during SSR you can `await allTasks()` (re-exported from `@clerk/i18n`) to flush
-all in-flight locale loads before rendering.
+all in-flight locale loads before rendering (or `loadTranslations` for a single
+message — see [React app](#react-app)).
+
+`base` is treated as `en` by default. If your source strings are written in another
+language, pass `baseLocale` — that locale is served from `base` with no fetch:
+
+```ts
+createI18n($locale, { get, baseLocale: 'fr' });
+```
+
+### Plural messages with params
+
+Wrap `count(...)` in `params(...)` for a message that needs both a number (for plural
+selection) and named params. The resolved message is `(n, args) => string` — `n` selects
+the form, then `{count}` and the named placeholders are substituted:
+
+```ts
+const $msgs = i18n('pagination', {
+  page: params<{ category: string }>(count({ one: 'One page in {category}', other: '{count} pages in {category}' })),
+});
+$msgs.get().page(5, { category: 'robots' }); // "5 pages in robots"
+```
 
 ## Overrides
 
@@ -175,3 +196,179 @@ function Notice() {
 
 Non-React consumers can use `formatToParts(message, values)` for a flat,
 value-resolved part list.
+
+## React app
+
+The examples above use module-level stores — the quick path for a **client-only SPA**.
+For **SSR** (Next.js, RSC, …) create the stores **per request** behind a provider and seed
+server-loaded translations via `createI18n`'s `cache`; otherwise concurrent server
+requests share one `$locale`. The provider is a few lines in your app — the package stays
+unopinionated about your framework:
+
+```tsx
+// localization.tsx
+import { createContext, useContext, useMemo, type ReactNode } from 'react';
+import {
+  atom,
+  browser,
+  createI18n,
+  localeFrom,
+  type I18n,
+  type ResolvedOverrides,
+  type WritableStore,
+} from '@clerk/i18n';
+import { useStore } from '@clerk/i18n/react';
+
+const loadLocale = (locale: string) =>
+  fetch(`https://cdn.example.com/clerk/locales/${locale}.json`).then(r => r.json());
+
+type SeededMessages = Record<string, Record<string, Record<string, unknown>>>;
+
+interface LocalizationValue {
+  i18n: I18n;
+  $locale: WritableStore<string | null>;
+}
+const LocalizationContext = createContext<LocalizationValue | null>(null);
+
+export interface LocalizationProviderProps {
+  /** Active locale, resolved per request on the server. Wins over browser detection. */
+  locale?: string;
+  /** Fallback when neither `locale` nor a browser language matches. Defaults to 'en'. */
+  defaultLocale?: string;
+  /** Locales the app ships translations for. */
+  locales: string[];
+  /** Consumer overrides, e.g. from an appearance / localization prop. */
+  overrides?: ResolvedOverrides;
+  /** Server-loaded translations for the active locale (locale -> namespace -> messages). */
+  initialMessages?: SeededMessages;
+  children: ReactNode;
+}
+
+export function LocalizationProvider({
+  locale,
+  defaultLocale = 'en',
+  locales,
+  overrides,
+  initialMessages,
+  children,
+}: LocalizationProviderProps) {
+  // Built once per provider instance = once per request on the server, so concurrent
+  // requests never share a $locale. Seeding `cache` makes the first render correct.
+  const value = useMemo(() => {
+    const $explicit = atom<string | null>(locale ?? null); // SSR seed + runtime switch point
+    const $locale = localeFrom($explicit, browser({ available: locales, fallback: defaultLocale }));
+    const i18n = createI18n($locale, {
+      get: loadLocale,
+      overrides: atom<ResolvedOverrides>(overrides ?? {}),
+      cache: initialMessages,
+    });
+    return { i18n, $locale: $explicit };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return <LocalizationContext.Provider value={value}>{children}</LocalizationContext.Provider>;
+}
+
+/** Create + read a namespace's messages within the provider. */
+export function useMessages<B extends Record<string, unknown>>(namespace: string, base: B) {
+  const ctx = useContext(LocalizationContext);
+  if (!ctx) throw new Error('useMessages must be used within <LocalizationProvider>');
+  // The computed store must be stable for useSyncExternalStore; `i18n` is stable per provider.
+  const $messages = useMemo(() => ctx.i18n(namespace, base), [ctx]);
+  return useStore($messages);
+}
+```
+
+Define each component's `base` at module scope (source strings live with the UI) and read
+it with `useMessages`:
+
+```tsx
+// organization-profile.messages.ts
+export const orgProfileBase = { title: 'Organization Profile', tab: { general: 'General' } };
+
+// organization-profile.tsx
+import { useMessages } from '../localization';
+import { orgProfileBase } from './organization-profile.messages';
+
+function OrganizationProfile() {
+  const m = useMessages('organizationProfile', orgProfileBase);
+  return <h1>{m.title}</h1>;
+}
+```
+
+Switch locale at runtime by writing the exposed store (`ctx.$locale.set('fr')`); the
+`locale` prop only **seeds** the initial value, so there's no effect and no load flicker.
+
+### SSR (Next.js Pages Router)
+
+Resolve the locale and fetch translations on the server, then pass both down.
+`initialMessages` seeds `cache`, so the first server render is correct and single-pass:
+
+```tsx
+// pages/_app.tsx
+const LOCALES = ['en', 'fr', 'de'];
+
+export default function MyApp({ Component, pageProps, locale, initialMessages }) {
+  return (
+    <LocalizationProvider
+      locale={locale}
+      defaultLocale='en'
+      locales={LOCALES}
+      initialMessages={initialMessages}
+    >
+      <Component {...pageProps} />
+    </LocalizationProvider>
+  );
+}
+
+MyApp.getInitialProps = async ({ ctx }) => {
+  const accept = ctx.req?.headers['accept-language'] ?? '';
+  const locale = LOCALES.find(l => accept.startsWith(l)) ?? 'en';
+  const initialMessages =
+    locale === 'en'
+      ? undefined
+      : { [locale]: await fetch(`https://cdn.example.com/clerk/locales/${locale}.json`).then(r => r.json()) };
+  return { locale, initialMessages };
+};
+```
+
+### Server-only rendering (RSC)
+
+With no client hydration, await a snapshot per request with `loadTranslations` and a
+per-request instance — `loadTranslations` waits for that instance's load only (unlike the
+global `allTasks`):
+
+```tsx
+import { atom, createI18n, loadTranslations } from '@clerk/i18n';
+import { postBase } from './post.messages';
+
+async function Post({ locale }: { locale: string }) {
+  const i18n = createI18n(atom(locale), { get: loadLocale }); // per-request, not module-scope
+  const t = await loadTranslations(i18n('post', postBase));
+  return <span>{t.title}</span>;
+}
+```
+
+### Inside Clerk's `ui` package
+
+`ui` uses the same provider pattern, built with `createContextAndHook` from
+`@clerk/shared/react` to match `MosaicProvider`. Consumer overrides from
+`<ClerkProvider localization={…}>` (the appearance layer) are authored with
+[`defineLocalization`](#overrides) and passed as the provider's `overrides`.
+
+## CI: extracting source strings
+
+`messagesToJSON` collects the `base` strings from message stores into one
+`{ namespace: { key } }` object to upload to a translation service. Markers serialize back
+to raw form (`params` / `messageFormat` → template, `count` / `params(count)` → forms). Run
+it after importing every `*.messages` module — build the stores from a throwaway instance:
+
+```ts
+import { atom, createI18n, messagesToJSON } from '@clerk/i18n';
+import { orgProfileBase } from './aio/organization-profile.messages';
+import { signInBase } from './sign-in/sign-in.messages';
+
+const i18n = createI18n(atom('en'), { get: async () => ({}) });
+const json = messagesToJSON(i18n('organizationProfile', orgProfileBase), i18n('signIn', signInBase));
+// { organizationProfile: { title: 'Organization Profile', … }, signIn: { … } }
+```

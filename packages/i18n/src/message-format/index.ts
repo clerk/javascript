@@ -67,46 +67,66 @@ function resolveValue(handler: MessageFormatHandlers[string] | undefined, inner?
 }
 
 /**
- * Render `parts` to a string from `start`, stopping at the close tag named
- * `stopTag` (used to recurse into nested markup). Returns the rendered string
- * and the index just past the consumed range.
+ * Visitor that folds the token stream into values of type `T`. Each consumer
+ * (string renderer, React renderer, …) supplies one; the traversal itself lives
+ * once, in {@link walk}.
  */
-function renderParts(
+export interface WalkVisitor<T> {
+  /** Literal text between tokens. */
+  text(value: string): T;
+  /** A `{$name}` variable. */
+  value(name: string): T;
+  /**
+   * A `{#tag}…{/tag}` (`open`, with already-folded `children`) or `{#tag/}`
+   * (`standalone`, no children) markup node. `index` is the token's position,
+   * suitable for use as a stable React key.
+   */
+  markup(kind: 'open' | 'standalone', name: string, children: T[], index: number): T;
+}
+
+/**
+ * Single recursive fold over a parsed token stream, shared by every renderer.
+ * Walks from `start`, recursing into each `{#tag}…{/tag}` range and stopping at
+ * the close tag named `stopTag`; stray close tags are skipped. The traversal and
+ * its edge cases live here once — consumers only decide how parts combine via
+ * the {@link WalkVisitor}. Returns the folded items and the index just past the
+ * consumed range.
+ */
+export function walk<T>(
   parts: MessageFormatPart[],
   start: number,
-  handlers: MessageFormatHandlers | undefined,
   stopTag: string | undefined,
-): { out: string; next: number } {
-  let out = '';
+  visitor: WalkVisitor<T>,
+): { items: T[]; next: number } {
+  const items: T[] = [];
   let i = start;
 
   while (i < parts.length) {
     const p = parts[i];
 
     if (p.type === 'text') {
-      out += p.value;
+      items.push(visitor.text(p.value));
       i++;
     } else if (p.type === 'string') {
-      out += resolveValue(handlers?.[p.name]);
+      items.push(visitor.value(p.name));
       i++;
     } else if (p.kind === 'standalone') {
-      out += resolveValue(handlers?.[p.name]);
+      items.push(visitor.markup('standalone', p.name, [], i));
       i++;
     } else if (p.kind === 'close') {
       if (p.name === stopTag) {
-        return { out, next: i + 1 };
+        return { items, next: i + 1 };
       }
       i++; // stray close — skip
     } else {
-      // open: recurse to collect the inner range, then hand it to the handler.
-      const inner = renderParts(parts, i + 1, handlers, p.name);
-      const handler = handlers?.[p.name];
-      out += typeof handler === 'function' ? handler(inner.out) : inner.out;
+      // open: fold the inner range, then let the visitor combine it.
+      const inner = walk(parts, i + 1, p.name, visitor);
+      items.push(visitor.markup('open', p.name, inner.items, i));
       i = inner.next;
     }
   }
 
-  return { out, next: i };
+  return { items, next: i };
 }
 
 /**
@@ -116,7 +136,19 @@ function renderParts(
  */
 export const messageFormat = transform<RichText>((_locale, translation) => {
   const parts = getMessageFormatParts(translation);
-  const format = (handlers?: MessageFormatHandlers): string => renderParts(parts, 0, handlers, undefined).out;
+  const format = (handlers?: MessageFormatHandlers): string =>
+    walk<string>(parts, 0, undefined, {
+      text: value => value,
+      value: name => resolveValue(handlers?.[name]),
+      markup: (kind, name, children) => {
+        const handler = handlers?.[name];
+        // Standalone has no children — preserve the original resolveValue path.
+        if (kind === 'standalone') {
+          return resolveValue(handler);
+        }
+        return typeof handler === 'function' ? handler(children.join('')) : children.join('');
+      },
+    }).items.join('');
   return Object.assign(format, { parts });
 });
 

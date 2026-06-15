@@ -9,6 +9,8 @@ export default defineConfig({
   sourcemap: true,
   clean: true,
   dts: true,
-  // React is a peer; alien-signals is a runtime dependency. Neither is bundled.
-  external: ['react', 'react-dom', 'alien-signals'],
+  // Keep runtime deps external so consumers dedupe a single copy. nanostores in
+  // particular coordinates `task()`/`allTasks()` through a module-level registry,
+  // so a bundled copy would not share that registry with the consumer's own.
+  external: ['react', 'react-dom', 'nanostores'],
 });

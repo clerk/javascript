@@ -20,12 +20,30 @@ export interface CreateI18nOptions {
    * — the same overrides apply to every locale. Author with `defineLocalization`.
    */
   overrides?: ReadableStore<ResolvedOverrides>;
+  /**
+   * The locale the inline `base` definitions are written in. It is served
+   * directly without a fetch. Defaults to `'en'`.
+   */
+  baseLocale?: string;
 }
 
-/** The message-store factory returned by `createI18n`. */
-export type I18n = <B extends Record<string, unknown>>(namespace: string, base: B) => ReadableStore<Messages<B>>;
+/**
+ * A message store. Carries a back-reference to its `i18n` instance (so
+ * `loadTranslations` can await that instance's loads) and its source `namespace`
+ * + `base` (so `messagesToJSON` can serialize it).
+ */
+export type MessageStore<B extends Record<string, unknown>> = ReadableStore<Messages<B>> & {
+  i18n: I18n;
+  namespace: string;
+  base: B;
+};
 
-const BASE_LOCALE = 'en';
+/** The message-store factory returned by `createI18n`. */
+export interface I18n {
+  <B extends Record<string, unknown>>(namespace: string, base: B): MessageStore<B>;
+  /** True while any locale load is in flight. Await it with `translationsLoading`. */
+  loading: ReadableStore<boolean>;
+}
 
 /** Stable empty-overrides store, used when no `overrides` store is supplied. */
 const NO_OVERRIDES = atom<ResolvedOverrides>({});
@@ -35,24 +53,46 @@ function asMarker(value: unknown): AnyMarker | null {
 }
 
 export function createI18n($locale: ReadableStore<string>, options: CreateI18nOptions): I18n {
-  const { get, cache = {}, overrides = NO_OVERRIDES } = options;
+  const { get, cache = {}, overrides = NO_OVERRIDES, baseLocale = 'en' } = options;
 
   // Loaded locale data. Setting a fresh object is what drives dependent message
   // computeds to recompute — no manual invalidation counter needed.
   const $resolved = atom<LocaleCache>({ ...cache });
   const pending: Record<string, Promise<void>> = {};
 
+  // Per-instance loading flag, true while any fetch is in flight. Awaited by
+  // `translationsLoading`/`loadTranslations` so server-only rendering waits for
+  // this instance only (unlike the global `allTasks`).
+  const $loading = atom(false);
+  let inFlight = 0;
+
   function fetchLocale(locale: string): Promise<void> {
     // `task()` registers the load with nanostores so `allTasks()` can await it
     // during SSR; the `pending` map keeps each locale to a single fetch.
-    pending[locale] ??= task(() =>
-      Promise.resolve(get(locale)).then(data => {
-        const merged: NamespaceData = Array.isArray(data) ? Object.assign({}, ...data) : (data ?? {});
-        const next: LocaleCache = { ...$resolved.get() };
-        next[locale] = { ...next[locale], ...merged };
-        $resolved.set(next);
-      }),
-    );
+    pending[locale] ??= task(() => {
+      inFlight++;
+      $loading.set(true);
+      return (
+        Promise.resolve(get(locale))
+          .then(data => {
+            const merged: NamespaceData = Array.isArray(data) ? Object.assign({}, ...data) : (data ?? {});
+            const next: LocaleCache = { ...$resolved.get() };
+            next[locale] = { ...next[locale], ...merged };
+            $resolved.set(next);
+          })
+          // A failed load leaves the locale unresolved (messages fall back to base).
+          // Clear the slot so a later locale switch can retry instead of being
+          // permanently poisoned by a single transient failure.
+          .catch(() => {
+            delete pending[locale];
+          })
+          .finally(() => {
+            if (--inFlight === 0) {
+              $loading.set(false);
+            }
+          })
+      );
+    });
     return pending[locale];
   }
 
@@ -60,7 +100,7 @@ export function createI18n($locale: ReadableStore<string>, options: CreateI18nOp
   // (and is not the base locale), fetch it. `subscribe` fires immediately, so the
   // initial locale is handled too.
   $locale.subscribe(locale => {
-    if (locale !== BASE_LOCALE && !$resolved.get()[locale]) {
+    if (locale !== baseLocale && !$resolved.get()[locale]) {
       void fetchLocale(locale);
     }
   });
@@ -86,6 +126,18 @@ export function createI18n($locale: ReadableStore<string>, options: CreateI18nOp
       };
     }
 
+    if (marker?._type === 'count-params') {
+      const rules = new Intl.PluralRules(locale);
+      const forms: PluralForms =
+        override && typeof override === 'object'
+          ? { ...marker.forms, ...(override as Partial<PluralForms>) }
+          : marker.forms;
+      return (n: number, args?: Record<string, string | number>) => {
+        const tpl = forms[rules.select(n)] ?? forms.other;
+        return tpl.replace(/\{(\w+)\}/g, (_, key: string) => (key === 'count' ? String(n) : String(args?.[key] ?? '')));
+      };
+    }
+
     if (marker?._type === 'transform') {
       const tpl = typeof override === 'string' ? override : marker.template;
       return marker.fn(locale, tpl);
@@ -106,12 +158,12 @@ export function createI18n($locale: ReadableStore<string>, options: CreateI18nOp
     return out as Messages<B>;
   }
 
-  return function i18n<B extends Record<string, unknown>>(namespace: string, base: B): ReadableStore<Messages<B>> {
+  function i18n<B extends Record<string, unknown>>(namespace: string, base: B): MessageStore<B> {
     // nanostores `computed` recomputes only when one of its dependency values
     // changes (by ===) and returns the cached reference otherwise — so the
     // message snapshot is referentially stable, which is what useSyncExternalStore
     // requires. `resolved` and `overrides` change by reference on every update.
-    return computed(
+    const store = computed(
       [$locale, $resolved, overrides],
       (locale: string, resolved: LocaleCache, userOverrides: ResolvedOverrides) => {
         const localeData = resolved[locale]?.[namespace];
@@ -121,5 +173,11 @@ export function createI18n($locale: ReadableStore<string>, options: CreateI18nOp
         return buildMessages(locale, base, merged);
       },
     ) as ReadableStore<Messages<B>>;
-  };
+    // Back-reference + source definition, used by `loadTranslations` (await this
+    // instance's loads) and `messagesToJSON` (serialize the base back to JSON).
+    return Object.assign(store, { i18n: api, namespace, base });
+  }
+
+  const api: I18n = Object.assign(i18n, { loading: $loading });
+  return api;
 }

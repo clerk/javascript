@@ -62,6 +62,27 @@ describe('messageFormat (string path)', () => {
       { type: 'string', name: 'name' },
     ]);
   });
+
+  it('skips a stray close tag with no matching open', () => {
+    expect(rich('a{/b}c')()).toBe('ac');
+  });
+
+  it('drops standalone markup when its handler is absent', () => {
+    expect(rich('a{#br/}b')()).toBe('ab');
+  });
+
+  it('substitutes a missing variable with an empty string', () => {
+    expect(rich('Hi {$name}')()).toBe('Hi ');
+  });
+
+  it('handles markup nested three levels deep', () => {
+    const out = rich('{#a}{#b}{#c}x{/c}{/b}{/a}')({
+      a: inner => `[a${inner}]`,
+      b: inner => `[b${inner}]`,
+      c: inner => `[c${inner}]`,
+    });
+    expect(out).toBe('[a[b[cx]]]');
+  });
 });
 
 describe('formatToParts', () => {

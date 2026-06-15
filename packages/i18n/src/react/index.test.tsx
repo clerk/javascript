@@ -110,6 +110,26 @@ describe('<Message>', () => {
     const { container } = render(<Message of={rich('a {#b}x{/b} b')} />);
     expect(container.innerHTML).toBe('a x b');
   });
+
+  it('skips a stray close tag with no matching open', () => {
+    const { container } = render(<Message of={rich('a{/b}c')} />);
+    expect(container.innerHTML).toBe('ac');
+  });
+
+  it('renders nothing for standalone markup without a component', () => {
+    const { container } = render(<Message of={rich('a{#br/}b')} />);
+    expect(container.innerHTML).toBe('ab');
+  });
+
+  it('renders markup nested three levels deep', () => {
+    const { container } = render(
+      <Message
+        of={rich('{#a}{#b}{#c}x{/c}{/b}{/a}')}
+        components={{ a: c => <em>{c}</em>, b: c => <b>{c}</b>, c: c => <code>{c}</code> }}
+      />,
+    );
+    expect(container.innerHTML).toBe('<em><b><code>x</code></b></em>');
+  });
 });
 
 describe('useMessage', () => {
