@@ -78,7 +78,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         isActive={pathname === href}
                         render={<Link href={href} />}
                       >
-                        <span className='truncate'>{mod.meta.title}</span>
+                        <span className='truncate'>{mod.meta.label ?? mod.meta.title}</span>
                         <span className='text-sidebar-foreground/50 shrink-0 font-mono text-[10px] leading-none'>
                           {`<${mod.meta.title} />`}
                         </span>
