@@ -1,8 +1,8 @@
 import type { ESLint } from 'eslint';
 
-import requireAuthProtection from './rules/next/require-auth-protection';
+import requireAuthProtection from './require-auth-protection';
 
-export const next: ESLint.Plugin = {
+const plugin: ESLint.Plugin = {
   meta: {
     name: '@clerk/eslint-plugin/next',
     version: PACKAGE_VERSION,
@@ -11,3 +11,5 @@ export const next: ESLint.Plugin = {
     'require-auth-protection': requireAuthProtection,
   },
 };
+
+export default plugin;

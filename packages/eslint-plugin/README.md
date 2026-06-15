@@ -58,11 +58,11 @@ Requires ESLint `>=9` (flat config).
 Register the plugin and declare your protected/public folder globs in `eslint.config.mjs`:
 
 ```js
-import { next } from '@clerk/eslint-plugin';
+import clerkNext from '@clerk/eslint-plugin/next';
 
 export default [
   {
-    plugins: { '@clerk/next': next },
+    plugins: { '@clerk/next': clerkNext },
     rules: {
       '@clerk/next/require-auth-protection': [
         'error',

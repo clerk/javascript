@@ -25,19 +25,18 @@
   "author": "Clerk",
   "sideEffects": false,
   "exports": {
-    ".": {
+    "./next": {
       "import": {
-        "types": "./dist/index.d.mts",
-        "default": "./dist/index.mjs"
+        "types": "./dist/next.d.mts",
+        "default": "./dist/next.mjs"
       },
       "require": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
+        "types": "./dist/next.d.ts",
+        "default": "./dist/next.js"
       }
     },
     "./package.json": "./package.json"
   },
-  "main": "./dist/index.js",
   "files": [
     "dist"
   ],
