@@ -1080,7 +1080,7 @@ export const enUS: LocalizationResource = {
         badge__unconfigured: 'Unconfigured',
         certificateLabel: 'Certificate',
         descriptionLine1:
-          'Let members sign in through your identity provider using their domain email. Members without a matching domain are unaffected.',
+          'Require members to sign in through your identity provider using their domain email. Members without a matching domain are unaffected.',
         descriptionLine2:
           'Anyone who signs in will be automatically added to this organization. New members will be assigned to {{role}}.',
         descriptionLine2__noRole: 'Anyone who signs in will be automatically added to this organization.',

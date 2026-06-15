@@ -20,7 +20,7 @@ const withSecurityPageFixtures = (f: Parameters<Parameters<typeof createFixtures
 };
 
 const DESCRIPTION_LINE_1 =
-  'Let members sign in through your identity provider using their domain email. Members without a matching domain are unaffected.';
+  'Require members to sign in through your identity provider using their domain email. Members without a matching domain are unaffected.';
 // `org:member` renders through the humanized fallback — the fixture user cannot read the roles list.
 const DESCRIPTION_LINE_2 =
   'Anyone who signs in will be automatically added to this organization. New members will be assigned to member.';
