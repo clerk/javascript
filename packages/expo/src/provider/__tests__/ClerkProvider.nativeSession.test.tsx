@@ -1,4 +1,4 @@
-import { render, waitFor } from '@testing-library/react';
+import { act, render, waitFor } from '@testing-library/react';
 import React, { type ReactNode } from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
@@ -35,7 +35,7 @@ const mocks = vi.hoisted(() => {
       isLoaded: true,
       sessionId: null as string | null,
     },
-    clerkListener: undefined as (() => void) | undefined,
+    clerkListener: undefined as ((payload?: { session?: { id?: string | null } | null }) => void) | undefined,
   };
 });
 
@@ -389,7 +389,7 @@ describe('ClerkProvider native session notifications', () => {
     mocks.getClientToken.mockResolvedValue(null);
     mocks.clerkInstance.client.lastActiveSessionId = null;
 
-    const { rerender } = render(
+    render(
       <ClerkProvider
         publishableKey='pk_test_123'
         tokenCache={mocks.tokenCache}
@@ -402,14 +402,9 @@ describe('ClerkProvider native session notifications', () => {
 
     mocks.configure.mockClear();
     mocks.tokenCache.getToken.mockResolvedValue('client-token');
-    mocks.authState.sessionId = 'sess_js';
-
-    rerender(
-      <ClerkProvider
-        publishableKey='pk_test_123'
-        tokenCache={mocks.tokenCache}
-      />,
-    );
+    act(() => {
+      mocks.clerkListener?.({ session: { id: 'sess_js' } });
+    });
 
     await waitFor(() => {
       expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', 'client-token');
@@ -419,7 +414,7 @@ describe('ClerkProvider native session notifications', () => {
   test('refreshes native after JS signs out', async () => {
     mocks.authState.sessionId = 'sess_js';
 
-    const { rerender } = render(
+    render(
       <ClerkProvider
         publishableKey='pk_test_123'
         tokenCache={mocks.tokenCache}
@@ -431,18 +426,22 @@ describe('ClerkProvider native session notifications', () => {
     });
 
     mocks.configure.mockClear();
+    act(() => {
+      mocks.clerkListener?.({ session: { id: 'sess_js' } });
+    });
+
+    await waitFor(() => {
+      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', 'client-token');
+    });
+
+    mocks.configure.mockClear();
     mocks.notifyNativeSessionChanged.mockClear();
     mocks.refreshClient.mockClear();
     mocks.signOut.mockClear();
     mocks.tokenCache.getToken.mockResolvedValue(null);
-    mocks.authState.sessionId = null;
-
-    rerender(
-      <ClerkProvider
-        publishableKey='pk_test_123'
-        tokenCache={mocks.tokenCache}
-      />,
-    );
+    act(() => {
+      mocks.clerkListener?.({ session: null });
+    });
 
     await waitFor(() => {
       expect(mocks.signOut).toHaveBeenCalledWith('sess_js');
