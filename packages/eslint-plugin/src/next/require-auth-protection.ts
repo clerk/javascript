@@ -2,18 +2,12 @@
 import type { TSESTree } from '@typescript-eslint/utils';
 import type { Rule } from 'eslint';
 
-import type { ExportTarget, FunctionNode } from '../lib/exports';
-import { iterateExportAllDeclarations, iterateNamedExports, resolveDefaultExport } from '../lib/exports';
-import {
-  type FileKind,
-  getFileKind,
-  getRelativeFolder,
-  isClientModule,
-  isServerFunctionModule,
-} from '../lib/file-info';
-import type { ClassifyOptions } from '../lib/match-folders';
-import { classifyFolder, hasDescendantsMatching } from '../lib/match-folders';
-import { findAuthLocalNames, hasProtectAtTop } from '../lib/protection-checks';
+import type { ExportTarget, FunctionNode } from './lib/exports';
+import { iterateExportAllDeclarations, iterateNamedExports, resolveDefaultExport } from './lib/exports';
+import { type FileKind, getFileKind, getRelativeFolder, isClientModule, isServerFunctionModule } from './lib/file-info';
+import type { ClassifyOptions } from './lib/match-folders';
+import { classifyFolder, hasDescendantsMatching } from './lib/match-folders';
+import { findAuthLocalNames, hasProtectAtTop } from './lib/protection-checks';
 
 export type MessageId = 'missingProtect' | 'exportImported' | 'unverifiableExport' | 'unlistedMixedScopeLayout';
 
