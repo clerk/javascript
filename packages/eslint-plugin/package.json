@@ -35,20 +35,20 @@
         "default": "./dist/next.js"
       }
     },
-    "./fix-auth-protection": {
+    "./next/fix-auth-protection": {
       "import": {
-        "types": "./dist/fixAuthProtection.d.mts",
-        "default": "./dist/fixAuthProtection.mjs"
+        "types": "./dist/next/fix-auth-protection.d.mts",
+        "default": "./dist/next/fix-auth-protection.mjs"
       },
       "require": {
-        "types": "./dist/fix-auth-protection.d.ts",
-        "default": "./dist/fix-auth-protection.js"
+        "types": "./dist/next/fix-auth-protection.d.ts",
+        "default": "./dist/next/fix-auth-protection.js"
       }
     },
     "./package.json": "./package.json"
   },
   "bin": {
-    "clerk-fix-auth-protection": "./dist/cli.js"
+    "clerk-next-fix-auth-protection": "./dist/next/fix-auth-protection-cli.js"
   },
   "files": [
     "dist"

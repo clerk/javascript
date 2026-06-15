@@ -6,7 +6,7 @@ import * as tsParser from '@typescript-eslint/parser';
 import { ESLint, type Linter as LinterTypes } from 'eslint';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { fixAuthProtection } from '../../fix-auth-protection';
+import { fixAuthProtection } from '../fix-auth-protection';
 import rule from '../require-auth-protection';
 
 // Register the rule directly (rather than importing the `next` plugin barrel,

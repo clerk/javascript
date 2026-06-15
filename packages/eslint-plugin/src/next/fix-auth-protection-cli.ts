@@ -8,14 +8,14 @@ function relative(filePath: string): string {
   return path.relative(process.cwd(), filePath) || filePath;
 }
 
-const HELP = `clerk-fix-auth-protection
+const HELP = `clerk-next-fix-auth-protection
 
 Apply the @clerk/eslint-plugin \`require-auth-protection\` rule's
 \`await auth.protect()\` suggestions across your project. Uses your existing
 ESLint config (so the protected/public folder globs are honored).
 
 Usage
-  clerk-fix-auth-protection [patterns...] [options]
+  clerk-next-fix-auth-protection [patterns...] [options]
 
 Arguments
   patterns            Files, directories, or globs to scan (default: ".")
@@ -25,8 +25,8 @@ Options
   -h, --help          Show this help
 
 Examples
-  clerk-fix-auth-protection
-  clerk-fix-auth-protection "app/**" --dry-run
+  clerk-next-fix-auth-protection
+  clerk-next-fix-auth-protection "app/**" --dry-run
 `;
 
 function pluralize(count: number, noun: string): string {

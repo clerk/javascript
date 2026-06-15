@@ -5,8 +5,8 @@
  * *suggestion* rather than an autofix, so `eslint --fix` deliberately leaves it
  * alone (adding a protection check changes runtime behavior). This runner lets
  * you apply those suggestions in bulk on demand — from a script via
- * `fixAuthProtection()` or from the terminal via the `clerk-fix-auth-protection`
- * command.
+ * `fixAuthProtection()` or from the terminal via the
+ * `clerk-next-fix-auth-protection` command.
  *
  * It works by linting with the consumer's own ESLint config (so the
  * protected/public folder globs are honored) and applying the rule's

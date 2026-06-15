@@ -5,8 +5,8 @@ import pkgJson from './package.json' with { type: 'json' };
 export default defineConfig({
   entry: {
     next: './src/next/index.ts',
-    fixAuthProtection: './src/fix-auth-protection.ts',
-    cli: './src/cli.ts',
+    'next/fix-auth-protection': './src/next/fix-auth-protection.ts',
+    'next/fix-auth-protection-cli': './src/next/fix-auth-protection-cli.ts',
   },
   format: ['cjs', 'esm'],
   fixedExtension: false,

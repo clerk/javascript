@@ -146,19 +146,19 @@ Because the protection insertion is a suggestion rather than an autofix, `eslint
 
 ```sh
 # Fix everything under the current directory
-npx clerk-fix-auth-protection
+npx clerk-next-fix-auth-protection
 
 # Scope it, or preview without writing
-npx clerk-fix-auth-protection "app/**"
-npx clerk-fix-auth-protection --dry-run
+npx clerk-next-fix-auth-protection "app/**"
+npx clerk-next-fix-auth-protection --dry-run
 ```
 
 Resources the rule can't safely fix on its own (imported/wrapped exports, unacknowledged mixed-scope layouts) are listed as needing manual attention, and the command exits non-zero when any remain (or when `--dry-run` would make changes), so it can gate CI.
 
 The same logic is available programmatically:
 
-```ts
-import { fixAuthProtection } from '@clerk/eslint-plugin/fix-auth-protection';
+````ts
+import { fixAuthProtection } from '@clerk/eslint-plugin/next/fix-auth-protection';
 
 const { fixed, unresolved } = await fixAuthProtection({
   patterns: ['app/**'],
@@ -218,7 +218,7 @@ if (
   unauthorized();
   forbidden();
 }
-```
+````
 
 ## Support
 
