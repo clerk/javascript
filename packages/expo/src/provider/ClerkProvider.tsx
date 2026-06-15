@@ -63,7 +63,7 @@ type SyncableClerkInstance = {
   client?: { lastActiveSessionId?: string | null } | null;
   loaded?: boolean;
   session?: { id?: string | null } | null;
-  setActive?: (params: { session: string }) => void | Promise<void>;
+  setActive?: (params: { session: string | null }) => void | Promise<void>;
   __internal_reloadInitialResources?: () => void | Promise<void>;
 };
 
@@ -172,6 +172,8 @@ async function syncNativeClientToJs({
     typeof clerkInstance.setActive === 'function'
   ) {
     await clerkInstance.setActive({ session: nativeActiveSessionId });
+  } else if (!nativeActiveSessionId && jsActiveSessionId && typeof clerkInstance.setActive === 'function') {
+    await clerkInstance.setActive({ session: null });
   }
 }
 
