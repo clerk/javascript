@@ -176,6 +176,7 @@ export function OrganizationProfile(props: OrganizationProfileProps) {
                 onClick={() => setActive(section.value)}
                 {...s.navItem}
                 {...(active === section.value ? { 'data-cl-selected': '' } : {})}
+                aria-current={active === section.value ? 'page' : undefined}
               >
                 {section.label}
               </button>
