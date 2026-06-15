@@ -1,5 +1,20 @@
 # Change Log
 
+## 3.4.3
+
+### Patch Changes
+
+- Bump the bundled `clerk-ios` SDK from `1.2.2` to `1.2.3`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.2.3. ([#8854](https://github.com/clerk/javascript/pull/8854)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Bump the bundled `clerk-ios` SDK from `1.2.3` to `1.2.4`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.2.4. ([#8867](https://github.com/clerk/javascript/pull/8867)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Fix platform-specific module resolution for Expo builds so native and web implementations are selected correctly. ([#8865](https://github.com/clerk/javascript/pull/8865)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`f4167ec`](https://github.com/clerk/javascript/commit/f4167eccb19e0de98340d48e221b950e3dad189e), [`17e4164`](https://github.com/clerk/javascript/commit/17e416471a5409e5a4c02f4f94f687c428c071de), [`ed2cf75`](https://github.com/clerk/javascript/commit/ed2cf75ce713703d8e2c258fc3ca0cf43dc964dc), [`67c04a4`](https://github.com/clerk/javascript/commit/67c04a43db64b70819d68333f99e3483523d1d47), [`fa23ad8`](https://github.com/clerk/javascript/commit/fa23ad84957eebbc1856c213d178de32a10dcbf2), [`51c8fdc`](https://github.com/clerk/javascript/commit/51c8fdcb7160457e44cfe7cc86524f7d728a030a), [`c2ba971`](https://github.com/clerk/javascript/commit/c2ba971aad55df570507b7b117786ab048415ad3), [`8744728`](https://github.com/clerk/javascript/commit/8744728e6610b2229f56dd3b31975c3f57395f02), [`d9b5c7d`](https://github.com/clerk/javascript/commit/d9b5c7d79fe641d08f45f0df7d4f5146b6b2c3ab)]:
+  - @clerk/shared@4.18.0
+  - @clerk/clerk-js@6.17.0
+  - @clerk/react@6.10.0
+
 ## 3.4.2
 
 ### Patch Changes

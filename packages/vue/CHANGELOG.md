@@ -1,5 +1,14 @@
 # @clerk/vue
 
+## 2.4.3
+
+### Patch Changes
+
+- Align the `HeadlessBrowserClerk.load()` parameter type with the runtime behavior by accepting the full `ClerkOptions`, including `isSatellite`. The clerk-js implementation has always accepted and used `isSatellite` from `load()` options — it's the only way to configure a satellite app when using `@clerk/clerk-js` directly — but the type previously excluded it, producing a contradictory generated API reference and type errors for direct consumers. ([#8846](https://github.com/clerk/javascript/pull/8846)) by [@manovotny](https://github.com/manovotny)
+
+- Updated dependencies [[`f4167ec`](https://github.com/clerk/javascript/commit/f4167eccb19e0de98340d48e221b950e3dad189e), [`17e4164`](https://github.com/clerk/javascript/commit/17e416471a5409e5a4c02f4f94f687c428c071de), [`ed2cf75`](https://github.com/clerk/javascript/commit/ed2cf75ce713703d8e2c258fc3ca0cf43dc964dc), [`67c04a4`](https://github.com/clerk/javascript/commit/67c04a43db64b70819d68333f99e3483523d1d47), [`51c8fdc`](https://github.com/clerk/javascript/commit/51c8fdcb7160457e44cfe7cc86524f7d728a030a), [`c2ba971`](https://github.com/clerk/javascript/commit/c2ba971aad55df570507b7b117786ab048415ad3), [`8744728`](https://github.com/clerk/javascript/commit/8744728e6610b2229f56dd3b31975c3f57395f02), [`d9b5c7d`](https://github.com/clerk/javascript/commit/d9b5c7d79fe641d08f45f0df7d4f5146b6b2c3ab)]:
+  - @clerk/shared@4.18.0
+
 ## 2.4.2
 
 ### Patch Changes
