@@ -42,9 +42,9 @@ describe('messagesToJSON', () => {
   it('does not pollute Object.prototype when namespace is a dangerous key', () => {
     const i18n = createI18n(atom('en'), { get: vi.fn() });
     const $store = i18n('__proto__', { polluted: 'bad' });
-    const before = Object.prototype.hasOwnProperty('polluted');
+    const before = Object.hasOwn(Object.prototype, 'polluted');
     messagesToJSON($store);
-    expect(Object.prototype.hasOwnProperty('polluted')).toBe(before);
+    expect(Object.hasOwn(Object.prototype, 'polluted')).toBe(before);
     expect(({} as Record<string, unknown>).polluted).toBeUndefined();
   });
 });
