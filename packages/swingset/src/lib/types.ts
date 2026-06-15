@@ -38,6 +38,12 @@ export interface StoryMeta {
   group: string;
   title: string;
   /**
+   * Optional human-friendly label shown in the sidebar. Falls back to `title` when
+   * omitted. Use this when the desired sidebar text differs from the component name
+   * (which still drives the slug and the `<Title />` tag).
+   */
+  label?: string;
+  /**
    * Path to the file that exports the documented component, relative to the monorepo
    * root (e.g. `packages/ui/src/mosaic/components/button.tsx`). Rendered as a "View
    * source" link to the file on GitHub. See `lib/source.ts`.
