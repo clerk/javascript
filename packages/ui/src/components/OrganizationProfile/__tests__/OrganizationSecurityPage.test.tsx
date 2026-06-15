@@ -25,6 +25,14 @@ const DESCRIPTION_LINE_1 =
 const DESCRIPTION_LINE_2 =
   'Anyone who signs in will be automatically added to this organization. New members will be assigned to member.';
 
+const verifiedDomain = {
+  id: 'dmn_verified',
+  name: 'clerk.com',
+  organizationId: 'Org1',
+  enrollmentMode: 'enterprise_sso',
+  ownershipVerification: { status: 'verified', strategy: 'txt' },
+} as any;
+
 const configuredConnection = (overrides: Record<string, unknown> = {}) =>
   ({
     id: 'ent_1',
@@ -191,6 +199,7 @@ describe('OrganizationSecurityPage', () => {
       const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
 
       fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
+      fixtures.clerk.organization?.getDomains.mockResolvedValue({ data: [verifiedDomain], total_count: 1 } as any);
 
       const { userEvent } = renderPage(wrapper);
 
@@ -208,6 +217,7 @@ describe('OrganizationSecurityPage', () => {
         data: [{ id: 'run_1', status: 'success' }],
         total_count: 1,
       } as any);
+      fixtures.clerk.organization?.getDomains.mockResolvedValue({ data: [verifiedDomain], total_count: 1 } as any);
 
       const { userEvent } = renderPage(wrapper);
 
