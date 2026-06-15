@@ -1,6 +1,7 @@
 import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
+import type { PaginationState } from './use-data-table';
 import { useDataTable } from './use-data-table';
 
 type Person = { id: number; name: string; role: string };
@@ -20,6 +21,14 @@ describe('useDataTable', () => {
       expect(result.current.rows[0].id).toBe('0');
       expect(result.current.rows[1].id).toBe('1');
       expect(result.current.rows[2].id).toBe('2');
+    });
+
+    it('uses getRowId for stable ids when provided', () => {
+      const { result } = renderHook(() => useDataTable({ data: DATA, getRowId: row => String(row.id) }));
+
+      expect(result.current.rows[0].id).toBe('1');
+      expect(result.current.rows[1].id).toBe('2');
+      expect(result.current.rows[2].id).toBe('3');
     });
 
     it('exposes original data on each row', () => {
@@ -133,6 +142,15 @@ describe('useDataTable', () => {
 
       expect(onColumnFiltersChange).toHaveBeenCalledWith([{ id: 'role', value: 'Member' }]);
     });
+
+    it('respects controlled columnFilters prop', () => {
+      const controlled: Array<{ id: string; value: unknown }> = [{ id: 'role', value: 'Admin' }];
+      const { result } = renderHook(() => useDataTable({ data: DATA, columnFilters: controlled }));
+
+      act(() => result.current.setColumnFilters([]));
+
+      expect(result.current.columnFilters).toEqual(controlled);
+    });
   });
 
   describe('globalFilter', () => {
@@ -157,6 +175,14 @@ describe('useDataTable', () => {
       act(() => result.current.setGlobalFilter('bob'));
 
       expect(onGlobalFilterChange).toHaveBeenCalledWith('bob');
+    });
+
+    it('respects controlled globalFilter prop', () => {
+      const { result } = renderHook(() => useDataTable({ data: DATA, globalFilter: 'alice' }));
+
+      act(() => result.current.setGlobalFilter(''));
+
+      expect(result.current.globalFilter).toBe('alice');
     });
   });
 
@@ -251,6 +277,24 @@ describe('useDataTable', () => {
       expect(result.current.pagination.pageIndex).toBe(1);
     });
 
+    it('nextPage does not advance past the last page', () => {
+      const { result } = renderHook(() =>
+        useDataTable({ data: DATA, totalCount: 10, defaultPagination: { pageIndex: 0, pageSize: 10 } }),
+      );
+
+      act(() => result.current.nextPage());
+
+      expect(result.current.pagination.pageIndex).toBe(0);
+    });
+
+    it('previousPage does not go below page 0', () => {
+      const { result } = renderHook(() => useDataTable({ data: DATA }));
+
+      act(() => result.current.previousPage());
+
+      expect(result.current.pagination.pageIndex).toBe(0);
+    });
+
     it('setPageSize updates pageSize and resets pageIndex to 0', () => {
       const { result } = renderHook(() =>
         useDataTable({ data: DATA, defaultPagination: { pageIndex: 3, pageSize: 10 } }),
@@ -275,6 +319,15 @@ describe('useDataTable', () => {
       act(() => result.current.nextPage());
 
       expect(onPaginationChange).toHaveBeenCalledWith({ pageIndex: 1, pageSize: 10 });
+    });
+
+    it('respects controlled pagination prop', () => {
+      const controlled: PaginationState = { pageIndex: 2, pageSize: 10 };
+      const { result } = renderHook(() => useDataTable({ data: DATA, totalCount: 50, pagination: controlled }));
+
+      act(() => result.current.nextPage());
+
+      expect(result.current.pagination).toEqual(controlled);
     });
   });
 
@@ -340,6 +393,14 @@ describe('useDataTable', () => {
       expect(result.current.getIsSomeRowsSelected()).toBe(false);
     });
 
+    it('getIsSomeRowsSelected() returns false when all rows are selected', () => {
+      const { result } = renderHook(() =>
+        useDataTable({ data: DATA, defaultRowSelection: { '0': true, '1': true, '2': true } }),
+      );
+
+      expect(result.current.getIsSomeRowsSelected()).toBe(false);
+    });
+
     it('toggleAllRowsSelected() selects all rows', () => {
       const { result } = renderHook(() => useDataTable({ data: DATA }));
 
@@ -366,6 +427,15 @@ describe('useDataTable', () => {
       act(() => result.current.rows[1].toggleSelected());
 
       expect(onRowSelectionChange).toHaveBeenCalledWith({ '1': true });
+    });
+
+    it('respects controlled rowSelection prop', () => {
+      const controlled = { '0': true };
+      const { result } = renderHook(() => useDataTable({ data: DATA, rowSelection: controlled }));
+
+      act(() => result.current.rows[0].toggleSelected());
+
+      expect(result.current.rowSelection).toEqual(controlled);
     });
   });
 });

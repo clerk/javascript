@@ -17,6 +17,7 @@ function functionalUpdate<T>(updater: Updater<T>, old: T): T {
 
 export interface UseDataTableOptions<TData> {
   data: TData[];
+  getRowId?: (row: TData, index: number) => string;
   totalCount?: number;
 
   sorting?: SortingState;
@@ -140,7 +141,7 @@ export function useDataTable<TData>(opts: UseDataTableOptions<TData>): UseDataTa
   const rows = useMemo<DataTableRow<TData>[]>(
     () =>
       opts.data.map((original, i) => {
-        const id = String(i);
+        const id = opts.getRowId ? opts.getRowId(original, i) : String(i);
         return {
           id,
           original,
@@ -148,7 +149,7 @@ export function useDataTable<TData>(opts: UseDataTableOptions<TData>): UseDataTa
           toggleSelected: () => setRowSelection(old => ({ ...old, [id]: !old[id] })),
         };
       }),
-    [opts.data, rowSelection, setRowSelection],
+    [opts.data, opts.getRowId, rowSelection, setRowSelection],
   );
 
   // ── Pagination helpers ──────────────────────────────────────────────────────
@@ -165,12 +166,23 @@ export function useDataTable<TData>(opts: UseDataTableOptions<TData>): UseDataTa
 
   const getCanPreviousPage = useCallback(() => pagination.pageIndex > 0, [pagination.pageIndex]);
 
-  const nextPage = useCallback(() => setPagination(p => ({ ...p, pageIndex: p.pageIndex + 1 })), [setPagination]);
+  const nextPage = useCallback(() => {
+    if (getCanNextPage()) {
+      setPagination(p => ({ ...p, pageIndex: p.pageIndex + 1 }));
+    }
+  }, [getCanNextPage, setPagination]);
 
-  const previousPage = useCallback(() => setPagination(p => ({ ...p, pageIndex: p.pageIndex - 1 })), [setPagination]);
+  const previousPage = useCallback(
+    () => setPagination(p => ({ ...p, pageIndex: Math.max(0, p.pageIndex - 1) })),
+    [setPagination],
+  );
 
   const setPageSize = useCallback(
-    (size: number) => setPagination(() => ({ pageIndex: 0, pageSize: size })),
+    (size: number) => {
+      if (size > 0) {
+        setPagination(() => ({ pageIndex: 0, pageSize: size }));
+      }
+    },
     [setPagination],
   );
 
@@ -181,7 +193,10 @@ export function useDataTable<TData>(opts: UseDataTableOptions<TData>): UseDataTa
     [rows, rowSelection],
   );
 
-  const getIsSomeRowsSelected = useCallback(() => rows.some(r => !!rowSelection[r.id]), [rows, rowSelection]);
+  const getIsSomeRowsSelected = useCallback(
+    () => rows.some(r => !!rowSelection[r.id]) && !getIsAllRowsSelected(),
+    [rows, rowSelection, getIsAllRowsSelected],
+  );
 
   const toggleAllRowsSelected = useCallback(() => {
     setRowSelection(getIsAllRowsSelected() ? {} : Object.fromEntries(rows.map(r => [r.id, true])));
