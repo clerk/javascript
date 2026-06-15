@@ -295,7 +295,11 @@ const DomainCard = ({
 }: {
   domain: OrganizationDomainResource;
   onRemove: () => void;
-}): JSX.Element => {
+}): JSX.Element | null => {
+  if (!domain.name) {
+    return null;
+  }
+
   const ownershipVerification = domain.ownershipVerification;
   const isVerified = ownershipVerification?.status === 'verified';
   const cardId = isVerified ? 'verified' : 'unverified';
