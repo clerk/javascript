@@ -140,13 +140,16 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
     case .sessionChanged(_, _), .signInCompleted(_), .signUpCompleted(_):
       emitClerkNativeRefreshClient(Self.authStatePayload())
     case .signedOut(_), .accountDeleted:
-      do {
-        _ = try await Clerk.shared.refreshClient()
-      } catch {
-        // The auth event still represents the latest user action; emit below so
-        // JS consumers can clear stale state even if the follow-up refresh fails.
+      emitClerkNativeRefreshClient(Self.signedOutAuthStatePayload())
+      Swift.Task { @MainActor in
+        do {
+          _ = try await Clerk.shared.refreshClient()
+        } catch {
+          // The auth event still represents the latest user action; emit below so
+          // JS consumers can clear stale state even if the follow-up refresh fails.
+        }
+        emitClerkNativeRefreshClient(Self.authStatePayload())
       }
-      emitClerkNativeRefreshClient(Self.authStatePayload())
     case .signInNeedsContinuation(_), .signUpNeedsContinuation(_), .tokenRefreshed(_):
       break
     }
@@ -180,6 +183,16 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
     }
 
     return payload
+  }
+
+  @MainActor
+  private static func signedOutAuthStatePayload() -> [String: Any] {
+    return [
+      "sessionId": NSNull(),
+      "clientToken": Clerk.shared.deviceToken ?? NSNull(),
+      "session": NSNull(),
+      "user": NSNull(),
+    ]
   }
 
   @MainActor
