@@ -39,7 +39,7 @@ type UpdateParams = {
   /**
    * Overrides the sign-in strategy that is preferred when a password is required.
    *
-   * @remarks Accepts `'password'` or `'otp'`. Pass an empty string to clear the override. The value is only consulted when a password is required, and is dormant otherwise.
+   * @remarks Accepts `'password'` or `'otp'`. Pass an empty string to clear the override. Passing `null` or `undefined` leaves the current value unchanged. The value is only consulted when a password is required, and is dormant otherwise.
    */
   preferredSignInStrategyWhenPasswordRequired?: 'password' | 'otp' | '' | null | undefined;
 };
