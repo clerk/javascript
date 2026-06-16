@@ -2,23 +2,13 @@ import { iconImageUrl } from '@clerk/shared/constants';
 import React from 'react';
 
 import type { LocalizationKey } from '@/customizables';
-import {
-  Box,
-  Col,
-  descriptors,
-  Flow,
-  Grid,
-  localizationKeys,
-  RadioInput,
-  Span,
-  Text,
-  useLocalizations,
-} from '@/customizables';
+import { Box, Col, descriptors, Flow, Grid, localizationKeys, Span, Text, useLocalizations } from '@/customizables';
 import { useCardState } from '@/elements/contexts';
 import { common, mqu } from '@/styledSystem';
 import { Alert } from '@/ui/elements/Alert';
 import { handleError } from '@/utils/errorHandler';
 
+import { ChangeProviderDialog } from '../ChangeProviderDialog';
 import { useConfigureSSO } from '../ConfigureSSOContext';
 import { Step } from '../elements/Step';
 import { useWizard } from '../elements/Wizard';
@@ -54,30 +44,42 @@ const PROVIDER_GROUPS: ReadonlyArray<{
   },
 ];
 
+const providerLabel = (provider: ProviderType): LocalizationKey | undefined =>
+  PROVIDER_GROUPS.flatMap(group => group.options).find(option => option.id === provider)?.label;
+
 export const SelectProviderStep = (): JSX.Element => {
   const {
     organizationEnterpriseConnection: c,
-    enterpriseConnectionMutations: { createConnection },
+    enterpriseConnectionMutations: { createConnection, changeProvider },
+    contentRef,
   } = useConfigureSSO();
   const { goNext, goPrev, isFirstStep } = useWizard();
+  const { t } = useLocalizations();
 
   const [selected, setSelected] = React.useState<ProviderType | null>(c.provider ?? null);
   const card = useCardState();
 
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [isChangeDialogOpen, setIsChangeDialogOpen] = React.useState(false);
 
   const handleSelect = (next: ProviderType) => {
     setSelected(next);
   };
+
+  const isChangingProvider = c.hasConnection && selected !== null && selected !== c.provider;
 
   const handleContinue = async (): Promise<void> => {
     if (!selected) {
       return;
     }
 
-    if (c.hasConnection) {
-      // TODO ORGS-1607 - Support changing the provider
+    if (c.hasConnection && selected === c.provider) {
       void goNext();
+      return;
+    }
+
+    if (isChangingProvider) {
+      setIsChangeDialogOpen(true);
       return;
     }
 
@@ -92,6 +94,28 @@ export const SelectProviderStep = (): JSX.Element => {
       setIsSubmitting(false);
     }
   };
+
+  const handleConfirmChangeProvider = async (): Promise<void> => {
+    if (!selected) {
+      return;
+    }
+
+    card.setError(undefined);
+    setIsSubmitting(true);
+
+    try {
+      await changeProvider(selected);
+      setIsChangeDialogOpen(false);
+      void goNext();
+    } catch (err) {
+      handleError(err as Error, [], card.setError);
+      setIsChangeDialogOpen(false);
+      setIsSubmitting(false);
+    }
+  };
+
+  const currentProviderLabel = c.provider ? providerLabel(c.provider) : undefined;
+  const nextProviderLabel = selected ? providerLabel(selected) : undefined;
 
   return (
     <Flow.Part part='selectProvider'>
@@ -122,6 +146,8 @@ export const SelectProviderStep = (): JSX.Element => {
                 />
 
                 <Grid
+                  role='radiogroup'
+                  aria-label={t(group.label)}
                   elementDescriptor={descriptors.configureSSOProviderGrid}
                   gap={3}
                   sx={{
@@ -134,22 +160,16 @@ export const SelectProviderStep = (): JSX.Element => {
                   {group.options.map(option => (
                     <ProviderCard
                       key={option.id}
-                      name='configure-sso-provider'
                       value={option.id}
                       iconId={option.iconId}
                       label={option.label}
-                      checked={selected === option.id}
-                      onChange={() => handleSelect(option.id)}
+                      isSelected={selected === option.id}
+                      onSelect={() => handleSelect(option.id)}
                     />
                   ))}
                 </Grid>
               </Col>
             ))}
-
-            <Alert
-              variant='warning'
-              title={localizationKeys('configureSSO.selectProviderStep.warning')}
-            />
 
             {card.error && (
               <Alert
@@ -164,39 +184,56 @@ export const SelectProviderStep = (): JSX.Element => {
         <Step.Footer>
           <Step.Footer.Previous
             onClick={() => goPrev()}
-            isDisabled={isFirstStep}
+            isDisabled={isFirstStep || isSubmitting}
           />
 
           <Step.Footer.Continue
             onClick={handleContinue}
-            isLoading={isSubmitting}
+            isLoading={isSubmitting && !isChangeDialogOpen}
             isDisabled={!selected || isSubmitting}
           />
         </Step.Footer>
+
+        {currentProviderLabel && nextProviderLabel ? (
+          <ChangeProviderDialog
+            isOpen={isChangeDialogOpen}
+            onClose={() => setIsChangeDialogOpen(false)}
+            onConfirm={() => {
+              void handleConfirmChangeProvider();
+            }}
+            isSubmitting={isSubmitting}
+            nextProviderLabel={nextProviderLabel}
+            currentProviderLabel={currentProviderLabel}
+            contentRef={contentRef}
+          />
+        ) : null}
       </Step>
     </Flow.Part>
   );
 };
 
 type ProviderCardProps = {
-  name: string;
   value: string;
   iconId: string;
   label: LocalizationKey;
-  checked?: boolean;
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  isSelected?: boolean;
+  onSelect: () => void;
 };
 
-const ProviderCard = ({ name, value, iconId, label, checked, onChange }: ProviderCardProps): JSX.Element => {
+const ProviderCard = ({ value, iconId, label, isSelected, onSelect }: ProviderCardProps): JSX.Element => {
   const { t } = useLocalizations();
   const labelText = t(label);
 
   return (
     <Box
-      as='label'
+      as='button'
+      role='radio'
+      aria-checked={isSelected}
+      aria-label={labelText}
       elementDescriptor={descriptors.configureSSOProviderCard}
       elementId={descriptors.configureSSOProviderCard.setId(value)}
-      isActive={checked}
+      isActive={isSelected}
+      onClick={onSelect}
       sx={t => ({
         display: 'flex',
         flexDirection: 'column',
@@ -207,38 +244,19 @@ const ProviderCard = ({ name, value, iconId, label, checked, onChange }: Provide
         padding: t.space.$1x5,
         cursor: 'pointer',
         position: 'relative',
+        appearance: 'none',
+        textAlign: 'center',
+        backgroundColor: isSelected ? t.colors.$neutralAlpha50 : 'transparent',
         ...common.borderVariants(t).normal,
-        '&:has(input:focus-visible)': {
+        '&:focus-visible': {
           ...common.focusRingStyles(t),
           borderColor: t.colors.$borderAlpha300,
         },
         '&:hover': {
           backgroundColor: t.colors.$neutralAlpha50,
         },
-        '&:has(input:checked)': {
-          backgroundColor: t.colors.$neutralAlpha50,
-        },
       })}
     >
-      <RadioInput
-        elementDescriptor={descriptors.configureSSOProviderCardRadio}
-        elementId={descriptors.configureSSOProviderCardRadio.setId(value)}
-        name={name}
-        value={value}
-        checked={checked}
-        onChange={onChange}
-        focusRing={false}
-        sx={theme => ({
-          position: 'absolute',
-          top: theme.space.$1x5,
-          insetInlineStart: theme.space.$1x5,
-          margin: 0,
-          width: 'fit-content',
-          boxShadow: 'none',
-          '&:hover': { boxShadow: 'none' },
-        })}
-      />
-
       <Span
         elementDescriptor={descriptors.configureSSOProviderCardIcon}
         elementId={descriptors.configureSSOProviderCardIcon.setId(value)}
