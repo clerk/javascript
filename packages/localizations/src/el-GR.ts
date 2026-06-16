@@ -1070,6 +1070,7 @@ export const elGR: LocalizationResource = {
     identification_deletion_failed: 'Δεν μπορείτε να διαγράψετε το τελευταίο στοιχείο ταυτοποιησής σας.',
     not_allowed_access:
       "Η διεύθυνση email ή το τηλέφωνο δεν επιτρέπεται για την εγγραφή. Αυτό μπορεί να οφείλεται στη χρήση '+', '=', '#' ή '.' στην διεύθυνση email σας, χρήση πεδίου που συνδέεται με υπηρεσία email, ή εμφανής αποκλεισμός. Αν πιστεύετε ότι αυτό είναι ένα σφάλμα, παρακαλούμε επικοινωνήστε με την υποστήριξη.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'Ο τομέας {{domain}} δεν μπορεί να επαληθευτεί.',
     organization_domain_common: 'Ο τομέας {{domain}} δεν μπορεί να επαληθευτεί επειδή είναι κοινός τομέας email.',
     organization_domain_exists_for_enterprise_connection:

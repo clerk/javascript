@@ -1067,6 +1067,7 @@ export const roRO: LocalizationResource = {
       'Numele dvs. de utilizator trebuie să conțină cel puțin un caracter nenumeric.',
     identification_deletion_failed: undefined,
     not_allowed_access: undefined,
+    oauth_access_denied: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,

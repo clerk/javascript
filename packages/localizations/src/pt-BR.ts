@@ -1066,6 +1066,7 @@ export const ptBR: LocalizationResource = {
     identification_deletion_failed: 'Você não pode excluir sua última identificação.',
     not_allowed_access:
       "O endereço de e-mail ou número de telefone não é permitido para registro. Isso pode ser devido ao uso de '+', '=', '#' ou '.' no endereço de e-mail, o uso de um domínio associado a um serviço de e-mail temporário ou uma exclusão explícita.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'Este é um provedor de domínio de e-mail bloqueado. Por favor, use um diferente.',
     organization_domain_common: 'Este é um provedor de domínio de e-mail comum. Por favor, use um diferente.',
     organization_domain_exists_for_enterprise_connection: 'Este domínio já existe para uma conexão empresarial.',

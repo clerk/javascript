@@ -1077,6 +1077,7 @@ export const jaJP: LocalizationResource = {
     identification_deletion_failed: '最後の識別情報は削除できません。',
     not_allowed_access:
       "メールアドレスまたは電話番号は登録に使用できません。これは、'+', '=', '#' または '.' がメールアドレスに使用されているか、一時的な電子メールサービスに接続されたドメインが使用されているか、明示的な除外が行われているためです。エラーが発生した場合は、サポートに連絡してください。",
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'このメールプロバイダーのドメインはブロックされています。別のものを使用してください。',
     organization_domain_common: 'これは一般的なメールプロバイダーのドメインです。別のものを使用してください。',
     organization_domain_exists_for_enterprise_connection: 'このドメインは組織の SSO で既に使用されています。',

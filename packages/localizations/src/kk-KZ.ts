@@ -1040,6 +1040,7 @@ export const kkKZ: LocalizationResource = {
     form_username_needs_non_number_char: 'Пайдаланушы атыңызда кемінде бір санды емес таңба болуы керек.',
     identification_deletion_failed: 'Соңғы идентификацияны жою мүмкін емес.',
     not_allowed_access: 'Бұл бетке қол жеткізуге рұқсат жоқ. Қате болса, қолдау қызметіне хабарласыңыз.',
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'Бұл электрондық пошта домені бұғатталған. Басқасын қолданыңыз.',
     organization_domain_common: 'Бұл жалпы электрондық пошта домені. Басқасын қолданыңыз.',
     organization_domain_exists_for_enterprise_connection: 'Бұл домен ұйымыңыздың SSO үшін қолданылады.',

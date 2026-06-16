@@ -1634,6 +1634,7 @@ export const enUS: LocalizationResource = {
     insufficient_seats_contact_support:
       'Your organization does not have enough seats to invite the desired number of members. Please contact support.',
     not_allowed_access: undefined,
+    oauth_access_denied: 'You did not grant access to your account.',
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,

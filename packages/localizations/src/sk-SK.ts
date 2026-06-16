@@ -1059,6 +1059,7 @@ export const skSK: LocalizationResource = {
     form_username_needs_non_number_char: 'Vaše používateľské meno musí obsahovať aspoň jeden nečíselný znak.',
     identification_deletion_failed: 'Nemôžete odstrániť váš posledný identifikátor.',
     not_allowed_access: 'Nemáte povolený prístup k tejto stránke. Ak si myslíte, že je to chyba, kontaktujte podporu.',
+    oauth_access_denied: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,

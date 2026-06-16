@@ -1070,6 +1070,7 @@ export const frFR: LocalizationResource = {
     identification_deletion_failed: 'Vous ne pouvez pas supprimer votre dernière identification.',
     not_allowed_access:
       "L'adresse e-mail ou le numéro de téléphone n'est pas autorisée à s'inscrire. Cela peut être dû à l'utilisation de '+', '=', '#' ou '.' dans votre adresse e-mail, l'utilisation d'un domaine connecté à un service de messagerie temporaire ou l'exclusion explicite. Si vous pensez que c'est une erreur, veuillez contacter le support.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: "Ce domaine d'organisation est bloqué.",
     organization_domain_common: 'Ce domaine est trop courant pour une organisation.',
     organization_domain_exists_for_enterprise_connection: undefined,
