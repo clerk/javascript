@@ -1,0 +1,30 @@
+# Code owners for the @clerk/javascript release and CI control plane.
+#
+# These paths are the supply-chain surface: workflows, composite actions, the
+# package manager + workspace config, the release/changeset config, and the
+# dependency-intake config. A change here can reach OIDC publishing, alter what
+# gets packed into published tarballs, or weaken the workflow trust boundary, so
+# every change requires review from the team that owns the release pipeline.
+#
+# Routing alone does not enforce review: it is only enforced once branch
+# protection requires Code Owner approval on these paths (the admin half of
+# SDK-79). See SDK-79 / Monorepo Supply-Chain Hardening.
+
+# Entire GitHub Actions surface: workflows and composite actions.
+/.github/                                 @clerk/sdk-infra
+
+# Package manager, workspace, and root manifest.
+/.npmrc                                   @clerk/sdk-infra
+/pnpm-workspace.yaml                      @clerk/sdk-infra
+/package.json                             @clerk/sdk-infra
+
+# Build, release, and changeset config.
+/turbo.json                               @clerk/sdk-infra
+/.changeset/config.json                   @clerk/sdk-infra
+
+# Dependency intake.
+/renovate.json5                           @clerk/sdk-infra
+/scripts/renovate-config-generator.mjs    @clerk/sdk-infra
+
+# Supply-chain guard scripts (must not be neutered without review).
+/scripts/check-workflow-triggers.mjs      @clerk/sdk-infra

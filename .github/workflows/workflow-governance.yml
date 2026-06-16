@@ -1,0 +1,37 @@
+name: Workflow Governance
+
+# Supply-chain guardrails for the workflow control plane (SDK-79 / Monorepo
+# Supply-Chain Hardening). Runs on every PR so it always reports a status and can
+# be wired up as a required check.
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  guard-triggers:
+    name: Guard workflow triggers
+    runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_SHORT && fromJSON(vars.TIMEOUT_MINUTES_SHORT) || 3 }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+          show-progress: false
+          sparse-checkout: |
+            .github/workflows
+            scripts/check-workflow-triggers.mjs
+          sparse-checkout-cone-mode: false
+
+      - name: Forbid pull_request_target
+        run: node scripts/check-workflow-triggers.mjs
