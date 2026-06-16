@@ -51,7 +51,7 @@ The rule only detects protected or not, which corresponds to signed in/signed ou
 npm install --save-dev @clerk/eslint-plugin
 ```
 
-Requires ESLint `>=9` (flat config).
+Requires ESLint `>=9` (flat config), and also works with Oxlint when configured as a `jsPlugin`.
 
 ## Usage
 
@@ -78,7 +78,7 @@ export default [
 
 This rule also works with Oxlint, you can configure the `rules` just like above after adding the plugin as a `jsPlugin` in `.oxlintrc.json`:
 
-```
+```json
 "jsPlugins": [
   {
     "name": "@clerk/next",
@@ -210,6 +210,8 @@ await auth.protect()
 await (await auth()).protect()
 // Any kind of variable declaration is okay
 const { userId } = await auth.protect();
+// More narrow checks are also fine
+await auth.protect({ role: 'org:admin' })
 
 // -- Custom handling --
 const { isAuthenticated, userId, sessionId } = await auth();
