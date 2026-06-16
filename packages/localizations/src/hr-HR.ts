@@ -1104,6 +1104,7 @@ export const hrHR: LocalizationResource = {
     identification_deletion_failed: 'Ne možete izbrisati svoju posljednju identifikaciju.',
     not_allowed_access:
       "E-mail adresa ili broj telefona nije dozvoljen za registraciju. Ovo može biti zbog korištenja '+', '=', '#' ili '.' u vašoj e-mail adresi, korištenja domene povezane s vremenskom e-mail uslugom ili eksplicitnog blokiranja. Ako smatrate da je ovo pogreška, obratite se podršci.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'Ovo je blokirana domena pružatelja e-pošte. Molimo koristite drugu.',
     organization_domain_common: 'Ovo je uobičajena domena pružatelja e-pošte. Molimo koristite drugu.',
     organization_domain_exists_for_enterprise_connection:

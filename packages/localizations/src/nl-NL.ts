@@ -1050,6 +1050,7 @@ export const nlNL: LocalizationResource = {
     identification_deletion_failed: 'Je kunt je laatste identificatie niet verwijderen.',
     not_allowed_access:
       "Je e-mailadres of telefoonnummer is niet toegestaan voor registratie. Dit kan zijn omdat je '+', '=', '#' of '.' in je e-mailadres gebruikt, een domein dat is gekoppeld aan een tijdelijke e-mailservice gebruikt, of een expliciete uitsluiting heeft.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'Het domein van de organisatie is geblokkeerd.',
     organization_domain_common: 'Het domein van de organisatie is te algemeen.',
     organization_domain_exists_for_enterprise_connection: undefined,

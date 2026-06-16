@@ -60,6 +60,64 @@ describe('_authenticateWithTransport', () => {
     expect(clerk.__internal_handleResourceCallback).toHaveBeenCalledWith(resource, {});
   });
 
+  it('rejects with a localizable error without reloading when the native callback reports OAuth failure', async () => {
+    const clerk = makeClerk();
+    const transport = {
+      getRedirectUrl: vi.fn().mockResolvedValue('myapp://sso-callback'),
+      open: vi.fn().mockResolvedValue({
+        callbackUrl: 'myapp://sso-callback?__clerk_status=failed&__clerk_error_code=oauth_access_denied',
+      }),
+    };
+    const resource = { reload: vi.fn().mockResolvedValue(undefined) } as any;
+    const authenticateMethod = vi.fn(async (_params, navigate) => navigate('https://provider.example/auth'));
+
+    await expect(
+      _authenticateWithTransport({
+        clerk: clerk as any,
+        transport,
+        resource,
+        authenticateMethod,
+        params: {} as any,
+        callbackParams: {},
+      }),
+    ).rejects.toMatchObject({
+      code: 'oauth_access_denied',
+      clerkRuntimeError: true,
+    } satisfies Partial<ClerkRuntimeError>);
+
+    expect(resource.reload).not.toHaveBeenCalled();
+    expect(clerk.__internal_handleResourceCallback).not.toHaveBeenCalled();
+  });
+
+  it('uses a generic error code for unknown native OAuth callback failure codes', async () => {
+    const clerk = makeClerk();
+    const transport = {
+      getRedirectUrl: vi.fn().mockResolvedValue('myapp://sso-callback'),
+      open: vi.fn().mockResolvedValue({
+        callbackUrl: 'myapp://sso-callback?__clerk_status=failed&__clerk_error_code=reverification_cancelled',
+      }),
+    };
+    const resource = { reload: vi.fn().mockResolvedValue(undefined) } as any;
+    const authenticateMethod = vi.fn(async (_params, navigate) => navigate('https://provider.example/auth'));
+
+    await expect(
+      _authenticateWithTransport({
+        clerk: clerk as any,
+        transport,
+        resource,
+        authenticateMethod,
+        params: {} as any,
+        callbackParams: {},
+      }),
+    ).rejects.toMatchObject({
+      code: 'oauth_callback_failed',
+      clerkRuntimeError: true,
+    } satisfies Partial<ClerkRuntimeError>);
+
+    expect(resource.reload).not.toHaveBeenCalled();
+    expect(clerk.__internal_handleResourceCallback).not.toHaveBeenCalled();
+  });
+
   it('propagates transport.open rejection and does not complete the callback', async () => {
     const clerk = makeClerk();
     const transport = {

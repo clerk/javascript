@@ -1081,6 +1081,7 @@ export const msMY: LocalizationResource = {
     identification_deletion_failed: 'Anda tidak boleh memadamkan pengenalan terakhir anda.',
     not_allowed_access:
       'Anda tidak mempunyai kebenaran untuk mengakses halaman ini. Sila hubungi sokongan jika anda percaya ini adalah kesilapan.',
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'Ini adalah domain pembekal e-mel yang disekat. Sila gunakan yang berbeza.',
     organization_domain_common: 'Ini adalah domain pembekal e-mel biasa. Sila gunakan yang berbeza.',
     organization_domain_exists_for_enterprise_connection: 'Domain ini sudah digunakan untuk SSO organisasi anda',

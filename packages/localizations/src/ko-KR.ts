@@ -1048,6 +1048,7 @@ export const koKR: LocalizationResource = {
     identification_deletion_failed: '마지막 식별 정보는 삭제할 수 없어요.',
     not_allowed_access:
       "이메일 주소 또는 전화번호는 가입에 사용할 수 없어요. 이메일 주소에 '+', '=', '#' 또는 '.'이 포함됐거나 임시 이메일 서비스 도메인이거나, 명시적으로 제외된 경우예요. 이 오류가 계속되면 지원에 문의해 주세요.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,

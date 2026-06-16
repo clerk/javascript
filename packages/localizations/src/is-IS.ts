@@ -1103,6 +1103,7 @@ export const isIS: LocalizationResource = {
     identification_deletion_failed: 'Þú getur ekki eytt síðasta auðkenni þínu.',
     not_allowed_access:
       "Netfang eða símanúmer þitt er ekki leyft til að skrá sig. Þetta gæti verið vegna þess að þú ert að nota '+', '=', '#' eða '.' í netfangi þínu, að nota domen sem tengist tímabundnum tölvupóstur, eða að þú ert búinn til að nota það. Ef þú reynir að skrá sig og færð villu, vinsamlegast hafið samband við stuðning.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,

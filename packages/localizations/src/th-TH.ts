@@ -1046,6 +1046,7 @@ export const thTH: LocalizationResource = {
     form_username_needs_non_number_char: 'ชื่อผู้ใช้ของคุณต้องมีอักขระที่ไม่ใช่ตัวเลขอย่างน้อยหนึ่งตัว',
     identification_deletion_failed: undefined,
     not_allowed_access: undefined,
+    oauth_access_denied: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
