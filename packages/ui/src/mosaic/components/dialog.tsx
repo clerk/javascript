@@ -111,7 +111,7 @@ const Viewport = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef
 const Popup = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<typeof Primitive.Popup>>(
   function DialogPopup(props, ref) {
     const variantProps = React.useContext(DialogVariantContext);
-    const { popup } = useRecipe(dialogRecipe, variantProps);
+    const { popup } = useRecipe(dialogRecipe, { variants: variantProps });
     return (
       <Primitive.Popup
         ref={ref}
