@@ -4,11 +4,34 @@ import NativeClerkModule from '../specs/NativeClerkModule';
 
 export const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
 
-function loadNativeModule(): typeof NativeClerkModule | null {
+type ClerkExpoNativeModule = {
+  addListener(eventName: string, listener?: (...args: unknown[]) => void): { remove: () => void };
+  configure(publishableKey: string, bearerToken: string | null): Promise<void>;
+  getClientToken(): Promise<string | null>;
+  removeListeners(count: number): void;
+  syncFromJsClientToken(clientToken: string | null, sourceId: string | null): Promise<void>;
+};
+
+function isClerkExpoModule(module: unknown): module is ClerkExpoNativeModule {
+  if (!module || typeof module !== 'object') {
+    return false;
+  }
+  const maybeModule = module as Record<string, unknown>;
+
+  return (
+    typeof maybeModule.addListener === 'function' &&
+    typeof maybeModule.configure === 'function' &&
+    typeof maybeModule.getClientToken === 'function' &&
+    typeof maybeModule.removeListeners === 'function' &&
+    typeof maybeModule.syncFromJsClientToken === 'function'
+  );
+}
+
+function loadNativeModule(): ClerkExpoNativeModule | null {
   if (!isNativeSupported) {
     return null;
   }
-  let nativeModule: typeof NativeClerkModule | null = null;
+  let nativeModule: unknown = null;
 
   try {
     nativeModule = NativeClerkModule;
@@ -18,7 +41,7 @@ function loadNativeModule(): typeof NativeClerkModule | null {
     }
   }
 
-  if (nativeModule?.configure) {
+  if (isClerkExpoModule(nativeModule)) {
     return nativeModule;
   }
 
@@ -27,13 +50,11 @@ function loadNativeModule(): typeof NativeClerkModule | null {
     // when the generated TurboModule object is incomplete.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { requireNativeModule } = require('expo');
-    return requireNativeModule('ClerkExpo') ?? nativeModule;
+    const expoModule = requireNativeModule('ClerkExpo');
+    return isClerkExpoModule(expoModule) ? expoModule : null;
   } catch (e) {
     if (__DEV__ && !nativeModule) {
       console.warn('[ClerkExpo] Native module not available:', e);
-    }
-    if (nativeModule) {
-      return nativeModule;
     }
     return null;
   }

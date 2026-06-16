@@ -86,8 +86,10 @@ vi.mock('../../hooks/useNativeClientEvents', () => {
 vi.mock('../../specs/NativeClerkModule', () => {
   return {
     default: {
+      addListener: vi.fn(),
       configure: mocks.configure,
       getClientToken: mocks.getClientToken,
+      removeListeners: vi.fn(),
       syncFromJsClientToken: mocks.syncFromJsClientToken,
     },
   };
@@ -240,7 +242,7 @@ describe('ClerkProvider native client sync', () => {
       expect(mocks.clerkInstance.__internal_reloadInitialResources).toHaveBeenCalled();
     });
     expect(mocks.tokenCache.saveToken).not.toHaveBeenCalledWith(CLERK_CLIENT_JWT_KEY, expect.anything());
-    expect(mocks.tokenCache.clearToken).not.toHaveBeenCalledWith(CLERK_CLIENT_JWT_KEY);
+    expect(mocks.tokenCache.clearToken).toHaveBeenCalledWith(CLERK_CLIENT_JWT_KEY);
   });
 
   test('does not bounce a JS client listener event while applying a native client change', async () => {

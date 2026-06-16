@@ -134,7 +134,10 @@ async function readNativeClientToken({ waitForToken }: { waitForToken: boolean }
 async function syncClientTokenToCache(tokenCache: TokenCache | undefined, clientToken: string | null): Promise<void> {
   if (clientToken) {
     await tokenCache?.saveToken(CLERK_CLIENT_JWT_KEY, clientToken);
+    return;
   }
+
+  await tokenCache?.clearToken?.(CLERK_CLIENT_JWT_KEY);
 }
 
 async function syncClientTokenToCacheWithoutNotifying({

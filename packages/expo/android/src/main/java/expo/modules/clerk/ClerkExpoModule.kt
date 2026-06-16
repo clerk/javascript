@@ -36,7 +36,7 @@ class ClerkExpoModule : Module() {
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
     private var clientStateObserverJob: Job? = null
     private var lastObservedClient: Client? = null
-    private var pendingClientChangeSourceId: String? = null
+    private var jsOriginatedClientSyncDepth = 0
     private var configuredPublishableKey: String? = null
 
     companion object {
@@ -95,9 +95,11 @@ class ClerkExpoModule : Module() {
                 }
 
                 lastObservedClient = client
-                val sourceId = pendingClientChangeSourceId
-                pendingClientChangeSourceId = null
-                emitClientChanged(sourceId)
+                if (jsOriginatedClientSyncDepth > 0) {
+                    return@collect
+                }
+
+                emitClientChanged()
             }
         }
     }
@@ -291,7 +293,7 @@ class ClerkExpoModule : Module() {
 
         coroutineScope.launch {
             try {
-                pendingClientChangeSourceId = sourceId?.takeIf { it.isNotEmpty() }
+                jsOriginatedClientSyncDepth += 1
                 if (!clientToken.isNullOrBlank()) {
                     when (val result = Clerk.updateDeviceToken(clientToken)) {
                         is ClerkResult.Failure -> {
@@ -333,7 +335,7 @@ class ClerkExpoModule : Module() {
             } catch (e: Exception) {
                 promise.reject("E_SYNC_FROM_JS_FAILED", e.message ?: "Client token sync failed", e)
             } finally {
-                pendingClientChangeSourceId = null
+                jsOriginatedClientSyncDepth = maxOf(0, jsOriginatedClientSyncDepth - 1)
             }
         }
     }
