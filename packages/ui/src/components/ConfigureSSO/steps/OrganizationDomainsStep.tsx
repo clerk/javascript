@@ -47,20 +47,45 @@ export const OrganizationDomainsStep = (): JSX.Element => {
   const { goPrev, goNext, isFirstStep, isLastStep } = useWizard();
   const card = useCardState();
   const [domainToRemove, setDomainToRemove] = useState<OrganizationDomainResource | null>(null);
+  const [isContinuing, setIsContinuing] = useState(false);
 
   const handleCreateDomain = async (domain: string) => {
     card.setError(undefined);
 
     try {
-      const createdDomain = await createDomain(domain);
-
-      if (createdDomain && enterpriseConnection) {
-        const domains = Array.from(new Set([...enterpriseConnection.domains, createdDomain.name]));
-        await updateConnection(enterpriseConnection.id, { domains });
-      }
+      await createDomain(domain);
     } catch (err: any) {
       const apiError = getFieldError(err) ?? getGlobalError(err);
       card.setError(apiError);
+    }
+  };
+
+  const handleContinue = async () => {
+    card.setError(undefined);
+    setIsContinuing(true);
+
+    const verifiedDomainNames =
+      organizationDomains
+        ?.filter(domain => domain.ownershipVerification?.status === 'verified')
+        .map(domain => domain.name) ?? [];
+    const domains = Array.from(new Set([...(enterpriseConnection?.domains ?? []), ...verifiedDomainNames]));
+    const hasNewDomains = domains.length !== (enterpriseConnection?.domains?.length ?? 0);
+
+    if (!enterpriseConnection || !hasNewDomains) {
+      setIsContinuing(false);
+      void goNext();
+      return;
+    }
+
+    // New verified domains have been added, so we need to update the connection
+    try {
+      await updateConnection(enterpriseConnection.id, { domains });
+      void goNext();
+    } catch (err: any) {
+      const apiError = getFieldError(err) ?? getGlobalError(err);
+      card.setError(apiError);
+    } finally {
+      setIsContinuing(false);
     }
   };
 
@@ -157,8 +182,9 @@ export const OrganizationDomainsStep = (): JSX.Element => {
             isDisabled={isFirstStep}
           />
           <Step.Footer.Continue
-            onClick={() => goNext()}
-            isDisabled={isLastStep || !hasAllDomainsVerified}
+            onClick={handleContinue}
+            isDisabled={isLastStep || !hasAllDomainsVerified || isContinuing}
+            isLoading={isContinuing}
           />
         </Step.Footer>
       </Step>
