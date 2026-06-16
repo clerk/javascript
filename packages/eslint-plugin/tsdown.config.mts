@@ -16,7 +16,9 @@ export default defineConfig({
   dts: true,
   // `eslint` is a peer dependency resolved from the consumer's install; never
   // bundle it into the fix runner / CLI.
-  external: ['eslint'],
+  deps: {
+    neverBundle: ['eslint'],
+  },
   define: {
     PACKAGE_VERSION: `"${pkgJson.version}"`,
   },
