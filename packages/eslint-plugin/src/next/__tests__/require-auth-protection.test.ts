@@ -964,7 +964,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/dashboard/page.tsx'),
       options: [config],
-      errors: [{ messageId: 'missingProtect' }],
+      errors: [missingProtectError()],
     },
     {
       name: 'inline type auth import does not provide a runtime binding',
@@ -976,7 +976,7 @@ ruleTester.run('require-auth-protection', rule, {
       `,
       filename: abs('app/dashboard/page.tsx'),
       options: [config],
-      errors: [{ messageId: 'missingProtect' }],
+      errors: [missingProtectError()],
     },
     {
       name: 'auth.protect() in a later declarator does not count — earlier code ran first',
@@ -1110,7 +1110,7 @@ ruleTester.run('require-auth-protection', rule, {
           resources: { serverComponentEntrypoints: false },
         },
       ],
-      errors: [{ messageId: 'missingProtect', data: { subject: 'POST handler' } }],
+      errors: [missingProtectError({ subject: 'POST handler' })],
     },
     {
       name: 'route handler declared above and re-exported via specifier, missing protect',
