@@ -91,7 +91,9 @@ export function Controlled() {
 
   // Reset the field whenever the dialog closes.
   useEffect(() => {
-    if (!open) setConfirmValue('');
+    if (!open) {
+      setConfirmValue('');
+    }
   }, [open]);
 
   return (
@@ -119,11 +121,17 @@ export function Controlled() {
       }}
     >
       <Box
-        render={p => <label {...p} />}
+        render={p => (
+          <label
+            {...p}
+            htmlFor='confirm-resource'
+          />
+        )}
         sx={t => ({ ...t.text('sm'), fontWeight: t.font.medium })}
       >
-        Type "{resourceName}" to confirm.
+        Type {resourceName} to confirm.
         <Input
+          id='confirm-resource'
           value={confirmValue}
           onChange={e => setConfirmValue(e.target.value)}
           sx={t => ({ marginBlockStart: t.spacing(1) })}
