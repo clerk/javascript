@@ -221,6 +221,12 @@ export const enUS: LocalizationResource = {
         'Your SSO connection is ready. Once activated, anyone signing in with {{domain}} must use your identity provider.',
       title: 'SSO connection configured',
     },
+    changeProviderDialog: {
+      cancelButton: 'Cancel',
+      confirmButton: 'Change provider',
+      subtitle: 'Switching to {{provider}} will remove your {{currentProvider}} connection and require a new setup.',
+      title: 'Change provider to {{provider}}',
+    },
     configureStep: {
       attributeMappingTable: {
         badges: {
