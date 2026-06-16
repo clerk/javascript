@@ -96,7 +96,7 @@ class ClerkExpoModule: RCTEventEmitter {
 
   /// Emits a native client change event to JS from anywhere in the native layer.
   /// Used by native views to ask ClerkProvider to reload JS client state.
-  static func emitRefreshClient(_ body: [String: Any]? = nil) {
+  static func emitClientChanged(_ body: [String: Any]? = nil) {
     let eventBody = body ?? [:]
 
     guard let instance = sharedInstance else {
@@ -196,6 +196,6 @@ class ClerkExpoModule: RCTEventEmitter {
 }
 
 /// Requests that ClerkProvider reload the JS client from native client state.
-public func emitClerkNativeRefreshClient(_ body: [String: Any]? = nil) {
-  ClerkExpoModule.emitRefreshClient(body)
+public func emitClerkNativeClientChanged(_ body: [String: Any]? = nil) {
+  ClerkExpoModule.emitClientChanged(body)
 }

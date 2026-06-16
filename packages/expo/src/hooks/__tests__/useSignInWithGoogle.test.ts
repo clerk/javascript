@@ -50,7 +50,6 @@ vi.mock('../../specs/NativeClerkModule', () => {
   return {
     default: {
       configure: vi.fn(),
-      getSession: vi.fn(),
       getClientToken: vi.fn(),
       refreshClient: vi.fn(),
     },

@@ -2,6 +2,7 @@ import type { ClientResource, SignedInSessionResource } from '@clerk/shared/type
 import { type MutableRefObject, useCallback, useEffect, useMemo, useRef } from 'react';
 import { Platform } from 'react-native';
 
+import { MemoryTokenCache } from '../cache';
 import type { TokenCache } from '../cache/types';
 import { CLERK_CLIENT_JWT_KEY } from '../constants';
 import {
@@ -57,8 +58,10 @@ export function useSyncableTokenCache({
   tokenCacheListenersRef: MutableRefObject<Set<ClientTokenCacheListener>>;
 }): TokenCache | undefined {
   return useMemo(() => {
-    if (!tokenCache) {
-      return tokenCache;
+    const effectiveTokenCache =
+      tokenCache ?? (Platform.OS === 'ios' || Platform.OS === 'android' ? MemoryTokenCache : undefined);
+    if (!effectiveTokenCache) {
+      return undefined;
     }
 
     const notifyClientTokenListeners = (clientToken: string | null) => {
@@ -72,21 +75,25 @@ export function useSyncableTokenCache({
     };
 
     return {
-      getToken: key => tokenCache.getToken(key),
+      getToken: key => effectiveTokenCache.getToken(key),
       saveToken: async (key, token) => {
-        await tokenCache.saveToken(key, token);
+        await effectiveTokenCache.saveToken(key, token);
         if (key === CLERK_CLIENT_JWT_KEY) {
           notifyClientTokenListeners(token);
         }
       },
       clearToken: async key => {
-        await tokenCache.clearToken?.(key);
+        await effectiveTokenCache.clearToken?.(key);
         if (key === CLERK_CLIENT_JWT_KEY) {
           notifyClientTokenListeners(null);
         }
       },
     };
   }, [suppressTokenCacheNotificationsRef, tokenCache, tokenCacheListenersRef]);
+}
+
+function getEffectiveTokenCache(tokenCache: TokenCache | undefined): TokenCache | undefined {
+  return tokenCache ?? (Platform.OS === 'ios' || Platform.OS === 'android' ? MemoryTokenCache : defaultTokenCache);
 }
 
 function getNativeClientTokenFromSnapshot(
@@ -135,6 +142,23 @@ async function syncClientTokenToCache(tokenCache: TokenCache | undefined, client
   }
 }
 
+async function syncClientTokenToCacheWithoutNotifying({
+  clientToken,
+  suppressTokenCacheNotificationsRef,
+  tokenCache,
+}: {
+  clientToken: string | null;
+  suppressTokenCacheNotificationsRef: MutableRefObject<boolean>;
+  tokenCache: TokenCache | undefined;
+}): Promise<void> {
+  suppressTokenCacheNotificationsRef.current = true;
+  try {
+    await syncClientTokenToCache(tokenCache, clientToken);
+  } finally {
+    suppressTokenCacheNotificationsRef.current = false;
+  }
+}
+
 function getDefaultSignedInSession(client: ClientResource | null | undefined): SignedInSessionResource | null {
   if (!client) {
     return null;
@@ -165,6 +189,46 @@ async function refreshJsClientWithoutEmitting(clerkInstance: SyncableClerkInstan
   });
 
   return refreshedClient;
+}
+
+async function recoverJsClientFromNativeToken({
+  clerkInstance,
+  error,
+  suppressTokenCacheNotificationsRef,
+  tokenCache,
+}: {
+  clerkInstance: SyncableClerkInstance;
+  error: unknown;
+  suppressTokenCacheNotificationsRef: MutableRefObject<boolean>;
+  tokenCache: TokenCache | undefined;
+}): Promise<boolean> {
+  const nativeClientToken = await readNativeClientToken({ waitForToken: false });
+  if (!nativeClientToken) {
+    return false;
+  }
+
+  if (__DEV__) {
+    console.warn('[NativeClientSync] Failed to refresh JS client with native client token:', error);
+  }
+
+  await syncClientTokenToCacheWithoutNotifying({
+    clientToken: nativeClientToken,
+    suppressTokenCacheNotificationsRef,
+    tokenCache,
+  });
+
+  try {
+    await clerkInstance.__internal_reloadInitialResources?.();
+    await reconcileJsActiveSessionFromClient({
+      clerkInstance,
+    });
+    return Boolean(getDefaultSignedInSession(clerkInstance.client));
+  } catch (recoveryError) {
+    if (__DEV__) {
+      console.warn('[NativeClientSync] Failed to recover JS client after unauthenticated state:', recoveryError);
+    }
+    return false;
+  }
 }
 
 async function reconcileJsActiveSessionFromClient({
@@ -266,7 +330,7 @@ async function syncNativeClientToJs({
       : await readNativeClientToken({
           waitForToken: !nativeClientEvent,
         });
-  const effectiveTokenCache = tokenCache ?? defaultTokenCache;
+  const effectiveTokenCache = getEffectiveTokenCache(tokenCache);
 
   if (!nativeClientToken && !nativeClientEvent) {
     return;
@@ -276,14 +340,13 @@ async function syncNativeClientToJs({
     nativeRefreshFromJsControllerRef?.current?.cancel();
 
     if (suppressTokenCacheNotificationsRef) {
-      suppressTokenCacheNotificationsRef.current = true;
-    }
-    try {
+      await syncClientTokenToCacheWithoutNotifying({
+        clientToken: nativeClientToken,
+        suppressTokenCacheNotificationsRef,
+        tokenCache: effectiveTokenCache,
+      });
+    } else {
       await syncClientTokenToCache(effectiveTokenCache, nativeClientToken);
-    } finally {
-      if (suppressTokenCacheNotificationsRef) {
-        suppressTokenCacheNotificationsRef.current = false;
-      }
     }
 
     const refreshedClient = await refreshJsClientWithoutEmitting(clerkInstance);
@@ -371,6 +434,10 @@ export function NativeClientSync({
       const alreadyReconcilingRemovedActiveSession = isReconcilingRemovedActiveSession;
 
       if ((currentSessionWasRemoved || alreadyReconcilingRemovedActiveSession) && fallbackSession) {
+        // Clerk JS briefly emits signed-out when the active session disappears,
+        // even if the refreshed client still has another signed-in session.
+        // Keep that transient state internal so native session switching does
+        // not dismiss mounted native UI before setActive settles on JS.
         isReconcilingRemovedActiveSession = true;
         originalUpdateClient(newClient, { __internal_dangerouslySkipEmit: true });
 
@@ -453,24 +520,24 @@ export function NativeClientSync({
         do {
           latestRunGeneration = generation;
           pendingNativeRefreshRef.current = null;
-          await refreshNativeFromJsClient(pendingOptions, generation);
+          try {
+            await refreshNativeFromJsClient(pendingOptions, generation);
+          } catch (error: unknown) {
+            if (__DEV__) {
+              console.warn('[NativeClientSync] Failed to refresh native client from JS client change:', error);
+            }
+          }
           pendingOptions = pendingNativeRefreshRef.current ?? {};
           if (pendingNativeRefreshRef.current !== null) {
             generation = nativeRefreshGenerationRef.current + 1;
             nativeRefreshGenerationRef.current = generation;
           }
         } while (pendingNativeRefreshRef.current !== null);
-      })()
-        .catch((error: unknown) => {
-          if (__DEV__) {
-            console.warn('[NativeClientSync] Failed to refresh native client from JS client change:', error);
-          }
-        })
-        .finally(() => {
-          if (latestRunGeneration === nativeRefreshGenerationRef.current) {
-            isRefreshingNativeFromJsRef.current = false;
-          }
-        });
+      })().finally(() => {
+        if (latestRunGeneration === nativeRefreshGenerationRef.current || pendingNativeRefreshRef.current === null) {
+          isRefreshingNativeFromJsRef.current = false;
+        }
+      });
     },
     [publishableKey],
   );
@@ -494,7 +561,7 @@ export function NativeClientSync({
 
     const originalHandleUnauthenticated = clerkInstance.handleUnauthenticated.bind(clerkInstance);
     let isHandlingUnauthenticated = false;
-    const effectiveTokenCache = tokenCache ?? defaultTokenCache;
+    const effectiveTokenCache = getEffectiveTokenCache(tokenCache);
 
     const handleUnauthenticated: SyncableClerkInstance['handleUnauthenticated'] = async options => {
       if (isHandlingUnauthenticated) {
@@ -504,36 +571,40 @@ export function NativeClientSync({
       isHandlingUnauthenticated = true;
       try {
         return await runWithSuppressedJsClientChanges(suppressJsClientChangedRef, async () => {
-          const nativeClientToken = await readNativeClientToken({ waitForToken: false });
-          if (nativeClientToken) {
-            suppressTokenCacheNotificationsRef.current = true;
-            try {
-              await syncClientTokenToCache(effectiveTokenCache, nativeClientToken);
-            } finally {
-              suppressTokenCacheNotificationsRef.current = false;
+          try {
+            const nativeClientToken = await readNativeClientToken({ waitForToken: false });
+            if (nativeClientToken) {
+              await syncClientTokenToCacheWithoutNotifying({
+                clientToken: nativeClientToken,
+                suppressTokenCacheNotificationsRef,
+                tokenCache: effectiveTokenCache,
+              });
             }
-          }
 
-          const refreshedClient = await refreshJsClientWithoutEmitting(clerkInstance);
-          if (refreshedClient) {
-            await reconcileJsActiveSessionFromClient({
+            // Native may have already moved the server-side client to a new
+            // active session. Refresh JS before allowing Clerk JS' stale-session
+            // 401 path to collapse the whole client to signed out.
+            const refreshedClient = await refreshJsClientWithoutEmitting(clerkInstance);
+            if (refreshedClient) {
+              await reconcileJsActiveSessionFromClient({
+                clerkInstance,
+              });
+              return;
+            }
+          } catch (error) {
+            const didRecover = await recoverJsClientFromNativeToken({
               clerkInstance,
+              error,
+              suppressTokenCacheNotificationsRef,
+              tokenCache: effectiveTokenCache,
             });
-            return;
+            if (didRecover) {
+              return;
+            }
           }
 
           return originalHandleUnauthenticated(options);
         });
-      } catch (error) {
-        const nativeClientToken = await readNativeClientToken({ waitForToken: false });
-        if (nativeClientToken) {
-          if (__DEV__) {
-            console.warn('[NativeClientSync] Failed to refresh JS client with native client token:', error);
-          }
-          return;
-        }
-
-        return originalHandleUnauthenticated(options);
       } finally {
         isHandlingUnauthenticated = false;
       }
@@ -609,7 +680,7 @@ export function useNativeClientBootstrap({
               return;
             }
 
-            const effectiveTokenCache = tokenCache ?? defaultTokenCache;
+            const effectiveTokenCache = getEffectiveTokenCache(tokenCache);
             let bearerToken: string | null = null;
             try {
               bearerToken = await getCachedClientToken(effectiveTokenCache);

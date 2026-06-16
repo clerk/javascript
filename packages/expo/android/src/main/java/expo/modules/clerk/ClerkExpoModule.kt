@@ -36,12 +36,13 @@ class ClerkExpoModule : Module() {
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
     private var clientStateObserverJob: Job? = null
     private var lastObservedClient: Client? = null
+    private var pendingClientChangeSourceId: String? = null
     private var configuredPublishableKey: String? = null
 
     companion object {
         private var sharedInstance: ClerkExpoModule? = null
 
-        fun emitRefreshClient(sourceId: String? = null) {
+        fun emitClientChanged(sourceId: String? = null) {
             val instance = sharedInstance ?: return
             instance.sendEvent(NATIVE_CLIENT_CHANGED_EVENT, instance.clientChangedPayload(sourceId))
         }
@@ -98,7 +99,9 @@ class ClerkExpoModule : Module() {
                 }
 
                 lastObservedClient = client
-                emitRefreshClient()
+                val sourceId = pendingClientChangeSourceId
+                pendingClientChangeSourceId = null
+                emitClientChanged(sourceId)
             }
         }
     }
@@ -311,9 +314,11 @@ class ClerkExpoModule : Module() {
 
         coroutineScope.launch {
             try {
+                pendingClientChangeSourceId = sourceId?.takeIf { it.isNotEmpty() }
                 if (!clientToken.isNullOrBlank()) {
                     when (val result = Clerk.updateDeviceToken(clientToken)) {
                         is ClerkResult.Failure -> {
+                            pendingClientChangeSourceId = null
                             promise.reject(
                                 "E_SYNC_FROM_JS_FAILED",
                                 result.error?.firstMessage() ?: result.throwable?.message ?: "Client token sync failed",
@@ -329,7 +334,9 @@ class ClerkExpoModule : Module() {
                             } catch (_: TimeoutCancellationException) {
                                 debugLog(TAG, "syncFromJsClientToken - session did not appear after token update")
                             }
-                            emitRefreshClient(sourceId)
+                            lastObservedClient = Clerk.clientFlow.value
+                            pendingClientChangeSourceId = null
+                            emitClientChanged(sourceId)
                             promise.resolve(null)
                             return@launch
                         }
@@ -337,17 +344,23 @@ class ClerkExpoModule : Module() {
                 }
 
                 when (val result = Clerk.refreshClient()) {
-                    is ClerkResult.Failure -> promise.reject(
-                        "E_SYNC_FROM_JS_FAILED",
-                        result.error?.firstMessage() ?: result.throwable?.message ?: "Client refresh failed",
-                        null
-                    )
+                    is ClerkResult.Failure -> {
+                        pendingClientChangeSourceId = null
+                        promise.reject(
+                            "E_SYNC_FROM_JS_FAILED",
+                            result.error?.firstMessage() ?: result.throwable?.message ?: "Client refresh failed",
+                            null
+                        )
+                    }
                     is ClerkResult.Success -> {
-                        emitRefreshClient(sourceId)
+                        lastObservedClient = Clerk.clientFlow.value
+                        pendingClientChangeSourceId = null
+                        emitClientChanged(sourceId)
                         promise.resolve(null)
                     }
                 }
             } catch (e: Exception) {
+                pendingClientChangeSourceId = null
                 promise.reject("E_SYNC_FROM_JS_FAILED", e.message ?: "Client token sync failed", e)
             }
         }

@@ -85,7 +85,7 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
   @MainActor
   private static func emitClientChangedIfReceivedToken(_ bearerToken: String?) {
     guard let token = bearerToken, !token.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
-    emitClerkNativeRefreshClient(Self.clientChangedPayload())
+    emitClerkNativeClientChanged(Self.clientChangedPayload())
   }
 
   @MainActor
@@ -114,7 +114,7 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
         if newClientState != self.lastObservedClientState {
           self.lastObservedClientState = newClientState
           let payload = Self.clientChangedPayload()
-          emitClerkNativeRefreshClient(payload)
+          emitClerkNativeClientChanged(payload)
         }
 
         self.observeClient(generation: generation)
@@ -260,14 +260,14 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
       _ = try await Clerk.shared.updateDeviceToken(token)
       await Self.waitForLoadedSession()
       lastObservedClientState = Self.clientStateSnapshot()
-      emitClerkNativeRefreshClient(Self.clientChangedPayload(sourceId: sourceId))
+      emitClerkNativeClientChanged(Self.clientChangedPayload(sourceId: sourceId))
       return
     }
 
     _ = try await Clerk.shared.refreshClient()
     await Self.waitForLoadedClient()
     lastObservedClientState = Self.clientStateSnapshot()
-    emitClerkNativeRefreshClient(Self.clientChangedPayload(sourceId: sourceId))
+    emitClerkNativeClientChanged(Self.clientChangedPayload(sourceId: sourceId))
   }
 
   private static func authMode(from mode: String) -> AuthView.Mode {

@@ -159,6 +159,26 @@ describe('ClerkProvider native client sync', () => {
     });
   });
 
+  test('syncs JS token cache changes when ClerkProvider uses the default token cache', async () => {
+    mocks.tokenCache.getToken.mockResolvedValue(null);
+
+    render(<ClerkProvider publishableKey='pk_test_123' />);
+
+    await waitFor(() => {
+      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', null);
+    });
+
+    mocks.syncFromJsClientToken.mockClear();
+
+    await act(async () => {
+      await mocks.clerkOptions?.tokenCache?.saveToken(CLERK_CLIENT_JWT_KEY, 'client-token');
+    });
+
+    await waitFor(() => {
+      expect(mocks.syncFromJsClientToken).toHaveBeenCalledWith('client-token', expect.any(String));
+    });
+  });
+
   test('reloads JS resources after native emits a client change with a token', async () => {
     mocks.tokenCache.getToken.mockResolvedValue(null);
     mocks.getClientToken.mockResolvedValue(null);
@@ -633,6 +653,51 @@ describe('ClerkProvider native client sync', () => {
     expect(mocks.clerkInstance.setActive).not.toHaveBeenCalledWith({ session: null });
   });
 
+  test('falls back to JS unauthenticated handling when native token recovery has no signed-in sessions', async () => {
+    const removedSession = {
+      id: 'session_1',
+      status: 'active',
+      user: { id: 'user_1' },
+    };
+    const originalHandleUnauthenticated = mocks.clerkInstance.handleUnauthenticated;
+
+    mocks.clerkInstance.client = {
+      signedInSessions: [removedSession],
+      lastActiveSessionId: 'session_1',
+      fetch: vi.fn().mockRejectedValue(new Error('stale session 401')),
+    };
+    mocks.clerkInstance.session = removedSession;
+    mocks.getClientToken.mockResolvedValue('native-client-token');
+    mocks.clerkInstance.__internal_reloadInitialResources.mockImplementation(() => {
+      mocks.clerkInstance.client = {
+        signedInSessions: [],
+        lastActiveSessionId: null,
+      };
+      mocks.clerkInstance.session = null;
+    });
+
+    render(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.configure).toHaveBeenCalled();
+    });
+    await waitFor(() => {
+      expect(mocks.clerkInstance.handleUnauthenticated).not.toBe(originalHandleUnauthenticated);
+    });
+
+    await act(async () => {
+      await mocks.clerkInstance.handleUnauthenticated();
+    });
+
+    expect(mocks.tokenCache.saveToken).toHaveBeenCalledWith(CLERK_CLIENT_JWT_KEY, 'native-client-token');
+    expect(originalHandleUnauthenticated).toHaveBeenCalled();
+  });
+
   test('refreshes native from the server after the JS client changes', async () => {
     mocks.tokenCache.getToken.mockResolvedValue(null);
 
@@ -655,6 +720,44 @@ describe('ClerkProvider native client sync', () => {
 
     await waitFor(() => {
       expect(mocks.syncFromJsClientToken).toHaveBeenCalledWith(null, expect.any(String));
+    });
+  });
+
+  test('continues processing queued native sync after a native sync failure', async () => {
+    mocks.tokenCache.getToken.mockResolvedValue(null);
+    let rejectFirstSync: ((error: Error) => void) | undefined;
+    mocks.syncFromJsClientToken.mockImplementationOnce(() => {
+      return new Promise((_resolve, reject) => {
+        rejectFirstSync = reject;
+      });
+    });
+
+    render(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', null);
+    });
+
+    act(() => {
+      mocks.clerkListener?.();
+    });
+
+    await waitFor(() => {
+      expect(mocks.syncFromJsClientToken).toHaveBeenCalledWith(null, expect.any(String));
+    });
+
+    await act(async () => {
+      await mocks.clerkOptions?.tokenCache?.saveToken(CLERK_CLIENT_JWT_KEY, 'client-token');
+      rejectFirstSync?.(new Error('native sync failed'));
+    });
+
+    await waitFor(() => {
+      expect(mocks.syncFromJsClientToken).toHaveBeenCalledWith('client-token', expect.any(String));
     });
   });
 
