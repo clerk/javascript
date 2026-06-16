@@ -36,6 +36,12 @@ type UpdateParams = {
    * Whether the instance should use URL-based session syncing in development mode (i.e. without third-party cookies).
    */
   urlBasedSessionSyncing?: boolean | null | undefined;
+  /**
+   * Overrides the sign-in strategy that is preferred when a password is required.
+   *
+   * @remarks Accepts `'password'` or `'otp'`. Pass an empty string to clear the override. The value is only consulted when a password is required, and is dormant otherwise.
+   */
+  preferredSignInStrategyWhenPasswordRequired?: 'password' | 'otp' | '' | null | undefined;
 };
 
 type UpdateRestrictionsParams = {
