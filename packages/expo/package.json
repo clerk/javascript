@@ -101,10 +101,10 @@
     "app.plugin.d.ts"
   ],
   "scripts": {
-    "build": "tsdown",
+    "build": "tsup",
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
-    "dev": "tsdown --watch",
+    "dev": "tsup --watch",
     "dev:pub": "pnpm dev -- --env.publish",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
