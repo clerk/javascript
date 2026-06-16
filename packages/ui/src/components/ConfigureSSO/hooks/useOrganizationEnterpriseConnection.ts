@@ -195,16 +195,8 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
 
   const enterpriseConnectionMutations = useMemo<EnterpriseConnectionMutations>(() => {
     const createConnection: EnterpriseConnectionMutations['createConnection'] = provider => {
-      const primaryEmailAddress = user?.primaryEmailAddress;
-      const emailDomain = primaryEmailAddress?.emailAddress.split('@')[1];
-
-      // Connection name will always be defined due to the organization name
-      // Soon this logic will be moved to the Frontend API
-      const connectionName = emailDomain ?? organization?.name ?? '';
-
       return createEnterpriseConnection({
         provider,
-        name: connectionName,
         domains: organizationDomains?.map(domain => domain.name),
       });
     };
