@@ -82,10 +82,26 @@ export default [
 | ------------------- | --------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `protected`         | `string[]` (required) | —        | Folder globs whose resources must be guarded.                                                                                                                                                            |
 | `public`            | `string[]`            | `[]`     | Folder globs that are exempt.                                                                                                                                                                            |
+| `resources`         | `object`              | all true | Resource groups to check. Supports `routeHandlers`, `serverFunctions`, and `serverComponentEntrypoints`, each as an optional boolean.                                                                    |
 | `mixedScopeLayouts` | `'auto' \| string[]`  | `'auto'` | Layouts/templates that intentionally wrap both protected and public descendants. `'auto'` allows them silently; a list requires each such folder to be acknowledged explicitly.                          |
 | `rootDir`           | `string`              | _(auto)_ | Directory folder globs are resolved against. Defaults to the nearest ancestor `eslint.config.*`, then ESLint `cwd`. Set to `import.meta.dirname` in your config file when auto-discovery is unavailable. |
 
 Globs use a minimal dialect — only `*` (single segment) and `**` (any depth). When a folder matches both `protected` and `public`, the most specific pattern wins, and `protected` wins ties.
+
+Use `resources` to disable whole resource groups when a project only wants this rule to enforce protection for some App Router resources:
+
+```js
+{
+  protected: ['app/**'],
+  resources: {
+    routeHandlers: true,
+    serverFunctions: true,
+    serverComponentEntrypoints: false,
+  },
+}
+```
+
+We recommend leaving all as true, but switching some off can be useful during incremental migrations.
 
 ## What counts as protected
 
@@ -121,13 +137,12 @@ General protection must happen at the top of the function, but additional narrow
 
 This section describes the exact details of how the lint rule works. You normally do no need to read or understand this if you only want to use the rule.
 
-Within folders that are configured as protected (and that eslint covers), this rule checks:
+Within folders that are configured as protected (and that eslint covers), this rule checks these resources when their resource group is enabled:
 
 - No files with `'use client'` at the top - Early bailout for these
-- The default export of `page`, `layout`, `template`, `default` files
-- All http verb exports of `route` files (`GET`, `POST` etc - API endpoints)
-- All exports of files with `'use server'` at the top (Server Functions)
-- All inline functions that has `'use server'` at the top of the function (Inline Server Functions)
+- `serverComponentEntrypoints`: the default export of `page`, `layout`, `template`, and `default` files
+- `routeHandlers`: all http verb exports of `route` files (`GET`, `POST` etc - API endpoints)
+- `serverFunctions`: all exports of files with `'use server'` at the top, and all inline functions that have `'use server'` at the top of the function
 
 Notably, it does not:
 

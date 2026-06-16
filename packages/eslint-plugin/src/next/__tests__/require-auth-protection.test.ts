@@ -847,6 +847,89 @@ ruleTester.run('require-auth-protection', rule, {
       filename: abs('app/(routes)/(unauthenticated)/feed/(.)photo/[id]/page.tsx'),
       options: [config],
     },
+    {
+      name: 'serverComponentEntrypoints resource disabled skips unprotected page',
+      code: `
+        export default async function Page() {
+          return <div>Hello</div>;
+        }
+      `,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [
+        {
+          ...config,
+          resources: { serverComponentEntrypoints: false },
+        },
+      ],
+    },
+    {
+      name: 'serverComponentEntrypoints resource disabled skips mixed-scope layout warning',
+      code: `
+        export default function RootLayout({ children }) {
+          return <html><body>{children}</body></html>;
+        }
+      `,
+      filename: abs('app/layout.tsx'),
+      options: [
+        {
+          ...config,
+          resources: { serverComponentEntrypoints: false },
+          mixedScopeLayouts: [],
+        },
+      ],
+    },
+    {
+      name: 'routeHandlers resource disabled skips unprotected route handler',
+      code: `
+        export async function POST() {
+          return new Response('ok');
+        }
+      `,
+      filename: abs('app/api/things/route.ts'),
+      options: [
+        {
+          ...config,
+          resources: { routeHandlers: false },
+        },
+      ],
+    },
+    {
+      name: 'serverFunctions resource disabled skips module Server Functions',
+      code: `
+        'use server';
+        export async function deleteUser(id) {
+          return id;
+        }
+      `,
+      filename: abs('app/admin/users/actions.ts'),
+      options: [
+        {
+          ...config,
+          resources: { serverFunctions: false },
+        },
+      ],
+    },
+    {
+      name: 'serverFunctions resource disabled skips inline Server Functions',
+      code: `
+        import { auth } from '@clerk/nextjs/server';
+        export default async function Page() {
+          await auth.protect();
+          async function updateUser() {
+            'use server';
+            return 1;
+          }
+          return <form action={updateUser} />;
+        }
+      `,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [
+        {
+          ...config,
+          resources: { serverFunctions: false },
+        },
+      ],
+    },
   ],
 
   invalid: [
@@ -1002,6 +1085,22 @@ ruleTester.run('require-auth-protection', rule, {
       filename: abs('app/api/things/route.ts'),
       options: [config],
       errors: [{ messageId: 'missingProtect' }],
+    },
+    {
+      name: 'disabled serverComponentEntrypoints resource still checks route handlers',
+      code: `
+        export async function POST() {
+          return new Response('ok');
+        }
+      `,
+      filename: abs('app/api/things/route.ts'),
+      options: [
+        {
+          ...config,
+          resources: { serverComponentEntrypoints: false },
+        },
+      ],
+      errors: [{ messageId: 'missingProtect', data: { subject: 'POST handler' } }],
     },
     {
       name: 'route handler declared above and re-exported via specifier, missing protect',
@@ -1642,6 +1741,37 @@ describe('require-auth-protection schema validation', () => {
 
   it('accepts configs with `protected` set and other options omitted', () => {
     expect(() => lintWithOptions({ protected: ['app/**'] })).not.toThrow();
+  });
+
+  it('accepts optional resource configuration', () => {
+    expect(() =>
+      lintWithOptions({
+        protected: ['app/**'],
+        resources: {
+          routeHandlers: true,
+          serverFunctions: false,
+          serverComponentEntrypoints: true,
+        },
+      }),
+    ).not.toThrow();
+  });
+
+  it('rejects unknown resource options', () => {
+    expect(() =>
+      lintWithOptions({
+        protected: ['app/**'],
+        resources: { components: false },
+      }),
+    ).toThrow(/components|additional/i);
+  });
+
+  it('rejects non-boolean resource options', () => {
+    expect(() =>
+      lintWithOptions({
+        protected: ['app/**'],
+        resources: { routeHandlers: 'report-only' },
+      }),
+    ).toThrow(/routeHandlers|boolean/i);
   });
 
   it('accepts an optional `rootDir`', () => {

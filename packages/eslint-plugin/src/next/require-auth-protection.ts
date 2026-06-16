@@ -5,18 +5,31 @@ import type { Rule } from 'eslint';
 import type { ExportTarget, FunctionNode } from './lib/exports';
 import { iterateExportAllDeclarations, iterateNamedExports, resolveDefaultExport } from './lib/exports';
 import { type FileKind, getFileKind, getRelativeFolder, isClientModule, isServerFunctionModule } from './lib/file-info';
-import { resolveProjectRoot } from './lib/project-root';
 import type { ClassifyOptions } from './lib/match-folders';
 import { classifyFolder, hasDescendantsMatching } from './lib/match-folders';
+import { resolveProjectRoot } from './lib/project-root';
 import { findAuthLocalNames, hasProtectAtTop } from './lib/protection-checks';
 
 export type MessageId = 'missingProtect' | 'exportImported' | 'unverifiableExport' | 'unlistedMixedScopeLayout';
+
+interface ResourceOptions {
+  /** Route handler files, such as `route.ts`. */
+  routeHandlers?: boolean;
+  /** Module-level and inline Server Functions using `'use server'`. */
+  serverFunctions?: boolean;
+  /** Server Component entrypoints, such as `page.tsx`, `layout.tsx`, `template.tsx`, and `default.tsx`. */
+  serverComponentEntrypoints?: boolean;
+}
+
+type NormalizedResourceOptions = Required<ResourceOptions>;
 
 export interface RuleOptions {
   /** Glob patterns that mark folders as protected. */
   protected: string[];
   /** Glob patterns that exempt folders from protection. */
   public?: string[];
+  /** Resource groups that should be checked. All resource groups are checked by default. */
+  resources?: ResourceOptions;
   /** Layouts that wrap both protected and public descendants. */
   mixedScopeLayouts?: 'auto' | string[];
   /**
@@ -29,6 +42,12 @@ export interface RuleOptions {
 }
 
 const HTTP_METHODS = new Set(['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD']);
+
+const DEFAULT_RESOURCES: NormalizedResourceOptions = {
+  routeHandlers: true,
+  serverFunctions: true,
+  serverComponentEntrypoints: true,
+};
 
 const rule: Rule.RuleModule = {
   meta: {
@@ -46,6 +65,15 @@ const rule: Rule.RuleModule = {
             minItems: 1,
           },
           public: { type: 'array', items: { type: 'string' } },
+          resources: {
+            type: 'object',
+            properties: {
+              routeHandlers: { type: 'boolean' },
+              serverFunctions: { type: 'boolean' },
+              serverComponentEntrypoints: { type: 'boolean' },
+            },
+            additionalProperties: false,
+          },
           mixedScopeLayouts: {
             oneOf: [
               { type: 'string', enum: ['auto'] },
@@ -78,6 +106,7 @@ const rule: Rule.RuleModule = {
       protected: options.protected,
       public: options.public ?? [],
     };
+    const resources = normalizeResources(options.resources);
     const mixedScopeLayoutsOption = options.mixedScopeLayouts === undefined ? 'auto' : options.mixedScopeLayouts;
 
     const projectRoot = resolveProjectRoot(filename, { rootDir: options.rootDir, cwd });
@@ -108,7 +137,7 @@ const rule: Rule.RuleModule = {
         // This needs to be before the other bailouts. It sets up state
         // necessary for the independent function visitors to work.
         authNames = findAuthLocalNames(ast);
-        shouldCheckInlineServerFunctions = !isClient;
+        shouldCheckInlineServerFunctions = resources.serverFunctions && !isClient;
 
         if (!fileKind && !isServerFunction) {
           return;
@@ -121,16 +150,23 @@ const rule: Rule.RuleModule = {
           return;
         }
 
-        if ((fileKind === 'layout' || fileKind === 'template') && hasDescendantsMatching(folder, config.public)) {
+        if (
+          resources.serverComponentEntrypoints &&
+          (fileKind === 'layout' || fileKind === 'template') &&
+          hasDescendantsMatching(folder, config.public)
+        ) {
           checkUnacknowledgedMixedScope(context, ast, fileKind, folder, mixedScopeLayoutsOption);
           return;
         }
 
-        if (fileKind === 'page' || fileKind === 'layout' || fileKind === 'template' || fileKind === 'default') {
+        if (
+          resources.serverComponentEntrypoints &&
+          (fileKind === 'page' || fileKind === 'layout' || fileKind === 'template' || fileKind === 'default')
+        ) {
           checkDefaultExport(context, ast, fileKind, authNames, checkedFunctions);
-        } else if (fileKind === 'route') {
+        } else if (resources.routeHandlers && fileKind === 'route') {
           checkRouteHandlers(context, ast, authNames, checkedFunctions);
-        } else if (isServerFunction) {
+        } else if (resources.serverFunctions && isServerFunction) {
           checkServerFunctions(context, ast, authNames, checkedFunctions);
         }
       },
@@ -166,6 +202,10 @@ const rule: Rule.RuleModule = {
 };
 
 export default rule;
+
+function normalizeResources(resources: ResourceOptions | undefined): NormalizedResourceOptions {
+  return { ...DEFAULT_RESOURCES, ...resources };
+}
 
 function checkUnacknowledgedMixedScope(
   context: Rule.RuleContext,
