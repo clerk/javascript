@@ -548,6 +548,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'enterpriseConnectionButtonText',
 
   'configureSSOHeader',
+  'configureSSOHeaderBackButton',
   'configureSSOMobileNavbar',
   'configureSSOStepper',
   'configureSSOStepperItem',

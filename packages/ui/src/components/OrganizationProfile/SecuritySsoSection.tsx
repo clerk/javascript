@@ -28,7 +28,7 @@ type SecuritySsoSectionProps = {
   deleteConnection: EnterpriseConnectionMutations['deleteConnection'];
   organizationName: string;
   contentRef: React.RefObject<HTMLDivElement>;
-  onConfigure: () => void;
+  onConfigure: (forceInitialStep?: boolean) => void;
 };
 
 const STATUS_BADGES: Record<
@@ -95,7 +95,7 @@ export const SecuritySsoSection = (props: SecuritySsoSectionProps): JSX.Element 
             'organizationProfile.securityPage.ssoSection.primaryButton__startConfiguration',
           )}
           primaryButtonId='start'
-          onConfigure={onConfigure}
+          onConfigure={() => onConfigure(true)}
         />
       )}
 
@@ -105,7 +105,7 @@ export const SecuritySsoSection = (props: SecuritySsoSectionProps): JSX.Element 
             'organizationProfile.securityPage.ssoSection.primaryButton__continueConfiguration',
           )}
           primaryButtonId='continue'
-          onConfigure={onConfigure}
+          onConfigure={() => onConfigure()}
         />
       )}
 
@@ -205,7 +205,7 @@ const ConfiguredContent = (props: ConfiguredContentProps): JSX.Element => {
           actions={[
             {
               label: localizationKeys('organizationProfile.securityPage.ssoSection.menuAction__edit'),
-              onClick: onConfigure,
+              onClick: () => onConfigure(true),
             },
             isActive
               ? {

@@ -71,6 +71,31 @@ describe('ConfigureSSO', () => {
     });
   });
 
+  describe('standalone mount header', () => {
+    it('renders the stepper without a back control (no host title / onExit)', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEnterpriseSso({ selfServeSSO: true });
+        f.withEmailAddress();
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', permissions: ['org:sys_entconns:manage'] }],
+        });
+      });
+
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
+      mockOrganizationDomains(fixtures, [verifiedDomain]);
+
+      const { findByText, queryByRole } = render(<ConfigureSSO />, { wrapper });
+
+      await findByText(/select your identity provider/i);
+
+      // The standalone wizard is mounted without `title`/`onExit`, so the header
+      // exposes no "Security" back control.
+      expect(queryByRole('button', { name: 'Security' })).not.toBeInTheDocument();
+    });
+  });
+
   describe('in a personal workspace', () => {
     it('renders the wizard without checking the manage enterprise connections permission', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
