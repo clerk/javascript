@@ -73,10 +73,6 @@ class ClerkExpoModule : Module() {
             getClientToken(promise)
         }
 
-        AsyncFunction("refreshClient") { promise: Promise ->
-            refreshClient(promise)
-        }
-
         AsyncFunction("syncFromJsClientToken") { clientToken: String?, sourceId: String?, promise: Promise ->
             syncFromJsClientToken(clientToken, sourceId, promise)
         }
@@ -119,6 +115,11 @@ class ClerkExpoModule : Module() {
             result["sourceId"] = sourceId
         }
         return result
+    }
+
+    private fun emitSyncedClientChanged(sourceId: String?) {
+        lastObservedClient = Clerk.clientFlow.value
+        emitClientChanged(sourceId)
     }
 
     // MARK: - configure
@@ -280,30 +281,6 @@ class ClerkExpoModule : Module() {
         }
     }
 
-    // MARK: - refreshClient
-
-    private fun refreshClient(promise: Promise) {
-        if (!Clerk.isInitialized.value) {
-            promise.resolve(null)
-            return
-        }
-
-        coroutineScope.launch {
-            try {
-                when (val result = Clerk.refreshClient()) {
-                    is ClerkResult.Failure -> promise.reject(
-                        "E_REFRESH_CLIENT_FAILED",
-                        result.error?.firstMessage() ?: result.throwable?.message ?: "Client refresh failed",
-                        null
-                    )
-                    is ClerkResult.Success -> promise.resolve(null)
-                }
-            } catch (e: Exception) {
-                promise.reject("E_REFRESH_CLIENT_FAILED", e.message ?: "Client refresh failed", e)
-            }
-        }
-    }
-
     // MARK: - syncFromJsClientToken
 
     private fun syncFromJsClientToken(clientToken: String?, sourceId: String?, promise: Promise) {
@@ -318,7 +295,6 @@ class ClerkExpoModule : Module() {
                 if (!clientToken.isNullOrBlank()) {
                     when (val result = Clerk.updateDeviceToken(clientToken)) {
                         is ClerkResult.Failure -> {
-                            pendingClientChangeSourceId = null
                             promise.reject(
                                 "E_SYNC_FROM_JS_FAILED",
                                 result.error?.firstMessage() ?: result.throwable?.message ?: "Client token sync failed",
@@ -334,9 +310,7 @@ class ClerkExpoModule : Module() {
                             } catch (_: TimeoutCancellationException) {
                                 debugLog(TAG, "syncFromJsClientToken - session did not appear after token update")
                             }
-                            lastObservedClient = Clerk.clientFlow.value
-                            pendingClientChangeSourceId = null
-                            emitClientChanged(sourceId)
+                            emitSyncedClientChanged(sourceId)
                             promise.resolve(null)
                             return@launch
                         }
@@ -345,7 +319,6 @@ class ClerkExpoModule : Module() {
 
                 when (val result = Clerk.refreshClient()) {
                     is ClerkResult.Failure -> {
-                        pendingClientChangeSourceId = null
                         promise.reject(
                             "E_SYNC_FROM_JS_FAILED",
                             result.error?.firstMessage() ?: result.throwable?.message ?: "Client refresh failed",
@@ -353,15 +326,14 @@ class ClerkExpoModule : Module() {
                         )
                     }
                     is ClerkResult.Success -> {
-                        lastObservedClient = Clerk.clientFlow.value
-                        pendingClientChangeSourceId = null
-                        emitClientChanged(sourceId)
+                        emitSyncedClientChanged(sourceId)
                         promise.resolve(null)
                     }
                 }
             } catch (e: Exception) {
-                pendingClientChangeSourceId = null
                 promise.reject("E_SYNC_FROM_JS_FAILED", e.message ?: "Client token sync failed", e)
+            } finally {
+                pendingClientChangeSourceId = null
             }
         }
     }

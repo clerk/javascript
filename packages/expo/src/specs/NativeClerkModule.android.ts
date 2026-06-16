@@ -6,8 +6,7 @@ interface Spec {
   addListener?(eventName: string): void;
   configure(publishableKey: string, bearerToken: string | null): Promise<void>;
   getClientToken(): Promise<string | null>;
-  refreshClient(): Promise<void>;
-  syncFromJsClientToken?(clientToken: string | null, sourceId: string | null): Promise<void>;
+  syncFromJsClientToken(clientToken: string | null, sourceId: string | null): Promise<void>;
   removeListeners?(count: number): void;
 }
 

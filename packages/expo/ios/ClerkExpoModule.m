@@ -11,9 +11,6 @@ RCT_EXTERN_METHOD(configure:(NSString *)publishableKey
 RCT_EXTERN_METHOD(getClientToken:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 
-RCT_EXTERN_METHOD(refreshClient:(RCTPromiseResolveBlock)resolve
-                  reject:(RCTPromiseRejectBlock)reject)
-
 RCT_EXTERN_METHOD(syncFromJsClientToken:(id)clientToken
                   sourceId:(id)sourceId
                   resolve:(RCTPromiseResolveBlock)resolve

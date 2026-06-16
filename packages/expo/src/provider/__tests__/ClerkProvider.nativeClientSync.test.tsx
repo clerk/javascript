@@ -10,8 +10,6 @@ const mocks = vi.hoisted(() => {
     configure: vi.fn(),
     getClientToken: vi.fn(),
     nativeClientEvent: null as unknown,
-    refreshClient: vi.fn(),
-    hasSyncFromJsClientToken: true,
     syncFromJsClientToken: vi.fn(),
     tokenCache: {
       clearToken: vi.fn(),
@@ -90,10 +88,7 @@ vi.mock('../../specs/NativeClerkModule', () => {
     default: {
       configure: mocks.configure,
       getClientToken: mocks.getClientToken,
-      refreshClient: mocks.refreshClient,
-      get syncFromJsClientToken() {
-        return mocks.hasSyncFromJsClientToken ? mocks.syncFromJsClientToken : undefined;
-      },
+      syncFromJsClientToken: mocks.syncFromJsClientToken,
     },
   };
 });
@@ -119,7 +114,6 @@ describe('ClerkProvider native client sync', () => {
     vi.clearAllMocks();
     mocks.nativeClientEvent = null;
     mocks.configure.mockResolvedValue(undefined);
-    mocks.hasSyncFromJsClientToken = true;
     mocks.getClientToken.mockResolvedValue('native-client-token');
     mocks.syncFromJsClientToken.mockResolvedValue(undefined);
     mocks.tokenCache.getToken.mockResolvedValue('client-token');
@@ -850,31 +844,6 @@ describe('ClerkProvider native client sync', () => {
 
     await waitFor(() => {
       expect(mocks.syncFromJsClientToken).toHaveBeenCalledWith(null, expect.any(String));
-    });
-  });
-
-  test('falls back to refreshClient for JS client changes when token sync is unavailable', async () => {
-    mocks.hasSyncFromJsClientToken = false;
-    mocks.tokenCache.getToken.mockResolvedValue(null);
-
-    render(
-      <ClerkProvider
-        publishableKey='pk_test_123'
-        tokenCache={mocks.tokenCache}
-      />,
-    );
-
-    await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalled();
-    });
-
-    mocks.refreshClient.mockClear();
-    act(() => {
-      mocks.clerkListener?.();
-    });
-
-    await waitFor(() => {
-      expect(mocks.refreshClient).toHaveBeenCalled();
     });
   });
 });

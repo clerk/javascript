@@ -10,7 +10,6 @@ import {
   type NativeClientSnapshot,
   useNativeClientEvents,
 } from '../hooks/useNativeClientEvents';
-import { tokenCache as defaultTokenCache } from '../token-cache';
 import { ClerkExpoModule as NativeClerkModule } from '../utils/native-module';
 
 const tokenCacheReadTimeoutMs = 1_000;
@@ -92,10 +91,6 @@ export function useSyncableTokenCache({
   }, [suppressTokenCacheNotificationsRef, tokenCache, tokenCacheListenersRef]);
 }
 
-function getEffectiveTokenCache(tokenCache: TokenCache | undefined): TokenCache | undefined {
-  return tokenCache ?? (Platform.OS === 'ios' || Platform.OS === 'android' ? MemoryTokenCache : defaultTokenCache);
-}
-
 function getNativeClientTokenFromSnapshot(
   snapshot: NativeClientSnapshot | null | undefined,
 ): string | null | undefined {
@@ -159,6 +154,27 @@ async function syncClientTokenToCacheWithoutNotifying({
   }
 }
 
+async function syncNativeTokenToCache({
+  clientToken,
+  suppressTokenCacheNotificationsRef,
+  tokenCache,
+}: {
+  clientToken: string | null;
+  suppressTokenCacheNotificationsRef?: MutableRefObject<boolean>;
+  tokenCache: TokenCache | undefined;
+}): Promise<void> {
+  if (suppressTokenCacheNotificationsRef) {
+    await syncClientTokenToCacheWithoutNotifying({
+      clientToken,
+      suppressTokenCacheNotificationsRef,
+      tokenCache,
+    });
+    return;
+  }
+
+  await syncClientTokenToCache(tokenCache, clientToken);
+}
+
 function getDefaultSignedInSession(client: ClientResource | null | undefined): SignedInSessionResource | null {
   if (!client) {
     return null;
@@ -191,6 +207,68 @@ async function refreshJsClientWithoutEmitting(clerkInstance: SyncableClerkInstan
   return refreshedClient;
 }
 
+async function refreshJsClientFromNativeState({
+  clerkInstance,
+  nativeClientToken,
+  reloadInitialResources,
+  suppressTokenCacheNotificationsRef,
+  tokenCache,
+}: {
+  clerkInstance: SyncableClerkInstance;
+  nativeClientToken: string | null;
+  reloadInitialResources: boolean;
+  suppressTokenCacheNotificationsRef?: MutableRefObject<boolean>;
+  tokenCache: TokenCache | undefined;
+}): Promise<boolean> {
+  await syncNativeTokenToCache({
+    clientToken: nativeClientToken,
+    suppressTokenCacheNotificationsRef,
+    tokenCache,
+  });
+
+  const refreshedClient = await refreshJsClientWithoutEmitting(clerkInstance);
+  if (refreshedClient) {
+    await reconcileJsActiveSessionFromClient({
+      clerkInstance,
+    });
+    return true;
+  }
+
+  if (reloadInitialResources && typeof clerkInstance.__internal_reloadInitialResources === 'function') {
+    await clerkInstance.__internal_reloadInitialResources();
+    await reconcileJsActiveSessionFromClient({
+      clerkInstance,
+    });
+    return Boolean(getDefaultSignedInSession(clerkInstance.client));
+  }
+
+  return false;
+}
+
+async function reloadJsClientFromNativeState({
+  clerkInstance,
+  nativeClientToken,
+  suppressTokenCacheNotificationsRef,
+  tokenCache,
+}: {
+  clerkInstance: SyncableClerkInstance;
+  nativeClientToken: string;
+  suppressTokenCacheNotificationsRef?: MutableRefObject<boolean>;
+  tokenCache: TokenCache | undefined;
+}): Promise<boolean> {
+  await syncNativeTokenToCache({
+    clientToken: nativeClientToken,
+    suppressTokenCacheNotificationsRef,
+    tokenCache,
+  });
+
+  await clerkInstance.__internal_reloadInitialResources?.();
+  await reconcileJsActiveSessionFromClient({
+    clerkInstance,
+  });
+  return Boolean(getDefaultSignedInSession(clerkInstance.client));
+}
+
 async function recoverJsClientFromNativeToken({
   clerkInstance,
   error,
@@ -211,18 +289,13 @@ async function recoverJsClientFromNativeToken({
     console.warn('[NativeClientSync] Failed to refresh JS client with native client token:', error);
   }
 
-  await syncClientTokenToCacheWithoutNotifying({
-    clientToken: nativeClientToken,
-    suppressTokenCacheNotificationsRef,
-    tokenCache,
-  });
-
   try {
-    await clerkInstance.__internal_reloadInitialResources?.();
-    await reconcileJsActiveSessionFromClient({
+    return await reloadJsClientFromNativeState({
       clerkInstance,
+      nativeClientToken,
+      suppressTokenCacheNotificationsRef,
+      tokenCache,
     });
-    return Boolean(getDefaultSignedInSession(clerkInstance.client));
   } catch (recoveryError) {
     if (__DEV__) {
       console.warn('[NativeClientSync] Failed to recover JS client after unauthenticated state:', recoveryError);
@@ -330,7 +403,6 @@ async function syncNativeClientToJs({
       : await readNativeClientToken({
           waitForToken: !nativeClientEvent,
         });
-  const effectiveTokenCache = getEffectiveTokenCache(tokenCache);
 
   if (!nativeClientToken && !nativeClientEvent) {
     return;
@@ -339,30 +411,12 @@ async function syncNativeClientToJs({
   await runWithSuppressedJsClientChanges(suppressJsClientChangedRef, async () => {
     nativeRefreshFromJsControllerRef?.current?.cancel();
 
-    if (suppressTokenCacheNotificationsRef) {
-      await syncClientTokenToCacheWithoutNotifying({
-        clientToken: nativeClientToken,
-        suppressTokenCacheNotificationsRef,
-        tokenCache: effectiveTokenCache,
-      });
-    } else {
-      await syncClientTokenToCache(effectiveTokenCache, nativeClientToken);
-    }
-
-    const refreshedClient = await refreshJsClientWithoutEmitting(clerkInstance);
-    if (refreshedClient) {
-      await reconcileJsActiveSessionFromClient({
-        clerkInstance,
-      });
-      return;
-    }
-
-    if (typeof clerkInstance.__internal_reloadInitialResources === 'function') {
-      await clerkInstance.__internal_reloadInitialResources();
-    }
-
-    await reconcileJsActiveSessionFromClient({
+    await refreshJsClientFromNativeState({
       clerkInstance,
+      nativeClientToken,
+      reloadInitialResources: true,
+      suppressTokenCacheNotificationsRef,
+      tokenCache,
     });
   });
 }
@@ -377,7 +431,6 @@ async function syncNativeClientToJs({
 export function NativeClientSync({
   clerkInstance,
   nativeRefreshFromJsControllerRef,
-  publishableKey,
   suppressJsClientChangedRef,
   suppressTokenCacheNotificationsRef,
   tokenCache,
@@ -385,7 +438,6 @@ export function NativeClientSync({
 }: {
   clerkInstance: SyncableClerkInstance | null | undefined;
   nativeRefreshFromJsControllerRef: MutableRefObject<NativeRefreshFromJsController | null>;
-  publishableKey: string;
   suppressJsClientChangedRef: MutableRefObject<number>;
   suppressTokenCacheNotificationsRef: MutableRefObject<boolean>;
   tokenCache: TokenCache | undefined;
@@ -472,75 +524,66 @@ export function NativeClientSync({
     };
   }, [clerkInstance, suppressJsClientChangedRef]);
 
-  const queueNativeRefreshFromJs = useCallback(
-    (options: NativeRefreshFromJsOptions): void => {
-      if (isRefreshingNativeFromJsRef.current) {
-        if (!('clientToken' in options)) {
-          return;
-        }
-
-        pendingNativeRefreshRef.current = mergePendingNativeRefreshOptions(pendingNativeRefreshRef.current, options);
-        nativeRefreshGenerationRef.current += 1;
+  const queueNativeRefreshFromJs = useCallback((options: NativeRefreshFromJsOptions): void => {
+    if (isRefreshingNativeFromJsRef.current) {
+      if (!('clientToken' in options)) {
         return;
       }
 
-      const initialGeneration = nativeRefreshGenerationRef.current + 1;
-      nativeRefreshGenerationRef.current = initialGeneration;
-      isRefreshingNativeFromJsRef.current = true;
+      pendingNativeRefreshRef.current = mergePendingNativeRefreshOptions(pendingNativeRefreshRef.current, options);
+      nativeRefreshGenerationRef.current += 1;
+      return;
+    }
 
-      const refreshNativeFromJsClient = async (
-        options: NativeRefreshFromJsOptions,
-        generation: number,
-      ): Promise<void> => {
-        const ClerkExpo = NativeClerkModule;
-        if (!ClerkExpo || generation !== nativeRefreshGenerationRef.current) {
-          return;
-        }
+    const initialGeneration = nativeRefreshGenerationRef.current + 1;
+    nativeRefreshGenerationRef.current = initialGeneration;
+    isRefreshingNativeFromJsRef.current = true;
 
-        const bearerToken = 'clientToken' in options ? (options.clientToken ?? null) : null;
-        if (generation !== nativeRefreshGenerationRef.current) {
-          return;
-        }
+    const refreshNativeFromJsClient = async (
+      options: NativeRefreshFromJsOptions,
+      generation: number,
+    ): Promise<void> => {
+      const ClerkExpo = NativeClerkModule;
+      if (!ClerkExpo || generation !== nativeRefreshGenerationRef.current) {
+        return;
+      }
 
-        if (typeof ClerkExpo.syncFromJsClientToken === 'function') {
-          const sourceId = `${nativeClientSyncSourceIdPrefix}-${generation}`;
-          await ClerkExpo.syncFromJsClientToken(bearerToken, sourceId);
-        } else if ('clientToken' in options && bearerToken) {
-          await ClerkExpo.configure(publishableKey, bearerToken);
-        } else {
-          await ClerkExpo.refreshClient?.();
-        }
-      };
+      const bearerToken = 'clientToken' in options ? (options.clientToken ?? null) : null;
+      if (generation !== nativeRefreshGenerationRef.current) {
+        return;
+      }
 
-      let latestRunGeneration = initialGeneration;
+      const sourceId = `${nativeClientSyncSourceIdPrefix}-${generation}`;
+      await ClerkExpo.syncFromJsClientToken(bearerToken, sourceId);
+    };
 
-      void (async () => {
-        let pendingOptions = options;
-        let generation = initialGeneration;
-        do {
-          latestRunGeneration = generation;
-          pendingNativeRefreshRef.current = null;
-          try {
-            await refreshNativeFromJsClient(pendingOptions, generation);
-          } catch (error: unknown) {
-            if (__DEV__) {
-              console.warn('[NativeClientSync] Failed to refresh native client from JS client change:', error);
-            }
+    let latestRunGeneration = initialGeneration;
+
+    void (async () => {
+      let pendingOptions = options;
+      let generation = initialGeneration;
+      do {
+        latestRunGeneration = generation;
+        pendingNativeRefreshRef.current = null;
+        try {
+          await refreshNativeFromJsClient(pendingOptions, generation);
+        } catch (error: unknown) {
+          if (__DEV__) {
+            console.warn('[NativeClientSync] Failed to refresh native client from JS client change:', error);
           }
-          pendingOptions = pendingNativeRefreshRef.current ?? {};
-          if (pendingNativeRefreshRef.current !== null) {
-            generation = nativeRefreshGenerationRef.current + 1;
-            nativeRefreshGenerationRef.current = generation;
-          }
-        } while (pendingNativeRefreshRef.current !== null);
-      })().finally(() => {
-        if (latestRunGeneration === nativeRefreshGenerationRef.current || pendingNativeRefreshRef.current === null) {
-          isRefreshingNativeFromJsRef.current = false;
         }
-      });
-    },
-    [publishableKey],
-  );
+        pendingOptions = pendingNativeRefreshRef.current ?? {};
+        if (pendingNativeRefreshRef.current !== null) {
+          generation = nativeRefreshGenerationRef.current + 1;
+          nativeRefreshGenerationRef.current = generation;
+        }
+      } while (pendingNativeRefreshRef.current !== null);
+    })().finally(() => {
+      if (latestRunGeneration === nativeRefreshGenerationRef.current || pendingNativeRefreshRef.current === null) {
+        isRefreshingNativeFromJsRef.current = false;
+      }
+    });
+  }, []);
 
   useEffect(() => {
     const listener: ClientTokenCacheListener = clientToken => {
@@ -561,7 +604,6 @@ export function NativeClientSync({
 
     const originalHandleUnauthenticated = clerkInstance.handleUnauthenticated.bind(clerkInstance);
     let isHandlingUnauthenticated = false;
-    const effectiveTokenCache = getEffectiveTokenCache(tokenCache);
 
     const handleUnauthenticated: SyncableClerkInstance['handleUnauthenticated'] = async options => {
       if (isHandlingUnauthenticated) {
@@ -573,22 +615,17 @@ export function NativeClientSync({
         return await runWithSuppressedJsClientChanges(suppressJsClientChangedRef, async () => {
           try {
             const nativeClientToken = await readNativeClientToken({ waitForToken: false });
-            if (nativeClientToken) {
-              await syncClientTokenToCacheWithoutNotifying({
-                clientToken: nativeClientToken,
-                suppressTokenCacheNotificationsRef,
-                tokenCache: effectiveTokenCache,
-              });
-            }
-
             // Native may have already moved the server-side client to a new
             // active session. Refresh JS before allowing Clerk JS' stale-session
             // 401 path to collapse the whole client to signed out.
-            const refreshedClient = await refreshJsClientWithoutEmitting(clerkInstance);
-            if (refreshedClient) {
-              await reconcileJsActiveSessionFromClient({
-                clerkInstance,
-              });
+            const didRecover = await refreshJsClientFromNativeState({
+              clerkInstance,
+              nativeClientToken,
+              reloadInitialResources: false,
+              suppressTokenCacheNotificationsRef,
+              tokenCache,
+            });
+            if (didRecover) {
               return;
             }
           } catch (error) {
@@ -596,7 +633,7 @@ export function NativeClientSync({
               clerkInstance,
               error,
               suppressTokenCacheNotificationsRef,
-              tokenCache: effectiveTokenCache,
+              tokenCache,
             });
             if (didRecover) {
               return;
@@ -680,10 +717,9 @@ export function useNativeClientBootstrap({
               return;
             }
 
-            const effectiveTokenCache = getEffectiveTokenCache(tokenCache);
             let bearerToken: string | null = null;
             try {
-              bearerToken = await getCachedClientToken(effectiveTokenCache);
+              bearerToken = await getCachedClientToken(tokenCache);
             } catch (e) {
               if (__DEV__) {
                 console.warn('[ClerkProvider] Token cache read failed:', e);

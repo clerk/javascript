@@ -31,7 +31,6 @@ public protocol ClerkNativeBridgeProtocol {
   // SDK operations
   func configure(publishableKey: String, bearerToken: String?) async throws
   func getClientToken() async -> String?
-  func refreshClient() async throws
   func syncFromJsClientToken(_ clientToken: String?, sourceId: String?) async throws
 }
 
@@ -148,25 +147,6 @@ class ClerkExpoModule: RCTEventEmitter {
     Task {
       let token = await bridge.getClientToken()
       resolve(token)
-    }
-  }
-
-  // MARK: - refreshClient
-
-  @objc func refreshClient(_ resolve: @escaping RCTPromiseResolveBlock,
-                            reject: @escaping RCTPromiseRejectBlock) {
-    guard let bridge = clerkNativeBridge else {
-      resolve(nil)
-      return
-    }
-
-    Task {
-      do {
-        try await bridge.refreshClient()
-        resolve(nil)
-      } catch {
-        reject("E_REFRESH_CLIENT_FAILED", error.localizedDescription, error)
-      }
     }
   }
 

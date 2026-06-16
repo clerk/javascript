@@ -136,7 +136,6 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
         <NativeClientSync
           clerkInstance={clerkInstance}
           nativeRefreshFromJsControllerRef={nativeRefreshFromJsControllerRef}
-          publishableKey={pk}
           suppressJsClientChangedRef={suppressJsClientChangedRef}
           suppressTokenCacheNotificationsRef={suppressTokenCacheNotificationsRef}
           tokenCache={syncableTokenCache}
