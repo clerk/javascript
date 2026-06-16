@@ -10,6 +10,7 @@ import {
 import { Default as DestructiveDefault, meta as destructiveMeta } from '../stories/destructive.stories';
 import { Default as DialogDefault, meta as dialogComponentMeta } from '../stories/dialog.component.stories';
 import { meta as dialogMeta } from '../stories/dialog.stories';
+import { Default as HeadingDefault, meta as headingComponentMeta } from '../stories/heading.component.stories';
 import {
   Default,
   Disabled as InputDisabled,
@@ -34,6 +35,7 @@ import { meta as popoverMeta } from '../stories/popover.stories';
 import { meta as selectMeta } from '../stories/select.stories';
 import { Default as TabsComponentDefault, meta as tabsComponentMeta } from '../stories/tabs.component.stories';
 import { meta as tabsMeta } from '../stories/tabs.stories';
+import { Default as TextDefault, meta as textComponentMeta } from '../stories/text.component.stories';
 import { meta as tooltipMeta } from '../stories/tooltip.stories';
 import { toSlug } from './slug';
 import type { StoryModule } from './types';
@@ -53,7 +55,11 @@ const inputModule: StoryModule = { meta: inputMeta, Default, Sizes: InputSizes, 
 
 const dialogComponentModule: StoryModule = { meta: dialogComponentMeta, Default: DialogDefault };
 
+const headingComponentModule: StoryModule = { meta: headingComponentMeta, Default: HeadingDefault };
+
 const tabsComponentModule: StoryModule = { meta: tabsComponentMeta, Default: TabsComponentDefault };
+
+const textComponentModule: StoryModule = { meta: textComponentMeta, Default: TextDefault };
 
 // Headless primitives carry just `meta` (no story functions). Like every component
 // they're documented as a single overview page; their live demos come from `<Story>` /
@@ -82,7 +88,9 @@ export const registry: StoryModule[] = [
   buttonModule,
   inputModule,
   dialogComponentModule,
+  headingComponentModule,
   tabsComponentModule,
+  textComponentModule,
   // Primitives — alphabetical within the group.
   accordionModule,
   autocompleteModule,

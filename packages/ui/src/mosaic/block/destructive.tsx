@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import type { HTMLAttributes } from 'react';
 
 import { Box } from '../components/box';
 import { Button } from '../components/button';
 import { Dialog } from '../components/dialog';
+import { Heading } from '../components/heading';
 import { Input } from '../components/input';
+import { Text } from '../components/text';
 
 interface DestructiveProps {
-  trigger: (props: Omit<HTMLAttributes<HTMLElement>, 'color'>) => React.ReactNode;
+  trigger: React.ComponentProps<typeof Dialog>['trigger'];
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
@@ -42,62 +43,61 @@ export function Destructive({
   };
 
   return (
-    <Dialog.Root
+    <Dialog
       open={open}
       onOpenChange={onOpenChange}
+      trigger={trigger}
     >
-      <Dialog.Trigger render={trigger} />
-      <Dialog.Portal>
-        <Dialog.Backdrop />
-        <Dialog.Viewport>
-          <Dialog.Popup>
-            <Dialog.Title>{title}</Dialog.Title>
-            <Dialog.Description>{description}</Dialog.Description>
-            <Box
-              render={p => (
-                <form
-                  {...p}
-                  onSubmit={handleSubmit}
-                />
-              )}
-              sx={t => ({
-                marginBlockStart: t.spacing(3),
-              })}
+      <Dialog.Title render={p => <Heading {...p} />}>{title}</Dialog.Title>
+      <Dialog.Description render={p => <Text {...p} />}>{description}</Dialog.Description>
+      <form onSubmit={handleSubmit}>
+        <Box
+          render={p => <label {...p} />}
+          sx={t => ({
+            ...t.text('sm'),
+            fontWeight: t.font.medium,
+          })}
+        >
+          Type &quot;{resourceName}&quot; below to continue.
+          <Input
+            value={confirmValue}
+            onChange={e => setConfirmValue(e.target.value)}
+            disabled={isDeleting}
+            sx={t => ({
+              marginBlockStart: t.spacing(1),
+            })}
+          />
+        </Box>
+        <Box
+          sx={t => ({
+            marginBlockStart: t.spacing(4),
+          })}
+        >
+          <ButtonGroup>
+            <Button disabled={!canSubmit}>Cancel</Button>
+            <Button
+              type='submit'
+              intent='destructive'
+              disabled={!canSubmit}
             >
-              <Box
-                render={p => <label {...p} />}
-                sx={t => ({
-                  ...t.text('sm'),
-                  fontWeight: t.font.medium,
-                })}
-              >
-                Type &quot;{resourceName}&quot; below to continue.
-                <Input
-                  value={confirmValue}
-                  onChange={e => setConfirmValue(e.target.value)}
-                  disabled={isDeleting}
-                  sx={t => ({
-                    marginBlockStart: t.spacing(1),
-                  })}
-                />
-              </Box>
-              <Box
-                sx={t => ({
-                  marginBlockStart: t.spacing(4),
-                })}
-              >
-                <Button
-                  type='submit'
-                  color='destructive'
-                  disabled={!canSubmit}
-                >
-                  {primaryActionLabel}
-                </Button>
-              </Box>
-            </Box>
-          </Dialog.Popup>
-        </Dialog.Viewport>
-      </Dialog.Portal>
-    </Dialog.Root>
+              {primaryActionLabel}
+            </Button>
+          </ButtonGroup>
+        </Box>
+      </form>
+    </Dialog>
+  );
+}
+
+function ButtonGroup({ children }: { children: React.ReactNode }) {
+  return (
+    <Box
+      sx={t => ({
+        display: 'flex',
+        columnGap: t.spacing(2),
+      })}
+    >
+      {children}
+    </Box>
   );
 }

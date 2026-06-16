@@ -1,0 +1,79 @@
+import * as TextStories from './text.component.stories';
+
+# Text
+
+A typographic component for body text with size and color variants. Renders as a `<p>` by default and supports font-size and color theming through the Mosaic design system.
+
+## Example
+
+<Preview
+  name='Default'
+  storyModule={TextStories}
+/>
+
+## Usage
+
+```tsx
+import { Text } from '@clerk/ui/mosaic/components/text';
+
+<Text size="base" intent="primary">
+  This is a paragraph of body text.
+</Text>
+```
+
+### Sizes
+
+The `size` prop controls the font-size and line-height via the theme's typography scale:
+
+```tsx
+<Text size="xs">Extra small text</Text>
+<Text size="sm">Small text</Text>
+<Text size="base">Base text</Text>
+<Text size="lg">Large text</Text>
+<Text size="xl">Extra large text</Text>
+<Text size="2xl">2XL text</Text>
+```
+
+### Intents
+
+The `intent` prop controls the color:
+
+```tsx
+<Text intent="primary">Primary text</Text>
+<Text intent="mutedForeground">Muted text</Text>
+<Text intent="destructive">Destructive text</Text>
+```
+
+### Custom Styling
+
+Use the `sx` prop for custom Emotion styles:
+
+```tsx
+<Text sx={{ marginBottom: 16, lineHeight: 1.6 }}>
+  Styled text block.
+</Text>
+```
+
+### Render Prop
+
+Use the `render` prop for custom markup:
+
+```tsx
+<Text render={props => (
+  <span {...props}>
+    Custom text element
+  </span>
+)} />
+```
+
+## Props
+
+| Prop     | Type                                              | Default     | Description                   |
+| -------- | ------------------------------------------------- | ----------- | ----------------------------- |
+| `size`   | `'xs' \| 'sm' \| 'base' \| 'lg' \| 'xl' \| '2xl'` | `'sm'`      | Font size variant             |
+| `intent` | `'primary' \| 'mutedForeground' \| 'destructive'` | `'primary'` | Text color variant            |
+| `sx`     | `CSSObject`                                       | —           | Custom Emotion styles         |
+| `render` | `(props) => ReactNode`                            | —           | Render prop for custom markup |
+| `ref`    | `Ref<HTMLParagraphElement>`                       | —           | Forward ref to the `<p>`      |
+
+All other HTML attributes of `<p>` are supported via spread.

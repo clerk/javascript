@@ -2,15 +2,12 @@ import * as DialogStories from './dialog.component.stories';
 
 # Dialog
 
-The styled Mosaic `Dialog` — the headless `@clerk/headless` dialog primitives composed with
-Mosaic slot recipes. It inherits open state, portalling, focus management, dismissal (outside
-press / Escape), and ARIA wiring from the primitive, and adds Mosaic's themed styling for each
-part. Slot identity (`data-cl-slot`) is applied by this styled layer, not by the headless parts.
+The Mosaic `Dialog` — an opinionated wrapper around the headless `@clerk/headless` dialog
+primitives, composed with Mosaic slot recipes. It flattens the required nesting (Root, Portal,
+Backdrop, Viewport, Popup) into a single component and exposes a `close` callback through a
+render-prop children pattern.
 
 ## Example
-
-The trigger below is a Mosaic `Button`, wired in through the trigger's `render` prop. Open it,
-then press Escape or click the backdrop to dismiss.
 
 <Story
   name='Default'
@@ -23,25 +20,88 @@ then press Escape or click the backdrop to dismiss.
 import { Button } from '@clerk/ui/mosaic/components/button';
 import { Dialog } from '@clerk/ui/mosaic/components/dialog';
 
-<Dialog.Root>
-  <Dialog.Trigger render={props => <Button {...props}>Open dialog</Button>} />
+<Dialog trigger={props => <Button {...props}>Open dialog</Button>}>
+  {({ close }) => (
+    <>
+      <Dialog.Title>Confirm action</Dialog.Title>
+      <Dialog.Description>Are you sure you want to proceed?</Dialog.Description>
+      <Button onClick={close}>Cancel</Button>
+    </>
+  )}
+</Dialog>
+```
+
+The `trigger` render prop receives the interaction props (ARIA attributes, click handler) from
+Floating UI and should spread them onto whatever element opens the dialog.
+
+`children` can also be a plain `ReactNode` when no programmatic close is needed — the dialog
+can always be dismissed via Escape or clicking the backdrop:
+
+```tsx
+<Dialog trigger={props => <Button {...props}>Open</Button>}>
+  <Dialog.Title>Info</Dialog.Title>
+  <Dialog.Description>Nothing to confirm here.</Dialog.Description>
+</Dialog>
+```
+
+### Controlled
+
+```tsx
+const [open, setOpen] = useState(false);
+
+<Dialog
+  open={open}
+  onOpenChange={setOpen}
+  trigger={props => <Button {...props}>Open</Button>}
+>
+  {({ close }) => (
+    <>
+      <Dialog.Title>Confirm</Dialog.Title>
+      <Button onClick={close}>Cancel</Button>
+    </>
+  )}
+</Dialog>
+```
+
+## Props
+
+| Prop           | Type                                                       | Default | Description                                       |
+| -------------- | ---------------------------------------------------------- | ------- | ------------------------------------------------- |
+| `trigger`      | `(props: HTMLAttributes<HTMLElement>) => ReactNode`        | —       | Render prop for the trigger element               |
+| `children`     | `ReactNode \| ((ctx: { close: () => void }) => ReactNode)` | —       | Dialog content; use render prop to access `close` |
+| `size`         | `'md' \| 'lg'`                                             | `'md'`  | Controls the popup width                          |
+| `open`         | `boolean`                                                  | —       | Controlled open state                             |
+| `defaultOpen`  | `boolean`                                                  | `false` | Initial open state (uncontrolled)                 |
+| `onOpenChange` | `(open: boolean) => void`                                  | —       | Called when the open state changes                |
+| `modal`        | `boolean`                                                  | `true`  | Trap focus and make the rest of the page inert    |
+
+## Sub-parts
+
+| Part                 | Slot                 | Description                                          |
+| -------------------- | -------------------- | ---------------------------------------------------- |
+| `Dialog.Title`       | `dialog-title`       | Heading; wired to the popup's `aria-labelledby`      |
+| `Dialog.Description` | `dialog-description` | Description; wired to the popup's `aria-describedby` |
+
+## Compound parts
+
+For custom layouts that need full control over structure, all underlying parts are accessible
+as static properties. Import `Dialog` and compose the compound directly:
+
+```tsx
+<Dialog.Root open={open} onOpenChange={setOpen}>
+  <Dialog.Trigger render={props => <Button {...props}>Open</Button>} />
   <Dialog.Portal>
     <Dialog.Backdrop />
     <Dialog.Viewport>
       <Dialog.Popup>
         <Dialog.Title>Confirm action</Dialog.Title>
-        <Dialog.Description>Are you sure you want to proceed?</Dialog.Description>
+        <Dialog.Description>Are you sure?</Dialog.Description>
         <Dialog.Close>Cancel</Dialog.Close>
       </Dialog.Popup>
     </Dialog.Viewport>
   </Dialog.Portal>
-</Dialog.Root>;
+</Dialog.Root>
 ```
-
-Any part accepts a `render` prop for polymorphic rendering — pass a function that receives the
-part's computed props and spreads them onto your element, as the trigger does with `Button`.
-
-## Parts
 
 | Part                 | Slot                 | Description                                             |
 | -------------------- | -------------------- | ------------------------------------------------------- |
@@ -57,7 +117,13 @@ part's computed props and spreads them onto your element, as the trigger does wi
 
 ## Styling
 
-Each styled part is themed by the Mosaic dialog recipe and stays targetable through its
-`data-cl-slot` plus the state attributes the primitive emits (`data-cl-open`,
-`data-cl-starting-style`, `data-cl-ending-style`). Override per slot through
-`appearance.elements` — e.g. `{ 'dialog-popup': { borderRadius: 24 } }`.
+Override per slot through `appearance.elements` — e.g. `{ 'dialog-popup': { borderRadius: 24 } }`.
+State attributes from the headless layer are also available for CSS targeting:
+
+| Attribute                | Applies To                  | Description                       |
+| ------------------------ | --------------------------- | --------------------------------- |
+| `data-cl-slot`           | All parts                   | Part identifier                   |
+| `data-cl-open`           | Trigger, Backdrop, Viewport | Present when the dialog is open   |
+| `data-cl-closed`         | Trigger, Backdrop, Viewport | Present when closed (during exit) |
+| `data-cl-starting-style` | Backdrop, Viewport, Popup   | Present on the entering frame     |
+| `data-cl-ending-style`   | Backdrop, Viewport, Popup   | Present during the exit animation |

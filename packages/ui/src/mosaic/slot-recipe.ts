@@ -32,12 +32,14 @@ export interface StyleRule extends CSSProperties, ConditionStyles {
 /** Per-instance style override — either a static object or a function that receives the resolved theme. */
 export type SxProp = StyleRule | ((theme: MosaicTheme) => StyleRule);
 
+/** Dynamic `data-cl-*` attributes emitted by variant/state mappers — template-literal key keeps `keyof` specific. */
+type SlotDataAttrs = { [K in `data-cl-${string}`]?: string };
+
 /** The props a styled element receives: the slot id, the merged `css`, and any state data-attributes. */
-export interface SlotProps {
+export interface SlotProps extends SlotDataAttrs {
   'data-cl-slot': string;
   css: StyleRule;
   className?: string;
-  [dataAttr: string]: unknown;
 }
 
 /** Maps each variant axis to its allowed values (a string union, or `boolean` for `true`/`false` axes). */
@@ -130,7 +132,7 @@ interface SlotRecipeConfig {
  */
 export function defineSlotRecipe<
   S extends Record<string, { slot: string }>,
-  V extends Record<string, Record<string, Partial<Record<keyof S, StyleRule>>>> = Record<string, never>,
+  V extends Record<string, Record<string, SlotStyleMap>> = Record<string, never>,
 >(config: MultiSlotConfig<S, V> | ((theme: MosaicTheme) => MultiSlotConfig<S, V>)): SlotRecipe<keyof S & string, V>;
 export function defineSlotRecipe<V extends Record<string, Record<string, StyleRule>> = Record<string, never>>(
   config: SingleSlotConfig<V> | ((theme: MosaicTheme) => SingleSlotConfig<V>),
@@ -188,8 +190,6 @@ export function useRecipe<SlotKeys extends string, V>(
     (opts.variants ?? {}) as Record<string, unknown>,
     config.defaultVariants ?? {},
   );
-  const variantAttrs = variantsToAttrs(resolvedVariants, config.variants);
-
   const result = {} as Record<SlotKeys, SlotProps>;
   for (const slotKey of recipe.slotKeys) {
     const slotId = recipe.slotMap[slotKey];
@@ -214,7 +214,7 @@ export function useRecipe<SlotKeys extends string, V>(
 
     result[slotKey] = {
       'data-cl-slot': slotId,
-      ...variantAttrs,
+      ...variantsToAttrs(resolvedVariants, config.variants, slotKey, recipe.single),
       ...stateAttrs,
       css: expandConditions(css),
       ...(className !== undefined && { className }),
@@ -279,14 +279,27 @@ function compoundMatches(cv: Record<string, unknown>, resolved: Record<string, s
  * (e.g. `[data-cl-slot='button'][data-cl-size='sm']`). Boolean axes (`true`/`false` keys) use
  * presence semantics — the attr is emitted only when `true` — matching the state model; every other
  * axis emits its value (`data-cl-size="sm"`).
+ *
+ * For multi-slot recipes, a variant attr is only emitted on a slot that actually has styles for
+ * that variant value — prevents parent-recipe variant attrs from leaking onto child components
+ * that receive slot props via a render prop.
  */
 function variantsToAttrs(
   resolved: Record<string, string>,
   variants?: Record<string, Record<string, unknown>>,
-): Record<string, string> {
-  const attrs: Record<string, string> = {};
+  slotKey?: string,
+  single?: boolean,
+): Record<`data-cl-${string}`, string> {
+  const attrs: Record<`data-cl-${string}`, string> = {};
   for (const axis in resolved) {
     const value = resolved[axis];
+    // Multi-slot: skip this attr if the variant value defines no styles for this slot.
+    if (!single && slotKey !== undefined) {
+      const variantStyles = variants?.[axis]?.[value];
+      if (!variantStyles || typeof variantStyles !== 'object' || !(slotKey in variantStyles)) {
+        continue;
+      }
+    }
     const keys = variants?.[axis] ? Object.keys(variants[axis]) : [];
     const isBoolean = keys.length > 0 && keys.every(key => key === 'true' || key === 'false');
     if (isBoolean) {
@@ -301,8 +314,8 @@ function variantsToAttrs(
 }
 
 /** Converts a truthy state object into `data-cl-<kebab>` attributes; falsy keys are omitted. */
-function stateToAttrs(state?: Record<string, boolean>): Record<string, string> {
-  const attrs: Record<string, string> = {};
+function stateToAttrs(state?: Record<string, boolean>): Record<`data-cl-${string}`, string> {
+  const attrs: Record<`data-cl-${string}`, string> = {};
   if (!state) {
     return attrs;
   }
