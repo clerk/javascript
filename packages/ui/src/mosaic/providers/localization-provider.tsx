@@ -1,13 +1,14 @@
 import { atom, browser, createI18n, defineLocalization, localeFrom } from '@clerk/i18n';
 import { useStore } from '@clerk/i18n/react';
 import { createContextAndHook } from '@clerk/shared/react';
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 
 import type { FlatOverrides, I18n, NestedOverrides, Registry, ResolvedOverrides, WritableStore } from '@clerk/i18n';
 
 interface LocalizationValue {
   i18n: I18n;
   $locale: WritableStore<string | null>;
+  $overrides: WritableStore<ResolvedOverrides>;
 }
 
 const [LocalizationCtx, useLocalization] = createContextAndHook<LocalizationValue>('LocalizationContext');
@@ -38,15 +39,33 @@ export function LocalizationProvider<R extends Registry = Registry>({
   // Seed $explicit so the first render is correct; no useEffect needed.
   const value = useMemo(() => {
     const $explicit = atom<string | null>(locale ?? null);
+    const $overrides = atom<ResolvedOverrides>(
+      overrides ? defineLocalization(overrides as NestedOverrides<Registry>) : {},
+    );
     const $locale = localeFrom($explicit, browser({ available: locales, fallback: defaultLocale }));
     const i18n = createI18n($locale, {
       get: () => Promise.resolve({}),
-      overrides: atom<ResolvedOverrides>(overrides ? defineLocalization(overrides as NestedOverrides<Registry>) : {}),
+      overrides: $overrides,
       cache: initialMessages,
     });
-    return { i18n, $locale: $explicit };
+    return { i18n, $locale: $explicit, $overrides };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Sync controlled props → atoms during render (derived-state pattern, no effect needed).
+  // locale: primitive comparison against atom's current value is sufficient.
+  const nextLocale = locale ?? null;
+  if (value.$locale.get() !== nextLocale) {
+    value.$locale.set(nextLocale);
+  }
+
+  // overrides: defineLocalization() returns a new object every call, so compare
+  // the prop reference — not the resolved value — to avoid spurious updates.
+  const prevOverridesRef = useRef(overrides);
+  if (prevOverridesRef.current !== overrides) {
+    prevOverridesRef.current = overrides;
+    value.$overrides.set(overrides ? defineLocalization(overrides as NestedOverrides<Registry>) : {});
+  }
 
   return <LocalizationCtx.Provider value={{ value }}>{children}</LocalizationCtx.Provider>;
 }

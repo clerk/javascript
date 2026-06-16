@@ -160,7 +160,13 @@ export function createI18n($locale: ReadableStore<string>, options: CreateI18nOp
   ): Messages<B> {
     const out: Record<string, unknown> = {};
     for (const key in base) {
-      out[key] = buildEntry(locale, base[key], overridesForNamespace?.[key]);
+      const baseVal = base[key];
+      const override = overridesForNamespace?.[key];
+      if (typeof baseVal === 'object' && baseVal !== null && !asMarker(baseVal)) {
+        out[key] = buildMessages(locale, baseVal as Record<string, unknown>, override as Overrides | undefined);
+      } else {
+        out[key] = buildEntry(locale, baseVal, override);
+      }
     }
     return out as Messages<B>;
   }
