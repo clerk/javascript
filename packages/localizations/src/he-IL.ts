@@ -196,28 +196,26 @@ export const heIL: LocalizationResource = {
       },
       warning: 'לאחר בחירת ספק לא ניתן לשנות אותו עד לסיום ההגדרה',
     },
-    verifyEmailDomainStep: {
-      title: 'אימות כתובת אימייל',
-      subtitle: 'אמת את כתובת האימייל שעליה ברצונך להפעיל את חיבור הארגון.',
-      addEmailAddress: {
-        formTitle: 'אנחנו צריכים את האימייל שלך',
-        formSubtitle: 'כדי להתחיל, נצטרך את כתובת האימייל שלך',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'כתובת אימייל',
+    organizationDomainsStep: {
+      title: 'הוספת דומיינים של SSO',
+      subtitle: 'הוסף ואמת בעלות על הדומיינים שהארגון שלך משתמש בהם כדי להתחבר.',
+      formFieldLabel__domain: 'דומיינים',
+      formFieldInputPlaceholder__domain: 'הקלד את הדומיין שלך כאן ולחץ על הוסף כדי להתחיל',
+      formButtonPrimary__add: 'הוסף',
+      domainSuggestion: {
+        messageLabel: 'האימייל שלך משתמש ב-{{domain}}. האם ברצונך להוסיף אותו?',
+        formButtonPrimary__add: 'הוסף {{domain}}',
       },
-      emailCode: {
-        formTitle: 'אמת את כתובת האימייל שלך',
-        formSubtitle: 'הזן את קוד האימות שנשלח אל {{identifier}}',
-        resendButton: 'לא קיבלת קוד? שלח שוב',
-        verified: {
-          title: 'קיבלנו את האימייל שלך',
-          subtitle: 'אימתת את כתובת האימייל שלך עם האימייל הבא',
-          inputLabel: 'כתובת אימייל מאומתת',
+      domainCard: {
+        badge__verified: 'מאומת',
+        badge__unverified: 'לא מאומת',
+        verifiedAtLabel: "אומת בתאריך {{ date | shortDate('he-IL') }}",
+        txtRecord: {
+          instructions: 'הוסף רשומת TXT זו אצל ספק ה-DNS שלך. נאמת אותה אוטומטית ברגע שהרשומה תהיה פעילה.',
+          typeLabel: 'סוג',
+          hostLabel: 'מארח / שם',
+          valueLabel: 'ערך',
         },
-      },
-      domainTaken: {
-        title: 'לדומיין הזה ({{domain}}) כבר יש חיבור SSO',
-        subtitle: 'צור קשר עם מנהל היישום כדי לקבל גישה דרך החיבור הקיים.',
       },
     },
   },

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/hono",
-  "version": "0.1.36",
+  "version": "0.1.37",
   "description": "Clerk SDK for Hono",
   "keywords": [
     "auth",

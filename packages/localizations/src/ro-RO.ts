@@ -202,28 +202,28 @@ export const roRO: LocalizationResource = {
       },
       warning: 'Odată ce un furnizor este selectat, nu îl puteți schimba până când configurația nu este finalizată',
     },
-    verifyEmailDomainStep: {
-      title: 'Verifică adresa de e-mail',
-      subtitle: 'Verifică adresa de e-mail pe care dorești să activezi conexiunea enterprise.',
-      addEmailAddress: {
-        formTitle: 'Avem nevoie de e-mailul tău',
-        formSubtitle: 'Pentru a începe, vom avea nevoie de adresa ta de e-mail',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'Adresă de e-mail',
+    organizationDomainsStep: {
+      title: 'Adaugă domenii SSO',
+      subtitle:
+        'Adaugă și verifică dreptul de proprietate asupra domeniilor pe care organizația ta le folosește pentru autentificare.',
+      formFieldLabel__domain: 'Domenii',
+      formFieldInputPlaceholder__domain: 'Scrie aici domeniul tău și fă clic pe adaugă pentru a începe',
+      formButtonPrimary__add: 'Adaugă',
+      domainSuggestion: {
+        messageLabel: 'E-mailul tău folosește {{domain}}. Vrei să-l adaugi?',
+        formButtonPrimary__add: 'Adaugă {{domain}}',
       },
-      emailCode: {
-        formTitle: 'Verifică adresa ta de e-mail',
-        formSubtitle: 'Introdu codul de verificare trimis la {{identifier}}',
-        resendButton: 'Nu ai primit un cod? Retrimite',
-        verified: {
-          title: 'Am primit e-mailul tău',
-          subtitle: 'Ai verificat adresa ta de e-mail cu următorul e-mail',
-          inputLabel: 'Adresă de e-mail verificată',
+      domainCard: {
+        badge__verified: 'Verificat',
+        badge__unverified: 'Neverificat',
+        verifiedAtLabel: "Verificat pe {{ date | shortDate('ro-RO') }}",
+        txtRecord: {
+          instructions:
+            'Adaugă această înregistrare TXT la furnizorul tău DNS. O vom verifica automat de îndată ce înregistrarea devine activă.',
+          typeLabel: 'Tip',
+          hostLabel: 'Gazdă / Nume',
+          valueLabel: 'Valoare',
         },
-      },
-      domainTaken: {
-        title: 'Acest domeniu ({{domain}}) are deja o conexiune SSO',
-        subtitle: 'Contactează administratorul aplicației pentru a obține acces prin conexiunea existentă.',
       },
     },
   },

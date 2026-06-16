@@ -47,7 +47,7 @@ vi.mock('../../ConfigureSSOContext', () => ({
       },
     },
     testRuns: testRunsSource,
-    mutations: { createTestRun },
+    enterpriseConnectionMutations: { createTestRun },
   }),
 }));
 

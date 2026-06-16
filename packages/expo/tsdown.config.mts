@@ -4,6 +4,7 @@ import { defineConfig } from 'tsdown';
 import { runAfterLast } from '../../scripts/utils.ts';
 import clerkJsPkgJson from '../clerk-js/package.json' with { type: 'json' };
 import pkgJson from './package.json' with { type: 'json' };
+import { preservePlatformSpecifiers } from './scripts/preservePlatformSpecifiers.mts';
 
 export default defineConfig(overrideOptions => {
   const isWatch = !!overrideOptions.watch;
@@ -14,7 +15,7 @@ export default defineConfig(overrideOptions => {
     fixedExtension: false,
     outDir: './dist',
     entry: ['./src/**/*.{ts,tsx,js,jsx}', '!./src/**/*.test.{ts,tsx}', '!./src/**/__tests__/**'],
-    bundle: false,
+    unbundle: true,
     clean: true,
     minify: false,
     sourcemap: true,
@@ -24,6 +25,7 @@ export default defineConfig(overrideOptions => {
       JS_PACKAGE_VERSION: `"${clerkJsPkgJson.version}"`,
       __DEV__: `${isWatch}`,
     },
+    plugins: [preservePlatformSpecifiers()],
   };
 
   return runAfterLast(['pnpm build:declarations', shouldPublish && 'pkglab pub --ping'])(options);

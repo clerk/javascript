@@ -224,29 +224,27 @@ export const fiFI: LocalizationResource = {
       },
       warning: 'Kun palveluntarjoaja on valittu, et voi vaihtaa sitä ennen kuin määritys on valmis',
     },
-    verifyEmailDomainStep: {
-      title: 'Vahvista sähköpostiosoite',
-      subtitle: 'Vahvista sähköpostiosoite, jolle haluat ottaa yritysyhteyden käyttöön.',
-      addEmailAddress: {
-        formTitle: 'Tarvitsemme sähköpostiosi',
-        formSubtitle: 'Aloittaaksemme tarvitsemme sähköpostiosoitteesi',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'Sähköpostiosoite',
+    organizationDomainsStep: {
+      title: 'Lisää SSO-verkkotunnuksia',
+      subtitle: 'Lisää ja vahvista niiden verkkotunnusten omistajuus, joita organisaatiosi käyttää kirjautumiseen.',
+      formFieldLabel__domain: 'Verkkotunnukset',
+      formFieldInputPlaceholder__domain: 'Kirjoita verkkotunnuksesi tähän ja aloita napsauttamalla Lisää',
+      formButtonPrimary__add: 'Lisää',
+      domainSuggestion: {
+        messageLabel: 'Sähköpostisi käyttää osoitetta {{domain}}. Haluatko lisätä sen?',
+        formButtonPrimary__add: 'Lisää {{domain}}',
       },
-      emailCode: {
-        formTitle: 'Vahvista sähköpostiosoitteesi',
-        formSubtitle: 'Anna vahvistuskoodi, joka lähetettiin osoitteeseen {{identifier}}',
-        resendButton: 'Etkö saanut koodia? Lähetä uudelleen',
-        verified: {
-          title: 'Saimme sähköpostisi',
-          subtitle: 'Olet vahvistanut sähköpostiosoitteesi seuraavalla sähköpostilla',
-          inputLabel: 'Vahvistettu sähköpostiosoite',
+      domainCard: {
+        badge__verified: 'Vahvistettu',
+        badge__unverified: 'Vahvistamaton',
+        verifiedAtLabel: "Vahvistettu {{ date | shortDate('fi-FI') }}",
+        txtRecord: {
+          instructions:
+            'Lisää tämä TXT-tietue DNS-palveluntarjoajallesi. Vahvistamme sen automaattisesti, kun tietue on aktiivinen.',
+          typeLabel: 'Tyyppi',
+          hostLabel: 'Isäntä / Nimi',
+          valueLabel: 'Arvo',
         },
-      },
-      domainTaken: {
-        title: 'Tällä verkkotunnuksella ({{domain}}) on jo SSO-yhteys',
-        subtitle:
-          'Ota yhteyttä sovelluksen järjestelmänvalvojaan saadaksesi käyttöoikeudet olemassa olevan yhteyden kautta.',
       },
     },
   },

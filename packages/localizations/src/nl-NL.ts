@@ -196,29 +196,27 @@ export const nlNL: LocalizationResource = {
       },
       warning: 'Zodra een provider is geselecteerd, kun je deze niet meer wijzigen totdat de configuratie is voltooid',
     },
-    verifyEmailDomainStep: {
-      title: 'E-mailadres verifiëren',
-      subtitle: 'Verifieer het e-mailadres waarop je de enterprise-verbinding wilt inschakelen.',
-      addEmailAddress: {
-        formTitle: 'We hebben je e-mail nodig',
-        formSubtitle: 'Om te beginnen hebben we je e-mailadres nodig',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'E-mailadres',
+    organizationDomainsStep: {
+      title: 'SSO-domeinen toevoegen',
+      subtitle: 'Voeg de domeinen toe die je organisatie gebruikt om in te loggen en verifieer het eigendom ervan.',
+      formFieldLabel__domain: 'Domeinen',
+      formFieldInputPlaceholder__domain: 'Typ hier uw domein en klik op toevoegen om te beginnen',
+      formButtonPrimary__add: 'Toevoegen',
+      domainSuggestion: {
+        messageLabel: 'Je e-mailadres gebruikt {{domain}}. Wil je het toevoegen?',
+        formButtonPrimary__add: '{{domain}} toevoegen',
       },
-      emailCode: {
-        formTitle: 'Verifieer je e-mailadres',
-        formSubtitle: 'Voer de verificatiecode in die is verzonden naar {{identifier}}',
-        resendButton: 'Geen code ontvangen? Opnieuw verzenden',
-        verified: {
-          title: 'We hebben je e-mail ontvangen',
-          subtitle: 'Je hebt je e-mailadres geverifieerd met de volgende e-mail',
-          inputLabel: 'Geverifieerd e-mailadres',
+      domainCard: {
+        badge__verified: 'Geverifieerd',
+        badge__unverified: 'Niet geverifieerd',
+        verifiedAtLabel: "Geverifieerd op {{ date | shortDate('nl-NL') }}",
+        txtRecord: {
+          instructions:
+            'Voeg dit TXT-record toe aan je DNS-provider. We verifiëren het automatisch zodra het record actief is.',
+          typeLabel: 'Type',
+          hostLabel: 'Host / Naam',
+          valueLabel: 'Waarde',
         },
-      },
-      domainTaken: {
-        title: 'Dit domein ({{domain}}) heeft al een SSO-verbinding',
-        subtitle:
-          'Neem contact op met de beheerder van de applicatie om toegang te krijgen via de bestaande verbinding.',
       },
     },
   },

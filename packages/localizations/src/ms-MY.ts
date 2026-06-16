@@ -204,28 +204,27 @@ export const msMY: LocalizationResource = {
       },
       warning: 'Setelah pembekal dipilih anda tidak boleh menukar lagi sehingga konfigurasi selesai',
     },
-    verifyEmailDomainStep: {
-      title: 'Sahkan alamat e-mel',
-      subtitle: 'Sahkan alamat e-mel yang anda ingin dayakan sambungan enterprise.',
-      addEmailAddress: {
-        formTitle: 'Kami memerlukan e-mel anda',
-        formSubtitle: 'Untuk memulakan kami memerlukan alamat e-mel anda',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'Alamat e-mel',
+    organizationDomainsStep: {
+      title: 'Tambah domain SSO',
+      subtitle: 'Tambah dan sahkan pemilikan domain yang digunakan organisasi anda untuk log masuk.',
+      formFieldLabel__domain: 'Domain',
+      formFieldInputPlaceholder__domain: 'Taip domain anda di sini dan klik tambah untuk bermula',
+      formButtonPrimary__add: 'Tambah',
+      domainSuggestion: {
+        messageLabel: 'E-mel anda menggunakan {{domain}}. Adakah anda mahu menambahkannya?',
+        formButtonPrimary__add: 'Tambah {{domain}}',
       },
-      emailCode: {
-        formTitle: 'Sahkan alamat e-mel anda',
-        formSubtitle: 'Masukkan kod pengesahan yang dihantar ke {{identifier}}',
-        resendButton: 'Tidak menerima kod? Hantar semula',
-        verified: {
-          title: 'Kami menerima e-mel anda',
-          subtitle: 'Anda telah mengesahkan alamat e-mel anda dengan e-mel berikut',
-          inputLabel: 'Alamat e-mel disahkan',
+      domainCard: {
+        badge__verified: 'Disahkan',
+        badge__unverified: 'Belum disahkan',
+        verifiedAtLabel: "Disahkan pada {{ date | shortDate('ms-MY') }}",
+        txtRecord: {
+          instructions:
+            'Tambahkan rekod TXT ini kepada penyedia DNS anda. Kami akan mengesahkan secara automatik sebaik sahaja rekod aktif.',
+          typeLabel: 'Jenis',
+          hostLabel: 'Hos / Nama',
+          valueLabel: 'Nilai',
         },
-      },
-      domainTaken: {
-        title: 'Domain ini ({{domain}}) sudah mempunyai sambungan SSO',
-        subtitle: 'Hubungi pentadbir aplikasi untuk mendapatkan akses melalui sambungan sedia ada.',
       },
     },
   },

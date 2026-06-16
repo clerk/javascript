@@ -49,11 +49,11 @@ const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObject<HTMLD
     enterpriseConnection,
     organizationEnterpriseConnection,
     testRuns,
-    mutations,
-    primaryEmailAddress,
+    enterpriseConnectionMutations,
+    organizationDomains,
+    organizationDomainMutations,
   } = useOrganizationEnterpriseConnection();
 
-  // Gate loading above the provider so the context never observes a loading state.
   if (isLoading) {
     return <ConfigureSSOSkeleton />;
   }
@@ -65,8 +65,9 @@ const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObject<HTMLD
         testRuns={testRuns}
         enterpriseConnection={enterpriseConnection}
         contentRef={contentRef}
-        mutations={mutations}
-        primaryEmailAddress={primaryEmailAddress}
+        enterpriseConnectionMutations={enterpriseConnectionMutations}
+        organizationDomainMutations={organizationDomainMutations}
+        organizationDomains={organizationDomains}
       />
     </ConfigureSSOProtect>
   );
