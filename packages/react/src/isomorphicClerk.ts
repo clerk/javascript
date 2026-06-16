@@ -576,19 +576,25 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return undefined;
     }
 
-    await loadClerkUIScript({
-      ...this.options,
-      publishableKey: this.#publishableKey,
-      proxyUrl: this.proxyUrl,
-      domain: this.domain,
-      nonce: this.options.nonce,
-    });
+    // Skip the remote UI loader in no-RHC builds (e.g. Chrome extensions) so the CDN script
+    // injector is dead-code-eliminated from the bundle, mirroring getClerkJsEntryChunk.
+    if (!__BUILD_DISABLE_RHC__) {
+      await loadClerkUIScript({
+        ...this.options,
+        publishableKey: this.#publishableKey,
+        proxyUrl: this.proxyUrl,
+        domain: this.domain,
+        nonce: this.options.nonce,
+      });
 
-    if (!global.__internal_ClerkUICtor) {
-      throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
+      if (!global.__internal_ClerkUICtor) {
+        throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
+      }
+
+      return global.__internal_ClerkUICtor;
     }
 
-    return global.__internal_ClerkUICtor;
+    return undefined;
   }
 
   public on: Clerk['on'] = (...args) => {
@@ -738,7 +744,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     });
 
     this.premountConfigureSSONodes.forEach((props, node) => {
-      clerkjs.mountConfigureSSO(node, props);
+      clerkjs.__internal_mountConfigureSSO(node, props);
     });
 
     this.premountOAuthConsentNodes.forEach((props, node) => {
@@ -871,6 +877,14 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   get __internal_lastEmittedResources(): Resources | undefined {
     return this.clerkjs?.__internal_lastEmittedResources;
+  }
+
+  get __internal_hasOAuthTransport(): boolean {
+    return this.clerkjs?.__internal_hasOAuthTransport || false;
+  }
+
+  get __internal_oauthTransport() {
+    return this.clerkjs?.__internal_oauthTransport || null;
   }
 
   /**
@@ -1277,34 +1291,20 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  mountConfigureSSO = (node: HTMLDivElement, props?: ConfigureSSOProps): void => {
+  __internal_mountConfigureSSO = (node: HTMLDivElement, props?: ConfigureSSOProps): void => {
     if (this.clerkjs && this.loaded) {
-      this.clerkjs.mountConfigureSSO(node, props);
+      this.clerkjs.__internal_mountConfigureSSO(node, props);
     } else {
       this.premountConfigureSSONodes.set(node, props);
     }
   };
 
-  unmountConfigureSSO = (node: HTMLDivElement): void => {
+  __internal_unmountConfigureSSO = (node: HTMLDivElement): void => {
     if (this.clerkjs && this.loaded) {
-      this.clerkjs.unmountConfigureSSO(node);
+      this.clerkjs.__internal_unmountConfigureSSO(node);
     } else {
       this.premountConfigureSSONodes.delete(node);
     }
-  };
-
-  /**
-   * @deprecated Use `mountConfigureSSO` instead.
-   */
-  __experimental_mountConfigureSSO = (node: HTMLDivElement, props?: ConfigureSSOProps): void => {
-    this.mountConfigureSSO(node, props);
-  };
-
-  /**
-   * @deprecated Use `unmountConfigureSSO` instead.
-   */
-  __experimental_unmountConfigureSSO = (node: HTMLDivElement): void => {
-    this.unmountConfigureSSO(node);
   };
 
   __internal_mountOAuthConsent = (node: HTMLDivElement, props?: OAuthConsentProps) => {
@@ -1546,6 +1546,20 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     } else {
       this.premountMethodCalls.set('handleGoogleOneTapCallback', callback);
     }
+  };
+
+  __internal_handleResourceCallback = async (
+    signInOrUp: SignInResource | SignUpResource,
+    params: HandleOAuthCallbackParams,
+    customNavigate?: (to: string) => Promise<unknown>,
+  ): Promise<unknown> => {
+    const callback = () => this.clerkjs?.__internal_handleResourceCallback(signInOrUp, params, customNavigate);
+    if (this.clerkjs && this.loaded) {
+      return callback();
+    }
+
+    this.premountMethodCalls.set('__internal_handleResourceCallback', callback);
+    return;
   };
 
   handleEmailLinkVerification = async (params: HandleEmailLinkVerificationParams) => {

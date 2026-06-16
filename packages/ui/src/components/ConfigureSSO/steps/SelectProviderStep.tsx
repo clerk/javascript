@@ -1,5 +1,4 @@
 import { iconImageUrl } from '@clerk/shared/constants';
-import { useUser } from '@clerk/shared/react/index';
 import React from 'react';
 
 import type { LocalizationKey } from '@/customizables';
@@ -25,13 +24,7 @@ import { Step } from '../elements/Step';
 import { useWizard } from '../elements/Wizard';
 import type { ProviderType } from '../types';
 
-/**
- * Provider icons whose SVGs are monochromatic and should flip with the
- * theme. Mirrors the SUPPORTS_MASK_IMAGE list in `common/ProviderIcon.tsx`
- * — keep in sync if either grows.
- */
 const MONOCHROMATIC_PROVIDER_ICONS: ReadonlySet<string> = new Set(['okta']);
-
 const PROVIDER_GROUPS: ReadonlyArray<{
   id: 'saml';
   label: LocalizationKey;
@@ -62,40 +55,42 @@ const PROVIDER_GROUPS: ReadonlyArray<{
 ];
 
 export const SelectProviderStep = (): JSX.Element => {
-  const { goToStep } = useWizard();
-  const { provider, setProvider, createEnterpriseConnection } = useConfigureSSO();
+  const {
+    organizationEnterpriseConnection: c,
+    enterpriseConnectionMutations: { createConnection },
+  } = useConfigureSSO();
+  const { goNext, goPrev, isFirstStep } = useWizard();
 
-  // Re-hydrate from context so users returning from `verify-domain`
-  // (after picking a provider but needing to verify their email first)
-  // don't have to re-click their provider.
-  const [selected, setSelected] = React.useState<ProviderType | null>(provider ?? null);
-  const { user } = useUser();
+  const [selected, setSelected] = React.useState<ProviderType | null>(c.provider ?? null);
   const card = useCardState();
 
-  const handleContinue = async () => {
-    if (!selected || !user) {
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+
+  const handleSelect = (next: ProviderType) => {
+    setSelected(next);
+  };
+
+  const handleContinue = async (): Promise<void> => {
+    if (!selected) {
       return;
     }
 
-    setProvider(selected);
-
-    const primaryEmailAddress = user?.primaryEmailAddress;
-    const hasVerifiedPrimaryEmailAddress = primaryEmailAddress?.verification.status === 'verified';
-
-    if (!primaryEmailAddress || !hasVerifiedPrimaryEmailAddress) {
-      void goToStep('verify-domain');
+    if (c.hasConnection) {
+      // TODO ORGS-1607 - Support changing the provider
+      void goNext();
       return;
     }
 
-    // Otherwise, set the provider and create the enterprise connection
+    card.setError(undefined);
+    setIsSubmitting(true);
+
     try {
-      await createEnterpriseConnection(selected, primaryEmailAddress);
+      await createConnection(selected);
+      void goNext();
     } catch (err) {
       handleError(err as Error, [], card.setError);
-      return;
+      setIsSubmitting(false);
     }
-
-    void goToStep('configure');
   };
 
   return (
@@ -144,7 +139,7 @@ export const SelectProviderStep = (): JSX.Element => {
                       iconId={option.iconId}
                       label={option.label}
                       checked={selected === option.id}
-                      onChange={() => setSelected(option.id)}
+                      onChange={() => handleSelect(option.id)}
                     />
                   ))}
                 </Grid>
@@ -167,12 +162,15 @@ export const SelectProviderStep = (): JSX.Element => {
         </Step.Body>
 
         <Step.Footer>
-          <Step.Footer.Previous isDisabled />
+          <Step.Footer.Previous
+            onClick={() => goPrev()}
+            isDisabled={isFirstStep}
+          />
 
           <Step.Footer.Continue
             onClick={handleContinue}
-            isLoading={card.isLoading}
-            isDisabled={!selected}
+            isLoading={isSubmitting}
+            isDisabled={!selected || isSubmitting}
           />
         </Step.Footer>
       </Step>

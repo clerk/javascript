@@ -203,29 +203,28 @@ export const deDE: LocalizationResource = {
       warning:
         'Sobald ein Anbieter ausgewählt ist, können Sie ihn nicht mehr ändern, bis die Konfiguration abgeschlossen ist',
     },
-    verifyEmailDomainStep: {
-      title: 'E-Mail-Adresse verifizieren',
-      subtitle: 'Verifizieren Sie die E-Mail-Adresse, für die Sie die Unternehmensverbindung aktivieren möchten.',
-      addEmailAddress: {
-        formTitle: 'Wir benötigen Ihre E-Mail',
-        formSubtitle: 'Um zu beginnen, benötigen wir Ihre E-Mail-Adresse',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'E-Mail-Adresse',
+    organizationDomainsStep: {
+      title: 'SSO-Domains hinzufügen',
+      subtitle:
+        'Fügen Sie die Domains hinzu, die Ihre Organisation zur Anmeldung verwendet, und verifizieren Sie deren Eigentümerschaft.',
+      formFieldLabel__domain: 'Domains',
+      formFieldInputPlaceholder__domain: 'Geben Sie hier Ihre Domain ein und klicken Sie zum Starten auf „Hinzufügen"',
+      formButtonPrimary__add: 'Hinzufügen',
+      domainSuggestion: {
+        messageLabel: 'Ihre E-Mail verwendet {{domain}}. Möchten Sie sie hinzufügen?',
+        formButtonPrimary__add: '{{domain}} hinzufügen',
       },
-      emailCode: {
-        formTitle: 'Verifizieren Sie Ihre E-Mail-Adresse',
-        formSubtitle: 'Geben Sie den an {{identifier}} gesendeten Verifizierungscode ein',
-        resendButton: 'Keinen Code erhalten? Erneut senden',
-        verified: {
-          title: 'Wir haben Ihre E-Mail erhalten',
-          subtitle: 'Sie haben Ihre E-Mail-Adresse mit der folgenden E-Mail verifiziert',
-          inputLabel: 'Verifizierte E-Mail-Adresse',
+      domainCard: {
+        badge__verified: 'Verifiziert',
+        badge__unverified: 'Nicht verifiziert',
+        verifiedAtLabel: "Verifiziert am {{ date | shortDate('de-DE') }}",
+        txtRecord: {
+          instructions:
+            'Fügen Sie diesen TXT-Eintrag bei Ihrem DNS-Anbieter hinzu. Wir verifizieren ihn automatisch, sobald der Eintrag aktiv ist.',
+          typeLabel: 'Typ',
+          hostLabel: 'Host / Name',
+          valueLabel: 'Wert',
         },
-      },
-      domainTaken: {
-        title: 'Diese Domain ({{domain}}) hat bereits eine SSO-Verbindung',
-        subtitle:
-          'Wenden Sie sich an den Administrator der Anwendung, um über die bestehende Verbindung Zugriff zu erhalten.',
       },
     },
   },

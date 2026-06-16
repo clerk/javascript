@@ -191,6 +191,11 @@ export type __internal_LocalizationResource = {
     keepSubscription: LocalizationValue;
     reSubscribe: LocalizationValue;
     seats: LocalizationValue;
+    seatsWithLimit: LocalizationValue<'limit'>;
+    seatBreakdownSingular: LocalizationValue<'rate'>;
+    seatBreakdownPlural: LocalizationValue<'chargeable' | 'rate'>;
+    seatBreakdownIncludedSingular: LocalizationValue<'totalSeats' | 'included' | 'rate'>;
+    seatBreakdownIncludedPlural: LocalizationValue<'totalSeats' | 'included' | 'chargeable' | 'rate'>;
     subscribe: LocalizationValue;
     startFreeTrial: LocalizationValue;
     startFreeTrial__days: LocalizationValue<'days'>;
@@ -200,6 +205,7 @@ export type __internal_LocalizationResource = {
     switchToMonthlyWithPrice: LocalizationValue<'price' | 'currency'>;
     switchToAnnualWithAnnualPrice: LocalizationValue<'price' | 'currency'>;
     billedAnnually: LocalizationValue;
+    billedMonthly: LocalizationValue;
     billedMonthlyOnly: LocalizationValue;
     billedAnnuallyOnly: LocalizationValue;
     cancelFreeTrial: LocalizationValue<'plan'>;
@@ -214,13 +220,16 @@ export type __internal_LocalizationResource = {
     viewPayment: LocalizationValue;
     availableFeatures: LocalizationValue;
     subtotal: LocalizationValue;
+    subtotalRenewal: LocalizationValue;
     credit: LocalizationValue;
     prorationCredit: LocalizationValue;
     accountCredit: LocalizationValue;
     creditRemainder: LocalizationValue;
     payerCreditRemainder: LocalizationValue;
+    proratedDiscount: LocalizationValue;
     totalDue: LocalizationValue;
     totalDueToday: LocalizationValue;
+    totalDuePerPeriod: LocalizationValue;
     pastDue: LocalizationValue;
     pay: LocalizationValue<'amount'>;
     cancelSubscriptionTitle: LocalizationValue<'plan'>;
@@ -301,6 +310,7 @@ export type __internal_LocalizationResource = {
       downgradeNotice: LocalizationValue;
       pastDueNotice: LocalizationValue;
       totalDueAfterTrial: LocalizationValue<'days'>;
+      totalDuePerPeriod: LocalizationValue;
       perMonth: LocalizationValue;
     };
   };
@@ -954,6 +964,7 @@ export type __internal_LocalizationResource = {
         actionLabel__newSubscription: LocalizationValue;
         actionLabel__manageSubscription: LocalizationValue;
         actionLabel__switchPlan: LocalizationValue;
+        overview: LocalizationValue;
       };
       paymentHistorySection: {
         empty: LocalizationValue;
@@ -1021,12 +1032,13 @@ export type __internal_LocalizationResource = {
       members: LocalizationValue;
       billing: LocalizationValue;
       apiKeys: LocalizationValue;
-      selfServeSSO: LocalizationValue;
+      security: LocalizationValue;
     };
     badge__unverified: LocalizationValue;
     badge__automaticInvitation: LocalizationValue;
     badge__automaticSuggestion: LocalizationValue;
     badge__manualInvitation: LocalizationValue;
+    badge__enterpriseSso: LocalizationValue;
     start: {
       headerTitle__members: LocalizationValue;
       membershipSeatUsageLabel: LocalizationValue<'count' | 'limit'>;
@@ -1110,6 +1122,7 @@ export type __internal_LocalizationResource = {
       successMessage: LocalizationValue;
       detailsTitle__inviteFailed: LocalizationValue<'email_addresses'>;
       formButtonPrimary__continue: LocalizationValue;
+      formButtonPrimary__purchaseSeats: LocalizationValue;
       selectDropdown__role: LocalizationValue;
     };
     removeDomainPage: {
@@ -1117,6 +1130,35 @@ export type __internal_LocalizationResource = {
       messageLine1: LocalizationValue<'domain'>;
       messageLine2: LocalizationValue;
       successMessage: LocalizationValue;
+    };
+    securityPage: {
+      title: LocalizationValue;
+      removeDialog: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+        confirmButton: LocalizationValue;
+      };
+      ssoSection: {
+        title: LocalizationValue;
+        badge__unconfigured: LocalizationValue;
+        badge__inProgress: LocalizationValue;
+        badge__active: LocalizationValue;
+        badge__inactive: LocalizationValue;
+        descriptionLine1: LocalizationValue;
+        descriptionLine2: LocalizationValue<'role'>;
+        descriptionLine2__noRole: LocalizationValue;
+        primaryButton__startConfiguration: LocalizationValue;
+        primaryButton__continueConfiguration: LocalizationValue;
+        providerLabel: LocalizationValue;
+        domainLabel: LocalizationValue;
+        signOnUrlLabel: LocalizationValue;
+        issuerLabel: LocalizationValue;
+        certificateLabel: LocalizationValue;
+        menuAction__edit: LocalizationValue;
+        menuAction__activate: LocalizationValue;
+        menuAction__deactivate: LocalizationValue;
+        menuAction__remove: LocalizationValue;
+      };
     };
     membersPage: {
       detailsTitle__emptyRow: LocalizationValue;
@@ -1195,6 +1237,11 @@ export type __internal_LocalizationResource = {
         actionLabel__newSubscription: LocalizationValue;
         actionLabel__manageSubscription: LocalizationValue;
         actionLabel__switchPlan: LocalizationValue;
+        includedSeatsUsage: LocalizationValue<'includedSeats'>;
+        overview: LocalizationValue;
+        paidSeatsUsage: LocalizationValue<'seatsQuantity' | 'amount'>;
+        seatLimit: LocalizationValue<'seatLimit'>;
+        seatLimitAndIncludedSeats: LocalizationValue<'seatLimit' | 'includedSeats'>;
       };
       paymentHistorySection: {
         empty: LocalizationValue;
@@ -1321,28 +1368,26 @@ export type __internal_LocalizationResource = {
       };
       warning: LocalizationValue;
     };
-    verifyEmailDomainStep: {
+    organizationDomainsStep: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
-      addEmailAddress: {
-        formTitle: LocalizationValue;
-        formSubtitle: LocalizationValue;
-        inputPlaceholder: LocalizationValue;
-        inputLabel: LocalizationValue;
+      formFieldLabel__domain: LocalizationValue;
+      formFieldInputPlaceholder__domain: LocalizationValue;
+      formButtonPrimary__add: LocalizationValue;
+      domainSuggestion: {
+        messageLabel: LocalizationValue<'domain'>;
+        formButtonPrimary__add: LocalizationValue<'domain'>;
       };
-      emailCode: {
-        formTitle: LocalizationValue;
-        formSubtitle: LocalizationValue<'identifier'>;
-        resendButton: LocalizationValue;
-        verified: {
-          title: LocalizationValue;
-          subtitle: LocalizationValue;
-          inputLabel: LocalizationValue;
+      domainCard: {
+        badge__verified: LocalizationValue;
+        badge__unverified: LocalizationValue;
+        verifiedAtLabel: LocalizationValue<'date'>;
+        txtRecord: {
+          instructions: LocalizationValue;
+          typeLabel: LocalizationValue;
+          hostLabel: LocalizationValue;
+          valueLabel: LocalizationValue;
         };
-      };
-      domainTaken: {
-        title: LocalizationValue<'domain'>;
-        subtitle: LocalizationValue;
       };
     };
     testConfigurationStep: {
@@ -2068,4 +2113,6 @@ type UnstableErrors = WithParamName<{
   organization_membership_quota_exceeded: LocalizationValue;
   organization_not_found_or_unauthorized: LocalizationValue;
   organization_not_found_or_unauthorized_with_create_organization_disabled: LocalizationValue;
+  insufficient_seats_contact_support: LocalizationValue;
+  insufficient_seats_change_plan: LocalizationValue;
 }>;

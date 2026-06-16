@@ -1,5 +1,49 @@
 # Change Log
 
+## 3.1.36
+
+### Patch Changes
+
+- Updated dependencies [[`f4167ec`](https://github.com/clerk/javascript/commit/f4167eccb19e0de98340d48e221b950e3dad189e), [`17e4164`](https://github.com/clerk/javascript/commit/17e416471a5409e5a4c02f4f94f687c428c071de), [`ed2cf75`](https://github.com/clerk/javascript/commit/ed2cf75ce713703d8e2c258fc3ca0cf43dc964dc), [`67c04a4`](https://github.com/clerk/javascript/commit/67c04a43db64b70819d68333f99e3483523d1d47), [`fa23ad8`](https://github.com/clerk/javascript/commit/fa23ad84957eebbc1856c213d178de32a10dcbf2), [`51c8fdc`](https://github.com/clerk/javascript/commit/51c8fdcb7160457e44cfe7cc86524f7d728a030a), [`c2ba971`](https://github.com/clerk/javascript/commit/c2ba971aad55df570507b7b117786ab048415ad3), [`8744728`](https://github.com/clerk/javascript/commit/8744728e6610b2229f56dd3b31975c3f57395f02), [`d9b5c7d`](https://github.com/clerk/javascript/commit/d9b5c7d79fe641d08f45f0df7d4f5146b6b2c3ab)]:
+  - @clerk/shared@4.18.0
+  - @clerk/clerk-js@6.17.0
+  - @clerk/react@6.10.0
+  - @clerk/ui@1.17.0
+
+## 3.1.35
+
+### Patch Changes
+
+- Migrate the build pipeline to tsdown and TypeScript 6.0. This is an internal tooling change with no intended changes to the public API or runtime behavior. ([#8177](https://github.com/clerk/javascript/pull/8177)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`d0ed42f`](https://github.com/clerk/javascript/commit/d0ed42f88a876e208a8e6d71ad01e9e31fb5d746), [`f046c49`](https://github.com/clerk/javascript/commit/f046c491d99c880b61e335645ad3ced4fee602d8), [`b5fa9f6`](https://github.com/clerk/javascript/commit/b5fa9f6ab2f01f1bbf6de52e16b4c9d9516f966c), [`3d5b2fe`](https://github.com/clerk/javascript/commit/3d5b2fe959171770bb7e8493d8a204317b7101a7)]:
+  - @clerk/ui@1.16.1
+  - @clerk/clerk-js@6.16.1
+  - @clerk/shared@4.17.1
+  - @clerk/react@6.9.1
+
+## 3.1.34
+
+### Patch Changes
+
+- Updated dependencies [[`df4619f`](https://github.com/clerk/javascript/commit/df4619f170912bd9a4dc02ccbc90802761c05ac0), [`a5c7bc7`](https://github.com/clerk/javascript/commit/a5c7bc74dabfa78d4748516ccc252f68cae82264), [`5273b1d`](https://github.com/clerk/javascript/commit/5273b1d8d832ba1db9c2c2ac6d0b427d541a67af)]:
+  - @clerk/ui@1.16.0
+  - @clerk/clerk-js@6.16.0
+  - @clerk/shared@4.17.0
+  - @clerk/react@6.9.0
+
+## 3.1.33
+
+### Patch Changes
+
+- Strip the remotely-hosted `@clerk/ui` script loader from the bundle. The extension SDK already ships Clerk UI bundled via `@clerk/ui/no-rhc`, but the CDN loader for `ui.browser.js` (a dynamically injected `<script>` tag) remained in the build as unreachable code. The Chrome Web Store rejects this under Manifest V3's prohibition on remotely hosted code even though it never runs. It is now removed at build time. ([#8773](https://github.com/clerk/javascript/pull/8773)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`83f50f6`](https://github.com/clerk/javascript/commit/83f50f68619205f16541439fd27ca653686ba6df), [`2d6670c`](https://github.com/clerk/javascript/commit/2d6670c6c05c59901709283921b5d65c43f3a676), [`83f50f6`](https://github.com/clerk/javascript/commit/83f50f68619205f16541439fd27ca653686ba6df), [`0aa6e81`](https://github.com/clerk/javascript/commit/0aa6e8190bcd7204353518539514e8ba72518389), [`81ce9d3`](https://github.com/clerk/javascript/commit/81ce9d3d440b53a9c790bd8a6b1b80c7eea2945b), [`af706e3`](https://github.com/clerk/javascript/commit/af706e35420a16c028fd34b70dd50d663d42e006), [`032632c`](https://github.com/clerk/javascript/commit/032632c6982297e53e28559b59b4a435de4c9adc), [`0fece6f`](https://github.com/clerk/javascript/commit/0fece6ff5d2b1babb59a285dbce9d46723e33d73), [`b295af3`](https://github.com/clerk/javascript/commit/b295af3d5bb12e09a502cae4a935d2e7f5d35d5c), [`0c854c3`](https://github.com/clerk/javascript/commit/0c854c356cb95d9f56bf002df1beeefe0ec4f31a), [`b5efe17`](https://github.com/clerk/javascript/commit/b5efe177fb52b735f9c3dfd66d9158cc15f5e41e), [`6cf1078`](https://github.com/clerk/javascript/commit/6cf1078a4090a0dc569c055190f525ce62e5f6dc), [`eb5c02d`](https://github.com/clerk/javascript/commit/eb5c02d7f36e4b3a9fafbf62384445f9a6a823cf), [`8e1bd48`](https://github.com/clerk/javascript/commit/8e1bd48a91dc07751493f41416d2a68b89e114cc)]:
+  - @clerk/react@6.8.0
+  - @clerk/clerk-js@6.15.0
+  - @clerk/shared@4.16.0
+  - @clerk/ui@1.15.1
+
 ## 3.1.32
 
 ### Patch Changes

@@ -1,5 +1,5 @@
 import type { EnterpriseConnectionJSON, UserJSON } from '@clerk/shared/types';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { BaseResource } from '../internal';
 import { User } from '../User';
@@ -137,327 +137,6 @@ describe('User', () => {
     expect(connections).toHaveLength(1);
     expect(connections[0].name).toBe('Acme Corp SSO');
     expect(connections[0].allowOrganizationAccountLinking).toBe(true);
-  });
-
-  it('creates an enterprise connection', async () => {
-    const enterpriseConnectionJSON = {
-      id: 'ec_new',
-      object: 'enterprise_connection' as const,
-      name: 'New SSO',
-      active: true,
-      provider: 'saml_okta',
-      logo_public_url: null,
-      domains: ['acme.com'],
-      organization_id: null,
-      sync_user_attributes: true,
-      disable_additional_identifications: false,
-      allow_organization_account_linking: false,
-      custom_attributes: [],
-      oauth_config: null,
-      saml_connection: null,
-      created_at: 1234567890,
-      updated_at: 1234567890,
-    };
-
-    // @ts-ignore
-    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: enterpriseConnectionJSON }));
-
-    const user = new User({
-      email_addresses: [],
-      phone_numbers: [],
-      web3_wallets: [],
-      external_accounts: [],
-    } as unknown as UserJSON);
-
-    const conn = await user.createEnterpriseConnection({
-      provider: 'saml_okta',
-      name: 'New SSO',
-      organizationId: 'org_1',
-      saml: { idpEntityId: 'https://idp.example.com' },
-    });
-
-    // @ts-ignore
-    expect(BaseResource._fetch).toHaveBeenCalledWith({
-      method: 'POST',
-      path: '/me/enterprise_connections',
-      body: {
-        provider: 'saml_okta',
-        name: 'New SSO',
-        organization_id: 'org_1',
-        saml_idp_entity_id: 'https://idp.example.com',
-      },
-    });
-
-    expect(conn.id).toBe('ec_new');
-    expect(conn.name).toBe('New SSO');
-  });
-
-  it('updates an enterprise connection', async () => {
-    const enterpriseConnectionJSON = {
-      id: 'ec_123',
-      object: 'enterprise_connection' as const,
-      name: 'Updated',
-      active: false,
-      provider: 'saml_okta',
-      logo_public_url: null,
-      domains: ['acme.com'],
-      organization_id: null,
-      sync_user_attributes: true,
-      disable_additional_identifications: false,
-      allow_organization_account_linking: false,
-      custom_attributes: [],
-      oauth_config: null,
-      saml_connection: null,
-      created_at: 1234567890,
-      updated_at: 1234567900,
-    };
-
-    // @ts-ignore
-    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: enterpriseConnectionJSON }));
-
-    const user = new User({
-      email_addresses: [],
-      phone_numbers: [],
-      web3_wallets: [],
-      external_accounts: [],
-    } as unknown as UserJSON);
-
-    await user.updateEnterpriseConnection('ec_123', {
-      name: 'Updated',
-      active: false,
-      syncUserAttributes: true,
-    });
-
-    // @ts-ignore
-    expect(BaseResource._fetch).toHaveBeenCalledWith({
-      method: 'PATCH',
-      path: '/me/enterprise_connections/ec_123',
-      body: {
-        name: 'Updated',
-        active: false,
-        sync_user_attributes: true,
-      },
-    });
-  });
-
-  it('preserves `saml.attributeMapping` and `saml.customAttributes` keys when creating an enterprise connection', async () => {
-    BaseResource._fetch = vi.fn().mockReturnValue(
-      Promise.resolve({
-        response: {
-          id: 'ec_new',
-          object: 'enterprise_connection' as const,
-          name: 'New SSO',
-          active: true,
-          provider: 'saml_okta',
-          logo_public_url: null,
-          domains: [],
-          organization_id: null,
-          sync_user_attributes: true,
-          disable_additional_identifications: false,
-          allow_organization_account_linking: false,
-          custom_attributes: [],
-          oauth_config: null,
-          saml_connection: null,
-          created_at: 1,
-          updated_at: 1,
-        },
-      }),
-    );
-
-    const user = new User({
-      email_addresses: [],
-      phone_numbers: [],
-      web3_wallets: [],
-      external_accounts: [],
-    } as unknown as UserJSON);
-
-    await user.createEnterpriseConnection({
-      provider: 'saml_okta',
-      name: 'New SSO',
-      saml: {
-        idpEntityId: 'https://idp.example.com',
-        attributeMapping: {
-          emailAddress: 'mail',
-          firstName: 'givenName',
-          'custom:role': 'role',
-        },
-      },
-    });
-
-    // @ts-ignore
-    expect(BaseResource._fetch).toHaveBeenCalledWith({
-      method: 'POST',
-      path: '/me/enterprise_connections',
-      body: {
-        provider: 'saml_okta',
-        name: 'New SSO',
-        saml_idp_entity_id: 'https://idp.example.com',
-        saml_attribute_mapping: {
-          emailAddress: 'mail',
-          firstName: 'givenName',
-          'custom:role': 'role',
-        },
-      },
-    });
-  });
-
-  it('preserves `customAttributes` and `saml.attributeMapping` keys when updating an enterprise connection', async () => {
-    // @ts-ignore
-    BaseResource._fetch = vi.fn().mockReturnValue(
-      Promise.resolve({
-        response: {
-          id: 'ec_123',
-          object: 'enterprise_connection' as const,
-          name: 'Updated',
-          active: true,
-          provider: 'saml_okta',
-          logo_public_url: null,
-          domains: [],
-          organization_id: null,
-          sync_user_attributes: true,
-          disable_additional_identifications: false,
-          allow_organization_account_linking: false,
-          custom_attributes: [],
-          oauth_config: null,
-          saml_connection: null,
-          created_at: 1,
-          updated_at: 2,
-        },
-      }),
-    );
-
-    const user = new User({
-      email_addresses: [],
-      phone_numbers: [],
-      web3_wallets: [],
-      external_accounts: [],
-    } as unknown as UserJSON);
-
-    await user.updateEnterpriseConnection('ec_123', {
-      customAttributes: {
-        MyClaim: 'x',
-        CustomValue: 'y',
-        nestedCamelKey: { innerCamelKey: 'z' },
-      },
-      saml: {
-        attributeMapping: {
-          emailAddress: 'mail',
-          firstName: 'givenName',
-        },
-      },
-    });
-
-    // @ts-ignore
-    expect(BaseResource._fetch).toHaveBeenCalledWith({
-      method: 'PATCH',
-      path: '/me/enterprise_connections/ec_123',
-      body: {
-        custom_attributes: {
-          MyClaim: 'x',
-          CustomValue: 'y',
-          nestedCamelKey: { innerCamelKey: 'z' },
-        },
-        saml_attribute_mapping: {
-          emailAddress: 'mail',
-          firstName: 'givenName',
-        },
-      },
-    });
-  });
-
-  it('deletes an enterprise connection', async () => {
-    const deletedJSON = {
-      object: 'enterprise_connection',
-      id: 'ec_123',
-      deleted: true,
-    };
-
-    // @ts-ignore
-    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: deletedJSON }));
-
-    const user = new User({
-      email_addresses: [],
-      phone_numbers: [],
-      web3_wallets: [],
-      external_accounts: [],
-    } as unknown as UserJSON);
-
-    const result = await user.deleteEnterpriseConnection('ec_123');
-
-    // @ts-ignore
-    expect(BaseResource._fetch).toHaveBeenCalledWith({
-      method: 'DELETE',
-      path: '/me/enterprise_connections/ec_123',
-    });
-
-    expect(result.id).toBe('ec_123');
-    expect(result.deleted).toBe(true);
-  });
-
-  it('creates an enterprise connection test run', async () => {
-    // @ts-ignore
-    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: { url: 'https://example.com/test' } }));
-
-    const user = new User({
-      email_addresses: [],
-      phone_numbers: [],
-      web3_wallets: [],
-      external_accounts: [],
-    } as unknown as UserJSON);
-
-    const init = await user.createEnterpriseConnectionTestRun('ec_123');
-
-    // @ts-ignore
-    expect(BaseResource._fetch).toHaveBeenCalledWith({
-      method: 'POST',
-      path: '/me/enterprise_connections/ec_123/test_runs',
-    });
-
-    expect(init.url).toBe('https://example.com/test');
-  });
-
-  it('lists enterprise connection test runs', async () => {
-    const paginated = {
-      data: [
-        {
-          object: 'enterprise_connection_test_run' as const,
-          id: 'run_1',
-          status: 'success',
-          connection_type: 'saml' as const,
-          created_at: 1700000000000,
-        },
-      ],
-      total_count: 1,
-    };
-
-    // @ts-ignore
-    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: paginated }));
-
-    const user = new User({
-      email_addresses: [],
-      phone_numbers: [],
-      web3_wallets: [],
-      external_accounts: [],
-    } as unknown as UserJSON);
-
-    const result = await user.getEnterpriseConnectionTestRuns('ec_123', {
-      initialPage: 1,
-      pageSize: 10,
-      status: ['pending', 'success'],
-    });
-
-    // @ts-ignore
-    const call = BaseResource._fetch.mock.calls[0][0];
-    expect(call.method).toBe('GET');
-    expect(call.path).toBe('/me/enterprise_connections/ec_123/test_runs');
-    expect(call.search.get('limit')).toBe('10');
-    expect(call.search.get('offset')).toBe('0');
-    expect(call.search.getAll('status')).toEqual(['pending', 'success']);
-
-    expect(result.total_count).toBe(1);
-    expect(result.data).toHaveLength(1);
-    expect(result.data[0].id).toBe('run_1');
-    expect(result.data[0].connectionType).toBe('saml');
   });
 
   it('creates a web3 wallet', async () => {
@@ -755,6 +434,226 @@ describe('User', () => {
       body: {
         unsafeMetadata: JSON.stringify({ theme: null }),
       },
+    });
+  });
+
+  describe('.update with metadata routing', () => {
+    beforeEach(() => {
+      // @ts-ignore
+      BaseResource.clerk = { publishableKey: 'pk_test_foo' };
+    });
+
+    it('calls PATCH /me only when no unsafeMetadata is provided', async () => {
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: {} }));
+
+      const user = new User({} as unknown as UserJSON);
+      await user.update({ firstName: 'Jane' });
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledTimes(1);
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith({
+        method: 'PATCH',
+        path: '/me',
+        body: { firstName: 'Jane' },
+      });
+    });
+
+    it('routes only-metadata updates to /me/metadata as an RFC 7396 merge patch', async () => {
+      // Server still reflects the locally-cached state; the reload returns
+      // the same metadata, so the diff is computed identically.
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockImplementation((opts: any) => {
+        if (opts.method === 'GET') {
+          return Promise.resolve({
+            response: { unsafe_metadata: { theme: 'dark', layout: 'compact' } },
+          });
+        }
+        return Promise.resolve({ response: {} });
+      });
+
+      // Seed current state: { theme: 'dark', layout: 'compact' }. Desired
+      // state drops `layout` and changes `theme` — the merge patch must
+      // null-delete `layout` to preserve replace semantics.
+      const user = new User({
+        unsafe_metadata: { theme: 'dark', layout: 'compact' },
+      } as unknown as UserJSON);
+
+      await user.update({ unsafeMetadata: { theme: 'light' } });
+
+      // Two calls now: a GET /me reload to refresh the diff baseline, then
+      // PATCH /me/metadata with the computed patch.
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledTimes(2);
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenNthCalledWith(
+        1,
+        expect.objectContaining({ method: 'GET', path: '/me' }),
+        expect.anything(),
+      );
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenNthCalledWith(2, {
+        method: 'PATCH',
+        path: '/me/metadata',
+        body: {
+          unsafeMetadata: JSON.stringify({ theme: 'light', layout: null }),
+        },
+      });
+    });
+
+    it('reloads before diffing so server-side mutations are not lost', async () => {
+      // The local cache thinks unsafeMetadata is { a: 1 }, but the server
+      // has actually drifted to { a: 1, b: 2 }. Without the pre-diff reload
+      // the SDK would compute mergePatch({ a: 1 }, { a: 99 }) = { a: 99 }
+      // and `b` would survive on the server, silently violating the
+      // caller's intended replace semantics.
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockImplementation((opts: any) => {
+        if (opts.method === 'GET') {
+          return Promise.resolve({
+            response: { unsafe_metadata: { a: 1, b: 2 } },
+          });
+        }
+        return Promise.resolve({ response: {} });
+      });
+
+      const user = new User({
+        unsafe_metadata: { a: 1 },
+      } as unknown as UserJSON);
+
+      await user.update({ unsafeMetadata: { a: 99 } });
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledTimes(2);
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenNthCalledWith(2, {
+        method: 'PATCH',
+        path: '/me/metadata',
+        body: {
+          // The patch null-deletes `b` because the reload surfaced it as a
+          // key the server has and the desired state does not.
+          unsafeMetadata: JSON.stringify({ a: 99, b: null }),
+        },
+      });
+    });
+
+    it('splits mixed calls: PATCH /me for non-metadata, then PATCH /me/metadata for metadata', async () => {
+      const calls: Array<{ method: string; path: string | undefined }> = [];
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockImplementation((opts: any) => {
+        calls.push({ method: opts.method, path: opts.path });
+        return Promise.resolve({ response: {} });
+      });
+
+      const user = new User({
+        unsafe_metadata: { foo: 'old' },
+      } as unknown as UserJSON);
+
+      await user.update({
+        firstName: 'Jane',
+        unsafeMetadata: { foo: 'new', bar: 'added' },
+      });
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledTimes(2);
+      expect(calls[0]).toEqual({ method: 'PATCH', path: '/me' });
+      expect(calls[1]).toEqual({ method: 'PATCH', path: '/me/metadata' });
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenNthCalledWith(1, {
+        method: 'PATCH',
+        path: '/me',
+        body: { firstName: 'Jane' },
+      });
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenNthCalledWith(2, {
+        method: 'PATCH',
+        path: '/me/metadata',
+        body: {
+          unsafeMetadata: JSON.stringify({ foo: 'new', bar: 'added' }),
+        },
+      });
+    });
+
+    it('makes only a reload call when desired metadata equals current (no PUT)', async () => {
+      // The pre-diff reload always runs, but if the fresh server state
+      // matches `desired` the computed patch is empty and we skip the PUT.
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockImplementation((opts: any) => {
+        if (opts.method === 'GET') {
+          return Promise.resolve({
+            response: { unsafe_metadata: { theme: 'dark' } },
+          });
+        }
+        return Promise.resolve({ response: {} });
+      });
+
+      const user = new User({
+        unsafe_metadata: { theme: 'dark' },
+      } as unknown as UserJSON);
+
+      await user.update({ unsafeMetadata: { theme: 'dark' } });
+
+      // Exactly one call: the reload. No PATCH /me/metadata.
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledTimes(1);
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith(
+        expect.objectContaining({ method: 'GET', path: '/me' }),
+        expect.anything(),
+      );
+    });
+
+    it('logs a deprecation warning when unsafeMetadata is passed to update()', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockImplementation((opts: any) => {
+        if (opts.method === 'GET') {
+          return Promise.resolve({ response: { unsafe_metadata: {} } });
+        }
+        return Promise.resolve({ response: {} });
+      });
+
+      const user = new User({} as unknown as UserJSON);
+      await user.update({ unsafeMetadata: { theme: 'dark' } });
+
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('user.update({ unsafeMetadata })'));
+
+      warnSpy.mockRestore();
+    });
+
+    it('does not log a deprecation warning when unsafeMetadata is not passed to update()', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: {} }));
+
+      const user = new User({} as unknown as UserJSON);
+      await user.update({ firstName: 'Jane' });
+
+      expect(warnSpy).not.toHaveBeenCalled();
+
+      warnSpy.mockRestore();
+    });
+
+    it('does not log a deprecation warning for production publishable keys', async () => {
+      // @ts-ignore
+      BaseResource.clerk = { publishableKey: 'pk_live_foo' };
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockImplementation((opts: any) => {
+        if (opts.method === 'GET') {
+          return Promise.resolve({ response: { unsafe_metadata: {} } });
+        }
+        return Promise.resolve({ response: {} });
+      });
+
+      const user = new User({} as unknown as UserJSON);
+      await user.update({ unsafeMetadata: { theme: 'dark' } });
+
+      expect(warnSpy).not.toHaveBeenCalled();
+
+      warnSpy.mockRestore();
     });
   });
 });

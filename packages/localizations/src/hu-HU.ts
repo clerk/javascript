@@ -225,28 +225,28 @@ export const huHU: LocalizationResource = {
       },
       warning: 'Miután kiválasztotta a szolgáltatót, nem módosíthatja, amíg a konfiguráció be nem fejeződik',
     },
-    verifyEmailDomainStep: {
-      title: 'E-mail-cím megerősítése',
-      subtitle: 'Erősítse meg azt az e-mail-címet, amelyen engedélyezni szeretné a vállalati kapcsolatot.',
-      addEmailAddress: {
-        formTitle: 'Szükségünk van az e-mail-címére',
-        formSubtitle: 'A kezdéshez szükségünk lesz az e-mail-címére',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'E-mail-cím',
+    organizationDomainsStep: {
+      title: 'SSO-tartományok hozzáadása',
+      subtitle:
+        'Adja hozzá és igazolja azon tartományok tulajdonjogát, amelyeket szervezete a bejelentkezéshez használ.',
+      formFieldLabel__domain: 'Tartományok',
+      formFieldInputPlaceholder__domain: 'Írja be ide a tartományát, majd kattintson a Hozzáadás gombra a kezdéshez',
+      formButtonPrimary__add: 'Hozzáadás',
+      domainSuggestion: {
+        messageLabel: 'Az e-mail-címe a következőt használja: {{domain}}. Szeretné hozzáadni?',
+        formButtonPrimary__add: '{{domain}} hozzáadása',
       },
-      emailCode: {
-        formTitle: 'Erősítse meg az e-mail-címét',
-        formSubtitle: 'Adja meg a {{identifier}} címre küldött ellenőrző kódot',
-        resendButton: 'Nem kapott kódot? Küldés újra',
-        verified: {
-          title: 'Megkaptuk az e-mailjét',
-          subtitle: 'Megerősítette az e-mail-címét az alábbi e-maillel',
-          inputLabel: 'Megerősített e-mail-cím',
+      domainCard: {
+        badge__verified: 'Igazolva',
+        badge__unverified: 'Nincs igazolva',
+        verifiedAtLabel: "Igazolva: {{ date | shortDate('hu-HU') }}",
+        txtRecord: {
+          instructions:
+            'Adja hozzá ezt a TXT-rekordot a DNS-szolgáltatójához. Automatikusan igazoljuk, amint a rekord aktívvá válik.',
+          typeLabel: 'Típus',
+          hostLabel: 'Gazda / Név',
+          valueLabel: 'Érték',
         },
-      },
-      domainTaken: {
-        title: 'Ez a domain ({{domain}}) már rendelkezik SSO-kapcsolattal',
-        subtitle: 'A meglévő kapcsolaton keresztüli hozzáférés érdekében forduljon az alkalmazás rendszergazdájához.',
       },
     },
   },

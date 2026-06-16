@@ -1,3 +1,4 @@
+/* eslint-disable turbo/no-undeclared-env-vars */
 import { expect, test } from '@playwright/test';
 
 import type { Application } from '../models/application';
@@ -172,6 +173,17 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
     });
 
     test('custom profile page survives a parent rerender without remounting', async ({ page, context }) => {
+      // Validates the @clerk/react fix from #8604 (custom pages must not remount on a
+      // parent rerender). The staging leg installs published @latest packages
+      // (E2E_SDK_SOURCE=latest), which do not yet contain the fix, so this is
+      // deterministically red there until the next @clerk/react release. PR CI builds
+      // the SDK from the branch and still exercises this test.
+      // TODO: remove this skip once @clerk/react including #8604 is published to npm.
+      test.skip(
+        process.env.E2E_SDK_SOURCE === 'latest',
+        'validates the unreleased @clerk/react fix (#8604); covered by ref-built CI',
+      );
+
       const u = createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.waitForMounted();

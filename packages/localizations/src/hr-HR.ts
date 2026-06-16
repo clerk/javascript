@@ -225,28 +225,27 @@ export const hrHR: LocalizationResource = {
       },
       warning: 'Nakon odabira pružatelja ne možete ga ponovno mijenjati dok konfiguracija ne završi',
     },
-    verifyEmailDomainStep: {
-      title: 'Potvrdi e-mail adresu',
-      subtitle: 'Potvrdite e-mail adresu na kojoj želite omogućiti poslovnu vezu.',
-      addEmailAddress: {
-        formTitle: 'Treba nam vaš e-mail',
-        formSubtitle: 'Za početak ćemo trebati vašu e-mail adresu',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'E-mail adresa',
+    organizationDomainsStep: {
+      title: 'Dodaj SSO domene',
+      subtitle: 'Dodajte i potvrdite vlasništvo nad domenama koje vaša organizacija koristi za prijavu.',
+      formFieldLabel__domain: 'Domene',
+      formFieldInputPlaceholder__domain: 'Ovdje upišite svoju domenu i kliknite dodaj za početak',
+      formButtonPrimary__add: 'Dodaj',
+      domainSuggestion: {
+        messageLabel: 'Vaša e-pošta koristi {{domain}}. Želite li ga dodati?',
+        formButtonPrimary__add: 'Dodaj {{domain}}',
       },
-      emailCode: {
-        formTitle: 'Potvrdite svoju e-mail adresu',
-        formSubtitle: 'Unesite verifikacijski kod poslan na {{identifier}}',
-        resendButton: 'Niste primili kod? Pošalji ponovno',
-        verified: {
-          title: 'Primili smo vaš e-mail',
-          subtitle: 'Potvrdili ste svoju e-mail adresu sljedećim e-mailom',
-          inputLabel: 'Potvrđena e-mail adresa',
+      domainCard: {
+        badge__verified: 'Potvrđeno',
+        badge__unverified: 'Nepotvrđeno',
+        verifiedAtLabel: "Potvrđeno {{ date | shortDate('hr-HR') }}",
+        txtRecord: {
+          instructions:
+            'Dodajte ovaj TXT zapis kod svog DNS pružatelja. Automatski ćemo ga potvrditi čim zapis postane aktivan.',
+          typeLabel: 'Vrsta',
+          hostLabel: 'Host / Naziv',
+          valueLabel: 'Vrijednost',
         },
-      },
-      domainTaken: {
-        title: 'Ova domena ({{domain}}) već ima SSO vezu',
-        subtitle: 'Kontaktirajte administratora aplikacije kako biste dobili pristup putem postojeće veze.',
       },
     },
   },

@@ -1,57 +1,26 @@
-import type { DeletedObjectResource, EnterpriseConnectionResource } from '@clerk/shared/types';
 import { describe, expect, it, vi } from 'vitest';
 
+import { localizationKeys } from '@/customizables';
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen, waitFor } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
 
-const goToStep = vi.fn();
-
-vi.mock('../elements/Wizard', () => ({
-  useWizard: () => ({
-    activeSteps: [],
-    currentStep: undefined,
-    currentIndex: -1,
-    totalSteps: 0,
-    isFirstStep: true,
-    isLastStep: false,
-    isNested: false,
-    goNext: vi.fn(),
-    goPrev: vi.fn(),
-    goToStep,
-    registerStep: vi.fn(),
-    unregisterStep: vi.fn(),
-  }),
-}));
-
-const setProvider = vi.fn();
-const deleteEnterpriseConnection = vi.fn();
-
-const connectionMockState = vi.hoisted(() => ({
-  current: { id: 'idn_connection_1' } as Partial<EnterpriseConnectionResource> | null,
-}));
-
-vi.mock('../ConfigureSSOContext', () => ({
-  useConfigureSSO: () => ({
-    enterpriseConnection: connectionMockState.current,
-    provider: undefined,
-    setProvider,
-    deleteEnterpriseConnection,
-    initialStepId: 'confirmation',
-    contentRef: { current: null },
-    createEnterpriseConnection: vi.fn(),
-    updateEnterpriseConnection: vi.fn(),
-    isDomainTakenByOtherOrg: false,
-  }),
-}));
-
 import { ResetConnectionDialog } from '../ResetConnectionDialog';
+
+const deleteConnection = vi.fn();
 
 const { createFixtures } = bindCreateFixtures('ConfigureSSO');
 
 const renderDialog = (
   wrapper: React.ComponentType<{ children?: React.ReactNode }>,
-  props: { isOpen?: boolean; onClose?: () => void; confirmationValue?: string } = {},
+  props: {
+    isOpen?: boolean;
+    onClose?: () => void;
+    confirmationValue?: string;
+    title?: ReturnType<typeof localizationKeys>;
+    subtitle?: ReturnType<typeof localizationKeys>;
+    confirmButtonLabel?: ReturnType<typeof localizationKeys>;
+  } = {},
 ) => {
   const onClose = props.onClose ?? vi.fn();
   const utils = render(
@@ -60,6 +29,11 @@ const renderDialog = (
         isOpen={props.isOpen ?? true}
         onClose={onClose}
         confirmationValue={props.confirmationValue ?? 'Acme Inc'}
+        onDelete={() => deleteConnection('idn_connection_1')}
+        contentRef={{ current: null }}
+        title={props.title}
+        subtitle={props.subtitle}
+        confirmButtonLabel={props.confirmButtonLabel}
       />
     </CardStateProvider>,
     { wrapper },
@@ -68,12 +42,8 @@ const renderDialog = (
 };
 
 const resetMocks = () => {
-  goToStep.mockReset();
-  setProvider.mockReset();
-  deleteEnterpriseConnection.mockReset();
-  deleteEnterpriseConnection.mockResolvedValue({} as DeletedObjectResource);
-  goToStep.mockResolvedValue(undefined);
-  connectionMockState.current = { id: 'idn_connection_1' };
+  deleteConnection.mockReset();
+  deleteConnection.mockResolvedValue(undefined);
 };
 
 describe('ResetConnectionDialog', () => {
@@ -99,6 +69,25 @@ describe('ResetConnectionDialog', () => {
       ),
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Reset connection' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+  });
+
+  it('renders override copy when title, subtitle, and confirm label props are supplied', async () => {
+    resetMocks();
+    const { wrapper } = await createFixtures();
+    renderDialog(wrapper, {
+      confirmationValue: 'Acme Inc',
+      title: localizationKeys('organizationProfile.securityPage.removeDialog.title'),
+      subtitle: localizationKeys('organizationProfile.securityPage.removeDialog.subtitle'),
+      confirmButtonLabel: localizationKeys('organizationProfile.securityPage.removeDialog.confirmButton'),
+    });
+
+    expect(screen.getByRole('heading', { name: 'Remove SSO connection' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Reset connection' })).not.toBeInTheDocument();
+    expect(screen.getByText(/Are you sure you want to remove the connection\?/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Remove connection' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Reset connection' })).not.toBeInTheDocument();
+    // Type-to-confirm is unchanged by the override.
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
   });
 
@@ -138,10 +127,10 @@ describe('ResetConnectionDialog', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
     expect(onClose).toHaveBeenCalledTimes(1);
-    expect(deleteEnterpriseConnection).not.toHaveBeenCalled();
+    expect(deleteConnection).not.toHaveBeenCalled();
   });
 
-  it('deletes the connection, clears the provider, rewinds the wizard, and closes on a successful submit', async () => {
+  it('resets the connection (delete + re-derive) and closes on a successful submit', async () => {
     resetMocks();
     const onClose = vi.fn();
     const { wrapper } = await createFixtures();
@@ -151,10 +140,9 @@ describe('ResetConnectionDialog', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Reset connection' }));
 
     await waitFor(() => {
-      expect(deleteEnterpriseConnection).toHaveBeenCalledWith('idn_connection_1');
+      expect(deleteConnection).toHaveBeenCalledTimes(1);
     });
-    expect(setProvider).toHaveBeenCalledWith(undefined);
-    expect(goToStep).toHaveBeenCalledWith('select-provider');
+    expect(deleteConnection).toHaveBeenCalledWith('idn_connection_1');
     await waitFor(() => {
       expect(onClose).toHaveBeenCalledTimes(1);
     });

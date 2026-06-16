@@ -12,7 +12,9 @@ export default defineConfig(({ watch }) => {
     target: 'es2022',
     platform: 'browser',
     external: ['react', 'react-dom', '@clerk/localizations', '@clerk/shared'],
+    noExternal: ['@clerk/headless'],
     format: ['esm'], // ESM only
+    fixedExtension: false,
     minify: false,
     plugins: [
       svgr({

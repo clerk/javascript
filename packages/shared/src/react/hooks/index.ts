@@ -38,16 +38,13 @@ export type {
   UseUserEnterpriseConnectionsParams,
   UseUserEnterpriseConnectionsReturn,
 } from './useUserEnterpriseConnections';
-export { __internal_useEnterpriseConnectionTestRuns } from './useEnterpriseConnectionTestRuns';
-export type {
-  UseEnterpriseConnectionTestRunsParams,
-  UseEnterpriseConnectionTestRunsReturn,
-} from './useEnterpriseConnectionTestRuns';
 export { __internal_useOrganizationEnterpriseConnections } from './useOrganizationEnterpriseConnections';
 export type {
   UseOrganizationEnterpriseConnectionsParams,
   UseOrganizationEnterpriseConnectionsReturn,
 } from './useOrganizationEnterpriseConnections';
+export { __internal_useOrganizationDomains } from './useOrganizationDomains';
+export type { UseOrganizationDomainsParams, UseOrganizationDomainsReturn } from './useOrganizationDomains';
 export { __internal_useOrganizationEnterpriseConnectionTestRuns } from './useOrganizationEnterpriseConnectionTestRuns';
 export type {
   UseOrganizationEnterpriseConnectionTestRunsParams,

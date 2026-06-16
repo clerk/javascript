@@ -1,15 +1,12 @@
-/* eslint-disable import/namespace, import/default, import/no-named-as-default, import/no-named-as-default-member, simple-import-sort/imports */
-// These deep imports from react-native internals are required by codegen.
-import codegenNativeComponent from 'react-native/Libraries/Utilities/codegenNativeComponent';
-import type { HostComponent, ViewProps } from 'react-native';
-import type { BubblingEventHandler } from 'react-native/Libraries/Types/CodegenTypes';
-/* eslint-enable import/namespace, import/default, import/no-named-as-default, import/no-named-as-default-member, simple-import-sort/imports */
+import type { NativeSyntheticEvent, ViewProps } from 'react-native';
+import { requireNativeComponent } from 'react-native';
 
-type ProfileEvent = Readonly<{ type: string; data: string }>;
+type ProfileEvent = Readonly<{ type: string }>;
+type ProfileEventHandler = (event: NativeSyntheticEvent<ProfileEvent>) => void | Promise<void>;
 
 interface NativeProps extends ViewProps {
-  isDismissable?: boolean;
-  onProfileEvent?: BubblingEventHandler<ProfileEvent>;
+  isDismissible?: boolean;
+  onProfileEvent?: ProfileEventHandler;
 }
 
-export default codegenNativeComponent<NativeProps>('ClerkUserProfileView') as HostComponent<NativeProps>;
+export default requireNativeComponent<NativeProps>('ClerkUserProfileView');

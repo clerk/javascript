@@ -202,29 +202,27 @@ export const itIT: LocalizationResource = {
       },
       warning: 'Una volta selezionato un provider non potrai cambiarlo fino al termine della configurazione',
     },
-    verifyEmailDomainStep: {
-      title: 'Verifica indirizzo email',
-      subtitle: "Verifica l'indirizzo email su cui vuoi abilitare la connessione aziendale.",
-      addEmailAddress: {
-        formTitle: 'Abbiamo bisogno della tua email',
-        formSubtitle: 'Per iniziare avremo bisogno del tuo indirizzo email',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'Indirizzo email',
+    organizationDomainsStep: {
+      title: 'Aggiungi domini SSO',
+      subtitle: 'Aggiungi e verifica la proprietà dei domini che la tua organizzazione utilizza per accedere.',
+      formFieldLabel__domain: 'Domini',
+      formFieldInputPlaceholder__domain: 'Digita qui il tuo dominio e clicca su Aggiungi per iniziare',
+      formButtonPrimary__add: 'Aggiungi',
+      domainSuggestion: {
+        messageLabel: 'La tua email usa {{domain}}. Vuoi aggiungerlo?',
+        formButtonPrimary__add: 'Aggiungi {{domain}}',
       },
-      emailCode: {
-        formTitle: 'Verifica il tuo indirizzo email',
-        formSubtitle: 'Inserisci il codice di verifica inviato a {{identifier}}',
-        resendButton: 'Non hai ricevuto il codice? Invia di nuovo',
-        verified: {
-          title: 'Abbiamo ricevuto la tua email',
-          subtitle: 'Hai verificato il tuo indirizzo email con la seguente email',
-          inputLabel: 'Indirizzo email verificato',
+      domainCard: {
+        badge__verified: 'Verificato',
+        badge__unverified: 'Non verificato',
+        verifiedAtLabel: "Verificato il {{ date | shortDate('it-IT') }}",
+        txtRecord: {
+          instructions:
+            'Aggiungi questo record TXT al tuo provider DNS. Verificheremo automaticamente non appena il record sarà attivo.',
+          typeLabel: 'Tipo',
+          hostLabel: 'Host / Nome',
+          valueLabel: 'Valore',
         },
-      },
-      domainTaken: {
-        title: 'Questo dominio ({{domain}}) ha già una connessione SSO',
-        subtitle:
-          "Contatta l'amministratore dell'applicazione per ottenere l'accesso tramite la connessione esistente.",
       },
     },
   },
