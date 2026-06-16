@@ -38,6 +38,21 @@ export const buttonRecipe = defineSlotRecipe(theme => ({
       sm: { padding: `${theme.spacing(0.2)} ${theme.spacing(2)}`, ...theme.text('xs') },
       md: { padding: `${theme.spacing(2)} ${theme.spacing(4)}`, ...theme.text('sm') },
     },
+    shape: {
+      default: {},
+      square: {
+        paddingInline: 0,
+        paddingBlock: 0,
+        aspectRatio: '1 / 1',
+        borderRadius: theme.rounded.md,
+      },
+      circle: {
+        paddingInline: 0,
+        paddingBlock: 0,
+        aspectRatio: '1 / 1',
+        borderRadius: theme.rounded.full,
+      },
+    },
   },
   compoundVariants: [
     {
@@ -106,8 +121,12 @@ export const buttonRecipe = defineSlotRecipe(theme => ({
         _active: {},
       },
     },
+    { shape: 'square', size: 'sm', css: { width: theme.spacing(6), height: theme.spacing(6) } },
+    { shape: 'square', size: 'md', css: { width: theme.spacing(9), height: theme.spacing(9) } },
+    { shape: 'circle', size: 'sm', css: { width: theme.spacing(6), height: theme.spacing(6) } },
+    { shape: 'circle', size: 'md', css: { width: theme.spacing(9), height: theme.spacing(9) } },
   ],
-  defaultVariants: { intent: 'primary', size: 'md', variant: 'filled' },
+  defaultVariants: { intent: 'primary', size: 'md', variant: 'filled', shape: 'default' },
 }));
 
 declare module '../registry' {
@@ -119,9 +138,9 @@ declare module '../registry' {
 export type ButtonProps = React.ComponentPropsWithRef<'button'> & RecipeVariantProps<typeof buttonRecipe>;
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function MosaicButton(props, ref) {
-  const { intent, variant, size, disabled, sx, children, ...rest } = props;
+  const { intent, variant, size, shape, disabled, sx, children, ...rest } = props;
   const { root } = useRecipe(buttonRecipe, {
-    variants: { intent, variant, size },
+    variants: { intent, variant, size, shape },
     state: { disabled: !!disabled },
     sx,
   });
