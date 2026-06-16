@@ -31,10 +31,7 @@ export const ConfigureStep = (): JSX.Element => {
     [c],
   );
 
-  // Entering `configure` lands on its first sub-step, `select-provider`, so advancing into configuration
-  // always shows provider selection first, even when a connection already
-  // exists
-  const initialStepId = direction === -1 ? undefined : 'select-provider';
+  const initialStepId = direction === 1 ? 'select-provider' : undefined;
 
   return (
     <Wizard

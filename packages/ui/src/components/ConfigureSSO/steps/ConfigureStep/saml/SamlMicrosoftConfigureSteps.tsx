@@ -192,13 +192,6 @@ const SamlMicrosoftCreateAppStep = (): JSX.Element => {
                 'configureSSO.configureStep.samlMicrosoft.createAppStep.assignUsersInstructions.title',
               )}
             />
-            <Text
-              as='p'
-              colorScheme='secondary'
-              localizationKey={localizationKeys(
-                'configureSSO.configureStep.samlMicrosoft.createAppStep.assignUsersInstructions.paragraph1',
-              )}
-            />
 
             <Col
               elementDescriptor={descriptors.configureSSOInstructionsList}
@@ -248,14 +241,6 @@ const SamlMicrosoftCreateAppStep = (): JSX.Element => {
                 colorScheme='secondary'
                 localizationKey={localizationKeys(
                   'configureSSO.configureStep.samlMicrosoft.createAppStep.assignUsersInstructions.step5',
-                )}
-              />
-              <Text
-                elementDescriptor={descriptors.configureSSOInstructionsListItem}
-                as='li'
-                colorScheme='secondary'
-                localizationKey={localizationKeys(
-                  'configureSSO.configureStep.samlMicrosoft.createAppStep.assignUsersInstructions.step6',
                 )}
               />
             </Col>
@@ -353,53 +338,55 @@ const SamlMicrosoftServiceProviderStep = (): JSX.Element => {
                 colorScheme='secondary'
                 localizationKey={localizationKeys('configureSSO.configureStep.samlMicrosoft.serviceProviderStep.step4')}
               />
+
+              <Box
+                elementDescriptor={descriptors.configureSSOInstructionsListItem}
+                as='li'
+                sx={theme => ({
+                  fontSize: theme.fontSizes.$md,
+                  lineHeight: theme.lineHeights.$small,
+                  color: theme.colors.$colorMutedForeground,
+                })}
+              >
+                <Text
+                  as='span'
+                  colorScheme='secondary'
+                  localizationKey={localizationKeys(
+                    'configureSSO.configureStep.samlMicrosoft.serviceProviderStep.step5',
+                  )}
+                />
+                <Col sx={theme => ({ gap: theme.space.$4, marginBlock: theme.space.$3 })}>
+                  <Form.ControlRow elementId={spEntityIdField.id}>
+                    <Form.CommonInputWrapper {...spEntityIdField.props}>
+                      <ClipboardInput
+                        value={spEntityId}
+                        readOnly
+                        copyIcon={Clipboard}
+                        copiedIcon={Checkmark}
+                      />
+                    </Form.CommonInputWrapper>
+                  </Form.ControlRow>
+
+                  <Form.ControlRow elementId={acsUrlField.id}>
+                    <Form.CommonInputWrapper {...acsUrlField.props}>
+                      <ClipboardInput
+                        value={acsUrl}
+                        readOnly
+                        copyIcon={Clipboard}
+                        copiedIcon={Checkmark}
+                      />
+                    </Form.CommonInputWrapper>
+                  </Form.ControlRow>
+                </Col>
+              </Box>
+
               <Text
                 elementDescriptor={descriptors.configureSSOInstructionsListItem}
                 as='li'
                 colorScheme='secondary'
-                localizationKey={localizationKeys('configureSSO.configureStep.samlMicrosoft.serviceProviderStep.step5')}
+                localizationKey={localizationKeys('configureSSO.configureStep.samlMicrosoft.serviceProviderStep.step6')}
               />
             </Col>
-          </Col>
-
-          <Form.ControlRow elementId={spEntityIdField.id}>
-            <Form.CommonInputWrapper {...spEntityIdField.props}>
-              <ClipboardInput
-                value={spEntityId}
-                readOnly
-                copyIcon={Clipboard}
-                copiedIcon={Checkmark}
-              />
-            </Form.CommonInputWrapper>
-          </Form.ControlRow>
-
-          <Form.ControlRow elementId={acsUrlField.id}>
-            <Form.CommonInputWrapper {...acsUrlField.props}>
-              <ClipboardInput
-                value={acsUrl}
-                readOnly
-                copyIcon={Clipboard}
-                copiedIcon={Checkmark}
-              />
-            </Form.CommonInputWrapper>
-          </Form.ControlRow>
-
-          <Col
-            elementDescriptor={descriptors.configureSSOInstructionsList}
-            as='ul'
-            sx={theme => ({
-              gap: theme.space.$1x5,
-              margin: 0,
-              paddingInlineStart: theme.space.$5,
-              listStyleType: 'disc',
-            })}
-          >
-            <Text
-              elementDescriptor={descriptors.configureSSOInstructionsListItem}
-              as='li'
-              colorScheme='secondary'
-              localizationKey={localizationKeys('configureSSO.configureStep.samlMicrosoft.serviceProviderStep.step6')}
-            />
           </Col>
         </Step.Section>
       </Step.Body>
@@ -557,31 +544,21 @@ const SamlMicrosoftAttributeMappingStep = (): JSX.Element => {
 
       <Step.Body>
         <Step.Section sx={theme => ({ gap: theme.space.$3 })}>
-          <Heading
-            elementDescriptor={descriptors.configureSSOInstructionsHeading}
-            as='h3'
-            textVariant='subtitle'
-            localizationKey={localizationKeys('configureSSO.configureStep.samlMicrosoft.attributeMappingStep.title')}
-          />
-
-          <MicrosoftAttributeMappingTable />
-
           <Text
             as='p'
             colorScheme='secondary'
-            localizationKey={localizationKeys(
-              'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.paragraph',
-            )}
+            elementDescriptor={descriptors.configureSSOInstructionsHeading}
+            localizationKey={localizationKeys('configureSSO.configureStep.samlMicrosoft.attributeMappingStep.title')}
           />
 
           <Col
             elementDescriptor={descriptors.configureSSOInstructionsList}
-            as='ul'
+            as='ol'
             sx={theme => ({
               gap: theme.space.$1x5,
               margin: 0,
               paddingInlineStart: theme.space.$5,
-              listStyleType: 'disc',
+              listStyleType: 'decimal',
             })}
           >
             <Text
@@ -596,13 +573,9 @@ const SamlMicrosoftAttributeMappingStep = (): JSX.Element => {
               colorScheme='secondary'
               localizationKey={localizationKeys('configureSSO.configureStep.samlMicrosoft.attributeMappingStep.step2')}
             />
-            <Text
-              elementDescriptor={descriptors.configureSSOInstructionsListItem}
-              as='li'
-              colorScheme='secondary'
-              localizationKey={localizationKeys('configureSSO.configureStep.samlMicrosoft.attributeMappingStep.step3')}
-            />
           </Col>
+
+          <MicrosoftAttributeMappingTable />
         </Step.Section>
       </Step.Body>
 

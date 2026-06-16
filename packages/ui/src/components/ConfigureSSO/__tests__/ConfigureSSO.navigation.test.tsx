@@ -107,7 +107,7 @@ describe('ConfigureSSO wizard navigation (integration)', () => {
     });
   });
 
-  it('shows select-provider when entering configure with an existing in-progress connection', async () => {
+  it('resumes the provider configuration when entering configure with an existing in-progress connection', async () => {
     const { wrapper, fixtures } = await createFixtures(withAdminOrgUser);
 
     fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([unconfiguredConnection] as any);
@@ -117,12 +117,10 @@ describe('ConfigureSSO wizard navigation (integration)', () => {
     } as any);
     mockVerifiedDomains(fixtures);
 
-    const { findByText, queryByRole } = render(<ConfigureSSO />, { wrapper });
+    const { findByRole, queryByText } = render(<ConfigureSSO />, { wrapper });
 
-    // Verified domains + a connection ⇒ the outer wizard seeds to `configure`,
-    // whose sub-wizard starts on `select-provider` rather than the Okta config.
-    await findByText(/select your identity provider/i);
-    expect(queryByRole('heading', { name: /configure okta workforce/i })).not.toBeInTheDocument();
+    await findByRole('heading', { name: /configure okta workforce/i });
+    expect(queryByText(/select your identity provider/i)).not.toBeInTheDocument();
   });
 
   // Contract rules 7 + 10: reset deletes the connection, then the wizard

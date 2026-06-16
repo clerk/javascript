@@ -225,7 +225,11 @@ describe('OrganizationSecurityPage', () => {
       // Continue passes no forced step, so the wizard resumes at the furthest-
       // reachable step for this connection (configure, since a provider connection
       // exists and the domain is verified) rather than the forced first step.
+      // Resuming into `configure` (direction 0) falls through to its furthest-
+      // reachable sub-step: a provider already exists, so it lands on
+      // `configure-provider` rather than re-showing `select-provider`.
       expect(await screen.findByRole('heading', { name: /configure okta workforce/i })).toBeInTheDocument();
+      expect(screen.queryByRole('heading', { name: /select your identity provider/i })).not.toBeInTheDocument();
       expect(screen.queryByRole('heading', { name: /add SSO domains/i })).not.toBeInTheDocument();
     });
 

@@ -71,7 +71,7 @@ describe('SelectProviderStep', () => {
     renderStep(wrapper);
 
     expect(screen.getByRole('heading', { name: 'Select your identity provider' })).toBeInTheDocument();
-    expect(screen.getByText(/We.*ll guide you through the detailed setup process next\./)).toBeInTheDocument();
+    expect(screen.getByText(/You.*ll configure the connection details in the next step/)).toBeInTheDocument();
   });
 
   it('renders all SAML provider radios with their labels', async () => {
