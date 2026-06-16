@@ -13,6 +13,8 @@ const CLERK_AUTH_SOURCE = '@clerk/nextjs/server';
  * Collect the local names that `auth` is imported as from `@clerk/nextjs/server`
  * in the given module. Usually returns `{'auth'}`, but handles aliased imports
  * like `import { auth as clerkAuth } from '@clerk/nextjs/server'` correctly.
+ * Type-only imports (`import type { auth }` / `import { type auth }`) are
+ * excluded — they are erased at compile time and do not provide a runtime binding.
  */
 export function findAuthLocalNames(programNode: TSESTree.Program): Set<string> {
   const names = new Set<string>();
@@ -23,8 +25,14 @@ export function findAuthLocalNames(programNode: TSESTree.Program): Set<string> {
     if (stmt.source.value !== CLERK_AUTH_SOURCE) {
       continue;
     }
+    if (stmt.importKind === 'type') {
+      continue;
+    }
     for (const spec of stmt.specifiers) {
       if (spec.type !== 'ImportSpecifier') {
+        continue;
+      }
+      if (spec.importKind === 'type') {
         continue;
       }
       const imported = spec.imported.type === 'Identifier' ? spec.imported.name : spec.imported.value;

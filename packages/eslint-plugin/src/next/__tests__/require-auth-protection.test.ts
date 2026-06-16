@@ -826,6 +826,30 @@ ruleTester.run('require-auth-protection', rule, {
       errors: [{ messageId: 'missingProtect' }],
     },
     {
+      name: 'type-only auth import does not provide a runtime binding',
+      code: `
+        import type { auth } from '@clerk/nextjs/server';
+        export default async function Page() {
+          return <div>Hello</div>;
+        }
+      `,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+      errors: [{ messageId: 'missingProtect' }],
+    },
+    {
+      name: 'inline type auth import does not provide a runtime binding',
+      code: `
+        import { type auth } from '@clerk/nextjs/server';
+        export default async function Page() {
+          return <div>Hello</div>;
+        }
+      `,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+      errors: [{ messageId: 'missingProtect' }],
+    },
+    {
       name: 'auth.protect() in a later declarator does not count — earlier code ran first',
       code: `
         import { auth } from '@clerk/nextjs/server';
