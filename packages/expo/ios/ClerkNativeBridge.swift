@@ -10,6 +10,16 @@ import ClerkKit
 import ClerkKitUI
 import ClerkExpo  // Import the pod to access ClerkNativeBridgeProtocol
 
+private struct ClerkExpoHeaderMiddleware: ClerkRequestMiddleware {
+  // Replaced by the config plugin when this bridge is copied into the app target.
+  private static let hostSdkVersion = "__CLERK_EXPO_VERSION__"
+
+  func prepare(_ request: inout URLRequest) async throws {
+    request.addValue("expo", forHTTPHeaderField: "x-clerk-host-sdk")
+    request.addValue(Self.hostSdkVersion, forHTTPHeaderField: "x-clerk-host-sdk-version")
+  }
+}
+
 // MARK: - Native Bridge Implementation
 
 public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
@@ -161,10 +171,11 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
   }
 
   private static func makeClerkOptions() -> Clerk.Options {
+    let middleware = Clerk.Options.MiddlewareConfig(request: [ClerkExpoHeaderMiddleware()])
     guard let service = keychainService else {
-      return .init()
+      return .init(middleware: middleware)
     }
-    return .init(keychainConfig: .init(service: service))
+    return .init(keychainConfig: .init(service: service), middleware: middleware)
   }
 
   @MainActor
