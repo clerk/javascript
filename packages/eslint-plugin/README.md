@@ -76,6 +76,19 @@ export default [
 ];
 ```
 
+This rule also works with Oxlint, you can configure the `rules` just like above after adding the plugin as a `jsPlugin` in `.oxlintrc.json`:
+
+```
+"jsPlugins": [
+  {
+    "name": "@clerk/next",
+    "specifier": "@clerk/eslint-plugin/next"
+  }
+]
+```
+
+Note that the bulk auto-fixer described further down does require `eslint` to be installed.
+
 ## Options
 
 | Option              | Type                  | Default  | Description                                                                                                                                                                                              |
