@@ -25,6 +25,8 @@ export interface ConfigureSSOData {
   organizationEnterpriseConnection: OrganizationEnterpriseConnection;
   testRuns: TestRunsView;
   organizationDomains: OrganizationDomainResource[] | undefined;
+  /** Exits the wizard back to the host; absent on the standalone mount. Reused by the back control and the future "Skip for now". */
+  onExit?: () => void;
 }
 
 interface ConfigureSSOProviderProps {
@@ -35,6 +37,7 @@ interface ConfigureSSOProviderProps {
   contentRef: React.RefObject<HTMLDivElement>;
   enterpriseConnectionMutations: EnterpriseConnectionMutations;
   organizationDomainMutations: OrganizationDomainMutations;
+  onExit?: () => void;
 }
 
 const ConfigureSSOContext = React.createContext<ConfigureSSOData | null>(null);
@@ -48,6 +51,7 @@ export const ConfigureSSOProvider = ({
   contentRef,
   enterpriseConnectionMutations,
   organizationDomainMutations,
+  onExit,
   children,
 }: PropsWithChildren<ConfigureSSOProviderProps>): JSX.Element => {
   const value = React.useMemo<ConfigureSSOData>(
@@ -59,6 +63,7 @@ export const ConfigureSSOProvider = ({
       organizationDomains,
       enterpriseConnectionMutations,
       organizationDomainMutations,
+      onExit,
     }),
     [
       contentRef,
@@ -68,6 +73,7 @@ export const ConfigureSSOProvider = ({
       testRuns,
       organizationDomains,
       enterpriseConnection,
+      onExit,
     ],
   );
 
