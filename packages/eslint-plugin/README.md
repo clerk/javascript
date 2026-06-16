@@ -96,6 +96,9 @@ import { auth } from '@clerk/nextjs/server';
 
 export default async function Page() {
   await auth.protect();
+  // A protect call with a more narrow role or permissions check also works:
+  await auth.protect({ role: 'org:admin' });
+
   // ...
 }
 ```

@@ -95,6 +95,42 @@ ruleTester.run('require-auth-protection', rule, {
       options: [config],
     },
     {
+      name: 'protected page with await auth.protect({ role })',
+      code: `
+        import { auth } from '@clerk/nextjs/server';
+        export default async function Page() {
+          await auth.protect({ role: 'admin' });
+          return <div>Admin</div>;
+        }
+      `,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+    },
+    {
+      name: 'protected page with await auth.protect({ permission })',
+      code: `
+        import { auth } from '@clerk/nextjs/server';
+        export default async function Page() {
+          await auth.protect({ permission: 'org:settings:manage' });
+          return <div>Settings</div>;
+        }
+      `,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+    },
+    {
+      name: 'protected page destructuring auth.protect({ role }) return value',
+      code: `
+        import { auth } from '@clerk/nextjs/server';
+        export default async function Page() {
+          const { userId } = await auth.protect({ role: 'admin' });
+          return <div>{userId}</div>;
+        }
+      `,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+    },
+    {
       name: 'protected page declaring function above and exporting identifier',
       code: `
         import { auth } from '@clerk/nextjs/server';
