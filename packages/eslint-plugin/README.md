@@ -132,14 +132,14 @@ export default async function Page() {
 }
 ```
 
-…or by an early-exit check derived from `auth()` that returns, throws, or calls `notFound()` / `redirect()`:
+…or by an early-exit check derived from `auth()` that returns, throws, or redirects signed-out users (via Next.js navigation helpers or Clerk's `redirectToSignIn()` / `redirectToSignUp()` from `auth()`):
 
 ```ts
 import { auth } from '@clerk/nextjs/server';
 
 export default async function Page() {
-  const { userId } = await auth();
-  if (userId === null) notFound();
+  const { isAuthenticated, redirectToSignIn } = await auth();
+  if (!isAuthenticated) redirectToSignIn();
   // ...
 }
 ```
@@ -214,7 +214,7 @@ const { userId } = await auth.protect();
 await auth.protect({ role: 'org:admin' })
 
 // -- Custom handling --
-const { isAuthenticated, userId, sessionId } = await auth();
+const { isAuthenticated, userId, sessionId, redirectToSignIn, redirectToSignUp } = await auth();
 // Any of these checks are okay
 // Note: For useAuth() on the client !userId can also mean
 // "loading", but here it's fine
@@ -229,14 +229,14 @@ if (
   // unconditional "exit" at the top level, these count:
   return;
   throw;
-  // The Next.js versions of these functions throw errors
-  // and counts as exits, note that we match these by name,
-  // we do not currently trace them back to the real imports
+  // Matched by callee identifier name (imports are not traced):
   redirect();
   permanentRedirect();
   notFound();
   unauthorized();
   forbidden();
+  redirectToSignIn();
+  redirectToSignUp();
 }
 ```
 

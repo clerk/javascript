@@ -194,6 +194,32 @@ ruleTester.run('require-auth-protection', rule, {
       options: [config],
     },
     {
+      name: 'manual check: redirectToSignIn from await auth() destructure',
+      code: `
+        import { auth } from '@clerk/nextjs/server';
+        export default async function Page() {
+          const { userId, redirectToSignIn } = await auth();
+          if (!userId) redirectToSignIn();
+          return <div />;
+        }
+      `,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+    },
+    {
+      name: 'manual check: redirectToSignUp from await auth() destructure',
+      code: `
+        import { auth } from '@clerk/nextjs/server';
+        export default async function Page() {
+          const { userId, redirectToSignUp } = await auth();
+          if (userId === null) redirectToSignUp();
+          return <div />;
+        }
+      `,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+    },
+    {
       name: 'manual check: userId === null in block, with notFound',
       code: `
         import { auth } from '@clerk/nextjs/server';

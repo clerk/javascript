@@ -53,7 +53,15 @@ const AUTH_FIELDS = new Set<AuthField>(['userId', 'sessionId', 'isAuthenticated'
 // would be complex, not worth the effort (at this point) and disallow any type
 // of wrapper that eventually calls these functions behind the scenes.
 // Essentially, if you name something to any of these, we'll credit you with an exit.
-const EXIT_FUNCTIONS = new Set(['redirect', 'permanentRedirect', 'notFound', 'unauthorized', 'forbidden']);
+const EXIT_FUNCTIONS = new Set([
+  'redirect',
+  'permanentRedirect',
+  'notFound',
+  'unauthorized',
+  'forbidden',
+  'redirectToSignIn',
+  'redirectToSignUp',
+]);
 
 function isProtectCall(node: TSESTree.Node | null | undefined, authNames: Set<string>): boolean {
   if (!node || node.type !== 'CallExpression') {
