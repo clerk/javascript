@@ -77,7 +77,12 @@ export function Destructive({
                 columnGap: t.spacing(2),
               })}
             >
-              <Button onClick={close}>Cancel</Button>
+              <Button
+                onClick={close}
+                variant='outline'
+              >
+                Cancel
+              </Button>
               <Button
                 type='submit'
                 intent='destructive'

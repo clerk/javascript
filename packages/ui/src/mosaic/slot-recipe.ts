@@ -91,8 +91,8 @@ interface MultiSlotConfig<S extends Record<string, { slot: string }>, V> {
   slot?: never;
   base?: Partial<Record<keyof S, StyleRule>>;
   variants?: V;
-  compoundVariants?: Array<Record<string, unknown> & { css: Partial<Record<keyof S, StyleRule>> }>;
-  defaultVariants?: Record<string, unknown>;
+  compoundVariants?: Array<VariantSelection<V> & { css: Partial<Record<keyof S, StyleRule>> }>;
+  defaultVariants?: VariantSelection<V>;
 }
 
 interface SingleSlotConfig<V> {
@@ -100,8 +100,8 @@ interface SingleSlotConfig<V> {
   slots?: never;
   base?: StyleRule;
   variants?: V;
-  compoundVariants?: Array<Record<string, unknown> & { css: StyleRule }>;
-  defaultVariants?: Record<string, unknown>;
+  compoundVariants?: Array<VariantSelection<V> & { css: StyleRule }>;
+  defaultVariants?: VariantSelection<V>;
 }
 
 /** Normalized internal config — slot-style values are always keyed by slot key. */
