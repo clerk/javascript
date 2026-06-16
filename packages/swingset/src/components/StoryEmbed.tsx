@@ -32,15 +32,7 @@ export function StoryEmbed({ name, storyModule, composition }: StoryEmbedProps) 
 
   const preview = (
     <div className='flex min-h-20 items-center justify-center p-6'>
-      <MosaicProvider
-        localization={{
-          overrides: {
-            organizationProfile: {
-              title: 'hello world',
-            },
-          },
-        }}
-      >
+      <MosaicProvider>
         <StoryComp {...defaultValues} />
       </MosaicProvider>
     </div>
