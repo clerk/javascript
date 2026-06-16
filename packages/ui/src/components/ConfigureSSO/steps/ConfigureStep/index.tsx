@@ -5,7 +5,7 @@ import { CardStateProvider } from '@/elements/contexts';
 
 import { useConfigureSSO } from '../../ConfigureSSOContext';
 import { Step } from '../../elements/Step';
-import { Wizard, type WizardStepConfig } from '../../elements/Wizard';
+import { useWizard, Wizard, type WizardStepConfig } from '../../elements/Wizard';
 import type { ProviderType } from '../../types';
 import { SelectProviderStep } from '../SelectProviderStep';
 import {
@@ -24,14 +24,23 @@ const STEPS_BY_PROVIDER: Record<ProviderType, () => JSX.Element> = {
 
 export const ConfigureStep = (): JSX.Element => {
   const { organizationEnterpriseConnection: c } = useConfigureSSO();
+  const { direction } = useWizard();
 
   const steps = React.useMemo<WizardStepConfig[]>(
     () => [{ id: 'select-provider' }, { id: 'configure-provider', guard: () => c.hasConnection }],
     [c],
   );
 
+  // Entering `configure` lands on its first sub-step, `select-provider`, so advancing into configuration
+  // always shows provider selection first, even when a connection already
+  // exists
+  const initialStepId = direction === -1 ? undefined : 'select-provider';
+
   return (
-    <Wizard steps={steps}>
+    <Wizard
+      steps={steps}
+      initialStepId={initialStepId}
+    >
       <Wizard.Match id='select-provider'>
         <CardStateProvider>
           <SelectProviderStep />

@@ -61,6 +61,7 @@ export const SelectProviderStep = (): JSX.Element => {
 
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [isChangeDialogOpen, setIsChangeDialogOpen] = React.useState(false);
+  const [changeFromProvider, setChangeFromProvider] = React.useState<ProviderType | null>(null);
 
   const handleSelect = (next: ProviderType) => {
     setSelected(next);
@@ -79,6 +80,7 @@ export const SelectProviderStep = (): JSX.Element => {
     }
 
     if (isChangingProvider) {
+      setChangeFromProvider(c.provider ?? null);
       setIsChangeDialogOpen(true);
       return;
     }
@@ -105,16 +107,16 @@ export const SelectProviderStep = (): JSX.Element => {
 
     try {
       await changeProvider(selected);
-      setIsChangeDialogOpen(false);
       void goNext();
     } catch (err) {
       handleError(err as Error, [], card.setError);
       setIsChangeDialogOpen(false);
+      setChangeFromProvider(null);
       setIsSubmitting(false);
     }
   };
 
-  const currentProviderLabel = c.provider ? providerLabel(c.provider) : undefined;
+  const currentProviderLabel = changeFromProvider ? providerLabel(changeFromProvider) : undefined;
   const nextProviderLabel = selected ? providerLabel(selected) : undefined;
 
   return (
@@ -197,7 +199,10 @@ export const SelectProviderStep = (): JSX.Element => {
         {currentProviderLabel && nextProviderLabel ? (
           <ChangeProviderDialog
             isOpen={isChangeDialogOpen}
-            onClose={() => setIsChangeDialogOpen(false)}
+            onClose={() => {
+              setIsChangeDialogOpen(false);
+              setChangeFromProvider(null);
+            }}
             onConfirm={() => {
               void handleConfirmChangeProvider();
             }}
