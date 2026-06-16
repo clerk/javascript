@@ -17,16 +17,20 @@ function variantToKnob(key: string, options: Record<string, unknown>, defaultVal
 }
 
 export function generateKnobs(meta: StoryMeta): KnobRecord {
-  if (!meta.styles?._variants) {
-    return {};
-  }
-
-  const variants = meta.styles._variants as VariantMap;
-  const defaults = meta.styles._defaultVariants ?? {};
   const knobs: KnobRecord = {};
 
-  for (const [key, options] of Object.entries(variants)) {
-    knobs[key] = variantToKnob(key, options, defaults[key]);
+  // CVA variants → boolean/select knobs.
+  if (meta.styles?._variants) {
+    const variants = meta.styles._variants as VariantMap;
+    const defaults = meta.styles._defaultVariants ?? {};
+    for (const [key, options] of Object.entries(variants)) {
+      knobs[key] = variantToKnob(key, options, defaults[key]);
+    }
+  }
+
+  // Ad-hoc knobs declared on the story (e.g. text content props) extend the variant set.
+  if (meta.knobs) {
+    Object.assign(knobs, meta.knobs);
   }
 
   return knobs;

@@ -38,6 +38,15 @@ export const buttonRecipe = defineSlotRecipe(theme => ({
         _hover: { backgroundColor: theme.mix('destructive', 'destructiveForeground', 12) },
         _active: { backgroundColor: theme.mix('destructive', 'destructiveForeground', 24) },
       },
+      // Low-emphasis companion to `primary` — e.g. the secondary action in a dialog. The
+      // border is an inset shadow so it sits flush with `primary` (no extra box size).
+      secondary: {
+        backgroundColor: 'transparent',
+        color: theme.color.primary,
+        boxShadow: `inset 0 0 0 1px ${theme.alpha('primary', 20)}`,
+        _hover: { backgroundColor: theme.alpha('primary', 6) },
+        _active: { backgroundColor: theme.alpha('primary', 12) },
+      },
     },
     size: {
       sm: { padding: `${theme.spacing(0.2)} ${theme.spacing(2)}`, ...theme.text('xs') },

@@ -2,62 +2,85 @@ import * as DialogStories from './dialog.component.stories';
 
 # Dialog
 
-The styled Mosaic `Dialog` — the headless `@clerk/headless` dialog primitives composed with
-Mosaic slot recipes. It inherits open state, portalling, focus management, dismissal (outside
-press / Escape), and ARIA wiring from the primitive, and adds Mosaic's themed styling for each
-part. Slot identity (`data-cl-slot`) is applied by this styled layer, not by the headless parts.
+The styled Mosaic `Dialog` — an opinionated modal built on the headless `@clerk/headless`
+dialog primitive. It owns a conventional layout (optional progress stepper, header,
+description, body, a dismiss affordance, and an aligned action row) behind a single props API,
+and inherits open state, portalling, focus management, dismissal (outside press / Escape), and
+ARIA wiring from the primitive. For bespoke structure, drop down to the unstyled
+[Dialog primitive](/primitives/dialog).
 
-## Example
+## Playground
 
-The trigger below is a Mosaic `Button`, wired in through the trigger's `render` prop. Open it,
-then press Escape or click the backdrop to dismiss.
-
-<Story
+<Preview
   name='Default'
   storyModule={DialogStories}
 />
 
+## Props
+
+<PropTable
+  meta={DialogStories.meta}
+  extra={[
+    { name: 'open', type: 'boolean' },
+    { name: 'defaultOpen', type: 'boolean', default: 'false' },
+    { name: 'onOpenChange', type: '(open: boolean) => void' },
+    { name: 'modal', type: 'boolean', default: 'true' },
+    { name: 'trigger', type: '(props) => ReactNode' },
+    { name: 'progress', type: '{ current: number; total: number }' },
+    { name: 'header', type: 'ReactNode' },
+    { name: 'description', type: 'ReactNode' },
+    { name: 'children', type: 'ReactNode' },
+    { name: 'actions', type: 'DialogActions | ReactNode' },
+  ]}
+/>
+
+`alignment`, `close`, `header`, and `description` are live knobs above; the rest are content
+and behavior props. `trigger` is optional — omit it and drive the dialog through `open` / `onOpenChange` (e.g. from
+a menu item elsewhere on the page). `actions` takes a structured `{ primary, secondary }` object
+— primary is brand-colored, secondary uses the `secondary` `Button` color and dismisses the
+dialog when it has no `onClick` — or arbitrary nodes (see [Custom actions](#custom-actions)).
+
 ## Usage
 
-```tsx
-import { Button } from '@clerk/ui/mosaic/components/button';
-import { Dialog } from '@clerk/ui/mosaic/components/dialog';
+The snippet below reflects the props selected in the table above — change a prop and it updates
+here.
 
-<Dialog.Root>
-  <Dialog.Trigger render={props => <Button {...props}>Open dialog</Button>} />
-  <Dialog.Portal>
-    <Dialog.Backdrop />
-    <Dialog.Viewport>
-      <Dialog.Popup>
-        <Dialog.Title>Confirm action</Dialog.Title>
-        <Dialog.Description>Are you sure you want to proceed?</Dialog.Description>
-        <Dialog.Close>Cancel</Dialog.Close>
-      </Dialog.Popup>
-    </Dialog.Viewport>
-  </Dialog.Portal>
-</Dialog.Root>;
-```
+<Usage
+  component='Dialog'
+  module='@clerk/ui/mosaic/components/dialog'
+/>
 
-Any part accepts a `render` prop for polymorphic rendering — pass a function that receives the
-part's computed props and spreads them onto your element, as the trigger does with `Button`.
+---
 
-## Parts
+## Examples
 
-| Part                 | Slot                 | Description                                             |
-| -------------------- | -------------------- | ------------------------------------------------------- |
-| `Dialog.Root`        | none (context)       | Owns open state, ARIA ids, and the transition lifecycle |
-| `Dialog.Trigger`     | `dialog-trigger`     | Toggles the dialog open on click                        |
-| `Dialog.Portal`      | none (portal)        | Portals its children; renders nothing until mounted     |
-| `Dialog.Backdrop`    | `dialog-backdrop`    | Themed overlay behind the dialog                        |
-| `Dialog.Viewport`    | `dialog-viewport`    | Fixed centering container; owns scroll lock             |
-| `Dialog.Popup`       | `dialog-popup`       | The dialog surface (`role="dialog"`, focus-trapped)     |
-| `Dialog.Title`       | `dialog-title`       | Heading; wired to the popup's `aria-labelledby`         |
-| `Dialog.Description` | `dialog-description` | Description; wired to the popup's `aria-describedby`    |
-| `Dialog.Close`       | `dialog-close`       | Closes the dialog on click                              |
+### Progress
 
-## Styling
+Pass `progress` to render a stepper at the top of the dialog for multi-step flows; omit the prop
+to hide it. `current` is 1-based.
 
-Each styled part is themed by the Mosaic dialog recipe and stays targetable through its
-`data-cl-slot` plus the state attributes the primitive emits (`data-cl-open`,
-`data-cl-starting-style`, `data-cl-ending-style`). Override per slot through
-`appearance.elements` — e.g. `{ 'dialog-popup': { borderRadius: 24 } }`.
+<Story
+  name='Progress'
+  storyModule={DialogStories}
+/>
+
+### Custom actions
+
+Pass `actions` as nodes instead of the structured object when you need extra buttons or custom
+markup.
+
+<Story
+  name='CustomActions'
+  storyModule={DialogStories}
+/>
+
+### Controlled
+
+Provide `open` / `onOpenChange` to own the open state. This destructive example renders a
+type-to-confirm `Input` as the dialog's `children` and keeps the primary action `disabled`
+until the name matches — the same pattern as the `Destructive` block.
+
+<Story
+  name='Controlled'
+  storyModule={DialogStories}
+/>

@@ -33,6 +33,15 @@ const nextConfig = {
     // `/utils` lives outside `primitives/`, so alias it first (more specific wins).
     config.resolve.alias['@clerk/headless/utils'] = resolve(__dirname, '../headless/src/utils');
     config.resolve.alias['@clerk/headless'] = resolve(__dirname, '../headless/src/primitives');
+    // `import src from './x?raw'` returns the file's untransformed source as a string —
+    // powers the `<Story>` "Code" footer. Registered as a `pre` loader so it runs first and
+    // sees the original bytes; the downstream SWC pass only re-emits the resulting string
+    // literal, so the source survives intact. See scripts/raw-loader.cjs.
+    config.module.rules.push({
+      resourceQuery: /raw/,
+      enforce: 'pre',
+      use: [{ loader: resolve(__dirname, 'scripts/raw-loader.cjs') }],
+    });
     return config;
   },
 };

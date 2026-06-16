@@ -53,6 +53,13 @@ export interface StoryMeta {
     _variants: Record<string, Record<string, unknown>>;
     _defaultVariants?: Record<string, unknown>;
   };
+  /**
+   * Ad-hoc knobs for props that aren't CVA variants — e.g. free-text content like a dialog
+   * `header`/`description`. Merged with the variant-derived knobs, so the prop table renders
+   * an editable control (text/number/select) and the preview + usage snippet update live.
+   * Keyed by prop name.
+   */
+  knobs?: KnobRecord;
 }
 
 // Loose component type so story modules don't require double-casting through unknown.
