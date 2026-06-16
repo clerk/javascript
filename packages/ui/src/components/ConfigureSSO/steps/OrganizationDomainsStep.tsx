@@ -51,10 +51,10 @@ export const OrganizationDomainsStep = (): JSX.Element => {
     card.setError(undefined);
 
     try {
-      await createDomain(domain);
+      const createdDomain = await createDomain(domain);
 
-      if (enterpriseConnection) {
-        const domains = Array.from(new Set([...enterpriseConnection.domains, domain]));
+      if (createdDomain && enterpriseConnection) {
+        const domains = Array.from(new Set([...enterpriseConnection.domains, createdDomain.name]));
         await updateConnection(enterpriseConnection.id, { domains });
       }
     } catch (err: any) {

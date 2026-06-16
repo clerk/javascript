@@ -1,3 +1,4 @@
+import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
@@ -104,5 +105,32 @@ describe('RemoveDomainDialog', () => {
     await waitFor(() => {
       expect(onClose).toHaveBeenCalledTimes(1);
     });
+  });
+
+  it('keeps the dialog open and surfaces an error when removal fails', async () => {
+    resetMocks();
+    onRemove.mockRejectedValueOnce(
+      new ClerkAPIResponseError('Error', {
+        data: [
+          {
+            code: 'internal_server_error',
+            long_message: 'Something went wrong while removing the domain.',
+            message: 'Removal failed.',
+          },
+        ],
+        status: 500,
+      }),
+    );
+    const onClose = vi.fn();
+    const { wrapper } = await createFixtures();
+    const { userEvent } = renderDialog(wrapper, { onClose });
+
+    await userEvent.click(screen.getByRole('button', { name: 'Remove domain' }));
+
+    await waitFor(() => {
+      expect(onRemove).toHaveBeenCalledTimes(1);
+    });
+    expect(await screen.findByText('Something went wrong while removing the domain.')).toBeInTheDocument();
+    expect(onClose).not.toHaveBeenCalled();
   });
 });
