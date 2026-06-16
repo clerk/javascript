@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { describe, expectTypeOf, test } from 'vitest';
 
 import type { ComponentProps } from './render-element';
