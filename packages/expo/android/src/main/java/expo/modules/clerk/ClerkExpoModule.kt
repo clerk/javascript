@@ -24,6 +24,7 @@ import kotlinx.coroutines.withTimeout
 import org.json.JSONObject
 
 private const val TAG = "ClerkExpoModule"
+private const val NATIVE_CLIENT_CHANGED_EVENT = "clerkNativeClientChanged"
 
 private fun debugLog(tag: String, message: String) {
     if (BuildConfig.DEBUG) {
@@ -40,16 +41,16 @@ class ClerkExpoModule : Module() {
     companion object {
         private var sharedInstance: ClerkExpoModule? = null
 
-        fun emitRefreshClient() {
+        fun emitRefreshClient(sourceId: String? = null) {
             val instance = sharedInstance ?: return
-            instance.sendEvent("refreshClient", instance.currentAuthStatePayload())
+            instance.sendEvent(NATIVE_CLIENT_CHANGED_EVENT, instance.clientChangedPayload(sourceId))
         }
     }
 
     override fun definition() = ModuleDefinition {
         Name("ClerkExpo")
 
-        Events("refreshClient")
+        Events(NATIVE_CLIENT_CHANGED_EVENT)
 
         OnCreate {
             sharedInstance = this@ClerkExpoModule
@@ -67,10 +68,6 @@ class ClerkExpoModule : Module() {
             configure(pubKey, bearerToken, promise)
         }
 
-        AsyncFunction("getSession") { promise: Promise ->
-            getSession(promise)
-        }
-
         AsyncFunction("getClientToken") { promise: Promise ->
             getClientToken(promise)
         }
@@ -79,8 +76,8 @@ class ClerkExpoModule : Module() {
             refreshClient(promise)
         }
 
-        AsyncFunction("signOut") { sessionId: String?, promise: Promise ->
-            signOut(sessionId, promise)
+        AsyncFunction("syncFromJsClientToken") { clientToken: String?, sourceId: String?, promise: Promise ->
+            syncFromJsClientToken(clientToken, sourceId, promise)
         }
     }
 
@@ -106,41 +103,18 @@ class ClerkExpoModule : Module() {
         }
     }
 
-    private fun currentAuthStatePayload(): Map<String, Any?> {
-        val session = Clerk.session
-        val user = Clerk.user
+    private fun clientChangedPayload(sourceId: String? = null): Map<String, Any?> {
         val result = mutableMapOf<String, Any?>(
-            "sessionId" to session?.id,
             "clientToken" to try {
                 Clerk.getDeviceToken()
             } catch (e: Exception) {
-                debugLog(TAG, "currentAuthStatePayload - getDeviceToken failed: ${e.message}")
+                debugLog(TAG, "clientChangedPayload - getDeviceToken failed: ${e.message}")
                 null
             }
         )
-
-        result["session"] = session?.let {
-            mapOf(
-                "id" to it.id,
-                "status" to it.status.name,
-                "userId" to it.user?.id
-            )
+        if (!sourceId.isNullOrEmpty()) {
+            result["sourceId"] = sourceId
         }
-
-        result["user"] = user?.let {
-            val primaryEmail = it.emailAddresses?.find { e -> e.id == it.primaryEmailAddressId }
-            val primaryPhone = it.phoneNumbers.find { p -> p.id == it.primaryPhoneNumberId }
-
-            mapOf(
-                "id" to it.id,
-                "firstName" to it.firstName,
-                "lastName" to it.lastName,
-                "imageUrl" to it.imageUrl,
-                "primaryEmailAddress" to primaryEmail?.emailAddress,
-                "primaryPhoneNumber" to primaryPhone?.phoneNumber
-            )
-        }
-
         return result
     }
 
@@ -185,8 +159,8 @@ class ClerkExpoModule : Module() {
                         withTimeout(10_000L) {
                             Clerk.isInitialized.first { it }
                         }
-                        // If a bearer token was provided, wait for the session to hydrate
-                        // so callers that immediately call getSession() see the session.
+                        // If a bearer token was provided, wait for native client state to hydrate
+                        // before resolving the configure call.
                         if (!bearerToken.isNullOrEmpty()) {
                             withTimeout(5_000L) {
                                 Clerk.sessionFlow.first { it != null }
@@ -288,19 +262,6 @@ class ClerkExpoModule : Module() {
         }
     }
 
-    // MARK: - getSession
-
-    private fun getSession(promise: Promise) {
-        if (!Clerk.isInitialized.value) {
-            // Return null when not initialized (matches iOS behavior)
-            // so callers can proceed to call configure() with a bearer token.
-            promise.resolve(null)
-            return
-        }
-
-        promise.resolve(currentAuthStatePayload())
-    }
-
     // MARK: - getClientToken
 
     private fun getClientToken(promise: Promise) {
@@ -340,9 +301,9 @@ class ClerkExpoModule : Module() {
         }
     }
 
-    // MARK: - signOut
+    // MARK: - syncFromJsClientToken
 
-    private fun signOut(sessionId: String?, promise: Promise) {
+    private fun syncFromJsClientToken(clientToken: String?, sourceId: String?, promise: Promise) {
         if (!Clerk.isInitialized.value) {
             promise.resolve(null)
             return
@@ -350,19 +311,44 @@ class ClerkExpoModule : Module() {
 
         coroutineScope.launch {
             try {
-                when (val result = Clerk.auth.signOut(sessionId = sessionId)) {
+                if (!clientToken.isNullOrBlank()) {
+                    when (val result = Clerk.updateDeviceToken(clientToken)) {
+                        is ClerkResult.Failure -> {
+                            promise.reject(
+                                "E_SYNC_FROM_JS_FAILED",
+                                result.error?.firstMessage() ?: result.throwable?.message ?: "Client token sync failed",
+                                null
+                            )
+                            return@launch
+                        }
+                        is ClerkResult.Success -> {
+                            try {
+                                withTimeout(5_000L) {
+                                    Clerk.sessionFlow.first { it != null }
+                                }
+                            } catch (_: TimeoutCancellationException) {
+                                debugLog(TAG, "syncFromJsClientToken - session did not appear after token update")
+                            }
+                            emitRefreshClient(sourceId)
+                            promise.resolve(null)
+                            return@launch
+                        }
+                    }
+                }
+
+                when (val result = Clerk.refreshClient()) {
                     is ClerkResult.Failure -> promise.reject(
-                        "E_SIGN_OUT_FAILED",
-                        result.error?.firstMessage() ?: result.throwable?.message ?: "Sign-out failed",
+                        "E_SYNC_FROM_JS_FAILED",
+                        result.error?.firstMessage() ?: result.throwable?.message ?: "Client refresh failed",
                         null
                     )
                     is ClerkResult.Success -> {
-                        emitRefreshClient()
+                        emitRefreshClient(sourceId)
                         promise.resolve(null)
                     }
                 }
             } catch (e: Exception) {
-                promise.reject("E_SIGN_OUT_FAILED", e.message ?: "Sign-out failed", e)
+                promise.reject("E_SYNC_FROM_JS_FAILED", e.message ?: "Client token sync failed", e)
             }
         }
     }

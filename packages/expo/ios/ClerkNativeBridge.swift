@@ -24,16 +24,12 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
   var darkTheme: ClerkTheme?
 
   private var clientObservationGeneration = 0
-  private var lastObservedAuthState: AuthStateSnapshot?
-  private var authEventObservationTask: Swift.Task<Void, Never>?
+  private var lastObservedClientState: ClientStateSnapshot?
 
   private init() {}
 
-  private struct AuthStateSnapshot: Equatable {
-    let clientId: String?
-    let sessionId: String?
-    let userId: String?
-    let sessionIds: [String]
+  private struct ClientStateSnapshot: Equatable {
+    let client: Client?
     let deviceToken: String?
   }
 
@@ -59,20 +55,19 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
       Self.clerkConfigured = true
       Self.configuredPublishableKey = publishableKey
       startClientObserver(reset: true)
-      startAuthEventObserver(reset: true)
 
       let shouldWaitForSession = try await Self.syncTokenState(bearerToken: bearerToken)
       await Self.waitForLoadedSessionIfNeeded(shouldWaitForSession)
+      Self.emitClientChangedIfReceivedToken(bearerToken)
       emitClerkNativeBridgeReady()
       return
     }
 
     if Self.clerkConfigured {
       startClientObserver()
-      startAuthEventObserver()
       let shouldWaitForSession = try await Self.syncTokenState(bearerToken: bearerToken)
       await Self.waitForLoadedSessionIfNeeded(shouldWaitForSession)
-      emitClerkNativeBridgeReady()
+      Self.emitClientChangedIfReceivedToken(bearerToken)
       return
     }
 
@@ -80,37 +75,46 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
     Self.configuredPublishableKey = publishableKey
     Clerk.configure(publishableKey: publishableKey, options: Self.makeClerkOptions())
     startClientObserver()
-    startAuthEventObserver()
 
     let shouldWaitForSession = try await Self.syncTokenState(bearerToken: bearerToken)
     await Self.waitForLoadedSessionIfNeeded(shouldWaitForSession)
+    Self.emitClientChangedIfReceivedToken(bearerToken)
     emitClerkNativeBridgeReady()
   }
 
   @MainActor
+  private static func emitClientChangedIfReceivedToken(_ bearerToken: String?) {
+    guard let token = bearerToken, !token.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+    emitClerkNativeRefreshClient(Self.clientChangedPayload())
+  }
+
+  @MainActor
   private func startClientObserver(reset: Bool = false) {
-    guard reset || clientObservationGeneration == 0 else { return }
+    guard reset || clientObservationGeneration == 0 else {
+      return
+    }
 
     clientObservationGeneration += 1
     let generation = clientObservationGeneration
-    lastObservedAuthState = Self.authStateSnapshot()
+    lastObservedClientState = Self.clientStateSnapshot()
     observeClient(generation: generation)
   }
 
   @MainActor
   private func observeClient(generation: Int) {
     withObservationTracking {
-      _ = Self.authStateSnapshot()
+      _ = Self.clientStateSnapshot()
     } onChange: { [weak self] in
       Task { @MainActor [weak self] in
         await Task.yield()
 
         guard let self, generation == self.clientObservationGeneration else { return }
 
-        let newAuthState = Self.authStateSnapshot()
-        if newAuthState != self.lastObservedAuthState {
-          self.lastObservedAuthState = newAuthState
-          emitClerkNativeRefreshClient(Self.authStatePayload())
+        let newClientState = Self.clientStateSnapshot()
+        if newClientState != self.lastObservedClientState {
+          self.lastObservedClientState = newClientState
+          let payload = Self.clientChangedPayload()
+          emitClerkNativeRefreshClient(payload)
         }
 
         self.observeClient(generation: generation)
@@ -119,80 +123,24 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
   }
 
   @MainActor
-  private func startAuthEventObserver(reset: Bool = false) {
-    if reset {
-      authEventObservationTask?.cancel()
-      authEventObservationTask = nil
-    }
-
-    guard authEventObservationTask == nil else { return }
-
-    authEventObservationTask = Swift.Task { @MainActor [weak self] in
-      for await event in Clerk.shared.auth.events {
-        await self?.handleAuthEvent(event)
-      }
-    }
-  }
-
-  @MainActor
-  private func handleAuthEvent(_ event: AuthEvent) async {
-    switch event {
-    case .sessionChanged(_, _), .signInCompleted(_), .signUpCompleted(_):
-      emitClerkNativeRefreshClient(Self.authStatePayload())
-    case .signedOut(_), .accountDeleted:
-      emitClerkNativeRefreshClient(Self.signedOutAuthStatePayload())
-      Swift.Task { @MainActor in
-        do {
-          _ = try await Clerk.shared.refreshClient()
-        } catch {
-          // The auth event still represents the latest user action; emit below so
-          // JS consumers can clear stale state even if the follow-up refresh fails.
-        }
-        emitClerkNativeRefreshClient(Self.authStatePayload())
-      }
-    case .signInNeedsContinuation(_), .signUpNeedsContinuation(_), .tokenRefreshed(_):
-      break
-    }
-  }
-
-  @MainActor
-  private static func authStateSnapshot() -> AuthStateSnapshot {
+  private static func clientStateSnapshot() -> ClientStateSnapshot {
     let client = Clerk.shared.client
-    let session = Clerk.shared.session
 
-    return AuthStateSnapshot(
-      clientId: client?.id,
-      sessionId: session?.id,
-      userId: Clerk.shared.user?.id,
-      sessionIds: client?.sessions.map(\.id) ?? [],
+    return ClientStateSnapshot(
+      client: client,
       deviceToken: Clerk.shared.deviceToken
     )
   }
 
   @MainActor
-  private static func authStatePayload() -> [String: Any] {
+  private static func clientChangedPayload(sourceId: String? = nil) -> [String: Any] {
     var payload: [String: Any] = [:]
-    payload["sessionId"] = Clerk.shared.session?.id ?? NSNull()
     payload["clientToken"] = Clerk.shared.deviceToken ?? NSNull()
-
-    if let session = Clerk.shared.session {
-      payload.merge(sessionPayload(from: session, user: session.user ?? Clerk.shared.user)) { _, new in new }
-    } else {
-      payload["session"] = NSNull()
-      payload["user"] = NSNull()
+    if let sourceId, !sourceId.isEmpty {
+      payload["sourceId"] = sourceId
     }
 
     return payload
-  }
-
-  @MainActor
-  private static func signedOutAuthStatePayload() -> [String: Any] {
-    return [
-      "sessionId": NSNull(),
-      "clientToken": Clerk.shared.deviceToken ?? NSNull(),
-      "session": NSNull(),
-      "user": NSNull(),
-    ]
   }
 
   @MainActor
@@ -298,29 +246,28 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
   }
 
   @MainActor
-  public func getSession() async -> [String: Any]? {
-    guard Self.clerkConfigured, let session = Clerk.shared.session else {
-      return nil
-    }
-    return Self.sessionPayload(from: session, user: session.user ?? Clerk.shared.user)
-  }
-
-  @MainActor
   public func refreshClient() async throws {
     guard Self.clerkConfigured else { return }
     _ = try await Clerk.shared.refreshClient()
     await Self.waitForLoadedClient()
-    emitClerkNativeBridgeReady()
   }
 
   @MainActor
-  public func signOut(sessionId: String?) async throws {
+  public func syncFromJsClientToken(_ clientToken: String?, sourceId: String?) async throws {
     guard Self.clerkConfigured else { return }
-    try await Clerk.shared.auth.signOut(sessionId: sessionId)
+
+    if let token = clientToken?.trimmingCharacters(in: .whitespacesAndNewlines), !token.isEmpty {
+      _ = try await Clerk.shared.updateDeviceToken(token)
+      await Self.waitForLoadedSession()
+      lastObservedClientState = Self.clientStateSnapshot()
+      emitClerkNativeRefreshClient(Self.clientChangedPayload(sourceId: sourceId))
+      return
+    }
+
     _ = try await Clerk.shared.refreshClient()
     await Self.waitForLoadedClient()
-    emitClerkNativeRefreshClient(Self.authStatePayload())
-    emitClerkNativeBridgeReady()
+    lastObservedClientState = Self.clientStateSnapshot()
+    emitClerkNativeRefreshClient(Self.clientChangedPayload(sourceId: sourceId))
   }
 
   private static func authMode(from mode: String) -> AuthView.Mode {
@@ -428,39 +375,6 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
     return hostingController
   }
 
-  private static func sessionPayload(from session: Session, user: User?) -> [String: Any] {
-    var payload: [String: Any] = [
-      "sessionId": session.id,
-      "status": String(describing: session.status)
-    ]
-
-    if let user {
-      payload["user"] = userPayload(from: user)
-    }
-
-    return payload
-  }
-
-  private static func userPayload(from user: User) -> [String: Any] {
-    var payload: [String: Any] = [
-      "id": user.id,
-      "imageUrl": user.imageUrl
-    ]
-
-    if let firstName = user.firstName {
-      payload["firstName"] = firstName
-    }
-    if let lastName = user.lastName {
-      payload["lastName"] = lastName
-    }
-    if let primaryEmail = user.emailAddresses.first(where: { $0.id == user.primaryEmailAddressId }) {
-      payload["primaryEmailAddress"] = primaryEmail.emailAddress
-    } else if let firstEmail = user.emailAddresses.first {
-      payload["primaryEmailAddress"] = firstEmail.emailAddress
-    }
-
-    return payload
-  }
 }
 
 // MARK: - Inline User Button Wrapper (for embedded rendering)

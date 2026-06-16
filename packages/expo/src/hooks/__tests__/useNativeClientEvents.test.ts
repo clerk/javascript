@@ -1,22 +1,21 @@
 import { act, cleanup, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { addNativeSessionListener, type NativeSessionSnapshot } from '../nativeSessionEvents';
-import { useNativeClientEvents } from '../useNativeClientEvents';
+import { type NativeClientSnapshot, useNativeClientEvents } from '../useNativeClientEvents';
 
 const mocks = vi.hoisted(() => {
   return {
     addListener: vi.fn(),
-    nativeListener: undefined as ((snapshot?: NativeSessionSnapshot) => void) | undefined,
+    nativeListener: undefined as ((snapshot?: NativeClientSnapshot) => void) | undefined,
     remove: vi.fn(),
   };
 });
 
 vi.mock('react-native', () => {
   return {
-    NativeEventEmitter: vi.fn().mockImplementation(() => ({
+    DeviceEventEmitter: {
       addListener: mocks.addListener,
-    })),
+    },
     Platform: {
       OS: 'ios',
     },
@@ -45,37 +44,23 @@ describe('useNativeClientEvents', () => {
     cleanup();
   });
 
-  test('forwards native refresh payloads to native session listeners', async () => {
-    const sessionSnapshots: Array<NativeSessionSnapshot | undefined> = [];
-    const removeNativeSessionListener = addNativeSessionListener(snapshot => {
-      sessionSnapshots.push(snapshot);
-    });
-
+  test('stores native client change payloads', async () => {
     const { result, unmount } = renderHook(() => useNativeClientEvents());
+
+    expect(mocks.addListener).toHaveBeenCalledWith('clerkNativeClientChanged', expect.any(Function));
 
     act(() => {
       mocks.nativeListener?.({
-        sessionId: 'sess_123',
         clientToken: 'client-token',
-        user: { id: 'user_123' },
+        sourceId: 'native-source',
       });
     });
 
     await waitFor(() => {
-      expect(result.current.nativeClientEvent?.sessionId).toBe('sess_123');
+      expect(result.current.nativeClientEvent?.clientToken).toBe('client-token');
+      expect(result.current.nativeClientEvent?.sourceId).toBe('native-source');
     });
 
-    expect(result.current.nativeClientEvent?.clientToken).toBe('client-token');
-    expect(result.current.nativeClientEvent?.user?.id).toBe('user_123');
-    expect(sessionSnapshots).toEqual([
-      {
-        sessionId: 'sess_123',
-        clientToken: 'client-token',
-        user: { id: 'user_123' },
-      },
-    ]);
-
-    removeNativeSessionListener();
     unmount();
   });
 });

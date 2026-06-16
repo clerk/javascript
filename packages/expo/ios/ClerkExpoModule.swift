@@ -1,5 +1,5 @@
 // ClerkExpoModule - Native module for Clerk integration
-// This module provides the configure function, session sync, and native view bridges.
+// This module provides the configure function, client sync, and native view bridges.
 // SwiftUI Clerk views are created by the app target through ClerkNativeBridge because
 // the Clerk SDK (SPM) isn't accessible from the CocoaPods-backed React Native pod.
 
@@ -30,10 +30,9 @@ public protocol ClerkNativeBridgeProtocol {
 
   // SDK operations
   func configure(publishableKey: String, bearerToken: String?) async throws
-  func getSession() async -> [String: Any]?
   func getClientToken() async -> String?
   func refreshClient() async throws
-  func signOut(sessionId: String?) async throws
+  func syncFromJsClientToken(_ clientToken: String?, sourceId: String?) async throws
 }
 
 public protocol ClerkNativeBridgeReadyObserver: AnyObject {
@@ -81,8 +80,10 @@ class ClerkExpoModule: RCTEventEmitter {
     return false
   }
 
+  private static let nativeClientChangedEvent = "clerkNativeClientChanged"
+
   override func supportedEvents() -> [String]! {
-    return ["refreshClient"]
+    return [Self.nativeClientChangedEvent]
   }
 
   override func startObserving() {
@@ -93,11 +94,25 @@ class ClerkExpoModule: RCTEventEmitter {
     ClerkExpoModule._hasListeners = false
   }
 
-  /// Emits a refreshClient event to JS from anywhere in the native layer.
+  /// Emits a native client change event to JS from anywhere in the native layer.
   /// Used by native views to ask ClerkProvider to reload JS client state.
   static func emitRefreshClient(_ body: [String: Any]? = nil) {
-    guard _hasListeners, let instance = sharedInstance else { return }
-    instance.sendEvent(withName: "refreshClient", body: body ?? [:])
+    let eventBody = body ?? [:]
+
+    guard let instance = sharedInstance else {
+      return
+    }
+
+    if let bridge = instance.bridge {
+      bridge.enqueueJSCall("RCTDeviceEventEmitter", method: "emit", args: [nativeClientChangedEvent, eventBody], completion: nil)
+      return
+    }
+
+    guard _hasListeners else {
+      return
+    }
+
+    instance.sendEvent(withName: nativeClientChangedEvent, body: eventBody)
   }
 
   // MARK: - configure
@@ -118,21 +133,6 @@ class ClerkExpoModule: RCTEventEmitter {
       } catch {
         reject("E_CONFIGURE_FAILED", error.localizedDescription, error)
       }
-    }
-  }
-
-  // MARK: - getSession
-
-  @objc func getSession(_ resolve: @escaping RCTPromiseResolveBlock,
-                         reject: @escaping RCTPromiseRejectBlock) {
-    guard let bridge = clerkNativeBridge else {
-      resolve(nil)
-      return
-    }
-
-    Task {
-      let session = await bridge.getSession()
-      resolve(session)
     }
   }
 
@@ -170,22 +170,25 @@ class ClerkExpoModule: RCTEventEmitter {
     }
   }
 
-  // MARK: - signOut
+  // MARK: - syncFromJsClientToken
 
-  @objc func signOut(_ sessionId: String?,
-                     resolve: @escaping RCTPromiseResolveBlock,
-                     reject: @escaping RCTPromiseRejectBlock) {
+  @objc func syncFromJsClientToken(_ clientToken: Any?,
+                                   sourceId: Any?,
+                                   resolve: @escaping RCTPromiseResolveBlock,
+                                   reject: @escaping RCTPromiseRejectBlock) {
     guard let bridge = clerkNativeBridge else {
       resolve(nil)
       return
     }
 
+    let normalizedClientToken = clientToken as? String
+    let normalizedSourceId = sourceId as? String
     Task {
       do {
-        try await bridge.signOut(sessionId: sessionId)
+        try await bridge.syncFromJsClientToken(normalizedClientToken, sourceId: normalizedSourceId)
         resolve(nil)
       } catch {
-        reject("E_SIGN_OUT_FAILED", error.localizedDescription, error)
+        reject("E_SYNC_FROM_JS_FAILED", error.localizedDescription, error)
       }
     }
   }
