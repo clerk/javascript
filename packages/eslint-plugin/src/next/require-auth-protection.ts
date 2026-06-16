@@ -190,6 +190,10 @@ function checkUnacknowledgedMixedScope(
   });
 }
 
+function getMissingProtectReportNode(fn: FunctionNode, fallback: TSESTree.Node): TSESTree.Node {
+  return fn.id ?? fn.body ?? fallback;
+}
+
 function checkMissingProtect(
   context: Rule.RuleContext,
   reportNode: TSESTree.Node,
@@ -210,7 +214,7 @@ function checkMissingProtect(
     checkedFunctions?.add(target.node);
     if (!hasProtectAtTop(target.node, authNames)) {
       context.report({
-        node: reportNode,
+        node: getMissingProtectReportNode(target.node, reportNode),
         messageId: 'missingProtect',
         data: { subject },
       });
@@ -318,7 +322,7 @@ function checkInlineServerFunction(
   }
   if (!hasProtectAtTop(fn, authNames)) {
     context.report({
-      node: fn,
+      node: getMissingProtectReportNode(fn, fn),
       messageId: 'missingProtect',
       data: { subject: 'Inline Server Function' },
     });
