@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Header } from '@/ui/elements/Header';
 import { ProfileCard } from '@/ui/elements/ProfileCard';
 
+import React from 'react';
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import { ConfigureSSOProtect } from '../ConfigureSSO/ConfigureSSO';
 import { ConfigureSSOSkeleton } from '../ConfigureSSO/ConfigureSSOSkeleton';
@@ -29,13 +30,14 @@ export const OrganizationSecurityPage = ({ contentRef }: OrganizationSecurityPag
 /** Separate from the page so the connection hook only runs behind the organization check. */
 const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPageProps) => {
   const {
-    isLoading,
     organization,
+    isLoading,
     enterpriseConnection,
     organizationEnterpriseConnection,
     testRuns,
-    mutations,
-    primaryEmailAddress,
+    enterpriseConnectionMutations,
+    organizationDomains,
+    organizationDomainMutations,
   } = useOrganizationEnterpriseConnection();
 
   const [view, setView] = useState<'overview' | 'wizard'>('overview');
@@ -67,8 +69,8 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
               <SecuritySsoSection
                 connection={organizationEnterpriseConnection}
                 enterpriseConnection={enterpriseConnection}
-                setConnectionActive={mutations.setConnectionActive}
-                deleteConnection={mutations.deleteConnection}
+                setConnectionActive={enterpriseConnectionMutations.setConnectionActive}
+                deleteConnection={enterpriseConnectionMutations.deleteConnection}
                 organizationName={organization?.name ?? ''}
                 contentRef={contentRef}
                 onConfigure={() => setView('wizard')}
@@ -82,8 +84,9 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
           testRuns={testRuns}
           enterpriseConnection={enterpriseConnection}
           contentRef={contentRef}
-          mutations={mutations}
-          primaryEmailAddress={primaryEmailAddress}
+          enterpriseConnectionMutations={enterpriseConnectionMutations}
+          organizationDomainMutations={organizationDomainMutations}
+          organizationDomains={organizationDomains}
         />
       )}
     </ConfigureSSOProtect>

@@ -76,7 +76,7 @@ export const ConfirmationStep = (): JSX.Element => {
 const EnableSsoSection = (): JSX.Element => {
   const {
     enterpriseConnection,
-    mutations: { setConnectionActive },
+    enterpriseConnectionMutations: { setConnectionActive },
   } = useConfigureSSO();
   const card = useCardState();
 
@@ -254,7 +254,7 @@ const ConfigurationDetailsSection = (): JSX.Element => {
 };
 
 const ResetConnectionSection = (): JSX.Element => {
-  const { enterpriseConnection, mutations, contentRef } = useConfigureSSO();
+  const { enterpriseConnection, enterpriseConnectionMutations, contentRef } = useConfigureSSO();
   const { organization } = useOrganization();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -280,7 +280,7 @@ const ResetConnectionSection = (): JSX.Element => {
         confirmationValue={organization?.name ?? ''}
         // The confirmation step is only reachable with a connection, so the resource is set.
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        onDelete={() => mutations.deleteConnection(enterpriseConnection!.id)}
+        onDelete={() => enterpriseConnectionMutations.deleteConnection(enterpriseConnection!.id)}
         contentRef={contentRef}
       />
     </ProfileSection.Root>

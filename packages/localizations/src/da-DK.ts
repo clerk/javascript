@@ -196,28 +196,26 @@ export const daDK: LocalizationResource = {
       },
       warning: 'Når en udbyder er valgt, kan du ikke ændre den, før konfigurationen er færdig',
     },
-    verifyEmailDomainStep: {
-      title: 'Bekræft e-mailadresse',
-      subtitle: 'Bekræft den e-mailadresse, du vil aktivere virksomhedsforbindelsen på.',
-      addEmailAddress: {
-        formTitle: 'Vi har brug for din e-mail',
-        formSubtitle: 'For at starte har vi brug for din e-mailadresse',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'E-mailadresse',
+    organizationDomainsStep: {
+      title: 'Tilføj SSO-domæner',
+      subtitle: 'Tilføj og bekræft ejerskabet af de domæner, din organisation bruger til at logge ind.',
+      formFieldLabel__domain: 'Domæner',
+      formFieldInputPlaceholder__domain: 'Skriv dit domæne her, og klik på tilføj for at starte',
+      formButtonPrimary__add: 'Tilføj',
+      domainSuggestion: {
+        messageLabel: 'Din e-mail bruger {{domain}}. Vil du tilføje det?',
+        formButtonPrimary__add: 'Tilføj {{domain}}',
       },
-      emailCode: {
-        formTitle: 'Bekræft din e-mailadresse',
-        formSubtitle: 'Indtast bekræftelseskoden sendt til {{identifier}}',
-        resendButton: 'Modtog du ingen kode? Send igen',
-        verified: {
-          title: 'Vi har modtaget din e-mail',
-          subtitle: 'Du har bekræftet din e-mailadresse med følgende e-mail',
-          inputLabel: 'Bekræftet e-mailadresse',
+      domainCard: {
+        badge__verified: 'Bekræftet',
+        badge__unverified: 'Ikke bekræftet',
+        verifiedAtLabel: "Bekræftet den {{ date | shortDate('da-DK') }}",
+        txtRecord: {
+          instructions: 'Tilføj denne TXT-post hos din DNS-udbyder. Vi bekræfter automatisk, så snart posten er aktiv.',
+          typeLabel: 'Type',
+          hostLabel: 'Vært / Navn',
+          valueLabel: 'Værdi',
         },
-      },
-      domainTaken: {
-        title: 'Dette domæne ({{domain}}) har allerede en SSO-forbindelse',
-        subtitle: 'Kontakt applikationens administrator for at få adgang via den eksisterende forbindelse.',
       },
     },
   },

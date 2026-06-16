@@ -28,8 +28,54 @@ type OrganizationDomainVerificationStrategy = 'email_code';
 /** @inline */
 export type OrganizationDomainVerificationStatus = 'unverified' | 'verified';
 
+/**
+ * The strategy used to verify ownership of an Organization's domain.
+ *
+ * @inline
+ */
+export type OrganizationDomainOwnershipVerificationStrategy = 'txt' | 'legacy' | 'manual_override';
+
+/**
+ * Holds the ownership verification details of an Organization's domain, including
+ * the TXT record an admin must publish to prove ownership.
+ */
+export interface OrganizationDomainOwnershipVerification {
+  /**
+   * The current status of the domain ownership verification.
+   */
+  status: OrganizationDomainVerificationStatus;
+  /**
+   * The strategy used to verify ownership of the domain.
+   */
+  strategy: OrganizationDomainOwnershipVerificationStrategy;
+  /**
+   * The number of verification attempts that have been made, or `null` if none.
+   */
+  attempts: number | null;
+  /**
+   * The date and time when the current verification attempt expires, or `null`.
+   */
+  expiresAt: Date | null;
+  /**
+   * The date and time when ownership of the domain was verified, or `null` if it has not been verified.
+   */
+  verifiedAt: Date | null;
+  /**
+   * The fully qualified DNS name the org admin must publish the TXT record under. Present only immediately after preparing ownership verification.
+   */
+  txtRecordName: string | null;
+  /**
+   * The exact value the org admin must publish in the TXT record. Present only immediately after preparing ownership verification.
+   */
+  txtRecordValue: string | null;
+}
+
 /** @inline */
-export type OrganizationEnrollmentMode = 'manual_invitation' | 'automatic_invitation' | 'automatic_suggestion';
+export type OrganizationEnrollmentMode =
+  | 'manual_invitation'
+  | 'automatic_invitation'
+  | 'automatic_suggestion'
+  | 'enterprise_sso';
 
 /**
  * The `OrganizationDomain` object is the model around an Organization's [Verified Domain](https://clerk.com/docs/guides/organizations/add-members/verified-domains).
@@ -61,8 +107,18 @@ export interface OrganizationDomainResource extends ClerkResource {
   enrollmentMode: OrganizationEnrollmentMode;
   /**
    * The verification details for the domain, or `null` if the domain has not been verified.
+   *
+   * @deprecated Use `affiliationVerification` instead.
    */
   verification: OrganizationDomainVerification | null;
+  /**
+   * The affiliation verification details for the domain, or `null` if the domain has not been verified.
+   */
+  affiliationVerification: OrganizationDomainVerification | null;
+  /**
+   * The ownership verification details for the domain, or `null` if ownership has not been verified.
+   */
+  ownershipVerification: OrganizationDomainOwnershipVerification | null;
   /**
    * The date and time when the domain was created.
    */
@@ -136,3 +192,50 @@ export type UpdateEnrollmentModeParams = Pick<OrganizationDomainResource, 'enrol
    */
   deletePending?: boolean;
 };
+
+/** @generateWithEmptyComment */
+export type CreateOrganizationDomainParams = {
+  /**
+   * The domain name, for example `clerk.com`.
+   */
+  name: string;
+  /**
+   * The enrollment mode that determines how matching users are added to the Organization. Defaults to `manual_invitation`.
+   */
+  enrollmentMode?: OrganizationEnrollmentMode;
+};
+
+/**
+ * A per-domain failure entry returned by the bulk ownership verification flows,
+ * carrying the id of the domain that was skipped and the API error code that
+ * caused it.
+ */
+export interface OrganizationDomainBulkOwnershipVerificationError {
+  /**
+   * The unique identifier of the Verified Domain that could not be processed.
+   */
+  id: string;
+  /**
+   * The API error code describing why the domain was skipped, for example `resource_not_found`.
+   */
+  code: string;
+}
+
+/**
+ * The partial-success result of a bulk ownership verification flow
+ * (`prepareOwnershipVerification`/`attemptOwnershipVerification`). Each
+ * requested domain lands in either `data` (with its current ownership state)
+ * or `errors`.
+ */
+export interface OrganizationDomainsBulkOwnershipVerificationResource {
+  /**
+   * The Verified Domains that were processed successfully. After
+   * `prepareOwnershipVerification`, each domain's `ownershipVerification`
+   * carries the `txtRecordName` and `txtRecordValue` to publish.
+   */
+  data: OrganizationDomainResource[];
+  /**
+   * The per-domain failures that were skipped without failing the whole batch.
+   */
+  errors: OrganizationDomainBulkOwnershipVerificationError[];
+}

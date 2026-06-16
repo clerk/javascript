@@ -1038,6 +1038,7 @@ export type __internal_LocalizationResource = {
     badge__automaticInvitation: LocalizationValue;
     badge__automaticSuggestion: LocalizationValue;
     badge__manualInvitation: LocalizationValue;
+    badge__enterpriseSso: LocalizationValue;
     start: {
       headerTitle__members: LocalizationValue;
       membershipSeatUsageLabel: LocalizationValue<'count' | 'limit'>;
@@ -1367,28 +1368,26 @@ export type __internal_LocalizationResource = {
       };
       warning: LocalizationValue;
     };
-    verifyEmailDomainStep: {
+    organizationDomainsStep: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
-      addEmailAddress: {
-        formTitle: LocalizationValue;
-        formSubtitle: LocalizationValue;
-        inputPlaceholder: LocalizationValue;
-        inputLabel: LocalizationValue;
+      formFieldLabel__domain: LocalizationValue;
+      formFieldInputPlaceholder__domain: LocalizationValue;
+      formButtonPrimary__add: LocalizationValue;
+      domainSuggestion: {
+        messageLabel: LocalizationValue<'domain'>;
+        formButtonPrimary__add: LocalizationValue<'domain'>;
       };
-      emailCode: {
-        formTitle: LocalizationValue;
-        formSubtitle: LocalizationValue<'identifier'>;
-        resendButton: LocalizationValue;
-        verified: {
-          title: LocalizationValue;
-          subtitle: LocalizationValue;
-          inputLabel: LocalizationValue;
+      domainCard: {
+        badge__verified: LocalizationValue;
+        badge__unverified: LocalizationValue;
+        verifiedAtLabel: LocalizationValue<'date'>;
+        txtRecord: {
+          instructions: LocalizationValue;
+          typeLabel: LocalizationValue;
+          hostLabel: LocalizationValue;
+          valueLabel: LocalizationValue;
         };
-      };
-      domainTaken: {
-        title: LocalizationValue<'domain'>;
-        subtitle: LocalizationValue;
       };
     };
     testConfigurationStep: {

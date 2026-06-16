@@ -196,28 +196,27 @@ export const srRS: LocalizationResource = {
       },
       warning: 'Kada se provajder izabere, ne možete ga ponovo menjati dok se konfiguracija ne završi',
     },
-    verifyEmailDomainStep: {
-      title: 'Potvrdi adresu e-pošte',
-      subtitle: 'Potvrdite adresu e-pošte na kojoj želite da omogućite enterprise konekciju.',
-      addEmailAddress: {
-        formTitle: 'Potrebna nam je vaša e-pošta',
-        formSubtitle: 'Da bismo započeli, biće nam potrebna vaša adresa e-pošte',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'Adresa e-pošte',
+    organizationDomainsStep: {
+      title: 'Dodaj SSO domene',
+      subtitle: 'Dodajte i potvrdite vlasništvo nad domenima koje vaša organizacija koristi za prijavu.',
+      formFieldLabel__domain: 'Domeni',
+      formFieldInputPlaceholder__domain: 'Ovde unesite svoj domen i kliknite na dodaj da biste počeli',
+      formButtonPrimary__add: 'Dodaj',
+      domainSuggestion: {
+        messageLabel: 'Vaša e-pošta koristi {{domain}}. Želite li da ga dodate?',
+        formButtonPrimary__add: 'Dodaj {{domain}}',
       },
-      emailCode: {
-        formTitle: 'Potvrdite svoju adresu e-pošte',
-        formSubtitle: 'Unesite verifikacioni kod poslat na {{identifier}}',
-        resendButton: 'Niste primili kod? Pošalji ponovo',
-        verified: {
-          title: 'Primili smo vašu e-poštu',
-          subtitle: 'Potvrdili ste svoju adresu e-pošte sledećom e-poštom',
-          inputLabel: 'Potvrđena adresa e-pošte',
+      domainCard: {
+        badge__verified: 'Potvrđeno',
+        badge__unverified: 'Nepotvrđeno',
+        verifiedAtLabel: "Potvrđeno {{ date | shortDate('sr-RS') }}",
+        txtRecord: {
+          instructions:
+            'Dodajte ovaj TXT zapis kod svog DNS provajdera. Automatski ćemo ga potvrditi čim zapis postane aktivan.',
+          typeLabel: 'Tip',
+          hostLabel: 'Host / Naziv',
+          valueLabel: 'Vrednost',
         },
-      },
-      domainTaken: {
-        title: 'Ovaj domen ({{domain}}) već ima SSO konekciju',
-        subtitle: 'Kontaktirajte administratora aplikacije da biste dobili pristup putem postojeće konekcije.',
       },
     },
   },
