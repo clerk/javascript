@@ -14,7 +14,7 @@
     "electron-passkeys.win32-arm64-msvc.node"
   ],
   "engines": {
-    "node": ">=20.9.0"
+    "node": ">=24.15.0"
   },
   "os": [
     "win32"

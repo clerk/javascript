@@ -43,7 +43,7 @@
     "@clerk/electron-passkeys-win32-x64-msvc": "workspace:*"
   },
   "engines": {
-    "node": ">=20.9.0"
+    "node": ">=24.15.0"
   },
   "publishConfig": {
     "access": "public"
