@@ -223,6 +223,16 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'organizationProfileMembersSearchInputIcon',
   'organizationProfileMembersSearchInput',
 
+  'organizationProfileSecuritySsoBadge',
+  'organizationProfileSecuritySsoDescription',
+  'organizationProfileSecuritySsoConfigureButton',
+  'organizationProfileSecuritySsoDetailRows',
+  'organizationProfileSecuritySsoDetailRow',
+  'organizationProfileSecuritySsoDetailRowLabel',
+  'organizationProfileSecuritySsoDetailRowChip',
+  'organizationProfileSecuritySsoDetailRowLink',
+  'organizationProfileSecuritySsoProviderIcon',
+
   'organizationListPreviewItems',
   'organizationListPreviewItem',
   'organizationListPreviewButton',
