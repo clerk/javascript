@@ -25,7 +25,6 @@ export interface ConfigureSSOData {
   organizationEnterpriseConnection: OrganizationEnterpriseConnection;
   testRuns: TestRunsView;
   organizationDomains: OrganizationDomainResource[] | undefined;
-  /** Exits the wizard back to the host; absent on the standalone mount. Reused by the back control and the future "Skip for now". */
   onExit?: () => void;
 }
 
