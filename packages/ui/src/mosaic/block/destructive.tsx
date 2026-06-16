@@ -48,56 +48,47 @@ export function Destructive({
       onOpenChange={onOpenChange}
       trigger={trigger}
     >
-      <Dialog.Title render={p => <Heading {...p} />}>{title}</Dialog.Title>
-      <Dialog.Description render={p => <Text {...p} />}>{description}</Dialog.Description>
-      <form onSubmit={handleSubmit}>
-        <Box
-          render={p => <label {...p} />}
-          sx={t => ({
-            ...t.text('sm'),
-            fontWeight: t.font.medium,
-          })}
-        >
-          Type &quot;{resourceName}&quot; below to continue.
-          <Input
-            value={confirmValue}
-            onChange={e => setConfirmValue(e.target.value)}
-            disabled={isDeleting}
-            sx={t => ({
-              marginBlockStart: t.spacing(1),
-            })}
-          />
-        </Box>
-        <Box
-          sx={t => ({
-            marginBlockStart: t.spacing(4),
-          })}
-        >
-          <ButtonGroup>
-            <Button disabled={!canSubmit}>Cancel</Button>
-            <Button
-              type='submit'
-              intent='destructive'
-              disabled={!canSubmit}
+      {({ close }) => (
+        <>
+          <Dialog.Title render={p => <Heading {...p} />}>{title}</Dialog.Title>
+          <Dialog.Description render={p => <Text {...p} />}>{description}</Dialog.Description>
+          <form onSubmit={handleSubmit}>
+            <Box
+              render={p => <label {...p} />}
+              sx={t => ({
+                ...t.text('sm'),
+                fontWeight: t.font.medium,
+              })}
             >
-              {primaryActionLabel}
-            </Button>
-          </ButtonGroup>
-        </Box>
-      </form>
+              Type &quot;{resourceName}&quot; below to continue.
+              <Input
+                value={confirmValue}
+                onChange={e => setConfirmValue(e.target.value)}
+                disabled={isDeleting}
+                sx={t => ({
+                  marginBlockStart: t.spacing(1),
+                })}
+              />
+            </Box>
+            <Box
+              sx={t => ({
+                marginBlockStart: t.spacing(4),
+                display: 'flex',
+                columnGap: t.spacing(2),
+              })}
+            >
+              <Button onClick={close}>Cancel</Button>
+              <Button
+                type='submit'
+                intent='destructive'
+                disabled={!canSubmit}
+              >
+                {primaryActionLabel}
+              </Button>
+            </Box>
+          </form>
+        </>
+      )}
     </Dialog>
-  );
-}
-
-function ButtonGroup({ children }: { children: React.ReactNode }) {
-  return (
-    <Box
-      sx={t => ({
-        display: 'flex',
-        columnGap: t.spacing(2),
-      })}
-    >
-      {children}
-    </Box>
   );
 }
