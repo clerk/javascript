@@ -204,10 +204,21 @@ describe('assertSubClaim(sub?)', () => {
 });
 
 describe('assertAuthorizedPartiesClaim(azp?, authorizedParties?)', () => {
-  it('does not throw if azp missing or empty', () => {
+  it('does not throw if azp missing or empty and no authorizedParties are configured', () => {
     expect(() => assertAuthorizedPartiesClaim()).not.toThrow();
     expect(() => assertAuthorizedPartiesClaim('')).not.toThrow();
     expect(() => assertAuthorizedPartiesClaim(undefined)).not.toThrow();
+    expect(() => assertAuthorizedPartiesClaim('', [])).not.toThrow();
+    expect(() => assertAuthorizedPartiesClaim(undefined, [])).not.toThrow();
+  });
+
+  it('throws error if azp is missing or empty but authorizedParties are configured', () => {
+    expect(() => assertAuthorizedPartiesClaim('', ['azp-1'])).toThrow(
+      `Invalid JWT Authorized party claim (azp) "". Expected "azp-1".`,
+    );
+    expect(() => assertAuthorizedPartiesClaim(undefined, ['azp-1'])).toThrow(
+      `Invalid JWT Authorized party claim (azp) undefined. Expected "azp-1".`,
+    );
   });
 
   it('does not throw if authorizedParties missing or empty', () => {
