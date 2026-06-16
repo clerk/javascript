@@ -67,7 +67,7 @@ const [open, setOpen] = useState(false);
 
 | Prop           | Type                                                       | Default | Description                                       |
 | -------------- | ---------------------------------------------------------- | ------- | ------------------------------------------------- |
-| `trigger`      | `(props: HTMLAttributes<HTMLElement>) => ReactNode`        | —       | Render prop for the trigger element               |
+| `trigger`      | `(props: HTMLAttributes<HTMLElement>) => ReactElement`     | —       | Render prop for the trigger element               |
 | `children`     | `ReactNode \| ((ctx: { close: () => void }) => ReactNode)` | —       | Dialog content; use render prop to access `close` |
 | `size`         | `'md' \| 'lg'`                                             | `'md'`  | Controls the popup width                          |
 | `open`         | `boolean`                                                  | —       | Controlled open state                             |
@@ -82,38 +82,15 @@ const [open, setOpen] = useState(false);
 | `Dialog.Title`       | `dialog-title`       | Heading; wired to the popup's `aria-labelledby`      |
 | `Dialog.Description` | `dialog-description` | Description; wired to the popup's `aria-describedby` |
 
-## Compound parts
+## Styled slots
 
-For custom layouts that need full control over structure, all underlying parts are accessible
-as static properties. Import `Dialog` and compose the compound directly:
+The Mosaic dialog exposes the following slots that can be styled via `appearance.elements`:
 
-```tsx
-<Dialog.Root open={open} onOpenChange={setOpen}>
-  <Dialog.Trigger render={props => <Button {...props}>Open</Button>} />
-  <Dialog.Portal>
-    <Dialog.Backdrop />
-    <Dialog.Viewport>
-      <Dialog.Popup>
-        <Dialog.Title>Confirm action</Dialog.Title>
-        <Dialog.Description>Are you sure?</Dialog.Description>
-        <Dialog.Close>Cancel</Dialog.Close>
-      </Dialog.Popup>
-    </Dialog.Viewport>
-  </Dialog.Portal>
-</Dialog.Root>
-```
-
-| Part                 | Slot                 | Description                                             |
-| -------------------- | -------------------- | ------------------------------------------------------- |
-| `Dialog.Root`        | none (context)       | Owns open state, ARIA ids, and the transition lifecycle |
-| `Dialog.Trigger`     | `dialog-trigger`     | Toggles the dialog open on click                        |
-| `Dialog.Portal`      | none (portal)        | Portals its children; renders nothing until mounted     |
-| `Dialog.Backdrop`    | `dialog-backdrop`    | Themed overlay behind the dialog                        |
-| `Dialog.Viewport`    | `dialog-viewport`    | Fixed centering container; owns scroll lock             |
-| `Dialog.Popup`       | `dialog-popup`       | The dialog surface (`role="dialog"`, focus-trapped)     |
-| `Dialog.Title`       | `dialog-title`       | Heading; wired to the popup's `aria-labelledby`         |
-| `Dialog.Description` | `dialog-description` | Description; wired to the popup's `aria-describedby`    |
-| `Dialog.Close`       | `dialog-close`       | Closes the dialog on click                              |
+| Slot              | Component | Description                                         |
+| ----------------- | --------- | --------------------------------------------------- |
+| `dialog-backdrop` | Backdrop  | Themed overlay behind the dialog                    |
+| `dialog-viewport` | Viewport  | Fixed centering container; owns scroll lock         |
+| `dialog-popup`    | Popup     | The dialog surface (`role="dialog"`, focus-trapped) |
 
 ## Styling
 

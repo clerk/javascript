@@ -21,14 +21,16 @@ export function withMosaicSlot<C extends React.ElementType>(
 ): React.ForwardRefExoticComponent<
   MosaicSlotProps<React.ComponentPropsWithoutRef<C>> & React.RefAttributes<React.ElementRef<C>>
 > {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const Wrapped = React.forwardRef<any, any>((props, ref) =>
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    React.createElement(Component as any, { ...props, ref }),
-  );
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Wrapped.displayName = `MosaicSlot(${(Component as any).displayName || (Component as any).name || 'Component'})`;
-  return Wrapped as React.ForwardRefExoticComponent<
-    MosaicSlotProps<React.ComponentPropsWithoutRef<C>> & React.RefAttributes<React.ElementRef<C>>
-  >;
+  type Props = MosaicSlotProps<React.ComponentPropsWithoutRef<C>>;
+  type Ref = React.ElementRef<C>;
+
+  const Wrapped = React.forwardRef<Ref, Props>((props, ref) => React.createElement(Component, { ...props, ref }));
+  const componentName =
+    typeof Component === 'string'
+      ? Component
+      : (Component as React.FunctionComponent).displayName ||
+        (Component as React.FunctionComponent).name ||
+        'Component';
+  Wrapped.displayName = `MosaicSlot(${componentName})`;
+  return Wrapped as React.ForwardRefExoticComponent<Props & React.RefAttributes<Ref>>;
 }

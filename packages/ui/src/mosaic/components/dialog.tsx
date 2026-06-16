@@ -123,7 +123,7 @@ const Popup = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<ty
 );
 
 interface DialogProps extends Pick<HeadlessDialogProps, 'open' | 'defaultOpen' | 'onOpenChange' | 'modal'> {
-  trigger: (props: Omit<React.HTMLAttributes<HTMLElement>, 'color'>) => React.ReactElement;
+  trigger: React.ComponentProps<typeof Primitive.Trigger>['render'];
   children: ReactNode | ((ctx: { close: () => void }) => ReactNode);
   size?: DialogVariantProps['size'];
 }

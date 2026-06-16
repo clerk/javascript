@@ -6,6 +6,11 @@ import { renderElement } from '@clerk/headless/utils';
 import type { RecipeVariantProps } from '../slot-recipe';
 import { defineSlotRecipe, useRecipe } from '../slot-recipe';
 
+/**
+ * Mosaic heading slot recipe.
+ * Provides variants for size ('xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl')
+ * and intent ('primary' | 'mutedForeground' | 'destructive').
+ */
 export const headingRecipe = defineSlotRecipe(theme => ({
   slot: 'heading',
   base: {
@@ -22,8 +27,11 @@ export const headingRecipe = defineSlotRecipe(theme => ({
     },
     intent: {
       primary: { color: theme.color.primary },
-      mutedForeground: { color: theme.color.mutedForeground },
+      primaryForeground: { color: theme.color.primaryForeground },
       destructive: { color: theme.color.destructive },
+      destructiveForeground: { color: theme.color.destructiveForeground },
+      muted: { color: theme.color.muted },
+      mutedForeground: { color: theme.color.mutedForeground },
     },
   },
   defaultVariants: { size: 'base', intent: 'primary' },
@@ -35,8 +43,14 @@ declare module '../registry' {
   }
 }
 
+/** Props for the Heading component combining h2 attributes with recipe variants. */
 export type HeadingProps = ComponentProps<'h2'> & RecipeVariantProps<typeof headingRecipe>;
 
+/**
+ * Themeable heading component.
+ * Renders as an h2 element by default, forwards refs, and supports
+ * size and intent variants plus Mosaic styling (sx prop and render callback).
+ */
 export const Heading = React.forwardRef<HTMLHeadingElement, HeadingProps>(function MosaicHeading(props, ref) {
   const { size, intent, sx, render, ...rest } = props;
   const { root } = useRecipe(headingRecipe, { variants: { size, intent }, sx });

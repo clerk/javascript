@@ -11,11 +11,14 @@ export const meta: StoryMeta = {
   styles: dialogRecipe,
 };
 
-export function Default({ size }: { size?: 'md' | 'lg' }) {
+const dialogTrigger = (props: React.HTMLAttributes<HTMLElement>) => <Button {...props}>Open dialog</Button>;
+
+export function Default(args: Record<string, unknown>) {
+  const { size } = args as { size?: 'md' | 'lg' };
   return (
     <Dialog
       size={size}
-      trigger={props => <Button {...props}>Open dialog</Button>}
+      trigger={dialogTrigger}
     >
       {({ close }) => (
         <>

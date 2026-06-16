@@ -84,7 +84,7 @@ export interface SlotRecipe<SlotKeys extends string, V> {
 
 // ─── Config Shapes ──────────────────────────────────────────────────────────────
 
-type SlotStyleMap = Record<string, StyleRule>;
+type SlotStyleMap<SlotKey extends string = string> = Partial<Record<SlotKey, StyleRule>>;
 
 interface MultiSlotConfig<S extends Record<string, { slot: string }>, V> {
   slots: S;
@@ -132,7 +132,7 @@ interface SlotRecipeConfig {
  */
 export function defineSlotRecipe<
   S extends Record<string, { slot: string }>,
-  V extends Record<string, Record<string, SlotStyleMap>> = Record<string, never>,
+  V extends Record<string, Record<string, SlotStyleMap<keyof S & string>>> = Record<string, never>,
 >(config: MultiSlotConfig<S, V> | ((theme: MosaicTheme) => MultiSlotConfig<S, V>)): SlotRecipe<keyof S & string, V>;
 export function defineSlotRecipe<V extends Record<string, Record<string, StyleRule>> = Record<string, never>>(
   config: SingleSlotConfig<V> | ((theme: MosaicTheme) => SingleSlotConfig<V>),

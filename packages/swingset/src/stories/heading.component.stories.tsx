@@ -10,13 +10,11 @@ export const meta: StoryMeta = {
   styles: headingRecipe,
 };
 
-export function Default({
-  size,
-  intent,
-}: {
-  size?: 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl';
-  intent?: 'primary' | 'mutedForeground' | 'destructive';
-}) {
+export function Default(args: Record<string, unknown>) {
+  const { size, intent } = args as {
+    size?: 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl';
+    intent?: 'primary' | 'primaryForeground' | 'destructive' | 'destructiveForeground' | 'muted' | 'mutedForeground';
+  };
   return (
     <Heading
       size={size}
