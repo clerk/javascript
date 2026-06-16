@@ -2,7 +2,7 @@ import React from 'react';
 
 import { useMosaicTheme } from '../MosaicProvider';
 import { Box as PrimitiveBox } from '../primitives/box';
-import { Dialog as Primitive } from '../primitives/dialog';
+import { Dialog as PrimitiveDialog } from '../primitives/dialog';
 import type { SxProp } from '../slot-recipe';
 import { defineSlotRecipe, useRecipe } from '../slot-recipe';
 import { Button, type ButtonProps } from './button';
@@ -169,11 +169,11 @@ declare module '../registry' {
   }
 }
 
-const Trigger = React.forwardRef<HTMLButtonElement, React.ComponentPropsWithoutRef<typeof Primitive.Trigger>>(
+const Trigger = React.forwardRef<HTMLButtonElement, React.ComponentPropsWithoutRef<typeof PrimitiveDialog.Trigger>>(
   function DialogTrigger(props, ref) {
     const { trigger } = useRecipe(dialogRecipe);
     return (
-      <Primitive.Trigger
+      <PrimitiveDialog.Trigger
         ref={ref}
         {...props}
         {...trigger}
@@ -182,11 +182,11 @@ const Trigger = React.forwardRef<HTMLButtonElement, React.ComponentPropsWithoutR
   },
 );
 
-const Backdrop = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<typeof Primitive.Backdrop>>(
+const Backdrop = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<typeof PrimitiveDialog.Backdrop>>(
   function DialogBackdrop(props, ref) {
     const { backdrop } = useRecipe(dialogRecipe);
     return (
-      <Primitive.Backdrop
+      <PrimitiveDialog.Backdrop
         ref={ref}
         {...props}
         {...backdrop}
@@ -195,11 +195,11 @@ const Backdrop = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef
   },
 );
 
-const Viewport = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<typeof Primitive.Viewport>>(
+const Viewport = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<typeof PrimitiveDialog.Viewport>>(
   function DialogViewport(props, ref) {
     const { viewport } = useRecipe(dialogRecipe);
     return (
-      <Primitive.Viewport
+      <PrimitiveDialog.Viewport
         ref={ref}
         {...props}
         {...viewport}
@@ -208,11 +208,11 @@ const Viewport = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef
   },
 );
 
-const Popup = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<typeof Primitive.Popup>>(
+const Popup = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<typeof PrimitiveDialog.Popup>>(
   function DialogPopup(props, ref) {
     const { popup } = useRecipe(dialogRecipe);
     return (
-      <Primitive.Popup
+      <PrimitiveDialog.Popup
         ref={ref}
         {...props}
         {...popup}
@@ -221,11 +221,11 @@ const Popup = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<ty
   },
 );
 
-const Title = React.forwardRef<HTMLHeadingElement, React.ComponentPropsWithoutRef<typeof Primitive.Title>>(
+const Title = React.forwardRef<HTMLHeadingElement, React.ComponentPropsWithoutRef<typeof PrimitiveDialog.Title>>(
   function DialogTitle(props, ref) {
     const { title } = useRecipe(dialogRecipe);
     return (
-      <Primitive.Title
+      <PrimitiveDialog.Title
         ref={ref}
         {...props}
         {...title}
@@ -236,11 +236,11 @@ const Title = React.forwardRef<HTMLHeadingElement, React.ComponentPropsWithoutRe
 
 const Description = React.forwardRef<
   HTMLParagraphElement,
-  React.ComponentPropsWithoutRef<typeof Primitive.Description>
+  React.ComponentPropsWithoutRef<typeof PrimitiveDialog.Description>
 >(function DialogDescription(props, ref) {
   const { description } = useRecipe(dialogRecipe);
   return (
-    <Primitive.Description
+    <PrimitiveDialog.Description
       ref={ref}
       {...props}
       {...description}
@@ -248,11 +248,11 @@ const Description = React.forwardRef<
   );
 });
 
-const Close = React.forwardRef<HTMLButtonElement, React.ComponentPropsWithoutRef<typeof Primitive.Close>>(
+const Close = React.forwardRef<HTMLButtonElement, React.ComponentPropsWithoutRef<typeof PrimitiveDialog.Close>>(
   function DialogClose(props, ref) {
     const { close } = useRecipe(dialogRecipe);
     return (
-      <Primitive.Close
+      <PrimitiveDialog.Close
         ref={ref}
         {...props}
         {...close}
@@ -373,7 +373,7 @@ function DialogComponent(props: DialogProps) {
             </Button>
           ) : (
             // No handler → the secondary action simply dismisses the dialog.
-            <Primitive.Close
+            <PrimitiveDialog.Close
               render={(p: Omit<React.HTMLAttributes<HTMLElement>, 'color'>) => (
                 <Button
                   {...p}
@@ -400,27 +400,27 @@ function DialogComponent(props: DialogProps) {
   };
 
   return (
-    <Primitive.Root
+    <PrimitiveDialog.Root
       open={open}
       defaultOpen={defaultOpen}
       onOpenChange={onOpenChange}
       modal={modal}
     >
       {trigger ? <Trigger render={trigger} /> : null}
-      <Primitive.Portal>
-        <Primitive.Backdrop {...slots.backdrop} />
-        <Primitive.Viewport {...slots.viewport}>
-          <Primitive.Popup
+      <PrimitiveDialog.Portal>
+        <PrimitiveDialog.Backdrop {...slots.backdrop} />
+        <PrimitiveDialog.Viewport {...slots.viewport}>
+          <PrimitiveDialog.Popup
             {...slots.popup}
             css={sx ? { ...slots.popup.css, ...(typeof sx === 'function' ? sx(theme) : sx) } : slots.popup.css}
           >
             {close ? (
-              <Primitive.Close
+              <PrimitiveDialog.Close
                 {...slots.dismiss}
                 aria-label='Close'
               >
                 ✕
-              </Primitive.Close>
+              </PrimitiveDialog.Close>
             ) : null}
             {progress ? (
               <PrimitiveBox {...slots.progress}>
@@ -433,16 +433,16 @@ function DialogComponent(props: DialogProps) {
                 ))}
               </PrimitiveBox>
             ) : null}
-            {header != null ? <Primitive.Title {...slots.title}>{header}</Primitive.Title> : null}
+            {header != null ? <PrimitiveDialog.Title {...slots.title}>{header}</PrimitiveDialog.Title> : null}
             {description != null ? (
-              <Primitive.Description {...slots.description}>{description}</Primitive.Description>
+              <PrimitiveDialog.Description {...slots.description}>{description}</PrimitiveDialog.Description>
             ) : null}
             {children != null ? <PrimitiveBox {...slots.content}>{children}</PrimitiveBox> : null}
             {actions != null ? <PrimitiveBox {...slots.actions}>{renderActions()}</PrimitiveBox> : null}
-          </Primitive.Popup>
-        </Primitive.Viewport>
-      </Primitive.Portal>
-    </Primitive.Root>
+          </PrimitiveDialog.Popup>
+        </PrimitiveDialog.Viewport>
+      </PrimitiveDialog.Portal>
+    </PrimitiveDialog.Root>
   );
 }
 
@@ -451,9 +451,9 @@ function DialogComponent(props: DialogProps) {
  * composable parts are attached for cases the high-level API doesn't cover.
  */
 export const Dialog: typeof DialogComponent & {
-  Root: typeof Primitive.Root;
+  Root: typeof PrimitiveDialog.Root;
   Trigger: typeof Trigger;
-  Portal: typeof Primitive.Portal;
+  Portal: typeof PrimitiveDialog.Portal;
   Backdrop: typeof Backdrop;
   Viewport: typeof Viewport;
   Popup: typeof Popup;
@@ -461,9 +461,9 @@ export const Dialog: typeof DialogComponent & {
   Description: typeof Description;
   Close: typeof Close;
 } = Object.assign(DialogComponent, {
-  Root: Primitive.Root,
+  Root: PrimitiveDialog.Root,
   Trigger,
-  Portal: Primitive.Portal,
+  Portal: PrimitiveDialog.Portal,
   Backdrop,
   Viewport,
   Popup,
