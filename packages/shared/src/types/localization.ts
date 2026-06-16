@@ -1381,6 +1381,8 @@ export type __internal_LocalizationResource = {
         badge__verified: LocalizationValue;
         badge__unverified: LocalizationValue;
         verifiedAtLabel: LocalizationValue<'date'>;
+        removeButtonTooltip__lastVerifiedDomain: LocalizationValue;
+        removeButtonTooltip__lastVerifiedDomainActive: LocalizationValue;
         txtRecord: {
           instructions: LocalizationValue;
           typeLabel: LocalizationValue;

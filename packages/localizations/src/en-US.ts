@@ -282,6 +282,8 @@ export const enUS: LocalizationResource = {
         badge__verified: 'Verified',
         badge__unverified: 'Unverified',
         verifiedAtLabel: "Verified on {{ date | shortDate('en-US') }}",
+        removeButtonTooltip__lastVerifiedDomain: 'At least one verified domain is required to set up SSO.',
+        removeButtonTooltip__lastVerifiedDomainActive: 'At least one verified domain is required to keep SSO enabled.',
         txtRecord: {
           instructions: "Add this TXT record to your DNS provider. We'll verify automatically once the record is live.",
           typeLabel: 'Type',

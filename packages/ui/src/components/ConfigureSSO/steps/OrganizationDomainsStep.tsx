@@ -23,6 +23,7 @@ import { ClipboardInput } from '@/elements/ClipboardInput';
 import { useCardState } from '@/elements/contexts';
 import { Field } from '@/elements/FieldControl';
 import { Form } from '@/elements/Form';
+import { Tooltip } from '@/elements/Tooltip';
 import { Checkmark, Clipboard, Close } from '@/icons';
 import { common } from '@/styledSystem';
 import { useFormControl } from '@/ui/utils/useFormControl';
@@ -75,6 +76,15 @@ export const OrganizationDomainsStep = (): JSX.Element => {
 
   const hasAllDomainsVerified = areAllOrganizationDomainsVerified(organizationDomains);
 
+  // A connection needs at least one verified domain to point at, so the last
+  // remaining verified domain cannot be removed while a connection exists
+  const verifiedDomainCount =
+    organizationDomains?.filter(domain => domain.ownershipVerification?.status === 'verified').length ?? 0;
+  const lockLastVerifiedDomain = Boolean(enterpriseConnection);
+  const lastVerifiedDomainTooltip = enterpriseConnection?.active
+    ? localizationKeys('configureSSO.organizationDomainsStep.domainCard.removeButtonTooltip__lastVerifiedDomainActive')
+    : localizationKeys('configureSSO.organizationDomainsStep.domainCard.removeButtonTooltip__lastVerifiedDomain');
+
   return (
     <Flow.Part part='organizationDomains'>
       <Step
@@ -122,13 +132,20 @@ export const OrganizationDomainsStep = (): JSX.Element => {
                   ...common.unstyledScrollbar(t),
                 })}
               >
-                {organizationDomains.map(domain => (
-                  <DomainCard
-                    key={domain.id}
-                    domain={domain}
-                    onRemove={() => setDomainToRemove(domain)}
-                  />
-                ))}
+                {organizationDomains.map(domain => {
+                  const isVerified = domain.ownershipVerification?.status === 'verified';
+                  const isLastVerifiedDomain = isVerified && verifiedDomainCount === 1;
+                  const isRemoveDisabled = lockLastVerifiedDomain && isLastVerifiedDomain;
+                  return (
+                    <DomainCard
+                      key={domain.id}
+                      domain={domain}
+                      onRemove={() => setDomainToRemove(domain)}
+                      isRemoveDisabled={isRemoveDisabled}
+                      removeDisabledTooltip={lastVerifiedDomainTooltip}
+                    />
+                  );
+                })}
               </Col>
             )}
           </Step.Section>
@@ -319,9 +336,13 @@ const DomainSuggestion = ({ onSubmit }: { onSubmit: (domain: string) => Promise<
 const DomainCard = ({
   domain,
   onRemove,
+  isRemoveDisabled = false,
+  removeDisabledTooltip,
 }: {
   domain: OrganizationDomainResource;
   onRemove: () => void;
+  isRemoveDisabled?: boolean;
+  removeDisabledTooltip?: ReturnType<typeof localizationKeys>;
 }): JSX.Element | null => {
   if (!domain.name) {
     return null;
@@ -330,6 +351,23 @@ const DomainCard = ({
   const ownershipVerification = domain.ownershipVerification;
   const isVerified = ownershipVerification?.status === 'verified';
   const cardId = isVerified ? 'verified' : 'unverified';
+
+  const removeButton = (
+    <Button
+      elementDescriptor={descriptors.configureSSOVerifyDomainCardRemoveButton}
+      variant='ghost'
+      colorScheme='neutral'
+      aria-label='Remove domain'
+      onClick={onRemove}
+      isDisabled={isRemoveDisabled}
+      sx={t => ({ flexShrink: 0, padding: t.space.$1 })}
+    >
+      <Icon
+        icon={Close}
+        sx={t => ({ width: t.sizes.$4, height: t.sizes.$4, color: t.colors.$colorMutedForeground })}
+      />
+    </Button>
+  );
 
   return (
     <Col
@@ -384,19 +422,14 @@ const DomainCard = ({
           )}
         </Flex>
 
-        <Button
-          elementDescriptor={descriptors.configureSSOVerifyDomainCardRemoveButton}
-          variant='ghost'
-          colorScheme='neutral'
-          aria-label='Remove domain'
-          onClick={onRemove}
-          sx={t => ({ flexShrink: 0, padding: t.space.$1 })}
-        >
-          <Icon
-            icon={Close}
-            sx={t => ({ width: t.sizes.$4, height: t.sizes.$4, color: t.colors.$colorMutedForeground })}
-          />
-        </Button>
+        {isRemoveDisabled && removeDisabledTooltip ? (
+          <Tooltip.Root>
+            <Tooltip.Trigger>{removeButton}</Tooltip.Trigger>
+            <Tooltip.Content text={removeDisabledTooltip} />
+          </Tooltip.Root>
+        ) : (
+          removeButton
+        )}
       </Flex>
 
       <Box sx={{ overflow: 'hidden' }}>
