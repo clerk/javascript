@@ -137,12 +137,19 @@ const OrganizationProfileSection = () => {
 const OrganizationDomainsSection = () => {
   const { organizationSettings } = useEnvironment();
   const { organization, domains } = useOrganization();
+  const canManageDomains = useProtect({ permission: 'org:sys_domains:manage' });
 
   if (!organizationSettings || !organization) {
     return null;
   }
 
-  if (!organizationSettings.domains.enabled || !domains?.data?.length) {
+  if (!organizationSettings.domains.enabled) {
+    return null;
+  }
+
+  // Hide the section when there are no domains to show and the user cannot add
+  // any
+  if (!domains?.data?.length && !canManageDomains) {
     return null;
   }
 
