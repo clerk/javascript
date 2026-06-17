@@ -16,6 +16,9 @@ Pod::Spec.new do |s|
   s.static_framework = true
 
   s.dependency 'GoogleSignIn', '~> 9.0'
+  # AppCheckCore 11.3.0 introduces a RecaptchaInterop dependency that fails
+  # static CocoaPods integration unless apps opt into modular headers.
+  s.dependency 'AppCheckCore', '< 11.3.0'
 
   # Only include the Google Sign-In module files
   s.source_files = 'ClerkGoogleSignInModule.swift', 'ClerkGoogleSignInModule.m'
