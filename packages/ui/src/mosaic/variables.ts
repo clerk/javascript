@@ -11,6 +11,7 @@ export const defaultMosaicVariables = Object.freeze({
     destructiveForeground: 'oklch(0.985 0 0)',
     muted: 'light-dark(oklch(0.97 0 0), oklch(0.269 0 0))',
     mutedForeground: 'light-dark(oklch(0.556 0 0), oklch(0.708 0 0))',
+    border: `light-dark(oklch(0.922 0 0), oklch(1 0 0 / 10%))`,
   },
   spacing: '0.25rem',
   rounded: {

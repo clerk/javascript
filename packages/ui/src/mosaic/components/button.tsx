@@ -16,7 +16,7 @@ export const buttonRecipe = defineSlotRecipe(theme => ({
     fontWeight: 500,
     ...theme.text('sm'),
     cursor: 'pointer',
-    border: 'none',
+    border: '1px solid transparent',
     transition: 'background-color 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s',
     _focusVisible: {
       outline: `2px solid ${theme.alpha('primary', 50)}`,
@@ -25,26 +25,108 @@ export const buttonRecipe = defineSlotRecipe(theme => ({
     _disabled: { opacity: 0.5, cursor: 'not-allowed', pointerEvents: 'none' },
   },
   variants: {
-    color: {
-      primary: {
+    intent: {
+      primary: {},
+      destructive: {},
+    },
+    variant: {
+      filled: {},
+      outline: {},
+      ghost: {},
+    },
+    size: {
+      sm: { padding: `${theme.spacing(0.2)} ${theme.spacing(2)}`, ...theme.text('xs') },
+      md: { padding: `${theme.spacing(2)} ${theme.spacing(4)}`, ...theme.text('sm') },
+    },
+    shape: {
+      default: {},
+      square: {
+        paddingInline: 0,
+        paddingBlock: 0,
+        aspectRatio: '1 / 1',
+        borderRadius: theme.rounded.md,
+      },
+      circle: {
+        paddingInline: 0,
+        paddingBlock: 0,
+        aspectRatio: '1 / 1',
+        borderRadius: theme.rounded.full,
+      },
+    },
+  },
+  compoundVariants: [
+    {
+      intent: 'primary',
+      variant: 'filled',
+      css: {
         backgroundColor: theme.color.primary,
         color: theme.color.primaryForeground,
         _hover: { backgroundColor: theme.mix('primary', 'primaryForeground', 12) },
         _active: { backgroundColor: theme.mix('primary', 'primaryForeground', 24) },
       },
-      destructive: {
+    },
+    {
+      intent: 'destructive',
+      variant: 'filled',
+      css: {
         backgroundColor: theme.color.destructive,
         color: theme.color.destructiveForeground,
         _hover: { backgroundColor: theme.mix('destructive', 'destructiveForeground', 12) },
         _active: { backgroundColor: theme.mix('destructive', 'destructiveForeground', 24) },
       },
     },
-    size: {
-      sm: { padding: `${theme.spacing(0.2)} ${theme.spacing(2)}`, ...theme.text('xs') },
-      md: { padding: `${theme.spacing(2)} ${theme.spacing(4)}`, ...theme.text('sm') },
+    {
+      intent: 'primary',
+      variant: 'outline',
+      css: {
+        backgroundColor: 'transparent',
+        borderColor: theme.color.border,
+        color: theme.color.primary,
+        // TODO
+        _hover: {},
+        _active: {},
+      },
     },
-  },
-  defaultVariants: { color: 'primary', size: 'md' },
+    {
+      intent: 'destructive',
+      variant: 'outline',
+      css: {
+        backgroundColor: 'transparent',
+        borderColor: theme.color.border,
+        color: theme.color.destructive,
+        // TODO
+        _hover: {},
+        _active: {},
+      },
+    },
+    {
+      intent: 'primary',
+      variant: 'ghost',
+      css: {
+        backgroundColor: 'transparent',
+        color: theme.color.primary,
+        // TODO
+        _hover: {},
+        _active: {},
+      },
+    },
+    {
+      intent: 'destructive',
+      variant: 'ghost',
+      css: {
+        backgroundColor: 'transparent',
+        color: theme.color.destructive,
+        // TODO
+        _hover: {},
+        _active: {},
+      },
+    },
+    { shape: 'square', size: 'sm', css: { width: theme.spacing(6), height: theme.spacing(6) } },
+    { shape: 'square', size: 'md', css: { width: theme.spacing(9), height: theme.spacing(9) } },
+    { shape: 'circle', size: 'sm', css: { width: theme.spacing(6), height: theme.spacing(6) } },
+    { shape: 'circle', size: 'md', css: { width: theme.spacing(9), height: theme.spacing(9) } },
+  ],
+  defaultVariants: { intent: 'primary', size: 'md', variant: 'filled', shape: 'default' },
 }));
 
 declare module '../registry' {
@@ -53,12 +135,15 @@ declare module '../registry' {
   }
 }
 
-export type ButtonProps = Omit<React.ComponentPropsWithRef<'button'>, 'color'> &
-  RecipeVariantProps<typeof buttonRecipe>;
+export type ButtonProps = React.ComponentPropsWithRef<'button'> & RecipeVariantProps<typeof buttonRecipe>;
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function MosaicButton(props, ref) {
-  const { color, size, disabled, sx, children, ...rest } = props;
-  const { root } = useRecipe(buttonRecipe, { variants: { color, size }, state: { disabled: !!disabled }, sx });
+  const { intent, variant, size, shape, disabled, sx, children, ...rest } = props;
+  const { root } = useRecipe(buttonRecipe, {
+    variants: { intent, variant, size, shape },
+    state: { disabled: !!disabled },
+    sx,
+  });
   return (
     <button
       ref={ref}
