@@ -5,6 +5,7 @@ import { renderElement } from '@clerk/headless/utils';
 
 import type { RecipeVariantProps } from '../slot-recipe';
 import { defineSlotRecipe, useRecipe } from '../slot-recipe';
+import { useContextProps } from '../utils/context';
 
 /**
  * Mosaic text slot recipe.
@@ -44,13 +45,15 @@ declare module '../registry' {
 /** Props for the Text component combining p element attributes with recipe variants. */
 export type TextProps = ComponentProps<'p'> & RecipeVariantProps<typeof textRecipe>;
 
+export const TextContext = React.createContext<Partial<TextProps> | null>(null);
+
 /**
  * Themeable text component.
  * Renders as a p element by default, forwards refs, and supports
  * size and intent variants plus Mosaic styling (sx prop and render callback).
  */
-export const Text = React.forwardRef<HTMLParagraphElement, TextProps>(function MosaicText(props, ref) {
-  const { size, intent, sx, render, ...rest } = props;
+export const Text = React.forwardRef<HTMLParagraphElement, TextProps>(function MosaicText(rawProps, ref) {
+  const { size, intent, sx, render, ...rest } = useContextProps(rawProps, TextContext);
   const { root } = useRecipe(textRecipe, { variants: { size, intent }, sx });
   if (render) {
     return renderElement({ defaultTagName: 'p', render, props: { ref, ...root, ...rest } as Record<string, unknown> });

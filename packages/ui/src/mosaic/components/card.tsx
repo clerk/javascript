@@ -2,6 +2,7 @@ import React from 'react';
 
 import type { RecipeVariantProps } from '../slot-recipe';
 import { defineSlotRecipe, useRecipe } from '../slot-recipe';
+import { TextContext } from './text';
 
 export const cardRecipe = defineSlotRecipe(theme => ({
   slots: {
@@ -79,11 +80,13 @@ const Header = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<'
   const variantProps = React.useContext(CardVariantContext);
   const { header } = useRecipe(cardRecipe, { variants: variantProps });
   return (
-    <div
-      ref={ref}
-      {...header}
-      {...props}
-    />
+    <TextContext.Provider value={{ intent: 'mutedForeground' }}>
+      <div
+        ref={ref}
+        {...header}
+        {...props}
+      />
+    </TextContext.Provider>
   );
 });
 
