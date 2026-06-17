@@ -17,7 +17,34 @@ export * from './MachineApi';
 export * from './M2MTokenApi';
 export * from './JwksApi';
 export * from './JwtTemplatesApi';
-export * from './OrganizationApi';
+// `GetOrganizationMembershipListParams` and `GetOrganizationInvitationListParams` are defined on
+// both `UserApi` (user-scoped) and `OrganizationApi` (org-scoped) with different shapes.
+// UserApi's variants remain the canonical public exports through this barrel; OrganizationApi's
+// variants are reachable via direct import from `./OrganizationApi`, and typedoc still resolves
+// them locally on the class methods.
+export { OrganizationAPI } from './OrganizationApi';
+export type {
+  CreateBulkOrganizationInvitationParams,
+  CreateOrganizationDomainParams,
+  CreateOrganizationInvitationParams,
+  CreateOrganizationMembershipParams,
+  CreateParams,
+  DeleteOrganizationDomainParams,
+  DeleteOrganizationMembershipParams,
+  GetInstanceOrganizationMembershipListParams,
+  GetOrganizationDomainListParams,
+  GetOrganizationInvitationParams,
+  GetOrganizationListParams,
+  GetOrganizationParams,
+  MetadataParams,
+  RevokeOrganizationInvitationParams,
+  UpdateLogoParams,
+  UpdateMetadataParams,
+  UpdateOrganizationDomainParams,
+  UpdateOrganizationMembershipMetadataParams,
+  UpdateOrganizationMembershipParams,
+  UpdateParams,
+} from './OrganizationApi';
 export * from './OrganizationPermissionApi';
 export * from './OrganizationRoleApi';
 export * from './OAuthApplicationsApi';
@@ -33,8 +60,3 @@ export * from './TestingTokenApi';
 export * from './UserApi';
 export * from './WaitlistEntryApi';
 export * from './WebhookApi';
-
-// Disambiguate names that exist in both UserApi (user-scoped) and OrganizationApi
-// (org-scoped) — the UserApi versions remain the canonical public exports; the
-// org-scoped variants stay reachable via direct import from './OrganizationApi'.
-export type { GetOrganizationInvitationListParams, GetOrganizationMembershipListParams } from './UserApi';
