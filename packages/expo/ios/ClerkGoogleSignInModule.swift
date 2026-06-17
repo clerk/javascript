@@ -32,8 +32,8 @@ public class ClerkGoogleSignInModule: Module {
   // MARK: - configure
 
   private func configure(_ params: [String: Any?]) {
-    let webClientId = params["webClientId"] as? String ?? ""
-    let iosClientId = params["iosClientId"] as? String
+    let webClientId = self.nonEmptyClientId(params["webClientId"] as? String)
+    let iosClientId = self.nonEmptyClientId(params["iosClientId"] as? String)
     self.clientId = iosClientId ?? webClientId
     self.hostedDomain = params["hostedDomain"] as? String
 
@@ -59,7 +59,7 @@ public class ClerkGoogleSignInModule: Module {
       return
     }
 
-    let filterByAuthorized = params?["filterByAuthorizedAccounts"] as? Bool ?? false
+    let filterByAuthorized = params?["filterByAuthorizedAccounts"] as? Bool ?? true
     let hint: String? = filterByAuthorized
       ? GIDSignIn.sharedInstance.currentUser?.profile?.email
       : nil
@@ -136,6 +136,14 @@ public class ClerkGoogleSignInModule: Module {
   }
 
   // MARK: - Helpers
+
+  private func nonEmptyClientId(_ value: String?) -> String? {
+    guard let value = value?.trimmingCharacters(in: .whitespacesAndNewlines) else {
+      return nil
+    }
+
+    return value.isEmpty ? nil : value
+  }
 
   private func getPresentingViewController() -> UIViewController? {
     guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
