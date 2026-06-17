@@ -149,7 +149,7 @@ app.whenReady().then(() => {
 ```
 
 > [!NOTE]
-> Loading the renderer from a dev server (such as Vite) requires looser rules for HMR: add `'unsafe-eval'` to `script-src` and your dev server's origin to `connect-src` (for example, `ws://localhost:5173 http://localhost:5173`). Many apps skip CSP during development and apply it only to packaged builds.
+> Loading the renderer from a dev server (such as Vite) requires looser rules for HMR: add `'unsafe-eval'` to `script-src` and your dev server's origin to `connect-src` (for example, `ws://localhost:<port> http://localhost:<port>`). Many apps skip CSP during development and apply it only to packaged builds.
 
 ## Support
 
