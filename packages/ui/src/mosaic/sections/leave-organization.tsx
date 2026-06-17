@@ -67,7 +67,7 @@ export function LeaveOrganization() {
           <Destructive
             trigger={props => (
               <Button
-                color='destructive'
+                intent='destructive'
                 {...props}
                 sx={{
                   flexShrink: 0,

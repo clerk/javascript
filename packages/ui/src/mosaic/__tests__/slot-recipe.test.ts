@@ -19,7 +19,7 @@ const buttonRecipe = defineSlotRecipe({
   variants: {
     color: { primary: { color: 'white' }, danger: { color: 'red' } },
     size: { sm: { fontSize: 12 }, md: { fontSize: 14 } },
-    loading: { false: null, true: { cursor: 'wait' } },
+    loading: { false: {}, true: { cursor: 'wait' } },
   },
   compoundVariants: [{ color: 'danger', size: 'sm', css: { fontWeight: 700 } }],
   defaultVariants: { color: 'primary', size: 'md' },
@@ -242,6 +242,46 @@ describe('type inference', () => {
       useRecipe(buttonRecipe, { variants: { color: 'nope' } });
       // @ts-expect-error `loading` is a boolean variant, not a string
       useRecipe(buttonRecipe, { variants: { loading: 'true' } });
+    };
+    expect(true).toBe(true);
+  });
+
+  it('defaultVariants only accepts valid variant keys and values', () => {
+    () => {
+      defineSlotRecipe({
+        slot: 'button',
+        variants: { color: { primary: {}, danger: {} } },
+        // @ts-expect-error 'nope' is not a valid color value
+        defaultVariants: { color: 'nope' },
+      });
+      defineSlotRecipe({
+        slot: 'button',
+        variants: { color: { primary: {}, danger: {} } },
+        // @ts-expect-error 'unknown' is not a declared variant axis
+        defaultVariants: { unknown: 'primary' },
+      });
+    };
+    expect(true).toBe(true);
+  });
+
+  it('compoundVariants entries only accept valid variant keys and values', () => {
+    () => {
+      defineSlotRecipe({
+        slot: 'button',
+        variants: { color: { primary: {}, danger: {} }, size: { sm: {}, md: {} } },
+        compoundVariants: [
+          // @ts-expect-error 'nope' is not a valid color value
+          { color: 'nope', css: { fontWeight: 700 } },
+        ],
+      });
+      defineSlotRecipe({
+        slot: 'button',
+        variants: { color: { primary: {}, danger: {} } },
+        compoundVariants: [
+          // @ts-expect-error 'unknown' is not a declared variant axis
+          { unknown: 'primary', css: {} },
+        ],
+      });
     };
     expect(true).toBe(true);
   });

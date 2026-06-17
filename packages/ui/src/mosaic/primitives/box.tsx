@@ -1,4 +1,4 @@
-import { type ComponentProps, renderElement } from '@clerk/headless/utils';
+import { type ComponentProps, type RenderProp, renderElement } from '@clerk/headless/utils';
 import React from 'react';
 
 /**
@@ -6,10 +6,14 @@ import React from 'react';
  * styles of its own. The mosaic styled layer (`components/box.tsx`) passes `css` at the JSX
  * boundary, where Emotion turns it into a `className` that this part forwards to its rendered
  * DOM node — the same boundary the `withMosaicSlot` bridge relies on.
+ *
+ * Accepts render prop with any element type — styling passes along regardless of what's rendered.
  */
-export type BoxProps = ComponentProps<'div'>;
+export type BoxProps = Omit<ComponentProps<'div'>, 'render'> & {
+  render?: RenderProp<React.HTMLAttributes<HTMLElement>>;
+};
 
-export const Box = React.forwardRef<HTMLDivElement, BoxProps>(function Box(props, ref) {
+export const Box = React.forwardRef<HTMLElement, BoxProps>(function Box(props, ref) {
   const { render, ...rest } = props;
   return renderElement({ defaultTagName: 'div', render, props: { ...rest, ref } });
 });

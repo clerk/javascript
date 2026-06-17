@@ -11,6 +11,12 @@ import { Default as DestructiveDefault, meta as destructiveMeta } from '../stori
 import { Default as DialogDefault, meta as dialogComponentMeta } from '../stories/dialog.component.stories';
 import { meta as dialogMeta } from '../stories/dialog.stories';
 import {
+  Default as HeadingDefault,
+  Intents as HeadingIntents,
+  meta as headingMeta,
+  Sizes as HeadingSizes,
+} from '../stories/heading.stories';
+import {
   Default,
   Disabled as InputDisabled,
   Invalid,
@@ -34,6 +40,12 @@ import { meta as popoverMeta } from '../stories/popover.stories';
 import { meta as selectMeta } from '../stories/select.stories';
 import { Default as TabsComponentDefault, meta as tabsComponentMeta } from '../stories/tabs.component.stories';
 import { meta as tabsMeta } from '../stories/tabs.stories';
+import {
+  Default as TextDefault,
+  Intents as TextIntents,
+  meta as textMeta,
+  Sizes as TextSizes,
+} from '../stories/text.stories';
 import { meta as tooltipMeta } from '../stories/tooltip.stories';
 import { toSlug } from './slug';
 import type { StoryModule } from './types';
@@ -53,7 +65,16 @@ const inputModule: StoryModule = { meta: inputMeta, Default, Sizes: InputSizes, 
 
 const dialogComponentModule: StoryModule = { meta: dialogComponentMeta, Default: DialogDefault };
 
+const headingModule: StoryModule = {
+  meta: headingMeta,
+  Default: HeadingDefault,
+  Sizes: HeadingSizes,
+  Intents: HeadingIntents,
+};
+
 const tabsComponentModule: StoryModule = { meta: tabsComponentMeta, Default: TabsComponentDefault };
+
+const textModule: StoryModule = { meta: textMeta, Default: TextDefault, Sizes: TextSizes, Intents: TextIntents };
 
 // Headless primitives carry just `meta` (no story functions). Like every component
 // they're documented as a single overview page; their live demos come from `<Story>` /
@@ -82,7 +103,9 @@ export const registry: StoryModule[] = [
   buttonModule,
   inputModule,
   dialogComponentModule,
+  headingModule,
   tabsComponentModule,
+  textModule,
   // Primitives — alphabetical within the group.
   accordionModule,
   autocompleteModule,
