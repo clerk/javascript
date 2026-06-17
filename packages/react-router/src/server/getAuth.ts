@@ -6,9 +6,8 @@ import {
 import type { PendingSessionOptions } from '@clerk/shared/types';
 import type { LoaderFunctionArgs } from 'react-router';
 
-import { IsOptIntoMiddleware } from '../server/utils';
 import { noLoaderArgsPassedInGetAuth } from '../utils/errors';
-import { authFnContext } from './clerkMiddleware';
+import { authenticateFromRequest } from './clerkMiddleware';
 
 type GetAuthOptions = PendingSessionOptions & { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] };
 
@@ -22,15 +21,12 @@ export const getAuth: GetAuthFn<LoaderFunctionArgs, true> = (async (
 
   const { acceptsToken, treatPendingAsSignedOut } = opts || {};
 
-  const authObjectFn = IsOptIntoMiddleware(args.context) && args.context.get(authFnContext);
-  if (!authObjectFn) {
-    throw new Error(
-      'Clerk: clerkMiddleware() not detected. Make sure you have installed the clerkMiddleware in your root route.',
-    );
-  }
+  // Re-derive auth from this request rather than reading a cached value, so a
+  // shared context can never return another user.
+  const requestState = await authenticateFromRequest(args, 'any');
 
   return getAuthObjectForAcceptedToken({
-    authObject: authObjectFn({ treatPendingAsSignedOut }),
+    authObject: requestState.toAuth({ treatPendingAsSignedOut }),
     acceptsToken,
   });
 }) as GetAuthFn<LoaderFunctionArgs, true>;
