@@ -1,10 +1,11 @@
 import { useOrganization } from '@clerk/shared/react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 import { Header } from '@/ui/elements/Header';
 import { ProfileCard } from '@/ui/elements/ProfileCard';
 
-import { Col, descriptors, localizationKeys } from '../../customizables';
+import { Col, descriptors, Icon, localizationKeys, SimpleButton, Text } from '../../customizables';
+import { ChevronLeft } from '../../icons';
 import { ConfigureSSOProtect } from '../ConfigureSSO/ConfigureSSO';
 import { ConfigureSSOSkeleton } from '../ConfigureSSO/ConfigureSSOSkeleton';
 import { ConfigureSSOWizard } from '../ConfigureSSO/ConfigureSSOWizard';
@@ -26,24 +27,52 @@ export const OrganizationSecurityPage = ({ contentRef }: OrganizationSecurityPag
   return <OrganizationSecurityPageContent contentRef={contentRef} />;
 };
 
-/** Separate from the page so the connection hook only runs behind the organization check. */
 const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPageProps) => {
   const {
-    isLoading,
     organization,
+    isLoading,
     enterpriseConnection,
     organizationEnterpriseConnection,
     testRuns,
-    mutations,
-    primaryEmailAddress,
+    enterpriseConnectionMutations,
+    organizationDomains,
+    organizationDomainMutations,
   } = useOrganizationEnterpriseConnection();
 
   const [view, setView] = useState<'overview' | 'wizard'>('overview');
+  const [forceFirstStep, setForceFirstStep] = useState(false);
 
-  // Gate loading above the provider so the context never observes a loading state.
+  const exitWizard = () => setView('overview');
+
+  const openWizard = (forceInitialStep = false) => {
+    setForceFirstStep(forceInitialStep);
+    setView('wizard');
+  };
+
   if (isLoading) {
     return <ConfigureSSOSkeleton />;
   }
+
+  const backControl = (
+    <SimpleButton
+      elementDescriptor={descriptors.configureSSOHeaderBackButton}
+      variant='unstyled'
+      onClick={exitWizard}
+      sx={t => ({
+        gap: t.space.$1,
+        padding: 0,
+        color: t.colors.$colorMutedForeground,
+        '&:hover': { color: t.colors.$colorForeground },
+      })}
+    >
+      <Icon icon={ChevronLeft} />
+      <Text
+        as='span'
+        variant='body'
+        localizationKey={localizationKeys('organizationProfile.navbar.security')}
+      />
+    </SimpleButton>
+  );
 
   return (
     <ConfigureSSOProtect>
@@ -67,11 +96,11 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
               <SecuritySsoSection
                 connection={organizationEnterpriseConnection}
                 enterpriseConnection={enterpriseConnection}
-                setConnectionActive={mutations.setConnectionActive}
-                deleteConnection={mutations.deleteConnection}
+                setConnectionActive={enterpriseConnectionMutations.setConnectionActive}
+                deleteConnection={enterpriseConnectionMutations.deleteConnection}
                 organizationName={organization?.name ?? ''}
                 contentRef={contentRef}
-                onConfigure={() => setView('wizard')}
+                onConfigure={openWizard}
               />
             </Col>
           </Col>
@@ -82,8 +111,12 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
           testRuns={testRuns}
           enterpriseConnection={enterpriseConnection}
           contentRef={contentRef}
-          mutations={mutations}
-          primaryEmailAddress={primaryEmailAddress}
+          enterpriseConnectionMutations={enterpriseConnectionMutations}
+          organizationDomainMutations={organizationDomainMutations}
+          organizationDomains={organizationDomains}
+          forceInitialStep={forceFirstStep}
+          title={backControl}
+          onExit={exitWizard}
         />
       )}
     </ConfigureSSOProtect>

@@ -14,7 +14,7 @@ vi.mock('../../../../ConfigureSSOContext', () => ({
     enterpriseConnection: undefined,
     organizationEnterpriseConnection: { hasConnection: false },
     provider: 'saml_google',
-    mutations: {},
+    enterpriseConnectionMutations: {},
   }),
 }));
 

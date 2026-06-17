@@ -196,28 +196,26 @@ export const arSA: LocalizationResource = {
       },
       warning: 'بمجرد اختيار المزود لا يمكنك التغيير مرة أخرى حتى انتهاء التكوين',
     },
-    verifyEmailDomainStep: {
-      title: 'التحقق من البريد الإلكتروني',
-      subtitle: 'تحقق من عنوان البريد الإلكتروني الذي تريد تفعيل اتصال المؤسسة عليه.',
-      addEmailAddress: {
-        formTitle: 'نحتاج إلى بريدك الإلكتروني',
-        formSubtitle: 'للبدء، نحتاج إلى عنوان بريدك الإلكتروني',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'عنوان البريد الإلكتروني',
+    organizationDomainsStep: {
+      title: 'إضافة نطاقات SSO',
+      subtitle: 'أضِف نطاقات مؤسستك المستخدمة لتسجيل الدخول وتحقّق من ملكيتها.',
+      formFieldLabel__domain: 'النطاقات',
+      formFieldInputPlaceholder__domain: 'اكتب نطاقك هنا وانقر على إضافة للبدء',
+      formButtonPrimary__add: 'إضافة',
+      domainSuggestion: {
+        messageLabel: 'بريدك الإلكتروني يستخدم {{domain}}. هل تريد إضافته؟',
+        formButtonPrimary__add: 'إضافة {{domain}}',
       },
-      emailCode: {
-        formTitle: 'تحقق من عنوان بريدك الإلكتروني',
-        formSubtitle: 'أدخل رمز التحقق المرسل إلى {{identifier}}',
-        resendButton: 'لم تتلقَّ الرمز؟ إعادة الإرسال',
-        verified: {
-          title: 'لقد تلقينا بريدك الإلكتروني',
-          subtitle: 'لقد تحققت من عنوان بريدك الإلكتروني التالي',
-          inputLabel: 'عنوان البريد الإلكتروني الذي تم التحقق منه',
+      domainCard: {
+        badge__verified: 'تم التحقق',
+        badge__unverified: 'لم يتم التحقق',
+        verifiedAtLabel: "تم التحقق في {{ date | shortDate('en-US') }}",
+        txtRecord: {
+          instructions: 'أضِف سجل TXT هذا إلى مزوّد DNS الخاص بك. سنتحقق تلقائيًا بمجرد أن يصبح السجل نشطًا.',
+          typeLabel: 'النوع',
+          hostLabel: 'المضيف / الاسم',
+          valueLabel: 'القيمة',
         },
-      },
-      domainTaken: {
-        title: 'هذا النطاق ({{domain}}) لديه بالفعل اتصال SSO',
-        subtitle: 'تواصل مع مسؤول التطبيق للحصول على الوصول من خلال الاتصال الحالي.',
       },
     },
   },

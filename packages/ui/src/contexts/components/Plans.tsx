@@ -103,6 +103,7 @@ type HandleSelectPlanProps = {
   portalRoot?: HTMLElement | null;
   appearance?: Appearance;
   newSubscriptionRedirectUrl?: string;
+  onSubscriptionComplete?: () => void;
 };
 
 export const usePlansContext = () => {
@@ -347,6 +348,7 @@ export const usePlansContext = () => {
       portalRoot: providedPortalRoot,
       appearance,
       newSubscriptionRedirectUrl,
+      onSubscriptionComplete,
     }: HandleSelectPlanProps) => {
       const portalRoot = providedPortalRoot ?? getClosestProfileScrollBox(mode, event);
 
@@ -359,6 +361,7 @@ export const usePlansContext = () => {
         priceId,
         onSubscriptionComplete: () => {
           revalidateAll();
+          onSubscriptionComplete?.();
         },
         onClose: () => {
           if (session?.id) {

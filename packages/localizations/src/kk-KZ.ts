@@ -196,28 +196,27 @@ export const kkKZ: LocalizationResource = {
       },
       warning: 'Провайдер таңдалғаннан кейін, конфигурация аяқталғанша өзгерте алмайсыз',
     },
-    verifyEmailDomainStep: {
-      title: 'Электрондық пошта мекенжайын растау',
-      subtitle: 'Кәсіпорын байланысын іске қосқыңыз келетін электрондық пошта мекенжайын растаңыз.',
-      addEmailAddress: {
-        formTitle: 'Бізге электрондық поштаңыз қажет',
-        formSubtitle: 'Бастау үшін электрондық пошта мекенжайыңыз қажет болады',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'Электрондық пошта мекенжайы',
+    organizationDomainsStep: {
+      title: 'SSO домендерін қосу',
+      subtitle: 'Ұйымыңыз кіру үшін пайдаланатын домендердің меншігін қосып, растаңыз.',
+      formFieldLabel__domain: 'Домендер',
+      formFieldInputPlaceholder__domain: 'Доменіңізді осы жерге енгізіп, бастау үшін «Қосу» түймесін басыңыз',
+      formButtonPrimary__add: 'Қосу',
+      domainSuggestion: {
+        messageLabel: 'Электрондық поштаңыз {{domain}} пайдаланады. Оны қосқыңыз келе ме?',
+        formButtonPrimary__add: '{{domain}} қосу',
       },
-      emailCode: {
-        formTitle: 'Электрондық пошта мекенжайыңызды растаңыз',
-        formSubtitle: '{{identifier}} мекенжайына жіберілген растау кодын енгізіңіз',
-        resendButton: 'Код алмадыңыз ба? Қайта жіберу',
-        verified: {
-          title: 'Электрондық поштаңызды алдық',
-          subtitle: 'Электрондық пошта мекенжайыңызды келесі поштамен растадыңыз',
-          inputLabel: 'Расталған электрондық пошта мекенжайы',
+      domainCard: {
+        badge__verified: 'Расталған',
+        badge__unverified: 'Расталмаған',
+        verifiedAtLabel: "{{ date | shortDate('kk-KZ') }} күні расталды",
+        txtRecord: {
+          instructions:
+            'Бұл TXT жазбасын DNS провайдеріңізге қосыңыз. Жазба белсенді болған бойда біз оны автоматты түрде растаймыз.',
+          typeLabel: 'Түрі',
+          hostLabel: 'Хост / Атау',
+          valueLabel: 'Мән',
         },
-      },
-      domainTaken: {
-        title: 'Бұл доменде ({{domain}}) бұрыннан SSO байланысы бар',
-        subtitle: 'Қолданыстағы байланыс арқылы кіруге қол жеткізу үшін қолданба әкімшісіне хабарласыңыз.',
       },
     },
   },

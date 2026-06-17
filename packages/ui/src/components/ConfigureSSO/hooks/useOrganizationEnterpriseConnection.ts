@@ -1,4 +1,5 @@
 import {
+  __internal_useOrganizationDomains,
   __internal_useOrganizationEnterpriseConnections,
   useOrganization,
   useSession,
@@ -6,10 +7,11 @@ import {
 } from '@clerk/shared/react';
 import type {
   DeletedObjectResource,
-  EmailAddressResource,
   EnterpriseConnectionResource,
   EnterpriseConnectionTestRunInitResource,
   EnterpriseConnectionTestRunResource,
+  OrganizationDomainResource,
+  OrganizationDomainsBulkOwnershipVerificationResource,
   OrganizationResource,
   SignedInSessionResource,
   UpdateOrganizationEnterpriseConnectionParams,
@@ -18,10 +20,9 @@ import type {
 import { useMemo, useRef } from 'react';
 
 import {
-  connectionBackingEmail,
+  organizationEnterpriseConnection as buildOrganizationEnterpriseConnection,
   isEnterpriseConnectionConfigured,
   type OrganizationEnterpriseConnection,
-  organizationEnterpriseConnection as buildOrganizationEnterpriseConnection,
 } from '../domain/organizationEnterpriseConnection';
 import type { ProviderType } from '../types';
 import { type RefreshTestRunsOptions, useEnterpriseConnectionTestRuns } from './useEnterpriseConnectionTestRuns';
@@ -40,13 +41,11 @@ import { type RefreshTestRunsOptions, useEnterpriseConnectionTestRuns } from './
  */
 export interface EnterpriseConnectionMutations {
   /**
-   * Derives the connection name from the email domain; resolves to `undefined`
-   * without creating when no primary email is available.
+   * Creates a new enterprise connection for the active organization. The
+   * verified organization domains are sourced from the hook itself, so callers
+   * never thread them through.
    */
-  createConnection: (
-    provider: ProviderType,
-    primaryEmailAddress?: EmailAddressResource,
-  ) => Promise<EnterpriseConnectionResource | undefined>;
+  createConnection: (provider: ProviderType) => Promise<EnterpriseConnectionResource | undefined>;
   updateConnection: (
     id: string,
     params: UpdateOrganizationEnterpriseConnectionParams,
@@ -55,6 +54,17 @@ export interface EnterpriseConnectionMutations {
   deleteConnection: (id: string) => Promise<DeletedObjectResource | undefined>;
   /** Resolves with the test-run URL to open. */
   createTestRun: (id: string) => Promise<EnterpriseConnectionTestRunInitResource>;
+}
+
+export interface OrganizationDomainMutations {
+  createDomain: (name: string) => Promise<OrganizationDomainResource | undefined>;
+  prepareOwnershipVerification: (
+    domains: OrganizationDomainResource[],
+  ) => Promise<OrganizationDomainsBulkOwnershipVerificationResource | undefined>;
+  attemptOwnershipVerification: (
+    domains: OrganizationDomainResource[],
+  ) => Promise<OrganizationDomainsBulkOwnershipVerificationResource | undefined>;
+  revalidate: () => Promise<void>;
 }
 
 export interface UseOrganizationEnterpriseConnectionResult {
@@ -70,12 +80,12 @@ export interface UseOrganizationEnterpriseConnectionResult {
   organization: OrganizationResource | null | undefined;
   /** FAPI currently supports a single connection per organization. */
   enterpriseConnection: EnterpriseConnectionResource | undefined;
-  /** Used to derive the connection name on create. */
-  primaryEmailAddress: EmailAddressResource | undefined;
   /** The domain entity the wizard makes every flow decision from. */
   organizationEnterpriseConnection: OrganizationEnterpriseConnection;
-  mutations: EnterpriseConnectionMutations;
+  enterpriseConnectionMutations: EnterpriseConnectionMutations;
   testRuns: TestRunsView;
+  organizationDomains: OrganizationDomainResource[] | undefined;
+  organizationDomainMutations: OrganizationDomainMutations;
 }
 
 /**
@@ -164,26 +174,38 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
   const { session } = useSession();
   const { organization } = useOrganization();
 
-  const primaryEmailAddress = user?.primaryEmailAddress ?? undefined;
+  const {
+    isLoading: isLoadingOrganizationDomains,
+    data: organizationDomains,
+    createDomain,
+    prepareOwnershipVerification,
+    attemptOwnershipVerification,
+    revalidate: revalidateDomains,
+  } = __internal_useOrganizationDomains({ enrollmentMode: 'enterprise_sso' });
 
-  // The connection-domain mutations, defined inline here so the umbrella hook
-  // owns the single mutation surface. The org-scoped FAPI endpoints have no
-  // reverification middleware, so these call the underlying handles directly.
-  const mutations = useMemo<EnterpriseConnectionMutations>(() => {
-    const createConnection: EnterpriseConnectionMutations['createConnection'] = (provider, primaryEmail) => {
-      const emailDomain = primaryEmail?.emailAddress.split('@')[1];
+  const organizationDomainMutations = useMemo<OrganizationDomainMutations>(
+    () => ({
+      createDomain,
+      prepareOwnershipVerification,
+      attemptOwnershipVerification,
+      revalidate: revalidateDomains,
+    }),
+    [createDomain, prepareOwnershipVerification, attemptOwnershipVerification, revalidateDomains],
+  );
 
-      if (!emailDomain) {
-        return Promise.resolve(undefined);
-      }
+  const enterpriseConnectionMutations = useMemo<EnterpriseConnectionMutations>(() => {
+    const createConnection: EnterpriseConnectionMutations['createConnection'] = provider => {
+      const primaryEmailAddress = user?.primaryEmailAddress;
+      const emailDomain = primaryEmailAddress?.emailAddress.split('@')[1];
 
-      // The organization is inferred from the URL path on the org-scoped
-      // endpoint, so we don't pass `organizationId` in the body. `domains` is
-      // required by the create endpoint and is derived from the email domain.
+      // Connection name will always be defined due to the organization name
+      // Soon this logic will be moved to the Frontend API
+      const connectionName = emailDomain ?? organization?.name ?? '';
+
       return createEnterpriseConnection({
         provider,
-        name: emailDomain,
-        domains: [emailDomain],
+        name: connectionName,
+        domains: organizationDomains?.map(domain => domain.name),
       });
     };
 
@@ -214,7 +236,14 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
       deleteConnection,
       createTestRun,
     };
-  }, [organization, createEnterpriseConnection, updateEnterpriseConnection, deleteEnterpriseConnection]);
+  }, [
+    user,
+    organization,
+    organizationDomains,
+    createEnterpriseConnection,
+    updateEnterpriseConnection,
+    deleteEnterpriseConnection,
+  ]);
 
   const testRuns = useMemo<TestRunsView>(
     () => ({
@@ -239,20 +268,15 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
     ],
   );
 
-  // The email whose domain backs the connection — the single domain rule, shared
-  // with the verify-domain step so the guards and the UI never disagree.
-  const primaryEmail = connectionBackingEmail(user);
-
   // The single domain entity everything downstream reads decisions from, keyed
   // on the raw inputs so it is only rebuilt when one of them changes.
   const organizationEnterpriseConnection = useMemo<OrganizationEnterpriseConnection>(
     () =>
       buildOrganizationEnterpriseConnection({
         connection: enterpriseConnection,
-        primaryEmail,
         hasSuccessfulTestRun,
       }),
-    [enterpriseConnection, primaryEmail, hasSuccessfulTestRun],
+    [enterpriseConnection, hasSuccessfulTestRun],
   );
 
   return {
@@ -263,12 +287,13 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
     // first load — that case fetches them as part of the initial load. On the
     // fresh-start path they stay dormant until the connection is configured, and
     // landing on the test step then shows table-level loading, never the global
-    // skeleton.
-    isLoading: isLoadingEnterpriseConnections || (hadInitialConnection && isLoadingTestRuns),
+    isLoading:
+      isLoadingEnterpriseConnections || isLoadingOrganizationDomains || (hadInitialConnection && isLoadingTestRuns),
     enterpriseConnection,
-    primaryEmailAddress,
     organizationEnterpriseConnection,
-    mutations,
+    enterpriseConnectionMutations,
     testRuns,
+    organizationDomains,
+    organizationDomainMutations,
   };
 };

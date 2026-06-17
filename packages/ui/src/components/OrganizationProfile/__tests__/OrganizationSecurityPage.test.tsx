@@ -25,6 +25,14 @@ const DESCRIPTION_LINE_1 =
 const DESCRIPTION_LINE_2 =
   'Anyone who signs in will be automatically added to this organization. New members will be assigned to member.';
 
+const verifiedDomain = {
+  id: 'dmn_verified',
+  name: 'clerk.com',
+  organizationId: 'Org1',
+  enrollmentMode: 'enterprise_sso',
+  ownershipVerification: { status: 'verified', strategy: 'txt' },
+} as any;
+
 const configuredConnection = (overrides: Record<string, unknown> = {}) =>
   ({
     id: 'ent_1',
@@ -187,20 +195,49 @@ describe('OrganizationSecurityPage', () => {
   });
 
   describe('view switching', () => {
-    it('switches to the wizard when Start configuration is clicked', async () => {
+    it('opens the wizard at the first step when Start configuration is clicked', async () => {
       const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
 
       fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
+      fixtures.clerk.organization?.getDomains.mockResolvedValue({ data: [verifiedDomain], total_count: 1 } as any);
 
       const { userEvent } = renderPage(wrapper);
 
       await userEvent.click(await screen.findByRole('button', { name: 'Start configuration' }));
 
-      expect(await screen.findByText(/select your identity provider/i)).toBeInTheDocument();
+      // Start forces the first step. The fixture domain is already verified, so
+      // without the forced entry the wizard would skip to select-provider —
+      // proving Start threads `forceInitialStep`.
+      expect(await screen.findByRole('heading', { name: /add SSO domains/i })).toBeInTheDocument();
+      expect(screen.queryByText(/select your identity provider/i)).not.toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Start configuration' })).not.toBeInTheDocument();
     });
 
-    it('switches to the wizard when Edit is selected from the actions menu', async () => {
+    it('resumes the wizard at the reachable step when Continue configuration is clicked', async () => {
+      const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
+
+      // A connection without SAML configuration is mid-setup (in_progress).
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([
+        configuredConnection({ samlConnection: null }),
+      ]);
+      fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
+        data: [],
+        total_count: 0,
+      } as any);
+      fixtures.clerk.organization?.getDomains.mockResolvedValue({ data: [verifiedDomain], total_count: 1 } as any);
+
+      const { userEvent } = renderPage(wrapper);
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Continue configuration' }));
+
+      // Continue passes no forced step, so the wizard resumes at the furthest-
+      // reachable step for this connection (configure, since a provider connection
+      // exists and the domain is verified) rather than the forced first step.
+      expect(await screen.findByRole('heading', { name: /configure okta workforce/i })).toBeInTheDocument();
+      expect(screen.queryByRole('heading', { name: /add SSO domains/i })).not.toBeInTheDocument();
+    });
+
+    it('opens the wizard at the first step when Edit is selected from the actions menu', async () => {
       const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
 
       fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([configuredConnection({ active: true })]);
@@ -208,15 +245,40 @@ describe('OrganizationSecurityPage', () => {
         data: [{ id: 'run_1', status: 'success' }],
         total_count: 1,
       } as any);
+      fixtures.clerk.organization?.getDomains.mockResolvedValue({ data: [verifiedDomain], total_count: 1 } as any);
 
       const { userEvent } = renderPage(wrapper);
 
       await userEvent.click(await screen.findByRole('button', { name: /open menu/i }));
       await userEvent.click(screen.getByRole('menuitem', { name: 'Edit' }));
 
-      // An active connection short-circuits the wizard to the confirmation step.
-      expect(await screen.findByText(/configuration details/i)).toBeInTheDocument();
+      // Edit forces the first step rather than the connection's furthest-reachable
+      // step (confirmation, for an active connection).
+      expect(await screen.findByRole('heading', { name: /add SSO domains/i })).toBeInTheDocument();
+      expect(screen.queryByText(/configuration details/i)).not.toBeInTheDocument();
       expect(screen.queryByText(DESCRIPTION_LINE_1)).not.toBeInTheDocument();
+    });
+  });
+
+  describe('wizard back control', () => {
+    it('renders a Security back control in the wizard that returns to the overview', async () => {
+      const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
+
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
+      fixtures.clerk.organization?.getDomains.mockResolvedValue({ data: [verifiedDomain], total_count: 1 } as any);
+
+      const { userEvent } = renderPage(wrapper);
+
+      // Enter the wizard from the overview.
+      await userEvent.click(await screen.findByRole('button', { name: 'Start configuration' }));
+      const backControl = await screen.findByRole('button', { name: 'Security' });
+      expect(backControl).toBeInTheDocument();
+
+      // The back control exits to the overview (the Start action returns).
+      await userEvent.click(backControl);
+
+      expect(await screen.findByRole('button', { name: 'Start configuration' })).toBeInTheDocument();
+      expect(screen.queryByRole('heading', { name: /add SSO domains/i })).not.toBeInTheDocument();
     });
   });
 
