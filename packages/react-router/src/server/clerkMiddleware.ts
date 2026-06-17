@@ -35,15 +35,16 @@ const sharedContextMessage =
 
 // Keyed by the Request, never the shared context: the runtime builds a distinct
 // Request per incoming request, so two concurrent requests can't collide here even
-// when they share one RouterContextProvider.
-const requestStateByRequest = new WeakMap<Request, RequestState<any>>();
+// when they share one RouterContextProvider. Holds the in-flight promise so
+// concurrent reads of the same Request share a single re-derivation.
+const requestStateByRequest = new WeakMap<Request, Promise<RequestState<any>>>();
 
 /**
  * Auth state for this request. Reuses what clerkMiddleware already resolved (keyed
  * by Request, so handshake/refresh and any machine-token verification happen once
  * per request). On a Request-instance miss (e.g. React Router's action -> loader
  * revalidation), it re-authenticates from this request's own cookies and caches
- * the result so repeat calls on that Request reuse it too.
+ * the in-flight promise so concurrent and repeat reads on that Request reuse it.
  */
 export async function resolveRequestState(args: DataFunctionArgs): Promise<RequestState<any>> {
   const cached = requestStateByRequest.get(args.request);
@@ -63,13 +64,19 @@ export async function resolveRequestState(args: DataFunctionArgs): Promise<Reque
   // options + resolved keys), so this can't pick up another request's resolved
   // options even when the context is shared. Identity comes from args.request.
   const options = loadOptions(args, config);
-  const requestState = await clerkClient(args, config).authenticateRequest(
+  // Cache the promise before awaiting so concurrent callers share one re-derive;
+  // drop it on failure so a transient error isn't cached for the request's lifetime.
+  const requestStatePromise = clerkClient(args, config).authenticateRequest(
     createClerkRequest(patchRequest(args.request)),
     { ...options, acceptsToken: 'any' },
   );
-
-  requestStateByRequest.set(args.request, requestState);
-  return requestState;
+  requestStateByRequest.set(args.request, requestStatePromise);
+  try {
+    return await requestStatePromise;
+  } catch (error) {
+    requestStateByRequest.delete(args.request);
+    throw error;
+  }
 }
 
 /**
@@ -188,7 +195,7 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFun
 
     // Cache the resolved state keyed by this Request so getAuth/rootAuthLoader reuse
     // it. authFnContext/requestStateContext remain for back-compat.
-    requestStateByRequest.set(args.request, requestState);
+    requestStateByRequest.set(args.request, Promise.resolve(requestState));
     args.context.set(middlewareConfigContext, middlewareConfig);
     args.context.set(authFnContext, (opts?: PendingSessionOptions) => requestState.toAuth(opts));
     args.context.set(requestStateContext, { requestState, additionalState });

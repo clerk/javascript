@@ -173,6 +173,34 @@ describe('clerkMiddleware + getAuth auth isolation', () => {
     expect(authSpy).toHaveBeenCalledTimes(2);
   });
 
+  // Concurrent reads of the same fresh Request (e.g. a parallel loader fan-out after
+  // an action) must share a single re-derivation rather than each re-authenticating,
+  // so any machine-token verification / refresh happens once per request.
+  it('dedupes concurrent re-derivation for the same fresh Request', async () => {
+    const authSpy = vi.fn(
+      (req: { url: string }) =>
+        new Promise(resolve => setTimeout(() => resolve(fakeStateForRequest(req)), 0)),
+    );
+    mockClerkClient.mockReturnValue({ authenticateRequest: authSpy } as unknown as ClerkClient);
+
+    const middleware = clerkMiddleware();
+    const request = new Request('http://app.test/?u=user_A', { method: 'POST' });
+    const args = { request, context: new RouterContextProvider() } as unknown as LoaderFunctionArgs;
+
+    await middleware(args, async () => {
+      const loaderRequest = new Request(request.url, { headers: request.headers });
+      const loaderArgs = { request: loaderRequest, context: args.context } as unknown as LoaderFunctionArgs;
+      // Two concurrent reads on the SAME fresh Request before the first resolves.
+      const [a, b] = await Promise.all([readUserId(loaderArgs), readUserId(loaderArgs)]);
+      expect(a).toBe('user_A');
+      expect(b).toBe('user_A');
+      return new Response('A');
+    });
+
+    // middleware (1) + a single shared re-derive for the fresh Request (1), not 2.
+    expect(authSpy).toHaveBeenCalledTimes(2);
+  });
+
   // Request-derived options (e.g. a domain/proxyUrl/isSatellite function) must be
   // resolved from each request, not read off a shared context. Here domain is
   // derived from the URL; even when B overwrites the shared config between A's
