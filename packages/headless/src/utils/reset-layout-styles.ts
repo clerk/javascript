@@ -19,25 +19,27 @@
  * the original inline layout styles immediately.
  */
 export function resetLayoutStyles(element: HTMLElement): () => void {
-  const originalLayoutStyles = {
-    'justify-content': element.style.justifyContent,
-    'align-items': element.style.alignItems,
-    'align-content': element.style.alignContent,
-    'justify-items': element.style.justifyItems,
-  };
+  // Capture the value AND its priority flag so an inline `!important` is
+  // restored faithfully (getPropertyValue alone would drop the priority).
+  const keys = ['justify-content', 'align-items', 'align-content', 'justify-items'];
+  const originalLayoutStyles = keys.map(key => ({
+    key,
+    value: element.style.getPropertyValue(key),
+    priority: element.style.getPropertyPriority(key),
+  }));
 
-  Object.keys(originalLayoutStyles).forEach(key => {
+  keys.forEach(key => {
     element.style.setProperty(key, 'initial', 'important');
   });
 
   function restore() {
-    Object.entries(originalLayoutStyles).forEach(([key, value]) => {
+    for (const { key, value, priority } of originalLayoutStyles) {
       if (value === '') {
         element.style.removeProperty(key);
-        return;
+        continue;
       }
-      element.style.setProperty(key, value);
-    });
+      element.style.setProperty(key, value, priority);
+    }
   }
 
   const frame = requestAnimationFrame(restore);
