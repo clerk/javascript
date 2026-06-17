@@ -27,9 +27,9 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     button: dynamic(() => import('../stories/button.mdx')),
     input: dynamic(() => import('../stories/input.mdx')),
     dialog: dynamic(() => import('../stories/dialog.component.mdx')),
-    heading: dynamic(() => import('../stories/heading.component.mdx')),
+    heading: dynamic(() => import('../stories/heading.mdx')),
     tabs: dynamic(() => import('../stories/tabs.component.mdx')),
-    text: dynamic(() => import('../stories/text.component.mdx')),
+    text: dynamic(() => import('../stories/text.mdx')),
   },
   primitives: {
     // Headless primitives — alphabetical.
