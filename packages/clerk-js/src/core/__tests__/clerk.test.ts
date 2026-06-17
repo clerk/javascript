@@ -3013,6 +3013,23 @@ describe('Clerk singleton', () => {
       expect(() => sut.mountUserButton(document.createElement('div'))).not.toThrow();
     });
 
+    it('is a no-op when Clerk UI is already attached', async () => {
+      const firstCtor = vi.fn(() => ({}));
+      const secondCtor = vi.fn(() => ({}));
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load({ ...mockedLoadOptions, ui: { ClerkUI: firstCtor } });
+      await Promise.resolve();
+
+      expect(firstCtor).toHaveBeenCalledTimes(1);
+
+      sut.__internal_attachClerkUI(secondCtor, { ...mockedLoadOptions, ui: { ClerkUI: secondCtor } });
+      await Promise.resolve();
+
+      expect(firstCtor).toHaveBeenCalledTimes(1);
+      expect(secondCtor).not.toHaveBeenCalled();
+    });
+
     it('supports legacy clerkUICtor option for backwards compatibility', async () => {
       const mockClerkUIInstance = { mount: vi.fn() };
       const mockClerkUICtor = vi.fn(() => mockClerkUIInstance);
