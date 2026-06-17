@@ -6,10 +6,8 @@ import {
 import type { PendingSessionOptions } from '@clerk/shared/types';
 import type { LoaderFunctionArgs } from 'react-router';
 
-import { IsOptIntoMiddleware } from '../server/utils';
 import { noLoaderArgsPassedInGetAuth } from '../utils/errors';
-import { authFnContext } from './clerkMiddleware';
-import { requestAuthStorage } from './requestAuthStorage';
+import { authenticateFromRequest } from './clerkMiddleware';
 
 type GetAuthOptions = PendingSessionOptions & { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] };
 
@@ -23,19 +21,15 @@ export const getAuth: GetAuthFn<LoaderFunctionArgs, true> = (async (
 
   const { acceptsToken, treatPendingAsSignedOut } = opts || {};
 
-  // Prefer the request-scoped store (immune to a shared RouterContextProvider);
-  // fall back to the RR context slot for runtimes without async storage or calls
-  // made outside the middleware's async scope.
-  const scopedAuthFn = requestAuthStorage.getStore()?.authFn;
-  const authObjectFn = scopedAuthFn ?? (IsOptIntoMiddleware(args.context) && args.context.get(authFnContext));
-  if (!authObjectFn) {
-    throw new Error(
-      'Clerk: clerkMiddleware() not detected. Make sure you have installed the clerkMiddleware in your root route.',
-    );
-  }
+  // Re-derive the current request's auth from `args.request` rather than reading
+  // a cached value off the React Router context. Identity is a pure function of
+  // this request's cookies/headers, so a context shared across requests can never
+  // return another user. clerkMiddleware (required) already ran the handshake and
+  // warmed the JWKS cache, so this verification is networkless.
+  const requestState = await authenticateFromRequest(args, 'any');
 
   return getAuthObjectForAcceptedToken({
-    authObject: authObjectFn({ treatPendingAsSignedOut }),
+    authObject: requestState.toAuth({ treatPendingAsSignedOut }),
     acceptsToken,
   });
 }) as GetAuthFn<LoaderFunctionArgs, true>;

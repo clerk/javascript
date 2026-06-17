@@ -1,14 +1,16 @@
-// Request-scoped auth isolation for clerkMiddleware + getAuth.
+// Auth isolation for clerkMiddleware + getAuth under a shared React Router context.
 //
-// clerkMiddleware binds each request's auth to an AsyncLocalStorage scope (see
-// requestAuthStorage) and also mirrors it onto the React Router context. getAuth
-// reads the async scope first. That keeps auth correct per request even when an
-// app shares one RouterContextProvider across requests (the custom-server /
-// getLoadContext footgun) - the failure mode reported as a cross-user "bleed".
+// getAuth re-derives the current request's auth from `args.request` (a pure
+// function of that request's cookies/headers), so even when an app shares one
+// RouterContextProvider across requests (the custom-server / getLoadContext
+// footgun) getAuth still returns the right user. These tests pin that: a shared
+// context is isolated, a per-request context is isolated, and the action->loader
+// hop (where React Router mints a fresh Request) still resolves the right user.
 //
-// Only clerkClient and loadOptions are mocked; each request authenticates as a
-// distinct user encoded in its URL, so the sole variable under test is whether
-// the RouterContextProvider is shared or per-request.
+// Only clerkClient and loadOptions are mocked; authenticateRequest resolves each
+// request to the user encoded in its URL (?u=...), so the sole variable is which
+// request getAuth re-derives from. A pk_live key keeps the shared-context probe
+// in production mode (warn, not throw) so two requests can run on one context.
 import type { ClerkClient } from '@clerk/backend';
 import { AuthStatus, TokenType } from '@clerk/backend/internal';
 import type { LoaderFunctionArgs } from 'react-router';
@@ -26,19 +28,16 @@ vi.mock('../loadOptions');
 const mockClerkClient = vi.mocked(clerkClient);
 const mockLoadOptions = vi.mocked(loadOptions);
 
-// The "user" for a request is encoded in its URL (?u=...); authenticateRequest
-// reads it back, so every request resolves to its own correct identity.
 function fakeStateForRequest(req: { url: string }) {
   const userId = new URL(req.url).searchParams.get('u');
   return {
     status: AuthStatus.SignedIn,
     headers: new Headers(),
+    publishableKey: 'pk_live_xxx',
     toAuth: () => ({ userId, tokenType: TokenType.SessionToken }),
   };
 }
 
-// Flush microtasks so request A finishes authenticate + context.set and parks
-// inside next() before request B runs.
 const flushMicrotasks = () => new Promise<void>(resolve => setTimeout(resolve, 0));
 
 async function readUserId(args: LoaderFunctionArgs): Promise<string | null | undefined> {
@@ -46,7 +45,7 @@ async function readUserId(args: LoaderFunctionArgs): Promise<string | null | und
   return auth.userId;
 }
 
-describe('clerkMiddleware + getAuth request-scoped isolation', () => {
+describe('clerkMiddleware + getAuth auth isolation', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockLoadOptions.mockReturnValue({
@@ -54,8 +53,9 @@ describe('clerkMiddleware + getAuth request-scoped isolation', () => {
       authorizedParties: [],
       signInUrl: '',
       signUpUrl: '',
-      secretKey: 'sk_test_...',
-      publishableKey: 'pk_test_...',
+      secretKey: 'sk_live_xxx',
+      // pk_live -> production instance -> shared-context probe warns (does not throw).
+      publishableKey: 'pk_live_xxx',
     } as unknown as ReturnType<typeof loadOptions>);
     mockClerkClient.mockReturnValue({
       authenticateRequest: vi.fn(async (req: { url: string }) => fakeStateForRequest(req)),
@@ -63,8 +63,8 @@ describe('clerkMiddleware + getAuth request-scoped isolation', () => {
   });
 
   // Interleave two concurrent requests, each using `contextFor(request)`:
-  //  1. A's middleware authenticates, sets context, then parks inside next().
-  //  2. B's middleware authenticates, sets context, reads its own auth in next().
+  //  1. A's middleware runs, then parks inside next().
+  //  2. B's middleware runs, B's loader reads its own auth in next().
   //  3. A unparks and reads its auth.
   async function runInterleaved(contextFor: (req: Request) => RouterContextProvider) {
     const middleware = clerkMiddleware();
@@ -97,10 +97,6 @@ describe('clerkMiddleware + getAuth request-scoped isolation', () => {
     return results;
   }
 
-  // The regression: with a single shared RouterContextProvider, B's middleware
-  // overwrote the shared context's auth between A's middleware and A's loader
-  // read, so A was served B's identity. The async scope fixes this: A's loader
-  // runs inside A's store regardless of the shared context.
   it('keeps auth per-request with a shared RouterContextProvider', async () => {
     const shared = new RouterContextProvider();
     const results = await runInterleaved(() => shared);
@@ -120,10 +116,9 @@ describe('clerkMiddleware + getAuth request-scoped isolation', () => {
     expect(results.B).toBe('user_B');
   });
 
-  // On a mutation, React Router mints a NEW Request for the post-action loader
-  // revalidation (a request-keyed store would miss it), but the loader still runs
-  // inside the middleware's async scope, so getAuth resolves the right user even
-  // when reading via the fresh Request and a shared context.
+  // React Router mints a NEW Request for post-action loader revalidation. getAuth
+  // re-derives from whatever request the loader was invoked with, so it resolves
+  // the right user even reading via the fresh Request on a shared context.
   it('resolves the right user when the loader reads via a fresh Request (action -> loader)', async () => {
     const shared = new RouterContextProvider();
     const middleware = clerkMiddleware();

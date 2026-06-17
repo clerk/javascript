@@ -2,7 +2,7 @@ import type { RequestState } from '@clerk/backend/internal';
 import type { LoaderFunctionArgs } from 'react-router';
 
 import { invalidRootLoaderCallbackReturn } from '../utils/errors';
-import { authFnContext, requestStateContext } from './clerkMiddleware';
+import { authenticateFromRequest, authFnContext, requestStateContext } from './clerkMiddleware';
 import type {
   AdditionalStateOptions,
   LoaderFunctionArgsWithAuth,
@@ -128,6 +128,10 @@ export const rootAuthLoader: RootAuthLoader = async (
     );
   }
 
-  const { requestState, additionalState } = contextValue;
-  return processRootAuthLoader(args, requestState, additionalState, handler);
+  // Re-derive the request state from this request rather than using the value
+  // cached on the (possibly shared) context, so identity can never bleed across
+  // concurrent requests. additionalState is identity-free app config and is safe
+  // to read from the context.
+  const requestState = await authenticateFromRequest(args, 'any');
+  return processRootAuthLoader(args, requestState, contextValue.additionalState, handler);
 };

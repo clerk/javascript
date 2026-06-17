@@ -2,49 +2,54 @@ import { TokenType } from '@clerk/backend/internal';
 import { data, type LoaderFunctionArgs } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { authFnContext, requestStateContext } from '../clerkMiddleware';
+import { clerkClient } from '../clerkClient';
+import { authFnContext, requestOptionsContext, requestStateContext } from '../clerkMiddleware';
 import { rootAuthLoader } from '../rootAuthLoader';
 
+vi.mock('../clerkClient');
+const mockClerkClient = vi.mocked(clerkClient);
+
 describe('rootAuthLoader', () => {
+  const mockRequestState = {
+    toAuth: vi.fn().mockImplementation(() => ({
+      userId: 'user_xxx',
+      tokenType: TokenType.SessionToken,
+    })),
+    headers: new Headers(),
+    status: 'signed-in',
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
     process.env.CLERK_SECRET_KEY = 'sk_test_...';
+    // rootAuthLoader re-derives the request state from the request rather than
+    // reading the value cached on the context.
+    mockClerkClient.mockReturnValue({
+      authenticateRequest: vi.fn().mockResolvedValue(mockRequestState),
+    } as any);
   });
 
   describe('with middleware context', () => {
-    const mockRequestState = {
-      toAuth: vi.fn().mockImplementation(() => ({
-        userId: 'user_xxx',
-        tokenType: TokenType.SessionToken,
-      })),
-      headers: new Headers(),
-      status: 'signed-in',
-    };
-
-    const mockContext = {
+    const makeContext = (additionalState: Record<string, unknown> = {}) => ({
       get: vi.fn().mockImplementation(contextKey => {
+        if (contextKey === requestOptionsContext) {
+          return { secretKey: 'sk_test_...', publishableKey: 'pk_test_...', acceptsToken: 'any' };
+        }
         if (contextKey === requestStateContext) {
-          return {
-            requestState: mockRequestState,
-            additionalState: {},
-          };
+          return { requestState: mockRequestState, additionalState };
         }
         if (contextKey === authFnContext) {
-          return vi.fn().mockImplementation((options?: any) => ({
-            userId: 'user_xxx',
-            tokenType: TokenType.SessionToken,
-            ...options,
-          }));
+          return vi.fn().mockReturnValue({ userId: 'user_xxx', tokenType: TokenType.SessionToken });
         }
         return null;
       }),
       set: vi.fn(),
-    };
+    });
 
     const args = {
-      context: mockContext,
+      context: makeContext(),
       request: new Request('http://clerk.com'),
-    } as LoaderFunctionArgs;
+    } as unknown as LoaderFunctionArgs;
 
     it('should work with a callback', async () => {
       await rootAuthLoader(args, () => ({ data: 'test' }));
@@ -108,31 +113,15 @@ describe('rootAuthLoader', () => {
     });
 
     it('should forward redirect URL options from additionalState into clerkState', async () => {
-      const mockContext2 = {
-        get: vi.fn().mockImplementation(contextKey => {
-          if (contextKey === requestStateContext) {
-            return {
-              requestState: mockRequestState,
-              additionalState: {
-                signInForceRedirectUrl: '/dashboard',
-                signUpForceRedirectUrl: '/welcome',
-                signInFallbackRedirectUrl: '/home',
-                signUpFallbackRedirectUrl: '/home',
-              },
-            };
-          }
-          if (contextKey === authFnContext) {
-            return vi.fn().mockReturnValue({ userId: 'user_xxx', tokenType: TokenType.SessionToken });
-          }
-          return null;
-        }),
-        set: vi.fn(),
-      };
-
       const result = (await rootAuthLoader({
-        context: mockContext2,
+        context: makeContext({
+          signInForceRedirectUrl: '/dashboard',
+          signUpForceRedirectUrl: '/welcome',
+          signInFallbackRedirectUrl: '/home',
+          signUpFallbackRedirectUrl: '/home',
+        }),
         request: new Request('http://clerk.com'),
-      } as LoaderFunctionArgs)) as any;
+      } as unknown as LoaderFunctionArgs)) as any;
 
       const internalState = result.clerkState.__internal_clerk_state;
       expect(internalState.__signInForceRedirectUrl).toBe('/dashboard');

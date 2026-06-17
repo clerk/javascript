@@ -2,24 +2,32 @@ import { TokenType } from '@clerk/backend/internal';
 import type { LoaderFunctionArgs } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { authFnContext } from '../clerkMiddleware';
+import { clerkClient } from '../clerkClient';
+import { requestOptionsContext } from '../clerkMiddleware';
 import { getAuth } from '../getAuth';
+
+vi.mock('../clerkClient');
+const mockClerkClient = vi.mocked(clerkClient);
 
 describe('getAuth', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     process.env.CLERK_SECRET_KEY = 'sk_test_...';
+    mockClerkClient.mockReturnValue({
+      authenticateRequest: vi.fn().mockResolvedValue({
+        headers: new Headers(),
+        toAuth: (options?: any) => ({ userId: 'user_xxx', tokenType: TokenType.SessionToken, ...options }),
+      }),
+    } as any);
   });
 
-  it('should work when middleware context exists', async () => {
+  it('should re-derive auth from the request when middleware ran', async () => {
+    // Middleware stashes identity-free options; getAuth re-derives the user from
+    // the request via authenticateRequest rather than reading a cached value.
     const mockContext = {
       get: vi.fn().mockImplementation(contextKey => {
-        if (contextKey === authFnContext) {
-          return vi.fn().mockImplementation((options?: any) => ({
-            userId: 'user_xxx',
-            tokenType: TokenType.SessionToken,
-            ...options,
-          }));
+        if (contextKey === requestOptionsContext) {
+          return { secretKey: 'sk_test_...', publishableKey: 'pk_test_...', acceptsToken: 'any' };
         }
         return null;
       }),
