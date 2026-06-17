@@ -17,7 +17,7 @@ import type {
   UpdateOrganizationEnterpriseConnectionParams,
   UserResource,
 } from '@clerk/shared/types';
-import { useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 
 import {
   organizationEnterpriseConnection as buildOrganizationEnterpriseConnection,
@@ -174,6 +174,24 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
   const { session } = useSession();
   const { organization } = useOrganization();
 
+  const handleDomainOwnershipVerified = useCallback(
+    async (verifiedDomains: OrganizationDomainResource[]) => {
+      if (!enterpriseConnection) {
+        return;
+      }
+
+      const verifiedDomainNames = verifiedDomains.map(domain => domain.name);
+      const domains = Array.from(new Set([...(enterpriseConnection.domains ?? []), ...verifiedDomainNames]));
+      const hasNewDomains = domains.length !== (enterpriseConnection.domains?.length ?? 0);
+      if (!hasNewDomains) {
+        return;
+      }
+
+      await updateEnterpriseConnection(enterpriseConnection.id, { domains });
+    },
+    [enterpriseConnection, updateEnterpriseConnection],
+  );
+
   const {
     isLoading: isLoadingOrganizationDomains,
     data: organizationDomains,
@@ -181,7 +199,10 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
     prepareOwnershipVerification,
     attemptOwnershipVerification,
     revalidate: revalidateDomains,
-  } = __internal_useOrganizationDomains({ enrollmentMode: 'enterprise_sso' });
+  } = __internal_useOrganizationDomains({
+    enrollmentMode: 'enterprise_sso',
+    onOwnershipVerified: handleDomainOwnershipVerified,
+  });
 
   const organizationDomainMutations = useMemo<OrganizationDomainMutations>(
     () => ({
