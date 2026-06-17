@@ -136,7 +136,7 @@ const OrganizationProfileSection = () => {
 
 const OrganizationDomainsSection = () => {
   const { organizationSettings } = useEnvironment();
-  const { organization, domains } = useOrganization();
+  const { organization, domains } = useOrganization({ domains: { infinite: true } });
   const canManageDomains = useProtect({ permission: 'org:sys_domains:manage' });
 
   if (!organizationSettings || !organization) {
