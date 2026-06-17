@@ -27,14 +27,26 @@ const sharedContextProbe = createContext<Request | null>(null);
 const sharedContextMessage =
   "Clerk: The React Router `context` is being reused across requests. clerkMiddleware() resolves each request's auth from that request, so sign-in state stays correct, but sharing one context across requests is unsupported and can leak your application's own per-request data. This usually comes from a custom server or `getLoadContext()` that returns a single RouterContextProvider; return a new RouterContextProvider() for each request instead.";
 
+// Keyed by the Request, never the shared context: the runtime builds a distinct
+// Request per incoming request, so two concurrent requests can't collide here even
+// when they share one RouterContextProvider.
+const requestStateByRequest = new WeakMap<Request, RequestState<any>>();
+
 /**
- * Re-derives the request's auth from `args.request` using the identity-free options
- * stashed by clerkMiddleware, so a shared context can never return another user.
+ * Auth state for this request. Reuses what clerkMiddleware already resolved
+ * (so handshake/refresh and any machine-token verification happen once per
+ * request), and re-authenticates only when the Request instance differs from the
+ * one the middleware saw (e.g. React Router's action -> loader revalidation).
  */
-export async function authenticateFromRequest(
-  args: DataFunctionArgs,
-  acceptsToken: AuthenticateRequestOptions['acceptsToken'] = 'any',
-): Promise<RequestState<any>> {
+export async function resolveRequestState(args: DataFunctionArgs): Promise<RequestState<any>> {
+  const cached = requestStateByRequest.get(args.request);
+  if (cached) {
+    return cached;
+  }
+
+  // Miss: re-derive from this request's own cookies. `options` is identity-free
+  // config, so reading it from a possibly-shared context is safe; identity comes
+  // from args.request, so the result is always this request's user.
   const options = IsOptIntoMiddleware(args.context) ? args.context.get(requestOptionsContext) : null;
   if (!options) {
     throw new Error(
@@ -44,7 +56,7 @@ export async function authenticateFromRequest(
 
   return clerkClient(args, options).authenticateRequest(createClerkRequest(patchRequest(args.request)), {
     ...options,
-    acceptsToken,
+    acceptsToken: 'any',
   });
 }
 
@@ -151,8 +163,10 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFun
       signUpFallbackRedirectUrl: loadedOptions.signUpFallbackRedirectUrl,
     };
 
-    // Stash identity-free options for re-derivation; authFnContext/requestStateContext
-    // remain for back-compat but identity is no longer read from them.
+    // Cache the resolved state keyed by this Request so getAuth/rootAuthLoader reuse
+    // it. Stash identity-free options for the re-derive fallback when the Request
+    // instance differs. authFnContext/requestStateContext remain for back-compat.
+    requestStateByRequest.set(args.request, requestState);
     args.context.set(requestOptionsContext, authenticateOptions);
     args.context.set(authFnContext, (opts?: PendingSessionOptions) => requestState.toAuth(opts));
     args.context.set(requestStateContext, { requestState, additionalState });

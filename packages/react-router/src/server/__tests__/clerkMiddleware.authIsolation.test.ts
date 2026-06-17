@@ -128,4 +128,45 @@ describe('clerkMiddleware + getAuth auth isolation', () => {
 
     expect(seen).toBe('user_A');
   });
+
+  // The point of resolving once: the middleware authenticates, and repeat getAuth
+  // calls on the same request reuse that result instead of re-authenticating
+  // (so machine-token verification / refresh happen once per request, not per call).
+  it('authenticates once per request and reuses it across getAuth calls', async () => {
+    const authSpy = vi.fn((req: { url: string }) => Promise.resolve(fakeStateForRequest(req)));
+    mockClerkClient.mockReturnValue({ authenticateRequest: authSpy } as unknown as ClerkClient);
+
+    const middleware = clerkMiddleware();
+    const request = new Request('http://app.test/?u=user_A');
+    const args = { request, context: new RouterContextProvider() } as unknown as LoaderFunctionArgs;
+
+    await middleware(args, async () => {
+      expect(await readUserId(args)).toBe('user_A');
+      expect(await readUserId(args)).toBe('user_A');
+      return new Response('A');
+    });
+
+    // Only the middleware's authenticateRequest ran; the two getAuth calls reused it.
+    expect(authSpy).toHaveBeenCalledTimes(1);
+  });
+
+  // On a Request-instance miss (action -> loader), it re-derives exactly once.
+  it('re-derives once on a fresh Request instance', async () => {
+    const authSpy = vi.fn((req: { url: string }) => Promise.resolve(fakeStateForRequest(req)));
+    mockClerkClient.mockReturnValue({ authenticateRequest: authSpy } as unknown as ClerkClient);
+
+    const middleware = clerkMiddleware();
+    const request = new Request('http://app.test/?u=user_A', { method: 'POST' });
+    const args = { request, context: new RouterContextProvider() } as unknown as LoaderFunctionArgs;
+
+    await middleware(args, async () => {
+      const loaderRequest = new Request(request.url, { headers: request.headers });
+      const loaderArgs = { request: loaderRequest, context: args.context } as unknown as LoaderFunctionArgs;
+      expect(await readUserId(loaderArgs)).toBe('user_A');
+      return new Response('A');
+    });
+
+    // middleware (1) + one re-derive for the fresh loader Request (1).
+    expect(authSpy).toHaveBeenCalledTimes(2);
+  });
 });
