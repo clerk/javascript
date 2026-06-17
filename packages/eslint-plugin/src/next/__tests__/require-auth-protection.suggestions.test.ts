@@ -76,6 +76,48 @@ export default async () => {
       ],
     },
     {
+      name: 'route: concise-body arrow returning a parenthesized object literal wraps without leaving parens',
+      code: `export const GET = () => ({ ok: true });`,
+      filename: abs('app/api/widgets/route.ts'),
+      options: [config],
+      errors: [
+        {
+          messageId: 'missingProtect',
+          suggestions: [
+            {
+              messageId: 'addAuthProtect',
+              output: `import { auth } from '@clerk/nextjs/server';
+export const GET = async () => {
+  await auth.protect();
+  return { ok: true };
+};`,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: 'page: concise-body arrow returning parenthesized JSX wraps without leaving parens',
+      code: `export default () => (<div>Hello</div>);`,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+      errors: [
+        {
+          messageId: 'missingProtect',
+          suggestions: [
+            {
+              messageId: 'addAuthProtect',
+              output: `import { auth } from '@clerk/nextjs/server';
+export default async () => {
+  await auth.protect();
+  return <div>Hello</div>;
+};`,
+            },
+          ],
+        },
+      ],
+    },
+    {
       name: 'page: default-exported local identifier',
       code: `function Page() {
   return <div>Hello</div>;

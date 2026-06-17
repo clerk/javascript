@@ -155,7 +155,21 @@ function insertProtectCallFix(
     const fnIndent = getLineIndent(sourceCode, fn);
     const inner = `${fnIndent}  `;
     const exprText = sourceCode.getText(body);
-    return fixer.replaceText(body, `{\n${inner}${call}\n${inner}return ${exprText};\n${fnIndent}}`);
+    const blockBody = `{\n${inner}${call}\n${inner}return ${exprText};\n${fnIndent}}`;
+
+    // Replace everything after the `=>`, not just the body node. A body node's
+    // range excludes any parentheses wrapping the expression, so replacing only
+    // the body leaves them behind and emits `() => ({ ...block... })` for a
+    // parenthesized concise body (`() => ({ ok: true })`, `() => (<jsx />)`),
+    // which is a syntax error.
+    const arrowToken = sourceCode.getTokenBefore(body, {
+      filter: token => token.type === 'Punctuator' && token.value === '=>',
+    });
+    if (arrowToken) {
+      return fixer.replaceTextRange([arrowToken.range[1], fn.range[1]], ` ${blockBody}`);
+    }
+    // Defensive fallback: no `=>` found (unexpected). Replace just the body.
+    return fixer.replaceText(body, blockBody);
   }
 
   const stmts = body.body;
