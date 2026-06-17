@@ -57,11 +57,16 @@ export class Verification {
   }
 }
 
+/** @generateWithEmptyComment */
 export class OrganizationDomainVerification {
   constructor(
+    /** The current status of the verification. */
     readonly status: string,
+    /** The strategy used to verify the domain. */
     readonly strategy: string,
+    /** The number of verification attempts that have been made. */
     readonly attempts: number | null = null,
+    /** The date and time when the current verification attempt expires. */
     readonly expireAt: number | null = null,
   ) {}
 

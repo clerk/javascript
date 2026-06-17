@@ -677,7 +677,7 @@ export class UserAPI extends AbstractAPI {
 
   /**
    * Gets a list of the given user's Organization memberships.
-   * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property than contains an array of [`OrganizationMembership`](https://clerk.com/docs/reference/backend/types/organization-membership) objects, and a `totalCount` property that indicates the total number of Organization memberships for the user.
+   * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property than contains an array of [`OrganizationMembership`](https://clerk.com/docs/reference/backend/types/backend-organization-membership) objects, and a `totalCount` property that indicates the total number of Organization memberships for the user.
    */
   public async getOrganizationMembershipList(params: GetOrganizationMembershipListParams) {
     const { userId, limit, offset } = params;
@@ -692,7 +692,7 @@ export class UserAPI extends AbstractAPI {
 
   /**
    * Gets a list of the given user's Organization invitations.
-   * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property than contains an array of [`OrganizationInvitation`](https://clerk.com/docs/reference/backend/types/organization-invitation) objects, and a `totalCount` property that indicates the total number of Organization invitations for the user.
+   * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property than contains an array of [`OrganizationInvitation`](https://clerk.com/docs/reference/backend/types/backend-organization-invitation) objects, and a `totalCount` property that indicates the total number of Organization invitations for the user.
    */
   public async getOrganizationInvitationList(params: GetOrganizationInvitationListParams) {
     const { userId, ...queryParams } = params;
@@ -791,7 +791,7 @@ export class UserAPI extends AbstractAPI {
 
   /**
    * Deletes the passkey identification for a given user and notifies them through email.
-   * @returns A [`DeletedObjectResource`](https://clerk.com/docs/reference/backend/types/backend-deleted-object-resource).
+   * @returns A [`DeletedObjectResource`](https://clerk.com/docs/reference/types/deleted-object-resource).
    */
   public async deleteUserPasskey(params: DeleteUserPasskeyParams) {
     this.requireId(params.userId);
@@ -804,7 +804,7 @@ export class UserAPI extends AbstractAPI {
 
   /**
    * Deletes a Web3 wallet identification for the given user.
-   * @returns A [`DeletedObjectResource`](https://clerk.com/docs/reference/backend/types/backend-deleted-object-resource).
+   * @returns A [`DeletedObjectResource`](https://clerk.com/docs/reference/types/deleted-object-resource).
    */
   public async deleteUserWeb3Wallet(params: DeleteWeb3WalletParams) {
     this.requireId(params.userId);
@@ -817,7 +817,7 @@ export class UserAPI extends AbstractAPI {
 
   /**
    * Deletes an external account for the given user.
-   * @returns A [`DeletedObjectResource`](https://clerk.com/docs/reference/backend/types/backend-deleted-object-resource).
+   * @returns A [`DeletedObjectResource`](https://clerk.com/docs/reference/types/deleted-object-resource).
    */
   public async deleteUserExternalAccount(params: DeleteUserExternalAccountParams) {
     this.requireId(params.userId);
