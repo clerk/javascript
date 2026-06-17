@@ -559,7 +559,7 @@ export const enUS_v4: any = {
       headerSubtitle__settings: 'Manage organization settings',
     },
     profilePage: {
-      title: 'Organization Profile',
+      title: 'Profile',
       subtitle: 'Manage organization profile',
       successMessage: 'The organization has been updated.',
       dangerSection: {

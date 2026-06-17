@@ -501,7 +501,7 @@ export const bgBG: LocalizationResource = {
       headerTitle__members: 'Членове',
       profileSection: {
         primaryButton: undefined,
-        title: 'Organization Profile',
+        title: 'Profile',
         uploadAction__title: 'Logo',
       },
     },

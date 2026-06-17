@@ -1156,7 +1156,6 @@ export type __internal_LocalizationResource = {
         domainLabel: LocalizationValue;
         signOnUrlLabel: LocalizationValue;
         issuerLabel: LocalizationValue;
-        certificateLabel: LocalizationValue;
         menuAction__edit: LocalizationValue;
         menuAction__activate: LocalizationValue;
         menuAction__deactivate: LocalizationValue;
@@ -1385,12 +1384,21 @@ export type __internal_LocalizationResource = {
         badge__verified: LocalizationValue;
         badge__unverified: LocalizationValue;
         verifiedAtLabel: LocalizationValue<'date'>;
+        removeButtonTooltip__lastVerifiedDomain: LocalizationValue;
+        removeButtonTooltip__lastVerifiedDomainActive: LocalizationValue;
         txtRecord: {
           instructions: LocalizationValue;
           typeLabel: LocalizationValue;
           hostLabel: LocalizationValue;
           valueLabel: LocalizationValue;
         };
+      };
+      removeDomainDialog: {
+        title: LocalizationValue;
+        subtitle__active: LocalizationValue<'domain'>;
+        subtitle__inactive: LocalizationValue<'domain'>;
+        cancelButton: LocalizationValue;
+        removeButton: LocalizationValue;
       };
     };
     testConfigurationStep: {
@@ -1838,7 +1846,6 @@ export type __internal_LocalizationResource = {
         title: LocalizationValue;
         ssoUrlLabel: LocalizationValue;
         issuerLabel: LocalizationValue;
-        certificateLabel: LocalizationValue;
         configureAgainLink: LocalizationValue;
       };
       resetSection: {
