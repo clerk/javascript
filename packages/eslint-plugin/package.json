@@ -35,7 +35,20 @@
         "default": "./dist/next.js"
       }
     },
+    "./next/fix-auth-protection": {
+      "import": {
+        "types": "./dist/next/fix-auth-protection.d.mts",
+        "default": "./dist/next/fix-auth-protection.mjs"
+      },
+      "require": {
+        "types": "./dist/next/fix-auth-protection.d.ts",
+        "default": "./dist/next/fix-auth-protection.js"
+      }
+    },
     "./package.json": "./package.json"
+  },
+  "bin": {
+    "clerk-next-fix-auth-protection": "./dist/next/fix-auth-protection-cli.js"
   },
   "files": [
     "dist"

@@ -51,7 +51,7 @@ The rule only detects protected or not, which corresponds to signed in/signed ou
 npm install --save-dev @clerk/eslint-plugin
 ```
 
-Requires ESLint `>=9` (flat config).
+Requires ESLint `>=9` (flat config), and also works with Oxlint when configured as a `jsPlugin`.
 
 ## Usage
 
@@ -75,6 +75,19 @@ export default [
   },
 ];
 ```
+
+This rule also works with Oxlint, you can configure the `rules` just like above after adding the plugin as a `jsPlugin` in `.oxlintrc.json`:
+
+```json
+"jsPlugins": [
+  {
+    "name": "@clerk/next",
+    "specifier": "@clerk/eslint-plugin/next"
+  }
+]
+```
+
+Note that the bulk auto-fixer described further down does require `eslint` to be installed.
 
 ## Options
 
@@ -101,7 +114,7 @@ Use `resources` to disable whole resource groups when a project only wants this 
 }
 ```
 
-We recommend leaving all as true, but switching some off can be useful during incremental migrations.
+We recommend leaving all as true, but switching some off can be useful during incremental migrations. This configuration also scopes suggestions and bulk-fix tooling: disabled resource groups are not reported by the rule, so they will not receive editor quick-fixes or bulk-applied fixes.
 
 ## What counts as protected
 
@@ -119,23 +132,60 @@ export default async function Page() {
 }
 ```
 
-…or by an early-exit check derived from `auth()` that returns, throws, or calls `notFound()` / `redirect()`:
+…or by an early-exit check derived from `auth()` that returns, throws, or redirects signed-out users (via Next.js navigation helpers or Clerk's `redirectToSignIn()` / `redirectToSignUp()` from `auth()`):
 
 ```ts
 import { auth } from '@clerk/nextjs/server';
 
 export default async function Page() {
-  const { userId } = await auth();
-  if (userId === null) notFound();
+  const { isAuthenticated, redirectToSignIn } = await auth();
+  if (!isAuthenticated) redirectToSignIn();
   // ...
 }
 ```
 
 General protection must happen at the top of the function, but additional narrowing auth checks can happen further down.
 
+## Suggestions
+
+For each unprotected resource it flags, the rule offers an editor quick-fix suggestion that inserts `await auth.protect()` at the top of the function (making it `async` and adding the `import { auth } from '@clerk/nextjs/server'` import if needed). Suggestions are opt-in: they appear in your editor's quick-fix menu and are not applied by `eslint --fix`, since adding a protection check changes runtime behavior.
+
+## Bulk auto-fixing
+
+> [!WARNING]
+> Applying these fixes changes the runtime behavior of your application — `await auth.protect()` enforces authentication where there potentially was none, or might override custom auth checks that were already in place. Always review the changes and test your application afterwards.
+
+Because the protection insertion is a suggestion rather than an autofix, `eslint --fix` deliberately won't apply it. To apply it across many files at once, use the bundled command, which lints with your existing ESLint config (so your protected/public globs are honored) and applies the suggestion to every resource it can safely fix:
+
+```sh
+# Fix everything under the current directory
+npx clerk-next-fix-auth-protection
+
+# Preview without writing
+npx clerk-next-fix-auth-protection --dry-run
+
+# Scope fixes to a specific pattern, this will still
+# use protected/public from your ESLint config, but
+# can be useful to only fix a subset of your application
+npx clerk-next-fix-auth-protection "app/**"
+```
+
+Resources the rule can't safely fix on its own (imported/wrapped exports, unacknowledged mixed-scope layouts) are listed as needing manual attention, and the command exits non-zero when any remain (or when `--dry-run` would make changes).
+
+The same logic is available programmatically:
+
+```ts
+import { fixAuthProtection } from '@clerk/eslint-plugin/next/fix-auth-protection';
+
+const { fixed, unresolved } = await fixAuthProtection({
+  patterns: ['app/**'],
+  dryRun: false,
+});
+```
+
 ## Implementation details
 
-This section describes the exact details of how the lint rule works. You normally do no need to read or understand this if you only want to use the rule.
+This section describes the exact details of how the lint rule works. You normally do not need to read or understand this if you only want to use the rule.
 
 Within folders that are configured as protected (and that eslint covers), this rule checks these resources when their resource group is enabled:
 
@@ -160,9 +210,11 @@ await auth.protect()
 await (await auth()).protect()
 // Any kind of variable declaration is okay
 const { userId } = await auth.protect();
+// More narrow checks are also fine
+await auth.protect({ role: 'org:admin' })
 
 // -- Custom handling --
-const { isAuthenticated, userId, sessionId } = await auth();
+const { isAuthenticated, userId, sessionId, redirectToSignIn, redirectToSignUp } = await auth();
 // Any of these checks are okay
 // Note: For useAuth() on the client !userId can also mean
 // "loading", but here it's fine
@@ -177,14 +229,14 @@ if (
   // unconditional "exit" at the top level, these count:
   return;
   throw;
-  // The Next.js versions of these functions throw errors
-  // and counts as exits, note that we match these by name,
-  // we do not currently trace them back to the real imports
+  // Matched by callee identifier name (imports are not traced):
   redirect();
   permanentRedirect();
   notFound();
   unauthorized();
   forbidden();
+  redirectToSignIn();
+  redirectToSignUp();
 }
 ```
 
