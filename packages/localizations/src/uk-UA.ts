@@ -500,7 +500,7 @@ export const ukUA: LocalizationResource = {
       headerTitle__members: 'Учасники',
       profileSection: {
         primaryButton: undefined,
-        title: 'Organization Profile',
+        title: 'Profile',
         uploadAction__title: 'Logo',
       },
     },
