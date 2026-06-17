@@ -1,5 +1,5 @@
 import { CAPTCHA_ELEMENT_ID } from '@clerk/shared/internal/clerk-js/constants';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Box, useAppearance, useLocalizations } from '../customizables';
 
@@ -8,12 +8,23 @@ import { Box, useAppearance, useLocalizations } from '../customizables';
  * which operates outside the React lifecycle. It stores the observed state in ref to ensure that
  * any external style changes, such as updates to max-height, min-height, or margin-bottom persist across re-renders,
  * preventing unwanted layout resets.
+ *
+ * When Turnstile escalates to an interactive "Verify you are human" challenge it sets the element's
+ * `maxHeight` to a non-`'0'` value (reset back to `'0'` on resolve/error). `onInteractiveChange` surfaces
+ * that signal so a parent can react (e.g. spotlight the challenge); it never fires on mount.
  */
-export const CaptchaElement = () => {
+export const CaptchaElement = ({ onInteractiveChange }: { onInteractiveChange?: (interactive: boolean) => void }) => {
   const elementRef = useRef(null);
   const maxHeightValueRef = useRef('0');
   const minHeightValueRef = useRef('unset');
   const marginBottomValueRef = useRef('unset');
+  // State exists to force a re-render on the interactive transition, which re-applies the ref-held
+  // styles above (preserving Turnstile's injected values). The value itself drives the `position`
+  // toggle added in the next commit.
+  const [, setIsInteractive] = useState(false);
+  // The observer is set up once (`[]` deps), so it reads the latest callback through a ref.
+  const onInteractiveChangeRef = useRef(onInteractiveChange);
+  onInteractiveChangeRef.current = onInteractiveChange;
   const { parsedCaptcha } = useAppearance();
   const { locale } = useLocalizations();
   const captchaTheme = parsedCaptcha?.theme;
@@ -34,6 +45,14 @@ export const CaptchaElement = () => {
           maxHeightValueRef.current = target.style.maxHeight || '0';
           minHeightValueRef.current = target.style.minHeight || 'unset';
           marginBottomValueRef.current = target.style.marginBottom || 'unset';
+
+          // ORDERING IS LOAD-BEARING: derive and apply the interactive signal only AFTER the refs above
+          // are updated. The re-render that `setIsInteractive` triggers reads those refs fresh; setting
+          // state earlier (or from a separate effect) would write stale defaults back into `style` and
+          // clobber Turnstile's injected styles.
+          const nowInteractive = maxHeightValueRef.current !== '0';
+          setIsInteractive(nowInteractive);
+          onInteractiveChangeRef.current?.(nowInteractive);
         }
       });
     });
