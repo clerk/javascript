@@ -4,6 +4,10 @@ import { Text, textRecipe } from '@clerk/ui/mosaic/components/text';
 
 import type { StoryMeta } from '@/lib/types';
 
+// Exposes this file's own source (via the `?raw` webpack rule) so each `<Story>` example
+// renders a code footer with its function's source. See `StoryModule.__source`.
+export { default as __source } from './text.stories?raw';
+
 export const meta: StoryMeta = {
   group: 'Components',
   title: 'Text',
