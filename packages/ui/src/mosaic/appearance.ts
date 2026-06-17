@@ -1,7 +1,21 @@
 import * as React from 'react';
 
+import type { IconName } from './icons/registry';
 import type { MosaicElements } from './registry';
 import type { MosaicVariables } from './variables';
+
+/**
+ * The props handed to an icon override: the resolved `className` (Mosaic's sizing/color, applied to
+ * the override exactly as to the built-in glyph, so icons stay visually consistent), `data-cl-slot`
+ * for targeting, and any forwarded `svg` props. Spread them onto your element.
+ */
+export type MosaicIconRenderProps = React.ComponentPropsWithRef<'svg'> & { 'data-cl-slot'?: string };
+
+/** Replaces a named icon's glyph. Spread the received props onto your element so Mosaic styling applies. */
+export type MosaicIconRenderer = (props: MosaicIconRenderProps) => React.ReactElement;
+
+/** `appearance.icons`: per-name glyph overrides, applied globally. */
+export type MosaicIconOverrides = Partial<Record<IconName, MosaicIconRenderer>>;
 
 /**
  * The flow-scope keys an `appearance` may carry. Overrides nested under one of these keys (inside
@@ -40,6 +54,8 @@ export type MosaicScopedElements = MosaicElements & {
 export interface MosaicAppearance {
   variables?: MosaicVariables;
   elements?: MosaicScopedElements;
+  /** Per-name icon glyph overrides (global). See `MosaicIconOverrides`. */
+  icons?: MosaicIconOverrides;
 }
 
 /**
@@ -55,6 +71,13 @@ export const MosaicAppearanceProvider = MosaicAppearanceContext.Provider;
 
 /** Returns the ordered element layers from the nearest `MosaicProvider` (or `[]` standalone). */
 export const useMosaicAppearance = (): ParsedMosaicElements => React.useContext(MosaicAppearanceContext);
+
+const MosaicIconsContext = React.createContext<MosaicIconOverrides>({});
+
+export const MosaicIconsProvider = MosaicIconsContext.Provider;
+
+/** Returns the icon glyph overrides from the nearest `MosaicProvider` (or `{}` standalone). */
+export const useMosaicIcons = (): MosaicIconOverrides => React.useContext(MosaicIconsContext);
 
 /**
  * Flattens `appearance.elements` into ordered layers for the active `scope`: the global slot

@@ -4,10 +4,10 @@ import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import React from 'react';
 
-import { MosaicAppearanceProvider, parseMosaicAppearance } from './appearance';
 import type { MosaicAppearance } from './appearance';
-import { defaultMosaicVariables, resolveVariables } from './variables';
+import { MosaicAppearanceProvider, MosaicIconsProvider, parseMosaicAppearance } from './appearance';
 import type { MosaicTheme } from './variables';
+import { defaultMosaicVariables, resolveVariables } from './variables';
 
 const getInsertionPoint = (): HTMLElement | null => {
   if (typeof document === 'undefined') {
@@ -31,6 +31,7 @@ export interface MosaicProviderProps {
 export function MosaicProvider({ children, nonce, cssLayerName, appearance, scope }: MosaicProviderProps) {
   const theme = React.useMemo(() => resolveVariables(defaultMosaicVariables, appearance?.variables), [appearance]);
   const parsedElements = React.useMemo(() => parseMosaicAppearance(appearance, scope), [appearance, scope]);
+  const icons = React.useMemo(() => appearance?.icons ?? {}, [appearance]);
   const cache = React.useMemo(() => {
     const el = getInsertionPoint();
     const emotionCache = createCache({
@@ -47,7 +48,9 @@ export function MosaicProvider({ children, nonce, cssLayerName, appearance, scop
   return (
     <MosaicThemeContext.Provider value={theme}>
       <MosaicAppearanceProvider value={parsedElements}>
-        <CacheProvider value={cache}>{children}</CacheProvider>
+        <MosaicIconsProvider value={icons}>
+          <CacheProvider value={cache}>{children}</CacheProvider>
+        </MosaicIconsProvider>
       </MosaicAppearanceProvider>
     </MosaicThemeContext.Provider>
   );
