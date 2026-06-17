@@ -174,9 +174,10 @@ describe('OrganizationSettings', () => {
     );
     const { queryByText } = await act(() => render(<OrganizationGeneralPage />, { wrapper }));
 
-    await new Promise(r => setTimeout(r, 100));
-    expect(queryByText('Verified domains')).not.toBeInTheDocument();
-    expect(queryByText('Add domain')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(queryByText('Verified domains')).not.toBeInTheDocument();
+      expect(queryByText('Add domain')).not.toBeInTheDocument();
+    });
   });
 
   it('shows domains and shows the Add domain button when `org:sys_domains:manage` exists even with an empty list', async () => {
