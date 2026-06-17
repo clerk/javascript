@@ -573,6 +573,54 @@ describe('SignInStart', () => {
     });
   });
 
+  describe('Instant password field visibility', () => {
+    it('hides the empty instant password field from the a11y tree via inert', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword({ required: true });
+      });
+      const { container } = render(<SignInStart />, { wrapper });
+
+      const passwordField = container.querySelector('#password-field') as HTMLElement;
+      expect(passwordField).not.toBeNull();
+
+      const row = passwordField.closest('[class*="formFieldRow"]') as HTMLElement;
+      expect(row).toHaveAttribute('inert');
+      // toggle button + input are removed from tab order / a11y tree while hidden
+      expect(passwordField).toHaveAttribute('tabindex', '-1');
+    });
+
+    it('reveals the instant password field (clears inert) when the browser autofills it', async () => {
+      // Simulate the browser's :autofill animation that the component polls for
+      mockGetComputedStyle.mockReturnValue({
+        animationName: 'onAutoFillStart',
+        pointerEvents: 'auto',
+        getPropertyValue: vi.fn().mockReturnValue(''),
+      });
+
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword({ required: true });
+      });
+      const { container } = render(<SignInStart />, { wrapper });
+
+      const passwordField = container.querySelector('#password-field') as HTMLElement;
+      const row = passwordField.closest('[class*="formFieldRow"]') as HTMLElement;
+
+      // initially hidden until the autofill poll fires
+      expect(row).toHaveAttribute('inert');
+
+      await waitFor(
+        () => {
+          expect(row).not.toHaveAttribute('inert');
+        },
+        { timeout: 2000 },
+      );
+      // Forgot password action only renders once the field is shown
+      screen.getByText(/Forgot password/i);
+    });
+  });
+
   describe('Session already exists error handling', () => {
     it('redirects user when session_exists error is returned during sign-in', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
