@@ -88,6 +88,69 @@ import { ClerkProvider } from '@clerk/electron/react';
 <ClerkProvider publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}>{/* ... */}</ClerkProvider>;
 ```
 
+## Content Security Policy
+
+`@clerk/electron` loads Clerk's prebuilt UI from Clerk's CDN at runtime rather than bundling it, so your renderer's Content Security Policy must allow Clerk's Frontend API host. If it doesn't, the UI script fails to load and Clerk components never render.
+
+Replace `{fapi_host}` below with your instance's **Frontend API** host, found in the [Clerk Dashboard](https://dashboard.clerk.com) under **API keys**. It includes a `clerk.` segment (for example, `clerk.your-app.com` in production or `your-slug.clerk.accounts.dev` in development). This is _not_ the Account Portal URL (`your-slug.accounts.dev`) — using that host blocks the UI script from loading.
+
+```
+default-src 'self';
+script-src 'self' 'unsafe-inline' https://{fapi_host} https://challenges.cloudflare.com;
+connect-src 'self' https://{fapi_host};
+img-src 'self' https://img.clerk.com data:;
+style-src 'self' 'unsafe-inline';
+worker-src 'self' blob:;
+frame-src 'self' https://challenges.cloudflare.com;
+form-action 'self';
+```
+
+> [!NOTE]
+> This covers sign-in/up and the hotloaded UI. If you use Clerk Billing (Stripe) or other features, you'll need to allow additional origins; see Clerk's [CSP guide](https://clerk.com/docs/guides/secure/best-practices/csp-headers) for the full list.
+
+Apply it either with a `<meta>` tag in your renderer HTML:
+
+```html
+<meta
+  http-equiv="Content-Security-Policy"
+  content="default-src 'self'; script-src 'self' 'unsafe-inline' https://{fapi_host} https://challenges.cloudflare.com; connect-src 'self' https://{fapi_host}; img-src 'self' https://img.clerk.com data:; style-src 'self' 'unsafe-inline'; worker-src 'self' blob:; frame-src 'self' https://challenges.cloudflare.com; form-action 'self';"
+/>
+```
+
+or, as [Electron's security guide](https://www.electronjs.org/docs/latest/tutorial/security#7-define-a-content-security-policy) recommends, as a response header from the main process:
+
+```ts
+// main.ts
+import { app, session } from 'electron';
+
+const fapiHost = 'clerk.your-app.com';
+
+app.whenReady().then(() => {
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Content-Security-Policy': [
+          [
+            "default-src 'self'",
+            `script-src 'self' 'unsafe-inline' https://${fapiHost} https://challenges.cloudflare.com`,
+            `connect-src 'self' https://${fapiHost}`,
+            "img-src 'self' https://img.clerk.com data:",
+            "style-src 'self' 'unsafe-inline'",
+            "worker-src 'self' blob:",
+            "frame-src 'self' https://challenges.cloudflare.com",
+            "form-action 'self'",
+          ].join('; '),
+        ],
+      },
+    });
+  });
+});
+```
+
+> [!NOTE]
+> Loading the renderer from a dev server (such as Vite) requires looser rules for HMR: add `'unsafe-eval'` to `script-src` and your dev server's origin to `connect-src` (for example, `ws://localhost:5173 http://localhost:5173`). Many apps skip CSP during development and apply it only to packaged builds.
+
 ## Support
 
 For help, visit our [support page](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_electron).

@@ -10,6 +10,7 @@ let beforeRequest:
 let afterResponse: ((request: unknown, response: Response) => Promise<void>) | null = null;
 
 const clerkConstructor = vi.hoisted(() => vi.fn());
+const loadClerkUIScript = vi.hoisted(() => vi.fn());
 
 vi.mock('@clerk/clerk-js', () => ({
   Clerk: class MockClerk {
@@ -34,8 +35,9 @@ vi.mock('@clerk/react/internal', () => ({
   },
 }));
 
-vi.mock('@clerk/ui', () => ({
-  ui: { ClerkUI: 'mock-ui' },
+vi.mock('@clerk/shared/loadClerkJsScript', async importOriginal => ({
+  ...(await importOriginal<Record<string, unknown>>()),
+  loadClerkUIScript,
 }));
 
 describe('Electron ClerkProvider', () => {
@@ -60,6 +62,11 @@ describe('Electron ClerkProvider', () => {
         oauthTransport,
       },
     });
+    // Resolve the UI hotload so the provider's `ui.ClerkUI` promise does not reject during render.
+    loadClerkUIScript.mockImplementation(() => {
+      (window as unknown as { __internal_ClerkUICtor?: unknown }).__internal_ClerkUICtor = 'mock-ui-ctor';
+      return Promise.resolve(null);
+    });
   });
 
   it('renders React ClerkProvider with Electron defaults', () => {
@@ -77,7 +84,6 @@ describe('Electron ClerkProvider', () => {
       publishableKey: 'pk_test_provider',
       signInUrl: '/sign-in',
       standardBrowser: false,
-      ui: { ClerkUI: 'mock-ui' },
     });
     expect(capturedProviderProps?.Clerk).toBeDefined();
     expect(capturedProviderProps?.__internal_oauthTransport).toEqual({
