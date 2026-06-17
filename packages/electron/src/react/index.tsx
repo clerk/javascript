@@ -4,6 +4,7 @@ import { loadClerkUIScript } from '@clerk/shared/loadClerkJsScript';
 import type { ClerkUIConstructor } from '@clerk/shared/ui';
 import type { ReactNode } from 'react';
 
+import type { PasskeySupport } from '../passkeys';
 import { createClerkInstance } from './create-clerk-instance';
 
 type ClerkOAuthTransport = NonNullable<ReactClerkProviderProps['__internal_oauthTransport']>;
@@ -17,6 +18,18 @@ export type ClerkProviderProps = Omit<
    * Your Clerk publishable key, available in the Clerk Dashboard.
    */
   publishableKey: string;
+  /**
+   * Enables passkey support. Pass the `passkeys` export from `@clerk/electron/passkeys`;
+   * when omitted, no passkey code is bundled or initialized.
+   *
+   * @example
+   * ```tsx
+   * import { passkeys } from '@clerk/electron/passkeys';
+   *
+   * <ClerkProvider publishableKey={publishableKey} passkeys={passkeys} />
+   * ```
+   */
+  passkeys?: PasskeySupport;
 };
 
 let cachedClerkUI: { promise: Promise<ClerkUIConstructor>; publishableKey: string } | null = null;
@@ -65,8 +78,8 @@ function createOAuthTransport(): ClerkOAuthTransport | undefined {
   };
 }
 
-export function ClerkProvider({ children, publishableKey, ...props }: ClerkProviderProps): JSX.Element {
-  const clerk = createClerkInstance(publishableKey);
+export function ClerkProvider({ children, publishableKey, passkeys, ...props }: ClerkProviderProps): JSX.Element {
+  const clerk = createClerkInstance(publishableKey, passkeys);
   const oauthTransport = createOAuthTransport();
   const clerkUI = loadClerkUI(publishableKey, props);
 

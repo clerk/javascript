@@ -1,2 +1,3 @@
 export { createClerkBridge } from './main/create-clerk-bridge';
-export type { ClerkBridge, CreateClerkBridgeOptions } from './shared/types';
+export { setupPasskeysMain } from './main/passkey-handlers';
+export type { ClerkBridge, CreateClerkBridgeOptions, ExposeClerkBridgeOptions, TokenStorage } from './shared/types';

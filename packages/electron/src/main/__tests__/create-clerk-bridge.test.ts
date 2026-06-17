@@ -1,7 +1,7 @@
 import { app, ipcMain, protocol, shell } from 'electron';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { OAUTH_TRANSPORT_CHANNELS } from '../../shared/ipc';
+import { OAUTH_TRANSPORT_CHANNELS, PASSKEY_CHANNELS } from '../../shared/ipc';
 import type { TokenStorage } from '../../shared/types';
 import { createClerkBridge } from '../create-clerk-bridge';
 
@@ -20,6 +20,15 @@ vi.mock('electron', () => ({
   },
   shell: {
     openExternal: vi.fn(),
+  },
+}));
+
+vi.mock('@clerk/electron-passkeys', () => ({
+  default: {
+    isAvailable: () => true,
+    capabilities: () => ({ platformAuthenticator: true, securityKeys: true }),
+    createCredential: vi.fn(),
+    getCredential: vi.fn(),
   },
 }));
 
@@ -98,6 +107,32 @@ describe('createClerkBridge', () => {
     clerk.cleanup();
 
     expect(ipcMain.removeHandler).toHaveBeenCalledTimes(3);
+  });
+
+  it('does not register passkey IPC handlers by default', () => {
+    createClerkBridge({ storage });
+
+    const channels = vi.mocked(ipcMain.handle).mock.calls.map(([channel]) => channel);
+    expect(channels).not.toContain(PASSKEY_CHANNELS.create);
+    expect(channels).not.toContain(PASSKEY_CHANNELS.get);
+    expect(channels).not.toContain(PASSKEY_CHANNELS.capabilities);
+  });
+
+  it('registers passkey IPC handlers when passkeys are enabled', () => {
+    createClerkBridge({ storage, passkeys: true });
+
+    const channels = vi.mocked(ipcMain.handle).mock.calls.map(([channel]) => channel);
+    expect(channels).toContain(PASSKEY_CHANNELS.create);
+    expect(channels).toContain(PASSKEY_CHANNELS.get);
+    expect(channels).toContain(PASSKEY_CHANNELS.capabilities);
+  });
+
+  it('cleans up passkey handlers together with the token handlers', () => {
+    const clerk = createClerkBridge({ storage, passkeys: true });
+
+    clerk.cleanup();
+
+    expect(ipcMain.removeHandler).toHaveBeenCalledTimes(6);
   });
 
   it('cleans up OAuth transport handlers when renderer origin is configured', () => {

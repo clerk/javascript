@@ -62,6 +62,26 @@ describe('exposeClerkBridge', () => {
     });
   });
 
+  it('does not expose the passkey bridge by default', () => {
+    exposeClerkBridge();
+
+    const exposedKeys = vi.mocked(contextBridge.exposeInMainWorld).mock.calls.map(([key]) => key);
+    expect(exposedKeys).not.toContain('__clerk_internal_electron_passkeys');
+  });
+
+  it('exposes the passkey bridge when passkeys is enabled', () => {
+    exposeClerkBridge({ passkeys: true });
+
+    expect(contextBridge.exposeInMainWorld).toHaveBeenCalledWith(
+      '__clerk_internal_electron_passkeys',
+      expect.objectContaining({
+        create: expect.any(Function),
+        get: expect.any(Function),
+        capabilities: expect.any(Function),
+      }),
+    );
+  });
+
   it('forwards token cache calls over IPC', async () => {
     exposeClerkBridge();
 
