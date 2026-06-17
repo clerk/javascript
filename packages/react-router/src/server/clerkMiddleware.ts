@@ -1,6 +1,7 @@
 import type { AuthObject } from '@clerk/backend';
 import type { RequestState } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest } from '@clerk/backend/internal';
+import { logger } from '@clerk/shared/logger';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
 import type { PendingSessionOptions } from '@clerk/shared/types';
 import type { MiddlewareFunction } from 'react-router';
@@ -9,6 +10,7 @@ import { createContext } from 'react-router';
 import { clerkClient } from './clerkClient';
 import { resolveKeysWithKeylessFallback } from './keyless/utils';
 import { loadOptions } from './loadOptions';
+import { requestAuthStorage } from './requestAuthStorage';
 import type { AdditionalStateOptions, ClerkMiddlewareOptions } from './types';
 import { patchRequest } from './utils';
 
@@ -19,6 +21,15 @@ type RequestStateContextValue = {
 
 export const authFnContext = createContext<((options?: PendingSessionOptions) => AuthObject) | null>(null);
 export const requestStateContext = createContext<RequestStateContextValue | null>(null);
+
+// Probe used to detect a React Router `context` that is reused across requests.
+// React Router gives each request its own context, so this is unset on a fresh
+// one; if a different request already stamped it, the app is sharing a single
+// context across requests (commonly a custom server or getLoadContext that
+// returns one RouterContextProvider). Auth stays correct regardless thanks to
+// requestAuthStorage, but a shared context can still leak the app's own
+// per-request values, so we warn once.
+const sharedContextProbe = createContext<Request | null>(null);
 
 /**
  * Middleware that integrates Clerk authentication into your React Router application.
@@ -38,6 +49,16 @@ export const requestStateContext = createContext<RequestStateContextValue | null
  */
 export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFunction<Response> => {
   return async (args, next) => {
+    // Runs before the first await so the get/set is atomic per request: if the
+    // context already carries a different request's marker, it is being shared.
+    const probedRequest = args.context.get(sharedContextProbe);
+    if (probedRequest && probedRequest !== args.request) {
+      logger.warnOnce(
+        'Clerk: The React Router `context` was reused across requests. clerkMiddleware() keeps each request\'s auth isolated, so sign-in state stays correct, but sharing one context across requests is unsupported and can leak your own per-request data. This usually comes from a custom server or `getLoadContext()` that returns a single RouterContextProvider; return a new RouterContextProvider() for each request instead.',
+      );
+    }
+    args.context.set(sharedContextProbe, args.request);
+
     const clerkRequest = createClerkRequest(patchRequest(args.request));
     const loadedOptions = loadOptions(args, options);
 
@@ -103,27 +124,35 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFun
       throw new Error('Clerk: handshake status without redirect');
     }
 
-    args.context.set(authFnContext, (opts?: PendingSessionOptions) => requestState.toAuth(opts));
-    args.context.set(requestStateContext, {
-      requestState,
-      additionalState: {
-        __keylessClaimUrl,
-        __keylessApiKeysUrl,
-        signInForceRedirectUrl: loadedOptions.signInForceRedirectUrl,
-        signUpForceRedirectUrl: loadedOptions.signUpForceRedirectUrl,
-        signInFallbackRedirectUrl: loadedOptions.signInFallbackRedirectUrl,
-        signUpFallbackRedirectUrl: loadedOptions.signUpFallbackRedirectUrl,
-      },
+    const authFn = (opts?: PendingSessionOptions) => requestState.toAuth(opts);
+    const additionalState: AdditionalStateOptions = {
+      __keylessClaimUrl,
+      __keylessApiKeysUrl,
+      signInForceRedirectUrl: loadedOptions.signInForceRedirectUrl,
+      signUpForceRedirectUrl: loadedOptions.signUpForceRedirectUrl,
+      signInFallbackRedirectUrl: loadedOptions.signInFallbackRedirectUrl,
+      signUpFallbackRedirectUrl: loadedOptions.signUpFallbackRedirectUrl,
+    };
+
+    // Mirror the auth onto the React Router context for back-compat: anything
+    // reading authFnContext / requestStateContext directly keeps working.
+    args.context.set(authFnContext, authFn);
+    args.context.set(requestStateContext, { requestState, additionalState });
+
+    // Primary path: bind this request's auth to the async execution scope so
+    // getAuth resolves it per-request even when the RR context is shared across
+    // requests (see requestAuthStorage). next(), and every loader/action it
+    // runs, executes inside this scope.
+    return requestAuthStorage.run({ authFn, requestState, additionalState }, async () => {
+      const response = await next();
+
+      if (requestState.headers) {
+        requestState.headers.forEach((value, key) => {
+          response.headers.append(key, value);
+        });
+      }
+
+      return response;
     });
-
-    const response = await next();
-
-    if (requestState.headers) {
-      requestState.headers.forEach((value, key) => {
-        response.headers.append(key, value);
-      });
-    }
-
-    return response;
   };
 };

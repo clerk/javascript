@@ -9,6 +9,7 @@ import type { LoaderFunctionArgs } from 'react-router';
 import { IsOptIntoMiddleware } from '../server/utils';
 import { noLoaderArgsPassedInGetAuth } from '../utils/errors';
 import { authFnContext } from './clerkMiddleware';
+import { requestAuthStorage } from './requestAuthStorage';
 
 type GetAuthOptions = PendingSessionOptions & { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] };
 
@@ -22,7 +23,11 @@ export const getAuth: GetAuthFn<LoaderFunctionArgs, true> = (async (
 
   const { acceptsToken, treatPendingAsSignedOut } = opts || {};
 
-  const authObjectFn = IsOptIntoMiddleware(args.context) && args.context.get(authFnContext);
+  // Prefer the request-scoped store (immune to a shared RouterContextProvider);
+  // fall back to the RR context slot for runtimes without async storage or calls
+  // made outside the middleware's async scope.
+  const scopedAuthFn = requestAuthStorage.getStore()?.authFn;
+  const authObjectFn = scopedAuthFn ?? (IsOptIntoMiddleware(args.context) && args.context.get(authFnContext));
   if (!authObjectFn) {
     throw new Error(
       'Clerk: clerkMiddleware() not detected. Make sure you have installed the clerkMiddleware in your root route.',
