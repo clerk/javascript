@@ -33,6 +33,7 @@ export function OrganizationProfile() {
           '0px 5px 15px 0px rgba(0,0,0,0.08), 0px 15px 35px -5px rgba(0,0,0,0.20), 0px 0px 0px 1px rgba(0,0,0,0.06)',
         background: `light-dark(white, oklch(0.145 0 0))`,
         width: '100%',
+        minHeight: '625px',
       })}
     >
       {/* Sidebar */}
