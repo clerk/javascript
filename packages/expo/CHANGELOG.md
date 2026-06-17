@@ -1,5 +1,26 @@
 # Change Log
 
+## 3.4.4
+
+### Patch Changes
+
+- Fixes iOS Google One Tap sign-in to reject blank Google client IDs and to default to filtering by previously authorized accounts. ([#8903](https://github.com/clerk/javascript/pull/8903)) by [@mikepitre](https://github.com/mikepitre)
+
+- Fixes iOS builds that use native Google Sign-In by letting Expo Autolinking configure the required Google pod dependencies. ([#8901](https://github.com/clerk/javascript/pull/8901)) by [@mikepitre](https://github.com/mikepitre)
+
+- Preserve Expo's relative import specifiers in tsdown builds so Metro platform-specific module resolution and root exports work correctly. ([#8880](https://github.com/clerk/javascript/pull/8880)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix Expo native Clerk components and JavaScript auth hooks staying stale when authentication changes between the JavaScript and native SDKs. JS-owned sign-in now hydrates native components on cold start, sign-out from either runtime updates the other side, and native multi-session changes keep the remaining JavaScript session active. ([#8879](https://github.com/clerk/javascript/pull/8879)) by [@mikepitre](https://github.com/mikepitre)
+
+- Restores the previous iOS Google sign-in default so sign-in does not filter by previously authorized accounts unless explicitly requested. ([#8905](https://github.com/clerk/javascript/pull/8905)) by [@mikepitre](https://github.com/mikepitre)
+
+- Add Expo host SDK request headers to native iOS Clerk SDK requests made through `@clerk/expo`. ([#8883](https://github.com/clerk/javascript/pull/8883)) by [@mikepitre](https://github.com/mikepitre)
+
+- Updated dependencies [[`cc83980`](https://github.com/clerk/javascript/commit/cc83980549b6ad79d06ada5bbc168c522fbb6ba7), [`d5968d0`](https://github.com/clerk/javascript/commit/d5968d026d6b2a1b399b6967fd8727613a5bc3cd), [`431e16c`](https://github.com/clerk/javascript/commit/431e16c69a2745779af217747c13a7f922e250fa), [`ffbc650`](https://github.com/clerk/javascript/commit/ffbc650ebbcee48171c95aa5d2b497273b0276b0)]:
+  - @clerk/clerk-js@6.18.0
+  - @clerk/shared@4.19.0
+  - @clerk/react@6.10.1
+
 ## 3.4.3
 
 ### Patch Changes
