@@ -25,7 +25,7 @@ export const CaptchaElement = ({
    */
   gapless?: boolean;
 }) => {
-  const elementRef = useRef(null);
+  const elementRef = useRef<HTMLDivElement>(null);
   const maxHeightValueRef = useRef('0');
   const minHeightValueRef = useRef('unset');
   const marginBottomValueRef = useRef('unset');
@@ -60,7 +60,12 @@ export const CaptchaElement = ({
           // are updated. The re-render that `setIsInteractive` triggers reads those refs fresh; setting
           // state earlier (or from a separate effect) would write stale defaults back into `style` and
           // clobber Turnstile's injected styles.
-          const nowInteractive = maxHeightValueRef.current !== '0';
+          //
+          // Turnstile expands the widget by setting `maxHeight: 'unset'` and collapses it back to `'0'`.
+          // Browsers serialize that `'0'` to `'0px'` when read back, so compare the PARSED length to zero
+          // rather than the literal `'0'` — otherwise the collapse reads as a non-`'0'` string and the
+          // spotlight stays stuck (blank card) after the challenge resolves.
+          const nowInteractive = parseFloat(maxHeightValueRef.current) > 0 || maxHeightValueRef.current === 'unset';
           setIsInteractive(nowInteractive);
           onInteractiveChangeRef.current?.(nowInteractive);
         }

@@ -17,9 +17,16 @@ export const simulateCaptchaInteractive = (el: HTMLElement) => {
   el.style.maxHeight = 'unset';
 };
 
-/** Simulate the interactive challenge resolving (widget collapses back). */
+/**
+ * Simulate the interactive challenge resolving (widget collapses back).
+ *
+ * `turnstile.ts` resets `maxHeight` to `'0'`, but browsers serialize that to `'0px'`
+ * when it's read back off `style` — so collapse with `'0px'` to mirror what the
+ * MutationObserver actually sees in a real browser (jsdom would keep a literal `'0'`
+ * and hide the off-by-serialization bug this guards against).
+ */
 export const simulateCaptchaResolved = (el: HTMLElement) => {
-  el.style.maxHeight = '0';
+  el.style.maxHeight = '0px';
 };
 
 /**
