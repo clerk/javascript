@@ -791,7 +791,7 @@ export class UserAPI extends AbstractAPI {
 
   /**
    * Deletes the passkey identification for a given user and notifies them through email.
-   * @returns A [`DeletedObjectResource`](https://clerk.com/docs/reference/types/deleted-object-resource).
+   * @returns The [`DeletedObject`](https://clerk.com/docs/reference/backend/types/deleted-object) object.
    */
   public async deleteUserPasskey(params: DeleteUserPasskeyParams) {
     this.requireId(params.userId);
@@ -804,7 +804,7 @@ export class UserAPI extends AbstractAPI {
 
   /**
    * Deletes a Web3 wallet identification for the given user.
-   * @returns A [`DeletedObjectResource`](https://clerk.com/docs/reference/types/deleted-object-resource).
+   * @returns The [`DeletedObject`](https://clerk.com/docs/reference/backend/types/deleted-object) object.
    */
   public async deleteUserWeb3Wallet(params: DeleteWeb3WalletParams) {
     this.requireId(params.userId);
@@ -817,7 +817,7 @@ export class UserAPI extends AbstractAPI {
 
   /**
    * Deletes an external account for the given user.
-   * @returns A [`DeletedObjectResource`](https://clerk.com/docs/reference/types/deleted-object-resource).
+   * @returns The [`DeletedObject`](https://clerk.com/docs/reference/backend/types/deleted-object) object.
    */
   public async deleteUserExternalAccount(params: DeleteUserExternalAccountParams) {
     this.requireId(params.userId);
