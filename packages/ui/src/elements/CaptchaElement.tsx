@@ -13,15 +13,25 @@ import { Box, useAppearance, useLocalizations } from '../customizables';
  * `maxHeight` to a non-`'0'` value (reset back to `'0'` on resolve/error). `onInteractiveChange` surfaces
  * that signal so a parent can react (e.g. spotlight the challenge); it never fires on mount.
  */
-export const CaptchaElement = ({ onInteractiveChange }: { onInteractiveChange?: (interactive: boolean) => void }) => {
+export const CaptchaElement = ({
+  onInteractiveChange,
+  gapless,
+}: {
+  onInteractiveChange?: (interactive: boolean) => void;
+  /**
+   * When true, the element is removed from flow (`position:absolute`) while collapsed so it adds no
+   * gap gutter to a flex parent, switching to `position:static` while interactive. Opt-in so the
+   * other (non-spotlight) render sites keep their current positioning.
+   */
+  gapless?: boolean;
+}) => {
   const elementRef = useRef(null);
   const maxHeightValueRef = useRef('0');
   const minHeightValueRef = useRef('unset');
   const marginBottomValueRef = useRef('unset');
-  // State exists to force a re-render on the interactive transition, which re-applies the ref-held
-  // styles above (preserving Turnstile's injected values). The value itself drives the `position`
-  // toggle added in the next commit.
-  const [, setIsInteractive] = useState(false);
+  // State forces a re-render on the interactive transition, which re-applies the ref-held styles
+  // above (preserving Turnstile's injected values) and drives the `gapless` position toggle.
+  const [isInteractive, setIsInteractive] = useState(false);
   // The observer is set up once (`[]` deps), so it reads the latest callback through a ref.
   const onInteractiveChangeRef = useRef(onInteractiveChange);
   onInteractiveChangeRef.current = onInteractiveChange;
@@ -75,6 +85,9 @@ export const CaptchaElement = ({ onInteractiveChange }: { onInteractiveChange?: 
         maxHeight: maxHeightValueRef.current,
         minHeight: minHeightValueRef.current,
         marginBottom: marginBottomValueRef.current,
+        // When `gapless`, drop out of flow while collapsed so the element contributes no gap gutter
+        // to its flex parent; rejoin flow once the interactive challenge expands it.
+        position: gapless ? (isInteractive ? 'static' : 'absolute') : undefined,
       }}
       data-cl-theme={captchaTheme}
       data-cl-size={captchaSize}

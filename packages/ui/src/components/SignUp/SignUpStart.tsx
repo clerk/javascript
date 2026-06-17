@@ -464,8 +464,8 @@ function SignUpStartInternal(): JSX.Element {
                   />
                 )}
               </SocialButtonsReversibleContainerWithDivider>
-              {!shouldShowForm && <CaptchaElement />}
             </Flex>
+            <CaptchaElement gapless />
           </Card.Content>
 
           <Card.Footer>

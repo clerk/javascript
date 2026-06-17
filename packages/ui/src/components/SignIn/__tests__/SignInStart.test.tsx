@@ -1,4 +1,5 @@
 import { ClerkAPIResponseError } from '@clerk/shared/error';
+import { CAPTCHA_ELEMENT_ID } from '@clerk/shared/internal/clerk-js/constants';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import type { SignInResource } from '@clerk/shared/types';
 import { waitFor } from '@testing-library/react';
@@ -713,6 +714,24 @@ describe('SignInStart', () => {
         '',
         expect.not.stringContaining('__clerk_ticket'),
       );
+    });
+  });
+
+  describe('Captcha', () => {
+    it('renders the captcha widget in the form (email) config', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress();
+      });
+      render(<SignInStart />, { wrapper });
+      expect(document.getElementById(CAPTCHA_ELEMENT_ID)).not.toBeNull();
+    });
+
+    it('renders the captcha widget in the social-only (no form) config', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withSocialProvider({ provider: 'google' });
+      });
+      render(<SignInStart />, { wrapper });
+      expect(document.getElementById(CAPTCHA_ELEMENT_ID)).not.toBeNull();
     });
   });
 });

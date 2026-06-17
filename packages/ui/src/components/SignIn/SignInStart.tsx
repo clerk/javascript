@@ -629,13 +629,11 @@ function SignInStartInternal(): JSX.Element {
                       />
                     </Col>
                     <Col center>
-                      <CaptchaElement />
                       <Form.SubmitButton hasArrow />
                     </Col>
                   </Form.Root>
                 ) : null}
               </SocialButtonsReversibleContainerWithDivider>
-              {!standardFormAttributes.length && <CaptchaElement />}
               {userSettings.attributes.passkey?.enabled &&
                 userSettings.passkeySettings.show_sign_in_button &&
                 isWebSupported && (
@@ -647,6 +645,7 @@ function SignInStartInternal(): JSX.Element {
                   </Card.Action>
                 )}
             </Col>
+            <CaptchaElement gapless />
           </Card.Content>
           <Card.Footer>
             {userSettings.signUp.mode === SIGN_UP_MODES.PUBLIC && !isCombinedFlow && (
