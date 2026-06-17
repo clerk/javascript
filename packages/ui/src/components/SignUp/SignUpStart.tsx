@@ -65,6 +65,9 @@ function SignUpStartInternal(): JSX.Element {
   );
 
   const [missingRequirementsWithTicket, setMissingRequirementsWithTicket] = React.useState(false);
+  // When the captcha escalates to an interactive challenge, spotlight it by collapsing/inerting the
+  // rest of the card (see the descriptors.main column below).
+  const [captchaIsInteractive, setCaptchaIsInteractive] = React.useState(false);
 
   const {
     userSettings: { passwordSettings, usernameSettings },
@@ -442,6 +445,9 @@ function SignUpStartInternal(): JSX.Element {
               direction='col'
               elementDescriptor={descriptors.main}
               gap={6}
+              // @ts-ignore - `inert` is not yet in the installed React types
+              inert={captchaIsInteractive ? '' : undefined}
+              sx={captchaIsInteractive ? { visibility: 'hidden', height: 0, overflow: 'hidden' } : undefined}
             >
               <SocialButtonsReversibleContainerWithDivider>
                 {(showOauthProviders || showWeb3Providers || showAlternativePhoneCodeProviders) && (
@@ -465,7 +471,10 @@ function SignUpStartInternal(): JSX.Element {
                 )}
               </SocialButtonsReversibleContainerWithDivider>
             </Flex>
-            <CaptchaElement gapless />
+            <CaptchaElement
+              gapless
+              onInteractiveChange={setCaptchaIsInteractive}
+            />
           </Card.Content>
 
           <Card.Footer>

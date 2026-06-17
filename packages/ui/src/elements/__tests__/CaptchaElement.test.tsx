@@ -1,8 +1,8 @@
 import { CAPTCHA_ELEMENT_ID } from '@clerk/shared/internal/clerk-js/constants';
 import { describe, expect, it, vi } from 'vitest';
 
-import { bindCreateFixtures } from '@/test/create-fixtures';
 import { simulateCaptchaInteractive, simulateCaptchaResolved } from '@/test/captcha';
+import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, waitFor } from '@/test/utils';
 
 import { CaptchaElement } from '../CaptchaElement';

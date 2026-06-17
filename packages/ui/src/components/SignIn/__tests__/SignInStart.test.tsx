@@ -5,6 +5,7 @@ import type { SignInResource } from '@clerk/shared/types';
 import { waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { simulateCaptchaInteractive, simulateCaptchaResolved } from '@/test/captcha';
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { fireEvent, mockWebAuthn, render, screen } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
@@ -732,6 +733,51 @@ describe('SignInStart', () => {
       });
       render(<SignInStart />, { wrapper });
       expect(document.getElementById(CAPTCHA_ELEMENT_ID)).not.toBeNull();
+    });
+  });
+
+  describe('Captcha spotlight', () => {
+    const getCaptcha = () => document.getElementById(CAPTCHA_ELEMENT_ID) as HTMLElement;
+
+    it('inerts the form/social subtree while interactive — never the captcha or header — and restores', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withSocialProvider({ provider: 'google' });
+      });
+      render(<SignInStart />, { wrapper });
+
+      const google = screen.getByText(/continue with google/i);
+      expect(google.closest('[inert]')).toBeNull();
+
+      simulateCaptchaInteractive(getCaptcha());
+
+      await waitFor(() => expect(google.closest('[inert]')).not.toBeNull());
+      // The captcha widget and the header stay outside the inert subtree.
+      expect(getCaptcha().closest('[inert]')).toBeNull();
+      expect(screen.getByRole('heading').closest('[inert]')).toBeNull();
+
+      simulateCaptchaResolved(getCaptcha());
+      await waitFor(() => expect(google.closest('[inert]')).toBeNull());
+    });
+
+    mockWebAuthn(() => {
+      it('keeps the passkey action available (outside the inert subtree) during the spotlight', async () => {
+        const { wrapper } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPasskey();
+          f.withPasskeySettings({
+            allow_autofill: false,
+            show_sign_in_button: true,
+          });
+        });
+        render(<SignInStart />, { wrapper });
+
+        simulateCaptchaInteractive(getCaptcha());
+        // Spotlight is active (the form is inert)...
+        await waitFor(() => expect(screen.getByText(/email address/i).closest('[inert]')).not.toBeNull());
+        // ...but the passkey action remains reachable.
+        expect(screen.getByText('Use passkey instead').closest('[inert]')).toBeNull();
+      });
     });
   });
 });
