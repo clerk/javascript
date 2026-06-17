@@ -49,10 +49,9 @@ export const Icon = React.forwardRef<SVGSVGElement, IconProps>(function MosaicIc
       <ClassNames>
         {emotion =>
           override({
-            ref,
+            ...rest,
             'data-cl-slot': root['data-cl-slot'],
             className: emotion.cx(emotion.css(root.css), root.className),
-            ...rest,
           })
         }
       </ClassNames>

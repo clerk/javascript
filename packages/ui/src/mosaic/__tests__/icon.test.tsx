@@ -9,6 +9,13 @@ import { MosaicProvider } from '../MosaicProvider';
 const wrap = (ui: React.ReactElement, appearance?: MosaicAppearance) =>
   render(<MosaicProvider appearance={appearance}>{ui}</MosaicProvider>);
 
+/** Concatenates every inserted Emotion `<style>` rule (whitespace-stripped) for substring assertions. */
+const insertedStyles = () =>
+  Array.from(document.querySelectorAll('style'))
+    .map(el => el.textContent ?? '')
+    .join('')
+    .replace(/\s+/g, '');
+
 describe('Icon', () => {
   it('renders the default glyph for a known name', () => {
     const { container } = wrap(<Icon name='chevron-right' />);
@@ -43,7 +50,10 @@ describe('Icon', () => {
       icons: { 'chevron-right': props => <span {...props} data-testid='override' /> },
     };
     const { getByTestId } = wrap(<Icon name='chevron-right' />, appearance);
+    // The override carries a serialized Mosaic class...
     expect(getByTestId('override').className).toBeTruthy();
+    // ...and that class actually applies the appearance.elements.icon styling.
+    expect(insertedStyles()).toContain('opacity:0.5');
   });
 
   it('falls through to the default when a different name is overridden', () => {

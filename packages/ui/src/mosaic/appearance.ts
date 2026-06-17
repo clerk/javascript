@@ -9,7 +9,7 @@ import type { MosaicVariables } from './variables';
  * the override exactly as to the built-in glyph, so icons stay visually consistent), `data-cl-slot`
  * for targeting, and any forwarded `svg` props. Spread them onto your element.
  */
-export type MosaicIconRenderProps = React.ComponentPropsWithRef<'svg'> & { 'data-cl-slot'?: string };
+export type MosaicIconRenderProps = React.ComponentPropsWithoutRef<'svg'> & { 'data-cl-slot'?: string };
 
 /** Replaces a named icon's glyph. Spread the received props onto your element so Mosaic styling applies. */
 export type MosaicIconRenderer = (props: MosaicIconRenderProps) => React.ReactElement;
