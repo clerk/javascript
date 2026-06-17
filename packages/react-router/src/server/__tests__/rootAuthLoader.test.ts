@@ -1,3 +1,4 @@
+import type { ClerkClient } from '@clerk/backend';
 import { TokenType } from '@clerk/backend/internal';
 import { data, type LoaderFunctionArgs } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -26,7 +27,7 @@ describe('rootAuthLoader', () => {
     // reading the value cached on the context.
     mockClerkClient.mockReturnValue({
       authenticateRequest: vi.fn().mockResolvedValue(mockRequestState),
-    } as any);
+    } as unknown as ClerkClient);
   });
 
   describe('with middleware context', () => {

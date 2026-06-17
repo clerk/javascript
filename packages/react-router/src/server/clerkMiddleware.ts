@@ -18,7 +18,9 @@ type RequestStateContextValue = {
   additionalState: AdditionalStateOptions;
 };
 
+/** @internal Not part of the public API. Used internally to detect middleware presence; may be removed in a major. */
 export const authFnContext = createContext<((options?: PendingSessionOptions) => AuthObject) | null>(null);
+/** @internal Not part of the public API. Used internally for additionalState; may be removed in a major. */
 export const requestStateContext = createContext<RequestStateContextValue | null>(null);
 // Request-INDEPENDENT config (the static clerkMiddleware options plus resolved keys)
 // used to re-derive auth on a Request-instance miss. It deliberately does NOT hold

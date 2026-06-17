@@ -1,3 +1,4 @@
+import type { ClerkClient } from '@clerk/backend';
 import { TokenType } from '@clerk/backend/internal';
 import type { LoaderFunctionArgs } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -16,9 +17,13 @@ describe('getAuth', () => {
     mockClerkClient.mockReturnValue({
       authenticateRequest: vi.fn().mockResolvedValue({
         headers: new Headers(),
-        toAuth: (options?: any) => ({ userId: 'user_xxx', tokenType: TokenType.SessionToken, ...options }),
+        toAuth: (options?: Record<string, unknown>) => ({
+          userId: 'user_xxx',
+          tokenType: TokenType.SessionToken,
+          ...(options ?? {}),
+        }),
       }),
-    } as any);
+    } as unknown as ClerkClient);
   });
 
   it('should re-derive auth from the request when middleware ran', async () => {
