@@ -3,7 +3,7 @@ import type { LoaderFunctionArgs } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { clerkClient } from '../clerkClient';
-import { requestOptionsContext } from '../clerkMiddleware';
+import { middlewareConfigContext } from '../clerkMiddleware';
 import { getAuth } from '../getAuth';
 
 vi.mock('../clerkClient');
@@ -26,7 +26,7 @@ describe('getAuth', () => {
     // the request via authenticateRequest rather than reading a cached value.
     const mockContext = {
       get: vi.fn().mockImplementation(contextKey => {
-        if (contextKey === requestOptionsContext) {
+        if (contextKey === middlewareConfigContext) {
           return { secretKey: 'sk_test_...', publishableKey: 'pk_test_...', acceptsToken: 'any' };
         }
         return null;

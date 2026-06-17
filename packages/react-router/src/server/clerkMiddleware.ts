@@ -20,8 +20,12 @@ type RequestStateContextValue = {
 
 export const authFnContext = createContext<((options?: PendingSessionOptions) => AuthObject) | null>(null);
 export const requestStateContext = createContext<RequestStateContextValue | null>(null);
-// Identity-free resolved options, reused by getAuth/rootAuthLoader to re-derive the request's user.
-export const requestOptionsContext = createContext<AuthenticateRequestOptions | null>(null);
+// Request-INDEPENDENT config (the static clerkMiddleware options plus resolved keys)
+// used to re-derive auth on a Request-instance miss. It deliberately does NOT hold
+// resolved request-derived values (domain/proxyUrl/isSatellite); those are
+// re-resolved per request from args.request, so a shared context can't leak one
+// request's resolved options to another.
+export const middlewareConfigContext = createContext<ClerkMiddlewareOptions | null>(null);
 const sharedContextProbe = createContext<Request | null>(null);
 
 const sharedContextMessage =
@@ -33,10 +37,11 @@ const sharedContextMessage =
 const requestStateByRequest = new WeakMap<Request, RequestState<any>>();
 
 /**
- * Auth state for this request. Reuses what clerkMiddleware already resolved
- * (so handshake/refresh and any machine-token verification happen once per
- * request), and re-authenticates only when the Request instance differs from the
- * one the middleware saw (e.g. React Router's action -> loader revalidation).
+ * Auth state for this request. Reuses what clerkMiddleware already resolved (keyed
+ * by Request, so handshake/refresh and any machine-token verification happen once
+ * per request). On a Request-instance miss (e.g. React Router's action -> loader
+ * revalidation), it re-authenticates from this request's own cookies and caches
+ * the result so repeat calls on that Request reuse it too.
  */
 export async function resolveRequestState(args: DataFunctionArgs): Promise<RequestState<any>> {
   const cached = requestStateByRequest.get(args.request);
@@ -44,20 +49,25 @@ export async function resolveRequestState(args: DataFunctionArgs): Promise<Reque
     return cached;
   }
 
-  // Miss: re-derive from this request's own cookies. `options` is identity-free
-  // config, so reading it from a possibly-shared context is safe; identity comes
-  // from args.request, so the result is always this request's user.
-  const options = IsOptIntoMiddleware(args.context) ? args.context.get(requestOptionsContext) : null;
-  if (!options) {
+  const config = IsOptIntoMiddleware(args.context) ? args.context.get(middlewareConfigContext) : null;
+  if (!config) {
     throw new Error(
       'Clerk: clerkMiddleware() not detected. Make sure you have installed the clerkMiddleware in your root route.',
     );
   }
 
-  return clerkClient(args, options).authenticateRequest(createClerkRequest(patchRequest(args.request)), {
-    ...options,
-    acceptsToken: 'any',
-  });
+  // Re-resolve options from THIS request: domain/proxyUrl/isSatellite are derived
+  // from args.request, and `config` carries only request-independent values (static
+  // options + resolved keys), so this can't pick up another request's resolved
+  // options even when the context is shared. Identity comes from args.request.
+  const options = loadOptions(args, config);
+  const requestState = await clerkClient(args, config).authenticateRequest(
+    createClerkRequest(patchRequest(args.request)),
+    { ...options, acceptsToken: 'any' },
+  );
+
+  requestStateByRequest.set(args.request, requestState);
+  return requestState;
 }
 
 /**
@@ -163,11 +173,21 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFun
       signUpFallbackRedirectUrl: loadedOptions.signUpFallbackRedirectUrl,
     };
 
+    // Request-independent config (static options + resolved keys) for the re-derive
+    // fallback when the Request instance differs. Deliberately excludes resolved
+    // domain/proxyUrl/isSatellite, which are re-resolved per request from args.request.
+    const middlewareConfig: ClerkMiddlewareOptions = {
+      ...options,
+      secretKey: loadedOptions.secretKey,
+      publishableKey: loadedOptions.publishableKey,
+      jwtKey,
+      machineSecretKey,
+    };
+
     // Cache the resolved state keyed by this Request so getAuth/rootAuthLoader reuse
-    // it. Stash identity-free options for the re-derive fallback when the Request
-    // instance differs. authFnContext/requestStateContext remain for back-compat.
+    // it. authFnContext/requestStateContext remain for back-compat.
     requestStateByRequest.set(args.request, requestState);
-    args.context.set(requestOptionsContext, authenticateOptions);
+    args.context.set(middlewareConfigContext, middlewareConfig);
     args.context.set(authFnContext, (opts?: PendingSessionOptions) => requestState.toAuth(opts));
     args.context.set(requestStateContext, { requestState, additionalState });
 

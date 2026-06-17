@@ -150,8 +150,9 @@ describe('clerkMiddleware + getAuth auth isolation', () => {
     expect(authSpy).toHaveBeenCalledTimes(1);
   });
 
-  // On a Request-instance miss (action -> loader), it re-derives exactly once.
-  it('re-derives once on a fresh Request instance', async () => {
+  // On a Request-instance miss (action -> loader) it re-derives once for that fresh
+  // Request and caches it, so repeat getAuth calls on it don't re-authenticate.
+  it('re-derives once per fresh Request and caches it', async () => {
     const authSpy = vi.fn((req: { url: string }) => Promise.resolve(fakeStateForRequest(req)));
     mockClerkClient.mockReturnValue({ authenticateRequest: authSpy } as unknown as ClerkClient);
 
@@ -163,10 +164,70 @@ describe('clerkMiddleware + getAuth auth isolation', () => {
       const loaderRequest = new Request(request.url, { headers: request.headers });
       const loaderArgs = { request: loaderRequest, context: args.context } as unknown as LoaderFunctionArgs;
       expect(await readUserId(loaderArgs)).toBe('user_A');
+      expect(await readUserId(loaderArgs)).toBe('user_A');
       return new Response('A');
     });
 
-    // middleware (1) + one re-derive for the fresh loader Request (1).
+    // middleware (1) + a single re-derive for the fresh loader Request (1); the
+    // second getAuth on that Request reused the cached result.
     expect(authSpy).toHaveBeenCalledTimes(2);
+  });
+
+  // Request-derived options (e.g. a domain/proxyUrl/isSatellite function) must be
+  // resolved from each request, not read off a shared context. Here domain is
+  // derived from the URL; even when B overwrites the shared config between A's
+  // middleware and A's fresh loader Request, A must authenticate with A's domain.
+  it('re-resolves request-derived options per request on a miss (no options bleed)', async () => {
+    mockLoadOptions.mockImplementation(
+      (a: { request: Request }) =>
+        ({
+          audience: '',
+          authorizedParties: [],
+          signInUrl: '',
+          signUpUrl: '',
+          secretKey: 'sk_live_xxx',
+          publishableKey: 'pk_live_xxx',
+          domain: new URL(a.request.url).searchParams.get('u'),
+        }) as unknown as ReturnType<typeof loadOptions>,
+    );
+
+    const calls: Array<{ reqUser: string | null; domain: unknown }> = [];
+    mockClerkClient.mockReturnValue({
+      authenticateRequest: vi.fn((req: { url: string }, opts: { domain?: unknown }) => {
+        calls.push({ reqUser: new URL(req.url).searchParams.get('u'), domain: opts.domain });
+        return Promise.resolve(fakeStateForRequest(req));
+      }),
+    } as unknown as ClerkClient);
+
+    const shared = new RouterContextProvider();
+    const middleware = clerkMiddleware();
+
+    const reqA = new Request('http://app.test/?u=user_A', { method: 'POST' });
+    const argsA = { request: reqA, context: shared } as unknown as LoaderFunctionArgs;
+    const reqB = new Request('http://app.test/?u=user_B');
+    const argsB = { request: reqB, context: shared } as unknown as LoaderFunctionArgs;
+
+    let releaseA!: () => void;
+    const gateA = new Promise<void>(resolve => (releaseA = resolve));
+
+    const aDone = middleware(argsA, async () => {
+      await gateA;
+      // Fresh Request (action -> loader): misses the cache and re-derives.
+      const loaderReqA = new Request(reqA.url, { headers: reqA.headers });
+      const loaderArgsA = { request: loaderReqA, context: shared } as unknown as LoaderFunctionArgs;
+      await readUserId(loaderArgsA);
+      return new Response('A');
+    });
+
+    await flushMicrotasks();
+    await middleware(argsB, () => Promise.resolve(new Response('B')));
+    releaseA();
+    await aDone;
+
+    // Every authenticateRequest call used the domain resolved from its own request.
+    expect(calls.length).toBeGreaterThan(0);
+    for (const call of calls) {
+      expect(call.domain).toBe(call.reqUser);
+    }
   });
 });

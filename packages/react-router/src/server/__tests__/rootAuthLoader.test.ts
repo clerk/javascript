@@ -3,7 +3,7 @@ import { data, type LoaderFunctionArgs } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { clerkClient } from '../clerkClient';
-import { authFnContext, requestOptionsContext, requestStateContext } from '../clerkMiddleware';
+import { authFnContext, middlewareConfigContext, requestStateContext } from '../clerkMiddleware';
 import { rootAuthLoader } from '../rootAuthLoader';
 
 vi.mock('../clerkClient');
@@ -32,7 +32,7 @@ describe('rootAuthLoader', () => {
   describe('with middleware context', () => {
     const makeContext = (additionalState: Record<string, unknown> = {}) => ({
       get: vi.fn().mockImplementation(contextKey => {
-        if (contextKey === requestOptionsContext) {
+        if (contextKey === middlewareConfigContext) {
           return { secretKey: 'sk_test_...', publishableKey: 'pk_test_...', acceptsToken: 'any' };
         }
         if (contextKey === requestStateContext) {
