@@ -59,7 +59,7 @@ public class ClerkGoogleSignInModule: Module {
       return
     }
 
-    let filterByAuthorized = params?["filterByAuthorizedAccounts"] as? Bool ?? true
+    let filterByAuthorized = params?["filterByAuthorizedAccounts"] as? Bool ?? false
     let hint: String? = filterByAuthorized
       ? GIDSignIn.sharedInstance.currentUser?.profile?.email
       : nil
