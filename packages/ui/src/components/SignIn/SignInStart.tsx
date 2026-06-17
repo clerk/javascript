@@ -742,6 +742,7 @@ const InstantPasswordRow = ({
         onActionClicked={show ? onForgotPasswordClick : undefined}
         ref={ref}
         tabIndex={show ? undefined : -1}
+        aria-hidden={!show}
       />
     </Form.ControlRow>
   );
