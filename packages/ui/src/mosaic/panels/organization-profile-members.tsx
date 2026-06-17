@@ -385,6 +385,7 @@ export function OrganizationProfileMembers() {
           <Text
             size='xs'
             intent='mutedForeground'
+            sx={t => ({ fontWeight: t.font.medium })}
           >
             {visibleMembers.length} members
           </Text>

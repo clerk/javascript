@@ -43,7 +43,7 @@ export function FilterChip({ label, value, onValueChange, items, clearable = tru
             display: 'inline-flex',
             alignItems: 'center',
             gap: t.spacing(1),
-            height: '28px',
+            height: '24px',
             paddingInline: t.spacing(2),
             borderRadius: t.rounded.md,
             border: showSelected ? `1px solid ${t.color.border}` : `1px dashed ${t.color.border}`,
@@ -75,13 +75,13 @@ export function FilterChip({ label, value, onValueChange, items, clearable = tru
             <Text
               size='xs'
               render={p => <span {...p} />}
+              sx={t => ({ fontWeight: t.font.medium })}
             >
               {label}
             </Text>
           )}
           <ChevronDown
-            width={11}
-            height={11}
+            height={16}
             style={{ opacity: 0.6, flexShrink: 0 }}
           />
         </Box>
