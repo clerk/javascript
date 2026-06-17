@@ -178,8 +178,7 @@ describe('clerkMiddleware + getAuth auth isolation', () => {
   // so any machine-token verification / refresh happens once per request.
   it('dedupes concurrent re-derivation for the same fresh Request', async () => {
     const authSpy = vi.fn(
-      (req: { url: string }) =>
-        new Promise(resolve => setTimeout(() => resolve(fakeStateForRequest(req)), 0)),
+      (req: { url: string }) => new Promise(resolve => setTimeout(() => resolve(fakeStateForRequest(req)), 0)),
     );
     mockClerkClient.mockReturnValue({ authenticateRequest: authSpy } as unknown as ClerkClient);
 
