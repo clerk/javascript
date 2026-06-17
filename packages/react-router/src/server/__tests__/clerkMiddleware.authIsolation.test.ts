@@ -48,7 +48,7 @@ describe('clerkMiddleware + getAuth auth isolation', () => {
       publishableKey: 'pk_live_xxx',
     } as unknown as ReturnType<typeof loadOptions>);
     mockClerkClient.mockReturnValue({
-      authenticateRequest: vi.fn(async (req: { url: string }) => fakeStateForRequest(req)),
+      authenticateRequest: vi.fn((req: { url: string }) => Promise.resolve(fakeStateForRequest(req))),
     } as unknown as ClerkClient);
   });
 
@@ -98,7 +98,9 @@ describe('clerkMiddleware + getAuth auth isolation', () => {
   it('keeps auth per-request with a fresh RouterContextProvider per request', async () => {
     const perRequest = new Map<Request, RouterContextProvider>();
     const results = await runInterleaved(req => {
-      if (!perRequest.has(req)) perRequest.set(req, new RouterContextProvider());
+      if (!perRequest.has(req)) {
+        perRequest.set(req, new RouterContextProvider());
+      }
       return perRequest.get(req)!;
     });
 

@@ -25,7 +25,7 @@ export const requestOptionsContext = createContext<AuthenticateRequestOptions | 
 const sharedContextProbe = createContext<Request | null>(null);
 
 const sharedContextMessage =
-  'Clerk: The React Router `context` is being reused across requests. clerkMiddleware() resolves each request\'s auth from that request, so sign-in state stays correct, but sharing one context across requests is unsupported and can leak your application\'s own per-request data. This usually comes from a custom server or `getLoadContext()` that returns a single RouterContextProvider; return a new RouterContextProvider() for each request instead.';
+  "Clerk: The React Router `context` is being reused across requests. clerkMiddleware() resolves each request's auth from that request, so sign-in state stays correct, but sharing one context across requests is unsupported and can leak your application's own per-request data. This usually comes from a custom server or `getLoadContext()` that returns a single RouterContextProvider; return a new RouterContextProvider() for each request instead.";
 
 /**
  * Re-derives the request's auth from `args.request` using the identity-free options

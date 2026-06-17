@@ -28,7 +28,7 @@ function fakeStateForRequest(req: { url: string }) {
   };
 }
 
-const noop = async () => new Response('ok');
+const noop = () => Promise.resolve(new Response('ok'));
 
 describe('clerkMiddleware shared-context detection', () => {
   let warnOnceSpy: ReturnType<typeof vi.spyOn>;
@@ -45,7 +45,7 @@ describe('clerkMiddleware shared-context detection', () => {
       publishableKey: 'pk_live_xxx',
     } as unknown as ReturnType<typeof loadOptions>);
     mockClerkClient.mockReturnValue({
-      authenticateRequest: vi.fn(async (req: { url: string }) => fakeStateForRequest(req)),
+      authenticateRequest: vi.fn((req: { url: string }) => Promise.resolve(fakeStateForRequest(req))),
     } as unknown as ClerkClient);
   });
 
@@ -70,11 +70,17 @@ describe('clerkMiddleware shared-context detection', () => {
     const middleware = clerkMiddleware();
 
     await middleware(
-      { request: new Request('http://app.test/?u=user_A'), context: new RouterContextProvider() } as unknown as LoaderFunctionArgs,
+      {
+        request: new Request('http://app.test/?u=user_A'),
+        context: new RouterContextProvider(),
+      } as unknown as LoaderFunctionArgs,
       noop,
     );
     await middleware(
-      { request: new Request('http://app.test/?u=user_B'), context: new RouterContextProvider() } as unknown as LoaderFunctionArgs,
+      {
+        request: new Request('http://app.test/?u=user_B'),
+        context: new RouterContextProvider(),
+      } as unknown as LoaderFunctionArgs,
       noop,
     );
 
