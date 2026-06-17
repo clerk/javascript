@@ -2,17 +2,17 @@
 import { meta as accordionMeta } from '../stories/accordion.stories';
 import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
 import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
+import {
+  Centered as CardCentered,
+  Default as CardDefault,
+  meta as cardComponentMeta,
+} from '../stories/card.component.stories';
 import { meta as collapsibleMeta } from '../stories/collapsible.stories';
 import {
   Default as DeleteOrganizationDefault,
   meta as deleteOrganizationMeta,
 } from '../stories/delete-organization.stories';
 import { Default as DestructiveDefault, meta as destructiveMeta } from '../stories/destructive.stories';
-import {
-  Centered as CardCentered,
-  Default as CardDefault,
-  meta as cardComponentMeta,
-} from '../stories/card.component.stories';
 import { Default as DialogDefault, meta as dialogComponentMeta } from '../stories/dialog.component.stories';
 import { meta as dialogMeta } from '../stories/dialog.stories';
 import {
