@@ -21,9 +21,7 @@ export type OAuthProvider =
 
 export type OAuthStrategy = `oauth_${OAuthProvider}`;
 
-/**
- * @inline
- */
+/** @inline */
 export type OrganizationInvitationStatus = 'pending' | 'accepted' | 'revoked' | 'expired';
 
 export type OrganizationDomainVerificationStatus = 'unverified' | 'verified';
@@ -32,6 +30,7 @@ export type OrganizationDomainVerificationStrategy = 'email_code'; // only avail
 
 export type OrganizationEnrollmentMode = 'manual_invitation' | 'automatic_invitation' | 'automatic_suggestion';
 
+/** @inline */
 export type OrganizationMembershipRole = OrganizationCustomRoleKey;
 
 export type SignInStatus = 'needs_identifier' | 'needs_factor_one' | 'needs_factor_two' | 'complete';

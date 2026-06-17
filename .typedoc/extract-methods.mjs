@@ -806,6 +806,9 @@ function resolveDeclarationWithObjectMembers(t, project) {
   if (t.type === 'optional') {
     return resolveDeclarationWithObjectMembers(/** @type {import('typedoc').OptionalType} */ (t).elementType, project);
   }
+  if (t.type === 'array') {
+    return resolveDeclarationWithObjectMembers(/** @type {import('typedoc').ArrayType} */ (t).elementType, project);
+  }
   if (t.type === 'reflection') {
     const children = t.declaration?.children;
     return children?.length ? children : undefined;
@@ -858,14 +861,15 @@ function resolveDeclarationWithObjectMembers(t, project) {
 }
 
 /**
- * Build the name cell for a nominal-nested row. Uses `?.` when the parent param is optional (so `options?.foo` mirrors how it would be accessed at runtime) and `.` when required — same rule as `clerkParametersTable.flattenParams` in `custom-theme.mjs`.
+ * Build the name cell for a nominal-nested row. Uses `?.` when the parent param is optional (so `options?.foo` mirrors how it would be accessed at runtime) and `.` when required — same rule as `clerkParametersTable.flattenParams` in `custom-theme.mjs`. Appends `?` to the child name when the child property itself is optional, matching how the inline-flatten path renders `params.field?` via the standard parametersTable.
  *
  * @param {import('typedoc').ParameterReflection} parentParam
- * @param {string} childName
+ * @param {import('typedoc').DeclarationReflection} child
  */
-function formatNestedParamNameColumn(parentParam, childName) {
+function formatNestedParamNameColumn(parentParam, child) {
   const sep = parentParam.flags?.isOptional ? '?.' : '.';
-  return `\`${parentParam.name}${sep}${childName}\``;
+  const childOptional = child.flags?.isOptional ? '?' : '';
+  return `\`${parentParam.name}${sep}${child.name}${childOptional}\``;
 }
 
 /**
@@ -923,7 +927,7 @@ function nestedParameterRowsFromDocumentedProperties(param, ctx) {
   for (const child of props) {
     const summary = child.comment?.summary;
     const typeCell = child.type ? removeLineBreaksForTableCell(ctx.partials.someType(child.type)) : '`unknown`';
-    const nestedNameCol = formatNestedParamNameColumn(param, child.name);
+    const nestedNameCol = formatNestedParamNameColumn(param, child);
     const nestedDescRaw = summary?.length ? displayPartsToString(summary).trim() || '—' : '—';
     // Strip line breaks so multi-line `<ul>` / paragraph descriptions don't shatter the markdown
     // table row (which must be a single line). Matches the treatment already applied to typeCell.

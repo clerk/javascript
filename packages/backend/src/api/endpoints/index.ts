@@ -33,3 +33,8 @@ export * from './TestingTokenApi';
 export * from './UserApi';
 export * from './WaitlistEntryApi';
 export * from './WebhookApi';
+
+// Disambiguate names that exist in both UserApi (user-scoped) and OrganizationApi
+// (org-scoped) — the UserApi versions remain the canonical public exports; the
+// org-scoped variants stay reachable via direct import from './OrganizationApi'.
+export type { GetOrganizationInvitationListParams, GetOrganizationMembershipListParams } from './UserApi';

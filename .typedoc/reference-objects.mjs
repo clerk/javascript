@@ -64,6 +64,10 @@ export const BACKEND_API_CONFIG = {
     symbol: 'UserAPI',
     declarationHint: 'api/endpoints/UserApi',
   },
+  'backend/organization-api/organization-api.mdx': {
+    symbol: 'OrganizationAPI',
+    declarationHint: 'api/endpoints/OrganizationApi',
+  },
 };
 
 /** Stable iteration order matches key order in {@link REFERENCE_OBJECT_CONFIG} then {@link BACKEND_API_CONFIG}. */

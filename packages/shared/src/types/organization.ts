@@ -22,18 +22,14 @@ import type { GetEnterpriseConnectionsParams } from './user';
 
 declare global {
   /**
-   * If you want to provide custom types for the organization.publicMetadata object,
-   * simply redeclare this rule in the global namespace.
-   * Every Organization object will use the provided type.
+   * If you want to provide custom types for the `organization.publicMetadata` object, simply redeclare this rule in the global namespace. Every `Organization` object will use the provided type.
    */
   interface OrganizationPublicMetadata {
     [k: string]: unknown;
   }
 
   /**
-   * If you want to provide custom types for the organization.privateMetadata object,
-   * simply redeclare this rule in the global namespace.
-   * Every Organization object will use the provided type.
+   * If you want to provide custom types for the `organization.privateMetadata` object, simply redeclare this rule in the global namespace. Every `Organization` object will use the provided type.
    */
   interface OrganizationPrivateMetadata {
     [k: string]: unknown;
