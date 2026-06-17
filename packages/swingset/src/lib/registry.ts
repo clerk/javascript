@@ -8,7 +8,11 @@ import {
   meta as deleteOrganizationMeta,
 } from '../stories/delete-organization.stories';
 import { Default as DestructiveDefault, meta as destructiveMeta } from '../stories/destructive.stories';
-import { Default as CardDefault, meta as cardComponentMeta } from '../stories/card.component.stories';
+import {
+  Centered as CardCentered,
+  Default as CardDefault,
+  meta as cardComponentMeta,
+} from '../stories/card.component.stories';
 import { Default as DialogDefault, meta as dialogComponentMeta } from '../stories/dialog.component.stories';
 import { meta as dialogMeta } from '../stories/dialog.stories';
 import {
@@ -60,7 +64,7 @@ const organizationProfileGeneralModule: StoryModule = {
   Default: OrganizationProfileGeneralDefault,
 };
 
-const cardComponentModule: StoryModule = { meta: cardComponentMeta, Default: CardDefault };
+const cardComponentModule: StoryModule = { meta: cardComponentMeta, Default: CardDefault, Centered: CardCentered };
 
 const buttonModule: StoryModule = { meta: buttonMeta, Primary, Sizes, Disabled };
 
