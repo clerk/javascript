@@ -136,13 +136,13 @@ const OrganizationProfileSection = () => {
 
 const OrganizationDomainsSection = () => {
   const { organizationSettings } = useEnvironment();
-  const { organization } = useOrganization();
+  const { organization, domains } = useOrganization();
 
   if (!organizationSettings || !organization) {
     return null;
   }
 
-  if (!organizationSettings.domains.enabled) {
+  if (!organizationSettings.domains.enabled || !domains?.data?.length) {
     return null;
   }
 
