@@ -36,7 +36,7 @@ export const buttonRecipe = defineSlotRecipe(theme => ({
     },
     size: {
       sm: { padding: `${theme.spacing(0.2)} ${theme.spacing(2)}`, ...theme.text('xs') },
-      md: { padding: `${theme.spacing(2)} ${theme.spacing(4)}`, ...theme.text('sm') },
+      md: { padding: `${theme.spacing(1)} ${theme.spacing(3)}`, ...theme.text('sm') },
     },
     shape: {
       default: {},

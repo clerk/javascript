@@ -58,6 +58,24 @@ const nextConfig = {
     excludeRawQuery(config.module.rules);
     config.module.rules.push({ resourceQuery: /raw/, type: 'asset/source' });
 
+    config.module.rules.push({
+      test: /\.svg$/,
+      resourceQuery: { not: [/raw/] },
+      use: [
+        {
+          loader: '@svgr/webpack',
+          options: {
+            svgo: true,
+            svgoConfig: {
+              floatPrecision: 3,
+              transformPrecision: 1,
+              plugins: ['preset-default', 'removeDimensions', 'removeStyleElement'],
+            },
+          },
+        },
+      ],
+    });
+
     config.resolve.alias['@clerk/ui/mosaic'] = resolve(__dirname, '../ui/src/mosaic');
     // Consume @clerk/headless primitives from source (no dist build needed), mirroring Mosaic.
     // `/utils` lives outside `primitives/`, so alias it first (more specific wins).

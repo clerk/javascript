@@ -1,0 +1,14 @@
+import * as OrganizationProfileMembersStories from './organization-profile-members.stories';
+
+# Organization Profile Members
+
+The Members tab panel of the Organization Profile — renders the member list with roles, pending join requests (Decline/Accept), and invited-member indicators.
+
+<Story
+  name='Default'
+  storyModule={OrganizationProfileMembersStories}
+  composition={[
+    { name: 'Avatar', href: '/components/avatar', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+  ]}
+/>

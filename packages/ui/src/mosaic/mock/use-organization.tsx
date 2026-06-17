@@ -14,11 +14,17 @@ import { delay, LOAD_DELAY_MS, MUTATION_DELAY_MS } from './organization-store';
  * simulated delay. Simulated async only — no real SDK.
  */
 
+export interface MockEmailDomain {
+  id: string;
+  domain: string;
+}
+
 export interface MockOrganization {
   id: string;
   name: string;
   slug: string | null;
   membersCount: number;
+  emailDomains: MockEmailDomain[];
   /** Delete the entire organization (admin-only in the real API). */
   destroy: () => Promise<void>;
 }
@@ -52,10 +58,11 @@ export function useOrganization(): UseOrganizationReturn {
   return {
     isLoaded: true,
     organization: {
-      id: 'org_mock',
-      name: "Alex's Organization",
-      slug: 'alex-org',
+      id: 'org_3ClR4FuXD4m9qlH7s',
+      name: 'Acme Co.',
+      slug: 'acme-co',
       membersCount: 4,
+      emailDomains: [{ id: 'dom_1', domain: 'clerk.dev' }],
       destroy: () => delay(MUTATION_DELAY_MS),
     },
     membership: {

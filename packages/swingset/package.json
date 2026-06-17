@@ -31,6 +31,7 @@
     "@mdx-js/loader": "^3.1.1",
     "@mdx-js/react": "^3.1.0",
     "@next/mdx": "^15.0.0",
+    "@svgr/webpack": "^6.5.1",
     "@tailwindcss/postcss": "^4.0.0",
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",

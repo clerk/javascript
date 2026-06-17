@@ -1,0 +1,48 @@
+import * as AvatarStories from './avatar.stories';
+
+# Avatar
+
+A themed avatar with two shape variants: `org` (rounded square) for organizations and `user` (circle) for users. Accepts a `color` prop for per-entity brand colors and an optional `src` for image avatars.
+
+## Playground
+
+<Preview
+  name='Primary'
+  storyModule={AvatarStories}
+/>
+
+## Props
+
+<PropTable meta={AvatarStories.meta} />
+
+## Usage
+
+<Usage
+  component='Avatar'
+  module='@clerk/ui/mosaic/components/avatar'
+/>
+
+---
+
+## Examples
+
+### Org variant
+
+<Story
+  name='OrgVariant'
+  storyModule={AvatarStories}
+/>
+
+### User variant
+
+<Story
+  name='UserVariant'
+  storyModule={AvatarStories}
+/>
+
+### Sizes
+
+<Story
+  name='Sizes'
+  storyModule={AvatarStories}
+/>

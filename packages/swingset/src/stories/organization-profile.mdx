@@ -2,13 +2,13 @@ import * as OrganizationProfileStories from './organization-profile.stories';
 
 # Organization Profile
 
-The full Organization Profile AIO — lays out the organization panels under a tabbed shell as a single view.
+The full Organization Profile AIO — a sidebar-navigated modal shell that renders organization management panels. The sidebar shows the org avatar, name, and nav items (General, Members, Billing, API Keys); the content area swaps panels on selection.
 
 <Story
   name='Default'
   storyModule={OrganizationProfileStories}
   composition={[
     { name: 'OrganizationProfileGeneral', href: '/panels/organization-profile-general', layer: 'Panels' },
-    { name: 'Tabs', href: '/components/tabs', layer: 'Components' },
+    { name: 'Avatar', href: '/components/avatar', layer: 'Components' },
   ]}
 />

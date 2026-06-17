@@ -49,6 +49,11 @@ export interface StoryMeta {
    * source" link to the file on GitHub. See `lib/source.ts`.
    */
   source?: string;
+  /**
+   * When true, the docs page uses a wider content column (max-w-5xl instead of max-w-3xl).
+   * Use for AIO components and other wide compositions that need more horizontal room.
+   */
+  wide?: boolean;
   styles?: {
     _variants: Record<string, Record<string, unknown>>;
     _defaultVariants?: Record<string, unknown>;

@@ -15,6 +15,9 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   },
   panels: {
     'organization-profile-general': dynamic(() => import('../stories/organization-profile-general.mdx')),
+    'organization-profile-members': dynamic(() => import('../stories/organization-profile-members.mdx')),
+    'organization-profile-billing': dynamic(() => import('../stories/organization-profile-billing.mdx')),
+    'organization-profile-api-keys': dynamic(() => import('../stories/organization-profile-api-keys.mdx')),
   },
   sections: {
     'leave-organization': dynamic(() => import('../stories/leave-organization.mdx')),
@@ -24,6 +27,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     destructive: dynamic(() => import('../stories/destructive.mdx')),
   },
   components: {
+    avatar: dynamic(() => import('../stories/avatar.mdx')),
     button: dynamic(() => import('../stories/button.mdx')),
     input: dynamic(() => import('../stories/input.mdx')),
     dialog: dynamic(() => import('../stories/dialog.component.mdx')),
@@ -66,7 +70,7 @@ export function DocsViewer({ group, slug }: DocsViewerProps) {
       key={`${group}/${slug}`}
       meta={meta}
     >
-      <article className='prose relative mx-auto w-full min-w-0 max-w-3xl p-8'>
+      <article className={`prose relative mx-auto w-full min-w-0 p-8 ${meta?.wide ? 'max-w-5xl' : 'max-w-3xl'}`}>
         {meta?.source ? (
           <div className='absolute right-8 top-8'>
             <ViewSource source={meta.source} />

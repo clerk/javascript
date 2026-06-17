@@ -8,6 +8,7 @@ export const meta: StoryMeta = {
   title: 'OrganizationProfile',
   label: 'Org Profile',
   source: 'packages/ui/src/mosaic/aio/organization-profile.tsx',
+  wide: true,
 };
 
 export function Default() {

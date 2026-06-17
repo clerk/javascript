@@ -1,0 +1,14 @@
+import * as OrganizationProfileBillingStories from './organization-profile-billing.stories';
+
+# Organization Profile Billing
+
+The Billing tab panel of the Organization Profile — sub-tab navigation (Subscription / Statements / Payments), current plan summary, and payment methods list.
+
+<Story
+  name='Default'
+  storyModule={OrganizationProfileBillingStories}
+  composition={[
+    { name: 'Tabs', href: '/components/tabs', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+  ]}
+/>

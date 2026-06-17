@@ -1,5 +1,12 @@
 // Import stories explicitly to control order and avoid type casting through unknown.
 import { meta as accordionMeta } from '../stories/accordion.stories';
+import {
+  meta as avatarMeta,
+  OrgVariant as AvatarOrgVariant,
+  Primary as AvatarPrimary,
+  Sizes as AvatarSizes,
+  UserVariant as AvatarUserVariant,
+} from '../stories/avatar.stories';
 import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
 import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
 import { meta as collapsibleMeta } from '../stories/collapsible.stories';
@@ -33,9 +40,21 @@ import {
   meta as organizationProfileMeta,
 } from '../stories/organization-profile.stories';
 import {
+  Default as OrganizationProfileApiKeysDefault,
+  meta as organizationProfileApiKeysMeta,
+} from '../stories/organization-profile-api-keys.stories';
+import {
+  Default as OrganizationProfileBillingDefault,
+  meta as organizationProfileBillingMeta,
+} from '../stories/organization-profile-billing.stories';
+import {
   Default as OrganizationProfileGeneralDefault,
   meta as organizationProfileGeneralMeta,
 } from '../stories/organization-profile-general.stories';
+import {
+  Default as OrganizationProfileMembersDefault,
+  meta as organizationProfileMembersMeta,
+} from '../stories/organization-profile-members.stories';
 import { meta as popoverMeta } from '../stories/popover.stories';
 import { meta as selectMeta } from '../stories/select.stories';
 import { Default as TabsComponentDefault, meta as tabsComponentMeta } from '../stories/tabs.component.stories';
@@ -57,6 +76,26 @@ const organizationProfileModule: StoryModule = { meta: organizationProfileMeta, 
 const organizationProfileGeneralModule: StoryModule = {
   meta: organizationProfileGeneralMeta,
   Default: OrganizationProfileGeneralDefault,
+};
+const organizationProfileMembersModule: StoryModule = {
+  meta: organizationProfileMembersMeta,
+  Default: OrganizationProfileMembersDefault,
+};
+const organizationProfileBillingModule: StoryModule = {
+  meta: organizationProfileBillingMeta,
+  Default: OrganizationProfileBillingDefault,
+};
+const organizationProfileApiKeysModule: StoryModule = {
+  meta: organizationProfileApiKeysMeta,
+  Default: OrganizationProfileApiKeysDefault,
+};
+
+const avatarModule: StoryModule = {
+  meta: avatarMeta,
+  Primary: AvatarPrimary,
+  OrgVariant: AvatarOrgVariant,
+  UserVariant: AvatarUserVariant,
+  Sizes: AvatarSizes,
 };
 
 const buttonModule: StoryModule = { meta: buttonMeta, Primary, Sizes, Disabled };
@@ -94,12 +133,16 @@ export const registry: StoryModule[] = [
   organizationProfileModule,
   // Panels
   organizationProfileGeneralModule,
+  organizationProfileMembersModule,
+  organizationProfileBillingModule,
+  organizationProfileApiKeysModule,
   // Sections
   leaveOrganizationModule,
   deleteOrganizationModule,
   // Blocks
   destructiveModule,
   // Components
+  avatarModule,
   buttonModule,
   inputModule,
   dialogComponentModule,
