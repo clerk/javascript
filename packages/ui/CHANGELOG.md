@@ -1,5 +1,28 @@
 # @clerk/ui
 
+## 1.18.0
+
+### Minor Changes
+
+- Introduce organization domains with TXT verification on self-serve SSO flow ([#8788](https://github.com/clerk/javascript/pull/8788)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Improve `OrganizationProfile` UI: ([#8898](https://github.com/clerk/javascript/pull/8898)) by [@LauraBeatris](https://github.com/LauraBeatris)
+  - Hide the `Verified domains` section when there are no domains and the user lacks permission to add them
+  - Rename the `Organization profile` section to `Profile` for consistency with `UserProfile`
+  - Align the enterprise accounts section with the account data
+
+### Patch Changes
+
+- When inviting organization members requires purchasing additional seats, invitations are now sent automatically after checkout completes successfully. ([#8869](https://github.com/clerk/javascript/pull/8869)) by [@dstaley](https://github.com/dstaley)
+
+- Add confirmation dialog for organization domain deletion as part of self-serve SSO ([#8866](https://github.com/clerk/javascript/pull/8866)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- The Security page's SSO wizard now has a back-to-Security control, and Start/Edit open the wizard at the first step (Continue resumes where you left off). ([#8864](https://github.com/clerk/javascript/pull/8864)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Updated dependencies [[`d5968d0`](https://github.com/clerk/javascript/commit/d5968d026d6b2a1b399b6967fd8727613a5bc3cd), [`431e16c`](https://github.com/clerk/javascript/commit/431e16c69a2745779af217747c13a7f922e250fa), [`ffbc650`](https://github.com/clerk/javascript/commit/ffbc650ebbcee48171c95aa5d2b497273b0276b0)]:
+  - @clerk/localizations@4.9.0
+  - @clerk/shared@4.19.0
+
 ## 1.17.0
 
 ### Minor Changes
