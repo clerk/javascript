@@ -84,7 +84,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign out 
     await u.page.getByRole('link', { name: 'Protected', exact: true }).click();
     await u.page.getByTestId('protected').waitFor();
     await u.page.getByRole('link', { name: 'Home' }).click();
-    await u.page.getByRole('button', { name: 'Open user menu' }).click();
+    await u.page.getByRole('button', { name: /Open account panel/i }).click();
 
     await u.page.getByRole('button', { name: 'Sign out' }).click();
     await u.po.expect.toBeSignedOut();
