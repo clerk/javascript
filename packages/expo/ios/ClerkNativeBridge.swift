@@ -1,14 +1,23 @@
 // ClerkNativeBridge - Provides app-target Clerk SDK operations and SwiftUI view controllers to ClerkExpo.
 // This file is injected into the app target by the config plugin.
-// It uses `import ClerkKit` (SPM) which is only accessible from the app target.
+// It uses the ClerkKit Swift package, which is only accessible from the app target.
 
 import UIKit
 import SwiftUI
 import Observation
-import Security
-import ClerkKit
+@_spi(FrameworkIntegration) import ClerkKit
 import ClerkKitUI
 import ClerkExpo  // Import the pod to access ClerkNativeBridgeProtocol
+
+private struct ClerkExpoHeaderMiddleware: ClerkRequestMiddleware {
+  // Replaced by the config plugin when this bridge is copied into the app target.
+  private static let hostSdkVersion = "__CLERK_EXPO_VERSION__"
+
+  func prepare(_ request: inout URLRequest) async throws {
+    request.addValue("expo", forHTTPHeaderField: "x-clerk-host-sdk")
+    request.addValue(Self.hostSdkVersion, forHTTPHeaderField: "x-clerk-host-sdk-version")
+  }
+}
 
 // MARK: - Native Bridge Implementation
 
@@ -25,16 +34,14 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
   var darkTheme: ClerkTheme?
 
   private var clientObservationGeneration = 0
-  private var lastObservedClient: Client?
-
-  private enum KeychainKey {
-    static let jsClientJWT = "__clerk_client_jwt"
-    static let nativeDeviceToken = "clerkDeviceToken"
-    static let cachedClient = "cachedClient"
-    static let cachedEnvironment = "cachedEnvironment"
-  }
+  private var lastObservedClientState: ClientStateSnapshot?
 
   private init() {}
+
+  private struct ClientStateSnapshot: Equatable {
+    let client: Client?
+    let deviceToken: String?
+  }
 
   /// Resolves the keychain service name, checking ClerkKeychainService in Info.plist first
   /// (for extension apps sharing a keychain group), then falling back to the bundle identifier.
@@ -43,11 +50,6 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
       return custom
     }
     return Bundle.main.bundleIdentifier
-  }
-
-  private static var keychain: ExpoKeychain? {
-    guard let service = keychainService, !service.isEmpty else { return nil }
-    return ExpoKeychain(service: service)
   }
 
   // Register this app-target bridge with the ClerkExpo module.
@@ -64,29 +66,18 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
       Self.configuredPublishableKey = publishableKey
       startClientObserver(reset: true)
 
-      Self.syncTokenState(bearerToken: bearerToken)
-      if !(bearerToken?.isEmpty ?? true) {
-        _ = try? await Clerk.shared.refreshClient()
-      }
-
-      await Self.waitForLoadedSession()
-      return
-    }
-
-    Self.syncTokenState(bearerToken: bearerToken)
-
-    // If already configured with a new bearer token, refresh the client
-    // to pick up the session associated with the device token we just wrote.
-    // Clerk.configure() is idempotent for the same publishable key, so use refreshClient().
-    if Self.shouldRefreshConfiguredClient(for: bearerToken) {
-      startClientObserver()
-      _ = try? await Clerk.shared.refreshClient()
-      await Self.waitForLoadedSession()
+      let shouldWaitForSession = try await Self.syncTokenState(bearerToken: bearerToken)
+      await Self.waitForLoadedSessionIfNeeded(shouldWaitForSession)
+      Self.emitClientChangedIfReceivedToken(bearerToken)
+      emitClerkNativeBridgeReady()
       return
     }
 
     if Self.clerkConfigured {
       startClientObserver()
+      let shouldWaitForSession = try await Self.syncTokenState(bearerToken: bearerToken)
+      await Self.waitForLoadedSessionIfNeeded(shouldWaitForSession)
+      Self.emitClientChangedIfReceivedToken(bearerToken)
       return
     }
 
@@ -95,33 +86,45 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
     Clerk.configure(publishableKey: publishableKey, options: Self.makeClerkOptions())
     startClientObserver()
 
-    await Self.waitForLoadedSession()
+    let shouldWaitForSession = try await Self.syncTokenState(bearerToken: bearerToken)
+    await Self.waitForLoadedSessionIfNeeded(shouldWaitForSession)
+    Self.emitClientChangedIfReceivedToken(bearerToken)
+    emitClerkNativeBridgeReady()
+  }
+
+  @MainActor
+  private static func emitClientChangedIfReceivedToken(_ bearerToken: String?) {
+    guard let token = bearerToken, !token.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+    emitClerkNativeClientChanged(Self.clientChangedPayload())
   }
 
   @MainActor
   private func startClientObserver(reset: Bool = false) {
-    guard reset || clientObservationGeneration == 0 else { return }
+    guard reset || clientObservationGeneration == 0 else {
+      return
+    }
 
     clientObservationGeneration += 1
     let generation = clientObservationGeneration
-    lastObservedClient = Clerk.shared.client
+    lastObservedClientState = Self.clientStateSnapshot()
     observeClient(generation: generation)
   }
 
   @MainActor
   private func observeClient(generation: Int) {
     withObservationTracking {
-      _ = Clerk.shared.client
+      _ = Self.clientStateSnapshot()
     } onChange: { [weak self] in
       Task { @MainActor [weak self] in
         await Task.yield()
 
         guard let self, generation == self.clientObservationGeneration else { return }
 
-        let newClient = Clerk.shared.client
-        if newClient != self.lastObservedClient {
-          self.lastObservedClient = newClient
-          emitClerkNativeRefreshClient()
+        let newClientState = Self.clientStateSnapshot()
+        if newClientState != self.lastObservedClientState {
+          self.lastObservedClientState = newClientState
+          let payload = Self.clientChangedPayload()
+          emitClerkNativeClientChanged(payload)
         }
 
         self.observeClient(generation: generation)
@@ -129,30 +132,34 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
     }
   }
 
-  private static func syncTokenState(bearerToken: String?) {
-    // Sync JS SDK's client token to native keychain so both SDKs share the same client.
-    // This handles the case where the user signed in via JS SDK but the native SDK
-    // has no device token (e.g., after app reinstall or first launch).
-    if let token = bearerToken, !token.isEmpty {
-      let existingToken = readNativeDeviceToken()
-      writeNativeDeviceToken(token)
+  @MainActor
+  private static func clientStateSnapshot() -> ClientStateSnapshot {
+    let client = Clerk.shared.client
 
-      // If the device token changed (or didn't exist), clear stale cached client/environment.
-      // A previous launch may have cached an anonymous client (no device token), and the
-      // SDK would send both the new device token AND the stale client ID in API requests,
-      // causing a 400 error. Clearing the cache forces a fresh client fetch using only
-      // the device token.
-      if existingToken != token {
-        clearCachedClerkData()
-      }
-      return
-    }
-
-    syncJSTokenToNativeKeychainIfNeeded()
+    return ClientStateSnapshot(
+      client: client,
+      deviceToken: Clerk.shared.deviceToken
+    )
   }
 
-  private static func shouldRefreshConfiguredClient(for bearerToken: String?) -> Bool {
-    clerkConfigured && !(bearerToken?.isEmpty ?? true)
+  @MainActor
+  private static func clientChangedPayload(sourceId: String? = nil) -> [String: Any] {
+    var payload: [String: Any] = [:]
+    payload["clientToken"] = Clerk.shared.deviceToken ?? NSNull()
+    if let sourceId, !sourceId.isEmpty {
+      payload["sourceId"] = sourceId
+    }
+
+    return payload
+  }
+
+  @MainActor
+  private static func syncTokenState(bearerToken: String?) async throws -> Bool {
+    guard let token = bearerToken, !token.isEmpty else {
+      return Clerk.shared.deviceToken != nil
+    }
+    _ = try await Clerk.shared.updateDeviceToken(token)
+    return true
   }
 
   private static func shouldReconfigure(for publishableKey: String) -> Bool {
@@ -161,10 +168,11 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
   }
 
   private static func makeClerkOptions() -> Clerk.Options {
+    let middleware = Clerk.Options.MiddlewareConfig(request: [ClerkExpoHeaderMiddleware()])
     guard let service = keychainService else {
-      return .init()
+      return .init(middleware: middleware)
     }
-    return .init(keychainConfig: .init(service: service))
+    return .init(keychainConfig: .init(service: service), middleware: middleware)
   }
 
   @MainActor
@@ -179,39 +187,26 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
     }
   }
 
-  /// Copies the JS SDK's client JWT from expo-secure-store to the native SDK's
-  /// keychain entry, but only if the native SDK doesn't already have a device token.
-  /// Both expo-secure-store and the native Clerk SDK use the iOS Keychain with the
-  /// bundle identifier as the service name, making cross-SDK token sharing possible.
-  private static func syncJSTokenToNativeKeychainIfNeeded() {
-    guard let keychain else { return }
-    guard keychain.string(forKey: KeychainKey.nativeDeviceToken) == nil else { return }
-    guard let jsToken = keychain.string(forKey: KeychainKey.jsClientJWT), !jsToken.isEmpty else { return }
-
-    keychain.set(jsToken, forKey: KeychainKey.nativeDeviceToken)
+  @MainActor
+  private static func waitForLoadedClient() async {
+    for _ in 0..<clerkLoadMaxAttempts {
+      if Clerk.shared.isLoaded {
+        return
+      }
+      try? await Task.sleep(nanoseconds: clerkLoadIntervalNs)
+    }
   }
 
-  /// Reads the native device token from keychain, if present.
-  private static func readNativeDeviceToken() -> String? {
-    keychain?.string(forKey: KeychainKey.nativeDeviceToken)
+  @MainActor
+  private static func waitForLoadedSessionIfNeeded(_ shouldWait: Bool) async {
+    guard shouldWait else { return }
+    await waitForLoadedSession()
   }
 
-  /// Clears stale cached client and environment data from keychain.
-  /// This prevents the native SDK from loading a stale anonymous client
-  /// during initialization, which would conflict with a newly-synced device token.
-  private static func clearCachedClerkData() {
-    keychain?.delete(KeychainKey.cachedClient)
-    keychain?.delete(KeychainKey.cachedEnvironment)
-  }
-
-  /// Writes the provided bearer token as the native SDK's device token.
-  /// If the native SDK already has a device token, it is updated with the new value.
-  private static func writeNativeDeviceToken(_ token: String) {
-    keychain?.set(token, forKey: KeychainKey.nativeDeviceToken)
-  }
-
-  public func getClientToken() -> String? {
-    Self.readNativeDeviceToken()
+  @MainActor
+  public func getClientToken() async -> String? {
+    guard Self.clerkConfigured else { return nil }
+    return Clerk.shared.deviceToken
   }
 
   // MARK: - Inline View Creation
@@ -221,7 +216,9 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
     dismissible: Bool,
     onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
   ) -> UIViewController? {
-    makeHostingController(
+    guard Self.clerkConfigured else { return nil }
+
+    return makeHostingController(
       rootView: ClerkInlineAuthWrapperView(
         mode: Self.authMode(from: mode),
         dismissible: dismissible,
@@ -236,7 +233,9 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
     dismissible: Bool,
     onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
   ) -> UIViewController? {
-    makeHostingController(
+    guard Self.clerkConfigured else { return nil }
+
+    return makeHostingController(
       rootView: ClerkInlineProfileWrapperView(
         dismissible: dismissible,
         lightTheme: lightTheme,
@@ -247,7 +246,9 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
   }
 
   public func makeUserButtonViewController() -> UIViewController? {
-    makeHostingController(
+    guard Self.clerkConfigured else { return nil }
+
+    return makeHostingController(
       rootView: ClerkInlineUserButtonWrapperView(
         lightTheme: lightTheme,
         darkTheme: darkTheme
@@ -256,18 +257,19 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
   }
 
   @MainActor
-  public func getSession() async -> [String: Any]? {
-    guard Self.clerkConfigured, let session = Clerk.shared.session else {
-      return nil
-    }
-    return Self.sessionPayload(from: session, user: session.user ?? Clerk.shared.user)
-  }
-
-  @MainActor
-  public func refreshClient() async throws {
+  public func syncFromJsClientToken(_ clientToken: String?, sourceId: String?) async throws {
     guard Self.clerkConfigured else { return }
-    _ = try await Clerk.shared.refreshClient()
-    await Self.waitForLoadedSession()
+
+    if let token = clientToken?.trimmingCharacters(in: .whitespacesAndNewlines), !token.isEmpty {
+      _ = try await Clerk.shared.updateDeviceToken(token)
+      await Self.waitForLoadedSession()
+    } else {
+      _ = try await Clerk.shared.refreshClient()
+      await Self.waitForLoadedClient()
+    }
+
+    lastObservedClientState = Self.clientStateSnapshot()
+    emitClerkNativeClientChanged(Self.clientChangedPayload(sourceId: sourceId))
   }
 
   private static func authMode(from mode: String) -> AuthView.Mode {
@@ -375,94 +377,6 @@ public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
     return hostingController
   }
 
-  private static func sessionPayload(from session: Session, user: User?) -> [String: Any] {
-    var payload: [String: Any] = [
-      "sessionId": session.id,
-      "status": String(describing: session.status)
-    ]
-
-    if let user {
-      payload["user"] = userPayload(from: user)
-    }
-
-    return payload
-  }
-
-  private static func userPayload(from user: User) -> [String: Any] {
-    var payload: [String: Any] = [
-      "id": user.id,
-      "imageUrl": user.imageUrl
-    ]
-
-    if let firstName = user.firstName {
-      payload["firstName"] = firstName
-    }
-    if let lastName = user.lastName {
-      payload["lastName"] = lastName
-    }
-    if let primaryEmail = user.emailAddresses.first(where: { $0.id == user.primaryEmailAddressId }) {
-      payload["primaryEmailAddress"] = primaryEmail.emailAddress
-    } else if let firstEmail = user.emailAddresses.first {
-      payload["primaryEmailAddress"] = firstEmail.emailAddress
-    }
-
-    return payload
-  }
-}
-
-private struct ExpoKeychain {
-  private let service: String
-
-  init(service: String) {
-    self.service = service
-  }
-
-  func string(forKey key: String) -> String? {
-    guard let data = data(forKey: key) else { return nil }
-    return String(data: data, encoding: .utf8)
-  }
-
-  func set(_ value: String, forKey key: String) {
-    guard let data = value.data(using: .utf8) else { return }
-
-    var addQuery = baseQuery(for: key)
-    addQuery[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
-    addQuery[kSecValueData as String] = data
-
-    let status = SecItemAdd(addQuery as CFDictionary, nil)
-    if status == errSecDuplicateItem {
-      let attributes: [String: Any] = [
-        kSecValueData as String: data,
-        kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
-      ]
-      SecItemUpdate(baseQuery(for: key) as CFDictionary, attributes as CFDictionary)
-    }
-  }
-
-  func delete(_ key: String) {
-    SecItemDelete(baseQuery(for: key) as CFDictionary)
-  }
-
-  private func data(forKey key: String) -> Data? {
-    var query = baseQuery(for: key)
-    query[kSecReturnData as String] = true
-    query[kSecMatchLimit as String] = kSecMatchLimitOne
-
-    var result: CFTypeRef?
-    guard SecItemCopyMatching(query as CFDictionary, &result) == errSecSuccess else {
-      return nil
-    }
-
-    return result as? Data
-  }
-
-  private func baseQuery(for key: String) -> [String: Any] {
-    [
-      kSecClass as String: kSecClassGenericPassword,
-      kSecAttrService as String: service,
-      kSecAttrAccount as String: key,
-    ]
-  }
 }
 
 // MARK: - Inline User Button Wrapper (for embedded rendering)

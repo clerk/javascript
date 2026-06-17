@@ -60,5 +60,12 @@ export type StoryComponent = React.ComponentType<Record<string, unknown>>;
 
 export interface StoryModule {
   meta: StoryMeta;
-  [storyName: string]: StoryComponent | StoryMeta;
+  /**
+   * Raw source text of the `*.stories.tsx` file, exposed via a `?raw` self-import
+   * (`export { default as __source } from './x.stories?raw'`). Present only on modules
+   * that opt into the `<Story>` code footer; `StoryEmbed` extracts the previewed story's
+   * function from it. See `lib/extractStorySource.ts`.
+   */
+  __source?: string;
+  [storyName: string]: StoryComponent | StoryMeta | string | undefined;
 }

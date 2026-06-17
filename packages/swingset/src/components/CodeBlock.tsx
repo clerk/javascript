@@ -19,6 +19,21 @@ function getHighlighter(): Promise<Highlighter> {
   return highlighterPromise;
 }
 
+/**
+ * Highlights `code` with the shared Shiki highlighter and returns the resulting HTML
+ * (empty until the highlighter resolves). Shared by `CodeBlock` and the `<Story>` code
+ * footer so they reuse a single highlighter instance.
+ */
+export function useShikiHtml(code: string, lang: string): string {
+  const [html, setHtml] = useState('');
+  useEffect(() => {
+    void getHighlighter().then(hl => {
+      setHtml(hl.codeToHtml(code, { lang, theme: 'css-variables' }));
+    });
+  }, [code, lang]);
+  return html;
+}
+
 interface CodeBlockProps {
   children?: string;
   className?: string;
@@ -27,15 +42,9 @@ interface CodeBlockProps {
 export function CodeBlock({ children, className }: CodeBlockProps) {
   const lang = className?.replace('language-', '') ?? 'text';
   const code = typeof children === 'string' ? children.trimEnd() : '';
-  const [html, setHtml] = useState('');
+  const html = useShikiHtml(code, lang);
   const [copied, setCopied] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    void getHighlighter().then(hl => {
-      setHtml(hl.codeToHtml(code, { lang, theme: 'css-variables' }));
-    });
-  }, [code, lang]);
 
   function copy() {
     void navigator.clipboard.writeText(code).then(() => {
