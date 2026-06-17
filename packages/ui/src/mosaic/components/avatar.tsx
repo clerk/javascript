@@ -10,6 +10,7 @@ export const avatarRecipe = defineSlotRecipe(theme => ({
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
+    boxShadow: `0 0 0 -1px ${theme.alpha('primary', 30)}`,
     flexShrink: 0,
     backgroundColor: theme.color.muted,
     color: theme.color.mutedForeground,

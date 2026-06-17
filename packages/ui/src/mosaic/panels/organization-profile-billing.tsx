@@ -21,13 +21,13 @@ export function OrganizationProfileBilling() {
         <Tabs.Panel value='subscription'>
           <Box sx={t => ({ display: 'flex', flexDirection: 'column', gap: t.spacing(6) })}>
             {/* Plan */}
-            <Box sx={t => ({ display: 'flex', flexDirection: 'column', gap: t.spacing(2) })}>
+            <Box sx={t => ({ display: 'flex', flexDirection: 'column', gap: t.spacing(2.5) })}>
               <Box
                 sx={t => ({
                   display: 'flex',
                   alignItems: 'center',
                   paddingInline: t.spacing(3),
-                  paddingRight: t.spacing(2),
+                  paddingRight: t.spacing(1),
                 })}
               >
                 <Heading
@@ -85,13 +85,13 @@ export function OrganizationProfileBilling() {
             </Box>
 
             {/* Payment methods */}
-            <Box sx={t => ({ display: 'flex', flexDirection: 'column', gap: t.spacing(1) })}>
+            <Box sx={t => ({ display: 'flex', flexDirection: 'column', gap: t.spacing(2.5) })}>
               <Box
                 sx={t => ({
                   display: 'flex',
                   alignItems: 'center',
                   paddingInline: t.spacing(3),
-                  paddingRight: t.spacing(2),
+                  paddingRight: t.spacing(1),
                 })}
               >
                 <Heading

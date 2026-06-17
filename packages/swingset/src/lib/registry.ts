@@ -9,6 +9,14 @@ import {
 } from '../stories/avatar.stories';
 import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
 import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
+import {
+  BothStates as FilterChipBothStates,
+  Default as FilterChipDefault,
+  meta as filterChipMeta,
+  NotClearable as FilterChipNotClearable,
+  Selected as FilterChipSelected,
+} from '../stories/filter-chip.stories';
+import { Default as SelectComponentDefault, meta as selectComponentMeta } from '../stories/select.component.stories';
 import { meta as collapsibleMeta } from '../stories/collapsible.stories';
 import {
   Default as DeleteOrganizationDefault,
@@ -104,6 +112,16 @@ const inputModule: StoryModule = { meta: inputMeta, Default, Sizes: InputSizes, 
 
 const dialogComponentModule: StoryModule = { meta: dialogComponentMeta, Default: DialogDefault };
 
+const selectComponentModule: StoryModule = { meta: selectComponentMeta, Default: SelectComponentDefault };
+
+const filterChipModule: StoryModule = {
+  meta: filterChipMeta,
+  Default: FilterChipDefault,
+  Selected: FilterChipSelected,
+  NotClearable: FilterChipNotClearable,
+  BothStates: FilterChipBothStates,
+};
+
 const headingModule: StoryModule = {
   meta: headingMeta,
   Default: HeadingDefault,
@@ -144,9 +162,11 @@ export const registry: StoryModule[] = [
   // Components
   avatarModule,
   buttonModule,
+  filterChipModule,
   inputModule,
   dialogComponentModule,
   headingModule,
+  selectComponentModule,
   tabsComponentModule,
   textModule,
   // Primitives — alphabetical within the group.

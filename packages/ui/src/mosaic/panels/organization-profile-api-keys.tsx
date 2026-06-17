@@ -27,7 +27,6 @@ export function OrganizationProfileApiKeys() {
         <Button
           variant='filled'
           intent='primary'
-          size='sm'
         >
           Add key
         </Button>

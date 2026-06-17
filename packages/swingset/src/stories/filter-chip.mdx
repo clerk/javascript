@@ -1,0 +1,65 @@
+import * as FilterChipStories from './filter-chip.stories';
+
+# Filter Chip
+
+A compact dropdown trigger for applying a single filter or sort value. Has two visual states: **unselected** (dashed border, muted background, just the label) and **selected** (solid border, white background, muted label prefix + value). Uses the styled `Select` component for its dropdown.
+
+## Playground
+
+<Story
+  name='Default'
+  storyModule={FilterChipStories}
+/>
+
+## Usage
+
+```tsx
+import { FilterChip } from '@clerk/ui/mosaic/components/filter-chip';
+
+const [role, setRole] = useState<string | undefined>(undefined);
+
+<FilterChip
+  label='Role'
+  value={role}
+  onValueChange={setRole}
+  items={[
+    { value: 'admin', label: 'Admin' },
+    { value: 'member', label: 'Member' },
+  ]}
+/>
+```
+
+## Examples
+
+### Selected
+
+<Story
+  name='Selected'
+  storyModule={FilterChipStories}
+/>
+
+### Not clearable (sort)
+
+When `clearable={false}` the chip always renders in the selected style and omits the "Any" option. Use this for sort controls that always have a value.
+
+<Story
+  name='NotClearable'
+  storyModule={FilterChipStories}
+/>
+
+### Both states side-by-side
+
+<Story
+  name='BothStates'
+  storyModule={FilterChipStories}
+/>
+
+## Props
+
+| Prop            | Type                                   | Default | Description                                              |
+| --------------- | -------------------------------------- | ------- | -------------------------------------------------------- |
+| `label`         | `string`                               | —       | The filter's display name, shown as prefix when selected |
+| `value`         | `string \| undefined`                  | —       | The selected filter value                                |
+| `onValueChange` | `(value: string \| undefined) => void` | —       | Called on selection; receives `undefined` when cleared   |
+| `items`         | `{ value: string; label: string }[]`   | —       | The available options                                    |
+| `clearable`     | `boolean`                              | `true`  | When true, adds an "Any" option that clears the filter   |

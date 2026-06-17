@@ -90,17 +90,17 @@ export function OrganizationProfileGeneral() {
         sx={t => ({
           display: 'flex',
           flexDirection: 'column',
-          gap: t.spacing(2),
+          gap: t.spacing(2.5),
         })}
       >
         {/* Section header */}
         <Box
           sx={t => ({
             display: 'flex',
-            alignItems: 'flex-start',
+            alignItems: 'center',
             gap: t.spacing(2),
             paddingInline: t.spacing(3),
-            paddingRight: t.spacing(2),
+            paddingRight: t.spacing(1),
           })}
         >
           <Box
@@ -166,7 +166,7 @@ export function OrganizationProfileGeneral() {
         sx={t => ({
           display: 'flex',
           flexDirection: 'column',
-          gap: t.spacing(2),
+          gap: t.spacing(2.5),
         })}
       >
         <Box

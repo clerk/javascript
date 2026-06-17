@@ -1,0 +1,55 @@
+import * as SelectComponentStories from './select.component.stories';
+
+# Select
+
+The styled Mosaic select, built on the `@clerk/headless` Select primitive and themed via a slot recipe. It inherits the primitive's floating-ui positioning, keyboard navigation, typeahead, and ARIA wiring, and adds Mosaic token-driven styles to the popup and option parts.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={SelectComponentStories}
+/>
+
+## Usage
+
+```tsx
+import { Select } from '@clerk/ui/mosaic/components/select';
+
+<Select
+  placement='bottom-start'
+  sideOffset={4}
+  trigger={p => <button {...p}>Pick one ▾</button>}
+>
+  <Select.Option value='a' label='Option A'>Option A</Select.Option>
+  <Select.Option value='b' label='Option B'>Option B</Select.Option>
+</Select>
+```
+
+## Parts
+
+| Part                | Slot (`data-cl-slot`) | Description                                            |
+| ------------------- | --------------------- | ------------------------------------------------------ |
+| `Select.Root`       | —                     | Context provider; owns value and open state            |
+| `Select.Trigger`    | —                     | Button that opens the dropdown; accepts `render` prop  |
+| `Select.Value`      | —                     | Displays the selected label or placeholder             |
+| `Select.Portal`     | —                     | Portals the positioner; renders nothing when unmounted |
+| `Select.Positioner` | `select-positioner`   | Floating-ui positioned container                       |
+| `Select.Popup`      | `select-popup`        | Styled visual wrapper around the option list           |
+| `Select.Option`     | `select-option`       | Styled selectable option                               |
+
+## Styling
+
+The styled parts are themed via `selectRecipe`. Each slot can be overridden via `appearance.elements`:
+
+```tsx
+<MosaicProvider appearance={{ elements: { 'select-popup': { borderRadius: 16 } } }}>
+  …
+</MosaicProvider>
+```
+
+| Slot                | Description                         |
+| ------------------- | ----------------------------------- |
+| `select-positioner` | Floating positioned container       |
+| `select-popup`      | Dropdown panel (background, border) |
+| `select-option`     | Each option row (hover, selected)   |

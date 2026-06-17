@@ -29,9 +29,11 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   components: {
     avatar: dynamic(() => import('../stories/avatar.mdx')),
     button: dynamic(() => import('../stories/button.mdx')),
+    'filter-chip': dynamic(() => import('../stories/filter-chip.mdx')),
     input: dynamic(() => import('../stories/input.mdx')),
     dialog: dynamic(() => import('../stories/dialog.component.mdx')),
     heading: dynamic(() => import('../stories/heading.mdx')),
+    select: dynamic(() => import('../stories/select.component.mdx')),
     tabs: dynamic(() => import('../stories/tabs.component.mdx')),
     text: dynamic(() => import('../stories/text.mdx')),
   },
