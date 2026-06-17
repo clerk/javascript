@@ -734,6 +734,10 @@ const InstantPasswordRow = ({
   return (
     <Form.ControlRow
       elementId={field.id}
+      // `inert` removes the whole row (input + show/hide toggle) from the a11y tree and blocks
+      // all focus while the field is visually hidden. Spread it only when hidden so React omits
+      // the attribute when shown — a present `inert` (even `inert="false"`) keeps the row inert.
+      {...(show ? undefined : ({ inert: '' } as { inert?: string }))}
       sx={show ? undefined : { position: 'absolute', opacity: 0, height: 0, pointerEvents: 'none', marginTop: '-1rem' }}
     >
       <Form.PasswordInput
@@ -742,7 +746,6 @@ const InstantPasswordRow = ({
         onActionClicked={show ? onForgotPasswordClick : undefined}
         ref={ref}
         tabIndex={show ? undefined : -1}
-        aria-hidden={!show}
       />
     </Form.ControlRow>
   );
