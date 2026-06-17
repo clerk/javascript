@@ -21,11 +21,8 @@ export const getAuth: GetAuthFn<LoaderFunctionArgs, true> = (async (
 
   const { acceptsToken, treatPendingAsSignedOut } = opts || {};
 
-  // Re-derive the current request's auth from `args.request` rather than reading
-  // a cached value off the React Router context. Identity is a pure function of
-  // this request's cookies/headers, so a context shared across requests can never
-  // return another user. clerkMiddleware (required) already ran the handshake and
-  // warmed the JWKS cache, so this verification is networkless.
+  // Re-derive auth from this request rather than reading a cached value, so a
+  // shared context can never return another user.
   const requestState = await authenticateFromRequest(args, 'any');
 
   return getAuthObjectForAcceptedToken({

@@ -1,7 +1,6 @@
 import type { AuthObject } from '@clerk/backend';
 import type { AuthenticateRequestOptions, RequestState } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest } from '@clerk/backend/internal';
-import { isDevelopmentFromPublishableKey } from '@clerk/shared/keys';
 import { logger } from '@clerk/shared/logger';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
 import type { PendingSessionOptions } from '@clerk/shared/types';
@@ -21,34 +20,16 @@ type RequestStateContextValue = {
 
 export const authFnContext = createContext<((options?: PendingSessionOptions) => AuthObject) | null>(null);
 export const requestStateContext = createContext<RequestStateContextValue | null>(null);
-
-// The resolved AuthenticateRequestOptions for this request (keys, urls, domain,
-// proxy, sync options, keyless-resolved keys). This is app/instance-level config,
-// NOT user identity, so getAuth/rootAuthLoader can read it back and re-derive the
-// current user from the request even if the surrounding context is shared.
+// Identity-free resolved options, reused by getAuth/rootAuthLoader to re-derive the request's user.
 export const requestOptionsContext = createContext<AuthenticateRequestOptions | null>(null);
-
-// Probe used to detect a React Router `context` reused across requests. React
-// Router gives each request its own context, so this is unset on a fresh one; if
-// a different request already stamped it, the app is sharing one context across
-// requests (commonly a custom server or getLoadContext that returns a single
-// RouterContextProvider). getAuth re-derives identity per request so sign-in
-// stays correct regardless, but a shared context can still leak the app's own
-// per-request data, so we surface it (throw in dev, warn once in prod).
 const sharedContextProbe = createContext<Request | null>(null);
 
 const sharedContextMessage =
   'Clerk: The React Router `context` is being reused across requests. clerkMiddleware() resolves each request\'s auth from that request, so sign-in state stays correct, but sharing one context across requests is unsupported and can leak your application\'s own per-request data. This usually comes from a custom server or `getLoadContext()` that returns a single RouterContextProvider; return a new RouterContextProvider() for each request instead.';
 
 /**
- * Re-derives the current request's auth state from `args.request`, using the
- * resolved (identity-free) options the middleware stashed on the context.
- *
- * Identity comes purely from this request's cookies/headers, so a context shared
- * across requests can never produce a cross-user result. The stashed options are
- * app/instance-level config (keys, urls), not user identity, so reading them from
- * a possibly-shared context is safe. Verification is networkless once the
- * middleware has warmed the JWKS cache for this process.
+ * Re-derives the request's auth from `args.request` using the identity-free options
+ * stashed by clerkMiddleware, so a shared context can never return another user.
  */
 export async function authenticateFromRequest(
   args: DataFunctionArgs,
@@ -85,10 +66,13 @@ export async function authenticateFromRequest(
  */
 export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFunction<Response> => {
   return async (args, next) => {
-    // Runs before the first await so the read/write is atomic per request: if the
-    // context already carries a different request's marker, it is being shared.
+    // A context reused across requests means the app is sharing one
+    // RouterContextProvider. Auth stays correct (it is re-derived per request),
+    // but a shared context can leak the app's own per-request data, so warn once.
     const probedRequest = args.context.get(sharedContextProbe);
-    const contextReused = !!(probedRequest && probedRequest !== args.request);
+    if (probedRequest && probedRequest !== args.request) {
+      logger.warnOnce(sharedContextMessage);
+    }
     args.context.set(sharedContextProbe, args.request);
 
     const clerkRequest = createClerkRequest(patchRequest(args.request));
@@ -106,15 +90,6 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFun
     }
     if (secretKey) {
       loadedOptions.secretKey = secretKey;
-    }
-
-    // Surface a shared context: fail loud in development so it is caught before
-    // production, log once in production (auth is already isolated per request).
-    if (contextReused) {
-      if (isDevelopmentFromPublishableKey(loadedOptions.publishableKey)) {
-        throw new Error(sharedContextMessage);
-      }
-      logger.warnOnce(sharedContextMessage);
     }
 
     // Pick only the properties needed by authenticateRequest.
@@ -176,10 +151,8 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFun
       signUpFallbackRedirectUrl: loadedOptions.signUpFallbackRedirectUrl,
     };
 
-    // Stash the identity-free resolved options so getAuth/rootAuthLoader can
-    // re-derive this request's user from the request itself (see
-    // authenticateFromRequest). authFnContext/requestStateContext are still
-    // written for back-compat, but identity is no longer read from them.
+    // Stash identity-free options for re-derivation; authFnContext/requestStateContext
+    // remain for back-compat but identity is no longer read from them.
     args.context.set(requestOptionsContext, authenticateOptions);
     args.context.set(authFnContext, (opts?: PendingSessionOptions) => requestState.toAuth(opts));
     args.context.set(requestStateContext, { requestState, additionalState });

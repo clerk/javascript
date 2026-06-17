@@ -1,16 +1,6 @@
-// Auth isolation for clerkMiddleware + getAuth under a shared React Router context.
-//
-// getAuth re-derives the current request's auth from `args.request` (a pure
-// function of that request's cookies/headers), so even when an app shares one
-// RouterContextProvider across requests (the custom-server / getLoadContext
-// footgun) getAuth still returns the right user. These tests pin that: a shared
-// context is isolated, a per-request context is isolated, and the action->loader
-// hop (where React Router mints a fresh Request) still resolves the right user.
-//
-// Only clerkClient and loadOptions are mocked; authenticateRequest resolves each
-// request to the user encoded in its URL (?u=...), so the sole variable is which
-// request getAuth re-derives from. A pk_live key keeps the shared-context probe
-// in production mode (warn, not throw) so two requests can run on one context.
+// getAuth re-derives auth from `args.request`, so it returns the right user even
+// when an app shares one RouterContextProvider across requests. authenticateRequest
+// is mocked to resolve each request to the user encoded in its URL (?u=...).
 import type { ClerkClient } from '@clerk/backend';
 import { AuthStatus, TokenType } from '@clerk/backend/internal';
 import type { LoaderFunctionArgs } from 'react-router';

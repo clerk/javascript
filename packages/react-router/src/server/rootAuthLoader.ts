@@ -128,10 +128,8 @@ export const rootAuthLoader: RootAuthLoader = async (
     );
   }
 
-  // Re-derive the request state from this request rather than using the value
-  // cached on the (possibly shared) context, so identity can never bleed across
-  // concurrent requests. additionalState is identity-free app config and is safe
-  // to read from the context.
+  // Re-derive from this request rather than the cached context value, so identity
+  // can never bleed across concurrent requests.
   const requestState = await authenticateFromRequest(args, 'any');
   return processRootAuthLoader(args, requestState, contextValue.additionalState, handler);
 };
