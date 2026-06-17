@@ -43,7 +43,7 @@ export type CreateParams = {
   name: string;
   /** The slug of the Organization. */
   slug?: string;
-  /** The ID of the user creating the organization. The user will become an [admin](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions#default-roles) for the Organization. */
+  /** The ID of the user creating the Organization. The user will become an [admin](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions#default-roles) for the Organization. */
   createdBy?: string;
   /** The maximum number of memberships allowed in the Organization. `0` means unlimited. */
   maxAllowedMemberships?: number;
@@ -154,6 +154,7 @@ export type GetOrganizationMembershipListParams = ClerkPaginationRequest<{
   createdAtAfter?: number;
 }>;
 
+/** @generateWithEmptyComment */
 export type GetInstanceOrganizationMembershipListParams = ClerkPaginationRequest<{
   /**
    * Filters Organization memberships in a particular order. Prefix a value with `+` to sort in ascending order, or `-` to sort in descending order. Defaults to `-created_at`.
