@@ -447,7 +447,11 @@ function SignUpStartInternal(): JSX.Element {
               gap={6}
               // @ts-ignore - `inert` is not yet in the installed React types
               inert={captchaIsInteractive ? '' : undefined}
-              sx={captchaIsInteractive ? { visibility: 'hidden', height: 0, overflow: 'hidden' } : undefined}
+              // `display:none` (not `visibility:hidden`) so the collapsed column leaves flex flow and
+              // contributes no `gap` gutter to `Card.Content` — otherwise it injects empty space above
+              // the spotlighted captcha. Subtree stays mounted (form state preserved); `inert` is then
+              // redundant-but-harmless.
+              sx={captchaIsInteractive ? { display: 'none' } : undefined}
             >
               <SocialButtonsReversibleContainerWithDivider>
                 {(showOauthProviders || showWeb3Providers || showAlternativePhoneCodeProviders) && (
