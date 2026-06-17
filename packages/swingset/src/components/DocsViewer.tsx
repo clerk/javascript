@@ -25,6 +25,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   },
   components: {
     button: dynamic(() => import('../stories/button.mdx')),
+    card: dynamic(() => import('../stories/card.component.mdx')),
     input: dynamic(() => import('../stories/input.mdx')),
     dialog: dynamic(() => import('../stories/dialog.component.mdx')),
     heading: dynamic(() => import('../stories/heading.mdx')),
