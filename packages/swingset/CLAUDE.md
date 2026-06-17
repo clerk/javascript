@@ -38,6 +38,9 @@ These require reading several files together; the `README.md` covers the step-by
 
 - **MDX.** `mdx-components.tsx` injects custom components into all MDX: `<Preview>` (→ `StoryPreview`), `<Story>` (→ `StoryEmbed`, static), `<PropTable>` (→ interactive `PropTable`), `<Usage>` (→ `UsageBlock`, a live code snippet that reflects the current knob values), and a `<pre>` override routing fenced code through Shiki (`CodeBlock`). `next.config.mjs` configures `remark-gfm` and `rehype-raw` (with MDX node pass-through) so raw HTML in tables works.
 
+- **`<Story>` examples can show their source in a collapsible code footer.** When a story module exposes its own source as `__source` — via a `?raw` self-import (`export { default as __source } from './x.stories?raw'`) — `StoryEmbed` runs `extractStorySource` (`lib/extractStorySource.ts`) to pull the *previewed story function's* source out of that raw text, then `toUsageSnippet` (`lib/exampleSnippet.ts`) to reduce that knob harness to a clean usage snippet (unwraps `export function …() { return (…) }` down to the returned JSX and strips the `{...knobsAsProps(props)}` / `{...props}` knob plumbing), and renders a `CodeFooter` (`CodeFooter.tsx`): a "View code" toggle that's collapsed by default and reveals the snippet with a height animation (Base UI's `--collapsible-panel-height` + `data-starting/ending-style`). It's **opt-in per module** — only modules that export `__source` get a footer, and it's keyed to whichever story `name` the `<Story>` renders, so each example shows its own code. Shiki highlighting is shared with the `<pre>`/`CodeBlock` path through the `useShikiHtml` hook. A `<Story>` can carry both a code footer and a `composition` footer; they stack under the preview.
+  - The `?raw` query is wired in `next.config.mjs`: an `asset/source` rule handles `?raw` imports, and — crucially — a recursive `excludeRawQuery` pass adds `resourceQuery: { not: [/raw/] }` to every *other* loader so Next's SWC loader doesn't compile the file first (otherwise `__source` would contain `_jsxDEV(…)` output instead of the authored source).
+
 - **Two component layers.** `src/components/ui/*` are shadcn/ui primitives (`components.json`, `base-nova` style, neutral base) used for swingset's *own* chrome (sidebar, tabs, inputs). The components being *documented* come from `@clerk/ui/mosaic`. Don't confuse the two. Mosaic stories use Emotion (`/** @jsxImportSource @emotion/react */` pragma; `compiler.emotion` enabled in Next).
 
 ## Documenting Mosaic components
@@ -89,6 +92,16 @@ Story files that render styled Mosaic components must start with the Emotion pra
 ### Archetype A — styled component (`Components`)
 
 A styled Mosaic component. Which of the two forms below applies is decided by the component's shape, not by preference: if it exposes a single flat CVA recipe (`meta.styles`), use the **simple** form; if it's compound — built from slot recipes with no flat variant props (`Dialog`, `Tabs`) — use the **compound** form.
+
+**Every `Components`-layer story file exposes its source so each `<Story>` example renders a code footer.** Add the self-import once, right after the imports:
+
+```ts
+// Exposes this file's own source (via the `?raw` webpack rule) so each `<Story>` example
+// renders a code footer with its function's source. See `StoryModule.__source`.
+export { default as __source } from './<name>.stories?raw';
+```
+
+That's all the wiring needed — `StoryEmbed` picks `__source` up automatically and renders a collapsible "View code" footer keyed to each example's story function (see the `<Story>` code-footer architecture note above). No MDX change is required; keep authoring `<Story name='…' storyModule={…} />` as before. This applies to both A forms (simple and compound) and to every example a Components page ships.
 
 #### A · simple — single CVA recipe (`Button`, `Input`)
 
@@ -253,6 +266,7 @@ import * as DeleteOrganizationStories from './delete-organization.stories';
 
 - [ ] `meta.source` is set to a repo-root-relative path.
 - [ ] Story renders (Emotion pragma present for styled components).
+- [ ] `Components`-layer story files export `__source` (the `?raw` self-import) so every `<Story>` example gets a "View code" footer.
 - [ ] MDX sections match the archetype's required order exactly.
 - [ ] Every props-table row states its default in the **Default** column (auto `<PropTable>` fills it from `_defaultVariants`; `—` / `(required)` when none).
 - [ ] Wiring done per `README.md`: `registry.ts`, `DocsViewer.tsx`'s `docModules`, and the `app/page.tsx` redirect if this is now the first component.

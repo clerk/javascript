@@ -4,6 +4,10 @@ import { Heading, headingRecipe } from '@clerk/ui/mosaic/components/heading';
 
 import type { StoryMeta } from '@/lib/types';
 
+// Exposes this file's own source (via the `?raw` webpack rule) so each `<Story>` example
+// renders a code footer with its function's source. See `StoryModule.__source`.
+export { default as __source } from './heading.stories?raw';
+
 export const meta: StoryMeta = {
   group: 'Components',
   title: 'Heading',
