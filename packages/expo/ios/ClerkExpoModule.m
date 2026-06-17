@@ -8,21 +8,12 @@ RCT_EXTERN_METHOD(configure:(NSString *)publishableKey
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 
-RCT_EXTERN_METHOD(presentAuth:(NSDictionary *)options
-                  resolve:(RCTPromiseResolveBlock)resolve
-                  reject:(RCTPromiseRejectBlock)reject)
-
-RCT_EXTERN_METHOD(presentUserProfile:(NSDictionary *)options
-                  resolve:(RCTPromiseResolveBlock)resolve
-                  reject:(RCTPromiseRejectBlock)reject)
-
-RCT_EXTERN_METHOD(getSession:(RCTPromiseResolveBlock)resolve
-                  reject:(RCTPromiseRejectBlock)reject)
-
 RCT_EXTERN_METHOD(getClientToken:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 
-RCT_EXTERN_METHOD(signOut:(RCTPromiseResolveBlock)resolve
+RCT_EXTERN_METHOD(syncFromJsClientToken:(id)clientToken
+                  sourceId:(id)sourceId
+                  resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 
 @end

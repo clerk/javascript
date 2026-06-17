@@ -200,28 +200,27 @@ export const csCZ: LocalizationResource = {
       },
       warning: 'Jakmile vyberete poskytovatele, nelze ho změnit, dokud nebude konfigurace dokončena',
     },
-    verifyEmailDomainStep: {
-      title: 'Ověřit e-mailovou adresu',
-      subtitle: 'Ověřte e-mailovou adresu, na které chcete povolit podnikové připojení.',
-      addEmailAddress: {
-        formTitle: 'Potřebujeme váš e-mail',
-        formSubtitle: 'K zahájení budeme potřebovat vaši e-mailovou adresu',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'E-mailová adresa',
+    organizationDomainsStep: {
+      title: 'Přidat domény SSO',
+      subtitle: 'Přidejte a ověřte vlastnictví domén, které vaše organizace používá k přihlášení.',
+      formFieldLabel__domain: 'Domény',
+      formFieldInputPlaceholder__domain: 'Zde zadejte svou doménu a kliknutím na přidat začněte',
+      formButtonPrimary__add: 'Přidat',
+      domainSuggestion: {
+        messageLabel: 'Váš e-mail používá {{domain}}. Chcete jej přidat?',
+        formButtonPrimary__add: 'Přidat {{domain}}',
       },
-      emailCode: {
-        formTitle: 'Ověřte svou e-mailovou adresu',
-        formSubtitle: 'Zadejte ověřovací kód odeslaný na {{identifier}}',
-        resendButton: 'Neobdrželi jste kód? Odeslat znovu',
-        verified: {
-          title: 'Máme váš e-mail',
-          subtitle: 'Ověřili jste svou e-mailovou adresu pomocí následujícího e-mailu',
-          inputLabel: 'Ověřená e-mailová adresa',
+      domainCard: {
+        badge__verified: 'Ověřeno',
+        badge__unverified: 'Neověřeno',
+        verifiedAtLabel: "Ověřeno {{ date | shortDate('cs-CZ') }}",
+        txtRecord: {
+          instructions:
+            'Přidejte tento záznam TXT u svého poskytovatele DNS. Jakmile bude záznam aktivní, automaticky jej ověříme.',
+          typeLabel: 'Typ',
+          hostLabel: 'Hostitel / Název',
+          valueLabel: 'Hodnota',
         },
-      },
-      domainTaken: {
-        title: 'Tato doména ({{domain}}) již má SSO připojení',
-        subtitle: 'Kontaktujte administrátora aplikace, abyste získali přístup prostřednictvím stávajícího připojení.',
       },
     },
   },

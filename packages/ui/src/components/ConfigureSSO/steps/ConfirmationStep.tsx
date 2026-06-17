@@ -1,4 +1,4 @@
-import { useOrganization, useReverification } from '@clerk/shared/react';
+import { useOrganization } from '@clerk/shared/react';
 import { useState } from 'react';
 
 import { AlertIcon, Badge, Button, Col, descriptors, Flex, Flow, Link, localizationKeys, Text } from '@/customizables';
@@ -48,6 +48,7 @@ export const ConfirmationStep = (): JSX.Element => {
         </Step.Body>
 
         <Step.Footer>
+          <Step.Footer.Reset />
           {!isActive && (
             <Flex
               elementDescriptor={descriptors.configureSSOConfirmationInactiveBanner}
@@ -73,12 +74,13 @@ export const ConfirmationStep = (): JSX.Element => {
 };
 
 const EnableSsoSection = (): JSX.Element => {
-  const { enterpriseConnection, updateEnterpriseConnection } = useConfigureSSO();
+  const {
+    enterpriseConnection,
+    enterpriseConnectionMutations: { setConnectionActive },
+  } = useConfigureSSO();
   const card = useCardState();
 
   const [isChecked, setIsChecked] = useState(!!enterpriseConnection?.active);
-
-  const updateActive = useReverification((id: string, active: boolean) => updateEnterpriseConnection(id, { active }));
 
   const onActiveChange = async (active: boolean) => {
     if (card.isLoading) {
@@ -92,7 +94,7 @@ const EnableSsoSection = (): JSX.Element => {
     try {
       // Enterprise connection is guaranteed to be set at this point
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const updated = await updateActive(enterpriseConnection!.id, active);
+      const updated = await setConnectionActive(enterpriseConnection!.id, active);
       if (updated) {
         setIsChecked(updated.active);
       }
@@ -214,34 +216,15 @@ const ConfigurationDetailsSection = (): JSX.Element => {
               {samlConnection?.idpEntityId}
             </Text>
           </ProfileSection.Item>
-
-          <ProfileSection.Item
-            id='ssoConfiguration'
-            sx={t => ({ gap: t.space.$3, paddingInlineStart: 0 })}
-          >
-            <Text
-              elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsLabel}
-              colorScheme='secondary'
-              localizationKey={localizationKeys('configureSSO.confirmation.configurationSection.certificateLabel')}
-              sx={t => ({ width: t.space.$36, flexShrink: 0, whiteSpace: 'nowrap' })}
-            />
-            <Text
-              elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsValue}
-              truncate
-              title={samlConnection?.idpCertificate}
-              sx={{ minWidth: 0 }}
-            >
-              {samlConnection?.idpCertificate}
-            </Text>
-          </ProfileSection.Item>
         </ProfileSection.ItemList>
 
         <Flex justify='start'>
           <Button
             elementDescriptor={descriptors.configureSSOConfirmationReconfigureButton}
+            id='configureAgain'
+            onClick={() => goToStep('configure')}
             variant='outline'
             size='sm'
-            onClick={() => goToStep('configure')}
             localizationKey={localizationKeys('configureSSO.confirmation.configurationSection.configureAgainLink')}
           />
         </Flex>
@@ -251,6 +234,7 @@ const ConfigurationDetailsSection = (): JSX.Element => {
 };
 
 const ResetConnectionSection = (): JSX.Element => {
+  const { enterpriseConnection, enterpriseConnectionMutations, contentRef } = useConfigureSSO();
   const { organization } = useOrganization();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -274,6 +258,10 @@ const ResetConnectionSection = (): JSX.Element => {
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         confirmationValue={organization?.name ?? ''}
+        // The confirmation step is only reachable with a connection, so the resource is set.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        onDelete={() => enterpriseConnectionMutations.deleteConnection(enterpriseConnection!.id)}
+        contentRef={contentRef}
       />
     </ProfileSection.Root>
   );

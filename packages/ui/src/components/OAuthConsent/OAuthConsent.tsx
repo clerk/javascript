@@ -142,7 +142,7 @@ function _OAuthConsent() {
 
   const primaryIdentifier = user?.primaryEmailAddress?.emailAddress || user?.primaryPhoneNumber?.phoneNumber;
 
-  const displayedScopes = scopes.filter(item => ![OFFLINE_ACCESS_SCOPE, USER_ORG_READ_SCOPE].includes(item.scope));
+  const displayedScopes = scopes.filter(item => item.scope !== OFFLINE_ACCESS_SCOPE);
   const hasOfflineAccess = scopes.some(item => item.scope === OFFLINE_ACCESS_SCOPE);
 
   return (

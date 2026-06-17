@@ -196,29 +196,28 @@ export const elGR: LocalizationResource = {
       },
       warning: 'Μόλις επιλεγεί ένας πάροχος δεν μπορείτε να τον αλλάξετε μέχρι να ολοκληρωθεί η ρύθμιση',
     },
-    verifyEmailDomainStep: {
-      title: 'Επαλήθευση διεύθυνσης email',
-      subtitle: 'Επαληθεύστε τη διεύθυνση email στην οποία θέλετε να ενεργοποιήσετε τη σύνδεση επιχείρησης.',
-      addEmailAddress: {
-        formTitle: 'Χρειαζόμαστε το email σας',
-        formSubtitle: 'Για να ξεκινήσουμε, θα χρειαστούμε τη διεύθυνση email σας',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'Διεύθυνση email',
+    organizationDomainsStep: {
+      title: 'Προσθήκη τομέων SSO',
+      subtitle: 'Προσθέστε και επαληθεύστε την κυριότητα των τομέων που χρησιμοποιεί ο οργανισμός σας για σύνδεση.',
+      formFieldLabel__domain: 'Τομείς',
+      formFieldInputPlaceholder__domain:
+        'Πληκτρολογήστε τον τομέα σας εδώ και κάντε κλικ στο «Προσθήκη» για να ξεκινήσετε',
+      formButtonPrimary__add: 'Προσθήκη',
+      domainSuggestion: {
+        messageLabel: 'Το email σας χρησιμοποιεί {{domain}}. Θέλετε να το προσθέσετε;',
+        formButtonPrimary__add: 'Προσθήκη {{domain}}',
       },
-      emailCode: {
-        formTitle: 'Επαληθεύστε τη διεύθυνση email σας',
-        formSubtitle: 'Εισαγάγετε τον κωδικό επαλήθευσης που στάλθηκε στο {{identifier}}',
-        resendButton: 'Δεν λάβατε κωδικό; Επαναποστολή',
-        verified: {
-          title: 'Λάβαμε το email σας',
-          subtitle: 'Έχετε επαληθεύσει τη διεύθυνση email σας με το ακόλουθο email',
-          inputLabel: 'Επαληθευμένη διεύθυνση email',
+      domainCard: {
+        badge__verified: 'Επαληθευμένο',
+        badge__unverified: 'Μη επαληθευμένο',
+        verifiedAtLabel: "Επαληθεύτηκε στις {{ date | shortDate('el-GR') }}",
+        txtRecord: {
+          instructions:
+            'Προσθέστε αυτήν την εγγραφή TXT στον πάροχο DNS σας. Θα την επαληθεύσουμε αυτόματα μόλις η εγγραφή ενεργοποιηθεί.',
+          typeLabel: 'Τύπος',
+          hostLabel: 'Κεντρικός υπολογιστής / Όνομα',
+          valueLabel: 'Τιμή',
         },
-      },
-      domainTaken: {
-        title: 'Αυτός ο τομέας ({{domain}}) διαθέτει ήδη σύνδεση SSO',
-        subtitle:
-          'Επικοινωνήστε με τον διαχειριστή της εφαρμογής για να αποκτήσετε πρόσβαση μέσω της υπάρχουσας σύνδεσης.',
       },
     },
   },

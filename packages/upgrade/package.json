@@ -1,6 +1,6 @@
 {
   "name": "@clerk/upgrade",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/clerk/javascript.git",
@@ -35,7 +35,6 @@
   "dependencies": {
     "chalk": "^5.3.0",
     "ejs": "3.1.10",
-    "execa": "9.4.1",
     "gray-matter": "^4.0.3",
     "index-to-position": "^0.1.2",
     "jscodeshift": "^17.0.0",
@@ -43,7 +42,6 @@
     "meow": "^11.0.0",
     "read-pkg": "^9.0.1",
     "semver-regex": "^4.0.5",
-    "temp-dir": "^3.0.0",
     "tinyglobby": "^0.2.15"
   },
   "devDependencies": {

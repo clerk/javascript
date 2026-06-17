@@ -203,28 +203,27 @@ export const teIN: LocalizationResource = {
       },
       warning: 'ఒకసారి ప్రొవైడర్ ఎంచుకున్న తర్వాత, కాన్ఫిగరేషన్ ముగిసే వరకు మీరు మళ్లీ మార్చలేరు',
     },
-    verifyEmailDomainStep: {
-      title: 'ఇమెయిల్ చిరునామా ధృవీకరించండి',
-      subtitle: 'మీరు ఎంటర్‌ప్రైజ్ కనెక్షన్‌ను ప్రారంభించాలనుకుంటున్న ఇమెయిల్ చిరునామాను ధృవీకరించండి.',
-      addEmailAddress: {
-        formTitle: 'మాకు మీ ఇమెయిల్ అవసరం',
-        formSubtitle: 'ప్రారంభించడానికి మాకు మీ ఇమెయిల్ చిరునామా అవసరం',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'ఇమెయిల్ చిరునామా',
+    organizationDomainsStep: {
+      title: 'SSO డొమైన్‌లను జోడించండి',
+      subtitle: 'మీ సంస్థ సైన్ ఇన్ చేయడానికి ఉపయోగించే డొమైన్‌ల యాజమాన్యాన్ని జోడించి ధృవీకరించండి.',
+      formFieldLabel__domain: 'డొమైన్‌లు',
+      formFieldInputPlaceholder__domain: 'మీ డొమైన్‌ను ఇక్కడ టైప్ చేసి, ప్రారంభించడానికి జోడించు క్లిక్ చేయండి',
+      formButtonPrimary__add: 'జోడించు',
+      domainSuggestion: {
+        messageLabel: 'మీ ఇమెయిల్ {{domain}} ను ఉపయోగిస్తుంది. మీరు దీన్ని జోడించాలనుకుంటున్నారా?',
+        formButtonPrimary__add: '{{domain}} జోడించు',
       },
-      emailCode: {
-        formTitle: 'మీ ఇమెయిల్ చిరునామాను ధృవీకరించండి',
-        formSubtitle: '{{identifier}} కు పంపిన ధృవీకరణ కోడ్‌ను నమోదు చేయండి',
-        resendButton: 'కోడ్ అందలేదా? మళ్లీ పంపండి',
-        verified: {
-          title: 'మాకు మీ ఇమెయిల్ వచ్చింది',
-          subtitle: 'మీరు కింది ఇమెయిల్‌తో మీ ఇమెయిల్ చిరునామాను ధృవీకరించారు',
-          inputLabel: 'ధృవీకరించబడిన ఇమెయిల్ చిరునామా',
+      domainCard: {
+        badge__verified: 'ధృవీకరించబడింది',
+        badge__unverified: 'ధృవీకరించబడలేదు',
+        verifiedAtLabel: "{{ date | shortDate('te-IN') }} న ధృవీకరించబడింది",
+        txtRecord: {
+          instructions:
+            'ఈ TXT రికార్డ్‌ను మీ DNS ప్రొవైడర్‌కు జోడించండి. రికార్డ్ సక్రియం అయిన వెంటనే మేము స్వయంచాలకంగా ధృవీకరిస్తాము.',
+          typeLabel: 'రకం',
+          hostLabel: 'హోస్ట్ / పేరు',
+          valueLabel: 'విలువ',
         },
-      },
-      domainTaken: {
-        title: 'ఈ డొమైన్‌కి ({{domain}}) ఇప్పటికే SSO కనెక్షన్ ఉంది',
-        subtitle: 'ఇప్పటికే ఉన్న కనెక్షన్ ద్వారా యాక్సెస్ పొందడానికి అప్లికేషన్ నిర్వాహకుడిని సంప్రదించండి.',
       },
     },
   },

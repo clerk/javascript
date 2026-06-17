@@ -1,4 +1,4 @@
-export { TokenCache } from './types';
+export type { TokenCache } from './types';
 
 export { MemoryTokenCache } from './MemoryTokenCache';
 export { ClientResourceCache, EnvironmentResourceCache, SessionJWTCache } from './ResourceCache';

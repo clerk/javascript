@@ -548,6 +548,7 @@ export const enUS_v4: any = {
     badge__automaticInvitation: 'Automatic invitations',
     badge__automaticSuggestion: 'Automatic suggestions',
     badge__manualInvitation: 'No automatic enrollment',
+    badge__enterpriseSso: 'Enterprise SSO',
     start: {
       headerTitle__members: 'Members',
       headerTitle__settings: 'Settings',
@@ -555,7 +556,7 @@ export const enUS_v4: any = {
       headerSubtitle__settings: 'Manage organization settings',
     },
     profilePage: {
-      title: 'Organization Profile',
+      title: 'Profile',
       subtitle: 'Manage organization profile',
       successMessage: 'The organization has been updated.',
       dangerSection: {
@@ -581,7 +582,7 @@ export const enUS_v4: any = {
         subtitle:
           'Allow users to join the organization automatically or request to join based on a verified email domain.',
         primaryButton: 'Add domain',
-        unverifiedDomain_menuAction__verify: 'Verify domain',
+        unverifiedDomain_menuAction__verify: 'Verify domains',
         unverifiedDomain_menuAction__remove: 'Delete domain',
       },
     },

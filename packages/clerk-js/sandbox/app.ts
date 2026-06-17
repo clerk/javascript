@@ -1,5 +1,5 @@
 import { PageMocking, type MockScenario } from '@clerk/msw';
-import * as l from '../../localizations';
+import * as l from '../../localizations/src';
 import { dark, neobrutalism, shadcn, shadesOfPurple } from '../../ui/src/themes';
 import type { Clerk as ClerkType } from '../';
 import { initCommandPalette } from './cmdk';
@@ -399,7 +399,7 @@ void (async () => {
     '/waitlist': { mount: 'mountWaitlist', component: 'waitlist' },
     '/pricing-table': { mount: 'mountPricingTable', component: 'pricingTable' },
     '/api-keys': { mount: 'mountAPIKeys', component: 'apiKeys' },
-    '/configure-sso': { mount: 'mountConfigureSSO', component: 'configureSSO' },
+    '/configure-sso': { mount: '__internal_mountConfigureSSO', component: 'configureSSO' },
     '/task-choose-organization': {
       mount: 'mountTaskChooseOrganization',
       component: 'taskChooseOrganization',

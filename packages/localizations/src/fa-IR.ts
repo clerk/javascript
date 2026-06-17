@@ -201,28 +201,27 @@ export const faIR: LocalizationResource = {
       },
       warning: 'پس از انتخاب یک ارائه‌دهنده، نمی‌توانید آن را تا پایان پیکربندی تغییر دهید',
     },
-    verifyEmailDomainStep: {
-      title: 'تأیید آدرس ایمیل',
-      subtitle: 'آدرس ایمیلی را که می‌خواهید اتصال سازمانی روی آن فعال شود، تأیید کنید.',
-      addEmailAddress: {
-        formTitle: 'به ایمیل شما نیاز داریم',
-        formSubtitle: 'برای شروع به آدرس ایمیل شما نیاز داریم',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'آدرس ایمیل',
+    organizationDomainsStep: {
+      title: 'افزودن دامنه‌های SSO',
+      subtitle: 'مالکیت دامنه‌هایی را که سازمان شما برای ورود استفاده می‌کند، اضافه و تأیید کنید.',
+      formFieldLabel__domain: 'دامنه‌ها',
+      formFieldInputPlaceholder__domain: 'دامنه خود را اینجا تایپ کنید و برای شروع روی افزودن کلیک کنید',
+      formButtonPrimary__add: 'افزودن',
+      domainSuggestion: {
+        messageLabel: 'ایمیل شما از {{domain}} استفاده می‌کند. آیا می‌خواهید آن را اضافه کنید؟',
+        formButtonPrimary__add: 'افزودن {{domain}}',
       },
-      emailCode: {
-        formTitle: 'آدرس ایمیل خود را تأیید کنید',
-        formSubtitle: 'کد تأیید ارسال شده به {{identifier}} را وارد کنید',
-        resendButton: 'کد را دریافت نکردید؟ ارسال مجدد',
-        verified: {
-          title: 'ایمیل شما را دریافت کردیم',
-          subtitle: 'شما آدرس ایمیل خود را با ایمیل زیر تأیید کرده‌اید',
-          inputLabel: 'آدرس ایمیل تأیید شده',
+      domainCard: {
+        badge__verified: 'تأییدشده',
+        badge__unverified: 'تأییدنشده',
+        verifiedAtLabel: "تأیید‌شده در {{ date | shortDate('fa-IR') }}",
+        txtRecord: {
+          instructions:
+            'این رکورد TXT را به ارائه‌دهنده DNS خود اضافه کنید. به‌محض فعال شدن رکورد، به‌طور خودکار آن را تأیید می‌کنیم.',
+          typeLabel: 'نوع',
+          hostLabel: 'میزبان / نام',
+          valueLabel: 'مقدار',
         },
-      },
-      domainTaken: {
-        title: 'این دامنه ({{domain}}) قبلاً یک اتصال SSO دارد',
-        subtitle: 'برای دسترسی از طریق اتصال موجود، با مدیر برنامه تماس بگیرید.',
       },
     },
   },

@@ -225,28 +225,27 @@ export const nbNO: LocalizationResource = {
       },
       warning: 'Når en leverandør er valgt, kan du ikke endre igjen før konfigurasjonen er ferdig',
     },
-    verifyEmailDomainStep: {
-      title: 'Verifiser e-postadresse',
-      subtitle: 'Verifiser e-postadressen du vil aktivere virksomhetstilkoblingen på.',
-      addEmailAddress: {
-        formTitle: 'Vi trenger e-posten din',
-        formSubtitle: 'For å starte trenger vi e-postadressen din',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'E-postadresse',
+    organizationDomainsStep: {
+      title: 'Legg til SSO-domener',
+      subtitle: 'Legg til og bekreft eierskapet til domenene organisasjonen din bruker for å logge på.',
+      formFieldLabel__domain: 'Domener',
+      formFieldInputPlaceholder__domain: 'Skriv inn domenet ditt her, og klikk på legg til for å starte',
+      formButtonPrimary__add: 'Legg til',
+      domainSuggestion: {
+        messageLabel: 'E-posten din bruker {{domain}}. Vil du legge den til?',
+        formButtonPrimary__add: 'Legg til {{domain}}',
       },
-      emailCode: {
-        formTitle: 'Verifiser e-postadressen din',
-        formSubtitle: 'Skriv inn verifiseringskoden som ble sendt til {{identifier}}',
-        resendButton: 'Mottok du ingen kode? Send på nytt',
-        verified: {
-          title: 'Vi mottok e-posten din',
-          subtitle: 'Du har verifisert e-postadressen din med følgende e-post',
-          inputLabel: 'Verifisert e-postadresse',
+      domainCard: {
+        badge__verified: 'Verifisert',
+        badge__unverified: 'Ikke verifisert',
+        verifiedAtLabel: "Verifisert den {{ date | shortDate('nb-NO') }}",
+        txtRecord: {
+          instructions:
+            'Legg til denne TXT-posten hos DNS-leverandøren din. Vi verifiserer automatisk når posten er aktiv.',
+          typeLabel: 'Type',
+          hostLabel: 'Vert / Navn',
+          valueLabel: 'Verdi',
         },
-      },
-      domainTaken: {
-        title: 'Dette domenet ({{domain}}) har allerede en SSO-tilkobling',
-        subtitle: 'Kontakt programmets administrator for å få tilgang via den eksisterende tilkoblingen.',
       },
     },
   },

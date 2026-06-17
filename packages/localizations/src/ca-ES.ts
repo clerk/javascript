@@ -203,28 +203,27 @@ export const caES: LocalizationResource = {
       },
       warning: 'Un cop seleccionat un proveïdor no podreu canviar-lo fins que la configuració hagi finalitzat',
     },
-    verifyEmailDomainStep: {
-      title: 'Verifica el correu electrònic',
-      subtitle: "Verifica l'adreça de correu electrònic on vols habilitar la connexió empresarial.",
-      addEmailAddress: {
-        formTitle: 'Necessitem el teu correu',
-        formSubtitle: 'Per començar necessitem la teva adreça de correu electrònic',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'Adreça de correu electrònic',
+    organizationDomainsStep: {
+      title: 'Afegeix dominis SSO',
+      subtitle: 'Afegeix i verifica la propietat dels dominis que la teva organització utilitza per iniciar sessió.',
+      formFieldLabel__domain: 'Dominis',
+      formFieldInputPlaceholder__domain: 'Escriu aquí el teu domini i fes clic a Afegeix per començar',
+      formButtonPrimary__add: 'Afegeix',
+      domainSuggestion: {
+        messageLabel: 'El teu correu electrònic utilitza {{domain}}. Vols afegir-lo?',
+        formButtonPrimary__add: 'Afegeix {{domain}}',
       },
-      emailCode: {
-        formTitle: "Verifica l'adreça de correu electrònic",
-        formSubtitle: 'Introdueix el codi de verificació enviat a {{identifier}}',
-        resendButton: 'No has rebut el codi? Reenvia',
-        verified: {
-          title: 'Hem rebut el teu correu',
-          subtitle: 'Has verificat la teva adreça de correu electrònic amb el següent correu',
-          inputLabel: 'Adreça de correu electrònic verificada',
+      domainCard: {
+        badge__verified: 'Verificat',
+        badge__unverified: 'Sense verificar',
+        verifiedAtLabel: "Verificat el {{ date | shortDate('ca-ES') }}",
+        txtRecord: {
+          instructions:
+            'Afegeix aquest registre TXT al teu proveïdor de DNS. El verificarem automàticament un cop el registre estigui actiu.',
+          typeLabel: 'Tipus',
+          hostLabel: 'Amfitrió / Nom',
+          valueLabel: 'Valor',
         },
-      },
-      domainTaken: {
-        title: 'Aquest domini ({{domain}}) ja té una connexió SSO',
-        subtitle: "Contacta amb l'administrador de l'aplicació per obtenir accés a través de la connexió existent.",
       },
     },
   },

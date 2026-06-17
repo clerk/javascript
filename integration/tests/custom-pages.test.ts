@@ -1,3 +1,4 @@
+/* eslint-disable turbo/no-undeclared-env-vars */
 import { expect, test } from '@playwright/test';
 
 import type { Application } from '../models/application';
@@ -169,6 +170,48 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
           await u.page.waitForAppUrl('/user');
         });
       });
+    });
+
+    test('custom profile page survives a parent rerender without remounting', async ({ page, context }) => {
+      // Validates the @clerk/react fix from #8604 (custom pages must not remount on a
+      // parent rerender). The staging leg installs published @latest packages
+      // (E2E_SDK_SOURCE=latest), which do not yet contain the fix, so this is
+      // deterministically red there until the next @clerk/react release. PR CI builds
+      // the SDK from the branch and still exercises this test.
+      // TODO: remove this skip once @clerk/react including #8604 is published to npm.
+      test.skip(
+        process.env.E2E_SDK_SOURCE === 'latest',
+        'validates the unreleased @clerk/react fix (#8604); covered by ref-built CI',
+      );
+
+      const u = createTestUtils({ app, page, context });
+      await u.po.signIn.goTo();
+      await u.po.signIn.waitForMounted();
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+      await u.po.expect.toBeSignedIn();
+
+      await u.page.goToRelative(CUSTOM_PROFILE_PAGE);
+      await u.po.userProfile.waitForMounted();
+
+      // Open the custom page (Page 1)
+      const [profilePage] = await u.page.locator('button.cl-navbarButton__custom-page-0').all();
+      await profilePage.click();
+
+      // Local state lives inside the portaled custom page and starts at 0.
+      await u.page.waitForSelector('p[data-local-counter="1"]', { state: 'attached' });
+      await expect(u.page.locator('p[data-local-counter="1"]')).toHaveText('Local counter: 0');
+
+      // Mutate the local state to 2.
+      await u.page.locator('button[data-local-counter="1"]').click();
+      await u.page.locator('button[data-local-counter="1"]').click();
+      await expect(u.page.locator('p[data-local-counter="1"]')).toHaveText('Local counter: 2');
+
+      // Force a parent rerender: this re-creates the <UserProfile> element and reruns useCustomPages.
+      await u.page.locator('button[data-testid="rerender-parent"]').click();
+      await expect(u.page.locator('button[data-testid="rerender-parent"]')).toHaveText('Rerender parent: 1');
+
+      // The custom page must NOT remount, so its local state is preserved.
+      await expect(u.page.locator('p[data-local-counter="1"]')).toHaveText('Local counter: 2');
     });
 
     test.describe('User Button with experimental asStandalone and asProvider', () => {

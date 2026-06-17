@@ -10,6 +10,7 @@ import { CardStateProvider } from '@/ui/elements/contexts';
 
 import { OptionsProvider } from '../../../contexts';
 import { AppearanceProvider } from '../../../customizables';
+import { SIGN_IN_RESET_PASSWORD_INTENT_PARAM } from '../shared';
 import { SignInStart } from '../SignInStart';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
@@ -476,6 +477,47 @@ describe('SignInStart', () => {
       props.setProps({ initialValues: { username: 'foo' } });
       render(<SignInStart />, { wrapper });
       screen.getByDisplayValue(/foo/i);
+    });
+  });
+
+  describe('Forgot password on instant password field', () => {
+    it('navigates to factor-one with reset intent when clicking Forgot password', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword({ required: true });
+      });
+      fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_first_factor' } as SignInResource));
+      const { userEvent, container } = render(<SignInStart />, { wrapper });
+
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      const instantPasswordField = container.querySelector('#password-field') as Element;
+      fireEvent.change(instantPasswordField, { target: { value: 'some-password' } });
+
+      await userEvent.click(screen.getByText(/Forgot password/i));
+
+      await waitFor(() => {
+        expect(fixtures.signIn.create).toHaveBeenCalledWith({
+          identifier: 'hello@clerk.com',
+        });
+        expect(fixtures.router.navigate).toHaveBeenCalledWith('factor-one', {
+          searchParams: new URLSearchParams({ [SIGN_IN_RESET_PASSWORD_INTENT_PARAM]: 'true' }),
+        });
+      });
+    });
+
+    it('does not call create when identifier is empty', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword({ required: true });
+      });
+      const { userEvent, container } = render(<SignInStart />, { wrapper });
+
+      const instantPasswordField = container.querySelector('#password-field') as Element;
+      fireEvent.change(instantPasswordField, { target: { value: 'some-password' } });
+
+      await userEvent.click(screen.getByText(/Forgot password/i));
+
+      expect(fixtures.signIn.create).not.toHaveBeenCalled();
     });
   });
 
