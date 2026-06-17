@@ -326,7 +326,7 @@ export function OrganizationProfileMembers() {
                 alignItems: 'center',
                 paddingInline: t.spacing(3),
                 paddingBlock: t.spacing(2),
-                gap: t.spacing(2),
+                gap: t.spacing(1.5),
                 borderTop: `1px solid ${t.color.border}`,
               })}
             >
