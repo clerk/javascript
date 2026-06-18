@@ -1,5 +1,3 @@
-import { useRef } from 'react';
-
 import { Box } from '../components/box';
 import { Button } from '../components/button';
 import { SectionSkeleton } from '../components/section-skeleton';
@@ -7,7 +5,7 @@ import { Destructive } from '../block/destructive';
 import { useOrganization } from '../mock/use-organization';
 import { useMachine } from '../machine/useMachine';
 import type { MockOrganization } from '../mock/use-organization';
-import { createDeleteOrgMachine } from './delete-organization-machine';
+import { deleteOrgMachine } from './delete-organization-machine';
 
 export function DeleteOrganization() {
   const { isLoaded, organization } = useOrganization();
@@ -16,9 +14,7 @@ export function DeleteOrganization() {
 }
 
 function DeleteOrganizationReady({ organization }: { organization: MockOrganization }) {
-  const organizationRef = useRef(organization);
-  organizationRef.current = organization;
-  const [snapshot, send] = useMachine(createDeleteOrgMachine(async () => organizationRef.current.destroy()));
+  const [snapshot, send] = useMachine(deleteOrgMachine, { context: { destroyFn: () => organization.destroy() } });
 
   return (
     <Box

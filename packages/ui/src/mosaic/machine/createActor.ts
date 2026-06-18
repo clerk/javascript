@@ -55,7 +55,9 @@ export function createActor<TContext extends object, TEvent extends EventObject>
   // through an event-agnostic lens to keep the runtime helpers honestly typed.
   const states = machine.states as unknown as Record<string, StateConfig<TContext, EventObject>>;
 
-  let context: TContext = { ...machine.context, ...options.context, ...teleport?.context };
+  // Tracks the latest setContext patch so it survives a stop/start cycle.
+  let liveContextPatch: Partial<TContext> = options.context ?? {};
+  let context: TContext = { ...machine.context, ...liveContextPatch, ...teleport?.context };
   // `initial` may be derived from context (e.g. furthest-reachable step).
   const resolveInitial = () => (typeof machine.initial === 'function' ? machine.initial(context) : machine.initial);
   let value = teleport?.value ?? resolveInitial();
@@ -177,7 +179,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       status = 'active';
       // Reset state and context so a restart (e.g. after StrictMode stop/start)
       // begins from idle rather than re-entering and re-invoking a mid-flight state.
-      context = { ...machine.context, ...options.context };
+      context = { ...machine.context, ...liveContextPatch };
       value = resolveInitial();
       enterState(INIT_EVENT);
       commit();
@@ -224,6 +226,11 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       const transition = pickTransition(normalizeTransitions(states[value]?.on?.[event.type]), event);
       if (!transition) return false;
       return transition.target === undefined || canEnter(transition.target as string, event);
+    },
+
+    setContext(patch: Partial<TContext>) {
+      liveContextPatch = { ...liveContextPatch, ...patch };
+      context = { ...context, ...patch };
     },
 
     recheck() {

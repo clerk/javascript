@@ -1,5 +1,3 @@
-import { useRef } from 'react';
-
 import { Box } from '../components/box';
 import { Button } from '../components/button';
 import { SectionSkeleton } from '../components/section-skeleton';
@@ -7,7 +5,7 @@ import { Destructive } from '../block/destructive';
 import { useOrganization } from '../mock/use-organization';
 import { useMachine } from '../machine/useMachine';
 import type { MockMembership, MockOrganization } from '../mock/use-organization';
-import { createLeaveOrgMachine } from './leave-organization-machine';
+import { leaveOrgMachine } from './leave-organization-machine';
 
 export function LeaveOrganization() {
   const { isLoaded, organization, membership } = useOrganization();
@@ -27,9 +25,7 @@ function LeaveOrganizationReady({
   organization: MockOrganization;
   membership: MockMembership;
 }) {
-  const membershipRef = useRef(membership);
-  membershipRef.current = membership;
-  const [snapshot, send] = useMachine(createLeaveOrgMachine(async () => membershipRef.current.destroy()));
+  const [snapshot, send] = useMachine(leaveOrgMachine, { context: { leaveFn: () => membership.destroy() } });
 
   return (
     <Box

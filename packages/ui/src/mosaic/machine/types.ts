@@ -168,6 +168,13 @@ export interface Actor<TContext, TEvent extends EventObject> {
   /** Whether the event would be handled (a guard-passing, enterable transition exists) right now. */
   can: (event: TEvent) => boolean;
   /**
+   * Silently merge a partial context patch into the running actor — no snapshot
+   * emitted, no transitions triggered. Use this to keep injected dependencies
+   * (e.g. an async function from a React prop) current without restarting the actor.
+   * Patches survive a stop/start cycle (e.g. React StrictMode).
+   */
+  setContext: (patch: Partial<TContext>) => void;
+  /**
    * Re-evaluate the current state against live data. Call this when external data
    * a guard reads (an SWR cache, a store) has changed, so the machine can
    * self-correct:
