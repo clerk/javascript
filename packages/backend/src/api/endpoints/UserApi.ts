@@ -632,7 +632,7 @@ export class UserAPI extends AbstractAPI {
   /**
    * Gets the corresponding [OAuth access token](!oauth-access-token) for a user that has previously authenticated with the given OAuth provider.
    * @param userId - The ID of the user to get the OAuth access tokens for.
-   * @param provider - The OAuth provider to get the access tokens for. If using a custom OAuth provider, prefix the provider name with `custom_` (e.g. `custom_google`).
+   * @param provider - The OAuth provider to get the access tokens for. If using a custom OAuth provider, prefix the provider name with `custom_` (e.g. `oauth_custom_google`).
    * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property than contains an array of [`OauthAccessToken`](https://clerk.com/docs/reference/backend/types/backend-oauth-access-token) objects, and a `totalCount` property that indicates the total number of OAuth access tokens for the specified user and provider.
    */
   public async getUserOauthAccessToken(
