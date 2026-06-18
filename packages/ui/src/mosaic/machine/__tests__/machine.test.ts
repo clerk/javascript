@@ -619,4 +619,29 @@ describe('actor restart — StrictMode start/stop/start cycle', () => {
     actor.send({ type: 'OPEN' });
     expect(actor.getSnapshot().value).toBe('confirming');
   });
+
+  it('does not re-fire an in-flight invoke when restarted from an invoke state', async () => {
+    const gate = deferred<void>();
+    let invokeCount = 0;
+    const actor = createActor(
+      createDeleteOrgMachine(() => {
+        invokeCount++;
+        return gate.promise;
+      }),
+    );
+
+    actor.start();
+    actor.send({ type: 'OPEN' });
+    actor.send({ type: 'TYPE', value: 'Acme Inc' });
+    actor.send({ type: 'CONFIRM' });
+    expect(actor.getSnapshot().value).toBe('deleting');
+    expect(invokeCount).toBe(1);
+
+    // Stopped mid-invoke (e.g. Suspense remount) then restarted.
+    actor.stop();
+    actor.start();
+    expect(actor.getSnapshot().status).toBe('active');
+    // The invoke must not fire a second time.
+    expect(invokeCount).toBe(1);
+  });
 });

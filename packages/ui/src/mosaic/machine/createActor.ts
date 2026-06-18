@@ -175,6 +175,10 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       if (started) return actor;
       started = true;
       status = 'active';
+      // Reset state and context so a restart (e.g. after StrictMode stop/start)
+      // begins from idle rather than re-entering and re-invoking a mid-flight state.
+      context = { ...machine.context, ...options.context };
+      value = resolveInitial();
       enterState(INIT_EVENT);
       commit();
       return actor;
