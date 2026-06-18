@@ -4,30 +4,30 @@ import { BillingPlan } from './CommercePlan';
 import type { BillingSubscriptionItemJSON } from './JSON';
 
 /**
- * The `BillingSubscriptionItem` object is similar to the [`BillingSubscriptionItemResource`](/docs/reference/types/billing-subscription-item-resource) object as it holds information about a subscription item, as well as methods for managing it. However, the `BillingSubscriptionItem` object is different in that it is used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/billing/GET/billing/subscription_items) and is not directly accessible from the Frontend API.
+ * The `BillingSubscriptionItem` object is similar to the [`BillingSubscriptionItemResource`](https://clerk.com/docs/reference/types/billing-subscription-item-resource) object as it holds information about a subscription item, as well as methods for managing it. However, the `BillingSubscriptionItem` object is different in that it is used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/billing/GET/billing/subscription_items) and is not directly accessible from the Frontend API.
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export class BillingSubscriptionItem {
   constructor(
     /**
-     * The unique identifier for the subscription item.
+     * The unique identifier for the Subscription Item.
      */
     readonly id: string,
     /**
-     * The status of the subscription item.
+     * The status of the Subscription Item.
      */
     readonly status: BillingSubscriptionItemJSON['status'],
     /**
-     * The Plan period for the subscription item.
+     * The period of the Plan associated with this Subscription Item.
      */
     readonly planPeriod: 'month' | 'annual',
     /**
-     * Unix timestamp (milliseconds) of when the current period starts.
+     * The Unix timestamp (milliseconds) of when the current period starts.
      */
     readonly periodStart: number,
     /**
-     * The next payment information.
+     * Information about the next scheduled payment for this Subscription Item. If present, contains the amount of the next payment and the Unix timestamp (milliseconds) of when the next payment is scheduled.
      */
     readonly nextPayment:
       | {
@@ -36,58 +36,58 @@ export class BillingSubscriptionItem {
            */
           amount: number;
           /**
-           * Unix timestamp (milliseconds) of when the next payment is scheduled.
+           * The Unix timestamp (milliseconds) of when the next payment is scheduled.
            */
           date: number;
         }
       | null
       | undefined,
     /**
-     * The current amount for the subscription item.
+     * The current amount for the Subscription Item.
      */
     readonly amount: BillingMoneyAmount | undefined,
     /**
-     * The Plan associated with this subscription item.
+     * The Plan associated with this Subscription Item.
      */
     readonly plan: BillingPlan | null,
     /**
-     * The Plan ID.
+     * The ID of the Plan associated with this Subscription Item.
      */
     readonly planId: string | null,
     /**
-     * Unix timestamp (milliseconds) of when the subscription item was created.
+     * The Unix timestamp (milliseconds) of when the Subscription Item was created.
      */
     readonly createdAt: number,
     /**
-     * Unix timestamp (milliseconds) of when the subscription item was last updated.
+     * The Unix timestamp (milliseconds) of when the Subscription Item was last updated.
      */
     readonly updatedAt: number,
     /**
-     * Unix timestamp (milliseconds) of when the current period ends.
+     * The Unix timestamp (milliseconds) of when the current period ends.
      */
     readonly periodEnd: number | null,
     /**
-     * Unix timestamp (milliseconds) of when the subscription item was canceled.
+     * The Unix timestamp (milliseconds) of when the Subscription Item was canceled.
      */
     readonly canceledAt: number | null,
     /**
-     * Unix timestamp (milliseconds) of when the subscription item became past due.
+     * The Unix timestamp (milliseconds) of when the Subscription Item became past due.
      */
     readonly pastDueAt: number | null,
     /**
-     * Unix timestamp (milliseconds) of when the subscription item ended.
+     * The Unix timestamp (milliseconds) of when the Subscription Item ended.
      */
     readonly endedAt: number | null,
     /**
-     * The payer ID.
+     * The ID of the payer for this Subscription Item.
      */
     readonly payerId: string | undefined,
     /**
-     * Whether this subscription item is currently in a free trial period.
+     * Whether this Subscription Item is currently in a free trial period.
      */
     readonly isFreeTrial?: boolean,
     /**
-     * The lifetime amount paid for this subscription item.
+     * The lifetime amount paid for this Subscription Item.
      */
     readonly lifetimePaid?: BillingMoneyAmount,
   ) {}

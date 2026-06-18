@@ -48,6 +48,12 @@ describe('Typedoc output', () => {
 
     expect(nestedFolders).toMatchInlineSnapshot(`
       [
+        "backend/allowlist-identifier-api",
+        "backend/allowlist-identifier-api/methods",
+        "backend/billing-api",
+        "backend/billing-api/methods",
+        "backend/domain-api",
+        "backend/domain-api/methods",
         "backend/organization-api",
         "backend/organization-api/methods",
         "backend/user-api",

@@ -4,46 +4,46 @@ import { BillingSubscriptionItem } from './CommerceSubscriptionItem';
 import type { BillingSubscriptionJSON } from './JSON';
 
 /**
- * The `BillingSubscription` object is similar to the [`BillingSubscriptionResource`](/docs/reference/types/billing-subscription-resource) object as it holds information about a subscription, as well as methods for managing it. However, the `BillingSubscription` object is different in that it is used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/billing/GET/organizations/%7Borganization_id%7D/billing/subscription) and is not directly accessible from the Frontend API.
+ * The `BillingSubscription` object is similar to the [`BillingSubscriptionResource`](https://clerk.com/docs/reference/types/billing-subscription-resource) object as it holds information about a subscription, as well as methods for managing it. However, the `BillingSubscription` object is different in that it is used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/billing/GET/organizations/%7Borganization_id%7D/billing/subscription) and is not directly accessible from the Frontend API.
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export class BillingSubscription {
   constructor(
     /**
-     * The unique identifier for the billing subscription.
+     * The unique identifier for the Subscription.
      */
     readonly id: string,
     /**
-     * The current status of the subscription.
+     * The current status of the Subscription.
      */
     readonly status: BillingSubscriptionJSON['status'],
     /**
-     * The ID of the payer for this subscription.
+     * The ID of the payer for this Subscription.
      */
     readonly payerId: string,
     /**
-     * Unix timestamp (milliseconds) of when the subscription was created.
+     * The Unix timestamp (milliseconds) of when the Subscription was created.
      */
     readonly createdAt: number,
     /**
-     * Unix timestamp (milliseconds) of when the subscription was last updated.
+     * The Unix timestamp (milliseconds) of when the Subscription was last updated.
      */
     readonly updatedAt: number,
     /**
-     * Unix timestamp (milliseconds) of when the subscription became active.
+     * The Unix timestamp (milliseconds) of when the Subscription became active.
      */
     readonly activeAt: number | null,
     /**
-     * Unix timestamp (milliseconds) of when the subscription became past due.
+     * The Unix timestamp (milliseconds) of when the Subscription became past due.
      */
     readonly pastDueAt: number | null,
     /**
-     * Array of subscription items in this subscription.
+     * All of the Subscription Items in this Subscription.
      */
     readonly subscriptionItems: BillingSubscriptionItem[],
     /**
-     * Information about the next scheduled payment.
+     * Information about the next scheduled payment for this Subscription. If present, contains the amount of the next payment and the Unix timestamp (milliseconds) of when the next payment is scheduled.
      */
     readonly nextPayment: { date: number; amount: BillingMoneyAmount } | null,
     /**

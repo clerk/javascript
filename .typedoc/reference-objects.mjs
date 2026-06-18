@@ -68,6 +68,18 @@ export const BACKEND_API_CONFIG = {
     symbol: 'OrganizationAPI',
     declarationHint: 'api/endpoints/OrganizationApi',
   },
+  'backend/billing-api/billing-api.mdx': {
+    symbol: 'BillingAPI',
+    declarationHint: 'api/endpoints/BillingApi',
+  },
+  'backend/allowlist-identifier-api/allowlist-identifier-api.mdx': {
+    symbol: 'AllowlistIdentifierAPI',
+    declarationHint: 'api/endpoints/AllowlistIdentifierApi',
+  },
+  'backend/domain-api/domain-api.mdx': {
+    symbol: 'DomainAPI',
+    declarationHint: 'api/endpoints/DomainApi',
+  },
 };
 
 /** Stable iteration order matches key order in {@link REFERENCE_OBJECT_CONFIG} then {@link BACKEND_API_CONFIG}. */
