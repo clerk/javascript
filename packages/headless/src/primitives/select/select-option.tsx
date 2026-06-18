@@ -24,9 +24,10 @@ export function SelectOption(props: SelectOptionProps) {
   const isActive = activeIndex === index;
 
   useEffect(() => {
-    valueToLabelRef.current.set(value, displayLabel);
+    const map = valueToLabelRef.current;
+    map.set(value, displayLabel);
     return () => {
-      valueToLabelRef.current.delete(value);
+      map.delete(value);
     };
   }, [value, displayLabel, valueToLabelRef]);
 

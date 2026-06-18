@@ -10,9 +10,10 @@ import { CardStateProvider } from '@/ui/elements/contexts';
 // `handleContinue` that calls the create mutation then `useWizard().goNext`.
 // We assert on those nav calls.
 const goNext = vi.fn();
+const goPrev = vi.fn();
 
 vi.mock('../../elements/Wizard', () => ({
-  useWizard: () => ({ current: 'select-provider', goNext }),
+  useWizard: () => ({ current: 'select-provider', goNext, goPrev, isFirstStep: true }),
 }));
 
 const createEnterpriseConnection = vi.fn();
@@ -22,25 +23,16 @@ const createEnterpriseConnection = vi.fn();
 // setProvider. The step uses goNext (not goToStep) after a successful create.
 const contextState = vi.hoisted(() => ({
   provider: undefined as 'saml_okta' | 'saml_custom' | undefined,
-  primaryEmailAddress: { emailAddress: 'test@clerk.com' } as { emailAddress: string } | undefined,
-  isPrimaryEmailVerified: true,
 }));
 
 vi.mock('../../ConfigureSSOContext', () => ({
   useConfigureSSO: () => ({
     enterpriseConnection: undefined,
-    // The step's local `handleContinue` reads the reverification-wrapped create
-    // mutation off the bundled `mutations` object.
-    mutations: {
+    enterpriseConnectionMutations: {
       createConnection: createEnterpriseConnection,
     },
-    primaryEmailAddress: contextState.primaryEmailAddress,
-    // Provider is sourced from the connection entity; the step no longer reads a
-    // context-level setProvider — verify-domain runs first, so the create is
-    // unconditional.
     organizationEnterpriseConnection: {
       provider: contextState.provider,
-      isPrimaryEmailVerified: contextState.isPrimaryEmailVerified,
     },
   }),
 }));
@@ -58,11 +50,10 @@ const renderStep = (
 
 const resetMocks = () => {
   goNext.mockReset();
+  goPrev.mockReset();
   createEnterpriseConnection.mockReset();
   createEnterpriseConnection.mockResolvedValue(undefined);
   contextState.provider = undefined;
-  contextState.primaryEmailAddress = { emailAddress: 'test@clerk.com' };
-  contextState.isPrimaryEmailVerified = true;
 };
 
 describe('SelectProviderStep', () => {
@@ -166,7 +157,7 @@ describe('SelectProviderStep', () => {
       expect(goNext).toHaveBeenCalled();
     });
 
-    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta', contextState.primaryEmailAddress);
+    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta');
     // The create then the goNext are the tail of the call order.
     expect(callOrder.slice(-2)).toEqual(['createEnterpriseConnection', 'goNext']);
   });
@@ -183,7 +174,7 @@ describe('SelectProviderStep', () => {
       expect(goNext).toHaveBeenCalled();
     });
 
-    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_custom', contextState.primaryEmailAddress);
+    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_custom');
   });
 
   it('does not advance when failing to create enterprise connection', async () => {
@@ -201,7 +192,7 @@ describe('SelectProviderStep', () => {
     await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
 
     await waitFor(() => {
-      expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta', contextState.primaryEmailAddress);
+      expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta');
     });
 
     expect(goNext).not.toHaveBeenCalled();
@@ -213,25 +204,5 @@ describe('SelectProviderStep', () => {
     renderStep(wrapper);
 
     expect(screen.getByRole('button', { name: /Previous/i })).toBeDisabled();
-  });
-
-  it('always creates and jumps to configure (verify-domain ran first, so no branch back)', async () => {
-    // Under the new step order the user reaches select-provider only after
-    // verify-domain, so the create is unconditional even if the verified fact is
-    // somehow false — there is no longer a branch back to verify-domain.
-    resetMocks();
-    contextState.isPrimaryEmailVerified = false;
-
-    const { wrapper } = await createFixtures();
-    const { userEvent } = renderStep(wrapper);
-
-    await userEvent.click(screen.getByRole('radio', { name: 'Okta Workforce' }));
-    await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
-
-    await waitFor(() => {
-      expect(goNext).toHaveBeenCalled();
-    });
-
-    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta', contextState.primaryEmailAddress);
   });
 });

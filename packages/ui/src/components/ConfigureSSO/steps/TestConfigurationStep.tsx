@@ -696,7 +696,7 @@ const OpenTestUrlButton = ({ onTestRunCreated }: OpenTestUrlButtonProps): JSX.El
   const card = useCardState();
   const {
     enterpriseConnection,
-    mutations: { createTestRun },
+    enterpriseConnectionMutations: { createTestRun },
   } = useConfigureSSO();
 
   const [isCreatingTestRun, setIsCreatingTestRun] = useState(false);

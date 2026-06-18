@@ -204,28 +204,27 @@ export const taIN: LocalizationResource = {
       },
       warning: 'வழங்குநரைத் தேர்ந்தெடுத்த பிறகு, கட்டமைப்பு முடியும் வரை மீண்டும் மாற்ற முடியாது',
     },
-    verifyEmailDomainStep: {
-      title: 'மின்னஞ்சல் முகவரியை சரிபார்க்கவும்',
-      subtitle: 'நீங்கள் நிறுவன இணைப்பை இயக்க விரும்பும் மின்னஞ்சல் முகவரியை சரிபார்க்கவும்.',
-      addEmailAddress: {
-        formTitle: 'எங்களுக்கு உங்கள் மின்னஞ்சல் தேவை',
-        formSubtitle: 'தொடங்க உங்கள் மின்னஞ்சல் முகவரி தேவைப்படும்',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'மின்னஞ்சல் முகவரி',
+    organizationDomainsStep: {
+      title: 'SSO டொமைன்களைச் சேர்க்கவும்',
+      subtitle: 'உங்கள் நிறுவனம் உள்நுழைய பயன்படுத்தும் டொமைன்களின் உரிமையைச் சேர்த்து சரிபார்க்கவும்.',
+      formFieldLabel__domain: 'டொமைன்கள்',
+      formFieldInputPlaceholder__domain: 'உங்கள் டொமைனை இங்கே தட்டச்சு செய்து, தொடங்க சேர் என்பதைக் கிளிக் செய்யவும்',
+      formButtonPrimary__add: 'சேர்',
+      domainSuggestion: {
+        messageLabel: 'உங்கள் மின்னஞ்சல் {{domain}} ஐப் பயன்படுத்துகிறது. அதைச் சேர்க்க விரும்புகிறீர்களா?',
+        formButtonPrimary__add: '{{domain}} ஐச் சேர்',
       },
-      emailCode: {
-        formTitle: 'உங்கள் மின்னஞ்சல் முகவரியை சரிபார்க்கவும்',
-        formSubtitle: '{{identifier}} க்கு அனுப்பப்பட்ட சரிபார்ப்பு குறியீட்டை உள்ளிடவும்',
-        resendButton: 'குறியீடு கிடைக்கவில்லையா? மீண்டும் அனுப்பு',
-        verified: {
-          title: 'உங்கள் மின்னஞ்சல் கிடைத்தது',
-          subtitle: 'பின்வரும் மின்னஞ்சலுடன் உங்கள் மின்னஞ்சல் முகவரியை சரிபார்த்துள்ளீர்கள்',
-          inputLabel: 'சரிபார்க்கப்பட்ட மின்னஞ்சல் முகவரி',
+      domainCard: {
+        badge__verified: 'சரிபார்க்கப்பட்டது',
+        badge__unverified: 'சரிபார்க்கப்படவில்லை',
+        verifiedAtLabel: "{{ date | shortDate('ta-IN') }} அன்று சரிபார்க்கப்பட்டது",
+        txtRecord: {
+          instructions:
+            'இந்த TXT பதிவை உங்கள் DNS வழங்குநரிடம் சேர்க்கவும். பதிவு செயலில் வந்தவுடன் நாங்கள் தானாகவே சரிபார்ப்போம்.',
+          typeLabel: 'வகை',
+          hostLabel: 'ஹோஸ்ட் / பெயர்',
+          valueLabel: 'மதிப்பு',
         },
-      },
-      domainTaken: {
-        title: 'இந்த டொமைனுக்கு ({{domain}}) ஏற்கனவே SSO இணைப்பு உள்ளது',
-        subtitle: 'ஏற்கனவே உள்ள இணைப்பின் வழியாக அணுகலைப் பெற, பயன்பாட்டின் நிர்வாகியைத் தொடர்பு கொள்ளவும்.',
       },
     },
   },

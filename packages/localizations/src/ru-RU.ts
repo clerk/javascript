@@ -196,28 +196,27 @@ export const ruRU: LocalizationResource = {
       },
       warning: 'После выбора поставщика вы не сможете изменить его до завершения настройки',
     },
-    verifyEmailDomainStep: {
-      title: 'Подтвердить адрес электронной почты',
-      subtitle: 'Подтвердите адрес электронной почты, для которого вы хотите включить корпоративное подключение.',
-      addEmailAddress: {
-        formTitle: 'Нам нужна ваша электронная почта',
-        formSubtitle: 'Чтобы начать, нам потребуется ваш адрес электронной почты',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'Адрес электронной почты',
+    organizationDomainsStep: {
+      title: 'Добавить домены SSO',
+      subtitle: 'Добавьте и подтвердите право собственности на домены, которые ваша организация использует для входа.',
+      formFieldLabel__domain: 'Домены',
+      formFieldInputPlaceholder__domain: 'Введите домен здесь и нажмите «Добавить», чтобы начать',
+      formButtonPrimary__add: 'Добавить',
+      domainSuggestion: {
+        messageLabel: 'Ваша электронная почта использует {{domain}}. Хотите добавить его?',
+        formButtonPrimary__add: 'Добавить {{domain}}',
       },
-      emailCode: {
-        formTitle: 'Подтвердите ваш адрес электронной почты',
-        formSubtitle: 'Введите код подтверждения, отправленный на {{identifier}}',
-        resendButton: 'Не получили код? Отправить повторно',
-        verified: {
-          title: 'Мы получили вашу электронную почту',
-          subtitle: 'Вы подтвердили свой адрес электронной почты с помощью следующего письма',
-          inputLabel: 'Подтверждённый адрес электронной почты',
+      domainCard: {
+        badge__verified: 'Подтверждён',
+        badge__unverified: 'Не подтверждён',
+        verifiedAtLabel: "Подтверждён {{ date | shortDate('ru-RU') }}",
+        txtRecord: {
+          instructions:
+            'Добавьте эту TXT-запись у своего DNS-провайдера. Мы проверим её автоматически, как только запись станет активной.',
+          typeLabel: 'Тип',
+          hostLabel: 'Хост / Имя',
+          valueLabel: 'Значение',
         },
-      },
-      domainTaken: {
-        title: 'Этот домен ({{domain}}) уже имеет SSO-подключение',
-        subtitle: 'Свяжитесь с администратором приложения, чтобы получить доступ через существующее подключение.',
       },
     },
   },

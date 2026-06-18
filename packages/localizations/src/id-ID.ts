@@ -196,28 +196,27 @@ export const idID: LocalizationResource = {
       },
       warning: 'Setelah penyedia dipilih, Anda tidak dapat mengubahnya lagi sampai konfigurasi selesai',
     },
-    verifyEmailDomainStep: {
-      title: 'Verifikasi alamat email',
-      subtitle: 'Verifikasi alamat email yang ingin Anda aktifkan koneksi enterprise-nya.',
-      addEmailAddress: {
-        formTitle: 'Kami membutuhkan email Anda',
-        formSubtitle: 'Untuk memulai, kami membutuhkan alamat email Anda',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'Alamat email',
+    organizationDomainsStep: {
+      title: 'Tambahkan domain SSO',
+      subtitle: 'Tambahkan dan verifikasi kepemilikan domain yang digunakan organisasi Anda untuk masuk.',
+      formFieldLabel__domain: 'Domain',
+      formFieldInputPlaceholder__domain: 'Ketik domain Anda di sini dan klik tambah untuk memulai',
+      formButtonPrimary__add: 'Tambah',
+      domainSuggestion: {
+        messageLabel: 'Email Anda menggunakan {{domain}}. Apakah Anda ingin menambahkannya?',
+        formButtonPrimary__add: 'Tambah {{domain}}',
       },
-      emailCode: {
-        formTitle: 'Verifikasi alamat email Anda',
-        formSubtitle: 'Masukkan kode verifikasi yang dikirim ke {{identifier}}',
-        resendButton: 'Tidak menerima kode? Kirim ulang',
-        verified: {
-          title: 'Kami mendapatkan email Anda',
-          subtitle: 'Anda telah memverifikasi alamat email Anda dengan email berikut',
-          inputLabel: 'Alamat email terverifikasi',
+      domainCard: {
+        badge__verified: 'Terverifikasi',
+        badge__unverified: 'Belum terverifikasi',
+        verifiedAtLabel: "Diverifikasi pada {{ date | shortDate('id-ID') }}",
+        txtRecord: {
+          instructions:
+            'Tambahkan data TXT ini ke penyedia DNS Anda. Kami akan memverifikasi secara otomatis setelah data aktif.',
+          typeLabel: 'Tipe',
+          hostLabel: 'Host / Nama',
+          valueLabel: 'Nilai',
         },
-      },
-      domainTaken: {
-        title: 'Domain ini ({{domain}}) sudah memiliki koneksi SSO',
-        subtitle: 'Hubungi administrator aplikasi untuk mendapatkan akses melalui koneksi yang ada.',
       },
     },
   },

@@ -202,28 +202,27 @@ export const hiIN: LocalizationResource = {
       },
       warning: 'एक बार प्रदाता का चयन करने के बाद आप कॉन्फ़िगरेशन समाप्त होने तक इसे बदल नहीं सकते',
     },
-    verifyEmailDomainStep: {
-      title: 'ईमेल पता सत्यापित करें',
-      subtitle: 'उस ईमेल पते को सत्यापित करें जिस पर आप एंटरप्राइज़ कनेक्शन सक्षम करना चाहते हैं।',
-      addEmailAddress: {
-        formTitle: 'हमें आपके ईमेल की आवश्यकता है',
-        formSubtitle: 'शुरू करने के लिए हमें आपके ईमेल पते की आवश्यकता होगी',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'ईमेल पता',
+    organizationDomainsStep: {
+      title: 'SSO डोमेन जोड़ें',
+      subtitle: 'अपने संगठन द्वारा साइन इन के लिए उपयोग किए जाने वाले डोमेन का स्वामित्व जोड़ें और सत्यापित करें।',
+      formFieldLabel__domain: 'डोमेन',
+      formFieldInputPlaceholder__domain: 'अपना डोमेन यहाँ टाइप करें और शुरू करने के लिए जोड़ें पर क्लिक करें',
+      formButtonPrimary__add: 'जोड़ें',
+      domainSuggestion: {
+        messageLabel: 'आपका ईमेल {{domain}} का उपयोग करता है। क्या आप इसे जोड़ना चाहते हैं?',
+        formButtonPrimary__add: '{{domain}} जोड़ें',
       },
-      emailCode: {
-        formTitle: 'अपना ईमेल पता सत्यापित करें',
-        formSubtitle: '{{identifier}} पर भेजा गया सत्यापन कोड दर्ज करें',
-        resendButton: 'कोड नहीं मिला? पुनः भेजें',
-        verified: {
-          title: 'हमें आपका ईमेल मिल गया',
-          subtitle: 'आपने निम्नलिखित ईमेल के साथ अपना ईमेल पता सत्यापित किया है',
-          inputLabel: 'सत्यापित ईमेल पता',
+      domainCard: {
+        badge__verified: 'सत्यापित',
+        badge__unverified: 'असत्यापित',
+        verifiedAtLabel: "{{ date | shortDate('hi-IN') }} को सत्यापित",
+        txtRecord: {
+          instructions:
+            'इस TXT रिकॉर्ड को अपने DNS प्रदाता में जोड़ें। रिकॉर्ड सक्रिय होते ही हम स्वतः सत्यापित कर देंगे।',
+          typeLabel: 'प्रकार',
+          hostLabel: 'होस्ट / नाम',
+          valueLabel: 'मान',
         },
-      },
-      domainTaken: {
-        title: 'इस डोमेन ({{domain}}) में पहले से ही एक SSO कनेक्शन है',
-        subtitle: 'मौजूदा कनेक्शन के माध्यम से एक्सेस प्राप्त करने के लिए एप्लिकेशन के व्यवस्थापक से संपर्क करें।',
       },
     },
   },

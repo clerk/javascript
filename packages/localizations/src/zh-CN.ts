@@ -196,28 +196,26 @@ export const zhCN: LocalizationResource = {
       },
       warning: '选择提供商后,在配置完成之前无法再次更改',
     },
-    verifyEmailDomainStep: {
-      title: '验证电子邮件地址',
-      subtitle: '验证您想要启用企业连接的电子邮件地址。',
-      addEmailAddress: {
-        formTitle: '我们需要您的电子邮件',
-        formSubtitle: '为了开始，我们需要您的电子邮件地址',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: '电子邮件地址',
+    organizationDomainsStep: {
+      title: '添加 SSO 域名',
+      subtitle: '添加并验证贵组织用于登录的域名的所有权。',
+      formFieldLabel__domain: '域名',
+      formFieldInputPlaceholder__domain: '在此输入您的域名，然后点击添加即可开始',
+      formButtonPrimary__add: '添加',
+      domainSuggestion: {
+        messageLabel: '您的邮箱使用了 {{domain}}。是否要添加它？',
+        formButtonPrimary__add: '添加 {{domain}}',
       },
-      emailCode: {
-        formTitle: '验证您的电子邮件地址',
-        formSubtitle: '输入发送到 {{identifier}} 的验证码',
-        resendButton: '没有收到验证码？重新发送',
-        verified: {
-          title: '我们已收到您的电子邮件',
-          subtitle: '您已使用以下电子邮件验证了您的电子邮件地址',
-          inputLabel: '已验证的电子邮件地址',
+      domainCard: {
+        badge__verified: '已验证',
+        badge__unverified: '未验证',
+        verifiedAtLabel: "验证于 {{ date | shortDate('zh-CN') }}",
+        txtRecord: {
+          instructions: '将此 TXT 记录添加到您的 DNS 提供商。记录生效后，我们将自动进行验证。',
+          typeLabel: '类型',
+          hostLabel: '主机 / 名称',
+          valueLabel: '值',
         },
-      },
-      domainTaken: {
-        title: '此域名 ({{domain}}) 已存在 SSO 连接',
-        subtitle: '请联系应用程序管理员，通过现有连接获取访问权限。',
       },
     },
   },

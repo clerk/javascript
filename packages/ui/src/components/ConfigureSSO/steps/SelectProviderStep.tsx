@@ -24,13 +24,7 @@ import { Step } from '../elements/Step';
 import { useWizard } from '../elements/Wizard';
 import type { ProviderType } from '../types';
 
-/**
- * Provider icons whose SVGs are monochromatic and should flip with the
- * theme. Mirrors the SUPPORTS_MASK_IMAGE list in `common/ProviderIcon.tsx`
- * — keep in sync if either grows.
- */
 const MONOCHROMATIC_PROVIDER_ICONS: ReadonlySet<string> = new Set(['okta']);
-
 const PROVIDER_GROUPS: ReadonlyArray<{
   id: 'saml';
   label: LocalizationKey;
@@ -62,43 +56,28 @@ const PROVIDER_GROUPS: ReadonlyArray<{
 
 export const SelectProviderStep = (): JSX.Element => {
   const {
-    primaryEmailAddress,
     organizationEnterpriseConnection: c,
-    mutations: { createConnection },
+    enterpriseConnectionMutations: { createConnection },
   } = useConfigureSSO();
-  const { goNext } = useWizard();
+  const { goNext, goPrev, isFirstStep } = useWizard();
 
-  // Re-hydrate from context so users returning from another step don't have to
-  // re-click their provider.
   const [selected, setSelected] = React.useState<ProviderType | null>(c.provider ?? null);
   const card = useCardState();
 
-  // Step-LOCAL submit state for the Continue button. `goNext` now DEFERS the
-  // advance until the next step's guard catches up to the just-resolved create
-  // (the wizard machine resolves it on the next render), so the shared card
-  // loading would otherwise leak into the next step as an idle flash. Keeping
-  // the loading local — and NOT resetting it on success — holds the button in
-  // its loading state straight through the transition; the deferred advance
-  // unmounts this step, which ends the loading visually with no idle frame.
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const handleSelect = (next: ProviderType) => {
     setSelected(next);
   };
 
-  // On a fresh start the create is unconditional, then `goNext` lands `configure`
-  // because the resolved create flips `hasConnection`, satisfying its guard. On
-  // revisit a connection already exists, so we never re-create — `goNext` alone.
   const handleContinue = async (): Promise<void> => {
     if (!selected) {
       return;
     }
 
-    // Connection already created on a prior visit: don't re-create, just
-    // advance — `configure`'s guard already holds, so this advances immediately
-    // (no submit, no loading).
     if (c.hasConnection) {
-      goNext();
+      // TODO ORGS-1607 - Support changing the provider
+      void goNext();
       return;
     }
 
@@ -106,13 +85,10 @@ export const SelectProviderStep = (): JSX.Element => {
     setIsSubmitting(true);
 
     try {
-      await createConnection(selected, primaryEmailAddress);
-      // `goNext` defers; the button STAYS loading and this step unmounts when
-      // the deferred advance lands. Do NOT reset `isSubmitting` on success.
-      goNext();
+      await createConnection(selected);
+      void goNext();
     } catch (err) {
       handleError(err as Error, [], card.setError);
-      // Re-enable the button ONLY on error — there is no advance to unmount it.
       setIsSubmitting(false);
     }
   };
@@ -186,7 +162,10 @@ export const SelectProviderStep = (): JSX.Element => {
         </Step.Body>
 
         <Step.Footer>
-          <Step.Footer.Previous isDisabled />
+          <Step.Footer.Previous
+            onClick={() => goPrev()}
+            isDisabled={isFirstStep}
+          />
 
           <Step.Footer.Continue
             onClick={handleContinue}

@@ -224,28 +224,27 @@ export const isIS: LocalizationResource = {
       },
       warning: 'Þegar þjónustuaðili hefur verið valinn er ekki hægt að breyta aftur fyrr en stillingu er lokið',
     },
-    verifyEmailDomainStep: {
-      title: 'Staðfesta tölvupóstfang',
-      subtitle: 'Staðfestu tölvupóstfangið sem þú vilt virkja fyrirtækjatenginguna á.',
-      addEmailAddress: {
-        formTitle: 'Við þurfum tölvupóstinn þinn',
-        formSubtitle: 'Til að byrja þurfum við tölvupóstfangið þitt',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'Tölvupóstfang',
+    organizationDomainsStep: {
+      title: 'Bæta við SSO-lénum',
+      subtitle: 'Bættu við og staðfestu eignarhald á lénunum sem fyrirtækið þitt notar til að skrá sig inn.',
+      formFieldLabel__domain: 'Lén',
+      formFieldInputPlaceholder__domain: 'Skrifaðu lénið þitt hér og smelltu á bæta við til að byrja',
+      formButtonPrimary__add: 'Bæta við',
+      domainSuggestion: {
+        messageLabel: 'Tölvupósturinn þinn notar {{domain}}. Viltu bæta því við?',
+        formButtonPrimary__add: 'Bæta við {{domain}}',
       },
-      emailCode: {
-        formTitle: 'Staðfestu tölvupóstfangið þitt',
-        formSubtitle: 'Sláðu inn staðfestingarkóðann sem var sendur á {{identifier}}',
-        resendButton: 'Fékkstu engan kóða? Senda aftur',
-        verified: {
-          title: 'Við fengum tölvupóstinn þinn',
-          subtitle: 'Þú hefur staðfest tölvupóstfangið þitt með eftirfarandi tölvupósti',
-          inputLabel: 'Staðfest tölvupóstfang',
+      domainCard: {
+        badge__verified: 'Staðfest',
+        badge__unverified: 'Óstaðfest',
+        verifiedAtLabel: "Staðfest {{ date | shortDate('is-IS') }}",
+        txtRecord: {
+          instructions:
+            'Bættu þessari TXT-færslu við DNS-þjónustuna þína. Við staðfestum sjálfkrafa um leið og færslan verður virk.',
+          typeLabel: 'Tegund',
+          hostLabel: 'Hýsill / Nafn',
+          valueLabel: 'Gildi',
         },
-      },
-      domainTaken: {
-        title: 'Þetta lén ({{domain}}) er þegar með SSO-tengingu',
-        subtitle: 'Hafðu samband við stjórnanda forritsins til að fá aðgang í gegnum núverandi tengingu.',
       },
     },
   },

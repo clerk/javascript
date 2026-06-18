@@ -197,28 +197,27 @@ export const bgBG: LocalizationResource = {
       },
       warning: 'След като изберете доставчик, не можете да го промените, докато конфигурацията не приключи',
     },
-    verifyEmailDomainStep: {
-      title: 'Потвърди имейл адреса',
-      subtitle: 'Потвърдете имейл адреса, на който искате да активирате корпоративната връзка.',
-      addEmailAddress: {
-        formTitle: 'Нуждаем се от вашия имейл',
-        formSubtitle: 'За да започнем, ще ни е необходим вашият имейл адрес',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'Имейл адрес',
+    organizationDomainsStep: {
+      title: 'Добавяне на SSO домейни',
+      subtitle: 'Добавете и потвърдете собствеността върху домейните, които вашата организация използва за вход.',
+      formFieldLabel__domain: 'Домейни',
+      formFieldInputPlaceholder__domain: 'Въведете домейна си тук и щракнете върху добавяне, за да започнете',
+      formButtonPrimary__add: 'Добави',
+      domainSuggestion: {
+        messageLabel: 'Вашият имейл използва {{domain}}. Искате ли да го добавите?',
+        formButtonPrimary__add: 'Добавяне на {{domain}}',
       },
-      emailCode: {
-        formTitle: 'Потвърдете имейл адреса си',
-        formSubtitle: 'Въведете кода за потвърждение, изпратен на {{identifier}}',
-        resendButton: 'Не получихте код? Изпрати отново',
-        verified: {
-          title: 'Получихме имейла ви',
-          subtitle: 'Потвърдихте имейл адреса си със следния имейл',
-          inputLabel: 'Потвърден имейл адрес',
+      domainCard: {
+        badge__verified: 'Потвърден',
+        badge__unverified: 'Непотвърден',
+        verifiedAtLabel: "Потвърден на {{ date | shortDate('bg-BG') }}",
+        txtRecord: {
+          instructions:
+            'Добавете този TXT запис към вашия DNS доставчик. Ще потвърдим автоматично, след като записът стане активен.',
+          typeLabel: 'Тип',
+          hostLabel: 'Хост / Име',
+          valueLabel: 'Стойност',
         },
-      },
-      domainTaken: {
-        title: 'Този домейн ({{domain}}) вече има SSO връзка',
-        subtitle: 'Свържете се с администратора на приложението, за да получите достъп чрез съществуващата връзка.',
       },
     },
   },
@@ -502,7 +501,7 @@ export const bgBG: LocalizationResource = {
       headerTitle__members: 'Членове',
       profileSection: {
         primaryButton: undefined,
-        title: 'Organization Profile',
+        title: 'Profile',
         uploadAction__title: 'Logo',
       },
     },
