@@ -7,7 +7,7 @@ import SwiftUI
 import Observation
 @_spi(FrameworkIntegration) import ClerkKit
 import ClerkKitUI
-import ClerkExpo  // Import the pod to access ClerkNativeBridgeProtocol
+internal import ClerkExpo  // Import the pod to access ClerkNativeBridgeProtocol
 
 private struct ClerkExpoHeaderMiddleware: ClerkRequestMiddleware {
   // Replaced by the config plugin when this bridge is copied into the app target.
