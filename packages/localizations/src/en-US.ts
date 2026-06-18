@@ -228,6 +228,10 @@ export const enUS: LocalizationResource = {
       title: 'Change provider to {{provider}}',
     },
     configureStep: {
+      activeConnectionWarning: {
+        title:
+          'This connection is active. Saving changes applies immediately and may disrupt sign-in for current members.',
+      },
       attributeMappingTable: {
         badges: {
           optional: 'Optional',
@@ -354,7 +358,7 @@ export const enUS: LocalizationResource = {
         createAppStep: {
           createAppInstructions: {
             step1: 'In the side navigation, under <bold>Apps</bold>, select <bold>Web and mobile apps.</bold>',
-            step2: 'In Select <bold>Add app</bold>, then <bold>Add custom SAML app.</bold>',
+            step2: 'Select <bold>Add app</bold>, then <bold>Add custom SAML app.</bold>',
             step3: 'Enter an <bold>App name.</bold>',
             step4: 'Select <bold>Continue</bold>.',
             title: 'In Google Workspace, create a new SAML application:',

@@ -1478,6 +1478,9 @@ export type __internal_LocalizationResource = {
           optional: LocalizationValue;
         };
       };
+      activeConnectionWarning: {
+        title: LocalizationValue;
+      };
       samlOkta: {
         mainHeaderTitle: LocalizationValue;
         createAppStep: {
