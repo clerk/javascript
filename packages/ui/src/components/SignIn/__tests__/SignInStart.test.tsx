@@ -575,6 +575,52 @@ describe('SignInStart', () => {
     });
   });
 
+  describe('Instant password field a11y', () => {
+    it('hides the empty instant password field from the a11y tree via aria-hidden', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword({ required: true });
+      });
+      const { container } = render(<SignInStart />, { wrapper });
+
+      const passwordField = container.querySelector('#password-field') as HTMLElement;
+      expect(passwordField).not.toBeNull();
+
+      const row = passwordField.closest('[class*="formFieldRow"]') as HTMLElement;
+      expect(row).toHaveAttribute('aria-hidden', 'true');
+    });
+
+    it('reveals the instant password field when the browser autofills it', async () => {
+      // Simulate the browser's :autofill animation that the component polls for
+      mockGetComputedStyle.mockReturnValue({
+        animationName: 'onAutoFillStart',
+        pointerEvents: 'auto',
+        getPropertyValue: vi.fn().mockReturnValue(''),
+      });
+
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword({ required: true });
+      });
+      const { container } = render(<SignInStart />, { wrapper });
+
+      const passwordField = container.querySelector('#password-field') as HTMLElement;
+      const row = passwordField.closest('[class*="formFieldRow"]') as HTMLElement;
+
+      // initially hidden from a11y tree until the autofill poll fires
+      expect(row).toHaveAttribute('aria-hidden', 'true');
+
+      await waitFor(
+        () => {
+          expect(row).not.toHaveAttribute('aria-hidden');
+        },
+        { timeout: 2000 },
+      );
+      // Forgot password action only renders once the field is shown
+      screen.getByText(/Forgot password/i);
+    });
+  });
+
   describe('Session already exists error handling', () => {
     it('redirects user when session_exists error is returned during sign-in', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {

@@ -105,6 +105,7 @@ export const SignInFactorOneAlternativeChannelCodeForm = (props: SignInFactorOne
       onResendCodeClicked={prepare}
       safeIdentifier={props.factor.safeIdentifier}
       profileImageUrl={signIn.userData.imageUrl}
+      identityPreviewEditButtonAriaLabel={localizationKeys('identityPreviewEditButton__phoneNumber')}
       alternativeMethodsLabel={localizationKeys('footerActionLink__alternativePhoneCodeProvider')}
       onShowAlternativeMethodsClicked={prepareWithSMS}
       showAlternativeMethods

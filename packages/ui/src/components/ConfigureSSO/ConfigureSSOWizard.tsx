@@ -7,8 +7,8 @@ import { ConfigureSSOHeader } from './ConfigureSSOHeader';
 import { areAllOrganizationDomainsVerified } from './domain/organizationEnterpriseConnection';
 import { Wizard, type WizardStepConfig } from './elements/Wizard';
 import {
+  ActivateStep,
   ConfigureStep,
-  ConfirmationStep,
   OrganizationDomainsStep,
   SelectProviderStep,
   TestConfigurationStep,
@@ -26,11 +26,11 @@ export const ConfigureSSOWizard = ({ title, forceInitialStep, ...props }: Config
 
   const steps = React.useMemo<WizardStepConfig[]>(
     () => [
-      { id: 'verify-domain', label: 'Verify domain' },
+      { id: 'verify-domain', label: 'Domains' },
       { id: 'select-provider', guard: () => allDomainsVerified },
-      { id: 'configure', label: 'Configure', guard: () => c.hasConnection },
+      { id: 'configure', label: 'Connection', guard: () => c.hasConnection },
       { id: 'test', label: 'Test', guard: () => c.hasMinimumConfiguration || c.isActive },
-      { id: 'confirmation', label: 'Confirmation', guard: () => c.hasSuccessfulTestRun || c.isActive },
+      { id: 'activate', label: 'Activate', guard: () => c.hasSuccessfulTestRun || c.isActive },
     ],
     [c, allDomainsVerified],
   );
@@ -69,9 +69,9 @@ export const ConfigureSSOWizard = ({ title, forceInitialStep, ...props }: Config
           </CardStateProvider>
         </Wizard.Match>
 
-        <Wizard.Match id='confirmation'>
+        <Wizard.Match id='activate'>
           <CardStateProvider>
-            <ConfirmationStep />
+            <ActivateStep />
           </CardStateProvider>
         </Wizard.Match>
       </Wizard>

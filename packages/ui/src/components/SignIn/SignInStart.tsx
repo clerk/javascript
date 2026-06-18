@@ -747,14 +747,26 @@ const InstantPasswordRow = ({
   return (
     <Form.ControlRow
       elementId={field.id}
-      sx={show ? undefined : { position: 'absolute', opacity: 0, height: 0, pointerEvents: 'none', marginTop: '-1rem' }}
+      aria-hidden={show ? undefined : true}
+      sx={
+        show
+          ? undefined
+          : {
+              position: 'absolute',
+              opacity: 0,
+              height: 0,
+              overflow: 'hidden',
+              pointerEvents: 'none',
+              marginTop: '-1rem',
+            }
+      }
     >
       <Form.PasswordInput
         {...field.props}
         actionLabel={show ? localizationKeys('formFieldAction__forgotPassword') : undefined}
         onActionClicked={show ? onForgotPasswordClick : undefined}
-        ref={ref}
         tabIndex={show ? undefined : -1}
+        ref={ref}
       />
     </Form.ControlRow>
   );

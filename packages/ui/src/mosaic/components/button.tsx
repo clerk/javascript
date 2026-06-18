@@ -53,6 +53,12 @@ export const buttonRecipe = defineSlotRecipe(theme => ({
         borderRadius: theme.rounded.full,
       },
     },
+    fullWidth: {
+      true: {
+        width: '100%',
+      },
+      false: {},
+    },
   },
   compoundVariants: [
     {
@@ -126,7 +132,7 @@ export const buttonRecipe = defineSlotRecipe(theme => ({
     { shape: 'circle', size: 'sm', css: { width: theme.spacing(6), height: theme.spacing(6) } },
     { shape: 'circle', size: 'md', css: { width: theme.spacing(9), height: theme.spacing(9) } },
   ],
-  defaultVariants: { intent: 'primary', size: 'md', variant: 'filled', shape: 'default' },
+  defaultVariants: { intent: 'primary', size: 'md', variant: 'filled', shape: 'default', fullWidth: false },
 }));
 
 declare module '../registry' {
@@ -138,9 +144,9 @@ declare module '../registry' {
 export type ButtonProps = React.ComponentPropsWithRef<'button'> & RecipeVariantProps<typeof buttonRecipe>;
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function MosaicButton(props, ref) {
-  const { intent, variant, size, shape, disabled, sx, children, ...rest } = props;
+  const { intent, variant, size, shape, fullWidth, disabled, sx, children, ...rest } = props;
   const { root } = useRecipe(buttonRecipe, {
-    variants: { intent, variant, size, shape },
+    variants: { intent, variant, size, shape, fullWidth },
     state: { disabled: !!disabled },
     sx,
   });

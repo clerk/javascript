@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 
 import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
 import { useTabsContext } from './tabs-context';
@@ -10,7 +10,7 @@ export type TabsIndicatorProps = ComponentProps<'span'>;
 
 export function TabsIndicator(props: TabsIndicatorProps) {
   const { render, ...otherProps } = props;
-  const { value, getTabElement, orientation, listRef } = useTabsContext();
+  const { value, getTabElement, orientation, listElement } = useTabsContext();
 
   const [style, setStyle] = useState<React.CSSProperties>({});
   const previousRectRef = useRef<{
@@ -20,9 +20,11 @@ export function TabsIndicator(props: TabsIndicatorProps) {
     height: number;
   } | null>(null);
 
-  useEffect(() => {
+  // Measure synchronously before paint so the indicator never commits a frame
+  // at a stale position when the active tab changes.
+  useLayoutEffect(() => {
     const el = getTabElement(value);
-    const list = listRef.current;
+    const list = listElement;
     if (!el || !list) {
       return;
     }
@@ -64,7 +66,7 @@ export function TabsIndicator(props: TabsIndicatorProps) {
     ro.observe(el);
     ro.observe(list);
     return () => ro.disconnect();
-  }, [value, getTabElement, orientation, listRef]);
+  }, [value, getTabElement, orientation, listElement]);
 
   const defaultProps = {
     'data-cl-slot': 'tabs-indicator',
