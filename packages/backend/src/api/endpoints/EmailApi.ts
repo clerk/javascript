@@ -3,23 +3,55 @@ import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/email';
 
+/**
+ * A subset of mailbox object as specified in RFC 5322 §3.4. Specifically, a
+ * `name-addr` with an optional `display-name` and a required `addr-spec`.
+ *
+ * @see {@link https://datatracker.ietf.org/doc/html/rfc5322#section-3.4}
+ */
 type Mailbox = {
   /**
-   * Display name for the mailbox. Currently accepted by the API but not yet
-   * rendered server-side, so it has no effect on the delivered email for now.
+   * (Optional) Display name for the mailbox. Currently accepted by the API but
+   * not yet rendered server-side, so it has no effect on the delivered email
+   * for now.
    */
   name?: string;
+
+  /**
+   * The `addr-spec` of the mailbox, i.e. the email address itself.
+   */
   address: string;
 };
 
 export type CreateEmailParams = {
+  /**
+   * The recipient of the email. Currently only a single recipient is supported.
+   */
   to: Mailbox;
+
+  /**
+   * The sender of the email. See {@link Mailbox} for the accepted format. Note
+   * that the API does not yet render the `name` field of the `from` mailbox.
+   */
   from: Mailbox;
-  // Top-level camelCase keys are snake_cased automatically, so `replyTo` is
-  // sent as `reply_to`.
+
+  /**
+   * (Optional) The mailbox to include in the `reply-to` header of the email.
+   */
   replyTo?: Mailbox;
+
   subject: string;
+
+  /**
+   * The HTML body of the email. At least one of `html` and `text` must be
+   * provided. If both are provided, the `html` version will take precedence.
+   */
   html?: string;
+
+  /**
+   * The plain text body of the email. At least one of `html` and `text` must be
+   * provided. If both are provided, the `html` version will take precedence.
+   */
   text?: string;
 };
 
