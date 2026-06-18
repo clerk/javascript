@@ -573,8 +573,8 @@ describe('SignInStart', () => {
     });
   });
 
-  describe('Instant password field visibility', () => {
-    it('hides the empty instant password field from the a11y tree via inert', async () => {
+  describe('Instant password field a11y', () => {
+    it('hides the empty instant password field from the a11y tree via display:none', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withEmailAddress();
         f.withPassword({ required: true });
@@ -585,12 +585,10 @@ describe('SignInStart', () => {
       expect(passwordField).not.toBeNull();
 
       const row = passwordField.closest('[class*="formFieldRow"]') as HTMLElement;
-      expect(row).toHaveAttribute('inert');
-      // toggle button + input are removed from tab order / a11y tree while hidden
-      expect(passwordField).toHaveAttribute('tabindex', '-1');
+      expect(row).not.toBeVisible();
     });
 
-    it('reveals the instant password field (clears inert) when the browser autofills it', async () => {
+    it('reveals the instant password field when the browser autofills it', async () => {
       // Simulate the browser's :autofill animation that the component polls for
       mockGetComputedStyle.mockReturnValue({
         animationName: 'onAutoFillStart',
@@ -608,11 +606,11 @@ describe('SignInStart', () => {
       const row = passwordField.closest('[class*="formFieldRow"]') as HTMLElement;
 
       // initially hidden until the autofill poll fires
-      expect(row).toHaveAttribute('inert');
+      expect(row).not.toBeVisible();
 
       await waitFor(
         () => {
-          expect(row).not.toHaveAttribute('inert');
+          expect(row).toBeVisible();
         },
         { timeout: 2000 },
       );
