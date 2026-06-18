@@ -196,3 +196,42 @@ describe('subscription cleanup', () => {
     expect(live).toBe(0);
   });
 });
+
+describe('useMachine — stale prop closure', () => {
+  it('always invokes the latest destroy fn even when the prop changes between renders', async () => {
+    const gate = deferred<void>();
+    const staleDestroy = vi.fn(() => gate.promise);
+    const freshDestroy = vi.fn(() => gate.promise);
+
+    function DeleteOrg({ destroy }: { destroy: () => Promise<void> }) {
+      // The ref is stable across renders; the wrapper reads from it at call time,
+      // so the actor always invokes the latest prop even though it was created once.
+      const destroyRef = React.useRef(destroy);
+      destroyRef.current = destroy;
+      const [snapshot, send] = useMachine(createDeleteOrgMachine(() => destroyRef.current()));
+      return (
+        <div>
+          <output data-testid='state'>{snapshot.value}</output>
+          <button onClick={() => send({ type: 'OPEN' })}>Open</button>
+          <button onClick={() => send({ type: 'TYPE', value: 'Acme Inc' })}>Type</button>
+          <button onClick={() => send({ type: 'CONFIRM' })}>Confirm</button>
+        </div>
+      );
+    }
+
+    const { rerender } = render(<DeleteOrg destroy={staleDestroy} />);
+    rerender(<DeleteOrg destroy={freshDestroy} />);
+
+    fireEvent.click(screen.getByText('Open'));
+    fireEvent.click(screen.getByText('Type'));
+    fireEvent.click(screen.getByText('Confirm'));
+    expect(screen.getByTestId('state')).toHaveTextContent('deleting');
+
+    await act(async () => gate.resolve());
+    expect(screen.getByTestId('state')).toHaveTextContent('deleted');
+
+    // freshDestroy should have been called — not the stale one from the first render.
+    expect(freshDestroy).toHaveBeenCalledTimes(1);
+    expect(staleDestroy).not.toHaveBeenCalled();
+  });
+});

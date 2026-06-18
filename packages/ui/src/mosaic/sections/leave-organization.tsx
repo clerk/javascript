@@ -1,3 +1,5 @@
+import { useRef } from 'react';
+
 import { Box } from '../components/box';
 import { Button } from '../components/button';
 import { SectionSkeleton } from '../components/section-skeleton';
@@ -25,7 +27,9 @@ function LeaveOrganizationReady({
   organization: MockOrganization;
   membership: MockMembership;
 }) {
-  const [snapshot, send] = useMachine(createLeaveOrgMachine(async () => membership.destroy()));
+  const membershipRef = useRef(membership);
+  membershipRef.current = membership;
+  const [snapshot, send] = useMachine(createLeaveOrgMachine(async () => membershipRef.current.destroy()));
 
   return (
     <Box
