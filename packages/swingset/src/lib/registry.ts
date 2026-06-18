@@ -2,6 +2,11 @@
 import { meta as accordionMeta } from '../stories/accordion.stories';
 import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
 import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
+import {
+  Centered as CardCentered,
+  Default as CardDefault,
+  meta as cardComponentMeta,
+} from '../stories/card.component.stories';
 import { meta as collapsibleMeta } from '../stories/collapsible.stories';
 import {
   Default as DeleteOrganizationDefault,
@@ -67,6 +72,8 @@ const organizationProfileGeneralModule: StoryModule = {
   Default: OrganizationProfileGeneralDefault,
 };
 
+const cardComponentModule: StoryModule = { meta: cardComponentMeta, Default: CardDefault, Centered: CardCentered };
+
 const buttonModule: StoryModule = { meta: buttonMeta, Primary, Sizes, Disabled };
 
 const inputModule: StoryModule = { meta: inputMeta, Default, Sizes: InputSizes, Disabled: InputDisabled, Invalid };
@@ -119,6 +126,7 @@ export const registry: StoryModule[] = [
   destructiveModule,
   // Components
   buttonModule,
+  cardComponentModule,
   inputModule,
   dialogComponentModule,
   headingModule,
