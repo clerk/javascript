@@ -185,7 +185,7 @@ describe('useOrganizationEnterpriseConnection — test-runs gating', () => {
 });
 
 describe('useOrganizationEnterpriseConnection — mutations', () => {
-  it('createConnection forwards the provider, the email-derived name, and the organization domain names (no organizationId in body)', async () => {
+  it('createConnection forwards the provider and the organization domains', async () => {
     domainsState.data = [{ name: 'acme.com' }, { name: 'example.com' }];
 
     const { result } = renderHook(() => useOrganizationEnterpriseConnection());
@@ -193,12 +193,11 @@ describe('useOrganizationEnterpriseConnection — mutations', () => {
     await result.current.enterpriseConnectionMutations.createConnection('saml_okta');
 
     expect(mutationSpies.create).toHaveBeenCalledTimes(1);
-    // `name` is derived from the active user's primary email domain
-    // (admin@clerk.com → clerk.com); `domains` are the verified organization
-    // domains passed straight through by the caller.
+    // `name` is derived by FAPI, so it is not sent from the client; `domains`
+    // are the verified organization domains passed straight through by the
+    // caller.
     expect(mutationSpies.create).toHaveBeenCalledWith({
       provider: 'saml_okta',
-      name: 'clerk.com',
       domains: ['acme.com', 'example.com'],
     });
   });
@@ -213,7 +212,6 @@ describe('useOrganizationEnterpriseConnection — mutations', () => {
     expect(mutationSpies.create).toHaveBeenCalledTimes(1);
     expect(mutationSpies.create).toHaveBeenCalledWith({
       provider: 'saml_okta',
-      name: 'clerk.com',
       domains: undefined,
     });
   });

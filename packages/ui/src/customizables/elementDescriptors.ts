@@ -631,6 +631,10 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'configureSSOResetConnectionDialogConfirmationInput',
   'configureSSOResetConnectionDialogSubmitButton',
 
+  'configureSSORemoveDomainDialog',
+  'configureSSORemoveDomainDialogCancelButton',
+  'configureSSORemoveDomainDialogSubmitButton',
+
   'web3SolanaWalletButtonsRoot',
   'web3SolanaWalletButtons',
   'web3SolanaWalletButtonsIconButton',

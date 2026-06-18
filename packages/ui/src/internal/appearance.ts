@@ -767,6 +767,10 @@ export type ElementsConfig = {
   configureSSOResetConnectionDialogConfirmationInput: WithOptions;
   configureSSOResetConnectionDialogSubmitButton: WithOptions;
 
+  configureSSORemoveDomainDialog: WithOptions;
+  configureSSORemoveDomainDialogCancelButton: WithOptions;
+  configureSSORemoveDomainDialogSubmitButton: WithOptions;
+
   web3SolanaWalletButtonsRoot: WithOptions;
   web3SolanaWalletButtons: WithOptions;
   web3SolanaWalletButtonsIconButton: WithOptions<string, LoadingState>;

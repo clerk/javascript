@@ -1,5 +1,16 @@
 # Change Log
 
+## 3.8.0
+
+### Minor Changes
+
+- Add support for the `preferredSignInStrategyWhenPasswordRequired` parameter to `clerkClient.instance.update()`. Accepts `'password'` or `'otp'` to override the preferred sign-in strategy when a password is required, or an empty string to clear the override. ([#8878](https://github.com/clerk/javascript/pull/8878)) by [@dmoerner](https://github.com/dmoerner)
+
+### Patch Changes
+
+- Updated dependencies [[`d5968d0`](https://github.com/clerk/javascript/commit/d5968d026d6b2a1b399b6967fd8727613a5bc3cd), [`ffbc650`](https://github.com/clerk/javascript/commit/ffbc650ebbcee48171c95aa5d2b497273b0276b0)]:
+  - @clerk/shared@4.19.0
+
 ## 3.7.1
 
 ### Patch Changes
