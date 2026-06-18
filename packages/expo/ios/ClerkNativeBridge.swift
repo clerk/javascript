@@ -7,7 +7,7 @@ import SwiftUI
 import Observation
 @_spi(FrameworkIntegration) import ClerkKit
 import ClerkKitUI
-import ClerkExpo  // Import the pod to access ClerkNativeBridgeProtocol
+internal import ClerkExpo  // Import the pod to access ClerkNativeBridgeProtocol
 
 private struct ClerkExpoHeaderMiddleware: ClerkRequestMiddleware {
   // Replaced by the config plugin when this bridge is copied into the app target.
@@ -21,7 +21,7 @@ private struct ClerkExpoHeaderMiddleware: ClerkRequestMiddleware {
 
 // MARK: - Native Bridge Implementation
 
-public final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
+final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
   public static let shared = ClerkNativeBridge()
 
   private static let clerkLoadMaxAttempts = 30

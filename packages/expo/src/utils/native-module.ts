@@ -5,10 +5,10 @@ import NativeClerkModule from '../specs/NativeClerkModule';
 export const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
 
 type ClerkExpoNativeModule = {
-  addListener(eventName: string, listener?: (...args: unknown[]) => void): { remove: () => void };
+  addListener?(eventName: string, listener?: (...args: unknown[]) => void): { remove: () => void };
   configure(publishableKey: string, bearerToken: string | null): Promise<void>;
   getClientToken(): Promise<string | null>;
-  removeListeners(count: number): void;
+  removeListeners?(count: number): void;
   syncFromJsClientToken(clientToken: string | null, sourceId: string | null): Promise<void>;
 };
 
@@ -19,10 +19,8 @@ function isClerkExpoModule(module: unknown): module is ClerkExpoNativeModule {
   const maybeModule = module as Record<string, unknown>;
 
   return (
-    typeof maybeModule.addListener === 'function' &&
     typeof maybeModule.configure === 'function' &&
     typeof maybeModule.getClientToken === 'function' &&
-    typeof maybeModule.removeListeners === 'function' &&
     typeof maybeModule.syncFromJsClientToken === 'function'
   );
 }
