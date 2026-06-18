@@ -410,12 +410,10 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
                 ? localizationKeys('billing.switchToAnnualWithAnnualPrice', {
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                     price: $(subscription.plan.annualFee!, { style: 'short' }),
-                    currency: '',
                   })
                 : localizationKeys('billing.switchToMonthlyWithPrice', {
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                     price: $(subscription.plan.fee!, { style: 'short' }),
-                    currency: '',
                   }),
             onClick: () => {
               openCheckout({
