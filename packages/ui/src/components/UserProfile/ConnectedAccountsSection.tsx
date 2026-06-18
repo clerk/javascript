@@ -158,7 +158,10 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
   return (
     <Fragment key={account.id}>
       <ProfileSection.Item id='connectedAccounts'>
-        <Flex sx={t => ({ overflow: 'hidden', gap: t.space.$2 })}>
+        <Flex
+          align='center'
+          sx={t => ({ overflow: 'hidden', gap: t.space.$2 })}
+        >
           <ProviderIcon
             id={account.provider}
             iconUrl={providerData?.iconUrl}

@@ -216,26 +216,6 @@ const ConfigurationDetailsSection = (): JSX.Element => {
               {samlConnection?.idpEntityId}
             </Text>
           </ProfileSection.Item>
-
-          <ProfileSection.Item
-            id='ssoConfiguration'
-            sx={t => ({ gap: t.space.$3, paddingInlineStart: 0 })}
-          >
-            <Text
-              elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsLabel}
-              colorScheme='secondary'
-              localizationKey={localizationKeys('configureSSO.confirmation.configurationSection.certificateLabel')}
-              sx={t => ({ width: t.space.$36, flexShrink: 0, whiteSpace: 'nowrap' })}
-            />
-            <Text
-              elementDescriptor={descriptors.configureSSOConfirmationConfigDetailsValue}
-              truncate
-              title={samlConnection?.idpCertificate}
-              sx={{ minWidth: 0 }}
-            >
-              {samlConnection?.idpCertificate}
-            </Text>
-          </ProfileSection.Item>
         </ProfileSection.ItemList>
 
         <Flex justify='start'>

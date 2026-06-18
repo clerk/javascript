@@ -213,7 +213,6 @@ export const enUS: LocalizationResource = {
   configureSSO: {
     confirmation: {
       configurationSection: {
-        certificateLabel: 'Certificate',
         configureAgainLink: 'Configure again',
         issuerLabel: 'Issuer',
         ssoUrlLabel: 'Sign on URL',
@@ -283,12 +282,22 @@ export const enUS: LocalizationResource = {
         badge__verified: 'Verified',
         badge__unverified: 'Unverified',
         verifiedAtLabel: "Verified on {{ date | shortDate('en-US') }}",
+        removeButtonTooltip__lastVerifiedDomain: 'At least one verified domain is required to set up SSO.',
+        removeButtonTooltip__lastVerifiedDomainActive: 'At least one verified domain is required to keep SSO enabled.',
         txtRecord: {
           instructions: "Add this TXT record to your DNS provider. We'll verify automatically once the record is live.",
           typeLabel: 'Type',
           hostLabel: 'Host / Name',
           valueLabel: 'Value',
         },
+      },
+      removeDomainDialog: {
+        title: 'Removing domain',
+        subtitle__active:
+          "You're about to remove {{domain}} from this enterprise connection. Users won't be able to sign-in with {{domain}} anymore.",
+        subtitle__inactive: "You're about to remove {{domain}} from this enterprise connection.",
+        cancelButton: 'Cancel',
+        removeButton: 'Remove domain',
       },
     },
     testConfigurationStep: {
@@ -1077,7 +1086,6 @@ export const enUS: LocalizationResource = {
         badge__inactive: 'Inactive',
         badge__inProgress: 'In Progress',
         badge__unconfigured: 'Unconfigured',
-        certificateLabel: 'Certificate',
         descriptionLine1:
           'Require members to sign in through your identity provider using their domain email. Members without a matching domain are unaffected.',
         descriptionLine2:
@@ -1103,7 +1111,7 @@ export const enUS: LocalizationResource = {
       membershipSeatUsageLabel: '{{count}} of {{limit}} seats used',
       profileSection: {
         primaryButton: 'Update profile',
-        title: 'Organization Profile',
+        title: 'Profile',
         uploadAction__title: 'Logo',
       },
     },
