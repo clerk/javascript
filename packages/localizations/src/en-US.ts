@@ -362,7 +362,7 @@ export const enUS: LocalizationResource = {
           headerSubtitle: 'Create a new SAML application in Google Workspace',
         },
         identityProviderMetadataStep: {
-          headerSubtitle: 'Configure identity provider metadata',
+          headerSubtitle: 'Add your Google Workspace application metadata',
           manual: {
             description: 'In your Google Workspace app, retrieve these values.',
             issuer: {
@@ -478,7 +478,7 @@ export const enUS: LocalizationResource = {
           headerSubtitle: 'Create a new enterprise application in your Azure Portal',
         },
         identityProviderMetadataStep: {
-          headerSubtitle: 'Configure identity provider metadata',
+          headerSubtitle: 'Add your Microsoft Entra application metadata',
           manual: {
             description:
               'On the <bold>SAML-based Sign-on</bold> page, find the <bold>SAML Certificates</bold> section. Retrieve these values and add them below.',
@@ -697,12 +697,12 @@ export const enUS: LocalizationResource = {
     },
     testConfigurationStep: {
       error__noSuccessfulTestRun:
-        'You need at least one successful test run before you can continue. Generate a test SSO URL and complete the sign-in flow.',
-      subtitle: 'Authenticate using the test SSO URL to verify you configured the connection correctly.',
+        'You need at least one successful test run before you can continue. Generate a test URL and complete the sign-in flow.',
+      subtitle: 'Sign in through the test URL to verify your SSO connection is configured correctly',
       testResults: {
         actionLabel__refresh: 'Refresh logs',
         empty: {
-          subtitle: 'Use the button above to start running tests',
+          subtitle: 'Select <bold>Open test URL</bold> to run your first test',
           title: 'No test results',
         },
         polling: 'Waiting for the test run to complete…',
