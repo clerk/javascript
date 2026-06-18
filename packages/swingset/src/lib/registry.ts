@@ -17,6 +17,13 @@ import {
   Sizes as HeadingSizes,
 } from '../stories/heading.stories';
 import {
+  Default as IconDefault,
+  meta as iconMeta,
+  Names as IconNames,
+  Override as IconOverride,
+  Sizes as IconSizes,
+} from '../stories/icon.stories';
+import {
   Default,
   Disabled as InputDisabled,
   Invalid,
@@ -76,6 +83,14 @@ const tabsComponentModule: StoryModule = { meta: tabsComponentMeta, Default: Tab
 
 const textModule: StoryModule = { meta: textMeta, Default: TextDefault, Sizes: TextSizes, Intents: TextIntents };
 
+const iconModule: StoryModule = {
+  meta: iconMeta,
+  Default: IconDefault,
+  Sizes: IconSizes,
+  Names: IconNames,
+  Override: IconOverride,
+};
+
 // Headless primitives carry just `meta` (no story functions). Like every component
 // they're documented as a single overview page; their live demos come from `<Story>` /
 // `<Preview>` embeds in the MDX, which import the stories module directly.
@@ -104,6 +119,7 @@ export const registry: StoryModule[] = [
   inputModule,
   dialogComponentModule,
   headingModule,
+  iconModule,
   tabsComponentModule,
   textModule,
   // Primitives — alphabetical within the group.
