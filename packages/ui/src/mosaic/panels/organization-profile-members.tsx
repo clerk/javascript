@@ -504,8 +504,8 @@ export function OrganizationProfileMembers() {
             sx={t => ({ color: filterOpen ? 'inherit' : t.color.mutedForeground, padding: t.spacing(1) })}
           >
             <Selector
-              width={14}
-              height={14}
+              width={16}
+              height={16}
             />
           </Button>
         </Box>

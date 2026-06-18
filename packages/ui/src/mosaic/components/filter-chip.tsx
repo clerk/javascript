@@ -1,6 +1,6 @@
 import type { SelectItem } from '@clerk/headless/select';
 
-import { ChevronDown } from '../../icons';
+import { ChevronDown, Close } from '../../icons';
 import { Box } from './box';
 import { Select } from './select';
 import { Text } from './text';
@@ -97,11 +97,23 @@ export function FilterChip({ label, value, onValueChange, items, clearable = tru
               {label}
             </Text>
           )}
-          <ChevronDown
-            width={16}
-            height={16}
-            style={{ flexShrink: 0 }}
-          />
+          {hasValue && clearable ? (
+            <Close
+              width={12}
+              height={12}
+              style={{ flexShrink: 0 }}
+              onClick={(e: React.MouseEvent) => {
+                e.stopPropagation();
+                onValueChange(undefined);
+              }}
+            />
+          ) : (
+            <ChevronDown
+              width={16}
+              height={16}
+              style={{ flexShrink: 0 }}
+            />
+          )}
         </Box>
       )}
     >

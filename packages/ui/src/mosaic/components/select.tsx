@@ -85,46 +85,49 @@ const Popup = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<ty
   },
 );
 
-const Option = React.forwardRef<HTMLButtonElement, React.ComponentPropsWithoutRef<typeof Primitive.Option>>(
-  function SelectOption({ children, ...props }, forwardedRef) {
-    const { option } = useRecipe(selectRecipe);
-    const innerRef = React.useRef<HTMLButtonElement | null>(null);
-    const [isSelected, setIsSelected] = React.useState(false);
+const Option = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentPropsWithoutRef<typeof Primitive.Option> & { showCheck?: boolean }
+>(function SelectOption({ children, showCheck = true, ...props }, forwardedRef) {
+  const { option } = useRecipe(selectRecipe);
+  const innerRef = React.useRef<HTMLButtonElement | null>(null);
+  const [isSelected, setIsSelected] = React.useState(false);
 
-    const setRefs = React.useCallback(
-      (el: HTMLButtonElement | null) => {
-        innerRef.current = el;
-        if (typeof forwardedRef === 'function') forwardedRef(el);
-        else if (forwardedRef) (forwardedRef as React.MutableRefObject<HTMLButtonElement | null>).current = el;
-      },
-      [forwardedRef],
-    );
+  const setRefs = React.useCallback(
+    (el: HTMLButtonElement | null) => {
+      innerRef.current = el;
+      if (typeof forwardedRef === 'function') forwardedRef(el);
+      else if (forwardedRef) (forwardedRef as React.MutableRefObject<HTMLButtonElement | null>).current = el;
+    },
+    [forwardedRef],
+  );
 
-    React.useLayoutEffect(() => {
-      const el = innerRef.current;
-      if (!el) return;
-      setIsSelected(el.hasAttribute('data-cl-selected'));
-      const observer = new MutationObserver(() => setIsSelected(el.hasAttribute('data-cl-selected')));
-      observer.observe(el, { attributes: true, attributeFilter: ['data-cl-selected'] });
-      return () => observer.disconnect();
-    }, []);
+  React.useLayoutEffect(() => {
+    const el = innerRef.current;
+    if (!el) return;
+    setIsSelected(el.hasAttribute('data-cl-selected'));
+    const observer = new MutationObserver(() => setIsSelected(el.hasAttribute('data-cl-selected')));
+    observer.observe(el, { attributes: true, attributeFilter: ['data-cl-selected'] });
+    return () => observer.disconnect();
+  }, []);
 
-    return (
-      <Primitive.Option
-        ref={setRefs}
-        {...props}
-        {...option}
-      >
+  return (
+    <Primitive.Option
+      ref={setRefs}
+      {...props}
+      {...option}
+    >
+      {showCheck && (
         <Checkmark
           width={16}
           height={16}
           style={{ visibility: isSelected ? 'visible' : 'hidden', flexShrink: 0, color: 'currentColor', opacity: 0.5 }}
         />
-        {children}
-      </Primitive.Option>
-    );
-  },
-);
+      )}
+      {children}
+    </Primitive.Option>
+  );
+});
 
 interface SelectProps extends Pick<
   HeadlessSelectProps,

@@ -1,0 +1,15 @@
+import * as UserProfileStories from './user-profile.stories';
+
+# User Profile
+
+The full User Profile AIO — a sidebar-navigated modal shell that renders user account management panels. The sidebar shows nav items (Profile, Security, Billing, API Keys); the content area swaps panels on selection.
+
+<Story
+  name='Default'
+  storyModule={UserProfileStories}
+  composition={[
+    { name: 'UserProfileGeneral', href: '/panels/user-profile-general', layer: 'Panels' },
+    { name: 'UserProfileSecurity', href: '/panels/user-profile-security', layer: 'Panels' },
+    { name: 'Avatar', href: '/components/avatar', layer: 'Components' },
+  ]}
+/>

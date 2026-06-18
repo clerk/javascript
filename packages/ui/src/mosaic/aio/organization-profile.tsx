@@ -217,8 +217,8 @@ export function OrganizationProfile() {
             position: 'absolute',
             top: t.spacing(3),
             right: t.spacing(3),
-            width: '36px',
-            height: '36px',
+            width: '24px',
+            height: '24px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -231,8 +231,8 @@ export function OrganizationProfile() {
           })}
         >
           <Close
-            width={20}
-            height={20}
+            width={16}
+            height={16}
           />
         </Box>
 

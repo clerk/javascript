@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { Plus } from '../../icons';
 import { Destructive } from '../block/destructive';
 import { Avatar } from '../components/avatar';
+import { Badge } from '../components/badge';
 import { Box } from '../components/box';
 import { Button } from '../components/button';
 import { Heading } from '../components/heading';
@@ -220,52 +221,41 @@ export function OrganizationProfileGeneral() {
         </Box>
 
         {/* Domain list — fetched data */}
-        <RevealContainer
-          revealed={revealed}
-          skeleton={
-            <Box
-              sx={t => ({
-                border: `1px solid ${t.color.border}`,
-                borderRadius: '8px',
-                height: '2.75rem',
-                padding: t.spacing(3),
-                display: 'flex',
-                alignItems: 'center',
-                background: `light-dark(white, oklch(0.145 0 0))`,
-              })}
-            >
+        <Box
+          sx={t => ({
+            border: `1px solid ${t.color.border}`,
+            borderRadius: '8px',
+            overflow: 'hidden',
+            background: `light-dark(white, oklch(0.145 0 0))`,
+          })}
+        >
+          {!revealed ? (
+            <Box sx={t => ({ padding: t.spacing(3), display: 'flex', alignItems: 'center' })}>
               <Skeleton
                 width={120}
                 height='0.875rem'
               />
             </Box>
-          }
-        >
-          <Box sx={t => ({ display: 'flex', flexDirection: 'column', gap: t.spacing(2.5) })}>
-            {isLoaded &&
-              organization?.emailDomains.map(({ id, domain }) => (
+          ) : (
+            isLoaded &&
+            organization?.emailDomains.map(({ id, domain, autoInvite }, i) => (
+              <React.Fragment key={id}>
+                {i > 0 && <Box sx={t => ({ height: '1px', background: t.color.border, marginInline: t.spacing(3) })} />}
                 <Box
-                  key={id}
                   sx={t => ({
-                    border: `1px solid ${t.color.border}`,
-                    borderRadius: '8px',
-                    height: '2.75rem',
                     padding: t.spacing(3),
                     display: 'flex',
                     alignItems: 'center',
-                    background: `light-dark(white, oklch(0.145 0 0))`,
+                    gap: t.spacing(2),
                   })}
                 >
-                  <Text
-                    size='sm'
-                    sx={() => ({ flex: 1, minWidth: 0 })}
-                  >
-                    {domain}
-                  </Text>
+                  <Text size='sm'>{domain}</Text>
+                  {autoInvite && <Badge>Automatic invites</Badge>}
                 </Box>
-              ))}
-          </Box>
-        </RevealContainer>
+              </React.Fragment>
+            ))
+          )}
+        </Box>
       </Box>
 
       {/* Danger zone */}
@@ -283,28 +273,29 @@ export function OrganizationProfileGeneral() {
           sx={t => ({
             border: `1px solid ${t.color.border}`,
             borderRadius: '8px',
-            padding: t.spacing(3),
+            overflow: 'hidden',
             background: `light-dark(white, oklch(0.145 0 0))`,
           })}
         >
-          <RevealContainer
-            revealed={revealed}
-            skeleton={
-              <Box sx={t => ({ display: 'flex', flexDirection: 'column', gap: t.spacing(3) })}>
+          {!revealed ? (
+            <>
+              <Box sx={t => ({ padding: t.spacing(3) })}>
                 <Skeleton
                   width={140}
                   height='0.875rem'
                 />
-                <Box sx={t => ({ height: '1px', background: t.color.border })} />
+              </Box>
+              <Box sx={t => ({ height: '1px', background: t.color.border, marginInline: t.spacing(3) })} />
+              <Box sx={t => ({ padding: t.spacing(3) })}>
                 <Skeleton
                   width={150}
                   height='0.875rem'
                 />
               </Box>
-            }
-          >
-            {isLoaded && organization ? (
-              <Box sx={t => ({ display: 'flex', flexDirection: 'column', gap: t.spacing(3) })}>
+            </>
+          ) : isLoaded && organization ? (
+            <>
+              <Box sx={t => ({ padding: t.spacing(3) })}>
                 <Destructive
                   trigger={props => (
                     <Button
@@ -329,12 +320,9 @@ export function OrganizationProfileGeneral() {
                   onDelete={handleLeave}
                   isDeleting={leavePending}
                 />
-                <Box
-                  sx={t => ({
-                    height: '1px',
-                    background: t.color.border,
-                  })}
-                />
+              </Box>
+              <Box sx={t => ({ height: '1px', background: t.color.border, marginInline: t.spacing(3) })} />
+              <Box sx={t => ({ padding: t.spacing(3) })}>
                 <Destructive
                   trigger={props => (
                     <Button
@@ -360,10 +348,8 @@ export function OrganizationProfileGeneral() {
                   isDeleting={deletePending}
                 />
               </Box>
-            ) : (
-              <Box />
-            )}
-          </RevealContainer>
+            </>
+          ) : null}
         </Box>
       </Box>
     </Box>

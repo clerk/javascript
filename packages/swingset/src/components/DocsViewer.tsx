@@ -12,6 +12,7 @@ import { ViewSource } from './ViewSource';
 const docModules: Record<string, Record<string, React.ComponentType>> = {
   aio: {
     'organization-profile': dynamic(() => import('../stories/organization-profile.mdx')),
+    'user-profile': dynamic(() => import('../stories/user-profile.mdx')),
   },
   panels: {
     'organization-profile-general': dynamic(() => import('../stories/organization-profile-general.mdx')),

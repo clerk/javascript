@@ -18,6 +18,7 @@ import GradientAvatar from '../components/mock/gradient-2.jpg';
 export interface MockEmailDomain {
   id: string;
   domain: string;
+  autoInvite?: boolean;
 }
 
 export interface MockOrganization {
@@ -65,7 +66,10 @@ export function useOrganization(): UseOrganizationReturn {
       avatar: GradientAvatar.src,
       slug: 'acme-co',
       membersCount: 4,
-      emailDomains: [{ id: 'dom_1', domain: 'clerk.dev' }],
+      emailDomains: [
+        { id: 'dom_1', domain: 'clerk.dev', autoInvite: true },
+        { id: 'dom_2', domain: 'clerk.com' },
+      ],
       destroy: () => delay(MUTATION_DELAY_MS),
     },
     membership: {

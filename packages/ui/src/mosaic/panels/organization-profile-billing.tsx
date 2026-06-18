@@ -12,7 +12,15 @@ import { Badge } from '../components/badge';
 const LOAD_DELAY_MS = 600;
 const REVEAL_TRANSITION = 'opacity 400ms ease-in-out, filter 400ms ease-in-out';
 
-export function OrganizationProfileBilling() {
+interface BillingPlan {
+  name: string;
+  price: string;
+  period?: string;
+}
+
+const DEFAULT_PLAN: BillingPlan = { name: 'Platinum', price: '$99.00', period: '/mo' };
+
+export function OrganizationProfileBilling({ plan = DEFAULT_PLAN }: { plan?: BillingPlan } = {}) {
   const [revealed, setRevealed] = useState(false);
 
   useEffect(() => {
@@ -112,22 +120,24 @@ export function OrganizationProfileBilling() {
                     size='sm'
                     sx={t => ({ flex: 1, fontWeight: t.font.medium })}
                   >
-                    Platinum
+                    {plan.name}
                   </Text>
                   <Box sx={t => ({ display: 'flex', alignItems: 'baseline', gap: t.spacing(0.5) })}>
                     <Text
                       size='sm'
                       sx={t => ({ fontWeight: t.font.medium })}
                     >
-                      $99.00
+                      {plan.price}
                     </Text>
-                    <Text
-                      size='sm'
-                      intent='mutedForeground'
-                      render={p => <span {...p} />}
-                    >
-                      /mo
-                    </Text>
+                    {plan.period && (
+                      <Text
+                        size='sm'
+                        intent='mutedForeground'
+                        render={p => <span {...p} />}
+                      >
+                        {plan.period}
+                      </Text>
+                    )}
                   </Box>
                 </Box>
               </Box>
