@@ -196,28 +196,27 @@ export const svSE: LocalizationResource = {
       },
       warning: 'När en leverantör har valts kan du inte ändra igen förrän konfigurationen är klar',
     },
-    verifyEmailDomainStep: {
-      title: 'Verifiera e-postadress',
-      subtitle: 'Verifiera e-postadressen som du vill aktivera företagsanslutningen för.',
-      addEmailAddress: {
-        formTitle: 'Vi behöver din e-post',
-        formSubtitle: 'För att börja behöver vi din e-postadress',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'E-postadress',
+    organizationDomainsStep: {
+      title: 'Lägg till SSO-domäner',
+      subtitle: 'Lägg till och verifiera ägarskapet för de domäner som din organisation använder för att logga in.',
+      formFieldLabel__domain: 'Domäner',
+      formFieldInputPlaceholder__domain: 'Skriv din domän här och klicka på lägg till för att börja',
+      formButtonPrimary__add: 'Lägg till',
+      domainSuggestion: {
+        messageLabel: 'Din e-post använder {{domain}}. Vill du lägga till den?',
+        formButtonPrimary__add: 'Lägg till {{domain}}',
       },
-      emailCode: {
-        formTitle: 'Verifiera din e-postadress',
-        formSubtitle: 'Ange verifieringskoden som skickats till {{identifier}}',
-        resendButton: 'Fick du ingen kod? Skicka igen',
-        verified: {
-          title: 'Vi har fått din e-post',
-          subtitle: 'Du har verifierat din e-postadress med följande e-post',
-          inputLabel: 'Verifierad e-postadress',
+      domainCard: {
+        badge__verified: 'Verifierad',
+        badge__unverified: 'Overifierad',
+        verifiedAtLabel: "Verifierad den {{ date | shortDate('sv-SE') }}",
+        txtRecord: {
+          instructions:
+            'Lägg till den här TXT-posten hos din DNS-leverantör. Vi verifierar automatiskt när posten är aktiv.',
+          typeLabel: 'Typ',
+          hostLabel: 'Värd / Namn',
+          valueLabel: 'Värde',
         },
-      },
-      domainTaken: {
-        title: 'Denna domän ({{domain}}) har redan en SSO-anslutning',
-        subtitle: 'Kontakta applikationens administratör för att få åtkomst via den befintliga anslutningen.',
       },
     },
   },

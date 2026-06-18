@@ -54,6 +54,7 @@ import {
   _futureAuthenticateWithPopup,
   wrapWithPopupRoutes,
 } from '../../utils/authenticateWithPopup';
+import { _authenticateWithTransport } from '../../utils/authenticateWithTransport';
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
@@ -449,6 +450,18 @@ export class SignUp extends BaseResource implements SignUpResource {
       unsafeMetadata?: SignUpUnsafeMetadata;
     },
   ): Promise<void> => {
+    const transport = SignUp.clerk.__internal_oauthTransport;
+    if (transport) {
+      return _authenticateWithTransport({
+        clerk: SignUp.clerk,
+        transport,
+        resource: this,
+        authenticateMethod: this.authenticateWithRedirectOrPopup,
+        params,
+        callbackParams: params.__internal_callbackParams ?? {},
+      });
+    }
+
     return this.authenticateWithRedirectOrPopup(params, windowNavigate);
   };
 

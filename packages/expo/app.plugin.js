@@ -18,11 +18,17 @@ const {
 } = require('@expo/config-plugins');
 const path = require('path');
 const fs = require('fs');
+const packageJson = require('./package.json');
 
 const CLERK_IOS_REPO = 'https://github.com/clerk/clerk-ios.git';
-const CLERK_IOS_VERSION = '1.2.2';
+const CLERK_IOS_VERSION = '1.2.4';
+const CLERK_EXPO_VERSION_PLACEHOLDER = '__CLERK_EXPO_VERSION__';
 
 const CLERK_MIN_IOS_VERSION = '17.0';
+
+function injectClerkExpoVersion(source, version = packageJson.version) {
+  return source.split(CLERK_EXPO_VERSION_PLACEHOLDER).join(version);
+}
 
 const withClerkIOS = config => {
   console.log('✅ Clerk iOS plugin loaded');
@@ -271,7 +277,8 @@ const withClerkIOS = config => {
       if (sourceFile && fs.existsSync(sourceFile)) {
         // ALWAYS copy the file to ensure we have the latest version
         const targetFile = path.join(iosProjectPath, 'ClerkNativeBridge.swift');
-        fs.copyFileSync(sourceFile, targetFile);
+        const sourceContents = fs.readFileSync(sourceFile, 'utf8');
+        fs.writeFileSync(targetFile, injectClerkExpoVersion(sourceContents));
         console.log('✅ Copied ClerkNativeBridge.swift to app target');
 
         // Add the file to the Xcode project manually
@@ -718,4 +725,10 @@ const withClerkExpo = (config, props = {}) => {
 };
 
 module.exports = withClerkExpo;
-module.exports._testing = { validateThemeJson, isPlainObject, VALID_COLOR_KEYS, HEX_COLOR_REGEX };
+module.exports._testing = {
+  validateThemeJson,
+  injectClerkExpoVersion,
+  isPlainObject,
+  VALID_COLOR_KEYS,
+  HEX_COLOR_REGEX,
+};

@@ -97,10 +97,11 @@ No additional props beyond standard HTML attributes and the `render` prop.
 
 ## Data Attributes
 
-| Attribute                         | Applies To                         | Description                             |
-| --------------------------------- | ---------------------------------- | --------------------------------------- |
-| `data-cl-slot`                    | All parts                          | Part identifier (e.g. `"dialog-popup"`) |
-| `data-cl-open` / `data-cl-closed` | Trigger, Backdrop, Viewport, Popup | Open state                              |
+| Attribute                         | Applies To                         | Description |
+| --------------------------------- | ---------------------------------- | ----------- |
+| `data-cl-open` / `data-cl-closed` | Trigger, Backdrop, Viewport, Popup | Open state  |
+
+Slot identity (`data-cl-slot`) is applied by the styled (mosaic) layer, not by the headless parts.
 
 ## Important Notes
 

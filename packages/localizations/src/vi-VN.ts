@@ -202,28 +202,27 @@ export const viVN: LocalizationResource = {
       },
       warning: 'Khi đã chọn nhà cung cấp, bạn không thể thay đổi cho đến khi cấu hình hoàn tất',
     },
-    verifyEmailDomainStep: {
-      title: 'Xác minh địa chỉ email',
-      subtitle: 'Xác minh địa chỉ email mà bạn muốn kích hoạt kết nối doanh nghiệp.',
-      addEmailAddress: {
-        formTitle: 'Chúng tôi cần email của bạn',
-        formSubtitle: 'Để bắt đầu, chúng tôi sẽ cần địa chỉ email của bạn',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'Địa chỉ email',
+    organizationDomainsStep: {
+      title: 'Thêm tên miền SSO',
+      subtitle: 'Thêm và xác minh quyền sở hữu các tên miền mà tổ chức của bạn dùng để đăng nhập.',
+      formFieldLabel__domain: 'Tên miền',
+      formFieldInputPlaceholder__domain: 'Nhập tên miền của bạn vào đây và nhấp vào thêm để bắt đầu',
+      formButtonPrimary__add: 'Thêm',
+      domainSuggestion: {
+        messageLabel: 'Email của bạn sử dụng {{domain}}. Bạn có muốn thêm nó không?',
+        formButtonPrimary__add: 'Thêm {{domain}}',
       },
-      emailCode: {
-        formTitle: 'Xác minh địa chỉ email của bạn',
-        formSubtitle: 'Nhập mã xác minh đã được gửi tới {{identifier}}',
-        resendButton: 'Không nhận được mã? Gửi lại',
-        verified: {
-          title: 'Chúng tôi đã nhận được email của bạn',
-          subtitle: 'Bạn đã xác minh địa chỉ email của mình với email sau',
-          inputLabel: 'Địa chỉ email đã xác minh',
+      domainCard: {
+        badge__verified: 'Đã xác minh',
+        badge__unverified: 'Chưa xác minh',
+        verifiedAtLabel: "Đã xác minh vào {{ date | shortDate('vi-VN') }}",
+        txtRecord: {
+          instructions:
+            'Thêm bản ghi TXT này vào nhà cung cấp DNS của bạn. Chúng tôi sẽ tự động xác minh khi bản ghi hoạt động.',
+          typeLabel: 'Loại',
+          hostLabel: 'Máy chủ / Tên',
+          valueLabel: 'Giá trị',
         },
-      },
-      domainTaken: {
-        title: 'Tên miền này ({{domain}}) đã có kết nối SSO',
-        subtitle: 'Liên hệ với quản trị viên của ứng dụng để có quyền truy cập thông qua kết nối hiện có.',
       },
     },
   },

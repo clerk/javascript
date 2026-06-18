@@ -196,29 +196,27 @@ export const skSK: LocalizationResource = {
       },
       warning: 'Po výbere poskytovateľa ho nemôžete zmeniť, kým sa konfigurácia neukončí',
     },
-    verifyEmailDomainStep: {
-      title: 'Overiť e-mailovú adresu',
-      subtitle: 'Overte e-mailovú adresu, na ktorej chcete povoliť podnikové pripojenie.',
-      addEmailAddress: {
-        formTitle: 'Potrebujeme váš e-mail',
-        formSubtitle: 'Na začiatok budeme potrebovať vašu e-mailovú adresu',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'E-mailová adresa',
+    organizationDomainsStep: {
+      title: 'Pridať SSO domény',
+      subtitle: 'Pridajte a overte vlastníctvo domén, ktoré vaša organizácia používa na prihlásenie.',
+      formFieldLabel__domain: 'Domény',
+      formFieldInputPlaceholder__domain: 'Sem zadajte svoju doménu a kliknutím na pridať začnite',
+      formButtonPrimary__add: 'Pridať',
+      domainSuggestion: {
+        messageLabel: 'Váš e-mail používa {{domain}}. Chcete ho pridať?',
+        formButtonPrimary__add: 'Pridať {{domain}}',
       },
-      emailCode: {
-        formTitle: 'Overte svoju e-mailovú adresu',
-        formSubtitle: 'Zadajte overovací kód odoslaný na {{identifier}}',
-        resendButton: 'Nedostali ste kód? Odoslať znova',
-        verified: {
-          title: 'Máme váš e-mail',
-          subtitle: 'Overili ste svoju e-mailovú adresu nasledujúcim e-mailom',
-          inputLabel: 'Overená e-mailová adresa',
+      domainCard: {
+        badge__verified: 'Overené',
+        badge__unverified: 'Neoverené',
+        verifiedAtLabel: "Overené {{ date | shortDate('sk-SK') }}",
+        txtRecord: {
+          instructions:
+            'Pridajte tento záznam TXT u svojho poskytovateľa DNS. Hneď ako bude záznam aktívny, automaticky ho overíme.',
+          typeLabel: 'Typ',
+          hostLabel: 'Hostiteľ / Názov',
+          valueLabel: 'Hodnota',
         },
-      },
-      domainTaken: {
-        title: 'Táto doména ({{domain}}) už má SSO pripojenie',
-        subtitle:
-          'Kontaktujte administrátora aplikácie, aby ste získali prístup prostredníctvom existujúceho pripojenia.',
       },
     },
   },

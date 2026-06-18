@@ -213,7 +213,6 @@ export const enUS: LocalizationResource = {
   configureSSO: {
     confirmation: {
       configurationSection: {
-        certificateLabel: 'Certificate',
         configureAgainLink: 'Configure again',
         issuerLabel: 'Issuer',
         ssoUrlLabel: 'Sign on URL',
@@ -269,28 +268,36 @@ export const enUS: LocalizationResource = {
       },
       warning: 'Once a provider is selected you cannot change again until the configuration is over',
     },
-    verifyEmailDomainStep: {
-      title: 'Verify email address',
-      subtitle: 'Verify the domain you want to enable the enterprise connection on.',
-      addEmailAddress: {
-        formTitle: 'We need your email',
-        formSubtitle: 'In order to start we will need your email address',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'Email address',
+    organizationDomainsStep: {
+      title: 'Add SSO domains',
+      subtitle: 'Add and verify ownership of the domains your organization uses to sign in.',
+      formFieldLabel__domain: 'Domains',
+      formFieldInputPlaceholder__domain: 'Type your domain here and click add to start',
+      formButtonPrimary__add: 'Add',
+      domainSuggestion: {
+        messageLabel: 'Your email uses {{domain}}. Do you want to add it?',
+        formButtonPrimary__add: 'Add {{domain}}',
       },
-      emailCode: {
-        formTitle: 'Verify your email address',
-        formSubtitle: 'Enter the verification code sent to {{identifier}}',
-        resendButton: "Didn't receive a code? Resend",
-        verified: {
-          title: 'We got your email',
-          subtitle: "You've verified your email address with the following email",
-          inputLabel: 'Verified email address',
+      domainCard: {
+        badge__verified: 'Verified',
+        badge__unverified: 'Unverified',
+        verifiedAtLabel: "Verified on {{ date | shortDate('en-US') }}",
+        removeButtonTooltip__lastVerifiedDomain: 'At least one verified domain is required to set up SSO.',
+        removeButtonTooltip__lastVerifiedDomainActive: 'At least one verified domain is required to keep SSO enabled.',
+        txtRecord: {
+          instructions: "Add this TXT record to your DNS provider. We'll verify automatically once the record is live.",
+          typeLabel: 'Type',
+          hostLabel: 'Host / Name',
+          valueLabel: 'Value',
         },
       },
-      domainTaken: {
-        title: 'This domain ({{domain}}) already has an SSO connection',
-        subtitle: "Contact the application's administrator to get access through the existing connection.",
+      removeDomainDialog: {
+        title: 'Removing domain',
+        subtitle__active:
+          "You're about to remove {{domain}} from this enterprise connection. Users won't be able to sign-in with {{domain}} anymore.",
+        subtitle__inactive: "You're about to remove {{domain}} from this enterprise connection.",
+        cancelButton: 'Cancel',
+        removeButton: 'Remove domain',
       },
     },
     testConfigurationStep: {
@@ -882,6 +889,7 @@ export const enUS: LocalizationResource = {
     badge__automaticInvitation: 'Automatic invitations',
     badge__automaticSuggestion: 'Automatic suggestions',
     badge__manualInvitation: 'No automatic enrollment',
+    badge__enterpriseSso: 'Enterprise SSO',
     badge__unverified: 'Unverified',
     billingPage: {
       paymentHistorySection: {
@@ -1066,13 +1074,44 @@ export const enUS: LocalizationResource = {
       successMessage: '{{domain}} has been removed.',
       title: 'Remove domain',
     },
+    securityPage: {
+      removeDialog: {
+        confirmButton: 'Remove connection',
+        subtitle:
+          'Are you sure you want to remove the connection? This action is irreversible and deletes the connection and all of its configuration.',
+        title: 'Remove SSO connection',
+      },
+      ssoSection: {
+        badge__active: 'Active',
+        badge__inactive: 'Inactive',
+        badge__inProgress: 'In Progress',
+        badge__unconfigured: 'Unconfigured',
+        descriptionLine1:
+          'Require members to sign in through your identity provider using their domain email. Members without a matching domain are unaffected.',
+        descriptionLine2:
+          'Anyone who signs in will be automatically added to this organization. New members will be assigned to {{role}}.',
+        descriptionLine2__noRole: 'Anyone who signs in will be automatically added to this organization.',
+        domainLabel: 'Domain',
+        issuerLabel: 'Issuer',
+        menuAction__activate: 'Activate',
+        menuAction__deactivate: 'Deactivate',
+        menuAction__edit: 'Edit',
+        menuAction__remove: 'Remove',
+        primaryButton__continueConfiguration: 'Continue configuration',
+        primaryButton__startConfiguration: 'Start configuration',
+        providerLabel: 'Provider',
+        signOnUrlLabel: 'Sign on URL',
+        title: 'SSO',
+      },
+      title: 'Security',
+    },
     start: {
       headerTitle__general: 'General',
       headerTitle__members: 'Members',
       membershipSeatUsageLabel: '{{count}} of {{limit}} seats used',
       profileSection: {
         primaryButton: 'Update profile',
-        title: 'Organization Profile',
+        title: 'Profile',
         uploadAction__title: 'Logo',
       },
     },

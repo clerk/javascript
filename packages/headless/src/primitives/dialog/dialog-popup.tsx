@@ -26,7 +26,6 @@ export const DialogPopup = React.forwardRef<HTMLDivElement, DialogPopupProps>(fu
   }
 
   const ownProps = {
-    'data-cl-slot': 'dialog-popup',
     ref: combinedRef,
     'aria-labelledby': labelId,
     'aria-describedby': descriptionId,

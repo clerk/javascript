@@ -196,28 +196,27 @@ export const beBY: LocalizationResource = {
       },
       warning: 'Пасля выбару правайдэра вы не зможаце змяніць яго, пакуль не скончыце канфігурацыю',
     },
-    verifyEmailDomainStep: {
-      title: 'Пацвердзіць адрас электроннай пошты',
-      subtitle: 'Пацвердзіце адрас электроннай пошты, на якім вы хочаце ўключыць карпаратыўнае падключэнне.',
-      addEmailAddress: {
-        formTitle: 'Нам патрэбна ваша пошта',
-        formSubtitle: 'Каб пачаць, нам спатрэбіцца ваш адрас электроннай пошты',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'Адрас электроннай пошты',
+    organizationDomainsStep: {
+      title: 'Дадаць дамены SSO',
+      subtitle: 'Дадайце і пацвердзіце права ўласнасці на дамены, якія ваша арганізацыя выкарыстоўвае для ўваходу.',
+      formFieldLabel__domain: 'Дамены',
+      formFieldInputPlaceholder__domain: 'Увядзіце свой дамен тут і націсніце «Дадаць», каб пачаць',
+      formButtonPrimary__add: 'Дадаць',
+      domainSuggestion: {
+        messageLabel: 'Ваша электронная пошта выкарыстоўвае {{domain}}. Хочаце дадаць яго?',
+        formButtonPrimary__add: 'Дадаць {{domain}}',
       },
-      emailCode: {
-        formTitle: 'Пацвердзіце ваш адрас электроннай пошты',
-        formSubtitle: 'Увядзіце код пацверджання, дасланы на {{identifier}}',
-        resendButton: 'Не атрымалі код? Адправіць паўторна',
-        verified: {
-          title: 'Мы атрымалі вашу пошту',
-          subtitle: 'Вы пацвердзілі свой адрас электроннай пошты з наступнай поштай',
-          inputLabel: 'Пацверджаны адрас электроннай пошты',
+      domainCard: {
+        badge__verified: 'Пацверджана',
+        badge__unverified: 'Не пацверджана',
+        verifiedAtLabel: "Пацверджана {{ date | shortDate('be-BY') }}",
+        txtRecord: {
+          instructions:
+            'Дадайце гэты TXT-запіс да вашага DNS-правайдара. Мы аўтаматычна выканаем праверку, як толькі запіс стане актыўным.',
+          typeLabel: 'Тып',
+          hostLabel: 'Хост / Імя',
+          valueLabel: 'Значэнне',
         },
-      },
-      domainTaken: {
-        title: 'Гэты дамен ({{domain}}) ужо мае SSO-падключэнне',
-        subtitle: 'Звяжыцеся з адміністратарам прыкладання, каб атрымаць доступ праз існуючае падключэнне.',
       },
     },
   },

@@ -14,7 +14,6 @@ export const DialogTitle = React.forwardRef<HTMLHeadingElement, DialogTitleProps
   const { labelId } = useDialogContext();
 
   const defaultProps = {
-    'data-cl-slot': 'dialog-title',
     id: labelId,
     ref,
   } satisfies DefaultProps<'h2'>;

@@ -38,6 +38,12 @@ export interface StoryMeta {
   group: string;
   title: string;
   /**
+   * Optional human-friendly label shown in the sidebar. Falls back to `title` when
+   * omitted. Use this when the desired sidebar text differs from the component name
+   * (which still drives the slug and the `<Title />` tag).
+   */
+  label?: string;
+  /**
    * Path to the file that exports the documented component, relative to the monorepo
    * root (e.g. `packages/ui/src/mosaic/components/button.tsx`). Rendered as a "View
    * source" link to the file on GitHub. See `lib/source.ts`.
@@ -54,5 +60,12 @@ export type StoryComponent = React.ComponentType<Record<string, unknown>>;
 
 export interface StoryModule {
   meta: StoryMeta;
-  [storyName: string]: StoryComponent | StoryMeta;
+  /**
+   * Raw source text of the `*.stories.tsx` file, exposed via a `?raw` self-import
+   * (`export { default as __source } from './x.stories?raw'`). Present only on modules
+   * that opt into the `<Story>` code footer; `StoryEmbed` extracts the previewed story's
+   * function from it. See `lib/extractStorySource.ts`.
+   */
+  __source?: string;
+  [storyName: string]: StoryComponent | StoryMeta | string | undefined;
 }

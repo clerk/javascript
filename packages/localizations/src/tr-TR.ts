@@ -196,28 +196,27 @@ export const trTR: LocalizationResource = {
       },
       warning: 'Bir sağlayıcı seçildikten sonra yapılandırma bitene kadar tekrar değiştiremezsiniz',
     },
-    verifyEmailDomainStep: {
-      title: 'E-posta adresini doğrula',
-      subtitle: 'Kurumsal bağlantıyı etkinleştirmek istediğiniz e-posta adresini doğrulayın.',
-      addEmailAddress: {
-        formTitle: 'E-postanıza ihtiyacımız var',
-        formSubtitle: 'Başlamak için e-posta adresinize ihtiyacımız olacak',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'E-posta adresi',
+    organizationDomainsStep: {
+      title: 'SSO alan adları ekle',
+      subtitle: 'Kuruluşunuzun oturum açmak için kullandığı alan adlarının sahipliğini ekleyin ve doğrulayın.',
+      formFieldLabel__domain: 'Alan adları',
+      formFieldInputPlaceholder__domain: 'Alan adınızı buraya yazın ve başlamak için Ekle düğmesine tıklayın',
+      formButtonPrimary__add: 'Ekle',
+      domainSuggestion: {
+        messageLabel: 'E-postanız {{domain}} kullanıyor. Eklemek ister misiniz?',
+        formButtonPrimary__add: '{{domain}} ekle',
       },
-      emailCode: {
-        formTitle: 'E-posta adresinizi doğrulayın',
-        formSubtitle: '{{identifier}} adresine gönderilen doğrulama kodunu girin',
-        resendButton: 'Kod almadınız mı? Tekrar gönder',
-        verified: {
-          title: 'E-postanızı aldık',
-          subtitle: 'E-posta adresinizi aşağıdaki e-posta ile doğruladınız',
-          inputLabel: 'Doğrulanmış e-posta adresi',
+      domainCard: {
+        badge__verified: 'Doğrulandı',
+        badge__unverified: 'Doğrulanmadı',
+        verifiedAtLabel: "{{ date | shortDate('tr-TR') }} tarihinde doğrulandı",
+        txtRecord: {
+          instructions:
+            'Bu TXT kaydını DNS sağlayıcınıza ekleyin. Kayıt yayına girer girmez otomatik olarak doğrulayacağız.',
+          typeLabel: 'Tür',
+          hostLabel: 'Ana bilgisayar / Ad',
+          valueLabel: 'Değer',
         },
-      },
-      domainTaken: {
-        title: 'Bu alan adı ({{domain}}) zaten bir SSO bağlantısına sahip',
-        subtitle: 'Mevcut bağlantı üzerinden erişim sağlamak için uygulamanın yöneticisiyle iletişime geçin.',
       },
     },
   },
