@@ -147,3 +147,61 @@ describe('Actor.send — signature is (event: TEvent) => void, not AnyEventObjec
     expectTypeOf(actor.send).not.toMatchTypeOf<(event: Record<string, unknown>) => void>();
   });
 });
+
+// ─── createMachine — on key and target type safety ───────────────────────────
+
+describe('createMachine — on keys are constrained to TEvent types', () => {
+  test('valid event type in on compiles', () => {
+    createMachine<TestContext, TestEvent>({
+      initial: 'idle',
+      context: { count: 0, label: '' },
+      states: { idle: { on: { SIMPLE: 'idle' } } },
+    });
+  });
+
+  test('unknown event type in on is rejected', () => {
+    createMachine<TestContext, TestEvent>({
+      initial: 'idle',
+      context: { count: 0, label: '' },
+      states: {
+        // @ts-expect-error — 'UNKNOWN_EVENT' is not in TestEvent['type']
+        idle: { on: { UNKNOWN_EVENT: 'idle' } },
+      },
+    });
+  });
+});
+
+describe('createMachine — TStates constrains initial and transition targets', () => {
+  type S = 'idle' | 'active';
+
+  test('valid initial compiles', () => {
+    createMachine<TestContext, TestEvent, S>({
+      initial: 'idle',
+      context: { count: 0, label: '' },
+      states: { idle: { on: { SIMPLE: 'active' } }, active: {} },
+    });
+  });
+
+  test('invalid initial is rejected', () => {
+    createMachine<TestContext, TestEvent, S>({
+      // @ts-expect-error — 'missing' is not in 'idle' | 'active'
+      initial: 'missing',
+      context: { count: 0, label: '' },
+      states: { idle: {}, active: {} },
+    });
+  });
+
+  test('invalid transition target is rejected', () => {
+    createMachine<TestContext, TestEvent, S>({
+      initial: 'idle',
+      context: { count: 0, label: '' },
+      states: {
+        idle: {
+          // @ts-expect-error — 'nonexistent' is not in 'idle' | 'active'
+          on: { SIMPLE: 'nonexistent' },
+        },
+        active: {},
+      },
+    });
+  });
+});

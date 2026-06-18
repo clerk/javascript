@@ -23,7 +23,8 @@ import type { EventObject, MachineConfig, StateMachine } from './types';
 export function createMachine<
   TContext extends object = Record<string, never>,
   TEvent extends EventObject = EventObject,
->(config: MachineConfig<TContext, TEvent>): StateMachine<TContext, TEvent> {
+  TStates extends string = string,
+>(config: MachineConfig<TContext, TEvent, TStates>): StateMachine<TContext, TEvent> {
   return {
     id: config.id,
     initial: config.initial,

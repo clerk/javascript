@@ -43,9 +43,9 @@ export type Action<TContext, TEvent extends EventObject> =
 export type Actions<TContext, TEvent extends EventObject> = Action<TContext, TEvent> | Action<TContext, TEvent>[];
 
 /** The long form of a transition. */
-export interface TransitionConfig<TContext, TEvent extends EventObject> {
+export interface TransitionConfig<TContext, TEvent extends EventObject, TStates extends string = string> {
   /** State to enter. Omit for an internal transition (runs actions, stays put). */
-  target?: string;
+  target?: TStates;
   /** Actions to run during the transition, in order. */
   actions?: Actions<TContext, TEvent>;
   /** Only take this transition when the guard passes. */
@@ -56,10 +56,10 @@ export interface TransitionConfig<TContext, TEvent extends EventObject> {
  * A transition may be a bare target string, a config object, or an array of
  * configs evaluated in order (first passing guard wins).
  */
-export type Transition<TContext, TEvent extends EventObject> =
-  | string
-  | TransitionConfig<TContext, TEvent>
-  | TransitionConfig<TContext, TEvent>[];
+export type Transition<TContext, TEvent extends EventObject, TStates extends string = string> =
+  | TStates
+  | TransitionConfig<TContext, TEvent, TStates>
+  | TransitionConfig<TContext, TEvent, TStates>[];
 
 /** The event type fired when an invoked promise resolves. */
 export const INVOKE_DONE = 'machine.invoke.done';
@@ -83,14 +83,19 @@ export interface ErrorInvokeEvent extends EventObject {
 }
 
 /** Invoke a promise on state entry and branch on its settlement. */
-export interface InvokeConfig<TContext, TEvent extends EventObject, TOutput = unknown> {
+export interface InvokeConfig<
+  TContext,
+  TEvent extends EventObject,
+  TOutput = unknown,
+  TStates extends string = string,
+> {
   /** Started on entry. The resolved value lands on `onDone` events as `output`. */
   src: (context: TContext, event: TEvent | DoneInvokeEvent | ErrorInvokeEvent) => Promise<TOutput>;
-  onDone?: Transition<TContext, DoneInvokeEvent<TOutput>>;
-  onError?: Transition<TContext, ErrorInvokeEvent>;
+  onDone?: Transition<TContext, DoneInvokeEvent<TOutput>, TStates>;
+  onError?: Transition<TContext, ErrorInvokeEvent, TStates>;
 }
 
-export interface StateConfig<TContext, TEvent extends EventObject> {
+export interface StateConfig<TContext, TEvent extends EventObject, TStates extends string = string> {
   /**
    * Entry precondition — "may navigation LAND on this state right now?". Checked
    * uniformly by *every* transition (and the derived initial) that targets this
@@ -100,12 +105,12 @@ export interface StateConfig<TContext, TEvent extends EventObject> {
    * via closure rather than `context` — pair with {@link Actor.recheck}.
    */
   guard?: Guard<TContext, TEvent>;
-  /** Event-name → transition map. */
-  on?: Record<string, Transition<TContext, TEvent>>;
+  /** Event-name → transition map. Constrained to event types in the machine's TEvent union. */
+  on?: Partial<Record<TEvent['type'], Transition<TContext, TEvent, TStates>>>;
   /** Eventless / immediate transitions, evaluated on entry and on {@link Actor.recheck}. */
-  always?: Transition<TContext, TEvent>;
+  always?: Transition<TContext, TEvent, TStates>;
   /** A promise to invoke on entry. */
-  invoke?: InvokeConfig<TContext, TEvent>;
+  invoke?: InvokeConfig<TContext, TEvent, unknown, TStates>;
   /** Actions run when the state is entered. */
   entry?: Actions<TContext, TEvent>;
   /** Actions run when the state is exited. */
@@ -118,13 +123,13 @@ export interface StateConfig<TContext, TEvent extends EventObject> {
  * The initial state may be a static id or derived from context at start time
  * (e.g. the Wizard computes the "furthest-reachable" step from its entry guards).
  */
-export type InitialResolver<TContext> = (context: TContext) => string;
+export type InitialResolver<TContext, TStates extends string = string> = (context: TContext) => TStates;
 
-export interface MachineConfig<TContext, TEvent extends EventObject> {
+export interface MachineConfig<TContext, TEvent extends EventObject, TStates extends string = string> {
   id?: string;
-  initial: string | InitialResolver<TContext>;
+  initial: TStates | InitialResolver<TContext, TStates>;
   context?: TContext;
-  states: Record<string, StateConfig<TContext, TEvent>>;
+  states: Record<TStates, StateConfig<TContext, TEvent, TStates>>;
 }
 
 /**
