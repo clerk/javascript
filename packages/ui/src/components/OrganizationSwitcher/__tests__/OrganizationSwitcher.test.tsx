@@ -597,6 +597,42 @@ describe('OrganizationSwitcher', () => {
     });
   });
 
+  describe('Accessibility', () => {
+    it('focuses the dialog container on open, not the first interactive item', async () => {
+      const { wrapper, props } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({ email_addresses: ['test@clerk.com'], create_organization_enabled: true });
+      });
+
+      props.setProps({ hidePersonal: true });
+      const { getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
+      await userEvent.click(getByRole('button', { name: 'Open organization switcher' }));
+
+      const dialog = screen.getByRole('dialog');
+      expect(dialog).toBeInTheDocument();
+      expect(dialog).toHaveFocus();
+    });
+
+    it('traps focus within the popover when open', async () => {
+      const { wrapper, props } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({ email_addresses: ['test@clerk.com'], create_organization_enabled: true });
+      });
+
+      props.setProps({ hidePersonal: true });
+      const { getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
+      await userEvent.click(getByRole('button', { name: 'Open organization switcher' }));
+
+      const dialog = screen.getByRole('dialog');
+      expect(dialog).toBeInTheDocument();
+
+      for (let i = 0; i < 10; i++) {
+        await userEvent.tab();
+        expect(dialog.contains(document.activeElement)).toBe(true);
+      }
+    });
+  });
+
   describe('OrganizationSwitcher with PortalProvider', () => {
     it('passes getContainer to openOrganizationProfile', async () => {
       const container = document.createElement('div');
