@@ -130,10 +130,6 @@ const LINK_REPLACEMENTS = [
   ['public-user-data', '/docs/reference/types/public-user-data'],
   ['session-status', '/docs/reference/types/session-status'],
   [
-    'organization-domain-verification',
-    '/docs/reference/backend/types/backend-organization-domain#organization-domain-verification',
-  ],
-  [
     'create-organization-invitation-params',
     '/docs/reference/backend/organization/create-organization-invitation#create-organization-invitation-params',
   ],
