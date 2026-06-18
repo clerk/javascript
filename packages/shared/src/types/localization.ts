@@ -1148,14 +1148,9 @@ export type __internal_LocalizationResource = {
         badge__active: LocalizationValue;
         badge__inactive: LocalizationValue;
         descriptionLine1: LocalizationValue;
-        descriptionLine2: LocalizationValue<'role'>;
-        descriptionLine2__noRole: LocalizationValue;
         primaryButton__startConfiguration: LocalizationValue;
         primaryButton__continueConfiguration: LocalizationValue;
-        providerLabel: LocalizationValue;
         domainLabel: LocalizationValue;
-        signOnUrlLabel: LocalizationValue;
-        issuerLabel: LocalizationValue;
         menuAction__edit: LocalizationValue;
         menuAction__activate: LocalizationValue;
         menuAction__deactivate: LocalizationValue;

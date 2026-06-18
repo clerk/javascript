@@ -19,11 +19,7 @@ const withSecurityPageFixtures = (f: Parameters<Parameters<typeof createFixtures
   });
 };
 
-const DESCRIPTION_LINE_1 =
-  'Require members to sign in through your identity provider using their domain email. Members without a matching domain are unaffected.';
-// `org:member` renders through the humanized fallback — the fixture user cannot read the roles list.
-const DESCRIPTION_LINE_2 =
-  'Anyone who signs in will be automatically added to this organization. New members will be assigned to member.';
+const DESCRIPTION_LINE_1 = 'Require members with a matching email domain to sign in through your identity provider.';
 
 const verifiedDomain = {
   id: 'dmn_verified',
@@ -65,7 +61,6 @@ describe('OrganizationSecurityPage', () => {
       expect(screen.getByText('SSO')).toBeInTheDocument();
       expect(screen.getByText('Unconfigured')).toBeInTheDocument();
       expect(screen.getByText(DESCRIPTION_LINE_1)).toBeInTheDocument();
-      expect(screen.getByText(DESCRIPTION_LINE_2)).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Start configuration' })).toBeInTheDocument();
 
       expect(screen.queryByRole('switch')).not.toBeInTheDocument();
@@ -89,7 +84,6 @@ describe('OrganizationSecurityPage', () => {
 
       expect(await screen.findByText('In Progress')).toBeInTheDocument();
       expect(screen.getByText(DESCRIPTION_LINE_1)).toBeInTheDocument();
-      expect(screen.getByText(DESCRIPTION_LINE_2)).toBeInTheDocument();
       expect(screen.queryByText(/you have started a configuration/i)).not.toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Continue configuration' })).toBeInTheDocument();
 
@@ -97,7 +91,7 @@ describe('OrganizationSecurityPage', () => {
       expect(screen.queryByRole('button', { name: /open menu/i })).not.toBeInTheDocument();
     });
 
-    it('renders the active state with the connection details', async () => {
+    it('renders the active state as a condensed overview with the domains and actions menu', async () => {
       const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
 
       fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([configuredConnection({ active: true })]);
@@ -110,29 +104,26 @@ describe('OrganizationSecurityPage', () => {
 
       expect(await screen.findByText('Active')).toBeInTheDocument();
       expect(screen.getByText(DESCRIPTION_LINE_1)).toBeInTheDocument();
-      expect(screen.getByText(DESCRIPTION_LINE_2)).toBeInTheDocument();
 
       expect(screen.queryByRole('switch')).not.toBeInTheDocument();
 
-      expect(screen.getByText('Provider')).toBeInTheDocument();
-      expect(screen.getByText('Okta Workforce')).toBeInTheDocument();
-      expect(screen.getByText('Domain')).toBeInTheDocument();
+      // The condensed overview keeps the domains, dropping the bordered detail card.
+      expect(screen.getByText('Domains')).toBeInTheDocument();
       expect(screen.getByText('clerk.com')).toBeInTheDocument();
-      expect(screen.getByText('Sign on URL')).toBeInTheDocument();
-      expect(screen.getByRole('link', { name: 'https://idp.example.com/sso' })).toHaveAttribute(
-        'href',
-        'https://idp.example.com/sso',
-      );
-      expect(screen.getByText('Issuer')).toBeInTheDocument();
-      expect(screen.getByRole('link', { name: 'https://idp.example.com/entity' })).toHaveAttribute(
-        'href',
-        'https://idp.example.com/entity',
-      );
+
+      // Provider, sign-on URL, issuer, and certificate rows are no longer rendered.
+      expect(screen.queryByText('Provider')).not.toBeInTheDocument();
+      expect(screen.queryByText('Okta Workforce')).not.toBeInTheDocument();
+      expect(screen.queryByText('Sign on URL')).not.toBeInTheDocument();
+      expect(screen.queryByText('Issuer')).not.toBeInTheDocument();
+      expect(screen.queryByText('Certificate')).not.toBeInTheDocument();
+      expect(screen.queryByText('CERT')).not.toBeInTheDocument();
+      expect(screen.queryByRole('link', { name: 'https://idp.example.com/sso' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('link', { name: 'https://idp.example.com/entity' })).not.toBeInTheDocument();
 
       expect(screen.getByRole('button', { name: /open menu/i })).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Start configuration' })).not.toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Continue configuration' })).not.toBeInTheDocument();
-      expect(screen.queryByText(/configuration details/i)).not.toBeInTheDocument();
     });
 
     it('renders the inactive state with a chip per domain', async () => {
@@ -153,23 +144,18 @@ describe('OrganizationSecurityPage', () => {
       expect(screen.queryByRole('switch')).not.toBeInTheDocument();
       expect(screen.getByRole('button', { name: /open menu/i })).toBeInTheDocument();
 
+      expect(screen.getByText('Domains')).toBeInTheDocument();
       for (const domain of ['github.com', 'gmail.com', 'maps.com', 'another.com']) {
         expect(screen.getByText(domain)).toBeInTheDocument();
       }
     });
 
-    it('renders long SAML values as truncating chips with full-value tooltips', async () => {
-      const longSsoUrl = `https://idp.example.com/sso/${'a'.repeat(280)}`;
+    it('renders long domains as truncating chips with full-value tooltips', async () => {
+      const longDomain = `${'a'.repeat(280)}.com`;
       const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
 
       fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([
-        configuredConnection({
-          active: true,
-          samlConnection: {
-            idpSsoUrl: longSsoUrl,
-            idpEntityId: 'https://idp.example.com/entity',
-          },
-        }),
+        configuredConnection({ active: true, domains: [longDomain] }),
       ]);
       fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
         data: [{ id: 'run_1', status: 'success' }],
@@ -178,11 +164,10 @@ describe('OrganizationSecurityPage', () => {
 
       renderPage(wrapper);
 
-      const ssoLink = await screen.findByRole('link', { name: longSsoUrl });
-      expect(ssoLink).toHaveAttribute('href', longSsoUrl);
+      const domainChip = await screen.findByText(longDomain);
       // The full value stays reachable via the tooltip once the chip truncates visually.
-      expect(ssoLink).toHaveAttribute('title', longSsoUrl);
-      expect(ssoLink).toHaveStyle({ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' });
+      expect(domainChip).toHaveAttribute('title', longDomain);
+      expect(domainChip).toHaveStyle({ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' });
     });
   });
 
@@ -460,84 +445,6 @@ describe('OrganizationSecurityPage', () => {
       // The badge reads from the (unchanged) entity — no optimistic flip to roll back.
       expect(screen.getByText('Active')).toBeInTheDocument();
       expect(screen.queryByText('Inactive')).not.toBeInTheDocument();
-    });
-  });
-
-  describe('enrollment role', () => {
-    it("renders the default role's display name when the roles list is readable", async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        f.withEnterpriseSso({ selfServeSSO: true });
-        f.withEmailAddress();
-        f.withOrganizations();
-        f.withOrganizationDomains(undefined, 'org:member');
-        f.withUser({
-          email_addresses: ['test@clerk.com'],
-          organization_memberships: [
-            { name: 'Org1', permissions: ['org:sys_entconns:manage', 'org:sys_memberships:read'] },
-          ],
-        });
-      });
-
-      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
-      fixtures.clerk.organization?.getRoles.mockResolvedValue({
-        total_count: 2,
-        data: [
-          { id: 'org:admin', key: 'org:admin', name: 'Admin' },
-          { id: 'org:member', key: 'org:member', name: 'Member' },
-        ],
-      } as any);
-
-      renderPage(wrapper);
-
-      expect(
-        await screen.findByText(
-          'Anyone who signs in will be automatically added to this organization. New members will be assigned to Member.',
-        ),
-      ).toBeInTheDocument();
-    });
-
-    it('falls back to a humanized role key when the roles list is not readable', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        f.withEnterpriseSso({ selfServeSSO: true });
-        f.withEmailAddress();
-        f.withOrganizations();
-        f.withOrganizationDomains(undefined, 'org:billing_admin');
-        f.withUser({
-          email_addresses: ['test@clerk.com'],
-          organization_memberships: [{ name: 'Org1', permissions: ['org:sys_entconns:manage'] }],
-        });
-      });
-
-      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
-
-      renderPage(wrapper);
-
-      expect(
-        await screen.findByText(
-          'Anyone who signs in will be automatically added to this organization. New members will be assigned to billing admin.',
-        ),
-      ).toBeInTheDocument();
-    });
-
-    it('omits the role sentence when no default role is configured', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        f.withEnterpriseSso({ selfServeSSO: true });
-        f.withEmailAddress();
-        f.withOrganizations();
-        f.withUser({
-          email_addresses: ['test@clerk.com'],
-          organization_memberships: [{ name: 'Org1', permissions: ['org:sys_entconns:manage'] }],
-        });
-      });
-
-      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
-
-      renderPage(wrapper);
-
-      expect(
-        await screen.findByText('Anyone who signs in will be automatically added to this organization.'),
-      ).toBeInTheDocument();
-      expect(screen.queryByText(/new members will be assigned to/i)).not.toBeInTheDocument();
     });
   });
 });
