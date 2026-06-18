@@ -1046,6 +1046,7 @@ export const daDK: LocalizationResource = {
     identification_deletion_failed: 'Du kan ikke slette din sidste identifikation.',
     not_allowed_access:
       "E-mailadressen eller telefonnummeret er ikke tilladt at tilmelde sig. Dette kan skyldes brug af '+', '=', '#' eller '.' i din e-mail-adresse, ved at bruge et domæne, der er forbundet med en midlertidig e-mail-tjeneste, eller ved at blive eksplicit blokeret. Hvis du mener, at dette er en fejl, bedes du kontakte support.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,

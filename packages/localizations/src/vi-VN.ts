@@ -1067,6 +1067,7 @@ export const viVN: LocalizationResource = {
     form_username_needs_non_number_char: 'Tên người dùng của bạn phải chứa ít nhất một ký tự không phải là số.',
     identification_deletion_failed: undefined,
     not_allowed_access: undefined,
+    oauth_access_denied: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,

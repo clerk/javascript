@@ -1051,6 +1051,7 @@ export const enGB: LocalizationResource = {
     form_username_needs_non_number_char: 'Your username must contain at least one non-numeric character.',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access: undefined,
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'This is a blocked email provider domain. Please use a different one.',
     organization_domain_common: 'This is a common email provider domain. Please use a different one.',
     organization_domain_exists_for_enterprise_connection: 'This domain is already used for your organisation’s SSO',

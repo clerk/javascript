@@ -1060,6 +1060,7 @@ export const faIR: LocalizationResource = {
     form_username_needs_non_number_char: 'نام کاربری شما باید حداقل شامل یک کاراکتر غیر عددی باشد.',
     identification_deletion_failed: 'حذف شناسه ناموفق بود.',
     not_allowed_access: 'دسترسی مجاز نیست.',
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'دامنه سازمان مسدود شده است.',
     organization_domain_common: 'دامنه سازمان عمومی است و قابل قبول نیست.',
     organization_domain_exists_for_enterprise_connection: 'این دامنه برای اتصال سازمانی موجود است.',

@@ -1038,6 +1038,7 @@ export const zhTW: LocalizationResource = {
     form_username_needs_non_number_char: '您的使用者名稱必須包含至少一個非數字字元。',
     identification_deletion_failed: '您無法刪除最後一個驗證方式。',
     not_allowed_access: undefined,
+    oauth_access_denied: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,

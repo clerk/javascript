@@ -1061,6 +1061,7 @@ export const csCZ: LocalizationResource = {
     form_username_needs_non_number_char: 'Uživatelské jméno musí obsahovat alespoň jeden nečíselný znak.',
     identification_deletion_failed: 'Svůj poslední identifikační údaj nelze smazat.',
     not_allowed_access: undefined,
+    oauth_access_denied: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,

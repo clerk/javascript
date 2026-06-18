@@ -1052,6 +1052,7 @@ export const svSE: LocalizationResource = {
     identification_deletion_failed: 'Du kan inte ta bort din sista identifiering.',
     not_allowed_access:
       "Adressen eller telefonnumret du använder för registrering är inte tillåtet. Detta kan bero på att du använder '+', '=', '#' eller '.' i din e-postadress, använder en domän som är kopplad till en tidsbegränsad e-posttjänst eller har ett explicit blockerat.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'Domänen är blockerad.',
     organization_domain_common: 'Domänen är vanlig.',
     organization_domain_exists_for_enterprise_connection: undefined,

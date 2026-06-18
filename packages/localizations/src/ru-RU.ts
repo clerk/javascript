@@ -1064,6 +1064,7 @@ export const ruRU: LocalizationResource = {
     identification_deletion_failed: 'Вы не можете удалить последнюю идентификацию.',
     not_allowed_access:
       "Адрес электронной почты или номер телефона не разрешен для регистрации. Это может быть связано с использованием '+', '=', '#' или '.' в вашем адресе электронной почты, использованием домена, связанного с временной электронной почтой, или явным исключением.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'Это заблокированный домен почтового провайдера. Пожалуйста, используйте другой.',
     organization_domain_common: 'Это распространенный домен почтового провайдера. Пожалуйста, используйте другой.',
     organization_domain_exists_for_enterprise_connection: undefined,

@@ -1071,6 +1071,7 @@ export const hiIN: LocalizationResource = {
     identification_deletion_failed: 'आप अपनी अंतिम पहचान को हटा नहीं सकते।',
     not_allowed_access:
       'आपके पास इस पेज तक पहुंचने की अनुमति नहीं है। यदि आपका मानना है कि यह एक त्रुटि है, तो कृपया सहायता से संपर्क करें।',
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'यह एक ब्लॉक किया गया ईमेल प्रदाता डोमेन है। कृपया दूसरा उपयोग करें।',
     organization_domain_common: 'यह एक सामान्य ईमेल प्रदाता डोमेन है। कृपया दूसरा उपयोग करें।',
     organization_domain_exists_for_enterprise_connection:
