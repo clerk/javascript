@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.clerk.api.Clerk
-import com.clerk.api.network.model.client.Client
 import com.clerk.api.network.model.error.firstMessage
 import com.clerk.api.network.serialization.ClerkResult
 import com.clerk.api.ui.ClerkColors
@@ -169,7 +168,7 @@ class ClerkExpoModule : Module() {
                         // before resolving the configure call.
                         if (!bearerToken.isNullOrEmpty()) {
                             withTimeout(5_000L) {
-                                Clerk.sessionFlow.first { it != null }
+                                Clerk.clientFlow.first { it != null }
                             }
                         }
                     } catch (e: TimeoutCancellationException) {
@@ -230,10 +229,10 @@ class ClerkExpoModule : Module() {
 
                         try {
                             withTimeout(5_000L) {
-                                Clerk.sessionFlow.first { it != null }
+                                Clerk.clientFlow.first { it != null }
                             }
                         } catch (_: TimeoutCancellationException) {
-                            debugLog(TAG, "configure - session did not appear after reconfigure token update")
+                            debugLog(TAG, "configure - client did not appear after reconfigure token update")
                         }
                     }
 
@@ -251,13 +250,13 @@ class ClerkExpoModule : Module() {
                         debugLog(TAG, "configure - updateDeviceToken failed: ${result.error}")
                     }
 
-                    // Wait for session to appear with the new token (up to 5s)
+                    // Wait for client state to hydrate with the new token (up to 5s).
                     try {
                         withTimeout(5_000L) {
-                            Clerk.sessionFlow.first { it != null }
+                            Clerk.clientFlow.first { it != null }
                         }
                     } catch (_: TimeoutCancellationException) {
-                        debugLog(TAG, "configure - session did not appear after token update")
+                        debugLog(TAG, "configure - client did not appear after token update")
                     }
                 }
 
@@ -295,6 +294,18 @@ class ClerkExpoModule : Module() {
             try {
                 jsOriginatedClientSyncDepth += 1
                 if (!clientToken.isNullOrBlank()) {
+                    val currentDeviceToken = try {
+                        Clerk.getDeviceToken()
+                    } catch (_: Exception) {
+                        null
+                    }
+
+                    if (currentDeviceToken == clientToken) {
+                        emitSyncedClientChanged(sourceId)
+                        promise.resolve(null)
+                        return@launch
+                    }
+
                     when (val result = Clerk.updateDeviceToken(clientToken)) {
                         is ClerkResult.Failure -> {
                             promise.reject(
@@ -307,10 +318,10 @@ class ClerkExpoModule : Module() {
                         is ClerkResult.Success -> {
                             try {
                                 withTimeout(5_000L) {
-                                    Clerk.sessionFlow.first { it != null }
+                                    Clerk.clientFlow.first { it != null }
                                 }
                             } catch (_: TimeoutCancellationException) {
-                                debugLog(TAG, "syncFromJsClientToken - session did not appear after token update")
+                                debugLog(TAG, "syncFromJsClientToken - client did not appear after token update")
                             }
                             emitSyncedClientChanged(sourceId)
                             promise.resolve(null)

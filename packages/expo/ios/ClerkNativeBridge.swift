@@ -66,8 +66,8 @@ final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
       Self.configuredPublishableKey = publishableKey
       startClientObserver(reset: true)
 
-      let shouldWaitForSession = try await Self.syncTokenState(bearerToken: bearerToken)
-      await Self.waitForLoadedSessionIfNeeded(shouldWaitForSession)
+      let shouldWaitForClient = try await Self.syncTokenState(bearerToken: bearerToken)
+      await Self.waitForLoadedClientIfNeeded(shouldWaitForClient)
       Self.emitClientChangedIfReceivedToken(bearerToken)
       emitClerkNativeBridgeReady()
       return
@@ -75,8 +75,8 @@ final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
 
     if Self.clerkConfigured {
       startClientObserver()
-      let shouldWaitForSession = try await Self.syncTokenState(bearerToken: bearerToken)
-      await Self.waitForLoadedSessionIfNeeded(shouldWaitForSession)
+      let shouldWaitForClient = try await Self.syncTokenState(bearerToken: bearerToken)
+      await Self.waitForLoadedClientIfNeeded(shouldWaitForClient)
       Self.emitClientChangedIfReceivedToken(bearerToken)
       return
     }
@@ -86,8 +86,8 @@ final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
     Clerk.configure(publishableKey: publishableKey, options: Self.makeClerkOptions())
     startClientObserver()
 
-    let shouldWaitForSession = try await Self.syncTokenState(bearerToken: bearerToken)
-    await Self.waitForLoadedSessionIfNeeded(shouldWaitForSession)
+    let shouldWaitForClient = try await Self.syncTokenState(bearerToken: bearerToken)
+    await Self.waitForLoadedClientIfNeeded(shouldWaitForClient)
     Self.emitClientChangedIfReceivedToken(bearerToken)
     emitClerkNativeBridgeReady()
   }
@@ -176,19 +176,9 @@ final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
   }
 
   @MainActor
-  private static func waitForLoadedSession() async {
-    // Wait for Clerk to finish loading (cached data + API refresh).
-    // The static configure() fires off async refreshes; poll until loaded.
-    for _ in 0..<clerkLoadMaxAttempts {
-      if Clerk.shared.isLoaded && Clerk.shared.session != nil && Clerk.shared.user != nil {
-        return
-      }
-      try? await Task.sleep(nanoseconds: clerkLoadIntervalNs)
-    }
-  }
-
-  @MainActor
   private static func waitForLoadedClient() async {
+    // Wait for Clerk to finish loading client state from cached data + API refresh.
+    // The bridge sync contract is client-token based, not session based.
     for _ in 0..<clerkLoadMaxAttempts {
       if Clerk.shared.isLoaded {
         return
@@ -198,9 +188,9 @@ final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
   }
 
   @MainActor
-  private static func waitForLoadedSessionIfNeeded(_ shouldWait: Bool) async {
+  private static func waitForLoadedClientIfNeeded(_ shouldWait: Bool) async {
     guard shouldWait else { return }
-    await waitForLoadedSession()
+    await waitForLoadedClient()
   }
 
   @MainActor
@@ -262,7 +252,7 @@ final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
 
     if let token = clientToken?.trimmingCharacters(in: .whitespacesAndNewlines), !token.isEmpty {
       _ = try await Clerk.shared.updateDeviceToken(token)
-      await Self.waitForLoadedSession()
+      await Self.waitForLoadedClient()
     } else {
       _ = try await Clerk.shared.refreshClient()
       await Self.waitForLoadedClient()
