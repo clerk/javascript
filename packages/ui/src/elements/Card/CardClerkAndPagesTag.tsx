@@ -38,7 +38,7 @@ export const CardClerkAndPagesTag = React.memo(
           outerSx,
         ]}
       >
-        {withDevOverlay && <DevModeOverlay gradient={0} />}
+        {withDevOverlay && <DevModeOverlay />}
         <Col
           sx={t => ({
             gap: displayConfig.branded || withFooterPages ? t.space.$2 : 0,
