@@ -671,6 +671,74 @@ function renderPropertiesFormatTable(args) {
 }
 
 /**
+ * Resolve a property's type to the `@inline` class/interface declaration it ultimately points at,
+ * or `undefined` if the type isn't (or doesn't unwrap to) one. Unwraps `OptionalType` and a union
+ * arm — covers `T | null` / `T | undefined`. Used to decide whether to expand nested rows for a
+ * property whose type is rendered inline as `\{ … \}`.
+ *
+ * @param {import('typedoc').Type | undefined} t
+ */
+function getInlineClassOrInterfaceTarget(t) {
+  let bare = /** @type {import('typedoc').Type | undefined} */ (unwrapOptional(t));
+  if (bare && bare.type === 'union') {
+    const u = /** @type {import('typedoc').UnionType} */ (bare);
+    bare = u.types.find(arm => {
+      if (arm.type !== 'reference') return false;
+      const refl = /** @type {import('typedoc').ReferenceType} */ (arm).reflection;
+      if (!refl || !isInlineModifierWithoutStandalonePage(refl)) return false;
+      return (
+        /** @type {{ kindOf?: (k: number) => boolean }} */ (refl).kindOf?.(ReflectionKind.Class) ||
+        /** @type {{ kindOf?: (k: number) => boolean }} */ (refl).kindOf?.(ReflectionKind.Interface)
+      );
+    });
+  }
+  if (!bare || bare.type !== 'reference') return undefined;
+  const decl = /** @type {import('typedoc').ReferenceType} */ (bare).reflection;
+  if (!decl) return undefined;
+  if (!isInlineModifierWithoutStandalonePage(decl)) return undefined;
+  const d = /** @type {import('typedoc').DeclarationReflection} */ (decl);
+  if (!d.kindOf(ReflectionKind.Class) && !d.kindOf(ReflectionKind.Interface)) return undefined;
+  return d;
+}
+
+/**
+ * Append synthesized `parent.child` rows after each property whose type is an `@inline` class or
+ * interface (or `null | InlineClass`). Mirrors {@link appendUnionObjectChildPropertyRows} — the
+ * synthesized reflection inherits the child's `flags.isOptional` so the renderer appends `?` on
+ * its own, and uses `?.` as the separator when the parent is optional.
+ *
+ * @template {import('typedoc').DeclarationReflection} T
+ * @param {T[]} base
+ * @returns {T[]}
+ */
+function appendInlineObjectChildPropertyRows(base) {
+  /** @type {T[]} */
+  const out = [];
+  for (const prop of base) {
+    out.push(prop);
+    if (prop.name.includes('.')) continue;
+    const target = getInlineClassOrInterfaceTarget(prop.type);
+    if (!target) continue;
+    const children = target.children?.filter(c => c.kindOf(ReflectionKind.Property));
+    if (!children?.length) continue;
+    const sep = prop.flags?.isOptional ? '?.' : '.';
+    for (const child of children) {
+      out.push(
+        /** @type {T} */ (
+          /** @type {unknown} */ ({
+            ...child,
+            name: `${prop.name}${sep}${child.name}`,
+            getFullName: () => prop.getFullName(),
+            getFriendlyFullName: () => prop.getFriendlyFullName(),
+          })
+        ),
+      );
+    }
+  }
+  return out;
+}
+
+/**
  * Same logic as typedoc-plugin-markdown `member.typeDeclarationTable`, but **always** runs `getFlattenedDeclarations` and then {@link appendUnionObjectChildPropertyRows} (union-object arm rows like `telemetry.*`). The default plugin skips flattening in `compact` mode, which hides nested keys like `telemetry.disabled`.
  *
  * @this {import('typedoc-plugin-markdown').MarkdownThemeContext}
@@ -1105,6 +1173,20 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
           if (decl.kindOf(ReflectionKind.TypeAlias) && decl.type) {
             return removeLineBreaks(this.partials.someType(decl.type));
           }
+          // Class or interface: there's no RHS to render, but the declaration's children describe the instance shape. Inline as a type-literal `\{ key: type; … \}` so use sites surface the same fields readers would see on the standalone page. Curly braces are escaped because MDX otherwise parses the literal as a JSX expression (and the object-literal bodies we emit aren't valid JS expressions).
+          if ((decl.kindOf(ReflectionKind.Class) || decl.kindOf(ReflectionKind.Interface)) && decl.children?.length) {
+            const props = decl.children.filter(c => c.kindOf(ReflectionKind.Property));
+            if (props.length) {
+              const fields = props
+                .map(p => {
+                  const sep = p.flags?.isOptional ? '?:' : ':';
+                  const typeMd = p.type ? this.partials.someType(p.type) : '`unknown`';
+                  return `${p.name}${sep} ${typeMd};`;
+                })
+                .join(' ');
+              return removeLineBreaks(`\\{ ${fields} \\}`);
+            }
+          }
           return backTicks(decl.name);
         }
         return superPartials.referenceType.call(this, model);
@@ -1128,7 +1210,8 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
               prop => !isCallableInterfaceProperty(prop, this.helpers) && !prop.comment?.hasModifier('@extractMethods'),
             )
           : model;
-        return superPartials.propertiesTable(filtered, options);
+        const expanded = appendInlineObjectChildPropertyRows(filtered);
+        return superPartials.propertiesTable(expanded, options);
       },
       /**
        * Parameter tables: same as the stock partial except single-property inline object params are not expanded to nested rows.

@@ -57,7 +57,7 @@ export class Verification {
   }
 }
 
-/** @generateWithEmptyComment */
+/** @inline */
 export class OrganizationDomainVerification {
   constructor(
     /** The current status of the verification. */

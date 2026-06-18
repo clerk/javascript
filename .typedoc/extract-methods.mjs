@@ -381,6 +381,49 @@ function substituteGenericParamRefsInType(t, map) {
 }
 
 /**
+ * Resolve a property's type to its declared default when it references a `TypeParameter` reflection.
+ * Used when a generic alias is inlined into an intersection (e.g. `CreateParams = { … } & MetadataParams` where the `& MetadataParams` arm gets inlined as a reflection, losing the named reference) so the property table surfaces the resolved default type instead of the open type-parameter name (e.g. `TPublic` → `OrganizationPublicMetadata`).
+ *
+ * @param {import('typedoc').Type | undefined} t
+ * @returns {import('typedoc').Type | undefined}
+ */
+function substituteTypeParameterDefaultsInType(t) {
+  if (!t) {
+    return t;
+  }
+  if (/** @type {{ type?: string }} */ (t).type === 'optional' && 'elementType' in t) {
+    const el = /** @type {{ elementType: import('typedoc').Type }} */ (t).elementType;
+    const next = substituteTypeParameterDefaultsInType(el);
+    if (next && next !== el) {
+      return new OptionalType(/** @type {import('typedoc').SomeType} */ (/** @type {unknown} */ (next)));
+    }
+    return t;
+  }
+  if (t instanceof ReferenceType) {
+    const tp = /** @type {{ kindOf?: (k: number) => boolean, default?: import('typedoc').Type }} */ (t.reflection);
+    if (tp?.kindOf?.(ReflectionKind.TypeParameter) && tp.default) {
+      return tp.default;
+    }
+  }
+  return t;
+}
+
+/**
+ * Clone each property and apply `substituteTypeParameterDefaultsInType` to its type — see comment on `substituteTypeParameterDefaultsInType` for the motivating case.
+ *
+ * @param {import('typedoc').DeclarationReflection[]} children
+ */
+function substituteTypeParameterDefaultsInChildren(children) {
+  return children.map(child => {
+    const next = substituteTypeParameterDefaultsInType(child.type);
+    if (next === child.type) {
+      return child;
+    }
+    return Object.assign(Object.create(Object.getPrototypeOf(child)), child, { type: next });
+  });
+}
+
+/**
  * @param {import('typedoc').SignatureReflection} sig
  * @param {Map<string, import('typedoc').Type> | undefined} instantiationMap
  */
@@ -736,6 +779,38 @@ function pickBetterUnionPropertyCandidate(existing, candidate) {
 }
 
 /**
+ * Collect the set of string-literal keys from a type used as the second argument to `Omit` or
+ * `Pick` — a single literal (`'organizationId'`) or a union of literals (`'a' | 'b'`). Returns
+ * `undefined` if the type isn't a literal/literal-union (e.g. a `keyof` reference we can't resolve
+ * here), in which case callers should fall through to the generic-instantiation path.
+ *
+ * @param {import('typedoc').Type | undefined} t
+ * @returns {Set<string> | undefined}
+ */
+function collectLiteralStringKeys(t) {
+  if (!t) {
+    return undefined;
+  }
+  if (t.type === 'literal' && typeof (/** @type {{ value: unknown }} */ (t).value) === 'string') {
+    return new Set([/** @type {{ value: string }} */ (t).value]);
+  }
+  if (t.type === 'union') {
+    const u = /** @type {import('typedoc').UnionType} */ (t);
+    /** @type {Set<string>} */
+    const keys = new Set();
+    for (const inner of u.types) {
+      const got = collectLiteralStringKeys(inner);
+      if (!got) {
+        return undefined;
+      }
+      for (const k of got) keys.add(k);
+    }
+    return keys.size ? keys : undefined;
+  }
+  return undefined;
+}
+
+/**
  * Filter each arm to `Property` reflections and dedupe by name, returning a single sorted list
  * (or `undefined` if every arm was empty). Used for intersection / union / generic-instantiation
  * arm merges in {@link resolveDeclarationWithObjectMembers}.
@@ -774,7 +849,8 @@ function mergePropertyArms(arms, options) {
   if (byName.size === 0) {
     return undefined;
   }
-  return [...byName.values()].sort((a, b) => a.name.localeCompare(b.name));
+  const merged = [...byName.values()].sort((a, b) => a.name.localeCompare(b.name));
+  return substituteTypeParameterDefaultsInChildren(merged);
 }
 
 /**
@@ -815,6 +891,22 @@ function resolveDeclarationWithObjectMembers(t, project) {
   }
   if (t.type === 'reference') {
     const ref = /** @type {import('typedoc').ReferenceType} */ (t);
+    /**
+     * `Omit<X, K>` / `Pick<X, K>` — TypeScript built-in utilities. They have no project reflection
+     * to look up, and falling through to the generic-instantiation path below would merge K's
+     * properties (zero, since K is a literal type) without applying the filter — Omit/Pick would
+     * silently behave like an identity. Resolve `X` to its property list, then keep/drop by the
+     * literal-string keys in `K`. Without this, `Array<Omit<X, 'k'>>` shows no nested rows because
+     * `decl` is undefined.
+     */
+    if ((ref.name === 'Omit' || ref.name === 'Pick') && (ref.typeArguments?.length ?? 0) === 2) {
+      const baseChildren = resolveDeclarationWithObjectMembers(ref.typeArguments[0], project);
+      const keys = collectLiteralStringKeys(ref.typeArguments[1]);
+      if (baseChildren?.length && keys) {
+        const keep = ref.name === 'Pick' ? c => keys.has(c.name) : c => !keys.has(c.name);
+        return baseChildren.filter(keep);
+      }
+    }
     let decl =
       ref.reflection && 'kind' in ref.reflection
         ? /** @type {import('typedoc').DeclarationReflection} */ (ref.reflection)
@@ -839,7 +931,7 @@ function resolveDeclarationWithObjectMembers(t, project) {
       return mergePropertyArms([base, ...argArms]);
     }
     if (decl.children?.length) {
-      return decl.children;
+      return substituteTypeParameterDefaultsInChildren(decl.children);
     }
     if (decl.type) {
       return resolveDeclarationWithObjectMembers(decl.type, project);
@@ -882,6 +974,12 @@ function formatNestedParamNameColumn(parentParam, child) {
 function parameterTypeLinksToStandaloneMdxPage(t, ctx) {
   const bare = unwrapOptional(t);
   if (!bare) {
+    return false;
+  }
+  // `Array<NamedType>`: the standalone page documents the element shape, not the array signature.
+  // Surface both — the Type column links to the element page, and nested `params.<field>` rows
+  // flatten the element so readers don't have to navigate just to see field names.
+  if (bare.type === 'array') {
     return false;
   }
   if (bare.type === 'reference') {

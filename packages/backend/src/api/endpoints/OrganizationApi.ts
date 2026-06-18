@@ -17,7 +17,7 @@ import type { WithSign } from './util-types';
 
 const basePath = '/organizations';
 
-/** @generateWithEmptyComment */
+/** @inline */
 export type MetadataParams<TPublic = OrganizationPublicMetadata, TPrivate = OrganizationPrivateMetadata> = {
   /** Metadata that can be read from the Frontend API and [Backend API](https://clerk.com/docs/reference/backend-api){{ target: '_blank' }}, but can be set only from the Backend API. */
   publicMetadata?: TPublic;
@@ -212,22 +212,7 @@ export type CreateOrganizationInvitationParams = {
 };
 
 /** @inline */
-export type CreateBulkOrganizationInvitationParams = Array<{
-  /** The email address of the user being invited. */
-  emailAddress: string;
-  /** The [Role](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) to assign to the user. */
-  role: OrganizationMembershipRole;
-  /** The number of days until the invitation expires. Defaults to `30`. */
-  expiresInDays?: number;
-  /** The ID of the user creating the invitation. */
-  inviterUserId?: string;
-  /** Metadata that can be read and set only from the [Backend API](https://clerk.com/docs/reference/backend-api){{ target: '_blank' }}. */
-  privateMetadata?: OrganizationInvitationPrivateMetadata;
-  /** Metadata that can be read from the Frontend API and [Backend API](https://clerk.com/docs/reference/backend-api){{ target: '_blank' }}, but can be set only from the Backend API. */
-  publicMetadata?: OrganizationInvitationPublicMetadata;
-  /** The full URL or path where the user will land after accepting the invitation. */
-  redirectUrl?: string;
-}>;
+export type CreateBulkOrganizationInvitationParams = Array<Omit<CreateOrganizationInvitationParams, 'organizationId'>>;
 
 /** @generateWithEmptyComment */
 export type GetOrganizationInvitationListParams = ClerkPaginationRequest<{
@@ -274,7 +259,7 @@ export type CreateOrganizationDomainParams = {
   /** The enrollment mode that determines how matching users are added to the Organization.
    *
    * <ul>
-   *  <li>`manual_invitation`: No automatic enrollment. Users with a matching email domain are not given any [invitation](https://clerk.com/docs/guides/organizations/add-members/verified-domains#automatic-invitations) or [suggestion](https://clerk.com/docs/guides/organizations/add-members/verified-domains#automatic-suggestions); an admin must invite them manually.</li>
+   *  <li>`manual_invitation`: No automatic enrollment. Users with a matching email domain are not given any [invitation](https://clerk.com/docs/guides/organizations/add-members/verified-domains#automatic-invitations) or [suggestion](https://clerk.com/docs/guides/organizations/add-members/verified-domains#automatic-suggestions); an [admin](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions#default-roles) must invite them manually.</li>
    *  <li>`automatic_invitation`: Users with a matching email domain automatically receive a pending [invitation](https://clerk.com/docs/reference/types/organization-invitation) (assigned the Organization's default role) which they can accept to join.</li>
    *  <li>`automatic_suggestion`: Users with a matching email domain automatically receive a [suggestion](https://clerk.com/docs/guides/organizations/add-members/verified-domains#automatic-suggestions) to join, which they can request.</li>
    * </ul>
