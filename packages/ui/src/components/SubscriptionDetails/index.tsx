@@ -24,13 +24,7 @@ import { handleError } from '@/ui/utils/errorHandler';
 import { getSeatLimitAndIncludedSeatsLocalizationKey } from '@/ui/utils/billingPlanSeats';
 import { formatDate } from '@/ui/utils/formatDate';
 
-import {
-  normalizeFormatted,
-  SubscriberTypeContext,
-  usePlansContext,
-  useSubscriberTypeContext,
-  useSubscription,
-} from '../../contexts';
+import { SubscriberTypeContext, usePlansContext, useSubscriberTypeContext, useSubscription } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import {
   Button,
@@ -319,6 +313,7 @@ function SubscriptionDetailsSummary() {
     or: 'throw',
   });
   const { data: subscription } = useSubscription();
+  const { $ } = useLocalizations();
 
   if (
     // Missing nextPayment means that an upcoming subscription is for the free plan
@@ -358,7 +353,7 @@ function SubscriptionDetailsSummary() {
         />
         <LineItems.Description
           prefix={subscription.nextPayment.amount.currency}
-          text={`${subscription.nextPayment.amount.currencySymbol}${subscription.nextPayment.amount.amountFormatted}`}
+          text={$(subscription.nextPayment.amount)}
         />
       </LineItems.Group>
     </LineItems.Root>
@@ -372,6 +367,7 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
   const { setIsOpen } = useDrawerContext();
   const { revalidateAll } = usePlansContext();
   const { setSubscription, setConfirmationOpen } = useContext(SubscriptionForCancellationContext);
+  const { $ } = useLocalizations();
   const canOrgManageBilling = useProtect(has => has({ permission: 'org:sys_billing:manage' }));
   const canManageBilling = subscriberType === 'user' || canOrgManageBilling;
 
@@ -413,15 +409,13 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
               subscription.planPeriod === 'month'
                 ? localizationKeys('billing.switchToAnnualWithAnnualPrice', {
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    price: normalizeFormatted(subscription.plan.annualFee!.amountFormatted),
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    currency: subscription.plan.annualFee!.currencySymbol,
+                    price: $(subscription.plan.annualFee!, { style: 'short' }),
+                    currency: '',
                   })
                 : localizationKeys('billing.switchToMonthlyWithPrice', {
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    price: normalizeFormatted(subscription.plan.fee!.amountFormatted),
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    currency: subscription.plan.fee!.currencySymbol,
+                    price: $(subscription.plan.fee!, { style: 'short' }),
+                    currency: '',
                   }),
             onClick: () => {
               openCheckout({
@@ -469,6 +463,7 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
     canManageBilling,
     isReSubscribable,
     setConfirmationOpen,
+    $,
   ]);
 
   if (actions.length === 0) {
@@ -509,7 +504,7 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
 
 // New component for individual subscription cards
 const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionItemResource }) => {
-  const { t } = useLocalizations();
+  const { t, $ } = useLocalizations();
   const subItemSeatsQty = subscription.seats?.quantity;
   const firstPaidSeatTier = subscription.seats?.tiers?.find(tier => tier.total.amount > 0);
   const monthLabel = t(localizationKeys('billing.month')).toLowerCase();
@@ -581,8 +576,7 @@ const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionI
                   textTransform: 'lowercase',
                 })}
               >
-                {fee.currencySymbol}
-                {fee.amountFormatted}
+                {$(fee)}
               </Text>
               <Text
                 variant='body'
@@ -639,7 +633,7 @@ const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionI
                   {t(
                     localizationKeys('organizationProfile.billingPage.subscriptionsListSection.paidSeatsUsage', {
                       seatsQuantity: firstPaidSeatTier.quantity,
-                      amount: `${firstPaidSeatTier.feePerBlock.currencySymbol}${firstPaidSeatTier.feePerBlock.amountFormatted} / ${monthLabel}`,
+                      amount: `${$(firstPaidSeatTier.feePerBlock)} / ${monthLabel}`,
                     }),
                   )}
                 </Text>
