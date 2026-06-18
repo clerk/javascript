@@ -3,12 +3,7 @@ import type { ThemableCssProp } from '@/ui/styledSystem';
 import { Box, Text } from '../customizables';
 import { useDevMode } from '../hooks/useDevMode';
 
-type DevModeOverlayProps = {
-  gradient?: number;
-};
-
-export const DevModeOverlay = (props: DevModeOverlayProps) => {
-  const { gradient = 60 } = props;
+export const DevModeOverlay = () => {
   const { showDevModeNotice } = useDevMode();
 
   if (!showDevModeNotice) {
@@ -20,10 +15,12 @@ export const DevModeOverlay = (props: DevModeOverlayProps) => {
       sx={t => ({
         userSelect: 'none',
         pointerEvents: 'none',
-        inset: 0,
+        insetInline: 0,
+        bottom: 0,
         position: 'absolute',
-        background: `repeating-linear-gradient(-45deg,${t.colors.$warningAlpha100},${t.colors.$warningAlpha100} 6px,${t.colors.$warningAlpha150} 6px,${t.colors.$warningAlpha150} 12px)`,
-        maskImage: `linear-gradient(transparent ${gradient}%, black)`,
+        backgroundColor: t.colors.$warning500,
+        height: 1,
+        maskImage: `linear-gradient(to right, transparent, black 60%, transparent)`,
       })}
     />
   );
