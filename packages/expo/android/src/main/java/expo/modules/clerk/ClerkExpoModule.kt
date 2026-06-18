@@ -73,8 +73,13 @@ class ClerkExpoModule : Module() {
             getClientToken(promise)
         }
 
-        AsyncFunction("syncFromJsClientToken") { clientToken: String?, sourceId: String?, promise: Promise ->
-            syncFromJsClientToken(clientToken, sourceId, promise)
+        AsyncFunction("syncFromJsClientToken") { clientToken: String?, sourceId: String?, shouldRefreshClient: Boolean?, promise: Promise ->
+            syncFromJsClientToken(
+                clientToken,
+                sourceId,
+                shouldRefreshClient ?: clientToken.isNullOrBlank(),
+                promise
+            )
         }
     }
 
@@ -169,7 +174,7 @@ class ClerkExpoModule : Module() {
                         // before resolving the configure call.
                         if (!bearerToken.isNullOrEmpty()) {
                             withTimeout(5_000L) {
-                                Clerk.sessionFlow.first { it != null }
+                                Clerk.clientFlow.first { it != null }
                             }
                         }
                     } catch (e: TimeoutCancellationException) {
@@ -230,10 +235,10 @@ class ClerkExpoModule : Module() {
 
                         try {
                             withTimeout(5_000L) {
-                                Clerk.sessionFlow.first { it != null }
+                                Clerk.clientFlow.first { it != null }
                             }
                         } catch (_: TimeoutCancellationException) {
-                            debugLog(TAG, "configure - session did not appear after reconfigure token update")
+                            debugLog(TAG, "configure - client did not appear after reconfigure token update")
                         }
                     }
 
@@ -251,13 +256,13 @@ class ClerkExpoModule : Module() {
                         debugLog(TAG, "configure - updateDeviceToken failed: ${result.error}")
                     }
 
-                    // Wait for session to appear with the new token (up to 5s)
+                    // Wait for client state to hydrate with the new token (up to 5s).
                     try {
                         withTimeout(5_000L) {
-                            Clerk.sessionFlow.first { it != null }
+                            Clerk.clientFlow.first { it != null }
                         }
                     } catch (_: TimeoutCancellationException) {
-                        debugLog(TAG, "configure - session did not appear after token update")
+                        debugLog(TAG, "configure - client did not appear after token update")
                     }
                 }
 
@@ -285,7 +290,12 @@ class ClerkExpoModule : Module() {
 
     // MARK: - syncFromJsClientToken
 
-    private fun syncFromJsClientToken(clientToken: String?, sourceId: String?, promise: Promise) {
+    private fun syncFromJsClientToken(
+        clientToken: String?,
+        sourceId: String?,
+        shouldRefreshClient: Boolean,
+        promise: Promise
+    ) {
         if (!Clerk.isInitialized.value) {
             promise.resolve(null)
             return
@@ -295,43 +305,65 @@ class ClerkExpoModule : Module() {
             try {
                 jsOriginatedClientSyncDepth += 1
                 if (!clientToken.isNullOrBlank()) {
-                    when (val result = Clerk.updateDeviceToken(clientToken)) {
-                        is ClerkResult.Failure -> {
-                            promise.reject(
-                                "E_SYNC_FROM_JS_FAILED",
-                                result.error?.firstMessage() ?: result.throwable?.message ?: "Client token sync failed",
-                                null
-                            )
-                            return@launch
-                        }
-                        is ClerkResult.Success -> {
-                            try {
-                                withTimeout(5_000L) {
-                                    Clerk.sessionFlow.first { it != null }
-                                }
-                            } catch (_: TimeoutCancellationException) {
-                                debugLog(TAG, "syncFromJsClientToken - session did not appear after token update")
-                            }
+                    val currentDeviceToken = try {
+                        Clerk.getDeviceToken()
+                    } catch (_: Exception) {
+                        null
+                    }
+
+                    if (currentDeviceToken == clientToken) {
+                        if (!shouldRefreshClient) {
                             emitSyncedClientChanged(sourceId)
                             promise.resolve(null)
                             return@launch
                         }
+                    } else {
+                        when (val result = Clerk.updateDeviceToken(clientToken)) {
+                            is ClerkResult.Failure -> {
+                                promise.reject(
+                                    "E_SYNC_FROM_JS_FAILED",
+                                    result.error?.firstMessage() ?: result.throwable?.message ?: "Client token sync failed",
+                                    null
+                                )
+                                return@launch
+                            }
+                            is ClerkResult.Success -> {
+                                try {
+                                    withTimeout(5_000L) {
+                                        Clerk.clientFlow.first { it != null }
+                                    }
+                                } catch (_: TimeoutCancellationException) {
+                                    debugLog(TAG, "syncFromJsClientToken - client did not appear after token update")
+                                }
+                                if (!shouldRefreshClient) {
+                                    emitSyncedClientChanged(sourceId)
+                                    promise.resolve(null)
+                                    return@launch
+                                }
+                            }
+                        }
                     }
                 }
 
-                when (val result = Clerk.refreshClient()) {
-                    is ClerkResult.Failure -> {
-                        promise.reject(
-                            "E_SYNC_FROM_JS_FAILED",
-                            result.error?.firstMessage() ?: result.throwable?.message ?: "Client refresh failed",
-                            null
-                        )
+                if (shouldRefreshClient) {
+                    when (val result = Clerk.refreshClient()) {
+                        is ClerkResult.Failure -> {
+                            promise.reject(
+                                "E_SYNC_FROM_JS_FAILED",
+                                result.error?.firstMessage() ?: result.throwable?.message ?: "Client refresh failed",
+                                null
+                            )
+                        }
+                        is ClerkResult.Success -> {
+                            emitSyncedClientChanged(sourceId)
+                            promise.resolve(null)
+                        }
                     }
-                    is ClerkResult.Success -> {
-                        emitSyncedClientChanged(sourceId)
-                        promise.resolve(null)
-                    }
+                    return@launch
                 }
+
+                emitSyncedClientChanged(sourceId)
+                promise.resolve(null)
             } catch (e: Exception) {
                 promise.reject("E_SYNC_FROM_JS_FAILED", e.message ?: "Client token sync failed", e)
             } finally {

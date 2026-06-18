@@ -13,6 +13,7 @@ RCT_EXTERN_METHOD(getClientToken:(RCTPromiseResolveBlock)resolve
 
 RCT_EXTERN_METHOD(syncFromJsClientToken:(id)clientToken
                   sourceId:(id)sourceId
+                  shouldRefreshClient:(id)shouldRefreshClient
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 

@@ -31,7 +31,7 @@ public protocol ClerkNativeBridgeProtocol {
   // SDK operations
   func configure(publishableKey: String, bearerToken: String?) async throws
   func getClientToken() async -> String?
-  func syncFromJsClientToken(_ clientToken: String?, sourceId: String?) async throws
+  func syncFromJsClientToken(_ clientToken: String?, sourceId: String?, shouldRefreshClient: Bool) async throws
 }
 
 public protocol ClerkNativeBridgeReadyObserver: AnyObject {
@@ -154,6 +154,7 @@ class ClerkExpoModule: RCTEventEmitter {
 
   @objc func syncFromJsClientToken(_ clientToken: Any?,
                                    sourceId: Any?,
+                                   shouldRefreshClient: Any?,
                                    resolve: @escaping RCTPromiseResolveBlock,
                                    reject: @escaping RCTPromiseRejectBlock) {
     guard let bridge = clerkNativeBridge else {
@@ -163,9 +164,15 @@ class ClerkExpoModule: RCTEventEmitter {
 
     let normalizedClientToken = clientToken as? String
     let normalizedSourceId = sourceId as? String
+    let defaultShouldRefreshClient = normalizedClientToken?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true
+    let normalizedShouldRefreshClient = (shouldRefreshClient as? Bool) ?? defaultShouldRefreshClient
     Task {
       do {
-        try await bridge.syncFromJsClientToken(normalizedClientToken, sourceId: normalizedSourceId)
+        try await bridge.syncFromJsClientToken(
+          normalizedClientToken,
+          sourceId: normalizedSourceId,
+          shouldRefreshClient: normalizedShouldRefreshClient
+        )
         resolve(nil)
       } catch {
         reject("E_SYNC_FROM_JS_FAILED", error.localizedDescription, error)

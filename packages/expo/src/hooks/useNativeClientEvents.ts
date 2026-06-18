@@ -32,6 +32,18 @@ type RefreshClientEventEmitter = {
   ) => RefreshClientEventSubscription;
 };
 
+function getNativeClientEventEmitter(): RefreshClientEventEmitter | null {
+  if (Platform.OS === 'ios') {
+    return DeviceEventEmitter;
+  }
+
+  if (ClerkExpo && typeof ClerkExpo.addListener === 'function') {
+    return ClerkExpo as RefreshClientEventEmitter;
+  }
+
+  return null;
+}
+
 /**
  * Listens for native client events that should sync JS client state.
  */
@@ -46,8 +58,11 @@ export function useNativeClientEvents(): UseNativeClientEventsReturn {
     let subscription: { remove: () => void } | null = null;
 
     try {
-      const eventEmitter: RefreshClientEventEmitter =
-        Platform.OS === 'ios' ? DeviceEventEmitter : (ClerkExpo as RefreshClientEventEmitter);
+      const eventEmitter = getNativeClientEventEmitter();
+
+      if (!eventEmitter) {
+        return;
+      }
 
       subscription = eventEmitter.addListener(nativeClientChangedEvent, snapshot => {
         setNativeClientEvent({ issuedAt: Date.now(), ...snapshot });

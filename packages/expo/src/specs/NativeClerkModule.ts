@@ -7,7 +7,11 @@ export interface Spec extends TurboModule {
   addListener(eventName: string): void;
   configure(publishableKey: string, bearerToken: string | null): Promise<void>;
   getClientToken(): Promise<string | null>;
-  syncFromJsClientToken(clientToken: string | null, sourceId: string | null): Promise<void>;
+  syncFromJsClientToken(
+    clientToken: string | null,
+    sourceId: string | null,
+    shouldRefreshClient?: boolean,
+  ): Promise<void>;
   // Required by NativeEventEmitter for internal native client change events.
   // This is not part of the public @clerk/expo API.
   removeListeners(count: number): void;
