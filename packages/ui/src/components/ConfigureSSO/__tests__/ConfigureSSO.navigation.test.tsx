@@ -225,4 +225,30 @@ describe('ConfigureSSO wizard navigation (integration)', () => {
       expect(queryByText(/at least one successful test run/i)).not.toBeInTheDocument();
     });
   });
+
+  // The labelled steps surface in the stepper under their renamed labels, and an
+  // active connection short-circuits to the (reachable) activate step.
+  it('renders the renamed stepper labels and reaches the activate step', async () => {
+    const { wrapper, fixtures } = await createFixtures(withAdminOrgUser);
+
+    fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([
+      { ...configuredConnection, id: 'ent_active', active: true } as any,
+    ]);
+    fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
+      data: [],
+      total_count: 0,
+    } as any);
+    mockVerifiedDomains(fixtures);
+
+    const { findByText, getByText } = render(<ConfigureSSO />, { wrapper });
+
+    // The activate step body renders (active connection short-circuits to the already-active variant).
+    await findByText(/sso connection is active/i);
+
+    // The stepper carries the renamed labels (select-provider stays unlabelled).
+    expect(getByText('Domains')).toBeInTheDocument();
+    expect(getByText('Connection')).toBeInTheDocument();
+    expect(getByText('Test')).toBeInTheDocument();
+    expect(getByText('Activate')).toBeInTheDocument();
+  });
 });
