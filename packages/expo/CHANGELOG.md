@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.4.6
+
+### Patch Changes
+
+- Fixes iOS builds for Expo apps by explicitly declaring the native Google Sign-In module's dependency on ExpoModulesCore. ([#8911](https://github.com/clerk/javascript/pull/8911)) by [@mikepitre](https://github.com/mikepitre)
+
 ## 3.4.5
 
 ### Patch Changes
