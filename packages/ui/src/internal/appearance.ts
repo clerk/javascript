@@ -753,14 +753,12 @@ export type ElementsConfig = {
   configureSSOTestRunParsedUserInfo: WithOptions;
   configureSSOTestError: WithOptions;
 
-  configureSSOConfirmationStatusBadge: WithOptions<string>;
-  configureSSOConfirmationDomainLink: WithOptions;
-  configureSSOConfirmationConfigDetailsLabel: WithOptions;
-  configureSSOConfirmationConfigDetailsValue: WithOptions;
-  configureSSOConfirmationConfigDetailsLink: WithOptions;
-  configureSSOConfirmationInactiveBanner: WithOptions;
-  configureSSOConfirmationReconfigureButton: WithOptions;
-  configureSSOConfirmationResetButton: WithOptions;
+  configureSSOActivate: WithOptions;
+  configureSSOActivateIcon: WithOptions;
+  configureSSOActivateTitle: WithOptions;
+  configureSSOActivateSubtitle: WithOptions;
+  configureSSOActivateButton: WithOptions;
+  configureSSOActivateSkipButton: WithOptions;
 
   configureSSOResetConnectionDialog: WithOptions;
   configureSSOResetConnectionDialogCancelButton: WithOptions;
