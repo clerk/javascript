@@ -1,5 +1,12 @@
 # Change Log
 
+## 7.5.5
+
+### Patch Changes
+
+- Updated dependencies [[`fb11e32`](https://github.com/clerk/javascript/commit/fb11e32c0945423cc392586662a0b1a2beec4635)]:
+  - @clerk/react@6.10.2
+
 ## 7.5.4
 
 ### Patch Changes
