@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { formatAmount } from '../useCurrencyFormatter';
 
@@ -69,5 +69,27 @@ describe('formatAmount', () => {
     };
 
     expect(formatAmount('en-US', amount, { style: 'short' })).toBe('$0');
+  });
+
+  it('falls back to naive formatting when Intl.NumberFormat throws', () => {
+    const amount = {
+      amount: 1000,
+      currency: 'USD',
+      // these values are specifically wrong to assert it's using them as fallbacks
+      amountFormatted: '99.99',
+      currencySymbol: '_',
+    };
+
+    const spy = vi.spyOn(Intl, 'NumberFormat').mockImplementation(() => {
+      throw new Error('Intl unavailable');
+    });
+
+    try {
+      // specifically using a locale not used in other tests to force the creation of a new instance of NumberFormat
+      expect(formatAmount('en-XA', amount)).toBe('_99.99');
+      expect(spy).toHaveBeenCalledTimes(1);
+    } finally {
+      spy.mockRestore();
+    }
   });
 });
