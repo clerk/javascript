@@ -40,3 +40,5 @@ export { SignInWithMetamaskButton } from './SignInWithMetamaskButton';
 export { SignOutButton } from './SignOutButton';
 export { SignUpButton } from './SignUpButton';
 export { HandleSSOCallback } from './HandleSSOCallback';
+export { Handoff } from './Handoff';
+export type { HandoffProps } from './Handoff';
