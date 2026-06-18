@@ -80,6 +80,18 @@ export const BACKEND_API_CONFIG = {
     symbol: 'DomainAPI',
     declarationHint: 'api/endpoints/DomainApi',
   },
+  'backend/session-api/session-api.mdx': {
+    symbol: 'SessionAPI',
+    declarationHint: 'api/endpoints/SessionApi',
+  },
+  'backend/client-api/client-api.mdx': {
+    symbol: 'ClientAPI',
+    declarationHint: 'api/endpoints/ClientApi',
+  },
+  'backend/invitation-api/invitation-api.mdx': {
+    symbol: 'InvitationAPI',
+    declarationHint: 'api/endpoints/InvitationApi',
+  },
 };
 
 /** Stable iteration order matches key order in {@link REFERENCE_OBJECT_CONFIG} then {@link BACKEND_API_CONFIG}. */

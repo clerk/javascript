@@ -40,9 +40,7 @@ export type SignInStatus = 'needs_identifier' | 'needs_factor_one' | 'needs_fact
 
 export type SignUpVerificationNextAction = 'needs_prepare' | 'needs_attempt' | '';
 
-/**
- * @inline
- */
+/** @inline */
 export type InvitationStatus = 'pending' | 'accepted' | 'revoked' | 'expired';
 
 export const DomainsEnrollmentModes = {
