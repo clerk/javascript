@@ -171,6 +171,9 @@ export type __internal_LocalizationResource = {
   footerPageLink__terms: LocalizationValue;
   paginationButton__previous: LocalizationValue;
   paginationButton__next: LocalizationValue;
+  identityPreviewEditButton__emailAddress: LocalizationValue;
+  identityPreviewEditButton__phoneNumber: LocalizationValue;
+  identityPreviewEditButton__identifier: LocalizationValue;
   paginationRowText__displaying: LocalizationValue;
   paginationRowText__of: LocalizationValue;
   membershipRole__admin: LocalizationValue;

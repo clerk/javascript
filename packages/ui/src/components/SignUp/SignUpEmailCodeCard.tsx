@@ -48,6 +48,7 @@ export const SignUpEmailCodeCard = () => {
         cardSubtitle={localizationKeys('signUp.emailCode.subtitle')}
         inputLabel={localizationKeys('signUp.emailCode.formSubtitle')}
         resendButton={localizationKeys('signUp.emailCode.resendButton')}
+        identityPreviewEditButtonAriaLabel={localizationKeys('identityPreviewEditButton__emailAddress')}
         prepare={prepare}
         attempt={attempt}
         safeIdentifier={signUp.emailAddress}
