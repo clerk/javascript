@@ -35,6 +35,7 @@ export const CaptchaElement = ({
   // The observer is set up once (`[]` deps), so it reads the latest callback through a ref.
   const onInteractiveChangeRef = useRef(onInteractiveChange);
   onInteractiveChangeRef.current = onInteractiveChange;
+  const isInteractiveRef = useRef(false);
   const { parsedCaptcha } = useAppearance();
   const { locale } = useLocalizations();
   const captchaTheme = parsedCaptcha?.theme;
@@ -66,8 +67,11 @@ export const CaptchaElement = ({
           // rather than the literal `'0'` — otherwise the collapse reads as a non-`'0'` string and the
           // spotlight stays stuck (blank card) after the challenge resolves.
           const nowInteractive = parseFloat(maxHeightValueRef.current) > 0 || maxHeightValueRef.current === 'unset';
-          setIsInteractive(nowInteractive);
-          onInteractiveChangeRef.current?.(nowInteractive);
+          if (nowInteractive !== isInteractiveRef.current) {
+            isInteractiveRef.current = nowInteractive;
+            setIsInteractive(nowInteractive);
+            onInteractiveChangeRef.current?.(nowInteractive);
+          }
         }
       });
     });

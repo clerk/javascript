@@ -551,37 +551,29 @@ describe('SignUpStart', () => {
       render(<SignUpStart />, { wrapper });
       expect(document.getElementById(CAPTCHA_ELEMENT_ID)).not.toBeNull();
     });
-  });
 
-  describe('Captcha spotlight', () => {
-    // The ticket tests above mutate window.location and don't restore it; reset to a clean URL.
-    beforeEach(() => {
-      Object.defineProperty(window, 'location', {
-        writable: true,
-        value: new URL('http://localhost/sign-up'),
+    describe('spotlight', () => {
+      const getCaptcha = () => document.getElementById(CAPTCHA_ELEMENT_ID) as HTMLElement;
+
+      it('inerts the form/social subtree while interactive — never the captcha or header — and restores', async () => {
+        const { wrapper } = await createFixtures(f => {
+          f.withEmailAddress({ required: true });
+          f.withSocialProvider({ provider: 'google' });
+        });
+        render(<SignUpStart />, { wrapper });
+
+        const google = screen.getByText(/continue with google/i);
+        expect(google.closest('[inert]')).toBeNull();
+
+        simulateCaptchaInteractive(getCaptcha());
+
+        await waitFor(() => expect(google.closest('[inert]')).not.toBeNull());
+        expect(getCaptcha().closest('[inert]')).toBeNull();
+        expect(screen.getByRole('heading').closest('[inert]')).toBeNull();
+
+        simulateCaptchaResolved(getCaptcha());
+        await waitFor(() => expect(google.closest('[inert]')).toBeNull());
       });
-    });
-
-    const getCaptcha = () => document.getElementById(CAPTCHA_ELEMENT_ID) as HTMLElement;
-
-    it('inerts the form/social subtree while interactive — never the captcha or header — and restores', async () => {
-      const { wrapper } = await createFixtures(f => {
-        f.withEmailAddress({ required: true });
-        f.withSocialProvider({ provider: 'google' });
-      });
-      render(<SignUpStart />, { wrapper });
-
-      const google = screen.getByText(/continue with google/i);
-      expect(google.closest('[inert]')).toBeNull();
-
-      simulateCaptchaInteractive(getCaptcha());
-
-      await waitFor(() => expect(google.closest('[inert]')).not.toBeNull());
-      expect(getCaptcha().closest('[inert]')).toBeNull();
-      expect(screen.getByRole('heading').closest('[inert]')).toBeNull();
-
-      simulateCaptchaResolved(getCaptcha());
-      await waitFor(() => expect(google.closest('[inert]')).toBeNull());
     });
   });
 });
