@@ -222,7 +222,7 @@ const FooterReset = (): JSX.Element | null => {
         size='sm'
         colorScheme='danger'
         onClick={() => setIsOpen(true)}
-        localizationKey={localizationKeys('configureSSO.confirmation.resetSection.title')}
+        localizationKey={localizationKeys('configureSSO.resetConnectionDialog.resetButton')}
         sx={{ marginInlineEnd: 'auto' }}
       />
       <ResetConnectionDialog
