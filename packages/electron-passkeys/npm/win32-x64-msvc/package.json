@@ -13,9 +13,6 @@
   "files": [
     "electron-passkeys.win32-x64-msvc.node"
   ],
-  "engines": {
-    "node": ">=24.15.0"
-  },
   "os": [
     "win32"
   ],

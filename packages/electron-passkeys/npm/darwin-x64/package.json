@@ -13,9 +13,6 @@
   "files": [
     "electron-passkeys.darwin-x64.node"
   ],
-  "engines": {
-    "node": ">=24.15.0"
-  },
   "os": [
     "darwin"
   ],
