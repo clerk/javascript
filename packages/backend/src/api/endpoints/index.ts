@@ -9,6 +9,7 @@ export * from './BlocklistIdentifierApi';
 export * from './ClientApi';
 export * from './DomainApi';
 export * from './EmailAddressApi';
+export * from './EmailApi';
 export * from './EnterpriseConnectionApi';
 export * from './IdPOAuthAccessTokenApi';
 export * from './InstanceApi';

@@ -9,6 +9,7 @@ import {
   ClientAPI,
   DomainAPI,
   EmailAddressAPI,
+  EmailApi,
   EnterpriseConnectionAPI,
   IdPOAuthAccessTokenApi,
   InstanceAPI,
@@ -71,6 +72,12 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     clients: new ClientAPI(request),
     domains: new DomainAPI(request),
     emailAddresses: new EmailAddressAPI(request),
+    /**
+     * @experimental This calls an internal, not-yet-public endpoint for sending
+     * transactional emails and is subject to change. It is advised to
+     * [pin](https://clerk.com/docs/pinning) the SDK version to avoid breaking changes.
+     */
+    emails: new EmailApi(request),
     enterpriseConnections: new EnterpriseConnectionAPI(request),
     idPOAuthAccessToken: new IdPOAuthAccessTokenApi(
       buildRequest({
