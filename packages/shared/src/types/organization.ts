@@ -10,7 +10,12 @@ import type {
   EnterpriseConnectionTestRunResource,
   GetEnterpriseConnectionTestRunsParams,
 } from './enterpriseConnectionTestRun';
-import type { OrganizationDomainResource, OrganizationEnrollmentMode } from './organizationDomain';
+import type {
+  CreateOrganizationDomainParams,
+  OrganizationDomainResource,
+  OrganizationDomainsBulkOwnershipVerificationResource,
+  OrganizationEnrollmentMode,
+} from './organizationDomain';
 import type { OrganizationInvitationResource, OrganizationInvitationStatus } from './organizationInvitation';
 import type { OrganizationCustomRoleKey, OrganizationMembershipResource } from './organizationMembership';
 import type { OrganizationMembershipRequestResource } from './organizationMembershipRequest';
@@ -169,8 +174,29 @@ export interface OrganizationResource extends ClerkResource, BillingPayerMethods
    * > [!WARNING]
    * > You must have [**Verified domains**](https://clerk.com/docs/guides/organizations/add-members/verified-domains) enabled in your app's settings in the Clerk Dashboard.
    * @param domainName - The name of the domain to create.
+   * @param params - Optional parameters, including the `enrollmentMode` to assign to the new domain.
    */
-  createDomain: (domainName: string) => Promise<OrganizationDomainResource>;
+  createDomain: (
+    domainName: string,
+    params?: Pick<CreateOrganizationDomainParams, 'enrollmentMode'>,
+  ) => Promise<OrganizationDomainResource>;
+  /**
+   * Issues a fresh TXT challenge for each of the given domains in a single
+   * request. Each resolved domain's `ownershipVerification` carries the
+   * `txtRecordName` and `txtRecordValue` the org admin must publish. A single
+   * bad domain does not fail the batch; it lands in `errors`.
+   * @returns An [`OrganizationDomainsBulkOwnershipVerificationResource`](https://clerk.com/docs/reference/types/organization-domains-bulk-ownership-verification-resource) object.
+   * @param domainIds - The unique identifiers of the domains to prepare.
+   */
+  prepareOwnershipVerification: (domainIds: string[]) => Promise<OrganizationDomainsBulkOwnershipVerificationResource>;
+  /**
+   * Resolves the published TXT record for each of the given domains in a single
+   * request to complete ownership verification. A single bad domain does not
+   * fail the batch; it lands in `errors`.
+   * @returns An [`OrganizationDomainsBulkOwnershipVerificationResource`](https://clerk.com/docs/reference/types/organization-domains-bulk-ownership-verification-resource) object.
+   * @param domainIds - The unique identifiers of the domains to attempt.
+   */
+  attemptOwnershipVerification: (domainIds: string[]) => Promise<OrganizationDomainsBulkOwnershipVerificationResource>;
   /**
    * Gets a domain for an Organization based on the given domain ID.
    * @returns An [`OrganizationDomainResource`](https://clerk.com/docs/reference/types/organization-domain-resource) object.

@@ -1,4 +1,9 @@
-import type { EmailAddressResource, EnterpriseConnectionResource, UserResource } from '@clerk/shared/types';
+import type {
+  EmailAddressResource,
+  EnterpriseConnectionResource,
+  OrganizationDomainResource,
+  UserResource,
+} from '@clerk/shared/types';
 
 import type { ProviderType } from '../types';
 
@@ -23,7 +28,6 @@ export const connectionBackingEmail = (user: UserResource | null | undefined): E
 export interface OrganizationEnterpriseConnectionInput {
   /** FAPI currently supports a single connection per organization. */
   connection: EnterpriseConnectionResource | null | undefined;
-  primaryEmail: EmailAddressResource | null | undefined;
   /** Probed upstream — not a property of the connection resource itself. */
   hasSuccessfulTestRun: boolean;
 }
@@ -40,7 +44,6 @@ export interface OrganizationEnterpriseConnection {
   readonly hasConnection: boolean;
   readonly isActive: boolean;
   readonly hasMinimumConfiguration: boolean;
-  readonly isPrimaryEmailVerified: boolean;
   readonly hasSuccessfulTestRun: boolean;
   readonly status: OrganizationEnterpriseConnectionStatus;
 }
@@ -49,6 +52,9 @@ export interface OrganizationEnterpriseConnection {
 export const isEnterpriseConnectionConfigured = (
   connection: EnterpriseConnectionResource | null | undefined,
 ): boolean => Boolean(connection?.samlConnection?.idpSsoUrl && connection?.samlConnection?.idpEntityId);
+
+export const areAllOrganizationDomainsVerified = (domains: OrganizationDomainResource[] | null | undefined): boolean =>
+  !!domains?.length && domains.every(domain => domain.ownershipVerification?.status === 'verified');
 
 const connectionStatus = ({
   hasConnection,
@@ -73,7 +79,6 @@ const connectionStatus = ({
 
 export const organizationEnterpriseConnection = ({
   connection,
-  primaryEmail,
   hasSuccessfulTestRun,
 }: OrganizationEnterpriseConnectionInput): OrganizationEnterpriseConnection => {
   const hasConnection = Boolean(connection);
@@ -85,7 +90,6 @@ export const organizationEnterpriseConnection = ({
     hasConnection,
     isActive,
     hasMinimumConfiguration,
-    isPrimaryEmailVerified: primaryEmail?.verification?.status === 'verified',
     hasSuccessfulTestRun,
     status: connectionStatus({ hasConnection, isActive, hasMinimumConfiguration, hasSuccessfulTestRun }),
   };

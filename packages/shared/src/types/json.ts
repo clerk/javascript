@@ -19,7 +19,11 @@ import type { ClerkAPIErrorJSON } from './errors';
 import type { EmailAddressIdentifier, UsernameIdentifier } from './identifiers';
 import type { ActClaim } from './jwtv2';
 import type { OAuthProvider } from './oauth';
-import type { OrganizationDomainVerificationStatus, OrganizationEnrollmentMode } from './organizationDomain';
+import type {
+  OrganizationDomainOwnershipVerificationStrategy,
+  OrganizationDomainVerificationStatus,
+  OrganizationEnrollmentMode,
+} from './organizationDomain';
 import type { OrganizationInvitationStatus } from './organizationInvitation';
 import type { OrganizationCustomRoleKey, OrganizationPermissionKey } from './organizationMembership';
 import type { OrganizationSettingsJSON } from './organizationSettings';
@@ -427,6 +431,27 @@ export interface OrganizationDomainVerificationJSON {
   strategy: 'email_code'; // only available value for now
   attempts: number;
   expires_at: number;
+  verified_at?: number | null;
+}
+
+export interface OrganizationDomainOwnershipVerificationJSON {
+  status: OrganizationDomainVerificationStatus;
+  strategy: OrganizationDomainOwnershipVerificationStrategy;
+  attempts: number | null;
+  expire_at: number | null;
+  verified_at: number | null;
+  /**
+   * Present only on ownership verification responses immediately after
+   * `prepare_ownership_verification`. The fully qualified DNS name the org admin
+   * must publish the TXT record under.
+   */
+  txt_record_name?: string | null;
+  /**
+   * Present only on ownership verification responses immediately after
+   * `prepare_ownership_verification`. The exact value the org admin must publish
+   * in the TXT record.
+   */
+  txt_record_value?: string | null;
 }
 
 export interface OrganizationDomainJSON extends ClerkResourceJSON {
@@ -435,12 +460,37 @@ export interface OrganizationDomainJSON extends ClerkResourceJSON {
   name: string;
   organization_id: string;
   enrollment_mode: OrganizationEnrollmentMode;
+  /**
+   * @deprecated Use `affiliation_verification` instead.
+   */
   verification: OrganizationDomainVerificationJSON | null;
+  affiliation_verification: OrganizationDomainVerificationJSON | null;
+  ownership_verification: OrganizationDomainOwnershipVerificationJSON | null;
   affiliation_email_address: string | null;
   created_at: number;
   updated_at: number;
   total_pending_invitations: number;
   total_pending_suggestions: number;
+}
+
+/**
+ * A per-domain failure entry returned by the bulk ownership verification
+ * endpoints, carrying the `organization_domain_id` and the API error code that
+ * caused it to be skipped.
+ */
+export interface OrganizationDomainBulkOwnershipVerificationErrorJSON {
+  id: string;
+  code: string;
+}
+
+/**
+ * Partial-success payload returned by the bulk `prepare`/`attempt`
+ * ownership verification endpoints. Each requested domain id lands in either
+ * `data` (with its current ownership state) or `errors`.
+ */
+export interface OrganizationDomainsBulkOwnershipVerificationJSON {
+  data: OrganizationDomainJSON[];
+  errors: OrganizationDomainBulkOwnershipVerificationErrorJSON[];
 }
 
 export interface RoleJSON extends ClerkResourceJSON {

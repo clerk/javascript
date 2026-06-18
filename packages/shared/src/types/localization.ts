@@ -171,6 +171,9 @@ export type __internal_LocalizationResource = {
   footerPageLink__terms: LocalizationValue;
   paginationButton__previous: LocalizationValue;
   paginationButton__next: LocalizationValue;
+  identityPreviewEditButton__emailAddress: LocalizationValue;
+  identityPreviewEditButton__phoneNumber: LocalizationValue;
+  identityPreviewEditButton__identifier: LocalizationValue;
   paginationRowText__displaying: LocalizationValue;
   paginationRowText__of: LocalizationValue;
   membershipRole__admin: LocalizationValue;
@@ -1038,6 +1041,7 @@ export type __internal_LocalizationResource = {
     badge__automaticInvitation: LocalizationValue;
     badge__automaticSuggestion: LocalizationValue;
     badge__manualInvitation: LocalizationValue;
+    badge__enterpriseSso: LocalizationValue;
     start: {
       headerTitle__members: LocalizationValue;
       membershipSeatUsageLabel: LocalizationValue<'count' | 'limit'>;
@@ -1129,6 +1133,34 @@ export type __internal_LocalizationResource = {
       messageLine1: LocalizationValue<'domain'>;
       messageLine2: LocalizationValue;
       successMessage: LocalizationValue;
+    };
+    securityPage: {
+      title: LocalizationValue;
+      removeDialog: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+        confirmButton: LocalizationValue;
+      };
+      ssoSection: {
+        title: LocalizationValue;
+        badge__unconfigured: LocalizationValue;
+        badge__inProgress: LocalizationValue;
+        badge__active: LocalizationValue;
+        badge__inactive: LocalizationValue;
+        descriptionLine1: LocalizationValue;
+        descriptionLine2: LocalizationValue<'role'>;
+        descriptionLine2__noRole: LocalizationValue;
+        primaryButton__startConfiguration: LocalizationValue;
+        primaryButton__continueConfiguration: LocalizationValue;
+        providerLabel: LocalizationValue;
+        domainLabel: LocalizationValue;
+        signOnUrlLabel: LocalizationValue;
+        issuerLabel: LocalizationValue;
+        menuAction__edit: LocalizationValue;
+        menuAction__activate: LocalizationValue;
+        menuAction__deactivate: LocalizationValue;
+        menuAction__remove: LocalizationValue;
+      };
     };
     membersPage: {
       detailsTitle__emptyRow: LocalizationValue;
@@ -1338,28 +1370,35 @@ export type __internal_LocalizationResource = {
       };
       warning: LocalizationValue;
     };
-    verifyEmailDomainStep: {
+    organizationDomainsStep: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
-      addEmailAddress: {
-        formTitle: LocalizationValue;
-        formSubtitle: LocalizationValue;
-        inputPlaceholder: LocalizationValue;
-        inputLabel: LocalizationValue;
+      formFieldLabel__domain: LocalizationValue;
+      formFieldInputPlaceholder__domain: LocalizationValue;
+      formButtonPrimary__add: LocalizationValue;
+      domainSuggestion: {
+        messageLabel: LocalizationValue<'domain'>;
+        formButtonPrimary__add: LocalizationValue<'domain'>;
       };
-      emailCode: {
-        formTitle: LocalizationValue;
-        formSubtitle: LocalizationValue<'identifier'>;
-        resendButton: LocalizationValue;
-        verified: {
-          title: LocalizationValue;
-          subtitle: LocalizationValue;
-          inputLabel: LocalizationValue;
+      domainCard: {
+        badge__verified: LocalizationValue;
+        badge__unverified: LocalizationValue;
+        verifiedAtLabel: LocalizationValue<'date'>;
+        removeButtonTooltip__lastVerifiedDomain: LocalizationValue;
+        removeButtonTooltip__lastVerifiedDomainActive: LocalizationValue;
+        txtRecord: {
+          instructions: LocalizationValue;
+          typeLabel: LocalizationValue;
+          hostLabel: LocalizationValue;
+          valueLabel: LocalizationValue;
         };
       };
-      domainTaken: {
-        title: LocalizationValue<'domain'>;
-        subtitle: LocalizationValue;
+      removeDomainDialog: {
+        title: LocalizationValue;
+        subtitle__active: LocalizationValue<'domain'>;
+        subtitle__inactive: LocalizationValue<'domain'>;
+        cancelButton: LocalizationValue;
+        removeButton: LocalizationValue;
       };
     };
     testConfigurationStep: {
@@ -1791,34 +1830,14 @@ export type __internal_LocalizationResource = {
         };
       };
     };
-    confirmation: {
-      statusSection: {
-        title: LocalizationValue;
-        activeBadge: LocalizationValue;
-        inactiveBadge: LocalizationValue;
-      };
-      enableSection: {
-        title: LocalizationValue;
-      };
-      domainSection: {
-        title: LocalizationValue;
-      };
-      configurationSection: {
-        title: LocalizationValue;
-        ssoUrlLabel: LocalizationValue;
-        issuerLabel: LocalizationValue;
-        certificateLabel: LocalizationValue;
-        configureAgainLink: LocalizationValue;
-      };
-      resetSection: {
-        title: LocalizationValue;
-        warning: LocalizationValue;
-        confirmationFieldLabel: LocalizationValue<'name'>;
-        submitButton: LocalizationValue;
-      };
-      inactiveBanner: {
-        title: LocalizationValue;
-      };
+    activate: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue<'domain'>;
+      activateButton: LocalizationValue;
+      skipButton: LocalizationValue;
+      activeTitle: LocalizationValue;
+      activeSubtitle: LocalizationValue<'domain'>;
+      doneButton: LocalizationValue;
     };
   };
   apiKeys: {

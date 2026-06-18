@@ -10,10 +10,28 @@ import { ViewSource } from './ViewSource';
 // MDX docs keyed by `group` slug → `component` slug. Group-aware so identically-named
 // entries (the headless `Dialog` primitive vs. the styled `Dialog` component) stay distinct.
 const docModules: Record<string, Record<string, React.ComponentType>> = {
+  aio: {
+    'organization-profile': dynamic(() => import('../stories/organization-profile.mdx')),
+  },
+  panels: {
+    'organization-profile-general': dynamic(() => import('../stories/organization-profile-general.mdx')),
+  },
+  sections: {
+    'leave-organization': dynamic(() => import('../stories/leave-organization.mdx')),
+    'delete-organization': dynamic(() => import('../stories/delete-organization.mdx')),
+  },
+  blocks: {
+    destructive: dynamic(() => import('../stories/destructive.mdx')),
+  },
   components: {
     button: dynamic(() => import('../stories/button.mdx')),
+    card: dynamic(() => import('../stories/card.component.mdx')),
     input: dynamic(() => import('../stories/input.mdx')),
     dialog: dynamic(() => import('../stories/dialog.component.mdx')),
+    heading: dynamic(() => import('../stories/heading.mdx')),
+    icon: dynamic(() => import('../stories/icon.mdx')),
+    tabs: dynamic(() => import('../stories/tabs.component.mdx')),
+    text: dynamic(() => import('../stories/text.mdx')),
   },
   primitives: {
     // Headless primitives — alphabetical.
@@ -26,6 +44,10 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     select: dynamic(() => import('../stories/select.mdx')),
     tabs: dynamic(() => import('../stories/tabs.mdx')),
     tooltip: dynamic(() => import('../stories/tooltip.mdx')),
+  },
+  hooks: {
+    // Headless hooks — alphabetical.
+    'use-data-table': dynamic(() => import('../stories/use-data-table.mdx')),
   },
 };
 

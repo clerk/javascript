@@ -5,15 +5,6 @@ import { render, waitFor } from '@/test/utils';
 
 import { ConfigureSSO } from '../ConfigureSSO';
 
-// Integration coverage for the wizard's navigation contract at the rendered-
-// component level — the real `ConfigureSSO` → `useOrganizationEnterpriseConnection`
-// → `ConfigureSSOWizard` → `<Wizard>` → `useWizardMachine` → step wiring, driven
-// only through the connection data the (auto-mocked) FAPI handles return. The
-// machine-level behaviours (defer/resolve, clamp) are unit-tested in
-// `useWizardMachine.test.tsx`; these tests prove those behaviours hold when the
-// connection state changes through the real query/revalidate path that the steps
-// actually use, not just a hand-driven config rerender.
-
 const { createFixtures } = bindCreateFixtures('ConfigureSSO');
 
 /** A connection created on the fresh-start path: present but not yet configured. */
@@ -52,7 +43,35 @@ const withAdminOrgUser = (f: any) => {
   });
 };
 
+const verifiedDomain = {
+  id: 'dmn_verified',
+  name: 'clerk.com',
+  organizationId: 'Org1',
+  enrollmentMode: 'enterprise_sso',
+  ownershipVerification: { status: 'verified', strategy: 'txt' },
+} as any;
+
+const mockVerifiedDomains = (fixtures: any) =>
+  fixtures.clerk.organization?.getDomains.mockResolvedValue({ data: [verifiedDomain], total_count: 1 } as any);
+
 describe('ConfigureSSO wizard navigation (integration)', () => {
+  it('lands on select-provider when all organization domains are verified (skips verify-domain)', async () => {
+    const { wrapper, fixtures } = await createFixtures(withAdminOrgUser);
+
+    fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
+    fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
+      data: [],
+      total_count: 0,
+    } as any);
+    mockVerifiedDomains(fixtures);
+
+    const { findByText, queryByText } = render(<ConfigureSSO />, { wrapper });
+
+    await findByText(/select your identity provider/i);
+    // verify-domain was skipped, so its subtitle never renders
+    expect(queryByText(/add and verify ownership of the domains/i)).not.toBeInTheDocument();
+  });
+
   // Contract rules 2 + 8: goNext defers when the next guard is not yet satisfied
   // (the create has fired but the connection has not landed), then completes on
   // the render after the data lands — here select-provider → configure on the
@@ -71,6 +90,7 @@ describe('ConfigureSSO wizard navigation (integration)', () => {
       data: [],
       total_count: 0,
     } as any);
+    mockVerifiedDomains(fixtures);
 
     const { findByText, findByRole, getByRole, userEvent, queryByText } = render(<ConfigureSSO />, { wrapper });
 
@@ -105,6 +125,7 @@ describe('ConfigureSSO wizard navigation (integration)', () => {
       data: [],
       total_count: 0,
     } as any);
+    mockVerifiedDomains(fixtures);
 
     const { findByText, getByRole, getByLabelText, findByRole, userEvent, queryByText } = render(<ConfigureSSO />, {
       wrapper,
@@ -138,6 +159,7 @@ describe('ConfigureSSO wizard navigation (integration)', () => {
       data: [],
       total_count: 0,
     } as any);
+    mockVerifiedDomains(fixtures);
 
     const { findByText, findByRole, getByRole, userEvent, queryByText } = render(<ConfigureSSO />, { wrapper });
 
@@ -175,6 +197,7 @@ describe('ConfigureSSO wizard navigation (integration)', () => {
       data: [],
       total_count: 0,
     } as any);
+    mockVerifiedDomains(fixtures);
 
     const { findByText, getByRole, getByLabelText, findByRole, userEvent, queryByText } = render(<ConfigureSSO />, {
       wrapper,
@@ -201,5 +224,31 @@ describe('ConfigureSSO wizard navigation (integration)', () => {
     await waitFor(() => {
       expect(queryByText(/at least one successful test run/i)).not.toBeInTheDocument();
     });
+  });
+
+  // The labelled steps surface in the stepper under their renamed labels, and an
+  // active connection short-circuits to the (reachable) activate step.
+  it('renders the renamed stepper labels and reaches the activate step', async () => {
+    const { wrapper, fixtures } = await createFixtures(withAdminOrgUser);
+
+    fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([
+      { ...configuredConnection, id: 'ent_active', active: true } as any,
+    ]);
+    fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
+      data: [],
+      total_count: 0,
+    } as any);
+    mockVerifiedDomains(fixtures);
+
+    const { findByText, getByText } = render(<ConfigureSSO />, { wrapper });
+
+    // The activate step body renders (active connection short-circuits to the already-active variant).
+    await findByText(/sso connection is active/i);
+
+    // The stepper carries the renamed labels (select-provider stays unlabelled).
+    expect(getByText('Domains')).toBeInTheDocument();
+    expect(getByText('Connection')).toBeInTheDocument();
+    expect(getByText('Test')).toBeInTheDocument();
+    expect(getByText('Activate')).toBeInTheDocument();
   });
 });

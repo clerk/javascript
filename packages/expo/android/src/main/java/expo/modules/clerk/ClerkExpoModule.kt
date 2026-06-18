@@ -24,6 +24,7 @@ import kotlinx.coroutines.withTimeout
 import org.json.JSONObject
 
 private const val TAG = "ClerkExpoModule"
+private const val NATIVE_CLIENT_CHANGED_EVENT = "clerkNativeClientChanged"
 
 private fun debugLog(tag: String, message: String) {
     if (BuildConfig.DEBUG) {
@@ -35,20 +36,22 @@ class ClerkExpoModule : Module() {
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
     private var clientStateObserverJob: Job? = null
     private var lastObservedClient: Client? = null
+    private var jsOriginatedClientSyncDepth = 0
     private var configuredPublishableKey: String? = null
 
     companion object {
         private var sharedInstance: ClerkExpoModule? = null
 
-        fun emitRefreshClient() {
-            sharedInstance?.sendEvent("refreshClient", emptyMap<String, Any?>())
+        fun emitClientChanged(sourceId: String? = null) {
+            val instance = sharedInstance ?: return
+            instance.sendEvent(NATIVE_CLIENT_CHANGED_EVENT, instance.clientChangedPayload(sourceId))
         }
     }
 
     override fun definition() = ModuleDefinition {
         Name("ClerkExpo")
 
-        Events("refreshClient")
+        Events(NATIVE_CLIENT_CHANGED_EVENT)
 
         OnCreate {
             sharedInstance = this@ClerkExpoModule
@@ -66,16 +69,12 @@ class ClerkExpoModule : Module() {
             configure(pubKey, bearerToken, promise)
         }
 
-        AsyncFunction("getSession") { promise: Promise ->
-            getSession(promise)
-        }
-
         AsyncFunction("getClientToken") { promise: Promise ->
             getClientToken(promise)
         }
 
-        AsyncFunction("refreshClient") { promise: Promise ->
-            refreshClient(promise)
+        AsyncFunction("syncFromJsClientToken") { clientToken: String?, sourceId: String?, promise: Promise ->
+            syncFromJsClientToken(clientToken, sourceId, promise)
         }
     }
 
@@ -96,9 +95,33 @@ class ClerkExpoModule : Module() {
                 }
 
                 lastObservedClient = client
-                emitRefreshClient()
+                if (jsOriginatedClientSyncDepth > 0) {
+                    return@collect
+                }
+
+                emitClientChanged()
             }
         }
+    }
+
+    private fun clientChangedPayload(sourceId: String? = null): Map<String, Any?> {
+        val result = mutableMapOf<String, Any?>(
+            "clientToken" to try {
+                Clerk.getDeviceToken()
+            } catch (e: Exception) {
+                debugLog(TAG, "clientChangedPayload - getDeviceToken failed: ${e.message}")
+                null
+            }
+        )
+        if (!sourceId.isNullOrEmpty()) {
+            result["sourceId"] = sourceId
+        }
+        return result
+    }
+
+    private fun emitSyncedClientChanged(sourceId: String?) {
+        lastObservedClient = Clerk.clientFlow.value
+        emitClientChanged(sourceId)
     }
 
     // MARK: - configure
@@ -142,8 +165,8 @@ class ClerkExpoModule : Module() {
                         withTimeout(10_000L) {
                             Clerk.isInitialized.first { it }
                         }
-                        // If a bearer token was provided, wait for the session to hydrate
-                        // so callers that immediately call getSession() see the session.
+                        // If a bearer token was provided, wait for native client state to hydrate
+                        // before resolving the configure call.
                         if (!bearerToken.isNullOrEmpty()) {
                             withTimeout(5_000L) {
                                 Clerk.sessionFlow.first { it != null }
@@ -245,46 +268,6 @@ class ClerkExpoModule : Module() {
         }
     }
 
-    // MARK: - getSession
-
-    private fun getSession(promise: Promise) {
-        if (!Clerk.isInitialized.value) {
-            // Return null when not initialized (matches iOS behavior)
-            // so callers can proceed to call configure() with a bearer token.
-            promise.resolve(null)
-            return
-        }
-
-        val session = Clerk.session
-        val user = Clerk.user
-
-        val result = mutableMapOf<String, Any?>()
-
-        session?.let {
-            result["session"] = mapOf(
-                "id" to it.id,
-                "status" to it.status.name,
-                "userId" to it.user?.id
-            )
-        }
-
-        user?.let {
-            val primaryEmail = it.emailAddresses?.find { e -> e.id == it.primaryEmailAddressId }
-            val primaryPhone = it.phoneNumbers.find { p -> p.id == it.primaryPhoneNumberId }
-
-            result["user"] = mapOf(
-                "id" to it.id,
-                "firstName" to it.firstName,
-                "lastName" to it.lastName,
-                "imageUrl" to it.imageUrl,
-                "primaryEmailAddress" to primaryEmail?.emailAddress,
-                "primaryPhoneNumber" to primaryPhone?.phoneNumber
-            )
-        }
-
-        promise.resolve(result)
-    }
-
     // MARK: - getClientToken
 
     private fun getClientToken(promise: Promise) {
@@ -300,9 +283,9 @@ class ClerkExpoModule : Module() {
         }
     }
 
-    // MARK: - refreshClient
+    // MARK: - syncFromJsClientToken
 
-    private fun refreshClient(promise: Promise) {
+    private fun syncFromJsClientToken(clientToken: String?, sourceId: String?, promise: Promise) {
         if (!Clerk.isInitialized.value) {
             promise.resolve(null)
             return
@@ -310,16 +293,49 @@ class ClerkExpoModule : Module() {
 
         coroutineScope.launch {
             try {
+                jsOriginatedClientSyncDepth += 1
+                if (!clientToken.isNullOrBlank()) {
+                    when (val result = Clerk.updateDeviceToken(clientToken)) {
+                        is ClerkResult.Failure -> {
+                            promise.reject(
+                                "E_SYNC_FROM_JS_FAILED",
+                                result.error?.firstMessage() ?: result.throwable?.message ?: "Client token sync failed",
+                                null
+                            )
+                            return@launch
+                        }
+                        is ClerkResult.Success -> {
+                            try {
+                                withTimeout(5_000L) {
+                                    Clerk.sessionFlow.first { it != null }
+                                }
+                            } catch (_: TimeoutCancellationException) {
+                                debugLog(TAG, "syncFromJsClientToken - session did not appear after token update")
+                            }
+                            emitSyncedClientChanged(sourceId)
+                            promise.resolve(null)
+                            return@launch
+                        }
+                    }
+                }
+
                 when (val result = Clerk.refreshClient()) {
-                    is ClerkResult.Failure -> promise.reject(
-                        "E_REFRESH_CLIENT_FAILED",
-                        result.error?.firstMessage() ?: result.throwable?.message ?: "Client refresh failed",
-                        null
-                    )
-                    is ClerkResult.Success -> promise.resolve(null)
+                    is ClerkResult.Failure -> {
+                        promise.reject(
+                            "E_SYNC_FROM_JS_FAILED",
+                            result.error?.firstMessage() ?: result.throwable?.message ?: "Client refresh failed",
+                            null
+                        )
+                    }
+                    is ClerkResult.Success -> {
+                        emitSyncedClientChanged(sourceId)
+                        promise.resolve(null)
+                    }
                 }
             } catch (e: Exception) {
-                promise.reject("E_REFRESH_CLIENT_FAILED", e.message ?: "Client refresh failed", e)
+                promise.reject("E_SYNC_FROM_JS_FAILED", e.message ?: "Client token sync failed", e)
+            } finally {
+                jsOriginatedClientSyncDepth = maxOf(0, jsOriginatedClientSyncDepth - 1)
             }
         }
     }

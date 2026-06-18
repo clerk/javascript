@@ -1,0 +1,46 @@
+import * as TextStories from './text.stories';
+
+# Text
+
+Text renders body copy in Mosaic. It renders as a `<p>` by default, forwards a ref to the underlying element, and themes its font-size and color through the `size` and `intent` variants. Use the `render` prop when the copy belongs in a different element, such as a `<span>` inline.
+
+## Playground
+
+<Preview
+  name='Default'
+  storyModule={TextStories}
+/>
+
+## Props
+
+<PropTable
+  meta={TextStories.meta}
+  extra={[{ name: 'render', type: '(props) => ReactNode' }]}
+/>
+
+## Usage
+
+<Usage
+  component='Text'
+  module='@clerk/ui/mosaic/components/text'
+>
+  This is a paragraph of body text.
+</Usage>
+
+---
+
+## Examples
+
+### Sizes
+
+<Story
+  name='Sizes'
+  storyModule={TextStories}
+/>
+
+### Intents
+
+<Story
+  name='Intents'
+  storyModule={TextStories}
+/>

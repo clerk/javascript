@@ -506,6 +506,30 @@ describe('Tabs', () => {
       const panels = document.querySelectorAll('[data-cl-slot="tabs-panel"][data-cl-hidden]');
       expect(panels).toHaveLength(2);
     });
+
+    it('non-selected panels have inert attribute, selected panel does not', () => {
+      renderTabs();
+      const panels = document.querySelectorAll('[data-cl-slot="tabs-panel"]');
+      const inert = Array.from(panels).filter(p => p.hasAttribute('inert'));
+      const notInert = Array.from(panels).filter(p => !p.hasAttribute('inert'));
+      // Presence check only — `inertProps` emits the value each React major reflects
+      // (string '' on 18, boolean true on 19), both of which serialize to inert="".
+      expect(inert).toHaveLength(2);
+      expect(notInert).toHaveLength(1);
+    });
+
+    it('inert updates when selection changes', async () => {
+      const user = userEvent.setup();
+      renderTabs();
+
+      await user.click(screen.getByText('Settings'));
+
+      const panels = document.querySelectorAll('[data-cl-slot="tabs-panel"]');
+      const [account, settings, billing] = Array.from(panels);
+      expect(account).toHaveAttribute('inert');
+      expect(settings).not.toHaveAttribute('inert');
+      expect(billing).toHaveAttribute('inert');
+    });
   });
 
   describe('roving tabindex', () => {

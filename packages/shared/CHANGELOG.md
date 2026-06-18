@@ -1,5 +1,37 @@
 # Change Log
 
+## 4.19.0
+
+### Minor Changes
+
+- Introduce organization domains with TXT verification on self-serve SSO flow ([#8788](https://github.com/clerk/javascript/pull/8788)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Add confirmation dialog for organization domain deletion as part of self-serve SSO ([#8866](https://github.com/clerk/javascript/pull/8866)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+## 4.18.0
+
+### Minor Changes
+
+- Add internal OAuth transport support for native desktop SDK wrappers to run Clerk's prebuilt OAuth flows through a system browser. ([#8831](https://github.com/clerk/javascript/pull/8831)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Align the `HeadlessBrowserClerk.load()` parameter type with the runtime behavior by accepting the full `ClerkOptions`, including `isSatellite`. The clerk-js implementation has always accepted and used `isSatellite` from `load()` options — it's the only way to configure a satellite app when using `@clerk/clerk-js` directly — but the type previously excluded it, producing a contradictory generated API reference and type errors for direct consumers. ([#8846](https://github.com/clerk/javascript/pull/8846)) by [@manovotny](https://github.com/manovotny)
+
+- Add an overview to the organization profile Security page. The page now lands on a summary of the SSO connection — a status badge (Unconfigured, In Progress, Active, Inactive), the configuration details framed in a card (provider, domain, sign-on URL, issuer, certificate), and an actions menu with Edit, Activate / Deactivate, and Remove — and switches into the existing configuration flow on Start, Continue, or Edit. ([#8813](https://github.com/clerk/javascript/pull/8813)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Rename the `<OrganizationProfile />` SSO page to "Security". The navbar entry is now labeled "Security" with a shield icon, its route path changed from `organization-self-serve-sso` to `organization-security`, and a new `organizationProfile.navbar.security` localization key replaces `organizationProfile.navbar.selfServeSSO`. ([#8796](https://github.com/clerk/javascript/pull/8796)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Ship a self-contained `CookieAttributes` interface from `@clerk/shared/cookie` and use it in `createCookieHandler`'s `set`/`remove` signatures. The published declarations previously referenced `Cookies.CookieAttributes` from js-cookie, which consumers could never resolve (the import was dropped from the declaration output and js-cookie ships no types), causing TS2503 errors under `skipLibCheck: false` and silently degrading the option types to `any` otherwise. ([#8841](https://github.com/clerk/javascript/pull/8841)) by [@jacekradko](https://github.com/jacekradko)
+
+- Resolve the browser connectivity heuristics (`isValidBrowser`, `isBrowserOnline`, and therefore `isValidBrowserOnline`) from the worker's `navigator` when `window` is unavailable but the code runs inside a `WorkerGlobalScope`. In a Web/Service Worker — most notably an MV3 extension background **service worker** (where `@clerk/chrome-extension` loads the background client) — there is no `window`, so these checks previously always reported "invalid/offline". That caused `getToken()` failures to be re-thrown as a misleading `clerk_offline` error and capped network retries lower than intended. The checks now read real connectivity from the worker's `navigator`. Server-side rendering continues to report `false` (the fallback requires a real worker scope, so a bare `globalThis.navigator` such as the one modern Node exposes is not treated as a browser), and behavior in standard browsers and React Native is unchanged. ([#8827](https://github.com/clerk/javascript/pull/8827)) by [@royanger](https://github.com/royanger)
+
+- Exclude self-identified server runtimes (`Cloudflare-Workers`, `Node.js`, `Deno`, `Bun` user agents) from the worker-scope `navigator` fallback used by `isValidBrowser`, `isBrowserOnline`, and `isValidBrowserOnline`. Today Cloudflare's workerd is excluded only because its `self` does not satisfy `instanceof WorkerGlobalScope`; this guard keeps the checks returning `false` on server-side worker runtimes even if that implementation detail changes, while real browser web/service workers (such as MV3 extension background workers) are unaffected. ([#8840](https://github.com/clerk/javascript/pull/8840)) by [@jacekradko](https://github.com/jacekradko)
+
+- Clarify the `isSatellite` JSDoc to note it must be set in `load()`, unlike `domain`, which is set in the `Clerk` constructor. This corrects the generated API reference for direct `@clerk/clerk-js` and `<script>` consumers, where `load()` is the only way to configure a satellite app. ([#8845](https://github.com/clerk/javascript/pull/8845)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
 ## 4.17.1
 
 ### Patch Changes

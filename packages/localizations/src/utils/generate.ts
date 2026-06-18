@@ -166,7 +166,7 @@ function run(langObj: any, name: string) {
 
   const finalText = disclaimerText + initialText(name.replace('-', '')) + json + ' as const;';
 
-  fs.writeFileSync(path.join(__dirname, `../${name}.ts`), finalText);
+  fs.writeFileSync(path.join(__dirname, '..', '..', 'src', `${name}.ts`), finalText);
 }
 
 run(enUS, 'en-US');
