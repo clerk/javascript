@@ -1117,7 +1117,7 @@ export const enUS: LocalizationResource = {
         badge__inactive: 'Inactive',
         badge__unconfigured: 'Unconfigured',
         descriptionLine1: 'Require members with a matching email domain to sign in through your identity provider.',
-        domainLabel: 'Domains',
+        domainLabel: 'Domains:',
         menuAction__activate: 'Activate',
         menuAction__deactivate: 'Deactivate',
         menuAction__edit: 'Edit',

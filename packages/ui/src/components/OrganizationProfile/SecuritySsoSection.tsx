@@ -28,11 +28,11 @@ type SecuritySsoSectionProps = {
 
 const STATUS_BADGES: Record<
   OrganizationEnterpriseConnectionStatus,
-  { id: string; colorScheme: 'secondary' | 'danger' | 'warning' | 'success'; label: LocalizationKey }
+  { id: string; colorScheme?: 'primary' | 'danger' | 'warning' | 'success'; label: LocalizationKey }
 > = {
   unconfigured: {
     id: 'unconfigured',
-    colorScheme: 'secondary',
+    colorScheme: 'primary',
     label: localizationKeys('organizationProfile.securityPage.ssoSection.badge__unconfigured'),
   },
   in_progress: {
@@ -214,27 +214,28 @@ const ConfiguredContent = (props: ConfiguredContentProps): JSX.Element => {
       <Card.Alert>{card.error}</Card.Alert>
 
       {domains.length > 0 && (
-        <Flex
-          align='center'
-          wrap='wrap'
-          gap={2}
-          sx={{ minWidth: 0 }}
-        >
+        <Flex sx={t => ({ gap: t.space.$1x5 })}>
           <Text
             elementDescriptor={descriptors.organizationProfileSecuritySsoDetailRowLabel}
             elementId={descriptors.organizationProfileSecuritySsoDetailRowLabel.setId('domain')}
             colorScheme='secondary'
             localizationKey={localizationKeys('organizationProfile.securityPage.ssoSection.domainLabel')}
-            sx={{ flexShrink: 0, '&::after': { content: '":"' } }}
           />
-          {domains.map(domain => (
-            <ValueChip
-              key={domain}
-              id='domain'
-            >
-              {domain}
-            </ValueChip>
-          ))}
+
+          <Flex
+            align='center'
+            wrap='wrap'
+            sx={t => ({ minWidth: 0, gap: t.space.$1x5 })}
+          >
+            {domains.map(domain => (
+              <Badge
+                key={domain}
+                elementDescriptor={descriptors.organizationProfileSecuritySsoDetailRowChip}
+              >
+                {domain}
+              </Badge>
+            ))}
+          </Flex>
         </Flex>
       )}
 
@@ -261,27 +262,4 @@ const SsoDescription = (): JSX.Element => (
     localizationKey={localizationKeys('organizationProfile.securityPage.ssoSection.descriptionLine1')}
     sx={{ minWidth: 0 }}
   />
-);
-
-type ValueChipProps = {
-  id: string;
-  children: string;
-};
-
-const ValueChip = ({ id, children }: ValueChipProps): JSX.Element => (
-  <Badge
-    elementDescriptor={descriptors.organizationProfileSecuritySsoDetailRowChip}
-    elementId={descriptors.organizationProfileSecuritySsoDetailRowChip.setId(id)}
-    sx={{ maxWidth: '100%', minWidth: 0 }}
-  >
-    <Text
-      as='p'
-      variant='caption'
-      truncate
-      title={children}
-      sx={{ color: 'inherit' }}
-    >
-      {children}
-    </Text>
-  </Badge>
 );
