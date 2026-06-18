@@ -11,7 +11,7 @@ description: >-
 
 # Working in the clerk/javascript monorepo
 
-This is Clerk's JavaScript SDK monorepo: 23 packages (20 published `@clerk/*` plus the private
+This is Clerk's JavaScript SDK monorepo: 24 packages (21 published `@clerk/*` plus the private
 `@clerk/msw`, `@clerk/headless`, and `@clerk/swingset`) managed with pnpm
 workspaces and Turborepo. Read this before building, testing, committing, or touching anything
 under `packages/`.
@@ -39,7 +39,7 @@ Full sequence, the 11 footguns, and the internal integration-test / 1Password se
 
 ## Package map: where does X live?
 
-The ~10 packages people touch most. Full 23-package table, the dependency pyramid, and the complete
+The ~10 packages people touch most. Full 24-package table, the dependency pyramid, and the complete
 "change X, touch Y" routing are in [`references/package-map.md`](references/package-map.md).
 
 | Package                | You change it when...                                                                                                                                       |
@@ -81,7 +81,7 @@ pnpm --filter @clerk/shared test path/to/file.test.ts
 # @clerk/backend runs a multi-runtime suite (run-s), so target one runtime for a single file:
 pnpm --filter @clerk/backend test:node path/to/file.test.ts
 
-# Quality gates (CI runs these)
+# Quality gates (run before pushing; CI runs equivalent checks)
 pnpm lint
 pnpm format            # workspace packages plus root files, docs/, integration/, scripts/
 pnpm prettier --write '.claude/**/*.md'   # pnpm format does not cover .claude/; format skill files this way
@@ -158,10 +158,13 @@ Full decision matrix:
 - `docs/PUBLISH.md`: release process (stable, canary, snapshot, backport, `!allow-major`).
 - `docs/CICD.md`: CI/CD pipeline and automated releases.
 - `docs/SECURITY.md`: vulnerability reporting (do **not** open public issues).
-- `references/theming-architecture.md`: deep dive on the `@clerk/ui` appearance/theming system.
+- `references/theming-architecture.md` (repo root, not this skill's `references/`): deep dive on the
+  `@clerk/ui` appearance/theming system.
 - Bundled: [`setup-and-footguns.md`](references/setup-and-footguns.md),
   [`package-map.md`](references/package-map.md),
   [`breaking-changes.md`](references/breaking-changes.md).
 
-For analyzing or coordinating a **release PR** (the "Version packages" PR), use the dedicated
-`analyze-javascript-release` and `coordinate-clerk-release` skills, not this one.
+Analyzing or coordinating a **release PR** (the "Version packages" PR) is out of scope for this
+skill; the release process lives in `docs/PUBLISH.md` and `docs/CICD.md`. Clerk employees may also
+have dedicated `analyze-javascript-release` / `coordinate-clerk-release` skills installed globally,
+but those are not shipped in this repo.

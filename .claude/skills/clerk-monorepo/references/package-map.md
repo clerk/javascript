@@ -1,6 +1,6 @@
 # Package map
 
-The 23 active, git-tracked packages, the dependency shape, and the full "change X, touch Y" routing.
+The 24 active, git-tracked packages, the dependency shape, and the full "change X, touch Y" routing.
 `SKILL.md` has the short version (the ~10 packages people touch most).
 
 > The authoritative package list is the set of `packages/*/package.json` files tracked in git. The
@@ -41,6 +41,7 @@ backwards-compatibility contract (see `breaking-changes.md`).
 | `@clerk/msw`                  | tooling         |     | MSW request handlers for mocking the Clerk API in tests. Private (not published).                                                                                              |
 | `@clerk/swingset`             | tooling         |     | Component explorer for `@clerk/ui`'s Mosaic design system. Private (not published).                                                                                            |
 | `@clerk/upgrade`              | tooling         |     | CLI codemod tool for upgrading consumers between SDK versions.                                                                                                                 |
+| `@clerk/eslint-plugin`        | tooling         |     | ESLint plugin enforcing Clerk patterns across JavaScript frameworks (lint rules shipped to apps). Published.                                                                  |
 
 Tests: `pnpm turbo test --filter=@clerk/<name>` (or `pnpm --filter @clerk/<name> test` after a
 build). Most packages use vitest; `@clerk/backend` runs a multi-runtime suite (node + edge +
@@ -49,7 +50,7 @@ script.
 
 ## Dependency shape
 
-```
+```text
                 @clerk/shared            (≈20 dependents, the base of the pyramid)
                     /      \
           @clerk/react   @clerk/backend  (≈10 dependents: every server adapter)
@@ -64,9 +65,10 @@ Practical consequence: a change to `@clerk/shared` or `@clerk/backend` fans out 
 test the consumers, not just the package you edited. After editing `shared`, a
 `pnpm turbo build --filter=@clerk/shared` keeps everything else type-correct.
 
-`@clerk/types` is a deprecated alias for `@clerk/shared/types`. Prefer importing from
-`@clerk/shared/types`. If a type error traces back to it, rebuild shared:
-`pnpm turbo build --filter=@clerk/shared`.
+`@clerk/types` is no longer a package in this repo; its types were merged into `@clerk/shared`
+(`packages/types/` is a leftover dir with no `package.json`). It survives only as a deprecated npm
+package that re-exports `@clerk/shared/types`, so always import from `@clerk/shared/types`. If a type
+error traces back to it, rebuild shared: `pnpm turbo build --filter=@clerk/shared`.
 
 ## Change X, touch Y
 
@@ -79,11 +81,11 @@ test the consumers, not just the package you edited. After editing `shared`, a
   Strings live in `packages/localizations/src`. `@clerk/ui` is consumed by the
   `react`/`astro`/`vue`/`chrome-extension` adapters; its compiled runtime is delivered alongside
   `clerk-js` (both are backwards-compat sensitive), though `clerk-js` does not declare it as a package
-  dependency. Watch with `pnpm dev:fe-libs`. For the theming/appearance system specifically, read
-  `references/theming-architecture.md`.
+  dependency. Watch with `pnpm dev:fe-libs`. For the theming/appearance system specifically, read the
+  repo-root `references/theming-architecture.md` (not this skill's own `references/` dir).
 - **Backend token verification / JWT / Backend API client**: `packages/backend/src` (JWT logic under
   `packages/backend/src/jwt`). Every server adapter depends on this.
-- **Next.js middleware / route handlers / server components**: `packages/nextjs/src` (client side
+- **Next.js middleware / route handlers / server components**: `packages/nextjs/src` (client-side
   reuses `@clerk/react` unchanged).
 - **Express / Fastify / Hono server integration**: the respective `packages/<framework>/src`.
 - **Cross-cutting utilities (storage, events, React context plumbing)**: `packages/shared/src`. High
@@ -96,6 +98,7 @@ test the consumers, not just the package you edited. After editing `shared`, a
 - **Consumer-facing test helpers**: `packages/testing/src` (Playwright/Cypress); API mocks in
   `packages/msw`.
 - **The upgrade codemods**: `packages/upgrade/src`.
+- **ESLint rules that enforce Clerk patterns**: `packages/eslint-plugin/src`.
 - **A brand-new framework adapter**: create `packages/<framework>`, depend on `@clerk/backend`
   (verify), `@clerk/shared` (utils), and `@clerk/react` (if React-based). Follow the structure of
   `packages/nextjs` or `packages/express`. The workspace glob `packages/*` picks it up automatically.

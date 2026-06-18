@@ -55,7 +55,9 @@ If you need to ship something that is not yet stable:
   existing APIs) to signal "no SemVer guarantee."
 - Or export from an `/experimental` subpath.
 
-Both are documented in `docs/CONTRIBUTING.md` (the "Experimental and internal APIs" section) and are
+All three are described in `docs/CONTRIBUTING.md` (the "Experimental and internal APIs" section),
+which states the SemVer carve-out explicitly for the `/experimental` subpath; the `__internal_` /
+`__experimental_` prefixes are conventions signalling the same no-guarantee expectation. All are
 exempt from the breaking-change rules above.
 
 ## What CI enforces
@@ -66,7 +68,7 @@ exempt from the breaking-change rules above.
   `break-check.config.json`) can reclassify findings, so it is informational. Still investigate
   anything it flags rather than assuming a false positive.
 - **Major Version Check** (`.github/workflows/major-version-check.yml`) is the gate for a major: a
-  `major` changeset bump fails the check until a public org member comments `!allow-major`. (It is
+  `major` changeset bump fails the check until an org member comments `!allow-major`. (It is
   not yet in `main`'s required-checks list, so treat a red check as blocking even when the merge
   button is not.) The exact comment commands (`!allow-major`, `!snapshot`, `!preview`) and when to
   use each are in `docs/PUBLISH.md`.
