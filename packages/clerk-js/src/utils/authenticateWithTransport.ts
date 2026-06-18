@@ -42,6 +42,15 @@ function getNativeOAuthCallbackFailure(callbackUrl: string): { code: string; mes
   };
 }
 
+async function resetFailedAttempt(resource: SignInResource | SignUpResource): Promise<void> {
+  try {
+    // Both resources accept `{}` to reset the attempt, but their `create` param types differ.
+    await (resource.create as (params: Record<string, never>) => Promise<unknown>)({});
+  } catch {
+    // Best-effort: the OAuth failure is still thrown, so a failed reset just keeps the prior behavior.
+  }
+}
+
 export async function _authenticateWithTransport(opts: {
   clerk: ClerkWithResourceCallback;
   transport: OAuthTransport;
@@ -67,6 +76,9 @@ export async function _authenticateWithTransport(opts: {
   const failure = getNativeOAuthCallbackFailure(callbackUrl);
 
   if (failure) {
+    // The failed verification persists on the client and would resurface on the next reload (the native
+    // flow never navigates away from the card), so reset the attempt before surfacing the error.
+    await resetFailedAttempt(opts.resource);
     throw new ClerkRuntimeError(failure.message, { code: failure.code });
   }
 
