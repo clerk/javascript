@@ -424,6 +424,8 @@ export const enUS: LocalizationResource = {
               claimName: 'Claim name',
               value: 'Value',
             },
+            copyClaimName: 'Copy claim name',
+            copyClaimNameCopied: 'Copied',
             rows: {
               email: {
                 attribute: 'Email address',
@@ -485,7 +487,7 @@ export const enUS: LocalizationResource = {
               placeholder: 'Paste URL here...',
             },
             signOnUrl: {
-              label: 'Single Sign-On URL',
+              label: 'Sign on URL',
               placeholder: 'Paste URL here...',
             },
             signingCertificate: {
@@ -498,7 +500,7 @@ export const enUS: LocalizationResource = {
           },
           metadataUrl: {
             description:
-              'On the <bold>SAML-based Sign-on</bold> page, find the <bold>SAML Certificates</bold> section. Add the <bold>App Federation Metadata Url</bold> below.',
+              'On the <bold>SAML-based Sign-on</bold> page, find the <bold>SAML Certificates</bold> section and copy the <bold>App Federation Metadata Url</bold>. Paste below.',
             label: 'Metadata URL',
             placeholder: 'Paste URL here...',
           },
@@ -506,7 +508,6 @@ export const enUS: LocalizationResource = {
             ariaLabel: 'Configuration ',
             manual: 'Configure manually',
             metadataUrl: 'Add via metadata',
-            title: 'Fill in your Microsoft Entra application details',
           },
         },
         mainHeaderTitle: 'Configure Microsoft Entra',

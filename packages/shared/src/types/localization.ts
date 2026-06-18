@@ -1651,7 +1651,6 @@ export type __internal_LocalizationResource = {
         identityProviderMetadataStep: {
           headerSubtitle: LocalizationValue;
           modes: {
-            title: LocalizationValue;
             ariaLabel: LocalizationValue;
             metadataFile: LocalizationValue;
             manual: LocalizationValue;
@@ -1776,7 +1775,6 @@ export type __internal_LocalizationResource = {
         identityProviderMetadataStep: {
           headerSubtitle: LocalizationValue;
           modes: {
-            title: LocalizationValue;
             ariaLabel: LocalizationValue;
             metadataUrl: LocalizationValue;
             manual: LocalizationValue;
@@ -1816,6 +1814,8 @@ export type __internal_LocalizationResource = {
               claimName: LocalizationValue;
               value: LocalizationValue;
             };
+            copyClaimName: LocalizationValue;
+            copyClaimNameCopied: LocalizationValue;
             rows: {
               email: { attribute: LocalizationValue; claimName: LocalizationValue; value: LocalizationValue };
               firstName: { attribute: LocalizationValue; claimName: LocalizationValue; value: LocalizationValue };
