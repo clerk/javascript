@@ -211,6 +211,16 @@ export const enUS: LocalizationResource = {
     yearPerUnit: 'Year per {{unitName}}',
   },
   configureSSO: {
+    activate: {
+      activateButton: 'Activate SSO',
+      activeSubtitle: 'Anyone signing in with {{domain}} must use your identity provider.',
+      activeTitle: 'SSO connection is active',
+      doneButton: 'Done',
+      skipButton: 'Skip for now',
+      subtitle:
+        'Your SSO connection is ready. Once activated, anyone signing in with {{domain}} must use your identity provider.',
+      title: 'SSO connection configured',
+    },
     configureStep: {
       attributeMappingTable: {
         badges: {
@@ -633,35 +643,6 @@ export const enUS: LocalizationResource = {
           },
         },
         mainHeaderTitle: 'Configure Okta Workforce',
-      },
-    },
-    confirmation: {
-      configurationSection: {
-        configureAgainLink: 'Configure again',
-        issuerLabel: 'Issuer',
-        ssoUrlLabel: 'Sign on URL',
-        title: 'Configuration details',
-      },
-      domainSection: {
-        title: 'Domain',
-      },
-      enableSection: {
-        title: 'Enable SSO',
-      },
-      inactiveBanner: {
-        title: 'SSO is inactive and you need to enable it to authenticate',
-      },
-      resetSection: {
-        confirmationFieldLabel: 'Type "{{name}}" to confirm',
-        submitButton: 'Reset connection',
-        title: 'Reset connection',
-        warning:
-          'This will permanently remove the SSO configuration. Members will no longer be able to sign in with SSO.',
-      },
-      statusSection: {
-        activeBadge: 'Active',
-        inactiveBadge: 'Inactive',
-        title: 'SSO Successfully configured',
       },
     },
     missingManageEnterpriseConnectionsPermission: {

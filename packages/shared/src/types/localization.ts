@@ -1830,33 +1830,14 @@ export type __internal_LocalizationResource = {
         };
       };
     };
-    confirmation: {
-      statusSection: {
-        title: LocalizationValue;
-        activeBadge: LocalizationValue;
-        inactiveBadge: LocalizationValue;
-      };
-      enableSection: {
-        title: LocalizationValue;
-      };
-      domainSection: {
-        title: LocalizationValue;
-      };
-      configurationSection: {
-        title: LocalizationValue;
-        ssoUrlLabel: LocalizationValue;
-        issuerLabel: LocalizationValue;
-        configureAgainLink: LocalizationValue;
-      };
-      resetSection: {
-        title: LocalizationValue;
-        warning: LocalizationValue;
-        confirmationFieldLabel: LocalizationValue<'name'>;
-        submitButton: LocalizationValue;
-      };
-      inactiveBanner: {
-        title: LocalizationValue;
-      };
+    activate: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue<'domain'>;
+      activateButton: LocalizationValue;
+      skipButton: LocalizationValue;
+      activeTitle: LocalizationValue;
+      activeSubtitle: LocalizationValue<'domain'>;
+      doneButton: LocalizationValue;
     };
   };
   apiKeys: {
