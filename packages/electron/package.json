@@ -101,7 +101,6 @@
     "@clerk/clerk-js": "workspace:^",
     "@clerk/react": "workspace:^",
     "@clerk/shared": "workspace:^",
-    "@clerk/ui": "workspace:^",
     "tslib": "catalog:repo"
   },
   "devDependencies": {
