@@ -247,13 +247,17 @@ final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
   }
 
   @MainActor
-  func syncFromJsClientToken(_ clientToken: String?, sourceId: String?) async throws {
+  func syncFromJsClientToken(_ clientToken: String?, sourceId: String?, shouldRefreshClient: Bool) async throws {
     guard Self.clerkConfigured else { return }
 
     if let token = clientToken?.trimmingCharacters(in: .whitespacesAndNewlines), !token.isEmpty {
-      _ = try await Clerk.shared.updateDeviceToken(token)
-      await Self.waitForLoadedClient()
-    } else {
+      if Clerk.shared.deviceToken != token {
+        _ = try await Clerk.shared.updateDeviceToken(token)
+        await Self.waitForLoadedClient()
+      }
+    }
+
+    if shouldRefreshClient {
       _ = try await Clerk.shared.refreshClient()
       await Self.waitForLoadedClient()
     }

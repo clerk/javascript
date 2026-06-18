@@ -9,7 +9,11 @@ type ClerkExpoNativeModule = {
   configure(publishableKey: string, bearerToken: string | null): Promise<void>;
   getClientToken(): Promise<string | null>;
   removeListeners?(count: number): void;
-  syncFromJsClientToken(clientToken: string | null, sourceId: string | null): Promise<void>;
+  syncFromJsClientToken(
+    clientToken: string | null,
+    sourceId: string | null,
+    shouldRefreshClient?: boolean,
+  ): Promise<void>;
 };
 
 function isClerkExpoModule(module: unknown): module is ClerkExpoNativeModule {

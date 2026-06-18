@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.clerk.api.Clerk
+import com.clerk.api.network.model.client.Client
 import com.clerk.api.network.model.error.firstMessage
 import com.clerk.api.network.serialization.ClerkResult
 import com.clerk.api.ui.ClerkColors
@@ -72,8 +73,13 @@ class ClerkExpoModule : Module() {
             getClientToken(promise)
         }
 
-        AsyncFunction("syncFromJsClientToken") { clientToken: String?, sourceId: String?, promise: Promise ->
-            syncFromJsClientToken(clientToken, sourceId, promise)
+        AsyncFunction("syncFromJsClientToken") { clientToken: String?, sourceId: String?, shouldRefreshClient: Boolean?, promise: Promise ->
+            syncFromJsClientToken(
+                clientToken,
+                sourceId,
+                shouldRefreshClient ?: clientToken.isNullOrBlank(),
+                promise
+            )
         }
     }
 
@@ -284,7 +290,12 @@ class ClerkExpoModule : Module() {
 
     // MARK: - syncFromJsClientToken
 
-    private fun syncFromJsClientToken(clientToken: String?, sourceId: String?, promise: Promise) {
+    private fun syncFromJsClientToken(
+        clientToken: String?,
+        sourceId: String?,
+        shouldRefreshClient: Boolean,
+        promise: Promise
+    ) {
         if (!Clerk.isInitialized.value) {
             promise.resolve(null)
             return
@@ -301,48 +312,58 @@ class ClerkExpoModule : Module() {
                     }
 
                     if (currentDeviceToken == clientToken) {
-                        emitSyncedClientChanged(sourceId)
-                        promise.resolve(null)
-                        return@launch
-                    }
-
-                    when (val result = Clerk.updateDeviceToken(clientToken)) {
-                        is ClerkResult.Failure -> {
-                            promise.reject(
-                                "E_SYNC_FROM_JS_FAILED",
-                                result.error?.firstMessage() ?: result.throwable?.message ?: "Client token sync failed",
-                                null
-                            )
-                            return@launch
-                        }
-                        is ClerkResult.Success -> {
-                            try {
-                                withTimeout(5_000L) {
-                                    Clerk.clientFlow.first { it != null }
-                                }
-                            } catch (_: TimeoutCancellationException) {
-                                debugLog(TAG, "syncFromJsClientToken - client did not appear after token update")
-                            }
+                        if (!shouldRefreshClient) {
                             emitSyncedClientChanged(sourceId)
                             promise.resolve(null)
                             return@launch
                         }
+                    } else {
+                        when (val result = Clerk.updateDeviceToken(clientToken)) {
+                            is ClerkResult.Failure -> {
+                                promise.reject(
+                                    "E_SYNC_FROM_JS_FAILED",
+                                    result.error?.firstMessage() ?: result.throwable?.message ?: "Client token sync failed",
+                                    null
+                                )
+                                return@launch
+                            }
+                            is ClerkResult.Success -> {
+                                try {
+                                    withTimeout(5_000L) {
+                                        Clerk.clientFlow.first { it != null }
+                                    }
+                                } catch (_: TimeoutCancellationException) {
+                                    debugLog(TAG, "syncFromJsClientToken - client did not appear after token update")
+                                }
+                                if (!shouldRefreshClient) {
+                                    emitSyncedClientChanged(sourceId)
+                                    promise.resolve(null)
+                                    return@launch
+                                }
+                            }
+                        }
                     }
                 }
 
-                when (val result = Clerk.refreshClient()) {
-                    is ClerkResult.Failure -> {
-                        promise.reject(
-                            "E_SYNC_FROM_JS_FAILED",
-                            result.error?.firstMessage() ?: result.throwable?.message ?: "Client refresh failed",
-                            null
-                        )
+                if (shouldRefreshClient) {
+                    when (val result = Clerk.refreshClient()) {
+                        is ClerkResult.Failure -> {
+                            promise.reject(
+                                "E_SYNC_FROM_JS_FAILED",
+                                result.error?.firstMessage() ?: result.throwable?.message ?: "Client refresh failed",
+                                null
+                            )
+                        }
+                        is ClerkResult.Success -> {
+                            emitSyncedClientChanged(sourceId)
+                            promise.resolve(null)
+                        }
                     }
-                    is ClerkResult.Success -> {
-                        emitSyncedClientChanged(sourceId)
-                        promise.resolve(null)
-                    }
+                    return@launch
                 }
+
+                emitSyncedClientChanged(sourceId)
+                promise.resolve(null)
             } catch (e: Exception) {
                 promise.reject("E_SYNC_FROM_JS_FAILED", e.message ?: "Client token sync failed", e)
             } finally {
