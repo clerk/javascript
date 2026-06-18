@@ -574,7 +574,7 @@ describe('SignInStart', () => {
   });
 
   describe('Instant password field a11y', () => {
-    it('hides the empty instant password field from the a11y tree via display:none', async () => {
+    it('hides the empty instant password field from the a11y tree via aria-hidden', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withEmailAddress();
         f.withPassword({ required: true });
@@ -585,7 +585,7 @@ describe('SignInStart', () => {
       expect(passwordField).not.toBeNull();
 
       const row = passwordField.closest('[class*="formFieldRow"]') as HTMLElement;
-      expect(row).not.toBeVisible();
+      expect(row).toHaveAttribute('aria-hidden', 'true');
     });
 
     it('reveals the instant password field when the browser autofills it', async () => {
@@ -605,12 +605,12 @@ describe('SignInStart', () => {
       const passwordField = container.querySelector('#password-field') as HTMLElement;
       const row = passwordField.closest('[class*="formFieldRow"]') as HTMLElement;
 
-      // initially hidden until the autofill poll fires
-      expect(row).not.toBeVisible();
+      // initially hidden from a11y tree until the autofill poll fires
+      expect(row).toHaveAttribute('aria-hidden', 'true');
 
       await waitFor(
         () => {
-          expect(row).toBeVisible();
+          expect(row).not.toHaveAttribute('aria-hidden');
         },
         { timeout: 2000 },
       );
