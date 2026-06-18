@@ -327,27 +327,15 @@ export type UpdateUserParams = {
   /** The maximum number of Organizations the user can create. `0` means unlimited. */
   createOrganizationsLimit?: number;
   /**
-   * Metadata visible to your Frontend and Backend APIs.
-   *
-   * @deprecated Updating metadata via `updateUser()` is deprecated. Use
-   * [`updateUserMetadata()`](https://clerk.com/docs/reference/backend/user/update-user-metadata) for partial updates (deep merge) or
-   * [`replaceUserMetadata()`](https://clerk.com/docs/reference/backend/user/replace-user-metadata) for full replacement.
+   * @deprecated Updating metadata via `updateUser()` is deprecated. Use [`updateUserMetadata()`](https://clerk.com/docs/reference/backend/user/update-user-metadata) for partial updates (deep merge) or [`replaceUserMetadata()`](https://clerk.com/docs/reference/backend/user/replace-user-metadata) for full replacement.
    */
   publicMetadata?: UserPublicMetadata;
   /**
-   * Metadata visible only to your Backend API.
-   *
-   * @deprecated Updating metadata via `updateUser()` is deprecated. Use
-   * [`updateUserMetadata()`](https://clerk.com/docs/reference/backend/user/update-user-metadata) for partial updates (deep merge) or
-   * [`replaceUserMetadata()`](https://clerk.com/docs/reference/backend/user/replace-user-metadata) for full replacement.
+   * @deprecated Updating metadata via `updateUser()` is deprecated. Use [`updateUserMetadata()`](https://clerk.com/docs/reference/backend/user/update-user-metadata) for partial updates (deep merge) or [`replaceUserMetadata()`](https://clerk.com/docs/reference/backend/user/replace-user-metadata) for full replacement.
    */
   privateMetadata?: UserPrivateMetadata;
   /**
-   * Metadata writeable from both the Frontend and Backend APIs.
-   *
-   * @deprecated Updating metadata via `updateUser()` is deprecated. Use
-   * [`updateUserMetadata()`](https://clerk.com/docs/reference/backend/user/update-user-metadata) for partial updates (deep merge) or
-   * [`replaceUserMetadata()`](https://clerk.com/docs/reference/backend/user/replace-user-metadata) for full replacement.
+   * @deprecated Updating metadata via `updateUser()` is deprecated. Use [`updateUserMetadata()`](https://clerk.com/docs/reference/backend/user/update-user-metadata) for partial updates (deep merge) or [`replaceUserMetadata()`](https://clerk.com/docs/reference/backend/user/replace-user-metadata) for full replacement.
    */
   unsafeMetadata?: UserUnsafeMetadata;
 } & (UserPasswordHashingParams | object);

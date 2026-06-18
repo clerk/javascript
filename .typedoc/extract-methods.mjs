@@ -101,6 +101,21 @@ function codeDisplayPartToMarkdown(text) {
 }
 
 /**
+ * Build the description cell for a nested `param.field` row: summary text plus a leading `**Deprecated.**` marker (with the `@deprecated` tag's body) when that tag is present. Matches what typedoc-plugin-markdown's `parseParams` emits for inline `{ … }` params — fields documented only via `@deprecated` (no summary) otherwise rendered as `—` here, hiding important guidance.
+ * Returns `'—'` when both summary and `@deprecated` are empty.
+ *
+ * @param {import('typedoc').Comment | undefined} comment
+ */
+function renderNestedRowDescription(comment) {
+  const summaryText = comment?.summary?.length ? displayPartsToString(comment.summary).trim() : '';
+  const deprecatedTag = comment?.blockTags?.find(t => t.tag === '@deprecated');
+  const deprecatedText = deprecatedTag ? displayPartsToString(deprecatedTag.content).trim() : '';
+  const deprecatedMd = deprecatedTag ? `**Deprecated.**${deprecatedText ? ` ${deprecatedText}` : ''}` : '';
+  const combined = [summaryText, deprecatedMd].filter(Boolean).join(' ');
+  return combined || '—';
+}
+
+/**
  * @param {import('typedoc').CommentDisplayPart[] | undefined} parts
  */
 function displayPartsToString(parts) {
@@ -1014,10 +1029,9 @@ function nestedParameterRowsFromDocumentedProperties(param, ctx) {
   /** @type {string[]} */
   const rows = [];
   for (const child of props) {
-    const summary = child.comment?.summary;
     const typeCell = child.type ? removeLineBreaksForTableCell(ctx.partials.someType(child.type)) : '`unknown`';
     const nestedNameCol = formatNestedParamNameColumn(param, child);
-    const nestedDescRaw = summary?.length ? displayPartsToString(summary).trim() || '—' : '—';
+    const nestedDescRaw = renderNestedRowDescription(child.comment);
     // Strip line breaks so multi-line `<ul>` / paragraph descriptions don't shatter the markdown
     // table row (which must be a single line). Matches the treatment already applied to typeCell.
     const nestedDesc = removeLineBreaksForTableCell(nestedDescRaw) ?? '—';
