@@ -1,37 +1,23 @@
-import ExpoModulesCore
+import React
 import GoogleSignIn
 
-public class ClerkGoogleSignInModule: Module {
+@objc(ClerkGoogleSignIn)
+class ClerkGoogleSignInModule: NSObject, RCTBridgeModule {
+
+  static func moduleName() -> String! {
+    return "ClerkGoogleSignIn"
+  }
+
+  @objc static func requiresMainQueueSetup() -> Bool {
+    return false
+  }
+
   private var clientId: String?
   private var hostedDomain: String?
 
-  public func definition() -> ModuleDefinition {
-    Name("ClerkGoogleSignIn")
-
-    Function("configure") { (params: [String: Any?]) in
-      self.configure(params)
-    }
-
-    AsyncFunction("signIn") { (params: [String: Any?]?, promise: Promise) in
-      self.signIn(params, promise: promise)
-    }.runOnQueue(.main)
-
-    AsyncFunction("createAccount") { (params: [String: Any?]?, promise: Promise) in
-      self.createAccount(params, promise: promise)
-    }.runOnQueue(.main)
-
-    AsyncFunction("presentExplicitSignIn") { (params: [String: Any?]?, promise: Promise) in
-      self.presentExplicitSignIn(params, promise: promise)
-    }.runOnQueue(.main)
-
-    AsyncFunction("signOut") { (promise: Promise) in
-      self.signOut(promise: promise)
-    }.runOnQueue(.main)
-  }
-
   // MARK: - configure
 
-  private func configure(_ params: [String: Any?]) {
+  @objc func configure(_ params: NSDictionary) {
     let webClientId = self.nonEmptyClientId(params["webClientId"] as? String)
     let iosClientId = self.nonEmptyClientId(params["iosClientId"] as? String)
     self.clientId = iosClientId ?? webClientId
@@ -48,91 +34,101 @@ public class ClerkGoogleSignInModule: Module {
 
   // MARK: - signIn
 
-  private func signIn(_ params: [String: Any?]?, promise: Promise) {
+  @objc func signIn(_ params: NSDictionary?,
+                     resolve: @escaping RCTPromiseResolveBlock,
+                     reject: @escaping RCTPromiseRejectBlock) {
     guard self.clientId != nil else {
-      promise.reject("NOT_CONFIGURED", "Google Sign-In is not configured. Call configure() first.")
+      reject("NOT_CONFIGURED", "Google Sign-In is not configured. Call configure() first.", nil)
       return
     }
 
-    guard let presentingVC = self.getPresentingViewController() else {
-      promise.reject("GOOGLE_SIGN_IN_ERROR", "No presenting view controller available")
-      return
-    }
-
-    let filterByAuthorized = params?["filterByAuthorizedAccounts"] as? Bool ?? false
-    let hint: String? = filterByAuthorized
-      ? GIDSignIn.sharedInstance.currentUser?.profile?.email
-      : nil
-    let nonce = params?["nonce"] as? String
-
-    GIDSignIn.sharedInstance.signIn(
-      withPresenting: presentingVC,
-      hint: hint,
-      additionalScopes: nil,
-      nonce: nonce,
-      completion: { result, error in
-        self.handleSignInResult(result: result, error: error, promise: promise)
+    DispatchQueue.main.async {
+      guard let presentingVC = self.getPresentingViewController() else {
+        reject("GOOGLE_SIGN_IN_ERROR", "No presenting view controller available", nil)
+        return
       }
-    )
+
+      let filterByAuthorized = params?["filterByAuthorizedAccounts"] as? Bool ?? false
+      let hint: String? = filterByAuthorized
+        ? GIDSignIn.sharedInstance.currentUser?.profile?.email
+        : nil
+      let nonce = params?["nonce"] as? String
+
+      GIDSignIn.sharedInstance.signIn(
+        withPresenting: presentingVC,
+        hint: hint,
+        additionalScopes: nil,
+        nonce: nonce
+      ) { result, error in
+        self.handleSignInResult(result: result, error: error, resolve: resolve, reject: reject)
+      }
+    }
   }
 
   // MARK: - createAccount
 
-  private func createAccount(_ params: [String: Any?]?, promise: Promise) {
+  @objc func createAccount(_ params: NSDictionary?,
+                             resolve: @escaping RCTPromiseResolveBlock,
+                             reject: @escaping RCTPromiseRejectBlock) {
     guard self.clientId != nil else {
-      promise.reject("NOT_CONFIGURED", "Google Sign-In is not configured. Call configure() first.")
+      reject("NOT_CONFIGURED", "Google Sign-In is not configured. Call configure() first.", nil)
       return
     }
 
-    guard let presentingVC = self.getPresentingViewController() else {
-      promise.reject("GOOGLE_SIGN_IN_ERROR", "No presenting view controller available")
-      return
-    }
-
-    let nonce = params?["nonce"] as? String
-
-    GIDSignIn.sharedInstance.signIn(
-      withPresenting: presentingVC,
-      hint: nil,
-      additionalScopes: nil,
-      nonce: nonce,
-      completion: { result, error in
-        self.handleSignInResult(result: result, error: error, promise: promise)
+    DispatchQueue.main.async {
+      guard let presentingVC = self.getPresentingViewController() else {
+        reject("GOOGLE_SIGN_IN_ERROR", "No presenting view controller available", nil)
+        return
       }
-    )
+
+      let nonce = params?["nonce"] as? String
+
+      GIDSignIn.sharedInstance.signIn(
+        withPresenting: presentingVC,
+        hint: nil,
+        additionalScopes: nil,
+        nonce: nonce
+      ) { result, error in
+        self.handleSignInResult(result: result, error: error, resolve: resolve, reject: reject)
+      }
+    }
   }
 
   // MARK: - presentExplicitSignIn
 
-  private func presentExplicitSignIn(_ params: [String: Any?]?, promise: Promise) {
+  @objc func presentExplicitSignIn(_ params: NSDictionary?,
+                                     resolve: @escaping RCTPromiseResolveBlock,
+                                     reject: @escaping RCTPromiseRejectBlock) {
     guard self.clientId != nil else {
-      promise.reject("NOT_CONFIGURED", "Google Sign-In is not configured. Call configure() first.")
+      reject("NOT_CONFIGURED", "Google Sign-In is not configured. Call configure() first.", nil)
       return
     }
 
-    guard let presentingVC = self.getPresentingViewController() else {
-      promise.reject("GOOGLE_SIGN_IN_ERROR", "No presenting view controller available")
-      return
-    }
-
-    let nonce = params?["nonce"] as? String
-
-    GIDSignIn.sharedInstance.signIn(
-      withPresenting: presentingVC,
-      hint: nil,
-      additionalScopes: nil,
-      nonce: nonce,
-      completion: { result, error in
-        self.handleSignInResult(result: result, error: error, promise: promise)
+    DispatchQueue.main.async {
+      guard let presentingVC = self.getPresentingViewController() else {
+        reject("GOOGLE_SIGN_IN_ERROR", "No presenting view controller available", nil)
+        return
       }
-    )
+
+      let nonce = params?["nonce"] as? String
+
+      GIDSignIn.sharedInstance.signIn(
+        withPresenting: presentingVC,
+        hint: nil,
+        additionalScopes: nil,
+        nonce: nonce
+      ) { result, error in
+        self.handleSignInResult(result: result, error: error, resolve: resolve, reject: reject)
+      }
+    }
   }
 
   // MARK: - signOut
 
-  private func signOut(promise: Promise) {
+  @objc func signOut(_ resolve: @escaping RCTPromiseResolveBlock,
+                      reject: @escaping RCTPromiseRejectBlock) {
     GIDSignIn.sharedInstance.signOut()
-    promise.resolve()
+    resolve(nil)
   }
 
   // MARK: - Helpers
@@ -159,23 +155,25 @@ public class ClerkGoogleSignInModule: Module {
     return topVC
   }
 
-  private func handleSignInResult(result: GIDSignInResult?, error: Error?, promise: Promise) {
+  private func handleSignInResult(result: GIDSignInResult?, error: Error?,
+                                   resolve: @escaping RCTPromiseResolveBlock,
+                                   reject: @escaping RCTPromiseRejectBlock) {
     if let error = error {
       let nsError = error as NSError
 
       // Check for user cancellation
       if nsError.domain == kGIDSignInErrorDomain && nsError.code == GIDSignInError.canceled.rawValue {
-        promise.reject("SIGN_IN_CANCELLED", "User cancelled the sign-in flow")
+        reject("SIGN_IN_CANCELLED", "User cancelled the sign-in flow", error)
         return
       }
 
-      promise.reject("GOOGLE_SIGN_IN_ERROR", error.localizedDescription)
+      reject("GOOGLE_SIGN_IN_ERROR", error.localizedDescription, error)
       return
     }
 
     guard let result = result,
           let idToken = result.user.idToken?.tokenString else {
-      promise.reject("GOOGLE_SIGN_IN_ERROR", "No ID token received")
+      reject("GOOGLE_SIGN_IN_ERROR", "No ID token received", nil)
       return
     }
 
@@ -197,6 +195,6 @@ public class ClerkGoogleSignInModule: Module {
       ] as [String: Any]
     ]
 
-    promise.resolve(response)
+    resolve(response)
   }
 }

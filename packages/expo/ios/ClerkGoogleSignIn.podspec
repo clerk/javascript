@@ -16,11 +16,9 @@ Pod::Spec.new do |s|
   s.static_framework = true
 
   s.dependency 'GoogleSignIn', '~> 9.0'
-  s.dependency 'GoogleUtilities'
-  s.dependency 'RecaptchaInterop'
 
   # Only include the Google Sign-In module files
-  s.source_files = 'ClerkGoogleSignInModule.swift'
+  s.source_files = 'ClerkGoogleSignInModule.swift', 'ClerkGoogleSignInModule.m'
 
   install_modules_dependencies(s)
 end

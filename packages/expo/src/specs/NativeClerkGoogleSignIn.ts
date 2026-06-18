@@ -1,13 +1,13 @@
-import { requireOptionalNativeModule } from 'expo';
+import type { TurboModule } from 'react-native';
+import { TurboModuleRegistry } from 'react-native';
+import type { UnsafeObject } from 'react-native/Libraries/Types/CodegenTypesNamespace';
 
-type NativeMap = Record<string, unknown>;
-
-interface Spec {
-  configure(params: NativeMap): void;
-  signIn(params: NativeMap | null): Promise<NativeMap>;
-  createAccount(params: NativeMap | null): Promise<NativeMap>;
-  presentExplicitSignIn(params: NativeMap | null): Promise<NativeMap>;
+export interface Spec extends TurboModule {
+  configure(params: UnsafeObject): void;
+  signIn(params: UnsafeObject | null): Promise<UnsafeObject>;
+  createAccount(params: UnsafeObject | null): Promise<UnsafeObject>;
+  presentExplicitSignIn(params: UnsafeObject | null): Promise<UnsafeObject>;
   signOut(): Promise<void>;
 }
 
-export default requireOptionalNativeModule<Spec>('ClerkGoogleSignIn');
+export default TurboModuleRegistry.get<Spec>('ClerkGoogleSignIn');
