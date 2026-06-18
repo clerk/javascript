@@ -430,7 +430,7 @@ type UserID = {
 export class UserAPI extends AbstractAPI {
   /**
    * Retrieves the list of users in your instance.
-   * @returns A [PaginatedResourceResponse](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property than contains an array of [`User`](https://clerk.com/docs/reference/backend/types/backend-user) objects, and a `totalCount` property that indicates the total number of users in your instance.
+   * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property than contains an array of [`User`](https://clerk.com/docs/reference/backend/types/backend-user) objects, and a `totalCount` property that indicates the total number of users in your instance.
    */
   public async getUserList(params: UserListParams = {}) {
     const { limit, offset, orderBy, ...userCountParams } = params;
@@ -629,21 +629,21 @@ export class UserAPI extends AbstractAPI {
     });
   }
 
-  /** @deprecated Use `getUserOauthAccessToken` without the `oauth_` provider prefix . */
-  public async getUserOauthAccessToken(
-    userId: string,
-    provider: `oauth_${OAuthProvider}`,
-  ): Promise<PaginatedResourceResponse<OauthAccessToken[]>>;
-  public async getUserOauthAccessToken(
-    userId: string,
-    provider: OAuthProvider,
-  ): Promise<PaginatedResourceResponse<OauthAccessToken[]>>;
   /**
    * Gets the corresponding [OAuth access token](!oauth-access-token) for a user that has previously authenticated with the given OAuth provider.
    * @param userId - The ID of the user to get the OAuth access tokens for.
    * @param provider - The OAuth provider to get the access tokens for. If using a custom OAuth provider, prefix the provider name with `custom_` (e.g. `custom_google`).
    * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property than contains an array of [`OauthAccessToken`](https://clerk.com/docs/reference/backend/types/backend-oauth-access-token) objects, and a `totalCount` property that indicates the total number of OAuth access tokens for the specified user and provider.
    */
+  public async getUserOauthAccessToken(
+    userId: string,
+    provider: OAuthProvider,
+  ): Promise<PaginatedResourceResponse<OauthAccessToken[]>>;
+  /** @deprecated Use `getUserOauthAccessToken` without the `oauth_` provider prefix . */
+  public async getUserOauthAccessToken(
+    userId: string,
+    provider: `oauth_${OAuthProvider}`,
+  ): Promise<PaginatedResourceResponse<OauthAccessToken[]>>;
   public async getUserOauthAccessToken(userId: string, provider: `oauth_${OAuthProvider}` | OAuthProvider) {
     this.requireId(userId);
     const hasPrefix = provider.startsWith('oauth_');

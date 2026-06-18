@@ -73,6 +73,7 @@ const LINK_REPLACEMENTS = [
   ['o-auth-consent-info', '/docs/reference/types/oauth-consent-info'],
   ['o-auth-consent-scope', '/docs/reference/types/oauth-consent-scope'],
   ['o-auth-strategy', '/docs/reference/types/sso#o-auth-strategy'],
+  ['o-auth-provider', '/docs/reference/types/sso#o-auth-provider'],
   ['session', '/docs/reference/backend/types/backend-session'],
   ['session-activity', '/docs/reference/backend/types/backend-session-activity'],
   ['organization', '/docs/reference/backend/types/backend-organization'],
@@ -292,6 +293,10 @@ function getCatchAllReplacements() {
     {
       pattern: /(?<![\[\w`#])`?OAuthStrategy`?(?![\]\w`])/g,
       replace: '[OAuthStrategy](/docs/reference/types/sso#o-auth-strategy)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?OAuthProvider`?(?![\]\w`])/g,
+      replace: '[OAuthProvider](/docs/reference/types/sso#o-auth-provider)',
     },
     {
       pattern: /(?<![\[\w`#])`?OrganizationResource`?(?![\]\w`])/g,
