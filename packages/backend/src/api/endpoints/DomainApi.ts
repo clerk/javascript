@@ -82,7 +82,7 @@ export class DomainAPI extends AbstractAPI {
    * Deletes a satellite domain for the instance.
    * @param satelliteDomainId - The ID of the satellite domain to delete.
    * @returns The [`DeletedObject`](https://clerk.com/docs/reference/backend/types/deleted-object).
-   * @deprecated Use the [`delete()`](https://clerk.com/docs/reference/backend/domain/delete) method instead.
+   * @deprecated
    */
   public async deleteDomain(satelliteDomainId: string) {
     this.requireId(satelliteDomainId);
