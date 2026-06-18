@@ -1480,6 +1480,7 @@ export type __internal_LocalizationResource = {
       };
       activeConnectionWarning: {
         title: LocalizationValue;
+        dismiss: LocalizationValue;
       };
       samlOkta: {
         mainHeaderTitle: LocalizationValue;

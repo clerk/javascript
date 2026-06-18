@@ -234,9 +234,11 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
         await deleteEnterpriseConnection(enterpriseConnection.id);
       }
 
+      const domains = enterpriseConnection?.domains ?? organizationDomains?.map(domain => domain.name);
+
       return createEnterpriseConnection({
         provider,
-        domains: organizationDomains?.map(domain => domain.name),
+        domains,
       });
     };
 

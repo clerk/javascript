@@ -231,6 +231,7 @@ export const enUS: LocalizationResource = {
       activeConnectionWarning: {
         title:
           'This connection is active. Saving changes applies immediately and may disrupt sign-in for current members.',
+        dismiss: 'Dismiss',
       },
       attributeMappingTable: {
         badges: {
