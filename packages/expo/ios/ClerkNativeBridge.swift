@@ -7,7 +7,7 @@ import SwiftUI
 import Observation
 @_spi(FrameworkIntegration) import ClerkKit
 import ClerkKitUI
-internal import ClerkExpo  // Import the pod to access ClerkNativeBridgeProtocol
+import ClerkExpo  // Import the pod to access ClerkNativeBridgeProtocol
 
 private struct ClerkExpoHeaderMiddleware: ClerkRequestMiddleware {
   // Replaced by the config plugin when this bridge is copied into the app target.
@@ -22,7 +22,7 @@ private struct ClerkExpoHeaderMiddleware: ClerkRequestMiddleware {
 // MARK: - Native Bridge Implementation
 
 final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
-  public static let shared = ClerkNativeBridge()
+  static let shared = ClerkNativeBridge()
 
   private static let clerkLoadMaxAttempts = 30
   private static let clerkLoadIntervalNs: UInt64 = 100_000_000
@@ -53,13 +53,13 @@ final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
   }
 
   // Register this app-target bridge with the ClerkExpo module.
-  @MainActor public static func register() {
+  @MainActor static func register() {
     shared.loadThemes()
     clerkNativeBridge = shared
   }
 
   @MainActor
-  public func configure(publishableKey: String, bearerToken: String? = nil) async throws {
+  func configure(publishableKey: String, bearerToken: String? = nil) async throws {
     if Self.shouldReconfigure(for: publishableKey) {
       try await Clerk.reconfigure(publishableKey: publishableKey, options: Self.makeClerkOptions())
       Self.clerkConfigured = true
@@ -204,14 +204,14 @@ final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
   }
 
   @MainActor
-  public func getClientToken() async -> String? {
+  func getClientToken() async -> String? {
     guard Self.clerkConfigured else { return nil }
     return Clerk.shared.deviceToken
   }
 
   // MARK: - Inline View Creation
 
-  public func makeAuthViewController(
+  func makeAuthViewController(
     mode: String,
     dismissible: Bool,
     onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
@@ -229,7 +229,7 @@ final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
     )
   }
 
-  public func makeUserProfileViewController(
+  func makeUserProfileViewController(
     dismissible: Bool,
     onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
   ) -> UIViewController? {
@@ -245,7 +245,7 @@ final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
     )
   }
 
-  public func makeUserButtonViewController() -> UIViewController? {
+  func makeUserButtonViewController() -> UIViewController? {
     guard Self.clerkConfigured else { return nil }
 
     return makeHostingController(
@@ -257,7 +257,7 @@ final class ClerkNativeBridge: ClerkNativeBridgeProtocol {
   }
 
   @MainActor
-  public func syncFromJsClientToken(_ clientToken: String?, sourceId: String?) async throws {
+  func syncFromJsClientToken(_ clientToken: String?, sourceId: String?) async throws {
     guard Self.clerkConfigured else { return }
 
     if let token = clientToken?.trimmingCharacters(in: .whitespacesAndNewlines), !token.isEmpty {
