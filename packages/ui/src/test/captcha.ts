@@ -4,29 +4,21 @@
  * Not bundled: this module lives under `src/test/` (the `@/test/*` alias resolves
  * only during test runs) and is never exported from the package entry.
  *
- * The interactive signal: our Turnstile logic (`turnstile.ts`) mutates the inline
- * `#clerk-captcha` element's `style.maxHeight` outside the React lifecycle —
- * `'unset'` (or any non-`'0'` value) while an interactive "Verify you are human"
- * challenge is showing, back to `'0'` once it resolves. `CaptchaElement` observes
- * this via a MutationObserver. These helpers reproduce that transition so tests
- * don't hand-roll the fiddly style mutation inline.
+ * The interactive signal: our Turnstile logic (`turnstile.ts`) sets
+ * `data-cl-interactive="true"` on `#clerk-captcha` when an interactive challenge
+ * is showing and removes it on resolve/error. `CaptchaElement` observes this via a
+ * MutationObserver. These helpers reproduce that transition so tests don't hand-roll
+ * the DOM mutation inline.
  */
 
 /** Simulate Turnstile escalating to an interactive challenge (widget expands). */
 export const simulateCaptchaInteractive = (el: HTMLElement) => {
-  el.style.maxHeight = 'unset';
+  el.dataset.clInteractive = 'true';
 };
 
-/**
- * Simulate the interactive challenge resolving (widget collapses back).
- *
- * `turnstile.ts` resets `maxHeight` to `'0'`, but browsers serialize that to `'0px'`
- * when it's read back off `style` — so collapse with `'0px'` to mirror what the
- * MutationObserver actually sees in a real browser (jsdom would keep a literal `'0'`
- * and hide the off-by-serialization bug this guards against).
- */
+/** Simulate the interactive challenge resolving (widget collapses back). */
 export const simulateCaptchaResolved = (el: HTMLElement) => {
-  el.style.maxHeight = '0px';
+  delete el.dataset.clInteractive;
 };
 
 /**

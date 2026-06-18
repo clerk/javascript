@@ -5,13 +5,13 @@ import { Box, useAppearance, useLocalizations } from '../customizables';
 
 /**
  * This component uses a MutationObserver to listen for DOM changes made by our Turnstile logic,
- * which operates outside the React lifecycle. It stores the observed state in ref to ensure that
+ * which operates outside the React lifecycle. It stores the observed state in refs to ensure that
  * any external style changes, such as updates to max-height, min-height, or margin-bottom persist across re-renders,
  * preventing unwanted layout resets.
  *
- * When Turnstile escalates to an interactive "Verify you are human" challenge it sets the element's
- * `maxHeight` to a non-`'0'` value (reset back to `'0'` on resolve/error). `onInteractiveChange` surfaces
- * that signal so a parent can react (e.g. spotlight the challenge); it never fires on mount.
+ * When Turnstile escalates to an interactive "Verify you are human" challenge it sets
+ * `data-cl-interactive="true"` on the element (removed on resolve/error). `onInteractiveChange`
+ * surfaces that signal so a parent can react (e.g. spotlight the challenge); it never fires on mount.
  */
 export const CaptchaElement = ({
   onInteractiveChange,
@@ -52,21 +52,20 @@ export const CaptchaElement = ({
     const observer = new MutationObserver(mutations => {
       mutations.forEach(mutation => {
         const target = mutation.target as HTMLDivElement;
-        if (mutation.type === 'attributes' && mutation.attributeName === 'style' && elementRef.current) {
+        if (mutation.type !== 'attributes' || !elementRef.current) {
+          return;
+        }
+        if (mutation.attributeName === 'style') {
+          // Keep refs in sync so Turnstile's injected styles survive React re-renders.
           maxHeightValueRef.current = target.style.maxHeight || '0';
           minHeightValueRef.current = target.style.minHeight || 'unset';
           marginBottomValueRef.current = target.style.marginBottom || 'unset';
-
-          // ORDERING IS LOAD-BEARING: derive and apply the interactive signal only AFTER the refs above
-          // are updated. The re-render that `setIsInteractive` triggers reads those refs fresh; setting
-          // state earlier (or from a separate effect) would write stale defaults back into `style` and
-          // clobber Turnstile's injected styles.
-          //
-          // Turnstile expands the widget by setting `maxHeight: 'unset'` and collapses it back to `'0'`.
-          // Browsers serialize that `'0'` to `'0px'` when read back, so compare the PARSED length to zero
-          // rather than the literal `'0'` — otherwise the collapse reads as a non-`'0'` string and the
-          // spotlight stays stuck (blank card) after the challenge resolves.
-          const nowInteractive = parseFloat(maxHeightValueRef.current) > 0 || maxHeightValueRef.current === 'unset';
+        }
+        if (mutation.attributeName === 'data-cl-interactive') {
+          // ORDERING IS LOAD-BEARING: style mutations from the same turnstile.ts call are
+          // delivered before this one (DOM mutations are batched and replayed in order), so
+          // the refs above are already up-to-date when the re-render triggered below runs.
+          const nowInteractive = target.dataset.clInteractive === 'true';
           if (nowInteractive !== isInteractiveRef.current) {
             isInteractiveRef.current = nowInteractive;
             setIsInteractive(nowInteractive);
@@ -78,7 +77,7 @@ export const CaptchaElement = ({
 
     observer.observe(elementRef.current, {
       attributes: true,
-      attributeFilter: ['style'],
+      attributeFilter: ['style', 'data-cl-interactive'],
     });
 
     return () => observer.disconnect();

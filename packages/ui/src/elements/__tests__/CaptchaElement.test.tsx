@@ -58,6 +58,6 @@ describe('CaptchaElement', () => {
     render(<CaptchaElement />, { wrapper });
 
     expect(() => simulateCaptchaInteractive(getCaptcha())).not.toThrow();
-    await waitFor(() => expect((getCaptcha().style.maxHeight || '0') !== '0').toBe(true));
+    await waitFor(() => expect(getCaptcha().dataset.clInteractive).toBe('true'));
   });
 });
