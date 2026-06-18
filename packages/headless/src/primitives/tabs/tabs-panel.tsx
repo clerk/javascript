@@ -2,21 +2,11 @@
 
 import { inertProps } from '@clerk/shared/inert';
 import { useMergeRefs } from '@floating-ui/react';
-import React, { useRef, version } from 'react';
+import React, { useRef } from 'react';
 
 import { useTransition } from '../../hooks/use-transition';
 import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
 import { useTabsContext } from './tabs-context';
-
-const major = parseInt(version, 10);
-const isModernReact = major >= 19 || major === 0;
-
-export function inertProps(active: boolean): Record<string, unknown> {
-  if (!active) {
-    return {};
-  }
-  return { inert: isModernReact ? true : '' };
-}
 
 export interface TabsPanelProps extends ComponentProps<'div'> {
   value: string;
