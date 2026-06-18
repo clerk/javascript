@@ -702,7 +702,7 @@ export function OrganizationProfileMembers() {
                           alignItems: 'center',
                           justifyContent: 'center',
                           transition:
-                            'opacity 200ms ease-in-out, filter 200ms ease-in-out, transform 200ms ease-in-out',
+                            'opacity 250ms cubic-bezier(0.22, 1, 0.36, 1), filter 250ms cubic-bezier(0.22, 1, 0.36, 1), transform 250ms cubic-bezier(0.22, 1, 0.36, 1)',
                           willChange: 'opacity, filter, transform',
                           opacity: showCheckbox ? 0 : 1,
                           filter: showCheckbox ? 'blur(2px)' : 'blur(0)',
@@ -731,7 +731,7 @@ export function OrganizationProfileMembers() {
                           alignItems: 'center',
                           justifyContent: 'center',
                           transition:
-                            'opacity 200ms ease-in-out, filter 200ms ease-in-out, transform 200ms ease-in-out',
+                            'opacity 250ms cubic-bezier(0.22, 1, 0.36, 1), filter 250ms cubic-bezier(0.22, 1, 0.36, 1), transform 250ms cubic-bezier(0.22, 1, 0.36, 1)',
                           willChange: 'opacity, filter, transform',
                           opacity: showCheckbox ? 1 : 0,
                           filter: showCheckbox ? 'blur(0)' : 'blur(2px)',
