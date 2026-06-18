@@ -1,5 +1,20 @@
 # Change Log
 
+## 3.4.7
+
+### Patch Changes
+
+- Fix native component auth state when syncing JS and native client changes. ([#8920](https://github.com/clerk/javascript/pull/8920)) by [@mikepitre](https://github.com/mikepitre)
+
+- Adds an iOS Google sign-in `hint` option and clarifies that Android account filtering is platform-specific. ([#8906](https://github.com/clerk/javascript/pull/8906)) by [@mikepitre](https://github.com/mikepitre)
+
+- Fix Android native component initialization when the Expo native module does not expose React Native event listener bookkeeping methods, and make the generated iOS bridge compatible with Swift's explicit import visibility checks. ([#8920](https://github.com/clerk/javascript/pull/8920)) by [@mikepitre](https://github.com/mikepitre)
+
+- Updated dependencies [[`c84f8df`](https://github.com/clerk/javascript/commit/c84f8df4222c212ecce6ae5ff8c47958b5b5d972), [`53e7b11`](https://github.com/clerk/javascript/commit/53e7b11058096d5ce15da53af12fe7236e88db2c), [`e51e22a`](https://github.com/clerk/javascript/commit/e51e22a2aec03293e8ccf5a5372cd9906aeccbb7)]:
+  - @clerk/shared@4.19.1
+  - @clerk/react@6.10.3
+  - @clerk/clerk-js@6.18.1
+
 ## 3.4.6
 
 ### Patch Changes
