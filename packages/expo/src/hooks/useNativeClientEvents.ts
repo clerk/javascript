@@ -1,12 +1,19 @@
 import { useEffect, useState } from 'react';
-import { NativeEventEmitter, Platform } from 'react-native';
+import { DeviceEventEmitter, Platform } from 'react-native';
 
 import { ClerkExpoModule as ClerkExpo, isNativeSupported } from '../utils/native-module';
+
+const nativeClientChangedEvent = 'clerkNativeClientChanged';
+
+export interface NativeClientSnapshot {
+  clientToken?: string | null;
+  sourceId?: string | null;
+}
 
 /**
  * Local marker for a native client event.
  */
-interface NativeClientEvent {
+export interface NativeClientEvent extends NativeClientSnapshot {
   issuedAt: number;
 }
 
@@ -19,7 +26,10 @@ type RefreshClientEventSubscription = {
 };
 
 type RefreshClientEventEmitter = {
-  addListener: (eventName: 'refreshClient', listener: () => void) => RefreshClientEventSubscription;
+  addListener: (
+    eventName: typeof nativeClientChangedEvent,
+    listener: (snapshot?: NativeClientSnapshot) => void,
+  ) => RefreshClientEventSubscription;
 };
 
 /**
@@ -37,12 +47,10 @@ export function useNativeClientEvents(): UseNativeClientEventsReturn {
 
     try {
       const eventEmitter: RefreshClientEventEmitter =
-        Platform.OS === 'android'
-          ? (ClerkExpo as RefreshClientEventEmitter)
-          : (new NativeEventEmitter(ClerkExpo) as RefreshClientEventEmitter);
+        Platform.OS === 'ios' ? DeviceEventEmitter : (ClerkExpo as RefreshClientEventEmitter);
 
-      subscription = eventEmitter.addListener('refreshClient', () => {
-        setNativeClientEvent({ issuedAt: Date.now() });
+      subscription = eventEmitter.addListener(nativeClientChangedEvent, snapshot => {
+        setNativeClientEvent({ issuedAt: Date.now(), ...snapshot });
       });
     } catch (error) {
       if (__DEV__) {

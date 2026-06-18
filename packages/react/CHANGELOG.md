@@ -1,5 +1,18 @@
 # Change Log
 
+## 6.10.2
+
+### Patch Changes
+
+- Fix `ReferenceError: global is not defined` thrown from the browser Clerk loader during `<ClerkProvider>` startup in production builds (seen in TanStack Start and React Router apps). The loader now reads the Clerk global via `globalThis` instead of relying on a `window.global` polyfill side-effect, whose load order across bundler chunks was not guaranteed. ([#8909](https://github.com/clerk/javascript/pull/8909)) by [@jacekradko](https://github.com/jacekradko)
+
+## 6.10.1
+
+### Patch Changes
+
+- Updated dependencies [[`d5968d0`](https://github.com/clerk/javascript/commit/d5968d026d6b2a1b399b6967fd8727613a5bc3cd), [`ffbc650`](https://github.com/clerk/javascript/commit/ffbc650ebbcee48171c95aa5d2b497273b0276b0)]:
+  - @clerk/shared@4.19.0
+
 ## 6.10.0
 
 ### Minor Changes

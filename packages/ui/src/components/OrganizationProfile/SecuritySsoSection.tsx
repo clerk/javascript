@@ -141,7 +141,8 @@ const NotConfiguredContent = ({
     <Button
       elementDescriptor={descriptors.organizationProfileSecuritySsoConfigureButton}
       elementId={descriptors.organizationProfileSecuritySsoConfigureButton.setId(primaryButtonId)}
-      variant='outline'
+      variant='bordered'
+      colorScheme='secondary'
       size='sm'
       onClick={onConfigure}
       localizationKey={primaryButtonKey}
@@ -305,15 +306,6 @@ const ConfiguredContent = (props: ConfiguredContentProps): JSX.Element => {
               id='issuer'
               href={samlConnection.idpEntityId}
             />
-          </DetailRow>
-        )}
-
-        {samlConnection?.idpCertificate && (
-          <DetailRow
-            id='certificate'
-            label={localizationKeys('organizationProfile.securityPage.ssoSection.certificateLabel')}
-          >
-            <ValueChip id='certificate'>{samlConnection.idpCertificate}</ValueChip>
           </DetailRow>
         )}
       </Col>
