@@ -24,6 +24,8 @@ export const cardRecipe = defineSlotRecipe(theme => ({
       border: `1px solid ${theme.color.border}`,
     },
     header: {
+      display: 'flex',
+      flexDirection: 'column',
       paddingBlockStart: theme.spacing(5),
       paddingInline: theme.spacing(4),
     },
