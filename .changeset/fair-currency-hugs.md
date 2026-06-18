@@ -1,4 +1,5 @@
 ---
+'@clerk/localizations': minor
 '@clerk/ui': minor
 ---
 
