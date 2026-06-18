@@ -1,5 +1,15 @@
 # Change Log
 
+## 4.19.0
+
+### Minor Changes
+
+- Introduce organization domains with TXT verification on self-serve SSO flow ([#8788](https://github.com/clerk/javascript/pull/8788)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Add confirmation dialog for organization domain deletion as part of self-serve SSO ([#8866](https://github.com/clerk/javascript/pull/8866)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
 ## 4.18.0
 
 ### Minor Changes

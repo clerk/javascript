@@ -6,7 +6,7 @@ alwaysApply: false
 Development Practices and Tooling
 
 Development Environment Setup
-- Requires Node.js 18.17.0+ and pnpm 9.15.9+
+- Requires Node.js >=24.15.0 and pnpm >=10.33.0 (see `.nvmrc` and `package.json` engines)
 - Use `pnpm install` to install all dependencies
 - Environment variables should be set in appropriate `.env` files
 - Use `pnpm dev` to start development mode across all packages

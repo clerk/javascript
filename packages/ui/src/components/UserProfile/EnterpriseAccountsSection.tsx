@@ -138,7 +138,6 @@ export const EnterpriseAccountsSection = withCardStateProvider(() => {
     <ProfileSection.Root
       title={localizationKeys('userProfile.start.enterpriseAccountsSection.title')}
       id='enterpriseAccounts'
-      centered={false}
     >
       <Card.Alert>{card.error}</Card.Alert>
       <Action.Root
@@ -174,7 +173,10 @@ const EnterpriseAccount = ({ account }: { account: EnterpriseAccountResource }) 
   return (
     <Fragment key={accountId}>
       <ProfileSection.Item id='enterpriseAccounts'>
-        <Flex sx={t => ({ overflow: 'hidden', gap: t.space.$2 })}>
+        <Flex
+          align='center'
+          sx={t => ({ overflow: 'hidden', gap: t.space.$2 })}
+        >
           <EnterpriseAccountProviderIcon account={account} />
           <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
             <Flex
@@ -222,6 +224,7 @@ const EnterpriseAccountProviderIcon = ({ account }: { account: EnterpriseAccount
       alt={`${connectionName}'s icon`}
       elementDescriptor={[descriptors.providerIcon]}
       elementId={descriptors.enterpriseButtonsProviderIcon.setId(account.provider)}
+      sx={{ flexShrink: 0 }}
     />
   );
 };
