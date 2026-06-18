@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Building, Close, Code, CreditCard, LogoMark, Users } from '../../icons';
 import { Avatar } from '../components/avatar';
 import { Box } from '../components/box';
+import { Skeleton } from '../components/skeleton';
 import { Text } from '../components/text';
 import { useOrganization } from '../mock/use-organization';
 import { OrganizationProfileApiKeys } from '../panels/organization-profile-api-keys';
@@ -20,8 +21,15 @@ const NAV: Array<{ id: NavId; label: string; Icon: React.ComponentType<React.SVG
 ];
 
 export function OrganizationProfile() {
-  const [activeNav, setActiveNav] = useState<NavId>('general');
+  const [activeNav, setActiveNav] = useState<NavId>('members');
   const { isLoaded, organization } = useOrganization();
+  const [revealed, setRevealed] = useState(false);
+
+  useEffect(() => {
+    if (isLoaded && organization) {
+      setRevealed(true);
+    }
+  }, [isLoaded, organization]);
 
   return (
     <Box
@@ -57,17 +65,51 @@ export function OrganizationProfile() {
           })}
         >
           {/* Org header */}
-          <Box sx={t => ({ paddingInline: t.spacing(3) })}>
+          <Box sx={t => ({ paddingInline: t.spacing(3), position: 'relative', height: '1.25rem' })}>
+            {/* Skeleton layer */}
             <Box
-              sx={t => ({
+              aria-hidden
+              sx={() => ({
+                position: 'absolute',
+                inset: 0,
                 display: 'flex',
                 alignItems: 'center',
-                gap: t.spacing(2),
+                gap: '0.625rem',
+                paddingInline: '0.625rem',
+                opacity: revealed ? 0 : 1,
+                filter: revealed ? 'blur(2px)' : 'blur(0)',
+                transition: 'opacity 400ms ease-in-out, filter 400ms ease-in-out',
+                pointerEvents: revealed ? 'none' : 'auto',
+              })}
+            >
+              <Skeleton
+                width='1.25rem'
+                height='1.25rem'
+                sx={t => ({ borderRadius: t.rounded.lg, flexShrink: 0 })}
+              />
+              <Skeleton
+                width={100}
+                height='0.875rem'
+              />
+            </Box>
+            {/* Content layer */}
+            <Box
+              sx={() => ({
+                position: 'absolute',
+                inset: 0,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.625rem',
+                paddingInline: '0.625rem',
+                opacity: revealed ? 1 : 0,
+                filter: revealed ? 'blur(0)' : 'blur(2px)',
+                transition: 'opacity 400ms ease-in-out, filter 400ms ease-in-out',
               })}
             >
               <Avatar
                 shape='org'
                 size='sm'
+                src={isLoaded && organization ? organization.avatar : undefined}
                 color='#6c47ff'
               />
               <Text

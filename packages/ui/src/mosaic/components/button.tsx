@@ -79,7 +79,7 @@ export const buttonRecipe = defineSlotRecipe(theme => ({
       intent: 'primary',
       variant: 'outline',
       css: {
-        backgroundColor: 'transparent',
+        backgroundColor: 'light-dark(white, oklch(0.145 0 0))',
         borderColor: theme.color.border,
         color: theme.color.primary,
         // TODO

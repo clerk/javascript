@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { delay, LOAD_DELAY_MS, MUTATION_DELAY_MS } from './organization-store';
+import GradientAvatar from '../components/mock/gradient-2.jpg';
 
 /**
  * Mock `useOrganization` for prototyping Mosaic organization-profile components.
@@ -22,6 +23,7 @@ export interface MockEmailDomain {
 export interface MockOrganization {
   id: string;
   name: string;
+  avatar?: string;
   slug: string | null;
   membersCount: number;
   emailDomains: MockEmailDomain[];
@@ -60,6 +62,7 @@ export function useOrganization(): UseOrganizationReturn {
     organization: {
       id: 'org_3ClR4FuXD4m9qlH7s',
       name: 'Acme Co.',
+      avatar: GradientAvatar.src,
       slug: 'acme-co',
       membersCount: 4,
       emailDomains: [{ id: 'dom_1', domain: 'clerk.dev' }],

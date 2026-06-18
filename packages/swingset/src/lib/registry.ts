@@ -8,6 +8,7 @@ import {
   UserVariant as AvatarUserVariant,
 } from '../stories/avatar.stories';
 import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
+import { Intents as BadgeIntents, meta as badgeMeta, Primary as BadgePrimary } from '../stories/badge.stories';
 import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
 import {
   BothStates as FilterChipBothStates,
@@ -106,6 +107,8 @@ const avatarModule: StoryModule = {
   Sizes: AvatarSizes,
 };
 
+const badgeModule: StoryModule = { meta: badgeMeta, Primary: BadgePrimary, Intents: BadgeIntents };
+
 const buttonModule: StoryModule = { meta: buttonMeta, Primary, Sizes, Disabled };
 
 const inputModule: StoryModule = { meta: inputMeta, Default, Sizes: InputSizes, Disabled: InputDisabled, Invalid };
@@ -161,6 +164,7 @@ export const registry: StoryModule[] = [
   destructiveModule,
   // Components
   avatarModule,
+  badgeModule,
   buttonModule,
   filterChipModule,
   inputModule,

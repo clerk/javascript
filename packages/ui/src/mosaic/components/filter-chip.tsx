@@ -40,6 +40,8 @@ export function FilterChip({ label, value, onValueChange, items, clearable = tru
           render={pp => <button {...pp} />}
           {...(p as object)}
           sx={t => ({
+            position: 'relative',
+            overflow: 'hidden',
             display: 'inline-flex',
             alignItems: 'center',
             gap: t.spacing(1),
@@ -53,6 +55,21 @@ export function FilterChip({ label, value, onValueChange, items, clearable = tru
             '&:hover': { borderColor: '#DBDBE0' },
           })}
         >
+          {!showSelected && (
+            <svg
+              aria-hidden='true'
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
+            >
+              <rect
+                x='0'
+                y='0'
+                width='100%'
+                height='100%'
+                rx='6'
+                fill='none'
+              />
+            </svg>
+          )}
           {showSelected ? (
             <>
               <Text
@@ -81,8 +98,9 @@ export function FilterChip({ label, value, onValueChange, items, clearable = tru
             </Text>
           )}
           <ChevronDown
+            width={16}
             height={16}
-            style={{ opacity: 0.6, flexShrink: 0 }}
+            style={{ flexShrink: 0 }}
           />
         </Box>
       )}

@@ -28,6 +28,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   },
   components: {
     avatar: dynamic(() => import('../stories/avatar.mdx')),
+    badge: dynamic(() => import('../stories/badge.mdx')),
     button: dynamic(() => import('../stories/button.mdx')),
     'filter-chip': dynamic(() => import('../stories/filter-chip.mdx')),
     input: dynamic(() => import('../stories/input.mdx')),

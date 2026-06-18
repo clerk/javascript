@@ -1,8 +1,8 @@
 /** @jsxImportSource @emotion/react */
-import { Avatar } from '@clerk/ui/mosaic/components/avatar';
+import { Avatar, avatarRecipe } from '@clerk/ui/mosaic/components/avatar';
+import GradientAvatar from '@clerk/ui/mosaic/components/mock/gradient-2.jpg';
 
 import type { StoryMeta } from '@/lib/types';
-import { avatarRecipe } from '@clerk/ui/mosaic/components/avatar';
 
 export { default as __source } from './avatar.stories?raw';
 
@@ -18,7 +18,7 @@ export function Primary(props: Record<string, unknown>) {
     <Avatar
       shape={props.shape as 'org' | 'user'}
       size={props.size as 'sm' | 'md' | 'lg'}
-      color='#6c47ff'
+      src={GradientAvatar.src}
     />
   );
 }
@@ -28,7 +28,7 @@ export function OrgVariant() {
     <Avatar
       shape='org'
       size='md'
-      color='#6c47ff'
+      src={GradientAvatar.src}
     />
   );
 }
@@ -38,7 +38,7 @@ export function UserVariant() {
     <Avatar
       shape='user'
       size='md'
-      color='#6c47ff'
+      src={GradientAvatar.src}
     />
   );
 }
@@ -49,17 +49,17 @@ export function Sizes() {
       <Avatar
         shape='org'
         size='sm'
-        color='#6c47ff'
+        src={GradientAvatar.src}
       />
       <Avatar
         shape='org'
         size='md'
-        color='#6c47ff'
+        src={GradientAvatar.src}
       />
       <Avatar
         shape='org'
         size='lg'
-        color='#6c47ff'
+        src={GradientAvatar.src}
       />
     </div>
   );

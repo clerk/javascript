@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import type { SelectPortalProps, SelectProps as HeadlessSelectProps } from '@clerk/headless/select';
 import type { FunctionComponent } from 'react';
 
+import { Checkmark } from '../../icons';
 import { Select as Primitive } from '../primitives/select';
 import { defineSlotRecipe, useRecipe } from '../slot-recipe';
 
@@ -30,6 +31,7 @@ export const selectRecipe = defineSlotRecipe(theme => ({
     option: {
       display: 'flex',
       alignItems: 'center',
+      gap: theme.spacing(2),
       width: '100%',
       paddingBlock: theme.spacing(1.5),
       paddingInline: theme.spacing(2),
@@ -39,7 +41,9 @@ export const selectRecipe = defineSlotRecipe(theme => ({
       border: 'none',
       textAlign: 'left',
       ...theme.text('sm'),
+      fontWeight: theme.font.medium,
       color: theme.color.primary,
+      '&:hover': { background: theme.color.muted },
       '&[data-cl-active]': { background: theme.color.muted },
       '&[data-cl-selected]': { fontWeight: theme.font.medium },
       '&[data-cl-disabled]': { opacity: 0.4, cursor: 'not-allowed' },
@@ -82,14 +86,42 @@ const Popup = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<ty
 );
 
 const Option = React.forwardRef<HTMLButtonElement, React.ComponentPropsWithoutRef<typeof Primitive.Option>>(
-  function SelectOption(props, ref) {
+  function SelectOption({ children, ...props }, forwardedRef) {
     const { option } = useRecipe(selectRecipe);
+    const innerRef = React.useRef<HTMLButtonElement | null>(null);
+    const [isSelected, setIsSelected] = React.useState(false);
+
+    const setRefs = React.useCallback(
+      (el: HTMLButtonElement | null) => {
+        innerRef.current = el;
+        if (typeof forwardedRef === 'function') forwardedRef(el);
+        else if (forwardedRef) (forwardedRef as React.MutableRefObject<HTMLButtonElement | null>).current = el;
+      },
+      [forwardedRef],
+    );
+
+    React.useLayoutEffect(() => {
+      const el = innerRef.current;
+      if (!el) return;
+      setIsSelected(el.hasAttribute('data-cl-selected'));
+      const observer = new MutationObserver(() => setIsSelected(el.hasAttribute('data-cl-selected')));
+      observer.observe(el, { attributes: true, attributeFilter: ['data-cl-selected'] });
+      return () => observer.disconnect();
+    }, []);
+
     return (
       <Primitive.Option
-        ref={ref}
+        ref={setRefs}
         {...props}
         {...option}
-      />
+      >
+        <Checkmark
+          width={16}
+          height={16}
+          style={{ visibility: isSelected ? 'visible' : 'hidden', flexShrink: 0, color: 'currentColor', opacity: 0.5 }}
+        />
+        {children}
+      </Primitive.Option>
     );
   },
 );

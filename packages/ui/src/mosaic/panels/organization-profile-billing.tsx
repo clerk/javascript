@@ -31,7 +31,7 @@ export function OrganizationProfileBilling() {
                 })}
               >
                 <Heading
-                  size='xs'
+                  size='sm'
                   sx={() => ({ flex: 1 })}
                 >
                   Plan
@@ -39,7 +39,7 @@ export function OrganizationProfileBilling() {
                 <Button
                   variant='ghost'
                   intent='primary'
-                  size='sm'
+                  size='md'
                   sx={t => ({ gap: t.spacing(1) })}
                 >
                   Switch plans
@@ -95,7 +95,7 @@ export function OrganizationProfileBilling() {
                 })}
               >
                 <Heading
-                  size='xs'
+                  size='sm'
                   sx={() => ({ flex: 1 })}
                 >
                   Payment methods
@@ -103,7 +103,7 @@ export function OrganizationProfileBilling() {
                 <Button
                   variant='ghost'
                   intent='primary'
-                  size='sm'
+                  size='md'
                   sx={t => ({ gap: t.spacing(1) })}
                 >
                   Add
