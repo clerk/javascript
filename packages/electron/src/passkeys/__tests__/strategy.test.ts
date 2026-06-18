@@ -23,6 +23,13 @@ describe('originSatisfiesRpId', () => {
     ['https:', 'badexample.com', 'example.com', false],
     ['https:', 'example.com.evil.com', 'example.com', false],
     ['https:', 'example.com', '', false],
+    ['http:', 'localhost', 'localhost', true],
+    ['http:', 'localhost', '', true],
+    ['http:', '127.0.0.1', '127.0.0.1', true],
+    ['http:', '::1', '::1', true],
+    ['http:', '[::1]', '::1', true],
+    ['http:', '[::1]', '[::1]', true],
+    ['http:', 'localhost', 'example.com', false],
     ['http:', 'example.com', 'example.com', false],
     ['file:', '', 'example.com', false],
     ['app:', 'bundle', 'example.com', false],
@@ -53,6 +60,22 @@ describe('decidePath', () => {
   describe('auto mode', () => {
     it('prefers the renderer when the origin satisfies the RP ID', () => {
       expect(decidePath(RP_ID, 'auto', env())).toBe('renderer');
+    });
+
+    it('prefers the renderer for localhost development origins when the RP ID matches', () => {
+      expect(decidePath('localhost', 'auto', env({ protocol: 'http:', hostname: 'localhost' }))).toBe('renderer');
+    });
+
+    it('prefers the renderer for 127.0.0.1 development origins when the RP ID matches', () => {
+      expect(decidePath('127.0.0.1', 'auto', env({ protocol: 'http:', hostname: '127.0.0.1' }))).toBe('renderer');
+    });
+
+    it('prefers the renderer for bracketed IPv6 localhost development origins when the RP ID matches', () => {
+      expect(decidePath('::1', 'auto', env({ protocol: 'http:', hostname: '[::1]' }))).toBe('renderer');
+    });
+
+    it('does not treat non-loopback http origins as renderer-eligible', () => {
+      expect(decidePath(RP_ID, 'auto', env({ protocol: 'http:', hostname: 'example.com' }))).toBe('native');
     });
 
     it('falls back to native for local bundles (file://)', () => {

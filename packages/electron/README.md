@@ -163,8 +163,8 @@ app.whenReady().then(() => {
 
 Passkey support works in two modes, selected automatically per request:
 
-- **Renderer mode** — when your window loads content over `https://` from an origin that matches your passkey RP ID, the renderer's built-in Chromium WebAuthn is used. Credentials are synced by the OS/browser ecosystem (Windows Hello works out of the box; Touch ID on macOS requires Electron ≥ 42 and [`app.configureWebAuthn`](https://www.electronjs.org/docs/latest/api/app#appconfigurewebauthnoptions-macos)).
-- **Native mode** — when your window loads a local bundle (`file://` or a custom protocol), WebAuthn's origin checks reject the request, so the ceremony is routed over IPC to the main process and serviced by the OS WebAuthn APIs (AuthenticationServices on macOS, `webauthn.dll` on Windows) via the optional [`@clerk/electron-passkeys`](https://github.com/clerk/javascript/tree/main/packages/electron-passkeys) native module.
+- **Renderer mode**: when your window loads content over `https://` from an origin that matches your passkey RP (Relying Party) ID, the renderer's built-in Chromium WebAuthn is used. Credentials are synced by the OS/browser ecosystem (Windows Hello works out of the box; Touch ID on macOS requires Electron ≥ 42 and [`app.configureWebAuthn`](https://www.electronjs.org/docs/latest/api/app#appconfigurewebauthnoptions-macos)).
+- **Native mode**: when your window loads a local bundle (e.g. `scheme://host`), WebAuthn's origin checks reject the request, so the ceremony is routed over IPC to the main process and serviced by the OS WebAuthn APIs (AuthenticationServices on macOS, `webauthn.dll` on Windows) via the optional [`@clerk/electron-passkeys`](https://github.com/clerk/javascript/tree/main/packages/electron-passkeys) native module.
 
 ### Setup
 
@@ -218,16 +218,16 @@ await clerk.load();
 
 Like passkeys on iOS, the macOS platform APIs require a verified association between your app and your domain:
 
-1. Serve an `apple-app-site-association` file from `https://<rp-domain>/.well-known/apple-app-site-association` (https, no redirect, `application/json`) listing your app: `{"webcredentials": {"apps": ["<TEAMID>.<bundle-id>"]}}`. The RP domain must be publicly reachable — Apple's CDN fetches it.
-2. Sign your app with `com.apple.developer.associated-domains` containing `webcredentials:<rp-domain>`. This is a _restricted_ entitlement: the build must embed a provisioning profile with the Associated Domains capability for the bundle ID, and the entitlements must also include `com.apple.application-identifier` and `com.apple.developer.team-identifier` matching the profile.
+1. In the Clerk Dashboard, navigate to the [Native applications](https://dashboard.clerk.com/~/native-applications) page and ensure that the Native API is enabled. This is required to integrate Clerk in your Electron application.
+2. Add an iOS application to the [Native applications](https://dashboard.clerk.com/~/native-applications) page in the Clerk Dashboard. You will need your app's App ID Prefix and Bundle ID. An Electron macOS app uses the same configuration as iOS applications.
+3. Sign your app with `com.apple.developer.associated-domains` containing `webcredentials:<rp-domain>`. This is a _restricted_ entitlement: the build must embed a provisioning profile with the Associated Domains capability for the bundle ID, and the entitlements must also include `com.apple.application-identifier` and `com.apple.developer.team-identifier` matching the profile.
 
-Hard-won development-build checklist (each of these failure modes produces the same opaque "not associated with domain" error):
+Quick Tips (each of these failure modes produces the same opaque "not associated with domain" error):
 
 - Sign with an **Apple Development** identity (`mac.type: development` in electron-builder) and a **macOS App Development** profile that includes your Mac; also install the profile on the machine (`~/Library/Developer/Xcode/UserData/Provisioning Profiles/<UUID>.provisionprofile`).
-- Copy `.app` bundles with `ditto`, never `cp -R` — `cp` breaks the bundle seal, and macOS silently ignores the entitlements of an app whose signature fails `codesign --verify --deep --strict`.
+- Copy `.app` bundles with `ditto`. Other copy methods may break the app seal and macOS silently ignores the entitlements of an app whose signature fails `codesign --verify --deep --strict`.
 - The system registers the domain association via `swcd` when the app launches; verify with `sudo swcutil show`. If state gets stuck, `sudo swcutil reset` and relaunch.
-- Prefer the default (production/CDN) association route. `?mode=developer` + `sudo swcutil developer-mode -e true` exists but is flaky in practice.
-- The system log tells the truth: `log stream --predicate 'process == "swcd" OR composedMessage CONTAINS "your.domain"'` while launching, and look for `taskgated-helper: allowing entitlement(s) ... due to provisioning profile`.
+- Prefer the default (production/CDN) association route. `?mode=developer` + `sudo swcutil developer-mode -e true` exists but is often flaky.
 
 Windows has no equivalent requirement. On Linux there is no native path; passkeys work in renderer mode only (including external security keys).
 

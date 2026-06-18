@@ -48,6 +48,18 @@ const requestOptions = () =>
     allowCredentials: [],
   }) as never;
 
+const creationOptionsForRpId = (rpId: string) =>
+  ({
+    ...creationOptions(),
+    rp: { id: rpId, name: 'Example' },
+  }) as never;
+
+const requestOptionsForRpId = (rpId: string) =>
+  ({
+    ...requestOptions(),
+    rpId,
+  }) as never;
+
 const registrationJSON = {
   id: HELLO_B64URL,
   rawId: HELLO_B64URL,
@@ -141,6 +153,23 @@ describe('createPasskeys', () => {
       expect(result.error).toBeNull();
     });
 
+    it('retries natively when browser WebAuthn does not support public key credentials', async () => {
+      const bridge = makeBridge();
+      stubEnvironment({ protocol: 'http:', hostname: 'localhost', bridge });
+      vi.mocked(webAuthnCreateCredential).mockResolvedValue({
+        publicKeyCredential: null,
+        error: Object.assign(new Error('The user agent does not support public key credentials.'), {
+          name: 'NotSupportedError',
+        }),
+      } as never);
+
+      const result = await createPasskeys().create(creationOptionsForRpId('localhost'));
+
+      expect(webAuthnCreateCredential).toHaveBeenCalled();
+      expect(bridge.create).toHaveBeenCalled();
+      expect(result.error).toBeNull();
+    });
+
     it('does not retry natively when the user cancels in the renderer', async () => {
       const bridge = makeBridge();
       stubEnvironment({ bridge });
@@ -153,6 +182,23 @@ describe('createPasskeys', () => {
       const result = await createPasskeys().create(creationOptions());
 
       expect(result).toBe(cancelled);
+      expect(bridge.create).not.toHaveBeenCalled();
+    });
+
+    it('does not retry natively for unsupported browser WebAuthn when renderer mode is forced', async () => {
+      const bridge = makeBridge();
+      stubEnvironment({ protocol: 'http:', hostname: 'localhost', bridge });
+      const unsupported = {
+        publicKeyCredential: null,
+        error: Object.assign(new Error('The user agent does not support public key credentials.'), {
+          name: 'NotSupportedError',
+        }),
+      };
+      vi.mocked(webAuthnCreateCredential).mockResolvedValue(unsupported as never);
+
+      const result = await createPasskeys({ mode: 'renderer' }).create(creationOptionsForRpId('localhost'));
+
+      expect(result).toBe(unsupported);
       expect(bridge.create).not.toHaveBeenCalled();
     });
 
@@ -227,6 +273,26 @@ describe('createPasskeys', () => {
       expect(bridge.get).toHaveBeenCalledWith(expect.objectContaining({ rpId: 'example.com', challenge: 'AQID' }));
       expect(result.error).toBeNull();
       expect(result.publicKeyCredential?.toJSON()).toEqual(authenticationJSON);
+    });
+
+    it('retries natively when browser WebAuthn authentication is unsupported', async () => {
+      const bridge = makeBridge();
+      stubEnvironment({ protocol: 'http:', hostname: 'localhost', bridge });
+      vi.mocked(webAuthnGetCredential).mockResolvedValue({
+        publicKeyCredential: null,
+        error: Object.assign(new Error('The user agent does not support public key credentials.'), {
+          name: 'NotSupportedError',
+        }),
+      } as never);
+
+      const result = await createPasskeys().get({ publicKeyOptions: requestOptionsForRpId('localhost') });
+
+      expect(webAuthnGetCredential).toHaveBeenCalledWith({
+        publicKeyOptions: expect.anything(),
+        conditionalUI: false,
+      });
+      expect(bridge.get).toHaveBeenCalled();
+      expect(result.error).toBeNull();
     });
   });
 
