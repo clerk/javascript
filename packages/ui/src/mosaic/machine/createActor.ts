@@ -174,6 +174,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     start() {
       if (started) return actor;
       started = true;
+      status = 'active';
       enterState(INIT_EVENT);
       commit();
       return actor;
@@ -181,6 +182,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
 
     stop() {
       if (status === 'stopped') return;
+      started = false; // allow restart (e.g. StrictMode effect cleanup + remount)
       status = 'stopped';
       invocationToken++; // abandon any in-flight invoke
       snapshot = { value, context, status };

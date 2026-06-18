@@ -600,3 +600,23 @@ describe('pure helpers (testable without an actor)', () => {
     expect(isAssignAction({ type: 'other' })).toBe(false);
   });
 });
+
+describe('actor restart — StrictMode start/stop/start cycle', () => {
+  it('send works after stop() + start() (simulates StrictMode effect cleanup)', () => {
+    const actor = createActor(createDeleteOrgMachine(() => Promise.resolve()));
+
+    actor.start();
+    expect(actor.getSnapshot().value).toBe('idle');
+
+    // StrictMode cleanup runs the effect teardown…
+    actor.stop();
+    expect(actor.getSnapshot().status).toBe('stopped');
+
+    // …then remounts and runs the effect again.
+    actor.start();
+    expect(actor.getSnapshot().status).toBe('active');
+
+    actor.send({ type: 'OPEN' });
+    expect(actor.getSnapshot().value).toBe('confirming');
+  });
+});
