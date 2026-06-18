@@ -1,5 +1,34 @@
 # Change Log
 
+## 4.9.0
+
+### Minor Changes
+
+- Introduce organization domains with TXT verification on self-serve SSO flow ([#8788](https://github.com/clerk/javascript/pull/8788)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Improve `OrganizationProfile` UI: ([#8898](https://github.com/clerk/javascript/pull/8898)) by [@LauraBeatris](https://github.com/LauraBeatris)
+  - Hide the `Verified domains` section when there are no domains and the user lacks permission to add them
+  - Rename the `Organization profile` section to `Profile` for consistency with `UserProfile`
+  - Align the enterprise accounts section with the account data
+
+### Patch Changes
+
+- Add confirmation dialog for organization domain deletion as part of self-serve SSO ([#8866](https://github.com/clerk/javascript/pull/8866)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`d5968d0`](https://github.com/clerk/javascript/commit/d5968d026d6b2a1b399b6967fd8727613a5bc3cd), [`ffbc650`](https://github.com/clerk/javascript/commit/ffbc650ebbcee48171c95aa5d2b497273b0276b0)]:
+  - @clerk/shared@4.19.0
+
+## 4.8.2
+
+### Patch Changes
+
+- Add an overview to the organization profile Security page. The page now lands on a summary of the SSO connection — a status badge (Unconfigured, In Progress, Active, Inactive), the configuration details framed in a card (provider, domain, sign-on URL, issuer, certificate), and an actions menu with Edit, Activate / Deactivate, and Remove — and switches into the existing configuration flow on Start, Continue, or Edit. ([#8813](https://github.com/clerk/javascript/pull/8813)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Rename the `<OrganizationProfile />` SSO page to "Security". The navbar entry is now labeled "Security" with a shield icon, its route path changed from `organization-self-serve-sso` to `organization-security`, and a new `organizationProfile.navbar.security` localization key replaces `organizationProfile.navbar.selfServeSSO`. ([#8796](https://github.com/clerk/javascript/pull/8796)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Updated dependencies [[`f4167ec`](https://github.com/clerk/javascript/commit/f4167eccb19e0de98340d48e221b950e3dad189e), [`17e4164`](https://github.com/clerk/javascript/commit/17e416471a5409e5a4c02f4f94f687c428c071de), [`ed2cf75`](https://github.com/clerk/javascript/commit/ed2cf75ce713703d8e2c258fc3ca0cf43dc964dc), [`67c04a4`](https://github.com/clerk/javascript/commit/67c04a43db64b70819d68333f99e3483523d1d47), [`51c8fdc`](https://github.com/clerk/javascript/commit/51c8fdcb7160457e44cfe7cc86524f7d728a030a), [`c2ba971`](https://github.com/clerk/javascript/commit/c2ba971aad55df570507b7b117786ab048415ad3), [`8744728`](https://github.com/clerk/javascript/commit/8744728e6610b2229f56dd3b31975c3f57395f02), [`d9b5c7d`](https://github.com/clerk/javascript/commit/d9b5c7d79fe641d08f45f0df7d4f5146b6b2c3ab)]:
+  - @clerk/shared@4.18.0
+
 ## 4.8.1
 
 ### Patch Changes

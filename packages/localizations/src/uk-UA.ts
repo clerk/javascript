@@ -196,28 +196,27 @@ export const ukUA: LocalizationResource = {
       },
       warning: 'Після вибору постачальника ви не зможете змінити його, доки не буде завершено налаштування',
     },
-    verifyEmailDomainStep: {
-      title: 'Підтвердити адресу електронної пошти',
-      subtitle: "Підтвердьте адресу електронної пошти, на якій ви хочете увімкнути корпоративне з'єднання.",
-      addEmailAddress: {
-        formTitle: 'Нам потрібна ваша електронна пошта',
-        formSubtitle: 'Щоб почати, нам знадобиться ваша адреса електронної пошти',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'Адреса електронної пошти',
+    organizationDomainsStep: {
+      title: 'Додати домени SSO',
+      subtitle: 'Додайте та підтвердьте право власності на домени, які ваша організація використовує для входу.',
+      formFieldLabel__domain: 'Домени',
+      formFieldInputPlaceholder__domain: 'Введіть свій домен тут і натисніть «Додати», щоб почати',
+      formButtonPrimary__add: 'Додати',
+      domainSuggestion: {
+        messageLabel: 'Ваша електронна пошта використовує {{domain}}. Бажаєте додати його?',
+        formButtonPrimary__add: 'Додати {{domain}}',
       },
-      emailCode: {
-        formTitle: 'Підтвердьте вашу адресу електронної пошти',
-        formSubtitle: 'Введіть код підтвердження, надісланий на {{identifier}}',
-        resendButton: 'Не отримали код? Надіслати повторно',
-        verified: {
-          title: 'Ми отримали вашу електронну пошту',
-          subtitle: 'Ви підтвердили адресу електронної пошти за допомогою наступного листа',
-          inputLabel: 'Підтверджена адреса електронної пошти',
+      domainCard: {
+        badge__verified: 'Підтверджено',
+        badge__unverified: 'Не підтверджено',
+        verifiedAtLabel: "Підтверджено {{ date | shortDate('uk-UA') }}",
+        txtRecord: {
+          instructions:
+            'Додайте цей TXT-запис до свого DNS-провайдера. Ми перевіримо його автоматично, щойно запис стане активним.',
+          typeLabel: 'Тип',
+          hostLabel: 'Хост / Імʼя',
+          valueLabel: 'Значення',
         },
-      },
-      domainTaken: {
-        title: "Цей домен ({{domain}}) уже має з'єднання SSO",
-        subtitle: "Зверніться до адміністратора програми, щоб отримати доступ через існуюче з'єднання.",
       },
     },
   },
@@ -501,7 +500,7 @@ export const ukUA: LocalizationResource = {
       headerTitle__members: 'Учасники',
       profileSection: {
         primaryButton: undefined,
-        title: 'Organization Profile',
+        title: 'Profile',
         uploadAction__title: 'Logo',
       },
     },

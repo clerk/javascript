@@ -1,6 +1,6 @@
 import UIKit
 
-public class ClerkNativeViewHost: UIView {
+public class ClerkNativeViewHost: UIView, ClerkNativeBridgeReadyObserver {
   private lazy var hostingCoordinator = ClerkNativeHostingCoordinator(containerView: self)
   private var hasInitialized: Bool = false
 
@@ -19,6 +19,7 @@ public class ClerkNativeViewHost: UIView {
       if hasInitialized {
         hostedViewDidDetachFromWindow()
       }
+      removeClerkNativeBridgeReadyObserver(self)
       hostingCoordinator.detach()
       hasInitialized = false
       return
@@ -26,6 +27,7 @@ public class ClerkNativeViewHost: UIView {
 
     guard !hasInitialized else { return }
     hasInitialized = true
+    addClerkNativeBridgeReadyObserver(self)
     hostedViewDidAttachToWindow()
     updateHostedView()
   }
@@ -48,6 +50,10 @@ public class ClerkNativeViewHost: UIView {
   func hostedViewDidAttachToWindow() {}
 
   func hostedViewDidDetachFromWindow() {}
+
+  public func clerkNativeBridgeDidBecomeReady() {
+    setNeedsHostedViewUpdate()
+  }
 
   private func updateHostedView() {
     guard let controller = makeHostedController() else { return }

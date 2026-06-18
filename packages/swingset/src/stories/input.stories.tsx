@@ -1,14 +1,18 @@
 /** @jsxImportSource @emotion/react */
 import type { InputProps } from '@clerk/ui/mosaic/components/input';
-import { Input, inputStyles } from '@clerk/ui/mosaic/components/input';
+import { Input, inputRecipe } from '@clerk/ui/mosaic/components/input';
 
 import type { StoryMeta } from '@/lib/types';
+
+// Exposes this file's own source (via the `?raw` webpack rule) so each `<Story>` example
+// renders a code footer with its function's source. See `StoryModule.__source`.
+export { default as __source } from './input.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
   title: 'Input',
   source: 'packages/ui/src/mosaic/components/input.tsx',
-  styles: inputStyles,
+  styles: inputRecipe,
 };
 
 function knobsAsProps(props: Record<string, unknown>) {

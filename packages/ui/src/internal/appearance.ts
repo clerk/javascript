@@ -363,6 +363,16 @@ export type ElementsConfig = {
   organizationProfileMembersSearchInputIcon: WithOptions;
   organizationProfileMembersSearchInput: WithOptions;
 
+  organizationProfileSecuritySsoBadge: WithOptions<string>;
+  organizationProfileSecuritySsoDescription: WithOptions;
+  organizationProfileSecuritySsoConfigureButton: WithOptions<string>;
+  organizationProfileSecuritySsoDetailRows: WithOptions;
+  organizationProfileSecuritySsoDetailRow: WithOptions<string>;
+  organizationProfileSecuritySsoDetailRowLabel: WithOptions<string>;
+  organizationProfileSecuritySsoDetailRowChip: WithOptions<string>;
+  organizationProfileSecuritySsoDetailRowLink: WithOptions<string>;
+  organizationProfileSecuritySsoProviderIcon: WithOptions;
+
   organizationListPreviewItems: WithOptions;
   organizationListPreviewItem: WithOptions;
   organizationListPreviewButton: WithOptions;
@@ -674,6 +684,7 @@ export type ElementsConfig = {
   enterpriseConnectionButtonText: WithOptions;
 
   configureSSOHeader: WithOptions;
+  configureSSOHeaderBackButton: WithOptions;
   configureSSOMobileNavbar: WithOptions;
   configureSSOStepper: WithOptions;
   configureSSOStepperItem: WithOptions<string, ActiveState>;
@@ -704,6 +715,13 @@ export type ElementsConfig = {
   configureSSOVerifyDomainErrorIcon: WithOptions;
   configureSSOVerifyDomainErrorTitle: WithOptions;
   configureSSOVerifyDomainErrorSubtitle: WithOptions;
+  configureSSOVerifyDomainList: WithOptions;
+  configureSSOVerifyDomainSuggestion: WithOptions;
+  configureSSOVerifyDomainCard: WithOptions<'verified' | 'unverified'>;
+  configureSSOVerifyDomainCardBadge: WithOptions<'verified' | 'unverified'>;
+  configureSSOVerifyDomainCardRemoveButton: WithOptions;
+  configureSSOVerifyDomainCardTxtRecord: WithOptions;
+  configureSSOVerifyDomainCardTxtRecordValue: WithOptions;
   configureSSOEmailVerificationForm: WithOptions<string>;
   configureSSOEmailVerificationIcon: WithOptions<string>;
   configureSSOEmailVerificationTitle: WithOptions<string>;
@@ -748,6 +766,10 @@ export type ElementsConfig = {
   configureSSOResetConnectionDialogCancelButton: WithOptions;
   configureSSOResetConnectionDialogConfirmationInput: WithOptions;
   configureSSOResetConnectionDialogSubmitButton: WithOptions;
+
+  configureSSORemoveDomainDialog: WithOptions;
+  configureSSORemoveDomainDialogCancelButton: WithOptions;
+  configureSSORemoveDomainDialogSubmitButton: WithOptions;
 
   web3SolanaWalletButtonsRoot: WithOptions;
   web3SolanaWalletButtons: WithOptions;

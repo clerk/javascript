@@ -205,28 +205,27 @@ export const frFR: LocalizationResource = {
       warning:
         "Une fois un fournisseur sélectionné, vous ne pourrez plus en changer jusqu'à la fin de la configuration",
     },
-    verifyEmailDomainStep: {
-      title: "Vérifier l'adresse e-mail",
-      subtitle: "Vérifiez l'adresse e-mail sur laquelle vous souhaitez activer la connexion entreprise.",
-      addEmailAddress: {
-        formTitle: 'Nous avons besoin de votre e-mail',
-        formSubtitle: 'Pour commencer, nous aurons besoin de votre adresse e-mail',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'Adresse e-mail',
+    organizationDomainsStep: {
+      title: 'Ajouter des domaines SSO',
+      subtitle: 'Ajoutez et vérifiez la propriété des domaines que votre organisation utilise pour se connecter.',
+      formFieldLabel__domain: 'Domaines',
+      formFieldInputPlaceholder__domain: 'Saisissez votre domaine ici et cliquez sur Ajouter pour commencer',
+      formButtonPrimary__add: 'Ajouter',
+      domainSuggestion: {
+        messageLabel: 'Votre e-mail utilise {{domain}}. Voulez-vous l’ajouter ?',
+        formButtonPrimary__add: 'Ajouter {{domain}}',
       },
-      emailCode: {
-        formTitle: 'Vérifiez votre adresse e-mail',
-        formSubtitle: 'Entrez le code de vérification envoyé à {{identifier}}',
-        resendButton: "Vous n'avez pas reçu de code ? Renvoyer",
-        verified: {
-          title: 'Nous avons reçu votre e-mail',
-          subtitle: "Vous avez vérifié votre adresse e-mail avec l'e-mail suivant",
-          inputLabel: 'Adresse e-mail vérifiée',
+      domainCard: {
+        badge__verified: 'Vérifié',
+        badge__unverified: 'Non vérifié',
+        verifiedAtLabel: "Vérifié le {{ date | shortDate('fr-FR') }}",
+        txtRecord: {
+          instructions:
+            'Ajoutez cet enregistrement TXT à votre fournisseur DNS. Nous le vérifierons automatiquement une fois l’enregistrement actif.',
+          typeLabel: 'Type',
+          hostLabel: 'Hôte / Nom',
+          valueLabel: 'Valeur',
         },
-      },
-      domainTaken: {
-        title: "Ce domaine ({{domain}}) dispose déjà d'une connexion SSO",
-        subtitle: "Contactez l'administrateur de l'application pour obtenir l'accès via la connexion existante.",
       },
     },
   },

@@ -330,7 +330,7 @@ const SamlCustomIdentityProviderMetadataStep = (): JSX.Element => {
   const { goNext, goPrev, isFirstStep } = useWizard();
   const {
     enterpriseConnection,
-    mutations: { updateConnection },
+    enterpriseConnectionMutations: { updateConnection },
   } = useConfigureSSO();
 
   const samlConnection = enterpriseConnection?.samlConnection;

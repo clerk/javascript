@@ -196,28 +196,27 @@ export const mnMN: LocalizationResource = {
       },
       warning: 'Үйлчилгээ үзүүлэгчийг сонгосны дараа тохиргоо дуустал өөрчлөх боломжгүй',
     },
-    verifyEmailDomainStep: {
-      title: 'И-мэйл хаягийг баталгаажуулах',
-      subtitle: 'Та байгууллагын холболтыг идэвхжүүлэхийг хүсэж буй и-мэйл хаягийг баталгаажуулна уу.',
-      addEmailAddress: {
-        formTitle: 'Бид таны и-мэйл хэрэгтэй',
-        formSubtitle: 'Эхлэхийн тулд бид таны и-мэйл хаягийг авах шаардлагатай',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'И-мэйл хаяг',
+    organizationDomainsStep: {
+      title: 'SSO домэйн нэмэх',
+      subtitle: 'Танай байгууллагын нэвтрэхэд ашигладаг домэйнуудын эзэмшлийг нэмж баталгаажуулна уу.',
+      formFieldLabel__domain: 'Домэйн',
+      formFieldInputPlaceholder__domain: 'Домэйнээ энд бичээд эхлэхийн тулд нэмэх дээр дарна уу',
+      formButtonPrimary__add: 'Нэмэх',
+      domainSuggestion: {
+        messageLabel: 'Таны имэйл {{domain}}-г ашиглаж байна. Үүнийг нэмэх үү?',
+        formButtonPrimary__add: '{{domain}} нэмэх',
       },
-      emailCode: {
-        formTitle: 'И-мэйл хаягаа баталгаажуулна уу',
-        formSubtitle: '{{identifier}} рүү илгээсэн баталгаажуулах кодыг оруулна уу',
-        resendButton: 'Код хүлээж аваагүй юу? Дахин илгээх',
-        verified: {
-          title: 'Бид таны и-мэйлийг хүлээн авлаа',
-          subtitle: 'Та доорх и-мэйлээр и-мэйл хаягаа баталгаажуулсан',
-          inputLabel: 'Баталгаажсан и-мэйл хаяг',
+      domainCard: {
+        badge__verified: 'Баталгаажсан',
+        badge__unverified: 'Баталгаажаагүй',
+        verifiedAtLabel: "{{ date | shortDate('mn-MN') }}-нд баталгаажсан",
+        txtRecord: {
+          instructions:
+            'Энэ TXT бичлэгийг өөрийн DNS үйлчилгээ үзүүлэгчид нэмнэ үү. Бичлэг идэвхжсэний дараа бид автоматаар баталгаажуулна.',
+          typeLabel: 'Төрөл',
+          hostLabel: 'Хост / Нэр',
+          valueLabel: 'Утга',
         },
-      },
-      domainTaken: {
-        title: 'Энэ домейн ({{domain}}) аль хэдийн SSO холболттой байна',
-        subtitle: 'Одоо байгаа холболтоор дамжуулан хандах эрх авахын тулд програмын администратортой холбогдоно уу.',
       },
     },
   },

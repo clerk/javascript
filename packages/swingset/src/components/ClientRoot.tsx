@@ -19,12 +19,10 @@ import { ThemeToggle } from './ThemeToggle';
 
 function useBreadcrumb() {
   const pathname = usePathname();
-  // /components/button        → ["Button"]
-  // /components/button/primary → ["Button", "Primary"]
-  const parts = pathname
-    .replace(/^\/components\//, '')
-    .split('/')
-    .filter(Boolean);
+  // /components/button → ["Button"]
+  // /primitives/dialog → ["Dialog"]
+  // The first segment is the group; drop it and surface the component (plus any sub-path).
+  const parts = pathname.split('/').filter(Boolean).slice(1);
   return parts.map(p => p.charAt(0).toUpperCase() + p.slice(1).replace(/-/g, ' '));
 }
 

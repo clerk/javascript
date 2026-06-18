@@ -196,28 +196,27 @@ export const esCR: LocalizationResource = {
       },
       warning: 'Una vez que se selecciona un proveedor no puedes cambiarlo hasta que termine la configuración',
     },
-    verifyEmailDomainStep: {
-      title: 'Verificar correo electrónico',
-      subtitle: 'Verifica la dirección de correo electrónico en la que deseas habilitar la conexión empresarial.',
-      addEmailAddress: {
-        formTitle: 'Necesitamos tu correo electrónico',
-        formSubtitle: 'Para empezar, necesitaremos tu dirección de correo electrónico',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'Dirección de correo electrónico',
+    organizationDomainsStep: {
+      title: 'Agregar dominios SSO',
+      subtitle: 'Agrega y verifica la propiedad de los dominios que tu organización usa para iniciar sesión.',
+      formFieldLabel__domain: 'Dominios',
+      formFieldInputPlaceholder__domain: 'Escribe aquí tu dominio y haz clic en Agregar para empezar',
+      formButtonPrimary__add: 'Agregar',
+      domainSuggestion: {
+        messageLabel: 'Tu correo electrónico usa {{domain}}. ¿Quieres agregarlo?',
+        formButtonPrimary__add: 'Agregar {{domain}}',
       },
-      emailCode: {
-        formTitle: 'Verifica tu dirección de correo electrónico',
-        formSubtitle: 'Ingresa el código de verificación enviado a {{identifier}}',
-        resendButton: '¿No recibiste un código? Reenviar',
-        verified: {
-          title: 'Recibimos tu correo electrónico',
-          subtitle: 'Has verificado tu dirección de correo electrónico con el siguiente correo',
-          inputLabel: 'Dirección de correo electrónico verificada',
+      domainCard: {
+        badge__verified: 'Verificado',
+        badge__unverified: 'Sin verificar',
+        verifiedAtLabel: "Verificado el {{ date | shortDate('es-CR') }}",
+        txtRecord: {
+          instructions:
+            'Agrega este registro TXT a tu proveedor de DNS. Lo verificaremos automáticamente una vez que el registro esté activo.',
+          typeLabel: 'Tipo',
+          hostLabel: 'Host / Nombre',
+          valueLabel: 'Valor',
         },
-      },
-      domainTaken: {
-        title: 'Este dominio ({{domain}}) ya tiene una conexión SSO',
-        subtitle: 'Contacta al administrador de la aplicación para obtener acceso a través de la conexión existente.',
       },
     },
   },

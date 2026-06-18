@@ -76,6 +76,7 @@ const USER_ENTERPRISE_CONNECTIONS_KEY = 'userEnterpriseConnections';
 const ENTERPRISE_CONNECTION_TEST_RUNS_KEY = 'enterpriseConnectionTestRuns';
 const ORGANIZATION_ENTERPRISE_CONNECTIONS_KEY = 'organizationEnterpriseConnections';
 const ORGANIZATION_ENTERPRISE_CONNECTION_TEST_RUNS_KEY = 'organizationEnterpriseConnectionTestRuns';
+const ORGANIZATION_DOMAINS_KEY = 'organizationDomains';
 
 export const INTERNAL_STABLE_KEYS = {
   PAYMENT_ATTEMPT_KEY,
@@ -85,6 +86,7 @@ export const INTERNAL_STABLE_KEYS = {
   ENTERPRISE_CONNECTION_TEST_RUNS_KEY,
   ORGANIZATION_ENTERPRISE_CONNECTIONS_KEY,
   ORGANIZATION_ENTERPRISE_CONNECTION_TEST_RUNS_KEY,
+  ORGANIZATION_DOMAINS_KEY,
 } as const;
 
 export type __internal_ResourceCacheStableKey = (typeof INTERNAL_STABLE_KEYS)[keyof typeof INTERNAL_STABLE_KEYS];

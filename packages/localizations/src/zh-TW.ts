@@ -202,28 +202,26 @@ export const zhTW: LocalizationResource = {
       },
       warning: '選擇提供者後,在設定完成之前無法再次變更',
     },
-    verifyEmailDomainStep: {
-      title: '驗證電子郵件地址',
-      subtitle: '驗證您想要啟用企業連線的電子郵件地址。',
-      addEmailAddress: {
-        formTitle: '我們需要您的電子郵件',
-        formSubtitle: '為了開始，我們需要您的電子郵件地址',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: '電子郵件地址',
+    organizationDomainsStep: {
+      title: '新增 SSO 網域',
+      subtitle: '新增並驗證貴組織用於登入的網域的所有權。',
+      formFieldLabel__domain: '網域',
+      formFieldInputPlaceholder__domain: '在此輸入您的網域，然後點選新增即可開始',
+      formButtonPrimary__add: '新增',
+      domainSuggestion: {
+        messageLabel: '您的電子郵件使用了 {{domain}}。是否要新增它？',
+        formButtonPrimary__add: '新增 {{domain}}',
       },
-      emailCode: {
-        formTitle: '驗證您的電子郵件地址',
-        formSubtitle: '輸入發送到 {{identifier}} 的驗證碼',
-        resendButton: '沒有收到驗證碼？重新發送',
-        verified: {
-          title: '我們已收到您的電子郵件',
-          subtitle: '您已使用以下電子郵件驗證了您的電子郵件地址',
-          inputLabel: '已驗證的電子郵件地址',
+      domainCard: {
+        badge__verified: '已驗證',
+        badge__unverified: '未驗證',
+        verifiedAtLabel: "驗證於 {{ date | shortDate('zh-TW') }}",
+        txtRecord: {
+          instructions: '請將此 TXT 記錄新增至您的 DNS 供應商。記錄生效後，我們將自動進行驗證。',
+          typeLabel: '類型',
+          hostLabel: '主機 / 名稱',
+          valueLabel: '值',
         },
-      },
-      domainTaken: {
-        title: '此網域 ({{domain}}) 已存在 SSO 連線',
-        subtitle: '請聯絡應用程式管理員，透過現有連線取得存取權限。',
       },
     },
   },

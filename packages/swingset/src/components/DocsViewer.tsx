@@ -2,40 +2,68 @@
 
 import dynamic from 'next/dynamic';
 
-import { getModuleBySlug } from '@/lib/registry';
+import { getModule } from '@/lib/registry';
 
 import { PlaygroundProvider } from './PlaygroundContext';
 import { ViewSource } from './ViewSource';
 
-const docModules: Record<string, React.ComponentType> = {
-  button: dynamic(() => import('../stories/button.mdx')),
-  input: dynamic(() => import('../stories/input.mdx')),
-  // Headless primitives — alphabetical.
-  accordion: dynamic(() => import('../stories/accordion.mdx')),
-  autocomplete: dynamic(() => import('../stories/autocomplete.mdx')),
-  collapsible: dynamic(() => import('../stories/collapsible.mdx')),
-  dialog: dynamic(() => import('../stories/dialog.mdx')),
-  menu: dynamic(() => import('../stories/menu.mdx')),
-  popover: dynamic(() => import('../stories/popover.mdx')),
-  select: dynamic(() => import('../stories/select.mdx')),
-  tabs: dynamic(() => import('../stories/tabs.mdx')),
-  tooltip: dynamic(() => import('../stories/tooltip.mdx')),
+// MDX docs keyed by `group` slug → `component` slug. Group-aware so identically-named
+// entries (the headless `Dialog` primitive vs. the styled `Dialog` component) stay distinct.
+const docModules: Record<string, Record<string, React.ComponentType>> = {
+  aio: {
+    'organization-profile': dynamic(() => import('../stories/organization-profile.mdx')),
+  },
+  panels: {
+    'organization-profile-general': dynamic(() => import('../stories/organization-profile-general.mdx')),
+  },
+  sections: {
+    'leave-organization': dynamic(() => import('../stories/leave-organization.mdx')),
+    'delete-organization': dynamic(() => import('../stories/delete-organization.mdx')),
+  },
+  blocks: {
+    destructive: dynamic(() => import('../stories/destructive.mdx')),
+  },
+  components: {
+    button: dynamic(() => import('../stories/button.mdx')),
+    input: dynamic(() => import('../stories/input.mdx')),
+    dialog: dynamic(() => import('../stories/dialog.component.mdx')),
+    heading: dynamic(() => import('../stories/heading.mdx')),
+    tabs: dynamic(() => import('../stories/tabs.component.mdx')),
+    text: dynamic(() => import('../stories/text.mdx')),
+  },
+  primitives: {
+    // Headless primitives — alphabetical.
+    accordion: dynamic(() => import('../stories/accordion.mdx')),
+    autocomplete: dynamic(() => import('../stories/autocomplete.mdx')),
+    collapsible: dynamic(() => import('../stories/collapsible.mdx')),
+    dialog: dynamic(() => import('../stories/dialog.mdx')),
+    menu: dynamic(() => import('../stories/menu.mdx')),
+    popover: dynamic(() => import('../stories/popover.mdx')),
+    select: dynamic(() => import('../stories/select.mdx')),
+    tabs: dynamic(() => import('../stories/tabs.mdx')),
+    tooltip: dynamic(() => import('../stories/tooltip.mdx')),
+  },
 };
 
 interface DocsViewerProps {
+  group: string;
   slug: string;
 }
 
-export function DocsViewer({ slug }: DocsViewerProps) {
-  const DocContent = docModules[slug];
+export function DocsViewer({ group, slug }: DocsViewerProps) {
+  const DocContent = docModules[group]?.[slug];
   if (!DocContent) {
-    return <div className='text-muted-foreground p-8 text-sm'>No docs found for &quot;{slug}&quot;.</div>;
+    return (
+      <div className='text-muted-foreground p-8 text-sm'>
+        No docs found for &quot;{group}/{slug}&quot;.
+      </div>
+    );
   }
-  const meta = getModuleBySlug(slug)?.meta;
+  const meta = getModule(group, slug)?.meta;
   return (
-    // Keyed by slug so navigating between components resets the playground state.
+    // Keyed by group/slug so navigating between components resets the playground state.
     <PlaygroundProvider
-      key={slug}
+      key={`${group}/${slug}`}
       meta={meta}
     >
       <article className='prose relative mx-auto w-full min-w-0 max-w-3xl p-8'>

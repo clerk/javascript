@@ -196,28 +196,27 @@ export const plPL: LocalizationResource = {
       },
       warning: 'Po wybraniu dostawcy nie można go ponownie zmienić aż do zakończenia konfiguracji',
     },
-    verifyEmailDomainStep: {
-      title: 'Zweryfikuj adres e-mail',
-      subtitle: 'Zweryfikuj adres e-mail, na którym chcesz włączyć połączenie firmowe.',
-      addEmailAddress: {
-        formTitle: 'Potrzebujemy Twojego e-maila',
-        formSubtitle: 'Aby rozpocząć, potrzebujemy Twojego adresu e-mail',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'Adres e-mail',
+    organizationDomainsStep: {
+      title: 'Dodaj domeny SSO',
+      subtitle: 'Dodaj i zweryfikuj własność domen, których Twoja organizacja używa do logowania.',
+      formFieldLabel__domain: 'Domeny',
+      formFieldInputPlaceholder__domain: 'Wpisz tutaj swoją domenę i kliknij dodaj, aby rozpocząć',
+      formButtonPrimary__add: 'Dodaj',
+      domainSuggestion: {
+        messageLabel: 'Twój e-mail używa {{domain}}. Czy chcesz go dodać?',
+        formButtonPrimary__add: 'Dodaj {{domain}}',
       },
-      emailCode: {
-        formTitle: 'Zweryfikuj swój adres e-mail',
-        formSubtitle: 'Wprowadź kod weryfikacyjny wysłany na adres {{identifier}}',
-        resendButton: 'Nie otrzymałeś kodu? Wyślij ponownie',
-        verified: {
-          title: 'Otrzymaliśmy Twój e-mail',
-          subtitle: 'Zweryfikowałeś swój adres e-mail za pomocą następującego e-maila',
-          inputLabel: 'Zweryfikowany adres e-mail',
+      domainCard: {
+        badge__verified: 'Zweryfikowano',
+        badge__unverified: 'Niezweryfikowano',
+        verifiedAtLabel: "Zweryfikowano {{ date | shortDate('pl-PL') }}",
+        txtRecord: {
+          instructions:
+            'Dodaj ten rekord TXT u swojego dostawcy DNS. Zweryfikujemy go automatycznie, gdy rekord stanie się aktywny.',
+          typeLabel: 'Typ',
+          hostLabel: 'Host / Nazwa',
+          valueLabel: 'Wartość',
         },
-      },
-      domainTaken: {
-        title: 'Ta domena ({{domain}}) ma już połączenie SSO',
-        subtitle: 'Skontaktuj się z administratorem aplikacji, aby uzyskać dostęp przez istniejące połączenie.',
       },
     },
   },

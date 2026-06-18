@@ -1,115 +1,169 @@
-import { cva } from '../cva';
+import React from 'react';
+import type { ReactNode } from 'react';
+
+import { useDialogContext } from '@clerk/headless/dialog';
+import type { DialogProps as HeadlessDialogProps } from '@clerk/headless/dialog';
+
 import { Dialog as Primitive } from '../primitives/dialog';
-import { styled } from '../styled';
+import { defineSlotRecipe, useRecipe } from '../slot-recipe';
+import type { RecipeVariantProps } from '../slot-recipe';
 
-const backdropStyles = cva({
+/**
+ * One multi-slot recipe owns every dialog part: slot identity (`data-cl-slot`),
+ * base styles, and the appearance cascade. Each exported part below reads its
+ * own slot from `useRecipe(dialogRecipe)` and spreads it onto the bridged
+ * headless primitive. The headless parts no longer emit `data-cl-slot` — slot
+ * identity is applied here, in the styled layer.
+ */
+export const dialogRecipe = defineSlotRecipe(theme => ({
+  slots: {
+    backdrop: { slot: 'dialog-backdrop' },
+    viewport: { slot: 'dialog-viewport' },
+    popup: { slot: 'dialog-popup' },
+  },
   base: {
-    position: 'fixed',
-    inset: 0,
-    backgroundColor: 'color-mix(in oklab, #000, transparent 50%)',
-    transition: 'opacity 150ms',
-    '&[data-cl-starting-style], &[data-cl-ending-style]': {
-      opacity: 0,
+    backdrop: {
+      position: 'fixed',
+      inset: 0,
+      backgroundColor: 'color-mix(in oklab, #000, transparent 50%)',
+      transition: 'opacity 150ms',
+      '&[data-cl-starting-style], &[data-cl-ending-style]': {
+        opacity: 0,
+      },
+    },
+    viewport: {
+      display: 'grid',
+      placeItems: 'center',
+      width: '100%',
+      minHeight: '100%',
+      padding: theme.spacing(4),
+    },
+    popup: {
+      backgroundColor: theme.color.primaryForeground,
+      color: theme.color.primary,
+      borderRadius: theme.rounded.lg,
+      padding: theme.spacing(6),
+      width: '100%',
+      boxShadow: '0 10px 30px rgba(0,0,0,0.18)',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: theme.spacing(3),
+      transition: 'transform 150ms ease-out, opacity 150ms ease-out',
+      '&[data-cl-starting-style], &[data-cl-ending-style]': {
+        opacity: 0,
+        transform: 'scale(0.98)',
+      },
     },
   },
-  variants: {},
-});
-
-const viewportStyles = cva(theme => ({
-  base: {
-    display: 'grid',
-    placeItems: 'center',
-    width: '100%',
-    minHeight: '100%',
-    padding: theme.spacing(4),
-  },
-  variants: {},
-}));
-
-const popupStyles = cva(theme => ({
-  base: {
-    backgroundColor: theme.color.primaryForeground,
-    color: theme.color.primary,
-    borderRadius: theme.rounded.lg,
-    padding: theme.spacing(6),
-    minWidth: '20rem',
-    maxWidth: '32rem',
-    width: '100%',
-    boxShadow: '0 10px 30px rgba(0,0,0,0.18)',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: theme.spacing(3),
-    transition: 'transform 150ms ease-out, opacity 150ms ease-out',
-    '&[data-cl-starting-style], &[data-cl-ending-style]': {
-      opacity: 0,
-      transform: 'scale(0.98)',
+  variants: {
+    size: {
+      md: {
+        popup: { minWidth: '20rem', maxWidth: '32rem' },
+      },
+      lg: {
+        popup: { minWidth: '28rem', maxWidth: '48rem' },
+      },
     },
   },
-  variants: {},
-}));
-
-const titleStyles = cva(theme => ({
-  base: {
-    ...theme.text('lg'),
-    fontWeight: 600,
-    margin: 0,
+  defaultVariants: {
+    size: 'md',
   },
-  variants: {},
 }));
 
-const descriptionStyles = cva(theme => ({
-  base: {
-    ...theme.text('sm'),
-    margin: 0,
-    opacity: 0.8,
+type DialogVariantProps = RecipeVariantProps<typeof dialogRecipe>;
+
+const DialogVariantContext = React.createContext<DialogVariantProps>({});
+
+declare module '../registry' {
+  interface MosaicSlotRegistry {
+    'dialog-backdrop': true;
+    'dialog-viewport': true;
+    'dialog-popup': true;
+  }
+}
+
+const Backdrop = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<typeof Primitive.Backdrop>>(
+  function DialogBackdrop(props, ref) {
+    const { backdrop } = useRecipe(dialogRecipe);
+    return (
+      <Primitive.Backdrop
+        ref={ref}
+        {...props}
+        {...backdrop}
+      />
+    );
   },
-  variants: {},
-}));
+);
 
-const closeStyles = cva(theme => ({
-  base: {
-    alignSelf: 'flex-end',
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingInline: theme.spacing(3),
-    paddingBlock: theme.spacing(1),
-    borderRadius: theme.rounded.md,
-    backgroundColor: 'transparent',
-    color: theme.color.primary,
-    border: `1px solid ${theme.alpha('primary', 20)}`,
-    ...theme.text('sm'),
-    cursor: 'pointer',
+const Viewport = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<typeof Primitive.Viewport>>(
+  function DialogViewport(props, ref) {
+    const { viewport } = useRecipe(dialogRecipe);
+    return (
+      <Primitive.Viewport
+        ref={ref}
+        {...props}
+        {...viewport}
+      />
+    );
   },
-  variants: {},
-}));
+);
 
-const Backdrop = styled(Primitive.Backdrop, backdropStyles);
-const Viewport = styled(Primitive.Viewport, viewportStyles);
-const Popup = styled(Primitive.Popup, popupStyles);
-const Title = styled(Primitive.Title, titleStyles);
-const Description = styled(Primitive.Description, descriptionStyles);
-const Close = styled(Primitive.Close, closeStyles);
+const Popup = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<typeof Primitive.Popup>>(
+  function DialogPopup(props, ref) {
+    const variantProps = React.useContext(DialogVariantContext);
+    const { popup } = useRecipe(dialogRecipe, { variants: variantProps });
+    return (
+      <Primitive.Popup
+        ref={ref}
+        {...props}
+        {...popup}
+      />
+    );
+  },
+);
 
-/** Styled mosaic Dialog components built on headless Dialog primitives. */
-export const Dialog: {
-  Root: typeof Primitive.Root;
-  Trigger: typeof Primitive.Trigger;
-  Portal: typeof Primitive.Portal;
-  Backdrop: typeof Backdrop;
-  Viewport: typeof Viewport;
-  Popup: typeof Popup;
-  Title: typeof Title;
-  Description: typeof Description;
-  Close: typeof Close;
-} = {
-  Root: Primitive.Root,
-  Trigger: Primitive.Trigger,
-  Portal: Primitive.Portal,
-  Backdrop,
-  Viewport,
-  Popup,
-  Title,
-  Description,
-  Close,
-};
+interface DialogProps extends Pick<HeadlessDialogProps, 'open' | 'defaultOpen' | 'onOpenChange' | 'modal'> {
+  trigger: React.ComponentProps<typeof Primitive.Trigger>['render'];
+  children: ReactNode | ((ctx: { close: () => void }) => ReactNode);
+  size?: DialogVariantProps['size'];
+}
+
+function DialogContent({ children }: { children: DialogProps['children'] }) {
+  const { setOpen } = useDialogContext();
+  if (typeof children !== 'function') return <>{children}</>;
+  return <>{children({ close: () => setOpen(false) })}</>;
+}
+
+export function Dialog({ trigger, children, size, open, defaultOpen, onOpenChange, modal }: DialogProps) {
+  return (
+    <DialogVariantContext.Provider value={{ size }}>
+      <Primitive.Root
+        open={open}
+        defaultOpen={defaultOpen}
+        onOpenChange={onOpenChange}
+        modal={modal}
+      >
+        <Primitive.Trigger render={trigger} />
+        <Primitive.Portal>
+          <Backdrop />
+          <Viewport>
+            <Popup>
+              <DialogContent>{children}</DialogContent>
+            </Popup>
+          </Viewport>
+        </Primitive.Portal>
+      </Primitive.Root>
+    </DialogVariantContext.Provider>
+  );
+}
+
+/** Compound parts for power-user / custom dialog layouts. */
+Dialog.Root = Primitive.Root;
+Dialog.Trigger = Primitive.Trigger;
+Dialog.Portal = Primitive.Portal;
+Dialog.Backdrop = Backdrop;
+Dialog.Viewport = Viewport;
+Dialog.Popup = Popup;
+Dialog.Title = Primitive.Title;
+Dialog.Description = Primitive.Description;
+Dialog.Close = Primitive.Close;
