@@ -29,6 +29,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     input: dynamic(() => import('../stories/input.mdx')),
     dialog: dynamic(() => import('../stories/dialog.component.mdx')),
     heading: dynamic(() => import('../stories/heading.mdx')),
+    icon: dynamic(() => import('../stories/icon.mdx')),
     tabs: dynamic(() => import('../stories/tabs.component.mdx')),
     text: dynamic(() => import('../stories/text.mdx')),
   },

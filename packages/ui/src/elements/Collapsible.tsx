@@ -1,3 +1,4 @@
+import { inertProps } from '@clerk/shared/inert';
 import { type PropsWithChildren, useEffect, useState } from 'react';
 
 import { Box, descriptors, useAppearance } from '../customizables';
@@ -75,8 +76,7 @@ export function Collapsible({ open, children, sx }: CollapsibleProps): JSX.Eleme
         }),
         sx,
       ]}
-      // @ts-ignore - inert not yet in React types
-      inert={!open ? '' : undefined}
+      {...inertProps(!open)}
     >
       <Box
         elementDescriptor={descriptors.collapsibleInner}
