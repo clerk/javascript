@@ -67,6 +67,8 @@ export const INVOKE_DONE = 'machine.invoke.done';
 export const INVOKE_ERROR = 'machine.invoke.error';
 /** The event delivered to a state on entry (and to the initial state on start). */
 export const INIT = 'machine.init';
+/** The event delivered to guards when {@link Actor.recheck} re-evaluates `always` transitions. */
+export const RECHECK = 'machine.recheck';
 
 /** Event delivered to `onDone` when an invoked promise resolves. */
 export interface DoneInvokeEvent<TOutput = unknown> extends EventObject {
@@ -89,9 +91,18 @@ export interface InvokeConfig<TContext, TEvent extends EventObject, TOutput = un
 }
 
 export interface StateConfig<TContext, TEvent extends EventObject> {
+  /**
+   * Entry precondition — "may navigation LAND on this state right now?". Checked
+   * uniformly by *every* transition (and the derived initial) that targets this
+   * state: when it fails, the transition is a true no-op (snapshot unchanged, no
+   * notify). Distinct from a transition `guard`, which gates a single edge. An
+   * omitted entry guard means "always enterable". Often reads live external data
+   * via closure rather than `context` — pair with {@link Actor.recheck}.
+   */
+  guard?: Guard<TContext, TEvent>;
   /** Event-name → transition map. */
   on?: Record<string, Transition<TContext, TEvent>>;
-  /** Eventless / immediate transitions, evaluated on entry. */
+  /** Eventless / immediate transitions, evaluated on entry and on {@link Actor.recheck}. */
   always?: Transition<TContext, TEvent>;
   /** A promise to invoke on entry. */
   invoke?: InvokeConfig<TContext, TEvent>;
@@ -103,9 +114,15 @@ export interface StateConfig<TContext, TEvent extends EventObject> {
   type?: 'final';
 }
 
+/**
+ * The initial state may be a static id or derived from context at start time
+ * (e.g. the Wizard computes the "furthest-reachable" step from its entry guards).
+ */
+export type InitialResolver<TContext> = (context: TContext) => string;
+
 export interface MachineConfig<TContext, TEvent extends EventObject> {
   id?: string;
-  initial: string;
+  initial: string | InitialResolver<TContext>;
   context?: TContext;
   states: Record<string, StateConfig<TContext, TEvent>>;
 }
@@ -117,7 +134,7 @@ export interface MachineConfig<TContext, TEvent extends EventObject> {
  */
 export interface StateMachine<TContext, TEvent extends EventObject> {
   id: string | undefined;
-  initial: string;
+  initial: string | InitialResolver<TContext>;
   context: TContext;
   states: Record<string, StateConfig<TContext, TEvent>>;
   config: MachineConfig<TContext, TEvent>;
@@ -148,8 +165,20 @@ export interface Actor<TContext, TEvent extends EventObject> {
   getSnapshot: () => Snapshot<TContext>;
   /** Subscribe to snapshots; returns an unsubscribe fn (usable with `useSyncExternalStore`). */
   subscribe: (listener: SnapshotListener<TContext>) => Unsubscribe;
-  /** Whether the event would be handled (a guard-passing transition exists) right now. */
+  /** Whether the event would be handled (a guard-passing, enterable transition exists) right now. */
   can: (event: TEvent | AnyEventObject) => boolean;
+  /**
+   * Re-evaluate the current state against live data. Call this when external data
+   * a guard reads (an SWR cache, a store) has changed, so the machine can
+   * self-correct:
+   *  - if the *current* state's entry guard no longer holds, re-seat to the
+   *    freshly resolved initial state (e.g. the Wizard's furthest-reachable step);
+   *  - otherwise re-run the current state's `always` transitions, resolving one
+   *    that was parked waiting on the now-arrived data.
+   * A no-op (no notify) when the current state is still enterable and no `always`
+   * transition applies.
+   */
+  recheck: () => void;
 }
 
 export interface CreateActorOptions<TContext> {

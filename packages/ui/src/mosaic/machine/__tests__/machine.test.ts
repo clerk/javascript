@@ -337,6 +337,142 @@ describe('createActor — can()', () => {
   });
 });
 
+describe('createActor — state entry guards', () => {
+  // Entry guards read live external data via closure — the Wizard's core need.
+  function makeGatedMachine(canEnterB: () => boolean) {
+    return createMachine<Record<string, never>, { type: 'GO' }>({
+      initial: 'a',
+      states: {
+        a: { on: { GO: 'b' } },
+        b: { guard: canEnterB },
+      },
+    });
+  }
+
+  it('blocks a transition whose target entry guard fails — a true no-op (same ref, no notify)', () => {
+    const actor = createActor(makeGatedMachine(() => false));
+    actor.start();
+    const seen: string[] = [];
+    actor.subscribe(s => seen.push(s.value));
+
+    const before = actor.getSnapshot();
+    actor.send({ type: 'GO' });
+
+    expect(actor.getSnapshot()).toBe(before); // referentially unchanged
+    expect(actor.getSnapshot().value).toBe('a');
+    expect(seen).toEqual([]); // subscribers NOT notified on a no-op
+  });
+
+  it('allows the transition once the entry guard holds, and reflects it in can()', () => {
+    let open = false;
+    const actor = createActor(makeGatedMachine(() => open));
+    actor.start();
+
+    expect(actor.can({ type: 'GO' })).toBe(false);
+    actor.send({ type: 'GO' });
+    expect(actor.getSnapshot().value).toBe('a'); // still blocked
+
+    open = true;
+    expect(actor.can({ type: 'GO' })).toBe(true);
+    actor.send({ type: 'GO' });
+    expect(actor.getSnapshot().value).toBe('b');
+  });
+});
+
+describe('createActor — derived initial state', () => {
+  it('computes the start state from context via an initial resolver', () => {
+    const machine = createMachine<{ resumeAt: string }, { type: 'X' }>({
+      initial: context => context.resumeAt,
+      context: { resumeAt: 'c' },
+      states: { a: {}, b: {}, c: {} },
+    });
+    const actor = createActor(machine);
+    actor.start();
+    expect(actor.getSnapshot().value).toBe('c');
+  });
+});
+
+describe('createActor — recheck (always re-evaluated on external-data change)', () => {
+  it('takes a parked always transition once external data lets its guard pass', () => {
+    let ready = false;
+    const machine = createMachine<Record<string, never>, { type: never }>({
+      initial: 'waiting',
+      states: {
+        waiting: { always: { target: 'ready', guard: () => ready } },
+        ready: {},
+      },
+    });
+    const actor = createActor(machine);
+    actor.start();
+    // Guard was false on entry → still parked in `waiting`.
+    expect(actor.getSnapshot().value).toBe('waiting');
+
+    const seen: string[] = [];
+    actor.subscribe(s => seen.push(s.value));
+
+    actor.recheck(); // data not ready yet → no-op, no notify
+    expect(actor.getSnapshot().value).toBe('waiting');
+    expect(seen).toEqual([]);
+
+    ready = true;
+    actor.recheck(); // external data changed → advance
+    expect(actor.getSnapshot().value).toBe('ready');
+    expect(seen).toEqual(['ready']);
+  });
+
+  it('re-seats to the resolved initial state when live data makes the current step unenterable', () => {
+    // Self-correction: the actor is sitting on a step whose entry guard reads live
+    // external data, and that data changes so the step is no longer enterable. A
+    // recheck() re-seats to the freshly-resolved initial state — the seam the
+    // Wizard's render-phase "clamp" stands on.
+    let bReachable = true;
+    const machine = createMachine<Record<string, never>, { type: never }>({
+      initial: () => (bReachable ? 'b' : 'a'),
+      states: {
+        a: {},
+        b: { guard: () => bReachable },
+      },
+    });
+    const actor = createActor(machine);
+    actor.start();
+    expect(actor.getSnapshot().value).toBe('b'); // initial resolver landed on b
+
+    const seen: string[] = [];
+    actor.subscribe(s => seen.push(s.value));
+
+    actor.recheck(); // b still enterable → no-op, no notify
+    expect(actor.getSnapshot().value).toBe('b');
+    expect(seen).toEqual([]);
+
+    bReachable = false;
+    actor.recheck(); // b unenterable → re-seat to the resolved initial (a)
+    expect(actor.getSnapshot().value).toBe('a');
+    expect(seen).toEqual(['a']);
+  });
+
+  it('does not re-seat while the current step is still enterable (a guard opening elsewhere does not yank)', () => {
+    // Mirrors the Wizard's "create-style change" invariant: a later guard going
+    // TRUE while the current step still holds must NOT move the user.
+    let bReachable = false;
+    const machine = createMachine<Record<string, never>, { type: never }>({
+      initial: 'a',
+      states: {
+        a: {},
+        b: { guard: () => bReachable },
+      },
+    });
+    const actor = createActor(machine);
+    actor.start();
+    const seen: string[] = [];
+    actor.subscribe(s => seen.push(s.value));
+
+    bReachable = true; // b becomes reachable, but a still holds → no re-seat
+    actor.recheck();
+    expect(actor.getSnapshot().value).toBe('a');
+    expect(seen).toEqual([]);
+  });
+});
+
 describe('createActor — observable contract', () => {
   it('notifies subscribers on each transition and stops after unsubscribe', () => {
     const actor = createActor(createDeleteOrgMachine(() => Promise.resolve()));

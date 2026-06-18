@@ -1,5 +1,5 @@
 import { isAssignAction } from './assign';
-import { INIT, INVOKE_DONE, INVOKE_ERROR } from './types';
+import { INIT, INVOKE_DONE, INVOKE_ERROR, RECHECK } from './types';
 import type {
   Actions,
   Actor,
@@ -55,8 +55,10 @@ export function createActor<TContext extends object, TEvent extends EventObject>
   // through an event-agnostic lens to keep the runtime helpers honestly typed.
   const states = machine.states as unknown as Record<string, StateConfig<TContext, EventObject>>;
 
-  let value = teleport?.value ?? machine.initial;
   let context: TContext = teleport ? { ...machine.context, ...teleport.context } : { ...machine.context };
+  // `initial` may be derived from context (e.g. furthest-reachable step).
+  const resolveInitial = () => (typeof machine.initial === 'function' ? machine.initial(context) : machine.initial);
+  let value = teleport?.value ?? resolveInitial();
 
   // A teleported actor is already "started" and inert: start() must not re-run
   // entry/always/invoke for the state it was dropped into.
@@ -90,9 +92,22 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     return transitions.find(transition => !transition.guard || transition.guard(context, event));
   }
 
-  /** Run a chosen transition: exit (if external) → actions → enter target. */
-  function takeTransition(transition: TransitionConfig<TContext, EventObject>, event: EventObject): void {
+  /** Whether a target state's entry guard currently permits landing on it. */
+  function canEnter(stateId: string, event: EventObject): boolean {
+    const guard = states[stateId]?.guard;
+    return !guard || guard(context, event);
+  }
+
+  /**
+   * Run a chosen transition: exit (if external) → actions → enter target.
+   * Returns `false` — a true no-op — when the target's entry guard blocks it, so
+   * the caller skips the commit and subscribers are never notified.
+   */
+  function takeTransition(transition: TransitionConfig<TContext, EventObject>, event: EventObject): boolean {
     const external = transition.target !== undefined;
+    if (external && !canEnter(transition.target as string, event)) {
+      return false; // entry guard blocks landing → snapshot unchanged, no notify
+    }
     if (external) {
       runActions(states[value].exit, event);
       invocationToken++; // abandon the invoke of the state we're leaving
@@ -102,6 +117,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       value = transition.target as string;
       enterState(event);
     }
+    return true;
   }
 
   function startInvoke(event: EventObject): void {
@@ -131,6 +147,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
   /** Entry side of a state: entry actions, then immediate/invoke resolution. */
   function enterState(event: EventObject): void {
     const stateConfig = states[value];
+    if (!stateConfig) return; // degenerate graph (e.g. empty wizard) — nothing to enter
     runActions(stateConfig.entry, event);
 
     if (stateConfig.type === 'final') {
@@ -139,8 +156,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     }
 
     const immediate = pickTransition(normalizeTransitions(stateConfig.always), event);
-    if (immediate && immediate.target !== undefined) {
-      takeTransition(immediate, event);
+    if (immediate && immediate.target !== undefined && takeTransition(immediate, event)) {
       return;
     }
 
@@ -176,10 +192,9 @@ export function createActor<TContext extends object, TEvent extends EventObject>
 
     send(event) {
       if (status !== 'active') return;
-      const transition = pickTransition(normalizeTransitions(states[value].on?.[event.type]), event);
+      const transition = pickTransition(normalizeTransitions(states[value]?.on?.[event.type]), event);
       if (!transition) return; // event not handled in this state → ignored
-      takeTransition(transition, event);
-      commit();
+      if (takeTransition(transition, event)) commit(); // entry-blocked → no commit, no notify
     },
 
     getSnapshot() {
@@ -200,7 +215,36 @@ export function createActor<TContext extends object, TEvent extends EventObject>
 
     can(event) {
       if (status !== 'active') return false;
-      return pickTransition(normalizeTransitions(states[value].on?.[event.type]), event) !== undefined;
+      const transition = pickTransition(normalizeTransitions(states[value]?.on?.[event.type]), event);
+      if (!transition) return false;
+      return transition.target === undefined || canEnter(transition.target as string, event);
+    },
+
+    recheck() {
+      if (status !== 'active') return;
+      const event = { type: RECHECK };
+
+      // Self-correct first: if live external data has made the *current* state
+      // unenterable (its entry guard no longer holds), re-seat to the freshly
+      // resolved initial state — the same derivation used on start (e.g. the
+      // Wizard's furthest-reachable step). `resolveInitial` always lands on an
+      // enterable step, so this is provably one-shot and cannot loop.
+      if (!canEnter(value, event)) {
+        const reseated = resolveInitial();
+        if (reseated !== value) {
+          runActions(states[value]?.exit, event);
+          invocationToken++; // abandon the invoke of the state we're leaving
+          value = reseated;
+          enterState(event);
+          commit();
+        }
+        return;
+      }
+
+      const immediate = pickTransition(normalizeTransitions(states[value]?.always), event);
+      if (immediate && immediate.target !== undefined && takeTransition(immediate, event)) {
+        commit(); // nothing applies → no commit, no notify
+      }
     },
   };
 
