@@ -1,7 +1,12 @@
 import { CAPTCHA_ELEMENT_ID } from '@clerk/shared/internal/clerk-js/constants';
 import { describe, expect, it, vi } from 'vitest';
 
-import { simulateCaptchaInteractive, simulateCaptchaResolved } from '@/test/captcha';
+import {
+  simulateCaptchaInteractive,
+  simulateCaptchaInteractiveLegacy,
+  simulateCaptchaResolved,
+  simulateCaptchaResolvedLegacy,
+} from '@/test/captcha';
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, waitFor } from '@/test/utils';
 
@@ -59,5 +64,29 @@ describe('CaptchaElement', () => {
 
     expect(() => simulateCaptchaInteractive(getCaptcha())).not.toThrow();
     await waitFor(() => expect(getCaptcha().dataset.clInteractive).toBe('true'));
+  });
+
+  describe('legacy clerk-js fallback (no data-cl-interactive attribute)', () => {
+    it('calls onInteractiveChange(true) when maxHeight expands without the attribute', async () => {
+      const { wrapper } = await createFixtures();
+      const onInteractiveChange = vi.fn();
+      render(<CaptchaElement onInteractiveChange={onInteractiveChange} />, { wrapper });
+
+      simulateCaptchaInteractiveLegacy(getCaptcha());
+
+      await waitFor(() => expect(onInteractiveChange).toHaveBeenLastCalledWith(true));
+    });
+
+    it('calls onInteractiveChange(false) when maxHeight collapses without the attribute', async () => {
+      const { wrapper } = await createFixtures();
+      const onInteractiveChange = vi.fn();
+      render(<CaptchaElement onInteractiveChange={onInteractiveChange} />, { wrapper });
+
+      simulateCaptchaInteractiveLegacy(getCaptcha());
+      await waitFor(() => expect(onInteractiveChange).toHaveBeenLastCalledWith(true));
+
+      simulateCaptchaResolvedLegacy(getCaptcha());
+      await waitFor(() => expect(onInteractiveChange).toHaveBeenLastCalledWith(false));
+    });
   });
 });

@@ -22,6 +22,25 @@ export const simulateCaptchaResolved = (el: HTMLElement) => {
 };
 
 /**
+ * Simulate old clerk-js escalating to interactive via maxHeight only (no data-cl-interactive).
+ * Uses a concrete pixel value so the mutation fires reliably in JSDOM.
+ */
+export const simulateCaptchaInteractiveLegacy = (el: HTMLElement) => {
+  el.style.maxHeight = '68px';
+  el.style.minHeight = '68px';
+  el.style.marginBottom = '1.5rem';
+};
+
+/**
+ * Simulate old clerk-js collapsing after resolve via maxHeight only (no data-cl-interactive).
+ */
+export const simulateCaptchaResolvedLegacy = (el: HTMLElement) => {
+  el.style.maxHeight = '0';
+  el.style.minHeight = '';
+  el.style.marginBottom = '';
+};
+
+/**
  * Cloudflare's documented dummy sitekeys for testing Turnstile.
  * @see https://developers.cloudflare.com/turnstile/troubleshooting/testing/
  *

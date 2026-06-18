@@ -60,6 +60,20 @@ export const CaptchaElement = ({
           maxHeightValueRef.current = target.style.maxHeight || '0';
           minHeightValueRef.current = target.style.minHeight || 'unset';
           marginBottomValueRef.current = target.style.marginBottom || 'unset';
+          // Fallback for old clerk-js that never writes data-cl-interactive: infer
+          // interactive state from maxHeight. When the MutationObserver callback fires,
+          // the DOM already reflects all mutations from the same microtask, so
+          // `target.dataset.clInteractive` is up-to-date — new clerk-js (which sets
+          // the attribute alongside the style) passes the guard and is handled below.
+          if (!('clInteractive' in target.dataset)) {
+            const mh = target.style.maxHeight;
+            const nowInteractive = mh !== '' && mh !== '0' && mh !== '0px';
+            if (nowInteractive !== isInteractiveRef.current) {
+              isInteractiveRef.current = nowInteractive;
+              setIsInteractive(nowInteractive);
+              onInteractiveChangeRef.current?.(nowInteractive);
+            }
+          }
         }
         if (mutation.attributeName === 'data-cl-interactive') {
           // ORDERING IS LOAD-BEARING: style mutations from the same turnstile.ts call are
