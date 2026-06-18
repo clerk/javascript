@@ -779,10 +779,7 @@ function pickBetterUnionPropertyCandidate(existing, candidate) {
 }
 
 /**
- * Collect the set of string-literal keys from a type used as the second argument to `Omit` or
- * `Pick` — a single literal (`'organizationId'`) or a union of literals (`'a' | 'b'`). Returns
- * `undefined` if the type isn't a literal/literal-union (e.g. a `keyof` reference we can't resolve
- * here), in which case callers should fall through to the generic-instantiation path.
+ * Collect the set of string-literal keys from a type used as the second argument to `Omit` or `Pick` — a single literal (`'organizationId'`) or a union of literals (`'a' | 'b'`). Returns `undefined` if the type isn't a literal/literal-union (e.g. a `keyof` reference we can't resolve here), in which case callers should fall through to the generic-instantiation path.
  *
  * @param {import('typedoc').Type | undefined} t
  * @returns {Set<string> | undefined}
@@ -892,12 +889,7 @@ function resolveDeclarationWithObjectMembers(t, project) {
   if (t.type === 'reference') {
     const ref = /** @type {import('typedoc').ReferenceType} */ (t);
     /**
-     * `Omit<X, K>` / `Pick<X, K>` — TypeScript built-in utilities. They have no project reflection
-     * to look up, and falling through to the generic-instantiation path below would merge K's
-     * properties (zero, since K is a literal type) without applying the filter — Omit/Pick would
-     * silently behave like an identity. Resolve `X` to its property list, then keep/drop by the
-     * literal-string keys in `K`. Without this, `Array<Omit<X, 'k'>>` shows no nested rows because
-     * `decl` is undefined.
+     * `Omit<X, K>` / `Pick<X, K>` — TypeScript built-in utilities. They have no project reflection to look up, and falling through to the generic-instantiation path below would merge K's properties (zero, since K is a literal type) without applying the filter — Omit/Pick would silently behave like an identity. Resolve `X` to its property list, then keep/drop by the literal-string keys in `K`. Without this, `Array<Omit<X, 'k'>>` shows no nested rows because `decl` is undefined.
      */
     if ((ref.name === 'Omit' || ref.name === 'Pick') && (ref.typeArguments?.length ?? 0) === 2) {
       const baseChildren = resolveDeclarationWithObjectMembers(ref.typeArguments[0], project);
@@ -977,8 +969,7 @@ function parameterTypeLinksToStandaloneMdxPage(t, ctx) {
     return false;
   }
   // `Array<NamedType>`: the standalone page documents the element shape, not the array signature.
-  // Surface both — the Type column links to the element page, and nested `params.<field>` rows
-  // flatten the element so readers don't have to navigate just to see field names.
+  // Surface both — the Type column links to the element page, and nested `params.<field>` rows flatten the element so readers don't have to navigate just to see field names.
   if (bare.type === 'array') {
     return false;
   }

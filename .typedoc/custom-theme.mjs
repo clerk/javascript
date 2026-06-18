@@ -671,10 +671,7 @@ function renderPropertiesFormatTable(args) {
 }
 
 /**
- * Resolve a property's type to the `@inline` class/interface declaration it ultimately points at,
- * or `undefined` if the type isn't (or doesn't unwrap to) one. Unwraps `OptionalType` and a union
- * arm — covers `T | null` / `T | undefined`. Used to decide whether to expand nested rows for a
- * property whose type is rendered inline as `\{ … \}`.
+ * Resolve a property's type to the `@inline` class/interface declaration it ultimately points at, or `undefined` if the type isn't (or doesn't unwrap to) one. Unwraps `OptionalType` and a union arm — covers `T | null` / `T | undefined`. Used to decide whether to expand nested rows for a property whose type is rendered inline as `\{ … \}`.
  *
  * @param {import('typedoc').Type | undefined} t
  */
@@ -702,10 +699,7 @@ function getInlineClassOrInterfaceTarget(t) {
 }
 
 /**
- * Append synthesized `parent.child` rows after each property whose type is an `@inline` class or
- * interface (or `null | InlineClass`). Mirrors {@link appendUnionObjectChildPropertyRows} — the
- * synthesized reflection inherits the child's `flags.isOptional` so the renderer appends `?` on
- * its own, and uses `?.` as the separator when the parent is optional.
+ * Append synthesized `parent.child` rows after each property whose type is an `@inline` class or interface (or `null | InlineClass`). Mirrors {@link appendUnionObjectChildPropertyRows} — the synthesized reflection inherits the child's `flags.isOptional` so the renderer appends `?` on its own, and uses `?.` as the separator when the parent is optional.
  *
  * @template {import('typedoc').DeclarationReflection} T
  * @param {T[]} base
