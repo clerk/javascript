@@ -85,3 +85,30 @@ export function useSelector<TContext extends object, TEvent extends EventObject,
 
   return useSyncExternalStore(actor.subscribe, getSelection, getSelection);
 }
+
+/**
+ * Logs machine state transitions to the console. Drop it directly below a
+ * `useMachine` or `useActor` call; remove before shipping.
+ *
+ * ```ts
+ * const [snapshot, send] = useMachine(machine);
+ * useMachineLogger('deleteOrg', snapshot);
+ * ```
+ *
+ * Output: `[deleteOrg] idle → confirming {error: null}`
+ */
+export function useMachineLogger<TContext extends object>(label: string, snapshot: Snapshot<TContext>): void {
+  const prevValue = useRef<string | undefined>(undefined);
+
+  useEffect(() => {
+    const current = snapshot.value;
+    const previous = prevValue.current;
+    prevValue.current = current;
+
+    if (previous === undefined) {
+      console.log(`[${label}] ${current}`, snapshot.context);
+    } else if (previous !== current) {
+      console.log(`[${label}] ${previous} → ${current}`, snapshot.context);
+    }
+  });
+}
