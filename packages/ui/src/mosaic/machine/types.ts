@@ -161,12 +161,12 @@ export interface Actor<TContext, TEvent extends EventObject> {
   /** Stop the actor and abandon any in-flight invoke. */
   stop: () => void;
   /** Send an event. Ignored once the actor is `done` or `stopped`. */
-  send: (event: TEvent | AnyEventObject) => void;
+  send: (event: TEvent) => void;
   getSnapshot: () => Snapshot<TContext>;
   /** Subscribe to snapshots; returns an unsubscribe fn (usable with `useSyncExternalStore`). */
   subscribe: (listener: SnapshotListener<TContext>) => Unsubscribe;
   /** Whether the event would be handled (a guard-passing, enterable transition exists) right now. */
-  can: (event: TEvent | AnyEventObject) => boolean;
+  can: (event: TEvent) => boolean;
   /**
    * Re-evaluate the current state against live data. Call this when external data
    * a guard reads (an SWR cache, a store) has changed, so the machine can
@@ -182,6 +182,13 @@ export interface Actor<TContext, TEvent extends EventObject> {
 }
 
 export interface CreateActorOptions<TContext> {
+  /**
+   * Runtime context merged over machine defaults at actor creation time.
+   * Use this to inject dependencies (e.g. an async function from a hook)
+   * without putting them in the module-level machine definition.
+   * Snapshot context takes precedence when both are provided.
+   */
+  context?: Partial<TContext>;
   /**
    * Start the actor teleported to this snapshot instead of the machine's
    * initial state. Used by {@link mockActor} — the actor is inert (no entry

@@ -502,6 +502,37 @@ describe('createActor — observable contract', () => {
   });
 });
 
+describe('createActor — context init option', () => {
+  type Ctx = { label: string; count: number };
+  type Ev = { type: 'GO' };
+
+  const machine = createMachine<Ctx, Ev>({
+    initial: 'idle',
+    context: { label: 'default', count: 0 },
+    states: { idle: { on: { GO: 'done' } }, done: { type: 'final' } },
+  });
+
+  it('merges runtime context over machine defaults', () => {
+    const actor = createActor(machine, { context: { label: 'runtime' } });
+    actor.start();
+    expect(actor.getSnapshot().context).toEqual({ label: 'runtime', count: 0 });
+  });
+
+  it('leaves unspecified fields at their machine defaults', () => {
+    const actor = createActor(machine, { context: { count: 42 } });
+    actor.start();
+    expect(actor.getSnapshot().context).toEqual({ label: 'default', count: 42 });
+  });
+
+  it('snapshot.context takes precedence over context init', () => {
+    const actor = createActor(machine, {
+      context: { label: 'runtime' },
+      snapshot: { value: 'idle', context: { label: 'teleport' } },
+    });
+    expect(actor.getSnapshot().context).toEqual({ label: 'teleport', count: 0 });
+  });
+});
+
 describe('mockActor — teleport', () => {
   it('drops the actor into an arbitrary state + context', () => {
     const actor = mockActor(

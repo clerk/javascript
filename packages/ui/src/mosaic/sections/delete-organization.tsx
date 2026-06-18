@@ -1,26 +1,20 @@
-import { useState } from 'react';
-
 import { Box } from '../components/box';
 import { Button } from '../components/button';
 import { SectionSkeleton } from '../components/section-skeleton';
 import { Destructive } from '../block/destructive';
 import { useOrganization } from '../mock/use-organization';
+import { useMachine } from '../machine/useMachine';
+import type { MockOrganization } from '../mock/use-organization';
+import { createDeleteOrgMachine } from './delete-organization-machine';
 
 export function DeleteOrganization() {
   const { isLoaded, organization } = useOrganization();
-  const [open, setOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  if (!isLoaded || !organization) return <SectionSkeleton />;
+  return <DeleteOrganizationReady organization={organization} />;
+}
 
-  if (!isLoaded || !organization) {
-    return <SectionSkeleton />;
-  }
-
-  const handleDelete = async () => {
-    setIsDeleting(true);
-    await organization.destroy();
-    setIsDeleting(false);
-    setOpen(false);
-  };
+function DeleteOrganizationReady({ organization }: { organization: MockOrganization }) {
+  const [snapshot, send] = useMachine(createDeleteOrgMachine(async () => organization.destroy()));
 
   return (
     <Box
@@ -75,14 +69,14 @@ export function DeleteOrganization() {
               Delete organization
             </Button>
           )}
-          open={open}
-          onOpenChange={setOpen}
+          open={snapshot.value === 'confirming' || snapshot.value === 'deleting'}
+          onOpenChange={isOpen => send({ type: isOpen ? 'OPEN' : 'CANCEL' })}
           title='Delete organization'
           description='Are you sure you want to delete this organization?'
           resourceName={organization.name}
           primaryActionLabel='Delete organization'
-          onDelete={handleDelete}
-          isDeleting={isDeleting}
+          onDelete={() => send({ type: 'CONFIRM' })}
+          isDeleting={snapshot.value === 'deleting'}
         />
       </Box>
     </Box>

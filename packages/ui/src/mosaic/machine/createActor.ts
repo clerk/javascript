@@ -55,7 +55,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
   // through an event-agnostic lens to keep the runtime helpers honestly typed.
   const states = machine.states as unknown as Record<string, StateConfig<TContext, EventObject>>;
 
-  let context: TContext = teleport ? { ...machine.context, ...teleport.context } : { ...machine.context };
+  let context: TContext = { ...machine.context, ...options.context, ...teleport?.context };
   // `initial` may be derived from context (e.g. furthest-reachable step).
   const resolveInitial = () => (typeof machine.initial === 'function' ? machine.initial(context) : machine.initial);
   let value = teleport?.value ?? resolveInitial();

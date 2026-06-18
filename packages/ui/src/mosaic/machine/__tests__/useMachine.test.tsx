@@ -54,6 +54,25 @@ describe('useMachine — drives a flow from a component', () => {
   });
 });
 
+describe('useMachine — context init option', () => {
+  it('passes runtime context through to the actor', () => {
+    type Ctx = { label: string };
+    const machine = createMachine<Ctx, { type: never }>({
+      initial: 'idle',
+      context: { label: 'default' },
+      states: { idle: {} },
+    });
+
+    function Comp() {
+      const [snapshot] = useMachine(machine, { context: { label: 'runtime' } });
+      return <output>{snapshot.context.label}</output>;
+    }
+
+    render(<Comp />);
+    expect(screen.getByText('runtime')).toBeInTheDocument();
+  });
+});
+
 describe('useActor + mockActor — render a teleported step', () => {
   it('shows the content for a state reached only by teleport', () => {
     // `deleting` sits behind a 2s mutation — unreachable by clicking. Teleport in.
