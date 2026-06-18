@@ -171,7 +171,7 @@ describe('ClerkProvider native client sync', () => {
     });
 
     await waitFor(() => {
-      expect(mocks.syncFromJsClientToken).toHaveBeenCalledWith('client-token', expect.any(String));
+      expect(mocks.syncFromJsClientToken).toHaveBeenCalledWith('client-token', expect.any(String), false);
     });
   });
 
@@ -715,7 +715,7 @@ describe('ClerkProvider native client sync', () => {
     });
 
     await waitFor(() => {
-      expect(mocks.syncFromJsClientToken).toHaveBeenCalledWith(null, expect.any(String));
+      expect(mocks.syncFromJsClientToken).toHaveBeenCalledWith(null, expect.any(String), true);
     });
   });
 
@@ -744,7 +744,7 @@ describe('ClerkProvider native client sync', () => {
     });
 
     await waitFor(() => {
-      expect(mocks.syncFromJsClientToken).toHaveBeenCalledWith(null, expect.any(String));
+      expect(mocks.syncFromJsClientToken).toHaveBeenCalledWith(null, expect.any(String), true);
     });
 
     await act(async () => {
@@ -753,7 +753,48 @@ describe('ClerkProvider native client sync', () => {
     });
 
     await waitFor(() => {
-      expect(mocks.syncFromJsClientToken).toHaveBeenCalledWith('client-token', expect.any(String));
+      expect(mocks.syncFromJsClientToken).toHaveBeenCalledWith('client-token', expect.any(String), false);
+    });
+  });
+
+  test('keeps a pending native client refresh while a token sync is in flight', async () => {
+    mocks.tokenCache.getToken.mockResolvedValue(null);
+    let resolveFirstSync: (() => void) | undefined;
+    mocks.syncFromJsClientToken.mockImplementationOnce(() => {
+      return new Promise<void>(resolve => {
+        resolveFirstSync = resolve;
+      });
+    });
+
+    render(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', null);
+    });
+
+    await act(async () => {
+      await mocks.clerkOptions?.tokenCache?.saveToken(CLERK_CLIENT_JWT_KEY, 'client-token');
+    });
+
+    await waitFor(() => {
+      expect(mocks.syncFromJsClientToken).toHaveBeenCalledWith('client-token', expect.any(String), false);
+    });
+
+    act(() => {
+      mocks.clerkListener?.();
+    });
+
+    await act(async () => {
+      resolveFirstSync?.();
+    });
+
+    await waitFor(() => {
+      expect(mocks.syncFromJsClientToken).toHaveBeenCalledWith(null, expect.any(String), true);
     });
   });
 
@@ -778,7 +819,7 @@ describe('ClerkProvider native client sync', () => {
     });
 
     await waitFor(() => {
-      expect(mocks.syncFromJsClientToken).toHaveBeenCalledWith('client-token', expect.any(String));
+      expect(mocks.syncFromJsClientToken).toHaveBeenCalledWith('client-token', expect.any(String), false);
     });
   });
 
@@ -803,7 +844,7 @@ describe('ClerkProvider native client sync', () => {
     });
 
     await waitFor(() => {
-      expect(mocks.syncFromJsClientToken).toHaveBeenCalledWith('client-token', expect.any(String));
+      expect(mocks.syncFromJsClientToken).toHaveBeenCalledWith('client-token', expect.any(String), false);
     });
 
     const sourceId = mocks.syncFromJsClientToken.mock.calls[0]?.[1];
@@ -845,7 +886,7 @@ describe('ClerkProvider native client sync', () => {
     });
 
     await waitFor(() => {
-      expect(mocks.syncFromJsClientToken).toHaveBeenCalledWith(null, expect.any(String));
+      expect(mocks.syncFromJsClientToken).toHaveBeenCalledWith(null, expect.any(String), true);
     });
   });
 });

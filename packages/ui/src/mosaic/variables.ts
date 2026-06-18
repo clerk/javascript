@@ -12,6 +12,8 @@ export const defaultMosaicVariables = Object.freeze({
     muted: 'light-dark(oklch(0.97 0 0), oklch(0.269 0 0))',
     mutedForeground: 'light-dark(oklch(0.556 0 0), oklch(0.708 0 0))',
     border: `light-dark(oklch(0.922 0 0), oklch(1 0 0 / 10%))`,
+    card: 'light-dark(oklch(1 0 0), oklch(0.205 0 0))',
+    cardForeground: 'light-dark(oklch(0.145 0 0), oklch(0.985 0 0))',
   },
   spacing: '0.25rem',
   rounded: {
@@ -94,9 +96,13 @@ const DANGEROUS_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
 function merge(target: Record<string, unknown>, overrides: Record<string, unknown>): Record<string, unknown> {
   const result: Record<string, unknown> = { ...target };
   for (const k in overrides) {
-    if (DANGEROUS_KEYS.has(k)) continue;
+    if (DANGEROUS_KEYS.has(k)) {
+      continue;
+    }
     const value = overrides[k];
-    if (value === undefined) continue;
+    if (value === undefined) {
+      continue;
+    }
     result[k] =
       typeof value === 'object' && value !== null && typeof result[k] === 'object'
         ? merge(result[k] as Record<string, unknown>, value as Record<string, unknown>)

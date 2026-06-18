@@ -750,6 +750,9 @@ importers:
 
   packages/headless:
     dependencies:
+      '@clerk/shared':
+        specifier: workspace:^
+        version: link:../shared
       '@floating-ui/react':
         specifier: catalog:repo
         version: 0.27.12(react-dom@18.3.1(react@18.3.1))(react@18.3.1)

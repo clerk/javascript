@@ -171,6 +171,9 @@ export type __internal_LocalizationResource = {
   footerPageLink__terms: LocalizationValue;
   paginationButton__previous: LocalizationValue;
   paginationButton__next: LocalizationValue;
+  identityPreviewEditButton__emailAddress: LocalizationValue;
+  identityPreviewEditButton__phoneNumber: LocalizationValue;
+  identityPreviewEditButton__identifier: LocalizationValue;
   paginationRowText__displaying: LocalizationValue;
   paginationRowText__of: LocalizationValue;
   membershipRole__admin: LocalizationValue;
@@ -1827,33 +1830,14 @@ export type __internal_LocalizationResource = {
         };
       };
     };
-    confirmation: {
-      statusSection: {
-        title: LocalizationValue;
-        activeBadge: LocalizationValue;
-        inactiveBadge: LocalizationValue;
-      };
-      enableSection: {
-        title: LocalizationValue;
-      };
-      domainSection: {
-        title: LocalizationValue;
-      };
-      configurationSection: {
-        title: LocalizationValue;
-        ssoUrlLabel: LocalizationValue;
-        issuerLabel: LocalizationValue;
-        configureAgainLink: LocalizationValue;
-      };
-      resetSection: {
-        title: LocalizationValue;
-        warning: LocalizationValue;
-        confirmationFieldLabel: LocalizationValue<'name'>;
-        submitButton: LocalizationValue;
-      };
-      inactiveBanner: {
-        title: LocalizationValue;
-      };
+    activate: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue<'domain'>;
+      activateButton: LocalizationValue;
+      skipButton: LocalizationValue;
+      activeTitle: LocalizationValue;
+      activeSubtitle: LocalizationValue<'domain'>;
+      doneButton: LocalizationValue;
     };
   };
   apiKeys: {
