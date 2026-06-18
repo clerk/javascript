@@ -1,0 +1,117 @@
+# useDataTable
+
+State manager for data tables from `@clerk/headless`. Tracks pagination, sorting, column filters, global filter, and row selection. Each state slice supports the controlled/uncontrolled pattern. Designed for server-side data: you supply the already-fetched page of rows, and the hook tracks which page, sort, and filters to request next.
+
+## Usage
+
+```tsx
+import { useDataTable } from '@clerk/headless/hooks';
+
+const {
+  rows,
+  pagination,
+  nextPage,
+  previousPage,
+  getPageCount,
+  rowSelection,
+  toggleAllRowsSelected,
+} = useDataTable({
+  data: pageOfData,        // current page fetched from the server
+  getRowId: row => row.id,
+  totalCount: 1000,
+  defaultPagination: { pageIndex: 0, pageSize: 20 },
+  onPaginationChange: newPagination => {
+    // re-fetch with the new page/size
+  },
+});
+```
+
+## Options
+
+| Prop                    | Type                             | Default                          | Description                                     |
+| ----------------------- | -------------------------------- | -------------------------------- | ----------------------------------------------- |
+| `data`                  | `TData[]`                        | required                         | Current page of rows                            |
+| `getRowId`              | `(row, index) => string`         | `String(index)`                  | Stable row identifier                           |
+| `totalCount`            | `number`                         | —                                | Total record count (used to compute page count) |
+| `sorting`               | `SortingState`                   | —                                | Controlled sort state                           |
+| `defaultSorting`        | `SortingState`                   | `[]`                             | Initial uncontrolled sort                       |
+| `onSortingChange`       | `OnChangeFn<SortingState>`       | —                                | Called when sort changes                        |
+| `columnFilters`         | `ColumnFiltersState`             | —                                | Controlled column filters                       |
+| `defaultColumnFilters`  | `ColumnFiltersState`             | `[]`                             | Initial uncontrolled column filters             |
+| `onColumnFiltersChange` | `OnChangeFn<ColumnFiltersState>` | —                                | Called when column filters change               |
+| `globalFilter`          | `string`                         | —                                | Controlled global search string                 |
+| `defaultGlobalFilter`   | `string`                         | `''`                             | Initial uncontrolled global filter              |
+| `onGlobalFilterChange`  | `OnChangeFn<string>`             | —                                | Called when global filter changes               |
+| `pagination`            | `PaginationState`                | —                                | Controlled pagination                           |
+| `defaultPagination`     | `PaginationState`                | `{ pageIndex: 0, pageSize: 10 }` | Initial uncontrolled pagination                 |
+| `onPaginationChange`    | `OnChangeFn<PaginationState>`    | —                                | Called when pagination changes                  |
+| `rowSelection`          | `RowSelectionState`              | —                                | Controlled row selection                        |
+| `defaultRowSelection`   | `RowSelectionState`              | `{}`                             | Initial uncontrolled row selection              |
+| `onRowSelectionChange`  | `OnChangeFn<RowSelectionState>`  | —                                | Called when selection changes                   |
+
+## Return
+
+### Rows
+
+| Value  | Type                    | Description                  |
+| ------ | ----------------------- | ---------------------------- |
+| `rows` | `DataTableRow<TData>[]` | `data` mapped to row objects |
+
+Each `DataTableRow` has:
+
+| Field              | Type            | Description                   |
+| ------------------ | --------------- | ----------------------------- |
+| `id`               | `string`        | Stable row identifier         |
+| `original`         | `TData`         | Original data item            |
+| `getIsSelected()`  | `() => boolean` | Whether this row is selected  |
+| `toggleSelected()` | `() => void`    | Toggle selection for this row |
+
+### Pagination
+
+| Value                  | Type                          | Description                          |
+| ---------------------- | ----------------------------- | ------------------------------------ |
+| `pagination`           | `PaginationState`             | Current `{ pageIndex, pageSize }`    |
+| `setPagination`        | `OnChangeFn<PaginationState>` | Set pagination state                 |
+| `nextPage()`           | `() => void`                  | Advance one page                     |
+| `previousPage()`       | `() => void`                  | Go back one page                     |
+| `setPageSize(n)`       | `(size: number) => void`      | Change page size and reset to page 0 |
+| `getCanNextPage()`     | `() => boolean`               | Whether a next page exists           |
+| `getCanPreviousPage()` | `() => boolean`               | Whether a previous page exists       |
+| `getPageCount()`       | `() => number`                | `ceil(totalCount / pageSize)`        |
+
+### Sorting
+
+| Value        | Type                       | Description                                          |
+| ------------ | -------------------------- | ---------------------------------------------------- |
+| `sorting`    | `SortingState`             | Current sort: `Array<{ id: string; desc: boolean }>` |
+| `setSorting` | `OnChangeFn<SortingState>` | Set sort state                                       |
+
+### Filters
+
+| Value              | Type                             | Description                  |
+| ------------------ | -------------------------------- | ---------------------------- |
+| `columnFilters`    | `ColumnFiltersState`             | Current column filters       |
+| `setColumnFilters` | `OnChangeFn<ColumnFiltersState>` | Set column filters           |
+| `globalFilter`     | `string`                         | Current global search string |
+| `setGlobalFilter`  | `OnChangeFn<string>`             | Set global filter            |
+
+### Row Selection
+
+| Value                     | Type                            | Description                               |
+| ------------------------- | ------------------------------- | ----------------------------------------- |
+| `rowSelection`            | `RowSelectionState`             | `Record<string, boolean>` keyed by row id |
+| `setRowSelection`         | `OnChangeFn<RowSelectionState>` | Set selection state                       |
+| `getIsAllRowsSelected()`  | `() => boolean`                 | All current rows are selected             |
+| `getIsSomeRowsSelected()` | `() => boolean`                 | Some (not all) rows are selected          |
+| `toggleAllRowsSelected()` | `() => void`                    | Select all; clear if all already selected |
+
+## Types
+
+```ts
+type SortingState       = Array<{ id: string; desc: boolean }>;
+type ColumnFiltersState = Array<{ id: string; value: unknown }>;
+type PaginationState    = { pageIndex: number; pageSize: number };
+type RowSelectionState  = Record<string, boolean>;
+type Updater<T>         = T | ((old: T) => T);
+type OnChangeFn<T>      = (updaterOrValue: Updater<T>) => void;
+```
