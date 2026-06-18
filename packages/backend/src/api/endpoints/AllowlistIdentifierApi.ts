@@ -10,9 +10,9 @@ const basePath = '/allowlist_identifiers';
 
 /** @generateWithEmptyComment */
 export type AllowlistIdentifierCreateParams = {
-  /** The identifier to add to the allowlist. */
+  /** The identifier to add to the allowlist. Can be an email address, a domain in wildcard email format (e.g. `*@example.com`), a phone number in international E.164 format (e.g. `+15555555555`), or a Web3 wallet address. */
   identifier: string;
-  /** Whether to notify the user that their identifier has been added to the allowlist. */
+  /** Whether to notify the user that their identifier has been added to the allowlist. Notifies the user if the `identifier` is an email address or phone number. Defaults to `true`. */
   notify: boolean;
 };
 
