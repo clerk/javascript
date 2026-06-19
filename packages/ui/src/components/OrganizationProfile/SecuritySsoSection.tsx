@@ -10,7 +10,17 @@ import { handleError } from '@/utils/errorHandler';
 
 import { useEnvironment } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
-import { Badge, Button, Col, descriptors, Flex, Icon, localizationKeys, Text, useLocalizations } from '../../customizables';
+import {
+  Badge,
+  Button,
+  Col,
+  descriptors,
+  Flex,
+  Icon,
+  localizationKeys,
+  Text,
+  useLocalizations,
+} from '../../customizables';
 import { useFetchRoles, useLocalizeCustomRoles } from '../../hooks/useFetchRoles';
 import { InformationCircle } from '../../icons';
 import type {
