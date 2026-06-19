@@ -1,5 +1,15 @@
 # Change Log
 
+## 3.5.0
+
+### Minor Changes
+
+- Fixes iOS development builds across Expo SDK versions by linking the Clerk iOS SDK through React Native's Swift Package Manager podspec support. This raises the minimum supported React Native version to 0.75, where that podspec SPM support is available; `@clerk/expo` already supports Expo SDK 53 and newer, and Expo SDK 53 ships with React Native 0.79. ([#8927](https://github.com/clerk/javascript/pull/8927)) by [@mikepitre](https://github.com/mikepitre)
+
+### Patch Changes
+
+- Fix JS/native client syncing so native and JavaScript client or device-token changes refresh each other consistently. ([#8929](https://github.com/clerk/javascript/pull/8929)) by [@mikepitre](https://github.com/mikepitre)
+
 ## 3.4.7
 
 ### Patch Changes
