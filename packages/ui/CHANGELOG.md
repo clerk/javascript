@@ -1,5 +1,25 @@
 # @clerk/ui
 
+## 1.20.0
+
+### Minor Changes
+
+- Introduces organization membership feature. ([#8933](https://github.com/clerk/javascript/pull/8933)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+  Organizations can enforce exclusive membership, limiting users to a single organization. During the `choose-organization` session task, members of such an organization are automatically activated instead of seeing the picker. `Organization.exclusiveMembership` is now exposed on the Organization resource.
+
+### Patch Changes
+
+- Updated dependencies [[`01789b4`](https://github.com/clerk/javascript/commit/01789b4e8d3a280940b7ebcb223a33c6ecfd209a)]:
+  - @clerk/shared@4.20.0
+  - @clerk/localizations@4.9.2
+
+## 1.19.0
+
+### Minor Changes
+
+- When an interactive bot-protection challenge appears during sign-in or sign-up, the card now brings the challenge to the foreground — hiding the other fields and buttons until it's solved — so it's clear the "Verify you are human" check must be completed. Invisible challenges are unaffected. ([#8907](https://github.com/clerk/javascript/pull/8907)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 1.18.1
 
 ### Patch Changes
