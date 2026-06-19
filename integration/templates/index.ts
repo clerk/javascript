@@ -22,6 +22,7 @@ export const templates = {
   'nuxt-node': resolve(__dirname, './nuxt-node'),
   'react-router-node': resolve(__dirname, './react-router-node'),
   'react-router-library': resolve(__dirname, './react-router-library'),
+  'react-router-node-shared-context': resolve(__dirname, './react-router-node-shared-context'),
   'custom-flows-react-vite': resolve(__dirname, './custom-flows-react-vite'),
   'chrome-extension-vite': resolve(__dirname, './chrome-extension-vite'),
 } as const;
