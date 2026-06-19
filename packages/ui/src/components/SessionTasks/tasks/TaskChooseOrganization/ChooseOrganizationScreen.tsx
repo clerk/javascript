@@ -26,6 +26,7 @@ import { Header } from '@/ui/elements/Header';
 import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
 import { useOrganizationListInView } from '@/ui/hooks/useOrganizationListInView';
 import { handleError } from '@/ui/utils/errorHandler';
+import { filterExclusiveMemberships } from '@/ui/utils/filterExclusiveMemberships';
 
 type ChooseOrganizationScreenProps = {
   onCreateOrganizationClick: () => void;
@@ -43,6 +44,13 @@ export const ChooseOrganizationScreen = (props: ChooseOrganizationScreenProps) =
   // This happens when concurrent requests resolve in unexpected order, leaving undefined/null items in the data array
   const userInvitationsData = userInvitations.data?.filter(a => !!a);
   const userSuggestionsData = userSuggestions.data?.filter(a => !!a);
+
+  // `userMemberships` is paginated; the exclusive filter operates on the currently loaded
+  // memberships. Exclusive members are locked to ~1 organization, so pagination is a non-issue.
+  // Invitations/suggestions are intentionally left unfiltered: an exclusive user should not have
+  // any, and the backend blocks them from joining other organizations.
+  const loadedMemberships = (userMemberships.count || 0) > 0 ? userMemberships.data || [] : [];
+  const { memberships: visibleMemberships } = filterExclusiveMemberships(loadedMemberships);
 
   return (
     <>
@@ -63,15 +71,14 @@ export const ChooseOrganizationScreen = (props: ChooseOrganizationScreenProps) =
       <Col elementDescriptor={descriptors.main}>
         <OrganizationPreviewListItems elementDescriptor={descriptors.taskChooseOrganizationPreviewItems}>
           <Actions role='menu'>
-            {(userMemberships.count || 0) > 0 &&
-              userMemberships.data?.map(inv => {
-                return (
-                  <MembershipPreview
-                    key={inv.id}
-                    {...inv}
-                  />
-                );
-              })}
+            {visibleMemberships.map(inv => {
+              return (
+                <MembershipPreview
+                  key={inv.id}
+                  {...inv}
+                />
+              );
+            })}
 
             {!userMemberships.hasNextPage &&
               userInvitationsData?.map(inv => {

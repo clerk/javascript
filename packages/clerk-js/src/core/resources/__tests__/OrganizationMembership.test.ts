@@ -11,6 +11,7 @@ describe('OrganizationMembership', () => {
       updated_at: 5678,
       role: 'admin',
       permissions: [],
+      exclusive_membership: true,
       organization: {
         id: 'test_org_id',
         image_url:
@@ -46,6 +47,7 @@ describe('OrganizationMembership', () => {
       id: 'test_id',
       role: 'admin',
       roleName: undefined,
+      exclusiveMembership: true,
       createdAt: expect.any(Date),
       updatedAt: expect.any(Date),
       permissions: [],

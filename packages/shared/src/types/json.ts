@@ -410,6 +410,7 @@ export interface OrganizationMembershipJSON extends ClerkResourceJSON {
   public_user_data?: PublicUserDataJSON;
   role: OrganizationCustomRoleKey;
   role_name: string;
+  exclusive_membership: boolean;
   created_at: number;
   updated_at: number;
 }

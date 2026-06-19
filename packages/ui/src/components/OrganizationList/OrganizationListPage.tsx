@@ -7,6 +7,7 @@ import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
 import { useOrganizationListInView } from '@/ui/hooks/useOrganizationListInView';
+import { filterExclusiveMemberships } from '@/ui/utils/filterExclusiveMemberships';
 
 import { useEnvironment, useOrganizationListContext } from '../../contexts';
 import { Box, Col, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
@@ -133,6 +134,13 @@ export const OrganizationListPageList = (props: { onCreateOrganizationClick: () 
   const userInvitationsData = userInvitations.data?.filter(a => !!a);
   const userSuggestionsData = userSuggestions.data?.filter(a => !!a);
 
+  // `userMemberships` is paginated; the exclusive filter operates on the currently loaded
+  // memberships. Exclusive members are locked to ~1 organization, so pagination is a non-issue.
+  // Invitations/suggestions are intentionally left unfiltered: an exclusive user should not have
+  // any, and the backend blocks them from joining other organizations.
+  const loadedMemberships = (userMemberships.count || 0) > 0 ? userMemberships.data || [] : [];
+  const { memberships: visibleMemberships, hasExclusive } = filterExclusiveMemberships(loadedMemberships);
+
   return (
     <>
       <Header.Root
@@ -156,16 +164,15 @@ export const OrganizationListPageList = (props: { onCreateOrganizationClick: () 
       <Col elementDescriptor={descriptors.main}>
         <PreviewListItems>
           <Actions role='menu'>
-            <PersonalAccountPreview />
-            {(userMemberships.count || 0) > 0 &&
-              userMemberships.data?.map(inv => {
-                return (
-                  <MembershipPreview
-                    key={inv.id}
-                    {...inv}
-                  />
-                );
-              })}
+            <PersonalAccountPreview forceHide={hasExclusive} />
+            {visibleMemberships.map(inv => {
+              return (
+                <MembershipPreview
+                  key={inv.id}
+                  {...inv}
+                />
+              );
+            })}
 
             {!userMemberships.hasNextPage &&
               userInvitationsData?.map(inv => {
