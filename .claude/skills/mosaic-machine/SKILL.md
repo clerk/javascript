@@ -16,7 +16,6 @@ import { createMachine } from './createMachine';
 import { createActor, mockActor } from './createActor';
 import { assign } from './assign';
 import { useMachine, useActor, useSelector } from './useMachine';
-import { waitFor } from './waitFor';
 ```
 
 ---
@@ -177,33 +176,6 @@ const isDeleting = useSelector(actor, snap => snap.value === 'deleting');
 ```tsx
 // The machine reads `ctx.onSuccess` — always the latest prop.
 const [snapshot, send] = useMachine(machine, { context: { onSuccess: props.onSuccess } });
-```
-
-### `waitFor` — promise that resolves on a state condition
-
-Use in **tests** and async orchestration to wait for an actor to reach a specific
-snapshot without manual subscribe wiring.
-
-```ts
-import { waitFor } from './waitFor';
-
-// Wait for a specific state value.
-const snap = await waitFor(actor, s => s.value === 'success');
-
-// Wait for a context field to be populated.
-const snap = await waitFor(actor, s => s.context.userId !== null, { timeout: 5000 });
-```
-
-Rejects if the actor reaches a non-active status (`done` or `stopped`) before the
-predicate passes, or if `timeout` milliseconds elapse (`WaitForTimeoutError`).
-No timeout by default — set one in tests to catch hangs early.
-
-```ts
-// In tests — drive the actor, then await the expected state.
-actor.start();
-actor.send({ type: 'SUBMIT' });
-const snap = await waitFor(actor, s => s.value === 'success', { timeout: 1000 });
-expect(snap.context.result).toBe('ok');
 ```
 
 ### Debug logging (remove before shipping)

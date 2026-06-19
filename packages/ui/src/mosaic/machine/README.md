@@ -170,7 +170,6 @@ You've already seen `states`, `on`, `context`, `assign`, and `invoke`. The rest:
 | `useMachine(machine, options?)`          | React: own an actor for the component's life → `[snapshot, send]`. Accepts `onDone` callback fired when the machine finishes. |
 | `useActor(actor)`                        | React: bind to a **shared** actor → `[snapshot, send]`.                                                                       |
 | `useSelector(actor, selector, equals?)`  | React: subscribe to one **slice** — re-renders only when that slice changes.                                                  |
-| `waitFor(actor, predicate, options?)`    | Returns a promise that resolves with the first snapshot satisfying `predicate`. Rejects on timeout or terminal status.        |
 
 ### Two behaviors worth knowing
 
@@ -197,21 +196,6 @@ a guard-gated wizard step), `mockActor` drops you straight in:
 const actor = mockActor(loader, { value: 'failure', context: { error: 'Network error' } });
 render(<Loader actor={actor} />); // snapshot a state you'd otherwise have to provoke
 ```
-
-For async flows, `waitFor` lets you assert the state after a promise settles
-without wiring up your own subscription:
-
-```ts
-import { waitFor } from '@/mosaic/machine/waitFor';
-
-actor.start();
-actor.send({ type: 'FETCH' });
-const snap = await waitFor(actor, s => s.value === 'success', { timeout: 1000 });
-expect(snap.context.data).toBe('expected');
-```
-
-`waitFor` rejects if the actor stops or reaches a final state before the
-predicate is satisfied, so tests fail fast rather than hanging.
 
 ---
 
