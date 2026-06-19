@@ -49,6 +49,7 @@ export function createClerkBridge(options: CreateClerkBridgeOptions): ClerkBridg
           supportFetchAPI: true,
           corsEnabled: true,
           stream: true,
+          ...options.renderer.privileges,
         },
       },
     ]);
