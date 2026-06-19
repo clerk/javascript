@@ -157,6 +157,20 @@ describe('OrganizationSecurityPage', () => {
       const domainChip = await screen.findByText(longDomain);
       expect(domainChip).toBeInTheDocument();
     });
+
+    it('exposes the SSO description info tooltip trigger', async () => {
+      const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
+
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
+
+      renderPage(wrapper);
+
+      expect(await screen.findByText(DESCRIPTION_LINE_1)).toBeInTheDocument();
+
+      // Assert the focusable trigger + accessible name only; the floating tooltip content is
+      // portaled and its open transition does not settle reliably in jsdom.
+      expect(screen.getByRole('button', { name: /more information/i })).toBeInTheDocument();
+    });
   });
 
   describe('view switching', () => {

@@ -5,10 +5,14 @@ import { Card } from '@/ui/elements/Card';
 import { CardStateProvider, useCardState } from '@/ui/elements/contexts';
 import { ProfileSection } from '@/ui/elements/Section';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
+import { Tooltip } from '@/ui/elements/Tooltip';
 import { handleError } from '@/utils/errorHandler';
 
+import { useEnvironment } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
-import { Badge, Button, Col, descriptors, Flex, localizationKeys, Text } from '../../customizables';
+import { Badge, Button, Col, descriptors, Flex, Icon, localizationKeys, Text } from '../../customizables';
+import { useFetchRoles, useLocalizeCustomRoles } from '../../hooks/useFetchRoles';
+import { InformationCircle } from '../../icons';
 import type {
   OrganizationEnterpriseConnection,
   OrganizationEnterpriseConnectionStatus,
@@ -255,11 +259,81 @@ const ConfiguredContent = (props: ConfiguredContentProps): JSX.Element => {
   );
 };
 
-const SsoDescription = (): JSX.Element => (
-  <Text
-    elementDescriptor={descriptors.organizationProfileSecuritySsoDescription}
-    colorScheme='secondary'
-    localizationKey={localizationKeys('organizationProfile.securityPage.ssoSection.descriptionLine1')}
-    sx={{ minWidth: 0 }}
-  />
-);
+const SsoDescription = (): JSX.Element => {
+  const roleName = useEnrollmentRoleName();
+
+  return (
+    <Flex
+      align='center'
+      wrap='wrap'
+      sx={t => ({ gap: t.space.$1, minWidth: 0 })}
+    >
+      <Text
+        as='span'
+        elementDescriptor={descriptors.organizationProfileSecuritySsoDescription}
+        colorScheme='secondary'
+        localizationKey={localizationKeys('organizationProfile.securityPage.ssoSection.descriptionLine1')}
+      />
+
+      <Tooltip.Root>
+        <Tooltip.Trigger>
+          <Button
+            variant='unstyled'
+            aria-label='More information'
+            sx={t => ({
+              display: 'inline-flex',
+              alignItems: 'center',
+              padding: 0,
+              height: 'fit-content',
+              borderRadius: t.radii.$sm,
+              color: t.colors.$colorMutedForeground,
+            })}
+          >
+            <Icon
+              icon={InformationCircle}
+              aria-hidden
+              sx={t => ({ width: t.sizes.$4, height: t.sizes.$4 })}
+            />
+          </Button>
+        </Tooltip.Trigger>
+        <Tooltip.Content
+          text={
+            roleName
+              ? localizationKeys('organizationProfile.securityPage.ssoSection.tooltip', { role: roleName })
+              : localizationKeys('organizationProfile.securityPage.ssoSection.tooltip__noRole')
+          }
+        />
+      </Tooltip.Root>
+    </Flex>
+  );
+};
+
+/**
+ * The display name of the role SSO-enrolled members are assigned — the environment's
+ * default member role, name-mapped when the roles list is readable.
+ */
+const useEnrollmentRoleName = (): string | undefined => {
+  const { organizationSettings } = useEnvironment();
+  const { options } = useFetchRoles();
+  const { localizeCustomRole } = useLocalizeCustomRoles();
+
+  // Mirrors the invite form's default-role resolution.
+  let roleKey = organizationSettings.domains.defaultRole ?? undefined;
+  if (!roleKey && options?.length === 1) {
+    roleKey = options[0].value;
+  }
+
+  if (!roleKey) {
+    return undefined;
+  }
+
+  return (
+    localizeCustomRole(roleKey) || options?.find(option => option.value === roleKey)?.label || humanizeRoleKey(roleKey)
+  );
+};
+
+/** `org:billing_admin` → `billing admin`. */
+const humanizeRoleKey = (roleKey: string): string => {
+  const lastSegment = roleKey.split(':').pop() ?? roleKey;
+  return lastSegment.replace(/[_-]+/g, ' ').trim() || roleKey;
+};

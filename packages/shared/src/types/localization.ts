@@ -1155,6 +1155,8 @@ export type __internal_LocalizationResource = {
         menuAction__activate: LocalizationValue;
         menuAction__deactivate: LocalizationValue;
         menuAction__remove: LocalizationValue;
+        tooltip: LocalizationValue<'role'>;
+        tooltip__noRole: LocalizationValue;
       };
     };
     membersPage: {
