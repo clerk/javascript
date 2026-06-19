@@ -12,12 +12,11 @@ public enum ClerkNativeViewEvent: String {
   case dismissed
 }
 
-public protocol ClerkNativeBridgeReadyObserver: AnyObject {
-  func clerkNativeBridgeDidBecomeReady()
+extension Notification.Name {
+  static let clerkNativeSDKDidConfigure = Notification.Name("com.clerk.expo.native-sdk.did-configure")
 }
 
-private let clerkNativeBridgeReadyObservers = NSHashTable<AnyObject>.weakObjects()
-private let clerkNativeBridgeStateQueue = DispatchQueue(label: "com.clerk.expo.native-bridge.state")
+private let clerkNativeClientEventQueue = DispatchQueue(label: "com.clerk.expo.native-client-events")
 private var clerkNativeClientChangedEmitter: (([String: Any]?) -> Void)?
 
 private struct ClerkExpoHeaderMiddleware: ClerkRequestMiddleware {
@@ -79,7 +78,7 @@ final class ClerkNativeBridge {
       let shouldWaitForClient = try await Self.syncTokenState(bearerToken: bearerToken)
       await Self.waitForLoadedClientIfNeeded(shouldWaitForClient)
       Self.emitClientChangedIfReceivedToken(bearerToken)
-      Self.emitReady()
+      Self.postConfiguredNotification()
       return
     }
 
@@ -99,7 +98,7 @@ final class ClerkNativeBridge {
     let shouldWaitForClient = try await Self.syncTokenState(bearerToken: bearerToken)
     await Self.waitForLoadedClientIfNeeded(shouldWaitForClient)
     Self.emitClientChangedIfReceivedToken(bearerToken)
-    Self.emitReady()
+    Self.postConfiguredNotification()
   }
 
   @MainActor
@@ -276,45 +275,19 @@ final class ClerkNativeBridge {
     Self.emitClientChanged(Self.clientChangedPayload(sourceId: sourceId))
   }
 
-  static func addReadyObserver(_ observer: ClerkNativeBridgeReadyObserver) {
-    clerkNativeBridgeStateQueue.sync {
-      clerkNativeBridgeReadyObservers.add(observer)
-    }
-  }
-
-  static func removeReadyObserver(_ observer: ClerkNativeBridgeReadyObserver) {
-    clerkNativeBridgeStateQueue.sync {
-      clerkNativeBridgeReadyObservers.remove(observer)
-    }
-  }
-
-  static func emitReady() {
-    let observers = clerkNativeBridgeStateQueue.sync {
-      clerkNativeBridgeReadyObservers.allObjects
-    }
-
-    let notifyObservers = {
-      for observer in observers {
-        (observer as? ClerkNativeBridgeReadyObserver)?.clerkNativeBridgeDidBecomeReady()
-      }
-    }
-
-    if Thread.isMainThread {
-      notifyObservers()
-    } else {
-      DispatchQueue.main.async(execute: notifyObservers)
-    }
+  private static func postConfiguredNotification() {
+    NotificationCenter.default.post(name: .clerkNativeSDKDidConfigure, object: nil)
   }
 
   static func setClientChangedEmitter(_ emitter: (([String: Any]?) -> Void)?) {
-    clerkNativeBridgeStateQueue.sync {
+    clerkNativeClientEventQueue.sync {
       clerkNativeClientChangedEmitter = emitter
     }
   }
 
   /// Requests that ClerkProvider reload the JS client from native client state.
   static func emitClientChanged(_ body: [String: Any]? = nil) {
-    let emitter = clerkNativeBridgeStateQueue.sync {
+    let emitter = clerkNativeClientEventQueue.sync {
       clerkNativeClientChangedEmitter
     }
     emitter?(body)

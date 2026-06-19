@@ -1,8 +1,9 @@
 import UIKit
 
-public class ClerkNativeViewHost: UIView, ClerkNativeBridgeReadyObserver {
+public class ClerkNativeViewHost: UIView {
   private lazy var hostingCoordinator = ClerkNativeHostingCoordinator(containerView: self)
   private var hasInitialized: Bool = false
+  private var configuredObserver: NSObjectProtocol?
 
   override public init(frame: CGRect) {
     super.init(frame: frame)
@@ -12,6 +13,10 @@ public class ClerkNativeViewHost: UIView, ClerkNativeBridgeReadyObserver {
     fatalError("init(coder:) has not been implemented")
   }
 
+  deinit {
+    removeConfiguredObserver()
+  }
+
   override public func didMoveToWindow() {
     super.didMoveToWindow()
 
@@ -19,7 +24,7 @@ public class ClerkNativeViewHost: UIView, ClerkNativeBridgeReadyObserver {
       if hasInitialized {
         hostedViewDidDetachFromWindow()
       }
-      ClerkNativeBridge.removeReadyObserver(self)
+      removeConfiguredObserver()
       hostingCoordinator.detach()
       hasInitialized = false
       return
@@ -27,7 +32,7 @@ public class ClerkNativeViewHost: UIView, ClerkNativeBridgeReadyObserver {
 
     guard !hasInitialized else { return }
     hasInitialized = true
-    ClerkNativeBridge.addReadyObserver(self)
+    addConfiguredObserver()
     hostedViewDidAttachToWindow()
     updateHostedView()
   }
@@ -51,8 +56,22 @@ public class ClerkNativeViewHost: UIView, ClerkNativeBridgeReadyObserver {
 
   func hostedViewDidDetachFromWindow() {}
 
-  public func clerkNativeBridgeDidBecomeReady() {
-    setNeedsHostedViewUpdate()
+  private func addConfiguredObserver() {
+    guard configuredObserver == nil else { return }
+
+    configuredObserver = NotificationCenter.default.addObserver(
+      forName: .clerkNativeSDKDidConfigure,
+      object: nil,
+      queue: .main
+    ) { [weak self] _ in
+      self?.setNeedsHostedViewUpdate()
+    }
+  }
+
+  private func removeConfiguredObserver() {
+    guard let configuredObserver else { return }
+    NotificationCenter.default.removeObserver(configuredObserver)
+    self.configuredObserver = nil
   }
 
   private func updateHostedView() {
