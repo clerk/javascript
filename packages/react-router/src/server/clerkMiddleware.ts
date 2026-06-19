@@ -39,6 +39,29 @@ const sharedContextMessage =
 // concurrent reads of the same Request share a single re-derivation.
 const requestStateByRequest = new WeakMap<Request, Promise<RequestState<any>>>();
 
+// The options authenticateRequest needs, picked from a resolved loadOptions() result.
+// Both clerkMiddleware's first pass and resolveRequestState's Request-miss fallback build
+// their authenticate options here, so the two paths can never drift into authenticating the
+// same request with different options.
+function pickAuthenticateOptions(options: ReturnType<typeof loadOptions>): AuthenticateRequestOptions {
+  return {
+    apiUrl: options.apiUrl,
+    secretKey: options.secretKey,
+    jwtKey: options.jwtKey,
+    proxyUrl: options.proxyUrl,
+    isSatellite: options.isSatellite,
+    domain: options.domain,
+    publishableKey: options.publishableKey,
+    machineSecretKey: options.machineSecretKey,
+    audience: options.audience,
+    authorizedParties: options.authorizedParties,
+    organizationSyncOptions: options.organizationSyncOptions,
+    signInUrl: options.signInUrl,
+    signUpUrl: options.signUpUrl,
+    acceptsToken: 'any',
+  };
+}
+
 /**
  * Auth state for this request. Reuses what clerkMiddleware already resolved (keyed
  * by Request, so handshake/refresh and any machine-token verification happen once
@@ -64,11 +87,20 @@ export async function resolveRequestState(args: DataFunctionArgs): Promise<Reque
   // options + resolved keys), so this can't pick up another request's resolved
   // options even when the context is shared. Identity comes from args.request.
   const options = loadOptions(args, config);
+  // A miss is a Request the middleware never authenticated, e.g. React Router hands loaders
+  // a fresh GET request when revalidating after an action. We re-derive identity from that
+  // request's own cookies. Any refresh/handshake headers this re-derive produces are NOT
+  // emitted: getAuth returns only an auth object, and rootAuthLoader suppresses Clerk headers
+  // when the middleware ran, so there is no response to attach them to here. Because refresh
+  // and handshake are GET-only on the backend, a POST action's middleware pass produces no
+  // such headers, so this is the only place a GET-loader re-derive could. That matches the
+  // prior behavior (a loader never emitted these) and is not a cross-user concern; the next
+  // top-level GET navigation runs the middleware and refreshes/handshakes there.
   // Cache the promise before awaiting so concurrent callers share one re-derive;
   // drop it on failure so a transient error isn't cached for the request's lifetime.
   const requestStatePromise = clerkClient(args, config).authenticateRequest(
     createClerkRequest(patchRequest(args.request)),
-    { ...options, acceptsToken: 'any' },
+    pickAuthenticateOptions(options),
   );
   requestStateByRequest.set(args.request, requestStatePromise);
   try {
@@ -123,40 +155,10 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFun
       loadedOptions.secretKey = secretKey;
     }
 
-    // Pick only the properties needed by authenticateRequest.
-    // Used when manually providing options to the middleware.
-    const {
-      apiUrl,
-      jwtKey,
-      proxyUrl,
-      isSatellite,
-      domain,
-      machineSecretKey,
-      audience,
-      authorizedParties,
-      signInUrl,
-      signUpUrl,
-      organizationSyncOptions,
-    } = loadedOptions;
-
-    const authenticateOptions: AuthenticateRequestOptions = {
-      apiUrl,
-      secretKey: loadedOptions.secretKey,
-      jwtKey,
-      proxyUrl,
-      isSatellite,
-      domain,
-      publishableKey: loadedOptions.publishableKey,
-      machineSecretKey,
-      audience,
-      authorizedParties,
-      organizationSyncOptions,
-      signInUrl,
-      signUpUrl,
-      acceptsToken: 'any',
-    };
-
-    const requestState = await clerkClient(args, options).authenticateRequest(clerkRequest, authenticateOptions);
+    const requestState = await clerkClient(args, options).authenticateRequest(
+      clerkRequest,
+      pickAuthenticateOptions(loadedOptions),
+    );
 
     const locationHeader = requestState.headers.get(constants.Headers.Location);
     if (locationHeader) {
@@ -173,6 +175,11 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFun
       throw new Error('Clerk: handshake status without redirect');
     }
 
+    // Stored on requestStateContext and read back by rootAuthLoader from the (possibly
+    // shared) context, NOT keyed by Request. Every field here must stay request-independent
+    // (static options or env), which is what makes it safe to read off a shared context. Do
+    // not add a value derived from args.request / headers here, or it can bleed across
+    // requests that share one RouterContextProvider; re-resolve such a value per request.
     const additionalState: AdditionalStateOptions = {
       __keylessClaimUrl,
       __keylessApiKeysUrl,
@@ -189,8 +196,8 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFun
       ...options,
       secretKey: loadedOptions.secretKey,
       publishableKey: loadedOptions.publishableKey,
-      jwtKey,
-      machineSecretKey,
+      jwtKey: loadedOptions.jwtKey,
+      machineSecretKey: loadedOptions.machineSecretKey,
     };
 
     // Cache the resolved state keyed by this Request so getAuth/rootAuthLoader reuse
