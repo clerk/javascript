@@ -49,17 +49,16 @@ const TaskChooseOrganizationInternal = () => {
   const { navigateOnSetActive } = useSessionTasksContext();
   const { redirectUrlComplete } = useTaskChooseOrganizationContext();
 
-  // An exclusive member belongs to exactly one organization, so find-first is correct.
   const exclusiveOrganization = user?.organizationMemberships?.find(
     membership => membership.organization.exclusiveMembership === true,
   )?.organization;
 
-  // Guards against the auto-activation effect firing more than once.
   const hasAutoActivated = useRef(false);
-  // When auto-activation fails we fall back to the regular flows so the user can recover.
   const [autoActivateFailed, setAutoActivateFailed] = useState(false);
   const shouldAutoActivate = !!exclusiveOrganization && !autoActivateFailed;
 
+  // Exclusive members belong to a single org — skip the picker and activate it once the org list is ready.
+  // On failure, surface the error and fall back to the normal choose/create flows.
   useEffect(() => {
     if (!exclusiveOrganization || autoActivateFailed || !isOrganizationListLoaded || hasAutoActivated.current) {
       return;
@@ -76,9 +75,7 @@ const TaskChooseOrganizationInternal = () => {
           },
         });
       } catch (err: any) {
-        // Surface the error through card state, mirroring ChooseOrganizationScreen's handling.
         handleError(err, [], card.setError);
-        // Don't leave the user stuck on an infinite spinner; fall back to the regular flows.
         setAutoActivateFailed(true);
       }
     })();

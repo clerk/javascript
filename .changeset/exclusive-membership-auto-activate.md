@@ -1,9 +1,9 @@
 ---
-'@clerk/clerk-js': patch
-'@clerk/shared': patch
-'@clerk/ui': patch
+'@clerk/clerk-js': minor
+'@clerk/shared': minor
+'@clerk/ui': minor
 ---
 
-When the `choose-organization` session task is triggered for a member of an organization that enforces exclusive membership, Clerk now automatically activates that organization instead of rendering the organization picker. The user sees a loading spinner while the organization is set as active; if activation fails, the regular picker is shown so they can recover. The generic force-choose-organization flow is unchanged for everyone else.
+Introduces organization membership feature.
 
-Additionally, `Organization.exclusiveMembership` is now exposed on the Organization resource, reflecting the `exclusive_membership` field returned by the Frontend API.
+Organizations can enforce exclusive membership, limiting users to a single organization. During the `choose-organization` session task, members of such an organization are automatically activated instead of seeing the picker. `Organization.exclusiveMembership` is now exposed on the Organization resource.
