@@ -50,7 +50,7 @@ export function useSyncableTokenCache({
   tokenCache,
   tokenCacheListenersRef,
 }: {
-  suppressTokenCacheNotificationsRef: MutableRefObject<boolean>;
+  suppressTokenCacheNotificationsRef: MutableRefObject<number>;
   tokenCache: TokenCache | undefined;
   tokenCacheListenersRef: MutableRefObject<Set<DeviceTokenCacheListener>>;
 }): TokenCache | undefined {
@@ -62,7 +62,7 @@ export function useSyncableTokenCache({
     }
 
     const notifyDeviceTokenListeners = (deviceToken: string | null) => {
-      if (suppressTokenCacheNotificationsRef.current) {
+      if (suppressTokenCacheNotificationsRef.current > 0) {
         return;
       }
 
@@ -134,14 +134,14 @@ async function syncDeviceTokenToCacheWithoutNotifying({
   tokenCache,
 }: {
   deviceToken: string | null;
-  suppressTokenCacheNotificationsRef: MutableRefObject<boolean>;
+  suppressTokenCacheNotificationsRef: MutableRefObject<number>;
   tokenCache: TokenCache | undefined;
 }): Promise<void> {
-  suppressTokenCacheNotificationsRef.current = true;
+  suppressTokenCacheNotificationsRef.current += 1;
   try {
     await syncDeviceTokenToCache(tokenCache, deviceToken);
   } finally {
-    suppressTokenCacheNotificationsRef.current = false;
+    suppressTokenCacheNotificationsRef.current = Math.max(0, suppressTokenCacheNotificationsRef.current - 1);
   }
 }
 
@@ -151,7 +151,7 @@ async function syncNativeDeviceTokenToCache({
   tokenCache,
 }: {
   deviceToken: string | null;
-  suppressTokenCacheNotificationsRef?: MutableRefObject<boolean>;
+  suppressTokenCacheNotificationsRef?: MutableRefObject<number>;
   tokenCache: TokenCache | undefined;
 }): Promise<void> {
   if (suppressTokenCacheNotificationsRef) {
@@ -206,7 +206,7 @@ async function refreshJsClientFromNativeState({
   nativeDeviceToken: string | null;
   reloadInitialResources: boolean;
   shouldSyncDeviceToken?: boolean;
-  suppressTokenCacheNotificationsRef?: MutableRefObject<boolean>;
+  suppressTokenCacheNotificationsRef?: MutableRefObject<number>;
   tokenCache: TokenCache | undefined;
 }): Promise<boolean> {
   if (shouldSyncDeviceToken) {
@@ -244,7 +244,7 @@ async function reloadJsClientFromNativeState({
 }: {
   clerkInstance: SyncableClerkInstance;
   nativeDeviceToken: string;
-  suppressTokenCacheNotificationsRef?: MutableRefObject<boolean>;
+  suppressTokenCacheNotificationsRef?: MutableRefObject<number>;
   tokenCache: TokenCache | undefined;
 }): Promise<boolean> {
   await syncNativeDeviceTokenToCache({
@@ -268,7 +268,7 @@ async function recoverJsClientFromNativeDeviceToken({
 }: {
   clerkInstance: SyncableClerkInstance;
   error: unknown;
-  suppressTokenCacheNotificationsRef: MutableRefObject<boolean>;
+  suppressTokenCacheNotificationsRef: MutableRefObject<number>;
   tokenCache: TokenCache | undefined;
 }): Promise<boolean> {
   const nativeDeviceToken = await readNativeDeviceToken({ waitForToken: false });
@@ -391,7 +391,7 @@ async function syncNativeClientToJs({
   nativeRefreshFromJsControllerRef?: MutableRefObject<NativeRefreshFromJsController | null>;
   nativeClientEvent?: NativeClientEvent | null;
   suppressJsClientChangedRef?: MutableRefObject<number>;
-  suppressTokenCacheNotificationsRef?: MutableRefObject<boolean>;
+  suppressTokenCacheNotificationsRef?: MutableRefObject<number>;
   tokenCache: TokenCache | undefined;
 }): Promise<void> {
   const didChangeClient = nativeClientEvent?.changed.client ?? true;
@@ -443,7 +443,7 @@ export function NativeClientSync({
   clerkInstance: SyncableClerkInstance | null | undefined;
   nativeRefreshFromJsControllerRef: MutableRefObject<NativeRefreshFromJsController | null>;
   suppressJsClientChangedRef: MutableRefObject<number>;
-  suppressTokenCacheNotificationsRef: MutableRefObject<boolean>;
+  suppressTokenCacheNotificationsRef: MutableRefObject<number>;
   tokenCache: TokenCache | undefined;
   tokenCacheListenersRef: MutableRefObject<Set<DeviceTokenCacheListener>>;
 }): null {
@@ -707,7 +707,7 @@ export function useNativeClientBootstrap({
   clerkInstance,
 }: {
   publishableKey: string;
-  suppressTokenCacheNotificationsRef: MutableRefObject<boolean>;
+  suppressTokenCacheNotificationsRef: MutableRefObject<number>;
   tokenCache: TokenCache | undefined;
   clerkInstance: SyncableClerkInstance | null | undefined;
 }) {
@@ -826,7 +826,7 @@ export function useNativeClientEventSync({
   isMountedRef: MutableRefObject<boolean>;
   nativeRefreshFromJsControllerRef: MutableRefObject<NativeRefreshFromJsController | null>;
   suppressJsClientChangedRef: MutableRefObject<number>;
-  suppressTokenCacheNotificationsRef: MutableRefObject<boolean>;
+  suppressTokenCacheNotificationsRef: MutableRefObject<number>;
   tokenCache: TokenCache | undefined;
 }) {
   const { nativeClientEvent } = useNativeClientEvents();

@@ -111,6 +111,14 @@ vi.mock('../singleton', () => {
   };
 });
 
+function deferred(): { promise: Promise<void>; resolve: () => void } {
+  let resolve!: () => void;
+  const promise = new Promise<void>(innerResolve => {
+    resolve = innerResolve;
+  });
+  return { promise, resolve };
+}
+
 describe('ClerkProvider native client sync', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -327,6 +335,88 @@ describe('ClerkProvider native client sync', () => {
 
     await waitFor(() => {
       expect(mocks.clerkInstance.__internal_reloadInitialResources).toHaveBeenCalled();
+    });
+    expect(mocks.syncClientStateFromJs).not.toHaveBeenCalled();
+  });
+
+  test('keeps token cache notifications suppressed across overlapping native token writes', async () => {
+    mocks.tokenCache.getToken.mockResolvedValue(null);
+    mocks.getClientToken.mockResolvedValue(null);
+
+    const firstSave = deferred();
+    const secondSave = deferred();
+    mocks.tokenCache.saveToken
+      .mockImplementationOnce(() => firstSave.promise)
+      .mockImplementationOnce(() => secondSave.promise);
+
+    const { rerender } = render(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', null);
+    });
+
+    mocks.syncClientStateFromJs.mockClear();
+    mocks.clerkInstance.__internal_reloadInitialResources.mockClear();
+
+    mocks.nativeClientEvent = {
+      issuedAt: 1,
+      changed: {
+        client: false,
+        deviceToken: true,
+      },
+      deviceToken: 'native-client-token-1',
+    };
+    rerender(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.tokenCache.saveToken).toHaveBeenCalledWith(CLERK_CLIENT_JWT_KEY, 'native-client-token-1');
+    });
+
+    mocks.nativeClientEvent = {
+      issuedAt: 2,
+      changed: {
+        client: false,
+        deviceToken: true,
+      },
+      deviceToken: 'native-client-token-2',
+    };
+    rerender(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.tokenCache.saveToken).toHaveBeenCalledWith(CLERK_CLIENT_JWT_KEY, 'native-client-token-2');
+    });
+
+    await act(async () => {
+      firstSave.resolve();
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(mocks.syncClientStateFromJs).not.toHaveBeenCalled();
+
+    await act(async () => {
+      secondSave.resolve();
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    await waitFor(() => {
+      expect(mocks.clerkInstance.__internal_reloadInitialResources).toHaveBeenCalledTimes(2);
     });
     expect(mocks.syncClientStateFromJs).not.toHaveBeenCalled();
   });

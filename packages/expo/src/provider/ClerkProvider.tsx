@@ -70,7 +70,7 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
   } = props;
   const pk = publishableKey;
   const tokenCacheListenersRef = useRef<Set<DeviceTokenCacheListener>>(new Set());
-  const suppressTokenCacheNotificationsRef = useRef(false);
+  const suppressTokenCacheNotificationsRef = useRef(0);
   const nativeRefreshFromJsControllerRef = useRef<NativeRefreshFromJsController | null>(null);
   const syncableTokenCache = useSyncableTokenCache({
     suppressTokenCacheNotificationsRef,
