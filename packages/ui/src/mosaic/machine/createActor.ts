@@ -1,8 +1,9 @@
 import { isAssignAction } from './assign';
-import { INIT, INVOKE_DONE, INVOKE_ERROR, RECHECK } from './types';
+import { AFTER, INIT, INVOKE_DONE, INVOKE_ERROR, RECHECK } from './types';
 import type {
   Actions,
   Actor,
+  AfterEvent,
   AnyEventObject,
   CreateActorOptions,
   EventObject,
@@ -71,6 +72,9 @@ export function createActor<TContext extends object, TEvent extends EventObject>
   // resolving after the fact is ignored — no transition, no setState-after-stop.
   let invocationToken = 0;
 
+  // Pending `after` timer IDs — cleared when the state is exited or the actor stops.
+  let afterTimers: ReturnType<typeof setTimeout>[] = [];
+
   // The snapshot is cached and only replaced on an actual change, so
   // getSnapshot() is referentially stable for useSyncExternalStore.
   let snapshot: Snapshot<TContext> = { value, context, status };
@@ -113,6 +117,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     if (external) {
       runActions(states[value].exit, event);
       invocationToken++; // abandon the invoke of the state we're leaving
+      clearAfterTimers();
     }
     runActions(transition.actions, event);
     if (external) {
@@ -146,6 +151,31 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     );
   }
 
+  function clearAfterTimers(): void {
+    for (const id of afterTimers) clearTimeout(id);
+    afterTimers = [];
+  }
+
+  function startAfterTimers(): void {
+    const afterConfig = states[value].after;
+    if (!afterConfig) return;
+    for (const [delayStr, raw] of Object.entries(afterConfig)) {
+      const delay = Number(delayStr);
+      // normalizeTransitions takes `raw: unknown`, so the AfterEvent↔EventObject
+      // mismatch is resolved at the parameter boundary, not by a cast here.
+      const transitions = normalizeTransitions<TContext, EventObject>(raw);
+      const id = setTimeout(() => {
+        afterTimers = afterTimers.filter(t => t !== id);
+        if (status !== 'active') return;
+        const afterEvent: AfterEvent = { type: AFTER, delay };
+        const transition = pickTransition(transitions, afterEvent);
+        if (!transition) return;
+        if (takeTransition(transition, afterEvent)) commit();
+      }, delay);
+      afterTimers.push(id);
+    }
+  }
+
   /** Entry side of a state: entry actions, then immediate/invoke resolution. */
   function enterState(event: EventObject): void {
     const stateConfig = states[value];
@@ -163,6 +193,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     }
 
     startInvoke(event);
+    startAfterTimers();
   }
 
   function commit(): void {
@@ -191,6 +222,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       started = false; // allow restart (e.g. StrictMode effect cleanup + remount)
       status = 'stopped';
       invocationToken++; // abandon any in-flight invoke
+      clearAfterTimers();
       snapshot = { value, context, status };
       for (const listener of listeners) {
         listener(snapshot);
@@ -247,6 +279,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
         if (reseated !== value) {
           runActions(states[value]?.exit, event);
           invocationToken++; // abandon the invoke of the state we're leaving
+          clearAfterTimers();
           value = reseated;
           enterState(event);
           commit();

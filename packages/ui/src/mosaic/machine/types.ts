@@ -3,8 +3,7 @@
  *
  * The design mirrors XState v5's config-object shape (so a machine is statically
  * introspectable — see {@link StateMachine.states}) but is trimmed to a tiny,
- * dependency-free core: no parallel states, history, delayed transitions, SCXML,
- * or spawned actors.
+ * dependency-free core: no parallel states, history, SCXML, or spawned actors.
  */
 
 /** The minimum shape every event must have. */
@@ -69,6 +68,8 @@ export const INVOKE_ERROR = 'machine.invoke.error';
 export const INIT = 'machine.init';
 /** The event delivered to guards when {@link Actor.recheck} re-evaluates `always` transitions. */
 export const RECHECK = 'machine.recheck';
+/** The event type delivered to an `after` transition when its timer fires. */
+export const AFTER = 'machine.after';
 
 /** Event delivered to `onDone` when an invoked promise resolves. */
 export interface DoneInvokeEvent<TOutput = unknown> extends EventObject {
@@ -80,6 +81,12 @@ export interface DoneInvokeEvent<TOutput = unknown> extends EventObject {
 export interface ErrorInvokeEvent extends EventObject {
   type: typeof INVOKE_ERROR;
   error: unknown;
+}
+
+/** Event delivered to an `after` transition when its timer fires. */
+export interface AfterEvent extends EventObject {
+  type: typeof AFTER;
+  delay: number;
 }
 
 /** Invoke a promise on state entry and branch on its settlement. */
@@ -109,6 +116,20 @@ export interface StateConfig<TContext, TEvent extends EventObject, TStates exten
   on?: Partial<Record<TEvent['type'], Transition<TContext, TEvent, TStates>>>;
   /** Eventless / immediate transitions, evaluated on entry and on {@link Actor.recheck}. */
   always?: Transition<TContext, TEvent, TStates>;
+  /**
+   * Delayed transitions — each key is a delay in milliseconds. The matching
+   * transition fires automatically after the delay unless the state is exited
+   * first (by an explicit event, `always`, or `invoke`). Timers are cancelled
+   * on exit and on `stop()`, so they never outlive the state or the actor.
+   *
+   * ```ts
+   * codeSent: {
+   *   after: { 60_000: 'expired' },
+   *   on: { SUBMIT: 'verifying' },
+   * }
+   * ```
+   */
+  after?: { [delay: number]: Transition<TContext, AfterEvent, TStates> };
   /** A promise to invoke on entry. */
   invoke?: InvokeConfig<TContext, TEvent, unknown, TStates>;
   /** Actions run when the state is entered. */

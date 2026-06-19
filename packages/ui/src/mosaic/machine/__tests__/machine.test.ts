@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { assign, isAssignAction } from '../assign';
 import { createActor, mockActor } from '../createActor';
@@ -643,5 +643,189 @@ describe('actor restart — StrictMode start/stop/start cycle', () => {
     expect(actor.getSnapshot().status).toBe('active');
     // The invoke must not fire a second time.
     expect(invokeCount).toBe(1);
+  });
+});
+
+describe('createActor — after (delayed transitions)', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('auto-advances to the target state after the delay', () => {
+    const machine = createMachine<Record<string, never>, { type: 'SUBMIT' }>({
+      id: 'otp',
+      initial: 'codeSent',
+      context: {},
+      states: {
+        codeSent: {
+          after: { 60_000: 'expired' },
+          on: { SUBMIT: 'verifying' },
+        },
+        expired: {},
+        verifying: {},
+      },
+    });
+
+    const actor = createActor(machine);
+    actor.start();
+    expect(actor.getSnapshot().value).toBe('codeSent');
+
+    vi.advanceTimersByTime(59_999);
+    expect(actor.getSnapshot().value).toBe('codeSent');
+
+    vi.advanceTimersByTime(1);
+    expect(actor.getSnapshot().value).toBe('expired');
+  });
+
+  it('cancels the timer when an explicit event fires first', () => {
+    const machine = createMachine<Record<string, never>, { type: 'SUBMIT' }>({
+      id: 'otp',
+      initial: 'codeSent',
+      context: {},
+      states: {
+        codeSent: {
+          after: { 60_000: 'expired' },
+          on: { SUBMIT: 'verifying' },
+        },
+        expired: {},
+        verifying: {},
+      },
+    });
+
+    const actor = createActor(machine);
+    actor.start();
+
+    actor.send({ type: 'SUBMIT' });
+    expect(actor.getSnapshot().value).toBe('verifying');
+
+    vi.advanceTimersByTime(60_000);
+    expect(actor.getSnapshot().value).toBe('verifying');
+  });
+
+  it('cancels the timer on stop()', () => {
+    const visited: string[] = [];
+    const machine = createMachine<Record<string, never>, { type: 'never' }>({
+      id: 'otp',
+      initial: 'codeSent',
+      context: {},
+      states: {
+        codeSent: { after: { 60_000: 'expired' } },
+        expired: {},
+      },
+    });
+
+    const actor = createActor(machine);
+    actor.subscribe(snap => visited.push(snap.value));
+    actor.start();
+    actor.stop();
+
+    vi.advanceTimersByTime(60_000);
+    expect(visited).not.toContain('expired');
+  });
+
+  it('when two after keys exist, the first to fire clears the other', () => {
+    const machine = createMachine<Record<string, never>, { type: 'never' }>({
+      id: 'race',
+      initial: 'waiting',
+      context: {},
+      states: {
+        waiting: {
+          after: {
+            500: 'first',
+            1_000: 'second',
+          },
+        },
+        first: {},
+        second: {},
+      },
+    });
+
+    const actor = createActor(machine);
+    actor.start();
+
+    vi.advanceTimersByTime(500);
+    expect(actor.getSnapshot().value).toBe('first');
+
+    vi.advanceTimersByTime(500);
+    expect(actor.getSnapshot().value).toBe('first'); // the 1000ms timer was cancelled
+  });
+
+  it('passes AfterEvent with the correct delay to transition actions', () => {
+    let capturedDelay: number | undefined;
+    const machine = createMachine<Record<string, never>, { type: 'never' }>({
+      id: 'timed',
+      initial: 'waiting',
+      context: {},
+      states: {
+        waiting: {
+          after: {
+            500: {
+              target: 'done',
+              actions: [
+                (_ctx, event) => {
+                  capturedDelay = event.delay;
+                },
+              ],
+            },
+          },
+        },
+        done: { type: 'final' },
+      },
+    });
+
+    const actor = createActor(machine);
+    actor.start();
+    vi.advanceTimersByTime(500);
+
+    expect(capturedDelay).toBe(500);
+    expect(actor.getSnapshot().value).toBe('done');
+  });
+
+  it('supports a guard on an after transition', () => {
+    const machine = createMachine<{ allow: boolean }, { type: 'never' }>({
+      id: 'guarded',
+      initial: 'waiting',
+      context: { allow: false },
+      states: {
+        waiting: {
+          after: {
+            500: { target: 'done', guard: ctx => ctx.allow },
+          },
+        },
+        done: {},
+      },
+    });
+
+    const actor = createActor(machine);
+    actor.start();
+
+    vi.advanceTimersByTime(500);
+    expect(actor.getSnapshot().value).toBe('waiting'); // guard blocked it
+
+    // Guards on after transitions are evaluated at fire-time, not schedule-time.
+    // A failing guard leaves the state unchanged (same as event transitions).
+  });
+
+  it('restarts cleanly after stop/start (StrictMode cycle)', () => {
+    const machine = createMachine<Record<string, never>, { type: 'never' }>({
+      id: 'otp',
+      initial: 'codeSent',
+      context: {},
+      states: {
+        codeSent: { after: { 60_000: 'expired' } },
+        expired: {},
+      },
+    });
+
+    const actor = createActor(machine);
+    actor.start();
+    actor.stop(); // StrictMode cleanup
+
+    actor.start(); // StrictMode remount — must reschedule the timer
+    vi.advanceTimersByTime(60_000);
+    expect(actor.getSnapshot().value).toBe('expired');
   });
 });
