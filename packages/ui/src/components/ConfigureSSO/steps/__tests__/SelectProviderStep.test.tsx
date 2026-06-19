@@ -89,8 +89,10 @@ describe('SelectProviderStep', () => {
     const { wrapper } = await createFixtures();
     const { container } = renderStep(wrapper);
 
-    // Emotion serializes sx into stylesheets, so we check both inline + the document's collected styles
-    const iconSpans = Array.from(container.querySelectorAll('[role="radio"] span[aria-hidden]'));
+    // Emotion serializes sx into stylesheets, so we check both inline + the document's collected styles.
+    // Each provider card is a <label> wrapping a visually-hidden native radio; the
+    // aria-hidden icon span lives inside it.
+    const iconSpans = Array.from(container.querySelectorAll('label span[aria-hidden]'));
     expect(iconSpans).toHaveLength(4);
 
     const collectedStyles = [
@@ -243,6 +245,8 @@ describe('SelectProviderStep', () => {
       await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
 
       expect(await screen.findByRole('heading', { name: /change provider to google workspace/i })).toBeInTheDocument();
+      // The dialog is named by its heading so assistive tech announces it.
+      expect(screen.getByRole('dialog', { name: /change provider to google workspace/i })).toBeInTheDocument();
       // Nothing is mutated until the user confirms.
       expect(changeProvider).not.toHaveBeenCalled();
       expect(goNext).not.toHaveBeenCalled();
@@ -266,6 +270,54 @@ describe('SelectProviderStep', () => {
       await waitFor(() => {
         expect(goNext).toHaveBeenCalled();
       });
+    });
+
+    it('keeps the dialog open and surfaces the error inline when the change fails', async () => {
+      resetMocks();
+      contextState.provider = 'saml_okta';
+      contextState.hasConnection = true;
+      changeProvider.mockRejectedValue(
+        new ClerkRuntimeError('failed to change provider', {
+          code: 'enterprise_connection_creation_failed',
+        }),
+      );
+      const { wrapper } = await createFixtures();
+      const { userEvent } = renderStep(wrapper);
+
+      await userEvent.click(screen.getByRole('radio', { name: 'Google Workspace' }));
+      await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Change provider' }));
+
+      await waitFor(() => {
+        expect(changeProvider).toHaveBeenCalledWith('saml_google');
+      });
+
+      // The error renders inside the still-open dialog and the user never advances.
+      expect(await screen.findByText(/failed to change provider/i)).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: /change provider to google workspace/i })).toBeInTheDocument();
+      expect(goNext).not.toHaveBeenCalled();
+    });
+
+    it('closes the dialog on Escape without changing the provider', async () => {
+      resetMocks();
+      contextState.provider = 'saml_okta';
+      contextState.hasConnection = true;
+      const { wrapper } = await createFixtures();
+      const { userEvent } = renderStep(wrapper);
+
+      await userEvent.click(screen.getByRole('radio', { name: 'Google Workspace' }));
+      await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
+
+      expect(await screen.findByRole('heading', { name: /change provider to google workspace/i })).toBeInTheDocument();
+
+      await userEvent.keyboard('{Escape}');
+
+      await waitFor(() => {
+        expect(screen.queryByRole('heading', { name: /change provider to/i })).not.toBeInTheDocument();
+      });
+      expect(changeProvider).not.toHaveBeenCalled();
+      expect(goNext).not.toHaveBeenCalled();
     });
 
     it('keeps the connection and stays put when the dialog is cancelled', async () => {
