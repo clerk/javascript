@@ -3,6 +3,11 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useSyncExternalStore }
 import { createActor } from './createActor';
 import type { Actor, CreateActorOptions, EventObject, Snapshot, StateMachine } from './types';
 
+export interface UseMachineOptions<TContext> extends CreateActorOptions<TContext> {
+  /** Called once when the machine reaches a final state (`type: 'final'`). */
+  onDone?: () => void;
+}
+
 /**
  * Bind an already-created actor to a component. Re-renders on every transition.
  *
@@ -31,7 +36,7 @@ export function useActor<TContext extends object, TEvent extends EventObject>(
  */
 export function useMachine<TContext extends object, TEvent extends EventObject>(
   machine: StateMachine<TContext, TEvent>,
-  options?: CreateActorOptions<TContext>,
+  options?: UseMachineOptions<TContext>,
 ): [Snapshot<TContext>, Actor<TContext, TEvent>['send']] {
   const actorRef = useRef<Actor<TContext, TEvent> | null>(null);
   if (actorRef.current === null) {
@@ -52,6 +57,13 @@ export function useMachine<TContext extends object, TEvent extends EventObject>(
   });
 
   const snapshot = useSyncExternalStore(actor.subscribe, actor.getSnapshot, actor.getSnapshot);
+
+  const onDoneRef = useRef(options?.onDone);
+  onDoneRef.current = options?.onDone;
+  useEffect(() => {
+    if (snapshot.status === 'done') onDoneRef.current?.();
+  }, [snapshot.status]);
+
   return [snapshot, actor.send];
 }
 

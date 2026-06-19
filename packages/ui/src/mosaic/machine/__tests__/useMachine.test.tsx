@@ -197,6 +197,79 @@ describe('subscription cleanup', () => {
   });
 });
 
+describe('useMachine — onDone', () => {
+  it('calls onDone exactly once when the machine reaches a final state', async () => {
+    const gate = deferred<void>();
+    const onDone = vi.fn();
+
+    type Ctx = { fn: () => Promise<void> };
+    type Ev = { type: 'GO' };
+    const machine = createMachine<Ctx, Ev>({
+      initial: 'idle',
+      context: { fn: async () => {} },
+      states: {
+        idle: { on: { GO: 'running' } },
+        running: { invoke: { src: (ctx: Ctx) => ctx.fn(), onDone: 'done', onError: 'done' } },
+        done: { type: 'final' },
+      },
+    });
+
+    function Comp() {
+      const [snapshot, send] = useMachine(machine, {
+        context: { fn: () => gate.promise },
+        onDone,
+      });
+      return (
+        <div>
+          <output data-testid='state'>{snapshot.value}</output>
+          <button onClick={() => send({ type: 'GO' })}>Go</button>
+        </div>
+      );
+    }
+
+    render(<Comp />);
+    expect(onDone).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByText('Go'));
+    await act(async () => gate.resolve());
+
+    expect(screen.getByTestId('state')).toHaveTextContent('done');
+    expect(onDone).toHaveBeenCalledTimes(1);
+  });
+
+  it('always invokes the latest onDone prop, not a stale closure', async () => {
+    const gate = deferred<void>();
+    const staleCallback = vi.fn();
+    const freshCallback = vi.fn();
+
+    type Ctx = { fn: () => Promise<void> };
+    type Ev = { type: 'GO' };
+    const machine = createMachine<Ctx, Ev>({
+      initial: 'idle',
+      context: { fn: async () => {} },
+      states: {
+        idle: { on: { GO: 'running' } },
+        running: { invoke: { src: (ctx: Ctx) => ctx.fn(), onDone: 'done', onError: 'done' } },
+        done: { type: 'final' },
+      },
+    });
+
+    function Comp({ onDone }: { onDone: () => void }) {
+      const [, send] = useMachine(machine, { context: { fn: () => gate.promise }, onDone });
+      return <button onClick={() => send({ type: 'GO' })}>Go</button>;
+    }
+
+    const { rerender } = render(<Comp onDone={staleCallback} />);
+    rerender(<Comp onDone={freshCallback} />);
+
+    fireEvent.click(screen.getByText('Go'));
+    await act(async () => gate.resolve());
+
+    expect(freshCallback).toHaveBeenCalledTimes(1);
+    expect(staleCallback).not.toHaveBeenCalled();
+  });
+});
+
 describe('useMachine — live context keeps injected functions current', () => {
   it('invokes the latest fn from options.context even when the prop changes between renders', async () => {
     const gate = deferred<void>();

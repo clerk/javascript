@@ -3,7 +3,7 @@ import { Button } from '../components/button';
 import { SectionSkeleton } from '../components/section-skeleton';
 import { Destructive } from '../block/destructive';
 import { useOrganization } from '../mock/use-organization';
-import { useMachine } from '../machine/useMachine';
+import { useMachine, useSelector } from '../machine/useMachine';
 import type { MockMembership, MockOrganization } from '../mock/use-organization';
 import { leaveOrgMachine } from './leave-organization-machine';
 
