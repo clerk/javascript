@@ -194,6 +194,7 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
                 // and then expands to the correct height
                 visibleWidget.style.minHeight = captchaSize === 'compact' ? '140px' : '68px';
                 visibleWidget.style.marginBottom = '1.5rem';
+                visibleWidget.dataset.clInteractive = 'true';
               }
             }
           },
@@ -291,6 +292,7 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
     if (captchaTypeUsed === 'smart') {
       const visibleWidget = document.getElementById(CAPTCHA_ELEMENT_ID);
       if (visibleWidget) {
+        delete visibleWidget.dataset.clInteractive;
         visibleWidget.style.maxHeight = '0';
         visibleWidget.style.minHeight = 'unset';
         visibleWidget.style.marginBottom = 'unset';

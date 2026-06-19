@@ -155,6 +155,9 @@ function SignInStartInternal(): JSX.Element {
   const hasSocialOrWeb3Buttons =
     !!authenticatableSocialStrategies.length || !!web3FirstFactors.length || !!alternativePhoneCodeChannels.length;
   const [shouldAutofocus, setShouldAutofocus] = useState(!isMobileDevice() && !hasSocialOrWeb3Buttons);
+  // When the captcha escalates to an interactive challenge, spotlight it by collapsing/inerting the
+  // rest of the card (see the descriptors.main column below).
+  const [captchaIsInteractive, setCaptchaIsInteractive] = useState(false);
   const textIdentifierField = useFormControl('identifier', initialValues[identifierAttribute] || '', {
     ...currentIdentifier,
     isRequired: true,
@@ -574,6 +577,13 @@ function SignInStartInternal(): JSX.Element {
             <Col
               elementDescriptor={descriptors.main}
               gap={6}
+              // @ts-ignore - `inert` is not yet in the installed React types
+              inert={captchaIsInteractive ? '' : undefined}
+              // `display:none` (not `visibility:hidden`) so the collapsed column leaves flex flow and
+              // contributes no `gap` gutter to `Card.Content` — otherwise it injects empty space above
+              // the spotlighted captcha. Subtree stays mounted (form state preserved); `inert` is then
+              // redundant-but-harmless.
+              sx={captchaIsInteractive ? { display: 'none' } : undefined}
             >
               <SocialButtonsReversibleContainerWithDivider>
                 {hasSocialOrWeb3Buttons && (
@@ -603,24 +613,27 @@ function SignInStartInternal(): JSX.Element {
                       <InstantPasswordRow field={passwordBasedInstance ? instantPasswordField : undefined} />
                     </Col>
                     <Col center>
-                      <CaptchaElement />
                       <Form.SubmitButton hasArrow />
                     </Col>
                   </Form.Root>
                 ) : null}
               </SocialButtonsReversibleContainerWithDivider>
-              {!standardFormAttributes.length && <CaptchaElement />}
-              {userSettings.attributes.passkey?.enabled &&
-                userSettings.passkeySettings.show_sign_in_button &&
-                isWebSupported && (
-                  <Card.Action elementId={'usePasskey'}>
-                    <Card.ActionLink
-                      localizationKey={localizationKeys('signIn.start.actionLink__use_passkey')}
-                      onClick={() => authenticateWithPasskey({ flow: 'discoverable' })}
-                    />
-                  </Card.Action>
-                )}
             </Col>
+            <CaptchaElement
+              gapless
+              onInteractiveChange={setCaptchaIsInteractive}
+            />
+            {/* Kept outside descriptors.main so the spotlight's `inert` leaves this alternative action reachable. */}
+            {userSettings.attributes.passkey?.enabled &&
+              userSettings.passkeySettings.show_sign_in_button &&
+              isWebSupported && (
+                <Card.Action elementId={'usePasskey'}>
+                  <Card.ActionLink
+                    localizationKey={localizationKeys('signIn.start.actionLink__use_passkey')}
+                    onClick={() => authenticateWithPasskey({ flow: 'discoverable' })}
+                  />
+                </Card.Action>
+              )}
           </Card.Content>
           <Card.Footer>
             {userSettings.signUp.mode === SIGN_UP_MODES.PUBLIC && !isCombinedFlow && (
