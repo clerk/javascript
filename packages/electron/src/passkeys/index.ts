@@ -67,8 +67,18 @@ const unsupportedReturn = <T>(): CredentialReturn<T> =>
     ),
   }) as CredentialReturn<T>;
 
-const isRpIdMismatchError = (error: unknown): boolean =>
-  !!error && typeof error === 'object' && (error as { code?: string }).code === 'passkey_invalid_rpID_or_domain';
+const shouldRetryNativeAfterRendererError = (error: unknown): boolean => {
+  if (!error || typeof error !== 'object') {
+    return false;
+  }
+
+  const { code, message, name } = error as { code?: string; message?: string; name?: string };
+  return (
+    code === 'passkey_invalid_rpID_or_domain' ||
+    name === 'NotSupportedError' ||
+    message?.toLowerCase().includes('user agent does not support public key credentials') === true
+  );
+};
 
 /** Creates an Electron passkey provider for clerk-js. */
 export function createPasskeys(options?: CreatePasskeysOptions): PasskeySupport {
@@ -86,8 +96,7 @@ export function createPasskeys(options?: CreatePasskeysOptions): PasskeySupport 
     }
 
     const result = await webAuthnCreateCredential(publicKey);
-    // Retry with native WebAuthn when Chromium rejects the RP ID for the page origin.
-    if (result.error && isRpIdMismatchError(result.error) && mode === 'auto' && env.nativeAvailable) {
+    if (result.error && shouldRetryNativeAfterRendererError(result.error) && mode === 'auto' && env.nativeAvailable) {
       return nativeCreateCredential(publicKey);
     }
     return result;
@@ -105,7 +114,7 @@ export function createPasskeys(options?: CreatePasskeysOptions): PasskeySupport 
     }
 
     const result = await webAuthnGetCredential({ publicKeyOptions, conditionalUI: false });
-    if (result.error && isRpIdMismatchError(result.error) && mode === 'auto' && env.nativeAvailable) {
+    if (result.error && shouldRetryNativeAfterRendererError(result.error) && mode === 'auto' && env.nativeAvailable) {
       return nativeGetCredential(publicKeyOptions);
     }
     return result;

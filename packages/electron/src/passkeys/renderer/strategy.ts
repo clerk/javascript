@@ -10,7 +10,21 @@ export type StrategyEnv = {
   electronMajor: number;
 };
 
+const LOOPBACK_HOSTNAMES = new Set(['localhost', '127.0.0.1', '::1']);
+
+function normalizeLoopbackHostname(hostname: string): string {
+  return hostname === '[::1]' ? '::1' : hostname;
+}
+
+function isLoopbackHostname(hostname: string): boolean {
+  return LOOPBACK_HOSTNAMES.has(normalizeLoopbackHostname(hostname));
+}
+
 export function originSatisfiesRpId(env: Pick<StrategyEnv, 'protocol' | 'hostname'>, rpId: string): boolean {
+  if (env.protocol === 'http:' && isLoopbackHostname(env.hostname)) {
+    return !rpId || normalizeLoopbackHostname(env.hostname) === normalizeLoopbackHostname(rpId);
+  }
+
   if (env.protocol !== 'https:' || !rpId) {
     return false;
   }
