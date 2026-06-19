@@ -1157,6 +1157,7 @@ export type __internal_LocalizationResource = {
         menuAction__remove: LocalizationValue;
         tooltip: LocalizationValue<'role'>;
         tooltip__noRole: LocalizationValue;
+        tooltipLabel: LocalizationValue;
       };
     };
     membersPage: {

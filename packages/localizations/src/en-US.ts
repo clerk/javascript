@@ -1128,6 +1128,7 @@ export const enUS: LocalizationResource = {
         tooltip:
           'Members without a matching domain can still sign in using existing auth methods. New members will be assigned {{role}} in this organization.',
         tooltip__noRole: 'Members without a matching domain can still sign in using existing auth methods.',
+        tooltipLabel: 'More information',
       },
       title: 'Security',
     },

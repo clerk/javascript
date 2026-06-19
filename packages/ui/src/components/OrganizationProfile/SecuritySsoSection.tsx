@@ -10,7 +10,7 @@ import { handleError } from '@/utils/errorHandler';
 
 import { useEnvironment } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
-import { Badge, Button, Col, descriptors, Flex, Icon, localizationKeys, Text } from '../../customizables';
+import { Badge, Button, Col, descriptors, Flex, Icon, localizationKeys, Text, useLocalizations } from '../../customizables';
 import { useFetchRoles, useLocalizeCustomRoles } from '../../hooks/useFetchRoles';
 import { InformationCircle } from '../../icons';
 import type {
@@ -261,6 +261,7 @@ const ConfiguredContent = (props: ConfiguredContentProps): JSX.Element => {
 
 const SsoDescription = (): JSX.Element => {
   const roleName = useEnrollmentRoleName();
+  const { t } = useLocalizations();
 
   return (
     <Text as='p'>
@@ -275,7 +276,7 @@ const SsoDescription = (): JSX.Element => {
         <Tooltip.Trigger>
           <Button
             variant='unstyled'
-            aria-label='More information'
+            aria-label={t(localizationKeys('organizationProfile.securityPage.ssoSection.tooltipLabel'))}
             sx={t => ({
               display: 'inline-flex',
               alignItems: 'center',
