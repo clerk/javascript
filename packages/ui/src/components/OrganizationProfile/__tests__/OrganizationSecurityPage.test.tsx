@@ -189,7 +189,7 @@ describe('OrganizationSecurityPage', () => {
   });
 
   describe('loading state', () => {
-    it('renders the overview chrome (the Security header, no wizard stepper) while loading', async () => {
+    it('renders the Security header and a centered spinner (no section frame, no wizard stepper) while loading', async () => {
       const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
 
       // Hold the source query pending so the page stays in its on-mount loading
@@ -204,10 +204,14 @@ describe('OrganizationSecurityPage', () => {
 
       // The page header stays mounted during load — no pop-in when data settles.
       expect(await screen.findByRole('heading', { name: 'Security' })).toBeInTheDocument();
-      // The SSO section frame is present (overview-shaped), with an in-frame spinner.
-      expect(container.querySelector('.cl-profileSection__sso')).toBeInTheDocument();
-      expect(container.querySelector('.cl-spinner')).toBeInTheDocument();
-      // It is NOT the wizard-shaped skeleton: no stepper renders in the overview load.
+
+      // The loading body is a bare spinner centered in the remaining content area.
+      const spinner = container.querySelector('.cl-spinner');
+      expect(spinner).toBeInTheDocument();
+      expect(spinner?.parentElement).toHaveStyle({ alignItems: 'center', justifyContent: 'center' });
+
+      // No overview section frame and no wizard-shaped skeleton during load.
+      expect(container.querySelector('.cl-profileSection__sso')).not.toBeInTheDocument();
       expect(container.querySelector('.cl-configureSSOStepper')).not.toBeInTheDocument();
     });
   });

@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 
 import { Header } from '@/ui/elements/Header';
 import { ProfileCard } from '@/ui/elements/ProfileCard';
-import { ProfileSection } from '@/ui/elements/Section';
 
 import { Col, descriptors, Flex, Icon, localizationKeys, SimpleButton, Spinner, Text } from '../../customizables';
 import { ChevronLeft } from '../../icons';
@@ -50,19 +49,27 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
     setView('wizard');
   };
 
-  // Loading is on mount, where `view` is still 'overview': keep the page chrome
-  // (the "Security" header + the SSO section frame) stable and swap only the
-  // section body for a placeholder, so the settled overview replaces it in place
-  // — no header pop-in, no swap into a differently-shaped wizard skeleton. The
-  // wizard skeleton stays for the rare case loading is ever entered from within
-  // the wizard view itself.
+  // Loading is on mount, where `view` is still 'overview': keep the "Security"
+  // header stable so the settled overview replaces the body in place (no header
+  // pop-in) and center a spinner in the remaining height beneath it. The wizard
+  // skeleton stays for the rare case loading is ever entered from the wizard view.
   if (isLoading) {
     return view === 'wizard' ? (
       <ConfigureSSOSkeleton />
     ) : (
       <ConfigureSSOProtect>
-        <SecurityPageOverview>
-          <SecuritySsoSectionSkeleton />
+        <SecurityPageOverview fillHeight>
+          <Flex
+            align='center'
+            justify='center'
+            sx={t => ({ flex: 1, paddingBlock: t.space.$5 })}
+          >
+            <Spinner
+              size='xs'
+              colorScheme='neutral'
+              elementDescriptor={descriptors.spinner}
+            />
+          </Flex>
         </SecurityPageOverview>
       </ConfigureSSOProtect>
     );
@@ -125,16 +132,26 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
  * The overview's stable page chrome — the security `ProfileCard.Page` and its
  * "Security" header. Both the settled overview and the on-mount loading state
  * render through this, so the section body is the only thing that swaps in.
+ *
+ * `fillHeight` grows the page to the scroll box so the loading state's spinner
+ * can center in the remaining height beneath the header.
  */
-const SecurityPageOverview = ({ children }: { children: React.ReactNode }): JSX.Element => (
-  <ProfileCard.Page>
+const SecurityPageOverview = ({
+  children,
+  fillHeight = false,
+}: {
+  children: React.ReactNode;
+  fillHeight?: boolean;
+}): JSX.Element => (
+  <ProfileCard.Page sx={fillHeight ? { flex: 1 } : undefined}>
     <Col
       elementDescriptor={descriptors.page}
-      sx={t => ({ gap: t.space.$8 })}
+      sx={t => ({ gap: t.space.$8, ...(fillHeight && { flex: 1 }) })}
     >
       <Col
         elementDescriptor={descriptors.profilePage}
         elementId={descriptors.profilePage.setId('organizationSecurity')}
+        sx={fillHeight ? { flex: 1 } : undefined}
       >
         <Header.Root>
           <Header.Title
@@ -147,30 +164,4 @@ const SecurityPageOverview = ({ children }: { children: React.ReactNode }): JSX.
       </Col>
     </Col>
   </ProfileCard.Page>
-);
-
-/**
- * Overview-shaped loading placeholder for the SSO section: the real section's
- * frame (same title + id) wrapping a centered spinner. Mirrors how other
- * OrganizationProfile sections show in-frame loading rather than swapping in a
- * differently-shaped skeleton.
- */
-const SecuritySsoSectionSkeleton = (): JSX.Element => (
-  <ProfileSection.Root
-    title={localizationKeys('organizationProfile.securityPage.ssoSection.title')}
-    id='sso'
-    centered={false}
-  >
-    <Flex
-      align='center'
-      justify='center'
-      sx={t => ({ paddingBlock: t.space.$5 })}
-    >
-      <Spinner
-        size='sm'
-        colorScheme='neutral'
-        elementDescriptor={descriptors.spinner}
-      />
-    </Flex>
-  </ProfileSection.Root>
 );
