@@ -1370,6 +1370,12 @@ export type __internal_LocalizationResource = {
       };
       warning: LocalizationValue;
     };
+    changeProviderDialog: {
+      title: LocalizationValue<'provider'>;
+      subtitle: LocalizationValue<'provider' | 'currentProvider'>;
+      cancelButton: LocalizationValue;
+      confirmButton: LocalizationValue;
+    };
     organizationDomainsStep: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
@@ -1472,6 +1478,10 @@ export type __internal_LocalizationResource = {
           optional: LocalizationValue;
         };
       };
+      activeConnectionWarning: {
+        title: LocalizationValue;
+        dismiss: LocalizationValue;
+      };
       samlOkta: {
         mainHeaderTitle: LocalizationValue;
         createAppStep: {
@@ -1482,7 +1492,6 @@ export type __internal_LocalizationResource = {
             step2: LocalizationValue;
             step3: LocalizationValue;
             step4: LocalizationValue;
-            step5: LocalizationValue;
           };
           serviceProviderInstructions: {
             title: LocalizationValue;
@@ -1523,7 +1532,6 @@ export type __internal_LocalizationResource = {
         assignUsersStep: {
           headerSubtitle: LocalizationValue;
           assignUsersInstructions: {
-            title: LocalizationValue;
             paragraph: LocalizationValue;
             step1: LocalizationValue;
             step2: LocalizationValue;
@@ -1535,7 +1543,6 @@ export type __internal_LocalizationResource = {
         identityProviderMetadataStep: {
           headerSubtitle: LocalizationValue;
           modes: {
-            title: LocalizationValue;
             ariaLabel: LocalizationValue;
             metadataUrl: LocalizationValue;
             manual: LocalizationValue;
@@ -1570,7 +1577,6 @@ export type __internal_LocalizationResource = {
         createAppStep: {
           headerSubtitle: LocalizationValue;
           createAppInstructions: {
-            title: LocalizationValue;
             paragraph: LocalizationValue;
           };
           serviceProviderFields: {
@@ -1588,25 +1594,23 @@ export type __internal_LocalizationResource = {
           attributeMappingTable: {
             title: LocalizationValue;
             columns: {
-              userProfile: LocalizationValue;
               attributeName: LocalizationValue;
+              userAttribute: LocalizationValue;
             };
             rows: {
-              email: { userProfile: LocalizationValue; attributeName: LocalizationValue };
-              firstName: { userProfile: LocalizationValue; attributeName: LocalizationValue };
-              lastName: { userProfile: LocalizationValue; attributeName: LocalizationValue };
+              email: { attributeName: LocalizationValue; userAttribute: LocalizationValue };
+              firstName: { attributeName: LocalizationValue; userAttribute: LocalizationValue };
+              lastName: { attributeName: LocalizationValue; userAttribute: LocalizationValue };
             };
           };
         };
         assignUsersStep: {
           headerSubtitle: LocalizationValue;
-          title: LocalizationValue;
           paragraph: LocalizationValue;
         };
         identityProviderMetadataStep: {
           headerSubtitle: LocalizationValue;
           modes: {
-            title: LocalizationValue;
             ariaLabel: LocalizationValue;
             metadataUrl: LocalizationValue;
             manual: LocalizationValue;
@@ -1646,13 +1650,11 @@ export type __internal_LocalizationResource = {
             step2: LocalizationValue;
             step3: LocalizationValue;
             step4: LocalizationValue;
-            step5: LocalizationValue;
           };
         };
         identityProviderMetadataStep: {
           headerSubtitle: LocalizationValue;
           modes: {
-            title: LocalizationValue;
             ariaLabel: LocalizationValue;
             metadataFile: LocalizationValue;
             manual: LocalizationValue;
@@ -1749,13 +1751,11 @@ export type __internal_LocalizationResource = {
           };
           assignUsersInstructions: {
             title: LocalizationValue;
-            paragraph1: LocalizationValue;
             step1: LocalizationValue;
             step2: LocalizationValue;
             step3: LocalizationValue;
             step4: LocalizationValue;
             step5: LocalizationValue;
-            step6: LocalizationValue;
           };
         };
         serviceProviderStep: {
@@ -1779,7 +1779,6 @@ export type __internal_LocalizationResource = {
         identityProviderMetadataStep: {
           headerSubtitle: LocalizationValue;
           modes: {
-            title: LocalizationValue;
             ariaLabel: LocalizationValue;
             metadataUrl: LocalizationValue;
             manual: LocalizationValue;
@@ -1811,16 +1810,16 @@ export type __internal_LocalizationResource = {
         attributeMappingStep: {
           headerSubtitle: LocalizationValue;
           title: LocalizationValue;
-          paragraph: LocalizationValue;
           step1: LocalizationValue;
           step2: LocalizationValue;
-          step3: LocalizationValue;
           attributeMappingTable: {
             columns: {
               attribute: LocalizationValue;
               claimName: LocalizationValue;
               value: LocalizationValue;
             };
+            copyClaimName: LocalizationValue;
+            copyClaimNameCopied: LocalizationValue;
             rows: {
               email: { attribute: LocalizationValue; claimName: LocalizationValue; value: LocalizationValue };
               firstName: { attribute: LocalizationValue; claimName: LocalizationValue; value: LocalizationValue };
