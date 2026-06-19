@@ -1,5 +1,13 @@
 # @clerk/swingset
 
+## 0.0.7
+
+### Patch Changes
+
+- Updated dependencies [[`01789b4`](https://github.com/clerk/javascript/commit/01789b4e8d3a280940b7ebcb223a33c6ecfd209a)]:
+  - @clerk/ui@1.20.0
+  - @clerk/headless@0.0.2
+
 ## 0.0.6
 
 ### Patch Changes
