@@ -18,6 +18,7 @@ import {
   SessionJWTCache,
 } from '../../cache';
 import { MemoryTokenCache } from '../../cache/MemoryTokenCache';
+import type { TokenCache } from '../../cache/types';
 import { CLERK_CLIENT_JWT_KEY } from '../../constants';
 import { errorThrower } from '../../errorThrower';
 import { assertValidProxyUrl, isNative } from '../../utils';
@@ -51,6 +52,7 @@ function hasOwnOption<Key extends keyof ClerkRuntimeOptions>(
 
 let __internal_clerk: HeadlessBrowserClerk | BrowserClerk | undefined;
 let __internal_clerkOptions: ClerkRuntimeOptions | undefined;
+let __internal_tokenCache: TokenCache = MemoryTokenCache;
 
 /**
  * Resolves the next native singleton config while preserving existing values for omitted options.
@@ -89,7 +91,9 @@ function getUpdatedClerkOptions(
 
 export function createClerkInstance(ClerkClass: typeof Clerk) {
   return (options?: BuildClerkOptions): HeadlessBrowserClerk | BrowserClerk => {
-    const { tokenCache = MemoryTokenCache, __experimental_resourceCache: createResourceCache } = options || {};
+    const { __experimental_resourceCache: createResourceCache } = options || {};
+    const hasNextTokenCache = !!options && Object.prototype.hasOwnProperty.call(options, 'tokenCache');
+    const nextTokenCache = hasNextTokenCache ? (options.tokenCache ?? MemoryTokenCache) : undefined;
     const {
       hasConfigChanged,
       options: { publishableKey, proxyUrl, domain },
@@ -99,15 +103,19 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
       errorThrower.throwMissingPublishableKeyError();
     }
 
+    if (nextTokenCache) {
+      __internal_tokenCache = nextTokenCache;
+    }
+
     if (!__internal_clerk || hasConfigChanged) {
       assertValidProxyUrl(proxyUrl);
 
       if (hasConfigChanged) {
-        tokenCache.clearToken?.(CLERK_CLIENT_JWT_KEY);
+        void __internal_tokenCache.clearToken?.(CLERK_CLIENT_JWT_KEY);
       }
 
-      const getToken = (key: string) => tokenCache.getToken(key);
-      const saveToken = (key: string, token: string) => tokenCache.saveToken(key, token);
+      const getToken = (key: string) => __internal_tokenCache.getToken(key);
+      const saveToken = (key: string, token: string) => __internal_tokenCache.saveToken(key, token);
 
       __internal_clerkOptions = { publishableKey, proxyUrl, domain };
       __internal_clerk = new ClerkClass(publishableKey, { proxyUrl, domain }) as unknown as BrowserClerk;
@@ -244,6 +252,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         }
       });
     }
+
     // At this point __internal_clerk is guaranteed to be defined
     return __internal_clerk;
   };
