@@ -86,7 +86,7 @@ const Item = ({
           <Icon
             icon={Checkmark}
             size='sm'
-            sx={theme => ({ color: theme.colors.$white })}
+            sx={theme => ({ color: isCurrent ? theme.colors.$colorBackground : theme.colors.$white })}
           />
         ) : (
           <Text
