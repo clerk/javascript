@@ -15,7 +15,7 @@ const makeNativeModule = ({ includeEventMethods = true } = {}) => ({
     : {}),
   configure: vi.fn(),
   getClientToken: vi.fn(),
-  syncFromJsClientToken: vi.fn(),
+  syncClientStateFromJs: vi.fn(),
 });
 
 vi.mock('react-native', () => ({
