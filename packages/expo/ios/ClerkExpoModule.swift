@@ -1,11 +1,9 @@
 // ClerkExpoModule - Native module for Clerk integration
 // This module provides the configure function, client sync, and native view bridges.
-// SwiftUI Clerk views are created by the app target through ClerkNativeBridge because
-// the Clerk SDK (SPM) isn't accessible from the CocoaPods-backed React Native pod.
+// SwiftUI Clerk views are created by ClerkNativeBridge through the Clerk iOS SPM dependency.
 
 import UIKit
 import React
-import ClerkExpoBridge
 
 // MARK: - Module
 
@@ -18,7 +16,7 @@ class ClerkExpoModule: RCTEventEmitter {
   override init() {
     super.init()
     ClerkExpoModule.sharedInstance = self
-    setClerkNativeClientChangedEmitter { body in
+    ClerkNativeBridge.setClientChangedEmitter { body in
       Self.emitClientChanged(body)
     }
   }
@@ -68,14 +66,9 @@ class ClerkExpoModule: RCTEventEmitter {
                         bearerToken: String?,
                         resolve: @escaping RCTPromiseResolveBlock,
                         reject: @escaping RCTPromiseRejectBlock) {
-    guard let bridge = clerkNativeBridge else {
-      reject("E_NOT_INITIALIZED", "Clerk not initialized. Make sure ClerkNativeBridge is registered.", nil)
-      return
-    }
-
     Task {
       do {
-        try await bridge.configure(publishableKey: publishableKey, bearerToken: bearerToken)
+        try await ClerkNativeBridge.shared.configure(publishableKey: publishableKey, bearerToken: bearerToken)
         resolve(nil)
       } catch {
         reject("E_CONFIGURE_FAILED", error.localizedDescription, error)
@@ -87,13 +80,8 @@ class ClerkExpoModule: RCTEventEmitter {
 
   @objc func getClientToken(_ resolve: @escaping RCTPromiseResolveBlock,
                               reject: @escaping RCTPromiseRejectBlock) {
-    guard let bridge = clerkNativeBridge else {
-      resolve(nil)
-      return
-    }
-
     Task {
-      let token = await bridge.getClientToken()
+      let token = await ClerkNativeBridge.shared.getClientToken()
       resolve(token)
     }
   }
@@ -105,18 +93,13 @@ class ClerkExpoModule: RCTEventEmitter {
                                    shouldRefreshClient: Any?,
                                    resolve: @escaping RCTPromiseResolveBlock,
                                    reject: @escaping RCTPromiseRejectBlock) {
-    guard let bridge = clerkNativeBridge else {
-      resolve(nil)
-      return
-    }
-
     let normalizedClientToken = clientToken as? String
     let normalizedSourceId = sourceId as? String
     let defaultShouldRefreshClient = normalizedClientToken?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true
     let normalizedShouldRefreshClient = (shouldRefreshClient as? Bool) ?? defaultShouldRefreshClient
     Task {
       do {
-        try await bridge.syncFromJsClientToken(
+        try await ClerkNativeBridge.shared.syncFromJsClientToken(
           normalizedClientToken,
           sourceId: normalizedSourceId,
           shouldRefreshClient: normalizedShouldRefreshClient

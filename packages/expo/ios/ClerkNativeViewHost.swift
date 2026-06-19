@@ -1,5 +1,4 @@
 import UIKit
-import ClerkExpoBridge
 
 public class ClerkNativeViewHost: UIView, ClerkNativeBridgeReadyObserver {
   private lazy var hostingCoordinator = ClerkNativeHostingCoordinator(containerView: self)
@@ -20,7 +19,7 @@ public class ClerkNativeViewHost: UIView, ClerkNativeBridgeReadyObserver {
       if hasInitialized {
         hostedViewDidDetachFromWindow()
       }
-      removeClerkNativeBridgeReadyObserver(self)
+      ClerkNativeBridge.removeReadyObserver(self)
       hostingCoordinator.detach()
       hasInitialized = false
       return
@@ -28,7 +27,7 @@ public class ClerkNativeViewHost: UIView, ClerkNativeBridgeReadyObserver {
 
     guard !hasInitialized else { return }
     hasInitialized = true
-    addClerkNativeBridgeReadyObserver(self)
+    ClerkNativeBridge.addReadyObserver(self)
     hostedViewDidAttachToWindow()
     updateHostedView()
   }

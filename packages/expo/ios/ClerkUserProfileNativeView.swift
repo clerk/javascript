@@ -1,6 +1,5 @@
 import React
 import UIKit
-import ClerkExpoBridge
 
 public class ClerkUserProfileNativeView: ClerkNativeViewHost {
   private var currentDismissible: Bool = true
@@ -37,9 +36,7 @@ public class ClerkUserProfileNativeView: ClerkNativeViewHost {
   }
 
   override func makeHostedController() -> UIViewController? {
-    guard let bridge = clerkNativeBridge else { return nil }
-
-    return bridge.makeUserProfileViewController(
+    return ClerkNativeBridge.shared.makeUserProfileViewController(
       dismissible: currentDismissible,
       onEvent: { [weak self] event, _ in
         if event == .dismissed {
