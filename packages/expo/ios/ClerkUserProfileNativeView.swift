@@ -1,5 +1,6 @@
 import React
 import UIKit
+import ClerkExpoBridge
 
 public class ClerkUserProfileNativeView: ClerkNativeViewHost {
   private var currentDismissible: Bool = true

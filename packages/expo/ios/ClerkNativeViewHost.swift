@@ -1,4 +1,5 @@
 import UIKit
+import ClerkExpoBridge
 
 public class ClerkNativeViewHost: UIView, ClerkNativeBridgeReadyObserver {
   private lazy var hostingCoordinator = ClerkNativeHostingCoordinator(containerView: self)

@@ -1,5 +1,6 @@
 import React
 import UIKit
+import ClerkExpoBridge
 
 public class ClerkAuthNativeView: ClerkNativeViewHost {
   private var currentMode: String = "signInOrUp"
