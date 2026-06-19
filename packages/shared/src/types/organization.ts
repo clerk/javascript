@@ -98,9 +98,9 @@ export interface OrganizationResource extends ClerkResource, BillingPayerMethods
    */
   selfServeSSOEnabled: boolean;
   /**
-   * Whether the Organization enforces exclusive membership, meaning members must have it set as their active Organization. This is `undefined` for instances that have not adopted the feature.
+   * Whether the Organization enforces exclusive membership, meaning members must have it set as their active Organization. Defaults to `false` for instances that have not adopted the feature.
    */
-  exclusiveMembership?: boolean;
+  exclusiveMembership: boolean;
   /**
    * The date when the Organization was first created.
    */

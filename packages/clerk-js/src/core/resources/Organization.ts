@@ -74,7 +74,7 @@ export class Organization extends BaseResource implements OrganizationResource {
   pendingInvitationsCount = 0;
   maxAllowedMemberships!: number;
   selfServeSSOEnabled = false;
-  exclusiveMembership?: boolean;
+  exclusiveMembership = false;
 
   constructor(data: OrganizationJSON | OrganizationJSONSnapshot) {
     super();
@@ -475,7 +475,7 @@ export class Organization extends BaseResource implements OrganizationResource {
     this.maxAllowedMemberships = data.max_allowed_memberships || 0;
     this.adminDeleteEnabled = data.admin_delete_enabled || false;
     this.selfServeSSOEnabled = data.self_serve_sso_enabled || false;
-    this.exclusiveMembership = data.exclusive_membership;
+    this.exclusiveMembership = data.exclusive_membership || false;
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
     return this;
