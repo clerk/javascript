@@ -1,5 +1,11 @@
 # @clerk/ui
 
+## 1.19.0
+
+### Minor Changes
+
+- When an interactive bot-protection challenge appears during sign-in or sign-up, the card now brings the challenge to the foreground — hiding the other fields and buttons until it's solved — so it's clear the "Verify you are human" check must be completed. Invisible challenges are unaffected. ([#8907](https://github.com/clerk/javascript/pull/8907)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 1.18.1
 
 ### Patch Changes
