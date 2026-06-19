@@ -166,9 +166,8 @@ describe('cross-user auth bleed: diagnostic forks', () => {
     const context = new RouterContextProvider();
 
     // First logical request: user_A. Middleware resolves and caches it on the object.
-    await middleware(
-      { request: reusedRequest, context } as unknown as LoaderFunctionArgs,
-      () => Promise.resolve(new Response('A')),
+    await middleware({ request: reusedRequest, context } as unknown as LoaderFunctionArgs, () =>
+      Promise.resolve(new Response('A')),
     );
 
     // Adapter now serves user_B but reuses the very same Request object.

@@ -50,6 +50,40 @@ describe('getAuth', () => {
     expect(auth.tokenType).toBe('session_token');
   });
 
+  it('returns signed-out instead of throwing when the re-derive yields a handshake state', async () => {
+    // A fresh GET loader request (Request-instance miss) can re-authenticate into a
+    // handshake state, whose toAuth() is null. The middleware redirects before loaders run,
+    // but the re-derive can't, so getAuth must fall back to signed-out rather than
+    // dereferencing null.
+    mockClerkClient.mockReturnValue({
+      authenticateRequest: vi.fn().mockResolvedValue({
+        headers: new Headers(),
+        status: 'handshake',
+        toAuth: () => null,
+      }),
+    } as unknown as ClerkClient);
+
+    const mockContext = {
+      get: vi.fn().mockImplementation(contextKey => {
+        if (contextKey === middlewareConfigContext) {
+          return { secretKey: 'sk_test_...', publishableKey: 'pk_test_...', acceptsToken: 'any' };
+        }
+        return null;
+      }),
+      set: vi.fn(),
+    };
+
+    const args = {
+      context: mockContext,
+      request: new Request('http://clerk.com'),
+    } as LoaderFunctionArgs;
+
+    const auth = await getAuth(args);
+
+    expect(auth.userId).toBeNull();
+    expect(auth.isAuthenticated).toBe(false);
+  });
+
   it('should throw an error when middleware context is missing', async () => {
     const mockContext = {
       get: vi.fn().mockReturnValue(null),
