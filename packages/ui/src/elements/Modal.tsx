@@ -21,12 +21,29 @@ type ModalProps = React.PropsWithChildren<{
   style?: React.CSSProperties;
   portalRoot?: HTMLElement | React.MutableRefObject<HTMLElement | null>;
   initialFocusRef?: number | React.MutableRefObject<HTMLElement | null>;
+  /** Names the `role='dialog'` content node for assistive technology. */
+  'aria-labelledby'?: string;
+  'aria-label'?: string;
+  /** Forwarded to the dialog content node, e.g. to restore Escape-to-close. */
+  onKeyDown?: React.KeyboardEventHandler<HTMLDivElement>;
 }>;
 
 export const Modal = withFloatingTree((props: ModalProps) => {
   const { disableScrollLock, enableScrollLock } = useScrollLock();
-  const { handleClose, handleOpen, contentSx, containerSx, canCloseModal, id, style, portalRoot, initialFocusRef } =
-    props;
+  const {
+    handleClose,
+    handleOpen,
+    contentSx,
+    containerSx,
+    canCloseModal,
+    id,
+    style,
+    portalRoot,
+    initialFocusRef,
+    'aria-labelledby': ariaLabelledBy,
+    'aria-label': ariaLabel,
+    onKeyDown,
+  } = props;
   const portalRootFromContext = usePortalRoot();
   const overlayRef = useRef<HTMLDivElement>(null);
   const { floating, isOpen, context, nodeId, toggle } = usePopover({
@@ -93,6 +110,9 @@ export const Modal = withFloatingTree((props: ModalProps) => {
             ref={floating}
             aria-modal='true'
             role='dialog'
+            aria-labelledby={ariaLabelledBy}
+            aria-label={ariaLabel}
+            onKeyDown={onKeyDown}
             sx={[
               t => ({
                 position: 'relative',
