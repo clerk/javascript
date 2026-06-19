@@ -6,7 +6,11 @@ import { ClerkExpoModule as ClerkExpo, isNativeSupported } from '../utils/native
 const nativeClientChangedEvent = 'clerkNativeClientChanged';
 
 export interface NativeClientSnapshot {
-  clientToken?: string | null;
+  changed: {
+    client: boolean;
+    deviceToken: boolean;
+  };
+  deviceToken: string | null;
   sourceId?: string | null;
 }
 
@@ -44,6 +48,14 @@ function getNativeClientEventEmitter(): RefreshClientEventEmitter | null {
   return null;
 }
 
+function isNativeClientSnapshot(snapshot: NativeClientSnapshot | undefined): snapshot is NativeClientSnapshot {
+  return (
+    typeof snapshot?.changed?.client === 'boolean' &&
+    typeof snapshot.changed.deviceToken === 'boolean' &&
+    (typeof snapshot.deviceToken === 'string' || snapshot.deviceToken === null)
+  );
+}
+
 /**
  * Listens for native client events that should sync JS client state.
  */
@@ -65,6 +77,10 @@ export function useNativeClientEvents(): UseNativeClientEventsReturn {
       }
 
       subscription = eventEmitter.addListener(nativeClientChangedEvent, snapshot => {
+        if (!isNativeClientSnapshot(snapshot)) {
+          return;
+        }
+
         setNativeClientEvent({ issuedAt: Date.now(), ...snapshot });
       });
     } catch (error) {

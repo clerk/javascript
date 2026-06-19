@@ -6,10 +6,11 @@ interface Spec {
   addListener?(eventName: string): void;
   configure(publishableKey: string, bearerToken: string | null): Promise<void>;
   getClientToken(): Promise<string | null>;
-  syncFromJsClientToken(
-    clientToken: string | null,
+  syncClientStateFromJs(
+    deviceToken: string | null,
     sourceId: string | null,
-    shouldRefreshClient?: boolean,
+    didChangeClient: boolean,
+    didChangeDeviceToken: boolean,
   ): Promise<void>;
   removeListeners?(count: number): void;
 }

@@ -56,6 +56,13 @@ final class ClerkNativeBridge {
     let deviceToken: String?
   }
 
+  private struct ClientStateChanges {
+    let client: Bool
+    let deviceToken: Bool
+
+    static let all = ClientStateChanges(client: true, deviceToken: true)
+  }
+
   /// Resolves the keychain service name, checking ClerkKeychainService in Info.plist first
   /// (for extension apps sharing a keychain group), then falling back to the bundle identifier.
   private static var keychainService: String? {
@@ -104,7 +111,7 @@ final class ClerkNativeBridge {
   @MainActor
   private static func emitClientChangedIfReceivedToken(_ bearerToken: String?) {
     guard let token = bearerToken, !token.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
-    Self.emitClientChanged(Self.clientChangedPayload())
+    Self.emitClientChanged(Self.clientChangedPayload(changes: .init(client: false, deviceToken: true)))
   }
 
   @MainActor
@@ -130,9 +137,14 @@ final class ClerkNativeBridge {
         guard let self, generation == self.clientObservationGeneration else { return }
 
         let newClientState = Self.clientStateSnapshot()
-        if newClientState != self.lastObservedClientState {
+        if let previousClientState = self.lastObservedClientState, newClientState != previousClientState {
           self.lastObservedClientState = newClientState
-          let payload = Self.clientChangedPayload()
+          let payload = Self.clientChangedPayload(
+            changes: .init(
+              client: newClientState.client != previousClientState.client,
+              deviceToken: newClientState.deviceToken != previousClientState.deviceToken
+            )
+          )
           Self.emitClientChanged(payload)
         }
 
@@ -152,9 +164,13 @@ final class ClerkNativeBridge {
   }
 
   @MainActor
-  private static func clientChangedPayload(sourceId: String? = nil) -> [String: Any] {
+  private static func clientChangedPayload(sourceId: String? = nil, changes: ClientStateChanges = .all) -> [String: Any] {
     var payload: [String: Any] = [:]
-    payload["clientToken"] = Clerk.shared.deviceToken ?? NSNull()
+    payload["changed"] = [
+      "client": changes.client,
+      "deviceToken": changes.deviceToken,
+    ]
+    payload["deviceToken"] = Clerk.shared.deviceToken ?? NSNull()
     if let sourceId, !sourceId.isEmpty {
       payload["sourceId"] = sourceId
     }
@@ -187,7 +203,7 @@ final class ClerkNativeBridge {
   @MainActor
   private static func waitForLoadedClient() async {
     // Wait for Clerk to finish loading client state from cached data + API refresh.
-    // The bridge sync contract is client-token based, not session based.
+    // The bridge sync contract is device-token based, not session based.
     for _ in 0..<clerkLoadMaxAttempts {
       if Clerk.shared.isLoaded {
         return
@@ -256,23 +272,39 @@ final class ClerkNativeBridge {
   }
 
   @MainActor
-  func syncFromJsClientToken(_ clientToken: String?, sourceId: String?, shouldRefreshClient: Bool) async throws {
+  func syncClientStateFromJs(
+    deviceToken: String?,
+    sourceId: String?,
+    didChangeClient: Bool,
+    didChangeDeviceToken: Bool
+  ) async throws {
     guard Self.clerkConfigured else { return }
 
-    if let token = clientToken?.trimmingCharacters(in: .whitespacesAndNewlines), !token.isEmpty {
+    let previousClientState = Self.clientStateSnapshot()
+
+    if didChangeDeviceToken, let token = deviceToken?.trimmingCharacters(in: .whitespacesAndNewlines), !token.isEmpty {
       if Clerk.shared.deviceToken != token {
         _ = try await Clerk.shared.updateDeviceToken(token)
         await Self.waitForLoadedClient()
       }
     }
 
-    if shouldRefreshClient {
+    if didChangeClient || didChangeDeviceToken {
       _ = try await Clerk.shared.refreshClient()
       await Self.waitForLoadedClient()
     }
 
-    lastObservedClientState = Self.clientStateSnapshot()
-    Self.emitClientChanged(Self.clientChangedPayload(sourceId: sourceId))
+    let newClientState = Self.clientStateSnapshot()
+    lastObservedClientState = newClientState
+    Self.emitClientChanged(
+      Self.clientChangedPayload(
+        sourceId: sourceId,
+        changes: .init(
+          client: newClientState.client != previousClientState.client,
+          deviceToken: newClientState.deviceToken != previousClientState.deviceToken
+        )
+      )
+    )
   }
 
   private static func postConfiguredNotification() {

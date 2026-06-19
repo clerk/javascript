@@ -8,7 +8,7 @@ import type { TokenCache } from '../cache/types';
 import { isNative, isWeb } from '../utils/runtime';
 import { maybeCompleteAuthSession } from './maybeCompleteAuthSession';
 import {
-  type ClientTokenCacheListener,
+  type DeviceTokenCacheListener,
   NativeClientSync,
   type NativeRefreshFromJsController,
   useNativeClientBootstrap,
@@ -69,7 +69,7 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
     ...rest
   } = props;
   const pk = publishableKey;
-  const tokenCacheListenersRef = useRef<Set<ClientTokenCacheListener>>(new Set());
+  const tokenCacheListenersRef = useRef<Set<DeviceTokenCacheListener>>(new Set());
   const suppressTokenCacheNotificationsRef = useRef(false);
   const nativeRefreshFromJsControllerRef = useRef<NativeRefreshFromJsController | null>(null);
   const syncableTokenCache = useSyncableTokenCache({

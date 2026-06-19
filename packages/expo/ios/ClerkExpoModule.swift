@@ -86,23 +86,23 @@ class ClerkExpoModule: RCTEventEmitter {
     }
   }
 
-  // MARK: - syncFromJsClientToken
+  // MARK: - syncClientStateFromJs
 
-  @objc func syncFromJsClientToken(_ clientToken: Any?,
+  @objc func syncClientStateFromJs(_ deviceToken: Any?,
                                    sourceId: Any?,
-                                   shouldRefreshClient: Any?,
+                                   didChangeClient: Bool,
+                                   didChangeDeviceToken: Bool,
                                    resolve: @escaping RCTPromiseResolveBlock,
                                    reject: @escaping RCTPromiseRejectBlock) {
-    let normalizedClientToken = clientToken as? String
+    let normalizedDeviceToken = deviceToken as? String
     let normalizedSourceId = sourceId as? String
-    let defaultShouldRefreshClient = normalizedClientToken?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true
-    let normalizedShouldRefreshClient = (shouldRefreshClient as? Bool) ?? defaultShouldRefreshClient
     Task {
       do {
-        try await ClerkNativeBridge.shared.syncFromJsClientToken(
-          normalizedClientToken,
+        try await ClerkNativeBridge.shared.syncClientStateFromJs(
+          deviceToken: normalizedDeviceToken,
           sourceId: normalizedSourceId,
-          shouldRefreshClient: normalizedShouldRefreshClient
+          didChangeClient: didChangeClient,
+          didChangeDeviceToken: didChangeDeviceToken
         )
         resolve(nil)
       } catch {
