@@ -96,6 +96,68 @@ const loader = createMachine({
 That's the whole flow, as one readable object. Notice there's no way to be in
 `loading` _and_ have an `error` — the shape forbids it.
 
+### Eliminating boilerplate with `setup`
+
+Once a machine grows beyond a few states, explicitly repeating the context and
+event types on every `assign` call gets noisy:
+
+```ts
+// Without setup — types must be restated every time
+assign<LoaderContext, Extract<LoaderEvent, { type: 'SET_QUERY' }>>((_, e) => ({
+  query: e.query,
+}));
+```
+
+`setup<TContext, TEvent>()` pre-binds both types once per file and returns
+factory functions that don't require repeating them:
+
+```ts
+import { setup } from '@/mosaic/machine/setup';
+
+const { createMachine, assign } = setup<LoaderContext, LoaderEvent>();
+
+const loader = createMachine({
+  // no <LoaderContext, LoaderEvent> needed
+  initial: 'idle',
+  context: { query: '', data: null, error: null },
+  states: {
+    idle: {
+      on: {
+        SET_QUERY: {
+          actions: assign((_, e) => ({ query: e.query })), // e: { type: 'SET_QUERY'; query: string } ✓
+        },
+        FETCH: 'loading',
+      },
+    },
+    loading: {
+      invoke: {
+        src: async ctx => fetchData(ctx.query),
+        onDone: {
+          target: 'success',
+          actions: assign((_, e) => ({ data: String(e.output), error: null })), // e: DoneInvokeEvent<unknown>
+        },
+        onError: {
+          target: 'failure',
+          actions: assign((_, e) => ({ error: String(e.error) })), // e: ErrorInvokeEvent
+        },
+      },
+    },
+    success: {},
+    failure: { on: { FETCH: 'loading' } },
+  },
+});
+```
+
+The `assign` returned by `setup` narrows the event type from its position:
+
+- Inside `on['SET_QUERY']` → `e: { type: 'SET_QUERY'; query: string }`
+- Inside `onDone` → `e: DoneInvokeEvent<unknown>`
+- Inside `onError` → `e: ErrorInvokeEvent`
+- Inside `after[delay]` → `e: AfterEvent`
+
+You no longer need to import `DoneInvokeEvent`, `ErrorInvokeEvent`, or `AfterEvent`
+in machine files — they flow through contextual typing automatically.
+
 ### Running it
 
 A machine on its own does nothing — it's just a description. To run it you wrap

@@ -3,7 +3,8 @@ import { describe, expectTypeOf, test } from 'vitest';
 import { assign } from './assign';
 import { createActor } from './createActor';
 import { createMachine } from './createMachine';
-import type { Snapshot } from './types';
+import { setup } from './setup';
+import type { Snapshot, StateMachine } from './types';
 
 // ─── Shared fixture ──────────────────────────────────────────────────────────
 
@@ -201,6 +202,69 @@ describe('createMachine — TStates constrains initial and transition targets', 
           on: { SIMPLE: 'nonexistent' },
         },
         active: {},
+      },
+    });
+  });
+});
+
+// ─── setup — pre-binds TContext and TEvent ───────────────────────────────────
+
+describe('setup — eliminates repetitive generic params', () => {
+  const { createMachine: make, assign: a } = setup<TestContext, TestEvent>();
+
+  test('createMachine compiles without explicit type parameters', () => {
+    const m = make({
+      initial: 'idle',
+      context: { count: 0, label: '' },
+      states: { idle: { on: { SIMPLE: 'idle' } } },
+    });
+    expectTypeOf(m).toMatchTypeOf<StateMachine<TestContext, TestEvent>>();
+  });
+
+  test('assign in on handler infers the narrowed event type — no Extract<> needed', () => {
+    make({
+      initial: 'idle',
+      context: { count: 0, label: '' },
+      states: {
+        idle: {
+          on: {
+            WITH_PAYLOAD: {
+              // e should be { type: 'WITH_PAYLOAD'; value: string }, not the full union
+              actions: a((_, e) => {
+                expectTypeOf(e).toEqualTypeOf<{ type: 'WITH_PAYLOAD'; value: string }>();
+                return { label: e.value };
+              }),
+            },
+          },
+        },
+      },
+    });
+  });
+
+  test('assign context return type is enforced — rejects unknown keys', () => {
+    make({
+      initial: 'idle',
+      context: { count: 0, label: '' },
+      states: {
+        idle: {
+          on: {
+            SIMPLE: {
+              // @ts-expect-error — 'unknown_key' is not in TestContext
+              actions: a(() => ({ unknown_key: true })),
+            },
+          },
+        },
+      },
+    });
+  });
+
+  test('on key constraint still holds — unknown event types are rejected', () => {
+    make({
+      initial: 'idle',
+      context: { count: 0, label: '' },
+      states: {
+        // @ts-expect-error — 'UNKNOWN_EVENT' is not in TestEvent['type']
+        idle: { on: { UNKNOWN_EVENT: 'idle' } },
       },
     });
   });

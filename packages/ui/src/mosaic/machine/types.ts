@@ -112,8 +112,13 @@ export interface StateConfig<TContext, TEvent extends EventObject, TStates exten
    * via closure rather than `context` — pair with {@link Actor.recheck}.
    */
   guard?: Guard<TContext, TEvent>;
-  /** Event-name → transition map. Constrained to event types in the machine's TEvent union. */
-  on?: Partial<Record<TEvent['type'], Transition<TContext, TEvent, TStates>>>;
+  /**
+   * Event-name → transition map. Each key is constrained to `TEvent['type']`
+   * and the transition's guards/actions receive the narrowed event member —
+   * e.g. a guard under `on['SUBMIT']` sees `Extract<TEvent, { type: 'SUBMIT' }>`,
+   * not the full union.
+   */
+  on?: { [K in TEvent['type']]?: Transition<TContext, Extract<TEvent, { type: K }>, TStates> };
   /** Eventless / immediate transitions, evaluated on entry and on {@link Actor.recheck}. */
   always?: Transition<TContext, TEvent, TStates>;
   /**

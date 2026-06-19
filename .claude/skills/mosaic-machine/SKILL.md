@@ -9,20 +9,29 @@ description: >
 
 # Mosaic Machine
 
-Imports live in `packages/ui/src/mosaic/machine/`.
+Core imports live in `packages/ui/src/mosaic/machine/`.
 
 ```ts
-import { createMachine } from './createMachine';
+import { setup } from './setup'; // primary: pre-binds TContext + TEvent
 import { createActor, mockActor } from './createActor';
-import { assign } from './assign';
 import { useMachine, useActor, useSelector } from './useMachine';
+
+// Lower-level (only when not using setup):
+import { createMachine } from './createMachine';
+import { assign } from './assign';
 ```
 
 ---
 
 ## Anatomy
 
+Use `setup<TContext, TEvent>()` at the top of each machine file. It pre-binds
+both type parameters, returning a typed `createMachine` and `assign` so you
+never have to restate them at call sites.
+
 ```ts
+import { setup } from './setup';
+
 // 1. Define context type — flat object, null defaults for optional fields.
 interface MyContext {
   data: string | null;
@@ -32,9 +41,13 @@ interface MyContext {
 // 2. Define the event union — SCREAMING_SNAKE_CASE types.
 type MyEvent = { type: 'FETCH' } | { type: 'RETRY' } | { type: 'RESET' };
 
-// 3. Factory when async deps are needed; plain createMachine() when not.
+// 3. Pre-bind types once for the file.
+const { createMachine, assign } = setup<MyContext, MyEvent>();
+
+// 4. Factory when async deps are needed; plain createMachine() when not.
 export function createMyMachine(fetchData: () => Promise<string>) {
-  return createMachine<MyContext, MyEvent>({
+  return createMachine({
+    // no <MyContext, MyEvent> needed
     id: 'my',
     initial: 'idle',
     context: { data: null, error: null },
@@ -47,11 +60,13 @@ export function createMyMachine(fetchData: () => Promise<string>) {
           src: () => fetchData(),
           onDone: {
             target: 'success',
-            actions: assign((_, event) => ({ data: event.output, error: null })),
+            // event type is DoneInvokeEvent<unknown> — inferred, no import needed
+            actions: assign((_, e) => ({ data: String(e.output), error: null })),
           },
           onError: {
             target: 'failure',
-            actions: assign((_, event) => ({ error: String(event.error) })),
+            // event type is ErrorInvokeEvent — inferred, no import needed
+            actions: assign((_, e) => ({ error: String(e.error) })),
           },
         },
       },
@@ -63,6 +78,16 @@ export function createMyMachine(fetchData: () => Promise<string>) {
   });
 }
 ```
+
+`assign`'s second type parameter is inferred from its position:
+
+- Inside `on['SOME_EVENT']` → narrowed to that event member (e.g. `e.value` is safe)
+- Inside `onDone` → `DoneInvokeEvent<unknown>`
+- Inside `onError` → `ErrorInvokeEvent`
+- Inside `after[delay]` → `AfterEvent`
+
+You do **not** need to import or write `DoneInvokeEvent`, `ErrorInvokeEvent`, `AfterEvent`,
+or `Extract<Event, { type: 'X' }>` in machine files.
 
 ---
 
