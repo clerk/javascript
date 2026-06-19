@@ -65,6 +65,9 @@ function SignUpStartInternal(): JSX.Element {
   );
 
   const [missingRequirementsWithTicket, setMissingRequirementsWithTicket] = React.useState(false);
+  // When the captcha escalates to an interactive challenge, spotlight it by collapsing/inerting the
+  // rest of the card (see the descriptors.main column below).
+  const [captchaIsInteractive, setCaptchaIsInteractive] = React.useState(false);
 
   const {
     userSettings: { passwordSettings, usernameSettings },
@@ -428,6 +431,13 @@ function SignUpStartInternal(): JSX.Element {
               direction='col'
               elementDescriptor={descriptors.main}
               gap={6}
+              // @ts-ignore - `inert` is not yet in the installed React types
+              inert={captchaIsInteractive ? '' : undefined}
+              // `display:none` (not `visibility:hidden`) so the collapsed column leaves flex flow and
+              // contributes no `gap` gutter to `Card.Content` — otherwise it injects empty space above
+              // the spotlighted captcha. Subtree stays mounted (form state preserved); `inert` is then
+              // redundant-but-harmless.
+              sx={captchaIsInteractive ? { display: 'none' } : undefined}
             >
               <SocialButtonsReversibleContainerWithDivider>
                 {(showOauthProviders || showWeb3Providers || showAlternativePhoneCodeProviders) && (
@@ -450,8 +460,11 @@ function SignUpStartInternal(): JSX.Element {
                   />
                 )}
               </SocialButtonsReversibleContainerWithDivider>
-              {!shouldShowForm && <CaptchaElement />}
             </Flex>
+            <CaptchaElement
+              gapless
+              onInteractiveChange={setCaptchaIsInteractive}
+            />
           </Card.Content>
 
           <Card.Footer>

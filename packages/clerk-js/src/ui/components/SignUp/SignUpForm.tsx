@@ -5,7 +5,6 @@ import { LegalCheckbox } from '@/ui/elements/LegalConsentCheckbox';
 import type { FormControlState } from '@/ui/utils/useFormControl';
 
 import { Col, localizationKeys, useAppearance } from '../../customizables';
-import { CaptchaElement } from '../../elements/CaptchaElement';
 import { mqu } from '../../styledSystem';
 import type { ActiveIdentifier, Fields } from './signUpFormHelpers';
 
@@ -115,7 +114,6 @@ export const SignUpForm = (props: SignUpFormProps) => {
         </Col>
       )}
       <Col center>
-        <CaptchaElement />
         <Col
           gap={6}
           sx={{
