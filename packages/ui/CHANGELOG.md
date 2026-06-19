@@ -1,5 +1,27 @@
 # @clerk/ui
 
+## 1.18.1
+
+### Patch Changes
+
+- Improve the accessible label for identity edit buttons in verification flows. ([#8902](https://github.com/clerk/javascript/pull/8902)) by [@austincalvelage](https://github.com/austincalvelage)
+
+- Remove hidden password input from accessibility tree when hidden ([#8899](https://github.com/clerk/javascript/pull/8899)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add support for the `inert` attribute usage under React 19. Inert content is now correctly non-interactive on both React 18 and 19. ([#8820](https://github.com/clerk/javascript/pull/8820)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix checkbox default styles when using the simple theme. ([#8922](https://github.com/clerk/javascript/pull/8922)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Improve Menu keyboard navigation and accessibility. Menus now support `Enter`/`Space` to open from the trigger, `ArrowDown`/`ArrowUp`/`Home`/`End` to move focus, `Escape` to close and return focus to the trigger, and skip disabled items during arrow-key navigation. Menus no longer mark the rest of the page as `aria-hidden` while open, so assistive technologies can still reach surrounding content. ([#8333](https://github.com/clerk/javascript/pull/8333)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- The SSO setup flow now ends on an explicit Activate step: after configuring and testing a connection you confirm activation with an Activate SSO action (or skip and activate later) instead of a static confirmation summary. ([#8882](https://github.com/clerk/javascript/pull/8882)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Fix the X (formerly Twitter) provider logo being nearly invisible in dark mode by recoloring it to match the foreground color, consistent with other monochrome provider icons. ([#8912](https://github.com/clerk/javascript/pull/8912)) by [@jordan-bott](https://github.com/jordan-bott)
+
+- Updated dependencies [[`c84f8df`](https://github.com/clerk/javascript/commit/c84f8df4222c212ecce6ae5ff8c47958b5b5d972), [`53e7b11`](https://github.com/clerk/javascript/commit/53e7b11058096d5ce15da53af12fe7236e88db2c), [`e51e22a`](https://github.com/clerk/javascript/commit/e51e22a2aec03293e8ccf5a5372cd9906aeccbb7)]:
+  - @clerk/localizations@4.9.1
+  - @clerk/shared@4.19.1
+
 ## 1.18.0
 
 ### Minor Changes

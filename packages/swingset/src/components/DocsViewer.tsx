@@ -25,9 +25,11 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   },
   components: {
     button: dynamic(() => import('../stories/button.mdx')),
+    card: dynamic(() => import('../stories/card.component.mdx')),
     input: dynamic(() => import('../stories/input.mdx')),
     dialog: dynamic(() => import('../stories/dialog.component.mdx')),
     heading: dynamic(() => import('../stories/heading.mdx')),
+    icon: dynamic(() => import('../stories/icon.mdx')),
     tabs: dynamic(() => import('../stories/tabs.component.mdx')),
     text: dynamic(() => import('../stories/text.mdx')),
   },
@@ -42,6 +44,10 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     select: dynamic(() => import('../stories/select.mdx')),
     tabs: dynamic(() => import('../stories/tabs.mdx')),
     tooltip: dynamic(() => import('../stories/tooltip.mdx')),
+  },
+  hooks: {
+    // Headless hooks — alphabetical.
+    'use-data-table': dynamic(() => import('../stories/use-data-table.mdx')),
   },
 };
 

@@ -35,6 +35,7 @@ type RefreshableClientResource = ClientResource & {
 
 type NativeRefreshFromJsOptions = {
   clientToken?: string | null;
+  shouldRefreshClient: boolean;
 };
 
 export type NativeRefreshFromJsController = {
@@ -353,13 +354,19 @@ function mergePendingNativeRefreshOptions(
     return next;
   }
 
-  if ('clientToken' in next) {
-    return {
-      clientToken: next.clientToken ?? null,
-    };
+  const merged: NativeRefreshFromJsOptions = {
+    shouldRefreshClient: current.shouldRefreshClient || next.shouldRefreshClient,
+  };
+
+  if ('clientToken' in current) {
+    merged.clientToken = current.clientToken ?? null;
   }
 
-  return current;
+  if ('clientToken' in next) {
+    merged.clientToken = next.clientToken ?? null;
+  }
+
+  return merged;
 }
 
 async function getCachedClientToken(tokenCache: TokenCache | undefined): Promise<string | null> {
@@ -529,10 +536,6 @@ export function NativeClientSync({
 
   const queueNativeRefreshFromJs = useCallback((options: NativeRefreshFromJsOptions): void => {
     if (isRefreshingNativeFromJsRef.current) {
-      if (!('clientToken' in options)) {
-        return;
-      }
-
       pendingNativeRefreshRef.current = mergePendingNativeRefreshOptions(pendingNativeRefreshRef.current, options);
       nativeRefreshGenerationRef.current += 1;
       return;
@@ -557,7 +560,7 @@ export function NativeClientSync({
       }
 
       const sourceId = `${nativeClientSyncSourceIdPrefix}-${generation}`;
-      await ClerkExpo.syncFromJsClientToken(bearerToken, sourceId);
+      await ClerkExpo.syncFromJsClientToken(bearerToken, sourceId, options.shouldRefreshClient);
     };
 
     let latestRunGeneration = initialGeneration;
@@ -575,7 +578,7 @@ export function NativeClientSync({
             console.warn('[NativeClientSync] Failed to refresh native client from JS client change:', error);
           }
         }
-        pendingOptions = pendingNativeRefreshRef.current ?? {};
+        pendingOptions = pendingNativeRefreshRef.current ?? { shouldRefreshClient: false };
         if (pendingNativeRefreshRef.current !== null) {
           generation = nativeRefreshGenerationRef.current + 1;
           nativeRefreshGenerationRef.current = generation;
@@ -590,7 +593,7 @@ export function NativeClientSync({
 
   useEffect(() => {
     const listener: ClientTokenCacheListener = clientToken => {
-      queueNativeRefreshFromJs({ clientToken });
+      queueNativeRefreshFromJs({ clientToken, shouldRefreshClient: clientToken === null });
     };
     const tokenCacheListeners = tokenCacheListenersRef.current;
 
@@ -670,7 +673,7 @@ export function NativeClientSync({
           return;
         }
 
-        queueNativeRefreshFromJs({});
+        queueNativeRefreshFromJs({ shouldRefreshClient: true });
       },
       { skipInitialEmit: true },
     );

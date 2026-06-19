@@ -6,11 +6,15 @@ const mocks = vi.hoisted(() => ({
   requireNativeModule: vi.fn(() => undefined as unknown),
 }));
 
-const makeNativeModule = () => ({
-  addListener: vi.fn(),
+const makeNativeModule = ({ includeEventMethods = true } = {}) => ({
+  ...(includeEventMethods
+    ? {
+        addListener: vi.fn(),
+        removeListeners: vi.fn(),
+      }
+    : {}),
   configure: vi.fn(),
   getClientToken: vi.fn(),
-  removeListeners: vi.fn(),
   syncFromJsClientToken: vi.fn(),
 });
 
@@ -41,7 +45,7 @@ describe('native module loader', () => {
     mocks.requireNativeModule.mockImplementation(() => mocks.expoModule);
   });
 
-  test('returns the generated native module when it satisfies the sync contract', async () => {
+  test('returns the generated native module when it satisfies the bootstrap contract', async () => {
     mocks.nativeModule = makeNativeModule();
 
     const { ClerkExpoModule } = await importNativeModule();
@@ -49,7 +53,15 @@ describe('native module loader', () => {
     expect(ClerkExpoModule).toBe(mocks.nativeModule);
   });
 
-  test('returns null when no native module satisfies the sync contract', async () => {
+  test('returns the generated Android module when it satisfies the bootstrap contract without event methods', async () => {
+    mocks.nativeModule = makeNativeModule({ includeEventMethods: false });
+
+    const { ClerkExpoModule } = await importNativeModule();
+
+    expect(ClerkExpoModule).toBe(mocks.nativeModule);
+  });
+
+  test('returns null when no native module satisfies the bootstrap contract', async () => {
     mocks.nativeModule = {
       configure: vi.fn(),
     };
