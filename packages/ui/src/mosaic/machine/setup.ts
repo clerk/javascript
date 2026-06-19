@@ -1,6 +1,15 @@
 import { assign as _assign } from './assign';
 import { createMachine as _createMachine } from './createMachine';
-import type { AssignAction, EventObject, MachineConfig, StateMachine } from './types';
+import type {
+  AssignAction,
+  DoneInvokeEvent,
+  ErrorInvokeEvent,
+  EventObject,
+  InvokeConfig,
+  MachineConfig,
+  StateMachine,
+  Transition,
+} from './types';
 
 /**
  * Pre-bind `TContext` and `TEvent` once per machine file, returning factory
@@ -37,5 +46,39 @@ export function setup<TContext extends object, TEvent extends EventObject>() {
     assign: <TEvt extends EventObject = EventObject>(
       fn: (context: TContext, event: TEvt) => Partial<TContext>,
     ): AssignAction<TContext, TEvt> => _assign<TContext, TEvt>(fn),
+
+    /**
+     * Wraps an async function so its resolved type flows into `onDone.actions`.
+     * Mirrors XState v5's `fromPromise<TOutput>()` — a typed wrapper that carries
+     * `TOutput` to `DoneInvokeEvent<TOutput>` without needing a full actor registry.
+     *
+     * ```ts
+     * const { createMachine, assign, fromPromise } = setup<Ctx, Event>();
+     *
+     * states: {
+     *   loading: {
+     *     invoke: fromPromise(
+     *       ctx => ctx.fetchFn(),                              // infers TOutput = Resource
+     *       { onDone: { target: 'success',
+     *                   actions: assign((_, e) => ({ data: e.output })) } }, // e.output: Resource ✓
+     *     ),
+     *   },
+     * }
+     * ```
+     *
+     * A raw `src` function (without `fromPromise`) still works — `e.output` is `any`.
+     */
+    fromPromise: <TOutput, TStates extends string = string>(
+      fn: (context: TContext) => Promise<TOutput>,
+      config?: {
+        onDone?: Transition<TContext, DoneInvokeEvent<TOutput>, TStates>;
+        onError?: Transition<TContext, ErrorInvokeEvent, TStates>;
+      },
+    ): InvokeConfig<TContext, TEvent, TOutput, TStates> => ({
+      // Cast needed: fn only uses context (no event param), but InvokeConfig.src
+      // signature accepts (context, event) for parity with state-entry event access.
+      src: fn as unknown as InvokeConfig<TContext, TEvent, TOutput, TStates>['src'],
+      ...config,
+    }),
   };
 }

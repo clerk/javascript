@@ -434,6 +434,172 @@ they are.**
 
 ---
 
+## Migration 4 (Medium): competing entry points — social buttons + email
+
+**Archetype:** multiple triggers for the same async flow where the UI needs
+to know _which_ trigger is active (to show a spinner on that specific control)
+
+**Source:** `components/SignIn/SignInStart.tsx` — the social OAuth buttons
+plus the email/phone identifier form on the same screen.
+
+### Before
+
+Two hooks coordinate card-level and button-level loading state:
+
+```tsx
+const status = useLoadingStatus(); // 'idle' | 'loading' | 'error'
+const card = useCardState(); // separate card-level loading + error
+
+// Clicking a social button:
+const handleOAuthClick = async strategy => {
+  status.setLoading();
+  card.setLoading();
+  try {
+    await signIn.authenticateWithRedirect({ strategy });
+  } catch (err) {
+    handleError(err, [], card.setError);
+  } finally {
+    status.setIdle();
+    card.setIdle();
+  }
+};
+
+// Submitting the identifier form:
+const handleSubmit = async e => {
+  status.setLoading();
+  card.setLoading();
+  try {
+    await signIn.create({ identifier });
+    wizard.nextStep();
+  } catch (err) {
+    handleError(err, [identifierField], card.setError);
+  } finally {
+    status.setIdle();
+    card.setIdle();
+  }
+};
+```
+
+The component then disables all buttons with `status.isLoading` and shows a
+spinner on whichever button was clicked by passing the strategy down as a
+separate prop or via a ref. Two sync calls per async entry point, a
+load-bearing `finally` in each, and nothing that prevents both handlers
+from calling `setLoading` simultaneously.
+
+### After
+
+A single `submitting` state with `activeStrategy` in context replaces both hooks:
+
+```ts
+import { setup } from '@/mosaic/machine/setup';
+
+interface SignInStartContext {
+  activeStrategy: OAuthStrategy | 'email' | null;
+  identifier: string;
+  error: string | null;
+  signInFn: (params: SignInCreateParams) => Promise<SignInResource>;
+}
+
+type SignInStartEvent =
+  | { type: 'CLICK_SOCIAL'; strategy: OAuthStrategy }
+  | { type: 'TYPE_IDENTIFIER'; value: string }
+  | { type: 'SUBMIT_IDENTIFIER' };
+
+const { createMachine, assign } = setup<SignInStartContext, SignInStartEvent>();
+
+export function createSignInStartMachine(deps: { signInFn: SignInStartContext['signInFn'] }) {
+  return createMachine({
+    initial: 'idle',
+    context: { activeStrategy: null, identifier: '', error: null, signInFn: deps.signInFn },
+    states: {
+      idle: {
+        on: {
+          CLICK_SOCIAL: {
+            target: 'submitting',
+            actions: assign((_, e) => ({ activeStrategy: e.strategy })),
+          },
+          TYPE_IDENTIFIER: {
+            actions: assign((_, e) => ({ identifier: e.value, error: null })),
+          },
+          SUBMIT_IDENTIFIER: {
+            target: 'submitting',
+            actions: assign(() => ({ activeStrategy: 'email' as const })),
+          },
+        },
+      },
+      submitting: {
+        // Both entry points converge here. idle's on-handlers are inactive,
+        // so a second CLICK_SOCIAL while already submitting is dropped automatically.
+        invoke: {
+          src: ctx =>
+            ctx.activeStrategy === 'email'
+              ? ctx.signInFn({ identifier: ctx.identifier })
+              : ctx.signInFn({ strategy: ctx.activeStrategy! }),
+          onDone: 'success',
+          onError: {
+            target: 'idle',
+            actions: assign((_, e) => ({ error: String(e.error), activeStrategy: null })),
+          },
+        },
+      },
+      success: { type: 'final' },
+    },
+  });
+}
+```
+
+In React, `isLocked` replaces `card.setLoading()` and `activeStrategy`
+replaces the per-button `status.isLoading` check:
+
+```tsx
+const [snapshot, send] = useMachine(signInStartMachine, {
+  context: { signInFn: params => signIn.create(params) },
+  onDone: () => setActive({ session: signIn.createdSessionId }),
+});
+
+const isLocked = snapshot.value === 'submitting';
+const active = snapshot.context.activeStrategy;
+
+// Social buttons:
+{oauthStrategies.map(strategy => (
+  <SocialButton
+    key={strategy}
+    disabled={isLocked}
+    isLoading={isLocked && active === strategy}
+    onClick={() => send({ type: 'CLICK_SOCIAL', strategy })}
+  />
+))}
+
+// Identifier form:
+<input
+  disabled={isLocked}
+  onChange={e => send({ type: 'TYPE_IDENTIFIER', value: e.target.value })}
+/>
+<SubmitButton
+  disabled={isLocked}
+  isLoading={isLocked && active === 'email'}
+  onClick={() => send({ type: 'SUBMIT_IDENTIFIER' })}
+/>
+{snapshot.context.error && <FieldError>{snapshot.context.error}</FieldError>}
+```
+
+### What collapsed
+
+| Before                                          | After                                                   |
+| ----------------------------------------------- | ------------------------------------------------------- |
+| `card.setLoading()` (disables everything)       | `snapshot.value === 'submitting'`                       |
+| Per-button `status.isLoading` (which one spins) | `snapshot.context.activeStrategy === strategy`          |
+| `card.setError(msg)`                            | `snapshot.context.error`                                |
+| `finally` block in each handler (load-bearing)  | gone — `invoke` always exits `submitting`               |
+| Two handlers racing on `setLoading`             | impossible — `CLICK_SOCIAL` not handled in `submitting` |
+| Logic testable only with React                  | pure actor test, no rendering needed                    |
+
+**Net: `useLoadingStatus` + `useCardState` → 1 machine. "Which button is
+spinning" falls out of context rather than requiring a separate tracking
+mechanism. Simultaneous triggers made unrepresentable.**
+
+---
+
 ## When NOT to reach for a machine
 
 A machine earns its keep when **two or more** of these are true:

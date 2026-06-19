@@ -269,3 +269,104 @@ describe('setup — eliminates repetitive generic params', () => {
     });
   });
 });
+
+// ─── setup.fromPromise — typed invoke output ──────────────────────────────────
+
+type FetchContext = { url: string; data: string | null; error: string | null };
+type FetchEvent = { type: 'FETCH' } | { type: 'RESET' };
+
+interface FetchResult {
+  body: string;
+  status: number;
+}
+
+describe('setup.fromPromise — e.output is typed from src return type', () => {
+  const { createMachine: make2, assign: a2, fromPromise } = setup<FetchContext, FetchEvent>();
+
+  // Typed async function — fromPromise infers TOutput = FetchResult from its return type.
+  const fakeFetch = (ctx: FetchContext): Promise<FetchResult> => Promise.resolve({ body: ctx.url, status: 200 });
+
+  test('e.output in onDone is typed to TOutput, not unknown or any', () => {
+    make2({
+      initial: 'idle',
+      context: { url: '', data: null, error: null },
+      states: {
+        idle: { on: { FETCH: 'loading' } },
+        loading: {
+          invoke: fromPromise(fakeFetch, {
+            onDone: {
+              target: 'idle',
+              actions: a2((_, e) => {
+                // e.output should be FetchResult, not unknown or any
+                expectTypeOf(e.output).toEqualTypeOf<FetchResult>();
+                return { data: e.output.body };
+              }),
+            },
+          }),
+        },
+      },
+    });
+  });
+
+  test('e.output allows accessing known fields without a cast', () => {
+    make2({
+      initial: 'idle',
+      context: { url: '', data: null, error: null },
+      states: {
+        idle: { on: { FETCH: 'loading' } },
+        loading: {
+          invoke: fromPromise(fakeFetch, {
+            onDone: {
+              target: 'idle',
+              // Accessing .body and .status directly — no cast needed
+              actions: a2((_, e) => ({ data: e.output.body + e.output.status })),
+            },
+          }),
+        },
+      },
+    });
+  });
+
+  test('assign context return type still enforced inside fromPromise onDone', () => {
+    make2({
+      initial: 'idle',
+      context: { url: '', data: null, error: null },
+      states: {
+        idle: { on: { FETCH: 'loading' } },
+        loading: {
+          invoke: fromPromise(fakeFetch, {
+            onDone: {
+              target: 'idle',
+              // @ts-expect-error — 'unknown_key' is not in FetchContext
+              actions: a2(() => ({ unknown_key: true })),
+            },
+          }),
+        },
+      },
+    });
+  });
+
+  test('a raw src function still works — e.output is any', () => {
+    make2({
+      initial: 'idle',
+      context: { url: '', data: null, error: null },
+      states: {
+        idle: { on: { FETCH: 'loading' } },
+        loading: {
+          invoke: {
+            // Raw function: output type is not carried through
+            src: async (ctx: FetchContext) => Promise.resolve(ctx.url),
+            onDone: {
+              target: 'idle',
+              actions: a2((_, e) => {
+                // any — document that fromPromise is required for typed output
+                expectTypeOf(e.output).toBeAny();
+                return {};
+              }),
+            },
+          },
+        },
+      },
+    });
+  });
+});

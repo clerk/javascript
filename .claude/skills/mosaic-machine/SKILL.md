@@ -9,6 +9,8 @@ description: >
 
 # Mosaic Machine
 
+> **XState-first rule:** Before designing any library feature or changing any API, look up how XState v5 handles the same pattern and align to it. Never invent new API shapes.
+
 Core imports live in `packages/ui/src/mosaic/machine/`.
 
 ```ts
@@ -20,6 +22,8 @@ import { useMachine, useActor, useSelector } from './useMachine';
 import { createMachine } from './createMachine';
 import { assign } from './assign';
 ```
+
+`setup<TContext, TEvent>()` returns `{ createMachine, assign, fromPromise }`. Use `fromPromise` for all `invoke` configurations — it carries the resolved type to `e.output` in `onDone.actions`.
 
 ---
 
@@ -42,7 +46,7 @@ interface MyContext {
 type MyEvent = { type: 'FETCH' } | { type: 'RETRY' } | { type: 'RESET' };
 
 // 3. Pre-bind types once for the file.
-const { createMachine, assign } = setup<MyContext, MyEvent>();
+const { createMachine, assign, fromPromise } = setup<MyContext, MyEvent>();
 
 // 4. Factory when async deps are needed; plain createMachine() when not.
 export function createMyMachine(fetchData: () => Promise<string>) {
@@ -56,19 +60,20 @@ export function createMyMachine(fetchData: () => Promise<string>) {
         on: { FETCH: 'loading' },
       },
       loading: {
-        invoke: {
-          src: () => fetchData(),
+        // fromPromise carries the resolved type to e.output in onDone.actions.
+        // A raw src function also works — e.output is `any` in that case.
+        invoke: fromPromise(() => fetchData(), {
           onDone: {
             target: 'success',
-            // event type is DoneInvokeEvent<unknown> — inferred, no import needed
-            actions: assign((_, e) => ({ data: String(e.output), error: null })),
+            // e.output: string — typed from fetchData's return type, no cast needed
+            actions: assign((_, e) => ({ data: e.output, error: null })),
           },
           onError: {
             target: 'failure',
-            // event type is ErrorInvokeEvent — inferred, no import needed
+            // e: ErrorInvokeEvent — inferred, no import needed
             actions: assign((_, e) => ({ error: String(e.error) })),
           },
-        },
+        }),
       },
       success: { type: 'final' },
       failure: {
@@ -82,7 +87,7 @@ export function createMyMachine(fetchData: () => Promise<string>) {
 `assign`'s second type parameter is inferred from its position:
 
 - Inside `on['SOME_EVENT']` → narrowed to that event member (e.g. `e.value` is safe)
-- Inside `onDone` → `DoneInvokeEvent<unknown>`
+- Inside `fromPromise(...).onDone` → `DoneInvokeEvent<TOutput>` where `TOutput` is the src return type
 - Inside `onError` → `ErrorInvokeEvent`
 - Inside `after[delay]` → `AfterEvent`
 

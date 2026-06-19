@@ -135,8 +135,12 @@ export interface StateConfig<TContext, TEvent extends EventObject, TStates exten
    * ```
    */
   after?: { [delay: number]: Transition<TContext, AfterEvent, TStates> };
-  /** A promise to invoke on entry. */
-  invoke?: InvokeConfig<TContext, TEvent, unknown, TStates>;
+  /**
+   * A promise to invoke on entry. Use {@link PromiseSrc} (created by
+   * `setup().fromPromise`) to carry the resolved type to `onDone.actions`.
+   * A raw `src` function is also accepted — `e.output` is `any` in that case.
+   */
+  invoke?: InvokeConfig<TContext, TEvent, any, TStates>;
   /** Actions run when the state is entered. */
   entry?: Actions<TContext, TEvent>;
   /** Actions run when the state is exited. */
