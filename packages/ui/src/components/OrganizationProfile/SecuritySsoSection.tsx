@@ -10,7 +10,7 @@ import { handleError } from '@/utils/errorHandler';
 
 import { useEnvironment } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
-import { Badge, Box, Button, Col, descriptors, Flex, Icon, localizationKeys, Text } from '../../customizables';
+import { Badge, Button, Col, descriptors, Flex, Icon, localizationKeys, Text } from '../../customizables';
 import { useFetchRoles, useLocalizeCustomRoles } from '../../hooks/useFetchRoles';
 import { InformationCircle } from '../../icons';
 import type {
@@ -263,10 +263,7 @@ const SsoDescription = (): JSX.Element => {
   const roleName = useEnrollmentRoleName();
 
   return (
-    <Box
-      as='p'
-      sx={{ margin: 0 }}
-    >
+    <Text as='p'>
       <Text
         as='span'
         elementDescriptor={descriptors.organizationProfileSecuritySsoDescription}
@@ -305,7 +302,7 @@ const SsoDescription = (): JSX.Element => {
           }
         />
       </Tooltip.Root>
-    </Box>
+    </Text>
   );
 };
 
