@@ -10,7 +10,7 @@ import { handleError } from '@/utils/errorHandler';
 
 import { useEnvironment } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
-import { Badge, Button, Col, descriptors, Flex, Icon, localizationKeys, Text } from '../../customizables';
+import { Badge, Box, Button, Col, descriptors, Flex, Icon, localizationKeys, Text } from '../../customizables';
 import { useFetchRoles, useLocalizeCustomRoles } from '../../hooks/useFetchRoles';
 import { InformationCircle } from '../../icons';
 import type {
@@ -263,10 +263,9 @@ const SsoDescription = (): JSX.Element => {
   const roleName = useEnrollmentRoleName();
 
   return (
-    <Flex
-      align='center'
-      wrap='wrap'
-      sx={t => ({ gap: t.space.$1, minWidth: 0 })}
+    <Box
+      as='p'
+      sx={{ margin: 0 }}
     >
       <Text
         as='span'
@@ -283,10 +282,12 @@ const SsoDescription = (): JSX.Element => {
             sx={t => ({
               display: 'inline-flex',
               alignItems: 'center',
+              verticalAlign: 'middle',
               padding: 0,
               height: 'fit-content',
               borderRadius: t.radii.$sm,
               color: t.colors.$colorMutedForeground,
+              marginInlineStart: t.space.$1,
             })}
           >
             <Icon
@@ -304,7 +305,7 @@ const SsoDescription = (): JSX.Element => {
           }
         />
       </Tooltip.Root>
-    </Flex>
+    </Box>
   );
 };
 
