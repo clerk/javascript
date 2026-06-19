@@ -270,10 +270,10 @@ describe('ConfigureSSO wizard navigation (integration)', () => {
 
   // Completion is guard-driven, not positional: re-entering an ACTIVE connection
   // shows every stepper step ticked even after navigating BACK to an earlier step.
-  // A completed (non-current) bullet renders a checkmark instead of its number, so
-  // exactly one bullet — the current one — still shows a digit. Under the old
-  // positional logic the steps AFTER current would lose their tick and show their
-  // numbers again, so this asserts the fix directly.
+  // A completed bullet renders a checkmark regardless of whether it is also the
+  // current step — so for a fully active connection all four bullets show checkmarks
+  // and zero show a digit. Under the old positional logic the steps AFTER current
+  // would lose their tick and show their numbers again, so this asserts the fix directly.
   it('re-entering an active connection keeps every step completed after navigating back', async () => {
     const { wrapper, fixtures } = await createFixtures(withAdminOrgUser);
 
@@ -306,9 +306,9 @@ describe('ConfigureSSO wizard navigation (integration)', () => {
     // The breadcrumb carries all four labels.
     expect(stepperLabels()).toEqual(['Domains', 'Connection', 'Test', 'Activate']);
 
-    // On the terminal step, the first three bullets are already ticked (checkmarks)
-    // and only the current 'Activate' bullet shows its number.
-    expect(bulletDigitCount()).toBe(1);
+    // On the terminal step all four steps are complete, so all four bullets show
+    // checkmarks — including the current 'Activate' step — and zero show a digit.
+    expect(bulletDigitCount()).toBe(0);
 
     // Navigate BACK to the first step via the breadcrumb. Every step's guard still
     // holds for an active connection, so 'Domains' is reachable.
@@ -316,8 +316,9 @@ describe('ConfigureSSO wizard navigation (integration)', () => {
 
     // Positional completion would now un-tick Connection/Test/Activate (they sit
     // AFTER current) and show their numbers. Guard-driven completion keeps them
-    // ticked, so still only the current 'Domains' bullet shows a digit.
-    expect(bulletDigitCount()).toBe(1);
+    // ticked. 'Domains' is also completed, so its bullet shows a checkmark too —
+    // zero bullets show a digit.
+    expect(bulletDigitCount()).toBe(0);
     expect(stepperLabels()).toEqual(['Domains', 'Connection', 'Test', 'Activate']);
   });
 });

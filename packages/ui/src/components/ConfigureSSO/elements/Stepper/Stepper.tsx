@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { Box, descriptors, Flex, Icon, SimpleButton, Text, Span } from '@/customizables';
-import { ChevronRight, Checkmark } from '@/icons';
+import { Box, descriptors, Flex, Icon, SimpleButton, Span,Text } from '@/customizables';
+import { Checkmark, ChevronRight } from '@/icons';
 
 import type { StepperItemProps, StepperProps } from './types';
 
@@ -82,7 +82,7 @@ const Item = ({
               : theme.colors.$colorMutedForeground,
         })}
       >
-        {isCompleted && !isCurrent ? (
+        {isCompleted ? (
           <Icon
             icon={Checkmark}
             size='sm'
