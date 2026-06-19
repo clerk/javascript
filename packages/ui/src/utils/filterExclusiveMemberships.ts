@@ -24,9 +24,7 @@ type FilterExclusiveMembershipsResult<T extends Pick<OrganizationMembershipResou
  * Note: memberships are paginated, so this operates on the currently loaded memberships. Exclusive
  * members are locked to ~1 organization, so pagination is a non-issue for them.
  */
-export const filterExclusiveMemberships = <
-  T extends Pick<OrganizationMembershipResource, 'exclusiveMembership'>,
->(
+export const filterExclusiveMemberships = <T extends Pick<OrganizationMembershipResource, 'exclusiveMembership'>>(
   memberships: T[],
 ): FilterExclusiveMembershipsResult<T> => {
   const hasExclusive = memberships.some(membership => membership.exclusiveMembership);
