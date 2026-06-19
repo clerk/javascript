@@ -587,3 +587,232 @@ describe('pattern: typed invoke output via fromPromise', () => {
     expect(actor.getSnapshot().context.resource?.id).toBe('si_abc');
   });
 });
+
+// ─── Pattern 7: On-mount async (replaces useEffect(fn, [])) ──────────────────
+
+/**
+ * A component that must perform async work immediately on mount and route
+ * based on the result. The classic implementation is:
+ *
+ *   useEffect(() => {
+ *     signIn.create({ strategy: 'ticket', ticket }).then(res => {
+ *       if (res.status === 'needs_first_factor') navigate('factor-one');
+ *       ...
+ *     });
+ *   }, []);
+ *
+ * Machine approach: make the async work the INITIAL state. actor.start() fires
+ * the invoke — no useEffect in the component, no imperative navigate calls.
+ *
+ * The component renders a loading indicator while in `redeeming`, and never
+ * needs to know what "needs_first_factor" means — it just reads snapshot.value.
+ */
+describe('pattern: on-mount async — initial state invokes immediately', () => {
+  type Ctx = { ticket: string; pendingStatus: string };
+  type Evt = { type: 'CANCEL' };
+
+  const { createMachine, assign, fromPromise } = setup<Ctx, Evt>();
+
+  function makeMachine(redeemFn: (ticket: string) => Promise<{ status: string }>) {
+    return createMachine({
+      initial: 'redeeming', // fires on actor.start() — no useEffect needed
+      context: { ticket: '', pendingStatus: '' },
+      states: {
+        redeeming: {
+          invoke: fromPromise(ctx => redeemFn(ctx.ticket), {
+            onDone: {
+              target: 'routing',
+              actions: assign((_, e) => ({ pendingStatus: e.output.status })),
+            },
+            onError: { target: 'failed' },
+          }),
+          on: { CANCEL: 'cancelled' },
+        },
+        routing: {
+          always: [
+            { target: 'firstFactor', guard: ctx => ctx.pendingStatus === 'needs_first_factor' },
+            { target: 'secondFactor', guard: ctx => ctx.pendingStatus === 'needs_second_factor' },
+            { target: 'complete' },
+          ],
+        },
+        firstFactor: {},
+        secondFactor: {},
+        complete: { type: 'final' },
+        failed: {},
+        cancelled: {},
+      },
+    });
+  }
+
+  it('fires the async call immediately on start — no useEffect in the component', async () => {
+    const redeemFn = vi.fn(() => Promise.resolve({ status: 'needs_first_factor' }));
+    const actor = createActor(makeMachine(redeemFn), { context: { ticket: 'org_ticket_123' } });
+    actor.start();
+    expect(actor.getSnapshot().value).toBe('redeeming');
+    expect(redeemFn).toHaveBeenCalledWith('org_ticket_123');
+  });
+
+  it('routes to firstFactor when the ticket resolves to needs_first_factor', async () => {
+    const actor = createActor(
+      makeMachine(() => Promise.resolve({ status: 'needs_first_factor' })),
+      { context: { ticket: 'tk' } },
+    );
+    actor.start();
+    await tick();
+    expect(actor.getSnapshot().value).toBe('firstFactor');
+  });
+
+  it('routes to secondFactor when the ticket resolves to needs_second_factor', async () => {
+    const actor = createActor(
+      makeMachine(() => Promise.resolve({ status: 'needs_second_factor' })),
+      { context: { ticket: 'tk' } },
+    );
+    actor.start();
+    await tick();
+    expect(actor.getSnapshot().value).toBe('secondFactor');
+  });
+
+  it('routes to complete as the fallback', async () => {
+    const actor = createActor(
+      makeMachine(() => Promise.resolve({ status: 'complete' })),
+      { context: { ticket: 'tk' } },
+    );
+    actor.start();
+    await tick();
+    expect(actor.getSnapshot().value).toBe('complete');
+    expect(actor.getSnapshot().status).toBe('done');
+  });
+
+  it('transitions to failed on error', async () => {
+    const actor = createActor(
+      makeMachine(() => Promise.reject(new Error('Invalid ticket'))),
+      { context: { ticket: 'bad' } },
+    );
+    actor.start();
+    await tick();
+    expect(actor.getSnapshot().value).toBe('failed');
+  });
+
+  it('can be cancelled while the invoke is in-flight — late resolve is a no-op', async () => {
+    const gate = deferred<{ status: string }>();
+    const actor = createActor(
+      makeMachine(() => gate.promise),
+      { context: { ticket: 'tk' } },
+    );
+    actor.start();
+    actor.send({ type: 'CANCEL' });
+    expect(actor.getSnapshot().value).toBe('cancelled');
+    gate.resolve({ status: 'complete' });
+    await tick();
+    // Machine stays in cancelled — the in-flight invoke was abandoned
+    expect(actor.getSnapshot().value).toBe('cancelled');
+  });
+});
+
+// ─── Pattern 8: Reactive value → auto-switch (replaces useLayoutEffect) ───────
+
+/**
+ * A sign-in identifier field that auto-switches to phone input when the user
+ * types (or a browser autofills) a value starting with "+".
+ *
+ * Old approach:
+ *   const [hasSwitchedByAutofill, setHasSwitchedByAutofill] = useState(false);
+ *   useLayoutEffect(() => {
+ *     if (value.startsWith('+') && phoneEnabled && fieldType !== 'phone' && !hasSwitchedByAutofill) {
+ *       switchToPhone(value);
+ *       setHasSwitchedByAutofill(true); // prevent re-triggering on subsequent autofills
+ *     }
+ *   }, [value]);
+ *
+ * Machine approach: the TYPE event handler applies the same guard atomically.
+ * `hasAutoSwitched` lives in context alongside the value — no separate useState,
+ * no useLayoutEffect, no risk of the effect firing after unmount.
+ *
+ * The loop-prevention guard (hasAutoSwitched) works the same way; a manual
+ * SWITCH_FIELD event resets it so autofill can trigger once more.
+ */
+describe('pattern: reactive value auto-switch (replaces useLayoutEffect + hasSwitchedByAutofill)', () => {
+  type FieldType = 'text' | 'phone';
+  type Ctx = { value: string; fieldType: FieldType; hasAutoSwitched: boolean };
+  type Evt = { type: 'TYPE'; value: string } | { type: 'SWITCH_FIELD' } | { type: 'SUBMIT' };
+
+  const { createMachine, assign } = setup<Ctx, Evt>();
+
+  function makeMachine(phoneEnabled: boolean) {
+    return createMachine({
+      initial: 'idle',
+      context: { value: '', fieldType: 'text', hasAutoSwitched: false },
+      states: {
+        idle: {
+          on: {
+            TYPE: {
+              // All the useLayoutEffect logic lives here — atomically with the value update.
+              actions: assign((ctx, e) => {
+                const shouldSwitch =
+                  phoneEnabled && e.value.startsWith('+') && ctx.fieldType !== 'phone' && !ctx.hasAutoSwitched;
+                if (shouldSwitch) {
+                  return { value: e.value, fieldType: 'phone' as FieldType, hasAutoSwitched: true };
+                }
+                return { value: e.value };
+              }),
+            },
+            SWITCH_FIELD: {
+              // Manual switch resets the auto-switch guard so autofill can trigger once more.
+              actions: assign(ctx => ({
+                fieldType: (ctx.fieldType === 'text' ? 'phone' : 'text') as FieldType,
+                hasAutoSwitched: false,
+              })),
+            },
+            SUBMIT: 'submitting',
+          },
+        },
+        submitting: { type: 'final' },
+      },
+    });
+  }
+
+  it('switches to phone when value starts with +', () => {
+    const actor = createActor(makeMachine(true));
+    actor.start();
+    actor.send({ type: 'TYPE', value: '+1 555 123 4567' });
+    expect(actor.getSnapshot().context.fieldType).toBe('phone');
+    expect(actor.getSnapshot().context.hasAutoSwitched).toBe(true);
+  });
+
+  it('does not switch again on subsequent autofills — loop prevention', () => {
+    const actor = createActor(makeMachine(true));
+    actor.start();
+    actor.send({ type: 'TYPE', value: '+1 555 123 4567' }); // auto-switches, marks guard
+    actor.send({ type: 'TYPE', value: '+1 999 000 0000' }); // should NOT switch again
+    expect(actor.getSnapshot().context.fieldType).toBe('phone');
+    expect(actor.getSnapshot().context.value).toBe('+1 999 000 0000'); // value still updates
+  });
+
+  it('does not switch when phone is not enabled', () => {
+    const actor = createActor(makeMachine(false));
+    actor.start();
+    actor.send({ type: 'TYPE', value: '+44 20 1234 5678' });
+    expect(actor.getSnapshot().context.fieldType).toBe('text');
+  });
+
+  it('manual SWITCH_FIELD resets the guard so autofill can trigger once more', () => {
+    const actor = createActor(makeMachine(true));
+    actor.start();
+    actor.send({ type: 'TYPE', value: '+1 555' }); // auto-switches to phone, hasAutoSwitched = true
+    actor.send({ type: 'SWITCH_FIELD' }); // user manually switches back to text, resets guard
+    expect(actor.getSnapshot().context.fieldType).toBe('text');
+    expect(actor.getSnapshot().context.hasAutoSwitched).toBe(false);
+    actor.send({ type: 'TYPE', value: '+44 777' }); // autofill can trigger once more
+    expect(actor.getSnapshot().context.fieldType).toBe('phone');
+  });
+
+  it('does not switch when already in phone mode', () => {
+    const actor = createActor(makeMachine(true));
+    actor.start();
+    actor.send({ type: 'SWITCH_FIELD' }); // manually switch to phone
+    const before = actor.getSnapshot();
+    actor.send({ type: 'TYPE', value: '+1 555' }); // already phone — no change to fieldType
+    expect(actor.getSnapshot().context.fieldType).toBe('phone');
+    expect(actor.getSnapshot().context.hasAutoSwitched).toBe(before.context.hasAutoSwitched);
+  });
+});

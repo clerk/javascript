@@ -600,6 +600,171 @@ mechanism. Simultaneous triggers made unrepresentable.**
 
 ---
 
+## Migration 5: useEffect as a machine smell — three patterns from SignInStart
+
+`useEffect(fn, [])` and `useLayoutEffect(fn, [deps])` in a component are almost
+always a sign that logic belongs in a machine instead. `SignInStart.tsx` has
+three concrete examples.
+
+### Pattern A — on-mount async + routing
+
+```tsx
+// Before: a useEffect fires on mount, does async work, and imperatively navigates
+useEffect(() => {
+  if (!organizationTicket) return;
+  signIn
+    .create({ strategy: 'ticket', ticket: organizationTicket })
+    .then(res => {
+      if (res.status === 'needs_first_factor') return navigate('factor-one');
+      if (res.status === 'needs_second_factor') return navigate('factor-two');
+      // ...
+    })
+    .catch(attemptToRecoverFromSignInError);
+}, []);
+```
+
+The machine makes the async call _the initial state_. `actor.start()` fires it;
+the component never needs a `useEffect` or an imperative `navigate`:
+
+```ts
+createMachine({
+  initial: 'redeeming', // ← fires on actor.start()
+  context: { ticket: '', pendingStatus: '' },
+  states: {
+    redeeming: {
+      invoke: fromPromise(ctx => signIn.create({ strategy: 'ticket', ticket: ctx.ticket }), {
+        onDone: {
+          target: 'routing',
+          actions: assign((_, e) => ({ pendingStatus: e.output.status })),
+        },
+        onError: { target: 'failed' },
+      }),
+    },
+    routing: {
+      always: [
+        { target: 'firstFactor', guard: ctx => ctx.pendingStatus === 'needs_first_factor' },
+        { target: 'secondFactor', guard: ctx => ctx.pendingStatus === 'needs_second_factor' },
+        { target: 'complete' },
+      ],
+    },
+    firstFactor: {},
+    secondFactor: {},
+    complete: { type: 'final' },
+    failed: {},
+  },
+});
+```
+
+The component renders `<LoadingCard />` while `snapshot.value === 'redeeming'` and
+lets the router layer (which maps state → route) handle navigation. No domain
+knowledge in the component.
+
+> Proved in `patterns.test.ts` — Pattern 7.
+
+---
+
+### Pattern B — on-mount external state read → error
+
+```tsx
+// Before: a useEffect fires on mount, reads external data, and imperatively sets error
+useEffect(() => {
+  const error = signIn?.firstFactorVerification?.error;
+  if (error) {
+    card.setError(error); // mutates card state imperatively
+    void signIn.create({}); // workaround to reset the attempt
+  }
+}, []);
+```
+
+The machine receives the external data as context at creation time. An `initial`
+function routes immediately — no effect, no imperative call:
+
+```ts
+createMachine({
+  initial: ctx => (ctx.oauthError ? 'oauthError' : 'idle'),
+  context: { oauthError: null, ... },
+  states: {
+    oauthError: {
+      // entry could fire the signIn.create({}) reset if needed
+      on: { DISMISS: 'idle' },
+    },
+    idle: { ... },
+  },
+});
+
+// At creation, pass the external error in:
+const machine = createSignInStartMachine({
+  signInFn: ...,
+  oauthError: signIn.firstFactorVerification?.error ?? null,
+});
+```
+
+The component reads `snapshot.context.oauthError` or branches on
+`snapshot.value === 'oauthError'` — it never calls `card.setError`.
+
+---
+
+### Pattern C — reactive value → auto-switch (replaces useLayoutEffect)
+
+```tsx
+// Before: watches identifierField.value to auto-switch to phone input
+useLayoutEffect(() => {
+  if (
+    identifierField.value.startsWith('+') &&
+    identifierAttributes.includes('phone_number') &&
+    identifierAttribute !== 'phone_number' &&
+    !hasSwitchedByAutofill
+  ) {
+    handlePhoneNumberPaste(identifierField.value);
+    setHasSwitchedByAutofill(true); // prevent re-triggering on subsequent autofills
+  }
+}, [identifierField.value, identifierAttributes]);
+```
+
+The machine puts the same guard inside the `TYPE` event handler. The switch and
+the loop-prevention flag (`hasAutoSwitched`) update atomically with the value:
+
+```ts
+TYPE: {
+  actions: assign((ctx, e) => {
+    const shouldSwitch =
+      phoneEnabled &&
+      e.value.startsWith('+') &&
+      ctx.fieldType !== 'phone' &&
+      !ctx.hasAutoSwitched;
+    if (shouldSwitch) {
+      return { value: e.value, fieldType: 'phone', hasAutoSwitched: true };
+    }
+    return { value: e.value };
+  }),
+},
+SWITCH_FIELD: {
+  // Manual switch resets the guard so autofill can trigger once more
+  actions: assign(ctx => ({
+    fieldType: ctx.fieldType === 'text' ? 'phone' : 'text',
+    hasAutoSwitched: false,
+  })),
+},
+```
+
+`hasSwitchedByAutofill` disappears as a `useState` — it's `ctx.hasAutoSwitched`,
+collocated with the value that drives it.
+
+> Proved in `patterns.test.ts` — Pattern 8.
+
+---
+
+### The rule
+
+| If you see…                                     | It maps to…                                           |
+| ----------------------------------------------- | ----------------------------------------------------- |
+| `useEffect(fn, [])` — async on mount            | Initial state with `invoke`                           |
+| `useEffect(fn, [])` — read external on mount    | `initial` as a function, or `always` in initial state |
+| `useLayoutEffect(fn, [value])` — react to value | `assign` guard inside the event that changes `value`  |
+| `useEffect(fn, [a, b])` — sync two values       | Transition that updates both atomically               |
+
+---
+
 ## When NOT to reach for a machine
 
 A machine earns its keep when **two or more** of these are true:
