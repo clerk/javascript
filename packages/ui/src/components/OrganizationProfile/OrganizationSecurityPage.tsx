@@ -3,8 +3,9 @@ import React, { useState } from 'react';
 
 import { Header } from '@/ui/elements/Header';
 import { ProfileCard } from '@/ui/elements/ProfileCard';
+import { ProfileSection } from '@/ui/elements/Section';
 
-import { Col, descriptors, Icon, localizationKeys, SimpleButton, Text } from '../../customizables';
+import { Col, descriptors, Flex, Icon, localizationKeys, SimpleButton, Spinner, Text } from '../../customizables';
 import { ChevronLeft } from '../../icons';
 import { ConfigureSSOProtect } from '../ConfigureSSO/ConfigureSSO';
 import { ConfigureSSOSkeleton } from '../ConfigureSSO/ConfigureSSOSkeleton';
@@ -49,8 +50,22 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
     setView('wizard');
   };
 
+  // Loading is on mount, where `view` is still 'overview': keep the page chrome
+  // (the "Security" header + the SSO section frame) stable and swap only the
+  // section body for a placeholder, so the settled overview replaces it in place
+  // — no header pop-in, no swap into a differently-shaped wizard skeleton. The
+  // wizard skeleton stays for the rare case loading is ever entered from within
+  // the wizard view itself.
   if (isLoading) {
-    return <ConfigureSSOSkeleton />;
+    return view === 'wizard' ? (
+      <ConfigureSSOSkeleton />
+    ) : (
+      <ConfigureSSOProtect>
+        <SecurityPageOverview>
+          <SecuritySsoSectionSkeleton />
+        </SecurityPageOverview>
+      </ConfigureSSOProtect>
+    );
   }
 
   const backControl = (
@@ -77,34 +92,17 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
   return (
     <ConfigureSSOProtect>
       {view === 'overview' ? (
-        <ProfileCard.Page>
-          <Col
-            elementDescriptor={descriptors.page}
-            sx={t => ({ gap: t.space.$8 })}
-          >
-            <Col
-              elementDescriptor={descriptors.profilePage}
-              elementId={descriptors.profilePage.setId('organizationSecurity')}
-            >
-              <Header.Root>
-                <Header.Title
-                  localizationKey={localizationKeys('organizationProfile.securityPage.title')}
-                  sx={t => ({ marginBottom: t.space.$4 })}
-                  textVariant='h2'
-                />
-              </Header.Root>
-              <SecuritySsoSection
-                connection={organizationEnterpriseConnection}
-                enterpriseConnection={enterpriseConnection}
-                setConnectionActive={enterpriseConnectionMutations.setConnectionActive}
-                deleteConnection={enterpriseConnectionMutations.deleteConnection}
-                organizationName={organization?.name ?? ''}
-                contentRef={contentRef}
-                onConfigure={openWizard}
-              />
-            </Col>
-          </Col>
-        </ProfileCard.Page>
+        <SecurityPageOverview>
+          <SecuritySsoSection
+            connection={organizationEnterpriseConnection}
+            enterpriseConnection={enterpriseConnection}
+            setConnectionActive={enterpriseConnectionMutations.setConnectionActive}
+            deleteConnection={enterpriseConnectionMutations.deleteConnection}
+            organizationName={organization?.name ?? ''}
+            contentRef={contentRef}
+            onConfigure={openWizard}
+          />
+        </SecurityPageOverview>
       ) : (
         <ConfigureSSOWizard
           organizationEnterpriseConnection={organizationEnterpriseConnection}
@@ -122,3 +120,57 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
     </ConfigureSSOProtect>
   );
 };
+
+/**
+ * The overview's stable page chrome — the security `ProfileCard.Page` and its
+ * "Security" header. Both the settled overview and the on-mount loading state
+ * render through this, so the section body is the only thing that swaps in.
+ */
+const SecurityPageOverview = ({ children }: { children: React.ReactNode }): JSX.Element => (
+  <ProfileCard.Page>
+    <Col
+      elementDescriptor={descriptors.page}
+      sx={t => ({ gap: t.space.$8 })}
+    >
+      <Col
+        elementDescriptor={descriptors.profilePage}
+        elementId={descriptors.profilePage.setId('organizationSecurity')}
+      >
+        <Header.Root>
+          <Header.Title
+            localizationKey={localizationKeys('organizationProfile.securityPage.title')}
+            sx={t => ({ marginBottom: t.space.$4 })}
+            textVariant='h2'
+          />
+        </Header.Root>
+        {children}
+      </Col>
+    </Col>
+  </ProfileCard.Page>
+);
+
+/**
+ * Overview-shaped loading placeholder for the SSO section: the real section's
+ * frame (same title + id) wrapping a centered spinner. Mirrors how other
+ * OrganizationProfile sections show in-frame loading rather than swapping in a
+ * differently-shaped skeleton.
+ */
+const SecuritySsoSectionSkeleton = (): JSX.Element => (
+  <ProfileSection.Root
+    title={localizationKeys('organizationProfile.securityPage.ssoSection.title')}
+    id='sso'
+    centered={false}
+  >
+    <Flex
+      align='center'
+      justify='center'
+      sx={t => ({ paddingBlock: t.space.$5 })}
+    >
+      <Spinner
+        size='sm'
+        colorScheme='neutral'
+        elementDescriptor={descriptors.spinner}
+      />
+    </Flex>
+  </ProfileSection.Root>
+);

@@ -61,9 +61,11 @@ describe('OrganizationSecurityPage', () => {
 
       renderPage(wrapper);
 
-      expect(await screen.findByRole('heading', { name: 'Security' })).toBeInTheDocument();
+      // The "Security" header now also renders during the loading placeholder, so
+      // wait on the settled badge before asserting the page chrome and content.
+      expect(await screen.findByText('Unconfigured')).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Security' })).toBeInTheDocument();
       expect(screen.getByText('SSO')).toBeInTheDocument();
-      expect(screen.getByText('Unconfigured')).toBeInTheDocument();
       expect(screen.getByText(DESCRIPTION_LINE_1)).toBeInTheDocument();
       expect(screen.getByText(DESCRIPTION_LINE_2)).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Start configuration' })).toBeInTheDocument();
@@ -183,6 +185,30 @@ describe('OrganizationSecurityPage', () => {
       // The full value stays reachable via the tooltip once the chip truncates visually.
       expect(ssoLink).toHaveAttribute('title', longSsoUrl);
       expect(ssoLink).toHaveStyle({ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' });
+    });
+  });
+
+  describe('loading state', () => {
+    it('renders the overview chrome (the Security header, no wizard stepper) while loading', async () => {
+      const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
+
+      // Hold the source query pending so the page stays in its on-mount loading
+      // state (view is still 'overview').
+      fixtures.clerk.organization?.getEnterpriseConnections.mockReturnValue(new Promise(() => {}) as any);
+      fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
+        data: [],
+        total_count: 0,
+      } as any);
+
+      const { container } = renderPage(wrapper);
+
+      // The page header stays mounted during load — no pop-in when data settles.
+      expect(await screen.findByRole('heading', { name: 'Security' })).toBeInTheDocument();
+      // The SSO section frame is present (overview-shaped), with an in-frame spinner.
+      expect(container.querySelector('.cl-profileSection__sso')).toBeInTheDocument();
+      expect(container.querySelector('.cl-spinner')).toBeInTheDocument();
+      // It is NOT the wizard-shaped skeleton: no stepper renders in the overview load.
+      expect(container.querySelector('.cl-configureSSOStepper')).not.toBeInTheDocument();
     });
   });
 
