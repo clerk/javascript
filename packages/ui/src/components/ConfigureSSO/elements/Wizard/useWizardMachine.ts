@@ -213,8 +213,10 @@ export const useWizardMachine = ({ config, parentWizard, initialStepId }: UseWiz
   // Breadcrumb-facing active steps: every descriptor, in declaration order.
   // Derived synchronously from the live descriptors — known before `current` is
   // resolved, so there is no inconsistency window. Each item carries
-  // `isCompleted` (POSITIONAL: sits before current in declaration order) and
-  // `isReachable` (GUARD-DRIVEN: its entry guard holds now — the single source
+  // `isCompleted` (the step's own `isComplete` predicate when it declares one —
+  // position-INDEPENDENT, so a finished step stays ticked after a back-nav —
+  // otherwise the POSITIONAL fallback: sits before current in declaration order)
+  // and `isReachable` (GUARD-DRIVEN: its entry guard holds now — the single source
   // the stepper binds `isDisabled = !isReachable` to and the same predicate
   // `goToStep` checks). Whether an item appears in the breadcrumb is the header's
   // call (it filters on `label`), not the machine's.
@@ -224,7 +226,9 @@ export const useWizardMachine = ({ config, parentWizard, initialStepId }: UseWiz
     return descriptors.map((s, descriptorIndex) => ({
       id: s.id,
       label: s.label,
-      isCompleted: currentDescriptorIndex >= 0 && descriptorIndex < currentDescriptorIndex,
+      isCompleted: s.isComplete
+        ? s.isComplete()
+        : currentDescriptorIndex >= 0 && descriptorIndex < currentDescriptorIndex,
       isReachable: guardHolds(s),
     }));
   }, [config, current]);

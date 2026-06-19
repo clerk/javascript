@@ -25,6 +25,15 @@ export interface WizardStepConfig {
    * always-reachable predecessor both rely on that.
    */
   guard?: () => boolean;
+  /**
+   * Inline completion predicate: "is THIS step's work done right now?", decoupled
+   * from the current position. Drives the stepper's completed tick so a step reads
+   * as done whenever its own work is, regardless of where the user currently
+   * stands (re-entering an already-finished flow shows every step ticked).
+   * OMITTED ⇒ fall back to the POSITIONAL default (sits before current) — nested /
+   * per-provider wizards that declare no `isComplete` are unchanged.
+   */
+  isComplete?: () => boolean;
 }
 
 /**
@@ -44,8 +53,10 @@ export interface WizardActiveStep {
   id: string;
   label?: LocalizationKey | string;
   /**
-   * POSITIONAL: the step sits before the current step in declaration order.
-   * Drives the visual "completed" tick only — it is not guard-derived.
+   * Whether this step's work is done — drives the visual "completed" tick. Resolved
+   * from the step's own `isComplete` predicate when it declares one (position-
+   * independent: a finished step stays ticked even when the user navigates back),
+   * otherwise the POSITIONAL default (sits before current in declaration order).
    */
   isCompleted: boolean;
   /**

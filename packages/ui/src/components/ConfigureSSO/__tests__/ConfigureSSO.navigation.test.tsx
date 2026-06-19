@@ -267,4 +267,57 @@ describe('ConfigureSSO wizard navigation (integration)', () => {
     expect(getByText('Test')).toBeInTheDocument();
     expect(getByText('Activate')).toBeInTheDocument();
   });
+
+  // Completion is guard-driven, not positional: re-entering an ACTIVE connection
+  // shows every stepper step ticked even after navigating BACK to an earlier step.
+  // A completed (non-current) bullet renders a checkmark instead of its number, so
+  // exactly one bullet — the current one — still shows a digit. Under the old
+  // positional logic the steps AFTER current would lose their tick and show their
+  // numbers again, so this asserts the fix directly.
+  it('re-entering an active connection keeps every step completed after navigating back', async () => {
+    const { wrapper, fixtures } = await createFixtures(withAdminOrgUser);
+
+    fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([
+      { ...configuredConnection, id: 'ent_active', active: true } as any,
+    ]);
+    fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
+      data: [],
+      total_count: 0,
+    } as any);
+    mockVerifiedDomains(fixtures);
+
+    const { container, findByText, userEvent } = render(<ConfigureSSO />, { wrapper });
+
+    // Mounts on the activate step (active connection short-circuits to it).
+    await findByText(/sso connection is active/i);
+
+    const stepper = () => container.querySelector('.cl-configureSSOStepper') as HTMLElement;
+    const bulletDigitCount = () =>
+      Array.from(stepper().querySelectorAll('.cl-configureSSOStepperItemBullet')).filter(el =>
+        /\d/.test(el.textContent ?? ''),
+      ).length;
+    const stepperLabels = () =>
+      Array.from(stepper().querySelectorAll('.cl-configureSSOStepperItemLabel')).map(el => el.textContent);
+    const stepperButton = (label: string) =>
+      Array.from(stepper().querySelectorAll<HTMLButtonElement>('.cl-configureSSOStepperItem')).find(
+        btn => btn.textContent?.trim() === label,
+      )!;
+
+    // The breadcrumb carries all four labels.
+    expect(stepperLabels()).toEqual(['Domains', 'Connection', 'Test', 'Activate']);
+
+    // On the terminal step, the first three bullets are already ticked (checkmarks)
+    // and only the current 'Activate' bullet shows its number.
+    expect(bulletDigitCount()).toBe(1);
+
+    // Navigate BACK to the first step via the breadcrumb. Every step's guard still
+    // holds for an active connection, so 'Domains' is reachable.
+    await userEvent.click(stepperButton('Domains'));
+
+    // Positional completion would now un-tick Connection/Test/Activate (they sit
+    // AFTER current) and show their numbers. Guard-driven completion keeps them
+    // ticked, so still only the current 'Domains' bullet shows a digit.
+    expect(bulletDigitCount()).toBe(1);
+    expect(stepperLabels()).toEqual(['Domains', 'Connection', 'Test', 'Activate']);
+  });
 });

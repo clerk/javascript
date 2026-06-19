@@ -20,13 +20,34 @@ export const ConfigureSSOWizard = ({ title, forceInitialStep, ...props }: Config
 
   const steps = React.useMemo<WizardStepConfig[]>(
     () => [
-      { id: 'verify-domain', label: 'Domains' },
+      // `isComplete` is position-independent (unlike the stepper's positional
+      // default), so re-entering an active connection ticks every step wherever the
+      // user stands. Each mirrors its guard except `activate`, whose completion is
+      // its own terminal `isActive`; `configure` keys off real configuration (or
+      // active), NOT a bare `hasConnection`, so a just-created-but-unconfigured
+      // connection does not read as done.
+      { id: 'verify-domain', label: 'Domains', isComplete: () => allDomainsVerified },
       // `select-provider` now lives inside `configure` as its first sub-step, so
       // reaching `configure` only requires verified domains (fresh start) or an
       // existing connection (resume / change-provider).
-      { id: 'configure', label: 'Connection', guard: () => allDomainsVerified || c.hasConnection },
-      { id: 'test', label: 'Test', guard: () => c.hasMinimumConfiguration || c.isActive },
-      { id: 'activate', label: 'Activate', guard: () => c.hasSuccessfulTestRun || c.isActive },
+      {
+        id: 'configure',
+        label: 'Connection',
+        guard: () => allDomainsVerified || c.hasConnection,
+        isComplete: () => c.hasMinimumConfiguration || c.isActive,
+      },
+      {
+        id: 'test',
+        label: 'Test',
+        guard: () => c.hasMinimumConfiguration || c.isActive,
+        isComplete: () => c.hasSuccessfulTestRun || c.isActive,
+      },
+      {
+        id: 'activate',
+        label: 'Activate',
+        guard: () => c.hasSuccessfulTestRun || c.isActive,
+        isComplete: () => c.isActive,
+      },
     ],
     [c, allDomainsVerified],
   );

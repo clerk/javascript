@@ -202,6 +202,25 @@ describe('useWizardMachine — first/last and reachability derivations', () => {
     expect(byId.a).toBe(true);
     expect(byId.b).toBe(false);
   });
+
+  it('isComplete predicate overrides the positional default (position-independent completion)', () => {
+    // 'a' declares its work UNdone and 'c' declares it DONE — independent of where
+    // current sits. Seed on 'b' (the middle): positionally 'a' would read complete
+    // and 'c' incomplete, but the predicates flip both, proving `isComplete` wins.
+    const { result } = renderMachine({
+      config: cfg([
+        { id: 'a', isComplete: () => false },
+        { id: 'b', guard: () => true },
+        { id: 'c', guard: () => true, isComplete: () => true },
+      ]),
+      initialStepId: 'b',
+    });
+    expect(result.current.current).toBe('b');
+    const byId = Object.fromEntries(result.current.activeSteps.map(s => [s.id, s.isCompleted]));
+    expect(byId.a).toBe(false); // predicate overrides "before current" → not complete
+    expect(byId.b).toBe(false); // no predicate, positional: not before itself
+    expect(byId.c).toBe(true); // predicate overrides "after current" → complete
+  });
 });
 
 describe('useWizardMachine — deferred goNext (submit-then-advance race)', () => {
