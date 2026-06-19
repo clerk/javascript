@@ -1,3 +1,5 @@
+import type { CustomScheme } from 'electron';
+
 type Awaitable<T> = T | Promise<T>;
 
 export type TokenStorage = {
@@ -36,7 +38,7 @@ export type ClerkBridge = {
   cleanup: () => void;
 };
 
-export type RendererSchemeOptions = {
+export type RendererSchemeOptions = CustomScheme & {
   /**
    * Custom scheme used for the renderer origin.
    */

@@ -77,6 +77,65 @@ describe('createClerkBridge', () => {
     ]);
   });
 
+  it('merges custom renderer scheme privileges with Clerk defaults', () => {
+    createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+        privileges: {
+          allowExtensions: true,
+          allowServiceWorkers: true,
+          bypassCSP: true,
+          codeCache: true,
+        },
+      },
+    });
+
+    expect(protocol.registerSchemesAsPrivileged).toHaveBeenCalledWith([
+      {
+        scheme: 'my-app',
+        privileges: {
+          allowExtensions: true,
+          allowServiceWorkers: true,
+          bypassCSP: true,
+          codeCache: true,
+          corsEnabled: true,
+          secure: true,
+          standard: true,
+          stream: true,
+          supportFetchAPI: true,
+        },
+      },
+    ]);
+  });
+
+  it('allows custom renderer scheme privileges to override Clerk defaults', () => {
+    createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+        privileges: {
+          stream: false,
+        },
+      },
+    });
+
+    expect(protocol.registerSchemesAsPrivileged).toHaveBeenCalledWith([
+      {
+        scheme: 'my-app',
+        privileges: {
+          corsEnabled: true,
+          secure: true,
+          standard: true,
+          stream: false,
+          supportFetchAPI: true,
+        },
+      },
+    ]);
+  });
+
   it('requires renderer.scheme to be a scheme name, not a URL', () => {
     expect(() =>
       createClerkBridge({
