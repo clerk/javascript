@@ -1126,7 +1126,7 @@ export const enUS: LocalizationResource = {
         primaryButton__startConfiguration: 'Start configuration',
         title: 'SSO',
         tooltip:
-          'Members without a matching domain can still sign in using existing auth methods. New members will be assigned {{role}} in this organization.',
+          'Members without a matching domain can still sign in using existing auth methods. New members will be assigned to {{role}} in this organization.',
         tooltip__noRole: 'Members without a matching domain can still sign in using existing auth methods.',
         tooltipLabel: 'More information',
       },
