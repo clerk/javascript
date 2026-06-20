@@ -138,6 +138,52 @@ jobs:
           path: .turbo/runs
           retention-days: 5
 
+  electron-passkeys-changed:
+    name: Detect electron-passkeys changes
+    needs: [check-permissions]
+    runs-on: "blacksmith-8vcpu-ubuntu-2204"
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      changed: ${{ steps.filter.outputs.changed }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          filter: blob:none
+          show-progress: false
+
+      - name: Check for electron-passkeys file changes
+        uses: dorny/paths-filter@d1c1ffe0248fe513906c8e24db8ea791d46f8590 # v3.0.3
+        id: filter
+        with:
+          base: ${{ github.event_name == 'merge_group' && github.event.merge_group.base_sha || '' }}
+          ref: ${{ github.event_name == 'merge_group' && github.event.merge_group.head_sha || '' }}
+          filters: |
+            changed:
+              - 'packages/electron-passkeys/src/**'
+              - 'packages/electron-passkeys/Cargo.toml'
+              - 'packages/electron-passkeys/Cargo.lock'
+              - 'packages/electron-passkeys/build.rs'
+              - 'packages/electron-passkeys/index.js'
+              - 'packages/electron-passkeys/index.d.ts'
+              - 'packages/electron-passkeys/npm/**/package.json'
+              - 'packages/electron-passkeys/package.json'
+              - '.github/workflows/ci.yml'
+              - '.github/workflows/electron-passkeys.yml'
+              - '.github/actions/electron-passkeys-artifacts/**'
+
+  electron-passkeys-build:
+    name: Build electron-passkeys native binaries
+    needs: [check-permissions, electron-passkeys-changed]
+    if: needs.electron-passkeys-changed.outputs.changed == 'true'
+    uses: ./.github/workflows/electron-passkeys.yml
+    permissions:
+      contents: read
+
   bundle-size:
     needs: [check-permissions, build-packages]
     name: Bundle size
@@ -522,7 +568,8 @@ jobs:
 
   pkg-pr-new:
     name: Publish with pkg-pr-new
-    needs: [check-permissions, build-packages]
+    needs: [check-permissions, build-packages, electron-passkeys-changed, electron-passkeys-build]
+    if: ${{ always() && !cancelled() && needs.check-permissions.result == 'success' && needs.build-packages.result == 'success' && needs.electron-passkeys-changed.result == 'success' && (needs.electron-passkeys-changed.outputs.changed != 'true' || needs.electron-passkeys-build.result == 'success') }}
     runs-on: "blacksmith-8vcpu-ubuntu-2204"
     defaults:
       run:
@@ -552,5 +599,14 @@ jobs:
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
-      - name: Publish with pkg-pr-new
+      - name: Assemble electron-passkeys native artifacts
+        if: needs.electron-passkeys-changed.outputs.changed == 'true'
+        uses: ./.github/actions/electron-passkeys-artifacts
+
+      - name: Publish with pkg-pr-new (with native packages)
+        if: needs.electron-passkeys-changed.outputs.changed == 'true'
         run: pnpm run build && pnpx pkg-pr-new@${{ vars.PKG_PR_NEW_VERSION || '0.0.49' }} publish --compact --pnpm './packages/*' './packages/electron-passkeys/npm/*'
+
+      - name: Publish with pkg-pr-new
+        if: needs.electron-passkeys-changed.outputs.changed != 'true'
+        run: pnpm run build && pnpx pkg-pr-new@${{ vars.PKG_PR_NEW_VERSION || '0.0.49' }} publish --compact --pnpm './packages/*'
