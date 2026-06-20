@@ -20,9 +20,78 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  electron-passkeys-detect-production:
+    name: Detect if electron-passkeys needs native build (production)
+    if: ${{ github.event_name == 'push' && github.repository == 'clerk/javascript' }}
+    runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
+    permissions:
+      contents: read
+    outputs:
+      needs_native: ${{ steps.detect.outputs.needs_native }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          fetch-tags: false
+          filter: blob:none
+
+      - name: Detect if native packages need publishing
+        id: detect
+        run: |
+          count=$(find .changeset -name '*.md' ! -name 'README.md' | wc -l)
+          if [ "$count" -gt 0 ]; then
+            echo "needs_native=false" >> "$GITHUB_OUTPUT"
+            echo "Pending changesets found — in version-PR mode, skipping native build"
+            exit 0
+          fi
+
+          node <<'NODE'
+          const { execFileSync } = require('child_process');
+          const { appendFileSync } = require('fs');
+
+          const packages = [
+            ['@clerk/electron-passkeys', './packages/electron-passkeys/package.json'],
+            ['@clerk/electron-passkeys-darwin-arm64', './packages/electron-passkeys/npm/darwin-arm64/package.json'],
+            ['@clerk/electron-passkeys-darwin-x64', './packages/electron-passkeys/npm/darwin-x64/package.json'],
+            ['@clerk/electron-passkeys-win32-arm64-msvc', './packages/electron-passkeys/npm/win32-arm64-msvc/package.json'],
+            ['@clerk/electron-passkeys-win32-x64-msvc', './packages/electron-passkeys/npm/win32-x64-msvc/package.json'],
+          ];
+
+          for (const [name, packageJsonPath] of packages) {
+            const { version } = require(packageJsonPath);
+            try {
+              execFileSync('npm', ['view', `${name}@${version}`, 'version'], { stdio: ['ignore', 'pipe', 'pipe'] });
+              console.log(`${name}@${version} already exists on npm`);
+            } catch (error) {
+              const output = `${error.stdout || ''}\n${error.stderr || ''}`;
+              if (error.status === 1 && /E404|404|No match found|not found/i.test(output)) {
+                console.log(`${name}@${version} is missing from npm — native build needed`);
+                appendFileSync(process.env.GITHUB_OUTPUT, 'needs_native=true\n');
+                process.exit(0);
+              }
+              console.error(output);
+              throw error;
+            }
+          }
+
+          console.log('All electron-passkeys package versions already exist on npm — no native build needed');
+          appendFileSync(process.env.GITHUB_OUTPUT, 'needs_native=false\n');
+          NODE
+
+  electron-passkeys-build-production:
+    name: Build electron-passkeys native binaries (production)
+    needs: [electron-passkeys-detect-production]
+    if: needs.electron-passkeys-detect-production.outputs.needs_native == 'true'
+    uses: ./.github/workflows/electron-passkeys.yml
+    permissions:
+      contents: read
+
   release:
     name: Release
-    if: ${{ github.event_name == 'push' && github.repository == 'clerk/javascript' }}
+    needs: [electron-passkeys-detect-production, electron-passkeys-build-production]
+    if: ${{ always() && !cancelled() && github.event_name == 'push' && github.repository == 'clerk/javascript' && needs.electron-passkeys-detect-production.result == 'success' && (needs.electron-passkeys-detect-production.outputs.needs_native != 'true' || needs.electron-passkeys-build-production.result == 'success') }}
     runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
@@ -66,6 +135,10 @@ jobs:
 
       - name: Build release
         run: pnpm turbo build $TURBO_ARGS --force
+
+      - name: Assemble electron-passkeys native artifacts
+        if: needs.electron-passkeys-detect-production.outputs.needs_native == 'true'
+        uses: ./.github/actions/electron-passkeys-artifacts
 
       - name: Create Release PR
         id: changesets
