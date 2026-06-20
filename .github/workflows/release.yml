@@ -85,6 +85,8 @@ jobs:
     needs: [electron-passkeys-detect-production]
     if: needs.electron-passkeys-detect-production.outputs.needs_native == 'true'
     uses: ./.github/workflows/electron-passkeys.yml
+    with:
+      artifact-prefix: production-bindings
     permissions:
       contents: read
 
@@ -139,6 +141,8 @@ jobs:
       - name: Assemble electron-passkeys native artifacts
         if: needs.electron-passkeys-detect-production.outputs.needs_native == 'true'
         uses: ./.github/actions/electron-passkeys-artifacts
+        with:
+          artifact-pattern: production-bindings-*
 
       - name: Create Release PR
         id: changesets
@@ -346,6 +350,8 @@ jobs:
     needs: [electron-passkeys-changed-canary]
     if: needs.electron-passkeys-changed-canary.outputs.changed == 'true'
     uses: ./.github/workflows/electron-passkeys.yml
+    with:
+      artifact-prefix: canary-bindings
     permissions:
       contents: read
 
@@ -382,6 +388,8 @@ jobs:
       - name: Assemble electron-passkeys native artifacts
         if: needs.electron-passkeys-changed-canary.outputs.changed == 'true'
         uses: ./.github/actions/electron-passkeys-artifacts
+        with:
+          artifact-pattern: canary-bindings-*
 
       - name: Version packages for canary
         id: version-packages
@@ -561,6 +569,7 @@ jobs:
     uses: ./.github/workflows/electron-passkeys.yml
     with:
       ref: ${{ needs.snapshot-preflight.outputs.pr_head_sha }}
+      artifact-prefix: snapshot-bindings
     permissions:
       contents: read
 
@@ -601,6 +610,8 @@ jobs:
       - name: Assemble electron-passkeys native artifacts
         if: needs.electron-passkeys-changed-snapshot.outputs.changed == 'true'
         uses: ./.github/actions/electron-passkeys-artifacts
+        with:
+          artifact-pattern: snapshot-bindings-*
 
       - name: Extract snapshot name
         id: extract-snapshot-name

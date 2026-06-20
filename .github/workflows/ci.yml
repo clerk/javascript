@@ -181,6 +181,8 @@ jobs:
     needs: [check-permissions, electron-passkeys-changed]
     if: needs.electron-passkeys-changed.outputs.changed == 'true'
     uses: ./.github/workflows/electron-passkeys.yml
+    with:
+      artifact-prefix: pkg-pr-bindings
     permissions:
       contents: read
 
@@ -602,6 +604,8 @@ jobs:
       - name: Assemble electron-passkeys native artifacts
         if: needs.electron-passkeys-changed.outputs.changed == 'true'
         uses: ./.github/actions/electron-passkeys-artifacts
+        with:
+          artifact-pattern: pkg-pr-bindings-*
 
       - name: Publish with pkg-pr-new (with native packages)
         if: needs.electron-passkeys-changed.outputs.changed == 'true'

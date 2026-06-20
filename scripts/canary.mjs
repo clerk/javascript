@@ -2,20 +2,21 @@
 
 import { $, argv, echo } from 'zx';
 
-import { constants, getChangesetIgnoredPackages, getPackageNames, pinWorkspaceDeps } from './common.mjs';
+import {
+  constants,
+  electronPasskeysPackages,
+  getChangesetIgnoredPackages,
+  getPackageNames,
+  makePackagesPrivate,
+  pinWorkspaceDeps,
+} from './common.mjs';
 
 const skipElectronPasskeys = !argv['include-electron-passkeys'];
-const electronPasskeysPackages = new Set([
-  '@clerk/electron-passkeys',
-  '@clerk/electron-passkeys-darwin-arm64',
-  '@clerk/electron-passkeys-darwin-x64',
-  '@clerk/electron-passkeys-win32-arm64-msvc',
-  '@clerk/electron-passkeys-win32-x64-msvc',
-]);
+const electronPasskeysPackageSet = new Set(electronPasskeysPackages);
 const ignoredPackages = await getChangesetIgnoredPackages();
 const packageNames = (await getPackageNames())
   .filter(name => !ignoredPackages.has(name))
-  .filter(name => !skipElectronPasskeys || !electronPasskeysPackages.has(name));
+  .filter(name => !skipElectronPasskeys || !electronPasskeysPackageSet.has(name));
 const packageEntries = packageNames.map(name => `'${name}': patch`).join('\n');
 
 const snapshot = `---
@@ -50,6 +51,10 @@ const res = await $`pnpm changeset version --snapshot canary`;
 const success = !res.stderr.includes('No unreleased changesets found');
 
 await $`git checkout HEAD -- ${constants.ChangesetConfigFile}`;
+
+if (skipElectronPasskeys) {
+  await makePackagesPrivate(electronPasskeysPackages);
+}
 
 if (success) {
   echo('success=1');

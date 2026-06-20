@@ -2,10 +2,19 @@
 
 import { $, echo } from 'zx';
 
-import { constants, getChangesetIgnoredPackages, getPackageNames } from './common.mjs';
+import {
+  constants,
+  electronPasskeysPackages,
+  getChangesetIgnoredPackages,
+  getPackageNames,
+  makePackagesPrivate,
+} from './common.mjs';
 
+const electronPasskeysPackageSet = new Set(electronPasskeysPackages);
 const ignoredPackages = await getChangesetIgnoredPackages();
-const packageNames = (await getPackageNames()).filter(name => !ignoredPackages.has(name));
+const packageNames = (await getPackageNames())
+  .filter(name => !ignoredPackages.has(name))
+  .filter(name => !electronPasskeysPackageSet.has(name));
 const packageEntries = packageNames.map(name => `'${name}': patch`).join('\n');
 
 const snapshot = `---
@@ -35,6 +44,7 @@ const res = await $`pnpm changeset version --snapshot canary-core3`;
 const success = !res.stderr.includes('No unreleased changesets found');
 
 await $`git checkout HEAD -- ${constants.ChangesetConfigFile}`;
+await makePackagesPrivate(electronPasskeysPackages);
 
 if (success) {
   echo('success=1');

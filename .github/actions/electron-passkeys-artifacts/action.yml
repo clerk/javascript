@@ -1,13 +1,19 @@
 name: Assemble electron-passkeys native artifacts
 description: Downloads build artifacts, assembles platform packages, and verifies each contains exactly one .node binary.
 
+inputs:
+  artifact-pattern:
+    description: Artifact name pattern to download.
+    required: false
+    default: bindings-*
+
 runs:
   using: composite
   steps:
     - name: Download all build artifacts
       uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
       with:
-        pattern: bindings-*
+        pattern: ${{ inputs.artifact-pattern }}
         path: packages/electron-passkeys/artifacts
 
     - name: Move binaries into per-platform npm packages

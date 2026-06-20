@@ -8,6 +8,11 @@ on:
         required: false
         type: string
         default: ''
+      artifact-prefix:
+        description: 'Artifact name prefix for uploaded native bindings.'
+        required: false
+        type: string
+        default: bindings
   workflow_dispatch:
 
 jobs:
@@ -62,6 +67,6 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: bindings-${{ matrix.settings.target }}
+          name: ${{ inputs.artifact-prefix }}-${{ matrix.settings.target }}
           path: packages/electron-passkeys/electron-passkeys.*.node
           if-no-files-found: error
