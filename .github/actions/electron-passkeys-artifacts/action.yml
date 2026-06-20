@@ -1,0 +1,54 @@
+name: Assemble electron-passkeys native artifacts
+description: Downloads build artifacts, assembles platform packages, and verifies each contains exactly one .node binary.
+
+runs:
+  using: composite
+  steps:
+    - name: Download all build artifacts
+      uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+      with:
+        pattern: bindings-*
+        path: packages/electron-passkeys/artifacts
+
+    - name: Move binaries into per-platform npm packages
+      shell: bash
+      run: pnpm --filter @clerk/electron-passkeys artifacts
+
+    - name: Verify every platform package contains its binary
+      shell: bash
+      working-directory: ${{ github.workspace }}/packages/electron-passkeys
+      run: |
+        set -euo pipefail
+
+        for dir in npm/*/; do
+          count=$(find "$dir" -maxdepth 1 -type f -name '*.node' | wc -l | tr -d '[:space:]')
+          if [ "$count" -ne 1 ]; then
+            echo "::error::$dir must contain exactly one root .node binary, found $count"
+            exit 1
+          fi
+
+          main=$(node -e "
+            const fs = require('fs');
+            const pkg = JSON.parse(fs.readFileSync(process.argv[1], 'utf8'));
+            if (typeof pkg.main !== 'string' || pkg.main.length === 0) {
+              process.exit(1);
+            }
+            process.stdout.write(pkg.main);
+          " "$dir/package.json") || {
+            echo "::error::$dir package.json must define a non-empty main field"
+            exit 1
+          }
+
+          main_file=${main#./}
+          if [[ "$main_file" == */* || "$main_file" != *.node ]]; then
+            echo "::error::$dir package.json main must point to a root .node file, got '$main'"
+            exit 1
+          fi
+
+          if [ ! -f "$dir$main_file" ]; then
+            echo "::error::$dir package.json main points to missing binary '$main'"
+            exit 1
+          fi
+
+          (cd "$dir" && pnpm pack --dry-run)
+        done
