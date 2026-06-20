@@ -4,8 +4,20 @@ import { $, argv, echo } from 'zx';
 
 import { constants, getChangesetIgnoredPackages, getPackageNames, pinWorkspaceDeps } from './common.mjs';
 
+const includeElectronPasskeys = Boolean(argv['include-electron-passkeys']);
+const electronPasskeysFlagValue = argv['include-electron-passkeys'];
+const skipElectronPasskeys = !includeElectronPasskeys;
+const electronPasskeysPackages = new Set([
+  '@clerk/electron-passkeys',
+  '@clerk/electron-passkeys-darwin-arm64',
+  '@clerk/electron-passkeys-darwin-x64',
+  '@clerk/electron-passkeys-win32-arm64-msvc',
+  '@clerk/electron-passkeys-win32-x64-msvc',
+]);
 const ignoredPackages = await getChangesetIgnoredPackages();
-const packageNames = (await getPackageNames()).filter(name => !ignoredPackages.has(name));
+const packageNames = (await getPackageNames())
+  .filter(name => !ignoredPackages.has(name))
+  .filter(name => !skipElectronPasskeys || !electronPasskeysPackages.has(name));
 const packageEntries = packageNames.map(name => `'${name}': patch`).join('\n');
 
 const snapshot = `---
@@ -15,7 +27,13 @@ ${packageEntries}
 Snapshot release
 `;
 
-const prefix = argv.name || argv._[0] || 'snapshot';
+const prefix =
+  argv.name ||
+  argv._[0] ||
+  (typeof electronPasskeysFlagValue === 'string' && !['true', 'false'].includes(electronPasskeysFlagValue)
+    ? electronPasskeysFlagValue
+    : undefined) ||
+  'snapshot';
 
 await $`pnpm dlx json -I -f ${constants.ChangesetConfigFile} -e "this.changelog = false"`;
 
