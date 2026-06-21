@@ -5,14 +5,6 @@ export const constants = {
   ChangesetConfigFile: '.changeset/config.json',
 };
 
-export const electronPasskeysPackages = [
-  '@clerk/electron-passkeys',
-  '@clerk/electron-passkeys-darwin-arm64',
-  '@clerk/electron-passkeys-darwin-x64',
-  '@clerk/electron-passkeys-win32-arm64-msvc',
-  '@clerk/electron-passkeys-win32-x64-msvc',
-];
-
 export async function getChangesetIgnoredPackages() {
   const config = JSON.parse(await readFile(constants.ChangesetConfigFile, 'utf-8'));
   return new Set(config.ignore || []);
@@ -50,24 +42,6 @@ export async function getPackageNames() {
   }
 
   return packageNames.sort();
-}
-
-export async function makePackagesPrivate(packageNames) {
-  const privatePackageNames = new Set(packageNames);
-  const packageJsonFiles = await getPackageJsonFiles();
-
-  for (const file of packageJsonFiles) {
-    try {
-      const content = await readFile(file, 'utf-8');
-      const packageJson = JSON.parse(content);
-      if (privatePackageNames.has(packageJson.name)) {
-        packageJson.private = true;
-        await writeFile(file, JSON.stringify(packageJson, null, 2) + '\n');
-      }
-    } catch {
-      // package.json doesn't exist or is invalid, skip
-    }
-  }
 }
 
 /**
