@@ -21,33 +21,64 @@ concurrency:
 
 jobs:
   electron-passkeys-detect-production:
-    name: Detect if electron-passkeys needs native build (production)
+    name: Detect electron-passkeys production release
     if: ${{ github.event_name == 'push' && github.repository == 'clerk/javascript' }}
     runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
     permissions:
       contents: read
     outputs:
       needs_native: ${{ steps.detect.outputs.needs_native }}
+      version: ${{ steps.detect.outputs.version }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           persist-credentials: false
-          fetch-depth: 1
+          fetch-depth: 0
           fetch-tags: false
           filter: blob:none
 
-      - name: Detect if native packages need publishing
+      - name: Detect wrapper version change
         id: detect
+        env:
+          BEFORE: ${{ github.event.before }}
+          SHA: ${{ github.sha }}
         run: |
-          count=$(find .changeset -name '*.md' ! -name 'README.md' | wc -l)
-          if [ "$count" -gt 0 ]; then
+          set -euo pipefail
+
+          package_json="packages/electron-passkeys/package.json"
+          before="$BEFORE"
+
+          if [ -z "$before" ] || [[ "$before" =~ ^0+$ ]] || ! git cat-file -e "$before^{commit}" 2>/dev/null; then
+            before="${SHA}^"
+          fi
+
+          current_version=$(node -p "require('./$package_json').version")
+          echo "version=$current_version" >> "$GITHUB_OUTPUT"
+
+          pending_changesets=$(find .changeset -name '*.md' ! -name 'README.md' | wc -l | tr -d '[:space:]')
+          if [ "$pending_changesets" -gt 0 ]; then
+            echo "Pending changesets found; skipping native production build until the Changesets release PR is merged."
             echo "needs_native=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          version=$(node -p "require('./packages/electron-passkeys/package.json').version")
-          published=$(npm view "@clerk/electron-passkeys@${version}" version 2>/dev/null || true)
-          [ -n "$published" ] && echo "needs_native=false" >> "$GITHUB_OUTPUT" || echo "needs_native=true" >> "$GITHUB_OUTPUT"
+
+          if git diff --quiet "$before" "$SHA" -- "$package_json"; then
+            echo "No @clerk/electron-passkeys package.json change detected."
+            echo "needs_native=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          previous_version=$(git show "$before:$package_json" | node -p "JSON.parse(require('fs').readFileSync(0, 'utf8')).version")
+
+          if [ "$previous_version" = "$current_version" ]; then
+            echo "No @clerk/electron-passkeys version change detected."
+            echo "needs_native=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "Detected @clerk/electron-passkeys version change: $previous_version -> $current_version"
+          echo "needs_native=true" >> "$GITHUB_OUTPUT"
 
   electron-passkeys-build-production:
     name: Build electron-passkeys native binaries (production)
@@ -62,8 +93,8 @@ jobs:
   release:
     name: Release
     needs: [electron-passkeys-detect-production, electron-passkeys-build-production]
-    # Run when: detect succeeded (no checkout/script error) AND build either was not needed (skipped) or succeeded.
-    if: ${{ always() && !cancelled() && github.event_name == 'push' && github.repository == 'clerk/javascript' && needs.electron-passkeys-detect-production.result == 'success' && needs.electron-passkeys-build-production.result != 'failure' }}
+    # Run when detection succeeds and, if electron-passkeys is being released, native binaries built successfully.
+    if: ${{ always() && !cancelled() && github.event_name == 'push' && github.repository == 'clerk/javascript' && needs.electron-passkeys-detect-production.result == 'success' && (needs.electron-passkeys-detect-production.outputs.needs_native != 'true' || needs.electron-passkeys-build-production.result == 'success') }}
     runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
