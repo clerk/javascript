@@ -41,44 +41,7 @@ jobs:
         id: detect
         run: |
           count=$(find .changeset -name '*.md' ! -name 'README.md' | wc -l)
-          if [ "$count" -gt 0 ]; then
-            echo "needs_native=false" >> "$GITHUB_OUTPUT"
-            echo "Pending changesets found — in version-PR mode, skipping native build"
-            exit 0
-          fi
-
-          node <<'NODE'
-          const { execFileSync } = require('child_process');
-          const { appendFileSync } = require('fs');
-
-          const packages = [
-            ['@clerk/electron-passkeys', './packages/electron-passkeys/package.json'],
-            ['@clerk/electron-passkeys-darwin-arm64', './packages/electron-passkeys/npm/darwin-arm64/package.json'],
-            ['@clerk/electron-passkeys-darwin-x64', './packages/electron-passkeys/npm/darwin-x64/package.json'],
-            ['@clerk/electron-passkeys-win32-arm64-msvc', './packages/electron-passkeys/npm/win32-arm64-msvc/package.json'],
-            ['@clerk/electron-passkeys-win32-x64-msvc', './packages/electron-passkeys/npm/win32-x64-msvc/package.json'],
-          ];
-
-          for (const [name, packageJsonPath] of packages) {
-            const { version } = require(packageJsonPath);
-            try {
-              execFileSync('npm', ['view', `${name}@${version}`, 'version'], { stdio: ['ignore', 'pipe', 'pipe'] });
-              console.log(`${name}@${version} already exists on npm`);
-            } catch (error) {
-              const output = `${error.stdout || ''}\n${error.stderr || ''}`;
-              if (error.status === 1 && /E404|404|No match found|not found/i.test(output)) {
-                console.log(`${name}@${version} is missing from npm — native build needed`);
-                appendFileSync(process.env.GITHUB_OUTPUT, 'needs_native=true\n');
-                process.exit(0);
-              }
-              console.error(output);
-              throw error;
-            }
-          }
-
-          console.log('All electron-passkeys package versions already exist on npm — no native build needed');
-          appendFileSync(process.env.GITHUB_OUTPUT, 'needs_native=false\n');
-          NODE
+          [ "$count" -eq 0 ] && echo "needs_native=true" >> "$GITHUB_OUTPUT" || echo "needs_native=false" >> "$GITHUB_OUTPUT"
 
   electron-passkeys-build-production:
     name: Build electron-passkeys native binaries (production)
@@ -93,7 +56,7 @@ jobs:
   release:
     name: Release
     needs: [electron-passkeys-detect-production, electron-passkeys-build-production]
-    if: ${{ always() && !cancelled() && github.event_name == 'push' && github.repository == 'clerk/javascript' && needs.electron-passkeys-detect-production.result == 'success' && (needs.electron-passkeys-detect-production.outputs.needs_native != 'true' || needs.electron-passkeys-build-production.result == 'success') }}
+    if: ${{ always() && !cancelled() && github.event_name == 'push' && github.repository == 'clerk/javascript' && needs.electron-passkeys-detect-production.result == 'success' && needs.electron-passkeys-build-production.result != 'failure' }}
     runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
@@ -310,55 +273,9 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SDK_SLACKER_WEBHOOK_URL }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
-  electron-passkeys-changed-canary:
-    name: Detect electron-passkeys changes (canary)
-    if: ${{ github.event_name == 'push' && github.repository == 'clerk/javascript' }}
-    runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
-    permissions:
-      contents: read
-    outputs:
-      changed: ${{ steps.filter.outputs.changed }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-        with:
-          persist-credentials: false
-          fetch-depth: 0
-          filter: blob:none
-
-      - name: Check for electron-passkeys file changes
-        uses: dorny/paths-filter@d1c1ffe0248fe513906c8e24db8ea791d46f8590 # v3.0.3
-        id: filter
-        with:
-          base: ${{ github.event.before }}
-          filters: |
-            changed:
-              - 'packages/electron-passkeys/src/**'
-              - 'packages/electron-passkeys/Cargo.toml'
-              - 'packages/electron-passkeys/Cargo.lock'
-              - 'packages/electron-passkeys/build.rs'
-              - 'packages/electron-passkeys/index.js'
-              - 'packages/electron-passkeys/index.d.ts'
-              - 'packages/electron-passkeys/npm/**/package.json'
-              - 'packages/electron-passkeys/package.json'
-              - '.github/workflows/electron-passkeys.yml'
-              - '.github/workflows/release.yml'
-              - '.github/actions/electron-passkeys-artifacts/**'
-
-  electron-passkeys-build-canary:
-    name: Build electron-passkeys native binaries (canary)
-    needs: [electron-passkeys-changed-canary]
-    if: needs.electron-passkeys-changed-canary.outputs.changed == 'true'
-    uses: ./.github/workflows/electron-passkeys.yml
-    with:
-      artifact-prefix: canary-bindings
-    permissions:
-      contents: read
-
   canary-release:
     name: Canary release
-    needs: [electron-passkeys-changed-canary, electron-passkeys-build-canary]
-    if: ${{ always() && !cancelled() && github.event_name == 'push' && github.repository == 'clerk/javascript' && needs.electron-passkeys-changed-canary.result == 'success' && (needs.electron-passkeys-changed-canary.outputs.changed != 'true' || needs.electron-passkeys-build-canary.result == 'success') }}
+    if: ${{ github.event_name == 'push' && github.repository == 'clerk/javascript' }}
     runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
     permissions:
@@ -385,17 +302,9 @@ jobs:
       - name: Upgrade npm for trusted publishing
         run: npx npm@11 install -g npm@11
 
-      - name: Assemble electron-passkeys native artifacts
-        if: needs.electron-passkeys-changed-canary.outputs.changed == 'true'
-        uses: ./.github/actions/electron-passkeys-artifacts
-        with:
-          artifact-pattern: canary-bindings-*
-
       - name: Version packages for canary
         id: version-packages
-        run: |
-          flag=${{ needs.electron-passkeys-changed-canary.outputs.changed == 'true' && '--include-electron-passkeys' || '' }}
-          pnpm version-packages:canary $flag | tail -1 >> "$GITHUB_OUTPUT"
+        run: pnpm version-packages:canary | tail -1 >> "$GITHUB_OUTPUT"
 
       - name: Build release
         if: steps.version-packages.outputs.success == '1'
@@ -576,7 +485,7 @@ jobs:
   snapshot-release:
     name: Snapshot release
     needs: [snapshot-preflight, electron-passkeys-changed-snapshot, electron-passkeys-build-snapshot]
-    if: ${{ always() && !cancelled() && github.event_name == 'issue_comment' && startsWith(github.event.comment.body, '!snapshot') && github.repository == 'clerk/javascript' && github.event.issue.pull_request && needs.snapshot-preflight.result == 'success' && needs.electron-passkeys-changed-snapshot.result == 'success' && (needs.electron-passkeys-changed-snapshot.outputs.changed != 'true' || needs.electron-passkeys-build-snapshot.result == 'success') }}
+    if: ${{ always() && !cancelled() && github.event_name == 'issue_comment' && startsWith(github.event.comment.body, '!snapshot') && github.repository == 'clerk/javascript' && github.event.issue.pull_request && needs.snapshot-preflight.result == 'success' && needs.electron-passkeys-changed-snapshot.result == 'success' && needs.electron-passkeys-build-snapshot.result != 'failure' }}
     runs-on: ${{ vars.RUNNER_LARGE || 'ubuntu-latest-l' }}
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 

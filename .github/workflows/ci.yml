@@ -571,7 +571,7 @@ jobs:
   pkg-pr-new:
     name: Publish with pkg-pr-new
     needs: [check-permissions, build-packages, electron-passkeys-changed, electron-passkeys-build]
-    if: ${{ always() && !cancelled() && needs.check-permissions.result == 'success' && needs.build-packages.result == 'success' && needs.electron-passkeys-changed.result == 'success' && (needs.electron-passkeys-changed.outputs.changed != 'true' || needs.electron-passkeys-build.result == 'success') }}
+    if: ${{ always() && !cancelled() && needs.check-permissions.result == 'success' && needs.build-packages.result == 'success' && needs.electron-passkeys-changed.result == 'success' && needs.electron-passkeys-build.result != 'failure' }}
     runs-on: "blacksmith-8vcpu-ubuntu-2204"
     defaults:
       run:
