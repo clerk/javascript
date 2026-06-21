@@ -162,6 +162,8 @@ jobs:
         with:
           base: ${{ github.event_name == 'merge_group' && github.event.merge_group.base_sha || '' }}
           ref: ${{ github.event_name == 'merge_group' && github.event.merge_group.head_sha || '' }}
+          # pkg-pr-new needs prebuilt native artifacts only when the electron-passkeys
+          # package, native build workflow, or artifact assembly action changes.
           filters: |
             changed:
               - 'packages/electron-passkeys/src/**'
@@ -172,7 +174,6 @@ jobs:
               - 'packages/electron-passkeys/index.d.ts'
               - 'packages/electron-passkeys/npm/**/package.json'
               - 'packages/electron-passkeys/package.json'
-              - '.github/workflows/ci.yml'
               - '.github/workflows/electron-passkeys.yml'
               - '.github/actions/electron-passkeys-artifacts/**'
 

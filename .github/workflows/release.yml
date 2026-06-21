@@ -43,42 +43,7 @@ jobs:
         env:
           BEFORE: ${{ github.event.before }}
           SHA: ${{ github.sha }}
-        run: |
-          set -euo pipefail
-
-          package_json="packages/electron-passkeys/package.json"
-          before="$BEFORE"
-
-          if [ -z "$before" ] || [[ "$before" =~ ^0+$ ]] || ! git cat-file -e "$before^{commit}" 2>/dev/null; then
-            before="${SHA}^"
-          fi
-
-          current_version=$(node -p "require('./$package_json').version")
-          echo "version=$current_version" >> "$GITHUB_OUTPUT"
-
-          pending_changesets=$(find .changeset -name '*.md' ! -name 'README.md' | wc -l | tr -d '[:space:]')
-          if [ "$pending_changesets" -gt 0 ]; then
-            echo "Pending changesets found; skipping native production build until the Changesets release PR is merged."
-            echo "needs_native=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          if git diff --quiet "$before" "$SHA" -- "$package_json"; then
-            echo "No @clerk/electron-passkeys package.json change detected."
-            echo "needs_native=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          previous_version=$(git show "$before:$package_json" | node -p "JSON.parse(require('fs').readFileSync(0, 'utf8')).version")
-
-          if [ "$previous_version" = "$current_version" ]; then
-            echo "No @clerk/electron-passkeys version change detected."
-            echo "needs_native=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          echo "Detected @clerk/electron-passkeys version change: $previous_version -> $current_version"
-          echo "needs_native=true" >> "$GITHUB_OUTPUT"
+        run: node scripts/detect-electron-passkeys-release.mjs
 
   electron-passkeys-build-production:
     name: Build electron-passkeys native binaries (production)

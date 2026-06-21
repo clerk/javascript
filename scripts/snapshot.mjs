@@ -2,20 +2,13 @@
 
 import { $, argv, echo } from 'zx';
 
-import {
-  constants,
-  electronPasskeysPackages,
-  getChangesetIgnoredPackages,
-  getPackageNames,
-  makePackagesPrivate,
-  pinWorkspaceDeps,
-} from './common.mjs';
+import { constants, getChangesetIgnoredPackages, getPackageNames, pinWorkspaceDeps } from './common.mjs';
+import { excludeElectronPasskeysPackages, makeElectronPasskeysPackagesPrivate } from './electron-passkeys-release.mjs';
 
-const electronPasskeysPackageSet = new Set(electronPasskeysPackages);
 const ignoredPackages = await getChangesetIgnoredPackages();
-const packageNames = (await getPackageNames())
-  .filter(name => !ignoredPackages.has(name))
-  .filter(name => !electronPasskeysPackageSet.has(name));
+const packageNames = excludeElectronPasskeysPackages(
+  (await getPackageNames()).filter(name => !ignoredPackages.has(name)),
+);
 const packageEntries = packageNames.map(name => `'${name}': patch`).join('\n');
 
 const snapshot = `---
@@ -53,7 +46,7 @@ const success = !res.stderr.includes('No unreleased changesets found');
 
 await $`git checkout HEAD -- ${constants.ChangesetConfigFile}`;
 
-await makePackagesPrivate(electronPasskeysPackages);
+await makeElectronPasskeysPackagesPrivate();
 
 if (success) {
   echo('success=1');
