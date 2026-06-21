@@ -11,14 +11,11 @@ import {
   pinWorkspaceDeps,
 } from './common.mjs';
 
-const includeElectronPasskeys = Boolean(argv['include-electron-passkeys']);
-const electronPasskeysFlagValue = argv['include-electron-passkeys'];
-const skipElectronPasskeys = !includeElectronPasskeys;
 const electronPasskeysPackageSet = new Set(electronPasskeysPackages);
 const ignoredPackages = await getChangesetIgnoredPackages();
 const packageNames = (await getPackageNames())
   .filter(name => !ignoredPackages.has(name))
-  .filter(name => !skipElectronPasskeys || !electronPasskeysPackageSet.has(name));
+  .filter(name => !electronPasskeysPackageSet.has(name));
 const packageEntries = packageNames.map(name => `'${name}': patch`).join('\n');
 
 const snapshot = `---
@@ -28,13 +25,7 @@ ${packageEntries}
 Snapshot release
 `;
 
-const prefix =
-  argv.name ||
-  argv._[0] ||
-  (typeof electronPasskeysFlagValue === 'string' && !['true', 'false'].includes(electronPasskeysFlagValue)
-    ? electronPasskeysFlagValue
-    : undefined) ||
-  'snapshot';
+const prefix = argv.name || argv._[0] || 'snapshot';
 
 await $`pnpm dlx json -I -f ${constants.ChangesetConfigFile} -e "this.changelog = false"`;
 
@@ -62,9 +53,7 @@ const success = !res.stderr.includes('No unreleased changesets found');
 
 await $`git checkout HEAD -- ${constants.ChangesetConfigFile}`;
 
-if (skipElectronPasskeys) {
-  await makePackagesPrivate(electronPasskeysPackages);
-}
+await makePackagesPrivate(electronPasskeysPackages);
 
 if (success) {
   echo('success=1');

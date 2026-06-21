@@ -41,7 +41,13 @@ jobs:
         id: detect
         run: |
           count=$(find .changeset -name '*.md' ! -name 'README.md' | wc -l)
-          [ "$count" -eq 0 ] && echo "needs_native=true" >> "$GITHUB_OUTPUT" || echo "needs_native=false" >> "$GITHUB_OUTPUT"
+          if [ "$count" -gt 0 ]; then
+            echo "needs_native=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          version=$(node -p "require('./packages/electron-passkeys/package.json').version")
+          published=$(npm view "@clerk/electron-passkeys@${version}" version 2>/dev/null || true)
+          [ -n "$published" ] && echo "needs_native=false" >> "$GITHUB_OUTPUT" || echo "needs_native=true" >> "$GITHUB_OUTPUT"
 
   electron-passkeys-build-production:
     name: Build electron-passkeys native binaries (production)
@@ -56,6 +62,7 @@ jobs:
   release:
     name: Release
     needs: [electron-passkeys-detect-production, electron-passkeys-build-production]
+    # Run when: detect succeeded (no checkout/script error) AND build either was not needed (skipped) or succeeded.
     if: ${{ always() && !cancelled() && github.event_name == 'push' && github.repository == 'clerk/javascript' && needs.electron-passkeys-detect-production.result == 'success' && needs.electron-passkeys-build-production.result != 'failure' }}
     runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
@@ -373,15 +380,17 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SDK_SLACKER_WEBHOOK_URL }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
-  snapshot-preflight:
-    name: Snapshot preflight
+  snapshot-release:
+    name: Snapshot release
     if: ${{ github.event_name == 'issue_comment' && startsWith(github.event.comment.body, '!snapshot') && github.repository == 'clerk/javascript' && github.event.issue.pull_request }}
-    runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
+    runs-on: ${{ vars.RUNNER_LARGE || 'ubuntu-latest-l' }}
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
+
     permissions:
       contents: read
-      pull-requests: read
-    outputs:
-      pr_head_sha: ${{ steps.validate-pr.outputs.pr_head_sha }}
+      id-token: write
+      pull-requests: write
+
     steps:
       - name: Limit action to Clerk members
         uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
@@ -404,13 +413,11 @@ jobs:
             }
 
       - name: Validate PR source and freshness
-        id: validate-pr
         uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           result-encoding: string
           retries: 3
           retry-exempt-status-codes: 400,401
-          github-token: ${{ secrets.CLERK_COOKIE_PAT }}
           script: |
             const { data: pr } = await github.rest.pulls.get({
               owner: 'clerk',
@@ -428,77 +435,12 @@ jobs:
 
             if (prLastUpdated > commentCreated) {
               core.setFailed("The PR has been updated since !snapshot was initiated. Please review the changes and re-run the !snapshot command.");
-              return;
             }
 
-            core.setOutput('pr_head_sha', pr.head.sha);
-
-  electron-passkeys-changed-snapshot:
-    name: Detect electron-passkeys changes (snapshot)
-    needs: [snapshot-preflight]
-    if: ${{ always() && !cancelled() && github.event_name == 'issue_comment' && startsWith(github.event.comment.body, '!snapshot') && github.repository == 'clerk/javascript' && github.event.issue.pull_request && needs.snapshot-preflight.result == 'success' }}
-    runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
-    permissions:
-      contents: read
-    outputs:
-      changed: ${{ steps.filter.outputs.changed }}
-    steps:
-      - name: Checkout PR head
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-        with:
-          ref: ${{ needs.snapshot-preflight.outputs.pr_head_sha }}
-          persist-credentials: false
-          fetch-depth: 0
-          filter: blob:none
-
-      - name: Check for electron-passkeys file changes
-        uses: dorny/paths-filter@d1c1ffe0248fe513906c8e24db8ea791d46f8590 # v3.0.3
-        id: filter
-        with:
-          base: main
-          ref: ${{ needs.snapshot-preflight.outputs.pr_head_sha }}
-          filters: |
-            changed:
-              - 'packages/electron-passkeys/src/**'
-              - 'packages/electron-passkeys/Cargo.toml'
-              - 'packages/electron-passkeys/Cargo.lock'
-              - 'packages/electron-passkeys/build.rs'
-              - 'packages/electron-passkeys/index.js'
-              - 'packages/electron-passkeys/index.d.ts'
-              - 'packages/electron-passkeys/npm/**/package.json'
-              - 'packages/electron-passkeys/package.json'
-              - '.github/workflows/electron-passkeys.yml'
-              - '.github/workflows/release.yml'
-              - '.github/actions/electron-passkeys-artifacts/**'
-
-  electron-passkeys-build-snapshot:
-    name: Build electron-passkeys native binaries (snapshot)
-    needs: [snapshot-preflight, electron-passkeys-changed-snapshot]
-    if: needs.electron-passkeys-changed-snapshot.outputs.changed == 'true'
-    uses: ./.github/workflows/electron-passkeys.yml
-    with:
-      ref: ${{ needs.snapshot-preflight.outputs.pr_head_sha }}
-      artifact-prefix: snapshot-bindings
-    permissions:
-      contents: read
-
-  snapshot-release:
-    name: Snapshot release
-    needs: [snapshot-preflight, electron-passkeys-changed-snapshot, electron-passkeys-build-snapshot]
-    if: ${{ always() && !cancelled() && github.event_name == 'issue_comment' && startsWith(github.event.comment.body, '!snapshot') && github.repository == 'clerk/javascript' && github.event.issue.pull_request && needs.snapshot-preflight.result == 'success' && needs.electron-passkeys-changed-snapshot.result == 'success' && needs.electron-passkeys-build-snapshot.result != 'failure' }}
-    runs-on: ${{ vars.RUNNER_LARGE || 'ubuntu-latest-l' }}
-    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
-
-    permissions:
-      contents: read
-      id-token: write
-      pull-requests: write
-
-    steps:
       - name: Checkout repo
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
-          ref: ${{ needs.snapshot-preflight.outputs.pr_head_sha }}
+          ref: refs/pull/${{ github.event.issue.number }}/head
           persist-credentials: false
           fetch-depth: 1
           fetch-tags: false
@@ -516,12 +458,6 @@ jobs:
       - name: Upgrade npm for trusted publishing
         run: npx npm@11 install -g npm@11
 
-      - name: Assemble electron-passkeys native artifacts
-        if: needs.electron-passkeys-changed-snapshot.outputs.changed == 'true'
-        uses: ./.github/actions/electron-passkeys-artifacts
-        with:
-          artifact-pattern: snapshot-bindings-*
-
       - name: Extract snapshot name
         id: extract-snapshot-name
         uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
@@ -537,9 +473,7 @@ jobs:
 
       - name: Version packages for snapshot
         id: version-packages
-        run: |
-          flag=${{ needs.electron-passkeys-changed-snapshot.outputs.changed == 'true' && '--include-electron-passkeys' || '' }}
-          pnpm version-packages:snapshot $flag ${{ steps.extract-snapshot-name.outputs.name }} | tail -1 >> "$GITHUB_OUTPUT"
+        run: pnpm version-packages:snapshot ${{ steps.extract-snapshot-name.outputs.name }} | tail -1 >> "$GITHUB_OUTPUT"
 
       - name: Build release
         if: steps.version-packages.outputs.success == '1'
