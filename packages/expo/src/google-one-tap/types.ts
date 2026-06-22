@@ -41,11 +41,28 @@ export type SignInParams = {
   nonce?: string;
 
   /**
-   * Whether to filter credentials to only show accounts that have been
-   * previously authorized for this app.
+   * Android only. Whether to filter credentials to only show accounts that have
+   * previously authorized this app.
+   *
+   * No-op on iOS.
+   *
+   * @platform Android
    * @default true
    */
   filterByAuthorizedAccounts?: boolean;
+
+  /**
+   * iOS only. Hint passed to Google Sign-In, such as a user ID or email
+   * address.
+   *
+   * This may prefill or prioritize an account when possible, but does not
+   * restrict the account picker.
+   *
+   * No-op on Android.
+   *
+   * @platform iOS
+   */
+  hint?: string;
 };
 
 /**
