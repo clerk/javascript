@@ -1,5 +1,4 @@
 import { isAssignAction } from './assign';
-import { AFTER, INIT, INVOKE_DONE, INVOKE_ERROR, RECHECK } from './types';
 import type {
   Actions,
   Actor,
@@ -14,11 +13,14 @@ import type {
   TransitionConfig,
   Unsubscribe,
 } from './types';
+import { AFTER, INIT, INVOKE_DONE, INVOKE_ERROR, RECHECK } from './types';
 
 const INIT_EVENT: AnyEventObject = { type: INIT };
 
 function toArray<T>(value: T | T[] | undefined): T[] {
-  if (value === undefined) return [];
+  if (value === undefined) {
+    return [];
+  }
   return Array.isArray(value) ? value : [value];
 }
 
@@ -129,7 +131,9 @@ export function createActor<TContext extends object, TEvent extends EventObject>
 
   function startInvoke(event: EventObject): void {
     const invoke = states[value].invoke;
-    if (!invoke) return;
+    if (!invoke) {
+      return;
+    }
     const token = ++invocationToken;
     // SAFETY: startInvoke is called with the actor's internal EventObject, but
     // InvokeConfig.src is typed to accept (context, TEvent | DoneInvokeEvent | ErrorInvokeEvent).
@@ -137,36 +141,59 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     // on state entry and typically ignore it. The runtime views events through an
     // event-agnostic lens (line 57) for this reason.
     //
-    // Use the Promise constructor rather than Promise.resolve(src()) so that a
-    // synchronous throw from src is caught and routed to onError instead of
-    // propagating as an unhandled exception (Promise.resolve(fn()) evaluates fn()
-    // before the promise chain begins, so a sync throw escapes the .then handler).
-    new Promise<unknown>(resolve => resolve(invoke.src(context, event as never))).then(
+    // Catch synchronous throws from src and route them through onError via a
+    // rejected promise. Promise.resolve() on a native Promise returns it unchanged
+    // (0 extra microtask hops), so the .then handler runs in exactly 1 tick. The
+    // previous `new Promise(r => r(thenable))` pattern added 2 extra hops via the
+    // thenable resolution procedure, breaking tests that flush with a single await.
+    let srcPromise: Promise<unknown>;
+    try {
+      srcPromise = Promise.resolve(invoke.src(context, event as never));
+    } catch (err) {
+      srcPromise = Promise.reject(err);
+    }
+    srcPromise.then(
       output => {
-        if (status !== 'active' || token !== invocationToken) return;
+        if (status !== 'active' || token !== invocationToken) {
+          return;
+        }
         const doneEvent = { type: INVOKE_DONE, output };
         const transition = pickTransition(normalizeTransitions(invoke.onDone), doneEvent);
-        if (!transition) return;
-        if (takeTransition(transition, doneEvent)) commit();
+        if (!transition) {
+          return;
+        }
+        if (takeTransition(transition, doneEvent)) {
+          commit();
+        }
       },
       (error: unknown) => {
-        if (status !== 'active' || token !== invocationToken) return;
+        if (status !== 'active' || token !== invocationToken) {
+          return;
+        }
         const errorEvent = { type: INVOKE_ERROR, error };
         const transition = pickTransition(normalizeTransitions(invoke.onError), errorEvent);
-        if (!transition) return;
-        if (takeTransition(transition, errorEvent)) commit();
+        if (!transition) {
+          return;
+        }
+        if (takeTransition(transition, errorEvent)) {
+          commit();
+        }
       },
     );
   }
 
   function clearAfterTimers(): void {
-    for (const id of afterTimers) clearTimeout(id);
+    for (const id of afterTimers) {
+      clearTimeout(id);
+    }
     afterTimers = [];
   }
 
   function startAfterTimers(): void {
     const afterConfig = states[value].after;
-    if (!afterConfig) return;
+    if (!afterConfig) {
+      return;
+    }
     for (const [delayStr, raw] of Object.entries(afterConfig)) {
       const delay = Number(delayStr);
       // normalizeTransitions takes `raw: unknown`, so the AfterEvent↔EventObject
@@ -174,11 +201,17 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       const transitions = normalizeTransitions<TContext, EventObject>(raw);
       const id = setTimeout(() => {
         afterTimers = afterTimers.filter(t => t !== id);
-        if (status !== 'active') return;
+        if (status !== 'active') {
+          return;
+        }
         const afterEvent: AfterEvent = { type: AFTER, delay };
         const transition = pickTransition(transitions, afterEvent);
-        if (!transition) return;
-        if (takeTransition(transition, afterEvent)) commit();
+        if (!transition) {
+          return;
+        }
+        if (takeTransition(transition, afterEvent)) {
+          commit();
+        }
       }, delay);
       afterTimers.push(id);
     }
@@ -187,7 +220,9 @@ export function createActor<TContext extends object, TEvent extends EventObject>
   /** Entry side of a state: entry actions, then immediate/invoke resolution. */
   function enterState(event: EventObject): void {
     const stateConfig = states[value];
-    if (!stateConfig) return; // degenerate graph (e.g. empty wizard) — nothing to enter
+    if (!stateConfig) {
+      return;
+    } // degenerate graph (e.g. empty wizard) — nothing to enter
     runActions(stateConfig.entry, event);
 
     if (stateConfig.type === 'final') {
@@ -213,7 +248,9 @@ export function createActor<TContext extends object, TEvent extends EventObject>
 
   const actor: Actor<TContext, TEvent> = {
     start() {
-      if (started) return actor;
+      if (started) {
+        return actor;
+      }
       started = true;
       status = 'active';
       // Reset state and context so a restart (e.g. after StrictMode stop/start)
@@ -226,7 +263,9 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     },
 
     stop() {
-      if (status === 'stopped') return;
+      if (status === 'stopped') {
+        return;
+      }
       started = false; // allow restart (e.g. StrictMode effect cleanup + remount)
       status = 'stopped';
       invocationToken++; // abandon any in-flight invoke
@@ -239,10 +278,16 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     },
 
     send(event) {
-      if (!started || status !== 'active') return;
+      if (!started || status !== 'active') {
+        return;
+      }
       const transition = pickTransition(normalizeTransitions(states[value]?.on?.[event.type]), event);
-      if (!transition) return; // event not handled in this state → ignored
-      if (takeTransition(transition, event)) commit(); // entry-blocked → no commit, no notify
+      if (!transition) {
+        return;
+      } // event not handled in this state → ignored
+      if (takeTransition(transition, event)) {
+        commit();
+      } // entry-blocked → no commit, no notify
     },
 
     getSnapshot() {
@@ -262,10 +307,14 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     },
 
     can(event) {
-      if (!started || status !== 'active') return false;
+      if (!started || status !== 'active') {
+        return false;
+      }
       const transition = pickTransition(normalizeTransitions(states[value]?.on?.[event.type]), event);
-      if (!transition) return false;
-      return transition.target === undefined || canEnter(transition.target as string, event);
+      if (!transition) {
+        return false;
+      }
+      return transition.target === undefined || canEnter(transition.target, event);
     },
 
     setContext(patch: Partial<TContext>) {
@@ -274,7 +323,9 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     },
 
     recheck() {
-      if (status !== 'active') return;
+      if (status !== 'active') {
+        return;
+      }
       const event = { type: RECHECK };
 
       // Self-correct first: if live external data has made the *current* state
