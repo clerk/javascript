@@ -299,7 +299,6 @@ export const MultiSessionActions = (props: MultiSessionActionsProps) => {
           icon={Add}
           label={localizationKeys('userButton.action__addAccount')}
           onClick={handleAddAccountClicked}
-          role={undefined}
           iconSx={t => ({
             width: t.sizes.$9,
             height: t.sizes.$6,
@@ -366,7 +365,6 @@ export const SignOutAllActions = (props: SignOutAllActionsProps) => {
         onClick={handleSignOutAllClicked}
         variant='ghost'
         colorScheme='neutral'
-        role={undefined}
         sx={[
           t => ({
             backgroundColor: t.colors.$transparent,
