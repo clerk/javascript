@@ -36,6 +36,7 @@ testAgainstRunningApps({})('billing hooks @billing', ({ app }) => {
 
   test.describe('when signed in', () => {
     test.describe.configure({ mode: 'serial' });
+
     test('subscribes to a plan', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
@@ -51,8 +52,6 @@ testAgainstRunningApps({})('billing hooks @billing', ({ app }) => {
     });
 
     test('renders billing hooks with plans, statements and subscription', async ({ page, context }) => {
-      // TODO: Re-enable once flaky statements endpoint is fixed
-      test.skip(true, 'Skipped due to flaky statements endpoint');
       const u = createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });

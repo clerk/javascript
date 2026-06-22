@@ -51,7 +51,7 @@ vi.mock('../../specs/NativeClerkModule', () => {
     default: {
       configure: vi.fn(),
       getClientToken: vi.fn(),
-      syncFromJsClientToken: vi.fn(),
+      syncClientStateFromJs: vi.fn(),
     },
   };
 });

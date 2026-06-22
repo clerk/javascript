@@ -51,10 +51,15 @@ export const deDE: LocalizationResource = {
       formButtonPrimary__revoke: 'API-Key widerrufen',
       formHint: 'Sind Sie sicher, dass Sie diesen API-Key löschen wollen?',
       formTitle: 'API-Key "{{apiKeyName}}" widerrufen?',
+      inputLabel: undefined,
     },
+    tableHeader__actions: undefined,
+    tableHeader__lastUsed: undefined,
+    tableHeader__name: undefined,
   },
   backButton: 'Zurück',
   badge__activePlan: 'Aktiv',
+  badge__banned: undefined,
   badge__canceledEndsAt: "Storniert • Endet am {{ date | shortDate('de-DE') }}",
   badge__currentPlan: 'Aktueller Plan',
   badge__default: 'Standard',
@@ -75,11 +80,14 @@ export const deDE: LocalizationResource = {
   badge__userDevice: 'Benutzergerät',
   badge__you: 'Du',
   billing: {
+    accountCredit: undefined,
     addPaymentMethod__label: 'Zahlungsmethode hinzufügen',
     alwaysFree: 'Immer kostenlos',
     annually: 'Jährlich',
     availableFeatures: 'Verfügbare Funktionen',
     billedAnnually: 'Jährlich abgerechnet',
+    billedAnnuallyOnly: undefined,
+    billedMonthly: undefined,
     billedMonthlyOnly: 'Nur monatlich abgerechnet',
     cancelFreeTrial: 'Kostenlose Testversion kündigen',
     cancelFreeTrialAccessUntil:
@@ -118,20 +126,25 @@ export const deDE: LocalizationResource = {
       title__subscriptionSuccessful: 'Geschafft!',
       title__trialSuccess: 'Testversion erfolgreich gestartet!',
       totalDueAfterTrial: 'Gesamtbetrag fällig nach Testende in {{days}} Tagen',
+      totalDuePerPeriod: undefined,
     },
     credit: 'Guthaben',
     creditRemainder: 'Verbleibendes Guthaben für den restlichen Abrechnungszeitraum.',
     defaultFreePlanActive: 'Sie nutzen aktuell den kostenlosen Plan.',
     free: 'Kostenlos',
     getStarted: 'Jetzt starten',
+    highlightedPlanBadge: 'Beliebt',
     keepFreeTrial: 'Kostenlose Testversion behalten',
     keepSubscription: 'Abonnement behalten',
     manage: 'Verwalten',
     manageSubscription: 'Mitgliedschaft verwalten',
     month: 'Monat',
+    monthAbbreviation: undefined,
+    monthPerUnit: undefined,
     monthly: 'Monatlich',
     pastDue: 'Überfällig',
     pay: '{{amount}} bezahlen',
+    payerCreditRemainder: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: 'Jährlich abgerechnet',
@@ -147,12 +160,32 @@ export const deDE: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Zahlungsmethoden',
-    highlightedPlanBadge: 'Beliebt',
     pricingTable: {
       billingCycle: 'Abrechnungszyklus',
       included: 'Enthalten',
+      seatCost: {
+        additionalSeats: undefined,
+        freeUpToSeats: undefined,
+        includedSeats: undefined,
+        perSeat: undefined,
+        tooltip: {
+          additionalSeatsEach: undefined,
+          firstSeatsIncludedInPlan: undefined,
+          freeForUpToSeats: undefined,
+        },
+        unlimitedSeats: undefined,
+        upToSeats: undefined,
+      },
     },
+    proratedDiscount: undefined,
+    prorationCredit: undefined,
     reSubscribe: 'Erneut abonnieren',
+    seatBreakdownIncludedPlural: undefined,
+    seatBreakdownIncludedSingular: undefined,
+    seatBreakdownPlural: undefined,
+    seatBreakdownSingular: undefined,
+    seats: undefined,
+    seatsWithLimit: undefined,
     seeAllFeatures: 'Alle Funktionen anzeigen',
     startFreeTrial: 'Kostenlose Testversion starten',
     startFreeTrial__days: '{{days}}-tägige kostenlose Testversion starten',
@@ -173,18 +206,453 @@ export const deDE: LocalizationResource = {
       trialStartedOn: 'Testversion gestartet am',
     },
     subtotal: 'Zwischensumme',
+    subtotalRenewal: undefined,
     switchPlan: 'Zu diesem Plan wechseln',
     switchToAnnual: 'Wechsel zu jährlich',
     switchToAnnualWithAnnualPrice: 'Auf jährlich wechseln {{currency}}{{price}} / Jahr',
     switchToMonthly: 'Wechsel zu monatlich',
     switchToMonthlyWithPrice: 'Auf monatlich wechseln {{currency}}{{price}} / Monat',
     totalDue: 'Gesamtbetrag',
+    totalDuePerPeriod: undefined,
     totalDueToday: 'Heute fällig',
     viewFeatures: 'Funktionen anzeigen',
     viewPayment: 'Zahlung anzeigen',
     year: 'Jahr',
+    yearAbbreviation: undefined,
+    yearPerUnit: undefined,
   },
   configureSSO: {
+    configureStep: {
+      attributeMappingTable: {
+        badges: {
+          optional: undefined,
+          required: undefined,
+        },
+      },
+      samlCustom: {
+        assignUsersStep: {
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          title: undefined,
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attributeName: undefined,
+              userProfile: undefined,
+            },
+            rows: {
+              email: {
+                attributeName: undefined,
+                userProfile: undefined,
+              },
+              firstName: {
+                attributeName: undefined,
+                userProfile: undefined,
+              },
+              lastName: {
+                attributeName: undefined,
+                userProfile: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        createAppStep: {
+          createAppInstructions: {
+            paragraph: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+            title: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+      },
+      samlGoogle: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              appAttribute: undefined,
+              googleAttribute: undefined,
+            },
+            rows: {
+              email: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+              firstName: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+              lastName: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+        },
+        configureUserAccess: {
+          assignUsersInstructions: {
+            paragraph1: undefined,
+            paragraph2: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        createAppStep: {
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataFile: {
+            description: undefined,
+            fileUploaded: undefined,
+            label: undefined,
+            removeFile: undefined,
+            replaceFile: undefined,
+            uploadFile: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataFile: undefined,
+            title: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        serviceProviderStep: {
+          headerSubtitle: undefined,
+          nameIdInstructions: {
+            step1: undefined,
+            step2: undefined,
+          },
+          paragraph: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+          title: undefined,
+        },
+      },
+      samlMicrosoft: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attribute: undefined,
+              claimName: undefined,
+              value: undefined,
+            },
+            rows: {
+              email: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+              firstName: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+              lastName: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          title: undefined,
+        },
+        createAppStep: {
+          assignUsersInstructions: {
+            paragraph1: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            step6: undefined,
+            title: undefined,
+          },
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: {
+              label: undefined,
+              subSteps: {
+                appName: undefined,
+                create: undefined,
+                nonGallery: undefined,
+              },
+            },
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+            title: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        serviceProviderStep: {
+          headerSubtitle: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+          step5: undefined,
+          step6: undefined,
+          title: undefined,
+        },
+      },
+      samlOkta: {
+        assignUsersStep: {
+          assignUsersInstructions: {
+            paragraph: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              expression: undefined,
+              name: undefined,
+            },
+            rows: {
+              email: {
+                expression: undefined,
+                name: undefined,
+              },
+              firstName: {
+                expression: undefined,
+                name: undefined,
+              },
+              lastName: {
+                expression: undefined,
+                name: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+        },
+        createAppStep: {
+          completeSamlIntegrationInstructions: {
+            step1: undefined,
+            step2: undefined,
+            title: undefined,
+          },
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+          serviceProviderInstructions: {
+            paragraph1: undefined,
+            paragraph2: undefined,
+            serviceProviderFields: {
+              acsUrl: {
+                label: undefined,
+              },
+              spEntityId: {
+                label: undefined,
+              },
+            },
+            title: undefined,
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+            title: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+      },
+    },
+    confirmation: {
+      configurationSection: {
+        configureAgainLink: undefined,
+        issuerLabel: undefined,
+        ssoUrlLabel: undefined,
+        title: undefined,
+      },
+      domainSection: {
+        title: undefined,
+      },
+      enableSection: {
+        title: undefined,
+      },
+      inactiveBanner: {
+        title: undefined,
+      },
+      resetSection: {
+        confirmationFieldLabel: undefined,
+        submitButton: undefined,
+        title: undefined,
+        warning: undefined,
+      },
+      statusSection: {
+        activeBadge: undefined,
+        inactiveBadge: undefined,
+        title: undefined,
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'Wenden Sie sich an Ihren Organisationsadministrator, um Ihre Berechtigungen zu erweitern.',
       title: 'Sie haben keine Berechtigung, Single Sign-On (SSO) zu verwalten',
@@ -192,40 +660,123 @@ export const deDE: LocalizationResource = {
     navbar: {
       title: 'Single Sign-On (SSO) konfigurieren',
     },
-    selectProviderStep: {
-      title: 'Anbieter auswählen',
-      subtitle: 'Wählen Sie den Anbieter, für den Sie SSO einrichten möchten.',
-      saml: {
-        groupLabel: 'SAML',
-        okta: 'Okta Workforce',
-        customSaml: 'Benutzerdefinierter SAML-Anbieter',
-      },
-      warning:
-        'Sobald ein Anbieter ausgewählt ist, können Sie ihn nicht mehr ändern, bis die Konfiguration abgeschlossen ist',
-    },
     organizationDomainsStep: {
-      title: 'SSO-Domains hinzufügen',
-      subtitle:
-        'Fügen Sie die Domains hinzu, die Ihre Organisation zur Anmeldung verwendet, und verifizieren Sie deren Eigentümerschaft.',
-      formFieldLabel__domain: 'Domains',
-      formFieldInputPlaceholder__domain: 'Geben Sie hier Ihre Domain ein und klicken Sie zum Starten auf „Hinzufügen"',
-      formButtonPrimary__add: 'Hinzufügen',
-      domainSuggestion: {
-        messageLabel: 'Ihre E-Mail verwendet {{domain}}. Möchten Sie sie hinzufügen?',
-        formButtonPrimary__add: '{{domain}} hinzufügen',
-      },
       domainCard: {
-        badge__verified: 'Verifiziert',
         badge__unverified: 'Nicht verifiziert',
-        verifiedAtLabel: "Verifiziert am {{ date | shortDate('de-DE') }}",
+        badge__verified: 'Verifiziert',
+        removeButtonTooltip__lastVerifiedDomain: undefined,
+        removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          hostLabel: 'Host / Name',
           instructions:
             'Fügen Sie diesen TXT-Eintrag bei Ihrem DNS-Anbieter hinzu. Wir verifizieren ihn automatisch, sobald der Eintrag aktiv ist.',
           typeLabel: 'Typ',
-          hostLabel: 'Host / Name',
           valueLabel: 'Wert',
         },
+        verifiedAtLabel: "Verifiziert am {{ date | shortDate('de-DE') }}",
       },
+      domainSuggestion: {
+        formButtonPrimary__add: '{{domain}} hinzufügen',
+        messageLabel: 'Ihre E-Mail verwendet {{domain}}. Möchten Sie sie hinzufügen?',
+      },
+      formButtonPrimary__add: 'Hinzufügen',
+      formFieldInputPlaceholder__domain: 'Geben Sie hier Ihre Domain ein und klicken Sie zum Starten auf „Hinzufügen"',
+      formFieldLabel__domain: 'Domains',
+      removeDomainDialog: {
+        cancelButton: undefined,
+        removeButton: undefined,
+        subtitle__active: undefined,
+        subtitle__inactive: undefined,
+        title: undefined,
+      },
+      subtitle:
+        'Fügen Sie die Domains hinzu, die Ihre Organisation zur Anmeldung verwendet, und verifizieren Sie deren Eigentümerschaft.',
+      title: 'SSO-Domains hinzufügen',
+    },
+    resetConnectionDialog: {
+      cancelButton: undefined,
+      confirmationFieldLabel: undefined,
+      confirmationFieldPlaceholder: undefined,
+      resetButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    selectProviderStep: {
+      saml: {
+        customSaml: 'Benutzerdefinierter SAML-Anbieter',
+        google: undefined,
+        groupLabel: 'SAML',
+        microsoft: undefined,
+        okta: 'Okta Workforce',
+      },
+      subtitle: 'Wählen Sie den Anbieter, für den Sie SSO einrichten möchten.',
+      title: 'Anbieter auswählen',
+      warning:
+        'Sobald ein Anbieter ausgewählt ist, können Sie ihn nicht mehr ändern, bis die Konfiguration abgeschlossen ist',
+    },
+    testConfigurationStep: {
+      error__noSuccessfulTestRun: undefined,
+      subtitle: undefined,
+      testResults: {
+        actionLabel__refresh: undefined,
+        empty: {
+          subtitle: undefined,
+          title: undefined,
+        },
+        polling: undefined,
+        status__failed: undefined,
+        status__pending: undefined,
+        status__success: undefined,
+        title: undefined,
+      },
+      testRunDetails: {
+        howToFix: {
+          actionLabel__viewDocumentation: undefined,
+          oauth_access_denied: {
+            description: undefined,
+          },
+          oauth_fetch_user_error: {
+            intro: undefined,
+            step1: undefined,
+            step2: undefined,
+          },
+          oauth_token_exchange_error: {
+            description: undefined,
+          },
+          saml_email_address_domain_mismatch: {
+            description: undefined,
+          },
+          saml_response_relaystate_missing: {
+            description: undefined,
+          },
+          saml_user_attribute_missing: {
+            intro: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+          },
+          sectionTitle: undefined,
+        },
+        parsedUserInfo: {
+          email: undefined,
+          firstName: undefined,
+          sectionTitle: undefined,
+        },
+        runDetails: {
+          actionLabel__copied: undefined,
+          actionLabel__copy: undefined,
+          errorCode: undefined,
+          fullMessage: undefined,
+          sectionTitle: undefined,
+          status: undefined,
+          timestamp: undefined,
+        },
+        title: undefined,
+      },
+      testUrl: {
+        actionLabel__open: undefined,
+      },
+      title: undefined,
     },
   },
   createOrganization: {
@@ -275,6 +826,7 @@ export const deDE: LocalizationResource = {
   formFieldInputPlaceholder__organizationSlug: 'my-org',
   formFieldInputPlaceholder__password: 'Passwort eingeben',
   formFieldInputPlaceholder__phoneNumber: 'Telefonnummer eingeben',
+  formFieldInputPlaceholder__signUpPassword: undefined,
   formFieldInputPlaceholder__username: 'Benutzername eingeben',
   formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKey: 'API-Key',
@@ -305,6 +857,9 @@ export const deDE: LocalizationResource = {
   formFieldLabel__role: 'Rolle',
   formFieldLabel__signOutOfOtherSessions: 'Alle anderen Geräte abmelden',
   formFieldLabel__username: 'Benutzername',
+  identityPreviewEditButton__emailAddress: undefined,
+  identityPreviewEditButton__identifier: undefined,
+  identityPreviewEditButton__phoneNumber: undefined,
   impersonationFab: {
     action__signOut: 'Abmelden',
     title: 'Angemeldet als {{identifier}}',
@@ -315,6 +870,22 @@ export const deDE: LocalizationResource = {
   membershipRole__admin: 'Administrator',
   membershipRole__basicMember: 'Mitglied',
   membershipRole__guestMember: 'Gast',
+  oauthConsent: {
+    action__allow: undefined,
+    action__deny: undefined,
+    offlineAccessNotice: undefined,
+    redirectNotice: undefined,
+    redirectUriModal: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    scopeList: {
+      title: undefined,
+    },
+    subtitle: undefined,
+    viewFullUrl: undefined,
+    warning: undefined,
+  },
   organizationList: {
     action__createOrganization: 'Organisation erstellen',
     action__invitationAccept: 'Beitreten',
@@ -332,6 +903,7 @@ export const deDE: LocalizationResource = {
     },
     badge__automaticInvitation: 'Automatische Einladungen',
     badge__automaticSuggestion: 'Automatische Vorschläge',
+    badge__enterpriseSso: undefined,
     badge__manualInvitation: 'Keine automatische Aufnahme',
     badge__unverified: 'Nicht verifiziert',
     billingPage: {
@@ -369,6 +941,7 @@ export const deDE: LocalizationResource = {
       statementsSection: {
         empty: 'Keine Abrechnungen verfügbar',
         itemCaption__paidForPlan: 'Bezahlt für {{plan}} {{period}} Plan',
+        itemCaption__payerCredit: undefined,
         itemCaption__proratedCredit: 'Anteilige Gutschrift für teilweise Nutzung des vorherigen Abonnements',
         itemCaption__subscribedAndPaidForPlan: 'Abonniert und bezahlt für {{plan}} {{period}} Plan',
         notFound: 'Abrechnung nicht gefunden',
@@ -381,6 +954,11 @@ export const deDE: LocalizationResource = {
         actionLabel__manageSubscription: 'Verwalten',
         actionLabel__newSubscription: 'Plan abonnieren',
         actionLabel__switchPlan: 'Plan wechseln',
+        includedSeatsUsage: undefined,
+        overview: undefined,
+        paidSeatsUsage: undefined,
+        seatLimit: undefined,
+        seatLimitAndIncludedSeats: undefined,
         tableHeader__edit: 'Bearbeiten',
         tableHeader__plan: 'Plan',
         tableHeader__startDate: 'Startdatum',
@@ -403,6 +981,7 @@ export const deDE: LocalizationResource = {
       detailsTitle__inviteFailed:
         'Die Einladungen konnten nicht versendet werden. Beheben Sie Folgendes und versuchen Sie es erneut:',
       formButtonPrimary__continue: 'Einladungen verschicken',
+      formButtonPrimary__purchaseSeats: undefined,
       selectDropdown__role: 'Rolle wählen',
       subtitle: 'Laden Sie neue Mitglieder zu dieser Organisation ein',
       successMessage: 'Einladungen erfolgreich versendet',
@@ -463,12 +1042,14 @@ export const deDE: LocalizationResource = {
       description: 'Verwalten Sie Ihre Organisation.',
       general: 'Allgemein',
       members: 'Mitglieder',
+      security: undefined,
       title: 'Organisation',
     },
     plansPage: {
       alerts: {
         noPermissionsToManageBilling:
           'Sie haben keine Berechtigung, die Abrechnungen für diese Organisation zu verwalten.',
+        planMembershipLimitExceeded: undefined,
       },
       title: 'Pläne',
     },
@@ -509,9 +1090,33 @@ export const deDE: LocalizationResource = {
       successMessage: '{{domain}} wurde entfernt.',
       title: 'Domain entfernen',
     },
+    securityPage: {
+      removeDialog: {
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      ssoSection: {
+        badge__active: undefined,
+        badge__inProgress: undefined,
+        badge__inactive: undefined,
+        badge__unconfigured: undefined,
+        descriptionLine1: undefined,
+        domainLabel: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__continueConfiguration: undefined,
+        primaryButton__startConfiguration: undefined,
+        title: undefined,
+      },
+      title: undefined,
+    },
     start: {
       headerTitle__general: 'Allgemein',
       headerTitle__members: 'Mitglieder',
+      membershipSeatUsageLabel: undefined,
       profileSection: {
         primaryButton: 'Profil bearbeiten',
         title: 'Organisationsprofil',
@@ -1024,6 +1629,8 @@ export const deDE: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: 'Sie sind bereits Mitglied in dieser Organisation.',
+    api_key_name_already_exists: undefined,
+    api_key_usage_exceeded: undefined,
     avatar_file_size_exceeded:
       'Die Dateigröße überschreitet das Maximum von 10 MB. Bitte wählen Sie eine kleinere Datei.',
     avatar_file_type_invalid:
@@ -1070,6 +1677,8 @@ export const deDE: LocalizationResource = {
     form_username_invalid_length: 'Der Benutzername muss zwischen 3 und 30 Zeichen lang sein.',
     form_username_needs_non_number_char: 'Ihr Benutzername muss mindestens ein nicht-numerisches Zeichen enthalten.',
     identification_deletion_failed: 'Sie können Ihre letzte Kennung nicht löschen.',
+    insufficient_seats_change_plan: undefined,
+    insufficient_seats_contact_support: undefined,
     not_allowed_access:
       "Die E-Mail-Adresse oder Telefonnummer ist für die Anmeldung nicht zulässig. Dies kann daran liegen, dass Ihre E-Mail-Adresse die Zeichen '+', '=', '#' oder '.' enthält, Sie eine Domain verwenden, die mit einem temporären E-Mail-Dienst verknüpft ist, oder dass Sie explizit gesperrt sind. Wenn Sie glauben, dass dies ein Fehler ist, wenden Sie sich bitte an den Support.",
     organization_domain_blocked: 'Diese E-Mail-Provider-Domain ist gesperrt. Bitte verwenden Sie eine andere.',
@@ -1215,6 +1824,7 @@ export const deDE: LocalizationResource = {
       statementsSection: {
         empty: 'Keine Abrechnungen verfügbar',
         itemCaption__paidForPlan: 'Bezahlt für {{plan}} {{period}} Plan',
+        itemCaption__payerCredit: undefined,
         itemCaption__proratedCredit: 'Anteilige Gutschrift für teilweise Nutzung des vorherigen Abonnements',
         itemCaption__subscribedAndPaidForPlan: 'Abonniert und bezahlt für {{plan}} {{period}} Plan',
         notFound: 'Abrechnung nicht gefunden',
@@ -1227,6 +1837,7 @@ export const deDE: LocalizationResource = {
         actionLabel__manageSubscription: 'Verwalten',
         actionLabel__newSubscription: 'Plan abonnieren',
         actionLabel__switchPlan: 'Plan wechseln',
+        overview: undefined,
         tableHeader__edit: 'Bearbeiten',
         tableHeader__plan: 'Plan',
         tableHeader__startDate: 'Startdatum',

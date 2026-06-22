@@ -50,10 +50,15 @@ export const elGR: LocalizationResource = {
       formButtonPrimary__revoke: 'Ανάκληση κλειδιού',
       formHint: 'Αυτή η ενέργεια είναι μόνιμη και μη αναστρέψιμη.',
       formTitle: 'Ανάκληση κλειδιού API',
+      inputLabel: undefined,
     },
+    tableHeader__actions: undefined,
+    tableHeader__lastUsed: undefined,
+    tableHeader__name: undefined,
   },
   backButton: 'Πίσω',
   badge__activePlan: 'Ενεργό πλάνο',
+  badge__banned: undefined,
   badge__canceledEndsAt: 'Ακυρώθηκε, λήγει {{date | timeString("el-GR")}}',
   badge__currentPlan: 'Τρέχον πλάνο',
   badge__default: 'Προεπιλογή',
@@ -74,11 +79,14 @@ export const elGR: LocalizationResource = {
   badge__userDevice: 'Συσκευή χρήστη',
   badge__you: 'Εσείς',
   billing: {
+    accountCredit: undefined,
     addPaymentMethod__label: 'Προσθήκη μεθόδου πληρωμής',
     alwaysFree: 'Πάντα δωρεάν',
     annually: 'Ετήσια',
     availableFeatures: 'Διαθέσιμα χαρακτηριστικά',
     billedAnnually: 'Χρέωση ετησίως',
+    billedAnnuallyOnly: undefined,
+    billedMonthly: undefined,
     billedMonthlyOnly: 'Χρέωση μόνο μηνιαίως',
     cancelFreeTrial: 'Ακύρωση δωρεάν δοκιμής',
     cancelFreeTrialAccessUntil: 'Θα έχετε πρόσβαση μέχρι τις {{date | timeString("el-GR")}}',
@@ -112,20 +120,25 @@ export const elGR: LocalizationResource = {
       title__subscriptionSuccessful: 'Επιτυχής συνδρομή',
       title__trialSuccess: 'Επιτυχής δωρεάν δοκιμή',
       totalDueAfterTrial: 'Σύνολο οφειλής μετά τη δοκιμή',
+      totalDuePerPeriod: undefined,
     },
     credit: 'Πίστωση',
     creditRemainder: 'Υπόλοιπο πίστωσης',
     defaultFreePlanActive: 'Το προεπιλεγμένο δωρεάν πλάνο είναι ενεργό',
     free: 'Δωρεάν',
     getStarted: 'Ξεκινήστε',
+    highlightedPlanBadge: 'Δημοφιλές',
     keepFreeTrial: 'Διατήρηση δωρεάν δοκιμής',
     keepSubscription: 'Διατήρηση συνδρομής',
     manage: 'Διαχείριση',
     manageSubscription: 'Διαχείριση συνδρομής',
     month: 'μήνας',
+    monthAbbreviation: undefined,
+    monthPerUnit: undefined,
     monthly: 'Μηνιαία',
     pastDue: 'Ληξιπρόθεσμο',
     pay: 'Πληρωμή',
+    payerCreditRemainder: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: '{{price}} ετησίως',
@@ -141,12 +154,32 @@ export const elGR: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Μέθοδοι πληρωμής',
-    highlightedPlanBadge: 'Δημοφιλές',
     pricingTable: {
       billingCycle: 'Κύκλος χρέωσης',
       included: 'Περιλαμβάνεται',
+      seatCost: {
+        additionalSeats: undefined,
+        freeUpToSeats: undefined,
+        includedSeats: undefined,
+        perSeat: undefined,
+        tooltip: {
+          additionalSeatsEach: undefined,
+          firstSeatsIncludedInPlan: undefined,
+          freeForUpToSeats: undefined,
+        },
+        unlimitedSeats: undefined,
+        upToSeats: undefined,
+      },
     },
+    proratedDiscount: undefined,
+    prorationCredit: undefined,
     reSubscribe: 'Επανεγγραφή',
+    seatBreakdownIncludedPlural: undefined,
+    seatBreakdownIncludedSingular: undefined,
+    seatBreakdownPlural: undefined,
+    seatBreakdownSingular: undefined,
+    seats: undefined,
+    seatsWithLimit: undefined,
     seeAllFeatures: 'Δείτε όλα τα χαρακτηριστικά',
     startFreeTrial: 'Έναρξη δωρεάν δοκιμής',
     startFreeTrial__days: 'Έναρξη δωρεάν δοκιμής {{days}} ημερών',
@@ -167,18 +200,453 @@ export const elGR: LocalizationResource = {
       trialStartedOn: 'Η δοκιμή ξεκίνησε στις',
     },
     subtotal: 'Υποσύνολο',
+    subtotalRenewal: undefined,
     switchPlan: 'Αλλαγή πλάνου',
     switchToAnnual: 'Αλλαγή σε ετήσια χρέωση',
     switchToAnnualWithAnnualPrice: 'Αλλαγή σε ετήσια χρέωση για {{price}}/έτος',
     switchToMonthly: 'Αλλαγή σε μηνιαία χρέωση',
     switchToMonthlyWithPrice: 'Αλλαγή σε μηνιαία χρέωση για {{price}}/μήνα',
     totalDue: 'Συνολική οφειλή',
+    totalDuePerPeriod: undefined,
     totalDueToday: 'Συνολική οφειλή σήμερα',
     viewFeatures: 'Προβολή χαρακτηριστικών',
     viewPayment: 'Προβολή πληρωμής',
     year: 'έτος',
+    yearAbbreviation: undefined,
+    yearPerUnit: undefined,
   },
   configureSSO: {
+    configureStep: {
+      attributeMappingTable: {
+        badges: {
+          optional: undefined,
+          required: undefined,
+        },
+      },
+      samlCustom: {
+        assignUsersStep: {
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          title: undefined,
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attributeName: undefined,
+              userProfile: undefined,
+            },
+            rows: {
+              email: {
+                attributeName: undefined,
+                userProfile: undefined,
+              },
+              firstName: {
+                attributeName: undefined,
+                userProfile: undefined,
+              },
+              lastName: {
+                attributeName: undefined,
+                userProfile: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        createAppStep: {
+          createAppInstructions: {
+            paragraph: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+            title: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+      },
+      samlGoogle: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              appAttribute: undefined,
+              googleAttribute: undefined,
+            },
+            rows: {
+              email: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+              firstName: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+              lastName: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+        },
+        configureUserAccess: {
+          assignUsersInstructions: {
+            paragraph1: undefined,
+            paragraph2: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        createAppStep: {
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataFile: {
+            description: undefined,
+            fileUploaded: undefined,
+            label: undefined,
+            removeFile: undefined,
+            replaceFile: undefined,
+            uploadFile: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataFile: undefined,
+            title: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        serviceProviderStep: {
+          headerSubtitle: undefined,
+          nameIdInstructions: {
+            step1: undefined,
+            step2: undefined,
+          },
+          paragraph: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+          title: undefined,
+        },
+      },
+      samlMicrosoft: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attribute: undefined,
+              claimName: undefined,
+              value: undefined,
+            },
+            rows: {
+              email: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+              firstName: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+              lastName: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          title: undefined,
+        },
+        createAppStep: {
+          assignUsersInstructions: {
+            paragraph1: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            step6: undefined,
+            title: undefined,
+          },
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: {
+              label: undefined,
+              subSteps: {
+                appName: undefined,
+                create: undefined,
+                nonGallery: undefined,
+              },
+            },
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+            title: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        serviceProviderStep: {
+          headerSubtitle: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+          step5: undefined,
+          step6: undefined,
+          title: undefined,
+        },
+      },
+      samlOkta: {
+        assignUsersStep: {
+          assignUsersInstructions: {
+            paragraph: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              expression: undefined,
+              name: undefined,
+            },
+            rows: {
+              email: {
+                expression: undefined,
+                name: undefined,
+              },
+              firstName: {
+                expression: undefined,
+                name: undefined,
+              },
+              lastName: {
+                expression: undefined,
+                name: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+        },
+        createAppStep: {
+          completeSamlIntegrationInstructions: {
+            step1: undefined,
+            step2: undefined,
+            title: undefined,
+          },
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+          serviceProviderInstructions: {
+            paragraph1: undefined,
+            paragraph2: undefined,
+            serviceProviderFields: {
+              acsUrl: {
+                label: undefined,
+              },
+              spEntityId: {
+                label: undefined,
+              },
+            },
+            title: undefined,
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+            title: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+      },
+    },
+    confirmation: {
+      configurationSection: {
+        configureAgainLink: undefined,
+        issuerLabel: undefined,
+        ssoUrlLabel: undefined,
+        title: undefined,
+      },
+      domainSection: {
+        title: undefined,
+      },
+      enableSection: {
+        title: undefined,
+      },
+      inactiveBanner: {
+        title: undefined,
+      },
+      resetSection: {
+        confirmationFieldLabel: undefined,
+        submitButton: undefined,
+        title: undefined,
+        warning: undefined,
+      },
+      statusSection: {
+        activeBadge: undefined,
+        inactiveBadge: undefined,
+        title: undefined,
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'Επικοινωνήστε με τον διαχειριστή του οργανισμού σας για να αναβαθμίσετε τις άδειές σας.',
       title: 'Δεν έχετε άδεια διαχείρισης της Ενιαίας Σύνδεσης (SSO)',
@@ -186,39 +654,122 @@ export const elGR: LocalizationResource = {
     navbar: {
       title: 'Διαμόρφωση Ενιαίας Σύνδεσης (SSO)',
     },
-    selectProviderStep: {
-      title: 'Επιλέξτε πάροχο',
-      subtitle: 'Επιλέξτε τον πάροχο για τον οποίο θα ρυθμίσετε SSO.',
-      saml: {
-        groupLabel: 'SAML',
-        okta: 'Okta Workforce',
-        customSaml: 'Προσαρμοσμένος πάροχος SAML',
-      },
-      warning: 'Μόλις επιλεγεί ένας πάροχος δεν μπορείτε να τον αλλάξετε μέχρι να ολοκληρωθεί η ρύθμιση',
-    },
     organizationDomainsStep: {
-      title: 'Προσθήκη τομέων SSO',
-      subtitle: 'Προσθέστε και επαληθεύστε την κυριότητα των τομέων που χρησιμοποιεί ο οργανισμός σας για σύνδεση.',
-      formFieldLabel__domain: 'Τομείς',
-      formFieldInputPlaceholder__domain:
-        'Πληκτρολογήστε τον τομέα σας εδώ και κάντε κλικ στο «Προσθήκη» για να ξεκινήσετε',
-      formButtonPrimary__add: 'Προσθήκη',
-      domainSuggestion: {
-        messageLabel: 'Το email σας χρησιμοποιεί {{domain}}. Θέλετε να το προσθέσετε;',
-        formButtonPrimary__add: 'Προσθήκη {{domain}}',
-      },
       domainCard: {
-        badge__verified: 'Επαληθευμένο',
         badge__unverified: 'Μη επαληθευμένο',
-        verifiedAtLabel: "Επαληθεύτηκε στις {{ date | shortDate('el-GR') }}",
+        badge__verified: 'Επαληθευμένο',
+        removeButtonTooltip__lastVerifiedDomain: undefined,
+        removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          hostLabel: 'Κεντρικός υπολογιστής / Όνομα',
           instructions:
             'Προσθέστε αυτήν την εγγραφή TXT στον πάροχο DNS σας. Θα την επαληθεύσουμε αυτόματα μόλις η εγγραφή ενεργοποιηθεί.',
           typeLabel: 'Τύπος',
-          hostLabel: 'Κεντρικός υπολογιστής / Όνομα',
           valueLabel: 'Τιμή',
         },
+        verifiedAtLabel: "Επαληθεύτηκε στις {{ date | shortDate('el-GR') }}",
       },
+      domainSuggestion: {
+        formButtonPrimary__add: 'Προσθήκη {{domain}}',
+        messageLabel: 'Το email σας χρησιμοποιεί {{domain}}. Θέλετε να το προσθέσετε;',
+      },
+      formButtonPrimary__add: 'Προσθήκη',
+      formFieldInputPlaceholder__domain:
+        'Πληκτρολογήστε τον τομέα σας εδώ και κάντε κλικ στο «Προσθήκη» για να ξεκινήσετε',
+      formFieldLabel__domain: 'Τομείς',
+      removeDomainDialog: {
+        cancelButton: undefined,
+        removeButton: undefined,
+        subtitle__active: undefined,
+        subtitle__inactive: undefined,
+        title: undefined,
+      },
+      subtitle: 'Προσθέστε και επαληθεύστε την κυριότητα των τομέων που χρησιμοποιεί ο οργανισμός σας για σύνδεση.',
+      title: 'Προσθήκη τομέων SSO',
+    },
+    resetConnectionDialog: {
+      cancelButton: undefined,
+      confirmationFieldLabel: undefined,
+      confirmationFieldPlaceholder: undefined,
+      resetButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    selectProviderStep: {
+      saml: {
+        customSaml: 'Προσαρμοσμένος πάροχος SAML',
+        google: undefined,
+        groupLabel: 'SAML',
+        microsoft: undefined,
+        okta: 'Okta Workforce',
+      },
+      subtitle: 'Επιλέξτε τον πάροχο για τον οποίο θα ρυθμίσετε SSO.',
+      title: 'Επιλέξτε πάροχο',
+      warning: 'Μόλις επιλεγεί ένας πάροχος δεν μπορείτε να τον αλλάξετε μέχρι να ολοκληρωθεί η ρύθμιση',
+    },
+    testConfigurationStep: {
+      error__noSuccessfulTestRun: undefined,
+      subtitle: undefined,
+      testResults: {
+        actionLabel__refresh: undefined,
+        empty: {
+          subtitle: undefined,
+          title: undefined,
+        },
+        polling: undefined,
+        status__failed: undefined,
+        status__pending: undefined,
+        status__success: undefined,
+        title: undefined,
+      },
+      testRunDetails: {
+        howToFix: {
+          actionLabel__viewDocumentation: undefined,
+          oauth_access_denied: {
+            description: undefined,
+          },
+          oauth_fetch_user_error: {
+            intro: undefined,
+            step1: undefined,
+            step2: undefined,
+          },
+          oauth_token_exchange_error: {
+            description: undefined,
+          },
+          saml_email_address_domain_mismatch: {
+            description: undefined,
+          },
+          saml_response_relaystate_missing: {
+            description: undefined,
+          },
+          saml_user_attribute_missing: {
+            intro: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+          },
+          sectionTitle: undefined,
+        },
+        parsedUserInfo: {
+          email: undefined,
+          firstName: undefined,
+          sectionTitle: undefined,
+        },
+        runDetails: {
+          actionLabel__copied: undefined,
+          actionLabel__copy: undefined,
+          errorCode: undefined,
+          fullMessage: undefined,
+          sectionTitle: undefined,
+          status: undefined,
+          timestamp: undefined,
+        },
+        title: undefined,
+      },
+      testUrl: {
+        actionLabel__open: undefined,
+      },
+      title: undefined,
     },
   },
   createOrganization: {
@@ -268,6 +819,7 @@ export const elGR: LocalizationResource = {
   formFieldInputPlaceholder__organizationSlug: 'my-org',
   formFieldInputPlaceholder__password: 'Εισάγετε τον κωδικό σας',
   formFieldInputPlaceholder__phoneNumber: 'Εισάγετε τον αριθμό τηλεφώνου σας',
+  formFieldInputPlaceholder__signUpPassword: undefined,
   formFieldInputPlaceholder__username: 'Εισάγετε όνομα χρήστη',
   formFieldInput__emailAddress_format: 'Διεύθυνση email',
   formFieldLabel__apiKey: 'Κλειδί API',
@@ -298,6 +850,9 @@ export const elGR: LocalizationResource = {
   formFieldLabel__role: 'Ρόλος',
   formFieldLabel__signOutOfOtherSessions: 'Αποσύνδεση από όλες τις άλλες συσκευές',
   formFieldLabel__username: 'Όνομα χρήστη',
+  identityPreviewEditButton__emailAddress: undefined,
+  identityPreviewEditButton__identifier: undefined,
+  identityPreviewEditButton__phoneNumber: undefined,
   impersonationFab: {
     action__signOut: 'Αποσύνδεση',
     title: 'Είστε συνδεδεμένος ως {{identifier}}',
@@ -308,6 +863,22 @@ export const elGR: LocalizationResource = {
   membershipRole__admin: 'Διαχειριστής',
   membershipRole__basicMember: 'Μέλος',
   membershipRole__guestMember: 'Επισκέπτης',
+  oauthConsent: {
+    action__allow: undefined,
+    action__deny: undefined,
+    offlineAccessNotice: undefined,
+    redirectNotice: undefined,
+    redirectUriModal: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    scopeList: {
+      title: undefined,
+    },
+    subtitle: undefined,
+    viewFullUrl: undefined,
+    warning: undefined,
+  },
   organizationList: {
     action__createOrganization: 'Δημιουργία οργανισμού',
     action__invitationAccept: 'Συμμετοχή',
@@ -325,6 +896,7 @@ export const elGR: LocalizationResource = {
     },
     badge__automaticInvitation: 'Αυτόματες προσκλήσεις',
     badge__automaticSuggestion: 'Αυτόματες προτάσεις',
+    badge__enterpriseSso: undefined,
     badge__manualInvitation: 'Χωρίς αυτόματη εγγραφή',
     badge__unverified: 'Μη επαληθευμένο',
     billingPage: {
@@ -361,6 +933,7 @@ export const elGR: LocalizationResource = {
       statementsSection: {
         empty: 'Δεν υπάρχουν καταστάσεις',
         itemCaption__paidForPlan: 'Πληρώθηκε για {{planName}}',
+        itemCaption__payerCredit: undefined,
         itemCaption__proratedCredit: 'Πίστωση αναλογικής κατανομής',
         itemCaption__subscribedAndPaidForPlan: 'Εγγραφή και πληρωμή για {{planName}}',
         notFound: 'Δεν βρέθηκαν καταστάσεις',
@@ -373,6 +946,11 @@ export const elGR: LocalizationResource = {
         actionLabel__manageSubscription: 'Διαχείριση συνδρομής',
         actionLabel__newSubscription: 'Νέα συνδρομή',
         actionLabel__switchPlan: 'Αλλαγή πλάνου',
+        includedSeatsUsage: undefined,
+        overview: undefined,
+        paidSeatsUsage: undefined,
+        seatLimit: undefined,
+        seatLimitAndIncludedSeats: undefined,
         tableHeader__edit: 'Επεξεργασία',
         tableHeader__plan: 'Πλάνο',
         tableHeader__startDate: 'Ημερομηνία έναρξης',
@@ -395,6 +973,7 @@ export const elGR: LocalizationResource = {
       detailsTitle__inviteFailed:
         'Οι προσκλήσεις δεν μπορούσαν να σταλούν. Διορθώστε τα παρακάτω στοιχεία και δοκιμάστε ξανά:',
       formButtonPrimary__continue: 'Αποστολή προσκλήσεων',
+      formButtonPrimary__purchaseSeats: undefined,
       selectDropdown__role: 'Επιλογή ρόλου',
       subtitle: 'Προσκαλέστε νέα μέλη σε αυτόν τον οργανισμό',
       successMessage: 'Οι προσκλήσεις εστάλησαν με επιτυχία',
@@ -455,11 +1034,13 @@ export const elGR: LocalizationResource = {
       description: 'Διαχείριση του οργανισμού σας.',
       general: 'Γενικά',
       members: 'Μέλη',
+      security: undefined,
       title: 'Οργανισμός',
     },
     plansPage: {
       alerts: {
         noPermissionsToManageBilling: 'Δεν έχετε δικαιώματα για διαχείριση χρεώσεων',
+        planMembershipLimitExceeded: undefined,
       },
       title: 'Πλάνα',
     },
@@ -500,9 +1081,33 @@ export const elGR: LocalizationResource = {
       successMessage: 'Ο τομέας {{domain}} αφαιρέθηκε.',
       title: 'Αφαίρεση τομέα',
     },
+    securityPage: {
+      removeDialog: {
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      ssoSection: {
+        badge__active: undefined,
+        badge__inProgress: undefined,
+        badge__inactive: undefined,
+        badge__unconfigured: undefined,
+        descriptionLine1: undefined,
+        domainLabel: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__continueConfiguration: undefined,
+        primaryButton__startConfiguration: undefined,
+        title: undefined,
+      },
+      title: undefined,
+    },
     start: {
       headerTitle__general: 'Γενικά',
       headerTitle__members: 'Μέλη',
+      membershipSeatUsageLabel: undefined,
       profileSection: {
         primaryButton: 'Ενημέρωση προφίλ',
         title: 'Προφίλ οργανισμού',
@@ -1018,6 +1623,8 @@ export const elGR: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: 'Είστε ήδη μέλος σε αυτόν τον οργανισμό',
+    api_key_name_already_exists: undefined,
+    api_key_usage_exceeded: undefined,
     avatar_file_size_exceeded:
       'Το μέγεθος του αρχείου υπερβαίνει το μέγιστο όριο των 10 MB. Επιλέξτε ένα μικρότερο αρχείο.',
     avatar_file_type_invalid: 'Ο τύπος αρχείου δεν υποστηρίζεται. Ανεβάστε μια εικόνα JPG, PNG, GIF ή WEBP.',
@@ -1067,6 +1674,8 @@ export const elGR: LocalizationResource = {
     form_username_invalid_length: 'Το όνομα χρήστη πρέπει να αποτελείται από 4 έως 64 χαρακτήρες.',
     form_username_needs_non_number_char: 'Το όνομα χρήστη πρέπει να περιέχει τουλάχιστον έναν μη αριθμητικό χαρακτήρα.',
     identification_deletion_failed: 'Δεν μπορείτε να διαγράψετε το τελευταίο στοιχείο ταυτοποιησής σας.',
+    insufficient_seats_change_plan: undefined,
+    insufficient_seats_contact_support: undefined,
     not_allowed_access:
       "Η διεύθυνση email ή το τηλέφωνο δεν επιτρέπεται για την εγγραφή. Αυτό μπορεί να οφείλεται στη χρήση '+', '=', '#' ή '.' στην διεύθυνση email σας, χρήση πεδίου που συνδέεται με υπηρεσία email, ή εμφανής αποκλεισμός. Αν πιστεύετε ότι αυτό είναι ένα σφάλμα, παρακαλούμε επικοινωνήστε με την υποστήριξη.",
     organization_domain_blocked: 'Ο τομέας {{domain}} δεν μπορεί να επαληθευτεί.',
@@ -1206,6 +1815,7 @@ export const elGR: LocalizationResource = {
       statementsSection: {
         empty: 'Δεν υπάρχουν καταστάσεις',
         itemCaption__paidForPlan: 'Πληρώθηκε για {{planName}}',
+        itemCaption__payerCredit: undefined,
         itemCaption__proratedCredit: 'Πίστωση αναλογικής κατανομής',
         itemCaption__subscribedAndPaidForPlan: 'Εγγραφή και πληρωμή για {{planName}}',
         notFound: 'Δεν βρέθηκαν καταστάσεις',
@@ -1218,6 +1828,7 @@ export const elGR: LocalizationResource = {
         actionLabel__manageSubscription: 'Διαχείριση συνδρομής',
         actionLabel__newSubscription: 'Νέα συνδρομή',
         actionLabel__switchPlan: 'Αλλαγή πλάνου',
+        overview: undefined,
         tableHeader__edit: 'Επεξεργασία',
         tableHeader__plan: 'Πλάνο',
         tableHeader__startDate: 'Ημερομηνία έναρξης',
