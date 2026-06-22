@@ -17,7 +17,7 @@ import type {
   UpdateOrganizationEnterpriseConnectionParams,
   UserResource,
 } from '@clerk/shared/types';
-import { useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 
 import {
   organizationEnterpriseConnection as buildOrganizationEnterpriseConnection,
@@ -46,6 +46,11 @@ export interface EnterpriseConnectionMutations {
    * never thread them through.
    */
   createConnection: (provider: ProviderType) => Promise<EnterpriseConnectionResource | undefined>;
+  /**
+   * Swaps the active organization's connection to a different provider. This removes the existing
+   * connection and creates a fresh one.
+   */
+  changeProvider: (provider: ProviderType) => Promise<EnterpriseConnectionResource | undefined>;
   updateConnection: (
     id: string,
     params: UpdateOrganizationEnterpriseConnectionParams,
@@ -174,6 +179,24 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
   const { session } = useSession();
   const { organization } = useOrganization();
 
+  const handleDomainOwnershipVerified = useCallback(
+    async (verifiedDomains: OrganizationDomainResource[]) => {
+      if (!enterpriseConnection) {
+        return;
+      }
+
+      const verifiedDomainNames = verifiedDomains.map(domain => domain.name);
+      const domains = Array.from(new Set([...(enterpriseConnection.domains ?? []), ...verifiedDomainNames]));
+      const hasNewDomains = domains.length !== (enterpriseConnection.domains?.length ?? 0);
+      if (!hasNewDomains) {
+        return;
+      }
+
+      await updateEnterpriseConnection(enterpriseConnection.id, { domains });
+    },
+    [enterpriseConnection, updateEnterpriseConnection],
+  );
+
   const {
     isLoading: isLoadingOrganizationDomains,
     data: organizationDomains,
@@ -181,7 +204,10 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
     prepareOwnershipVerification,
     attemptOwnershipVerification,
     revalidate: revalidateDomains,
-  } = __internal_useOrganizationDomains({ enrollmentMode: 'enterprise_sso' });
+  } = __internal_useOrganizationDomains({
+    enrollmentMode: 'enterprise_sso',
+    onOwnershipVerified: handleDomainOwnershipVerified,
+  });
 
   const organizationDomainMutations = useMemo<OrganizationDomainMutations>(
     () => ({
@@ -195,17 +221,24 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
 
   const enterpriseConnectionMutations = useMemo<EnterpriseConnectionMutations>(() => {
     const createConnection: EnterpriseConnectionMutations['createConnection'] = provider => {
-      const primaryEmailAddress = user?.primaryEmailAddress;
-      const emailDomain = primaryEmailAddress?.emailAddress.split('@')[1];
+      return createEnterpriseConnection({
+        provider,
+        domains: organizationDomains?.map(domain => domain.name),
+      });
+    };
 
-      // Connection name will always be defined due to the organization name
-      // Soon this logic will be moved to the Frontend API
-      const connectionName = emailDomain ?? organization?.name ?? '';
+    const changeProvider: EnterpriseConnectionMutations['changeProvider'] = async provider => {
+      // Currently it's not possible to change the provider of an existing connection,
+      // so we need to delete the existing connection and create a new one.
+      if (enterpriseConnection) {
+        await deleteEnterpriseConnection(enterpriseConnection.id);
+      }
+
+      const domains = enterpriseConnection?.domains ?? organizationDomains?.map(domain => domain.name);
 
       return createEnterpriseConnection({
         provider,
-        name: connectionName,
-        domains: organizationDomains?.map(domain => domain.name),
+        domains,
       });
     };
 
@@ -231,6 +264,7 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
 
     return {
       createConnection,
+      changeProvider,
       updateConnection,
       setConnectionActive,
       deleteConnection,
@@ -240,6 +274,7 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
     user,
     organization,
     organizationDomains,
+    enterpriseConnection,
     createEnterpriseConnection,
     updateEnterpriseConnection,
     deleteEnterpriseConnection,

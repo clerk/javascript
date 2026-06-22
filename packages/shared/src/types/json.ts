@@ -398,6 +398,7 @@ export interface OrganizationJSON extends ClerkResourceJSON {
   admin_delete_enabled: boolean;
   max_allowed_memberships: number;
   self_serve_sso_enabled?: boolean;
+  exclusive_membership?: boolean;
 }
 
 export interface OrganizationMembershipJSON extends ClerkResourceJSON {

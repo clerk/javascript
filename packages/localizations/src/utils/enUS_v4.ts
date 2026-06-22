@@ -80,6 +80,9 @@ export const enUS_v4: any = {
   footerPageLink__terms: 'Terms',
   paginationButton__previous: 'Previous',
   paginationButton__next: 'Next',
+  identityPreviewEditButton__emailAddress: 'Edit email address',
+  identityPreviewEditButton__phoneNumber: 'Edit phone number',
+  identityPreviewEditButton__identifier: 'Edit identifier',
   paginationRowText__displaying: 'Displaying',
   paginationRowText__of: 'of',
   membershipRole__admin: 'Admin',
@@ -556,7 +559,7 @@ export const enUS_v4: any = {
       headerSubtitle__settings: 'Manage organization settings',
     },
     profilePage: {
-      title: 'Organization Profile',
+      title: 'Profile',
       subtitle: 'Manage organization profile',
       successMessage: 'The organization has been updated.',
       dangerSection: {

@@ -5,6 +5,7 @@ import { renderElement } from '@clerk/headless/utils';
 
 import type { RecipeVariantProps } from '../slot-recipe';
 import { defineSlotRecipe, useRecipe } from '../slot-recipe';
+import { useContextProps } from '../utils/context';
 
 /**
  * Mosaic heading slot recipe.
@@ -46,13 +47,15 @@ declare module '../registry' {
 /** Props for the Heading component combining h2 attributes with recipe variants. */
 export type HeadingProps = ComponentProps<'h2'> & RecipeVariantProps<typeof headingRecipe>;
 
+export const HeadingContext = React.createContext<Partial<HeadingProps> | null>(null);
+
 /**
  * Themeable heading component.
  * Renders as an h2 element by default, forwards refs, and supports
  * size and intent variants plus Mosaic styling (sx prop and render callback).
  */
-export const Heading = React.forwardRef<HTMLHeadingElement, HeadingProps>(function MosaicHeading(props, ref) {
-  const { size, intent, sx, render, ...rest } = props;
+export const Heading = React.forwardRef<HTMLHeadingElement, HeadingProps>(function MosaicHeading(rawProps, ref) {
+  const { size, intent, sx, render, ...rest } = useContextProps(rawProps, HeadingContext);
   const { root } = useRecipe(headingRecipe, { variants: { size, intent }, sx });
   if (render) {
     // renderElement handles the cast; Emotion processes `css` inside the callback's own JSX.

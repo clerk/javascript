@@ -617,19 +617,25 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'configureSSOTestRunParsedUserInfo',
   'configureSSOTestError',
 
-  'configureSSOConfirmationStatusBadge',
-  'configureSSOConfirmationDomainLink',
-  'configureSSOConfirmationConfigDetailsLabel',
-  'configureSSOConfirmationConfigDetailsValue',
-  'configureSSOConfirmationConfigDetailsLink',
-  'configureSSOConfirmationInactiveBanner',
-  'configureSSOConfirmationReconfigureButton',
-  'configureSSOConfirmationResetButton',
+  'configureSSOActivate',
+  'configureSSOActivateIcon',
+  'configureSSOActivateTitle',
+  'configureSSOActivateSubtitle',
+  'configureSSOActivateButton',
+  'configureSSOActivateSkipButton',
 
   'configureSSOResetConnectionDialog',
   'configureSSOResetConnectionDialogCancelButton',
   'configureSSOResetConnectionDialogConfirmationInput',
   'configureSSOResetConnectionDialogSubmitButton',
+
+  'configureSSOChangeProviderDialog',
+  'configureSSOChangeProviderDialogCancelButton',
+  'configureSSOChangeProviderDialogConfirmButton',
+
+  'configureSSORemoveDomainDialog',
+  'configureSSORemoveDomainDialogCancelButton',
+  'configureSSORemoveDomainDialogSubmitButton',
 
   'web3SolanaWalletButtonsRoot',
   'web3SolanaWalletButtons',
