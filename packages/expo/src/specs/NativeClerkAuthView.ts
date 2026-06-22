@@ -1,13 +1,13 @@
-import type { NativeSyntheticEvent, ViewProps } from 'react-native';
-import { requireNativeComponent } from 'react-native';
+import { requireNativeView } from 'expo';
+import type { ViewProps } from 'react-native';
 
 type AuthEvent = Readonly<{ type: string }>;
-type AuthEventHandler = (event: NativeSyntheticEvent<AuthEvent>) => void | Promise<void>;
+type NativeEvent<T> = Readonly<{ nativeEvent: T }>;
 
 interface NativeProps extends ViewProps {
   mode?: string;
   isDismissible?: boolean;
-  onAuthEvent?: AuthEventHandler;
+  onAuthEvent?: (event: NativeEvent<AuthEvent>) => void;
 }
 
-export default requireNativeComponent<NativeProps>('ClerkAuthView');
+export default requireNativeView<NativeProps>('ClerkAuthView');
