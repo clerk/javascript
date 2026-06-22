@@ -1,0 +1,25 @@
+{
+  "name": "@clerk/electron-passkeys-win32-x64-msvc",
+  "version": "0.0.1",
+  "description": "Native passkey support for Clerk's Electron SDK (Windows x64)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/electron-passkeys"
+  },
+  "license": "MIT",
+  "author": "Clerk",
+  "main": "electron-passkeys.win32-x64-msvc.node",
+  "files": [
+    "electron-passkeys.win32-x64-msvc.node"
+  ],
+  "os": [
+    "win32"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

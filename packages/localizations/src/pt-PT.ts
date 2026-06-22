@@ -1681,6 +1681,7 @@ export const ptPT: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       "O endereço de e-mail ou número de telemóvel não é permitido para registo. Isto pode dever-se à utilização de '+', '=', '#' ou '.' no endereço de e-mail, ao uso de um domínio associado a um serviço de e-mail temporário ou a uma exclusão explícita.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'Este domínio organizacional está bloqueado.',
     organization_domain_common: 'Este domínio é demasiado comum para ser utilizado numa organização.',
     organization_domain_exists_for_enterprise_connection: 'Este domínio já existe para uma ligação empresarial.',

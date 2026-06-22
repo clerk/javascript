@@ -57,9 +57,11 @@ describe('OrganizationSecurityPage', () => {
 
       renderPage(wrapper);
 
-      expect(await screen.findByRole('heading', { name: 'Security' })).toBeInTheDocument();
+      // The "Security" header now also renders during the loading placeholder, so
+      // wait on the settled badge before asserting the page chrome and content.
+      expect(await screen.findByText('Unconfigured')).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Security' })).toBeInTheDocument();
       expect(screen.getByText('SSO')).toBeInTheDocument();
-      expect(screen.getByText('Unconfigured')).toBeInTheDocument();
       expect(screen.getByText(DESCRIPTION_LINE_1)).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Start configuration' })).toBeInTheDocument();
 
@@ -170,6 +172,34 @@ describe('OrganizationSecurityPage', () => {
       // Assert the focusable trigger + accessible name only; the floating tooltip content is
       // portaled and its open transition does not settle reliably in jsdom.
       expect(screen.getByRole('button', { name: /more information/i })).toBeInTheDocument();
+    });
+  });
+
+  describe('loading state', () => {
+    it('renders the Security header and a centered spinner (no section frame, no wizard stepper) while loading', async () => {
+      const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
+
+      // Hold the source query pending so the page stays in its on-mount loading
+      // state (view is still 'overview').
+      fixtures.clerk.organization?.getEnterpriseConnections.mockReturnValue(new Promise(() => {}) as any);
+      fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
+        data: [],
+        total_count: 0,
+      } as any);
+
+      const { container } = renderPage(wrapper);
+
+      // The page header stays mounted during load — no pop-in when data settles.
+      expect(await screen.findByRole('heading', { name: 'Security' })).toBeInTheDocument();
+
+      // The loading body is a bare spinner centered in the remaining content area.
+      const spinner = container.querySelector('.cl-spinner');
+      expect(spinner).toBeInTheDocument();
+      expect(spinner?.parentElement).toHaveStyle({ alignItems: 'center', justifyContent: 'center' });
+
+      // No overview section frame and no wizard-shaped skeleton during load.
+      expect(container.querySelector('.cl-profileSection__sso')).not.toBeInTheDocument();
+      expect(container.querySelector('.cl-configureSSOStepper')).not.toBeInTheDocument();
     });
   });
 
