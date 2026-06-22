@@ -136,22 +136,25 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     // The cast suppresses that mismatch; src implementations receive the INIT event
     // on state entry and typically ignore it. The runtime views events through an
     // event-agnostic lens (line 57) for this reason.
-    Promise.resolve(invoke.src(context, event as never)).then(
+    //
+    // Use the Promise constructor rather than Promise.resolve(src()) so that a
+    // synchronous throw from src is caught and routed to onError instead of
+    // propagating as an unhandled exception (Promise.resolve(fn()) evaluates fn()
+    // before the promise chain begins, so a sync throw escapes the .then handler).
+    new Promise<unknown>(resolve => resolve(invoke.src(context, event as never))).then(
       output => {
         if (status !== 'active' || token !== invocationToken) return;
         const doneEvent = { type: INVOKE_DONE, output };
         const transition = pickTransition(normalizeTransitions(invoke.onDone), doneEvent);
         if (!transition) return;
-        takeTransition(transition, doneEvent);
-        commit();
+        if (takeTransition(transition, doneEvent)) commit();
       },
       (error: unknown) => {
         if (status !== 'active' || token !== invocationToken) return;
         const errorEvent = { type: INVOKE_ERROR, error };
         const transition = pickTransition(normalizeTransitions(invoke.onError), errorEvent);
         if (!transition) return;
-        takeTransition(transition, errorEvent);
-        commit();
+        if (takeTransition(transition, errorEvent)) commit();
       },
     );
   }

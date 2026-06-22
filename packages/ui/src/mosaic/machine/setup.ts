@@ -11,6 +11,20 @@ import type {
   Transition,
 } from './types';
 
+interface SetupTools<TContext extends object, TEvent extends EventObject> {
+  createMachine(config: MachineConfig<TContext, TEvent>): StateMachine<TContext, TEvent>;
+  assign<TEvt extends EventObject = EventObject>(
+    fn: (context: TContext, event: TEvt) => Partial<TContext>,
+  ): AssignAction<TContext, TEvt>;
+  fromPromise<TOutput, TStates extends string = string>(
+    fn: (context: TContext) => Promise<TOutput>,
+    config?: {
+      onDone?: Transition<TContext, DoneInvokeEvent<TOutput>, TStates>;
+      onError?: Transition<TContext, ErrorInvokeEvent, TStates>;
+    },
+  ): InvokeConfig<TContext, TEvent, TOutput, TStates>;
+}
+
 /**
  * Pre-bind `TContext` and `TEvent` once per machine file, returning factory
  * functions that don't require repeating those types at every call site.
@@ -38,7 +52,7 @@ import type {
  * `onError`, or `after` — eliminating the need to write
  * `assign<Ctx, Extract<Event, { type: 'X' }>>` by hand.
  */
-export function setup<TContext extends object, TEvent extends EventObject>() {
+export function setup<TContext extends object, TEvent extends EventObject>(): SetupTools<TContext, TEvent> {
   return {
     createMachine: (config: MachineConfig<TContext, TEvent>): StateMachine<TContext, TEvent> =>
       _createMachine<TContext, TEvent>(config),
