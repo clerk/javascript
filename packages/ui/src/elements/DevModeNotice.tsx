@@ -4,17 +4,19 @@ import { Box, Text } from '../customizables';
 import { useDevMode } from '../hooks/useDevMode';
 
 const DEV_MODE_GRID = {
-  width: 420,
-  height: 25,
+  width: 400,
+  height: 60,
   squareSize: 1.5,
   gap: 2,
-  minOpacity: 0.15,
-  maxOpacity: 0.75,
+  minOpacity: 0.1,
+  maxOpacity: 0.7,
   contrast: 2,
-  fadeWidth: 100,
-  fadeHeight: 36,
-  edgeFadeStop: 50,
-  lineHeight: 2,
+  fadeWidth: 45, // % of width; horizontal radius of the oval — smaller pulls the sides in / curves them more
+  fadeHeight: 20, // px; vertical radius of the oval — smaller makes the top edge curve down more sharply
+  fadeCenterY: 85, // % of height; vertical center of the oval — 100 = on the bottom line; >100 pushes it below for a gentler top arc
+  fadeStrength: 0.98, // 0–1; how strongly the oval fade dims toward its edge (1 = fully transparent, 0 = no fade)
+  fadeCenter: 0.82, // 0–1; mask opacity at the very center — below 1 fades the middle a touch so the falloff is gentler
+  lineHeight: 1,
 } as const;
 
 const cellRandom = (x: number, y: number) => {
@@ -42,8 +44,8 @@ const buildDevModeGridTile = (options: typeof DEV_MODE_GRID) => {
 };
 
 const gridTile = buildDevModeGridTile(DEV_MODE_GRID);
-const gridMask = `radial-gradient(ellipse ${DEV_MODE_GRID.fadeWidth}% ${(DEV_MODE_GRID.fadeHeight / DEV_MODE_GRID.height) * 100}% at 50% 100%, #000 0%, transparent 100%)`;
-const edgeMask = `linear-gradient(to right, transparent, #000 ${DEV_MODE_GRID.edgeFadeStop}%, #000 ${100 - DEV_MODE_GRID.edgeFadeStop}%, transparent)`;
+// A single oval mask: its curve fades the grid on the top AND the sides, so the top edge curves down toward the corners.
+const gridMask = `radial-gradient(ellipse ${DEV_MODE_GRID.fadeWidth}% ${(DEV_MODE_GRID.fadeHeight / DEV_MODE_GRID.height) * 100}% at 50% ${DEV_MODE_GRID.fadeCenterY}%, rgba(0,0,0,${DEV_MODE_GRID.fadeCenter}) 0%, rgba(0,0,0,${1 - DEV_MODE_GRID.fadeStrength}) 100%)`;
 const lineMask = 'linear-gradient(to right, transparent 2%, #000 50%, transparent 98%)';
 
 export const DevModeOverlay = () => {
@@ -55,6 +57,7 @@ export const DevModeOverlay = () => {
 
   return (
     <Box
+      data-clerk-dev-mode-overlay=''
       sx={{
         userSelect: 'none',
         pointerEvents: 'none',
@@ -68,34 +71,25 @@ export const DevModeOverlay = () => {
         sx={{
           position: 'absolute',
           inset: 0,
-          maskImage: edgeMask,
-          WebkitMaskImage: edgeMask,
+          maskImage: gridMask,
+          WebkitMaskImage: gridMask,
         }}
       >
         <Box
-          sx={{
+          sx={t => ({
             position: 'absolute',
-            inset: 0,
-            maskImage: gridMask,
-            WebkitMaskImage: gridMask,
-          }}
-        >
-          <Box
-            sx={t => ({
-              position: 'absolute',
-              top: 0,
-              insetInline: 0,
-              bottom: DEV_MODE_GRID.lineHeight,
-              backgroundColor: t.colors.$warning500,
-              maskImage: gridTile,
-              maskRepeat: 'repeat-x',
-              maskPosition: 'left bottom',
-              WebkitMaskImage: gridTile,
-              WebkitMaskRepeat: 'repeat-x',
-              WebkitMaskPosition: 'left bottom',
-            })}
-          />
-        </Box>
+            top: 0,
+            insetInline: 0,
+            bottom: DEV_MODE_GRID.lineHeight,
+            backgroundColor: t.colors.$warning500,
+            maskImage: gridTile,
+            maskRepeat: 'repeat-x',
+            maskPosition: 'left bottom',
+            WebkitMaskImage: gridTile,
+            WebkitMaskRepeat: 'repeat-x',
+            WebkitMaskPosition: 'left bottom',
+          })}
+        />
       </Box>
       <Box
         sx={t => ({
@@ -123,10 +117,11 @@ export const DevModeNotice = (props: DevModeNoticeProps) => {
 
   return (
     <Text
+      data-clerk-dev-mode-notice=''
+      variant='buttonSmall'
       sx={[
         t => ({
           color: t.colors.$warning500,
-          fontWeight: t.fontWeights.$semibold,
           padding: t.space.$1x5,
         }),
         sx,
