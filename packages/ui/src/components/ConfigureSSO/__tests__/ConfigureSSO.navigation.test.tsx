@@ -107,6 +107,22 @@ describe('ConfigureSSO wizard navigation (integration)', () => {
     });
   });
 
+  it('resumes the provider configuration when entering configure with an existing in-progress connection', async () => {
+    const { wrapper, fixtures } = await createFixtures(withAdminOrgUser);
+
+    fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([unconfiguredConnection] as any);
+    fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
+      data: [],
+      total_count: 0,
+    } as any);
+    mockVerifiedDomains(fixtures);
+
+    const { findByRole, queryByText } = render(<ConfigureSSO />, { wrapper });
+
+    await findByRole('heading', { name: /configure okta workforce/i });
+    expect(queryByText(/select your identity provider/i)).not.toBeInTheDocument();
+  });
+
   // Contract rules 7 + 10: reset deletes the connection, then the wizard
   // re-derives to the furthest-reachable step for the now-no-connection state
   // (select-provider, since the email is verified) and renders a real step body —

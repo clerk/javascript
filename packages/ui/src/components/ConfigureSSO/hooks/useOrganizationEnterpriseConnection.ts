@@ -46,6 +46,11 @@ export interface EnterpriseConnectionMutations {
    * never thread them through.
    */
   createConnection: (provider: ProviderType) => Promise<EnterpriseConnectionResource | undefined>;
+  /**
+   * Swaps the active organization's connection to a different provider. This removes the existing
+   * connection and creates a fresh one.
+   */
+  changeProvider: (provider: ProviderType) => Promise<EnterpriseConnectionResource | undefined>;
   updateConnection: (
     id: string,
     params: UpdateOrganizationEnterpriseConnectionParams,
@@ -222,6 +227,21 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
       });
     };
 
+    const changeProvider: EnterpriseConnectionMutations['changeProvider'] = async provider => {
+      // Currently it's not possible to change the provider of an existing connection,
+      // so we need to delete the existing connection and create a new one.
+      if (enterpriseConnection) {
+        await deleteEnterpriseConnection(enterpriseConnection.id);
+      }
+
+      const domains = enterpriseConnection?.domains ?? organizationDomains?.map(domain => domain.name);
+
+      return createEnterpriseConnection({
+        provider,
+        domains,
+      });
+    };
+
     const updateConnection: EnterpriseConnectionMutations['updateConnection'] = (id, params) =>
       updateEnterpriseConnection(id, params);
 
@@ -244,6 +264,7 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
 
     return {
       createConnection,
+      changeProvider,
       updateConnection,
       setConnectionActive,
       deleteConnection,
@@ -253,6 +274,7 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
     user,
     organization,
     organizationDomains,
+    enterpriseConnection,
     createEnterpriseConnection,
     updateEnterpriseConnection,
     deleteEnterpriseConnection,

@@ -629,6 +629,10 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'configureSSOResetConnectionDialogConfirmationInput',
   'configureSSOResetConnectionDialogSubmitButton',
 
+  'configureSSOChangeProviderDialog',
+  'configureSSOChangeProviderDialogCancelButton',
+  'configureSSOChangeProviderDialogConfirmButton',
+
   'configureSSORemoveDomainDialog',
   'configureSSORemoveDomainDialogCancelButton',
   'configureSSORemoveDomainDialogSubmitButton',
