@@ -62,10 +62,7 @@ export function buildAuthProtectFixes({
     fixes.push(importFix);
   }
 
-  const asyncFix = ensureAsyncFix(fixer, sourceCode, fn);
-  if (asyncFix) {
-    fixes.push(asyncFix);
-  }
+  fixes.push(...ensureAsyncFixes(fixer, sourceCode, fn));
 
   fixes.push(insertProtectCallFix(fixer, sourceCode, fn, authName, authNames));
 
@@ -120,19 +117,48 @@ function getLineIndent(sourceCode: TSESLint.SourceCode, node: TSESTree.Node): st
   return match ? match[0] : '';
 }
 
-function ensureAsyncFix(
+function isPromiseTypeAnnotation(type: TSESTree.TypeNode): boolean {
+  return type.type === 'TSTypeReference' && type.typeName.type === 'Identifier' && type.typeName.name === 'Promise';
+}
+
+function wrapReturnTypeInPromiseFix(
   fixer: TSESLint.RuleFixer,
   sourceCode: TSESLint.SourceCode,
   fn: FunctionNode,
 ): TSESLint.RuleFix | null {
+  const returnType = fn.returnType;
+  if (!returnType) {
+    return null;
+  }
+  const typeAnnotation = returnType.typeAnnotation;
+  // If return type is a predicate like `value is boolean`, we still add `async`,
+  // but don't edit the return type. This will produce invalid TS so user can
+  // go fix it. Should be exceedingly rare.
+  if (typeAnnotation.type === 'TSTypePredicate' || isPromiseTypeAnnotation(typeAnnotation)) {
+    return null;
+  }
+  const typeText = sourceCode.getText(typeAnnotation);
+  return fixer.replaceText(typeAnnotation, `Promise<${typeText}>`);
+}
+
+function ensureAsyncFixes(
+  fixer: TSESLint.RuleFixer,
+  sourceCode: TSESLint.SourceCode,
+  fn: FunctionNode,
+): TSESLint.RuleFix[] {
   if (fn.async) {
-    return null;
+    return [];
   }
+  const fixes: TSESLint.RuleFix[] = [];
   const firstToken = sourceCode.getFirstToken(fn);
-  if (!firstToken) {
-    return null;
+  if (firstToken) {
+    fixes.push(fixer.insertTextBefore(firstToken, 'async '));
   }
-  return fixer.insertTextBefore(firstToken, 'async ');
+  const returnTypeFix = wrapReturnTypeInPromiseFix(fixer, sourceCode, fn);
+  if (returnTypeFix) {
+    fixes.push(returnTypeFix);
+  }
+  return fixes;
 }
 
 function insertProtectCallFix(

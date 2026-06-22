@@ -479,6 +479,96 @@ export default async function Page() {
       ],
     },
     {
+      name: 'page: sync default export with explicit return type — wraps in Promise',
+      code: `export default function Page(): JSX.Element {
+  return <div>Hello</div>;
+}`,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+      errors: [
+        {
+          messageId: 'missingProtect',
+          suggestions: [
+            {
+              messageId: 'addAuthProtect',
+              output: `import { auth } from '@clerk/nextjs/server';
+export default async function Page(): Promise<JSX.Element> {
+  await auth.protect();
+  return <div>Hello</div>;
+}`,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: 'route: sync arrow with explicit return type — wraps in Promise',
+      code: `export const GET = (): Response => new Response('ok');`,
+      filename: abs('app/api/widgets/route.ts'),
+      options: [config],
+      errors: [
+        {
+          messageId: 'missingProtect',
+          suggestions: [
+            {
+              messageId: 'addAuthProtect',
+              output: `import { auth } from '@clerk/nextjs/server';
+export const GET = async (): Promise<Response> => {
+  await auth.protect();
+  return new Response('ok');
+};`,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: 'route: sync function with Promise return type — does not double-wrap',
+      code: `export function GET(): Promise<Response> {
+  return Promise.resolve(new Response('ok'));
+}`,
+      filename: abs('app/api/widgets/route.ts'),
+      options: [config],
+      errors: [
+        {
+          messageId: 'missingProtect',
+          suggestions: [
+            {
+              messageId: 'addAuthProtect',
+              output: `import { auth } from '@clerk/nextjs/server';
+export async function GET(): Promise<Response> {
+  await auth.protect();
+  return Promise.resolve(new Response('ok'));
+}`,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: 'route: type-predicate return type — adds async but does not wrap return type',
+      code: `export function GET(value: unknown): value is boolean {
+  return typeof value === 'boolean';
+}`,
+      filename: abs('app/api/widgets/route.ts'),
+      options: [config],
+      errors: [
+        {
+          messageId: 'missingProtect',
+          suggestions: [
+            {
+              messageId: 'addAuthProtect',
+              output: `import { auth } from '@clerk/nextjs/server';
+export async function GET(value: unknown): value is boolean {
+  await auth.protect();
+  return typeof value === 'boolean';
+}`,
+            },
+          ],
+        },
+      ],
+    },
+    {
       name: 're-exported default: reported as imported, offers no suggestion',
       code: `export { default } from './implementation';`,
       filename: abs('app/dashboard/page.tsx'),
