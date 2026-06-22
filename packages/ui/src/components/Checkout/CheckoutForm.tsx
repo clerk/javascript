@@ -369,18 +369,8 @@ export const PayWithTestPaymentMethod = () => {
         display: 'flex',
         flexDirection: 'column',
         rowGap: t.space.$2,
-        position: 'relative',
       })}
     >
-      <Box
-        sx={t => ({
-          position: 'absolute',
-          inset: 0,
-          background: `repeating-linear-gradient(-45deg,${t.colors.$warningAlpha100},${t.colors.$warningAlpha100} 6px,${t.colors.$warningAlpha150} 6px,${t.colors.$warningAlpha150} 12px)`,
-          maskImage: `linear-gradient(transparent 20%, black)`,
-          pointerEvents: 'none',
-        })}
-      />
       <Flex
         sx={t => ({
           alignItems: 'center',
