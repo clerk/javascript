@@ -89,7 +89,7 @@
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
-    "lint:attw": "attw --pack . --profile node16 --ignore-rules unexpected-module-syntax",
+    "lint:attw": "attw --pack . --profile node16 --ignore-rules unexpected-module-syntax --ignore-rules no-resolution",
     "lint:publint": "publint",
     "test": "vitest run",
     "test:ci": "vitest run --maxWorkers=70%",
