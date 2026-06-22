@@ -1,7 +1,8 @@
-import { useUser } from '@clerk/shared/react';
+import { useClerk, useUser } from '@clerk/shared/react';
+import { eventFlowStepMounted } from '@clerk/shared/telemetry';
 import type { OrganizationDomainResource } from '@clerk/shared/types';
 import type React from 'react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import {
   Badge,
@@ -40,13 +41,30 @@ export const OrganizationDomainsStep = (): JSX.Element => {
   const {
     enterpriseConnection,
     organizationDomains,
+    organizationEnterpriseConnection,
     contentRef,
     organizationDomainMutations: { createDomain, revalidate },
     enterpriseConnectionMutations: { updateConnection },
   } = useConfigureSSO();
   const { goPrev, goNext, isFirstStep, isLastStep } = useWizard();
   const card = useCardState();
+  const clerk = useClerk();
   const [domainToRemove, setDomainToRemove] = useState<OrganizationDomainResource | null>(null);
+
+  const hasRecordedTelemetryEvent = useRef(false);
+  useEffect(() => {
+    if (hasRecordedTelemetryEvent.current) {
+      return;
+    }
+
+    hasRecordedTelemetryEvent.current = true;
+    clerk.telemetry?.record(
+      eventFlowStepMounted('configureSSO', 'verify-domain', {
+        connectionStatus: organizationEnterpriseConnection.status,
+      }),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleCreateDomain = async (domain: string) => {
     card.setError(undefined);
