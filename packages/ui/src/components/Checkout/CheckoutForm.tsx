@@ -371,7 +371,6 @@ export const PayWithTestPaymentMethod = () => {
         flexDirection: 'column',
         rowGap: t.space.$2,
         position: 'relative',
-        isolation: 'isolate',
         overflow: 'hidden',
       })}
     >
@@ -382,7 +381,6 @@ export const PayWithTestPaymentMethod = () => {
           justifyContent: 'center',
           flexDirection: 'column',
           rowGap: t.space.$2,
-          zIndex: 1,
         })}
       >
         <Text
