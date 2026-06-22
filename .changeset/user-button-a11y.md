@@ -1,7 +1,7 @@
 ---
-'@clerk/ui': patch
+'@clerk/ui': minor
 '@clerk/shared': patch
 '@clerk/localizations': patch
 ---
 
-Fix UserButton popover accessibility: use `role="dialog"` with grouped actions instead of `role="menu"` with `menuitem` children, fix focus management via floating-ui's interaction system, and add identity-first trigger labels
+Improve UserButton and OrganizationSwitcher accessibility: popovers now receive focus when opened, trigger buttons use identity-first labels, and actions are logically grouped for screen readers
