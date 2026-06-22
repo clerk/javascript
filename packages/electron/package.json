@@ -1,6 +1,6 @@
 {
   "name": "@clerk/electron",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Clerk SDK for Electron",
   "keywords": [
     "clerk",
@@ -27,67 +27,66 @@
     ".": {
       "import": {
         "types": "./dist/types/index.d.ts",
-        "default": "./dist/esm/index.js"
+        "default": "./dist/index.mjs"
       },
       "require": {
         "types": "./dist/types/index.d.ts",
-        "default": "./dist/cjs/index.js"
+        "default": "./dist/index.js"
       }
     },
     "./preload": {
       "import": {
         "types": "./dist/types/preload/index.d.ts",
-        "default": "./dist/esm/preload/index.js"
+        "default": "./dist/preload/index.mjs"
       },
       "require": {
         "types": "./dist/types/preload/index.d.ts",
-        "default": "./dist/cjs/preload/index.js"
+        "default": "./dist/preload/index.js"
       }
     },
     "./storage": {
       "import": {
         "types": "./dist/types/storage/index.d.ts",
-        "default": "./dist/esm/storage/index.js"
+        "default": "./dist/storage/index.mjs"
       },
       "require": {
         "types": "./dist/types/storage/index.d.ts",
-        "default": "./dist/cjs/storage/index.js"
+        "default": "./dist/storage/index.js"
       }
     },
     "./react": {
       "import": {
         "types": "./dist/types/react/index.d.ts",
-        "default": "./dist/esm/react/index.js"
+        "default": "./dist/react/index.mjs"
       },
       "require": {
         "types": "./dist/types/react/index.d.ts",
-        "default": "./dist/cjs/react/index.js"
+        "default": "./dist/react/index.js"
       }
     },
     "./passkeys": {
       "import": {
         "types": "./dist/types/passkeys/index.d.ts",
-        "default": "./dist/esm/passkeys/index.js"
+        "default": "./dist/passkeys/index.mjs"
       },
       "require": {
         "types": "./dist/types/passkeys/index.d.ts",
-        "default": "./dist/cjs/passkeys/index.js"
+        "default": "./dist/passkeys/index.js"
       }
     },
     "./package.json": "./package.json"
   },
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/index.js",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "types": "./dist/types/index.d.ts",
   "files": [
-    "dist",
-    "preload"
+    "dist"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "tsdown",
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
-    "dev": "tsup --watch",
+    "dev": "tsdown --watch",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
