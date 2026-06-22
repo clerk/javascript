@@ -77,7 +77,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouterBundledUI.*'] })(
 
       await u.page.goToRelative('/user-button');
       await u.po.userButton.waitForMounted();
-      await expect(u.page.getByRole('button', { name: /Open account panel/i })).toBeVisible();
+      await expect(u.page.getByRole('button', { name: /Open user menu/i })).toBeVisible();
     });
 
     test('can sign out through user button', async ({ page, context }) => {
