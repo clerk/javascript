@@ -1,20 +1,12 @@
-import { waitForElement } from '@clerk/shared/dom';
-import { CAPTCHA_ELEMENT_ID, CAPTCHA_INVISIBLE_CLASSNAME } from '@clerk/shared/internal/clerk-js/constants';
+import { CAPTCHA_ELEMENT_ID } from '@clerk/shared/internal/clerk-js/constants';
 import { loadScript } from '@clerk/shared/loadScript';
-import type { CaptchaWidgetType } from '@clerk/shared/types';
 
+import { cleanupCaptchaContainer, resolveCaptchaContainer } from './containerResolver';
 import type { CaptchaOptions } from './types';
 
 // We use the explicit render mode to be able to control when the widget is rendered.
 // CF docs: https://developers.cloudflare.com/turnstile/get-started/client-side-rendering/#disable-implicit-rendering
 const CLOUDFLARE_TURNSTILE_ORIGINAL_URL = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
-
-// These belong to `clerk/ui` now
-type CaptchaAttributes = {
-  theme?: unknown;
-  language?: unknown;
-  size: unknown;
-};
 
 declare global {
   export interface Window {
@@ -52,18 +44,6 @@ async function loadCaptchaFromCloudflareURL(nonce?: string) {
   }
 }
 
-function getCaptchaAttibutesFromElemenet(element: HTMLElement): CaptchaAttributes {
-  try {
-    const theme = element.getAttribute('data-cl-theme') || undefined;
-    const language = element.getAttribute('data-cl-language') || undefined;
-    const size = element.getAttribute('data-cl-size') || undefined;
-
-    return { theme, language, size };
-  } catch {
-    return { theme: undefined, language: undefined, size: undefined };
-  }
-}
-
 /*
  * How this function works:
  * The widgetType is either 'invisible' or 'smart'.
@@ -72,88 +52,34 @@ function getCaptchaAttibutesFromElemenet(element: HTMLElement): CaptchaAttribute
  *  not exist, the invisibleSiteKey is used as a fallback and the widget is rendered in a hidden div at the bottom of the body.
  */
 export const getTurnstileToken = async (opts: CaptchaOptions) => {
-  const { siteKey, widgetType, invisibleSiteKey, nonce } = opts;
-  const { modalContainerQuerySelector, modalWrapperQuerySelector, closeModal, openModal } = opts;
-  const captcha: Turnstile.Turnstile = await loadCaptcha(nonce);
+  const { modalWrapperQuerySelector, closeModal } = opts;
+  const captcha: Turnstile.Turnstile = await loadCaptcha(opts.nonce);
   const errorCodes: (string | number)[] = [];
 
   let captchaToken = '';
   let id = '';
-  let turnstileSiteKey = siteKey;
-  let captchaTheme: any;
-  let captchaSize: any;
-  let captchaLanguage: any;
   let retries = 0;
-  let widgetContainerQuerySelector: string | undefined;
-  // The backend uses this to determine which Turnstile site-key was used in order to verify the token
-  let captchaWidgetType: CaptchaWidgetType = null;
-  let captchaTypeUsed: 'invisible' | 'modal' | 'smart' = 'invisible';
 
-  // modal
-  if (modalContainerQuerySelector && modalWrapperQuerySelector) {
-    // if invisible is selected but modal is provided,
-    // we're going to render the invisible widget in the modal
-    // but we won't show the modal as it will never escalate to interactive mode
-    captchaWidgetType = widgetType;
-    widgetContainerQuerySelector = modalContainerQuerySelector;
-    captchaTypeUsed = 'modal';
-    try {
-      await openModal?.();
-    } catch {
-      // When a client is captcha_block the first attempt to open the modal will fail with 'ClerkJS components are not ready yet.'
-      // This happens consistently in the first attempt, because in clerk.#loadInStandardBrowser we first await for the `/client` response
-      // and then we run initComponents to initialize the components.
-      // eslint-disable-next-line @typescript-eslint/only-throw-error
-      throw { captchaError: 'modal_component_not_ready' };
-    }
-    const modalContainderEl = await waitForElement(modalContainerQuerySelector);
-    if (modalContainderEl) {
-      const { theme, language, size } = getCaptchaAttibutesFromElemenet(modalContainderEl);
-      captchaTheme = theme;
-      captchaLanguage = language;
-      captchaSize = size;
-    }
-  }
+  const resolved = await resolveCaptchaContainer(opts);
+  const { containerSelector, containerType, effectiveSiteKey, captchaWidgetType, attributes } = resolved;
+  const { theme: captchaTheme, language: captchaLanguage, size: captchaSize } = attributes;
 
-  // smart widget with container provided by user
-  if (!widgetContainerQuerySelector && widgetType === 'smart') {
+  // Smart-flow pre-render: hide the consumer's #clerk-captcha until the widget asks to escalate.
+  if (containerType === 'smart') {
     const visibleDiv = document.getElementById(CAPTCHA_ELEMENT_ID);
     if (visibleDiv) {
-      captchaTypeUsed = 'smart';
-      captchaWidgetType = 'smart';
-      widgetContainerQuerySelector = `#${CAPTCHA_ELEMENT_ID}`;
-      visibleDiv.style.maxHeight = '0'; // This is to prevent the layout shift when the render method is called
-      const { theme, language, size } = getCaptchaAttibutesFromElemenet(visibleDiv);
-      captchaTheme = theme;
-      captchaLanguage = language;
-      captchaSize = size;
-    } else {
-      console.error(
-        'Cannot initialize Smart CAPTCHA widget because the `clerk-captcha` DOM element was not found; falling back to Invisible CAPTCHA widget. If you are using a custom flow, visit https://clerk.com/docs/guides/development/custom-flows/authentication/bot-sign-up-protection for instructions',
-      );
+      visibleDiv.style.maxHeight = '0';
     }
-  }
-
-  // invisible widget for which we create the container automatically
-  if (!widgetContainerQuerySelector) {
-    captchaTypeUsed = 'invisible';
-    turnstileSiteKey = invisibleSiteKey;
-    captchaWidgetType = 'invisible';
-    widgetContainerQuerySelector = `.${CAPTCHA_INVISIBLE_CLASSNAME}`;
-    const div = document.createElement('div');
-    div.classList.add(CAPTCHA_INVISIBLE_CLASSNAME);
-    div.style.display = 'none'; // This is to prevent the layout shift when the render method is called
-    document.body.appendChild(div);
   }
 
   const handleCaptchaTokenGeneration = async (): Promise<[string, string]> => {
     return new Promise((resolve, reject) => {
       try {
-        const id = captcha.render(widgetContainerQuerySelector, {
-          sitekey: turnstileSiteKey,
+        const id = captcha.render(containerSelector, {
+          sitekey: effectiveSiteKey,
           appearance: 'interaction-only',
-          theme: captchaTheme || 'auto',
-          size: captchaSize || 'normal',
+          theme: (captchaTheme as Turnstile.RenderParameters['theme']) || 'auto',
+          size: (captchaSize as Turnstile.RenderParameters['size']) || 'normal',
           language: captchaLanguage || 'auto',
           action: opts.action,
           retry: 'never',
@@ -189,7 +115,7 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
              */
             if (retries < 2 && shouldRetryTurnstileErrorCode(errorCode.toString())) {
               setTimeout(() => {
-                if (widgetContainerQuerySelector && !document.querySelector(widgetContainerQuerySelector)) {
+                if (containerSelector && !document.querySelector(containerSelector)) {
                   reject([errorCodes.join(','), id]);
                   return;
                 }
@@ -230,17 +156,8 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
       captchaError: e,
     };
   } finally {
-    // cleanup
-    if (captchaTypeUsed === 'modal') {
-      closeModal?.();
-    }
-    if (captchaTypeUsed === 'invisible') {
-      const invisibleWidget = document.querySelector(`.${CAPTCHA_INVISIBLE_CLASSNAME}`);
-      if (invisibleWidget) {
-        document.body.removeChild(invisibleWidget);
-      }
-    }
-    if (captchaTypeUsed === 'smart') {
+    // Revert smart-flow style mutations before delegating to the shared cleanup.
+    if (containerType === 'smart') {
       const visibleWidget = document.getElementById(CAPTCHA_ELEMENT_ID);
       if (visibleWidget) {
         delete visibleWidget.dataset.clInteractive;
@@ -249,6 +166,7 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
         visibleWidget.style.marginBottom = 'unset';
       }
     }
+    cleanupCaptchaContainer(containerType, opts);
   }
 
   return { captchaToken, captchaWidgetType };

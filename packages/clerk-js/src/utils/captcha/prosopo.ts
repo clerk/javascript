@@ -1,13 +1,15 @@
-import { waitForElement } from '@clerk/shared/dom';
-import { CAPTCHA_ELEMENT_ID, CAPTCHA_INVISIBLE_CLASSNAME } from '@clerk/shared/internal/clerk-js/constants';
+import { CAPTCHA_ELEMENT_ID } from '@clerk/shared/internal/clerk-js/constants';
 import { loadScript } from '@clerk/shared/loadScript';
-import type { CaptchaWidgetType } from '@clerk/shared/types';
 
+import { cleanupCaptchaContainer, resolveCaptchaContainer } from './containerResolver';
 import type { CaptchaOptions } from './types';
 
 // We use the explicit render mode so we control when the widget mounts.
 // Prosopo docs: https://docs.prosopo.io/en/js/api-reference/javascript-api-reference.html
 const PROSOPO_BUNDLE_URL = 'https://js.prosopo.io/js/procaptcha.bundle.js?render=explicit';
+
+// Reserve space for the rendered smart widget to avoid layout shift; matches Procaptcha's frictionless widget height.
+const PROSOPO_SMART_MIN_HEIGHT = '78px';
 
 type ProcaptchaTheme = 'light' | 'dark';
 
@@ -54,95 +56,45 @@ async function loadProcaptchaFromUrl(nonce?: string) {
     return await loadScript(PROSOPO_BUNDLE_URL, { defer: true, nonce });
   } catch (err) {
     console.warn(
-      'Clerk: Failed to load the CAPTCHA script from Prosopo. If you see a CSP error in your browser, please add the necessary CSP rules to your app. Visit https://clerk.com/docs/security/clerk-csp for more information.',
+      'Clerk: Failed to load the CAPTCHA script from Prosopo (js.prosopo.io). If you see a CSP error in your browser, ensure your `script-src`, `connect-src`, and `frame-src` directives include `https://*.prosopo.io`. See https://docs.prosopo.io/en/integrations/csp.html for the full list of Prosopo CSP directives, and https://clerk.com/docs/security/clerk-csp for Clerk-side guidance.',
     );
     throw err;
   }
 }
 
-function getCaptchaAttibutesFromElemenet(element: HTMLElement) {
-  try {
-    const rawTheme = element.getAttribute('data-cl-theme') || undefined;
-    const theme: ProcaptchaTheme | undefined = rawTheme === 'dark' || rawTheme === 'light' ? rawTheme : undefined;
-    const language = element.getAttribute('data-cl-language') || undefined;
-    return { theme, language };
-  } catch {
-    return { theme: undefined, language: undefined };
-  }
+function narrowTheme(theme: string | undefined): ProcaptchaTheme | undefined {
+  return theme === 'dark' || theme === 'light' ? theme : undefined;
 }
 
 /*
- * Mirrors getTurnstileToken: renders an invisible Procaptcha widget by default,
- * or a smart widget inside the user-provided #clerk-captcha container when present.
+ * Mirrors getTurnstileToken via the shared container resolver: renders an invisible Procaptcha
+ * widget by default, or a smart widget inside the consumer-provided #clerk-captcha element when
+ * present. Note that Procaptcha's render() takes an Element rather than a selector — we resolve
+ * the Element here.
  */
 export const getProcaptchaToken = async (opts: CaptchaOptions) => {
-  const { siteKey, widgetType, invisibleSiteKey, nonce } = opts;
-  const { modalContainerQuerySelector, modalWrapperQuerySelector, closeModal, openModal } = opts;
-  const captcha = await loadProcaptcha(nonce);
+  const { closeModal } = opts;
+  const captcha = await loadProcaptcha(opts.nonce);
 
-  let captchaToken = '';
-  let prosopoSiteKey = siteKey;
-  let captchaTheme: ProcaptchaTheme | undefined;
-  let captchaLanguage: string | undefined;
-  let widgetContainerQuerySelector: string | undefined;
-  // The backend uses this to determine which site-key was used in order to verify the token
-  let captchaWidgetType: CaptchaWidgetType = null;
-  let captchaTypeUsed: 'invisible' | 'modal' | 'smart' = 'invisible';
+  const resolved = await resolveCaptchaContainer(opts);
+  const { containerSelector, containerType, effectiveSiteKey, captchaWidgetType, attributes } = resolved;
+  const captchaTheme = narrowTheme(attributes.theme);
+  const captchaLanguage = attributes.language;
 
-  // modal
-  if (modalContainerQuerySelector && modalWrapperQuerySelector) {
-    captchaWidgetType = widgetType;
-    widgetContainerQuerySelector = modalContainerQuerySelector;
-    captchaTypeUsed = 'modal';
-    try {
-      await openModal?.();
-    } catch {
-      // eslint-disable-next-line @typescript-eslint/only-throw-error
-      throw { captchaError: 'modal_component_not_ready' };
-    }
-    const modalContainderEl = await waitForElement(modalContainerQuerySelector);
-    if (modalContainderEl) {
-      const { theme, language } = getCaptchaAttibutesFromElemenet(modalContainderEl);
-      captchaTheme = theme;
-      captchaLanguage = language;
-    }
-  }
-
-  // smart widget with container provided by user
-  if (!widgetContainerQuerySelector && widgetType === 'smart') {
+  // Reserve space for the smart widget; Procaptcha shows its widget from the start so we cannot
+  // hide it the way Turnstile does with maxHeight=0.
+  if (containerType === 'smart') {
     const visibleDiv = document.getElementById(CAPTCHA_ELEMENT_ID);
     if (visibleDiv) {
-      captchaTypeUsed = 'smart';
-      captchaWidgetType = 'smart';
-      widgetContainerQuerySelector = `#${CAPTCHA_ELEMENT_ID}`;
-      // Procaptcha's smart widget is visible from the start, unlike Turnstile's interaction-only mode.
-      // Reserve a reasonable min-height to reduce layout shift while the widget renders.
-      visibleDiv.style.minHeight = '78px';
+      visibleDiv.style.minHeight = PROSOPO_SMART_MIN_HEIGHT;
       visibleDiv.style.marginBottom = '1.5rem';
-      const { theme, language } = getCaptchaAttibutesFromElemenet(visibleDiv);
-      captchaTheme = theme;
-      captchaLanguage = language;
-    } else {
-      console.error(
-        'Cannot initialize Smart CAPTCHA widget because the `clerk-captcha` DOM element was not found; falling back to Invisible CAPTCHA widget. If you are using a custom flow, visit https://clerk.com/docs/guides/development/custom-flows/authentication/bot-sign-up-protection for instructions',
-      );
     }
   }
 
-  // invisible widget for which we create the container automatically
-  if (!widgetContainerQuerySelector) {
-    captchaTypeUsed = 'invisible';
-    prosopoSiteKey = invisibleSiteKey;
-    captchaWidgetType = 'invisible';
-    widgetContainerQuerySelector = `.${CAPTCHA_INVISIBLE_CLASSNAME}`;
-    const div = document.createElement('div');
-    div.classList.add(CAPTCHA_INVISIBLE_CLASSNAME);
-    div.style.display = 'none';
-    document.body.appendChild(div);
-  }
+  let captchaToken = '';
 
   const handleCaptchaTokenGeneration = async (): Promise<string> => {
-    const containerEl = widgetContainerQuerySelector ? document.querySelector(widgetContainerQuerySelector) : null;
+    const containerEl = document.querySelector(containerSelector);
     if (!containerEl) {
       // eslint-disable-next-line @typescript-eslint/only-throw-error
       throw 'captcha_container_missing';
@@ -150,7 +102,7 @@ export const getProcaptchaToken = async (opts: CaptchaOptions) => {
 
     return new Promise<string>((resolve, reject) => {
       const renderOptions: ProcaptchaRenderOptions = {
-        siteKey: prosopoSiteKey,
+        siteKey: effectiveSiteKey,
         theme: captchaTheme,
         language: captchaLanguage,
         callback: (token: string) => {
@@ -158,6 +110,8 @@ export const getProcaptchaToken = async (opts: CaptchaOptions) => {
           resolve(token);
         },
         'error-callback': () => {
+          // Procaptcha's error-callback signature does not include an error code; emit a stable
+          // identifier so callers can branch on it.
           reject('procaptcha_error');
         },
         'expired-callback': () => {
@@ -165,15 +119,15 @@ export const getProcaptchaToken = async (opts: CaptchaOptions) => {
         },
       };
 
-      if (captchaTypeUsed === 'invisible') {
+      if (containerType === 'invisible') {
         renderOptions.size = 'invisible';
       }
 
       Promise.resolve(captcha.render(containerEl, renderOptions))
         .then(() => {
-          // Invisible widgets do not auto-challenge — execute() dispatches the event
-          // the bundle's invisible component is listening for once it has mounted.
-          if (captchaTypeUsed === 'invisible') {
+          // Invisible widgets do not auto-challenge — execute() dispatches the event the bundle's
+          // invisible component is listening for once it has mounted.
+          if (containerType === 'invisible') {
             captcha.execute();
           }
         })
@@ -189,28 +143,21 @@ export const getProcaptchaToken = async (opts: CaptchaOptions) => {
       captchaError: typeof e === 'string' ? e : (e as Error)?.message || 'unexpected_captcha_error',
     };
   } finally {
-    // cleanup
+    // The bundle's reset() unmounts every Procaptcha root it has registered, including ours.
     try {
       captcha.reset();
     } catch {
       // best-effort cleanup
     }
-    if (captchaTypeUsed === 'modal') {
-      closeModal?.();
-    }
-    if (captchaTypeUsed === 'invisible') {
-      const invisibleWidget = document.querySelector(`.${CAPTCHA_INVISIBLE_CLASSNAME}`);
-      if (invisibleWidget) {
-        document.body.removeChild(invisibleWidget);
-      }
-    }
-    if (captchaTypeUsed === 'smart') {
+    // Revert smart-flow style mutations before delegating to the shared cleanup.
+    if (containerType === 'smart') {
       const visibleWidget = document.getElementById(CAPTCHA_ELEMENT_ID);
       if (visibleWidget) {
         visibleWidget.style.minHeight = 'unset';
         visibleWidget.style.marginBottom = 'unset';
       }
     }
+    cleanupCaptchaContainer(containerType, opts);
   }
 
   return { captchaToken, captchaWidgetType };
