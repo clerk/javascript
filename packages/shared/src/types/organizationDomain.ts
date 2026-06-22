@@ -76,11 +76,11 @@ export interface OrganizationDomainOwnershipVerification {
    */
   verifiedAt: Date | null;
   /**
-   * The fully qualified DNS name under which the Organization admin must publish the TXT record. Only present immediately after calling `prepareOwnershipVerification`, and `null` otherwise.
+   * The fully qualified DNS name under which the Organization admin must publish the TXT record. Populated while the TXT challenge is available, and `null` otherwise.
    */
   txtRecordName: string | null;
   /**
-   * The exact value the Organization admin must publish in the TXT record. Only present immediately after calling `prepareOwnershipVerification`, and `null` otherwise.
+   * The exact value the Organization admin must publish in the TXT record. Populated while the TXT challenge is available, and `null` otherwise.
    */
   txtRecordValue: string | null;
 }
