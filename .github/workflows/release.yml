@@ -20,9 +20,47 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  detect-native:
+    name: Detect electron-passkeys publish
+    if: ${{ github.event_name == 'push' && github.repository == 'clerk/javascript' }}
+    runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      should-build: ${{ steps.detect.outputs.should-build }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          fetch-tags: false
+          filter: 'blob:none'
+          show-progress: false
+
+      - name: Determine whether electron-passkeys is about to publish
+        id: detect
+        run: node scripts/detect-electron-passkeys-publish.mjs >> "$GITHUB_OUTPUT"
+
+  build-native:
+    name: Build electron-passkeys native binaries
+    needs: detect-native
+    if: ${{ needs.detect-native.outputs.should-build == 'true' }}
+    permissions:
+      contents: read
+    uses: ./.github/workflows/electron-passkeys.yml
+
   release:
     name: Release
-    if: ${{ github.event_name == 'push' && github.repository == 'clerk/javascript' }}
+    needs: [detect-native, build-native]
+    if: >-
+      always()
+      && github.event_name == 'push'
+      && github.repository == 'clerk/javascript'
+      && needs.detect-native.result == 'success'
+      && needs.build-native.result != 'failure'
+      && needs.build-native.result != 'cancelled'
     runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
@@ -66,6 +104,17 @@ jobs:
 
       - name: Build release
         run: pnpm turbo build $TURBO_ARGS --force
+
+      - name: Download electron-passkeys native binaries
+        if: ${{ needs.detect-native.outputs.should-build == 'true' }}
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: electron-passkeys-npm
+          path: packages/electron-passkeys/npm
+
+      - name: Verify electron-passkeys binaries are present
+        if: ${{ needs.detect-native.outputs.should-build == 'true' }}
+        run: node scripts/check-electron-passkeys-binaries.mjs packages/electron-passkeys/npm
 
       - name: Create Release PR
         id: changesets
