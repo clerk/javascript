@@ -219,8 +219,27 @@ describe('getProcaptchaToken', () => {
   });
 
   describe('rejection paths', () => {
-    it('rejects with procaptcha_error when error-callback fires', async () => {
+    it('propagates the error message when error-callback fires with an Error', async () => {
       installProcaptchaMock(call => {
+        setTimeout(() => call.options['error-callback'](new Error('challenge_failed')), 0);
+      });
+
+      await expect(
+        getProcaptchaToken({
+          captchaProvider: 'prosopo',
+          siteKey: 'visible-key',
+          invisibleSiteKey: 'invisible-key',
+          widgetType: 'invisible',
+        }),
+      ).rejects.toMatchObject({ captchaError: 'challenge_failed' });
+
+      // Invisible container still cleaned up after error.
+      expect(document.querySelector(`.${CAPTCHA_INVISIBLE_CLASSNAME}`)).toBeNull();
+    });
+
+    it('falls back to "procaptcha_error" when error-callback fires without an argument', async () => {
+      installProcaptchaMock(call => {
+        // Defensive fallback for runtimes that omit the Error argument the bundle currently passes.
         setTimeout(() => call.options['error-callback'](), 0);
       });
 
@@ -232,9 +251,6 @@ describe('getProcaptchaToken', () => {
           widgetType: 'invisible',
         }),
       ).rejects.toMatchObject({ captchaError: 'procaptcha_error' });
-
-      // Invisible container still cleaned up after error.
-      expect(document.querySelector(`.${CAPTCHA_INVISIBLE_CLASSNAME}`)).toBeNull();
     });
 
     it('rejects with procaptcha_expired when expired-callback fires', async () => {

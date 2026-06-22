@@ -17,7 +17,11 @@ type ProcaptchaRenderOptions = {
   siteKey: string;
   theme?: ProcaptchaTheme;
   callback?: (token: string) => void;
-  'error-callback'?: () => void;
+  // The Procaptcha runtime invokes error-callback with an Error built from the underlying
+  // challenge failure (procaptcha modules/Manager.ts → events.onError(new Error(message))).
+  // The public type in @prosopo/types declares this as `() => void` and omits the argument —
+  // we type it the way the runtime actually behaves so the message can be propagated.
+  'error-callback'?: (error: Error) => void;
   'expired-callback'?: () => void;
   'close-callback'?: () => void;
   size?: 'invisible';
@@ -109,10 +113,10 @@ export const getProcaptchaToken = async (opts: CaptchaOptions) => {
           closeModal?.();
           resolve(token);
         },
-        'error-callback': () => {
-          // Procaptcha's error-callback signature does not include an error code; emit a stable
-          // identifier so callers can branch on it.
-          reject('procaptcha_error');
+        'error-callback': (error: Error) => {
+          // Surface the underlying challenge error message (e.g. from procaptcha's Manager).
+          // Fall back to a stable identifier if the runtime omits the argument for any reason.
+          reject(error?.message || 'procaptcha_error');
         },
         'expired-callback': () => {
           reject('procaptcha_expired');
