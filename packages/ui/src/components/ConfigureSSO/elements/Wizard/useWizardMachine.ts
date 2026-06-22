@@ -1,6 +1,13 @@
 import React from 'react';
 
-import { isStepReachable, initialState, reduce, type WizardConfig, type WizardEvent, type WizardState } from './reducer';
+import {
+  isStepReachable,
+  initialState,
+  reduce,
+  type WizardConfig,
+  type WizardEvent,
+  type WizardState,
+} from './reducer';
 import type { WizardActiveStep, WizardContextValue } from './types';
 
 /**

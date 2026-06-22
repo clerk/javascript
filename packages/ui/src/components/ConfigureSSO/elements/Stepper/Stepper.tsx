@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Box, descriptors, Flex, Icon, SimpleButton, Span,Text } from '@/customizables';
+import { Box, descriptors, Flex, Icon, SimpleButton, Span, Text } from '@/customizables';
 import { Checkmark, ChevronRight } from '@/icons';
 
 import type { StepperItemProps, StepperProps } from './types';
