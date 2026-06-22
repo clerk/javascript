@@ -1,3 +1,6 @@
+import { useClerk } from '@clerk/shared/react';
+import { eventFlowStepMounted } from '@clerk/shared/telemetry';
+
 import { Button, Col, descriptors, Flex, Flow, Heading, Icon, localizationKeys, Text } from '@/customizables';
 import { useCardState } from '@/elements/contexts';
 import { ChevronRight, DuotoneShieldCheck } from '@/icons';
@@ -15,6 +18,7 @@ export const ActivateStep = (): JSX.Element => {
     onExit,
   } = useConfigureSSO();
   const card = useCardState();
+  const clerk = useClerk();
 
   // The activate step is only reachable with a configured connection, so the
   // domains are set; join multiples for the subtitle copy.
@@ -31,6 +35,7 @@ export const ActivateStep = (): JSX.Element => {
 
     try {
       await setConnectionActive(enterpriseConnection.id, true);
+      clerk.telemetry?.record(eventFlowStepMounted('configureSSO', 'activate', { connectionStatus: 'active' }));
       onExit?.();
     } catch (err) {
       handleError(err as Error, [], card.setError);
