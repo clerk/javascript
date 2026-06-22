@@ -38,6 +38,7 @@ export const ActivateStep = (): JSX.Element => {
       await setConnectionActive(enterpriseConnection.id, true);
       clerk.telemetry?.record(
         eventFlowStepMounted('configureSSO', 'activate', {
+          timestamp: new Date().toISOString(),
           connectionStatus: 'active',
           connectionId: enterpriseConnection.id,
           organizationId: organization?.id ?? null,

@@ -8,24 +8,24 @@ type EventFlowStepMounted = {
   flow: string;
   /** The step/part that mounted, e.g. `verify-domain` */
   step: string;
-  /** ISO-8601 timestamp, used to measure the time between steps of the same flow. */
-  timestamp: string;
+  /** Free-form, flow-specific metadata supplied by the caller (e.g. `timestamp`, `connectionStatus`). */
+  metadata: TelemetryEventRaw['payload'];
 } & TelemetryEventRaw['payload'];
 
 /**
- * Fires an event when a part of a multi-step flow becomes visible.
+ * Fires an event from a part of a multi-step flow.
  *
  * @param flow - The flow identifier (matches `Flow.Root`'s `flow`).
  * @param step - The step/part that mounted.
- * @param payload - Extra, flow-specific metadata
+ * @param metadata - Flow-specific metadata sent under `payload.metadata`.
  * @param eventSamplingRate - Override the default full-capture sampling rate.
  * @example
- * telemetry.record(eventFlowStepMounted('configureSSO', 'verify-domain', { connectionStatus: 'unconfigured' }));
+ * telemetry.record(eventFlowStepMounted('configureSSO', 'verify-domain', { timestamp: new Date().toISOString(), connectionStatus: 'unconfigured' }));
  */
 export function eventFlowStepMounted(
   flow: string,
   step: string,
-  payload: TelemetryEventRaw['payload'] = {},
+  metadata: TelemetryEventRaw['payload'] = {},
   eventSamplingRate: number = EVENT_SAMPLING_RATE,
 ): TelemetryEventRaw<EventFlowStepMounted> {
   return {
@@ -34,8 +34,7 @@ export function eventFlowStepMounted(
     payload: {
       flow,
       step,
-      timestamp: new Date().toISOString(),
-      ...payload,
+      metadata,
     },
   };
 }

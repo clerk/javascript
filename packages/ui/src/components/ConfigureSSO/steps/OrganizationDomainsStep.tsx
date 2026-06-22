@@ -61,6 +61,7 @@ export const OrganizationDomainsStep = (): JSX.Element => {
     hasRecordedTelemetryEvent.current = true;
     clerk.telemetry?.record(
       eventFlowStepMounted('configureSSO', 'verify-domain', {
+        timestamp: new Date().toISOString(),
         connectionStatus: organizationEnterpriseConnection.status,
         connectionId: enterpriseConnection?.id ?? null,
         organizationId: organization?.id ?? null,
