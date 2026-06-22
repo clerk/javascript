@@ -17,6 +17,9 @@ export const leaveOrgMachine = createMachine<LeaveOrgContext, LeaveOrgEvent>({
     idle: { on: { OPEN: 'confirming' } },
     confirming: {
       on: {
+        // The name-match guard lives in Destructive (canSubmit = confirmValue === resourceName).
+        // The machine receives CONFIRM only after the UI has already enforced the constraint,
+        // so no machine-level guard is needed here.
         CONFIRM: 'leaving',
         CANCEL: {
           target: 'idle',

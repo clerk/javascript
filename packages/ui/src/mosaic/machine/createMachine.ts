@@ -28,6 +28,9 @@ export function createMachine<
   return {
     id: config.id,
     initial: config.initial,
+    // SAFETY: config.context is optional; when omitted the machine has no context.
+    // The empty object satisfies any TContext at runtime — callers that omit context
+    // also use Record<string, never> as TContext so no fields are accessed.
     context: config.context ?? ({} as TContext),
     states: config.states,
     config,

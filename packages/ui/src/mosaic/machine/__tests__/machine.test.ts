@@ -42,6 +42,23 @@ describe('createMachine — introspection (the swingset seam)', () => {
   });
 });
 
+describe('createActor — pre-start safety', () => {
+  it('send() is a no-op before start() — does not run transitions without entry actions', () => {
+    const actor = createActor(createDeleteOrgMachine(() => Promise.resolve()));
+    const before = actor.getSnapshot();
+
+    actor.send({ type: 'OPEN' });
+
+    expect(actor.getSnapshot()).toBe(before);
+    expect(actor.getSnapshot().value).toBe('idle');
+  });
+
+  it('can() returns false before start()', () => {
+    const actor = createActor(createDeleteOrgMachine(() => Promise.resolve()));
+    expect(actor.can({ type: 'OPEN' })).toBe(false);
+  });
+});
+
 describe('createActor — transitions', () => {
   it('starts in the initial state', () => {
     const actor = createActor(createDeleteOrgMachine(() => Promise.resolve()));

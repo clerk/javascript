@@ -75,8 +75,9 @@ export function setup<TContext extends object, TEvent extends EventObject>() {
         onError?: Transition<TContext, ErrorInvokeEvent, TStates>;
       },
     ): InvokeConfig<TContext, TEvent, TOutput, TStates> => ({
-      // Cast needed: fn only uses context (no event param), but InvokeConfig.src
-      // signature accepts (context, event) for parity with state-entry event access.
+      // SAFETY: fn only uses context (no event param), but InvokeConfig.src accepts
+      // (context, event) for parity with state-entry event access. The extra event
+      // parameter is unused; callers receive only context at runtime.
       src: fn as unknown as InvokeConfig<TContext, TEvent, TOutput, TStates>['src'],
       ...config,
     }),

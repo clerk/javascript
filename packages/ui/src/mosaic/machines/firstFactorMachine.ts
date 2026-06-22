@@ -47,7 +47,9 @@ function buildAttemptParams(factor: SignInFirstFactor, value: string): AttemptFi
   if (factor.strategy === 'password') {
     return { strategy: 'password', password: value };
   }
-  // Code-based strategies (email_code, phone_code, reset_password_*_code) all use `code`.
+  // SAFETY: buildAttemptParams is only called from `submitting`, which is only reachable
+  // via `verifying`. The machine's routing guarantees factor.strategy is 'password' or a
+  // code-based strategy at this call site. TypeScript cannot narrow through state-entry invariants.
   return { strategy: factor.strategy, code: value } as AttemptFirstFactorParams;
 }
 
@@ -90,7 +92,9 @@ export function createFirstFactorMachine(deps: {
     },
     states: {
       // Calls prepareFirstFactor on entry (delivers the code via email/SMS).
-      // Cast is safe: only entered when needsPrepare(ctx.factor) is true.
+      // SAFETY: `preparing` is only entered when needsPrepare(ctx.factor) is true (see
+      // the initial resolver and routingStrategy always-transitions). TypeScript cannot
+      // narrow ctx.factor through state-entry invariants, so the cast is required.
       preparing: {
         invoke: fromPromise(ctx => ctx.prepareFn(ctx.factor as PrepareFirstFactorParams), {
           onDone: 'verifying',
@@ -117,6 +121,9 @@ export function createFirstFactorMachine(deps: {
         invoke: fromPromise(ctx => ctx.attemptFn(buildAttemptParams(ctx.factor, ctx.value)), {
           onDone: {
             target: 'complete',
+            // SAFETY: e.output is a SignInResource whose .status is always a valid SignInStatus
+            // string; TypeScript types output as the broad resolved return type and does not
+            // narrow .status to the SignInStatus literal union automatically.
             actions: assign((_, e) => ({ completionStatus: e.output.status as SignInStatus })),
           },
           onError: {
@@ -153,6 +160,8 @@ export function createFirstFactorMachine(deps: {
 
       // Re-delivers the code by calling prepareFirstFactor again, then starts the cooldown.
       resending: {
+        // SAFETY: same invariant as `preparing` — `resending` is only reachable when
+        // the current factor requires a prepare call (needsPrepare is true).
         invoke: fromPromise(ctx => ctx.prepareFn(ctx.factor as PrepareFirstFactorParams), {
           onDone: {
             target: 'cooldown',

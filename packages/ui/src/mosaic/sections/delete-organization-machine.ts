@@ -17,6 +17,10 @@ export const deleteOrgMachine = createMachine<DeleteOrgContext, DeleteOrgEvent>(
     idle: { on: { OPEN: 'confirming' } },
     confirming: {
       on: {
+        // The name-match guard lives in Destructive (canSubmit = confirmValue === resourceName).
+        // The machine receives CONFIRM only after the UI has already enforced the constraint,
+        // so no machine-level guard is needed here. The test fixture (delete-organization-machine.ts
+        // in __tests__) models the guard explicitly for unit-testing purposes.
         CONFIRM: 'deleting',
         CANCEL: {
           target: 'idle',

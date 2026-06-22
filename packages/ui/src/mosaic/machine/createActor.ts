@@ -131,6 +131,11 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     const invoke = states[value].invoke;
     if (!invoke) return;
     const token = ++invocationToken;
+    // SAFETY: startInvoke is called with the actor's internal EventObject, but
+    // InvokeConfig.src is typed to accept (context, TEvent | DoneInvokeEvent | ErrorInvokeEvent).
+    // The cast suppresses that mismatch; src implementations receive the INIT event
+    // on state entry and typically ignore it. The runtime views events through an
+    // event-agnostic lens (line 57) for this reason.
     Promise.resolve(invoke.src(context, event as never)).then(
       output => {
         if (status !== 'active' || token !== invocationToken) return;
@@ -231,7 +236,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     },
 
     send(event) {
-      if (status !== 'active') return;
+      if (!started || status !== 'active') return;
       const transition = pickTransition(normalizeTransitions(states[value]?.on?.[event.type]), event);
       if (!transition) return; // event not handled in this state → ignored
       if (takeTransition(transition, event)) commit(); // entry-blocked → no commit, no notify
@@ -254,7 +259,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     },
 
     can(event) {
-      if (status !== 'active') return false;
+      if (!started || status !== 'active') return false;
       const transition = pickTransition(normalizeTransitions(states[value]?.on?.[event.type]), event);
       if (!transition) return false;
       return transition.target === undefined || canEnter(transition.target as string, event);
