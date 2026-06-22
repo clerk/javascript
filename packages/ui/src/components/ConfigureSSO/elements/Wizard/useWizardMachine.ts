@@ -1,6 +1,13 @@
 import React from 'react';
 
-import { guardHolds, initialState, reduce, type WizardConfig, type WizardEvent, type WizardState } from './reducer';
+import {
+  isStepReachable,
+  initialState,
+  reduce,
+  type WizardConfig,
+  type WizardEvent,
+  type WizardState,
+} from './reducer';
 import type { WizardActiveStep, WizardContextValue } from './types';
 
 /**
@@ -13,7 +20,7 @@ import type { WizardActiveStep, WizardContextValue } from './types';
 const resolveInitial = (cfg: WizardConfig, preferred?: string): WizardState => {
   if (preferred) {
     const target = cfg.descriptors.find(d => d.id === preferred);
-    if (target && guardHolds(target)) {
+    if (target && isStepReachable(target)) {
       return { current: preferred, direction: 0, hasNavigated: false };
     }
   }
@@ -102,7 +109,7 @@ export const useWizardMachine = ({ config, parentWizard, initialStepId }: UseWiz
   // — initialState always lands on a guard-passing step, so it cannot loop.
   if (!isNested) {
     const currentDescriptor = config.descriptors.find(d => d.id === state.current);
-    if (!currentDescriptor || !guardHolds(currentDescriptor)) {
+    if (!currentDescriptor || !isStepReachable(currentDescriptor)) {
       const seated = initialState(config);
       if (seated.current !== state.current) {
         setState(seated);
@@ -213,19 +220,23 @@ export const useWizardMachine = ({ config, parentWizard, initialStepId }: UseWiz
   // Breadcrumb-facing active steps: every descriptor, in declaration order.
   // Derived synchronously from the live descriptors — known before `current` is
   // resolved, so there is no inconsistency window. Each item carries
-  // `isCompleted` (POSITIONAL: sits before current in declaration order) and
-  // `isReachable` (GUARD-DRIVEN: its entry guard holds now — the single source
-  // the stepper binds `isDisabled = !isReachable` to and the same predicate
-  // `goToStep` checks). Whether an item appears in the breadcrumb is the header's
-  // call (it filters on `label`), not the machine's.
+  // `isCompleted` (the step's own `isComplete` predicate when it declares one —
+  // position-INDEPENDENT, so a finished step stays ticked after a back-nav —
+  // otherwise the POSITIONAL fallback: sits before current in declaration order)
+  // and `isReachable` (PREDICATE-DRIVEN: its entry reachability predicate holds now —
+  // the single source the stepper binds `isDisabled = !isReachable` to and the
+  // same predicate `goToStep` checks). Whether an item appears in the breadcrumb
+  // is the header's call (it filters on `label`), not the machine's.
   const activeSteps = React.useMemo<WizardActiveStep[]>(() => {
     const descriptors = config.descriptors;
     const currentDescriptorIndex = descriptors.findIndex(s => s.id === current);
     return descriptors.map((s, descriptorIndex) => ({
       id: s.id,
       label: s.label,
-      isCompleted: currentDescriptorIndex >= 0 && descriptorIndex < currentDescriptorIndex,
-      isReachable: guardHolds(s),
+      isCompleted: s.isComplete
+        ? s.isComplete()
+        : currentDescriptorIndex >= 0 && descriptorIndex < currentDescriptorIndex,
+      isReachable: isStepReachable(s),
     }));
   }, [config, current]);
 
