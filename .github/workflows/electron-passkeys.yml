@@ -8,9 +8,16 @@ on:
       - 'packages/electron-passkeys/**'
       - '.github/workflows/electron-passkeys.yml'
 
+permissions:
+  contents: read
+  actions: read
+
 concurrency:
   group: electron-passkeys-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   build:
