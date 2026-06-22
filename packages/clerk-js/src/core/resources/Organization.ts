@@ -49,6 +49,7 @@ export class Organization extends BaseResource implements OrganizationResource {
   membersCount = 0;
   pendingInvitationsCount = 0;
   maxAllowedMemberships!: number;
+  exclusiveMembership = false;
 
   constructor(data: OrganizationJSON | OrganizationJSONSnapshot) {
     super();
@@ -305,6 +306,7 @@ export class Organization extends BaseResource implements OrganizationResource {
     this.pendingInvitationsCount = data.pending_invitations_count || 0;
     this.maxAllowedMemberships = data.max_allowed_memberships || 0;
     this.adminDeleteEnabled = data.admin_delete_enabled || false;
+    this.exclusiveMembership = data.exclusive_membership || false;
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
     return this;
@@ -323,6 +325,7 @@ export class Organization extends BaseResource implements OrganizationResource {
       pending_invitations_count: this.pendingInvitationsCount,
       max_allowed_memberships: this.maxAllowedMemberships,
       admin_delete_enabled: this.adminDeleteEnabled,
+      exclusive_membership: this.exclusiveMembership,
       created_at: this.createdAt.getTime(),
       updated_at: this.updatedAt.getTime(),
     };
