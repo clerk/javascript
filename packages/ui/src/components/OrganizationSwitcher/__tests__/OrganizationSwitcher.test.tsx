@@ -317,8 +317,6 @@ describe('OrganizationSwitcher', () => {
           pendingInvitationsCount: 1,
         },
       });
-      // The displayed-list filter reads `organization.exclusiveMembership`, which the fake org factory
-      // does not set, so flag it explicitly on the loaded page.
       (exclusiveMembership.organization as any).exclusiveMembership = true;
 
       fixtures.clerk.user?.getOrganizationMemberships.mockReturnValueOnce(
@@ -345,7 +343,6 @@ describe('OrganizationSwitcher', () => {
       props.setProps({ hidePersonal: false });
       const { getAllByText, queryByText, getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
       await userEvent.click(getByRole('button'));
-      // Only the exclusive org is present; the non-exclusive org and personal workspace are hidden.
       expect(getAllByText('Org1').length).toBeGreaterThan(0);
       expect(queryByText('Org2')).not.toBeInTheDocument();
       expect(queryByText('Personal account')).not.toBeInTheDocument();

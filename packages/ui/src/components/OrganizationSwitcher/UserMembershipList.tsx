@@ -50,18 +50,13 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
   const { ref, userMemberships } = useFetchMemberships();
   const { user } = useUser();
 
-  // Derive `hasExclusive` from the full, non-paginated membership set on the User resource so it never
-  // fails open when the exclusive membership is not on the currently loaded page of `userMemberships`.
   const { hasExclusive } = filterExclusiveMemberships(user?.organizationMemberships ?? []);
 
-  // The displayed list still filters the currently loaded page to exclusive-only, so a partially-loaded
-  // page can never surface a non-exclusive organization.
   const loadedMemberships = (userMemberships.count || 0) > 0 ? userMemberships.data || [] : [];
   const { memberships: visibleMemberships } = filterExclusiveMemberships(loadedMemberships);
 
   const otherOrgs = visibleMemberships.map(e => e.organization).filter(o => o.id !== currentOrg?.id);
 
-  // When the user has an exclusive membership, the personal workspace must always be hidden.
   const hidePersonalWorkspace = hidePersonal || hasExclusive;
 
   if (!user) {
@@ -71,8 +66,6 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
   const { primaryEmailAddress, primaryPhoneNumber, primaryWeb3Wallet, username, ...userWithoutIdentifiers } = user;
 
   const { isLoading } = userMemberships;
-  // When the user has an exclusive membership we never load additional pages, so the infinite-scroll
-  // observer must not keep paginating (a later page could otherwise surface non-exclusive orgs).
   const hasNextPage = hasExclusive ? false : userMemberships.hasNextPage;
 
   return (

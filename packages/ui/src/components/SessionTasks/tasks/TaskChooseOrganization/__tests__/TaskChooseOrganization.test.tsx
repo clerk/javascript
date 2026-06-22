@@ -535,9 +535,6 @@ describe('TaskChooseOrganization', () => {
         });
       });
 
-      // Force the auto-activation to fail so the choose-organization fallback screen renders. A Clerk
-      // API error is used so the component's error handler surfaces it and falls back gracefully (an
-      // unknown error would be rethrown by `handleError`).
       fixtures.clerk.setActive.mockRejectedValue(
         new ClerkAPIResponseError('activation failed', {
           data: [{ code: 'organization_not_found_or_unauthorized', message: 'activation failed' }],
@@ -557,11 +554,8 @@ describe('TaskChooseOrganization', () => {
           pendingInvitationsCount: 0,
         },
       });
-      // The displayed-list filter reads `organization.exclusiveMembership`, which the fake org factory
-      // does not set, so flag it explicitly on the loaded page.
       (exclusiveMembership.organization as any).exclusiveMembership = true;
 
-      // A loaded membership page plus an outstanding suggestion: neither create nor suggestion may show.
       fixtures.clerk.user?.getOrganizationMemberships.mockReturnValue(
         Promise.resolve({
           data: [exclusiveMembership],
@@ -584,9 +578,7 @@ describe('TaskChooseOrganization', () => {
 
       const { findByText, queryByText, queryByRole } = render(<TaskChooseOrganization />, { wrapper });
 
-      // The exclusive organization is still listed on the fallback screen.
       expect(await findByText('Exclusive Org')).toBeInTheDocument();
-      // But none of the join/create surfaces are rendered.
       expect(queryByText('Create new organization')).not.toBeInTheDocument();
       expect(queryByRole('textbox', { name: /name/i })).not.toBeInTheDocument();
       expect(queryByText('OrgTwoSuggestion')).not.toBeInTheDocument();

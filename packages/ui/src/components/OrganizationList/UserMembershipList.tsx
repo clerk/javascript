@@ -97,8 +97,6 @@ export const PersonalAccountPreview = withCardStateProvider((props: { forceHide?
     });
   };
 
-  // `forceHide` is set when the user has an exclusive membership, in which case the personal
-  // account must always be hidden.
   if (hidePersonal || props.forceHide) {
     return null;
   }

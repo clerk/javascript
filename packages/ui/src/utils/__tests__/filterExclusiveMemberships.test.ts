@@ -7,7 +7,6 @@ type TestMembership = Pick<OrganizationMembershipResource, 'organization'> & { i
 
 const createMembership = (id: string, exclusiveMembership: boolean): TestMembership => ({
   id,
-  // Only the fields the filter reads need to be realistic; the rest is irrelevant to the unit under test.
   organization: { id: `org_${id}`, exclusiveMembership } as OrganizationResource,
 });
 
@@ -25,7 +24,6 @@ describe('filterExclusiveMemberships', () => {
     const result = filterExclusiveMemberships(memberships);
 
     expect(result.hasExclusive).toBe(false);
-    // The same array reference is returned unchanged when there is no exclusive membership.
     expect(result.memberships).toBe(memberships);
   });
 

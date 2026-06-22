@@ -37,15 +37,9 @@ export const ChooseOrganizationScreen = (props: ChooseOrganizationScreenProps) =
   const { user } = useUser();
   const { ref, userMemberships, userSuggestions, userInvitations } = useOrganizationListInView();
 
-  // Derive `hasExclusive` from the full, non-paginated membership set on the User resource so it never
-  // fails open when the exclusive membership is not on the currently loaded page of `userMemberships`.
-  // This screen also renders as the auto-activate failure fallback, so it cannot assume the backend
-  // blocks an exclusive user from joining/creating other organizations — it must enforce that here.
   const { hasExclusive } = filterExclusiveMemberships(user?.organizationMemberships ?? []);
 
   const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
-  // When the user has an exclusive membership, invitations/suggestions are hidden and we never load
-  // additional membership pages, so the spinner/observer must not keep paginating.
   const hasNextPage = hasExclusive
     ? false
     : userMemberships?.hasNextPage || userInvitations?.hasNextPage || userSuggestions?.hasNextPage;
@@ -55,8 +49,6 @@ export const ChooseOrganizationScreen = (props: ChooseOrganizationScreenProps) =
   const userInvitationsData = userInvitations.data?.filter(a => !!a);
   const userSuggestionsData = userSuggestions.data?.filter(a => !!a);
 
-  // The displayed list still filters the currently loaded page to exclusive-only, so a partially-loaded
-  // page can never surface a non-exclusive organization.
   const loadedMemberships = (userMemberships.count || 0) > 0 ? userMemberships.data || [] : [];
   const { memberships: visibleMemberships } = filterExclusiveMemberships(loadedMemberships);
 
@@ -88,10 +80,6 @@ export const ChooseOrganizationScreen = (props: ChooseOrganizationScreenProps) =
               );
             })}
 
-            {/* When the user has an exclusive membership they must not see ways to join or create
-                other organizations: invitations, suggestions, and the create button are all hidden.
-                This screen renders as the auto-activate failure fallback, so it enforces this directly
-                rather than relying on the backend to block the user. */}
             {!hasExclusive &&
               !userMemberships.hasNextPage &&
               userInvitationsData?.map(inv => {

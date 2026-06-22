@@ -213,8 +213,6 @@ describe('OrganizationList', () => {
             pendingInvitationsCount: 0,
           },
         });
-        // The displayed-list filter reads `organization.exclusiveMembership`, which the fake org factory
-        // does not set, so flag it explicitly on the loaded page.
         (exclusiveMembership.organization as any).exclusiveMembership = true;
 
         fixtures.clerk.user?.getOrganizationMemberships.mockReturnValue(
@@ -236,9 +234,7 @@ describe('OrganizationList', () => {
 
         const { findByText, queryByText, queryByRole } = render(<OrganizationList />, { wrapper });
 
-        // The exclusive org is shown.
         expect(await findByText('Exclusive Org')).toBeInTheDocument();
-        // Personal account, invitations, and the create button are all hidden.
         expect(queryByText('Personal account')).not.toBeInTheDocument();
         expect(queryByText('InvitedOrg')).not.toBeInTheDocument();
         expect(queryByRole('menuitem', { name: 'Create organization' })).not.toBeInTheDocument();
