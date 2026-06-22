@@ -17,6 +17,7 @@ interface DestructiveProps {
   resourceName: string;
   onDelete: () => void | Promise<void>;
   isDeleting: boolean;
+  error?: string | null;
 }
 
 export function Destructive({
@@ -29,6 +30,7 @@ export function Destructive({
   resourceName,
   onDelete,
   isDeleting,
+  error,
 }: DestructiveProps) {
   const [confirmValue, setConfirmValue] = useState('');
   const canSubmit = confirmValue === resourceName && !isDeleting;
@@ -52,6 +54,18 @@ export function Destructive({
         <>
           <Dialog.Title render={p => <Heading {...p} />}>{title}</Dialog.Title>
           <Dialog.Description render={p => <Text {...p} />}>{description}</Dialog.Description>
+          {error && (
+            <Box
+              render={p => <p {...p} />}
+              sx={t => ({
+                ...t.text('sm'),
+                color: t.color.destructive,
+                marginBlockStart: t.spacing(2),
+              })}
+            >
+              {error}
+            </Box>
+          )}
           <form onSubmit={handleSubmit}>
             <Box
               render={p => <label {...p} />}

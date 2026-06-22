@@ -88,6 +88,7 @@ function LeaveOrganizationReady({
           primaryActionLabel='Leave organization'
           onDelete={() => send({ type: 'CONFIRM' })}
           isDeleting={snapshot.value === 'leaving'}
+          error={snapshot.context.error}
         />
       </Box>
     </Box>

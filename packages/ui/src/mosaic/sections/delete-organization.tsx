@@ -77,6 +77,7 @@ function DeleteOrganizationReady({ organization }: { organization: MockOrganizat
           primaryActionLabel='Delete organization'
           onDelete={() => send({ type: 'CONFIRM' })}
           isDeleting={snapshot.value === 'deleting'}
+          error={snapshot.context.error}
         />
       </Box>
     </Box>
