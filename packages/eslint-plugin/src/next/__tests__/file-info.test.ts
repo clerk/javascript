@@ -60,11 +60,14 @@ describe('isUnderAppRouterRoot', () => {
   it('returns true for `app/` and `src/app/` folders', () => {
     expect(isUnderAppRouterRoot('app')).toBe(true);
     expect(isUnderAppRouterRoot('app/dashboard')).toBe(true);
+    expect(isUnderAppRouterRoot('src/app')).toBe(true);
     expect(isUnderAppRouterRoot('src/app/dashboard')).toBe(true);
-    expect(isUnderAppRouterRoot('apps/web/app/dashboard')).toBe(true);
   });
 
-  it('returns false for folders that merely contain `app` in a segment name', () => {
+  it('returns false for folders that are not rooted at `app/` or `src/app/`', () => {
+    expect(isUnderAppRouterRoot('apps/web/app/dashboard')).toBe(false);
+    expect(isUnderAppRouterRoot('src/pages-router/app')).toBe(false);
+    expect(isUnderAppRouterRoot('src/pages-router/app/dashboard')).toBe(false);
     expect(isUnderAppRouterRoot('myapp/dashboard')).toBe(false);
     expect(isUnderAppRouterRoot('app-utils')).toBe(false);
     expect(isUnderAppRouterRoot('utils')).toBe(false);
@@ -81,6 +84,8 @@ describe('getAppRouterFileKind', () => {
   it('returns null for resource filenames outside App Router', () => {
     expect(getAppRouterFileKind('/proj/utils/page.tsx', 'utils')).toBeNull();
     expect(getAppRouterFileKind('/proj/shared/route.ts', 'shared')).toBeNull();
+    expect(getAppRouterFileKind('/proj/apps/web/app/page.tsx', 'apps/web/app')).toBeNull();
+    expect(getAppRouterFileKind('/proj/src/pages-router/app/page.tsx', 'src/pages-router/app')).toBeNull();
   });
 
   it('returns null for non-resource files even under App Router', () => {

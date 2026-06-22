@@ -38,11 +38,17 @@ export function getRelativeFolder(filename: string | undefined, rootDir: string 
 }
 
 /**
- * Whether `relativeFolder` lies under a Next.js App Router root (`app/...` or
- * `src/app/...`, including nested monorepo layouts such as `apps/web/app/...`).
+ * Whether `relativeFolder` lies under a Next.js App Router root, relative to
+ * the configured project root. Only Next.js' supported root layouts (`app/...`
+ * and `src/app/...`) count; monorepo apps should set `rootDir` per app.
  */
 export function isUnderAppRouterRoot(relativeFolder: string): boolean {
-  return relativeFolder.split('/').some(seg => seg === 'app');
+  return (
+    relativeFolder === 'app' ||
+    relativeFolder.startsWith('app/') ||
+    relativeFolder === 'src/app' ||
+    relativeFolder.startsWith('src/app/')
+  );
 }
 
 /**

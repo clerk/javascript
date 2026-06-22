@@ -95,8 +95,8 @@ Note that the bulk auto-fixer described further down does require `eslint` to be
 
 | Option              | Type                  | Default  | Description                                                                                                                                                                                                             |
 | ------------------- | --------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `protected`         | `string[]` (required) | —        | Project-relative folder globs whose resources must be guarded.                                                                                                                                                          |
-| `public`            | `string[]`            | `[]`     | Project-relative folder globs that are exempt.                                                                                                                                                                          |
+| `protected`         | `string[]` (required) | —        | Folder globs relative to the project root whose resources must be guarded.                                                                                                                                              |
+| `public`            | `string[]`            | `[]`     | Folder globs relative to the project root that are exempt.                                                                                                                                                              |
 | `resources`         | `object`              | all true | Resource groups to check. Supports `routeHandlers`, `serverFunctions`, and `serverComponentEntrypoints`, each as an optional boolean.                                                                                   |
 | `mixedScopeLayouts` | `'auto' \| string[]`  | `'auto'` | Layouts/templates that intentionally wrap both protected and public descendants. `'auto'` allows them silently; a list requires each such folder to be acknowledged explicitly.                                         |
 | `rootDir`           | `string`              | _(auto)_ | Project root used to resolve project-relative folder globs. Defaults to the nearest ancestor `eslint.config.*`, then ESLint `cwd`. Set to `import.meta.dirname` in your config file when auto-discovery is unavailable. |
@@ -107,12 +107,12 @@ Globs use a minimal dialect — only `*` (single segment) and `**` (any depth). 
 
 `protected` and `public` are project-relative folder globs. Use `app/**` for a root `app` directory, `src/app/**` for a `src/app` directory, and `src/**`, `shared/**`, etc. for other project folders.
 
-The project root is normally determined by the nearest `eslint.config.*` ancestor of the file being checked, and falls back to `cwd`. If you need better control, for example in a monorepo setup, you can specify `rootDir`; the globs will be relative to that directory.
+The project root is normally determined by the nearest `eslint.config.*` ancestor of the file being checked, and falls back to `cwd`. You can configure it manually using `rootDir`.
 
 We recommend starting with `protected: ['**']`. This protects the following resources by default:
 
-- Server Functions are checked wherever they live in the project
-- Regardless of configuration, App Router entrypoints like `page.jsx` or `route.js` are only checked if they live under a `app/` folder
+- Server Functions are checked wherever they live in the project when their folder is protected
+- Regardless of configuration, App Router entrypoints like `page.jsx` or `route.js` are only checked if they live under `app/` or `src/app/` relative to the project root
 
 Use `public` for explicit exemptions:
 
@@ -165,6 +165,28 @@ Use `resources` to disable whole resource groups when a project only wants this 
 
 We recommend leaving all as true, but switching some off can be useful during incremental migrations. This configuration also scopes suggestions and bulk-fix tooling: disabled resource groups are not reported by the rule, so they will not receive editor quick-fixes or bulk-applied fixes.
 
+## Monorepo setups
+
+If you keep a separate `eslint.config.*` in each application, this rule will work with your monorepo setup out of the box.
+
+If you have a single top level `eslint.config.*`, you need to define the rule once for each application, and you need to configure `rootDir` to point to each application root (for example `apps/web`). This makes sense when you consider that each `protected` and `public` pattern is application specific. For example:
+
+```ts
+{
+  files: ['apps/web/src/**/*.{ts,tsx}'],
+  rules: {
+    '@clerk/next/require-auth-protection': [
+      'error',
+      {
+        rootDir: 'apps/web',
+        protected: ['**'],
+        public: ['src/app/sign-in/**'],
+      }
+    ]
+  }
+}
+```
+
 ## What counts as protected
 
 The rule is satisfied when the relevant function guards itself at the top, either by calling `auth.protect()`:
@@ -216,7 +238,7 @@ npx clerk-next-fix-auth-protection --dry-run
 # Scope fixes to a specific pattern, this will still
 # use protected/public from your ESLint config, but
 # can be useful to only fix a subset of your application
-npx clerk-next-fix-auth-protection "src/app/**"
+npx clerk-next-fix-auth-protection "src/**"
 ```
 
 Resources the rule can't safely fix on its own (imported/wrapped exports, unacknowledged mixed-scope layouts) are listed as needing manual attention, and the command exits non-zero when any remain (or when `--dry-run` would make changes).
@@ -227,7 +249,7 @@ The same logic is available programmatically:
 import { fixAuthProtection } from '@clerk/eslint-plugin/next/fix-auth-protection';
 
 const { fixed, unresolved } = await fixAuthProtection({
-  patterns: ['src/app/**'],
+  patterns: ['src/**'],
   dryRun: false,
 });
 ```
