@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { assign, isAssignAction } from '../assign';
 import { createActor, mockActor } from '../createActor';
 import { createMachine } from '../createMachine';
-import type { DoneInvokeEvent, ErrorInvokeEvent } from '../types';
+import type { DoneInvokeEvent } from '../types';
 import {
   createDeleteOrgMachine,
   createLoaderMachine,
@@ -637,7 +637,7 @@ describe('actor restart — StrictMode start/stop/start cycle', () => {
     expect(actor.getSnapshot().value).toBe('confirming');
   });
 
-  it('does not re-fire an in-flight invoke when restarted from an invoke state', async () => {
+  it('does not re-fire an in-flight invoke when restarted from an invoke state', () => {
     const gate = deferred<void>();
     let invokeCount = 0;
     const actor = createActor(

@@ -94,9 +94,13 @@ function createWizardMachine(descriptors: StepDescriptor[]): StateMachine<Wizard
   // Furthest contiguously-reachable step (mirrors reducer.ts `initialState`):
   // walk forward while the NEXT step's guard holds, stop at the first gate.
   const furthestReachable = (): string => {
-    if (descriptors.length === 0) return '';
+    if (descriptors.length === 0) {
+      return '';
+    }
     let i = 0;
-    while (i + 1 < descriptors.length && guardHolds(descriptors[i + 1])) i++;
+    while (i + 1 < descriptors.length && guardHolds(descriptors[i + 1])) {
+      i++;
+    }
     return descriptors[i].id;
   };
 
@@ -455,8 +459,18 @@ describe('Wizard AFTER — driven through useMachine', () => {
       return (
         <div>
           <output data-testid='step'>{STEP_LABEL[snapshot.value]}</output>
-          <button onClick={() => send({ type: 'PREV' })}>Back</button>
-          <button onClick={() => send({ type: 'NEXT' })}>Next</button>
+          <button
+            type='button'
+            onClick={() => send({ type: 'PREV' })}
+          >
+            Back
+          </button>
+          <button
+            type='button'
+            onClick={() => send({ type: 'NEXT' })}
+          >
+            Next
+          </button>
         </div>
       );
     }

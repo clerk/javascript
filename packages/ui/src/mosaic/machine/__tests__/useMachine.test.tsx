@@ -26,9 +26,24 @@ describe('useMachine — drives a flow from a component', () => {
       return (
         <div>
           <output data-testid='state'>{snapshot.value}</output>
-          <button onClick={() => send({ type: 'OPEN' })}>Open</button>
-          <button onClick={() => send({ type: 'TYPE', value: 'Acme Inc' })}>Type name</button>
-          <button onClick={() => send({ type: 'CONFIRM' })}>Confirm</button>
+          <button
+            type='button'
+            onClick={() => send({ type: 'OPEN' })}
+          >
+            Open
+          </button>
+          <button
+            type='button'
+            onClick={() => send({ type: 'TYPE', value: 'Acme Inc' })}
+          >
+            Type name
+          </button>
+          <button
+            type='button'
+            onClick={() => send({ type: 'CONFIRM' })}
+          >
+            Confirm
+          </button>
         </div>
       );
     }
@@ -47,7 +62,7 @@ describe('useMachine — drives a flow from a component', () => {
     fireEvent.click(screen.getByText('Confirm'));
     expect(screen.getByTestId('state')).toHaveTextContent('deleting');
 
-    await act(async () => {
+    await act(() => {
       gate.resolve();
     });
     expect(screen.getByTestId('state')).toHaveTextContent('deleted');
@@ -222,7 +237,12 @@ describe('useMachine — onDone', () => {
       return (
         <div>
           <output data-testid='state'>{snapshot.value}</output>
-          <button onClick={() => send({ type: 'GO' })}>Go</button>
+          <button
+            type='button'
+            onClick={() => send({ type: 'GO' })}
+          >
+            Go
+          </button>
         </div>
       );
     }
@@ -231,7 +251,9 @@ describe('useMachine — onDone', () => {
     expect(onDone).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getByText('Go'));
-    await act(async () => gate.resolve());
+    await act(() => {
+      gate.resolve();
+    });
 
     expect(screen.getByTestId('state')).toHaveTextContent('done');
     expect(onDone).toHaveBeenCalledTimes(1);
@@ -256,14 +278,23 @@ describe('useMachine — onDone', () => {
 
     function Comp({ onDone }: { onDone: () => void }) {
       const [, send] = useMachine(machine, { context: { fn: () => gate.promise }, onDone });
-      return <button onClick={() => send({ type: 'GO' })}>Go</button>;
+      return (
+        <button
+          type='button'
+          onClick={() => send({ type: 'GO' })}
+        >
+          Go
+        </button>
+      );
     }
 
     const { rerender } = render(<Comp onDone={staleCallback} />);
     rerender(<Comp onDone={freshCallback} />);
 
     fireEvent.click(screen.getByText('Go'));
-    await act(async () => gate.resolve());
+    await act(() => {
+      gate.resolve();
+    });
 
     expect(freshCallback).toHaveBeenCalledTimes(1);
     expect(staleCallback).not.toHaveBeenCalled();
@@ -294,7 +325,12 @@ describe('useMachine — live context keeps injected functions current', () => {
       return (
         <div>
           <output data-testid='state'>{snapshot.value}</output>
-          <button onClick={() => send({ type: 'GO' })}>Go</button>
+          <button
+            type='button'
+            onClick={() => send({ type: 'GO' })}
+          >
+            Go
+          </button>
         </div>
       );
     }
@@ -305,7 +341,9 @@ describe('useMachine — live context keeps injected functions current', () => {
     fireEvent.click(screen.getByText('Go'));
     expect(screen.getByTestId('state')).toHaveTextContent('running');
 
-    await act(async () => gate.resolve());
+    await act(() => {
+      gate.resolve();
+    });
     expect(screen.getByTestId('state')).toHaveTextContent('done');
 
     expect(freshFn).toHaveBeenCalledTimes(1);

@@ -546,7 +546,7 @@ describe('pattern: typed invoke output via fromPromise', () => {
 
   const machine = createMachine({
     initial: 'idle',
-    context: { resource: null, error: null, fetchFn: async () => ({ status: '', id: '' }) },
+    context: { resource: null, error: null, fetchFn: () => Promise.resolve({ status: '', id: '' }) },
     states: {
       idle: { on: { FETCH: 'loading' } },
       loading: {
@@ -568,7 +568,7 @@ describe('pattern: typed invoke output via fromPromise', () => {
 
   it('stores the full resolved resource in context', async () => {
     const resource: Resource = { status: 'complete', id: 'res_123' };
-    const actor = createActor(machine, { context: { fetchFn: async () => resource } });
+    const actor = createActor(machine, { context: { fetchFn: () => Promise.resolve(resource) } });
     actor.start();
     actor.send({ type: 'FETCH' });
     await tick();
@@ -578,7 +578,7 @@ describe('pattern: typed invoke output via fromPromise', () => {
 
   it('stores the full resource including non-status fields', async () => {
     const resource: Resource = { status: 'needs_first_factor', id: 'si_abc' };
-    const actor = createActor(machine, { context: { fetchFn: async () => resource } });
+    const actor = createActor(machine, { context: { fetchFn: () => Promise.resolve(resource) } });
     actor.start();
     actor.send({ type: 'FETCH' });
     await tick();
@@ -644,7 +644,7 @@ describe('pattern: on-mount async — initial state invokes immediately', () => 
     });
   }
 
-  it('fires the async call immediately on start — no useEffect in the component', async () => {
+  it('fires the async call immediately on start — no useEffect in the component', () => {
     const redeemFn = vi.fn(() => Promise.resolve({ status: 'needs_first_factor' }));
     const actor = createActor(makeMachine(redeemFn), { context: { ticket: 'org_ticket_123' } });
     actor.start();

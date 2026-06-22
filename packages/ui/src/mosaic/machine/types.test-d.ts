@@ -210,6 +210,7 @@ describe('createMachine — TStates constrains initial and transition targets', 
 // ─── setup — pre-binds TContext and TEvent ───────────────────────────────────
 
 describe('setup — eliminates repetitive generic params', () => {
+  // eslint-disable-next-line @typescript-eslint/unbound-method -- setup() returns closures, not this-bound methods
   const { createMachine: make, assign: a } = setup<TestContext, TestEvent>();
 
   test('createMachine compiles without explicit type parameters', () => {
@@ -281,6 +282,7 @@ interface FetchResult {
 }
 
 describe('setup.fromPromise — e.output is typed from src return type', () => {
+  // eslint-disable-next-line @typescript-eslint/unbound-method -- setup() returns closures, not this-bound methods
   const { createMachine: make2, assign: a2, fromPromise } = setup<FetchContext, FetchEvent>();
 
   // Typed async function — fromPromise infers TOutput = FetchResult from its return type.

@@ -53,7 +53,9 @@ export function useMachine<TContext extends object, TEvent extends EventObject>(
   // useLayoutEffect with no deps runs synchronously after every render, before
   // paint — ensuring setContext fires before any user event triggers an invoke.
   useLayoutEffect(() => {
-    if (options?.context) actor.setContext(options.context);
+    if (options?.context) {
+      actor.setContext(options.context);
+    }
   });
 
   const snapshot = useSyncExternalStore(actor.subscribe, actor.getSnapshot, actor.getSnapshot);
@@ -61,7 +63,9 @@ export function useMachine<TContext extends object, TEvent extends EventObject>(
   const onDoneRef = useRef(options?.onDone);
   onDoneRef.current = options?.onDone;
   useEffect(() => {
-    if (snapshot.status === 'done') onDoneRef.current?.();
+    if (snapshot.status === 'done') {
+      onDoneRef.current?.();
+    }
   }, [snapshot.status]);
 
   return [snapshot, actor.send];
