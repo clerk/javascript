@@ -3,12 +3,12 @@ import { describe, expect, it, vi } from 'vitest';
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, waitFor } from '@/test/utils';
 
-import { OrganizationList } from '../';
 import { createFakeOrganization } from '../../CreateOrganization/__tests__/CreateOrganization.test';
 import {
   createFakeUserOrganizationInvitation,
   createFakeUserOrganizationMembership,
 } from '../../OrganizationSwitcher/__tests__/test-utils';
+import { OrganizationList } from '../';
 
 const { createFixtures } = bindCreateFixtures('OrganizationList');
 
@@ -185,6 +185,59 @@ describe('OrganizationList', () => {
         expect(queryByText('OrgOne')).toBeInTheDocument();
         await userEvent.click(getByRole('button', { name: 'Join' }));
         expect(queryByRole('button', { name: 'Join' })).not.toBeInTheDocument();
+      });
+    });
+
+    describe('with an exclusive membership', () => {
+      it('shows only the exclusive org and hides personal/create/invitation surfaces', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withOrganizations();
+          f.withUser({
+            email_addresses: ['test@clerk.com'],
+            create_organization_enabled: true,
+            organization_memberships: [
+              { id: '1', name: 'Exclusive Org', slug: 'exclusive', exclusive_membership: true },
+            ],
+          });
+        });
+
+        const exclusiveMembership = createFakeUserOrganizationMembership({
+          id: '1',
+          organization: {
+            id: '1',
+            name: 'Exclusive Org',
+            slug: 'exclusive',
+            membersCount: 1,
+            adminDeleteEnabled: false,
+            maxAllowedMemberships: 1,
+            pendingInvitationsCount: 0,
+          },
+        });
+        (exclusiveMembership.organization as any).exclusiveMembership = true;
+
+        fixtures.clerk.user?.getOrganizationMemberships.mockReturnValue(
+          Promise.resolve({
+            data: [exclusiveMembership],
+            total_count: 1,
+          }),
+        );
+
+        const invitation = createFakeUserOrganizationInvitation({
+          id: '1',
+          emailAddress: 'one@clerk.com',
+          publicOrganizationData: { name: 'InvitedOrg' },
+        });
+
+        fixtures.clerk.user?.getOrganizationInvitations.mockReturnValue(
+          Promise.resolve({ data: [invitation], total_count: 1 }),
+        );
+
+        const { findByText, queryByText, queryByRole } = render(<OrganizationList />, { wrapper });
+
+        expect(await findByText('Exclusive Org')).toBeInTheDocument();
+        expect(queryByText('Personal account')).not.toBeInTheDocument();
+        expect(queryByText('InvitedOrg')).not.toBeInTheDocument();
+        expect(queryByRole('menuitem', { name: 'Create organization' })).not.toBeInTheDocument();
       });
     });
 

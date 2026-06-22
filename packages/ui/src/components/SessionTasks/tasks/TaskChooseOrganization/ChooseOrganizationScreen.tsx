@@ -26,6 +26,7 @@ import { Header } from '@/ui/elements/Header';
 import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
 import { useOrganizationListInView } from '@/ui/hooks/useOrganizationListInView';
 import { handleError } from '@/ui/utils/errorHandler';
+import { filterExclusiveMemberships } from '@/ui/utils/filterExclusiveMemberships';
 
 type ChooseOrganizationScreenProps = {
   onCreateOrganizationClick: () => void;
@@ -36,13 +37,20 @@ export const ChooseOrganizationScreen = (props: ChooseOrganizationScreenProps) =
   const { user } = useUser();
   const { ref, userMemberships, userSuggestions, userInvitations } = useOrganizationListInView();
 
+  const { hasExclusive } = filterExclusiveMemberships(user?.organizationMemberships ?? []);
+
   const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
-  const hasNextPage = userMemberships?.hasNextPage || userInvitations?.hasNextPage || userSuggestions?.hasNextPage;
+  const hasNextPage = hasExclusive
+    ? false
+    : userMemberships?.hasNextPage || userInvitations?.hasNextPage || userSuggestions?.hasNextPage;
 
   // Filter out falsy values that can occur when infinite loading resolves pages out of order
   // This happens when concurrent requests resolve in unexpected order, leaving undefined/null items in the data array
   const userInvitationsData = userInvitations.data?.filter(a => !!a);
   const userSuggestionsData = userSuggestions.data?.filter(a => !!a);
+
+  const loadedMemberships = (userMemberships.count || 0) > 0 ? userMemberships.data || [] : [];
+  const { memberships: visibleMemberships } = filterExclusiveMemberships(loadedMemberships);
 
   return (
     <>
@@ -63,17 +71,17 @@ export const ChooseOrganizationScreen = (props: ChooseOrganizationScreenProps) =
       <Col elementDescriptor={descriptors.main}>
         <OrganizationPreviewListItems elementDescriptor={descriptors.taskChooseOrganizationPreviewItems}>
           <Actions role='menu'>
-            {(userMemberships.count || 0) > 0 &&
-              userMemberships.data?.map(inv => {
-                return (
-                  <MembershipPreview
-                    key={inv.id}
-                    {...inv}
-                  />
-                );
-              })}
+            {visibleMemberships.map(inv => {
+              return (
+                <MembershipPreview
+                  key={inv.id}
+                  {...inv}
+                />
+              );
+            })}
 
-            {!userMemberships.hasNextPage &&
+            {!hasExclusive &&
+              !userMemberships.hasNextPage &&
               userInvitationsData?.map(inv => {
                 return (
                   <InvitationPreview
@@ -83,7 +91,8 @@ export const ChooseOrganizationScreen = (props: ChooseOrganizationScreenProps) =
                 );
               })}
 
-            {!userMemberships.hasNextPage &&
+            {!hasExclusive &&
+              !userMemberships.hasNextPage &&
               !userInvitations.hasNextPage &&
               userSuggestionsData?.map(inv => {
                 return (
@@ -96,13 +105,15 @@ export const ChooseOrganizationScreen = (props: ChooseOrganizationScreenProps) =
 
             {(hasNextPage || isLoading) && <OrganizationPreviewSpinner ref={ref} />}
 
-            <CreateOrganizationButton
-              onCreateOrganizationClick={() => {
-                // Clear error originated from the list when switching to form
-                card.setError(undefined);
-                props.onCreateOrganizationClick();
-              }}
-            />
+            {!hasExclusive && (
+              <CreateOrganizationButton
+                onCreateOrganizationClick={() => {
+                  // Clear error originated from the list when switching to form
+                  card.setError(undefined);
+                  props.onCreateOrganizationClick();
+                }}
+              />
+            )}
           </Actions>
         </OrganizationPreviewListItems>
       </Col>

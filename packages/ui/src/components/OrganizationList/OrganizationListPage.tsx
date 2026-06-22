@@ -1,3 +1,4 @@
+import { useUser } from '@clerk/shared/react';
 import { useState } from 'react';
 
 import { CreateOrganizationAction } from '@/common/CreateOrganizationAction';
@@ -7,6 +8,7 @@ import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
 import { useOrganizationListInView } from '@/ui/hooks/useOrganizationListInView';
+import { filterExclusiveMemberships } from '@/ui/utils/filterExclusiveMemberships';
 
 import { useEnvironment, useOrganizationListContext } from '../../contexts';
 import { Box, Col, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
@@ -118,9 +120,14 @@ export const OrganizationListPageList = (props: { onCreateOrganizationClick: () 
 
   const { ref, userMemberships, userSuggestions, userInvitations } = useOrganizationListInView();
   const { hidePersonal } = useOrganizationListContext();
+  const { user } = useUser();
+
+  const { hasExclusive } = filterExclusiveMemberships(user?.organizationMemberships ?? []);
 
   const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
-  const hasNextPage = userMemberships?.hasNextPage || userInvitations?.hasNextPage || userSuggestions?.hasNextPage;
+  const hasNextPage = hasExclusive
+    ? false
+    : userMemberships?.hasNextPage || userInvitations?.hasNextPage || userSuggestions?.hasNextPage;
 
   const onCreateOrganizationClick = () => {
     // Clear error originated from the list when switching to form
@@ -132,6 +139,9 @@ export const OrganizationListPageList = (props: { onCreateOrganizationClick: () 
   // This happens when concurrent requests resolve in unexpected order, leaving undefined/null items in the data array
   const userInvitationsData = userInvitations.data?.filter(a => !!a);
   const userSuggestionsData = userSuggestions.data?.filter(a => !!a);
+
+  const loadedMemberships = (userMemberships.count || 0) > 0 ? userMemberships.data || [] : [];
+  const { memberships: visibleMemberships } = filterExclusiveMemberships(loadedMemberships);
 
   return (
     <>
@@ -156,18 +166,18 @@ export const OrganizationListPageList = (props: { onCreateOrganizationClick: () 
       <Col elementDescriptor={descriptors.main}>
         <PreviewListItems>
           <Actions role='menu'>
-            <PersonalAccountPreview />
-            {(userMemberships.count || 0) > 0 &&
-              userMemberships.data?.map(inv => {
-                return (
-                  <MembershipPreview
-                    key={inv.id}
-                    {...inv}
-                  />
-                );
-              })}
+            <PersonalAccountPreview forceHide={hasExclusive} />
+            {visibleMemberships.map(inv => {
+              return (
+                <MembershipPreview
+                  key={inv.id}
+                  {...inv}
+                />
+              );
+            })}
 
-            {!userMemberships.hasNextPage &&
+            {!hasExclusive &&
+              !userMemberships.hasNextPage &&
               userInvitationsData?.map(inv => {
                 return (
                   <InvitationPreview
@@ -177,7 +187,8 @@ export const OrganizationListPageList = (props: { onCreateOrganizationClick: () 
                 );
               })}
 
-            {!userMemberships.hasNextPage &&
+            {!hasExclusive &&
+              !userMemberships.hasNextPage &&
               !userInvitations.hasNextPage &&
               userSuggestionsData?.map(inv => {
                 return (
@@ -190,7 +201,7 @@ export const OrganizationListPageList = (props: { onCreateOrganizationClick: () 
 
             {(hasNextPage || isLoading) && <OrganizationPreviewSpinner ref={ref} />}
 
-            <CreateOrganizationButton onCreateOrganizationClick={onCreateOrganizationClick} />
+            {!hasExclusive && <CreateOrganizationButton onCreateOrganizationClick={onCreateOrganizationClick} />}
           </Actions>
         </PreviewListItems>
       </Col>

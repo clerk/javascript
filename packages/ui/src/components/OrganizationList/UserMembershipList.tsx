@@ -72,7 +72,7 @@ export const MembershipPreview = (props: { organization: OrganizationResource })
   );
 };
 
-export const PersonalAccountPreview = withCardStateProvider(() => {
+export const PersonalAccountPreview = withCardStateProvider((props: { forceHide?: boolean }) => {
   const card = useCardState();
   const { hidePersonal, navigateAfterSelectPersonal } = useOrganizationListContext();
   const { isLoaded, setActive } = useOrganizationList();
@@ -97,7 +97,7 @@ export const PersonalAccountPreview = withCardStateProvider(() => {
     });
   };
 
-  if (hidePersonal) {
+  if (hidePersonal || props.forceHide) {
     return null;
   }
 

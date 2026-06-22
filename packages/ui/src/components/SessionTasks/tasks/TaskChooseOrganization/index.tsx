@@ -107,7 +107,7 @@ const TaskChooseOrganizationInternal = () => {
               <LoadingCardContent />
             ) : (
               <TaskChooseOrganizationFlows
-                initialFlow={hasExistingResources ? 'choose' : 'create'}
+                initialFlow={exclusiveOrganization || hasExistingResources ? 'choose' : 'create'}
                 organizationCreationDefaults={organizationCreationDefaults.data}
               />
             )}

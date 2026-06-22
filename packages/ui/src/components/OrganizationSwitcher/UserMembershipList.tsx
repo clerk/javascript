@@ -5,6 +5,7 @@ import React from 'react';
 import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
 import { PersonalWorkspacePreview } from '@/ui/elements/PersonalWorkspacePreview';
 import { PreviewButton } from '@/ui/elements/PreviewButton';
+import { filterExclusiveMemberships } from '@/ui/utils/filterExclusiveMemberships';
 
 import { InfiniteListSpinner } from '../../common';
 import { useOrganizationSwitcherContext } from '../../contexts';
@@ -49,9 +50,14 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
   const { ref, userMemberships } = useFetchMemberships();
   const { user } = useUser();
 
-  const otherOrgs = ((userMemberships.count || 0) > 0 ? userMemberships.data || [] : [])
-    .map(e => e.organization)
-    .filter(o => o.id !== currentOrg?.id);
+  const { hasExclusive } = filterExclusiveMemberships(user?.organizationMemberships ?? []);
+
+  const loadedMemberships = (userMemberships.count || 0) > 0 ? userMemberships.data || [] : [];
+  const { memberships: visibleMemberships } = filterExclusiveMemberships(loadedMemberships);
+
+  const otherOrgs = visibleMemberships.map(e => e.organization).filter(o => o.id !== currentOrg?.id);
+
+  const hidePersonalWorkspace = hidePersonal || hasExclusive;
 
   if (!user) {
     return null;
@@ -59,7 +65,8 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
 
   const { primaryEmailAddress, primaryPhoneNumber, primaryWeb3Wallet, username, ...userWithoutIdentifiers } = user;
 
-  const { isLoading, hasNextPage } = userMemberships;
+  const { isLoading } = userMemberships;
+  const hasNextPage = hasExclusive ? false : userMemberships.hasNextPage;
 
   return (
     <Box
@@ -75,9 +82,9 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
         ...common.unstyledScrollbar(t),
       })}
       role='group'
-      aria-label={hidePersonal ? 'List of all organization memberships' : 'List of all accounts'}
+      aria-label={hidePersonalWorkspace ? 'List of all organization memberships' : 'List of all accounts'}
     >
-      {currentOrg && !hidePersonal && (
+      {currentOrg && !hidePersonalWorkspace && (
         <PreviewButton
           elementDescriptor={descriptors.organizationSwitcherPreviewButton}
           elementId={descriptors.organizationSwitcherPreviewButton.setId('personal')}
