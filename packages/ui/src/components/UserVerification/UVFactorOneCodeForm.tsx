@@ -24,6 +24,7 @@ export type UVFactorOneCodeFormProps = UVFactorOneCodeCard & {
   cardSubtitle: LocalizationKey;
   inputLabel: LocalizationKey;
   resendButton: LocalizationKey;
+  identityPreviewEditButtonAriaLabel: LocalizationKey;
 };
 
 export const UVFactorOneCodeForm = (props: UVFactorOneCodeFormProps) => {
@@ -67,6 +68,7 @@ export const UVFactorOneCodeForm = (props: UVFactorOneCodeFormProps) => {
       onResendCodeClicked={prepare}
       safeIdentifier={props.factor.safeIdentifier}
       profileImageUrl={session?.user?.imageUrl}
+      identityPreviewEditButtonAriaLabel={props.identityPreviewEditButtonAriaLabel}
       onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
       showAlternativeMethods={props.showAlternativeMethods}
       onBackLinkClicked={props.onBackLinkClicked}

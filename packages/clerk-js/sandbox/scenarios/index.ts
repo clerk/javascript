@@ -4,3 +4,4 @@ export { CheckoutSeats } from './checkout-seats';
 export { OrgProfileSeatLimit } from './org-profile-seat-limit';
 export { PricingTableSBB } from './pricing-table-sbb';
 export { AnnualOnlyPlans } from './annual-only-plans';
+export { XProviderEnabled } from './x-provider-enabled';

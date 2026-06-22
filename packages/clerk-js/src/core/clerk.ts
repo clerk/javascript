@@ -337,6 +337,14 @@ export class Clerk implements ClerkInterface {
     return Clerk.version;
   }
 
+  get uiVersion(): string | undefined {
+    // `@clerk/ui` publishes its constructor (which carries its package version) on this global when hot-loaded
+    // from the CDN; bundled (no-RHC) builds pass the constructor directly via `options.ui.ClerkUI` instead.
+    const globalCtor = typeof window !== 'undefined' ? window.__internal_ClerkUICtor : undefined;
+    const bundledCtor = this.#options.ui?.ClerkUI;
+    return globalCtor?.version ?? (bundledCtor instanceof Promise ? undefined : bundledCtor?.version);
+  }
+
   set sdkMetadata(metadata: SDKMetadata) {
     Clerk.sdkMetadata = metadata;
   }

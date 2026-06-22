@@ -73,10 +73,9 @@ const SamlGoogleCreateAppStep = (): JSX.Element => {
       <Step.Body>
         <Step.Section sx={theme => ({ gap: theme.space.$5 })}>
           <Col sx={theme => ({ gap: theme.space.$1x5 })}>
-            <Heading
-              elementDescriptor={descriptors.configureSSOInstructionsHeading}
-              as='h3'
-              textVariant='subtitle'
+            <Text
+              as='p'
+              colorScheme='secondary'
               localizationKey={localizationKeys(
                 'configureSSO.configureStep.samlGoogle.createAppStep.createAppInstructions.title',
               )}
@@ -122,14 +121,6 @@ const SamlGoogleCreateAppStep = (): JSX.Element => {
                 colorScheme='secondary'
                 localizationKey={localizationKeys(
                   'configureSSO.configureStep.samlGoogle.createAppStep.createAppInstructions.step4',
-                )}
-              />
-              <Text
-                elementDescriptor={descriptors.configureSSOInstructionsListItem}
-                as='li'
-                colorScheme='secondary'
-                localizationKey={localizationKeys(
-                  'configureSSO.configureStep.samlGoogle.createAppStep.createAppInstructions.step5',
                 )}
               />
             </Col>
@@ -328,14 +319,6 @@ const SamlGoogleIdentityProviderMetadataStep = (): JSX.Element => {
           fill
           gap={5}
         >
-          <Heading
-            elementDescriptor={descriptors.configureSSOInstructionsHeading}
-            as='h3'
-            textVariant='subtitle'
-            localizationKey={localizationKeys(
-              'configureSSO.configureStep.samlGoogle.identityProviderMetadataStep.modes.title',
-            )}
-          />
           <IdentityProviderConfigurationModes
             modes={GOOGLE_IDP_MODES}
             value={mode}

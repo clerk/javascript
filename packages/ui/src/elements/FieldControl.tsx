@@ -230,7 +230,6 @@ const CheckboxIndicator = forwardRef<HTMLInputElement, CheckboxIndicatorProps>(
         elementId={elementId || descriptors.formFieldInput.setId(formField.fieldId)}
         focusRing={false}
         sx={t => ({
-          width: 'fit-content',
           flexShrink: 0,
           marginTop: t.space.$0x5,
         })}

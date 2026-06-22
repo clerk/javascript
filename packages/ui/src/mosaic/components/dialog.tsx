@@ -1,12 +1,11 @@
-import React from 'react';
-import type { ReactNode } from 'react';
-
-import { useDialogContext } from '@clerk/headless/dialog';
 import type { DialogProps as HeadlessDialogProps } from '@clerk/headless/dialog';
+import { useDialogContext } from '@clerk/headless/dialog';
+import type { ReactNode } from 'react';
+import React from 'react';
 
 import { Dialog as Primitive } from '../primitives/dialog';
-import { defineSlotRecipe, useRecipe } from '../slot-recipe';
 import type { RecipeVariantProps } from '../slot-recipe';
+import { defineSlotRecipe, useRecipe } from '../slot-recipe';
 
 /**
  * One multi-slot recipe owns every dialog part: slot identity (`data-cl-slot`),
@@ -130,7 +129,9 @@ interface DialogProps extends Pick<HeadlessDialogProps, 'open' | 'defaultOpen' |
 
 function DialogContent({ children }: { children: DialogProps['children'] }) {
   const { setOpen } = useDialogContext();
-  if (typeof children !== 'function') return <>{children}</>;
+  if (typeof children !== 'function') {
+    return <>{children}</>;
+  }
   return <>{children({ close: () => setOpen(false) })}</>;
 }
 
