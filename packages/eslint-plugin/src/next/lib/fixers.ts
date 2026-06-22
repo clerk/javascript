@@ -17,6 +17,7 @@
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 
 import type { FunctionNode } from './exports';
+import { inferQuoteChar } from './quote-style';
 
 const CLERK_AUTH_SOURCE = '@clerk/nextjs/server';
 
@@ -275,7 +276,8 @@ function ensureAuthImportFix(
     continue;
   }
 
-  const importText = `import { auth } from '${CLERK_AUTH_SOURCE}';`;
+  const quote = inferQuoteChar(sourceCode, program);
+  const importText = `import { auth } from ${quote}${CLERK_AUTH_SOURCE}${quote};`;
   const stmts = program.body;
 
   // Insert after a leading directive prologue (module-level `'use server'` /
