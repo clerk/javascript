@@ -20,16 +20,7 @@ export const ConfigureSSOWizard = ({ title, forceInitialStep, ...props }: Config
 
   const steps = React.useMemo<WizardStepConfig[]>(
     () => [
-      // `isComplete` is position-independent (unlike the stepper's positional
-      // default), so re-entering an active connection ticks every step wherever the
-      // user stands. Each mirrors its guard except `activate`, whose completion is
-      // its own terminal `isActive`; `configure` keys off real configuration (or
-      // active), NOT a bare `hasConnection`, so a just-created-but-unconfigured
-      // connection does not read as done.
       { id: 'verify-domain', label: 'Domains', isComplete: () => allDomainsVerified },
-      // `select-provider` now lives inside `configure` as its first sub-step, so
-      // reaching `configure` only requires verified domains (fresh start) or an
-      // existing connection (resume / change-provider).
       {
         id: 'configure',
         label: 'Connection',

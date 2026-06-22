@@ -7,7 +7,6 @@ import { ProfileCard } from '@/ui/elements/ProfileCard';
 import { Col, descriptors, Flex, Icon, localizationKeys, SimpleButton, Spinner, Text } from '../../customizables';
 import { ChevronLeft } from '../../icons';
 import { ConfigureSSOProtect } from '../ConfigureSSO/ConfigureSSO';
-import { ConfigureSSOSkeleton } from '../ConfigureSSO/ConfigureSSOSkeleton';
 import { ConfigureSSOWizard } from '../ConfigureSSO/ConfigureSSOWizard';
 import { useOrganizationEnterpriseConnection } from '../ConfigureSSO/hooks/useOrganizationEnterpriseConnection';
 import { SecuritySsoSection } from './SecuritySsoSection';
@@ -49,14 +48,8 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
     setView('wizard');
   };
 
-  // Loading is on mount, where `view` is still 'overview': keep the "Security"
-  // header stable so the settled overview replaces the body in place (no header
-  // pop-in) and center a spinner in the remaining height beneath it. The wizard
-  // skeleton stays for the rare case loading is ever entered from the wizard view.
   if (isLoading) {
-    return view === 'wizard' ? (
-      <ConfigureSSOSkeleton />
-    ) : (
+    return (
       <ConfigureSSOProtect>
         <SecurityPageOverview fillHeight>
           <Flex
