@@ -3,9 +3,9 @@ import type { WizardStepDescriptor } from './types';
 /**
  * The pure state a generic, domain-agnostic wizard tracks. The step graph
  * (`descriptors`) is passed in; each descriptor carries its own inline entry
- * guard, so there is no separate guards record. Navigation is positional and
- * sequential — no visited history; the entry guard decides whether navigation
- * may land on a target.
+ * reachability predicate, so there is no separate predicates record. Navigation
+ * is positional and sequential — no visited history; the reachability predicate
+ * decides whether navigation may land on a target.
  */
 export interface WizardState {
   current: string;
@@ -31,22 +31,22 @@ export interface WizardConfig {
 }
 
 /**
- * Resolve a step's inline entry guard. An omitted `guard` defaults TRUE — "no
- * precondition" (the entry step), not "blocked".
+ * Resolve a step's inline reachability predicate. An omitted `isReachable`
+ * defaults TRUE — "no precondition" (the entry step), not "blocked".
  */
-export const guardHolds = (step: WizardStepDescriptor): boolean => (step.guard ? step.guard() : true);
+export const isStepReachable = (step: WizardStepDescriptor): boolean => (step.isReachable ? step.isReachable() : true);
 
 const indexOf = (steps: WizardStepDescriptor[], id: string): number => steps.findIndex(s => s.id === id);
 
-// Entry guards are expected to be monotonic across the declared order (a later
-// step's guard holding implies every earlier step's guard holds); the
+// Reachability predicates are expected to be monotonic across the declared order
+// (a later step's predicate holding implies every earlier step's does); the
 // furthest-reachable init and positional back-navigation rely on that.
 
 /**
- * Where the wizard mounts on (re)load, derived purely from the graph + guards:
- * the FURTHEST step reachable by a contiguous run of holding entry guards from
- * the first step. Walk forward while the *next* step's guard holds; stop at the
- * first gate. With monotonic guards this lands on the deepest step the user has
+ * Where the wizard mounts on (re)load, derived purely from the graph + reachability:
+ * the FURTHEST step reachable by a contiguous run of holding entry predicates from
+ * the first step. Walk forward while the *next* step's predicate holds; stop at the
+ * first gate. With monotonic predicates this lands on the deepest step the user has
  * unlocked. Degenerate-safe: an empty graph yields an empty `current`.
  */
 export const initialState = (config: WizardConfig): WizardState => {
@@ -55,7 +55,7 @@ export const initialState = (config: WizardConfig): WizardState => {
     return { current: '', direction: 0, hasNavigated: false };
   }
   let i = 0;
-  while (i + 1 < steps.length && guardHolds(steps[i + 1])) {
+  while (i + 1 < steps.length && isStepReachable(steps[i + 1])) {
     i++;
   }
   return { current: steps[i].id, direction: 0, hasNavigated: false };
@@ -95,7 +95,7 @@ export const reduce = (state: WizardState, event: WizardEvent, config: WizardCon
       }
       // Blocked: the next step's entry precondition is not met. Hard stop —
       // same ref, NO skip-ahead walk (sequential, one slot only).
-      if (!guardHolds(next)) {
+      if (!isStepReachable(next)) {
         return state;
       }
       return advance(next.id, 1);
@@ -111,10 +111,10 @@ export const reduce = (state: WizardState, event: WizardEvent, config: WizardCon
       if (!prev) {
         return state;
       }
-      // Positional back-nav, still guard-gated. With monotonic guards a
-      // predecessor's guard holds whenever the current step's does, so this
-      // normally passes; an explicit non-monotonic guard can still block it.
-      if (!guardHolds(prev)) {
+      // Positional back-nav, still reachability-gated. With monotonic predicates
+      // a predecessor's predicate holds whenever the current step's does, so this
+      // normally passes; an explicit non-monotonic predicate can still block it.
+      if (!isStepReachable(prev)) {
         return state;
       }
       return advance(prev.id, -1);
@@ -127,9 +127,9 @@ export const reduce = (state: WizardState, event: WizardEvent, config: WizardCon
         return state;
       }
       // Blocked: the target's entry precondition is not met. The stepper binds
-      // `isDisabled = !isReachable` to the SAME `guardHolds(target)` predicate,
+      // `isDisabled = !isReachable` to the SAME `isStepReachable(target)` predicate,
       // so a disabled breadcrumb item and a blocked GOTO agree.
-      if (!guardHolds(target)) {
+      if (!isStepReachable(target)) {
         return state;
       }
       return advance(target.id, 0);

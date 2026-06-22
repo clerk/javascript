@@ -24,19 +24,19 @@ export const ConfigureSSOWizard = ({ title, forceInitialStep, ...props }: Config
       {
         id: 'configure',
         label: 'Connection',
-        guard: () => allDomainsVerified || c.hasConnection,
+        isReachable: () => allDomainsVerified || c.hasConnection,
         isComplete: () => c.hasMinimumConfiguration || c.isActive,
       },
       {
         id: 'test',
         label: 'Test',
-        guard: () => c.hasMinimumConfiguration || c.isActive,
+        isReachable: () => c.hasMinimumConfiguration || c.isActive,
         isComplete: () => c.hasSuccessfulTestRun || c.isActive,
       },
       {
         id: 'activate',
         label: 'Activate',
-        guard: () => c.hasSuccessfulTestRun || c.isActive,
+        isReachable: () => c.hasSuccessfulTestRun || c.isActive,
         isComplete: () => c.isActive,
       },
     ],
