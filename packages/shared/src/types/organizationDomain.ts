@@ -1,43 +1,58 @@
 import type { ClerkResource } from './resource';
 
 /**
- * Holds the verification details of an Organization's [Verified Domain](https://clerk.com/docs/guides/organizations/add-members/verified-domains).
+ * Holds the affiliation verification details of an Organization's [Verified Domain](https://clerk.com/docs/guides/organizations/add-members/verified-domains). Affiliation proves that the current user controls an email address that belongs to the domain, and is established by sending a one-time code to that email address.
+ *
+ * This is the object referenced by both `affiliationVerification` and the deprecated `verification` property of `OrganizationDomainResource`.
  */
 export interface OrganizationDomainVerification {
   /**
-   * The current status of the domain verification.
+   * The current status of the affiliation verification.
    */
   status: OrganizationDomainVerificationStatus;
   /**
-   * The strategy used to verify the domain.
+   * The strategy used to verify affiliation with the domain. The only supported strategy is `'email_code'`, where a one-time code is sent to an email address on the domain.
    */
   strategy: OrganizationDomainVerificationStrategy;
   /**
-   * The number of verification attempts that have been made.
+   * The number of verification attempts that have been made for the current affiliation verification.
    */
   attempts: number;
   /**
-   * The date and time when the current verification attempt expires.
+   * The date and time when the current affiliation verification attempt expires.
    */
   expiresAt: Date;
 }
 
-/** @inline */
+/**
+ * The strategy used to verify affiliation with an Organization's domain.
+ *
+ * @inline
+ */
 type OrganizationDomainVerificationStrategy = 'email_code';
 
-/** @inline */
+/**
+ * The current status of an Organization domain verification.
+ *
+ * @inline
+ */
 export type OrganizationDomainVerificationStatus = 'unverified' | 'verified';
 
 /**
  * The strategy used to verify ownership of an Organization's domain.
+ *
+ * <ul>
+ *  <li>`txt`: Ownership is proven by publishing a DNS TXT record (see `txtRecordName` and `txtRecordValue` on `OrganizationDomainOwnershipVerification`).</li>
+ *  <li>`legacy`: Ownership was implicitly granted to domains that predate the TXT verification flow, so no per-attempt proof exists.</li>
+ *  <li>`manual_override`: Ownership was granted manually by a Clerk admin via the Backend API or Dashboard, bypassing the DNS challenge.</li>
+ * </ul>
  *
  * @inline
  */
 export type OrganizationDomainOwnershipVerificationStrategy = 'txt' | 'legacy' | 'manual_override';
 
 /**
- * Holds the ownership verification details of an Organization's domain, including
- * the TXT record an admin must publish to prove ownership.
+ * Holds the ownership verification details of an Organization's [Verified Domain](https://clerk.com/docs/guides/organizations/add-members/verified-domains). Ownership proves control of the underlying DNS domain, typically by publishing a TXT record, and is required before the domain can be used for enterprise SSO.
  */
 export interface OrganizationDomainOwnershipVerification {
   /**
@@ -49,23 +64,23 @@ export interface OrganizationDomainOwnershipVerification {
    */
   strategy: OrganizationDomainOwnershipVerificationStrategy;
   /**
-   * The number of verification attempts that have been made, or `null` if none.
+   * The number of verification attempts that have been made for the current ownership verification, or `null` when ownership was not established through a per-attempt flow (for example, the `legacy` strategy).
    */
   attempts: number | null;
   /**
-   * The date and time when the current verification attempt expires, or `null`.
+   * The date and time when the current ownership verification attempt expires, or `null` when there is no pending attempt.
    */
   expiresAt: Date | null;
   /**
-   * The date and time when ownership of the domain was verified, or `null` if it has not been verified.
+   * The date and time when ownership of the domain was verified, or `null` if ownership has not been verified yet.
    */
   verifiedAt: Date | null;
   /**
-   * The fully qualified DNS name the org admin must publish the TXT record under. Present only immediately after preparing ownership verification.
+   * The fully qualified DNS name under which the Organization admin must publish the TXT record. Only present immediately after calling `prepareOwnershipVerification`, and `null` otherwise.
    */
   txtRecordName: string | null;
   /**
-   * The exact value the org admin must publish in the TXT record. Present only immediately after preparing ownership verification.
+   * The exact value the Organization admin must publish in the TXT record. Only present immediately after calling `prepareOwnershipVerification`, and `null` otherwise.
    */
   txtRecordValue: string | null;
 }
@@ -206,9 +221,7 @@ export type CreateOrganizationDomainParams = {
 };
 
 /**
- * A per-domain failure entry returned by the bulk ownership verification flows,
- * carrying the id of the domain that was skipped and the API error code that
- * caused it.
+ * Describes a single domain that could not be processed during a bulk ownership verification flow. A failed domain is reported here instead of causing the entire batch to fail.
  */
 export interface OrganizationDomainBulkOwnershipVerificationError {
   /**
@@ -222,20 +235,15 @@ export interface OrganizationDomainBulkOwnershipVerificationError {
 }
 
 /**
- * The partial-success result of a bulk ownership verification flow
- * (`prepareOwnershipVerification`/`attemptOwnershipVerification`). Each
- * requested domain lands in either `data` (with its current ownership state)
- * or `errors`.
+ * The result of a bulk ownership verification flow, such as `prepareOwnershipVerification` or `attemptOwnershipVerification`, where ownership is verified for several of an Organization's domains at once. Because the operation can partially succeed, each requested domain is reported in either `data` or `errors`.
  */
 export interface OrganizationDomainsBulkOwnershipVerificationResource {
   /**
-   * The Verified Domains that were processed successfully. After
-   * `prepareOwnershipVerification`, each domain's `ownershipVerification`
-   * carries the `txtRecordName` and `txtRecordValue` to publish.
+   * The Verified Domains that were processed successfully. After `prepareOwnershipVerification`, each domain's `ownershipVerification` carries the `txtRecordName` and `txtRecordValue` that must be published to a DNS TXT record.
    */
   data: OrganizationDomainResource[];
   /**
-   * The per-domain failures that were skipped without failing the whole batch.
+   * The domains that could not be processed. Each entry identifies the domain and the reason it was skipped, while the remaining domains in the batch are still processed.
    */
   errors: OrganizationDomainBulkOwnershipVerificationError[];
 }
