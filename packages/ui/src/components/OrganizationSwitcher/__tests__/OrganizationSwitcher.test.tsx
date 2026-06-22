@@ -631,6 +631,45 @@ describe('OrganizationSwitcher', () => {
         expect(dialog.contains(document.activeElement)).toBe(true);
       }
     });
+
+    it('uses dialog semantics for the trigger button', async () => {
+      const { wrapper, props } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({ email_addresses: ['test@clerk.com'], create_organization_enabled: true });
+      });
+
+      props.setProps({ hidePersonal: true });
+      const { getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
+      const trigger = getByRole('button', { name: 'Open organization switcher' });
+
+      expect(trigger).toHaveAttribute('aria-haspopup', 'dialog');
+      await userEvent.click(trigger);
+
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(screen.queryByRole('menu')).toBeNull();
+      expect(screen.queryByRole('menuitem')).toBeNull();
+    });
+
+    it('closes on escape and restores focus to the trigger', async () => {
+      const { wrapper, props } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({ email_addresses: ['test@clerk.com'], create_organization_enabled: true });
+      });
+
+      props.setProps({ hidePersonal: true });
+      const { getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
+      const trigger = getByRole('button', { name: 'Open organization switcher' });
+
+      await userEvent.click(trigger);
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+      await userEvent.keyboard('{Escape}');
+
+      await waitFor(() => {
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      });
+      expect(trigger).toHaveFocus();
+    });
   });
 
   describe('OrganizationSwitcher with PortalProvider', () => {
