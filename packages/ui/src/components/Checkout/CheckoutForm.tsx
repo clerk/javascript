@@ -8,6 +8,7 @@ import { Drawer } from '@/ui/elements/Drawer';
 import { LineItems } from '@/ui/elements/LineItems';
 import { SegmentedControl } from '@/ui/elements/SegmentedControl';
 import { Select, SelectButton, SelectOptionList } from '@/ui/elements/Select';
+import { DevModeOverlay } from '@/ui/elements/DevModeNotice';
 import { Tooltip } from '@/ui/elements/Tooltip';
 import {
   getCheckoutSeatUnitTotal,
@@ -369,14 +370,19 @@ export const PayWithTestPaymentMethod = () => {
         display: 'flex',
         flexDirection: 'column',
         rowGap: t.space.$2,
+        position: 'relative',
+        isolation: 'isolate',
+        overflow: 'hidden',
       })}
     >
+      <DevModeOverlay />
       <Flex
         sx={t => ({
           alignItems: 'center',
           justifyContent: 'center',
           flexDirection: 'column',
           rowGap: t.space.$2,
+          zIndex: 1,
         })}
       >
         <Text
