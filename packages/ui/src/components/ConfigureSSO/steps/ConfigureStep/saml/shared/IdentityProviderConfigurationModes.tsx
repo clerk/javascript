@@ -37,6 +37,7 @@ export const IdentityProviderConfigurationModes = ({
       value={value}
       onChange={next => onChange(next as IdpConfigurationMode)}
       fullWidth
+      size='lg'
     >
       {modes.map(mode => {
         const label = labels[mode];

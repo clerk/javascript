@@ -765,6 +765,10 @@ export type ElementsConfig = {
   configureSSOResetConnectionDialogConfirmationInput: WithOptions;
   configureSSOResetConnectionDialogSubmitButton: WithOptions;
 
+  configureSSOChangeProviderDialog: WithOptions;
+  configureSSOChangeProviderDialogCancelButton: WithOptions;
+  configureSSOChangeProviderDialogConfirmButton: WithOptions;
+
   configureSSORemoveDomainDialog: WithOptions;
   configureSSORemoveDomainDialogCancelButton: WithOptions;
   configureSSORemoveDomainDialogSubmitButton: WithOptions;

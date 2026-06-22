@@ -3,11 +3,11 @@ import type { LocalizationKey } from '@/customizables';
 /**
  * One navigable position in a `<Wizard>`, declared as a plain config object in
  * the `steps` array. The graph IS the array — no `React.Children` walking, no
- * `<Wizard.Step>` component. Each entry is registration only (order, guard,
+ * `<Wizard.Step>` component. Each entry is registration only (order, reachability,
  * label/visibility) and carries NO body; rendering is declarative via
  * `<Wizard.Match id>`.
  *
- * `guard` is an *entry precondition* ("may navigation LAND here right now?"),
+ * `isReachable` is an *entry precondition* ("may navigation LAND here right now?"),
  * NOT a "skip if already satisfied" flag — it only blocks landing on a step
  * whose precondition is unmet, never causes a step to be skipped.
  */
@@ -19,12 +19,21 @@ export interface WizardStepConfig {
   /**
    * Inline entry-precondition predicate: "may navigation land on this step right
    * now?". Evaluated uniformly by init / `goNext` / `goPrev` / `goToStep` / the
-   * stepper. OMITTED ⇒ TRUE (always enterable — the entry step). Guards are
-   * expected to be *monotonic* across the declared order (a later guard holding
-   * implies every earlier one holds); the furthest-reachable init and the
-   * always-reachable predecessor both rely on that.
+   * stepper. OMITTED ⇒ TRUE (always enterable — the entry step). Reachability
+   * predicates are expected to be *monotonic* across the declared order (a later
+   * predicate holding implies every earlier one holds); the furthest-reachable
+   * init and the always-reachable predecessor both rely on that.
    */
-  guard?: () => boolean;
+  isReachable?: () => boolean;
+  /**
+   * Inline completion predicate: "is THIS step's work done right now?", decoupled
+   * from the current position. Drives the stepper's completed tick so a step reads
+   * as done whenever its own work is, regardless of where the user currently
+   * stands (re-entering an already-finished flow shows every step ticked).
+   * OMITTED ⇒ fall back to the POSITIONAL default (sits before current) — nested /
+   * per-provider wizards that declare no `isComplete` are unchanged.
+   */
+  isComplete?: () => boolean;
 }
 
 /**
@@ -44,8 +53,10 @@ export interface WizardActiveStep {
   id: string;
   label?: LocalizationKey | string;
   /**
-   * POSITIONAL: the step sits before the current step in declaration order.
-   * Drives the visual "completed" tick only — it is not guard-derived.
+   * Whether this step's work is done — drives the visual "completed" tick. Resolved
+   * from the step's own `isComplete` predicate when it declares one (position-
+   * independent: a finished step stays ticked even when the user navigates back),
+   * otherwise the POSITIONAL default (sits before current in declaration order).
    */
   isCompleted: boolean;
   /**
