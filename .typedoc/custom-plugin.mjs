@@ -131,6 +131,7 @@ const LINK_REPLACEMENTS = [
   ['public-user-data', '/docs/reference/types/public-user-data'],
   ['session-status', '/docs/reference/types/session-status'],
   ['create-organization-domain-params', '#create-organization-domain-params'],
+  ['organization-domain-verification', '/docs/reference/types/organization-domain-resource'],
 ];
 
 /**
