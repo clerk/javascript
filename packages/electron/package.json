@@ -26,51 +26,51 @@
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/types/index.d.ts",
+        "types": "./dist/index.d.mts",
         "default": "./dist/index.mjs"
       },
       "require": {
-        "types": "./dist/types/index.d.ts",
+        "types": "./dist/index.d.ts",
         "default": "./dist/index.js"
       }
     },
     "./preload": {
       "import": {
-        "types": "./dist/types/preload/index.d.ts",
+        "types": "./dist/preload/index.d.mts",
         "default": "./dist/preload/index.mjs"
       },
       "require": {
-        "types": "./dist/types/preload/index.d.ts",
+        "types": "./dist/preload/index.d.ts",
         "default": "./dist/preload/index.js"
       }
     },
     "./storage": {
       "import": {
-        "types": "./dist/types/storage/index.d.ts",
+        "types": "./dist/storage/index.d.mts",
         "default": "./dist/storage/index.mjs"
       },
       "require": {
-        "types": "./dist/types/storage/index.d.ts",
+        "types": "./dist/storage/index.d.ts",
         "default": "./dist/storage/index.js"
       }
     },
     "./react": {
       "import": {
-        "types": "./dist/types/react/index.d.ts",
+        "types": "./dist/react/index.d.mts",
         "default": "./dist/react/index.mjs"
       },
       "require": {
-        "types": "./dist/types/react/index.d.ts",
+        "types": "./dist/react/index.d.ts",
         "default": "./dist/react/index.js"
       }
     },
     "./passkeys": {
       "import": {
-        "types": "./dist/types/passkeys/index.d.ts",
+        "types": "./dist/passkeys/index.d.mts",
         "default": "./dist/passkeys/index.mjs"
       },
       "require": {
-        "types": "./dist/types/passkeys/index.d.ts",
+        "types": "./dist/passkeys/index.d.ts",
         "default": "./dist/passkeys/index.js"
       }
     },
@@ -78,13 +78,12 @@
   },
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
-  "types": "./dist/types/index.d.ts",
+  "types": "./dist/index.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
     "build": "tsdown",
-    "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
     "dev": "tsdown --watch",
     "format": "node ../../scripts/format-package.mjs",

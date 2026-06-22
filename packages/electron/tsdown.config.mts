@@ -1,14 +1,12 @@
-import type { Options } from 'tsdown';
 import { defineConfig } from 'tsdown';
 
-import { runAfterLast } from '../../scripts/utils.ts';
 import pkgJson from './package.json' with { type: 'json' };
 
 export default defineConfig(overrideOptions => {
   const isWatch = !!overrideOptions.watch;
   const shouldPublish = !!overrideOptions.env?.publish;
 
-  const options: Options = {
+  return {
     entry: {
       index: './src/index.ts',
       'preload/index': './src/preload/index.ts',
@@ -20,7 +18,7 @@ export default defineConfig(overrideOptions => {
     deps: {
       neverBundle: ['@clerk/electron-passkeys'],
     },
-    dts: false,
+    dts: true,
     fixedExtension: false,
     format: ['cjs', 'esm'],
     minify: false,
@@ -32,7 +30,6 @@ export default defineConfig(overrideOptions => {
       PACKAGE_VERSION: `"${pkgJson.version}"`,
       __DEV__: `${isWatch}`,
     },
+    onSuccess: shouldPublish ? 'pkglab pub --ping' : undefined,
   };
-
-  return runAfterLast(['pnpm build:declarations', shouldPublish && 'pkglab pub --ping'])(options);
 });

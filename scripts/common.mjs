@@ -12,17 +12,7 @@ export async function getChangesetIgnoredPackages() {
 
 export async function getPackageJsonFiles() {
   const result = await $`find packages -mindepth 2 -maxdepth 2 -name package.json`.quiet();
-  const topLevel = result.stdout.trim().split('\n').filter(Boolean);
-
-  // Native addon platform packages (@clerk/electron-passkeys-*) live one level deeper,
-  // under packages/electron-passkeys/npm/*. They are real publishable workspace packages,
-  // so include them in version/publish discovery alongside the top-level packages.
-  const nativeResult = await $`find packages/electron-passkeys/npm -mindepth 2 -maxdepth 2 -name package.json`
-    .quiet()
-    .nothrow();
-  const nativePackages = nativeResult.stdout.trim().split('\n').filter(Boolean);
-
-  return [...topLevel, ...nativePackages];
+  return result.stdout.trim().split('\n').filter(Boolean);
 }
 
 export async function getPackageNames() {
