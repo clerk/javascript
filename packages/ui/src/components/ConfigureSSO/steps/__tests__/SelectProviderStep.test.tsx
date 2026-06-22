@@ -89,8 +89,10 @@ describe('SelectProviderStep', () => {
     const { wrapper } = await createFixtures();
     const { container } = renderStep(wrapper);
 
-    // Emotion serializes sx into stylesheets, so we check both inline + the document's collected styles
-    const iconSpans = Array.from(container.querySelectorAll('[role="radio"] span[aria-hidden]'));
+    // Emotion serializes sx into stylesheets, so we check both inline + the document's collected styles.
+    // Each provider card is a <label> wrapping a visually-hidden native radio; the
+    // aria-hidden icon span lives inside it.
+    const iconSpans = Array.from(container.querySelectorAll('label span[aria-hidden]'));
     expect(iconSpans).toHaveLength(4);
 
     const collectedStyles = [
@@ -266,6 +268,35 @@ describe('SelectProviderStep', () => {
       await waitFor(() => {
         expect(goNext).toHaveBeenCalled();
       });
+    });
+
+    it('closes the dialog and surfaces the error on the step when the change fails', async () => {
+      resetMocks();
+      contextState.provider = 'saml_okta';
+      contextState.hasConnection = true;
+      changeProvider.mockRejectedValue(
+        new ClerkRuntimeError('failed to change provider', {
+          code: 'enterprise_connection_creation_failed',
+        }),
+      );
+      const { wrapper } = await createFixtures();
+      const { userEvent } = renderStep(wrapper);
+
+      await userEvent.click(screen.getByRole('radio', { name: 'Google Workspace' }));
+      await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Change provider' }));
+
+      await waitFor(() => {
+        expect(changeProvider).toHaveBeenCalledWith('saml_google');
+      });
+
+      // The dialog closes and the error surfaces on the step card.
+      await waitFor(() => {
+        expect(screen.queryByRole('heading', { name: /change provider to/i })).not.toBeInTheDocument();
+      });
+      expect(await screen.findByText(/failed to change provider/i)).toBeInTheDocument();
+      expect(goNext).not.toHaveBeenCalled();
     });
 
     it('keeps the connection and stays put when the dialog is cancelled', async () => {
