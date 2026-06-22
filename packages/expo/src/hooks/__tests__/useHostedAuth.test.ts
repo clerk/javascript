@@ -144,6 +144,23 @@ describe('useHostedAuth', () => {
     expect(response.createdSessionId).toBe('sess_123');
   });
 
+  test('does not activate a session when the callback does not return one', async () => {
+    mockHostedAuthResponse();
+    mocks.openAuthSessionAsync.mockResolvedValue({
+      type: 'success',
+      url: 'myapp:///hosted-auth-callback?state=state-123&rotating_token_nonce=nonce-123',
+    });
+    mockClient.reload.mockResolvedValue(mockClient);
+
+    const { result } = renderHook(() => useHostedAuth());
+    const response = await result.current.startHostedAuth({ state: 'state-123' });
+
+    expect(mockClient.reload).toHaveBeenCalledWith({ rotatingTokenNonce: 'nonce-123' });
+    expect(mockUpdateClient).toHaveBeenCalledWith(mockClient);
+    expect(mockSetActive).not.toHaveBeenCalled();
+    expect(response.createdSessionId).toBeNull();
+  });
+
   test('surfaces browser session open failures', async () => {
     mockHostedAuthResponse();
     mocks.openAuthSessionAsync.mockImplementation(() => {
