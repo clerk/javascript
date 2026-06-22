@@ -57,13 +57,21 @@ describe('useNativeClientEvents', () => {
 
     act(() => {
       mocks.nativeListener?.({
-        clientToken: 'client-token',
+        changed: {
+          client: false,
+          deviceToken: true,
+        },
+        deviceToken: 'device-token',
         sourceId: 'native-source',
       });
     });
 
     await waitFor(() => {
-      expect(result.current.nativeClientEvent?.clientToken).toBe('client-token');
+      expect(result.current.nativeClientEvent?.deviceToken).toBe('device-token');
+      expect(result.current.nativeClientEvent?.changed).toEqual({
+        client: false,
+        deviceToken: true,
+      });
       expect(result.current.nativeClientEvent?.sourceId).toBe('native-source');
     });
 
@@ -75,7 +83,7 @@ describe('useNativeClientEvents', () => {
     mocks.nativeModule = {
       configure: vi.fn(),
       getClientToken: vi.fn(),
-      syncFromJsClientToken: vi.fn(),
+      syncClientStateFromJs: vi.fn(),
     };
 
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);

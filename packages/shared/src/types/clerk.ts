@@ -257,6 +257,11 @@ export interface Clerk {
   version: string | undefined;
 
   /**
+   * The version of `@clerk/ui` that is currently loaded, or `undefined` if the prebuilt UI has not been loaded yet.
+   */
+  uiVersion: string | undefined;
+
+  /**
    * If present, contains information about the SDK that the host application is using.
    * For example, if Clerk is loaded through `@clerk/nextjs`, this would be `{ name: '@clerk/nextjs', version: '1.0.0' }`. You don't need to set this value yourself unless you're [developing an SDK](https://clerk.com/docs/guides/development/sdk-development/overview).
    */

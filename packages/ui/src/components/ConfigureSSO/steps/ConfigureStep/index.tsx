@@ -1,10 +1,13 @@
-import { type JSX } from 'react';
+import React, { type JSX } from 'react';
 
 import { descriptors, Flow } from '@/customizables';
+import { CardStateProvider } from '@/elements/contexts';
 
 import { useConfigureSSO } from '../../ConfigureSSOContext';
 import { Step } from '../../elements/Step';
+import { useWizard, Wizard, type WizardStepConfig } from '../../elements/Wizard';
 import type { ProviderType } from '../../types';
+import { SelectProviderStep } from '../SelectProviderStep';
 import {
   SamlCustomConfigureSteps,
   SamlGoogleConfigureSteps,
@@ -19,7 +22,38 @@ const STEPS_BY_PROVIDER: Record<ProviderType, () => JSX.Element> = {
   saml_microsoft: SamlMicrosoftConfigureSteps,
 };
 
-export const ConfigureStep = (): JSX.Element | null => {
+export const ConfigureStep = (): JSX.Element => {
+  const { organizationEnterpriseConnection: c } = useConfigureSSO();
+  const { direction } = useWizard();
+
+  const steps = React.useMemo<WizardStepConfig[]>(
+    () => [{ id: 'select-provider' }, { id: 'configure-provider', guard: () => c.hasConnection }],
+    [c],
+  );
+
+  const initialStepId = direction === 1 ? 'select-provider' : undefined;
+
+  return (
+    <Wizard
+      steps={steps}
+      initialStepId={initialStepId}
+    >
+      <Wizard.Match id='select-provider'>
+        <CardStateProvider>
+          <SelectProviderStep />
+        </CardStateProvider>
+      </Wizard.Match>
+
+      <Wizard.Match id='configure-provider'>
+        <CardStateProvider>
+          <ConfigureProviderStep />
+        </CardStateProvider>
+      </Wizard.Match>
+    </Wizard>
+  );
+};
+
+const ConfigureProviderStep = (): JSX.Element | null => {
   const { organizationEnterpriseConnection: c } = useConfigureSSO();
 
   // Type guard: the provider should be defined by the time we reach configure.
