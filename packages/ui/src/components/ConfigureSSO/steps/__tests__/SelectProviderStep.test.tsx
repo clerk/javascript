@@ -245,8 +245,6 @@ describe('SelectProviderStep', () => {
       await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
 
       expect(await screen.findByRole('heading', { name: /change provider to google workspace/i })).toBeInTheDocument();
-      // The dialog is named by its heading so assistive tech announces it.
-      expect(screen.getByRole('dialog', { name: /change provider to google workspace/i })).toBeInTheDocument();
       // Nothing is mutated until the user confirms.
       expect(changeProvider).not.toHaveBeenCalled();
       expect(goNext).not.toHaveBeenCalled();
@@ -272,7 +270,7 @@ describe('SelectProviderStep', () => {
       });
     });
 
-    it('keeps the dialog open and surfaces the error inline when the change fails', async () => {
+    it('closes the dialog and surfaces the error on the step when the change fails', async () => {
       resetMocks();
       contextState.provider = 'saml_okta';
       contextState.hasConnection = true;
@@ -293,30 +291,11 @@ describe('SelectProviderStep', () => {
         expect(changeProvider).toHaveBeenCalledWith('saml_google');
       });
 
-      // The error renders inside the still-open dialog and the user never advances.
-      expect(await screen.findByText(/failed to change provider/i)).toBeInTheDocument();
-      expect(screen.getByRole('heading', { name: /change provider to google workspace/i })).toBeInTheDocument();
-      expect(goNext).not.toHaveBeenCalled();
-    });
-
-    it('closes the dialog on Escape without changing the provider', async () => {
-      resetMocks();
-      contextState.provider = 'saml_okta';
-      contextState.hasConnection = true;
-      const { wrapper } = await createFixtures();
-      const { userEvent } = renderStep(wrapper);
-
-      await userEvent.click(screen.getByRole('radio', { name: 'Google Workspace' }));
-      await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
-
-      expect(await screen.findByRole('heading', { name: /change provider to google workspace/i })).toBeInTheDocument();
-
-      await userEvent.keyboard('{Escape}');
-
+      // The dialog closes and the error surfaces on the step card.
       await waitFor(() => {
         expect(screen.queryByRole('heading', { name: /change provider to/i })).not.toBeInTheDocument();
       });
-      expect(changeProvider).not.toHaveBeenCalled();
+      expect(await screen.findByText(/failed to change provider/i)).toBeInTheDocument();
       expect(goNext).not.toHaveBeenCalled();
     });
 

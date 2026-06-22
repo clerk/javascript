@@ -108,16 +108,23 @@ export const SelectProviderStep = (): JSX.Element => {
     }
   };
 
-  // The dialog owns its own submit/error state so a failed change stays visible
-  // inside the dialog and is retryable. We re-throw so the dialog can surface the
-  // error inline; on success goNext unmounts this step (and the dialog with it).
   const handleConfirmChangeProvider = async (): Promise<void> => {
     if (!selected) {
       return;
     }
 
-    await changeProvider(selected);
-    void goNext();
+    card.setError(undefined);
+    setIsSubmitting(true);
+
+    try {
+      await changeProvider(selected);
+      void goNext();
+    } catch (err) {
+      handleError(err as Error, [], card.setError);
+      setIsChangeDialogOpen(false);
+      setChangeFromProvider(null);
+      setIsSubmitting(false);
+    }
   };
 
   const currentProviderLabel = changeFromProvider ? providerLabel(changeFromProvider) : undefined;
@@ -208,7 +215,10 @@ export const SelectProviderStep = (): JSX.Element => {
               setIsChangeDialogOpen(false);
               setChangeFromProvider(null);
             }}
-            onConfirm={handleConfirmChangeProvider}
+            onConfirm={() => {
+              void handleConfirmChangeProvider();
+            }}
+            isSubmitting={isSubmitting}
             nextProviderLabel={nextProviderLabel}
             currentProviderLabel={currentProviderLabel}
             contentRef={contentRef}
