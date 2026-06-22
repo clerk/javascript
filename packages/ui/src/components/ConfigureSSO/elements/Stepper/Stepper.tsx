@@ -75,10 +75,10 @@ const Item = ({
           width: theme.sizes.$4,
           height: theme.sizes.$4,
           borderRadius: theme.radii.$circle,
-          backgroundColor: isCurrent
-            ? theme.colors.$colorForeground
-            : isCompleted
-              ? theme.colors.$success500
+          backgroundColor: isCompleted
+            ? theme.colors.$success500
+            : isCurrent
+              ? theme.colors.$colorForeground
               : theme.colors.$colorMutedForeground,
         })}
       >
@@ -86,7 +86,7 @@ const Item = ({
           <Icon
             icon={Checkmark}
             size='sm'
-            sx={theme => ({ color: isCurrent ? theme.colors.$colorBackground : theme.colors.$white })}
+            sx={theme => ({ color: theme.colors.$white })}
           />
         ) : (
           <Text
