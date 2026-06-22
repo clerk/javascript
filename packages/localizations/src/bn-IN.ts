@@ -1149,6 +1149,9 @@ export const bnIN: LocalizationResource = {
     action__openUserMenu: 'ব্যবহারকারী মেনু খুলুন',
     action__signOut: 'সাইন আউট',
     action__signOutAll: 'সব অ্যাকাউন্ট থেকে সাইন আউট করুন',
+    label__userButtonPopover: 'অ্যাকাউন্ট প্যানেল',
+    label__accountActions: 'অ্যাকাউন্ট অ্যাকশন',
+    label__activeSessions: 'সক্রিয় সেশন',
   },
   userProfile: {
     apiKeysPage: {

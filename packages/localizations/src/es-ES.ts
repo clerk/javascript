@@ -1136,6 +1136,9 @@ export const esES: LocalizationResource = {
     action__openUserMenu: 'Abrir menú de usuario',
     action__signOut: 'Cerrar sesión',
     action__signOutAll: 'Salir de todas las cuentas',
+    label__userButtonPopover: 'Panel de cuenta',
+    label__accountActions: 'Acciones de cuenta',
+    label__activeSessions: 'Sesiones activas',
   },
   userProfile: {
     apiKeysPage: {

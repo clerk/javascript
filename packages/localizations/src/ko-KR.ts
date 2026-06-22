@@ -1122,6 +1122,9 @@ export const koKR: LocalizationResource = {
     action__openUserMenu: '사용자 메뉴 열기',
     action__signOut: '로그아웃',
     action__signOutAll: '모든 계정에서 로그아웃',
+    label__userButtonPopover: '계정 패널',
+    label__accountActions: '계정 작업',
+    label__activeSessions: '활성 세션',
   },
   userProfile: {
     apiKeysPage: {

@@ -1160,6 +1160,9 @@ export const taIN: LocalizationResource = {
     action__openUserMenu: 'பயனர் மெனுவைத் திற',
     action__signOut: 'வெளியேறு',
     action__signOutAll: 'அனைத்து கணக்குகளிலிருந்தும் வெளியேறு',
+    label__userButtonPopover: 'கணக்கு பலகம்',
+    label__accountActions: 'கணக்கு செயல்கள்',
+    label__activeSessions: 'செயலில் உள்ள அமர்வுகள்',
   },
   userProfile: {
     apiKeysPage: {

@@ -1120,6 +1120,9 @@ export const daDK: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Log ud',
     action__signOutAll: 'Log ud af alle konti',
+    label__userButtonPopover: 'Kontopanel',
+    label__accountActions: 'Kontohandlinger',
+    label__activeSessions: 'Aktive sessioner',
   },
   userProfile: {
     apiKeysPage: {

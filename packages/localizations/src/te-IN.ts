@@ -1154,6 +1154,9 @@ export const teIN: LocalizationResource = {
     action__openUserMenu: 'వినియోగదారు మెనుని తెరువు',
     action__signOut: 'సైన్ అవుట్',
     action__signOutAll: 'అన్ని ఖాతాల నుండి సైన్ అవుట్ అవ్వండి',
+    label__userButtonPopover: 'ఖాతా ప్యానెల్',
+    label__accountActions: 'ఖాతా చర్యలు',
+    label__activeSessions: 'క్రియాశీల సెషన్‌లు',
   },
   userProfile: {
     apiKeysPage: {

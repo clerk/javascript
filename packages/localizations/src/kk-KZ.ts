@@ -1113,6 +1113,9 @@ export const kkKZ: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Шығу',
     action__signOutAll: 'Барлық есептік жазбалардан шығу',
+    label__userButtonPopover: 'Есептік жазба тақтасы',
+    label__accountActions: 'Есептік жазба әрекеттері',
+    label__activeSessions: 'Белсенді сессиялар',
   },
   userProfile: {
     apiKeysPage: {

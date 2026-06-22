@@ -1158,6 +1158,9 @@ export const msMY: LocalizationResource = {
     action__openUserMenu: 'Buka menu pengguna',
     action__signOut: 'Daftar keluar',
     action__signOutAll: 'Daftar keluar dari semua akaun',
+    label__userButtonPopover: 'Panel akaun',
+    label__accountActions: 'Tindakan akaun',
+    label__activeSessions: 'Sesi aktif',
   },
   userProfile: {
     apiKeysPage: {

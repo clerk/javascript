@@ -1126,6 +1126,9 @@ export const mnMN: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Гарах',
     action__signOutAll: 'Бүх бүртгэлээс гарна уу',
+    label__userButtonPopover: 'Бүртгэлийн самбар',
+    label__accountActions: 'Бүртгэлийн үйлдлүүд',
+    label__activeSessions: 'Идэвхтэй сессүүд',
   },
   userProfile: {
     apiKeysPage: {

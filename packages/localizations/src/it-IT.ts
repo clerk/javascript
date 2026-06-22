@@ -1132,6 +1132,9 @@ export const itIT: LocalizationResource = {
     action__openUserMenu: 'Apri menu utente',
     action__signOut: 'Disconnetti',
     action__signOutAll: 'Disconnetti da tutti gli accounts',
+    label__userButtonPopover: 'Pannello account',
+    label__accountActions: 'Azioni account',
+    label__activeSessions: 'Sessioni attive',
   },
   userProfile: {
     apiKeysPage: {

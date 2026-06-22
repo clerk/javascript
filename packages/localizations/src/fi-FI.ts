@@ -1175,6 +1175,9 @@ export const fiFI: LocalizationResource = {
     action__openUserMenu: 'Avaa käyttäjävalikko',
     action__signOut: 'Kirjaudu ulos',
     action__signOutAll: 'Kirjaudu ulos kaikilta tileiltä',
+    label__userButtonPopover: 'Tilin paneeli',
+    label__accountActions: 'Tilin toiminnot',
+    label__activeSessions: 'Aktiiviset istunnot',
   },
   userProfile: {
     apiKeysPage: {

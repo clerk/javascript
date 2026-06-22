@@ -1103,6 +1103,9 @@ export const zhCN: LocalizationResource = {
     action__openUserMenu: '打开用户菜单',
     action__signOut: '退出登录',
     action__signOutAll: '退出所有账户',
+    label__userButtonPopover: '账户面板',
+    label__accountActions: '账户操作',
+    label__activeSessions: '活跃会话',
   },
   userProfile: {
     apiKeysPage: {

@@ -1123,6 +1123,9 @@ export const bgBG: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Изход',
     action__signOutAll: 'Изход от всички акаунти',
+    label__userButtonPopover: 'Панел на акаунта',
+    label__accountActions: 'Действия с акаунта',
+    label__activeSessions: 'Активни сесии',
   },
   userProfile: {
     apiKeysPage: {

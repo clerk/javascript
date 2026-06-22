@@ -1147,6 +1147,9 @@ export const ptPT: LocalizationResource = {
     action__openUserMenu: 'Abrir menu do utilizador',
     action__signOut: 'Terminar sessão',
     action__signOutAll: 'Terminar sessão de todas as contas',
+    label__userButtonPopover: 'Painel da conta',
+    label__accountActions: 'Ações da conta',
+    label__activeSessions: 'Sessões ativas',
   },
   userProfile: {
     apiKeysPage: {

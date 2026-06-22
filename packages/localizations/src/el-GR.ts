@@ -1148,6 +1148,9 @@ export const elGR: LocalizationResource = {
     action__openUserMenu: 'Άνοιγμα μενού χρήστη',
     action__signOut: 'Αποσύνδεση',
     action__signOutAll: 'Αποσύνδεση από όλους τους λογαριασμούς',
+    label__userButtonPopover: 'Πίνακας λογαριασμού',
+    label__accountActions: 'Ενέργειες λογαριασμού',
+    label__activeSessions: 'Ενεργές συνεδρίες',
   },
   userProfile: {
     apiKeysPage: {

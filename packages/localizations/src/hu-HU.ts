@@ -1182,6 +1182,9 @@ export const huHU: LocalizationResource = {
     action__openUserMenu: 'Felhasználói menü megnyitása',
     action__signOut: 'Kijelentkezés',
     action__signOutAll: 'Kijelentkezés minden fiókból',
+    label__userButtonPopover: 'Fiókpanel',
+    label__accountActions: 'Fiókműveletek',
+    label__activeSessions: 'Aktív munkamenetek',
   },
   userProfile: {
     apiKeysPage: {

@@ -1143,6 +1143,9 @@ export const roRO: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Deconectează-te',
     action__signOutAll: 'Deconectează toate conturile',
+    label__userButtonPopover: 'Panoul contului',
+    label__accountActions: 'Acțiuni cont',
+    label__activeSessions: 'Sesiuni active',
   },
   userProfile: {
     apiKeysPage: {

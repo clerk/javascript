@@ -1135,6 +1135,9 @@ export const csCZ: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Odhlásit se',
     action__signOutAll: 'Odhlásit se ze všech účtů',
+    label__userButtonPopover: 'Panel účtu',
+    label__accountActions: 'Akce účtu',
+    label__activeSessions: 'Aktivní relace',
   },
   userProfile: {
     apiKeysPage: {
