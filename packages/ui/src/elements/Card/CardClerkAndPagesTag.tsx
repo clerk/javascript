@@ -41,7 +41,7 @@ export const CardClerkAndPagesTag = React.memo(
         {withDevOverlay && <DevModeOverlay />}
         <Col
           sx={t => ({
-            gap: displayConfig.branded || withFooterPages ? t.space.$3 : 0,
+            gap: displayConfig.branded || withFooterPages ? t.space.$4 : 0,
             marginInline: 'auto',
             width: '100%',
             justifyContent: 'center',
