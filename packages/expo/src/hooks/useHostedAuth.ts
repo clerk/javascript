@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/react';
-import type { ClientResource, SignedInSessionResource } from '@clerk/shared/types';
+import type { ClientResource } from '@clerk/shared/types';
 import type * as AuthSession from 'expo-auth-session';
 import type * as WebBrowser from 'expo-web-browser';
 
@@ -93,8 +93,8 @@ export function useHostedAuth() {
     const rotatingTokenNonce = callbackParams.get('rotating_token_nonce') ?? '';
     if (rotatingTokenNonce) {
       updatedClient = await clerk.client?.reload({ rotatingTokenNonce });
-      if (updatedClient && 'updateClient' in clerk && typeof clerk.updateClient === 'function') {
-        clerk.updateClient(updatedClient);
+      if (updatedClient) {
+        getClientUpdater(clerk)?.(updatedClient);
       }
     }
     const createdSessionId =
@@ -103,11 +103,8 @@ export function useHostedAuth() {
       clerk.client?.lastActiveSessionId ??
       null;
     if (createdSessionId) {
-      const createdSession =
-        updatedClient?.sessions?.find(session => session.id === createdSessionId) ??
-        clerk.client?.sessions?.find(session => session.id === createdSessionId);
       await clerk.setActive({
-        session: (createdSession as SignedInSessionResource | undefined) ?? createdSessionId,
+        session: createdSessionId,
       });
     }
 
@@ -121,6 +118,14 @@ export function useHostedAuth() {
   return {
     startHostedAuth,
   };
+}
+
+function getClientUpdater(clerk: ReturnType<typeof useClerk>): ((client: ClientResource) => void) | undefined {
+  const maybeClerkWithClientUpdater = clerk as typeof clerk & {
+    updateClient?: (client: ClientResource) => void;
+  };
+
+  return maybeClerkWithClientUpdater.updateClient;
 }
 
 function toFapiInitialPage(initialPage: HostedAuthInitialPage | undefined): FapiHostedAuthInitialPage | undefined {
