@@ -1,4 +1,4 @@
-import { useClerk, useUser } from '@clerk/shared/react';
+import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import { eventFlowStepMounted } from '@clerk/shared/telemetry';
 import type { OrganizationDomainResource } from '@clerk/shared/types';
 import type React from 'react';
@@ -49,6 +49,7 @@ export const OrganizationDomainsStep = (): JSX.Element => {
   const { goPrev, goNext, isFirstStep, isLastStep } = useWizard();
   const card = useCardState();
   const clerk = useClerk();
+  const { organization } = useOrganization();
   const [domainToRemove, setDomainToRemove] = useState<OrganizationDomainResource | null>(null);
 
   const hasRecordedTelemetryEvent = useRef(false);
@@ -61,6 +62,8 @@ export const OrganizationDomainsStep = (): JSX.Element => {
     clerk.telemetry?.record(
       eventFlowStepMounted('configureSSO', 'verify-domain', {
         connectionStatus: organizationEnterpriseConnection.status,
+        connectionId: enterpriseConnection?.id ?? null,
+        organizationId: organization?.id ?? null,
       }),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
