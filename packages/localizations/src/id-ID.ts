@@ -1666,6 +1666,7 @@ export const idID: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       "Alamat email atau nomor telepon tidak diizinkan untuk mendaftar. Ini mungkin disebabkan oleh penggunaan '+', '=', '#' atau '.' dalam alamat email Anda, penggunaan domain yang terhubung dengan layanan email sementara, atau pengecualian eksplisit. Jika Anda menganggap ini sebagai kesalahan, silakan hubungi dukungan.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'Ini adalah domain penyedia email yang diblokir. Silakan gunakan yang lain.',
     organization_domain_common: 'Ini adalah domain penyedia email umum. Silakan gunakan yang lain.',
     organization_domain_exists_for_enterprise_connection: undefined,

@@ -1661,6 +1661,7 @@ export const trTR: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       "E-posta adresiniz veya telefon numaranız kayıt için izin verilmiyor. Bu, e-posta adresinizde '+', '=', '#' veya '.' kullanmanız, geçici e-posta hizmetiyle ilişkilendirilmiş bir alan adı kullanmanız veya açık bir engellemeyle ilgili olabilir.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'Organizasyon alan adı engellendi.',
     organization_domain_common: 'Organizasyon alan adı çok yaygın.',
     organization_domain_exists_for_enterprise_connection: 'Kurumsal bağlantı için bu alan adı zaten mevcut.',

@@ -1689,6 +1689,7 @@ export const taIN: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       'இந்த பக்கத்தை அணுக உங்களுக்கு அனுமதி இல்லை. இது பிழை என்று நீங்கள் நம்பினால், ஆதரவைத் தொடர்பு கொள்ளவும்.',
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'இது தடுக்கப்பட்ட மின்னஞ்சல் வழங்குநர் டொமைன். வேறொன்றைப் பயன்படுத்தவும்.',
     organization_domain_common: 'இது பொதுவான மின்னஞ்சல் வழங்குநர் டொமைன். வேறொன்றைப் பயன்படுத்தவும்.',
     organization_domain_exists_for_enterprise_connection:

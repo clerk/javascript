@@ -1681,6 +1681,7 @@ export const bnIN: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       'আপনার এই পৃষ্ঠা অ্যাক্সেস করার অনুমতি নেই। আপনি যদি মনে করেন এটি একটি ত্রুটি, দয়া করে সাপোর্টের সাথে যোগাযোগ করুন।',
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'এটি একটি ব্লক করা ইমেইল প্রদানকারী ডোমেন। দয়া করে একটি ভিন্ন ব্যবহার করুন।',
     organization_domain_common: 'এটি একটি সাধারণ ইমেইল প্রদানকারী ডোমেন। দয়া করে একটি ভিন্ন ব্যবহার করুন।',
     organization_domain_exists_for_enterprise_connection: 'এই ডোমেন ইতিমধ্যে আপনার সংগঠনের SSO-এর জন্য ব্যবহৃত হচ্ছে',

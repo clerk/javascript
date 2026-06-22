@@ -1669,6 +1669,7 @@ export const faIR: LocalizationResource = {
     insufficient_seats_change_plan: undefined,
     insufficient_seats_contact_support: undefined,
     not_allowed_access: 'دسترسی مجاز نیست.',
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'دامنه سازمان مسدود شده است.',
     organization_domain_common: 'دامنه سازمان عمومی است و قابل قبول نیست.',
     organization_domain_exists_for_enterprise_connection: 'این دامنه برای اتصال سازمانی موجود است.',
