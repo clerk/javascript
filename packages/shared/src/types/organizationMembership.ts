@@ -70,10 +70,6 @@ export interface OrganizationMembershipResource extends ClerkResource {
    */
   roleName: string;
   /**
-   * Whether this membership is to an Organization that enforces exclusive membership. When `true`, the user can only belong to this Organization and cannot access a personal account or other Organizations.
-   */
-  exclusiveMembership: boolean;
-  /**
    * The date when the membership was created.
    */
   createdAt: Date;

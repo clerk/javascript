@@ -1,3 +1,4 @@
+import { ClerkAPIResponseError } from '@clerk/shared/error';
 import type { OrganizationResource } from '@clerk/shared/src/types';
 import { waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -11,8 +12,8 @@ import {
 } from '@/ui/components/OrganizationSwitcher/__tests__/test-utils';
 import { clearFetchCache } from '@/ui/hooks/useFetch';
 
-import { TaskChooseOrganization } from '..';
 import type { FakeOrganizationParams } from '../../../../CreateOrganization/__tests__/CreateOrganization.test';
+import { TaskChooseOrganization } from '..';
 
 type FakeOrganizationParams = {
   id: string;
@@ -497,6 +498,98 @@ describe('TaskChooseOrganization', () => {
           }),
         );
       });
+    });
+  });
+
+  describe('with an exclusive membership', () => {
+    it('auto-activates the exclusive organization without rendering the picker', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withForceOrganizationSelection();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          create_organization_enabled: true,
+          tasks: [{ key: 'choose-organization' }],
+          organization_memberships: [{ id: '1', name: 'Exclusive Org', slug: 'exclusive', exclusive_membership: true }],
+        });
+      });
+
+      fixtures.clerk.setActive.mockReturnValue(Promise.resolve());
+
+      render(<TaskChooseOrganization />, { wrapper });
+
+      await waitFor(() => {
+        expect(fixtures.clerk.setActive).toHaveBeenCalled();
+      });
+    });
+
+    it('hides create/invitation/suggestion surfaces on the fallback screen when auto-activation fails', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withForceOrganizationSelection();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          create_organization_enabled: true,
+          tasks: [{ key: 'choose-organization' }],
+          organization_memberships: [{ id: '1', name: 'Exclusive Org', slug: 'exclusive', exclusive_membership: true }],
+        });
+      });
+
+      // Force the auto-activation to fail so the choose-organization fallback screen renders. A Clerk
+      // API error is used so the component's error handler surfaces it and falls back gracefully (an
+      // unknown error would be rethrown by `handleError`).
+      fixtures.clerk.setActive.mockRejectedValue(
+        new ClerkAPIResponseError('activation failed', {
+          data: [{ code: 'organization_not_found_or_unauthorized', message: 'activation failed' }],
+          status: 403,
+        }),
+      );
+
+      const exclusiveMembership = createFakeUserOrganizationMembership({
+        id: '1',
+        organization: {
+          id: '1',
+          name: 'Exclusive Org',
+          slug: 'exclusive',
+          membersCount: 1,
+          adminDeleteEnabled: false,
+          maxAllowedMemberships: 1,
+          pendingInvitationsCount: 0,
+        },
+      });
+      // The displayed-list filter reads `organization.exclusiveMembership`, which the fake org factory
+      // does not set, so flag it explicitly on the loaded page.
+      (exclusiveMembership.organization as any).exclusiveMembership = true;
+
+      // A loaded membership page plus an outstanding suggestion: neither create nor suggestion may show.
+      fixtures.clerk.user?.getOrganizationMemberships.mockReturnValue(
+        Promise.resolve({
+          data: [exclusiveMembership],
+          total_count: 1,
+        }),
+      );
+
+      fixtures.clerk.user?.getOrganizationSuggestions.mockReturnValue(
+        Promise.resolve({
+          data: [
+            createFakeUserOrganizationSuggestion({
+              id: '2',
+              emailAddress: 'two@clerk.com',
+              publicOrganizationData: { name: 'OrgTwoSuggestion' },
+            }),
+          ],
+          total_count: 1,
+        }),
+      );
+
+      const { findByText, queryByText, queryByRole } = render(<TaskChooseOrganization />, { wrapper });
+
+      // The exclusive organization is still listed on the fallback screen.
+      expect(await findByText('Exclusive Org')).toBeInTheDocument();
+      // But none of the join/create surfaces are rendered.
+      expect(queryByText('Create new organization')).not.toBeInTheDocument();
+      expect(queryByRole('textbox', { name: /name/i })).not.toBeInTheDocument();
+      expect(queryByText('OrgTwoSuggestion')).not.toBeInTheDocument();
     });
   });
 });

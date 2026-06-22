@@ -292,6 +292,65 @@ describe('OrganizationSwitcher', () => {
       expect(getByText('Org2')).toBeInTheDocument();
     });
 
+    it('lists only the exclusive organization and hides the personal workspace', async () => {
+      const { wrapper, props, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [
+            { name: 'Org1', id: '1', slug: 'org1', exclusive_membership: true },
+            { name: 'Org2', id: '2', slug: 'org2' },
+          ],
+        });
+      });
+      fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
+
+      const exclusiveMembership = createFakeUserOrganizationMembership({
+        id: '1',
+        organization: {
+          id: '1',
+          name: 'Org1',
+          slug: 'org1',
+          membersCount: 1,
+          adminDeleteEnabled: false,
+          maxAllowedMemberships: 1,
+          pendingInvitationsCount: 1,
+        },
+      });
+      // The displayed-list filter reads `organization.exclusiveMembership`, which the fake org factory
+      // does not set, so flag it explicitly on the loaded page.
+      (exclusiveMembership.organization as any).exclusiveMembership = true;
+
+      fixtures.clerk.user?.getOrganizationMemberships.mockReturnValueOnce(
+        Promise.resolve({
+          data: [
+            exclusiveMembership,
+            createFakeUserOrganizationMembership({
+              id: '2',
+              organization: {
+                id: '2',
+                name: 'Org2',
+                slug: 'org2',
+                membersCount: 1,
+                adminDeleteEnabled: false,
+                maxAllowedMemberships: 1,
+                pendingInvitationsCount: 1,
+              },
+            }),
+          ],
+          total_count: 2,
+        }),
+      );
+
+      props.setProps({ hidePersonal: false });
+      const { getAllByText, queryByText, getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
+      await userEvent.click(getByRole('button'));
+      // Only the exclusive org is present; the non-exclusive org and personal workspace are hidden.
+      expect(getAllByText('Org1').length).toBeGreaterThan(0);
+      expect(queryByText('Org2')).not.toBeInTheDocument();
+      expect(queryByText('Personal account')).not.toBeInTheDocument();
+    });
+
     it('does allow creating organization if max allowed memberships is not reached', async () => {
       const { wrapper, props } = await createFixtures(f => {
         f.withOrganizations();

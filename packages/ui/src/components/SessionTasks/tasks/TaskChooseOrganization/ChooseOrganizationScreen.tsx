@@ -37,18 +37,26 @@ export const ChooseOrganizationScreen = (props: ChooseOrganizationScreenProps) =
   const { user } = useUser();
   const { ref, userMemberships, userSuggestions, userInvitations } = useOrganizationListInView();
 
+  // Derive `hasExclusive` from the full, non-paginated membership set on the User resource so it never
+  // fails open when the exclusive membership is not on the currently loaded page of `userMemberships`.
+  // This screen also renders as the auto-activate failure fallback, so it cannot assume the backend
+  // blocks an exclusive user from joining/creating other organizations — it must enforce that here.
+  const { hasExclusive } = filterExclusiveMemberships(user?.organizationMemberships ?? []);
+
   const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
-  const hasNextPage = userMemberships?.hasNextPage || userInvitations?.hasNextPage || userSuggestions?.hasNextPage;
+  // When the user has an exclusive membership, invitations/suggestions are hidden and we never load
+  // additional membership pages, so the spinner/observer must not keep paginating.
+  const hasNextPage = hasExclusive
+    ? false
+    : userMemberships?.hasNextPage || userInvitations?.hasNextPage || userSuggestions?.hasNextPage;
 
   // Filter out falsy values that can occur when infinite loading resolves pages out of order
   // This happens when concurrent requests resolve in unexpected order, leaving undefined/null items in the data array
   const userInvitationsData = userInvitations.data?.filter(a => !!a);
   const userSuggestionsData = userSuggestions.data?.filter(a => !!a);
 
-  // `userMemberships` is paginated; the exclusive filter operates on the currently loaded
-  // memberships. Exclusive members are locked to ~1 organization, so pagination is a non-issue.
-  // Invitations/suggestions are intentionally left unfiltered: an exclusive user should not have
-  // any, and the backend blocks them from joining other organizations.
+  // The displayed list still filters the currently loaded page to exclusive-only, so a partially-loaded
+  // page can never surface a non-exclusive organization.
   const loadedMemberships = (userMemberships.count || 0) > 0 ? userMemberships.data || [] : [];
   const { memberships: visibleMemberships } = filterExclusiveMemberships(loadedMemberships);
 
@@ -80,7 +88,12 @@ export const ChooseOrganizationScreen = (props: ChooseOrganizationScreenProps) =
               );
             })}
 
-            {!userMemberships.hasNextPage &&
+            {/* When the user has an exclusive membership they must not see ways to join or create
+                other organizations: invitations, suggestions, and the create button are all hidden.
+                This screen renders as the auto-activate failure fallback, so it enforces this directly
+                rather than relying on the backend to block the user. */}
+            {!hasExclusive &&
+              !userMemberships.hasNextPage &&
               userInvitationsData?.map(inv => {
                 return (
                   <InvitationPreview
@@ -90,7 +103,8 @@ export const ChooseOrganizationScreen = (props: ChooseOrganizationScreenProps) =
                 );
               })}
 
-            {!userMemberships.hasNextPage &&
+            {!hasExclusive &&
+              !userMemberships.hasNextPage &&
               !userInvitations.hasNextPage &&
               userSuggestionsData?.map(inv => {
                 return (
@@ -103,13 +117,15 @@ export const ChooseOrganizationScreen = (props: ChooseOrganizationScreenProps) =
 
             {(hasNextPage || isLoading) && <OrganizationPreviewSpinner ref={ref} />}
 
-            <CreateOrganizationButton
-              onCreateOrganizationClick={() => {
-                // Clear error originated from the list when switching to form
-                card.setError(undefined);
-                props.onCreateOrganizationClick();
-              }}
-            />
+            {!hasExclusive && (
+              <CreateOrganizationButton
+                onCreateOrganizationClick={() => {
+                  // Clear error originated from the list when switching to form
+                  card.setError(undefined);
+                  props.onCreateOrganizationClick();
+                }}
+              />
+            )}
           </Actions>
         </OrganizationPreviewListItems>
       </Col>

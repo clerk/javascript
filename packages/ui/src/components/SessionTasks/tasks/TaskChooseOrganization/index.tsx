@@ -107,7 +107,9 @@ const TaskChooseOrganizationInternal = () => {
               <LoadingCardContent />
             ) : (
               <TaskChooseOrganizationFlows
-                initialFlow={hasExistingResources ? 'choose' : 'create'}
+                // An exclusive user whose auto-activation failed must land on the choose screen (which
+                // is gated to exclusive orgs only) and must never be dropped into the create-org flow.
+                initialFlow={exclusiveOrganization || hasExistingResources ? 'choose' : 'create'}
                 organizationCreationDefaults={organizationCreationDefaults.data}
               />
             )}
