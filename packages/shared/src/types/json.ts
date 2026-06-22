@@ -411,6 +411,7 @@ export interface OrganizationJSON extends ClerkResourceJSON {
   pending_invitations_count: number;
   admin_delete_enabled: boolean;
   max_allowed_memberships: number;
+  exclusive_membership?: boolean;
 }
 
 export interface OrganizationMembershipJSON extends ClerkResourceJSON {

@@ -46,6 +46,10 @@ export interface OrganizationResource extends ClerkResource, BillingPayerMethods
   publicMetadata: OrganizationPublicMetadata;
   adminDeleteEnabled: boolean;
   maxAllowedMemberships: number;
+  /**
+   * Whether the Organization enforces exclusive membership, meaning members must have it set as their active Organization. Defaults to `false` for instances that have not adopted the feature.
+   */
+  exclusiveMembership: boolean;
   createdAt: Date;
   updatedAt: Date;
   update: (params: UpdateOrganizationParams) => Promise<OrganizationResource>;
