@@ -92,6 +92,18 @@ export const BACKEND_API_CONFIG = {
     symbol: 'InvitationAPI',
     declarationHint: 'api/endpoints/InvitationApi',
   },
+  'backend/redirect-url-api/redirect-url-api.mdx': {
+    symbol: 'RedirectUrlAPI',
+    declarationHint: 'api/endpoints/RedirectUrlApi',
+  },
+  'backend/email-address-api/email-address-api.mdx': {
+    symbol: 'EmailAddressAPI',
+    declarationHint: 'api/endpoints/EmailAddressApi',
+  },
+  'backend/phone-number-api/phone-number-api.mdx': {
+    symbol: 'PhoneNumberAPI',
+    declarationHint: 'api/endpoints/PhoneNumberApi',
+  },
 };
 
 /** Stable iteration order matches key order in {@link REFERENCE_OBJECT_CONFIG} then {@link BACKEND_API_CONFIG}. */
