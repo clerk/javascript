@@ -70,6 +70,7 @@ const LINK_REPLACEMENTS = [
   ['organization-domain-resource', '/docs/reference/types/organization-domain-resource'],
   ['organization-invitation-resource', '/docs/reference/types/organization-invitation'],
   ['organization-membership-request-resource', '/docs/reference/types/organization-membership-request'],
+  ['o-auth-application-namespace', '/docs/reference/types/oauth-application'],
   ['o-auth-consent-info', '/docs/reference/types/oauth-consent-info'],
   ['o-auth-consent-scope', '/docs/reference/types/oauth-consent-scope'],
   ['o-auth-strategy', '/docs/reference/types/sso#o-auth-strategy'],
