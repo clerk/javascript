@@ -776,7 +776,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return this.clerkjs?.version;
   }
 
-  get uiVersion() {
+  get uiVersion(): string | undefined {
     return this.clerkjs?.uiVersion;
   }
 
