@@ -26,7 +26,7 @@ const ruleTester = new RuleTester({
   },
 });
 
-const config = { protected: ['app/**'] };
+const config = { protected: ['**'], rootDir: projectRoot };
 
 ruleTester.run('require-auth-protection (suggestions)', rule, {
   valid: [],

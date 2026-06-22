@@ -4,7 +4,13 @@ import type { Rule } from 'eslint';
 
 import type { ExportTarget, FunctionNode } from './lib/exports';
 import { iterateExportAllDeclarations, iterateNamedExports, resolveDefaultExport } from './lib/exports';
-import { type FileKind, getFileKind, getRelativeFolder, isClientModule, isServerFunctionModule } from './lib/file-info';
+import {
+  type FileKind,
+  getAppRouterFileKind,
+  getRelativeFolder,
+  isClientModule,
+  isServerFunctionModule,
+} from './lib/file-info';
 import { buildAuthProtectFixes } from './lib/fixers';
 import type { ClassifyOptions } from './lib/match-folders';
 import { classifyFolder, hasDescendantsMatching } from './lib/match-folders';
@@ -30,19 +36,19 @@ interface ResourceOptions {
 type NormalizedResourceOptions = Required<ResourceOptions>;
 
 export interface RuleOptions {
-  /** Glob patterns that mark folders as protected. */
+  /** Project-relative folder globs whose resources must be guarded. */
   protected: string[];
-  /** Glob patterns that exempt folders from protection. */
+  /** Project-relative folder globs that are exempt. */
   public?: string[];
   /** Resource groups that should be checked. All resource groups are checked by default. */
   resources?: ResourceOptions;
   /** Layouts that wrap both protected and public descendants. */
   mixedScopeLayouts?: 'auto' | string[];
   /**
-   * Directory paths are relativized against when resolving `app/...` folder
-   * globs. Defaults to the nearest ancestor `eslint.config.*` (same walk ESLint
-   * uses for config lookup), then ESLint `cwd`. Set to `import.meta.dirname` in
-   * your `eslint.config.mjs` when config discovery is unavailable.
+   * Project root used to resolve project-relative folder globs. Defaults to the
+   * nearest ancestor `eslint.config.*` (same walk ESLint uses for config
+   * lookup), then ESLint `cwd`. Set to `import.meta.dirname` in your
+   * `eslint.config.mjs` when config discovery is unavailable.
    */
   rootDir?: string;
 }
@@ -123,7 +129,7 @@ const rule: Rule.RuleModule = {
       return {};
     }
 
-    const fileKind = getFileKind(filename);
+    const fileKind = getAppRouterFileKind(filename, folder);
 
     let authNames = new Set<string>();
     let shouldCheckInlineServerFunctions = false;

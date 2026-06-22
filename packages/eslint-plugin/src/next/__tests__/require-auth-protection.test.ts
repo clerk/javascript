@@ -28,8 +28,9 @@ const ruleTester = new RuleTester({
 });
 
 const config = {
-  protected: ['app/**'],
+  protected: ['**'],
   public: ['app/(routes)/(unauthenticated)/**'],
+  rootDir: projectRoot,
 };
 
 // suggestions.test.ts already tests the suggestions, so we override with
@@ -870,8 +871,50 @@ ruleTester.run('require-auth-protection', rule, {
         {
           protected: ['app/**'],
           public: [],
+          rootDir: projectRoot,
         },
       ],
+    },
+    {
+      name: 'src/app project uses project-relative globs',
+      code: `
+        import { auth } from '@clerk/nextjs/server';
+        export default async function Page() {
+          await auth.protect();
+          return <div>Hello</div>;
+        }
+      `,
+      filename: abs('src/app/dashboard/page.tsx'),
+      options: [
+        {
+          protected: ['src/app/**'],
+          public: [],
+          rootDir: projectRoot,
+        },
+      ],
+    },
+    {
+      name: 'page.tsx outside App Router is ignored even with protected: ["**"]',
+      code: `
+        export default function Page() {
+          return null;
+        }
+      `,
+      filename: abs('utils/page.tsx'),
+      options: [config],
+    },
+    {
+      name: 'Server Function outside App Router is checked with protected: ["**"]',
+      code: `
+        'use server';
+        import { auth } from '@clerk/nextjs/server';
+        export async function deleteUser(id) {
+          await auth.protect();
+          return id;
+        }
+      `,
+      filename: abs('shared/actions.ts'),
+      options: [config],
     },
     {
       name: 'intercepting route in public folder, no protect call (classified by source folder)',
@@ -1736,9 +1779,22 @@ ruleTester.run('require-auth-protection', rule, {
         {
           protected: ['app/**'],
           public: [],
+          rootDir: projectRoot,
         },
       ],
       errors: [missingProtectError()],
+    },
+    {
+      name: 'unprotected Server Function outside App Router is flagged with protected: ["**"]',
+      code: `
+        'use server';
+        export async function deleteUser(id) {
+          return id;
+        }
+      `,
+      filename: abs('shared/actions.ts'),
+      options: [config],
+      errors: [missingProtectError({ subject: "Server Function 'deleteUser'" })],
     },
   ],
 });
