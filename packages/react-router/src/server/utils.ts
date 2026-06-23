@@ -50,8 +50,6 @@ export function assertValidHandlerResult(val: any, error?: string): asserts val 
 
 /**
  * `get` and `set` properties are available when React Router middleware is enabled.
- *
- * If you're using React Router v7, enable the v8_middleware future flag in your react-router.config.ts file.
  */
 export const IsOptIntoMiddleware = (
   context: ReactRouterContext,
