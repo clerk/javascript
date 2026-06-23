@@ -9,6 +9,10 @@ export default defineConfig({
       projects: ['./tsconfig.json'],
     }),
   ],
+  ssr: {
+    // Needed for v8 for now
+    noExternal: ['@clerk/react-router'],
+  },
   server: {
     port: process.env.PORT ? Number(process.env.PORT) : undefined,
   },
