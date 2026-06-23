@@ -1,8 +1,11 @@
 import { render } from '@testing-library/react';
 import React from 'react';
+import { renderToString } from 'react-dom/server';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockClerkProvider = vi.fn(({ children }: { children: React.ReactNode }) => <div>{children}</div>);
+const mockUseNavigate = vi.fn(() => vi.fn());
+const mockUseLocation = vi.fn(() => ({ pathname: '/' }));
 
 vi.mock('@clerk/react/internal', () => ({
   InternalClerkProvider: (props: any) => mockClerkProvider(props),
@@ -11,8 +14,8 @@ vi.mock('@clerk/react/internal', () => ({
 vi.mock('@clerk/react', () => ({}));
 
 vi.mock('react-router', () => ({
-  useNavigate: () => vi.fn(),
-  useLocation: () => ({ pathname: '/' }),
+  useNavigate: () => mockUseNavigate(),
+  useLocation: () => mockUseLocation(),
   UNSAFE_DataRouterContext: React.createContext(null),
 }));
 
@@ -34,6 +37,7 @@ describe('ClerkProvider __internal_clerkUIUrl via clerkState', () => {
   afterEach(() => {
     vi.clearAllMocks();
     vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
   });
 
   it('passes __internal_clerkUIUrl from clerkState to the underlying ClerkProvider', async () => {
@@ -124,5 +128,40 @@ describe('ClerkProvider __internal_clerkUIUrl via clerkState', () => {
         signUpUrl: '/sign-up',
       }),
     );
+  });
+
+  it('does not initialize React Router navigation during SSR', async () => {
+    vi.stubGlobal('window', undefined);
+    const { ClerkProvider } = await import('../ReactRouterClerkProvider');
+
+    const clerkState = {
+      __type: 'clerkState' as const,
+      __internal_clerk_state: {
+        __clerk_ssr_state: undefined,
+        __publishableKey: 'pk_test_xxx',
+      },
+    };
+
+    renderToString(
+      <ClerkProvider loaderData={{ clerkState }}>
+        <div>Test</div>
+      </ClerkProvider>,
+    );
+
+    expect(mockUseNavigate).not.toHaveBeenCalled();
+    expect(mockUseLocation).not.toHaveBeenCalled();
+  });
+
+  it('initializes React Router navigation during browser renders', async () => {
+    const { ClerkProvider } = await import('../ReactRouterClerkProvider');
+
+    render(
+      <ClerkProvider publishableKey='pk_test_xxx'>
+        <div>Test</div>
+      </ClerkProvider>,
+    );
+
+    expect(mockUseNavigate).toHaveBeenCalled();
+    expect(mockUseLocation).toHaveBeenCalled();
   });
 });

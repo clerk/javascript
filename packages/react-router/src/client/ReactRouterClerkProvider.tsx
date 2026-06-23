@@ -31,13 +31,32 @@ type ClerkProviderPropsWithState<TUi extends Ui = Ui> = ReactRouterClerkProvider
   clerkState?: ClerkState;
 };
 
-function ClerkProviderBase<TUi extends Ui = Ui>({ children, ...rest }: ClerkProviderPropsWithState<TUi>) {
-  const awaitableNavigate = useAwaitableNavigate();
-  const isSpaMode = _isSpaMode();
+function AwaitableNavigateSetter() {
+  if (typeof window === 'undefined') {
+    return null;
+  }
 
-  React.useEffect(() => {
+  return <AwaitableNavigateSetterInner />;
+}
+
+function AwaitableNavigateSetterInner() {
+  const awaitableNavigate = useAwaitableNavigate();
+
+  React.useLayoutEffect(() => {
     awaitableNavigateRef.current = awaitableNavigate;
+
+    return () => {
+      if (awaitableNavigateRef.current === awaitableNavigate) {
+        awaitableNavigateRef.current = undefined;
+      }
+    };
   }, [awaitableNavigate]);
+
+  return null;
+}
+
+function ClerkProviderBase<TUi extends Ui = Ui>({ children, ...rest }: ClerkProviderPropsWithState<TUi>) {
+  const isSpaMode = _isSpaMode();
 
   const { clerkState, ...restProps } = rest;
   ReactClerkProvider.displayName = 'ReactClerkProvider';
@@ -124,6 +143,7 @@ function ClerkProviderBase<TUi extends Ui = Ui>({ children, ...rest }: ClerkProv
         {...keylessProps}
         {...restProps}
       >
+        <AwaitableNavigateSetter />
         {children}
       </ReactClerkProvider>
     </ClerkReactRouterOptionsProvider>
