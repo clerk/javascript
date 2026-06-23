@@ -104,6 +104,18 @@ export const BACKEND_API_CONFIG = {
     symbol: 'PhoneNumberAPI',
     declarationHint: 'api/endpoints/PhoneNumberApi',
   },
+  'backend/agent-task-api/agent-task-api.mdx': {
+    symbol: 'AgentTaskAPI',
+    declarationHint: 'api/endpoints/AgentTaskApi',
+  },
+  'backend/sign-in-token-api/sign-in-token-api.mdx': {
+    symbol: 'SignInTokenAPI',
+    declarationHint: 'api/endpoints/SignInTokenApi',
+  },
+  'backend/enterprise-connection-api/enterprise-connection-api.mdx': {
+    symbol: 'EnterpriseConnectionAPI',
+    declarationHint: 'api/endpoints/EnterpriseConnectionApi',
+  },
 };
 
 /** Stable iteration order matches key order in {@link REFERENCE_OBJECT_CONFIG} then {@link BACKEND_API_CONFIG}. */

@@ -48,6 +48,8 @@ describe('Typedoc output', () => {
 
     expect(nestedFolders).toMatchInlineSnapshot(`
       [
+        "backend/agent-task-api",
+        "backend/agent-task-api/methods",
         "backend/allowlist-identifier-api",
         "backend/allowlist-identifier-api/methods",
         "backend/billing-api",
@@ -58,6 +60,8 @@ describe('Typedoc output', () => {
         "backend/domain-api/methods",
         "backend/email-address-api",
         "backend/email-address-api/methods",
+        "backend/enterprise-connection-api",
+        "backend/enterprise-connection-api/methods",
         "backend/invitation-api",
         "backend/invitation-api/methods",
         "backend/organization-api",
@@ -68,6 +72,8 @@ describe('Typedoc output', () => {
         "backend/redirect-url-api/methods",
         "backend/session-api",
         "backend/session-api/methods",
+        "backend/sign-in-token-api",
+        "backend/sign-in-token-api/methods",
         "backend/user-api",
         "backend/user-api/methods",
         "react/legacy",

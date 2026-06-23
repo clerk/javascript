@@ -1,29 +1,17 @@
 import type { AgentTaskJSON } from './JSON';
 
 /**
- * Represents a agent token resource.
- *
- * Agent tokens are used for testing purposes and allow creating sessions
- * for users without requiring full authentication flows.
+ * The Backend `AgentTask` object represents an agent task resource. Agent tasks are used for testing purposes and allow creating sessions for users without requiring full authentication flows.
  */
 export class AgentTask {
   constructor(
-    /**
-     * A stable identifier for the agent, unique per agent_name within an instance.
-     */
+    /** The identifier for the agent, unique per `agent_name` within an instance. */
     readonly agentId: string,
-    /**
-     * A unique identifier for this agent task.
-     * @deprecated Use agentTaskId instead.
-     */
+    /** @deprecated Use `agentTaskId` instead. */
     readonly taskId: string,
-    /**
-     * A unique identifier for this agent task.
-     */
+    /** The unique identifier for this agent task. */
     readonly agentTaskId: string,
-    /**
-     * The FAPI URL that, when visited, creates a session for the user.
-     */
+    /** The Frontend API URL that, when visited, creates a session for the user. Only returned by [`create()`](https://clerk.com/docs/reference/backend/agent-tasks/create); omitted from [`revoke()`](https://clerk.com/docs/reference/backend/agent-tasks/revoke). */
     readonly url: string,
   ) {}
 
