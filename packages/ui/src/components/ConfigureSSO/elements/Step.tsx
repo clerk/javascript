@@ -206,7 +206,7 @@ FooterContinue.displayName = 'Step.Footer.Continue';
  * footer row, matching the prior destructive affordance.
  */
 const FooterReset = (): JSX.Element | null => {
-  const { enterpriseConnection, mutations, contentRef } = useConfigureSSO();
+  const { enterpriseConnection, enterpriseConnectionMutations, contentRef } = useConfigureSSO();
   const organization = __internal_useOrganizationBase();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -222,14 +222,14 @@ const FooterReset = (): JSX.Element | null => {
         size='sm'
         colorScheme='danger'
         onClick={() => setIsOpen(true)}
-        localizationKey={localizationKeys('configureSSO.confirmation.resetSection.title')}
+        localizationKey={localizationKeys('configureSSO.resetConnectionDialog.resetButton')}
         sx={{ marginInlineEnd: 'auto' }}
       />
       <ResetConnectionDialog
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         confirmationValue={organization?.name ?? ''}
-        onDelete={() => mutations.deleteConnection(enterpriseConnection.id)}
+        onDelete={() => enterpriseConnectionMutations.deleteConnection(enterpriseConnection.id)}
         contentRef={contentRef}
       />
     </>

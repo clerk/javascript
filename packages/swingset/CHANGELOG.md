@@ -1,5 +1,42 @@
 # @clerk/swingset
 
+## 0.0.7
+
+### Patch Changes
+
+- Updated dependencies [[`01789b4`](https://github.com/clerk/javascript/commit/01789b4e8d3a280940b7ebcb223a33c6ecfd209a)]:
+  - @clerk/ui@1.20.0
+  - @clerk/headless@0.0.2
+
+## 0.0.6
+
+### Patch Changes
+
+- Updated dependencies [[`9e1d849`](https://github.com/clerk/javascript/commit/9e1d849068df57229eb6545cb4a6d492146a20c1)]:
+  - @clerk/ui@1.19.0
+
+## 0.0.5
+
+### Patch Changes
+
+- Updated dependencies [[`c84f8df`](https://github.com/clerk/javascript/commit/c84f8df4222c212ecce6ae5ff8c47958b5b5d972), [`325fc43`](https://github.com/clerk/javascript/commit/325fc43ebfe8a5cf6ad4d5ddfc7b8036059a456a), [`e51e22a`](https://github.com/clerk/javascript/commit/e51e22a2aec03293e8ccf5a5372cd9906aeccbb7), [`08c6cfc`](https://github.com/clerk/javascript/commit/08c6cfc6bc7b52792f335be7469e3230b4c5068c), [`57a58ac`](https://github.com/clerk/javascript/commit/57a58acdf35eea2da8df14689b3da5440855ba56), [`53e7b11`](https://github.com/clerk/javascript/commit/53e7b11058096d5ce15da53af12fe7236e88db2c), [`0d40c4d`](https://github.com/clerk/javascript/commit/0d40c4dd171cc237eb948091a39c6ad574c873db)]:
+  - @clerk/ui@1.18.1
+  - @clerk/headless@0.0.1
+
+## 0.0.4
+
+### Patch Changes
+
+- Updated dependencies [[`d5968d0`](https://github.com/clerk/javascript/commit/d5968d026d6b2a1b399b6967fd8727613a5bc3cd), [`431e16c`](https://github.com/clerk/javascript/commit/431e16c69a2745779af217747c13a7f922e250fa), [`a938d74`](https://github.com/clerk/javascript/commit/a938d745990585499301dc510c22bd40a322df58), [`ffbc650`](https://github.com/clerk/javascript/commit/ffbc650ebbcee48171c95aa5d2b497273b0276b0), [`d97a887`](https://github.com/clerk/javascript/commit/d97a887ae6aeb5bf81af98a8e147834d6dde2c69)]:
+  - @clerk/ui@1.18.0
+
+## 0.0.3
+
+### Patch Changes
+
+- Updated dependencies [[`17e4164`](https://github.com/clerk/javascript/commit/17e416471a5409e5a4c02f4f94f687c428c071de), [`ed2cf75`](https://github.com/clerk/javascript/commit/ed2cf75ce713703d8e2c258fc3ca0cf43dc964dc), [`67c04a4`](https://github.com/clerk/javascript/commit/67c04a43db64b70819d68333f99e3483523d1d47), [`fa23ad8`](https://github.com/clerk/javascript/commit/fa23ad84957eebbc1856c213d178de32a10dcbf2)]:
+  - @clerk/ui@1.17.0
+
 ## 0.0.2
 
 ### Patch Changes

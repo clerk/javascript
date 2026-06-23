@@ -31,9 +31,6 @@ testAgainstRunningApps({})('per-seat pricing @billing', ({ app }) => {
       const emailInput = u.po.page.getByTestId('tag-input');
       await emailInput.fill(INVITEE_EMAIL);
       await emailInput.press('Enter');
-
-      await u.po.page.getByRole('button', { name: /select role/i }).click();
-      await u.po.page.getByRole('option', { name: /^member$/i }).click();
     };
 
     await u.po.signIn.goTo();
@@ -74,27 +71,19 @@ testAgainstRunningApps({})('per-seat pricing @billing', ({ app }) => {
     await expect(u.po.checkout.root.getByText('Payment was successful!')).toBeVisible({
       timeout: 15_000,
     });
-    await u.po.checkout.confirmAndContinue();
-    await u.po.checkout.root.waitFor({ state: 'hidden', timeout: 15_000 });
 
-    await u.po.organizationProfile.goTo();
-    await u.po.page.getByText(/^Members$/).click();
-    await expect(u.po.page.getByRole('heading', { name: 'Members' })).toBeVisible();
-    await u.po.page.getByRole('button', { name: 'Invite' }).click();
-    await fillInviteForm();
+    await expect
+      .poll(
+        async () => {
+          const { data } = await u.services.clerk.organizations.getOrganizationInvitationList({
+            organizationId: fakeOrganization.organization.id,
+            status: ['pending'],
+          });
 
-    const sendInvitationsButton = u.po.page.getByRole('button', { name: 'Send invitations' });
-    await expect(sendInvitationsButton).toBeEnabled({ timeout: 15_000 });
-    await sendInvitationsButton.click({ timeout: 15_000 });
-
-    await expect(u.po.page.getByText('Invitations successfully sent')).toBeVisible({
-      timeout: 15_000,
-    });
-    await u.po.page.getByRole('button', { name: 'Finish' }).click();
-
-    await u.po.page.getByRole('tab', { name: /Invitations/i }).click();
-    await expect(u.po.page.getByText(INVITEE_EMAIL)).toBeVisible({
-      timeout: 15_000,
-    });
+          return data.some(invitation => invitation.emailAddress === INVITEE_EMAIL);
+        },
+        { timeout: 15_000 },
+      )
+      .toBe(true);
   });
 });
