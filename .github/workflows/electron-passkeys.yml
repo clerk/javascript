@@ -3,10 +3,6 @@ name: Electron Passkeys Native Build
 on:
   workflow_dispatch:
 
-permissions:
-  contents: read
-  actions: read
-
 concurrency:
   group: electron-passkeys-${{ github.head_ref || github.ref }}
   cancel-in-progress: true

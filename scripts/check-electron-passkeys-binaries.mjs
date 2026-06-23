@@ -8,11 +8,10 @@ export const DEFAULT_NPM_DIR = 'packages/electron-passkeys/npm';
 
 export async function findMissingBinaries(npmDir) {
   const entries = await readdir(npmDir, { withFileTypes: true });
-  const platformDirs = entries.filter(entry => entry.isDirectory()).sort((a, b) => a.name.localeCompare(b.name));
   const missing = [];
 
-  for (const platformDir of platformDirs) {
-    const dir = resolve(npmDir, platformDir.name);
+  for (const entry of entries.filter(entry => entry.isDirectory()).sort((a, b) => a.name.localeCompare(b.name))) {
+    const dir = resolve(npmDir, entry.name);
     const files = await readdir(dir, { withFileTypes: true });
     const count = files.filter(file => file.isFile() && file.name.endsWith('.node')).length;
 
@@ -24,15 +23,27 @@ export async function findMissingBinaries(npmDir) {
   return missing;
 }
 
+export function formatBinaryCountError(dir, count) {
+  const packageType = count === 0 ? 'empty' : 'invalid';
+
+  return `::error::${dir} has ${count} .node binaries (expected exactly 1); publishing it would ship an ${packageType} package`;
+}
+
 async function main() {
   const npmDir = process.argv[2] || DEFAULT_NPM_DIR;
-  const missing = await findMissingBinaries(npmDir);
+  let missing;
+
+  try {
+    missing = await findMissingBinaries(npmDir);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(`::error::Failed to scan ${npmDir}: ${message}`);
+    process.exit(1);
+  }
 
   if (missing.length > 0) {
     for (const { dir, count } of missing) {
-      console.error(
-        `::error::${dir} has ${count} .node binaries (expected exactly 1); publishing it would ship an empty package`,
-      );
+      console.error(formatBinaryCountError(dir, count));
     }
 
     process.exit(1);

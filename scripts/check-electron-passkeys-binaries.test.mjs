@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 import { afterEach, describe, expect, test } from 'vitest';
 
-import { findMissingBinaries } from './check-electron-passkeys-binaries.mjs';
+import { findMissingBinaries, formatBinaryCountError } from './check-electron-passkeys-binaries.mjs';
 
 const roots = [];
 
@@ -48,5 +48,17 @@ describe('findMissingBinaries', () => {
     await createPlatformDir(root, 'darwin-arm64', ['passkeys.node', 'other.node']);
 
     await expect(findMissingBinaries(root)).resolves.toEqual([{ dir: join(root, 'darwin-arm64'), count: 2 }]);
+  });
+});
+
+describe('formatBinaryCountError', () => {
+  test('describes missing and duplicate binaries accurately', () => {
+    expect(formatBinaryCountError('/tmp/darwin-arm64', 0)).toBe(
+      '::error::/tmp/darwin-arm64 has 0 .node binaries (expected exactly 1); publishing it would ship an empty package',
+    );
+
+    expect(formatBinaryCountError('/tmp/darwin-arm64', 2)).toBe(
+      '::error::/tmp/darwin-arm64 has 2 .node binaries (expected exactly 1); publishing it would ship an invalid package',
+    );
   });
 });
