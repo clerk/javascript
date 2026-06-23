@@ -1,0 +1,87 @@
+{
+  "name": "@clerk/eslint-plugin",
+  "version": "0.1.0",
+  "description": "ESLint plugin for enforcing Clerk patterns across JavaScript frameworks.",
+  "keywords": [
+    "auth",
+    "authentication",
+    "eslint",
+    "eslintplugin",
+    "eslint-plugin",
+    "next",
+    "nextjs",
+    "clerk"
+  ],
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/eslint-plugin"
+  },
+  "license": "MIT",
+  "author": "Clerk",
+  "sideEffects": false,
+  "exports": {
+    "./next": {
+      "import": {
+        "types": "./dist/next.d.mts",
+        "default": "./dist/next.mjs"
+      },
+      "require": {
+        "types": "./dist/next.d.ts",
+        "default": "./dist/next.js"
+      }
+    },
+    "./next/fix-auth-protection": {
+      "import": {
+        "types": "./dist/next/fix-auth-protection.d.mts",
+        "default": "./dist/next/fix-auth-protection.mjs"
+      },
+      "require": {
+        "types": "./dist/next/fix-auth-protection.d.ts",
+        "default": "./dist/next/fix-auth-protection.js"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "clerk-next-fix-auth-protection": "./dist/next/fix-auth-protection-cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "clean": "rimraf ./dist",
+    "dev": "tsdown --watch",
+    "format": "node ../../scripts/format-package.mjs",
+    "format:check": "node ../../scripts/format-package.mjs --check",
+    "lint": "eslint src",
+    "lint:attw": "attw --pack . --profile node16",
+    "lint:publint": "publint",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.17",
+    "@typescript-eslint/parser": "8.58.0",
+    "@typescript-eslint/utils": "8.58.0",
+    "eslint": "9.31.0",
+    "tsdown": "catalog:repo",
+    "typescript": "catalog:repo",
+    "vitest": "3.2.4"
+  },
+  "peerDependencies": {
+    "eslint": ">=9"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

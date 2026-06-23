@@ -43,50 +43,14 @@ export type SerializedPublicKeyCredentialRequestOptions = Omit<
   challenge: string;
 };
 
-// The return type from the "get" native module.
-export interface AuthenticationResponseJSON {
-  id: string;
-  rawId: string;
-  response: AuthenticatorAssertionResponseJSON;
-  authenticatorAttachment?: AuthenticatorAttachment;
-  clientExtensionResults: AuthenticationExtensionsClientOutputs;
-  type: PublicKeyCredentialType;
-}
-
 // The serialized response of the native module "create" response to be send back to clerk
 export type PublicKeyCredentialWithAuthenticatorAttestationResponse =
   ClerkPublicKeyCredentialWithAuthenticatorAttestationResponse & {
     toJSON: () => any;
   };
 
-interface AuthenticatorAssertionResponseJSON {
-  clientDataJSON: string;
-  authenticatorData: string;
-  signature: string;
-  userHandle?: string;
-}
-
 // The serialized response of the native module "get" response to be send back to clerk
 export type PublicKeyCredentialWithAuthenticatorAssertionResponse =
   ClerkPublicKeyCredentialWithAuthenticatorAssertionResponse & {
     toJSON: () => any;
   };
-
-interface AuthenticatorAttestationResponseJSON {
-  clientDataJSON: string;
-  attestationObject: string;
-  authenticatorData?: string;
-  transports?: AuthenticatorTransportFuture[];
-  publicKeyAlgorithm?: COSEAlgorithmIdentifier;
-  publicKey?: string;
-}
-
-// The type is returned from from native module "create" response
-export interface RegistrationResponseJSON {
-  id: string;
-  rawId: string;
-  response: AuthenticatorAttestationResponseJSON;
-  authenticatorAttachment?: AuthenticatorAttachment;
-  clientExtensionResults: AuthenticationExtensionsClientOutputs;
-  type: PublicKeyCredentialType;
-}

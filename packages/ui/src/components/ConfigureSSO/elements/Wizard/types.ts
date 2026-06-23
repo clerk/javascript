@@ -1,107 +1,115 @@
-import type React from 'react';
-
 import type { LocalizationKey } from '@/customizables';
 
 /**
- * Props for `<Wizard.Step>`. Each rendered Step is one navigable
- * position in its parent `<Wizard>`. Inner sub-steps are declared by
- * nesting another `<Wizard>` inside the Step's body
+ * One navigable position in a `<Wizard>`, declared as a plain config object in
+ * the `steps` array. The graph IS the array — no `React.Children` walking, no
+ * `<Wizard.Step>` component. Each entry is registration only (order, reachability,
+ * label/visibility) and carries NO body; rendering is declarative via
+ * `<Wizard.Match id>`.
+ *
+ * `isReachable` is an *entry precondition* ("may navigation LAND here right now?"),
+ * NOT a "skip if already satisfied" flag — it only blocks landing on a step
+ * whose precondition is unmet, never causes a step to be skipped.
  */
-export interface WizardStepProps {
-  /**
-   * Stable identifier for the step. Used as a React key, for
-   * `goToStep(id)`, and to register the step with the parent wizard
-   */
+export interface WizardStepConfig {
+  /** Stable id: React key, `goToStep(id)`, `<Wizard.Match id>`, graph position. */
   id: string;
-  /**
-   * Label shown in the breadcrumb at the top of the wizard. Only
-   * outermost steps need a label — inner steps reuse their parent's
-   * breadcrumb entry
-   */
+  /** Breadcrumb label. Only outermost steps need one; inner steps reuse the parent's. */
   label?: LocalizationKey | string;
   /**
-   * Marks this step as completed regardless of its position relative
-   * to the current step
+   * Inline entry-precondition predicate: "may navigation land on this step right
+   * now?". Evaluated uniformly by init / `goNext` / `goPrev` / `goToStep` / the
+   * stepper. OMITTED ⇒ TRUE (always enterable — the entry step). Reachability
+   * predicates are expected to be *monotonic* across the declared order (a later
+   * predicate holding implies every earlier one holds); the furthest-reachable
+   * init and the always-reachable predecessor both rely on that.
    */
-  isCompleted?: boolean;
+  isReachable?: () => boolean;
   /**
-   * The step body. Anything React, including a nested
-   * `<Wizard>` for inner sub-steps
+   * Inline completion predicate: "is THIS step's work done right now?", decoupled
+   * from the current position. Drives the stepper's completed tick so a step reads
+   * as done whenever its own work is, regardless of where the user currently
+   * stands (re-entering an already-finished flow shows every step ticked).
+   * OMITTED ⇒ fall back to the POSITIONAL default (sits before current) — nested /
+   * per-provider wizards that declare no `isComplete` are unchanged.
    */
-  children: React.ReactNode;
+  isComplete?: () => boolean;
 }
 
 /**
- * Internal step descriptor mirrored from a Step's props once it has
- * registered itself with the parent wizard. Consumers shouldn't need
- * to construct these directly
+ * The step descriptor the engine reads. The `steps` config array is body-less
+ * registration, so the descriptor and the config are the same shape — the
+ * reducer consumes the array verbatim.
+ */
+export type WizardStepDescriptor = WizardStepConfig;
+
+/**
+ * A breadcrumb-facing view of an in-flow step: the descriptors in declaration
+ * order, with their resolved completion and reachability state. Whether a step
+ * shows in the breadcrumb is a render concern (the header filters on `label`),
+ * not a property of the descriptor.
  */
 export interface WizardActiveStep {
   id: string;
   label?: LocalizationKey | string;
-  isCompleted?: boolean;
+  /**
+   * Whether this step's work is done — drives the visual "completed" tick. Resolved
+   * from the step's own `isComplete` predicate when it declares one (position-
+   * independent: a finished step stays ticked even when the user navigates back),
+   * otherwise the POSITIONAL default (sits before current in declaration order).
+   */
+  isCompleted: boolean;
+  /**
+   * GUARD-DRIVEN: the step's entry guard holds right now, so navigation may
+   * land on it. The single source the stepper binds `isDisabled = !isReachable`
+   * to, and the exact predicate `goToStep` checks before jumping.
+   */
+  isReachable: boolean;
 }
 
 export interface WizardContextValue {
-  /**
-   * The active siblings inside the *current* Wizard scope, in JSX
-   * declaration order. Steps register themselves on mount and
-   * unregister on unmount
-   */
+  current: string;
+  /** All descriptors in declaration order, known synchronously. */
   activeSteps: WizardActiveStep[];
-  /**
-   * The step currently rendered as the wizard's body, or `undefined`
-   * before the first step has registered
-   */
+  /** The active step's view; `undefined` only if `current` names no descriptor. */
   currentStep: WizardActiveStep | undefined;
-  /**
-   * Index of `currentStep` within `activeSteps`. `-1` if not matched
-   */
+  /** Index of `current` within `activeSteps`; `-1` if it names no descriptor. */
   currentIndex: number;
-  /**
-   * Convenience: `activeSteps.length`
-   */
+  /** `1` forward, `-1` back, `0` jump/initial. Drives animation only. */
+  direction: 1 | -1 | 0;
   totalSteps: number;
   /**
-   * `true` when the user is at the very first position inside *this*
-   * wizard scope and there is no parent wizard to fall back on
+   * `true` while still on the mount step with no navigation yet — separates
+   * "landed here on initial load" from "navigated in later" without inspecting
+   * history. Drives load-once-then-refetch-on-entry data semantics.
    */
+  isInitialStep: boolean;
+  /** `true` when rendered inside another wizard (parent owns the chrome). */
+  isNested: boolean;
+  /** First position in THIS scope, with no parent to fall back on. */
   isFirstStep: boolean;
-  /**
-   * `true` when the user is at the very last position inside *this*
-   * wizard scope and there is no parent wizard to fall back on
-   */
+  /** Last position in THIS scope, with no parent to fall back on. */
   isLastStep: boolean;
   /**
-   * `true` when this wizard is rendered inside another wizard. The
-   * outermost wizard owns the breadcrumb / footer chrome; nested
-   * wizards just contribute their own active step bodies
+   * Advance one slot when the next step's entry guard holds (sequential, no
+   * skip-satisfied walk) — immediately if it already holds, otherwise as soon as
+   * it becomes satisfied while still on this step (a deferred advance: the call
+   * parks a pending forward move that resolves on a later render once the guard
+   * holds). An explicit `goPrev`/`goToStep` abandons that pending advance. From
+   * the terminal position, falls through to the parent's `goNext` (so a nested
+   * sub-flow's last step advances the parent); no-op when there is no parent.
+   *
+   * Call-site rule: only call `goNext` after the action that satisfies the next
+   * guard (submit-then-advance), or pre-check the condition first. Calling it on
+   * an ungated click parks a deferred advance that fires later without a user
+   * gesture once the guard happens to hold.
    */
-  isNested: boolean;
+  goNext: () => void;
+  /** Mirror of `goNext` backward (positional, no history). */
+  goPrev: () => void;
   /**
-   * Navigate forward. Within this wizard, advances to the next active
-   * sibling. On the last sibling, falls through to the parent
-   * wizard's `goNext` (if any)
+   * Jump by `id` iff its entry guard holds. No-op if unknown, already current,
+   * or guard-blocked.
    */
-  goNext: () => Promise<unknown> | void;
-  /**
-   * Navigate backward. Mirror of `goNext`: previous sibling, then
-   * back to the parent's last sibling on overflow
-   */
-  goPrev: () => Promise<unknown> | void;
-  /**
-   * Jump to a specific step by `id` within this wizard scope. No-op
-   * if the id is not in `activeSteps`
-   */
-  goToStep: (id: string) => Promise<unknown> | void;
-  /**
-   * Internal — called by `<Wizard.Step>` on mount (and again whenever
-   * its descriptor props change) to register itself with the wizard
-   */
-  registerStep: (step: WizardActiveStep) => void;
-  /**
-   * Internal — called by `<Wizard.Step>` on unmount (or when its `id`
-   * changes) to remove itself from the wizard's active steps
-   */
-  unregisterStep: (id: string) => void;
+  goToStep: (id: string) => void;
 }

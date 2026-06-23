@@ -51,10 +51,15 @@ export const teIN: LocalizationResource = {
       formButtonPrimary__revoke: 'కీని ఉపసంహరించు',
       formHint: 'మీరు ఖచ్చితంగా ఈ రహస్య కీని తొలగించాలనుకుంటున్నారా?',
       formTitle: '"{{apiKeyName}}" రహస్య కీని ఉపసంహరించాలా?',
+      inputLabel: undefined,
     },
+    tableHeader__actions: undefined,
+    tableHeader__lastUsed: undefined,
+    tableHeader__name: undefined,
   },
   backButton: 'వెనుకకు',
   badge__activePlan: 'క్రియాశీలం',
+  badge__banned: undefined,
   badge__canceledEndsAt: "రద్దు చేయబడింది • ముగుస్తుంది {{ date | shortDate('te-IN') }}",
   badge__currentPlan: 'ప్రస్తుత ప్లాన్',
   badge__default: 'డిఫాల్ట్',
@@ -75,11 +80,14 @@ export const teIN: LocalizationResource = {
   badge__userDevice: 'వినియోగదారు పరికరం',
   badge__you: 'మీరు',
   billing: {
+    accountCredit: undefined,
     addPaymentMethod__label: 'చెల్లింపు పద్ధతిని జోడించు',
     alwaysFree: 'ఎల్లప్పుడూ ఉచితం',
     annually: 'వార్షికంగా',
     availableFeatures: 'అందుబాటులో ఉన్న ఫీచర్లు',
     billedAnnually: 'వార్షిక బిల్లింగ్',
+    billedAnnuallyOnly: undefined,
+    billedMonthly: undefined,
     billedMonthlyOnly: 'నెలవారీగా మాత్రమే బిల్ చేయబడుతుంది',
     cancelFreeTrial: 'ఉచిత ట్రయల్‌ను రద్దు చేయి',
     cancelFreeTrialAccessUntil:
@@ -119,20 +127,25 @@ export const teIN: LocalizationResource = {
       title__subscriptionSuccessful: 'విజయం!',
       title__trialSuccess: 'ట్రయల్ విజయవంతంగా ప్రారంభమైంది!',
       totalDueAfterTrial: '{{days}} రోజుల్లో ట్రయల్ ముగిసిన తర్వాత చెల్లించవలసిన మొత్తం',
+      totalDuePerPeriod: undefined,
     },
     credit: 'క్రెడిట్',
     creditRemainder: 'మీ ప్రస్తుత సబ్‌స్క్రిప్షన్ యొక్క మిగిలిన కాలానికి క్రెడిట్.',
     defaultFreePlanActive: 'మీరు ప్రస్తుతం ఉచిత ప్లాన్‌లో ఉన్నారు',
     free: 'ఉచితం',
     getStarted: 'ప్రారంభించండి',
+    highlightedPlanBadge: 'ప్రసిద్ధ',
     keepFreeTrial: 'ఉచిత ట్రయల్‌ను ఉంచు',
     keepSubscription: 'సబ్‌స్క్రిప్షన్‌ను ఉంచు',
     manage: 'నిర్వహించు',
     manageSubscription: 'సభ్యత్వాన్ని నిర్వహించండి',
     month: 'నెల',
+    monthAbbreviation: undefined,
+    monthPerUnit: undefined,
     monthly: 'నెలవారీ',
     pastDue: 'బకాయి',
     pay: '{{amount}} చెల్లించు',
+    payerCreditRemainder: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: 'వార్షిక చెల్లింపు',
@@ -148,12 +161,32 @@ export const teIN: LocalizationResource = {
       },
     },
     paymentMethods__label: 'చెల్లింపు పద్ధతులు',
-    highlightedPlanBadge: 'ప్రసిద్ధ',
     pricingTable: {
       billingCycle: 'బిల్లింగ్ చక్రం',
       included: 'చేర్చబడింది',
+      seatCost: {
+        additionalSeats: undefined,
+        freeUpToSeats: undefined,
+        includedSeats: undefined,
+        perSeat: undefined,
+        tooltip: {
+          additionalSeatsEach: undefined,
+          firstSeatsIncludedInPlan: undefined,
+          freeForUpToSeats: undefined,
+        },
+        unlimitedSeats: undefined,
+        upToSeats: undefined,
+      },
     },
+    proratedDiscount: undefined,
+    prorationCredit: undefined,
     reSubscribe: 'మళ్లీ సబ్‌స్క్రైబ్ చేయి',
+    seatBreakdownIncludedPlural: undefined,
+    seatBreakdownIncludedSingular: undefined,
+    seatBreakdownPlural: undefined,
+    seatBreakdownSingular: undefined,
+    seats: undefined,
+    seatsWithLimit: undefined,
     seeAllFeatures: 'అన్ని ఫీచర్లను చూడు',
     startFreeTrial: 'ఉచిత ట్రయల్‌ను ప్రారంభించు',
     startFreeTrial__days: '{{days}}-రోజుల ఉచిత ట్రయల్‌ను ప్రారంభించు',
@@ -174,18 +207,453 @@ export const teIN: LocalizationResource = {
       trialStartedOn: 'ట్రయల్ ప్రారంభమైన తేదీ',
     },
     subtotal: 'ఉప మొత్తం',
+    subtotalRenewal: undefined,
     switchPlan: 'ఈ ప్లాన్‌కు మారండి',
     switchToAnnual: 'వార్షికానికి మార్చు',
     switchToAnnualWithAnnualPrice: 'వార్షికానికి మార్చు {{currency}}{{price}} / సంవత్సరం',
     switchToMonthly: 'నెలవారీకి మార్చు',
     switchToMonthlyWithPrice: 'నెలవారీకి మార్చు {{currency}}{{price}} / నెల',
     totalDue: 'చెల్లించవలసిన మొత్తం',
+    totalDuePerPeriod: undefined,
     totalDueToday: 'ఈరోజు చెల్లించవలసిన మొత్తం',
     viewFeatures: 'ఫీచర్లను చూడు',
     viewPayment: 'చెల్లింపును చూడు',
     year: 'సంవత్సరం',
+    yearAbbreviation: undefined,
+    yearPerUnit: undefined,
   },
   configureSSO: {
+    configureStep: {
+      attributeMappingTable: {
+        badges: {
+          optional: undefined,
+          required: undefined,
+        },
+      },
+      samlCustom: {
+        assignUsersStep: {
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          title: undefined,
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attributeName: undefined,
+              userProfile: undefined,
+            },
+            rows: {
+              email: {
+                attributeName: undefined,
+                userProfile: undefined,
+              },
+              firstName: {
+                attributeName: undefined,
+                userProfile: undefined,
+              },
+              lastName: {
+                attributeName: undefined,
+                userProfile: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        createAppStep: {
+          createAppInstructions: {
+            paragraph: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+            title: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+      },
+      samlGoogle: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              appAttribute: undefined,
+              googleAttribute: undefined,
+            },
+            rows: {
+              email: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+              firstName: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+              lastName: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+        },
+        configureUserAccess: {
+          assignUsersInstructions: {
+            paragraph1: undefined,
+            paragraph2: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        createAppStep: {
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataFile: {
+            description: undefined,
+            fileUploaded: undefined,
+            label: undefined,
+            removeFile: undefined,
+            replaceFile: undefined,
+            uploadFile: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataFile: undefined,
+            title: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        serviceProviderStep: {
+          headerSubtitle: undefined,
+          nameIdInstructions: {
+            step1: undefined,
+            step2: undefined,
+          },
+          paragraph: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+          title: undefined,
+        },
+      },
+      samlMicrosoft: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attribute: undefined,
+              claimName: undefined,
+              value: undefined,
+            },
+            rows: {
+              email: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+              firstName: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+              lastName: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          title: undefined,
+        },
+        createAppStep: {
+          assignUsersInstructions: {
+            paragraph1: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            step6: undefined,
+            title: undefined,
+          },
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: {
+              label: undefined,
+              subSteps: {
+                appName: undefined,
+                create: undefined,
+                nonGallery: undefined,
+              },
+            },
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+            title: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        serviceProviderStep: {
+          headerSubtitle: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+          step5: undefined,
+          step6: undefined,
+          title: undefined,
+        },
+      },
+      samlOkta: {
+        assignUsersStep: {
+          assignUsersInstructions: {
+            paragraph: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              expression: undefined,
+              name: undefined,
+            },
+            rows: {
+              email: {
+                expression: undefined,
+                name: undefined,
+              },
+              firstName: {
+                expression: undefined,
+                name: undefined,
+              },
+              lastName: {
+                expression: undefined,
+                name: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+        },
+        createAppStep: {
+          completeSamlIntegrationInstructions: {
+            step1: undefined,
+            step2: undefined,
+            title: undefined,
+          },
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+          serviceProviderInstructions: {
+            paragraph1: undefined,
+            paragraph2: undefined,
+            serviceProviderFields: {
+              acsUrl: {
+                label: undefined,
+              },
+              spEntityId: {
+                label: undefined,
+              },
+            },
+            title: undefined,
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+            title: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+      },
+    },
+    confirmation: {
+      configurationSection: {
+        configureAgainLink: undefined,
+        issuerLabel: undefined,
+        ssoUrlLabel: undefined,
+        title: undefined,
+      },
+      domainSection: {
+        title: undefined,
+      },
+      enableSection: {
+        title: undefined,
+      },
+      inactiveBanner: {
+        title: undefined,
+      },
+      resetSection: {
+        confirmationFieldLabel: undefined,
+        submitButton: undefined,
+        title: undefined,
+        warning: undefined,
+      },
+      statusSection: {
+        activeBadge: undefined,
+        inactiveBadge: undefined,
+        title: undefined,
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'మీ అనుమతులను అప్‌గ్రేడ్ చేయడానికి మీ సంస్థ నిర్వాహకుడిని సంప్రదించండి.',
       title: 'సింగిల్ సైన్-ఆన్ (SSO) నిర్వహించడానికి మీకు అనుమతి లేదు',
@@ -193,39 +661,121 @@ export const teIN: LocalizationResource = {
     navbar: {
       title: 'సింగిల్ సైన్-ఆన్ (SSO) కాన్ఫిగర్ చేయండి',
     },
-    selectProviderStep: {
-      title: 'ప్రొవైడర్‌ను ఎంచుకోండి',
-      subtitle: 'మీరు SSO సెటప్ చేయబోతున్న ప్రొవైడర్‌ను ఎంచుకోండి.',
-      saml: {
-        groupLabel: 'SAML',
-        okta: 'Okta Workforce',
-        customSaml: 'కస్టమ్ SAML ప్రొవైడర్',
+    organizationDomainsStep: {
+      domainCard: {
+        badge__unverified: 'ధృవీకరించబడలేదు',
+        badge__verified: 'ధృవీకరించబడింది',
+        removeButtonTooltip__lastVerifiedDomain: undefined,
+        removeButtonTooltip__lastVerifiedDomainActive: undefined,
+        txtRecord: {
+          hostLabel: 'హోస్ట్ / పేరు',
+          instructions:
+            'ఈ TXT రికార్డ్‌ను మీ DNS ప్రొవైడర్‌కు జోడించండి. రికార్డ్ సక్రియం అయిన వెంటనే మేము స్వయంచాలకంగా ధృవీకరిస్తాము.',
+          typeLabel: 'రకం',
+          valueLabel: 'విలువ',
+        },
+        verifiedAtLabel: "{{ date | shortDate('te-IN') }} న ధృవీకరించబడింది",
       },
+      domainSuggestion: {
+        formButtonPrimary__add: '{{domain}} జోడించు',
+        messageLabel: 'మీ ఇమెయిల్ {{domain}} ను ఉపయోగిస్తుంది. మీరు దీన్ని జోడించాలనుకుంటున్నారా?',
+      },
+      formButtonPrimary__add: 'జోడించు',
+      formFieldInputPlaceholder__domain: 'మీ డొమైన్‌ను ఇక్కడ టైప్ చేసి, ప్రారంభించడానికి జోడించు క్లిక్ చేయండి',
+      formFieldLabel__domain: 'డొమైన్‌లు',
+      removeDomainDialog: {
+        cancelButton: undefined,
+        removeButton: undefined,
+        subtitle__active: undefined,
+        subtitle__inactive: undefined,
+        title: undefined,
+      },
+      subtitle: 'మీ సంస్థ సైన్ ఇన్ చేయడానికి ఉపయోగించే డొమైన్‌ల యాజమాన్యాన్ని జోడించి ధృవీకరించండి.',
+      title: 'SSO డొమైన్‌లను జోడించండి',
+    },
+    resetConnectionDialog: {
+      cancelButton: undefined,
+      confirmationFieldLabel: undefined,
+      confirmationFieldPlaceholder: undefined,
+      resetButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    selectProviderStep: {
+      saml: {
+        customSaml: 'కస్టమ్ SAML ప్రొవైడర్',
+        google: undefined,
+        groupLabel: 'SAML',
+        microsoft: undefined,
+        okta: 'Okta Workforce',
+      },
+      subtitle: 'మీరు SSO సెటప్ చేయబోతున్న ప్రొవైడర్‌ను ఎంచుకోండి.',
+      title: 'ప్రొవైడర్‌ను ఎంచుకోండి',
       warning: 'ఒకసారి ప్రొవైడర్ ఎంచుకున్న తర్వాత, కాన్ఫిగరేషన్ ముగిసే వరకు మీరు మళ్లీ మార్చలేరు',
     },
-    verifyEmailDomainStep: {
-      title: 'ఇమెయిల్ చిరునామా ధృవీకరించండి',
-      subtitle: 'మీరు ఎంటర్‌ప్రైజ్ కనెక్షన్‌ను ప్రారంభించాలనుకుంటున్న ఇమెయిల్ చిరునామాను ధృవీకరించండి.',
-      addEmailAddress: {
-        formTitle: 'మాకు మీ ఇమెయిల్ అవసరం',
-        formSubtitle: 'ప్రారంభించడానికి మాకు మీ ఇమెయిల్ చిరునామా అవసరం',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'ఇమెయిల్ చిరునామా',
-      },
-      emailCode: {
-        formTitle: 'మీ ఇమెయిల్ చిరునామాను ధృవీకరించండి',
-        formSubtitle: '{{identifier}} కు పంపిన ధృవీకరణ కోడ్‌ను నమోదు చేయండి',
-        resendButton: 'కోడ్ అందలేదా? మళ్లీ పంపండి',
-        verified: {
-          title: 'మాకు మీ ఇమెయిల్ వచ్చింది',
-          subtitle: 'మీరు కింది ఇమెయిల్‌తో మీ ఇమెయిల్ చిరునామాను ధృవీకరించారు',
-          inputLabel: 'ధృవీకరించబడిన ఇమెయిల్ చిరునామా',
+    testConfigurationStep: {
+      error__noSuccessfulTestRun: undefined,
+      subtitle: undefined,
+      testResults: {
+        actionLabel__refresh: undefined,
+        empty: {
+          subtitle: undefined,
+          title: undefined,
         },
+        polling: undefined,
+        status__failed: undefined,
+        status__pending: undefined,
+        status__success: undefined,
+        title: undefined,
       },
-      domainTaken: {
-        title: 'ఈ డొమైన్‌కి ({{domain}}) ఇప్పటికే SSO కనెక్షన్ ఉంది',
-        subtitle: 'ఇప్పటికే ఉన్న కనెక్షన్ ద్వారా యాక్సెస్ పొందడానికి అప్లికేషన్ నిర్వాహకుడిని సంప్రదించండి.',
+      testRunDetails: {
+        howToFix: {
+          actionLabel__viewDocumentation: undefined,
+          oauth_access_denied: {
+            description: undefined,
+          },
+          oauth_fetch_user_error: {
+            intro: undefined,
+            step1: undefined,
+            step2: undefined,
+          },
+          oauth_token_exchange_error: {
+            description: undefined,
+          },
+          saml_email_address_domain_mismatch: {
+            description: undefined,
+          },
+          saml_response_relaystate_missing: {
+            description: undefined,
+          },
+          saml_user_attribute_missing: {
+            intro: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+          },
+          sectionTitle: undefined,
+        },
+        parsedUserInfo: {
+          email: undefined,
+          firstName: undefined,
+          sectionTitle: undefined,
+        },
+        runDetails: {
+          actionLabel__copied: undefined,
+          actionLabel__copy: undefined,
+          errorCode: undefined,
+          fullMessage: undefined,
+          sectionTitle: undefined,
+          status: undefined,
+          timestamp: undefined,
+        },
+        title: undefined,
       },
+      testUrl: {
+        actionLabel__open: undefined,
+      },
+      title: undefined,
     },
   },
   createOrganization: {
@@ -273,6 +823,7 @@ export const teIN: LocalizationResource = {
   formFieldInputPlaceholder__organizationSlug: 'my-org',
   formFieldInputPlaceholder__password: 'మీ పాస్‌వర్డ్‌ను నమోదు చేయండి',
   formFieldInputPlaceholder__phoneNumber: 'మీ ఫోన్ నంబర్‌ను నమోదు చేయండి',
+  formFieldInputPlaceholder__signUpPassword: undefined,
   formFieldInputPlaceholder__username: 'మీ వినియోగదారు పేరును నమోదు చేయండి',
   formFieldInput__emailAddress_format: 'ఉదాహరణ ఫార్మాట్: name@example.com',
   formFieldLabel__apiKey: 'API కీ',
@@ -303,6 +854,9 @@ export const teIN: LocalizationResource = {
   formFieldLabel__role: 'పాత్ర',
   formFieldLabel__signOutOfOtherSessions: 'అన్ని ఇతర పరికరాల నుండి సైన్ అవుట్ అవ్వండి',
   formFieldLabel__username: 'వినియోగదారు పేరు',
+  identityPreviewEditButton__emailAddress: undefined,
+  identityPreviewEditButton__identifier: undefined,
+  identityPreviewEditButton__phoneNumber: undefined,
   impersonationFab: {
     action__signOut: 'సైన్ అవుట్',
     title: '{{identifier}} గా సైన్ ఇన్ చేసారు',
@@ -312,6 +866,22 @@ export const teIN: LocalizationResource = {
   membershipRole__admin: 'నిర్వాహకుడు',
   membershipRole__basicMember: 'సభ్యుడు',
   membershipRole__guestMember: 'అతిథి',
+  oauthConsent: {
+    action__allow: undefined,
+    action__deny: undefined,
+    offlineAccessNotice: undefined,
+    redirectNotice: undefined,
+    redirectUriModal: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    scopeList: {
+      title: undefined,
+    },
+    subtitle: undefined,
+    viewFullUrl: undefined,
+    warning: undefined,
+  },
   organizationList: {
     action__createOrganization: 'సంస్థను సృష్టించండి',
     action__invitationAccept: 'చేరండి',
@@ -329,6 +899,7 @@ export const teIN: LocalizationResource = {
     },
     badge__automaticInvitation: 'స్వయంచాలక ఆహ్వానాలు',
     badge__automaticSuggestion: 'స్వయంచాలక సూచనలు',
+    badge__enterpriseSso: undefined,
     badge__manualInvitation: 'స్వయంచాలక నమోదు లేదు',
     badge__unverified: 'ధృవీకరించబడలేదు',
     billingPage: {
@@ -366,6 +937,7 @@ export const teIN: LocalizationResource = {
       statementsSection: {
         empty: 'ప్రదర్శించడానికి స్టేట్‌మెంట్‌లు లేవు',
         itemCaption__paidForPlan: '{{plan}} {{period}} ప్లాన్ కోసం చెల్లించబడింది',
+        itemCaption__payerCredit: undefined,
         itemCaption__proratedCredit: 'మునుపటి సబ్‌స్క్రిప్షన్ యొక్క పాక్షిక వినియోగానికి దామాషా క్రెడిట్',
         itemCaption__subscribedAndPaidForPlan: '{{plan}} {{period}} ప్లాన్ కోసం సబ్‌స్క్రైబ్ చేసి చెల్లించబడింది',
         notFound: 'స్టేట్‌మెంట్ కనుగొనబడలేదు',
@@ -378,6 +950,11 @@ export const teIN: LocalizationResource = {
         actionLabel__manageSubscription: 'నిర్వహించు',
         actionLabel__newSubscription: 'ఒక ప్లాన్‌కు సబ్‌స్క్రైబ్ చేయి',
         actionLabel__switchPlan: 'ప్లాన్‌లను మార్చు',
+        includedSeatsUsage: undefined,
+        overview: undefined,
+        paidSeatsUsage: undefined,
+        seatLimit: undefined,
+        seatLimitAndIncludedSeats: undefined,
         tableHeader__edit: 'సవరించు',
         tableHeader__plan: 'ప్లాన్',
         tableHeader__startDate: 'ప్రారంభ తేదీ',
@@ -400,6 +977,7 @@ export const teIN: LocalizationResource = {
       detailsTitle__inviteFailed:
         'ఆహ్వానాలు పంపడం సాధ్యం కాలేదు. కింది ఇమెయిల్ చిరునామాల కోసం ఇప్పటికే పెండింగ్‌లో ఉన్న ఆహ్వానాలు ఉన్నాయి: {{email_addresses}}.',
       formButtonPrimary__continue: 'ఆహ్వానాలను పంపండి',
+      formButtonPrimary__purchaseSeats: undefined,
       selectDropdown__role: 'పాత్రను ఎంచుకోండి',
       subtitle:
         'ఒకటి లేదా అంతకంటే ఎక్కువ ఇమెయిల్ చిరునామాలను నమోదు చేయండి లేదా అతికించండి, స్థలాలు లేదా కామాలతో విడదీయబడింది.',
@@ -461,11 +1039,13 @@ export const teIN: LocalizationResource = {
       description: 'మీ సంస్థను నిర్వహించండి.',
       general: 'సాధారణ',
       members: 'సభ్యులు',
+      security: undefined,
       title: 'సంస్థ',
     },
     plansPage: {
       alerts: {
         noPermissionsToManageBilling: 'ఈ సంస్థ యొక్క బిల్లింగ్‌ను నిర్వహించడానికి మీకు అనుమతులు లేవు.',
+        planMembershipLimitExceeded: undefined,
       },
       title: 'ప్లాన్‌లు',
     },
@@ -506,9 +1086,33 @@ export const teIN: LocalizationResource = {
       successMessage: '{{domain}} తొలగించబడింది.',
       title: 'డొమైన్‌ను తొలగించండి',
     },
+    securityPage: {
+      removeDialog: {
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      ssoSection: {
+        badge__active: undefined,
+        badge__inProgress: undefined,
+        badge__inactive: undefined,
+        badge__unconfigured: undefined,
+        descriptionLine1: undefined,
+        domainLabel: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__continueConfiguration: undefined,
+        primaryButton__startConfiguration: undefined,
+        title: undefined,
+      },
+      title: undefined,
+    },
     start: {
       headerTitle__general: 'సాధారణ',
       headerTitle__members: 'సభ్యులు',
+      membershipSeatUsageLabel: undefined,
       profileSection: {
         primaryButton: 'ప్రొఫైల్‌ను నవీకరించండి',
         title: 'సంస్థ ప్రొఫైల్',
@@ -1030,6 +1634,8 @@ export const teIN: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ఇప్పటికే సంస్థ సభ్యుడు.',
+    api_key_name_already_exists: undefined,
+    api_key_usage_exceeded: undefined,
     avatar_file_size_exceeded: 'ఫైల్ పరిమాణం గరిష్ట 10MB పరిమితిని మించిపోయింది. దయచేసి చిన్న ఫైల్‌ను ఎంచుకోండి.',
     avatar_file_type_invalid: 'ఫైల్ రకం సపోర్ట్ చేయబడలేదు. దయచేసి JPG, PNG, GIF లేదా WEBP చిత్రాన్ని అప్‌లోడ్ చేయండి.',
     captcha_invalid:
@@ -1075,8 +1681,11 @@ export const teIN: LocalizationResource = {
     form_username_invalid_length: 'మీ వినియోగదారు పేరు {{min_length}} మరియు {{max_length}} అక్షరాల మధ్య ఉండాలి.',
     form_username_needs_non_number_char: 'మీ వినియోగదారు పేరులో కనీసం ఒక సంఖ్యేతర అక్షరం ఉండాలి.',
     identification_deletion_failed: 'మీరు మీ చివరి గుర్తింపును తొలగించలేరు.',
+    insufficient_seats_change_plan: undefined,
+    insufficient_seats_contact_support: undefined,
     not_allowed_access:
       'మీకు ఈ పేజీని యాక్సెస్ చేయడానికి అనుమతి లేదు. ఇది లోపం అని మీరు నమ్మితే దయచేసి మద్దతును సంప్రదించండి.',
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'ఇది నిరోధించబడిన ఇమెయిల్ ప్రొవైడర్ డొమైన్. దయచేసి వేరొకదాన్ని ఉపయోగించండి.',
     organization_domain_common: 'ఇది సాధారణ ఇమెయిల్ ప్రొవైడర్ డొమైన్. దయచేసి వేరొకదాన్ని ఉపయోగించండి.',
     organization_domain_exists_for_enterprise_connection: 'ఈ డొమైన్ ఇప్పటికే మీ సంస్థ SSOకి ఉపయోగించబడుతోంది',
@@ -1155,6 +1764,9 @@ export const teIN: LocalizationResource = {
     action__openUserMenu: 'వినియోగదారు మెనుని తెరువు',
     action__signOut: 'సైన్ అవుట్',
     action__signOutAll: 'అన్ని ఖాతాల నుండి సైన్ అవుట్ అవ్వండి',
+    label__userButtonPopover: 'ఖాతా ప్యానెల్',
+    label__accountActions: 'ఖాతా చర్యలు',
+    label__activeSessions: 'క్రియాశీల సెషన్‌లు',
   },
   userProfile: {
     apiKeysPage: {
@@ -1211,6 +1823,7 @@ export const teIN: LocalizationResource = {
       statementsSection: {
         empty: 'ప్రదర్శించడానికి స్టేట్‌మెంట్‌లు లేవు',
         itemCaption__paidForPlan: '{{plan}} {{period}} ప్లాన్ కోసం చెల్లించబడింది',
+        itemCaption__payerCredit: undefined,
         itemCaption__proratedCredit: 'మునుపటి సబ్‌స్క్రిప్షన్ యొక్క పాక్షిక వినియోగానికి దామాషా క్రెడిట్',
         itemCaption__subscribedAndPaidForPlan: '{{plan}} {{period}} ప్లాన్ కోసం సబ్‌స్క్రైబ్ చేసి చెల్లించబడింది',
         notFound: 'స్టేట్‌మెంట్ కనుగొనబడలేదు',
@@ -1223,6 +1836,7 @@ export const teIN: LocalizationResource = {
         actionLabel__manageSubscription: 'నిర్వహించు',
         actionLabel__newSubscription: 'ఒక ప్లాన్‌కు సబ్‌స్క్రైబ్ చేయి',
         actionLabel__switchPlan: 'ప్లాన్‌లను మార్చు',
+        overview: undefined,
         tableHeader__edit: 'సవరించు',
         tableHeader__plan: 'ప్లాన్',
         tableHeader__startDate: 'ప్రారంభ తేదీ',

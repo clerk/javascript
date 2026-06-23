@@ -136,11 +136,11 @@ export type FlowMetadata = {
     | 'methodSelectionMFA'
     | 'provideEmail'
     | 'selectProvider'
-    | 'verifyDomain'
+    | 'organizationDomains'
     | 'configureCreateApp'
     | 'configureMapAttributes'
     | 'testSso'
-    | 'ssoConfirmation';
+    | 'ssoActivate';
 };
 
 const [FlowMetadataCtx, useFlowMetadata] = createContextAndHook<FlowMetadata>('FlowMetadata');

@@ -1,5 +1,142 @@
 # Change Log
 
+## 6.20.0
+
+### Minor Changes
+
+- Introduces organization membership feature. ([#8933](https://github.com/clerk/javascript/pull/8933)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+  Organizations can enforce exclusive membership, limiting users to a single organization. During the `choose-organization` session task, members of such an organization are automatically activated instead of seeing the picker. `Organization.exclusiveMembership` is now exposed on the Organization resource.
+
+### Patch Changes
+
+- Updated dependencies [[`01789b4`](https://github.com/clerk/javascript/commit/01789b4e8d3a280940b7ebcb223a33c6ecfd209a)]:
+  - @clerk/shared@4.20.0
+
+## 6.19.0
+
+### Minor Changes
+
+- Fix the inline captcha spotlight to expand correctly when an older clerk-js runtime is paired with a newer UI that expects the `data-cl-interactive` attribute — the challenge now falls back to the `maxHeight` heuristic so the spotlight still fires across version skews. ([#8907](https://github.com/clerk/javascript/pull/8907)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 6.18.1
+
+### Patch Changes
+
+- Updated dependencies [[`c84f8df`](https://github.com/clerk/javascript/commit/c84f8df4222c212ecce6ae5ff8c47958b5b5d972), [`53e7b11`](https://github.com/clerk/javascript/commit/53e7b11058096d5ce15da53af12fe7236e88db2c), [`e51e22a`](https://github.com/clerk/javascript/commit/e51e22a2aec03293e8ccf5a5372cd9906aeccbb7)]:
+  - @clerk/shared@4.19.1
+
+## 6.18.0
+
+### Minor Changes
+
+- Introduce organization domains with TXT verification on self-serve SSO flow ([#8788](https://github.com/clerk/javascript/pull/8788)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Improve `OrganizationProfile` UI: ([#8898](https://github.com/clerk/javascript/pull/8898)) by [@LauraBeatris](https://github.com/LauraBeatris)
+  - Hide the `Verified domains` section when there are no domains and the user lacks permission to add them
+  - Rename the `Organization profile` section to `Profile` for consistency with `UserProfile`
+  - Align the enterprise accounts section with the account data
+
+### Patch Changes
+
+- Update the `preact` version bundled inside the lazily-loaded Coinbase Wallet web3 chunk to 10.27.3, clearing a dependency security advisory. Only the Coinbase web3 wallet code path is affected. ([#8856](https://github.com/clerk/javascript/pull/8856)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`d5968d0`](https://github.com/clerk/javascript/commit/d5968d026d6b2a1b399b6967fd8727613a5bc3cd), [`ffbc650`](https://github.com/clerk/javascript/commit/ffbc650ebbcee48171c95aa5d2b497273b0276b0)]:
+  - @clerk/shared@4.19.0
+
+## 6.17.0
+
+### Minor Changes
+
+- Add internal OAuth transport support for native desktop SDK wrappers to run Clerk's prebuilt OAuth flows through a system browser. ([#8831](https://github.com/clerk/javascript/pull/8831)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Rename the `<OrganizationProfile />` SSO page to "Security". The navbar entry is now labeled "Security" with a shield icon, its route path changed from `organization-self-serve-sso` to `organization-security`, and a new `organizationProfile.navbar.security` localization key replaces `organizationProfile.navbar.selfServeSSO`. ([#8796](https://github.com/clerk/javascript/pull/8796)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Upgrade build tooling to Rspack 2 (No user-facing API changes). ([#8382](https://github.com/clerk/javascript/pull/8382)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`f4167ec`](https://github.com/clerk/javascript/commit/f4167eccb19e0de98340d48e221b950e3dad189e), [`17e4164`](https://github.com/clerk/javascript/commit/17e416471a5409e5a4c02f4f94f687c428c071de), [`ed2cf75`](https://github.com/clerk/javascript/commit/ed2cf75ce713703d8e2c258fc3ca0cf43dc964dc), [`67c04a4`](https://github.com/clerk/javascript/commit/67c04a43db64b70819d68333f99e3483523d1d47), [`51c8fdc`](https://github.com/clerk/javascript/commit/51c8fdcb7160457e44cfe7cc86524f7d728a030a), [`c2ba971`](https://github.com/clerk/javascript/commit/c2ba971aad55df570507b7b117786ab048415ad3), [`8744728`](https://github.com/clerk/javascript/commit/8744728e6610b2229f56dd3b31975c3f57395f02), [`d9b5c7d`](https://github.com/clerk/javascript/commit/d9b5c7d79fe641d08f45f0df7d4f5146b6b2c3ab)]:
+  - @clerk/shared@4.18.0
+
+## 6.16.1
+
+### Patch Changes
+
+- Migrate the build pipeline to tsdown and TypeScript 6.0. This is an internal tooling change with no intended changes to the public API or runtime behavior. ([#8177](https://github.com/clerk/javascript/pull/8177)) by [@dstaley](https://github.com/dstaley)
+
+- Deprecate passing `unsafeMetadata` to `user.update()`. ([#8587](https://github.com/clerk/javascript/pull/8587)) by [@brunol95](https://github.com/brunol95)
+
+  Use `user.updateMetadata()` when you want to partially update unsafe metadata with deep-merge semantics:
+
+  ```ts
+  await user.updateMetadata({
+    unsafeMetadata: { onboardingComplete: true },
+  });
+  ```
+
+  `user.update({ unsafeMetadata })` continues to work for now and preserves its existing full-replacement behavior:
+
+  ```ts
+  await user.update({
+    unsafeMetadata: { theme: 'dark' },
+  });
+  ```
+
+  New code should prefer `user.updateMetadata({ unsafeMetadata })` for metadata-only updates.
+
+- Updated dependencies [[`f046c49`](https://github.com/clerk/javascript/commit/f046c491d99c880b61e335645ad3ced4fee602d8), [`b5fa9f6`](https://github.com/clerk/javascript/commit/b5fa9f6ab2f01f1bbf6de52e16b4c9d9516f966c), [`3d5b2fe`](https://github.com/clerk/javascript/commit/3d5b2fe959171770bb7e8493d8a204317b7101a7)]:
+  - @clerk/shared@4.17.1
+
+## 6.16.0
+
+### Minor Changes
+
+- Add support for Clerk Billing plans with per-seat costs. ([#8629](https://github.com/clerk/javascript/pull/8629)) by [@dstaley](https://github.com/dstaley)
+  - New invite-to-checkout flow when inviting members while on a plan that uses per-seat costs.
+  - New localization values to support UI additions.
+  - Support for the `orgId` and `minSeats` parameters to `getPlans()`.
+  - Support for the `seatsQuantity` and `priceId` parameters to checkout creation.
+  - New `totals` field on payments.
+  - New `availablePrices` field on plans.
+  - New `nextPayment` field on subscription items.
+  - New `discounts` field on checkouts.
+  - Additional fields on `nextPayment` for more granularity.
+
+### Patch Changes
+
+- Updated dependencies [[`a5c7bc7`](https://github.com/clerk/javascript/commit/a5c7bc74dabfa78d4748516ccc252f68cae82264)]:
+  - @clerk/shared@4.17.0
+
+## 6.15.0
+
+### Minor Changes
+
+- Remove the `<ConfigureSSO />` component from the public API in favor of usage within `OrganizationProfile` ([#8779](https://github.com/clerk/javascript/pull/8779)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  Removing these exports has no breaking changes impact on production applications, as <ConfigureSSO /> was never released as a GA component
+
+### Patch Changes
+
+- Internal refactor for self-serve SSO wizard navigation to leverage a guard-based state machine. ([#8715](https://github.com/clerk/javascript/pull/8715)) by [@iagodahlem](https://github.com/iagodahlem)
+
+  It makes the step navigation more predictable: the step you land on (including after a reload) and which steps you can move to are derived from the connection's state, the connection reset flow lands you on the right step.
+
+- Remove deprecated `createEnterpriseConnection`, `updateEnterpriseConnection`, `deleteEnterpriseConnection`, `createEnterpriseConnectionTestRun`, and `getEnterpriseConnectionTestRuns` methods from the `User` resource in favor of `Organization` scoped ones. Also removes the unused internal `__internal_useEnterpriseConnectionTestRuns` hook. ([#8747](https://github.com/clerk/javascript/pull/8747)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  `ConfigureSSO` was previously the only consumer but since it hasn't been released GA yet, these changes won't break existing production clients
+
+- Correctly display OAuth consent redirect domains for known multi-label public suffixes. ([#8700](https://github.com/clerk/javascript/pull/8700)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix the future SignUp API dropping documented params in some flows: ([#8762](https://github.com/clerk/javascript/pull/8762)) by [@dmoerner](https://github.com/dmoerner)
+  - `signUp.password()` and `signUp.sso()` now default the sign-up's `locale` to the browser locale when they create a new sign-up, matching the documented behavior and `signUp.create()`. An explicitly passed `locale` still takes precedence, and updates to an existing sign-up remain unaffected.
+  - `signUp.web3()` now forwards the `firstName`, `lastName`, and `locale` params to the created sign-up instead of silently ignoring them.
+
+- Add and improve JSDoc comments across public types and methods to support generated reference documentation for the `/objects` docs section. Exports a few previously-internal types (`OnEventListener`, `OffEventListener`, `ClerkOptionsNavigation`) so they can be referenced from the generated docs. ([#8276](https://github.com/clerk/javascript/pull/8276)) by [@alexisintech](https://github.com/alexisintech)
+
+- Updated dependencies [[`2d6670c`](https://github.com/clerk/javascript/commit/2d6670c6c05c59901709283921b5d65c43f3a676), [`af706e3`](https://github.com/clerk/javascript/commit/af706e35420a16c028fd34b70dd50d663d42e006), [`032632c`](https://github.com/clerk/javascript/commit/032632c6982297e53e28559b59b4a435de4c9adc), [`0fece6f`](https://github.com/clerk/javascript/commit/0fece6ff5d2b1babb59a285dbce9d46723e33d73), [`b295af3`](https://github.com/clerk/javascript/commit/b295af3d5bb12e09a502cae4a935d2e7f5d35d5c), [`8e1bd48`](https://github.com/clerk/javascript/commit/8e1bd48a91dc07751493f41416d2a68b89e114cc)]:
+  - @clerk/shared@4.16.0
+
 ## 6.14.0
 
 ### Minor Changes

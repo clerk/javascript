@@ -51,10 +51,15 @@ export const msMY: LocalizationResource = {
       formButtonPrimary__revoke: 'Batalkan kunci',
       formHint: 'Adakah anda pasti mahu memadamkan kunci Rahsia ini?',
       formTitle: 'Batalkan kunci rahsia "{{apiKeyName}}"?',
+      inputLabel: undefined,
     },
+    tableHeader__actions: undefined,
+    tableHeader__lastUsed: undefined,
+    tableHeader__name: undefined,
   },
   backButton: 'Kembali',
   badge__activePlan: 'Aktif',
+  badge__banned: undefined,
   badge__canceledEndsAt: "Dibatalkan • Tamat {{ date | shortDate('ms-MY') }}",
   badge__currentPlan: 'Pelan Semasa',
   badge__default: 'Lalai',
@@ -75,11 +80,14 @@ export const msMY: LocalizationResource = {
   badge__userDevice: 'Peranti pengguna',
   badge__you: 'Anda',
   billing: {
+    accountCredit: undefined,
     addPaymentMethod__label: 'Tambah kaedah pembayaran',
     alwaysFree: 'Sentiasa percuma',
     annually: 'Tahunan',
     availableFeatures: 'Ciri yang tersedia',
     billedAnnually: 'Dibilkan secara tahunan',
+    billedAnnuallyOnly: undefined,
+    billedMonthly: undefined,
     billedMonthlyOnly: 'Hanya dibilkan secara bulanan',
     cancelFreeTrial: 'Batalkan percubaan percuma',
     cancelFreeTrialAccessUntil:
@@ -120,20 +128,25 @@ export const msMY: LocalizationResource = {
       title__subscriptionSuccessful: 'Berjaya!',
       title__trialSuccess: 'Percubaan berjaya dimulakan!',
       totalDueAfterTrial: 'Jumlah Perlu Dibayar selepas percubaan tamat dalam {{days}} hari',
+      totalDuePerPeriod: undefined,
     },
     credit: 'Kredit',
     creditRemainder: 'Kredit untuk baki langganan semasa anda.',
     defaultFreePlanActive: 'Anda kini menggunakan pelan Percuma',
     free: 'Percuma',
     getStarted: 'Mulakan',
+    highlightedPlanBadge: 'Popular',
     keepFreeTrial: 'Kekalkan percubaan percuma',
     keepSubscription: 'Kekalkan langganan',
     manage: 'Urus',
     manageSubscription: 'Urus keahlian',
     month: 'Bulan',
+    monthAbbreviation: undefined,
+    monthPerUnit: undefined,
     monthly: 'Bulanan',
     pastDue: 'Tertunggak',
     pay: 'Bayar {{amount}}',
+    payerCreditRemainder: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: 'Pembayaran tahunan',
@@ -149,12 +162,32 @@ export const msMY: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Kaedah Pembayaran',
-    highlightedPlanBadge: 'Popular',
     pricingTable: {
       billingCycle: 'Kitaran pengebilan',
       included: 'Disertakan',
+      seatCost: {
+        additionalSeats: undefined,
+        freeUpToSeats: undefined,
+        includedSeats: undefined,
+        perSeat: undefined,
+        tooltip: {
+          additionalSeatsEach: undefined,
+          firstSeatsIncludedInPlan: undefined,
+          freeForUpToSeats: undefined,
+        },
+        unlimitedSeats: undefined,
+        upToSeats: undefined,
+      },
     },
+    proratedDiscount: undefined,
+    prorationCredit: undefined,
     reSubscribe: 'Langgan semula',
+    seatBreakdownIncludedPlural: undefined,
+    seatBreakdownIncludedSingular: undefined,
+    seatBreakdownPlural: undefined,
+    seatBreakdownSingular: undefined,
+    seats: undefined,
+    seatsWithLimit: undefined,
     seeAllFeatures: 'Lihat semua ciri',
     startFreeTrial: 'Mulakan percubaan percuma',
     startFreeTrial__days: 'Mulakan percubaan percuma {{days}} hari',
@@ -175,18 +208,453 @@ export const msMY: LocalizationResource = {
       trialStartedOn: 'Percubaan bermula pada',
     },
     subtotal: 'Jumlah kecil',
+    subtotalRenewal: undefined,
     switchPlan: 'Tukar ke pelan ini',
     switchToAnnual: 'Tukar kepada tahunan',
     switchToAnnualWithAnnualPrice: 'Tukar kepada tahunan {{currency}}{{price}} / tahun',
     switchToMonthly: 'Tukar kepada bulanan',
     switchToMonthlyWithPrice: 'Tukar kepada bulanan {{currency}}{{price}} / bulan',
     totalDue: 'Jumlah perlu dibayar',
+    totalDuePerPeriod: undefined,
     totalDueToday: 'Jumlah Perlu Dibayar Hari Ini',
     viewFeatures: 'Lihat ciri',
     viewPayment: 'Lihat pembayaran',
     year: 'Tahun',
+    yearAbbreviation: undefined,
+    yearPerUnit: undefined,
   },
   configureSSO: {
+    configureStep: {
+      attributeMappingTable: {
+        badges: {
+          optional: undefined,
+          required: undefined,
+        },
+      },
+      samlCustom: {
+        assignUsersStep: {
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          title: undefined,
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attributeName: undefined,
+              userProfile: undefined,
+            },
+            rows: {
+              email: {
+                attributeName: undefined,
+                userProfile: undefined,
+              },
+              firstName: {
+                attributeName: undefined,
+                userProfile: undefined,
+              },
+              lastName: {
+                attributeName: undefined,
+                userProfile: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        createAppStep: {
+          createAppInstructions: {
+            paragraph: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+            title: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+      },
+      samlGoogle: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              appAttribute: undefined,
+              googleAttribute: undefined,
+            },
+            rows: {
+              email: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+              firstName: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+              lastName: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+        },
+        configureUserAccess: {
+          assignUsersInstructions: {
+            paragraph1: undefined,
+            paragraph2: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        createAppStep: {
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataFile: {
+            description: undefined,
+            fileUploaded: undefined,
+            label: undefined,
+            removeFile: undefined,
+            replaceFile: undefined,
+            uploadFile: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataFile: undefined,
+            title: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        serviceProviderStep: {
+          headerSubtitle: undefined,
+          nameIdInstructions: {
+            step1: undefined,
+            step2: undefined,
+          },
+          paragraph: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+          title: undefined,
+        },
+      },
+      samlMicrosoft: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attribute: undefined,
+              claimName: undefined,
+              value: undefined,
+            },
+            rows: {
+              email: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+              firstName: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+              lastName: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          title: undefined,
+        },
+        createAppStep: {
+          assignUsersInstructions: {
+            paragraph1: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            step6: undefined,
+            title: undefined,
+          },
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: {
+              label: undefined,
+              subSteps: {
+                appName: undefined,
+                create: undefined,
+                nonGallery: undefined,
+              },
+            },
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+            title: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        serviceProviderStep: {
+          headerSubtitle: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+          step5: undefined,
+          step6: undefined,
+          title: undefined,
+        },
+      },
+      samlOkta: {
+        assignUsersStep: {
+          assignUsersInstructions: {
+            paragraph: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              expression: undefined,
+              name: undefined,
+            },
+            rows: {
+              email: {
+                expression: undefined,
+                name: undefined,
+              },
+              firstName: {
+                expression: undefined,
+                name: undefined,
+              },
+              lastName: {
+                expression: undefined,
+                name: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+        },
+        createAppStep: {
+          completeSamlIntegrationInstructions: {
+            step1: undefined,
+            step2: undefined,
+            title: undefined,
+          },
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+          serviceProviderInstructions: {
+            paragraph1: undefined,
+            paragraph2: undefined,
+            serviceProviderFields: {
+              acsUrl: {
+                label: undefined,
+              },
+              spEntityId: {
+                label: undefined,
+              },
+            },
+            title: undefined,
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+            title: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+      },
+    },
+    confirmation: {
+      configurationSection: {
+        configureAgainLink: undefined,
+        issuerLabel: undefined,
+        ssoUrlLabel: undefined,
+        title: undefined,
+      },
+      domainSection: {
+        title: undefined,
+      },
+      enableSection: {
+        title: undefined,
+      },
+      inactiveBanner: {
+        title: undefined,
+      },
+      resetSection: {
+        confirmationFieldLabel: undefined,
+        submitButton: undefined,
+        title: undefined,
+        warning: undefined,
+      },
+      statusSection: {
+        activeBadge: undefined,
+        inactiveBadge: undefined,
+        title: undefined,
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'Hubungi pentadbir organisasi anda untuk menaik taraf kebenaran anda.',
       title: 'Anda tidak mempunyai kebenaran untuk mengurus Log Masuk Tunggal (SSO)',
@@ -194,39 +662,121 @@ export const msMY: LocalizationResource = {
     navbar: {
       title: 'Konfigurasi Log Masuk Tunggal (SSO)',
     },
-    selectProviderStep: {
-      title: 'Pilih pembekal',
-      subtitle: 'Pilih pembekal yang anda akan sediakan SSO untuknya.',
-      saml: {
-        groupLabel: 'SAML',
-        okta: 'Okta Workforce',
-        customSaml: 'Pembekal SAML Tersuai',
+    organizationDomainsStep: {
+      domainCard: {
+        badge__unverified: 'Belum disahkan',
+        badge__verified: 'Disahkan',
+        removeButtonTooltip__lastVerifiedDomain: undefined,
+        removeButtonTooltip__lastVerifiedDomainActive: undefined,
+        txtRecord: {
+          hostLabel: 'Hos / Nama',
+          instructions:
+            'Tambahkan rekod TXT ini kepada penyedia DNS anda. Kami akan mengesahkan secara automatik sebaik sahaja rekod aktif.',
+          typeLabel: 'Jenis',
+          valueLabel: 'Nilai',
+        },
+        verifiedAtLabel: "Disahkan pada {{ date | shortDate('ms-MY') }}",
       },
+      domainSuggestion: {
+        formButtonPrimary__add: 'Tambah {{domain}}',
+        messageLabel: 'E-mel anda menggunakan {{domain}}. Adakah anda mahu menambahkannya?',
+      },
+      formButtonPrimary__add: 'Tambah',
+      formFieldInputPlaceholder__domain: 'Taip domain anda di sini dan klik tambah untuk bermula',
+      formFieldLabel__domain: 'Domain',
+      removeDomainDialog: {
+        cancelButton: undefined,
+        removeButton: undefined,
+        subtitle__active: undefined,
+        subtitle__inactive: undefined,
+        title: undefined,
+      },
+      subtitle: 'Tambah dan sahkan pemilikan domain yang digunakan organisasi anda untuk log masuk.',
+      title: 'Tambah domain SSO',
+    },
+    resetConnectionDialog: {
+      cancelButton: undefined,
+      confirmationFieldLabel: undefined,
+      confirmationFieldPlaceholder: undefined,
+      resetButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    selectProviderStep: {
+      saml: {
+        customSaml: 'Pembekal SAML Tersuai',
+        google: undefined,
+        groupLabel: 'SAML',
+        microsoft: undefined,
+        okta: 'Okta Workforce',
+      },
+      subtitle: 'Pilih pembekal yang anda akan sediakan SSO untuknya.',
+      title: 'Pilih pembekal',
       warning: 'Setelah pembekal dipilih anda tidak boleh menukar lagi sehingga konfigurasi selesai',
     },
-    verifyEmailDomainStep: {
-      title: 'Sahkan alamat e-mel',
-      subtitle: 'Sahkan alamat e-mel yang anda ingin dayakan sambungan enterprise.',
-      addEmailAddress: {
-        formTitle: 'Kami memerlukan e-mel anda',
-        formSubtitle: 'Untuk memulakan kami memerlukan alamat e-mel anda',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'Alamat e-mel',
-      },
-      emailCode: {
-        formTitle: 'Sahkan alamat e-mel anda',
-        formSubtitle: 'Masukkan kod pengesahan yang dihantar ke {{identifier}}',
-        resendButton: 'Tidak menerima kod? Hantar semula',
-        verified: {
-          title: 'Kami menerima e-mel anda',
-          subtitle: 'Anda telah mengesahkan alamat e-mel anda dengan e-mel berikut',
-          inputLabel: 'Alamat e-mel disahkan',
+    testConfigurationStep: {
+      error__noSuccessfulTestRun: undefined,
+      subtitle: undefined,
+      testResults: {
+        actionLabel__refresh: undefined,
+        empty: {
+          subtitle: undefined,
+          title: undefined,
         },
+        polling: undefined,
+        status__failed: undefined,
+        status__pending: undefined,
+        status__success: undefined,
+        title: undefined,
       },
-      domainTaken: {
-        title: 'Domain ini ({{domain}}) sudah mempunyai sambungan SSO',
-        subtitle: 'Hubungi pentadbir aplikasi untuk mendapatkan akses melalui sambungan sedia ada.',
+      testRunDetails: {
+        howToFix: {
+          actionLabel__viewDocumentation: undefined,
+          oauth_access_denied: {
+            description: undefined,
+          },
+          oauth_fetch_user_error: {
+            intro: undefined,
+            step1: undefined,
+            step2: undefined,
+          },
+          oauth_token_exchange_error: {
+            description: undefined,
+          },
+          saml_email_address_domain_mismatch: {
+            description: undefined,
+          },
+          saml_response_relaystate_missing: {
+            description: undefined,
+          },
+          saml_user_attribute_missing: {
+            intro: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+          },
+          sectionTitle: undefined,
+        },
+        parsedUserInfo: {
+          email: undefined,
+          firstName: undefined,
+          sectionTitle: undefined,
+        },
+        runDetails: {
+          actionLabel__copied: undefined,
+          actionLabel__copy: undefined,
+          errorCode: undefined,
+          fullMessage: undefined,
+          sectionTitle: undefined,
+          status: undefined,
+          timestamp: undefined,
+        },
+        title: undefined,
       },
+      testUrl: {
+        actionLabel__open: undefined,
+      },
+      title: undefined,
     },
   },
   createOrganization: {
@@ -274,6 +824,7 @@ export const msMY: LocalizationResource = {
   formFieldInputPlaceholder__organizationSlug: 'organisasi-saya',
   formFieldInputPlaceholder__password: 'Masukkan kata laluan anda',
   formFieldInputPlaceholder__phoneNumber: 'Masukkan nombor telefon anda',
+  formFieldInputPlaceholder__signUpPassword: undefined,
   formFieldInputPlaceholder__username: 'Masukkan nama pengguna anda',
   formFieldInput__emailAddress_format: 'Contoh format: name@example.com',
   formFieldLabel__apiKey: 'Kunci API',
@@ -304,6 +855,9 @@ export const msMY: LocalizationResource = {
   formFieldLabel__role: 'Peranan',
   formFieldLabel__signOutOfOtherSessions: 'Daftar keluar dari semua peranti lain',
   formFieldLabel__username: 'Nama pengguna',
+  identityPreviewEditButton__emailAddress: undefined,
+  identityPreviewEditButton__identifier: undefined,
+  identityPreviewEditButton__phoneNumber: undefined,
   impersonationFab: {
     action__signOut: 'Daftar keluar',
     title: 'Didaftarkan sebagai {{identifier}}',
@@ -314,6 +868,22 @@ export const msMY: LocalizationResource = {
   membershipRole__admin: 'Pentadbir',
   membershipRole__basicMember: 'Ahli',
   membershipRole__guestMember: 'Tetamu',
+  oauthConsent: {
+    action__allow: undefined,
+    action__deny: undefined,
+    offlineAccessNotice: undefined,
+    redirectNotice: undefined,
+    redirectUriModal: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    scopeList: {
+      title: undefined,
+    },
+    subtitle: undefined,
+    viewFullUrl: undefined,
+    warning: undefined,
+  },
   organizationList: {
     action__createOrganization: 'Cipta organisasi',
     action__invitationAccept: 'Sertai',
@@ -331,6 +901,7 @@ export const msMY: LocalizationResource = {
     },
     badge__automaticInvitation: 'Jemputan automatik',
     badge__automaticSuggestion: 'Cadangan automatik',
+    badge__enterpriseSso: undefined,
     badge__manualInvitation: 'Tiada pendaftaran automatik',
     badge__unverified: 'Belum disahkan',
     billingPage: {
@@ -368,6 +939,7 @@ export const msMY: LocalizationResource = {
       statementsSection: {
         empty: 'Tiada penyata untuk dipaparkan',
         itemCaption__paidForPlan: 'Dibayar untuk pelan {{plan}} {{period}}',
+        itemCaption__payerCredit: undefined,
         itemCaption__proratedCredit: 'Kredit prorata untuk penggunaan separa langganan sebelumnya',
         itemCaption__subscribedAndPaidForPlan: 'Dilanggan dan dibayar untuk pelan {{plan}} {{period}}',
         notFound: 'Penyata tidak ditemui',
@@ -380,6 +952,11 @@ export const msMY: LocalizationResource = {
         actionLabel__manageSubscription: 'Urus',
         actionLabel__newSubscription: 'Langgan satu pelan',
         actionLabel__switchPlan: 'Tukar pelan',
+        includedSeatsUsage: undefined,
+        overview: undefined,
+        paidSeatsUsage: undefined,
+        seatLimit: undefined,
+        seatLimitAndIncludedSeats: undefined,
         tableHeader__edit: 'Sunting',
         tableHeader__plan: 'Pelan',
         tableHeader__startDate: 'Tarikh mula',
@@ -402,6 +979,7 @@ export const msMY: LocalizationResource = {
       detailsTitle__inviteFailed:
         'Jemputan tidak dapat dihantar. Terdapat jemputan tertunggak untuk alamat e-mel berikut: {{email_addresses}}.',
       formButtonPrimary__continue: 'Hantar jemputan',
+      formButtonPrimary__purchaseSeats: undefined,
       selectDropdown__role: 'Pilih peranan',
       subtitle: 'Masukkan atau tampal satu atau lebih alamat e-mel, dipisahkan oleh ruang atau koma.',
       successMessage: 'Jemputan berjaya dihantar',
@@ -462,11 +1040,13 @@ export const msMY: LocalizationResource = {
       description: 'Urus organisasi anda.',
       general: 'Am',
       members: 'Ahli',
+      security: undefined,
       title: 'Organisasi',
     },
     plansPage: {
       alerts: {
         noPermissionsToManageBilling: 'Anda tidak mempunyai kebenaran untuk mengurus pengebilan bagi organisasi ini.',
+        planMembershipLimitExceeded: undefined,
       },
       title: 'Pelan',
     },
@@ -507,9 +1087,33 @@ export const msMY: LocalizationResource = {
       successMessage: '{{domain}} telah dikeluarkan.',
       title: 'Keluarkan domain',
     },
+    securityPage: {
+      removeDialog: {
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      ssoSection: {
+        badge__active: undefined,
+        badge__inProgress: undefined,
+        badge__inactive: undefined,
+        badge__unconfigured: undefined,
+        descriptionLine1: undefined,
+        domainLabel: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__continueConfiguration: undefined,
+        primaryButton__startConfiguration: undefined,
+        title: undefined,
+      },
+      title: undefined,
+    },
     start: {
       headerTitle__general: 'Am',
       headerTitle__members: 'Ahli',
+      membershipSeatUsageLabel: undefined,
       profileSection: {
         primaryButton: 'Kemas kini profil',
         title: 'Profil Organisasi',
@@ -1032,6 +1636,8 @@ export const msMY: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} sudah menjadi ahli organisasi.',
+    api_key_name_already_exists: undefined,
+    api_key_usage_exceeded: undefined,
     avatar_file_size_exceeded: 'Saiz fail melebihi had maksimum 10MB. Sila pilih fail yang lebih kecil.',
     avatar_file_type_invalid: 'Jenis fail tidak disokong. Sila muat naik imej JPG, PNG, GIF atau WEBP.',
     captcha_invalid:
@@ -1080,8 +1686,11 @@ export const msMY: LocalizationResource = {
     form_username_needs_non_number_char:
       'Nama pengguna anda mesti mengandungi sekurang-kurangnya satu aksara bukan nombor.',
     identification_deletion_failed: 'Anda tidak boleh memadamkan pengenalan terakhir anda.',
+    insufficient_seats_change_plan: undefined,
+    insufficient_seats_contact_support: undefined,
     not_allowed_access:
       'Anda tidak mempunyai kebenaran untuk mengakses halaman ini. Sila hubungi sokongan jika anda percaya ini adalah kesilapan.',
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'Ini adalah domain pembekal e-mel yang disekat. Sila gunakan yang berbeza.',
     organization_domain_common: 'Ini adalah domain pembekal e-mel biasa. Sila gunakan yang berbeza.',
     organization_domain_exists_for_enterprise_connection: 'Domain ini sudah digunakan untuk SSO organisasi anda',
@@ -1159,6 +1768,9 @@ export const msMY: LocalizationResource = {
     action__openUserMenu: 'Buka menu pengguna',
     action__signOut: 'Daftar keluar',
     action__signOutAll: 'Daftar keluar dari semua akaun',
+    label__userButtonPopover: 'Panel akaun',
+    label__accountActions: 'Tindakan akaun',
+    label__activeSessions: 'Sesi aktif',
   },
   userProfile: {
     apiKeysPage: {
@@ -1215,6 +1827,7 @@ export const msMY: LocalizationResource = {
       statementsSection: {
         empty: 'Tiada penyata untuk dipaparkan',
         itemCaption__paidForPlan: 'Dibayar untuk pelan {{plan}} {{period}}',
+        itemCaption__payerCredit: undefined,
         itemCaption__proratedCredit: 'Kredit prorata untuk penggunaan separa langganan sebelumnya',
         itemCaption__subscribedAndPaidForPlan: 'Dilanggan dan dibayar untuk pelan {{plan}} {{period}}',
         notFound: 'Penyata tidak ditemui',
@@ -1227,6 +1840,7 @@ export const msMY: LocalizationResource = {
         actionLabel__manageSubscription: 'Urus',
         actionLabel__newSubscription: 'Langgan satu pelan',
         actionLabel__switchPlan: 'Tukar pelan',
+        overview: undefined,
         tableHeader__edit: 'Sunting',
         tableHeader__plan: 'Pelan',
         tableHeader__startDate: 'Tarikh mula',

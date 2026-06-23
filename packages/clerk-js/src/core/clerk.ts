@@ -98,6 +98,7 @@ import type {
   LoadedClerk,
   NavigateOptions,
   OAuthApplicationNamespace,
+  OAuthTransport,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
@@ -269,6 +270,7 @@ export class Clerk implements ClerkInterface {
   #listeners: Array<(emission: Resources) => void> = [];
   #navigationListeners: Array<() => void> = [];
   #options: ClerkOptions = {};
+  #oauthTransport: OAuthTransport | null = null;
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
   #publicEventBus = createClerkEventBus();
@@ -293,6 +295,14 @@ export class Clerk implements ClerkInterface {
           client: this.#queryClient,
         }
       : undefined;
+  }
+
+  get __internal_hasOAuthTransport(): boolean {
+    return this.#oauthTransport !== null;
+  }
+
+  get __internal_oauthTransport(): OAuthTransport | null {
+    return this.#oauthTransport;
   }
 
   public __internal_getCachedResources:
@@ -325,6 +335,14 @@ export class Clerk implements ClerkInterface {
 
   get version(): string {
     return Clerk.version;
+  }
+
+  get uiVersion(): string | undefined {
+    // `@clerk/ui` publishes its constructor (which carries its package version) on this global when hot-loaded
+    // from the CDN; bundled (no-RHC) builds pass the constructor directly via `options.ui.ClerkUI` instead.
+    const globalCtor = typeof window !== 'undefined' ? window.__internal_ClerkUICtor : undefined;
+    const bundledCtor = this.#options.ui?.ClerkUI;
+    return globalCtor?.version ?? (bundledCtor instanceof Promise ? undefined : bundledCtor?.version);
   }
 
   set sdkMetadata(metadata: SDKMetadata) {
@@ -529,6 +547,7 @@ export class Clerk implements ClerkInterface {
     }
 
     this.#options = this.#initOptions(options);
+    this.#oauthTransport = this.#options.__internal_oauthTransport ?? null;
 
     // Initialize ClerkUI if it was provided
     if (this.#options.ui?.ClerkUI) {
@@ -1460,8 +1479,9 @@ export class Clerk implements ClerkInterface {
    *
    * @param targetNode Target to mount the ConfigureSSO component.
    * @param props Configuration parameters.
+   * @hidden
    */
-  public mountConfigureSSO = (node: HTMLDivElement, props?: ConfigureSSOProps) => {
+  public __internal_mountConfigureSSO = (node: HTMLDivElement, props?: ConfigureSSOProps) => {
     const { isEnabled: isOrganizationsEnabled } = this.__internal_attemptToEnableEnvironmentSetting({
       for: 'organizations',
       caller: 'ConfigureSSO',
@@ -1525,23 +1545,10 @@ export class Clerk implements ClerkInterface {
    * If there is no component mounted at the target node, results in a noop.
    *
    * @param targetNode Target node to unmount the ConfigureSSO component from.
+   * @hidden
    */
-  public unmountConfigureSSO = (node: HTMLDivElement) => {
+  public __internal_unmountConfigureSSO = (node: HTMLDivElement) => {
     void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
-  };
-
-  /**
-   * @deprecated Use `mountConfigureSSO` instead.
-   */
-  public __experimental_mountConfigureSSO = (node: HTMLDivElement, props?: ConfigureSSOProps) => {
-    return this.mountConfigureSSO(node, props);
-  };
-
-  /**
-   * @deprecated Use `unmountConfigureSSO` instead.
-   */
-  public __experimental_unmountConfigureSSO = (node: HTMLDivElement) => {
-    return this.unmountConfigureSSO(node);
   };
 
   public mountTaskChooseOrganization = (node: HTMLDivElement, props?: TaskChooseOrganizationProps) => {
@@ -2297,7 +2304,7 @@ export class Clerk implements ClerkInterface {
     return null;
   };
 
-  public handleGoogleOneTapCallback = async (
+  public __internal_handleResourceCallback = async (
     signInOrUp: SignInResource | SignUpResource,
     params: HandleOAuthCallbackParams,
     customNavigate?: (to: string) => Promise<unknown>,
@@ -2320,6 +2327,14 @@ export class Clerk implements ClerkInterface {
       signIn,
       navigate,
     });
+  };
+
+  public handleGoogleOneTapCallback = async (
+    signInOrUp: SignInResource | SignUpResource,
+    params: HandleOAuthCallbackParams,
+    customNavigate?: (to: string) => Promise<unknown>,
+  ): Promise<unknown> => {
+    return this.__internal_handleResourceCallback(signInOrUp, params, customNavigate);
   };
 
   private _handleRedirectCallback = async (
@@ -2433,6 +2448,7 @@ export class Clerk implements ClerkInterface {
 
     const signInUrl = params.signInUrl || displayConfig.signInUrl;
     const signUpUrl = params.signUpUrl || displayConfig.signUpUrl;
+    const internalNavigateOnSetActive = params.__internal_navigateOnSetActive;
 
     const setActiveNavigate = async ({
       session,
@@ -2443,6 +2459,15 @@ export class Clerk implements ClerkInterface {
       baseUrl: string;
       redirectUrl: string;
     }) => {
+      if (internalNavigateOnSetActive) {
+        await internalNavigateOnSetActive({
+          session,
+          redirectUrl,
+          decorateUrl: url => this.buildUrlWithAuth(url),
+        });
+        return;
+      }
+
       if (!session.currentTask) {
         await this.navigate(redirectUrl);
         return;
@@ -2458,7 +2483,11 @@ export class Clerk implements ClerkInterface {
       return this.setActive({
         session: si.sessionId,
         navigate: async ({ session }) => {
-          await setActiveNavigate({ session, baseUrl: signInUrl, redirectUrl: redirectUrls.getAfterSignInUrl() });
+          await setActiveNavigate({
+            session,
+            baseUrl: signInUrl,
+            redirectUrl: redirectUrls.getAfterSignInUrl(),
+          });
         },
       });
     }
@@ -2473,7 +2502,11 @@ export class Clerk implements ClerkInterface {
           return this.setActive({
             session: res.createdSessionId,
             navigate: async ({ session }) => {
-              await setActiveNavigate({ session, baseUrl: signUpUrl, redirectUrl: redirectUrls.getAfterSignInUrl() });
+              await setActiveNavigate({
+                session,
+                baseUrl: signUpUrl,
+                redirectUrl: redirectUrls.getAfterSignInUrl(),
+              });
             },
           });
         case 'needs_first_factor':
@@ -2524,7 +2557,11 @@ export class Clerk implements ClerkInterface {
           return this.setActive({
             session: res.createdSessionId,
             navigate: async ({ session }) => {
-              await setActiveNavigate({ session, baseUrl: signUpUrl, redirectUrl: redirectUrls.getAfterSignUpUrl() });
+              await setActiveNavigate({
+                session,
+                baseUrl: signUpUrl,
+                redirectUrl: redirectUrls.getAfterSignUpUrl(),
+              });
             },
           });
         case 'missing_requirements':
@@ -2538,7 +2575,11 @@ export class Clerk implements ClerkInterface {
       return this.setActive({
         session: su.sessionId,
         navigate: async ({ session }) => {
-          await setActiveNavigate({ session, baseUrl: signUpUrl, redirectUrl: redirectUrls.getAfterSignUpUrl() });
+          await setActiveNavigate({
+            session,
+            baseUrl: signUpUrl,
+            redirectUrl: redirectUrls.getAfterSignUpUrl(),
+          });
         },
       });
     }

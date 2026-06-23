@@ -10,7 +10,7 @@ import { useFormControl } from '@/ui/utils/useFormControl';
 
 import { useConfigureSSO } from '../../../ConfigureSSOContext';
 import { Step } from '../../../elements/Step';
-import { useWizard, Wizard } from '../../../elements/Wizard';
+import { useWizard, Wizard, type WizardStepConfig } from '../../../elements/Wizard';
 import { InnerStepCounter } from '../../../elements/Wizard/InnerStepCounter';
 import {
   applySamlSubmitError,
@@ -23,61 +23,38 @@ import {
   type IdpConfigurationMode,
 } from './shared/IdentityProviderConfigurationModes';
 
+const GOOGLE_STEPS: WizardStepConfig[] = [
+  { id: 'create-app' },
+  { id: 'identity-provider-metadata' },
+  { id: 'service-provider' },
+  { id: 'attribute-mapping' },
+  { id: 'configure-user-access' },
+];
+
 export const SamlGoogleConfigureSteps = (): JSX.Element => {
   return (
-    <>
-      <Wizard.Step id='create-app'>
-        <Step.Header
-          title={localizationKeys('configureSSO.configureStep.samlGoogle.mainHeaderTitle')}
-          description={localizationKeys('configureSSO.configureStep.samlGoogle.createAppStep.headerSubtitle')}
-        >
-          <InnerStepCounter />
-        </Step.Header>
+    // Linear, guard-less sub-flow: mount on the first step. (Entry guards drive
+    // furthest-reachable init, which would otherwise land the last step here.)
+    <Wizard
+      steps={GOOGLE_STEPS}
+      initialStepId={GOOGLE_STEPS[0].id}
+    >
+      <Wizard.Match id='create-app'>
         <SamlGoogleCreateAppStep />
-      </Wizard.Step>
-
-      <Wizard.Step id='identity-provider-metadata'>
-        <Step.Header
-          title={localizationKeys('configureSSO.configureStep.samlGoogle.mainHeaderTitle')}
-          description={localizationKeys(
-            'configureSSO.configureStep.samlGoogle.identityProviderMetadataStep.headerSubtitle',
-          )}
-        >
-          <InnerStepCounter />
-        </Step.Header>
+      </Wizard.Match>
+      <Wizard.Match id='identity-provider-metadata'>
         <SamlGoogleIdentityProviderMetadataStep />
-      </Wizard.Step>
-
-      <Wizard.Step id='service-provider'>
-        <Step.Header
-          title={localizationKeys('configureSSO.configureStep.samlGoogle.mainHeaderTitle')}
-          description={localizationKeys('configureSSO.configureStep.samlGoogle.serviceProviderStep.headerSubtitle')}
-        >
-          <InnerStepCounter />
-        </Step.Header>
+      </Wizard.Match>
+      <Wizard.Match id='service-provider'>
         <SamlGoogleServiceProviderStep />
-      </Wizard.Step>
-
-      <Wizard.Step id='attribute-mapping'>
-        <Step.Header
-          title={localizationKeys('configureSSO.configureStep.samlGoogle.mainHeaderTitle')}
-          description={localizationKeys('configureSSO.configureStep.samlGoogle.attributeMappingStep.headerSubtitle')}
-        >
-          <InnerStepCounter />
-        </Step.Header>
+      </Wizard.Match>
+      <Wizard.Match id='attribute-mapping'>
         <SamlGoogleAttributeMappingStep />
-      </Wizard.Step>
-
-      <Wizard.Step id='configure-user-access'>
-        <Step.Header
-          title={localizationKeys('configureSSO.configureStep.samlGoogle.mainHeaderTitle')}
-          description={localizationKeys('configureSSO.configureStep.samlGoogle.configureUserAccess.headerSubtitle')}
-        >
-          <InnerStepCounter />
-        </Step.Header>
+      </Wizard.Match>
+      <Wizard.Match id='configure-user-access'>
         <SamlGoogleConfigureUserAccessStep />
-      </Wizard.Step>
-    </>
+      </Wizard.Match>
+    </Wizard>
   );
 };
 
@@ -86,13 +63,19 @@ const SamlGoogleCreateAppStep = (): JSX.Element => {
 
   return (
     <>
+      <Step.Header
+        title={localizationKeys('configureSSO.configureStep.samlGoogle.mainHeaderTitle')}
+        description={localizationKeys('configureSSO.configureStep.samlGoogle.createAppStep.headerSubtitle')}
+      >
+        <InnerStepCounter />
+      </Step.Header>
+
       <Step.Body>
         <Step.Section sx={theme => ({ gap: theme.space.$5 })}>
           <Col sx={theme => ({ gap: theme.space.$1x5 })}>
-            <Heading
-              elementDescriptor={descriptors.configureSSOInstructionsHeading}
-              as='h3'
-              textVariant='subtitle'
+            <Text
+              as='p'
+              colorScheme='secondary'
               localizationKey={localizationKeys(
                 'configureSSO.configureStep.samlGoogle.createAppStep.createAppInstructions.title',
               )}
@@ -140,14 +123,6 @@ const SamlGoogleCreateAppStep = (): JSX.Element => {
                   'configureSSO.configureStep.samlGoogle.createAppStep.createAppInstructions.step4',
                 )}
               />
-              <Text
-                elementDescriptor={descriptors.configureSSOInstructionsListItem}
-                as='li'
-                colorScheme='secondary'
-                localizationKey={localizationKeys(
-                  'configureSSO.configureStep.samlGoogle.createAppStep.createAppInstructions.step5',
-                )}
-              />
             </Col>
           </Col>
         </Step.Section>
@@ -173,7 +148,10 @@ const GOOGLE_IDP_MODES = ['metadataFile', 'manual'] as const satisfies readonly 
 const SamlGoogleIdentityProviderMetadataStep = (): JSX.Element => {
   const card = useCardState();
   const { goNext, goPrev, isFirstStep } = useWizard();
-  const { enterpriseConnection, updateEnterpriseConnection } = useConfigureSSO();
+  const {
+    enterpriseConnection,
+    enterpriseConnectionMutations: { updateConnection },
+  } = useConfigureSSO();
 
   const samlConnection = enterpriseConnection?.samlConnection;
   const hasExistingManualConfig = Boolean(
@@ -185,6 +163,13 @@ const SamlGoogleIdentityProviderMetadataStep = (): JSX.Element => {
   const [mode, setMode] = React.useState<IdpConfigurationMode>(hasExistingManualConfig ? 'manual' : 'metadataFile');
   const [metadataFile, setMetadataFile] = React.useState<File | null>(null);
   const [certFile, setCertFile] = React.useState<File | null>(null);
+  // Step-LOCAL submit state for the Continue button. `goNext` bubbles to the
+  // parent (this is the terminal nested step) and the parent DEFERS the
+  // configure→test advance until the updateConnection revalidate lands. Keeping
+  // the loading local — and NOT resetting it on success — holds the button
+  // loading straight through that deferred transition; the advance unmounts this
+  // nested step, ending the loading with no idle flash on the shared card.
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const metadataFileField = useFormControl('idpMetadata', '', {
     type: 'text',
@@ -228,7 +213,7 @@ const SamlGoogleIdentityProviderMetadataStep = (): JSX.Element => {
   const isValid =
     mode === 'metadataFile' ? hasMetadataFile : trimmedSignOnUrl.length > 0 && trimmedIssuer.length > 0 && hasCert;
 
-  const canSubmit = isValid && !card.isLoading;
+  const canSubmit = isValid && !isSubmitting;
 
   const formProps: IdentityProviderConfigurationFormProps =
     mode === 'metadataFile'
@@ -293,7 +278,7 @@ const SamlGoogleIdentityProviderMetadataStep = (): JSX.Element => {
     }
 
     card.setError(undefined);
-    card.setLoading();
+    setIsSubmitting(true);
 
     try {
       const saml = await buildSamlConfigurationPayload({
@@ -302,7 +287,10 @@ const SamlGoogleIdentityProviderMetadataStep = (): JSX.Element => {
         manual: { signOnUrl: signOnUrlField.value, issuer: issuerField.value, certFile },
       });
 
-      await updateEnterpriseConnection(enterpriseConnection.id, { saml });
+      await updateConnection(enterpriseConnection.id, { saml });
+      // `goNext` bubbles to the parent, which DEFERS the advance to `test` until
+      // the revalidate lands. The button STAYS loading and this nested step
+      // unmounts when that deferred advance resolves — do NOT reset on success.
       void goNext();
     } catch (err) {
       if (mode === 'metadataFile') {
@@ -310,26 +298,27 @@ const SamlGoogleIdentityProviderMetadataStep = (): JSX.Element => {
       } else {
         applySamlSubmitError(err, card, signOnUrlField, [issuerField, certificateField]);
       }
-    } finally {
-      card.setIdle();
+      // Re-enable ONLY on error — there is no advance to unmount the button.
+      setIsSubmitting(false);
     }
   };
 
   return (
     <>
+      <Step.Header
+        title={localizationKeys('configureSSO.configureStep.samlGoogle.mainHeaderTitle')}
+        description={localizationKeys(
+          'configureSSO.configureStep.samlGoogle.identityProviderMetadataStep.headerSubtitle',
+        )}
+      >
+        <InnerStepCounter />
+      </Step.Header>
+
       <Step.Body>
         <Step.Section
           fill
           gap={5}
         >
-          <Heading
-            elementDescriptor={descriptors.configureSSOInstructionsHeading}
-            as='h3'
-            textVariant='subtitle'
-            localizationKey={localizationKeys(
-              'configureSSO.configureStep.samlGoogle.identityProviderMetadataStep.modes.title',
-            )}
-          />
           <IdentityProviderConfigurationModes
             modes={GOOGLE_IDP_MODES}
             value={mode}
@@ -357,11 +346,11 @@ const SamlGoogleIdentityProviderMetadataStep = (): JSX.Element => {
         <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
-          isDisabled={isFirstStep || card.isLoading}
+          isDisabled={isFirstStep || isSubmitting}
         />
         <Step.Footer.Continue
           onClick={handleContinue}
-          isLoading={card.isLoading}
+          isLoading={isSubmitting}
           isDisabled={!canSubmit}
         />
       </Step.Footer>
@@ -393,6 +382,13 @@ const SamlGoogleServiceProviderStep = (): JSX.Element => {
 
   return (
     <>
+      <Step.Header
+        title={localizationKeys('configureSSO.configureStep.samlGoogle.mainHeaderTitle')}
+        description={localizationKeys('configureSSO.configureStep.samlGoogle.serviceProviderStep.headerSubtitle')}
+      >
+        <InnerStepCounter />
+      </Step.Header>
+
       <Step.Body>
         <Step.Section sx={theme => ({ gap: theme.space.$5 })}>
           <Col sx={theme => ({ gap: theme.space.$1x5 })}>
@@ -564,6 +560,13 @@ const SamlGoogleAttributeMappingStep = (): JSX.Element => {
 
   return (
     <>
+      <Step.Header
+        title={localizationKeys('configureSSO.configureStep.samlGoogle.mainHeaderTitle')}
+        description={localizationKeys('configureSSO.configureStep.samlGoogle.attributeMappingStep.headerSubtitle')}
+      >
+        <InnerStepCounter />
+      </Step.Header>
+
       <Step.Body>
         <Step.Section sx={theme => ({ gap: theme.space.$3 })}>
           <Text
@@ -620,6 +623,13 @@ const SamlGoogleConfigureUserAccessStep = (): JSX.Element => {
 
   return (
     <>
+      <Step.Header
+        title={localizationKeys('configureSSO.configureStep.samlGoogle.mainHeaderTitle')}
+        description={localizationKeys('configureSSO.configureStep.samlGoogle.configureUserAccess.headerSubtitle')}
+      >
+        <InnerStepCounter />
+      </Step.Header>
+
       <Step.Body>
         <Step.Section sx={theme => ({ gap: theme.space.$3 })}>
           <Text

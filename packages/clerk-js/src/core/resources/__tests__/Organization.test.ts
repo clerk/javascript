@@ -148,6 +148,10 @@ describe('Organization', () => {
       const conn = await organization.createEnterpriseConnection({
         provider: 'saml_okta',
         name: 'New SSO',
+        // `domains` is required by the org-scoped create endpoint; it is sent as
+        // a `domains` array on the body and serialized as repeated form fields
+        // (`domains=acme.com`) by the form serializer downstream.
+        domains: ['acme.com'],
         // Even though callers may still pass this for convenience, the SDK
         // must not include it in the body — the org URL is authoritative.
         organizationId: ORG_ID,
@@ -161,6 +165,7 @@ describe('Organization', () => {
         body: {
           provider: 'saml_okta',
           name: 'New SSO',
+          domains: ['acme.com'],
           saml_idp_entity_id: 'https://idp.example.com',
         },
       });
@@ -171,6 +176,42 @@ describe('Organization', () => {
 
       expect(conn.id).toBe('ec_new');
       expect(conn.name).toBe('New SSO');
+    });
+
+    it('omits domains from the create body when none are provided', async () => {
+      const enterpriseConnectionJSON = {
+        id: 'ec_new',
+        object: 'enterprise_connection' as const,
+        name: 'New SSO',
+        active: true,
+        provider: 'saml_okta',
+        logo_public_url: null,
+        domains: [],
+        organization_id: ORG_ID,
+        sync_user_attributes: true,
+        disable_additional_identifications: false,
+        allow_organization_account_linking: false,
+        custom_attributes: [],
+        oauth_config: null,
+        saml_connection: null,
+        created_at: 1234567890,
+        updated_at: 1234567890,
+      };
+
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: enterpriseConnectionJSON }));
+
+      const organization = createOrganization();
+
+      await organization.createEnterpriseConnection({
+        provider: 'saml_okta',
+        name: 'New SSO',
+      });
+
+      // @ts-ignore
+      const callBody = BaseResource._fetch.mock.calls[0][0].body;
+      // Backwards-compatible: an omitted (or empty) `domains` is not sent.
+      expect('domains' in callBody).toBe(false);
     });
 
     it('updates an enterprise connection without forwarding organization_id in the body', async () => {

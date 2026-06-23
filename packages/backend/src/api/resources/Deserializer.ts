@@ -28,9 +28,12 @@ import {
   OrganizationInvitation,
   OrganizationMembership,
   OrganizationSettings,
+  Permission,
   PhoneNumber,
   ProxyCheck,
   RedirectUrl,
+  Role,
+  RoleSet,
   SamlConnection,
   Session,
   SignInToken,
@@ -191,12 +194,18 @@ function jsonToObject(item: any): any {
       return OrganizationMembership.fromJSON(item);
     case ObjectType.OrganizationSettings:
       return OrganizationSettings.fromJSON(item);
+    case ObjectType.Permission:
+      return Permission.fromJSON(item);
     case ObjectType.PhoneNumber:
       return PhoneNumber.fromJSON(item);
     case ObjectType.ProxyCheck:
       return ProxyCheck.fromJSON(item);
     case ObjectType.RedirectUrl:
       return RedirectUrl.fromJSON(item);
+    case ObjectType.Role:
+      return Role.fromJSON(item);
+    case ObjectType.RoleSet:
+      return RoleSet.fromJSON(item);
     case ObjectType.EnterpriseConnection:
       return EnterpriseConnection.fromJSON(item);
     case ObjectType.SamlConnection:

@@ -111,13 +111,21 @@ jobs:
       - name: Validate staging instance settings
         run: node scripts/validate-staging-instances.mjs
         env:
+          # Report-only unless the `STAGING_VALIDATE_STRICT` repo variable is set to "true"/"1".
+          # When strict, a mismatch on critical config (see CRITICAL_PATHS in the script) fails
+          # this job, which gates the integration-tests job below so the run stops fast with a
+          # clear diagnostic instead of letting a drifted staging mirror produce opaque failures.
+          STAGING_VALIDATE_STRICT: ${{ vars.STAGING_VALIDATE_STRICT }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           INTEGRATION_STAGING_INSTANCE_KEYS: ${{ secrets.INTEGRATION_STAGING_INSTANCE_KEYS }}
 
   integration-tests:
     name: Integration Tests (${{ matrix.test-name }}, ${{ matrix.test-project }})
-    needs: [permissions-check]
-    if: ${{ always() && (needs.permissions-check.result == 'success' || needs.permissions-check.result == 'skipped') }}
+    needs: [permissions-check, validate-instances]
+    # Run when permissions passed/skipped AND the staging-config validation did not block.
+    # validate-instances only fails when strict gating is enabled and critical config drifted,
+    # so by default (report-only) this is a no-op and tests run as before.
+    if: ${{ always() && (needs.permissions-check.result == 'success' || needs.permissions-check.result == 'skipped') && (needs.validate-instances.result == 'success' || needs.validate-instances.result == 'skipped') }}
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     defaults:
       run:
@@ -277,6 +285,11 @@ jobs:
         timeout-minutes: 25
         run: pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
         env:
+          # Staging e2e validates the LIVE staging deploy, which is not a turbo input
+          # (the cache key is integration/** + env). Force re-execution so a cached green
+          # pass can't stand in for an untested deploy, and so the Playwright JSON report
+          # is regenerated every run instead of being skipped on a `>>> FULL TURBO` hit.
+          TURBO_FORCE: 'true'
           E2E_DEBUG: '1'
           E2E_STAGING: '1'
           E2E_WORKERS: '2'
@@ -301,18 +314,24 @@ jobs:
 
       # Always upload the machine-readable report (even on success) so downstream
       # reporting/classification can run regardless of the leg's pass/fail outcome.
+      # The json reporter's outputFile is resolved relative to the Playwright config
+      # directory (integration/), not the repo root, so the report lands under
+      # integration/playwright-report/. Keep that prefix here. `warn` (not `ignore`)
+      # so a future path regression surfaces in the logs instead of failing silently.
       - name: Upload Playwright JSON report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: playwright-report-${{ github.run_id }}-${{ github.run_attempt }}-${{ steps.inputs.outputs.artifact-suffix }}
-          path: playwright-report/results.json
-          if-no-files-found: ignore
+          path: integration/playwright-report/results.json
+          if-no-files-found: warn
           retention-days: 3
 
   report:
     name: Report Results
-    needs: [integration-tests]
+    # validate-instances is needed so a strict-mode gate failure (which SKIPS all
+    # test legs rather than failing them) still reaches the Slack notification.
+    needs: [integration-tests, validate-instances]
     if: always()
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     defaults:
@@ -346,7 +365,7 @@ jobs:
           fi
 
       - name: Notify Slack on failure
-        if: ${{ needs.integration-tests.result == 'failure' && steps.inputs.outputs.notify-slack == 'true' }}
+        if: ${{ (needs.integration-tests.result == 'failure' || needs.validate-instances.result == 'failure') && steps.inputs.outputs.notify-slack == 'true' }}
         uses: slackapi/slack-github-action@e28cf165c92ffef168d23c5c9000cffc8a25e117 # v1.24.0
         with:
           payload: |

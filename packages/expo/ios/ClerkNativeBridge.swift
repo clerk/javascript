@@ -1,0 +1,534 @@
+// ClerkNativeBridge - Provides Clerk SDK operations and SwiftUI view controllers to ClerkExpo.
+
+import UIKit
+import SwiftUI
+import Observation
+@_spi(FrameworkIntegration) import ClerkKit
+import ClerkKitUI
+
+/// Events emitted by the native view wrappers to their React Native host views.
+public enum ClerkNativeViewEvent: String {
+  /// Emitted by the Expo host view when app-owned dismissible content leaves the window.
+  case dismissed
+}
+
+extension Notification.Name {
+  static let clerkNativeSDKDidConfigure = Notification.Name("com.clerk.expo.native-sdk.did-configure")
+}
+
+private let clerkNativeClientEventQueue = DispatchQueue(label: "com.clerk.expo.native-client-events")
+private var clerkNativeClientChangedEmitter: (([String: Any]?) -> Void)?
+
+private struct ClerkExpoHeaderMiddleware: ClerkRequestMiddleware {
+  private static var hostSdkVersion: String? {
+    Bundle.main.object(forInfoDictionaryKey: "ClerkExpoVersion") as? String
+  }
+
+  func prepare(_ request: inout URLRequest) async throws {
+    request.addValue("expo", forHTTPHeaderField: "x-clerk-host-sdk")
+    if let hostSdkVersion = Self.hostSdkVersion, !hostSdkVersion.isEmpty {
+      request.addValue(hostSdkVersion, forHTTPHeaderField: "x-clerk-host-sdk-version")
+    }
+  }
+}
+
+// MARK: - Native Bridge Implementation
+
+final class ClerkNativeBridge {
+  static let shared = ClerkNativeBridge()
+
+  private static let clerkLoadMaxAttempts = 30
+  private static let clerkLoadIntervalNs: UInt64 = 100_000_000
+  private static var clerkConfigured = false
+  private static var configuredPublishableKey: String?
+
+  /// Parsed light and dark themes from Info.plist "ClerkTheme" dictionary.
+  var lightTheme: ClerkTheme?
+  var darkTheme: ClerkTheme?
+
+  private var clientObservationGeneration = 0
+  private var lastObservedClientState: ClientStateSnapshot?
+
+  private init() {}
+
+  private struct ClientStateSnapshot: Equatable {
+    let client: Client?
+    let deviceToken: String?
+  }
+
+  private struct ClientStateChanges {
+    let client: Bool
+    let deviceToken: Bool
+
+    static let all = ClientStateChanges(client: true, deviceToken: true)
+  }
+
+  /// Resolves the keychain service name, checking ClerkKeychainService in Info.plist first
+  /// (for extension apps sharing a keychain group), then falling back to the bundle identifier.
+  private static var keychainService: String? {
+    if let custom = Bundle.main.object(forInfoDictionaryKey: "ClerkKeychainService") as? String, !custom.isEmpty {
+      return custom
+    }
+    return Bundle.main.bundleIdentifier
+  }
+
+  @MainActor
+  func configure(publishableKey: String, bearerToken: String? = nil) async throws {
+    loadThemes()
+
+    if Self.shouldReconfigure(for: publishableKey) {
+      try await Clerk.reconfigure(publishableKey: publishableKey, options: Self.makeClerkOptions())
+      Self.clerkConfigured = true
+      Self.configuredPublishableKey = publishableKey
+      startClientObserver(reset: true)
+
+      let shouldWaitForClient = try await Self.syncTokenState(bearerToken: bearerToken)
+      await Self.waitForLoadedClientIfNeeded(shouldWaitForClient)
+      Self.emitClientChangedIfReceivedToken(bearerToken)
+      Self.postConfiguredNotification()
+      return
+    }
+
+    if Self.clerkConfigured {
+      startClientObserver()
+      let shouldWaitForClient = try await Self.syncTokenState(bearerToken: bearerToken)
+      await Self.waitForLoadedClientIfNeeded(shouldWaitForClient)
+      Self.emitClientChangedIfReceivedToken(bearerToken)
+      return
+    }
+
+    Self.clerkConfigured = true
+    Self.configuredPublishableKey = publishableKey
+    Clerk.configure(publishableKey: publishableKey, options: Self.makeClerkOptions())
+    startClientObserver()
+
+    let shouldWaitForClient = try await Self.syncTokenState(bearerToken: bearerToken)
+    await Self.waitForLoadedClientIfNeeded(shouldWaitForClient)
+    Self.emitClientChangedIfReceivedToken(bearerToken)
+    Self.postConfiguredNotification()
+  }
+
+  @MainActor
+  private static func emitClientChangedIfReceivedToken(_ bearerToken: String?) {
+    guard let token = bearerToken, !token.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+    Self.emitClientChanged(Self.clientChangedPayload(changes: .init(client: false, deviceToken: true)))
+  }
+
+  @MainActor
+  private func startClientObserver(reset: Bool = false) {
+    guard reset || clientObservationGeneration == 0 else {
+      return
+    }
+
+    clientObservationGeneration += 1
+    let generation = clientObservationGeneration
+    lastObservedClientState = Self.clientStateSnapshot()
+    observeClient(generation: generation)
+  }
+
+  @MainActor
+  private func observeClient(generation: Int) {
+    withObservationTracking {
+      _ = Self.clientStateSnapshot()
+    } onChange: { [weak self] in
+      Task { @MainActor [weak self] in
+        await Task.yield()
+
+        guard let self, generation == self.clientObservationGeneration else { return }
+
+        let newClientState = Self.clientStateSnapshot()
+        if let previousClientState = self.lastObservedClientState, newClientState != previousClientState {
+          self.lastObservedClientState = newClientState
+          let payload = Self.clientChangedPayload(
+            changes: .init(
+              client: newClientState.client != previousClientState.client,
+              deviceToken: newClientState.deviceToken != previousClientState.deviceToken
+            )
+          )
+          Self.emitClientChanged(payload)
+        }
+
+        self.observeClient(generation: generation)
+      }
+    }
+  }
+
+  @MainActor
+  private static func clientStateSnapshot() -> ClientStateSnapshot {
+    let client = Clerk.shared.client
+
+    return ClientStateSnapshot(
+      client: client,
+      deviceToken: Clerk.shared.deviceToken
+    )
+  }
+
+  @MainActor
+  private static func clientChangedPayload(sourceId: String? = nil, changes: ClientStateChanges = .all) -> [String: Any] {
+    var payload: [String: Any] = [:]
+    payload["changed"] = [
+      "client": changes.client,
+      "deviceToken": changes.deviceToken,
+    ]
+    payload["deviceToken"] = Clerk.shared.deviceToken ?? NSNull()
+    if let sourceId, !sourceId.isEmpty {
+      payload["sourceId"] = sourceId
+    }
+
+    return payload
+  }
+
+  @MainActor
+  private static func syncTokenState(bearerToken: String?) async throws -> Bool {
+    guard let token = bearerToken, !token.isEmpty else {
+      return Clerk.shared.deviceToken != nil
+    }
+    _ = try await Clerk.shared.updateDeviceToken(token)
+    return true
+  }
+
+  private static func shouldReconfigure(for publishableKey: String) -> Bool {
+    guard clerkConfigured, let configuredPublishableKey else { return false }
+    return configuredPublishableKey != publishableKey
+  }
+
+  private static func makeClerkOptions() -> Clerk.Options {
+    let middleware = Clerk.Options.MiddlewareConfig(request: [ClerkExpoHeaderMiddleware()])
+    guard let service = keychainService else {
+      return .init(middleware: middleware)
+    }
+    return .init(keychainConfig: .init(service: service), middleware: middleware)
+  }
+
+  @MainActor
+  private static func waitForLoadedClient() async {
+    // Wait for Clerk to finish loading client state from cached data + API refresh.
+    // The bridge sync contract is device-token based, not session based.
+    for _ in 0..<clerkLoadMaxAttempts {
+      if Clerk.shared.isLoaded {
+        return
+      }
+      try? await Task.sleep(nanoseconds: clerkLoadIntervalNs)
+    }
+  }
+
+  @MainActor
+  private static func waitForLoadedClientIfNeeded(_ shouldWait: Bool) async {
+    guard shouldWait else { return }
+    await waitForLoadedClient()
+  }
+
+  @MainActor
+  func getClientToken() async -> String? {
+    guard Self.clerkConfigured else { return nil }
+    return Clerk.shared.deviceToken
+  }
+
+  // MARK: - Inline View Creation
+
+  func makeAuthViewController(
+    mode: String,
+    dismissible: Bool,
+    onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
+  ) -> UIViewController? {
+    guard Self.clerkConfigured else { return nil }
+
+    return makeHostingController(
+      rootView: ClerkInlineAuthWrapperView(
+        mode: Self.authMode(from: mode),
+        dismissible: dismissible,
+        lightTheme: lightTheme,
+        darkTheme: darkTheme
+      ),
+      onDismiss: dismissible ? { onEvent(.dismissed, [:]) } : nil
+    )
+  }
+
+  func makeUserProfileViewController(
+    dismissible: Bool,
+    onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
+  ) -> UIViewController? {
+    guard Self.clerkConfigured else { return nil }
+
+    return makeHostingController(
+      rootView: ClerkInlineProfileWrapperView(
+        dismissible: dismissible,
+        lightTheme: lightTheme,
+        darkTheme: darkTheme
+      ),
+      onDismiss: dismissible ? { onEvent(.dismissed, [:]) } : nil
+    )
+  }
+
+  func makeUserButtonViewController() -> UIViewController? {
+    guard Self.clerkConfigured else { return nil }
+
+    return makeHostingController(
+      rootView: ClerkInlineUserButtonWrapperView(
+        lightTheme: lightTheme,
+        darkTheme: darkTheme
+      )
+    )
+  }
+
+  @MainActor
+  func syncClientStateFromJs(
+    deviceToken: String?,
+    sourceId: String?,
+    didChangeClient: Bool,
+    didChangeDeviceToken: Bool
+  ) async throws {
+    guard Self.clerkConfigured else { return }
+
+    let previousClientState = Self.clientStateSnapshot()
+
+    if didChangeDeviceToken, let token = deviceToken?.trimmingCharacters(in: .whitespacesAndNewlines), !token.isEmpty {
+      if Clerk.shared.deviceToken != token {
+        _ = try await Clerk.shared.updateDeviceToken(token)
+        await Self.waitForLoadedClient()
+      }
+    }
+
+    if didChangeClient || didChangeDeviceToken {
+      _ = try await Clerk.shared.refreshClient()
+      await Self.waitForLoadedClient()
+    }
+
+    let newClientState = Self.clientStateSnapshot()
+    lastObservedClientState = newClientState
+    Self.emitClientChanged(
+      Self.clientChangedPayload(
+        sourceId: sourceId,
+        changes: .init(
+          client: newClientState.client != previousClientState.client,
+          deviceToken: newClientState.deviceToken != previousClientState.deviceToken
+        )
+      )
+    )
+  }
+
+  private static func postConfiguredNotification() {
+    NotificationCenter.default.post(name: .clerkNativeSDKDidConfigure, object: nil)
+  }
+
+  static func setClientChangedEmitter(_ emitter: (([String: Any]?) -> Void)?) {
+    clerkNativeClientEventQueue.sync {
+      clerkNativeClientChangedEmitter = emitter
+    }
+  }
+
+  /// Requests that ClerkProvider reload the JS client from native client state.
+  static func emitClientChanged(_ body: [String: Any]? = nil) {
+    let emitter = clerkNativeClientEventQueue.sync {
+      clerkNativeClientChangedEmitter
+    }
+    emitter?(body)
+  }
+
+  private static func authMode(from mode: String) -> AuthView.Mode {
+    switch mode {
+    case "signIn":
+      .signIn
+    case "signUp":
+      .signUp
+    default:
+      .signInOrUp
+    }
+  }
+
+  // MARK: - Theme Parsing
+
+  /// Reads the "ClerkTheme" dictionary from Info.plist and builds light / dark themes.
+  @MainActor func loadThemes() {
+    guard let themeDictionary = Bundle.main.object(forInfoDictionaryKey: "ClerkTheme") as? [String: Any] else {
+      return
+    }
+
+    // Build light theme from top-level "colors" and "design"
+    let lightColors = (themeDictionary["colors"] as? [String: String]).flatMap { parseColors(from: $0) }
+    let design = (themeDictionary["design"] as? [String: Any]).flatMap { parseDesign(from: $0) }
+    let fonts = (themeDictionary["design"] as? [String: Any]).flatMap { parseFonts(from: $0) }
+
+    if lightColors != nil || design != nil || fonts != nil {
+      lightTheme = ClerkTheme(colors: lightColors ?? .default, fonts: fonts ?? .default, design: design ?? .default)
+    }
+
+    // Build dark theme from "darkColors" (inherits same design/fonts)
+    if let darkColorsDict = themeDictionary["darkColors"] as? [String: String] {
+      let darkColors = parseColors(from: darkColorsDict)
+      if darkColors != nil || design != nil || fonts != nil {
+        darkTheme = ClerkTheme(colors: darkColors ?? .default, fonts: fonts ?? .default, design: design ?? .default)
+      }
+    }
+  }
+
+  private func parseColors(from dict: [String: String]) -> ClerkTheme.Colors? {
+    let hasAny = dict.values.contains { colorFromHex($0) != nil }
+    guard hasAny else { return nil }
+
+    return ClerkTheme.Colors(
+      primary: dict["primary"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultPrimaryColor,
+      background: dict["background"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultBackgroundColor,
+      input: dict["input"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultInputColor,
+      danger: dict["danger"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultDangerColor,
+      success: dict["success"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultSuccessColor,
+      warning: dict["warning"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultWarningColor,
+      foreground: dict["foreground"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultForegroundColor,
+      mutedForeground: dict["mutedForeground"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultMutedForegroundColor,
+      primaryForeground: dict["primaryForeground"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultPrimaryForegroundColor,
+      inputForeground: dict["inputForeground"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultInputForegroundColor,
+      neutral: dict["neutral"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultNeutralColor,
+      ring: dict["ring"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultRingColor,
+      muted: dict["muted"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultMutedColor,
+      shadow: dict["shadow"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultShadowColor,
+      border: dict["border"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultBorderColor
+    )
+  }
+
+  private func colorFromHex(_ hex: String) -> Color? {
+    var cleaned = hex.trimmingCharacters(in: .whitespacesAndNewlines)
+    if cleaned.hasPrefix("#") { cleaned.removeFirst() }
+
+    var rgb: UInt64 = 0
+    guard Scanner(string: cleaned).scanHexInt64(&rgb) else { return nil }
+
+    switch cleaned.count {
+    case 6:
+      return Color(
+        red: Double((rgb >> 16) & 0xFF) / 255.0,
+        green: Double((rgb >> 8) & 0xFF) / 255.0,
+        blue: Double(rgb & 0xFF) / 255.0
+      )
+    case 8:
+      return Color(
+        red: Double((rgb >> 24) & 0xFF) / 255.0,
+        green: Double((rgb >> 16) & 0xFF) / 255.0,
+        blue: Double((rgb >> 8) & 0xFF) / 255.0,
+        opacity: Double(rgb & 0xFF) / 255.0
+      )
+    default:
+      return nil
+    }
+  }
+
+  private func parseFonts(from dict: [String: Any]) -> ClerkTheme.Fonts? {
+    guard let fontFamily = dict["fontFamily"] as? String, !fontFamily.isEmpty else { return nil }
+    return ClerkTheme.Fonts(fontFamily: fontFamily)
+  }
+
+  private func parseDesign(from dict: [String: Any]) -> ClerkTheme.Design? {
+    guard let radius = dict["borderRadius"] as? Double else { return nil }
+    return ClerkTheme.Design(borderRadius: CGFloat(radius))
+  }
+
+  private func makeHostingController<Content: View>(
+    rootView: Content,
+    onDismiss: (() -> Void)? = nil
+  ) -> UIViewController {
+    let hostingController = ClerkNativeHostingController(rootView: rootView, onDismiss: onDismiss)
+    hostingController.view.backgroundColor = .clear
+    return hostingController
+  }
+
+}
+
+// MARK: - Inline User Button Wrapper (for embedded rendering)
+
+struct ClerkInlineUserButtonWrapperView: View {
+  let lightTheme: ClerkTheme?
+  let darkTheme: ClerkTheme?
+
+  @Environment(\.colorScheme) private var colorScheme
+
+  var body: some View {
+    let view = UserButton()
+      .environment(Clerk.shared)
+    let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
+    let themedView = Group {
+      if let theme {
+        view.environment(\.clerkTheme, theme)
+      } else {
+        view
+      }
+    }
+    themedView
+      .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+  }
+}
+
+// MARK: - Inline Auth View Wrapper (for embedded rendering)
+
+struct ClerkInlineAuthWrapperView: View {
+  let mode: AuthView.Mode
+  let dismissible: Bool
+  let lightTheme: ClerkTheme?
+  let darkTheme: ClerkTheme?
+
+  @Environment(\.colorScheme) private var colorScheme
+
+  private var themedAuthView: some View {
+    let view = AuthView(mode: mode, isDismissible: dismissible)
+      .environment(Clerk.shared)
+    let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
+    return Group {
+      if let theme {
+        view.environment(\.clerkTheme, theme)
+      } else {
+        view
+      }
+    }
+  }
+
+  var body: some View {
+    themedAuthView
+  }
+}
+
+private final class ClerkNativeHostingController<Content: View>: UIHostingController<Content> {
+  private let onDismiss: (() -> Void)?
+  private var didSendDismiss = false
+
+  init(rootView: Content, onDismiss: (() -> Void)? = nil) {
+    self.onDismiss = onDismiss
+    super.init(rootView: rootView)
+  }
+
+  @MainActor @preconcurrency required dynamic init?(coder aDecoder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
+  override func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
+    sendDismissIfNeeded()
+    super.dismiss(animated: flag, completion: completion)
+  }
+
+  private func sendDismissIfNeeded() {
+    guard !didSendDismiss else { return }
+    didSendDismiss = true
+    onDismiss?()
+  }
+}
+
+// MARK: - Inline Profile View Wrapper (for embedded rendering)
+
+struct ClerkInlineProfileWrapperView: View {
+  let dismissible: Bool
+  let lightTheme: ClerkTheme?
+  let darkTheme: ClerkTheme?
+
+  @Environment(\.colorScheme) private var colorScheme
+
+  var body: some View {
+    let view = UserProfileView(isDismissible: dismissible)
+      .environment(Clerk.shared)
+    let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
+    let themedView = Group {
+      if let theme {
+        view.environment(\.clerkTheme, theme)
+      } else {
+        view
+      }
+    }
+    themedView
+  }
+}

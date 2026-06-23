@@ -6,65 +6,41 @@ import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen, waitFor } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
 
+// Navigation goes through the generic wizard facade. The step owns a local
+// `handleContinue` that calls the create mutation then `useWizard().goNext`.
+// We assert on those nav calls.
 const goNext = vi.fn();
 const goPrev = vi.fn();
-const goToStep = vi.fn();
 
 vi.mock('../../elements/Wizard', () => ({
-  useWizard: () => ({
-    activeSteps: [],
-    currentStep: undefined,
-    currentIndex: -1,
-    totalSteps: 0,
-    isFirstStep: true,
-    isLastStep: false,
-    isNested: false,
-    goNext,
-    goPrev,
-    goToStep,
-    registerStep: vi.fn(),
-    unregisterStep: vi.fn(),
-  }),
+  useWizard: () => ({ current: 'select-provider', goNext, goPrev, isFirstStep: true }),
 }));
 
-const setProvider = vi.fn();
 const createEnterpriseConnection = vi.fn();
+const changeProvider = vi.fn();
+
+// Provider is sourced from the connection entity
+// (organizationEnterpriseConnection.provider) rather than a context-level
+// setProvider. The step uses goNext (not goToStep) after a successful create.
+const contextState = vi.hoisted(() => ({
+  provider: undefined as 'saml_okta' | 'saml_custom' | 'saml_google' | undefined,
+  hasConnection: false,
+}));
 
 vi.mock('../../ConfigureSSOContext', () => ({
   useConfigureSSO: () => ({
-    enterpriseConnection: undefined,
-    provider: undefined,
-    setProvider,
-    createEnterpriseConnection,
-    initialStepId: 'select-provider',
+    enterpriseConnection: contextState.hasConnection ? { id: 'ent_1' } : undefined,
+    contentRef: { current: null },
+    enterpriseConnectionMutations: {
+      createConnection: createEnterpriseConnection,
+      changeProvider,
+    },
+    organizationEnterpriseConnection: {
+      provider: contextState.provider,
+      hasConnection: contextState.hasConnection,
+    },
   }),
 }));
-
-const userMockState = vi.hoisted(() => ({
-  current: {
-    primaryEmailAddress: {
-      emailAddress: 'test@clerk.com',
-      verification: { status: 'verified' as 'verified' | 'unverified' },
-    },
-  } as {
-    primaryEmailAddress?: {
-      emailAddress: string;
-      verification: { status: 'verified' | 'unverified' };
-    };
-  } | null,
-}));
-
-vi.mock('@clerk/shared/react/index', async importOriginal => {
-  const actual = await importOriginal<typeof import('@clerk/shared/react/index')>();
-  return {
-    ...actual,
-    useUser: () => ({
-      user: userMockState.current,
-      isLoaded: true,
-      isSignedIn: true,
-    }),
-  };
-});
 
 import { SelectProviderStep } from '../SelectProviderStep';
 
@@ -80,16 +56,12 @@ const renderStep = (
 const resetMocks = () => {
   goNext.mockReset();
   goPrev.mockReset();
-  goToStep.mockReset();
-  setProvider.mockReset();
   createEnterpriseConnection.mockReset();
   createEnterpriseConnection.mockResolvedValue(undefined);
-  userMockState.current = {
-    primaryEmailAddress: {
-      emailAddress: 'test@clerk.com',
-      verification: { status: 'verified' },
-    },
-  };
+  changeProvider.mockReset();
+  changeProvider.mockResolvedValue(undefined);
+  contextState.provider = undefined;
+  contextState.hasConnection = false;
 };
 
 describe('SelectProviderStep', () => {
@@ -99,7 +71,7 @@ describe('SelectProviderStep', () => {
     renderStep(wrapper);
 
     expect(screen.getByRole('heading', { name: 'Select your identity provider' })).toBeInTheDocument();
-    expect(screen.getByText(/We.*ll guide you through the detailed setup process next\./)).toBeInTheDocument();
+    expect(screen.getByText(/You.*ll configure the connection details in the next step/)).toBeInTheDocument();
   });
 
   it('renders all SAML provider radios with their labels', async () => {
@@ -117,7 +89,9 @@ describe('SelectProviderStep', () => {
     const { wrapper } = await createFixtures();
     const { container } = renderStep(wrapper);
 
-    // Emotion serializes sx into stylesheets, so we check both inline + the document's collected styles
+    // Emotion serializes sx into stylesheets, so we check both inline + the document's collected styles.
+    // Each provider card is a <label> wrapping a visually-hidden native radio; the
+    // aria-hidden icon span lives inside it.
     const iconSpans = Array.from(container.querySelectorAll('label span[aria-hidden]'));
     expect(iconSpans).toHaveLength(4);
 
@@ -172,17 +146,15 @@ describe('SelectProviderStep', () => {
     expect(customSamlRadio).toBeChecked();
   });
 
-  it('records the provider and advances when Continue is clicked', async () => {
+  it('records the provider and jumps to configure when Continue is clicked', async () => {
     resetMocks();
     const callOrder: string[] = [];
-    setProvider.mockImplementation(() => {
-      callOrder.push('setProvider');
-    });
-    createEnterpriseConnection.mockImplementation(async () => {
+    createEnterpriseConnection.mockImplementation(() => {
       callOrder.push('createEnterpriseConnection');
+      return Promise.resolve(undefined);
     });
-    goToStep.mockImplementation(() => {
-      callOrder.push('goToStep');
+    goNext.mockImplementation(() => {
+      callOrder.push('goNext');
     });
 
     const { wrapper } = await createFixtures();
@@ -192,12 +164,12 @@ describe('SelectProviderStep', () => {
     await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
 
     await waitFor(() => {
-      expect(goToStep).toHaveBeenCalledWith('configure');
+      expect(goNext).toHaveBeenCalled();
     });
 
-    expect(setProvider).toHaveBeenCalledWith('saml_okta');
-    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta', userMockState.current?.primaryEmailAddress);
-    expect(callOrder).toEqual(['setProvider', 'createEnterpriseConnection', 'goToStep']);
+    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta');
+    // The create then the goNext are the tail of the call order.
+    expect(callOrder.slice(-2)).toEqual(['createEnterpriseConnection', 'goNext']);
   });
 
   it('forwards the Custom SAML backend provider id when selected', async () => {
@@ -209,11 +181,10 @@ describe('SelectProviderStep', () => {
     await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
 
     await waitFor(() => {
-      expect(goToStep).toHaveBeenCalledWith('configure');
+      expect(goNext).toHaveBeenCalled();
     });
 
-    expect(setProvider).toHaveBeenCalledWith('saml_custom');
-    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_custom', userMockState.current?.primaryEmailAddress);
+    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_custom');
   });
 
   it('does not advance when failing to create enterprise connection', async () => {
@@ -231,10 +202,10 @@ describe('SelectProviderStep', () => {
     await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
 
     await waitFor(() => {
-      expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta', userMockState.current?.primaryEmailAddress);
+      expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta');
     });
 
-    expect(goToStep).not.toHaveBeenCalled();
+    expect(goNext).not.toHaveBeenCalled();
   });
 
   it('disables Previous on the first step', async () => {
@@ -245,44 +216,106 @@ describe('SelectProviderStep', () => {
     expect(screen.getByRole('button', { name: /Previous/i })).toBeDisabled();
   });
 
-  it('routes to verify-domain when the user has no primary email address', async () => {
-    resetMocks();
-    userMockState.current = {};
+  describe('changing provider when a connection already exists', () => {
+    it('advances without creating or changing when the connected provider is re-selected', async () => {
+      resetMocks();
+      contextState.provider = 'saml_okta';
+      contextState.hasConnection = true;
+      const { wrapper } = await createFixtures();
+      const { userEvent } = renderStep(wrapper);
 
-    const { wrapper } = await createFixtures();
-    const { userEvent } = renderStep(wrapper);
+      // The connected provider is preselected, so Continue just walks forward.
+      await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
 
-    await userEvent.click(screen.getByRole('radio', { name: 'Okta Workforce' }));
-    await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
-
-    await waitFor(() => {
-      expect(goToStep).toHaveBeenCalledWith('verify-domain');
+      await waitFor(() => {
+        expect(goNext).toHaveBeenCalled();
+      });
+      expect(createEnterpriseConnection).not.toHaveBeenCalled();
+      expect(changeProvider).not.toHaveBeenCalled();
     });
 
-    expect(setProvider).toHaveBeenCalledWith('saml_okta');
-    expect(createEnterpriseConnection).not.toHaveBeenCalled();
-  });
+    it('opens the confirmation dialog when a different provider is selected', async () => {
+      resetMocks();
+      contextState.provider = 'saml_okta';
+      contextState.hasConnection = true;
+      const { wrapper } = await createFixtures();
+      const { userEvent } = renderStep(wrapper);
 
-  it('routes to verify-domain when the user has an unverified primary email address', async () => {
-    resetMocks();
-    userMockState.current = {
-      primaryEmailAddress: {
-        emailAddress: 'test@clerk.com',
-        verification: { status: 'unverified' },
-      },
-    };
+      await userEvent.click(screen.getByRole('radio', { name: 'Google Workspace' }));
+      await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
 
-    const { wrapper } = await createFixtures();
-    const { userEvent } = renderStep(wrapper);
-
-    await userEvent.click(screen.getByRole('radio', { name: 'Okta Workforce' }));
-    await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
-
-    await waitFor(() => {
-      expect(goToStep).toHaveBeenCalledWith('verify-domain');
+      expect(await screen.findByRole('heading', { name: /change provider to google workspace/i })).toBeInTheDocument();
+      // Nothing is mutated until the user confirms.
+      expect(changeProvider).not.toHaveBeenCalled();
+      expect(goNext).not.toHaveBeenCalled();
     });
 
-    expect(setProvider).toHaveBeenCalledWith('saml_okta');
-    expect(createEnterpriseConnection).not.toHaveBeenCalled();
+    it('changes the provider and advances when the dialog is confirmed', async () => {
+      resetMocks();
+      contextState.provider = 'saml_okta';
+      contextState.hasConnection = true;
+      const { wrapper } = await createFixtures();
+      const { userEvent } = renderStep(wrapper);
+
+      await userEvent.click(screen.getByRole('radio', { name: 'Google Workspace' }));
+      await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Change provider' }));
+
+      await waitFor(() => {
+        expect(changeProvider).toHaveBeenCalledWith('saml_google');
+      });
+      await waitFor(() => {
+        expect(goNext).toHaveBeenCalled();
+      });
+    });
+
+    it('closes the dialog and surfaces the error on the step when the change fails', async () => {
+      resetMocks();
+      contextState.provider = 'saml_okta';
+      contextState.hasConnection = true;
+      changeProvider.mockRejectedValue(
+        new ClerkRuntimeError('failed to change provider', {
+          code: 'enterprise_connection_creation_failed',
+        }),
+      );
+      const { wrapper } = await createFixtures();
+      const { userEvent } = renderStep(wrapper);
+
+      await userEvent.click(screen.getByRole('radio', { name: 'Google Workspace' }));
+      await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Change provider' }));
+
+      await waitFor(() => {
+        expect(changeProvider).toHaveBeenCalledWith('saml_google');
+      });
+
+      // The dialog closes and the error surfaces on the step card.
+      await waitFor(() => {
+        expect(screen.queryByRole('heading', { name: /change provider to/i })).not.toBeInTheDocument();
+      });
+      expect(await screen.findByText(/failed to change provider/i)).toBeInTheDocument();
+      expect(goNext).not.toHaveBeenCalled();
+    });
+
+    it('keeps the connection and stays put when the dialog is cancelled', async () => {
+      resetMocks();
+      contextState.provider = 'saml_okta';
+      contextState.hasConnection = true;
+      const { wrapper } = await createFixtures();
+      const { userEvent } = renderStep(wrapper);
+
+      await userEvent.click(screen.getByRole('radio', { name: 'Google Workspace' }));
+      await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Cancel' }));
+
+      await waitFor(() => {
+        expect(screen.queryByRole('heading', { name: /change provider to/i })).not.toBeInTheDocument();
+      });
+      expect(changeProvider).not.toHaveBeenCalled();
+      expect(goNext).not.toHaveBeenCalled();
+    });
   });
 });

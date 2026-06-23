@@ -1,5 +1,151 @@
 # Change Log
 
+## 3.5.2
+
+### Patch Changes
+
+- Updated dependencies [[`01789b4`](https://github.com/clerk/javascript/commit/01789b4e8d3a280940b7ebcb223a33c6ecfd209a)]:
+  - @clerk/clerk-js@6.20.0
+  - @clerk/shared@4.20.0
+  - @clerk/react@6.10.4
+
+## 3.5.1
+
+### Patch Changes
+
+- Updated dependencies [[`9e1d849`](https://github.com/clerk/javascript/commit/9e1d849068df57229eb6545cb4a6d492146a20c1)]:
+  - @clerk/clerk-js@6.19.0
+  - @clerk/react@6.10.3
+
+## 3.5.0
+
+### Minor Changes
+
+- Fixes iOS development builds across Expo SDK versions by linking the Clerk iOS SDK through React Native's Swift Package Manager podspec support. This raises the minimum supported React Native version to 0.75, where that podspec SPM support is available; `@clerk/expo` already supports Expo SDK 53 and newer, and Expo SDK 53 ships with React Native 0.79. ([#8927](https://github.com/clerk/javascript/pull/8927)) by [@mikepitre](https://github.com/mikepitre)
+
+### Patch Changes
+
+- Fix JS/native client syncing so native and JavaScript client or device-token changes refresh each other consistently. ([#8929](https://github.com/clerk/javascript/pull/8929)) by [@mikepitre](https://github.com/mikepitre)
+
+## 3.4.7
+
+### Patch Changes
+
+- Fix native component auth state when syncing JS and native client changes. ([#8920](https://github.com/clerk/javascript/pull/8920)) by [@mikepitre](https://github.com/mikepitre)
+
+- Adds an iOS Google sign-in `hint` option and clarifies that Android account filtering is platform-specific. ([#8906](https://github.com/clerk/javascript/pull/8906)) by [@mikepitre](https://github.com/mikepitre)
+
+- Fix Android native component initialization when the Expo native module does not expose React Native event listener bookkeeping methods, and make the generated iOS bridge compatible with Swift's explicit import visibility checks. ([#8920](https://github.com/clerk/javascript/pull/8920)) by [@mikepitre](https://github.com/mikepitre)
+
+- Updated dependencies [[`c84f8df`](https://github.com/clerk/javascript/commit/c84f8df4222c212ecce6ae5ff8c47958b5b5d972), [`53e7b11`](https://github.com/clerk/javascript/commit/53e7b11058096d5ce15da53af12fe7236e88db2c), [`e51e22a`](https://github.com/clerk/javascript/commit/e51e22a2aec03293e8ccf5a5372cd9906aeccbb7)]:
+  - @clerk/shared@4.19.1
+  - @clerk/react@6.10.3
+  - @clerk/clerk-js@6.18.1
+
+## 3.4.6
+
+### Patch Changes
+
+- Fixes iOS builds for Expo apps by explicitly declaring the native Google Sign-In module's dependency on ExpoModulesCore. ([#8911](https://github.com/clerk/javascript/pull/8911)) by [@mikepitre](https://github.com/mikepitre)
+
+## 3.4.5
+
+### Patch Changes
+
+- Updated dependencies [[`fb11e32`](https://github.com/clerk/javascript/commit/fb11e32c0945423cc392586662a0b1a2beec4635)]:
+  - @clerk/react@6.10.2
+
+## 3.4.4
+
+### Patch Changes
+
+- Fixes iOS Google One Tap sign-in to reject blank Google client IDs and to default to filtering by previously authorized accounts. ([#8903](https://github.com/clerk/javascript/pull/8903)) by [@mikepitre](https://github.com/mikepitre)
+
+- Fixes iOS builds that use native Google Sign-In by letting Expo Autolinking configure the required Google pod dependencies. ([#8901](https://github.com/clerk/javascript/pull/8901)) by [@mikepitre](https://github.com/mikepitre)
+
+- Preserve Expo's relative import specifiers in tsdown builds so Metro platform-specific module resolution and root exports work correctly. ([#8880](https://github.com/clerk/javascript/pull/8880)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix Expo native Clerk components and JavaScript auth hooks staying stale when authentication changes between the JavaScript and native SDKs. JS-owned sign-in now hydrates native components on cold start, sign-out from either runtime updates the other side, and native multi-session changes keep the remaining JavaScript session active. ([#8879](https://github.com/clerk/javascript/pull/8879)) by [@mikepitre](https://github.com/mikepitre)
+
+- Restores the previous iOS Google sign-in default so sign-in does not filter by previously authorized accounts unless explicitly requested. ([#8905](https://github.com/clerk/javascript/pull/8905)) by [@mikepitre](https://github.com/mikepitre)
+
+- Add Expo host SDK request headers to native iOS Clerk SDK requests made through `@clerk/expo`. ([#8883](https://github.com/clerk/javascript/pull/8883)) by [@mikepitre](https://github.com/mikepitre)
+
+- Updated dependencies [[`cc83980`](https://github.com/clerk/javascript/commit/cc83980549b6ad79d06ada5bbc168c522fbb6ba7), [`d5968d0`](https://github.com/clerk/javascript/commit/d5968d026d6b2a1b399b6967fd8727613a5bc3cd), [`431e16c`](https://github.com/clerk/javascript/commit/431e16c69a2745779af217747c13a7f922e250fa), [`ffbc650`](https://github.com/clerk/javascript/commit/ffbc650ebbcee48171c95aa5d2b497273b0276b0)]:
+  - @clerk/clerk-js@6.18.0
+  - @clerk/shared@4.19.0
+  - @clerk/react@6.10.1
+
+## 3.4.3
+
+### Patch Changes
+
+- Bump the bundled `clerk-ios` SDK from `1.2.2` to `1.2.3`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.2.3. ([#8854](https://github.com/clerk/javascript/pull/8854)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Bump the bundled `clerk-ios` SDK from `1.2.3` to `1.2.4`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.2.4. ([#8867](https://github.com/clerk/javascript/pull/8867)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Fix platform-specific module resolution for Expo builds so native and web implementations are selected correctly. ([#8865](https://github.com/clerk/javascript/pull/8865)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`f4167ec`](https://github.com/clerk/javascript/commit/f4167eccb19e0de98340d48e221b950e3dad189e), [`17e4164`](https://github.com/clerk/javascript/commit/17e416471a5409e5a4c02f4f94f687c428c071de), [`ed2cf75`](https://github.com/clerk/javascript/commit/ed2cf75ce713703d8e2c258fc3ca0cf43dc964dc), [`67c04a4`](https://github.com/clerk/javascript/commit/67c04a43db64b70819d68333f99e3483523d1d47), [`fa23ad8`](https://github.com/clerk/javascript/commit/fa23ad84957eebbc1856c213d178de32a10dcbf2), [`51c8fdc`](https://github.com/clerk/javascript/commit/51c8fdcb7160457e44cfe7cc86524f7d728a030a), [`c2ba971`](https://github.com/clerk/javascript/commit/c2ba971aad55df570507b7b117786ab048415ad3), [`8744728`](https://github.com/clerk/javascript/commit/8744728e6610b2229f56dd3b31975c3f57395f02), [`d9b5c7d`](https://github.com/clerk/javascript/commit/d9b5c7d79fe641d08f45f0df7d4f5146b6b2c3ab)]:
+  - @clerk/shared@4.18.0
+  - @clerk/clerk-js@6.17.0
+  - @clerk/react@6.10.0
+
+## 3.4.2
+
+### Patch Changes
+
+- Bump the bundled `clerk-ios` SDK from `1.2.1` to `1.2.2`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.2.2. ([#8826](https://github.com/clerk/javascript/pull/8826)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Migrate the build pipeline to tsdown and TypeScript 6.0. This is an internal tooling change with no intended changes to the public API or runtime behavior. ([#8177](https://github.com/clerk/javascript/pull/8177)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`f046c49`](https://github.com/clerk/javascript/commit/f046c491d99c880b61e335645ad3ced4fee602d8), [`b5fa9f6`](https://github.com/clerk/javascript/commit/b5fa9f6ab2f01f1bbf6de52e16b4c9d9516f966c), [`3d5b2fe`](https://github.com/clerk/javascript/commit/3d5b2fe959171770bb7e8493d8a204317b7101a7)]:
+  - @clerk/clerk-js@6.16.1
+  - @clerk/shared@4.17.1
+  - @clerk/react@6.9.1
+
+## 3.4.1
+
+### Patch Changes
+
+- Bump the `clerk-ios` version pulled into Expo projects to `1.2.1`. ([#8801](https://github.com/clerk/javascript/pull/8801)) by [@mikepitre](https://github.com/mikepitre)
+
+- Remove React Native codegen warnings from Expo native auth components on iOS. ([#8800](https://github.com/clerk/javascript/pull/8800)) by [@mikepitre](https://github.com/mikepitre)
+
+- Updated dependencies [[`a5c7bc7`](https://github.com/clerk/javascript/commit/a5c7bc74dabfa78d4748516ccc252f68cae82264)]:
+  - @clerk/clerk-js@6.16.0
+  - @clerk/shared@4.17.0
+  - @clerk/react@6.9.0
+
+## 3.4.0
+
+### Minor Changes
+
+- Update Expo's beta native prebuilt components to more closely match the behavior of Clerk's native iOS and Android SDKs. ([#8699](https://github.com/clerk/javascript/pull/8699)) by [@mikepitre](https://github.com/mikepitre)
+
+  Previously, native auth and profile views relied on Expo-specific presentation behavior. `AuthView` and `UserProfileView` are now app-presented components, with dismissal handled through `onDismiss`. This also improves session synchronization between Clerk's JavaScript and native layers.
+
+  **Note:** This includes native changes, so rebuild your native app after upgrading (`expo prebuild --clean` or a new EAS build).
+
+### Patch Changes
+
+- Bump the native SDKs pulled into Expo: `clerk-ios` to `1.2.0`. ([#8745](https://github.com/clerk/javascript/pull/8745)) by [@mikepitre](https://github.com/mikepitre)
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.0.26` to `1.0.28`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.0.28. ([#8780](https://github.com/clerk/javascript/pull/8780)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Make `react-dom` an optional peer dependency so native Expo apps can install Clerk without pulling in a React DOM version they do not use. ([#8789](https://github.com/clerk/javascript/pull/8789)) by [@mikepitre](https://github.com/mikepitre)
+
+- Fix `useSSO()` in Expo apps that hit module loading failures when starting an SSO flow under Metro. ([#8720](https://github.com/clerk/javascript/pull/8720)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix Expo native builds that could fail when `expo-web-browser` is not installed but `ClerkProvider` is imported. ([#8607](https://github.com/clerk/javascript/pull/8607)) by [@chriscanin](https://github.com/chriscanin)
+
+- Add and improve JSDoc comments across public types and methods to support generated reference documentation for the `/objects` docs section. Exports a few previously-internal types (`OnEventListener`, `OffEventListener`, `ClerkOptionsNavigation`) so they can be referenced from the generated docs. ([#8276](https://github.com/clerk/javascript/pull/8276)) by [@alexisintech](https://github.com/alexisintech)
+
+- Updated dependencies [[`83f50f6`](https://github.com/clerk/javascript/commit/83f50f68619205f16541439fd27ca653686ba6df), [`2d6670c`](https://github.com/clerk/javascript/commit/2d6670c6c05c59901709283921b5d65c43f3a676), [`83f50f6`](https://github.com/clerk/javascript/commit/83f50f68619205f16541439fd27ca653686ba6df), [`af706e3`](https://github.com/clerk/javascript/commit/af706e35420a16c028fd34b70dd50d663d42e006), [`032632c`](https://github.com/clerk/javascript/commit/032632c6982297e53e28559b59b4a435de4c9adc), [`0fece6f`](https://github.com/clerk/javascript/commit/0fece6ff5d2b1babb59a285dbce9d46723e33d73), [`b295af3`](https://github.com/clerk/javascript/commit/b295af3d5bb12e09a502cae4a935d2e7f5d35d5c), [`0c854c3`](https://github.com/clerk/javascript/commit/0c854c356cb95d9f56bf002df1beeefe0ec4f31a), [`eb5c02d`](https://github.com/clerk/javascript/commit/eb5c02d7f36e4b3a9fafbf62384445f9a6a823cf), [`8e1bd48`](https://github.com/clerk/javascript/commit/8e1bd48a91dc07751493f41416d2a68b89e114cc)]:
+  - @clerk/react@6.8.0
+  - @clerk/clerk-js@6.15.0
+  - @clerk/shared@4.16.0
+
 ## 3.3.1
 
 ### Patch Changes

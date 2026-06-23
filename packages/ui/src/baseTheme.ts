@@ -60,6 +60,21 @@ const checkboxShadowStyles = (
   };
 };
 
+const checkboxBaseStyles = (theme: InternalTheme) => ({
+  padding: theme.space.$1,
+  width: theme.sizes.$3x5,
+  height: theme.sizes.$3x5,
+  appearance: 'none' as const,
+  borderRadius: theme.radii.$sm,
+  backgroundSize: `${theme.sizes.$2} ${theme.sizes.$2}`,
+  backgroundPosition: 'center',
+  backgroundRepeat: 'no-repeat',
+  '&:checked': {
+    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 8 8'%3E%3Cpath fill='${theme.colors.$white}' fill-rule='evenodd' d='M7.712.233a.889.889 0 0 1 .055 1.256C6.742 2.61 6.249 3.291 5.508 4.615c-.279.5-.589 1.194-.835 1.784a36.761 36.761 0 0 0-.382.95l-.021.057-.006.014-.001.003a.89.89 0 0 1-1.504.27L.218 4.765A.889.889 0 1 1 1.56 3.6l1.591 1.834c.235-.548.524-1.181.806-1.685.807-1.445 1.38-2.239 2.499-3.46A.889.889 0 0 1 7.712.234Z' clip-rule='evenodd'/%3E%3C/svg%3E")`,
+    backgroundColor: theme.colors.$primary500,
+  },
+});
+
 const inputStyles = (theme: InternalTheme) => ({
   borderWidth: 0,
   ...inputShadowStyles(theme, {
@@ -213,6 +228,7 @@ const clerkTheme: Appearance = {
         },
       },
       checkbox: {
+        ...checkboxBaseStyles(theme),
         ...checkboxShadowStyles(theme, {
           idle1: theme.colors.$neutralAlpha150,
           idle2: theme.colors.$neutralAlpha100,
@@ -220,19 +236,10 @@ const clerkTheme: Appearance = {
           hover2: theme.colors.$neutralAlpha150,
           focus: theme.colors.$neutralAlpha150,
         }),
-        padding: theme.space.$1,
-        width: theme.sizes.$3x5,
-        height: theme.sizes.$3x5,
-        appearance: 'none',
-        borderRadius: theme.radii.$sm,
         border: 'none',
-        backgroundSize: `${theme.sizes.$2} ${theme.sizes.$2}`,
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
         '&:checked': {
-          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 8 8'%3E%3Cpath fill='${theme.colors.$white}' fill-rule='evenodd' d='M7.712.233a.889.889 0 0 1 .055 1.256C6.742 2.61 6.249 3.291 5.508 4.615c-.279.5-.589 1.194-.835 1.784a36.761 36.761 0 0 0-.382.95l-.021.057-.006.014-.001.003a.89.89 0 0 1-1.504.27L.218 4.765A.889.889 0 1 1 1.56 3.6l1.591 1.834c.235-.548.524-1.181.806-1.685.807-1.445 1.38-2.239 2.499-3.46A.889.889 0 0 1 7.712.234Z' clip-rule='evenodd'/%3E%3C/svg%3E")`,
+          ...checkboxBaseStyles(theme)['&:checked'],
           borderColor: theme.colors.$transparent,
-          backgroundColor: theme.colors.$primary500,
         },
       },
       tagInputContainer: {

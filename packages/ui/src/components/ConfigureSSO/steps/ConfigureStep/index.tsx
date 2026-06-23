@@ -1,11 +1,13 @@
-import { type JSX } from 'react';
+import React, { type JSX } from 'react';
 
 import { descriptors, Flow } from '@/customizables';
+import { CardStateProvider } from '@/elements/contexts';
 
 import { useConfigureSSO } from '../../ConfigureSSOContext';
 import { Step } from '../../elements/Step';
-import { Wizard } from '../../elements/Wizard';
+import { useWizard, Wizard, type WizardStepConfig } from '../../elements/Wizard';
 import type { ProviderType } from '../../types';
+import { SelectProviderStep } from '../SelectProviderStep';
 import {
   SamlCustomConfigureSteps,
   SamlGoogleConfigureSteps,
@@ -20,19 +22,50 @@ const STEPS_BY_PROVIDER: Record<ProviderType, () => JSX.Element> = {
   saml_microsoft: SamlMicrosoftConfigureSteps,
 };
 
-export const ConfigureStep = (): JSX.Element | null => {
-  const { provider } = useConfigureSSO();
+export const ConfigureStep = (): JSX.Element => {
+  const { organizationEnterpriseConnection: c } = useConfigureSSO();
+  const { direction } = useWizard();
 
-  // Type guard, at this point the provider should have been defined
-  if (!provider) {
+  const steps = React.useMemo<WizardStepConfig[]>(
+    () => [{ id: 'select-provider' }, { id: 'configure-provider', isReachable: () => c.hasConnection }],
+    [c],
+  );
+
+  const initialStepId = direction === 1 ? 'select-provider' : undefined;
+
+  return (
+    <Wizard
+      steps={steps}
+      initialStepId={initialStepId}
+    >
+      <Wizard.Match id='select-provider'>
+        <CardStateProvider>
+          <SelectProviderStep />
+        </CardStateProvider>
+      </Wizard.Match>
+
+      <Wizard.Match id='configure-provider'>
+        <CardStateProvider>
+          <ConfigureProviderStep />
+        </CardStateProvider>
+      </Wizard.Match>
+    </Wizard>
+  );
+};
+
+const ConfigureProviderStep = (): JSX.Element | null => {
+  const { organizationEnterpriseConnection: c } = useConfigureSSO();
+
+  // Type guard: the provider should be defined by the time we reach configure.
+  if (!c.provider) {
     return null;
   }
 
-  // Type guard to ensure steps are provided
-  // If a new provider is added to the select step, then build will fail ahead of runtime
-  const StepsByProvider = STEPS_BY_PROVIDER[provider];
+  // Adding a provider to the select step without a mapping here fails the build.
+  const StepsByProvider = STEPS_BY_PROVIDER[c.provider];
+
   if (!StepsByProvider) {
-    throw new Error(`No steps found for provider: ${provider}`);
+    throw new Error(`No steps found for provider: ${c.provider}`);
   }
 
   return (
@@ -41,9 +74,7 @@ export const ConfigureStep = (): JSX.Element | null => {
         elementDescriptor={descriptors.configureSSOStep}
         elementId={descriptors.configureSSOStep.setId('configure')}
       >
-        <Wizard>
-          <StepsByProvider />
-        </Wizard>
+        <StepsByProvider />
       </Step>
     </Flow.Part>
   );
