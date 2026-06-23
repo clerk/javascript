@@ -2,10 +2,9 @@ import type { CustomPage } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { cleanup, render, screen, waitFor } from '@/test/utils';
+import { render, screen, waitFor } from '@/test/utils';
 
-import { OrganizationProfile } from '../';
-import { OrganizationSecurityPage } from '../OrganizationSecurityPage';
+import { OrganizationProfile } from '..';
 
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 
@@ -538,8 +537,8 @@ describe('OrganizationProfile', () => {
       await waitFor(() => expect(queryByText('Security')).toBeNull());
     });
 
-    it('includes SSO even when the user does not have the manage enterprise connections permission, but the page surfaces a warning', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
+    it('does not include SSO when the user lacks the manage enterprise connections permission', async () => {
+      const { wrapper } = await createFixtures(f => {
         f.withEnterpriseSso({ selfServeSSO: true });
         f.withOrganizations();
         f.withUser({
@@ -554,17 +553,8 @@ describe('OrganizationProfile', () => {
         });
       });
 
-      fixtures.clerk.user?.getEnterpriseConnections.mockResolvedValue([]);
-
-      render(<OrganizationProfile />, { wrapper });
-      expect(await screen.findByText('Security')).toBeDefined();
-
-      cleanup();
-      render(<OrganizationSecurityPage />, { wrapper });
-      expect(await screen.findByText(/you do not have permission to manage single sign-on/i)).toBeDefined();
-      expect(
-        screen.queryByText(/contact your organization.*administrator to upgrade your permissions/i),
-      ).toBeInTheDocument();
+      const { queryByText } = render(<OrganizationProfile />, { wrapper });
+      expect(queryByText('Security')).not.toBeInTheDocument();
     });
   });
 
