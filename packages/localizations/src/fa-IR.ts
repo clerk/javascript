@@ -1743,6 +1743,9 @@ export const faIR: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'خروج',
     action__signOutAll: 'خروج از همه حساب‌ها',
+    label__userButtonPopover: 'پنل حساب',
+    label__accountActions: 'اقدامات حساب',
+    label__activeSessions: 'جلسات فعال',
   },
   userProfile: {
     apiKeysPage: {

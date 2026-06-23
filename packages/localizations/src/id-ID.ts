@@ -1743,6 +1743,9 @@ export const idID: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Keluar',
     action__signOutAll: 'Keluar dari semua akun',
+    label__userButtonPopover: 'Panel akun',
+    label__accountActions: 'Tindakan akun',
+    label__activeSessions: 'Sesi aktif',
   },
   userProfile: {
     apiKeysPage: {

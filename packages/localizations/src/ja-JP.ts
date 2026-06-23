@@ -1756,6 +1756,9 @@ export const jaJP: LocalizationResource = {
     action__openUserMenu: 'ユーザーメニューを開く',
     action__signOut: 'サインアウト',
     action__signOutAll: '全てのアカウントからサインアウト',
+    label__userButtonPopover: 'アカウントパネル',
+    label__accountActions: 'アカウント操作',
+    label__activeSessions: 'アクティブセッション',
   },
   userProfile: {
     apiKeysPage: {

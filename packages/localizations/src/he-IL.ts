@@ -1720,6 +1720,9 @@ export const heIL: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'התנתק',
     action__signOutAll: 'התנתק מכל החשבונות',
+    label__userButtonPopover: 'לוח החשבון',
+    label__accountActions: 'פעולות חשבון',
+    label__activeSessions: 'סשנים פעילים',
   },
   userProfile: {
     apiKeysPage: {

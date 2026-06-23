@@ -1766,6 +1766,9 @@ export const deDE: LocalizationResource = {
     action__openUserMenu: 'Benutzermenü öffnen',
     action__signOut: 'Abmelden',
     action__signOutAll: 'Melden Sie sich von allen Konten ab',
+    label__userButtonPopover: 'Kontopanel',
+    label__accountActions: 'Kontoaktionen',
+    label__activeSessions: 'Aktive Sitzungen',
   },
   userProfile: {
     apiKeysPage: {

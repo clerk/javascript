@@ -1735,6 +1735,9 @@ export const nlNL: LocalizationResource = {
     action__openUserMenu: 'Gebruikersmenu openen',
     action__signOut: 'Uitloggen',
     action__signOutAll: 'Uitloggen uit alle accounts',
+    label__userButtonPopover: 'Accountpaneel',
+    label__accountActions: 'Accountacties',
+    label__activeSessions: 'Actieve sessies',
   },
   userProfile: {
     apiKeysPage: {
