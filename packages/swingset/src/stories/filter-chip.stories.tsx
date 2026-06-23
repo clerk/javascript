@@ -1,7 +1,6 @@
 /** @jsxImportSource @emotion/react */
-import { useState } from 'react';
-
 import { FilterChip } from '@clerk/ui/mosaic/components/filter-chip';
+import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 

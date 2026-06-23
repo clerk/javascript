@@ -1,5 +1,6 @@
 // Import stories explicitly to control order and avoid type casting through unknown.
 import { meta as accordionMeta } from '../stories/accordion.stories';
+import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
 import {
   meta as avatarMeta,
   OrgVariant as AvatarOrgVariant,
@@ -7,17 +8,8 @@ import {
   Sizes as AvatarSizes,
   UserVariant as AvatarUserVariant,
 } from '../stories/avatar.stories';
-import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
 import { Intents as BadgeIntents, meta as badgeMeta, Primary as BadgePrimary } from '../stories/badge.stories';
 import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
-import {
-  BothStates as FilterChipBothStates,
-  Default as FilterChipDefault,
-  meta as filterChipMeta,
-  NotClearable as FilterChipNotClearable,
-  Selected as FilterChipSelected,
-} from '../stories/filter-chip.stories';
-import { Default as SelectComponentDefault, meta as selectComponentMeta } from '../stories/select.component.stories';
 import { meta as collapsibleMeta } from '../stories/collapsible.stories';
 import {
   Default as DeleteOrganizationDefault,
@@ -26,6 +18,13 @@ import {
 import { Default as DestructiveDefault, meta as destructiveMeta } from '../stories/destructive.stories';
 import { Default as DialogDefault, meta as dialogComponentMeta } from '../stories/dialog.component.stories';
 import { meta as dialogMeta } from '../stories/dialog.stories';
+import {
+  BothStates as FilterChipBothStates,
+  Default as FilterChipDefault,
+  meta as filterChipMeta,
+  NotClearable as FilterChipNotClearable,
+  Selected as FilterChipSelected,
+} from '../stories/filter-chip.stories';
 import {
   Default as HeadingDefault,
   Intents as HeadingIntents,
@@ -48,7 +47,6 @@ import {
   Default as OrganizationProfileDefault,
   meta as organizationProfileMeta,
 } from '../stories/organization-profile.stories';
-import { Default as UserProfileDefault, meta as userProfileMeta } from '../stories/user-profile.stories';
 import {
   Default as OrganizationProfileApiKeysDefault,
   meta as organizationProfileApiKeysMeta,
@@ -66,6 +64,7 @@ import {
   meta as organizationProfileMembersMeta,
 } from '../stories/organization-profile-members.stories';
 import { meta as popoverMeta } from '../stories/popover.stories';
+import { Default as SelectComponentDefault, meta as selectComponentMeta } from '../stories/select.component.stories';
 import { meta as selectMeta } from '../stories/select.stories';
 import { Default as TabsComponentDefault, meta as tabsComponentMeta } from '../stories/tabs.component.stories';
 import { meta as tabsMeta } from '../stories/tabs.stories';
@@ -76,6 +75,7 @@ import {
   Sizes as TextSizes,
 } from '../stories/text.stories';
 import { meta as tooltipMeta } from '../stories/tooltip.stories';
+import { Default as UserProfileDefault, meta as userProfileMeta } from '../stories/user-profile.stories';
 import { toSlug } from './slug';
 import type { StoryModule } from './types';
 
