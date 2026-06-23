@@ -1,4 +1,4 @@
-import { MagnifyingGlass, Plus, Selector } from '../../icons';
+import { MagnifyingGlass, Selector } from '../../icons';
 import { Box } from '../components/box';
 import { Button } from '../components/button';
 import { Heading } from '../components/heading';
