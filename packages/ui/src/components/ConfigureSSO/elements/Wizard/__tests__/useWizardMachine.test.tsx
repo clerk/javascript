@@ -551,12 +551,6 @@ describe('useWizardMachine — reachability clamp (self-correct on a broken isRe
   });
 
   it('re-seats a nested wizard in place when its active isReachable breaks (does not bubble)', () => {
-    // ConfigureSSO's middle wizard is nested AND has a guarded step
-    // (`configure-provider`, reachable only while a connection exists). When that
-    // connection is deleted from inside the flow, the guard breaks; the clamp must
-    // re-seat to the furthest LOCAL reachable step (n0 here, select-provider in the
-    // app) IN PLACE rather than bubbling to the parent — otherwise the nested
-    // wizard strands on an impossible step (the ORGS-1675 blank pane).
     const parent = makeParent();
     let open = true;
     const gate = () => open;

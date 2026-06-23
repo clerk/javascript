@@ -163,13 +163,6 @@ describe('ConfigureSSO wizard navigation (integration)', () => {
     expect(queryByText(/test your sso connection/i)).not.toBeInTheDocument();
   });
 
-  // ORGS-1675: resetting from the FIRST per-provider configure step (not the test
-  // step) must also land on select-provider. The configure sub-flow runs inside a
-  // NESTED wizard whose `configure-provider` step is gated on `hasConnection`;
-  // deleting the connection breaks that guard. Before the fix the nested clamp was
-  // skipped (gated on `!isNested`), so the wizard stranded on `configure-provider`
-  // — which renders nothing without a provider — leaving a blank pane. The clamp
-  // now runs for the nested wizard too and re-seats it in place to select-provider.
   it('reset → re-derive: deleting from the first configure step lands on select-provider (no blank)', async () => {
     const { wrapper, fixtures } = await createFixtures(withAdminOrgUser);
 
