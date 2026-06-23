@@ -26,64 +26,65 @@
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/index.d.mts",
-        "default": "./dist/index.mjs"
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/esm/index.js"
       },
       "require": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/cjs/index.js"
       }
     },
     "./preload": {
       "import": {
-        "types": "./dist/preload/index.d.mts",
-        "default": "./dist/preload/index.mjs"
+        "types": "./dist/types/preload/index.d.ts",
+        "default": "./dist/esm/preload/index.js"
       },
       "require": {
-        "types": "./dist/preload/index.d.ts",
-        "default": "./dist/preload/index.js"
+        "types": "./dist/types/preload/index.d.ts",
+        "default": "./dist/cjs/preload/index.js"
       }
     },
     "./storage": {
       "import": {
-        "types": "./dist/storage/index.d.mts",
-        "default": "./dist/storage/index.mjs"
+        "types": "./dist/types/storage/index.d.ts",
+        "default": "./dist/esm/storage/index.js"
       },
       "require": {
-        "types": "./dist/storage/index.d.ts",
-        "default": "./dist/storage/index.js"
+        "types": "./dist/types/storage/index.d.ts",
+        "default": "./dist/cjs/storage/index.js"
       }
     },
     "./react": {
       "import": {
-        "types": "./dist/react/index.d.mts",
-        "default": "./dist/react/index.mjs"
+        "types": "./dist/types/react/index.d.ts",
+        "default": "./dist/esm/react/index.js"
       },
       "require": {
-        "types": "./dist/react/index.d.ts",
-        "default": "./dist/react/index.js"
+        "types": "./dist/types/react/index.d.ts",
+        "default": "./dist/cjs/react/index.js"
       }
     },
     "./passkeys": {
       "import": {
-        "types": "./dist/passkeys/index.d.mts",
-        "default": "./dist/passkeys/index.mjs"
+        "types": "./dist/types/passkeys/index.d.ts",
+        "default": "./dist/esm/passkeys/index.js"
       },
       "require": {
-        "types": "./dist/passkeys/index.d.ts",
-        "default": "./dist/passkeys/index.js"
+        "types": "./dist/types/passkeys/index.d.ts",
+        "default": "./dist/cjs/passkeys/index.js"
       }
     },
     "./package.json": "./package.json"
   },
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
     "build": "tsdown",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
     "dev": "tsdown --watch",
     "format": "node ../../scripts/format-package.mjs",
