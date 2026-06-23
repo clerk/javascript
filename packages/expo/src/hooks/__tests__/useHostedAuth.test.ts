@@ -13,6 +13,8 @@ const mocks = vi.hoisted(() => {
   return {
     makeRedirectUri: vi.fn(),
     openAuthSessionAsync: vi.fn(),
+    digestStringAsync: vi.fn(),
+    getRandomBytes: vi.fn(),
     randomUUID: vi.fn(),
     useClerk: vi.fn(),
     getClerkInstance: vi.fn(),
@@ -53,11 +55,21 @@ vi.mock('expo-web-browser', () => {
 
 vi.mock('expo-crypto', () => {
   return {
+    CryptoDigestAlgorithm: {
+      SHA256: 'SHA256',
+    },
+    CryptoEncoding: {
+      BASE64: 'BASE64',
+    },
+    digestStringAsync: mocks.digestStringAsync,
+    getRandomBytes: mocks.getRandomBytes,
     randomUUID: mocks.randomUUID,
   };
 });
 
 const mockFapiRequest = vi.fn();
+const mockCodeVerifier = '000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f';
+const mockCodeChallenge = 'mock-code-challenge-_';
 
 describe('useHostedAuth', () => {
   const mockClient = {
@@ -79,12 +91,24 @@ describe('useHostedAuth', () => {
         };
       }
       if (request === 'expo-crypto') {
-        return { randomUUID: mocks.randomUUID };
+        return {
+          CryptoDigestAlgorithm: {
+            SHA256: 'SHA256',
+          },
+          CryptoEncoding: {
+            BASE64: 'BASE64',
+          },
+          digestStringAsync: mocks.digestStringAsync,
+          getRandomBytes: mocks.getRandomBytes,
+          randomUUID: mocks.randomUUID,
+        };
       }
       return originalModuleLoad.call(Module, request, parent, isMain);
     });
     mockClient.lastActiveSessionId = null;
     mocks.makeRedirectUri.mockReturnValue('myapp:///hosted-auth-callback');
+    mocks.getRandomBytes.mockReturnValue(Uint8Array.from(Array.from({ length: 32 }, (_, index) => index)));
+    mocks.digestStringAsync.mockResolvedValue('mock-code-challenge+/=');
     mocks.randomUUID.mockReturnValue('generated-state-123');
     mocks.useClerk.mockReturnValue({
       loaded: true,
@@ -125,6 +149,7 @@ describe('useHostedAuth', () => {
       path: '/client/hosted_auth',
       body: {
         redirectUrl: 'myapp:///hosted-auth-callback',
+        codeChallenge: mockCodeChallenge,
         initialPage: undefined,
         state: 'state-123',
       },
@@ -133,12 +158,18 @@ describe('useHostedAuth', () => {
       path: 'hosted-auth-callback',
       isTripleSlashed: true,
     });
+    expect(mocks.digestStringAsync).toHaveBeenCalledWith('SHA256', mockCodeVerifier, {
+      encoding: 'BASE64',
+    });
     expect(mocks.openAuthSessionAsync).toHaveBeenCalledWith(
       'https://example.accounts.dev/sign-in',
       'myapp:///hosted-auth-callback',
       undefined,
     );
-    expect(mockClient.reload).toHaveBeenCalledWith({ rotatingTokenNonce: 'nonce-123' });
+    expect(mockClient.reload).toHaveBeenCalledWith({
+      rotatingTokenNonce: 'nonce-123',
+      codeVerifier: mockCodeVerifier,
+    });
     expect(mockUpdateClient).toHaveBeenCalledWith(mockClient);
     expect(mockSetActive).toHaveBeenCalledWith({ session: 'sess_123' });
     expect(response.createdSessionId).toBe('sess_123');
@@ -155,7 +186,10 @@ describe('useHostedAuth', () => {
     const { result } = renderHook(() => useHostedAuth());
     const response = await result.current.startHostedAuth({ state: 'state-123' });
 
-    expect(mockClient.reload).toHaveBeenCalledWith({ rotatingTokenNonce: 'nonce-123' });
+    expect(mockClient.reload).toHaveBeenCalledWith({
+      rotatingTokenNonce: 'nonce-123',
+      codeVerifier: mockCodeVerifier,
+    });
     expect(mockUpdateClient).toHaveBeenCalledWith(mockClient);
     expect(mockSetActive).not.toHaveBeenCalled();
     expect(response.createdSessionId).toBeNull();
@@ -187,6 +221,7 @@ describe('useHostedAuth', () => {
       path: '/client/hosted_auth',
       body: {
         redirectUrl: 'myapp:///hosted-auth-callback',
+        codeChallenge: mockCodeChallenge,
         initialPage: undefined,
         state: 'generated-state-123',
       },
@@ -221,6 +256,7 @@ describe('useHostedAuth', () => {
       path: '/client/hosted_auth',
       body: {
         redirectUrl: 'myapp:///hosted-auth-callback',
+        codeChallenge: mockCodeChallenge,
         initialPage: 'sign_up',
         state: 'state-123',
       },

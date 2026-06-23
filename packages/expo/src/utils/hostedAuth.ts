@@ -8,6 +8,7 @@ export type FapiHostedAuthInitialPage = 'sign_in' | 'sign_up';
 
 export type CreateHostedAuthParams = {
   redirectUrl: string;
+  codeChallenge: string;
   initialPage?: FapiHostedAuthInitialPage;
   state?: string;
 };

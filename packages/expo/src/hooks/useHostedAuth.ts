@@ -1,6 +1,7 @@
 import { useClerk } from '@clerk/react';
 import type { ClientResource } from '@clerk/shared/types';
 import type * as AuthSession from 'expo-auth-session';
+import type * as ExpoCrypto from 'expo-crypto';
 import type * as WebBrowser from 'expo-web-browser';
 
 import { errorThrower } from '../utils/errors';
@@ -19,6 +20,11 @@ export type StartHostedAuthReturnType = {
   createdSessionId: string | null;
   authSessionResult: WebBrowser.WebBrowserAuthSessionResult | null;
   client?: ClientResource;
+};
+
+type HostedAuthPKCE = {
+  codeVerifier: string;
+  codeChallenge: string;
 };
 
 export function useHostedAuth() {
@@ -57,11 +63,13 @@ export function useHostedAuth() {
         isTripleSlashed: true,
       });
     const state = params.state ?? (await createState());
+    const pkce = await createPKCE();
     if (!clerk.client) {
       return errorThrower.throw('Hosted auth requires a loaded Clerk client.');
     }
     const hostedAuth = await createHostedAuth({
       redirectUrl,
+      codeChallenge: pkce.codeChallenge,
       initialPage: toFapiInitialPage(params.initialPage),
       state,
     });
@@ -92,7 +100,7 @@ export function useHostedAuth() {
     let updatedClient: ClientResource | undefined;
     const rotatingTokenNonce = callbackParams.get('rotating_token_nonce') ?? '';
     if (rotatingTokenNonce) {
-      updatedClient = await clerk.client?.reload({ rotatingTokenNonce });
+      updatedClient = await clerk.client?.reload({ rotatingTokenNonce, codeVerifier: pkce.codeVerifier });
       if (updatedClient) {
         getClientUpdater(clerk)?.(updatedClient);
       }
@@ -141,16 +149,41 @@ function toFapiInitialPage(initialPage: HostedAuthInitialPage | undefined): Fapi
 }
 
 async function createState(): Promise<string> {
+  return loadExpoCrypto().randomUUID();
+}
+
+async function createPKCE(): Promise<HostedAuthPKCE> {
+  const Crypto = loadExpoCrypto();
+  const codeVerifier = bytesToHex(Crypto.getRandomBytes(32));
+  const codeChallenge = base64ToBase64Url(
+    await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, codeVerifier, {
+      encoding: Crypto.CryptoEncoding.BASE64,
+    }),
+  );
+
+  return {
+    codeVerifier,
+    codeChallenge,
+  };
+}
+
+function loadExpoCrypto(): typeof ExpoCrypto {
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { randomUUID } = require('expo-crypto') as typeof import('expo-crypto');
-    return randomUUID();
+    return require('expo-crypto') as typeof import('expo-crypto');
   } catch {
     return errorThrower.throw(
-      'expo-crypto is required to start hosted auth without an explicit state. ' +
-        'Please install it by running: npx expo install expo-crypto',
+      'expo-crypto is required to start hosted auth. Please install it by running: npx expo install expo-crypto',
     );
   }
+}
+
+function bytesToHex(bytes: Uint8Array): string {
+  return Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
+function base64ToBase64Url(base64: string): string {
+  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
 }
 
 function callbackUrlMatchesRedirectUrl(callbackUrl: URL, redirectUrl: string): boolean {
