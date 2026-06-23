@@ -2,4 +2,4 @@
 '@clerk/ui': patch
 ---
 
-Updates flush card development mode indicator styling.
+Updates development mode indicator styling.
