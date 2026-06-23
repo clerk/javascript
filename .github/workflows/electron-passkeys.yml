@@ -1,12 +1,7 @@
 name: Electron Passkeys Native Build
 
 on:
-  workflow_call:
   workflow_dispatch:
-  pull_request:
-    paths:
-      - 'packages/electron-passkeys/**'
-      - '.github/workflows/electron-passkeys.yml'
 
 permissions:
   contents: read
@@ -111,3 +106,4 @@ jobs:
           name: electron-passkeys-npm
           path: packages/electron-passkeys/npm/**/*.node
           if-no-files-found: error
+          retention-days: 90
