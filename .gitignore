@@ -10,6 +10,13 @@ out
 packages/*/dist/**
 **/.pnpm-store/**
 
+# Vendored upstream sources are NOT build output. Anything under
+# packages/*/src/vendor/*/upstream/ is a verbatim copy of an npm tarball and
+# must ship with the package; the `dist` and `build` matchers above would
+# otherwise silently exclude their `dist/` subdirs from git.
+!packages/*/src/vendor/**
+
+
 # dependencies
 node_modules
 **/node_modules/**

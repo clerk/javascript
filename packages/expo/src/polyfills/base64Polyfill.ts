@@ -1,4 +1,8 @@
-import { decode, encode } from 'base-64';
+// Vendored from base-64@1.0.0 — see ../vendor/base-64/README.md for the
+// supply-chain rationale (this code becomes global.btoa/global.atob inside
+// every Clerk-Expo customer app, which makes it an unusually high-leverage
+// upstream dep to leave externalized).
+import { decode, encode } from '../vendor/base-64';
 
 import { isHermes } from '../utils';
 
