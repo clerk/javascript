@@ -265,6 +265,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return this.clerkjs?.__internal_getOption ? this.clerkjs?.__internal_getOption(key) : this.options[key];
   }
 
+  public __internal_windowNavigate: Clerk['__internal_windowNavigate'] = (to, opts) => {
+    this.clerkjs?.__internal_windowNavigate?.(to, opts);
+  };
+
   constructor(options: IsomorphicClerkOptions) {
     this.#publishableKey = options?.publishableKey;
     this.#proxyUrl = options?.proxyUrl;

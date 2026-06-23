@@ -1,7 +1,6 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { type ClerkError, ClerkRuntimeError, isCaptchaError, isClerkAPIResponseError } from '@clerk/shared/error';
 import { createValidatePassword } from '@clerk/shared/internal/clerk-js/passwords/password';
-import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { Poller } from '@clerk/shared/poller';
 import type {
   AttemptEmailAddressVerificationParams,
@@ -462,7 +461,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       });
     }
 
-    return this.authenticateWithRedirectOrPopup(params, windowNavigate);
+    return this.authenticateWithRedirectOrPopup(params, SignUp.clerk.__internal_windowNavigate);
   };
 
   public authenticateWithPopup = async (
@@ -1082,7 +1081,7 @@ class SignUpFuture implements SignUpFutureResource {
           // Pick up the modified SignUp resource
           await this.#resource.reload();
         } else {
-          windowNavigate(externalVerificationRedirectURL);
+          SignUp.clerk.__internal_windowNavigate(externalVerificationRedirectURL);
         }
       }
     });
