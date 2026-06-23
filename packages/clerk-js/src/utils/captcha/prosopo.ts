@@ -161,7 +161,7 @@ export const getProcaptchaToken = async (opts: CaptchaOptions) => {
         visibleWidget.style.marginBottom = 'unset';
       }
     }
-    cleanupCaptchaContainer(containerType, opts);
+    cleanupCaptchaContainer(containerType, opts, containerSelector);
   }
 
   return { captchaToken, captchaWidgetType };

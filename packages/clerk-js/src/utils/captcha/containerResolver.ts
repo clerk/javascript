@@ -22,6 +22,14 @@ export type ResolvedCaptchaContainer = {
   attributes: CaptchaContainerAttributes;
 };
 
+// Auth flows should fail fast rather than hang if Clerk's modal never mounts the container.
+const MODAL_CONTAINER_TIMEOUT_MS = 5000;
+
+// Per-instance suffix for invisible containers so concurrent challenges don't render into or
+// remove each other's nodes.
+let invisibleContainerCounter = 0;
+const nextInvisibleContainerId = () => `${CAPTCHA_INVISIBLE_CLASSNAME}-${Date.now()}-${++invisibleContainerCounter}`;
+
 function readContainerAttributes(element: Element): CaptchaContainerAttributes {
   try {
     const el = element as HTMLElement;
@@ -44,7 +52,7 @@ function readContainerAttributes(element: Element): CaptchaContainerAttributes {
  * has not mounted a `#clerk-captcha` element.
  *
  * Side effects: opens the modal (when modal selectors are passed) and appends a hidden
- * `.clerk-invisible-captcha` div to the body for the invisible flow. Both are reverted by
+ * per-instance invisible container to the body for the invisible flow. Both are reverted by
  * {@link cleanupCaptchaContainer}.
  */
 export const resolveCaptchaContainer = async (opts: CaptchaOptions): Promise<ResolvedCaptchaContainer> => {
@@ -60,13 +68,21 @@ export const resolveCaptchaContainer = async (opts: CaptchaOptions): Promise<Res
       // eslint-disable-next-line @typescript-eslint/only-throw-error
       throw { captchaError: 'modal_component_not_ready' };
     }
-    const el = await waitForElement(modalContainerQuerySelector);
+    // waitForElement never rejects, so race it against a timeout to keep the auth flow from hanging.
+    const el = await Promise.race<Element | null>([
+      waitForElement(modalContainerQuerySelector),
+      new Promise<null>(resolve => setTimeout(() => resolve(null), MODAL_CONTAINER_TIMEOUT_MS)),
+    ]);
+    if (!el) {
+      // eslint-disable-next-line @typescript-eslint/only-throw-error
+      throw { captchaError: 'modal_container_not_found' };
+    }
     return {
       containerSelector: modalContainerQuerySelector,
       containerType: 'modal',
       effectiveSiteKey: opts.siteKey,
       captchaWidgetType: opts.widgetType,
-      attributes: el ? readContainerAttributes(el) : {},
+      attributes: readContainerAttributes(el),
     };
   }
 
@@ -87,13 +103,16 @@ export const resolveCaptchaContainer = async (opts: CaptchaOptions): Promise<Res
     );
   }
 
-  // invisible (default + smart fallback): create a hidden throwaway container.
+  // invisible (default + smart fallback): create a hidden throwaway container with a unique id so
+  // concurrent challenges resolve to their own node.
+  const containerId = nextInvisibleContainerId();
   const div = document.createElement('div');
+  div.id = containerId;
   div.classList.add(CAPTCHA_INVISIBLE_CLASSNAME);
   div.style.display = 'none';
   document.body.appendChild(div);
   return {
-    containerSelector: `.${CAPTCHA_INVISIBLE_CLASSNAME}`,
+    containerSelector: `#${containerId}`,
     containerType: 'invisible',
     effectiveSiteKey: opts.invisibleSiteKey,
     captchaWidgetType: 'invisible',
@@ -104,18 +123,20 @@ export const resolveCaptchaContainer = async (opts: CaptchaOptions): Promise<Res
 /**
  * Reverts the DOM side effects of {@link resolveCaptchaContainer}. The smart container is owned by
  * the consumer (we leave it in place); provider-specific style mutations should be cleaned up by
- * the caller before invoking this.
+ * the caller before invoking this. `containerSelector` is required for invisible containers so
+ * the right per-instance node is removed when challenges run concurrently.
  */
 export const cleanupCaptchaContainer = (
   containerType: CaptchaContainerType,
   opts: Pick<CaptchaOptions, 'closeModal'>,
+  containerSelector?: string,
 ) => {
   if (containerType === 'modal') {
     opts.closeModal?.();
     return;
   }
-  if (containerType === 'invisible') {
-    const invisibleWidget = document.querySelector(`.${CAPTCHA_INVISIBLE_CLASSNAME}`);
+  if (containerType === 'invisible' && containerSelector) {
+    const invisibleWidget = document.querySelector(containerSelector);
     if (invisibleWidget && invisibleWidget.parentNode === document.body) {
       document.body.removeChild(invisibleWidget);
     }
