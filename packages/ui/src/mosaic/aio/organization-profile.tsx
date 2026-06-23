@@ -1,8 +1,11 @@
 import { Box } from '../components/box';
 import { Tabs } from '../components/tabs';
 import { OrganizationProfileGeneral } from '../panels/organization-profile-general';
+import { useMessages } from '../providers/localization-provider';
+import { orgProfileBase } from './organization-profile.messages';
 
 export function OrganizationProfile() {
+  const m = useMessages('organizationProfile', orgProfileBase);
   return (
     <Box
       sx={t => ({
@@ -17,12 +20,12 @@ export function OrganizationProfile() {
           marginBlockEnd: t.spacing(8),
         })}
       >
-        Organization Profile
+        {m.title}
       </Box>
       <Tabs.Root defaultValue='general'>
         <Tabs.List>
-          <Tabs.Tab value='general'>General</Tabs.Tab>
-          <Tabs.Tab value='members'>Members</Tabs.Tab>
+          <Tabs.Tab value='general'>{m.tab.general}</Tabs.Tab>
+          <Tabs.Tab value='members'>{m.tab.members}</Tabs.Tab>
         </Tabs.List>
         <Tabs.Panel value='general'>
           <OrganizationProfileGeneral />
@@ -36,7 +39,7 @@ export function OrganizationProfile() {
               textAlign: 'center',
             })}
           >
-            Members content
+            {m.membersContent}
           </Box>
         </Tabs.Panel>
       </Tabs.Root>

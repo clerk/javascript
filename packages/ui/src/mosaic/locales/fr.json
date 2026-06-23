@@ -1,0 +1,10 @@
+{
+  "organizationProfile": {
+    "title": "Profil de l'organisation",
+    "tab": {
+      "general": "Général",
+      "members": "Membres"
+    },
+    "membersContent": "Contenu des membres"
+  }
+}

@@ -3,13 +3,13 @@ import React from 'react';
 import { describe, expect, it } from 'vitest';
 
 import type { MosaicAppearance } from '../appearance';
-import { MosaicProvider } from '../MosaicProvider';
+import { MosaicProvider } from '../providers/mosaic-provider';
 import { defineSlotRecipe, useRecipe } from '../slot-recipe';
 import { slot, useSlot } from '../useSlot';
 
 function wrapper(appearance?: MosaicAppearance, scope?: string) {
   return function Wrapper({ children }: { children: React.ReactNode }) {
-    return React.createElement(MosaicProvider, { appearance, scope }, children);
+    return React.createElement(MosaicProvider, { appearance: { ...appearance, scope } }, children);
   };
 }
 

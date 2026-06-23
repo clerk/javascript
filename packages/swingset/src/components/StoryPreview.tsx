@@ -1,6 +1,6 @@
 'use client';
 
-import { MosaicProvider } from '@clerk/ui/mosaic/MosaicProvider';
+import { MosaicProvider } from '@clerk/ui/mosaic/providers/mosaic-provider';
 import { RotateCcwIcon, SlidersHorizontalIcon } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
@@ -61,8 +61,8 @@ export function StoryPreview({ name, storyModule }: StoryPreviewProps) {
       <div className='flex min-h-40 items-center justify-center p-10'>
         {mounted && (
           <MosaicProvider
-            cssLayerName='components'
             appearance={{
+              cssLayerName: 'components',
               variables,
             }}
           >
