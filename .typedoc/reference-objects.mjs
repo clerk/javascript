@@ -116,6 +116,18 @@ export const BACKEND_API_CONFIG = {
     symbol: 'EnterpriseConnectionAPI',
     declarationHint: 'api/endpoints/EnterpriseConnectionApi',
   },
+  'backend/testing-token-api/testing-token-api.mdx': {
+    symbol: 'TestingTokenAPI',
+    declarationHint: 'api/endpoints/TestingTokenApi',
+  },
+  'backend/waitlist-entry-api/waitlist-entry-api.mdx': {
+    symbol: 'WaitlistEntryAPI',
+    declarationHint: 'api/endpoints/WaitlistEntryApi',
+  },
+  'backend/machine-api/machine-api.mdx': {
+    symbol: 'MachineApi',
+    declarationHint: 'api/endpoints/MachineApi',
+  },
 };
 
 /** Stable iteration order matches key order in {@link REFERENCE_OBJECT_CONFIG} then {@link BACKEND_API_CONFIG}. */

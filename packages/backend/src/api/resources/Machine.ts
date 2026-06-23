@@ -5,13 +5,21 @@ import type { MachineJSON } from './JSON';
  */
 export class Machine {
   constructor(
+    /** The unique identifier for the machine. */
     readonly id: string,
+    /** The name of the machine. */
     readonly name: string,
+    /** The ID of the instance the machine belongs to. */
     readonly instanceId: string,
+    /** The Unix timestamp when the machine was created. */
     readonly createdAt: number,
+    /** The Unix timestamp when the machine was last updated. */
     readonly updatedAt: number,
+    /** The machines that the current machine has access to. */
     readonly scopedMachines: Machine[],
+    /** The default time-to-live (TTL) in seconds for tokens created by this machine. */
     readonly defaultTokenTtl: number,
+    /** The secret key for the machine. */
     readonly secretKey?: string,
   ) {}
 

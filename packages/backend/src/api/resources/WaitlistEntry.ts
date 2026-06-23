@@ -3,12 +3,12 @@ import { Invitation } from './Invitation';
 import type { WaitlistEntryJSON } from './JSON';
 
 /**
- * The Backend `WaitlistEntry` object holds information about a waitlist entry for a given email address.
+ * The Backend `WaitlistEntry` object holds information about a [waitlist entry](https://clerk.com/docs/guides/secure/restricting-access#waitlist).
  */
 export class WaitlistEntry {
   constructor(
     /**
-     * The unique identifier for this waitlist entry.
+     * The unique identifier for the waitlist entry.
      */
     readonly id: string,
     /**
@@ -20,19 +20,19 @@ export class WaitlistEntry {
      */
     readonly status: WaitlistEntryStatus,
     /**
-     * The invitation associated with this waitlist entry.
+     * The invitation associated with the waitlist entry.
      */
     readonly invitation: Invitation | null,
     /**
-     * The date when the waitlist entry was first created.
+     * The Unix timestamp when the waitlist entry was created.
      */
     readonly createdAt: number,
     /**
-     * The date when the waitlist entry was last updated.
+     * The Unix timestamp when the waitlist entry was last updated.
      */
     readonly updatedAt: number,
     /**
-     * Whether the waitlist entry is locked or not.
+     * Whether the waitlist entry is locked.
      */
     readonly isLocked?: boolean,
   ) {}
