@@ -119,6 +119,9 @@ const rule: Rule.RuleModule = {
     const ruleId = context.id ?? 'require-auth-protection';
     validatePathPatterns(ruleId, 'protected', options.protected);
     validatePathPatterns(ruleId, 'public', options.public);
+    if (Array.isArray(options.mixedScopeLayouts)) {
+      validatePathPatterns(ruleId, 'mixedScopeLayouts', options.mixedScopeLayouts);
+    }
     const config: ClassifyOptions = {
       protected: options.protected,
       public: options.public ?? [],
@@ -226,19 +229,46 @@ function normalizeResources(resources: ResourceOptions | undefined): NormalizedR
 
 function validatePathPatterns(
   ruleId: string,
-  optionName: 'protected' | 'public',
+  optionName: 'protected' | 'public' | 'mixedScopeLayouts',
   patterns: string[] | undefined,
 ): void {
   if (!patterns) {
     return;
   }
   for (const pattern of patterns) {
-    if (pattern.split('/').includes('..')) {
-      throw new Error(
-        `${ruleId}: \`${optionName}\` patterns must be relative to \`rootDir\` and cannot contain \`..\` segments. Received "${pattern}".`,
-      );
+    const error = getPathPatternError(pattern);
+    if (error) {
+      throw new Error(`${ruleId}: \`${optionName}\` ${error} Received "${pattern}".`);
     }
   }
+}
+
+function getPathPatternError(pattern: string): string | null {
+  if (pattern === '') {
+    return 'patterns cannot be empty.';
+  }
+  if (pattern.includes('\\')) {
+    return 'patterns must use `/` path separators, not `\\`.';
+  }
+  if (pattern.startsWith('/') || /^[A-Za-z]:\//.test(pattern)) {
+    return 'patterns must be relative to `rootDir`, not absolute.';
+  }
+  if (pattern.includes('{') || pattern.includes('}')) {
+    return 'patterns cannot use brace expansion.';
+  }
+
+  const segments = pattern.split('/');
+  if (segments.includes('')) {
+    return 'patterns cannot contain empty path segments.';
+  }
+  if (segments.includes('.')) {
+    return 'patterns cannot contain `.` segments.';
+  }
+  if (segments.includes('..')) {
+    return 'patterns cannot contain `..` segments.';
+  }
+
+  return null;
 }
 
 function checkUnacknowledgedMixedScope(

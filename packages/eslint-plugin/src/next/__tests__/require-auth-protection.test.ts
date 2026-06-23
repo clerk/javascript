@@ -1844,11 +1844,9 @@ describe('require-auth-protection schema validation', () => {
   });
 
   it('rejects protected patterns with `..` segments', () => {
-    expect(() => lintWithOptions({ protected: ['../app/**'] })).toThrow(
-      /protected.*relative to `rootDir`.*cannot contain `\.\.`/s,
-    );
+    expect(() => lintWithOptions({ protected: ['../app/**'] })).toThrow(/protected.*cannot contain `\.\.` segments/s);
     expect(() => lintWithOptions({ protected: ['app/../admin/**'] })).toThrow(
-      /protected.*relative to `rootDir`.*cannot contain `\.\.`/s,
+      /protected.*cannot contain `\.\.` segments/s,
     );
   });
 
@@ -1860,7 +1858,45 @@ describe('require-auth-protection schema validation', () => {
 
   it('rejects public patterns with `..` segments', () => {
     expect(() => lintWithOptions({ protected: ['**'], public: ['../public/**'] })).toThrow(
-      /public.*relative to `rootDir`.*cannot contain `\.\.`/s,
+      /public.*cannot contain `\.\.` segments/s,
+    );
+  });
+
+  it('rejects path patterns with absolute paths', () => {
+    expect(() => lintWithOptions({ protected: ['/app/**'] })).toThrow(
+      /protected.*relative to `rootDir`, not absolute/s,
+    );
+    expect(() => lintWithOptions({ protected: ['C:/app/**'] })).toThrow(
+      /protected.*relative to `rootDir`, not absolute/s,
+    );
+  });
+
+  it('rejects path patterns with backslashes', () => {
+    expect(() => lintWithOptions({ protected: ['src\\app\\**'] })).toThrow(/protected.*must use `\/` path separators/s);
+  });
+
+  it('rejects path patterns with empty segments', () => {
+    expect(() => lintWithOptions({ protected: [''] })).toThrow(/protected.*cannot be empty/s);
+    expect(() => lintWithOptions({ protected: ['app//admin/**'] })).toThrow(/protected.*empty path segments/s);
+    expect(() => lintWithOptions({ protected: ['app/**/'] })).toThrow(/protected.*empty path segments/s);
+  });
+
+  it('rejects path patterns with `.` segments', () => {
+    expect(() => lintWithOptions({ protected: ['./app/**'] })).toThrow(/protected.*cannot contain `\.` segments/s);
+    expect(() => lintWithOptions({ protected: ['app/./admin/**'] })).toThrow(
+      /protected.*cannot contain `\.` segments/s,
+    );
+  });
+
+  it('rejects path patterns with brace expansion', () => {
+    expect(() => lintWithOptions({ protected: ['src/app/**/*.{ts,tsx}'] })).toThrow(
+      /protected.*cannot use brace expansion/s,
+    );
+  });
+
+  it('validates array-form mixedScopeLayouts as path patterns', () => {
+    expect(() => lintWithOptions({ protected: ['**'], mixedScopeLayouts: ['src\\app'] })).toThrow(
+      /mixedScopeLayouts.*must use `\/` path separators/s,
     );
   });
 
