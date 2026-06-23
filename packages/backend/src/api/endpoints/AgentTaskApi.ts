@@ -49,7 +49,7 @@ export class AgentTaskAPI extends AbstractAPI {
 
   /**
    * Revokes the given agent task.
-   * @param agentTaskId - The ID of the agent task to revoke.
+   * @param agentTaskId - The ID of the Agent Task to revoke.
    * @returns The revoked [`AgentTask`](https://clerk.com/docs/reference/backend/types/backend-agent-task) object.
    */
   public async revoke(agentTaskId: string) {

@@ -145,8 +145,8 @@ export class EnterpriseConnectionAPI extends AbstractAPI {
   }
 
   /**
-   * Gets a list of enterprise connections for the instance.
-   * @returns The list of [`EnterpriseConnection`](https://clerk.com/docs/reference/backend/types/backend-enterprise-connection) objects.
+   * Gets the list of enterprise connections for the instance.
+   * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property containing an array of [`EnterpriseConnection`](https://clerk.com/docs/reference/backend/types/backend-enterprise-connection) objects and a `totalCount` property containing the total number of enterprise connections for the instance.
    */
   public async getEnterpriseConnectionList(params: EnterpriseConnectionListParams = {}) {
     return this.request<PaginatedResourceResponse<EnterpriseConnection[]>>({

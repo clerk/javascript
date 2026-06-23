@@ -1,7 +1,7 @@
 import type { SignInTokenJSON } from './JSON';
 
 /**
- * The Backend `SignInToken` object holds information about a sign in token.
+ * The Backend `SignInToken` object holds information about a sign-in token.
  */
 export class SignInToken {
   constructor(
