@@ -1676,6 +1676,7 @@ export const viVN: LocalizationResource = {
     insufficient_seats_change_plan: undefined,
     insufficient_seats_contact_support: undefined,
     not_allowed_access: undefined,
+    oauth_access_denied: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -1752,6 +1753,9 @@ export const viVN: LocalizationResource = {
     action__openUserMenu: 'Mở menu người dùng',
     action__signOut: 'Đăng xuất',
     action__signOutAll: 'Đăng xuất tất cả tài khoản',
+    label__userButtonPopover: 'Bảng điều khiển tài khoản',
+    label__accountActions: 'Hành động tài khoản',
+    label__activeSessions: 'Phiên hoạt động',
   },
   userProfile: {
     apiKeysPage: {

@@ -1646,6 +1646,7 @@ export const heIL: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       "האימייל או מספר הטלפון אינו מותר להרשמה. זה עשוי להיות בגלל השימוש ב-'+', '=', '#' או '.' בכתובת האימייל שלך, השימוש בתחום המחובר לשירות אימייל זמני או הפרסט בכתובת האימייל שלך. אם מחזרים שגיאה, נא ליצור קשר עם תמיכה.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'הדומיין של ספק האימייל הזה חסום. אנא נסה אחד שונה.',
     organization_domain_common: 'הדומיין של ספק האימייל הזה נפוץ. אנא נסה אחד שונה.',
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -1719,6 +1720,9 @@ export const heIL: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'התנתק',
     action__signOutAll: 'התנתק מכל החשבונות',
+    label__userButtonPopover: 'לוח החשבון',
+    label__accountActions: 'פעולות חשבון',
+    label__activeSessions: 'סשנים פעילים',
   },
   userProfile: {
     apiKeysPage: {

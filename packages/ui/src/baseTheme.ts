@@ -138,10 +138,28 @@ const clerkTheme: Appearance = {
                 theme.shadows.$focusRing.replace('{{color}}', theme.colors.$colorRing),
               ].toString(),
             },
+            '&:focus:not(:focus-visible)': {
+              boxShadow: BUTTON_SOLID_SHADOW(theme.colors.$primary500),
+            },
+            '&:focus-visible': {
+              boxShadow: [
+                BUTTON_SOLID_SHADOW(theme.colors.$primary500),
+                theme.shadows.$focusRing.replace('{{color}}', theme.colors.$colorRing),
+              ].toString(),
+            },
           },
           '&[data-color="danger"]': {
             boxShadow: BUTTON_SOLID_SHADOW(theme.colors.$danger500),
             '&:focus': {
+              boxShadow: [
+                BUTTON_SOLID_SHADOW(theme.colors.$danger500),
+                theme.shadows.$focusRing.replace('{{color}}', theme.colors.$dangerAlpha200),
+              ].toString(),
+            },
+            '&:focus:not(:focus-visible)': {
+              boxShadow: BUTTON_SOLID_SHADOW(theme.colors.$danger500),
+            },
+            '&:focus-visible': {
               boxShadow: [
                 BUTTON_SOLID_SHADOW(theme.colors.$danger500),
                 theme.shadows.$focusRing.replace('{{color}}', theme.colors.$dangerAlpha200),
@@ -158,11 +176,29 @@ const clerkTheme: Appearance = {
               theme.shadows.$focusRing.replace('{{color}}', theme.colors.$colorRing),
             ].toString(),
           },
+          '&:focus:not(:focus-visible)': {
+            boxShadow: BUTTON_OUTLINE_SHADOW(theme.colors.$borderAlpha100),
+          },
+          '&:focus-visible': {
+            boxShadow: [
+              BUTTON_OUTLINE_SHADOW(theme.colors.$borderAlpha100),
+              theme.shadows.$focusRing.replace('{{color}}', theme.colors.$colorRing),
+            ].toString(),
+          },
         },
         '&[data-variant="bordered"]': {
           borderWidth: 0,
           boxShadow: BUTTON_OUTLINE_SHADOW(theme.colors.$borderAlpha100),
           '&:focus': {
+            boxShadow: [
+              BUTTON_OUTLINE_SHADOW(theme.colors.$borderAlpha100),
+              theme.shadows.$focusRing.replace('{{color}}', theme.colors.$colorRing),
+            ].toString(),
+          },
+          '&:focus:not(:focus-visible)': {
+            boxShadow: BUTTON_OUTLINE_SHADOW(theme.colors.$borderAlpha100),
+          },
+          '&:focus-visible': {
             boxShadow: [
               BUTTON_OUTLINE_SHADOW(theme.colors.$borderAlpha100),
               theme.shadows.$focusRing.replace('{{color}}', theme.colors.$colorRing),
@@ -221,7 +257,7 @@ const clerkTheme: Appearance = {
       },
       selectSearchInput__countryCode: {
         boxShadow: 'none',
-        '&:focus': { boxShadow: 'none' },
+        '&:focus-visible': { boxShadow: 'none' },
       },
       cardBox: {
         borderWidth: 0,

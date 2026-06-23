@@ -1665,6 +1665,7 @@ export const beBY: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       "Адрас электроннай пошты ці нумар тэлефона не дазволены для рэгістрацыі. Гэта можа быць звязана з выкарыстаннем знакаў '+', '=', '#' або '.' у вашым адрасе электроннай пошты, з дапамогай дамена, падлучанага да часовай службы электроннай пошты, або відавочна заблакіраваны. Калі вы лічыце, што гэта памылка, звярніцеся ў службу падтрымкі.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'Дамен арганізацыі заблакаван.',
     organization_domain_common: 'Дамен арганізацыі звычайны і не можа быць выкарыстаны.',
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -1740,6 +1741,9 @@ export const beBY: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Выйсці',
     action__signOutAll: 'Выйсці з усіх уліковых запісаў',
+    label__userButtonPopover: 'Панэль уліковага запісу',
+    label__accountActions: 'Дзеянні з уліковым запісам',
+    label__activeSessions: 'Актыўныя сесіі',
   },
   userProfile: {
     apiKeysPage: {

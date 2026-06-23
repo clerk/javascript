@@ -1643,6 +1643,7 @@ export const zhTW: LocalizationResource = {
     insufficient_seats_change_plan: undefined,
     insufficient_seats_contact_support: undefined,
     not_allowed_access: undefined,
+    oauth_access_denied: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -1717,6 +1718,9 @@ export const zhTW: LocalizationResource = {
     action__openUserMenu: '開啟使用者選單',
     action__signOut: '登出',
     action__signOutAll: '登出所有帳戶',
+    label__userButtonPopover: '帳戶面板',
+    label__accountActions: '帳戶操作',
+    label__activeSessions: '活躍工作階段',
   },
   userProfile: {
     apiKeysPage: {

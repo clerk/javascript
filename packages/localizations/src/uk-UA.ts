@@ -1656,6 +1656,7 @@ export const ukUA: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       "Адреса електронної пошти або номер телефону не дозволено для реєстрації. Це може бути пов'язано з використанням '+', '=', '#' або '.' в адресі електронної пошти, використанням домену, пов'язаного з тимчасовою електронною поштою, або явного виключення.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -1730,6 +1731,9 @@ export const ukUA: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Вийти',
     action__signOutAll: 'Вийти з усіх акаунтів',
+    label__userButtonPopover: 'Панель облікового запису',
+    label__accountActions: 'Дії облікового запису',
+    label__activeSessions: 'Активні сеанси',
   },
   userProfile: {
     apiKeysPage: {

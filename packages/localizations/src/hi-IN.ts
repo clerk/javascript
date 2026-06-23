@@ -1680,6 +1680,7 @@ export const hiIN: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       'आपके पास इस पेज तक पहुंचने की अनुमति नहीं है। यदि आपका मानना है कि यह एक त्रुटि है, तो कृपया सहायता से संपर्क करें।',
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'यह एक ब्लॉक किया गया ईमेल प्रदाता डोमेन है। कृपया दूसरा उपयोग करें।',
     organization_domain_common: 'यह एक सामान्य ईमेल प्रदाता डोमेन है। कृपया दूसरा उपयोग करें।',
     organization_domain_exists_for_enterprise_connection:
@@ -1759,6 +1760,9 @@ export const hiIN: LocalizationResource = {
     action__openUserMenu: 'उपयोगकर्ता मेनू खोलें',
     action__signOut: 'साइन आउट',
     action__signOutAll: 'सभी खातों से साइन आउट करें',
+    label__userButtonPopover: 'खाता पैनल',
+    label__accountActions: 'खाता क्रियाएं',
+    label__activeSessions: 'सक्रिय सत्र',
   },
   userProfile: {
     apiKeysPage: {

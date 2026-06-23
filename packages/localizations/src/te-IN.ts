@@ -1685,6 +1685,7 @@ export const teIN: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       'మీకు ఈ పేజీని యాక్సెస్ చేయడానికి అనుమతి లేదు. ఇది లోపం అని మీరు నమ్మితే దయచేసి మద్దతును సంప్రదించండి.',
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'ఇది నిరోధించబడిన ఇమెయిల్ ప్రొవైడర్ డొమైన్. దయచేసి వేరొకదాన్ని ఉపయోగించండి.',
     organization_domain_common: 'ఇది సాధారణ ఇమెయిల్ ప్రొవైడర్ డొమైన్. దయచేసి వేరొకదాన్ని ఉపయోగించండి.',
     organization_domain_exists_for_enterprise_connection: 'ఈ డొమైన్ ఇప్పటికే మీ సంస్థ SSOకి ఉపయోగించబడుతోంది',
@@ -1763,6 +1764,9 @@ export const teIN: LocalizationResource = {
     action__openUserMenu: 'వినియోగదారు మెనుని తెరువు',
     action__signOut: 'సైన్ అవుట్',
     action__signOutAll: 'అన్ని ఖాతాల నుండి సైన్ అవుట్ అవ్వండి',
+    label__userButtonPopover: 'ఖాతా ప్యానెల్',
+    label__accountActions: 'ఖాతా చర్యలు',
+    label__activeSessions: 'క్రియాశీల సెషన్‌లు',
   },
   userProfile: {
     apiKeysPage: {

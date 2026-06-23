@@ -1670,6 +1670,7 @@ export const csCZ: LocalizationResource = {
     insufficient_seats_change_plan: undefined,
     insufficient_seats_contact_support: undefined,
     not_allowed_access: undefined,
+    oauth_access_denied: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -1744,6 +1745,9 @@ export const csCZ: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Odhlásit se',
     action__signOutAll: 'Odhlásit se ze všech účtů',
+    label__userButtonPopover: 'Panel účtu',
+    label__accountActions: 'Akce účtu',
+    label__activeSessions: 'Aktivní relace',
   },
   userProfile: {
     apiKeysPage: {

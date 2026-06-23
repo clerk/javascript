@@ -1685,6 +1685,7 @@ export const huHU: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       "Az email címed vagy a telefonszámod nem használható regisztrációhoz. Ez lehet, mert az email címedben vagy a telefonszámodban szerepel a '+', '=', '#' vagy '.' karakter, vagy az email címedben vagy a telefonszámodban szerepel egy időzített email szolgáltató vagy kizárt tartomány. Ha úgy gondolja, hogy ez hiba, vegye fel velünk a kapcsolatot.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -1763,6 +1764,9 @@ export const huHU: LocalizationResource = {
     action__openUserMenu: 'Felhasználói menü megnyitása',
     action__signOut: 'Kijelentkezés',
     action__signOutAll: 'Kijelentkezés minden fiókból',
+    label__userButtonPopover: 'Fiókpanel',
+    label__accountActions: 'Fiókműveletek',
+    label__activeSessions: 'Aktív munkamenetek',
   },
   userProfile: {
     apiKeysPage: {

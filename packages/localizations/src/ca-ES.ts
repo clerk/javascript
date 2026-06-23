@@ -1669,6 +1669,7 @@ export const caES: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       "L'adreça de correu electrònic o el número de telèfon no es permet registrar-se. Això podria ser degut a l'ús de '+', '=', '#' o '.' a la vostra adreça de correu electrònic, utilitzant un domini connectat amb un servei de correu electrònic temporal o bloquejant-se explícitament. Si creieu que es tracta d'un error, poseu-vos en contacte amb el servei d'assistència.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: "Aquest és un domini bloquejat, si us plau utilitza'n un altre.",
     organization_domain_common: "Aquest és un domini habitual, si us plau utilitza'n un altre.",
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -1746,6 +1747,9 @@ export const caES: LocalizationResource = {
     action__openUserMenu: "Obre el menú d'usuari",
     action__signOut: 'Tanca sessió',
     action__signOutAll: 'Tanca sessió de tots els comptes',
+    label__userButtonPopover: 'Tauler del compte',
+    label__accountActions: 'Accions del compte',
+    label__activeSessions: 'Sessions actives',
   },
   userProfile: {
     apiKeysPage: {

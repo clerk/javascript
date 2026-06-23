@@ -1011,6 +1011,9 @@ export type __internal_LocalizationResource = {
     action__addAccount: LocalizationValue;
     action__openUserMenu: LocalizationValue;
     action__closeUserMenu: LocalizationValue;
+    label__userButtonPopover?: LocalizationValue;
+    label__accountActions?: LocalizationValue;
+    label__activeSessions?: LocalizationValue;
   };
   organizationSwitcher: {
     personalWorkspace: LocalizationValue;
@@ -2034,6 +2037,7 @@ type UnstableErrors = WithParamName<{
   form_password_or_identifier_incorrect: LocalizationValue;
   form_password_validation_failed: LocalizationValue;
   not_allowed_access: LocalizationValue;
+  oauth_access_denied: LocalizationValue;
   form_identifier_exists: LocalizationValue;
   form_identifier_exists__email_address: LocalizationValue;
   form_identifier_exists__username: LocalizationValue;

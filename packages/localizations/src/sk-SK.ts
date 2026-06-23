@@ -1666,6 +1666,7 @@ export const skSK: LocalizationResource = {
     insufficient_seats_change_plan: undefined,
     insufficient_seats_contact_support: undefined,
     not_allowed_access: 'Nemáte povolený prístup k tejto stránke. Ak si myslíte, že je to chyba, kontaktujte podporu.',
+    oauth_access_denied: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -1740,6 +1741,9 @@ export const skSK: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Odhlásiť sa',
     action__signOutAll: 'Odhlásiť sa zo všetkých účtov',
+    label__userButtonPopover: 'Panel účtu',
+    label__accountActions: 'Akcie účtu',
+    label__activeSessions: 'Aktívne relácie',
   },
   userProfile: {
     apiKeysPage: {

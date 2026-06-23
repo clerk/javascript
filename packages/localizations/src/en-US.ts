@@ -1676,6 +1676,7 @@ export const enUS: LocalizationResource = {
     insufficient_seats_contact_support:
       'Your organization does not have enough seats to invite the desired number of members. Please contact support.',
     not_allowed_access: undefined,
+    oauth_access_denied: 'You did not grant access to your account.',
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -1753,6 +1754,9 @@ export const enUS: LocalizationResource = {
     action__openUserMenu: 'Open user menu',
     action__signOut: 'Sign out',
     action__signOutAll: 'Sign out of all accounts',
+    label__userButtonPopover: 'Account panel',
+    label__accountActions: 'Account actions',
+    label__activeSessions: 'Active sessions',
   },
   userProfile: {
     apiKeysPage: {

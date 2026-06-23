@@ -2,7 +2,18 @@ import { iconImageUrl } from '@clerk/shared/constants';
 import React from 'react';
 
 import type { LocalizationKey } from '@/customizables';
-import { Box, Col, descriptors, Flow, Grid, localizationKeys, Span, Text, useLocalizations } from '@/customizables';
+import {
+  Box,
+  Col,
+  descriptors,
+  Flow,
+  Grid,
+  localizationKeys,
+  RadioInput,
+  Span,
+  Text,
+  useLocalizations,
+} from '@/customizables';
 import { useCardState } from '@/elements/contexts';
 import { common, mqu } from '@/styledSystem';
 import { Alert } from '@/ui/elements/Alert';
@@ -162,11 +173,12 @@ export const SelectProviderStep = (): JSX.Element => {
                   {group.options.map(option => (
                     <ProviderCard
                       key={option.id}
+                      name='configure-sso-provider'
                       value={option.id}
                       iconId={option.iconId}
                       label={option.label}
-                      isSelected={selected === option.id}
-                      onSelect={() => handleSelect(option.id)}
+                      checked={selected === option.id}
+                      onChange={() => handleSelect(option.id)}
                     />
                   ))}
                 </Grid>
@@ -218,27 +230,24 @@ export const SelectProviderStep = (): JSX.Element => {
 };
 
 type ProviderCardProps = {
+  name: string;
   value: string;
   iconId: string;
   label: LocalizationKey;
-  isSelected?: boolean;
-  onSelect: () => void;
+  checked?: boolean;
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
-const ProviderCard = ({ value, iconId, label, isSelected, onSelect }: ProviderCardProps): JSX.Element => {
+const ProviderCard = ({ name, value, iconId, label, checked, onChange }: ProviderCardProps): JSX.Element => {
   const { t } = useLocalizations();
   const labelText = t(label);
 
   return (
     <Box
-      as='button'
-      role='radio'
-      aria-checked={isSelected}
-      aria-label={labelText}
+      as='label'
       elementDescriptor={descriptors.configureSSOProviderCard}
       elementId={descriptors.configureSSOProviderCard.setId(value)}
-      isActive={isSelected}
-      onClick={onSelect}
+      isActive={checked}
       sx={t => ({
         display: 'flex',
         flexDirection: 'column',
@@ -249,19 +258,33 @@ const ProviderCard = ({ value, iconId, label, isSelected, onSelect }: ProviderCa
         padding: t.space.$1x5,
         cursor: 'pointer',
         position: 'relative',
-        appearance: 'none',
-        textAlign: 'center',
-        backgroundColor: isSelected ? t.colors.$neutralAlpha50 : 'transparent',
         ...common.borderVariants(t).normal,
-        '&:focus-visible': {
+        '&:has(input:focus-visible)': {
           ...common.focusRingStyles(t),
           borderColor: t.colors.$borderAlpha300,
         },
         '&:hover': {
           backgroundColor: t.colors.$neutralAlpha50,
         },
+        '&:has(input:checked)': {
+          backgroundColor: t.colors.$neutralAlpha50,
+        },
       })}
     >
+      <RadioInput
+        elementDescriptor={descriptors.configureSSOProviderCardRadio}
+        elementId={descriptors.configureSSOProviderCardRadio.setId(value)}
+        name={name}
+        value={value}
+        checked={checked}
+        onChange={onChange}
+        focusRing={false}
+        // The visible dot is intentionally dropped per design; the radio stays in
+        // the a11y tree (sr-only, not display:none) so it keeps native radiogroup
+        // keyboard semantics and names itself from the wrapping label.
+        sx={common.visuallyHidden()}
+      />
+
       <Span
         elementDescriptor={descriptors.configureSSOProviderCardIcon}
         elementId={descriptors.configureSSOProviderCardIcon.setId(value)}

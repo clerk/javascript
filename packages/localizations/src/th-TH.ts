@@ -1655,6 +1655,7 @@ export const thTH: LocalizationResource = {
     insufficient_seats_change_plan: undefined,
     insufficient_seats_contact_support: undefined,
     not_allowed_access: undefined,
+    oauth_access_denied: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -1729,6 +1730,9 @@ export const thTH: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'ออกจากระบบ',
     action__signOutAll: 'ออกจากระบบทุกบัญชี',
+    label__userButtonPopover: 'แผงบัญชี',
+    label__accountActions: 'การดำเนินการบัญชี',
+    label__activeSessions: 'เซสชันที่ใช้งานอยู่',
   },
   userProfile: {
     apiKeysPage: {

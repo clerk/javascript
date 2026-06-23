@@ -1660,6 +1660,7 @@ export const mnMN: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       "Имэйл хаяг эсвэл утасны дугаарыг бүртгүүлэхийг хориглоно. Энэ нь '+', '=', '#' эсвэл '.'-г ашигласантай холбоотой байж болно. түр зуурын цахим шуудангийн үйлчилгээтэй холбогдсон домэйн ашиглах, эсвэл шууд хаагдсан байх. Хэрэв та үүнийг алдаа гэж үзэж байгаа бол дэмжлэгтэй холбогдоно уу.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -1735,6 +1736,9 @@ export const mnMN: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Гарах',
     action__signOutAll: 'Бүх бүртгэлээс гарна уу',
+    label__userButtonPopover: 'Бүртгэлийн самбар',
+    label__accountActions: 'Бүртгэлийн үйлдлүүд',
+    label__activeSessions: 'Идэвхтэй сессүүд',
   },
   userProfile: {
     apiKeysPage: {
