@@ -1761,6 +1761,9 @@ export const isIS: LocalizationResource = {
     action__openUserMenu: 'Opna notendavalmynd',
     action__signOut: 'Skrá út',
     action__signOutAll: 'Skrá út af öllum reikningum',
+    label__userButtonPopover: 'Reikningsspjald',
+    label__accountActions: 'Reikningsaðgerðir',
+    label__activeSessions: 'Virkar lotur',
   },
   userProfile: {
     apiKeysPage: {

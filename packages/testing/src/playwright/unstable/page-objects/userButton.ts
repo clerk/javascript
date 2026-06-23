@@ -23,14 +23,14 @@ export const createUserButtonPageObject = (testArgs: { page: EnhancedPage }) => 
         menuItems = [menuItems];
       }
       for (const menuItem of menuItems) {
-        await expect(page.getByRole('menuitem', { name: menuItem })).toBeVisible();
+        await expect(page.getByRole('button', { name: menuItem })).toBeVisible();
       }
     },
     triggerSignOut: () => {
-      return page.getByRole('menuitem', { name: /Sign out$/i }).click();
+      return page.getByRole('button', { name: /Sign out$/i }).click();
     },
     triggerManageAccount: () => {
-      return page.getByRole('menuitem', { name: /Manage account/i }).click();
+      return page.getByRole('button', { name: /Manage account/i }).click();
     },
     switchAccount: (emailAddress: string) => {
       return page.getByText(emailAddress).click();

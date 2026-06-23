@@ -1761,6 +1761,9 @@ export const nbNO: LocalizationResource = {
     action__openUserMenu: 'Åpne brukermeny',
     action__signOut: 'Logg ut',
     action__signOutAll: 'Logg ut av alle kontoer',
+    label__userButtonPopover: 'Kontopanel',
+    label__accountActions: 'Kontohandlinger',
+    label__activeSessions: 'Aktive økter',
   },
   userProfile: {
     apiKeysPage: {
