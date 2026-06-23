@@ -1742,6 +1742,9 @@ export const plPL: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Wyloguj',
     action__signOutAll: 'Wyloguj ze wszystkich kont',
+    label__userButtonPopover: 'Panel konta',
+    label__accountActions: 'Działania na koncie',
+    label__activeSessions: 'Aktywne sesje',
   },
   userProfile: {
     apiKeysPage: {

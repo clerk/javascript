@@ -1737,6 +1737,9 @@ export const enGB: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Sign out',
     action__signOutAll: 'Sign out of all accounts',
+    label__userButtonPopover: 'Account panel',
+    label__accountActions: 'Account actions',
+    label__activeSessions: 'Active sessions',
   },
   userProfile: {
     apiKeysPage: {

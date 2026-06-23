@@ -1731,6 +1731,9 @@ export const ukUA: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Вийти',
     action__signOutAll: 'Вийти з усіх акаунтів',
+    label__userButtonPopover: 'Панель облікового запису',
+    label__accountActions: 'Дії облікового запису',
+    label__activeSessions: 'Активні сеанси',
   },
   userProfile: {
     apiKeysPage: {

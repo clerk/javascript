@@ -1747,6 +1747,9 @@ export const esUY: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Cerrar sesión',
     action__signOutAll: 'Cerrar sesión en todas las cuentas',
+    label__userButtonPopover: 'Panel de cuenta',
+    label__accountActions: 'Acciones de cuenta',
+    label__activeSessions: 'Sesiones activas',
   },
   userProfile: {
     apiKeysPage: {

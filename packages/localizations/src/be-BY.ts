@@ -1741,6 +1741,9 @@ export const beBY: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Выйсці',
     action__signOutAll: 'Выйсці з усіх уліковых запісаў',
+    label__userButtonPopover: 'Панэль уліковага запісу',
+    label__accountActions: 'Дзеянні з уліковым запісам',
+    label__activeSessions: 'Актыўныя сесіі',
   },
   userProfile: {
     apiKeysPage: {

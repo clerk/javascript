@@ -1732,6 +1732,9 @@ export const srRS: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Odjavi se',
     action__signOutAll: 'Odjavi se sa svih naloga',
+    label__userButtonPopover: 'Панел налога',
+    label__accountActions: 'Акције налога',
+    label__activeSessions: 'Активне сесије',
   },
   userProfile: {
     apiKeysPage: {
