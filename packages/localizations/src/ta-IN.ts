@@ -1101,18 +1101,13 @@ export const taIN: LocalizationResource = {
         badge__inactive: undefined,
         badge__unconfigured: undefined,
         descriptionLine1: undefined,
-        descriptionLine2: undefined,
-        descriptionLine2__noRole: undefined,
         domainLabel: undefined,
-        issuerLabel: undefined,
         menuAction__activate: undefined,
         menuAction__deactivate: undefined,
         menuAction__edit: undefined,
         menuAction__remove: undefined,
         primaryButton__continueConfiguration: undefined,
         primaryButton__startConfiguration: undefined,
-        providerLabel: undefined,
-        signOnUrlLabel: undefined,
         title: undefined,
       },
       title: undefined,
@@ -1694,6 +1689,7 @@ export const taIN: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       'இந்த பக்கத்தை அணுக உங்களுக்கு அனுமதி இல்லை. இது பிழை என்று நீங்கள் நம்பினால், ஆதரவைத் தொடர்பு கொள்ளவும்.',
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'இது தடுக்கப்பட்ட மின்னஞ்சல் வழங்குநர் டொமைன். வேறொன்றைப் பயன்படுத்தவும்.',
     organization_domain_common: 'இது பொதுவான மின்னஞ்சல் வழங்குநர் டொமைன். வேறொன்றைப் பயன்படுத்தவும்.',
     organization_domain_exists_for_enterprise_connection:
@@ -1774,6 +1770,9 @@ export const taIN: LocalizationResource = {
     action__openUserMenu: 'பயனர் மெனுவைத் திற',
     action__signOut: 'வெளியேறு',
     action__signOutAll: 'அனைத்து கணக்குகளிலிருந்தும் வெளியேறு',
+    label__userButtonPopover: 'கணக்கு பலகம்',
+    label__accountActions: 'கணக்கு செயல்கள்',
+    label__activeSessions: 'செயலில் உள்ள அமர்வுகள்',
   },
   userProfile: {
     apiKeysPage: {

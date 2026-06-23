@@ -39,6 +39,7 @@ const FILES_WITHOUT_HEADINGS = [
   'use-organization-creation-defaults-params.mdx',
   'use-o-auth-consent-params.mdx',
   'use-o-auth-consent-return.mdx',
+  'create-organization-domain-params.mdx',
 ];
 
 /**
@@ -70,6 +71,7 @@ const LINK_REPLACEMENTS = [
   ['organization-domain-resource', '/docs/reference/types/organization-domain-resource'],
   ['organization-invitation-resource', '/docs/reference/types/organization-invitation'],
   ['organization-membership-request-resource', '/docs/reference/types/organization-membership-request'],
+  ['o-auth-application-namespace', '/docs/reference/types/oauth-application'],
   ['o-auth-consent-info', '/docs/reference/types/oauth-consent-info'],
   ['o-auth-consent-scope', '/docs/reference/types/oauth-consent-scope'],
   ['o-auth-strategy', '/docs/reference/types/sso#o-auth-strategy'],
@@ -133,6 +135,7 @@ const LINK_REPLACEMENTS = [
     'create-organization-invitation-params',
     '/docs/reference/backend/organization/create-organization-invitation#create-organization-invitation-params',
   ],
+  ['create-organization-domain-params', '#create-organization-domain-params'],
 ];
 
 /**
