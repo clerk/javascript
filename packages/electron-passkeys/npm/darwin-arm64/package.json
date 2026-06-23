@@ -1,0 +1,25 @@
+{
+  "name": "@clerk/electron-passkeys-darwin-arm64",
+  "version": "0.0.1",
+  "description": "Native passkey support for Clerk's Electron SDK (macOS arm64)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/electron-passkeys"
+  },
+  "license": "MIT",
+  "author": "Clerk",
+  "main": "electron-passkeys.darwin-arm64.node",
+  "files": [
+    "electron-passkeys.darwin-arm64.node"
+  ],
+  "os": [
+    "darwin"
+  ],
+  "cpu": [
+    "arm64"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

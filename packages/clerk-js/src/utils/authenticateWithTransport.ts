@@ -19,6 +19,38 @@ type ClerkWithResourceCallback = {
   ) => Promise<unknown>;
 };
 
+const NATIVE_OAUTH_FAILED_STATUS = 'failed';
+const NATIVE_OAUTH_ERROR_FALLBACK_CODE = 'oauth_callback_failed';
+const NATIVE_OAUTH_ERROR_MESSAGES: Record<string, string> = {
+  oauth_access_denied: 'You did not grant access to your account.',
+};
+
+function getNativeOAuthCallbackFailure(callbackUrl: string): { code: string; message: string } | null {
+  const searchParams = new URL(callbackUrl).searchParams;
+  const status = searchParams.get('__clerk_status');
+
+  if (status !== NATIVE_OAUTH_FAILED_STATUS) {
+    return null;
+  }
+
+  const unsafeCode = searchParams.get('__clerk_error_code') || NATIVE_OAUTH_ERROR_FALLBACK_CODE;
+  const code = NATIVE_OAUTH_ERROR_MESSAGES[unsafeCode] ? unsafeCode : NATIVE_OAUTH_ERROR_FALLBACK_CODE;
+
+  return {
+    code,
+    message: NATIVE_OAUTH_ERROR_MESSAGES[code] || 'OAuth callback failed.',
+  };
+}
+
+async function resetFailedAttempt(resource: SignInResource | SignUpResource): Promise<void> {
+  try {
+    // Both resources accept `{}` to reset the attempt, but their `create` param types differ.
+    await (resource.create as (params: Record<string, never>) => Promise<unknown>)({});
+  } catch {
+    // Best-effort: the OAuth failure is still thrown, so a failed reset just keeps the prior behavior.
+  }
+}
+
 export async function _authenticateWithTransport(opts: {
   clerk: ClerkWithResourceCallback;
   transport: OAuthTransport;
@@ -41,6 +73,15 @@ export async function _authenticateWithTransport(opts: {
   }
 
   const { callbackUrl } = await opts.transport.open(new URL(verificationUrl.toString()));
+  const failure = getNativeOAuthCallbackFailure(callbackUrl);
+
+  if (failure) {
+    // The failed verification persists on the client and would resurface on the next reload (the native
+    // flow never navigates away from the card), so reset the attempt before surfacing the error.
+    await resetFailedAttempt(opts.resource);
+    throw new ClerkRuntimeError(failure.message, { code: failure.code });
+  }
+
   const nonce = new URL(callbackUrl).searchParams.get('rotating_token_nonce');
 
   if (nonce) {
