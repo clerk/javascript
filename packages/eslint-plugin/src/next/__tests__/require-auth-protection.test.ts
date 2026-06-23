@@ -1817,6 +1817,19 @@ describe('require-auth-protection schema validation', () => {
       },
     });
   };
+  const lintWithCustomRuleId = (options: RuleOptions | Record<string, unknown>) => {
+    const linter = new Linter();
+    return linter.verify('export default function X() {}', {
+      plugins: {
+        clerk: {
+          rules: { 'require-auth-protection': rule },
+        },
+      },
+      rules: {
+        'clerk/require-auth-protection': ['warn', options],
+      },
+    });
+  };
 
   it('rejects configs missing `protected`', () => {
     expect(() => lintWithOptions({ public: ['app/(unauthenticated)/**'] })).toThrow(/protected/);
@@ -1828,6 +1841,31 @@ describe('require-auth-protection schema validation', () => {
 
   it('accepts configs with `protected` set and other options omitted', () => {
     expect(() => lintWithOptions({ protected: ['app/**'] })).not.toThrow();
+  });
+
+  it('rejects protected patterns with `..` segments', () => {
+    expect(() => lintWithOptions({ protected: ['../app/**'] })).toThrow(
+      /protected.*relative to `rootDir`.*cannot contain `\.\.`/s,
+    );
+    expect(() => lintWithOptions({ protected: ['app/../admin/**'] })).toThrow(
+      /protected.*relative to `rootDir`.*cannot contain `\.\.`/s,
+    );
+  });
+
+  it('uses the configured rule id in path pattern validation errors', () => {
+    expect(() => lintWithCustomRuleId({ protected: ['../app/**'] })).toThrow(
+      /clerk\/require-auth-protection: `protected` patterns/,
+    );
+  });
+
+  it('rejects public patterns with `..` segments', () => {
+    expect(() => lintWithOptions({ protected: ['**'], public: ['../public/**'] })).toThrow(
+      /public.*relative to `rootDir`.*cannot contain `\.\.`/s,
+    );
+  });
+
+  it('allows pattern segments that only start with dots', () => {
+    expect(() => lintWithOptions({ protected: ['.well-known/**', '..foo/**'] })).not.toThrow();
   });
 
   it('accepts optional resource configuration', () => {

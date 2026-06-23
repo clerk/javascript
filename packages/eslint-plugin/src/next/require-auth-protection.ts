@@ -116,6 +116,9 @@ const rule: Rule.RuleModule = {
     const filename = context.physicalFilename ?? context.filename ?? context.getFilename?.();
     const cwd = context.cwd || context.getCwd?.();
     const options = (context.options[0] ?? {}) as Partial<RuleOptions>;
+    const ruleId = context.id ?? 'require-auth-protection';
+    validatePathPatterns(ruleId, 'protected', options.protected);
+    validatePathPatterns(ruleId, 'public', options.public);
     const config: ClassifyOptions = {
       protected: options.protected,
       public: options.public ?? [],
@@ -219,6 +222,23 @@ export default rule;
 
 function normalizeResources(resources: ResourceOptions | undefined): NormalizedResourceOptions {
   return { ...DEFAULT_RESOURCES, ...resources };
+}
+
+function validatePathPatterns(
+  ruleId: string,
+  optionName: 'protected' | 'public',
+  patterns: string[] | undefined,
+): void {
+  if (!patterns) {
+    return;
+  }
+  for (const pattern of patterns) {
+    if (pattern.split('/').includes('..')) {
+      throw new Error(
+        `${ruleId}: \`${optionName}\` patterns must be relative to \`rootDir\` and cannot contain \`..\` segments. Received "${pattern}".`,
+      );
+    }
+  }
 }
 
 function checkUnacknowledgedMixedScope(

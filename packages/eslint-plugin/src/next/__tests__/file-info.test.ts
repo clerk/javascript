@@ -41,6 +41,11 @@ describe('getRelativeFolder', () => {
     expect(getRelativeFolder('/elsewhere/utils/foo.ts', '/proj')).toBeNull();
   });
 
+  it('allows project folders whose names start with dots', () => {
+    expect(getRelativeFolder('/proj/..foo/actions.ts', '/proj')).toBe('..foo');
+    expect(getRelativeFolder('/proj/.well-known/actions.ts', '/proj')).toBe('.well-known');
+  });
+
   it('returns the project-relative folder for files outside App Router', () => {
     expect(getRelativeFolder('/proj/utils/foo.ts', '/proj')).toBe('utils');
     expect(getRelativeFolder('/proj/shared/actions.ts', '/proj')).toBe('shared');

@@ -30,7 +30,7 @@ export function getRelativeFolder(filename: string | undefined, rootDir: string 
 
   const normalizedRoot = rootDir.replaceAll('\\', '/');
   const rel = path.posix.relative(normalizedRoot, normalizedFile);
-  if (!rel || rel.startsWith('..')) {
+  if (!rel || rel === '..' || rel.startsWith('../')) {
     return null;
   }
 
