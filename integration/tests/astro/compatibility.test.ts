@@ -15,8 +15,8 @@ test.describe('Astro version compatibility @astro', () => {
       .clone()
       .setName('astro-node-v6-smoke')
       .addDependency('astro', '^6.4.8')
-      .addDependency('@astrojs/node', '^9.5.5')
-      .addDependency('@astrojs/react', '^4.4.2')
+      .addDependency('@astrojs/node', '^10.1.4')
+      .addDependency('@astrojs/react', '^5.0.7')
       .commit();
 
     await app.setup();
