@@ -1,9 +1,19 @@
 import { atom, browser, createI18n, defineLocalization, localeFrom } from '@clerk/i18n';
 import { useStore } from '@clerk/i18n/react';
 import { createContextAndHook } from '@clerk/shared/react';
+import type { BillingMoneyAmount } from '@clerk/shared/types';
 import React, { useMemo, useRef } from 'react';
 
-import type { FlatOverrides, I18n, NestedOverrides, Registry, ResolvedOverrides, WritableStore } from '@clerk/i18n';
+import type {
+  CurrencyFormatFn,
+  CurrencyFormatOptions,
+  FlatOverrides,
+  I18n,
+  NestedOverrides,
+  Registry,
+  ResolvedOverrides,
+  WritableStore,
+} from '@clerk/i18n';
 
 interface LocalizationValue {
   i18n: I18n;
@@ -76,4 +86,12 @@ export function useMessages<B extends Record<string, unknown>>(namespace: string
   // $messages must be stable for useSyncExternalStore; i18n is stable per provider instance.
   const $messages = useMemo(() => i18n(namespace, base), [i18n]);
   return useStore($messages);
+}
+
+export function formatBillingAmount(
+  formatCurrency: CurrencyFormatFn,
+  amount: BillingMoneyAmount,
+  opts?: CurrencyFormatOptions,
+) {
+  return formatCurrency(amount.amount, amount.currency, opts);
 }

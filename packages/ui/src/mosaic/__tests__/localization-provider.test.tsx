@@ -1,10 +1,10 @@
 import { renderHook } from '@testing-library/react';
 import React from 'react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import frMessages from '../locales/fr.json';
 import { MosaicProvider } from '../providers/mosaic-provider';
-import { useMessages } from '../providers/localization-provider';
+import { formatBillingAmount, useMessages } from '../providers/localization-provider';
 
 const base = { title: 'Organization Profile', tab: { general: 'General', members: 'Members' } };
 
@@ -27,5 +27,21 @@ describe('LocalizationProvider overrides', () => {
     expect(result.current.title).toBe('test');
     // Non-overridden key still resolves from the French bundle
     expect((result.current.tab as Record<string, unknown>).general).toBe('Général');
+  });
+});
+
+describe('LocalizationProvider currency formatting', () => {
+  const amount = {
+    amount: 1000,
+    amountFormatted: '10.00',
+    currency: 'USD',
+    currencySymbol: '$',
+  };
+
+  it('adapts Billing money amounts to a resolved currency message', () => {
+    const formatCurrency = vi.fn(() => '$10');
+
+    expect(formatBillingAmount(formatCurrency, amount, { style: 'short' })).toBe('$10');
+    expect(formatCurrency).toHaveBeenCalledWith(1000, 'USD', { style: 'short' });
   });
 });

@@ -1,5 +1,6 @@
 import { computed } from 'nanostores';
 
+import { createCurrencyFormatter } from '../currency';
 import type { ReadableStore } from '../types';
 
 export interface CurrencyFormatOptions {
@@ -27,6 +28,7 @@ export function formatter($locale: ReadableStore<string>): ReadableStore<Formatt
     const dtf: Record<string, Intl.DateTimeFormat> = {};
     const nf: Record<string, Intl.NumberFormat> = {};
     const rtf: Record<string, Intl.RelativeTimeFormat> = {};
+    const currency = createCurrencyFormatter(locale);
 
     return {
       time(date, opts = {}) {
@@ -44,29 +46,7 @@ export function formatter($locale: ReadableStore<string>): ReadableStore<Formatt
         rtf[key] ??= new Intl.RelativeTimeFormat(locale, { numeric: 'auto', ...opts });
         return rtf[key].format(value, unit);
       },
-      currency(amount, currencyCode, opts = {}) {
-        try {
-          const currency = currencyCode !== '' ? currencyCode : 'USD';
-          const baseKey = JSON.stringify({ style: 'currency', currency });
-          nf[baseKey] ??= new Intl.NumberFormat(locale, { style: 'currency', currency });
-          const { maximumFractionDigits } = nf[baseKey].resolvedOptions();
-          const major = amount / 10 ** (maximumFractionDigits ?? 2);
-
-          if (opts.style === 'short') {
-            const shortKey = JSON.stringify({ style: 'currency', currency, trailingZeroDisplay: 'stripIfInteger' });
-            nf[shortKey] ??= new Intl.NumberFormat(locale, {
-              style: 'currency',
-              currency,
-              trailingZeroDisplay: 'stripIfInteger',
-            });
-            return nf[shortKey].format(major);
-          }
-
-          return nf[baseKey].format(major);
-        } catch {
-          return `${currencyCode} ${(amount / 100).toFixed(2)}`;
-        }
-      },
+      currency,
     };
   });
 }

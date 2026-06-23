@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { atom } from '../atom';
 import { count } from '../count';
+import { currency } from '../currency';
 import { defineLocalization } from '../define-localization';
 import { params } from '../params';
 import { createI18n } from './index';
@@ -62,6 +63,18 @@ describe('createI18n', () => {
 
     expect($msg.get().items(1)).toBe('1 item');
     expect($msg.get().items(5)).toBe('5 items');
+  });
+
+  it('formats currency with the active locale', () => {
+    const $locale = atom('en-US');
+    const i18n = createI18n($locale, { get: vi.fn() });
+    const $msg = i18n('billing', { $: currency() });
+
+    expect($msg.get().$(1000, 'USD')).toBe('$10.00');
+    expect($msg.get().$(1000, 'USD', { style: 'short' })).toBe('$10');
+
+    $locale.set('fr-FR');
+    expect($msg.get().$(100000, 'USD')).toBe('1 000,00 $US');
   });
 
   // Snapshot identity must be stable across reads when nothing changed, otherwise

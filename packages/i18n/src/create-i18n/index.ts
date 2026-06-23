@@ -1,5 +1,6 @@
 import { atom, computed, task } from 'nanostores';
 
+import { createCurrencyFormatter } from '../currency';
 import type { AnyMarker, Messages, PluralForms, ReadableStore, ResolvedOverrides } from '../types';
 
 /** The override values for one namespace, keyed by message key. */
@@ -131,6 +132,10 @@ export function createI18n($locale: ReadableStore<string>, options: CreateI18nOp
         const tpl = forms[rules.select(n)] ?? forms.other;
         return tpl.replace(/\{count\}/g, String(n));
       };
+    }
+
+    if (marker?._type === 'currency') {
+      return createCurrencyFormatter(locale);
     }
 
     if (marker?._type === 'count-params') {

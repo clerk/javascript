@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { atom } from '../atom';
 import { count } from '../count';
 import { createI18n } from '../create-i18n';
+import { currency } from '../currency';
 import { messageFormat } from '../message-format';
 import { params } from '../params';
 import { messagesToJSON } from './index';
@@ -15,6 +16,7 @@ describe('messagesToJSON', () => {
       greet: params('Hi {name}'),
       items: count({ one: '{count} item', other: '{count} items' }),
       page: params<{ category: string }>(count({ one: 'One in {category}', other: '{count} in {category}' })),
+      $: currency(),
       notice: messageFormat('Read the {#a}terms{/a}'),
       nested: { title: 'T' },
     });
