@@ -3,7 +3,9 @@ import { describe, expectTypeOf, it } from 'vitest';
 import { atom } from './atom';
 import { count } from './count';
 import { createI18n } from './create-i18n';
+import { currency } from './currency';
 import { defineLocalization } from './define-localization';
+import type { CurrencyFormatFn, CurrencyFormatOptions } from './index';
 import type { RichText } from './message-format';
 import { messageFormat } from './message-format';
 import { params } from './params';
@@ -27,12 +29,14 @@ describe('createI18n message inference', () => {
       plain: 'Hello',
       greet: params('Hi {name}'),
       items: count({ one: '{count} item', other: '{count} items' }),
+      price: currency(),
       rich: messageFormat('{#b}x{/b}'),
     }).get();
 
     expectTypeOf(m.plain).toEqualTypeOf<string>();
     expectTypeOf(m.greet).parameter(0).toEqualTypeOf<{ name: string | number }>();
     expectTypeOf(m.items).toEqualTypeOf<(n: number) => string>();
+    expectTypeOf(m.price).toEqualTypeOf<CurrencyFormatFn>();
     expectTypeOf(m.rich).toEqualTypeOf<RichText>();
   });
 
@@ -47,6 +51,12 @@ describe('OverrideValue', () => {
     expectTypeOf<OverrideValue<string>>().toEqualTypeOf<string>();
     expectTypeOf<OverrideValue<ParamsMarker<'Hi {name}'>>>().toEqualTypeOf<string>();
     expectTypeOf<OverrideValue<CountMarker>>().toEqualTypeOf<Partial<PluralForms>>();
+  });
+});
+
+describe('currency formatting typing', () => {
+  it('exposes options for higher-level currency helpers', () => {
+    expectTypeOf<CurrencyFormatOptions>().toMatchTypeOf<{ style?: 'short' }>();
   });
 });
 

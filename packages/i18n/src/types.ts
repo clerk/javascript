@@ -9,6 +9,8 @@
 
 import type { ReadableAtom, WritableAtom } from 'nanostores';
 
+import type { CurrencyFormatFn } from './currency';
+
 // ---------------------------------------------------------------------------
 // Stores
 //
@@ -52,6 +54,10 @@ export interface CountMarker {
   readonly forms: PluralForms;
 }
 
+export interface CurrencyMarker {
+  readonly _type: 'currency';
+}
+
 /**
  * A pluralized message that also takes named params: `params(count(...))`. The
  * resolved message is `(n, args) => string` — `n` selects the plural form, then
@@ -71,7 +77,7 @@ export interface TransformMarker<R = unknown> {
 }
 
 /** Any message marker. Used for runtime narrowing in `create-i18n`. */
-export type AnyMarker = ParamsMarker | CountMarker | CountParamsMarker | TransformMarker;
+export type AnyMarker = ParamsMarker | CountMarker | CurrencyMarker | CountParamsMarker | TransformMarker;
 
 // ---------------------------------------------------------------------------
 // `messageFormat` transform types
@@ -120,11 +126,13 @@ export type MessageType<V> =
       ? (n: number, args: P) => string
       : V extends CountMarker
         ? (n: number) => string
-        : V extends TransformMarker<infer R>
-          ? R
-          : V extends string
-            ? string
-            : V;
+        : V extends CurrencyMarker
+          ? CurrencyFormatFn
+          : V extends TransformMarker<infer R>
+            ? R
+            : V extends string
+              ? string
+              : V;
 
 /** Map a whole `base` definition object to its resolved messages object. */
 export type Messages<B> = { [K in keyof B]: MessageType<B[K]> };
@@ -146,13 +154,15 @@ export type OverrideValue<V> = V extends ParamsMarker
   ? string
   : V extends CountMarker | CountParamsMarker
     ? Partial<PluralForms>
-    : V extends TransformMarker
-      ? string
-      : V extends string
+    : V extends CurrencyMarker
+      ? never
+      : V extends TransformMarker
         ? string
-        : V extends Record<string, unknown>
-          ? { [K in keyof V]?: OverrideValue<V[K]> }
-          : OverrideInput;
+        : V extends string
+          ? string
+          : V extends Record<string, unknown>
+            ? { [K in keyof V]?: OverrideValue<V[K]> }
+            : OverrideInput;
 
 /** A map of namespace -> `base` definition, used to type overrides precisely. */
 export type Registry = Record<string, Record<string, unknown>>;

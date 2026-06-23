@@ -1,5 +1,6 @@
 import { atom, computed, task } from 'nanostores';
 
+import { createCurrencyFormatter } from '../currency';
 import type { AnyMarker, Messages, PluralForms, ReadableStore, ResolvedOverrides } from '../types';
 
 /** The override values for one namespace, keyed by message key. */
@@ -133,6 +134,10 @@ export function createI18n($locale: ReadableStore<string>, options: CreateI18nOp
       };
     }
 
+    if (marker?._type === 'currency') {
+      return createCurrencyFormatter(locale);
+    }
+
     if (marker?._type === 'count-params') {
       const rules = new Intl.PluralRules(locale);
       const forms: PluralForms =
@@ -160,7 +165,13 @@ export function createI18n($locale: ReadableStore<string>, options: CreateI18nOp
   ): Messages<B> {
     const out: Record<string, unknown> = {};
     for (const key in base) {
-      out[key] = buildEntry(locale, base[key], overridesForNamespace?.[key]);
+      const baseVal = base[key];
+      const override = overridesForNamespace?.[key];
+      if (typeof baseVal === 'object' && baseVal !== null && !asMarker(baseVal)) {
+        out[key] = buildMessages(locale, baseVal as Record<string, unknown>, override as Overrides | undefined);
+      } else {
+        out[key] = buildEntry(locale, baseVal, override);
+      }
     }
     return out as Messages<B>;
   }

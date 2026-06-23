@@ -6,6 +6,7 @@ export { localeFrom } from './locale-from';
 export { formatter } from './formatter';
 export { params } from './params';
 export { count } from './count';
+export { currency } from './currency';
 export { messageFormat, getMessageFormatParts, formatToParts } from './message-format';
 export { createI18n } from './create-i18n';
 export { defineLocalization } from './define-localization';
@@ -14,12 +15,14 @@ export { translationsLoading } from './translations-loading';
 export { messagesToJSON } from './messages-to-json';
 
 export type { BrowserOptions } from './browser';
-export type { Formatter } from './formatter';
+export type { CurrencyFormatFn } from './currency';
+export type { CurrencyFormatOptions, Formatter } from './formatter';
 export type { MessageFormatPart, RichText, ResolvedPart } from './message-format';
 export type { CreateI18nOptions, I18n, MessageStore } from './create-i18n';
 export type {
   AnyMarker,
   CountMarker,
+  CurrencyMarker,
   ExtractParams,
   FlatKey,
   FlatOverrides,

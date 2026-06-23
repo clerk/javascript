@@ -20,7 +20,7 @@ const $fmt = formatter($locale); // reactive Intl wrapper
 `createI18n($locale, options)` returns a namespace factory. `base` is the source-locale definition; message types are inferred from it. Non-base locales are fetched lazily via `get`; until the data lands, messages fall back to `base` per key.
 
 ```ts
-import { createI18n, params, count, messageFormat } from '@clerk/i18n';
+import { createI18n, params, count, currency, messageFormat } from '@clerk/i18n';
 
 const i18n = createI18n($locale, {
   get: locale => fetch(`/locales/${locale}.json`).then(r => r.json()),
@@ -30,12 +30,14 @@ const $messages = i18n('cart', {
   title: 'Your cart',
   greeting: params('Hi {name}'), // (args: { name: string | number }) => string
   items: count({ one: '{count} item', other: '{count} items' }), // (n: number) => string
+  price: currency(), // (amount: number, currencyCode: string, opts?) => string
   notice: messageFormat('Read the {#a}terms{/a}'), // (handlers?) => string
 });
 
 const m = $messages.get();
 m.greeting({ name: 'Sam' }); // "Hi Sam"
 m.items(3); // "3 items"
+m.price(1000, 'USD'); // "$10.00"
 m.notice({ a: t => `<a>${t}</a>` }); // "Read the <a>terms</a>"
 ```
 
