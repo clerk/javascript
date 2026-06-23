@@ -3,8 +3,6 @@ import node from '@astrojs/node';
 import clerk from '@clerk/astro';
 import react from '@astrojs/react';
 
-import tailwind from '@astrojs/tailwind';
-
 export default defineConfig({
   output: 'server',
   adapter: node({
@@ -19,7 +17,6 @@ export default defineConfig({
       },
     }),
     react(),
-    tailwind(),
   ],
   server: {
     port: process.env.PORT ? Number(process.env.PORT) : undefined,
