@@ -200,6 +200,11 @@ const NavbarContainer = (
         sx={{
           width: 'fit-content',
         }}
+        devModeNoticeSx={t => ({
+          // Match the card footer so the notice sits the same distance from the bottom as sign-in/sign-up.
+          padding: t.space.$none,
+          marginBottom: `calc(${t.space.$1} * -1)`,
+        })}
       />
     </Col>
   );
