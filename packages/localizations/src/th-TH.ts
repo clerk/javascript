@@ -1730,6 +1730,9 @@ export const thTH: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'ออกจากระบบ',
     action__signOutAll: 'ออกจากระบบทุกบัญชี',
+    label__userButtonPopover: 'แผงบัญชี',
+    label__accountActions: 'การดำเนินการบัญชี',
+    label__activeSessions: 'เซสชันที่ใช้งานอยู่',
   },
   userProfile: {
     apiKeysPage: {

@@ -1741,6 +1741,9 @@ export const skSK: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Odhlásiť sa',
     action__signOutAll: 'Odhlásiť sa zo všetkých účtov',
+    label__userButtonPopover: 'Panel účtu',
+    label__accountActions: 'Akcie účtu',
+    label__activeSessions: 'Aktívne relácie',
   },
   userProfile: {
     apiKeysPage: {

@@ -31,7 +31,7 @@ describe('OrganizationList', () => {
       expect(queryByText('to continue to TestApp')).toBeInTheDocument();
       //
       expect(queryByText('Personal account')).toBeInTheDocument();
-      expect(queryByRole('menuitem', { name: 'Create organization' })).toBeInTheDocument();
+      expect(queryByRole('button', { name: 'Create organization' })).toBeInTheDocument();
     });
   });
 
@@ -78,7 +78,7 @@ describe('OrganizationList', () => {
         // Display membership
         expect(queryByText('Org1')).toBeInTheDocument();
 
-        expect(queryByRole('menuitem', { name: 'Create organization' })).toBeInTheDocument();
+        expect(queryByRole('button', { name: 'Create organization' })).toBeInTheDocument();
       });
     });
 
@@ -236,7 +236,7 @@ describe('OrganizationList', () => {
       expect(queryByRole('button', { name: 'Upload' })).not.toBeInTheDocument();
       expect(queryByLabelText(/name/i)).not.toBeInTheDocument();
       expect(queryByLabelText(/slug/i)).not.toBeInTheDocument();
-      await userEvent.click(getByRole('menuitem', { name: 'Create organization' }));
+      await userEvent.click(getByRole('button', { name: 'Create organization' }));
       // Header
       expect(queryByRole('heading', { name: /Create organization/i })).toBeInTheDocument();
       // Form fields of CreateOrganizationForm
@@ -266,9 +266,9 @@ describe('OrganizationList', () => {
         },
       );
       await waitFor(async () =>
-        expect(await findByRole('menuitem', { name: 'Create organization' })).toBeInTheDocument(),
+        expect(await findByRole('button', { name: 'Create organization' })).toBeInTheDocument(),
       );
-      await userEvent.click(getByRole('menuitem', { name: 'Create organization' }));
+      await userEvent.click(getByRole('button', { name: 'Create organization' }));
       await waitFor(async () => expect(await findByLabelText(/name/i)).toBeInTheDocument());
       await userEvent.type(getByLabelText(/name/i), 'new org');
       await userEvent.click(getByRole('button', { name: /create organization/i }));
@@ -290,9 +290,9 @@ describe('OrganizationList', () => {
       const { findByRole, getByRole, userEvent, queryByLabelText } = render(<OrganizationList />, { wrapper });
 
       await waitFor(async () =>
-        expect(await findByRole('menuitem', { name: 'Create organization' })).toBeInTheDocument(),
+        expect(await findByRole('button', { name: 'Create organization' })).toBeInTheDocument(),
       );
-      await userEvent.click(getByRole('menuitem', { name: 'Create organization' }));
+      await userEvent.click(getByRole('button', { name: 'Create organization' }));
       expect(queryByLabelText(/Name/i)).toBeInTheDocument();
       expect(queryByLabelText(/Slug/i)).not.toBeInTheDocument();
     });
@@ -310,9 +310,9 @@ describe('OrganizationList', () => {
       const { findByRole, getByRole, userEvent, queryByLabelText } = render(<OrganizationList />, { wrapper });
 
       await waitFor(async () =>
-        expect(await findByRole('menuitem', { name: 'Create organization' })).toBeInTheDocument(),
+        expect(await findByRole('button', { name: 'Create organization' })).toBeInTheDocument(),
       );
-      await userEvent.click(getByRole('menuitem', { name: 'Create organization' }));
+      await userEvent.click(getByRole('button', { name: 'Create organization' }));
       expect(queryByLabelText(/Name/i)).toBeInTheDocument();
       expect(queryByLabelText(/Slug/i)).toBeInTheDocument();
     });
@@ -445,9 +445,9 @@ describe('OrganizationList', () => {
 
         fixtures.clerk.setActive.mockReturnValue(Promise.resolve());
         await waitFor(async () =>
-          expect(await findByRole('menuitem', { name: 'Create organization' })).toBeInTheDocument(),
+          expect(await findByRole('button', { name: 'Create organization' })).toBeInTheDocument(),
         );
-        await userEvent.click(getByRole('menuitem', { name: 'Create organization' }));
+        await userEvent.click(getByRole('button', { name: 'Create organization' }));
         await waitFor(async () => expect(await findByLabelText(/name/i)).toBeInTheDocument());
         await userEvent.type(getByLabelText(/name/i), 'new org');
         await userEvent.click(getByRole('button', { name: /create organization/i }));

@@ -1728,6 +1728,9 @@ export const arSA: LocalizationResource = {
     action__openUserMenu: 'فتح قائمة المستخدم',
     action__signOut: 'تسجيل الخروج',
     action__signOutAll: 'تسجيل الخروج من جميع الحسابات',
+    label__userButtonPopover: 'لوحة الحساب',
+    label__accountActions: 'إجراءات الحساب',
+    label__activeSessions: 'الجلسات النشطة',
   },
   userProfile: {
     apiKeysPage: {
