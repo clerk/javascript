@@ -1752,6 +1752,9 @@ export const ptBR: LocalizationResource = {
     action__openUserMenu: 'Abrir menu do usuário',
     action__signOut: 'Sair',
     action__signOutAll: 'Sair de todas as contas',
+    label__userButtonPopover: 'Painel da conta',
+    label__accountActions: 'Ações da conta',
+    label__activeSessions: 'Sessões ativas',
   },
   userProfile: {
     apiKeysPage: {
