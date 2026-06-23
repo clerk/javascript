@@ -5,8 +5,13 @@ import type { UNSAFE_DataWithResponseInit } from 'react-router';
 
 import { getPublicEnvVariables } from '../utils/env';
 import { canUseKeyless } from '../utils/feature-flags';
-import type { ReactRouterContext } from '../utils/types';
 import type { AdditionalStateOptions } from './types';
+
+// AppLoadContext was removed from React Router v8. Keep a structural type for the context shape we use.
+type ReactRouterContext = Record<string, any> & {
+  get?: <T>(context: unknown) => T | undefined;
+  set?: <T>(context: unknown, value: T) => void;
+};
 
 export function isResponse(value: any): value is Response {
   return (

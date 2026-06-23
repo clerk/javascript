@@ -1,11 +1,12 @@
 import { getEnvVariable } from '@clerk/shared/getEnvVariable';
 import { isTruthy } from '@clerk/shared/underscore';
 
-import type { ReactRouterContext } from './types';
-
-export const getPublicEnvVariables = (context: ReactRouterContext | undefined) => {
+export const getPublicEnvVariables = (context: object | undefined) => {
   const getValue = (name: string): string => {
-    return getEnvVariable(`VITE_${name}`, context) || getEnvVariable(name, context);
+    return (
+      getEnvVariable(`VITE_${name}`, context as Record<string, any>) ||
+      getEnvVariable(name, context as Record<string, any>)
+    );
   };
 
   return {
