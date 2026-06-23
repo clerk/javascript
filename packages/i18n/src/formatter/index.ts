@@ -2,10 +2,19 @@ import { computed } from 'nanostores';
 
 import type { ReadableStore } from '../types';
 
+export interface CurrencyFormatOptions {
+  style?: 'short';
+}
+
 export interface Formatter {
   time(date: Date | number, opts?: Intl.DateTimeFormatOptions): string;
   number(value: number | bigint, opts?: Intl.NumberFormatOptions): string;
   relativeTime(value: number, unit: Intl.RelativeTimeFormatUnit, opts?: Intl.RelativeTimeFormatOptions): string;
+  /**
+   * Formats a minor-unit amount (e.g. cents) as a locale-aware currency string.
+   * `style: 'short'` strips trailing zeros (requires `trailingZeroDisplay` support; Chrome 99+, Safari 15.4+).
+   */
+  currency(amount: number, currencyCode: string, opts?: CurrencyFormatOptions): string;
 }
 
 /**
@@ -34,6 +43,29 @@ export function formatter($locale: ReadableStore<string>): ReadableStore<Formatt
         const key = JSON.stringify(opts);
         rtf[key] ??= new Intl.RelativeTimeFormat(locale, { numeric: 'auto', ...opts });
         return rtf[key].format(value, unit);
+      },
+      currency(amount, currencyCode, opts = {}) {
+        try {
+          const currency = currencyCode !== '' ? currencyCode : 'USD';
+          const baseKey = JSON.stringify({ style: 'currency', currency });
+          nf[baseKey] ??= new Intl.NumberFormat(locale, { style: 'currency', currency });
+          const { maximumFractionDigits } = nf[baseKey].resolvedOptions();
+          const major = amount / 10 ** (maximumFractionDigits ?? 2);
+
+          if (opts.style === 'short') {
+            const shortKey = JSON.stringify({ style: 'currency', currency, trailingZeroDisplay: 'stripIfInteger' });
+            nf[shortKey] ??= new Intl.NumberFormat(locale, {
+              style: 'currency',
+              currency,
+              trailingZeroDisplay: 'stripIfInteger',
+            });
+            return nf[shortKey].format(major);
+          }
+
+          return nf[baseKey].format(major);
+        } catch {
+          return `${currencyCode} ${(amount / 100).toFixed(2)}`;
+        }
       },
     };
   });

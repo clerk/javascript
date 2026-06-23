@@ -14,7 +14,7 @@ export { translationsLoading } from './translations-loading';
 export { messagesToJSON } from './messages-to-json';
 
 export type { BrowserOptions } from './browser';
-export type { Formatter } from './formatter';
+export type { CurrencyFormatOptions, Formatter } from './formatter';
 export type { MessageFormatPart, RichText, ResolvedPart } from './message-format';
 export type { CreateI18nOptions, I18n, MessageStore } from './create-i18n';
 export type {
