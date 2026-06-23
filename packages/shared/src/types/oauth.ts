@@ -6,7 +6,7 @@ export interface OAuthProviderData {
   provider: OAuthProvider;
   strategy: OAuthStrategy;
   name: string;
-  docsUrl: string;
+  docsUrl?: string;
 }
 
 /** @inline */
