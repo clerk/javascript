@@ -30,6 +30,7 @@ test.describe('Astro version compatibility @astro', () => {
   test('builds with Astro 6 and custom UserButton menu items', async () => {
     await app.build();
 
+    expect(app.buildOutput).not.toHaveLength(0);
     expect(app.buildOutput).not.toContain('Illegal return statement');
   });
 });
