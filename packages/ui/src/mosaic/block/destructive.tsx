@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+
+import { useControllableState } from '@clerk/headless/hooks';
 
 import { Box } from '../components/box';
 import { Button } from '../components/button';
@@ -17,7 +19,10 @@ interface DestructiveProps {
   resourceName: string;
   onDelete: () => void | Promise<void>;
   isDeleting: boolean;
+  canSubmit: boolean;
   error?: string | null;
+  confirmationValue?: string;
+  onConfirmationValueChange?: (value: string) => void;
 }
 
 export function Destructive({
@@ -30,14 +35,16 @@ export function Destructive({
   resourceName,
   onDelete,
   isDeleting,
+  canSubmit,
   error,
+  confirmationValue,
+  onConfirmationValueChange,
 }: DestructiveProps) {
-  const [confirmValue, setConfirmValue] = useState('');
-  const canSubmit = confirmValue === resourceName && !isDeleting;
+  const [confirmValue, setConfirmValue] = useControllableState(confirmationValue, '', onConfirmationValueChange);
 
   useEffect(() => {
     if (!open) setConfirmValue('');
-  }, [open]);
+  }, [open, setConfirmValue]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

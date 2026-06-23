@@ -52,6 +52,27 @@ describe('useMachine — drives a flow from a component', () => {
     });
     expect(screen.getByTestId('state')).toHaveTextContent('deleted');
   });
+
+  it('exposes the actor so components can ask whether a transition is available', () => {
+    function DeleteOrg() {
+      const [, send, actor] = useMachine(createDeleteOrgMachine(() => Promise.resolve()));
+      return (
+        <div>
+          <output data-testid='can-confirm'>{String(actor.can({ type: 'CONFIRM' }))}</output>
+          <button onClick={() => send({ type: 'OPEN' })}>Open</button>
+          <button onClick={() => send({ type: 'TYPE', value: 'Acme Inc' })}>Type name</button>
+        </div>
+      );
+    }
+
+    render(<DeleteOrg />);
+
+    fireEvent.click(screen.getByText('Open'));
+    expect(screen.getByTestId('can-confirm')).toHaveTextContent('false');
+
+    fireEvent.click(screen.getByText('Type name'));
+    expect(screen.getByTestId('can-confirm')).toHaveTextContent('true');
+  });
 });
 
 describe('useMachine — context init option', () => {

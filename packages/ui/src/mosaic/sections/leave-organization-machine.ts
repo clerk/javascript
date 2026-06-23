@@ -1,43 +1,56 @@
-import { assign } from '../machine/assign';
-import { createMachine } from '../machine/createMachine';
-import type { ErrorInvokeEvent } from '../machine/types';
+import { setup } from '../machine/setup';
 
 export interface LeaveOrgContext {
-  leaveFn: () => Promise<void>;
+  organizationName: string;
+  confirmationValue: string;
+  leaveOrganization: () => Promise<void>;
   error: string | null;
 }
 
-export type LeaveOrgEvent = { type: 'OPEN' } | { type: 'CONFIRM' } | { type: 'CANCEL' };
+export type LeaveOrgEvent =
+  | { type: 'OPEN' }
+  | { type: 'TYPE_CONFIRMATION'; value: string }
+  | { type: 'CONFIRM' }
+  | { type: 'CANCEL' };
 
-export const leaveOrgMachine = createMachine<LeaveOrgContext, LeaveOrgEvent>({
+const { createMachine, assign, fromPromise } = setup<LeaveOrgContext, LeaveOrgEvent>();
+
+export const leaveOrgMachine = createMachine({
   id: 'leaveOrg',
   initial: 'idle',
-  context: { leaveFn: async () => {}, error: null },
+  context: {
+    organizationName: '',
+    confirmationValue: '',
+    leaveOrganization: async () => {},
+    error: null,
+  },
   states: {
     idle: { on: { OPEN: 'confirming' } },
     confirming: {
       on: {
-        // The name-match guard lives in Destructive (canSubmit = confirmValue === resourceName).
-        // The machine receives CONFIRM only after the UI has already enforced the constraint,
-        // so no machine-level guard is needed here.
-        CONFIRM: 'leaving',
+        TYPE_CONFIRMATION: {
+          actions: assign((_, event) => ({ confirmationValue: event.value, error: null })),
+        },
+        CONFIRM: {
+          target: 'leaving',
+          guard: context => context.confirmationValue === context.organizationName,
+        },
         CANCEL: {
           target: 'idle',
-          actions: assign<LeaveOrgContext, LeaveOrgEvent>(() => ({ error: null })),
+          actions: assign(() => ({ confirmationValue: '', error: null })),
         },
       },
     },
     leaving: {
-      invoke: {
-        src: ctx => ctx.leaveFn(),
+      invoke: fromPromise(ctx => ctx.leaveOrganization(), {
         onDone: 'left',
         onError: {
           target: 'confirming',
-          actions: assign<LeaveOrgContext, ErrorInvokeEvent>((_, event) => ({
+          actions: assign((_, event) => ({
             error: String(event.error),
           })),
         },
-      },
+      }),
     },
     left: { type: 'final' },
   },

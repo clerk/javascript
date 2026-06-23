@@ -37,7 +37,7 @@ export function useActor<TContext extends object, TEvent extends EventObject>(
 export function useMachine<TContext extends object, TEvent extends EventObject>(
   machine: StateMachine<TContext, TEvent>,
   options?: UseMachineOptions<TContext>,
-): [Snapshot<TContext>, Actor<TContext, TEvent>['send']] {
+): [Snapshot<TContext>, Actor<TContext, TEvent>['send'], Actor<TContext, TEvent>] {
   const actorRef = useRef<Actor<TContext, TEvent> | null>(null);
   if (actorRef.current === null) {
     actorRef.current = createActor(machine, options);
@@ -64,7 +64,7 @@ export function useMachine<TContext extends object, TEvent extends EventObject>(
     if (snapshot.status === 'done') onDoneRef.current?.();
   }, [snapshot.status]);
 
-  return [snapshot, actor.send];
+  return [snapshot, actor.send, actor];
 }
 
 /**
