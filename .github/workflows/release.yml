@@ -22,9 +22,7 @@ concurrency:
 jobs:
   release:
     name: Release
-    if: >-
-      github.event_name == 'push'
-      && github.repository == 'clerk/javascript'
+    if: ${{ github.event_name == 'push' && github.repository == 'clerk/javascript' }}
     runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
