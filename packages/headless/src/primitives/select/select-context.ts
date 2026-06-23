@@ -27,6 +27,7 @@ export interface SelectContextValue {
   activeIndex: number | null;
   setActiveIndex: React.Dispatch<React.SetStateAction<number | null>>;
   selectedIndex: number | null;
+  setSelectedIndex: React.Dispatch<React.SetStateAction<number | null>>;
   selectedValue: string | undefined;
   selectedLabel: string | null;
   elementsRef: React.MutableRefObject<Array<HTMLElement | null>>;
