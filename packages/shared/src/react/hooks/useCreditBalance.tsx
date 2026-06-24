@@ -9,9 +9,9 @@ import { useClerkQuery } from '../query/useQuery';
 import { STABLE_KEYS } from '../stable-keys';
 import { useOrganizationBase } from './base/useOrganizationBase';
 import { useUserBase } from './base/useUserBase';
+import { createCacheKeys } from './createCacheKeys';
 import { useBillingIsEnabled } from './useBillingIsEnabled';
 import { useClearQueriesOnSignOut } from './useClearQueriesOnSignOut';
-import { createCacheKeys } from './createCacheKeys';
 
 const HOOK_NAME = 'useCreditBalance';
 
@@ -68,7 +68,7 @@ export function useCreditBalance(params?: UseCreditBalanceParams): CreditBalance
         payerId,
       },
       untracked: {
-        args: { payerId: payerId!, orgId: safeOrgId },
+        args: { payerId: payerId as string, orgId: safeOrgId },
       },
     });
   }, [user?.id, organization?.id, params?.for, payerId]);

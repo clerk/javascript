@@ -1,4 +1,5 @@
 import type { BillingCreditBalanceJSON, BillingCreditBalanceResource, BillingMoneyAmount } from '@clerk/shared/types';
+
 import { billingMoneyAmountFromJSON } from '../../utils';
 
 export class BillingCreditBalance implements BillingCreditBalanceResource {
