@@ -231,6 +231,7 @@ export interface EnterpriseAccountJSON extends ClerkResourceJSON {
 
 export interface ExternalAccountJSON extends ClerkResourceJSON {
   object: typeof ObjectType.ExternalAccount;
+  external_account_id: string;
   provider: string;
   identification_id: string;
   provider_user_id: string;

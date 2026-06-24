@@ -13,6 +13,11 @@ export class ExternalAccount {
      */
     readonly id: string,
     /**
+     * The unique identifier for the external account resource (prefixed with `eac_`).
+     * This is the value expected by methods such as `users.deleteUserExternalAccount()`.
+     */
+    readonly externalAccountId: string,
+    /**
      * The provider name (e.g., `google`).
      */
     readonly provider: string,
@@ -74,6 +79,7 @@ export class ExternalAccount {
   static fromJSON(data: ExternalAccountJSON): ExternalAccount {
     return new ExternalAccount(
       data.id,
+      data.external_account_id,
       data.provider,
       data.provider_user_id,
       data.identification_id,
