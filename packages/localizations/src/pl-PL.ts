@@ -674,8 +674,8 @@ export const plPL: LocalizationResource = {
         messageLabel: 'Twój e-mail używa {{domain}}. Czy chcesz go dodać?',
       },
       formButtonPrimary__add: 'Dodaj',
-      formFieldInputPlaceholder__domain: 'Wpisz tutaj swoją domenę i kliknij dodaj, aby rozpocząć',
-      formFieldLabel__domain: 'Domeny',
+      formFieldInputPlaceholder__domain: 'Dodaj domenę',
+      formFieldLabel__domain: 'Domena',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

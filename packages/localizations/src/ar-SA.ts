@@ -673,8 +673,8 @@ export const arSA: LocalizationResource = {
         messageLabel: 'بريدك الإلكتروني يستخدم {{domain}}. هل تريد إضافته؟',
       },
       formButtonPrimary__add: 'إضافة',
-      formFieldInputPlaceholder__domain: 'اكتب نطاقك هنا وانقر على إضافة للبدء',
-      formFieldLabel__domain: 'النطاقات',
+      formFieldInputPlaceholder__domain: 'إضافة نطاق',
+      formFieldLabel__domain: 'النطاق',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

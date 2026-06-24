@@ -673,7 +673,7 @@ export const zhCN: LocalizationResource = {
         messageLabel: '您的邮箱使用了 {{domain}}。是否要添加它？',
       },
       formButtonPrimary__add: '添加',
-      formFieldInputPlaceholder__domain: '在此输入您的域名，然后点击添加即可开始',
+      formFieldInputPlaceholder__domain: '添加域名',
       formFieldLabel__domain: '域名',
       removeDomainDialog: {
         cancelButton: undefined,

@@ -682,7 +682,7 @@ export const msMY: LocalizationResource = {
         messageLabel: 'E-mel anda menggunakan {{domain}}. Adakah anda mahu menambahkannya?',
       },
       formButtonPrimary__add: 'Tambah',
-      formFieldInputPlaceholder__domain: 'Taip domain anda di sini dan klik tambah untuk bermula',
+      formFieldInputPlaceholder__domain: 'Tambah domain',
       formFieldLabel__domain: 'Domain',
       removeDomainDialog: {
         cancelButton: undefined,

@@ -680,7 +680,7 @@ export const isIS: LocalizationResource = {
         messageLabel: 'Tölvupósturinn þinn notar {{domain}}. Viltu bæta því við?',
       },
       formButtonPrimary__add: 'Bæta við',
-      formFieldInputPlaceholder__domain: 'Skrifaðu lénið þitt hér og smelltu á bæta við til að byrja',
+      formFieldInputPlaceholder__domain: 'Bæta við léni',
       formFieldLabel__domain: 'Lén',
       removeDomainDialog: {
         cancelButton: undefined,
