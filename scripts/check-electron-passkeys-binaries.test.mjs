@@ -14,11 +14,14 @@ async function createRoot() {
   return root;
 }
 
-async function createPlatformDir(root, name, nodeFiles) {
+async function createPlatformDir(root, name, nodeFiles, main = 'passkeys.node') {
   const dir = join(root, name);
   await mkdir(dir, { recursive: true });
 
-  await Promise.all(nodeFiles.map(file => writeFile(join(dir, file), '')));
+  await Promise.all([
+    writeFile(join(dir, 'package.json'), `${JSON.stringify({ files: [main], main }, null, 2)}\n`),
+    ...nodeFiles.map(file => writeFile(join(dir, file), '')),
+  ]);
 
   return dir;
 }
@@ -48,6 +51,15 @@ describe('findMissingBinaries', () => {
     await createPlatformDir(root, 'darwin-arm64', ['passkeys.node', 'other.node']);
 
     await expect(findMissingBinaries(root)).resolves.toEqual([{ dir: join(root, 'darwin-arm64'), count: 2 }]);
+  });
+
+  test('flags a dir where the declared binary is missing', async () => {
+    const root = await createRoot();
+    await createPlatformDir(root, 'darwin-arm64', ['other.node'], 'passkeys.node');
+
+    await expect(findMissingBinaries(root)).resolves.toEqual([
+      { count: 1, dir: join(root, 'darwin-arm64'), expectedFile: 'passkeys.node' },
+    ]);
   });
 });
 
