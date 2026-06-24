@@ -36,9 +36,9 @@ const { applyVariants, filterProps } = createVariants(theme => ({
     },
     focusRing: {
       true: {
-        '&:focus': {
+        '&:focus-visible': {
           outline: 'none',
-          ...common.focusRing(theme),
+          ...common.focusRingStyles(theme),
         },
       },
     },
