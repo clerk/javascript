@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Box, descriptors, Flex, Icon, SimpleButton, Span, Text } from '@/customizables';
 import { Checkmark, ChevronRight } from '@/icons';
+import { mqu } from '@/styledSystem';
 
 import type { StepperItemProps, StepperProps } from './types';
 
@@ -34,6 +35,7 @@ const Root = ({ children }: StepperProps): JSX.Element => {
               icon={ChevronRight}
               size='md'
               colorScheme='neutral'
+              sx={{ [mqu.md]: { display: 'none' } }}
             />
           )}
         </Span>
@@ -139,7 +141,7 @@ const Skeleton = ({ totalSteps = 4 }: SkeletonProps): JSX.Element => (
             icon={ChevronRight}
             size='md'
             colorScheme='neutral'
-            sx={{ opacity: 0.16 }}
+            sx={{ opacity: 0.16, [mqu.md]: { display: 'none' } }}
           />
         )}
       </React.Fragment>
