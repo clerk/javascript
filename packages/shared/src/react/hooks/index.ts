@@ -31,6 +31,7 @@ export { useCreditBalance as __experimental_useCreditBalance } from './useCredit
  *
  * These exist here in order to keep React Query implementations in a centralized place.
  */
+export { __internal_useCreditHistoryQuery } from './useCreditHistory';
 export { __internal_useStatementQuery } from './useStatementQuery';
 export { __internal_usePlanDetailsQuery } from './usePlanDetailsQuery';
 export { __internal_usePaymentAttemptQuery } from './usePaymentAttemptQuery';

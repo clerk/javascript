@@ -905,6 +905,13 @@ export const enUS: LocalizationResource = {
     billingPage: {
       accountCreditsSection: {
         title: 'Account credits',
+        viewHistory: 'View credit history',
+      },
+      creditHistoryPage: {
+        title: 'Account credit history',
+        tableHeader__amount: 'Amount',
+        tableHeader__date: 'Date',
+        tableHeader__reason: 'Reason',
       },
       paymentHistorySection: {
         empty: 'No payment history',
@@ -1789,6 +1796,13 @@ export const enUS: LocalizationResource = {
     billingPage: {
       accountCreditsSection: {
         title: 'Account credits',
+        viewHistory: 'View credit history',
+      },
+      creditHistoryPage: {
+        title: 'Account credit history',
+        tableHeader__amount: 'Amount',
+        tableHeader__date: 'Date',
+        tableHeader__reason: 'Reason',
       },
       paymentHistorySection: {
         empty: 'No payment history',

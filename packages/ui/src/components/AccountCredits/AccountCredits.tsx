@@ -1,10 +1,13 @@
 import { ProfileSection } from '@/ui/elements/Section';
 import { useCreditBalance, useSubscriberTypeLocalizationRoot } from '../../contexts';
 import { localizationKeys, Text } from '../../customizables';
+import { ArrowRight } from '../../icons';
+import { useRouter } from '../../router';
 
 export const AccountCredits = () => {
   const { data: creditBalance, isLoading } = useCreditBalance();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
+  const { navigate } = useRouter();
 
   // Only show if balance is not null
   if (!creditBalance?.balance || isLoading) {
@@ -33,6 +36,19 @@ export const AccountCredits = () => {
           </Text>
         </ProfileSection.Item>
       </ProfileSection.ItemList>
+      <ProfileSection.ButtonGroup id='accountCredits'>
+        <ProfileSection.ArrowButton
+          id='accountCredits'
+          textLocalizationKey={localizationKeys(`${localizationRoot}.billingPage.accountCreditsSection.viewHistory`)}
+          sx={[t => ({ justifyContent: 'start', height: t.sizes.$8 })]}
+          rightIcon={ArrowRight}
+          rightIconSx={t => ({
+            width: t.sizes.$4,
+            height: t.sizes.$4,
+          })}
+          onClick={() => void navigate('credit-history')}
+        />
+      </ProfileSection.ButtonGroup>
     </ProfileSection.Root>
   );
 };

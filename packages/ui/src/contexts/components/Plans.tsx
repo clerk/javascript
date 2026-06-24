@@ -5,6 +5,7 @@ import {
   __experimental_usePlans,
   __experimental_useStatements,
   __experimental_useSubscription,
+  __internal_useCreditHistoryQuery,
   __internal_useOrganizationBase,
   useClerk,
   useSession,
@@ -91,6 +92,15 @@ export const useCreditBalance = () => {
   const params = useBillingHookParams();
   const { data: subscription } = useSubscription();
   return __experimental_useCreditBalance({
+    ...params,
+    payerId: subscription?.payerId,
+  });
+};
+
+export const useCreditHistory = () => {
+  const params = useBillingHookParams();
+  const { data: subscription } = useSubscription();
+  return __internal_useCreditHistoryQuery({
     ...params,
     payerId: subscription?.payerId,
   });

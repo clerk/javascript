@@ -6,6 +6,7 @@ export * from './APIKey';
 export * from './AuthConfig';
 export * from './BillingCheckout';
 export * from './BillingCreditBalance';
+export * from './BillingCreditLedger';
 export * from './BillingPayment';
 export * from './BillingPaymentMethod';
 export * from './BillingPlan';

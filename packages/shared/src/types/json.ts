@@ -940,6 +940,21 @@ export interface BillingCreditBalanceJSON {
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
+export interface BillingCreditLedgerJSON {
+  object: 'commerce_credit_ledger';
+  id: string;
+  payer_id: string;
+  amount: number;
+  currency: string;
+  source_type: string;
+  source_id: string;
+  note?: string | null;
+  created_at: number;
+}
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
 export interface BillingMoneyAmountJSON {
   amount: number;
   amount_formatted: string;

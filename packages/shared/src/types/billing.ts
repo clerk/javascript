@@ -89,6 +89,13 @@ export interface BillingNamespace {
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   getCreditBalance: (params: GetCreditBalanceParams) => Promise<BillingCreditBalanceResource>;
+
+  /**
+   * Gets the credit history for the current payer.
+   *
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+   */
+  getCreditHistory: (params: GetCreditHistoryParams) => Promise<ClerkPaginatedResponse<BillingCreditLedgerResource>>;
 }
 
 /**
@@ -960,6 +967,34 @@ export type GetCreditBalanceParams = {
    */
   payerId: string;
 };
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export type GetCreditHistoryParams = {
+  /**
+   * The ID of the Organization to get the credit history for.
+   */
+  orgId?: string;
+  /**
+   * The ID of the payer to get the credit history for.
+   */
+  payerId: string;
+};
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingCreditLedgerResource {
+  id: string;
+  payerId: string;
+  amount: number;
+  currency: string;
+  sourceType: string;
+  sourceId: string;
+  note: string | null;
+  createdAt: Date;
+}
 
 /**
  * The `BillingMoneyAmount` type represents a monetary value with currency information.
