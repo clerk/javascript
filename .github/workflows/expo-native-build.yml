@@ -96,7 +96,7 @@ jobs:
       - name: Prebuild Android fixture
         if: ${{ matrix.platform == 'android' }}
         working-directory: ${{ env.FIXTURE_DIR }}
-        run: pnpm prebuild:android
+        run: pnpm expo prebuild --clean --platform android
 
       - name: Build Android fixture
         if: ${{ matrix.platform == 'android' }}
@@ -106,7 +106,7 @@ jobs:
       - name: Prebuild iOS fixture
         if: ${{ matrix.platform == 'ios' }}
         working-directory: ${{ env.FIXTURE_DIR }}
-        run: pnpm prebuild:ios
+        run: pnpm expo prebuild --clean --platform ios
 
       - name: Build iOS fixture
         if: ${{ matrix.platform == 'ios' }}
