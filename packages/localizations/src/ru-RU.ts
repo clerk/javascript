@@ -675,7 +675,7 @@ export const ruRU: LocalizationResource = {
       },
       formButtonPrimary__add: 'Добавить',
       formFieldInputPlaceholder__domain: 'Введите домен здесь и нажмите «Добавить», чтобы начать',
-      formFieldLabel__domain: 'Домены',
+      formFieldLabel__domain: 'Домен',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

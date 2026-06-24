@@ -675,7 +675,7 @@ export const nlBE: LocalizationResource = {
       },
       formButtonPrimary__add: 'Toevoegen',
       formFieldInputPlaceholder__domain: 'Typ hier uw domein en klik op toevoegen om te beginnen',
-      formFieldLabel__domain: 'Domeinen',
+      formFieldLabel__domain: 'Domein',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

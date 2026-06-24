@@ -679,7 +679,7 @@ export const csCZ: LocalizationResource = {
       },
       formButtonPrimary__add: 'Přidat',
       formFieldInputPlaceholder__domain: 'Zde zadejte svou doménu a kliknutím na přidat začněte',
-      formFieldLabel__domain: 'Domény',
+      formFieldLabel__domain: 'Doména',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

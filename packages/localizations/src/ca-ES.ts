@@ -682,7 +682,7 @@ export const caES: LocalizationResource = {
       },
       formButtonPrimary__add: 'Afegeix',
       formFieldInputPlaceholder__domain: 'Escriu aquí el teu domini i fes clic a Afegeix per començar',
-      formFieldLabel__domain: 'Dominis',
+      formFieldLabel__domain: 'Domini',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

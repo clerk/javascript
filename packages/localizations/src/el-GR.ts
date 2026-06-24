@@ -676,7 +676,7 @@ export const elGR: LocalizationResource = {
       formButtonPrimary__add: 'Προσθήκη',
       formFieldInputPlaceholder__domain:
         'Πληκτρολογήστε τον τομέα σας εδώ και κάντε κλικ στο «Προσθήκη» για να ξεκινήσετε',
-      formFieldLabel__domain: 'Τομείς',
+      formFieldLabel__domain: 'Τομέας',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

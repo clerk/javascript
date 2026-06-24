@@ -680,7 +680,7 @@ export const faIR: LocalizationResource = {
       },
       formButtonPrimary__add: 'افزودن',
       formFieldInputPlaceholder__domain: 'دامنه خود را اینجا تایپ کنید و برای شروع روی افزودن کلیک کنید',
-      formFieldLabel__domain: 'دامنه‌ها',
+      formFieldLabel__domain: 'دامنه',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

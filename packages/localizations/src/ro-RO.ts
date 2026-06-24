@@ -681,7 +681,7 @@ export const roRO: LocalizationResource = {
       },
       formButtonPrimary__add: 'Adaugă',
       formFieldInputPlaceholder__domain: 'Scrie aici domeniul tău și fă clic pe adaugă pentru a începe',
-      formFieldLabel__domain: 'Domenii',
+      formFieldLabel__domain: 'Domeniu',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

@@ -682,7 +682,7 @@ export const huHU: LocalizationResource = {
       },
       formButtonPrimary__add: 'Hozzáadás',
       formFieldInputPlaceholder__domain: 'Írja be ide a tartományát, majd kattintson a Hozzáadás gombra a kezdéshez',
-      formFieldLabel__domain: 'Tartományok',
+      formFieldLabel__domain: 'Tartomány',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

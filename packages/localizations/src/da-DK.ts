@@ -674,7 +674,7 @@ export const daDK: LocalizationResource = {
       },
       formButtonPrimary__add: 'Tilføj',
       formFieldInputPlaceholder__domain: 'Skriv dit domæne her, og klik på tilføj for at starte',
-      formFieldLabel__domain: 'Domæner',
+      formFieldLabel__domain: 'Domæne',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

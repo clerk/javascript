@@ -683,7 +683,7 @@ export const frFR: LocalizationResource = {
       },
       formButtonPrimary__add: 'Ajouter',
       formFieldInputPlaceholder__domain: 'Saisissez votre domaine ici et cliquez sur Ajouter pour commencer',
-      formFieldLabel__domain: 'Domaines',
+      formFieldLabel__domain: 'Domaine',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

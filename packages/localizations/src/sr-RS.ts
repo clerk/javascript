@@ -675,7 +675,7 @@ export const srRS: LocalizationResource = {
       },
       formButtonPrimary__add: 'Dodaj',
       formFieldInputPlaceholder__domain: 'Ovde unesite svoj domen i kliknite na dodaj da biste počeli',
-      formFieldLabel__domain: 'Domeni',
+      formFieldLabel__domain: 'Domen',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

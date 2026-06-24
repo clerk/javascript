@@ -674,7 +674,7 @@ export const heIL: LocalizationResource = {
       },
       formButtonPrimary__add: 'הוסף',
       formFieldInputPlaceholder__domain: 'הקלד את הדומיין שלך כאן ולחץ על הוסף כדי להתחיל',
-      formFieldLabel__domain: 'דומיינים',
+      formFieldLabel__domain: 'דומיין',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

@@ -674,7 +674,7 @@ export const arSA: LocalizationResource = {
       },
       formButtonPrimary__add: 'إضافة',
       formFieldInputPlaceholder__domain: 'اكتب نطاقك هنا وانقر على إضافة للبدء',
-      formFieldLabel__domain: 'النطاقات',
+      formFieldLabel__domain: 'النطاق',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

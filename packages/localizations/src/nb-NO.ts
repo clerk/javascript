@@ -682,7 +682,7 @@ export const nbNO: LocalizationResource = {
       },
       formButtonPrimary__add: 'Legg til',
       formFieldInputPlaceholder__domain: 'Skriv inn domenet ditt her, og klikk på legg til for å starte',
-      formFieldLabel__domain: 'Domener',
+      formFieldLabel__domain: 'Domene',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

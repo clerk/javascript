@@ -681,7 +681,7 @@ export const itIT: LocalizationResource = {
       },
       formButtonPrimary__add: 'Aggiungi',
       formFieldInputPlaceholder__domain: 'Digita qui il tuo dominio e clicca su Aggiungi per iniziare',
-      formFieldLabel__domain: 'Domini',
+      formFieldLabel__domain: 'Dominio',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

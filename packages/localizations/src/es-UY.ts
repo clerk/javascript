@@ -675,7 +675,7 @@ export const esUY: LocalizationResource = {
       },
       formButtonPrimary__add: 'Agregar',
       formFieldInputPlaceholder__domain: 'Escribí aquí tu dominio y hacé clic en Agregar para empezar',
-      formFieldLabel__domain: 'Dominios',
+      formFieldLabel__domain: 'Dominio',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

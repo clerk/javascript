@@ -683,7 +683,7 @@ export const taIN: LocalizationResource = {
       },
       formButtonPrimary__add: 'சேர்',
       formFieldInputPlaceholder__domain: 'உங்கள் டொமைனை இங்கே தட்டச்சு செய்து, தொடங்க சேர் என்பதைக் கிளிக் செய்யவும்',
-      formFieldLabel__domain: 'டொமைன்கள்',
+      formFieldLabel__domain: 'டொமைன்',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

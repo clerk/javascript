@@ -675,7 +675,7 @@ export const plPL: LocalizationResource = {
       },
       formButtonPrimary__add: 'Dodaj',
       formFieldInputPlaceholder__domain: 'Wpisz tutaj swoją domenę i kliknij dodaj, aby rozpocząć',
-      formFieldLabel__domain: 'Domeny',
+      formFieldLabel__domain: 'Domena',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

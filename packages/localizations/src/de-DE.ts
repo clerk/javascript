@@ -681,7 +681,7 @@ export const deDE: LocalizationResource = {
       },
       formButtonPrimary__add: 'Hinzufügen',
       formFieldInputPlaceholder__domain: 'Geben Sie hier Ihre Domain ein und klicken Sie zum Starten auf „Hinzufügen"',
-      formFieldLabel__domain: 'Domains',
+      formFieldLabel__domain: 'Domain',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

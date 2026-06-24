@@ -675,7 +675,7 @@ export const skSK: LocalizationResource = {
       },
       formButtonPrimary__add: 'Pridať',
       formFieldInputPlaceholder__domain: 'Sem zadajte svoju doménu a kliknutím na pridať začnite',
-      formFieldLabel__domain: 'Domény',
+      formFieldLabel__domain: 'Doména',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

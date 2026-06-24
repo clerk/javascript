@@ -675,7 +675,7 @@ export const kkKZ: LocalizationResource = {
       },
       formButtonPrimary__add: 'Қосу',
       formFieldInputPlaceholder__domain: 'Доменіңізді осы жерге енгізіп, бастау үшін «Қосу» түймесін басыңыз',
-      formFieldLabel__domain: 'Домендер',
+      formFieldLabel__domain: 'Домен',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

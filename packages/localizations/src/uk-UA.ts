@@ -675,7 +675,7 @@ export const ukUA: LocalizationResource = {
       },
       formButtonPrimary__add: 'Додати',
       formFieldInputPlaceholder__domain: 'Введіть свій домен тут і натисніть «Додати», щоб почати',
-      formFieldLabel__domain: 'Домени',
+      formFieldLabel__domain: 'Домен',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

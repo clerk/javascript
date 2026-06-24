@@ -675,7 +675,7 @@ export const beBY: LocalizationResource = {
       },
       formButtonPrimary__add: 'Дадаць',
       formFieldInputPlaceholder__domain: 'Увядзіце свой дамен тут і націсніце «Дадаць», каб пачаць',
-      formFieldLabel__domain: 'Дамены',
+      formFieldLabel__domain: 'Дамен',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

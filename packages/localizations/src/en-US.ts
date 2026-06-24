@@ -667,7 +667,7 @@ export const enUS: LocalizationResource = {
       },
       formButtonPrimary__add: 'Add',
       formFieldInputPlaceholder__domain: 'Type your domain here and click add to start',
-      formFieldLabel__domain: 'Domains',
+      formFieldLabel__domain: 'Domain',
       removeDomainDialog: {
         cancelButton: 'Cancel',
         removeButton: 'Remove domain',

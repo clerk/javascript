@@ -682,7 +682,7 @@ export const teIN: LocalizationResource = {
       },
       formButtonPrimary__add: 'జోడించు',
       formFieldInputPlaceholder__domain: 'మీ డొమైన్‌ను ఇక్కడ టైప్ చేసి, ప్రారంభించడానికి జోడించు క్లిక్ చేయండి',
-      formFieldLabel__domain: 'డొమైన్‌లు',
+      formFieldLabel__domain: 'డొమైన్',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

@@ -682,7 +682,7 @@ export const hrHR: LocalizationResource = {
       },
       formButtonPrimary__add: 'Dodaj',
       formFieldInputPlaceholder__domain: 'Ovdje upišite svoju domenu i kliknite dodaj za početak',
-      formFieldLabel__domain: 'Domene',
+      formFieldLabel__domain: 'Domena',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

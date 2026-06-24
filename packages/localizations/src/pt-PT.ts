@@ -683,7 +683,7 @@ export const ptPT: LocalizationResource = {
       },
       formButtonPrimary__add: 'Adicionar',
       formFieldInputPlaceholder__domain: 'Escreva aqui o seu domínio e clique em adicionar para começar',
-      formFieldLabel__domain: 'Domínios',
+      formFieldLabel__domain: 'Domínio',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
