@@ -51,7 +51,6 @@ export const SetupMfaStartScreen = withCardStateProvider((props: SetupMfaStartSc
           </Flex>
         )}
         <Actions
-          role='menu'
           elementDescriptor={descriptors.taskSetupMfaMethodSelectionItems}
           sx={t => ({
             borderTopWidth: t.borderWidths.$normal,

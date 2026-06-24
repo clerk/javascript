@@ -88,7 +88,6 @@ export const ExtraSmallAction = (props: Omit<ActionProps, 'label'>) => {
       ]}
       isDisabled={card.isLoading}
       onClick={onClick}
-      role='menuitem'
       {...rest}
     >
       <Flex
@@ -202,7 +201,6 @@ export const Action = (props: ActionProps) => {
       ]}
       isDisabled={card.isLoading}
       onClick={onClick}
-      role='menuitem'
       {...rest}
     >
       <Flex

@@ -8,6 +8,7 @@ import { Drawer } from '@/ui/elements/Drawer';
 import { LineItems } from '@/ui/elements/LineItems';
 import { SegmentedControl } from '@/ui/elements/SegmentedControl';
 import { Select, SelectButton, SelectOptionList } from '@/ui/elements/Select';
+import { DevModeOverlay } from '@/ui/elements/DevModeNotice';
 import { Tooltip } from '@/ui/elements/Tooltip';
 import {
   getCheckoutSeatUnitTotal,
@@ -370,17 +371,10 @@ export const PayWithTestPaymentMethod = () => {
         flexDirection: 'column',
         rowGap: t.space.$2,
         position: 'relative',
+        overflow: 'hidden',
       })}
     >
-      <Box
-        sx={t => ({
-          position: 'absolute',
-          inset: 0,
-          background: `repeating-linear-gradient(-45deg,${t.colors.$warningAlpha100},${t.colors.$warningAlpha100} 6px,${t.colors.$warningAlpha150} 6px,${t.colors.$warningAlpha150} 12px)`,
-          maskImage: `linear-gradient(transparent 20%, black)`,
-          pointerEvents: 'none',
-        })}
-      />
+      <DevModeOverlay />
       <Flex
         sx={t => ({
           alignItems: 'center',

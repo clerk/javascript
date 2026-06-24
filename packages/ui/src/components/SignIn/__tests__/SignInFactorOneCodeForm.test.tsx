@@ -40,6 +40,7 @@ describe('SignInFactorOneCodeForm', () => {
     cardSubtitle: localizationKeys('signIn.phoneCode.subtitle'),
     inputLabel: localizationKeys('signIn.phoneCode.formTitle'),
     resendButton: localizationKeys('signIn.phoneCode.resendButton'),
+    identityPreviewEditButtonAriaLabel: localizationKeys('identityPreviewEditButton__phoneNumber'),
   };
 
   describe('Cache Key Generation', () => {
@@ -84,6 +85,7 @@ describe('SignInFactorOneCodeForm', () => {
         cardSubtitle: localizationKeys('signIn.phoneCode.subtitle'),
         inputLabel: localizationKeys('signIn.phoneCode.formTitle'),
         resendButton: localizationKeys('signIn.phoneCode.resendButton'),
+        identityPreviewEditButtonAriaLabel: localizationKeys('identityPreviewEditButton__phoneNumber'),
       };
 
       renderWithProviders(<SignInFactorOneCodeForm {...phonePropsWithChannel} />, { wrapper });
@@ -123,6 +125,7 @@ describe('SignInFactorOneCodeForm', () => {
         cardSubtitle: localizationKeys('signIn.phoneCode.subtitle'),
         inputLabel: localizationKeys('signIn.phoneCode.formTitle'),
         resendButton: localizationKeys('signIn.phoneCode.resendButton'),
+        identityPreviewEditButtonAriaLabel: localizationKeys('identityPreviewEditButton__phoneNumber'),
       };
 
       renderWithProviders(<SignInFactorOneCodeForm {...props} />, { wrapper });
@@ -201,6 +204,7 @@ describe('SignInFactorOneCodeForm', () => {
         cardSubtitle: localizationKeys('signIn.emailCode.subtitle'),
         inputLabel: localizationKeys('signIn.emailCode.formTitle'),
         resendButton: localizationKeys('signIn.emailCode.resendButton'),
+        identityPreviewEditButtonAriaLabel: localizationKeys('identityPreviewEditButton__emailAddress'),
       };
 
       const { getByLabelText } = renderWithProviders(<SignInFactorOneCodeForm {...emailProps} />, { wrapper });

@@ -83,7 +83,6 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
           elementId={descriptors.organizationSwitcherPreviewButton.setId('personal')}
           icon={ArrowRight}
           onClick={onPersonalWorkspaceClick}
-          role='menuitem'
         >
           <PersonalWorkspacePreview
             user={userWithoutIdentifiers}
@@ -99,7 +98,6 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
           elementId={descriptors.organizationSwitcherPreviewButton.setId('organization')}
           icon={ArrowRight}
           onClick={() => onOrganizationClick(organization)}
-          role='menuitem'
           sx={t => ({
             border: `0 solid ${t.colors.$borderAlpha100}`,
           })}
