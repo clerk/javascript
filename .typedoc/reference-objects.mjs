@@ -128,6 +128,18 @@ export const BACKEND_API_CONFIG = {
     symbol: 'MachineApi',
     declarationHint: 'api/endpoints/MachineApi',
   },
+  'backend/m2-m-token-api/m2-m-token-api.mdx': {
+    symbol: 'M2MTokenApi',
+    declarationHint: 'api/endpoints/M2MTokenApi',
+  },
+  'backend/o-auth-applications-api/o-auth-applications-api.mdx': {
+    symbol: 'OAuthApplicationsApi',
+    declarationHint: 'api/endpoints/OAuthApplicationsApi',
+  },
+  'backend/api-keys-api/api-keys-api.mdx': {
+    symbol: 'APIKeysAPI',
+    declarationHint: 'api/endpoints/APIKeysApi',
+  },
 };
 
 /** Stable iteration order matches key order in {@link REFERENCE_OBJECT_CONFIG} then {@link BACKEND_API_CONFIG}. */
