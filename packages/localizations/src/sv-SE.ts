@@ -1736,6 +1736,9 @@ export const svSE: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Logga ut',
     action__signOutAll: 'Logga ut från alla konton',
+    label__userButtonPopover: 'Kontopanel',
+    label__accountActions: 'Kontoåtgärder',
+    label__activeSessions: 'Aktiva sessioner',
   },
   userProfile: {
     apiKeysPage: {

@@ -1011,6 +1011,9 @@ export type __internal_LocalizationResource = {
     action__addAccount: LocalizationValue;
     action__openUserMenu: LocalizationValue;
     action__closeUserMenu: LocalizationValue;
+    label__userButtonPopover?: LocalizationValue;
+    label__accountActions?: LocalizationValue;
+    label__activeSessions?: LocalizationValue;
   };
   organizationSwitcher: {
     personalWorkspace: LocalizationValue;

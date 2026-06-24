@@ -1756,6 +1756,9 @@ export const frFR: LocalizationResource = {
     action__openUserMenu: 'Ouvrir le menu utilisateur',
     action__signOut: 'Déconnexion',
     action__signOutAll: 'Se déconnecter de tous les comptes',
+    label__userButtonPopover: 'Panneau du compte',
+    label__accountActions: 'Actions du compte',
+    label__activeSessions: 'Sessions actives',
   },
   userProfile: {
     apiKeysPage: {

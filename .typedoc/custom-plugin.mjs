@@ -39,6 +39,7 @@ const FILES_WITHOUT_HEADINGS = [
   'use-organization-creation-defaults-params.mdx',
   'use-o-auth-consent-params.mdx',
   'use-o-auth-consent-return.mdx',
+  'create-organization-domain-params.mdx',
 ];
 
 /**
@@ -129,6 +130,8 @@ const LINK_REPLACEMENTS = [
   ['session-task', '/docs/reference/types/session-task'],
   ['public-user-data', '/docs/reference/types/public-user-data'],
   ['session-status', '/docs/reference/types/session-status'],
+  ['create-organization-domain-params', '#create-organization-domain-params'],
+  ['organization-domain-verification', '/docs/reference/types/organization-domain-resource'],
 ];
 
 /**

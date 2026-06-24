@@ -78,8 +78,8 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
         position: 'relative',
         borderRadius: theme.radii.$md,
         zIndex: 1,
-        '&:focus-within,&[data-focus-within="true"]': {
-          ...common.borderVariants(theme, { hasError: rest.hasError }).normal['&:focus'],
+        '&:has(:focus-visible),&:focus-within': {
+          ...common.borderVariants(theme, { hasError: rest.hasError }).normal['&:focus-visible'],
         },
       })}
     >
@@ -119,7 +119,7 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
             borderEndEndRadius: '0',
             borderStartEndRadius: '0',
             paddingInlineEnd: t.space.$2,
-            ':focus': {
+            '&:focus-visible': {
               zIndex: 2,
               boxShadow: 'none',
             },
@@ -191,7 +191,7 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
                 borderStartStartRadius: 0,
                 borderEndStartRadius: 0,
                 paddingInlineStart: t.space.$1,
-                '&:focus': {
+                '&:focus-visible': {
                   borderColor: 'unset',
                   boxShadow: 'unset',
                 },

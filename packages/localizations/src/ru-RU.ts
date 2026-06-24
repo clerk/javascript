@@ -1751,6 +1751,9 @@ export const ruRU: LocalizationResource = {
     action__openUserMenu: 'Открыть меню пользователя',
     action__signOut: 'Выйти',
     action__signOutAll: 'Выйти из всех учетных записей',
+    label__userButtonPopover: 'Панель аккаунта',
+    label__accountActions: 'Действия аккаунта',
+    label__activeSessions: 'Активные сессии',
   },
   userProfile: {
     apiKeysPage: {

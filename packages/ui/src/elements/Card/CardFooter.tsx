@@ -67,6 +67,8 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
         withFooterPages={showSponsorAndLinks && !isProfileFooter}
         devModeNoticeSx={t => ({
           padding: t.space.$none,
+          // The footer adds $4 (16px) below this section; pull the notice down so it sits ~12px from the bottom.
+          marginBottom: `calc(${t.space.$1} * -1)`,
         })}
         outerSx={isProfileFooter ? profileCardFooterStyles : undefined}
         withDevOverlay

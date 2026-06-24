@@ -1760,6 +1760,9 @@ export const hiIN: LocalizationResource = {
     action__openUserMenu: 'उपयोगकर्ता मेनू खोलें',
     action__signOut: 'साइन आउट',
     action__signOutAll: 'सभी खातों से साइन आउट करें',
+    label__userButtonPopover: 'खाता पैनल',
+    label__accountActions: 'खाता क्रियाएं',
+    label__activeSessions: 'सक्रिय सत्र',
   },
   userProfile: {
     apiKeysPage: {

@@ -1753,6 +1753,9 @@ export const viVN: LocalizationResource = {
     action__openUserMenu: 'Mở menu người dùng',
     action__signOut: 'Đăng xuất',
     action__signOutAll: 'Đăng xuất tất cả tài khoản',
+    label__userButtonPopover: 'Bảng điều khiển tài khoản',
+    label__accountActions: 'Hành động tài khoản',
+    label__activeSessions: 'Phiên hoạt động',
   },
   userProfile: {
     apiKeysPage: {

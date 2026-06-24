@@ -1764,6 +1764,9 @@ export const hrHR: LocalizationResource = {
     action__openUserMenu: 'Otvori korisnički izbornik',
     action__signOut: 'Odjavi se',
     action__signOutAll: 'Odjavi se sa svih računa',
+    label__userButtonPopover: 'Ploča računa',
+    label__accountActions: 'Akcije računa',
+    label__activeSessions: 'Aktivne sesije',
   },
   userProfile: {
     apiKeysPage: {
