@@ -150,7 +150,7 @@ describe('useHostedAuth', () => {
       body: {
         redirectUrl: 'myapp:///hosted-auth-callback',
         codeChallenge: mockCodeChallenge,
-        initialPage: undefined,
+        mode: undefined,
         state: 'state-123',
       },
     });
@@ -222,7 +222,7 @@ describe('useHostedAuth', () => {
       body: {
         redirectUrl: 'myapp:///hosted-auth-callback',
         codeChallenge: mockCodeChallenge,
-        initialPage: undefined,
+        mode: undefined,
         state: 'generated-state-123',
       },
     });
@@ -242,14 +242,14 @@ describe('useHostedAuth', () => {
     );
   });
 
-  test('passes through the requested initial page', async () => {
+  test('passes through the requested mode', async () => {
     mockHostedAuthResponse('https://example.accounts.dev/sign-up');
     mocks.openAuthSessionAsync.mockResolvedValue({
       type: 'dismiss',
     });
 
     const { result } = renderHook(() => useHostedAuth());
-    await result.current.startHostedAuth({ initialPage: 'sign-up', state: 'state-123' });
+    await result.current.startHostedAuth({ mode: 'sign-up', state: 'state-123' });
 
     expect(mockFapiRequest).toHaveBeenCalledWith({
       method: 'POST',
@@ -257,7 +257,7 @@ describe('useHostedAuth', () => {
       body: {
         redirectUrl: 'myapp:///hosted-auth-callback',
         codeChallenge: mockCodeChallenge,
-        initialPage: 'sign_up',
+        mode: 'sign_up',
         state: 'state-123',
       },
     });
