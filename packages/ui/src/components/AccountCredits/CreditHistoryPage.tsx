@@ -20,7 +20,7 @@ function formatCreditAmount(amount: number, currencySymbol: string): string {
   return `${prefix}${currencySymbol}${dollars}`;
 }
 
-export const CreditHistoryPage = () => {
+export const CreditHistoryPage = (): JSX.Element => {
   const { navigate } = useRouter();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
   const { data: creditBalance } = useCreditBalance();
