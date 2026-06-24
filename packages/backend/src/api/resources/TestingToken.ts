@@ -5,7 +5,7 @@ export class TestingToken {
   constructor(
     /** The token string. */
     readonly token: string,
-    /** The timestamp when the token expires. */
+    /** The Unix timestamp when the token expires. */
     readonly expiresAt: number,
   ) {}
 
