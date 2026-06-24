@@ -45,7 +45,7 @@ const SignInAccountSwitcherInternal = () => {
               borderTopColor: t.colors.$borderAlpha100,
             })}
           >
-            <Actions role='menu'>
+            <Actions>
               {signedInSessions.map(s => (
                 <PreviewButton
                   key={s.id}

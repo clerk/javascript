@@ -1,0 +1,6 @@
+target/
+*.node
+artifacts/
+# napi-generated type defs for the raw native binding (the public surface is
+# the hand-written index.js/index.d.ts loader)
+native.d.ts

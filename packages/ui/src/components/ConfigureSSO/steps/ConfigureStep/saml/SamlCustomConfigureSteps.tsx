@@ -5,7 +5,6 @@ import {
   Col,
   descriptors,
   Flex,
-  Heading,
   localizationKeys,
   Table,
   Tbody,
@@ -102,14 +101,6 @@ const SamlCustomCreateAppStep = (): JSX.Element => {
       <Step.Body>
         <Step.Section sx={theme => ({ gap: theme.space.$5 })}>
           <Col sx={theme => ({ gap: theme.space.$1x5 })}>
-            <Heading
-              elementDescriptor={descriptors.configureSSOInstructionsHeading}
-              as='h3'
-              textVariant='subtitle'
-              localizationKey={localizationKeys(
-                'configureSSO.configureStep.samlCustom.createAppStep.createAppInstructions.title',
-              )}
-            />
             <Text
               as='p'
               colorScheme='secondary'
@@ -221,7 +212,7 @@ const CustomAttributeMappingTable = (): JSX.Element => (
           <Text
             sx={theme => ({ fontSize: theme.fontSizes.$xs })}
             localizationKey={localizationKeys(
-              'configureSSO.configureStep.samlCustom.attributeMappingStep.attributeMappingTable.columns.userProfile',
+              'configureSSO.configureStep.samlCustom.attributeMappingStep.attributeMappingTable.columns.attributeName',
             )}
           />
         </Th>
@@ -229,7 +220,7 @@ const CustomAttributeMappingTable = (): JSX.Element => (
           <Text
             sx={theme => ({ fontSize: theme.fontSizes.$xs })}
             localizationKey={localizationKeys(
-              'configureSSO.configureStep.samlCustom.attributeMappingStep.attributeMappingTable.columns.attributeName',
+              'configureSSO.configureStep.samlCustom.attributeMappingStep.attributeMappingTable.columns.userAttribute',
             )}
           />
         </Th>
@@ -247,8 +238,9 @@ const CustomAttributeMappingTable = (): JSX.Element => (
               <Text
                 as='span'
                 colorScheme='secondary'
+                sx={{ fontFamily: 'monospace' }}
                 localizationKey={localizationKeys(
-                  `configureSSO.configureStep.samlCustom.attributeMappingStep.attributeMappingTable.rows.${row.id}.userProfile`,
+                  `configureSSO.configureStep.samlCustom.attributeMappingStep.attributeMappingTable.rows.${row.id}.userAttribute`,
                 )}
               />
               <Badge
@@ -268,7 +260,6 @@ const CustomAttributeMappingTable = (): JSX.Element => (
           <Td>
             <Text
               as='span'
-              sx={{ fontFamily: 'monospace' }}
               localizationKey={localizationKeys(
                 `configureSSO.configureStep.samlCustom.attributeMappingStep.attributeMappingTable.rows.${row.id}.attributeName`,
               )}
@@ -294,12 +285,6 @@ const SamlCustomAssignUsersStep = (): JSX.Element => {
 
       <Step.Body>
         <Step.Section sx={theme => ({ gap: theme.space.$3 })}>
-          <Heading
-            elementDescriptor={descriptors.configureSSOInstructionsHeading}
-            as='h3'
-            textVariant='subtitle'
-            localizationKey={localizationKeys('configureSSO.configureStep.samlCustom.assignUsersStep.title')}
-          />
           <Text
             as='p'
             colorScheme='secondary'
@@ -488,14 +473,6 @@ const SamlCustomIdentityProviderMetadataStep = (): JSX.Element => {
           fill
           gap={5}
         >
-          <Heading
-            elementDescriptor={descriptors.configureSSOInstructionsHeading}
-            as='h3'
-            textVariant='subtitle'
-            localizationKey={localizationKeys(
-              'configureSSO.configureStep.samlCustom.identityProviderMetadataStep.modes.title',
-            )}
-          />
           <IdentityProviderConfigurationModes
             modes={CUSTOM_SAML_IDP_MODES}
             value={mode}

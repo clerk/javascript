@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { Box, descriptors, Flex, Icon, SimpleButton, Text, Span } from '@/customizables';
-import { ChevronRight, Checkmark } from '@/icons';
+import { Box, descriptors, Flex, Icon, SimpleButton, Span, Text } from '@/customizables';
+import { Checkmark, ChevronRight } from '@/icons';
 
 import type { StepperItemProps, StepperProps } from './types';
 
@@ -75,14 +75,14 @@ const Item = ({
           width: theme.sizes.$4,
           height: theme.sizes.$4,
           borderRadius: theme.radii.$circle,
-          backgroundColor: isCurrent
-            ? theme.colors.$colorForeground
-            : isCompleted
-              ? theme.colors.$success500
+          backgroundColor: isCompleted
+            ? theme.colors.$success500
+            : isCurrent
+              ? theme.colors.$colorForeground
               : theme.colors.$colorMutedForeground,
         })}
       >
-        {isCompleted && !isCurrent ? (
+        {isCompleted ? (
           <Icon
             icon={Checkmark}
             size='sm'

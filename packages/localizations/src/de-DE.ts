@@ -1102,18 +1102,13 @@ export const deDE: LocalizationResource = {
         badge__inactive: undefined,
         badge__unconfigured: undefined,
         descriptionLine1: undefined,
-        descriptionLine2: undefined,
-        descriptionLine2__noRole: undefined,
         domainLabel: undefined,
-        issuerLabel: undefined,
         menuAction__activate: undefined,
         menuAction__deactivate: undefined,
         menuAction__edit: undefined,
         menuAction__remove: undefined,
         primaryButton__continueConfiguration: undefined,
         primaryButton__startConfiguration: undefined,
-        providerLabel: undefined,
-        signOnUrlLabel: undefined,
         title: undefined,
       },
       title: undefined,
@@ -1686,6 +1681,7 @@ export const deDE: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       "Die E-Mail-Adresse oder Telefonnummer ist für die Anmeldung nicht zulässig. Dies kann daran liegen, dass Ihre E-Mail-Adresse die Zeichen '+', '=', '#' oder '.' enthält, Sie eine Domain verwenden, die mit einem temporären E-Mail-Dienst verknüpft ist, oder dass Sie explizit gesperrt sind. Wenn Sie glauben, dass dies ein Fehler ist, wenden Sie sich bitte an den Support.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'Diese E-Mail-Provider-Domain ist gesperrt. Bitte verwenden Sie eine andere.',
     organization_domain_common: 'Dies ist eine gängige E-Mail-Provider-Domain. Bitte verwenden Sie eine andere.',
     organization_domain_exists_for_enterprise_connection:
@@ -1770,6 +1766,9 @@ export const deDE: LocalizationResource = {
     action__openUserMenu: 'Benutzermenü öffnen',
     action__signOut: 'Abmelden',
     action__signOutAll: 'Melden Sie sich von allen Konten ab',
+    label__userButtonPopover: 'Kontopanel',
+    label__accountActions: 'Kontoaktionen',
+    label__activeSessions: 'Aktive Sitzungen',
   },
   userProfile: {
     apiKeysPage: {
