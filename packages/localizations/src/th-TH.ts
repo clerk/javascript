@@ -677,7 +677,7 @@ export const thTH: LocalizationResource = {
         messageLabel: 'อีเมลของคุณใช้ {{domain}} คุณต้องการเพิ่มหรือไม่?',
       },
       formButtonPrimary__add: 'เพิ่ม',
-      formFieldInputPlaceholder__domain: 'พิมพ์โดเมนของคุณที่นี่แล้วคลิกเพิ่มเพื่อเริ่มต้น',
+      formFieldInputPlaceholder__domain: 'เพิ่มโดเมน',
       formFieldLabel__domain: 'โดเมน',
       removeDomainDialog: {
         cancelButton: undefined,

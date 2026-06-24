@@ -675,8 +675,8 @@ export const bgBG: LocalizationResource = {
         messageLabel: 'Вашият имейл използва {{domain}}. Искате ли да го добавите?',
       },
       formButtonPrimary__add: 'Добави',
-      formFieldInputPlaceholder__domain: 'Въведете домейна си тук и щракнете върху добавяне, за да започнете',
-      formFieldLabel__domain: 'Домейни',
+      formFieldInputPlaceholder__domain: 'Добавяне на домейн',
+      formFieldLabel__domain: 'Домейн',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

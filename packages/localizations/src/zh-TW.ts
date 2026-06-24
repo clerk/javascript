@@ -676,7 +676,7 @@ export const zhTW: LocalizationResource = {
         messageLabel: '您的電子郵件使用了 {{domain}}。是否要新增它？',
       },
       formButtonPrimary__add: '新增',
-      formFieldInputPlaceholder__domain: '在此輸入您的網域，然後點選新增即可開始',
+      formFieldInputPlaceholder__domain: '新增網域',
       formFieldLabel__domain: '網域',
       removeDomainDialog: {
         cancelButton: undefined,

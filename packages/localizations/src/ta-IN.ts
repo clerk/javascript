@@ -682,8 +682,8 @@ export const taIN: LocalizationResource = {
         messageLabel: 'உங்கள் மின்னஞ்சல் {{domain}} ஐப் பயன்படுத்துகிறது. அதைச் சேர்க்க விரும்புகிறீர்களா?',
       },
       formButtonPrimary__add: 'சேர்',
-      formFieldInputPlaceholder__domain: 'உங்கள் டொமைனை இங்கே தட்டச்சு செய்து, தொடங்க சேர் என்பதைக் கிளிக் செய்யவும்',
-      formFieldLabel__domain: 'டொமைன்கள்',
+      formFieldInputPlaceholder__domain: 'டொமைனைச் சேர்',
+      formFieldLabel__domain: 'டொமைன்',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

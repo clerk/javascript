@@ -680,8 +680,8 @@ export const roRO: LocalizationResource = {
         messageLabel: 'E-mailul tău folosește {{domain}}. Vrei să-l adaugi?',
       },
       formButtonPrimary__add: 'Adaugă',
-      formFieldInputPlaceholder__domain: 'Scrie aici domeniul tău și fă clic pe adaugă pentru a începe',
-      formFieldLabel__domain: 'Domenii',
+      formFieldInputPlaceholder__domain: 'Adaugă domeniu',
+      formFieldLabel__domain: 'Domeniu',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
