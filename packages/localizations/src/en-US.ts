@@ -557,7 +557,7 @@ export const enUS: LocalizationResource = {
             },
             rows: {
               email: {
-                expression: 'user.mail',
+                expression: 'user.email',
                 name: 'mail',
               },
               firstName: {
