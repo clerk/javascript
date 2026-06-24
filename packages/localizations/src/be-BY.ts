@@ -674,7 +674,7 @@ export const beBY: LocalizationResource = {
         messageLabel: 'Ваша электронная пошта выкарыстоўвае {{domain}}. Хочаце дадаць яго?',
       },
       formButtonPrimary__add: 'Дадаць',
-      formFieldInputPlaceholder__domain: 'Увядзіце свой дамен тут і націсніце «Дадаць», каб пачаць',
+      formFieldInputPlaceholder__domain: 'Дадаць дамен',
       formFieldLabel__domain: 'Дамен',
       removeDomainDialog: {
         cancelButton: undefined,

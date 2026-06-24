@@ -680,7 +680,7 @@ export const deDE: LocalizationResource = {
         messageLabel: 'Ihre E-Mail verwendet {{domain}}. Möchten Sie sie hinzufügen?',
       },
       formButtonPrimary__add: 'Hinzufügen',
-      formFieldInputPlaceholder__domain: 'Geben Sie hier Ihre Domain ein und klicken Sie zum Starten auf „Hinzufügen"',
+      formFieldInputPlaceholder__domain: 'Domain hinzufügen',
       formFieldLabel__domain: 'Domain',
       removeDomainDialog: {
         cancelButton: undefined,

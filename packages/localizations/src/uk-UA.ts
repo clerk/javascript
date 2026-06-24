@@ -674,7 +674,7 @@ export const ukUA: LocalizationResource = {
         messageLabel: 'Ваша електронна пошта використовує {{domain}}. Бажаєте додати його?',
       },
       formButtonPrimary__add: 'Додати',
-      formFieldInputPlaceholder__domain: 'Введіть свій домен тут і натисніть «Додати», щоб почати',
+      formFieldInputPlaceholder__domain: 'Додати домен',
       formFieldLabel__domain: 'Домен',
       removeDomainDialog: {
         cancelButton: undefined,

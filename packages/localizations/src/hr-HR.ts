@@ -681,7 +681,7 @@ export const hrHR: LocalizationResource = {
         messageLabel: 'Vaša e-pošta koristi {{domain}}. Želite li ga dodati?',
       },
       formButtonPrimary__add: 'Dodaj',
-      formFieldInputPlaceholder__domain: 'Ovdje upišite svoju domenu i kliknite dodaj za početak',
+      formFieldInputPlaceholder__domain: 'Dodaj domenu',
       formFieldLabel__domain: 'Domena',
       removeDomainDialog: {
         cancelButton: undefined,

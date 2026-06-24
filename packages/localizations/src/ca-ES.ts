@@ -681,7 +681,7 @@ export const caES: LocalizationResource = {
         messageLabel: 'El teu correu electrònic utilitza {{domain}}. Vols afegir-lo?',
       },
       formButtonPrimary__add: 'Afegeix',
-      formFieldInputPlaceholder__domain: 'Escriu aquí el teu domini i fes clic a Afegeix per començar',
+      formFieldInputPlaceholder__domain: 'Afegeix un domini',
       formFieldLabel__domain: 'Domini',
       removeDomainDialog: {
         cancelButton: undefined,

@@ -680,7 +680,7 @@ export const ptBR: LocalizationResource = {
         messageLabel: 'Seu e-mail usa {{domain}}. Deseja adicioná-lo?',
       },
       formButtonPrimary__add: 'Adicionar',
-      formFieldInputPlaceholder__domain: 'Digite seu domínio aqui e clique em Adicionar para começar',
+      formFieldInputPlaceholder__domain: 'Adicionar domínio',
       formFieldLabel__domain: 'Domínio',
       removeDomainDialog: {
         cancelButton: undefined,

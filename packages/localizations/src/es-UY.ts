@@ -674,7 +674,7 @@ export const esUY: LocalizationResource = {
         messageLabel: 'Tu correo electrónico usa {{domain}}. ¿Querés agregarlo?',
       },
       formButtonPrimary__add: 'Agregar',
-      formFieldInputPlaceholder__domain: 'Escribí aquí tu dominio y hacé clic en Agregar para empezar',
+      formFieldInputPlaceholder__domain: 'Agregar dominio',
       formFieldLabel__domain: 'Dominio',
       removeDomainDialog: {
         cancelButton: undefined,

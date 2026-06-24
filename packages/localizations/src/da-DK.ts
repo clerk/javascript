@@ -673,7 +673,7 @@ export const daDK: LocalizationResource = {
         messageLabel: 'Din e-mail bruger {{domain}}. Vil du tilføje det?',
       },
       formButtonPrimary__add: 'Tilføj',
-      formFieldInputPlaceholder__domain: 'Skriv dit domæne her, og klik på tilføj for at starte',
+      formFieldInputPlaceholder__domain: 'Tilføj domæne',
       formFieldLabel__domain: 'Domæne',
       removeDomainDialog: {
         cancelButton: undefined,

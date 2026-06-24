@@ -674,7 +674,7 @@ export const skSK: LocalizationResource = {
         messageLabel: 'Váš e-mail používa {{domain}}. Chcete ho pridať?',
       },
       formButtonPrimary__add: 'Pridať',
-      formFieldInputPlaceholder__domain: 'Sem zadajte svoju doménu a kliknutím na pridať začnite',
+      formFieldInputPlaceholder__domain: 'Pridať doménu',
       formFieldLabel__domain: 'Doména',
       removeDomainDialog: {
         cancelButton: undefined,

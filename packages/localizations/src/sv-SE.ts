@@ -674,7 +674,7 @@ export const svSE: LocalizationResource = {
         messageLabel: 'Din e-post använder {{domain}}. Vill du lägga till den?',
       },
       formButtonPrimary__add: 'Lägg till',
-      formFieldInputPlaceholder__domain: 'Skriv din domän här och klicka på lägg till för att börja',
+      formFieldInputPlaceholder__domain: 'Lägg till domän',
       formFieldLabel__domain: 'Domän',
       removeDomainDialog: {
         cancelButton: undefined,
