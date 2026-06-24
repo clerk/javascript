@@ -18,7 +18,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  FIXTURE_DIR: packages/expo/e2e/native-build-fixture
+  FIXTURE_DIR: integration/templates/expo-native
   FIXTURE_PUBLISHABLE_KEY: pk_test_ZHVtbXkuY2xlcmsuYWNjb3VudHMuZGV2JA
   SDK_PACK_DIR: /tmp/clerk-expo-pack
 
