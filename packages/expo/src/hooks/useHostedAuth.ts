@@ -62,7 +62,7 @@ export function useHostedAuth() {
         path: 'hosted-auth-callback',
         isTripleSlashed: true,
       });
-    const state = params.state ?? (await createState());
+    const state = params.state ?? createState();
     const pkce = await createPKCE();
     if (!clerk.client) {
       return errorThrower.throw('Hosted auth requires a loaded Clerk client.');
@@ -148,7 +148,7 @@ function toFapiMode(mode: HostedAuthMode | undefined): FapiHostedAuthMode | unde
   return undefined;
 }
 
-async function createState(): Promise<string> {
+function createState(): string {
   return loadExpoCrypto().randomUUID();
 }
 
@@ -170,7 +170,7 @@ async function createPKCE(): Promise<HostedAuthPKCE> {
 function loadExpoCrypto(): typeof ExpoCrypto {
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    return require('expo-crypto') as typeof import('expo-crypto');
+    return require('expo-crypto') as typeof ExpoCrypto;
   } catch {
     return errorThrower.throw(
       'expo-crypto is required to start hosted auth. Please install it by running: npx expo install expo-crypto',
