@@ -35,12 +35,11 @@ export const AccountCredits = () => {
             {creditBalance.balance.amountFormatted}
           </Text>
         </ProfileSection.Item>
-      </ProfileSection.ItemList>
-      <ProfileSection.ButtonGroup id='accountCredits'>
         <ProfileSection.ArrowButton
           id='accountCredits'
           textLocalizationKey={localizationKeys(`${localizationRoot}.billingPage.accountCreditsSection.viewHistory`)}
           sx={[t => ({ justifyContent: 'start', height: t.sizes.$8 })]}
+          leftIconSx={() => ({ display: 'none' })}
           rightIcon={ArrowRight}
           rightIconSx={t => ({
             width: t.sizes.$4,
@@ -48,7 +47,7 @@ export const AccountCredits = () => {
           })}
           onClick={() => void navigate('credit-history')}
         />
-      </ProfileSection.ButtonGroup>
+      </ProfileSection.ItemList>
     </ProfileSection.Root>
   );
 };
