@@ -4,10 +4,10 @@
   "private": true,
   "main": "index.js",
   "scripts": {
+    "build:android": "cd android && ./gradlew assembleRelease",
+    "build:ios": "xcodebuild -workspace ios/ClerkExpoNativeBuildFixture.xcworkspace -scheme ClerkExpoNativeBuildFixture -configuration Release -sdk iphonesimulator -derivedDataPath ios/build CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=''",
     "prebuild:android": "expo prebuild --clean --platform android",
-    "prebuild:ios": "expo prebuild --clean --platform ios",
-    "run:android": "expo run:android --variant release --no-bundler",
-    "run:ios": "expo run:ios --configuration Release --no-bundler"
+    "prebuild:ios": "expo prebuild --clean --platform ios"
   },
   "dependencies": {
     "expo": "~54.0.34",

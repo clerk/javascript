@@ -100,14 +100,8 @@ jobs:
 
       - name: Build Android fixture
         if: ${{ matrix.platform == 'android' }}
-        uses: reactivecircus/android-emulator-runner@e89f39f1abbbd05b1113a29cf4db69e7540cae5a # v2
-        with:
-          api-level: 34
-          target: google_apis
-          arch: x86_64
-          script: |
-            cd "$FIXTURE_DIR"
-            pnpm run:android
+        working-directory: ${{ env.FIXTURE_DIR }}
+        run: pnpm build:android
 
       - name: Prebuild iOS fixture
         if: ${{ matrix.platform == 'ios' }}
@@ -117,4 +111,4 @@ jobs:
       - name: Build iOS fixture
         if: ${{ matrix.platform == 'ios' }}
         working-directory: ${{ env.FIXTURE_DIR }}
-        run: pnpm run:ios
+        run: pnpm build:ios
