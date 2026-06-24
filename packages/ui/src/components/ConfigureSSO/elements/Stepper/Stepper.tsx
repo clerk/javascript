@@ -16,6 +16,7 @@ const Root = ({ children }: StepperProps): JSX.Element => {
       sx={theme => ({
         gap: theme.space.$2,
         flexWrap: 'wrap',
+        [mqu.md]: { gap: theme.space.$3 },
       })}
     >
       {items.map((child, index) => (
@@ -129,6 +130,7 @@ const Skeleton = ({ totalSteps = 4 }: SkeletonProps): JSX.Element => (
     sx={theme => ({
       gap: theme.space.$2,
       flexWrap: 'wrap',
+      [mqu.md]: { gap: theme.space.$3 },
     })}
   >
     {Array.from({ length: totalSteps }).map((_, index) => (
