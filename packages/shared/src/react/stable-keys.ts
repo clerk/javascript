@@ -33,6 +33,9 @@ const PAYMENT_ATTEMPTS_KEY = 'billing-payment-attempts';
 // Keys for `useStatements`
 const STATEMENTS_KEY = 'billing-statements';
 
+// Keys for `useCreditBalance`
+const CREDIT_BALANCE_KEY = 'billing-credit-balance';
+
 export const STABLE_KEYS = {
   // Keys for `useOrganizationList`
   USER_MEMBERSHIPS_KEY,
@@ -60,6 +63,9 @@ export const STABLE_KEYS = {
 
   // Keys for `useOAuthConsent`
   OAUTH_CONSENT_INFO_KEY,
+
+  // Keys for `useCreditBalance`
+  CREDIT_BALANCE_KEY,
 } as const;
 
 export type ResourceCacheStableKey = (typeof STABLE_KEYS)[keyof typeof STABLE_KEYS];

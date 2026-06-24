@@ -82,6 +82,13 @@ export interface BillingNamespace {
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   startCheckout: (params: CreateCheckoutParams) => Promise<BillingCheckoutResource>;
+
+  /**
+   * Gets the credit balance for the current payer.
+   *
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+   */
+  getCreditBalance: (params: GetCreditBalanceParams) => Promise<BillingCreditBalanceResource>;
 }
 
 /**
@@ -926,7 +933,33 @@ export interface BillingSubscriptionResource extends ClerkResource {
    * Whether the payer is eligible for a free trial.
    */
   eligibleForFreeTrial: boolean;
+
+  /**
+   * The ID of the payer for this subscription.
+   */
+  payerId: string;
 }
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingCreditBalanceResource {
+  /**
+   * The balance of the credit.
+   */
+  balance: BillingMoneyAmount | null;
+}
+
+export type GetCreditBalanceParams = {
+  /**
+   * The ID of the Organization to get the credit balance for.
+   */
+  orgId?: string;
+  /**
+   * The ID of the payer to get the credit balance for.
+   */
+  payerId: string;
+};
 
 /**
  * The `BillingMoneyAmount` type represents a monetary value with currency information.

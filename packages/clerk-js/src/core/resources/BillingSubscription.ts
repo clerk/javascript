@@ -36,6 +36,7 @@ export class BillingSubscription extends BaseResource implements BillingSubscrip
   nextPayment?: BillingSubscriptionNextPayment | null;
   subscriptionItems!: BillingSubscriptionItemResource[];
   eligibleForFreeTrial!: boolean;
+  payerId!: string;
 
   constructor(data: BillingSubscriptionJSON) {
     super();
@@ -63,6 +64,7 @@ export class BillingSubscription extends BaseResource implements BillingSubscrip
 
     this.subscriptionItems = (data.subscription_items || []).map(item => new BillingSubscriptionItem(item));
     this.eligibleForFreeTrial = this.withDefault(data.eligible_for_free_trial, false);
+    this.payerId = data.payer_id;
     return this;
   }
 }

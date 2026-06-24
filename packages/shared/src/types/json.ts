@@ -926,6 +926,15 @@ export interface BillingSubscriptionJSON extends ClerkResourceJSON {
   past_due_at: number | null;
   subscription_items: BillingSubscriptionItemJSON[] | null;
   eligible_for_free_trial: boolean;
+  payer_id: string;
+}
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingCreditBalanceJSON {
+  object: 'commerce_credit_balance';
+  balance: BillingMoneyAmountJSON | null;
 }
 
 /**

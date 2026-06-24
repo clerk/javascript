@@ -1,4 +1,5 @@
 import {
+  __experimental_useCreditBalance,
   __experimental_usePaymentAttempts,
   __experimental_usePaymentMethods,
   __experimental_usePlans,
@@ -83,6 +84,15 @@ export const usePlans = (params?: { mode: 'cache' }) => {
     keepPreviousData: true,
     enabled: true,
     __experimental_mode: params?.mode,
+  });
+};
+
+export const useCreditBalance = () => {
+  const params = useBillingHookParams();
+  const { data: subscription } = useSubscription();
+  return __experimental_useCreditBalance({
+    ...params,
+    payerId: subscription?.payerId,
   });
 };
 

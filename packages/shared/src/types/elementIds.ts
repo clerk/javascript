@@ -62,7 +62,8 @@ export type ProfileSectionId =
   | 'configureAgain'
   | 'resetSso'
   | 'testSsoUrl'
-  | 'testResults';
+  | 'testResults'
+  | 'accountCredits';
 export type ProfilePageId =
   | 'account'
   | 'security'

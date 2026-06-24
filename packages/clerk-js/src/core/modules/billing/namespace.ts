@@ -1,5 +1,7 @@
 import type {
   BillingCheckoutJSON,
+  BillingCreditBalanceJSON,
+  BillingCreditBalanceResource,
   BillingNamespace,
   BillingPaymentJSON,
   BillingPaymentResource,
@@ -11,6 +13,7 @@ import type {
   BillingSubscriptionResource,
   ClerkPaginatedResponse,
   CreateCheckoutParams,
+  GetCreditBalanceParams,
   GetPaymentAttemptsParams,
   GetPlansParams,
   GetStatementsParams,
@@ -21,6 +24,7 @@ import { convertPageToOffsetSearchParams } from '../../../utils/convertPageToOff
 import {
   BaseResource,
   BillingCheckout,
+  BillingCreditBalance,
   BillingPayment,
   BillingPlan,
   BillingStatement,
@@ -139,5 +143,12 @@ export class Billing implements BillingNamespace {
     )?.response as unknown as BillingCheckoutJSON;
 
     return new BillingCheckout(json);
+  };
+
+  getCreditBalance = async (params: GetCreditBalanceParams): Promise<BillingCreditBalanceResource> => {
+    return await BaseResource._fetch({
+      path: Billing.path(`/payers/${params.payerId}/credits`, { orgId: params.orgId }),
+      method: 'GET',
+    }).then(res => new BillingCreditBalance(res?.response as unknown as BillingCreditBalanceJSON));
   };
 }
