@@ -93,13 +93,13 @@ Note that the bulk auto-fixer described further down does require `eslint` to be
 
 ## Options
 
-| Option              | Type                  | Default  | Description                                                                                                                                                                                                             |
-| ------------------- | --------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `protected`         | `string[]` (required) | —        | Folder globs relative to the project root whose resources must be guarded.                                                                                                                                              |
-| `public`            | `string[]`            | `[]`     | Folder globs relative to the project root that are exempt.                                                                                                                                                              |
-| `resources`         | `object`              | all true | Resource groups to check. Supports `routeHandlers`, `serverFunctions`, and `serverComponentEntrypoints`, each as an optional boolean.                                                                                   |
-| `mixedScopeLayouts` | `'auto' \| string[]`  | `'auto'` | Layouts/templates that intentionally wrap both protected and public descendants. `'auto'` allows them silently; a list requires each such folder to be acknowledged explicitly.                                         |
-| `rootDir`           | `string`              | _(auto)_ | Project root used to resolve project-relative folder globs. Defaults to the nearest ancestor `eslint.config.*`, then ESLint `cwd`. Set to `import.meta.dirname` in your config file when auto-discovery is unavailable. |
+| Option              | Type                  | Default  | Description                                                                                                                                                                          |
+| ------------------- | --------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `protected`         | `string[]` (required) | —        | Folder globs relative to the project root whose resources must be guarded.                                                                                                           |
+| `public`            | `string[]`            | `[]`     | Folder globs relative to the project root that are exempt.                                                                                                                           |
+| `resources`         | `object`              | all true | Resource groups to check. Supports `routeHandlers`, `serverFunctions`, and `serverComponentEntrypoints`, each as an optional boolean.                                                |
+| `mixedScopeLayouts` | `'auto' \| string[]`  | `'auto'` | Layouts/templates that intentionally wrap both protected and public descendants. `'auto'` allows them silently; a list requires each such folder to be acknowledged explicitly.      |
+| `rootDir`           | `string`              | _(auto)_ | Project root used to resolve project-relative folder globs. Defaults to the nearest ancestor `eslint.config.*`, then ESLint/Oxlint `cwd`. Relative paths are resolved against `cwd`. |
 
 Globs use a minimal dialect — only `*` (single segment) and `**` (any depth). When a folder matches both `protected` and `public`, the most specific pattern wins, and `protected` wins ties.
 
@@ -107,7 +107,7 @@ Globs use a minimal dialect — only `*` (single segment) and `**` (any depth). 
 
 `protected` and `public` are project-relative folder globs. Use `app/**` for a root `app` directory, `src/app/**` for a `src/app` directory, and `src/**`, `shared/**`, etc. for other project folders.
 
-The project root is normally determined by the nearest `eslint.config.*` ancestor of the file being checked, and falls back to `cwd`. You can configure it manually using `rootDir`.
+The project root is normally determined by the nearest `eslint.config.*` ancestor of the file being checked, and falls back to `cwd`. You can configure it manually using `rootDir`; relative `rootDir` values are resolved against ESLint/Oxlint `cwd`.
 
 We recommend starting with `protected: ['**']`. This protects the following resources by default:
 
