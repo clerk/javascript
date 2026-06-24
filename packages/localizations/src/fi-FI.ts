@@ -680,8 +680,8 @@ export const fiFI: LocalizationResource = {
         messageLabel: 'Sähköpostisi käyttää osoitetta {{domain}}. Haluatko lisätä sen?',
       },
       formButtonPrimary__add: 'Lisää',
-      formFieldInputPlaceholder__domain: 'Kirjoita verkkotunnuksesi tähän ja aloita napsauttamalla Lisää',
-      formFieldLabel__domain: 'Verkkotunnukset',
+      formFieldInputPlaceholder__domain: 'Lisää verkkotunnus',
+      formFieldLabel__domain: 'Verkkotunnus',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1757,6 +1757,9 @@ export const fiFI: LocalizationResource = {
     action__openUserMenu: 'Avaa käyttäjävalikko',
     action__signOut: 'Kirjaudu ulos',
     action__signOutAll: 'Kirjaudu ulos kaikilta tileiltä',
+    label__userButtonPopover: 'Tilin paneeli',
+    label__accountActions: 'Tilin toiminnot',
+    label__activeSessions: 'Aktiiviset istunnot',
   },
   userProfile: {
     apiKeysPage: {

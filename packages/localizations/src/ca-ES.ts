@@ -681,8 +681,8 @@ export const caES: LocalizationResource = {
         messageLabel: 'El teu correu electrònic utilitza {{domain}}. Vols afegir-lo?',
       },
       formButtonPrimary__add: 'Afegeix',
-      formFieldInputPlaceholder__domain: 'Escriu aquí el teu domini i fes clic a Afegeix per començar',
-      formFieldLabel__domain: 'Dominis',
+      formFieldInputPlaceholder__domain: 'Afegeix un domini',
+      formFieldLabel__domain: 'Domini',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1747,6 +1747,9 @@ export const caES: LocalizationResource = {
     action__openUserMenu: "Obre el menú d'usuari",
     action__signOut: 'Tanca sessió',
     action__signOutAll: 'Tanca sessió de tots els comptes',
+    label__userButtonPopover: 'Tauler del compte',
+    label__accountActions: 'Accions del compte',
+    label__activeSessions: 'Sessions actives',
   },
   userProfile: {
     apiKeysPage: {

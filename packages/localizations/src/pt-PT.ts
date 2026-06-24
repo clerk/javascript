@@ -682,8 +682,8 @@ export const ptPT: LocalizationResource = {
         messageLabel: 'O seu e-mail utiliza {{domain}}. Pretende adicioná-lo?',
       },
       formButtonPrimary__add: 'Adicionar',
-      formFieldInputPlaceholder__domain: 'Escreva aqui o seu domínio e clique em adicionar para começar',
-      formFieldLabel__domain: 'Domínios',
+      formFieldInputPlaceholder__domain: 'Adicionar domínio',
+      formFieldLabel__domain: 'Domínio',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1757,6 +1757,9 @@ export const ptPT: LocalizationResource = {
     action__openUserMenu: 'Abrir menu do utilizador',
     action__signOut: 'Terminar sessão',
     action__signOutAll: 'Terminar sessão de todas as contas',
+    label__userButtonPopover: 'Painel da conta',
+    label__accountActions: 'Ações da conta',
+    label__activeSessions: 'Sessões ativas',
   },
   userProfile: {
     apiKeysPage: {

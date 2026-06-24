@@ -101,19 +101,22 @@ export const useWizardMachine = ({ config, parentWizard, initialStepId }: UseWiz
   // deleted from a footer reset, or revoked elsewhere), OR the active id names no
   // descriptor at all (an invalid seed, or a step removed from the graph), the
   // wizard is sitting on an impossible step. Re-seat to the furthest-reachable
-  // step — the SAME derivation used on mount (initialState). React discards this
-  // render and re-renders before paint, so the impossible frame never shows. Do
-  // NOT "fix" this by adding a goToStep: navigation here is emergent from the
-  // guard state, by design. The condition (current descriptor is missing or its
-  // guard is false, and the re-seated step differs) makes it a provably one-shot
-  // — initialState always lands on a guard-passing step, so it cannot loop.
-  if (!isNested) {
-    const currentDescriptor = config.descriptors.find(d => d.id === state.current);
-    if (!currentDescriptor || !isStepReachable(currentDescriptor)) {
-      const seated = initialState(config);
-      if (seated.current !== state.current) {
-        setState(seated);
-      }
+  // step — the SAME derivation used on mount (initialState), over the LOCAL
+  // descriptors. Runs for nested wizards too: ConfigureSSO's middle wizard has a
+  // guarded `configure-provider` step that breaks when its connection is deleted
+  // from inside the flow, and the re-seat must happen IN PLACE (the local
+  // setState, never bubbling to the parent) so it falls back to select-provider
+  // instead of stranding on a blank pane. React discards this render and
+  // re-renders before paint, so the impossible frame never shows. Do NOT "fix"
+  // this by adding a goToStep: navigation here is emergent from the guard state,
+  // by design. The condition (current descriptor is missing or its guard is
+  // false, and the re-seated step differs) makes it a provably one-shot —
+  // initialState always lands on a guard-passing step, so it cannot loop.
+  const currentDescriptor = config.descriptors.find(d => d.id === state.current);
+  if (!currentDescriptor || !isStepReachable(currentDescriptor)) {
+    const seated = initialState(config);
+    if (seated.current !== state.current) {
+      setState(seated);
     }
   }
 

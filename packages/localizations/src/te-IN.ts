@@ -681,8 +681,8 @@ export const teIN: LocalizationResource = {
         messageLabel: 'మీ ఇమెయిల్ {{domain}} ను ఉపయోగిస్తుంది. మీరు దీన్ని జోడించాలనుకుంటున్నారా?',
       },
       formButtonPrimary__add: 'జోడించు',
-      formFieldInputPlaceholder__domain: 'మీ డొమైన్‌ను ఇక్కడ టైప్ చేసి, ప్రారంభించడానికి జోడించు క్లిక్ చేయండి',
-      formFieldLabel__domain: 'డొమైన్‌లు',
+      formFieldInputPlaceholder__domain: 'డొమైన్‌ను జోడించు',
+      formFieldLabel__domain: 'డొమైన్',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1764,6 +1764,9 @@ export const teIN: LocalizationResource = {
     action__openUserMenu: 'వినియోగదారు మెనుని తెరువు',
     action__signOut: 'సైన్ అవుట్',
     action__signOutAll: 'అన్ని ఖాతాల నుండి సైన్ అవుట్ అవ్వండి',
+    label__userButtonPopover: 'ఖాతా ప్యానెల్',
+    label__accountActions: 'ఖాతా చర్యలు',
+    label__activeSessions: 'క్రియాశీల సెషన్‌లు',
   },
   userProfile: {
     apiKeysPage: {

@@ -674,8 +674,8 @@ export const nlBE: LocalizationResource = {
         messageLabel: 'Je e-mailadres gebruikt {{domain}}. Wil je het toevoegen?',
       },
       formButtonPrimary__add: 'Toevoegen',
-      formFieldInputPlaceholder__domain: 'Typ hier uw domein en klik op toevoegen om te beginnen',
-      formFieldLabel__domain: 'Domeinen',
+      formFieldInputPlaceholder__domain: 'Domein toevoegen',
+      formFieldLabel__domain: 'Domein',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1735,6 +1735,9 @@ export const nlBE: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Uitloggen',
     action__signOutAll: 'Uitloggen uit alle accounts',
+    label__userButtonPopover: 'Accountpaneel',
+    label__accountActions: 'Accountacties',
+    label__activeSessions: 'Actieve sessies',
   },
   userProfile: {
     apiKeysPage: {

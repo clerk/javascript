@@ -680,8 +680,8 @@ export const deDE: LocalizationResource = {
         messageLabel: 'Ihre E-Mail verwendet {{domain}}. Möchten Sie sie hinzufügen?',
       },
       formButtonPrimary__add: 'Hinzufügen',
-      formFieldInputPlaceholder__domain: 'Geben Sie hier Ihre Domain ein und klicken Sie zum Starten auf „Hinzufügen"',
-      formFieldLabel__domain: 'Domains',
+      formFieldInputPlaceholder__domain: 'Domain hinzufügen',
+      formFieldLabel__domain: 'Domain',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1766,6 +1766,9 @@ export const deDE: LocalizationResource = {
     action__openUserMenu: 'Benutzermenü öffnen',
     action__signOut: 'Abmelden',
     action__signOutAll: 'Melden Sie sich von allen Konten ab',
+    label__userButtonPopover: 'Kontopanel',
+    label__accountActions: 'Kontoaktionen',
+    label__activeSessions: 'Aktive Sitzungen',
   },
   userProfile: {
     apiKeysPage: {

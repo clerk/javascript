@@ -680,7 +680,7 @@ export const bnIN: LocalizationResource = {
         messageLabel: 'আপনার ইমেল {{domain}} ব্যবহার করে। আপনি কি এটি যোগ করতে চান?',
       },
       formButtonPrimary__add: 'যোগ করুন',
-      formFieldInputPlaceholder__domain: 'আপনার ডোমেইন এখানে টাইপ করুন এবং শুরু করতে যোগ করুন-এ ক্লিক করুন',
+      formFieldInputPlaceholder__domain: 'ডোমেইন যোগ করুন',
       formFieldLabel__domain: 'ডোমেইন',
       removeDomainDialog: {
         cancelButton: undefined,
@@ -1759,6 +1759,9 @@ export const bnIN: LocalizationResource = {
     action__openUserMenu: 'ব্যবহারকারী মেনু খুলুন',
     action__signOut: 'সাইন আউট',
     action__signOutAll: 'সব অ্যাকাউন্ট থেকে সাইন আউট করুন',
+    label__userButtonPopover: 'অ্যাকাউন্ট প্যানেল',
+    label__accountActions: 'অ্যাকাউন্ট অ্যাকশন',
+    label__activeSessions: 'সক্রিয় সেশন',
   },
   userProfile: {
     apiKeysPage: {

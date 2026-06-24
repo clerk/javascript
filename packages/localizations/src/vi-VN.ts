@@ -680,7 +680,7 @@ export const viVN: LocalizationResource = {
         messageLabel: 'Email của bạn sử dụng {{domain}}. Bạn có muốn thêm nó không?',
       },
       formButtonPrimary__add: 'Thêm',
-      formFieldInputPlaceholder__domain: 'Nhập tên miền của bạn vào đây và nhấp vào thêm để bắt đầu',
+      formFieldInputPlaceholder__domain: 'Thêm tên miền',
       formFieldLabel__domain: 'Tên miền',
       removeDomainDialog: {
         cancelButton: undefined,
@@ -1753,6 +1753,9 @@ export const viVN: LocalizationResource = {
     action__openUserMenu: 'Mở menu người dùng',
     action__signOut: 'Đăng xuất',
     action__signOutAll: 'Đăng xuất tất cả tài khoản',
+    label__userButtonPopover: 'Bảng điều khiển tài khoản',
+    label__accountActions: 'Hành động tài khoản',
+    label__activeSessions: 'Phiên hoạt động',
   },
   userProfile: {
     apiKeysPage: {

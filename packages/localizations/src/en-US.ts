@@ -279,7 +279,7 @@ export const enUS: LocalizationResource = {
               label: 'Assertion consumer service (ACS) URL',
             },
             spEntityId: {
-              label: 'Service provider entity ID',
+              label: 'Entity ID',
             },
           },
         },
@@ -557,7 +557,7 @@ export const enUS: LocalizationResource = {
             },
             rows: {
               email: {
-                expression: 'user.mail',
+                expression: 'user.email',
                 name: 'mail',
               },
               firstName: {
@@ -667,7 +667,7 @@ export const enUS: LocalizationResource = {
       },
       formButtonPrimary__add: 'Add',
       formFieldInputPlaceholder__domain: 'Type your domain here and click add to start',
-      formFieldLabel__domain: 'Domains',
+      formFieldLabel__domain: 'Domain',
       removeDomainDialog: {
         cancelButton: 'Cancel',
         removeButton: 'Remove domain',
@@ -1754,6 +1754,9 @@ export const enUS: LocalizationResource = {
     action__openUserMenu: 'Open user menu',
     action__signOut: 'Sign out',
     action__signOutAll: 'Sign out of all accounts',
+    label__userButtonPopover: 'Account panel',
+    label__accountActions: 'Account actions',
+    label__activeSessions: 'Active sessions',
   },
   userProfile: {
     apiKeysPage: {
