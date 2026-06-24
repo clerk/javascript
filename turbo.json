@@ -79,6 +79,22 @@
     "dev": {
       "cache": false
     },
+    "@clerk/clerk-js#dev": {
+      "cache": false,
+      "dependsOn": ["@clerk/shared#build"]
+    },
+    "@clerk/ui#dev": {
+      "cache": false,
+      "dependsOn": ["@clerk/shared#build", "@clerk/localizations#build"]
+    },
+    "@clerk/shared#dev": {
+      "cache": false,
+      "dependsOn": ["@clerk/shared#build"]
+    },
+    "@clerk/localizations#dev": {
+      "cache": false,
+      "dependsOn": ["@clerk/localizations#build"]
+    },
     "dev:current": {
       "cache": false,
       "dependsOn": ["^build", "dev"],
