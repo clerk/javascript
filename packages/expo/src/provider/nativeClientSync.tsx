@@ -787,8 +787,7 @@ export function useNativeClientBootstrap({
             }
           }
         } catch (error) {
-          const isNativeModuleNotFound =
-            error instanceof Error && error.message.includes('Cannot find native module');
+          const isNativeModuleNotFound = error instanceof Error && error.message.includes('Cannot find native module');
           if (isNativeModuleNotFound) {
             if (__DEV__) {
               console.debug(
