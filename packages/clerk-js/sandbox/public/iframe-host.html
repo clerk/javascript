@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>iframe host (parent)</title>
+  </head>
+  <body>
+    <h1>iframe host</h1>
+    <p>Embeds a cross-origin iframe to reproduce the embedded-app (e.g. Replit preview) session-refresh scenario.</p>
+    <iframe
+      id="f"
+      style="width: 480px; height: 360px; border: 1px solid #ccc"
+    ></iframe>
+    <script>
+      // Build a cross-origin URL for the iframe by swapping localhost <-> 127.0.0.1 on the same dev server.
+      const params = new URLSearchParams(location.search);
+      const framePath = params.get('framePath') || '/iframe-probe.html';
+      const frameSearch = params.get('frameSearch') || '';
+      const u = new URL(location.href);
+      u.hostname = location.hostname === 'localhost' ? '127.0.0.1' : 'localhost';
+      u.pathname = framePath;
+      u.search = frameSearch;
+      u.hash = '';
+      window.__frameSrc = u.toString();
+      document.getElementById('f').src = window.__frameSrc;
+    </script>
+  </body>
+</html>
