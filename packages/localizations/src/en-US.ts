@@ -279,7 +279,7 @@ export const enUS: LocalizationResource = {
               label: 'Assertion consumer service (ACS) URL',
             },
             spEntityId: {
-              label: 'Service provider entity ID',
+              label: 'Entity ID',
             },
           },
         },
@@ -666,7 +666,7 @@ export const enUS: LocalizationResource = {
         messageLabel: 'Your email uses {{domain}}. Do you want to add it?',
       },
       formButtonPrimary__add: 'Add',
-      formFieldInputPlaceholder__domain: 'Add domain',
+      formFieldInputPlaceholder__domain: 'Type your domain here and click add to start',
       formFieldLabel__domain: 'Domain',
       removeDomainDialog: {
         cancelButton: 'Cancel',
