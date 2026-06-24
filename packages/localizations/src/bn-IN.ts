@@ -680,7 +680,7 @@ export const bnIN: LocalizationResource = {
         messageLabel: 'আপনার ইমেল {{domain}} ব্যবহার করে। আপনি কি এটি যোগ করতে চান?',
       },
       formButtonPrimary__add: 'যোগ করুন',
-      formFieldInputPlaceholder__domain: 'আপনার ডোমেইন এখানে টাইপ করুন এবং শুরু করতে যোগ করুন-এ ক্লিক করুন',
+      formFieldInputPlaceholder__domain: 'ডোমেইন যোগ করুন',
       formFieldLabel__domain: 'ডোমেইন',
       removeDomainDialog: {
         cancelButton: undefined,

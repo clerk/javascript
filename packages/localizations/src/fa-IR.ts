@@ -679,7 +679,7 @@ export const faIR: LocalizationResource = {
         messageLabel: 'ایمیل شما از {{domain}} استفاده می‌کند. آیا می‌خواهید آن را اضافه کنید؟',
       },
       formButtonPrimary__add: 'افزودن',
-      formFieldInputPlaceholder__domain: 'دامنه خود را اینجا تایپ کنید و برای شروع روی افزودن کلیک کنید',
+      formFieldInputPlaceholder__domain: 'افزودن دامنه',
       formFieldLabel__domain: 'دامنه',
       removeDomainDialog: {
         cancelButton: undefined,

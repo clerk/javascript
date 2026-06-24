@@ -680,7 +680,7 @@ export const viVN: LocalizationResource = {
         messageLabel: 'Email của bạn sử dụng {{domain}}. Bạn có muốn thêm nó không?',
       },
       formButtonPrimary__add: 'Thêm',
-      formFieldInputPlaceholder__domain: 'Nhập tên miền của bạn vào đây và nhấp vào thêm để bắt đầu',
+      formFieldInputPlaceholder__domain: 'Thêm tên miền',
       formFieldLabel__domain: 'Tên miền',
       removeDomainDialog: {
         cancelButton: undefined,
