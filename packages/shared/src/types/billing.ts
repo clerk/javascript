@@ -992,7 +992,6 @@ export interface BillingCreditLedgerResource {
   currency: string;
   sourceType: string;
   sourceId: string;
-  note: string | null;
   createdAt: Date;
 }
 

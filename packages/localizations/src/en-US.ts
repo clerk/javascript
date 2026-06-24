@@ -911,7 +911,6 @@ export const enUS: LocalizationResource = {
         title: 'Account credit history',
         tableHeader__amount: 'Amount',
         tableHeader__date: 'Date',
-        tableHeader__reason: 'Reason',
       },
       paymentHistorySection: {
         empty: 'No payment history',
@@ -1802,7 +1801,6 @@ export const enUS: LocalizationResource = {
         title: 'Account credit history',
         tableHeader__amount: 'Amount',
         tableHeader__date: 'Date',
-        tableHeader__reason: 'Reason',
       },
       paymentHistorySection: {
         empty: 'No payment history',

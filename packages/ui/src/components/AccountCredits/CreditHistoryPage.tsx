@@ -108,18 +108,6 @@ export const CreditHistoryPage = () => {
                   )}
                 />
               </Box>
-              <Box
-                as='th'
-                sx={t => ({ padding: t.space.$3, textAlign: 'left' })}
-              >
-                <Text
-                  variant='caption'
-                  colorScheme='secondary'
-                  localizationKey={localizationKeys(
-                    `${localizationRoot}.billingPage.creditHistoryPage.tableHeader__reason`,
-                  )}
-                />
-              </Box>
             </Box>
           </Box>
           <Box as='tbody'>
@@ -150,17 +138,6 @@ export const CreditHistoryPage = () => {
                   sx={t => ({ padding: t.space.$3 })}
                 >
                   <Text variant='body'>{formatCreditDate(entry.createdAt)}</Text>
-                </Box>
-                <Box
-                  as='td'
-                  sx={t => ({ padding: t.space.$3 })}
-                >
-                  <Text
-                    variant='body'
-                    colorScheme='secondary'
-                  >
-                    {entry.note || '-'}
-                  </Text>
                 </Box>
               </Box>
             ))}

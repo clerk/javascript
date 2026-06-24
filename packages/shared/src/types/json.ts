@@ -948,7 +948,6 @@ export interface BillingCreditLedgerJSON {
   currency: string;
   source_type: string;
   source_id: string;
-  note?: string | null;
   created_at: number;
 }
 

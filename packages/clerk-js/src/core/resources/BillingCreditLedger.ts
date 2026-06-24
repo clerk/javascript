@@ -11,7 +11,6 @@ export class BillingCreditLedger extends BaseResource implements BillingCreditLe
   currency!: string;
   sourceType!: string;
   sourceId!: string;
-  note: string | null = null;
   createdAt!: Date;
 
   constructor(data: BillingCreditLedgerJSON) {
@@ -30,7 +29,6 @@ export class BillingCreditLedger extends BaseResource implements BillingCreditLe
     this.currency = data.currency;
     this.sourceType = data.source_type;
     this.sourceId = data.source_id;
-    this.note = data.note ?? null;
     this.createdAt = unixEpochToDate(data.created_at);
     return this;
   }

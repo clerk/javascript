@@ -946,7 +946,6 @@ export type __internal_LocalizationResource = {
         title: LocalizationValue;
         tableHeader__amount: LocalizationValue;
         tableHeader__date: LocalizationValue;
-        tableHeader__reason: LocalizationValue;
       };
       start: {
         headerTitle__payments: LocalizationValue;
@@ -1229,7 +1228,6 @@ export type __internal_LocalizationResource = {
         title: LocalizationValue;
         tableHeader__amount: LocalizationValue;
         tableHeader__date: LocalizationValue;
-        tableHeader__reason: LocalizationValue;
       };
       start: {
         headerTitle__payments: LocalizationValue;
