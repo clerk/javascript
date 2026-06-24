@@ -681,7 +681,7 @@ export const jaJP: LocalizationResource = {
         messageLabel: 'あなたのメールは {{domain}} を使用しています。追加しますか？',
       },
       formButtonPrimary__add: '追加',
-      formFieldInputPlaceholder__domain: 'ここにドメインを入力し、「追加」をクリックして開始します',
+      formFieldInputPlaceholder__domain: 'ドメインを追加',
       formFieldLabel__domain: 'ドメイン',
       removeDomainDialog: {
         cancelButton: undefined,

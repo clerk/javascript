@@ -681,8 +681,8 @@ export const teIN: LocalizationResource = {
         messageLabel: 'మీ ఇమెయిల్ {{domain}} ను ఉపయోగిస్తుంది. మీరు దీన్ని జోడించాలనుకుంటున్నారా?',
       },
       formButtonPrimary__add: 'జోడించు',
-      formFieldInputPlaceholder__domain: 'మీ డొమైన్‌ను ఇక్కడ టైప్ చేసి, ప్రారంభించడానికి జోడించు క్లిక్ చేయండి',
-      formFieldLabel__domain: 'డొమైన్‌లు',
+      formFieldInputPlaceholder__domain: 'డొమైన్‌ను జోడించు',
+      formFieldLabel__domain: 'డొమైన్',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

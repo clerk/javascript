@@ -680,8 +680,8 @@ export const itIT: LocalizationResource = {
         messageLabel: 'La tua email usa {{domain}}. Vuoi aggiungerlo?',
       },
       formButtonPrimary__add: 'Aggiungi',
-      formFieldInputPlaceholder__domain: 'Digita qui il tuo dominio e clicca su Aggiungi per iniziare',
-      formFieldLabel__domain: 'Domini',
+      formFieldInputPlaceholder__domain: 'Aggiungi dominio',
+      formFieldLabel__domain: 'Dominio',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

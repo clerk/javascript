@@ -680,7 +680,7 @@ export const hiIN: LocalizationResource = {
         messageLabel: 'आपका ईमेल {{domain}} का उपयोग करता है। क्या आप इसे जोड़ना चाहते हैं?',
       },
       formButtonPrimary__add: 'जोड़ें',
-      formFieldInputPlaceholder__domain: 'अपना डोमेन यहाँ टाइप करें और शुरू करने के लिए जोड़ें पर क्लिक करें',
+      formFieldInputPlaceholder__domain: 'डोमेन जोड़ें',
       formFieldLabel__domain: 'डोमेन',
       removeDomainDialog: {
         cancelButton: undefined,

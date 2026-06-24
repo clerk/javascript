@@ -681,8 +681,8 @@ export const huHU: LocalizationResource = {
         messageLabel: 'Az e-mail-címe a következőt használja: {{domain}}. Szeretné hozzáadni?',
       },
       formButtonPrimary__add: 'Hozzáadás',
-      formFieldInputPlaceholder__domain: 'Írja be ide a tartományát, majd kattintson a Hozzáadás gombra a kezdéshez',
-      formFieldLabel__domain: 'Tartományok',
+      formFieldInputPlaceholder__domain: 'Tartomány hozzáadása',
+      formFieldLabel__domain: 'Tartomány',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
