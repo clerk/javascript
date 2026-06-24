@@ -1,5 +1,4 @@
 import { isAssignAction } from './assign';
-import { AFTER, INIT, INVOKE_DONE, INVOKE_ERROR, RECHECK } from './types';
 import type {
   Actions,
   Actor,
@@ -14,22 +13,12 @@ import type {
   TransitionConfig,
   Unsubscribe,
 } from './types';
+import { AFTER, INIT, INVOKE_DONE, INVOKE_ERROR, RECHECK } from './types';
 
 const INIT_EVENT: AnyEventObject = { type: INIT };
 
-function toArray<T>(value: T | T[] | undefined): T[] {
-  if (value === undefined) return [];
-  return Array.isArray(value) ? value : [value];
-}
-
-/** Normalise a transition (string | object | array) into an ordered list of configs. */
-function normalizeTransitions<TContext, TEvent extends EventObject>(
-  raw: unknown,
-): TransitionConfig<TContext, TEvent>[] {
-  return toArray(raw as TransitionConfig<TContext, TEvent> | string | undefined).map(entry =>
-    typeof entry === 'string' ? { target: entry } : entry,
-  );
-}
+// Collapse toArray into single helper: returns empty array, original if array, or wrapped value
+const toArr = <T>(v: T | T[] | undefined): T[] => (!v ? [] : Array.isArray(v) ? v : [v]);
 
 /**
  * Wrap a machine definition in a running instance (an "actor").
@@ -79,10 +68,10 @@ export function createActor<TContext extends object, TEvent extends EventObject>
   // getSnapshot() is referentially stable for useSyncExternalStore.
   let snapshot: Snapshot<TContext> = { value, context, status };
 
-  const listeners = new Set<SnapshotListener<TContext>>();
+  const listeners: SnapshotListener<TContext>[] = [];
 
   function runActions(actions: Actions<TContext, EventObject> | undefined, event: EventObject): void {
-    for (const action of toArray(actions)) {
+    for (const action of toArr(actions)) {
       if (isAssignAction<TContext, EventObject>(action)) {
         context = { ...context, ...action.assignment(context, event) };
       } else {
@@ -129,7 +118,9 @@ export function createActor<TContext extends object, TEvent extends EventObject>
 
   function startInvoke(event: EventObject): void {
     const invoke = states[value].invoke;
-    if (!invoke) return;
+    if (!invoke) {
+      return;
+    }
     const token = ++invocationToken;
     // SAFETY: startInvoke is called with the actor's internal EventObject, but
     // InvokeConfig.src is typed to accept (context, TEvent | DoneInvokeEvent | ErrorInvokeEvent).
@@ -138,18 +129,32 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     // event-agnostic lens (line 57) for this reason.
     Promise.resolve(invoke.src(context, event as never)).then(
       output => {
-        if (status !== 'active' || token !== invocationToken) return;
+        if (status !== 'active' || token !== invocationToken) {
+          return;
+        }
         const doneEvent = { type: INVOKE_DONE, output };
-        const transition = pickTransition(normalizeTransitions(invoke.onDone), doneEvent);
-        if (!transition) return;
+        const transition = pickTransition(
+          toArr(invoke.onDone as any).map(e => (typeof e === 'string' ? { target: e } : e)),
+          doneEvent,
+        );
+        if (!transition) {
+          return;
+        }
         takeTransition(transition, doneEvent);
         commit();
       },
       (error: unknown) => {
-        if (status !== 'active' || token !== invocationToken) return;
+        if (status !== 'active' || token !== invocationToken) {
+          return;
+        }
         const errorEvent = { type: INVOKE_ERROR, error };
-        const transition = pickTransition(normalizeTransitions(invoke.onError), errorEvent);
-        if (!transition) return;
+        const transition = pickTransition(
+          toArr(invoke.onError as any).map(e => (typeof e === 'string' ? { target: e } : e)),
+          errorEvent,
+        );
+        if (!transition) {
+          return;
+        }
         takeTransition(transition, errorEvent);
         commit();
       },
@@ -157,25 +162,34 @@ export function createActor<TContext extends object, TEvent extends EventObject>
   }
 
   function clearAfterTimers(): void {
-    for (const id of afterTimers) clearTimeout(id);
+    for (const id of afterTimers) {
+      clearTimeout(id);
+    }
     afterTimers = [];
   }
 
   function startAfterTimers(): void {
     const afterConfig = states[value].after;
-    if (!afterConfig) return;
+    if (!afterConfig) {
+      return;
+    }
     for (const [delayStr, raw] of Object.entries(afterConfig)) {
       const delay = Number(delayStr);
-      // normalizeTransitions takes `raw: unknown`, so the AfterEvent↔EventObject
-      // mismatch is resolved at the parameter boundary, not by a cast here.
-      const transitions = normalizeTransitions<TContext, EventObject>(raw);
+      // Normalize transitions: toArr handles undefined/array/single value, map converts string targets
+      const transitions = toArr(raw as any).map(e => (typeof e === 'string' ? { target: e } : e));
       const id = setTimeout(() => {
         afterTimers = afterTimers.filter(t => t !== id);
-        if (status !== 'active') return;
+        if (status !== 'active') {
+          return;
+        }
         const afterEvent: AfterEvent = { type: AFTER, delay };
         const transition = pickTransition(transitions, afterEvent);
-        if (!transition) return;
-        if (takeTransition(transition, afterEvent)) commit();
+        if (!transition) {
+          return;
+        }
+        if (takeTransition(transition, afterEvent)) {
+          commit();
+        }
       }, delay);
       afterTimers.push(id);
     }
@@ -184,7 +198,9 @@ export function createActor<TContext extends object, TEvent extends EventObject>
   /** Entry side of a state: entry actions, then immediate/invoke resolution. */
   function enterState(event: EventObject): void {
     const stateConfig = states[value];
-    if (!stateConfig) return; // degenerate graph (e.g. empty wizard) — nothing to enter
+    if (!stateConfig) {
+      return;
+    } // degenerate graph (e.g. empty wizard) — nothing to enter
     runActions(stateConfig.entry, event);
 
     if (stateConfig.type === 'final') {
@@ -192,7 +208,10 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       return;
     }
 
-    const immediate = pickTransition(normalizeTransitions(stateConfig.always), event);
+    const immediate = pickTransition(
+      toArr(stateConfig.always as any).map(e => (typeof e === 'string' ? { target: e } : e)),
+      event,
+    );
     if (immediate && immediate.target !== undefined && takeTransition(immediate, event)) {
       return;
     }
@@ -203,14 +222,16 @@ export function createActor<TContext extends object, TEvent extends EventObject>
 
   function commit(): void {
     snapshot = { value, context, status };
-    for (const listener of listeners) {
-      listener(snapshot);
+    for (let i = listeners.length; i--; ) {
+      listeners[i](snapshot);
     }
   }
 
   const actor: Actor<TContext, TEvent> = {
     start() {
-      if (started) return actor;
+      if (started) {
+        return actor;
+      }
       started = true;
       status = 'active';
       // Reset state and context so a restart (e.g. after StrictMode stop/start)
@@ -223,23 +244,34 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     },
 
     stop() {
-      if (status === 'stopped') return;
+      if (status === 'stopped') {
+        return;
+      }
       started = false; // allow restart (e.g. StrictMode effect cleanup + remount)
       status = 'stopped';
       invocationToken++; // abandon any in-flight invoke
       clearAfterTimers();
       snapshot = { value, context, status };
-      for (const listener of listeners) {
-        listener(snapshot);
+      for (let i = listeners.length; i--; ) {
+        listeners[i](snapshot);
       }
-      listeners.clear();
+      listeners.length = 0;
     },
 
     send(event) {
-      if (!started || status !== 'active') return;
-      const transition = pickTransition(normalizeTransitions(states[value]?.on?.[event.type]), event);
-      if (!transition) return; // event not handled in this state → ignored
-      if (takeTransition(transition, event)) commit(); // entry-blocked → no commit, no notify
+      if (!started || status !== 'active') {
+        return;
+      }
+      const transition = pickTransition(
+        toArr(states[value]?.on?.[event.type] as any).map(e => (typeof e === 'string' ? { target: e } : e)),
+        event,
+      );
+      if (!transition) {
+        return;
+      } // event not handled in this state → ignored
+      if (takeTransition(transition, event)) {
+        commit();
+      } // entry-blocked → no commit, no notify
     },
 
     getSnapshot() {
@@ -252,17 +284,27 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     // trivial, non-breaking wrapper over `subscribe` + `getSnapshot` — no need to
     // pull the dependency in now.
     subscribe(listener: SnapshotListener<TContext>): Unsubscribe {
-      listeners.add(listener);
+      listeners.push(listener);
       return () => {
-        listeners.delete(listener);
+        const i = listeners.indexOf(listener);
+        if (~i) {
+          listeners.splice(i, 1);
+        }
       };
     },
 
     can(event) {
-      if (!started || status !== 'active') return false;
-      const transition = pickTransition(normalizeTransitions(states[value]?.on?.[event.type]), event);
-      if (!transition) return false;
-      return transition.target === undefined || canEnter(transition.target as string, event);
+      if (!started || status !== 'active') {
+        return false;
+      }
+      const transition = pickTransition(
+        toArr(states[value]?.on?.[event.type] as any).map(e => (typeof e === 'string' ? { target: e } : e)),
+        event,
+      );
+      if (!transition) {
+        return false;
+      }
+      return transition.target === undefined || canEnter(transition.target, event);
     },
 
     setContext(patch: Partial<TContext>) {
@@ -271,7 +313,9 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     },
 
     recheck() {
-      if (status !== 'active') return;
+      if (status !== 'active') {
+        return;
+      }
       const event = { type: RECHECK };
 
       // Self-correct first: if live external data has made the *current* state
@@ -292,7 +336,10 @@ export function createActor<TContext extends object, TEvent extends EventObject>
         return;
       }
 
-      const immediate = pickTransition(normalizeTransitions(states[value]?.always), event);
+      const immediate = pickTransition(
+        toArr(states[value]?.always as any).map(e => (typeof e === 'string' ? { target: e } : e)),
+        event,
+      );
       if (immediate && immediate.target !== undefined && takeTransition(immediate, event)) {
         commit(); // nothing applies → no commit, no notify
       }
