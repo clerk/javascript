@@ -140,7 +140,9 @@ export type MeEnterpriseConnectionOidcInput = OrganizationEnterpriseConnectionOi
 
 export type CreateOrganizationEnterpriseConnectionParams = {
   provider: OrganizationEnterpriseConnectionProvider;
-  name: string;
+  name?: string;
+  /** FQDN strings the connection authenticates. Required by the org-scoped create endpoint. */
+  domains?: string[];
   organizationId?: string | null;
   saml?: OrganizationEnterpriseConnectionSamlInput | null;
   oidc?: OrganizationEnterpriseConnectionOidcInput | null;
@@ -151,6 +153,7 @@ export type CreateMeEnterpriseConnectionParams = CreateOrganizationEnterpriseCon
 
 export type UpdateOrganizationEnterpriseConnectionParams = {
   name?: string | null;
+  domains?: string[];
   active?: boolean | null;
   syncUserAttributes?: boolean | null;
   disableAdditionalIdentifications?: boolean | null;

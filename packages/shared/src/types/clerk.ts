@@ -1,5 +1,4 @@
-import type { ClerkGlobalHookError } from '@/errors/globalHookError';
-
+import type { ClerkGlobalHookError } from '../errors/globalHookError';
 import type { ClerkUIConstructor } from '../ui/types';
 import type { APIKeysNamespace } from './apiKeys';
 import type {
@@ -20,6 +19,7 @@ import type { LocalizationResource } from './localization';
 import type { DomainOrProxyUrl, MultiDomainAndOrProxy } from './multiDomain';
 import type { OAuthProvider, OAuthScope } from './oauth';
 import type { OAuthApplicationNamespace } from './oauthApplication';
+import type { OAuthTransport } from './oauthTransport';
 import type { OrganizationResource } from './organization';
 import type { OrganizationCustomRoleKey } from './organizationMembership';
 import type { ClerkPaginationParams } from './pagination';
@@ -79,6 +79,8 @@ export type __experimental_CheckoutOptions = {
   for?: ForPayerType;
   planPeriod: BillingSubscriptionPlanPeriod;
   planId: string;
+  seatsQuantity?: number;
+  priceId?: string;
 };
 
 export type CheckoutErrors = {
@@ -253,6 +255,11 @@ export interface Clerk {
    * The Clerk SDK version number.
    */
   version: string | undefined;
+
+  /**
+   * The version of `@clerk/ui` that is currently loaded, or `undefined` if the prebuilt UI has not been loaded yet.
+   */
+  uiVersion: string | undefined;
 
   /**
    * If present, contains information about the SDK that the host application is using.
@@ -1045,6 +1052,32 @@ export interface Clerk {
   ) => Promise<unknown>;
 
   /**
+   * Whether an OAuth transport (e.g. for Electron) has been registered.
+   *
+   * @internal
+   */
+  __internal_hasOAuthTransport: boolean;
+
+  /**
+   * The registered OAuth transport, or null when none is registered.
+   *
+   * @internal
+   */
+  __internal_oauthTransport: OAuthTransport | null;
+
+  /**
+   * Completes an OAuth/SAML callback using a sign-in or sign-up resource already in hand
+   * (generalization of `handleGoogleOneTapCallback`).
+   *
+   * @internal
+   */
+  __internal_handleResourceCallback: (
+    signInOrUp: SignInResource | SignUpResource,
+    params: HandleOAuthCallbackParams,
+    customNavigate?: (to: string) => Promise<unknown>,
+  ) => Promise<unknown>;
+
+  /**
    * Completes a custom OAuth or SAML redirect flow that was started by calling [`SignIn.authenticateWithRedirect(params)`](https://clerk.com/docs/reference/objects/sign-in) or [`SignUp.authenticateWithRedirect(params)`](https://clerk.com/docs/reference/objects/sign-up).
    *
    * @param params - Additional props that define where the user will be redirected to at the end of a successful OAuth or SAML flow.
@@ -1217,6 +1250,18 @@ export type HandleOAuthCallbackParams = TransferableOption &
      * Metadata that can be read and set from the frontend. Once the sign-up is complete, the value of this field will be automatically copied to the newly created user's unsafe metadata. One common use case for this attribute is to use it to implement custom fields that can be collected during sign-up and will automatically be attached to the created `User` object.
      */
     unsafeMetadata?: SignUpUnsafeMetadata;
+    /**
+     * Internal navigation hook used by Clerk UI to preserve custom post-activation routing
+     * when completing an OAuth callback in-process (transport flows). Not set by the web
+     * redirect/popup paths.
+     *
+     * @internal
+     */
+    __internal_navigateOnSetActive?: (opts: {
+      session: SessionResource;
+      redirectUrl: string;
+      decorateUrl: (url: string) => string;
+    }) => Promise<unknown>;
   };
 
 export type HandleSamlCallbackParams = HandleOAuthCallbackParams;
@@ -1356,7 +1401,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     allowedRedirectProtocols?: Array<string>;
     /**
-     * Indicates whether the application is a satellite application.
+     * Indicates whether the current application should behave as a satellite app. Unlike `domain`, which must be set in the [`Clerk` constructor](https://clerk.com/docs/reference/objects/clerk), `isSatellite` must be set in [`load()`](https://clerk.com/docs/reference/objects/clerk#load).
      */
     isSatellite?: boolean | ((url: URL) => boolean);
     /**
@@ -1449,6 +1494,16 @@ export type ClerkOptions = ClerkOptionsNavigation &
      * @internal
      */
     __internal_keyless_dismissPrompt?: (() => Promise<void>) | null;
+
+    /**
+     * Provide a transport for OAuth/SSO flows in environments where a same-document
+     * redirect or popup cannot be used (e.g. Electron, Tauri). When set, Clerk uses the
+     * transport's `getRedirectUrl` as the FAPI `redirectUrl` and calls `open` instead of
+     * navigating the document. Intended for native desktop SDK wrappers.
+     *
+     * @internal
+     */
+    __internal_oauthTransport?: OAuthTransport;
 
     /**
      * Customize the URL paths users are redirected to after sign-in or sign-up when specific
@@ -2370,6 +2425,8 @@ export type __internal_CheckoutProps = {
   appearance?: ClerkAppearanceTheme;
   planId?: string;
   planPeriod?: BillingSubscriptionPlanPeriod;
+  seatsQuantity?: number;
+  priceId?: string;
   for?: ForPayerType;
   onSubscriptionComplete?: () => void;
   portalId?: string;
@@ -2390,6 +2447,8 @@ export type __experimental_CheckoutButtonProps = {
   planId: string;
   planPeriod?: BillingSubscriptionPlanPeriod;
   for?: ForPayerType;
+  seatsQuantity?: number;
+  priceId?: string;
   onSubscriptionComplete?: () => void;
   checkoutProps?: {
     appearance?: ClerkAppearanceTheme;
@@ -2871,7 +2930,7 @@ export interface HeadlessBrowserClerk extends Clerk {
    *
    * When using the JavaScript SDK, you must call the `load()` method before using the `Clerk` object in your code. Refer to the [quickstart guide](https://clerk.com/docs/js-frontend/getting-started/quickstart) for more information.
    */
-  load: (opts?: Without<ClerkOptions, 'isSatellite'>) => Promise<void>;
+  load: (opts?: ClerkOptions) => Promise<void>;
   updateClient: (client: ClientResource) => void;
 }
 

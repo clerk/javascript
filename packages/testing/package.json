@@ -1,6 +1,6 @@
 {
   "name": "@clerk/testing",
-  "version": "2.0.35",
+  "version": "2.1.6",
   "description": "Utilities to help you create E2E test suites for apps using Clerk",
   "keywords": [
     "auth",
@@ -74,7 +74,7 @@
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
-    "test": "vitest"
+    "test": "vitest run"
   },
   "dependencies": {
     "@clerk/backend": "workspace:^",

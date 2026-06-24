@@ -20,8 +20,12 @@
     "packages/ui",
     "packages/vue"
   ],
+  "ignoreSubpaths": ["@clerk/astro#./env"],
   "snapshotDir": ".api-snapshots",
   "mainBranch": "main",
   "checkVersionBump": true,
-  "outputFormat": "markdown"
+  "outputFormat": "markdown",
+  "ai": {
+    "applyDowngrades": true
+  }
 }

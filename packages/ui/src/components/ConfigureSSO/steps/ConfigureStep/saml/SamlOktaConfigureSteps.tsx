@@ -23,7 +23,7 @@ import { useFormControl } from '@/ui/utils/useFormControl';
 
 import { useConfigureSSO } from '../../../ConfigureSSOContext';
 import { Step } from '../../../elements/Step';
-import { useWizard, Wizard } from '../../../elements/Wizard';
+import { useWizard, Wizard, type WizardStepConfig } from '../../../elements/Wizard';
 import { InnerStepCounter } from '../../../elements/Wizard/InnerStepCounter';
 import {
   applySamlSubmitError,
@@ -36,51 +36,34 @@ import {
   type IdpConfigurationMode,
 } from './shared/IdentityProviderConfigurationModes';
 
+const OKTA_STEPS: WizardStepConfig[] = [
+  { id: 'create-app' },
+  { id: 'attribute-mapping' },
+  { id: 'assign-users' },
+  { id: 'identity-provider-metadata' },
+];
+
 export const SamlOktaConfigureSteps = (): JSX.Element => {
   return (
-    <>
-      <Wizard.Step id='create-app'>
-        <Step.Header
-          title={localizationKeys('configureSSO.configureStep.samlOkta.mainHeaderTitle')}
-          description={localizationKeys('configureSSO.configureStep.samlOkta.createAppStep.headerSubtitle')}
-        >
-          <InnerStepCounter />
-        </Step.Header>
+    // Linear, guard-less sub-flow: mount on the first step. (Entry guards drive
+    // furthest-reachable init, which would otherwise land the last step here.)
+    <Wizard
+      steps={OKTA_STEPS}
+      initialStepId={OKTA_STEPS[0].id}
+    >
+      <Wizard.Match id='create-app'>
         <SamlOktaCreateAppStep />
-      </Wizard.Step>
-
-      <Wizard.Step id='attribute-mapping'>
-        <Step.Header
-          title={localizationKeys('configureSSO.configureStep.samlOkta.mainHeaderTitle')}
-          description={localizationKeys('configureSSO.configureStep.samlOkta.attributeMappingStep.headerSubtitle')}
-        >
-          <InnerStepCounter />
-        </Step.Header>
+      </Wizard.Match>
+      <Wizard.Match id='attribute-mapping'>
         <SamlOktaAttributeMappingStep />
-      </Wizard.Step>
-
-      <Wizard.Step id='assign-users'>
-        <Step.Header
-          title={localizationKeys('configureSSO.configureStep.samlOkta.mainHeaderTitle')}
-          description={localizationKeys('configureSSO.configureStep.samlOkta.assignUsersStep.headerSubtitle')}
-        >
-          <InnerStepCounter />
-        </Step.Header>
+      </Wizard.Match>
+      <Wizard.Match id='assign-users'>
         <SamlOktaAssignUsersStep />
-      </Wizard.Step>
-
-      <Wizard.Step id='identity-provider-metadata'>
-        <Step.Header
-          title={localizationKeys('configureSSO.configureStep.samlOkta.mainHeaderTitle')}
-          description={localizationKeys(
-            'configureSSO.configureStep.samlOkta.identityProviderMetadataStep.headerSubtitle',
-          )}
-        >
-          <InnerStepCounter />
-        </Step.Header>
+      </Wizard.Match>
+      <Wizard.Match id='identity-provider-metadata'>
         <SamlOktaIdentityProviderMetadataStep />
-      </Wizard.Step>
-    </>
+      </Wizard.Match>
+    </Wizard>
   );
 };
 
@@ -108,6 +91,13 @@ const SamlOktaCreateAppStep = (): JSX.Element => {
 
   return (
     <>
+      <Step.Header
+        title={localizationKeys('configureSSO.configureStep.samlOkta.mainHeaderTitle')}
+        description={localizationKeys('configureSSO.configureStep.samlOkta.createAppStep.headerSubtitle')}
+      >
+        <InnerStepCounter />
+      </Step.Header>
+
       <Step.Body>
         <Step.Section sx={theme => ({ gap: theme.space.$5 })}>
           <Col sx={theme => ({ gap: theme.space.$1x5 })}>
@@ -160,14 +150,6 @@ const SamlOktaCreateAppStep = (): JSX.Element => {
                 colorScheme='secondary'
                 localizationKey={localizationKeys(
                   'configureSSO.configureStep.samlOkta.createAppStep.createAppInstructions.step4',
-                )}
-              />
-              <Text
-                elementDescriptor={descriptors.configureSSOInstructionsListItem}
-                as='li'
-                colorScheme='secondary'
-                localizationKey={localizationKeys(
-                  'configureSSO.configureStep.samlOkta.createAppStep.createAppInstructions.step5',
                 )}
               />
             </Col>
@@ -363,6 +345,13 @@ const SamlOktaAttributeMappingStep = (): JSX.Element => {
 
   return (
     <>
+      <Step.Header
+        title={localizationKeys('configureSSO.configureStep.samlOkta.mainHeaderTitle')}
+        description={localizationKeys('configureSSO.configureStep.samlOkta.attributeMappingStep.headerSubtitle')}
+      >
+        <InnerStepCounter />
+      </Step.Header>
+
       <Step.Body>
         <Step.Section sx={theme => ({ gap: theme.space.$3 })}>
           <Text
@@ -419,16 +408,15 @@ const SamlOktaAssignUsersStep = (): JSX.Element => {
 
   return (
     <>
+      <Step.Header
+        title={localizationKeys('configureSSO.configureStep.samlOkta.mainHeaderTitle')}
+        description={localizationKeys('configureSSO.configureStep.samlOkta.assignUsersStep.headerSubtitle')}
+      >
+        <InnerStepCounter />
+      </Step.Header>
+
       <Step.Body>
         <Step.Section sx={theme => ({ gap: theme.space.$3 })}>
-          <Heading
-            elementDescriptor={descriptors.configureSSOInstructionsHeading}
-            as='h3'
-            textVariant='subtitle'
-            localizationKey={localizationKeys(
-              'configureSSO.configureStep.samlOkta.assignUsersStep.assignUsersInstructions.title',
-            )}
-          />
           <Text
             as='p'
             colorScheme='secondary'
@@ -511,7 +499,10 @@ const OKTA_IDP_MODES = ['metadataUrl', 'manual'] as const satisfies readonly Idp
 const SamlOktaIdentityProviderMetadataStep = (): JSX.Element => {
   const card = useCardState();
   const { goNext, goPrev, isFirstStep } = useWizard();
-  const { enterpriseConnection, updateEnterpriseConnection } = useConfigureSSO();
+  const {
+    enterpriseConnection,
+    enterpriseConnectionMutations: { updateConnection },
+  } = useConfigureSSO();
 
   const samlConnection = enterpriseConnection?.samlConnection;
   const hasExistingConfig = Boolean(
@@ -524,6 +515,13 @@ const SamlOktaIdentityProviderMetadataStep = (): JSX.Element => {
 
   const [mode, setMode] = React.useState<IdpConfigurationMode>(hasExistingConfig ? 'manual' : 'metadataUrl');
   const [certFile, setCertFile] = React.useState<File | null>(null);
+  // Step-LOCAL submit state for the Continue button. `goNext` bubbles to the
+  // parent (this is the terminal nested step) and the parent DEFERS the
+  // configure→test advance until the updateConnection revalidate lands. Keeping
+  // the loading local — and NOT resetting it on success — holds the button
+  // loading straight through that deferred transition; the advance unmounts this
+  // nested step, ending the loading with no idle flash on the shared card.
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const metadataUrlField = useFormControl('idpMetadataUrl', samlConnection?.idpMetadataUrl ?? '', {
     type: 'text',
@@ -570,7 +568,7 @@ const SamlOktaIdentityProviderMetadataStep = (): JSX.Element => {
       ? trimmedMetadataUrl.length > 0
       : trimmedSignOnUrl.length > 0 && trimmedIssuer.length > 0 && hasCert;
 
-  const canSubmit = isValid && !card.isLoading;
+  const canSubmit = isValid && !isSubmitting;
 
   const formProps: IdentityProviderConfigurationFormProps =
     mode === 'metadataUrl'
@@ -618,7 +616,7 @@ const SamlOktaIdentityProviderMetadataStep = (): JSX.Element => {
     }
 
     card.setError(undefined);
-    card.setLoading();
+    setIsSubmitting(true);
 
     try {
       const saml = await buildSamlConfigurationPayload({
@@ -626,7 +624,10 @@ const SamlOktaIdentityProviderMetadataStep = (): JSX.Element => {
         metadataUrl: { value: metadataUrlField.value },
         manual: { signOnUrl: signOnUrlField.value, issuer: issuerField.value, certFile },
       });
-      await updateEnterpriseConnection(enterpriseConnection.id, { saml });
+      await updateConnection(enterpriseConnection.id, { saml });
+      // `goNext` bubbles to the parent, which DEFERS the advance to `test` until
+      // the revalidate lands. The button STAYS loading and this nested step
+      // unmounts when that deferred advance resolves — do NOT reset on success.
       void goNext();
     } catch (err) {
       if (mode === 'metadataUrl') {
@@ -634,26 +635,27 @@ const SamlOktaIdentityProviderMetadataStep = (): JSX.Element => {
       } else {
         applySamlSubmitError(err, card, signOnUrlField, [issuerField, certificateField]);
       }
-    } finally {
-      card.setIdle();
+      // Re-enable ONLY on error — there is no advance to unmount the button.
+      setIsSubmitting(false);
     }
   };
 
   return (
     <>
+      <Step.Header
+        title={localizationKeys('configureSSO.configureStep.samlOkta.mainHeaderTitle')}
+        description={localizationKeys(
+          'configureSSO.configureStep.samlOkta.identityProviderMetadataStep.headerSubtitle',
+        )}
+      >
+        <InnerStepCounter />
+      </Step.Header>
+
       <Step.Body>
         <Step.Section
           fill
           gap={5}
         >
-          <Heading
-            elementDescriptor={descriptors.configureSSOInstructionsHeading}
-            as='h3'
-            textVariant='subtitle'
-            localizationKey={localizationKeys(
-              'configureSSO.configureStep.samlOkta.identityProviderMetadataStep.modes.title',
-            )}
-          />
           <IdentityProviderConfigurationModes
             modes={OKTA_IDP_MODES}
             value={mode}
@@ -679,11 +681,11 @@ const SamlOktaIdentityProviderMetadataStep = (): JSX.Element => {
         <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
-          isDisabled={isFirstStep || card.isLoading}
+          isDisabled={isFirstStep || isSubmitting}
         />
         <Step.Footer.Continue
           onClick={handleContinue}
-          isLoading={card.isLoading}
+          isLoading={isSubmitting}
           isDisabled={!canSubmit}
         />
       </Step.Footer>

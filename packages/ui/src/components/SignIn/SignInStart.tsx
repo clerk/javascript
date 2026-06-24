@@ -39,7 +39,11 @@ import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useTotalEnabledAuthMethods } from '../../hooks/useTotalEnabledAuthMethods';
 import { useRouter } from '../../router';
 import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
-import { hasMultipleEnterpriseConnections, useHandleAuthenticateWithPasskey } from './shared';
+import {
+  hasMultipleEnterpriseConnections,
+  SIGN_IN_RESET_PASSWORD_INTENT_PARAM,
+  useHandleAuthenticateWithPasskey,
+} from './shared';
 import { SignInAlternativePhoneCodePhoneNumberCard } from './SignInAlternativePhoneCodePhoneNumberCard';
 import { SignInSocialButtons } from './SignInSocialButtons';
 import {
@@ -154,6 +158,9 @@ function SignInStartInternal(): JSX.Element {
   const hasSocialOrWeb3Buttons =
     !!authenticatableSocialStrategies.length || !!web3FirstFactors.length || !!alternativePhoneCodeChannels.length;
   const [shouldAutofocus, setShouldAutofocus] = useState(!isMobileDevice() && !hasSocialOrWeb3Buttons);
+  // When the captcha escalates to an interactive challenge, spotlight it by collapsing/inerting the
+  // rest of the card (see the descriptors.main column below).
+  const [captchaIsInteractive, setCaptchaIsInteractive] = useState(false);
   const textIdentifierField = useFormControl('identifier', initialValues[identifierAttribute] || '', {
     ...currentIdentifier,
     isRequired: true,
@@ -347,7 +354,10 @@ function SignInStartInternal(): JSX.Element {
     });
   };
 
-  const signInWithFields = async (...fields: Array<FormControlState<string>>) => {
+  const signInWithFields = async (
+    fields: Array<FormControlState<string>>,
+    options?: { resetPasswordIntent?: boolean },
+  ) => {
     // If the user has already selected an alternative phone code provider, we use that.
     const preferredAlternativePhoneChannel =
       alternativePhoneCodeProvider?.channel ||
@@ -385,6 +395,11 @@ function SignInStartInternal(): JSX.Element {
           break;
         case 'needs_first_factor': {
           if (!hasOnlyEnterpriseSSOFirstFactors(res) || hasMultipleEnterpriseConnections(res.supportedFirstFactors)) {
+            if (options?.resetPasswordIntent) {
+              return navigate('factor-one', {
+                searchParams: new URLSearchParams({ [SIGN_IN_RESET_PASSWORD_INTENT_PARAM]: 'true' }),
+              });
+            }
             return navigate('factor-one');
           }
 
@@ -447,7 +462,7 @@ function SignInStartInternal(): JSX.Element {
     );
 
     if (instantPasswordError) {
-      await signInWithFields(identifierField);
+      await signInWithFields([identifierField]);
     } else if (sessionAlreadyExistsError) {
       await clerk.setActive({
         session: clerk.client.lastActiveSessionId,
@@ -514,7 +529,18 @@ function SignInStartInternal(): JSX.Element {
 
   const handleFirstPartySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    return signInWithFields(identifierField, instantPasswordField);
+    return signInWithFields([identifierField, instantPasswordField]);
+  };
+
+  const handleForgotPasswordClick: React.MouseEventHandler = e => {
+    e.preventDefault();
+    // Surface the same native required-field validation as the Continue button
+    // when the identifier is missing
+    const form = e.currentTarget.closest('form');
+    if (form && !form.reportValidity()) {
+      return;
+    }
+    void signInWithFields([identifierField], { resetPasswordIntent: true });
   };
 
   const DynamicField = useMemo(() => {
@@ -574,6 +600,13 @@ function SignInStartInternal(): JSX.Element {
             <Col
               elementDescriptor={descriptors.main}
               gap={6}
+              // @ts-ignore - `inert` is not yet in the installed React types
+              inert={captchaIsInteractive ? '' : undefined}
+              // `display:none` (not `visibility:hidden`) so the collapsed column leaves flex flow and
+              // contributes no `gap` gutter to `Card.Content` — otherwise it injects empty space above
+              // the spotlighted captcha. Subtree stays mounted (form state preserved); `inert` is then
+              // redundant-but-harmless.
+              sx={captchaIsInteractive ? { display: 'none' } : undefined}
             >
               <SocialButtonsReversibleContainerWithDivider>
                 {hasSocialOrWeb3Buttons && (
@@ -600,27 +633,33 @@ function SignInStartInternal(): JSX.Element {
                           isLastAuthenticationStrategy={isIdentifierLastAuthenticationStrategy}
                         />
                       </Form.ControlRow>
-                      <InstantPasswordRow field={passwordBasedInstance ? instantPasswordField : undefined} />
+                      <InstantPasswordRow
+                        field={passwordBasedInstance ? instantPasswordField : undefined}
+                        onForgotPasswordClick={handleForgotPasswordClick}
+                      />
                     </Col>
                     <Col center>
-                      <CaptchaElement />
                       <Form.SubmitButton hasArrow />
                     </Col>
                   </Form.Root>
                 ) : null}
               </SocialButtonsReversibleContainerWithDivider>
-              {!standardFormAttributes.length && <CaptchaElement />}
-              {userSettings.attributes.passkey?.enabled &&
-                userSettings.passkeySettings.show_sign_in_button &&
-                isWebSupported && (
-                  <Card.Action elementId={'usePasskey'}>
-                    <Card.ActionLink
-                      localizationKey={localizationKeys('signIn.start.actionLink__use_passkey')}
-                      onClick={() => authenticateWithPasskey({ flow: 'discoverable' })}
-                    />
-                  </Card.Action>
-                )}
             </Col>
+            <CaptchaElement
+              gapless
+              onInteractiveChange={setCaptchaIsInteractive}
+            />
+            {/* Kept outside descriptors.main so the spotlight's `inert` leaves this alternative action reachable. */}
+            {userSettings.attributes.passkey?.enabled &&
+              userSettings.passkeySettings.show_sign_in_button &&
+              isWebSupported && (
+                <Card.Action elementId={'usePasskey'}>
+                  <Card.ActionLink
+                    localizationKey={localizationKeys('signIn.start.actionLink__use_passkey')}
+                    onClick={() => authenticateWithPasskey({ flow: 'discoverable' })}
+                  />
+                </Card.Action>
+              )}
           </Card.Content>
           <Card.Footer>
             {userSettings.signUp.mode === SIGN_UP_MODES.PUBLIC && !isCombinedFlow && (
@@ -663,7 +702,13 @@ const hasOnlyEnterpriseSSOFirstFactors = (signIn: SignInResource): boolean => {
   return signIn.supportedFirstFactors.every(ff => ff.strategy === 'enterprise_sso');
 };
 
-const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> }) => {
+const InstantPasswordRow = ({
+  field,
+  onForgotPasswordClick,
+}: {
+  field?: FormControlState<'password'>;
+  onForgotPasswordClick?: React.MouseEventHandler;
+}) => {
   const [autofilled, setAutofilled] = useState(false);
   const ref = useRef<HTMLInputElement>(null);
   const show = !!(autofilled || field?.value);
@@ -702,12 +747,26 @@ const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> })
   return (
     <Form.ControlRow
       elementId={field.id}
-      sx={show ? undefined : { position: 'absolute', opacity: 0, height: 0, pointerEvents: 'none', marginTop: '-1rem' }}
+      aria-hidden={show ? undefined : true}
+      sx={
+        show
+          ? undefined
+          : {
+              position: 'absolute',
+              opacity: 0,
+              height: 0,
+              overflow: 'hidden',
+              pointerEvents: 'none',
+              marginTop: '-1rem',
+            }
+      }
     >
       <Form.PasswordInput
         {...field.props}
-        ref={ref}
+        actionLabel={show ? localizationKeys('formFieldAction__forgotPassword') : undefined}
+        onActionClicked={show ? onForgotPasswordClick : undefined}
         tabIndex={show ? undefined : -1}
+        ref={ref}
       />
     </Form.ControlRow>
   );

@@ -15,21 +15,9 @@ export type IdpConfigurationMode = 'metadataUrl' | 'metadataFile' | 'manual';
 type ModeLocalizationKeys = Partial<Record<IdpConfigurationMode, LocalizationKey>>;
 
 type IdentityProviderConfigurationModesProps = {
-  /**
-   * The set of modes to render as segments, in display order
-   */
   modes: readonly IdpConfigurationMode[];
-  /**
-   * The currently controlled selected mode state
-   */
   value: IdpConfigurationMode;
-  /**
-   * Called when the user selects a different mode
-   */
   onChange: (mode: IdpConfigurationMode) => void;
-  /**
-   * Localization keys for the aria label and each mode button
-   */
   labels: {
     ariaLabel: LocalizationKey;
   } & ModeLocalizationKeys;
@@ -49,6 +37,7 @@ export const IdentityProviderConfigurationModes = ({
       value={value}
       onChange={next => onChange(next as IdpConfigurationMode)}
       fullWidth
+      size='lg'
     >
       {modes.map(mode => {
         const label = labels[mode];

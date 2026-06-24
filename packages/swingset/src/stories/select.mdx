@@ -1,0 +1,139 @@
+import * as SelectStories from './select.stories';
+
+# Select
+
+A custom dropdown for picking one value from a list, from `@clerk/headless`. It is a
+**headless** primitive: it supplies value and open state, portalling, floating-ui
+positioning (with optional native-`<select>`-style item alignment), keyboard navigation
+with typeahead, and ARIA wiring, but ships **no styles** — you bring your own CSS by
+targeting the `data-cl-*` attributes each part emits.
+
+## Example
+
+The demo below is intentionally unstyled — it renders the raw primitive so you can see its
+behavior and ARIA wiring. Open it and pick an option (arrow keys, typeahead, and Enter all
+work); the trigger reflects the selected value.
+
+<Story
+  name='Default'
+  storyModule={SelectStories}
+/>
+
+## Usage
+
+```tsx
+import { Select } from '@clerk/headless/select';
+
+<Select.Root>
+  <Select.Trigger>
+    <Select.Value placeholder='Choose a fruit…' />
+  </Select.Trigger>
+  <Select.Portal>
+    <Select.Positioner>
+      <Select.Popup>
+        <Select.Option value='apple'>Apple</Select.Option>
+        <Select.Option value='banana'>Banana</Select.Option>
+        <Select.Option
+          value='cherry'
+          disabled
+        >
+          Cherry
+        </Select.Option>
+      </Select.Popup>
+    </Select.Positioner>
+  </Select.Portal>
+</Select.Root>;
+```
+
+### Controlled
+
+```tsx
+const [value, setValue] = useState('apple');
+
+<Select.Root
+  value={value}
+  onValueChange={setValue}
+>
+  {/* trigger + portal */}
+</Select.Root>;
+```
+
+## Parts
+
+| Part                | Default Element | Description                                                          |
+| ------------------- | --------------- | -------------------------------------------------------------------- |
+| `Select.Root`       | none (context)  | Owns value and open state plus positioning                           |
+| `Select.Trigger`    | `<button>`      | Toggles the dropdown; acts as the positioning anchor                 |
+| `Select.Value`      | `<span>`        | Displays the selected option's label, or the placeholder             |
+| `Select.Portal`     | none (portal)   | Portals its children; renders nothing until mounted                  |
+| `Select.Positioner` | `<div>`         | Floating-positioned container (`role="listbox"`)                     |
+| `Select.Popup`      | `<div>`         | Visual wrapper for the option list                                   |
+| `Select.Option`     | `<button>`      | A selectable option (`role="option"`)                                |
+| `Select.Arrow`      | `<svg>`         | Optional arrow (only positioned when `alignItemWithTrigger={false}`) |
+
+All rendered parts accept a `render` prop for polymorphic rendering and standard HTML
+attributes for their default element. `Select.Arrow` accepts floating-ui `FloatingArrow`
+props. `Select.Portal` is optional.
+
+## Props
+
+### `Select.Root`
+
+| Prop                              | Type                                 | Default                     | Description                                                        |
+| --------------------------------- | ------------------------------------ | --------------------------- | ------------------------------------------------------------------ |
+| <code>value</code>                | <code>string</code>                  | —                           | Controlled selected value                                          |
+| <code>defaultValue</code>         | <code>string</code>                  | —                           | Initial selected value (uncontrolled)                              |
+| <code>onValueChange</code>        | <code>(value: string) => void</code> | —                           | Called when the selection changes                                  |
+| <code>open</code>                 | <code>boolean</code>                 | —                           | Controlled open state                                              |
+| <code>defaultOpen</code>          | <code>boolean</code>                 | <code>false</code>          | Initial open state (uncontrolled)                                  |
+| <code>onOpenChange</code>         | <code>(open: boolean) => void</code> | —                           | Called when the open state changes                                 |
+| <code>items</code>                | <code>SelectItem[]</code>            | —                           | `{ label, value }[]` used to resolve the selected label early      |
+| <code>alignItemWithTrigger</code> | <code>boolean</code>                 | <code>true</code>           | Overlay the selected item on the trigger (native-`<select>` style) |
+| <code>placement</code>            | <code>Placement</code>               | <code>'bottom-start'</code> | Placement when not aligning to the item                            |
+| <code>sideOffset</code>           | <code>number</code>                  | <code>4</code>              | Gap in px (applies only when `alignItemWithTrigger={false}`)       |
+
+`SelectItem` is `{ label: string; value: string }` — disabling is done per-`Option`.
+
+### `Select.Value`
+
+| Prop                     | Type                   | Default | Description                        |
+| ------------------------ | ---------------------- | ------- | ---------------------------------- |
+| <code>placeholder</code> | <code>ReactNode</code> | —       | Rendered when no value is selected |
+
+### `Select.Option`
+
+| Prop                  | Type                 | Default               | Description                                  |
+| --------------------- | -------------------- | --------------------- | -------------------------------------------- |
+| <code>value</code>    | <code>string</code>  | — (required)          | The option's value                           |
+| <code>label</code>    | <code>string</code>  | falls back to `value` | Display label, also used for typeahead       |
+| <code>disabled</code> | <code>boolean</code> | —                     | Prevent selection (stays keyboard-focusable) |
+
+`Select.Trigger`, `Select.Positioner`, and `Select.Popup` take no additional props beyond
+standard HTML attributes for their default element. `Select.Portal` accepts `root`.
+
+## Styling
+
+Each part emits `data-cl-*` attributes you can target with any CSS solution:
+
+| Attribute                | Applies To        | Description                                        |
+| ------------------------ | ----------------- | -------------------------------------------------- |
+| `data-cl-slot`           | All parts         | Part identifier                                    |
+| `data-cl-open`           | Trigger, Popup    | Present when the dropdown is open                  |
+| `data-cl-closed`         | Trigger, Popup    | Present when closed (Popup stays mounted to exit)  |
+| `data-cl-selected`       | Option            | Present on the currently selected option           |
+| `data-cl-active`         | Option            | Present on the keyboard-highlighted option         |
+| `data-cl-disabled`       | Option            | Present on a disabled option                       |
+| `data-cl-side`           | Positioner, Arrow | Resolved side: `top` / `bottom` / `left` / `right` |
+| `data-cl-starting-style` | Popup             | Present on the entering frame                      |
+| `data-cl-ending-style`   | Popup             | Present during the exit animation                  |
+
+The positioner exposes anchor/viewport geometry as CSS variables (and sets an inline
+`max-height` to the available viewport height):
+
+| Variable                | Description                                           |
+| ----------------------- | ----------------------------------------------------- |
+| `--cl-anchor-width`     | Trigger width                                         |
+| `--cl-anchor-height`    | Trigger height                                        |
+| `--cl-available-width`  | Available width between the anchor and viewport edge  |
+| `--cl-available-height` | Available height between the anchor and viewport edge |
+| `--cl-transform-origin` | `transform-origin` pointing back toward the anchor    |

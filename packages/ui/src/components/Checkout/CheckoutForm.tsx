@@ -8,8 +8,14 @@ import { Drawer } from '@/ui/elements/Drawer';
 import { LineItems } from '@/ui/elements/LineItems';
 import { SegmentedControl } from '@/ui/elements/SegmentedControl';
 import { Select, SelectButton, SelectOptionList } from '@/ui/elements/Select';
+import { DevModeOverlay } from '@/ui/elements/DevModeNotice';
 import { Tooltip } from '@/ui/elements/Tooltip';
-import { getSeatUnitPrice } from '@/ui/utils/billingPlanSeats';
+import {
+  getCheckoutSeatUnitTotal,
+  getIncludedSeatsUnitTotalTier,
+  getPaidSeatsUnitTotalTier,
+  getSeatUnitPrice,
+} from '@/ui/utils/billingPlanSeats';
 import { handleError } from '@/ui/utils/errorHandler';
 
 import { DevOnly } from '../../common/DevOnly';
@@ -39,18 +45,27 @@ export const CheckoutForm = withCardStateProvider(() => {
   const showProratedCredit = !!totals.credits?.proration?.amount && totals.credits.proration.amount.amount > 0;
   const showAccountCredits = !!totals.credits?.payer?.appliedAmount && totals.credits.payer.appliedAmount.amount > 0;
   const showPastDue = !!totals.pastDue?.amount && totals.pastDue.amount > 0;
+  const showProratedDiscount = !!totals.discounts?.proration?.amount && totals.discounts.proration.amount.amount > 0;
+  const showRenewalTotals =
+    !!totals.totalsDuePerPeriod &&
+    totals.totalDueNow &&
+    totals.totalsDuePerPeriod.grandTotal.amount !== totals.totalDueNow.amount;
   const showDowngradeInfo = !isImmediatePlanChange;
 
-  const fee =
-    planPeriod === 'month'
-      ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        plan.fee!
-      : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        plan.annualMonthlyFee!;
+  const seatPerUnitTotal = getCheckoutSeatUnitTotal(totals);
+  const includedSeatsTier = getIncludedSeatsUnitTotalTier(seatPerUnitTotal);
+  const paidSeatsTier = getPaidSeatsUnitTotalTier(seatPerUnitTotal);
 
-  const descriptionElements = [];
+  const descriptionElements: Array<ReturnType<typeof localizationKeys>> = [];
   if (planPeriod === 'annual') {
     descriptionElements.push(localizationKeys('billing.billedAnnually'));
+  }
+  if (includedSeatsTier && includedSeatsTier.quantity !== null) {
+    descriptionElements.push(
+      localizationKeys('billing.pricingTable.seatCost.includedSeats', {
+        includedSeats: includedSeatsTier.quantity,
+      }),
+    );
   }
   const seatUnitPrice = getSeatUnitPrice(plan);
   if (seatUnitPrice && seatUnitPrice.tiers.length === 1 && seatUnitPrice.tiers[0].feePerBlock.amount === 0) {
@@ -85,19 +100,32 @@ export const CheckoutForm = withCardStateProvider(() => {
                 ) : null
               }
             />
-            <LineItems.Description
-              prefix={planPeriod === 'annual' ? 'x12' : undefined}
-              text={`${fee.currencySymbol}${fee.amountFormatted}`}
-              suffix={localizationKeys('billing.checkout.perMonth')}
-            />
+            {totals.baseFee ? (
+              <LineItems.Description
+                prefix={planPeriod === 'annual' ? 'x12' : undefined}
+                text={`${totals.baseFee.currencySymbol}${totals.baseFee.amountFormatted}`}
+                suffix={localizationKeys('billing.checkout.perMonth')}
+              />
+            ) : null}
           </LineItems.Group>
-          <LineItems.Group
-            borderTop
-            variant='tertiary'
-          >
-            <LineItems.Title title={localizationKeys('billing.subtotal')} />
-            <LineItems.Description text={`${totals.subtotal.currencySymbol}${totals.subtotal.amountFormatted}`} />
-          </LineItems.Group>
+          {paidSeatsTier && paidSeatsTier.quantity !== null && (
+            <LineItems.Group borderTop>
+              <LineItems.Title title={localizationKeys('billing.seats')} />
+              <LineItems.Description
+                prefix={`${paidSeatsTier.quantity} x`}
+                text={`${paidSeatsTier.feePerBlock.currencySymbol}${paidSeatsTier.feePerBlock.amountFormatted}`}
+                suffix={localizationKeys('billing.checkout.perMonth')}
+              />
+            </LineItems.Group>
+          )}
+          {showProratedDiscount && (
+            <LineItems.Group variant='tertiary'>
+              <LineItems.Title title={localizationKeys('billing.proratedDiscount')} />
+              <LineItems.Description
+                text={`- ${totals.discounts?.proration?.amount.currencySymbol}${totals.discounts?.proration?.amount.amountFormatted}`}
+              />
+            </LineItems.Group>
+          )}
           {showProratedCredit && (
             <LineItems.Group variant='tertiary'>
               <LineItems.Title title={localizationKeys('billing.creditRemainder')} />
@@ -129,7 +157,7 @@ export const CheckoutForm = withCardStateProvider(() => {
             </LineItems.Group>
           )}
 
-          {!!freeTrialEndsAt && !!plan.freeTrialDays && totals.totalDueAfterFreeTrial && (
+          {!!freeTrialEndsAt && !!plan.freeTrialDays && totals.totalDueAfterFreeTrial ? (
             <LineItems.Group variant='tertiary'>
               <LineItems.Title
                 title={localizationKeys('billing.checkout.totalDueAfterTrial', {
@@ -140,12 +168,35 @@ export const CheckoutForm = withCardStateProvider(() => {
                 text={`${totals.totalDueAfterFreeTrial.currencySymbol}${totals.totalDueAfterFreeTrial.amountFormatted}`}
               />
             </LineItems.Group>
-          )}
+          ) : showRenewalTotals ? null : totals.totalDuePerPeriod ? (
+            <LineItems.Group
+              borderTop
+              variant='tertiary'
+            >
+              <LineItems.Title title={localizationKeys('billing.checkout.totalDuePerPeriod')} />
+              <LineItems.Description
+                text={`${totals.totalDuePerPeriod.currencySymbol}${totals.totalDuePerPeriod.amountFormatted}`}
+              />
+            </LineItems.Group>
+          ) : null}
 
-          <LineItems.Group borderTop>
-            <LineItems.Title title={localizationKeys('billing.totalDueToday')} />
-            <LineItems.Description text={`${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`} />
-          </LineItems.Group>
+          {totals.totalDueNow ? (
+            <LineItems.Group borderTop>
+              <LineItems.Title title={localizationKeys('billing.totalDueToday')} />
+              <LineItems.Description
+                text={`${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`}
+              />
+            </LineItems.Group>
+          ) : null}
+
+          {showRenewalTotals && (
+            <LineItems.Group borderTop>
+              <LineItems.Title title={localizationKeys('billing.totalDuePerPeriod')} />
+              <LineItems.Description
+                text={`${totals.totalsDuePerPeriod?.grandTotal.currencySymbol}${totals.totalsDuePerPeriod?.grandTotal.amountFormatted}`}
+              />
+            </LineItems.Group>
+          )}
         </LineItems.Root>
       </Box>
 
@@ -320,17 +371,10 @@ export const PayWithTestPaymentMethod = () => {
         flexDirection: 'column',
         rowGap: t.space.$2,
         position: 'relative',
+        overflow: 'hidden',
       })}
     >
-      <Box
-        sx={t => ({
-          position: 'absolute',
-          inset: 0,
-          background: `repeating-linear-gradient(-45deg,${t.colors.$warningAlpha100},${t.colors.$warningAlpha100} 6px,${t.colors.$warningAlpha150} 6px,${t.colors.$warningAlpha150} 12px)`,
-          maskImage: `linear-gradient(transparent 20%, black)`,
-          pointerEvents: 'none',
-        })}
-      />
+      <DevModeOverlay />
       <Flex
         sx={t => ({
           alignItems: 'center',
@@ -362,6 +406,7 @@ export const PayWithTestPaymentMethod = () => {
 
 const useSubmitLabel = () => {
   const { checkout } = useCheckout();
+  const { seatsQuantity } = useCheckoutContext();
   const { status, freeTrialEndsAt, totals } = checkout;
 
   if (status === 'needs_initialization') {
@@ -369,10 +414,15 @@ const useSubmitLabel = () => {
   }
 
   if (freeTrialEndsAt) {
+    if (seatsQuantity && totals.totalDueNow) {
+      return localizationKeys('billing.pay', {
+        amount: `${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`,
+      });
+    }
     return localizationKeys('billing.startFreeTrial');
   }
 
-  if (totals.totalDueNow.amount > 0) {
+  if (totals.totalDueNow && totals.totalDueNow.amount > 0) {
     return localizationKeys('billing.pay', {
       amount: `${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`,
     });

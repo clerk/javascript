@@ -23,6 +23,7 @@ type SignInFactorTwoCodeFormProps = UVFactorTwoCodeCard & {
   cardSubtitle: LocalizationKey;
   inputLabel: LocalizationKey;
   resendButton?: LocalizationKey;
+  identityPreviewEditButtonAriaLabel: LocalizationKey;
 };
 
 export const UVFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => {
@@ -67,6 +68,7 @@ export const UVFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => {
       onResendCodeClicked={prepare}
       safeIdentifier={'safeIdentifier' in props.factor ? props.factor.safeIdentifier : undefined}
       profileImageUrl={session?.user?.imageUrl}
+      identityPreviewEditButtonAriaLabel={props.identityPreviewEditButtonAriaLabel}
       onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
       showAlternativeMethods={props.showAlternativeMethods}
     />

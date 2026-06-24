@@ -171,6 +171,9 @@ export type __internal_LocalizationResource = {
   footerPageLink__terms: LocalizationValue;
   paginationButton__previous: LocalizationValue;
   paginationButton__next: LocalizationValue;
+  identityPreviewEditButton__emailAddress: LocalizationValue;
+  identityPreviewEditButton__phoneNumber: LocalizationValue;
+  identityPreviewEditButton__identifier: LocalizationValue;
   paginationRowText__displaying: LocalizationValue;
   paginationRowText__of: LocalizationValue;
   membershipRole__admin: LocalizationValue;
@@ -191,6 +194,11 @@ export type __internal_LocalizationResource = {
     keepSubscription: LocalizationValue;
     reSubscribe: LocalizationValue;
     seats: LocalizationValue;
+    seatsWithLimit: LocalizationValue<'limit'>;
+    seatBreakdownSingular: LocalizationValue<'rate'>;
+    seatBreakdownPlural: LocalizationValue<'chargeable' | 'rate'>;
+    seatBreakdownIncludedSingular: LocalizationValue<'totalSeats' | 'included' | 'rate'>;
+    seatBreakdownIncludedPlural: LocalizationValue<'totalSeats' | 'included' | 'chargeable' | 'rate'>;
     subscribe: LocalizationValue;
     startFreeTrial: LocalizationValue;
     startFreeTrial__days: LocalizationValue<'days'>;
@@ -200,6 +208,7 @@ export type __internal_LocalizationResource = {
     switchToMonthlyWithPrice: LocalizationValue<'price' | 'currency'>;
     switchToAnnualWithAnnualPrice: LocalizationValue<'price' | 'currency'>;
     billedAnnually: LocalizationValue;
+    billedMonthly: LocalizationValue;
     billedMonthlyOnly: LocalizationValue;
     billedAnnuallyOnly: LocalizationValue;
     cancelFreeTrial: LocalizationValue<'plan'>;
@@ -214,13 +223,16 @@ export type __internal_LocalizationResource = {
     viewPayment: LocalizationValue;
     availableFeatures: LocalizationValue;
     subtotal: LocalizationValue;
+    subtotalRenewal: LocalizationValue;
     credit: LocalizationValue;
     prorationCredit: LocalizationValue;
     accountCredit: LocalizationValue;
     creditRemainder: LocalizationValue;
     payerCreditRemainder: LocalizationValue;
+    proratedDiscount: LocalizationValue;
     totalDue: LocalizationValue;
     totalDueToday: LocalizationValue;
+    totalDuePerPeriod: LocalizationValue;
     pastDue: LocalizationValue;
     pay: LocalizationValue<'amount'>;
     cancelSubscriptionTitle: LocalizationValue<'plan'>;
@@ -301,6 +313,7 @@ export type __internal_LocalizationResource = {
       downgradeNotice: LocalizationValue;
       pastDueNotice: LocalizationValue;
       totalDueAfterTrial: LocalizationValue<'days'>;
+      totalDuePerPeriod: LocalizationValue;
       perMonth: LocalizationValue;
     };
   };
@@ -954,6 +967,7 @@ export type __internal_LocalizationResource = {
         actionLabel__newSubscription: LocalizationValue;
         actionLabel__manageSubscription: LocalizationValue;
         actionLabel__switchPlan: LocalizationValue;
+        overview: LocalizationValue;
       };
       paymentHistorySection: {
         empty: LocalizationValue;
@@ -997,6 +1011,9 @@ export type __internal_LocalizationResource = {
     action__addAccount: LocalizationValue;
     action__openUserMenu: LocalizationValue;
     action__closeUserMenu: LocalizationValue;
+    label__userButtonPopover?: LocalizationValue;
+    label__accountActions?: LocalizationValue;
+    label__activeSessions?: LocalizationValue;
   };
   organizationSwitcher: {
     personalWorkspace: LocalizationValue;
@@ -1021,12 +1038,13 @@ export type __internal_LocalizationResource = {
       members: LocalizationValue;
       billing: LocalizationValue;
       apiKeys: LocalizationValue;
-      selfServeSSO: LocalizationValue;
+      security: LocalizationValue;
     };
     badge__unverified: LocalizationValue;
     badge__automaticInvitation: LocalizationValue;
     badge__automaticSuggestion: LocalizationValue;
     badge__manualInvitation: LocalizationValue;
+    badge__enterpriseSso: LocalizationValue;
     start: {
       headerTitle__members: LocalizationValue;
       membershipSeatUsageLabel: LocalizationValue<'count' | 'limit'>;
@@ -1110,6 +1128,7 @@ export type __internal_LocalizationResource = {
       successMessage: LocalizationValue;
       detailsTitle__inviteFailed: LocalizationValue<'email_addresses'>;
       formButtonPrimary__continue: LocalizationValue;
+      formButtonPrimary__purchaseSeats: LocalizationValue;
       selectDropdown__role: LocalizationValue;
     };
     removeDomainPage: {
@@ -1117,6 +1136,32 @@ export type __internal_LocalizationResource = {
       messageLine1: LocalizationValue<'domain'>;
       messageLine2: LocalizationValue;
       successMessage: LocalizationValue;
+    };
+    securityPage: {
+      title: LocalizationValue;
+      removeDialog: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+        confirmButton: LocalizationValue;
+      };
+      ssoSection: {
+        title: LocalizationValue;
+        badge__unconfigured: LocalizationValue;
+        badge__inProgress: LocalizationValue;
+        badge__active: LocalizationValue;
+        badge__inactive: LocalizationValue;
+        descriptionLine1: LocalizationValue;
+        primaryButton__startConfiguration: LocalizationValue;
+        primaryButton__continueConfiguration: LocalizationValue;
+        domainLabel: LocalizationValue;
+        menuAction__edit: LocalizationValue;
+        menuAction__activate: LocalizationValue;
+        menuAction__deactivate: LocalizationValue;
+        menuAction__remove: LocalizationValue;
+        tooltip: LocalizationValue<'role'>;
+        tooltip__noRole: LocalizationValue;
+        tooltipLabel: LocalizationValue;
+      };
     };
     membersPage: {
       detailsTitle__emptyRow: LocalizationValue;
@@ -1195,6 +1240,11 @@ export type __internal_LocalizationResource = {
         actionLabel__newSubscription: LocalizationValue;
         actionLabel__manageSubscription: LocalizationValue;
         actionLabel__switchPlan: LocalizationValue;
+        includedSeatsUsage: LocalizationValue<'includedSeats'>;
+        overview: LocalizationValue;
+        paidSeatsUsage: LocalizationValue<'seatsQuantity' | 'amount'>;
+        seatLimit: LocalizationValue<'seatLimit'>;
+        seatLimitAndIncludedSeats: LocalizationValue<'seatLimit' | 'includedSeats'>;
       };
       paymentHistorySection: {
         empty: LocalizationValue;
@@ -1321,28 +1371,41 @@ export type __internal_LocalizationResource = {
       };
       warning: LocalizationValue;
     };
-    verifyEmailDomainStep: {
+    changeProviderDialog: {
+      title: LocalizationValue<'provider'>;
+      subtitle: LocalizationValue<'provider' | 'currentProvider'>;
+      cancelButton: LocalizationValue;
+      confirmButton: LocalizationValue;
+    };
+    organizationDomainsStep: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
-      addEmailAddress: {
-        formTitle: LocalizationValue;
-        formSubtitle: LocalizationValue;
-        inputPlaceholder: LocalizationValue;
-        inputLabel: LocalizationValue;
+      formFieldLabel__domain: LocalizationValue;
+      formFieldInputPlaceholder__domain: LocalizationValue;
+      formButtonPrimary__add: LocalizationValue;
+      domainSuggestion: {
+        messageLabel: LocalizationValue<'domain'>;
+        formButtonPrimary__add: LocalizationValue<'domain'>;
       };
-      emailCode: {
-        formTitle: LocalizationValue;
-        formSubtitle: LocalizationValue<'identifier'>;
-        resendButton: LocalizationValue;
-        verified: {
-          title: LocalizationValue;
-          subtitle: LocalizationValue;
-          inputLabel: LocalizationValue;
+      domainCard: {
+        badge__verified: LocalizationValue;
+        badge__unverified: LocalizationValue;
+        verifiedAtLabel: LocalizationValue<'date'>;
+        removeButtonTooltip__lastVerifiedDomain: LocalizationValue;
+        removeButtonTooltip__lastVerifiedDomainActive: LocalizationValue;
+        txtRecord: {
+          instructions: LocalizationValue;
+          typeLabel: LocalizationValue;
+          hostLabel: LocalizationValue;
+          valueLabel: LocalizationValue;
         };
       };
-      domainTaken: {
-        title: LocalizationValue<'domain'>;
-        subtitle: LocalizationValue;
+      removeDomainDialog: {
+        title: LocalizationValue;
+        subtitle__active: LocalizationValue<'domain'>;
+        subtitle__inactive: LocalizationValue<'domain'>;
+        cancelButton: LocalizationValue;
+        removeButton: LocalizationValue;
       };
     };
     testConfigurationStep: {
@@ -1416,6 +1479,10 @@ export type __internal_LocalizationResource = {
           optional: LocalizationValue;
         };
       };
+      activeConnectionWarning: {
+        title: LocalizationValue;
+        dismiss: LocalizationValue;
+      };
       samlOkta: {
         mainHeaderTitle: LocalizationValue;
         createAppStep: {
@@ -1426,7 +1493,6 @@ export type __internal_LocalizationResource = {
             step2: LocalizationValue;
             step3: LocalizationValue;
             step4: LocalizationValue;
-            step5: LocalizationValue;
           };
           serviceProviderInstructions: {
             title: LocalizationValue;
@@ -1467,7 +1533,6 @@ export type __internal_LocalizationResource = {
         assignUsersStep: {
           headerSubtitle: LocalizationValue;
           assignUsersInstructions: {
-            title: LocalizationValue;
             paragraph: LocalizationValue;
             step1: LocalizationValue;
             step2: LocalizationValue;
@@ -1479,7 +1544,6 @@ export type __internal_LocalizationResource = {
         identityProviderMetadataStep: {
           headerSubtitle: LocalizationValue;
           modes: {
-            title: LocalizationValue;
             ariaLabel: LocalizationValue;
             metadataUrl: LocalizationValue;
             manual: LocalizationValue;
@@ -1514,7 +1578,6 @@ export type __internal_LocalizationResource = {
         createAppStep: {
           headerSubtitle: LocalizationValue;
           createAppInstructions: {
-            title: LocalizationValue;
             paragraph: LocalizationValue;
           };
           serviceProviderFields: {
@@ -1532,25 +1595,23 @@ export type __internal_LocalizationResource = {
           attributeMappingTable: {
             title: LocalizationValue;
             columns: {
-              userProfile: LocalizationValue;
               attributeName: LocalizationValue;
+              userAttribute: LocalizationValue;
             };
             rows: {
-              email: { userProfile: LocalizationValue; attributeName: LocalizationValue };
-              firstName: { userProfile: LocalizationValue; attributeName: LocalizationValue };
-              lastName: { userProfile: LocalizationValue; attributeName: LocalizationValue };
+              email: { attributeName: LocalizationValue; userAttribute: LocalizationValue };
+              firstName: { attributeName: LocalizationValue; userAttribute: LocalizationValue };
+              lastName: { attributeName: LocalizationValue; userAttribute: LocalizationValue };
             };
           };
         };
         assignUsersStep: {
           headerSubtitle: LocalizationValue;
-          title: LocalizationValue;
           paragraph: LocalizationValue;
         };
         identityProviderMetadataStep: {
           headerSubtitle: LocalizationValue;
           modes: {
-            title: LocalizationValue;
             ariaLabel: LocalizationValue;
             metadataUrl: LocalizationValue;
             manual: LocalizationValue;
@@ -1590,13 +1651,11 @@ export type __internal_LocalizationResource = {
             step2: LocalizationValue;
             step3: LocalizationValue;
             step4: LocalizationValue;
-            step5: LocalizationValue;
           };
         };
         identityProviderMetadataStep: {
           headerSubtitle: LocalizationValue;
           modes: {
-            title: LocalizationValue;
             ariaLabel: LocalizationValue;
             metadataFile: LocalizationValue;
             manual: LocalizationValue;
@@ -1693,13 +1752,11 @@ export type __internal_LocalizationResource = {
           };
           assignUsersInstructions: {
             title: LocalizationValue;
-            paragraph1: LocalizationValue;
             step1: LocalizationValue;
             step2: LocalizationValue;
             step3: LocalizationValue;
             step4: LocalizationValue;
             step5: LocalizationValue;
-            step6: LocalizationValue;
           };
         };
         serviceProviderStep: {
@@ -1723,7 +1780,6 @@ export type __internal_LocalizationResource = {
         identityProviderMetadataStep: {
           headerSubtitle: LocalizationValue;
           modes: {
-            title: LocalizationValue;
             ariaLabel: LocalizationValue;
             metadataUrl: LocalizationValue;
             manual: LocalizationValue;
@@ -1755,16 +1811,16 @@ export type __internal_LocalizationResource = {
         attributeMappingStep: {
           headerSubtitle: LocalizationValue;
           title: LocalizationValue;
-          paragraph: LocalizationValue;
           step1: LocalizationValue;
           step2: LocalizationValue;
-          step3: LocalizationValue;
           attributeMappingTable: {
             columns: {
               attribute: LocalizationValue;
               claimName: LocalizationValue;
               value: LocalizationValue;
             };
+            copyClaimName: LocalizationValue;
+            copyClaimNameCopied: LocalizationValue;
             rows: {
               email: { attribute: LocalizationValue; claimName: LocalizationValue; value: LocalizationValue };
               firstName: { attribute: LocalizationValue; claimName: LocalizationValue; value: LocalizationValue };
@@ -1774,34 +1830,14 @@ export type __internal_LocalizationResource = {
         };
       };
     };
-    confirmation: {
-      statusSection: {
-        title: LocalizationValue;
-        activeBadge: LocalizationValue;
-        inactiveBadge: LocalizationValue;
-      };
-      enableSection: {
-        title: LocalizationValue;
-      };
-      domainSection: {
-        title: LocalizationValue;
-      };
-      configurationSection: {
-        title: LocalizationValue;
-        ssoUrlLabel: LocalizationValue;
-        issuerLabel: LocalizationValue;
-        certificateLabel: LocalizationValue;
-        configureAgainLink: LocalizationValue;
-      };
-      resetSection: {
-        title: LocalizationValue;
-        warning: LocalizationValue;
-        confirmationFieldLabel: LocalizationValue<'name'>;
-        submitButton: LocalizationValue;
-      };
-      inactiveBanner: {
-        title: LocalizationValue;
-      };
+    activate: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue<'domain'>;
+      activateButton: LocalizationValue;
+      skipButton: LocalizationValue;
+      activeTitle: LocalizationValue;
+      activeSubtitle: LocalizationValue<'domain'>;
+      doneButton: LocalizationValue;
     };
   };
   apiKeys: {
@@ -2001,6 +2037,7 @@ type UnstableErrors = WithParamName<{
   form_password_or_identifier_incorrect: LocalizationValue;
   form_password_validation_failed: LocalizationValue;
   not_allowed_access: LocalizationValue;
+  oauth_access_denied: LocalizationValue;
   form_identifier_exists: LocalizationValue;
   form_identifier_exists__email_address: LocalizationValue;
   form_identifier_exists__username: LocalizationValue;
@@ -2068,4 +2105,6 @@ type UnstableErrors = WithParamName<{
   organization_membership_quota_exceeded: LocalizationValue;
   organization_not_found_or_unauthorized: LocalizationValue;
   organization_not_found_or_unauthorized_with_create_organization_disabled: LocalizationValue;
+  insufficient_seats_contact_support: LocalizationValue;
+  insufficient_seats_change_plan: LocalizationValue;
 }>;
