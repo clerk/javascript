@@ -5,13 +5,13 @@ import type * as ExpoCrypto from 'expo-crypto';
 import type * as WebBrowser from 'expo-web-browser';
 
 import { errorThrower } from '../utils/errors';
-import { createHostedAuth, type FapiHostedAuthInitialPage } from '../utils/hostedAuth';
+import { createHostedAuth, type FapiHostedAuthMode } from '../utils/hostedAuth';
 
-export type HostedAuthInitialPage = 'sign-in' | 'sign-up';
+export type HostedAuthMode = 'sign-in' | 'sign-up';
 
 export type StartHostedAuthParams = {
   redirectUrl?: string;
-  initialPage?: HostedAuthInitialPage;
+  mode?: HostedAuthMode;
   state?: string;
   authSessionOptions?: Pick<WebBrowser.AuthSessionOpenOptions, 'showInRecents'>;
 };
@@ -70,7 +70,7 @@ export function useHostedAuth() {
     const hostedAuth = await createHostedAuth({
       redirectUrl,
       codeChallenge: pkce.codeChallenge,
-      initialPage: toFapiInitialPage(params.initialPage),
+      mode: toFapiMode(params.mode),
       state,
     });
 
@@ -136,12 +136,12 @@ function getClientUpdater(clerk: ReturnType<typeof useClerk>): ((client: ClientR
   return maybeClerkWithClientUpdater.updateClient;
 }
 
-function toFapiInitialPage(initialPage: HostedAuthInitialPage | undefined): FapiHostedAuthInitialPage | undefined {
-  if (initialPage === 'sign-in') {
+function toFapiMode(mode: HostedAuthMode | undefined): FapiHostedAuthMode | undefined {
+  if (mode === 'sign-in') {
     return 'sign_in';
   }
 
-  if (initialPage === 'sign-up') {
+  if (mode === 'sign-up') {
     return 'sign_up';
   }
 

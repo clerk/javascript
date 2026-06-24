@@ -4,12 +4,12 @@ import type { ClerkAPIErrorJSON } from '@clerk/shared/types';
 import { getClerkInstance } from '../provider/singleton';
 import { errorThrower } from './errors';
 
-export type FapiHostedAuthInitialPage = 'sign_in' | 'sign_up';
+export type FapiHostedAuthMode = 'sign_in' | 'sign_up';
 
 export type CreateHostedAuthParams = {
   redirectUrl: string;
   codeChallenge: string;
-  initialPage?: FapiHostedAuthInitialPage;
+  mode?: FapiHostedAuthMode;
   state?: string;
 };
 
