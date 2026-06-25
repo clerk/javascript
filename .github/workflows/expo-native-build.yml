@@ -25,6 +25,7 @@ env:
 
 jobs:
   native-build:
+    if: ${{ github.head_ref != 'changeset-release/main' }}
     name: Expo ${{ matrix.expo-sdk }} / ${{ matrix.platform }}
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 45
@@ -36,6 +37,12 @@ jobs:
             platform: android
             runner: blacksmith-8vcpu-ubuntu-2204
           - expo-sdk: 54
+            platform: ios
+            runner: blacksmith-6vcpu-macos-26
+          - expo-sdk: 55
+            platform: android
+            runner: blacksmith-8vcpu-ubuntu-2204
+          - expo-sdk: 55
             platform: ios
             runner: blacksmith-6vcpu-macos-26
           - expo-sdk: 56
