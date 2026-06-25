@@ -1,0 +1,135 @@
+{
+  "name": "@clerk/electron",
+  "version": "0.0.4",
+  "description": "Clerk SDK for Electron",
+  "keywords": [
+    "clerk",
+    "electron",
+    "auth",
+    "authentication",
+    "session",
+    "jwt",
+    "desktop"
+  ],
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/electron"
+  },
+  "license": "MIT",
+  "author": "Clerk",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
+    },
+    "./preload": {
+      "import": {
+        "types": "./dist/types/preload/index.d.ts",
+        "default": "./dist/esm/preload/index.js"
+      },
+      "require": {
+        "types": "./dist/types/preload/index.d.ts",
+        "default": "./dist/cjs/preload/index.js"
+      }
+    },
+    "./storage": {
+      "import": {
+        "types": "./dist/types/storage/index.d.ts",
+        "default": "./dist/esm/storage/index.js"
+      },
+      "require": {
+        "types": "./dist/types/storage/index.d.ts",
+        "default": "./dist/cjs/storage/index.js"
+      }
+    },
+    "./react": {
+      "import": {
+        "types": "./dist/types/react/index.d.ts",
+        "default": "./dist/esm/react/index.js"
+      },
+      "require": {
+        "types": "./dist/types/react/index.d.ts",
+        "default": "./dist/cjs/react/index.js"
+      }
+    },
+    "./passkeys": {
+      "import": {
+        "types": "./dist/types/passkeys/index.d.ts",
+        "default": "./dist/esm/passkeys/index.js"
+      },
+      "require": {
+        "types": "./dist/types/passkeys/index.d.ts",
+        "default": "./dist/cjs/passkeys/index.js"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
+    "clean": "rimraf ./dist",
+    "dev": "tsdown --watch",
+    "format": "node ../../scripts/format-package.mjs",
+    "format:check": "node ../../scripts/format-package.mjs --check",
+    "lint": "eslint src",
+    "lint:attw": "attw --pack . --profile node16 --ignore-rules unexpected-module-syntax --ignore-rules no-resolution",
+    "lint:publint": "publint",
+    "test": "vitest run",
+    "test:ci": "vitest run --maxWorkers=70%",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@clerk/clerk-js": "workspace:^",
+    "@clerk/react": "workspace:^",
+    "@clerk/shared": "workspace:^",
+    "tslib": "catalog:repo"
+  },
+  "devDependencies": {
+    "@clerk/electron-passkeys": "workspace:*",
+    "@types/node": "^22.19.17",
+    "electron": "^39.2.6",
+    "electron-store": "^8.2.0"
+  },
+  "peerDependencies": {
+    "@clerk/electron-passkeys": "*",
+    "electron": ">=28",
+    "electron-store": "^8.2.0",
+    "react": "catalog:peer-react",
+    "react-dom": "catalog:peer-react"
+  },
+  "peerDependenciesMeta": {
+    "@clerk/electron-passkeys": {
+      "optional": true
+    },
+    "electron-store": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

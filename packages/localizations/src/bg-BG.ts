@@ -675,8 +675,8 @@ export const bgBG: LocalizationResource = {
         messageLabel: 'Вашият имейл използва {{domain}}. Искате ли да го добавите?',
       },
       formButtonPrimary__add: 'Добави',
-      formFieldInputPlaceholder__domain: 'Въведете домейна си тук и щракнете върху добавяне, за да започнете',
-      formFieldLabel__domain: 'Домейни',
+      formFieldInputPlaceholder__domain: 'Добавяне на домейн',
+      formFieldLabel__domain: 'Домейн',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1658,6 +1658,7 @@ export const bgBG: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       'Имейл адресът или телефонният номер не са разрешени за регистрация. Това може да се дължи на използването на „+“, „=“, „#“ или „.“ във вашия имейл адрес, като използвате домейн, свързан с временна имейл услуга, или сте изрично блокирани. Ако смятате, че това е грешка, моля, свържете се с поддръжката.',
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'Доменът на организацията е блокиран.',
     organization_domain_common: 'Доменът на организацията е твърде общ.',
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -1732,6 +1733,9 @@ export const bgBG: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Изход',
     action__signOutAll: 'Изход от всички акаунти',
+    label__userButtonPopover: 'Панел на акаунта',
+    label__accountActions: 'Действия с акаунта',
+    label__activeSessions: 'Активни сесии',
   },
   userProfile: {
     apiKeysPage: {

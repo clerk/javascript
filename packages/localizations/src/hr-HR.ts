@@ -210,9 +210,9 @@ export const hrHR: LocalizationResource = {
     subtotalRenewal: undefined,
     switchPlan: 'Prebaci na ovaj plan',
     switchToAnnual: 'Prebaci na godišnje',
-    switchToAnnualWithAnnualPrice: 'Prebaci na godišnje {{currency}}{{price}} / godišnje',
+    switchToAnnualWithAnnualPrice: 'Prebaci na godišnje {{price}} / godišnje',
     switchToMonthly: 'Prebaci na mjesečno',
-    switchToMonthlyWithPrice: 'Prebaci na mjesečno {{currency}}{{price}} / mjesečno',
+    switchToMonthlyWithPrice: 'Prebaci na mjesečno {{price}} / mjesečno',
     totalDue: 'Ukupno za platiti',
     totalDuePerPeriod: undefined,
     totalDueToday: 'Ukupno za platiti danas',
@@ -681,8 +681,8 @@ export const hrHR: LocalizationResource = {
         messageLabel: 'Vaša e-pošta koristi {{domain}}. Želite li ga dodati?',
       },
       formButtonPrimary__add: 'Dodaj',
-      formFieldInputPlaceholder__domain: 'Ovdje upišite svoju domenu i kliknite dodaj za početak',
-      formFieldLabel__domain: 'Domene',
+      formFieldInputPlaceholder__domain: 'Dodaj domenu',
+      formFieldLabel__domain: 'Domena',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1685,6 +1685,7 @@ export const hrHR: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       "E-mail adresa ili broj telefona nije dozvoljen za registraciju. Ovo može biti zbog korištenja '+', '=', '#' ili '.' u vašoj e-mail adresi, korištenja domene povezane s vremenskom e-mail uslugom ili eksplicitnog blokiranja. Ako smatrate da je ovo pogreška, obratite se podršci.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'Ovo je blokirana domena pružatelja e-pošte. Molimo koristite drugu.',
     organization_domain_common: 'Ovo je uobičajena domena pružatelja e-pošte. Molimo koristite drugu.',
     organization_domain_exists_for_enterprise_connection:
@@ -1763,6 +1764,9 @@ export const hrHR: LocalizationResource = {
     action__openUserMenu: 'Otvori korisnički izbornik',
     action__signOut: 'Odjavi se',
     action__signOutAll: 'Odjavi se sa svih računa',
+    label__userButtonPopover: 'Ploča računa',
+    label__accountActions: 'Akcije računa',
+    label__activeSessions: 'Aktivne sesije',
   },
   userProfile: {
     apiKeysPage: {

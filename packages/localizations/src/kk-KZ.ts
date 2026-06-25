@@ -674,8 +674,8 @@ export const kkKZ: LocalizationResource = {
         messageLabel: 'Электрондық поштаңыз {{domain}} пайдаланады. Оны қосқыңыз келе ме?',
       },
       formButtonPrimary__add: 'Қосу',
-      formFieldInputPlaceholder__domain: 'Доменіңізді осы жерге енгізіп, бастау үшін «Қосу» түймесін басыңыз',
-      formFieldLabel__domain: 'Домендер',
+      formFieldInputPlaceholder__domain: 'Домен қосу',
+      formFieldLabel__domain: 'Домен',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1648,6 +1648,7 @@ export const kkKZ: LocalizationResource = {
     insufficient_seats_change_plan: undefined,
     insufficient_seats_contact_support: undefined,
     not_allowed_access: 'Бұл бетке қол жеткізуге рұқсат жоқ. Қате болса, қолдау қызметіне хабарласыңыз.',
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'Бұл электрондық пошта домені бұғатталған. Басқасын қолданыңыз.',
     organization_domain_common: 'Бұл жалпы электрондық пошта домені. Басқасын қолданыңыз.',
     organization_domain_exists_for_enterprise_connection: 'Бұл домен ұйымыңыздың SSO үшін қолданылады.',
@@ -1722,6 +1723,9 @@ export const kkKZ: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Шығу',
     action__signOutAll: 'Барлық есептік жазбалардан шығу',
+    label__userButtonPopover: 'Есептік жазба тақтасы',
+    label__accountActions: 'Есептік жазба әрекеттері',
+    label__activeSessions: 'Белсенді сессиялар',
   },
   userProfile: {
     apiKeysPage: {

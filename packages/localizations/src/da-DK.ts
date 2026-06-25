@@ -673,8 +673,8 @@ export const daDK: LocalizationResource = {
         messageLabel: 'Din e-mail bruger {{domain}}. Vil du tilføje det?',
       },
       formButtonPrimary__add: 'Tilføj',
-      formFieldInputPlaceholder__domain: 'Skriv dit domæne her, og klik på tilføj for at starte',
-      formFieldLabel__domain: 'Domæner',
+      formFieldInputPlaceholder__domain: 'Tilføj domæne',
+      formFieldLabel__domain: 'Domæne',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1655,6 +1655,7 @@ export const daDK: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       "E-mailadressen eller telefonnummeret er ikke tilladt at tilmelde sig. Dette kan skyldes brug af '+', '=', '#' eller '.' i din e-mail-adresse, ved at bruge et domæne, der er forbundet med en midlertidig e-mail-tjeneste, eller ved at blive eksplicit blokeret. Hvis du mener, at dette er en fejl, bedes du kontakte support.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -1729,6 +1730,9 @@ export const daDK: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Log ud',
     action__signOutAll: 'Log ud af alle konti',
+    label__userButtonPopover: 'Kontopanel',
+    label__accountActions: 'Kontohandlinger',
+    label__activeSessions: 'Aktive sessioner',
   },
   userProfile: {
     apiKeysPage: {

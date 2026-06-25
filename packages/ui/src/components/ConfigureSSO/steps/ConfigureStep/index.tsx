@@ -27,7 +27,7 @@ export const ConfigureStep = (): JSX.Element => {
   const { direction } = useWizard();
 
   const steps = React.useMemo<WizardStepConfig[]>(
-    () => [{ id: 'select-provider' }, { id: 'configure-provider', guard: () => c.hasConnection }],
+    () => [{ id: 'select-provider' }, { id: 'configure-provider', isReachable: () => c.hasConnection }],
     [c],
   );
 

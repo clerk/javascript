@@ -4,10 +4,8 @@ import React, { useState } from 'react';
 import { Header } from '@/ui/elements/Header';
 import { ProfileCard } from '@/ui/elements/ProfileCard';
 
-import { Col, descriptors, Icon, localizationKeys, SimpleButton, Text } from '../../customizables';
+import { Col, descriptors, Flex, Icon, localizationKeys, SimpleButton, Spinner, Text } from '../../customizables';
 import { ChevronLeft } from '../../icons';
-import { ConfigureSSOProtect } from '../ConfigureSSO/ConfigureSSO';
-import { ConfigureSSOSkeleton } from '../ConfigureSSO/ConfigureSSOSkeleton';
 import { ConfigureSSOWizard } from '../ConfigureSSO/ConfigureSSOWizard';
 import { useOrganizationEnterpriseConnection } from '../ConfigureSSO/hooks/useOrganizationEnterpriseConnection';
 import { SecuritySsoSection } from './SecuritySsoSection';
@@ -50,7 +48,21 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
   };
 
   if (isLoading) {
-    return <ConfigureSSOSkeleton />;
+    return (
+      <SecurityPageOverview fillHeight>
+        <Flex
+          align='center'
+          justify='center'
+          sx={t => ({ flex: 1, paddingBlock: t.space.$5 })}
+        >
+          <Spinner
+            size='xs'
+            colorScheme='neutral'
+            elementDescriptor={descriptors.spinner}
+          />
+        </Flex>
+      </SecurityPageOverview>
+    );
   }
 
   const backControl = (
@@ -74,51 +86,68 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
     </SimpleButton>
   );
 
-  return (
-    <ConfigureSSOProtect>
-      {view === 'overview' ? (
-        <ProfileCard.Page>
-          <Col
-            elementDescriptor={descriptors.page}
-            sx={t => ({ gap: t.space.$8 })}
-          >
-            <Col
-              elementDescriptor={descriptors.profilePage}
-              elementId={descriptors.profilePage.setId('organizationSecurity')}
-            >
-              <Header.Root>
-                <Header.Title
-                  localizationKey={localizationKeys('organizationProfile.securityPage.title')}
-                  sx={t => ({ marginBottom: t.space.$4 })}
-                  textVariant='h2'
-                />
-              </Header.Root>
-              <SecuritySsoSection
-                connection={organizationEnterpriseConnection}
-                enterpriseConnection={enterpriseConnection}
-                setConnectionActive={enterpriseConnectionMutations.setConnectionActive}
-                deleteConnection={enterpriseConnectionMutations.deleteConnection}
-                organizationName={organization?.name ?? ''}
-                contentRef={contentRef}
-                onConfigure={openWizard}
-              />
-            </Col>
-          </Col>
-        </ProfileCard.Page>
-      ) : (
-        <ConfigureSSOWizard
-          organizationEnterpriseConnection={organizationEnterpriseConnection}
-          testRuns={testRuns}
-          enterpriseConnection={enterpriseConnection}
-          contentRef={contentRef}
-          enterpriseConnectionMutations={enterpriseConnectionMutations}
-          organizationDomainMutations={organizationDomainMutations}
-          organizationDomains={organizationDomains}
-          forceInitialStep={forceFirstStep}
-          title={backControl}
-          onExit={exitWizard}
-        />
-      )}
-    </ConfigureSSOProtect>
+  return view === 'overview' ? (
+    <SecurityPageOverview>
+      <SecuritySsoSection
+        connection={organizationEnterpriseConnection}
+        enterpriseConnection={enterpriseConnection}
+        setConnectionActive={enterpriseConnectionMutations.setConnectionActive}
+        deleteConnection={enterpriseConnectionMutations.deleteConnection}
+        organizationName={organization?.name ?? ''}
+        contentRef={contentRef}
+        onConfigure={openWizard}
+      />
+    </SecurityPageOverview>
+  ) : (
+    <ConfigureSSOWizard
+      organizationEnterpriseConnection={organizationEnterpriseConnection}
+      testRuns={testRuns}
+      enterpriseConnection={enterpriseConnection}
+      contentRef={contentRef}
+      enterpriseConnectionMutations={enterpriseConnectionMutations}
+      organizationDomainMutations={organizationDomainMutations}
+      organizationDomains={organizationDomains}
+      forceInitialStep={forceFirstStep}
+      title={backControl}
+      onExit={exitWizard}
+    />
   );
 };
+
+/**
+ * The overview's stable page chrome — the security `ProfileCard.Page` and its
+ * "Security" header. Both the settled overview and the on-mount loading state
+ * render through this, so the section body is the only thing that swaps in.
+ *
+ * `fillHeight` grows the page to the scroll box so the loading state's spinner
+ * can center in the remaining height beneath the header.
+ */
+const SecurityPageOverview = ({
+  children,
+  fillHeight = false,
+}: {
+  children: React.ReactNode;
+  fillHeight?: boolean;
+}): JSX.Element => (
+  <ProfileCard.Page sx={fillHeight ? { flex: 1 } : undefined}>
+    <Col
+      elementDescriptor={descriptors.page}
+      sx={t => ({ gap: t.space.$8, ...(fillHeight && { flex: 1 }) })}
+    >
+      <Col
+        elementDescriptor={descriptors.profilePage}
+        elementId={descriptors.profilePage.setId('organizationSecurity')}
+        sx={fillHeight ? { flex: 1 } : undefined}
+      >
+        <Header.Root>
+          <Header.Title
+            localizationKey={localizationKeys('organizationProfile.securityPage.title')}
+            sx={t => ({ marginBottom: t.space.$4 })}
+            textVariant='h2'
+          />
+        </Header.Root>
+        {children}
+      </Col>
+    </Col>
+  </ProfileCard.Page>
+);

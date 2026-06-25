@@ -361,6 +361,59 @@ ruleTester.run('require-auth-protection', rule, {
       options: [config],
     },
     {
+      name: 'manual check: !isAuthenticated || otherCondition with return',
+      code: `
+        import { auth } from '@clerk/nextjs/server';
+        export default async function Page() {
+          const { isAuthenticated } = await auth();
+          if (!isAuthenticated || someFlag) return null;
+          return <div />;
+        }
+      `,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+    },
+    {
+      name: 'manual check: otherCondition || !isAuthenticated with return',
+      code: `
+        import { auth } from '@clerk/nextjs/server';
+        export default async function Page() {
+          const { isAuthenticated } = await auth();
+          if (someFlag || !isAuthenticated) return null;
+          return <div />;
+        }
+      `,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+    },
+    {
+      name: 'manual check: userId === null || otherCondition with redirect',
+      code: `
+        import { auth } from '@clerk/nextjs/server';
+        import { redirect } from 'next/navigation';
+        export default async function Page() {
+          const { userId } = await auth();
+          if (userId === null || someFlag) redirect('/sign-in');
+          return <div />;
+        }
+      `,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+    },
+    {
+      name: 'manual check: !isAuthenticated || a || b with return',
+      code: `
+        import { auth } from '@clerk/nextjs/server';
+        export default async function Page() {
+          const { isAuthenticated } = await auth();
+          if (!isAuthenticated || a || b) return null;
+          return <div />;
+        }
+      `,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+    },
+    {
       name: 'leading directive is skipped (use cache before protect)',
       code: `
         import { auth } from '@clerk/nextjs/server';
@@ -1617,6 +1670,34 @@ ruleTester.run('require-auth-protection', rule, {
         export default async function Page() {
           const { userId } = await auth();
           if (userId === undefined) return null;
+          return <div />;
+        }
+      `,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+      errors: [missingProtectError()],
+    },
+    {
+      name: 'manual check: !isAuthenticated && otherCondition is NOT accepted',
+      code: `
+        import { auth } from '@clerk/nextjs/server';
+        export default async function Page() {
+          const { isAuthenticated } = await auth();
+          if (!isAuthenticated && someFlag) return null;
+          return <div />;
+        }
+      `,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+      errors: [missingProtectError()],
+    },
+    {
+      name: 'manual check: (!isAuthenticated && x) || y is NOT accepted',
+      code: `
+        import { auth } from '@clerk/nextjs/server';
+        export default async function Page() {
+          const { isAuthenticated } = await auth();
+          if ((!isAuthenticated && x) || y) return null;
           return <div />;
         }
       `,

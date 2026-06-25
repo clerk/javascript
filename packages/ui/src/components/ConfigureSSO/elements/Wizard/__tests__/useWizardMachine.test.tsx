@@ -45,37 +45,38 @@ const renderMachine = (args: {
 describe('useWizardMachine — initial seeding', () => {
   it('mounts on the furthest contiguously-reachable step', () => {
     const { result } = renderMachine({
-      config: cfg([{ id: 'a' }, { id: 'b', guard: () => true }, { id: 'c', guard: () => false }]),
+      config: cfg([{ id: 'a' }, { id: 'b', isReachable: () => true }, { id: 'c', isReachable: () => false }]),
     });
     expect(result.current.current).toBe('b');
     expect(result.current.isInitialStep).toBe(true);
   });
 
-  it('an explicit initialStepId wins over the guard-derived step', () => {
+  it('an explicit initialStepId wins over the reachability-derived step', () => {
     const { result } = renderMachine({
-      config: cfg([{ id: 'a' }, { id: 'b', guard: () => true }]),
+      config: cfg([{ id: 'a' }, { id: 'b', isReachable: () => true }]),
       initialStepId: 'a',
     });
     expect(result.current.current).toBe('a');
   });
 
-  it('falls back to the guard-derived step when initialStepId names no descriptor', () => {
+  it('falls back to the reachability-derived step when initialStepId names no descriptor', () => {
     // An invalid seed must NOT park the machine on a step outside the graph
     // (which would dead-lock NEXT/PREV). resolveInitial rejects it and falls
     // back to initialState — here the furthest contiguously-reachable step.
     const { result } = renderMachine({
-      config: cfg([{ id: 'a' }, { id: 'b', guard: () => true }, { id: 'c', guard: () => false }]),
+      config: cfg([{ id: 'a' }, { id: 'b', isReachable: () => true }, { id: 'c', isReachable: () => false }]),
       initialStepId: 'does-not-exist',
     });
     expect(result.current.current).toBe('b');
   });
 
-  it('seats on a nested-style valid initialStepId (the guard-less first inner step)', () => {
-    // Nested SAML/verify sub-wizards resume on their first inner step, which is
-    // guard-less so guardHolds is true — resolveInitial honors it verbatim, no
-    // fallback. Guards regressing nested mounts back to initialState.
+  it('seats on a nested-style valid initialStepId (the first inner step with no isReachable)', () => {
+    // Nested SAML/verify sub-wizards resume on their first inner step, which has
+    // no isReachable predicate so isStepReachable is true — resolveInitial honors
+    // it verbatim, no fallback. Reachability predicates regressing nested mounts
+    // back to initialState.
     const { result } = renderMachine({
-      config: cfg([{ id: 'n0' }, { id: 'n1', guard: () => true }]),
+      config: cfg([{ id: 'n0' }, { id: 'n1', isReachable: () => true }]),
       parentWizard: makeParent(),
       initialStepId: 'n0',
     });
@@ -83,11 +84,11 @@ describe('useWizardMachine — initial seeding', () => {
   });
 });
 
-describe('useWizardMachine — sequential guard-gated navigation', () => {
-  it('goNext advances one slot when the next guard holds and clears isInitialStep', () => {
+describe('useWizardMachine — sequential isReachable-gated navigation', () => {
+  it('goNext advances one slot when the next isReachable holds and clears isInitialStep', () => {
     const { result } = renderMachine({
       // Seed on 'a' so there is forward room within scope.
-      config: cfg([{ id: 'a' }, { id: 'b', guard: () => true }]),
+      config: cfg([{ id: 'a' }, { id: 'b', isReachable: () => true }]),
       initialStepId: 'a',
     });
     expect(result.current.current).toBe('a');
@@ -101,7 +102,7 @@ describe('useWizardMachine — sequential guard-gated navigation', () => {
   it('goToStep jumps to a reachable target and blocks an unreachable one', () => {
     let cOpen = false;
     const { result } = renderMachine({
-      config: cfg([{ id: 'a' }, { id: 'b', guard: () => true }, { id: 'c', guard: () => cOpen }]),
+      config: cfg([{ id: 'a' }, { id: 'b', isReachable: () => true }, { id: 'c', isReachable: () => cOpen }]),
     });
     // init lands on b (furthest reachable). Jump back to a.
     act(() => result.current.goToStep('a'));
@@ -117,7 +118,7 @@ describe('useWizardMachine — sequential guard-gated navigation', () => {
   });
 });
 
-describe('useWizardMachine — SEAM: terminal-position bubble vs guard-blocked hard stop', () => {
+describe('useWizardMachine — SEAM: terminal-position bubble vs isReachable-blocked hard stop', () => {
   it('a TERMINAL goNext DOES bubble to parent.goNext', () => {
     const parent = makeParent();
     const { result } = renderMachine({
@@ -128,15 +129,15 @@ describe('useWizardMachine — SEAM: terminal-position bubble vs guard-blocked h
     expect(parent.goNext).toHaveBeenCalledTimes(1);
   });
 
-  it('a guard-BLOCKED mid-flow goNext does NOT bubble to parent.goNext', () => {
+  it('an isReachable-BLOCKED mid-flow goNext does NOT bubble to parent.goNext', () => {
     const parent = makeParent();
     const { result } = renderMachine({
       // a is entry (reachable), b is gated out. init stays on a (not terminal).
-      config: cfg([{ id: 'a' }, { id: 'b', guard: () => false }]),
+      config: cfg([{ id: 'a' }, { id: 'b', isReachable: () => false }]),
       parentWizard: parent,
     });
     expect(result.current.current).toBe('a');
-    act(() => result.current.goNext()); // blocked by b's guard, a is NOT terminal
+    act(() => result.current.goNext()); // blocked by b's isReachable, a is NOT terminal
     expect(result.current.current).toBe('a');
     expect(parent.goNext).not.toHaveBeenCalled();
   });
@@ -144,7 +145,7 @@ describe('useWizardMachine — SEAM: terminal-position bubble vs guard-blocked h
   it('a FIRST-position goPrev bubbles to parent.goPrev; a mid-flow blocked goPrev does not', () => {
     const parent = makeParent();
     const { result } = renderMachine({
-      config: cfg([{ id: 'a' }, { id: 'b', guard: () => true }]),
+      config: cfg([{ id: 'a' }, { id: 'b', isReachable: () => true }]),
       parentWizard: parent,
     });
     // init walks to furthest reachable -> b. goPrev to a (positional).
@@ -160,7 +161,7 @@ describe('useWizardMachine — SEAM: terminal-position bubble vs guard-blocked h
 
 describe('useWizardMachine — first/last and reachability derivations', () => {
   it('isFirstStep agrees with goPrev (true exactly when goPrev cannot move within scope)', () => {
-    const { result } = renderMachine({ config: cfg([{ id: 'a' }, { id: 'b', guard: () => true }]) });
+    const { result } = renderMachine({ config: cfg([{ id: 'a' }, { id: 'b', isReachable: () => true }]) });
     // init -> b. Not first.
     expect(result.current.isFirstStep).toBe(false);
     act(() => result.current.goPrev()); // -> a
@@ -169,62 +170,81 @@ describe('useWizardMachine — first/last and reachability derivations', () => {
   });
 
   it('isLastStep is true exactly at the terminal slot', () => {
-    const { result } = renderMachine({ config: cfg([{ id: 'a' }, { id: 'b', guard: () => true }]) });
+    const { result } = renderMachine({ config: cfg([{ id: 'a' }, { id: 'b', isReachable: () => true }]) });
     // init -> b (terminal).
     expect(result.current.isLastStep).toBe(true);
     act(() => result.current.goPrev());
     expect(result.current.isLastStep).toBe(false);
   });
 
-  it('activeSteps.isReachable equals guardHolds(step) for each step', () => {
+  it('activeSteps.isReachable equals isStepReachable(step) for each step', () => {
     const open = () => true;
     const closed = () => false;
     const { result } = renderMachine({
-      config: cfg([{ id: 'a' }, { id: 'b', guard: open }, { id: 'c', guard: closed }]),
+      config: cfg([{ id: 'a' }, { id: 'b', isReachable: open }, { id: 'c', isReachable: closed }]),
     });
     const byId = Object.fromEntries(result.current.activeSteps.map(s => [s.id, s.isReachable]));
-    expect(byId.a).toBe(true); // no guard -> always reachable
+    expect(byId.a).toBe(true); // no isReachable -> always reachable
     expect(byId.b).toBe(true); // open
     expect(byId.c).toBe(false); // closed
   });
 
   it('activeSteps contains every descriptor in declaration order', () => {
     const { result } = renderMachine({
-      config: cfg([{ id: 'a' }, { id: 'b' }, { id: 'c', guard: () => true }]),
+      config: cfg([{ id: 'a' }, { id: 'b' }, { id: 'c', isReachable: () => true }]),
     });
     expect(result.current.activeSteps.map(s => s.id)).toEqual(['a', 'b', 'c']);
   });
 
   it('isCompleted is positional (steps before current in declaration order)', () => {
-    const { result } = renderMachine({ config: cfg([{ id: 'a' }, { id: 'b', guard: () => true }]) });
+    const { result } = renderMachine({ config: cfg([{ id: 'a' }, { id: 'b', isReachable: () => true }]) });
     // init -> b. a sits before b.
     const byId = Object.fromEntries(result.current.activeSteps.map(s => [s.id, s.isCompleted]));
     expect(byId.a).toBe(true);
     expect(byId.b).toBe(false);
   });
+
+  it('isComplete predicate overrides the positional default (position-independent completion)', () => {
+    // 'a' declares its work UNdone and 'c' declares it DONE — independent of where
+    // current sits. Seed on 'b' (the middle): positionally 'a' would read complete
+    // and 'c' incomplete, but the predicates flip both, proving `isComplete` wins.
+    const { result } = renderMachine({
+      config: cfg([
+        { id: 'a', isComplete: () => false },
+        { id: 'b', isReachable: () => true },
+        { id: 'c', isReachable: () => true, isComplete: () => true },
+      ]),
+      initialStepId: 'b',
+    });
+    expect(result.current.current).toBe('b');
+    const byId = Object.fromEntries(result.current.activeSteps.map(s => [s.id, s.isCompleted]));
+    expect(byId.a).toBe(false); // predicate overrides "before current" → not complete
+    expect(byId.b).toBe(false); // no predicate, positional: not before itself
+    expect(byId.c).toBe(true); // predicate overrides "after current" → complete
+  });
 });
 
 describe('useWizardMachine — deferred goNext (submit-then-advance race)', () => {
-  it('advances immediately when the next guard already holds (no defer)', () => {
+  it('advances immediately when the next isReachable already holds (no defer)', () => {
     const { result } = renderMachine({
-      config: cfg([{ id: 'a' }, { id: 'b', guard: () => true }]),
+      config: cfg([{ id: 'a' }, { id: 'b', isReachable: () => true }]),
       initialStepId: 'a',
     });
     expect(result.current.current).toBe('a');
     act(() => result.current.goNext());
-    // Guard held at call time → advanced in the same tick, nothing pending.
+    // isReachable held at call time → advanced in the same tick, nothing pending.
     expect(result.current.current).toBe('b');
   });
 
-  it('does NOT advance while the next guard is unmet, then advances once the guard updates between renders (deferred resolution)', () => {
+  it('does NOT advance while the next isReachable is unmet, then advances once it updates between renders (deferred resolution)', () => {
     // Models the create/submit → advance race: `goNext` fires while the next
-    // step's guard still reads false (React has not re-rendered with the fresh
-    // config yet). It must NOT no-op — it parks a pending advance and resolves it
-    // on a later render once the guard flips true.
+    // step's isReachable still reads false (React has not re-rendered with the
+    // fresh config yet). It must NOT no-op — it parks a pending advance and
+    // resolves it on a later render once isReachable flips true.
     let bOpen = false;
     const bGuard = () => bOpen;
     const { result, rerender } = renderMachine({
-      config: cfg([{ id: 'a' }, { id: 'b', guard: bGuard }]),
+      config: cfg([{ id: 'a' }, { id: 'b', isReachable: bGuard }]),
       initialStepId: 'a',
     });
     expect(result.current.current).toBe('a');
@@ -234,12 +254,12 @@ describe('useWizardMachine — deferred goNext (submit-then-advance race)', () =
     act(() => result.current.goNext());
     expect(result.current.current).toBe('a');
 
-    // The awaited mutation lands: b's guard now holds. A re-render with a fresh
-    // config object lets the render-phase resolver re-reduce NEXT and advance.
+    // The awaited mutation lands: b's isReachable now holds. A re-render with a
+    // fresh config object lets the render-phase resolver re-reduce NEXT and advance.
     bOpen = true;
     act(() => {
       rerender({
-        config: cfg([{ id: 'a' }, { id: 'b', guard: bGuard }]),
+        config: cfg([{ id: 'a' }, { id: 'b', isReachable: bGuard }]),
         parentWizard: null,
         initialStepId: 'a',
       });
@@ -247,34 +267,34 @@ describe('useWizardMachine — deferred goNext (submit-then-advance race)', () =
     expect(result.current.current).toBe('b');
   });
 
-  it('keeps a pending advance across an intermediate render where the guard is still unmet', () => {
+  it('keeps a pending advance across an intermediate render where isReachable is still unmet', () => {
     // The resolver must NOT clear a pending advance just because it could not
     // advance this render — clearing early would re-open the race. It stays
-    // pending until the guard finally holds.
+    // pending until isReachable finally holds.
     let bOpen = false;
     const bGuard = () => bOpen;
     const { result, rerender } = renderMachine({
-      config: cfg([{ id: 'a' }, { id: 'b', guard: bGuard }]),
+      config: cfg([{ id: 'a' }, { id: 'b', isReachable: bGuard }]),
       initialStepId: 'a',
     });
     act(() => result.current.goNext()); // defers, b still gated out
     expect(result.current.current).toBe('a');
 
-    // An unrelated re-render while b is STILL gated out: pending must survive.
+    // An unrelated re-render while b's isReachable is STILL false: pending must survive.
     act(() => {
       rerender({
-        config: cfg([{ id: 'a' }, { id: 'b', guard: bGuard }]),
+        config: cfg([{ id: 'a' }, { id: 'b', isReachable: bGuard }]),
         parentWizard: null,
         initialStepId: 'a',
       });
     });
     expect(result.current.current).toBe('a');
 
-    // Now the guard opens → the still-pending advance resolves.
+    // Now isReachable opens → the still-pending advance resolves.
     bOpen = true;
     act(() => {
       rerender({
-        config: cfg([{ id: 'a' }, { id: 'b', guard: bGuard }]),
+        config: cfg([{ id: 'a' }, { id: 'b', isReachable: bGuard }]),
         parentWizard: null,
         initialStepId: 'a',
       });
@@ -282,21 +302,21 @@ describe('useWizardMachine — deferred goNext (submit-then-advance race)', () =
     expect(result.current.current).toBe('b');
   });
 
-  it('abandons a pending advance when the user goPrev before it resolves', () => {
+  it('abandons a pending advance when the user goPrev before the isReachable resolves', () => {
     let bOpen = false;
     const bGuard = () => bOpen;
     const { result, rerender } = renderMachine({
       // Seed on b so there is room to step back to a, then defer forward from a.
-      config: cfg([{ id: 'a' }, { id: 'b', guard: bGuard }, { id: 'c', guard: () => false }]),
+      config: cfg([{ id: 'a' }, { id: 'b', isReachable: bGuard }, { id: 'c', isReachable: () => false }]),
       initialStepId: 'a',
     });
     expect(result.current.current).toBe('a');
 
-    // Open b so goNext lands on b; then defer the b→c advance (c gated out).
+    // Open b so goNext lands on b; then defer the b→c advance (c's isReachable is false).
     bOpen = true;
     act(() => {
       rerender({
-        config: cfg([{ id: 'a' }, { id: 'b', guard: bGuard }, { id: 'c', guard: () => false }]),
+        config: cfg([{ id: 'a' }, { id: 'b', isReachable: bGuard }, { id: 'c', isReachable: () => false }]),
         parentWizard: null,
         initialStepId: 'a',
       });
@@ -310,10 +330,10 @@ describe('useWizardMachine — deferred goNext (submit-then-advance race)', () =
     act(() => result.current.goPrev()); // b -> a
     expect(result.current.current).toBe('a');
 
-    // Even if c later opens, the abandoned pending must NOT yank the user forward.
+    // Even if c's isReachable later opens, the abandoned pending must NOT yank the user forward.
     act(() => {
       rerender({
-        config: cfg([{ id: 'a' }, { id: 'b', guard: bGuard }, { id: 'c', guard: () => true }]),
+        config: cfg([{ id: 'a' }, { id: 'b', isReachable: bGuard }, { id: 'c', isReachable: () => true }]),
         parentWizard: null,
         initialStepId: 'a',
       });
@@ -321,10 +341,10 @@ describe('useWizardMachine — deferred goNext (submit-then-advance race)', () =
     expect(result.current.current).toBe('a');
   });
 
-  it('abandons a pending advance when the user goToStep before it resolves', () => {
+  it('abandons a pending advance when the user goToStep before the isReachable resolves', () => {
     const { result } = renderMachine({
       // a entry, b gated out (defer target), c reachable for the jump.
-      config: cfg([{ id: 'a' }, { id: 'b', guard: () => false }, { id: 'c', guard: () => true }]),
+      config: cfg([{ id: 'a' }, { id: 'b', isReachable: () => false }, { id: 'c', isReachable: () => true }]),
       initialStepId: 'a',
     });
     expect(result.current.current).toBe('a');
@@ -337,13 +357,13 @@ describe('useWizardMachine — deferred goNext (submit-then-advance race)', () =
 
   it('a nested TERMINAL goNext bubbles and the PARENT defers, then resolves (configure→test case)', () => {
     // The nested SAML metadata step is terminal: its goNext bubbles to the
-    // parent. The parent's next guard (test) has not caught up to the just-
-    // resolved updateConnection yet, so the PARENT defers and resolves on its
-    // own next render.
+    // parent. The parent's next isReachable (test) has not caught up to the
+    // just-resolved updateConnection yet, so the PARENT defers and resolves on
+    // its own next render.
     let testOpen = false;
     const testGuard = () => testOpen;
     const { result: parent, rerender: rerenderParent } = renderMachine({
-      config: cfg([{ id: 'configure' }, { id: 'test', guard: testGuard }]),
+      config: cfg([{ id: 'configure' }, { id: 'test', isReachable: testGuard }]),
       initialStepId: 'configure',
     });
     expect(parent.current.current).toBe('configure');
@@ -359,12 +379,12 @@ describe('useWizardMachine — deferred goNext (submit-then-advance race)', () =
     act(() => nested.current.goNext());
     expect(parent.current.current).toBe('configure');
 
-    // The revalidate lands: `test` guard now holds. The parent's resolver
+    // The revalidate lands: `test` isReachable now holds. The parent's resolver
     // advances on its next render.
     testOpen = true;
     act(() => {
       rerenderParent({
-        config: cfg([{ id: 'configure' }, { id: 'test', guard: testGuard }]),
+        config: cfg([{ id: 'configure' }, { id: 'test', isReachable: testGuard }]),
         parentWizard: null,
         initialStepId: 'configure',
       });
@@ -374,27 +394,27 @@ describe('useWizardMachine — deferred goNext (submit-then-advance race)', () =
 
   it('the clamp and the deferred resolver coexist: a pending advance clears when the active step becomes unreachable', () => {
     // While a forward advance is pending, the connection backing the current step
-    // is deleted (its guard breaks). The clamp re-seats current to the furthest-
-    // reachable step; the deferred resolver then sees `pendingNextFrom !==
-    // state.current` and abandons the pending advance — no double-setState fight,
-    // no stale forward jump.
+    // is deleted (its isReachable breaks). The clamp re-seats current to the
+    // furthest-reachable step; the deferred resolver then sees `pendingNextFrom
+    // !== state.current` and abandons the pending advance — no double-setState
+    // fight, no stale forward jump.
     let bOpen = true;
     const bGuard = () => bOpen;
     const { result, rerender } = renderMachine({
       // Seed on b (furthest reachable); c gated out so a forward goNext defers.
-      config: cfg([{ id: 'a' }, { id: 'b', guard: bGuard }, { id: 'c', guard: () => false }]),
+      config: cfg([{ id: 'a' }, { id: 'b', isReachable: bGuard }, { id: 'c', isReachable: () => false }]),
     });
     expect(result.current.current).toBe('b');
 
     act(() => result.current.goNext()); // b -> c blocked → defers from b
     expect(result.current.current).toBe('b');
 
-    // b's guard breaks: the clamp re-seats to a, and the pending advance (parked
-    // at b) is abandoned because current no longer equals b.
+    // b's isReachable breaks: the clamp re-seats to a, and the pending advance
+    // (parked at b) is abandoned because current no longer equals b.
     bOpen = false;
     act(() => {
       rerender({
-        config: cfg([{ id: 'a' }, { id: 'b', guard: bGuard }, { id: 'c', guard: () => false }]),
+        config: cfg([{ id: 'a' }, { id: 'b', isReachable: bGuard }, { id: 'c', isReachable: () => false }]),
         parentWizard: null,
         initialStepId: undefined,
       });
@@ -404,7 +424,7 @@ describe('useWizardMachine — deferred goNext (submit-then-advance race)', () =
     // A further render does not resurrect the abandoned advance (c still gated).
     act(() => {
       rerender({
-        config: cfg([{ id: 'a' }, { id: 'b', guard: bGuard }, { id: 'c', guard: () => false }]),
+        config: cfg([{ id: 'a' }, { id: 'b', isReachable: bGuard }, { id: 'c', isReachable: () => false }]),
         parentWizard: null,
         initialStepId: undefined,
       });
@@ -413,23 +433,23 @@ describe('useWizardMachine — deferred goNext (submit-then-advance race)', () =
   });
 });
 
-describe('useWizardMachine — reachability clamp (self-correct on a broken guard)', () => {
-  it('re-seats to the furthest-reachable step when the active step guard breaks between renders', () => {
+describe('useWizardMachine — reachability clamp (self-correct on a broken isReachable)', () => {
+  it('re-seats to the furthest-reachable step when the active step isReachable breaks between renders', () => {
     // Start with c reachable; the machine seeds on c (furthest reachable).
     let cOpen = true;
     const open = () => cOpen;
-    const config = cfg([{ id: 'a' }, { id: 'b', guard: () => true }, { id: 'c', guard: open }]);
+    const config = cfg([{ id: 'a' }, { id: 'b', isReachable: () => true }, { id: 'c', isReachable: open }]);
     const { result, rerender } = renderMachine({ config });
     expect(result.current.current).toBe('c');
 
-    // The connection backing c is deleted: c's guard now breaks. Re-render with a
-    // fresh config object so the memo sees new descriptors. The machine notices
-    // its active step is impossible and re-seats to the furthest-reachable step
-    // (b — a + b still reachable, c gated out).
+    // The connection backing c is deleted: c's isReachable now breaks. Re-render
+    // with a fresh config object so the memo sees new descriptors. The machine
+    // notices its active step is impossible and re-seats to the furthest-reachable
+    // step (b — a + b still reachable, c gated out).
     cOpen = false;
     act(() => {
       rerender({
-        config: cfg([{ id: 'a' }, { id: 'b', guard: () => true }, { id: 'c', guard: open }]),
+        config: cfg([{ id: 'a' }, { id: 'b', isReachable: () => true }, { id: 'c', isReachable: open }]),
         parentWizard: null,
         initialStepId: undefined,
       });
@@ -437,18 +457,18 @@ describe('useWizardMachine — reachability clamp (self-correct on a broken guar
     expect(result.current.current).toBe('b');
   });
 
-  it('re-seats all the way to the entry step when every later guard breaks', () => {
+  it('re-seats all the way to the entry step when every later isReachable breaks', () => {
     let unlocked = true;
     const gate = () => unlocked;
     const { result, rerender } = renderMachine({
-      config: cfg([{ id: 'a' }, { id: 'b', guard: gate }, { id: 'c', guard: gate }]),
+      config: cfg([{ id: 'a' }, { id: 'b', isReachable: gate }, { id: 'c', isReachable: gate }]),
     });
     expect(result.current.current).toBe('c');
 
     unlocked = false;
     act(() => {
       rerender({
-        config: cfg([{ id: 'a' }, { id: 'b', guard: gate }, { id: 'c', guard: gate }]),
+        config: cfg([{ id: 'a' }, { id: 'b', isReachable: gate }, { id: 'c', isReachable: gate }]),
         parentWizard: null,
         initialStepId: undefined,
       });
@@ -458,19 +478,19 @@ describe('useWizardMachine — reachability clamp (self-correct on a broken guar
 
   it('re-seats to the furthest-reachable step when the active step id is no longer in the descriptors', () => {
     // Seed (validly) on 'c'. The step is then removed from the graph entirely, so
-    // `current` names no descriptor — an impossible position the guard check alone
-    // (which only fires when the descriptor EXISTS) would miss, dead-locking the
-    // machine. The widened clamp (`!currentDescriptor || !guardHolds`) catches the
-    // missing id and re-seats to the furthest-reachable surviving step (b).
+    // `current` names no descriptor — an impossible position the isReachable check
+    // alone (which only fires when the descriptor EXISTS) would miss, dead-locking
+    // the machine. The widened clamp (`!currentDescriptor || !isStepReachable`)
+    // catches the missing id and re-seats to the furthest-reachable surviving step (b).
     const { result, rerender } = renderMachine({
-      config: cfg([{ id: 'a' }, { id: 'b', guard: () => true }, { id: 'c', guard: () => true }]),
+      config: cfg([{ id: 'a' }, { id: 'b', isReachable: () => true }, { id: 'c', isReachable: () => true }]),
       initialStepId: 'c',
     });
     expect(result.current.current).toBe('c');
 
     act(() => {
       rerender({
-        config: cfg([{ id: 'a' }, { id: 'b', guard: () => true }]), // 'c' removed
+        config: cfg([{ id: 'a' }, { id: 'b', isReachable: () => true }]), // 'c' removed
         parentWizard: null,
         initialStepId: 'c',
       });
@@ -478,13 +498,13 @@ describe('useWizardMachine — reachability clamp (self-correct on a broken guar
     expect(result.current.current).toBe('b');
   });
 
-  it('does NOT move when a guard goes TRUE while the active step still holds (create-style change)', () => {
-    // Seed on a; b is gated out. Opening b later (a guard going TRUE) must not
-    // yank the user forward — a's guard still holds, so there is nothing to fix.
+  it('does NOT move when an isReachable goes TRUE while the active step still holds (create-style change)', () => {
+    // Seed on a; b is gated out. Opening b later (a isReachable going TRUE) must
+    // not yank the user forward — a's isReachable still holds, nothing to fix.
     let bOpen = false;
     const bGuard = () => bOpen;
     const { result, rerender } = renderMachine({
-      config: cfg([{ id: 'a' }, { id: 'b', guard: bGuard }]),
+      config: cfg([{ id: 'a' }, { id: 'b', isReachable: bGuard }]),
       initialStepId: 'a',
     });
     expect(result.current.current).toBe('a');
@@ -492,37 +512,37 @@ describe('useWizardMachine — reachability clamp (self-correct on a broken guar
     bOpen = true;
     act(() => {
       rerender({
-        config: cfg([{ id: 'a' }, { id: 'b', guard: bGuard }]),
+        config: cfg([{ id: 'a' }, { id: 'b', isReachable: bGuard }]),
         parentWizard: null,
         initialStepId: 'a',
       });
     });
-    // a still holds — no clamp. The user advances only via an explicit goNext.
+    // a's isReachable still holds — no clamp. The user advances only via an explicit goNext.
     expect(result.current.current).toBe('a');
   });
 
-  it('is a provably one-shot: the clamp re-seats to a guard-passing step and does not loop or re-fire', () => {
+  it('is a provably one-shot: the clamp re-seats to a reachable step and does not loop or re-fire', () => {
     let cOpen = true;
     const open = () => cOpen;
     const { result, rerender } = renderMachine({
-      config: cfg([{ id: 'a' }, { id: 'b', guard: () => true }, { id: 'c', guard: open }]),
+      config: cfg([{ id: 'a' }, { id: 'b', isReachable: () => true }, { id: 'c', isReachable: open }]),
     });
     expect(result.current.current).toBe('c');
 
     cOpen = false;
     act(() => {
       rerender({
-        config: cfg([{ id: 'a' }, { id: 'b', guard: () => true }, { id: 'c', guard: open }]),
+        config: cfg([{ id: 'a' }, { id: 'b', isReachable: () => true }, { id: 'c', isReachable: open }]),
         parentWizard: null,
         initialStepId: undefined,
       });
     });
-    // Lands on a guard-passing step (b). A subsequent render with the same broken
-    // config does NOT move it again — b's guard holds, so the clamp is inert.
+    // Lands on a reachable step (b). A subsequent render with the same broken
+    // config does NOT move it again — b's isReachable holds, so the clamp is inert.
     expect(result.current.current).toBe('b');
     act(() => {
       rerender({
-        config: cfg([{ id: 'a' }, { id: 'b', guard: () => true }, { id: 'c', guard: open }]),
+        config: cfg([{ id: 'a' }, { id: 'b', isReachable: () => true }, { id: 'c', isReachable: open }]),
         parentWizard: null,
         initialStepId: undefined,
       });
@@ -530,26 +550,29 @@ describe('useWizardMachine — reachability clamp (self-correct on a broken guar
     expect(result.current.current).toBe('b');
   });
 
-  it('does not clamp a nested wizard (isNested) even when its active guard breaks', () => {
-    // A nested machine is guard-less in practice, but the clamp is gated on
-    // !isNested regardless: a nested wizard never re-seats, it bubbles instead.
+  it('re-seats a nested wizard in place when its active isReachable breaks (does not bubble)', () => {
+    const parent = makeParent();
     let open = true;
     const gate = () => open;
     const { result, rerender } = renderMachine({
-      config: cfg([{ id: 'n0' }, { id: 'n1', guard: gate }]),
-      parentWizard: makeParent(),
+      config: cfg([{ id: 'n0' }, { id: 'n1', isReachable: gate }]),
+      parentWizard: parent,
     });
     expect(result.current.current).toBe('n1');
 
     open = false;
     act(() => {
       rerender({
-        config: cfg([{ id: 'n0' }, { id: 'n1', guard: gate }]),
-        parentWizard: makeParent(),
+        config: cfg([{ id: 'n0' }, { id: 'n1', isReachable: gate }]),
+        parentWizard: parent,
         initialStepId: undefined,
       });
     });
-    // Nested: no clamp. current stays put despite the broken guard.
-    expect(result.current.current).toBe('n1');
+    // Nested clamp: re-seats to the furthest LOCAL reachable step (n0), in place.
+    expect(result.current.current).toBe('n0');
+    // The re-seat is a local setState — it must NOT bubble to the parent.
+    expect(parent.goNext).not.toHaveBeenCalled();
+    expect(parent.goPrev).not.toHaveBeenCalled();
+    expect(parent.goToStep).not.toHaveBeenCalled();
   });
 });

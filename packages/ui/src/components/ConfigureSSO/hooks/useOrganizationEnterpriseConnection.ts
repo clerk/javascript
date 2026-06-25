@@ -228,8 +228,11 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
     };
 
     const changeProvider: EnterpriseConnectionMutations['changeProvider'] = async provider => {
-      // Currently it's not possible to change the provider of an existing connection,
-      // so we need to delete the existing connection and create a new one.
+      // FAPI can't switch an existing connection's provider in place, so for the MVP
+      // we delete the old connection and create a new one. This is intentionally
+      // non-atomic: if the create fails, the org is briefly left without a connection
+      // until the user retries. Recovery is by design — the next render revalidates
+      // the now-deleted connection away, so a retry is just a plain create.
       if (enterpriseConnection) {
         await deleteEnterpriseConnection(enterpriseConnection.id);
       }

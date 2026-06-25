@@ -209,9 +209,9 @@ export const esES: LocalizationResource = {
     subtotalRenewal: undefined,
     switchPlan: 'Cambiar a este plan',
     switchToAnnual: 'Cambiar a anual',
-    switchToAnnualWithAnnualPrice: 'Cambiar a anual {{currency}}{{price}} / año',
+    switchToAnnualWithAnnualPrice: 'Cambiar a anual {{price}} / año',
     switchToMonthly: 'Cambiar a mensual',
-    switchToMonthlyWithPrice: 'Cambiar a mensual {{currency}}{{price}} / mes',
+    switchToMonthlyWithPrice: 'Cambiar a mensual {{price}} / mes',
     totalDue: 'Total a pagar',
     totalDuePerPeriod: undefined,
     totalDueToday: 'Total a pagar hoy',
@@ -680,8 +680,8 @@ export const esES: LocalizationResource = {
         messageLabel: 'Tu correo electrónico usa {{domain}}. ¿Quieres añadirlo?',
       },
       formButtonPrimary__add: 'Añadir',
-      formFieldInputPlaceholder__domain: 'Escribe aquí tu dominio y haz clic en Añadir para empezar',
-      formFieldLabel__domain: 'Dominios',
+      formFieldInputPlaceholder__domain: 'Añadir dominio',
+      formFieldLabel__domain: 'Dominio',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1669,6 +1669,7 @@ export const esES: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       "La dirección de correo electrónico o el número de teléfono no está permitido para registrarse. Esto puede deberse al uso de '+', '=', '#' o '.' en tu dirección de correo electrónico, el uso de un dominio conectado a un servicio de correo electrónico temporal o la exclusión explícita. Si cree que se trata de un error, póngase en contacto con el soporte.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'Este es un dominio bloqueado, por favor usa otro.',
     organization_domain_common: 'Este es un dominio común, por favor usa otro.',
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -1745,6 +1746,9 @@ export const esES: LocalizationResource = {
     action__openUserMenu: 'Abrir menú de usuario',
     action__signOut: 'Cerrar sesión',
     action__signOutAll: 'Salir de todas las cuentas',
+    label__userButtonPopover: 'Panel de cuenta',
+    label__accountActions: 'Acciones de cuenta',
+    label__activeSessions: 'Sesiones activas',
   },
   userProfile: {
     apiKeysPage: {
