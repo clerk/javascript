@@ -2,4 +2,4 @@
 '@clerk/localizations': patch
 ---
 
-Fix Okta instructions wording to align with docs
+Fix Okta instructions in self-serve SSO flow such as updating the expressions on attribute statement step
