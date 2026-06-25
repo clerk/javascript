@@ -5,22 +5,10 @@ import { type NativeClientSnapshot, useNativeClientEvents } from '../useNativeCl
 
 const mocks = vi.hoisted(() => {
   return {
-    addListener: vi.fn(),
+    moduleAddListener: vi.fn(),
     nativeModule: {} as unknown,
     nativeListener: undefined as ((snapshot?: NativeClientSnapshot) => void) | undefined,
-    platform: {
-      OS: 'ios',
-    },
     remove: vi.fn(),
-  };
-});
-
-vi.mock('react-native', () => {
-  return {
-    DeviceEventEmitter: {
-      addListener: mocks.addListener,
-    },
-    Platform: mocks.platform,
   };
 });
 
@@ -35,12 +23,13 @@ vi.mock('../../utils/native-module', () => {
 
 describe('useNativeClientEvents', () => {
   beforeEach(() => {
-    mocks.nativeModule = {};
+    mocks.nativeModule = {
+      addListener: mocks.moduleAddListener,
+    };
     mocks.nativeListener = undefined;
-    mocks.platform.OS = 'ios';
     mocks.remove.mockReset();
-    mocks.addListener.mockReset();
-    mocks.addListener.mockImplementation((_eventName, listener) => {
+    mocks.moduleAddListener.mockReset();
+    mocks.moduleAddListener.mockImplementation((_eventName, listener) => {
       mocks.nativeListener = listener;
       return { remove: mocks.remove };
     });
@@ -53,7 +42,7 @@ describe('useNativeClientEvents', () => {
   test('stores native client change payloads', async () => {
     const { result, unmount } = renderHook(() => useNativeClientEvents());
 
-    expect(mocks.addListener).toHaveBeenCalledWith('clerkNativeClientChanged', expect.any(Function));
+    expect(mocks.moduleAddListener).toHaveBeenCalledWith('clerkNativeClientChanged', expect.any(Function));
 
     act(() => {
       mocks.nativeListener?.({
@@ -78,8 +67,7 @@ describe('useNativeClientEvents', () => {
     unmount();
   });
 
-  test('does not subscribe Android modules without React Native addListener', () => {
-    mocks.platform.OS = 'android';
+  test('does not subscribe modules without an Expo event emitter', () => {
     mocks.nativeModule = {
       configure: vi.fn(),
       getClientToken: vi.fn(),
@@ -90,7 +78,7 @@ describe('useNativeClientEvents', () => {
 
     const { unmount } = renderHook(() => useNativeClientEvents());
 
-    expect(mocks.addListener).not.toHaveBeenCalled();
+    expect(mocks.moduleAddListener).not.toHaveBeenCalled();
     expect(consoleError).not.toHaveBeenCalled();
 
     consoleError.mockRestore();

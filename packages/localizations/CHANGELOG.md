@@ -1,5 +1,19 @@
 # Change Log
 
+## 4.10.0
+
+### Minor Changes
+
+- Monetary amounts are now formatted using your application's locale. For example, with the locale set to `fr-FR`, a USD 1000 amount now renders as `1 000,00 $US`; previously, it rendered as `$1,000.00` regardless of your application's configured locale. ([#8918](https://github.com/clerk/javascript/pull/8918)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Fix Okta expression label for email attribute on the self-serve SSO flow ([#8985](https://github.com/clerk/javascript/pull/8985)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Update the SSO domains step copy across all supported languages: ([#8979](https://github.com/clerk/javascript/pull/8979)) by [@LauraBeatris](https://github.com/LauraBeatris)
+  - `organizationDomainsStep.formFieldLabel__domain` changed from the plural "Domains" to the singular "Domain".
+  - `organizationDomainsStep.formFieldInputPlaceholder__domain` changed to a shorter "Add domain".
+
 ## 4.9.3
 
 ### Patch Changes
