@@ -673,8 +673,8 @@ export const heIL: LocalizationResource = {
         messageLabel: 'האימייל שלך משתמש ב-{{domain}}. האם ברצונך להוסיף אותו?',
       },
       formButtonPrimary__add: 'הוסף',
-      formFieldInputPlaceholder__domain: 'הקלד את הדומיין שלך כאן ולחץ על הוסף כדי להתחיל',
-      formFieldLabel__domain: 'דומיינים',
+      formFieldInputPlaceholder__domain: 'הוסף דומיין',
+      formFieldLabel__domain: 'דומיין',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

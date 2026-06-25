@@ -38,6 +38,12 @@ jobs:
           - expo-sdk: 54
             platform: ios
             runner: blacksmith-6vcpu-macos-26
+          - expo-sdk: 55
+            platform: android
+            runner: blacksmith-8vcpu-ubuntu-2204
+          - expo-sdk: 55
+            platform: ios
+            runner: blacksmith-6vcpu-macos-26
           - expo-sdk: 56
             platform: android
             runner: blacksmith-8vcpu-ubuntu-2204
