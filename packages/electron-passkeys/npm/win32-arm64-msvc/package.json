@@ -1,6 +1,6 @@
 {
   "name": "@clerk/electron-passkeys-win32-arm64-msvc",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Native passkey support for Clerk's Electron SDK (Windows arm64)",
   "repository": {
     "type": "git",
