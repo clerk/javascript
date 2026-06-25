@@ -1,5 +1,18 @@
 # @clerk/ui
 
+## 1.22.0
+
+### Minor Changes
+
+- Monetary amounts are now formatted using your application's locale. For example, with the locale set to `fr-FR`, a USD 1000 amount now renders as `1 000,00 $US`; previously, it rendered as `$1,000.00` regardless of your application's configured locale. ([#8918](https://github.com/clerk/javascript/pull/8918)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Fix the `<ConfigureSSO />` wizard header on small screens: the back link now stacks above the step indicators and the step separators are hidden, so the steps no longer wrap onto a second line. ([#8984](https://github.com/clerk/javascript/pull/8984)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Updated dependencies [[`fd7b824`](https://github.com/clerk/javascript/commit/fd7b8247c8bc0d9c14bd470df8d5f6cf707eab59), [`af0eb3f`](https://github.com/clerk/javascript/commit/af0eb3f02cd1a3eca2c7dbc4df4d226f8d844213), [`8024cac`](https://github.com/clerk/javascript/commit/8024cac2fb34e46adc4f043f9fa32d5e3886cee9)]:
+  - @clerk/localizations@4.10.0
+
 ## 1.21.0
 
 ### Minor Changes
