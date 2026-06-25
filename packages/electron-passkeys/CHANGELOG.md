@@ -1,5 +1,11 @@
 # @clerk/electron-passkeys
 
+## 0.0.3
+
+### Patch Changes
+
+- Publish corrected native platform packages for Electron passkeys. ([#8989](https://github.com/clerk/javascript/pull/8989)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 0.0.2
 
 ### Patch Changes
