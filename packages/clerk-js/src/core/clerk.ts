@@ -138,7 +138,7 @@ import type {
   WaitlistResource,
   Web3Provider,
 } from '@clerk/shared/types';
-import type { ClerkUI } from '@clerk/shared/ui';
+import type { ClerkUI, ClerkUIConstructor } from '@clerk/shared/ui';
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
 import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
 import type { QueryClient } from '@tanstack/query-core';
@@ -549,18 +549,7 @@ export class Clerk implements ClerkInterface {
     this.#options = this.#initOptions(options);
     this.#oauthTransport = this.#options.__internal_oauthTransport ?? null;
 
-    // Initialize ClerkUI if it was provided
-    if (this.#options.ui?.ClerkUI) {
-      this.#clerkUI = Promise.resolve(this.#options.ui.ClerkUI).then(
-        ClerkUI =>
-          new ClerkUI(
-            () => this,
-            () => this.environment,
-            this.#options,
-            new ModuleManager(),
-          ),
-      );
-    }
+    this.#initClerkUI();
 
     // In development mode, if custom router options are provided, warn if both routerPush and routerReplace are not provided
     if (
@@ -635,6 +624,39 @@ export class Clerk implements ClerkInterface {
       // bubble up the error
       throw error;
     }
+  };
+
+  __internal_attachClerkUI = (
+    ClerkUI: ClerkUIConstructor | Promise<ClerkUIConstructor>,
+    options?: ClerkOptions,
+  ): void => {
+    if (this.#clerkUI) {
+      return;
+    }
+
+    const uiOptions = this.#initOptions({
+      ...this.#options,
+      ...options,
+      ui: { ...this.#options.ui, ...options?.ui, ClerkUI },
+    });
+
+    this.#initClerkUI(uiOptions);
+  };
+
+  #initClerkUI = (options = this.#options): void => {
+    if (this.#clerkUI || !options.ui?.ClerkUI) {
+      return;
+    }
+
+    this.#clerkUI = Promise.resolve(options.ui.ClerkUI).then(
+      ClerkUI =>
+        new ClerkUI(
+          () => this,
+          () => this.environment,
+          options,
+          new ModuleManager(),
+        ),
+    );
   };
 
   #isCombinedSignInOrUpFlow(): boolean {

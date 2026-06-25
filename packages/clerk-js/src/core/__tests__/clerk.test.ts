@@ -3106,6 +3106,63 @@ describe('Clerk singleton', () => {
       expect(mockClerkUICtor).toHaveBeenCalled();
     });
 
+    it('attaches ui.ClerkUI to an already loaded instance without refetching initial resources or mutating load options', async () => {
+      const mockControls = { mountComponent: vi.fn() };
+      const mockClerkUIInstance = {
+        ensureMounted: vi.fn().mockResolvedValue(mockControls),
+      };
+      const mockClerkUICtor = vi.fn(() => mockClerkUIInstance);
+      const nextRouterPush = vi.fn();
+      const appearance = { variables: { colorPrimary: 'red' } };
+
+      mockClientFetch.mockClear();
+      mockEnvironmentFetch.mockClear();
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+
+      expect(mockClientFetch).toHaveBeenCalledTimes(1);
+      expect(mockEnvironmentFetch).toHaveBeenCalledTimes(1);
+
+      sut.__internal_attachClerkUI(mockClerkUICtor, {
+        ...mockedLoadOptions,
+        routerPush: nextRouterPush,
+        appearance,
+        ui: { ClerkUI: mockClerkUICtor },
+      });
+      await Promise.resolve();
+
+      expect(mockClerkUICtor).toHaveBeenCalledTimes(1);
+      expect(mockClientFetch).toHaveBeenCalledTimes(1);
+      expect(mockEnvironmentFetch).toHaveBeenCalledTimes(1);
+      expect(mockClerkUICtor.mock.calls[0]?.[2]).toEqual(
+        expect.objectContaining({
+          appearance,
+          routerPush: nextRouterPush,
+        }),
+      );
+      expect(sut.__internal_getOption('appearance')).toBeUndefined();
+      expect(sut.__internal_getOption('routerPush')).toBe(mockedLoadOptions.routerPush);
+      expect(() => sut.mountUserButton(document.createElement('div'))).not.toThrow();
+    });
+
+    it('is a no-op when Clerk UI is already attached', async () => {
+      const firstCtor = vi.fn(() => ({}));
+      const secondCtor = vi.fn(() => ({}));
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load({ ...mockedLoadOptions, ui: { ClerkUI: firstCtor } });
+      await Promise.resolve();
+
+      expect(firstCtor).toHaveBeenCalledTimes(1);
+
+      sut.__internal_attachClerkUI(secondCtor, { ...mockedLoadOptions, ui: { ClerkUI: secondCtor } });
+      await Promise.resolve();
+
+      expect(firstCtor).toHaveBeenCalledTimes(1);
+      expect(secondCtor).not.toHaveBeenCalled();
+    });
+
     it('supports legacy clerkUICtor option for backwards compatibility', async () => {
       const mockClerkUIInstance = { mount: vi.fn() };
       const mockClerkUICtor = vi.fn(() => mockClerkUIInstance);
