@@ -1,5 +1,6 @@
 import { requireNativeView } from 'expo';
 import type { NativeSyntheticEvent, ViewProps } from 'react-native';
+import { Platform } from 'react-native';
 
 type AuthEvent = Readonly<{ type: string }>;
 
@@ -9,4 +10,7 @@ interface NativeProps extends ViewProps {
   onAuthEvent?: (event: NativeSyntheticEvent<AuthEvent>) => void;
 }
 
-export default requireNativeView<NativeProps>('ClerkAuthView');
+const NativeClerkAuthView =
+  Platform.OS === 'ios' || Platform.OS === 'android' ? requireNativeView<NativeProps>('ClerkAuthView') : null;
+
+export default NativeClerkAuthView;
