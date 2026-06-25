@@ -58,4 +58,39 @@ describe('EmailApi', () => {
     expect(response.status).toBe('queued');
     expect(response.deliveredByClerk).toBe(true);
   });
+
+  it('sends a transactional email addressed by userId', async () => {
+    server.use(
+      http.post(
+        'https://api.clerk.test/v1/email',
+        validateHeaders(async ({ request }) => {
+          const body = await request.json();
+          // The nested `userId` must be snake_cased to `user_id` on the wire.
+          expect(body).toEqual({
+            to: { user_id: 'user_123' },
+            from: { address: 'noreply@acme.com' },
+            subject: 'Hello',
+            html: '<p>hi</p>',
+          });
+          return HttpResponse.json({
+            ...mockEmail,
+            to_email_address: 'member@acme.com',
+            email_address_id: 'idn_123',
+            user_id: 'user_123',
+          });
+        }),
+      ),
+    );
+
+    const response = await apiClient.emails.create({
+      to: { userId: 'user_123' },
+      from: { address: 'noreply@acme.com' },
+      subject: 'Hello',
+      html: '<p>hi</p>',
+    });
+
+    expect(response.toEmailAddress).toBe('member@acme.com');
+    expect(response.emailAddressId).toBe('idn_123');
+    expect(response.userId).toBe('user_123');
+  });
 });
