@@ -206,9 +206,9 @@ export const zhTW: LocalizationResource = {
     subtotalRenewal: undefined,
     switchPlan: '切換到此方案',
     switchToAnnual: '切換到每年',
-    switchToAnnualWithAnnualPrice: '切換到每年 {{currency}}{{price}} / 年',
+    switchToAnnualWithAnnualPrice: '切換到每年 {{price}} / 年',
     switchToMonthly: '切換到每月',
-    switchToMonthlyWithPrice: '切換到每月 {{currency}}{{price}} / 月',
+    switchToMonthlyWithPrice: '切換到每月 {{price}} / 月',
     totalDue: '總逾期金額',
     totalDuePerPeriod: undefined,
     totalDueToday: '總逾期金額',
@@ -676,7 +676,7 @@ export const zhTW: LocalizationResource = {
         messageLabel: '您的電子郵件使用了 {{domain}}。是否要新增它？',
       },
       formButtonPrimary__add: '新增',
-      formFieldInputPlaceholder__domain: '在此輸入您的網域，然後點選新增即可開始',
+      formFieldInputPlaceholder__domain: '新增網域',
       formFieldLabel__domain: '網域',
       removeDomainDialog: {
         cancelButton: undefined,
@@ -1718,6 +1718,9 @@ export const zhTW: LocalizationResource = {
     action__openUserMenu: '開啟使用者選單',
     action__signOut: '登出',
     action__signOutAll: '登出所有帳戶',
+    label__userButtonPopover: '帳戶面板',
+    label__accountActions: '帳戶操作',
+    label__activeSessions: '活躍工作階段',
   },
   userProfile: {
     apiKeysPage: {

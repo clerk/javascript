@@ -38,6 +38,16 @@ const getFlushElements = (t: InternalTheme) => ({
       borderTopWidth: 0,
       padding: 0,
     },
+    '& [data-clerk-dev-mode-overlay]': {
+      display: 'none',
+    },
+    '& [data-clerk-dev-mode-notice]': {
+      alignSelf: 'center',
+      marginBottom: `calc(${t.space.$2} * -1)`,
+      marginInline: 'auto',
+      padding: 0,
+      textAlign: 'center',
+    },
   },
 });
 

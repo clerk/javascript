@@ -674,8 +674,8 @@ export const esUY: LocalizationResource = {
         messageLabel: 'Tu correo electrónico usa {{domain}}. ¿Querés agregarlo?',
       },
       formButtonPrimary__add: 'Agregar',
-      formFieldInputPlaceholder__domain: 'Escribí aquí tu dominio y hacé clic en Agregar para empezar',
-      formFieldLabel__domain: 'Dominios',
+      formFieldInputPlaceholder__domain: 'Agregar dominio',
+      formFieldLabel__domain: 'Dominio',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1747,6 +1747,9 @@ export const esUY: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Cerrar sesión',
     action__signOutAll: 'Cerrar sesión en todas las cuentas',
+    label__userButtonPopover: 'Panel de cuenta',
+    label__accountActions: 'Acciones de cuenta',
+    label__activeSessions: 'Sesiones activas',
   },
   userProfile: {
     apiKeysPage: {

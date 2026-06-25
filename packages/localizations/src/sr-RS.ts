@@ -674,8 +674,8 @@ export const srRS: LocalizationResource = {
         messageLabel: 'Vaša e-pošta koristi {{domain}}. Želite li da ga dodate?',
       },
       formButtonPrimary__add: 'Dodaj',
-      formFieldInputPlaceholder__domain: 'Ovde unesite svoj domen i kliknite na dodaj da biste počeli',
-      formFieldLabel__domain: 'Domeni',
+      formFieldInputPlaceholder__domain: 'Dodaj domen',
+      formFieldLabel__domain: 'Domen',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1732,6 +1732,9 @@ export const srRS: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Odjavi se',
     action__signOutAll: 'Odjavi se sa svih naloga',
+    label__userButtonPopover: 'Панел налога',
+    label__accountActions: 'Акције налога',
+    label__activeSessions: 'Активне сесије',
   },
   userProfile: {
     apiKeysPage: {

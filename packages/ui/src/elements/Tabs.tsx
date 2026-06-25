@@ -172,7 +172,7 @@ export const Tab = (props: TabProps) => {
           borderRadius: 0,
           padding: `${t.space.$2x5} ${t.space.$0x25}`,
           width: 'fit-content',
-          '&:hover, :focus': { backgroundColor: t.colors.$transparent, boxShadow: 'none' },
+          '&:hover, &:focus-visible': { backgroundColor: t.colors.$transparent, boxShadow: 'none' },
         }),
         sx,
       ]}

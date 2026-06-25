@@ -675,8 +675,8 @@ export const bgBG: LocalizationResource = {
         messageLabel: 'Вашият имейл използва {{domain}}. Искате ли да го добавите?',
       },
       formButtonPrimary__add: 'Добави',
-      formFieldInputPlaceholder__domain: 'Въведете домейна си тук и щракнете върху добавяне, за да започнете',
-      formFieldLabel__domain: 'Домейни',
+      formFieldInputPlaceholder__domain: 'Добавяне на домейн',
+      formFieldLabel__domain: 'Домейн',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1733,6 +1733,9 @@ export const bgBG: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Изход',
     action__signOutAll: 'Изход от всички акаунти',
+    label__userButtonPopover: 'Панел на акаунта',
+    label__accountActions: 'Действия с акаунта',
+    label__activeSessions: 'Активни сесии',
   },
   userProfile: {
     apiKeysPage: {

@@ -207,9 +207,9 @@ export const csCZ: LocalizationResource = {
     subtotalRenewal: undefined,
     switchPlan: 'Přepnout na tento plán',
     switchToAnnual: 'Přepnout na roční',
-    switchToAnnualWithAnnualPrice: 'Přepnout na roční {{currency}}{{price}} / rok',
+    switchToAnnualWithAnnualPrice: 'Přepnout na roční {{price}} / rok',
     switchToMonthly: 'Přepnout na měsíční',
-    switchToMonthlyWithPrice: 'Přepnout na měsíční {{currency}}{{price}} / měsíc',
+    switchToMonthlyWithPrice: 'Přepnout na měsíční {{price}} / měsíc',
     totalDue: 'Celkem k zaplacení',
     totalDuePerPeriod: undefined,
     totalDueToday: 'Celkem k zaplacení dnes',
@@ -678,8 +678,8 @@ export const csCZ: LocalizationResource = {
         messageLabel: 'Váš e-mail používá {{domain}}. Chcete jej přidat?',
       },
       formButtonPrimary__add: 'Přidat',
-      formFieldInputPlaceholder__domain: 'Zde zadejte svou doménu a kliknutím na přidat začněte',
-      formFieldLabel__domain: 'Domény',
+      formFieldInputPlaceholder__domain: 'Přidat doménu',
+      formFieldLabel__domain: 'Doména',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1745,6 +1745,9 @@ export const csCZ: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Odhlásit se',
     action__signOutAll: 'Odhlásit se ze všech účtů',
+    label__userButtonPopover: 'Panel účtu',
+    label__accountActions: 'Akce účtu',
+    label__activeSessions: 'Aktivní relace',
   },
   userProfile: {
     apiKeysPage: {

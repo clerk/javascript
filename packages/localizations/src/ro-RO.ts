@@ -209,9 +209,9 @@ export const roRO: LocalizationResource = {
     subtotalRenewal: undefined,
     switchPlan: 'Schimbă pe acest plan',
     switchToAnnual: 'Treci la anual',
-    switchToAnnualWithAnnualPrice: 'Treci la anual {{currency}}{{price}} / an',
+    switchToAnnualWithAnnualPrice: 'Treci la anual {{price}} / an',
     switchToMonthly: 'Treci la lunar',
-    switchToMonthlyWithPrice: 'Treci la lunar {{currency}}{{price}} / lună',
+    switchToMonthlyWithPrice: 'Treci la lunar {{price}} / lună',
     totalDue: 'Total de plată',
     totalDuePerPeriod: undefined,
     totalDueToday: 'Total de plată astăzi',
@@ -680,8 +680,8 @@ export const roRO: LocalizationResource = {
         messageLabel: 'E-mailul tău folosește {{domain}}. Vrei să-l adaugi?',
       },
       formButtonPrimary__add: 'Adaugă',
-      formFieldInputPlaceholder__domain: 'Scrie aici domeniul tău și fă clic pe adaugă pentru a începe',
-      formFieldLabel__domain: 'Domenii',
+      formFieldInputPlaceholder__domain: 'Adaugă domeniu',
+      formFieldLabel__domain: 'Domeniu',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1753,6 +1753,9 @@ export const roRO: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Deconectează-te',
     action__signOutAll: 'Deconectează toate conturile',
+    label__userButtonPopover: 'Panoul contului',
+    label__accountActions: 'Acțiuni cont',
+    label__activeSessions: 'Sesiuni active',
   },
   userProfile: {
     apiKeysPage: {

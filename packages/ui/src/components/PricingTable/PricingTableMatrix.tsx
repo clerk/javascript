@@ -47,7 +47,7 @@ export function PricingTableMatrix({
   const segmentedControlId = `${pricingTableMatrixId}-segmented-control`;
 
   const { buttonPropsForPlan } = usePlansContext();
-  const { t } = useLocalizations();
+  const { t, $ } = useLocalizations();
 
   const feePeriodNoticeAnimation: ThemableCssProp = t => ({
     transition: isMotionSafe
@@ -239,8 +239,7 @@ export function PricingTableMatrix({
                               variant='h2'
                               colorScheme='body'
                             >
-                              {planFee.currencySymbol}
-                              {planFee.amountFormatted}
+                              {$(planFee)}
                             </Text>
                             <Text
                               elementDescriptor={descriptors.pricingTableMatrixFeePeriod}
