@@ -579,7 +579,7 @@ export const enUS: LocalizationResource = {
         createAppStep: {
           completeSamlIntegrationInstructions: {
             step1:
-              'From the  <bold>Feedback**</bold>, select <bold>This is an internal app that we have created.</bold>',
+              'From the <bold>Feedback**</bold>, select <bold>This is an internal app that we have created.</bold>',
             step2: 'Click <bold>Finish</bold> to complete the integration.',
             title: 'Complete the SAML integration',
           },
