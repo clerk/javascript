@@ -7,19 +7,59 @@ import type * as WebBrowser from 'expo-web-browser';
 import { errorThrower } from '../utils/errors';
 import { createHostedAuth, type FapiHostedAuthMode } from '../utils/hostedAuth';
 
+/**
+ * Controls which Account Portal auth screen opens for hosted auth.
+ */
 export type HostedAuthMode = 'sign-in' | 'sign-up';
 
+/**
+ * Options for starting hosted auth from a native Expo application.
+ */
 export type StartHostedAuthParams = {
+  /**
+   * Native deep-link URL that Account Portal redirects to after auth completes.
+   * Defaults to `AuthSession.makeRedirectUri({ path: 'hosted-auth-callback', isTripleSlashed: true })`.
+   */
   redirectUrl?: string;
+  /**
+   * Initial hosted auth screen to open.
+   */
   mode?: HostedAuthMode;
+  /**
+   * Optional opaque state value used to bind the browser callback to this auth attempt.
+   * A cryptographically random value is generated when omitted.
+   */
   state?: string;
-  authSessionOptions?: Pick<WebBrowser.AuthSessionOpenOptions, 'showInRecents'>;
+  /**
+   * Options forwarded to `expo-web-browser` when opening the hosted auth session.
+   */
+  authSessionOptions?: {
+    showInRecents?: boolean;
+  };
 };
 
+/**
+ * Result returned after a hosted auth attempt finishes.
+ */
 export type StartHostedAuthReturnType = {
+  /**
+   * The session activated in the native SDK, or `null` when auth did not complete.
+   */
   createdSessionId: string | null;
-  authSessionResult: WebBrowser.WebBrowserAuthSessionResult | null;
-  client?: ClientResource;
+  /**
+   * Result returned by the hosted browser session, or `null` when Clerk was not loaded.
+   */
+  authSessionResult: {
+    type: string;
+    url?: string | null;
+  } | null;
+  /**
+   * The current Clerk client after hosted auth completes.
+   */
+  client?: {
+    id?: string;
+    lastActiveSessionId: string | null;
+  };
 };
 
 type HostedAuthPKCE = {
@@ -27,7 +67,12 @@ type HostedAuthPKCE = {
   codeChallenge: string;
 };
 
-export function useHostedAuth() {
+/**
+ * Returns helpers for authenticating native Expo users through Clerk's hosted Account Portal.
+ */
+export function useHostedAuth(): {
+  startHostedAuth: (params?: StartHostedAuthParams) => Promise<StartHostedAuthReturnType>;
+} {
   const clerk = useClerk();
 
   async function startHostedAuth(params: StartHostedAuthParams = {}): Promise<StartHostedAuthReturnType> {
@@ -198,9 +243,9 @@ function callbackUrlMatchesRedirectUrl(callbackUrl: URL, redirectUrl: string): b
     return false;
   }
 
-  if (expectedUrl.host && callbackUrl.host !== expectedUrl.host) {
+  if (callbackUrl.host !== expectedUrl.host) {
     return false;
   }
 
-  return !expectedUrl.pathname || callbackUrl.pathname === expectedUrl.pathname;
+  return callbackUrl.pathname === expectedUrl.pathname;
 }

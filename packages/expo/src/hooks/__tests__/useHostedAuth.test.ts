@@ -293,6 +293,20 @@ describe('useHostedAuth', () => {
     );
   });
 
+  test('rejects callback authority mismatches for triple-slashed redirect URLs', async () => {
+    mockHostedAuthResponse();
+    mocks.openAuthSessionAsync.mockResolvedValue({
+      type: 'success',
+      url: 'myapp://attacker/hosted-auth-callback?state=state-123',
+    });
+
+    const { result } = renderHook(() => useHostedAuth());
+
+    await expect(result.current.startHostedAuth({ state: 'state-123' })).rejects.toThrow(
+      'Hosted auth callback URL did not match the initiated redirect URL.',
+    );
+  });
+
   test('rejects invalid hosted auth responses', async () => {
     mockFapiRequest.mockResolvedValue({
       ok: true,
