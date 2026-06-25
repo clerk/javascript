@@ -47,7 +47,13 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
     setView('wizard');
   };
 
-  if (isLoading) {
+  // Gate the page-level loading overview to the overview view only. A wizard is
+  // only ever opened after the overview has settled (it gates on `isLoading`),
+  // so once `view === 'wizard'` the connection data is present and stays warm; a
+  // later `isLoading` flip (e.g. the test-runs query cold-loading after a
+  // configure write) must not tear the open wizard down and reseat it — each
+  // wizard step owns its own loading UI.
+  if (isLoading && view === 'overview') {
     return (
       <SecurityPageOverview fillHeight>
         <Flex

@@ -89,7 +89,6 @@ vi.mock('../../specs/NativeClerkModule', () => {
       addListener: vi.fn(),
       configure: mocks.configure,
       getClientToken: mocks.getClientToken,
-      removeListeners: vi.fn(),
       syncClientStateFromJs: mocks.syncClientStateFromJs,
     },
   };

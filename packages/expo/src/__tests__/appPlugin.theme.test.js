@@ -88,6 +88,25 @@ describe('validateThemeJson', () => {
     expect(() => validateThemeJson({ colors: { shadow: '#00000080' } })).not.toThrow();
   });
 
+  test('accepts secondary button color keys without warnings', () => {
+    const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    expect(() =>
+      validateThemeJson({
+        colors: {
+          secondaryButtonBackground: '#FFFFFF',
+          secondaryButtonForeground: '#111111',
+        },
+        darkColors: {
+          secondaryButtonBackground: '#111111',
+          secondaryButtonForeground: '#FFFFFF',
+        },
+      }),
+    ).not.toThrow();
+
+    expect(spy).not.toHaveBeenCalled();
+  });
+
   // --- unknown keys ---
 
   test('warns on unknown color keys but does not throw', () => {

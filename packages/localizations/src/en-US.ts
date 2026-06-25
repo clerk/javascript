@@ -198,9 +198,9 @@ export const enUS: LocalizationResource = {
     subtotalRenewal: 'Subtotal per period',
     switchPlan: 'Switch to this plan',
     switchToAnnual: 'Switch to annual',
-    switchToAnnualWithAnnualPrice: 'Switch to annual {{currency}}{{price}} / year',
+    switchToAnnualWithAnnualPrice: 'Switch to annual {{price}} / year',
     switchToMonthly: 'Switch to monthly',
-    switchToMonthlyWithPrice: 'Switch to monthly {{currency}}{{price}} / month',
+    switchToMonthlyWithPrice: 'Switch to monthly {{price}} / month',
     totalDue: 'Total due',
     totalDuePerPeriod: 'Total per period',
     totalDueToday: 'Total due today',
@@ -557,15 +557,15 @@ export const enUS: LocalizationResource = {
             },
             rows: {
               email: {
-                expression: 'user.email',
+                expression: 'user.profile.email',
                 name: 'mail',
               },
               firstName: {
-                expression: 'user.firstName',
+                expression: 'user.profile.firstName',
                 name: 'firstName',
               },
               lastName: {
-                expression: 'user.lastName',
+                expression: 'user.profile.lastName',
                 name: 'lastName',
               },
             },
@@ -578,7 +578,7 @@ export const enUS: LocalizationResource = {
         },
         createAppStep: {
           completeSamlIntegrationInstructions: {
-            step1: 'From the options menu, select <bold>This is an internal app that we have created.</bold>',
+            step1: 'From the <bold>Feedback</bold>, select <bold>This is an internal app that we have created.</bold>',
             step2: 'Click <bold>Finish</bold> to complete the integration.',
             title: 'Complete the SAML integration',
           },
@@ -608,7 +608,7 @@ export const enUS: LocalizationResource = {
         identityProviderMetadataStep: {
           headerSubtitle: 'Add your Okta application metadata',
           manual: {
-            description: 'In your Okta SAML application, go to the Sign On tab and retrieve these values.',
+            description: 'In your Okta SAML application, go to the <bold>Sign On</bold> tab and retrieve these values.',
             issuer: {
               label: 'Issuer',
               placeholder: 'Paste URL here...',
@@ -627,7 +627,7 @@ export const enUS: LocalizationResource = {
           },
           metadataUrl: {
             description:
-              'In your Okta SAML application, go to the Sign On tab and retrieve the metadata URL. Paste it below.',
+              'In your Okta SAML application, go to the <bold>Sign On</bold> tab and retrieve the metadata URL. Paste it below.',
             label: 'Metadata URL',
             placeholder: 'Paste URL here...',
           },
@@ -649,8 +649,12 @@ export const enUS: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        badge__expired: 'Expired',
         badge__unverified: 'Unverified',
         badge__verified: 'Verified',
+        expiredAtLabel:
+          "Domain verification expired on {{ date | shortDate('en-US') }}. Verify again to generate a new DNS record.",
+        expiredLabel: 'Domain verification expired. Verify again to generate a new DNS record.',
         removeButtonTooltip__lastVerifiedDomain: 'At least one verified domain is required to set up SSO.',
         removeButtonTooltip__lastVerifiedDomainActive: 'At least one verified domain is required to keep SSO enabled.',
         txtRecord: {
@@ -660,6 +664,7 @@ export const enUS: LocalizationResource = {
           valueLabel: 'Value',
         },
         verifiedAtLabel: "Verified on {{ date | shortDate('en-US') }}",
+        verifyAgainButton: 'Verify again',
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Add {{domain}}',

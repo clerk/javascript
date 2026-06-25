@@ -6,7 +6,17 @@ import { LineItems } from '@/ui/elements/LineItems';
 import { formatDate } from '@/ui/utils/formatDate';
 
 import { useCheckoutContext } from '../../contexts';
-import { Box, Button, descriptors, Heading, localizationKeys, Span, Text, useAppearance } from '../../customizables';
+import {
+  Box,
+  Button,
+  descriptors,
+  Heading,
+  localizationKeys,
+  Span,
+  Text,
+  useAppearance,
+  useLocalizations,
+} from '../../customizables';
 import { transitionDurationValues, transitionTiming } from '../../foundations/transitions';
 import { usePrefersReducedMotion } from '../../hooks';
 import { useRouter } from '../../router';
@@ -164,6 +174,7 @@ export const CheckoutComplete = () => {
   const { checkout } = useCheckout();
   const { totals, paymentMethod, planPeriodStart, freeTrialEndsAt } = checkout;
   const [mousePosition, setMousePosition] = useState({ x: 256, y: 256 });
+  const { $ } = useLocalizations();
 
   const prefersReducedMotion = usePrefersReducedMotion();
   const { animations: layoutAnimations } = useAppearance().parsedOptions;
@@ -420,9 +431,7 @@ export const CheckoutComplete = () => {
           {totals.totalDueNow ? (
             <LineItems.Group variant='secondary'>
               <LineItems.Title title={localizationKeys('billing.checkout.lineItems.title__totalPaid')} />
-              <LineItems.Description
-                text={`${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`}
-              />
+              <LineItems.Description text={$(totals.totalDueNow)} />
             </LineItems.Group>
           ) : null}
 

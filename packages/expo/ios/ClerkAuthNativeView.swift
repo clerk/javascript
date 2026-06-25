@@ -1,4 +1,4 @@
-import React
+import ExpoModulesCore
 import UIKit
 
 public class ClerkAuthNativeView: ClerkNativeViewHost {
@@ -6,28 +6,24 @@ public class ClerkAuthNativeView: ClerkNativeViewHost {
   private var currentDismissible: Bool = true
   private var didSendDismiss = false
 
-  @objc var onAuthEvent: RCTBubblingEventBlock?
+  let onAuthEvent = EventDispatcher()
 
-  @objc var mode: NSString? {
-    didSet {
-      let newMode = (mode as String?) ?? "signInOrUp"
-      guard newMode != currentMode else { return }
-      currentMode = newMode
-      setNeedsHostedViewUpdate()
-    }
+  func setMode(_ mode: String?) {
+    let newMode = mode ?? "signInOrUp"
+    guard newMode != currentMode else { return }
+    currentMode = newMode
+    setNeedsHostedViewUpdate()
   }
 
-  @objc var isDismissible: NSNumber? {
-    didSet {
-      let newDismissible = isDismissible?.boolValue ?? true
-      guard newDismissible != currentDismissible else { return }
-      currentDismissible = newDismissible
-      setNeedsHostedViewUpdate()
-    }
+  func setDismissible(_ isDismissible: Bool?) {
+    let newDismissible = isDismissible ?? true
+    guard newDismissible != currentDismissible else { return }
+    currentDismissible = newDismissible
+    setNeedsHostedViewUpdate()
   }
 
   private func sendAuthEvent(type: ClerkNativeViewEvent) {
-    onAuthEvent?(["type": type.rawValue])
+    onAuthEvent(["type": type.rawValue])
   }
 
   private func sendDismissIfNeeded() {
@@ -58,14 +54,20 @@ public class ClerkAuthNativeView: ClerkNativeViewHost {
   }
 }
 
-@objc(ClerkAuthViewManager)
-class ClerkAuthViewManager: RCTViewManager {
+public class ClerkAuthViewModule: Module {
+  public func definition() -> ModuleDefinition {
+    Name("ClerkAuthView")
 
-  override static func requiresMainQueueSetup() -> Bool {
-    return true
-  }
+    View(ClerkAuthNativeView.self) {
+      Events("onAuthEvent")
 
-  override func view() -> UIView! {
-    return ClerkAuthNativeView()
+      Prop("mode") { (view: ClerkAuthNativeView, mode: String?) in
+        view.setMode(mode)
+      }
+
+      Prop("isDismissible") { (view: ClerkAuthNativeView, isDismissible: Bool?) in
+        view.setDismissible(isDismissible)
+      }
+    }
   }
 }

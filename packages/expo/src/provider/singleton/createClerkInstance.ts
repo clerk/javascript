@@ -20,7 +20,8 @@ import {
 import { MemoryTokenCache } from '../../cache/MemoryTokenCache';
 import { CLERK_CLIENT_JWT_KEY } from '../../constants';
 import { errorThrower } from '../../errorThrower';
-import { assertValidProxyUrl, isNative } from '../../utils';
+import { assertValidProxyUrl } from '../../utils/errors';
+import { isNative } from '../../utils/runtime';
 import type { BuildClerkOptions } from './types';
 
 /**

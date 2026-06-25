@@ -1,5 +1,40 @@
 # Change Log
 
+## 3.6.1
+
+### Patch Changes
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.0.30` to `1.0.31`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.0.31. ([#8996](https://github.com/clerk/javascript/pull/8996)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Allow Expo native theme JSON to configure secondary button background and foreground colors for native SSO buttons. ([#8997](https://github.com/clerk/javascript/pull/8997)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`19ce04a`](https://github.com/clerk/javascript/commit/19ce04aab6387c430dc41e51c6130a88cc543cc8), [`2492043`](https://github.com/clerk/javascript/commit/24920437b0c61c4852be830d5495e53ae956e37d)]:
+  - @clerk/clerk-js@6.22.0
+  - @clerk/shared@4.22.0
+  - @clerk/react@6.11.1
+
+## 3.6.0
+
+### Minor Changes
+
+- Align the iOS native Clerk module and native views with Android by registering them through Expo Modules. ([#8976](https://github.com/clerk/javascript/pull/8976)) by [@mikepitre](https://github.com/mikepitre)
+
+### Patch Changes
+
+- Add a development warning and API docs note that native Google Sign-In will require installing `@clerk/expo-google-signin` in the next major version. ([#8991](https://github.com/clerk/javascript/pull/8991)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 3.5.4
+
+### Patch Changes
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.0.28` to `1.0.30`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.0.30. ([#8954](https://github.com/clerk/javascript/pull/8954)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Bump the bundled `clerk-ios` SDK from `1.2.4` to `1.2.5`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.2.5. ([#8978](https://github.com/clerk/javascript/pull/8978)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies [[`59f7327`](https://github.com/clerk/javascript/commit/59f73279ecb1b4e61eded0c68aa951211dd0db40)]:
+  - @clerk/clerk-js@6.21.1
+  - @clerk/react@6.11.0
+
 ## 3.5.3
 
 ### Patch Changes

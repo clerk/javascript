@@ -3,7 +3,7 @@ import type { PropsWithChildren } from 'react';
 import React from 'react';
 
 import { Button, descriptors, Flex, useLocalizations } from '../customizables';
-import type { PropsOfComponent } from '../styledSystem';
+import { common, type PropsOfComponent } from '../styledSystem';
 import { getValidChildren } from '../utils/getValidReactChildren';
 
 type TabsContextValue = {
@@ -173,6 +173,9 @@ export const Tab = (props: TabProps) => {
           padding: `${t.space.$2x5} ${t.space.$0x25}`,
           width: 'fit-content',
           '&:hover, &:focus-visible': { backgroundColor: t.colors.$transparent, boxShadow: 'none' },
+          '&:focus-visible': {
+            ...common.focusRing(t),
+          },
         }),
         sx,
       ]}
