@@ -224,18 +224,15 @@ describe('Client Singleton', () => {
       codeVerifier: 'verifier_123',
     });
 
-    expect(fetchSpy).toHaveBeenCalledWith(
-      {
-        method: 'POST',
-        path: '/client',
-        body: {
-          _method: 'GET',
-          rotatingTokenNonce: 'nonce_123',
-          codeVerifier: 'verifier_123',
-        },
+    expect(fetchSpy).toHaveBeenCalledWith({
+      method: 'POST',
+      path: '/client',
+      body: {
+        _method: 'GET',
+        rotatingTokenNonce: 'nonce_123',
+        codeVerifier: 'verifier_123',
       },
-      { forceUpdateClient: true },
-    );
+    });
     expect(client.lastActiveSessionId).toBe('session_1');
   });
 
