@@ -2,18 +2,10 @@
 
 import { $, argv, echo } from 'zx';
 
-import {
-  constants,
-  getChangesetIgnoredPackages,
-  getPackageNames,
-  isElectronPasskeysPackage,
-  pinWorkspaceDeps,
-} from './common.mjs';
+import { constants, getChangesetIgnoredPackages, getPackageNames, pinWorkspaceDeps } from './common.mjs';
 
 const ignoredPackages = await getChangesetIgnoredPackages();
-const packageNames = (await getPackageNames()).filter(
-  name => !ignoredPackages.has(name) && !isElectronPasskeysPackage(name),
-);
+const packageNames = (await getPackageNames()).filter(name => !ignoredPackages.has(name));
 const packageEntries = packageNames.map(name => `'${name}': patch`).join('\n');
 
 const snapshot = `---
