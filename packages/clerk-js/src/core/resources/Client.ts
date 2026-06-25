@@ -78,6 +78,15 @@ export class Client extends BaseResource implements ClientResource {
     return this._baseGet({ fetchMaxTries });
   }
 
+  /**
+   * Reloads the current client from FAPI.
+   *
+   * By default this uses the standard GET reload path. When redeeming a
+   * PKCE-bound rotating token nonce, callers must pass both
+   * `rotatingTokenNonce` and `codeVerifier`; that path sends the verifier in the
+   * request body via a POST override so the PKCE secret is not serialized into
+   * the URL.
+   */
   public async reload(params?: ClerkResourceReloadParams): Promise<this> {
     if (!params?.rotatingTokenNonce || !params.codeVerifier) {
       return super.reload(params);
