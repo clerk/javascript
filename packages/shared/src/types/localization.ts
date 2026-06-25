@@ -1390,7 +1390,11 @@ export type __internal_LocalizationResource = {
       domainCard: {
         badge__verified: LocalizationValue;
         badge__unverified: LocalizationValue;
+        badge__expired: LocalizationValue;
         verifiedAtLabel: LocalizationValue<'date'>;
+        expiredAtLabel: LocalizationValue<'date'>;
+        expiredLabel: LocalizationValue;
+        verifyAgainButton: LocalizationValue;
         removeButtonTooltip__lastVerifiedDomain: LocalizationValue;
         removeButtonTooltip__lastVerifiedDomainActive: LocalizationValue;
         txtRecord: {
