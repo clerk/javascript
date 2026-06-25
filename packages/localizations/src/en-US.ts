@@ -198,9 +198,9 @@ export const enUS: LocalizationResource = {
     subtotalRenewal: 'Subtotal per period',
     switchPlan: 'Switch to this plan',
     switchToAnnual: 'Switch to annual',
-    switchToAnnualWithAnnualPrice: 'Switch to annual {{currency}}{{price}} / year',
+    switchToAnnualWithAnnualPrice: 'Switch to annual {{price}} / year',
     switchToMonthly: 'Switch to monthly',
-    switchToMonthlyWithPrice: 'Switch to monthly {{currency}}{{price}} / month',
+    switchToMonthlyWithPrice: 'Switch to monthly {{price}} / month',
     totalDue: 'Total due',
     totalDuePerPeriod: 'Total per period',
     totalDueToday: 'Total due today',
@@ -279,7 +279,7 @@ export const enUS: LocalizationResource = {
               label: 'Assertion consumer service (ACS) URL',
             },
             spEntityId: {
-              label: 'Service provider entity ID',
+              label: 'Entity ID',
             },
           },
         },
@@ -557,7 +557,7 @@ export const enUS: LocalizationResource = {
             },
             rows: {
               email: {
-                expression: 'user.mail',
+                expression: 'user.email',
                 name: 'mail',
               },
               firstName: {
@@ -667,7 +667,7 @@ export const enUS: LocalizationResource = {
       },
       formButtonPrimary__add: 'Add',
       formFieldInputPlaceholder__domain: 'Type your domain here and click add to start',
-      formFieldLabel__domain: 'Domains',
+      formFieldLabel__domain: 'Domain',
       removeDomainDialog: {
         cancelButton: 'Cancel',
         removeButton: 'Remove domain',

@@ -673,8 +673,8 @@ export const enGB: LocalizationResource = {
         messageLabel: 'Your email uses {{domain}}. Do you want to add it?',
       },
       formButtonPrimary__add: 'Add',
-      formFieldInputPlaceholder__domain: 'Type your domain here and click add to start',
-      formFieldLabel__domain: 'Domains',
+      formFieldInputPlaceholder__domain: 'Add domain',
+      formFieldLabel__domain: 'Domain',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
