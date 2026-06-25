@@ -649,8 +649,12 @@ export const enUS: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        badge__expired: 'Expired',
         badge__unverified: 'Unverified',
         badge__verified: 'Verified',
+        expiredAtLabel:
+          "Domain verification expired on {{ date | shortDate('en-US') }}. Verify again to generate a new DNS record.",
+        expiredLabel: 'Domain verification expired. Verify again to generate a new DNS record.',
         removeButtonTooltip__lastVerifiedDomain: 'At least one verified domain is required to set up SSO.',
         removeButtonTooltip__lastVerifiedDomainActive: 'At least one verified domain is required to keep SSO enabled.',
         txtRecord: {
@@ -660,6 +664,7 @@ export const enUS: LocalizationResource = {
           valueLabel: 'Value',
         },
         verifiedAtLabel: "Verified on {{ date | shortDate('en-US') }}",
+        verifyAgainButton: 'Verify again',
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Add {{domain}}',
