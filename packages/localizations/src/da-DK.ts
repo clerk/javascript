@@ -673,8 +673,8 @@ export const daDK: LocalizationResource = {
         messageLabel: 'Din e-mail bruger {{domain}}. Vil du tilføje det?',
       },
       formButtonPrimary__add: 'Tilføj',
-      formFieldInputPlaceholder__domain: 'Skriv dit domæne her, og klik på tilføj for at starte',
-      formFieldLabel__domain: 'Domæner',
+      formFieldInputPlaceholder__domain: 'Tilføj domæne',
+      formFieldLabel__domain: 'Domæne',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1730,6 +1730,9 @@ export const daDK: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Log ud',
     action__signOutAll: 'Log ud af alle konti',
+    label__userButtonPopover: 'Kontopanel',
+    label__accountActions: 'Kontohandlinger',
+    label__activeSessions: 'Aktive sessioner',
   },
   userProfile: {
     apiKeysPage: {

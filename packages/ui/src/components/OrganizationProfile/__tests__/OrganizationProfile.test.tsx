@@ -2,10 +2,11 @@ import type { CustomPage } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { cleanup, render, screen, waitFor } from '@/test/utils';
+import { render, screen, waitFor } from '@/test/utils';
+import { VirtualRouter } from '@/ui/router';
 
-import { OrganizationProfile } from '../';
-import { OrganizationSecurityPage } from '../OrganizationSecurityPage';
+import { OrganizationProfile } from '..';
+import { OrganizationProfileRoutes } from '../OrganizationProfileRoutes';
 
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 
@@ -538,8 +539,8 @@ describe('OrganizationProfile', () => {
       await waitFor(() => expect(queryByText('Security')).toBeNull());
     });
 
-    it('includes SSO even when the user does not have the manage enterprise connections permission, but the page surfaces a warning', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
+    it('does not include SSO when the user lacks the manage enterprise connections permission', async () => {
+      const { wrapper } = await createFixtures(f => {
         f.withEnterpriseSso({ selfServeSSO: true });
         f.withOrganizations();
         f.withUser({
@@ -554,17 +555,56 @@ describe('OrganizationProfile', () => {
         });
       });
 
-      fixtures.clerk.user?.getEnterpriseConnections.mockResolvedValue([]);
+      const { queryByText } = render(<OrganizationProfile />, { wrapper });
+      expect(queryByText('Security')).not.toBeInTheDocument();
+    });
+  });
 
-      render(<OrganizationProfile />, { wrapper });
-      expect(await screen.findByText('Security')).toBeDefined();
+  describe('SSO route guard', () => {
+    const SECURITY_DESCRIPTION =
+      'Require members with a matching email domain to sign in through your identity provider.';
 
-      cleanup();
-      render(<OrganizationSecurityPage />, { wrapper });
-      expect(await screen.findByText(/you do not have permission to manage single sign-on/i)).toBeDefined();
-      expect(
-        screen.queryByText(/contact your organization.*administrator to upgrade your permissions/i),
-      ).toBeInTheDocument();
+    // The navbar tests above only prove the link is hidden. This block exercises the
+    // route guard wrapping the security route, so direct navigation is blocked too.
+    // The shared fixture wrapper installs a mocked RouteContext that never matches a
+    // path, so the guarded sub-route only mounts under a real router seeded to its path.
+    const renderSecurityRoute = (wrapper: React.ComponentType<{ children?: React.ReactNode }>) =>
+      render(
+        <VirtualRouter startPath='/organization-security'>
+          <OrganizationProfileRoutes contentRef={{ current: null }} />
+        </VirtualRouter>,
+        { wrapper },
+      );
+
+    const withSelfServeSSO = (permissions: string[]) => (f: Parameters<Parameters<typeof createFixtures>[0]>[0]) => {
+      f.withEnterpriseSso({ selfServeSSO: true });
+      f.withEmailAddress();
+      f.withOrganizations();
+      f.withOrganizationDomains(undefined, 'org:member');
+      f.withUser({
+        email_addresses: ['test@clerk.com'],
+        organization_memberships: [{ name: 'Org1', self_serve_sso_enabled: true, permissions }],
+      });
+    };
+
+    it('renders the security page on the guarded route when the user can manage enterprise connections', async () => {
+      const { wrapper, fixtures } = await createFixtures(withSelfServeSSO(['org:sys_entconns:manage']));
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
+
+      renderSecurityRoute(wrapper);
+
+      expect(await screen.findByText(SECURITY_DESCRIPTION)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Start configuration' })).toBeInTheDocument();
+    });
+
+    it('blocks the security page on the guarded route when the user lacks the manage enterprise connections permission', async () => {
+      const { wrapper, fixtures } = await createFixtures(withSelfServeSSO([]));
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
+
+      renderSecurityRoute(wrapper);
+
+      await waitFor(() => expect(screen.queryByText(SECURITY_DESCRIPTION)).not.toBeInTheDocument());
+      expect(screen.queryByRole('button', { name: 'Start configuration' })).not.toBeInTheDocument();
     });
   });
 

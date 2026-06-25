@@ -209,9 +209,9 @@ export const deDE: LocalizationResource = {
     subtotalRenewal: undefined,
     switchPlan: 'Zu diesem Plan wechseln',
     switchToAnnual: 'Wechsel zu jährlich',
-    switchToAnnualWithAnnualPrice: 'Auf jährlich wechseln {{currency}}{{price}} / Jahr',
+    switchToAnnualWithAnnualPrice: 'Auf jährlich wechseln {{price}} / Jahr',
     switchToMonthly: 'Wechsel zu monatlich',
-    switchToMonthlyWithPrice: 'Auf monatlich wechseln {{currency}}{{price}} / Monat',
+    switchToMonthlyWithPrice: 'Auf monatlich wechseln {{price}} / Monat',
     totalDue: 'Gesamtbetrag',
     totalDuePerPeriod: undefined,
     totalDueToday: 'Heute fällig',
@@ -680,8 +680,8 @@ export const deDE: LocalizationResource = {
         messageLabel: 'Ihre E-Mail verwendet {{domain}}. Möchten Sie sie hinzufügen?',
       },
       formButtonPrimary__add: 'Hinzufügen',
-      formFieldInputPlaceholder__domain: 'Geben Sie hier Ihre Domain ein und klicken Sie zum Starten auf „Hinzufügen"',
-      formFieldLabel__domain: 'Domains',
+      formFieldInputPlaceholder__domain: 'Domain hinzufügen',
+      formFieldLabel__domain: 'Domain',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1766,6 +1766,9 @@ export const deDE: LocalizationResource = {
     action__openUserMenu: 'Benutzermenü öffnen',
     action__signOut: 'Abmelden',
     action__signOutAll: 'Melden Sie sich von allen Konten ab',
+    label__userButtonPopover: 'Kontopanel',
+    label__accountActions: 'Kontoaktionen',
+    label__activeSessions: 'Aktive Sitzungen',
   },
   userProfile: {
     apiKeysPage: {

@@ -674,8 +674,8 @@ export const kkKZ: LocalizationResource = {
         messageLabel: 'Электрондық поштаңыз {{domain}} пайдаланады. Оны қосқыңыз келе ме?',
       },
       formButtonPrimary__add: 'Қосу',
-      formFieldInputPlaceholder__domain: 'Доменіңізді осы жерге енгізіп, бастау үшін «Қосу» түймесін басыңыз',
-      formFieldLabel__domain: 'Домендер',
+      formFieldInputPlaceholder__domain: 'Домен қосу',
+      formFieldLabel__domain: 'Домен',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1723,6 +1723,9 @@ export const kkKZ: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Шығу',
     action__signOutAll: 'Барлық есептік жазбалардан шығу',
+    label__userButtonPopover: 'Есептік жазба тақтасы',
+    label__accountActions: 'Есептік жазба әрекеттері',
+    label__activeSessions: 'Белсенді сессиялар',
   },
   userProfile: {
     apiKeysPage: {

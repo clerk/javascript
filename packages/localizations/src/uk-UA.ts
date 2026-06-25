@@ -674,8 +674,8 @@ export const ukUA: LocalizationResource = {
         messageLabel: 'Ваша електронна пошта використовує {{domain}}. Бажаєте додати його?',
       },
       formButtonPrimary__add: 'Додати',
-      formFieldInputPlaceholder__domain: 'Введіть свій домен тут і натисніть «Додати», щоб почати',
-      formFieldLabel__domain: 'Домени',
+      formFieldInputPlaceholder__domain: 'Додати домен',
+      formFieldLabel__domain: 'Домен',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1731,6 +1731,9 @@ export const ukUA: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Вийти',
     action__signOutAll: 'Вийти з усіх акаунтів',
+    label__userButtonPopover: 'Панель облікового запису',
+    label__accountActions: 'Дії облікового запису',
+    label__activeSessions: 'Активні сеанси',
   },
   userProfile: {
     apiKeysPage: {

@@ -211,9 +211,9 @@ export const frFR: LocalizationResource = {
     subtotalRenewal: undefined,
     switchPlan: 'Changer de plan',
     switchToAnnual: "Passer à l'annuel",
-    switchToAnnualWithAnnualPrice: 'Passer à l’annuel {{currency}}{{price}} / an',
+    switchToAnnualWithAnnualPrice: 'Passer à l’annuel {{price}} / an',
     switchToMonthly: 'Passer au mensuel',
-    switchToMonthlyWithPrice: 'Passer au mensuel {{currency}}{{price}} / mois',
+    switchToMonthlyWithPrice: 'Passer au mensuel {{price}} / mois',
     totalDue: 'Total dû',
     totalDuePerPeriod: undefined,
     totalDueToday: "Total dû aujourd'hui",
@@ -682,8 +682,8 @@ export const frFR: LocalizationResource = {
         messageLabel: 'Votre e-mail utilise {{domain}}. Voulez-vous l’ajouter ?',
       },
       formButtonPrimary__add: 'Ajouter',
-      formFieldInputPlaceholder__domain: 'Saisissez votre domaine ici et cliquez sur Ajouter pour commencer',
-      formFieldLabel__domain: 'Domaines',
+      formFieldInputPlaceholder__domain: 'Ajouter un domaine',
+      formFieldLabel__domain: 'Domaine',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1756,6 +1756,9 @@ export const frFR: LocalizationResource = {
     action__openUserMenu: 'Ouvrir le menu utilisateur',
     action__signOut: 'Déconnexion',
     action__signOutAll: 'Se déconnecter de tous les comptes',
+    label__userButtonPopover: 'Panneau du compte',
+    label__accountActions: 'Actions du compte',
+    label__activeSessions: 'Sessions actives',
   },
   userProfile: {
     apiKeysPage: {

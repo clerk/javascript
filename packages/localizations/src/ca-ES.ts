@@ -210,9 +210,9 @@ export const caES: LocalizationResource = {
     subtotalRenewal: undefined,
     switchPlan: 'Canviar a aquest pla',
     switchToAnnual: 'Canviar a anual',
-    switchToAnnualWithAnnualPrice: 'Canviar a anual {{currency}}{{price}} / any',
+    switchToAnnualWithAnnualPrice: 'Canviar a anual {{price}} / any',
     switchToMonthly: 'Canviar a mensual',
-    switchToMonthlyWithPrice: 'Canviar a mensual {{currency}}{{price}} / mes',
+    switchToMonthlyWithPrice: 'Canviar a mensual {{price}} / mes',
     totalDue: 'Total a pagar',
     totalDuePerPeriod: undefined,
     totalDueToday: 'Total a pagar avui',
@@ -681,8 +681,8 @@ export const caES: LocalizationResource = {
         messageLabel: 'El teu correu electrònic utilitza {{domain}}. Vols afegir-lo?',
       },
       formButtonPrimary__add: 'Afegeix',
-      formFieldInputPlaceholder__domain: 'Escriu aquí el teu domini i fes clic a Afegeix per començar',
-      formFieldLabel__domain: 'Dominis',
+      formFieldInputPlaceholder__domain: 'Afegeix un domini',
+      formFieldLabel__domain: 'Domini',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1747,6 +1747,9 @@ export const caES: LocalizationResource = {
     action__openUserMenu: "Obre el menú d'usuari",
     action__signOut: 'Tanca sessió',
     action__signOutAll: 'Tanca sessió de tots els comptes',
+    label__userButtonPopover: 'Tauler del compte',
+    label__accountActions: 'Accions del compte',
+    label__activeSessions: 'Sessions actives',
   },
   userProfile: {
     apiKeysPage: {

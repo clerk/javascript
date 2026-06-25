@@ -209,9 +209,9 @@ export const hiIN: LocalizationResource = {
     subtotalRenewal: undefined,
     switchPlan: 'इस योजना पर स्विच करें',
     switchToAnnual: 'वार्षिक पर स्विच करें',
-    switchToAnnualWithAnnualPrice: 'वार्षिक पर स्विच करें {{currency}}{{price}} / वर्ष',
+    switchToAnnualWithAnnualPrice: 'वार्षिक पर स्विच करें {{price}} / वर्ष',
     switchToMonthly: 'मासिक पर स्विच करें',
-    switchToMonthlyWithPrice: 'मासिक पर स्विच करें {{currency}}{{price}} / माह',
+    switchToMonthlyWithPrice: 'मासिक पर स्विच करें {{price}} / माह',
     totalDue: 'कुल देय',
     totalDuePerPeriod: undefined,
     totalDueToday: 'आज का कुल देय',
@@ -680,7 +680,7 @@ export const hiIN: LocalizationResource = {
         messageLabel: 'आपका ईमेल {{domain}} का उपयोग करता है। क्या आप इसे जोड़ना चाहते हैं?',
       },
       formButtonPrimary__add: 'जोड़ें',
-      formFieldInputPlaceholder__domain: 'अपना डोमेन यहाँ टाइप करें और शुरू करने के लिए जोड़ें पर क्लिक करें',
+      formFieldInputPlaceholder__domain: 'डोमेन जोड़ें',
       formFieldLabel__domain: 'डोमेन',
       removeDomainDialog: {
         cancelButton: undefined,
@@ -1760,6 +1760,9 @@ export const hiIN: LocalizationResource = {
     action__openUserMenu: 'उपयोगकर्ता मेनू खोलें',
     action__signOut: 'साइन आउट',
     action__signOutAll: 'सभी खातों से साइन आउट करें',
+    label__userButtonPopover: 'खाता पैनल',
+    label__accountActions: 'खाता क्रियाएं',
+    label__activeSessions: 'सक्रिय सत्र',
   },
   userProfile: {
     apiKeysPage: {
