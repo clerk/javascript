@@ -45,14 +45,18 @@ const makeDataTransfer = (files: File[] = [], types: string[] = ['Files']) =>
 
 const findFileInput = (container: HTMLElement) => {
   const input = container.querySelector<HTMLInputElement>('input[type="file"]');
-  if (!input) throw new Error('Could not find hidden file input');
+  if (!input) {
+    throw new Error('Could not find hidden file input');
+  }
   return input;
 };
 
 const findDropZone = (container: HTMLElement) => {
   // The outer Flex registered with the drop handlers is the file input's next sibling.
   const sibling = findFileInput(container).nextElementSibling;
-  if (!sibling) throw new Error('Could not find drop zone element');
+  if (!sibling) {
+    throw new Error('Could not find drop zone element');
+  }
   return sibling as HTMLElement;
 };
 
@@ -169,6 +173,25 @@ describe('AvatarUploader', () => {
       await user.click(getByRole('button', { name: /^remove$/i }));
 
       await waitFor(() => expect(onAvatarRemove).toHaveBeenCalledTimes(1));
+    });
+
+    it('re-enables buttons after remove completes', async () => {
+      const user = userEvent.setup();
+      const { wrapper } = await createFixtures();
+      const onAvatarRemove = vi.fn();
+      const { getByRole } = render(
+        <Harness
+          onAvatarChange={vi.fn().mockResolvedValue(undefined)}
+          onAvatarRemove={onAvatarRemove}
+        />,
+        { wrapper },
+      );
+
+      await user.click(getByRole('button', { name: /^remove$/i }));
+
+      await waitFor(() => expect(onAvatarRemove).toHaveBeenCalledTimes(1));
+      expect(getByRole('button', { name: /^remove$/i })).not.toBeDisabled();
+      expect(getByRole('button', { name: /upload/i })).not.toBeDisabled();
     });
   });
 });

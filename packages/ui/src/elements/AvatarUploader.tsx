@@ -20,6 +20,7 @@ export type AvatarUploaderProps = {
   onAvatarChange: (file: File) => Promise<unknown>;
   onAvatarRemove?: (() => void) | null;
   avatarPreviewPlaceholder?: React.ReactElement | null;
+  rounded?: boolean;
 };
 
 const fileToBase64 = (file: File): Promise<string> => {
@@ -45,7 +46,15 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const openDialog = () => inputRef.current?.click();
 
-  const { onAvatarChange, onAvatarRemove, title, avatarPreview, avatarPreviewPlaceholder, ...rest } = props;
+  const {
+    onAvatarChange,
+    onAvatarRemove,
+    title,
+    avatarPreview,
+    avatarPreviewPlaceholder,
+    rounded = true,
+    ...rest
+  } = props;
 
   const handleFileDrop = (file: File | null) => {
     if (file === null) {
@@ -64,6 +73,7 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
   const handleRemove = async () => {
     card.setLoading();
     await handleFileDrop(null);
+    card.setIdle();
     return onAvatarRemove?.();
   };
 
@@ -105,6 +115,8 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
 
   const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
     // Only reset when leaving the container entirely, not when moving between children.
+    // SAFETY: e.relatedTarget is typed as EventTarget | null, but in drag events it is always
+    // a DOM Node (or null). Element.contains() requires Node | null; the cast is safe here.
     if (e.currentTarget.contains(e.relatedTarget as Node | null)) {
       return;
     }
@@ -141,26 +153,23 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
       />
 
       <Flex
+        {...rest}
         gap={4}
         align='center'
         onDragEnter={handleDragEnter}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
-        {...rest}
       >
         <Flex
           sx={t => ({
-            borderRadius: t.radii.$md,
+            borderRadius: isDraggingOver && rounded ? t.radii.$circle : t.radii.$md,
             transitionProperty: t.transitionProperty.$common,
             transitionDuration: t.transitionDuration.$controls,
             transitionTimingFunction: t.transitionTiming.$common,
             ...(isDraggingOver && {
               outline: `${t.borderWidths.$normal} dashed ${t.colors.$primary500}`,
               outlineOffset: t.space.$0x5,
-              '&:has([data-rounded="true"])': {
-                borderRadius: t.radii.$circle,
-              },
             }),
           })}
         >
