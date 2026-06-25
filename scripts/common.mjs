@@ -34,10 +34,6 @@ export async function getPackageNames() {
   return packageNames.sort();
 }
 
-export function isElectronPasskeysPackage(name) {
-  return name === '@clerk/electron-passkeys' || name.startsWith('@clerk/electron-passkeys-');
-}
-
 /**
  * Converts `workspace:^` to `workspace:*` for all @clerk/* dependencies.
  * This ensures that snapshot/canary releases use exact versions instead of
