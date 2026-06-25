@@ -87,25 +87,20 @@ export class Client extends BaseResource implements ClientResource {
    * request body via a POST override so the PKCE secret is not serialized into
    * the URL.
    */
-  public async reload(params?: ClerkResourceReloadParams): Promise<this> {
-    if (!params?.rotatingTokenNonce || !params.codeVerifier) {
+  public reload(params?: ClerkResourceReloadParams): Promise<this> {
+    const { rotatingTokenNonce, codeVerifier } = params || {};
+
+    if (!rotatingTokenNonce || !codeVerifier) {
       return super.reload(params);
     }
 
-    const json = await Client._fetch<ClientJSON>(
-      {
-        method: 'POST',
-        path: this.path(),
-        body: {
-          _method: 'GET',
-          rotatingTokenNonce: params.rotatingTokenNonce,
-          codeVerifier: params.codeVerifier,
-        } as any,
-      },
-      { forceUpdateClient: true },
-    );
-
-    return this.fromJSON((json?.response || json) as ClientJSON | null);
+    return this._basePost<ClientJSON>({
+      body: {
+        _method: 'GET',
+        rotatingTokenNonce,
+        codeVerifier,
+      } as any,
+    });
   }
 
   async destroy(): Promise<void> {
