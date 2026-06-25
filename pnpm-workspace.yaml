@@ -1,5 +1,6 @@
 packages:
   - packages/*
+  - packages/electron-passkeys/npm/*
 
 catalogs:
   peer-react:
@@ -11,20 +12,22 @@ catalogs:
     react: 18.3.1
     react-dom: 18.3.1
   repo:
+    '@floating-ui/react': 0.27.12
     '@swc/helpers': 0.5.21
     '@tanstack/query-core': ^5.100.6
     core-js: 3.47.0
-    rolldown: 1.0.0-beta.47
-    tsdown: 0.15.7
+    rolldown: 1.1.0
+    tsdown: 0.22.2
     tslib: 2.8.1
     tsup: 8.5.1
-    typescript: 5.8.3
+    typescript: 6.0.3
     vue: 3.5.33
     zx: 8.8.5
   rspack:
-    '@rspack/cli': 1.7.11
-    '@rspack/core': 1.7.11
-    '@rspack/plugin-react-refresh': 1.6.2
+    '@rspack/cli': 2.0.6
+    '@rspack/core': 2.0.6
+    '@rspack/dev-server': 2.0.3
+    '@rspack/plugin-react-refresh': 2.0.1
   module-manager:
     '@base-org/account': 2.0.1
     '@coinbase/wallet-sdk': 4.3.7
@@ -40,13 +43,14 @@ minimumReleaseAgeExclude:
   - '@clerk/*'
   - 'pkglab'
   - 'pkglab-*'
-  # CVE-2026-23869: React Server Components DoS
-  - 'next@15.5.15'
-  - '@next/*'
   # Renovate security update: @modelcontextprotocol/sdk@1.26.0
   - '@modelcontextprotocol/sdk@1.26.0'
   # Renovate security update: esbuild@0.25.0
   - esbuild@0.25.0
+  # Renovate security update: astro@6.1.6
+  - astro@6.1.6
+  # Renovate security update: vite@6.4.2
+  - vite@6.4.2
 
 trustPolicy: no-downgrade
 trustPolicyExclude:
@@ -64,6 +68,8 @@ trustPolicyExclude:
   - 'undici@5.29.0 || 6.22.0'
   # Same idea, their 2.x publish process is more "trustworthy"
   - 'ua-parser-js@1.0.41'
+  # Same idea, the newer publish has weaker trust metadata than an older release.
+  - 'tinyclip@0.1.13'
   # Same idea, their 10.x publish process is more "trustworthy"
   - '@octokit/endpoint@9.0.6'
   # They experimented with provenance for some earlier versions

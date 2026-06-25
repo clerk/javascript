@@ -1,14 +1,15 @@
 import type {
   __internal_CheckoutProps,
-  OAuthConsentProps,
   __internal_PlanDetailsProps,
   __internal_SubscriptionDetailsProps,
   __internal_UserVerificationProps,
   APIKeysProps,
   ClerkAppearanceTheme,
+  ConfigureSSOProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
   NewSubscriptionRedirectUrl,
+  OAuthConsentProps,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
@@ -64,6 +65,7 @@ export type AvailableComponentProps =
   | __internal_SubscriptionDetailsProps
   | __internal_PlanDetailsProps
   | APIKeysProps
+  | ConfigureSSOProps
   | OAuthConsentProps
   | TaskChooseOrganizationProps
   | TaskResetPasswordProps
@@ -145,6 +147,11 @@ export type APIKeysCtx = APIKeysProps & {
   mode?: ComponentMode;
 };
 
+export type ConfigureSSOCtx = ConfigureSSOProps & {
+  componentName: 'ConfigureSSO';
+  mode?: ComponentMode;
+};
+
 export type CheckoutCtx = __internal_CheckoutProps & {
   componentName: 'Checkout';
 } & NewSubscriptionRedirectUrl;
@@ -218,11 +225,6 @@ export type OAuthConsentCtx = {
    * Customize the appearance of the component.
    */
   appearance?: ClerkAppearanceTheme;
-  /**
-   * When true, renders the organization picker and submits organization_id
-   * with the consent form. Internal use only, not exposed in the public prop type.
-   */
-  enableOrgSelection?: boolean;
 };
 
 export type SubscriptionDetailsCtx = __internal_SubscriptionDetailsProps & {
@@ -249,6 +251,7 @@ export type AvailableComponentCtx =
   | PricingTableCtx
   | CheckoutCtx
   | APIKeysCtx
+  | ConfigureSSOCtx
   | OAuthConsentCtx
   | SubscriptionDetailsCtx
   | PlanDetailsCtx

@@ -24,4 +24,4 @@ export {
   __resetClerkQueryClientForTest,
   __setClerkQueryClientForTest,
   getClerkQueryClient,
-} from './clerk-rq/clerk-query-client';
+} from './query/clerk-query-client';

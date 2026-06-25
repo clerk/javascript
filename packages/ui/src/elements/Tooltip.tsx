@@ -190,8 +190,9 @@ const Content = React.forwardRef<
   React.HTMLProps<HTMLDivElement> & {
     text: string | LocalizationKey;
     sx?: ThemableCssProp;
+    textSx?: ThemableCssProp;
   }
->(function TooltipContent({ style, text, sx, ...props }, propRef) {
+>(function TooltipContent({ style, text, sx, textSx, ...props }, propRef) {
   const context = useTooltipContext();
   const ref = useMergeRefs([context.refs.setFloating, propRef]);
   const portalRoot = usePortalRoot();
@@ -232,6 +233,7 @@ const Content = React.forwardRef<
             localizationKey={text}
             variant='body'
             colorScheme='inherit'
+            sx={textSx}
           />
         </Box>
       </Box>

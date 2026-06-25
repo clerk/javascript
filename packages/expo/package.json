@@ -1,6 +1,6 @@
 {
   "name": "@clerk/expo",
-  "version": "3.2.7",
+  "version": "3.5.3",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -101,10 +101,10 @@
     "app.plugin.d.ts"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "tsdown",
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
-    "dev": "tsup --watch",
+    "dev": "tsdown --watch",
     "dev:pub": "pnpm dev -- --env.publish",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
@@ -124,19 +124,19 @@
     "@clerk/expo-passkeys": "workspace:*",
     "@expo/config-plugins": "^54.0.4",
     "@types/base-64": "^1.0.2",
-    "esbuild": "^0.25.0",
+    "esbuild": "^0.28.0",
     "expo-apple-authentication": "^7.2.4",
-    "expo-auth-session": "^5.4.0",
-    "expo-constants": "^18.0.0",
-    "expo-crypto": "^15.0.7",
+    "expo-auth-session": "^5.5.2",
+    "expo-constants": "^18.0.13",
+    "expo-crypto": "^15.0.9",
     "expo-local-authentication": "^13.8.0",
     "expo-secure-store": "^12.8.1",
     "expo-web-browser": "^12.8.2",
-    "react-native": "^0.81.4"
+    "react-native": "^0.85.2"
   },
   "peerDependencies": {
     "@clerk/expo-passkeys": ">=0.0.6",
-    "expo": ">=53 <56",
+    "expo": ">=53 <57",
     "expo-apple-authentication": ">=7.0.0",
     "expo-auth-session": ">=5",
     "expo-constants": ">=12",
@@ -146,7 +146,7 @@
     "expo-web-browser": ">=12.5.0",
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0",
-    "react-native": ">=0.73"
+    "react-native": ">=0.75"
   },
   "peerDependenciesMeta": {
     "@clerk/expo-passkeys": {
@@ -172,6 +172,9 @@
     },
     "expo-web-browser": {
       "optional": true
+    },
+    "react-dom": {
+      "optional": true
     }
   },
   "engines": {
@@ -183,9 +186,6 @@
   "codegenConfig": {
     "name": "ClerkExpoSpec",
     "type": "all",
-    "jsSrcsDir": "src/specs",
-    "android": {
-      "javaPackageName": "expo.modules.clerk"
-    }
+    "jsSrcsDir": "src/specs"
   }
 }

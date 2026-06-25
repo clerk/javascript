@@ -1,0 +1,190 @@
+name: API Changes
+
+on:
+  push:
+    branches:
+      - main
+      - release/v4
+      - release/core-2
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - main
+      - release/v4
+      - release/core-2
+    paths:
+      - 'packages/astro/**'
+      - 'packages/backend/**'
+      - 'packages/chrome-extension/**'
+      - 'packages/clerk-js/**'
+      - 'packages/expo/**'
+      - 'packages/expo-passkeys/**'
+      - 'packages/express/**'
+      - 'packages/fastify/**'
+      - 'packages/hono/**'
+      - 'packages/localizations/**'
+      - 'packages/nextjs/**'
+      - 'packages/nuxt/**'
+      - 'packages/react/**'
+      - 'packages/react-router/**'
+      - 'packages/shared/**'
+      - 'packages/tanstack-react-start/**'
+      - 'packages/testing/**'
+      - 'packages/ui/**'
+      - 'packages/vue/**'
+      - 'break-check.config.json'
+      - '.github/workflows/api-changes.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  # break-check (https://github.com/clerk/break-check) snapshots only these
+  # packages' declaration surfaces; kept in sync with break-check.config.json.
+  # `build:declarations` is filtered to them so the rest of the monorepo doesn't
+  # build. Promoted into $GITHUB_ENV in the PR job so the Action's setup-command
+  # (which runs in a worktree) sees it alongside init-blacksmith's TURBO_ARGS.
+  BREAK_CHECK_FILTERS: >-
+    --filter=@clerk/astro
+    --filter=@clerk/backend
+    --filter=@clerk/chrome-extension
+    --filter=@clerk/clerk-js
+    --filter=@clerk/expo
+    --filter=@clerk/expo-passkeys
+    --filter=@clerk/express
+    --filter=@clerk/fastify
+    --filter=@clerk/hono
+    --filter=@clerk/localizations
+    --filter=@clerk/nextjs
+    --filter=@clerk/nuxt
+    --filter=@clerk/react
+    --filter=@clerk/react-router
+    --filter=@clerk/shared
+    --filter=@clerk/tanstack-react-start
+    --filter=@clerk/testing
+    --filter=@clerk/ui
+    --filter=@clerk/vue
+
+jobs:
+  # Snapshot the base branch's API surface once per push and publish it as an
+  # artifact. PRs download the snapshot matching their base.sha instead of
+  # rebuilding it, so the check only builds the PR head. Falls back to a base
+  # rebuild when no artifact exists (first PR, expired, or base not yet pushed).
+  publish-baseline:
+    if: github.event_name == 'push'
+    name: Publish API Baseline
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    continue-on-error: true
+    permissions:
+      contents: read
+    defaults:
+      run:
+        shell: bash
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 15 }}
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+          filter: 'blob:none'
+          show-progress: false
+
+      - name: Setup
+        uses: ./.github/actions/init-blacksmith
+        with:
+          cache-enabled: true
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+
+      - name: Build declarations
+        run: pnpm turbo build:declarations $TURBO_ARGS $BREAK_CHECK_FILTERS
+
+      - name: Generate API snapshot
+        run: |
+          npx --yes "@clerk/break-check@0.5.0" snapshot \
+            --output "$GITHUB_WORKSPACE/.api-snapshots-baseline"
+
+      - name: Upload baseline artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: break-check-baseline
+          path: .api-snapshots-baseline
+          retention-days: 30
+          if-no-files-found: error
+          # .api-snapshots-baseline is dot-prefixed; upload-artifact treats it as
+          # hidden and skips it without this flag.
+          include-hidden-files: true
+
+  check-api:
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.draft == false }}
+    name: API Changes
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    # Advisory: a red break-check does not block merge today. Flip to a gate
+    # later (fail-on-breaking + policy-mode + a required status check).
+    continue-on-error: true
+    permissions:
+      contents: read
+      pull-requests: write
+      # The Action downloads the baseline artifact via the GitHub API.
+      actions: read
+    defaults:
+      run:
+        shell: bash
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 20 }}
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          # Check out the PR head commit, not the refs/pull/N/merge ref that
+          # checkout resolves by default (it absorbs base-branch drift, so once
+          # main advances the diff reports unrelated changes as the PR's own).
+          # This also makes the head's blobs local so the in-place build needs no
+          # extra fetch. persist-credentials: false keeps the token out of the
+          # checkout where the PR's own build scripts run; the repo is public, so
+          # the Action's on-demand blob fetch in the fallback base rebuild still
+          # works unauthenticated.
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          filter: 'blob:none'
+          persist-credentials: false
+          show-progress: false
+
+      - name: Setup
+        uses: ./.github/actions/init-blacksmith
+        with:
+          cache-enabled: true
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+
+      - name: Promote break-check filters into the job env
+        # init-blacksmith exports TURBO_ARGS via $GITHUB_ENV, which the Action's
+        # worktree setup-command inherits. Promote the package filters the same
+        # way so the command can stay one shared line for the head build and the
+        # fallback base rebuild.
+        run: echo "BREAK_CHECK_FILTERS=$BREAK_CHECK_FILTERS" >> "$GITHUB_ENV"
+
+      - name: Break Check
+        uses: clerk/break-check@28f2635be18aa1127189f088a564645efb3aad90 # v0.5.0
+        with:
+          break-check-version: '0.5.0'
+          # The PR head is already checked out, so build it in place rather than
+          # in a second head worktree.
+          head-ref: ''
+          # Reuse the snapshot published for the PR's base commit; the Action
+          # falls back to a base rebuild when no matching artifact is found.
+          baseline-artifact-name: break-check-baseline
+          setup-command: pnpm install --frozen-lockfile && pnpm turbo build:declarations $TURBO_ARGS $BREAK_CHECK_FILTERS
+          # Enables the AI reviewer. The downgrade policy lives in
+          # break-check.config.json (ai.applyDowngrades). Empty on fork PRs
+          # (secrets are withheld there), where the rule-based diff still runs.
+          anthropic-api-key: ${{ secrets.BREAK_CHECK_ANTHROPIC_API_KEY }}
+          comment: 'true'
+          fail-on-breaking: 'false'

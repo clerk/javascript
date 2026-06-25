@@ -51,10 +51,15 @@ export const koKR: LocalizationResource = {
       formButtonPrimary__revoke: '키 폐기',
       formHint: '이 시크릿 키를 삭제할까요?',
       formTitle: '"{{apiKeyName}}" 시크릿 키를 폐기할까요?',
+      inputLabel: undefined,
     },
+    tableHeader__actions: '동작',
+    tableHeader__lastUsed: '마지막 사용',
+    tableHeader__name: '이름',
   },
   backButton: '돌아가기',
   badge__activePlan: '활성',
+  badge__banned: undefined,
   badge__canceledEndsAt: "취소됨 • {{ date | shortDate('ko-KR') }}에 종료",
   badge__currentPlan: '현재 플랜',
   badge__default: '기본값',
@@ -75,11 +80,14 @@ export const koKR: LocalizationResource = {
   badge__userDevice: '사용자 장치',
   badge__you: '나',
   billing: {
+    accountCredit: undefined,
     addPaymentMethod__label: '결제 수단 추가',
     alwaysFree: '항상 무료',
     annually: '연간',
     availableFeatures: '사용 가능한 기능',
     billedAnnually: '연간 결제',
+    billedAnnuallyOnly: undefined,
+    billedMonthly: undefined,
     billedMonthlyOnly: '월간 결제만 가능',
     cancelFreeTrial: '무료 체험 취소',
     cancelFreeTrialAccessUntil:
@@ -116,20 +124,25 @@ export const koKR: LocalizationResource = {
       title__subscriptionSuccessful: '성공!',
       title__trialSuccess: '무료 체험이 시작됐어요!',
       totalDueAfterTrial: '{{days}}일 후 무료 체험이 끝나면 결제할 금액',
+      totalDuePerPeriod: undefined,
     },
     credit: '크레딧',
     creditRemainder: '현재 구독 남은 기간에 대한 크레딧',
     defaultFreePlanActive: '현재 무료 플랜을 사용 중이에요',
     free: '무료',
     getStarted: '시작하기',
+    highlightedPlanBadge: '인기',
     keepFreeTrial: '무료 체험 유지',
     keepSubscription: '구독 유지',
     manage: '관리',
     manageSubscription: '구독 관리',
     month: '월',
+    monthAbbreviation: undefined,
+    monthPerUnit: undefined,
     monthly: '월간',
     pastDue: '연체',
     pay: '{{amount}} 결제',
+    payerCreditRemainder: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: '연간 결제',
@@ -145,12 +158,32 @@ export const koKR: LocalizationResource = {
       },
     },
     paymentMethods__label: '결제 수단',
-    popular: '인기',
     pricingTable: {
       billingCycle: '결제 주기',
       included: '포함',
+      seatCost: {
+        additionalSeats: undefined,
+        freeUpToSeats: undefined,
+        includedSeats: undefined,
+        perSeat: undefined,
+        tooltip: {
+          additionalSeatsEach: undefined,
+          firstSeatsIncludedInPlan: undefined,
+          freeForUpToSeats: undefined,
+        },
+        unlimitedSeats: undefined,
+        upToSeats: undefined,
+      },
     },
+    proratedDiscount: undefined,
+    prorationCredit: undefined,
     reSubscribe: '다시 구독',
+    seatBreakdownIncludedPlural: undefined,
+    seatBreakdownIncludedSingular: undefined,
+    seatBreakdownPlural: undefined,
+    seatBreakdownSingular: undefined,
+    seats: undefined,
+    seatsWithLimit: undefined,
     seeAllFeatures: '전체 기능 보기',
     startFreeTrial: '무료 체험 시작',
     startFreeTrial__days: '{{days}}일 무료 체험 시작',
@@ -171,16 +204,575 @@ export const koKR: LocalizationResource = {
       trialStartedOn: '체험 시작일',
     },
     subtotal: '소계',
+    subtotalRenewal: undefined,
     switchPlan: '이 플랜으로 전환',
     switchToAnnual: '연간 결제로 변경',
-    switchToAnnualWithAnnualPrice: '연간 {{currency}}{{price}} / 년으로 변경',
+    switchToAnnualWithAnnualPrice: '연간 {{price}} / 년으로 변경',
     switchToMonthly: '월간 결제로 변경',
-    switchToMonthlyWithPrice: '월간 {{currency}}{{price}} / 월로 변경',
+    switchToMonthlyWithPrice: '월간 {{price}} / 월로 변경',
     totalDue: '총 결제 금액',
+    totalDuePerPeriod: undefined,
     totalDueToday: '오늘 결제 금액',
     viewFeatures: '기능 보기',
     viewPayment: '결제 보기',
     year: '년',
+    yearAbbreviation: undefined,
+    yearPerUnit: undefined,
+  },
+  configureSSO: {
+    configureStep: {
+      attributeMappingTable: {
+        badges: {
+          optional: undefined,
+          required: undefined,
+        },
+      },
+      samlCustom: {
+        assignUsersStep: {
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          title: undefined,
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attributeName: undefined,
+              userProfile: undefined,
+            },
+            rows: {
+              email: {
+                attributeName: undefined,
+                userProfile: undefined,
+              },
+              firstName: {
+                attributeName: undefined,
+                userProfile: undefined,
+              },
+              lastName: {
+                attributeName: undefined,
+                userProfile: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        createAppStep: {
+          createAppInstructions: {
+            paragraph: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+            title: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+      },
+      samlGoogle: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              appAttribute: undefined,
+              googleAttribute: undefined,
+            },
+            rows: {
+              email: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+              firstName: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+              lastName: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+        },
+        configureUserAccess: {
+          assignUsersInstructions: {
+            paragraph1: undefined,
+            paragraph2: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        createAppStep: {
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataFile: {
+            description: undefined,
+            fileUploaded: undefined,
+            label: undefined,
+            removeFile: undefined,
+            replaceFile: undefined,
+            uploadFile: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataFile: undefined,
+            title: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        serviceProviderStep: {
+          headerSubtitle: undefined,
+          nameIdInstructions: {
+            step1: undefined,
+            step2: undefined,
+          },
+          paragraph: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+          title: undefined,
+        },
+      },
+      samlMicrosoft: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attribute: undefined,
+              claimName: undefined,
+              value: undefined,
+            },
+            rows: {
+              email: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+              firstName: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+              lastName: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          title: undefined,
+        },
+        createAppStep: {
+          assignUsersInstructions: {
+            paragraph1: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            step6: undefined,
+            title: undefined,
+          },
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: {
+              label: undefined,
+              subSteps: {
+                appName: undefined,
+                create: undefined,
+                nonGallery: undefined,
+              },
+            },
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+            title: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        serviceProviderStep: {
+          headerSubtitle: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+          step5: undefined,
+          step6: undefined,
+          title: undefined,
+        },
+      },
+      samlOkta: {
+        assignUsersStep: {
+          assignUsersInstructions: {
+            paragraph: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              expression: undefined,
+              name: undefined,
+            },
+            rows: {
+              email: {
+                expression: undefined,
+                name: undefined,
+              },
+              firstName: {
+                expression: undefined,
+                name: undefined,
+              },
+              lastName: {
+                expression: undefined,
+                name: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+        },
+        createAppStep: {
+          completeSamlIntegrationInstructions: {
+            step1: undefined,
+            step2: undefined,
+            title: undefined,
+          },
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+          serviceProviderInstructions: {
+            paragraph1: undefined,
+            paragraph2: undefined,
+            serviceProviderFields: {
+              acsUrl: {
+                label: undefined,
+              },
+              spEntityId: {
+                label: undefined,
+              },
+            },
+            title: undefined,
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+            title: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+      },
+    },
+    confirmation: {
+      configurationSection: {
+        configureAgainLink: undefined,
+        issuerLabel: undefined,
+        ssoUrlLabel: undefined,
+        title: undefined,
+      },
+      domainSection: {
+        title: undefined,
+      },
+      enableSection: {
+        title: undefined,
+      },
+      inactiveBanner: {
+        title: undefined,
+      },
+      resetSection: {
+        confirmationFieldLabel: undefined,
+        submitButton: undefined,
+        title: undefined,
+        warning: undefined,
+      },
+      statusSection: {
+        activeBadge: undefined,
+        inactiveBadge: undefined,
+        title: undefined,
+      },
+    },
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: '권한을 업그레이드하려면 조직 관리자에게 문의하세요.',
+      title: '싱글 사인온(SSO)을 관리할 권한이 없습니다',
+    },
+    navbar: {
+      title: '싱글 사인온(SSO) 구성',
+    },
+    organizationDomainsStep: {
+      domainCard: {
+        badge__unverified: '미확인',
+        badge__verified: '확인됨',
+        removeButtonTooltip__lastVerifiedDomain: undefined,
+        removeButtonTooltip__lastVerifiedDomainActive: undefined,
+        txtRecord: {
+          hostLabel: '호스트 / 이름',
+          instructions: '이 TXT 레코드를 DNS 공급자에 추가하세요. 레코드가 활성화되면 자동으로 확인합니다.',
+          typeLabel: '유형',
+          valueLabel: '값',
+        },
+        verifiedAtLabel: "{{ date | shortDate('ko-KR') }}에 확인됨",
+      },
+      domainSuggestion: {
+        formButtonPrimary__add: '{{domain}} 추가',
+        messageLabel: '이메일이 {{domain}}을(를) 사용합니다. 추가하시겠습니까?',
+      },
+      formButtonPrimary__add: '추가',
+      formFieldInputPlaceholder__domain: '도메인 추가',
+      formFieldLabel__domain: '도메인',
+      removeDomainDialog: {
+        cancelButton: undefined,
+        removeButton: undefined,
+        subtitle__active: undefined,
+        subtitle__inactive: undefined,
+        title: undefined,
+      },
+      subtitle: '조직에서 로그인에 사용하는 도메인의 소유권을 추가하고 확인하세요.',
+      title: 'SSO 도메인 추가',
+    },
+    resetConnectionDialog: {
+      cancelButton: undefined,
+      confirmationFieldLabel: undefined,
+      confirmationFieldPlaceholder: undefined,
+      resetButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    selectProviderStep: {
+      saml: {
+        customSaml: '사용자 지정 SAML 공급자',
+        google: undefined,
+        groupLabel: 'SAML',
+        microsoft: undefined,
+        okta: 'Okta Workforce',
+      },
+      subtitle: 'SSO를 설정할 공급자를 선택하세요.',
+      title: '공급자 선택',
+      warning: '공급자를 선택하면 구성이 완료될 때까지 다시 변경할 수 없습니다',
+    },
+    testConfigurationStep: {
+      error__noSuccessfulTestRun: undefined,
+      subtitle: undefined,
+      testResults: {
+        actionLabel__refresh: undefined,
+        empty: {
+          subtitle: undefined,
+          title: undefined,
+        },
+        polling: undefined,
+        status__failed: undefined,
+        status__pending: undefined,
+        status__success: undefined,
+        title: undefined,
+      },
+      testRunDetails: {
+        howToFix: {
+          actionLabel__viewDocumentation: undefined,
+          oauth_access_denied: {
+            description: undefined,
+          },
+          oauth_fetch_user_error: {
+            intro: undefined,
+            step1: undefined,
+            step2: undefined,
+          },
+          oauth_token_exchange_error: {
+            description: undefined,
+          },
+          saml_email_address_domain_mismatch: {
+            description: undefined,
+          },
+          saml_response_relaystate_missing: {
+            description: undefined,
+          },
+          saml_user_attribute_missing: {
+            intro: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+          },
+          sectionTitle: undefined,
+        },
+        parsedUserInfo: {
+          email: undefined,
+          firstName: undefined,
+          sectionTitle: undefined,
+        },
+        runDetails: {
+          actionLabel__copied: undefined,
+          actionLabel__copy: undefined,
+          errorCode: undefined,
+          fullMessage: undefined,
+          sectionTitle: undefined,
+          status: undefined,
+          timestamp: undefined,
+        },
+        title: undefined,
+      },
+      testUrl: {
+        actionLabel__open: undefined,
+      },
+      title: undefined,
+    },
   },
   createOrganization: {
     formButtonSubmit: '조직 만들기',
@@ -227,6 +819,7 @@ export const koKR: LocalizationResource = {
   formFieldInputPlaceholder__organizationSlug: 'my-org',
   formFieldInputPlaceholder__password: '비밀번호를 입력하세요',
   formFieldInputPlaceholder__phoneNumber: '휴대폰 번호를 입력하세요',
+  formFieldInputPlaceholder__signUpPassword: undefined,
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: '예시: name@example.com',
   formFieldLabel__apiKey: 'API 키',
@@ -257,6 +850,9 @@ export const koKR: LocalizationResource = {
   formFieldLabel__role: '역할',
   formFieldLabel__signOutOfOtherSessions: '다른 모든 기기에서 로그아웃',
   formFieldLabel__username: '아이디',
+  identityPreviewEditButton__emailAddress: undefined,
+  identityPreviewEditButton__identifier: undefined,
+  identityPreviewEditButton__phoneNumber: undefined,
   impersonationFab: {
     action__signOut: '로그아웃',
     title: '{{identifier}}로 로그인했어요',
@@ -266,6 +862,22 @@ export const koKR: LocalizationResource = {
   membershipRole__admin: '관리자',
   membershipRole__basicMember: '멤버',
   membershipRole__guestMember: '게스트',
+  oauthConsent: {
+    action__allow: undefined,
+    action__deny: undefined,
+    offlineAccessNotice: undefined,
+    redirectNotice: undefined,
+    redirectUriModal: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    scopeList: {
+      title: undefined,
+    },
+    subtitle: undefined,
+    viewFullUrl: undefined,
+    warning: undefined,
+  },
   organizationList: {
     action__createOrganization: '조직 만들기',
     action__invitationAccept: '참여',
@@ -283,6 +895,7 @@ export const koKR: LocalizationResource = {
     },
     badge__automaticInvitation: '자동 초대',
     badge__automaticSuggestion: '자동 제안',
+    badge__enterpriseSso: undefined,
     badge__manualInvitation: '자동 등록 없음',
     badge__unverified: '미인증',
     billingPage: {
@@ -319,6 +932,7 @@ export const koKR: LocalizationResource = {
       statementsSection: {
         empty: '표시할 명세서가 없어요',
         itemCaption__paidForPlan: '{{plan}} {{period}} 플랜 결제',
+        itemCaption__payerCredit: undefined,
         itemCaption__proratedCredit: '이전 구독 일부 사용에 대한 비례 크레딧',
         itemCaption__subscribedAndPaidForPlan: '{{plan}} {{period}} 플랜을 구독하고 결제했어요',
         notFound: '명세서를 찾을 수 없어요',
@@ -331,6 +945,11 @@ export const koKR: LocalizationResource = {
         actionLabel__manageSubscription: '관리',
         actionLabel__newSubscription: '플랜 구독하기',
         actionLabel__switchPlan: '플랜 변경',
+        includedSeatsUsage: undefined,
+        overview: undefined,
+        paidSeatsUsage: undefined,
+        seatLimit: undefined,
+        seatLimitAndIncludedSeats: undefined,
         tableHeader__edit: '편집',
         tableHeader__plan: '플랜',
         tableHeader__startDate: '시작일',
@@ -353,6 +972,7 @@ export const koKR: LocalizationResource = {
       detailsTitle__inviteFailed:
         '초대를 보낼 수 없어요. 다음 이메일 주소에는 이미 대기 중인 초대가 있어요: {{email_addresses}}.',
       formButtonPrimary__continue: '초대 보내기',
+      formButtonPrimary__purchaseSeats: undefined,
       selectDropdown__role: '역할 선택',
       subtitle: '공백이나 쉼표로 구분해 이메일 주소를 입력하거나 붙여넣어 주세요.',
       successMessage: '초대가 성공적으로 전송됐어요',
@@ -411,11 +1031,13 @@ export const koKR: LocalizationResource = {
       description: '조직을 관리하세요.',
       general: '일반',
       members: '멤버',
+      security: undefined,
       title: '조직',
     },
     plansPage: {
       alerts: {
         noPermissionsToManageBilling: '이 조직의 결제를 관리할 권한이 없어요.',
+        planMembershipLimitExceeded: undefined,
       },
       title: '플랜',
     },
@@ -454,9 +1076,33 @@ export const koKR: LocalizationResource = {
       successMessage: '{{domain}}이(가) 삭제됐어요.',
       title: '도메인 삭제',
     },
+    securityPage: {
+      removeDialog: {
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      ssoSection: {
+        badge__active: undefined,
+        badge__inProgress: undefined,
+        badge__inactive: undefined,
+        badge__unconfigured: undefined,
+        descriptionLine1: undefined,
+        domainLabel: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__continueConfiguration: undefined,
+        primaryButton__startConfiguration: undefined,
+        title: undefined,
+      },
+      title: undefined,
+    },
     start: {
       headerTitle__general: '일반',
       headerTitle__members: '멤버',
+      membershipSeatUsageLabel: undefined,
       profileSection: {
         primaryButton: '프로필 업데이트',
         title: '조직 프로필',
@@ -960,6 +1606,8 @@ export const koKR: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}}은(는) 이미 이 조직의 멤버예요.',
+    api_key_name_already_exists: undefined,
+    api_key_usage_exceeded: undefined,
     avatar_file_size_exceeded: '파일 크기가 최대 10MB 제한을 초과해요. 더 작은 파일을 선택해 주세요.',
     avatar_file_type_invalid: '지원되지 않는 파일 형식이에요. JPG, PNG, GIF 또는 WEBP 이미지를 업로드해 주세요.',
     captcha_invalid:
@@ -1002,8 +1650,11 @@ export const koKR: LocalizationResource = {
     form_username_invalid_length: '아이디는 {{min_length}}~{{max_length}}자여야 해요.',
     form_username_needs_non_number_char: '아이디에는 숫자가 아닌 문자가 하나 이상 포함돼야 해요.',
     identification_deletion_failed: '마지막 식별 정보는 삭제할 수 없어요.',
+    insufficient_seats_change_plan: undefined,
+    insufficient_seats_contact_support: undefined,
     not_allowed_access:
       "이메일 주소 또는 전화번호는 가입에 사용할 수 없어요. 이메일 주소에 '+', '=', '#' 또는 '.'이 포함됐거나 임시 이메일 서비스 도메인이거나, 명시적으로 제외된 경우예요. 이 오류가 계속되면 지원에 문의해 주세요.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -1078,6 +1729,9 @@ export const koKR: LocalizationResource = {
     action__openUserMenu: '사용자 메뉴 열기',
     action__signOut: '로그아웃',
     action__signOutAll: '모든 계정에서 로그아웃',
+    label__userButtonPopover: '계정 패널',
+    label__accountActions: '계정 작업',
+    label__activeSessions: '활성 세션',
   },
   userProfile: {
     apiKeysPage: {
@@ -1131,6 +1785,7 @@ export const koKR: LocalizationResource = {
       statementsSection: {
         empty: '표시할 명세서가 없어요',
         itemCaption__paidForPlan: '{{plan}} {{period}} 플랜 결제',
+        itemCaption__payerCredit: undefined,
         itemCaption__proratedCredit: '이전 구독 일부 사용에 대한 비례 크레딧',
         itemCaption__subscribedAndPaidForPlan: '{{plan}} {{period}} 플랜을 구독하고 결제했어요',
         notFound: '명세서를 찾을 수 없어요',
@@ -1143,6 +1798,7 @@ export const koKR: LocalizationResource = {
         actionLabel__manageSubscription: '관리',
         actionLabel__newSubscription: '플랜 구독하기',
         actionLabel__switchPlan: '플랜 변경',
+        overview: undefined,
         tableHeader__edit: '편집',
         tableHeader__plan: '플랜',
         tableHeader__startDate: '시작일',

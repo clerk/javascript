@@ -1,7 +1,7 @@
 import { QueryClient } from '@tanstack/query-core';
 import { vi } from 'vitest';
 
-import { __setClerkQueryClientForTest } from '@/react/clerk-rq/clerk-query-client';
+import { __setClerkQueryClientForTest } from '@/react/query/clerk-query-client';
 
 /**
  * Builds a deterministic QueryClient and installs it as the shared singleton.
@@ -28,7 +28,7 @@ export function createMockQueryClient() {
 }
 
 /**
- * Simple mock Clerk factory with common properties. The clerk-rq query client
+ * Simple mock Clerk factory with common properties. The shared query client
  * is no longer attached to the Clerk instance — pass `queryClient: null` to
  * reset the shared singleton, or omit the option to install a fresh default.
  */

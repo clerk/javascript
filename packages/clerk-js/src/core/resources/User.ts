@@ -1,11 +1,10 @@
 import { getFullName } from '@clerk/shared/internal/clerk-js/user';
+import { isDevelopmentFromPublishableKey } from '@clerk/shared/keys';
 import type {
   BackupCodeJSON,
   BackupCodeResource,
-  ClerkPaginatedResponse,
   CreateEmailAddressParams,
   CreateExternalAccountParams,
-  CreateMeEnterpriseConnectionParams,
   CreatePhoneNumberParams,
   CreateWeb3WalletParams,
   DeletedObjectJSON,
@@ -14,15 +13,9 @@ import type {
   EnterpriseAccountResource,
   EnterpriseConnectionJSON,
   EnterpriseConnectionResource,
-  EnterpriseConnectionTestRunInitJSON,
-  EnterpriseConnectionTestRunInitResource,
-  EnterpriseConnectionTestRunJSON,
-  EnterpriseConnectionTestRunResource,
-  EnterpriseConnectionTestRunsPaginatedJSON,
   ExternalAccountJSON,
   ExternalAccountResource,
   GetEnterpriseConnectionsParams,
-  GetEnterpriseConnectionTestRunsParams,
   GetOrganizationMemberships,
   GetUserOrganizationInvitationsParams,
   GetUserOrganizationSuggestionsParams,
@@ -34,7 +27,7 @@ import type {
   SetProfileImageParams,
   TOTPJSON,
   TOTPResource,
-  UpdateMeEnterpriseConnectionParams,
+  UpdateUserMetadataParams,
   UpdateUserParams,
   UpdateUserPasswordParams,
   UserJSON,
@@ -43,10 +36,9 @@ import type {
   VerifyTOTPParams,
   Web3WalletResource,
 } from '@clerk/shared/types';
-import { deepCamelToSnake } from '@clerk/shared/underscore';
 
-import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
 import { unixEpochToDate } from '../../utils/date';
+import { computeMergePatch } from '../../utils/mergePatch';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { eventBus, events } from '../events';
 import { addPaymentMethod, getPaymentMethods, initializePaymentMethod } from '../modules/billing';
@@ -57,7 +49,6 @@ import {
   EmailAddress,
   EnterpriseAccount,
   EnterpriseConnection,
-  EnterpriseConnectionTestRun,
   ExternalAccount,
   Image,
   OrganizationMembership,
@@ -235,8 +226,57 @@ export class User extends BaseResource implements UserResource {
     return new BackupCode(json);
   };
 
-  update = (params: UpdateUserParams): Promise<UserResource> => {
+  update = async (params: UpdateUserParams): Promise<UserResource> => {
+    const { unsafeMetadata, ...rest } = params;
+    const hasMetadata = unsafeMetadata !== undefined;
+    const hasRest = Object.keys(rest).length > 0;
+
+    if (!hasMetadata) {
+      return this._basePatch({
+        body: normalizeUnsafeMetadata(params),
+      });
+    }
+
+    if (isDevelopmentFromPublishableKey(BaseResource.clerk.publishableKey)) {
+      console.warn(
+        'Clerk - DEPRECATION WARNING: "user.update({ unsafeMetadata })" is deprecated and will be removed in the next major release.\nUse user.updateMetadata({ unsafeMetadata }) for partial updates (deep merge) instead.',
+      );
+    }
+
+    // The FAPI endpoint deprecates `unsafe_metadata` on PATCH /me. Route
+    // metadata through PATCH /me/metadata (deep-merge) while preserving the
+    // *replace* semantics of `user.update({ unsafeMetadata })` by
+    // diffing the locally-cached value against the desired one and sending
+    // an RFC 7396 merge patch (null-deletes for removed keys).
+    //
+    //
+    // When `hasRest` is true the PATCH /me below refreshes `this` in place
+    // via `fromJSON` before we read `this.unsafeMetadata` for the diff.
+    // When it's false (only-metadata update), no upstream call refreshes the cache,
+    // so we `reload()` explicitly.
+    if (hasRest) {
+      await this._basePatch({
+        body: normalizeUnsafeMetadata(rest as UpdateUserParams),
+      });
+    } else {
+      await this.reload();
+    }
+
+    const patch = computeMergePatch(this.unsafeMetadata, unsafeMetadata);
+
+    // An empty patch means current already equals desired — short-circuit.
+    if (patch !== null && typeof patch === 'object' && Object.keys(patch).length === 0) {
+      return this;
+    }
+
+    return this.updateMetadata({
+      unsafeMetadata: patch as UserUnsafeMetadata,
+    });
+  };
+
+  updateMetadata = (params: UpdateUserMetadataParams): Promise<UserResource> => {
     return this._basePatch({
+      path: `${this.path()}/metadata`,
       body: normalizeUnsafeMetadata(params),
     });
   };
@@ -326,85 +366,6 @@ export class User extends BaseResource implements UserResource {
     )?.response as unknown as EnterpriseConnectionJSON[];
 
     return (json || []).map(connection => new EnterpriseConnection(connection));
-  };
-
-  createEnterpriseConnection = async (
-    params: CreateMeEnterpriseConnectionParams,
-  ): Promise<EnterpriseConnectionResource> => {
-    const json = (
-      await BaseResource._fetch<EnterpriseConnectionJSON>({
-        path: `${this.path()}/enterprise_connections`,
-        method: 'POST',
-        body: toMeEnterpriseConnectionBody(params) as any,
-      })
-    )?.response as unknown as EnterpriseConnectionJSON;
-
-    return new EnterpriseConnection(json);
-  };
-
-  updateEnterpriseConnection = async (
-    enterpriseConnectionId: string,
-    params: UpdateMeEnterpriseConnectionParams,
-  ): Promise<EnterpriseConnectionResource> => {
-    const json = (
-      await BaseResource._fetch<EnterpriseConnectionJSON>({
-        path: `${this.path()}/enterprise_connections/${enterpriseConnectionId}`,
-        method: 'PATCH',
-        body: toMeEnterpriseConnectionBody(params) as any,
-      })
-    )?.response as unknown as EnterpriseConnectionJSON;
-
-    return new EnterpriseConnection(json);
-  };
-
-  deleteEnterpriseConnection = async (enterpriseConnectionId: string): Promise<DeletedObjectResource> => {
-    const json = (
-      await BaseResource._fetch<DeletedObjectJSON>({
-        path: `${this.path()}/enterprise_connections/${enterpriseConnectionId}`,
-        method: 'DELETE',
-      })
-    )?.response as unknown as DeletedObjectJSON;
-
-    return new DeletedObject(json);
-  };
-
-  createEnterpriseConnectionTestRun = async (
-    enterpriseConnectionId: string,
-  ): Promise<EnterpriseConnectionTestRunInitResource> => {
-    const json = (
-      await BaseResource._fetch({
-        path: `${this.path()}/enterprise_connections/${enterpriseConnectionId}/test_runs`,
-        method: 'POST',
-      })
-    )?.response as unknown as EnterpriseConnectionTestRunInitJSON;
-
-    return { url: json.url };
-  };
-
-  getEnterpriseConnectionTestRuns = async (
-    enterpriseConnectionId: string,
-    params?: GetEnterpriseConnectionTestRunsParams,
-  ): Promise<ClerkPaginatedResponse<EnterpriseConnectionTestRunResource>> => {
-    const { status, ...rest } = params || {};
-    const search = convertPageToOffsetSearchParams(rest);
-    if (status?.length) {
-      for (const s of status) {
-        search.append('status', s);
-      }
-    }
-
-    const res = await BaseResource._fetch({
-      path: `${this.path()}/enterprise_connections/${enterpriseConnectionId}/test_runs`,
-      method: 'GET',
-      search,
-    });
-
-    const payload = res?.response as unknown as EnterpriseConnectionTestRunsPaginatedJSON | undefined;
-
-    return {
-      total_count: payload?.total_count ?? 0,
-      data: (payload?.data ?? []).map((row: EnterpriseConnectionTestRunJSON) => new EnterpriseConnectionTestRun(row)),
-    };
   };
 
   initializePaymentMethod: typeof initializePaymentMethod = params => {
@@ -545,31 +506,4 @@ export class User extends BaseResource implements UserResource {
       created_at: this.createdAt?.getTime() || null,
     };
   }
-}
-
-/**
- * Serializes `CreateMeEnterpriseConnectionParams` / `UpdateMeEnterpriseConnectionParams`
- * for the `/me/enterprise_connections` FAPI endpoints.
- *
- * Uses `deepCamelToSnake` but preserves `saml.attributeMapping` and `customAttributes` as-is. Their keys are
- * user-supplied data and must not be camel→snake transformed.
- */
-function toMeEnterpriseConnectionBody(
-  params: CreateMeEnterpriseConnectionParams | UpdateMeEnterpriseConnectionParams,
-): Record<string, unknown> {
-  const originalAttributeMapping =
-    params.saml && typeof params.saml === 'object' ? params.saml.attributeMapping : undefined;
-  const originalCustomAttributes = 'customAttributes' in params ? params.customAttributes : undefined;
-
-  const body = deepCamelToSnake(params) as Record<string, any>;
-
-  if (originalAttributeMapping !== undefined && body.saml && typeof body.saml === 'object') {
-    body.saml.attribute_mapping = originalAttributeMapping;
-  }
-
-  if (originalCustomAttributes !== undefined) {
-    body.custom_attributes = originalCustomAttributes;
-  }
-
-  return body;
 }

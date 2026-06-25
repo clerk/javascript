@@ -29,6 +29,8 @@ export const OrganizationProfileNavbar = (
       }) || has({ permission: 'org:sys_billing:manage' }),
   );
 
+  const allowSecurityRoute = useProtect(has => has({ permission: 'org:sys_entconns:manage' }));
+
   const routes = pages.routes
     .filter(
       r =>
@@ -40,7 +42,12 @@ export const OrganizationProfileNavbar = (
         r.id !== ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.BILLING ||
         (r.id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.BILLING && allowBillingRoutes),
     )
-    .filter(r => r.id !== ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.API_KEYS || !apiKeysProps?.hide);
+    .filter(r => r.id !== ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.API_KEYS || !apiKeysProps?.hide)
+    .filter(
+      r =>
+        r.id !== ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.SECURITY ||
+        (r.id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.SECURITY && allowSecurityRoute),
+    );
   if (!organization) {
     return null;
   }

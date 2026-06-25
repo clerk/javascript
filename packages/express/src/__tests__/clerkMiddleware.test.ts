@@ -1,3 +1,4 @@
+import type * as ClerkBackend from '@clerk/backend';
 import type { Request, RequestHandler, Response } from 'express';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -12,9 +13,29 @@ vi.mock('@clerk/backend/proxy', async () => {
   };
 });
 
-import { authenticateRequest } from '../authenticateRequest';
+const { mockCreateClerkClient } = vi.hoisted(() => ({
+  mockCreateClerkClient: vi.fn(),
+}));
+vi.mock('@clerk/backend', async () => {
+  const actual = await vi.importActual<typeof ClerkBackend>('@clerk/backend');
+  mockCreateClerkClient.mockImplementation(actual.createClerkClient);
+  return {
+    ...actual,
+    createClerkClient: mockCreateClerkClient,
+  };
+});
+
+const { mockWarnOnce } = vi.hoisted(() => ({
+  mockWarnOnce: vi.fn(),
+}));
+vi.mock('@clerk/shared/logger', () => ({
+  logger: { warnOnce: mockWarnOnce, logOnce: vi.fn() },
+}));
+
+import { authenticateAndDecorateRequest, authenticateRequest } from '../authenticateRequest';
 import { clerkMiddleware } from '../clerkMiddleware';
 import { getAuth } from '../getAuth';
+import { requireAuth } from '../requireAuth';
 import { assertNoDebugHeaders, assertSignedOutDebugHeaders, runMiddleware, runMiddlewareOnPath } from './helpers';
 
 describe('clerkMiddleware', () => {
@@ -125,6 +146,176 @@ describe('clerkMiddleware', () => {
     );
   });
 
+  it('forwards arbitrary AuthenticateRequestOptions/VerifyTokenOptions to authenticateRequest', async () => {
+    const authenticateRequestMock = vi.fn().mockResolvedValue({});
+    const clerkClient = {
+      authenticateRequest: authenticateRequestMock,
+    } as any;
+
+    const organizationSyncOptions = {
+      organizationPatterns: ['/orgs/:slug'],
+    };
+
+    await authenticateRequest({
+      clerkClient,
+      request: {
+        method: 'GET',
+        url: '/',
+        headers: {
+          host: 'example.com',
+        },
+      } as Request,
+      options: {
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_....',
+        clockSkewInMs: 12_345,
+        audience: 'https://api.example.com',
+        authorizedParties: ['https://example.com'],
+        jwtKey: 'jwt-key-value',
+        acceptsToken: 'session_token',
+        organizationSyncOptions,
+        skipJwksCache: true,
+        headerType: 'JWT',
+      } as any,
+    });
+
+    expect(authenticateRequestMock).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.objectContaining({
+        audience: 'https://api.example.com',
+        authorizedParties: ['https://example.com'],
+        clockSkewInMs: 12_345,
+        jwtKey: 'jwt-key-value',
+        acceptsToken: 'session_token',
+        organizationSyncOptions,
+        skipJwksCache: true,
+        headerType: 'JWT',
+      }),
+    );
+  });
+
+  it('does not forward middleware-only options (clerkClient, debug, frontendApiProxy) to authenticateRequest', async () => {
+    const authenticateRequestMock = vi.fn().mockResolvedValue({});
+    const clerkClient = {
+      authenticateRequest: authenticateRequestMock,
+    } as any;
+
+    await authenticateRequest({
+      clerkClient,
+      request: {
+        method: 'GET',
+        url: '/',
+        headers: {
+          host: 'example.com',
+        },
+      } as Request,
+      options: {
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_....',
+        clerkClient,
+        debug: true,
+        frontendApiProxy: { enabled: true, path: '/__clerk' },
+      },
+    });
+
+    const forwarded = authenticateRequestMock.mock.calls[0][1];
+    expect(forwarded).not.toHaveProperty('clerkClient');
+    expect(forwarded).not.toHaveProperty('debug');
+    expect(forwarded).not.toHaveProperty('frontendApiProxy');
+  });
+
+  describe('apiUrl/apiVersion default-client construction', () => {
+    beforeEach(() => {
+      mockCreateClerkClient.mockClear();
+    });
+
+    it('builds a per-middleware ClerkClient with apiUrl when no custom clerkClient is supplied', () => {
+      authenticateAndDecorateRequest({
+        apiUrl: 'https://api.example.test',
+        secretKey: 'sk_test_....',
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+      });
+
+      expect(mockCreateClerkClient).toHaveBeenCalledWith(
+        expect.objectContaining({ apiUrl: 'https://api.example.test' }),
+      );
+    });
+
+    it('builds a per-middleware ClerkClient with apiVersion when no custom clerkClient is supplied', () => {
+      authenticateAndDecorateRequest({
+        apiVersion: 'v2',
+        secretKey: 'sk_test_....',
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+      });
+
+      expect(mockCreateClerkClient).toHaveBeenCalledWith(expect.objectContaining({ apiVersion: 'v2' }));
+    });
+
+    it('does not call createClerkClient at construction when apiUrl/apiVersion are not set', () => {
+      authenticateAndDecorateRequest({ secretKey: 'sk_test_....' });
+
+      expect(mockCreateClerkClient).not.toHaveBeenCalled();
+    });
+
+    it('does not build a per-middleware client when the caller supplies their own clerkClient', () => {
+      const customClient = { authenticateRequest: vi.fn() } as any;
+
+      authenticateAndDecorateRequest({
+        apiUrl: 'https://api.example.test',
+        apiVersion: 'v2',
+        clerkClient: customClient,
+      });
+
+      expect(mockCreateClerkClient).not.toHaveBeenCalled();
+    });
+
+    it('routes outbound API traffic to the apiUrl override', async () => {
+      const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+        new Response('{"data":[],"total_count":0}', {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        }),
+      );
+
+      authenticateAndDecorateRequest({
+        apiUrl: 'https://api.example.test',
+        secretKey: 'sk_test_....',
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+      });
+
+      const client = mockCreateClerkClient.mock.results[0].value;
+      await client.users.getUserList().catch(() => undefined);
+
+      const calledUrls = fetchSpy.mock.calls.map(call => {
+        const input = call[0];
+        if (typeof input === 'string') {
+          return input;
+        }
+        if (input instanceof URL) {
+          return input.href;
+        }
+        return input.url;
+      });
+      expect(calledUrls.some(url => new URL(url).origin === 'https://api.example.test')).toBe(true);
+
+      fetchSpy.mockRestore();
+    });
+
+    it('callback form: builds a per-middleware ClerkClient when the callback returns apiUrl', async () => {
+      await runMiddleware(
+        clerkMiddleware(() => ({
+          apiUrl: 'https://api.example.test',
+          secretKey: 'sk_test_....',
+          publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        })),
+      ).expect(200);
+
+      expect(mockCreateClerkClient).toHaveBeenCalledWith(
+        expect.objectContaining({ apiUrl: 'https://api.example.test' }),
+      );
+    });
+  });
+
   it('throws error if clerkMiddleware is not executed before getAuth', async () => {
     const customMiddleware: RequestHandler = (request, response, next) => {
       const auth = getAuth(request);
@@ -146,6 +337,87 @@ describe('clerkMiddleware', () => {
 
     expect(response.header).toHaveProperty('x-clerk-auth-status', 'handshake');
     expect(response.header).toHaveProperty('location', expect.stringContaining('/v1/client/handshake?redirect_url='));
+  });
+
+  describe('foreign req.auth values (authentication bypass hardening)', () => {
+    beforeEach(() => {
+      mockWarnOnce.mockClear();
+    });
+
+    it('authenticates the request even when a previous middleware set req.auth to a plain object (express-jwt style)', async () => {
+      const foreignAuth: RequestHandler = (req, _res, next) => {
+        Object.assign(req, { auth: { sub: 'attacker' } });
+        next();
+      };
+
+      const response = await runMiddleware([foreignAuth, clerkMiddleware()], {
+        Cookie: '__clerk_db_jwt=deadbeef;',
+      }).expect(200, 'Hello world!');
+
+      assertSignedOutDebugHeaders(response);
+      expect(mockWarnOnce).toHaveBeenCalledTimes(1);
+    });
+
+    it('overwrites a foreign req.auth function so getAuth returns Clerk state', async () => {
+      const foreignAuth: RequestHandler = (req, _res, next) => {
+        Object.assign(req, { auth: () => ({ userId: 'attacker' }) });
+        next();
+      };
+
+      let capturedUserId: string | null | undefined;
+      const capture: RequestHandler = (req, _res, next) => {
+        capturedUserId = getAuth(req).userId;
+        next();
+      };
+
+      const response = await runMiddleware([foreignAuth, clerkMiddleware(), capture], {
+        Cookie: '__clerk_db_jwt=deadbeef;',
+      }).expect(200, 'Hello world!');
+
+      assertSignedOutDebugHeaders(response);
+      expect(capturedUserId).toBeNull();
+    });
+
+    it('does not re-authenticate when clerkMiddleware runs twice', async () => {
+      const authenticateRequestSpy = vi.fn().mockResolvedValue({
+        headers: new Headers(),
+        status: 'signed-out',
+        toAuth: () => ({ userId: null }),
+      });
+      const clerkClient = { authenticateRequest: authenticateRequestSpy } as any;
+
+      await runMiddleware([clerkMiddleware({ clerkClient }), clerkMiddleware({ clerkClient })]).expect(
+        200,
+        'Hello world!',
+      );
+
+      expect(authenticateRequestSpy).toHaveBeenCalledTimes(1);
+      expect(mockWarnOnce).not.toHaveBeenCalled();
+    });
+
+    it('requireAuth is not bypassed by a foreign req.auth that reports a userId', async () => {
+      const foreignAuth: RequestHandler = (req, _res, next) => {
+        Object.assign(req, { auth: () => ({ userId: 'attacker' }) });
+        next();
+      };
+
+      const response = await runMiddleware([foreignAuth, requireAuth({ signInUrl: '/sign-in' })]);
+
+      expect(response.status).toBe(302);
+      expect(response.headers.location).toBe('/sign-in');
+    });
+
+    it('requireAuth redirects (does not 500) when a foreign req.auth is a plain object', async () => {
+      const foreignAuth: RequestHandler = (req, _res, next) => {
+        Object.assign(req, { auth: { sub: 'attacker' } });
+        next();
+      };
+
+      const response = await runMiddleware([foreignAuth, requireAuth({ signInUrl: '/sign-in' })]);
+
+      expect(response.status).toBe(302);
+      expect(response.headers.location).toBe('/sign-in');
+    });
   });
 
   describe('Frontend API proxy handling', () => {

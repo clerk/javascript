@@ -1,11 +1,10 @@
 import { useOAuthConsent as useOAuthConsentOriginal } from '@clerk/shared/react';
 import type { InternalClerkScriptProps } from '@clerk/shared/types';
-import type { Ui } from '@clerk/ui/internal';
 import type React from 'react';
 
 import { OAuthConsent as OAuthConsentOriginal } from './components/uiComponents';
 import { ClerkProvider } from './contexts/ClerkProvider';
-import type { ClerkProviderProps } from './types';
+import type { ClerkProviderProps, Ui } from './types';
 
 export { publishableKeyFromHost } from '@clerk/shared/keys';
 export { setErrorThrowerOptions } from './errors/errorThrower';
@@ -40,7 +39,7 @@ export {
   setClerkJsLoadingErrorPackageName,
 } from '@clerk/shared/loadClerkJsScript';
 
-export type { Ui } from '@clerk/ui/internal';
+export type { Ui } from './types';
 
 export type { InternalClerkScriptProps } from '@clerk/shared/types';
 

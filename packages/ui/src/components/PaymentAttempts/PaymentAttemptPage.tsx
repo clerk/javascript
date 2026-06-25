@@ -1,9 +1,11 @@
 import { __internal_usePaymentAttemptQuery } from '@clerk/shared/react/index';
-import type { BillingSubscriptionItemResource } from '@clerk/shared/types';
+import type { BillingPaymentResource } from '@clerk/shared/types';
 
 import { Alert } from '@/ui/elements/Alert';
 import { Header } from '@/ui/elements/Header';
 import { LineItems } from '@/ui/elements/LineItems';
+import { ProfileCard } from '@/ui/elements/ProfileCard';
+import { getPlanSeatLimit, getSeatsPerUnitTotal, summarizeSeatCharges } from '@/ui/utils/billingPlanSeats';
 import { formatDate } from '@/ui/utils/formatDate';
 import { truncateWithEndVisible } from '@/ui/utils/truncateTextWithEndVisible';
 
@@ -22,14 +24,14 @@ import {
   useLocalizations,
 } from '../../customizables';
 import { useClipboard } from '../../hooks';
-import { Check, Copy } from '../../icons';
+import { Checkmark, Copy } from '../../icons';
 import { useRouter } from '../../router';
 
 export const PaymentAttemptPage = () => {
   const { params, navigate } = useRouter();
   const subscriberType = useSubscriberTypeContext();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
-  const { t, translateError } = useLocalizations();
+  const { t, translateError, $ } = useLocalizations();
   const requesterType = subscriberType === 'organization' ? 'organization' : 'user';
 
   const {
@@ -42,22 +44,22 @@ export const PaymentAttemptPage = () => {
     enabled: Boolean(params.paymentAttemptId),
   });
 
-  const subscriptionItem = paymentAttempt?.subscriptionItem;
-
   if (isLoading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-        <Spinner
-          colorScheme='primary'
-          sx={{ margin: 'auto', display: 'block' }}
-          elementDescriptor={descriptors.spinner}
-        />
-      </Box>
+      <ProfileCard.Page>
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+          <Spinner
+            colorScheme='primary'
+            sx={{ margin: 'auto', display: 'block' }}
+            elementDescriptor={descriptors.spinner}
+          />
+        </Box>
+      </ProfileCard.Page>
     );
   }
 
   return (
-    <>
+    <ProfileCard.Page>
       <Header.Root
         sx={t => ({
           borderBlockEndWidth: t.borderWidths.$normal,
@@ -147,7 +149,7 @@ export const PaymentAttemptPage = () => {
               {paymentAttempt.status}
             </Badge>
           </Box>
-          <PaymentAttemptBody subscriptionItem={subscriptionItem} />
+          <PaymentAttemptBody paymentAttempt={paymentAttempt} />
           <Box
             elementDescriptor={descriptors.paymentAttemptFooter}
             as='footer'
@@ -187,21 +189,24 @@ export const PaymentAttemptPage = () => {
                 variant='h3'
                 elementDescriptor={descriptors.paymentAttemptFooterValue}
               >
-                {paymentAttempt.amount.currencySymbol}
-                {paymentAttempt.amount.amountFormatted}
+                {$(paymentAttempt.amount)}
               </Text>
             </Span>
           </Box>
         </Box>
       )}
-    </>
+    </ProfileCard.Page>
   );
 };
 
-function PaymentAttemptBody({ subscriptionItem }: { subscriptionItem: BillingSubscriptionItemResource | undefined }) {
-  if (!subscriptionItem) {
+function PaymentAttemptBody({ paymentAttempt }: { paymentAttempt: BillingPaymentResource | undefined }) {
+  const { $ } = useLocalizations();
+
+  if (!paymentAttempt) {
     return null;
   }
+
+  const { subscriptionItem } = paymentAttempt;
 
   const fee =
     subscriptionItem.planPeriod === 'month'
@@ -209,6 +214,11 @@ function PaymentAttemptBody({ subscriptionItem }: { subscriptionItem: BillingSub
         subscriptionItem.plan.fee!
       : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         subscriptionItem.plan.annualMonthlyFee!;
+
+  const seatsTotal = subscriptionItem.seats != null ? getSeatsPerUnitTotal(paymentAttempt.totals) : undefined;
+  const seatSummary = summarizeSeatCharges(seatsTotal);
+  const seatsChargeable = seatSummary ? seatSummary.totalSeats - seatSummary.included : 0;
+  const planSeatLimit = getPlanSeatLimit(subscriptionItem.plan);
 
   return (
     <Box
@@ -222,26 +232,64 @@ function PaymentAttemptBody({ subscriptionItem }: { subscriptionItem: BillingSub
           <LineItems.Title title={subscriptionItem.plan.name} />
           <LineItems.Description
             prefix={subscriptionItem.planPeriod === 'annual' ? 'x12' : undefined}
-            text={`${fee.currencySymbol}${fee.amountFormatted}`}
+            text={$(fee)}
           />
         </LineItems.Group>
+        {seatSummary && (
+          <LineItems.Group>
+            <LineItems.Title
+              title={
+                planSeatLimit != null
+                  ? localizationKeys('billing.seatsWithLimit', { limit: planSeatLimit })
+                  : localizationKeys('billing.seats')
+              }
+              description={(() => {
+                const rate = $(seatSummary.paidTier.feePerBlock);
+                const isSingular = seatsChargeable === 1;
+                if (seatSummary.included > 0) {
+                  return isSingular
+                    ? localizationKeys('billing.seatBreakdownIncludedSingular', {
+                        totalSeats: seatSummary.totalSeats,
+                        included: seatSummary.included,
+                        rate,
+                      })
+                    : localizationKeys('billing.seatBreakdownIncludedPlural', {
+                        totalSeats: seatSummary.totalSeats,
+                        included: seatSummary.included,
+                        chargeable: seatsChargeable,
+                        rate,
+                      });
+                }
+                return isSingular
+                  ? localizationKeys('billing.seatBreakdownSingular', { rate })
+                  : localizationKeys('billing.seatBreakdownPlural', { chargeable: seatsChargeable, rate });
+              })()}
+            />
+            <LineItems.Description
+              prefix={subscriptionItem.planPeriod === 'annual' ? 'x12' : undefined}
+              text={$(seatSummary.paidTier.total)}
+            />
+          </LineItems.Group>
+        )}
         <LineItems.Group
           borderTop
           variant='tertiary'
         >
           <LineItems.Title title={localizationKeys('billing.subtotal')} />
-          <LineItems.Description
-            text={`${subscriptionItem.amount?.currencySymbol}${subscriptionItem.amount?.amountFormatted}`}
-          />
+          <LineItems.Description text={paymentAttempt.totals?.subtotal ? $(paymentAttempt.totals.subtotal) : ''} />
         </LineItems.Group>
+        {paymentAttempt.totals?.discounts?.proration && paymentAttempt.totals.discounts.proration.amount.amount > 0 && (
+          <LineItems.Group variant='tertiary'>
+            <LineItems.Title title={localizationKeys('billing.proratedDiscount')} />
+            <LineItems.Description text={`- ${$(paymentAttempt.totals.discounts.proration.amount)}`} />
+          </LineItems.Group>
+        )}
         {subscriptionItem.credits &&
           subscriptionItem.credits.proration &&
           subscriptionItem.credits.proration.amount.amount > 0 && (
             <LineItems.Group variant='tertiary'>
               <LineItems.Title title={localizationKeys('billing.prorationCredit')} />
-              <LineItems.Description
-                text={`- ${subscriptionItem.credits.proration.amount.currencySymbol}${subscriptionItem.credits.proration.amount.amountFormatted}`}
-              />
+              <LineItems.Description text={`- ${$(subscriptionItem.credits.proration.amount)}`} />
             </LineItems.Group>
           )}
         {subscriptionItem.credits &&
@@ -249,9 +297,7 @@ function PaymentAttemptBody({ subscriptionItem }: { subscriptionItem: BillingSub
           subscriptionItem.credits.payer.appliedAmount.amount > 0 && (
             <LineItems.Group variant='tertiary'>
               <LineItems.Title title={localizationKeys('billing.accountCredit')} />
-              <LineItems.Description
-                text={`- ${subscriptionItem.credits.payer.appliedAmount.currencySymbol}${subscriptionItem.credits.payer.appliedAmount.amountFormatted}`}
-              />
+              <LineItems.Description text={`- ${$(subscriptionItem.credits.payer.appliedAmount)}`} />
             </LineItems.Group>
           )}
       </LineItems.Root>
@@ -266,7 +312,7 @@ function CopyButton({ text, copyLabel = 'Copy' }: { text: string; copyLabel?: st
     <Button
       elementDescriptor={descriptors.paymentAttemptCopyButton}
       variant='unstyled'
-      onClick={onCopy}
+      onClick={() => onCopy()}
       sx={t => ({
         color: 'inherit',
         width: t.sizes.$4,
@@ -283,7 +329,7 @@ function CopyButton({ text, copyLabel = 'Copy' }: { text: string; copyLabel?: st
     >
       <Icon
         size='sm'
-        icon={hasCopied ? Check : Copy}
+        icon={hasCopied ? Checkmark : Copy}
         aria-hidden
       />
     </Button>

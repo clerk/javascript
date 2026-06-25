@@ -93,7 +93,7 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     await u.po.userButton.toHaveVisibleMenuItems([/Custom link/i, /Custom action/i, /Custom click/i]);
 
     // Click custom action and check for custom page availbility
-    await u.page.getByRole('menuitem', { name: /Custom action/i }).click();
+    await u.page.getByRole('button', { name: /Custom action/i }).click();
     await u.po.userProfile.waitForUserProfileModal();
     await expect(u.page.getByRole('heading', { name: 'Custom Terms Page' })).toBeVisible();
 
@@ -114,7 +114,7 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
         );
       });
     });
-    await u.page.getByRole('menuitem', { name: /Custom click/i }).click();
+    await u.page.getByRole('button', { name: /Custom click/i }).click();
     expect(await eventPromise).toBe('custom_click');
 
     // Trigger the popover again
@@ -122,7 +122,7 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     await u.po.userButton.waitForPopover();
 
     // Click custom link and check navigation
-    await u.page.getByRole('menuitem', { name: /Custom link/i }).click();
+    await u.page.getByRole('button', { name: /Custom link/i }).click();
     await u.page.waitForAppUrl('/user');
   });
 
@@ -139,7 +139,7 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     await u.po.userButton.waitForPopover();
 
     // First item should now be the sign out button
-    await u.page.getByRole('menuitem').first().click();
+    await u.page.getByRole('button').first().click();
     await u.po.expect.toBeSignedOut();
   });
 
@@ -482,6 +482,42 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
 
     // Components should be rendered on hard reload
     await u.po.userButton.waitForMounted();
+  });
+
+  test('preserves clerk component styling after view transitions navigations', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+
+    // Sign in directly (full navigation, not view transition)
+    await u.page.goToRelative('/sign-in');
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
+    await u.po.expect.toBeSignedIn();
+
+    // Go to the view-transitions-enabled page
+    await u.page.goToRelative('/transitions');
+    await u.po.userButton.waitForMounted();
+
+    // Navigate to a second transitions page via link click (triggers view transition)
+    await u.page.getByRole('link', { name: /Page 2/i }).click();
+    await u.page.waitForURL(`${app.serverUrl}/transitions/page2`);
+    await u.po.userButton.waitForMounted();
+
+    // Navigate back via link click (triggers another view transition)
+    await u.page.getByRole('link', { name: /Back/i }).click();
+    await u.page.waitForURL(`${app.serverUrl}/transitions`);
+    await u.po.userButton.waitForMounted();
+
+    // Verify Emotion style elements are present in document.head after the round-trip.
+    // Regression: cloneNode() on #clerk-components detached the React root from its host
+    // element, causing Clerk to lose its style injection context on subsequent navigations.
+    const emotionStyleCount = await page.evaluate(() => document.head.querySelectorAll('style[data-emotion]').length);
+    expect(emotionStyleCount).toBeGreaterThan(0);
+
+    // Verify #clerk-components is attached to the live document (not detached from the React root).
+    const clerkRootIsAttached = await page.evaluate(() =>
+      document.body.contains(document.getElementById('clerk-components')),
+    );
+    expect(clerkRootIsAttached).toBe(true);
   });
 
   test('server islands Show component shows correct states', async ({ page, context }) => {

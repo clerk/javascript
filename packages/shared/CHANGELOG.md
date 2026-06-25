@@ -1,5 +1,273 @@
 # Change Log
 
+## 4.21.0
+
+### Minor Changes
+
+- Expose the loaded `@clerk/ui` version on the `Clerk` object via a new `uiVersion` property. It returns the version of the prebuilt UI bundle once it has loaded (for example `Clerk.uiVersion` in the browser console), or `undefined` if the UI has not been loaded yet. `@clerk/clerk-js` and `@clerk/ui` are versioned and loaded independently, so `uiVersion` can differ from `Clerk.version`. ([#8931](https://github.com/clerk/javascript/pull/8931)) by [@jacekradko](https://github.com/jacekradko)
+
+- Make `OAuthProviderData.docsUrl` optional and remove the Enstall OAuth provider docs URL. ([#8885](https://github.com/clerk/javascript/pull/8885)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+### Patch Changes
+
+- Condense the OrganizationProfile Security page SSO overview to a single summary row (one-line description, domains as chips, status badge, actions under the overflow menu) and remove the now-unused ssoSection provider/sign-on URL/issuer/descriptionLine2 localization keys. ([#8915](https://github.com/clerk/javascript/pull/8915)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Add a generic `FLOW_STEP_MOUNTED` telemetry event (`eventFlowStepMounted`) for measuring multi-step flow funnels, and wire it into the self-serve SSO flow ([#8951](https://github.com/clerk/javascript/pull/8951)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Add localization support for OAuth access denied errors. ([#8786](https://github.com/clerk/javascript/pull/8786)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Allow changing enterprise connection provider between self-serve SSO steps ([#8881](https://github.com/clerk/javascript/pull/8881)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Improve UserButton and OrganizationSwitcher accessibility. The trigger button now announces itself as a dialog trigger (`aria-haspopup="dialog"`) and the popover uses `role="dialog"` instead of `role="menu"`. UserButton and OrganizationSwitcher popovers now receive focus when opened, and actions are logically grouped with labelled `role="group"` elements for screen readers. ([#8325](https://github.com/clerk/javascript/pull/8325)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.20.0
+
+### Minor Changes
+
+- Introduces organization membership feature. ([#8933](https://github.com/clerk/javascript/pull/8933)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+  Organizations can enforce exclusive membership, limiting users to a single organization. During the `choose-organization` session task, members of such an organization are automatically activated instead of seeing the picker. `Organization.exclusiveMembership` is now exposed on the Organization resource.
+
+## 4.19.1
+
+### Patch Changes
+
+- Improve the accessible label for identity edit buttons in verification flows. ([#8902](https://github.com/clerk/javascript/pull/8902)) by [@austincalvelage](https://github.com/austincalvelage)
+
+- The SSO setup flow now ends on an explicit Activate step: after configuring and testing a connection you confirm activation with an Activate SSO action (or skip and activate later) instead of a static confirmation summary. ([#8882](https://github.com/clerk/javascript/pull/8882)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Add an `inertProps` helper (`@clerk/shared/inert`) that resolves the correct `inert` attribute value for the consumer's React major (React 19 dropped the `inert` attribute for falsy string values). ([#8820](https://github.com/clerk/javascript/pull/8820)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.19.0
+
+### Minor Changes
+
+- Introduce organization domains with TXT verification on self-serve SSO flow ([#8788](https://github.com/clerk/javascript/pull/8788)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Add confirmation dialog for organization domain deletion as part of self-serve SSO ([#8866](https://github.com/clerk/javascript/pull/8866)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+## 4.18.0
+
+### Minor Changes
+
+- Add internal OAuth transport support for native desktop SDK wrappers to run Clerk's prebuilt OAuth flows through a system browser. ([#8831](https://github.com/clerk/javascript/pull/8831)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Align the `HeadlessBrowserClerk.load()` parameter type with the runtime behavior by accepting the full `ClerkOptions`, including `isSatellite`. The clerk-js implementation has always accepted and used `isSatellite` from `load()` options — it's the only way to configure a satellite app when using `@clerk/clerk-js` directly — but the type previously excluded it, producing a contradictory generated API reference and type errors for direct consumers. ([#8846](https://github.com/clerk/javascript/pull/8846)) by [@manovotny](https://github.com/manovotny)
+
+- Add an overview to the organization profile Security page. The page now lands on a summary of the SSO connection — a status badge (Unconfigured, In Progress, Active, Inactive), the configuration details framed in a card (provider, domain, sign-on URL, issuer, certificate), and an actions menu with Edit, Activate / Deactivate, and Remove — and switches into the existing configuration flow on Start, Continue, or Edit. ([#8813](https://github.com/clerk/javascript/pull/8813)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Rename the `<OrganizationProfile />` SSO page to "Security". The navbar entry is now labeled "Security" with a shield icon, its route path changed from `organization-self-serve-sso` to `organization-security`, and a new `organizationProfile.navbar.security` localization key replaces `organizationProfile.navbar.selfServeSSO`. ([#8796](https://github.com/clerk/javascript/pull/8796)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Ship a self-contained `CookieAttributes` interface from `@clerk/shared/cookie` and use it in `createCookieHandler`'s `set`/`remove` signatures. The published declarations previously referenced `Cookies.CookieAttributes` from js-cookie, which consumers could never resolve (the import was dropped from the declaration output and js-cookie ships no types), causing TS2503 errors under `skipLibCheck: false` and silently degrading the option types to `any` otherwise. ([#8841](https://github.com/clerk/javascript/pull/8841)) by [@jacekradko](https://github.com/jacekradko)
+
+- Resolve the browser connectivity heuristics (`isValidBrowser`, `isBrowserOnline`, and therefore `isValidBrowserOnline`) from the worker's `navigator` when `window` is unavailable but the code runs inside a `WorkerGlobalScope`. In a Web/Service Worker — most notably an MV3 extension background **service worker** (where `@clerk/chrome-extension` loads the background client) — there is no `window`, so these checks previously always reported "invalid/offline". That caused `getToken()` failures to be re-thrown as a misleading `clerk_offline` error and capped network retries lower than intended. The checks now read real connectivity from the worker's `navigator`. Server-side rendering continues to report `false` (the fallback requires a real worker scope, so a bare `globalThis.navigator` such as the one modern Node exposes is not treated as a browser), and behavior in standard browsers and React Native is unchanged. ([#8827](https://github.com/clerk/javascript/pull/8827)) by [@royanger](https://github.com/royanger)
+
+- Exclude self-identified server runtimes (`Cloudflare-Workers`, `Node.js`, `Deno`, `Bun` user agents) from the worker-scope `navigator` fallback used by `isValidBrowser`, `isBrowserOnline`, and `isValidBrowserOnline`. Today Cloudflare's workerd is excluded only because its `self` does not satisfy `instanceof WorkerGlobalScope`; this guard keeps the checks returning `false` on server-side worker runtimes even if that implementation detail changes, while real browser web/service workers (such as MV3 extension background workers) are unaffected. ([#8840](https://github.com/clerk/javascript/pull/8840)) by [@jacekradko](https://github.com/jacekradko)
+
+- Clarify the `isSatellite` JSDoc to note it must be set in `load()`, unlike `domain`, which is set in the `Clerk` constructor. This corrects the generated API reference for direct `@clerk/clerk-js` and `<script>` consumers, where `load()` is the only way to configure a satellite app. ([#8845](https://github.com/clerk/javascript/pull/8845)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+## 4.17.1
+
+### Patch Changes
+
+- Migrate the build pipeline to tsdown and TypeScript 6.0. This is an internal tooling change with no intended changes to the public API or runtime behavior. ([#8177](https://github.com/clerk/javascript/pull/8177)) by [@dstaley](https://github.com/dstaley)
+
+- Deprecate passing `unsafeMetadata` to `user.update()`. ([#8587](https://github.com/clerk/javascript/pull/8587)) by [@brunol95](https://github.com/brunol95)
+
+  Use `user.updateMetadata()` when you want to partially update unsafe metadata with deep-merge semantics:
+
+  ```ts
+  await user.updateMetadata({
+    unsafeMetadata: { onboardingComplete: true },
+  });
+  ```
+
+  `user.update({ unsafeMetadata })` continues to work for now and preserves its existing full-replacement behavior:
+
+  ```ts
+  await user.update({
+    unsafeMetadata: { theme: 'dark' },
+  });
+  ```
+
+  New code should prefer `user.updateMetadata({ unsafeMetadata })` for metadata-only updates.
+
+- Restore resolvable TypeScript declarations. Type declarations are now emitted per-module at stable public paths instead of being bundled into content-hashed internal chunk files. This fixes type resolution failures (or silent `any` degradation) in packages whose declarations reference `@clerk/shared` types, such as `@clerk/vue`, `@clerk/react`, `@clerk/ui`, and `@clerk/testing`, which previously pointed at unresolvable `@clerk/shared/_chunks/*` specifiers. ([#8811](https://github.com/clerk/javascript/pull/8811)) by [@jacekradko](https://github.com/jacekradko)
+
+## 4.17.0
+
+### Minor Changes
+
+- Add support for Clerk Billing plans with per-seat costs. ([#8629](https://github.com/clerk/javascript/pull/8629)) by [@dstaley](https://github.com/dstaley)
+  - New invite-to-checkout flow when inviting members while on a plan that uses per-seat costs.
+  - New localization values to support UI additions.
+  - Support for the `orgId` and `minSeats` parameters to `getPlans()`.
+  - Support for the `seatsQuantity` and `priceId` parameters to checkout creation.
+  - New `totals` field on payments.
+  - New `availablePrices` field on plans.
+  - New `nextPayment` field on subscription items.
+  - New `discounts` field on checkouts.
+  - Additional fields on `nextPayment` for more granularity.
+
+## 4.16.0
+
+### Minor Changes
+
+- Remove the `<ConfigureSSO />` component from the public API in favor of usage within `OrganizationProfile` ([#8779](https://github.com/clerk/javascript/pull/8779)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  Removing these exports has no breaking changes impact on production applications, as <ConfigureSSO /> was never released as a GA component
+
+### Patch Changes
+
+- Add JSDoc comments to the Organization-related resource types (`OrganizationDomain`, `OrganizationCreationDefaults`, `OrganizationInvitation`, `OrganizationMembership`, `OrganizationMembershipRequest`, `OrganizationSettings`, and `OrganizationSuggestion`) to improve the generated Typedoc API docs ([#8748](https://github.com/clerk/javascript/pull/8748)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Internal refactor for self-serve SSO wizard navigation to leverage a guard-based state machine. ([#8715](https://github.com/clerk/javascript/pull/8715)) by [@iagodahlem](https://github.com/iagodahlem)
+
+  It makes the step navigation more predictable: the step you land on (including after a reload) and which steps you can move to are derived from the connection's state, the connection reset flow lands you on the right step.
+
+- Remove deprecated `createEnterpriseConnection`, `updateEnterpriseConnection`, `deleteEnterpriseConnection`, `createEnterpriseConnectionTestRun`, and `getEnterpriseConnectionTestRuns` methods from the `User` resource in favor of `Organization` scoped ones. Also removes the unused internal `__internal_useEnterpriseConnectionTestRuns` hook. ([#8747](https://github.com/clerk/javascript/pull/8747)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  `ConfigureSSO` was previously the only consumer but since it hasn't been released GA yet, these changes won't break existing production clients
+
+- Correctly display OAuth consent redirect domains for known multi-label public suffixes. ([#8700](https://github.com/clerk/javascript/pull/8700)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Add and improve JSDoc comments across public types and methods to support generated reference documentation for the `/objects` docs section. Exports a few previously-internal types (`OnEventListener`, `OffEventListener`, `ClerkOptionsNavigation`) so they can be referenced from the generated docs. ([#8276](https://github.com/clerk/javascript/pull/8276)) by [@alexisintech](https://github.com/alexisintech)
+
+## 4.15.0
+
+### Minor Changes
+
+- Internal `<ConfigureSSO />` refactor to call new org-scoped enterprise connections FAPI endpoints, replacing the `/me/` deprecated scope. ([#8671](https://github.com/clerk/javascript/pull/8671)) by [@iagodahlem](https://github.com/iagodahlem)
+
+### Patch Changes
+
+- Add support for Google Workspace SAML provider to self-serve SSO ([#8690](https://github.com/clerk/javascript/pull/8690)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Layer architecture for configure steps per IdP and protocol on `<ConfigureSSO />` ([#8651](https://github.com/clerk/javascript/pull/8651)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Prevent keyless mode from activating in CI and other automated environments in framework SDKs. ([#8676](https://github.com/clerk/javascript/pull/8676)) by [@mwickett](https://github.com/mwickett)
+
+- Add support for Microsoft Entra SAML provider to self-serve SSO ([#8695](https://github.com/clerk/javascript/pull/8695)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Replace the telemetry `postinstall` script with a one-time runtime notice, printed once per process on server runtimes (Node, excluding CI) when the telemetry collector boots against a development instance. Drops the `std-env` dependency. ([#8549](https://github.com/clerk/javascript/pull/8549)) by [@jacekradko](https://github.com/jacekradko)
+
+  Removing `postinstall` improves the package's supply-chain posture: `@clerk/shared` no longer executes arbitrary code at install time, aligning with package-manager defaults that increasingly disable install scripts.
+
+  Browser-only applications with no server-side Clerk runtime (e.g. a Vite SPA) will not surface an in-band notice. Telemetry behavior and opt-out (`telemetry={false}` or `*_CLERK_TELEMETRY_DISABLED`) are unchanged; disclosure for these setups is provided at https://clerk.com/docs/telemetry.
+
+- Nest rolldown's shared build chunks under `dist/runtime/_chunks/` instead of emitting them flat next to the entry points. The package exposes `"./*"`, which resolves to `dist/runtime/*`, so the content-hashed internal chunks were being picked up by API-diff tooling whenever a chunk hash shifted. Entry and type resolution are unchanged; the chunks are still referenced by relative path, and external `./_chunks/*` package subpaths are blocked. ([#8717](https://github.com/clerk/javascript/pull/8717)) by [@jacekradko](https://github.com/jacekradko)
+
+## 4.14.0
+
+### Minor Changes
+
+- Display "Single Sign-on (SSO)" section in `OrganizationProfile` if self-serve SSO is enabled on the current active organization ([#8600](https://github.com/clerk/javascript/pull/8600)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Guard `ConfigureSSO` based on active organization ([#8613](https://github.com/clerk/javascript/pull/8613)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Treat terminal user-state 403 responses as unauthenticated in ClerkJS. ([#8649](https://github.com/clerk/javascript/pull/8649)) by [@jacekradko](https://github.com/jacekradko)
+
+- Introduce UX improvements for `<ConfigureSSO />` such as: ([#8601](https://github.com/clerk/javascript/pull/8601)) by [@LauraBeatris](https://github.com/LauraBeatris)
+  - Render attribute-mapping and service-provider field labels per IdP nomenclature
+  - Add "Open test URL" button and surface a clear empty state
+  - Expand the appearance descriptor surface across step content so developers can override styling
+
+## 4.13.1
+
+### Patch Changes
+
+- Bump `js-cookie` to `3.0.7` to address GHSA-qjx8-664m-686j. ([#8630](https://github.com/clerk/javascript/pull/8630)) by [@jacekradko](https://github.com/jacekradko)
+
+## 4.13.0
+
+### Minor Changes
+
+- Remove `<ConfigureSSO />` from experimental path ([#8588](https://github.com/clerk/javascript/pull/8588)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Remove internal tag from publicly re-exported error helpers ([#8598](https://github.com/clerk/javascript/pull/8598)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 4.12.2
+
+### Patch Changes
+
+- Fix attribute statement section in `<ConfigureSSO />` with claim name for Custom SAML provider ([#8586](https://github.com/clerk/javascript/pull/8586)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+## 4.12.1
+
+### Patch Changes
+
+- Add support for custom SAML provider in `<ConfigureSSO />` ([#8564](https://github.com/clerk/javascript/pull/8564)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+## 4.12.0
+
+### Minor Changes
+
+- Add `highlightedPlan` prop to PricingTable default layout to render a "Popular" badge on the matching plan ([#8554](https://github.com/clerk/javascript/pull/8554)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Add a two-mode segmented control to the SAML config submission sub-step in `<__experimental_ConfigureSSO />`. Users pick between **Add via metadata URL** (default) and **Configure manually**. The metadata URL form is unchanged; the manual entry form ships in a follow-up commit. Locale keys added under `configureSSO.configureStep.samlOkta.modes` in `en-US`. ([#8553](https://github.com/clerk/javascript/pull/8553)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Add confirmation step for `<__experimental_ConfigureSSO />` ([#8531](https://github.com/clerk/javascript/pull/8531)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Add test step for `<__experimental_ConfigureSSO />` ([#8544](https://github.com/clerk/javascript/pull/8544)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+## 4.11.0
+
+### Minor Changes
+
+- Add `user.updateMetadata()` for updating current user's metadata attributes by merging existing values with the provided parameters. ([#8537](https://github.com/clerk/javascript/pull/8537)) by [@brunol95](https://github.com/brunol95)
+
+### Patch Changes
+
+- Implement the Okta SAML metadata URL submission path in the Configure step of `<__experimental_ConfigureSSO />`. Adds a single text input for the IdP metadata URL; Continue posts `{ saml: { idpMetadataUrl } }` via `user.updateEnterpriseConnection` wrapped in `useReverification`, with `useCardState` driving the loading state and `handleError` routing backend errors inline to the field or to the card-level error surface. Locale keys added under `configureSSO.configureStep` in `en-US`. Manual entry, file upload, SP-side copy rows, and the Okta admin-console walkthrough ship in follow-up PRs. ([#8535](https://github.com/clerk/javascript/pull/8535)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Implement the provider selection step of `<__experimental_ConfigureSSO />`. Renders the two SAML provider tiles (Okta Workforce and Custom SAML Provider) with real icons sourced from `img.clerk.com`, tracks the picked provider in local state, and gates `Step.Footer.Continue` on a selection. Includes a warning callout about provider lock-in and a minor `Step.Header` alignment tweak. All user-visible strings are wired through `@clerk/localizations`, with translations for every supported locale. ([#8503](https://github.com/clerk/javascript/pull/8503)) by [@iagodahlem](https://github.com/iagodahlem)
+
+  Also extends the flow context with `provider` and `setProvider`, adds the `deriveInitialStep` helper, and wires the wizard's `initialStepId` so the configure flow remounts on the right step after a reload. Continue on Select Provider stages the chosen provider and advances to the next step; the enterprise connection is created on Verify Domain once the user's email is verified and primary.
+
+- Update `<ConfigureSSO />` in the context of organizations to only allow managing enterprise connections based on system permission ([#8515](https://github.com/clerk/javascript/pull/8515)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Add verify/add email address step to `<__experimental_ConfigureSSO />` ([#8520](https://github.com/clerk/javascript/pull/8520)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+## 4.10.2
+
+### Patch Changes
+
+- Improved the `cannot_render_single_session_enabled` dev warning to use friendlier wording. The message now clearly states that the behavior is expected and points developers to the Clerk Dashboard to enable multi-session mode if needed. ([#8488](https://github.com/clerk/javascript/pull/8488)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.10.1
+
+### Patch Changes
+
+- Fix OAuth consent component and hook related types. ([#8483](https://github.com/clerk/javascript/pull/8483)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+## 4.10.0
+
+### Minor Changes
+
+- Add experimental `<ConfigureSSO />` component. Not ready for usage yet. ([#8427](https://github.com/clerk/javascript/pull/8427)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Localize API keys table headers ([#8462](https://github.com/clerk/javascript/pull/8462)) by [@jebibot](https://github.com/jebibot)
+
+- Avoid referencing `process.env` when auto-proxy detection runs in runtimes where `process` is unavailable. ([#8466](https://github.com/clerk/javascript/pull/8466)) by [@jacekradko](https://github.com/jacekradko)
+
+- Move ownership of the clerk-rq `QueryClient` from `@clerk/clerk-js` into `@clerk/shared`. The `QueryObserver` (constructed in `@clerk/shared`) and the `Query` objects it observes now always come from a single `@tanstack/query-core` resolution — the cross-bundle API contract that produced #8428 (`Query.isFetched is not a function`) no longer exists. ([#8434](https://github.com/clerk/javascript/pull/8434)) by [@jacekradko](https://github.com/jacekradko)
+
+  This removes the undocumented `clerk.__internal_queryClient` getter from both `@clerk/clerk-js` and `@clerk/react`'s `IsomorphicClerk`. The `QueryClient` is owned by an internal singleton in `@clerk/shared`, lazily instantiated on the browser only — server renders return `undefined`, preserving SSR safety and avoiding cross-request cache sharing.
+
+  `@tanstack/query-core` is no longer a direct dependency of `@clerk/clerk-js`; it remains a dep of `@clerk/shared` and resolves consumer-side as before.
+
 ## 4.9.0
 
 ### Minor Changes

@@ -54,7 +54,7 @@ import { withClerk } from './withClerk';
 
 type FallbackProp = {
   /**
-   * An optional element to render while the component is mounting.
+   * The element to render while the component is mounting.
    */
   fallback?: ReactNode;
 };
@@ -126,8 +126,8 @@ type OrganizationSwitcherPropsWithoutCustomPages = Without<
 const CustomPortalsRenderer = (props: CustomPortalsRendererProps) => {
   return (
     <>
-      {props?.customPagesPortals?.map((portal, index) => createElement(portal, { key: index }))}
-      {props?.customMenuItemsPortals?.map((portal, index) => createElement(portal, { key: index }))}
+      {props?.customPagesPortals?.map(({ key, portal }) => createElement(portal, { key }))}
+      {props?.customMenuItemsPortals?.map(({ key, portal }) => createElement(portal, { key }))}
     </>
   );
 };

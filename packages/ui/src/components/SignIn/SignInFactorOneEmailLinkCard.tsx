@@ -99,6 +99,7 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
         formTitle={localizationKeys('signIn.emailLink.formTitle')}
         formSubtitle={localizationKeys('signIn.emailLink.formSubtitle')}
         resendButton={localizationKeys('signIn.emailLink.resendButton')}
+        identityPreviewEditButtonAriaLabel={localizationKeys('identityPreviewEditButton__emailAddress')}
         onResendCodeClicked={restartVerification}
         safeIdentifier={props.factor.safeIdentifier}
         profileImageUrl={signIn.userData.imageUrl}

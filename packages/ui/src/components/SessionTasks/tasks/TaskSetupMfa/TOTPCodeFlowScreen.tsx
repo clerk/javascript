@@ -12,7 +12,7 @@ import { Form } from '@/elements/Form';
 import { FormButtonContainer } from '@/elements/FormButtons';
 import { FormContainer } from '@/elements/FormContainer';
 import { FullHeightLoader } from '@/elements/FullHeightLoader';
-import { Check, ClipboardOutline } from '@/icons';
+import { Checkmark, Clipboard } from '@/icons';
 import { Button, Col, descriptors, localizationKeys, Text } from '@/ui/customizables';
 import { Card } from '@/ui/elements/Card';
 import { SuccessPage } from '@/ui/elements/SuccessPage';
@@ -95,8 +95,8 @@ export const AddAuthenticatorApp = withCardStateProvider((props: AddAuthenticato
 
                 <ClipboardInput
                   value={totp.secret}
-                  copyIcon={ClipboardOutline}
-                  copiedIcon={Check}
+                  copyIcon={Clipboard}
+                  copiedIcon={Checkmark}
                 />
               </>
             )}
