@@ -33,7 +33,8 @@ export type FieldId =
   | 'idpSsoUrl'
   | 'acsUrl'
   | 'spEntityId'
-  | 'web3WalletName';
+  | 'web3WalletName'
+  | 'domain';
 export type ProfileSectionId =
   | 'profile'
   | 'username'

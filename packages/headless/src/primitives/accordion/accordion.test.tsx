@@ -209,11 +209,31 @@ describe('Accordion', () => {
       expect(panel).not.toHaveAttribute('data-cl-starting-style');
     });
 
-    it('sets --cl-accordion-panel-height CSS variable on panel', () => {
+    it('pins --cl-accordion-panel-height while the open animation is in progress', () => {
+      // Keep an animation pending so the idle reset (which clears the var) holds off.
+      const original = (Element.prototype as { getAnimations?: unknown }).getAnimations;
+      (Element.prototype as { getAnimations?: unknown }).getAnimations = () => [
+        { finished: new Promise<void>(() => {}) },
+      ];
+      try {
+        renderAccordion({ defaultValue: ['item1'] });
+        const panel = document.querySelector('[data-cl-slot="accordion-panel"]') as HTMLElement;
+        expect(panel.getAttribute('style')).toContain('--cl-accordion-panel-height');
+      } finally {
+        if (original) {
+          (Element.prototype as { getAnimations?: unknown }).getAnimations = original;
+        } else {
+          delete (Element.prototype as { getAnimations?: unknown }).getAnimations;
+        }
+      }
+    });
+
+    it('clears the pinned height once the panel settles open (flows at auto)', () => {
+      // With no running animations the panel drops the measured pixel height so it
+      // flows naturally with its content.
       renderAccordion({ defaultValue: ['item1'] });
       const panel = document.querySelector('[data-cl-slot="accordion-panel"]') as HTMLElement;
-      // Verify the CSS variable is present in the style attribute
-      expect(panel.getAttribute('style')).toContain('--cl-accordion-panel-height');
+      expect(panel.getAttribute('style') ?? '').not.toContain('--cl-accordion-panel-height');
     });
   });
 

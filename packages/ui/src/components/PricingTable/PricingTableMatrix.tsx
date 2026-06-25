@@ -1,3 +1,4 @@
+import { inertProps } from '@clerk/shared/inert';
 import type { BillingPlanResource, BillingSubscriptionPlanPeriod } from '@clerk/shared/types';
 import * as React from 'react';
 
@@ -46,7 +47,7 @@ export function PricingTableMatrix({
   const segmentedControlId = `${pricingTableMatrixId}-segmented-control`;
 
   const { buttonPropsForPlan } = usePlansContext();
-  const { t } = useLocalizations();
+  const { t, $ } = useLocalizations();
 
   const feePeriodNoticeAnimation: ThemableCssProp = t => ({
     transition: isMotionSafe
@@ -238,8 +239,7 @@ export function PricingTableMatrix({
                               variant='h2'
                               colorScheme='body'
                             >
-                              {planFee.currencySymbol}
-                              {planFee.amountFormatted}
+                              {$(planFee)}
                             </Text>
                             <Text
                               elementDescriptor={descriptors.pricingTableMatrixFeePeriod}
@@ -265,8 +265,7 @@ export function PricingTableMatrix({
                                   }),
                                   feePeriodNoticeAnimation,
                                 ]}
-                                // @ts-ignore - Needed until React 19 support
-                                inert={planPeriod !== 'annual' ? 'true' : undefined}
+                                {...inertProps(planPeriod !== 'annual')}
                               >
                                 <Box
                                   elementDescriptor={descriptors.pricingTableMatrixFeePeriodNoticeInner}

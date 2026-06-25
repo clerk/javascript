@@ -1,6 +1,6 @@
 {
   "name": "@clerk/headless",
-  "version": "0.0.0",
+  "version": "0.0.3",
   "private": true,
   "sideEffects": false,
   "type": "module",
@@ -58,6 +58,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@clerk/shared": "workspace:^",
     "@floating-ui/react": "catalog:repo"
   },
   "devDependencies": {
@@ -68,14 +69,14 @@
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
     "axe-core": "^4.11.3",
-    "happy-dom": "^18.0.1",
+    "happy-dom": "^20.8.9",
     "react": "catalog:react",
     "react-dom": "catalog:react",
     "rollup-plugin-preserve-directives": "^0.4.0",
     "typescript": "catalog:repo",
     "vite": "6.4.2",
     "vite-plugin-dts": "^4.5.4",
-    "vitest": "4.1.4",
+    "vitest": "4.1.6",
     "vitest-axe": "^0.1.0"
   },
   "peerDependencies": {

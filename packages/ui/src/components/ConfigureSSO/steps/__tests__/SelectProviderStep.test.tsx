@@ -10,37 +10,34 @@ import { CardStateProvider } from '@/ui/elements/contexts';
 // `handleContinue` that calls the create mutation then `useWizard().goNext`.
 // We assert on those nav calls.
 const goNext = vi.fn();
+const goPrev = vi.fn();
 
 vi.mock('../../elements/Wizard', () => ({
-  useWizard: () => ({ current: 'select-provider', goNext }),
+  useWizard: () => ({ current: 'select-provider', goNext, goPrev, isFirstStep: true }),
 }));
 
 const createEnterpriseConnection = vi.fn();
+const changeProvider = vi.fn();
 
 // Provider is sourced from the connection entity
 // (organizationEnterpriseConnection.provider) rather than a context-level
 // setProvider. The step uses goNext (not goToStep) after a successful create.
 const contextState = vi.hoisted(() => ({
-  provider: undefined as 'saml_okta' | 'saml_custom' | undefined,
-  primaryEmailAddress: { emailAddress: 'test@clerk.com' } as { emailAddress: string } | undefined,
-  isPrimaryEmailVerified: true,
+  provider: undefined as 'saml_okta' | 'saml_custom' | 'saml_google' | undefined,
+  hasConnection: false,
 }));
 
 vi.mock('../../ConfigureSSOContext', () => ({
   useConfigureSSO: () => ({
-    enterpriseConnection: undefined,
-    // The step's local `handleContinue` reads the reverification-wrapped create
-    // mutation off the bundled `mutations` object.
-    mutations: {
+    enterpriseConnection: contextState.hasConnection ? { id: 'ent_1' } : undefined,
+    contentRef: { current: null },
+    enterpriseConnectionMutations: {
       createConnection: createEnterpriseConnection,
+      changeProvider,
     },
-    primaryEmailAddress: contextState.primaryEmailAddress,
-    // Provider is sourced from the connection entity; the step no longer reads a
-    // context-level setProvider — verify-domain runs first, so the create is
-    // unconditional.
     organizationEnterpriseConnection: {
       provider: contextState.provider,
-      isPrimaryEmailVerified: contextState.isPrimaryEmailVerified,
+      hasConnection: contextState.hasConnection,
     },
   }),
 }));
@@ -58,11 +55,13 @@ const renderStep = (
 
 const resetMocks = () => {
   goNext.mockReset();
+  goPrev.mockReset();
   createEnterpriseConnection.mockReset();
   createEnterpriseConnection.mockResolvedValue(undefined);
+  changeProvider.mockReset();
+  changeProvider.mockResolvedValue(undefined);
   contextState.provider = undefined;
-  contextState.primaryEmailAddress = { emailAddress: 'test@clerk.com' };
-  contextState.isPrimaryEmailVerified = true;
+  contextState.hasConnection = false;
 };
 
 describe('SelectProviderStep', () => {
@@ -72,7 +71,7 @@ describe('SelectProviderStep', () => {
     renderStep(wrapper);
 
     expect(screen.getByRole('heading', { name: 'Select your identity provider' })).toBeInTheDocument();
-    expect(screen.getByText(/We.*ll guide you through the detailed setup process next\./)).toBeInTheDocument();
+    expect(screen.getByText(/You.*ll configure the connection details in the next step/)).toBeInTheDocument();
   });
 
   it('renders all SAML provider radios with their labels', async () => {
@@ -90,7 +89,9 @@ describe('SelectProviderStep', () => {
     const { wrapper } = await createFixtures();
     const { container } = renderStep(wrapper);
 
-    // Emotion serializes sx into stylesheets, so we check both inline + the document's collected styles
+    // Emotion serializes sx into stylesheets, so we check both inline + the document's collected styles.
+    // Each provider card is a <label> wrapping a visually-hidden native radio; the
+    // aria-hidden icon span lives inside it.
     const iconSpans = Array.from(container.querySelectorAll('label span[aria-hidden]'));
     expect(iconSpans).toHaveLength(4);
 
@@ -166,7 +167,7 @@ describe('SelectProviderStep', () => {
       expect(goNext).toHaveBeenCalled();
     });
 
-    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta', contextState.primaryEmailAddress);
+    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta');
     // The create then the goNext are the tail of the call order.
     expect(callOrder.slice(-2)).toEqual(['createEnterpriseConnection', 'goNext']);
   });
@@ -183,7 +184,7 @@ describe('SelectProviderStep', () => {
       expect(goNext).toHaveBeenCalled();
     });
 
-    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_custom', contextState.primaryEmailAddress);
+    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_custom');
   });
 
   it('does not advance when failing to create enterprise connection', async () => {
@@ -201,7 +202,7 @@ describe('SelectProviderStep', () => {
     await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
 
     await waitFor(() => {
-      expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta', contextState.primaryEmailAddress);
+      expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta');
     });
 
     expect(goNext).not.toHaveBeenCalled();
@@ -215,23 +216,106 @@ describe('SelectProviderStep', () => {
     expect(screen.getByRole('button', { name: /Previous/i })).toBeDisabled();
   });
 
-  it('always creates and jumps to configure (verify-domain ran first, so no branch back)', async () => {
-    // Under the new step order the user reaches select-provider only after
-    // verify-domain, so the create is unconditional even if the verified fact is
-    // somehow false — there is no longer a branch back to verify-domain.
-    resetMocks();
-    contextState.isPrimaryEmailVerified = false;
+  describe('changing provider when a connection already exists', () => {
+    it('advances without creating or changing when the connected provider is re-selected', async () => {
+      resetMocks();
+      contextState.provider = 'saml_okta';
+      contextState.hasConnection = true;
+      const { wrapper } = await createFixtures();
+      const { userEvent } = renderStep(wrapper);
 
-    const { wrapper } = await createFixtures();
-    const { userEvent } = renderStep(wrapper);
+      // The connected provider is preselected, so Continue just walks forward.
+      await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
 
-    await userEvent.click(screen.getByRole('radio', { name: 'Okta Workforce' }));
-    await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
-
-    await waitFor(() => {
-      expect(goNext).toHaveBeenCalled();
+      await waitFor(() => {
+        expect(goNext).toHaveBeenCalled();
+      });
+      expect(createEnterpriseConnection).not.toHaveBeenCalled();
+      expect(changeProvider).not.toHaveBeenCalled();
     });
 
-    expect(createEnterpriseConnection).toHaveBeenCalledWith('saml_okta', contextState.primaryEmailAddress);
+    it('opens the confirmation dialog when a different provider is selected', async () => {
+      resetMocks();
+      contextState.provider = 'saml_okta';
+      contextState.hasConnection = true;
+      const { wrapper } = await createFixtures();
+      const { userEvent } = renderStep(wrapper);
+
+      await userEvent.click(screen.getByRole('radio', { name: 'Google Workspace' }));
+      await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
+
+      expect(await screen.findByRole('heading', { name: /change provider to google workspace/i })).toBeInTheDocument();
+      // Nothing is mutated until the user confirms.
+      expect(changeProvider).not.toHaveBeenCalled();
+      expect(goNext).not.toHaveBeenCalled();
+    });
+
+    it('changes the provider and advances when the dialog is confirmed', async () => {
+      resetMocks();
+      contextState.provider = 'saml_okta';
+      contextState.hasConnection = true;
+      const { wrapper } = await createFixtures();
+      const { userEvent } = renderStep(wrapper);
+
+      await userEvent.click(screen.getByRole('radio', { name: 'Google Workspace' }));
+      await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Change provider' }));
+
+      await waitFor(() => {
+        expect(changeProvider).toHaveBeenCalledWith('saml_google');
+      });
+      await waitFor(() => {
+        expect(goNext).toHaveBeenCalled();
+      });
+    });
+
+    it('closes the dialog and surfaces the error on the step when the change fails', async () => {
+      resetMocks();
+      contextState.provider = 'saml_okta';
+      contextState.hasConnection = true;
+      changeProvider.mockRejectedValue(
+        new ClerkRuntimeError('failed to change provider', {
+          code: 'enterprise_connection_creation_failed',
+        }),
+      );
+      const { wrapper } = await createFixtures();
+      const { userEvent } = renderStep(wrapper);
+
+      await userEvent.click(screen.getByRole('radio', { name: 'Google Workspace' }));
+      await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Change provider' }));
+
+      await waitFor(() => {
+        expect(changeProvider).toHaveBeenCalledWith('saml_google');
+      });
+
+      // The dialog closes and the error surfaces on the step card.
+      await waitFor(() => {
+        expect(screen.queryByRole('heading', { name: /change provider to/i })).not.toBeInTheDocument();
+      });
+      expect(await screen.findByText(/failed to change provider/i)).toBeInTheDocument();
+      expect(goNext).not.toHaveBeenCalled();
+    });
+
+    it('keeps the connection and stays put when the dialog is cancelled', async () => {
+      resetMocks();
+      contextState.provider = 'saml_okta';
+      contextState.hasConnection = true;
+      const { wrapper } = await createFixtures();
+      const { userEvent } = renderStep(wrapper);
+
+      await userEvent.click(screen.getByRole('radio', { name: 'Google Workspace' }));
+      await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Cancel' }));
+
+      await waitFor(() => {
+        expect(screen.queryByRole('heading', { name: /change provider to/i })).not.toBeInTheDocument();
+      });
+      expect(changeProvider).not.toHaveBeenCalled();
+      expect(goNext).not.toHaveBeenCalled();
+    });
   });
 });

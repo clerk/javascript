@@ -12,11 +12,11 @@ export const meta: StoryMeta = {
   source: 'packages/ui/src/mosaic/block/destructive.tsx',
 };
 
-function DestructiveTrigger(props: Omit<HTMLAttributes<HTMLElement>, 'color'>) {
+function DestructiveTrigger(props: HTMLAttributes<HTMLElement>) {
   return (
     <Button
       {...props}
-      color='destructive'
+      intent='destructive'
     >
       Delete organization
     </Button>

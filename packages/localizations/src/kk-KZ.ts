@@ -50,10 +50,15 @@ export const kkKZ: LocalizationResource = {
       formButtonPrimary__revoke: undefined,
       formHint: undefined,
       formTitle: undefined,
+      inputLabel: undefined,
     },
+    tableHeader__actions: undefined,
+    tableHeader__lastUsed: undefined,
+    tableHeader__name: undefined,
   },
   backButton: 'Артқа',
   badge__activePlan: undefined,
+  badge__banned: undefined,
   badge__canceledEndsAt: undefined,
   badge__currentPlan: 'Ағымдағы жоспар',
   badge__default: 'Әдепкі бойынша',
@@ -74,11 +79,14 @@ export const kkKZ: LocalizationResource = {
   badge__userDevice: 'Пайдаланушы құрылғысы',
   badge__you: 'Сіз',
   billing: {
+    accountCredit: undefined,
     addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
     billedAnnually: 'Жыл сайын ақы төленеді',
+    billedAnnuallyOnly: undefined,
+    billedMonthly: undefined,
     billedMonthlyOnly: undefined,
     cancelFreeTrial: undefined,
     cancelFreeTrialAccessUntil: undefined,
@@ -112,20 +120,25 @@ export const kkKZ: LocalizationResource = {
       title__subscriptionSuccessful: 'Сәтті!',
       title__trialSuccess: undefined,
       totalDueAfterTrial: undefined,
+      totalDuePerPeriod: undefined,
     },
     credit: undefined,
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: 'Тегін',
     getStarted: 'Бастау',
+    highlightedPlanBadge: undefined,
     keepFreeTrial: undefined,
     keepSubscription: 'Жазылымды сақтау',
     manage: 'Басқару',
     manageSubscription: 'Жазылымды басқару',
     month: 'Ай',
+    monthAbbreviation: undefined,
+    monthPerUnit: undefined,
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
+    payerCreditRemainder: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -141,12 +154,32 @@ export const kkKZ: LocalizationResource = {
       },
     },
     paymentMethods__label: undefined,
-    highlightedPlanBadge: undefined,
     pricingTable: {
       billingCycle: undefined,
       included: undefined,
+      seatCost: {
+        additionalSeats: undefined,
+        freeUpToSeats: undefined,
+        includedSeats: undefined,
+        perSeat: undefined,
+        tooltip: {
+          additionalSeatsEach: undefined,
+          firstSeatsIncludedInPlan: undefined,
+          freeForUpToSeats: undefined,
+        },
+        unlimitedSeats: undefined,
+        upToSeats: undefined,
+      },
     },
+    proratedDiscount: undefined,
+    prorationCredit: undefined,
     reSubscribe: 'Қайта жазылу',
+    seatBreakdownIncludedPlural: undefined,
+    seatBreakdownIncludedSingular: undefined,
+    seatBreakdownPlural: undefined,
+    seatBreakdownSingular: undefined,
+    seats: undefined,
+    seatsWithLimit: undefined,
     seeAllFeatures: undefined,
     startFreeTrial: undefined,
     startFreeTrial__days: undefined,
@@ -167,18 +200,453 @@ export const kkKZ: LocalizationResource = {
       trialStartedOn: undefined,
     },
     subtotal: undefined,
+    subtotalRenewal: undefined,
     switchPlan: 'Осы жоспарға ауысу',
     switchToAnnual: undefined,
     switchToAnnualWithAnnualPrice: undefined,
     switchToMonthly: undefined,
     switchToMonthlyWithPrice: undefined,
     totalDue: undefined,
+    totalDuePerPeriod: undefined,
     totalDueToday: undefined,
     viewFeatures: undefined,
     viewPayment: undefined,
     year: undefined,
+    yearAbbreviation: undefined,
+    yearPerUnit: undefined,
   },
   configureSSO: {
+    configureStep: {
+      attributeMappingTable: {
+        badges: {
+          optional: undefined,
+          required: undefined,
+        },
+      },
+      samlCustom: {
+        assignUsersStep: {
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          title: undefined,
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attributeName: undefined,
+              userProfile: undefined,
+            },
+            rows: {
+              email: {
+                attributeName: undefined,
+                userProfile: undefined,
+              },
+              firstName: {
+                attributeName: undefined,
+                userProfile: undefined,
+              },
+              lastName: {
+                attributeName: undefined,
+                userProfile: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        createAppStep: {
+          createAppInstructions: {
+            paragraph: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+            title: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+      },
+      samlGoogle: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              appAttribute: undefined,
+              googleAttribute: undefined,
+            },
+            rows: {
+              email: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+              firstName: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+              lastName: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+        },
+        configureUserAccess: {
+          assignUsersInstructions: {
+            paragraph1: undefined,
+            paragraph2: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        createAppStep: {
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataFile: {
+            description: undefined,
+            fileUploaded: undefined,
+            label: undefined,
+            removeFile: undefined,
+            replaceFile: undefined,
+            uploadFile: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataFile: undefined,
+            title: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        serviceProviderStep: {
+          headerSubtitle: undefined,
+          nameIdInstructions: {
+            step1: undefined,
+            step2: undefined,
+          },
+          paragraph: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+          title: undefined,
+        },
+      },
+      samlMicrosoft: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attribute: undefined,
+              claimName: undefined,
+              value: undefined,
+            },
+            rows: {
+              email: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+              firstName: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+              lastName: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          title: undefined,
+        },
+        createAppStep: {
+          assignUsersInstructions: {
+            paragraph1: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            step6: undefined,
+            title: undefined,
+          },
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: {
+              label: undefined,
+              subSteps: {
+                appName: undefined,
+                create: undefined,
+                nonGallery: undefined,
+              },
+            },
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+            title: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        serviceProviderStep: {
+          headerSubtitle: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+          step5: undefined,
+          step6: undefined,
+          title: undefined,
+        },
+      },
+      samlOkta: {
+        assignUsersStep: {
+          assignUsersInstructions: {
+            paragraph: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              expression: undefined,
+              name: undefined,
+            },
+            rows: {
+              email: {
+                expression: undefined,
+                name: undefined,
+              },
+              firstName: {
+                expression: undefined,
+                name: undefined,
+              },
+              lastName: {
+                expression: undefined,
+                name: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+        },
+        createAppStep: {
+          completeSamlIntegrationInstructions: {
+            step1: undefined,
+            step2: undefined,
+            title: undefined,
+          },
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+          serviceProviderInstructions: {
+            paragraph1: undefined,
+            paragraph2: undefined,
+            serviceProviderFields: {
+              acsUrl: {
+                label: undefined,
+              },
+              spEntityId: {
+                label: undefined,
+              },
+            },
+            title: undefined,
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+            title: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+      },
+    },
+    confirmation: {
+      configurationSection: {
+        configureAgainLink: undefined,
+        issuerLabel: undefined,
+        ssoUrlLabel: undefined,
+        title: undefined,
+      },
+      domainSection: {
+        title: undefined,
+      },
+      enableSection: {
+        title: undefined,
+      },
+      inactiveBanner: {
+        title: undefined,
+      },
+      resetSection: {
+        confirmationFieldLabel: undefined,
+        submitButton: undefined,
+        title: undefined,
+        warning: undefined,
+      },
+      statusSection: {
+        activeBadge: undefined,
+        inactiveBadge: undefined,
+        title: undefined,
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'Рұқсаттарыңызды жаңарту үшін ұйым әкімшісіне хабарласыңыз.',
       title: 'Сізде бірыңғай кіруді (SSO) басқаруға рұқсат жоқ',
@@ -186,39 +654,121 @@ export const kkKZ: LocalizationResource = {
     navbar: {
       title: 'Бірыңғай кіруді конфигурациялау (SSO)',
     },
-    selectProviderStep: {
-      title: 'Провайдерді таңдау',
-      subtitle: 'SSO-ны баптамақшы провайдерді таңдаңыз.',
-      saml: {
-        groupLabel: 'SAML',
-        okta: 'Okta Workforce',
-        customSaml: 'Реттелетін SAML провайдері',
+    organizationDomainsStep: {
+      domainCard: {
+        badge__unverified: 'Расталмаған',
+        badge__verified: 'Расталған',
+        removeButtonTooltip__lastVerifiedDomain: undefined,
+        removeButtonTooltip__lastVerifiedDomainActive: undefined,
+        txtRecord: {
+          hostLabel: 'Хост / Атау',
+          instructions:
+            'Бұл TXT жазбасын DNS провайдеріңізге қосыңыз. Жазба белсенді болған бойда біз оны автоматты түрде растаймыз.',
+          typeLabel: 'Түрі',
+          valueLabel: 'Мән',
+        },
+        verifiedAtLabel: "{{ date | shortDate('kk-KZ') }} күні расталды",
       },
+      domainSuggestion: {
+        formButtonPrimary__add: '{{domain}} қосу',
+        messageLabel: 'Электрондық поштаңыз {{domain}} пайдаланады. Оны қосқыңыз келе ме?',
+      },
+      formButtonPrimary__add: 'Қосу',
+      formFieldInputPlaceholder__domain: 'Домен қосу',
+      formFieldLabel__domain: 'Домен',
+      removeDomainDialog: {
+        cancelButton: undefined,
+        removeButton: undefined,
+        subtitle__active: undefined,
+        subtitle__inactive: undefined,
+        title: undefined,
+      },
+      subtitle: 'Ұйымыңыз кіру үшін пайдаланатын домендердің меншігін қосып, растаңыз.',
+      title: 'SSO домендерін қосу',
+    },
+    resetConnectionDialog: {
+      cancelButton: undefined,
+      confirmationFieldLabel: undefined,
+      confirmationFieldPlaceholder: undefined,
+      resetButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    selectProviderStep: {
+      saml: {
+        customSaml: 'Реттелетін SAML провайдері',
+        google: undefined,
+        groupLabel: 'SAML',
+        microsoft: undefined,
+        okta: 'Okta Workforce',
+      },
+      subtitle: 'SSO-ны баптамақшы провайдерді таңдаңыз.',
+      title: 'Провайдерді таңдау',
       warning: 'Провайдер таңдалғаннан кейін, конфигурация аяқталғанша өзгерте алмайсыз',
     },
-    verifyEmailDomainStep: {
-      title: 'Электрондық пошта мекенжайын растау',
-      subtitle: 'Кәсіпорын байланысын іске қосқыңыз келетін электрондық пошта мекенжайын растаңыз.',
-      addEmailAddress: {
-        formTitle: 'Бізге электрондық поштаңыз қажет',
-        formSubtitle: 'Бастау үшін электрондық пошта мекенжайыңыз қажет болады',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'Электрондық пошта мекенжайы',
-      },
-      emailCode: {
-        formTitle: 'Электрондық пошта мекенжайыңызды растаңыз',
-        formSubtitle: '{{identifier}} мекенжайына жіберілген растау кодын енгізіңіз',
-        resendButton: 'Код алмадыңыз ба? Қайта жіберу',
-        verified: {
-          title: 'Электрондық поштаңызды алдық',
-          subtitle: 'Электрондық пошта мекенжайыңызды келесі поштамен растадыңыз',
-          inputLabel: 'Расталған электрондық пошта мекенжайы',
+    testConfigurationStep: {
+      error__noSuccessfulTestRun: undefined,
+      subtitle: undefined,
+      testResults: {
+        actionLabel__refresh: undefined,
+        empty: {
+          subtitle: undefined,
+          title: undefined,
         },
+        polling: undefined,
+        status__failed: undefined,
+        status__pending: undefined,
+        status__success: undefined,
+        title: undefined,
       },
-      domainTaken: {
-        title: 'Бұл доменде ({{domain}}) бұрыннан SSO байланысы бар',
-        subtitle: 'Қолданыстағы байланыс арқылы кіруге қол жеткізу үшін қолданба әкімшісіне хабарласыңыз.',
+      testRunDetails: {
+        howToFix: {
+          actionLabel__viewDocumentation: undefined,
+          oauth_access_denied: {
+            description: undefined,
+          },
+          oauth_fetch_user_error: {
+            intro: undefined,
+            step1: undefined,
+            step2: undefined,
+          },
+          oauth_token_exchange_error: {
+            description: undefined,
+          },
+          saml_email_address_domain_mismatch: {
+            description: undefined,
+          },
+          saml_response_relaystate_missing: {
+            description: undefined,
+          },
+          saml_user_attribute_missing: {
+            intro: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+          },
+          sectionTitle: undefined,
+        },
+        parsedUserInfo: {
+          email: undefined,
+          firstName: undefined,
+          sectionTitle: undefined,
+        },
+        runDetails: {
+          actionLabel__copied: undefined,
+          actionLabel__copy: undefined,
+          errorCode: undefined,
+          fullMessage: undefined,
+          sectionTitle: undefined,
+          status: undefined,
+          timestamp: undefined,
+        },
+        title: undefined,
       },
+      testUrl: {
+        actionLabel__open: undefined,
+      },
+      title: undefined,
     },
   },
   createOrganization: {
@@ -266,6 +816,7 @@ export const kkKZ: LocalizationResource = {
   formFieldInputPlaceholder__organizationSlug: 'my-org',
   formFieldInputPlaceholder__password: 'Құпия сөзді енгізіңіз',
   formFieldInputPlaceholder__phoneNumber: 'Телефон нөмірін енгізіңіз',
+  formFieldInputPlaceholder__signUpPassword: undefined,
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKey: 'API кілті',
@@ -296,6 +847,9 @@ export const kkKZ: LocalizationResource = {
   formFieldLabel__role: 'Рөлі',
   formFieldLabel__signOutOfOtherSessions: 'Барлық басқа құрылғылардан шығу',
   formFieldLabel__username: 'Пайдаланушы аты',
+  identityPreviewEditButton__emailAddress: undefined,
+  identityPreviewEditButton__identifier: undefined,
+  identityPreviewEditButton__phoneNumber: undefined,
   impersonationFab: {
     action__signOut: 'Шығу',
     title: '{{identifier}} ретінде кірдіңіз',
@@ -305,6 +859,22 @@ export const kkKZ: LocalizationResource = {
   membershipRole__admin: 'Әкімші',
   membershipRole__basicMember: 'Мүше',
   membershipRole__guestMember: 'Қонақ',
+  oauthConsent: {
+    action__allow: undefined,
+    action__deny: undefined,
+    offlineAccessNotice: undefined,
+    redirectNotice: undefined,
+    redirectUriModal: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    scopeList: {
+      title: undefined,
+    },
+    subtitle: undefined,
+    viewFullUrl: undefined,
+    warning: undefined,
+  },
   organizationList: {
     action__createOrganization: 'Ұйым құру',
     action__invitationAccept: 'Қосылу',
@@ -322,6 +892,7 @@ export const kkKZ: LocalizationResource = {
     },
     badge__automaticInvitation: 'Автошақырулар',
     badge__automaticSuggestion: 'Автоұсыныстар',
+    badge__enterpriseSso: undefined,
     badge__manualInvitation: 'Автоқосылу жоқ',
     badge__unverified: 'Расталмаған',
     billingPage: {
@@ -358,6 +929,7 @@ export const kkKZ: LocalizationResource = {
       statementsSection: {
         empty: undefined,
         itemCaption__paidForPlan: undefined,
+        itemCaption__payerCredit: undefined,
         itemCaption__proratedCredit: undefined,
         itemCaption__subscribedAndPaidForPlan: undefined,
         notFound: undefined,
@@ -370,6 +942,11 @@ export const kkKZ: LocalizationResource = {
         actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
+        includedSeatsUsage: undefined,
+        overview: undefined,
+        paidSeatsUsage: undefined,
+        seatLimit: undefined,
+        seatLimitAndIncludedSeats: undefined,
         tableHeader__edit: undefined,
         tableHeader__plan: undefined,
         tableHeader__startDate: undefined,
@@ -391,6 +968,7 @@ export const kkKZ: LocalizationResource = {
     invitePage: {
       detailsTitle__inviteFailed: 'Келесі электрондық пошталарға шақыру жіберілмеді: {{email_addresses}}.',
       formButtonPrimary__continue: 'Шақыруларды жіберу',
+      formButtonPrimary__purchaseSeats: undefined,
       selectDropdown__role: 'Рөлді таңдау',
       subtitle: 'Бірнеше электрондық поштаны енгізіңіз немесе қойыңыз.',
       successMessage: 'Шақырулар сәтті жіберілді',
@@ -448,11 +1026,13 @@ export const kkKZ: LocalizationResource = {
       description: 'Ұйымыңызды басқарыңыз.',
       general: 'Жалпы',
       members: 'Мүшелер',
+      security: undefined,
       title: 'Ұйым',
     },
     plansPage: {
       alerts: {
         noPermissionsToManageBilling: undefined,
+        planMembershipLimitExceeded: undefined,
       },
       title: undefined,
     },
@@ -491,9 +1071,33 @@ export const kkKZ: LocalizationResource = {
       successMessage: '{{domain}} жойылды.',
       title: 'Доменді жою',
     },
+    securityPage: {
+      removeDialog: {
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      ssoSection: {
+        badge__active: undefined,
+        badge__inProgress: undefined,
+        badge__inactive: undefined,
+        badge__unconfigured: undefined,
+        descriptionLine1: undefined,
+        domainLabel: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__continueConfiguration: undefined,
+        primaryButton__startConfiguration: undefined,
+        title: undefined,
+      },
+      title: undefined,
+    },
     start: {
       headerTitle__general: 'Жалпы',
       headerTitle__members: 'Мүшелер',
+      membershipSeatUsageLabel: undefined,
       profileSection: {
         primaryButton: 'Профильді жаңарту',
         title: 'Ұйым профилі',
@@ -999,6 +1603,8 @@ export const kkKZ: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ұйымға қазірдің өзінде қосылған.',
+    api_key_name_already_exists: undefined,
+    api_key_usage_exceeded: undefined,
     avatar_file_size_exceeded: 'Файл өлшемі 10 МБ шегінен асып кетті. Кішірек файлды таңдаңыз.',
     avatar_file_type_invalid: 'Файл түрі қолдау көрсетілмейді. JPG, PNG, GIF немесе WEBP суретін жүктеңіз.',
     captcha_invalid: 'Қауіпсіздік тексерілуі сәтсіз аяқталды. Браузерді өзгерту немесе кеңейтулерді өшіруге тырысыңыз.',
@@ -1039,7 +1645,10 @@ export const kkKZ: LocalizationResource = {
     form_username_invalid_length: 'Пайдаланушы аты {{min_length}} пен {{max_length}} арасында болуы керек.',
     form_username_needs_non_number_char: 'Пайдаланушы атыңызда кемінде бір санды емес таңба болуы керек.',
     identification_deletion_failed: 'Соңғы идентификацияны жою мүмкін емес.',
+    insufficient_seats_change_plan: undefined,
+    insufficient_seats_contact_support: undefined,
     not_allowed_access: 'Бұл бетке қол жеткізуге рұқсат жоқ. Қате болса, қолдау қызметіне хабарласыңыз.',
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'Бұл электрондық пошта домені бұғатталған. Басқасын қолданыңыз.',
     organization_domain_common: 'Бұл жалпы электрондық пошта домені. Басқасын қолданыңыз.',
     organization_domain_exists_for_enterprise_connection: 'Бұл домен ұйымыңыздың SSO үшін қолданылады.',
@@ -1114,6 +1723,9 @@ export const kkKZ: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Шығу',
     action__signOutAll: 'Барлық есептік жазбалардан шығу',
+    label__userButtonPopover: 'Есептік жазба тақтасы',
+    label__accountActions: 'Есептік жазба әрекеттері',
+    label__activeSessions: 'Белсенді сессиялар',
   },
   userProfile: {
     apiKeysPage: {
@@ -1166,6 +1778,7 @@ export const kkKZ: LocalizationResource = {
       statementsSection: {
         empty: undefined,
         itemCaption__paidForPlan: undefined,
+        itemCaption__payerCredit: undefined,
         itemCaption__proratedCredit: undefined,
         itemCaption__subscribedAndPaidForPlan: undefined,
         notFound: undefined,
@@ -1178,6 +1791,7 @@ export const kkKZ: LocalizationResource = {
         actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
+        overview: undefined,
         tableHeader__edit: undefined,
         tableHeader__plan: undefined,
         tableHeader__startDate: undefined,

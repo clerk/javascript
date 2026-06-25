@@ -1,7 +1,8 @@
 import React from 'react';
 
-import { Box, descriptors, Flex, Icon, SimpleButton, Text, Span } from '@/customizables';
-import { ChevronRight, Checkmark } from '@/icons';
+import { Box, descriptors, Flex, Icon, SimpleButton, Span, Text } from '@/customizables';
+import { Checkmark, ChevronRight } from '@/icons';
+import { mqu } from '@/styledSystem';
 
 import type { StepperItemProps, StepperProps } from './types';
 
@@ -15,6 +16,7 @@ const Root = ({ children }: StepperProps): JSX.Element => {
       sx={theme => ({
         gap: theme.space.$2,
         flexWrap: 'wrap',
+        [mqu.md]: { gap: theme.space.$3 },
       })}
     >
       {items.map((child, index) => (
@@ -34,6 +36,7 @@ const Root = ({ children }: StepperProps): JSX.Element => {
               icon={ChevronRight}
               size='md'
               colorScheme='neutral'
+              sx={{ [mqu.md]: { display: 'none' } }}
             />
           )}
         </Span>
@@ -75,14 +78,14 @@ const Item = ({
           width: theme.sizes.$4,
           height: theme.sizes.$4,
           borderRadius: theme.radii.$circle,
-          backgroundColor: isCurrent
-            ? theme.colors.$colorForeground
-            : isCompleted
-              ? theme.colors.$success500
+          backgroundColor: isCompleted
+            ? theme.colors.$success500
+            : isCurrent
+              ? theme.colors.$colorForeground
               : theme.colors.$colorMutedForeground,
         })}
       >
-        {isCompleted && !isCurrent ? (
+        {isCompleted ? (
           <Icon
             icon={Checkmark}
             size='sm'
@@ -127,6 +130,7 @@ const Skeleton = ({ totalSteps = 4 }: SkeletonProps): JSX.Element => (
     sx={theme => ({
       gap: theme.space.$2,
       flexWrap: 'wrap',
+      [mqu.md]: { gap: theme.space.$3 },
     })}
   >
     {Array.from({ length: totalSteps }).map((_, index) => (
@@ -139,7 +143,7 @@ const Skeleton = ({ totalSteps = 4 }: SkeletonProps): JSX.Element => (
             icon={ChevronRight}
             size='md'
             colorScheme='neutral'
-            sx={{ opacity: 0.16 }}
+            sx={{ opacity: 0.16, [mqu.md]: { display: 'none' } }}
           />
         )}
       </React.Fragment>

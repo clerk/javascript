@@ -3,6 +3,7 @@ import UIKit
 public class ClerkNativeViewHost: UIView {
   private lazy var hostingCoordinator = ClerkNativeHostingCoordinator(containerView: self)
   private var hasInitialized: Bool = false
+  private var configuredObserver: NSObjectProtocol?
 
   override public init(frame: CGRect) {
     super.init(frame: frame)
@@ -12,6 +13,10 @@ public class ClerkNativeViewHost: UIView {
     fatalError("init(coder:) has not been implemented")
   }
 
+  deinit {
+    removeConfiguredObserver()
+  }
+
   override public func didMoveToWindow() {
     super.didMoveToWindow()
 
@@ -19,6 +24,7 @@ public class ClerkNativeViewHost: UIView {
       if hasInitialized {
         hostedViewDidDetachFromWindow()
       }
+      removeConfiguredObserver()
       hostingCoordinator.detach()
       hasInitialized = false
       return
@@ -26,6 +32,7 @@ public class ClerkNativeViewHost: UIView {
 
     guard !hasInitialized else { return }
     hasInitialized = true
+    addConfiguredObserver()
     hostedViewDidAttachToWindow()
     updateHostedView()
   }
@@ -48,6 +55,24 @@ public class ClerkNativeViewHost: UIView {
   func hostedViewDidAttachToWindow() {}
 
   func hostedViewDidDetachFromWindow() {}
+
+  private func addConfiguredObserver() {
+    guard configuredObserver == nil else { return }
+
+    configuredObserver = NotificationCenter.default.addObserver(
+      forName: .clerkNativeSDKDidConfigure,
+      object: nil,
+      queue: .main
+    ) { [weak self] _ in
+      self?.setNeedsHostedViewUpdate()
+    }
+  }
+
+  private func removeConfiguredObserver() {
+    guard let configuredObserver else { return }
+    NotificationCenter.default.removeObserver(configuredObserver)
+    self.configuredObserver = nil
+  }
 
   private func updateHostedView() {
     guard let controller = makeHostedController() else { return }

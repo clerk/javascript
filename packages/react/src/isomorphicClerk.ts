@@ -91,12 +91,10 @@ const SDK_METADATA = {
   environment: process.env.NODE_ENV,
 };
 
-export interface Global {
-  Clerk?: HeadlessBrowserClerk | BrowserClerk;
-  __internal_ClerkUICtor?: ClerkUIConstructor;
+declare global {
+  var Clerk: HeadlessBrowserClerk | BrowserClerk | undefined;
+  var __internal_ClerkUICtor: ClerkUIConstructor | undefined;
 }
-
-declare const global: Global;
 
 type GenericFunction<TArgs = never> = (...args: TArgs[]) => unknown;
 
@@ -548,19 +546,19 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       });
     }
 
-    // Otherwise, set global.Clerk to the bundled ctor or instance
+    // Otherwise, set globalThis.Clerk to the bundled ctor or instance
     if (this.options.Clerk && !this.options.__internal_clerkJSUrl) {
-      global.Clerk = isConstructor<BrowserClerkConstructor | HeadlessBrowserClerkConstructor>(this.options.Clerk)
+      globalThis.Clerk = isConstructor<BrowserClerkConstructor | HeadlessBrowserClerkConstructor>(this.options.Clerk)
         ? new this.options.Clerk(this.#publishableKey, { proxyUrl: this.proxyUrl, domain: this.domain })
         : this.options.Clerk;
     }
 
-    if (!global.Clerk) {
+    if (!globalThis.Clerk) {
       // TODO @nikos: somehow throw if clerk ui failed to load but it was not headless
       throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');
     }
 
-    return global.Clerk;
+    return globalThis.Clerk;
   }
 
   private async getClerkUIEntryChunk(): Promise<ClerkUIConstructor | undefined> {
@@ -587,11 +585,11 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
         nonce: this.options.nonce,
       });
 
-      if (!global.__internal_ClerkUICtor) {
+      if (!globalThis.__internal_ClerkUICtor) {
         throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
       }
 
-      return global.__internal_ClerkUICtor;
+      return globalThis.__internal_ClerkUICtor;
     }
 
     return undefined;
@@ -776,6 +774,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   get version() {
     return this.clerkjs?.version;
+  }
+
+  get uiVersion(): string | undefined {
+    return this.clerkjs?.uiVersion;
   }
 
   get client(): ClientResource | undefined {

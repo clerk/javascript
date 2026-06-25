@@ -157,16 +157,34 @@ describe('Collapsible', () => {
       expect(panel).not.toHaveAttribute('data-cl-starting-style');
     });
 
-    it('sets --collapsible-panel-height CSS variable on panel', () => {
-      renderCollapsible({ defaultOpen: true });
-      const panel = document.querySelector('[data-cl-slot="collapsible-panel"]') as HTMLElement;
-      expect(panel.getAttribute('style')).toContain('--collapsible-panel-height');
+    it('pins --collapsible-panel-height/width while the open animation is in progress', () => {
+      // Keep an animation pending so the idle reset (which clears the vars) holds off.
+      const original = (Element.prototype as { getAnimations?: unknown }).getAnimations;
+      (Element.prototype as { getAnimations?: unknown }).getAnimations = () => [
+        { finished: new Promise<void>(() => {}) },
+      ];
+      try {
+        renderCollapsible({ defaultOpen: true });
+        const panel = document.querySelector('[data-cl-slot="collapsible-panel"]') as HTMLElement;
+        expect(panel.getAttribute('style')).toContain('--collapsible-panel-height');
+        expect(panel.getAttribute('style')).toContain('--collapsible-panel-width');
+      } finally {
+        if (original) {
+          (Element.prototype as { getAnimations?: unknown }).getAnimations = original;
+        } else {
+          delete (Element.prototype as { getAnimations?: unknown }).getAnimations;
+        }
+      }
     });
 
-    it('sets --collapsible-panel-width CSS variable on panel', () => {
+    it('clears the pinned dimensions once the panel settles open (flows at auto)', () => {
+      // With no running animations the panel drops the measured pixel dimensions so
+      // it flows naturally with its content.
       renderCollapsible({ defaultOpen: true });
       const panel = document.querySelector('[data-cl-slot="collapsible-panel"]') as HTMLElement;
-      expect(panel.getAttribute('style')).toContain('--collapsible-panel-width');
+      const style = panel.getAttribute('style') ?? '';
+      expect(style).not.toContain('--collapsible-panel-height');
+      expect(style).not.toContain('--collapsible-panel-width');
     });
   });
 
