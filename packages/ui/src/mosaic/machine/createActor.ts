@@ -4,6 +4,7 @@ import type {
   Actor,
   AfterEvent,
   AnyEventObject,
+  AssignAction,
   CreateActorOptions,
   EventObject,
   Snapshot,
@@ -11,9 +12,10 @@ import type {
   StateConfig,
   StateMachine,
   TransitionConfig,
+  TransitionFn,
   Unsubscribe,
 } from './types';
-import { AFTER, INIT, INVOKE_DONE, INVOKE_ERROR, RECHECK } from './types';
+import { AFTER, ASSIGN, INIT, INVOKE_DONE, INVOKE_ERROR, RECHECK } from './types';
 
 const INIT_EVENT: AnyEventObject = { type: INIT };
 
@@ -69,6 +71,37 @@ export function createActor<TContext extends object, TEvent extends EventObject>
   let snapshot: Snapshot<TContext> = { value, context, status };
 
   const listeners: SnapshotListener<TContext>[] = [];
+
+  /**
+   * Normalise a raw `Transition` value into a `TransitionConfig[]` the runtime
+   * can process uniformly. Handles all four arms of the `Transition` union:
+   * - string → `{ target: string }`
+   * - `TransitionConfig` → as-is
+   * - `TransitionConfig[]` → as-is
+   * - `TransitionFn` → called immediately; `undefined` return → `[]` (unhandled)
+   */
+  function normalizeTransition(raw: unknown, event: EventObject): TransitionConfig<TContext, EventObject>[] {
+    if (typeof raw === 'function') {
+      // SAFETY: raw is a TransitionFn — (args: {context, event}) => TransitionResult | undefined.
+      // The cast is required because the generic TStates parameter is erased at this internal
+      // boundary; callers have already narrowed the event type via StateConfig.on[K].
+      const result = (raw as TransitionFn<TContext, EventObject>)({ context, event });
+      if (result === undefined) {
+        return [];
+      }
+      const cfg: TransitionConfig<TContext, EventObject> = { target: result.target };
+      if (result.context !== undefined) {
+        const patch = result.context;
+        // SAFETY: Constructing AssignAction inline avoids importing the assign() helper here.
+        // The ASSIGN symbol is the exact tag isAssignAction checks in runActions.
+        cfg.actions = { type: ASSIGN, assignment: () => patch } as AssignAction<TContext, EventObject>;
+      }
+      return [cfg];
+    }
+    return toArr(raw as any).map(e =>
+      typeof e === 'string' ? { target: e } : (e as TransitionConfig<TContext, EventObject>),
+    );
+  }
 
   function runActions(actions: Actions<TContext, EventObject> | undefined, event: EventObject): void {
     for (const action of toArr(actions)) {
@@ -133,10 +166,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
           return;
         }
         const doneEvent = { type: INVOKE_DONE, output };
-        const transition = pickTransition(
-          toArr(invoke.onDone as any).map(e => (typeof e === 'string' ? { target: e } : e)),
-          doneEvent,
-        );
+        const transition = pickTransition(normalizeTransition(invoke.onDone, doneEvent), doneEvent);
         if (!transition) {
           return;
         }
@@ -148,10 +178,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
           return;
         }
         const errorEvent = { type: INVOKE_ERROR, error };
-        const transition = pickTransition(
-          toArr(invoke.onError as any).map(e => (typeof e === 'string' ? { target: e } : e)),
-          errorEvent,
-        );
+        const transition = pickTransition(normalizeTransition(invoke.onError, errorEvent), errorEvent);
         if (!transition) {
           return;
         }
@@ -175,15 +202,13 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     }
     for (const [delayStr, raw] of Object.entries(afterConfig)) {
       const delay = Number(delayStr);
-      // Normalize transitions: toArr handles undefined/array/single value, map converts string targets
-      const transitions = toArr(raw as any).map(e => (typeof e === 'string' ? { target: e } : e));
       const id = setTimeout(() => {
         afterTimers = afterTimers.filter(t => t !== id);
         if (status !== 'active') {
           return;
         }
         const afterEvent: AfterEvent = { type: AFTER, delay };
-        const transition = pickTransition(transitions, afterEvent);
+        const transition = pickTransition(normalizeTransition(raw, afterEvent), afterEvent);
         if (!transition) {
           return;
         }
@@ -208,10 +233,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       return;
     }
 
-    const immediate = pickTransition(
-      toArr(stateConfig.always as any).map(e => (typeof e === 'string' ? { target: e } : e)),
-      event,
-    );
+    const immediate = pickTransition(normalizeTransition(stateConfig.always, event), event);
     if (immediate && immediate.target !== undefined && takeTransition(immediate, event)) {
       return;
     }
@@ -262,10 +284,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       if (!started || status !== 'active') {
         return;
       }
-      const transition = pickTransition(
-        toArr(states[value]?.on?.[event.type] as any).map(e => (typeof e === 'string' ? { target: e } : e)),
-        event,
-      );
+      const transition = pickTransition(normalizeTransition(states[value]?.on?.[event.type], event), event);
       if (!transition) {
         return;
       } // event not handled in this state → ignored
@@ -297,10 +316,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       if (!started || status !== 'active') {
         return false;
       }
-      const transition = pickTransition(
-        toArr(states[value]?.on?.[event.type] as any).map(e => (typeof e === 'string' ? { target: e } : e)),
-        event,
-      );
+      const transition = pickTransition(normalizeTransition(states[value]?.on?.[event.type], event), event);
       if (!transition) {
         return false;
       }
@@ -336,10 +352,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
         return;
       }
 
-      const immediate = pickTransition(
-        toArr(states[value]?.always as any).map(e => (typeof e === 'string' ? { target: e } : e)),
-        event,
-      );
+      const immediate = pickTransition(normalizeTransition(states[value]?.always, event), event);
       if (immediate && immediate.target !== undefined && takeTransition(immediate, event)) {
         commit(); // nothing applies → no commit, no notify
       }

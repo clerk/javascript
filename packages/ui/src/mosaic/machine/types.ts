@@ -51,14 +51,33 @@ export interface TransitionConfig<TContext, TEvent extends EventObject, TStates 
   guard?: Guard<TContext, TEvent>;
 }
 
+/** What an inline transition function returns. `undefined` means the event is unhandled. */
+export interface TransitionResult<TContext, TStates extends string = string> {
+  /** State to enter. Omit for an internal transition (updates context, stays put). */
+  target?: TStates;
+  /** Shallow context patch applied after the transition. */
+  context?: Partial<TContext>;
+}
+
 /**
- * A transition may be a bare target string, a config object, or an array of
- * configs evaluated in order (first passing guard wins).
+ * Inline transition function. Replaces the `guard` + `actions: [assign(...)]`
+ * combo for the common case. Returning `undefined` means the event is unhandled
+ * (equivalent to a failing guard).
+ */
+export type TransitionFn<TContext, TEvent extends EventObject, TStates extends string = string> = (args: {
+  context: TContext;
+  event: TEvent;
+}) => TransitionResult<TContext, TStates> | undefined;
+
+/**
+ * A transition may be a bare target string, a config object, an array of
+ * configs evaluated in order (first passing guard wins), or an inline function.
  */
 export type Transition<TContext, TEvent extends EventObject, TStates extends string = string> =
   | TStates
   | TransitionConfig<TContext, TEvent, TStates>
-  | TransitionConfig<TContext, TEvent, TStates>[];
+  | TransitionConfig<TContext, TEvent, TStates>[]
+  | TransitionFn<TContext, TEvent, TStates>;
 
 /** The event type fired when an invoked promise resolves. */
 export const INVOKE_DONE = 'machine.invoke.done';

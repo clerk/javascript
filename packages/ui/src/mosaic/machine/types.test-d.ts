@@ -370,3 +370,58 @@ describe('setup.fromPromise — e.output is typed from src return type', () => {
     });
   });
 });
+
+// ─── TransitionFn — inline function form ─────────────────────────────────────
+
+describe('TransitionFn — accepted in on and always', () => {
+  const { createMachine: make3 } = setup<TestContext, TestEvent>();
+
+  test('function form accepted in on[K] — no type error', () => {
+    make3({
+      initial: 'idle',
+      context: { count: 0, label: '' },
+      states: {
+        idle: {
+          on: {
+            WITH_PAYLOAD: ({ context, event }) => {
+              // context is TContext
+              expectTypeOf(context).toEqualTypeOf<TestContext>();
+              // event is narrowed to the specific member
+              expectTypeOf(event).toEqualTypeOf<{ type: 'WITH_PAYLOAD'; value: string }>();
+              return { target: 'idle' as const };
+            },
+          },
+        },
+      },
+    });
+  });
+
+  test('function form accepted in always — no type error', () => {
+    make3({
+      initial: 'idle',
+      context: { count: 0, label: '' },
+      states: {
+        idle: {
+          always: ({ context }) => {
+            expectTypeOf(context).toEqualTypeOf<TestContext>();
+            return undefined;
+          },
+        },
+      },
+    });
+  });
+
+  test('returning undefined from TransitionFn is allowed', () => {
+    make3({
+      initial: 'idle',
+      context: { count: 0, label: '' },
+      states: {
+        idle: {
+          on: {
+            SIMPLE: (): undefined => undefined,
+          },
+        },
+      },
+    });
+  });
+});

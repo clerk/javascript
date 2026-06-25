@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { assign, isAssignAction } from '../assign';
 import { createActor, mockActor } from '../createActor';
 import { createMachine } from '../createMachine';
-import type { DoneInvokeEvent, ErrorInvokeEvent } from '../types';
+import type { DoneInvokeEvent } from '../types';
 import {
   createDeleteOrgMachine,
   createLoaderMachine,
@@ -844,5 +844,189 @@ describe('createActor — after (delayed transitions)', () => {
     actor.start(); // StrictMode remount — must reschedule the timer
     vi.advanceTimersByTime(60_000);
     expect(actor.getSnapshot().value).toBe('expired');
+  });
+});
+
+describe('createActor — inline transition functions (TransitionFn)', () => {
+  it('takes transition when function returns a target', () => {
+    const machine = createMachine<{ step: number }, { type: 'NEXT' }>({
+      initial: 'a',
+      context: { step: 0 },
+      states: {
+        a: { on: { NEXT: () => ({ target: 'b' }) } },
+        b: {},
+      },
+    });
+    const actor = createActor(machine);
+    actor.start();
+    actor.send({ type: 'NEXT' });
+    expect(actor.getSnapshot().value).toBe('b');
+  });
+
+  it('treats undefined return as unhandled — snapshot unchanged, no notify', () => {
+    const machine = createMachine<{ allowed: boolean }, { type: 'NEXT' }>({
+      initial: 'a',
+      context: { allowed: false },
+      states: {
+        a: {
+          on: { NEXT: ({ context }) => (context.allowed ? { target: 'b' } : undefined) },
+        },
+        b: {},
+      },
+    });
+    const actor = createActor(machine);
+    actor.start();
+    const seen: string[] = [];
+    actor.subscribe(s => seen.push(s.value));
+    const before = actor.getSnapshot();
+    actor.send({ type: 'NEXT' });
+    expect(actor.getSnapshot()).toBe(before);
+    expect(actor.getSnapshot().value).toBe('a');
+    expect(seen).toEqual([]);
+  });
+
+  it('applies context patch without navigation when function returns { context }', () => {
+    const machine = createMachine<{ name: string }, { type: 'SET'; value: string }>({
+      initial: 'active',
+      context: { name: '' },
+      states: {
+        active: {
+          on: { SET: ({ event }) => ({ context: { name: event.value } }) },
+        },
+      },
+    });
+    const actor = createActor(machine);
+    actor.start();
+    actor.send({ type: 'SET', value: 'Alice' });
+    expect(actor.getSnapshot().value).toBe('active');
+    expect(actor.getSnapshot().context.name).toBe('Alice');
+  });
+
+  it('applies context patch and navigates when function returns { target, context }', () => {
+    const machine = createMachine<{ email: string }, { type: 'SUBMIT'; value: string }>({
+      initial: 'filling',
+      context: { email: '' },
+      states: {
+        filling: {
+          on: {
+            SUBMIT: ({ event }) => ({ target: 'submitting' as const, context: { email: event.value } }),
+          },
+        },
+        submitting: {},
+      },
+    });
+    const actor = createActor(machine);
+    actor.start();
+    actor.send({ type: 'SUBMIT', value: 'a@b.com' });
+    expect(actor.getSnapshot().value).toBe('submitting');
+    expect(actor.getSnapshot().context.email).toBe('a@b.com');
+  });
+
+  it('receives the narrowed event type via the args object', () => {
+    const captured: string[] = [];
+    const machine = createMachine<Record<string, never>, { type: 'GO'; payload: string }>({
+      initial: 'a',
+      context: {},
+      states: {
+        a: {
+          on: {
+            GO: ({ event }) => {
+              captured.push(event.payload);
+              return { target: 'b' };
+            },
+          },
+        },
+        b: {},
+      },
+    });
+    const actor = createActor(machine);
+    actor.start();
+    actor.send({ type: 'GO', payload: 'hello' });
+    expect(captured).toEqual(['hello']);
+  });
+
+  it('always function form navigates when it returns a target', () => {
+    const machine = createMachine<{ done: boolean }, { type: never }>({
+      initial: 'checking',
+      context: { done: true },
+      states: {
+        checking: {
+          always: ({ context }) => (context.done ? { target: 'complete' } : undefined),
+        },
+        complete: {},
+      },
+    });
+    const actor = createActor(machine);
+    actor.start();
+    expect(actor.getSnapshot().value).toBe('complete');
+  });
+
+  it('always function form stays when it returns undefined', () => {
+    const machine = createMachine<{ done: boolean }, { type: never }>({
+      initial: 'checking',
+      context: { done: false },
+      states: {
+        checking: {
+          always: ({ context }) => (context.done ? { target: 'complete' } : undefined),
+        },
+        complete: {},
+      },
+    });
+    const actor = createActor(machine);
+    actor.start();
+    expect(actor.getSnapshot().value).toBe('checking');
+  });
+
+  it('always function form is re-evaluated by recheck()', () => {
+    let ready = false;
+    const machine = createMachine<Record<string, never>, { type: never }>({
+      initial: 'waiting',
+      context: {},
+      states: {
+        waiting: {
+          always: () => (ready ? { target: 'done' } : undefined),
+        },
+        done: {},
+      },
+    });
+    const actor = createActor(machine);
+    actor.start();
+    expect(actor.getSnapshot().value).toBe('waiting');
+
+    ready = true;
+    actor.recheck();
+    expect(actor.getSnapshot().value).toBe('done');
+  });
+
+  it('can() returns true when TransitionFn would return a takeable transition', () => {
+    const machine = createMachine<{ allowed: boolean }, { type: 'GO' }>({
+      initial: 'a',
+      context: { allowed: true },
+      states: {
+        a: {
+          on: { GO: ({ context }) => (context.allowed ? { target: 'b' } : undefined) },
+        },
+        b: {},
+      },
+    });
+    const actor = createActor(machine);
+    actor.start();
+    expect(actor.can({ type: 'GO' })).toBe(true);
+  });
+
+  it('can() returns false when TransitionFn returns undefined', () => {
+    const machine = createMachine<{ allowed: boolean }, { type: 'GO' }>({
+      initial: 'a',
+      context: { allowed: false },
+      states: {
+        a: {
+          on: { GO: ({ context }) => (context.allowed ? { target: 'b' } : undefined) },
+        },
+        b: {},
+      },
+    });
+    const actor = createActor(machine);
+    actor.start();
+    expect(actor.can({ type: 'GO' })).toBe(false);
   });
 });
