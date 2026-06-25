@@ -74,7 +74,7 @@ const mockCodeChallenge = 'mock-code-challenge-_';
 
 describe('useHostedAuth', () => {
   const mockClient = {
-    lastActiveSessionId: null,
+    lastActiveSessionId: null as string | null,
     reload: vi.fn(),
   };
   const mockUpdateClient = vi.fn();
@@ -116,6 +116,9 @@ describe('useHostedAuth', () => {
       client: mockClient,
       setActive: mockSetActive,
       updateClient: mockUpdateClient,
+      getFapiClient: () => ({
+        request: mockFapiRequest,
+      }),
     });
     mocks.getClerkInstance.mockReturnValue({
       getFapiClient: () => ({
@@ -155,6 +158,7 @@ describe('useHostedAuth', () => {
         state: 'state-123',
       },
     });
+    expect(mocks.getClerkInstance).not.toHaveBeenCalled();
     expect(mocks.makeRedirectUri).toHaveBeenCalledWith({
       path: 'hosted-auth-callback',
       isTripleSlashed: true,
@@ -176,6 +180,27 @@ describe('useHostedAuth', () => {
     expect(response.createdSessionId).toBe('sess_123');
   });
 
+  test('falls back to the reloaded client session when callback session id is absent', async () => {
+    const updatedClient = {
+      ...mockClient,
+      lastActiveSessionId: 'sess_reloaded',
+    };
+    mockHostedAuthResponse();
+    mocks.openAuthSessionAsync.mockResolvedValue({
+      type: 'success',
+      url: 'myapp:///hosted-auth-callback?state=state-123&rotating_token_nonce=nonce-123',
+    });
+    mockClient.reload.mockResolvedValue(updatedClient);
+
+    const { result } = renderHook(() => useHostedAuth());
+    const response = await result.current.startHostedAuth({ state: 'state-123' });
+
+    expect(mockUpdateClient).toHaveBeenCalledWith(updatedClient);
+    expect(mockSetActive).toHaveBeenCalledWith({ session: 'sess_reloaded' });
+    expect(response.createdSessionId).toBe('sess_reloaded');
+    expect(response.client).toBe(updatedClient);
+  });
+
   test('does not activate a session when the callback does not return one', async () => {
     mockHostedAuthResponse();
     mocks.openAuthSessionAsync.mockResolvedValue({
@@ -192,6 +217,22 @@ describe('useHostedAuth', () => {
       codeVerifier: mockCodeVerifier,
     });
     expect(mockUpdateClient).toHaveBeenCalledWith(mockClient);
+    expect(mockSetActive).not.toHaveBeenCalled();
+    expect(response.createdSessionId).toBeNull();
+  });
+
+  test('does not fall back to an existing active session when callback session params are missing', async () => {
+    mockClient.lastActiveSessionId = 'sess_existing';
+    mockHostedAuthResponse();
+    mocks.openAuthSessionAsync.mockResolvedValue({
+      type: 'success',
+      url: 'myapp:///hosted-auth-callback?state=state-123',
+    });
+
+    const { result } = renderHook(() => useHostedAuth());
+    const response = await result.current.startHostedAuth({ state: 'state-123' });
+
+    expect(mockClient.reload).not.toHaveBeenCalled();
     expect(mockSetActive).not.toHaveBeenCalled();
     expect(response.createdSessionId).toBeNull();
   });
@@ -275,6 +316,20 @@ describe('useHostedAuth', () => {
 
     await expect(result.current.startHostedAuth({ state: 'state-123' })).rejects.toThrow(
       'Hosted auth callback URL did not match the initiated redirect URL.',
+    );
+  });
+
+  test('rejects malformed callback URLs with a hosted auth error', async () => {
+    mockHostedAuthResponse();
+    mocks.openAuthSessionAsync.mockResolvedValue({
+      type: 'success',
+      url: '://not-a-url',
+    });
+
+    const { result } = renderHook(() => useHostedAuth());
+
+    await expect(result.current.startHostedAuth({ state: 'state-123' })).rejects.toThrow(
+      'Hosted auth callback URL was invalid.',
     );
   });
 

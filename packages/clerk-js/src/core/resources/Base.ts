@@ -63,8 +63,8 @@ export abstract class BaseResource {
   }
 
   public async reload(params?: ClerkResourceReloadParams): Promise<this> {
-    const { codeVerifier, rotatingTokenNonce } = params || {};
-    return this._baseGet({ codeVerifier, forceUpdateClient: true, rotatingTokenNonce });
+    const { rotatingTokenNonce } = params || {};
+    return this._baseGet({ forceUpdateClient: true, rotatingTokenNonce });
   }
 
   public isNew(): boolean {
@@ -207,7 +207,6 @@ export abstract class BaseResource {
       {
         method: 'GET',
         path: this.path(),
-        codeVerifier: opts.codeVerifier,
         rotatingTokenNonce: opts.rotatingTokenNonce,
         signal: opts.abortSignal,
       },

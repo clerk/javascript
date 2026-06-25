@@ -47,8 +47,10 @@ type ClerkWithFapiClient = {
   getFapiClient?: () => FapiClient | undefined;
 };
 
-export async function createHostedAuth(params: CreateHostedAuthParams): Promise<HostedAuthResource> {
-  const fapiClient = (getClerkInstance() as ClerkWithFapiClient | undefined)?.getFapiClient?.();
+export async function createHostedAuth(params: CreateHostedAuthParams, clerk?: unknown): Promise<HostedAuthResource> {
+  const fapiClient =
+    (clerk as ClerkWithFapiClient | undefined)?.getFapiClient?.() ??
+    (getClerkInstance() as ClerkWithFapiClient | undefined)?.getFapiClient?.();
   if (!fapiClient) {
     return errorThrower.throw('Hosted auth requires a Clerk instance that can make FAPI requests.');
   }

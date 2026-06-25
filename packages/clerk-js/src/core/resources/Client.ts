@@ -1,4 +1,5 @@
 import type {
+  ClerkResourceReloadParams,
   ClientJSON,
   ClientJSONSnapshot,
   ClientResource,
@@ -75,6 +76,27 @@ export class Client extends BaseResource implements ClientResource {
 
   fetch({ fetchMaxTries, abortSignal }: { fetchMaxTries?: number; abortSignal?: AbortSignal } = {}): Promise<this> {
     return this._baseGet({ fetchMaxTries, abortSignal });
+  }
+
+  public async reload(params?: ClerkResourceReloadParams): Promise<this> {
+    if (!params?.rotatingTokenNonce || !params.codeVerifier) {
+      return super.reload(params);
+    }
+
+    const json = await Client._fetch<ClientJSON>(
+      {
+        method: 'POST',
+        path: this.path(),
+        body: {
+          _method: 'GET',
+          rotatingTokenNonce: params.rotatingTokenNonce,
+          codeVerifier: params.codeVerifier,
+        },
+      },
+      { forceUpdateClient: true },
+    );
+
+    return this.fromJSON((json?.response || json) as ClientJSON | null);
   }
 
   async destroy(): Promise<void> {

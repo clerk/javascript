@@ -19,6 +19,7 @@ export type StartHostedAuthParams = {
   /**
    * Native deep-link URL that Account Portal redirects to after auth completes.
    * Defaults to `AuthSession.makeRedirectUri({ path: 'hosted-auth-callback', isTripleSlashed: true })`.
+   * Production instances must allowlist this URL in the Clerk Dashboard.
    */
   redirectUrl?: string;
   /**
@@ -83,6 +84,9 @@ export function useHostedAuth(): {
         client: clerk.client,
       };
     }
+    if (!clerk.client) {
+      return errorThrower.throw('Hosted auth requires a loaded Clerk client.');
+    }
 
     let AuthSessionModule: typeof AuthSession;
     let WebBrowserModule: typeof WebBrowser;
@@ -109,15 +113,15 @@ export function useHostedAuth(): {
       });
     const state = params.state ?? createState();
     const pkce = await createPKCE();
-    if (!clerk.client) {
-      return errorThrower.throw('Hosted auth requires a loaded Clerk client.');
-    }
-    const hostedAuth = await createHostedAuth({
-      redirectUrl,
-      codeChallenge: pkce.codeChallenge,
-      mode: toFapiMode(params.mode),
-      state,
-    });
+    const hostedAuth = await createHostedAuth(
+      {
+        redirectUrl,
+        codeChallenge: pkce.codeChallenge,
+        mode: toFapiMode(params.mode),
+        state,
+      },
+      clerk,
+    );
 
     const authSessionResult = await WebBrowserModule.openAuthSessionAsync(
       hostedAuth.url,
@@ -132,7 +136,12 @@ export function useHostedAuth(): {
       };
     }
 
-    const callbackUrl = new URL(authSessionResult.url);
+    let callbackUrl: URL;
+    try {
+      callbackUrl = new URL(authSessionResult.url);
+    } catch {
+      return errorThrower.throw('Hosted auth callback URL was invalid.');
+    }
     if (!callbackUrlMatchesRedirectUrl(callbackUrl, redirectUrl)) {
       return errorThrower.throw('Hosted auth callback URL did not match the initiated redirect URL.');
     }
@@ -143,18 +152,17 @@ export function useHostedAuth(): {
     }
 
     let updatedClient: ClientResource | undefined;
+    let createdSessionId: string | null = null;
     const rotatingTokenNonce = callbackParams.get('rotating_token_nonce') ?? '';
     if (rotatingTokenNonce) {
       updatedClient = await clerk.client?.reload({ rotatingTokenNonce, codeVerifier: pkce.codeVerifier });
       if (updatedClient) {
         getClientUpdater(clerk)?.(updatedClient);
+        createdSessionId = normalizeSessionId(
+          callbackParams.get('created_session_id') || updatedClient.lastActiveSessionId,
+        );
       }
     }
-    const createdSessionId =
-      callbackParams.get('created_session_id') ??
-      updatedClient?.lastActiveSessionId ??
-      clerk.client?.lastActiveSessionId ??
-      null;
     if (createdSessionId) {
       await clerk.setActive({
         session: createdSessionId,
@@ -191,6 +199,10 @@ function toFapiMode(mode: HostedAuthMode | undefined): FapiHostedAuthMode | unde
   }
 
   return undefined;
+}
+
+function normalizeSessionId(sessionId: string | null | undefined): string | null {
+  return sessionId || null;
 }
 
 function createState(): string {

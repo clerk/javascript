@@ -18,7 +18,6 @@ export type FapiRequestInit = RequestInit & {
   search?: ConstructorParameters<typeof URLSearchParams>[0];
   sessionId?: string;
   rotatingTokenNonce?: string;
-  codeVerifier?: string;
   pathPrefix?: string;
   url?: URL;
 };
@@ -28,7 +27,6 @@ type FapiQueryStringParameters = {
   _clerk_session_id?: string;
   _clerk_js_version?: string;
   rotating_token_nonce?: string;
-  code_verifier?: string;
 };
 
 type FapiRequestOptions = {
@@ -109,14 +107,7 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
   }
 
   // TODO @userland-errors:
-  function buildQueryString({
-    method,
-    path,
-    sessionId,
-    search,
-    rotatingTokenNonce,
-    codeVerifier,
-  }: FapiRequestInit): string {
+  function buildQueryString({ method, path, sessionId, search, rotatingTokenNonce }: FapiRequestInit): string {
     const searchParams = new URLSearchParams(search as any);
     // the above will parse {key: ['val1','val2']} as key: 'val1,val2' and we need to recreate the array bellow
 
@@ -127,9 +118,6 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
 
     if (rotatingTokenNonce) {
       searchParams.append('rotating_token_nonce', rotatingTokenNonce);
-    }
-    if (codeVerifier) {
-      searchParams.append('code_verifier', codeVerifier);
     }
 
     if (options.domain && options.instanceType === 'development' && options.isSatellite) {
