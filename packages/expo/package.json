@@ -61,6 +61,10 @@
       "types": "./dist/apple/index.d.ts",
       "default": "./dist/apple/index.js"
     },
+    "./hosted-auth": {
+      "types": "./dist/hosted-auth/index.d.ts",
+      "default": "./dist/hosted-auth/index.js"
+    },
     "./resource-cache": {
       "types": "./dist/resource-cache/index.d.ts",
       "default": "./dist/resource-cache/index.js"
@@ -92,6 +96,7 @@
     "token-cache",
     "google",
     "apple",
+    "hosted-auth",
     "experimental",
     "legacy",
     "src/specs",
