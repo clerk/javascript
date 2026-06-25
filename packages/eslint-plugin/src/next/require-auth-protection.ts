@@ -4,7 +4,13 @@ import type { Rule } from 'eslint';
 
 import type { ExportTarget, FunctionNode } from './lib/exports';
 import { iterateExportAllDeclarations, iterateNamedExports, resolveDefaultExport } from './lib/exports';
-import { type FileKind, getFileKind, getRelativeFolder, isClientModule, isServerFunctionModule } from './lib/file-info';
+import {
+  type FileKind,
+  getAppRouterFileKind,
+  getRelativeFolder,
+  isClientModule,
+  isServerFunctionModule,
+} from './lib/file-info';
 import { buildAuthProtectFixes } from './lib/fixers';
 import type { ClassifyOptions } from './lib/match-folders';
 import { classifyFolder, hasDescendantsMatching } from './lib/match-folders';
@@ -30,19 +36,19 @@ interface ResourceOptions {
 type NormalizedResourceOptions = Required<ResourceOptions>;
 
 export interface RuleOptions {
-  /** Glob patterns that mark folders as protected. */
+  /** Project-relative folder globs whose resources must be guarded. */
   protected: string[];
-  /** Glob patterns that exempt folders from protection. */
+  /** Project-relative folder globs that are exempt. */
   public?: string[];
   /** Resource groups that should be checked. All resource groups are checked by default. */
   resources?: ResourceOptions;
   /** Layouts that wrap both protected and public descendants. */
   mixedScopeLayouts?: 'auto' | string[];
   /**
-   * Directory paths are relativized against when resolving `app/...` folder
-   * globs. Defaults to the nearest ancestor `eslint.config.*` (same walk ESLint
-   * uses for config lookup), then ESLint `cwd`. Set to `import.meta.dirname` in
-   * your `eslint.config.mjs` when config discovery is unavailable.
+   * Project root used to resolve project-relative folder globs. Defaults to the
+   * nearest ancestor `eslint.config.*` (same walk ESLint uses for config
+   * lookup), then ESLint `cwd`. Set to `import.meta.dirname` in your
+   * `eslint.config.mjs` when config discovery is unavailable.
    */
   rootDir?: string;
 }
@@ -110,6 +116,12 @@ const rule: Rule.RuleModule = {
     const filename = context.physicalFilename ?? context.filename ?? context.getFilename?.();
     const cwd = context.cwd || context.getCwd?.();
     const options = (context.options[0] ?? {}) as Partial<RuleOptions>;
+    const ruleId = context.id ?? 'require-auth-protection';
+    validatePathPatterns(ruleId, 'protected', options.protected);
+    validatePathPatterns(ruleId, 'public', options.public);
+    if (Array.isArray(options.mixedScopeLayouts)) {
+      validatePathPatterns(ruleId, 'mixedScopeLayouts', options.mixedScopeLayouts);
+    }
     const config: ClassifyOptions = {
       protected: options.protected,
       public: options.public ?? [],
@@ -123,7 +135,7 @@ const rule: Rule.RuleModule = {
       return {};
     }
 
-    const fileKind = getFileKind(filename);
+    const fileKind = getAppRouterFileKind(filename, folder);
 
     let authNames = new Set<string>();
     let shouldCheckInlineServerFunctions = false;
@@ -213,6 +225,50 @@ export default rule;
 
 function normalizeResources(resources: ResourceOptions | undefined): NormalizedResourceOptions {
   return { ...DEFAULT_RESOURCES, ...resources };
+}
+
+function validatePathPatterns(
+  ruleId: string,
+  optionName: 'protected' | 'public' | 'mixedScopeLayouts',
+  patterns: string[] | undefined,
+): void {
+  if (!patterns) {
+    return;
+  }
+  for (const pattern of patterns) {
+    const error = getPathPatternError(pattern);
+    if (error) {
+      throw new Error(`${ruleId}: \`${optionName}\` ${error} Received "${pattern}".`);
+    }
+  }
+}
+
+function getPathPatternError(pattern: string): string | null {
+  if (pattern === '') {
+    return 'patterns cannot be empty.';
+  }
+  if (pattern.includes('\\')) {
+    return 'patterns must use `/` path separators, not `\\`.';
+  }
+  if (pattern.startsWith('/') || /^[A-Za-z]:\//.test(pattern)) {
+    return 'patterns must be relative to `rootDir`, not absolute.';
+  }
+  if (pattern.includes('{') || pattern.includes('}')) {
+    return 'patterns cannot use brace expansion.';
+  }
+
+  const segments = pattern.split('/');
+  if (segments.includes('')) {
+    return 'patterns cannot contain empty path segments.';
+  }
+  if (segments.includes('.')) {
+    return 'patterns cannot contain `.` segments.';
+  }
+  if (segments.includes('..')) {
+    return 'patterns cannot contain `..` segments.';
+  }
+
+  return null;
 }
 
 function checkUnacknowledgedMixedScope(
