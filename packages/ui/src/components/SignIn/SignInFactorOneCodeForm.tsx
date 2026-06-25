@@ -30,6 +30,7 @@ export type SignInFactorOneCodeFormProps = SignInFactorOneCodeCard & {
   cardSubtitle: LocalizationKey;
   inputLabel: LocalizationKey;
   resendButton: LocalizationKey;
+  identityPreviewEditButtonAriaLabel: LocalizationKey;
 };
 
 export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => {
@@ -144,6 +145,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
       onResendCodeClicked={prepare}
       safeIdentifier={props.factor.safeIdentifier}
       profileImageUrl={signIn.userData.imageUrl}
+      identityPreviewEditButtonAriaLabel={props.identityPreviewEditButtonAriaLabel}
       onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
       showAlternativeMethods={props.showAlternativeMethods}
       onIdentityPreviewEditClicked={goBack}

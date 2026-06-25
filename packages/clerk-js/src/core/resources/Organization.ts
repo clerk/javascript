@@ -2,6 +2,7 @@ import type {
   AddMemberParams,
   ClerkPaginatedResponse,
   ClerkResourceReloadParams,
+  CreateOrganizationDomainParams,
   CreateOrganizationEnterpriseConnectionParams,
   CreateOrganizationParams,
   DeletedObjectJSON,
@@ -24,6 +25,8 @@ import type {
   InviteMembersParams,
   OrganizationDomainJSON,
   OrganizationDomainResource,
+  OrganizationDomainsBulkOwnershipVerificationJSON,
+  OrganizationDomainsBulkOwnershipVerificationResource,
   OrganizationInvitationJSON,
   OrganizationInvitationResource,
   OrganizationJSON,
@@ -71,6 +74,7 @@ export class Organization extends BaseResource implements OrganizationResource {
   pendingInvitationsCount = 0;
   maxAllowedMemberships!: number;
   selfServeSSOEnabled = false;
+  exclusiveMembership = false;
 
   constructor(data: OrganizationJSON | OrganizationJSONSnapshot) {
     super();
@@ -134,11 +138,17 @@ export class Organization extends BaseResource implements OrganizationResource {
   getDomains = async (
     getDomainParams?: GetDomainsParams,
   ): Promise<ClerkPaginatedResponse<OrganizationDomainResource>> => {
+    const { enrollmentMode, ...rest } = getDomainParams || {};
+    const search = convertPageToOffsetSearchParams(rest);
+    if (enrollmentMode) {
+      search.set('enrollment_mode', enrollmentMode);
+    }
+
     return await BaseResource._fetch(
       {
         path: `/organizations/${this.id}/domains`,
         method: 'GET',
-        search: convertPageToOffsetSearchParams(getDomainParams),
+        search,
       },
       {
         forceUpdateClient: true,
@@ -282,8 +292,46 @@ export class Organization extends BaseResource implements OrganizationResource {
     });
   };
 
-  createDomain = async (name: string): Promise<OrganizationDomainResource> => {
-    return OrganizationDomain.create(this.id, { name });
+  createDomain = async (
+    name: string,
+    params?: Pick<CreateOrganizationDomainParams, 'enrollmentMode'>,
+  ): Promise<OrganizationDomainResource> => {
+    return OrganizationDomain.create(this.id, { name, enrollmentMode: params?.enrollmentMode });
+  };
+
+  prepareOwnershipVerification = async (
+    domainIds: string[],
+  ): Promise<OrganizationDomainsBulkOwnershipVerificationResource> => {
+    return this.bulkOwnershipVerification('prepare_ownership_verification', domainIds);
+  };
+
+  attemptOwnershipVerification = async (
+    domainIds: string[],
+  ): Promise<OrganizationDomainsBulkOwnershipVerificationResource> => {
+    return this.bulkOwnershipVerification('attempt_ownership_verification', domainIds);
+  };
+
+  private bulkOwnershipVerification = async (
+    action: 'prepare_ownership_verification' | 'attempt_ownership_verification',
+    domainIds: string[],
+  ): Promise<OrganizationDomainsBulkOwnershipVerificationResource> => {
+    const { data, errors } = (
+      await BaseResource._fetch(
+        {
+          path: `/organizations/${this.id}/domains/${action}/bulk`,
+          method: 'POST',
+          body: { organization_domain_ids: domainIds } as any,
+        },
+        {
+          forceUpdateClient: true,
+        },
+      )
+    )?.response as unknown as OrganizationDomainsBulkOwnershipVerificationJSON;
+
+    return {
+      data: (data ?? []).map(domain => new OrganizationDomain(domain)),
+      errors: errors ?? [],
+    };
   };
 
   getMemberships: GetMemberships = async getMembershipsParams => {
@@ -427,6 +475,7 @@ export class Organization extends BaseResource implements OrganizationResource {
     this.maxAllowedMemberships = data.max_allowed_memberships || 0;
     this.adminDeleteEnabled = data.admin_delete_enabled || false;
     this.selfServeSSOEnabled = data.self_serve_sso_enabled || false;
+    this.exclusiveMembership = data.exclusive_membership || false;
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
     return this;
@@ -446,6 +495,7 @@ export class Organization extends BaseResource implements OrganizationResource {
       max_allowed_memberships: this.maxAllowedMemberships,
       admin_delete_enabled: this.adminDeleteEnabled,
       self_serve_sso_enabled: this.selfServeSSOEnabled,
+      exclusive_membership: this.exclusiveMembership,
       created_at: this.createdAt.getTime(),
       updated_at: this.updatedAt.getTime(),
     };

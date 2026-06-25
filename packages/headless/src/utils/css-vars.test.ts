@@ -58,13 +58,13 @@ function createMockState(
     platform: {
       getElementRects: vi.fn(),
       getDimensions: vi.fn(),
-      getClippingRect: vi.fn(async () => ({
+      getClippingRect: vi.fn(() => ({
         width: 1024,
         height: 768,
         x: 0,
         y: 0,
       })),
-      convertOffsetParentRelativeRectToViewportRelativeRect: vi.fn(async ({ rect }: { rect: unknown }) => rect),
+      convertOffsetParentRelativeRectToViewportRelativeRect: vi.fn(({ rect }: { rect: unknown }) => rect),
     },
     x: 0,
     y: 0,

@@ -2,6 +2,24 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { inBrowser, isValidBrowser, isValidBrowserOnline, userAgentIsRobot } from '../browser';
 
+/**
+ * Simulates a Web/Service Worker global scope (e.g. an MV3 background service worker):
+ * no `window`, but a `WorkerGlobalScope` exposing a `WorkerNavigator` as `self.navigator`.
+ * Reuses the existing jsdom navigator (with its property spies) as the worker navigator so
+ * userAgent/onLine/webdriver getters keep applying.
+ */
+function mockServiceWorkerScope() {
+  const workerNavigator = window.navigator;
+  class WorkerGlobalScope {}
+  const workerSelf = Object.create(WorkerGlobalScope.prototype);
+  workerSelf.navigator = workerNavigator;
+  vi.stubGlobal('WorkerGlobalScope', WorkerGlobalScope);
+  vi.stubGlobal('self', workerSelf);
+  const windowSpy = vi.spyOn(global, 'window', 'get');
+  // @ts-ignore - Test
+  windowSpy.mockReturnValue(undefined);
+}
+
 describe('inBrowser()', () => {
   afterEach(() => {
     vi.restoreAllMocks();
@@ -36,9 +54,58 @@ describe('isValidBrowser', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.unstubAllGlobals();
   });
 
-  it('returns false if not in browser', () => {
+  it('returns false when there is no window and no WorkerGlobalScope (e.g. Node SSR)', () => {
+    // Modern Node exposes `globalThis.navigator`, so the bare global navigator stays
+    // defined here. Without a `WorkerGlobalScope`, SSR must still be treated as non-browser.
+    const windowSpy = vi.spyOn(global, 'window', 'get');
+    // @ts-ignore - Test
+    windowSpy.mockReturnValue(undefined);
+
+    expect(isValidBrowser()).toBe(false);
+  });
+
+  it('returns true in a service worker (no window) when a valid WorkerNavigator is present', () => {
+    mockServiceWorkerScope();
+    userAgentGetter.mockReturnValue(
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    );
+    webdriverGetter.mockReturnValue(false);
+
+    expect(isValidBrowser()).toBe(true);
+  });
+
+  it('returns false in a worker scope whose navigator identifies a server runtime (e.g. Cloudflare Workers)', () => {
+    // Today workerd's `self` fails the `instanceof WorkerGlobalScope` gate, but that is a
+    // quirk of its prototype chain. This simulates a spec-compliant workerd: full worker
+    // scope, navigator present, but the user agent self-identifies as a server runtime.
+    mockServiceWorkerScope();
+    userAgentGetter.mockReturnValue('Cloudflare-Workers');
+    webdriverGetter.mockReturnValue(false);
+
+    expect(isValidBrowser()).toBe(false);
+  });
+
+  it.each(['Node.js/24', 'Deno/2.5.0', 'Bun/1.3.9'])(
+    'returns false in a worker scope whose navigator identifies the %s server runtime',
+    userAgent => {
+      mockServiceWorkerScope();
+      userAgentGetter.mockReturnValue(userAgent);
+      webdriverGetter.mockReturnValue(false);
+
+      expect(isValidBrowser()).toBe(false);
+    },
+  );
+
+  it('returns false when WorkerGlobalScope exists but self is not an instance of it (e.g. workerd today)', () => {
+    // workerd exposes the WorkerGlobalScope constructor without linking `self` to its
+    // prototype chain, so the instanceof gate must reject it even with a browser-like UA.
+    vi.stubGlobal('WorkerGlobalScope', class {});
+    vi.stubGlobal('self', {
+      navigator: { userAgent: 'Mozilla/5.0 Chrome/120.0.0.0 Safari/537.36', onLine: true, webdriver: false },
+    });
     const windowSpy = vi.spyOn(global, 'window', 'get');
     // @ts-ignore - Test
     windowSpy.mockReturnValue(undefined);
@@ -131,6 +198,11 @@ describe('isValidBrowserOnline', () => {
     connectionGetter = vi.spyOn(window.navigator, 'connection', 'get');
   });
 
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
+
   it('returns TRUE if connection is online, navigator is online, has disabled webdriver, and not a bot', () => {
     userAgentGetter.mockReturnValue(
       'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/109.0',
@@ -206,5 +278,48 @@ describe('isValidBrowserOnline', () => {
     });
 
     expect(isValidBrowserOnline()).toBe(true);
+  });
+
+  it('returns TRUE in a service worker (no window) when the WorkerNavigator reports online', () => {
+    mockServiceWorkerScope();
+    userAgentGetter.mockReturnValue(
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    );
+    webdriverGetter.mockReturnValue(false);
+    onLineGetter.mockReturnValue(true);
+
+    expect(isValidBrowserOnline()).toBe(true);
+  });
+
+  it('returns FALSE in a service worker (no window) when the WorkerNavigator reports offline', () => {
+    mockServiceWorkerScope();
+    userAgentGetter.mockReturnValue(
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    );
+    webdriverGetter.mockReturnValue(false);
+    onLineGetter.mockReturnValue(false);
+
+    expect(isValidBrowserOnline()).toBe(false);
+  });
+
+  it('returns FALSE when there is no window and no WorkerGlobalScope (e.g. Node SSR)', () => {
+    // Modern Node exposes `globalThis.navigator`, so the bare global navigator stays
+    // defined here. Without a `WorkerGlobalScope`, SSR must still be treated as non-browser.
+    const windowSpy = vi.spyOn(global, 'window', 'get');
+    // @ts-ignore - Test
+    windowSpy.mockReturnValue(undefined);
+
+    expect(isValidBrowserOnline()).toBe(false);
+  });
+
+  it('returns FALSE in a worker scope whose navigator identifies a server runtime (e.g. Cloudflare Workers)', () => {
+    // Cloudflare Workers do not implement `navigator.onLine`, so without the server-runtime
+    // exclusion this would fall into the "onLine is not a boolean -> assume online" branch.
+    mockServiceWorkerScope();
+    userAgentGetter.mockReturnValue('Cloudflare-Workers');
+    webdriverGetter.mockReturnValue(false);
+    onLineGetter.mockReturnValue(undefined);
+
+    expect(isValidBrowserOnline()).toBe(false);
   });
 });

@@ -3,10 +3,13 @@ import React, { type JSX } from 'react';
 import {
   Badge,
   Box,
+  Button,
   Col,
   descriptors,
   Flex,
   Heading,
+  Icon,
+  type LocalizationKey,
   localizationKeys,
   Table,
   Tbody,
@@ -15,12 +18,15 @@ import {
   Th,
   Thead,
   Tr,
+  useLocalizations,
 } from '@/customizables';
 import { ClipboardInput } from '@/elements/ClipboardInput';
 import { useCardState } from '@/elements/contexts';
 import { Form } from '@/elements/Form';
 import { Tooltip } from '@/elements/Tooltip';
+import { useClipboard } from '@/hooks';
 import { Checkmark, Clipboard } from '@/icons';
+import { truncateWithEndVisible } from '@/ui/utils/truncateTextWithEndVisible';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
 import { useConfigureSSO } from '../../../ConfigureSSOContext';
@@ -192,13 +198,6 @@ const SamlMicrosoftCreateAppStep = (): JSX.Element => {
                 'configureSSO.configureStep.samlMicrosoft.createAppStep.assignUsersInstructions.title',
               )}
             />
-            <Text
-              as='p'
-              colorScheme='secondary'
-              localizationKey={localizationKeys(
-                'configureSSO.configureStep.samlMicrosoft.createAppStep.assignUsersInstructions.paragraph1',
-              )}
-            />
 
             <Col
               elementDescriptor={descriptors.configureSSOInstructionsList}
@@ -248,14 +247,6 @@ const SamlMicrosoftCreateAppStep = (): JSX.Element => {
                 colorScheme='secondary'
                 localizationKey={localizationKeys(
                   'configureSSO.configureStep.samlMicrosoft.createAppStep.assignUsersInstructions.step5',
-                )}
-              />
-              <Text
-                elementDescriptor={descriptors.configureSSOInstructionsListItem}
-                as='li'
-                colorScheme='secondary'
-                localizationKey={localizationKeys(
-                  'configureSSO.configureStep.samlMicrosoft.createAppStep.assignUsersInstructions.step6',
                 )}
               />
             </Col>
@@ -353,53 +344,55 @@ const SamlMicrosoftServiceProviderStep = (): JSX.Element => {
                 colorScheme='secondary'
                 localizationKey={localizationKeys('configureSSO.configureStep.samlMicrosoft.serviceProviderStep.step4')}
               />
+
+              <Box
+                elementDescriptor={descriptors.configureSSOInstructionsListItem}
+                as='li'
+                sx={theme => ({
+                  fontSize: theme.fontSizes.$md,
+                  lineHeight: theme.lineHeights.$small,
+                  color: theme.colors.$colorMutedForeground,
+                })}
+              >
+                <Text
+                  as='span'
+                  colorScheme='secondary'
+                  localizationKey={localizationKeys(
+                    'configureSSO.configureStep.samlMicrosoft.serviceProviderStep.step5',
+                  )}
+                />
+                <Col sx={theme => ({ gap: theme.space.$4, marginBlock: theme.space.$3 })}>
+                  <Form.ControlRow elementId={spEntityIdField.id}>
+                    <Form.CommonInputWrapper {...spEntityIdField.props}>
+                      <ClipboardInput
+                        value={spEntityId}
+                        readOnly
+                        copyIcon={Clipboard}
+                        copiedIcon={Checkmark}
+                      />
+                    </Form.CommonInputWrapper>
+                  </Form.ControlRow>
+
+                  <Form.ControlRow elementId={acsUrlField.id}>
+                    <Form.CommonInputWrapper {...acsUrlField.props}>
+                      <ClipboardInput
+                        value={acsUrl}
+                        readOnly
+                        copyIcon={Clipboard}
+                        copiedIcon={Checkmark}
+                      />
+                    </Form.CommonInputWrapper>
+                  </Form.ControlRow>
+                </Col>
+              </Box>
+
               <Text
                 elementDescriptor={descriptors.configureSSOInstructionsListItem}
                 as='li'
                 colorScheme='secondary'
-                localizationKey={localizationKeys('configureSSO.configureStep.samlMicrosoft.serviceProviderStep.step5')}
+                localizationKey={localizationKeys('configureSSO.configureStep.samlMicrosoft.serviceProviderStep.step6')}
               />
             </Col>
-          </Col>
-
-          <Form.ControlRow elementId={spEntityIdField.id}>
-            <Form.CommonInputWrapper {...spEntityIdField.props}>
-              <ClipboardInput
-                value={spEntityId}
-                readOnly
-                copyIcon={Clipboard}
-                copiedIcon={Checkmark}
-              />
-            </Form.CommonInputWrapper>
-          </Form.ControlRow>
-
-          <Form.ControlRow elementId={acsUrlField.id}>
-            <Form.CommonInputWrapper {...acsUrlField.props}>
-              <ClipboardInput
-                value={acsUrl}
-                readOnly
-                copyIcon={Clipboard}
-                copiedIcon={Checkmark}
-              />
-            </Form.CommonInputWrapper>
-          </Form.ControlRow>
-
-          <Col
-            elementDescriptor={descriptors.configureSSOInstructionsList}
-            as='ul'
-            sx={theme => ({
-              gap: theme.space.$1x5,
-              margin: 0,
-              paddingInlineStart: theme.space.$5,
-              listStyleType: 'disc',
-            })}
-          >
-            <Text
-              elementDescriptor={descriptors.configureSSOInstructionsListItem}
-              as='li'
-              colorScheme='secondary'
-              localizationKey={localizationKeys('configureSSO.configureStep.samlMicrosoft.serviceProviderStep.step6')}
-            />
           </Col>
         </Step.Section>
       </Step.Body>
@@ -430,118 +423,154 @@ const MICROSOFT_ATTRIBUTE_ROWS: ReadonlyArray<MicrosoftAttributeRow> = [
   { id: 'lastName', isRequired: false },
 ];
 
-const MicrosoftAttributeMappingTable = (): JSX.Element => (
-  <Table
-    elementDescriptor={descriptors.configureSSOAttributeMappingTable}
-    sx={theme => ({
-      'tr > th:first-of-type': { paddingInlineStart: theme.space.$4 },
-    })}
-  >
-    <Thead>
-      <Tr>
-        <Th>
-          <Text
-            sx={theme => ({ fontSize: theme.fontSizes.$xs })}
-            localizationKey={localizationKeys(
-              'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.columns.attribute',
-            )}
-          />
-        </Th>
-        <Th>
-          <Text
-            sx={theme => ({ fontSize: theme.fontSizes.$xs })}
-            localizationKey={localizationKeys(
-              'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.columns.claimName',
-            )}
-          />
-        </Th>
-        <Th>
-          <Text
-            sx={theme => ({ fontSize: theme.fontSizes.$xs })}
-            localizationKey={localizationKeys(
-              'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.columns.value',
-            )}
-          />
-        </Th>
-      </Tr>
-    </Thead>
-    <Tbody>
-      {MICROSOFT_ATTRIBUTE_ROWS.map(row => {
-        const claimNameKey = localizationKeys(
-          `configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.rows.${row.id}.claimName`,
-        );
+const MicrosoftClaimNameCell = ({ claimNameKey }: { claimNameKey: LocalizationKey }): JSX.Element => {
+  const { t } = useLocalizations();
+  const claimName = t(claimNameKey);
+  const { onCopy, hasCopied } = useClipboard(claimName);
 
-        return (
-          <Tr key={row.id}>
-            {/*
-             * Keep the attribute name + badge on a single line. Without this,
-             * the next cell's `width: 100%` squeezes this one to its minimum
-             * intrinsic width, which causes "Email address" / "First name" /
-             * "Last name" to wrap onto two lines.
-             */}
-            <Td sx={{ whiteSpace: 'nowrap' }}>
-              <Flex
-                as='span'
-                align='center'
-                sx={theme => ({ gap: theme.space.$2 })}
-              >
-                <Text
+  return (
+    <Td sx={{ maxWidth: 0, width: '100%' }}>
+      <Flex
+        as='span'
+        align='center'
+        sx={theme => ({ gap: theme.space.$1 })}
+      >
+        <Tooltip.Root>
+          <Tooltip.Trigger>
+            <Text
+              as='span'
+              sx={{
+                fontFamily: 'monospace',
+                display: 'block',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {/* Middle-truncate so the meaningful end of the claim URI (e.g. "emailaddress") stays visible. */}
+              {truncateWithEndVisible(claimName, 32, 12)}
+            </Text>
+          </Tooltip.Trigger>
+          <Tooltip.Content
+            text={claimNameKey}
+            textSx={{ overflowWrap: 'anywhere' }}
+          />
+        </Tooltip.Root>
+        <Button
+          variant='ghost'
+          onClick={() => onCopy()}
+          aria-label={t(
+            localizationKeys(
+              hasCopied
+                ? 'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.copyClaimNameCopied'
+                : 'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.copyClaimName',
+            ),
+          )}
+          sx={theme => ({
+            padding: 0,
+            height: theme.sizes.$5,
+            aspectRatio: 1,
+            borderRadius: theme.radii.$sm,
+            color: theme.colors.$colorMutedForeground,
+          })}
+        >
+          <Icon
+            size='sm'
+            icon={hasCopied ? Checkmark : Clipboard}
+            aria-hidden
+          />
+        </Button>
+      </Flex>
+    </Td>
+  );
+};
+
+const MicrosoftAttributeMappingTable = (): JSX.Element => {
+  return (
+    <Table
+      elementDescriptor={descriptors.configureSSOAttributeMappingTable}
+      sx={theme => ({
+        'tr > th:first-of-type': { paddingInlineStart: theme.space.$4 },
+      })}
+    >
+      <Thead>
+        <Tr>
+          <Th>
+            <Text
+              sx={theme => ({ fontSize: theme.fontSizes.$xs })}
+              localizationKey={localizationKeys(
+                'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.columns.attribute',
+              )}
+            />
+          </Th>
+          <Th>
+            <Text
+              sx={theme => ({ fontSize: theme.fontSizes.$xs })}
+              localizationKey={localizationKeys(
+                'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.columns.claimName',
+              )}
+            />
+          </Th>
+          <Th>
+            <Text
+              sx={theme => ({ fontSize: theme.fontSizes.$xs })}
+              localizationKey={localizationKeys(
+                'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.columns.value',
+              )}
+            />
+          </Th>
+        </Tr>
+      </Thead>
+      <Tbody>
+        {MICROSOFT_ATTRIBUTE_ROWS.map(row => {
+          const claimNameKey = localizationKeys(
+            `configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.rows.${row.id}.claimName`,
+          );
+
+          return (
+            <Tr key={row.id}>
+              <Td sx={{ whiteSpace: 'nowrap' }}>
+                <Flex
                   as='span'
-                  colorScheme='secondary'
-                  localizationKey={localizationKeys(
-                    `configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.rows.${row.id}.attribute`,
-                  )}
-                />
-                <Badge
-                  elementDescriptor={descriptors.configureSSOAttributeMappingBadge}
-                  elementId={descriptors.configureSSOAttributeMappingBadge.setId(
-                    row.isRequired ? 'required' : 'optional',
-                  )}
-                  colorScheme={row.isRequired ? 'warning' : 'primary'}
-                  localizationKey={localizationKeys(
-                    row.isRequired
-                      ? 'configureSSO.configureStep.attributeMappingTable.badges.required'
-                      : 'configureSSO.configureStep.attributeMappingTable.badges.optional',
-                  )}
-                />
-              </Flex>
-            </Td>
-            <Td sx={{ maxWidth: 0, width: '100%' }}>
-              <Tooltip.Root>
-                <Tooltip.Trigger>
+                  align='center'
+                  sx={theme => ({ gap: theme.space.$2 })}
+                >
                   <Text
                     as='span'
-                    sx={{
-                      fontFamily: 'monospace',
-                      display: 'block',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    }}
-                    localizationKey={claimNameKey}
+                    colorScheme='secondary'
+                    localizationKey={localizationKeys(
+                      `configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.rows.${row.id}.attribute`,
+                    )}
                   />
-                </Tooltip.Trigger>
-                <Tooltip.Content
-                  text={claimNameKey}
-                  textSx={{ overflowWrap: 'anywhere' }}
+                  <Badge
+                    elementDescriptor={descriptors.configureSSOAttributeMappingBadge}
+                    elementId={descriptors.configureSSOAttributeMappingBadge.setId(
+                      row.isRequired ? 'required' : 'optional',
+                    )}
+                    colorScheme={row.isRequired ? 'warning' : 'primary'}
+                    localizationKey={localizationKeys(
+                      row.isRequired
+                        ? 'configureSSO.configureStep.attributeMappingTable.badges.required'
+                        : 'configureSSO.configureStep.attributeMappingTable.badges.optional',
+                    )}
+                  />
+                </Flex>
+              </Td>
+              <MicrosoftClaimNameCell claimNameKey={claimNameKey} />
+              <Td>
+                <Text
+                  as='span'
+                  sx={{ fontFamily: 'monospace' }}
+                  localizationKey={localizationKeys(
+                    `configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.rows.${row.id}.value`,
+                  )}
                 />
-              </Tooltip.Root>
-            </Td>
-            <Td>
-              <Text
-                as='span'
-                sx={{ fontFamily: 'monospace' }}
-                localizationKey={localizationKeys(
-                  `configureSSO.configureStep.samlMicrosoft.attributeMappingStep.attributeMappingTable.rows.${row.id}.value`,
-                )}
-              />
-            </Td>
-          </Tr>
-        );
-      })}
-    </Tbody>
-  </Table>
-);
+              </Td>
+            </Tr>
+          );
+        })}
+      </Tbody>
+    </Table>
+  );
+};
 
 const SamlMicrosoftAttributeMappingStep = (): JSX.Element => {
   const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
@@ -557,31 +586,21 @@ const SamlMicrosoftAttributeMappingStep = (): JSX.Element => {
 
       <Step.Body>
         <Step.Section sx={theme => ({ gap: theme.space.$3 })}>
-          <Heading
-            elementDescriptor={descriptors.configureSSOInstructionsHeading}
-            as='h3'
-            textVariant='subtitle'
-            localizationKey={localizationKeys('configureSSO.configureStep.samlMicrosoft.attributeMappingStep.title')}
-          />
-
-          <MicrosoftAttributeMappingTable />
-
           <Text
             as='p'
             colorScheme='secondary'
-            localizationKey={localizationKeys(
-              'configureSSO.configureStep.samlMicrosoft.attributeMappingStep.paragraph',
-            )}
+            elementDescriptor={descriptors.configureSSOInstructionsHeading}
+            localizationKey={localizationKeys('configureSSO.configureStep.samlMicrosoft.attributeMappingStep.title')}
           />
 
           <Col
             elementDescriptor={descriptors.configureSSOInstructionsList}
-            as='ul'
+            as='ol'
             sx={theme => ({
               gap: theme.space.$1x5,
               margin: 0,
               paddingInlineStart: theme.space.$5,
-              listStyleType: 'disc',
+              listStyleType: 'decimal',
             })}
           >
             <Text
@@ -596,13 +615,9 @@ const SamlMicrosoftAttributeMappingStep = (): JSX.Element => {
               colorScheme='secondary'
               localizationKey={localizationKeys('configureSSO.configureStep.samlMicrosoft.attributeMappingStep.step2')}
             />
-            <Text
-              elementDescriptor={descriptors.configureSSOInstructionsListItem}
-              as='li'
-              colorScheme='secondary'
-              localizationKey={localizationKeys('configureSSO.configureStep.samlMicrosoft.attributeMappingStep.step3')}
-            />
           </Col>
+
+          <MicrosoftAttributeMappingTable />
         </Step.Section>
       </Step.Body>
 
@@ -628,7 +643,7 @@ const SamlMicrosoftIdentityProviderMetadataStep = (): JSX.Element => {
   const { goNext, goPrev, isFirstStep } = useWizard();
   const {
     enterpriseConnection,
-    mutations: { updateConnection },
+    enterpriseConnectionMutations: { updateConnection },
   } = useConfigureSSO();
 
   const samlConnection = enterpriseConnection?.samlConnection;
@@ -642,12 +657,6 @@ const SamlMicrosoftIdentityProviderMetadataStep = (): JSX.Element => {
 
   const [mode, setMode] = React.useState<IdpConfigurationMode>(hasExistingConfig ? 'manual' : 'metadataUrl');
   const [certFile, setCertFile] = React.useState<File | null>(null);
-  // Step-LOCAL submit state for the Continue button. `goNext` bubbles to the
-  // parent (this is the terminal nested step) and the parent DEFERS the
-  // configure→test advance until the updateConnection revalidate lands. Keeping
-  // the loading local — and NOT resetting it on success — holds the button
-  // loading straight through that deferred transition; the advance unmounts this
-  // nested step, ending the loading with no idle flash on the shared card.
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const metadataUrlField = useFormControl('idpMetadataUrl', samlConnection?.idpMetadataUrl ?? '', {
@@ -788,14 +797,6 @@ const SamlMicrosoftIdentityProviderMetadataStep = (): JSX.Element => {
           fill
           gap={5}
         >
-          <Heading
-            elementDescriptor={descriptors.configureSSOInstructionsHeading}
-            as='h3'
-            textVariant='subtitle'
-            localizationKey={localizationKeys(
-              'configureSSO.configureStep.samlMicrosoft.identityProviderMetadataStep.modes.title',
-            )}
-          />
           <IdentityProviderConfigurationModes
             modes={MICROSOFT_SAML_IDP_MODES}
             value={mode}

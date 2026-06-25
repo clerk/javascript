@@ -87,6 +87,7 @@ export const SignUpEmailLinkCard = () => {
         formTitle={localizationKeys('signUp.emailLink.formTitle')}
         formSubtitle={localizationKeys('signUp.emailLink.formSubtitle')}
         resendButton={localizationKeys('signUp.emailLink.resendButton')}
+        identityPreviewEditButtonAriaLabel={localizationKeys('identityPreviewEditButton__emailAddress')}
         onResendCodeClicked={restartVerification}
         safeIdentifier={signUp.emailAddress}
       />

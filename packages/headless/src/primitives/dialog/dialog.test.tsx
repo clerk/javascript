@@ -7,41 +7,27 @@ import { Dialog } from './index';
 
 afterEach(() => cleanup());
 
+// Headless parts no longer emit `data-cl-slot` — slot identity is applied by the styled
+// (mosaic) layer. Tests locate the surface-only parts (backdrop, viewport, trigger) via
+// `data-testid` and everything else via its accessible role or text.
 function renderDialog(props: Partial<React.ComponentProps<typeof Dialog.Root>> = {}) {
   return render(
     <Dialog.Root {...props}>
-      <Dialog.Trigger>Open dialog</Dialog.Trigger>
-      <Dialog.Backdrop>
+      <Dialog.Trigger data-testid='dialog-trigger'>Open dialog</Dialog.Trigger>
+      <Dialog.Backdrop data-testid='dialog-backdrop' />
+      <Dialog.Viewport data-testid='dialog-viewport'>
         <Dialog.Popup>
           <Dialog.Title>Dialog Title</Dialog.Title>
           <Dialog.Description>Some dialog description</Dialog.Description>
           <p>Dialog body content</p>
           <Dialog.Close>Close</Dialog.Close>
         </Dialog.Popup>
-      </Dialog.Backdrop>
+      </Dialog.Viewport>
     </Dialog.Root>,
   );
 }
 
 describe('Dialog', () => {
-  describe('slot attributes', () => {
-    it('renders trigger with data-cl-slot', () => {
-      renderDialog();
-      const trigger = screen.getByRole('button', { name: 'Open dialog' });
-      expect(trigger).toHaveAttribute('data-cl-slot', 'dialog-trigger');
-    });
-
-    it('renders all parts with correct slot attributes when open', () => {
-      renderDialog({ defaultOpen: true });
-
-      expect(document.querySelector('[data-cl-slot="dialog-backdrop"]')).toBeInTheDocument();
-      expect(document.querySelector('[data-cl-slot="dialog-popup"]')).toBeInTheDocument();
-      expect(document.querySelector('[data-cl-slot="dialog-title"]')).toBeInTheDocument();
-      expect(document.querySelector('[data-cl-slot="dialog-description"]')).toBeInTheDocument();
-      expect(document.querySelector('[data-cl-slot="dialog-close"]')).toBeInTheDocument();
-    });
-  });
-
   describe('open/close', () => {
     it('opens on trigger click', async () => {
       const user = userEvent.setup();
@@ -51,7 +37,7 @@ describe('Dialog', () => {
       await user.click(trigger);
 
       expect(trigger).toHaveAttribute('data-cl-open', '');
-      expect(document.querySelector('[data-cl-slot="dialog-popup"]')).toBeInTheDocument();
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
 
     it('closes on Escape', async () => {
@@ -91,7 +77,7 @@ describe('Dialog', () => {
     it('respects controlled open prop', () => {
       renderDialog({ open: true });
 
-      expect(document.querySelector('[data-cl-slot="dialog-popup"]')).toBeInTheDocument();
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
 
     it('does not open when controlled open is false', async () => {
@@ -100,7 +86,7 @@ describe('Dialog', () => {
 
       await user.click(screen.getByRole('button', { name: 'Open dialog' }));
 
-      expect(document.querySelector('[data-cl-slot="dialog-popup"]')).not.toBeInTheDocument();
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
   });
 
@@ -108,21 +94,21 @@ describe('Dialog', () => {
     it('popup has aria-labelledby linked to title', () => {
       renderDialog({ defaultOpen: true });
 
-      const title = document.querySelector('[data-cl-slot="dialog-title"]');
-      const popup = document.querySelector('[data-cl-slot="dialog-popup"]');
+      const title = screen.getByText('Dialog Title');
+      const popup = screen.getByRole('dialog');
 
       expect(title).toHaveAttribute('id');
-      expect(popup).toHaveAttribute('aria-labelledby', title?.getAttribute('id'));
+      expect(popup).toHaveAttribute('aria-labelledby', title.getAttribute('id'));
     });
 
     it('popup has aria-describedby linked to description', () => {
       renderDialog({ defaultOpen: true });
 
-      const desc = document.querySelector('[data-cl-slot="dialog-description"]');
-      const popup = document.querySelector('[data-cl-slot="dialog-popup"]');
+      const desc = screen.getByText('Some dialog description');
+      const popup = screen.getByRole('dialog');
 
       expect(desc).toHaveAttribute('id');
-      expect(popup).toHaveAttribute('aria-describedby', desc?.getAttribute('id'));
+      expect(popup).toHaveAttribute('aria-describedby', desc.getAttribute('id'));
     });
 
     it('popup has role=dialog', () => {
@@ -135,7 +121,7 @@ describe('Dialog', () => {
   describe('animation lifecycle', () => {
     it('backdrop is not rendered when closed', () => {
       renderDialog();
-      expect(document.querySelector('[data-cl-slot="dialog-backdrop"]')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('dialog-backdrop')).not.toBeInTheDocument();
     });
 
     it('applies data-cl-open on popup when open', async () => {
@@ -144,8 +130,7 @@ describe('Dialog', () => {
 
       await user.click(screen.getByRole('button', { name: 'Open dialog' }));
 
-      const popup = document.querySelector('[data-cl-slot="dialog-popup"]');
-      expect(popup).toHaveAttribute('data-cl-open', '');
+      expect(screen.getByRole('dialog')).toHaveAttribute('data-cl-open', '');
     });
 
     it('applies data-cl-open on backdrop when open', async () => {
@@ -154,8 +139,21 @@ describe('Dialog', () => {
 
       await user.click(screen.getByRole('button', { name: 'Open dialog' }));
 
-      const backdrop = document.querySelector('[data-cl-slot="dialog-backdrop"]');
-      expect(backdrop).toHaveAttribute('data-cl-open', '');
+      expect(screen.getByTestId('dialog-backdrop')).toHaveAttribute('data-cl-open', '');
+    });
+
+    it('applies data-cl-open on viewport when open', async () => {
+      const user = userEvent.setup();
+      renderDialog();
+
+      await user.click(screen.getByRole('button', { name: 'Open dialog' }));
+
+      expect(screen.getByTestId('dialog-viewport')).toHaveAttribute('data-cl-open', '');
+    });
+
+    it('viewport is not rendered when closed', () => {
+      renderDialog();
+      expect(screen.queryByTestId('dialog-viewport')).not.toBeInTheDocument();
     });
   });
 
@@ -187,12 +185,12 @@ describe('Dialog', () => {
         </Dialog.Root>,
       );
 
-      expect(document.querySelector('[data-cl-slot="dialog-popup"]')).not.toBeInTheDocument();
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
       expect(screen.queryByText('Popup content')).not.toBeInTheDocument();
 
       await user.click(screen.getByRole('button', { name: 'Open' }));
 
-      expect(document.querySelector('[data-cl-slot="dialog-popup"]')).toBeInTheDocument();
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
       expect(screen.getByText('Popup content')).toBeInTheDocument();
     });
   });
@@ -206,8 +204,8 @@ describe('Dialog', () => {
 
     it('trigger has data-cl-open when dialog is visible', () => {
       renderDialog({ defaultOpen: true });
-      // When modal is open, trigger's container gets aria-hidden, so use querySelector
-      const trigger = document.querySelector('[data-cl-slot="dialog-trigger"]');
+      // When modal is open, the trigger's container gets aria-hidden, so query by test id.
+      const trigger = screen.getByTestId('dialog-trigger');
       expect(trigger).toHaveAttribute('data-cl-open', '');
     });
   });
@@ -218,6 +216,40 @@ describe('Dialog', () => {
       // Modal dialog should have role=dialog (already tested)
       // Focus should be trapped inside the dialog
       expect(screen.getByRole('dialog')).toBeInTheDocument();
+    });
+
+    it('non-modal dialog allows background interaction', async () => {
+      const onBackgroundClick = vi.fn();
+      const user = userEvent.setup();
+      render(
+        <>
+          <button
+            type='button'
+            onClick={onBackgroundClick}
+          >
+            Background button
+          </button>
+          <Dialog.Root modal={false}>
+            <Dialog.Trigger>Open dialog</Dialog.Trigger>
+            <Dialog.Backdrop />
+            <Dialog.Viewport data-testid='dialog-viewport'>
+              <Dialog.Popup>
+                <Dialog.Title>Dialog Title</Dialog.Title>
+                <Dialog.Close>Close</Dialog.Close>
+              </Dialog.Popup>
+            </Dialog.Viewport>
+          </Dialog.Root>
+        </>,
+      );
+
+      await user.click(screen.getByRole('button', { name: 'Open dialog' }));
+
+      const viewport = screen.getByTestId('dialog-viewport');
+      expect(viewport).toHaveStyle({ pointerEvents: 'auto' });
+      expect(viewport.parentElement).toHaveStyle({ pointerEvents: 'none' });
+
+      await user.click(screen.getByRole('button', { name: 'Background button' }));
+      expect(onBackgroundClick).toHaveBeenCalledTimes(1);
     });
   });
 

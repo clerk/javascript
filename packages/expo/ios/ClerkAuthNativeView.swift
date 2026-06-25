@@ -46,9 +46,7 @@ public class ClerkAuthNativeView: ClerkNativeViewHost {
   }
 
   override func makeHostedController() -> UIViewController? {
-    guard let bridge = clerkNativeBridge else { return nil }
-
-    return bridge.makeAuthViewController(
+    return ClerkNativeBridge.shared.makeAuthViewController(
       mode: currentMode,
       dismissible: currentDismissible,
       onEvent: { [weak self] event, _ in

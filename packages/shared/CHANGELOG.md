@@ -1,5 +1,103 @@
 # Change Log
 
+## 4.21.0
+
+### Minor Changes
+
+- Expose the loaded `@clerk/ui` version on the `Clerk` object via a new `uiVersion` property. It returns the version of the prebuilt UI bundle once it has loaded (for example `Clerk.uiVersion` in the browser console), or `undefined` if the UI has not been loaded yet. `@clerk/clerk-js` and `@clerk/ui` are versioned and loaded independently, so `uiVersion` can differ from `Clerk.version`. ([#8931](https://github.com/clerk/javascript/pull/8931)) by [@jacekradko](https://github.com/jacekradko)
+
+- Make `OAuthProviderData.docsUrl` optional and remove the Enstall OAuth provider docs URL. ([#8885](https://github.com/clerk/javascript/pull/8885)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+### Patch Changes
+
+- Condense the OrganizationProfile Security page SSO overview to a single summary row (one-line description, domains as chips, status badge, actions under the overflow menu) and remove the now-unused ssoSection provider/sign-on URL/issuer/descriptionLine2 localization keys. ([#8915](https://github.com/clerk/javascript/pull/8915)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Add a generic `FLOW_STEP_MOUNTED` telemetry event (`eventFlowStepMounted`) for measuring multi-step flow funnels, and wire it into the self-serve SSO flow ([#8951](https://github.com/clerk/javascript/pull/8951)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Add localization support for OAuth access denied errors. ([#8786](https://github.com/clerk/javascript/pull/8786)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Allow changing enterprise connection provider between self-serve SSO steps ([#8881](https://github.com/clerk/javascript/pull/8881)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Improve UserButton and OrganizationSwitcher accessibility. The trigger button now announces itself as a dialog trigger (`aria-haspopup="dialog"`) and the popover uses `role="dialog"` instead of `role="menu"`. UserButton and OrganizationSwitcher popovers now receive focus when opened, and actions are logically grouped with labelled `role="group"` elements for screen readers. ([#8325](https://github.com/clerk/javascript/pull/8325)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.20.0
+
+### Minor Changes
+
+- Introduces organization membership feature. ([#8933](https://github.com/clerk/javascript/pull/8933)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+  Organizations can enforce exclusive membership, limiting users to a single organization. During the `choose-organization` session task, members of such an organization are automatically activated instead of seeing the picker. `Organization.exclusiveMembership` is now exposed on the Organization resource.
+
+## 4.19.1
+
+### Patch Changes
+
+- Improve the accessible label for identity edit buttons in verification flows. ([#8902](https://github.com/clerk/javascript/pull/8902)) by [@austincalvelage](https://github.com/austincalvelage)
+
+- The SSO setup flow now ends on an explicit Activate step: after configuring and testing a connection you confirm activation with an Activate SSO action (or skip and activate later) instead of a static confirmation summary. ([#8882](https://github.com/clerk/javascript/pull/8882)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Add an `inertProps` helper (`@clerk/shared/inert`) that resolves the correct `inert` attribute value for the consumer's React major (React 19 dropped the `inert` attribute for falsy string values). ([#8820](https://github.com/clerk/javascript/pull/8820)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.19.0
+
+### Minor Changes
+
+- Introduce organization domains with TXT verification on self-serve SSO flow ([#8788](https://github.com/clerk/javascript/pull/8788)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Add confirmation dialog for organization domain deletion as part of self-serve SSO ([#8866](https://github.com/clerk/javascript/pull/8866)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+## 4.18.0
+
+### Minor Changes
+
+- Add internal OAuth transport support for native desktop SDK wrappers to run Clerk's prebuilt OAuth flows through a system browser. ([#8831](https://github.com/clerk/javascript/pull/8831)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Align the `HeadlessBrowserClerk.load()` parameter type with the runtime behavior by accepting the full `ClerkOptions`, including `isSatellite`. The clerk-js implementation has always accepted and used `isSatellite` from `load()` options — it's the only way to configure a satellite app when using `@clerk/clerk-js` directly — but the type previously excluded it, producing a contradictory generated API reference and type errors for direct consumers. ([#8846](https://github.com/clerk/javascript/pull/8846)) by [@manovotny](https://github.com/manovotny)
+
+- Add an overview to the organization profile Security page. The page now lands on a summary of the SSO connection — a status badge (Unconfigured, In Progress, Active, Inactive), the configuration details framed in a card (provider, domain, sign-on URL, issuer, certificate), and an actions menu with Edit, Activate / Deactivate, and Remove — and switches into the existing configuration flow on Start, Continue, or Edit. ([#8813](https://github.com/clerk/javascript/pull/8813)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Rename the `<OrganizationProfile />` SSO page to "Security". The navbar entry is now labeled "Security" with a shield icon, its route path changed from `organization-self-serve-sso` to `organization-security`, and a new `organizationProfile.navbar.security` localization key replaces `organizationProfile.navbar.selfServeSSO`. ([#8796](https://github.com/clerk/javascript/pull/8796)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Ship a self-contained `CookieAttributes` interface from `@clerk/shared/cookie` and use it in `createCookieHandler`'s `set`/`remove` signatures. The published declarations previously referenced `Cookies.CookieAttributes` from js-cookie, which consumers could never resolve (the import was dropped from the declaration output and js-cookie ships no types), causing TS2503 errors under `skipLibCheck: false` and silently degrading the option types to `any` otherwise. ([#8841](https://github.com/clerk/javascript/pull/8841)) by [@jacekradko](https://github.com/jacekradko)
+
+- Resolve the browser connectivity heuristics (`isValidBrowser`, `isBrowserOnline`, and therefore `isValidBrowserOnline`) from the worker's `navigator` when `window` is unavailable but the code runs inside a `WorkerGlobalScope`. In a Web/Service Worker — most notably an MV3 extension background **service worker** (where `@clerk/chrome-extension` loads the background client) — there is no `window`, so these checks previously always reported "invalid/offline". That caused `getToken()` failures to be re-thrown as a misleading `clerk_offline` error and capped network retries lower than intended. The checks now read real connectivity from the worker's `navigator`. Server-side rendering continues to report `false` (the fallback requires a real worker scope, so a bare `globalThis.navigator` such as the one modern Node exposes is not treated as a browser), and behavior in standard browsers and React Native is unchanged. ([#8827](https://github.com/clerk/javascript/pull/8827)) by [@royanger](https://github.com/royanger)
+
+- Exclude self-identified server runtimes (`Cloudflare-Workers`, `Node.js`, `Deno`, `Bun` user agents) from the worker-scope `navigator` fallback used by `isValidBrowser`, `isBrowserOnline`, and `isValidBrowserOnline`. Today Cloudflare's workerd is excluded only because its `self` does not satisfy `instanceof WorkerGlobalScope`; this guard keeps the checks returning `false` on server-side worker runtimes even if that implementation detail changes, while real browser web/service workers (such as MV3 extension background workers) are unaffected. ([#8840](https://github.com/clerk/javascript/pull/8840)) by [@jacekradko](https://github.com/jacekradko)
+
+- Clarify the `isSatellite` JSDoc to note it must be set in `load()`, unlike `domain`, which is set in the `Clerk` constructor. This corrects the generated API reference for direct `@clerk/clerk-js` and `<script>` consumers, where `load()` is the only way to configure a satellite app. ([#8845](https://github.com/clerk/javascript/pull/8845)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+## 4.17.1
+
+### Patch Changes
+
+- Migrate the build pipeline to tsdown and TypeScript 6.0. This is an internal tooling change with no intended changes to the public API or runtime behavior. ([#8177](https://github.com/clerk/javascript/pull/8177)) by [@dstaley](https://github.com/dstaley)
+
+- Deprecate passing `unsafeMetadata` to `user.update()`. ([#8587](https://github.com/clerk/javascript/pull/8587)) by [@brunol95](https://github.com/brunol95)
+
+  Use `user.updateMetadata()` when you want to partially update unsafe metadata with deep-merge semantics:
+
+  ```ts
+  await user.updateMetadata({
+    unsafeMetadata: { onboardingComplete: true },
+  });
+  ```
+
+  `user.update({ unsafeMetadata })` continues to work for now and preserves its existing full-replacement behavior:
+
+  ```ts
+  await user.update({
+    unsafeMetadata: { theme: 'dark' },
+  });
+  ```
+
+  New code should prefer `user.updateMetadata({ unsafeMetadata })` for metadata-only updates.
+
+- Restore resolvable TypeScript declarations. Type declarations are now emitted per-module at stable public paths instead of being bundled into content-hashed internal chunk files. This fixes type resolution failures (or silent `any` degradation) in packages whose declarations reference `@clerk/shared` types, such as `@clerk/vue`, `@clerk/react`, `@clerk/ui`, and `@clerk/testing`, which previously pointed at unresolvable `@clerk/shared/_chunks/*` specifiers. ([#8811](https://github.com/clerk/javascript/pull/8811)) by [@jacekradko](https://github.com/jacekradko)
+
 ## 4.17.0
 
 ### Minor Changes

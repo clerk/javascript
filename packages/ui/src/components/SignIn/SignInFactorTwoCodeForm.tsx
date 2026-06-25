@@ -132,6 +132,7 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
       onResendCodeClicked={prepare}
       safeIdentifier={'safeIdentifier' in props.factor ? props.factor.safeIdentifier : undefined}
       profileImageUrl={signIn.userData.imageUrl}
+      identityPreviewEditButtonAriaLabel={localizationKeys('identityPreviewEditButton__identifier')}
       onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
     >
       {isResettingPassword(signIn) && (

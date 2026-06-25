@@ -20,6 +20,7 @@ import type { SignUpCtx } from '@/types';
 import { SignInFactorOneSolanaWalletsCard } from '@/ui/components/SignIn/SignInFactorOneSolanaWalletsCard';
 import { normalizeRoutingOptions } from '@/utils/normalizeRoutingOptions';
 
+import { buildSignInOAuthCallbackParams, buildSignUpOAuthCallbackParams } from './buildOAuthCallbackParams';
 import {
   LazySignUpContinue,
   LazySignUpProtectCheck,
@@ -76,18 +77,7 @@ function SignInRoutes(): JSX.Element {
           <ResetPasswordSuccess />
         </Route>
         <Route path='sso-callback'>
-          <SignInSSOCallback
-            signUpUrl={signInContext.signUpUrl}
-            signInUrl={signInContext.signInUrl}
-            signInForceRedirectUrl={signInContext.afterSignInUrl}
-            signUpForceRedirectUrl={signInContext.afterSignUpUrl}
-            continueSignUpUrl={signInContext.signUpContinueUrl}
-            transferable={signInContext.transferable}
-            firstFactorUrl={'../factor-one'}
-            secondFactorUrl={'../factor-two'}
-            resetPasswordUrl={'../reset-password'}
-            unsafeMetadata={signInContext.unsafeMetadata}
-          />
+          <SignInSSOCallback {...buildSignInOAuthCallbackParams(signInContext)} />
         </Route>
         <Route path='choose'>
           <SignInAccountSwitcher />
@@ -123,17 +113,7 @@ function SignInRoutes(): JSX.Element {
               <LazySignUpVerifyPhone />
             </Route>
             <Route path='sso-callback'>
-              <LazySignUpSSOCallback
-                signUpUrl={signUpContext.signUpUrl}
-                signInUrl={signUpContext.signInUrl}
-                signUpForceRedirectUrl={signUpContext.afterSignUpUrl}
-                signInForceRedirectUrl={signUpContext.afterSignInUrl}
-                secondFactorUrl={signUpContext.secondFactorUrl}
-                continueSignUpUrl='../continue'
-                verifyEmailAddressUrl='../verify-email-address'
-                verifyPhoneNumberUrl='../verify-phone-number'
-                unsafeMetadata={signUpContext.unsafeMetadata}
-              />
+              <LazySignUpSSOCallback {...buildSignUpOAuthCallbackParams(signUpContext)} />
             </Route>
             <Route path='verify'>
               <SignUpEmailLinkFlowComplete

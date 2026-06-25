@@ -8,6 +8,7 @@ import { Drawer } from '@/ui/elements/Drawer';
 import { LineItems } from '@/ui/elements/LineItems';
 import { SegmentedControl } from '@/ui/elements/SegmentedControl';
 import { Select, SelectButton, SelectOptionList } from '@/ui/elements/Select';
+import { DevModeOverlay } from '@/ui/elements/DevModeNotice';
 import { Tooltip } from '@/ui/elements/Tooltip';
 import {
   getCheckoutSeatUnitTotal,
@@ -19,7 +20,18 @@ import { handleError } from '@/ui/utils/errorHandler';
 
 import { DevOnly } from '../../common/DevOnly';
 import { useCheckoutContext, usePaymentMethods } from '../../contexts';
-import { Box, Button, Col, descriptors, Flex, Form, localizationKeys, Spinner, Text } from '../../customizables';
+import {
+  Box,
+  Button,
+  Col,
+  descriptors,
+  Flex,
+  Form,
+  localizationKeys,
+  Spinner,
+  Text,
+  useLocalizations,
+} from '../../customizables';
 import { ChevronUpDown, InformationCircle } from '../../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../../styledSystem';
 import * as AddPaymentMethod from '../PaymentMethods/AddPaymentMethod';
@@ -34,6 +46,7 @@ const HIDDEN_INPUT_NAME = 'payment_method_id';
 
 export const CheckoutForm = withCardStateProvider(() => {
   const { checkout } = useCheckout();
+  const { $ } = useLocalizations();
 
   const { plan, totals, isImmediatePlanChange, planPeriod, freeTrialEndsAt } = checkout;
 
@@ -102,7 +115,7 @@ export const CheckoutForm = withCardStateProvider(() => {
             {totals.baseFee ? (
               <LineItems.Description
                 prefix={planPeriod === 'annual' ? 'x12' : undefined}
-                text={`${totals.baseFee.currencySymbol}${totals.baseFee.amountFormatted}`}
+                text={$(totals.baseFee)}
                 suffix={localizationKeys('billing.checkout.perMonth')}
               />
             ) : null}
@@ -112,7 +125,7 @@ export const CheckoutForm = withCardStateProvider(() => {
               <LineItems.Title title={localizationKeys('billing.seats')} />
               <LineItems.Description
                 prefix={`${paidSeatsTier.quantity} x`}
-                text={`${paidSeatsTier.feePerBlock.currencySymbol}${paidSeatsTier.feePerBlock.amountFormatted}`}
+                text={$(paidSeatsTier.feePerBlock)}
                 suffix={localizationKeys('billing.checkout.perMonth')}
               />
             </LineItems.Group>
@@ -121,7 +134,7 @@ export const CheckoutForm = withCardStateProvider(() => {
             <LineItems.Group variant='tertiary'>
               <LineItems.Title title={localizationKeys('billing.proratedDiscount')} />
               <LineItems.Description
-                text={`- ${totals.discounts?.proration?.amount.currencySymbol}${totals.discounts?.proration?.amount.amountFormatted}`}
+                text={totals.discounts?.proration?.amount ? `- ${$(totals.discounts.proration.amount)}` : ''}
               />
             </LineItems.Group>
           )}
@@ -129,7 +142,7 @@ export const CheckoutForm = withCardStateProvider(() => {
             <LineItems.Group variant='tertiary'>
               <LineItems.Title title={localizationKeys('billing.creditRemainder')} />
               <LineItems.Description
-                text={`- ${totals.credits?.proration?.amount.currencySymbol}${totals.credits?.proration?.amount.amountFormatted}`}
+                text={totals.credits?.proration?.amount ? `- ${$(totals.credits.proration.amount)}` : ''}
               />
             </LineItems.Group>
           )}
@@ -137,7 +150,7 @@ export const CheckoutForm = withCardStateProvider(() => {
             <LineItems.Group variant='tertiary'>
               <LineItems.Title title={localizationKeys('billing.payerCreditRemainder')} />
               <LineItems.Description
-                text={`- ${totals.credits?.payer?.appliedAmount?.currencySymbol}${totals.credits?.payer?.appliedAmount?.amountFormatted}`}
+                text={totals.credits?.payer?.appliedAmount ? `- ${$(totals.credits.payer.appliedAmount)}` : ''}
               />
             </LineItems.Group>
           )}
@@ -152,7 +165,7 @@ export const CheckoutForm = withCardStateProvider(() => {
                 </Tooltip.Trigger>
                 <Tooltip.Content text={localizationKeys('billing.checkout.pastDueNotice')} />
               </Tooltip.Root>
-              <LineItems.Description text={`${totals.pastDue?.currencySymbol}${totals.pastDue?.amountFormatted}`} />
+              <LineItems.Description text={totals.pastDue ? $(totals.pastDue) : ''} />
             </LineItems.Group>
           )}
 
@@ -163,9 +176,7 @@ export const CheckoutForm = withCardStateProvider(() => {
                   days: plan.freeTrialDays,
                 })}
               />
-              <LineItems.Description
-                text={`${totals.totalDueAfterFreeTrial.currencySymbol}${totals.totalDueAfterFreeTrial.amountFormatted}`}
-              />
+              <LineItems.Description text={$(totals.totalDueAfterFreeTrial)} />
             </LineItems.Group>
           ) : showRenewalTotals ? null : totals.totalDuePerPeriod ? (
             <LineItems.Group
@@ -173,30 +184,22 @@ export const CheckoutForm = withCardStateProvider(() => {
               variant='tertiary'
             >
               <LineItems.Title title={localizationKeys('billing.checkout.totalDuePerPeriod')} />
-              <LineItems.Description
-                text={`${totals.totalDuePerPeriod.currencySymbol}${totals.totalDuePerPeriod.amountFormatted}`}
-              />
+              <LineItems.Description text={$(totals.totalDuePerPeriod)} />
             </LineItems.Group>
           ) : null}
 
           {totals.totalDueNow ? (
             <LineItems.Group borderTop>
               <LineItems.Title title={localizationKeys('billing.totalDueToday')} />
-              <LineItems.Description
-                text={`${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`}
-              />
+              <LineItems.Description text={$(totals.totalDueNow)} />
             </LineItems.Group>
           ) : null}
 
           {showRenewalTotals && (
-            <>
-              <LineItems.Group borderTop>
-                <LineItems.Title title={localizationKeys('billing.totalDuePerPeriod')} />
-                <LineItems.Description
-                  text={`${totals.totalsDuePerPeriod?.grandTotal.currencySymbol}${totals.totalsDuePerPeriod?.grandTotal.amountFormatted}`}
-                />
-              </LineItems.Group>
-            </>
+            <LineItems.Group borderTop>
+              <LineItems.Title title={localizationKeys('billing.totalDuePerPeriod')} />
+              <LineItems.Description text={totals.totalsDuePerPeriod ? $(totals.totalsDuePerPeriod.grandTotal) : ''} />
+            </LineItems.Group>
           )}
         </LineItems.Root>
       </Box>
@@ -372,17 +375,10 @@ export const PayWithTestPaymentMethod = () => {
         flexDirection: 'column',
         rowGap: t.space.$2,
         position: 'relative',
+        overflow: 'hidden',
       })}
     >
-      <Box
-        sx={t => ({
-          position: 'absolute',
-          inset: 0,
-          background: `repeating-linear-gradient(-45deg,${t.colors.$warningAlpha100},${t.colors.$warningAlpha100} 6px,${t.colors.$warningAlpha150} 6px,${t.colors.$warningAlpha150} 12px)`,
-          maskImage: `linear-gradient(transparent 20%, black)`,
-          pointerEvents: 'none',
-        })}
-      />
+      <DevModeOverlay />
       <Flex
         sx={t => ({
           alignItems: 'center',
@@ -414,6 +410,8 @@ export const PayWithTestPaymentMethod = () => {
 
 const useSubmitLabel = () => {
   const { checkout } = useCheckout();
+  const { seatsQuantity } = useCheckoutContext();
+  const { $ } = useLocalizations();
   const { status, freeTrialEndsAt, totals } = checkout;
 
   if (status === 'needs_initialization') {
@@ -421,12 +419,17 @@ const useSubmitLabel = () => {
   }
 
   if (freeTrialEndsAt) {
+    if (seatsQuantity && totals.totalDueNow) {
+      return localizationKeys('billing.pay', {
+        amount: $(totals.totalDueNow),
+      });
+    }
     return localizationKeys('billing.startFreeTrial');
   }
 
   if (totals.totalDueNow && totals.totalDueNow.amount > 0) {
     return localizationKeys('billing.pay', {
-      amount: `${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`,
+      amount: $(totals.totalDueNow),
     });
   }
 

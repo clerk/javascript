@@ -33,20 +33,18 @@ export const CardClerkAndPagesTag = React.memo(
           {
             width: '100%',
             position: 'relative',
-            isolation: 'isolate',
           },
           outerSx,
         ]}
       >
-        {withDevOverlay && <DevModeOverlay gradient={0} />}
+        {withDevOverlay && <DevModeOverlay />}
         <Col
           sx={t => ({
-            gap: displayConfig.branded || withFooterPages ? t.space.$2 : 0,
+            gap: displayConfig.branded || withFooterPages ? t.space.$4 : 0,
             marginInline: 'auto',
             width: '100%',
             justifyContent: 'center',
             alignItems: 'center',
-            zIndex: 1,
             position: 'relative',
           })}
         >

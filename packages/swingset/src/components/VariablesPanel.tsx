@@ -3,7 +3,6 @@
 import type { MosaicVariables } from '@clerk/ui/mosaic/variables';
 import { defaultMosaicVariables } from '@clerk/ui/mosaic/variables';
 
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -30,18 +29,6 @@ export function VariablesPanel({ variables, onChange }: VariablesPanelProps) {
 
   return (
     <div className='flex flex-col gap-1'>
-      <div className='flex items-center justify-between gap-2 border-b px-3 py-2'>
-        <span className='text-muted-foreground text-[10px] font-semibold uppercase tracking-widest'>Variables</span>
-        <Button
-          variant='ghost'
-          size='sm'
-          className='text-muted-foreground h-6 px-2 text-xs'
-          onClick={() => onChange({})}
-        >
-          Reset
-        </Button>
-      </div>
-
       <div className='flex flex-col gap-4 p-3'>
         <section className='flex flex-col gap-2'>
           <div className='text-brand text-[10px] font-semibold uppercase tracking-widest'>Colors</div>
