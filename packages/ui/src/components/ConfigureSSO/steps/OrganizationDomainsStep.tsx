@@ -81,7 +81,7 @@ export const OrganizationDomainsStep = (): JSX.Element => {
     }
   };
 
-  const handleVerifyAgain = async (domain: OrganizationDomainResource) => {
+  const handlePrepareOwnershipVerification = async (domain: OrganizationDomainResource) => {
     card.setError(undefined);
 
     try {
@@ -169,7 +169,7 @@ export const OrganizationDomainsStep = (): JSX.Element => {
                       key={domain.id}
                       domain={domain}
                       onRemove={() => setDomainToRemove(domain)}
-                      onVerifyAgain={() => handleVerifyAgain(domain)}
+                      onPrepareOwnershipVerification={() => handlePrepareOwnershipVerification(domain)}
                       isRemoveDisabled={isRemoveDisabled}
                       removeDisabledTooltip={lastVerifiedDomainTooltip}
                     />
@@ -365,13 +365,13 @@ const DomainSuggestion = ({ onSubmit }: { onSubmit: (domain: string) => Promise<
 const DomainCard = ({
   domain,
   onRemove,
-  onVerifyAgain,
+  onPrepareOwnershipVerification,
   isRemoveDisabled = false,
   removeDisabledTooltip,
 }: {
   domain: OrganizationDomainResource;
   onRemove: () => void;
-  onVerifyAgain: () => Promise<void>;
+  onPrepareOwnershipVerification: () => Promise<void>;
   isRemoveDisabled?: boolean;
   removeDisabledTooltip?: ReturnType<typeof localizationKeys>;
 }): JSX.Element | null => {
@@ -382,7 +382,7 @@ const DomainCard = ({
   const ownershipVerification = domain.ownershipVerification;
   const isVerified = ownershipVerification?.status === 'verified';
   const isExpired = ownershipVerification?.status === 'expired';
-  const cardId = isVerified ? 'verified' : isExpired ? 'expired' : 'unverified';
+  const cardId = ownershipVerification?.status ?? 'unverified';
 
   const removeButton = (
     <Button
@@ -472,7 +472,7 @@ const DomainCard = ({
             <ExpiredNotice
               key='expired'
               expiresAt={ownershipVerification?.expiresAt ?? null}
-              onVerifyAgain={onVerifyAgain}
+              onPrepareOwnershipVerification={onPrepareOwnershipVerification}
             />
           ) : ownershipVerification?.verifiedAt ? (
             <Text
@@ -498,16 +498,16 @@ const DomainCard = ({
 
 const ExpiredNotice = ({
   expiresAt,
-  onVerifyAgain,
+  onPrepareOwnershipVerification,
 }: {
   expiresAt: Date | null;
-  onVerifyAgain: () => Promise<void>;
+  onPrepareOwnershipVerification: () => Promise<void>;
 }): JSX.Element => {
   const [isVerifying, setIsVerifying] = useState(false);
 
   const handleVerifyAgain = () => {
     setIsVerifying(true);
-    void onVerifyAgain().finally(() => setIsVerifying(false));
+    void onPrepareOwnershipVerification().finally(() => setIsVerifying(false));
   };
 
   return (
@@ -523,7 +523,6 @@ const ExpiredNotice = ({
             ? localizationKeys('configureSSO.organizationDomainsStep.domainCard.expiredAtLabel', { date: expiresAt })
             : localizationKeys('configureSSO.organizationDomainsStep.domainCard.expiredLabel')
         }
-        sx={t => ({ fontSize: t.fontSizes.$sm })}
       />
 
       <Button
@@ -532,12 +531,12 @@ const ExpiredNotice = ({
         size='xs'
         isLoading={isVerifying}
         onClick={handleVerifyAgain}
-        sx={{ alignSelf: 'flex-start' }}
+        sx={t => ({ alignSelf: 'flex-start', gap: t.space.$1x5 })}
       >
         <Icon
           icon={RotateLeftRight}
           size='sm'
-          sx={t => ({ marginInlineEnd: t.space.$1 })}
+          colorScheme='neutral'
         />
         <Text
           as='span'
