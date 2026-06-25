@@ -1,14 +1,16 @@
+import ExpoModulesCore
 import UIKit
 
-public class ClerkNativeViewHost: UIView {
+public class ClerkNativeViewHost: ExpoView {
   private lazy var hostingCoordinator = ClerkNativeHostingCoordinator(containerView: self)
   private var hasInitialized: Bool = false
   private var configuredObserver: NSObjectProtocol?
 
-  override public init(frame: CGRect) {
-    super.init(frame: frame)
+  public required init(appContext: AppContext? = nil) {
+    super.init(appContext: appContext)
   }
 
+  @available(*, unavailable)
   public required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }

@@ -33,6 +33,8 @@ Pod::Spec.new do |s|
   s.source         = { git: 'https://github.com/clerk/javascript' }
   s.static_framework = true
 
+  s.dependency 'ExpoModulesCore'
+
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',
     'SWIFT_COMPILATION_MODE' => 'wholemodule'
@@ -50,14 +52,11 @@ Pod::Spec.new do |s|
   end
 
   s.source_files = "ClerkNativeBridge.swift",
-                   "ClerkExpoModule.swift", "ClerkExpoModule.m",
+                   "ClerkExpoModule.swift",
                    "ClerkNativeViewHost.swift",
                    "ClerkAuthNativeView.swift",
-                   "ClerkAuthViewManager.m",
                    "ClerkUserProfileNativeView.swift",
-                   "ClerkUserProfileViewManager.m",
-                   "ClerkUserButtonNativeView.swift",
-                   "ClerkUserButtonViewManager.m"
+                   "ClerkUserButtonNativeView.swift"
 
   install_modules_dependencies(s)
 end

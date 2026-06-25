@@ -6,8 +6,7 @@
  * 1. iOS is configured with the required deployment target and metadata
  * 2. Android is configured with packaging exclusions for dependencies
  *
- * Native modules are registered via Expo Modules autolinking on Android and
- * React Native autolinking on iOS (RCTViewManager).
+ * Native modules and views are registered via Expo Modules autolinking.
  */
 const {
   withXcodeProject,
@@ -187,8 +186,7 @@ const withClerkGoogleSignIn = config => {
  * 2. Android gets packaging exclusions for dependency conflicts
  * 3. Google Sign-In URL scheme is configured (if env var is set)
  *
- * Native modules are registered via Expo Modules autolinking on Android and
- * React Native autolinking on iOS (RCTViewManager).
+ * Native modules and views are registered via Expo Modules autolinking.
  */
 /**
  * Write ClerkKeychainService to Info.plist when keychainService is provided.
