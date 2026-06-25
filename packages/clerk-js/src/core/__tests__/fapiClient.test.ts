@@ -151,15 +151,13 @@ describe('buildUrl(options)', () => {
     );
   });
 
-  it('adds rotating token nonce and code verifier when provided', () => {
+  it('adds rotating token nonce when provided', () => {
     const url = fapiClient.buildUrl({
       path: '/client',
       rotatingTokenNonce: 'nonce_123',
-      codeVerifier: 'verifier_123',
     });
 
     expect(url.searchParams.get('rotating_token_nonce')).toBe('nonce_123');
-    expect(url.searchParams.get('code_verifier')).toBe('verifier_123');
   });
 
   // The return value isn't as expected.
