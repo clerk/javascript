@@ -1,5 +1,18 @@
 # Change Log
 
+## 4.11.0
+
+### Minor Changes
+
+- Handle expired organization domains on self-serve SSO flow, allowing to trigger a new verification ([#9000](https://github.com/clerk/javascript/pull/9000)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Fix Okta instructions in self-serve SSO flow such as updating the expressions on attribute statement step ([#9001](https://github.com/clerk/javascript/pull/9001)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Updated dependencies [[`19ce04a`](https://github.com/clerk/javascript/commit/19ce04aab6387c430dc41e51c6130a88cc543cc8)]:
+  - @clerk/shared@4.22.0
+
 ## 4.10.0
 
 ### Minor Changes
