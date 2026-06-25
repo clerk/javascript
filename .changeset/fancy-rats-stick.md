@@ -5,4 +5,4 @@
 '@clerk/ui': minor
 ---
 
-Display the C2s Account Credits in the user/org profile.
+Add account credits section and credit history page to the billing tab for payers with an existing credit balance.
