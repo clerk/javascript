@@ -1040,6 +1040,7 @@ describe('ClerkProvider native client sync', () => {
 
   test('ignores native client events that echo a JS-originated sync', async () => {
     mocks.tokenCache.getToken.mockResolvedValue(null);
+    mocks.getClientToken.mockResolvedValue(null);
 
     const { rerender } = render(
       <ClerkProvider
