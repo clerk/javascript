@@ -23,6 +23,27 @@ export type WindowNavigateOptions = {
 const SCHEME_RELATIVE_PREFIX = /^[/\\][/\\]/;
 
 /**
+ * Normalizes a string the same way the WHATWG URL parser does before it parses: strip leading C0
+ * control and space characters, then remove ASCII tab/LF/CR from anywhere. Without this, inputs
+ * like `/\t/evil.com` or `\x00//evil.com` slip past the scheme-relative check yet still resolve
+ * scheme-relative (inheriting the base's allowlisted scheme) and redirect cross-origin.
+ */
+function stripUrlParserIgnoredChars(to: string): string {
+  let start = 0;
+  while (start < to.length && to.charCodeAt(start) <= 0x20) {
+    start++;
+  }
+  let result = '';
+  for (let i = start; i < to.length; i++) {
+    const code = to.charCodeAt(i);
+    if (code !== 0x09 && code !== 0x0a && code !== 0x0d) {
+      result += to[i];
+    }
+  }
+  return result;
+}
+
+/**
  * Helper utility to navigate via window.location.href. Also dispatches a clerk:beforeunload custom event.
  *
  * Navigations whose protocol is not in the allowlist (e.g. `javascript:`, `data:`) are aborted.
@@ -39,7 +60,7 @@ const SCHEME_RELATIVE_PREFIX = /^[/\\][/\\]/;
  * in the next major version.
  */
 export function windowNavigate(to: URL | string, options?: WindowNavigateOptions): void {
-  if (typeof to === 'string' && SCHEME_RELATIVE_PREFIX.test(to.trim())) {
+  if (typeof to === 'string' && SCHEME_RELATIVE_PREFIX.test(stripUrlParserIgnoredChars(to))) {
     console.warn(
       `Clerk: scheme-relative navigation to "${to}" is not allowed. Provide a same-origin path or an absolute URL.`,
     );

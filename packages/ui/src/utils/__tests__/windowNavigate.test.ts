@@ -87,4 +87,14 @@ describe('clerkWindowNavigate', () => {
     expect(eventSpy).not.toHaveBeenCalled();
     expect(warnSpy).toHaveBeenCalledTimes(1);
   });
+
+  it('fails closed for control-character scheme-relative bypasses when ClerkJS is older', () => {
+    const clerk = {} as unknown as Clerk;
+
+    clerkWindowNavigate(clerk, '/\t/evil.example/path');
+
+    expect(hrefSetter).not.toHaveBeenCalled();
+    expect(eventSpy).not.toHaveBeenCalled();
+    expect(warnSpy).toHaveBeenCalledTimes(1);
+  });
 });

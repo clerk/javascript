@@ -87,6 +87,14 @@ describe('windowNavigate', () => {
     ['mixed \\/host', '\\/evil.example/path'],
     ['leading-whitespace scheme-relative', '   //evil.example/path'],
     ['leading-tab scheme-relative', '\t//evil.example/path'],
+    // Control characters the URL parser strips but `trim()` does not: each still resolves
+    // scheme-relative against the base origin, so the guard must normalize before testing.
+    ['interior-tab scheme-relative', '/\t/evil.example/path'],
+    ['interior-newline scheme-relative', '/\n/evil.example/path'],
+    ['interior-cr scheme-relative', '/\r/evil.example/path'],
+    ['interior-tab backslash', '\\\t\\evil.example/path'],
+    ['leading-null scheme-relative', '\x00//evil.example/path'],
+    ['leading-c0-controls scheme-relative', '\x01\x02//evil.example/path'],
   ])('blocks %s and does not navigate', (_label, to) => {
     windowNavigate(to);
     expect(hrefSetter).not.toHaveBeenCalled();
