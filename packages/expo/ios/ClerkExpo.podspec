@@ -33,6 +33,8 @@ Pod::Spec.new do |s|
   s.source         = { git: 'https://github.com/clerk/javascript' }
   s.static_framework = true
 
+  s.dependency 'ExpoModulesCore'
+
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',
     'SWIFT_COMPILATION_MODE' => 'wholemodule'
