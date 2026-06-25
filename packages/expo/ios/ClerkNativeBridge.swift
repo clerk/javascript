@@ -380,6 +380,8 @@ final class ClerkNativeBridge {
       neutral: dict["neutral"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultNeutralColor,
       ring: dict["ring"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultRingColor,
       muted: dict["muted"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultMutedColor,
+      secondaryButtonBackground: dict["secondaryButtonBackground"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultSecondaryButtonBackgroundColor,
+      secondaryButtonForeground: dict["secondaryButtonForeground"].flatMap { colorFromHex($0) },
       shadow: dict["shadow"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultShadowColor,
       border: dict["border"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultBorderColor
     )
