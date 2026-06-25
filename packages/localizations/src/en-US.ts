@@ -557,15 +557,15 @@ export const enUS: LocalizationResource = {
             },
             rows: {
               email: {
-                expression: 'user.email',
+                expression: 'user.profile.email',
                 name: 'mail',
               },
               firstName: {
-                expression: 'user.firstName',
+                expression: 'user.profile.firstName',
                 name: 'firstName',
               },
               lastName: {
-                expression: 'user.lastName',
+                expression: 'user.profile.lastName',
                 name: 'lastName',
               },
             },
@@ -578,7 +578,8 @@ export const enUS: LocalizationResource = {
         },
         createAppStep: {
           completeSamlIntegrationInstructions: {
-            step1: 'From the options menu, select <bold>This is an internal app that we have created.</bold>',
+            step1:
+              'From the  <bold>Feedback**</bold>, select <bold>This is an internal app that we have created.</bold>',
             step2: 'Click <bold>Finish</bold> to complete the integration.',
             title: 'Complete the SAML integration',
           },
@@ -608,7 +609,7 @@ export const enUS: LocalizationResource = {
         identityProviderMetadataStep: {
           headerSubtitle: 'Add your Okta application metadata',
           manual: {
-            description: 'In your Okta SAML application, go to the Sign On tab and retrieve these values.',
+            description: 'In your Okta SAML application, go to the <bold>Sign On</bold> tab and retrieve these values.',
             issuer: {
               label: 'Issuer',
               placeholder: 'Paste URL here...',
@@ -627,7 +628,7 @@ export const enUS: LocalizationResource = {
           },
           metadataUrl: {
             description:
-              'In your Okta SAML application, go to the Sign On tab and retrieve the metadata URL. Paste it below.',
+              'In your Okta SAML application, go to the  <bold>Sign On</bold> tab and retrieve the metadata URL. Paste it below.',
             label: 'Metadata URL',
             placeholder: 'Paste URL here...',
           },
