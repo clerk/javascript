@@ -578,8 +578,7 @@ export const enUS: LocalizationResource = {
         },
         createAppStep: {
           completeSamlIntegrationInstructions: {
-            step1:
-              'From the <bold>Feedback**</bold>, select <bold>This is an internal app that we have created.</bold>',
+            step1: 'From the <bold>Feedback</bold>, select <bold>This is an internal app that we have created.</bold>',
             step2: 'Click <bold>Finish</bold> to complete the integration.',
             title: 'Complete the SAML integration',
           },
@@ -628,7 +627,7 @@ export const enUS: LocalizationResource = {
           },
           metadataUrl: {
             description:
-              'In your Okta SAML application, go to the  <bold>Sign On</bold> tab and retrieve the metadata URL. Paste it below.',
+              'In your Okta SAML application, go to the <bold>Sign On</bold> tab and retrieve the metadata URL. Paste it below.',
             label: 'Metadata URL',
             placeholder: 'Paste URL here...',
           },
