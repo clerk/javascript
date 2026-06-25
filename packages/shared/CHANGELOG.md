@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.22.0
+
+### Minor Changes
+
+- Handle expired organization domains on self-serve SSO flow, allowing to trigger a new verification ([#9000](https://github.com/clerk/javascript/pull/9000)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
 ## 4.21.0
 
 ### Minor Changes

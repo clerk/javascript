@@ -1,5 +1,18 @@
 # Change Log
 
+## 6.22.0
+
+### Minor Changes
+
+- Handle expired organization domains on self-serve SSO flow, allowing to trigger a new verification ([#9000](https://github.com/clerk/javascript/pull/9000)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Prevent a cross-tab broadcast failure from evicting a freshly cached session token. Previously, if broadcasting a token update to other tabs threw (for example when the `BroadcastChannel` was racing a close), the token that was just cached got dropped and the next `getToken()` made an unnecessary network request. The broadcast is now isolated so a failure no longer discards a valid cached token. ([#8969](https://github.com/clerk/javascript/pull/8969)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`19ce04a`](https://github.com/clerk/javascript/commit/19ce04aab6387c430dc41e51c6130a88cc543cc8)]:
+  - @clerk/shared@4.22.0
+
 ## 6.21.1
 
 ### Patch Changes
