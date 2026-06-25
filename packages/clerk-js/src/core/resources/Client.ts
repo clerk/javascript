@@ -1,5 +1,4 @@
 import type {
-  ClerkResourceReloadParams,
   ClientJSON,
   ClientJSONSnapshot,
   ClientResource,
@@ -76,15 +75,6 @@ export class Client extends BaseResource implements ClientResource {
 
   fetch({ fetchMaxTries }: { fetchMaxTries?: number } = {}): Promise<this> {
     return this._baseGet({ fetchMaxTries });
-  }
-
-  public reload(params?: ClerkResourceReloadParams): Promise<this> {
-    if (params?.rotatingTokenNonce && params.codeVerifier) {
-      // POST override keeps verifier-bound reload secrets out of the URL.
-      return this._basePost<ClientJSON>({ body: { _method: 'GET', ...params } as any });
-    }
-
-    return super.reload(params);
   }
 
   async destroy(): Promise<void> {

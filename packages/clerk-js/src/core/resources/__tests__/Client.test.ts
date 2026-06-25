@@ -193,49 +193,6 @@ describe('Client Singleton', () => {
     expect(client.signIn.status).toBe('needs_second_factor');
   });
 
-  it('redeems hosted auth rotating token nonce with verifier in the request body', async () => {
-    const user = createUser({ id: 'user_1' });
-    const session = createSession({ id: 'session_1' }, user);
-    const clientObjectJSON: ClientJSON = {
-      object: 'client',
-      id: 'test_id',
-      status: 'active',
-      last_active_session_id: null,
-      sign_in: createSignIn({ id: 'test_sign_in_id' }, user),
-      sign_up: createSignUp({ id: 'test_sign_up_id' }),
-      sessions: [session],
-      created_at: Date.now() - 1000,
-      updated_at: Date.now(),
-    } as any;
-
-    const reloadedClientJSON: ClientJSON = {
-      ...clientObjectJSON,
-      last_active_session_id: 'session_1',
-    };
-
-    const fetchSpy = vi.spyOn(BaseResource, '_fetch').mockResolvedValueOnce({
-      response: reloadedClientJSON,
-    } as any);
-
-    Client.clearInstance();
-    const client = Client.getOrCreateInstance().fromJSON(clientObjectJSON);
-    await client.reload({
-      rotatingTokenNonce: 'nonce_123',
-      codeVerifier: 'verifier_123',
-    });
-
-    expect(fetchSpy).toHaveBeenCalledWith({
-      method: 'POST',
-      path: '/client',
-      body: {
-        _method: 'GET',
-        rotatingTokenNonce: 'nonce_123',
-        codeVerifier: 'verifier_123',
-      },
-    });
-    expect(client.lastActiveSessionId).toBe('session_1');
-  });
-
   it('replaces sign up and sign in identity when fromJSON receives new ids', () => {
     const user = createUser({ first_name: 'John', last_name: 'Doe', id: 'user_1' });
     const session = createSession({ id: 'session_1' }, user);
