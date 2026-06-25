@@ -5,7 +5,7 @@ import type * as ExpoCrypto from 'expo-crypto';
 import type * as WebBrowser from 'expo-web-browser';
 
 import { errorThrower } from '../utils/errors';
-import { createHostedAuth, type FapiHostedAuthMode } from '../utils/hostedAuth';
+import { createHostedAuth, type FapiHostedAuthMode, redeemHostedAuth } from '../utils/hostedAuth';
 
 /**
  * Controls which Account Portal auth screen opens for hosted auth.
@@ -155,7 +155,14 @@ export function useHostedAuth(): {
     let createdSessionId: string | null = null;
     const rotatingTokenNonce = callbackParams.get('rotating_token_nonce') ?? '';
     if (rotatingTokenNonce) {
-      updatedClient = await clerk.client?.reload({ rotatingTokenNonce, codeVerifier: pkce.codeVerifier });
+      updatedClient = await redeemHostedAuth(
+        {
+          rotatingTokenNonce,
+          codeVerifier: pkce.codeVerifier,
+        },
+        clerk.client,
+        clerk,
+      );
       if (updatedClient) {
         getClientUpdater(clerk)?.(updatedClient);
         createdSessionId = normalizeSessionId(

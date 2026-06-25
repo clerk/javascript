@@ -1,5 +1,6 @@
 import Module from 'node:module';
 
+import type { ClientJSON } from '@clerk/shared/types';
 import { renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
@@ -76,12 +77,14 @@ describe('useHostedAuth', () => {
   const mockClient = {
     lastActiveSessionId: null as string | null,
     reload: vi.fn(),
+    fromJSON: vi.fn(),
   };
   const mockUpdateClient = vi.fn();
   const mockSetActive = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockFapiRequest.mockReset();
     vi.spyOn(moduleWithLoad, '_load').mockImplementation((request, parent, isMain) => {
       if (request === 'expo-auth-session') {
         return { makeRedirectUri: mocks.makeRedirectUri };
@@ -107,6 +110,10 @@ describe('useHostedAuth', () => {
       return originalModuleLoad.call(Module, request, parent, isMain);
     });
     mockClient.lastActiveSessionId = null;
+    mockClient.fromJSON.mockImplementation((clientJSON: ClientJSON) => {
+      mockClient.lastActiveSessionId = clientJSON.last_active_session_id;
+      return mockClient;
+    });
     mocks.makeRedirectUri.mockReturnValue('myapp:///hosted-auth-callback');
     mocks.getRandomBytes.mockReturnValue(Uint8Array.from(Array.from({ length: 32 }, (_, index) => index)));
     mocks.digestStringAsync.mockResolvedValue('mock-code-challenge+/=');
@@ -143,7 +150,7 @@ describe('useHostedAuth', () => {
       type: 'success',
       url: 'myapp:///hosted-auth-callback?state=state-123&rotating_token_nonce=nonce-123&created_session_id=sess_123',
     });
-    mockClient.reload.mockResolvedValue(mockClient);
+    mockHostedAuthRedeemResponse({ lastActiveSessionId: 'sess_123' });
 
     const { result } = renderHook(() => useHostedAuth());
     const response = await result.current.startHostedAuth({ state: 'state-123' });
@@ -171,34 +178,36 @@ describe('useHostedAuth', () => {
       'myapp:///hosted-auth-callback',
       undefined,
     );
-    expect(mockClient.reload).toHaveBeenCalledWith({
-      rotatingTokenNonce: 'nonce-123',
-      codeVerifier: mockCodeVerifier,
+    expect(mockFapiRequest).toHaveBeenNthCalledWith(2, {
+      method: 'POST',
+      path: '/client',
+      body: {
+        _method: 'GET',
+        rotatingTokenNonce: 'nonce-123',
+        codeVerifier: mockCodeVerifier,
+      },
     });
+    expect(mockClient.fromJSON).toHaveBeenCalledWith(expect.objectContaining({ object: 'client' }));
     expect(mockUpdateClient).toHaveBeenCalledWith(mockClient);
     expect(mockSetActive).toHaveBeenCalledWith({ session: 'sess_123' });
     expect(response.createdSessionId).toBe('sess_123');
   });
 
   test('falls back to the reloaded client session when callback session id is absent', async () => {
-    const updatedClient = {
-      ...mockClient,
-      lastActiveSessionId: 'sess_reloaded',
-    };
     mockHostedAuthResponse();
     mocks.openAuthSessionAsync.mockResolvedValue({
       type: 'success',
       url: 'myapp:///hosted-auth-callback?state=state-123&rotating_token_nonce=nonce-123',
     });
-    mockClient.reload.mockResolvedValue(updatedClient);
+    mockHostedAuthRedeemResponse({ lastActiveSessionId: 'sess_reloaded' });
 
     const { result } = renderHook(() => useHostedAuth());
     const response = await result.current.startHostedAuth({ state: 'state-123' });
 
-    expect(mockUpdateClient).toHaveBeenCalledWith(updatedClient);
+    expect(mockUpdateClient).toHaveBeenCalledWith(mockClient);
     expect(mockSetActive).toHaveBeenCalledWith({ session: 'sess_reloaded' });
     expect(response.createdSessionId).toBe('sess_reloaded');
-    expect(response.client).toBe(updatedClient);
+    expect(response.client).toBe(mockClient);
   });
 
   test('does not activate a session when the callback does not return one', async () => {
@@ -207,15 +216,12 @@ describe('useHostedAuth', () => {
       type: 'success',
       url: 'myapp:///hosted-auth-callback?state=state-123&rotating_token_nonce=nonce-123',
     });
-    mockClient.reload.mockResolvedValue(mockClient);
+    mockHostedAuthRedeemResponse();
 
     const { result } = renderHook(() => useHostedAuth());
     const response = await result.current.startHostedAuth({ state: 'state-123' });
 
-    expect(mockClient.reload).toHaveBeenCalledWith({
-      rotatingTokenNonce: 'nonce-123',
-      codeVerifier: mockCodeVerifier,
-    });
+    expect(mockFapiRequest).toHaveBeenNthCalledWith(2, expect.objectContaining({ path: '/client' }));
     expect(mockUpdateClient).toHaveBeenCalledWith(mockClient);
     expect(mockSetActive).not.toHaveBeenCalled();
     expect(response.createdSessionId).toBeNull();
@@ -232,7 +238,7 @@ describe('useHostedAuth', () => {
     const { result } = renderHook(() => useHostedAuth());
     const response = await result.current.startHostedAuth({ state: 'state-123' });
 
-    expect(mockClient.reload).not.toHaveBeenCalled();
+    expect(mockFapiRequest).toHaveBeenCalledTimes(1);
     expect(mockSetActive).not.toHaveBeenCalled();
     expect(response.createdSessionId).toBeNull();
   });
@@ -407,7 +413,7 @@ describe('useHostedAuth', () => {
 });
 
 function mockHostedAuthResponse(url = 'https://example.accounts.dev/sign-in') {
-  mockFapiRequest.mockResolvedValue({
+  mockFapiRequest.mockResolvedValueOnce({
     ok: true,
     status: 200,
     statusText: 'OK',
@@ -416,6 +422,29 @@ function mockHostedAuthResponse(url = 'https://example.accounts.dev/sign-in') {
         object: 'hosted_auth',
         url,
       },
+    },
+  });
+}
+
+function mockHostedAuthRedeemResponse({ lastActiveSessionId = null }: { lastActiveSessionId?: string | null } = {}) {
+  mockFapiRequest.mockResolvedValueOnce({
+    ok: true,
+    status: 200,
+    statusText: 'OK',
+    payload: {
+      response: {
+        object: 'client',
+        id: 'client_123',
+        sessions: [],
+        sign_in: null,
+        sign_up: null,
+        last_active_session_id: lastActiveSessionId,
+        captcha_bypass: false,
+        cookie_expires_at: null,
+        last_authentication_strategy: null,
+        created_at: Date.now() - 1000,
+        updated_at: Date.now(),
+      } as unknown as ClientJSON,
     },
   });
 }
