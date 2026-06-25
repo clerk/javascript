@@ -35,7 +35,10 @@ function NativeBuildFixture() {
         presentationStyle='pageSheet'
         onRequestClose={() => setIsAuthOpen(false)}
       >
-        <AuthView onDismiss={() => setIsAuthOpen(false)} />
+        <View style={styles.modalContent}>
+          <Text testID='auth-view-mounted'>Native AuthView mounted</Text>
+          <AuthView onDismiss={() => setIsAuthOpen(false)} />
+        </View>
       </Modal>
     </View>
   );
@@ -69,5 +72,8 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 20,
     fontWeight: '600',
+  },
+  modalContent: {
+    flex: 1,
   },
 });

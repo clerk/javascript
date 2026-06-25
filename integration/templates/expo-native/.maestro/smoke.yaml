@@ -1,0 +1,7 @@
+appId: com.clerk.exponativebuildfixture
+---
+- launchApp
+- assertVisible: 'Clerk Expo Native Fixture'
+- assertVisible: 'Open native AuthView'
+- tapOn: 'Open native AuthView'
+- assertVisible: 'Native AuthView mounted'
