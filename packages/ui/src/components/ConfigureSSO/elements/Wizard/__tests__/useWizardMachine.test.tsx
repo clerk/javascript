@@ -550,14 +550,13 @@ describe('useWizardMachine — reachability clamp (self-correct on a broken isRe
     expect(result.current.current).toBe('b');
   });
 
-  it('does not clamp a nested wizard (isNested) even when its active isReachable breaks', () => {
-    // A nested machine has no isReachable in practice, but the clamp is gated on
-    // !isNested regardless: a nested wizard never re-seats, it bubbles instead.
+  it('re-seats a nested wizard in place when its active isReachable breaks (does not bubble)', () => {
+    const parent = makeParent();
     let open = true;
     const gate = () => open;
     const { result, rerender } = renderMachine({
       config: cfg([{ id: 'n0' }, { id: 'n1', isReachable: gate }]),
-      parentWizard: makeParent(),
+      parentWizard: parent,
     });
     expect(result.current.current).toBe('n1');
 
@@ -565,11 +564,15 @@ describe('useWizardMachine — reachability clamp (self-correct on a broken isRe
     act(() => {
       rerender({
         config: cfg([{ id: 'n0' }, { id: 'n1', isReachable: gate }]),
-        parentWizard: makeParent(),
+        parentWizard: parent,
         initialStepId: undefined,
       });
     });
-    // Nested: no clamp. current stays put despite the broken isReachable.
-    expect(result.current.current).toBe('n1');
+    // Nested clamp: re-seats to the furthest LOCAL reachable step (n0), in place.
+    expect(result.current.current).toBe('n0');
+    // The re-seat is a local setState — it must NOT bubble to the parent.
+    expect(parent.goNext).not.toHaveBeenCalled();
+    expect(parent.goPrev).not.toHaveBeenCalled();
+    expect(parent.goToStep).not.toHaveBeenCalled();
   });
 });

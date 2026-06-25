@@ -210,9 +210,9 @@ export const nbNO: LocalizationResource = {
     subtotalRenewal: undefined,
     switchPlan: 'Bytt til denne planen',
     switchToAnnual: 'Bytt til årlig',
-    switchToAnnualWithAnnualPrice: 'Bytt til årlig {{currency}}{{price}} / år',
+    switchToAnnualWithAnnualPrice: 'Bytt til årlig {{price}} / år',
     switchToMonthly: 'Bytt til månedlig',
-    switchToMonthlyWithPrice: 'Bytt til månedlig {{currency}}{{price}} / måned',
+    switchToMonthlyWithPrice: 'Bytt til månedlig {{price}} / måned',
     totalDue: 'Totalt å betale',
     totalDuePerPeriod: undefined,
     totalDueToday: 'Totalt å betale i dag',
@@ -681,8 +681,8 @@ export const nbNO: LocalizationResource = {
         messageLabel: 'E-posten din bruker {{domain}}. Vil du legge den til?',
       },
       formButtonPrimary__add: 'Legg til',
-      formFieldInputPlaceholder__domain: 'Skriv inn domenet ditt her, og klikk på legg til for å starte',
-      formFieldLabel__domain: 'Domener',
+      formFieldInputPlaceholder__domain: 'Legg til domene',
+      formFieldLabel__domain: 'Domene',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1761,6 +1761,9 @@ export const nbNO: LocalizationResource = {
     action__openUserMenu: 'Åpne brukermeny',
     action__signOut: 'Logg ut',
     action__signOutAll: 'Logg ut av alle kontoer',
+    label__userButtonPopover: 'Kontopanel',
+    label__accountActions: 'Kontohandlinger',
+    label__activeSessions: 'Aktive økter',
   },
   userProfile: {
     apiKeysPage: {

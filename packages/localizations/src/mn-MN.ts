@@ -674,7 +674,7 @@ export const mnMN: LocalizationResource = {
         messageLabel: 'Таны имэйл {{domain}}-г ашиглаж байна. Үүнийг нэмэх үү?',
       },
       formButtonPrimary__add: 'Нэмэх',
-      formFieldInputPlaceholder__domain: 'Домэйнээ энд бичээд эхлэхийн тулд нэмэх дээр дарна уу',
+      formFieldInputPlaceholder__domain: 'Домэйн нэмэх',
       formFieldLabel__domain: 'Домэйн',
       removeDomainDialog: {
         cancelButton: undefined,
@@ -1736,6 +1736,9 @@ export const mnMN: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Гарах',
     action__signOutAll: 'Бүх бүртгэлээс гарна уу',
+    label__userButtonPopover: 'Бүртгэлийн самбар',
+    label__accountActions: 'Бүртгэлийн үйлдлүүд',
+    label__activeSessions: 'Идэвхтэй сессүүд',
   },
   userProfile: {
     apiKeysPage: {

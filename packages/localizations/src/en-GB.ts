@@ -673,8 +673,8 @@ export const enGB: LocalizationResource = {
         messageLabel: 'Your email uses {{domain}}. Do you want to add it?',
       },
       formButtonPrimary__add: 'Add',
-      formFieldInputPlaceholder__domain: 'Type your domain here and click add to start',
-      formFieldLabel__domain: 'Domains',
+      formFieldInputPlaceholder__domain: 'Add domain',
+      formFieldLabel__domain: 'Domain',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1737,6 +1737,9 @@ export const enGB: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Sign out',
     action__signOutAll: 'Sign out of all accounts',
+    label__userButtonPopover: 'Account panel',
+    label__accountActions: 'Account actions',
+    label__activeSessions: 'Active sessions',
   },
   userProfile: {
     apiKeysPage: {
