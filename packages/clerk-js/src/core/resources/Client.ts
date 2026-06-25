@@ -91,7 +91,7 @@ export class Client extends BaseResource implements ClientResource {
           _method: 'GET',
           rotatingTokenNonce: params.rotatingTokenNonce,
           codeVerifier: params.codeVerifier,
-        },
+        } as any,
       },
       { forceUpdateClient: true },
     );
