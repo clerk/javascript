@@ -1622,4 +1622,86 @@ describe('SessionTokenCache', () => {
       expect(SessionTokenCache.size()).toBe(1);
     });
   });
+
+  // --- SDK-117 characterization backfill ---------------------------------
+  // These lock in current, intended behavior before the cache is split into
+  // separate storage / scheduler / cross-tab collaborators. They are the
+  // regression bar for that refactor, covering the gaps the audit surfaced:
+  // BroadcastChannel lifecycle, broadcast-failure resilience, graceful
+  // degradation without BroadcastChannel, and audience key coalescing.
+
+  describe('BroadcastChannel lifecycle', () => {
+    it('close() closes the underlying channel', () => {
+      expect(mockBroadcastChannel.close).not.toHaveBeenCalled();
+
+      SessionTokenCache.close();
+
+      expect(mockBroadcastChannel.close).toHaveBeenCalledTimes(1);
+    });
+
+    it('lazily reopens a new channel on the next operation after close()', () => {
+      SessionTokenCache.close();
+      (global.BroadcastChannel as unknown as ReturnType<typeof vi.fn>).mockClear();
+
+      // get() calls ensureBroadcastChannel(), which must reconstruct the channel
+      SessionTokenCache.get({ tokenId: 'anything' });
+
+      expect(global.BroadcastChannel).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('graceful degradation without BroadcastChannel', () => {
+    it('continues to cache and retrieve tokens when BroadcastChannel is unavailable', async () => {
+      // Simulate a runtime that does not provide BroadcastChannel.
+      SessionTokenCache.close();
+      (global as any).BroadcastChannel = undefined;
+
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+      const token = new Token({ id: 'no-bc-token', jwt, object: 'token' });
+      const tokenResolver = Promise.resolve<TokenResource>(token);
+      const key = { tokenId: 'no-bc-token' };
+
+      expect(() => SessionTokenCache.set({ ...key, tokenResolver })).not.toThrow();
+      await tokenResolver;
+
+      const result = SessionTokenCache.get(key);
+      expect(result?.entry.tokenId).toBe('no-bc-token');
+    });
+  });
+
+  describe('audience key coalescing', () => {
+    it('treats empty-string audience and undefined audience as the same entry', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+      const token = new Token({ id: 'aud-coalesce', jwt, object: 'token' });
+      const tokenResolver = Promise.resolve<TokenResource>(token);
+
+      SessionTokenCache.set({ audience: '', tokenId: 'aud-coalesce', tokenResolver });
+      await tokenResolver;
+
+      // `audience || ''` collapses '' and undefined to the same key.
+      expect(SessionTokenCache.get({ tokenId: 'aud-coalesce' })?.entry.tokenId).toBe('aud-coalesce');
+      expect(SessionTokenCache.get({ audience: '', tokenId: 'aud-coalesce' })?.entry.tokenId).toBe('aud-coalesce');
+      expect(SessionTokenCache.size()).toBe(1);
+    });
+
+    it('isolates an audience-scoped token from the no-audience token of the same id', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const tokenA = new Token({ id: 'aud-split', jwt: createJwtWithTtl(nowSeconds, 60), object: 'token' });
+      const tokenB = new Token({ id: 'aud-split', jwt: createJwtWithTtl(nowSeconds, 60), object: 'token' });
+
+      SessionTokenCache.set({ tokenId: 'aud-split', tokenResolver: Promise.resolve<TokenResource>(tokenA) });
+      SessionTokenCache.set({
+        audience: 'https://api.example.com',
+        tokenId: 'aud-split',
+        tokenResolver: Promise.resolve<TokenResource>(tokenB),
+      });
+      await Promise.resolve();
+
+      expect(SessionTokenCache.size()).toBe(2);
+      expect(SessionTokenCache.get({ tokenId: 'aud-split' })?.entry).toBeDefined();
+      expect(SessionTokenCache.get({ audience: 'https://api.example.com', tokenId: 'aud-split' })?.entry).toBeDefined();
+    });
+  });
 });
