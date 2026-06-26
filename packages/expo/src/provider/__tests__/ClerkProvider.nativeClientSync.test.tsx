@@ -233,6 +233,9 @@ describe('ClerkProvider native client sync', () => {
     await waitFor(() => {
       expect(mocks.configure).toHaveBeenCalled();
     });
+    await waitFor(() => {
+      expect(mocks.clerkInstance.__internal_reloadInitialResources).toHaveBeenCalled();
+    });
 
     mocks.clerkInstance.__internal_reloadInitialResources.mockClear();
     mocks.tokenCache.saveToken.mockClear();
