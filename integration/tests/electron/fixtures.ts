@@ -31,7 +31,12 @@ async function setupClerkTestingEnv(env: EnvironmentConfig) {
     throw new Error('Missing Clerk integration keys for Electron E2E tests');
   }
 
-  const { frontendApi: frontendApiUrl } = parsePublishableKey(publishableKey, { fatal: true });
+  const { frontendApi: frontendApiUrl, instanceType } = parsePublishableKey(publishableKey, { fatal: true });
+
+  if (instanceType !== 'development') {
+    return;
+  }
+
   await clerkSetup({
     publishableKey,
     frontendApiUrl,
