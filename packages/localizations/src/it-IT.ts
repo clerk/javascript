@@ -209,9 +209,9 @@ export const itIT: LocalizationResource = {
     subtotalRenewal: undefined,
     switchPlan: 'Passa a questo piano',
     switchToAnnual: 'Passa ad annuale',
-    switchToAnnualWithAnnualPrice: 'Passa ad annuale {{currency}}{{price}} / anno',
+    switchToAnnualWithAnnualPrice: 'Passa ad annuale {{price}} / anno',
     switchToMonthly: 'Passa a mensile',
-    switchToMonthlyWithPrice: 'Passa a mensile {{currency}}{{price}} / mese',
+    switchToMonthlyWithPrice: 'Passa a mensile {{price}} / mese',
     totalDue: 'Totale dovuto',
     totalDuePerPeriod: undefined,
     totalDueToday: 'Totale dovuto oggi',
@@ -680,8 +680,8 @@ export const itIT: LocalizationResource = {
         messageLabel: 'La tua email usa {{domain}}. Vuoi aggiungerlo?',
       },
       formButtonPrimary__add: 'Aggiungi',
-      formFieldInputPlaceholder__domain: 'Digita qui il tuo dominio e clicca su Aggiungi per iniziare',
-      formFieldLabel__domain: 'Domini',
+      formFieldInputPlaceholder__domain: 'Aggiungi dominio',
+      formFieldLabel__domain: 'Dominio',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1667,6 +1667,7 @@ export const itIT: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       "L'indirizzo email o il numero di telefono non è autorizzato per la registrazione. Questo può essere dovuto all'uso di '+', '=', '#' o '.' nell'indirizzo email, l'uso di un dominio collegato a un servizio email temporaneo o l'esclusione esplicita. Se ritieni che si tratti di un errore, contattaci.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: "Il dominio dell'organizzazione è stato bloccato.",
     organization_domain_common: 'Questo dominio è troppo comune per essere utilizzato.',
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -1741,6 +1742,9 @@ export const itIT: LocalizationResource = {
     action__openUserMenu: 'Apri menu utente',
     action__signOut: 'Disconnetti',
     action__signOutAll: 'Disconnetti da tutti gli accounts',
+    label__userButtonPopover: 'Pannello account',
+    label__accountActions: 'Azioni account',
+    label__activeSessions: 'Sessioni attive',
   },
   userProfile: {
     apiKeysPage: {

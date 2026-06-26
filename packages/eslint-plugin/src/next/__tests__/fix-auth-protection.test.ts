@@ -79,7 +79,7 @@ export default async function Page() {
     expect(result.unresolved).toEqual([]);
     expect(result.fixed).toEqual([{ filePath: page, protections: 1 }]);
 
-    expect(await readFile(page, 'utf8')).toBe(`import { auth } from '@clerk/nextjs/server';
+    expect(await readFile(page, 'utf8')).toBe(`import { auth } from "@clerk/nextjs/server";
 export default async function Page() {
   await auth.protect();
   return <div>Hello</div>;
@@ -109,7 +109,7 @@ export async function POST() {
     expect(result.fixed).toEqual([{ filePath: route, protections: 2 }]);
 
     const output = await readFile(route, 'utf8');
-    expect(output).toBe(`import { auth } from '@clerk/nextjs/server';
+    expect(output).toBe(`import { auth } from "@clerk/nextjs/server";
 export async function GET() {
   await auth.protect();
   return new Response('ok');

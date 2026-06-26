@@ -211,9 +211,9 @@ export const ptPT: LocalizationResource = {
     subtotalRenewal: undefined,
     switchPlan: 'Mudar para este plano',
     switchToAnnual: 'Mudar para anual',
-    switchToAnnualWithAnnualPrice: 'Mudar para anual {{currency}}{{price}} / ano',
+    switchToAnnualWithAnnualPrice: 'Mudar para anual {{price}} / ano',
     switchToMonthly: 'Mudar para mensal',
-    switchToMonthlyWithPrice: 'Mudar para mensal {{currency}}{{price}} / mês',
+    switchToMonthlyWithPrice: 'Mudar para mensal {{price}} / mês',
     totalDue: 'Total devido',
     totalDuePerPeriod: undefined,
     totalDueToday: 'Total devido hoje',
@@ -682,8 +682,8 @@ export const ptPT: LocalizationResource = {
         messageLabel: 'O seu e-mail utiliza {{domain}}. Pretende adicioná-lo?',
       },
       formButtonPrimary__add: 'Adicionar',
-      formFieldInputPlaceholder__domain: 'Escreva aqui o seu domínio e clique em adicionar para começar',
-      formFieldLabel__domain: 'Domínios',
+      formFieldInputPlaceholder__domain: 'Adicionar domínio',
+      formFieldLabel__domain: 'Domínio',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1681,6 +1681,7 @@ export const ptPT: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       "O endereço de e-mail ou número de telemóvel não é permitido para registo. Isto pode dever-se à utilização de '+', '=', '#' ou '.' no endereço de e-mail, ao uso de um domínio associado a um serviço de e-mail temporário ou a uma exclusão explícita.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'Este domínio organizacional está bloqueado.',
     organization_domain_common: 'Este domínio é demasiado comum para ser utilizado numa organização.',
     organization_domain_exists_for_enterprise_connection: 'Este domínio já existe para uma ligação empresarial.',
@@ -1756,6 +1757,9 @@ export const ptPT: LocalizationResource = {
     action__openUserMenu: 'Abrir menu do utilizador',
     action__signOut: 'Terminar sessão',
     action__signOutAll: 'Terminar sessão de todas as contas',
+    label__userButtonPopover: 'Painel da conta',
+    label__accountActions: 'Ações da conta',
+    label__activeSessions: 'Sessões ativas',
   },
   userProfile: {
     apiKeysPage: {

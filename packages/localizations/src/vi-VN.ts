@@ -209,9 +209,9 @@ export const viVN: LocalizationResource = {
     subtotalRenewal: undefined,
     switchPlan: 'Chuyển sang gói này',
     switchToAnnual: 'Chuyển sang hàng năm',
-    switchToAnnualWithAnnualPrice: 'Chuyển sang gói năm {{currency}}{{price}} / năm',
+    switchToAnnualWithAnnualPrice: 'Chuyển sang gói năm {{price}} / năm',
     switchToMonthly: 'Chuyển sang hàng tháng',
-    switchToMonthlyWithPrice: 'Chuyển sang gói tháng {{currency}}{{price}} / tháng',
+    switchToMonthlyWithPrice: 'Chuyển sang gói tháng {{price}} / tháng',
     totalDue: 'Tổng cần thanh toán',
     totalDuePerPeriod: undefined,
     totalDueToday: 'Tổng cần thanh toán hôm nay',
@@ -680,7 +680,7 @@ export const viVN: LocalizationResource = {
         messageLabel: 'Email của bạn sử dụng {{domain}}. Bạn có muốn thêm nó không?',
       },
       formButtonPrimary__add: 'Thêm',
-      formFieldInputPlaceholder__domain: 'Nhập tên miền của bạn vào đây và nhấp vào thêm để bắt đầu',
+      formFieldInputPlaceholder__domain: 'Thêm tên miền',
       formFieldLabel__domain: 'Tên miền',
       removeDomainDialog: {
         cancelButton: undefined,
@@ -1676,6 +1676,7 @@ export const viVN: LocalizationResource = {
     insufficient_seats_change_plan: undefined,
     insufficient_seats_contact_support: undefined,
     not_allowed_access: undefined,
+    oauth_access_denied: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -1752,6 +1753,9 @@ export const viVN: LocalizationResource = {
     action__openUserMenu: 'Mở menu người dùng',
     action__signOut: 'Đăng xuất',
     action__signOutAll: 'Đăng xuất tất cả tài khoản',
+    label__userButtonPopover: 'Bảng điều khiển tài khoản',
+    label__accountActions: 'Hành động tài khoản',
+    label__activeSessions: 'Phiên hoạt động',
   },
   userProfile: {
     apiKeysPage: {

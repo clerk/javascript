@@ -1,3 +1,4 @@
+import { ClerkRuntimeError } from '@clerk/shared/error';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
@@ -105,6 +106,7 @@ describe('Test localizable components', () => {
         form_code_incorrect: 'form_code_incorrect',
         form_password_incorrect: 'form_password_incorrect',
         not_allowed_access: undefined,
+        oauth_access_denied: 'oauth_access_denied',
         form_identifier_exists: 'form_identifier_exists',
         form_identifier_exists__username: 'form_identifier_exists__username',
         form_identifier_exists__email_address: 'form_identifier_exists__email_address',
@@ -131,6 +133,9 @@ describe('Test localizable components', () => {
     expect(translateError({ code: 'form_code_incorrect', message: 'message' })).toBe('form_code_incorrect');
     expect(translateError({ code: 'form_password_incorrect', message: 'message' })).toBe('form_password_incorrect');
     expect(translateError({ code: 'not_allowed_access', message: 'message' })).toBe('message');
+    expect(translateError(new ClerkRuntimeError('message', { code: 'oauth_access_denied' }))).toBe(
+      'oauth_access_denied',
+    );
     expect(translateError({ code: 'form_identifier_exists', message: 'message' })).toBe('form_identifier_exists');
     expect(
       translateError({ code: 'form_identifier_exists', message: 'message', meta: { paramName: 'username' } }),
@@ -138,6 +143,16 @@ describe('Test localizable components', () => {
     expect(
       translateError({ code: 'form_identifier_exists', message: 'message', meta: { paramName: 'email_address' } }),
     ).toBe('form_identifier_exists__email_address');
+  });
+
+  it('translates native OAuth access denied errors using the default localization resource', async () => {
+    const { wrapper } = await createFixtures();
+    const { result } = renderHook(() => useLocalizations(), { wrapper });
+    const { translateError } = result.current;
+
+    expect(translateError(new ClerkRuntimeError('message', { code: 'oauth_access_denied' }))).toBe(
+      'You did not grant access to your account.',
+    );
   });
 });
 

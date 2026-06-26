@@ -211,9 +211,9 @@ export const msMY: LocalizationResource = {
     subtotalRenewal: undefined,
     switchPlan: 'Tukar ke pelan ini',
     switchToAnnual: 'Tukar kepada tahunan',
-    switchToAnnualWithAnnualPrice: 'Tukar kepada tahunan {{currency}}{{price}} / tahun',
+    switchToAnnualWithAnnualPrice: 'Tukar kepada tahunan {{price}} / tahun',
     switchToMonthly: 'Tukar kepada bulanan',
-    switchToMonthlyWithPrice: 'Tukar kepada bulanan {{currency}}{{price}} / bulan',
+    switchToMonthlyWithPrice: 'Tukar kepada bulanan {{price}} / bulan',
     totalDue: 'Jumlah perlu dibayar',
     totalDuePerPeriod: undefined,
     totalDueToday: 'Jumlah Perlu Dibayar Hari Ini',
@@ -682,7 +682,7 @@ export const msMY: LocalizationResource = {
         messageLabel: 'E-mel anda menggunakan {{domain}}. Adakah anda mahu menambahkannya?',
       },
       formButtonPrimary__add: 'Tambah',
-      formFieldInputPlaceholder__domain: 'Taip domain anda di sini dan klik tambah untuk bermula',
+      formFieldInputPlaceholder__domain: 'Tambah domain',
       formFieldLabel__domain: 'Domain',
       removeDomainDialog: {
         cancelButton: undefined,
@@ -1690,6 +1690,7 @@ export const msMY: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       'Anda tidak mempunyai kebenaran untuk mengakses halaman ini. Sila hubungi sokongan jika anda percaya ini adalah kesilapan.',
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'Ini adalah domain pembekal e-mel yang disekat. Sila gunakan yang berbeza.',
     organization_domain_common: 'Ini adalah domain pembekal e-mel biasa. Sila gunakan yang berbeza.',
     organization_domain_exists_for_enterprise_connection: 'Domain ini sudah digunakan untuk SSO organisasi anda',
@@ -1767,6 +1768,9 @@ export const msMY: LocalizationResource = {
     action__openUserMenu: 'Buka menu pengguna',
     action__signOut: 'Daftar keluar',
     action__signOutAll: 'Daftar keluar dari semua akaun',
+    label__userButtonPopover: 'Panel akaun',
+    label__accountActions: 'Tindakan akaun',
+    label__activeSessions: 'Sesi aktif',
   },
   userProfile: {
     apiKeysPage: {

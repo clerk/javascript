@@ -506,6 +506,42 @@ describe('SessionTokenCache', () => {
     });
   });
 
+  describe('broadcast resilience', () => {
+    it('a failing postMessage does not evict the freshly cached token', async () => {
+      // A broadcast failure (postMessage throwing, e.g. InvalidStateError when the
+      // channel races a close) is a side effect that must not evict the freshly
+      // cached token or force an unnecessary refetch (SDK-119).
+      mockBroadcastChannel.postMessage.mockImplementationOnce(() => {
+        throw new Error('channel closed');
+      });
+
+      const futureExp = Math.floor(Date.now() / 1000) + 3600;
+      const tokenResolver = Promise.resolve({
+        getRawString: () => mockJwt,
+        jwt: { claims: { exp: futureExp, iat: 1675876730, sid: 'session_123' } },
+      } as any);
+
+      expect(() =>
+        SessionTokenCache.set({
+          tokenId: 'session_123',
+          tokenResolver,
+        }),
+      ).not.toThrow();
+
+      await tokenResolver;
+      // Flush the cache write's .then (broadcast) and .catch microtasks. Fake timers
+      // are active in this suite, so flush microtasks rather than using a setTimeout.
+      for (let i = 0; i < 5; i++) {
+        await Promise.resolve();
+      }
+
+      // The broadcast was attempted and threw, but the token must stay cached.
+      expect(mockBroadcastChannel.postMessage).toHaveBeenCalledTimes(1);
+      expect(SessionTokenCache.size()).toBe(1);
+      expect(SessionTokenCache.get({ tokenId: 'session_123' })).toBeDefined();
+    });
+  });
+
   describe('clear()', () => {
     it('removes all entries and clears timeouts', async () => {
       const futureExp = Math.floor(Date.now() / 1000) + 3600;
