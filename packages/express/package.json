@@ -81,7 +81,7 @@
   "devDependencies": {
     "@types/express": "^4.17.25",
     "@types/supertest": "^6.0.3",
-    "express": "^4.22.1",
+    "express": "^4.22.2",
     "supertest": "^6.3.4"
   },
   "peerDependencies": {
