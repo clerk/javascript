@@ -47,7 +47,7 @@ export const leaveOrgMachine = createMachine({
         onError: {
           target: 'confirming',
           actions: assign((_, event) => ({
-            error: String(event.error),
+            error: event.error instanceof Error ? event.error.message : 'Something went wrong. Please try again.',
           })),
         },
       }),

@@ -23,7 +23,7 @@ import { createMachine } from './createMachine';
 import { assign } from './assign';
 ```
 
-`setup<TContext, TEvent>()` returns `{ createMachine, assign, fromPromise }`. Use `fromPromise` for all `invoke` configurations — it carries the resolved type to `e.output` in `onDone.actions`.
+`setup<TContext, TEvent>()` returns `{ createMachine, assign, fromPromise }`. Use `fromPromise` for promise-based `invoke` configurations — it carries the resolved type to `e.output` in `onDone.actions`.
 
 ---
 

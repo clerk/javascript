@@ -63,6 +63,6 @@ describe('leaveOrgMachine', () => {
     await tick();
 
     expect(actor.getSnapshot().value).toBe('confirming');
-    expect(actor.getSnapshot().context.error).toBe('Error: nope');
+    expect(actor.getSnapshot().context.error).toBe('nope');
   });
 });

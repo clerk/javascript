@@ -45,7 +45,7 @@ Four words. That's the whole vocabulary:
 
 A flow that loads data has three steps and looks like this:
 
-```
+```text
         FETCH                resolves
  idle ─────────►  loading  ───────────►  success
                      │

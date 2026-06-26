@@ -121,47 +121,56 @@ import { assign } from '@/mosaic/machine/assign';
 type Context = { error: string | null };
 type Event = { type: 'SUBMIT'; emailAddress: string } | { type: 'NAVIGATE_DONE' };
 
-const waitlistMachine = createMachine<Context, Event>({
-  id: 'waitlist',
-  initial: 'idle',
-  context: { error: null },
-  states: {
-    idle: {
-      on: { SUBMIT: 'submitting' },
-    },
-    submitting: {
-      // Double-submit is impossible: SUBMIT is not handled here.
-      invoke: {
-        src: (ctx, event) =>
-          clerk.joinWaitlist({ emailAddress: (event as Extract<Event, { type: 'SUBMIT' }>).emailAddress }),
-        onDone: {
-          target: 'success',
-          actions: assign(() => ({ error: null })),
-        },
-        onError: {
-          target: 'idle',
-          actions: assign((_ctx, e) => ({ error: String(e.error) })),
+type WaitlistDeps = {
+  joinWaitlist: (args: { emailAddress: string }) => Promise<void>;
+  navigate: (url: string) => void;
+  afterJoinWaitlistUrl?: string;
+};
+
+function createWaitlistMachine(deps: WaitlistDeps) {
+  return createMachine<Context, Event>({
+    id: 'waitlist',
+    initial: 'idle',
+    context: { error: null },
+    states: {
+      idle: {
+        on: { SUBMIT: 'submitting' },
+      },
+      submitting: {
+        // Double-submit is impossible: SUBMIT is not handled here.
+        invoke: {
+          src: (ctx, event) =>
+            deps.joinWaitlist({ emailAddress: (event as Extract<Event, { type: 'SUBMIT' }>).emailAddress }),
+          onDone: {
+            target: 'success',
+            actions: assign(() => ({ error: null })),
+          },
+          onError: {
+            target: 'idle',
+            actions: assign((_ctx, e) => ({ error: String(e.error) })),
+          },
         },
       },
+      success: {
+        // Optional auto-navigate on entry:
+        entry: [
+          () => {
+            if (deps.afterJoinWaitlistUrl) {
+              setTimeout(() => deps.navigate(deps.afterJoinWaitlistUrl), 2000);
+            }
+          },
+        ],
+      },
     },
-    success: {
-      // Optional auto-navigate on entry:
-      entry: [
-        (ctx, event) => {
-          if (afterJoinWaitlistUrl) {
-            setTimeout(() => navigate(afterJoinWaitlistUrl), 2000);
-          }
-        },
-      ],
-    },
-  },
-});
+  });
+}
 ```
 
 In React:
 
 ```tsx
-const [snapshot, send] = useMachine(waitlistMachine);
+const machine = createWaitlistMachine({ joinWaitlist: clerk.joinWaitlist, navigate, afterJoinWaitlistUrl });
+const [snapshot, send] = useMachine(machine);
 
 <Form.Root
   onSubmit={e => {
@@ -358,6 +367,7 @@ idle ─────────────────────────
 ```ts
 type SignInContext = {
   selectedProvider: PhoneCodeChannelData | null;
+  identifier: string;
   error: string | null;
 };
 type SignInEvent =
@@ -368,7 +378,7 @@ type SignInEvent =
 const signInStartMachine = createMachine<SignInContext, SignInEvent>({
   id: 'signInStart',
   initial: 'idle',
-  context: { selectedProvider: null, error: null },
+  context: { selectedProvider: null, identifier: '', error: null },
   states: {
     idle: {
       on: {
@@ -376,7 +386,10 @@ const signInStartMachine = createMachine<SignInContext, SignInEvent>({
           target: 'provider_selected',
           actions: assign((_ctx, e) => ({ selectedProvider: e.provider, error: null })),
         },
-        SUBMIT: 'submitting',
+        SUBMIT: {
+          target: 'submitting',
+          actions: assign((_ctx, e) => ({ identifier: e.identifier })),
+        },
       },
     },
     provider_selected: {
@@ -385,12 +398,15 @@ const signInStartMachine = createMachine<SignInContext, SignInEvent>({
           target: 'idle',
           actions: assign(() => ({ selectedProvider: null })),
         },
-        SUBMIT: 'submitting',
+        SUBMIT: {
+          target: 'submitting',
+          actions: assign((_ctx, e) => ({ identifier: e.identifier })),
+        },
       },
     },
     submitting: {
       invoke: {
-        src: (_ctx, event) => signIn.create({ identifier: (event as any).identifier }),
+        src: ctx => signIn.create({ identifier: ctx.identifier }),
         onDone: { target: 'idle', actions: assign(() => ({ error: null })) },
         onError: {
           target: 'idle',

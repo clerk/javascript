@@ -170,8 +170,9 @@ export function createActor<TContext extends object, TEvent extends EventObject>
         if (!transition) {
           return;
         }
-        takeTransition(transition, doneEvent);
-        commit();
+        if (takeTransition(transition, doneEvent)) {
+          commit();
+        }
       },
       (error: unknown) => {
         if (status !== 'active' || token !== invocationToken) {
@@ -182,8 +183,9 @@ export function createActor<TContext extends object, TEvent extends EventObject>
         if (!transition) {
           return;
         }
-        takeTransition(transition, errorEvent);
-        commit();
+        if (takeTransition(transition, errorEvent)) {
+          commit();
+        }
       },
     );
   }

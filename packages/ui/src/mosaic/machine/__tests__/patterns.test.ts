@@ -41,7 +41,7 @@ describe('pattern: multi-button loading (social + email)', () => {
 
   const { createMachine, assign, fromPromise } = setup<Ctx, Evt>();
 
-  function makeSignInMachine(socialFn: () => Promise<void>, emailFn: () => Promise<void>) {
+  function makeSignInMachine(socialFn: (strategy: Strategy) => Promise<void>, emailFn: () => Promise<void>) {
     return createMachine({
       initial: 'idle',
       context: { activeStrategy: null, error: null },
@@ -61,13 +61,16 @@ describe('pattern: multi-button loading (social + email)', () => {
         submitting: {
           // All entry points converge here. CLICK_SOCIAL while submitting is a no-op —
           // `idle`'s handlers are inactive, so simultaneous triggers are impossible.
-          invoke: fromPromise(ctx => (ctx.activeStrategy === 'email' ? emailFn() : socialFn()), {
-            onDone: { target: 'success' },
-            onError: {
-              target: 'idle',
-              actions: assign((_, e) => ({ error: String(e.error), activeStrategy: null })),
+          invoke: fromPromise(
+            ctx => (ctx.activeStrategy === 'email' ? emailFn() : socialFn(ctx.activeStrategy as Strategy)),
+            {
+              onDone: { target: 'success' },
+              onError: {
+                target: 'idle',
+                actions: assign((_, e) => ({ error: String(e.error), activeStrategy: null })),
+              },
             },
-          }),
+          ),
         },
         success: { type: 'final' },
       },
