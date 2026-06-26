@@ -1,7 +1,7 @@
 import { isUserLockedError } from '@clerk/shared/error';
 import { clerkInvalidFAPIResponse } from '@clerk/shared/internal/clerk-js/errors';
 import { useClerk } from '@clerk/shared/react';
-import type { EmailCodeFactor, PhoneCodeFactor, ResetPasswordCodeFactor } from '@clerk/shared/types';
+import type { EmailCodeFactor, PhoneCodeFactor, ResetPasswordCodeFactor, SignInResource } from '@clerk/shared/types';
 import { useMemo } from 'react';
 
 import { useCardState } from '@/ui/elements/contexts';
@@ -82,6 +82,16 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
     return navigate('../');
   };
 
+  // A `prepare` (the code-send itself, on mount and on resend) can come back Protect-gated, not
+  // just `attempt` below. Route it through the same choke point so the gate isn't dropped — a
+  // no-op when the response isn't gated.
+  const handlePrepareResult = (res: SignInResource) => {
+    if (navigateOnSignInProtectGate(res, navigate, '../protect-check')) {
+      return;
+    }
+    props.onFactorPrepare();
+  };
+
   const prepare = () => {
     if (shouldAvoidPrepare) {
       return;
@@ -89,13 +99,13 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
 
     void signIn
       .prepareFirstFactor(props.factor)
-      .then(() => props.onFactorPrepare())
+      .then(handlePrepareResult)
       .catch(err => handleError(err, [], card.setError));
   };
 
   useFetch(shouldAvoidInitialPrepare ? undefined : () => signIn?.prepareFirstFactor(props.factor), cacheKey, {
     staleTime: 100,
-    onSuccess: () => props.onFactorPrepare(),
+    onSuccess: handlePrepareResult,
     onError: err => handleError(err, [], card.setError),
   });
 

@@ -2413,7 +2413,8 @@ export class Clerk implements ClerkInterface {
     );
 
     const navigateToSignInProtectCheck = makeNavigate(
-      buildURL({ base: displayConfig.signInUrl, hashPath: '/protect-check' }, { stringify: true }),
+      params.signInProtectCheckUrl ||
+        buildURL({ base: displayConfig.signInUrl, hashPath: '/protect-check' }, { stringify: true }),
     );
 
     const redirectUrls = new RedirectUrls(this.#options, params);
@@ -2430,7 +2431,8 @@ export class Clerk implements ClerkInterface {
     );
 
     const navigateToSignUpProtectCheck = makeNavigate(
-      buildURL({ base: displayConfig.signUpUrl, hashPath: '/protect-check' }, { stringify: true }),
+      params.signUpProtectCheckUrl ||
+        buildURL({ base: displayConfig.signUpUrl, hashPath: '/protect-check' }, { stringify: true }),
     );
 
     const navigateToNextStepSignUp = ({ missingFields }: { missingFields: SignUpField[] }) => {
@@ -2459,7 +2461,9 @@ export class Clerk implements ClerkInterface {
         verifyPhonePath:
           params.verifyPhoneNumberUrl ||
           buildURL({ base: displayConfig.signUpUrl, hashPath: '/verify-phone-number' }, { stringify: true }),
-        protectCheckPath: buildURL({ base: displayConfig.signUpUrl, hashPath: '/protect-check' }, { stringify: true }),
+        protectCheckPath:
+          params.signUpProtectCheckUrl ||
+          buildURL({ base: displayConfig.signUpUrl, hashPath: '/protect-check' }, { stringify: true }),
         navigate,
       });
     };

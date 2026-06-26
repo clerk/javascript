@@ -108,6 +108,28 @@ describe('SignInProtectCheck', () => {
     });
   });
 
+  it('routes on the refreshed resource when an expired-challenge reload clears the gate', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.startSignInWithProtectCheck({ expiresAt: Date.now() - 60_000 });
+    });
+    // The reload picks up a sign-in whose gate has cleared (the server advanced the flow on read).
+    const reloadMock = vi.fn().mockImplementation(async () => {
+      (fixtures.signIn as any).status = 'needs_first_factor';
+      (fixtures.signIn as any).protectCheck = null;
+      return fixtures.signIn;
+    });
+    (fixtures.signIn as any).reload = reloadMock;
+
+    render(<SignInProtectCheck />, { wrapper });
+
+    // Must continue the flow on the refreshed resource, not fail/strand on the still-expired branch.
+    await waitFor(() => {
+      expect(reloadMock).toHaveBeenCalled();
+      expect(mockExecute).not.toHaveBeenCalled();
+      expect(fixtures.router.navigate).toHaveBeenCalledWith('../factor-one');
+    });
+  });
+
   it('treats protect_check_already_resolved as a soft success, reloads, and continues the flow', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.startSignInWithProtectCheck();

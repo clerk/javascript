@@ -74,6 +74,8 @@ export const useGoogleOneTapContext = () => {
         },
         { stringify: true },
       );
+      const signInProtectCheckUrl = buildURL({ base: signInUrl, hashPath: '/protect-check' }, { stringify: true });
+      const signUpProtectCheckUrl = buildURL({ base: signUpUrl, hashPath: '/protect-check' }, { stringify: true });
 
       return {
         signInUrl,
@@ -81,6 +83,8 @@ export const useGoogleOneTapContext = () => {
         firstFactorUrl,
         secondFactorUrl,
         continueSignUpUrl: signUpContinueUrl,
+        signInProtectCheckUrl,
+        signUpProtectCheckUrl,
         signInForceRedirectUrl,
         signUpForceRedirectUrl,
       };

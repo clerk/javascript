@@ -58,7 +58,7 @@ Single provider that handles cascade and theme delivery. It accepts `appearance`
 import { MosaicProvider } from '../mosaic/MosaicProvider';
 
 <MosaicProvider>{children}</MosaicProvider>;
-````
+```
 
 ### useMosaicTheme
 

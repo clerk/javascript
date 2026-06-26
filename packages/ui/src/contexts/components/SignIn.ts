@@ -21,6 +21,7 @@ export type SignInContextType = Omit<SignInCtx, 'fallbackRedirectUrl' | 'forceRe
   signUpUrl: string;
   signInUrl: string;
   signUpContinueUrl: string;
+  signUpProtectCheckUrl: string;
   authQueryString: string | null;
   afterSignUpUrl: string;
   afterSignInUrl: string;
@@ -127,6 +128,10 @@ export const useSignInContext = (): SignInContextType => {
   }
 
   const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
+  // Built off `signUpUrl`, which is rewritten to `<signInUrl>#/create` in the combined flow, so this
+  // resolves to the embedded `…/create/protect-check` route there and the standalone sign-up route
+  // otherwise — keeping a Protect-gated sign-up inside whichever component is mounted.
+  const signUpProtectCheckUrl = buildURL({ base: signUpUrl, hashPath: '/protect-check' }, { stringify: true });
 
   const navigateOnSetActive = async ({
     session,
@@ -187,6 +192,7 @@ export const useSignInContext = (): SignInContextType => {
     ssoCallbackUrl,
     navigateAfterSignIn,
     signUpContinueUrl,
+    signUpProtectCheckUrl,
     queryParams,
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
     authQueryString,

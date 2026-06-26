@@ -66,10 +66,13 @@ const SignInFactorOneSolanaWalletsCardInner = () => {
                     .authenticateWithWeb3({
                       customNavigate: router.navigate,
                       redirectUrl: ctx.afterSignInUrl || '/',
-                      secondFactorUrl: 'factor-two',
-                      protectCheckUrl: 'protect-check',
-                      signUpProtectCheckUrl: ctx.isCombinedFlow ? 'create/protect-check' : undefined,
-                      signUpContinueUrl: ctx.isCombinedFlow ? 'create/continue' : ctx.signUpContinueUrl,
+                      // This card is mounted one level deep at `/sign-in/choose-wallet`, so every
+                      // relative target needs to climb out of `choose-wallet` first (unlike
+                      // `SignInSocialButtons`, which lives at the sign-in root and omits the `../`).
+                      secondFactorUrl: '../factor-two',
+                      protectCheckUrl: '../protect-check',
+                      signUpProtectCheckUrl: ctx.isCombinedFlow ? '../create/protect-check' : undefined,
+                      signUpContinueUrl: ctx.isCombinedFlow ? '../create/continue' : ctx.signUpContinueUrl,
                       strategy: 'web3_solana_signature',
                       walletName,
                     })

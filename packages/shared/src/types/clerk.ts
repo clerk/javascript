@@ -1243,6 +1243,16 @@ export type HandleOAuthCallbackParams = TransferableOption &
      */
     verifyPhoneNumberUrl?: string | null;
     /**
+     * The full URL or path to navigate to if the sign-in is gated by a Clerk Protect challenge
+     * (`protect_check`). Defaults to the `protect-check` route on the mounted sign-in component.
+     */
+    signInProtectCheckUrl?: string | null;
+    /**
+     * The full URL or path to navigate to if the sign-up is gated by a Clerk Protect challenge
+     * (`protect_check`). Defaults to the `protect-check` route on the mounted sign-up component.
+     */
+    signUpProtectCheckUrl?: string | null;
+    /**
      * The underlying resource to optionally reload before processing an OAuth callback.
      */
     reloadResource?: 'signIn' | 'signUp';

@@ -1,6 +1,5 @@
 import { ClerkRuntimeError, isClerkAPIResponseError } from '@clerk/shared/error';
 import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
-import { executeProtectCheck } from '@clerk/shared/internal/clerk-js/protectCheck';
 import type { ProtectCheckResource } from '@clerk/shared/types';
 import React from 'react';
 
@@ -68,6 +67,18 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
   const [isRunning, setIsRunning] = React.useState(false);
   const [retryNonce, setRetryNonce] = React.useState(0);
 
+  // Tracks real unmount, distinct from the per-run `cancelled` flag below. Clearing `protectCheck`
+  // (e.g. an expired-challenge reload that advances the flow) flips the token dependency and
+  // re-runs/cancels the main effect — but that re-run is exactly our cue to route, so the routing
+  // must key on actual unmount, not on the effect's cancel flag.
+  const mountedRef = React.useRef(true);
+  React.useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
+
   // Keep the latest callbacks without re-running the effect when the caller re-renders.
   const paramsRef = React.useRef(params);
   paramsRef.current = params;
@@ -125,23 +136,31 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
       void (async () => {
         try {
           await reload();
-          if (cancelled) {
+          if (!mountedRef.current) {
             return;
           }
           const refreshed = getProtectCheck();
           const stillExpired = !!refreshed && refreshed.expiresAt !== undefined && refreshed.expiresAt < Date.now();
           if (stillExpired) {
             // The server didn't re-mint on read. Don't sit on a spinner — fail loud so the user
-            // gets a retry instead of an indefinite wait. (A fresh, different-token challenge
-            // would have re-triggered this effect via the token dependency.)
+            // gets a retry instead of an indefinite wait.
             failWith(ERROR_CODES.PROTECT_CHECK_TIMED_OUT, 'Protect verification expired');
+          } else if (!refreshed) {
+            // The reload cleared the gate or completed the flow. Route on the refreshed live
+            // resource so the flow continues (and a completed sign-in still gets `setActive`)
+            // instead of the route guard bouncing the user back to flow start. Keyed on mount (not
+            // `cancelled`): clearing protectCheck re-runs/cancels this effect, and that re-run is
+            // our signal to route — it must not abort the routing.
+            await onResolved(getResource(), () => !mountedRef.current);
           }
+          // Otherwise the server re-minted a fresh, non-expired challenge whose new token
+          // re-triggers this effect (keyed on the token), which then runs it.
         } catch (err: any) {
-          if (!cancelled) {
+          if (mountedRef.current) {
             handleError(err, [], card.setError);
           }
         } finally {
-          if (!cancelled) {
+          if (mountedRef.current) {
             isRunningRef.current = false;
             setIsRunning(false);
           }
@@ -161,6 +180,15 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
     const runChallenge = async () => {
       let timeoutId: ReturnType<typeof setTimeout> | undefined;
       try {
+        // Load the Protect SDK loader lazily, gated on the same compile-time flag as the
+        // fail-closed guard above. In no-RHC builds `__BUILD_DISABLE_RHC__` is `true`, so this
+        // branch (and the dynamic `import()` below it) is dead-code-eliminated — the loader and
+        // its remote `import(sdk_url)` are tree-shaken out of those bundles entirely rather than
+        // merely shipped-but-unused.
+        if (__BUILD_DISABLE_RHC__) {
+          return;
+        }
+        const { executeProtectCheck } = await import('@clerk/shared/internal/clerk-js/protectCheck');
         const proofToken = await Promise.race([
           executeProtectCheck(protectCheck, container, { signal: abortController.signal }),
           new Promise<never>((_, reject) => {
