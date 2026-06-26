@@ -1,5 +1,6 @@
 import { useClerk } from '@clerk/react';
 import { isClerkAPIResponseError } from '@clerk/shared/error';
+import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type { ClientResource, SetActive } from '@clerk/shared/types';
 
 import { ClerkGoogleOneTapSignIn, isErrorWithCode, isSuccessResponse } from '../google-one-tap';
@@ -75,6 +76,8 @@ export function createUseSignInWithGoogle(platformConfig: PlatformConfig) {
     warnAboutGoogleSignInPackageMigration();
 
     const clerk = useClerk();
+
+    clerk.telemetry?.record(eventMethodCalled('useSignInWithGoogle'));
 
     async function startGoogleAuthenticationFlow(
       startGoogleAuthenticationFlowParams?: StartGoogleAuthenticationFlowParams,
