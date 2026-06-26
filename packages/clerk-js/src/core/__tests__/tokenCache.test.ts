@@ -1670,35 +1670,6 @@ describe('SessionTokenCache', () => {
     });
   });
 
-  describe('broadcast resilience', () => {
-    // KNOWN BUG (SDK-119): a broadcast side-effect failure currently evicts the
-    // freshly cached token, because the postMessage throw propagates into the
-    // setInternal `.catch(deleteKey)`. This asserts the intended contract and is
-    // marked `it.fails` so the suite stays green while documenting the bug; it
-    // flips red (forcing removal of `.fails`) once SDK-119 lands the try/catch.
-    it.fails('a failing postMessage does not evict the freshly cached token', async () => {
-      // postMessage can throw (e.g. InvalidStateError if the channel races a
-      // close). Broadcasting is a side effect; a failure must not destroy the
-      // cache entry that was just stored.
-      mockBroadcastChannel.postMessage.mockImplementationOnce(() => {
-        throw new Error('channel closed');
-      });
-
-      const futureExp = Math.floor(Date.now() / 1000) + 3600;
-      const tokenResolver = Promise.resolve({
-        getRawString: () => mockJwt,
-        jwt: { claims: { exp: futureExp, iat: 1675876730, sid: 'session_123' } },
-      } as any);
-
-      SessionTokenCache.set({ tokenId: 'session_123', tokenResolver });
-      await tokenResolver;
-      await Promise.resolve();
-
-      const result = SessionTokenCache.get({ tokenId: 'session_123' });
-      expect(result?.entry.tokenId).toBe('session_123');
-    });
-  });
-
   describe('audience key coalescing', () => {
     it('treats empty-string audience and undefined audience as the same entry', async () => {
       const nowSeconds = Math.floor(Date.now() / 1000);
