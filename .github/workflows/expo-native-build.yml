@@ -9,6 +9,7 @@ on:
       - '.github/workflows/expo-native-build.yml'
       - 'integration/templates/expo-native/**'
       - 'packages/expo/**'
+      - 'packages/expo-google-signin/**'
   workflow_dispatch:
 
 permissions:
@@ -67,14 +68,21 @@ jobs:
       - name: Install monorepo dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build and pack @clerk/expo
+      - name: Build and pack Clerk Expo packages
         run: |
           pnpm --filter @clerk/expo... build
+          pnpm --filter @clerk/expo-google-signin... build
           mkdir -p "$SDK_PACK_DIR"
           pnpm --filter @clerk/expo pack --pack-destination "$SDK_PACK_DIR"
-          SDK_TARBALL="$(ls "$SDK_PACK_DIR"/clerk-expo-*.tgz)"
-          if tar -tf "$SDK_TARBALL" | grep -q '^package/e2e/'; then
+          pnpm --filter @clerk/expo-google-signin pack --pack-destination "$SDK_PACK_DIR"
+          EXPO_TARBALL="$(ls "$SDK_PACK_DIR"/clerk-expo-[0-9]*.tgz)"
+          GOOGLE_TARBALL="$(ls "$SDK_PACK_DIR"/clerk-expo-google-signin-*.tgz)"
+          if tar -tf "$EXPO_TARBALL" | grep -q '^package/e2e/'; then
             echo "Fixture files must not be packed into @clerk/expo"
+            exit 1
+          fi
+          if tar -tf "$GOOGLE_TARBALL" | grep -q '^package/e2e/'; then
+            echo "Fixture files must not be packed into @clerk/expo-google-signin"
             exit 1
           fi
 
@@ -85,8 +93,9 @@ jobs:
         run: |
           cp "package.sdk-$EXPO_SDK.json" package.json
           pnpm install --no-frozen-lockfile
-          SDK_TARBALL="$(ls "$SDK_PACK_DIR"/clerk-expo-*.tgz)"
-          pnpm add "$SDK_TARBALL" -w
+          EXPO_TARBALL="$(ls "$SDK_PACK_DIR"/clerk-expo-[0-9]*.tgz)"
+          GOOGLE_TARBALL="$(ls "$SDK_PACK_DIR"/clerk-expo-google-signin-*.tgz)"
+          pnpm add "$EXPO_TARBALL" "$GOOGLE_TARBALL" -w
           pnpm expo install expo-auth-session expo-constants expo-crypto expo-dev-client expo-secure-store expo-web-browser
 
       - name: Write fixture .env
@@ -120,3 +129,63 @@ jobs:
         if: ${{ matrix.platform == 'ios' }}
         working-directory: ${{ env.FIXTURE_DIR }}
         run: pnpm build:ios
+
+  core-only-prebuild:
+    if: ${{ github.head_ref != 'changeset-release/main' }}
+    name: Expo core-only autolinking smoke
+    runs-on: blacksmith-8vcpu-ubuntu-2204
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24.15.0
+          cache: pnpm
+
+      - name: Install monorepo dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build and pack @clerk/expo
+        run: |
+          pnpm --filter @clerk/expo... build
+          mkdir -p "$SDK_PACK_DIR"
+          pnpm --filter @clerk/expo pack --pack-destination "$SDK_PACK_DIR"
+
+      - name: Install core-only fixture dependencies
+        working-directory: ${{ env.FIXTURE_DIR }}
+        env:
+          EXPO_SDK: 56
+        run: |
+          cp "package.sdk-$EXPO_SDK.json" package.json
+          pnpm install --no-frozen-lockfile
+          EXPO_TARBALL="$(ls "$SDK_PACK_DIR"/clerk-expo-[0-9]*.tgz)"
+          pnpm add "$EXPO_TARBALL" -w
+          pnpm expo install expo-auth-session expo-constants expo-dev-client expo-secure-store expo-web-browser
+
+      - name: Write core-only app config
+        working-directory: ${{ env.FIXTURE_DIR }}
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const app = JSON.parse(fs.readFileSync('app.json', 'utf8'));
+          app.expo.plugins = ['expo-secure-store', '@clerk/expo', 'expo-web-browser'];
+          fs.writeFileSync('app.json', JSON.stringify(app, null, 2) + '\n');
+          NODE
+
+      - name: Prebuild Android core-only fixture
+        working-directory: ${{ env.FIXTURE_DIR }}
+        run: pnpm expo prebuild --clean --platform android
+
+      - name: Assert Google native module is not autolinked
+        working-directory: ${{ env.FIXTURE_DIR }}
+        run: |
+          if grep -R "ClerkGoogleSignIn\|googleid\|credentials-play-services-auth" android; then
+            echo "Google Sign-In native code was autolinked in core-only fixture"
+            exit 1
+          fi
