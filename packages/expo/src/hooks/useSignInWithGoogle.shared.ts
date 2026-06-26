@@ -1,5 +1,6 @@
 import { useClerk } from '@clerk/react';
 import { isClerkAPIResponseError } from '@clerk/shared/error';
+import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type { ClientResource, SetActive } from '@clerk/shared/types';
 
 import { ClerkGoogleOneTapSignIn, isErrorWithCode, isSuccessResponse } from '../google-one-tap';
@@ -8,7 +9,6 @@ import type {
   StartGoogleAuthenticationFlowParams,
   StartGoogleAuthenticationFlowReturnType,
 } from './useSignInWithGoogle.types';
-import { eventMethodCalled } from '@clerk/shared/telemetry';
 
 export type GoogleClientIds = {
   webClientId: string;
