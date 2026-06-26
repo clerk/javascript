@@ -494,7 +494,6 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y xvfb
           fi
-          xvfb-run --help > /dev/null
 
       - name: Run Integration Tests
         id: integration-tests

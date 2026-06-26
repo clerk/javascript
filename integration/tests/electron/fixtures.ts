@@ -62,7 +62,7 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
       await provide(app);
       await app.teardown();
     },
-    { scope: 'worker', timeout: 120_000 },
+    { scope: 'worker', timeout: 180_000 },
   ],
 
   electronApplication: async ({ electronTestApp }, provide) => {

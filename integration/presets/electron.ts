@@ -7,7 +7,7 @@ const vite = applicationConfig()
   .useTemplate(templates['electron-vite'])
   .setEnvFormatter('public', key => `VITE_${key}`)
   .addScript('setup', 'pnpm install')
-  .addScript('dev', 'pnpm build')
+  .addScript('dev', 'echo noop')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'echo noop')
   .addDependency('@clerk/electron', PKGLAB);

@@ -41,7 +41,13 @@ function registerClerkAppProtocol() {
       return new Response('Not found', { status: 404 });
     }
 
-    const requestedPath = decodeURIComponent(url.pathname);
+    let requestedPath;
+    try {
+      requestedPath = decodeURIComponent(url.pathname);
+    } catch {
+      return new Response('Bad request', { status: 400 });
+    }
+
     const resolvedPath = path.resolve(rendererRoot, `.${requestedPath}`);
     const relativePath = path.relative(rendererRoot, resolvedPath);
     const isSafe = relativePath === '' || (!relativePath.startsWith('..') && !path.isAbsolute(relativePath));
