@@ -70,7 +70,7 @@ export function useCreditBalance(params?: UseCreditBalanceParams): CreditBalance
     });
   }, [user?.id, organization?.id, params?.for]);
 
-  const queriesEnabled = Boolean(user?.id && billingEnabled);
+  const queriesEnabled = Boolean(user?.id && billingEnabled && (params?.enabled ?? true));
   useClearQueriesOnSignOut({
     isSignedOut: user === null,
     authenticated,
