@@ -1,17 +1,17 @@
 import { requireNativeModule } from 'expo';
 
 interface Spec {
-  // addListener/removeListeners are present on the iOS RN event emitter module.
-  // Android uses Expo Modules EventEmitter instead.
-  addListener?(eventName: string): void;
+  // Exposed by Expo Modules EventEmitter for internal native client change events.
+  // This is not part of the public @clerk/expo API.
+  addListener?(eventName: string, listener?: (...args: unknown[]) => void): { remove: () => void };
   configure(publishableKey: string, bearerToken: string | null): Promise<void>;
   getClientToken(): Promise<string | null>;
-  syncFromJsClientToken(
-    clientToken: string | null,
+  syncClientStateFromJs(
+    deviceToken: string | null,
     sourceId: string | null,
-    shouldRefreshClient?: boolean,
+    didChangeClient: boolean,
+    didChangeDeviceToken: boolean,
   ): Promise<void>;
-  removeListeners?(count: number): void;
 }
 
 export default requireNativeModule<Spec>('ClerkExpo');

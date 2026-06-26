@@ -21,9 +21,12 @@ export type StartGoogleAuthenticationFlowReturnType = {
  * Native Google Authentication is only available on iOS and Android.
  * For web platforms, use the OAuth-based Google Sign-In flow instead via useSSO.
  *
+ * In the next major version, apps using native Google Sign-In will need to install
+ * `@clerk/expo-google-signin` alongside `@clerk/expo`.
+ *
  * @example
  * ```tsx
- * import { useSSO } from '@clerk/clerk-expo';
+ * import { useSSO } from '@clerk/expo';
  * import { Button } from 'react-native';
  *
  * function GoogleSignInButton() {

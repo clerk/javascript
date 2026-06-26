@@ -1,20 +1,17 @@
-import type { TurboModule } from 'react-native';
-import { TurboModuleRegistry } from 'react-native';
+import { requireOptionalNativeModule } from 'expo';
 
-export interface Spec extends TurboModule {
-  // Required by NativeEventEmitter for internal native client change events.
+export interface Spec {
+  // Exposed by Expo Modules EventEmitter for internal native client change events.
   // This is not part of the public @clerk/expo API.
-  addListener(eventName: string): void;
+  addListener?(eventName: string, listener?: (...args: unknown[]) => void): { remove: () => void };
   configure(publishableKey: string, bearerToken: string | null): Promise<void>;
   getClientToken(): Promise<string | null>;
-  syncFromJsClientToken(
-    clientToken: string | null,
+  syncClientStateFromJs(
+    deviceToken: string | null,
     sourceId: string | null,
-    shouldRefreshClient?: boolean,
+    didChangeClient: boolean,
+    didChangeDeviceToken: boolean,
   ): Promise<void>;
-  // Required by NativeEventEmitter for internal native client change events.
-  // This is not part of the public @clerk/expo API.
-  removeListeners(count: number): void;
 }
 
-export default TurboModuleRegistry.get<Spec>('ClerkExpo');
+export default requireOptionalNativeModule<Spec>('ClerkExpo');

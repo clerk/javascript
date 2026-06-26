@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
-import { DeviceEventEmitter, Platform } from 'react-native';
 
 import { ClerkExpoModule as ClerkExpo, isNativeSupported } from '../utils/native-module';
 
 const nativeClientChangedEvent = 'clerkNativeClientChanged';
 
 export interface NativeClientSnapshot {
-  clientToken?: string | null;
+  changed: {
+    client: boolean;
+    deviceToken: boolean;
+  };
+  deviceToken: string | null;
   sourceId?: string | null;
 }
 
@@ -33,15 +36,19 @@ type RefreshClientEventEmitter = {
 };
 
 function getNativeClientEventEmitter(): RefreshClientEventEmitter | null {
-  if (Platform.OS === 'ios') {
-    return DeviceEventEmitter;
-  }
-
   if (ClerkExpo && typeof ClerkExpo.addListener === 'function') {
     return ClerkExpo as RefreshClientEventEmitter;
   }
 
   return null;
+}
+
+function isNativeClientSnapshot(snapshot: NativeClientSnapshot | undefined): snapshot is NativeClientSnapshot {
+  return (
+    typeof snapshot?.changed?.client === 'boolean' &&
+    typeof snapshot.changed.deviceToken === 'boolean' &&
+    (typeof snapshot.deviceToken === 'string' || snapshot.deviceToken === null)
+  );
 }
 
 /**
@@ -65,6 +72,10 @@ export function useNativeClientEvents(): UseNativeClientEventsReturn {
       }
 
       subscription = eventEmitter.addListener(nativeClientChangedEvent, snapshot => {
+        if (!isNativeClientSnapshot(snapshot)) {
+          return;
+        }
+
         setNativeClientEvent({ issuedAt: Date.now(), ...snapshot });
       });
     } catch (error) {

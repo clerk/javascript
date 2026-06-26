@@ -717,11 +717,12 @@ export type ElementsConfig = {
   configureSSOVerifyDomainErrorSubtitle: WithOptions;
   configureSSOVerifyDomainList: WithOptions;
   configureSSOVerifyDomainSuggestion: WithOptions;
-  configureSSOVerifyDomainCard: WithOptions<'verified' | 'unverified'>;
-  configureSSOVerifyDomainCardBadge: WithOptions<'verified' | 'unverified'>;
+  configureSSOVerifyDomainCard: WithOptions<'verified' | 'unverified' | 'expired'>;
+  configureSSOVerifyDomainCardBadge: WithOptions<'verified' | 'unverified' | 'expired'>;
   configureSSOVerifyDomainCardRemoveButton: WithOptions;
   configureSSOVerifyDomainCardTxtRecord: WithOptions;
   configureSSOVerifyDomainCardTxtRecordValue: WithOptions;
+  configureSSOVerifyDomainCardExpired: WithOptions;
   configureSSOEmailVerificationForm: WithOptions<string>;
   configureSSOEmailVerificationIcon: WithOptions<string>;
   configureSSOEmailVerificationTitle: WithOptions<string>;
@@ -764,6 +765,10 @@ export type ElementsConfig = {
   configureSSOResetConnectionDialogCancelButton: WithOptions;
   configureSSOResetConnectionDialogConfirmationInput: WithOptions;
   configureSSOResetConnectionDialogSubmitButton: WithOptions;
+
+  configureSSOChangeProviderDialog: WithOptions;
+  configureSSOChangeProviderDialogCancelButton: WithOptions;
+  configureSSOChangeProviderDialogConfirmButton: WithOptions;
 
   configureSSORemoveDomainDialog: WithOptions;
   configureSSORemoveDomainDialogCancelButton: WithOptions;

@@ -27,6 +27,7 @@ jobs:
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
     permissions:
+      actions: read
       contents: write
       id-token: write
       packages: write
@@ -64,8 +65,30 @@ jobs:
       - name: Upgrade npm for trusted publishing
         run: npx npm@11 install -g npm@11
 
+      - name: Determine whether electron-passkeys is about to publish
+        id: detect-native
+        run: node scripts/detect-electron-passkeys-publish.mjs >> "$GITHUB_OUTPUT"
+
       - name: Build release
         run: pnpm turbo build $TURBO_ARGS --force
+
+      - name: Download electron-passkeys native binaries
+        if: ${{ steps.detect-native.outputs.should-build == 'true' }}
+        uses: dawidd6/action-download-artifact@b6e2e70617bc3265edd6dab6c906732b2f1ae151 # v21
+        with:
+          github_token: ${{ github.token }}
+          workflow: electron-passkeys.yml
+          name: electron-passkeys-npm
+          path: packages/electron-passkeys/npm
+          branch: ${{ github.ref_name }}
+          event: workflow_dispatch
+          workflow_conclusion: success
+          search_artifacts: true
+          allow_forks: false
+
+      - name: Verify electron-passkeys binaries are present
+        if: ${{ steps.detect-native.outputs.should-build == 'true' }}
+        run: node scripts/check-electron-passkeys-binaries.mjs packages/electron-passkeys/npm
 
       - name: Create Release PR
         id: changesets
@@ -201,7 +224,16 @@ jobs:
       - name: Generate notification payload
         id: notification
         if: steps.changesets.outputs.published == 'true'
-        run: payload=$(node scripts/notify.mjs '${{ steps.changesets.outputs.publishedPackages }}' '${{ github.actor }}') && echo ::set-output name=payload::${payload//$'\n'/'%0A'}
+        env:
+          PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.publishedPackages }}
+          GH_ACTOR: ${{ github.actor }}
+        run: |
+          payload="$(node scripts/notify.mjs "$PUBLISHED_PACKAGES" "$GH_ACTOR")"
+          {
+            echo 'payload<<__NOTIFY_EOF__'
+            echo "$payload"
+            echo '__NOTIFY_EOF__'
+          } >> "$GITHUB_OUTPUT"
 
       - name: Send commit log to Slack
         id: slack

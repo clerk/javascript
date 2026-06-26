@@ -674,9 +674,8 @@ export const elGR: LocalizationResource = {
         messageLabel: 'Το email σας χρησιμοποιεί {{domain}}. Θέλετε να το προσθέσετε;',
       },
       formButtonPrimary__add: 'Προσθήκη',
-      formFieldInputPlaceholder__domain:
-        'Πληκτρολογήστε τον τομέα σας εδώ και κάντε κλικ στο «Προσθήκη» για να ξεκινήσετε',
-      formFieldLabel__domain: 'Τομείς',
+      formFieldInputPlaceholder__domain: 'Προσθήκη τομέα',
+      formFieldLabel__domain: 'Τομέας',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1093,18 +1092,13 @@ export const elGR: LocalizationResource = {
         badge__inactive: undefined,
         badge__unconfigured: undefined,
         descriptionLine1: undefined,
-        descriptionLine2: undefined,
-        descriptionLine2__noRole: undefined,
         domainLabel: undefined,
-        issuerLabel: undefined,
         menuAction__activate: undefined,
         menuAction__deactivate: undefined,
         menuAction__edit: undefined,
         menuAction__remove: undefined,
         primaryButton__continueConfiguration: undefined,
         primaryButton__startConfiguration: undefined,
-        providerLabel: undefined,
-        signOnUrlLabel: undefined,
         title: undefined,
       },
       title: undefined,
@@ -1683,6 +1677,7 @@ export const elGR: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       "Η διεύθυνση email ή το τηλέφωνο δεν επιτρέπεται για την εγγραφή. Αυτό μπορεί να οφείλεται στη χρήση '+', '=', '#' ή '.' στην διεύθυνση email σας, χρήση πεδίου που συνδέεται με υπηρεσία email, ή εμφανής αποκλεισμός. Αν πιστεύετε ότι αυτό είναι ένα σφάλμα, παρακαλούμε επικοινωνήστε με την υποστήριξη.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'Ο τομέας {{domain}} δεν μπορεί να επαληθευτεί.',
     organization_domain_common: 'Ο τομέας {{domain}} δεν μπορεί να επαληθευτεί επειδή είναι κοινός τομέας email.',
     organization_domain_exists_for_enterprise_connection:
@@ -1762,6 +1757,9 @@ export const elGR: LocalizationResource = {
     action__openUserMenu: 'Άνοιγμα μενού χρήστη',
     action__signOut: 'Αποσύνδεση',
     action__signOutAll: 'Αποσύνδεση από όλους τους λογαριασμούς',
+    label__userButtonPopover: 'Πίνακας λογαριασμού',
+    label__accountActions: 'Ενέργειες λογαριασμού',
+    label__activeSessions: 'Ενεργές συνεδρίες',
   },
   userProfile: {
     apiKeysPage: {

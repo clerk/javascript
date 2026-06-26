@@ -8,11 +8,11 @@ type ClerkExpoNativeModule = {
   addListener?(eventName: string, listener?: (...args: unknown[]) => void): { remove: () => void };
   configure(publishableKey: string, bearerToken: string | null): Promise<void>;
   getClientToken(): Promise<string | null>;
-  removeListeners?(count: number): void;
-  syncFromJsClientToken(
-    clientToken: string | null,
+  syncClientStateFromJs(
+    deviceToken: string | null,
     sourceId: string | null,
-    shouldRefreshClient?: boolean,
+    didChangeClient: boolean,
+    didChangeDeviceToken: boolean,
   ): Promise<void>;
 };
 
@@ -25,7 +25,7 @@ function isClerkExpoModule(module: unknown): module is ClerkExpoNativeModule {
   return (
     typeof maybeModule.configure === 'function' &&
     typeof maybeModule.getClientToken === 'function' &&
-    typeof maybeModule.syncFromJsClientToken === 'function'
+    typeof maybeModule.syncClientStateFromJs === 'function'
   );
 }
 
@@ -47,19 +47,11 @@ function loadNativeModule(): ClerkExpoNativeModule | null {
     return nativeModule;
   }
 
-  try {
-    // Expo SDK 54 can expose installed modules through Expo's module registry even
-    // when the generated TurboModule object is incomplete.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { requireNativeModule } = require('expo');
-    const expoModule = requireNativeModule('ClerkExpo');
-    return isClerkExpoModule(expoModule) ? expoModule : null;
-  } catch (e) {
-    if (__DEV__ && !nativeModule) {
-      console.warn('[ClerkExpo] Native module not available:', e);
-    }
-    return null;
+  if (__DEV__ && nativeModule) {
+    console.warn('[ClerkExpo] Native module does not satisfy the expected contract.');
   }
+
+  return null;
 }
 
 export const ClerkExpoModule = loadNativeModule();

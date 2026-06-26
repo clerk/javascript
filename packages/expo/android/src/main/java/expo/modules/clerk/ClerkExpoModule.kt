@@ -35,16 +35,32 @@ private fun debugLog(tag: String, message: String) {
 class ClerkExpoModule : Module() {
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
     private var clientStateObserverJob: Job? = null
-    private var lastObservedClient: Client? = null
+    private var lastObservedClientState: ClientStateSnapshot? = null
     private var jsOriginatedClientSyncDepth = 0
     private var configuredPublishableKey: String? = null
+
+    private data class ClientStateSnapshot(
+        val client: Client?,
+        val deviceToken: String?
+    )
+
+    private data class ClientStateChanges(
+        val client: Boolean,
+        val deviceToken: Boolean
+    )
 
     companion object {
         private var sharedInstance: ClerkExpoModule? = null
 
         fun emitClientChanged(sourceId: String? = null) {
             val instance = sharedInstance ?: return
-            instance.sendEvent(NATIVE_CLIENT_CHANGED_EVENT, instance.clientChangedPayload(sourceId))
+            instance.sendEvent(
+                NATIVE_CLIENT_CHANGED_EVENT,
+                instance.clientChangedPayload(
+                    sourceId = sourceId,
+                    changes = ClientStateChanges(client = true, deviceToken = true)
+                )
+            )
         }
     }
 
@@ -73,11 +89,17 @@ class ClerkExpoModule : Module() {
             getClientToken(promise)
         }
 
-        AsyncFunction("syncFromJsClientToken") { clientToken: String?, sourceId: String?, shouldRefreshClient: Boolean?, promise: Promise ->
-            syncFromJsClientToken(
-                clientToken,
+        AsyncFunction("syncClientStateFromJs") {
+                deviceToken: String?,
+                sourceId: String?,
+                didChangeClient: Boolean,
+                didChangeDeviceToken: Boolean,
+                promise: Promise ->
+            syncClientStateFromJs(
+                deviceToken,
                 sourceId,
-                shouldRefreshClient ?: clientToken.isNullOrBlank(),
+                didChangeClient,
+                didChangeDeviceToken,
                 promise
             )
         }
@@ -91,32 +113,59 @@ class ClerkExpoModule : Module() {
             return
         }
 
-        lastObservedClient = Clerk.clientFlow.value
+        lastObservedClientState = clientStateSnapshot()
 
         clientStateObserverJob = coroutineScope.launch {
             Clerk.clientFlow.collect { client ->
-                if (client == lastObservedClient) {
+                val previousClientState = lastObservedClientState
+                val newClientState = clientStateSnapshot(client)
+
+                if (newClientState == previousClientState) {
                     return@collect
                 }
 
-                lastObservedClient = client
+                lastObservedClientState = newClientState
                 if (jsOriginatedClientSyncDepth > 0) {
                     return@collect
                 }
 
-                emitClientChanged()
+                sendEvent(
+                    NATIVE_CLIENT_CHANGED_EVENT,
+                    clientChangedPayload(
+                        deviceToken = newClientState.deviceToken,
+                        changes = ClientStateChanges(
+                            client = newClientState.client != previousClientState?.client,
+                            deviceToken = newClientState.deviceToken != previousClientState?.deviceToken
+                        )
+                    )
+                )
             }
         }
     }
 
-    private fun clientChangedPayload(sourceId: String? = null): Map<String, Any?> {
-        val result = mutableMapOf<String, Any?>(
-            "clientToken" to try {
+    private fun clientStateSnapshot(client: Client? = Clerk.clientFlow.value): ClientStateSnapshot {
+        return ClientStateSnapshot(
+            client = client,
+            deviceToken = try {
                 Clerk.getDeviceToken()
             } catch (e: Exception) {
-                debugLog(TAG, "clientChangedPayload - getDeviceToken failed: ${e.message}")
+                debugLog(TAG, "clientStateSnapshot - getDeviceToken failed: ${e.message}")
                 null
             }
+        )
+    }
+
+    private fun clientChangedPayload(
+        sourceId: String? = null,
+        changes: ClientStateChanges,
+        deviceToken: String? = clientStateSnapshot().deviceToken
+    ): Map<String, Any?> {
+        val result = mutableMapOf<String, Any?>(
+            "changed" to mapOf(
+                "client" to changes.client,
+                "deviceToken" to changes.deviceToken
+            ),
+            "deviceToken" to deviceToken
         )
         if (!sourceId.isNullOrEmpty()) {
             result["sourceId"] = sourceId
@@ -124,9 +173,20 @@ class ClerkExpoModule : Module() {
         return result
     }
 
-    private fun emitSyncedClientChanged(sourceId: String?) {
-        lastObservedClient = Clerk.clientFlow.value
-        emitClientChanged(sourceId)
+    private fun emitSyncedClientChanged(
+        sourceId: String?,
+        changes: ClientStateChanges,
+        snapshot: ClientStateSnapshot = clientStateSnapshot()
+    ) {
+        lastObservedClientState = snapshot
+        sendEvent(
+            NATIVE_CLIENT_CHANGED_EVENT,
+            clientChangedPayload(
+                sourceId = sourceId,
+                changes = changes,
+                deviceToken = snapshot.deviceToken
+            )
+        )
     }
 
     // MARK: - configure
@@ -288,12 +348,13 @@ class ClerkExpoModule : Module() {
         }
     }
 
-    // MARK: - syncFromJsClientToken
+    // MARK: - syncClientStateFromJs
 
-    private fun syncFromJsClientToken(
-        clientToken: String?,
+    private fun syncClientStateFromJs(
+        deviceToken: String?,
         sourceId: String?,
-        shouldRefreshClient: Boolean,
+        didChangeClient: Boolean,
+        didChangeDeviceToken: Boolean,
         promise: Promise
     ) {
         if (!Clerk.isInitialized.value) {
@@ -304,25 +365,21 @@ class ClerkExpoModule : Module() {
         coroutineScope.launch {
             try {
                 jsOriginatedClientSyncDepth += 1
-                if (!clientToken.isNullOrBlank()) {
+                val previousClientState = clientStateSnapshot()
+
+                if (didChangeDeviceToken && !deviceToken.isNullOrBlank()) {
                     val currentDeviceToken = try {
                         Clerk.getDeviceToken()
                     } catch (_: Exception) {
                         null
                     }
 
-                    if (currentDeviceToken == clientToken) {
-                        if (!shouldRefreshClient) {
-                            emitSyncedClientChanged(sourceId)
-                            promise.resolve(null)
-                            return@launch
-                        }
-                    } else {
-                        when (val result = Clerk.updateDeviceToken(clientToken)) {
+                    if (currentDeviceToken != deviceToken) {
+                        when (val result = Clerk.updateDeviceToken(deviceToken)) {
                             is ClerkResult.Failure -> {
                                 promise.reject(
                                     "E_SYNC_FROM_JS_FAILED",
-                                    result.error?.firstMessage() ?: result.throwable?.message ?: "Client token sync failed",
+                                    result.error?.firstMessage() ?: result.throwable?.message ?: "Device token sync failed",
                                     null
                                 )
                                 return@launch
@@ -333,19 +390,14 @@ class ClerkExpoModule : Module() {
                                         Clerk.clientFlow.first { it != null }
                                     }
                                 } catch (_: TimeoutCancellationException) {
-                                    debugLog(TAG, "syncFromJsClientToken - client did not appear after token update")
-                                }
-                                if (!shouldRefreshClient) {
-                                    emitSyncedClientChanged(sourceId)
-                                    promise.resolve(null)
-                                    return@launch
+                                    debugLog(TAG, "syncClientStateFromJs - client did not appear after token update")
                                 }
                             }
                         }
                     }
                 }
 
-                if (shouldRefreshClient) {
+                if (didChangeClient || didChangeDeviceToken) {
                     when (val result = Clerk.refreshClient()) {
                         is ClerkResult.Failure -> {
                             promise.reject(
@@ -355,17 +407,33 @@ class ClerkExpoModule : Module() {
                             )
                         }
                         is ClerkResult.Success -> {
-                            emitSyncedClientChanged(sourceId)
+                            val newClientState = clientStateSnapshot()
+                            emitSyncedClientChanged(
+                                sourceId,
+                                ClientStateChanges(
+                                    client = newClientState.client != previousClientState.client,
+                                    deviceToken = newClientState.deviceToken != previousClientState.deviceToken
+                                ),
+                                newClientState
+                            )
                             promise.resolve(null)
                         }
                     }
                     return@launch
                 }
 
-                emitSyncedClientChanged(sourceId)
+                val newClientState = clientStateSnapshot()
+                emitSyncedClientChanged(
+                    sourceId,
+                    ClientStateChanges(
+                        client = newClientState.client != previousClientState.client,
+                        deviceToken = newClientState.deviceToken != previousClientState.deviceToken
+                    ),
+                    newClientState
+                )
                 promise.resolve(null)
             } catch (e: Exception) {
-                promise.reject("E_SYNC_FROM_JS_FAILED", e.message ?: "Client token sync failed", e)
+                promise.reject("E_SYNC_FROM_JS_FAILED", e.message ?: "Client state sync failed", e)
             } finally {
                 jsOriginatedClientSyncDepth = maxOf(0, jsOriginatedClientSyncDepth - 1)
             }
@@ -416,7 +484,9 @@ class ClerkExpoModule : Module() {
             border = json.optStringColor("border"),
             ring = json.optStringColor("ring"),
             muted = json.optStringColor("muted"),
-            shadow = json.optStringColor("shadow")
+            shadow = json.optStringColor("shadow"),
+            secondaryButtonBackground = json.optStringColor("secondaryButtonBackground"),
+            secondaryButtonForeground = json.optStringColor("secondaryButtonForeground")
         )
     }
 

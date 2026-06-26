@@ -434,40 +434,50 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
 
         const channel = broadcastChannel;
         if (channel && options.broadcast) {
-          const tokenRaw = newToken.getRawString();
-          if (tokenRaw && claims.sid) {
-            const sessionId = claims.sid;
-            const organizationId = claims.org_id || (claims.o as any)?.id;
-            const template = TokenId.extractTemplate(entry.tokenId, sessionId, organizationId);
+          // Best-effort side effect: a broadcast failure (e.g. postMessage racing a
+          // channel close) must not reach the outer catch and evict the cached token (SDK-119).
+          try {
+            const tokenRaw = newToken.getRawString();
+            if (tokenRaw && claims.sid) {
+              const sessionId = claims.sid;
+              const organizationId = claims.org_id || (claims.o as any)?.id;
+              const template = TokenId.extractTemplate(entry.tokenId, sessionId, organizationId);
 
-            const expectedTokenId = TokenId.build(sessionId, template, organizationId);
-            if (entry.tokenId === expectedTokenId) {
-              const traceId = `bc_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+              const expectedTokenId = TokenId.build(sessionId, template, organizationId);
+              if (entry.tokenId === expectedTokenId) {
+                const traceId = `bc_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
 
-              debugLogger.info(
-                'Broadcasting token update to other tabs',
-                {
+                debugLogger.info(
+                  'Broadcasting token update to other tabs',
+                  {
+                    organizationId,
+                    sessionId,
+                    tabId,
+                    template,
+                    tokenId: entry.tokenId,
+                    traceId,
+                  },
+                  'tokenCache',
+                );
+
+                const message: SessionTokenEvent = {
                   organizationId,
                   sessionId,
-                  tabId,
                   template,
                   tokenId: entry.tokenId,
+                  tokenRaw,
                   traceId,
-                },
-                'tokenCache',
-              );
+                };
 
-              const message: SessionTokenEvent = {
-                organizationId,
-                sessionId,
-                template,
-                tokenId: entry.tokenId,
-                tokenRaw,
-                traceId,
-              };
-
-              channel.postMessage(message);
+                channel.postMessage(message);
+              }
             }
+          } catch (error) {
+            debugLogger.warn(
+              'Failed to broadcast token update to other tabs',
+              { error, tabId, tokenId: entry.tokenId },
+              'tokenCache',
+            );
           }
         }
       })

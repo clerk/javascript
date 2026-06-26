@@ -586,6 +586,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'configureSSOVerifyDomainCardRemoveButton',
   'configureSSOVerifyDomainCardTxtRecord',
   'configureSSOVerifyDomainCardTxtRecordValue',
+  'configureSSOVerifyDomainCardExpired',
   'configureSSOEmailVerificationForm',
   'configureSSOEmailVerificationIcon',
   'configureSSOEmailVerificationTitle',
@@ -628,6 +629,10 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'configureSSOResetConnectionDialogCancelButton',
   'configureSSOResetConnectionDialogConfirmationInput',
   'configureSSOResetConnectionDialogSubmitButton',
+
+  'configureSSOChangeProviderDialog',
+  'configureSSOChangeProviderDialogCancelButton',
+  'configureSSOChangeProviderDialogConfirmButton',
 
   'configureSSORemoveDomainDialog',
   'configureSSORemoveDomainDialogCancelButton',
