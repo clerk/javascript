@@ -100,17 +100,13 @@ export async function executeProtectCheck(
   let mod: Record<string, unknown>;
   try {
     mod = await import(/* webpackIgnore: true */ validated.toString());
-  } catch (err) {
-    // The browser surfaces CSP-blocked imports as the same error shape as a network error
-    // (typically a TypeError "Failed to fetch dynamically imported module"), so we can't
-    // reliably distinguish them. Surface a generic message to the UI — the URL is NOT
-    // included to avoid a phishing surface where a tampered response could place an
-    // attacker-chosen URL in the auth UI. Diagnostic detail goes to the original error.
-    const original = err instanceof Error ? err.message : String(err);
+  } catch {
+    // Surface a generic message and deliberately omit the original error: Chromium/Firefox embed
+    // the sdk_url in the dynamic-import failure text, which a tampered response could plant in the UI.
     throw new ClerkRuntimeError(
       'Protect check script failed to load. This is commonly caused by a Content Security ' +
         'Policy that blocks the script origin (add it to your script-src directive), a ' +
-        `network error, or an invalid module. (Original error: ${original})`,
+        'network error, or an invalid module.',
       { code: 'protect_check_script_load_failed' },
     );
   }

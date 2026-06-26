@@ -153,7 +153,10 @@ describe('executeProtectCheck', () => {
       });
     });
 
-    it('does not leak the sdkUrl in the user-facing load-failure message', async () => {
+    it('does not append the underlying import error (which can embed the sdkUrl) to the message', async () => {
+      // Node's import error omits the URL, so the not-toContain checks below are vacuous on their own.
+      // The `Original error` guard is the real one: a browser embeds the sdk_url in the import failure,
+      // which must never reach the user-facing message.
       try {
         await executeProtectCheck(
           protectCheck({ sdkUrl: 'https://attacker-controlled.example/evil.js' }),
@@ -161,6 +164,9 @@ describe('executeProtectCheck', () => {
         );
         throw new Error('should have rejected');
       } catch (err: any) {
+        expect(err.code).toBe('protect_check_script_load_failed');
+        expect(err.message).toContain('invalid module.');
+        expect(err.message).not.toMatch(/original error/i);
         expect(err.message).not.toContain('attacker-controlled.example');
         expect(err.message).not.toContain('evil.js');
       }
