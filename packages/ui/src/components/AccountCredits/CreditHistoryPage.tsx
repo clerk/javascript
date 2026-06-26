@@ -1,32 +1,31 @@
 import { Header } from '@/ui/elements/Header';
 import { ProfileCard } from '@/ui/elements/ProfileCard';
 
-import { useCreditBalance, useCreditHistory, useSubscriberTypeLocalizationRoot } from '../../contexts';
-import { Box, descriptors, localizationKeys, Spinner, Text } from '../../customizables';
+import { useCreditHistory, useSubscriberTypeLocalizationRoot } from '../../contexts';
+import {
+  Box,
+  descriptors,
+  localizationKeys,
+  Spinner,
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
+  useLocalizations,
+} from '../../customizables';
 import { useRouter } from '../../router';
-
-function formatCreditDate(date: Date): string {
-  return new Intl.DateTimeFormat('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  }).format(date);
-}
-
-function formatCreditAmount(amount: number, currencySymbol: string): string {
-  const absAmount = Math.abs(amount);
-  const dollars = (absAmount / 100).toFixed(2);
-  const prefix = amount >= 0 ? '+' : '-';
-  return `${prefix}${currencySymbol}${dollars}`;
-}
 
 export const CreditHistoryPage = (): JSX.Element => {
   const { navigate } = useRouter();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
-  const { data: creditBalance } = useCreditBalance();
+  const { $, locale } = useLocalizations();
   const { data: creditHistory, isLoading } = useCreditHistory();
 
-  const currencySymbol = creditBalance?.balance?.currencySymbol ?? '$';
+  const formatCreditDate = (date: Date): string =>
+    new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric', year: 'numeric' }).format(date);
 
   if (isLoading) {
     return (
@@ -70,13 +69,9 @@ export const CreditHistoryPage = (): JSX.Element => {
           overflow: 'clip',
         })}
       >
-        <Box
-          as='table'
-          sx={{ width: '100%', borderCollapse: 'collapse' }}
-        >
-          <Box as='thead'>
-            <Box
-              as='tr'
+        <Table sx={{ width: '100%', borderCollapse: 'collapse' }}>
+          <Thead>
+            <Tr
               sx={t => ({
                 background: t.colors.$neutralAlpha25,
                 borderBlockEndWidth: t.borderWidths.$normal,
@@ -84,37 +79,24 @@ export const CreditHistoryPage = (): JSX.Element => {
                 borderBlockEndColor: t.colors.$borderAlpha100,
               })}
             >
-              <Box
-                as='th'
+              <Th
                 sx={t => ({ padding: t.space.$3, textAlign: 'left' })}
-              >
-                <Text
-                  variant='caption'
-                  colorScheme='secondary'
-                  localizationKey={localizationKeys(
-                    `${localizationRoot}.billingPage.creditHistoryPage.tableHeader__amount`,
-                  )}
-                />
-              </Box>
-              <Box
-                as='th'
+                localizationKey={localizationKeys(
+                  `${localizationRoot}.billingPage.creditHistoryPage.tableHeader__amount`,
+                )}
+              />
+              <Th
                 sx={t => ({ padding: t.space.$3, textAlign: 'left' })}
-              >
-                <Text
-                  variant='caption'
-                  colorScheme='secondary'
-                  localizationKey={localizationKeys(
-                    `${localizationRoot}.billingPage.creditHistoryPage.tableHeader__date`,
-                  )}
-                />
-              </Box>
-            </Box>
-          </Box>
-          <Box as='tbody'>
+                localizationKey={localizationKeys(
+                  `${localizationRoot}.billingPage.creditHistoryPage.tableHeader__date`,
+                )}
+              />
+            </Tr>
+          </Thead>
+          <Tbody>
             {creditHistory?.data?.map(entry => (
-              <Box
+              <Tr
                 key={entry.id}
-                as='tr'
                 sx={t => ({
                   borderBlockEndWidth: t.borderWidths.$normal,
                   borderBlockEndStyle: t.borderStyles.$solid,
@@ -122,27 +104,26 @@ export const CreditHistoryPage = (): JSX.Element => {
                   '&:last-child': { borderBlockEnd: 'none' },
                 })}
               >
-                <Box
-                  as='td'
-                  sx={t => ({ padding: t.space.$3 })}
-                >
+                <Td sx={t => ({ padding: t.space.$3 })}>
                   <Text
                     variant='subtitle'
                     sx={{ color: entry.amount >= 0 ? undefined : 'inherit' }}
                   >
-                    {formatCreditAmount(entry.amount, currencySymbol)}
+                    {`${entry.amount >= 0 ? '+' : '-'}${$({
+                      amount: Math.abs(entry.amount),
+                      amountFormatted: '',
+                      currency: entry.currency,
+                      currencySymbol: '',
+                    })}`}
                   </Text>
-                </Box>
-                <Box
-                  as='td'
-                  sx={t => ({ padding: t.space.$3 })}
-                >
+                </Td>
+                <Td sx={t => ({ padding: t.space.$3 })}>
                   <Text variant='body'>{formatCreditDate(entry.createdAt)}</Text>
-                </Box>
-              </Box>
+                </Td>
+              </Tr>
             ))}
-          </Box>
-        </Box>
+          </Tbody>
+        </Table>
       </Box>
     </ProfileCard.Page>
   );
