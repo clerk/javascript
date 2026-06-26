@@ -1,4 +1,5 @@
 import { ClerkProvider, useAuth, useUser } from '@clerk/expo';
+import { useSignInWithGoogle } from '@clerk/expo/google';
 import { AuthView, UserButton } from '@clerk/expo/native';
 import { tokenCache } from '@clerk/expo/token-cache';
 import { useState } from 'react';
@@ -12,6 +13,7 @@ if (!publishableKey) {
 
 function NativeBuildFixture() {
   const { isLoaded, isSignedIn } = useAuth({ treatPendingAsSignedOut: false });
+  const { startGoogleAuthenticationFlow } = useSignInWithGoogle();
   const { user } = useUser();
   const [isAuthOpen, setIsAuthOpen] = useState(false);
 
@@ -23,6 +25,7 @@ function NativeBuildFixture() {
       </View>
 
       <Text testID='auth-state'>{isLoaded ? `signed ${isSignedIn ? 'in' : 'out'}` : 'loading'}</Text>
+      <Text testID='google-signin-hook'>{typeof startGoogleAuthenticationFlow}</Text>
       {user?.id && <Text testID='user-id'>{user.id}</Text>}
       <Button
         title='Open native AuthView'
