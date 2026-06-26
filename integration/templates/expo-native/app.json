@@ -12,6 +12,6 @@
     "android": {
       "package": "com.clerk.exponativebuildfixture"
     },
-    "plugins": ["expo-secure-store", "@clerk/expo", "expo-web-browser"]
+    "plugins": ["expo-secure-store", "@clerk/expo", "@clerk/expo-google-signin", "expo-web-browser"]
   }
 }

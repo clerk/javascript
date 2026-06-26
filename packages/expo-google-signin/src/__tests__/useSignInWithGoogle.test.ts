@@ -29,7 +29,7 @@ vi.mock('@clerk/shared/error', async importOriginal => {
   };
 });
 
-vi.mock('../../google-one-tap', async importOriginal => {
+vi.mock('../google-one-tap', async importOriginal => {
   const actual = await importOriginal();
   return {
     ...actual,
@@ -46,17 +46,7 @@ vi.mock('react-native', () => {
   };
 });
 
-vi.mock('../../specs/NativeClerkModule', () => {
-  return {
-    default: {
-      configure: vi.fn(),
-      getClientToken: vi.fn(),
-      syncClientStateFromJs: vi.fn(),
-    },
-  };
-});
-
-vi.mock('../../specs/NativeClerkGoogleSignIn', () => {
+vi.mock('../specs/NativeClerkGoogleSignIn', () => {
   return {
     default: {
       configure: vi.fn(),
@@ -127,25 +117,6 @@ describe('useSignInWithGoogle', () => {
   });
 
   describe('startGoogleAuthenticationFlow', () => {
-    test('should warn once in development about the upcoming package split', () => {
-      const originalDev = globalThis.__DEV__;
-      globalThis.__DEV__ = true;
-      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
-
-      try {
-        renderHook(() => useSignInWithGoogle());
-        renderHook(() => useSignInWithGoogle());
-
-        expect(consoleWarnSpy).toHaveBeenCalledTimes(1);
-        expect(consoleWarnSpy).toHaveBeenCalledWith(
-          'Clerk: In the next major version, native Google Sign-In will require installing @clerk/expo-google-signin. The @clerk/expo/google import path will continue to work.',
-        );
-      } finally {
-        consoleWarnSpy.mockRestore();
-        globalThis.__DEV__ = originalDev;
-      }
-    });
-
     test('should return the hook with startGoogleAuthenticationFlow function', () => {
       const { result } = renderHook(() => useSignInWithGoogle());
 

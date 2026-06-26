@@ -17,12 +17,9 @@ export type {
  * - Built-in nonce support for replay attack protection
  * - No additional dependencies required
  *
- * In the next major version, apps using native Google Sign-In will need to install
- * `@clerk/expo-google-signin` alongside `@clerk/expo`.
- *
  * @example
  * ```tsx
- * import { useSignInWithGoogle } from '@clerk/expo';
+ * import { useSignInWithGoogle } from '@clerk/expo-google-signin';
  * import { Button } from 'react-native';
  *
  * function GoogleSignInButton() {

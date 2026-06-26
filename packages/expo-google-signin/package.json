@@ -1,0 +1,73 @@
+{
+  "name": "@clerk/expo-google-signin",
+  "version": "0.0.0",
+  "description": "Native Google Sign-In library to be used with Clerk for Expo",
+  "keywords": [
+    "react-native",
+    "expo",
+    "google-signin",
+    "clerk"
+  ],
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/expo-google-signin"
+  },
+  "license": "MIT",
+  "author": "Clerk",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "android",
+    "ios",
+    "expo-module.config.json",
+    "app.plugin.js",
+    "app.plugin.d.ts"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
+    "clean": "rimraf ./dist",
+    "dev": "tsup --watch",
+    "dev:pub": "pnpm dev -- --env.publish",
+    "format": "node ../../scripts/format-package.mjs",
+    "format:check": "node ../../scripts/format-package.mjs --check",
+    "lint": "eslint src",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@clerk/react": "workspace:^",
+    "@clerk/shared": "workspace:^",
+    "tslib": "catalog:repo"
+  },
+  "devDependencies": {
+    "@expo/config-plugins": "^54.0.4",
+    "@types/react": "catalog:react",
+    "expo": "~54.0.34",
+    "expo-constants": "^18.0.13",
+    "expo-crypto": "^15.0.9",
+    "react": "catalog:react",
+    "react-native": "^0.85.2",
+    "tsup": "catalog:repo"
+  },
+  "peerDependencies": {
+    "expo": ">=53 <57",
+    "expo-constants": ">=12",
+    "expo-crypto": ">=12",
+    "react": "^18.0.0 || ^19.0.0",
+    "react-native": ">=0.75"
+  },
+  "peerDependenciesMeta": {
+    "expo-constants": {
+      "optional": true
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

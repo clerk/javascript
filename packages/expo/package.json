@@ -121,6 +121,7 @@
     "tslib": "catalog:repo"
   },
   "devDependencies": {
+    "@clerk/expo-google-signin": "workspace:*",
     "@clerk/expo-passkeys": "workspace:*",
     "@expo/config-plugins": "^54.0.4",
     "@types/base-64": "^1.0.2",
@@ -135,6 +136,7 @@
     "react-native": "^0.85.2"
   },
   "peerDependencies": {
+    "@clerk/expo-google-signin": ">=0.0.0",
     "@clerk/expo-passkeys": ">=0.0.6",
     "expo": ">=53 <57",
     "expo-apple-authentication": ">=7.0.0",
@@ -149,6 +151,9 @@
     "react-native": ">=0.75"
   },
   "peerDependenciesMeta": {
+    "@clerk/expo-google-signin": {
+      "optional": true
+    },
     "@clerk/expo-passkeys": {
       "optional": true
     },

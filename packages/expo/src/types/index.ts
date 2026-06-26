@@ -9,24 +9,3 @@ export type { IStorage, BuildClerkOptions } from '../provider/singleton/types';
 // OAuth/SSO hook types
 export type { UseOAuthFlowParams, StartOAuthFlowParams, StartOAuthFlowReturnType } from '../hooks/useOAuth';
 export type { StartSSOFlowParams, StartSSOFlowReturnType } from '../hooks/useSSO';
-
-// Google Sign-In types
-export type {
-  StartGoogleAuthenticationFlowParams,
-  StartGoogleAuthenticationFlowReturnType,
-} from '../hooks/useSignInWithGoogle.types';
-
-// Google One Tap types
-export type {
-  ConfigureParams,
-  SignInParams,
-  CreateAccountParams,
-  ExplicitSignInParams,
-  GoogleUser,
-  OneTapSuccessResponse,
-  CancelledResponse,
-  NoSavedCredentialFound,
-  OneTapResponse,
-  GoogleSignInErrorCode,
-  GoogleSignInError,
-} from '../google-one-tap/types';

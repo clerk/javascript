@@ -1,4 +1,4 @@
-import { type ConfigPlugin, createRunOncePlugin, withAppBuildGradle, withInfoPlist } from '@expo/config-plugins';
+import { type ConfigPlugin, createRunOncePlugin, withAppBuildGradle } from '@expo/config-plugins';
 
 import pkg from '../../package.json';
 
@@ -39,53 +39,14 @@ const withClerkAndroidPackaging: ConfigPlugin = config => {
 };
 
 /**
- * Configures iOS URL scheme for Google Sign-In.
- */
-const withClerkGoogleSignIn: ConfigPlugin = config => {
-  // Get the iOS URL scheme from environment or config.extra
-  // We capture it here before entering the mod callback
-  const iosUrlScheme =
-    process.env.EXPO_PUBLIC_CLERK_GOOGLE_IOS_URL_SCHEME ||
-    (config as { extra?: Record<string, string> }).extra?.EXPO_PUBLIC_CLERK_GOOGLE_IOS_URL_SCHEME;
-
-  if (!iosUrlScheme) {
-    // No URL scheme configured, skip iOS configuration
-    return config;
-  }
-
-  // Add iOS URL scheme for Google Sign-In
-  return withInfoPlist(config, modConfig => {
-    if (!Array.isArray(modConfig.modResults.CFBundleURLTypes)) {
-      modConfig.modResults.CFBundleURLTypes = [];
-    }
-
-    // Check if the scheme is already added to avoid duplicates
-    const schemeExists = modConfig.modResults.CFBundleURLTypes.some(urlType =>
-      urlType.CFBundleURLSchemes?.includes(iosUrlScheme),
-    );
-
-    if (!schemeExists) {
-      // Add Google Sign-In URL scheme
-      modConfig.modResults.CFBundleURLTypes.push({
-        CFBundleURLSchemes: [iosUrlScheme],
-      });
-    }
-
-    return modConfig;
-  });
-};
-
-/**
  * Combined plugin that applies all Clerk configurations.
  *
  * When this plugin is used, it:
- * 1. Configures iOS URL scheme for Google Sign-In (if env var is set)
- * 2. Adds Android packaging exclusions to resolve dependency conflicts
+ * 1. Adds Android packaging exclusions to resolve dependency conflicts
  *
  * Native modules and views are registered via Expo Modules autolinking.
  */
 const withClerkExpo: ConfigPlugin = config => {
-  config = withClerkGoogleSignIn(config);
   config = withClerkAndroidPackaging(config);
   return config;
 };

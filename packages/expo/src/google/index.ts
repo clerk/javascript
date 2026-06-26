@@ -1,5 +1,5 @@
-export { useSignInWithGoogle } from '../hooks/useSignInWithGoogle';
+export { useSignInWithGoogle } from '@clerk/expo-google-signin';
 export type {
   StartGoogleAuthenticationFlowParams,
   StartGoogleAuthenticationFlowReturnType,
-} from '../hooks/useSignInWithGoogle.types';
+} from '@clerk/expo-google-signin';
