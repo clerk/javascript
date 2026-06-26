@@ -673,7 +673,7 @@ export const zhCN: LocalizationResource = {
         messageLabel: '您的邮箱使用了 {{domain}}。是否要添加它？',
       },
       formButtonPrimary__add: '添加',
-      formFieldInputPlaceholder__domain: '在此输入您的域名，然后点击添加即可开始',
+      formFieldInputPlaceholder__domain: '添加域名',
       formFieldLabel__domain: '域名',
       removeDomainDialog: {
         cancelButton: undefined,
@@ -1639,6 +1639,7 @@ export const zhCN: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       "您使用的电子邮件地址或电话号码不允许注册。这可能是因为您在电子邮件地址中使用了 '+', '=', '#' 或 '.'，使用了与临时电子邮件服务关联的域名，或者有明确的排除。如果您认为这是错误，请联系支持。",
+    oauth_access_denied: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -1712,6 +1713,9 @@ export const zhCN: LocalizationResource = {
     action__openUserMenu: '打开用户菜单',
     action__signOut: '退出登录',
     action__signOutAll: '退出所有账户',
+    label__userButtonPopover: '账户面板',
+    label__accountActions: '账户操作',
+    label__activeSessions: '活跃会话',
   },
   userProfile: {
     apiKeysPage: {

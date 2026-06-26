@@ -210,9 +210,9 @@ export const jaJP: LocalizationResource = {
     subtotalRenewal: undefined,
     switchPlan: 'このプランに切り替える',
     switchToAnnual: '年払いに切り替える',
-    switchToAnnualWithAnnualPrice: '年払い {{currency}}{{price}} / 年 に切り替える',
+    switchToAnnualWithAnnualPrice: '年払い {{price}} / 年 に切り替える',
     switchToMonthly: '月払いに切り替える',
-    switchToMonthlyWithPrice: '月払い {{currency}}{{price}} / 月 に切り替える',
+    switchToMonthlyWithPrice: '月払い {{price}} / 月 に切り替える',
     totalDue: '支払い合計',
     totalDuePerPeriod: undefined,
     totalDueToday: '本日のお支払合計',
@@ -681,7 +681,7 @@ export const jaJP: LocalizationResource = {
         messageLabel: 'あなたのメールは {{domain}} を使用しています。追加しますか？',
       },
       formButtonPrimary__add: '追加',
-      formFieldInputPlaceholder__domain: 'ここにドメインを入力し、「追加」をクリックして開始します',
+      formFieldInputPlaceholder__domain: 'ドメインを追加',
       formFieldLabel__domain: 'ドメイン',
       removeDomainDialog: {
         cancelButton: undefined,
@@ -1680,6 +1680,7 @@ export const jaJP: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       "メールアドレスまたは電話番号は登録に使用できません。これは、'+', '=', '#' または '.' がメールアドレスに使用されているか、一時的な電子メールサービスに接続されたドメインが使用されているか、明示的な除外が行われているためです。エラーが発生した場合は、サポートに連絡してください。",
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'このメールプロバイダーのドメインはブロックされています。別のものを使用してください。',
     organization_domain_common: 'これは一般的なメールプロバイダーのドメインです。別のものを使用してください。',
     organization_domain_exists_for_enterprise_connection: 'このドメインは組織の SSO で既に使用されています。',
@@ -1755,6 +1756,9 @@ export const jaJP: LocalizationResource = {
     action__openUserMenu: 'ユーザーメニューを開く',
     action__signOut: 'サインアウト',
     action__signOutAll: '全てのアカウントからサインアウト',
+    label__userButtonPopover: 'アカウントパネル',
+    label__accountActions: 'アカウント操作',
+    label__activeSessions: 'アクティブセッション',
   },
   userProfile: {
     apiKeysPage: {

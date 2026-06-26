@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { DeviceEventEmitter, Platform } from 'react-native';
 
 import { ClerkExpoModule as ClerkExpo, isNativeSupported } from '../utils/native-module';
 
@@ -37,10 +36,6 @@ type RefreshClientEventEmitter = {
 };
 
 function getNativeClientEventEmitter(): RefreshClientEventEmitter | null {
-  if (Platform.OS === 'ios') {
-    return DeviceEventEmitter;
-  }
-
   if (ClerkExpo && typeof ClerkExpo.addListener === 'function') {
     return ClerkExpo as RefreshClientEventEmitter;
   }

@@ -1,7 +1,8 @@
-import { useUser } from '@clerk/shared/react';
+import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
+import { eventFlowStepMounted } from '@clerk/shared/telemetry';
 import type { OrganizationDomainResource } from '@clerk/shared/types';
 import type React from 'react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import {
   Badge,
@@ -24,7 +25,7 @@ import { useCardState } from '@/elements/contexts';
 import { Field } from '@/elements/FieldControl';
 import { Form } from '@/elements/Form';
 import { Tooltip } from '@/elements/Tooltip';
-import { Checkmark, Clipboard, Close } from '@/icons';
+import { Checkmark, Clipboard, Close, RotateLeftRight } from '@/icons';
 import { common } from '@/styledSystem';
 import { useFormControl } from '@/ui/utils/useFormControl';
 import { getFieldError, getGlobalError } from '@/utils/errorHandler';
@@ -40,19 +41,51 @@ export const OrganizationDomainsStep = (): JSX.Element => {
   const {
     enterpriseConnection,
     organizationDomains,
+    organizationEnterpriseConnection,
     contentRef,
-    organizationDomainMutations: { createDomain, revalidate },
+    organizationDomainMutations: { createDomain, revalidate, prepareOwnershipVerification },
     enterpriseConnectionMutations: { updateConnection },
   } = useConfigureSSO();
   const { goPrev, goNext, isFirstStep, isLastStep } = useWizard();
   const card = useCardState();
+  const clerk = useClerk();
+  const { organization } = useOrganization();
   const [domainToRemove, setDomainToRemove] = useState<OrganizationDomainResource | null>(null);
+
+  const hasRecordedTelemetryEvent = useRef(false);
+  useEffect(() => {
+    if (hasRecordedTelemetryEvent.current) {
+      return;
+    }
+
+    hasRecordedTelemetryEvent.current = true;
+    clerk.telemetry?.record(
+      eventFlowStepMounted('configureSSO', 'verify-domain', {
+        timestamp: new Date().toISOString(),
+        connectionStatus: organizationEnterpriseConnection.status,
+        connectionId: enterpriseConnection?.id ?? null,
+        organizationId: organization?.id ?? null,
+      }),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleCreateDomain = async (domain: string) => {
     card.setError(undefined);
 
     try {
       await createDomain(domain);
+    } catch (err: any) {
+      const apiError = getFieldError(err) ?? getGlobalError(err);
+      card.setError(apiError);
+    }
+  };
+
+  const handlePrepareOwnershipVerification = async (domain: OrganizationDomainResource) => {
+    card.setError(undefined);
+
+    try {
+      await prepareOwnershipVerification([domain]);
     } catch (err: any) {
       const apiError = getFieldError(err) ?? getGlobalError(err);
       card.setError(apiError);
@@ -136,6 +169,7 @@ export const OrganizationDomainsStep = (): JSX.Element => {
                       key={domain.id}
                       domain={domain}
                       onRemove={() => setDomainToRemove(domain)}
+                      onPrepareOwnershipVerification={() => handlePrepareOwnershipVerification(domain)}
                       isRemoveDisabled={isRemoveDisabled}
                       removeDisabledTooltip={lastVerifiedDomainTooltip}
                     />
@@ -331,11 +365,13 @@ const DomainSuggestion = ({ onSubmit }: { onSubmit: (domain: string) => Promise<
 const DomainCard = ({
   domain,
   onRemove,
+  onPrepareOwnershipVerification,
   isRemoveDisabled = false,
   removeDisabledTooltip,
 }: {
   domain: OrganizationDomainResource;
   onRemove: () => void;
+  onPrepareOwnershipVerification: () => Promise<void>;
   isRemoveDisabled?: boolean;
   removeDisabledTooltip?: ReturnType<typeof localizationKeys>;
 }): JSX.Element | null => {
@@ -345,7 +381,8 @@ const DomainCard = ({
 
   const ownershipVerification = domain.ownershipVerification;
   const isVerified = ownershipVerification?.status === 'verified';
-  const cardId = isVerified ? 'verified' : 'unverified';
+  const isExpired = ownershipVerification?.status === 'expired';
+  const cardId = ownershipVerification?.status ?? 'unverified';
 
   const removeButton = (
     <Button
@@ -404,11 +441,13 @@ const DomainCard = ({
             localizationKey={
               isVerified
                 ? localizationKeys('configureSSO.organizationDomainsStep.domainCard.badge__verified')
-                : localizationKeys('configureSSO.organizationDomainsStep.domainCard.badge__unverified')
+                : isExpired
+                  ? localizationKeys('configureSSO.organizationDomainsStep.domainCard.badge__expired')
+                  : localizationKeys('configureSSO.organizationDomainsStep.domainCard.badge__unverified')
             }
           />
 
-          {!isVerified && (
+          {!isVerified && !isExpired && (
             <Spinner
               size='xs'
               colorScheme='neutral'
@@ -429,7 +468,13 @@ const DomainCard = ({
 
       <Box sx={{ overflow: 'hidden' }}>
         <Animated>
-          {ownershipVerification?.verifiedAt ? (
+          {isExpired ? (
+            <ExpiredNotice
+              key='expired'
+              expiresAt={ownershipVerification?.expiresAt ?? null}
+              onPrepareOwnershipVerification={onPrepareOwnershipVerification}
+            />
+          ) : ownershipVerification?.verifiedAt ? (
             <Text
               key='verified'
               as='p'
@@ -447,6 +492,57 @@ const DomainCard = ({
           )}
         </Animated>
       </Box>
+    </Col>
+  );
+};
+
+const ExpiredNotice = ({
+  expiresAt,
+  onPrepareOwnershipVerification,
+}: {
+  expiresAt: Date | null;
+  onPrepareOwnershipVerification: () => Promise<void>;
+}): JSX.Element => {
+  const [isVerifying, setIsVerifying] = useState(false);
+
+  const handleVerifyAgain = () => {
+    setIsVerifying(true);
+    void onPrepareOwnershipVerification().finally(() => setIsVerifying(false));
+  };
+
+  return (
+    <Col
+      elementDescriptor={descriptors.configureSSOVerifyDomainCardExpired}
+      sx={t => ({ gap: t.space.$3, paddingInline: t.space.$4, paddingBottom: t.space.$4 })}
+    >
+      <Text
+        as='p'
+        colorScheme='secondary'
+        localizationKey={
+          expiresAt
+            ? localizationKeys('configureSSO.organizationDomainsStep.domainCard.expiredAtLabel', { date: expiresAt })
+            : localizationKeys('configureSSO.organizationDomainsStep.domainCard.expiredLabel')
+        }
+      />
+
+      <Button
+        variant='bordered'
+        colorScheme='secondary'
+        size='xs'
+        isLoading={isVerifying}
+        onClick={handleVerifyAgain}
+        sx={t => ({ alignSelf: 'flex-start', gap: t.space.$1x5 })}
+      >
+        <Icon
+          icon={RotateLeftRight}
+          size='sm'
+          colorScheme='neutral'
+        />
+        <Text
+          as='span'
+          localizationKey={localizationKeys('configureSSO.organizationDomainsStep.domainCard.verifyAgainButton')}
+        />
+      </Button>
     </Col>
   );
 };

@@ -673,8 +673,8 @@ export const arSA: LocalizationResource = {
         messageLabel: 'بريدك الإلكتروني يستخدم {{domain}}. هل تريد إضافته؟',
       },
       formButtonPrimary__add: 'إضافة',
-      formFieldInputPlaceholder__domain: 'اكتب نطاقك هنا وانقر على إضافة للبدء',
-      formFieldLabel__domain: 'النطاقات',
+      formFieldInputPlaceholder__domain: 'إضافة نطاق',
+      formFieldLabel__domain: 'النطاق',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1654,6 +1654,7 @@ export const arSA: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       'لا يُسمح بالتسجيل باستخدام عنوان البريد الإلكتروني أو رقم الهاتف. قد يكون ذلك بسبب استخدام "+" أو "=" أو "#" أو "." في عنوان بريدك الإلكتروني، أو استخدام نطاق متصل بخدمة بريد إلكتروني مؤقتة، أو حظرك بشكل صريح. إذا كنت تعتقد أن هذا خطأ، يُرجى التواصل مع الدعم.',
+    oauth_access_denied: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -1727,6 +1728,9 @@ export const arSA: LocalizationResource = {
     action__openUserMenu: 'فتح قائمة المستخدم',
     action__signOut: 'تسجيل الخروج',
     action__signOutAll: 'تسجيل الخروج من جميع الحسابات',
+    label__userButtonPopover: 'لوحة الحساب',
+    label__accountActions: 'إجراءات الحساب',
+    label__activeSessions: 'الجلسات النشطة',
   },
   userProfile: {
     apiKeysPage: {
