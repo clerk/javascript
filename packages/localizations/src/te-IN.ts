@@ -210,9 +210,9 @@ export const teIN: LocalizationResource = {
     subtotalRenewal: undefined,
     switchPlan: 'ఈ ప్లాన్‌కు మారండి',
     switchToAnnual: 'వార్షికానికి మార్చు',
-    switchToAnnualWithAnnualPrice: 'వార్షికానికి మార్చు {{currency}}{{price}} / సంవత్సరం',
+    switchToAnnualWithAnnualPrice: 'వార్షికానికి మార్చు {{price}} / సంవత్సరం',
     switchToMonthly: 'నెలవారీకి మార్చు',
-    switchToMonthlyWithPrice: 'నెలవారీకి మార్చు {{currency}}{{price}} / నెల',
+    switchToMonthlyWithPrice: 'నెలవారీకి మార్చు {{price}} / నెల',
     totalDue: 'చెల్లించవలసిన మొత్తం',
     totalDuePerPeriod: undefined,
     totalDueToday: 'ఈరోజు చెల్లించవలసిన మొత్తం',
@@ -681,8 +681,8 @@ export const teIN: LocalizationResource = {
         messageLabel: 'మీ ఇమెయిల్ {{domain}} ను ఉపయోగిస్తుంది. మీరు దీన్ని జోడించాలనుకుంటున్నారా?',
       },
       formButtonPrimary__add: 'జోడించు',
-      formFieldInputPlaceholder__domain: 'మీ డొమైన్‌ను ఇక్కడ టైప్ చేసి, ప్రారంభించడానికి జోడించు క్లిక్ చేయండి',
-      formFieldLabel__domain: 'డొమైన్‌లు',
+      formFieldInputPlaceholder__domain: 'డొమైన్‌ను జోడించు',
+      formFieldLabel__domain: 'డొమైన్',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1685,6 +1685,7 @@ export const teIN: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       'మీకు ఈ పేజీని యాక్సెస్ చేయడానికి అనుమతి లేదు. ఇది లోపం అని మీరు నమ్మితే దయచేసి మద్దతును సంప్రదించండి.',
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'ఇది నిరోధించబడిన ఇమెయిల్ ప్రొవైడర్ డొమైన్. దయచేసి వేరొకదాన్ని ఉపయోగించండి.',
     organization_domain_common: 'ఇది సాధారణ ఇమెయిల్ ప్రొవైడర్ డొమైన్. దయచేసి వేరొకదాన్ని ఉపయోగించండి.',
     organization_domain_exists_for_enterprise_connection: 'ఈ డొమైన్ ఇప్పటికే మీ సంస్థ SSOకి ఉపయోగించబడుతోంది',
@@ -1763,6 +1764,9 @@ export const teIN: LocalizationResource = {
     action__openUserMenu: 'వినియోగదారు మెనుని తెరువు',
     action__signOut: 'సైన్ అవుట్',
     action__signOutAll: 'అన్ని ఖాతాల నుండి సైన్ అవుట్ అవ్వండి',
+    label__userButtonPopover: 'ఖాతా ప్యానెల్',
+    label__accountActions: 'ఖాతా చర్యలు',
+    label__activeSessions: 'క్రియాశీల సెషన్‌లు',
   },
   userProfile: {
     apiKeysPage: {

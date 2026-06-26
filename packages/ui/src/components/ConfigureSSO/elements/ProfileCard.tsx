@@ -1,5 +1,5 @@
 import { descriptors, Flex } from '@/customizables';
-import { common } from '@/styledSystem';
+import { common, mqu } from '@/styledSystem';
 
 type ProfileCardHeaderProps = React.PropsWithChildren;
 
@@ -16,6 +16,11 @@ export const ProfileCardHeader = (props: ProfileCardHeaderProps): JSX.Element =>
       borderBottomWidth: theme.borderWidths.$normal,
       borderBottomStyle: theme.borderStyles.$solid,
       borderBottomColor: theme.colors.$borderAlpha100,
+      [mqu.md]: {
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        gap: theme.space.$4,
+      },
     })}
   />
 );

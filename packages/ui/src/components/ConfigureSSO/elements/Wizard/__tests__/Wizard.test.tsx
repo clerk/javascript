@@ -28,7 +28,7 @@ const NavButtons = (): JSX.Element => {
 
 describe('<Wizard> + <Wizard.Match>', () => {
   it('renders only the active step body and advances on goNext', () => {
-    const steps: WizardStepConfig[] = [{ id: 'a' }, { id: 'b', guard: () => true }];
+    const steps: WizardStepConfig[] = [{ id: 'a' }, { id: 'b', isReachable: () => true }];
 
     render(
       <Wizard
@@ -56,7 +56,7 @@ describe('<Wizard> + <Wizard.Match>', () => {
   });
 
   it('a nested sub-flow terminal goNext advances the PARENT wizard', () => {
-    const outer: WizardStepConfig[] = [{ id: 'outer-1' }, { id: 'outer-2', guard: () => true }];
+    const outer: WizardStepConfig[] = [{ id: 'outer-1' }, { id: 'outer-2', isReachable: () => true }];
     // Single inner step => inner is immediately terminal; its goNext bubbles.
     const inner: WizardStepConfig[] = [{ id: 'inner-only' }];
 
@@ -99,7 +99,7 @@ describe('<Wizard> + <Wizard.Match>', () => {
   });
 
   it('a guard-blocked top-level goNext is a hard stop (no advance)', () => {
-    const steps: WizardStepConfig[] = [{ id: 'a' }, { id: 'b', guard: () => false }];
+    const steps: WizardStepConfig[] = [{ id: 'a' }, { id: 'b', isReachable: () => false }];
 
     render(
       <Wizard

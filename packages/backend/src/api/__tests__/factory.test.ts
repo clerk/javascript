@@ -29,6 +29,12 @@ describe('api.client', () => {
     expect(response.emailAddresses[0].emailAddress).toBe('john.doe@clerk.test');
     expect(response.phoneNumbers[0].phoneNumber).toBe('+311-555-2368');
     expect(response.externalAccounts[0].emailAddress).toBe('john.doe@clerk.test');
+    // Google/Facebook: `id` is the `idn_` identification id and `externalAccountId` carries the `eac_` id.
+    expect(response.externalAccounts[0].id).toBe('idn_2abcGoogleIdentification00000');
+    expect(response.externalAccounts[0].externalAccountId).toBe('eac_2abcGoogleExternalAccount0000');
+    // Other providers: `id` is already the `eac_` id and `externalAccountId` is absent.
+    expect(response.externalAccounts[1].id).toBe('eac_2defGithubExternalAccount0000');
+    expect(response.externalAccounts[1].externalAccountId).toBeUndefined();
     expect(response.enterpriseAccounts[0].emailAddress).toBe('john.doe@clerk.test');
     expect(response.enterpriseAccounts[0].provider).toBe('saml_okta');
     expect(response.enterpriseAccounts[0].enterpriseConnection?.name).toBe('Okta SSO');

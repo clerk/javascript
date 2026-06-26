@@ -586,6 +586,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'configureSSOVerifyDomainCardRemoveButton',
   'configureSSOVerifyDomainCardTxtRecord',
   'configureSSOVerifyDomainCardTxtRecordValue',
+  'configureSSOVerifyDomainCardExpired',
   'configureSSOEmailVerificationForm',
   'configureSSOEmailVerificationIcon',
   'configureSSOEmailVerificationTitle',

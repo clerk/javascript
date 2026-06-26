@@ -674,8 +674,8 @@ export const esCR: LocalizationResource = {
         messageLabel: 'Tu correo electrónico usa {{domain}}. ¿Quieres agregarlo?',
       },
       formButtonPrimary__add: 'Agregar',
-      formFieldInputPlaceholder__domain: 'Escribe aquí tu dominio y haz clic en Agregar para empezar',
-      formFieldLabel__domain: 'Dominios',
+      formFieldInputPlaceholder__domain: 'Agregar dominio',
+      formFieldLabel__domain: 'Dominio',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1668,6 +1668,7 @@ export const esCR: LocalizationResource = {
     insufficient_seats_change_plan: undefined,
     insufficient_seats_contact_support: undefined,
     not_allowed_access: 'No tienes permiso para acceder a esta página.',
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'Este correo electrónico del dominio está bloqueado, intenta con otro.',
     organization_domain_common: 'Este correo electrónico del dominio es muy común, intenta con otro.',
     organization_domain_exists_for_enterprise_connection: 'Este dominio ya esta en uso para tú organización',
@@ -1744,6 +1745,9 @@ export const esCR: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Cerrar sesión',
     action__signOutAll: 'Salir de todas las cuentas',
+    label__userButtonPopover: 'Panel de cuenta',
+    label__accountActions: 'Acciones de cuenta',
+    label__activeSessions: 'Sesiones activas',
   },
   userProfile: {
     apiKeysPage: {

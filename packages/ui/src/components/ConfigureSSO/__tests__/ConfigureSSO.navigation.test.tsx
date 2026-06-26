@@ -163,6 +163,45 @@ describe('ConfigureSSO wizard navigation (integration)', () => {
     expect(queryByText(/test your sso connection/i)).not.toBeInTheDocument();
   });
 
+  it('reset → re-derive: deleting from the first configure step lands on select-provider (no blank)', async () => {
+    const { wrapper, fixtures } = await createFixtures(withAdminOrgUser);
+
+    // First settle: an unconfigured connection ⇒ mounts on the first configure
+    // step (Configure Okta Workforce, step 1 of 4). After the delete's revalidate:
+    // no connection ⇒ the nested clamp re-seats to select-provider.
+    fixtures.clerk.organization?.getEnterpriseConnections
+      .mockResolvedValueOnce([unconfiguredConnection] as any)
+      .mockResolvedValue([] as any);
+    fixtures.clerk.organization?.deleteEnterpriseConnection.mockResolvedValue({ id: 'ent_new' } as any);
+    fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
+      data: [],
+      total_count: 0,
+    } as any);
+    mockVerifiedDomains(fixtures);
+
+    const { findByText, getByRole, getByLabelText, findByRole, userEvent, queryByRole } = render(<ConfigureSSO />, {
+      wrapper,
+    });
+
+    // Mounts directly on the first configure step (existing connection resumes here).
+    await findByRole('heading', { name: /configure okta workforce/i });
+
+    // Reset from the configure-step footer: type-to-confirm with the organization
+    // name and confirm.
+    await userEvent.click(getByRole('button', { name: /reset connection/i }));
+    await userEvent.type(getByLabelText(/below to continue/i), 'Org1');
+    const confirmButton = await findByRole('button', { name: /reset connection/i });
+    await waitFor(() => expect(confirmButton).toBeEnabled());
+    await userEvent.click(confirmButton);
+
+    // The nested wizard self-corrects to select-provider — a real rendered step,
+    // not the blank pane the unguarded nested clamp used to strand on.
+    await findByText(/select your identity provider/i);
+    await waitFor(() => {
+      expect(queryByRole('heading', { name: /configure okta workforce/i })).not.toBeInTheDocument();
+    });
+  });
+
   // A card error surfaced on one step must not leak into the next. Each top-level
   // step owns its own `CardStateProvider`, so the error lives in the departed
   // step's scope only — leaving that step unmounts the provider and the error
@@ -266,5 +305,59 @@ describe('ConfigureSSO wizard navigation (integration)', () => {
     expect(getByText('Connection')).toBeInTheDocument();
     expect(getByText('Test')).toBeInTheDocument();
     expect(getByText('Activate')).toBeInTheDocument();
+  });
+
+  // Completion is guard-driven, not positional: re-entering an ACTIVE connection
+  // shows every stepper step ticked even after navigating BACK to an earlier step.
+  // A completed bullet renders a checkmark regardless of whether it is also the
+  // current step — so for a fully active connection all four bullets show checkmarks
+  // and zero show a digit. Under the old positional logic the steps AFTER current
+  // would lose their tick and show their numbers again, so this asserts the fix directly.
+  it('re-entering an active connection keeps every step completed after navigating back', async () => {
+    const { wrapper, fixtures } = await createFixtures(withAdminOrgUser);
+
+    fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([
+      { ...configuredConnection, id: 'ent_active', active: true } as any,
+    ]);
+    fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
+      data: [],
+      total_count: 0,
+    } as any);
+    mockVerifiedDomains(fixtures);
+
+    const { container, findByText, userEvent } = render(<ConfigureSSO />, { wrapper });
+
+    // Mounts on the activate step (active connection short-circuits to it).
+    await findByText(/sso connection is active/i);
+
+    const stepper = () => container.querySelector('.cl-configureSSOStepper') as HTMLElement;
+    const bulletDigitCount = () =>
+      Array.from(stepper().querySelectorAll('.cl-configureSSOStepperItemBullet')).filter(el =>
+        /\d/.test(el.textContent ?? ''),
+      ).length;
+    const stepperLabels = () =>
+      Array.from(stepper().querySelectorAll('.cl-configureSSOStepperItemLabel')).map(el => el.textContent);
+    const stepperButton = (label: string) =>
+      Array.from(stepper().querySelectorAll<HTMLButtonElement>('.cl-configureSSOStepperItem')).find(
+        btn => btn.textContent?.trim() === label,
+      )!;
+
+    // The breadcrumb carries all four labels.
+    expect(stepperLabels()).toEqual(['Domains', 'Connection', 'Test', 'Activate']);
+
+    // On the terminal step all four steps are complete, so all four bullets show
+    // checkmarks — including the current 'Activate' step — and zero show a digit.
+    expect(bulletDigitCount()).toBe(0);
+
+    // Navigate BACK to the first step via the breadcrumb. Every step's guard still
+    // holds for an active connection, so 'Domains' is reachable.
+    await userEvent.click(stepperButton('Domains'));
+
+    // Positional completion would now un-tick Connection/Test/Activate (they sit
+    // AFTER current) and show their numbers. Guard-driven completion keeps them
+    // ticked. 'Domains' is also completed, so its bullet shows a checkmark too —
+    // zero bullets show a digit.
+    expect(bulletDigitCount()).toBe(0);
+    expect(stepperLabels()).toEqual(['Domains', 'Connection', 'Test', 'Activate']);
   });
 });
