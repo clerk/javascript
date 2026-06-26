@@ -59,6 +59,40 @@ describe('EmailApi', () => {
     expect(response.deliveredByClerk).toBe(true);
   });
 
+  it('sends a transactional email with a text body', async () => {
+    server.use(
+      http.post(
+        'https://api.clerk.test/v1/email',
+        validateHeaders(async ({ request }) => {
+          const body = await request.json();
+          expect(body).toEqual({
+            to: { address: 'admin@acme.com' },
+            from: { address: 'noreply@acme.com' },
+            subject: 'Hello',
+            text: 'hi',
+          });
+          return HttpResponse.json({
+            ...mockEmail,
+            body: null,
+            body_plain: 'hi',
+          });
+        }),
+      ),
+    );
+
+    const response = await apiClient.emails.create({
+      to: { address: 'admin@acme.com' },
+      from: { address: 'noreply@acme.com' },
+      subject: 'Hello',
+      text: 'hi',
+    });
+
+    expect(response.id).toBe('ema_123');
+    expect(response.body).toBeNull();
+    expect(response.bodyPlain).toBe('hi');
+    expect(response.status).toBe('queued');
+  });
+
   it('sends a transactional email addressed by userId', async () => {
     server.use(
       http.post(
