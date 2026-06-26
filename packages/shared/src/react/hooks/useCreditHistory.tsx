@@ -16,7 +16,6 @@ const HOOK_NAME = 'useCreditHistory';
 
 export type UseCreditHistoryParams = {
   for?: ForPayerType;
-  payerId?: string;
   enabled?: boolean;
 };
 
@@ -48,8 +47,6 @@ export function __internal_useCreditHistoryQuery(params?: UseCreditHistoryParams
     }
   }, [clerk]);
 
-  const payerId = params?.payerId;
-
   const [queryClient] = useClerkQueryClient();
 
   const { queryKey, invalidationKey, stableKey, authenticated } = useMemo(() => {
@@ -62,15 +59,14 @@ export function __internal_useCreditHistoryQuery(params?: UseCreditHistoryParams
       tracked: {
         userId: user?.id,
         orgId: safeOrgId,
-        payerId,
       },
       untracked: {
-        args: { payerId: payerId as string, orgId: safeOrgId },
+        args: { orgId: safeOrgId },
       },
     });
-  }, [user?.id, organization?.id, params?.for, payerId]);
+  }, [user?.id, organization?.id, params?.for]);
 
-  const queriesEnabled = Boolean(user?.id && billingEnabled && payerId && (params?.enabled ?? true));
+  const queriesEnabled = Boolean(user?.id && billingEnabled && (params?.enabled ?? true));
   useClearQueriesOnSignOut({
     isSignedOut: user === null,
     authenticated,

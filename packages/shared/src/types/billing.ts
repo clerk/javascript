@@ -962,10 +962,6 @@ export type GetCreditBalanceParams = {
    * The ID of the Organization to get the credit balance for.
    */
   orgId?: string;
-  /**
-   * The ID of the payer to get the credit balance for.
-   */
-  payerId: string;
 };
 
 /**
@@ -976,10 +972,6 @@ export type GetCreditHistoryParams = {
    * The ID of the Organization to get the credit history for.
    */
   orgId?: string;
-  /**
-   * The ID of the payer to get the credit history for.
-   */
-  payerId: string;
 };
 
 /**

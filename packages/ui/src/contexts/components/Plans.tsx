@@ -90,20 +90,12 @@ export const usePlans = (params?: { mode: 'cache' }) => {
 
 export const useCreditBalance = () => {
   const params = useBillingHookParams();
-  const { data: subscription } = useSubscription();
-  return __experimental_useCreditBalance({
-    ...params,
-    payerId: subscription?.payerId,
-  });
+  return __experimental_useCreditBalance(params);
 };
 
 export const useCreditHistory = () => {
   const params = useBillingHookParams();
-  const { data: subscription } = useSubscription();
-  return __internal_useCreditHistoryQuery({
-    ...params,
-    payerId: subscription?.payerId,
-  });
+  return __internal_useCreditHistoryQuery(params);
 };
 
 type HandleSelectPlanProps = {

@@ -151,7 +151,7 @@ export class Billing implements BillingNamespace {
 
   getCreditBalance = async (params: GetCreditBalanceParams): Promise<BillingCreditBalanceResource> => {
     return await BaseResource._fetch({
-      path: Billing.path(`/payers/${params.payerId}/credits`, { orgId: params.orgId }),
+      path: Billing.path('/credits', { orgId: params.orgId }),
       method: 'GET',
     }).then(res => new BillingCreditBalance(res?.response as unknown as BillingCreditBalanceJSON));
   };
@@ -160,7 +160,7 @@ export class Billing implements BillingNamespace {
     params: GetCreditHistoryParams,
   ): Promise<ClerkPaginatedResponse<BillingCreditLedgerResource>> => {
     return await BaseResource._fetch({
-      path: Billing.path(`/payers/${params.payerId}/credits/history`, { orgId: params.orgId }),
+      path: Billing.path('/credits/history', { orgId: params.orgId }),
       method: 'GET',
     }).then(res => {
       const { data, total_count } = res?.response as unknown as {

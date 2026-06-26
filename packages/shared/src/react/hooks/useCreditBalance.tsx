@@ -17,7 +17,6 @@ const HOOK_NAME = 'useCreditBalance';
 
 export type UseCreditBalanceParams = {
   for?: ForPayerType;
-  payerId?: string;
   keepPreviousData?: boolean;
   enabled?: boolean;
 };
@@ -51,7 +50,6 @@ export function useCreditBalance(params?: UseCreditBalanceParams): CreditBalance
   }, [clerk]);
 
   const keepPreviousData = params?.keepPreviousData ?? false;
-  const payerId = params?.payerId;
 
   const [queryClient] = useClerkQueryClient();
 
@@ -65,15 +63,14 @@ export function useCreditBalance(params?: UseCreditBalanceParams): CreditBalance
       tracked: {
         userId: user?.id,
         orgId: safeOrgId,
-        payerId,
       },
       untracked: {
-        args: { payerId: payerId as string, orgId: safeOrgId },
+        args: { orgId: safeOrgId },
       },
     });
-  }, [user?.id, organization?.id, params?.for, payerId]);
+  }, [user?.id, organization?.id, params?.for]);
 
-  const queriesEnabled = Boolean(user?.id && billingEnabled && payerId);
+  const queriesEnabled = Boolean(user?.id && billingEnabled);
   useClearQueriesOnSignOut({
     isSignedOut: user === null,
     authenticated,
