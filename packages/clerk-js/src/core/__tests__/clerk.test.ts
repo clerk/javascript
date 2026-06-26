@@ -819,6 +819,152 @@ describe('Clerk singleton', () => {
     );
   });
 
+  describe('updateSessionCookie monotonic backstop', () => {
+    const sessionId = 'sess_active';
+
+    const createJwtWithOiat = (
+      iat: number,
+      oiat: number | undefined,
+      opts: { sid?: string; org?: string; ttl?: number } = {},
+    ): string => {
+      const { sid = sessionId, org, ttl = 60 } = opts;
+      const header: Record<string, unknown> = { alg: 'HS256', typ: 'JWT' };
+      if (oiat !== undefined) {
+        header.oiat = oiat;
+      }
+      const payload: Record<string, unknown> = { sid, iat, exp: iat + ttl };
+      if (org) {
+        payload.org_id = org;
+      }
+      const b64 = (o: object) => btoa(JSON.stringify(o)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+      return `${b64(header)}.${b64(payload)}.test-signature`;
+    };
+
+    const loadClerkWithSession = async () => {
+      const mockSession = {
+        id: sessionId,
+        status: 'active',
+        user: {},
+        getToken: vi.fn(),
+        lastActiveToken: { getRawString: () => mockJwt },
+      };
+      mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load();
+      return sut;
+    };
+
+    const emitToken = (raw: string | null) => {
+      eventBus.emit(events.TokenUpdate, {
+        token: raw === null ? null : ({ jwt: {}, getRawString: () => raw } as any),
+      });
+    };
+
+    it('drops a strictly-staler same-context token and keeps the fresher cookie', async () => {
+      await loadClerkWithSession();
+
+      const fresh = createJwtWithOiat(1000, 200);
+      emitToken(fresh);
+      expect(document.cookie).toContain(fresh);
+
+      const stale = createJwtWithOiat(900, 100);
+      emitToken(stale);
+      expect(document.cookie).not.toContain(stale);
+      expect(document.cookie).toContain(fresh);
+    });
+
+    it('applies a fresher same-context token', async () => {
+      await loadClerkWithSession();
+
+      const older = createJwtWithOiat(1000, 100);
+      emitToken(older);
+      expect(document.cookie).toContain(older);
+
+      const newer = createJwtWithOiat(1100, 200);
+      emitToken(newer);
+      expect(document.cookie).toContain(newer);
+    });
+
+    it('applies a token with equal oiat and iat (publish on tie)', async () => {
+      await loadClerkWithSession();
+
+      const first = createJwtWithOiat(1000, 100, { ttl: 60 });
+      emitToken(first);
+      expect(document.cookie).toContain(first);
+
+      const second = createJwtWithOiat(1000, 100, { ttl: 120 });
+      emitToken(second);
+      expect(document.cookie).toContain(second);
+    });
+
+    it('drops a token for a different session', async () => {
+      await loadClerkWithSession();
+
+      const wrongSession = createJwtWithOiat(1000, 200, { sid: 'sess_other' });
+      emitToken(wrongSession);
+      expect(document.cookie).not.toContain(wrongSession);
+    });
+
+    it('drops a token for a different organization', async () => {
+      await loadClerkWithSession();
+
+      const wrongOrg = createJwtWithOiat(1000, 200, { org: 'org_other' });
+      emitToken(wrongOrg);
+      expect(document.cookie).not.toContain(wrongOrg);
+    });
+
+    it('applies a personal-workspace token (no org) for the active personal workspace', async () => {
+      await loadClerkWithSession();
+
+      const personal = createJwtWithOiat(1000, 200);
+      emitToken(personal);
+      expect(document.cookie).toContain(personal);
+    });
+
+    it('applies an active-context token even when the current cookie is a different session with higher oiat', async () => {
+      const sut = await loadClerkWithSession();
+
+      // Plant a different-session, higher-oiat cookie by temporarily making it the active context.
+      (sut.session as any).id = 'sess_other';
+      const otherContext = createJwtWithOiat(2000, 999, { sid: 'sess_other' });
+      emitToken(otherContext);
+      expect(document.cookie).toContain(otherContext);
+
+      // Restore the active session; a lower-oiat active-context token must still apply,
+      // because the different-session cookie is not a valid freshness baseline.
+      (sut.session as any).id = sessionId;
+      const active = createJwtWithOiat(1000, 100, { sid: sessionId });
+      emitToken(active);
+      expect(document.cookie).toContain(active);
+    });
+
+    it('applies a token without an oiat header (fail open)', async () => {
+      await loadClerkWithSession();
+
+      const noOiat = createJwtWithOiat(1000, undefined);
+      emitToken(noOiat);
+      expect(document.cookie).toContain(noOiat);
+    });
+
+    it('applies a malformed token (fail open)', async () => {
+      await loadClerkWithSession();
+
+      emitToken('garbage.token');
+      expect(document.cookie).toContain('garbage.token');
+    });
+
+    it('removes the cookie when the token is null', async () => {
+      await loadClerkWithSession();
+
+      const fresh = createJwtWithOiat(1000, 200);
+      emitToken(fresh);
+      expect(document.cookie).toContain(fresh);
+
+      emitToken(null);
+      expect(document.cookie).not.toContain(fresh);
+    });
+  });
+
   describe('.signOut()', () => {
     const mockClientDestroy = vi.fn();
     const mockClientRemoveSessions = vi.fn();

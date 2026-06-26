@@ -49,6 +49,7 @@ import { TokenId } from '@/utils/tokenId';
 import { clerkInvalidStrategy, clerkMissingWebAuthnPublicKeyOptions } from '../errors';
 import { eventBus, events } from '../events';
 import type { FapiResponseJSON } from '../fapiClient';
+import { isStrictlyStalerJwt, normalizeOrgId, pickFreshestOrIncoming, tokenOrgId } from '../tokenFreshness';
 import { SessionTokenCache } from '../tokenCache';
 import { BaseResource, getClientResourceFromPayload, PublicUserData, Token, User } from './internal';
 import { SessionVerification } from './SessionVerification';
@@ -86,7 +87,6 @@ export class Session extends BaseResource implements SessionResource {
     super();
 
     this.fromJSON(data);
-    this.#hydrateCache(this.lastActiveToken);
   }
 
   end = (): Promise<SessionResource> => {
@@ -209,19 +209,37 @@ export class Session extends BaseResource implements SessionResource {
     })(params);
   };
 
-  #hydrateCache = (token: TokenResource | null) => {
-    if (token) {
-      const tokenId = this.#getCacheId();
-      // Dispatch tokenUpdate for __session tokens with the session's active organization ID
-      const shouldDispatchTokenUpdate = true;
+  #applyIncomingLastActiveToken(raw: SessionJSON['last_active_token'] | null) {
+    if (!raw) {
+      this.lastActiveToken = null;
+      return;
+    }
+
+    const incoming = new Token(raw);
+    const tokenId = this.#getCacheId();
+    const current = SessionTokenCache.get({ tokenId })?.entry.resolvedToken ?? null;
+
+    // A token whose explicit org claim differs from the active org is stale-context: it must
+    // not win lastActiveToken over a cached active-context token, nor be written into the
+    // active cache slot that getToken() reads. A token with no org claim is legacy/personal
+    // and counts as same-context.
+    const incomingOrg = tokenOrgId(incoming);
+    const sameContext = !incomingOrg || normalizeOrgId(incomingOrg) === normalizeOrgId(this.lastActiveOrganizationId);
+
+    if (current && (!sameContext || isStrictlyStalerJwt(incoming, current))) {
+      this.lastActiveToken = current;
+      return;
+    }
+
+    this.lastActiveToken = incoming;
+    if (sameContext && (!current || current.getRawString() !== incoming.getRawString())) {
       SessionTokenCache.set({
         tokenId,
-        tokenResolver: Promise.resolve(token),
-        onRefresh: () =>
-          this.#refreshTokenInBackground(undefined, this.lastActiveOrganizationId, tokenId, shouldDispatchTokenUpdate),
+        tokenResolver: Promise.resolve(incoming),
+        onRefresh: () => this.#refreshTokenInBackground(undefined, this.lastActiveOrganizationId, tokenId, true),
       });
     }
-  };
+  }
 
   // If it's a session token, retrieve it with their session id, otherwise it's a jwt template token
   // and retrieve it using the session id concatenated with the jwt template name.
@@ -405,7 +423,7 @@ export class Session extends BaseResource implements SessionResource {
       this.publicUserData = new PublicUserData(data.public_user_data);
     }
 
-    this.lastActiveToken = data.last_active_token ? new Token(data.last_active_token) : null;
+    this.#applyIncomingLastActiveToken(data.last_active_token ?? null);
 
     return this;
   }
@@ -520,7 +538,7 @@ export class Session extends BaseResource implements SessionResource {
 
     eventBus.emit(events.TokenUpdate, { token });
 
-    if (token.jwt) {
+    if (token.jwt && (!this.lastActiveToken || !isStrictlyStalerJwt(token, this.lastActiveToken))) {
       this.lastActiveToken = token;
       eventBus.emit(events.SessionTokenResolved, null);
     }
@@ -535,21 +553,25 @@ export class Session extends BaseResource implements SessionResource {
   ): Promise<string | null> {
     debugLogger.info('Fetching new token from API', { organizationId, template, tokenId }, 'session');
 
-    const tokenResolver = this.#createTokenResolver(template, organizationId, skipCache);
+    const fetchPromise = this.#createTokenResolver(template, organizationId, skipCache);
+    const tokenResolver = fetchPromise.then(fetched =>
+      pickFreshestOrIncoming(SessionTokenCache.get({ tokenId })?.entry.resolvedToken, fetched),
+    );
+
     SessionTokenCache.set({
       tokenId,
       tokenResolver,
       onRefresh: () => this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate),
     });
 
-    return tokenResolver.then(token => {
-      const rawString = token.getRawString();
+    return tokenResolver.then(winner => {
+      const rawString = winner.getRawString();
       if (!rawString) {
         // Throw so retry logic in getToken() can handle it,
         // rather than silently returning null (which callers interpret as "signed out").
         throw new ClerkRuntimeError('Token fetch returned empty response', { code: 'network_error' });
       }
-      this.#dispatchTokenEvents(token, shouldDispatchTokenUpdate);
+      this.#dispatchTokenEvents(winner, shouldDispatchTokenUpdate);
       return rawString;
     });
   }
@@ -600,14 +622,16 @@ export class Session extends BaseResource implements SessionResource {
           return;
         }
 
+        const winner = pickFreshestOrIncoming(SessionTokenCache.get({ tokenId })?.entry.resolvedToken, token);
+
         // Cache the resolved token for future calls
         // Re-register onRefresh to handle the next refresh cycle when this token approaches expiration
         SessionTokenCache.set({
           tokenId,
-          tokenResolver: Promise.resolve(token),
+          tokenResolver: Promise.resolve(winner),
           onRefresh: () => this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate),
         });
-        this.#dispatchTokenEvents(token, shouldDispatchTokenUpdate);
+        this.#dispatchTokenEvents(winner, shouldDispatchTokenUpdate);
       })
       .catch(error => {
         // Log but don't propagate - callers already have stale token

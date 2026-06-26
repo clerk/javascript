@@ -18,6 +18,8 @@ import { clerkMissingDevBrowser } from '../errors';
 import { eventBus, events } from '../events';
 import type { FapiClient } from '../fapiClient';
 import { Environment } from '../resources/Environment';
+import { Token } from '../resources/Token';
+import { isStrictlyStalerJwt, normalizeOrgId, tokenOiat, tokenOrgId, tokenSid } from '../tokenFreshness';
 import { createActiveContextCookie } from './cookies/activeContext';
 import type { ClientUatCookieHandler } from './cookies/clientUat';
 import { createClientUatCookie } from './cookies/clientUat';
@@ -194,6 +196,10 @@ export class AuthCookieService {
       return;
     }
 
+    if (token && this.#shouldDropStaleToken(token)) {
+      return;
+    }
+
     if (!token && !isValidBrowserOnline()) {
       debugLogger.warn('Removing session cookie (offline)', { sessionId: this.clerk.session?.id }, 'authCookieService');
     }
@@ -201,6 +207,46 @@ export class AuthCookieService {
     this.setActiveContextInStorage();
 
     return token ? this.sessionCookie.set(token) : this.sessionCookie.remove();
+  }
+
+  // Returns true only when `raw` is positively wrong-context or strictly staler than the
+  // SAME-context current cookie. Inert (false) for tokens without oiat and on any decode
+  // failure: stranding the user is worse than a transient revert.
+  #shouldDropStaleToken(raw: string): boolean {
+    const incoming = this.#decodeToken(raw);
+    if (!incoming || tokenOiat(incoming) == null) {
+      return false;
+    }
+
+    const sid = tokenSid(incoming);
+    if (sid && sid !== (this.clerk.session?.id ?? '')) {
+      return true;
+    }
+    if (normalizeOrgId(tokenOrgId(incoming)) !== normalizeOrgId(this.clerk.organization?.id)) {
+      return true;
+    }
+
+    const current = this.#decodeToken(this.sessionCookie.get());
+    if (!current || tokenOiat(current) == null) {
+      return false;
+    }
+    // Only a same-context cookie is a valid freshness baseline.
+    if (tokenSid(current) !== sid || normalizeOrgId(tokenOrgId(current)) !== normalizeOrgId(tokenOrgId(incoming))) {
+      return false;
+    }
+    return isStrictlyStalerJwt(incoming, current);
+  }
+
+  #decodeToken(raw: string | undefined): Token | null {
+    if (!raw) {
+      return null;
+    }
+    try {
+      const token = new Token({ id: '__session', jwt: raw, object: 'token' });
+      return token.jwt ? token : null;
+    } catch {
+      return null;
+    }
   }
 
   public setClientUatCookieForDevelopmentInstances() {
