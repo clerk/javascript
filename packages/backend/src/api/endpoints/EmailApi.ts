@@ -55,6 +55,35 @@ type EmailRecipient =
       name?: never;
     };
 
+/**
+ * The body of the email. At least one of `html` and `text` must be provided; if
+ * both are provided, the `html` version takes precedence. Encoded as a union so
+ * that omitting both is a compile-time error rather than a server-side one.
+ */
+type EmailContent =
+  | {
+      /**
+       * The HTML body of the email. Takes precedence over `text` when both are
+       * provided.
+       */
+      html: string;
+      /**
+       * (Optional) The plain text body of the email.
+       */
+      text?: string;
+    }
+  | {
+      /**
+       * (Optional) The HTML body of the email. Takes precedence over `text`
+       * when both are provided.
+       */
+      html?: string;
+      /**
+       * The plain text body of the email.
+       */
+      text: string;
+    };
+
 export type CreateEmailParams = {
   /**
    * The recipient of the email. Currently only a single recipient is supported.
@@ -75,19 +104,7 @@ export type CreateEmailParams = {
   replyTo?: Mailbox;
 
   subject: string;
-
-  /**
-   * The HTML body of the email. At least one of `html` and `text` must be
-   * provided. If both are provided, the `html` version will take precedence.
-   */
-  html?: string;
-
-  /**
-   * The plain text body of the email. At least one of `html` and `text` must be
-   * provided. If both are provided, the `html` version will take precedence.
-   */
-  text?: string;
-};
+} & EmailContent;
 
 export class EmailApi extends AbstractAPI {
   /**
