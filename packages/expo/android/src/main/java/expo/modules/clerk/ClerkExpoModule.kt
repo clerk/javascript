@@ -484,7 +484,9 @@ class ClerkExpoModule : Module() {
             border = json.optStringColor("border"),
             ring = json.optStringColor("ring"),
             muted = json.optStringColor("muted"),
-            shadow = json.optStringColor("shadow")
+            shadow = json.optStringColor("shadow"),
+            secondaryButtonBackground = json.optStringColor("secondaryButtonBackground"),
+            secondaryButtonForeground = json.optStringColor("secondaryButtonForeground")
         )
     }
 

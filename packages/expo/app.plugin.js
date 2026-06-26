@@ -225,7 +225,8 @@ const withClerkAppleSignIn = config => {
  * Accepts a `theme` prop pointing to a JSON file with optional keys:
  *   - colors: { primary, background, input, danger, success, warning,
  *               foreground, mutedForeground, primaryForeground, inputForeground,
- *               neutral, border, ring, muted, shadow }  (hex color strings)
+ *               neutral, border, ring, muted, shadow, secondaryButtonBackground,
+ *               secondaryButtonForeground }  (hex color strings)
  *   - darkColors: same keys as colors (for dark mode)
  *   - design: { fontFamily: string, borderRadius: number }
  *
@@ -248,6 +249,8 @@ const VALID_COLOR_KEYS = [
   'ring',
   'muted',
   'shadow',
+  'secondaryButtonBackground',
+  'secondaryButtonForeground',
 ];
 
 const HEX_COLOR_REGEX = /^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/;
