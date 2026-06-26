@@ -673,8 +673,8 @@ export const enGB: LocalizationResource = {
         messageLabel: 'Your email uses {{domain}}. Do you want to add it?',
       },
       formButtonPrimary__add: 'Add',
-      formFieldInputPlaceholder__domain: 'Type your domain here and click add to start',
-      formFieldLabel__domain: 'Domains',
+      formFieldInputPlaceholder__domain: 'Add domain',
+      formFieldLabel__domain: 'Domain',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1660,6 +1660,7 @@ export const enGB: LocalizationResource = {
     insufficient_seats_change_plan: undefined,
     insufficient_seats_contact_support: undefined,
     not_allowed_access: undefined,
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'This is a blocked email provider domain. Please use a different one.',
     organization_domain_common: 'This is a common email provider domain. Please use a different one.',
     organization_domain_exists_for_enterprise_connection: 'This domain is already used for your organisation’s SSO',
@@ -1736,6 +1737,9 @@ export const enGB: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Sign out',
     action__signOutAll: 'Sign out of all accounts',
+    label__userButtonPopover: 'Account panel',
+    label__accountActions: 'Account actions',
+    label__activeSessions: 'Active sessions',
   },
   userProfile: {
     apiKeysPage: {

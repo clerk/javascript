@@ -674,8 +674,8 @@ export const srRS: LocalizationResource = {
         messageLabel: 'Vaša e-pošta koristi {{domain}}. Želite li da ga dodate?',
       },
       formButtonPrimary__add: 'Dodaj',
-      formFieldInputPlaceholder__domain: 'Ovde unesite svoj domen i kliknite na dodaj da biste počeli',
-      formFieldLabel__domain: 'Domeni',
+      formFieldInputPlaceholder__domain: 'Dodaj domen',
+      formFieldLabel__domain: 'Domen',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1658,6 +1658,7 @@ export const srRS: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       "Adresa e-maila ili broja telefona nije dozvoljena za registraciju. Ovo može biti zbog korišćenja '+', '=', '#' ili '.' u adresi e-maila, korišćenja domena koji je povezan sa vremenskom e-mail uslugom ili eksplicitnom isključenju.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -1731,6 +1732,9 @@ export const srRS: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Odjavi se',
     action__signOutAll: 'Odjavi se sa svih naloga',
+    label__userButtonPopover: 'Панел налога',
+    label__accountActions: 'Акције налога',
+    label__activeSessions: 'Активне сесије',
   },
   userProfile: {
     apiKeysPage: {

@@ -210,9 +210,9 @@ export const huHU: LocalizationResource = {
     subtotalRenewal: undefined,
     switchPlan: 'Váltás erre a csomagra',
     switchToAnnual: 'Váltás éves fizetésre',
-    switchToAnnualWithAnnualPrice: 'Váltás éves fizetésre: {{currency}}{{price}} / év',
+    switchToAnnualWithAnnualPrice: 'Váltás éves fizetésre: {{price}} / év',
     switchToMonthly: 'Váltás havi fizetésre',
-    switchToMonthlyWithPrice: 'Váltás havi fizetésre: {{currency}}{{price}} / hó',
+    switchToMonthlyWithPrice: 'Váltás havi fizetésre: {{price}} / hó',
     totalDue: 'Fizetendő összeg',
     totalDuePerPeriod: undefined,
     totalDueToday: 'Mai fizetendő összeg',
@@ -681,8 +681,8 @@ export const huHU: LocalizationResource = {
         messageLabel: 'Az e-mail-címe a következőt használja: {{domain}}. Szeretné hozzáadni?',
       },
       formButtonPrimary__add: 'Hozzáadás',
-      formFieldInputPlaceholder__domain: 'Írja be ide a tartományát, majd kattintson a Hozzáadás gombra a kezdéshez',
-      formFieldLabel__domain: 'Tartományok',
+      formFieldInputPlaceholder__domain: 'Tartomány hozzáadása',
+      formFieldLabel__domain: 'Tartomány',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1685,6 +1685,7 @@ export const huHU: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       "Az email címed vagy a telefonszámod nem használható regisztrációhoz. Ez lehet, mert az email címedben vagy a telefonszámodban szerepel a '+', '=', '#' vagy '.' karakter, vagy az email címedben vagy a telefonszámodban szerepel egy időzített email szolgáltató vagy kizárt tartomány. Ha úgy gondolja, hogy ez hiba, vegye fel velünk a kapcsolatot.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -1763,6 +1764,9 @@ export const huHU: LocalizationResource = {
     action__openUserMenu: 'Felhasználói menü megnyitása',
     action__signOut: 'Kijelentkezés',
     action__signOutAll: 'Kijelentkezés minden fiókból',
+    label__userButtonPopover: 'Fiókpanel',
+    label__accountActions: 'Fiókműveletek',
+    label__activeSessions: 'Aktív munkamenetek',
   },
   userProfile: {
     apiKeysPage: {

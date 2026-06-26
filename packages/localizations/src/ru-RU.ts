@@ -674,8 +674,8 @@ export const ruRU: LocalizationResource = {
         messageLabel: 'Ваша электронная почта использует {{domain}}. Хотите добавить его?',
       },
       formButtonPrimary__add: 'Добавить',
-      formFieldInputPlaceholder__domain: 'Введите домен здесь и нажмите «Добавить», чтобы начать',
-      formFieldLabel__domain: 'Домены',
+      formFieldInputPlaceholder__domain: 'Добавить домен',
+      formFieldLabel__domain: 'Домен',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1673,6 +1673,7 @@ export const ruRU: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       "Адрес электронной почты или номер телефона не разрешен для регистрации. Это может быть связано с использованием '+', '=', '#' или '.' в вашем адресе электронной почты, использованием домена, связанного с временной электронной почтой, или явным исключением.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'Это заблокированный домен почтового провайдера. Пожалуйста, используйте другой.',
     organization_domain_common: 'Это распространенный домен почтового провайдера. Пожалуйста, используйте другой.',
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -1750,6 +1751,9 @@ export const ruRU: LocalizationResource = {
     action__openUserMenu: 'Открыть меню пользователя',
     action__signOut: 'Выйти',
     action__signOutAll: 'Выйти из всех учетных записей',
+    label__userButtonPopover: 'Панель аккаунта',
+    label__accountActions: 'Действия аккаунта',
+    label__activeSessions: 'Активные сессии',
   },
   userProfile: {
     apiKeysPage: {

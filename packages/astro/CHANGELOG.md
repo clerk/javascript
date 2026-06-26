@@ -1,5 +1,41 @@
 # @clerk/astro
 
+## 3.4.8
+
+### Patch Changes
+
+- Fix custom user button menu item rendering for Astro's stricter compiler. ([#8980](https://github.com/clerk/javascript/pull/8980)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Deprecate `createRouteMatcher()` in favor of resource-based auth checks. ([#8981](https://github.com/clerk/javascript/pull/8981)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Instead of protecting routes only from middleware, move auth checks into each protected Astro page, API route, or server-side handler:
+
+  ```ts
+  import type { APIRoute } from 'astro';
+
+  export const GET: APIRoute = ({ locals }) => {
+    const { userId } = locals.auth();
+
+    if (!userId) {
+      return new Response('Unauthorized', { status: 401 });
+    }
+
+    return Response.json({ userId });
+  };
+  ```
+
+- Updated dependencies [[`19ce04a`](https://github.com/clerk/javascript/commit/19ce04aab6387c430dc41e51c6130a88cc543cc8)]:
+  - @clerk/shared@4.22.0
+  - @clerk/backend@3.8.4
+
+## 3.4.7
+
+### Patch Changes
+
+- Updated dependencies [[`c38d853`](https://github.com/clerk/javascript/commit/c38d8534b916936acbe4131fac58c8743e684eab), [`7e3174a`](https://github.com/clerk/javascript/commit/7e3174a4f861ad89667c3d0c63b6f2d0c001bcb6), [`97039bb`](https://github.com/clerk/javascript/commit/97039bb871a33ccc2c9e46f011e4cbbc1459fb1e), [`f43071d`](https://github.com/clerk/javascript/commit/f43071d8d98194c22e34d1d72ed8d0cf0b6b0f0e), [`0e0ff11`](https://github.com/clerk/javascript/commit/0e0ff110fdab5f0ffb0a8896c1f864605c1f809d), [`0039618`](https://github.com/clerk/javascript/commit/003961810786af49daba5a3e82e34378d52b885c), [`a536a0d`](https://github.com/clerk/javascript/commit/a536a0d5b31a5fcba31813ed34f9494a4ec4851b)]:
+  - @clerk/shared@4.21.0
+  - @clerk/backend@3.8.3
+
 ## 3.4.6
 
 ### Patch Changes

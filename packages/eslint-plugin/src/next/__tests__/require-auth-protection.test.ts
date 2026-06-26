@@ -28,8 +28,9 @@ const ruleTester = new RuleTester({
 });
 
 const config = {
-  protected: ['app/**'],
+  protected: ['**'],
   public: ['app/(routes)/(unauthenticated)/**'],
+  rootDir: projectRoot,
 };
 
 // suggestions.test.ts already tests the suggestions, so we override with
@@ -353,6 +354,59 @@ ruleTester.run('require-auth-protection', rule, {
         export default async function Page() {
           const { userId, sessionId, isAuthenticated } = await auth();
           if (!isAuthenticated) return null;
+          return <div />;
+        }
+      `,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+    },
+    {
+      name: 'manual check: !isAuthenticated || otherCondition with return',
+      code: `
+        import { auth } from '@clerk/nextjs/server';
+        export default async function Page() {
+          const { isAuthenticated } = await auth();
+          if (!isAuthenticated || someFlag) return null;
+          return <div />;
+        }
+      `,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+    },
+    {
+      name: 'manual check: otherCondition || !isAuthenticated with return',
+      code: `
+        import { auth } from '@clerk/nextjs/server';
+        export default async function Page() {
+          const { isAuthenticated } = await auth();
+          if (someFlag || !isAuthenticated) return null;
+          return <div />;
+        }
+      `,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+    },
+    {
+      name: 'manual check: userId === null || otherCondition with redirect',
+      code: `
+        import { auth } from '@clerk/nextjs/server';
+        import { redirect } from 'next/navigation';
+        export default async function Page() {
+          const { userId } = await auth();
+          if (userId === null || someFlag) redirect('/sign-in');
+          return <div />;
+        }
+      `,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+    },
+    {
+      name: 'manual check: !isAuthenticated || a || b with return',
+      code: `
+        import { auth } from '@clerk/nextjs/server';
+        export default async function Page() {
+          const { isAuthenticated } = await auth();
+          if (!isAuthenticated || a || b) return null;
           return <div />;
         }
       `,
@@ -870,8 +924,50 @@ ruleTester.run('require-auth-protection', rule, {
         {
           protected: ['app/**'],
           public: [],
+          rootDir: projectRoot,
         },
       ],
+    },
+    {
+      name: 'src/app project uses project-relative globs',
+      code: `
+        import { auth } from '@clerk/nextjs/server';
+        export default async function Page() {
+          await auth.protect();
+          return <div>Hello</div>;
+        }
+      `,
+      filename: abs('src/app/dashboard/page.tsx'),
+      options: [
+        {
+          protected: ['src/app/**'],
+          public: [],
+          rootDir: projectRoot,
+        },
+      ],
+    },
+    {
+      name: 'page.tsx outside App Router is ignored even with protected: ["**"]',
+      code: `
+        export default function Page() {
+          return null;
+        }
+      `,
+      filename: abs('utils/page.tsx'),
+      options: [config],
+    },
+    {
+      name: 'Server Function outside App Router is checked with protected: ["**"]',
+      code: `
+        'use server';
+        import { auth } from '@clerk/nextjs/server';
+        export async function deleteUser(id) {
+          await auth.protect();
+          return id;
+        }
+      `,
+      filename: abs('shared/actions.ts'),
+      options: [config],
     },
     {
       name: 'intercepting route in public folder, no protect call (classified by source folder)',
@@ -1582,6 +1678,34 @@ ruleTester.run('require-auth-protection', rule, {
       errors: [missingProtectError()],
     },
     {
+      name: 'manual check: !isAuthenticated && otherCondition is NOT accepted',
+      code: `
+        import { auth } from '@clerk/nextjs/server';
+        export default async function Page() {
+          const { isAuthenticated } = await auth();
+          if (!isAuthenticated && someFlag) return null;
+          return <div />;
+        }
+      `,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+      errors: [missingProtectError()],
+    },
+    {
+      name: 'manual check: (!isAuthenticated && x) || y is NOT accepted',
+      code: `
+        import { auth } from '@clerk/nextjs/server';
+        export default async function Page() {
+          const { isAuthenticated } = await auth();
+          if ((!isAuthenticated && x) || y) return null;
+          return <div />;
+        }
+      `,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+      errors: [missingProtectError()],
+    },
+    {
       name: 'manual check: orgId === null is NOT accepted (orgId can be null while signed in)',
       code: `
         import { auth } from '@clerk/nextjs/server';
@@ -1736,9 +1860,22 @@ ruleTester.run('require-auth-protection', rule, {
         {
           protected: ['app/**'],
           public: [],
+          rootDir: projectRoot,
         },
       ],
       errors: [missingProtectError()],
+    },
+    {
+      name: 'unprotected Server Function outside App Router is flagged with protected: ["**"]',
+      code: `
+        'use server';
+        export async function deleteUser(id) {
+          return id;
+        }
+      `,
+      filename: abs('shared/actions.ts'),
+      options: [config],
+      errors: [missingProtectError({ subject: "Server Function 'deleteUser'" })],
     },
   ],
 });
@@ -1761,6 +1898,19 @@ describe('require-auth-protection schema validation', () => {
       },
     });
   };
+  const lintWithCustomRuleId = (options: RuleOptions | Record<string, unknown>) => {
+    const linter = new Linter();
+    return linter.verify('export default function X() {}', {
+      plugins: {
+        clerk: {
+          rules: { 'require-auth-protection': rule },
+        },
+      },
+      rules: {
+        'clerk/require-auth-protection': ['warn', options],
+      },
+    });
+  };
 
   it('rejects configs missing `protected`', () => {
     expect(() => lintWithOptions({ public: ['app/(unauthenticated)/**'] })).toThrow(/protected/);
@@ -1772,6 +1922,67 @@ describe('require-auth-protection schema validation', () => {
 
   it('accepts configs with `protected` set and other options omitted', () => {
     expect(() => lintWithOptions({ protected: ['app/**'] })).not.toThrow();
+  });
+
+  it('rejects protected patterns with `..` segments', () => {
+    expect(() => lintWithOptions({ protected: ['../app/**'] })).toThrow(/protected.*cannot contain `\.\.` segments/s);
+    expect(() => lintWithOptions({ protected: ['app/../admin/**'] })).toThrow(
+      /protected.*cannot contain `\.\.` segments/s,
+    );
+  });
+
+  it('uses the configured rule id in path pattern validation errors', () => {
+    expect(() => lintWithCustomRuleId({ protected: ['../app/**'] })).toThrow(
+      /clerk\/require-auth-protection: `protected` patterns/,
+    );
+  });
+
+  it('rejects public patterns with `..` segments', () => {
+    expect(() => lintWithOptions({ protected: ['**'], public: ['../public/**'] })).toThrow(
+      /public.*cannot contain `\.\.` segments/s,
+    );
+  });
+
+  it('rejects path patterns with absolute paths', () => {
+    expect(() => lintWithOptions({ protected: ['/app/**'] })).toThrow(
+      /protected.*relative to `rootDir`, not absolute/s,
+    );
+    expect(() => lintWithOptions({ protected: ['C:/app/**'] })).toThrow(
+      /protected.*relative to `rootDir`, not absolute/s,
+    );
+  });
+
+  it('rejects path patterns with backslashes', () => {
+    expect(() => lintWithOptions({ protected: ['src\\app\\**'] })).toThrow(/protected.*must use `\/` path separators/s);
+  });
+
+  it('rejects path patterns with empty segments', () => {
+    expect(() => lintWithOptions({ protected: [''] })).toThrow(/protected.*cannot be empty/s);
+    expect(() => lintWithOptions({ protected: ['app//admin/**'] })).toThrow(/protected.*empty path segments/s);
+    expect(() => lintWithOptions({ protected: ['app/**/'] })).toThrow(/protected.*empty path segments/s);
+  });
+
+  it('rejects path patterns with `.` segments', () => {
+    expect(() => lintWithOptions({ protected: ['./app/**'] })).toThrow(/protected.*cannot contain `\.` segments/s);
+    expect(() => lintWithOptions({ protected: ['app/./admin/**'] })).toThrow(
+      /protected.*cannot contain `\.` segments/s,
+    );
+  });
+
+  it('rejects path patterns with brace expansion', () => {
+    expect(() => lintWithOptions({ protected: ['src/app/**/*.{ts,tsx}'] })).toThrow(
+      /protected.*cannot use brace expansion/s,
+    );
+  });
+
+  it('validates array-form mixedScopeLayouts as path patterns', () => {
+    expect(() => lintWithOptions({ protected: ['**'], mixedScopeLayouts: ['src\\app'] })).toThrow(
+      /mixedScopeLayouts.*must use `\/` path separators/s,
+    );
+  });
+
+  it('allows pattern segments that only start with dots', () => {
+    expect(() => lintWithOptions({ protected: ['.well-known/**', '..foo/**'] })).not.toThrow();
   });
 
   it('accepts optional resource configuration', () => {
