@@ -8,6 +8,7 @@ import type {
   StartGoogleAuthenticationFlowParams,
   StartGoogleAuthenticationFlowReturnType,
 } from './useSignInWithGoogle.types';
+import { eventMethodCalled } from '@clerk/shared/telemetry';
 
 export type GoogleClientIds = {
   webClientId: string;
@@ -75,6 +76,8 @@ export function createUseSignInWithGoogle(platformConfig: PlatformConfig) {
     warnAboutGoogleSignInPackageMigration();
 
     const clerk = useClerk();
+
+    clerk.telemetry?.record(eventMethodCalled('useSignInWithGoogle'));
 
     async function startGoogleAuthenticationFlow(
       startGoogleAuthenticationFlowParams?: StartGoogleAuthenticationFlowParams,
