@@ -4,7 +4,10 @@ import { defineConfig } from 'tsdown';
 import { runAfterLast } from '../../scripts/utils.ts';
 import clerkJsPkgJson from '../clerk-js/package.json' with { type: 'json' };
 import pkgJson from './package.json' with { type: 'json' };
-import { preservePlatformSpecifiers } from './scripts/preservePlatformSpecifiers.mts';
+
+function preserveRelativeImports(id: string) {
+  return id.startsWith('.');
+}
 
 export default defineConfig(overrideOptions => {
   const isWatch = !!overrideOptions.watch;
@@ -19,13 +22,16 @@ export default defineConfig(overrideOptions => {
     clean: true,
     minify: false,
     sourcemap: true,
+    deps: {
+      // Keep relative import specifiers unchanged so Metro can apply platform-specific resolution.
+      neverBundle: preserveRelativeImports,
+    },
     define: {
       PACKAGE_NAME: `"${pkgJson.name}"`,
       PACKAGE_VERSION: `"${pkgJson.version}"`,
       JS_PACKAGE_VERSION: `"${clerkJsPkgJson.version}"`,
       __DEV__: `${isWatch}`,
     },
-    plugins: [preservePlatformSpecifiers()],
   };
 
   return runAfterLast(['pnpm build:declarations', shouldPublish && 'pkglab pub --ping'])(options);

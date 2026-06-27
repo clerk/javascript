@@ -93,7 +93,7 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     await u.po.userButton.toHaveVisibleMenuItems([/Custom link/i, /Custom action/i, /Custom click/i]);
 
     // Click custom action and check for custom page availbility
-    await u.page.getByRole('menuitem', { name: /Custom action/i }).click();
+    await u.page.getByRole('button', { name: /Custom action/i }).click();
     await u.po.userProfile.waitForUserProfileModal();
     await expect(u.page.getByRole('heading', { name: 'Custom Terms Page' })).toBeVisible();
 
@@ -114,7 +114,7 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
         );
       });
     });
-    await u.page.getByRole('menuitem', { name: /Custom click/i }).click();
+    await u.page.getByRole('button', { name: /Custom click/i }).click();
     expect(await eventPromise).toBe('custom_click');
 
     // Trigger the popover again
@@ -122,7 +122,7 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     await u.po.userButton.waitForPopover();
 
     // Click custom link and check navigation
-    await u.page.getByRole('menuitem', { name: /Custom link/i }).click();
+    await u.page.getByRole('button', { name: /Custom link/i }).click();
     await u.page.waitForAppUrl('/user');
   });
 
@@ -139,7 +139,7 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     await u.po.userButton.waitForPopover();
 
     // First item should now be the sign out button
-    await u.page.getByRole('menuitem').first().click();
+    await u.page.getByRole('button').first().click();
     await u.po.expect.toBeSignedOut();
   });
 

@@ -353,6 +353,7 @@ jobs:
             "custom",
             "hono",
             "chrome-extension",
+            "electron",
           ]
         test-project: ["chrome"]
         include:
@@ -492,10 +493,23 @@ jobs:
         working-directory: ./integration/certs
         run: ls -la && pwd
 
+      - name: Ensure Xvfb is installed
+        if: ${{ matrix.test-name == 'electron' }}
+        run: |
+          if ! command -v xvfb-run &> /dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y xvfb
+          fi
+
       - name: Run Integration Tests
         id: integration-tests
         timeout-minutes: 25
-        run: pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
+        run: |
+          if [ "${{ matrix.test-name }}" = "electron" ]; then
+            xvfb-run -a pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
+          else
+            pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
+          fi
         env:
           E2E_DEBUG: "1"
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
@@ -504,7 +518,6 @@ jobs:
           E2E_CLERK_UI_VERSION: "latest"
           E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
           E2E_PROJECT: ${{ matrix.test-project }}
-          E2E_CLERK_ENCRYPTION_KEY: ${{ matrix.clerk-encryption-key }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           NODE_EXTRA_CA_CERTS: ${{ github.workspace }}/integration/certs/rootCA.pem
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}

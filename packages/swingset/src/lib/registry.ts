@@ -2,6 +2,11 @@
 import { meta as accordionMeta } from '../stories/accordion.stories';
 import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
 import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
+import {
+  Centered as CardCentered,
+  Default as CardDefault,
+  meta as cardComponentMeta,
+} from '../stories/card.component.stories';
 import { meta as collapsibleMeta } from '../stories/collapsible.stories';
 import {
   Default as DeleteOrganizationDefault,
@@ -10,6 +15,19 @@ import {
 import { Default as DestructiveDefault, meta as destructiveMeta } from '../stories/destructive.stories';
 import { Default as DialogDefault, meta as dialogComponentMeta } from '../stories/dialog.component.stories';
 import { meta as dialogMeta } from '../stories/dialog.stories';
+import {
+  Default as HeadingDefault,
+  Intents as HeadingIntents,
+  meta as headingMeta,
+  Sizes as HeadingSizes,
+} from '../stories/heading.stories';
+import {
+  Default as IconDefault,
+  meta as iconMeta,
+  Names as IconNames,
+  Override as IconOverride,
+  Sizes as IconSizes,
+} from '../stories/icon.stories';
 import {
   Default,
   Disabled as InputDisabled,
@@ -34,7 +52,14 @@ import { meta as popoverMeta } from '../stories/popover.stories';
 import { meta as selectMeta } from '../stories/select.stories';
 import { Default as TabsComponentDefault, meta as tabsComponentMeta } from '../stories/tabs.component.stories';
 import { meta as tabsMeta } from '../stories/tabs.stories';
+import {
+  Default as TextDefault,
+  Intents as TextIntents,
+  meta as textMeta,
+  Sizes as TextSizes,
+} from '../stories/text.stories';
 import { meta as tooltipMeta } from '../stories/tooltip.stories';
+import { meta as useDataTableMeta } from '../stories/use-data-table.stories';
 import { toSlug } from './slug';
 import type { StoryModule } from './types';
 
@@ -47,13 +72,32 @@ const organizationProfileGeneralModule: StoryModule = {
   Default: OrganizationProfileGeneralDefault,
 };
 
+const cardComponentModule: StoryModule = { meta: cardComponentMeta, Default: CardDefault, Centered: CardCentered };
+
 const buttonModule: StoryModule = { meta: buttonMeta, Primary, Sizes, Disabled };
 
 const inputModule: StoryModule = { meta: inputMeta, Default, Sizes: InputSizes, Disabled: InputDisabled, Invalid };
 
 const dialogComponentModule: StoryModule = { meta: dialogComponentMeta, Default: DialogDefault };
 
+const headingModule: StoryModule = {
+  meta: headingMeta,
+  Default: HeadingDefault,
+  Sizes: HeadingSizes,
+  Intents: HeadingIntents,
+};
+
 const tabsComponentModule: StoryModule = { meta: tabsComponentMeta, Default: TabsComponentDefault };
+
+const textModule: StoryModule = { meta: textMeta, Default: TextDefault, Sizes: TextSizes, Intents: TextIntents };
+
+const iconModule: StoryModule = {
+  meta: iconMeta,
+  Default: IconDefault,
+  Sizes: IconSizes,
+  Names: IconNames,
+  Override: IconOverride,
+};
 
 // Headless primitives carry just `meta` (no story functions). Like every component
 // they're documented as a single overview page; their live demos come from `<Story>` /
@@ -68,6 +112,8 @@ const selectModule: StoryModule = { meta: selectMeta };
 const tabsModule: StoryModule = { meta: tabsMeta };
 const tooltipModule: StoryModule = { meta: tooltipMeta };
 
+const useDataTableModule: StoryModule = { meta: useDataTableMeta };
+
 export const registry: StoryModule[] = [
   // AIO
   organizationProfileModule,
@@ -80,9 +126,13 @@ export const registry: StoryModule[] = [
   destructiveModule,
   // Components
   buttonModule,
+  cardComponentModule,
   inputModule,
   dialogComponentModule,
+  headingModule,
+  iconModule,
   tabsComponentModule,
+  textModule,
   // Primitives — alphabetical within the group.
   accordionModule,
   autocompleteModule,
@@ -93,6 +143,8 @@ export const registry: StoryModule[] = [
   selectModule,
   tabsModule,
   tooltipModule,
+  // Hooks — alphabetical within the group.
+  useDataTableModule,
 ];
 
 /**

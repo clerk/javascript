@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import type { HTMLAttributes } from 'react';
+import { useControllableState } from '@clerk/headless/hooks';
+import React, { useEffect } from 'react';
 
 import { Box } from '../components/box';
 import { Button } from '../components/button';
 import { Dialog } from '../components/dialog';
+import { Heading } from '../components/heading';
 import { Input } from '../components/input';
+import { Text } from '../components/text';
 
 interface DestructiveProps {
-  trigger: (props: Omit<HTMLAttributes<HTMLElement>, 'color'>) => React.ReactNode;
+  trigger: React.ComponentProps<typeof Dialog>['trigger'];
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
@@ -16,6 +18,10 @@ interface DestructiveProps {
   resourceName: string;
   onDelete: () => void | Promise<void>;
   isDeleting: boolean;
+  canSubmit: boolean;
+  error?: string | null;
+  confirmationValue?: string;
+  onConfirmationValueChange?: (value: string) => void;
 }
 
 export function Destructive({
@@ -28,76 +34,91 @@ export function Destructive({
   resourceName,
   onDelete,
   isDeleting,
+  canSubmit,
+  error,
+  confirmationValue,
+  onConfirmationValueChange,
 }: DestructiveProps) {
-  const [confirmValue, setConfirmValue] = useState('');
-  const canSubmit = confirmValue === resourceName && !isDeleting;
+  const [confirmValue, setConfirmValue] = useControllableState(confirmationValue, '', onConfirmationValueChange);
 
   useEffect(() => {
-    if (!open) setConfirmValue('');
-  }, [open]);
+    if (!open) {
+      setConfirmValue('');
+    }
+  }, [open, setConfirmValue]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (canSubmit) onDelete();
+    if (canSubmit) {
+      onDelete();
+    }
   };
 
   return (
-    <Dialog.Root
+    <Dialog
       open={open}
       onOpenChange={onOpenChange}
+      trigger={trigger}
     >
-      <Dialog.Trigger render={trigger} />
-      <Dialog.Portal>
-        <Dialog.Backdrop />
-        <Dialog.Viewport>
-          <Dialog.Popup>
-            <Dialog.Title>{title}</Dialog.Title>
-            <Dialog.Description>{description}</Dialog.Description>
+      {({ close }) => (
+        <>
+          <Dialog.Title render={p => <Heading {...p} />}>{title}</Dialog.Title>
+          <Dialog.Description render={p => <Text {...p} />}>{description}</Dialog.Description>
+          {error && (
             <Box
-              render={p => (
-                <form
-                  {...p}
-                  onSubmit={handleSubmit}
-                />
-              )}
+              role='alert'
+              render={p => <p {...p} />}
               sx={t => ({
-                marginBlockStart: t.spacing(3),
+                ...t.text('sm'),
+                color: t.color.destructive,
+                marginBlockStart: t.spacing(2),
               })}
             >
-              <Box
-                render={p => <label {...p} />}
-                sx={t => ({
-                  ...t.text('sm'),
-                  fontWeight: t.font.medium,
-                })}
-              >
-                Type &quot;{resourceName}&quot; below to continue.
-                <Input
-                  value={confirmValue}
-                  onChange={e => setConfirmValue(e.target.value)}
-                  disabled={isDeleting}
-                  sx={t => ({
-                    marginBlockStart: t.spacing(1),
-                  })}
-                />
-              </Box>
-              <Box
-                sx={t => ({
-                  marginBlockStart: t.spacing(4),
-                })}
-              >
-                <Button
-                  type='submit'
-                  color='destructive'
-                  disabled={!canSubmit}
-                >
-                  {primaryActionLabel}
-                </Button>
-              </Box>
+              {error}
             </Box>
-          </Dialog.Popup>
-        </Dialog.Viewport>
-      </Dialog.Portal>
-    </Dialog.Root>
+          )}
+          <form onSubmit={handleSubmit}>
+            <Box
+              render={p => <label {...p} />}
+              sx={t => ({
+                ...t.text('sm'),
+                fontWeight: t.font.medium,
+              })}
+            >
+              Type &quot;{resourceName}&quot; below to continue.
+              <Input
+                value={confirmValue}
+                onChange={e => setConfirmValue(e.target.value)}
+                disabled={isDeleting}
+                sx={t => ({
+                  marginBlockStart: t.spacing(1),
+                })}
+              />
+            </Box>
+            <Box
+              sx={t => ({
+                marginBlockStart: t.spacing(4),
+                display: 'flex',
+                columnGap: t.spacing(2),
+              })}
+            >
+              <Button
+                onClick={close}
+                variant='outline'
+              >
+                Cancel
+              </Button>
+              <Button
+                type='submit'
+                intent='destructive'
+                disabled={!canSubmit}
+              >
+                {primaryActionLabel}
+              </Button>
+            </Box>
+          </form>
+        </>
+      )}
+    </Dialog>
   );
 }

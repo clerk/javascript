@@ -1,12 +1,11 @@
 import { useOrganization } from '@clerk/shared/react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 import { Header } from '@/ui/elements/Header';
 import { ProfileCard } from '@/ui/elements/ProfileCard';
 
-import { Col, descriptors, localizationKeys } from '../../customizables';
-import { ConfigureSSOProtect } from '../ConfigureSSO/ConfigureSSO';
-import { ConfigureSSOSkeleton } from '../ConfigureSSO/ConfigureSSOSkeleton';
+import { Col, descriptors, Flex, Icon, localizationKeys, SimpleButton, Spinner, Text } from '../../customizables';
+import { ChevronLeft } from '../../icons';
 import { ConfigureSSOWizard } from '../ConfigureSSO/ConfigureSSOWizard';
 import { useOrganizationEnterpriseConnection } from '../ConfigureSSO/hooks/useOrganizationEnterpriseConnection';
 import { SecuritySsoSection } from './SecuritySsoSection';
@@ -26,66 +25,135 @@ export const OrganizationSecurityPage = ({ contentRef }: OrganizationSecurityPag
   return <OrganizationSecurityPageContent contentRef={contentRef} />;
 };
 
-/** Separate from the page so the connection hook only runs behind the organization check. */
 const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPageProps) => {
   const {
-    isLoading,
     organization,
+    isLoading,
     enterpriseConnection,
     organizationEnterpriseConnection,
     testRuns,
-    mutations,
-    primaryEmailAddress,
+    enterpriseConnectionMutations,
+    organizationDomains,
+    organizationDomainMutations,
   } = useOrganizationEnterpriseConnection();
 
   const [view, setView] = useState<'overview' | 'wizard'>('overview');
+  const [forceFirstStep, setForceFirstStep] = useState(false);
 
-  // Gate loading above the provider so the context never observes a loading state.
-  if (isLoading) {
-    return <ConfigureSSOSkeleton />;
+  const exitWizard = () => setView('overview');
+
+  const openWizard = (forceInitialStep = false) => {
+    setForceFirstStep(forceInitialStep);
+    setView('wizard');
+  };
+
+  // Gate the page-level loading overview to the overview view only. A wizard is
+  // only ever opened after the overview has settled (it gates on `isLoading`),
+  // so once `view === 'wizard'` the connection data is present and stays warm; a
+  // later `isLoading` flip (e.g. the test-runs query cold-loading after a
+  // configure write) must not tear the open wizard down and reseat it — each
+  // wizard step owns its own loading UI.
+  if (isLoading && view === 'overview') {
+    return (
+      <SecurityPageOverview fillHeight>
+        <Flex
+          align='center'
+          justify='center'
+          sx={t => ({ flex: 1, paddingBlock: t.space.$5 })}
+        >
+          <Spinner
+            size='xs'
+            colorScheme='neutral'
+            elementDescriptor={descriptors.spinner}
+          />
+        </Flex>
+      </SecurityPageOverview>
+    );
   }
 
-  return (
-    <ConfigureSSOProtect>
-      {view === 'overview' ? (
-        <ProfileCard.Page>
-          <Col
-            elementDescriptor={descriptors.page}
-            sx={t => ({ gap: t.space.$8 })}
-          >
-            <Col
-              elementDescriptor={descriptors.profilePage}
-              elementId={descriptors.profilePage.setId('organizationSecurity')}
-            >
-              <Header.Root>
-                <Header.Title
-                  localizationKey={localizationKeys('organizationProfile.securityPage.title')}
-                  sx={t => ({ marginBottom: t.space.$4 })}
-                  textVariant='h2'
-                />
-              </Header.Root>
-              <SecuritySsoSection
-                connection={organizationEnterpriseConnection}
-                enterpriseConnection={enterpriseConnection}
-                setConnectionActive={mutations.setConnectionActive}
-                deleteConnection={mutations.deleteConnection}
-                organizationName={organization?.name ?? ''}
-                contentRef={contentRef}
-                onConfigure={() => setView('wizard')}
-              />
-            </Col>
-          </Col>
-        </ProfileCard.Page>
-      ) : (
-        <ConfigureSSOWizard
-          organizationEnterpriseConnection={organizationEnterpriseConnection}
-          testRuns={testRuns}
-          enterpriseConnection={enterpriseConnection}
-          contentRef={contentRef}
-          mutations={mutations}
-          primaryEmailAddress={primaryEmailAddress}
-        />
-      )}
-    </ConfigureSSOProtect>
+  const backControl = (
+    <SimpleButton
+      elementDescriptor={descriptors.configureSSOHeaderBackButton}
+      variant='unstyled'
+      onClick={exitWizard}
+      sx={t => ({
+        gap: t.space.$1,
+        padding: 0,
+        color: t.colors.$colorMutedForeground,
+        '&:hover': { color: t.colors.$colorForeground },
+      })}
+    >
+      <Icon icon={ChevronLeft} />
+      <Text
+        as='span'
+        variant='body'
+        localizationKey={localizationKeys('organizationProfile.navbar.security')}
+      />
+    </SimpleButton>
+  );
+
+  return view === 'overview' ? (
+    <SecurityPageOverview>
+      <SecuritySsoSection
+        connection={organizationEnterpriseConnection}
+        enterpriseConnection={enterpriseConnection}
+        setConnectionActive={enterpriseConnectionMutations.setConnectionActive}
+        deleteConnection={enterpriseConnectionMutations.deleteConnection}
+        organizationName={organization?.name ?? ''}
+        contentRef={contentRef}
+        onConfigure={openWizard}
+      />
+    </SecurityPageOverview>
+  ) : (
+    <ConfigureSSOWizard
+      organizationEnterpriseConnection={organizationEnterpriseConnection}
+      testRuns={testRuns}
+      enterpriseConnection={enterpriseConnection}
+      contentRef={contentRef}
+      enterpriseConnectionMutations={enterpriseConnectionMutations}
+      organizationDomainMutations={organizationDomainMutations}
+      organizationDomains={organizationDomains}
+      forceInitialStep={forceFirstStep}
+      title={backControl}
+      onExit={exitWizard}
+    />
   );
 };
+
+/**
+ * The overview's stable page chrome — the security `ProfileCard.Page` and its
+ * "Security" header. Both the settled overview and the on-mount loading state
+ * render through this, so the section body is the only thing that swaps in.
+ *
+ * `fillHeight` grows the page to the scroll box so the loading state's spinner
+ * can center in the remaining height beneath the header.
+ */
+const SecurityPageOverview = ({
+  children,
+  fillHeight = false,
+}: {
+  children: React.ReactNode;
+  fillHeight?: boolean;
+}): JSX.Element => (
+  <ProfileCard.Page sx={fillHeight ? { flex: 1 } : undefined}>
+    <Col
+      elementDescriptor={descriptors.page}
+      sx={t => ({ gap: t.space.$8, ...(fillHeight && { flex: 1 }) })}
+    >
+      <Col
+        elementDescriptor={descriptors.profilePage}
+        elementId={descriptors.profilePage.setId('organizationSecurity')}
+        sx={fillHeight ? { flex: 1 } : undefined}
+      >
+        <Header.Root>
+          <Header.Title
+            localizationKey={localizationKeys('organizationProfile.securityPage.title')}
+            sx={t => ({ marginBottom: t.space.$4 })}
+            textVariant='h2'
+          />
+        </Header.Root>
+        {children}
+      </Col>
+    </Col>
+  </ProfileCard.Page>
+);

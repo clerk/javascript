@@ -31,7 +31,7 @@ export const PaymentAttemptPage = () => {
   const { params, navigate } = useRouter();
   const subscriberType = useSubscriberTypeContext();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
-  const { t, translateError } = useLocalizations();
+  const { t, translateError, $ } = useLocalizations();
   const requesterType = subscriberType === 'organization' ? 'organization' : 'user';
 
   const {
@@ -189,8 +189,7 @@ export const PaymentAttemptPage = () => {
                 variant='h3'
                 elementDescriptor={descriptors.paymentAttemptFooterValue}
               >
-                {paymentAttempt.amount.currencySymbol}
-                {paymentAttempt.amount.amountFormatted}
+                {$(paymentAttempt.amount)}
               </Text>
             </Span>
           </Box>
@@ -201,6 +200,8 @@ export const PaymentAttemptPage = () => {
 };
 
 function PaymentAttemptBody({ paymentAttempt }: { paymentAttempt: BillingPaymentResource | undefined }) {
+  const { $ } = useLocalizations();
+
   if (!paymentAttempt) {
     return null;
   }
@@ -231,7 +232,7 @@ function PaymentAttemptBody({ paymentAttempt }: { paymentAttempt: BillingPayment
           <LineItems.Title title={subscriptionItem.plan.name} />
           <LineItems.Description
             prefix={subscriptionItem.planPeriod === 'annual' ? 'x12' : undefined}
-            text={`${fee.currencySymbol}${fee.amountFormatted}`}
+            text={$(fee)}
           />
         </LineItems.Group>
         {seatSummary && (
@@ -243,7 +244,7 @@ function PaymentAttemptBody({ paymentAttempt }: { paymentAttempt: BillingPayment
                   : localizationKeys('billing.seats')
               }
               description={(() => {
-                const rate = `${seatSummary.paidTier.feePerBlock.currencySymbol}${seatSummary.paidTier.feePerBlock.amountFormatted}`;
+                const rate = $(seatSummary.paidTier.feePerBlock);
                 const isSingular = seatsChargeable === 1;
                 if (seatSummary.included > 0) {
                   return isSingular
@@ -266,7 +267,7 @@ function PaymentAttemptBody({ paymentAttempt }: { paymentAttempt: BillingPayment
             />
             <LineItems.Description
               prefix={subscriptionItem.planPeriod === 'annual' ? 'x12' : undefined}
-              text={`${seatSummary.paidTier.total.currencySymbol}${seatSummary.paidTier.total.amountFormatted}`}
+              text={$(seatSummary.paidTier.total)}
             />
           </LineItems.Group>
         )}
@@ -275,16 +276,12 @@ function PaymentAttemptBody({ paymentAttempt }: { paymentAttempt: BillingPayment
           variant='tertiary'
         >
           <LineItems.Title title={localizationKeys('billing.subtotal')} />
-          <LineItems.Description
-            text={`${paymentAttempt.totals?.subtotal.currencySymbol}${paymentAttempt.totals?.subtotal.amountFormatted}`}
-          />
+          <LineItems.Description text={paymentAttempt.totals?.subtotal ? $(paymentAttempt.totals.subtotal) : ''} />
         </LineItems.Group>
         {paymentAttempt.totals?.discounts?.proration && paymentAttempt.totals.discounts.proration.amount.amount > 0 && (
           <LineItems.Group variant='tertiary'>
             <LineItems.Title title={localizationKeys('billing.proratedDiscount')} />
-            <LineItems.Description
-              text={`- ${paymentAttempt.totals.discounts.proration.amount.currencySymbol}${paymentAttempt.totals.discounts.proration.amount.amountFormatted}`}
-            />
+            <LineItems.Description text={`- ${$(paymentAttempt.totals.discounts.proration.amount)}`} />
           </LineItems.Group>
         )}
         {subscriptionItem.credits &&
@@ -292,9 +289,7 @@ function PaymentAttemptBody({ paymentAttempt }: { paymentAttempt: BillingPayment
           subscriptionItem.credits.proration.amount.amount > 0 && (
             <LineItems.Group variant='tertiary'>
               <LineItems.Title title={localizationKeys('billing.prorationCredit')} />
-              <LineItems.Description
-                text={`- ${subscriptionItem.credits.proration.amount.currencySymbol}${subscriptionItem.credits.proration.amount.amountFormatted}`}
-              />
+              <LineItems.Description text={`- ${$(subscriptionItem.credits.proration.amount)}`} />
             </LineItems.Group>
           )}
         {subscriptionItem.credits &&
@@ -302,9 +297,7 @@ function PaymentAttemptBody({ paymentAttempt }: { paymentAttempt: BillingPayment
           subscriptionItem.credits.payer.appliedAmount.amount > 0 && (
             <LineItems.Group variant='tertiary'>
               <LineItems.Title title={localizationKeys('billing.accountCredit')} />
-              <LineItems.Description
-                text={`- ${subscriptionItem.credits.payer.appliedAmount.currencySymbol}${subscriptionItem.credits.payer.appliedAmount.amountFormatted}`}
-              />
+              <LineItems.Description text={`- ${$(subscriptionItem.credits.payer.appliedAmount)}`} />
             </LineItems.Group>
           )}
       </LineItems.Root>

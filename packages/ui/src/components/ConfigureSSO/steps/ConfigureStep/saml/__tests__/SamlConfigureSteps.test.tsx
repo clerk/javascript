@@ -14,7 +14,7 @@ vi.mock('../../../../ConfigureSSOContext', () => ({
     enterpriseConnection: undefined,
     organizationEnterpriseConnection: { hasConnection: false },
     provider: 'saml_google',
-    mutations: {},
+    enterpriseConnectionMutations: {},
   }),
 }));
 
@@ -41,8 +41,6 @@ describe('SAML provider sub-flow — synchronous step derivation', () => {
     // the first derived step rather than a null first frame. Asserting on the
     // step-body instruction heading proves the body (not just the shared header)
     // is mounted.
-    expect(
-      await screen.findByRole('heading', { name: /create a new enterprise application in google workspace/i }),
-    ).toBeInTheDocument();
+    expect(await screen.findByText(/in google workspace, create a new saml application/i)).toBeInTheDocument();
   });
 });

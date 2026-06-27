@@ -8,7 +8,6 @@ import { getSeatLimitAndIncludedSeatsLocalizationKey } from '@/ui/utils/billingP
 import { isManageableSubscriptionItem } from '@/ui/utils/billingSubscription';
 
 import {
-  normalizeFormatted,
   useEnvironment,
   usePlansContext,
   useSubscriberTypeContext,
@@ -192,6 +191,8 @@ function SubscriptionOverviewRow({
   nextPayment: NonNullable<BillingSubscriptionResource['nextPayment']>;
   localizationRoot: ReturnType<typeof useSubscriberTypeLocalizationRoot>;
 }) {
+  const { $ } = useLocalizations();
+
   if (!nextPayment.totals) {
     return null;
   }
@@ -219,8 +220,7 @@ function SubscriptionOverviewRow({
               color: t.colors.$colorForeground,
             })}
           >
-            {nextPayment.totals.grandTotal.currencySymbol}
-            {nextPayment.totals.grandTotal.amountFormatted}
+            {$(nextPayment.totals.grandTotal)}
           </Text>
           <Text
             variant='subtitle'
@@ -245,11 +245,7 @@ function SubscriptionItemRow({
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const fee = subscriptionItem.planPeriod === 'annual' ? subscriptionItem.plan.annualFee! : subscriptionItem.plan.fee!;
   const { captionForSubscription } = usePlansContext();
-  const { t } = useLocalizations();
-
-  const feeFormatted = useMemo(() => {
-    return normalizeFormatted(fee.amountFormatted);
-  }, [fee.amountFormatted]);
+  const { t, $ } = useLocalizations();
 
   const subItemSeatsQty = subscriptionItem.seats?.quantity;
   const seatsTotalTier = subscriptionItem.seats?.tiers?.find(t => t.total.amount > 0);
@@ -313,8 +309,7 @@ function SubscriptionItemRow({
           })}
         >
           <Text variant='subtitle'>
-            {fee.currencySymbol}
-            {feeFormatted}
+            {$(fee, { style: 'short' })}
             {fee.amount > 0 && (
               <Span
                 sx={t => ({
@@ -390,7 +385,7 @@ function SubscriptionItemRow({
                   {t(
                     localizationKeys('organizationProfile.billingPage.subscriptionsListSection.paidSeatsUsage', {
                       seatsQuantity: seatsTotalTier.quantity,
-                      amount: `${seatsTotalTier.feePerBlock.currencySymbol}${seatsTotalTier.feePerBlock.amountFormatted} / ${monthLabel}`,
+                      amount: `${$(seatsTotalTier.feePerBlock)} / ${monthLabel}`,
                     }),
                   )}
                 </Text>

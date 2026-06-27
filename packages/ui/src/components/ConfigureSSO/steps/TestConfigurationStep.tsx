@@ -94,6 +94,7 @@ export const TestConfigurationStep = (): JSX.Element => {
             <Col gap={3}>
               <Text
                 as='p'
+                colorScheme='secondary'
                 localizationKey={localizationKeys('configureSSO.testConfigurationStep.subtitle')}
               />
 
@@ -696,7 +697,7 @@ const OpenTestUrlButton = ({ onTestRunCreated }: OpenTestUrlButtonProps): JSX.El
   const card = useCardState();
   const {
     enterpriseConnection,
-    mutations: { createTestRun },
+    enterpriseConnectionMutations: { createTestRun },
   } = useConfigureSSO();
 
   const [isCreatingTestRun, setIsCreatingTestRun] = useState(false);
