@@ -10,7 +10,7 @@ import { InfiniteListSpinner } from '../../common';
 import { useOrganizationSwitcherContext } from '../../contexts';
 import { Box, descriptors, localizationKeys } from '../../customizables';
 import { useInView } from '../../hooks';
-import { SwitchArrowRight } from '../../icons';
+import { ArrowRight } from '../../icons';
 import { common } from '../../styledSystem';
 import { organizationListParams } from './utils';
 
@@ -81,9 +81,8 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
         <PreviewButton
           elementDescriptor={descriptors.organizationSwitcherPreviewButton}
           elementId={descriptors.organizationSwitcherPreviewButton.setId('personal')}
-          icon={SwitchArrowRight}
+          icon={ArrowRight}
           onClick={onPersonalWorkspaceClick}
-          role='menuitem'
         >
           <PersonalWorkspacePreview
             user={userWithoutIdentifiers}
@@ -97,9 +96,8 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
           key={organization.id}
           elementDescriptor={descriptors.organizationSwitcherPreviewButton}
           elementId={descriptors.organizationSwitcherPreviewButton.setId('organization')}
-          icon={SwitchArrowRight}
+          icon={ArrowRight}
           onClick={() => onOrganizationClick(organization)}
-          role='menuitem'
           sx={t => ({
             border: `0 solid ${t.colors.$borderAlpha100}`,
           })}

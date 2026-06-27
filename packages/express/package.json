@@ -1,6 +1,6 @@
 {
   "name": "@clerk/express",
-  "version": "2.1.13",
+  "version": "2.1.32",
   "description": "Clerk server SDK for usage with Express",
   "keywords": [
     "clerk",
@@ -61,9 +61,9 @@
     "env.d.ts"
   ],
   "scripts": {
-    "build": "pnpm clean && tsup",
+    "build": "pnpm clean && tsdown",
     "clean": "rimraf ./dist",
-    "dev": "tsup --watch",
+    "dev": "tsdown --watch",
     "dev:pub": "pnpm dev -- --env.publish",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
@@ -81,7 +81,7 @@
   "devDependencies": {
     "@types/express": "^4.17.25",
     "@types/supertest": "^6.0.3",
-    "express": "^4.22.1",
+    "express": "^4.22.2",
     "supertest": "^6.3.4"
   },
   "peerDependencies": {

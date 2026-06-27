@@ -1,117 +1,135 @@
-import { useOrganization } from '@clerk/shared/react/index';
-import type { __experimental_ConfigureSSOProps } from '@clerk/shared/types';
+import { useSession } from '@clerk/shared/react';
+import type { ConfigureSSOProps } from '@clerk/shared/types';
 import React from 'react';
 
-import { useEnvironment, withCoreUserGuard } from '@/contexts';
-import { Box, Col, Flex, Flow, Icon, localizationKeys, Text, useAppearance } from '@/customizables';
-import { ApplicationLogo } from '@/elements/ApplicationLogo';
+import { useProtect } from '@/common';
+import { withCoreUserGuard } from '@/contexts';
+import { Col, Flex, Flow, Heading, Icon, localizationKeys, Text } from '@/customizables';
 import { withCardStateProvider } from '@/elements/contexts';
-import { NavBar, NavbarContextProvider } from '@/elements/Navbar';
 import { ProfileCard } from '@/elements/ProfileCard';
-import { BoxIcon } from '@/icons';
+import { ExclamationTriangle } from '@/icons';
 import { Route, Switch } from '@/router';
+
+import { ConfigureSSONavbar } from './ConfigureSSONavbar';
+import { ConfigureSSOSkeleton } from './ConfigureSSOSkeleton';
+import { ConfigureSSOWizard } from './ConfigureSSOWizard';
+import { ProfileCardFooter, ProfileCardHeader } from './elements/ProfileCard';
+import { Step } from './elements/Step';
+import { useOrganizationEnterpriseConnection } from './hooks/useOrganizationEnterpriseConnection';
 
 const ConfigureSSOInternal = () => {
   return (
     <Flow.Root flow='configureSSO'>
-      <Flow.Part>
-        <Switch>
-          <Route>
-            <AuthenticatedContent />
-          </Route>
-        </Switch>
-      </Flow.Part>
+      <Switch>
+        <Route>
+          <AuthenticatedContent />
+        </Route>
+      </Switch>
     </Flow.Root>
   );
 };
 
 const AuthenticatedContent = withCoreUserGuard(() => {
   const contentRef = React.useRef<HTMLDivElement>(null);
-  const { applicationName, logoImageUrl } = useEnvironment().displayConfig;
-  const { organizationSettings } = useEnvironment();
-  const { parsedOptions } = useAppearance();
-  const hasLogo = Boolean(parsedOptions.logoImageUrl || logoImageUrl);
 
   return (
     <ProfileCard.Root
       sx={t => ({ display: 'grid', gridTemplateColumns: '1fr 3fr', height: t.sizes.$176, overflow: 'hidden' })}
     >
-      <NavbarContextProvider contentRef={contentRef}>
-        <NavBar
-          header={
-            <Flex
-              align='center'
-              sx={t => ({
-                gap: t.space.$2,
-                padding: `${t.space.$none} ${t.space.$3}`,
-                maxWidth: '100%',
-              })}
-            >
-              {hasLogo ? (
-                <ApplicationLogo
-                  sx={t => ({ width: t.space.$9, height: t.space.$9, borderRadius: t.radii.$md, overflow: 'hidden' })}
-                />
-              ) : (
-                <Box
-                  sx={t => ({
-                    width: t.space.$9,
-                    height: t.space.$9,
-                    flexShrink: 0,
-                    borderRadius: t.radii.$md,
-                    backgroundColor: t.colors.$primary500,
-                    color: t.colors.$colorPrimaryForeground,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  })}
-                  aria-hidden
-                >
-                  <Icon
-                    icon={BoxIcon}
-                    sx={t => ({ width: t.sizes.$4, height: t.sizes.$4 })}
-                  />
-                </Box>
-              )}
-
-              <Col sx={{ minWidth: 0 }}>
-                <Text
-                  as='p'
-                  truncate
-                >
-                  {applicationName}
-                </Text>
-                {organizationSettings.enabled && <OrganizationSidebarSubtitle />}
-              </Col>
-            </Flex>
-          }
-          titleSx={t => ({ fontSize: t.fontSizes.$lg })}
-          title={localizationKeys('configureSSO.navbar.title')}
-          routes={[]}
-          contentRef={contentRef}
-        />
-        <ProfileCard.Content contentRef={contentRef} />
-      </NavbarContextProvider>
+      <ConfigureSSONavbar contentRef={contentRef}>
+        <ConfigureSSOContent contentRef={contentRef} />
+      </ConfigureSSONavbar>
     </ProfileCard.Root>
   );
 });
 
-const OrganizationSidebarSubtitle = () => {
-  const { organization } = useOrganization();
+const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObject<HTMLDivElement> }) => {
+  const {
+    isLoading,
+    enterpriseConnection,
+    organizationEnterpriseConnection,
+    testRuns,
+    enterpriseConnectionMutations,
+    organizationDomains,
+    organizationDomainMutations,
+  } = useOrganizationEnterpriseConnection();
 
-  if (!organization) {
-    return null;
+  if (isLoading) {
+    return <ConfigureSSOSkeleton />;
   }
 
   return (
-    <Text
-      as='span'
-      truncate
-      sx={t => ({ color: t.colors.$colorMutedForeground })}
-    >
-      {organization?.name}
-    </Text>
+    <ConfigureSSOProtect>
+      <ConfigureSSOWizard
+        organizationEnterpriseConnection={organizationEnterpriseConnection}
+        testRuns={testRuns}
+        enterpriseConnection={enterpriseConnection}
+        contentRef={contentRef}
+        enterpriseConnectionMutations={enterpriseConnectionMutations}
+        organizationDomainMutations={organizationDomainMutations}
+        organizationDomains={organizationDomains}
+      />
+    </ConfigureSSOProtect>
   );
 };
 
-export const ConfigureSSO: React.ComponentType<__experimental_ConfigureSSOProps> =
-  withCardStateProvider(ConfigureSSOInternal);
+/** Permission gate shared by the wizard's hosts — personal workspaces pass, since there is no membership to check. */
+export const ConfigureSSOProtect = ({ children }: { children: React.ReactNode }) => {
+  const { session } = useSession();
+  const isPersonalWorkspace = !session?.lastActiveOrganizationId;
+  const canManageEnterpriseConnections = useProtect(
+    has => isPersonalWorkspace || has({ permission: 'org:sys_entconns:manage' }),
+  );
+
+  if (!canManageEnterpriseConnections) {
+    return <MissingManageEnterpriseConnectionsPermission />;
+  }
+
+  return children;
+};
+
+const MissingManageEnterpriseConnectionsPermission = () => (
+  <>
+    <ProfileCardHeader />
+
+    <Step.Body>
+      <Step.Section
+        sx={{ flex: 1 }}
+        align='center'
+        justify='center'
+      >
+        <Flex
+          align='center'
+          justify='center'
+          sx={t => ({ flex: 1, padding: t.space.$8 })}
+        >
+          <Col
+            align='center'
+            sx={t => ({ gap: t.space.$2, textAlign: 'center', maxWidth: t.sizes.$94 })}
+          >
+            <Icon
+              icon={ExclamationTriangle}
+              sx={t => ({ width: t.sizes.$8, height: t.sizes.$8, color: t.colors.$neutralAlpha600 })}
+            />
+            <Heading
+              localizationKey={localizationKeys('configureSSO.missingManageEnterpriseConnectionsPermission.title')}
+              textVariant='h1'
+              sx={t => ({ fontSize: t.fontSizes.$lg, textWrap: 'balance' })}
+            />
+            <Text
+              as='p'
+              variant='body'
+              colorScheme='secondary'
+              localizationKey={localizationKeys('configureSSO.missingManageEnterpriseConnectionsPermission.subtitle')}
+              sx={{ textWrap: 'balance' }}
+            />
+          </Col>
+        </Flex>
+      </Step.Section>
+    </Step.Body>
+
+    <ProfileCardFooter />
+  </>
+);
+
+export const ConfigureSSO: React.ComponentType<ConfigureSSOProps> = withCardStateProvider(ConfigureSSOInternal);

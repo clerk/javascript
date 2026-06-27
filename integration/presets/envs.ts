@@ -1,5 +1,6 @@
 import { resolve } from 'node:path';
 
+import { automatedEnvironmentVariables } from '@clerk/shared/utils';
 import fs from 'fs-extra';
 
 import { constants } from '../constants';
@@ -90,6 +91,10 @@ const withKeyless = base
   // Creates keyless applications in our staging database.
   .setEnvVariable('private', 'CLERK_API_URL', 'https://api.clerkstage.dev')
   .setEnvVariable('public', 'CLERK_KEYLESS_DISABLED', false);
+
+automatedEnvironmentVariables.forEach(name => {
+  withKeyless.setEnvVariable('private', name, 'false');
+});
 
 const withEmailCodes = withInstanceKeys(
   'with-email-codes',

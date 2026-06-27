@@ -39,6 +39,7 @@ const OrganizationProfileInternal = () => {
 
 const AuthenticatedRoutes = withCoreUserGuard(() => {
   const contentRef = React.useRef<HTMLDivElement>(null);
+
   return (
     <ProfileCard.Root
       sx={t => ({ display: 'grid', gridTemplateColumns: '1fr 3fr', height: t.sizes.$176, overflow: 'hidden' })}
@@ -49,7 +50,7 @@ const AuthenticatedRoutes = withCoreUserGuard(() => {
           contentRef={contentRef}
           scrollBoxId={ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID}
         >
-          <OrganizationProfileRoutes />
+          <OrganizationProfileRoutes contentRef={contentRef} />
         </ProfileCard.Content>
       </OrganizationProfileNavbar>
     </ProfileCard.Root>

@@ -1,3 +1,21 @@
 {
-  "platforms": ["apple"]
+  "platforms": ["apple", "android"],
+  "apple": {
+    "modules": [
+      "ClerkExpoModule",
+      "ClerkAuthViewModule",
+      "ClerkUserProfileViewModule",
+      "ClerkUserButtonViewModule",
+      "ClerkGoogleSignInModule"
+    ]
+  },
+  "android": {
+    "modules": [
+      "expo.modules.clerk.ClerkExpoModule",
+      "expo.modules.clerk.ClerkAuthViewModule",
+      "expo.modules.clerk.ClerkUserProfileViewModule",
+      "expo.modules.clerk.ClerkUserButtonViewModule",
+      "expo.modules.clerk.googlesignin.ClerkGoogleSignInModule"
+    ]
+  }
 }

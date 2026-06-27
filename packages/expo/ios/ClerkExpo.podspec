@@ -17,6 +17,9 @@ else
   }
 end
 
+clerk_ios_repo = 'https://github.com/clerk/clerk-ios.git'
+clerk_ios_version = '1.2.6'
+
 Pod::Spec.new do |s|
   s.name           = 'ClerkExpo'
   s.version        = package['version']
@@ -30,17 +33,30 @@ Pod::Spec.new do |s|
   s.source         = { git: 'https://github.com/clerk/javascript' }
   s.static_framework = true
 
+  s.dependency 'ExpoModulesCore'
+
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',
     'SWIFT_COMPILATION_MODE' => 'wholemodule'
   }
 
-  # Only include the module files in the pod (both Swift and ObjC bridges).
-  # ClerkViewFactory.swift (with views) is injected into the app target by the config plugin
-  # because it uses `import ClerkKit` which is only available via SPM in the app target.
-  s.source_files = "ClerkExpoModule.swift", "ClerkExpoModule.m",
-                   "ClerkAuthViewManager.swift", "ClerkAuthViewManager.m",
-                   "ClerkUserProfileViewManager.swift", "ClerkUserProfileViewManager.m"
+  if defined?(spm_dependency)
+    spm_dependency(
+      s,
+      url: clerk_ios_repo,
+      requirement: { :kind => 'exactVersion', :version => clerk_ios_version },
+      products: ['ClerkKit', 'ClerkKitUI']
+    )
+  else
+    raise 'ClerkExpo requires React Native 0.75 or newer for iOS Swift Package Manager dependencies.'
+  end
+
+  s.source_files = "ClerkNativeBridge.swift",
+                   "ClerkExpoModule.swift",
+                   "ClerkNativeViewHost.swift",
+                   "ClerkAuthNativeView.swift",
+                   "ClerkUserProfileNativeView.swift",
+                   "ClerkUserButtonNativeView.swift"
 
   install_modules_dependencies(s)
 end

@@ -50,7 +50,7 @@ export class APIKey {
      */
     readonly createdBy: string | null,
     /**
-     * An optional description for the API key.
+     * A description for the API key.
      */
     readonly description: string | null,
     /**

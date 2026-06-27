@@ -1,11 +1,31 @@
+import { CLERK_MODAL_STATE } from '@clerk/shared/internal/clerk-js/constants';
 import type { ExternalAccountResource } from '@clerk/shared/types';
 import { act, waitFor } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import type { ComponentType, PropsWithChildren } from 'react';
+import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen } from '@/test/utils';
 
+import { AppearanceProvider } from '../../../customizables';
 import { ConnectedAccountsSection } from '../ConnectedAccountsSection';
+
+// jsdom never fires CSS `animationend`/`transitionend` events, so
+// `@formkit/auto-animate` (used by ProfileSection.ItemList) can never complete
+// its exit animation and retains unmounted DOM nodes indefinitely. This
+// prevents tests from deterministically asserting that a subtree was removed
+// after a state change. Disabling animations via appearance options makes the
+// Animated wrapper a no-op so React's unmount is reflected in the DOM
+// synchronously. The real-browser animation path is covered by manual testing
+// and by `Collapsible.test.tsx`.
+const withAnimationsDisabled = (Wrapper: ComponentType<PropsWithChildren>) => {
+  const WithAnimationsDisabled = ({ children }: PropsWithChildren) => (
+    <Wrapper>
+      <AppearanceProvider appearance={{ options: { animations: false } }}>{children}</AppearanceProvider>
+    </Wrapper>
+  );
+  return WithAnimationsDisabled;
+};
 
 const { createFixtures } = bindCreateFixtures('UserProfile');
 
@@ -128,11 +148,64 @@ describe('ConnectedAccountsSection ', () => {
       await userEvent.click(getByText(/connect account/i));
       await waitFor(() => getByText('Google'));
       await userEvent.click(getByText(/Google/i));
+
       expect(fixtures.clerk.user?.createExternalAccount).toHaveBeenCalledWith({
         redirectUrl: window.location.href,
         strategy: 'oauth_google',
         additionalScopes: [],
       });
+    });
+
+    it('uses the OAuth transport when one is registered', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(withoutConnections);
+
+      props.setProps({ componentName: 'UserProfile', mode: 'modal' } as any);
+      const open = vi.fn().mockResolvedValue({ callbackUrl: 'myapp://sso-callback?rotating_token_nonce=abc' });
+      Object.defineProperty(fixtures.clerk, '__internal_oauthTransport', {
+        configurable: true,
+        value: {
+          getRedirectUrl: vi.fn().mockResolvedValue('myapp://sso-callback'),
+          open,
+        },
+      });
+      const reload = vi.spyOn(fixtures.clerk.user!, 'reload').mockResolvedValue(fixtures.clerk.user!);
+      fixtures.clerk.user?.createExternalAccount.mockResolvedValue({
+        verification: { externalVerificationRedirectURL: new URL('https://provider.example/auth') },
+      } as ExternalAccountResource);
+      const { userEvent, getByText } = render(<ConnectedAccountsSection />, { wrapper });
+
+      await userEvent.click(getByText(/connect account/i));
+      await waitFor(() => getByText('Google'));
+      await userEvent.click(getByText(/Google/i));
+
+      const redirectUrl = fixtures.clerk.user?.createExternalAccount.mock.calls[0][0].redirectUrl;
+      const modalState = JSON.parse(window.atob(new URL(redirectUrl).searchParams.get(CLERK_MODAL_STATE) || ''));
+
+      expect(fixtures.clerk.user?.createExternalAccount).toHaveBeenCalledWith({
+        redirectUrl,
+        strategy: 'oauth_google',
+        additionalScopes: [],
+      });
+      expect(redirectUrl).toContain('myapp://sso-callback');
+      expect(modalState).toMatchObject({
+        componentName: 'UserProfile',
+        socialProvider: 'google',
+      });
+      expect(open).toHaveBeenCalledWith(new URL('https://provider.example/auth'));
+      expect(reload).toHaveBeenCalledWith({ rotatingTokenNonce: 'abc' });
+    });
+
+    it('shows an error when the provider verification URL is missing', async () => {
+      const { wrapper, fixtures } = await createFixtures(withoutConnections);
+
+      fixtures.clerk.user?.createExternalAccount.mockResolvedValue({} as ExternalAccountResource);
+      const { userEvent, getByText } = render(<ConnectedAccountsSection />, { wrapper });
+
+      await userEvent.click(getByText(/connect account/i));
+      await waitFor(() => getByText('Google'));
+      await userEvent.click(getByText(/Google/i));
+
+      expect(await screen.findByText(/OAuth flow did not receive a verification URL./i)).toBeInTheDocument();
     });
   });
 
@@ -161,7 +234,12 @@ describe('ConnectedAccountsSection ', () => {
       getByText('This account has been disconnected.');
       getByRole('button', { name: /reconnect/i });
       await userEvent.click(getByRole('button', { name: /reconnect/i }));
-      expect(fixtures.clerk.user?.createExternalAccount).toHaveBeenCalled();
+      expect(fixtures.clerk.user?.createExternalAccount).toHaveBeenCalledWith({
+        strategy: 'oauth_google',
+        redirectUrl: window.location.href,
+        additionalScopes: [],
+      });
+      expect(await screen.findByText(/OAuth flow did not receive a verification URL./i)).toBeInTheDocument();
     });
 
     it('Additional scopes need reconnection', async () => {
@@ -195,7 +273,42 @@ describe('ConnectedAccountsSection ', () => {
       getByText('This account has been disconnected.');
       getByRole('button', { name: /reconnect/i });
       await userEvent.click(getByRole('button', { name: /reconnect/i }));
-      expect(fixtures.clerk.user?.externalAccounts[0].reauthorize).toHaveBeenCalled();
+      expect(fixtures.clerk.user?.externalAccounts[0].reauthorize).toHaveBeenCalledWith({
+        additionalScopes: ['some_scope'],
+        redirectUrl: window.location.href,
+      });
+      expect(await screen.findByText(/OAuth flow did not receive a verification URL./i)).toBeInTheDocument();
+    });
+
+    it('uses the OAuth transport when reconnecting an account', async () => {
+      const { wrapper, fixtures } = await createFixtures(withReconnectableConnection);
+
+      const open = vi.fn().mockResolvedValue({ callbackUrl: 'myapp://sso-callback?rotating_token_nonce=abc' });
+      Object.defineProperty(fixtures.clerk, '__internal_oauthTransport', {
+        configurable: true,
+        value: {
+          getRedirectUrl: vi.fn().mockResolvedValue('myapp://sso-callback'),
+          open,
+        },
+      });
+      const reload = vi.spyOn(fixtures.clerk.user!, 'reload').mockResolvedValue(fixtures.clerk.user!);
+      fixtures.clerk.user?.createExternalAccount.mockResolvedValue({
+        verification: { externalVerificationRedirectURL: new URL('https://provider.example/auth') },
+      } as ExternalAccountResource);
+
+      const { userEvent, getByText, getByRole } = render(<ConnectedAccountsSection />, { wrapper });
+
+      getByText('This account has been disconnected.');
+      getByRole('button', { name: /reconnect/i });
+      await userEvent.click(getByRole('button', { name: /reconnect/i }));
+
+      expect(fixtures.clerk.user?.createExternalAccount).toHaveBeenCalledWith({
+        strategy: 'oauth_google',
+        redirectUrl: 'myapp://sso-callback',
+        additionalScopes: [],
+      });
+      expect(open).toHaveBeenCalledWith(new URL('https://provider.example/auth'));
+      expect(reload).toHaveBeenCalledWith({ rotatingTokenNonce: 'abc' });
     });
 
     it('Unrecoverable errors', async () => {
@@ -280,7 +393,9 @@ describe('ConnectedAccountsSection ', () => {
   describe('Handles opening/closing actions', () => {
     it('closes remove account form when connect account action is clicked', async () => {
       const { wrapper } = await createFixtures(withSomeConnections);
-      const { userEvent, getByText, getByRole, queryByRole } = render(<ConnectedAccountsSection />, { wrapper });
+      const { userEvent, getByText, getByRole, queryByRole } = render(<ConnectedAccountsSection />, {
+        wrapper: withAnimationsDisabled(wrapper),
+      });
 
       const item = getByText(/google/i);
       const menuButton = item.parentElement?.parentElement?.parentElement?.parentElement?.children?.[1];

@@ -36,18 +36,23 @@
     "GITHUB_TOKEN",
     "ACTIONS_RUNNER_DEBUG",
     "ACTIONS_STEP_DEBUG",
-    "VERCEL_AUTOMATION_BYPASS_SECRET"
+    "VERCEL_AUTOMATION_BYPASS_SECRET",
+    "PORT",
+    "UI_PORT"
   ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
       "inputs": [
+        "package.json",
         "*.d.ts",
         "bundlewatch.config.json",
         "src/**",
         "tsconfig.json",
         "tsconfig.build.json",
         "tsconfig.declarations.json",
+        "tsdown.config.mts",
+        "tsdown.config.ts",
         "tsup.config.ts",
         "subpaths.mjs",
         "!**/*.test.*",
@@ -92,6 +97,8 @@
         "tests/**",
         "tsconfig.json",
         "tsconfig.*.json",
+        "tsdown.config.mts",
+        "tsdown.config.ts",
         "tsup.config.ts",
         "!**/__snapshots__/**",
         "!CHANGELOG.md",
@@ -204,36 +211,43 @@
     "//#test:integration:ap-flows": {
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:generic": {
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:express": {
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:fastify": {
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:hono": {
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:nextjs": {
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:nextjs:canary": {
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:quickstart": {
@@ -246,11 +260,13 @@
         "VERCEL_AUTOMATION_BYPASS_SECRET"
       ],
       "inputs": ["integration/**"],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:astro": {
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:localhost": {
@@ -263,84 +279,106 @@
         "NODE_EXTRA_CA_CERTS"
       ],
       "inputs": ["integration/**"],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:sessions": {
       "env": ["CLEANUP", "DEBUG", "DISABLE_WEB_SECURITY", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "NODE_EXTRA_CA_CERTS"],
       "inputs": ["integration/**"],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:sessions:staging": {
       "env": ["CLEANUP", "DEBUG", "DISABLE_WEB_SECURITY", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "NODE_EXTRA_CA_CERTS"],
       "inputs": ["integration/**"],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:handshake": {
       "env": ["CLEANUP", "DEBUG", "DISABLE_WEB_SECURITY", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "NODE_EXTRA_CA_CERTS"],
       "inputs": ["integration/**"],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:handshake:staging": {
       "env": ["CLEANUP", "DEBUG", "DISABLE_WEB_SECURITY", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "NODE_EXTRA_CA_CERTS"],
       "inputs": ["integration/**"],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:expo-web": {
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:tanstack-react-start": {
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:vue": {
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:nuxt": {
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:react-router": {
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:billing": {
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:machine": {
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:custom": {
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:cache-components": {
       "dependsOn": ["@clerk/nextjs#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:chrome-extension": {
       "dependsOn": ["@clerk/nextjs#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
+      "outputs": ["integration/playwright-report/**"],
+      "outputLogs": "new-only"
+    },
+    "//#test:integration:electron": {
+      "dependsOn": ["@clerk/electron#build"],
+      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
+      "inputs": ["integration/**", "packages/electron/**"],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#typedoc:generate": {
       "dependsOn": ["@clerk/nextjs#build", "@clerk/react#build", "@clerk/shared#build"],
-      "inputs": ["tsconfig.typedoc.json", "typedoc.config.mjs"],
-      "outputs": [".typedoc/**"],
+      "inputs": ["tsconfig.typedoc.json", "typedoc.config.mjs", ".typedoc/**/*.mjs"],
+      "outputs": [".typedoc/docs/**"],
       "outputLogs": "new-only"
     },
     "//#test:typedoc": {

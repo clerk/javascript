@@ -5,7 +5,7 @@ import { formatDate } from '@/ui/utils/formatDate';
 import { truncateWithEndVisible } from '@/ui/utils/truncateTextWithEndVisible';
 
 import { usePaymentAttempts, useSubscriberTypeLocalizationRoot } from '../../contexts';
-import { Badge, localizationKeys, Td, Text } from '../../customizables';
+import { Badge, localizationKeys, Td, Text, useLocalizations } from '../../customizables';
 import { useRouter } from '../../router';
 
 /* -------------------------------------------------------------------------------------------------
@@ -43,6 +43,7 @@ export const PaymentAttemptsList = () => {
 const PaymentAttemptsListRow = ({ paymentAttempt }: { paymentAttempt: BillingPaymentResource }) => {
   const { id, amount, failedAt, paidAt, updatedAt, status } = paymentAttempt;
   const { navigate } = useRouter();
+  const { $ } = useLocalizations();
   const handleClick = () => {
     void navigate(`payment-attempt/${id}`);
   };
@@ -68,10 +69,7 @@ const PaymentAttemptsListRow = ({ paymentAttempt }: { paymentAttempt: BillingPay
           cursor: 'pointer',
         }}
       >
-        <Text>
-          {amount.currencySymbol}
-          {amount.amountFormatted}
-        </Text>
+        <Text>{$(amount)}</Text>
       </Td>
       <Td>
         <Badge

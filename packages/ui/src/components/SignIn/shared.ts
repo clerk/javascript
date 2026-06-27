@@ -11,6 +11,9 @@ import { handleError } from '@/ui/utils/errorHandler';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 
+/** Search param set when navigating from the start page "Forgot password?" action. */
+export const SIGN_IN_RESET_PASSWORD_INTENT_PARAM = '__clerk_reset_password';
+
 function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>) {
   const card = useCardState();
   // @ts-expect-error -- private method for the time being

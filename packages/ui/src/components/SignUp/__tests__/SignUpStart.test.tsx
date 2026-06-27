@@ -1,7 +1,10 @@
+import { ClerkAPIResponseError } from '@clerk/shared/error';
+import { CAPTCHA_ELEMENT_ID } from '@clerk/shared/internal/clerk-js/constants';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import type { SignUpResource } from '@clerk/shared/types';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { simulateCaptchaInteractive, simulateCaptchaResolved } from '@/test/captcha';
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { fireEvent, render, screen, waitFor } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
@@ -520,6 +523,57 @@ describe('SignUpStart', () => {
       );
 
       await waitFor(() => screen.getByText(/create your account/i));
+    });
+  });
+
+  describe('Captcha', () => {
+    // The ticket tests above mutate window.location and don't restore it (no afterEach in this
+    // suite); reset to a clean URL so the ticket flow doesn't fire during these renders.
+    beforeEach(() => {
+      Object.defineProperty(window, 'location', {
+        writable: true,
+        value: new URL('http://localhost/sign-up'),
+      });
+    });
+
+    it('renders the captcha widget in the form (email) config', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress({ required: true });
+      });
+      render(<SignUpStart />, { wrapper });
+      expect(document.getElementById(CAPTCHA_ELEMENT_ID)).not.toBeNull();
+    });
+
+    it('renders the captcha widget in the social-only (no form) config', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withSocialProvider({ provider: 'google' });
+      });
+      render(<SignUpStart />, { wrapper });
+      expect(document.getElementById(CAPTCHA_ELEMENT_ID)).not.toBeNull();
+    });
+
+    describe('spotlight', () => {
+      const getCaptcha = () => document.getElementById(CAPTCHA_ELEMENT_ID) as HTMLElement;
+
+      it('inerts the form/social subtree while interactive — never the captcha or header — and restores', async () => {
+        const { wrapper } = await createFixtures(f => {
+          f.withEmailAddress({ required: true });
+          f.withSocialProvider({ provider: 'google' });
+        });
+        render(<SignUpStart />, { wrapper });
+
+        const google = screen.getByText(/continue with google/i);
+        expect(google.closest('[inert]')).toBeNull();
+
+        simulateCaptchaInteractive(getCaptcha());
+
+        await waitFor(() => expect(google.closest('[inert]')).not.toBeNull());
+        expect(getCaptcha().closest('[inert]')).toBeNull();
+        expect(screen.getByRole('heading').closest('[inert]')).toBeNull();
+
+        simulateCaptchaResolved(getCaptcha());
+        await waitFor(() => expect(google.closest('[inert]')).toBeNull());
+      });
     });
   });
 });

@@ -1,6 +1,7 @@
 import {
   disabledOrganizationAPIKeysFeature,
   disabledOrganizationBillingFeature,
+  disabledSelfServeSSOFeature,
   disabledUserAPIKeysFeature,
   disabledUserBillingFeature,
 } from '@clerk/shared/internal/clerk-js/componentGuards';
@@ -9,7 +10,7 @@ import type { CustomPage, EnvironmentResource, LoadedClerk } from '@clerk/shared
 
 import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID, USER_PROFILE_NAVBAR_ROUTE_ID } from '../constants';
 import type { NavbarRoute } from '../elements/Navbar';
-import { Code, CreditCard, Organization, TickShield, User, Users } from '../icons';
+import { Building, Code, CreditCard, ShieldCheck, UserCircle, Users } from '../icons';
 import { localizationKeys } from '../localization';
 import { ExternalElementMounter } from './ExternalElementMounter';
 import { isDevelopmentSDK } from './runtimeEnvironment';
@@ -48,7 +49,15 @@ type GetDefaultRoutesReturnType = {
 
 type CreateCustomPagesParams = {
   customPages: CustomPage[];
-  getDefaultRoutes: ({ commerce, apiKeys }: { commerce: boolean; apiKeys: boolean }) => GetDefaultRoutesReturnType;
+  getDefaultRoutes: ({
+    commerce,
+    apiKeys,
+    security,
+  }: {
+    commerce: boolean;
+    apiKeys: boolean;
+    security: boolean;
+  }) => GetDefaultRoutesReturnType;
   setFirstPathToRoot: (routes: NavbarRoute[]) => NavbarRoute[];
   excludedPathsFromDuplicateWarning: string[];
 };
@@ -77,6 +86,7 @@ export const createOrganizationProfileCustomPages = (
   clerk: LoadedClerk,
   shouldShowBilling: boolean,
   environment?: EnvironmentResource,
+  shouldShowSelfServeSSO = false,
 ) => {
   return createCustomPages(
     {
@@ -89,6 +99,7 @@ export const createOrganizationProfileCustomPages = (
     shouldShowBilling,
     environment,
     true,
+    shouldShowSelfServeSSO,
   );
 };
 
@@ -98,6 +109,7 @@ const createCustomPages = (
   shouldShowBilling: boolean,
   environment?: EnvironmentResource,
   organization?: boolean,
+  shouldShowSelfServeSSO = false,
 ) => {
   const { INITIAL_ROUTES, pageToRootNavbarRouteMap, validReorderItemLabels } = getDefaultRoutes({
     commerce: organization
@@ -106,6 +118,7 @@ const createCustomPages = (
     apiKeys: organization
       ? !disabledOrganizationAPIKeysFeature(clerk, environment)
       : !disabledUserAPIKeysFeature(clerk, environment),
+    security: organization ? shouldShowSelfServeSSO && !disabledSelfServeSSOFeature(clerk, environment) : false,
   });
 
   if (isDevelopmentSDK(clerk)) {
@@ -269,13 +282,13 @@ const getUserProfileDefaultRoutes = ({
     {
       name: localizationKeys('userProfile.navbar.account'),
       id: USER_PROFILE_NAVBAR_ROUTE_ID.ACCOUNT,
-      icon: User,
+      icon: UserCircle,
       path: 'account',
     },
     {
       name: localizationKeys('userProfile.navbar.security'),
       id: USER_PROFILE_NAVBAR_ROUTE_ID.SECURITY,
-      icon: TickShield,
+      icon: ShieldCheck,
       path: 'security',
     },
   ];
@@ -315,15 +328,17 @@ const getUserProfileDefaultRoutes = ({
 const getOrganizationProfileDefaultRoutes = ({
   commerce,
   apiKeys,
+  security,
 }: {
   commerce: boolean;
   apiKeys: boolean;
+  security: boolean;
 }): GetDefaultRoutesReturnType => {
   const INITIAL_ROUTES: NavbarRoute[] = [
     {
       name: localizationKeys('organizationProfile.navbar.general'),
       id: ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.GENERAL,
-      icon: Organization,
+      icon: Building,
       path: 'organization-general',
     },
     {
@@ -347,6 +362,14 @@ const getOrganizationProfileDefaultRoutes = ({
       id: ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.API_KEYS,
       icon: Code,
       path: 'organization-api-keys',
+    });
+  }
+  if (security) {
+    INITIAL_ROUTES.push({
+      name: localizationKeys('organizationProfile.navbar.security'),
+      id: ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.SECURITY,
+      icon: ShieldCheck,
+      path: 'organization-security',
     });
   }
 

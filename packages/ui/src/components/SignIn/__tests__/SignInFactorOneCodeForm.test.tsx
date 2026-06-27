@@ -40,6 +40,7 @@ describe('SignInFactorOneCodeForm', () => {
     cardSubtitle: localizationKeys('signIn.phoneCode.subtitle'),
     inputLabel: localizationKeys('signIn.phoneCode.formTitle'),
     resendButton: localizationKeys('signIn.phoneCode.resendButton'),
+    identityPreviewEditButtonAriaLabel: localizationKeys('identityPreviewEditButton__phoneNumber'),
   };
 
   describe('Cache Key Generation', () => {
@@ -84,6 +85,7 @@ describe('SignInFactorOneCodeForm', () => {
         cardSubtitle: localizationKeys('signIn.phoneCode.subtitle'),
         inputLabel: localizationKeys('signIn.phoneCode.formTitle'),
         resendButton: localizationKeys('signIn.phoneCode.resendButton'),
+        identityPreviewEditButtonAriaLabel: localizationKeys('identityPreviewEditButton__phoneNumber'),
       };
 
       renderWithProviders(<SignInFactorOneCodeForm {...phonePropsWithChannel} />, { wrapper });
@@ -102,11 +104,14 @@ describe('SignInFactorOneCodeForm', () => {
       );
     });
 
-    it('still calls prepare when factor is already prepared but verification not verified', async () => {
-      const { wrapper } = await createFixtures(f => {
+    it('skips automatic prepare when the same factor verification is pending', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
         f.withPhoneNumber();
         f.startSignInWithPhoneNumber({ supportPhoneCode: true });
       });
+      fixtures.signIn.firstFactorVerification.status = 'unverified';
+      fixtures.signIn.firstFactorVerification.strategy = 'phone_code';
+      fixtures.signIn.firstFactorVerification.channel = 'sms';
 
       const props = {
         factor: {
@@ -114,26 +119,29 @@ describe('SignInFactorOneCodeForm', () => {
           phoneNumberId: 'idn_123',
           safeIdentifier: '+1234567890',
         },
-        factorAlreadyPrepared: true,
+        factorAlreadyPrepared: false,
         onFactorPrepare: vi.fn(),
         cardTitle: localizationKeys('signIn.phoneCode.title'),
         cardSubtitle: localizationKeys('signIn.phoneCode.subtitle'),
         inputLabel: localizationKeys('signIn.phoneCode.formTitle'),
         resendButton: localizationKeys('signIn.phoneCode.resendButton'),
+        identityPreviewEditButtonAriaLabel: localizationKeys('identityPreviewEditButton__phoneNumber'),
       };
 
       renderWithProviders(<SignInFactorOneCodeForm {...props} />, { wrapper });
 
-      expect(vi.mocked(useFetch)).toHaveBeenCalledWith(expect.any(Function), expect.any(Object), expect.any(Object));
+      expect(vi.mocked(useFetch)).toHaveBeenCalledWith(undefined, expect.any(Object), expect.any(Object));
     });
   });
 
   describe('shouldAvoidPrepare Logic', () => {
-    it('still calls prepare when factor is already prepared but verification not verified', async () => {
-      const { wrapper } = await createFixtures(f => {
+    it('allows prepare when the same factor verification is expired', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
         f.withPhoneNumber();
         f.startSignInWithPhoneNumber({ supportPhoneCode: true });
       });
+      fixtures.signIn.firstFactorVerification.status = 'expired';
+      fixtures.signIn.firstFactorVerification.strategy = 'phone_code';
 
       const propsWithFactorPrepared = {
         ...defaultProps,
@@ -142,11 +150,7 @@ describe('SignInFactorOneCodeForm', () => {
 
       renderWithProviders(<SignInFactorOneCodeForm {...propsWithFactorPrepared} />, { wrapper });
 
-      expect(vi.mocked(useFetch)).toHaveBeenCalledWith(
-        expect.any(Function), // fetcher should still be a function because shouldAvoidPrepare requires BOTH conditions
-        expect.any(Object),
-        expect.any(Object),
-      );
+      expect(vi.mocked(useFetch)).toHaveBeenCalledWith(expect.any(Function), expect.any(Object), expect.any(Object));
     });
 
     it('allows prepare when factor is not already prepared', async () => {
@@ -200,6 +204,7 @@ describe('SignInFactorOneCodeForm', () => {
         cardSubtitle: localizationKeys('signIn.emailCode.subtitle'),
         inputLabel: localizationKeys('signIn.emailCode.formTitle'),
         resendButton: localizationKeys('signIn.emailCode.resendButton'),
+        identityPreviewEditButtonAriaLabel: localizationKeys('identityPreviewEditButton__emailAddress'),
       };
 
       const { getByLabelText } = renderWithProviders(<SignInFactorOneCodeForm {...emailProps} />, { wrapper });

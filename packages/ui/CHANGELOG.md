@@ -1,5 +1,410 @@
 # @clerk/ui
 
+## 1.23.0
+
+### Minor Changes
+
+- Handle expired organization domains on self-serve SSO flow, allowing to trigger a new verification ([#9000](https://github.com/clerk/javascript/pull/9000)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Add drag-to-upload support in AvatarUploader ([#8348](https://github.com/clerk/javascript/pull/8348)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Fix the self-serve SSO configuration wizard losing your place when organization data refetches mid-flow. After submitting a Configure step (for example saving an identity provider's metadata), a background refetch on the OrganizationProfile Security page could unmount the open ConfigureSSO wizard and re-render it on an earlier step. The wizard now stays on its current step while data loads in the background. ([#8999](https://github.com/clerk/javascript/pull/8999)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Fix focus ring visibility on `Tab` elements for keyboard navigation. ([#8998](https://github.com/clerk/javascript/pull/8998)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`19ce04a`](https://github.com/clerk/javascript/commit/19ce04aab6387c430dc41e51c6130a88cc543cc8), [`3e036f4`](https://github.com/clerk/javascript/commit/3e036f425da47d781a45a0805ec8b0fcc6f38eff)]:
+  - @clerk/localizations@4.11.0
+  - @clerk/shared@4.22.0
+
+## 1.22.0
+
+### Minor Changes
+
+- Monetary amounts are now formatted using your application's locale. For example, with the locale set to `fr-FR`, a USD 1000 amount now renders as `1 000,00 $US`; previously, it rendered as `$1,000.00` regardless of your application's configured locale. ([#8918](https://github.com/clerk/javascript/pull/8918)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Fix the `<ConfigureSSO />` wizard header on small screens: the back link now stacks above the step indicators and the step separators are hidden, so the steps no longer wrap onto a second line. ([#8984](https://github.com/clerk/javascript/pull/8984)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Updated dependencies [[`fd7b824`](https://github.com/clerk/javascript/commit/fd7b8247c8bc0d9c14bd470df8d5f6cf707eab59), [`af0eb3f`](https://github.com/clerk/javascript/commit/af0eb3f02cd1a3eca2c7dbc4df4d226f8d844213), [`8024cac`](https://github.com/clerk/javascript/commit/8024cac2fb34e46adc4f043f9fa32d5e3886cee9)]:
+  - @clerk/localizations@4.10.0
+
+## 1.21.0
+
+### Minor Changes
+
+- Migrate from `:focus` to `:focus-visible` so focus rings only appear during keyboard navigation ([#8595](https://github.com/clerk/javascript/pull/8595)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Improve UserButton and OrganizationSwitcher accessibility. The trigger button now announces itself as a dialog trigger (`aria-haspopup="dialog"`) and the popover uses `role="dialog"` instead of `role="menu"`. UserButton and OrganizationSwitcher popovers now receive focus when opened, and actions are logically grouped with labelled `role="group"` elements for screen readers. ([#8325](https://github.com/clerk/javascript/pull/8325)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Condense the OrganizationProfile Security page SSO overview to a single summary row (one-line description, domains as chips, status badge, actions under the overflow menu) and remove the now-unused ssoSection provider/sign-on URL/issuer/descriptionLine2 localization keys. ([#8915](https://github.com/clerk/javascript/pull/8915)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Updates development mode indicator styling. ([#8917](https://github.com/clerk/javascript/pull/8917)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add a generic `FLOW_STEP_MOUNTED` telemetry event (`eventFlowStepMounted`) for measuring multi-step flow funnels, and wire it into the self-serve SSO flow ([#8951](https://github.com/clerk/javascript/pull/8951)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Add localization support for OAuth access denied errors. ([#8786](https://github.com/clerk/javascript/pull/8786)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Allow changing enterprise connection provider between self-serve SSO steps ([#8881](https://github.com/clerk/javascript/pull/8881)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- The Security tab in `<OrganizationProfile />` is now hidden for members who lack the manage enterprise connections permission (`org:sys_entconns:manage`), instead of rendering a permission-denied state. This matches how the Members, Billing, and API keys tabs are gated. ([#8971](https://github.com/clerk/javascript/pull/8971)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Self-serve SSO: fix the configuration wizard rendering a blank step when a connection is reset from the first configuration step. Resetting now returns to the provider selection step. ([#8970](https://github.com/clerk/javascript/pull/8970)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Self-serve SSO: restore keyboard-accessible provider selection, mark configuration wizard steps complete based on connection state rather than position, and fix the organization Security page loading state. ([#8940](https://github.com/clerk/javascript/pull/8940)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Updated dependencies [[`c38d853`](https://github.com/clerk/javascript/commit/c38d8534b916936acbe4131fac58c8743e684eab), [`7e3174a`](https://github.com/clerk/javascript/commit/7e3174a4f861ad89667c3d0c63b6f2d0c001bcb6), [`97039bb`](https://github.com/clerk/javascript/commit/97039bb871a33ccc2c9e46f011e4cbbc1459fb1e), [`f43071d`](https://github.com/clerk/javascript/commit/f43071d8d98194c22e34d1d72ed8d0cf0b6b0f0e), [`0e0ff11`](https://github.com/clerk/javascript/commit/0e0ff110fdab5f0ffb0a8896c1f864605c1f809d), [`0039618`](https://github.com/clerk/javascript/commit/003961810786af49daba5a3e82e34378d52b885c), [`a536a0d`](https://github.com/clerk/javascript/commit/a536a0d5b31a5fcba31813ed34f9494a4ec4851b)]:
+  - @clerk/localizations@4.9.3
+  - @clerk/shared@4.21.0
+
+## 1.20.0
+
+### Minor Changes
+
+- Introduces organization membership feature. ([#8933](https://github.com/clerk/javascript/pull/8933)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+  Organizations can enforce exclusive membership, limiting users to a single organization. During the `choose-organization` session task, members of such an organization are automatically activated instead of seeing the picker. `Organization.exclusiveMembership` is now exposed on the Organization resource.
+
+### Patch Changes
+
+- Updated dependencies [[`01789b4`](https://github.com/clerk/javascript/commit/01789b4e8d3a280940b7ebcb223a33c6ecfd209a)]:
+  - @clerk/shared@4.20.0
+  - @clerk/localizations@4.9.2
+
+## 1.19.0
+
+### Minor Changes
+
+- When an interactive bot-protection challenge appears during sign-in or sign-up, the card now brings the challenge to the foreground — hiding the other fields and buttons until it's solved — so it's clear the "Verify you are human" check must be completed. Invisible challenges are unaffected. ([#8907](https://github.com/clerk/javascript/pull/8907)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 1.18.1
+
+### Patch Changes
+
+- Improve the accessible label for identity edit buttons in verification flows. ([#8902](https://github.com/clerk/javascript/pull/8902)) by [@austincalvelage](https://github.com/austincalvelage)
+
+- Remove hidden password input from accessibility tree when hidden ([#8899](https://github.com/clerk/javascript/pull/8899)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add support for the `inert` attribute usage under React 19. Inert content is now correctly non-interactive on both React 18 and 19. ([#8820](https://github.com/clerk/javascript/pull/8820)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix checkbox default styles when using the simple theme. ([#8922](https://github.com/clerk/javascript/pull/8922)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Improve Menu keyboard navigation and accessibility. Menus now support `Enter`/`Space` to open from the trigger, `ArrowDown`/`ArrowUp`/`Home`/`End` to move focus, `Escape` to close and return focus to the trigger, and skip disabled items during arrow-key navigation. Menus no longer mark the rest of the page as `aria-hidden` while open, so assistive technologies can still reach surrounding content. ([#8333](https://github.com/clerk/javascript/pull/8333)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- The SSO setup flow now ends on an explicit Activate step: after configuring and testing a connection you confirm activation with an Activate SSO action (or skip and activate later) instead of a static confirmation summary. ([#8882](https://github.com/clerk/javascript/pull/8882)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Fix the X (formerly Twitter) provider logo being nearly invisible in dark mode by recoloring it to match the foreground color, consistent with other monochrome provider icons. ([#8912](https://github.com/clerk/javascript/pull/8912)) by [@jordan-bott](https://github.com/jordan-bott)
+
+- Updated dependencies [[`c84f8df`](https://github.com/clerk/javascript/commit/c84f8df4222c212ecce6ae5ff8c47958b5b5d972), [`53e7b11`](https://github.com/clerk/javascript/commit/53e7b11058096d5ce15da53af12fe7236e88db2c), [`e51e22a`](https://github.com/clerk/javascript/commit/e51e22a2aec03293e8ccf5a5372cd9906aeccbb7)]:
+  - @clerk/localizations@4.9.1
+  - @clerk/shared@4.19.1
+
+## 1.18.0
+
+### Minor Changes
+
+- Introduce organization domains with TXT verification on self-serve SSO flow ([#8788](https://github.com/clerk/javascript/pull/8788)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Improve `OrganizationProfile` UI: ([#8898](https://github.com/clerk/javascript/pull/8898)) by [@LauraBeatris](https://github.com/LauraBeatris)
+  - Hide the `Verified domains` section when there are no domains and the user lacks permission to add them
+  - Rename the `Organization profile` section to `Profile` for consistency with `UserProfile`
+  - Align the enterprise accounts section with the account data
+
+### Patch Changes
+
+- When inviting organization members requires purchasing additional seats, invitations are now sent automatically after checkout completes successfully. ([#8869](https://github.com/clerk/javascript/pull/8869)) by [@dstaley](https://github.com/dstaley)
+
+- Add confirmation dialog for organization domain deletion as part of self-serve SSO ([#8866](https://github.com/clerk/javascript/pull/8866)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- The Security page's SSO wizard now has a back-to-Security control, and Start/Edit open the wizard at the first step (Continue resumes where you left off). ([#8864](https://github.com/clerk/javascript/pull/8864)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Updated dependencies [[`d5968d0`](https://github.com/clerk/javascript/commit/d5968d026d6b2a1b399b6967fd8727613a5bc3cd), [`431e16c`](https://github.com/clerk/javascript/commit/431e16c69a2745779af217747c13a7f922e250fa), [`ffbc650`](https://github.com/clerk/javascript/commit/ffbc650ebbcee48171c95aa5d2b497273b0276b0)]:
+  - @clerk/localizations@4.9.0
+  - @clerk/shared@4.19.0
+
+## 1.17.0
+
+### Minor Changes
+
+- Add internal OAuth transport support for native desktop SDK wrappers to run Clerk's prebuilt OAuth flows through a system browser. ([#8831](https://github.com/clerk/javascript/pull/8831)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Add an overview to the organization profile Security page. The page now lands on a summary of the SSO connection — a status badge (Unconfigured, In Progress, Active, Inactive), the configuration details framed in a card (provider, domain, sign-on URL, issuer, certificate), and an actions menu with Edit, Activate / Deactivate, and Remove — and switches into the existing configuration flow on Start, Continue, or Edit. ([#8813](https://github.com/clerk/javascript/pull/8813)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Rename the `<OrganizationProfile />` SSO page to "Security". The navbar entry is now labeled "Security" with a shield icon, its route path changed from `organization-self-serve-sso` to `organization-security`, and a new `organizationProfile.navbar.security` localization key replaces `organizationProfile.navbar.selfServeSSO`. ([#8796](https://github.com/clerk/javascript/pull/8796)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Upgrade build tooling to Rspack 2 (No user-facing API changes). ([#8382](https://github.com/clerk/javascript/pull/8382)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`f4167ec`](https://github.com/clerk/javascript/commit/f4167eccb19e0de98340d48e221b950e3dad189e), [`17e4164`](https://github.com/clerk/javascript/commit/17e416471a5409e5a4c02f4f94f687c428c071de), [`ed2cf75`](https://github.com/clerk/javascript/commit/ed2cf75ce713703d8e2c258fc3ca0cf43dc964dc), [`67c04a4`](https://github.com/clerk/javascript/commit/67c04a43db64b70819d68333f99e3483523d1d47), [`51c8fdc`](https://github.com/clerk/javascript/commit/51c8fdcb7160457e44cfe7cc86524f7d728a030a), [`c2ba971`](https://github.com/clerk/javascript/commit/c2ba971aad55df570507b7b117786ab048415ad3), [`8744728`](https://github.com/clerk/javascript/commit/8744728e6610b2229f56dd3b31975c3f57395f02), [`d9b5c7d`](https://github.com/clerk/javascript/commit/d9b5c7d79fe641d08f45f0df7d4f5146b6b2c3ab)]:
+  - @clerk/shared@4.18.0
+  - @clerk/localizations@4.8.2
+
+## 1.16.1
+
+### Patch Changes
+
+- Fix checkout button label showing "Start free trial" when adding seats during a free trial period ([#8829](https://github.com/clerk/javascript/pull/8829)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+- Migrate the build pipeline to tsdown and TypeScript 6.0. This is an internal tooling change with no intended changes to the public API or runtime behavior. ([#8177](https://github.com/clerk/javascript/pull/8177)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`f046c49`](https://github.com/clerk/javascript/commit/f046c491d99c880b61e335645ad3ced4fee602d8), [`b5fa9f6`](https://github.com/clerk/javascript/commit/b5fa9f6ab2f01f1bbf6de52e16b4c9d9516f966c), [`3d5b2fe`](https://github.com/clerk/javascript/commit/3d5b2fe959171770bb7e8493d8a204317b7101a7)]:
+  - @clerk/localizations@4.8.1
+  - @clerk/shared@4.17.1
+
+## 1.16.0
+
+### Minor Changes
+
+- Add support for Clerk Billing plans with per-seat costs. ([#8629](https://github.com/clerk/javascript/pull/8629)) by [@dstaley](https://github.com/dstaley)
+  - New invite-to-checkout flow when inviting members while on a plan that uses per-seat costs.
+  - New localization values to support UI additions.
+  - Support for the `orgId` and `minSeats` parameters to `getPlans()`.
+  - Support for the `seatsQuantity` and `priceId` parameters to checkout creation.
+  - New `totals` field on payments.
+  - New `availablePrices` field on plans.
+  - New `nextPayment` field on subscription items.
+  - New `discounts` field on checkouts.
+  - Additional fields on `nextPayment` for more granularity.
+
+### Patch Changes
+
+- Display the scope description for `user:org:read` organization access in the OAuth Consent dialog so users understand organization membership information is being shared with the OAuth client. ([#8798](https://github.com/clerk/javascript/pull/8798)) by [@jfoshee](https://github.com/jfoshee)
+
+- Fix alignment of the domain section subtitle in the organization profile to match the button above it. ([#8795](https://github.com/clerk/javascript/pull/8795)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`a5c7bc7`](https://github.com/clerk/javascript/commit/a5c7bc74dabfa78d4748516ccc252f68cae82264)]:
+  - @clerk/localizations@4.8.0
+  - @clerk/shared@4.17.0
+
+## 1.15.1
+
+### Patch Changes
+
+- Fix Chrome-specific scroll jump when toggling the billing period switch on the pricing table. ([#8742](https://github.com/clerk/javascript/pull/8742)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix a circular import in the styled-system that could crash module initialization under bundler configurations with tree-shaking disabled. ([#8754](https://github.com/clerk/javascript/pull/8754)) by [@jacekradko](https://github.com/jacekradko)
+
+- Internal refactor for self-serve SSO wizard navigation to leverage a guard-based state machine. ([#8715](https://github.com/clerk/javascript/pull/8715)) by [@iagodahlem](https://github.com/iagodahlem)
+
+  It makes the step navigation more predictable: the step you land on (including after a reload) and which steps you can move to are derived from the connection's state, the connection reset flow lands you on the right step.
+
+- Correctly display OAuth consent redirect domains for known multi-label public suffixes. ([#8700](https://github.com/clerk/javascript/pull/8700)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix modal backdrop appearing light in dark mode ([#8743](https://github.com/clerk/javascript/pull/8743)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add a "Forgot password?" action on the sign-in start page when the password field is shown. This improves the account recovery UX when strict user enumeration protection is enabled. ([#8733](https://github.com/clerk/javascript/pull/8733)) by [@Ephem](https://github.com/Ephem)
+
+- Add and improve JSDoc comments across public types and methods to support generated reference documentation for the `/objects` docs section. Exports a few previously-internal types (`OnEventListener`, `OffEventListener`, `ClerkOptionsNavigation`) so they can be referenced from the generated docs. ([#8276](https://github.com/clerk/javascript/pull/8276)) by [@alexisintech](https://github.com/alexisintech)
+
+- Updated dependencies [[`2d6670c`](https://github.com/clerk/javascript/commit/2d6670c6c05c59901709283921b5d65c43f3a676), [`af706e3`](https://github.com/clerk/javascript/commit/af706e35420a16c028fd34b70dd50d663d42e006), [`032632c`](https://github.com/clerk/javascript/commit/032632c6982297e53e28559b59b4a435de4c9adc), [`0fece6f`](https://github.com/clerk/javascript/commit/0fece6ff5d2b1babb59a285dbce9d46723e33d73), [`b295af3`](https://github.com/clerk/javascript/commit/b295af3d5bb12e09a502cae4a935d2e7f5d35d5c), [`8e1bd48`](https://github.com/clerk/javascript/commit/8e1bd48a91dc07751493f41416d2a68b89e114cc), [`90bc732`](https://github.com/clerk/javascript/commit/90bc732143e907051f2cefab8a31283e3d985126)]:
+  - @clerk/shared@4.16.0
+  - @clerk/localizations@4.7.2
+
+## 1.15.0
+
+### Minor Changes
+
+- Internal `<ConfigureSSO />` refactor to call new org-scoped enterprise connections FAPI endpoints, replacing the `/me/` deprecated scope. ([#8671](https://github.com/clerk/javascript/pull/8671)) by [@iagodahlem](https://github.com/iagodahlem)
+
+### Patch Changes
+
+- Add support for Google Workspace SAML provider to self-serve SSO ([#8690](https://github.com/clerk/javascript/pull/8690)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Layer architecture for configure steps per IdP and protocol on `<ConfigureSSO />` ([#8651](https://github.com/clerk/javascript/pull/8651)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Reworks the `<ConfigureSSO />` confirmation step and adds a dedicated reset connection dialog: ([#8706](https://github.com/clerk/javascript/pull/8706)) by [@iagodahlem](https://github.com/iagodahlem)
+  - Introduces `<ResetConnectionDialog />` — a modal-based, type-to-confirm dialog scoped to the wizard container that replaces the inline reset confirmation card. Wraps the destructive delete behind `useReverification`, clears the local provider selection, and rewinds the wizard to provider selection on success.
+  - Restyles the confirmation step body: unified status header with an inline `Active` / `Inactive` badge, grouped Enable SSO and Domain rows, two-column configuration details rendered through `ProfileSection.ItemList`, outlined `Configure again`, destructive `Reset connection`, and an inactive-state banner inside the step footer.
+  - `Step.Header` now accepts a `badge` prop so a step can render an inline status pill next to its title without crowding the right-aligned children slot.
+  - `OrganizationProfile` forwards the shared content ref to `<ConfigureSSO />` so the new dialog portals into the wizard chrome when the component is embedded inside the organization profile.
+
+- "Fix rendering issue for free trial badge." ([#8712](https://github.com/clerk/javascript/pull/8712)) by [@l-armstrong](https://github.com/l-armstrong)
+
+- Fix the legal consent checkbox growing in size when its label wraps to a second line while using the `simple` theme. The checkbox is now aligned to the start of the row so it no longer stretches to match the label height. ([#8705](https://github.com/clerk/javascript/pull/8705)) by [@dmoerner](https://github.com/dmoerner)
+
+- Avoid sending duplicate verification codes when persisted email or phone code verifications are already pending. ([#8548](https://github.com/clerk/javascript/pull/8548)) by [@jacekradko](https://github.com/jacekradko)
+
+- Adds a wizard-wide reset connection entry on the `<ConfigureSSO />` step footers: ([#8711](https://github.com/clerk/javascript/pull/8711)) by [@iagodahlem](https://github.com/iagodahlem)
+  - New `Step.Footer.Reset` compound part that renders a destructive ghost button on the leading edge of the footer and opens the existing `ResetConnectionDialog`. The slot owns its own open state and gates itself on the current enterprise connection, so it stays hidden on the provider selection step.
+  - Wires the reset entry into the Verify Domain, Configure (Okta and Custom SAML), and Test steps so the reset action is reachable from anywhere in the wizard. The confirmation step keeps its in-body destructive button.
+  - Exposes a `configureSSOFooterResetButton` element descriptor so the new button surface can be themed via appearance customizations.
+
+- Fix stepper chevron wrapping in `<ConfigureSSO />` ([#8693](https://github.com/clerk/javascript/pull/8693)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add support for Microsoft Entra SAML provider to self-serve SSO ([#8695](https://github.com/clerk/javascript/pull/8695)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Add mobile support for `<ConfigureSSO />` navbar to display application name, logo and organization name ([#8675](https://github.com/clerk/javascript/pull/8675)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Scope the `UserProfile` active-devices fetch cache by `user.id` so a session switch or sign-out/sign-in on a shared device no longer renders the previous user's device activity (IP, location, browser/device) from the module-scoped cache. ([#8703](https://github.com/clerk/javascript/pull/8703)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`afb75e6`](https://github.com/clerk/javascript/commit/afb75e68efa561ff18f6ae5359df1cf336e861a5), [`c3df67a`](https://github.com/clerk/javascript/commit/c3df67a231adff73fa36563718d9b94e6bb2a540), [`86fd38f`](https://github.com/clerk/javascript/commit/86fd38f4e39ab89b6a9fbb7515a5d9b7b37aa3ab), [`8d6bb56`](https://github.com/clerk/javascript/commit/8d6bb56de25692e0f9c350f16c8f45fbedaad2ac), [`43dfefa`](https://github.com/clerk/javascript/commit/43dfefaabf0bad1a6d92b75b1cb6de1860ea87e4), [`5fc7b21`](https://github.com/clerk/javascript/commit/5fc7b21573cab36b9184dd6277396f7c38b91e1f), [`c2ba134`](https://github.com/clerk/javascript/commit/c2ba1344db5fd50f1d4e04d01d0455f0181c8d96)]:
+  - @clerk/localizations@4.7.1
+  - @clerk/shared@4.15.0
+
+## 1.14.0
+
+### Minor Changes
+
+- Migrate to new icon set to create consistency across components. ([#8319](https://github.com/clerk/javascript/pull/8319)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Display "Single Sign-on (SSO)" section in `OrganizationProfile` if self-serve SSO is enabled on the current active organization ([#8600](https://github.com/clerk/javascript/pull/8600)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Simplify ActionCard shadow styling. ([#8625](https://github.com/clerk/javascript/pull/8625)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add a visible radio indicator to each provider card on the `<ConfigureSSO />` Select Provider step. ([#8664](https://github.com/clerk/javascript/pull/8664)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Introduce UX improvements for `<ConfigureSSO />` such as: ([#8601](https://github.com/clerk/javascript/pull/8601)) by [@LauraBeatris](https://github.com/LauraBeatris)
+  - Render attribute-mapping and service-provider field labels per IdP nomenclature
+  - Add "Open test URL" button and surface a clear empty state
+  - Expand the appearance descriptor surface across step content so developers can override styling
+
+- Updated dependencies [[`e538525`](https://github.com/clerk/javascript/commit/e538525f2399e94099f0f523169710e4c73d430e), [`79cdd1f`](https://github.com/clerk/javascript/commit/79cdd1f9c9d8aa5d9a98d8d245b5f7f98c0cabb4), [`0937b5d`](https://github.com/clerk/javascript/commit/0937b5dfd8e119a0517576b921d887c924f0b148), [`48e3f64`](https://github.com/clerk/javascript/commit/48e3f647d3c89d99f42763a5ee741b684a176e96), [`4af9389`](https://github.com/clerk/javascript/commit/4af93898e1c3c8d51a9ce4ed590d1d564737718c), [`4d5027b`](https://github.com/clerk/javascript/commit/4d5027b15873dc6637e49f51142be64ef5f8e9bf), [`10d36ab`](https://github.com/clerk/javascript/commit/10d36abfd7e4fe0eed421565093704941a8574b9), [`4e08924`](https://github.com/clerk/javascript/commit/4e089248a3dfdf99fc110c06b699a084d4e8a7ee), [`bcf0e77`](https://github.com/clerk/javascript/commit/bcf0e776231c6ec675d3a3a8bfd122513d3c57ef)]:
+  - @clerk/localizations@4.7.0
+  - @clerk/shared@4.14.0
+
+## 1.13.1
+
+### Patch Changes
+
+- Fix the Manage Subscription button in `<UserProfile />` / `<OrganizationProfile />` and the Cancel / Re-subscribe actions in `<SubscriptionDetails />` so they are shown for paid seat-based plans that have no base fee. A shared `isManageableSubscriptionItem` helper now drives both places, treating "free / unmanageable" as "the instance's default plan" instead of "the plan has no base fee". ([#8375](https://github.com/clerk/javascript/pull/8375)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+- Updated dependencies [[`a036ce8`](https://github.com/clerk/javascript/commit/a036ce8fef3b3ee2b49fd05d592b083ffc37f463)]:
+  - @clerk/shared@4.13.1
+  - @clerk/localizations@4.6.8
+
+## 1.13.0
+
+### Minor Changes
+
+- Remove `<ConfigureSSO />` from experimental path ([#8588](https://github.com/clerk/javascript/pull/8588)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Add `elevation` appearance option with `'raised'` (default) and `'flush'` values. When set to `flush`, card-based components render without border, box-shadow, border-radius, outer padding, and footer background, allowing them to sit flat against their container. Applies to `<SignIn />`, `<SignUp />`, `<Waitlist />`, `<CreateOrganization />`, `<OrganizationList />`, `<OAuthConsent />`, `<UserVerification />`, and session task components. Profile and popover components always render as raised. Modal components always render as raised regardless of this setting. ([#8510](https://github.com/clerk/javascript/pull/8510)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  The `cardBox` element exposes a `data-elevation="flush"` attribute when flush is active, giving className-based themes a hook to neutralize their card chrome via attribute selectors. The `shadcn` theme uses this hook to drop its `shadow-sm border` utilities under flush.
+
+### Patch Changes
+
+- Add `ProfileCard.Page` for `UserProfile` and `OrganizationProfile` pages ([#8602](https://github.com/clerk/javascript/pull/8602)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Fix layout shift when Copy test URL button enters loading state in `<ConfigureSSO />` ([#8592](https://github.com/clerk/javascript/pull/8592)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Improve ClipboardInput positioning and accessibility by using `readOnly` instead of `isDisabled` ([#8593](https://github.com/clerk/javascript/pull/8593)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`6eaf4d6`](https://github.com/clerk/javascript/commit/6eaf4d66fe0b21fb96a5cd19d61e6c3b2302ff97), [`1aab31e`](https://github.com/clerk/javascript/commit/1aab31e5070b7223402ff71f65a0d829bbc29cfd)]:
+  - @clerk/shared@4.13.0
+  - @clerk/localizations@4.6.7
+
+## 1.12.1
+
+### Patch Changes
+
+- Fix attribute statement section in `<ConfigureSSO />` with claim name for Custom SAML provider ([#8586](https://github.com/clerk/javascript/pull/8586)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`95f6c2f`](https://github.com/clerk/javascript/commit/95f6c2f8b7154b11dc64c864dcd994baab637c70)]:
+  - @clerk/localizations@4.6.6
+  - @clerk/shared@4.12.2
+
+## 1.12.0
+
+### Minor Changes
+
+- Add `autoFocus` appearance option to disable automatic input focusing ([#8521](https://github.com/clerk/javascript/pull/8521)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Improve Floating UI usage: fix `arialLabel` typo in `MenuTrigger`, replace imperative floating ref in `MenuList` with `useMergeRefs`, remove manual position offset in `SelectOptionList`, add `aria-haspopup` to `MenuTrigger`, and add missing ARIA attributes (`aria-expanded`, `aria-haspopup`, `role`, `aria-selected`) to `Select` components. ([#8328](https://github.com/clerk/javascript/pull/8328)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add support for custom SAML provider in `<ConfigureSSO />` ([#8564](https://github.com/clerk/javascript/pull/8564)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Update `NavBar` to receive `containerSx` prop ([#8568](https://github.com/clerk/javascript/pull/8568)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`4fc38a0`](https://github.com/clerk/javascript/commit/4fc38a097cb9ed1d37c9c3faa274e5c44e405c68)]:
+  - @clerk/localizations@4.6.5
+  - @clerk/shared@4.12.1
+
+## 1.11.0
+
+### Minor Changes
+
+- Add `highlightedPlan` prop to PricingTable default layout to render a "Popular" badge on the matching plan ([#8554](https://github.com/clerk/javascript/pull/8554)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add support for inline `<bold>` markup in localization values, rendered as `<strong>` elements. Translators can now write `'Agree to <bold>Terms</bold>'` in a single key instead of splitting into prefix/bold/suffix fragments. Token values are substituted only into parsed text leaves, so user-controlled data can never become markup. Also hardens `applyTokensToString` to use `Object.prototype.hasOwnProperty.call` when filtering token names, preventing prototype-chain names like `{{hasOwnProperty}}` from crashing rendering. ([#8539](https://github.com/clerk/javascript/pull/8539)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Add a two-mode segmented control to the SAML config submission sub-step in `<__experimental_ConfigureSSO />`. Users pick between **Add via metadata URL** (default) and **Configure manually**. The metadata URL form is unchanged; the manual entry form ships in a follow-up commit. Locale keys added under `configureSSO.configureStep.samlOkta.modes` in `en-US`. ([#8553](https://github.com/clerk/javascript/pull/8553)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Add confirmation step for `<__experimental_ConfigureSSO />` ([#8531](https://github.com/clerk/javascript/pull/8531)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Add test step for `<__experimental_ConfigureSSO />` ([#8544](https://github.com/clerk/javascript/pull/8544)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`9fa6642`](https://github.com/clerk/javascript/commit/9fa6642de6a734faf532ca70c411431c5d0d2bbb), [`930047f`](https://github.com/clerk/javascript/commit/930047f3ea9b603a7f254f7764c3dc5e0fa7c769), [`b45777c`](https://github.com/clerk/javascript/commit/b45777c5723b01b8c7ee3d37b712c639067b36ab), [`5a7225e`](https://github.com/clerk/javascript/commit/5a7225ef119edf551e20bdce8af465b42981c8f2)]:
+  - @clerk/shared@4.12.0
+  - @clerk/localizations@4.6.4
+
+## 1.10.0
+
+### Minor Changes
+
+- Add `fontFamilyMono` appearance variable for customizing the monospace font used in Clerk components. Defaults to `ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace` and is exposed as the `--clerk-font-family-mono` CSS variable. ([#8546](https://github.com/clerk/javascript/pull/8546)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Implement the Okta SAML metadata URL submission path in the Configure step of `<__experimental_ConfigureSSO />`. Adds a single text input for the IdP metadata URL; Continue posts `{ saml: { idpMetadataUrl } }` via `user.updateEnterpriseConnection` wrapped in `useReverification`, with `useCardState` driving the loading state and `handleError` routing backend errors inline to the field or to the card-level error surface. Locale keys added under `configureSSO.configureStep` in `en-US`. Manual entry, file upload, SP-side copy rows, and the Okta admin-console walkthrough ship in follow-up PRs. ([#8535](https://github.com/clerk/javascript/pull/8535)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Implement the provider selection step of `<__experimental_ConfigureSSO />`. Renders the two SAML provider tiles (Okta Workforce and Custom SAML Provider) with real icons sourced from `img.clerk.com`, tracks the picked provider in local state, and gates `Step.Footer.Continue` on a selection. Includes a warning callout about provider lock-in and a minor `Step.Header` alignment tweak. All user-visible strings are wired through `@clerk/localizations`, with translations for every supported locale. ([#8503](https://github.com/clerk/javascript/pull/8503)) by [@iagodahlem](https://github.com/iagodahlem)
+
+  Also extends the flow context with `provider` and `setProvider`, adds the `deriveInitialStep` helper, and wires the wizard's `initialStepId` so the configure flow remounts on the right step after a reload. Continue on Select Provider stages the chosen provider and advances to the next step; the enterprise connection is created on Verify Domain once the user's email is verified and primary.
+
+- Update `<ConfigureSSO />` in the context of organizations to only allow managing enterprise connections based on system permission ([#8515](https://github.com/clerk/javascript/pull/8515)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- fix(ui): don't treat numeric usernames as phone numbers ([#8532](https://github.com/clerk/javascript/pull/8532)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+- Fixed custom page icons not rendering in React 19 due to a forwarded ref overwriting the internal node reference. ([#8534](https://github.com/clerk/javascript/pull/8534)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Add verify/add email address step to `<__experimental_ConfigureSSO />` ([#8520](https://github.com/clerk/javascript/pull/8520)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Refactor `<__experimental_ConfigureSSO />` into a layered primitive set: a state-driven Wizard, a UI-only Stepper, a `Step` compound, and ProfileCard chrome. No public component API change. Drops the central FooterActionsContext registry — each step now renders its own footer via `Step.Footer.Previous` / `Step.Footer.Continue` purely-presentational compounds. Adds a SelectProviderStep boilerplate filtered out of the breadcrumb. ([#8493](https://github.com/clerk/javascript/pull/8493)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Updated dependencies [[`1a4d7d1`](https://github.com/clerk/javascript/commit/1a4d7d1c711c25f4f83c0773616b799df2feb010), [`a6916b1`](https://github.com/clerk/javascript/commit/a6916b15658625a0e627c474a62212a65868bfb6), [`1084180`](https://github.com/clerk/javascript/commit/1084180797722ff113df8404a3c967bc6abeb12d), [`39099b6`](https://github.com/clerk/javascript/commit/39099b62308fc9b0ebbb25988c0ae4b655efe744), [`18e0a1a`](https://github.com/clerk/javascript/commit/18e0a1aa48e7f65a6610ec3c6ffe105deb3474b2)]:
+  - @clerk/localizations@4.6.3
+  - @clerk/shared@4.11.0
+
+## 1.9.1
+
+### Patch Changes
+
+- Fixed unhandled TypeError when `unsafeMetadata` is passed to `<SignUp />` ([#8500](https://github.com/clerk/javascript/pull/8500)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`5cda3ee`](https://github.com/clerk/javascript/commit/5cda3ee8451cc9af375895824d24a5c3ed7fbee6)]:
+  - @clerk/shared@4.10.2
+  - @clerk/localizations@4.6.2
+
+## 1.9.0
+
+### Minor Changes
+
+- Removed unused internal OAuthConsent prop. ([#8492](https://github.com/clerk/javascript/pull/8492)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Add wizard steps for the `<__experimental_ConfigureSSO />` component ([#8468](https://github.com/clerk/javascript/pull/8468)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Remove back button on the sign-in password compromised/pwned error screen. ([#8280](https://github.com/clerk/javascript/pull/8280)) by [@Ephem](https://github.com/Ephem)
+
+  These errors are not recoverable by re-entering the password, so the back button led to a confusing dead end that would always take you back to the same error.
+
+- Updated dependencies [[`7a5892f`](https://github.com/clerk/javascript/commit/7a5892f9bcaa1a6212e6e6d3741160929ffd027e)]:
+  - @clerk/shared@4.10.1
+  - @clerk/localizations@4.6.1
+
 ## 1.8.0
 
 ### Minor Changes

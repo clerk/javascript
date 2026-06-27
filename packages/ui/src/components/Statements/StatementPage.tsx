@@ -2,6 +2,7 @@ import { __internal_useStatementQuery } from '@clerk/shared/react/index';
 
 import { Alert } from '@/ui/elements/Alert';
 import { Header } from '@/ui/elements/Header';
+import { ProfileCard } from '@/ui/elements/ProfileCard';
 import { formatDate } from '@/ui/utils/formatDate';
 
 import { useSubscriberTypeContext, useSubscriberTypeLocalizationRoot } from '../../contexts/components';
@@ -15,7 +16,7 @@ import {
   Spinner,
   useLocalizations,
 } from '../../customizables';
-import { ArrowRightIcon, Plus, RotateLeftRight } from '../../icons';
+import { ArrowRight, Plus, RotateLeftRight } from '../../icons';
 import { useRouter } from '../../router';
 import { Statement } from './Statement';
 
@@ -23,7 +24,7 @@ export const StatementPage = () => {
   const { params, navigate } = useRouter();
   const subscriberType = useSubscriberTypeContext();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
-  const { t, translateError } = useLocalizations();
+  const { t, translateError, $ } = useLocalizations();
   const requesterType = subscriberType === 'organization' ? 'organization' : 'user';
 
   const {
@@ -38,18 +39,20 @@ export const StatementPage = () => {
 
   if (isLoading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-        <Spinner
-          colorScheme='primary'
-          sx={{ margin: 'auto', display: 'block' }}
-          elementDescriptor={descriptors.spinner}
-        />
-      </Box>
+      <ProfileCard.Page>
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+          <Spinner
+            colorScheme='primary'
+            sx={{ margin: 'auto', display: 'block' }}
+            elementDescriptor={descriptors.spinner}
+          />
+        </Box>
+      </ProfileCard.Page>
     );
   }
 
   return (
-    <>
+    <ProfileCard.Page>
       <Header.Root
         sx={t => ({
           borderBlockEndWidth: t.borderWidths.$normal,
@@ -95,8 +98,8 @@ export const StatementPage = () => {
                     <Statement.SectionContentItem key={item.id}>
                       <Statement.SectionContentDetailsHeader
                         title={item.subscriptionItem.plan.name}
-                        description={`${item.subscriptionItem.amount?.currencySymbol}${item.subscriptionItem.amount?.amountFormatted} / ${item.subscriptionItem.planPeriod === 'month' ? t(localizationKeys('billing.month')) : t(localizationKeys('billing.year'))}`}
-                        secondaryTitle={`${item.amount.currencySymbol}${item.amount.amountFormatted}`}
+                        description={`${item.subscriptionItem.amount ? $(item.subscriptionItem.amount) : ''} / ${item.subscriptionItem.planPeriod === 'month' ? t(localizationKeys('billing.month')) : t(localizationKeys('billing.year'))}`}
+                        secondaryTitle={$(item.amount)}
                       />
                       <Statement.SectionContentDetailsList>
                         <Statement.SectionContentDetailsListItem
@@ -130,13 +133,19 @@ export const StatementPage = () => {
                             >
                               <Span localizationKey={localizationKeys('billing.viewPayment')} />
                               <Icon
-                                icon={ArrowRightIcon}
+                                icon={ArrowRight}
                                 size='sm'
                                 aria-hidden
                               />
                             </SimpleButton>
                           }
                         />
+                        {item.totals?.discounts?.proration && item.totals.discounts.proration.amount.amount > 0 ? (
+                          <Statement.SectionContentDetailsListItem
+                            label={localizationKeys('billing.proratedDiscount')}
+                            value={`(${$(item.totals.discounts.proration.amount)})`}
+                          />
+                        ) : null}
                         {item.subscriptionItem.credits &&
                         item.subscriptionItem.credits.proration &&
                         item.subscriptionItem.credits.proration.amount.amount > 0 ? (
@@ -144,7 +153,7 @@ export const StatementPage = () => {
                             label={localizationKeys(
                               `${localizationRoot}.billingPage.statementsSection.itemCaption__proratedCredit`,
                             )}
-                            value={`(${item.subscriptionItem.credits.proration.amount.currencySymbol}${item.subscriptionItem.credits.proration.amount.amountFormatted})`}
+                            value={`(${$(item.subscriptionItem.credits.proration.amount)})`}
                           />
                         ) : null}
                         {item.subscriptionItem.credits &&
@@ -154,7 +163,7 @@ export const StatementPage = () => {
                             label={localizationKeys(
                               `${localizationRoot}.billingPage.statementsSection.itemCaption__payerCredit`,
                             )}
-                            value={`(${item.subscriptionItem.credits.payer.appliedAmount.currencySymbol}${item.subscriptionItem.credits.payer.appliedAmount.amountFormatted})`}
+                            value={`(${$(item.subscriptionItem.credits.payer.appliedAmount)})`}
                           />
                         ) : null}
                       </Statement.SectionContentDetailsList>
@@ -166,10 +175,10 @@ export const StatementPage = () => {
           </Statement.Body>
           <Statement.Footer
             label={localizationKeys(`${localizationRoot}.billingPage.statementsSection.totalPaid`)}
-            value={`${statement.totals.grandTotal.currencySymbol}${statement.totals.grandTotal.amountFormatted}`}
+            value={$(statement.totals.grandTotal)}
           />
         </Statement.Root>
       )}
-    </>
+    </ProfileCard.Page>
   );
 };

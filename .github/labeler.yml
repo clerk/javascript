@@ -20,6 +20,10 @@ elements:
   - changed-files:
       - any-glob-to-any-file: packages/elements/**
 
+eslint-plugin:
+  - changed-files:
+      - any-glob-to-any-file: packages/eslint-plugin/**
+
 expo:
   - changed-files:
       - any-glob-to-any-file: packages/expo/**
@@ -79,10 +83,6 @@ ui:
 vue:
   - changed-files:
       - any-glob-to-any-file: packages/vue/**
-
-playground:
-  - changed-files:
-      - any-glob-to-any-file: playground/**
 
 actions:
   - changed-files:

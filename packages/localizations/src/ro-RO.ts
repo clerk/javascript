@@ -51,10 +51,15 @@ export const roRO: LocalizationResource = {
       formButtonPrimary__revoke: 'Revocă cheia',
       formHint: 'Sigur vrei să ștergi această cheie Secret?',
       formTitle: 'Revoci cheia secretă „{{apiKeyName}}”?',
+      inputLabel: undefined,
     },
+    tableHeader__actions: undefined,
+    tableHeader__lastUsed: undefined,
+    tableHeader__name: undefined,
   },
   backButton: 'Înapoi',
   badge__activePlan: 'Activ',
+  badge__banned: undefined,
   badge__canceledEndsAt: "Anulat • Se încheie {{ date | shortDate('ro-RO') }}",
   badge__currentPlan: 'Plan curent',
   badge__default: 'Implicit',
@@ -75,11 +80,14 @@ export const roRO: LocalizationResource = {
   badge__userDevice: 'Dispozitiv utilizator',
   badge__you: 'Tu',
   billing: {
+    accountCredit: undefined,
     addPaymentMethod__label: 'Adaugă metodă de plată',
     alwaysFree: 'Întotdeauna gratuit',
     annually: 'Anual',
     availableFeatures: 'Funcții disponibile',
     billedAnnually: 'Facturat anual',
+    billedAnnuallyOnly: undefined,
+    billedMonthly: undefined,
     billedMonthlyOnly: 'Doar facturare lunară',
     cancelFreeTrial: 'Anulează perioada de probă',
     cancelFreeTrialAccessUntil:
@@ -118,20 +126,25 @@ export const roRO: LocalizationResource = {
       title__subscriptionSuccessful: 'Succes!',
       title__trialSuccess: 'Perioada de probă a început!',
       totalDueAfterTrial: 'Total de plată după ce perioada de probă se încheie în {{days}} zile',
+      totalDuePerPeriod: undefined,
     },
     credit: 'Credit',
     creditRemainder: 'Credit pentru restul abonamentului curent.',
     defaultFreePlanActive: 'În prezent ești pe planul Gratuit',
     free: 'Gratuit',
     getStarted: 'Începe',
+    highlightedPlanBadge: 'Popular',
     keepFreeTrial: 'Păstrează perioada de probă',
     keepSubscription: 'Păstrează abonamentul',
     manage: 'Gestionează',
     manageSubscription: 'Gestionează abonamentul',
     month: 'Lună',
+    monthAbbreviation: undefined,
+    monthPerUnit: undefined,
     monthly: 'Lunar',
     pastDue: 'Restanță',
     pay: 'Plătește {{amount}}',
+    payerCreditRemainder: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: 'Plată anuală',
@@ -147,12 +160,32 @@ export const roRO: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Metode de plată',
-    popular: 'Popular',
     pricingTable: {
       billingCycle: 'Ciclu de facturare',
       included: 'Inclus',
+      seatCost: {
+        additionalSeats: undefined,
+        freeUpToSeats: undefined,
+        includedSeats: undefined,
+        perSeat: undefined,
+        tooltip: {
+          additionalSeatsEach: undefined,
+          firstSeatsIncludedInPlan: undefined,
+          freeForUpToSeats: undefined,
+        },
+        unlimitedSeats: undefined,
+        upToSeats: undefined,
+      },
     },
+    proratedDiscount: undefined,
+    prorationCredit: undefined,
     reSubscribe: 'Re-abonează-te',
+    seatBreakdownIncludedPlural: undefined,
+    seatBreakdownIncludedSingular: undefined,
+    seatBreakdownPlural: undefined,
+    seatBreakdownSingular: undefined,
+    seats: undefined,
+    seatsWithLimit: undefined,
     seeAllFeatures: 'Vezi toate funcțiile',
     startFreeTrial: 'Începe perioada de probă',
     startFreeTrial__days: 'Începe perioada de probă de {{days}} zile',
@@ -173,20 +206,576 @@ export const roRO: LocalizationResource = {
       trialStartedOn: 'Perioada de probă a început pe',
     },
     subtotal: 'Subtotal',
+    subtotalRenewal: undefined,
     switchPlan: 'Schimbă pe acest plan',
     switchToAnnual: 'Treci la anual',
-    switchToAnnualWithAnnualPrice: 'Treci la anual {{currency}}{{price}} / an',
+    switchToAnnualWithAnnualPrice: 'Treci la anual {{price}} / an',
     switchToMonthly: 'Treci la lunar',
-    switchToMonthlyWithPrice: 'Treci la lunar {{currency}}{{price}} / lună',
+    switchToMonthlyWithPrice: 'Treci la lunar {{price}} / lună',
     totalDue: 'Total de plată',
+    totalDuePerPeriod: undefined,
     totalDueToday: 'Total de plată astăzi',
     viewFeatures: 'Vezi funcțiile',
     viewPayment: 'Vezi plata',
     year: 'An',
+    yearAbbreviation: undefined,
+    yearPerUnit: undefined,
   },
   configureSSO: {
+    configureStep: {
+      attributeMappingTable: {
+        badges: {
+          optional: undefined,
+          required: undefined,
+        },
+      },
+      samlCustom: {
+        assignUsersStep: {
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          title: undefined,
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attributeName: undefined,
+              userProfile: undefined,
+            },
+            rows: {
+              email: {
+                attributeName: undefined,
+                userProfile: undefined,
+              },
+              firstName: {
+                attributeName: undefined,
+                userProfile: undefined,
+              },
+              lastName: {
+                attributeName: undefined,
+                userProfile: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        createAppStep: {
+          createAppInstructions: {
+            paragraph: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+            title: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+      },
+      samlGoogle: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              appAttribute: undefined,
+              googleAttribute: undefined,
+            },
+            rows: {
+              email: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+              firstName: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+              lastName: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+        },
+        configureUserAccess: {
+          assignUsersInstructions: {
+            paragraph1: undefined,
+            paragraph2: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        createAppStep: {
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataFile: {
+            description: undefined,
+            fileUploaded: undefined,
+            label: undefined,
+            removeFile: undefined,
+            replaceFile: undefined,
+            uploadFile: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataFile: undefined,
+            title: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        serviceProviderStep: {
+          headerSubtitle: undefined,
+          nameIdInstructions: {
+            step1: undefined,
+            step2: undefined,
+          },
+          paragraph: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+          title: undefined,
+        },
+      },
+      samlMicrosoft: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attribute: undefined,
+              claimName: undefined,
+              value: undefined,
+            },
+            rows: {
+              email: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+              firstName: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+              lastName: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          title: undefined,
+        },
+        createAppStep: {
+          assignUsersInstructions: {
+            paragraph1: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            step6: undefined,
+            title: undefined,
+          },
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: {
+              label: undefined,
+              subSteps: {
+                appName: undefined,
+                create: undefined,
+                nonGallery: undefined,
+              },
+            },
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+            title: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        serviceProviderStep: {
+          headerSubtitle: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+          step5: undefined,
+          step6: undefined,
+          title: undefined,
+        },
+      },
+      samlOkta: {
+        assignUsersStep: {
+          assignUsersInstructions: {
+            paragraph: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              expression: undefined,
+              name: undefined,
+            },
+            rows: {
+              email: {
+                expression: undefined,
+                name: undefined,
+              },
+              firstName: {
+                expression: undefined,
+                name: undefined,
+              },
+              lastName: {
+                expression: undefined,
+                name: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+        },
+        createAppStep: {
+          completeSamlIntegrationInstructions: {
+            step1: undefined,
+            step2: undefined,
+            title: undefined,
+          },
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+          serviceProviderInstructions: {
+            paragraph1: undefined,
+            paragraph2: undefined,
+            serviceProviderFields: {
+              acsUrl: {
+                label: undefined,
+              },
+              spEntityId: {
+                label: undefined,
+              },
+            },
+            title: undefined,
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+            title: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+      },
+    },
+    confirmation: {
+      configurationSection: {
+        configureAgainLink: undefined,
+        issuerLabel: undefined,
+        ssoUrlLabel: undefined,
+        title: undefined,
+      },
+      domainSection: {
+        title: undefined,
+      },
+      enableSection: {
+        title: undefined,
+      },
+      inactiveBanner: {
+        title: undefined,
+      },
+      resetSection: {
+        confirmationFieldLabel: undefined,
+        submitButton: undefined,
+        title: undefined,
+        warning: undefined,
+      },
+      statusSection: {
+        activeBadge: undefined,
+        inactiveBadge: undefined,
+        title: undefined,
+      },
+    },
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'Contactați administratorul organizației dumneavoastră pentru a vă extinde permisiunile.',
+      title: 'Nu aveți permisiunea să gestionați autentificarea unică (SSO)',
+    },
     navbar: {
       title: 'Configurați autentificarea unică (SSO)',
+    },
+    organizationDomainsStep: {
+      domainCard: {
+        badge__unverified: 'Neverificat',
+        badge__verified: 'Verificat',
+        removeButtonTooltip__lastVerifiedDomain: undefined,
+        removeButtonTooltip__lastVerifiedDomainActive: undefined,
+        txtRecord: {
+          hostLabel: 'Gazdă / Nume',
+          instructions:
+            'Adaugă această înregistrare TXT la furnizorul tău DNS. O vom verifica automat de îndată ce înregistrarea devine activă.',
+          typeLabel: 'Tip',
+          valueLabel: 'Valoare',
+        },
+        verifiedAtLabel: "Verificat pe {{ date | shortDate('ro-RO') }}",
+      },
+      domainSuggestion: {
+        formButtonPrimary__add: 'Adaugă {{domain}}',
+        messageLabel: 'E-mailul tău folosește {{domain}}. Vrei să-l adaugi?',
+      },
+      formButtonPrimary__add: 'Adaugă',
+      formFieldInputPlaceholder__domain: 'Adaugă domeniu',
+      formFieldLabel__domain: 'Domeniu',
+      removeDomainDialog: {
+        cancelButton: undefined,
+        removeButton: undefined,
+        subtitle__active: undefined,
+        subtitle__inactive: undefined,
+        title: undefined,
+      },
+      subtitle:
+        'Adaugă și verifică dreptul de proprietate asupra domeniilor pe care organizația ta le folosește pentru autentificare.',
+      title: 'Adaugă domenii SSO',
+    },
+    resetConnectionDialog: {
+      cancelButton: undefined,
+      confirmationFieldLabel: undefined,
+      confirmationFieldPlaceholder: undefined,
+      resetButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    selectProviderStep: {
+      saml: {
+        customSaml: 'Furnizor SAML personalizat',
+        google: undefined,
+        groupLabel: 'SAML',
+        microsoft: undefined,
+        okta: 'Okta Workforce',
+      },
+      subtitle: 'Selectați furnizorul pentru care veți configura SSO.',
+      title: 'Selectați furnizorul',
+      warning: 'Odată ce un furnizor este selectat, nu îl puteți schimba până când configurația nu este finalizată',
+    },
+    testConfigurationStep: {
+      error__noSuccessfulTestRun: undefined,
+      subtitle: undefined,
+      testResults: {
+        actionLabel__refresh: undefined,
+        empty: {
+          subtitle: undefined,
+          title: undefined,
+        },
+        polling: undefined,
+        status__failed: undefined,
+        status__pending: undefined,
+        status__success: undefined,
+        title: undefined,
+      },
+      testRunDetails: {
+        howToFix: {
+          actionLabel__viewDocumentation: undefined,
+          oauth_access_denied: {
+            description: undefined,
+          },
+          oauth_fetch_user_error: {
+            intro: undefined,
+            step1: undefined,
+            step2: undefined,
+          },
+          oauth_token_exchange_error: {
+            description: undefined,
+          },
+          saml_email_address_domain_mismatch: {
+            description: undefined,
+          },
+          saml_response_relaystate_missing: {
+            description: undefined,
+          },
+          saml_user_attribute_missing: {
+            intro: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+          },
+          sectionTitle: undefined,
+        },
+        parsedUserInfo: {
+          email: undefined,
+          firstName: undefined,
+          sectionTitle: undefined,
+        },
+        runDetails: {
+          actionLabel__copied: undefined,
+          actionLabel__copy: undefined,
+          errorCode: undefined,
+          fullMessage: undefined,
+          sectionTitle: undefined,
+          status: undefined,
+          timestamp: undefined,
+        },
+        title: undefined,
+      },
+      testUrl: {
+        actionLabel__open: undefined,
+      },
+      title: undefined,
     },
   },
   createOrganization: {
@@ -235,6 +824,7 @@ export const roRO: LocalizationResource = {
   formFieldInputPlaceholder__organizationSlug: 'org-mea',
   formFieldInputPlaceholder__password: 'Introdu parola',
   formFieldInputPlaceholder__phoneNumber: 'Introdu numărul de telefon',
+  formFieldInputPlaceholder__signUpPassword: undefined,
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKey: 'Cheie API',
@@ -265,6 +855,9 @@ export const roRO: LocalizationResource = {
   formFieldLabel__role: 'Rol',
   formFieldLabel__signOutOfOtherSessions: 'Deconectează celelalte dispozitive',
   formFieldLabel__username: 'Nume de utilizator',
+  identityPreviewEditButton__emailAddress: undefined,
+  identityPreviewEditButton__identifier: undefined,
+  identityPreviewEditButton__phoneNumber: undefined,
   impersonationFab: {
     action__signOut: 'Deconectează-te',
     title: 'Autentificat ca {{identifier}}',
@@ -274,6 +867,22 @@ export const roRO: LocalizationResource = {
   membershipRole__admin: 'Administrator',
   membershipRole__basicMember: 'Membru',
   membershipRole__guestMember: 'Invitat',
+  oauthConsent: {
+    action__allow: undefined,
+    action__deny: undefined,
+    offlineAccessNotice: undefined,
+    redirectNotice: undefined,
+    redirectUriModal: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    scopeList: {
+      title: undefined,
+    },
+    subtitle: undefined,
+    viewFullUrl: undefined,
+    warning: undefined,
+  },
   organizationList: {
     action__createOrganization: 'Creează organizație',
     action__invitationAccept: 'Alătură-te',
@@ -291,6 +900,7 @@ export const roRO: LocalizationResource = {
     },
     badge__automaticInvitation: 'Invitații automate',
     badge__automaticSuggestion: 'Sugestii automate',
+    badge__enterpriseSso: undefined,
     badge__manualInvitation: 'Fără înscriere automată',
     badge__unverified: 'Neverificat',
     billingPage: {
@@ -328,6 +938,7 @@ export const roRO: LocalizationResource = {
       statementsSection: {
         empty: 'Nu există extrase de afișat',
         itemCaption__paidForPlan: 'Plătit pentru planul {{plan}} ({{period}})',
+        itemCaption__payerCredit: undefined,
         itemCaption__proratedCredit: 'Credit proporțional pentru utilizarea parțială a abonamentului anterior',
         itemCaption__subscribedAndPaidForPlan: 'Abonat și plătit pentru planul {{plan}} ({{period}})',
         notFound: 'Extrasul nu a fost găsit',
@@ -340,6 +951,11 @@ export const roRO: LocalizationResource = {
         actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'Abonează-te la un plan',
         actionLabel__switchPlan: 'Schimbă planurile',
+        includedSeatsUsage: undefined,
+        overview: undefined,
+        paidSeatsUsage: undefined,
+        seatLimit: undefined,
+        seatLimitAndIncludedSeats: undefined,
         tableHeader__edit: 'Editează',
         tableHeader__plan: 'Plan',
         tableHeader__startDate: 'Data începerii',
@@ -362,6 +978,7 @@ export const roRO: LocalizationResource = {
       detailsTitle__inviteFailed:
         'Invitațiile nu au putut fi trimise. Există deja invitații în așteptare pentru următoarele adrese: {{email_addresses}}.',
       formButtonPrimary__continue: 'Trimite invitațiile',
+      formButtonPrimary__purchaseSeats: undefined,
       selectDropdown__role: 'Selectează rolul',
       subtitle: 'Introdu sau lipește una sau mai multe adrese de email, separate prin spații sau virgule.',
       successMessage: 'Invitațiile au fost trimise cu succes',
@@ -422,11 +1039,13 @@ export const roRO: LocalizationResource = {
       description: 'Gestionează organizația.',
       general: 'General',
       members: 'Membri',
+      security: undefined,
       title: 'Organizație',
     },
     plansPage: {
       alerts: {
         noPermissionsToManageBilling: 'Nu ai permisiuni pentru a gestiona facturarea acestei organizații.',
+        planMembershipLimitExceeded: undefined,
       },
       title: 'Planuri',
     },
@@ -467,9 +1086,33 @@ export const roRO: LocalizationResource = {
       successMessage: '{{domain}} a fost eliminat.',
       title: 'Elimină domeniul',
     },
+    securityPage: {
+      removeDialog: {
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      ssoSection: {
+        badge__active: undefined,
+        badge__inProgress: undefined,
+        badge__inactive: undefined,
+        badge__unconfigured: undefined,
+        descriptionLine1: undefined,
+        domainLabel: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__continueConfiguration: undefined,
+        primaryButton__startConfiguration: undefined,
+        title: undefined,
+      },
+      title: undefined,
+    },
     start: {
       headerTitle__general: 'General',
       headerTitle__members: 'Membri',
+      membershipSeatUsageLabel: undefined,
       profileSection: {
         primaryButton: 'Actualizează profilul',
         title: 'Profilul organizației',
@@ -983,6 +1626,8 @@ export const roRO: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} este deja membru al organizației.',
+    api_key_name_already_exists: undefined,
+    api_key_usage_exceeded: undefined,
     avatar_file_size_exceeded:
       'Dimensiunea fișierului depășește limita maximă de 10 MB. Te rugăm să alegi un fișier mai mic.',
     avatar_file_type_invalid:
@@ -1028,7 +1673,10 @@ export const roRO: LocalizationResource = {
     form_username_needs_non_number_char:
       'Numele dvs. de utilizator trebuie să conțină cel puțin un caracter nenumeric.',
     identification_deletion_failed: undefined,
+    insufficient_seats_change_plan: undefined,
+    insufficient_seats_contact_support: undefined,
     not_allowed_access: undefined,
+    oauth_access_denied: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -1105,6 +1753,9 @@ export const roRO: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Deconectează-te',
     action__signOutAll: 'Deconectează toate conturile',
+    label__userButtonPopover: 'Panoul contului',
+    label__accountActions: 'Acțiuni cont',
+    label__activeSessions: 'Sesiuni active',
   },
   userProfile: {
     apiKeysPage: {
@@ -1161,6 +1812,7 @@ export const roRO: LocalizationResource = {
       statementsSection: {
         empty: 'Nu există extrase de afișat',
         itemCaption__paidForPlan: 'Plătit pentru planul {{plan}} {{period}}',
+        itemCaption__payerCredit: undefined,
         itemCaption__proratedCredit: 'Credit proporțional pentru utilizarea parțială a abonamentului anterior',
         itemCaption__subscribedAndPaidForPlan: 'Abonat și plătit pentru planul {{plan}} {{period}}',
         notFound: 'Extrasul nu a fost găsit',
@@ -1173,6 +1825,7 @@ export const roRO: LocalizationResource = {
         actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'Abonează-te la un plan',
         actionLabel__switchPlan: 'Schimbă planurile',
+        overview: undefined,
         tableHeader__edit: 'Editează',
         tableHeader__plan: 'Plan',
         tableHeader__startDate: 'Data începerii',

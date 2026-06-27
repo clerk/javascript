@@ -1,8 +1,9 @@
 import { iconImageUrl } from '@clerk/shared/constants';
 import React from 'react';
 
-import { Button, descriptors, Flex, Icon, Text } from '../customizables';
-import { PencilEdit } from '../icons';
+import { Button, descriptors, Flex, Icon, Text, useLocalizations } from '../customizables';
+import { Pen } from '../icons';
+import type { LocalizationKey } from '../localization';
 import type { PropsOfComponent } from '../styledSystem';
 import { formatSafeIdentifier, isMaskedIdentifier } from '../utils/formatSafeIdentifier';
 import { getFlagEmojiFromCountryIso, parsePhoneString } from '../utils/phoneUtils';
@@ -11,10 +12,18 @@ type IdentityPreviewProps = {
   avatarUrl: string | null | undefined;
   identifier: string | null | undefined;
   onClick?: React.MouseEventHandler;
+  editButtonAriaLabel: LocalizationKey;
 } & PropsOfComponent<typeof Flex>;
 
 export const IdentityPreview = (props: IdentityPreviewProps) => {
-  const { avatarUrl = iconImageUrl('avatar_placeholder', 'jpeg'), identifier, onClick, ...rest } = props;
+  const { t } = useLocalizations();
+  const {
+    avatarUrl = iconImageUrl('avatar_placeholder', 'jpeg'),
+    identifier,
+    onClick,
+    editButtonAriaLabel,
+    ...rest
+  } = props;
   const refs = React.useRef({ avatarUrl, identifier: formatSafeIdentifier(identifier) });
 
   const edit = onClick && (
@@ -23,11 +32,11 @@ export const IdentityPreview = (props: IdentityPreviewProps) => {
       variant='link'
       textVariant='buttonSmall'
       onClick={onClick}
-      aria-label={'Edit'}
+      aria-label={t(editButtonAriaLabel)}
     >
       <Icon
         elementDescriptor={descriptors.identityPreviewEditButtonIcon}
-        icon={PencilEdit}
+        icon={Pen}
       />
     </Button>
   );

@@ -1,5 +1,17 @@
-import type { UseFloatingOptions, UseFloatingReturn } from '@floating-ui/react';
-import { autoUpdate, flip, offset, shift, size, useDismiss, useFloating, useFloatingNodeId } from '@floating-ui/react';
+import type { UseFloatingOptions, UseFloatingReturn, UseInteractionsReturn, UseRoleProps } from '@floating-ui/react';
+import {
+  autoUpdate,
+  flip,
+  offset,
+  shift,
+  size,
+  useClick,
+  useDismiss,
+  useFloating,
+  useFloatingNodeId,
+  useInteractions,
+  useRole,
+} from '@floating-ui/react';
 import React, { useEffect } from 'react';
 
 type UsePopoverProps = {
@@ -9,7 +21,7 @@ type UsePopoverProps = {
   shoudFlip?: boolean;
   autoUpdate?: boolean;
   outsidePress?: boolean | ((event: MouseEvent) => boolean);
-  adjustToReferenceWidth?: boolean;
+  adjustToReferenceWidth?: boolean | number;
   referenceElement?: React.RefObject<HTMLElement> | null;
   canCloseModal?: boolean;
   bubbles?:
@@ -18,6 +30,7 @@ type UsePopoverProps = {
         escapeKey?: boolean;
         outsidePress?: boolean;
       };
+  role?: UseRoleProps['role'];
 };
 
 // Need to be explicitly defined to avoid type errors in the Popover component
@@ -32,6 +45,8 @@ export type UsePopoverReturn = {
   isOpen: boolean;
   styles: { position: React.CSSProperties['position']; top: number; left: number };
   context: UseFloatingReturn['context'];
+  getReferenceProps: UseInteractionsReturn['getReferenceProps'];
+  getFloatingProps: UseInteractionsReturn['getFloatingProps'];
 };
 
 export const usePopover = (props: UsePopoverProps = {}): UsePopoverReturn => {
@@ -42,6 +57,7 @@ export const usePopover = (props: UsePopoverProps = {}): UsePopoverReturn => {
     adjustToReferenceWidth = false,
     referenceElement,
     canCloseModal,
+    role: roleOption = 'dialog',
   } = props;
   const [isOpen, setIsOpen] = React.useState(props.defaultOpen || false);
   const nodeId = useFloatingNodeId();
@@ -60,20 +76,25 @@ export const usePopover = (props: UsePopoverProps = {}): UsePopoverReturn => {
       shift(),
       size({
         apply({ elements }) {
-          if (adjustToReferenceWidth) {
+          if (typeof adjustToReferenceWidth === 'number' || adjustToReferenceWidth === true) {
             const reference = elements.reference as any as HTMLElement;
-            elements.floating.style.width = reference ? `${reference?.offsetWidth}px` : '';
+            const extra = typeof adjustToReferenceWidth === 'number' ? adjustToReferenceWidth : 0;
+            elements.floating.style.width = reference ? `${reference.offsetWidth + extra}px` : '';
           }
         },
       }),
     ],
   });
 
-  useDismiss(context, {
+  const click = useClick(context);
+  const dismiss = useDismiss(context, {
     enabled: canCloseModal !== false,
     bubbles,
     outsidePress,
   });
+  const role = useRole(context, { role: roleOption });
+
+  const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
 
   useEffect(() => {
     if (props.defaultOpen) {
@@ -95,5 +116,7 @@ export const usePopover = (props: UsePopoverProps = {}): UsePopoverReturn => {
     isOpen,
     styles: { position: strategy, top: y ?? 0, left: x ?? 0 },
     context,
+    getReferenceProps,
+    getFloatingProps,
   };
 };

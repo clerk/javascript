@@ -267,7 +267,6 @@ export default tseslint.config([
       'commitlint.config.ts',
       'packages/*/dist/**',
       'packages/*/examples',
-      'playground/*',
       'pnpm-lock.json',
       'eslint.config.mjs',
       'typedoc.config.mjs',
@@ -535,6 +534,29 @@ export default tseslint.config([
     files: ['packages/ui/src/**/*'],
     rules: {
       'custom-rules/no-physical-css-properties': 'error',
+    },
+  },
+  {
+    name: 'packages/ui/mosaic',
+    files: ['packages/ui/src/mosaic/**/*'],
+    ignores: ['packages/ui/src/mosaic/utils.ts', 'packages/ui/src/mosaic/__tests__/**'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "Property > Literal.key[value='&:hover']",
+          message: "Use hover() from mosaic/utils instead of bare '&:hover'.",
+        },
+        {
+          selector: "Property > Literal.key[value='@media (hover: hover)']",
+          message: "Use hover() from mosaic/utils instead of raw '@media (hover: hover)'.",
+        },
+        {
+          selector: "Property > Literal.key[value='@media (prefers-reduced-motion: no-preference)']",
+          message:
+            "Use motionSafe() from mosaic/utils instead of raw '@media (prefers-reduced-motion: no-preference)'.",
+        },
+      ],
     },
   },
   {

@@ -36,8 +36,13 @@ export class Billing implements BillingNamespace {
   }
 
   getPlans = async (params?: GetPlansParams): Promise<ClerkPaginatedResponse<BillingPlanResource>> => {
-    const { for: forParam, ...safeParams } = params || {};
-    const searchParams = { ...safeParams, payer_type: forParam === 'organization' ? 'org' : 'user' };
+    const { for: forParam, orgId, minSeats, ...safeParams } = params || {};
+    const searchParams = {
+      ...safeParams,
+      payer_type: forParam === 'organization' ? 'org' : 'user',
+      org_id: orgId,
+      min_seats: minSeats,
+    };
     return await BaseResource._fetch({
       path: `${Billing.#pathRoot}/plans`,
       method: 'GET',

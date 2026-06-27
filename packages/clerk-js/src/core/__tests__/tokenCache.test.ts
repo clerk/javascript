@@ -31,13 +31,23 @@ function createJwtWithTtl(iatSeconds: number, ttlSeconds: number): string {
   return `${headerB64}.${payloadB64}.${signature}`;
 }
 
+/**
+ * Helper to create a JWT with custom iat AND oiat header for monotonic-freshness tests
+ */
+function createJwtWithOiat(iatSeconds: number, oiatSeconds: number, ttlSeconds = 60): string {
+  const header = { alg: 'HS256', typ: 'JWT', oiat: oiatSeconds };
+  const payload = { sid: 'session_123', exp: iatSeconds + ttlSeconds, iat: iatSeconds };
+  const b64 = (o: object) => btoa(JSON.stringify(o)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+  return `${b64(header)}.${b64(payload)}.test-signature`;
+}
+
 describe('SessionTokenCache', () => {
   let mockBroadcastChannel: {
     addEventListener: ReturnType<typeof vi.fn>;
     close: ReturnType<typeof vi.fn>;
     postMessage: ReturnType<typeof vi.fn>;
   };
-  let broadcastListener: (e: MessageEvent<SessionTokenEvent>) => void;
+  let broadcastListener: (e: MessageEvent<SessionTokenEvent>) => void | Promise<void>;
   let originalBroadcastChannel: any;
 
   beforeEach(() => {
@@ -195,26 +205,28 @@ describe('SessionTokenCache', () => {
       expect(SessionTokenCache.size()).toBe(0);
     });
 
-    it('enforces monotonicity: does not overwrite newer token with older one', () => {
+    it('enforces monotonicity: does not overwrite newer token with older one', async () => {
+      // Both tokens carry oiat (the production case post-rollout). Older oiat
+      // broadcast must not clobber the newer one already in cache.
+      const newerJwt = createJwtWithOiat(1666648250, 1666648250);
+      const olderJwt = createJwtWithOiat(1666648190, 1666648190);
+
       const newerEvent: MessageEvent<SessionTokenEvent> = {
         data: {
           organizationId: null,
           sessionId: 'session_123',
           template: undefined,
           tokenId: 'session_123',
-          tokenRaw: mockJwt,
+          tokenRaw: newerJwt,
           traceId: 'test_trace_7',
         },
       } as MessageEvent<SessionTokenEvent>;
 
-      broadcastListener(newerEvent);
+      await broadcastListener(newerEvent);
       const resultAfterNewer = SessionTokenCache.get({ tokenId: 'session_123' });
       expect(resultAfterNewer).toBeDefined();
       const newerCreatedAt = resultAfterNewer?.entry.createdAt;
 
-      // mockJwt has iat: 1666648250, so create an older one with iat: 1666648190 (60 seconds earlier)
-      const olderJwt =
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjY2NDg4NTAsImlhdCI6MTY2NjY0ODE5MH0.Z1BC47lImYvaAtluJlY-kBo0qOoAk42Xb-gNrB2SxJg';
       const olderEvent: MessageEvent<SessionTokenEvent> = {
         data: {
           organizationId: null,
@@ -226,11 +238,53 @@ describe('SessionTokenCache', () => {
         },
       } as MessageEvent<SessionTokenEvent>;
 
-      broadcastListener(olderEvent);
+      await broadcastListener(olderEvent);
 
       const resultAfterOlder = SessionTokenCache.get({ tokenId: 'session_123' });
       expect(resultAfterOlder).toBeDefined();
       expect(resultAfterOlder?.entry.createdAt).toBe(newerCreatedAt);
+    });
+
+    it('enforces monotonicity: replaces older cached token when a fresher-oiat broadcast arrives', async () => {
+      // Inverse of the previous test: a fresher-oiat broadcast must overwrite
+      // an older-oiat token already in cache. Use ttl=120 so both tokens stay
+      // valid against the test clock (nowSec=1666648260) — cache.get drops
+      // entries past their expiry.
+      const olderJwt = createJwtWithOiat(1666648190, 1666648190, 120);
+      const newerJwt = createJwtWithOiat(1666648250, 1666648250, 120);
+
+      const olderEvent: MessageEvent<SessionTokenEvent> = {
+        data: {
+          organizationId: null,
+          sessionId: 'session_123',
+          template: undefined,
+          tokenId: 'session_123',
+          tokenRaw: olderJwt,
+          traceId: 'test_trace_older_first',
+        },
+      } as MessageEvent<SessionTokenEvent>;
+
+      await broadcastListener(olderEvent);
+      const resultAfterOlder = SessionTokenCache.get({ tokenId: 'session_123' });
+      expect(resultAfterOlder).toBeDefined();
+      expect(resultAfterOlder?.entry.createdAt).toBe(1666648190);
+
+      const newerEvent: MessageEvent<SessionTokenEvent> = {
+        data: {
+          organizationId: null,
+          sessionId: 'session_123',
+          template: undefined,
+          tokenId: 'session_123',
+          tokenRaw: newerJwt,
+          traceId: 'test_trace_newer_second',
+        },
+      } as MessageEvent<SessionTokenEvent>;
+
+      await broadcastListener(newerEvent);
+
+      const resultAfterNewer = SessionTokenCache.get({ tokenId: 'session_123' });
+      expect(resultAfterNewer).toBeDefined();
+      expect(resultAfterNewer?.entry.createdAt).toBe(1666648250);
     });
 
     it('successfully updates cache with valid token', () => {
@@ -451,6 +505,42 @@ describe('SessionTokenCache', () => {
       await tokenResolver;
 
       expect(mockBroadcastChannel.postMessage).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('broadcast resilience', () => {
+    it('a failing postMessage does not evict the freshly cached token', async () => {
+      // A broadcast failure (postMessage throwing, e.g. InvalidStateError when the
+      // channel races a close) is a side effect that must not evict the freshly
+      // cached token or force an unnecessary refetch (SDK-119).
+      mockBroadcastChannel.postMessage.mockImplementationOnce(() => {
+        throw new Error('channel closed');
+      });
+
+      const futureExp = Math.floor(Date.now() / 1000) + 3600;
+      const tokenResolver = Promise.resolve({
+        getRawString: () => mockJwt,
+        jwt: { claims: { exp: futureExp, iat: 1675876730, sid: 'session_123' } },
+      } as any);
+
+      expect(() =>
+        SessionTokenCache.set({
+          tokenId: 'session_123',
+          tokenResolver,
+        }),
+      ).not.toThrow();
+
+      await tokenResolver;
+      // Flush the cache write's .then (broadcast) and .catch microtasks. Fake timers
+      // are active in this suite, so flush microtasks rather than using a setTimeout.
+      for (let i = 0; i < 5; i++) {
+        await Promise.resolve();
+      }
+
+      // The broadcast was attempted and threw, but the token must stay cached.
+      expect(mockBroadcastChannel.postMessage).toHaveBeenCalledTimes(1);
+      expect(SessionTokenCache.size()).toBe(1);
+      expect(SessionTokenCache.get({ tokenId: 'session_123' })).toBeDefined();
     });
   });
 
@@ -1532,6 +1622,88 @@ describe('SessionTokenCache', () => {
       });
 
       expect(SessionTokenCache.size()).toBe(1);
+    });
+  });
+
+  // --- SDK-117 characterization backfill ---------------------------------
+  // These lock in current, intended behavior before the cache is split into
+  // separate storage / scheduler / cross-tab collaborators. They are the
+  // regression bar for that refactor, covering the gaps the audit surfaced:
+  // BroadcastChannel lifecycle, broadcast-failure resilience, graceful
+  // degradation without BroadcastChannel, and audience key coalescing.
+
+  describe('BroadcastChannel lifecycle', () => {
+    it('close() closes the underlying channel', () => {
+      expect(mockBroadcastChannel.close).not.toHaveBeenCalled();
+
+      SessionTokenCache.close();
+
+      expect(mockBroadcastChannel.close).toHaveBeenCalledTimes(1);
+    });
+
+    it('lazily reopens a new channel on the next operation after close()', () => {
+      SessionTokenCache.close();
+      (global.BroadcastChannel as unknown as ReturnType<typeof vi.fn>).mockClear();
+
+      // get() calls ensureBroadcastChannel(), which must reconstruct the channel
+      SessionTokenCache.get({ tokenId: 'anything' });
+
+      expect(global.BroadcastChannel).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('graceful degradation without BroadcastChannel', () => {
+    it('continues to cache and retrieve tokens when BroadcastChannel is unavailable', async () => {
+      // Simulate a runtime that does not provide BroadcastChannel.
+      SessionTokenCache.close();
+      (global as any).BroadcastChannel = undefined;
+
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+      const token = new Token({ id: 'no-bc-token', jwt, object: 'token' });
+      const tokenResolver = Promise.resolve<TokenResource>(token);
+      const key = { tokenId: 'no-bc-token' };
+
+      expect(() => SessionTokenCache.set({ ...key, tokenResolver })).not.toThrow();
+      await tokenResolver;
+
+      const result = SessionTokenCache.get(key);
+      expect(result?.entry.tokenId).toBe('no-bc-token');
+    });
+  });
+
+  describe('audience key coalescing', () => {
+    it('treats empty-string audience and undefined audience as the same entry', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+      const token = new Token({ id: 'aud-coalesce', jwt, object: 'token' });
+      const tokenResolver = Promise.resolve<TokenResource>(token);
+
+      SessionTokenCache.set({ audience: '', tokenId: 'aud-coalesce', tokenResolver });
+      await tokenResolver;
+
+      // `audience || ''` collapses '' and undefined to the same key.
+      expect(SessionTokenCache.get({ tokenId: 'aud-coalesce' })?.entry.tokenId).toBe('aud-coalesce');
+      expect(SessionTokenCache.get({ audience: '', tokenId: 'aud-coalesce' })?.entry.tokenId).toBe('aud-coalesce');
+      expect(SessionTokenCache.size()).toBe(1);
+    });
+
+    it('isolates an audience-scoped token from the no-audience token of the same id', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const tokenA = new Token({ id: 'aud-split', jwt: createJwtWithTtl(nowSeconds, 60), object: 'token' });
+      const tokenB = new Token({ id: 'aud-split', jwt: createJwtWithTtl(nowSeconds, 60), object: 'token' });
+
+      SessionTokenCache.set({ tokenId: 'aud-split', tokenResolver: Promise.resolve<TokenResource>(tokenA) });
+      SessionTokenCache.set({
+        audience: 'https://api.example.com',
+        tokenId: 'aud-split',
+        tokenResolver: Promise.resolve<TokenResource>(tokenB),
+      });
+      await Promise.resolve();
+
+      expect(SessionTokenCache.size()).toBe(2);
+      expect(SessionTokenCache.get({ tokenId: 'aud-split' })?.entry).toBeDefined();
+      expect(SessionTokenCache.get({ audience: 'https://api.example.com', tokenId: 'aud-split' })?.entry).toBeDefined();
     });
   });
 });

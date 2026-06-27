@@ -1,6 +1,5 @@
 import { appendModalState } from '@clerk/shared/internal/clerk-js/queryStateParams';
-import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
-import { __internal_useUserEnterpriseConnections, useReverification, useUser } from '@clerk/shared/react';
+import { __internal_useUserEnterpriseConnections, useClerk, useReverification, useUser } from '@clerk/shared/react';
 import type { EnterpriseAccountResource, EnterpriseConnectionResource, OAuthProvider } from '@clerk/shared/types';
 import { Fragment, useState } from 'react';
 
@@ -9,6 +8,7 @@ import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { ProfileSection } from '@/ui/elements/Section';
 import { handleError } from '@/ui/utils/errorHandler';
 import { sleep } from '@/ui/utils/sleep';
+import { clerkWindowNavigate } from '@/ui/utils/windowNavigate';
 
 import { ProviderIcon } from '../../common';
 import { useUserProfileContext } from '../../contexts';
@@ -17,6 +17,7 @@ import { Action } from '../../elements/Action';
 const EnterpriseConnectMenuButton = (props: { connection: EnterpriseConnectionResource }) => {
   const { connection } = props;
   const card = useCardState();
+  const clerk = useClerk();
   const { user } = useUser();
   const { componentName, mode } = useUserProfileContext();
   const isModal = mode === 'modal';
@@ -42,7 +43,7 @@ const EnterpriseConnectMenuButton = (props: { connection: EnterpriseConnectionRe
       .then(res => {
         if (res?.verification?.externalVerificationRedirectURL) {
           void sleep(2000).then(() => card.setIdle(loadingKey));
-          windowNavigate(res.verification.externalVerificationRedirectURL);
+          clerkWindowNavigate(clerk, res.verification.externalVerificationRedirectURL);
         }
       })
       .catch(err => {
@@ -138,7 +139,6 @@ export const EnterpriseAccountsSection = withCardStateProvider(() => {
     <ProfileSection.Root
       title={localizationKeys('userProfile.start.enterpriseAccountsSection.title')}
       id='enterpriseAccounts'
-      centered={false}
     >
       <Card.Alert>{card.error}</Card.Alert>
       <Action.Root
@@ -174,7 +174,10 @@ const EnterpriseAccount = ({ account }: { account: EnterpriseAccountResource }) 
   return (
     <Fragment key={accountId}>
       <ProfileSection.Item id='enterpriseAccounts'>
-        <Flex sx={t => ({ overflow: 'hidden', gap: t.space.$2 })}>
+        <Flex
+          align='center'
+          sx={t => ({ overflow: 'hidden', gap: t.space.$2 })}
+        >
           <EnterpriseAccountProviderIcon account={account} />
           <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
             <Flex
@@ -222,6 +225,7 @@ const EnterpriseAccountProviderIcon = ({ account }: { account: EnterpriseAccount
       alt={`${connectionName}'s icon`}
       elementDescriptor={[descriptors.providerIcon]}
       elementId={descriptors.enterpriseButtonsProviderIcon.setId(account.provider)}
+      sx={{ flexShrink: 0 }}
     />
   );
 };

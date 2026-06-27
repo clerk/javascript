@@ -12,8 +12,10 @@ type CurrentUserOptions = PendingSessionOptions;
  *
  * Under the hood, this helper:
  * - calls `fetch()`, so it is automatically deduped per request.
- * - uses the [`GET /v1/users/{user_id}`](https://clerk.com/docs/reference/backend-api/tag/Users#operation/GetUser) endpoint.
+ * - uses the [`GET /v1/users/{user_id}`](https://clerk.com/docs/reference/backend-api/tag/users/GET/users/%7Buser_id%7D) endpoint.
  * - counts towards the [Backend API request rate limit](https://clerk.com/docs/guides/how-clerk-works/system-limits).
+ *
+ * @param opts - Options to configure the behavior of the helper.
  *
  * @example
  * ```tsx {{ filename: 'app/page.tsx' }}

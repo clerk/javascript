@@ -13,6 +13,7 @@ const fakeConsentInfo = {
   oauthApplicationUrl: 'https://example.com',
   clientId: 'client_test',
   state: 'abc',
+  redirectDomain: 'example.com',
   scopes: [
     { scope: 'openid', description: 'View your identity', requiresConsent: true },
     { scope: 'email', description: 'Access your email address', requiresConsent: true },
@@ -94,6 +95,7 @@ describe('OAuthConsent', () => {
 
     expect(getConsentInfo).toHaveBeenCalledWith({
       oauthClientId: 'client_test',
+      redirectUri: 'https://app.example/callback',
     });
   });
 
@@ -204,6 +206,7 @@ describe('OAuthConsent', () => {
       expect(getConsentInfo).toHaveBeenCalledWith({
         oauthClientId: 'override_id',
         scope: 'openid email',
+        redirectUri: 'https://app.example/callback',
       });
     });
   });
@@ -390,26 +393,7 @@ describe('OAuthConsent', () => {
       });
     });
 
-    it('renders the org selector when __internal_enableOrgSelection is true (fallback for existing apps)', async () => {
-      const { wrapper, fixtures, props } = await createFixtures(f => {
-        f.withUser({
-          email_addresses: ['jane@example.com'],
-          organization_memberships: [{ id: 'org_1', name: 'Acme Corp' }],
-        });
-        f.withOrganizations();
-      });
-
-      props.setProps({ componentName: 'OAuthConsent', __internal_enableOrgSelection: true } as any);
-      mockOAuthApplication(fixtures.clerk, { getConsentInfo: vi.fn().mockResolvedValue(fakeConsentInfo) });
-
-      const { getByText } = render(<OAuthConsent />, { wrapper });
-
-      await waitFor(() => {
-        expect(getByText('Acme Corp')).toBeVisible();
-      });
-    });
-
-    it('does not display user:org:read in the scopes list', async () => {
+    it('displays user:org:read in the scopes list', async () => {
       const { wrapper, fixtures, props } = await createFixtures(f => {
         f.withUser({
           email_addresses: ['jane@example.com'],
@@ -426,7 +410,7 @@ describe('OAuthConsent', () => {
       const { queryByText } = render(<OAuthConsent />, { wrapper });
 
       await waitFor(() => {
-        expect(queryByText('Access your organizations')).toBeNull();
+        expect(queryByText('Access your organizations')).toBeVisible();
       });
     });
 

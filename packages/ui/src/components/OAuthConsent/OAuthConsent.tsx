@@ -50,9 +50,11 @@ function _OAuthConsent() {
 
   // Public path: fetch via hook. Disabled on the accounts portal path
   // (which already has all data via context) to avoid a wasted FAPI request.
+  const redirectUri = ctx.redirectUrl ?? getRedirectUriFromSearch();
   const { data, isLoading, error } = useOAuthConsent({
     oauthClientId,
     scope,
+    redirectUri: redirectUri || undefined,
     // TODO: Remove this once account portal is refactored to use this component
     enabled: !hasContextCallbacks,
   });
@@ -69,10 +71,10 @@ function _OAuthConsent() {
   const oauthApplicationName = ctx.oauthApplicationName ?? data?.oauthApplicationName ?? '';
   const oauthApplicationLogoUrl = ctx.oauthApplicationLogoUrl ?? data?.oauthApplicationLogoUrl;
   const oauthApplicationUrl = ctx.oauthApplicationUrl ?? data?.oauthApplicationUrl;
-  const redirectUrl = ctx.redirectUrl ?? getRedirectUriFromSearch();
+  const redirectUrl = ctx.redirectUrl ?? redirectUri;
 
   const hasOrgReadScope = scopes.some(s => s.scope === USER_ORG_READ_SCOPE);
-  const orgSelectionEnabled = !!((hasOrgReadScope || ctx.enableOrgSelection) && organizationSettings.enabled);
+  const orgSelectionEnabled = !!(hasOrgReadScope && organizationSettings.enabled);
   const orgOptions = orgSelectionEnabled
     ? (user?.organizationMemberships ?? []).map(m => ({
         value: m.organization.id,
@@ -85,7 +87,7 @@ function _OAuthConsent() {
   const effectiveOrg = selectedOrg ?? defaultOrg;
 
   const { t } = useLocalizations();
-  const domainAction = getRedirectDisplay(redirectUrl);
+  const domainAction = data?.redirectDomain ?? getRedirectDisplay(redirectUrl);
   const viewFullUrlText = t(localizationKeys('oauthConsent.viewFullUrl'));
 
   // Error states only apply to the public flow.
@@ -140,7 +142,7 @@ function _OAuthConsent() {
 
   const primaryIdentifier = user?.primaryEmailAddress?.emailAddress || user?.primaryPhoneNumber?.phoneNumber;
 
-  const displayedScopes = scopes.filter(item => ![OFFLINE_ACCESS_SCOPE, USER_ORG_READ_SCOPE].includes(item.scope));
+  const displayedScopes = scopes.filter(item => item.scope !== OFFLINE_ACCESS_SCOPE);
   const hasOfflineAccess = scopes.some(item => item.scope === OFFLINE_ACCESS_SCOPE);
 
   return (

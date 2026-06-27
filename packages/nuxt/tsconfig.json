@@ -9,7 +9,7 @@
     "noUnusedLocals": true,
     "noEmit": true,
     "allowSyntheticDefaultImports": true,
-    "esModuleInterop": false,
+    "esModuleInterop": true,
     "skipLibCheck": true,
     "paths": {
       "#imports": ["./src/runtime/types/nitro-server"]
