@@ -6,7 +6,7 @@ import type {
   SignInResource,
   UnsubscribeCallback,
 } from '@clerk/shared/types';
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
 import { IsomorphicClerk } from '../isomorphicClerk';
 
@@ -215,7 +215,9 @@ describe('isomorphicClerk', () => {
         load: vi.fn().mockResolvedValue(undefined),
         loaded: false,
       };
-      const mockClerkCtor = vi.fn().mockImplementation(() => mockInstance);
+      const mockClerkCtor = vi.fn().mockImplementation(function () {
+        return mockInstance;
+      });
       mockClerkCtor.prototype = {};
 
       const clerk = new IsomorphicClerk({
@@ -437,12 +439,12 @@ describe('isomorphicClerk', () => {
 
   describe('__internal_windowNavigate', () => {
     let originalLocation: Location;
-    let hrefSetter: ReturnType<typeof vi.fn>;
+    let hrefSetter: Mock<(value: unknown) => void>;
     let warnSpy: ReturnType<typeof vi.spyOn>;
 
     beforeEach(() => {
       originalLocation = window.location;
-      hrefSetter = vi.fn();
+      hrefSetter = vi.fn<(value: unknown) => void>();
       Object.defineProperty(window, 'location', {
         configurable: true,
         value: new Proxy(

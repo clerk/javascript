@@ -109,12 +109,10 @@
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16 --ignore-rules false-cjs",
     "lint:publint": "publint",
-    "test": "run-s test:node test:edge-runtime test:cloudflare-miniflare",
-    "test:cloudflare-miniflare": "vitest run --environment miniflare",
+    "test": "run-s test:node test:edge-runtime",
     "test:edge-runtime": "vitest run --environment edge-runtime",
     "test:node": "vitest run --environment node",
-    "test:watch": "run-s test:watch:node test:watch:edge-runtime test:watch:cloudflare-miniflare",
-    "test:watch:cloudflare-miniflare": "vitest watch --environment miniflare",
+    "test:watch": "run-s test:watch:node test:watch:edge-runtime",
     "test:watch:edge-runtime": "vitest watch --environment edge-runtime",
     "test:watch:node": "vitest watch --environment node"
   },
@@ -128,8 +126,7 @@
     "cookie": "1.1.1",
     "msw": "2.14.2",
     "npm-run-all": "^4.1.5",
-    "snakecase-keys": "9.0.2",
-    "vitest-environment-miniflare": "2.14.4"
+    "snakecase-keys": "9.0.2"
   },
   "engines": {
     "node": ">=20.9.0"

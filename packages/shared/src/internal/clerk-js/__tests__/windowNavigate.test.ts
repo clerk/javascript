@@ -1,16 +1,16 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
 import { ALLOWED_PROTOCOLS, CLERK_BEFORE_UNLOAD_EVENT, windowNavigate } from '../windowNavigate';
 
 describe('windowNavigate', () => {
   let originalLocation: Location;
-  let hrefSetter: ReturnType<typeof vi.fn>;
+  let hrefSetter: Mock<(value: unknown) => void>;
   let warnSpy: ReturnType<typeof vi.spyOn>;
-  let eventSpy: ReturnType<typeof vi.fn>;
+  let eventSpy: Mock<(event: Event) => void>;
 
   beforeEach(() => {
     originalLocation = window.location;
-    hrefSetter = vi.fn();
+    hrefSetter = vi.fn<(value: unknown) => void>();
     Object.defineProperty(window, 'location', {
       configurable: true,
       value: new Proxy(
@@ -29,7 +29,7 @@ describe('windowNavigate', () => {
       ),
     });
     warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    eventSpy = vi.fn();
+    eventSpy = vi.fn<(event: Event) => void>();
     window.addEventListener(CLERK_BEFORE_UNLOAD_EVENT, eventSpy);
   });
 
