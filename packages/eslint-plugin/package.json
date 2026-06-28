@@ -67,7 +67,7 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@types/node": "^22.19.17",
+    "@types/node": "^22.20.0",
     "@typescript-eslint/parser": "8.58.0",
     "@typescript-eslint/utils": "8.58.0",
     "eslint": "9.31.0",
