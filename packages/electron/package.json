@@ -104,7 +104,7 @@
   },
   "devDependencies": {
     "@clerk/electron-passkeys": "workspace:*",
-    "@types/node": "^22.19.17",
+    "@types/node": "^22.20.0",
     "electron": "^39.2.6",
     "electron-store": "^8.2.0"
   },
