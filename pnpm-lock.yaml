@@ -39,8 +39,8 @@ catalogs:
       version: 18.3.7
   repo:
     '@floating-ui/react':
-      specifier: 0.27.12
-      version: 0.27.12
+      specifier: 0.27.19
+      version: 0.27.19
     '@swc/helpers':
       specifier: 0.5.21
       version: 0.5.21
@@ -92,8 +92,8 @@ overrides:
   ip-address@<=10.1.0: 10.1.1
   jws@<3.2.3: 3.2.3
   minimatch@>=9.0.0 <9.0.7: 9.0.7
-  picomatch@<2.3.2: 2.3.2
   picomatch@>=3.0.0 <3.0.2: 3.0.2
+  picomatch@<2.3.2: 2.3.2
   preact@>=10.27.0 <10.27.3: 10.27.3
   react: 18.3.1
   react-dom: 18.3.1
@@ -752,7 +752,7 @@ importers:
         version: link:../shared
       '@floating-ui/react':
         specifier: catalog:repo
-        version: 0.27.12(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 0.27.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@testing-library/dom':
         specifier: ^10.4.1
@@ -1176,7 +1176,7 @@ importers:
         version: 11.11.1(@types/react@18.3.28)(react@18.3.1)
       '@floating-ui/react':
         specifier: catalog:repo
-        version: 0.27.12(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 0.27.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@formkit/auto-animate':
         specifier: ^0.8.2
         version: 0.8.4
@@ -3233,8 +3233,8 @@ packages:
       react: 18.3.1
       react-dom: 18.3.1
 
-  '@floating-ui/react@0.27.12':
-    resolution: {integrity: sha512-kKlWNrpIQxF1B/a2MZvE0/uyKby4960yjO91W7nVyNKmmfNi62xU9HCjL1M1eWzx/LFj/VPSwJVbwQk9Pq/68A==}
+  '@floating-ui/react@0.27.19':
+    resolution: {integrity: sha512-31B8h5mm8YxotlE7/AU/PhNAl8eWxAmjL/v2QOxroDNkTFLk3Uu82u63N3b6TXa4EGJeeZLVcd/9AlNlVqzeog==}
     peerDependencies:
       react: 18.3.1
       react-dom: 18.3.1
@@ -18697,7 +18697,7 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@floating-ui/react@0.27.12(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@floating-ui/react@0.27.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@floating-ui/react-dom': 2.1.8(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@floating-ui/utils': 0.2.11
