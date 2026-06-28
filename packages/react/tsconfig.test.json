@@ -5,8 +5,7 @@
     "noImplicitReturns": false,
     "strict": false,
     "importHelpers": false,
-    "sourceMap": true,
-    "types": ["node"]
+    "sourceMap": true
   },
   "include": ["src/global.d.ts", "src/**/*.test.ts", "src/**/*.test.tsx"],
   "exclude": []

@@ -16,6 +16,7 @@
     "sourceMap": false,
     "strict": true,
     "target": "ES2019",
+    "types": ["node"],
     "rootDir": "./src"
   },
   "include": ["src"]
