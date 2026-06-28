@@ -14,7 +14,7 @@ catalogs:
   repo:
     '@floating-ui/react': 0.27.12
     '@swc/helpers': 0.5.21
-    '@tanstack/query-core': ^5.100.6
+    '@tanstack/query-core': ^5.101.1
     core-js: 3.47.0
     rolldown: 1.1.0
     tsdown: 0.22.2
