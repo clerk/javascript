@@ -138,7 +138,7 @@ describe('useSignInWithGoogle', () => {
 
         expect(consoleWarnSpy).toHaveBeenCalledTimes(1);
         expect(consoleWarnSpy).toHaveBeenCalledWith(
-          'Clerk: In the next major version, native Google Sign-In will require installing @clerk/expo-google-signin. The @clerk/expo/google import path will continue to work.',
+          'Clerk: In the next major version, native Google Sign-In will require installing @clerk/expo-google-signin and adding its Expo config plugin. The @clerk/expo/google import path will continue to work.',
         );
       } finally {
         consoleWarnSpy.mockRestore();
