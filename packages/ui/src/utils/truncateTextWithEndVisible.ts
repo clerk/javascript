@@ -20,7 +20,7 @@ export function truncateWithEndVisible(str: string, maxLength = 20, endChars = 5
   }
 
   if (maxLength <= endChars + ELLIPSIS_LENGTH) {
-    return ELLIPSIS + str.slice(-endChars);
+    return ELLIPSIS + Array.from(str).slice(-endChars).join('');
   }
 
   const chars = Array.from(str);

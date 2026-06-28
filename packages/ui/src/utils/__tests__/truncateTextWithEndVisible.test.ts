@@ -28,6 +28,14 @@ describe('truncateWithEndVisible', () => {
     expect(truncateWithEndVisible('1234567890', 5, 3)).toBe('...890');
   });
 
+  test('should not split surrogate pairs when maxLength is too small', () => {
+    // The short-maxLength fallback must stay code-point-safe like the main path.
+    // Slicing on UTF-16 code units cuts characters outside the BMP (CJK Extension B,
+    // emoji) mid-surrogate, leaving a replacement character.
+    expect(truncateWithEndVisible('𠮷𠮷𠮷𠮷𠮷', 8, 5)).toBe('...𠮷𠮷𠮷𠮷𠮷');
+    expect(truncateWithEndVisible('🍣🍣🍣🍣🍣', 8, 5)).toBe('...🍣🍣🍣🍣🍣');
+  });
+
   test('should handle email addresses', () => {
     expect(truncateWithEndVisible('test@example.com', 10)).toBe('te...e.com');
   });
