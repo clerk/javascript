@@ -813,7 +813,7 @@ importers:
         version: link:../shared
     devDependencies:
       hono:
-        specifier: ^4.12.26
+        specifier: ^4.12.27
         version: 4.12.27
 
   packages/localizations:
