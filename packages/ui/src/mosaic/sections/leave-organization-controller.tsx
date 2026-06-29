@@ -1,13 +1,23 @@
+import { useOrganization, useOrganizationList } from '@clerk/shared/react';
+
 import { useMachine } from '../machine/useMachine';
-import { useOrganization } from '../mock/use-organization';
 import { leaveOrgMachine } from './leave-organization-machine';
 
 export function useLeaveOrganizationController() {
   const { isLoaded, organization, membership } = useOrganization();
+  const { userMemberships } = useOrganizationList({ userMemberships: true });
+
   const [snapshot, send, actor] = useMachine(leaveOrgMachine, {
     context: {
       organizationName: organization?.name ?? '',
-      leaveOrganization: () => membership?.destroy() ?? Promise.resolve(),
+      leaveOrganization: async () => {
+        await membership?.destroy();
+        // Refresh org lists elsewhere (e.g. the switcher). Not awaited: a stale
+        // list must not make a successful leave look like it failed.
+        void userMemberships.revalidate?.();
+        // TODO(mosaic): navigate away from the left org's profile once the flow
+        // has router context, mirroring legacy navigateAfterLeaveOrganization.
+      },
     },
   });
 
