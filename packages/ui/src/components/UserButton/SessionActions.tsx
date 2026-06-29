@@ -174,7 +174,11 @@ export const MultiSessionActions = (props: MultiSessionActionsProps) => {
         >
           <Flex
             justify='between'
-            sx={t => ({ marginInlineStart: t.space.$12, padding: `0 ${t.space.$5} ${t.space.$4}`, gap: t.space.$2 })}
+            sx={t => ({
+              marginInlineStart: `calc(${t.sizes.$9} + ${t.space.$4})`,
+              padding: `0 ${t.space.$5} ${t.space.$4}`,
+              gap: t.space.$2,
+            })}
           >
             <SmallAction
               elementDescriptor={descriptors.userButtonPopoverActionButton}
