@@ -1,5 +1,5 @@
 import {
-  __experimental_useCreditBalance,
+  __internal_useCreditBalanceQuery,
   __experimental_usePaymentAttempts,
   __experimental_usePaymentMethods,
   __experimental_usePlans,
@@ -90,7 +90,7 @@ export const usePlans = (params?: { mode: 'cache' }) => {
 
 export const useCreditBalance = () => {
   const params = useBillingHookParams();
-  return __experimental_useCreditBalance(params);
+  return __internal_useCreditBalanceQuery(params);
 };
 
 export const useCreditHistory = () => {

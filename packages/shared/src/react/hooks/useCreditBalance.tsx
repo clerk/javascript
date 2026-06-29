@@ -32,7 +32,7 @@ export type CreditBalanceResult = {
 /**
  * @internal
  */
-export function useCreditBalance(params?: UseCreditBalanceParams): CreditBalanceResult {
+export function __internal_useCreditBalanceQuery(params?: UseCreditBalanceParams): CreditBalanceResult {
   useAssertWrappedByClerkProvider(HOOK_NAME);
 
   const clerk = useClerkInstanceContext();
