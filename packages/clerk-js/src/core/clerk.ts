@@ -2493,7 +2493,8 @@ export class Clerk implements ClerkInterface {
     }
 
     const userExistsButNeedsToSignIn =
-      su.externalAccountStatus === 'transferable' && su.externalAccountErrorCode === 'external_account_exists';
+      su.externalAccountStatus === 'transferable' &&
+      su.externalAccountErrorCode === ERROR_CODES.EXTERNAL_ACCOUNT_EXISTS;
 
     if (userExistsButNeedsToSignIn) {
       const res = await signIn.create({ transfer: true });
