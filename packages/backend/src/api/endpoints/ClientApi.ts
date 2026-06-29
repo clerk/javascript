@@ -50,6 +50,12 @@ export class ClientAPI extends AbstractAPI {
     });
   }
 
+  /**
+   * Retrieves the handshake payload for a given nonce. Used internally by Clerk's SDKs to resolve
+   * session cookies during the handshake flow.
+   *
+   * @internal
+   */
   public async getHandshakePayload(queryParams: GetHandshakePayloadParams) {
     return this.request<HandshakePayload>({
       method: 'GET',
