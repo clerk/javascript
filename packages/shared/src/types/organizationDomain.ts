@@ -241,11 +241,11 @@ export interface OrganizationDomainBulkOwnershipVerificationError {
 }
 
 /**
- * The `OrganizationDomainsBulkOwnershipVerificationResource` object is the result of a bulk ownership verification flow, such as [`prepareOwnershipVerification()`](https://clerk.com/docs/reference/types/organization-resource#prepare-ownership-verification) or [`attemptOwnershipVerification()`](https://clerk.com/docs/reference/types/organization-resource#attempt-ownership-verification), where ownership is verified for several of an Organization's [Verified Domains](https://clerk.com/docs/guides/organizations/add-members/verified-domains) at once. Because the operation can partially succeed, each requested domain is reported in either `data` or `errors`.
+ * The `OrganizationDomainsBulkOwnershipVerificationResource` object is the result of a bulk ownership verification flow, such as [`prepareOwnershipVerification()`](https://clerk.com/docs/reference/objects/organization#prepare-ownership-verification) or [`attemptOwnershipVerification()`](https://clerk.com/docs/reference/objects/organization#attempt-ownership-verification), where ownership is verified for several of an Organization's [Verified Domains](https://clerk.com/docs/guides/organizations/add-members/verified-domains) at once. Because the operation can partially succeed, each requested domain is reported in either `data` or `errors`.
  */
 export interface OrganizationDomainsBulkOwnershipVerificationResource {
   /**
-   * The domains that were processed successfully. After [`prepareOwnershipVerification()`](https://clerk.com/docs/reference/types/organization-resource#prepare-ownership-verification), each domain's `ownershipVerification` carries the `txtRecordName` and `txtRecordValue` that must be published to a DNS TXT record.
+   * The domains that were processed successfully. After [`prepareOwnershipVerification()`](https://clerk.com/docs/reference/objects/organization#prepare-ownership-verification), each domain's `ownershipVerification` carries the `txtRecordName` and `txtRecordValue` that must be published to a DNS TXT record.
    */
   data: OrganizationDomainResource[];
   /**
