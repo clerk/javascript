@@ -4,7 +4,7 @@ on:
   pull_request:
     types: [opened, edited, synchronize, reopened]
   issue_comment:
-    types: [created, edited]
+    types: [created, edited, deleted]
 
 permissions:
   contents: read
@@ -40,16 +40,27 @@ jobs:
             }
             const headSha = pullRequest.head.sha;
 
-            const setStatus = (state, description) =>
-              github.rest.repos.createCommitStatus({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                sha: headSha,
-                context: STATUS_CONTEXT,
-                state,
-                description,
-                target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
-              });
+            const setStatus = async (state, description) => {
+              try {
+                await github.rest.repos.createCommitStatus({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  sha: headSha,
+                  context: STATUS_CONTEXT,
+                  state,
+                  description,
+                  target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+                });
+              } catch (error) {
+                // Fork PRs get a read-only token and can't post statuses; don't fail the job over it
+                // (such PRs need an internal re-run or admin bypass). Re-throw anything else.
+                if (error.status === 403) {
+                  core.warning(`Could not post the "${STATUS_CONTEXT}" status (read-only token, likely a fork PR): ${error.message}`);
+                  return;
+                }
+                throw error;
+              }
+            };
 
             // Check if any changeset files indicate a major bump.
             const files = await github.paginate(github.rest.pulls.listFiles, {
@@ -95,9 +106,11 @@ jobs:
               per_page: 100,
             });
 
+            // The GITHUB_TOKEN (github-actions[bot]) isn't an org member, so checkMembershipForUser
+            // only confirms PUBLIC members; approvers must have public "clerk" org membership.
             let approvalFound = false;
             for (const comment of comments) {
-              if (comment.body.trim().toLowerCase() === '!allow-major') {
+              if (comment.body?.trim().toLowerCase() === '!allow-major') {
                 try {
                   const { status } = await github.rest.orgs.checkMembershipForUser({
                     org: context.repo.owner,
@@ -108,7 +121,7 @@ jobs:
                     break;
                   }
                 } catch (error) {
-                  // Not a public org member; keep looking.
+                  // Not a public org member (or not a member at all); keep looking.
                   continue;
                 }
               }
