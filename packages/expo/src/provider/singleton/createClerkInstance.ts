@@ -44,10 +44,10 @@ type ResolvedClerkRuntimeOptions = Omit<ClerkRuntimeOptions, 'publishableKey'> &
   publishableKey: string;
 };
 
-function hasOwnOption<Key extends keyof ClerkRuntimeOptions>(
-  options: ClerkRuntimeOptions | undefined,
+function hasOwnOption<Key extends keyof BuildClerkOptions>(
+  options: BuildClerkOptions | undefined,
   key: Key,
-): options is ClerkRuntimeOptions & Required<Pick<ClerkRuntimeOptions, Key>> {
+): options is BuildClerkOptions & Required<Pick<BuildClerkOptions, Key>> {
   return !!options && Object.prototype.hasOwnProperty.call(options, key);
 }
 
@@ -93,8 +93,6 @@ function getUpdatedClerkOptions(
 export function createClerkInstance(ClerkClass: typeof Clerk) {
   return (options?: BuildClerkOptions): HeadlessBrowserClerk | BrowserClerk => {
     const { __experimental_resourceCache: createResourceCache } = options || {};
-    const hasNextTokenCache = !!options && Object.prototype.hasOwnProperty.call(options, 'tokenCache');
-    const nextTokenCache = hasNextTokenCache ? (options.tokenCache ?? MemoryTokenCache) : undefined;
     const {
       hasConfigChanged,
       options: { publishableKey, proxyUrl, domain },
@@ -104,8 +102,8 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
       errorThrower.throwMissingPublishableKeyError();
     }
 
-    if (nextTokenCache) {
-      __internal_tokenCache = nextTokenCache;
+    if (hasOwnOption(options, 'tokenCache')) {
+      __internal_tokenCache = options.tokenCache ?? MemoryTokenCache;
     }
 
     if (!__internal_clerk || hasConfigChanged) {
