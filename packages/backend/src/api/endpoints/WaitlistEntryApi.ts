@@ -24,7 +24,7 @@ export type WaitlistEntryListParams = ClerkPaginationRequest<{
 export type WaitlistEntryCreateParams = {
   /** The email address to add to the waitlist. */
   emailAddress: string;
-  /** Whether to notify the user that their identifier has been added to the allowlist. Notifies the user if the `identifier` is an email address or phone number. Defaults to `true`. */
+  /** Whether to notify the user that their email address has been added to the waitlist. Notifies the user if the `emailAddress` is an email address. Defaults to `true`. */
   notify?: boolean;
 };
 

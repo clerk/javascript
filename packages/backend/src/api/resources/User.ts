@@ -28,7 +28,7 @@ export class User {
     readonly twoFactorEnabled: boolean,
     /** Whether the user is banned or not. */
     readonly banned: boolean,
-    /** Whether the user is banned or not. */
+    /** Whether the user is [locked](https://clerk.com/docs/guides/secure/user-lockout) or not. */
     readonly locked: boolean,
     /** The Unix timestamp when the user was first created. */
     readonly createdAt: number,

@@ -26,7 +26,7 @@ export class ClientAPI extends AbstractAPI {
   }
 
   /**
-   * Gets the given [`Client`](https://clerk.com/docs/reference/backend/types/backend-client). The clients are returned sorted by creation date, with the newest clients appearing first.
+   * Gets the given [`Client`](https://clerk.com/docs/reference/backend/types/backend-client).
    * @param clientId - The ID of the client to get.
    */
   public async getClient(clientId: string) {

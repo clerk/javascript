@@ -16,7 +16,7 @@ export type CreateAgentTaskParams = {
         userId: string;
         identifier?: never;
       };
-  /** The permissions the Agent Task will have. Currently, `'*'` is the only support value, which grants all permissions. */
+  /** The permissions the Agent Task will have. Currently, `'*'` is the only supported value, which grants all permissions. */
   permissions: string;
   /** The name of the agent creating the task. Used to derive a stable `agent_id` for the Agent Task. */
   agentName: string;

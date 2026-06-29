@@ -74,7 +74,7 @@ export class PhoneNumberAPI extends AbstractAPI {
   /**
    * Deletes the given phone number.
    * @param phoneNumberId - The ID of the phone number to delete.
-   * @returns The deleted [`PhoneNumber`](https://clerk.com/docs/reference/backend/types/backend-phone-number) object.
+   * @returns The [`DeletedObject`](https://clerk.com/docs/reference/backend/types/deleted-object) object.
    */
   public async deletePhoneNumber(phoneNumberId: string) {
     this.requireId(phoneNumberId);

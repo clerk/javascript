@@ -70,7 +70,7 @@ export class EmailAddressAPI extends AbstractAPI {
   /**
    * Deletes the given email address.
    * @param emailAddressId - The ID of the email address to delete.
-   * @returns The deleted [`EmailAddress`](https://clerk.com/docs/reference/backend/types/backend-email-address) object.
+   * @returns The [`DeletedObject`](https://clerk.com/docs/reference/backend/types/deleted-object) object.
    */
   public async deleteEmailAddress(emailAddressId: string) {
     this.requireId(emailAddressId);

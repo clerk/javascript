@@ -119,7 +119,7 @@ export class InvitationAPI extends AbstractAPI {
   /**
    * Revokes the given invitation.
    *
-   * Revoking an an invitation makes the invitation email link unusable. However, it doesn't prevent the user from signing up if they follow the sign up flow.
+   * Revoking an invitation makes the invitation email link unusable. However, it doesn't prevent the user from signing up if they follow the sign up flow.
    *
    * Only active (i.e. non-revoked) invitations can be revoked.
    * @param invitationId - The ID of the invitation to revoke.
