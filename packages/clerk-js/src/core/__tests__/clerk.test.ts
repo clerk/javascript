@@ -3095,7 +3095,9 @@ describe('Clerk singleton', () => {
 
     it('uses ui.ClerkUI when provided', async () => {
       const mockClerkUIInstance = { mount: vi.fn() };
-      const mockClerkUICtor = vi.fn(() => mockClerkUIInstance);
+      const mockClerkUICtor = vi.fn(function () {
+        return mockClerkUIInstance;
+      });
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({
@@ -3108,7 +3110,9 @@ describe('Clerk singleton', () => {
 
     it('supports legacy clerkUICtor option for backwards compatibility', async () => {
       const mockClerkUIInstance = { mount: vi.fn() };
-      const mockClerkUICtor = vi.fn(() => mockClerkUIInstance);
+      const mockClerkUICtor = vi.fn(function () {
+        return mockClerkUIInstance;
+      });
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({
@@ -3121,7 +3125,9 @@ describe('Clerk singleton', () => {
 
     it('supports legacy clerkUiCtor option for backwards compatibility', async () => {
       const mockClerkUIInstance = { mount: vi.fn() };
-      const mockClerkUICtor = vi.fn(() => mockClerkUIInstance);
+      const mockClerkUICtor = vi.fn(function () {
+        return mockClerkUIInstance;
+      });
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({

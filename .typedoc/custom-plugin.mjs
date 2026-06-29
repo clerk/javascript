@@ -137,6 +137,7 @@ const LINK_REPLACEMENTS = [
     '/docs/reference/backend/organization/create-organization-invitation#create-organization-invitation-params',
   ],
   ['create-organization-domain-params', '#create-organization-domain-params'],
+  ['organization-domain-verification', '/docs/reference/types/organization-domain-resource'],
 ];
 
 /**

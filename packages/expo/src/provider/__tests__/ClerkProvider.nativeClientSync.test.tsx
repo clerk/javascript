@@ -89,7 +89,6 @@ vi.mock('../../specs/NativeClerkModule', () => {
       addListener: vi.fn(),
       configure: mocks.configure,
       getClientToken: mocks.getClientToken,
-      removeListeners: vi.fn(),
       syncClientStateFromJs: mocks.syncClientStateFromJs,
     },
   };
@@ -234,6 +233,9 @@ describe('ClerkProvider native client sync', () => {
     await waitFor(() => {
       expect(mocks.configure).toHaveBeenCalled();
     });
+    await waitFor(() => {
+      expect(mocks.clerkInstance.__internal_reloadInitialResources).toHaveBeenCalled();
+    });
 
     mocks.clerkInstance.__internal_reloadInitialResources.mockClear();
     mocks.tokenCache.saveToken.mockClear();
@@ -302,6 +304,8 @@ describe('ClerkProvider native client sync', () => {
   });
 
   test('does not bounce a JS client listener event while applying a native client change', async () => {
+    mocks.getClientToken.mockResolvedValue(null);
+
     const { rerender } = render(
       <ClerkProvider
         publishableKey='pk_test_123'
@@ -1040,6 +1044,7 @@ describe('ClerkProvider native client sync', () => {
 
   test('ignores native client events that echo a JS-originated sync', async () => {
     mocks.tokenCache.getToken.mockResolvedValue(null);
+    mocks.getClientToken.mockResolvedValue(null);
 
     const { rerender } = render(
       <ClerkProvider

@@ -674,8 +674,8 @@ export const nlNL: LocalizationResource = {
         messageLabel: 'Je e-mailadres gebruikt {{domain}}. Wil je het toevoegen?',
       },
       formButtonPrimary__add: 'Toevoegen',
-      formFieldInputPlaceholder__domain: 'Typ hier uw domein en klik op toevoegen om te beginnen',
-      formFieldLabel__domain: 'Domeinen',
+      formFieldInputPlaceholder__domain: 'Domein toevoegen',
+      formFieldLabel__domain: 'Domein',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

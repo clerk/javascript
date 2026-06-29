@@ -231,6 +231,10 @@ export interface EnterpriseAccountJSON extends ClerkResourceJSON {
 
 export interface ExternalAccountJSON extends ClerkResourceJSON {
   object: typeof ObjectType.ExternalAccount;
+  /**
+   * The `eac_`-prefixed external account id. Only present for Google and Facebook accounts.
+   */
+  external_account_id?: string;
   provider: string;
   identification_id: string;
   provider_user_id: string;

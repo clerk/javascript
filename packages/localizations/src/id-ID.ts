@@ -674,7 +674,7 @@ export const idID: LocalizationResource = {
         messageLabel: 'Email Anda menggunakan {{domain}}. Apakah Anda ingin menambahkannya?',
       },
       formButtonPrimary__add: 'Tambah',
-      formFieldInputPlaceholder__domain: 'Ketik domain Anda di sini dan klik tambah untuk memulai',
+      formFieldInputPlaceholder__domain: 'Tambah domain',
       formFieldLabel__domain: 'Domain',
       removeDomainDialog: {
         cancelButton: undefined,
