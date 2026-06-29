@@ -121,8 +121,9 @@ jobs:
                     break;
                   }
                 } catch (error) {
-                  // Not a public org member (or not a member at all); keep looking.
-                  continue;
+                  // 404 = not a public org member; rethrow transient 403/5xx so a hiccup can't drop a valid approval.
+                  if (error?.status === 404) continue;
+                  throw error;
                 }
               }
             }
