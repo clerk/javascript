@@ -3,7 +3,7 @@
 import { FloatingFocusManager, FloatingList, useMergeRefs } from '@floating-ui/react';
 import React from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils/render-element';
 import { useMenuContext } from './menu-context';
 
 export type MenuPositionerProps = ComponentProps<'div'>;
@@ -53,15 +53,16 @@ export const MenuPositioner = React.forwardRef<HTMLDivElement, MenuPositionerPro
           }
         }
       },
-    }) as React.ComponentPropsWithRef<'div'>;
+    });
 
-    const defaultProps = {
+    const ownProps = {
       'data-cl-slot': 'menu-positioner',
       'data-cl-side': side,
       ref: combinedRef,
       style: floatingStyles,
-      ...floatingProps,
-    };
+    } satisfies DefaultProps<'div'>;
+
+    const defaultProps = { ...ownProps, ...floatingProps };
 
     if (!mounted) {
       return null;

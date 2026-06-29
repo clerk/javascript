@@ -11,11 +11,25 @@ export type RenderProp<Props = React.HTMLAttributes<HTMLElement>> = (props: Prop
 
 /**
  * Props accepted by any primitive part. Extends the native props for `Tag`
- * and adds the optional `render` escape hatch.
+ * and adds the optional `render` escape hatch, narrowed to that tag's props.
  */
 export type ComponentProps<Tag extends keyof React.JSX.IntrinsicElements> = React.ComponentPropsWithRef<Tag> & {
-  render?: RenderProp;
+  render?: RenderProp<React.ComponentPropsWithRef<Tag>>;
 };
+
+/**
+ * The props a primitive part applies to its own rendered element. Extends the
+ * native props for `Tag` and additionally permits internal `data-*` attributes
+ * (e.g. `data-cl-slot`), which `@types/react` intentionally omits from its
+ * element prop types.
+ *
+ * Use with `satisfies` to type-check authored default props — this validates
+ * every key against the real element props while still allowing our `data-*`
+ * attributes, instead of laundering the whole object past the checker with an
+ * `as` assertion.
+ */
+export type DefaultProps<Tag extends keyof React.JSX.IntrinsicElements> = React.ComponentPropsWithRef<Tag> &
+  Record<`data-${string}`, string>;
 
 /**
  * Maps state keys to functions that return data-attribute objects (or null).
@@ -84,8 +98,8 @@ interface RenderElementParamsBase<
 > {
   /** Fallback HTML tag when `render` is not provided. */
   defaultTagName: Tag;
-  /** Render prop from the consumer. */
-  render?: RenderProp;
+  /** Render prop from the consumer, narrowed to the element's native props. */
+  render?: RenderProp<React.ComponentPropsWithRef<Tag>>;
   /** State object. Keys are mapped to data attributes via `stateAttributesMapping`. */
   state?: State;
   /** Custom mapping from state keys to data-attribute objects. */
@@ -151,7 +165,7 @@ export function renderElement<
   const computedProps = { ...props, ...dataAttrs };
 
   if (render) {
-    return render(computedProps as React.HTMLAttributes<HTMLElement>);
+    return render(computedProps as React.ComponentPropsWithRef<Tag>);
   }
 
   return React.createElement(defaultTagName, computedProps);

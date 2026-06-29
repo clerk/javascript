@@ -1,0 +1,14 @@
+import * as OrganizationProfileStories from './organization-profile.stories';
+
+# Organization Profile
+
+The full Organization Profile AIO — lays out the organization panels under a tabbed shell as a single view.
+
+<Story
+  name='Default'
+  storyModule={OrganizationProfileStories}
+  composition={[
+    { name: 'OrganizationProfileGeneral', href: '/panels/organization-profile-general', layer: 'Panels' },
+    { name: 'Tabs', href: '/components/tabs', layer: 'Components' },
+  ]}
+/>

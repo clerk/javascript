@@ -3,8 +3,10 @@
 import { useMergeRefs } from '@floating-ui/react';
 import React, { type RefObject, useLayoutEffect, useRef, useState } from 'react';
 
+import { useAnimationsFinished } from '../../hooks/use-animations-finished';
 import { useTransition } from '../../hooks/use-transition';
 import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { resetLayoutStyles } from '../../utils/reset-layout-styles';
 import { useAccordionItemContext } from './accordion-context';
 
 export type AccordionPanelProps = ComponentProps<'div'>;
@@ -27,10 +29,12 @@ export const AccordionPanel = React.forwardRef<HTMLDivElement, AccordionPanelPro
       hasBeenClosed.current = true;
     }
 
-    const { mounted, transitionProps } = useTransition({
+    const { mounted, transitionStatus, transitionProps } = useTransition({
       open,
       ref: panelRef as RefObject<HTMLElement>,
     });
+
+    const runOnAnimationsFinished = useAnimationsFinished(panelRef, open);
 
     // Measure the content height and keep it in sync via ResizeObserver
     useLayoutEffect(() => {
@@ -43,8 +47,12 @@ export const AccordionPanel = React.forwardRef<HTMLDivElement, AccordionPanelPro
         return;
       }
 
-      // Measure scrollHeight of the panel's content
+      // Measure scrollHeight of the panel's content. Reset flex/grid alignment
+      // first so non-default alignment can't shrink the reported height.
+      let restoreLayoutStyles: (() => void) | undefined;
       const measure = () => {
+        restoreLayoutStyles?.();
+        restoreLayoutStyles = resetLayoutStyles(panel);
         setHeight(panel.scrollHeight);
       };
 
@@ -54,8 +62,35 @@ export const AccordionPanel = React.forwardRef<HTMLDivElement, AccordionPanelPro
       // Observe children mutations that affect height
       ro.observe(panel, { box: 'border-box' });
 
-      return () => ro.disconnect();
+      return () => {
+        ro.disconnect();
+        restoreLayoutStyles?.();
+      };
     }, [mounted]);
+
+    // Once the open animation settles, drop the measured pixel height so the
+    // panel flows naturally with its content (CSS var omitted → height: auto).
+    useLayoutEffect(() => {
+      if (!open || !mounted) {
+        return;
+      }
+      runOnAnimationsFinished(() => setHeight(undefined));
+    }, [open, mounted, runOnAnimationsFinished]);
+
+    // Re-pin to a measured pixel value when closing starts so the exit
+    // transition animates from a concrete height (height: auto can't interpolate).
+    useLayoutEffect(() => {
+      if (open || transitionStatus !== 'ending') {
+        return;
+      }
+      const panel = panelRef.current;
+      if (!panel) {
+        return;
+      }
+      const restoreLayoutStyles = resetLayoutStyles(panel);
+      setHeight(panel.scrollHeight);
+      return restoreLayoutStyles;
+    }, [open, transitionStatus]);
 
     const state = { open };
 

@@ -1,7 +1,6 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { type ClerkError, ClerkRuntimeError, isCaptchaError, isClerkAPIResponseError } from '@clerk/shared/error';
 import { createValidatePassword } from '@clerk/shared/internal/clerk-js/passwords/password';
-import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { Poller } from '@clerk/shared/poller';
 import type {
   AttemptEmailAddressVerificationParams,
@@ -54,6 +53,7 @@ import {
   _futureAuthenticateWithPopup,
   wrapWithPopupRoutes,
 } from '../../utils/authenticateWithPopup';
+import { _authenticateWithTransport } from '../../utils/authenticateWithTransport';
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
@@ -449,7 +449,19 @@ export class SignUp extends BaseResource implements SignUpResource {
       unsafeMetadata?: SignUpUnsafeMetadata;
     },
   ): Promise<void> => {
-    return this.authenticateWithRedirectOrPopup(params, windowNavigate);
+    const transport = SignUp.clerk.__internal_oauthTransport;
+    if (transport) {
+      return _authenticateWithTransport({
+        clerk: SignUp.clerk,
+        transport,
+        resource: this,
+        authenticateMethod: this.authenticateWithRedirectOrPopup,
+        params,
+        callbackParams: params.__internal_callbackParams ?? {},
+      });
+    }
+
+    return this.authenticateWithRedirectOrPopup(params, SignUp.clerk.__internal_windowNavigate);
   };
 
   public authenticateWithPopup = async (
@@ -1069,7 +1081,7 @@ class SignUpFuture implements SignUpFutureResource {
           // Pick up the modified SignUp resource
           await this.#resource.reload();
         } else {
-          windowNavigate(externalVerificationRedirectURL);
+          SignUp.clerk.__internal_windowNavigate(externalVerificationRedirectURL);
         }
       }
     });

@@ -1,6 +1,12 @@
 import { loadClerkJSScript, loadClerkUIScript } from '@clerk/shared/loadClerkJsScript';
-import type { Resources, UnsubscribeCallback } from '@clerk/shared/types';
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import type {
+  BrowserClerk,
+  HandleOAuthCallbackParams,
+  Resources,
+  SignInResource,
+  UnsubscribeCallback,
+} from '@clerk/shared/types';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
 import { IsomorphicClerk } from '../isomorphicClerk';
 
@@ -126,6 +132,45 @@ describe('isomorphicClerk', () => {
     expect(listenerCallHistory.length).toBe(0);
   });
 
+  it('queues __internal_handleResourceCallback until clerk-js has loaded', async () => {
+    const signInOrUp = {} as unknown as SignInResource;
+    const params: HandleOAuthCallbackParams = { signInUrl: '/sign-in' };
+    const customNavigate = vi.fn();
+    const handleResourceCallback = vi.fn();
+    const clerkjs = {
+      addListener: vi.fn(),
+      loaded: true,
+      __internal_handleResourceCallback: handleResourceCallback,
+    } satisfies Pick<BrowserClerk, 'addListener' | 'loaded' | '__internal_handleResourceCallback'>;
+    const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+
+    await isomorphicClerk.__internal_handleResourceCallback(signInOrUp, params, customNavigate);
+
+    expect(handleResourceCallback).not.toHaveBeenCalled();
+
+    (isomorphicClerk as any).replayInterceptedInvocations(clerkjs);
+
+    expect(handleResourceCallback).toHaveBeenCalledWith(signInOrUp, params, customNavigate);
+  });
+
+  it('calls __internal_handleResourceCallback immediately after clerk-js has loaded', async () => {
+    const signInOrUp = {} as unknown as SignInResource;
+    const params: HandleOAuthCallbackParams = { signInUrl: '/sign-in' };
+    const customNavigate = vi.fn();
+    const handleResourceCallback = vi.fn().mockResolvedValue('done');
+    const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+
+    (isomorphicClerk as any).clerkjs = {
+      loaded: true,
+      __internal_handleResourceCallback: handleResourceCallback,
+    } satisfies Pick<BrowserClerk, 'loaded' | '__internal_handleResourceCallback'>;
+
+    await expect(isomorphicClerk.__internal_handleResourceCallback(signInOrUp, params, customNavigate)).resolves.toBe(
+      'done',
+    );
+    expect(handleResourceCallback).toHaveBeenCalledWith(signInOrUp, params, customNavigate);
+  });
+
   describe('__internal_* URL precedence', () => {
     it('__internal_clerkJSUrl causes script loading even when Clerk prop is provided', async () => {
       const mockClerkCtor = vi.fn().mockImplementation(() => ({
@@ -170,7 +215,9 @@ describe('isomorphicClerk', () => {
         load: vi.fn().mockResolvedValue(undefined),
         loaded: false,
       };
-      const mockClerkCtor = vi.fn().mockImplementation(() => mockInstance);
+      const mockClerkCtor = vi.fn().mockImplementation(function () {
+        return mockInstance;
+      });
       mockClerkCtor.prototype = {};
 
       const clerk = new IsomorphicClerk({
@@ -387,6 +434,96 @@ describe('isomorphicClerk', () => {
           }),
         }),
       );
+    });
+  });
+
+  describe('__internal_windowNavigate', () => {
+    let originalLocation: Location;
+    let hrefSetter: Mock<(value: unknown) => void>;
+    let warnSpy: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      originalLocation = window.location;
+      hrefSetter = vi.fn<(value: unknown) => void>();
+      Object.defineProperty(window, 'location', {
+        configurable: true,
+        value: new Proxy(
+          { href: 'https://example.com/' },
+          {
+            set: (target, prop, value) => {
+              if (prop === 'href') {
+                hrefSetter(value);
+              }
+              (target as any)[prop] = value;
+              return true;
+            },
+          },
+        ),
+      });
+      warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      Object.defineProperty(window, 'location', { configurable: true, value: originalLocation });
+      warnSpy.mockRestore();
+    });
+
+    it('delegates to clerk-js when the navigation chokepoint is available', () => {
+      const navigate = vi.fn();
+      const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+      (isomorphicClerk as any).clerkjs = { __internal_windowNavigate: navigate };
+
+      isomorphicClerk.__internal_windowNavigate('/sign-in', { useStaticAllowlistOnly: true });
+
+      expect(navigate).toHaveBeenCalledWith('/sign-in', { useStaticAllowlistOnly: true });
+      expect(hrefSetter).not.toHaveBeenCalled();
+    });
+
+    it('falls back to navigation when clerk-js is older and lacks the chokepoint', () => {
+      const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+      // An older clerk-js that does not expose __internal_windowNavigate.
+      (isomorphicClerk as any).clerkjs = {};
+
+      isomorphicClerk.__internal_windowNavigate('/sign-in');
+
+      expect(hrefSetter).toHaveBeenCalledWith('https://example.com/sign-in');
+      expect(warnSpy).not.toHaveBeenCalled();
+    });
+
+    it('fallback honors the customer-supplied allowedRedirectProtocols option', () => {
+      const isomorphicClerk = new IsomorphicClerk({
+        publishableKey: 'pk_test_XXX',
+        allowedRedirectProtocols: ['slack:'],
+      });
+      (isomorphicClerk as any).clerkjs = {};
+
+      isomorphicClerk.__internal_windowNavigate('slack://channel/123');
+
+      expect(hrefSetter).toHaveBeenCalledWith('slack://channel/123');
+      expect(warnSpy).not.toHaveBeenCalled();
+    });
+
+    it('fallback fails closed for disallowed protocols', () => {
+      const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+      (isomorphicClerk as any).clerkjs = {};
+
+      isomorphicClerk.__internal_windowNavigate('javascript:alert(1)');
+
+      expect(hrefSetter).not.toHaveBeenCalled();
+      expect(warnSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('fallback ignores customer protocols when useStaticAllowlistOnly is set', () => {
+      const isomorphicClerk = new IsomorphicClerk({
+        publishableKey: 'pk_test_XXX',
+        allowedRedirectProtocols: ['slack:'],
+      });
+      (isomorphicClerk as any).clerkjs = {};
+
+      isomorphicClerk.__internal_windowNavigate('slack://channel/123', { useStaticAllowlistOnly: true });
+
+      expect(hrefSetter).not.toHaveBeenCalled();
+      expect(warnSpy).toHaveBeenCalledTimes(1);
     });
   });
 });

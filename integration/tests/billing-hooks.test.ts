@@ -36,6 +36,7 @@ testAgainstRunningApps({})('billing hooks @billing', ({ app }) => {
 
   test.describe('when signed in', () => {
     test.describe.configure({ mode: 'serial' });
+
     test('subscribes to a plan', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       await u.po.signIn.goTo();

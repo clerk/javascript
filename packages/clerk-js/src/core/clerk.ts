@@ -98,6 +98,7 @@ import type {
   LoadedClerk,
   NavigateOptions,
   OAuthApplicationNamespace,
+  OAuthTransport,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
@@ -269,6 +270,7 @@ export class Clerk implements ClerkInterface {
   #listeners: Array<(emission: Resources) => void> = [];
   #navigationListeners: Array<() => void> = [];
   #options: ClerkOptions = {};
+  #oauthTransport: OAuthTransport | null = null;
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
   #publicEventBus = createClerkEventBus();
@@ -293,6 +295,14 @@ export class Clerk implements ClerkInterface {
           client: this.#queryClient,
         }
       : undefined;
+  }
+
+  get __internal_hasOAuthTransport(): boolean {
+    return this.#oauthTransport !== null;
+  }
+
+  get __internal_oauthTransport(): OAuthTransport | null {
+    return this.#oauthTransport;
   }
 
   public __internal_getCachedResources:
@@ -325,6 +335,14 @@ export class Clerk implements ClerkInterface {
 
   get version(): string {
     return Clerk.version;
+  }
+
+  get uiVersion(): string | undefined {
+    // `@clerk/ui` publishes its constructor (which carries its package version) on this global when hot-loaded
+    // from the CDN; bundled (no-RHC) builds pass the constructor directly via `options.ui.ClerkUI` instead.
+    const globalCtor = typeof window !== 'undefined' ? window.__internal_ClerkUICtor : undefined;
+    const bundledCtor = this.#options.ui?.ClerkUI;
+    return globalCtor?.version ?? (bundledCtor instanceof Promise ? undefined : bundledCtor?.version);
   }
 
   set sdkMetadata(metadata: SDKMetadata) {
@@ -529,6 +547,7 @@ export class Clerk implements ClerkInterface {
     }
 
     this.#options = this.#initOptions(options);
+    this.#oauthTransport = this.#options.__internal_oauthTransport ?? null;
 
     // Initialize ClerkUI if it was provided
     if (this.#options.ui?.ClerkUI) {
@@ -1897,7 +1916,7 @@ export class Clerk implements ClerkInterface {
 
       if (customNavigate) {
         debugLogger.info(`Clerk is navigating to: ${to}`);
-        return await customNavigate(to, { windowNavigate });
+        return await customNavigate(to, { windowNavigate: this.__internal_windowNavigate });
       }
 
       // No window.location and no custom router - can't navigate
@@ -1936,13 +1955,13 @@ export class Clerk implements ClerkInterface {
 
     // Custom protocol URLs have an origin value of 'null'. In many cases, this indicates deep-linking and we want to ensure the customNavigate function is used if available.
     if ((toURL.origin !== 'null' && toURL.origin !== window.location.origin) || !customNavigate) {
-      windowNavigate(toURL);
+      this.__internal_windowNavigate(toURL);
       return;
     }
 
     const metadata = {
       ...(options?.metadata ? { __internal_metadata: options?.metadata } : {}),
-      windowNavigate,
+      windowNavigate: this.__internal_windowNavigate,
     };
     // React router only wants the path, search or hash portion.
     return await customNavigate(stripOrigin(toURL), metadata);
@@ -2285,7 +2304,7 @@ export class Clerk implements ClerkInterface {
     return null;
   };
 
-  public handleGoogleOneTapCallback = async (
+  public __internal_handleResourceCallback = async (
     signInOrUp: SignInResource | SignUpResource,
     params: HandleOAuthCallbackParams,
     customNavigate?: (to: string) => Promise<unknown>,
@@ -2308,6 +2327,14 @@ export class Clerk implements ClerkInterface {
       signIn,
       navigate,
     });
+  };
+
+  public handleGoogleOneTapCallback = async (
+    signInOrUp: SignInResource | SignUpResource,
+    params: HandleOAuthCallbackParams,
+    customNavigate?: (to: string) => Promise<unknown>,
+  ): Promise<unknown> => {
+    return this.__internal_handleResourceCallback(signInOrUp, params, customNavigate);
   };
 
   private _handleRedirectCallback = async (
@@ -2421,6 +2448,7 @@ export class Clerk implements ClerkInterface {
 
     const signInUrl = params.signInUrl || displayConfig.signInUrl;
     const signUpUrl = params.signUpUrl || displayConfig.signUpUrl;
+    const internalNavigateOnSetActive = params.__internal_navigateOnSetActive;
 
     const setActiveNavigate = async ({
       session,
@@ -2431,6 +2459,15 @@ export class Clerk implements ClerkInterface {
       baseUrl: string;
       redirectUrl: string;
     }) => {
+      if (internalNavigateOnSetActive) {
+        await internalNavigateOnSetActive({
+          session,
+          redirectUrl,
+          decorateUrl: url => this.buildUrlWithAuth(url),
+        });
+        return;
+      }
+
       if (!session.currentTask) {
         await this.navigate(redirectUrl);
         return;
@@ -2446,7 +2483,11 @@ export class Clerk implements ClerkInterface {
       return this.setActive({
         session: si.sessionId,
         navigate: async ({ session }) => {
-          await setActiveNavigate({ session, baseUrl: signInUrl, redirectUrl: redirectUrls.getAfterSignInUrl() });
+          await setActiveNavigate({
+            session,
+            baseUrl: signInUrl,
+            redirectUrl: redirectUrls.getAfterSignInUrl(),
+          });
         },
       });
     }
@@ -2461,7 +2502,11 @@ export class Clerk implements ClerkInterface {
           return this.setActive({
             session: res.createdSessionId,
             navigate: async ({ session }) => {
-              await setActiveNavigate({ session, baseUrl: signUpUrl, redirectUrl: redirectUrls.getAfterSignInUrl() });
+              await setActiveNavigate({
+                session,
+                baseUrl: signUpUrl,
+                redirectUrl: redirectUrls.getAfterSignInUrl(),
+              });
             },
           });
         case 'needs_first_factor':
@@ -2512,7 +2557,11 @@ export class Clerk implements ClerkInterface {
           return this.setActive({
             session: res.createdSessionId,
             navigate: async ({ session }) => {
-              await setActiveNavigate({ session, baseUrl: signUpUrl, redirectUrl: redirectUrls.getAfterSignUpUrl() });
+              await setActiveNavigate({
+                session,
+                baseUrl: signUpUrl,
+                redirectUrl: redirectUrls.getAfterSignUpUrl(),
+              });
             },
           });
         case 'missing_requirements':
@@ -2526,7 +2575,11 @@ export class Clerk implements ClerkInterface {
       return this.setActive({
         session: su.sessionId,
         navigate: async ({ session }) => {
-          await setActiveNavigate({ session, baseUrl: signUpUrl, redirectUrl: redirectUrls.getAfterSignUpUrl() });
+          await setActiveNavigate({
+            session,
+            baseUrl: signUpUrl,
+            redirectUrl: redirectUrls.getAfterSignUpUrl(),
+          });
         },
       });
     }
@@ -3524,6 +3577,21 @@ export class Clerk implements ClerkInterface {
 
     return allowedProtocols;
   }
+
+  /**
+   * Primary `window.location.href` navigation chokepoint for `@clerk/clerk-js` and `@clerk/ui`.
+   * By default the resolved URL is validated against the customer-supplied
+   * `allowedRedirectProtocols` option (the static `ALLOWED_PROTOCOLS` ∪ the customer extension),
+   * so internal callers honor customer protocols automatically.
+   *
+   * Pass `useStaticAllowlistOnly: true` to opt out of the customer extension when a call site
+   * must reject any protocol the customer added. There is no current internal consumer of the
+   * opt-out; it exists for future security-critical paths.
+   */
+  public __internal_windowNavigate = (to: URL | string, opts?: { useStaticAllowlistOnly?: boolean }): void => {
+    const allowedProtocols = opts?.useStaticAllowlistOnly ? ALLOWED_PROTOCOLS : this.#allowedRedirectProtocols;
+    windowNavigate(to, { allowedProtocols });
+  };
 
   #isLoaded(): this is LoadedClerk {
     return this.client !== undefined;

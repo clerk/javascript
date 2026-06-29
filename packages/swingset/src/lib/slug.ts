@@ -1,6 +1,6 @@
 export function toSlug(str: string): string {
   return str
-    .replace(/([A-Z])/g, (m, c, i) => (i > 0 ? '-' : '') + c.toLowerCase())
+    .replace(/([a-z])([A-Z])/g, '$1-$2')
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
     .replace(/^-/, '')

@@ -1,0 +1,123 @@
+import * as AccordionStories from './accordion.stories';
+
+# Accordion
+
+A set of stacked sections where each is toggled by its own heading button, from
+`@clerk/headless`. It is a **headless** primitive: it supplies behavior, single/multiple
+open state, roving-focus keyboard navigation, ARIA wiring, and the expand/collapse
+animation lifecycle, but ships **no styles** — you bring your own CSS by targeting the
+`data-cl-*` attributes each part emits.
+
+## Example
+
+The demo below is intentionally unstyled — it renders the raw primitive so you can see its
+behavior and ARIA wiring. Click a trigger to open its panel; in `single` mode opening one
+closes the others, and arrow keys move focus between triggers.
+
+<Story
+  name='Default'
+  storyModule={AccordionStories}
+/>
+
+## Usage
+
+```tsx
+import { Accordion } from '@clerk/headless/accordion';
+
+<Accordion.Root>
+  <Accordion.Item value='item-1'>
+    <Accordion.Header>
+      <Accordion.Trigger>Section 1</Accordion.Trigger>
+    </Accordion.Header>
+    <Accordion.Panel>Content for section 1</Accordion.Panel>
+  </Accordion.Item>
+  <Accordion.Item value='item-2'>
+    <Accordion.Header>
+      <Accordion.Trigger>Section 2</Accordion.Trigger>
+    </Accordion.Header>
+    <Accordion.Panel>Content for section 2</Accordion.Panel>
+  </Accordion.Item>
+</Accordion.Root>;
+```
+
+### Single (one item open at a time)
+
+```tsx
+<Accordion.Root type='single'>{/* items */}</Accordion.Root>
+```
+
+### Controlled
+
+```tsx
+const [value, setValue] = useState<string[]>(['item-1']);
+
+<Accordion.Root
+  value={value}
+  onValueChange={setValue}
+>
+  {/* items */}
+</Accordion.Root>;
+```
+
+## Parts
+
+| Part                | Default Element | Description                                                 |
+| ------------------- | --------------- | ----------------------------------------------------------- |
+| `Accordion.Root`    | `<div>`         | Root wrapper; owns open-item state and Home/End/arrow nav   |
+| `Accordion.Item`    | `<div>`         | Wraps one section; provides item context (value, open, IDs) |
+| `Accordion.Header`  | `<h3>`          | Heading wrapper for the trigger                             |
+| `Accordion.Trigger` | `<button>`      | Clickable toggle for its item's panel                       |
+| `Accordion.Panel`   | `<div>`         | Collapsible content region for its item                     |
+
+All parts accept a `render` prop for polymorphic rendering and standard HTML
+attributes for their default element. Compound parts throw if used outside their
+parent (`Accordion.*` outside `Root`; `Trigger`/`Header`/`Panel` outside `Item`).
+
+## Props
+
+### `Accordion.Root`
+
+| Prop                       | Type                                   | Default                 | Description                                    |
+| -------------------------- | -------------------------------------- | ----------------------- | ---------------------------------------------- |
+| <code>type</code>          | <code>'single' \| 'multiple'</code>    | <code>'multiple'</code> | `single` keeps at most one item open at a time |
+| <code>value</code>         | <code>string[]</code>                  | —                       | Controlled list of open item values            |
+| <code>defaultValue</code>  | <code>string[]</code>                  | <code>[]</code>         | Initially open item values (uncontrolled)      |
+| <code>onValueChange</code> | <code>(value: string[]) => void</code> | —                       | Called when the set of open items changes      |
+| <code>disabled</code>      | <code>boolean</code>                   | <code>false</code>      | Disable every item                             |
+
+### `Accordion.Item`
+
+| Prop                  | Type                 | Default         | Description                        |
+| --------------------- | -------------------- | --------------- | ---------------------------------- |
+| <code>value</code>    | <code>string</code>  | — (required)    | Unique value identifying this item |
+| <code>disabled</code> | <code>boolean</code> | inherits `Root` | Disable just this item             |
+
+`Accordion.Header`, `Accordion.Trigger`, and `Accordion.Panel` take no additional
+props beyond standard HTML attributes for their default element.
+
+## Styling
+
+Each part emits `data-cl-*` attributes you can target with any CSS solution:
+
+| Attribute                | Applies To           | Description                                         |
+| ------------------------ | -------------------- | --------------------------------------------------- |
+| `data-cl-slot`           | All parts            | Part identifier                                     |
+| `data-cl-open`           | Item, Trigger, Panel | Present when the item is open                       |
+| `data-cl-closed`         | Item, Trigger, Panel | Present when the item is closed                     |
+| `data-cl-disabled`       | Item, Trigger        | Present when the item is disabled                   |
+| `data-cl-starting-style` | Panel                | Present on the entering frame of the open animation |
+| `data-cl-ending-style`   | Panel                | Present during the exit animation before unmount    |
+
+`Accordion.Panel` exposes `--cl-accordion-panel-height` (its measured content height)
+for height-based animations:
+
+```css
+[data-cl-slot='accordion-panel'] {
+  overflow: hidden;
+  height: var(--cl-accordion-panel-height);
+  transition: height 200ms ease;
+}
+[data-cl-slot='accordion-panel'][data-cl-closed] {
+  height: 0;
+}
+```

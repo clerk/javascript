@@ -1,4 +1,4 @@
-/// <reference types="cypress" />
+/// <reference types="cypress" preserve="true" />
 import { type CreateAgentTaskParams, createAgentTestingTask as _createAgentTestingTask } from '../common';
 
 /**

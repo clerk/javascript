@@ -25,13 +25,6 @@ import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
 import { useSubscriberTypeContext } from './SubscriberType';
 
-/**
- * Only remove decimal places if they are '00', to match previous behavior.
- */
-export function normalizeFormatted(formatted: string) {
-  return formatted.endsWith('.00') ? formatted.slice(0, -3) : formatted;
-}
-
 const useBillingHookParams = () => {
   const subscriberType = useSubscriberTypeContext();
   const allowBillingRoutes = useProtect(
@@ -103,6 +96,7 @@ type HandleSelectPlanProps = {
   portalRoot?: HTMLElement | null;
   appearance?: Appearance;
   newSubscriptionRedirectUrl?: string;
+  onSubscriptionComplete?: () => void;
 };
 
 export const usePlansContext = () => {
@@ -347,6 +341,7 @@ export const usePlansContext = () => {
       portalRoot: providedPortalRoot,
       appearance,
       newSubscriptionRedirectUrl,
+      onSubscriptionComplete,
     }: HandleSelectPlanProps) => {
       const portalRoot = providedPortalRoot ?? getClosestProfileScrollBox(mode, event);
 
@@ -359,6 +354,7 @@ export const usePlansContext = () => {
         priceId,
         onSubscriptionComplete: () => {
           revalidateAll();
+          onSubscriptionComplete?.();
         },
         onClose: () => {
           if (session?.id) {

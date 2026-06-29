@@ -1,0 +1,131 @@
+import * as DialogStories from './dialog.stories';
+
+# Dialog
+
+A modal window that overlays the page and traps focus until dismissed, from
+`@clerk/headless`. It is a **headless** primitive: it supplies open state, portalling, an
+overlay surface, a centering viewport with optional body scroll lock, focus management,
+dismissal (outside press / Escape), and ARIA wiring, but ships **no styles** — you bring
+your own CSS by targeting the `data-cl-*` state attributes each part emits.
+
+## Example
+
+The demo below is intentionally unstyled — it renders the raw primitive so you can see its
+behavior and ARIA wiring. Open it, then press Escape or click outside the popup to dismiss.
+
+<Story
+  name='Default'
+  storyModule={DialogStories}
+/>
+
+## Usage
+
+```tsx
+import { Dialog } from '@clerk/headless/dialog';
+
+<Dialog.Root>
+  <Dialog.Trigger>Open</Dialog.Trigger>
+  <Dialog.Portal>
+    <Dialog.Backdrop />
+    <Dialog.Viewport>
+      <Dialog.Popup>
+        <Dialog.Title>Confirm action</Dialog.Title>
+        <Dialog.Description>Are you sure you want to proceed?</Dialog.Description>
+        <Dialog.Close>Cancel</Dialog.Close>
+      </Dialog.Popup>
+    </Dialog.Viewport>
+  </Dialog.Portal>
+</Dialog.Root>;
+```
+
+### Controlled
+
+```tsx
+const [open, setOpen] = useState(false);
+
+<Dialog.Root
+  open={open}
+  onOpenChange={setOpen}
+>
+  {/* trigger + portal */}
+</Dialog.Root>;
+```
+
+### Non-modal (page stays interactive)
+
+```tsx
+<Dialog.Root modal={false}>{/* focus is not trapped and the rest of the page stays interactive */}</Dialog.Root>
+```
+
+## Parts
+
+| Part                 | Default Element | Description                                                         |
+| -------------------- | --------------- | ------------------------------------------------------------------- |
+| `Dialog.Root`        | none (context)  | Owns open state, ARIA ids, modal mode, and the transition lifecycle |
+| `Dialog.Trigger`     | `<button>`      | Toggles the dialog open on click                                    |
+| `Dialog.Portal`      | none (portal)   | Portals its children; renders nothing until mounted                 |
+| `Dialog.Backdrop`    | `<div>`         | Semi-transparent overlay surface behind the popup                   |
+| `Dialog.Viewport`    | `<div>`         | Fixed centering container; owns body scroll lock                    |
+| `Dialog.Popup`       | `<div>`         | The dialog content container (`role="dialog"`, focus-trapped)       |
+| `Dialog.Title`       | `<h2>`          | Heading; wired to the popup's `aria-labelledby`                     |
+| `Dialog.Description` | `<p>`           | Description; wired to the popup's `aria-describedby`                |
+| `Dialog.Close`       | `<button>`      | Closes the dialog on click                                          |
+
+All rendered parts accept a `render` prop for polymorphic rendering and standard HTML
+attributes for their default element. Compound parts throw if used outside `Dialog.Root`.
+`Dialog.Title` and `Dialog.Description` manage their own `id`. `Dialog.Portal` is optional;
+for centered, scroll-locked modal behavior nest `Dialog.Popup` inside `Dialog.Viewport`.
+
+## Props
+
+### `Dialog.Root`
+
+| Prop                      | Type                                 | Default            | Description                                    |
+| ------------------------- | ------------------------------------ | ------------------ | ---------------------------------------------- |
+| <code>open</code>         | <code>boolean</code>                 | —                  | Controlled open state                          |
+| <code>defaultOpen</code>  | <code>boolean</code>                 | <code>false</code> | Initial open state (uncontrolled)              |
+| <code>onOpenChange</code> | <code>(open: boolean) => void</code> | —                  | Called when the open state changes             |
+| <code>modal</code>        | <code>boolean</code>                 | <code>true</code>  | Trap focus and make the rest of the page inert |
+
+### `Dialog.Portal`
+
+| Prop              | Type                                                             | Default                    | Description                      |
+| ----------------- | ---------------------------------------------------------------- | -------------------------- | -------------------------------- |
+| <code>root</code> | <code>HTMLElement \| null \| RefObject&lt;HTMLElement&gt;</code> | <code>document.body</code> | Container element to portal into |
+
+### `Dialog.Viewport`
+
+| Prop                    | Type                 | Default           | Description                               |
+| ----------------------- | -------------------- | ----------------- | ----------------------------------------- |
+| <code>lockScroll</code> | <code>boolean</code> | <code>true</code> | Lock body scroll while the dialog is open |
+
+`Dialog.Trigger`, `Dialog.Backdrop`, `Dialog.Popup`, `Dialog.Title`, `Dialog.Description`,
+and `Dialog.Close` take no additional props beyond standard HTML attributes for their
+default element.
+
+## Styling
+
+The headless parts don't emit `data-cl-slot` — slot identity is applied by the styled
+(Mosaic) layer. Target a part with your own class (or `render` prop) and combine it with
+the `data-cl-*` state attributes each part emits:
+
+| Attribute                | Applies To                         | Description                                       |
+| ------------------------ | ---------------------------------- | ------------------------------------------------- |
+| `data-cl-open`           | Trigger, Backdrop, Viewport, Popup | Present when the dialog is open                   |
+| `data-cl-closed`         | Trigger, Backdrop, Viewport, Popup | Present when closed (still mounted while exiting) |
+| `data-cl-starting-style` | Backdrop, Viewport, Popup          | Present on the entering frame                     |
+| `data-cl-ending-style`   | Backdrop, Viewport, Popup          | Present during the exit animation                 |
+
+The backdrop, viewport, and popup stay mounted through the exit animation, so enter/exit
+transitions are CSS-driven:
+
+```css
+.dialog-popup {
+  opacity: 1;
+  transition: opacity 150ms ease;
+}
+.dialog-popup[data-cl-starting-style],
+.dialog-popup[data-cl-ending-style] {
+  opacity: 0;
+}
+```

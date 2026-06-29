@@ -51,10 +51,15 @@ export const csCZ: LocalizationResource = {
       formButtonPrimary__revoke: 'Zrušit klíč',
       formHint: 'Jste si jisti, že chcete smazat tento tajný klíč?',
       formTitle: 'Zrušit tajný klíč "{{apiKeyName}}"?',
+      inputLabel: undefined,
     },
+    tableHeader__actions: undefined,
+    tableHeader__lastUsed: undefined,
+    tableHeader__name: undefined,
   },
   backButton: 'Zpět',
   badge__activePlan: 'Aktivní',
+  badge__banned: undefined,
   badge__canceledEndsAt: "Zrušeno • Končí {{ date | shortDate('cs-CZ') }}",
   badge__currentPlan: 'Aktuální plán',
   badge__default: 'Výchozí',
@@ -75,11 +80,14 @@ export const csCZ: LocalizationResource = {
   badge__userDevice: 'Zařízení uživatele',
   badge__you: 'Vy',
   billing: {
+    accountCredit: undefined,
     addPaymentMethod__label: 'Přidat platební metodu',
     alwaysFree: 'Vždy zdarma',
     annually: 'Ročně',
     availableFeatures: 'Dostupné funkce',
     billedAnnually: 'Fakturováno ročně',
+    billedAnnuallyOnly: undefined,
+    billedMonthly: undefined,
     billedMonthlyOnly: 'Fakturováno pouze měsíčně',
     cancelFreeTrial: undefined,
     cancelFreeTrialAccessUntil: undefined,
@@ -116,20 +124,25 @@ export const csCZ: LocalizationResource = {
       title__subscriptionSuccessful: 'Úspěch!',
       title__trialSuccess: undefined,
       totalDueAfterTrial: undefined,
+      totalDuePerPeriod: undefined,
     },
     credit: 'Kredit',
     creditRemainder: 'Kredit za zbytek vašeho současného předplatného.',
     defaultFreePlanActive: 'Aktuálně používáte bezplatný plán',
     free: 'Zdarma',
     getStarted: 'Začít',
+    highlightedPlanBadge: 'Populární',
     keepFreeTrial: undefined,
     keepSubscription: 'Ponechat předplatné',
     manage: 'Spravovat',
     manageSubscription: 'Spravovat předplatné',
     month: 'Měsíc',
+    monthAbbreviation: undefined,
+    monthPerUnit: undefined,
     monthly: 'Měsíčně',
     pastDue: 'Po splatnosti',
     pay: 'Zaplatit {{amount}}',
+    payerCreditRemainder: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: 'Roční platba',
@@ -145,12 +158,32 @@ export const csCZ: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Platební metody',
-    highlightedPlanBadge: 'Populární',
     pricingTable: {
       billingCycle: 'Fakturační cyklus',
       included: 'Zahrnuto',
+      seatCost: {
+        additionalSeats: undefined,
+        freeUpToSeats: undefined,
+        includedSeats: undefined,
+        perSeat: undefined,
+        tooltip: {
+          additionalSeatsEach: undefined,
+          firstSeatsIncludedInPlan: undefined,
+          freeForUpToSeats: undefined,
+        },
+        unlimitedSeats: undefined,
+        upToSeats: undefined,
+      },
     },
+    proratedDiscount: undefined,
+    prorationCredit: undefined,
     reSubscribe: 'Znovu se přihlásit',
+    seatBreakdownIncludedPlural: undefined,
+    seatBreakdownIncludedSingular: undefined,
+    seatBreakdownPlural: undefined,
+    seatBreakdownSingular: undefined,
+    seats: undefined,
+    seatsWithLimit: undefined,
     seeAllFeatures: 'Zobrazit všechny funkce',
     startFreeTrial: undefined,
     startFreeTrial__days: undefined,
@@ -171,18 +204,453 @@ export const csCZ: LocalizationResource = {
       trialStartedOn: undefined,
     },
     subtotal: 'Mezisoučet',
+    subtotalRenewal: undefined,
     switchPlan: 'Přepnout na tento plán',
     switchToAnnual: 'Přepnout na roční',
-    switchToAnnualWithAnnualPrice: 'Přepnout na roční {{currency}}{{price}} / rok',
+    switchToAnnualWithAnnualPrice: 'Přepnout na roční {{price}} / rok',
     switchToMonthly: 'Přepnout na měsíční',
-    switchToMonthlyWithPrice: 'Přepnout na měsíční {{currency}}{{price}} / měsíc',
+    switchToMonthlyWithPrice: 'Přepnout na měsíční {{price}} / měsíc',
     totalDue: 'Celkem k zaplacení',
+    totalDuePerPeriod: undefined,
     totalDueToday: 'Celkem k zaplacení dnes',
     viewFeatures: 'Zobrazit funkce',
     viewPayment: undefined,
     year: 'Rok',
+    yearAbbreviation: undefined,
+    yearPerUnit: undefined,
   },
   configureSSO: {
+    configureStep: {
+      attributeMappingTable: {
+        badges: {
+          optional: undefined,
+          required: undefined,
+        },
+      },
+      samlCustom: {
+        assignUsersStep: {
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          title: undefined,
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attributeName: undefined,
+              userProfile: undefined,
+            },
+            rows: {
+              email: {
+                attributeName: undefined,
+                userProfile: undefined,
+              },
+              firstName: {
+                attributeName: undefined,
+                userProfile: undefined,
+              },
+              lastName: {
+                attributeName: undefined,
+                userProfile: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        createAppStep: {
+          createAppInstructions: {
+            paragraph: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+            title: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+      },
+      samlGoogle: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              appAttribute: undefined,
+              googleAttribute: undefined,
+            },
+            rows: {
+              email: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+              firstName: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+              lastName: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+        },
+        configureUserAccess: {
+          assignUsersInstructions: {
+            paragraph1: undefined,
+            paragraph2: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        createAppStep: {
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataFile: {
+            description: undefined,
+            fileUploaded: undefined,
+            label: undefined,
+            removeFile: undefined,
+            replaceFile: undefined,
+            uploadFile: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataFile: undefined,
+            title: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        serviceProviderStep: {
+          headerSubtitle: undefined,
+          nameIdInstructions: {
+            step1: undefined,
+            step2: undefined,
+          },
+          paragraph: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+          title: undefined,
+        },
+      },
+      samlMicrosoft: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attribute: undefined,
+              claimName: undefined,
+              value: undefined,
+            },
+            rows: {
+              email: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+              firstName: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+              lastName: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          title: undefined,
+        },
+        createAppStep: {
+          assignUsersInstructions: {
+            paragraph1: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            step6: undefined,
+            title: undefined,
+          },
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: {
+              label: undefined,
+              subSteps: {
+                appName: undefined,
+                create: undefined,
+                nonGallery: undefined,
+              },
+            },
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+            title: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        serviceProviderStep: {
+          headerSubtitle: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+          step5: undefined,
+          step6: undefined,
+          title: undefined,
+        },
+      },
+      samlOkta: {
+        assignUsersStep: {
+          assignUsersInstructions: {
+            paragraph: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              expression: undefined,
+              name: undefined,
+            },
+            rows: {
+              email: {
+                expression: undefined,
+                name: undefined,
+              },
+              firstName: {
+                expression: undefined,
+                name: undefined,
+              },
+              lastName: {
+                expression: undefined,
+                name: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+        },
+        createAppStep: {
+          completeSamlIntegrationInstructions: {
+            step1: undefined,
+            step2: undefined,
+            title: undefined,
+          },
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+          serviceProviderInstructions: {
+            paragraph1: undefined,
+            paragraph2: undefined,
+            serviceProviderFields: {
+              acsUrl: {
+                label: undefined,
+              },
+              spEntityId: {
+                label: undefined,
+              },
+            },
+            title: undefined,
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+            title: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+      },
+    },
+    confirmation: {
+      configurationSection: {
+        configureAgainLink: undefined,
+        issuerLabel: undefined,
+        ssoUrlLabel: undefined,
+        title: undefined,
+      },
+      domainSection: {
+        title: undefined,
+      },
+      enableSection: {
+        title: undefined,
+      },
+      inactiveBanner: {
+        title: undefined,
+      },
+      resetSection: {
+        confirmationFieldLabel: undefined,
+        submitButton: undefined,
+        title: undefined,
+        warning: undefined,
+      },
+      statusSection: {
+        activeBadge: undefined,
+        inactiveBadge: undefined,
+        title: undefined,
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'Kontaktujte správce vaší organizace pro rozšíření vašich oprávnění.',
       title: 'Nemáte oprávnění ke správě jednotného přihlášení (SSO)',
@@ -190,39 +658,121 @@ export const csCZ: LocalizationResource = {
     navbar: {
       title: 'Nastavit jednotné přihlášení (SSO)',
     },
-    selectProviderStep: {
-      title: 'Vyberte poskytovatele',
-      subtitle: 'Vyberte poskytovatele, pro kterého budete nastavovat SSO.',
-      saml: {
-        groupLabel: 'SAML',
-        okta: 'Okta Workforce',
-        customSaml: 'Vlastní poskytovatel SAML',
+    organizationDomainsStep: {
+      domainCard: {
+        badge__unverified: 'Neověřeno',
+        badge__verified: 'Ověřeno',
+        removeButtonTooltip__lastVerifiedDomain: undefined,
+        removeButtonTooltip__lastVerifiedDomainActive: undefined,
+        txtRecord: {
+          hostLabel: 'Hostitel / Název',
+          instructions:
+            'Přidejte tento záznam TXT u svého poskytovatele DNS. Jakmile bude záznam aktivní, automaticky jej ověříme.',
+          typeLabel: 'Typ',
+          valueLabel: 'Hodnota',
+        },
+        verifiedAtLabel: "Ověřeno {{ date | shortDate('cs-CZ') }}",
       },
+      domainSuggestion: {
+        formButtonPrimary__add: 'Přidat {{domain}}',
+        messageLabel: 'Váš e-mail používá {{domain}}. Chcete jej přidat?',
+      },
+      formButtonPrimary__add: 'Přidat',
+      formFieldInputPlaceholder__domain: 'Přidat doménu',
+      formFieldLabel__domain: 'Doména',
+      removeDomainDialog: {
+        cancelButton: undefined,
+        removeButton: undefined,
+        subtitle__active: undefined,
+        subtitle__inactive: undefined,
+        title: undefined,
+      },
+      subtitle: 'Přidejte a ověřte vlastnictví domén, které vaše organizace používá k přihlášení.',
+      title: 'Přidat domény SSO',
+    },
+    resetConnectionDialog: {
+      cancelButton: undefined,
+      confirmationFieldLabel: undefined,
+      confirmationFieldPlaceholder: undefined,
+      resetButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    selectProviderStep: {
+      saml: {
+        customSaml: 'Vlastní poskytovatel SAML',
+        google: undefined,
+        groupLabel: 'SAML',
+        microsoft: undefined,
+        okta: 'Okta Workforce',
+      },
+      subtitle: 'Vyberte poskytovatele, pro kterého budete nastavovat SSO.',
+      title: 'Vyberte poskytovatele',
       warning: 'Jakmile vyberete poskytovatele, nelze ho změnit, dokud nebude konfigurace dokončena',
     },
-    verifyEmailDomainStep: {
-      title: 'Ověřit e-mailovou adresu',
-      subtitle: 'Ověřte e-mailovou adresu, na které chcete povolit podnikové připojení.',
-      addEmailAddress: {
-        formTitle: 'Potřebujeme váš e-mail',
-        formSubtitle: 'K zahájení budeme potřebovat vaši e-mailovou adresu',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'E-mailová adresa',
-      },
-      emailCode: {
-        formTitle: 'Ověřte svou e-mailovou adresu',
-        formSubtitle: 'Zadejte ověřovací kód odeslaný na {{identifier}}',
-        resendButton: 'Neobdrželi jste kód? Odeslat znovu',
-        verified: {
-          title: 'Máme váš e-mail',
-          subtitle: 'Ověřili jste svou e-mailovou adresu pomocí následujícího e-mailu',
-          inputLabel: 'Ověřená e-mailová adresa',
+    testConfigurationStep: {
+      error__noSuccessfulTestRun: undefined,
+      subtitle: undefined,
+      testResults: {
+        actionLabel__refresh: undefined,
+        empty: {
+          subtitle: undefined,
+          title: undefined,
         },
+        polling: undefined,
+        status__failed: undefined,
+        status__pending: undefined,
+        status__success: undefined,
+        title: undefined,
       },
-      domainTaken: {
-        title: 'Tato doména ({{domain}}) již má SSO připojení',
-        subtitle: 'Kontaktujte administrátora aplikace, abyste získali přístup prostřednictvím stávajícího připojení.',
+      testRunDetails: {
+        howToFix: {
+          actionLabel__viewDocumentation: undefined,
+          oauth_access_denied: {
+            description: undefined,
+          },
+          oauth_fetch_user_error: {
+            intro: undefined,
+            step1: undefined,
+            step2: undefined,
+          },
+          oauth_token_exchange_error: {
+            description: undefined,
+          },
+          saml_email_address_domain_mismatch: {
+            description: undefined,
+          },
+          saml_response_relaystate_missing: {
+            description: undefined,
+          },
+          saml_user_attribute_missing: {
+            intro: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+          },
+          sectionTitle: undefined,
+        },
+        parsedUserInfo: {
+          email: undefined,
+          firstName: undefined,
+          sectionTitle: undefined,
+        },
+        runDetails: {
+          actionLabel__copied: undefined,
+          actionLabel__copy: undefined,
+          errorCode: undefined,
+          fullMessage: undefined,
+          sectionTitle: undefined,
+          status: undefined,
+          timestamp: undefined,
+        },
+        title: undefined,
       },
+      testUrl: {
+        actionLabel__open: undefined,
+      },
+      title: undefined,
     },
   },
   createOrganization: {
@@ -271,6 +821,7 @@ export const csCZ: LocalizationResource = {
   formFieldInputPlaceholder__organizationSlug: 'moje-org',
   formFieldInputPlaceholder__password: 'Zadejte své heslo',
   formFieldInputPlaceholder__phoneNumber: 'Zadejte své telefonní číslo',
+  formFieldInputPlaceholder__signUpPassword: undefined,
   formFieldInputPlaceholder__username: 'Zadejte své uživatelské jméno',
   formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKey: 'API klíč',
@@ -301,6 +852,9 @@ export const csCZ: LocalizationResource = {
   formFieldLabel__role: 'Role',
   formFieldLabel__signOutOfOtherSessions: 'Odhlásit se ze všech ostatních zařízení',
   formFieldLabel__username: 'Uživatelské jméno',
+  identityPreviewEditButton__emailAddress: undefined,
+  identityPreviewEditButton__identifier: undefined,
+  identityPreviewEditButton__phoneNumber: undefined,
   impersonationFab: {
     action__signOut: 'Odhlásit se',
     title: 'Přihlášen jako {{identifier}}',
@@ -310,6 +864,22 @@ export const csCZ: LocalizationResource = {
   membershipRole__admin: 'Správce',
   membershipRole__basicMember: 'Člen',
   membershipRole__guestMember: 'Host',
+  oauthConsent: {
+    action__allow: undefined,
+    action__deny: undefined,
+    offlineAccessNotice: undefined,
+    redirectNotice: undefined,
+    redirectUriModal: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    scopeList: {
+      title: undefined,
+    },
+    subtitle: undefined,
+    viewFullUrl: undefined,
+    warning: undefined,
+  },
   organizationList: {
     action__createOrganization: 'Vytvořit organizaci',
     action__invitationAccept: 'Připojit se',
@@ -327,6 +897,7 @@ export const csCZ: LocalizationResource = {
     },
     badge__automaticInvitation: 'Automatické pozvánky',
     badge__automaticSuggestion: 'Automatické návrhy',
+    badge__enterpriseSso: undefined,
     badge__manualInvitation: 'Žádné automatické přihlášení',
     badge__unverified: 'Nepotvrzené',
     billingPage: {
@@ -364,6 +935,7 @@ export const csCZ: LocalizationResource = {
       statementsSection: {
         empty: 'Žádné výpisy k zobrazení',
         itemCaption__paidForPlan: 'Zaplaceno za plán {{plan}} {{period}}',
+        itemCaption__payerCredit: undefined,
         itemCaption__proratedCredit: 'Poměrný kredit za částečné využití předchozího předplatného',
         itemCaption__subscribedAndPaidForPlan: 'Předplaceno a zaplaceno za plán {{plan}} {{period}}',
         notFound: 'Výpis nenalezen',
@@ -376,6 +948,11 @@ export const csCZ: LocalizationResource = {
         actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'Přihlásit se k plánu',
         actionLabel__switchPlan: 'Změnit plány',
+        includedSeatsUsage: undefined,
+        overview: undefined,
+        paidSeatsUsage: undefined,
+        seatLimit: undefined,
+        seatLimitAndIncludedSeats: undefined,
         tableHeader__edit: 'Upravit',
         tableHeader__plan: 'Plán',
         tableHeader__startDate: 'Datum zahájení',
@@ -398,6 +975,7 @@ export const csCZ: LocalizationResource = {
       detailsTitle__inviteFailed:
         'Pozvánky nebylo možné odeslat. Již existují čekající pozvánky pro následující e-mailové adresy: {{email_addresses}}.',
       formButtonPrimary__continue: 'Odeslat pozvánky',
+      formButtonPrimary__purchaseSeats: undefined,
       selectDropdown__role: 'Vyberte roli',
       subtitle: 'Zadejte nebo vložte jednu nebo více e-mailových adres, oddělených mezerami nebo čárkami.',
       successMessage: 'Pozvánky úspěšně odeslány',
@@ -457,11 +1035,13 @@ export const csCZ: LocalizationResource = {
       description: 'Spravujte svou organizaci.',
       general: 'Obecné',
       members: 'Členové',
+      security: undefined,
       title: 'Organizace',
     },
     plansPage: {
       alerts: {
         noPermissionsToManageBilling: 'Nemáte oprávnění spravovat fakturaci pro tuto organizaci.',
+        planMembershipLimitExceeded: undefined,
       },
       title: 'Plány',
     },
@@ -502,9 +1082,33 @@ export const csCZ: LocalizationResource = {
       successMessage: '{{domain}} byl odstraněn.',
       title: 'Odebrat doménu',
     },
+    securityPage: {
+      removeDialog: {
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      ssoSection: {
+        badge__active: undefined,
+        badge__inProgress: undefined,
+        badge__inactive: undefined,
+        badge__unconfigured: undefined,
+        descriptionLine1: undefined,
+        domainLabel: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__continueConfiguration: undefined,
+        primaryButton__startConfiguration: undefined,
+        title: undefined,
+      },
+      title: undefined,
+    },
     start: {
       headerTitle__general: 'Obecné',
       headerTitle__members: 'Členové',
+      membershipSeatUsageLabel: undefined,
       profileSection: {
         primaryButton: 'Aktualizovat profil',
         title: 'Profil organizace',
@@ -1018,6 +1622,8 @@ export const csCZ: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} je již členem organizace.',
+    api_key_name_already_exists: undefined,
+    api_key_usage_exceeded: undefined,
     avatar_file_size_exceeded: 'Velikost souboru přesahuje maximální limit 10 MB. Vyberte prosím menší soubor.',
     avatar_file_type_invalid:
       'Typ souboru není podporován. Nahrajte prosím obrázek ve formátu JPG, PNG, GIF nebo WEBP.',
@@ -1061,7 +1667,10 @@ export const csCZ: LocalizationResource = {
     form_username_invalid_length: 'Vaše uživatelské jméno musí mít mezi {{min_length}} a {{max_length}} znaky.',
     form_username_needs_non_number_char: 'Uživatelské jméno musí obsahovat alespoň jeden nečíselný znak.',
     identification_deletion_failed: 'Svůj poslední identifikační údaj nelze smazat.',
+    insufficient_seats_change_plan: undefined,
+    insufficient_seats_contact_support: undefined,
     not_allowed_access: undefined,
+    oauth_access_denied: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -1136,6 +1745,9 @@ export const csCZ: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Odhlásit se',
     action__signOutAll: 'Odhlásit se ze všech účtů',
+    label__userButtonPopover: 'Panel účtu',
+    label__accountActions: 'Akce účtu',
+    label__activeSessions: 'Aktivní relace',
   },
   userProfile: {
     apiKeysPage: {
@@ -1192,6 +1804,7 @@ export const csCZ: LocalizationResource = {
       statementsSection: {
         empty: 'Žádné výpisy k zobrazení',
         itemCaption__paidForPlan: 'Zaplaceno za plán {{plan}} {{period}}',
+        itemCaption__payerCredit: undefined,
         itemCaption__proratedCredit: 'Poměrný kredit za částečné využití předchozího předplatného',
         itemCaption__subscribedAndPaidForPlan: 'Předplaceno a zaplaceno za plán {{plan}} {{period}}',
         notFound: 'Výpis nenalezen',
@@ -1204,6 +1817,7 @@ export const csCZ: LocalizationResource = {
         actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'Přihlásit se k plánu',
         actionLabel__switchPlan: 'Změnit plány',
+        overview: undefined,
         tableHeader__edit: 'Upravit',
         tableHeader__plan: 'Plán',
         tableHeader__startDate: 'Datum zahájení',

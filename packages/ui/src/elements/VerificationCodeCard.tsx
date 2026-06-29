@@ -21,6 +21,7 @@ export type VerificationCodeCardProps = {
   alternativeMethodsLabel?: LocalizationKey;
   profileImageUrl?: string;
   badgeText?: LocalizationKey;
+  identityPreviewEditButtonAriaLabel: LocalizationKey;
   onCodeEntryFinishedAction: (
     code: string,
     resolve: () => Promise<void>,
@@ -64,6 +65,7 @@ export const VerificationCodeContent = (props: PropsWithChildren<VerificationCod
           identifier={props.safeIdentifier}
           avatarUrl={props.profileImageUrl}
           onClick={props.onIdentityPreviewEditClicked ? props.onIdentityPreviewEditClicked : undefined}
+          editButtonAriaLabel={props.identityPreviewEditButtonAriaLabel}
         />
       </Header.Root>
       <Card.Alert>{card.error}</Card.Alert>

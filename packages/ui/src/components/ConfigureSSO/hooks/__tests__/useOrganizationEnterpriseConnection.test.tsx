@@ -1,4 +1,3 @@
-import type { EmailAddressResource } from '@clerk/shared/types';
 import { renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -47,6 +46,11 @@ const mutationSpies = vi.hoisted(() => ({
   delete: vi.fn(),
 }));
 
+const domainsState = vi.hoisted(() => ({
+  data: undefined as Array<{ name: string }> | undefined,
+  isLoading: false,
+}));
+
 vi.mock('@clerk/shared/react', () => ({
   __internal_useOrganizationEnterpriseConnections: () => ({
     data: connectionsState.data,
@@ -54,6 +58,14 @@ vi.mock('@clerk/shared/react', () => ({
     createEnterpriseConnection: mutationSpies.create,
     updateEnterpriseConnection: mutationSpies.update,
     deleteEnterpriseConnection: mutationSpies.delete,
+  }),
+  __internal_useOrganizationDomains: () => ({
+    data: domainsState.data,
+    isLoading: domainsState.isLoading,
+    createDomain: vi.fn(),
+    prepareOwnershipVerification: vi.fn(),
+    attemptOwnershipVerification: vi.fn(),
+    revalidate: vi.fn(() => Promise.resolve()),
   }),
   __internal_useOrganizationEnterpriseConnectionTestRuns: (params: { enabled?: boolean }) => {
     testRunsState.calls.push({ enabled: params.enabled });
@@ -79,6 +91,8 @@ import { useOrganizationEnterpriseConnection } from '../useOrganizationEnterpris
 beforeEach(() => {
   connectionsState.data = [];
   connectionsState.isLoading = false;
+  domainsState.data = undefined;
+  domainsState.isLoading = false;
   testRunsState.calls = [];
   testRunsState.isLoading = false;
   testRunsState.isFetching = false;
@@ -171,32 +185,41 @@ describe('useOrganizationEnterpriseConnection — test-runs gating', () => {
 });
 
 describe('useOrganizationEnterpriseConnection — mutations', () => {
-  const emailAddress = (address: string) => ({ emailAddress: address }) as EmailAddressResource;
+  it('createConnection forwards the provider and the organization domains', async () => {
+    domainsState.data = [{ name: 'acme.com' }, { name: 'example.com' }];
 
-  it('createConnection derives name + domains from the email domain and forwards them (no organizationId in body)', async () => {
     const { result } = renderHook(() => useOrganizationEnterpriseConnection());
 
-    await result.current.mutations.createConnection('saml_okta', emailAddress('admin@acme.com'));
+    await result.current.enterpriseConnectionMutations.createConnection('saml_okta');
+
+    expect(mutationSpies.create).toHaveBeenCalledTimes(1);
+    // `name` is derived by FAPI, so it is not sent from the client; `domains`
+    // are the verified organization domains passed straight through by the
+    // caller.
+    expect(mutationSpies.create).toHaveBeenCalledWith({
+      provider: 'saml_okta',
+      domains: ['acme.com', 'example.com'],
+    });
+  });
+
+  it('createConnection forwards undefined domains when the organization has none', async () => {
+    domainsState.data = undefined;
+
+    const { result } = renderHook(() => useOrganizationEnterpriseConnection());
+
+    await result.current.enterpriseConnectionMutations.createConnection('saml_okta');
 
     expect(mutationSpies.create).toHaveBeenCalledTimes(1);
     expect(mutationSpies.create).toHaveBeenCalledWith({
       provider: 'saml_okta',
-      name: 'acme.com',
-      domains: ['acme.com'],
+      domains: undefined,
     });
-  });
-
-  it('createConnection resolves to undefined without creating when no email is available', async () => {
-    const { result } = renderHook(() => useOrganizationEnterpriseConnection());
-
-    await expect(result.current.mutations.createConnection('saml_okta', undefined)).resolves.toBeUndefined();
-    expect(mutationSpies.create).not.toHaveBeenCalled();
   });
 
   it('setConnectionActive forwards only the active flag to update', async () => {
     const { result } = renderHook(() => useOrganizationEnterpriseConnection());
 
-    await result.current.mutations.setConnectionActive('ent_1', true);
+    await result.current.enterpriseConnectionMutations.setConnectionActive('ent_1', true);
 
     expect(mutationSpies.update).toHaveBeenCalledWith('ent_1', { active: true });
   });

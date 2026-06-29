@@ -20,12 +20,14 @@ import { CaptchaChallenge } from '../../../utils/captcha/CaptchaChallenge';
 
 // Mock the CaptchaChallenge module
 vi.mock('../../../utils/captcha/CaptchaChallenge', () => ({
-  CaptchaChallenge: vi.fn().mockImplementation(() => ({
-    managedOrInvisible: vi.fn().mockResolvedValue({
-      captchaToken: 'mock_token',
-      captchaWidgetType: 'invisible',
-    }),
-  })),
+  CaptchaChallenge: vi.fn().mockImplementation(function () {
+    return {
+      managedOrInvisible: vi.fn().mockResolvedValue({
+        captchaToken: 'mock_token',
+        captchaWidgetType: 'invisible',
+      }),
+    };
+  }),
 }));
 
 describe('SignUp', () => {
@@ -33,6 +35,49 @@ describe('SignUp', () => {
     const signUp = new SignUp();
     const snapshot = JSON.stringify(signUp);
     expect(snapshot).toBeDefined();
+  });
+
+  describe('authenticateWithRedirect with an OAuth transport', () => {
+    afterEach(() => {
+      vi.clearAllMocks();
+      SignUp.clerk = {} as any;
+    });
+
+    it('routes through the transport instead of windowNavigate when one is registered', async () => {
+      const open = vi.fn().mockResolvedValue({ callbackUrl: 'myapp://sso-callback' });
+      const handleResourceCallback = vi.fn().mockResolvedValue(undefined);
+      SignUp.clerk = {
+        buildUrlWithAuth: vi.fn(u => u),
+        __internal_oauthTransport: { getRedirectUrl: () => 'myapp://sso-callback', open },
+        __internal_handleResourceCallback: handleResourceCallback,
+        __internal_environment: { displayConfig: { captchaOauthBypass: [] } },
+      } as any;
+
+      const mockFetch = vi.fn().mockResolvedValueOnce({
+        client: null,
+        response: {
+          id: 'signup_123',
+          verifications: {
+            external_account: {
+              status: 'unverified',
+              external_verification_redirect_url: 'https://provider.example/auth',
+            },
+          },
+        },
+      });
+      BaseResource._fetch = mockFetch;
+
+      const signUp = new SignUp();
+      await signUp.authenticateWithRedirect({
+        strategy: 'oauth_google',
+        redirectUrl: '/sso-callback',
+        redirectUrlComplete: '/',
+        __internal_callbackParams: { signInUrl: '/sign-in' },
+      } as any);
+
+      expect(open).toHaveBeenCalledWith(new URL('https://provider.example/auth'));
+      expect(handleResourceCallback).toHaveBeenCalledWith(signUp, { signInUrl: '/sign-in' });
+    });
   });
 
   describe('create', () => {

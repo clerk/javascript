@@ -10,7 +10,7 @@ import type { CustomPage, EnvironmentResource, LoadedClerk } from '@clerk/shared
 
 import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID, USER_PROFILE_NAVBAR_ROUTE_ID } from '../constants';
 import type { NavbarRoute } from '../elements/Navbar';
-import { Building, Code, Connections, CreditCard, ShieldCheck, UserCircle, Users } from '../icons';
+import { Building, Code, CreditCard, ShieldCheck, UserCircle, Users } from '../icons';
 import { localizationKeys } from '../localization';
 import { ExternalElementMounter } from './ExternalElementMounter';
 import { isDevelopmentSDK } from './runtimeEnvironment';
@@ -52,11 +52,11 @@ type CreateCustomPagesParams = {
   getDefaultRoutes: ({
     commerce,
     apiKeys,
-    selfServeSSO,
+    security,
   }: {
     commerce: boolean;
     apiKeys: boolean;
-    selfServeSSO: boolean;
+    security: boolean;
   }) => GetDefaultRoutesReturnType;
   setFirstPathToRoot: (routes: NavbarRoute[]) => NavbarRoute[];
   excludedPathsFromDuplicateWarning: string[];
@@ -118,7 +118,7 @@ const createCustomPages = (
     apiKeys: organization
       ? !disabledOrganizationAPIKeysFeature(clerk, environment)
       : !disabledUserAPIKeysFeature(clerk, environment),
-    selfServeSSO: organization ? shouldShowSelfServeSSO && !disabledSelfServeSSOFeature(clerk, environment) : false,
+    security: organization ? shouldShowSelfServeSSO && !disabledSelfServeSSOFeature(clerk, environment) : false,
   });
 
   if (isDevelopmentSDK(clerk)) {
@@ -328,11 +328,11 @@ const getUserProfileDefaultRoutes = ({
 const getOrganizationProfileDefaultRoutes = ({
   commerce,
   apiKeys,
-  selfServeSSO,
+  security,
 }: {
   commerce: boolean;
   apiKeys: boolean;
-  selfServeSSO: boolean;
+  security: boolean;
 }): GetDefaultRoutesReturnType => {
   const INITIAL_ROUTES: NavbarRoute[] = [
     {
@@ -364,12 +364,12 @@ const getOrganizationProfileDefaultRoutes = ({
       path: 'organization-api-keys',
     });
   }
-  if (selfServeSSO) {
+  if (security) {
     INITIAL_ROUTES.push({
-      name: localizationKeys('organizationProfile.navbar.selfServeSSO'),
-      id: ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.SELF_SERVE_SSO,
-      icon: Connections,
-      path: 'organization-self-serve-sso',
+      name: localizationKeys('organizationProfile.navbar.security'),
+      id: ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.SECURITY,
+      icon: ShieldCheck,
+      path: 'organization-security',
     });
   }
 
