@@ -954,6 +954,40 @@ describe('tokens.authenticateRequest(options)', () => {
     });
   });
 
+  test('cookieToken: logs satellite-domain guidance when satellite sync enters a redirect loop', async () => {
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+    const requestState = await authenticateRequest(
+      mockRequestWithCookies(
+        { ...defaultHeaders, 'sec-fetch-dest': 'document' },
+        {
+          __client_uat: '0',
+          __clerk_redirect_count: '3',
+        },
+        `http://satellite.example/path?__clerk_synced=false`,
+      ),
+      mockOptions({
+        secretKey: 'deadbeef',
+        publishableKey: PK_LIVE,
+        signInUrl: 'https://primary.example/sign-in',
+        isSatellite: true,
+        domain: 'satellite.example',
+      }),
+    );
+
+    expect(requestState).toBeSignedOut({
+      reason: AuthErrorReason.SatelliteCookieNeedsSyncing,
+      isSatellite: true,
+      domain: 'satellite.example',
+      signInUrl: 'https://primary.example/sign-in',
+    });
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Satellite-domain authentication'));
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('configured primary or satellite domain'));
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('preview deployments'));
+
+    consoleSpy.mockRestore();
+  });
+
   test('cookieToken: triggers handshake when satelliteAutoSync is not set but __clerk_synced=false is present - dev', async () => {
     const requestState = await authenticateRequest(
       mockRequestWithCookies(
